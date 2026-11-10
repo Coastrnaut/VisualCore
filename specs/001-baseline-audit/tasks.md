@@ -80,3 +80,12 @@ MVP = US1 (pins and inventory). Then US2 trace, US4 baseline (the archived exit 
 ## Phase 8: Convergence
 
 - [X] T-F019 Fail `scripts/audit_projectm_reference.py` when `External/projectm-ios/Build/ProjectM.xcframework.json` `engineCommit` differs from the `Vendor/projectM` pin (or the framework is absent after the baseline), record `engine_build` in the audit JSON, and rerun the audit per FR-F001 (partial) — Verified 2026-11-10: F02.f00rework-projectm-audit-t019 exit 0; engine_build.engineCommit c88894e == pin
+
+## Phase 9: Convergence
+
+- [X] T-F020 Add `history` to the InventoryRow `kind` enum in `specs/001-baseline-audit/data-model.md` so the data model matches `scripts/inventory_reference.py` output per plan: data-model / FR-F003 (contradicts) — Verified 2026-11-10: data-model.md enum now lists history; matches reference-inventory.json kinds (history: 2 rows)
+
+## Phase 10: Convergence
+
+- [X] T-F021 Declare InventoryRow `detail` as object-or-string in `specs/001-baseline-audit/data-model.md` to match `reference-inventory.json` per plan: data-model (contradicts) — Verified 2026-11-10: data-model.md detail = object or string, matches reference-inventory.json
+- [X] T-F022 Correct BaselineRecord attestation path to `.autonomy/checks/F02.f00rework-*.json` (ledger current-gate rule, ADR-0004) in `specs/001-baseline-audit/data-model.md` per plan: data-model / FR-F008 (contradicts) — Verified 2026-11-10: data-model.md path matches .autonomy/checks/F02.f00rework-*.json (22 files)
