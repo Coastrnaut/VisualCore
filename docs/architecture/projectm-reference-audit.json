@@ -1,0 +1,201 @@
+{
+  "angle_build": {
+    "angleCommit": "29d18232e8031430f1257b7509ceca20d195114d",
+    "deploymentTarget": "26.0",
+    "depotToolsCommit": "c4cdaeebba9b9ed92d041997317ffdbd042158ac",
+    "slices": {
+      "ios-arm64": "target_os=\"ios\" target_environment=\"device\" target_cpu=\"arm64\" is_debug=false is_component_build=false symbol_level=0 angle_enable_metal=true angle_enable_gl=false angle_enable_vulkan=false angle_enable_swiftshader=false angle_enable_null=false angle_enable_wgpu=false angle_build_tests=false ios_enable_code_signing=false ios_deployment_target=\"26.0\" treat_warnings_as_errors=false",
+      "ios-sim-arm64": "target_os=\"ios\" target_environment=\"simulator\" target_cpu=\"arm64\" is_debug=false is_component_build=false symbol_level=0 angle_enable_metal=true angle_enable_gl=false angle_enable_vulkan=false angle_enable_swiftshader=false angle_enable_null=false angle_enable_wgpu=false angle_build_tests=false ios_enable_code_signing=false ios_deployment_target=\"26.0\" treat_warnings_as_errors=false",
+      "ios-sim-x64": "target_os=\"ios\" target_environment=\"simulator\" target_cpu=\"x64\" is_debug=false is_component_build=false symbol_level=0 angle_enable_metal=true angle_enable_gl=false angle_enable_vulkan=false angle_enable_swiftshader=false angle_enable_null=false angle_enable_wgpu=false angle_build_tests=false ios_enable_code_signing=false ios_deployment_target=\"26.0\" treat_warnings_as_errors=false"
+    },
+    "tools": {
+      "xcodebuild": "Xcode 27.2"
+    }
+  },
+  "angle_frameworks": {
+    "libEGL.xcframework": {
+      "path": "External/projectm-ios/Build/ANGLEFrameworks/libEGL.xcframework",
+      "slices": [
+        {
+          "CFBundleShortVersionString": "1.0",
+          "MinimumOSVersion": "26.0",
+          "archs": [
+            "arm64"
+          ],
+          "binary_sha256": "ac15d3db8bb05cd907895037039614b1700b56fe656e53ee09d1bc5dd5a788c1",
+          "exported_egl": 115,
+          "exported_gl": 0,
+          "identifier": "ios-arm64",
+          "platform": "ios",
+          "variant": "device"
+        },
+        {
+          "CFBundleShortVersionString": "1.0",
+          "MinimumOSVersion": "26.0",
+          "archs": [
+            "arm64",
+            "x86_64"
+          ],
+          "binary_sha256": "f9a9f89548673d99cd5dc6a43c32408fe8fa8150309f9fe1e2b097550e958bb5",
+          "exported_egl": 115,
+          "exported_gl": 0,
+          "identifier": "ios-arm64_x86_64-simulator",
+          "platform": "ios",
+          "variant": "simulator"
+        }
+      ]
+    },
+    "libGLESv2.xcframework": {
+      "path": "External/projectm-ios/Build/ANGLEFrameworks/libGLESv2.xcframework",
+      "slices": [
+        {
+          "CFBundleShortVersionString": "1.0",
+          "MinimumOSVersion": "26.0",
+          "archs": [
+            "arm64"
+          ],
+          "binary_sha256": "b5f55d09a5f2f1e00936c33785b8b8ffa0dda412c9617ae7c6223230f85ffbd7",
+          "exported_egl": 0,
+          "exported_gl": 827,
+          "identifier": "ios-arm64",
+          "platform": "ios",
+          "variant": "device"
+        },
+        {
+          "CFBundleShortVersionString": "1.0",
+          "MinimumOSVersion": "26.0",
+          "archs": [
+            "arm64",
+            "x86_64"
+          ],
+          "binary_sha256": "8d4d92e818b9537d15e78a94e182cb215b50fdbfe755a4603796b1cfe00e7786",
+          "exported_egl": 0,
+          "exported_gl": 827,
+          "identifier": "ios-arm64_x86_64-simulator",
+          "platform": "ios",
+          "variant": "simulator"
+        }
+      ]
+    }
+  },
+  "angle_tree_kilobytes": 12111196,
+  "apps": [
+    "CaptureLab",
+    "RendererLab",
+    "projectM-iOS"
+  ],
+  "bridge_sources_sha256": {
+    "Packages/ANGLERendering/Package.swift": "91416687c9ce123776556e4197f1a58d0d1a04b0ffbdcf7d5af1d8d41789657c",
+    "Packages/ANGLERendering/Sources/ANGLERendering/ANGLERenderer.swift": "4ffea095733cb6d43bec6ac4b9190c8c386ef91f751fb51aef0c1f26b66106c6",
+    "Packages/ANGLERendering/Sources/ANGLERendering/PresetPrewarmer.swift": "34379f4767e6d7625b9686416cf0dc2126c207d739f60b423b7f9ca733b9b6b1",
+    "Packages/ANGLERendering/Sources/CANGLE/CANGLE.c": "3206808b30df441ab424395210ec12b38b95ad1fa019f812eef72910bbc02dec",
+    "Packages/ANGLERendering/Sources/CANGLE/include/CANGLE.h": "17b4a0a457cc53d290113146bb16ecccc8730f199ee8c87faca7ed22d5c4dd27",
+    "Packages/ANGLERendering/Tests/ANGLERenderingTests/ANGLERendererTests.swift": "d79a45d8e83e66e670c4f8b7ba5b5b21509f9fb16c51911890374a2ff600b5b1",
+    "Packages/ANGLERendering/Tests/ANGLERenderingTests/FlashLimiterTests.swift": "9ed18f42fa7c21846d934a49fa78d49e97291ade981417e766c8f8968c51ad1a"
+  },
+  "build_scripts": {
+    "build_angle_xcframework.py": true,
+    "build_projectm_xcframework.py": true,
+    "check_compliance.py": true,
+    "check_privacy_manifest.py": true,
+    "generate_gles_loader.py": true,
+    "run_device_tests.py": true,
+    "test_scripts.py": true,
+    "validate_docs.py": true,
+    "verify_environment.py": true
+  },
+  "historical_projectm_commit_c88894e_matches": true,
+  "licenses": {
+    "LICENSE": {
+      "first_line": "MIT License",
+      "sha256": "8981eb38c7608786ce63d6e5c286c1bddf7ec7599e207e77418d1d4753c98852"
+    },
+    "Vendor/angle/LICENSE": {
+      "first_line": "// Copyright 2018 The ANGLE Project Authors.",
+      "sha256": "bf4da21bd20bcfb5b60b7ecc67fa864a79be049e21d6178076887f178dd6c71a"
+    },
+    "Vendor/projectM/COPYING": {
+      "first_line": "/**",
+      "sha256": "f583ba43182a6efd6ee00d2ff59af63a85420a511a762cd68a352576506ce543"
+    },
+    "Vendor/projectM/LICENSE.txt": {
+      "first_line": "GNU LESSER GENERAL PUBLIC LICENSE",
+      "sha256": "0fecfb1582cb164c14e948a4f28447689b3fbf2866d03c09a353c9c5fc93610d"
+    }
+  },
+  "packages": [
+    "ANGLERendering",
+    "AudioCore",
+    "CaptureKit",
+    "CaptureUI",
+    "Diagnostics",
+    "PresetLibrary",
+    "ProjectMBridge",
+    "Rendering"
+  ],
+  "problems": [],
+  "projectm_xcframework_present": false,
+  "reference": {
+    "clean": true,
+    "commit": "1ad0b9953a9f33497005e95b63889a68e34f5a8d",
+    "path": "External/projectm-ios",
+    "superproject_pin": "1ad0b9953a9f33497005e95b63889a68e34f5a8d"
+  },
+  "submodules": {
+    "Vendor/angle": {
+      "branch": "ios",
+      "commit": "29d18232e8031430f1257b7509ceca20d195114d",
+      "described": "(29d18232e8)",
+      "path": "Vendor/angle",
+      "shallow": "true",
+      "url": "https://github.com/Coastrnaut/angle.git"
+    },
+    "Vendor/presets/cream-of-the-crop": {
+      "commit": "0180df21f5e0bd39b9060cc5de420ed2f1f9e509",
+      "described": "(heads/master)",
+      "ignore": "untracked",
+      "path": "Vendor/presets/cream-of-the-crop",
+      "shallow": "true",
+      "url": "https://github.com/projectM-visualizer/presets-cream-of-the-crop.git"
+    },
+    "Vendor/presets/en-d": {
+      "commit": "fff71ea81223109f3558351667eef851f2781c96",
+      "described": "(heads/master)",
+      "ignore": "untracked",
+      "path": "Vendor/presets/en-d",
+      "shallow": "true",
+      "url": "https://github.com/projectM-visualizer/presets-en-d.git"
+    },
+    "Vendor/presets/milkdrop-original": {
+      "commit": "e03b83e3338d8f1ed6cbcf908c719f249ef24288",
+      "described": "(heads/master)",
+      "ignore": "untracked",
+      "path": "Vendor/presets/milkdrop-original",
+      "shallow": "true",
+      "url": "https://github.com/projectM-visualizer/presets-milkdrop-original.git"
+    },
+    "Vendor/presets/milkdrop-texture-pack": {
+      "commit": "6368812f27bc747b517218fbf89d21d59afce4d9",
+      "described": "(heads/master)",
+      "ignore": "untracked",
+      "path": "Vendor/presets/milkdrop-texture-pack",
+      "shallow": "true",
+      "url": "https://github.com/projectM-visualizer/presets-milkdrop-texture-pack.git"
+    },
+    "Vendor/presets/projectm-classic": {
+      "commit": "14a6244a7d32eb7e114e1a92d1cb93358cdcc54a",
+      "described": "(heads/master)",
+      "ignore": "untracked",
+      "path": "Vendor/presets/projectm-classic",
+      "shallow": "true",
+      "url": "https://github.com/projectM-visualizer/presets-projectm-classic.git"
+    },
+    "Vendor/projectM": {
+      "branch": "ios",
+      "commit": "c88894e966b3a862be148466b5d5c6e68d8bb9f1",
+      "described": "(remotes/origin/ios)",
+      "path": "Vendor/projectM",
+      "url": "https://github.com/Coastrnaut/projectm.git"
+    }
+  }
+}

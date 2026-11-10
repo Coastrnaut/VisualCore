@@ -1,0 +1,26 @@
+{
+  "checks": [
+    {
+      "attestation": ".autonomy/checks/F00.device-inventory.json",
+      "command": "python3 scripts/inventory_devices.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F00.device-inventory.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F00.projectm-reference-audit.json",
+      "command": "python3 scripts/audit_projectm_reference.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F00.projectm-reference-audit.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F00.verify-environment.json",
+      "command": "python3 scripts/verify_environment.py --json docs/verification/environment-F00.json",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F00.verify-environment.log"
+    }
+  ],
+  "generated": "2026-11-10T23:16:45+00:00",
+  "method": "deterministic-run-check",
+  "stage": "F00",
+  "status": "pass"
+}

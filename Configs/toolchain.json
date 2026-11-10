@@ -1,0 +1,11 @@
+{
+  "_comment": "Reference build host recorded 2026-11-08 in the owner's ProjectM-iOS ADR-0002; re-verified on this Mac 2026-11-10 (F00). verify_environment.py compares against these; never silently upgrade.",
+  "Xcode": "27.2",
+  "XcodeBuild": "27B52",
+  "SDK": "27.2",
+  "Swift": "6.4.2",
+  "XcodeGen": "2.46.0",
+  "CMake": "4.4.5",
+  "MinPython": "3.10",
+  "SimulatorRuntimes": ["iOS 26.5", "iOS 27.2"]
+}

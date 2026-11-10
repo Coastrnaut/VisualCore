@@ -1,0 +1,1331 @@
+{
+  "created": "2026-11-10T23:13:21+00:00",
+  "order": [
+    "F00",
+    "F01",
+    "F02",
+    "F03",
+    "F04",
+    "F05",
+    "F06",
+    "F07",
+    "F08",
+    "F09",
+    "A01-P00",
+    "A01-P01",
+    "A01-P02",
+    "A01-P03",
+    "A01-P04",
+    "A01-P05",
+    "A01-P06",
+    "A02-P00",
+    "A02-P01",
+    "A02-P02",
+    "A02-P03",
+    "A02-P04",
+    "A02-P05",
+    "A02-P06",
+    "A03-P00",
+    "A03-P01",
+    "A03-P02",
+    "A03-P03",
+    "A03-P04",
+    "A03-P05",
+    "A03-P06",
+    "A04-P00",
+    "A04-P01",
+    "A04-P02",
+    "A04-P03",
+    "A04-P04",
+    "A04-P05",
+    "A04-P06",
+    "A05-P00",
+    "A05-P01",
+    "A05-P02",
+    "A05-P03",
+    "A05-P04",
+    "A05-P05",
+    "A05-P06",
+    "A06-P00",
+    "A06-P01",
+    "A06-P02",
+    "A06-P03",
+    "A06-P04",
+    "A06-P05",
+    "A06-P06",
+    "A07-P00",
+    "A07-P01",
+    "A07-P02",
+    "A07-P03",
+    "A07-P04",
+    "A07-P05",
+    "A07-P06",
+    "A08-P00",
+    "A08-P01",
+    "A08-P02",
+    "A08-P03",
+    "A08-P04",
+    "A08-P05",
+    "A08-P06",
+    "A09-P00",
+    "A09-P01",
+    "A09-P02",
+    "A09-P03",
+    "A09-P04",
+    "A09-P05",
+    "A09-P06",
+    "A10-P00",
+    "A10-P01",
+    "A10-P02",
+    "A10-P03",
+    "A10-P04",
+    "A10-P05",
+    "A10-P06",
+    "A11-P00",
+    "A11-P01",
+    "A11-P02",
+    "A11-P03",
+    "A11-P04",
+    "A11-P05",
+    "A11-P06",
+    "A12-P00",
+    "A12-P01",
+    "A12-P02",
+    "A12-P03",
+    "A12-P04",
+    "A12-P05",
+    "A12-P06",
+    "A13-P00",
+    "A13-P01",
+    "A13-P02",
+    "A13-P03",
+    "A13-P04",
+    "A13-P05",
+    "A13-P06",
+    "A14-P00",
+    "A14-P01",
+    "A14-P02",
+    "A14-P03",
+    "A14-P04",
+    "A14-P05",
+    "A14-P06",
+    "A15-P00",
+    "A15-P01",
+    "A15-P02",
+    "A15-P03",
+    "A15-P04",
+    "A15-P05",
+    "A15-P06",
+    "A16-P00",
+    "A16-P01",
+    "A16-P02",
+    "A16-P03",
+    "A16-P04",
+    "A16-P05",
+    "A16-P06",
+    "A17-P00",
+    "A17-P01",
+    "A17-P02",
+    "A17-P03",
+    "A17-P04",
+    "A17-P05",
+    "A17-P06",
+    "A18-P00",
+    "A18-P01",
+    "A18-P02",
+    "A18-P03",
+    "A18-P04",
+    "A18-P05",
+    "A18-P06",
+    "A19-P00",
+    "A19-P01",
+    "A19-P02",
+    "A19-P03",
+    "A19-P04",
+    "A19-P05",
+    "A19-P06",
+    "A20-P00",
+    "A20-P01",
+    "A20-P02",
+    "A20-P03",
+    "A20-P04",
+    "A20-P05",
+    "A20-P06",
+    "A21-P00",
+    "A21-P01",
+    "A21-P02",
+    "A21-P03",
+    "A21-P04",
+    "A21-P05",
+    "A21-P06",
+    "A22-P00",
+    "A22-P01",
+    "A22-P02",
+    "A22-P03",
+    "A22-P04",
+    "A22-P05",
+    "A22-P06",
+    "A23-P00",
+    "A23-P01",
+    "A23-P02",
+    "A23-P03",
+    "A23-P04",
+    "A23-P05",
+    "A23-P06",
+    "A24-P00",
+    "A24-P01",
+    "A24-P02",
+    "A24-P03",
+    "A24-P04",
+    "A24-P05",
+    "A24-P06",
+    "A25-P00",
+    "A25-P01",
+    "A25-P02",
+    "A25-P03",
+    "A25-P04",
+    "A25-P05",
+    "A25-P06",
+    "IMPLEMENTATION-LOCK",
+    "D1-A01",
+    "D1-A02",
+    "D1-A03",
+    "D1-A04",
+    "D1-A05",
+    "D1-A06",
+    "D1-A07",
+    "D1-A08",
+    "D1-A09",
+    "D1-A10",
+    "D1-A11",
+    "D1-A12",
+    "D1-A13",
+    "D1-A14",
+    "D1-A15",
+    "D1-A16",
+    "D1-A17",
+    "D1-A18",
+    "D1-A19",
+    "D1-A20",
+    "D1-A21",
+    "D1-A22",
+    "D1-A23",
+    "D1-A24",
+    "D1-A25",
+    "D2-A01",
+    "D2-A02",
+    "D2-A03",
+    "D2-A04",
+    "D2-A05",
+    "D2-A06",
+    "D2-A07",
+    "D2-A08",
+    "D2-A09",
+    "D2-A10",
+    "D2-A11",
+    "D2-A12",
+    "D2-A13",
+    "D2-A14",
+    "D2-A15",
+    "D2-A16",
+    "D2-A17",
+    "D2-A18",
+    "D2-A19",
+    "D2-A20",
+    "D2-A21",
+    "D2-A22",
+    "D2-A23",
+    "D2-A24",
+    "D2-A25",
+    "D3-A01",
+    "D3-A02",
+    "D3-A03",
+    "D3-A04",
+    "D3-A05",
+    "D3-A06",
+    "D3-A07",
+    "D3-A08",
+    "D3-A09",
+    "D3-A10",
+    "D3-A11",
+    "D3-A12",
+    "D3-A13",
+    "D3-A14",
+    "D3-A15",
+    "D3-A16",
+    "D3-A17",
+    "D3-A18",
+    "D3-A19",
+    "D3-A20",
+    "D3-A21",
+    "D3-A22",
+    "D3-A23",
+    "D3-A24",
+    "D3-A25",
+    "DEVICE-RECONCILE",
+    "SUITE-FINAL"
+  ],
+  "schema": 1,
+  "stage_order": "foundation, apps, implementation-lock, D1, D2, D3, reconcile, final",
+  "stages": {
+    "A01-P00": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A01-P01": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A01-P02": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A01-P03": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A01-P04": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A01-P05": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A01-P06": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A02-P00": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A02-P01": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A02-P02": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A02-P03": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A02-P04": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A02-P05": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A02-P06": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A03-P00": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A03-P01": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A03-P02": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A03-P03": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A03-P04": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A03-P05": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A03-P06": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A04-P00": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A04-P01": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A04-P02": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A04-P03": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A04-P04": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A04-P05": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A04-P06": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A05-P00": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A05-P01": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A05-P02": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A05-P03": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A05-P04": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A05-P05": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A05-P06": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A06-P00": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A06-P01": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A06-P02": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A06-P03": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A06-P04": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A06-P05": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A06-P06": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A07-P00": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A07-P01": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A07-P02": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A07-P03": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A07-P04": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A07-P05": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A07-P06": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A08-P00": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A08-P01": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A08-P02": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A08-P03": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A08-P04": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A08-P05": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A08-P06": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A09-P00": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A09-P01": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A09-P02": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A09-P03": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A09-P04": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A09-P05": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A09-P06": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A10-P00": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A10-P01": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A10-P02": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A10-P03": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A10-P04": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A10-P05": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A10-P06": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A11-P00": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A11-P01": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A11-P02": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A11-P03": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A11-P04": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A11-P05": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A11-P06": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A12-P00": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A12-P01": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A12-P02": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A12-P03": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A12-P04": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A12-P05": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A12-P06": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A13-P00": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A13-P01": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A13-P02": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A13-P03": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A13-P04": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A13-P05": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A13-P06": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A14-P00": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A14-P01": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A14-P02": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A14-P03": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A14-P04": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A14-P05": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A14-P06": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A15-P00": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A15-P01": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A15-P02": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A15-P03": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A15-P04": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A15-P05": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A15-P06": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A16-P00": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A16-P01": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A16-P02": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A16-P03": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A16-P04": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A16-P05": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A16-P06": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A17-P00": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A17-P01": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A17-P02": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A17-P03": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A17-P04": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A17-P05": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A17-P06": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A18-P00": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A18-P01": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A18-P02": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A18-P03": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A18-P04": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A18-P05": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A18-P06": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A19-P00": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A19-P01": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A19-P02": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A19-P03": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A19-P04": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A19-P05": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A19-P06": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A20-P00": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A20-P01": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A20-P02": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A20-P03": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A20-P04": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A20-P05": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A20-P06": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A21-P00": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A21-P01": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A21-P02": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A21-P03": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A21-P04": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A21-P05": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A21-P06": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A22-P00": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A22-P01": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A22-P02": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A22-P03": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A22-P04": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A22-P05": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A22-P06": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A23-P00": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A23-P01": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A23-P02": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A23-P03": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A23-P04": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A23-P05": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A23-P06": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A24-P00": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A24-P01": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A24-P02": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A24-P03": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A24-P04": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A24-P05": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A24-P06": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A25-P00": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A25-P01": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A25-P02": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A25-P03": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A25-P04": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A25-P05": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "A25-P06": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "D1-A01": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "D1-A02": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "D1-A03": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "D1-A04": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "D1-A05": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "D1-A06": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "D1-A07": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "D1-A08": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "D1-A09": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "D1-A10": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "D1-A11": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "D1-A12": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "D1-A13": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "D1-A14": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "D1-A15": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "D1-A16": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "D1-A17": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "D1-A18": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "D1-A19": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "D1-A20": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "D1-A21": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "D1-A22": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "D1-A23": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "D1-A24": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "D1-A25": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "D2-A01": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "D2-A02": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "D2-A03": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "D2-A04": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "D2-A05": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "D2-A06": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "D2-A07": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "D2-A08": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "D2-A09": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "D2-A10": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "D2-A11": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "D2-A12": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "D2-A13": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "D2-A14": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "D2-A15": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "D2-A16": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "D2-A17": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "D2-A18": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "D2-A19": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "D2-A20": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "D2-A21": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "D2-A22": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "D2-A23": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "D2-A24": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "D2-A25": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "D3-A01": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "D3-A02": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "D3-A03": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "D3-A04": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "D3-A05": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "D3-A06": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "D3-A07": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "D3-A08": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "D3-A09": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "D3-A10": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "D3-A11": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "D3-A12": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "D3-A13": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "D3-A14": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "D3-A15": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "D3-A16": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "D3-A17": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "D3-A18": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "D3-A19": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "D3-A20": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "D3-A21": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "D3-A22": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "D3-A23": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "D3-A24": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "D3-A25": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "DEVICE-RECONCILE": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "F00": {
+      "attempts": [
+        {
+          "at": "2026-11-10T23:16:45+00:00",
+          "evidence": ".autonomy/evidence/F00.json",
+          "result": "pass"
+        }
+      ],
+      "status": "pass"
+    },
+    "F01": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "F02": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "F03": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "F04": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "F05": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "F06": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "F07": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "F08": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "F09": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "IMPLEMENTATION-LOCK": {
+      "attempts": [],
+      "status": "pending"
+    },
+    "SUITE-FINAL": {
+      "attempts": [],
+      "status": "pending"
+    }
+  },
+  "updated": "2026-11-10T23:16:45+00:00"
+}

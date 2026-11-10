@@ -1,0 +1,65 @@
+{
+  "note": "Inventory only (F00). No install/launch/test was performed. Hardware UDIDs kept in .autonomy/private.",
+  "observed_at": "2026-11-10T23:16:07+00:00",
+  "other_physical_devices": 0,
+  "problems": [],
+  "roles": {
+    "D1": {
+      "expected": {
+        "baseline_build": "24A446",
+        "baseline_os": "27.0.1",
+        "name": "iPhone 15",
+        "product_type": "iPhone15,4"
+      },
+      "observed": {
+        "developer_mode": "enabled",
+        "marketing_name": "iPhone 15",
+        "name": "iPhone77",
+        "os_build": "24A446",
+        "os_version": "27.0.1",
+        "pairing": "paired",
+        "product_type": "iPhone15,4",
+        "tunnel": "connected"
+      },
+      "status": "baseline"
+    },
+    "D2": {
+      "expected": {
+        "baseline_build": "24B119",
+        "baseline_os": "27.2",
+        "name": "iPad Pro 13-inch (M5)",
+        "product_type": "iPad17,3"
+      },
+      "observed": {
+        "developer_mode": "enabled",
+        "marketing_name": "iPad Pro 13-inch (M5)",
+        "name": "iPad77",
+        "os_build": "24B119",
+        "os_version": "27.2",
+        "pairing": "paired",
+        "product_type": "iPad17,3",
+        "tunnel": "disconnected"
+      },
+      "status": "baseline"
+    },
+    "D3": {
+      "expected": {
+        "baseline_build": "23F77",
+        "baseline_os": "26.5",
+        "name": "iPad (A16)",
+        "product_type": "iPad15,7"
+      },
+      "observed": {
+        "developer_mode": "enabled",
+        "marketing_name": "iPad (A16)",
+        "name": "iPadC",
+        "os_build": "23F77",
+        "os_version": "26.5",
+        "pairing": "paired",
+        "product_type": "iPad15,7",
+        "tunnel": "disconnected"
+      },
+      "status": "baseline"
+    }
+  }
+}
