@@ -110,7 +110,7 @@ def render(text: str, sdk_version: str) -> tuple[str, str]:
         h.append(f"{ret} {wrapper}({params});")
         ret_kw = "" if ret == "void" else "return "
         c.append(f"{ret} {wrapper}({params}) {{ {ret_kw}vcgl_table.{name}({args}); }}")
-    h += ["", "#endif", ""]
+    h += ["", "/* Hand-written loader over ANGLE's eglGetProcAddress (VCGLLoadFromEGL.c); included here because", " * SwiftPM uses this header as the module's umbrella header. */", '#include "CVisualCoreGLLoad.h"', "", "#endif", ""]
     return "\n".join(h), "\n".join(c) + "\n"
 
 

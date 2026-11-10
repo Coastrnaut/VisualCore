@@ -35,6 +35,9 @@ let package = Package(
         .target(name: "VisualCoreAudio", dependencies: [.product(name: "VisualCoreAudioDSP", package: "VisualCore")],
                 linkerSettings: [.linkedFramework("AVFAudio")]),
         .target(name: "VisualCoreAutomation", dependencies: [.product(name: "VisualCoreDiagnostics", package: "VisualCore")]),
+        .testTarget(name: "VisualCoreRenderingTests",
+                    dependencies: ["VisualCoreRendering", "CVisualCoreGL",
+                                   .product(name: "VisualCoreDiagnostics", package: "VisualCore")]),
     ],
     swiftLanguageModes: [.v6]
 )

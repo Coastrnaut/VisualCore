@@ -25,3 +25,35 @@ python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering \
 ```
 
 Simulator results are functional evidence only; device evidence comes in campaign II.
+
+## Integrating a render view (SC-F204, under 30 lines)
+
+```swift
+import SwiftUI
+import VisualCoreRendering
+
+@MainActor final class PulseScene: RenderScene {
+    func setup(_ context: RenderContext) throws {}
+    func resize(_ context: RenderContext) {}
+    func render(_ context: RenderContext, frame: FrameInfo) throws {
+        let level = Float(0.5 + 0.5 * sin(frame.time))
+        vcglClearColor(level, 0.2, 1 - level, 1)
+        vcglClear(GLbitfield(GL_COLOR_BUFFER_BIT))
+    }
+    func teardown(_ context: RenderContext) {}
+}
+
+struct PulseView: UIViewRepresentable {
+    func makeUIView(context: Context) -> UIView {
+        let host = try! RenderHost(scene: PulseScene())
+        context.coordinator.host = host
+        return host.view
+    }
+    func updateUIView(_ uiView: UIView, context: Context) {}
+    func makeCoordinator() -> Holder { Holder() }
+    final class Holder { var host: RenderHost? }
+}
+```
+
+`vcgl*` functions come from `CVisualCoreGL` (`import CVisualCoreGL`). The host keeps rendering while the
+coordinator holds it, and it suspends in the background on its own.

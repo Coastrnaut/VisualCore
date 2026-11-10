@@ -26,6 +26,8 @@ REF = ROOT / "External" / "projectm-ios"
 DERIVED = ROOT / "Build" / "DerivedData" / "reference"
 RESULTS = ROOT / ".autonomy" / "xcresults"
 TEST_FLAGS = ["-test-timeouts-enabled", "YES", "-default-test-execution-time-allowance", "180"]
+# Unique per run: earlier result bundles are evidence and are never overwritten.
+STAMP = __import__("datetime").datetime.now().strftime("%Y%m%dT%H%M%S")
 ALLOWED_GENERIC = {"generic/platform=iOS", "generic/platform=iOS Simulator"}
 
 
@@ -60,7 +62,7 @@ def steps() -> dict[str, tuple[list[str], Path]]:
     pkg = REF / "Packages" / "ANGLERendering"
     def pkg_test(runtime: str, tag: str) -> list[str]:
         return ["xcodebuild", "test", "-scheme", "ANGLERendering", "-destination", destination(simulator_udid(runtime)),
-                "-derivedDataPath", str(DERIVED / f"pkg-{tag}"), "-resultBundlePath", str(RESULTS / f"F00rework-anglerendering-{tag}.xcresult"),
+                "-derivedDataPath", str(DERIVED / f"pkg-{tag}"), "-resultBundlePath", str(RESULTS / f"reference-anglerendering-{tag}-{STAMP}.xcresult"),
                 "CODE_SIGNING_ALLOWED=NO", *TEST_FLAGS]
     return {
         "engine-xcframework": (["python3", "scripts/build_projectm_xcframework.py"], REF),

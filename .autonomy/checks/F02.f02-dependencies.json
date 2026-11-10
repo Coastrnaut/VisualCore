@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_dependencies.py"
+  ],
+  "command": "python3 scripts/check_dependencies.py",
+  "elapsed_seconds": 0.127,
+  "exit_code": 0,
+  "finished": "2026-11-10T23:55:04+00:00",
+  "log": ".autonomy/logs/F02.f02-dependencies.log",
+  "log_sha256": "3f27e2a429a843f52e7e989c3f9ec98e293f7f57f80707edd183c6474fd643b5",
+  "name": "f02-dependencies",
+  "stage": "F02",
+  "started": "2026-11-10T23:55:03+00:00",
+  "timed_out": false
+}

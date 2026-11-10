@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "python3",
+    "scripts/generate_vcgl.py",
+    "--check"
+  ],
+  "command": "python3 scripts/generate_vcgl.py --check",
+  "elapsed_seconds": 0.044,
+  "exit_code": 0,
+  "finished": "2026-11-10T23:55:03+00:00",
+  "log": ".autonomy/logs/F02.f02-gl-table-current.log",
+  "log_sha256": "a52cc373019f172e5e902c9867b51e8a2a10b4e09e032edc5a2eecd1185f4979",
+  "name": "f02-gl-table-current",
+  "stage": "F02",
+  "started": "2026-11-10T23:55:03+00:00",
+  "timed_out": false
+}

@@ -889,4 +889,8 @@ void vcglVertexAttribPointer(GLuint indx, GLint size, GLenum type, GLboolean nor
 void vcglViewport(GLint x, GLint y, GLsizei width, GLsizei height);
 void vcglWaitSync(GLsync sync, GLbitfield flags, GLuint64 timeout);
 
+/* Hand-written loader over ANGLE's eglGetProcAddress (VCGLLoadFromEGL.c); included here because
+ * SwiftPM uses this header as the module's umbrella header. */
+#include "CVisualCoreGLLoad.h"
+
 #endif
