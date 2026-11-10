@@ -104,6 +104,11 @@
     "validate_docs.py": true,
     "verify_environment.py": true
   },
+  "engine_build": {
+    "deploymentTarget": "26.0",
+    "engineCommit": "c88894e966b3a862be148466b5d5c6e68d8bb9f1",
+    "engineVersion": "4.2.0"
+  },
   "historical_projectm_commit_c88894e_matches": true,
   "licenses": {
     "LICENSE": {

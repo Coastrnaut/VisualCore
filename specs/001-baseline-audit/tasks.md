@@ -76,3 +76,7 @@ description: "Task list for feature 001 — Phase 0 baseline audit (ledger gate 
 ## Implementation Strategy
 
 MVP = US1 (pins and inventory). Then US2 trace, US4 baseline (the archived exit gate "ProjectM builds at the pinned commit"), US3 classification. Stop and record `blocked` on any baseline failure; never weaken the step list.
+
+## Phase 8: Convergence
+
+- [X] T-F019 Fail `scripts/audit_projectm_reference.py` when `External/projectm-ios/Build/ProjectM.xcframework.json` `engineCommit` differs from the `Vendor/projectM` pin (or the framework is absent after the baseline), record `engine_build` in the audit JSON, and rerun the audit per FR-F001 (partial) — Verified 2026-11-10: F02.f00rework-projectm-audit-t019 exit 0; engine_build.engineCommit c88894e == pin
