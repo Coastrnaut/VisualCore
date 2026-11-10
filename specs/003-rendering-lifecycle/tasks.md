@@ -47,7 +47,7 @@ IDs `T-F2##`. Tick only with `— Verified YYYY-MM-DD: <command/result>`. Checks
 - [X] T-F217 (SC-F206) Generic-iOS build of `VisualCoreRendering-Package`; `check_dependencies.py`; `check_compliance.py` — Verified 2026-11-10: F02.f02-rendering-generic-ios BUILD SUCCEEDED; f02-dependencies, f02-compliance exit 0
 - [X] T-F218 (FR-F213, SC-F205) Rerun reference baseline `test-anglerendering-ios27` and `-ios26` + clean check — Verified 2026-11-10: F02.f02-ref-anglerendering-ios27-a2 / -ios26-a2: reference 13/13 TEST SUCCEEDED; clean before/after (a1 exit 64 = result-bundle name reuse, kept)
 - [X] T-F219 (SC-F204) Document < 30-line integration example in `Packages/VisualCoreRendering/README.md` and compile it in a test — Verified 2026-11-10: README example compiled and rendered by ReadmeExampleTests (15th test) on both runtimes
-- [ ] T-F220 Seal and record ledger gate F02 (all F02 checks incl. `f00rework-*`, `f01rework-*`), push to origin
+- [X] T-F220 Seal and record ledger gate F02 (all F02 checks incl. `f00rework-*`, `f01rework-*`), push to origin — Verified 2026-11-10: desktop_runbook.py seal + record F02 (VERIFIED-GATE F02), pushed
 
 ## Dependencies
 

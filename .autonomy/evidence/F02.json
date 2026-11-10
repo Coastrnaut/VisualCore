@@ -1,0 +1,314 @@
+{
+  "checks": [
+    {
+      "attestation": ".autonomy/checks/F02.f00rework-build-capturelab-sim.json",
+      "command": "python3 scripts/run_reference_baseline.py --step build-capturelab-sim",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F02.f00rework-build-capturelab-sim.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F02.f00rework-build-projectm-ios-generic.json",
+      "command": "python3 scripts/run_reference_baseline.py --step build-projectm-ios-generic",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F02.f00rework-build-projectm-ios-generic.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F02.f00rework-build-projectm-ios-sim.json",
+      "command": "python3 scripts/run_reference_baseline.py --step build-projectm-ios-sim",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F02.f00rework-build-projectm-ios-sim.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F02.f00rework-build-rendererlab-sim-attempt2.json",
+      "command": "python3 scripts/run_reference_baseline.py --step build-rendererlab-sim",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F02.f00rework-build-rendererlab-sim-attempt2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F02.f00rework-citations.json",
+      "command": "python3 scripts/inventory_reference.py --check-citations docs/architecture/current-rendering-pipeline.md",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F02.f00rework-citations.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F02.f00rework-clean-after-attempt2.json",
+      "command": "python3 scripts/check_reference_clean.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F02.f00rework-clean-after-attempt2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F02.f00rework-clean-after.json",
+      "command": "python3 scripts/check_reference_clean.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F02.f00rework-clean-after.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F02.f00rework-clean-before.json",
+      "command": "python3 scripts/check_reference_clean.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F02.f00rework-clean-before.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F02.f00rework-compliance.json",
+      "command": "python3 scripts/check_compliance.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F02.f00rework-compliance.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F02.f00rework-device-inventory.json",
+      "command": "python3 scripts/inventory_devices.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F02.f00rework-device-inventory.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F02.f00rework-engine-xcframework.json",
+      "command": "python3 scripts/run_reference_baseline.py --step engine-xcframework",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F02.f00rework-engine-xcframework.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F02.f00rework-env.json",
+      "command": "python3 scripts/verify_environment.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F02.f00rework-env.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F02.f00rework-inventory.json",
+      "command": "python3 scripts/inventory_reference.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F02.f00rework-inventory.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F02.f00rework-projectm-audit-t019.json",
+      "command": "python3 scripts/audit_projectm_reference.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F02.f00rework-projectm-audit-t019.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F02.f00rework-projectm-audit.json",
+      "command": "python3 scripts/audit_projectm_reference.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F02.f00rework-projectm-audit.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F02.f00rework-script-tests.json",
+      "command": "python3 scripts/test_scripts.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F02.f00rework-script-tests.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F02.f00rework-test-anglerendering-ios26.json",
+      "command": "python3 scripts/run_reference_baseline.py --step test-anglerendering-ios26",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F02.f00rework-test-anglerendering-ios26.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F02.f00rework-test-anglerendering-ios27.json",
+      "command": "python3 scripts/run_reference_baseline.py --step test-anglerendering-ios27",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F02.f00rework-test-anglerendering-ios27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F02.f00rework-validate-docs.json",
+      "command": "python3 scripts/validate_docs.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F02.f00rework-validate-docs.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F02.f00rework-xcodegen-main.json",
+      "command": "python3 scripts/run_reference_baseline.py --step xcodegen-main",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F02.f00rework-xcodegen-main.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F02.f00rework-xcodegen-rendererlab.json",
+      "command": "python3 scripts/run_reference_baseline.py --step xcodegen-rendererlab",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F02.f00rework-xcodegen-rendererlab.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F02.f01rework-compliance.json",
+      "command": "python3 scripts/check_compliance.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F02.f01rework-compliance.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F02.f01rework-dependencies.json",
+      "command": "python3 scripts/check_dependencies.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F02.f01rework-dependencies.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F02.f01rework-describe-pure.json",
+      "command": "swift package describe --package-path Packages/VisualCore",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F02.f01rework-describe-pure.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F02.f01rework-describe-rendering.json",
+      "command": "swift package describe --package-path Packages/VisualCoreRendering",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F02.f01rework-describe-rendering.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F02.f01rework-pure-swift-test.json",
+      "command": "swift test --package-path Packages/VisualCore",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F02.f01rework-pure-swift-test.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F02.f01rework-rendering-scaffold-ios-attempt2.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination generic-ios",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F02.f01rework-rendering-scaffold-ios-attempt2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F02.f01rework-rendering-scaffold-sim-attempt2.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination generic-sim",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F02.f01rework-rendering-scaffold-sim-attempt2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F02.f01rework-script-tests.json",
+      "command": "python3 scripts/test_scripts.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F02.f01rework-script-tests.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F02.f01rework-validate-docs.json",
+      "command": "python3 scripts/validate_docs.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F02.f01rework-validate-docs.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F02.f02-compliance.json",
+      "command": "python3 scripts/check_compliance.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F02.f02-compliance.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F02.f02-dependencies.json",
+      "command": "python3 scripts/check_dependencies.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F02.f02-dependencies.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F02.f02-gl-table-current.json",
+      "command": "python3 scripts/generate_vcgl.py --check",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F02.f02-gl-table-current.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F02.f02-pure-swift-test.json",
+      "command": "swift test --package-path Packages/VisualCore",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F02.f02-pure-swift-test.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F02.f02-ref-anglerendering-ios26-a2.json",
+      "command": "python3 scripts/run_reference_baseline.py --step test-anglerendering-ios26",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F02.f02-ref-anglerendering-ios26-a2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F02.f02-ref-anglerendering-ios27-a2.json",
+      "command": "python3 scripts/run_reference_baseline.py --step test-anglerendering-ios27",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F02.f02-ref-anglerendering-ios27-a2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F02.f02-ref-build-projectm-ios-sim.json",
+      "command": "python3 scripts/run_reference_baseline.py --step build-projectm-ios-sim",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F02.f02-ref-build-projectm-ios-sim.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F02.f02-ref-clean-after-a2.json",
+      "command": "python3 scripts/check_reference_clean.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F02.f02-ref-clean-after-a2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F02.f02-ref-clean-after-build.json",
+      "command": "python3 scripts/check_reference_clean.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F02.f02-ref-clean-after-build.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F02.f02-ref-clean-after.json",
+      "command": "python3 scripts/check_reference_clean.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F02.f02-ref-clean-after.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F02.f02-ref-clean-before.json",
+      "command": "python3 scripts/check_reference_clean.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F02.f02-ref-clean-before.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F02.f02-rendering-generic-ios.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination generic-ios",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F02.f02-rendering-generic-ios.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F02.f02-rendering-tests-ios26-a3.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-26.5 --action test --result-name F02-rendering-ios26-a3",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F02.f02-rendering-tests-ios26-a3.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F02.f02-rendering-tests-ios26-a4.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-26.5 --action test --result-name F02-rendering-ios26-a4",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F02.f02-rendering-tests-ios26-a4.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F02.f02-rendering-tests-ios27-a3.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --result-name F02-rendering-ios27-a3",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F02.f02-rendering-tests-ios27-a3.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F02.f02-rendering-tests-ios27-a4.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --result-name F02-rendering-ios27-a4",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F02.f02-rendering-tests-ios27-a4.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F02.f02-script-tests-a2.json",
+      "command": "python3 scripts/test_scripts.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F02.f02-script-tests-a2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F02.f02-script-tests.json",
+      "command": "python3 scripts/test_scripts.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F02.f02-script-tests.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F02.f02-t221-tests-ios26.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-26.5 --action test --result-name F02-t221-ios26",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F02.f02-t221-tests-ios26.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F02.f02-t221-tests-ios27.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --result-name F02-t221-ios27",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F02.f02-t221-tests-ios27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F02.f02-validate-docs.json",
+      "command": "python3 scripts/validate_docs.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F02.f02-validate-docs.log"
+    }
+  ],
+  "generated": "2026-11-10T23:58:12+00:00",
+  "method": "deterministic-run-check",
+  "stage": "F02",
+  "status": "pass"
+}
