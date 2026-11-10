@@ -69,3 +69,7 @@ MVP = US1 (enforced boundaries + scaffolds). No renderer code is migrated (archi
 - [X] T-F114 Add `Packages/VisualCore/README.md` and `Packages/VisualCoreRendering/README.md` (purpose, products, rules R1-R5, test commands) per Constitution v1.1.0 documentation standard (partial) — Verified 2026-11-10: both package READMEs present with products, R2 imports and test commands
 - [X] T-F115 Reconcile R2 in `contracts/package-map.md` with `scripts/check_dependencies.py`: allow `simd` and `Accelerate` (system math available on host and iOS) with rationale per contracts: package-map R2 (contradicts) — Verified 2026-11-10: package-map R2 lists exactly PURE_ALLOWED_SYSTEM of check_dependencies.py (Foundation, Dispatch, os, Darwin, Glibc, _Concurrency, Synchronization, simd, Accelerate; tests XCTest/Testing)
 - [X] T-F116 Record `scripts/xcodebuild_package.py` as the sanctioned package build/test wrapper in `contracts/tests-adapter-submodule-regression.md` per plan: project structure (unrequested) — Verified 2026-11-10: contract test-boundaries section names the wrapper and its guarantees
+
+## Phase 10: Convergence
+
+- [X] T-F117 Align DependencyViolation in `specs/002-architecture-contracts/data-model.md` with checker output (`path` is `file` or `file:line`) per plan: data-model (contradicts) — Verified 2026-11-10: data-model.md matches check_dependencies.py output format
