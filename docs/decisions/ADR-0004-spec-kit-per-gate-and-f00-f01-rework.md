@@ -34,3 +34,12 @@ not met when F00 was sealed.
 5. The hand-written `specs/001-visualcore-foundation` dossier was removed (in git history at
    `a5f2417`). Constitution v1.0.0 stays: it came from the installed `/speckit-constitution`
    skill. The archive's §10.1 constitution prompt is re-run as an amendment check in feature 002.
+
+## Amendment log
+
+- 2026-11-10 — constitution **1.0.0 → 1.1.0** (MINOR), via `/speckit-constitution` with the archive
+  §10.1 prompt. Added Principle II-a (preserve the reference, regression evidence, no in-place
+  extraction) and the API/testing/performance/documentation/release standards section. Expanded II
+  (acyclic small packages, audited boundaries, no silent gitlink change), V (device-only performance
+  claims) and VI (spec/plan/tasks/verification per feature; ADRs). Updated the ID namespaces to
+  ADR-0004. No principle removed.

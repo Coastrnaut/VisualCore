@@ -21,7 +21,19 @@ Rationale: the ANGLE → Metal path is the only renderer with recorded device ev
   scenes, input, timing, optional audio features, diagnostics and test support.
 - ProjectM engine and preset types MUST NOT appear in VisualCore or any of the 25 apps; this is
   verified by package dependency graphs and linked-symbol scans of built products.
-- `External/projectm-ios` is pinned and read-only; engine changes go upstream as logged patches.
+- `External/projectm-ios` is pinned, independently versioned and read-only. Its gitlink, nested
+  pins and third-party sources are never modified silently; engine changes go upstream as logged
+  patches through an owner-approved ADR.
+- Packages are small, independently testable and acyclic. Boundaries are drawn only where the
+  Phase 0 audit of real code supports them (`docs/architecture/reusable-component-inventory.md`).
+
+### II-a. Preserve the Reference and Prove It
+
+- The existing ProjectM-iOS app and its working renderer are preserved unchanged. Any VisualCore
+  reuse of its behavior requires regression evidence: the reference baseline
+  (`docs/verification/projectm-baseline.md`) is rerun when a shared seam changes. Because the
+  submodule is read-only, "extraction" means re-implementing the audited behavior in VisualCore and
+  proving parity, never editing the reference in place.
 
 ### III. Explicit GPU Lifecycle and Thread Ownership
 
@@ -43,6 +55,8 @@ Rationale: the ANGLE → Metal path is the only renderer with recorded device ev
 - Campaign I = F00–F09, 175 app gates, IMPLEMENTATION-LOCK. No physical-device install, launch or
   test happens before `python3 Tools/python/desktop_runbook.py guard-device` passes.
 - Campaign II runs all 25 apps on D1, then D2, then D3 (75 rows). D3 stays on iPadOS 26.5.
+- Performance and GPU-lifecycle claims require physical-device evidence, which exists only in
+  Campaign II; until then such claims are labelled "untested on device".
 
 ### VI. Evidence Over Assertion
 
@@ -50,6 +64,8 @@ Rationale: the ANGLE → Metal path is the only renderer with recorded device ev
 - Tasks are ticked only with `— Verified YYYY-MM-DD: <command/result>`.
 - Simulator results are never performance or compatibility evidence; agent reports are not
   evidence. No fabricated waivers; owner-only steps are recorded as `BLOCKED_OWNER_ACTION`.
+- Every feature has a specification, plan, tasks and verification produced by the full Spec Kit
+  sequence (ADR-0004), and every architecture decision is a dated ADR in `docs/decisions/`.
 
 ### VII. Native, Accessible UI
 
@@ -90,12 +106,31 @@ Rationale: the ANGLE → Metal path is the only renderer with recorded device ev
 - Reference toolchain pins live in `Configs/toolchain.json` and are verified, never silently
   upgraded.
 
+## API, Testing, Performance, Documentation and Release Standards
+
+- **API design:** public symbols are documented, `Sendable`-correct and versioned semantically
+  per package; anything not needed by a consumer is `internal`. Breaking changes need an ADR and a
+  migration note.
+- **Testing:** every public API has host or simulator tests; GPU behavior is verified by pixel
+  readback; regression of the reference baseline runs whenever a shared seam changes.
+- **Performance:** budgets (frame rate floor 30 fps, memory quotas) are specified per feature;
+  measurements count only from physical devices with ≥ 200 samples for percentage criteria.
+- **Licensing:** third-party notices are bundled with each product; LGPL linkage is analysed
+  before distribution; new dependencies need a license review.
+- **Documentation:** each package has a README and API reference; `docs/architecture/` stays in
+  sync with code (validated by `scripts/validate_docs.py`).
+- **Dependencies:** acyclic, pinned, minimal; enforced by dependency and symbol scans.
+- **Release:** a release candidate needs all gates green, a privacy/license audit of the built
+  product and owner approval; App Store actions remain owner-only.
+
 ## Development Workflow
 
 - Spec Kit skills (`.claude/skills/speckit-*`) run inside the Claude Desktop Code session; the
   Claude CLI is never invoked.
-- Each feature uses unique ID namespaces (foundation `FR-F###`/`SC-F###`/`T-F###`; app NN
-  `FR-ANN-###`/`SC-ANN-###`/`T-ANN-###`/`R-ANN-##`), validated by `scripts/validate_docs.py`.
+- One Spec Kit feature per ledger gate with unique ID namespaces (foundation phase *k*
+  `FR-Fk##`/`SC-Fk##`/`T-Fk##`; app NN phase P `FR-ANN-P##`/`SC-ANN-P##`/`T-ANN-P##`), validated by
+  `scripts/validate_docs.py` (ADR-0004). Every command runs with its supplied archive prompt and every
+  feature ends with converge plus its fix loop (`docs/process/speckit-prompt-manifest.json`).
 - Commit locally after verified tasks, LF line endings, no co-author or generator trailers; no
   push to any remote without explicit owner authorization.
 - One writer per repository file; at most 10 concurrent agents; one Xcode/test lane per Mac.
@@ -109,7 +144,7 @@ Rationale: the ANGLE → Metal path is the only renderer with recorded device ev
   `docs/decisions/`.
 - Owner-only decisions (signing, App Store Connect, purchases, remote publication, D3's OS) cannot
   be amended or waived by an agent.
-- Every gate review checks compliance with Principles I–X; `scripts/check_compliance.py` enforces
+- Every gate review checks compliance with Principles I–X (including II-a); `scripts/check_compliance.py` enforces
   the mechanically checkable rules.
 
-**Version**: 1.0.0 | **Ratified**: 2026-11-10 | **Last Amended**: 2026-11-10
+**Version**: 1.1.0 | **Ratified**: 2026-11-10 | **Last Amended**: 2026-11-10
