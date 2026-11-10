@@ -1,0 +1,3 @@
+[submodule "External/projectm-ios"]
+	path = External/projectm-ios
+	url = https://github.com/Coastrnaut/projectm-ios.git
