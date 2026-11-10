@@ -26,6 +26,7 @@ Answered by the agent under the owner's delegated implementation intent (recomme
 - Q: Where may baseline build output be written? → A: Only into the reference's own gitignored outputs, produced by its own scripts (`Build/ProjectM.xcframework`, `Build/ANGLEFrameworks`, the gitignored generated `.xcodeproj`). Xcode DerivedData and result bundles go to VisualCore's gitignored `Build/` and `.autonomy/` directories.
 - Q: Which evidence declares the baseline verified? → A: All of the following, each run through `desktop_runbook.py run-check` with a hashed log: (1) the engine framework built with `scripts/build_projectm_xcframework.py`; (2) `xcodegen generate` for `project.yml` and `RendererLab.yml`; (3) simulator builds of `projectM-iOS`, `CaptureLab` and `RendererLab` plus a generic-iOS unsigned build of `projectM-iOS`; (4) the reference's existing `ANGLERendering` package tests on an iOS simulator; (5) a clean-tree check of the reference before and after.
 - Q: Which simulator runtimes does the baseline smoke cover? → A: iOS 27.2 for the full smoke and iOS 26.5 for the `ANGLERendering` tests, because D3's iOS 26 path is the compatibility floor.
+- Q: Apply the `/speckit-analyze` remediation (U1–U4, E1, T1)? → A: Yes, applied 2026-11-10 under delegation (no CRITICAL findings).
 - Q: Is the existing ANGLE framework reused or rebuilt? → A: Reused when the audit confirms it was built from the pinned ANGLE commit (F00 confirmed this). A rebuild uses only the reference's `scripts/build_angle_xcframework.py`, and only if the audit fails.
 
 ## User Scenarios & Testing *(mandatory)*
@@ -125,17 +126,20 @@ recorded in a baseline report with the exact commit and toolchain.
 ### Functional Requirements
 
 - **FR-F001**: The audit MUST record the superproject gitlink, reference HEAD, every nested
-  submodule pin, fork URL and branch, and verify the projectM and ANGLE forks are the owner's on `ios`.
+  submodule pin, fork URL and branch, and verify the projectM and ANGLE forks are the owner's on `ios`, and that prebuilt ANGLE/engine
+  binaries were built from the pinned commits.
 - **FR-F002**: The audit MUST fail if the reference checkout has tracked modifications before or
   after any audit or baseline step.
 - **FR-F003**: The repository audit MUST inventory source folders, build targets, package
   manifests, project generation files, scripts, tests, CI workflows, dependencies and licenses of
-  the reference, each with its path.
+  the reference, each with its path, including content submodules (preset packs) as content
+  dependencies.
 - **FR-F004**: The rendering-pipeline trace MUST cite path and symbol for app startup to renderer
   initialization, EGL context/surface creation, GL entry-point resolution into ANGLE, the Metal
   backend configuration and the presentation path.
 - **FR-F005**: The trace MUST cover render scheduling, threading, synchronization, resize,
-  orientation, teardown and recreation, labelling anything not settled by source as *unknown*
+  orientation, teardown and recreation, including secondary EGL contexts (the preset prewarmer),
+  labelling anything not settled by source as *unknown*
   with a follow-up task ID.
 - **FR-F006**: The resource inventory MUST list shaders, textures, framebuffers and their
   ownership and cleanup paths in the reference renderer.
@@ -147,7 +151,8 @@ recorded in a baseline report with the exact commit and toolchain.
   script, project generation, simulator builds of its three apps, a generic-iOS unsigned build of
   the visualizer app, and its renderer package tests on iOS 27.2 and 26.5 simulators, with
   toolchain versions, commands, exit codes and log hashes.
-- **FR-F009**: The baseline MUST NOT install, launch or test anything on a physical device; the
+- **FR-F009**: The baseline MUST NOT install, launch or test anything on a physical device (the
+  baseline runner accepts only simulator and generic-iOS destinations and never calls `devicectl`); the
   device inventory is read-only and identifiers stay out of committed files.
 - **FR-F010**: No production source and no submodule revision may change in this feature.
 
@@ -180,5 +185,6 @@ recorded in a baseline report with the exact commit and toolchain.
   reference's own scripts is not a modification of its source (CLAUDE.md §4).
 - XcodeGen output for the reference is written outside the reference checkout, or into its
   gitignored paths only.
+- The reference's preset submodules are initialized (its app build indexes them at build time).
 - The already sealed F00 checks remain valid for what they measured; this feature adds the
   missing deliverables (ADR-0004).
