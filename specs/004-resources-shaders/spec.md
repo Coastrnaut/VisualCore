@@ -14,6 +14,18 @@ through the reference harness, with the engine's shaders and presets unchanged. 
 non-ProjectM demonstration is package tests plus the sample scenes moved onto the new services. Pure
 parts go in the host-testable package. Contract: `specs/002-architecture-contracts/contracts/resources-shaders-errors.md`.
 
+## Clarifications
+
+### Session 2026-11-10
+
+Answered autonomously under the owner's standing approval (CLAUDE.md §2), recommended option chosen.
+
+- Q: Who owns the resource registry? → A: Each render host owns exactly one registry, bound to its context. There is no global registry, because contexts are unshared and objects never cross hosts.
+- Q: What happens to live GPU objects when the context is recreated or lost? → A: Scenes release their objects in `teardown` before recreation. Anything still live afterwards is counted as leaked and then forgotten **without** GL delete calls, because the old context is gone. Every handle of the old generation becomes stale.
+- Q: Which shading language versions are accepted? → A: GLSL ES 3.00 only (`#version 300 es`, added when absent). Any other `#version` line is rejected with a diagnostic, matching the ES 3.0 context.
+- Q: When is a cached program invalidated? → A: The cache key is a SHA-256 of the expanded vertex source, expanded fragment source and sorted defines. The cache is per host, cleared on every recreation, and bounded to 64 programs with least-recently-used eviction (evicted programs are deleted).
+- Q: How are shader and uniform errors reported? → A: Compile/link failures throw `ShaderError.compile`/`.link` carrying the mapped diagnostics, and the registry's `shaderFailures` counter increments. Uniform name/type mismatches are recorded once per program+uniform in the registry's warning list. Neither stops rendering.
+
 ## User Scenarios & Testing *(mandatory)*
 
 Users: developers of the suite apps (25 of them, most with custom shaders and offscreen targets).
@@ -95,12 +107,16 @@ recreation) and verify uniform type mismatches are reported once and not applied
   include cycles and unknown includes, each with a specific error.
 - **FR-F303**: The library MUST add `#version 300 es` when missing, and support named variants via
   `#define` lines inserted after the version line, keeping the line map correct.
-- **FR-F304**: ANGLE compile/link info logs MUST be parsed into diagnostics (file, line, stage,
+- **FR-F304**: Compile/link failures MUST throw errors carrying diagnostics and increment a
+  `shaderFailures` counter. ANGLE compile/link info logs MUST be parsed into diagnostics (file, line, stage,
   severity, message) mapped through the line map; unparseable lines keep the raw message.
 - **FR-F305**: Program creation MUST never replace a working program on failure; failures return
   diagnostics.
-- **FR-F306**: Programs MUST be cached by a hash of sources and defines per context generation, and
-  the cache cleared on recreation.
+- **FR-F306**: Programs MUST be cached by a SHA-256 of expanded sources and sorted defines, per host,
+  cleared on recreation, bounded to 64 programs with least-recently-used eviction.
+- **FR-F316**: Each render host MUST own one registry; on recreation, objects still live after scene
+  teardown are counted as leaked and forgotten without GL calls, and old-generation handles become stale.
+- **FR-F317**: Only GLSL ES 3.00 MUST be accepted; other `#version` lines are rejected with a diagnostic.
 - **FR-F307**: Uniform setters MUST validate the name and type against the program's active uniforms,
   reporting each mismatch once per program and uniform.
 - **FR-F308**: A resource registry MUST create textures, buffers, framebuffers (with color texture)
