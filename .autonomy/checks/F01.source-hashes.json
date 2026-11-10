@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "python3",
+    "scripts/source_hash_report.py"
+  ],
+  "command": "python3 scripts/source_hash_report.py",
+  "elapsed_seconds": 0.032,
+  "exit_code": 0,
+  "finished": "2026-11-10T23:21:44+00:00",
+  "log": ".autonomy/logs/F01.source-hashes.log",
+  "log_sha256": "79d17df724d252007a647d4f49cf89872e629b31ea9cc09a666c8f0029fefbf9",
+  "name": "source-hashes",
+  "stage": "F01",
+  "started": "2026-11-10T23:21:44+00:00",
+  "timed_out": false
+}

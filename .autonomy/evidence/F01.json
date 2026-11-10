@@ -1,0 +1,38 @@
+{
+  "checks": [
+    {
+      "attestation": ".autonomy/checks/F01.compliance.json",
+      "command": "python3 scripts/check_compliance.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F01.compliance.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F01.runbook-validate.json",
+      "command": "python3 Tools/python/desktop_runbook.py validate",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F01.runbook-validate.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F01.script-tests.json",
+      "command": "python3 scripts/test_scripts.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F01.script-tests.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F01.source-hashes.json",
+      "command": "python3 scripts/source_hash_report.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F01.source-hashes.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F01.validate-docs.json",
+      "command": "python3 scripts/validate_docs.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F01.validate-docs.log"
+    }
+  ],
+  "generated": "2026-11-10T23:21:50+00:00",
+  "method": "deterministic-run-check",
+  "stage": "F01",
+  "status": "pass"
+}

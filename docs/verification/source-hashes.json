@@ -1,0 +1,587 @@
+{
+  "readme_sha256": "728e408ff8767ba320db964ab0e4f607fbe15e84021a0bb4c8b572ddcd770f38",
+  "sources": [
+    {
+      "source": "sources/README.md",
+      "sha256": "1ee7e5bdcc7696b0e964dcb8c00178fb479e8246294f5a9b065fa76aa1212c65",
+      "bytes": 58016,
+      "embedded_ok": true,
+      "extracted_ok": true
+    },
+    {
+      "source": "sources/AppsBrainstorm.md",
+      "sha256": "efdcf626fa1b2594dc3f15c3e97b33f4ca8f282c553b463d948f6ff44465ce7f",
+      "bytes": 51518,
+      "embedded_ok": true,
+      "extracted_ok": true
+    },
+    {
+      "source": "apps/01-generative-art-studio.md",
+      "sha256": "557c444d28cf08094ad214e091a0eba5aba344861b5464c767de9ec399b836d9",
+      "bytes": 55738,
+      "embedded_ok": true,
+      "extracted_ok": true,
+      "app": {
+        "number": 1,
+        "slug": "generative-art-studio",
+        "gates": [
+          "A01-P00",
+          "A01-P01",
+          "A01-P02",
+          "A01-P03",
+          "A01-P04",
+          "A01-P05",
+          "A01-P06"
+        ],
+        "spec_dir": "specs/002-app-generative-art-studio"
+      }
+    },
+    {
+      "source": "apps/02-fluid-art-playground.md",
+      "sha256": "99984107b80f6595e34a3e68abca924a5a9525d3d352de0e7dfd672e978cc081",
+      "bytes": 54695,
+      "embedded_ok": true,
+      "extracted_ok": true,
+      "app": {
+        "number": 2,
+        "slug": "fluid-art-playground",
+        "gates": [
+          "A02-P00",
+          "A02-P01",
+          "A02-P02",
+          "A02-P03",
+          "A02-P04",
+          "A02-P05",
+          "A02-P06"
+        ],
+        "spec_dir": "specs/003-app-fluid-art-playground"
+      }
+    },
+    {
+      "source": "apps/03-fractal-explorer.md",
+      "sha256": "8d96a21550b0d5b955c3c8db7d62400323c237d72542fee5c1cfbde5ade4e9a8",
+      "bytes": 54149,
+      "embedded_ok": true,
+      "extracted_ok": true,
+      "app": {
+        "number": 3,
+        "slug": "fractal-explorer",
+        "gates": [
+          "A03-P00",
+          "A03-P01",
+          "A03-P02",
+          "A03-P03",
+          "A03-P04",
+          "A03-P05",
+          "A03-P06"
+        ],
+        "spec_dir": "specs/004-app-fractal-explorer"
+      }
+    },
+    {
+      "source": "apps/04-particle-universe.md",
+      "sha256": "118c17a296c184236da271ad0f539783664d6931fca7ceb389a5916295e5445f",
+      "bytes": 53849,
+      "embedded_ok": true,
+      "extracted_ok": true,
+      "app": {
+        "number": 4,
+        "slug": "particle-universe",
+        "gates": [
+          "A04-P00",
+          "A04-P01",
+          "A04-P02",
+          "A04-P03",
+          "A04-P04",
+          "A04-P05",
+          "A04-P06"
+        ],
+        "spec_dir": "specs/005-app-particle-universe"
+      }
+    },
+    {
+      "source": "apps/05-infinite-geometry.md",
+      "sha256": "329159552c0aeac3b72d859311ef2fad4c61ff14f8c1bdaa2115d188d6ea944e",
+      "bytes": 53262,
+      "embedded_ok": true,
+      "extracted_ok": true,
+      "app": {
+        "number": 5,
+        "slug": "infinite-geometry",
+        "gates": [
+          "A05-P00",
+          "A05-P01",
+          "A05-P02",
+          "A05-P03",
+          "A05-P04",
+          "A05-P05",
+          "A05-P06"
+        ],
+        "spec_dir": "specs/006-app-infinite-geometry"
+      }
+    },
+    {
+      "source": "apps/06-visualcore-music-lab.md",
+      "sha256": "428a8da52129a5976fd396c1367718552b281006eec522abf072843b5da30d28",
+      "bytes": 54507,
+      "embedded_ok": true,
+      "extracted_ok": true,
+      "app": {
+        "number": 6,
+        "slug": "visualcore-music-lab",
+        "gates": [
+          "A06-P00",
+          "A06-P01",
+          "A06-P02",
+          "A06-P03",
+          "A06-P04",
+          "A06-P05",
+          "A06-P06"
+        ],
+        "spec_dir": "specs/007-app-visualcore-music-lab"
+      }
+    },
+    {
+      "source": "apps/07-audio-odyssey.md",
+      "sha256": "2bec53c4b2e23f0536122c1b17cc9a54e1366243eb7ae3ebfa84caf4810266bc",
+      "bytes": 53820,
+      "embedded_ok": true,
+      "extracted_ok": true,
+      "app": {
+        "number": 7,
+        "slug": "audio-odyssey",
+        "gates": [
+          "A07-P00",
+          "A07-P01",
+          "A07-P02",
+          "A07-P03",
+          "A07-P04",
+          "A07-P05",
+          "A07-P06"
+        ],
+        "spec_dir": "specs/008-app-audio-odyssey"
+      }
+    },
+    {
+      "source": "apps/08-oscilloscope-studio.md",
+      "sha256": "4630f888041f2f44ddbd4dd071f857b4e56a87a37d3a5932b319df40d05b3456",
+      "bytes": 53641,
+      "embedded_ok": true,
+      "extracted_ok": true,
+      "app": {
+        "number": 8,
+        "slug": "oscilloscope-studio",
+        "gates": [
+          "A08-P00",
+          "A08-P01",
+          "A08-P02",
+          "A08-P03",
+          "A08-P04",
+          "A08-P05",
+          "A08-P06"
+        ],
+        "spec_dir": "specs/009-app-oscilloscope-studio"
+      }
+    },
+    {
+      "source": "apps/09-digital-aquarium.md",
+      "sha256": "1621d0893b92783555ede8bb72be5828eade9b4e2018bec4d1ca9e991c06868c",
+      "bytes": 53943,
+      "embedded_ok": true,
+      "extracted_ok": true,
+      "app": {
+        "number": 9,
+        "slug": "digital-aquarium",
+        "gates": [
+          "A09-P00",
+          "A09-P01",
+          "A09-P02",
+          "A09-P03",
+          "A09-P04",
+          "A09-P05",
+          "A09-P06"
+        ],
+        "spec_dir": "specs/010-app-digital-aquarium"
+      }
+    },
+    {
+      "source": "apps/10-neon-arcade.md",
+      "sha256": "5dc63ea3cceee8b727f226491018b30392214f6cff171762137dcc28d3f1a2ec",
+      "bytes": 53518,
+      "embedded_ok": true,
+      "extracted_ok": true,
+      "app": {
+        "number": 10,
+        "slug": "neon-arcade",
+        "gates": [
+          "A10-P00",
+          "A10-P01",
+          "A10-P02",
+          "A10-P03",
+          "A10-P04",
+          "A10-P05",
+          "A10-P06"
+        ],
+        "spec_dir": "specs/011-app-neon-arcade"
+      }
+    },
+    {
+      "source": "apps/11-physics-playground.md",
+      "sha256": "8457f8ead485ee91843286ce6b31971c9b0656c6521325598f1481e8a7f0fcf4",
+      "bytes": 53689,
+      "embedded_ok": true,
+      "extracted_ok": true,
+      "app": {
+        "number": 11,
+        "slug": "physics-playground",
+        "gates": [
+          "A11-P00",
+          "A11-P01",
+          "A11-P02",
+          "A11-P03",
+          "A11-P04",
+          "A11-P05",
+          "A11-P06"
+        ],
+        "spec_dir": "specs/012-app-physics-playground"
+      }
+    },
+    {
+      "source": "apps/12-tiny-worlds.md",
+      "sha256": "f6ca998dfd914132e92717a5e3fb1b8426e7c37bb60d4cbc3d148be8d0fb0b1c",
+      "bytes": 52898,
+      "embedded_ok": true,
+      "extracted_ok": true,
+      "app": {
+        "number": 12,
+        "slug": "tiny-worlds",
+        "gates": [
+          "A12-P00",
+          "A12-P01",
+          "A12-P02",
+          "A12-P03",
+          "A12-P04",
+          "A12-P05",
+          "A12-P06"
+        ],
+        "spec_dir": "specs/013-app-tiny-worlds"
+      }
+    },
+    {
+      "source": "apps/13-light-maze.md",
+      "sha256": "5c62ef567f5f855a2d322b0b15b1572cf86aaf4a08772d0505e7f1282bc1d3d8",
+      "bytes": 53224,
+      "embedded_ok": true,
+      "extracted_ok": true,
+      "app": {
+        "number": 13,
+        "slug": "light-maze",
+        "gates": [
+          "A13-P00",
+          "A13-P01",
+          "A13-P02",
+          "A13-P03",
+          "A13-P04",
+          "A13-P05",
+          "A13-P06"
+        ],
+        "spec_dir": "specs/014-app-light-maze"
+      }
+    },
+    {
+      "source": "apps/14-solar-system-explorer.md",
+      "sha256": "03a27d229017a665e883120387e13b5f4b0d26b527db9a53bff4560f083d78a1",
+      "bytes": 54143,
+      "embedded_ok": true,
+      "extracted_ok": true,
+      "app": {
+        "number": 14,
+        "slug": "solar-system-explorer",
+        "gates": [
+          "A14-P00",
+          "A14-P01",
+          "A14-P02",
+          "A14-P03",
+          "A14-P04",
+          "A14-P05",
+          "A14-P06"
+        ],
+        "spec_dir": "specs/015-app-solar-system-explorer"
+      }
+    },
+    {
+      "source": "apps/15-molecular-explorer.md",
+      "sha256": "34563982f72f4bd01d137f12a93f57482f5794642a948b3c7d7ef4bccdd16a41",
+      "bytes": 53661,
+      "embedded_ok": true,
+      "extracted_ok": true,
+      "app": {
+        "number": 15,
+        "slug": "molecular-explorer",
+        "gates": [
+          "A15-P00",
+          "A15-P01",
+          "A15-P02",
+          "A15-P03",
+          "A15-P04",
+          "A15-P05",
+          "A15-P06"
+        ],
+        "spec_dir": "specs/016-app-molecular-explorer"
+      }
+    },
+    {
+      "source": "apps/16-simulation-lab.md",
+      "sha256": "20c7b0bf1325b186860c9e4f142c71e48ddc08e0b207d64fd033f2503fa2271f",
+      "bytes": 54097,
+      "embedded_ok": true,
+      "extracted_ok": true,
+      "app": {
+        "number": 16,
+        "slug": "simulation-lab",
+        "gates": [
+          "A16-P00",
+          "A16-P01",
+          "A16-P02",
+          "A16-P03",
+          "A16-P04",
+          "A16-P05",
+          "A16-P06"
+        ],
+        "spec_dir": "specs/017-app-simulation-lab"
+      }
+    },
+    {
+      "source": "apps/17-interactive-anatomy.md",
+      "sha256": "933ec4e1c78425bd902760855daaed7e6d96e78514153a4baef8fa4e483135eb",
+      "bytes": 53794,
+      "embedded_ok": true,
+      "extracted_ok": true,
+      "app": {
+        "number": 17,
+        "slug": "interactive-anatomy",
+        "gates": [
+          "A17-P00",
+          "A17-P01",
+          "A17-P02",
+          "A17-P03",
+          "A17-P04",
+          "A17-P05",
+          "A17-P06"
+        ],
+        "spec_dir": "specs/018-app-interactive-anatomy"
+      }
+    },
+    {
+      "source": "apps/18-ambient-clock.md",
+      "sha256": "a719c2b74ccc6e83afc3fe612b9f909ea7c38d35e09b044a6422c671e99de57e",
+      "bytes": 53833,
+      "embedded_ok": true,
+      "extracted_ok": true,
+      "app": {
+        "number": 18,
+        "slug": "ambient-clock",
+        "gates": [
+          "A18-P00",
+          "A18-P01",
+          "A18-P02",
+          "A18-P03",
+          "A18-P04",
+          "A18-P05",
+          "A18-P06"
+        ],
+        "spec_dir": "specs/019-app-ambient-clock"
+      }
+    },
+    {
+      "source": "apps/19-living-wallpapers.md",
+      "sha256": "c28927351b3f61c3df108cc4f724478312090130536db31c2283c2f2d7f01e54",
+      "bytes": 54065,
+      "embedded_ok": true,
+      "extracted_ok": true,
+      "app": {
+        "number": 19,
+        "slug": "living-wallpapers",
+        "gates": [
+          "A19-P00",
+          "A19-P01",
+          "A19-P02",
+          "A19-P03",
+          "A19-P04",
+          "A19-P05",
+          "A19-P06"
+        ],
+        "spec_dir": "specs/020-app-living-wallpapers"
+      }
+    },
+    {
+      "source": "apps/20-digital-zen-garden.md",
+      "sha256": "b5bfc3915dc33c2562fc4e508a1a1cf22632ceace842563b64ecd3936b63dfee",
+      "bytes": 53494,
+      "embedded_ok": true,
+      "extracted_ok": true,
+      "app": {
+        "number": 20,
+        "slug": "digital-zen-garden",
+        "gates": [
+          "A20-P00",
+          "A20-P01",
+          "A20-P02",
+          "A20-P03",
+          "A20-P04",
+          "A20-P05",
+          "A20-P06"
+        ],
+        "spec_dir": "specs/021-app-digital-zen-garden"
+      }
+    },
+    {
+      "source": "apps/21-aurora.md",
+      "sha256": "1daca5bd25e29d42ec1d0df35c1d7bbaa25eb97504bf8d37aad852fb5ef2cb19",
+      "bytes": 52674,
+      "embedded_ok": true,
+      "extracted_ok": true,
+      "app": {
+        "number": 21,
+        "slug": "aurora",
+        "gates": [
+          "A21-P00",
+          "A21-P01",
+          "A21-P02",
+          "A21-P03",
+          "A21-P04",
+          "A21-P05",
+          "A21-P06"
+        ],
+        "spec_dir": "specs/022-app-aurora"
+      }
+    },
+    {
+      "source": "apps/22-shader-studio.md",
+      "sha256": "989b136f8e154ffc5ebff722da7af61fb8245534a97edfcca76c8361c3e81c23",
+      "bytes": 54003,
+      "embedded_ok": true,
+      "extracted_ok": true,
+      "app": {
+        "number": 22,
+        "slug": "shader-studio",
+        "gates": [
+          "A22-P00",
+          "A22-P01",
+          "A22-P02",
+          "A22-P03",
+          "A22-P04",
+          "A22-P05",
+          "A22-P06"
+        ],
+        "spec_dir": "specs/023-app-shader-studio"
+      }
+    },
+    {
+      "source": "apps/23-visual-programming-lab.md",
+      "sha256": "a7a4285d56c7a739efb28c22433ea4b5582fcc1013ee3a49adcf376de3e1571c",
+      "bytes": 54149,
+      "embedded_ok": true,
+      "extracted_ok": true,
+      "app": {
+        "number": 23,
+        "slug": "visual-programming-lab",
+        "gates": [
+          "A23-P00",
+          "A23-P01",
+          "A23-P02",
+          "A23-P03",
+          "A23-P04",
+          "A23-P05",
+          "A23-P06"
+        ],
+        "spec_dir": "specs/024-app-visual-programming-lab"
+      }
+    },
+    {
+      "source": "apps/24-graphics-benchmark-lab.md",
+      "sha256": "02488510c4d139cb9131c4ba6dff5f69beddfe8922d64cf5e1ad1413bc5d9f7d",
+      "bytes": 54575,
+      "embedded_ok": true,
+      "extracted_ok": true,
+      "app": {
+        "number": 24,
+        "slug": "graphics-benchmark-lab",
+        "gates": [
+          "A24-P00",
+          "A24-P01",
+          "A24-P02",
+          "A24-P03",
+          "A24-P04",
+          "A24-P05",
+          "A24-P06"
+        ],
+        "spec_dir": "specs/025-app-graphics-benchmark-lab"
+      }
+    },
+    {
+      "source": "apps/25-effects-composer.md",
+      "sha256": "8ce0dd99f2dbfb18dffb06f3de3b13786fd91203dbd19cb0d5136e494e205457",
+      "bytes": 54190,
+      "embedded_ok": true,
+      "extracted_ok": true,
+      "app": {
+        "number": 25,
+        "slug": "effects-composer",
+        "gates": [
+          "A25-P00",
+          "A25-P01",
+          "A25-P02",
+          "A25-P03",
+          "A25-P04",
+          "A25-P05",
+          "A25-P06"
+        ],
+        "spec_dir": "specs/026-app-effects-composer"
+      }
+    },
+    {
+      "source": "sources/VisualCore-25-App-Specs-Index.md",
+      "sha256": "08dd90cd17e1aae43e2e27921f92b7bb5aca0982040c0a93c930fe32bd6cc837",
+      "bytes": 5592,
+      "embedded_ok": true,
+      "extracted_ok": true
+    },
+    {
+      "source": "sources/VisualCore-25-App-Specs/INDEX.md",
+      "sha256": "08dd90cd17e1aae43e2e27921f92b7bb5aca0982040c0a93c930fe32bd6cc837",
+      "bytes": 5592,
+      "embedded_ok": true,
+      "extracted_ok": true
+    },
+    {
+      "source": "sources/VisualCore-25-App-Specs-manifest.json",
+      "sha256": "92f9c683553a83cd97678ffed2935ec494d49a40d185d03e98c34edfbdf98364",
+      "bytes": 6597,
+      "embedded_ok": true,
+      "extracted_ok": true
+    },
+    {
+      "source": "sources/ProjectM-iOS-CLAUDE.md",
+      "sha256": "8f691031510a776b4cef8a6b15597b4176729ab76b66f1702886e1e65f4ae4c1",
+      "bytes": 25405,
+      "embedded_ok": true,
+      "extracted_ok": true
+    },
+    {
+      "source": "sources/devices.md",
+      "sha256": "7ba8f719421a62ce1b67641f0146ca661e65e092226cc4bc9079351f50aaa96e",
+      "bytes": 2871,
+      "embedded_ok": true,
+      "extracted_ok": true
+    },
+    {
+      "source": "sources/Previous-autopilot-runbook.md",
+      "sha256": "492ec9ac2c9b1b7743a66319c1fca6f929491645be61d848f511d52ad4133b09",
+      "bytes": 98820,
+      "embedded_ok": true,
+      "extracted_ok": true
+    }
+  ],
+  "problems": []
+}

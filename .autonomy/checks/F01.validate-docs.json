@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "python3",
+    "scripts/validate_docs.py"
+  ],
+  "command": "python3 scripts/validate_docs.py",
+  "elapsed_seconds": 0.021,
+  "exit_code": 0,
+  "finished": "2026-11-10T23:21:44+00:00",
+  "log": ".autonomy/logs/F01.validate-docs.log",
+  "log_sha256": "7652a57a30f6205753f3713326e4d580deb20a376b6f4d38b9a5b8443191de15",
+  "name": "validate-docs",
+  "stage": "F01",
+  "started": "2026-11-10T23:21:44+00:00",
+  "timed_out": false
+}

@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "python3",
+    "Tools/python/desktop_runbook.py",
+    "validate"
+  ],
+  "command": "python3 Tools/python/desktop_runbook.py validate",
+  "elapsed_seconds": 0.04,
+  "exit_code": 0,
+  "finished": "2026-11-10T23:21:44+00:00",
+  "log": ".autonomy/logs/F01.runbook-validate.log",
+  "log_sha256": "52e994db3a8aa15fa1cc3c7fc0061e3f6b96b9dab4fce8e4c3e44ca9e0ae595a",
+  "name": "runbook-validate",
+  "stage": "F01",
+  "started": "2026-11-10T23:21:44+00:00",
+  "timed_out": false
+}
