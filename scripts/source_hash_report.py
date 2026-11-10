@@ -33,7 +33,7 @@ def main() -> int:
             n = int(am.group(1))
             row["app"] = {"number": n, "slug": am.group(2),
                           "gates": [f"A{n:02d}-P{p:02d}" for p in range(7)],
-                          "spec_dir": f"specs/{n + 1:03d}-app-{am.group(2)}"}
+                          "spec_feature_numbers": [f"{10 + (n - 1) * 7 + ph + 1:03d}" for ph in range(7)]}
         if got != want:
             problems.append(f"{name}: embedded hash mismatch")
         if not ext_ok:

@@ -33,7 +33,15 @@
           "A01-P05",
           "A01-P06"
         ],
-        "spec_dir": "specs/002-app-generative-art-studio"
+        "spec_feature_numbers": [
+          "011",
+          "012",
+          "013",
+          "014",
+          "015",
+          "016",
+          "017"
+        ]
       }
     },
     {
@@ -54,7 +62,15 @@
           "A02-P05",
           "A02-P06"
         ],
-        "spec_dir": "specs/003-app-fluid-art-playground"
+        "spec_feature_numbers": [
+          "018",
+          "019",
+          "020",
+          "021",
+          "022",
+          "023",
+          "024"
+        ]
       }
     },
     {
@@ -75,7 +91,15 @@
           "A03-P05",
           "A03-P06"
         ],
-        "spec_dir": "specs/004-app-fractal-explorer"
+        "spec_feature_numbers": [
+          "025",
+          "026",
+          "027",
+          "028",
+          "029",
+          "030",
+          "031"
+        ]
       }
     },
     {
@@ -96,7 +120,15 @@
           "A04-P05",
           "A04-P06"
         ],
-        "spec_dir": "specs/005-app-particle-universe"
+        "spec_feature_numbers": [
+          "032",
+          "033",
+          "034",
+          "035",
+          "036",
+          "037",
+          "038"
+        ]
       }
     },
     {
@@ -117,7 +149,15 @@
           "A05-P05",
           "A05-P06"
         ],
-        "spec_dir": "specs/006-app-infinite-geometry"
+        "spec_feature_numbers": [
+          "039",
+          "040",
+          "041",
+          "042",
+          "043",
+          "044",
+          "045"
+        ]
       }
     },
     {
@@ -138,7 +178,15 @@
           "A06-P05",
           "A06-P06"
         ],
-        "spec_dir": "specs/007-app-visualcore-music-lab"
+        "spec_feature_numbers": [
+          "046",
+          "047",
+          "048",
+          "049",
+          "050",
+          "051",
+          "052"
+        ]
       }
     },
     {
@@ -159,7 +207,15 @@
           "A07-P05",
           "A07-P06"
         ],
-        "spec_dir": "specs/008-app-audio-odyssey"
+        "spec_feature_numbers": [
+          "053",
+          "054",
+          "055",
+          "056",
+          "057",
+          "058",
+          "059"
+        ]
       }
     },
     {
@@ -180,7 +236,15 @@
           "A08-P05",
           "A08-P06"
         ],
-        "spec_dir": "specs/009-app-oscilloscope-studio"
+        "spec_feature_numbers": [
+          "060",
+          "061",
+          "062",
+          "063",
+          "064",
+          "065",
+          "066"
+        ]
       }
     },
     {
@@ -201,7 +265,15 @@
           "A09-P05",
           "A09-P06"
         ],
-        "spec_dir": "specs/010-app-digital-aquarium"
+        "spec_feature_numbers": [
+          "067",
+          "068",
+          "069",
+          "070",
+          "071",
+          "072",
+          "073"
+        ]
       }
     },
     {
@@ -222,7 +294,15 @@
           "A10-P05",
           "A10-P06"
         ],
-        "spec_dir": "specs/011-app-neon-arcade"
+        "spec_feature_numbers": [
+          "074",
+          "075",
+          "076",
+          "077",
+          "078",
+          "079",
+          "080"
+        ]
       }
     },
     {
@@ -243,7 +323,15 @@
           "A11-P05",
           "A11-P06"
         ],
-        "spec_dir": "specs/012-app-physics-playground"
+        "spec_feature_numbers": [
+          "081",
+          "082",
+          "083",
+          "084",
+          "085",
+          "086",
+          "087"
+        ]
       }
     },
     {
@@ -264,7 +352,15 @@
           "A12-P05",
           "A12-P06"
         ],
-        "spec_dir": "specs/013-app-tiny-worlds"
+        "spec_feature_numbers": [
+          "088",
+          "089",
+          "090",
+          "091",
+          "092",
+          "093",
+          "094"
+        ]
       }
     },
     {
@@ -285,7 +381,15 @@
           "A13-P05",
           "A13-P06"
         ],
-        "spec_dir": "specs/014-app-light-maze"
+        "spec_feature_numbers": [
+          "095",
+          "096",
+          "097",
+          "098",
+          "099",
+          "100",
+          "101"
+        ]
       }
     },
     {
@@ -306,7 +410,15 @@
           "A14-P05",
           "A14-P06"
         ],
-        "spec_dir": "specs/015-app-solar-system-explorer"
+        "spec_feature_numbers": [
+          "102",
+          "103",
+          "104",
+          "105",
+          "106",
+          "107",
+          "108"
+        ]
       }
     },
     {
@@ -327,7 +439,15 @@
           "A15-P05",
           "A15-P06"
         ],
-        "spec_dir": "specs/016-app-molecular-explorer"
+        "spec_feature_numbers": [
+          "109",
+          "110",
+          "111",
+          "112",
+          "113",
+          "114",
+          "115"
+        ]
       }
     },
     {
@@ -348,7 +468,15 @@
           "A16-P05",
           "A16-P06"
         ],
-        "spec_dir": "specs/017-app-simulation-lab"
+        "spec_feature_numbers": [
+          "116",
+          "117",
+          "118",
+          "119",
+          "120",
+          "121",
+          "122"
+        ]
       }
     },
     {
@@ -369,7 +497,15 @@
           "A17-P05",
           "A17-P06"
         ],
-        "spec_dir": "specs/018-app-interactive-anatomy"
+        "spec_feature_numbers": [
+          "123",
+          "124",
+          "125",
+          "126",
+          "127",
+          "128",
+          "129"
+        ]
       }
     },
     {
@@ -390,7 +526,15 @@
           "A18-P05",
           "A18-P06"
         ],
-        "spec_dir": "specs/019-app-ambient-clock"
+        "spec_feature_numbers": [
+          "130",
+          "131",
+          "132",
+          "133",
+          "134",
+          "135",
+          "136"
+        ]
       }
     },
     {
@@ -411,7 +555,15 @@
           "A19-P05",
           "A19-P06"
         ],
-        "spec_dir": "specs/020-app-living-wallpapers"
+        "spec_feature_numbers": [
+          "137",
+          "138",
+          "139",
+          "140",
+          "141",
+          "142",
+          "143"
+        ]
       }
     },
     {
@@ -432,7 +584,15 @@
           "A20-P05",
           "A20-P06"
         ],
-        "spec_dir": "specs/021-app-digital-zen-garden"
+        "spec_feature_numbers": [
+          "144",
+          "145",
+          "146",
+          "147",
+          "148",
+          "149",
+          "150"
+        ]
       }
     },
     {
@@ -453,7 +613,15 @@
           "A21-P05",
           "A21-P06"
         ],
-        "spec_dir": "specs/022-app-aurora"
+        "spec_feature_numbers": [
+          "151",
+          "152",
+          "153",
+          "154",
+          "155",
+          "156",
+          "157"
+        ]
       }
     },
     {
@@ -474,7 +642,15 @@
           "A22-P05",
           "A22-P06"
         ],
-        "spec_dir": "specs/023-app-shader-studio"
+        "spec_feature_numbers": [
+          "158",
+          "159",
+          "160",
+          "161",
+          "162",
+          "163",
+          "164"
+        ]
       }
     },
     {
@@ -495,7 +671,15 @@
           "A23-P05",
           "A23-P06"
         ],
-        "spec_dir": "specs/024-app-visual-programming-lab"
+        "spec_feature_numbers": [
+          "165",
+          "166",
+          "167",
+          "168",
+          "169",
+          "170",
+          "171"
+        ]
       }
     },
     {
@@ -516,7 +700,15 @@
           "A24-P05",
           "A24-P06"
         ],
-        "spec_dir": "specs/025-app-graphics-benchmark-lab"
+        "spec_feature_numbers": [
+          "172",
+          "173",
+          "174",
+          "175",
+          "176",
+          "177",
+          "178"
+        ]
       }
     },
     {
@@ -537,7 +729,15 @@
           "A25-P05",
           "A25-P06"
         ],
-        "spec_dir": "specs/026-app-effects-composer"
+        "spec_feature_numbers": [
+          "179",
+          "180",
+          "181",
+          "182",
+          "183",
+          "184",
+          "185"
+        ]
       }
     },
     {

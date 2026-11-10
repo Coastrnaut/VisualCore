@@ -25,8 +25,13 @@ TOKEN = re.compile(r"\[[A-Z][A-Z0-9_]{2,}\]")
 
 
 def namespace(feature_dir: Path) -> str:
-    num = feature_dir.name.split("-", 1)[0]
-    return "F" if num == "001" else f"A{int(num) - 1:02d}-"
+    """Feature numbering (ADR-0004): 001-010 = foundation phases F00-F09 (IDs F<phase>##);
+    011-185 = app NN phase P, number 10 + (NN-1)*7 + P + 1 (IDs ANN-<P>##)."""
+    num = int(feature_dir.name.split("-", 1)[0])
+    if num <= 10:
+        return f"F{num - 1}"
+    idx = num - 11
+    return f"A{idx // 7 + 1:02d}-{idx % 7}"
 
 
 def validate(root: Path = ROOT) -> list[str]:

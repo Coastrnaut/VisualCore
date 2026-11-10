@@ -19,10 +19,8 @@ the installed skills or workflow; the `specify` executable is not on PATH.
    machine paths; the attestation JSON keeps their SHA-256 so tampering is detectable.
 3. **Spec Kit is not re-initialized.** The existing installation is used through the
    model-invocable `.claude/skills/speckit-*` skills inside the Desktop session (VC-009).
-4. One feature dossier per foundation (`specs/001-visualcore-foundation/`) and per app
-   (`specs/0NN-app-<slug>/`); ledger stage IDs map onto phases inside each dossier (README §5.3).
-5. ID namespaces: foundation `FR-F###`, `SC-F###`, `T-F###`; app *NN* uses `FR-ANN-###`,
-   `SC-ANN-###`, `T-ANN-###`, `R-ANN-##` so `scripts/validate_docs.py` can detect collisions.
+4. Feature dossier layout: superseded by ADR-0004.
+5. ID namespaces and feature numbering: superseded by ADR-0004 (one feature per gate).
 
 ## Consequences
 

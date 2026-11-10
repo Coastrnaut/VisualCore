@@ -82,7 +82,7 @@ class DocsTests(unittest.TestCase):
     def test_namespace(self):
         with tempfile.TemporaryDirectory() as t:
             d = Path(t)
-            self.make(d, "- **FR-A01-001**: wrong namespace\n")
+            self.make(d, "- **FR-F101**: phase 1 id inside the phase 0 feature\n")
             self.assertTrue(any("namespace" in p for p in docs.validate(d)))
 
 
