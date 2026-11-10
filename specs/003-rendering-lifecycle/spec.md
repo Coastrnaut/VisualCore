@@ -14,6 +14,18 @@ host re-implements the audited EGL sequence per `specs/002-architecture-contract
 parity is shown by simulator pixel tests, and the reference baseline renderer tests rerun as the
 regression. ProjectM call-site migration is done by the F07 harness.
 
+## Clarifications
+
+### Session 2026-11-10
+
+Answered autonomously under the owner's standing approval (CLAUDE.md §2), recommended option chosen.
+
+- Q: Who suspends rendering when the app goes to the background? → A: The host does it itself. It observes the app entering the background (suspend, after finishing pending GPU work) and returning to the foreground (resume), because iOS forbids GPU work in the background. Apps can additionally pause and resume explicitly (e.g. a user pause); an app-requested pause survives a foreground return.
+- Q: When is the context recreated outside tests? → A: On explicit request (API, test hook) and automatically when EGL reports a lost context after a swap or make-current; both go through `reinitialized`.
+- Q: What happens when window-surface creation keeps failing? → A: The host stays `surfaceInvalid` and retries on each layout. After 3 consecutive failures it reports an `allocation` error to observers once, then keeps retrying silently on later layouts.
+- Q: What happens when a scene's setup throws? → A: The host records the error and reports it to observers. It stays alive and presents a clear (black) frame instead of the scene until a later recreation or scene replacement succeeds; it never crashes.
+- Q: Can several hosts exist at once, and who owns the EGL display? → A: Yes. Each host owns its own unshared context and surfaces; all of them live on the main thread. The ANGLE Metal display is process-wide, initialized once and never terminated, exactly as in the reference (which never calls `eglTerminate`), because terminating it would invalidate other hosts' contexts.
+
 ## User Scenarios & Testing *(mandatory)*
 
 Users: app developers adding a GPU view to any of the 25 apps or the Showcase.
@@ -79,7 +91,9 @@ simulator tests of observer callbacks and pacing decisions computed from given t
 
 - No ES3-capable configuration or missing GL entry points: creation fails with an `unsupported`
   error; nothing crashes.
-- Window-surface creation fails: *surfaceInvalid*, retried on the next layout.
+- Window-surface creation fails: *surfaceInvalid*, retried on each layout; one `allocation` error after 3 failures.
+- Scene setup throws: error reported, black frame presented, host alive.
+- Two hosts at once (e.g. Showcase thumbnails): independent contexts, shared display, no interference.
 - The view leaves the window: frame scheduling stops; it restarts when the view returns.
 - Very long frame (debugger, background): delta clamped to 0.1 s.
 - Destroy while suspended: teardown runs in contract order and leaves zero live GL objects that the
@@ -104,9 +118,15 @@ simulator tests of observer callbacks and pacing decisions computed from given t
 - **FR-F206**: Frames MUST be scheduled by a display link that starts when the view joins a window and
   stops when it leaves, with the contract's frame-rate caps (default 60, 30 under serious/critical
   thermal state or Low Power Mode, render scale 0.75 at critical) and delta clamped to 0.1 s.
-- **FR-F207**: Suspend and resume MUST pause and restart frame production without losing the surface.
-- **FR-F208**: Forced context recreation MUST destroy and recreate the context, increment the
-  generation, re-run scene setup and continue rendering.
+- **FR-F207**: Suspend and resume MUST pause and restart frame production without losing the surface. The host suspends itself when the app enters the background (after `glFinish`) and resumes on foreground unless the app requested a pause.
+- **FR-F208**: Context recreation (on request, or automatically when EGL reports a lost context) MUST
+  destroy and recreate the context, increment the generation, re-run scene setup and continue rendering.
+- **FR-F214**: Window-surface creation failures MUST keep the host in `surfaceInvalid` with a retry on
+  each layout, reporting one `allocation` error after 3 consecutive failures.
+- **FR-F215**: A scene whose setup or render throws MUST NOT crash the host; the error is reported and a
+  black frame is presented until a later recreation or scene replacement succeeds.
+- **FR-F216**: The EGL display MUST be process-wide, initialized once and never terminated; multiple
+  hosts may coexist, each with its own unshared context on the main thread.
 - **FR-F209**: Teardown MUST follow the contract order and leave no host-created surfaces or contexts.
 - **FR-F210**: The host MUST report capabilities: GL version, renderer, vendor, shading-language
   version, extension list, max texture size, max viewport dimensions.
