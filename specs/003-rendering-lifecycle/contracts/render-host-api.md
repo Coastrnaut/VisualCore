@@ -15,7 +15,12 @@
     public var generation: Int { get }
     public var capabilities: RenderCapabilities { get }
     public var lastError: RenderHostError? { get }
+    public var lifecycleHistory: [RenderLifecycleEvent] { get }            // bounded (256), includes creation
+    public var rejectedTransitions: Int { get }
+    public var presentedFrameCount: Int { get }                            // frames swapped onto the layer
+    public var framePacing: FramePacing { get }                            // current cap and render scale
     public func addObserver(_ observer: @escaping @MainActor (RenderLifecycleEvent) -> Void)
+    public func addErrorObserver(_ observer: @escaping @MainActor (RenderHostError) -> Void)   // e.g. one .allocation after 3 surface failures
     public func pause() / resume()                                         // app-requested
     public func recreateContext()
     public func replaceScene(_ scene: RenderScene)
@@ -24,6 +29,7 @@
     public func renderOneFrame(present: Bool = true) -> Bool
     public func readPixels() -> [UInt8]                                    // RGBA, rows bottom-up
     public var pixelSize: (width: Int, height: Int) { get }
+    // internal test hooks (via @testable): failNextSurfaceCreations(_:), simulateContextLossOnNextFrame()
 }
 ```
 

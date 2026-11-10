@@ -65,4 +65,4 @@ MVP = US1 (clear + gradient on both simulators). Implement in bounded groups; ru
 
 - [X] T-F221 Add test hook `simulateContextLossOnNextFrame()` to `RenderHost` and a simulator test proving EGL_CONTEXT_LOST after a swap reports `.contextLost`, recreates (generation +1) and renders again per FR-F208 (partial) — Verified 2026-11-10: testLostContextIsReportedRecreatedAndRendersAgain passes; F02.f02-t221-tests-ios27/ios26 16/16
 - [X] T-F222 Align `specs/003-rendering-lifecycle/data-model.md` RenderContext with code (`pixelWidth`, `pixelHeight`) per plan: data-model (contradicts) — Verified 2026-11-10: data-model.md lists pixelWidth/pixelHeight as in RenderScene.swift
-- [ ] T-F223 Document `addErrorObserver`, `lifecycleHistory`, `rejectedTransitions`, `presentedFrameCount`, `framePacing` in `contracts/render-host-api.md` per plan: contracts (unrequested)
+- [X] T-F223 Document `addErrorObserver`, `lifecycleHistory`, `rejectedTransitions`, `presentedFrameCount`, `framePacing` in `contracts/render-host-api.md` per plan: contracts (unrequested) — Verified 2026-11-10: contract lists every public RenderHost member in RenderHost.swift plus the two internal test hooks
