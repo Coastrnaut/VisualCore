@@ -7,5 +7,5 @@
 - **RenderCapabilities**: `glVersion`, `glslVersion`, `renderer`, `vendor`, `extensions[String]`,
   `maxTextureSize`, `maxViewport (w,h)`, `eglVendor`.
 - **FrameInfo**: `index: Int`, `time: Double`, `delta: Double (0…0.1)`, `targetTimestamp: Double`.
-- **RenderContext**: `generation`, `pixelSize (w,h)`, `framebuffer: UInt32 (0 = window)`.
+- **RenderContext**: `generation`, `pixelWidth`, `pixelHeight`, `framebuffer: UInt32 (0 = window)`.
 - **RenderHostError**: `unsupported(String)`, `allocation(String, Int32)`, `contextLost`, `scene(String)`.
