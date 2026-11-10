@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_reference_clean.py"
+  ],
+  "command": "python3 scripts/check_reference_clean.py",
+  "elapsed_seconds": 5.815,
+  "exit_code": 0,
+  "finished": "2026-11-10T23:31:07+00:00",
+  "log": ".autonomy/logs/F02.f00rework-clean-before.log",
+  "log_sha256": "ab948a306c2bfc305d301ffd2167d386f604b267e6986a7325756f2ea4d7bc96",
+  "name": "f00rework-clean-before",
+  "stage": "F02",
+  "started": "2026-11-10T23:31:01+00:00",
+  "timed_out": false
+}

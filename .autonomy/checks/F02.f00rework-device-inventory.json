@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "python3",
+    "scripts/inventory_devices.py"
+  ],
+  "command": "python3 scripts/inventory_devices.py",
+  "elapsed_seconds": 0.119,
+  "exit_code": 0,
+  "finished": "2026-11-10T23:33:41+00:00",
+  "log": ".autonomy/logs/F02.f00rework-device-inventory.log",
+  "log_sha256": "15fd30428a2837d858b4a3efb9bd63db9ced91ab693113fc179a7ecddfb9c529",
+  "name": "f00rework-device-inventory",
+  "stage": "F02",
+  "started": "2026-11-10T23:33:41+00:00",
+  "timed_out": false
+}

@@ -134,7 +134,7 @@
     "Rendering"
   ],
   "problems": [],
-  "projectm_xcframework_present": false,
+  "projectm_xcframework_present": true,
   "reference": {
     "clean": true,
     "commit": "1ad0b9953a9f33497005e95b63889a68e34f5a8d",

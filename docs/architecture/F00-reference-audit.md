@@ -84,3 +84,17 @@ IMPLEMENTATION-LOCK.
 `check_privacy_manifest.py`, `generate_gles_loader.py`, `run_device_tests.py`, `validate_docs.py`,
 `test_scripts.py`, `verify_environment.py`. VisualCore ports the applicable checks into its own
 `scripts/` rather than importing paths from the submodule.
+
+## 8. Addendum 2026-11-10 — Spec Kit rework (feature `specs/001-baseline-audit`, ADR-0004)
+
+F00 was sealed before its Spec Kit sequence ran. The archive's Phase 0 prompts were then run
+(specify → clarify → plan → checklist → tasks → analyze → implement → converge). They added the
+deliverables the archived Phase 0 required:
+
+* [`repository-audit.md`](repository-audit.md) + [`reference-inventory.json`](reference-inventory.json): full inventory.
+* [`current-rendering-pipeline.md`](current-rendering-pipeline.md): cited trace (48 citations, all resolved).
+* [`reusable-component-inventory.md`](reusable-component-inventory.md) and [`visualcore-gap-analysis.md`](visualcore-gap-analysis.md).
+* [`../verification/projectm-baseline.md`](../verification/projectm-baseline.md): reproducible build and simulator smoke of the unmodified reference.
+
+The rework checks were recorded with `run-check` under the then-current gate F02 (names
+`f00rework-*`), because the ledger accepts checks only for the current gate.

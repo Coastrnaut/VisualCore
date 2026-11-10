@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "python3",
+    "scripts/audit_projectm_reference.py"
+  ],
+  "command": "python3 scripts/audit_projectm_reference.py",
+  "elapsed_seconds": 5.777,
+  "exit_code": 0,
+  "finished": "2026-11-10T23:34:00+00:00",
+  "log": ".autonomy/logs/F02.f00rework-projectm-audit.log",
+  "log_sha256": "551af266150fd1be90a54212858a6de09114d7a03dad0af4c9ed4095410d0d7a",
+  "name": "f00rework-projectm-audit",
+  "stage": "F02",
+  "started": "2026-11-10T23:33:55+00:00",
+  "timed_out": false
+}

@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "python3",
+    "scripts/run_reference_baseline.py",
+    "--step",
+    "engine-xcframework"
+  ],
+  "command": "python3 scripts/run_reference_baseline.py --step engine-xcframework",
+  "elapsed_seconds": 18.347,
+  "exit_code": 0,
+  "finished": "2026-11-10T23:31:25+00:00",
+  "log": ".autonomy/logs/F02.f00rework-engine-xcframework.log",
+  "log_sha256": "a7ac1c1ffc0a95d9a19e99206441001cf88a14194e512362470b7ec8ca642eac",
+  "name": "f00rework-engine-xcframework",
+  "stage": "F02",
+  "started": "2026-11-10T23:31:07+00:00",
+  "timed_out": false
+}

@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "python3",
+    "scripts/run_reference_baseline.py",
+    "--step",
+    "xcodegen-main"
+  ],
+  "command": "python3 scripts/run_reference_baseline.py --step xcodegen-main",
+  "elapsed_seconds": 0.267,
+  "exit_code": 0,
+  "finished": "2026-11-10T23:31:25+00:00",
+  "log": ".autonomy/logs/F02.f00rework-xcodegen-main.log",
+  "log_sha256": "d328fdda716bc2e8d2eddde3833100ec60fc1f2c4a27e933061ed2d6435760f4",
+  "name": "f00rework-xcodegen-main",
+  "stage": "F02",
+  "started": "2026-11-10T23:31:25+00:00",
+  "timed_out": false
+}

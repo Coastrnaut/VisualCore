@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "python3",
+    "scripts/inventory_reference.py",
+    "--check-citations",
+    "docs/architecture/current-rendering-pipeline.md"
+  ],
+  "command": "python3 scripts/inventory_reference.py --check-citations docs/architecture/current-rendering-pipeline.md",
+  "elapsed_seconds": 0.034,
+  "exit_code": 0,
+  "finished": "2026-11-10T23:33:42+00:00",
+  "log": ".autonomy/logs/F02.f00rework-citations.log",
+  "log_sha256": "f591e722e6703e5312fae0f47008b84a6ee14621f36d44eed673e32b7bb5e5da",
+  "name": "f00rework-citations",
+  "stage": "F02",
+  "started": "2026-11-10T23:33:42+00:00",
+  "timed_out": false
+}

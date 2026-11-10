@@ -23,6 +23,9 @@ def load(name: str):
 compliance = load("check_compliance")
 docs = load("validate_docs")
 inventory = load("inventory_devices")
+clean = load("check_reference_clean")
+refinv = load("inventory_reference")
+baseline = load("run_reference_baseline")
 
 
 class ComplianceTests(unittest.TestCase):
@@ -100,6 +103,47 @@ class InventoryTests(unittest.TestCase):
         self.assertEqual(roles["D3"]["status"], "os-drift")
         self.assertTrue(any("D3" in p for p in problems))
         self.assertNotIn("_hardware_udid", json.dumps(roles))
+
+
+class ReferenceCleanTests(unittest.TestCase):
+    def test_clean_and_modified_repo(self):
+        import subprocess
+        with tempfile.TemporaryDirectory() as t:
+            repo = Path(t) / "ref"
+            repo.mkdir()
+            run = lambda *a: subprocess.run(["git", *a], cwd=repo, check=True, capture_output=True)
+            run("init", "-q"); run("config", "user.email", "t@t"); run("config", "user.name", "t")
+            (repo / "a.txt").write_text("x")
+            run("add", "a.txt"); run("commit", "-qm", "init")
+            self.assertEqual(clean.changes(repo), [])
+            (repo / "b.txt").write_text("untracked build output")
+            self.assertEqual(clean.changes(repo), [])
+            (repo / "a.txt").write_text("changed")
+            self.assertTrue(clean.changes(repo))
+
+
+class CitationTests(unittest.TestCase):
+    def test_resolution(self):
+        with tempfile.TemporaryDirectory() as t:
+            ref = Path(t)
+            (ref / "S.swift").write_text("func hello() {}")
+            doc = ref / "doc.md"
+            doc.write_text("ok ref:`S.swift`#`func hello()` bad ref:`S.swift`#`nope` missing ref:`X.swift`#`a`")
+            old = refinv.REF
+            refinv.REF = ref
+            try:
+                bad = refinv.check_citations(doc)
+            finally:
+                refinv.REF = old
+            self.assertEqual(len(bad), 2)
+
+
+class BaselineDestinationTests(unittest.TestCase):
+    def test_only_simulator_or_generic(self):
+        self.assertEqual(baseline.destination("generic/platform=iOS"), "generic/platform=iOS")
+        self.assertTrue(baseline.destination("19108E51-71E5-4862-9C7F-6CBC357C060D").startswith("platform=iOS Simulator"))
+        with self.assertRaises(SystemExit):
+            baseline.destination("platform=iOS,id=00008120-001A2B3C4D5E6F70")
 
 
 if __name__ == "__main__":

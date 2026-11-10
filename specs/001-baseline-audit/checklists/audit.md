@@ -12,39 +12,41 @@ Depth: standard (formal gate review). Audience: reviewer at the F00 rework gate.
 
 ## Repository Inventory Completeness
 
-- [ ] CHK001 Are all inventory categories named in the prompt (source folders, build targets, package manifests, project generation files, scripts, tests, CI, dependencies, licenses) each mapped to a requirement? [Completeness, Spec §FR-F003]
-- [ ] CHK002 Is the classification vocabulary (ProjectM-specific, reusable candidate, tooling) defined with criteria for choosing between them? [Clarity, Spec §FR-F007]
-- [ ] CHK003 Is the expected inventory size (8 packages, 3 apps) stated as a measurable completeness check rather than an assumption? [Measurability, Spec §SC-F003]
-- [ ] CHK004 Are nested content submodules (preset packs) explicitly in or out of the inventory scope? [Coverage, Gap]
-- [ ] CHK005 Does the spec define whether the reference's own specs/docs/test reports are inventoried or only cited as history? [Gap]
+- [x] CHK001 Are all inventory categories named in the prompt (source folders, build targets, package manifests, project generation files, scripts, tests, CI, dependencies, licenses) each mapped to a requirement? [Completeness, Spec §FR-F003]
+- [x] CHK002 Is the classification vocabulary (ProjectM-specific, reusable candidate, tooling) defined with criteria for choosing between them? [Clarity, Spec §FR-F007]
+- [x] CHK003 Is the expected inventory size (8 packages, 3 apps) stated as a measurable completeness check rather than an assumption? [Measurability, Spec §SC-F003]
+- [x] CHK004 Are nested content submodules (preset packs) explicitly in or out of the inventory scope? [Coverage, Gap]
+- [x] CHK005 Does the spec define whether the reference's own specs/docs/test reports are inventoried or only cited as history? [Gap]
 
 ## Rendering-Pipeline Trace
 
-- [ ] CHK006 Does the trace requirement enumerate every stage named in the prompt (startup → renderer init, EGL context/surface, GL→ANGLE, Metal configuration, presentation, scheduling, threading, synchronization, resize, orientation, teardown, recreation)? [Completeness, Spec §FR-F004, §FR-F005]
-- [ ] CHK007 Is the citation format (path plus symbol) specified precisely enough to be machine-checked? [Clarity, Spec §SC-F002]
-- [ ] CHK008 Is "unknown" defined, including what makes a behavior unsettled by source, and is each unknown required to carry a task ID? [Clarity, Spec §FR-F005, §SC-F006]
-- [ ] CHK009 Are the second-context code paths (preset prewarmer's own EGL context) required to be traced, or excluded with a reason? [Coverage, Gap]
-- [ ] CHK010 Is the GPU resource inventory (shaders, textures, framebuffers) required to state ownership and cleanup paths, not just existence? [Completeness, Spec §FR-F006]
-- [ ] CHK011 Do the trace requirements stay consistent with the constraint "no ANGLE feasibility project", i.e. they document rather than evaluate alternatives? [Consistency, Spec §Constraints]
+- [x] CHK006 Does the trace requirement enumerate every stage named in the prompt (startup → renderer init, EGL context/surface, GL→ANGLE, Metal configuration, presentation, scheduling, threading, synchronization, resize, orientation, teardown, recreation)? [Completeness, Spec §FR-F004, §FR-F005]
+- [x] CHK007 Is the citation format (path plus symbol) specified precisely enough to be machine-checked? [Clarity, Spec §SC-F002]
+- [x] CHK008 Is "unknown" defined, including what makes a behavior unsettled by source, and is each unknown required to carry a task ID? [Clarity, Spec §FR-F005, §SC-F006]
+- [x] CHK009 Are the second-context code paths (preset prewarmer's own EGL context) required to be traced, or excluded with a reason? [Coverage, Gap]
+- [x] CHK010 Is the GPU resource inventory (shaders, textures, framebuffers) required to state ownership and cleanup paths, not just existence? [Completeness, Spec §FR-F006]
+- [x] CHK011 Do the trace requirements stay consistent with the constraint "no ANGLE feasibility project", i.e. they document rather than evaluate alternatives? [Consistency, Spec §Constraints]
 
 ## Dependency and License Audit
 
-- [ ] CHK012 Are license requirements specified for every dependency layer (reference app, projectM engine, ANGLE plus its third-party notices, preset packs)? [Completeness, Spec §FR-F003]
-- [ ] CHK013 Is the LGPL linkage question for the engine stated as a follow-up rather than resolved implicitly? [Clarity, Assumption]
-- [ ] CHK014 Is pin verification measurable: fork URL, branch and commit for each nested submodule, and failure when they differ? [Measurability, Spec §FR-F001, §SC-F001]
-- [ ] CHK015 Is the requirement that prebuilt binaries match the pinned source commit explicit? [Gap, Spec §Edge Cases]
+- [x] CHK012 Are license requirements specified for every dependency layer (reference app, projectM engine, ANGLE plus its third-party notices, preset packs)? [Completeness, Spec §FR-F003]
+- [x] CHK013 Is the LGPL linkage question for the engine stated as a follow-up rather than resolved implicitly? [Clarity, Assumption]
+- [x] CHK014 Is pin verification measurable: fork URL, branch and commit for each nested submodule, and failure when they differ? [Measurability, Spec §FR-F001, §SC-F001]
+- [x] CHK015 Is the requirement that prebuilt binaries match the pinned source commit explicit? [Gap, Spec §Edge Cases]
 
 ## Reproducible Baseline Evidence
 
-- [ ] CHK016 Are the exact baseline evidence items enumerated, with pass/fail semantics for each? [Completeness, Spec §Clarifications, §SC-F004]
-- [ ] CHK017 Is "reproducible" defined (same commands, recorded toolchain, hashed logs) rather than left as an adjective? [Clarity, Spec §FR-F008]
-- [ ] CHK018 Are allowed write locations for generated output stated, and is a clean-tree check required before and after? [Consistency, Spec §FR-F002, §Clarifications]
-- [ ] CHK019 Are requirements defined for a baseline step that cannot run (blocked vs failed vs passed)? [Coverage, Exception Flow, Spec §User Story 4]
-- [ ] CHK020 Is the simulator-only nature of the smoke explicitly prevented from being reused as performance or device evidence? [Consistency, Spec §FR-F009, Constitution VI]
-- [ ] CHK021 Are the simulator runtimes for the smoke specified, and is the choice of device-by-runtime rather than by name stated? [Clarity, Spec §Clarifications]
-- [ ] CHK022 Is the relationship between the already sealed F00 evidence and this rework's new evidence specified so neither is overwritten? [Dependency, Spec §Assumptions, ADR-0004]
+- [x] CHK016 Are the exact baseline evidence items enumerated, with pass/fail semantics for each? [Completeness, Spec §Clarifications, §SC-F004]
+- [x] CHK017 Is "reproducible" defined (same commands, recorded toolchain, hashed logs) rather than left as an adjective? [Clarity, Spec §FR-F008]
+- [x] CHK018 Are allowed write locations for generated output stated, and is a clean-tree check required before and after? [Consistency, Spec §FR-F002, §Clarifications]
+- [x] CHK019 Are requirements defined for a baseline step that cannot run (blocked vs failed vs passed)? [Coverage, Exception Flow, Spec §User Story 4]
+- [x] CHK020 Is the simulator-only nature of the smoke explicitly prevented from being reused as performance or device evidence? [Consistency, Spec §FR-F009, Constitution VI]
+- [x] CHK021 Are the simulator runtimes for the smoke specified, and is the choice of device-by-runtime rather than by name stated? [Clarity, Spec §Clarifications]
+- [x] CHK022 Is the relationship between the already sealed F00 evidence and this rework's new evidence specified so neither is overwritten? [Dependency, Spec §Assumptions, ADR-0004]
 
 ## Notes
+
+- Reviewed 2026-11-10 by the agent acting as reviewer under the owner's delegated implementation intent: all 22 items satisfied after the `/speckit-analyze` remediation (CHK004, CHK009, CHK015) and the CHK005 spec edit (FR-F003 historical-context clause).
 
 - Mark items `[x]` only after review confirms the requirement-quality criterion is satisfied
 - Leave items unchecked when they still require clarification, correction, or reviewer evaluation

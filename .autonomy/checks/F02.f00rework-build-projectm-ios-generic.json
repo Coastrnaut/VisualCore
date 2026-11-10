@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "python3",
+    "scripts/run_reference_baseline.py",
+    "--step",
+    "build-projectm-ios-generic"
+  ],
+  "command": "python3 scripts/run_reference_baseline.py --step build-projectm-ios-generic",
+  "elapsed_seconds": 13.189,
+  "exit_code": 0,
+  "finished": "2026-11-10T23:32:05+00:00",
+  "log": ".autonomy/logs/F02.f00rework-build-projectm-ios-generic.log",
+  "log_sha256": "878b46a07147e79f8a775afa2388658633804ce50f264b31cee808ee244ec96b",
+  "name": "f00rework-build-projectm-ios-generic",
+  "stage": "F02",
+  "started": "2026-11-10T23:31:52+00:00",
+  "timed_out": false
+}

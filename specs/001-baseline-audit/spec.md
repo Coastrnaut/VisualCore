@@ -133,7 +133,8 @@ recorded in a baseline report with the exact commit and toolchain.
 - **FR-F003**: The repository audit MUST inventory source folders, build targets, package
   manifests, project generation files, scripts, tests, CI workflows, dependencies and licenses of
   the reference, each with its path, including content submodules (preset packs) as content
-  dependencies.
+  dependencies; the reference's own `specs/`, `docs/` and test reports are listed by path as
+  historical context only (VC-016), never as VisualCore evidence.
 - **FR-F004**: The rendering-pipeline trace MUST cite path and symbol for app startup to renderer
   initialization, EGL context/surface creation, GL entry-point resolution into ANGLE, the Metal
   backend configuration and the presentation path.

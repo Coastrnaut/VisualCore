@@ -1,0 +1,559 @@
+{
+  "reference_commit": "1ad0b9953a9f33497005e95b63889a68e34f5a8d",
+  "rows": [
+    {
+      "path": "Packages/ANGLERendering/Package.swift",
+      "kind": "package",
+      "role": "projectm-specific",
+      "detail": {
+        "targets": [
+          "libEGL",
+          "libGLESv2",
+          "CANGLE",
+          "ANGLERendering",
+          "ANGLERenderingTests"
+        ],
+        "local_deps": [
+          "../AudioCore",
+          "../ProjectMBridge",
+          "../Rendering"
+        ],
+        "reason": "EGL/ANGLE lifecycle is reusable in principle but ANGLERenderer hard-wires ProjectMEngine, Preset, NormalizedPCMReader and PresetPrewarmer",
+        "platforms": [
+          "iOS"
+        ]
+      }
+    },
+    {
+      "path": "Packages/ANGLERendering/Tests/ANGLERenderingTests",
+      "kind": "test-target",
+      "role": "projectm-specific",
+      "detail": {
+        "swift_files": 2,
+        "test_funcs": 13
+      }
+    },
+    {
+      "path": "Packages/AudioCore/Package.swift",
+      "kind": "package",
+      "role": "reusable-candidate",
+      "detail": {
+        "targets": [
+          "AudioCore",
+          "AudioCoreTests"
+        ],
+        "local_deps": [],
+        "reason": "PCM normalization, ring buffers and resampling are app-neutral; types are named for the visualizer",
+        "platforms": [
+          "iOS",
+          "macOS"
+        ]
+      }
+    },
+    {
+      "path": "Packages/AudioCore/Tests/AudioCoreTests",
+      "kind": "test-target",
+      "role": "reusable-candidate",
+      "detail": {
+        "swift_files": 9,
+        "test_funcs": 77
+      }
+    },
+    {
+      "path": "Packages/CaptureKit/Package.swift",
+      "kind": "package",
+      "role": "projectm-specific",
+      "detail": {
+        "targets": [
+          "CaptureKit",
+          "CaptureKitTests"
+        ],
+        "local_deps": [
+          "../AudioCore"
+        ],
+        "reason": "System/App Capture + microphone + in-app playback drivers for CaptureLab; ScreenCaptureKit path is product-specific",
+        "platforms": [
+          "iOS",
+          "macOS"
+        ]
+      }
+    },
+    {
+      "path": "Packages/CaptureKit/Tests/CaptureKitTests",
+      "kind": "test-target",
+      "role": "projectm-specific",
+      "detail": {
+        "swift_files": 5,
+        "test_funcs": 80
+      }
+    },
+    {
+      "path": "Packages/CaptureUI/Package.swift",
+      "kind": "package",
+      "role": "projectm-specific",
+      "detail": {
+        "targets": [
+          "CaptureUI",
+          "CaptureUITests"
+        ],
+        "local_deps": [
+          "../CaptureKit",
+          "../AudioCore"
+        ],
+        "reason": "SwiftUI for CaptureLab source selection",
+        "platforms": [
+          "iOS",
+          "macOS"
+        ]
+      }
+    },
+    {
+      "path": "Packages/CaptureUI/Tests/CaptureUITests",
+      "kind": "test-target",
+      "role": "projectm-specific",
+      "detail": {
+        "swift_files": 2,
+        "test_funcs": 10
+      }
+    },
+    {
+      "path": "Packages/Diagnostics/Package.swift",
+      "kind": "package",
+      "role": "reusable-candidate",
+      "detail": {
+        "targets": [
+          "Diagnostics"
+        ],
+        "local_deps": [
+          "../AudioCore"
+        ],
+        "reason": "session diagnostics/export primitives",
+        "platforms": [
+          "iOS",
+          "macOS"
+        ]
+      }
+    },
+    {
+      "path": "Packages/Diagnostics/Tests/DiagnosticsTests",
+      "kind": "test-target",
+      "role": "reusable-candidate",
+      "detail": {
+        "swift_files": 1,
+        "test_funcs": 8
+      }
+    },
+    {
+      "path": "Packages/PresetLibrary/Package.swift",
+      "kind": "package",
+      "role": "projectm-specific",
+      "detail": {
+        "targets": [
+          "PresetLibrary",
+          "PresetLibraryTests"
+        ],
+        "local_deps": [],
+        "reason": "MilkDrop preset index, scopes, search",
+        "platforms": [
+          "iOS",
+          "macOS"
+        ]
+      }
+    },
+    {
+      "path": "Packages/PresetLibrary/Tests/PresetLibraryTests",
+      "kind": "test-target",
+      "role": "projectm-specific",
+      "detail": {
+        "swift_files": 4,
+        "test_funcs": 14
+      }
+    },
+    {
+      "path": "Packages/ProjectMBridge/Package.swift",
+      "kind": "package",
+      "role": "projectm-specific",
+      "detail": {
+        "targets": [
+          "ProjectM",
+          "ProjectMBridge",
+          "ProjectMBridgeTests"
+        ],
+        "local_deps": [],
+        "reason": "Swift/ObjC bridge to the LGPL projectM engine",
+        "platforms": [
+          "iOS"
+        ]
+      }
+    },
+    {
+      "path": "Packages/ProjectMBridge/Tests/ProjectMBridgeTests",
+      "kind": "test-target",
+      "role": "projectm-specific",
+      "detail": {
+        "swift_files": 1,
+        "test_funcs": 13
+      }
+    },
+    {
+      "path": "Packages/Rendering/Package.swift",
+      "kind": "package",
+      "role": "projectm-specific",
+      "detail": {
+        "targets": [
+          "CFlashLimiter",
+          "Rendering",
+          "RenderingTests"
+        ],
+        "local_deps": [
+          "../AudioCore",
+          "../ProjectMBridge"
+        ],
+        "reason": "VisualizerRenderer protocol, preset repository and GLES (Apple OpenGLES) backend for the engine; QualityGovernor/FrameRateMeter/CFlashLimiter are reusable ideas",
+        "platforms": [
+          "iOS"
+        ]
+      }
+    },
+    {
+      "path": "Packages/Rendering/Tests/RenderingTests",
+      "kind": "test-target",
+      "role": "projectm-specific",
+      "detail": {
+        "swift_files": 5,
+        "test_funcs": 25
+      }
+    },
+    {
+      "path": "project.yml",
+      "kind": "xcodegen-spec",
+      "role": "tooling",
+      "detail": {
+        "targets": [
+          {
+            "name": "CaptureLab",
+            "type": "application"
+          },
+          {
+            "name": "CaptureLabUITests",
+            "type": "bundle.ui-testing"
+          },
+          {
+            "name": "projectM-iOS",
+            "type": "application"
+          },
+          {
+            "name": "projectM-iOSTests",
+            "type": "bundle.unit-test"
+          },
+          {
+            "name": "projectM-iOSUITests",
+            "type": "bundle.ui-testing"
+          }
+        ],
+        "schemes": [
+          "projectM-iOS",
+          "CaptureLab"
+        ],
+        "deployment_target": "26.0"
+      }
+    },
+    {
+      "path": "Apps/CaptureLab",
+      "kind": "app",
+      "role": "projectm-specific",
+      "detail": {
+        "xcodegen_spec": "project.yml",
+        "reason": "tester-only capture diagnostics app",
+        "swift_files": 5
+      }
+    },
+    {
+      "path": "Apps/projectM-iOS",
+      "kind": "app",
+      "role": "projectm-specific",
+      "detail": {
+        "xcodegen_spec": "project.yml",
+        "reason": "shipping visualizer app",
+        "swift_files": 35
+      }
+    },
+    {
+      "path": "RendererLab.yml",
+      "kind": "xcodegen-spec",
+      "role": "tooling",
+      "detail": {
+        "targets": [
+          {
+            "name": "RendererLab",
+            "type": "application"
+          }
+        ],
+        "schemes": [],
+        "deployment_target": "26.0"
+      }
+    },
+    {
+      "path": "Apps/RendererLab",
+      "kind": "app",
+      "role": "tooling",
+      "detail": {
+        "xcodegen_spec": "RendererLab.yml",
+        "reason": "renderer benchmark harness for ADR-0003",
+        "swift_files": 3
+      }
+    },
+    {
+      "path": "scripts/build_angle_xcframework.py",
+      "kind": "script",
+      "role": "tooling",
+      "detail": "Build ANGLE (Metal backend) as iOS xcframeworks from a pinned source (task T076; ADR-0003 Option B;"
+    },
+    {
+      "path": "scripts/build_preset_index.py",
+      "kind": "script",
+      "role": "tooling",
+      "detail": "Build the preset library index and archive (feature 002; tasks T204, T205, T214)."
+    },
+    {
+      "path": "scripts/build_projectm_xcframework.py",
+      "kind": "script",
+      "role": "tooling",
+      "detail": "Build the projectM engine as a dynamic `Build/ProjectM.xcframework` (task T065; RI-011; ADR-0004)."
+    },
+    {
+      "path": "scripts/check_capturelab_export.py",
+      "kind": "script",
+      "role": "tooling",
+      "detail": "Host-side check of a CaptureLab diagnostics export (task T039; used after CaptureLabUITests)."
+    },
+    {
+      "path": "scripts/check_compliance.py",
+      "kind": "script",
+      "role": "tooling",
+      "detail": "Constitution compliance check, run on every merge (tasks T014/T015)."
+    },
+    {
+      "path": "scripts/check_privacy_manifest.py",
+      "kind": "script",
+      "role": "tooling",
+      "detail": "Check a built app against its privacy manifest (task T106; FR-066). macOS only (uses nm)."
+    },
+    {
+      "path": "scripts/collect_licenses.py",
+      "kind": "script",
+      "role": "tooling",
+      "detail": "Collect the license texts for the Licenses screen (task T103; FR-067, ADR-0004, ADR-0005)."
+    },
+    {
+      "path": "scripts/generate_gles_loader.py",
+      "kind": "script",
+      "role": "tooling",
+      "detail": "Generate the static OpenGL ES 3.0 load-proc table for ProjectMBridge (tasks T068/T069, T071)."
+    },
+    {
+      "path": "scripts/generate_reference_audio.py",
+      "kind": "script",
+      "role": "tooling",
+      "detail": "Generate the deterministic In-App Playback reference track (task T044, FR-006, SC-006)."
+    },
+    {
+      "path": "scripts/make_diagnostic_project.py",
+      "kind": "script",
+      "role": "tooling",
+      "detail": "Generate a temporary diagnostic CaptureLab project (owner review 2026-11-08, ADR-0001 ruling 12)."
+    },
+    {
+      "path": "scripts/run_device_tests.py",
+      "kind": "script",
+      "role": "tooling",
+      "detail": "Run feature 002's device tests from the Mac (T238 performance and size, T239 purchase checks,"
+    },
+    {
+      "path": "scripts/test_scripts.py",
+      "kind": "script",
+      "role": "tooling",
+      "detail": "Tests for the repository scripts. Run: python scripts/test_scripts.py (Windows or macOS)."
+    },
+    {
+      "path": "scripts/validate_docs.py",
+      "kind": "script",
+      "role": "tooling",
+      "detail": "Validate cross-references in the specification documents (task T003)."
+    },
+    {
+      "path": "scripts/verify_environment.py",
+      "kind": "script",
+      "role": "tooling",
+      "detail": "Check the build toolchain against the pins in ADR-0002 (task T004)."
+    },
+    {
+      "path": ".github/workflows/ios-ci.yml",
+      "kind": "ci-workflow",
+      "role": "tooling",
+      "detail": {
+        "jobs": [
+          "docs-and-compliance",
+          "host-tests-linux",
+          "build-and-test-apple",
+          "engine-xcframework",
+          "angle-xcframeworks",
+          "build-ios27"
+        ]
+      }
+    },
+    {
+      "path": "Vendor/angle",
+      "kind": "dependency",
+      "role": "reusable-candidate",
+      "detail": {
+        "commit": "29d18232e8031430f1257b7509ceca20d195114d"
+      }
+    },
+    {
+      "path": "Vendor/presets/cream-of-the-crop",
+      "kind": "dependency",
+      "role": "content",
+      "detail": {
+        "commit": "0180df21f5e0bd39b9060cc5de420ed2f1f9e509"
+      }
+    },
+    {
+      "path": "Vendor/presets/en-d",
+      "kind": "dependency",
+      "role": "content",
+      "detail": {
+        "commit": "fff71ea81223109f3558351667eef851f2781c96"
+      }
+    },
+    {
+      "path": "Vendor/presets/milkdrop-original",
+      "kind": "dependency",
+      "role": "content",
+      "detail": {
+        "commit": "e03b83e3338d8f1ed6cbcf908c719f249ef24288"
+      }
+    },
+    {
+      "path": "Vendor/presets/milkdrop-texture-pack",
+      "kind": "dependency",
+      "role": "content",
+      "detail": {
+        "commit": "6368812f27bc747b517218fbf89d21d59afce4d9"
+      }
+    },
+    {
+      "path": "Vendor/presets/projectm-classic",
+      "kind": "dependency",
+      "role": "content",
+      "detail": {
+        "commit": "14a6244a7d32eb7e114e1a92d1cb93358cdcc54a"
+      }
+    },
+    {
+      "path": "Vendor/projectM",
+      "kind": "dependency",
+      "role": "projectm-specific",
+      "detail": {
+        "commit": "c88894e966b3a862be148466b5d5c6e68d8bb9f1"
+      }
+    },
+    {
+      "path": "LICENSE",
+      "kind": "license",
+      "role": "content",
+      "detail": "MIT License"
+    },
+    {
+      "path": "Vendor/projectM/COPYING",
+      "kind": "license",
+      "role": "content",
+      "detail": "/**"
+    },
+    {
+      "path": "Vendor/angle/LICENSE",
+      "kind": "license",
+      "role": "content",
+      "detail": "// Copyright 2018 The ANGLE Project Authors."
+    },
+    {
+      "path": "Build/ANGLEFrameworks/licenses/ANGLE.txt",
+      "kind": "license",
+      "role": "content",
+      "detail": "ANGLE third-party notice (build output)"
+    },
+    {
+      "path": "Build/ANGLEFrameworks/licenses/abseil-cpp.txt",
+      "kind": "license",
+      "role": "content",
+      "detail": "ANGLE third-party notice (build output)"
+    },
+    {
+      "path": "Build/ANGLEFrameworks/licenses/astc-encoder.txt",
+      "kind": "license",
+      "role": "content",
+      "detail": "ANGLE third-party notice (build output)"
+    },
+    {
+      "path": "Build/ANGLEFrameworks/licenses/libc++.txt",
+      "kind": "license",
+      "role": "content",
+      "detail": "ANGLE third-party notice (build output)"
+    },
+    {
+      "path": "Build/ANGLEFrameworks/licenses/libc++abi.txt",
+      "kind": "license",
+      "role": "content",
+      "detail": "ANGLE third-party notice (build output)"
+    },
+    {
+      "path": "Build/ANGLEFrameworks/licenses/llvm-libc.txt",
+      "kind": "license",
+      "role": "content",
+      "detail": "ANGLE third-party notice (build output)"
+    },
+    {
+      "path": "Build/ANGLEFrameworks/licenses/perfetto.txt",
+      "kind": "license",
+      "role": "content",
+      "detail": "ANGLE third-party notice (build output)"
+    },
+    {
+      "path": "Build/ANGLEFrameworks/licenses/protobuf.txt",
+      "kind": "license",
+      "role": "content",
+      "detail": "ANGLE third-party notice (build output)"
+    },
+    {
+      "path": "Build/ANGLEFrameworks/licenses/vulkan-headers.txt",
+      "kind": "license",
+      "role": "content",
+      "detail": "ANGLE third-party notice (build output)"
+    },
+    {
+      "path": "Build/ANGLEFrameworks/licenses/zlib.txt",
+      "kind": "license",
+      "role": "content",
+      "detail": "ANGLE third-party notice (build output)"
+    },
+    {
+      "path": "specs",
+      "kind": "history",
+      "role": "content",
+      "detail": {
+        "files": 27,
+        "note": "historical context only (VC-016); never VisualCore evidence"
+      }
+    },
+    {
+      "path": "docs",
+      "kind": "history",
+      "role": "content",
+      "detail": {
+        "files": 110,
+        "note": "historical context only (VC-016); never VisualCore evidence"
+      }
+    }
+  ],
+  "problems": []
+}
