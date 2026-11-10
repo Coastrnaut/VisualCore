@@ -24,6 +24,7 @@ Answered autonomously under the owner's standing approval (CLAUDE.md §2), recom
 - Q: When is the context recreated outside tests? → A: On explicit request (API, test hook) and automatically when EGL reports a lost context after a swap or make-current; both go through `reinitialized`.
 - Q: What happens when window-surface creation keeps failing? → A: The host stays `surfaceInvalid` and retries on each layout. After 3 consecutive failures it reports an `allocation` error to observers once, then keeps retrying silently on later layouts.
 - Q: What happens when a scene's setup throws? → A: The host records the error and reports it to observers. It stays alive and presents a clear (black) frame instead of the scene until a later recreation or scene replacement succeeds; it never crashes.
+- Q: Apply the `/speckit-analyze` remediation (E1 surface-failure test hook, A1 version-string check)? → A: Yes, applied 2026-11-10 (no critical findings).
 - Q: Can several hosts exist at once, and who owns the EGL display? → A: Yes. Each host owns its own unshared context and surfaces; all of them live on the main thread. The ANGLE Metal display is process-wide, initialized once and never terminated, exactly as in the reference (which never calls `eglTerminate`), because terminating it would invalidate other hosts' contexts.
 
 ## User Scenarios & Testing *(mandatory)*
