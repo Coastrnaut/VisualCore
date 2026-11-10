@@ -5,10 +5,14 @@
 | Layer | Where | Command | Evidence class |
 |---|---|---|---|
 | Pure VisualCore modules | macOS host | `swift test --package-path Packages/VisualCore` | functional |
-| Rendering/effects/UI/audio bridge | iOS 27.2 **and** 26.5 simulators | `xcodebuild test -scheme VisualCoreRendering-Package …` | functional (pixel readback) |
+| Rendering/effects/UI/audio bridge | iOS 27.2 **and** 26.5 simulators | `python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test` (and `sim-26.5`) | functional (pixel readback) |
 | Apps/Showcase/harness UI | iOS simulators | XCUITest via `xcodebuild test` | functional |
 | Compile coverage | generic iOS | `xcodebuild build -destination generic/platform=iOS CODE_SIGNING_ALLOWED=NO` | build |
 | Performance, thermal, real audio, GPU lifecycle on hardware | D1/D2/D3 | campaign II only, after IMPLEMENTATION-LOCK | device |
+
+`scripts/xcodebuild_package.py` is the sanctioned wrapper for package builds and tests. It runs from
+the repository root, chooses simulators by runtime, refuses physical destinations, and sets
+DerivedData, result bundles and test timeouts.
 
 ## ProjectM reference adapter (FR-F109)
 
