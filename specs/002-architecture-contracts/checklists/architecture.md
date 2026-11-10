@@ -12,37 +12,39 @@ Depth: standard gate review; audience: F01 rework reviewer. No clarifying questi
 
 ## Architecture Completeness
 
-- [ ] CHK001 Does every topic in the archived prompt (ownership/direction, public vs internal, lifecycle/threading, resources, shaders/diagnostics, errors/logging, tests, adapter, submodule, regression) have at least one FR? [Completeness, Spec §FR-F101–FR-F111]
-- [ ] CHK002 Is each package's responsibility, platform and public surface specified, not only its name? [Completeness, Spec §FR-F101]
-- [ ] CHK003 Are requirements defined for the unknowns U-F001–U-F003 (context loss, memory pressure, GPU memory) with a verifying gate? [Coverage, Spec §SC-F104]
-- [ ] CHK004 Is the teardown order specified with the leak-assertion step? [Completeness, Spec §FR-F104]
-- [ ] CHK005 Are secondary-context (warm-up) rules specified as well as the main render context? [Coverage, Spec §FR-F114]
-- [ ] CHK006 Are logging privacy rules defined (what must never be logged)? [Completeness, Spec §FR-F107]
+- [x] CHK001 Does every topic in the archived prompt (ownership/direction, public vs internal, lifecycle/threading, resources, shaders/diagnostics, errors/logging, tests, adapter, submodule, regression) have at least one FR? [Completeness, Spec §FR-F101–FR-F111]
+- [x] CHK002 Is each package's responsibility, platform and public surface specified, not only its name? [Completeness, Spec §FR-F101]
+- [x] CHK003 Are requirements defined for the unknowns U-F001–U-F003 (context loss, memory pressure, GPU memory) with a verifying gate? [Coverage, Spec §SC-F104]
+- [x] CHK004 Is the teardown order specified with the leak-assertion step? [Completeness, Spec §FR-F104]
+- [x] CHK005 Are secondary-context (warm-up) rules specified as well as the main render context? [Coverage, Spec §FR-F114]
+- [x] CHK006 Are logging privacy rules defined (what must never be logged)? [Completeness, Spec §FR-F107]
 
 ## Enforceable Boundaries
 
-- [ ] CHK007 Is every boundary rule stated so that a script can check it (named rule, scope, violation definition)? [Measurability, Spec §FR-F112]
-- [ ] CHK008 Is the list of forbidden reference modules exhaustive relative to the Phase 0 inventory (8 packages + engine framework)? [Completeness, Spec §FR-F102, Gap]
-- [ ] CHK009 Is the boundary between pure and iOS-only modules specified by allowed imports, not only by intent? [Clarity, Spec §FR-F102]
-- [ ] CHK010 Is "built-binary symbol scan" deferred explicitly to a named later gate rather than left implied? [Clarity, Spec §FR-F112]
-- [ ] CHK011 Are the seeded-violation cases for SC-F102 enumerated (ProjectM import, cycle, app import)? [Measurability, Spec §SC-F102]
-- [ ] CHK012 Is the test-support-only-in-tests rule specified? [Coverage, Gap]
+- [x] CHK007 Is every boundary rule stated so that a script can check it (named rule, scope, violation definition)? [Measurability, Spec §FR-F112]
+- [x] CHK008 Is the list of forbidden reference modules exhaustive relative to the Phase 0 inventory (8 packages + engine framework)? [Completeness, Spec §FR-F102, Gap]
+- [x] CHK009 Is the boundary between pure and iOS-only modules specified by allowed imports, not only by intent? [Clarity, Spec §FR-F102]
+- [x] CHK010 Is "built-binary symbol scan" deferred explicitly to a named later gate rather than left implied? [Clarity, Spec §FR-F112]
+- [x] CHK011 Are the seeded-violation cases for SC-F102 enumerated (ProjectM import, cycle, app import)? [Measurability, Spec §SC-F102]
+- [x] CHK012 Is the test-support-only-in-tests rule specified? [Coverage, Gap]
 
 ## Consistency and Traceability
 
-- [ ] CHK013 Is each package traced to a Phase 0 audit finding or gap (no unsupported boundaries)? [Traceability, Spec §SC-F101]
-- [ ] CHK014 Are the spec, ADR-0002, ADR-0003 and constitution v1.1.0 consistent on package count and dependency direction, with corrections required where they diverge? [Consistency, Spec §FR-F113]
-- [ ] CHK015 Do lifecycle states in the spec match the constitution's state list exactly? [Consistency, Constitution III]
-- [ ] CHK016 Is the API versioning rule consistent between spec (FR-F115) and constitution standards section? [Consistency]
+- [x] CHK013 Is each package traced to a Phase 0 audit finding or gap (no unsupported boundaries)? [Traceability, Spec §SC-F101]
+- [x] CHK014 Are the spec, ADR-0002, ADR-0003 and constitution v1.1.0 consistent on package count and dependency direction, with corrections required where they diverge? [Consistency, Spec §FR-F113]
+- [x] CHK015 Do lifecycle states in the spec match the constitution's state list exactly? [Consistency, Constitution III]
+- [x] CHK016 Is the API versioning rule consistent between spec (FR-F115) and constitution standards section? [Consistency]
 
 ## Regression and Policy
 
-- [ ] CHK017 Are regression triggers mapped to exact commands from the Phase 0 baseline? [Clarity, Spec §FR-F111]
-- [ ] CHK018 Is the pin-change procedure specified end to end (ADR, owner approval, patch log, regression)? [Completeness, Spec §FR-F110]
-- [ ] CHK019 Are adapter prohibitions as explicit as its permissions? [Coverage, Spec §FR-F109]
-- [ ] CHK020 Is LGPL handling for the adapter addressed in requirements or explicitly deferred? [Gap, Constitution X]
+- [x] CHK017 Are regression triggers mapped to exact commands from the Phase 0 baseline? [Clarity, Spec §FR-F111]
+- [x] CHK018 Is the pin-change procedure specified end to end (ADR, owner approval, patch log, regression)? [Completeness, Spec §FR-F110]
+- [x] CHK019 Are adapter prohibitions as explicit as its permissions? [Coverage, Spec §FR-F109]
+- [x] CHK020 Is LGPL handling for the adapter addressed in requirements or explicitly deferred? [Gap, Constitution X]
 
 ## Notes
+
+- Reviewed 2026-11-10 by the agent as reviewer under the owner's standing approval (CLAUDE.md §2): 20/20 satisfied by spec.md (FR-F101–FR-F115, SC-F101–F105) and the four contracts after the analyze remediation.
 
 - Mark items `[x]` only after review confirms the requirement-quality criterion is satisfied
 - Leave items unchecked when they still require clarification, correction, or reviewer evaluation

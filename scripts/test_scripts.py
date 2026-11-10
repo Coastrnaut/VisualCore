@@ -26,6 +26,10 @@ inventory = load("inventory_devices")
 clean = load("check_reference_clean")
 refinv = load("inventory_reference")
 baseline = load("run_reference_baseline")
+try:
+    deps = load("check_dependencies")
+except FileNotFoundError:
+    deps = None
 
 
 class ComplianceTests(unittest.TestCase):
@@ -144,6 +148,70 @@ class BaselineDestinationTests(unittest.TestCase):
         self.assertTrue(baseline.destination("00000000-0000-4000-8000-000000000001").startswith("platform=iOS Simulator"))
         with self.assertRaises(SystemExit):
             baseline.destination("platform=iOS,id=00008120-001A2B3C4D5E6F70")
+
+
+PURE_PKG = """// swift-tools-version: 6.0
+import PackageDescription
+let package = Package(name: "VisualCore", products: [],
+    targets: [
+        .target(name: "VisualCoreMath"),
+        .target(name: "VisualCoreSimulation", dependencies: ["VisualCoreMath"]),
+        .target(name: "VisualCoreTestSupport", dependencies: ["VisualCoreMath"]),
+        .testTarget(name: "VisualCoreMathTests", dependencies: ["VisualCoreMath", "VisualCoreTestSupport"]),
+    ])
+"""
+
+
+@unittest.skipIf(deps is None, "check_dependencies.py not written yet (T-F103)")
+class DependencyCheckerTests(unittest.TestCase):
+    def tree(self, files: dict) -> Path:
+        d = Path(tempfile.mkdtemp())
+        for rel, text in files.items():
+            (d / rel).parent.mkdir(parents=True, exist_ok=True)
+            (d / rel).write_text(text)
+        return d
+
+    def rules(self, files: dict) -> set:
+        return {v["rule"] for v in deps.check(self.tree(files))}
+
+    def base(self) -> dict:
+        return {"Packages/VisualCore/Package.swift": PURE_PKG,
+                "Packages/VisualCore/Sources/VisualCoreMath/M.swift": "import Foundation\n",
+                "Packages/VisualCore/Sources/VisualCoreSimulation/S.swift": "import VisualCoreMath\n"}
+
+    def test_clean(self):
+        self.assertEqual(self.rules(self.base()), set())
+
+    def test_r1_projectm_import_outside_harness(self):
+        f = self.base(); f["Apps/Foo/App/A.swift"] = "import ProjectMBridge\n"
+        self.assertIn("R1", self.rules(f))
+        f = self.base(); f["Harnesses/ProjectMReference/A.swift"] = "import ProjectMBridge\n"
+        self.assertNotIn("R1", self.rules(f))
+
+    def test_r1_whole_module_names(self):
+        f = self.base(); f["Apps/Foo/App/A.swift"] = "import VisualCoreDiagnostics\n"
+        self.assertNotIn("R1", self.rules(f))
+        f["Apps/Foo/App/B.swift"] = "import Diagnostics\n"
+        self.assertIn("R1", self.rules(f))
+
+    def test_r2_uikit_in_pure_module(self):
+        f = self.base(); f["Packages/VisualCore/Sources/VisualCoreMath/U.swift"] = "import UIKit\n"
+        self.assertIn("R2", self.rules(f))
+
+    def test_r3_cycle(self):
+        f = self.base()
+        f["Packages/VisualCore/Package.swift"] = PURE_PKG.replace('.target(name: "VisualCoreMath")', '.target(name: "VisualCoreMath", dependencies: ["VisualCoreSimulation"])')
+        self.assertIn("R3", self.rules(f))
+
+    def test_r4_package_imports_app(self):
+        f = self.base(); f["Apps/Foo/App/A.swift"] = "import Foundation\n"
+        f["Packages/VisualCore/Sources/VisualCoreMath/X.swift"] = "import Foo\n"
+        self.assertIn("R4", self.rules(f))
+
+    def test_r5_testsupport_in_product_target(self):
+        f = self.base()
+        f["Packages/VisualCore/Package.swift"] = PURE_PKG.replace('.target(name: "VisualCoreSimulation", dependencies: ["VisualCoreMath"])', '.target(name: "VisualCoreSimulation", dependencies: ["VisualCoreMath", "VisualCoreTestSupport"])')
+        self.assertIn("R5", self.rules(f))
 
 
 if __name__ == "__main__":

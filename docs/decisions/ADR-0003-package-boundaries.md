@@ -20,3 +20,22 @@ imports `ProjectMBridge`, `Rendering`, `ANGLERendering`, `PresetLibrary` or link
 
 Pure modules keep 70%+ of logic host-testable with `swift test` (Constitution IV); a binary-target
 package cannot be built on the macOS host, so GPU code is isolated in the iOS-only package.
+
+## Correction 2026-11-10 (feature 002, T-F106)
+
+The authoritative package map is now
+[`specs/002-architecture-contracts/contracts/package-map.md`](../../specs/002-architecture-contracts/contracts/package-map.md).
+It supersedes the table above. It traces every module to a Phase 0 finding or gap and adds two
+modules this ADR omitted: `VisualCorePersistence` (Constitution IX) and the generated `CVisualCoreGL`
+table. Enforced rules, checked by `scripts/check_dependencies.py`:
+
+* **R1** only `Harnesses/ProjectMReference/` touches reference modules (`ProjectMBridge`,
+  `ANGLERendering`, `Rendering`, `PresetLibrary`, `CaptureKit`, `CaptureUI`, `AudioCore`,
+  `Diagnostics`, `CANGLE`, `CFlashLimiter`) or `ProjectM.xcframework`; module names match whole.
+* **R2** pure `VisualCore` sources import only Foundation-level system modules and each other.
+* **R3** the target graph is acyclic.
+* **R4** packages never import app or harness modules.
+* **R5** `VisualCoreTestSupport` serves test targets only.
+
+The "check_compliance.py" reference above remains for non-dependency rules (private APIs,
+dlopen/dlsym, ReplayKit, signing).

@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "python3",
+    "scripts/validate_docs.py"
+  ],
+  "command": "python3 scripts/validate_docs.py",
+  "elapsed_seconds": 0.025,
+  "exit_code": 0,
+  "finished": "2026-11-10T23:44:03+00:00",
+  "log": ".autonomy/logs/F02.f01rework-validate-docs.log",
+  "log_sha256": "da6061dab22841d1a618e7226743154a5bac39f9935ee6c7b5fa4e8e868f9878",
+  "name": "f01rework-validate-docs",
+  "stage": "F02",
+  "started": "2026-11-10T23:44:03+00:00",
+  "timed_out": false
+}

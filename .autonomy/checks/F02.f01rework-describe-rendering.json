@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "swift",
+    "package",
+    "describe",
+    "--package-path",
+    "Packages/VisualCoreRendering"
+  ],
+  "command": "swift package describe --package-path Packages/VisualCoreRendering",
+  "elapsed_seconds": 0.569,
+  "exit_code": 0,
+  "finished": "2026-11-10T23:44:02+00:00",
+  "log": ".autonomy/logs/F02.f01rework-describe-rendering.log",
+  "log_sha256": "ba8352a10151c32b280014e88aad036e68de8d650fe3881b8fb397c95f62c1da",
+  "name": "f01rework-describe-rendering",
+  "stage": "F02",
+  "started": "2026-11-10T23:44:02+00:00",
+  "timed_out": false
+}

@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_compliance.py"
+  ],
+  "command": "python3 scripts/check_compliance.py",
+  "elapsed_seconds": 0.059,
+  "exit_code": 0,
+  "finished": "2026-11-10T23:44:03+00:00",
+  "log": ".autonomy/logs/F02.f01rework-compliance.log",
+  "log_sha256": "efeebcb5b79e8d9b33ecb0d418d2b8d021f10e0fa29de24c0d93736a98febf41",
+  "name": "f01rework-compliance",
+  "stage": "F02",
+  "started": "2026-11-10T23:44:03+00:00",
+  "timed_out": false
+}

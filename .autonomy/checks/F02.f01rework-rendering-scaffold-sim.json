@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package",
+    "--destination",
+    "generic-sim"
+  ],
+  "command": "'python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package' --destination generic-sim",
+  "elapsed_seconds": 0.002,
+  "exit_code": 127,
+  "finished": "2026-11-10T23:44:00+00:00",
+  "log": ".autonomy/logs/F02.f01rework-rendering-scaffold-sim.log",
+  "log_sha256": "9f336d72853e3b33fdedcbb8a8c12d3ecbfa2ffd3052632192a3574259d89a9c",
+  "name": "f01rework-rendering-scaffold-sim",
+  "stage": "F02",
+  "started": "2026-11-10T23:44:00+00:00",
+  "timed_out": false
+}

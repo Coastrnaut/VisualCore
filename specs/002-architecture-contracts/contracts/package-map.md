@@ -27,7 +27,7 @@ Supersedes the table in ADR-0003 where they differ (ADR-0003 is corrected to poi
 
 1. **R1** — Only `Harnesses/ProjectMReference/` may import or depend on `ProjectMBridge`,
    `ANGLERendering`, `Rendering`, `PresetLibrary`, `CaptureKit`, `CaptureUI`, `AudioCore`,
-   `Diagnostics` (reference packages) or `ProjectM.xcframework`.
+   `Diagnostics`, `CANGLE`, `CFlashLimiter` (reference packages and their C modules) or `ProjectM.xcframework`; names match whole.
 2. **R2** — Pure `VisualCore` modules import only Foundation/Swift standard library and each other
    (no UIKit, SwiftUI, QuartzCore, AVFAudio, C GL shims).
 3. **R3** — No cycles between products (manifest dependency graph is acyclic).

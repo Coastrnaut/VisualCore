@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "python3",
+    "scripts/test_scripts.py"
+  ],
+  "command": "python3 scripts/test_scripts.py",
+  "elapsed_seconds": 0.185,
+  "exit_code": 0,
+  "finished": "2026-11-10T23:44:03+00:00",
+  "log": ".autonomy/logs/F02.f01rework-script-tests.log",
+  "log_sha256": "36fc45aadb7f17eb0e0981a7df33c0791e9c2b225c339d24ffd639d650d66bb6",
+  "name": "f01rework-script-tests",
+  "stage": "F02",
+  "started": "2026-11-10T23:44:03+00:00",
+  "timed_out": false
+}

@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "swift",
+    "package",
+    "describe",
+    "--package-path",
+    "Packages/VisualCore"
+  ],
+  "command": "swift package describe --package-path Packages/VisualCore",
+  "elapsed_seconds": 0.194,
+  "exit_code": 0,
+  "finished": "2026-11-10T23:44:02+00:00",
+  "log": ".autonomy/logs/F02.f01rework-describe-pure.log",
+  "log_sha256": "2551d3af098fddc19661daaf35462d7d6e6e1c583b40bdebe22103c9a826c5f9",
+  "name": "f01rework-describe-pure",
+  "stage": "F02",
+  "started": "2026-11-10T23:44:02+00:00",
+  "timed_out": false
+}

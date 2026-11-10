@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package",
+    "--destination",
+    "generic-ios"
+  ],
+  "command": "'python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package' --destination generic-ios",
+  "elapsed_seconds": 0.002,
+  "exit_code": 127,
+  "finished": "2026-11-10T23:44:00+00:00",
+  "log": ".autonomy/logs/F02.f01rework-rendering-scaffold-ios.log",
+  "log_sha256": "283d9258b33f9b3e3b1be449ba9a9186259595f4ad771f592e6f226c85bc77b2",
+  "name": "f01rework-rendering-scaffold-ios",
+  "stage": "F02",
+  "started": "2026-11-10T23:44:00+00:00",
+  "timed_out": false
+}
