@@ -141,7 +141,7 @@ class CitationTests(unittest.TestCase):
 class BaselineDestinationTests(unittest.TestCase):
     def test_only_simulator_or_generic(self):
         self.assertEqual(baseline.destination("generic/platform=iOS"), "generic/platform=iOS")
-        self.assertTrue(baseline.destination("19108E51-71E5-4862-9C7F-6CBC357C060D").startswith("platform=iOS Simulator"))
+        self.assertTrue(baseline.destination("00000000-0000-4000-8000-000000000001").startswith("platform=iOS Simulator"))
         with self.assertRaises(SystemExit):
             baseline.destination("platform=iOS,id=00008120-001A2B3C4D5E6F70")
 
