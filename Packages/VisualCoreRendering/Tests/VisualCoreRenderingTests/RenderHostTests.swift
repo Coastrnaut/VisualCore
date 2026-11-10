@@ -167,6 +167,21 @@ final class RenderHostTests: XCTestCase {
         XCTAssertGreaterThan(pixel(host.readPixels(), host, x: 3, y: 3).1, 250)
     }
 
+    func testLostContextIsReportedRecreatedAndRendersAgain() throws {
+        let scene = RecordingScene()
+        let host = try makeLaidOut(scene)
+        var errors: [RenderHostError] = []
+        host.addErrorObserver { errors.append($0) }
+        host.simulateContextLossOnNextFrame()
+        XCTAssertFalse(host.renderOneFrame(present: true), "the frame with the lost context is dropped")
+        XCTAssertEqual(errors, [.contextLost])
+        XCTAssertEqual(host.generation, 2)
+        XCTAssertEqual(scene.setups, 2)
+        XCTAssertEqual(scene.teardowns, 1)
+        XCTAssertEqual(host.state, .active)
+        XCTAssertTrue(host.renderOneFrame(present: false))
+    }
+
     func testDestroyTearsDownAndLaterCallsAreNoOps() throws {
         let scene = RecordingScene()
         let host = try makeLaidOut(scene)

@@ -63,6 +63,6 @@ MVP = US1 (clear + gradient on both simulators). Implement in bounded groups; ru
 
 ## Phase 7: Convergence
 
-- [ ] T-F221 Add test hook `simulateContextLossOnNextFrame()` to `RenderHost` and a simulator test proving EGL_CONTEXT_LOST after a swap reports `.contextLost`, recreates (generation +1) and renders again per FR-F208 (partial)
+- [X] T-F221 Add test hook `simulateContextLossOnNextFrame()` to `RenderHost` and a simulator test proving EGL_CONTEXT_LOST after a swap reports `.contextLost`, recreates (generation +1) and renders again per FR-F208 (partial) — Verified 2026-11-10: testLostContextIsReportedRecreatedAndRendersAgain passes; F02.f02-t221-tests-ios27/ios26 16/16
 - [ ] T-F222 Align `specs/003-rendering-lifecycle/data-model.md` RenderContext with code (`pixelWidth`, `pixelHeight`) per plan: data-model (contradicts)
 - [ ] T-F223 Document `addErrorObserver`, `lifecycleHistory`, `rejectedTransitions`, `presentedFrameCount`, `framePacing` in `contracts/render-host-api.md` per plan: contracts (unrequested)

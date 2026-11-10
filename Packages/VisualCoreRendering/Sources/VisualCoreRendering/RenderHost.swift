@@ -343,7 +343,7 @@ public final class RenderHost {
         Self.assertMainThread()
         guard state == .active, let surface else { return false }
         guard eglMakeCurrent(display, surface, surface, context) == EGL_TRUE else {
-            handleEGLFailure()
+            handleEGLFailure(eglGetError())
             return false
         }
         vcglBindFramebuffer(GLenum(GL_FRAMEBUFFER), 0)
@@ -365,9 +365,15 @@ public final class RenderHost {
             vcglClearColor(0, 0, 0, 1)
             vcglClear(GLbitfield(GL_COLOR_BUFFER_BIT))
         }
+        if injectContextLoss {
+            // Test hook: behave exactly as if eglSwapBuffers had failed with EGL_CONTEXT_LOST.
+            injectContextLoss = false
+            handleEGLFailure(EGL_CONTEXT_LOST)
+            return false
+        }
         if present {
             guard eglSwapBuffers(display, surface) == EGL_TRUE else {
-                handleEGLFailure()
+                handleEGLFailure(eglGetError())
                 return false
             }
             presentedFrameCount += 1
@@ -375,12 +381,17 @@ public final class RenderHost {
         return true
     }
 
-    private func handleEGLFailure() {
-        if eglGetError() == EGL_CONTEXT_LOST {
+    /// FR-F208: a lost context is reported and recreated; other EGL failures are left to the next frame.
+    private func handleEGLFailure(_ error: EGLint) {
+        if error == EGL_CONTEXT_LOST {
             report(.contextLost)
             recreateContext()
         }
     }
+
+    /// Test hook (simulators cannot lose a context): the next frame takes the EGL_CONTEXT_LOST path.
+    func simulateContextLossOnNextFrame() { injectContextLoss = true }
+    private var injectContextLoss = false
 
     // MARK: Readback (FR-F211)
 
