@@ -75,3 +75,7 @@ P02 scene). T-A01-307 runs last.
 ## Implementation strategy
 
 The VisualCore store first, then the domain library, then the UI, then the leak gate and the contract.
+
+## Phase 5: Convergence
+
+- [ ] T-A01-308 Add `LibraryModel` unit tests in `Apps/GenerativeArtStudio/Tests/Unit/LibraryModelTests.swift`: an unwritable library directory makes `save` return nil and set `errorMessage`, with entries unchanged; 2 bad files among good ones give `problemCount == 2` per the edge case "write failure" and FR-A01-305 (partial)
