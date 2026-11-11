@@ -10,7 +10,7 @@ IDs `T-F4##`. One commit + push per task. Effects implemented one at a time (arc
 
 ## Phase 1: Setup
 
-- [ ] T-F401 Add test targets `VisualCoreEffectsGraphTests` (pure) and `VisualCoreEffectsTests` (sim) to the two Package.swift files
+- [X] T-F401 Add test targets `VisualCoreEffectsGraphTests` (pure) and `VisualCoreEffectsTests` (sim) to the two Package.swift files — Verified 2026-11-10: both test targets declared (first sources land in T-F402/T-F406; compiled there)
 
 ## Phase 2: Foundational (pure)
 
