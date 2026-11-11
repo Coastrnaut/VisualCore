@@ -41,7 +41,8 @@ final class DissipationFixtureTests: XCTestCase {
             let precision = try XCTUnwrap(scene.precision)
             if fallback { XCTAssertEqual(precision, .unorm8) }
             // Every step wrote the other target of each pair (one swap per pair per step).
-            XCTAssertEqual(scene.velocity?.swapCount, Self.steps)
+            // Feature 021: velocity is written twice per step (advect, then projection), dye once (advect).
+            XCTAssertEqual(scene.velocity?.swapCount, Self.steps * 2)
             XCTAssertEqual(scene.dye?.swapCount, Self.steps)
 
             // GLES leaves the half rounding of color writes implementation-defined: compare with the reference for

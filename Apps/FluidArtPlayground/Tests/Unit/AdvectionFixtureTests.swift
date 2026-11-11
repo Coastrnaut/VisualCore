@@ -31,24 +31,16 @@ final class AdvectionFixtureTests: XCTestCase {
         XCTAssertNil(scene.lastError, file: file, line: line)
         XCTAssertEqual(scene.stepCount, steps, file: file, line: line)
         let precision = try XCTUnwrap(scene.precision)
-        let modes: [StoragePrecision] = precision == .float16 ? [.float16, .float16TowardZero] : [.unorm8]
-        var dyeRefs: [[Float]] = [], velocityRefs: [[Float]] = []
         let c = scene.configuration
         XCTAssertEqual(scene.dye?.width, c.gridWidth, file: file, line: line)
-        for mode in modes {
-            var velocity = scene.initialVelocity().rounded(to: precision)
-            var dye = scene.initialDye().rounded(to: precision)
-            for _ in 0..<steps {
-                Advection.step(velocity: &velocity, dye: &dye, dt: 1.0 / 60, velocityDissipation: c.velocityDissipation,
-                               dyeDissipation: c.dyeDissipation, precision: mode, velocityEncoding: scene.encoding)
-            }
-            dyeRefs.append(dye.values)
-            velocityRefs.append(velocity.values)
-        }
+        // Feature 021: full-step reference (projection included; clarification 5).
+        let refs = try solverReference(scene, frames: Array(repeating: [], count: steps))
+        let modes = refs.map(\.mode)
+        let dyeRefs = refs.map(\.dye.values), velocityRefs = refs.map(\.velocity.values)
         let gpuDye = try XCTUnwrap(scene.dye?.read.readFloatPixels())
         let gpuVelocity = try XCTUnwrap(scene.velocity?.read.readFloatPixels())
         // SC-A02-203: within one storage step per step.
-        let tol = precision.tolerance * Float(steps == 120 ? 1 : steps)
+        let tol = precision.tolerance * (steps == 120 ? 1 : Float(steps) * storedPassesPerFrame(scene, splats: 0))
         let d = closestDifference(gpuDye, dyeRefs, tolerance: tol, relative: false)
         let v = closestDifference(gpuVelocity, velocityRefs, tolerance: tol, relative: precision != .unorm8)
         XCTAssertLessThanOrEqual(d.worst, tol, "dye \(c.gridWidth)² \(precision)", file: file, line: line)
@@ -80,7 +72,10 @@ final class AdvectionFixtureTests: XCTestCase {
     func testUniformVelocityMatchesCPU() throws {
         for size in [8, 16] {
             for fallback in [false, true] {
-                let scene = FluidFieldsScene(configuration: config(size), seed: .pattern, forceFallback: fallback)
+                // Uniform motion uses open edges (feature 021 clarification 5): walls would stop it at the edges.
+                var open = config(size)
+                open.boundaryMode = .open
+                let scene = FluidFieldsScene(configuration: open, seed: .pattern, forceFallback: fallback)
                 var v = FieldGrid(width: size, height: size, channels: 4)
                 for cell in 0..<(size * size) { v.values[cell * 4] = 30; v.values[cell * 4 + 1] = -15 }
                 scene.initialVelocityOverride = v
@@ -105,21 +100,14 @@ final class AdvectionFixtureTests: XCTestCase {
         scene.enqueue([splat])
         for _ in 0..<3 { XCTAssertTrue(host.renderOneFrame(present: false)) }
         let precision = try XCTUnwrap(scene.precision)
-        let modes: [StoragePrecision] = precision == .float16 ? [.float16, .float16TowardZero] : [.unorm8]
-        var refs: [[Float]] = []
-        for mode in modes {
-            var velocity = scene.initialVelocity().rounded(to: precision)
-            var dye = scene.initialDye().rounded(to: precision)
-            splat.apply(velocity: &velocity, dye: &dye, precision: mode, velocityEncoding: scene.encoding)
-            for _ in 0..<3 {
-                Advection.step(velocity: &velocity, dye: &dye, dt: 1.0 / 60, velocityDissipation: 1, dyeDissipation: 1,
-                               precision: mode, velocityEncoding: scene.encoding)
-            }
-            refs.append(dye.values)
-        }
+        // Feature 021: the splat lands in the first stepped frame, followed by two more full steps.
+        let reference = try solverReference(scene, frames: [[splat], [], []])
+        let modes = reference.map(\.mode)
+        let refs = reference.map(\.dye.values)
         let gpu = try XCTUnwrap(scene.dye?.read.readFloatPixels())
-        let d = closestDifference(gpu, refs, tolerance: precision.tolerance * 4, relative: false)
-        XCTAssertLessThanOrEqual(d.worst, precision.tolerance * 4)
+        let tol = precision.tolerance * 3 * storedPassesPerFrame(scene, splats: 1)
+        let d = closestDifference(gpu, refs, tolerance: tol, relative: false)
+        XCTAssertLessThanOrEqual(d.worst, tol)
         print("splat+advect fixture 16x16 \(precision): dye \(d.worst) via \(modes[d.reference])")
     }
 }

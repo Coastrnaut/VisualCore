@@ -56,7 +56,7 @@ IDs are `T-A02-3##`, with one commit and push per task (`scripts/tick_task.py`).
 
 ## Phase 3: User Stories 1 and 2 — GPU passes (P1)
 
-- [ ] T-A02-305 [US1] [US2] Add divergence, pressure, gradient and diffuse fragments to `FluidShaders.swift`
+- [X] T-A02-305 [US1] [US2] Add divergence, pressure, gradient and diffuse fragments to `FluidShaders.swift` — Verified 2026-11-11: FluidShaders gain solverCommon (dec/enc with uCenter and per-field ranges, inside(), velAt with the walls reflection, scalarAt), divergence, fill, pressure, gradient (walls rule), diffuse and copy fragments using texelFetch with explicit edge branches; FluidFieldsScene adds divergence/pressure/scratch pairs (created and released with the rest), the clarification-5 pipeline (advect velocity, viscosity, divergence, zero-fill + N Jacobi, gradient, then advect dye), only active uniforms per pass, activePressureIterations/qualityIterations and update(configuration:) (no rebuild). Phase 01/02 fixtures moved to the full-step reference (solverReference with FluidSolver.step; uniform motion with open edges; velocity swaps 2 per step). run-check A02-P03/t305-app-27 TEST SUCCEEDED, enumeration guard 26/26: half-float exact (0.0) through projection; 8-bit within the per-stored-pass tolerance (max dye 12/255, velocity 4/255 on the splat frame); isolation PASS
   (`texelFetch` with explicit edge branches; `uWalls`; encodings). Add pressure, divergence and scratch pairs to the
   scene, created and released with the others. Implement the pipeline of clarification 5 with
   `update(configuration:)` (edge mode, viscosity, dissipation and iterations take effect the next frame without a

@@ -21,6 +21,31 @@ func closestDifference(_ gpu: [Float], _ references: [[Float]], tolerance: Float
     return best
 }
 
+/// CPU reference of the scene's frames with the full solver (feature 021 clarification 5): `frames[k]` are the splats
+/// applied in frame k. Returns one (velocity, dye) result per candidate storage rounding.
+@MainActor
+func solverReference(_ scene: FluidFieldsScene, frames: [[Splat]], dt: Double = 1.0 / 60) throws -> [(mode: StoragePrecision, velocity: FieldGrid, dye: FieldGrid)] {
+    let precision = try XCTUnwrap(scene.precision)
+    let modes: [StoragePrecision] = precision == .float16 ? [.float16, .float16TowardZero] : [.unorm8]
+    let encodings = precision == .unorm8 ? try XCTUnwrap(FluidEncodings.unorm8(velocityRange: scene.velocityRangeCellsPerSecond)) : .none
+    return modes.map { mode in
+        var velocity = scene.initialVelocity().rounded(to: precision)
+        var dye = scene.initialDye().rounded(to: precision)
+        var log = FluidSolver.AccessLog()
+        for splats in frames {
+            FluidSolver.step(velocity: &velocity, dye: &dye, splats: splats, configuration: scene.configuration,
+                             pressureIterations: scene.activePressureIterations, dt: dt, precision: mode, encodings: encodings, log: &log)
+        }
+        return (mode, velocity, dye)
+    }
+}
+
+/// Stored passes in one frame (each may round once): splats ×2, advect ×2, viscosity, divergence, pressure, gradient.
+@MainActor
+func storedPassesPerFrame(_ scene: FluidFieldsScene, splats: Int) -> Float {
+    Float(2 * splats + 2 + (scene.configuration.viscosity > 0 ? FluidSolver.viscosityIterations : 0) + 2 + scene.activePressureIterations)
+}
+
 @MainActor
 final class SplatFixtureTests: XCTestCase {
     private func makeHost(_ scene: FluidFieldsScene) throws -> RenderHost {
@@ -58,21 +83,13 @@ final class SplatFixtureTests: XCTestCase {
                 XCTAssertEqual(scene.appliedSplats, 1)
                 XCTAssertNil(scene.lastError)
 
-                let modes: [StoragePrecision] = precision == .float16 ? [.float16, .float16TowardZero] : [.unorm8]
-                var dyeRefs: [[Float]] = [], velocityRefs: [[Float]] = []
-                for mode in modes {
-                    var velocity = scene.initialVelocity().rounded(to: precision)
-                    var dye = scene.initialDye().rounded(to: precision)
-                    splat.apply(velocity: &velocity, dye: &dye, precision: mode, velocityEncoding: scene.encoding)
-                    // The same frame then advects (feature 020 T-A02-211; clarification 5), with zero dissipation.
-                    Advection.step(velocity: &velocity, dye: &dye, dt: 1.0 / 60, velocityDissipation: 0, dyeDissipation: 0,
-                                   precision: mode, velocityEncoding: scene.encoding)
-                    dyeRefs.append(dye.values)
-                    velocityRefs.append(velocity.values)
-                }
+                // Feature 021: the same frame also projects (full-step reference, clarification 5).
+                let refs = try solverReference(scene, frames: [[splat]])
+                let modes = refs.map(\.mode)
+                let dyeRefs = refs.map(\.dye.values), velocityRefs = refs.map(\.velocity.values)
                 let gpuDye = try XCTUnwrap(scene.dye?.read.readFloatPixels())
                 let gpuVelocity = try XCTUnwrap(scene.velocity?.read.readFloatPixels())
-                let tol = precision.tolerance * 2   // two stored passes: splat, then advect
+                let tol = precision.tolerance * storedPassesPerFrame(scene, splats: 1)
                 let dyeDiff = closestDifference(gpuDye, dyeRefs, tolerance: tol, relative: false)
                 let velDiff = closestDifference(gpuVelocity, velocityRefs, tolerance: tol, relative: precision != .unorm8)
                 XCTAssertLessThanOrEqual(dyeDiff.worst, tol, "dye \(size)x\(size) \(precision)")

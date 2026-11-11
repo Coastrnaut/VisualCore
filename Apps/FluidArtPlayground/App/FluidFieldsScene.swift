@@ -56,9 +56,23 @@ final class FluidFieldsScene: RenderScene {
     private(set) var lastDrained = 0
     /// Splats waiting for the next stepped frame (CPU state; survives a context loss).
     private(set) var pendingSplats: [Splat] = []
+    /// Divergence, pressure and the viscosity scratch (feature 021), created and released with the other fields.
+    private(set) var divergenceField: PingPongTarget?
+    private(set) var pressure: PingPongTarget?
+    private var scratch: PingPongTarget?
+    /// Pressure iterations chosen by the quality policy; nil uses the configuration's value (feature 021).
+    var qualityIterations: Int?
+    /// Pressure iterations the last step used.
+    private(set) var lastPressureIterations = 0
     private var advect: FieldPass?
     private var splat: FieldPass?
     private var display: FieldPass?
+    private var divergencePass: FieldPass?
+    private var fillPass: FieldPass?
+    private var pressurePass: FieldPass?
+    private var gradientPass: FieldPass?
+    private var diffusePass: FieldPass?
+    private var copyPass: FieldPass?
     private var policy = TimeStepPolicy()
 
     init(configuration: FluidConfiguration = FluidConfiguration(), seed: SeedKind = .pattern,
@@ -102,6 +116,15 @@ final class FluidFieldsScene: RenderScene {
             advect = try FieldPass(registry: r, fragment: FluidShaders.advect, inputs: ["uVelocity", "uSource"], label: "fap.advect")
             splat = try FieldPass(registry: r, fragment: FluidShaders.splat, inputs: ["uField"], label: "fap.splat")
             display = try FieldPass(registry: r, fragment: FluidShaders.display, inputs: ["uDye"], label: "fap.display")
+            divergenceField = try PingPongTarget(registry: r, width: w, height: h, format: format, label: "fap.divergence")
+            pressure = try PingPongTarget(registry: r, width: w, height: h, format: format, label: "fap.pressure")
+            scratch = try PingPongTarget(registry: r, width: w, height: h, format: format, label: "fap.scratch")
+            divergencePass = try FieldPass(registry: r, fragment: FluidShaders.divergence, inputs: ["uVelocity"], label: "fap.divergence")
+            fillPass = try FieldPass(registry: r, fragment: FluidShaders.fill, inputs: [], label: "fap.fill")
+            pressurePass = try FieldPass(registry: r, fragment: FluidShaders.pressure, inputs: ["uPressure", "uDivergence"], label: "fap.pressure")
+            gradientPass = try FieldPass(registry: r, fragment: FluidShaders.gradient, inputs: ["uVelocity", "uPressure"], label: "fap.gradient")
+            diffusePass = try FieldPass(registry: r, fragment: FluidShaders.diffuse, inputs: ["uX", "uB"], label: "fap.diffuse")
+            copyPass = try FieldPass(registry: r, fragment: FluidShaders.copy, inputs: ["uField"], label: "fap.copy")
             guard uploadSeed(velocity.read, initialVelocity().values) else { throw FluidSceneError.seedUploadFailed("velocity") }
             guard uploadSeed(dye.read, initialDye().values) else { throw FluidSceneError.seedUploadFailed("dye") }
         } catch {
@@ -169,11 +192,12 @@ final class FluidFieldsScene: RenderScene {
                 let encoded = FieldUniform.int(storage == .rgba8 ? 1 : 0)
                 let range = FieldUniform.float(velocityRangeCellsPerSecond)
                 let center = FieldUniform.float(encoding?.center ?? 0.5)
-                // Clarification 5: velocity advects itself, then dye moves with the advected velocity.
+                // Spec 021 clarification 5: advect velocity, viscosity, projection, then dye by the projected velocity.
                 try advect.run(pair: velocity, input: "uSource", extraInputs: ["uVelocity": velocity.read], uniforms: [
                     "uDt": .float(Float(dt)), "uFactor": .float(Dissipation.factor(d: configuration.velocityDissipation, dt: dt)),
                     "uEncodedVelocity": encoded, "uSourceIsVelocity": .int(1), "uRange": range, "uCenter": center,
                 ])
+                try solve(velocity: velocity, dt: dt)
                 try advect.run(pair: dye, input: "uSource", extraInputs: ["uVelocity": velocity.read], uniforms: [
                     "uDt": .float(Float(dt)), "uFactor": .float(Dissipation.factor(d: configuration.dyeDissipation, dt: dt)),
                     "uEncodedVelocity": encoded, "uSourceIsVelocity": .int(0), "uRange": range, "uCenter": center,
@@ -188,6 +212,60 @@ final class FluidFieldsScene: RenderScene {
         }
     }
 
+    /// The solver uniforms shared by every pass (encoding, ranges, edge mode).
+    private var solverUniforms: [String: FieldUniform] {
+        let v = velocityRangeCellsPerSecond
+        return ["uWalls": .int(configuration.boundaryMode == .walls ? 1 : 0), "uEncoded": .int(storage == .rgba8 ? 1 : 0),
+                "uCenter": .float(encoding?.center ?? 0.5), "uRangeV": .float(v), "uRangeD": .float(v * 2), "uRangeP": .float(v * 4)]
+    }
+
+    /// The pressure iterations used now: the quality tier's value, never more than the configured value.
+    var activePressureIterations: Int {
+        min(configuration.pressureIterations, max(1, qualityIterations ?? configuration.pressureIterations))
+    }
+
+    /// Viscosity (if any), divergence, Jacobi pressure from zero and gradient subtraction (FluidSolver on the GPU).
+    private func solve(velocity: PingPongTarget, dt: Double) throws(FieldPassError) {
+        guard let divergenceField, let pressure, let scratch, let divergencePass, let fillPass, let pressurePass,
+              let gradientPass, let diffusePass, let copyPass else { return }
+        let common = solverUniforms
+        // Each pass gets the shared uniforms its program actually uses (the compiler removes unused ones, and
+        // FieldPass rejects names that are not active).
+        func uniforms(_ pass: FieldPass, _ extra: [String: FieldUniform] = [:]) -> [String: FieldUniform] {
+            common.merging(extra) { $1 }.filter { pass.program.uniforms[$0.key] != nil }
+        }
+        if configuration.viscosity > 0 {
+            try copyPass.run(output: .target(scratch.write), inputs: ["uField": velocity.read])
+            scratch.swap()
+            let alpha = Float(1 / (configuration.viscosity * FluidSolver.viscosityScale * dt))
+            for _ in 0..<FluidSolver.viscosityIterations {
+                try diffusePass.run(pair: velocity, input: "uX", extraInputs: ["uB": scratch.read], uniforms: uniforms(diffusePass, ["uAlpha": .float(alpha)]))
+            }
+        }
+        try divergencePass.run(output: .target(divergenceField.write), inputs: ["uVelocity": velocity.read], uniforms: uniforms(divergencePass))
+        divergenceField.swap()
+        try fillPass.run(output: .target(pressure.read), inputs: [:], uniforms: uniforms(fillPass))
+        let iterations = activePressureIterations
+        lastPressureIterations = iterations
+        for _ in 0..<iterations {
+            try pressurePass.run(pair: pressure, input: "uPressure", extraInputs: ["uDivergence": divergenceField.read],
+                                 uniforms: uniforms(pressurePass))
+        }
+        try gradientPass.run(pair: velocity, input: "uVelocity", extraInputs: ["uPressure": pressure.read],
+                             uniforms: uniforms(gradientPass))
+    }
+
+    /// Applies new tuning from the next frame without rebuilding the fields (feature 021 FR-A02-306): viscosity,
+    /// dissipation, pressure iterations, edge mode and splat settings. The grid size and velocity range are kept.
+    func update(configuration new: FluidConfiguration) {
+        var c = new
+        c.gridWidth = configuration.gridWidth
+        c.gridHeight = configuration.gridHeight
+        c.velocityRange = configuration.velocityRange
+        c.seed = configuration.seed
+        configuration = c.validated(maxEdge: effectiveMaxEdge).0
+    }
+
     func teardown(_ context: RenderContext) { releaseAll() }
 
     private func releaseAll() {
@@ -196,6 +274,17 @@ final class FluidFieldsScene: RenderScene {
         advect?.release()
         splat?.release()
         display?.release()
+        for pair in [divergenceField, pressure, scratch] { pair?.release() }
+        for pass in [divergencePass, fillPass, pressurePass, gradientPass, diffusePass, copyPass] { pass?.release() }
+        divergenceField = nil
+        pressure = nil
+        scratch = nil
+        divergencePass = nil
+        fillPass = nil
+        pressurePass = nil
+        gradientPass = nil
+        diffusePass = nil
+        copyPass = nil
         velocity = nil
         dye = nil
         advect = nil
