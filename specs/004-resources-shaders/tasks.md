@@ -10,7 +10,7 @@ IDs `T-F3##`. Tick only with `— Verified YYYY-MM-DD: <command/result>`. One co
 
 ## Phase 1: Setup
 
-- [X] T-F301 Add test targets `VisualCoreShaderSourceTests` to `Packages/VisualCore/Package.swift` — Verified 2026-11-10: swift package describe lists VisualCoreShaderSourceTests; scripts/tick_task.py added
+- [X] T-F301 Add test targets `VisualCoreShaderSourceTests` to `Packages/VisualCore/Package.swift` — Verified 2026-11-10: target declared in Package.swift (describe warns "no sources" until T-F302 adds the first test file; verified compiled in T-F302)
 
 ## Phase 2: Foundational (pure, host-tested)
 
