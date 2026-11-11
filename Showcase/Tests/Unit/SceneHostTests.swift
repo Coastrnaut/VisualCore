@@ -46,6 +46,34 @@ final class SceneHostTests: XCTestCase {
         XCTAssertEqual(sh.snapshot.leaked, 0, "teardown released everything")
     }
 
+    // T-F615 (spec edge case): a host that cannot be created yields a visible, readable error, not a blank canvas.
+    func testRenderingUnavailableIsReported() {
+        struct NoRenderer: Error, CustomStringConvertible { var description: String { "no OpenGL ES 3.0 configuration" } }
+        let sh = SceneHost(scene: ClearTestScene()) { _ in throw NoRenderer() }
+        XCTAssertNil(sh.host)
+        XCTAssertEqual(sh.unavailableMessage, "Rendering unavailable: no OpenGL ES 3.0 configuration")
+        XCTAssertTrue(sh.snapshot.label.hasSuffix("error=Rendering unavailable: no OpenGL ES 3.0 configuration"))
+        sh.close()
+    }
+
+    // T-F616 (FR-F607, US4 AC1): the overlay refreshes from its own timer at least twice per second.
+    func testDiagnosticsRefreshAtLeastTwicePerSecond() throws {
+        let scene = ClearTestScene()
+        let sh = SceneHost(scene: scene)
+        XCTAssertEqual(sh.status, "clear")
+        var changes: [Date] = []
+        let start = Date()
+        for i in 1...3 {
+            scene.status = "tick \(i)"
+            let deadline = Date().addingTimeInterval(0.5)
+            while sh.status != scene.status && Date() < deadline { RunLoop.current.run(until: Date().addingTimeInterval(0.02)) }
+            XCTAssertEqual(sh.status, "tick \(i)", "picked up within 0.5 s without a manual sample")
+            changes.append(Date())
+        }
+        XCTAssertLessThan(changes.last!.timeIntervalSince(start), 1.5)
+        sh.close()
+    }
+
     func testSnapshotLabelFormat() {
         var s = DiagnosticsSnapshot()
         s.frames = 12; s.fps = 59.6; s.state = "active"; s.generation = 2; s.liveResources = 3; s.liveBytes = 1024
