@@ -1,6 +1,7 @@
 // FluidArtPlaygroundApp.swift — Fluid Art Playground app shell (feature 018 A02-P00 T-A02-004; FR-A02-005).
-// Phase 00 is a titled home screen only: no render host, no permissions, no networking. The solver, its CPU reference
-// and rendering arrive in Phases 01–02 through VisualCore modules (docs/apps/fluid-art-playground/visualcore-contract.md).
+// Phase 01 (feature 019 T-A02-112) adds the playground canvas, reached from the home screen (`fap.home.open`).
+// No permissions, no networking; rendering goes through VisualCore modules
+// (docs/apps/fluid-art-playground/visualcore-contract.md).
 import SwiftUI
 
 @main
@@ -24,9 +25,18 @@ struct HomeView: View {
                     .accessibilityAddTraits(.isHeader)
                     .accessibilityLabel("Fluid Art Playground")
                     .accessibilityIdentifier("fap.home.title")
-                Text("Ink, smoke and dye simulations are coming in the next phases.")
+                Text("Watch seeded dye fade on a fluid grid. Touch, ink and smoke arrive in the next phases.")
                     .font(.body)
                     .multilineTextAlignment(.center)
+                NavigationLink {
+                    PlaygroundView()
+                } label: {
+                    Label("Open playground", systemImage: "play.fill")
+                        .font(.headline)
+                        .frame(minHeight: 44)
+                }
+                .buttonStyle(.borderedProminent)
+                .accessibilityIdentifier("fap.home.open")
             }
             .padding()
             .accessibilityElement(children: .contain)

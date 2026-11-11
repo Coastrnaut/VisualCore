@@ -29,7 +29,8 @@
 ## PlaygroundView (app)
 
 - Navigation: home `fap.home.open` → `PlaygroundView`.
-- The canvas has the identifier `fap.canvas`, the label "Fluid canvas", and a value from `FluidCanvasDescription`.
+- The canvas has the identifier `fap.canvas`. Its label is the `FluidCanvasDescription` text, following the A01
+  pattern, because `RenderSurface` exposes a label and a hint. The hint begins "Fluid canvas".
 - The title is "Playground", shown as a header.
 - No permissions and no networking.
 

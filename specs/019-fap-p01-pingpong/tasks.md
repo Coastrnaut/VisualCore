@@ -132,7 +132,7 @@ both runtimes and both storages.
 
 **Goal**: FR-A02-106 and 107. **Independent test**: the lifecycle unit tests and the UI test on both runtimes.
 
-- [ ] T-A02-112 [US3] Add `Apps/FluidArtPlayground/App/PlaygroundView.swift`:
+- [X] T-A02-112 [US3] Add `Apps/FluidArtPlayground/App/PlaygroundView.swift`: — Verified 2026-11-11: PlaygroundView with PlaygroundModel (owns one RenderHost(scene: FluidFieldsScene), destroyed on disappear; RenderSurface with identifier fap.canvas, label from FluidCanvasDescription, hint 'Fluid canvas...'; title 'Playground'; failure text if the host cannot start); home gains a 44-pt NavigationLink fap.home.open. Contract app-fields.md aligned with the A01 label-plus-hint pattern. run-check A02-P01/t112-app-build TEST BUILD SUCCEEDED with the dependency audit PASS; UI behavior verified in T-A02-113
   - `RenderHost(scene: FluidFieldsScene)` in `RenderSurface`, with the label "Fluid canvas" and a value from
     `FluidCanvasDescription`, identifier `fap.canvas`;
   - the title "Playground";
