@@ -90,6 +90,23 @@ final class ExplorerModel {
     /// VoiceOver announcements made for notice changes (tests).
     private(set) var announcements: [String] = []
 
+    /// Where the precision assumption comes from (feature 027 T-A03-209; US4 AC3), shown under the banner.
+    var precisionSource: String {
+        if let bits = mantissaBitsOverride { return "Shader precision: \(bits) bits (test setting)" }
+        return Self.precisionSource(highp: host?.capabilities.fragmentHighp, mediump: host?.capabilities.fragmentMediump)
+    }
+
+    /// Describes the precision the limit is computed from: highp, else mediump, else the conservative 10-bit assumption
+    /// with the reason.
+    static func precisionSource(highp: RenderCapabilities.ShaderPrecision?,
+                                mediump: RenderCapabilities.ShaderPrecision?) -> String {
+        if let h = highp, h.isSupported, h.precisionBits > 0 { return "Shader precision: highp, \(h.precisionBits) bits" }
+        if let m = mediump, m.isSupported, m.precisionBits > 0 {
+            return "Shader precision: mediump, \(m.precisionBits) bits — the graphics driver reported no usable highp floats"
+        }
+        return "Shader precision: assumed 10 bits — the graphics driver reported no usable highp or mediump float precision"
+    }
+
     /// The mantissa bits the shader works with.
     var mantissaBits: Int { mantissaBitsOverride ?? host?.capabilities.fragmentMantissaBits() ?? 10 }
     /// Device pixels per point.
@@ -260,6 +277,10 @@ struct ExplorerView: View {
                     Label(text, systemImage: "exclamationmark.triangle")
                         .fixedSize(horizontal: false, vertical: true)
                         .accessibilityIdentifier("fe.precision")
+                    Text(model.precisionSource)
+                        .font(.footnote)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .accessibilityIdentifier("fe.precision.source")
                 }
                 if model.usingFallback, let error = model.scene.errorMessage {
                     Text("The graphics shader could not run, so a simpler preview is shown. (\(error))")

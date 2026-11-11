@@ -1,5 +1,6 @@
 // PrecisionClampTests — feature 027 T-A03-207 (FR-A03-206, SC-A03-203; US4 AC1–AC3).
 import FractalExplorerCore
+import VisualCoreRendering
 import VisualCoreMath
 import XCTest
 @testable import FractalExplorer
@@ -56,5 +57,33 @@ final class PrecisionClampTests: XCTestCase {
         XCTAssertEqual(m.notice, .reached)
         let minUnitsPerPoint = PrecisionAdvisor.minimumPixelStep(mantissaBits: 10, magnitude: max(abs(m.state.viewport.center.x), abs(m.state.viewport.center.y))) * 3
         XCTAssertGreaterThanOrEqual(m.state.viewport.unitsPerPoint, minUnitsPerPoint * (1 - 1e-12))
+    }
+}
+
+// Feature 027 T-A03-209 (US4 AC3): the precision source and the fallback reason.
+@MainActor
+final class PrecisionSourceTests: XCTestCase {
+    typealias P = RenderCapabilities.ShaderPrecision
+
+    func testHighpMediumpAndNoReport() {
+        XCTAssertEqual(ExplorerModel.precisionSource(highp: P(rangeMin: 127, rangeMax: 127, precisionBits: 23),
+                                                     mediump: P(rangeMin: 15, rangeMax: 15, precisionBits: 10)),
+                       "Shader precision: highp, 23 bits")
+        XCTAssertEqual(ExplorerModel.precisionSource(highp: P(rangeMin: 0, rangeMax: 0, precisionBits: 0),
+                                                     mediump: P(rangeMin: 15, rangeMax: 15, precisionBits: 10)),
+                       "Shader precision: mediump, 10 bits — the graphics driver reported no usable highp floats")
+        XCTAssertEqual(ExplorerModel.precisionSource(highp: nil, mediump: nil),
+                       "Shader precision: assumed 10 bits — the graphics driver reported no usable highp or mediump float precision")
+    }
+
+    func testTheHostedModelReportsItsSource() {
+        let m = ExplorerModel(size: Vec2(300, 400))
+        defer { m.close() }
+        if m.host == nil {
+            XCTAssertTrue(m.precisionSource.hasPrefix("Shader precision: assumed 10 bits"))
+        } else {
+            XCTAssertTrue(m.precisionSource.hasPrefix("Shader precision: "), m.precisionSource)
+            XCTAssertTrue(m.precisionSource.contains("\(m.mantissaBits) bits"), m.precisionSource)
+        }
     }
 }

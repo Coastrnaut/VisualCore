@@ -69,6 +69,7 @@ final class ExplorerUITests: XCTestCase {
         }
         XCTAssertTrue(sawNear, "the near-limit notice comes first")
         XCTAssertTrue(banner.label.contains("Precision limit reached — zoom stops here"), banner.label)
+        XCTAssertTrue(app.staticTexts["fe.precision.source"].label.hasPrefix("Shader precision: "))
         XCTAssertTrue(canvas.label.hasSuffix("Precision limit reached — zoom stops here"), canvas.label)
         let atLimit = canvas.label
         zoomIn.tap()
