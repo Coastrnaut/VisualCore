@@ -17,6 +17,33 @@
 - Signing, archive upload and App Store Connect work are owner-only (`BLOCKED_OWNER_ACTION`, CLAUDE.md §5).
 - Evidence is host and simulator only.
 
+## Clarifications
+
+### Session 2026-11-11
+
+Answered autonomously under the owner's standing approval (CLAUDE.md §2); the recommended option was chosen in each case.
+
+- Q: How is "required-reason API use" detected in the built app? → A: By scanning the undefined and imported symbols
+  of the app binary and every embedded framework (`nm`) against a maintained table of Apple's required-reason API
+  categories and their symbols: UserDefaults, file timestamps, system boot time, disk space, active keyboards and user
+  defaults domains. A category used only inside an embedded framework without its own manifest (for example ANGLE) is
+  declared in the app's manifest. The table lives with the shared check, so every app gets the same detection.
+- Q: Which approved reasons are declared? → A: The reasons that describe the actual use, recorded with the code site
+  for each in the privacy summary: UserDefaults CA92.1 (the app's own settings); file timestamps C617.1 (files in the
+  app's own container); system boot time 35F9.1 (elapsed-time measurement for frame timing). A category the scan finds
+  that has no fitting reason is a release blocker, never a guessed declaration.
+- Q: What is the app icon? → A: A 1024×1024 opaque render of the Gradient Noise "Dusk" preset at a fixed time, made
+  by the app's own exporter in a hosted test and committed with its provenance (composition, seed, time, commit). It is
+  a single-size icon, with no text and no third-party art.
+- Q: How is the automation runner hosted in the app? → A: Through a reusable VisualCoreAutomation SwiftUI view that
+  hosts any RenderScene and runs the requested mode. It uses the existing `VISUALCORE_AUTORUN` environment trigger and
+  the smoke, launch and lifecycle modes, and is compiled only under DEBUG or the automation condition. The app hosts its
+  default composition, and the existing simulator runner script rehearses each mode.
+- Q: What does crash recovery clean at launch? → A: The export folder in the app's temporary directory (left behind
+  when the app is killed with the export sheet open) and leftover store temporary files, which the store already
+  removes when it loads. Saved compositions are never touched. An interrupted save keeps the previous file (atomic
+  replace, Phase 03).
+
 ## User Scenarios & Testing *(mandatory)*
 
 Users: the owner, who will sign and submit the app; App Review; people who install the app; and the maintainers of
@@ -130,8 +157,9 @@ campaign II.
   by every app.
 - **FR-A01-603**: The app MUST declare only the usage strings it needs (Photos add-only). Each declared permission
   MUST be justified in the privacy summary with the exact UI path that triggers it.
-- **FR-A01-604**: The app MUST have an app icon at the required store size, generated from the app's own renderer
-  (no third-party art), together with version metadata and the export-compliance (encryption) declaration.
+- **FR-A01-604**: The app MUST have a 1024×1024 opaque app icon rendered by the app's own exporter (no third-party art;
+  provenance recorded), together with version metadata (1.0.0, build 1) and the export-compliance (encryption)
+  declaration.
 - **FR-A01-605**: A privacy-and-credits document MUST list stored data, permissions, third-party components with
   licenses, and asset provenance. It MUST agree with the app's About text and the legal notices.
 - **FR-A01-606**: A release checklist and artifact inventory MUST list every release item with a status: verified
@@ -140,8 +168,8 @@ campaign II.
 - **FR-A01-607**: Compositions saved in the current format MUST open unchanged in this build (a committed fixture).
   Interrupted saves MUST leave the previous file readable. Leftover temporary and export files MUST be removed at
   launch.
-- **FR-A01-608**: A debug-only automation runner MUST provide smoke, launch and lifecycle modes that write JSON
-  reports and exit. It is rehearsed on simulators, and its symbols MUST be absent from the shipping build.
+- **FR-A01-608**: A debug-only automation runner, hosted through a reusable VisualCoreAutomation view, MUST provide
+  smoke, launch and lifecycle modes that write JSON reports and exit. It is rehearsed on simulators, and its symbols MUST be absent from the shipping build.
 - **FR-A01-609**: Build and archive instructions MUST give exact commands for the unsigned Release build and checks.
   Signing, archive upload and store submission are owner-only steps.
 - **FR-A01-610**: A shared release-readiness check MUST verify an app's release artifacts (icon, version, encryption
