@@ -1,0 +1,22 @@
+{
+  "argv": [
+    "git",
+    "diff",
+    "--stat",
+    "--exit-code",
+    "8172b76..HEAD",
+    "--",
+    "Packages",
+    "External"
+  ],
+  "command": "git diff --stat --exit-code 8172b76..HEAD -- Packages External",
+  "elapsed_seconds": 0.01,
+  "exit_code": 0,
+  "finished": "2026-11-11T03:25:46+00:00",
+  "log": ".autonomy/logs/A01-P00.t010-no-shared-changes.log",
+  "log_sha256": "e36b22a0e1a4109cd3701bcb563152db88262efa52095ceb7f560fac5ffbd7ed",
+  "name": "t010-no-shared-changes",
+  "stage": "A01-P00",
+  "started": "2026-11-11T03:25:46+00:00",
+  "timed_out": false
+}

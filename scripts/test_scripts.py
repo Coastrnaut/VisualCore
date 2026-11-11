@@ -459,7 +459,7 @@ class ReleaseCheckTests(unittest.TestCase):
     def test_step_list_covers_every_release_gate(self):
         names = [s.name for s in relcheck.steps("X")]
         self.assertEqual(len(names), len(set(names)))
-        for required in ["docs", "compliance", "dependencies", "public-api", "licenses", "script-tests", "host-visualcore",
+        for required in ["docs", "app-contracts", "compliance", "dependencies", "public-api", "licenses", "script-tests", "host-visualcore",
                          "host-gardenkit", "documented-api-showcase", "documented-api-second-consumer",
                          "rendering-sim-ios27", "rendering-sim-ios26", "showcase-ios27", "showcase-ios26",
                          "interactive-demo-ios26", "second-consumer-ios27", "projectm-reference-ios26",

@@ -88,6 +88,11 @@ def steps(stamp: str) -> list[Step]:
         Step("documented-api-interactive-demo", [PY, "scripts/check_documented_api.py", "--sources", "Harnesses/InteractiveDemo"]),
         Step("documented-api-second-consumer", [PY, "scripts/check_documented_api.py", "--sources", "Harnesses/SecondConsumer"]),
         Step("licenses", [PY, "scripts/check_licenses.py"]),
+        # Every app's Phase 00 VisualCore contract (feature 011): all citations resolve, gaps owned, decision recorded.
+        Step("app-contracts", [PY, "-c", "import pathlib,subprocess,sys;apps=sorted(p.parent.name for p in "
+                               "pathlib.Path('docs/apps').glob('*/visualcore-contract.json'));"
+                               "sys.exit(max([subprocess.run([sys.executable,'scripts/check_app_contract.py','--app',a]).returncode "
+                               "for a in apps] or [0]))"]),
         Step("script-tests", [PY, "scripts/test_scripts.py"]),
         Step("host-visualcore", ["swift", "test", "--package-path", "Packages/VisualCore"]),
         Step("host-gardenkit", ["swift", "test", "--package-path", "Harnesses/SecondConsumer/GardenKit"]),

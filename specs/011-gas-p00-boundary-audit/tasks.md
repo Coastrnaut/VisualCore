@@ -69,7 +69,7 @@ both simulators and the reference regression. IDs are `T-A01-0##`. Each task get
 
 ## Phase 7: Polish and cross-cutting
 
-- [ ] T-A01-010 Verify that `git diff --stat <phase-start>..HEAD -- Packages External` is empty (SC-A01-006). Add the release-check step `app-contracts` (runs `check_app_contract.py` for every `docs/apps/*/visualcore-contract.json`), with a test. Then run `validate_docs.py` and the full script tests.
+- [X] T-A01-010 Verify that `git diff --stat <phase-start>..HEAD -- Packages External` is empty (SC-A01-006). Add the release-check step `app-contracts` (runs `check_app_contract.py` for every `docs/apps/*/visualcore-contract.json`), with a test. Then run `validate_docs.py` and the full script tests. — Verified 2026-11-10: run-check A01-P00/t010-no-shared-changes: git diff --exit-code 8172b76..HEAD -- Packages External = no changes (SC-A01-006); release_check.py gains step app-contracts (all docs/apps/*/visualcore-contract.json; test asserts presence); run-check A01-P00/t010-release-fast PASS 7/7 (docs incl. links, app-contracts, compliance, dependencies, public API, licenses, 53 script tests)
 
 ## Dependencies
 
