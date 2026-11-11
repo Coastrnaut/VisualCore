@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "python3",
+    "scripts/audit_showcase_dependencies.py",
+    "--app",
+    "Build/DerivedData/Showcase/Build/Products/Debug-iphonesimulator/Showcase.app"
+  ],
+  "command": "python3 scripts/audit_showcase_dependencies.py --app Build/DerivedData/Showcase/Build/Products/Debug-iphonesimulator/Showcase.app",
+  "elapsed_seconds": 0.747,
+  "exit_code": 0,
+  "finished": "2026-11-11T01:24:58+00:00",
+  "log": ".autonomy/logs/F06.t612-audit-sim.log",
+  "log_sha256": "4085fb5b56139198025223db76b148dba0cda5632c918362378386a526618cc2",
+  "name": "t612-audit-sim",
+  "stage": "F06",
+  "started": "2026-11-11T01:24:57+00:00",
+  "timed_out": false
+}

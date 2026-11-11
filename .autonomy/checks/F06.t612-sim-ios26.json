@@ -1,0 +1,26 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/VisualCoreRendering",
+    "--scheme",
+    "VisualCoreRendering-Package",
+    "--destination",
+    "sim-26.5",
+    "--action",
+    "test",
+    "--result-name",
+    "F06-t612-ios26"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-26.5 --action test --result-name F06-t612-ios26",
+  "elapsed_seconds": 13.68,
+  "exit_code": 0,
+  "finished": "2026-11-11T01:25:26+00:00",
+  "log": ".autonomy/logs/F06.t612-sim-ios26.log",
+  "log_sha256": "65359f58d49b6cb35c33132f51e1d284724781cef5e3ba66bbe2a4d90befeb83",
+  "name": "t612-sim-ios26",
+  "stage": "F06",
+  "started": "2026-11-11T01:25:12+00:00",
+  "timed_out": false
+}

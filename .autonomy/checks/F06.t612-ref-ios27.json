@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "python3",
+    "scripts/run_reference_baseline.py",
+    "--step",
+    "test-anglerendering-ios27"
+  ],
+  "command": "python3 scripts/run_reference_baseline.py --step test-anglerendering-ios27",
+  "elapsed_seconds": 3.793,
+  "exit_code": 0,
+  "finished": "2026-11-11T01:25:31+00:00",
+  "log": ".autonomy/logs/F06.t612-ref-ios27.log",
+  "log_sha256": "a7aeb926aef0754deb974586586b57d18121eafbeed6316b21a430e81c7068cb",
+  "name": "t612-ref-ios27",
+  "stage": "F06",
+  "started": "2026-11-11T01:25:27+00:00",
+  "timed_out": false
+}

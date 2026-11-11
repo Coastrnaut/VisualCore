@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "python3",
+    "scripts/audit_showcase_dependencies.py",
+    "--app",
+    "Build/DerivedData/ShowcaseDevice/Build/Products/Debug-iphoneos/Showcase.app"
+  ],
+  "command": "python3 scripts/audit_showcase_dependencies.py --app Build/DerivedData/ShowcaseDevice/Build/Products/Debug-iphoneos/Showcase.app",
+  "elapsed_seconds": 0.616,
+  "exit_code": 0,
+  "finished": "2026-11-11T01:24:59+00:00",
+  "log": ".autonomy/logs/F06.t612-audit-device.log",
+  "log_sha256": "fb71142c0536cf3c8c64f3af39e469a187f3276eb879f2b1c33ffa08b9f36fe0",
+  "name": "t612-audit-device",
+  "stage": "F06",
+  "started": "2026-11-11T01:24:58+00:00",
+  "timed_out": false
+}

@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_compliance.py"
+  ],
+  "command": "python3 scripts/check_compliance.py",
+  "elapsed_seconds": 0.107,
+  "exit_code": 0,
+  "finished": "2026-11-11T01:25:26+00:00",
+  "log": ".autonomy/logs/F06.t612-check_compliance.log",
+  "log_sha256": "7d646eb5320fba765530ed16cda64e3fb1bfd329dfb0a43592c6923b7102ddb4",
+  "name": "t612-check_compliance",
+  "stage": "F06",
+  "started": "2026-11-11T01:25:26+00:00",
+  "timed_out": false
+}
