@@ -1,0 +1,25 @@
+{
+  "argv": [
+    "xcodebuild",
+    "build",
+    "-project",
+    "Harnesses/ProjectMReference/ProjectMReference.xcodeproj",
+    "-scheme",
+    "ProjectMReference",
+    "-destination",
+    "generic/platform=iOS",
+    "-derivedDataPath",
+    "Build/DerivedData/ProjectMReferenceDevice",
+    "CODE_SIGNING_ALLOWED=NO"
+  ],
+  "command": "xcodebuild build -project Harnesses/ProjectMReference/ProjectMReference.xcodeproj -scheme ProjectMReference -destination generic/platform=iOS -derivedDataPath Build/DerivedData/ProjectMReferenceDevice CODE_SIGNING_ALLOWED=NO",
+  "elapsed_seconds": 7.665,
+  "exit_code": 0,
+  "finished": "2026-11-11T01:57:20+00:00",
+  "log": ".autonomy/logs/F07.t713-harness-generic-ios.log",
+  "log_sha256": "549f256c5a44d6f9d587e465200c41eca994a62606f51eede6259de537ad3ae1",
+  "name": "t713-harness-generic-ios",
+  "stage": "F07",
+  "started": "2026-11-11T01:57:12+00:00",
+  "timed_out": false
+}

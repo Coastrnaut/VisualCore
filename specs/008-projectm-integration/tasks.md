@@ -35,7 +35,7 @@ The reference `External/projectm-ios` is never written.
 ## Phase 5: Polish
 
 - [X] T-F712 [US5] Migration log "Retained in ProjectM" section (preset library/warm-up, purchases, audio capture, CFlashLimiter, reference EGL renderer) with reasons (FR-F710); `Harnesses/ProjectMReference/README.md` (purpose, linkage, LGPL note, how to run) — Verified 2026-11-10: F07.t712-docs exit 0: migration-log 'Retained in ProjectM' section lists 6 retained parts with reasons (engine/bridge, preset library + warm-up, purchases, audio capture, CFlashLimiter, reference ANGLERenderer); Harnesses/ProjectMReference/README.md covers purpose, components, run commands, licensing and the amended baseline criterion
-- [ ] T-F713 Full verification: harness tests both runtimes, VisualCore host + rendering sims, Showcase build + audit, R1–R5, compliance, scripts, docs, reference regression and clean check
+- [X] T-F713 Full verification: harness tests both runtimes, VisualCore host + rendering sims, Showcase build + audit, R1–R5, compliance, scripts, docs, reference regression and clean check — Verified 2026-11-10: F07.t713-* all exit 0: host 130 tests; VisualCoreRendering 50 + effects 18 on iOS 27.2 (26.5 in F07.t707-vc-sim-ios26); package and harness generic-iOS builds; Showcase build with dependency audit PASS (still ProjectM-free); R1-R5 (only the harness links ProjectMBridge), compliance, test_scripts, docs, reference clean; harness 17/17 and reference 14/14 on both runtimes (F07.t711-*)
 - [ ] T-F714 {device} Engine-on-VisualCore frame pacing and A/B on D1/D2/D3 — **deferred to campaign II** (constitution V)
 
 ## Dependencies
