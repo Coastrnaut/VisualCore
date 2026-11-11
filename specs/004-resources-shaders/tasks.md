@@ -30,7 +30,7 @@ IDs `T-F3##`. Tick only with `— Verified YYYY-MM-DD: <command/result>`. One co
 
 ## Phase 4: US2 — Textures, buffers, framebuffers (P1)
 
-- [ ] T-F312 [US2] (SC-F303, SC-F305, FR-F310, FR-F313) Sim tests `ResourceRegistryTests.swift`: over-budget refusal, stale handle rejected after recreation, zero live after teardown across 100 recreations, render target render+readback, size validation, trimPools on memory warning
+- [X] T-F312 [US2] (SC-F303, SC-F305, FR-F310, FR-F313) Sim tests `ResourceRegistryTests.swift`: over-budget refusal, stale handle rejected after recreation, zero live after teardown across 100 recreations, render target render+readback, size validation, trimPools on memory warning — Verified 2026-11-10: 7 registry tests pass in F03.t313-registry-ios27-a2
 - [X] T-F313 [US2] Implement `ResourceRegistry.swift` + `GPUObjects.swift` (Texture, GPUBuffer, RenderTarget, GPUHandle, TextureFormat) and attach one registry per `RenderHost` exposed through `RenderContext.resources` (`RenderContext` drops `Sendable` because it is valid only inside main-thread callbacks; equality = generation, size, framebuffer, registry identity); leak accounting on recreation/destroy without GL calls on dead contexts (FR-F316); memory-warning hook — Verified 2026-11-10: F03.t313-registry-ios27-a2 exit 0, 28/28 (a1 exit 65 = test typo, kept)
 
 ## Phase 5: US3 — Variants, cache, uniforms (P2)
