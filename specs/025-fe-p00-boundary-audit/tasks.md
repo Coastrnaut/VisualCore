@@ -104,7 +104,7 @@ The matrix first (US1), then the baseline, the shell and the decision, reusing t
 
 ## Phase 7: Convergence
 
-- [ ] T-A03-008 Correct the contract inventory's "Build" entry. `scripts/release_check.py` lists 47 steps today, not
+- [X] T-A03-008 Correct the contract inventory's "Build" entry. `scripts/release_check.py` lists 47 steps today, not — Verified 2026-11-11: — Verified 2026-11-11: the inventory Build entry now gives release_check.py's 47 steps (release_check.py --list) by family (shared checks, per-app documented-API/isolation/host/app steps, release.json-driven release steps, reference regression); contract re-rendered; run-check A03-P00/t008-contract PASS 10 rows, 32 citations, 5 gaps, decision go
   30. Describe the step families instead: shared checks, per-app documented-API/isolation/host/app steps, the
   per-app release steps from `release.json`, and the reference regression. Then re-render the contract and run
   `check_app_contract.py --app fractal-explorer`. Covers FR-A03-001 (partial).

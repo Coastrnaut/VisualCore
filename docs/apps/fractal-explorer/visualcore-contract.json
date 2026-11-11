@@ -68,7 +68,7 @@
     },
     {
       "area": "Build",
-      "description": "XcodeGen 2.46.0 specs (root project.yml for Showcase and app targets; harness specs), package schemes via scripts/xcodebuild_package.py, unsigned simulator builds, scripts/release_check.py (30 steps) and CI.",
+      "description": "XcodeGen 2.46.0 specs (root project.yml for Showcase and app targets; harness specs), package schemes via scripts/xcodebuild_package.py, unsigned simulator builds, and scripts/release_check.py (47 steps at A03-P00, listed by --list): shared checks (docs, compliance, dependencies, public API, licenses, script tests, contracts), per-app documented-API, isolation, host and simulator app steps, per-app release steps generated from docs/apps/<slug>/release.json, and the reference regression steps.",
       "paths": [
         "project.yml",
         "scripts/xcodebuild_package.py",
