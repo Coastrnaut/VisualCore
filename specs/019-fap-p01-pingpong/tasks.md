@@ -107,7 +107,7 @@ both runtimes and both storages.
   closed form after N float32 steps; 1,000 steps at d = 10 stay finite and ≥ 0; unorm8 stalls as predicted),
   `DyeSeedTests` (determinism, range), `FluidCanvasDescriptionTests`. Acceptance: `swift test --package-path
   Apps/FluidArtPlayground/FluidArtPlaygroundCore` passes.
-- [ ] T-A02-110 [US1] Add `Apps/FluidArtPlayground/App/FluidShaders.swift`, with an original-work license header:
+- [X] T-A02-110 [US1] Add `Apps/FluidArtPlayground/App/FluidShaders.swift`, with an original-work license header: — Verified 2026-11-11: FluidShaders (dissipate with RGBA8 signed-velocity decode/scale/re-encode, display; MIT original-work header) and FluidFieldsScene: storage from FloatRenderSupport (forceFallback), velocity and dye PingPongTargets at the validated grid, one shared dissipate FieldPass plus a display pass, seed upload (velocity RG encoded with SignedRangeEncoding on RGBA8, analyze U1), TimeStepPolicy-clamped dt with the fixedDelta seam, stepCount/rebuildCount/lastError, readDye/readVelocity, teardown releases everything. run-check A02-P01/t110-app-build TEST BUILD SUCCEEDED (generic iOS Simulator) with the dependency audit PASS; behavior is verified by T-A02-111 and T-A02-113
   - a dissipate fragment, `uField`, `uFactor`, and `uEncoded`/`uRange` for RGBA8 signed velocity;
   - a display fragment, `uDye`, with a dark background.
 
