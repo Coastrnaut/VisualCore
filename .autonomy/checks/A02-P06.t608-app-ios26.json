@@ -1,0 +1,33 @@
+{
+  "argv": [
+    "xcodebuild",
+    "test",
+    "-project",
+    "VisualCore.xcodeproj",
+    "-scheme",
+    "FluidArtPlayground",
+    "-destination",
+    "platform=iOS Simulator,id=EC7498FF-31FF-4491-9666-B0D32785203C",
+    "-derivedDataPath",
+    "Build/DerivedData/FluidArtPlayground",
+    "-resultBundlePath",
+    ".autonomy/xcresults/a02p06-t608-ios26.xcresult",
+    "-test-timeouts-enabled",
+    "YES",
+    "-default-test-execution-time-allowance",
+    "300",
+    "-only-testing:FluidArtPlaygroundTests/CopyTests",
+    "-only-testing:FluidArtPlaygroundUITests/LaunchSmokeUITests",
+    "CODE_SIGNING_ALLOWED=NO"
+  ],
+  "command": "xcodebuild test -project VisualCore.xcodeproj -scheme FluidArtPlayground -destination 'platform=iOS Simulator,id=EC7498FF-31FF-4491-9666-B0D32785203C' -derivedDataPath Build/DerivedData/FluidArtPlayground -resultBundlePath .autonomy/xcresults/a02p06-t608-ios26.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 300 -only-testing:FluidArtPlaygroundTests/CopyTests -only-testing:FluidArtPlaygroundUITests/LaunchSmokeUITests CODE_SIGNING_ALLOWED=NO",
+  "elapsed_seconds": 9.194,
+  "exit_code": 0,
+  "finished": "2026-11-11T11:29:14+00:00",
+  "log": ".autonomy/logs/A02-P06.t608-app-ios26.log",
+  "log_sha256": "3e385a053fa0c4cc99eff58af0e4d12b286f91777d05bd7539f1e3af0727035e",
+  "name": "t608-app-ios26",
+  "stage": "A02-P06",
+  "started": "2026-11-11T11:29:05+00:00",
+  "timed_out": false
+}

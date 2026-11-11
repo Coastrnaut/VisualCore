@@ -32,6 +32,9 @@ struct FluidArtPlaygroundApp: App {
 }
 
 struct HomeView: View {
+    /// The home screen's description: only implemented, tested features (feature 024 FR-A02-609; CopyTests).
+    static let summary = "Swipe to paint with dye that drifts with the flow, or use Add splash. Pause, step and reset the fluid, choose palettes and detail in Adjust, and capture stills."
+
     var body: some View {
         NavigationStack {
             // Scrolls so the largest accessibility text sizes never clip (feature 020 audit).
@@ -47,7 +50,7 @@ struct HomeView: View {
                     .accessibilityAddTraits(.isHeader)
                     .accessibilityLabel("Fluid Art Playground")
                     .accessibilityIdentifier("fap.home.title")
-                Text("Swipe to paint with dye that drifts with the flow, or use Add splash. Pause, step and reset the fluid, choose palettes and detail in Adjust, and capture stills.")
+                Text(Self.summary)
                     .font(.body)
                     .multilineTextAlignment(.center)
                     .fixedSize(horizontal: false, vertical: true)

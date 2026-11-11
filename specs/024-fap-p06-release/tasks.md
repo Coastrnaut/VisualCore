@@ -106,7 +106,7 @@ IDs are `T-A02-6##`, with one commit per task (`scripts/tick_task.py`). Commands
 
 ## Phase 4: User Story 5 — no unsupported promises (P3)
 
-- [ ] T-A02-608 [US5] Review every user-visible string in `Apps/FluidArtPlayground/App/*.swift`, the store listing
+- [X] T-A02-608 [US5] Review every user-visible string in `Apps/FluidArtPlayground/App/*.swift`, the store listing — Verified 2026-11-11: — Verified 2026-11-11: reviewed every user-visible string in Apps/FluidArtPlayground/App (all name implemented, tested features; no promise or performance wording; the README is the canonical spec archive, not marketing copy, so unchanged); HomeView.summary constant; CopyTests 2 (home and store description free of banned words; 12 store claims -> 22 test references, all classes and methods exist); run-check A02-P06/t608-app-ios27 and t608-app-ios26 TEST SUCCEEDED (with LaunchSmokeUITests)
   and the README's A02 section against the implemented features. Remove any promise, "later phases" or performance
   wording. Expose the home copy as `HomeView.summary` (a static constant). Add `Apps/FluidArtPlayground/Tests/Unit/CopyTests.swift`,
   which scans `HomeView.summary` and `docs/apps/fluid-art-playground/store-listing.md` (read through `#filePath`;
