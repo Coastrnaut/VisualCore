@@ -29,6 +29,8 @@ let package = Package(
                                .product(name: "VisualCoreMath", package: "VisualCore"),
                                .product(name: "VisualCoreSimulation", package: "VisualCore"),
                                .product(name: "VisualCoreScenes", package: "VisualCore")],
+                // VisualCore GLSL include library (vc/*.glsl), loaded by ShaderBundle (feature 012).
+                resources: [.copy("GLSL")],
                 linkerSettings: [.linkedFramework("QuartzCore"), .linkedFramework("UIKit")]),
         .target(name: "VisualCoreEffects",
                 dependencies: ["VisualCoreRendering", .product(name: "VisualCoreEffectsGraph", package: "VisualCore")]),
@@ -43,6 +45,8 @@ let package = Package(
                                    .product(name: "VisualCoreEffectsGraph", package: "VisualCore")]),
         .testTarget(name: "VisualCoreRenderingTests",
                     dependencies: ["VisualCoreRendering", "CVisualCoreGL",
+                                   .product(name: "VisualCoreShaderSource", package: "VisualCore"),
+                                   .product(name: "VisualCoreTestSupport", package: "VisualCore"),
                                    .product(name: "VisualCoreDiagnostics", package: "VisualCore"),
                                    .product(name: "VisualCoreMath", package: "VisualCore"),
                                    .product(name: "VisualCoreSimulation", package: "VisualCore"),

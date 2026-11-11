@@ -326,6 +326,7 @@ VisualCoreParameters | var | public var range: ClosedRange<Double>
 VisualCorePersistence | enum | public enum PersistenceInfo
 VisualCorePersistence | let | public static let version
 VisualCoreRendering | class | public final class ClearColorScene: RenderScene
+VisualCoreRendering | class | public final class FullScreenShaderScene: RenderScene
 VisualCoreRendering | class | public final class GPUBuffer: GPUResource
 VisualCoreRendering | class | public final class GradientQuadScene: RenderScene
 VisualCoreRendering | class | public final class MeshRenderer
@@ -334,6 +335,7 @@ VisualCoreRendering | class | public final class PrimitiveRenderer
 VisualCoreRendering | class | public final class RenderHost
 VisualCoreRendering | class | public final class RenderTarget: GPUResource
 VisualCoreRendering | class | public final class ResourceRegistry
+VisualCoreRendering | class | public final class ShaderBundle: Sendable
 VisualCoreRendering | class | public final class ShaderProgram
 VisualCoreRendering | class | public final class Texture: GPUResource
 VisualCoreRendering | enum | public enum GLState
@@ -376,7 +378,9 @@ VisualCoreRendering | func | public func set(_ name: String, _ v: SIMD2<Float>)
 VisualCoreRendering | func | public func set(_ name: String, _ v: SIMD3<Float>)
 VisualCoreRendering | func | public func set(_ name: String, _ v: SIMD4<Float>)
 VisualCoreRendering | func | public func set(_ name: String, matrix4 m: [Float])
+VisualCoreRendering | func | public func set(_ name: String, vec3Array values: [SIMD3<Float>])
 VisualCoreRendering | func | public func setup(_ context: RenderContext) throws
+VisualCoreRendering | func | public func source(_ name: String) -> String?
 VisualCoreRendering | func | public func teardown(_ context: RenderContext)
 VisualCoreRendering | func | public func trimPools()
 VisualCoreRendering | func | public func upload(_ values: [Float], target: Int32 = GL_ARRAY_BUFFER)
@@ -386,7 +390,11 @@ VisualCoreRendering | func | public func use()
 VisualCoreRendering | func | public func warn(_ message: String) -> Bool
 VisualCoreRendering | func | public nonisolated static func == (a: RenderContext, b: RenderContext) -> Bool
 VisualCoreRendering | func | public static func resetForVisualCore(framebuffer: UInt32, width: Int, height: Int)
+VisualCoreRendering | init | public convenience init(bundle: Bundle, subdirectory: String? = "Shaders")
+VisualCoreRendering | init | public convenience init(fragmentName: String, bundle: ShaderBundle)
 VisualCoreRendering | init | public init()
+VisualCoreRendering | init | public init(files: [String: String])
+VisualCoreRendering | init | public init(fragment: String, fragmentName: String, bundle: ShaderBundle)
 VisualCoreRendering | init | public init(mesh: Mesh, registry: ResourceRegistry) throws
 VisualCoreRendering | init | public init(red: Float = 0, green: Float = 0, blue: Float = 0)
 VisualCoreRendering | init | public init(registry: ResourceRegistry) throws
@@ -402,6 +410,7 @@ VisualCoreRendering | let | public let handle: GPUHandle
 VisualCoreRendering | let | public let index: Int
 VisualCoreRendering | let | public let kind: ResourceKind
 VisualCoreRendering | let | public let label: String
+VisualCoreRendering | let | public let library: ShaderLibrary
 VisualCoreRendering | let | public let location: GLint
 VisualCoreRendering | let | public let mesh: Mesh
 VisualCoreRendering | let | public let name: GLuint
@@ -415,10 +424,14 @@ VisualCoreRendering | let | public let time: Double
 VisualCoreRendering | let | public let type: GLenum
 VisualCoreRendering | let | public let uniforms: [String: Uniform]
 VisualCoreRendering | let | public let width: Int, height: Int
+VisualCoreRendering | let | public static let extensions: Set<String>
 VisualCoreRendering | let | public static let maxCachedPrograms
 VisualCoreRendering | let | public static let maxCircleSegments
+VisualCoreRendering | let | public static let maxPaletteStops
 VisualCoreRendering | let | public static let minCircleSegments
 VisualCoreRendering | let | public static let version
+VisualCoreRendering | let | public static let vertexSource
+VisualCoreRendering | let | public static let visualCoreLibrary: [String: String]
 VisualCoreRendering | protocol | public protocol GPUResource: AnyObject
 VisualCoreRendering | protocol | public protocol RenderScene: AnyObject
 VisualCoreRendering | struct | public struct FrameInfo: Sendable, Equatable
@@ -431,6 +444,7 @@ VisualCoreRendering | var | public internal(set) static var lastFailureLog
 VisualCoreRendering | var | public private(set) var cacheHits
 VisualCoreRendering | var | public private(set) var capabilities
 VisualCoreRendering | var | public private(set) var compileCount
+VisualCoreRendering | var | public private(set) var errorMessage: String?
 VisualCoreRendering | var | public private(set) var generation: Int
 VisualCoreRendering | var | public private(set) var lastError: RenderHostError?
 VisualCoreRendering | var | public private(set) var lastInstanceCount
@@ -444,6 +458,7 @@ VisualCoreRendering | var | public var bytesPerPixel: Int
 VisualCoreRendering | var | public var cachedProgramCount: Int
 VisualCoreRendering | var | public var eglVendor
 VisualCoreRendering | var | public var extensions: [String]
+VisualCoreRendering | var | public var fixedTime: Double?
 VisualCoreRendering | var | public var framePacing: FramePacing
 VisualCoreRendering | var | public var generation: Int
 VisualCoreRendering | var | public var glVersion
@@ -453,12 +468,17 @@ VisualCoreRendering | var | public var lifecycleHistory: [RenderLifecycleEvent]
 VisualCoreRendering | var | public var lightDirection
 VisualCoreRendering | var | public var maxTextureSize
 VisualCoreRendering | var | public var maxViewport
+VisualCoreRendering | var | public var names: [String]
+VisualCoreRendering | var | public var palette: [SIMD3<Float>]
+VisualCoreRendering | var | public var parameters: [String: Double]
 VisualCoreRendering | var | public var pointerHandler: ((PointerEvent) -> Void)?
 VisualCoreRendering | var | public var red: Float, green: Float, blue: Float
 VisualCoreRendering | var | public var rejectedTransitions: Int
 VisualCoreRendering | var | public var renderer
+VisualCoreRendering | var | public var seedOffsets: SIMD4<Float>
 VisualCoreRendering | var | public var state: RenderLifecycleState
 VisualCoreRendering | var | public var stats: ResourceLedger.Snapshot
+VisualCoreRendering | var | public var timeScale: Double
 VisualCoreRendering | var | public var vendor
 VisualCoreRendering | var | public var view: UIView
 VisualCoreRendering | var | public var width: Int

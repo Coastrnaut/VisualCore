@@ -66,6 +66,14 @@ public final class ShaderProgram {
     public func set(_ name: String, _ v: Int32) {
         apply(name, [GL_INT, GL_BOOL, GL_SAMPLER_2D, GL_SAMPLER_3D, GL_SAMPLER_CUBE]) { vcglUniform1i($0, v) }
     }
+    /// Sets the first `min(values.count, declared size)` elements of a `vec3` array uniform (for example `u_palette[8]`);
+    /// call after `use()`; mismatches are warned once and not applied.
+    public func set(_ name: String, vec3Array values: [SIMD3<Float>]) {
+        let count = min(values.count, Int(uniforms[name]?.size ?? 0))
+        guard count > 0 else { apply(name, [GL_FLOAT_VEC3]) { _ in }; return }
+        let flat = values.prefix(count).flatMap { [$0.x, $0.y, $0.z] }
+        apply(name, [GL_FLOAT_VEC3]) { location in flat.withUnsafeBufferPointer { vcglUniform3fv(location, GLsizei(count), $0.baseAddress) } }
+    }
     /// A column-major 4×4 matrix (16 floats).
     public func set(_ name: String, matrix4 m: [Float]) {
         guard m.count == 16 else { _ = registry?.warn("\(cacheKey.prefix(8)):\(name) matrix needs 16 floats"); return }
