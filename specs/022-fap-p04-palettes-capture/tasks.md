@@ -76,7 +76,7 @@ Checkpoints: `validate_docs`, `check_dependencies`, `check_compliance` and `chec
 
 ## Phase 5: User Story 4 — pass isolation (P1)
 
-- [ ] T-A02-406 [US4] Add `PassIsolationTests` using `FieldPass.runObserver`: 10 frames in every palette and both
+- [X] T-A02-406 [US4] Add `PassIsolationTests` using `FieldPass.runObserver`: 10 frames in every palette and both — Verified 2026-11-11: PassIsolationTests with FieldPass.runObserver: 10 frames x 3 palettes x 2 storages with 2 splats per frame, viscosity 0.3 and 20-iteration projection; every frame runs exactly the expected 39 field passes (2x2 splats, 2 advect, copy + 8 viscosity, divergence, fill, 20 pressure, gradient, display) and 0 of 2,340 runs sampled their own output (SC-A02-404). run-check A02-P04/t406-app-27 and t406-app-26 TEST SUCCEEDED, enumeration guard 45/45 each (FR-A02-407)
   storages, with splats, viscosity and projection on. Assert 0 runs where an input equals the output, and the run
   count per frame equals the expected list (SC-A02-404).
 
