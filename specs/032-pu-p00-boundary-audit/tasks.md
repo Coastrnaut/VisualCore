@@ -51,3 +51,7 @@ Matrix first (the evidence every later phase relies on), then the baseline, shel
 
 - C1 (low): the shell's VisualCoreUI link (accent color only) is consistent with FR-A04-005/006; no change.
 - 0 critical issues; coverage 18/18 requirements.
+
+## Phase 7: Convergence
+
+- [ ] T-A04-008 Correct the contract inventory's "Build" entry: `release_check.py --list` gives 53 steps at A04-P00, not the 47 recorded at A03-P00; re-render and check the contract, per FR-A04-001 (partial)
