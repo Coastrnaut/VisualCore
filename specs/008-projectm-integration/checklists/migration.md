@@ -13,32 +13,38 @@ per-change obligations. Depth: standard (gate review); audience: gate reviewer.
 
 ## Before/After Evidence (must-have)
 
-- [ ] CHK001 Are the migration batches enumerated with a scope for each? [Completeness, Spec §FR-F706, Clarifications]
-- [ ] CHK002 Is "before" evidence defined per batch (which checks, at which pin)? [Clarity, Spec §FR-F706]
-- [ ] CHK003 Is "after" evidence defined per batch (harness tests, A/B comparison, reference rerun)? [Clarity, Spec §FR-F706]
-- [ ] CHK004 Is the recording location and format for the evidence specified? [Completeness, Spec §US5, §FR-F706]
+- [x] CHK001 Are the migration batches enumerated with a scope for each? [Completeness, Spec §FR-F706, Clarifications]
+- [x] CHK002 Is "before" evidence defined per batch (which checks, at which pin)? [Clarity, Spec §FR-F706]
+- [x] CHK003 Is "after" evidence defined per batch (harness tests, A/B comparison, reference rerun)? [Clarity, Spec §FR-F706]
+- [x] CHK004 Is the recording location and format for the evidence specified? [Completeness, Spec §US5, §FR-F706]
 
 ## Per-Change Obligations (archived prompt)
 
-- [ ] CHK005 Does each boundary state why it belongs in VisualCore? [Completeness, Spec §FR-F704, §FR-F710]
-- [ ] CHK006 Is "preserve existing behavior" made testable (reference behaviors named, e.g. failed preset keeps running)? [Measurability, Spec §US1 AC4]
-- [ ] CHK007 Are retained ProjectM-specific parts required to be listed with reasons? [Completeness, Spec §FR-F710]
-- [ ] CHK008 Is the prohibition on forced extraction of tightly coupled code reflected in requirements? [Consistency, Spec §FR-F708]
-- [ ] CHK009 Is the ANGLE-revision / renderer-architecture freeze stated? [Clarity, Spec §FR-F709]
+- [x] CHK005 Does each boundary state why it belongs in VisualCore? [Completeness, Spec §FR-F704, §FR-F710]
+- [x] CHK006 Is "preserve existing behavior" made testable (reference behaviors named, e.g. failed preset keeps running)? [Measurability, Spec §US1 AC4]
+- [x] CHK007 Are retained ProjectM-specific parts required to be listed with reasons? [Completeness, Spec §FR-F710]
+- [x] CHK008 Is the prohibition on forced extraction of tightly coupled code reflected in requirements? [Consistency, Spec §FR-F708]
+- [x] CHK009 Is the ANGLE-revision / renderer-architecture freeze stated? [Clarity, Spec §FR-F709]
 
 ## Baseline Comparison
 
-- [ ] CHK010 Is the reference path defined precisely enough to reproduce? [Clarity, Spec §FR-F705, Clarifications]
-- [ ] CHK011 Is the image tolerance quantified? [Measurability, Spec §SC-F702]
-- [ ] CHK012 Is non-determinism of the engine (wall-clock animation) acknowledged with a strategy? [Assumption, Gap]
-- [ ] CHK013 Are the inputs held equal between paths (preset, viewport, audio, frame sequence) listed? [Completeness, Spec §US2 AC1]
+- [x] CHK010 Is the reference path defined precisely enough to reproduce? [Clarity, Spec §FR-F705, Clarifications]
+- [x] CHK011 Is the image tolerance quantified? [Measurability, Spec §SC-F702]
+- [x] CHK012 Is non-determinism of the engine (wall-clock animation) acknowledged with a strategy? [Assumption, Spec §Assumptions]
+- [x] CHK013 Are the inputs held equal between paths (preset, viewport, audio, frame sequence) listed? [Completeness, Spec §US2 AC1]
 
 ## Lifecycle, Coexistence and Safety
 
-- [ ] CHK014 Are suspend/resume, resize, recreation and destruction counts quantified? [Measurability, Spec §SC-F703]
-- [ ] CHK015 Is the engine release order relative to its context specified? [Clarity, Spec §FR-F702, §US4 AC2]
-- [ ] CHK016 Are GL state coexistence requirements specific about which state is handed over? [Clarity, Spec §FR-F704]
-- [ ] CHK017 Are engine-creation failure and zero-size layout edge cases specified? [Coverage, Spec §Edge Cases]
-- [ ] CHK018 Are the reference read-only rule and clean-check timing (before/after) stated? [Completeness, Spec §FR-F709, §SC-F704]
-- [ ] CHK019 Are linkage limits (no preset library, StoreKit, capture; R1) and LGPL distribution limits documented? [Dependency, Spec §FR-F708, §Assumptions]
-- [ ] CHK020 Is device performance explicitly deferred? [Non-Functional, Spec §Assumptions, Constitution V]
+- [x] CHK014 Are suspend/resume, resize, recreation and destruction counts quantified? [Measurability, Spec §SC-F703]
+- [x] CHK015 Is the engine release order relative to its context specified? [Clarity, Spec §FR-F702, §US4 AC2]
+- [x] CHK016 Are GL state coexistence requirements specific about which state is handed over? [Clarity, Spec §FR-F704]
+- [x] CHK017 Are engine-creation failure and zero-size layout edge cases specified? [Coverage, Spec §Edge Cases]
+- [x] CHK018 Are the reference read-only rule and clean-check timing (before/after) stated? [Completeness, Spec §FR-F709, §SC-F704]
+- [x] CHK019 Are linkage limits (no preset library, StoreKit, capture; R1) and LGPL distribution limits documented? [Dependency, Spec §FR-F708, §Assumptions]
+- [x] CHK020 Is device performance explicitly deferred? [Non-Functional, Spec §Assumptions, Constitution V]
+
+## Notes
+
+- Reviewed 2026-11-10 by the agent under the owner's standing delegation (CLAUDE.md §2): 20/20 satisfied after one spec edit —
+  CHK012 (Assumptions now state the engine's wall-clock non-determinism and the interleaved A/B strategy).
+  `/speckit-implement` reads these markers and does not change them.

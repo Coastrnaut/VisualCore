@@ -142,3 +142,4 @@ ProjectM-specific and why.
 - Simulator results are functional only; frame-rate and thermal impact of hosting the engine through VisualCore are campaign-II measurements (constitution V).
 - The harness is a tester tool and is not distributed; LGPL linkage stays as in the reference (engine as a separate dynamic framework). Distribution would need a fresh linkage analysis.
 - Upstream test presets (`Vendor/projectM/presets/tests`) are readable from the simulator, as the reference's own tests do.
+- The engine animates on wall-clock time internally and the bridge exposes no frame-time control, so two renders are never bit-identical; the A/B comparison interleaves the two paths per frame (microsecond skew) and judges them by the SC-F702 tolerance. Measured differences are recorded as evidence, never tuned away.
