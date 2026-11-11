@@ -184,3 +184,27 @@ final class GoToModelTests: XCTestCase {
         XCTAssertEqual(m.state.viewport.center, Vec2(-0.75, 0.1))
     }
 }
+
+// Feature 028 T-A03-311 (US2 AC3): unreadable files are reported to the person.
+@MainActor
+final class BookmarkProblemsTests: XCTestCase {
+    func testProblemsText() {
+        XCTAssertNil(BookmarksView.problemsText(count: 0))
+        XCTAssertEqual(BookmarksView.problemsText(count: 1), "1 bookmark file could not be read and was left unchanged.")
+        XCTAssertEqual(BookmarksView.problemsText(count: 3), "3 bookmark files could not be read and were left unchanged.")
+    }
+
+    func testModelProblemsFeedTheNotice() throws {
+        let dir = FileManager.default.temporaryDirectory.appendingPathComponent("fe-problems-\(UUID().uuidString)")
+        defer { try? FileManager.default.removeItem(at: dir) }
+        try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        try Data("broken".utf8).write(to: dir.appendingPathComponent("a.json"))
+        try Data("{}".utf8).write(to: dir.appendingPathComponent("b.json"))
+        let m = ExplorerModel(size: Vec2(300, 400), bookmarksDirectory: dir)
+        m.close()
+        m.reloadBookmarks()
+        XCTAssertTrue(m.bookmarks.entries.isEmpty)
+        XCTAssertEqual(BookmarksView.problemsText(count: m.bookmarks.problems.count),
+                       "2 bookmark files could not be read and were left unchanged.")
+    }
+}

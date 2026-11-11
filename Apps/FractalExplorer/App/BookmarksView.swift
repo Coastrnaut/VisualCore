@@ -15,7 +15,15 @@ struct BookmarksView: View {
 
     var body: some View {
         NavigationStack {
-            Group {
+            VStack(spacing: 0) {
+                if let problems = Self.problemsText(count: model.bookmarks.problems.count) {
+                    Label(problems, systemImage: "exclamationmark.triangle")
+                        .font(.footnote)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .padding(.horizontal)
+                        .padding(.top, 8)
+                        .accessibilityIdentifier("fe.bookmarks.problems")
+                }
                 if model.bookmarks.entries.isEmpty {
                     Text("No bookmarks yet. Save the current view to come back to it later.")
                         .multilineTextAlignment(.center)
@@ -30,6 +38,7 @@ struct BookmarksView: View {
                     .accessibilityIdentifier("fe.bookmarks.list")
                 }
             }
+            .frame(maxHeight: .infinity, alignment: .top)
             .navigationTitle("Bookmarks")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -62,6 +71,15 @@ struct BookmarksView: View {
             }
         }
         .onAppear { model.reloadBookmarks() }
+    }
+
+    /// The notice for files that could not be read (feature 028 T-A03-311; US2 AC3); nil when there are none.
+    static func problemsText(count: Int) -> String? {
+        switch count {
+        case ..<1: nil
+        case 1: "1 bookmark file could not be read and was left unchanged."
+        default: "\(count) bookmark files could not be read and were left unchanged."
+        }
     }
 
     /// "Name, −0.5 + 0i · zoom 1×[, Near precision limit][, favorite]".
