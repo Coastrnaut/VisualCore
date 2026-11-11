@@ -21,6 +21,42 @@ Canonical overrides:
 - It reuses the app-neutral contract checker built in A01-P00, as A02 did.
 - Evidence is host and simulator only.
 
+## Clarifications
+
+### Session 2026-11-11
+
+Answered autonomously under the owner's standing approval (CLAUDE.md §2); the recommended option was chosen in each
+case. Facts were checked in code:
+- `Camera2D` (VisualCoreMath) clamps zoom to 0.1…100;
+- `vcglGetShaderPrecisionFormat` exists in the C GL table, but no public Swift precision query exists in
+  `RenderCapabilities`;
+- `Palette` (VisualCoreParameters), `PinchRecognizer` and `DragRecognizer` (VisualCoreScenes) exist;
+- `FullScreenShaderScene` and `FieldPass` exist (VisualCoreRendering);
+- `DocumentStore` and `TemporaryFolder` exist (VisualCorePersistence).
+
+- Q: Where do the inventory, matrix and gap register live, and how are citations checked? → A: In
+  `docs/apps/fractal-explorer/visualcore-contract.json` (the A01/A02 schema), rendered to `visualcore-contract.md`
+  and checked by `scripts/check_app_contract.py --app fractal-explorer`. The release check's `app-contracts` step
+  picks it up automatically.
+- Q: What exactly is the app shell? → A: A thin SwiftUI app target `FractalExplorer` in the root `project.yml`
+  (sources in `Apps/FractalExplorer/App/`), plus a UI smoke-test target. It has a titled home screen only, with no
+  rendering code and no app-local package. The domain package arrives in Phase 01 (manual §5 file policy: no empty
+  files).
+- Q: Which ProjectM regression steps form the baseline? → A: The same 7 steps as A01 and A02, in two `run-check`
+  chunks: engine xcframework, reference app build and read-only check; then ANGLERendering and ProjectMReference
+  tests on both runtimes.
+- Q: How does the audit classify precision management and deep-zoom coordinates? → A: Both are `requires
+  adaptation`:
+  - **Precision**: the C GL table can query shader precision, but no public Swift API reports the fragment `highp`
+    range and mantissa bits. The register assigns a precision query on `RenderCapabilities` (VisualCoreRendering)
+    and a pure precision advisor (VisualCoreMath) to Phase 02, which renders first.
+  - **Coordinates**: `Camera2D` caps zoom at 100× and is for point-space scenes. A generic double-precision
+    complex-plane viewport, with screen↔plane transforms and anchored pinch, goes to VisualCoreMath in Phase 01.
+  - The matrix assumes 32-bit shader floats and no double support.
+- Q: Does the shell need permissions, and are performance or precision targets set? → A: No permission, usage
+  description or networking. No performance or precision target is set or measured. Iteration caps and precision
+  limits come in later phases as data, and device measurement is campaign II.
+
 ## User Scenarios & Testing *(mandatory)*
 
 Users:
