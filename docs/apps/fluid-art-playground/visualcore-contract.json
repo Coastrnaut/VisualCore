@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "app": "fluid-art-playground",
-  "gate": "A02-P03",
+  "gate": "A02-P04",
   "date": "2026-11-11",
   "inventory": [
     {
@@ -194,7 +194,7 @@
         "file": "Apps/FluidArtPlayground/App/FluidFieldsScene.swift",
         "symbol": "FluidFieldsScene"
       },
-      "notes": "Closed in A02-P01 (G-PINGPONG): PingPongTarget swaps read/write targets with budget accounting and idempotent release; FieldPass refuses to sample its output (inputIsOutput). Verified by PingPongTargetTests/FieldPassTests and the app dissipation fixture on iOS 27.2 and 26.5."
+      "notes": "Closed in A02-P01 (G-PINGPONG): PingPongTarget swaps read/write targets with budget accounting and idempotent release; FieldPass refuses to sample its output (inputIsOutput). Verified by PingPongTargetTests/FieldPassTests and the app dissipation fixture on iOS 27.2 and 26.5. A02-P04: FieldPass.runObserver (VisualCore) audits whole frames: 2,340 runs over 60 frames, 0 sampled their own output (PassIsolationTests)."
     },
     {
       "id": "M02",
@@ -373,7 +373,7 @@
         "file": "Apps/GenerativeArtStudio/Core/Sources/GenerativeArtStudioCore/FamilyCatalog.swift",
         "symbol": "FamilyCatalog"
       },
-      "notes": "Palettes (exact sRGB, linear sampling) and bloom/composite/color-matrix passes."
+      "notes": "Palettes (exact sRGB, linear sampling) and bloom/composite/color-matrix passes. A02-P04: the Glowing dye palette uses VisualCore EffectScene with the bloom pass (bypassed for Ink and Smoke) and the flash limiter under Reduce Flashing (PlaygroundModel)."
     },
     {
       "id": "M07",
@@ -466,7 +466,7 @@
         "file": "Apps/GenerativeArtStudio/App/ExportSheet.swift",
         "symbol": "ExportRunner"
       },
-      "notes": "Offscreen render on the host's context, opaque sRGB PNG, capped sizes (A01-P04)."
+      "notes": "Offscreen render on the host's context, opaque sRGB PNG, capped sizes (A01-P04). A02-P04: still capture reuses RenderHost.renderOffscreen, ExportGeometry and StillImageEncoder with the scene paused (CaptureModel); share via the system share sheet with NSPhotoLibraryAddUsageDescription."
     },
     {
       "id": "M10",

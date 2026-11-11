@@ -79,3 +79,14 @@ speaks and what the screen shows, not exact values. Sheets at a medium detent wi
   with `pass.program.uniforms`.
 - **Measure before setting thresholds.** A 50% divergence-reduction target written before measuring was not reachable
   with the standard scheme. Set criteria from measured fixture data and record the numbers.
+
+## Feature 022 (A02-P04)
+
+- **Spoken labels must read observed state.** A canvas description computed from a non-observable object (the
+  render scene) never refreshed in SwiftUI. Read the model's observed properties, and assert the label changes after
+  a control changes.
+- **Sheets with result text at XXXL.** Wrap the content in a scroll view, give each text
+  `fixedSize(horizontal: false, vertical: true)`, and open the sheet at the large detent; otherwise the audit flags
+  clipped text.
+- **Offscreen captures for pixel probes.** `renderOffscreen` at exactly the grid size (scene paused) gives one pixel
+  per cell, so display formulas can be checked pixel by pixel against a CPU reference (within 0.5/255 here).
