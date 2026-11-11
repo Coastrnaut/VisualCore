@@ -167,7 +167,7 @@ passes.
 ### Measurable Outcomes
 
 - **SC-A01-201**: For every parameter of all 4 families, setting the minimum, maximum, out-of-range and non-finite
-  positions keeps values in range (100% of 21 parameters).
+  positions keeps values in range (100% of the 20 parameters: 5 + 4 + 5 + 6).
 - **SC-A01-202**: Changing one parameter by ≥ 25% of its range changes the rendered image (mean ≥ 1/255) for each
   family. Reset all returns the image to the preset image (≥ 99% of channels within 2/255).
 - **SC-A01-203**: A paused scene scrubbed to the same time renders identical images twice (max difference 0), for all
