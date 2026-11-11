@@ -1,0 +1,28 @@
+{
+  "argv": [
+    "python3",
+    "scripts/release_check.py",
+    "--log-dir",
+    ".autonomy/logs/release-check-final",
+    "--json",
+    ".autonomy/logs/release-check-final/summary-2.json",
+    "--only",
+    "second-consumer-ios27",
+    "projectm-reference-ios27",
+    "rendering-sim-ios26",
+    "showcase-ios26",
+    "interactive-demo-ios26",
+    "second-consumer-ios26",
+    "projectm-reference-ios26"
+  ],
+  "command": "python3 scripts/release_check.py --log-dir .autonomy/logs/release-check-final --json .autonomy/logs/release-check-final/summary-2.json --only second-consumer-ios27 projectm-reference-ios27 rendering-sim-ios26 showcase-ios26 interactive-demo-ios26 second-consumer-ios26 projectm-reference-ios26",
+  "elapsed_seconds": 277.492,
+  "exit_code": 0,
+  "finished": "2026-11-11T03:13:16+00:00",
+  "log": ".autonomy/logs/F09.t924-release-chunk2.log",
+  "log_sha256": "7119003c8960665693819974f6e9b6109e436fdd13d5a0851d8cdb75666f5a44",
+  "name": "t924-release-chunk2",
+  "stage": "F09",
+  "started": "2026-11-11T03:08:38+00:00",
+  "timed_out": false
+}

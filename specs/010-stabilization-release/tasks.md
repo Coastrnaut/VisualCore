@@ -52,5 +52,5 @@ T-F901 → T-F902; T-F903 → T-F904; T-F905/T-F906/T-F907 → T-F908; T-F909 ne
 
 ## Phase 6: Convergence
 
-- [ ] T-F924 Re-run the full `scripts/release_check.py` (all 30 steps, in foreground chunks) after the convergence changes and record the result per SC-F902 (partial)
+- [X] T-F924 Re-run the full `scripts/release_check.py` (all 30 steps, in foreground chunks) after the convergence changes and record the result per SC-F902 (partial) — Verified 2026-11-10: run-check F09/t924-release-chunk1 (15/15), t924-release-chunk2 (7/7), t924-release-chunk3 (8/8 incl. projectm-independence) = 30/30 steps pass after the convergence changes; logs + summary-1..3.json in .autonomy/logs/release-check-final
 - [ ] T-F925 Add a Verification section (release-check result, CI run, simulator runtimes) to `docs/release/release-notes-1.0.0-rc.1.md` and correct the CI scope statement per US5/AC2 (partial)

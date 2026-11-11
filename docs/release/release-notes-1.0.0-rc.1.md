@@ -47,8 +47,20 @@ Everything below has public `///` docs and is recorded in the API baseline
   automation symbols.
 - Host and simulator performance baselines ([docs/performance](../performance/README.md)); these are not device
   evidence.
-- `scripts/release_check.py` runs every gate. GitHub Actions CI (`.github/workflows/ci.yml`) runs the host-only gates.
+- `scripts/release_check.py` runs every gate. GitHub Actions CI (`.github/workflows/ci.yml`) runs the checks, the host
+  tests and an iOS Simulator build of the pure package. Gates that need the locally built ANGLE frameworks run only
+  in the release check.
 - Documentation: [index](../index.md), [getting started](../getting-started.md).
+
+## Verification
+
+| Evidence | Result |
+|---|---|
+| `scripts/release_check.py`, all 30 steps (ledger checks `F09/t924-release-chunk1..3`, 2026-11-10) | **30/30 pass** |
+| Simulators | iOS 27.2 (iPhone 18 Pro) and iOS 26.5 (iPhone 17 Pro Max): rendering, effects, automation, Showcase, InteractiveDemo, Lumen Garden and ProjectMReference suites |
+| GitHub Actions `ci` | checks, host-tests and simulator-build jobs green (run 42950139293) |
+| Release binary | 0 automation symbols and 0 trigger strings; ProjectM-independence audit pass |
+| Devices D1–D3 | **not tested**: pending campaign II |
 
 ## Versions
 
