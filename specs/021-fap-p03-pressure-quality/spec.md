@@ -252,6 +252,11 @@ The app maps tiers to iterations and splat cap, which unit tests verify.
   states. Real thermal behavior is a campaign II measurement.
 - Nothing is persisted. The Adjust values reset when the screen closes (persistence arrives in Phase 04 or 05).
 - The configuration stays at schema version 1 (no stored files exist).
+- Automatic quality changes are shown, not announced. The Adjust panel's tier label reflects the current tier, and
+  VoiceOver reads it on focus. Announcing every thermal step would interrupt the user for something they cannot act
+  on.
+- The quality policy starts at the best tier each time the playground opens and is reset when the screen closes, like
+  the other Adjust values.
 
 ## Traceability
 
@@ -272,3 +277,5 @@ The app maps tiers to iterations and splat cap, which unit tests verify.
 - Quality changes never drop or delay touch handling beyond the splat cap; the queue is never cleared by a tier
   change.
 - No hidden quality changes: the current tier is visible.
+- Thermal state and Low Power Mode are read locally from the system, used only for the current decision, and never
+  stored or transmitted.
