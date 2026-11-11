@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/VisualCore",
+    "--filter",
+    "EmitterShapeTests|ParticleSystemTests"
+  ],
+  "command": "swift test --package-path Packages/VisualCore --filter 'EmitterShapeTests|ParticleSystemTests'",
+  "elapsed_seconds": 5.099,
+  "exit_code": 0,
+  "finished": "2026-11-11T17:07:38+00:00",
+  "log": ".autonomy/logs/A04-P01.t102-emitters.log",
+  "log_sha256": "b1ed96b12aaf96399f92f541a250eab70ec7739d38a8198c71a8ed63daaf011b",
+  "name": "t102-emitters",
+  "stage": "A04-P01",
+  "started": "2026-11-11T17:07:33+00:00",
+  "timed_out": false
+}

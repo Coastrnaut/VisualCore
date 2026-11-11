@@ -21,7 +21,7 @@
 - New field `burst: EmitterBurst? = nil`.
 - New function `clamped() -> Emitter`:
   - non-finite values → the default;
-  - rate 0…20,000; lifetime 0.01…60 (ordered); speed 0…10,000 (ordered); sizes 0…512; spread 0…2π;
+  - rate 0…20,000; lifetime 0.01…3,600 (ordered; widened from 60 during T-A04-102 for the baselines’ 100 s); speed 0…10,000 (ordered); sizes 0…512; spread 0…2π;
   - half length and radius 0…10,000; burst count 1…5,000; interval 1/60…60.
 
 ### FixedStepSimulation (protocol)

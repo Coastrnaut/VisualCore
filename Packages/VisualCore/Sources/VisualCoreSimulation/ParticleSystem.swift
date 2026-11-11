@@ -1,6 +1,7 @@
 // ParticleSystem.swift — fixed-capacity particle pool with emitters, forces and a NaN guard
 // (feature 006 T-F512; FR-F507, FR-F511, FR-F512; research R6). Structure of arrays, swap-remove,
 // semi-implicit Euler; advance it with fixed steps (FixedStepClock) for frame-rate independence.
+// Feature 033 (A04-P01, G-EMITTERS): emitter shapes, burst emission and clamped emitters (EmitterShape.swift).
 import Foundation
 import VisualCoreMath
 
@@ -22,16 +23,23 @@ public struct Emitter: Sendable, Equatable {
     public var startSize: Double, endSize: Double
     /// Particle RGBA at birth and at death, interpolated linearly over its life.
     public var startColor: Vec4, endColor: Vec4
-    /// When false the emitter stops continuous emission (default true); `burst` still works.
+    /// When false the emitter stops continuous and periodic burst emission (default true); `burst(_:from:)` still works.
     public var isEmitting = true
+    /// Where new particles start, relative to `position` (default `.point`).
+    public var shape: EmitterShape
+    /// Periodic burst emission in addition to `rate` (default nil: none).
+    public var burst: EmitterBurst?
 
-    /// Defaults: 100 particles/s, 1 s life, speed 50–100, pointing +y with a full 2π spread, size 4→0, opaque→transparent white.
+    /// Defaults: 100 particles/s, 1 s life, speed 50–100, pointing +y with a full 2π spread, size 4→0, opaque→transparent
+    /// white, a point shape and no periodic bursts.
     public init(position: Vec2 = .zero, rate: Double = 100, lifetime: ClosedRange<Double> = 1...1,
                 speed: ClosedRange<Double> = 50...100, direction: Double = .pi / 2, spread: Double = 2 * .pi,
-                startSize: Double = 4, endSize: Double = 0, startColor: Vec4 = Vec4(1, 1, 1, 1), endColor: Vec4 = Vec4(1, 1, 1, 0)) {
+                startSize: Double = 4, endSize: Double = 0, startColor: Vec4 = Vec4(1, 1, 1, 1), endColor: Vec4 = Vec4(1, 1, 1, 0),
+                shape: EmitterShape = .point, burst: EmitterBurst? = nil) {
         self.position = position; self.rate = rate; self.lifetime = lifetime; self.speed = speed
         self.direction = direction; self.spread = spread
         self.startSize = startSize; self.endSize = endSize; self.startColor = startColor; self.endColor = endColor
+        self.shape = shape; self.burst = burst
     }
 }
 
@@ -82,6 +90,8 @@ public struct ParticleSystem: Sendable {
     // Structure of arrays, valid in 0..<aliveCount (internal for tests).
     var px: [Double], py: [Double], vx: [Double], vy: [Double], age: [Double], life: [Double], source: [Int]
     private var accumulators: [Double] = []
+    // Seconds since each emitter's last periodic burst; negative means "burst on the next step" (research R3).
+    private var burstClocks: [Double] = []
     private var pendingBursts: [(emitter: Int, count: Int)] = []
 
     /// Creates an empty pool of `capacity` particles (clamped to 1…100,000) seeded with `seed` (default 0).
@@ -128,25 +138,44 @@ public struct ParticleSystem: Sendable {
                 remove(i)
             } else { i += 1 }
         }
-        // 3. Emit.
+        // 3. Emit from clamped emitters (FR-A04-102): continuous rate, then periodic bursts, then requested bursts.
         if accumulators.count != emitters.count { accumulators = Array(accumulators.prefix(emitters.count)) + Array(repeating: 0, count: max(0, emitters.count - accumulators.count)) }
-        for (e, emitter) in emitters.enumerated() where emitter.isEmitting && emitter.rate.isFinite && emitter.rate > 0 {
+        if burstClocks.count != emitters.count { burstClocks = Array(burstClocks.prefix(emitters.count)) + Array(repeating: -1, count: max(0, emitters.count - burstClocks.count)) }
+        let active = emitters.map { $0.clamped() }
+        for (e, emitter) in active.enumerated() where emitter.isEmitting && emitter.rate > 0 {
             accumulators[e] += emitter.rate * dt
             let n = Int((accumulators[e] + 1e-9).rounded(.down))
             accumulators[e] = max(0, accumulators[e] - Double(n))
-            for _ in 0..<n { spawn(from: e) }
+            for _ in 0..<n { spawn(from: e, active[e]) }
         }
-        for b in pendingBursts where emitters.indices.contains(b.emitter) { for _ in 0..<b.count { spawn(from: b.emitter) } }
+        for (e, emitter) in active.enumerated() {
+            guard emitter.isEmitting, let b = emitter.burst else { continue }
+            if burstClocks[e] < 0 {
+                burstClocks[e] = 0
+            } else {
+                burstClocks[e] += dt
+                guard burstClocks[e] + 1e-9 >= b.interval else { continue }
+                // At most one burst per step; the leftover stays below one interval, so a stall cannot cause a storm.
+                burstClocks[e] = min(burstClocks[e] - b.interval, b.interval * 0.999_999)
+            }
+            for _ in 0..<b.count { spawn(from: e, emitter) }
+        }
+        for b in pendingBursts where emitters.indices.contains(b.emitter) { for _ in 0..<b.count { spawn(from: b.emitter, active[b.emitter]) } }
         pendingBursts.removeAll()
     }
 
-    private mutating func spawn(from e: Int) {
+    private mutating func spawn(from e: Int, _ em: Emitter) {
         guard aliveCount < capacity else { droppedCount += 1; return }
-        let em = emitters[e]
         let angle = em.direction + (random.double() - 0.5) * em.spread
         let speed = random.range(em.speed)
+        // Shape offset after angle and speed: a point draws nothing, keeping earlier seeded results identical (R2).
         let i = aliveCount
-        px[i] = em.position.x; py[i] = em.position.y
+        if em.shape == .point {
+            px[i] = em.position.x; py[i] = em.position.y
+        } else {
+            let offset = em.shape.sampleOffset(&random)
+            px[i] = em.position.x + offset.x; py[i] = em.position.y + offset.y
+        }
         vx[i] = cos(angle) * speed; vy[i] = sin(angle) * speed
         age[i] = 0
         life[i] = max(1e-6, random.range(em.lifetime))
@@ -166,7 +195,7 @@ public struct ParticleSystem: Sendable {
     /// Position, size and color of each live particle (size and color interpolated over life).
     public func instances() -> [ParticleInstance] {
         (0..<aliveCount).map { i in
-            let em = emitters.indices.contains(source[i]) ? emitters[source[i]] : Emitter()
+            let em = (emitters.indices.contains(source[i]) ? emitters[source[i]] : Emitter()).clamped()
             let t = min(max(age[i] / life[i], 0), 1)
             return ParticleInstance(position: Vec2(px[i], py[i]), size: em.startSize + (em.endSize - em.startSize) * t,
                                     color: em.startColor.mix(em.endColor, t))
