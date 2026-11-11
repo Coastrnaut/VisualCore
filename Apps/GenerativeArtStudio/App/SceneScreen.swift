@@ -135,8 +135,9 @@ struct SceneScreen: View {
     var body: some View {
         ZStack(alignment: .bottom) {
             if let model, let host = model.host {
-                RenderSurface(host: host, accessibilityLabel: family.accessibilityDescription,
-                              accessibilityHint: "\(family.title), preset \(family.defaultPreset.title).")
+                RenderSurface(host: host,
+                              accessibilityLabel: CanvasDescription(document: model.document, isPlaying: model.isPlaying).text,
+                              accessibilityHint: family.accessibilityDescription)
                     .ignoresSafeArea(edges: .bottom)
                     .accessibilityIdentifier("gas.scene.canvas")
             } else {

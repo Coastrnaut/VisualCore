@@ -85,7 +85,7 @@ IDs are `T-A01-5##`, with one commit and push per task (`scripts/tick_task.py`).
 
 ## Phase 3: US2 — Canvas description, VoiceOver and large text (P1)
 
-- [ ] T-A01-506 [US2] Add `Apps/GenerativeArtStudio/Core/Sources/GenerativeArtStudioCore/CanvasDescription.swift`
+- [X] T-A01-506 [US2] Add `Apps/GenerativeArtStudio/Core/Sources/GenerativeArtStudioCore/CanvasDescription.swift` — Verified 2026-11-11: Core CanvasDescription.swift: '<Family>, <preset> preset, <palette> palette, seed <n>, <playing/paused>.'; the preset matches only if seed, palette and the schema-resolved values equal the document (else 'custom preset'); unknown palette gives 'custom palette'. CanvasDescriptionTests 3/3 (default preset for all 4 families, a palette change → custom preset + new palette + paused, unknown palette). SceneScreen uses it as the gas.scene.canvas accessibility label (refreshed with the document and the 0.25 s play-state refresh), with the family description as the hint. run-check A01-P05/t506-core-tests-a2 30/30 (a1 failed: preset values are partial; fixed by resolving with schema defaults); t506-app-build BUILD SUCCEEDED. UI behavior verified by T-A01-507
   (`text` = "<Family>, <preset> preset, <palette> palette, seed <n>, <playing/paused>."; a preset that no longer
   matches gives "custom"; an unnamed palette gives "custom palette") with host tests in `CanvasDescriptionTests.swift`.
   Use it for the `gas.scene.canvas` accessibility label in `SceneScreen.swift`, refreshed on edits and on play state
