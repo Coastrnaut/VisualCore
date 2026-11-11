@@ -5,6 +5,7 @@
 **Scope:** reusable VisualCore framework, existing ProjectM-iOS reference integration, VisualCore Showcase, **25 independent iOS/iPadOS applications**, complete simulator/unit testing, and a **single contiguous, sequenced three-device qualification campaign**  
 **Inputs preserved:** original VisualCore README, AppsBrainstorm, all 25 app manuals and indexes, original ProjectM-iOS `CLAUDE.md`, owner-provided `devices.md`, and the previous CLI-oriented runbook (historical only)  
 **Companion file:** the separately supplied root **`CLAUDE.md`** in this deliverable; use both files together.
+**Framework documentation:** [docs/index.md](docs/index.md) · [Getting started](docs/getting-started.md) (added by feature 010 T-F911).  
 
 > **Start here; do not run historical commands from the appendices.** The first sections of this README are the updated controlling implementation specification. The remainder preserves complete source documents without deleting an app feature, algorithm, file layout, test requirement or prior lesson. Historical CLI instructions are archived solely to prevent loss of context: **do not execute `claude -p`, `claude --print`, a Claude Agent SDK runner, or the old Python supervisor.** Claude itself runs in the Desktop **Code** tab, and Python runs only deterministic build, audit, ledger and Apple-tool operations.
 
