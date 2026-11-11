@@ -77,3 +77,9 @@ regression. The gate is sealed only after converge appends nothing.
 ## Analyze fixes (2026-11-11, owner delegation)
 
 U1 app target also needs `VisualCoreRendering`; F1 T-A04-203 no longer [P]; B1 tier shown 1-based; B2 DEBUG seam evidence by source grep; E1 context recreation evidenced at package level. No critical issues; no speculative dependencies.
+
+## Phase 8: Convergence
+
+- [ ] T-A04-218 Add a DEBUG-only `-uitestReduceMotion YES` seam (`Apps/ParticleUniverse/App/DeviceConditionsSource.swift`, read by `SandboxView` alongside the environment value) and a UI test in `Apps/ParticleUniverse/Tests/UI/SandboxUITests.swift` showing the GPU stage starts paused under Reduce Motion (Play button shown, live count held at 0, renderer GPU); run on iOS 27.2 and 26.5 with the enumeration guard, per Spec §Edge Cases (Reduce Motion, CHK020) and Constitution VII (partial)
+- [ ] T-A04-219 Record in `specs/034-pu-p02-render-loop/research.md` R7 that quality decisions use one monotonic clock (`ProcessInfo.systemUptime`) on both the GPU and CPU paths instead of the host frame time, with the reason (one time base across a fallback switch), per plan "Lifecycle contracts" (contradicts)
+- [ ] T-A04-220 Document the DEBUG `-uitestRendererFailure` seam in `contracts/app-ui.md` and `SceneSimulation.nonFiniteRemoved` / `activeForces` in `data-model.md`, per contracts/app-ui.md and data-model (unrequested)
