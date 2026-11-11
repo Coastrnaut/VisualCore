@@ -18,14 +18,16 @@ after each phase, run `validate_docs.py`.
   - wrap modulo duration; scrub clamps; non-finite input ignored.
 
   Add tests in `Packages/VisualCore/Tests/VisualCoreSimulationTests/SceneClockTests.swift`: advance, pause freezes,
-  scrub, wrap, delta cap, speed clamp, reduced motion, NaN ignored, determinism.
+  scrub, wrap, delta cap, speed clamp, reduced motion (halves playback; scrub and paused time
+  unaffected, analyze C3), NaN ignored, determinism.
 - [ ] T-A01-202 [P] [US4] Implement `Packages/VisualCore/Sources/VisualCoreParameters/ParameterEditor.swift` per contracts/api.md:
   - `set(to:)` returns false for an unknown name or a non-finite value and clamps otherwise;
   - `set(normalized:)` clamps the position and treats non-finite as 0;
   - reset, resetAll, isModified, modifiedNames, rebase;
   - `formatted` gives 3 significant digits plus the unit.
 
-  Add tests in `Packages/VisualCore/Tests/VisualCoreParametersTests/ParameterEditorTests.swift`.
+  Add tests in `Packages/VisualCore/Tests/VisualCoreParametersTests/ParameterEditorTests.swift`, including that
+  resetting an unchanged parameter is a no-op (analyze C2).
 - [ ] T-A01-203 [US4] Implement `Packages/VisualCoreRendering/Sources/VisualCoreUI/ParameterPanel.swift`:
   - a Form section with a title, value-with-unit text, a Slider on the normalized position and a reset per row,
     plus Reset all;
@@ -50,7 +52,9 @@ after each phase, run `validate_docs.py`.
   - every one of the 20 parameters stays in range at 0, 1, −1, 2, NaN and ±∞ positions (SC-A01-201);
   - reset returns to the preset baseline;
   - the preset, palette and seed choices take effect.
-- [ ] T-A01-206 [US2] Add `Apps/GenerativeArtStudio/App/ClockedArtScene.swift` (wraps an ArtScene and advances a `SceneClock` each frame by `frame.delta`, then renders at `fixedTime = clock.time`) and `ArtSceneFactory.apply(_ composition:, to scene:)` (uniforms, palette and seed offsets; a particles cursor reset). Update `SceneScreen.swift`/`SceneModel` to own the editor and clock (Reduce Motion → `clock.reducedMotion`).
+- [ ] T-A01-206 [US2] Add `Apps/GenerativeArtStudio/App/ClockedArtScene.swift` (wraps an ArtScene and advances a `SceneClock` each frame by `frame.delta`, then renders at `fixedTime = clock.time`) and `ArtSceneFactory.apply(_ composition:, to scene:)` (uniforms, palette and seed offsets; a particles cursor reset). Update `SceneScreen.swift`/`SceneModel` to own the editor and clock (Reduce Motion → `clock.reducedMotion`). Values
+  are read from the editor at render time, so rapid changes apply only the latest value at the next frame (edge case;
+  analyze U1).
 - [ ] T-A01-207 [US1] Add `Apps/GenerativeArtStudio/App/ControlsSheet.swift`:
   - presented from `gas.controls.open`, sheet `gas.controls.sheet` with medium and large detents;
   - time row: `gas.time.playPause`, the `gas.time.scrub` slider over 0…120 s, and `gas.time.value`;
@@ -66,7 +70,8 @@ after each phase, run `validate_docs.py`.
   - Reduce Motion → `clock.reducedMotion`.
 
   Add `Apps/GenerativeArtStudio/Tests/UI/ControlsUITests.swift`: open the sheet, move a slider and see the value
-  text change, reset, play/pause toggles its label, scrub sets the time label, pick a preset and a palette, shuffle
+  text change, reset, play/pause toggles its accessibility label ("Pause"/"Play"), the scrub slider is labelled "Time" (analyze C1),
+  scrub sets the time label, pick a preset and a palette, shuffle
   changes the seed text. Run on iOS 27.2 and 26.5.
 
 ## Phase 3: US3 — Recoverable corrupt or future compositions (P1)
