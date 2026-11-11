@@ -44,7 +44,7 @@ contains additions only.
   - "p = coord − 0.5, i0 = floor(p), t = p − i0, indices clamped to the edge, lerp a + (b − a)·t in x then y".
 
   Tests in `FieldGridTests` cover centers, midpoints, edges and outside coordinates. Update the README.
-- [ ] T-A02-204 Add `Packages/VisualCoreRendering/Sources/VisualCoreRendering/GLSL/vc/field.glsl` (`vc_fieldTexel`,
+- [X] T-A02-204 Add `Packages/VisualCoreRendering/Sources/VisualCoreRendering/GLSL/vc/field.glsl` (`vc_fieldTexel`, — Verified 2026-11-11: GLSL/vc/field.glsl (vc_fieldTexel, vc_fieldBilinear with highp clamps; same formula as FieldGrid.sampleBilinear), ShaderBundle.visualCoreIncludes, FieldPass.init gains library: ShaderLibrary = ShaderBundle.visualCoreIncludes (the baseline shows the old init signature replaced, source compatible: every existing call compiled unchanged); FieldBilinearTests 2 (GPU equals CPU within 1e-5 for 4 dyadic scale/offset sets including outside coordinates; includes available); ShaderBundleTests include list updated (compiles field.glsl in every stage). run-check A02-P02/t204-rendering-27-2 and t204-rendering-26 TEST SUCCEEDED, enumeration guard 131/131 each (first attempt t204-rendering-27 failed only on the pinned include list); check_public_api --update then PASS; check_documented_api PASS; README, package-map and support-matrix updated
   `vc_fieldBilinear`, the same formula as the CPU) and `ShaderBundle.visualCoreIncludes`. Add a defaulted `library:`
   parameter to `FieldPass.init`. Add `FieldBilinearTests` (GPU = CPU within 1e-5 at 64 coordinates, including outside
   ones, in RGBA16F). Run the package tests on iOS 27.2 and 26.5 with the enumeration guard, `check_public_api

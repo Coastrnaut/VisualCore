@@ -210,6 +210,12 @@ These pieces are for GPU simulations and feedback effects that read the previous
 
   `run(pair:input:)` steps a `PingPongTarget` and swaps only on success. Passes built from the same source share one
   cached program, so create one pass per source.
+- `#include "vc/field.glsl"` in a field pass (passes resolve VisualCore includes by default through
+  `ShaderBundle.visualCoreIncludes`, or take `library:`) provides two functions (feature 020):
+  - `vc_fieldTexel(f, cell)`: a clamped `texelFetch`;
+  - `vc_fieldBilinear(f, cellCoord)`: exact bilinear sampling with cell centers at `i + 0.5`. It uses the same
+    arithmetic as `FieldGrid.sampleBilinear`, so semi-Lagrangian advection matches a CPU reference. Hardware LINEAR
+    filtering cannot do that, because of its reduced sub-texel precision.
 
 ```swift
 let format = FloatRenderSupport.detect(in: context.resources).storageFormat()

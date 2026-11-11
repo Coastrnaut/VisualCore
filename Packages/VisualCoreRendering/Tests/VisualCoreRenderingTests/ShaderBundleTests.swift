@@ -6,7 +6,7 @@ import VisualCoreShaderSource
 
 @MainActor
 final class ShaderBundleTests: XCTestCase {
-    static let includes = ["vc/hash.glsl", "vc/noise.glsl", "vc/palette.glsl", "vc/sdf.glsl", "vc/color.glsl"]
+    static let includes = ["vc/hash.glsl", "vc/noise.glsl", "vc/palette.glsl", "vc/sdf.glsl", "vc/color.glsl", "vc/field.glsl"]
 
     func testLibraryIsBundled() {
         XCTAssertEqual(Set(ShaderBundle.visualCoreLibrary.keys), Set(Self.includes))

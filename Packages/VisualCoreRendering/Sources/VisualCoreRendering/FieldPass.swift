@@ -2,6 +2,7 @@
 // target or framebuffer (feature 019 T-A02-105; gap G-FIELDPASS; research R5). It refuses to sample its own output,
 // so feedback and simulation steps cannot read and write the same texture (A02 Bounded GPU rule).
 import CVisualCoreGL
+import VisualCoreShaderSource
 
 /// A uniform value for a field pass.
 public enum FieldUniform: Sendable, Equatable {
@@ -65,10 +66,13 @@ public final class FieldPass {
     private var released = false
 
     /// Compiles `fragment` with the full-screen vertex shader; throws `.compile` with the first diagnostic.
-    public init(registry: ResourceRegistry, fragment: String, inputs: [String], label: String) throws(FieldPassError) {
+    /// `#include` directives resolve against `library` (default: the VisualCore includes, for example
+    /// `vc/field.glsl` for exact field sampling).
+    public init(registry: ResourceRegistry, fragment: String, inputs: [String], label: String,
+                library: ShaderLibrary = ShaderBundle.visualCoreIncludes) throws(FieldPassError) {
         do {
             program = try registry.program(vertex: FullScreenShaderScene.vertexSource, fragment: fragment,
-                                           vertexName: "fullscreen.vert", fragmentName: label)
+                                           library: library, vertexName: "fullscreen.vert", fragmentName: label)
         } catch let ShaderError.compile(diagnostics) {
             throw .compile(diagnostics.first.map { "\($0.file):\($0.line): \($0.message)" } ?? "\(label): compile failed")
         } catch {

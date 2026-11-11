@@ -468,7 +468,7 @@ VisualCoreRendering | init | public init(fragment: String, fragmentName: String,
 VisualCoreRendering | init | public init(mesh: Mesh, registry: ResourceRegistry) throws
 VisualCoreRendering | init | public init(red: Float = 0, green: Float = 0, blue: Float = 0)
 VisualCoreRendering | init | public init(registry: ResourceRegistry) throws
-VisualCoreRendering | init | public init(registry: ResourceRegistry, fragment: String, inputs: [String], label: String) throws(FieldPassError)
+VisualCoreRendering | init | public init(registry: ResourceRegistry, fragment: String, inputs: [String], label: String,
 VisualCoreRendering | init | public init(registry: ResourceRegistry, width: Int, height: Int, format: TextureFormat, label: String) throws
 VisualCoreRendering | init | public init(scene: RenderScene, maxFramesPerSecond: Int = 60, budget: ResourceBudget = ResourceBudget()) throws
 VisualCoreRendering | init | public init?(width: Int, height: Int, bottomUpRGBA: [UInt8])
@@ -513,6 +513,7 @@ VisualCoreRendering | let | public static let maxPaletteStops
 VisualCoreRendering | let | public static let minCircleSegments
 VisualCoreRendering | let | public static let version
 VisualCoreRendering | let | public static let vertexSource
+VisualCoreRendering | let | public static let visualCoreIncludes: ShaderLibrary
 VisualCoreRendering | let | public static let visualCoreLibrary: [String: String]
 VisualCoreRendering | protocol | public protocol GPUResource: AnyObject
 VisualCoreRendering | protocol | public protocol RenderScene: AnyObject

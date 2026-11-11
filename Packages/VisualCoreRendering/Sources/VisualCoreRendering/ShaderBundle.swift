@@ -14,6 +14,10 @@ public final class ShaderBundle: Sendable {
         return load(dir, prefix: "vc/")
     }()
 
+    /// A library holding only the VisualCore includes (`vc/*.glsl`), for inline shaders such as field passes
+    /// (feature 020).
+    public static let visualCoreIncludes: ShaderLibrary = ShaderBundle(files: [:]).library
+
     /// Library holding the app files and the VisualCore includes.
     public let library: ShaderLibrary
     private let files: [String: String]
