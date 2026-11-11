@@ -199,3 +199,15 @@ Story order: US1 (MVP) → US2 → US3 → US4 → detail → US5 → polish.
 3. Then automation and the rehearsal.
 4. Review checkpoints after T-A02-502 (VisualCore API and the regression), T-A02-505 (UI and audit), T-A02-511
    (Release symbols) and T-A02-512 (all checks).
+
+## Phase 9: Convergence
+
+- [ ] T-A02-513 Add a `fieldCheck` detection test to `StressTests`. Seed the scene with a NaN velocity cell, an
+  infinite dye cell, dye 5 and |v|·Δt beyond the grid. Assert each gives its `firstBad` message, that
+  `AppAutomation.check` returns it, and that nothing crashes. Covers the edge case "a non-finite value appearing"
+  and FR-A02-507 (partial).
+- [ ] T-A02-514 Extend `ControlTests`: after `resetCanvas()`, viscosity, palette, brush radius and detail are
+  unchanged. Covers US1/AC4 (partial).
+- [ ] T-A02-515 Add `rebuilds=<n>` (`scene.rebuildCount`) to `AppAutomation.note`, and assert it in
+  `AutomationTests.testLifecycleRebuildsAndPasses`, so the report records context recreation. Covers the edge case
+  "context loss during the test mode" (partial).
