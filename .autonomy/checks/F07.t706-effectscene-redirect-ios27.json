@@ -1,0 +1,26 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/VisualCoreRendering",
+    "--scheme",
+    "VisualCoreRendering-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--result-name",
+    "F07-t706-ios27"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --result-name F07-t706-ios27",
+  "elapsed_seconds": 5.385,
+  "exit_code": 0,
+  "finished": "2026-11-11T01:50:06+00:00",
+  "log": ".autonomy/logs/F07.t706-effectscene-redirect-ios27.log",
+  "log_sha256": "cd1ed7eaf371dcfb1901f71928147d65e90159923dc9452fae04b2c1b33457b5",
+  "name": "t706-effectscene-redirect-ios27",
+  "stage": "F07",
+  "started": "2026-11-11T01:50:01+00:00",
+  "timed_out": false
+}

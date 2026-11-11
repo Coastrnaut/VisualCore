@@ -15,6 +15,13 @@ public struct RenderContext: Equatable {
     /// The host's resource registry (one per host; feature 004).
     public let resources: ResourceRegistry
 
+    /// The same context drawing into another framebuffer of the given size — for wrappers that render a content
+    /// scene off-screen (EffectScene), so content that binds `framebuffer` lands in the wrapper's target
+    /// (feature 008 T-F706).
+    public func redirected(to framebuffer: UInt32, width: Int, height: Int) -> RenderContext {
+        RenderContext(generation: generation, pixelWidth: width, pixelHeight: height, framebuffer: framebuffer, resources: resources)
+    }
+
     public nonisolated static func == (a: RenderContext, b: RenderContext) -> Bool {
         a.generation == b.generation && a.pixelWidth == b.pixelWidth && a.pixelHeight == b.pixelHeight
             && a.framebuffer == b.framebuffer && a.resources === b.resources

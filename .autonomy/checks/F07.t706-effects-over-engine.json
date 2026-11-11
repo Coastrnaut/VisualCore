@@ -1,0 +1,31 @@
+{
+  "argv": [
+    "xcodebuild",
+    "test",
+    "-project",
+    "Harnesses/ProjectMReference/ProjectMReference.xcodeproj",
+    "-scheme",
+    "ProjectMReference",
+    "-destination",
+    "platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D",
+    "-derivedDataPath",
+    "Build/DerivedData/ProjectMReference",
+    "-resultBundlePath",
+    ".autonomy/xcresults/F07-t706-20261110-205026.xcresult",
+    "-test-timeouts-enabled",
+    "YES",
+    "-default-test-execution-time-allowance",
+    "180",
+    "CODE_SIGNING_ALLOWED=NO"
+  ],
+  "command": "xcodebuild test -project Harnesses/ProjectMReference/ProjectMReference.xcodeproj -scheme ProjectMReference -destination 'platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D' -derivedDataPath Build/DerivedData/ProjectMReference -resultBundlePath .autonomy/xcresults/F07-t706-20261110-205026.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 180 CODE_SIGNING_ALLOWED=NO",
+  "elapsed_seconds": 6.592,
+  "exit_code": 0,
+  "finished": "2026-11-11T01:50:32+00:00",
+  "log": ".autonomy/logs/F07.t706-effects-over-engine.log",
+  "log_sha256": "18108b2eafe428058fb80874742aae7a8df45e342e91ffbe20a6e4721fe53294",
+  "name": "t706-effects-over-engine",
+  "stage": "F07",
+  "started": "2026-11-11T01:50:26+00:00",
+  "timed_out": false
+}

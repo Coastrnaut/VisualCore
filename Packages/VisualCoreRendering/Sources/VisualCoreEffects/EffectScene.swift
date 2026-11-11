@@ -66,7 +66,10 @@ public final class EffectScene: RenderScene {
         }
         sceneTarget.bind()
         vcglViewport(0, 0, GLsizei(sceneTarget.width), GLsizei(sceneTarget.height))
-        try content.render(context, frame: frame)
+        // Content that binds `context.framebuffer` itself (the host contract, e.g. a foreign engine) must still land
+        // in the scene target (feature 008 T-F706).
+        try content.render(context.redirected(to: sceneTarget.handle.name, width: sceneTarget.width, height: sceneTarget.height),
+                           frame: frame)
         var output = sceneTarget
         if let renderer {
             do { output = try renderer.render(scene: sceneTarget, time: frame.time, delta: frame.delta) }

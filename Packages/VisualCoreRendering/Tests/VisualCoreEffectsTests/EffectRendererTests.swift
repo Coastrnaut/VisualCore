@@ -101,6 +101,30 @@ final class EffectRendererTests: XCTestCase {
         XCTAssertEqual(host.resources.stats.leaked, 0, "the effect scene releases what it allocated")
     }
 
+    // T-F706: content that binds context.framebuffer explicitly (host contract; e.g. the ProjectM engine) is still
+    // captured by the effect graph instead of drawing straight to the window.
+    func testContentBindingContextFramebufferIsCaptured() throws {
+        final class ExplicitFramebufferScene: RenderScene {
+            func setup(_ c: RenderContext) throws {}
+            func resize(_ c: RenderContext) {}
+            func render(_ c: RenderContext, frame: FrameInfo) throws {
+                vcglBindFramebuffer(GLenum(GL_FRAMEBUFFER), c.framebuffer)
+                vcglViewport(0, 0, GLsizei(c.pixelWidth), GLsizei(c.pixelHeight))
+                vcglClearColor(1, 0, 0, 1)
+                vcglClear(GLbitfield(GL_COLOR_BUFFER_BIT))
+            }
+            func teardown(_ c: RenderContext) {}
+        }
+        let scene = EffectScene(content: ExplicitFramebufferScene(), graph: Self.swapGraph)
+        let host = try RenderHost(scene: scene)
+        host.view.frame = CGRect(x: 0, y: 0, width: 16, height: 16)
+        host.view.layoutIfNeeded()
+        XCTAssertTrue(host.renderOneFrame(present: false))
+        let center = px(host, x: host.pixelSize.width / 2)
+        XCTAssertGreaterThan(center.z, 200, "red content swapped to blue by the graph")
+        XCTAssertLessThan(center.x, 50)
+    }
+
     func testReduceFlashingAppendsTheLimiter() throws {
         let scene = EffectScene(content: ClearColorScene(red: 1, green: 1, blue: 1), graph: Self.swapGraph)
         scene.reduceFlashing = true
