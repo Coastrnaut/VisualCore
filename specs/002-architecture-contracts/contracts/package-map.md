@@ -5,7 +5,7 @@ Supersedes the table in ADR-0003 where they differ (ADR-0003 is corrected to poi
 | Package / product | Platform | Owns | Public surface | May depend on | Audit trace |
 |---|---|---|---|---|---|
 | `Packages/VisualCore` · `VisualCoreMath` | host + iOS | vectors, matrices, quaternions, cameras, easing | value types | Foundation | gap: input/scenes/math |
-| · `VisualCoreSimulation` | host + iOS | fixed-step clock, seeded RNG, timelines, particle pool, NaN guard, `SceneClock` (A01-P02), `AccessibilityPreferences` (A01-P05) | value types, protocols | Math | gap: deterministic simulation |
+| · `VisualCoreSimulation` | host + iOS | fixed-step clock, seeded RNG, timelines, particle pool, NaN guard, `SceneClock` (A01-P02), `AccessibilityPreferences` (A01-P05), `FieldGrid`/`StoragePrecision`/`SignedRangeEncoding`/`TimeStepPolicy` (A02-P01) | value types, protocols | Math | gap: deterministic simulation |
 | · `VisualCoreScenes` | host + iOS | input mapping, pointer tracking, mesh generators, scene graph model, export geometry (`ExportGeometry`, A01-P04) | value types | Math | gap: input/scenes |
 | · `VisualCoreShaderSource` | host + iOS | shader library, include preprocessing, line maps, diagnostics parsing | value types | Foundation | gap: shader library (U-F003-adjacent) |
 | · `VisualCoreEffectsGraph` | host + iOS | effect DAG model, validation, quotas, flash-limiter model | value types | Foundation | gap: multi-pass graph; reference `CFlashLimiter` idea |

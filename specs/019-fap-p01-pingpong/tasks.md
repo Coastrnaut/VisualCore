@@ -31,7 +31,7 @@ each followed by the enumeration guard, plus the ProjectM regression after the V
 
 ## Phase 2: Foundational — generic CPU pieces in VisualCore (G-CPUFIELD; blocks US1 and US2)
 
-- [ ] T-A02-102 [P] Write host tests first, then implement in `Packages/VisualCore/Sources/VisualCoreSimulation/`:
+- [X] T-A02-102 [P] Write host tests first, then implement in `Packages/VisualCore/Sources/VisualCoreSimulation/`: — Verified 2026-11-11: VisualCoreSimulation FieldGrid/StoragePrecision (portable half rounding cross-checked against Float16 on 5,000 values; unorm8 stall case), SignedRangeEncoding, TimeStepPolicy with /// docs; tests FieldGridTests 8, SignedRangeEncodingTests 2, TimeStepPolicyTests 3. run-check A02-P01/t102-visualcore-host swift test: all suites pass (13 new XCTest + 168 Swift Testing, 0 failures); check_public_api --update (28 additions, 0 removed; baseline 923 lines) then PASS; check_documented_api PASS; check_compliance PASS; check_dependencies PASS; README and package-map updated
   - `FieldGrid.swift`: `FieldGrid` and `StoragePrecision`. The float16 rounding is `Float(Float16(x))`; unorm8 is
     `round(clamp(x,0,1)*255)/255`; the tolerances are 1e-6, 1e-3 and 1.5/255; channels are 1…4.
   - `SignedRangeEncoding.swift`: `encode = clamp(v/range*0.5+0.5, 0, 1)`; range > 0 and finite.

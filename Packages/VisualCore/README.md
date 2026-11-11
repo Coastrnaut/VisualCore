@@ -7,7 +7,7 @@ iOS 26+ inside apps. The package map and dependency rules R1–R5 are in
 | Product | Purpose |
 |---|---|
 | VisualCoreMath | vectors, matrices, quaternions, cameras, easing |
-| VisualCoreSimulation | fixed-step clock, seeded RNG, timelines, particle pool, NaN guard |
+| VisualCoreSimulation | fixed-step clock, seeded RNG, timelines, particle pool, NaN guard, CPU field grids, storage precision, time-step policy |
 | VisualCoreScenes | input mapping, pointer tracking, mesh generators, export geometry |
 | VisualCoreShaderSource | shader library, includes, line maps, diagnostics parsing |
 | VisualCoreEffectsGraph | effect DAG model, validation, quotas, flash-limiter model |
@@ -54,6 +54,14 @@ time dropped and counted, 1e-9 s boundary tolerance, invalid deltas = 0). `Seede
 through SplitMix64; integer sequences are identical on every platform. Simulations driven by the clock and the
 generator are bit-identical per platform and independent of the display rate (proven at 60 and 120 Hz); float
 identity across CPU architectures is not promised.
+
+**CPU field references** (`VisualCoreSimulation`, feature 019): a `FieldGrid` is a W×H grid with 1…4 channels,
+row-major from the bottom row up, as in GL. `StoragePrecision` (`float32`, `float16`, `unorm8`) rounds values the way
+GPU storage does after every step. Half precision uses portable round-to-nearest-even with no `Float16` dependency;
+unorm8 is clamped to 0…1 and stored as n/255. Its `tolerance` is one storage step (1e-6, 1e-3, 1.5/255), so a GPU pass
+can be compared with a CPU reference of the same precision. `SignedRangeEncoding` stores −range…range in 0…1, with
+zero at 0.5, for RGBA8 fallbacks. `TimeStepPolicy` gives one bounded step per frame (1/240…1/30 s; invalid deltas
+use the minimum), so a resume after a pause takes neither a huge step nor a catch-up loop.
 
 **Animation**: `ease(_:_:_:)` (linear, quad, cubic, sine, expo, back, elastic, bounce × in/out/inOut; f(0)=0,
 f(1)=1), `Tween` (repeat count or forever, autoreverse) and `Timeline` (play, pause, seek, reverse via negative
