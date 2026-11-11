@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/VisualCore",
+    "--filter",
+    "VisualCoreShaderSourceTests"
+  ],
+  "command": "swift test --package-path Packages/VisualCore --filter VisualCoreShaderSourceTests",
+  "elapsed_seconds": 5.598,
+  "exit_code": 0,
+  "finished": "2026-11-11T00:05:19+00:00",
+  "log": ".autonomy/logs/F03.t305-shaderlibrary.log",
+  "log_sha256": "d87f817a80c9ac1a97e3341e96026fc2d844a740527f1773108292a1c0970f1f",
+  "name": "t305-shaderlibrary",
+  "stage": "F03",
+  "started": "2026-11-11T00:05:13+00:00",
+  "timed_out": false
+}
