@@ -19,7 +19,7 @@ Supersedes the table in ADR-0003 where they differ (ADR-0003 is corrected to poi
 | · `VisualCoreEffects` | iOS | GPU passes, target pool, graph executor | classes | Rendering, EffectsGraph | gap: effects |
 | · `VisualCoreUI` | iOS | SwiftUI `RenderSurface`, diagnostics overlay, accessibility helpers | views | Rendering, Diagnostics | gap: native UI |
 | · `VisualCoreAudio` | iOS | AVAudioEngine mic/in-app taps → DSP | classes | AudioDSP | reference `AudioCore` lessons |
-| · `VisualCoreAutomation` | iOS | AutomationRunner (`DEBUG \|\| VISUALCORE_AUTOMATION`) | functions | Diagnostics | reference projectM-iOS AutomationRunner |
+| · `VisualCoreAutomation` | iOS | AutomationRunner (`DEBUG \|\| VISUALCORE_AUTOMATION`; empty otherwise) | classes | Rendering, Diagnostics (amended F09, feature 010) | reference projectM-iOS AutomationRunner |
 | `Showcase/`, `Apps/<Name>/`, `Harnesses/SecondConsumer/` | iOS apps | product UI/domain | none | any VisualCore product except TestSupport (tests only) | — |
 | `Harnesses/ProjectMReference/` (own `ProjectMReference.yml`) | iOS app | reference adapter | none | VisualCoreRendering + reference `ProjectMBridge` | F07 |
 

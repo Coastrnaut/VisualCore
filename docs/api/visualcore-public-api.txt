@@ -3,8 +3,37 @@ VisualCoreAudio | enum | public enum AudioInfo
 VisualCoreAudio | let | public static let version
 VisualCoreAudioDSP | enum | public enum AudioDSPInfo
 VisualCoreAudioDSP | let | public static let version
+VisualCoreAutomation | class | public final class AutomationRunner
 VisualCoreAutomation | enum | public enum AutomationInfo
+VisualCoreAutomation | func | public func run(mode: String, frames: Int = 120) -> AutomationReport
+VisualCoreAutomation | func | public static func requestedFrames(environment: [String: String] = ProcessInfo.processInfo.environment) -> Int
+VisualCoreAutomation | func | public static func requestedMode(environment: [String: String] = ProcessInfo.processInfo.environment) -> String?
+VisualCoreAutomation | init | public init(host: RenderHost, bundleID: String, outputDirectory: URL? = nil, terminate: @escaping (Int32) -> Void =
+VisualCoreAutomation | init | public init?(samples: [Double])
+VisualCoreAutomation | let | public static let environmentKey
+VisualCoreAutomation | let | public static let framesKey
+VisualCoreAutomation | let | public static let knownModes
 VisualCoreAutomation | let | public static let version
+VisualCoreAutomation | struct | public struct AutomationReport: Codable, Equatable, Sendable
+VisualCoreAutomation | struct | public struct FrameTimeStats: Codable, Equatable, Sendable
+VisualCoreAutomation | var | public private(set) var lastReportURL: URL?
+VisualCoreAutomation | var | public var bundleID: String
+VisualCoreAutomation | var | public var cycles: Int?
+VisualCoreAutomation | var | public var deviceModel: String
+VisualCoreAutomation | var | public var frameTimeMs: FrameTimeStats?
+VisualCoreAutomation | var | public var frames
+VisualCoreAutomation | var | public var leaked: Int?
+VisualCoreAutomation | var | public var max: Double
+VisualCoreAutomation | var | public var median: Double
+VisualCoreAutomation | var | public var message: String?
+VisualCoreAutomation | var | public var min: Double
+VisualCoreAutomation | var | public var mode: String
+VisualCoreAutomation | var | public var osVersion: String
+VisualCoreAutomation | var | public var p95: Double
+VisualCoreAutomation | var | public var result: String
+VisualCoreAutomation | var | public var schema
+VisualCoreAutomation | var | public var startedAt: String
+VisualCoreAutomation | var | public var timeToFirstFrameMs: Double?
 VisualCoreDiagnostics | enum | public enum DiagnosticsInfo
 VisualCoreDiagnostics | enum | public enum RenderLifecycleState: String, Sendable, Codable, CaseIterable
 VisualCoreDiagnostics | enum | public enum ResourceBudgetError: Error, Equatable, Sendable
