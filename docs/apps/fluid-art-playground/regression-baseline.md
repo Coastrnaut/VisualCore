@@ -76,3 +76,8 @@ ProjectMReference 17/17 on iOS 27.2 and 26.5): **7/7 pass**, unchanged.
 ## A02-P04 rerun after `FieldPass.runObserver` (2026-11-11)
 
 `A02-P04/t401-reference-a` 3/3 (pin `d93edd1` unchanged) and `t401-reference-b` 4/4: **7/7 pass**, unchanged.
+
+## A02-P05 rerun after `SyntheticGestureScript` and the automation seed/check hooks (2026-11-11)
+
+`A02-P05/t502-reference-a` 3/3 (pin `d93edd1` unchanged) and `t502-reference-b` 4/4: **7/7 pass**, unchanged. A01
+(`t502-a01-build`) and Showcase (`t502-showcase-build`) build against the changed `AutomationView`.

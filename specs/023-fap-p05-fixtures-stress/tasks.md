@@ -154,7 +154,7 @@ research R1–R7, data model, contract, quickstart).
 
 ## Phase 8: Polish and cross-cutting
 
-- [ ] T-A02-512 Documentation:
+- [X] T-A02-512 Documentation: — Verified 2026-11-11: — Verified 2026-11-11: contract gate A02-P05 (M07/M08 notes and evidence SyntheticGestureScript + AutomationRunner.requestedSeed, example TestMode; gaps G-GESTURESCRIPT and G-AUTOCHECK closed; decision reason) rendered by check_app_contract --render PASS 10 rows/49 citations/9 gaps; new docs/apps/fluid-art-playground/device-campaign.md (modes, keys, report fields, D1/D2/D3 rows 'automation ready, device run pending implementation lock'); regression-baseline A02-P05 section (t502-reference-a 3/3 + -b 4/4; A01/Showcase builds t502-a01-build, t502-showcase-build; no package change since); simulator lessons feature 023; run-check A02-P05/t512-fast-checks 14/14 PASS
   - the contract (`docs/apps/fluid-art-playground/visualcore-contract.{json,md}`): reused pieces, the two VisualCore
     additions, and gate A02-P05;
   - a new `docs/apps/fluid-art-playground/device-campaign.md`: modes, keys, report fields, the D1/D2/D3 rows marked

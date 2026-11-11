@@ -90,3 +90,19 @@ speaks and what the screen shows, not exact values. Sheets at a medium detent wi
   clipped text.
 - **Offscreen captures for pixel probes.** `renderOffscreen` at exactly the grid size (scene paused) gives one pixel
   per cell, so display formulas can be checked pixel by pixel against a CPU reference (within 0.5/255 here).
+
+## Feature 023 (A02-P05)
+
+- **Stress tests find real defects; fix the cause.** The first 600-frame stress run in half-float storage reached
+  |v| 34,688 cells/s and dye 89, because splats added force and dye without a bound. 8-bit storage passed only
+  because its encoding clamps. The fix is to bound what splats add, in the shader and the CPU reference, rather than
+  loosen the detector. Run every stress test in both storages.
+- **Byte-identical determinism holds on the simulator.** With a fixed step, a pinned quality tier and a seeded
+  gesture script, two runs give the same SHA-256. Here the digest was even identical across the iOS 27.2 and 26.5
+  runtimes. Claim it per runtime and device only.
+- **Several scripted fingers pinch.** Multi-pointer scripts must go through the painting path, not the gesture
+  recognizer, or two simultaneous pointers become a pinch.
+- **Lazy forms hide new rows.** Adding a picker pushed an existing row below the fold on the iOS 26.5 simulator's
+  smaller window. Scroll until each queried element exists before reading its label.
+- **One host per scene under automation.** `AutomationView` owns the RenderHost, so the app model must be able to run
+  unhosted (`hosted: false`) with a stand-in canvas size.

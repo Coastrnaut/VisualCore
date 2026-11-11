@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "app": "fluid-art-playground",
-  "gate": "A02-P04",
+  "gate": "A02-P05",
   "date": "2026-11-11",
   "inventory": [
     {
@@ -404,7 +404,7 @@
         "file": "Apps/FluidArtPlayground/App/PlaygroundView.swift",
         "symbol": "PlaygroundModel"
       },
-      "notes": "Closed in A02-P03 (G-QUALITY): QualityPolicy steps tiers down on serious/critical thermal state or Low Power above a ceiling and up after a calm period, at most once per decision interval; the app maps tiers to pressure iterations first, then the splat cap (FluidQuality). Real thermal behavior is measured in campaign II."
+      "notes": "Closed in A02-P03 (G-QUALITY): QualityPolicy steps tiers down on serious/critical thermal state or Low Power above a ceiling and up after a calm period, at most once per decision interval; the app maps tiers to pressure iterations first, then the splat cap (FluidQuality). Real thermal behavior is measured in campaign II. A02-P05 adds the user-facing Simulation detail picker (FluidDetail: 64², 128², 256², device-capped; field-only rebuild with fallback)."
     },
     {
       "id": "M08",
@@ -429,13 +429,25 @@
           "symbol": "SeededRandom",
           "product": "VisualCoreSimulation",
           "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/SyntheticGestureScript.swift",
+          "symbol": "SyntheticGestureScript",
+          "product": "VisualCoreScenes",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreAutomation/AutomationRunner.swift",
+          "symbol": "AutomationRunner.requestedSeed",
+          "product": "VisualCoreAutomation",
+          "public": true
         }
       ],
       "example": {
-        "file": "Apps/GenerativeArtStudio/App/ClockedArtScene.swift",
-        "symbol": "ClockedArtScene"
+        "file": "Apps/FluidArtPlayground/App/TestMode.swift",
+        "symbol": "TestMode"
       },
-      "notes": "Play/pause/scrub clock, fixed simulation steps and a seeded RNG."
+      "notes": "Play/pause/scrub clock, fixed simulation steps and a seeded RNG. A02-P05: the playground's Pause/Step/Reset (SimulationControl, scene requestStep/resetFields) and the deterministic test mode (fixed 1/60 s, tier pinned, VisualCore SyntheticGestureScript; byte-identical pictures for the same seed on iOS 27.2 and 26.5). Device runs use AutomationRunner modes with VISUALCORE_AUTORUN_SEED and the post-run field check (G-AUTOCHECK)."
     },
     {
       "id": "M09",
@@ -592,6 +604,30 @@
       "test": "Host tests: FieldGrid shape/difference/padding; StoragePrecision float32/float16 (cross-checked with Float16)/float16TowardZero/unorm8 rounding and the unorm8 stall; SignedRangeEncoding round trip; TimeStepPolicy clamp with invalid deltas. App fixture: GPU dissipation equals the precision-matched CPU reference (max diff 0.0) on iOS 27.2 and 26.5",
       "justification": "Found in A02-P01 (research R6): CPU references for GPU grid passes and precision-matched comparison are generic (A09, A16, A22 need them), so they go to VisualCore per Principle II.",
       "closed": "A02-P01"
+    },
+    {
+      "id": "G-GESTURESCRIPT",
+      "matrix": [
+        "M08"
+      ],
+      "kind": "adaptation",
+      "owner": "VisualCore:VisualCoreScenes",
+      "phase": 5,
+      "test": "SyntheticGestureScriptTests 11 (determinism, 100 seeds x 600 frames in bounds, began/moved/ended order, strictly increasing timestamps, clamps); app DeterminismTests byte-identical digests on iOS 27.2 and 26.5",
+      "justification": "Found in A02-P05 (research R1): seeded, replayable multi-pointer input is needed by every interactive app's fixtures and device runs, so it goes to VisualCore per Principle II; adds the pure edge VisualCoreScenes -> VisualCoreSimulation.",
+      "closed": "A02-P05"
+    },
+    {
+      "id": "G-AUTOCHECK",
+      "matrix": [
+        "M08"
+      ],
+      "kind": "adaptation",
+      "owner": "VisualCore:VisualCoreAutomation",
+      "phase": 5,
+      "test": "AutomationRunnerTests +4 (seed parsing, check pass with note, check fail, unknown mode unchecked) on both runtimes; ProjectM regression 7/7; app AutomationTests 4",
+      "justification": "Found in A02-P05 (research R2-R3): device runs must verify domain invariants and pass a seed; a generic app-supplied post-run check and seed key keep the runner app-neutral.",
+      "closed": "A02-P05"
     }
   ],
   "traceability": [
@@ -752,7 +788,8 @@
       "All 6 gaps are additive: five reusable VisualCore helpers (PingPongTarget, half-float support query, FieldPass, PointerVelocityTracker, QualityPolicy) owned per Principle II, and the solver equations kept app-local with a CPU reference by the A02 rule. None needs a second renderer, a fork, private API or networking.",
       "Half-float targets are not assumed: support is queried and an RGBA8 fallback is planned (G-FLOATRT), so no unverified GPU feature is a dependency.",
       "Reference regression baseline recorded green 7/7 (T-A02-003) and the empty shell builds and passes its smoke test on both simulator runtimes (T-A02-005).",
-      "Phase 01 starts with G-PINGPONG, G-FLOATRT and G-FIELDPASS in VisualCoreRendering and the app's GPU-free solver reference."
+      "Phase 01 starts with G-PINGPONG, G-FLOATRT and G-FIELDPASS in VisualCoreRendering and the app's GPU-free solver reference.",
+      "A02-P05: MVP-05 (pause, step, reset, deterministic seeded test mode) and MVP-06 (simulation detail) are implemented; the manual's fixtures 1-5 pass as one suite; a 600-frame stress run found and fixed unbounded splats in half-float storage; device stress automation is ready and rehearsed on simulators only (device runs pending the implementation lock)."
     ],
     "blockers": []
   }
