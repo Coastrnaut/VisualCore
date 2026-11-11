@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_documented_api.py",
+    "--sources",
+    "Harnesses/InteractiveDemo"
+  ],
+  "command": "python3 scripts/check_documented_api.py --sources Harnesses/InteractiveDemo",
+  "elapsed_seconds": 0.073,
+  "exit_code": 0,
+  "finished": "2026-11-11T02:10:26+00:00",
+  "log": ".autonomy/logs/F08.t803-docapi-Harnesses-InteractiveDemo.log",
+  "log_sha256": "cfb388f888a4ac115f2ba7cbd1bd27608fa51be2e06cda7dca03e572001bb3fc",
+  "name": "t803-docapi-Harnesses-InteractiveDemo",
+  "stage": "F08",
+  "started": "2026-11-11T02:10:26+00:00",
+  "timed_out": false
+}

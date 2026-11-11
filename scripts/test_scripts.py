@@ -27,6 +27,7 @@ clean = load("check_reference_clean")
 refinv = load("inventory_reference")
 baseline = load("run_reference_baseline")
 audit = load("audit_showcase_dependencies")
+docapi = load("check_documented_api")
 try:
     deps = load("check_dependencies")
 except FileNotFoundError:
@@ -300,6 +301,33 @@ class ShowcaseAuditTests(unittest.TestCase):
             code = audit.main([])
         self.assertEqual(code, 0, out.getvalue())
         self.assertIn("packages: checked 2", out.getvalue())
+
+
+class DocumentedApiTests(unittest.TestCase):
+    """Feature 009 T-F803 (FR-F806, SC-F802)."""
+    FIX = HERE / "fixtures" / "documented_api"
+
+    def run_check(self, consumer: str) -> tuple[int, str]:
+        import contextlib, io
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(io.StringIO()):
+            code = docapi.main(["--root", str(self.FIX), "--sources", consumer, "--packages", "packages", "--docs", "docs/README.md"])
+        return code, out.getvalue()
+
+    def test_documented_use_passes_and_ignores_comments_and_strings(self):
+        code, out = self.run_check("consumer_ok")
+        self.assertEqual(code, 0, out)
+        self.assertIn("used by consumer_ok: 2", out)
+
+    def test_undocumented_use_fails_naming_the_symbol(self):
+        code, out = self.run_check("consumer_bad")
+        self.assertEqual(code, 1)
+        self.assertIn("UNDOCUMENTED Hidden", out)
+
+    def test_usage_errors(self):
+        import contextlib, io
+        with contextlib.redirect_stderr(io.StringIO()), contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(docapi.main(["--root", str(self.FIX), "--sources", "missing"]), 2)
 
 
 if __name__ == "__main__":

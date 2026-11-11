@@ -59,6 +59,7 @@ f(1)=1), `Tween` (repeat count or forever, autoreverse) and `Timeline` (play, pa
 `rate`, completion events once per pass, `reduceMotion` jumps to end values and disables repeats).
 
 **Scenes and particles**: `SceneNode` (TRS transform, z-order, visibility, primitive rect/circle/line/polygon
-≤ 256 points, hit testing); `ParticleSystem` (capacity 10,000 default, ≤ 100,000; emitters, gravity/drag/attractor,
-NaN removal, `checksum()`); 3D: `OrbitCamera` (pitch ±89°, `project`, `ray`), `Mesh.plane/cube/uvSphere`
+≤ 256 points, hit testing); `ParticleSystem` (capacity 10,000 default, ≤ 100,000; `Emitter`s with rate, burst, lifetime, speed, direction/spread,
+size and color over life; `ParticleForce` gravity/drag/attractor; NaN removal, `checksum()`; `instances()` →
+`ParticleInstance` for `ParticleRenderer`); 3D: `OrbitCamera` (pitch ±89°, `project`, `ray`), `Mesh.plane/cube/uvSphere`
 (segments 3–256, rings 2–256, subdivisions ≤ 256).

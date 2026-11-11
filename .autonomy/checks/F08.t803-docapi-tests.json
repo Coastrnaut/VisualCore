@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "python3",
+    "scripts/test_scripts.py"
+  ],
+  "command": "python3 scripts/test_scripts.py",
+  "elapsed_seconds": 1.141,
+  "exit_code": 0,
+  "finished": "2026-11-11T02:10:18+00:00",
+  "log": ".autonomy/logs/F08.t803-docapi-tests.log",
+  "log_sha256": "a8c25e56b720e4862db20ca73452945ce3e003515cb81a916b23a404fb5e799f",
+  "name": "t803-docapi-tests",
+  "stage": "F08",
+  "started": "2026-11-11T02:10:17+00:00",
+  "timed_out": false
+}

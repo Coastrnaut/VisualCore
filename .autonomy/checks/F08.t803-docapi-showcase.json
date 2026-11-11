@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_documented_api.py",
+    "--sources",
+    "Showcase"
+  ],
+  "command": "python3 scripts/check_documented_api.py --sources Showcase",
+  "elapsed_seconds": 0.139,
+  "exit_code": 1,
+  "finished": "2026-11-11T02:10:18+00:00",
+  "log": ".autonomy/logs/F08.t803-docapi-showcase.log",
+  "log_sha256": "43526e6e3098b8dcc6677bc671177bb0387d76fcd243d062494df6416cc38f5d",
+  "name": "t803-docapi-showcase",
+  "stage": "F08",
+  "started": "2026-11-11T02:10:18+00:00",
+  "timed_out": false
+}
