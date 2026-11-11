@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "swift",
+    "build",
+    "--package-path",
+    "Apps/FluidArtPlayground/FluidArtPlaygroundCore"
+  ],
+  "command": "swift build --package-path Apps/FluidArtPlayground/FluidArtPlaygroundCore",
+  "elapsed_seconds": 2.571,
+  "exit_code": 0,
+  "finished": "2026-11-11T08:20:53+00:00",
+  "log": ".autonomy/logs/A02-P02.t201-core-build.log",
+  "log_sha256": "d838f8752ad86dac818c2d3c326e8a0fe387b87addf7c0639756adb21c0784a3",
+  "name": "t201-core-build",
+  "stage": "A02-P02",
+  "started": "2026-11-11T08:20:51+00:00",
+  "timed_out": false
+}

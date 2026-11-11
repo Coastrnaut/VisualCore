@@ -13,9 +13,11 @@ let package = Package(
     targets: [
         .target(name: "FluidArtPlaygroundCore", dependencies: [
             .product(name: "VisualCoreSimulation", package: "VisualCore"),
+            .product(name: "VisualCoreScenes", package: "VisualCore"),   // PointerVelocityTracker.Sample (A02-P02)
         ]),
         .testTarget(name: "FluidArtPlaygroundCoreTests", dependencies: ["FluidArtPlaygroundCore",
-                                                                       .product(name: "VisualCoreSimulation", package: "VisualCore")]),
+                                                                       .product(name: "VisualCoreSimulation", package: "VisualCore"),
+                                                                       .product(name: "VisualCoreScenes", package: "VisualCore")]),
     ],
     swiftLanguageModes: [.v6]
 )

@@ -21,7 +21,7 @@ contains additions only.
 
 ## Phase 1: Setup
 
-- [ ] T-A02-201 Add `VisualCoreScenes` to the `FluidArtPlaygroundCore` dependencies in
+- [X] T-A02-201 Add `VisualCoreScenes` to the `FluidArtPlaygroundCore` dependencies in — Verified 2026-11-11: FluidArtPlaygroundCore depends on VisualCoreScenes (for PointerVelocityTracker.Sample); the app target lists VisualCoreScenes in project.yml. run-check A02-P02/t201-core-build swift build pass; xcodegen generate exit 0; check_dependencies R1-R5 PASS
   `Apps/FluidArtPlayground/FluidArtPlaygroundCore/Package.swift` and to the app target in `project.yml`. Acceptance:
   `swift build` of the Core package, `xcodegen generate`, and `check_dependencies` (R1–R5) pass.
 
