@@ -98,7 +98,7 @@ IDs are `T-A01-4##`, with one commit and push per task (`scripts/tick_task.py`).
     `NS*UsageDescription` key (FR-A01-407; analyze C2).
 
   Run on iOS 27.2 and 26.5.
-- [ ] T-A01-407 [US1] Add `Apps/GenerativeArtStudio/Tests/UI/ExportUITests.swift`: open Export; change size and
+- [X] T-A01-407 [US1] Add `Apps/GenerativeArtStudio/Tests/UI/ExportUITests.swift`: open Export; change size and — Verified 2026-11-10: Tests/UI/ExportUITests.swift testExportSheetFlow: Export button labelled 'Export'; default 2048 × 2048 px; format 'Opaque · sRGB'; crop preview label follows the aspect; size picker label 'Size', value '2048 px'; aspect value 'Portrait 4:5' (FR-A01-409); Portrait → 1638 × 2048, 1080 px → 864 × 1080, Landscape → 1080 × 608; Export Image → share control gas.export.share, no error; Done closes the sheet; controls still open. LabeledContent reads '<title>, <value>', so labels are matched by suffix. run-check A01-P04/t407-exportui-ios27 + ios26 TEST SUCCEEDED
   aspect, and the dimension label updates (for example "864 × 1080 px"); the format label; run the export; the share
   control appears; close the sheet; the scene is still interactive. The size and aspect pickers expose labels and values (FR-A01-409;
   analyze C3). Run on iOS 27.2 and 26.5.
