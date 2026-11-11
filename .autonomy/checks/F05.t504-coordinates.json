@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/VisualCore"
+  ],
+  "command": "swift test --package-path Packages/VisualCore",
+  "elapsed_seconds": 3.418,
+  "exit_code": 0,
+  "finished": "2026-11-11T00:38:47+00:00",
+  "log": ".autonomy/logs/F05.t504-coordinates.log",
+  "log_sha256": "8619a33acd1b8cdf7c9bbcc45cb9594958c8cf22f52b39a9e83dd24c074d5e6b",
+  "name": "t504-coordinates",
+  "stage": "F05",
+  "started": "2026-11-11T00:38:44+00:00",
+  "timed_out": false
+}
