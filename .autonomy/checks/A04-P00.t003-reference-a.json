@@ -1,0 +1,24 @@
+{
+  "argv": [
+    "python3",
+    "scripts/release_check.py",
+    "--only",
+    "reference-engine-xcframework",
+    "reference-build-projectm-ios-sim",
+    "reference-clean",
+    "--log-dir",
+    ".autonomy/logs/t003-pu-reference-a",
+    "--json",
+    ".autonomy/logs/t003-pu-reference-a.json"
+  ],
+  "command": "python3 scripts/release_check.py --only reference-engine-xcframework reference-build-projectm-ios-sim reference-clean --log-dir .autonomy/logs/t003-pu-reference-a --json .autonomy/logs/t003-pu-reference-a.json",
+  "elapsed_seconds": 25.711,
+  "exit_code": 0,
+  "finished": "2026-11-11T16:53:22+00:00",
+  "log": ".autonomy/logs/A04-P00.t003-reference-a.log",
+  "log_sha256": "acf72322ad2e679660fce5c7757599187e8ed61f35790cf1e80bb8c58a65012c",
+  "name": "t003-reference-a",
+  "stage": "A04-P00",
+  "started": "2026-11-11T16:52:56+00:00",
+  "timed_out": false
+}

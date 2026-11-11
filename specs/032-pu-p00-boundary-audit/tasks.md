@@ -24,7 +24,7 @@ reference regression.
 
 ## Phase 3: US2 — Host, thread, build and regression baseline (P1)
 
-- [ ] T-A04-003 [US2] Run the 7-step reference regression in two `run-check` chunks (A04-P00) and record the steps, commands and results in `docs/apps/particle-universe/regression-baseline.md` (FR-A04-004, SC-A04-004).
+- [X] T-A04-003 [US2] Run the 7-step reference regression in two `run-check` chunks (A04-P00) and record the steps, commands and results in `docs/apps/particle-universe/regression-baseline.md` (FR-A04-004, SC-A04-004). — Verified 2026-11-11: — Verified 2026-11-11: run-check A04-P00/t003-reference-a 3/3 (engine xcframework, projectM-iOS simulator build BUILD SUCCEEDED, reference unmodified at d93edd1) and t003-reference-b 4/4 (ANGLERendering 14/14 and ProjectMReference 17/17 on iOS 27.2 and 26.5); recorded in docs/apps/particle-universe/regression-baseline.md
 
 ## Phase 4: US3 — Compilable empty app shell (P1)
 
