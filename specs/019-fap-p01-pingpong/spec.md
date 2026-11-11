@@ -18,6 +18,32 @@
 - The solver math stays in the app, in a GPU-free Core package with a CPU reference (A02 rule).
 - Evidence is host and simulator only.
 
+## Clarifications
+
+### Session 2026-11-11
+
+Answered autonomously under the owner's standing delegation (CLAUDE.md §2), recommended option in each case.
+
+- Q: Which dissipation formula defines "decays only according to configured dissipation"? → A: Per step, every
+  channel is multiplied by `1 / (1 + d·Δt)`, where `d` is the configured dissipation (0…10 per second) and `Δt` the
+  clamped step. With `d = 0` the value is unchanged.
+- Q: What are the bounds for grid size and time step? → A: Each grid edge is 16…512 cells, and further capped by the
+  device's maximum render size. The default is 128 × 128. `Δt` is the frame interval clamped to 1/240…1/30 s. After a
+  pause, exactly one clamped step is taken; there is no catch-up loop.
+- Q: What does the GPU result have to match, given that half-float and 8-bit storage round every step? → A: The CPU
+  reference rounds to the same storage precision after every step (`float32`, `float16` or `unorm8`). The GPU must
+  match the reference for its active format within one storage step per channel: 1e-3 for half-float values ≤ 1, and
+  1.5/255 for the 8-bit fallback. A plain float32 reference is not used for comparison, because 8-bit decay stalls
+  when the per-step change is below 1/510.
+- Q: How is half-float support decided, and what is the fallback? → A: Support needs a color-buffer float extension
+  (`GL_EXT_color_buffer_half_float` or `GL_EXT_color_buffer_float`) and a complete RGBA16F framebuffer probe.
+  Otherwise the fallback is RGBA8, with signed velocity encoded as `v / vmax · 0.5 + 0.5` (vmax from the
+  configuration, default 4 cells per step). The active format is reported. A test-only override forces the
+  fallback.
+- Q: What state do the fields have after a context loss? → A: Field contents are never carried across contexts.
+  Both pairs are recreated and re-seeded from the configuration's initial state, the step counter resets, and the
+  rebuild is reported with 0 leaked or stale resources.
+
 ## User Scenarios & Testing *(mandatory)*
 
 Users: people who open the playground (manual journeys 1–2), the implementer of later solver phases, and other apps
@@ -87,8 +113,11 @@ non-blank and changes over time as the dye fades.
 
 ### Edge Cases
 
-- A requested grid larger than the cap: clamped to the cap and reported.
-- Half-float render targets unavailable: the fallback format is used, with a looser tolerance that is documented.
+- A requested grid larger than the cap (512 per edge, or the device's maximum render size if smaller): clamped to the
+  cap and reported.
+- Half-float render targets unavailable (no color-buffer float extension, or an incomplete probe): RGBA8 is used, with
+  signed velocity encoded as `v / vmax · 0.5 + 0.5`. It is compared against the 8-bit-rounding reference within
+  1.5/255.
 - A long pause between frames: the simulation time step is clamped, so a resume never takes one huge step.
 - Context loss: field contents are not preserved across a context; they are rebuilt from the configuration's
   initial state, and no stale target is used.
@@ -110,8 +139,9 @@ non-blank and changes over time as the dye fades.
   testable on the host.
 - **FR-A02-103**: The app MUST keep the velocity and dye fields on the GPU in ping-pong pairs. Every step writes to a
   target different from the one it reads, and the fields are bounded by the configuration.
-- **FR-A02-104**: Uniform dye at rest MUST decay only according to the configured dissipation. The GPU result matches
-  the CPU reference within the stated tolerance after a fixed number of steps.
+- **FR-A02-104**: Uniform dye at rest MUST decay only according to the configured dissipation: each step multiplies by
+  `1 / (1 + d·Δt)`. After a fixed number of steps, the GPU result matches the precision-matched CPU reference within one
+  storage step per channel (1e-3 half-float; 1.5/255 for the RGBA8 fallback).
 - **FR-A02-105**: VisualCore MUST provide, with tests, docs and an API-baseline update, followed by a passing ProjectM
   regression:
   - a reusable ping-pong render-target pair: swap, a read/write guard, budget accounting, release;
@@ -121,8 +151,8 @@ non-blank and changes over time as the dye fades.
   spoken description. It creates no EGL context of its own.
 - **FR-A02-107**: After context loss, the fields MUST be rebuilt from the configuration with no stale handles and 0
   leaked resources.
-- **FR-A02-108**: The simulation time step MUST be clamped so that resuming after a pause never takes an oversized
-  step.
+- **FR-A02-108**: The simulation time step MUST be clamped to 1/240…1/30 s. Resuming after a pause takes exactly one
+  clamped step, never a catch-up loop.
 - **FR-A02-109**: The VisualCore contract MUST be updated: G-PINGPONG, G-FLOATRT and G-FIELDPASS closed; M01, M03 and
   M10 available. The contract check MUST pass. The app MUST stay offline and link no ProjectM module.
 
