@@ -54,6 +54,9 @@ final class ExplorerModel {
     var bookmarks: BookmarkLibrary
     /// The last bookmark operation's failure, shown as an alert; nil when there is none.
     var bookmarkError: String?
+    /// Shown after opening a bookmark whose view this device cannot show at full precision (feature 028 T-A03-307;
+    /// US3; clarification 2); cleared by the next zoom, pan or reset.
+    private(set) var bookmarkNote: String?
 
     /// `fragment` is a test seam (an invalid source exercises the fallback); `system` reads Reduce Motion (default: the
     /// system's, through VisualCoreUI's observer); `bookmarksDirectory` defaults to `Application Support/Bookmarks`
@@ -162,6 +165,16 @@ final class ExplorerModel {
         state = target
         paletteID = b.paletteID
         apply(target.viewport)
+        if state.viewport.unitsPerPoint > target.viewport.unitsPerPoint {
+            bookmarkNote = Self.bookmarkNoteText(savedBits: b.precision.mantissaBits, bits: mantissaBits)
+        }
+    }
+
+    /// The note for a bookmark opened at the clamp.
+    static func bookmarkNoteText(savedBits: Int, bits: Int) -> String {
+        savedBits > bits
+            ? "Saved at higher precision (\(savedBits) bits); shown at this device's limit (\(bits) bits)"
+            : "Shown at this device's precision limit (\(bits) bits)"
     }
 
     /// Renames a bookmark.
@@ -186,6 +199,7 @@ final class ExplorerModel {
     /// Applies a new viewport, clamping its scale so one device pixel never falls below one representable step of the
     /// coordinates (VisualCoreMath.PrecisionAdvisor with the shader's mantissa bits), then updates the notice.
     func apply(_ viewport: PlaneViewport) {
+        bookmarkNote = nil
         var v = viewport
         let magnitude = max(abs(v.center.x), abs(v.center.y))
         let minStep = PrecisionAdvisor.minimumPixelStep(mantissaBits: mantissaBits, magnitude: magnitude)
@@ -201,9 +215,9 @@ final class ExplorerModel {
 
     private func updateNotice(clamped: Bool) {
         let v = state.viewport
-        let status = PrecisionAdvisor.assess(mantissaBits: mantissaBits, magnitude: max(abs(v.center.x), abs(v.center.y)),
-                                             pixelStep: v.unitsPerPoint / pixelsPerPoint)
-        let next: PrecisionNotice = clamped || status.margin < 1.000_001 ? .reached : (status.level == .reliable ? .none : .near)
+        // One rule for the banner and for saved bookmarks (FractalExplorerCore.PrecisionMode.level).
+        let level = PrecisionMode.level(viewport: v, mantissaBits: mantissaBits, pixelsPerPoint: pixelsPerPoint)
+        let next: PrecisionNotice = clamped || level == .beyondLimit ? .reached : (level == .reliable ? .none : .near)
         guard next != notice else { return }
         notice = next
         if let text = next.text {
@@ -345,6 +359,12 @@ struct ExplorerView: View {
                         .font(.footnote)
                         .fixedSize(horizontal: false, vertical: true)
                         .accessibilityIdentifier("fe.precision.source")
+                }
+                if let note = model.bookmarkNote {
+                    Text(note)
+                        .font(.footnote)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .accessibilityIdentifier("fe.bookmark.note")
                 }
                 if model.usingFallback, let error = model.scene.errorMessage {
                     Text("The graphics shader could not run, so a simpler preview is shown. (\(error))")

@@ -36,17 +36,20 @@ public struct PrecisionMode: Codable, Equatable, Sendable {
         self.format = format; self.mantissaBits = mantissaBits; self.level = level
     }
 
-    /// The mode for a view, judged by `PrecisionAdvisor` with the shader's bits.
+    /// The mode for a view, judged by `PrecisionAdvisor` with the shader's bits. A view at the clamp (margin within
+    /// 1e-6 of one step, where the explorer says "Precision limit reached") counts as `beyondLimit`, matching the banner.
     public init(viewport: PlaneViewport, mantissaBits: Int, pixelsPerPoint: Double) {
+        self.init(mantissaBits: mantissaBits,
+                  level: Self.level(viewport: viewport, mantissaBits: mantissaBits, pixelsPerPoint: pixelsPerPoint))
+    }
+
+    /// The level of a view: `beyondLimit` at or past the clamp, `nearLimit` within 16 steps, else `reliable`.
+    public static func level(viewport: PlaneViewport, mantissaBits: Int, pixelsPerPoint: Double) -> Level {
         let status = PrecisionAdvisor.assess(mantissaBits: mantissaBits,
                                              magnitude: max(abs(viewport.center.x), abs(viewport.center.y)),
                                              pixelStep: viewport.unitsPerPoint / pixelsPerPoint)
-        let level: Level = switch status.level {
-        case .reliable: .reliable
-        case .nearLimit: .nearLimit
-        case .beyondLimit: .beyondLimit
-        }
-        self.init(mantissaBits: mantissaBits, level: level)
+        if status.margin < 1.000_001 { return .beyondLimit }
+        return status.level == .reliable ? .reliable : .nearLimit
     }
 
     var isValid: Bool { format == Self.gpuFloat32 && (1...64).contains(mantissaBits) }

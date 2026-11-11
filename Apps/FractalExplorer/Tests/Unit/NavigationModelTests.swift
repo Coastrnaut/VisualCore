@@ -87,3 +87,64 @@ final class NavigationModelTests: XCTestCase {
         XCTAssertEqual(m.state, before)
     }
 }
+
+// Feature 028 T-A03-307 (US3 AC1–AC3, SC-A03-304): the precision mode travels with the bookmark.
+@MainActor
+final class BookmarkPrecisionTests: XCTestCase {
+    private var folders: [URL] = []
+    override func tearDown() { folders.forEach { try? FileManager.default.removeItem(at: $0) } }
+
+    private func model(bits: Int, folder: URL) -> ExplorerModel {
+        folders.append(folder)
+        let m = ExplorerModel(size: Vec2(300, 400), bookmarksDirectory: folder)
+        m.close()
+        m.mantissaBitsOverride = bits
+        m.pixelsPerPointOverride = 3
+        return m
+    }
+
+    func testDeepBookmarkOpensClampedWithBannerAndNote() throws {
+        let dir = FileManager.default.temporaryDirectory.appendingPathComponent("fe-prec-\(UUID().uuidString)")
+        let deep = model(bits: 23, folder: dir)
+        for _ in 0..<60 { deep.zoomIn() }
+        XCTAssertEqual(deep.notice, .reached)
+        let entry = try XCTUnwrap(deep.saveBookmark(name: "Deep"))
+        XCTAssertEqual(entry.payload.precision.mantissaBits, 23)
+        XCTAssertEqual(entry.payload.precision.level, .beyondLimit)
+
+        let shallow = model(bits: 10, folder: dir)
+        shallow.reloadBookmarks()
+        shallow.open(entry.id)
+        XCTAssertEqual(shallow.notice, .reached)
+        XCTAssertEqual(shallow.notice.text, "Precision limit reached — zoom stops here")
+        XCTAssertEqual(shallow.bookmarkNote, "Saved at higher precision (23 bits); shown at this device's limit (10 bits)")
+        XCTAssertEqual(shallow.state.viewport.center, entry.payload.framing.center)
+        let minUnits = PrecisionAdvisor.minimumPixelStep(mantissaBits: 10, magnitude: max(abs(entry.payload.framing.center.x), abs(entry.payload.framing.center.y))) * 3
+        XCTAssertEqual(shallow.state.viewport.unitsPerPoint, minUnits, accuracy: minUnits * 1e-12)
+        shallow.zoomOut()
+        XCTAssertNil(shallow.bookmarkNote, "the note clears on the next zoom")
+    }
+
+    func testFittingBookmarkShowsNoNote() throws {
+        let dir = FileManager.default.temporaryDirectory.appendingPathComponent("fe-prec-\(UUID().uuidString)")
+        let a = model(bits: 23, folder: dir)
+        a.zoomIn(); a.zoomIn()
+        let entry = try XCTUnwrap(a.saveBookmark(name: "Shallow"))
+        XCTAssertEqual(entry.payload.precision.level, .reliable)
+        let b = model(bits: 10, folder: dir)
+        b.reloadBookmarks()
+        b.open(entry.id)
+        XCTAssertNil(b.bookmarkNote, "no clamp, no note")
+        XCTAssertNotEqual(b.notice, .reached, "10 bits are near the limit at 4×, but not clamped")
+        XCTAssertEqual(b.state.viewport.unitsPerPoint, PlaneFraming(center: entry.payload.framing.center, span: entry.payload.framing.span).viewport(size: Vec2(300, 400)).unitsPerPoint)
+        XCTAssertEqual(BookmarksView.label(try XCTUnwrap(b.bookmarks.entry(entry.id))), "Shallow, −0.5 + 0i · zoom 4×")
+    }
+
+    func testListLabelNamesALimitedLevel() throws {
+        let dir = FileManager.default.temporaryDirectory.appendingPathComponent("fe-prec-\(UUID().uuidString)")
+        let m = model(bits: 23, folder: dir)
+        for _ in 0..<60 { m.zoomIn() }
+        let entry = try XCTUnwrap(m.saveBookmark(name: "Edge"))
+        XCTAssertTrue(BookmarksView.label(entry).hasSuffix("At precision limit"), BookmarksView.label(entry))
+    }
+}
