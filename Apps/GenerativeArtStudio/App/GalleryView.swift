@@ -85,8 +85,8 @@ struct FamilyRow: View {
                 .accessibilityHidden(true)
             VStack(alignment: .leading, spacing: 4) {
                 Text(family.title).font(.headline)
-                Text(family.summary).font(.subheadline).foregroundStyle(.secondary)
-                Text("\(family.presets.count) presets").font(.caption).foregroundStyle(.secondary)
+                Text(family.summary).font(.subheadline).foregroundStyle(.primary)
+                Text("\(family.presets.count) presets").font(.caption).foregroundStyle(.primary)
             }
             Spacer(minLength: 8)
             PaletteSwatch(palette: FamilyCatalog.palette(family.defaultPaletteID) ?? Palette.builtIns[0])

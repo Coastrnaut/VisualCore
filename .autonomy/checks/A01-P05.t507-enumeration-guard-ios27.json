@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_test_enumeration.py",
+    "--sources",
+    "Apps/GenerativeArtStudio/Tests/UI",
+    "--log",
+    ".autonomy/logs/A01-P05.t507-ui-all-ios27.log"
+  ],
+  "command": "python3 scripts/check_test_enumeration.py --sources Apps/GenerativeArtStudio/Tests/UI --log .autonomy/logs/A01-P05.t507-ui-all-ios27.log",
+  "elapsed_seconds": 0.022,
+  "exit_code": 0,
+  "finished": "2026-11-11T06:17:57+00:00",
+  "log": ".autonomy/logs/A01-P05.t507-enumeration-guard-ios27.log",
+  "log_sha256": "2d02c197d4b8f3517fe69c4a08ba4c088ea284508e5380898b20c55091e2350b",
+  "name": "t507-enumeration-guard-ios27",
+  "stage": "A01-P05",
+  "started": "2026-11-11T06:17:57+00:00",
+  "timed_out": false
+}

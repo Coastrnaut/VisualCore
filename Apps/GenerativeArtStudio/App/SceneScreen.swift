@@ -178,7 +178,10 @@ struct SceneScreen: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .principal) {
-                Text(family.title).font(.headline).accessibilityIdentifier("gas.scene.title")
+                Text(family.title).font(.headline)
+                    .lineLimit(1).minimumScaleFactor(0.6)
+                    .accessibilityShowsLargeContentViewer()
+                    .accessibilityIdentifier("gas.scene.title")
             }
             ToolbarItem(placement: .topBarTrailing) {
                 Button { save() } label: { Image(systemName: "square.and.arrow.down") }
@@ -206,6 +209,7 @@ struct SceneScreen: View {
                 ControlsSheet(model: model)
                     .presentationDetents([.medium, .large])
                     .presentationBackgroundInteraction(.enabled(upThrough: .medium))
+                    .presentationBackground(Color(.systemGroupedBackground))   // opaque: text never sits on the artwork
             }
         }
         .sheet(item: $exportModel) { export in

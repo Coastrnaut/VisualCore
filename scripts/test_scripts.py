@@ -34,6 +34,7 @@ autosim = load("run_automation_sim")
 relsym = load("check_release_symbols")
 relcheck = load("release_check")
 appcontract = load("check_app_contract")
+enumeration = load("check_test_enumeration")
 try:
     deps = load("check_dependencies")
 except FileNotFoundError:
@@ -600,6 +601,22 @@ class AppContractTests(unittest.TestCase):
             (d / "visualcore-contract.json").write_text('{"schema": 1, "matrix": [{"id": "M", "notes": "' + "x" * 2001 + '"}]}')
             self.assertEqual(self.run_checker(Path(t))[0], 2)
         self.assertEqual(appcontract.main(["--app", "../etc"]), 2)
+
+
+class TestEnumerationTests(unittest.TestCase):
+    def test_missing_class_fails_and_full_run_passes(self):
+        with tempfile.TemporaryDirectory() as t:
+            d = Path(t)
+            (d / "src").mkdir()
+            (d / "src" / "A.swift").write_text("final class AUITests: XCTestCase {\n    func testOne() {}\n    func helper() {}\n}\n"
+                                             "class BUITests: XCTestCase {\n    @MainActor func testTwo() throws {}\n}\n")
+            log = d / "log"
+            log.write_text("Test Case '-[T.AUITests testOne]' passed (1 s).\n")
+            self.assertEqual(enumeration.main(["--sources", str(d / "src"), "--log", str(log)]), 1)
+            self.assertEqual(enumeration.main(["--sources", str(d / "src"), "--log", str(log), "--only", "AUITests"]), 0)
+            log.write_text(log.read_text() + "Test Case '-[T.BUITests testTwo]' passed (1 s).\n")
+            self.assertEqual(enumeration.main(["--sources", str(d / "src"), "--log", str(log)]), 0)
+            self.assertEqual(enumeration.main(["--sources", str(d / "nope"), "--log", str(log)]), 2)
 
 
 if __name__ == "__main__":

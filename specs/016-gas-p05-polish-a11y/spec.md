@@ -34,6 +34,16 @@ Answered autonomously under the owner's standing approval (CLAUDE.md §2); the r
   canvas (for example, the contrast of generated colors), because the canvas is one described image element and not
   text. Each one is listed with its reason. Every other finding is fixed.
 
+### Session 2026-11-11 (implement-time decision, T-A01-507)
+
+- Q: How is the audit applied when it reports system chrome or makes predictions? → A: Dynamic Type and clipping are
+  audited at the largest accessibility size, where text actually scales. At the default size the audit only predicts
+  them ("may be clipped at larger sizes"), so that run checks all other types. Besides the canvas artwork, two
+  findings are documented instead of fixed, each logged: navigation-bar chrome (bar buttons and the inline title;
+  iOS sizes the bar and offers the Large Content Viewer instead of scaling) and findings to which the audit attaches
+  no element. Every finding on the app's own views was fixed: accent contrast, primary-colored text, prominent
+  section headers, an opaque controls sheet, a 44-pt play button and unclipped picker values.
+
 ## User Scenarios & Testing *(mandatory)*
 
 Users: people who rely on Reduce Motion, flashing-light sensitivity settings, VoiceOver or large text (manual §2
@@ -142,8 +152,9 @@ the system values. Docs and the API baseline are updated, and the ProjectM regre
 - **FR-A01-503**: The live canvas MUST expose an accessibility description with the family, preset (or "custom"),
   palette, seed and play state, updated when any of them changes.
 - **FR-A01-504**: Every app screen MUST pass the automated accessibility audit at the default text size and at the
-  largest accessibility text size. Every issue found is fixed. Only findings about the artwork inside the live canvas
-  may be documented with their reason instead.
+  largest accessibility text size. Every issue found on the app's own views is fixed. Only the categories in
+  Clarifications (canvas artwork, navigation-bar chrome, findings without an element) may be documented with their
+  reason instead.
 - **FR-A01-505**: Background/foreground cycles and context recreation MUST restore every family at the same scene
   time, with 0 stale-object uses after recovery and 0 leaks. Export MUST work after recovery.
 - **FR-A01-506**: The reusable accessibility settings MUST live in VisualCore:

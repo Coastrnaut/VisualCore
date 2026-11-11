@@ -157,7 +157,7 @@ struct ExportSheet: View {
                         .frame(maxWidth: .infinity)
                         .listRowBackground(Color.clear)
                 }
-                Section("Size") {
+                Section {
                     Picker("Size", selection: $model.options.longEdge) {
                         ForEach(model.options.availableLongEdges, id: \.self) { edge in
                             Text(verbatim: "\(edge) px").tag(edge)
@@ -170,15 +170,13 @@ struct ExportSheet: View {
                     }
                     .accessibilityIdentifier("gas.export.aspect")
                     .accessibilityValue(Text(model.options.aspect.title))
-                    LabeledContent("Dimensions") {
-                        Text(verbatim: model.options.dimensionsLabel).accessibilityIdentifier("gas.export.dimensions")
-                    }
-                    LabeledContent("Format") {
-                        Text(verbatim: ExportOptions.formatLabel).accessibilityIdentifier("gas.export.format")
-                    }
+                    // Plain rows instead of LabeledContent: the audit reports its compressed label as partially scaling.
+                    Text(verbatim: "Dimensions: \(model.options.dimensionsLabel)").accessibilityIdentifier("gas.export.dimensions")
+                    Text(verbatim: "Format: \(ExportOptions.formatLabel)").accessibilityIdentifier("gas.export.format")
                 }
                 Section { action }
             }
+            .scrollEdgeEffectHidden(true, for: .bottom)   // rows near the edge keep full contrast (feature 016 audit)
             .navigationTitle("Export")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -213,8 +211,10 @@ struct ExportSheet: View {
     @ViewBuilder private var action: some View {
         switch model.phase {
         case .idle:
-            Button("Export Image") { Task { await model.run() } }
-                .accessibilityIdentifier("gas.export.run")
+            Button { Task { await model.run() } } label: {
+                Text("Export Image").font(.body.weight(.semibold)).frame(maxWidth: .infinity, alignment: .leading)
+            }
+            .accessibilityIdentifier("gas.export.run")
         case .rendering:
             HStack(spacing: 12) {
                 ProgressView()

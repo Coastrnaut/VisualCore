@@ -16,7 +16,9 @@ struct ControlsSheet: View {
                 Section("Time") {
                     HStack(spacing: 12) {
                         Button { model.togglePlay() } label: {
-                            Image(systemName: model.isPlaying ? "pause.fill" : "play.fill").frame(width: 28)
+                            Image(systemName: model.isPlaying ? "pause.fill" : "play.fill")
+                                .frame(minWidth: 44, minHeight: 44)   // 44 pt hit area (feature 016 audit)
+                                .contentShape(Rectangle())
                         }
                         .buttonStyle(.borderless)
                         .accessibilityLabel(model.isPlaying ? "Pause" : "Play")
@@ -76,6 +78,8 @@ struct ControlsSheet: View {
                 }
                 ParameterPanel(editor: Binding(get: { model.editor.editor }, set: { model.editor.updateEditor($0) }))
             }
+            .scrollEdgeEffectHidden(true, for: .bottom)   // rows near the edge keep full contrast (feature 016 audit)
+            .headerProminence(.increased)   // prominent primary-color headers (feature 016 audit)
             .navigationTitle("Controls")
             .navigationBarTitleDisplayMode(.inline)
         }

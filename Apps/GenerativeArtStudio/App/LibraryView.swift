@@ -20,7 +20,7 @@ struct LibraryView: View {
             }
             if model.entries.isEmpty {
                 Text("No saved compositions yet. Open a scene and tap Save.")
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.primary)
                     .accessibilityIdentifier("gas.library.empty")
             }
             ForEach(model.entries) { entry in row(entry) }
@@ -51,7 +51,7 @@ struct LibraryView: View {
                     VStack(alignment: .leading, spacing: 2) {
                         Text(entry.name).font(.headline)
                         Text("\(family?.title ?? entry.document.familyID) · \(entry.modifiedAt.formatted(date: .abbreviated, time: .shortened))")
-                            .font(.caption).foregroundStyle(.secondary)
+                            .font(.caption).foregroundStyle(.primary)
                     }
                     Spacer(minLength: 4)
                     PaletteSwatch(palette: FamilyCatalog.palette(entry.document.paletteID) ?? Palette.builtIns[0])

@@ -25,16 +25,15 @@ struct SettingsView: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section {
-                    choicePicker("Reduce Motion", selection: $motion, systemOn: system.current.reduceMotion,
-                                 id: "gas.settings.reduceMotion")
-                    choicePicker("Reduce Flashing", selection: $flashing, systemOn: system.current.dimFlashingLights,
-                                 id: "gas.settings.reduceFlashing")
-                } header: {
-                    Text("Motion and flashing")
-                } footer: {
+                Section("Motion and flashing") {
+                    choicePicker("Reduce Motion", selection: $motion, id: "gas.settings.reduceMotion")
+                    choicePicker("Reduce Flashing", selection: $flashing, id: "gas.settings.reduceFlashing")
+                    // A normal row rather than a section footer, so the text keeps full contrast (feature 016 audit).
                     Text("Reduce Motion plays scenes at half speed. Reduce Flashing limits sudden brightness changes. "
-                         + "System follows your device setting; Off overrides the system setting.")
+                         + "System follows your device setting; Off overrides the system setting. "
+                         + "Device setting now: Reduce Motion \(system.current.reduceMotion ? "on" : "off"), "
+                         + "Dim Flashing Lights \(system.current.dimFlashingLights ? "on" : "off").")
+                        .font(.footnote)
                         .accessibilityIdentifier("gas.settings.footer")
                 }
                 Section("About") {
@@ -42,6 +41,7 @@ struct SettingsView: View {
                         .accessibilityIdentifier("gas.settings.about")
                 }
             }
+            .headerProminence(.increased)   // prominent primary-color headers (feature 016 audit)
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -53,12 +53,12 @@ struct SettingsView: View {
         .accessibilityIdentifier("gas.settings")
     }
 
-    private func choicePicker(_ title: String, selection: Binding<String>, systemOn: Bool, id: String) -> some View {
+    private func choicePicker(_ title: String, selection: Binding<String>, id: String) -> some View {
         let current = AccessibilityChoice(storedValue: selection.wrappedValue)
         return Picker(title, selection: Binding(get: { AccessibilityChoice(storedValue: selection.wrappedValue) },
                                                 set: { selection.wrappedValue = $0.rawValue })) {
             ForEach(AccessibilityChoice.allCases) { choice in
-                Text(choice == .system ? "System (\(systemOn ? "On" : "Off"))" : choice.title).tag(choice)
+                Text(choice.title).tag(choice)
             }
         }
         .accessibilityIdentifier(id)
