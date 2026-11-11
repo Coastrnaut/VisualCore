@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_app_contract.py",
+    "--app",
+    "fluid-art-playground"
+  ],
+  "command": "python3 scripts/check_app_contract.py --app fluid-art-playground",
+  "elapsed_seconds": 0.029,
+  "exit_code": 0,
+  "finished": "2026-11-11T07:38:35+00:00",
+  "log": ".autonomy/logs/A02-P00.t006-contract.log",
+  "log_sha256": "e81d2ac222f3470199dd7c1b36f7aa0b6a19b176a6e177b0ec75762f0d481569",
+  "name": "t006-contract",
+  "stage": "A02-P00",
+  "started": "2026-11-11T07:38:35+00:00",
+  "timed_out": false
+}

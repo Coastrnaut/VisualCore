@@ -30,7 +30,7 @@ Read-only audit of the tree at gate A01-P06 (2026-11-11), for a GPU fluid solver
 - **R7 Bounded quality and thermal downgrade (v0.1 feature 06).** `FramePacing` (renderScale from thermal state and
   Low Power Mode) exists in VisualCoreRendering. There is no generic quality-profile policy mapping tiers to grid
   scale and iterations. Status: `requires adaptation`. Owner: VisualCoreSimulation `QualityPolicy` (pure) in
-  Phase 05.
+  Phase 03, the manual's "pressure projection and quality control" phase (aligned with gap G-QUALITY at T-A02-006).
 - **R8 Pause, reset, deterministic seeded test mode (feature 05).** `SceneClock` (pause, step via scrub) and
   `SeededRandom` exist. Status: `available` (examples: A01 `ClockedArtScene`, `SceneClockTests`). A fixed-step
   stepping helper exists in `VisualCoreSimulation` (fixed-step clock).

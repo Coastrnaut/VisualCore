@@ -48,7 +48,7 @@ commit and push per task (`scripts/tick_task.py`). Review checkpoint: after each
 
 ## Phase 5: US4 — Gap register and stop/go decision (P2)
 
-- [ ] T-A02-006 [US4] Complete the contract JSON:
+- [X] T-A02-006 [US4] Complete the contract JSON: — Verified 2026-11-11: visualcore-contract.json completed: 6 gaps (G-PINGPONG, G-FLOATRT, G-FIELDPASS → VisualCoreRendering phase 1; G-POINTERVEL → VisualCoreScenes phase 2; G-QUALITY → VisualCoreSimulation phase 3; G-SOLVER app-local phase 2 with the A02 justification), each with a test intent (G-PINGPONG rejects binding the read target as the write target, analyze C1); traceability for the brainstorm, features 01-06 and journeys 1-3 to phases; 9 negative rules with sources; decision go with 5 reasons and 0 blockers. visualcore-contract.md rendered between the generated markers. Research R7 aligned to phase 3. run-check A02-P00/t006-contract PASS: 10 rows, 35 citations, 6 gaps, decision go (FR-A02-008-011, SC-A02-005, SC-A02-007)
   - `gaps` for every non-available row, with an owner module, a phase and a test;
     the ping-pong gap's test MUST reject binding the read target as the write target (A02 rule; analyze C1);
   - `traceability` for v0.1 features 01–06 and journeys 1–3;

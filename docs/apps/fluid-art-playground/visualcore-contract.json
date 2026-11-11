@@ -440,8 +440,229 @@
       "notes": "rgba16f targets exist (used by HDR bloom) and incomplete framebuffers throw; no support query for EXT_color_buffer_half_float/float and no fallback policy (gap G-FLOATRT). The matrix assumes no support."
     }
   ],
-  "gaps": [],
-  "traceability": [],
-  "negative": [],
-  "decision": {}
+  "gaps": [
+    {
+      "id": "G-PINGPONG",
+      "matrix": [
+        "M01"
+      ],
+      "kind": "adaptation",
+      "owner": "VisualCore:VisualCoreRendering",
+      "phase": 1,
+      "test": "PingPongTarget simulator tests: swap alternates read/write targets, binding the read target as the write target is rejected (A02 rule), both targets are budget-accounted and released with 0 leaks after context loss; app fixture: uniform dye at rest decays only by the configured dissipation"
+    },
+    {
+      "id": "G-FLOATRT",
+      "matrix": [
+        "M10"
+      ],
+      "kind": "adaptation",
+      "owner": "VisualCore:VisualCoreRendering",
+      "phase": 1,
+      "test": "RenderCapabilities half-float render-target support query agrees with a framebuffer-completeness probe on both simulator runtimes; a forced 'unsupported' path selects the documented RGBA8 fallback"
+    },
+    {
+      "id": "G-FIELDPASS",
+      "matrix": [
+        "M03"
+      ],
+      "kind": "adaptation",
+      "owner": "VisualCore:VisualCoreRendering",
+      "phase": 1,
+      "test": "FieldPass simulator tests: a program with named sampler inputs renders into a target with typed uniforms, rejects an input that is also the output, and matches a CPU-computed result on a tiny grid"
+    },
+    {
+      "id": "G-SOLVER",
+      "matrix": [
+        "M04"
+      ],
+      "kind": "upstream",
+      "owner": "app-local",
+      "phase": 2,
+      "test": "App-domain solver (advection Phase 02, divergence/Jacobi/projection Phase 03): GPU passes match the Core package's CPU reference on 8x8 and 16x16 grids within a stated tolerance; kept in the app by the A02 rule (artistic model, not a VisualCore renderer)",
+      "justification": "Constitution A02: the fluid solver is an isolated app-domain component with a CPU reference, not a new VisualCore renderer; its equations are product content (artistic model). The reusable machinery it runs on (G-PINGPONG, G-FIELDPASS, G-FLOATRT) is assigned to VisualCore."
+    },
+    {
+      "id": "G-POINTERVEL",
+      "matrix": [
+        "M05"
+      ],
+      "kind": "adaptation",
+      "owner": "VisualCore:VisualCoreScenes",
+      "phase": 2,
+      "test": "PointerVelocityTracker host tests: per-pointer velocity from timestamped samples, multi-touch independence, capped samples per frame and smooth resampling between samples; the app's SplatQueue consumes it"
+    },
+    {
+      "id": "G-QUALITY",
+      "matrix": [
+        "M07"
+      ],
+      "kind": "adaptation",
+      "owner": "VisualCore:VisualCoreSimulation",
+      "phase": 3,
+      "test": "QualityPolicy host tests: tiers map to grid scale, solver iterations and splat cap; thermal 'serious'/'critical' and Low Power Mode step the tier down and recovery steps it up with hysteresis; consumes VisualCoreDiagnostics FramePacing inputs"
+    }
+  ],
+  "traceability": [
+    {
+      "item": "brainstorm: touch-driven ink, smoke, liquid, pigment and flowing effects",
+      "matrix": [
+        "M01",
+        "M02",
+        "M03",
+        "M04",
+        "M05",
+        "M06"
+      ],
+      "phases": [
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "item": "v0.1 feature 01 — 2D velocity and dye fields on a bounded grid",
+      "matrix": [
+        "M01",
+        "M03",
+        "M10"
+      ],
+      "phases": [
+        1
+      ]
+    },
+    {
+      "item": "v0.1 feature 02 — multi-touch splats with capped injection rate and smooth resampling",
+      "matrix": [
+        "M05"
+      ],
+      "phases": [
+        2
+      ]
+    },
+    {
+      "item": "v0.1 feature 03 — viscosity, dissipation and pressure-iteration quality",
+      "matrix": [
+        "M03",
+        "M04",
+        "M07"
+      ],
+      "phases": [
+        3
+      ]
+    },
+    {
+      "item": "v0.1 feature 04 — ink, smoke and glowing-dye palettes",
+      "matrix": [
+        "M06"
+      ],
+      "phases": [
+        4
+      ]
+    },
+    {
+      "item": "v0.1 feature 05 — pause, reset, deterministic seeded test mode and still capture",
+      "matrix": [
+        "M08",
+        "M09"
+      ],
+      "phases": [
+        4,
+        5
+      ]
+    },
+    {
+      "item": "v0.1 feature 06 — configurable resolution with thermal downgrade",
+      "matrix": [
+        "M07"
+      ],
+      "phases": [
+        3,
+        5
+      ]
+    },
+    {
+      "item": "journey 1 — swipe to inject pigment and velocity; pinch to change brush radius",
+      "matrix": [
+        "M05"
+      ],
+      "phases": [
+        2,
+        4
+      ]
+    },
+    {
+      "item": "journey 2 — switch palette and viscosity; reset to a known start",
+      "matrix": [
+        "M06",
+        "M07",
+        "M08"
+      ],
+      "phases": [
+        3,
+        4
+      ]
+    },
+    {
+      "item": "journey 3 — pause, step a frame, resume and capture a still",
+      "matrix": [
+        "M08",
+        "M09"
+      ],
+      "phases": [
+        4,
+        5
+      ]
+    }
+  ],
+  "negative": [
+    {
+      "rule": "No physically accurate water surface simulation",
+      "source": "manual §2 explicit non-goals"
+    },
+    {
+      "rule": "No arbitrary 3D fluid dynamics",
+      "source": "manual §2 explicit non-goals"
+    },
+    {
+      "rule": "No unbounded particle emission or background compute",
+      "source": "manual §2 explicit non-goals; constitution A02 bounded GPU"
+    },
+    {
+      "rule": "No networking; offline-first",
+      "source": "constitution A02 rules; manual §3"
+    },
+    {
+      "rule": "No ProjectM engine, preset or bridge linkage",
+      "source": "constitution II, rule R1, FR-A02-006"
+    },
+    {
+      "rule": "No second EGL/ANGLE initialization path or renderer",
+      "source": "constitution I; manual header rendering invariant"
+    },
+    {
+      "rule": "No physical-accuracy or scientific claims; the model is artistic",
+      "source": "manual §6 algorithm decision 5; constitution A02"
+    },
+    {
+      "rule": "No device-performance or compatibility claims before campaign II",
+      "source": "constitution V; CLAUDE.md §5"
+    },
+    {
+      "rule": "No VisualCore or ProjectM source changes in Phase 00",
+      "source": "manual §9 Phase 00; FR-A02-007"
+    }
+  ],
+  "decision": {
+    "result": "go",
+    "reasons": [
+      "Every capability maps to existing VisualCore API (4 available: feedback, blending/post, pause/reset/seeded, still capture) or an additive gap (6 rows).",
+      "All 6 gaps are additive: five reusable VisualCore helpers (PingPongTarget, half-float support query, FieldPass, PointerVelocityTracker, QualityPolicy) owned per Principle II, and the solver equations kept app-local with a CPU reference by the A02 rule. None needs a second renderer, a fork, private API or networking.",
+      "Half-float targets are not assumed: support is queried and an RGBA8 fallback is planned (G-FLOATRT), so no unverified GPU feature is a dependency.",
+      "Reference regression baseline recorded green 7/7 (T-A02-003) and the empty shell builds and passes its smoke test on both simulator runtimes (T-A02-005).",
+      "Phase 01 starts with G-PINGPONG, G-FLOATRT and G-FIELDPASS in VisualCoreRendering and the app's GPU-free solver reference."
+    ],
+    "blockers": []
+  }
 }
