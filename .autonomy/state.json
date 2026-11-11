@@ -359,8 +359,14 @@
       "status": "pass"
     },
     "A02-P02": {
-      "attempts": [],
-      "status": "pending"
+      "attempts": [
+        {
+          "at": "2026-11-11T08:47:39+00:00",
+          "evidence": ".autonomy/evidence/A02-P02.json",
+          "result": "pass"
+        }
+      ],
+      "status": "pass"
     },
     "A02-P03": {
       "attempts": [],
@@ -1435,5 +1441,5 @@
       "status": "pending"
     }
   },
-  "updated": "2026-11-11T08:14:35+00:00"
+  "updated": "2026-11-11T08:47:39+00:00"
 }
