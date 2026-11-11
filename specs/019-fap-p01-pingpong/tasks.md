@@ -101,7 +101,7 @@ both runtimes and both storages.
   - `ConfigurationIssue`, and `validated(maxEdge:)`, which is idempotent.
 
   `FluidConfigurationTests` cover ≥ 8 out-of-range cases, including NaN and infinity (SC-A02-103).
-- [ ] T-A02-109 [P] [US1] Add `Dissipation.swift` (`factor = 1/(1+d·dt)`, and `step` over a `FieldGrid` with
+- [X] T-A02-109 [P] [US1] Add `Dissipation.swift` (`factor = 1/(1+d·dt)`, and `step` over a `FieldGrid` with — Verified 2026-11-11: Dissipation (factor 1/(1+d*dt); CPU step with StoragePrecision rounding and optional SignedRangeEncoding per channel), DyeSeed (uniform, deterministic 8-blob pattern from SeededRandom with RGB in 0...1 and alpha 1, zeroVelocity), FluidCanvasDescription. Tests: DissipationTests 6 (d=0 identity in every precision, float32 closed form after 60 steps, 1,000 steps at d=10 finite and >= 0 in every precision, unorm8 stall, encoded velocity decays and zero stays zero), DyeSeedTests 2, FluidCanvasDescriptionTests 1. run-check A02-P01/t109-core-test swift test 15/15 pass; check_dependencies PASS
   `StoragePrecision`), `DyeSeed.swift` (`uniform`, a deterministic `pattern(seed:)` from `SeededRandom` with values
   in [0, 1], and `zeroVelocity`) and `FluidCanvasDescription.swift`. Tests: `DissipationTests` (d = 0 identity; the
   closed form after N float32 steps; 1,000 steps at d = 10 stay finite and ≥ 0; unorm8 stalls as predicted),

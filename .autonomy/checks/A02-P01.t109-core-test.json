@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Apps/FluidArtPlayground/FluidArtPlaygroundCore"
+  ],
+  "command": "swift test --package-path Apps/FluidArtPlayground/FluidArtPlaygroundCore",
+  "elapsed_seconds": 2.754,
+  "exit_code": 0,
+  "finished": "2026-11-11T07:59:10+00:00",
+  "log": ".autonomy/logs/A02-P01.t109-core-test.log",
+  "log_sha256": "0f66102373e7935fe2bcb248cafb5359b7a49dd3fdbfaa07d16dbc6f58e11800",
+  "name": "t109-core-test",
+  "stage": "A02-P01",
+  "started": "2026-11-11T07:59:07+00:00",
+  "timed_out": false
+}
