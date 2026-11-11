@@ -5,7 +5,7 @@ Supersedes the table in ADR-0003 where they differ (ADR-0003 is corrected to poi
 | Package / product | Platform | Owns | Public surface | May depend on | Audit trace |
 |---|---|---|---|---|---|
 | `Packages/VisualCore` · `VisualCoreMath` | host + iOS | vectors, matrices, quaternions, cameras, easing | value types | Foundation | gap: input/scenes/math |
-| · `VisualCoreSimulation` | host + iOS | fixed-step clock, seeded RNG, timelines, particle pool, NaN guard, `SceneClock` (A01-P02) | value types, protocols | Math | gap: deterministic simulation |
+| · `VisualCoreSimulation` | host + iOS | fixed-step clock, seeded RNG, timelines, particle pool, NaN guard, `SceneClock` (A01-P02), `AccessibilityPreferences` (A01-P05) | value types, protocols | Math | gap: deterministic simulation |
 | · `VisualCoreScenes` | host + iOS | input mapping, pointer tracking, mesh generators, scene graph model, export geometry (`ExportGeometry`, A01-P04) | value types | Math | gap: input/scenes |
 | · `VisualCoreShaderSource` | host + iOS | shader library, include preprocessing, line maps, diagnostics parsing | value types | Foundation | gap: shader library (U-F003-adjacent) |
 | · `VisualCoreEffectsGraph` | host + iOS | effect DAG model, validation, quotas, flash-limiter model | value types | Foundation | gap: multi-pass graph; reference `CFlashLimiter` idea |
@@ -17,8 +17,8 @@ Supersedes the table in ADR-0003 where they differ (ADR-0003 is corrected to poi
 | `Packages/VisualCoreRendering` · `CVisualCoreEGL` | iOS | EGL subset declarations (pinned ANGLE constants) | C | libEGL | reference `CANGLE` |
 | · `CVisualCoreGL` | iOS | generated ES 3.0 table (`vcgl*`) | C | libEGL, libGLESv2 | gap: full GL table |
 | · `VisualCoreRendering` | iOS | `RenderHost`, `RenderView` (+ touch adapter → `PointerEvent`), capabilities, resources, programs, primitive/particle/mesh drawing (F05, feature 006), offscreen still export (`renderOffscreen`, `StillImage`, `StillImageEncoder`; A01-P04) | classes (`@MainActor`) | C shims, pure modules | reference `ANGLERenderer` sequence (ADR-0002) |
-| · `VisualCoreEffects` | iOS | GPU passes, target pool, graph executor | classes | Rendering, EffectsGraph | gap: effects |
-| · `VisualCoreUI` | iOS | SwiftUI `RenderSurface` (A01-P01), `ParameterPanel` (A01-P02), diagnostics overlay and accessibility helpers (planned) | views | Rendering, Diagnostics, Parameters (amended A01-P02, feature 013) | gap: native UI |
+| · `VisualCoreEffects` | iOS | GPU passes, target pool, graph executor, `EffectScene` (incl. `bypassEffects`, A01-P05) | classes | Rendering, EffectsGraph | gap: effects |
+| · `VisualCoreUI` | iOS | SwiftUI `RenderSurface` (A01-P01), `ParameterPanel` (A01-P02), `SystemAccessibilityObserver` (A01-P05), diagnostics overlay (planned) | views | Rendering, Diagnostics, Parameters, Simulation (amended A01-P02 and A01-P05) | gap: native UI |
 | · `VisualCoreAudio` | iOS | AVAudioEngine mic/in-app taps → DSP | classes | AudioDSP | reference `AudioCore` lessons |
 | · `VisualCoreAutomation` | iOS | AutomationRunner (`DEBUG \|\| VISUALCORE_AUTOMATION`; empty otherwise) | classes | Rendering, Diagnostics (amended F09, feature 010) | reference projectM-iOS AutomationRunner |
 | `Showcase/`, `Apps/<Name>/`, `Harnesses/SecondConsumer/` | iOS apps | product UI/domain | none | any VisualCore product except TestSupport (tests only) | — |

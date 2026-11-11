@@ -184,3 +184,14 @@ let size = ExportGeometry(maxEdge: host.maxRenderSize).size(longEdge: 2048, aspe
 let png = try StillImageEncoder.pngData(host.renderOffscreen(width: size.width, height: size.height, time: 4.0))
 ```
 
+## Accessibility settings and effect bypass (feature 016, A01-P05)
+
+`SystemAccessibilityObserver` (VisualCoreUI, `@Observable`) publishes `current: SystemAccessibility`. Its values come
+from `UIAccessibility.isReduceMotionEnabled` and `MADimFlashingLightsEnabled()`, and it refreshes on their public
+change notifications. Pass `source:` to supply fixed values in tests. Combine it with
+`AccessibilityPreferences.resolve` to get the effective settings. Reading these flags needs no permission.
+
+`EffectScene.bypassEffects` draws the content straight into the host framebuffer, skips the graph and the
+Reduce-Flashing limiter, and leaves the renderer's state alone. Wrap a scene once and set
+`bypassEffects = !reduceFlashing`: the default path then costs nothing, and the limiter does not jump when it comes
+back. Set it to true around `renderOffscreen` so a still export is not limited.

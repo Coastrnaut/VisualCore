@@ -124,3 +124,14 @@ clock.
 
 Pass `RenderHost.maxRenderSize` as `maxEdge` to stay within the device's renderer limits.
 
+## Accessibility preferences (feature 016, A01-P05)
+
+`AccessibilityPreferences` (VisualCoreSimulation) holds an app's choices for Reduce Motion and Reduce Flashing, each an
+`AccessibilityChoice`: `.system` (default), `.on` or `.off`. `resolve(_:)` combines them with `SystemAccessibility`
+(the system's Reduce Motion and Dim Flashing Lights flags) into `EffectiveAccessibility`:
+
+- `.system` takes the system flag, while `.on` and `.off` override it (Off is the user's explicit choice);
+- `playbackRate` is `SceneClock.reducedMotionFactor` (0.5) under Reduce Motion, else 1;
+- `AccessibilityChoice(storedValue:)` and decoding turn an unknown stored value into `.system`.
+
+On iOS, `VisualCoreUI.SystemAccessibilityObserver` supplies the system values.

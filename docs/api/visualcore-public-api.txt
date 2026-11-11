@@ -115,6 +115,7 @@ VisualCoreEffects | var | public private(set) var lastError: Error?
 VisualCoreEffects | var | public private(set) var lastOrder: [String]
 VisualCoreEffects | var | public private(set) var lastWarnings: [String]
 VisualCoreEffects | var | public private(set) var renderer: EffectRenderer?
+VisualCoreEffects | var | public var bypassEffects
 VisualCoreEffects | var | public var effectiveGraph: EffectGraphDescription
 VisualCoreEffects | var | public var flashLimitPerSecond
 VisualCoreEffects | var | public var graph: EffectGraphDescription
@@ -704,11 +705,13 @@ VisualCoreShaderSource | struct | public struct ShaderDiagnostic: Sendable, Equa
 VisualCoreShaderSource | struct | public struct ShaderLibrary: Sendable
 VisualCoreShaderSource | struct | public struct SourceOrigin: Sendable, Equatable, Hashable, Codable
 VisualCoreShaderSource | var | public var description: String
+VisualCoreSimulation | enum | public enum AccessibilityChoice: String, Sendable, Codable, CaseIterable, Identifiable
 VisualCoreSimulation | enum | public enum ParticleForce: Sendable, Equatable
 VisualCoreSimulation | enum | public enum SimulationInfo
 VisualCoreSimulation | enum | public enum TimelineEvent: Sendable, Equatable
 VisualCoreSimulation | func | public func checksum() -> UInt64
 VisualCoreSimulation | func | public func instances() -> [ParticleInstance]
+VisualCoreSimulation | func | public func resolve(_ system: SystemAccessibility) -> EffectiveAccessibility
 VisualCoreSimulation | func | public func value(at t: Double) -> Double
 VisualCoreSimulation | func | public func value(of name: String) -> Double?
 VisualCoreSimulation | func | public mutating func add(_ tween: Tween, at offset: Double = 0, name: String)
@@ -732,14 +735,21 @@ VisualCoreSimulation | func | public mutating func toggle()
 VisualCoreSimulation | init | public init()
 VisualCoreSimulation | init | public init(capacity: Int = ParticleSystem.defaultCapacity, seed: UInt64 = 0)
 VisualCoreSimulation | init | public init(duration: Double = 120, speed: Double = 1, isPlaying: Bool = true)
+VisualCoreSimulation | init | public init(from decoder: Decoder) throws
 VisualCoreSimulation | init | public init(from: Double, to: Double, duration: Double, curve: EasingCurve = .linear, mode: EasingMode = .inOut,
 VisualCoreSimulation | init | public init(position: Vec2 = .zero, rate: Double = 100, lifetime: ClosedRange<Double> = 1...1,
 VisualCoreSimulation | init | public init(position: Vec2, size: Double, color: Vec4)
+VisualCoreSimulation | init | public init(reduceMotion: AccessibilityChoice = .system, reduceFlashing: AccessibilityChoice = .system)
+VisualCoreSimulation | init | public init(reduceMotion: Bool = false, dimFlashingLights: Bool = false)
+VisualCoreSimulation | init | public init(reduceMotion: Bool, reduceFlashing: Bool)
 VisualCoreSimulation | init | public init(seed: UInt64)
 VisualCoreSimulation | init | public init(step: Double = 1.0 / 120, maxSteps: Int = 8)
+VisualCoreSimulation | init | public init(storedValue: String?)
 VisualCoreSimulation | let | public let capacity: Int
 VisualCoreSimulation | let | public let duration: Double
 VisualCoreSimulation | let | public let maxSteps: Int
+VisualCoreSimulation | let | public let reduceFlashing: Bool
+VisualCoreSimulation | let | public let reduceMotion: Bool
 VisualCoreSimulation | let | public let seed: UInt64
 VisualCoreSimulation | let | public let step: Double
 VisualCoreSimulation | let | public static let boundaryTolerance
@@ -749,6 +759,8 @@ VisualCoreSimulation | let | public static let maxDelta
 VisualCoreSimulation | let | public static let reducedMotionFactor
 VisualCoreSimulation | let | public static let speedRange
 VisualCoreSimulation | let | public static let version
+VisualCoreSimulation | struct | public struct AccessibilityPreferences: Sendable, Equatable, Codable
+VisualCoreSimulation | struct | public struct EffectiveAccessibility: Sendable, Equatable
 VisualCoreSimulation | struct | public struct Emitter: Sendable, Equatable
 VisualCoreSimulation | struct | public struct Entry: Sendable, Equatable
 VisualCoreSimulation | struct | public struct FixedStepClock: Sendable, Equatable
@@ -757,6 +769,7 @@ VisualCoreSimulation | struct | public struct ParticleSystem: Sendable
 VisualCoreSimulation | struct | public struct SceneClock: Sendable, Equatable
 VisualCoreSimulation | struct | public struct SeededRandom: RandomNumberGenerator, Sendable, Equatable
 VisualCoreSimulation | struct | public struct SplitMix64: RandomNumberGenerator, Sendable
+VisualCoreSimulation | struct | public struct SystemAccessibility: Sendable, Equatable
 VisualCoreSimulation | struct | public struct Timeline: Sendable
 VisualCoreSimulation | struct | public struct Tween: Sendable, Equatable
 VisualCoreSimulation | var | public private(set) var accumulator
@@ -776,12 +789,14 @@ VisualCoreSimulation | var | public var alpha: Double
 VisualCoreSimulation | var | public var autoreverses: Bool
 VisualCoreSimulation | var | public var color: Vec4
 VisualCoreSimulation | var | public var curve: EasingCurve
+VisualCoreSimulation | var | public var dimFlashingLights: Bool
 VisualCoreSimulation | var | public var direction: Double
 VisualCoreSimulation | var | public var duration: Double
 VisualCoreSimulation | var | public var emitters: [Emitter]
 VisualCoreSimulation | var | public var finalValue: Double
 VisualCoreSimulation | var | public var forces: [ParticleForce]
 VisualCoreSimulation | var | public var from: Double
+VisualCoreSimulation | var | public var id: String
 VisualCoreSimulation | var | public var isEmitting
 VisualCoreSimulation | var | public var isFinished: Bool
 VisualCoreSimulation | var | public var isPaused
@@ -789,10 +804,14 @@ VisualCoreSimulation | var | public var lifetime: ClosedRange<Double>
 VisualCoreSimulation | var | public var mode: EasingMode
 VisualCoreSimulation | var | public var name: String
 VisualCoreSimulation | var | public var offset: Double
+VisualCoreSimulation | var | public var playbackRate: Double
 VisualCoreSimulation | var | public var position: Vec2
 VisualCoreSimulation | var | public var rate
 VisualCoreSimulation | var | public var rate: Double
+VisualCoreSimulation | var | public var reduceFlashing: AccessibilityChoice
 VisualCoreSimulation | var | public var reduceMotion
+VisualCoreSimulation | var | public var reduceMotion: AccessibilityChoice
+VisualCoreSimulation | var | public var reduceMotion: Bool
 VisualCoreSimulation | var | public var reducedMotion
 VisualCoreSimulation | var | public var repeatCount: Int?
 VisualCoreSimulation | var | public var simulatedTime: Double
@@ -802,6 +821,7 @@ VisualCoreSimulation | var | public var speed: Double
 VisualCoreSimulation | var | public var spread: Double
 VisualCoreSimulation | var | public var startColor: Vec4, endColor: Vec4
 VisualCoreSimulation | var | public var startSize: Double, endSize: Double
+VisualCoreSimulation | var | public var title: String
 VisualCoreSimulation | var | public var to: Double
 VisualCoreSimulation | var | public var totalDuration: Double?
 VisualCoreSimulation | var | public var tween: Tween
@@ -816,14 +836,18 @@ VisualCoreTestSupport | let | public let maxAbsolute: Int
 VisualCoreTestSupport | let | public let meanAbsolute: Double
 VisualCoreTestSupport | let | public static let version
 VisualCoreTestSupport | struct | public struct ImageDifference: Sendable, Equatable
+VisualCoreUI | class | public final class SystemAccessibilityObserver
 VisualCoreUI | enum | public enum ParameterPanelModel
 VisualCoreUI | enum | public enum UIInfo
 VisualCoreUI | func | public func makeUIView(context: Context) -> UIView
+VisualCoreUI | func | public func refresh()
 VisualCoreUI | func | public func updateUIView(_ uiView: UIView, context: Context)
 VisualCoreUI | func | public static func adjust(_ editor: inout ParameterEditor, _ name: String, up: Bool)
 VisualCoreUI | func | public static func rows(_ editor: ParameterEditor) -> [ParameterRow]
+VisualCoreUI | func | public static func systemValues() -> SystemAccessibility
 VisualCoreUI | init | public init(editor: Binding<ParameterEditor>)
 VisualCoreUI | init | public init(host: RenderHost, accessibilityLabel: String, accessibilityHint: String? = nil)
+VisualCoreUI | init | public init(source: @escaping @MainActor () -> SystemAccessibility = SystemAccessibilityObserver.systemValues)
 VisualCoreUI | let | public let accessibilityHint: String?
 VisualCoreUI | let | public let accessibilityLabel: String
 VisualCoreUI | let | public let host: RenderHost
@@ -833,8 +857,10 @@ VisualCoreUI | let | public let position: Double
 VisualCoreUI | let | public let title: String
 VisualCoreUI | let | public let value: String
 VisualCoreUI | let | public static let adjustStep
+VisualCoreUI | let | public static let changeNotifications: [Notification.Name]
 VisualCoreUI | let | public static let version
 VisualCoreUI | struct | public struct ParameterPanel: View
 VisualCoreUI | struct | public struct ParameterRow: Sendable, Equatable, Identifiable
 VisualCoreUI | struct | public struct RenderSurface: UIViewRepresentable
+VisualCoreUI | var | public private(set) var current: SystemAccessibility
 VisualCoreUI | var | public var body: some View

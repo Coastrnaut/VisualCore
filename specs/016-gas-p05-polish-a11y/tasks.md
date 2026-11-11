@@ -45,7 +45,7 @@ IDs are `T-A01-5##`, with one commit and push per task (`scripts/tick_task.py`).
     directly; the limiter renderer instance is kept across bypass on/off; 0 leaks after destroy.
 
   Run on iOS 27.2 and 26.5.
-- [ ] T-A01-503 [US4] Update the docs:
+- [X] T-A01-503 [US4] Update the docs: — Verified 2026-11-11: API baseline 865 declarations (+26: AccessibilityChoice/SystemAccessibility/EffectiveAccessibility/AccessibilityPreferences, SystemAccessibilityObserver, EffectScene.bypassEffects), 0 undocumented; VisualCore README 'Accessibility preferences'; VisualCoreRendering README 'Accessibility settings and effect bypass'; package-map rows (Simulation, Effects, UI incl. the new UI → Simulation dependency); support-matrix row (A01-P05); known-limitations built note; getting-started module table. run-check A01-P05/t503-fast 5/5 (docs, dependencies R1-R5, public-api, compliance, host-visualcore); t503-reference-a 3/3 + t503-reference-b 4/4 = reference regression 7/7 (FR-A01-506, SC-A01-505)
   - API baseline;
   - VisualCore README "Accessibility preferences";
   - VisualCoreRendering README (observer, bypass);
