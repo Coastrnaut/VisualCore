@@ -95,3 +95,24 @@ final class BlurPass: EffectPassRunner {
         }
     }
 }
+
+/// `bloom`: bright pass (threshold, soft knee) → separable blur (radius) → add × intensity onto the input.
+@MainActor
+final class BloomPass: EffectPassRunner {
+    private let bright: ShaderProgram, blur: ShaderProgram, add: ShaderProgram
+    init(registry: ResourceRegistry) throws {
+        bright = try registry.program(vertex: EffectShaders.vertex, fragment: EffectShaders.brightPass)
+        blur = try registry.program(vertex: EffectShaders.vertex, fragment: EffectShaders.blur)
+        add = try registry.program(vertex: EffectShaders.vertex, fragment: EffectShaders.addScaled)
+    }
+    func run(_ io: PassIO) throws {
+        guard let input = io.inputs["input"] else { return }
+        let r = io.registry
+        let highlights = try r.acquireTarget(width: io.output.width, height: io.output.height, format: io.output.format)
+        let glow = try r.acquireTarget(width: io.output.width, height: io.output.height, format: io.output.format)
+        defer { r.recycle(highlights); r.recycle(glow) }
+        drawFullscreen(bright, into: highlights, textures: [("input", input)]) { $0.set("u_threshold", io.params.scalar("threshold", 0.8)) }
+        try BlurPass.blur(blur, input: highlights, output: glow, radius: io.params.scalar("radius", 8), registry: r)
+        drawFullscreen(add, into: io.output, textures: [("base", input), ("overlay", glow)]) { $0.set("u_intensity", io.params.scalar("intensity", 1)) }
+    }
+}

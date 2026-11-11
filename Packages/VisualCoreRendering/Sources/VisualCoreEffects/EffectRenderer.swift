@@ -88,6 +88,7 @@ public final class EffectRenderer {
         case "copy": return try CopyPass(registry: registry)
         case "colorMatrix": return try ColorMatrixPass(registry: registry)
         case "blur": return try BlurPass(registry: registry)
+        case "bloom": return try BloomPass(registry: registry)
         default: throw EffectGraphError.unknownType(type, pass: "")
         }
     }

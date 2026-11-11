@@ -52,4 +52,33 @@ enum EffectShaders {
         color = sum / weights;
     }
     """
+
+    /// Bloom bright pass: keeps light above `u_threshold` with a 0.1 soft knee (Rec. 709 luma).
+    static let brightPass = """
+    precision mediump float;
+    uniform sampler2D u_input;
+    uniform float u_threshold;
+    in vec2 uv;
+    out vec4 color;
+    void main() {
+        vec4 c = texture(u_input, uv);
+        float luma = dot(c.rgb, vec3(0.2126, 0.7152, 0.0722));
+        float k = smoothstep(u_threshold - 0.1, u_threshold + 0.1, luma);
+        color = vec4(c.rgb * k, 1.0);
+    }
+    """
+
+    /// Adds `u_intensity × u_overlay` to `u_base`.
+    static let addScaled = """
+    precision mediump float;
+    uniform sampler2D u_base;
+    uniform sampler2D u_overlay;
+    uniform float u_intensity;
+    in vec2 uv;
+    out vec4 color;
+    void main() {
+        vec4 b = texture(u_base, uv);
+        color = vec4(min(b.rgb + u_intensity * texture(u_overlay, uv).rgb, vec3(1.0)), b.a);
+    }
+    """
 }
