@@ -94,7 +94,7 @@ research R1–R7, data model, contract, quickstart).
 
 ## Phase 4: User Story 3 — Fixture suite 1–5 (P2)
 
-- [ ] T-A02-507 [US3] Add `FixtureSuiteTests` (`Apps/FluidArtPlayground/Tests/Unit/FixtureSuiteTests.swift`), naming
+- [X] T-A02-507 [US3] Add `FixtureSuiteTests` (`Apps/FluidArtPlayground/Tests/Unit/FixtureSuiteTests.swift`), naming — Verified 2026-11-11: — Verified 2026-11-11: FixtureSuiteTests fixtures 1-5: (1) uniform dye decay max |GPU-ref| 0.0 in float16 and unorm8; (2) zero velocity: 0 cells grown, total 617.07->476.37 within bound 484.53 (unorm8 493.05 <= 501.30); (3) walls/open x both storages, wall normal flow 0, CPU reference 0 out-of-grid reads; (4) test-mode playground 682 runs over 10 frames, 0 self-sampling; (5) 100 suspended frames 0 steps, first frame after resume +1, deltas 600/0/-1/NaN/inf one step each in 1/240..1/30 s, paused scene stays paused with +0 through suspend/resume; run-check A02-P05/t507-app-ios27 and t507-app-ios26 TEST SUCCEEDED, enumeration 62/62 each
   fixtures 1–5:
   1. uniform dye decays by dissipation (reuses the DissipationFixture reference);
   2. zero velocity keeps a known pattern bounded (max does not grow; the sum stays within the dissipation bound);
