@@ -20,7 +20,7 @@ after each phase, run `validate_docs.py`.
   Add tests in `Packages/VisualCore/Tests/VisualCoreSimulationTests/SceneClockTests.swift`: advance, pause freezes,
   scrub, wrap, delta cap, speed clamp, reduced motion (halves playback; scrub and paused time
   unaffected, analyze C3), NaN ignored, determinism.
-- [ ] T-A01-202 [P] [US4] Implement `Packages/VisualCore/Sources/VisualCoreParameters/ParameterEditor.swift` per contracts/api.md:
+- [X] T-A01-202 [P] [US4] Implement `Packages/VisualCore/Sources/VisualCoreParameters/ParameterEditor.swift` per contracts/api.md: — Verified 2026-11-10: VisualCoreParameters/ParameterEditor.swift (set by value/normalized with clamping and NaN→0, reset/resetAll/no-op, isModified/modifiedNames, rebase, formatted 3 significant digits + unit); run-check A01-P02/t201-202-host-a2: ParameterEditorTests 4/4 pass, whole VisualCore host suite green; API baseline updated
   - `set(to:)` returns false for an unknown name or a non-finite value and clamps otherwise;
   - `set(normalized:)` clamps the position and treats non-finite as 0;
   - reset, resetAll, isModified, modifiedNames, rebase;
