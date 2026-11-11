@@ -97,7 +97,7 @@ contains additions only.
   - both storages (half: the closer of the nearest and toward-zero references).
 
   Keep the Phase 01 fixtures green.
-- [ ] T-A02-212 [US2] Run the app tests on iOS 27.2 and then 26.5, with the enumeration guard after each.
+- [X] T-A02-212 [US2] Run the app tests on iOS 27.2 and then 26.5, with the enumeration guard after each. — Verified 2026-11-11: App tests on both runtimes: run-check A02-P02/t211-app-27-3 (iOS 27.2) and t212-app-26 (iOS 26.5) TEST SUCCEEDED, enumeration guard 19/19 each; on iOS 26.5 every advection, splat and splat+advect fixture on 8x8 and 16x16 in both storages matched the CPU reference within tolerance (zero-velocity 120 steps exact; Phase 01 dissipation fixtures still exact)
 
 ## Phase 5: User Story 3 — A control alternative to swiping (P1)
 
