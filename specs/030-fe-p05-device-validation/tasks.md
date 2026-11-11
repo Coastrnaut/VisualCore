@@ -26,12 +26,12 @@ ProjectM regression and A01/A02 builds.
 
 ## Phase 3: User Story 1 — precision mode (P1) 🎯
 
-- [ ] T-A03-504 [P] [US1] Tests first, then `Apps/FractalExplorer/FractalExplorerCore/Sources/FractalExplorerCore/PrecisionLadder.swift` (zooms 4^i for "≤ 24 steps" from the Seahorse point; `Step` index/zoom/level/clamped/agreement; `verdict`: fail if a reliable step < 0.99, clamp step = first clamped, breakdown = first < 0.99, fail if breakdown < clamp; none-within-ladder cases). `PrecisionLadderTests` ≥ 4. `swift test` (FR-A03-502, SC-A03-502).
+- [ ] T-A03-504 [P] [US1] Tests first, then `Apps/FractalExplorer/FractalExplorerCore/Sources/FractalExplorerCore/PrecisionLadder.swift` (zooms 4^i for "≤ 24 steps" from the Seahorse point; `Step` index/zoom/level/clamped/agreement; `verdict`: fail if a reliable step < 0.99, clamp step = first clamped, breakdown = first < 0.99, fail if breakdown < clamp; none-within-ladder cases; the plan ends early once PlaneViewport's own 1e-15 scale limit would be reached at the given canvas, analyze I1). `PrecisionLadderTests` ≥ 4. `swift test` (FR-A03-502, SC-A03-502).
 - [ ] T-A03-505 [US1] Add `ExplorerModel(hosted: false)` (no own host; scene only) and `Apps/FractalExplorer/App/AppAutomation.swift` (`#if DEBUG || VISUALCORE_AUTOMATION`): AutomationView hosting `model.scene`, built-in modes with the check "no shader error", the `precision` app mode (capabilities, ladder rendered 64 × 64 unclamped through the scene, agreement vs CPU, level and clamp from the app's rules with the device bits and the view's display scale, measurements and details per the data model, verdict); route automation launches in `FractalExplorerApp.swift`; `project.yml` links VisualCoreAutomation. `AutomationModeTests` (precision mode against a recorder: pass, all measurements present, report decodes). Both runtimes (FR-A03-502, FR-A03-505).
 
 ## Phase 4: User Story 2 — tour mode (P1)
 
-- [ ] T-A03-506 [US2] Add the `tour` app mode to `AppAutomation.swift`: all tours at 1/60 s tour steps (frames capped per tour by `VISUALCORE_AUTORUN_FRAMES` when set), `renderOneFrame(present: true)` timed per step, a 1024 px still per stop via `StillCapture` compared at 64 points (≥ 99%), files removed, thermal state and Low Power Mode at start/end in details, frame-time statistics. `AutomationModeTests` gains the tour mode (capped frames: pass, stops 9, agreement measurements, no file left). Both runtimes (FR-A03-503, SC-A03-503).
+- [ ] T-A03-506 [US2] Add the `tour` app mode to `AppAutomation.swift`: all tours at 1/60 s tour steps (frames capped per tour by `VISUALCORE_AUTORUN_FRAMES` when set), `renderOneFrame(present: true)` timed per step, a still per stop at min(1024, the device's render limit) via `StillCapture` (analyze G1) compared at 64 points (≥ 99%), files removed, thermal state and Low Power Mode at start/end in details, frame-time statistics. `AutomationModeTests` gains the tour mode (capped frames: pass, stops 9, agreement measurements, no file left). Both runtimes (FR-A03-503, SC-A03-503).
 
 ## Phase 5: User Story 4 — rehearsal, release check and plan (P2)
 
@@ -52,3 +52,9 @@ ProjectM regression and A01/A02 builds.
 
 VisualCore app modes first, then the fixtures and modes, then rehearsal and the plan. Each task committed after its
 checks pass.
+
+## Analyze remediation (2026-11-11, applied under CLAUDE.md §2)
+
+- I1: the ladder stops before PlaneViewport's own scale limit.
+- G1: tour captures use min(1024, the device limit).
+- 0 critical issues.
