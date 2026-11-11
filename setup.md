@@ -186,6 +186,36 @@ The repo enforces LF through `.gitattributes`. Commits use the owner's normal em
 
 ## 4. Simulator runtimes
 
+First make sure the developer tools point at Xcode, not the Command Line Tools. Homebrew installs the Command Line
+Tools and selects them, which gives the error "tool 'xcodebuild' requires Xcode, but active developer directory
+'/Library/Developer/CommandLineTools' is a command line tools instance". Check:
+
+```bash
+xcode-select -p && xcodebuild -version
+```
+
+Expected: `/Applications/Xcode.app/Contents/Developer`, `Xcode 27.2` and `Build version 27B52`. If it shows
+`/Library/Developer/CommandLineTools` or the error above:
+
+1. 👤 Install Xcode 27.2 if `ls -d /Applications/Xcode*.app` lists nothing (§2).
+2. Select Xcode, using the app's actual name if it differs:
+
+   ```bash
+   sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
+   ```
+
+3. Accept the licence and finish the first launch:
+
+   ```bash
+   sudo xcodebuild -license accept
+   ```
+
+   ```bash
+   xcodebuild -runFirstLaunch
+   ```
+
+Then download the runtimes:
+
 ```bash
 xcodebuild -downloadPlatform iOS
 ```
