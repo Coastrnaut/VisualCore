@@ -66,4 +66,25 @@ final class ControlsRenderTests: XCTestCase {
             XCTAssertEqual(d.maxAbsolute, 0, "\(family) live edit equals fresh render")
         }
     }
+
+    func testControlsNeverCreateAnotherRenderHost() throws {
+        let model = SceneModel(family: FamilyCatalog.family(.particles), reduceMotion: false)
+        defer { model.close() }
+        let host = try XCTUnwrap(model.host)
+        host.view.frame = CGRect(origin: .zero, size: ArtRender.size)
+        host.view.layoutIfNeeded()
+        XCTAssertTrue(host.renderOneFrame(present: false))
+        model.editor.setParameter("count", normalized: 0.9)
+        model.editor.choosePreset("particles-burst")
+        model.editor.choosePalette("ocean")
+        model.editor.setSeed(99)
+        model.togglePlay()
+        model.scrub(to: 4)
+        model.editor.resetAll()
+        XCTAssertTrue(host.renderOneFrame(present: false))
+        XCTAssertTrue(model.host === host, "one render host for the screen's lifetime")
+        XCTAssertTrue(model.clocked.inner === model.scene, "the scene object is reused; only its inputs change")
+        XCTAssertEqual(model.clocked.clock.time, 4)
+        XCTAssertEqual(host.resources.stats.leaked, 0)
+    }
 }
