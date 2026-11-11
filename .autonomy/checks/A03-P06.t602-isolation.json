@@ -1,0 +1,22 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_app_isolation.py",
+    "--app",
+    "Apps/FractalExplorer",
+    "--built-app",
+    "Build/DerivedData/release-FractalExplorer-Release/Build/Products/Release-iphoneos/FractalExplorer.app",
+    "--allow-usage",
+    "NSPhotoLibraryAddUsageDescription"
+  ],
+  "command": "python3 scripts/check_app_isolation.py --app Apps/FractalExplorer --built-app Build/DerivedData/release-FractalExplorer-Release/Build/Products/Release-iphoneos/FractalExplorer.app --allow-usage NSPhotoLibraryAddUsageDescription",
+  "elapsed_seconds": 0.094,
+  "exit_code": 0,
+  "finished": "2026-11-11T15:55:51+00:00",
+  "log": ".autonomy/logs/A03-P06.t602-isolation.log",
+  "log_sha256": "28819f686ac8b21d94a1d5b93a19308d57ea68b503cc4dc610641dac3d706eef",
+  "name": "t602-isolation",
+  "stage": "A03-P06",
+  "started": "2026-11-11T15:55:51+00:00",
+  "timed_out": false
+}
