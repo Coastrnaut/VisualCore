@@ -163,4 +163,33 @@ final class PassPixelTests: XCTestCase {
         let p = try composite(mode: 1, opacity: 1)
         XCTAssertGreaterThanOrEqual(p.x, 254); XCTAssertGreaterThanOrEqual(p.z, 254)
     }
+
+    // MARK: feedback (T-F412)
+
+    func testFeedbackDecaysTowardTheInputAndClearsOnResize() throws {
+        var values: [Int] = []
+        var afterResize = 0
+        var liveAfterTeardown = -1
+        let host = try EffectHarness.run { ctx in
+            let black = try EffectHarness.solid(0, 0, 0, in: ctx)
+            let white = try EffectHarness.solid(1, 1, 1, in: ctx)
+            let bigWhite = try EffectHarness.solid(1, 1, 1, size: 24, in: ctx)
+            let r = try EffectRenderer(graph: EffectHarness.graph([
+                EffectPassDescription(id: "F", type: "feedback", inputs: ["input": "scene"], output: "f", params: ["decay": [0.5]]),
+            ], output: "f"), registry: ctx.resources)
+            for scene in [black, white, white] {
+                values.append(EffectHarness.pixel(try r.render(scene: scene, time: 0, delta: 1.0 / 60).readPixels(), width: 16, x: 2, y: 2).x)
+            }
+            afterResize = EffectHarness.pixel(try r.render(scene: bigWhite, time: 0, delta: 1.0 / 60).readPixels(), width: 24, x: 2, y: 2).x
+            r.invalidate()
+            [black, white, bigWhite].forEach { ctx.resources.release($0) }
+            liveAfterTeardown = ctx.resources.stats.liveCount[.framebuffer] ?? -1
+        }
+        XCTAssertEqual(values[0], 0)
+        XCTAssertEqual(values[1], 128, accuracy: 2)
+        XCTAssertEqual(values[2], 191, accuracy: 3)
+        XCTAssertEqual(afterResize, 255, "history cleared to the input on a size change")
+        XCTAssertEqual(liveAfterTeardown - (host.resources.stats.liveCount[.framebuffer] ?? 0), 0)
+        XCTAssertEqual(host.resources.stats.leaked, 0)
+    }
 }
