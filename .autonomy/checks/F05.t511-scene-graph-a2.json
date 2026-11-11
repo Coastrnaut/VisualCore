@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/VisualCore"
+  ],
+  "command": "swift test --package-path Packages/VisualCore",
+  "elapsed_seconds": 2.354,
+  "exit_code": 0,
+  "finished": "2026-11-11T00:45:21+00:00",
+  "log": ".autonomy/logs/F05.t511-scene-graph-a2.log",
+  "log_sha256": "f863e36f043d5f04cabeb63887444c02fe7cf20704b9a0d4f1e95c64eda7e3ce",
+  "name": "t511-scene-graph-a2",
+  "stage": "F05",
+  "started": "2026-11-11T00:45:19+00:00",
+  "timed_out": false
+}
