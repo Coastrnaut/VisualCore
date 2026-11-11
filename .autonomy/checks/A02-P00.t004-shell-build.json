@@ -1,0 +1,25 @@
+{
+  "argv": [
+    "xcodebuild",
+    "build",
+    "-project",
+    "VisualCore.xcodeproj",
+    "-scheme",
+    "FluidArtPlayground",
+    "-destination",
+    "generic/platform=iOS Simulator",
+    "-derivedDataPath",
+    "Build/DerivedData/FluidArtPlayground",
+    "CODE_SIGNING_ALLOWED=NO"
+  ],
+  "command": "xcodebuild build -project VisualCore.xcodeproj -scheme FluidArtPlayground -destination 'generic/platform=iOS Simulator' -derivedDataPath Build/DerivedData/FluidArtPlayground CODE_SIGNING_ALLOWED=NO",
+  "elapsed_seconds": 5.749,
+  "exit_code": 0,
+  "finished": "2026-11-11T07:37:00+00:00",
+  "log": ".autonomy/logs/A02-P00.t004-shell-build.log",
+  "log_sha256": "25a81bbe22b2d2acdd3193b565ca5fdfb2d52965bb15fd5365048fe211a01475",
+  "name": "t004-shell-build",
+  "stage": "A02-P00",
+  "started": "2026-11-11T07:36:54+00:00",
+  "timed_out": false
+}

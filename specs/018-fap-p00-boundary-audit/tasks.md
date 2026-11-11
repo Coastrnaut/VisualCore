@@ -36,7 +36,7 @@ commit and push per task (`scripts/tick_task.py`). Review checkpoint: after each
 
 ## Phase 4: US3 — Compilable empty app shell (P1)
 
-- [ ] T-A02-004 [US3] Add the shell:
+- [X] T-A02-004 [US3] Add the shell: — Verified 2026-11-11: Apps/FluidArtPlayground/App/FluidArtPlaygroundApp.swift (@main SwiftUI shell; HomeView with the title 'Fluid Art Playground', header trait, accessibility label and identifier fap.home.title, container fap.home; primary-colored text; no render host, permissions or networking); project.yml targets FluidArtPlayground (dev.visualcore.FluidArtPlayground, iOS 26.0, 0.1.0 (1), ITSAppUsesNonExemptEncryption false, no usage descriptions, no VisualCore product yet, dependency-audit post-build phase) and FluidArtPlaygroundUITests, scheme FluidArtPlayground; Info.plists generated under the gitignored Apps/*/Generated/. run-check A02-P00/t004-shell-build BUILD SUCCEEDED for generic iOS Simulator with the audit 'PASS: no ProjectM engine/preset/bridge dependency'; built Info.plist has the bundle id and display name and no usage description; check_dependencies R1-R5 PASS (FR-A02-005, FR-A02-006)
   - `Apps/FluidArtPlayground/App/FluidArtPlaygroundApp.swift`: an @main SwiftUI app with `HomeView`, title "Fluid
     Art Playground", identifier `fap.home.title`, accessibility label and header trait;
   - `Apps/FluidArtPlayground/Generated/{Info,UITests-Info}.plist`;
