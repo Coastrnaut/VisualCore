@@ -1,0 +1,18 @@
+{
+  "schema": 1,
+  "scheme": "FractalExplorer",
+  "bundleID": "dev.visualcore.FractalExplorer",
+  "version": "1.0.0",
+  "build": 1,
+  "allowedUsageDescriptions": ["NSPhotoLibraryAddUsageDescription"],
+  "requiredDocs": [
+    "docs/apps/fractal-explorer/privacy-and-credits.md",
+    "docs/apps/fractal-explorer/store-listing.md",
+    "docs/apps/fractal-explorer/build-and-archive.md",
+    "docs/apps/fractal-explorer/release-checklist.md"
+  ],
+  "checklist": "docs/apps/fractal-explorer/release-checklist.md",
+  "privacyManifest": true,
+  "icon": true,
+  "licenses": true
+}

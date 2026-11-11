@@ -1,0 +1,22 @@
+{
+  "argv": [
+    "python3",
+    "scripts/release_check.py",
+    "--only",
+    "app-release-fractal-explorer",
+    "--log-dir",
+    ".autonomy/logs/a03p06-t606-release",
+    "--json",
+    ".autonomy/logs/a03p06-t606-release.json"
+  ],
+  "command": "python3 scripts/release_check.py --only app-release-fractal-explorer --log-dir .autonomy/logs/a03p06-t606-release --json .autonomy/logs/a03p06-t606-release.json",
+  "elapsed_seconds": 7.718,
+  "exit_code": 0,
+  "finished": "2026-11-11T16:37:28+00:00",
+  "log": ".autonomy/logs/A03-P06.t606-app-release.log",
+  "log_sha256": "7bde9fbf9ece9b33a26987911d5c0c0f72b4b39e292d038b0a4b29b8f035c5ad",
+  "name": "t606-app-release",
+  "stage": "A03-P06",
+  "started": "2026-11-11T16:37:20+00:00",
+  "timed_out": false
+}

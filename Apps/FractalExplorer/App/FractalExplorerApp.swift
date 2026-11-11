@@ -33,8 +33,14 @@ struct FractalExplorerApp: App {
 }
 
 struct HomeView: View {
+    /// The home screen's description: only implemented, tested features (feature 031 FR-A03-605; CopyTests).
+    static let summary = "Explore the Mandelbrot and Julia sets. Pinch and drag to zoom and move, choose a palette and "
+        + "the number of iterations, save bookmarks, go to coordinates, take guided tours and capture pictures. The app "
+        + "shows when a view reaches the limit of your device's number precision."
+
     var body: some View {
         NavigationStack {
+            ScrollView {
             VStack(spacing: 16) {
                 Image(systemName: "circle.hexagongrid")
                     .font(.system(size: 56))
@@ -46,9 +52,11 @@ struct HomeView: View {
                     .accessibilityAddTraits(.isHeader)
                     .accessibilityLabel("Fractal Explorer")
                     .accessibilityIdentifier("fe.home.title")
-                Text("An explorer for the Mandelbrot and Julia sets.")
+                Text(Self.summary)
                     .font(.body)
                     .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .accessibilityIdentifier("fe.home.summary")
                 // Feature 026 T-A03-104: the explorer (Mandelbrot and Julia modes with explanations).
                 NavigationLink {
                     ExplorerView()
@@ -69,8 +77,10 @@ struct HomeView: View {
                 .accessibilityIdentifier("fe.home.acknowledgements")
             }
             .padding()
+            .frame(maxWidth: .infinity)
             .accessibilityElement(children: .contain)
             .accessibilityIdentifier("fe.home")
+            }
         }
     }
 }
