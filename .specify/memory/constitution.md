@@ -209,6 +209,47 @@ Ratified from the app manual's constitution prompt (2026-11-11).
 - **One phase at a time:** implement only one Spec Kit phase at a time (one ledger gate, ADR-0004), in order
   A02-P00 → A02-P06.
 
+### A03 Fractal Explorer (`Apps/FractalExplorer/`, `dev.visualcore.FractalExplorer`)
+
+Ratified from the app manual's constitution prompt (2026-11-11).
+
+- **Consumer, not fork:** a standalone iOS/iPadOS VisualCore consumer and never a fork of projectm-ios. It
+  uses only audited VisualCore public APIs over the OpenGL ES → ANGLE → Metal integration. It MUST NOT
+  create its own EGL/ANGLE initialization path, a second renderer, or link ProjectM engine code.
+- **Reuse first (Principle II):** generic machinery goes into VisualCore with tests, docs, the API baseline
+  and the reference regression. This covers:
+  - complex-plane viewports and screen↔plane transforms;
+  - precision estimation and limits;
+  - palettes and color mapping;
+  - pinch/pan camera math;
+  - bookmark persistence;
+  - offscreen capture.
+
+  Only the fractal formulas, curated content, tours and UI stay in the app.
+- **GPU-free domain:** viewport math, iteration and escape rules (with a CPU reference), the precision
+  advisor and persisted bookmarks MUST be testable without GPU access, through host `swift test`.
+- **Truthful precision:**
+  - zoom is clamped where 32-bit shader precision stops being reliable, and the limit is shown;
+  - there is no claim of unlimited deep zoom and no scientific claim beyond verified shader precision;
+  - precision limits are measured on real devices before any compatibility claim.
+- **Offline-first:** no networking. Any permission (such as saving to Photos) is disclosed before use and
+  requested only through public APIs.
+- **Bounded GPU:**
+  - iteration caps, render-target and capture sizes are capped;
+  - a render-cost estimate is shown before expensive work;
+  - shader parameters are validated and clamped before upload;
+  - context loss rebuilds everything from versioned CPU state.
+- **Accessibility:** native SwiftUI controls with VoiceOver labels, Dynamic Type, Reduce Motion (palette
+  animation and tours) and Reduce Flashing. The canvas has a spoken description that includes the mode and
+  location, and every gesture has a control alternative.
+- **Licenses and truthful claims:** every bundled asset, palette and shader records its license and author.
+  Mathematical explanations are educational, never presented as research-grade.
+- **Regression when VisualCore changes:** any VisualCore change made for this app MUST be followed by the
+  ProjectM reference regression (`scripts/run_reference_baseline.py` steps and `check_reference_clean.py`).
+- **Python only:** repository automation uses Python 3; there is no PowerShell dependency.
+- **One phase at a time:** implement only one Spec Kit phase at a time (one ledger gate, ADR-0004), in order
+  A03-P00 → A03-P06.
+
 ## Governance
 
 - Precedence: real Apple/toolchain behavior → canonical README chapters 1–18 and `CLAUDE.md` →
@@ -221,4 +262,4 @@ Ratified from the app manual's constitution prompt (2026-11-11).
 - Every gate review checks compliance with Principles I–X (including II-a); `scripts/check_compliance.py` enforces
   the mechanically checkable rules.
 
-**Version**: 1.3.0 | **Ratified**: 2026-11-10 | **Last Amended**: 2026-11-11
+**Version**: 1.4.0 | **Ratified**: 2026-11-10 | **Last Amended**: 2026-11-11
