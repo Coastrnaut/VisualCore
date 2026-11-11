@@ -22,6 +22,32 @@ Canonical overrides:
 - **Reuse:** app-defined automation modes with measurements in the report are generalized into VisualCore automation
   (G-AUTOMODE), so every app can add its own measurement modes.
 
+## Clarifications
+
+### Session 2026-11-11
+
+Answered autonomously under the owner's standing approval (CLAUDE.md §2), choosing the recommended option each time.
+Facts checked in code:
+- `AutomationRunner` knows only smoke, launch and lifecycle, applies `postRunCheck`/`checkNote` to those, writes one
+  JSON report and exits;
+- `AutomationReport` has no measurement fields yet; `AutomationView` owns the one render host;
+- the fractal shader receives the center and the step as 32-bit uniforms;
+- feature 027 GPU agreement reached 99.9% with boundary-only disagreements on default views.
+
+- Q: Which ladder steps does the precision mode judge, given that deep views near the set's boundary can disagree at a
+  few boundary pixels even when precision is fine? → A: The run judges the steps the app calls *reliable*: each must
+  agree ≥ 99% with the CPU reference (otherwise the advisor is overconfident on this device). Steps the app calls *near
+  the limit* are recorded but not judged (the app already warns "details may blur"). Steps past the clamp are drawn
+  only to locate the measured breakdown (first step below 99%), which is recorded. The verdict also fails if the clamp
+  step comes after the breakdown step.
+- Q: How does a mode registered by the app reach the render host and the report? → A: VisualCore's runner gains
+  `appModes: [String: handler]`, where a handler receives the render host and the report (inout) and may set result,
+  message, frames, frame-time statistics, `measurements` (name → number) and `details` (name → text). The runner then
+  applies the app's domain check and note as for built-in modes. Reports gain the two optional fields.
+- Q: How long is a tour run, and is its frame count limited? → A: All three tours at 60 tour steps per second (about
+  1,260 frames per tour); `VISUALCORE_AUTORUN_FRAMES` (if given) caps the frames per tour for quick rehearsals. Stills
+  are captured at every stop regardless.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Measure the device's real precision limit (Priority: P1) 🎯
@@ -40,8 +66,8 @@ reports and checks the precision limit the app enforces against what the device 
    for up to 24 steps, each step drawn at 64 × 64 and compared with the CPU reference (share of agreeing pixels), with
    the app's precision level at that step.
 2. **Given** the ladder, **Then** the report names the deepest zoom the app allows (its clamp) and the first zoom at
-   which agreement falls below 99% (the measured breakdown), and the run passes only if the app's clamp comes at or
-   before the measured breakdown (the app never shows a zoom the device draws wrongly).
+   which agreement falls below 99% (the measured breakdown). The run passes only if every step the app calls reliable
+   agrees ≥ 99% and the clamp comes at or before the breakdown (clarification 1).
 3. **Given** a device that reports no usable high precision, **Then** the report says which fallback was used.
 
 ---
