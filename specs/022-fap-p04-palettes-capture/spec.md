@@ -19,6 +19,42 @@ Canonical overrides:
 - Pause, step, reset and the seeded test mode stay in Phase 05.
 - Evidence is host and simulator only.
 
+## Clarifications
+
+### Session 2026-11-11
+
+Answered autonomously under the owner's standing delegation (CLAUDE.md §2), recommended option in each case.
+
+- Q: How does each palette turn dye into color? → A: Dye stays a per-channel amount. The display mode decides how it
+  shows:
+  - **Ink**: `paper × exp(−2·dye)`, with paper sRGB (0.96, 0.94, 0.88). Splat colors are ink absorptions, so the ink
+    looks indigo, sepia, crimson and so on.
+  - **Smoke**: background (0.04, 0.04, 0.05), mixed toward near-white by `1 − exp(−1.5·luma(dye))`, with no hue.
+    Splat colors are grays from 0.55 to 0.9.
+  - **Glowing dye**: black plus clamped dye, followed by VisualCore's bloom (threshold 0.6, intensity 1.2,
+    radius 8).
+
+  New splats use the active palette's colors. Dye already on the canvas is shown in the new mode immediately.
+- Q: How does pinching interact with painting? → A: VisualCore's `PinchRecognizer` is fed through a `PointerTracker`.
+  When a second finger goes down, both fingers' strokes are cancelled (the touch tracker forgets them) and pinch mode
+  starts. While pinching, `brushRadius = radius at the start × scale`, clamped to 0.005…0.25. Painting resumes with
+  the next touch after all fingers lift. The Adjust panel has a Brush size slider over the same range, shown as a
+  percentage of the canvas.
+- Q: What size and timing does a capture use? → A: The long edge is 2048 pixels, in the aspect of the canvas, capped
+  by the device's maximum render size (A01's `ExportGeometry`). The scene is paused for the offscreen render, so no
+  extra step runs. The render uses the same display path, including the glow effect for Glowing dye. The PNG is
+  written to a temporary file (the previous capture is deleted) and offered through the share sheet. Errors appear as
+  a message.
+- Q: How is "every pass writes somewhere else" observed? → A: VisualCore adds a main-actor run observer to
+  `FieldPass`. Each run reports the pass label, the output texture or framebuffer and the input textures. It is
+  nil in production. The fixture counts runs per frame against the expected list (splats × 2, two advections,
+  viscosity copy + 8 when on, divergence, fill, N pressure, gradient, display) and asserts that no input equals the
+  output. Effect-graph passes (the glow) use VisualCore's `EffectRenderer` target management, verified in VisualCore's
+  own tests (feature 005), and are not field passes.
+- Q: Which permission text does capture need? → A: Only `NSPhotoLibraryAddUsageDescription`: "Fluid Art Playground
+  saves your captured picture to Photos only when you choose Save Image." The system asks only if the user picks
+  Save Image in the share sheet. The isolation check allows exactly this one key.
+
 ## User Scenarios & Testing *(mandatory)*
 
 Users: people painting (manual journeys 1–3), VoiceOver and Switch Control users, and people who want to keep or share
