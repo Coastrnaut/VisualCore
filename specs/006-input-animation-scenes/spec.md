@@ -13,6 +13,18 @@ invocation), plus the canonical override: pure logic in host-testable `VisualCor
 (`VisualCoreMath`, `VisualCoreSimulation`, `VisualCoreScenes`), GL drawing in `VisualCoreRendering`;
 device measurements deferred to campaign II (constitution V).
 
+## Clarifications
+
+### Session 2026-11-10
+
+Answered autonomously under the owner's standing approval (CLAUDE.md §2), recommended option chosen.
+
+- Q: What form does the standalone interactive demo take? → A: A minimal harness app `Harnesses/InteractiveDemo` with its own XcodeGen spec, built unsigned for the simulator, driven by XCUITest; no ProjectM link (the Showcase is feature 007).
+- Q: Which seeded random algorithm is used? → A: xoshiro256** seeded through SplitMix64 (integer-only, so sequences are identical on every platform); doubles from the top 53 bits, floats from the top 24 bits; a golden-sequence test pins the first outputs for seed 42.
+- Q: What are the gesture thresholds? → A: Tap: ≤ 10 pt movement and ≤ 0.3 s; double-tap: second tap within 0.3 s and 30 pt; long-press: ≥ 0.5 s with ≤ 10 pt movement; drag begins after 10 pt movement. All are configurable per recognizer.
+- Q: How do one- and two-finger gestures interact? → A: Pinch and rotate run simultaneously; an active drag is cancelled when a second finger lands, and a pending tap fails once a second finger lands or movement exceeds the tap slop.
+- Q: How do animations respect Reduce Motion? → A: Timelines take a `reduceMotion` flag that makes tweens jump to their end values and disables repeats; the demo sets it from the system Reduce Motion setting and then also disables camera inertia. Particles are content, not UI motion, and stay unchanged.
+
 ## User Scenarios & Testing *(mandatory)*
 
 Users: developers of the 25 interactive apps (Physics Playground, Particle Universe, Generative Art
@@ -110,21 +122,22 @@ the camera and shapes animate on a timeline, proving the subsystems work togethe
 - Camera zoom limits (default 0.1–100) and orbit pitch limits (±89°) are enforced.
 - Timeline with zero duration jumps straight to its end value.
 - Device rotation: conversions use the current view size on the next event.
+- Reduce Motion on: tweens jump to their end values, repeats are disabled and the demo turns off camera inertia.
 
 ## Requirements *(mandatory)*
 
 ### Functional Requirements
 
 - **FR-F501**: Provide coordinate conversion among view points, pixels, normalized device coordinates and 2D world coordinates (through a pan/zoom/rotate camera), round-tripping within 0.001 points.
-- **FR-F502**: Provide pointer tracking for up to 10 touches and recognizers for tap, double-tap, long-press, drag, pinch and rotate with states possible → began → changed → ended/cancelled/failed; recognizers are pure and fed by timestamped events.
+- **FR-F502**: Provide pointer tracking for up to 10 touches and recognizers for tap, double-tap, long-press, drag, pinch and rotate with states possible → began → changed → ended/cancelled/failed; recognizers are pure and fed by timestamped events. Default thresholds: tap ≤ 10 pt and ≤ 0.3 s; double-tap within 0.3 s and 30 pt; long-press ≥ 0.5 s within 10 pt; drag after 10 pt (configurable). Pinch and rotate run simultaneously; a second finger cancels an active drag and fails a pending tap.
 - **FR-F503**: Provide a fixed-step clock (default 1/120 s, max 8 steps/frame) reporting steps, interpolation alpha and dropped time; invalid deltas are treated as zero.
-- **FR-F504**: Provide a seeded, platform-independent random generator whose sequence is identical on host and iOS for the same seed.
-- **FR-F505**: Provide easing functions (linear, quad, cubic, sine, expo, back, elastic, bounce; in/out/in-out) with f(0)=0, f(1)=1, and timelines/tweens supporting play, pause, seek, reverse, repeat and completion events.
+- **FR-F504**: Provide a seeded, platform-independent random generator (xoshiro256** seeded via SplitMix64) whose integer sequence is identical on host and iOS for the same seed, pinned by a golden-sequence test.
+- **FR-F505**: Provide easing functions (linear, quad, cubic, sine, expo, back, elastic, bounce; in/out/in-out) with f(0)=0, f(1)=1, and timelines/tweens supporting play, pause, seek, reverse, repeat and completion events, plus a `reduceMotion` flag that jumps tweens to their end values and disables repeats.
 - **FR-F506**: Provide a 2D scene model: nodes with transform (position, rotation, scale), z-order, visibility, children; primitives rectangle, circle, line, polygon with fill color; world-transform computation and hit testing.
 - **FR-F507**: Provide a particle system with a fixed-capacity pool (default 10,000, max 100,000), emitters (rate, burst, lifetime, velocity/spread, color/size over life), forces (gravity, drag, point attractor) and NaN removal, updated on the fixed step.
 - **FR-F508**: Provide GL drawing of 2D primitives and particles (instanced or batched) through the registry/program cache, with resources released on teardown and rebuilt on context recreation.
 - **FR-F509**: Provide minimal 3D support justified by the 3D app manuals: vectors/matrices/quaternions, perspective and orbit cameras with project/unproject, and mesh generators (plane, cube, UV sphere) with normals; no general 3D scene graph.
-- **FR-F510**: Provide a standalone interactive demo (no ProjectM symbols) combining input, particles, primitives and a timeline, with a diagnostics readout usable from UI tests.
+- **FR-F510**: Provide a standalone interactive demo harness app `Harnesses/InteractiveDemo` (own XcodeGen spec, unsigned simulator build, no ProjectM symbols) combining input, particles, primitives and a timeline, with a diagnostics readout usable from UI tests; it honors the system Reduce Motion setting.
 - **FR-F511**: Simulation state MUST be deterministic for a given seed, step and input sequence on the same platform (bit-identical), independent of display frame rate.
 
 ### Key Entities
@@ -153,4 +166,4 @@ the camera and shapes animate on a timeline, proving the subsystems work togethe
 - Gestures are recognized by pure recognizers fed from UIKit touches by a thin view adapter, so the logic is host-testable; apps may still use SwiftUI gestures directly.
 - Bit-identical determinism is required per platform/architecture; cross-architecture float identity is not promised (only the random sequence is integer-based and identical everywhere).
 - Particle and primitive draw performance on devices is measured in campaign II (constitution V); simulator tests are functional only.
-- The demo is a minimal harness app; the full Showcase is feature 007 (F06).
+- The demo is a minimal harness app (`Harnesses/InteractiveDemo`); the full Showcase is feature 007 (F06).
