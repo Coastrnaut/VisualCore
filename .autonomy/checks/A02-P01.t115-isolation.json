@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_app_isolation.py",
+    "--app",
+    "Apps/FluidArtPlayground",
+    "--built-app",
+    "Build/DerivedData/FluidArtPlayground/Build/Products/Debug-iphonesimulator/FluidArtPlayground.app"
+  ],
+  "command": "python3 scripts/check_app_isolation.py --app Apps/FluidArtPlayground --built-app Build/DerivedData/FluidArtPlayground/Build/Products/Debug-iphonesimulator/FluidArtPlayground.app",
+  "elapsed_seconds": 0.114,
+  "exit_code": 0,
+  "finished": "2026-11-11T08:09:52+00:00",
+  "log": ".autonomy/logs/A02-P01.t115-isolation.log",
+  "log_sha256": "2fdaef071cd725af06c1aa033cdcb2f04b1c991bfba1c311d8b26153808ccc5b",
+  "name": "t115-isolation",
+  "stage": "A02-P01",
+  "started": "2026-11-11T08:09:52+00:00",
+  "timed_out": false
+}

@@ -39,6 +39,7 @@ enumeration = load("check_test_enumeration")
 privacy = load("check_privacy_manifest")
 appreleasecheck = load("check_app_release")
 licensebundle = load("bundle_licenses")
+isolation = load("check_app_isolation")
 try:
     deps = load("check_dependencies")
 except FileNotFoundError:
@@ -458,6 +459,37 @@ class AutomationScriptTests(unittest.TestCase):
         self.assertEqual(relsym.automation_symbols("0000 T _main\n"), [])
 
 
+class AppIsolationTests(unittest.TestCase):
+    """Feature 019 T-A02-115: apps never own EGL and stay offline unless allowed."""
+
+    def scan(self, files: dict[str, str], **kw) -> list[str]:
+        with tempfile.TemporaryDirectory() as d:
+            for rel, text in files.items():
+                p = Path(d) / rel
+                p.parent.mkdir(parents=True, exist_ok=True)
+                p.write_text(text)
+            return isolation.scan(Path(d), **kw)
+
+    def test_egl_and_network_are_flagged(self):
+        problems = self.scan({"App/A.swift": "import CVisualCoreEGL\nlet d = eglGetDisplay(nil)\nlet s = URLSession.shared"})
+        self.assertEqual(len(problems), 3)
+
+    def test_comments_tests_and_allowed_network_are_ignored(self):
+        self.assertEqual(self.scan({"App/A.swift": "// eglGetDisplay( and URLSession in a comment\n/* import Network */\nlet x = 1",
+                                    "Tests/T.swift": "let s = URLSession.shared"}), [])
+        self.assertEqual(self.scan({"App/A.swift": "let s = URLSession.shared"}, allow_network=True), [])
+
+    def test_usage_descriptions(self):
+        import plistlib
+        with tempfile.TemporaryDirectory() as d:
+            app = Path(d) / "X.app"
+            app.mkdir()
+            with open(app / "Info.plist", "wb") as f:
+                plistlib.dump({"NSMicrophoneUsageDescription": "x", "CFBundleName": "X"}, f)
+            self.assertEqual(len(isolation.usage_problems(app, [])), 1)
+            self.assertEqual(isolation.usage_problems(app, ["NSMicrophoneUsageDescription"]), [])
+
+
 class ReleaseCheckTests(unittest.TestCase):
     """Feature 010 T-F908: release-check runner logic (step list, selection, logs, summary, failure handling)."""
 
@@ -475,6 +507,29 @@ class ReleaseCheckTests(unittest.TestCase):
         for s in relcheck.steps("X"):
             self.assertNotIn("devicectl", " ".join(s.argv))
             self.assertNotIn("platform=iOS,id=", " ".join(s.argv))
+
+    def test_app_steps_are_discovered_per_app(self):
+        """Feature 019 T-A02-115: documented-API, domain-package host tests and app tests for every app."""
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            for app, core in [("FluidArtPlayground", "FluidArtPlaygroundCore"), ("Solo", None)]:
+                (root / "Apps" / app / "App").mkdir(parents=True)
+                if core:
+                    (root / "Apps" / app / core).mkdir()
+                    (root / "Apps" / app / core / "Package.swift").write_text("// swift-tools-version: 6.0")
+            (root / "Apps" / "NotAnApp").mkdir(parents=True)
+            (root / "project.yml").write_text("schemes:\n  FluidArtPlayground:\n    build:\n      targets: {}\n")
+            names = [s.name for s in relcheck.app_domain_steps(root)]
+            self.assertEqual(names, ["documented-api-fluid-art-playground", "isolation-fluid-art-playground",
+                                     "host-fluid-art-playground-core", "documented-api-solo", "isolation-solo"])
+            tests = relcheck.app_test_steps("27.2", "X", root)
+            self.assertEqual([s.name for s in tests], ["app-fluid-art-playground-ios27"])
+            self.assertEqual(tests[0].needs_simulator, "27.2")
+        self.assertEqual(relcheck.kebab("GenerativeArtStudio"), "generative-art-studio")
+        names = [s.name for s in relcheck.steps("X")]
+        for required in ["documented-api-generative-art-studio", "documented-api-fluid-art-playground",
+                         "host-fluid-art-playground-core", "host-generative-art-studio-core", "app-generative-art-studio-ios27", "app-fluid-art-playground-ios26"]:
+            self.assertIn(required, names)
 
     def test_select_only_skip_and_unknown(self):
         all_steps = relcheck.steps("X")

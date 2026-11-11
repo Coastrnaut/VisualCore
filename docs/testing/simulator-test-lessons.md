@@ -32,3 +32,17 @@ the app build compiled against the old framework in `Build/DerivedData/<App>` an
 a wider neighbouring button, moves the resulting value. Assert ranges and consistency between what the control
 speaks and what the screen shows, not exact values. Sheets at a medium detent with background interaction pass
 `app.swipeUp()` to the content behind them. Swipe on the sheet's own list, or expand it through its grabber.
+
+## Feature 019 (A02-P01)
+
+- **Regenerate after adding a file.** XcodeGen lists source files when it generates the project. A test file added
+  afterwards is not compiled, and the scheme still passes: `t111-app-27` reported TEST SUCCEEDED without the new
+  class. Run `xcodegen generate --spec project.yml` after adding any file. The enumeration guard catches the miss.
+- **Unique package directory names.** SwiftPM and Xcode take a local package's identity from its directory name. A
+  second `Apps/<App>/Core` collided with A01's (`Core: (null)`, "Missing package product"). Name domain packages
+  `Apps/<App>/<App>Core`.
+- **Half-float writes may truncate.** GLES leaves the float-to-half rounding of color writes implementation-defined.
+  The iOS 27.2 and 26.5 simulators truncate, while uploads round to nearest. Compare GPU fields against
+  `StoragePrecision.float16` and `.float16TowardZero` references and record which mode matched; never loosen the
+  tolerance instead.
+- **`run-check` never overwrites.** Rerun under a new attempt name (`-2`, `-3`). Failed attempts stay as evidence.

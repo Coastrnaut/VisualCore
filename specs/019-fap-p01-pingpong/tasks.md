@@ -157,7 +157,7 @@ both runtimes and both storages.
   - M01, M03 and M10 are `available`, citing the new symbols.
 
   Re-render the `.md` and run `check_app_contract.py --app fluid-art-playground --render` (FR-A02-109).
-- [ ] T-A02-115 Run all checks: `check_documented_api.py --sources Apps/FluidArtPlayground`, `check_dependencies.py`,
+- [X] T-A02-115 Run all checks: `check_documented_api.py --sources Apps/FluidArtPlayground`, `check_dependencies.py`, — Verified 2026-11-11: run-check A02-P01/t115-release-fast-2: 13/13 (docs, app-contracts, compliance, dependencies, public-api, licenses, script-tests 67 OK, documented-api, isolation and host domain-package tests for fluid-art-playground and generative-art-studio). New shared tooling: scripts/check_app_isolation.py (no CVisualCoreEGL/CVisualCoreGL import or egl* call, offline unless allowed, no undeclared usage descriptions) with AppIsolationTests 3, and release_check per-app steps documented-api-*, isolation-*, host-*-core and app-*-ios27/26 (ReleaseCheckTests +1). t115-isolation PASS on Apps/FluidArtPlayground with the built app: 0 problems, no NS*UsageDescription; the dependency audit (no ProjectM) passed in every app build (FR-A02-106, FR-A02-109; analyze C1; SC-A02-105). Lessons added to docs/testing/simulator-test-lessons.md
   `check_compliance.py`, `check_licenses.py`, `validate_docs.py`, `test_scripts.py`, and the release fast steps.
   Confirm that the app has no networking, no usage descriptions and no ProjectM linkage (dependency audit). A source
   check finds no `CVisualCoreEGL` import and no `egl` call under `Apps/FluidArtPlayground` (FR-A02-106; analyze C1)

@@ -123,8 +123,45 @@ def steps(stamp: str) -> list[Step]:
     s.append(Step("release-symbols", [PY, "scripts/check_release_symbols.py", "--app", release_app]))
     # FR-F904: explicit ProjectM-independence audit of the shipping Showcase (spec, packages, imports, binary).
     s.append(Step("projectm-independence", [PY, "scripts/audit_showcase_dependencies.py", "--root", ".", "--app", release_app]))
+    s += app_domain_steps()
+    for rt in RUNTIMES:
+        s += app_test_steps(rt, stamp)
     s += app_release_steps()
     return s
+
+
+def kebab(name: str) -> str:
+    """`FluidArtPlayground` → `fluid-art-playground`."""
+    return re.sub(r"(?<=[a-z0-9])(?=[A-Z])", "-", name).lower()
+
+
+def app_dirs(root: Path = ROOT) -> list[Path]:
+    """Every app under Apps/ that has an App/ source folder."""
+    return sorted(p for p in root.glob("Apps/*") if (p / "App").is_dir())
+
+
+def app_domain_steps(root: Path = ROOT) -> list[Step]:
+    """Per app (feature 019 T-A02-115): the documented-API and isolation (no EGL, offline) checks over its sources, and
+    host tests of every GPU-free
+    domain package `Apps/<App>/<Name>Core` (packages are named `<App>Core` so SwiftPM identities never collide)."""
+    out: list[Step] = []
+    for app in app_dirs(root):
+        rel = str(app.relative_to(root))
+        out.append(Step(f"documented-api-{kebab(app.name)}", [PY, "scripts/check_documented_api.py", "--sources", rel]))
+        out.append(Step(f"isolation-{kebab(app.name)}", [PY, "scripts/check_app_isolation.py", "--app", rel]))
+        for manifest in sorted(app.glob("*/Package.swift")):
+            pkg = manifest.parent.name
+            name = kebab(pkg) if pkg.startswith(app.name) else f"{kebab(app.name)}-{kebab(pkg)}"
+            out.append(Step(f"host-{name}", ["swift", "test", "--package-path", str(manifest.parent.relative_to(root))]))
+    return out
+
+
+def app_test_steps(runtime: str, stamp: str, root: Path = ROOT) -> list[Step]:
+    """Per app with a same-named scheme in project.yml (feature 019 T-A02-115): unit and UI tests on `runtime`."""
+    spec = (root / "project.yml").read_text() if (root / "project.yml").is_file() else ""
+    schemes = set(re.findall(r"^  ([A-Za-z0-9]+):\n    build:", spec, flags=re.M))
+    return [xcode_test("VisualCore.xcodeproj", app.name, runtime, app.name, stamp, f"app-{kebab(app.name)}-{tag(runtime)}")
+            for app in app_dirs(root) if app.name in schemes]
 
 
 def app_release_steps(root: Path = ROOT) -> list[Step]:

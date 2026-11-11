@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "python3",
+    ".autonomy/logs/a02p01-t115/no_egl_check.py"
+  ],
+  "command": "python3 .autonomy/logs/a02p01-t115/no_egl_check.py",
+  "elapsed_seconds": 0.083,
+  "exit_code": 0,
+  "finished": "2026-11-11T08:09:13+00:00",
+  "log": ".autonomy/logs/A02-P01.t115-no-egl-network.log",
+  "log_sha256": "3b416863fb5bfeee887c2b520120c16e66e2095aaf162bd57381efcbdc7978df",
+  "name": "t115-no-egl-network",
+  "stage": "A02-P01",
+  "started": "2026-11-11T08:09:13+00:00",
+  "timed_out": false
+}
