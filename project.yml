@@ -103,6 +103,52 @@ targets:
         TEST_TARGET_NAME: Showcase
     dependencies:
       - target: Showcase
+  GenerativeArtStudio:
+    # A01 Generative Art Studio (feature 011 A01-P00): Phase 00 shell, no VisualCore products linked yet.
+    type: application
+    platform: iOS
+    sources:
+      - path: Apps/GenerativeArtStudio/App
+    info:
+      path: Apps/GenerativeArtStudio/Generated/Info.plist
+      properties:
+        CFBundleDisplayName: Generative Art Studio
+        CFBundleShortVersionString: "0.1.0"
+        CFBundleVersion: "1"
+        ITSAppUsesNonExemptEncryption: false
+        UILaunchScreen: {}
+        UIApplicationSceneManifest:
+          UIApplicationSupportsMultipleScenes: false
+        UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait, UIInterfaceOrientationLandscapeLeft, UIInterfaceOrientationLandscapeRight]
+        UISupportedInterfaceOrientations~ipad: [UIInterfaceOrientationPortrait, UIInterfaceOrientationPortraitUpsideDown, UIInterfaceOrientationLandscapeLeft, UIInterfaceOrientationLandscapeRight]
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: dev.visualcore.GenerativeArtStudio
+        PRODUCT_NAME: GenerativeArtStudio
+        GENERATE_INFOPLIST_FILE: NO
+        ENABLE_USER_SCRIPT_SANDBOXING: NO
+    postBuildScripts:
+      # FR-A01-006: the build fails if the app depends on ProjectM engine/preset/bridge modules.
+      - name: Dependency audit (FR-A01-006)
+        basedOnDependencyAnalysis: false
+        script: |
+          set -e
+          env -i PATH=/usr/bin:/bin:/usr/sbin:/sbin HOME="$HOME" DEVELOPER_DIR="$DEVELOPER_DIR" \
+            /usr/bin/python3 "$SRCROOT/scripts/audit_showcase_dependencies.py" --root "$SRCROOT" --spec project.yml \
+            --target GenerativeArtStudio --sources Apps/GenerativeArtStudio --app "$TARGET_BUILD_DIR/$WRAPPER_NAME"
+  GenerativeArtStudioUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources: [Apps/GenerativeArtStudio/Tests/UI]
+    info:
+      path: Apps/GenerativeArtStudio/Generated/UITests-Info.plist
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: dev.visualcore.GenerativeArtStudioUITests
+        GENERATE_INFOPLIST_FILE: NO
+        TEST_TARGET_NAME: GenerativeArtStudio
+    dependencies:
+      - target: GenerativeArtStudio
 schemes:
   Showcase:
     build:
@@ -112,3 +158,10 @@ schemes:
         ShowcaseUITests: [test]
     test:
       targets: [ShowcaseTests, ShowcaseUITests]
+  GenerativeArtStudio:
+    build:
+      targets:
+        GenerativeArtStudio: all
+        GenerativeArtStudioUITests: [test]
+    test:
+      targets: [GenerativeArtStudioUITests]
