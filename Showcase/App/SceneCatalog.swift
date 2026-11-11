@@ -36,7 +36,14 @@ struct SceneDescriptor: Identifiable {
 
 enum SceneCatalog {
     /// Scenes in display order (FR-F603: at least five).
-    @MainActor static var all: [SceneDescriptor] { [] }
+    @MainActor static var all: [SceneDescriptor] {
+        [
+            SceneDescriptor(id: "gradient-texture", title: "Shader Gradient and Texture",
+                            summary: "Shaders loaded from bundled files with an include, plus a bundled texture.",
+                            accessibilityDescription: "Left half: a slowly shifting rainbow gradient. Right half: a gray checkerboard texture.",
+                            interactionHint: "No touch interaction. Use diagnostics to inspect the renderer.") { GradientTextureScene(settings: $0) },
+        ]
+    }
 
     /// Problems with a catalog: duplicate or malformed ids and empty texts.
     static func problems(_ scenes: [SceneDescriptor]) -> [String] {

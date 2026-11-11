@@ -1,0 +1,32 @@
+{
+  "argv": [
+    "xcodebuild",
+    "test",
+    "-project",
+    "VisualCore.xcodeproj",
+    "-scheme",
+    "Showcase",
+    "-destination",
+    "platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D",
+    "-derivedDataPath",
+    "Build/DerivedData/Showcase",
+    "-resultBundlePath",
+    ".autonomy/xcresults/F06-t605-20261110-201108.xcresult",
+    "-test-timeouts-enabled",
+    "YES",
+    "-default-test-execution-time-allowance",
+    "180",
+    "CODE_SIGNING_ALLOWED=NO",
+    "-only-testing:ShowcaseTests"
+  ],
+  "command": "xcodebuild test -project VisualCore.xcodeproj -scheme Showcase -destination 'platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D' -derivedDataPath Build/DerivedData/Showcase -resultBundlePath .autonomy/xcresults/F06-t605-20261110-201108.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 180 CODE_SIGNING_ALLOWED=NO -only-testing:ShowcaseTests",
+  "elapsed_seconds": 5.887,
+  "exit_code": 0,
+  "finished": "2026-11-11T01:11:14+00:00",
+  "log": ".autonomy/logs/F06.t605-gradient-texture.log",
+  "log_sha256": "b9b8db166be024406ddaaa5856b00e7cf6e25a26dbf527ef37e8ea9bae703c71",
+  "name": "t605-gradient-texture",
+  "stage": "F06",
+  "started": "2026-11-11T01:11:08+00:00",
+  "timed_out": false
+}

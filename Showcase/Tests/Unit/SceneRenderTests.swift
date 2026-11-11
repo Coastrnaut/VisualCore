@@ -1,0 +1,60 @@
+// SceneRenderTests — feature 007 hosted pixel tests per scene (analyze remediation U1).
+import CVisualCoreGL
+import XCTest
+import VisualCoreRendering
+@testable import Showcase
+
+@MainActor
+enum SceneTestSupport {
+    /// Renders `frames` frames of a scene in a 64×32-point host and returns (pixels bottom-up, width, height, host).
+    static func render(_ scene: ShowcaseRenderScene, frames: Int = 2, size: CGSize = CGSize(width: 64, height: 32)) throws
+        -> (pixels: [UInt8], width: Int, height: Int, host: RenderHost) {
+        let host = try RenderHost(scene: scene)
+        host.view.frame = CGRect(origin: .zero, size: size)
+        host.view.layoutIfNeeded()
+        for _ in 0..<frames { _ = host.renderOneFrame(present: false) }
+        return (host.readPixels(), host.pixelSize.width, host.pixelSize.height, host)
+    }
+
+    static func px(_ p: [UInt8], _ w: Int, _ x: Int, _ y: Int) -> SIMD4<Int> {
+        let i = (y * w + x) * 4
+        return SIMD4(Int(p[i]), Int(p[i + 1]), Int(p[i + 2]), Int(p[i + 3]))
+    }
+
+    static func settings(injectShaderError: Bool = false, reduceMotion: Bool = false) -> ShowcaseSettings {
+        let d = UserDefaults(suiteName: "showcase.tests.\(UUID().uuidString)")!
+        d.set(reduceMotion, forKey: "uitestReduceMotion")
+        d.set(injectShaderError, forKey: "showcaseInjectShaderError")
+        return ShowcaseSettings(defaults: d)
+    }
+}
+
+@MainActor
+final class SceneRenderTests: XCTestCase {
+    func testGradientAndCheckerTextureAreVisible() throws {
+        let scene = GradientTextureScene(settings: SceneTestSupport.settings())
+        let r = try SceneTestSupport.render(scene)
+        XCTAssertNil(scene.errorMessage)
+        XCTAssertEqual(scene.status, "shader=gradient.frag texture=64x64")
+        // Left half: saturated hue gradient.
+        let left = SceneTestSupport.px(r.pixels, r.width, r.width / 4, r.height / 2)
+        XCTAssertGreaterThan(max(left.x, left.y, left.z) - min(left.x, left.y, left.z), 100, "saturated color \(left)")
+        // Right half: alternating light and dark checker cells along a row.
+        let row = (r.width / 2 + 2..<r.width - 2).map { SceneTestSupport.px(r.pixels, r.width, $0, r.height / 2).x }
+        XCTAssertTrue(row.contains { $0 > 200 } && row.contains { $0 < 70 }, "checker light and dark cells present")
+        r.host.destroy()
+        XCTAssertEqual(r.host.resources.stats.leaked, 0)
+    }
+
+    func testInjectedShaderErrorNamesFileAndLineAndRetryRecovers() throws {
+        let scene = GradientTextureScene(settings: SceneTestSupport.settings(injectShaderError: true))
+        let r = try SceneTestSupport.render(scene)
+        let message = try XCTUnwrap(scene.errorMessage)
+        XCTAssertTrue(message.hasPrefix("broken.frag:5:"), message)
+        scene.retry()
+        _ = r.host.renderOneFrame(present: false)
+        XCTAssertNil(scene.errorMessage)
+        XCTAssertEqual(scene.status, "shader=gradient.frag texture=64x64")
+        r.host.destroy()
+    }
+}

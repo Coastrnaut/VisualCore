@@ -174,12 +174,14 @@ public final class ResourceRegistry {
 
     /// Expands, compiles and links a program. A failure throws diagnostics and never touches any
     /// program the caller already holds (FR-F305).
+    /// `vertexName`/`fragmentName` label diagnostics (e.g. bundled file names, feature 007 T-F605).
     public func program(vertex: String, fragment: String, defines: [String: String] = [:],
-                        library: ShaderLibrary = ShaderLibrary()) throws -> ShaderProgram {
+                        library: ShaderLibrary = ShaderLibrary(),
+                        vertexName: String = "vertex", fragmentName: String = "fragment") throws -> ShaderProgram {
         let v: ExpandedShader, f: ExpandedShader
         do {
-            v = try library.expand(source: vertex, named: "vertex", defines: defines)
-            f = try library.expand(source: fragment, named: "fragment", defines: defines)
+            v = try library.expand(source: vertex, named: vertexName, defines: defines)
+            f = try library.expand(source: fragment, named: fragmentName, defines: defines)
         } catch {
             ledger.noteShaderFailure()
             throw ShaderError.source(error)
