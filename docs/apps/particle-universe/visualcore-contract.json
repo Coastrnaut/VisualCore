@@ -692,7 +692,7 @@
       "The simulation stays on the CPU (deterministic, bounded) and only drawing uses the GPU, because the OpenGL ES path offers no compute shaders (research R1); counts are capped and tiered (risk 3), additive blending gets a reduced-flash cap (risk 2), and instanced drawing is already proven by A01 (risk 1).",
       "Reference regression baseline recorded green 7/7 (T-A04-003) and the empty shell builds and passes its smoke test on both simulator runtimes (T-A04-005).",
       "Phase 01 starts with G-SIMSTEP and G-EMITTERS in VisualCoreSimulation and the app's seeded scene model.",
-      "A04-P01: a seeded, GPU-free particle domain — four emitter families with bounded counts on VisualCore's new emitter shapes and bursts (G-EMITTERS), a versioned validated ParticleScene, and VisualCore's FixedStepRunner (G-SIMSTEP) with a committed replay fixture that is bit-exact on host and both simulators; the sandbox shows a CPU preview with live and dropped counts, play/pause/step and new seed."
+      "A04-P01: a seeded, GPU-free particle domain — four emitter families with bounded counts on VisualCore's new emitter shapes and bursts (G-EMITTERS), a versioned validated ParticleScene, and VisualCore's FixedStepRunner (G-SIMSTEP) with a committed replay fixture that is bit-exact on host and both simulators; the sandbox shows a CPU preview with live and dropped counts, play/pause/step and new seed; ProjectM regression 7/7 after the VisualCore change (one noise-floor retry recorded)."
     ],
     "blockers": []
   }

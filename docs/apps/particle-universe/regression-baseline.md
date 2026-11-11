@@ -28,3 +28,25 @@ python3 scripts/release_check.py --only reference-test-anglerendering-ios27 refe
 
 **7/7 pass.** These are simulator results: a regression baseline, not device evidence. Any VisualCore change made for
 Particle Universe (gaps G-EMITTERS, G-FIELDS, G-PQUALITY, G-BLENDTRAIL) reruns these steps (constitution A04).
+
+## A04-P01 rerun after `EmitterShape`, `EmitterBurst`, `Emitter.radial`/`clamped()` and `FixedStepRunner` (2026-11-11)
+
+`A04-P01/t113-reference-a` 3/3 (pin `d93edd1` unchanged) and `t113-reference-b-2` 4/4: **7/7 pass**.
+
+The first chunk-B attempt, `t113-reference-b`, failed one step: `projectm-reference-ios27`
+`BaselineComparisonTests.testSquarePresetMatchesTheReferenceSequence`. Its within-8 score was 0.9705 against a required
+value of max(0.95, floor − 0.01). That run's engine noise floor was unusually high (0.9835), which set the requirement
+at 0.9735.
+
+The criterion is relative to the engine's own run-to-run noise: recorded floors span 96.9–99.1% (SC-F702 amendment,
+feature 008). The ProjectM path does not use the particle simulation that changed here. The unchanged rerun passed
+(within-8 0.9738, floor 0.9778, required ≥ 0.9678). The failed attempt stays in the ledger; the criterion was not
+changed.
+
+Further checks:
+- A01 (`t113-build-GenerativeArtStudio`) and A02 (`t113-build-FluidArtPlayground`) build for testing from clean
+  derived data.
+- VisualCoreRendering package tests pass on iOS 27.2 and 26.5 (`t113-rendering-27`, `t113-rendering-26`; enumeration
+  149/149 each).
+- The VisualCore host suite passes, including the baselines (`t104-visualcore-2`, `t105-visualcore`).
+- A01's `ParticleReplay` is unchanged (`t104-a01-core`).

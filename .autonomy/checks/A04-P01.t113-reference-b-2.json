@@ -1,0 +1,25 @@
+{
+  "argv": [
+    "python3",
+    "scripts/release_check.py",
+    "--only",
+    "reference-test-anglerendering-ios27",
+    "reference-test-anglerendering-ios26",
+    "projectm-reference-ios27",
+    "projectm-reference-ios26",
+    "--log-dir",
+    ".autonomy/logs/A04-P01-t113b2",
+    "--json",
+    ".autonomy/logs/A04-P01-t113b2.json"
+  ],
+  "command": "python3 scripts/release_check.py --only reference-test-anglerendering-ios27 reference-test-anglerendering-ios26 projectm-reference-ios27 projectm-reference-ios26 --log-dir .autonomy/logs/A04-P01-t113b2 --json .autonomy/logs/A04-P01-t113b2.json",
+  "elapsed_seconds": 18.456,
+  "exit_code": 0,
+  "finished": "2026-11-11T17:25:51+00:00",
+  "log": ".autonomy/logs/A04-P01.t113-reference-b-2.log",
+  "log_sha256": "16896d1358e9f627d24ee32fa07117c32e938948387a0a99c31f957d15fd02c6",
+  "name": "t113-reference-b-2",
+  "stage": "A04-P01",
+  "started": "2026-11-11T17:25:33+00:00",
+  "timed_out": false
+}
