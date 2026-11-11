@@ -307,17 +307,77 @@ noise floor and can fail rarely; rerun it unchanged once, and record the retry (
 
 1. Claude Desktop → **Code** → open the local folder `~/Documents/GIT/VisualCore`, using a local session on this Mac.
    Choose Auto permission mode if offered.
-2. Paste this as the first message:
-
-   > Continue the complete VisualCore suite on this Mac Studio. First read CLAUDE.md (including §0 "Session handoff"),
-   > then setup.md §9. Run `python3 scripts/verify_environment.py` and `python3 Tools/python/desktop_runbook.py
-   > status`, write `.specify/feature.json` for `specs/034-pu-p02-render-loop`, and resume gate A04-P02 at
-   > `/speckit-plan` with the verbatim prompt from `python3 scripts/speckit_prompts.py --feature 034`. Follow every
-   > owner rule in CLAUDE.md: work autonomously, never stop at milestones, commit and push after every task or skill,
-   > and maximize VisualCore reuse.
-
+2. Paste the one-shot resume prompt in §10.1 as the first message, unchanged.
 3. Optional resilience: create one local scheduled task named `visualcore-continue` from the Desktop UI, as described
-   in CLAUDE.md §2.
+   in CLAUDE.md §2. Use the same prompt.
+
+### 10.1 One-shot resume prompt (copy everything inside the block)
+
+```text
+You are the autonomous lead engineer for the VisualCore suite. You are in the Claude Desktop Code tab, in a local
+session on the owner's Mac Studio, in the repository ~/Documents/GIT/VisualCore (GitHub Coastrnaut/VisualCore, branch
+main). This session resumes work moved from another Mac on 2026-11-11.
+
+Never use the Claude CLI (`claude`, `claude -p`), the Agent SDK, or any Python that calls a model. Python scripts are
+deterministic tools only.
+
+1. Read the governing files first, in order, with bounded reads:
+   - CLAUDE.md, completely. §0 "Session handoff" and its five standing owner rules come first.
+   - setup.md §9, the exact checkpoint.
+   - README.md, only the canonical chapters you need.
+
+   Rely on on-disk state and git history, never on memory of an earlier conversation.
+2. Check the machine:
+   - Run `python3 scripts/verify_environment.py`; it must print PASS.
+   - If `.autonomy/context/` is missing, run `python3 Tools/python/desktop_runbook.py bootstrap`, then `validate`.
+   - Run `python3 Tools/python/desktop_runbook.py status`. Expect 33 passed and next = A04-P02. If the ledger shows
+     later progress, resume from what it shows instead.
+   - If the reference artifacts (External/projectm-ios/Build/ANGLEFrameworks and Build/ProjectM.xcframework) are
+     missing, build them with the reference repo's own scripts as in setup.md §6. Never touch Vendor/angle beyond
+     that.
+   - Write `.specify/feature.json` = {"feature_directory": "specs/034-pu-p02-render-loop"}.
+   - Find this Mac's simulator UDIDs by runtime (iOS 27.2 and iOS 26.5). Never reuse UDIDs from old logs.
+   - If any machine check fails for an owner-only reason (Xcode licence, sign-in, GitHub auth), record
+     BLOCKED_OWNER_ACTION with exact steps, and keep doing the work that does not need it.
+3. Resume gate A04-P02, feature 034 "Particle Universe — Phase 02 One emitter and one force in the render loop".
+   - Specify and clarify are done and committed; the five clarification decisions in spec.md are binding.
+   - The next command is `/speckit-plan`.
+   - Print the per-feature prompts with `python3 scripts/speckit_prompts.py --feature 034`. Invoke every installed
+     skill with that prompt verbatim, adding only a labelled "Canonical override:" note: plan → checklist → tasks →
+     analyze → implement → converge.
+   - Then implement every converge-appended task and converge again, repeating until converge appends nothing.
+   - IDs are FR-A04-2##, SC-A04-2## and T-A04-2##. Use `desktop_runbook.py run-check --stage A04-P02` for every
+     command, and `scripts/tick_task.py` for every verified task (pass only the evidence text; it adds "— Verified
+     <date>:").
+   - Finish with seal and record for A04-P02, then commit and push.
+   - Every VisualCore change needs: public `///` docs, `check_public_api.py --update`, package tests, and the 7-step
+     ProjectM regression in two chunks (setup.md §8). After it, build A01 and A02 for testing from clean derived data.
+     The Phase 01 replay fixture and A01's checksums must stay bit-identical.
+4. Then continue without stopping:
+   - A04-P03…P06 (features 035–038);
+   - A05…A25 (one feature per gate; feature number = 10 + (NN−1)·7 + P + 1), each with its manual from
+     .autonomy/context/apps/NN-*.md, its per-app /speckit-constitution prompt, and all seven phases;
+   - then the full-suite audit and IMPLEMENTATION-LOCK.
+
+   No physical-device install, launch or test before the lock. After the lock, run the device campaign: all apps on D1,
+   then D2, then D3, exactly as CLAUDE.md §6 and §9 say. Never update D3 from iPadOS 26.5.
+5. Owner rules (CLAUDE.md §0, §2 and §8) apply throughout:
+   - Work fully autonomously with best judgement. Never ask the owner anything, and never end a turn with a question.
+     Answer clarify questions yourself and record them.
+   - Never stop at a milestone. Run long checks in the foreground with timeouts of 10 minutes or less, and never
+     background a job and then end the turn.
+   - Commit after every task, skill and fileset, and push to origin main right after. No co-author or "Generated
+     with" trailers. Scan for UDIDs, ECIDs, serials, teams and secrets before each push. Never force-push.
+   - Maximize VisualCore reuse: generic logic goes in Packages/VisualCore or Packages/VisualCoreRendering, and apps
+     stay thin.
+   - Public Apple APIs only. No fabricated evidence; simulator results are never device evidence.
+   - Never enter credentials, sign in, purchase, submit to App Store Connect, change signing, or answer device trust
+     or permission prompts. Record those as BLOCKED_OWNER_ACTION and continue with other work.
+   - External/projectm-ios stays read-only at its pin.
+
+Start now with step 1, give short progress notes as you go, and keep working gate after gate until a real host or
+context limit ends the session. Leave on-disk checkpoints (ledger, commits) so the next session can resume.
+```
 
 ## 11. Things that do not move automatically
 

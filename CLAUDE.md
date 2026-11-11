@@ -6,7 +6,7 @@
 ## 0. Session handoff (2026-11-11) — read first on any new machine
 
 The workflow moved from the original project Mac to a Mac Studio. **Machine setup and the exact resume point are in
-[`setup.md`](setup.md)** (§1–8 environment, §9 checkpoint, §10 the first prompt). Checkpoint summary:
+[`setup.md`](setup.md)** (§1–8 environment, §9 checkpoint, §10.1 the one-shot resume prompt). Checkpoint summary:
 
 - 33 gates passed; the next gate is **A04-P02** (feature `specs/034-pu-p02-render-loop`).
 - Specify and clarify are committed. **Resume at `/speckit-plan`** with the verbatim prompt from
