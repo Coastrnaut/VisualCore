@@ -43,3 +43,10 @@ T-F601 → T-F602 (needs project.yml) and T-F603 (independent) → T-F604 → T-
 ## Implementation Strategy
 
 MVP = shell + audit + scene 1. Each scene lands with its own build and simulator screenshot check; the smoke test then covers all of them together.
+
+## Phase 6: Convergence
+
+- [ ] T-F614 Run `scripts/audit_showcase_dependencies.py` as a post-build script of the `Showcase` target in `project.yml` (on the built app; a finding fails the build before any test runs), verified by a clean build and by a deliberately contaminated temporary import that makes the build fail per FR-F610 (partial)
+- [ ] T-F615 Show a visible, labelled error view in `Showcase/App/SceneHostView.swift` whenever the scene's render host cannot be created, with a hosted test per spec Edge Cases: rendering unavailable (partial)
+- [ ] T-F616 Add a hosted test that `SceneHost` refreshes its diagnostics snapshot at least twice per second from its own timer per FR-F607 / US4 AC1 (partial)
+- [ ] T-F617 Sync the plan's source listing (SceneHost.swift, stripes.frag, SceneHostTests/SceneRenderTests/ShowcaseSmokeUITests, no Assets.xcassets) with the code per plan: project structure (partial)
