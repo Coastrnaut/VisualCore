@@ -41,8 +41,9 @@ following were checked in code:
   The playground writes captures through it (`tmp/Captures`), and the app empties it at launch. A01 keeps its own
   `LaunchCleanup` for this gate; switching A01 to the helper is recorded as reuse debt in the contract. Changing a
   sealed app's tested code is outside this gate.
-- Q: How is the app icon produced, and how is its provenance checked? → A: Through the deterministic test mode: seed
-  3, the Glowing dye palette, 90 frames, rendered offscreen at 1024×1024 through `RenderHost.renderOffscreen` and
+- Q: How is the app icon produced, and how is its provenance checked? → A: Through the deterministic test mode in its gentle setting (default force and splat
+  cap, 3 pointers at 500 pt/s; the stress settings wash the picture out to white): seed 3, the Glowing dye
+  palette, 90 frames, rendered offscreen at 1024×1024 through `RenderHost.renderOffscreen` and
   encoded with `StillImageEncoder`. `IconRenderTests` writes it once (with `FAP_WRITE_ICON=1`) and otherwise
   compares a fresh render with the committed PNG (mean ≤ 1/255), as A01 does.
 - Q: Where is the Acknowledgements screen reached? → A: From a home-screen link "Acknowledgements"

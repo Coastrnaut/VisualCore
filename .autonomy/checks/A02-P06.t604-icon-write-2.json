@@ -1,0 +1,32 @@
+{
+  "argv": [
+    "xcodebuild",
+    "test",
+    "-project",
+    "VisualCore.xcodeproj",
+    "-scheme",
+    "FluidArtPlayground",
+    "-destination",
+    "platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D",
+    "-derivedDataPath",
+    "Build/DerivedData/FluidArtPlayground",
+    "-resultBundlePath",
+    ".autonomy/xcresults/a02p06-t604-write-2.xcresult",
+    "-test-timeouts-enabled",
+    "YES",
+    "-default-test-execution-time-allowance",
+    "300",
+    "-only-testing:FluidArtPlaygroundTests/IconRenderTests",
+    "CODE_SIGNING_ALLOWED=NO"
+  ],
+  "command": "xcodebuild test -project VisualCore.xcodeproj -scheme FluidArtPlayground -destination 'platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D' -derivedDataPath Build/DerivedData/FluidArtPlayground -resultBundlePath .autonomy/xcresults/a02p06-t604-write-2.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 300 -only-testing:FluidArtPlaygroundTests/IconRenderTests CODE_SIGNING_ALLOWED=NO",
+  "elapsed_seconds": 6.304,
+  "exit_code": 0,
+  "finished": "2026-11-11T11:23:19+00:00",
+  "log": ".autonomy/logs/A02-P06.t604-icon-write-2.log",
+  "log_sha256": "88d731daa9b8abbaebdaa02a007f1ff931597b1eb8d48f3efee758f65a654c91",
+  "name": "t604-icon-write-2",
+  "stage": "A02-P06",
+  "started": "2026-11-11T11:23:13+00:00",
+  "timed_out": false
+}

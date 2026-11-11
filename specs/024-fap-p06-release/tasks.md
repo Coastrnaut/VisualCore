@@ -62,7 +62,7 @@ IDs are `T-A02-6##`, with one commit per task (`scripts/tick_task.py`). Commands
 
 ## Phase 3: User Story 2 — release package (P1)
 
-- [ ] T-A02-604 [US2] App icon and version:
+- [X] T-A02-604 [US2] App icon and version: — Verified 2026-11-11: — Verified 2026-11-11: icon-1024.png = the app's own render (TestMode gentle setting: default force/cap, 3 pointers at 500 pt/s, seed 3, Glowing dye, 90 frames, offscreen 1024^2, opaque; the first write with the stress settings was washed out white and was replaced — t604-icon-write then t604-icon-write-2; viewed); IconRenderTests provenance mean 0.0 max 0 on iOS 27.2 and 26.5 (run-check A02-P06/t604-icon-ios27, t604-icon-ios26, with DeterminismTests still green); project.yml: Resources, ASSETCATALOG_COMPILER_APPICON_NAME AppIcon, 1.0.0 (1); the built app has CFBundleIconName AppIcon and Assets.car
   - Add `Apps/FluidArtPlayground/Tests/Unit/IconRenderTests.swift`: test mode, seed 3, palette `glow`, 90 frames,
     hosted at 390×844, then paused, `renderOffscreen(1024, 1024)` and `StillImageEncoder.pngData`. With
     `FAP_WRITE_ICON=1` (`TEST_RUNNER_FAP_WRITE_ICON`) it writes the PNG; otherwise it compares with the committed

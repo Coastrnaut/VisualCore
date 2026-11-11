@@ -19,21 +19,25 @@ enum TestMode {
         var speed = 1_200.0
     }
 
-    /// The configuration of a test-mode run: the seed for the dye pattern, maximum force and splat cap
-    /// (aggressive by design), every other value the default.
-    static func configuration(seed: UInt64, base: FluidConfiguration = FluidConfiguration()) -> FluidConfiguration {
+    /// The configuration of a test-mode run: the seed for the dye pattern and, when `aggressive` (the stress
+    /// default), maximum force and splat cap; every other value comes from `base`.
+    static func configuration(seed: UInt64, base: FluidConfiguration = FluidConfiguration(),
+                              aggressive: Bool = true) -> FluidConfiguration {
         var c = base
         c.seed = seed == 0 ? 1 : seed
-        c.forceScale = FluidConfiguration.forceScaleRange.upperBound
-        c.maxSplatsPerFrame = FluidConfiguration.splatsPerFrameRange.upperBound
+        if aggressive {
+            c.forceScale = FluidConfiguration.forceScaleRange.upperBound
+            c.maxSplatsPerFrame = FluidConfiguration.splatsPerFrameRange.upperBound
+        }
         return c
     }
 
     /// A playground model in the test mode: fixed 1/60 s steps, the quality tier pinned to Full (nominal thermal
     /// state, no Low Power Mode, a frozen clock) and the seeded synthetic gesture script fed once per stepped frame.
     static func makeModel(seed: UInt64, script: Script = Script(), base: FluidConfiguration = FluidConfiguration(),
-                          viewSize: CGSize, forceFallback: Bool = false) -> PlaygroundModel {
-        let model = PlaygroundModel(configuration: configuration(seed: seed, base: base), forceFallback: forceFallback)
+                          aggressive: Bool = true, viewSize: CGSize, forceFallback: Bool = false) -> PlaygroundModel {
+        let model = PlaygroundModel(configuration: configuration(seed: seed, base: base, aggressive: aggressive),
+                                    forceFallback: forceFallback)
         if let host = model.host {
             host.view.frame = CGRect(origin: .zero, size: viewSize)
             host.view.layoutIfNeeded()
