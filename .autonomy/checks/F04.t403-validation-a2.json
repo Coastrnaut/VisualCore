@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/VisualCore",
+    "--filter",
+    "VisualCoreEffectsGraphTests"
+  ],
+  "command": "swift test --package-path Packages/VisualCore --filter VisualCoreEffectsGraphTests",
+  "elapsed_seconds": 3.214,
+  "exit_code": 0,
+  "finished": "2026-11-11T00:17:34+00:00",
+  "log": ".autonomy/logs/F04.t403-validation-a2.log",
+  "log_sha256": "b8325f9adb5831467605c89b5122556bfa8d18b6e3569e42334e639c44f6af3e",
+  "name": "t403-validation-a2",
+  "stage": "F04",
+  "started": "2026-11-11T00:17:30+00:00",
+  "timed_out": false
+}

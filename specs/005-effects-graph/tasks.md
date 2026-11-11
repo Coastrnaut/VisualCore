@@ -15,7 +15,7 @@ IDs `T-F4##`. One commit + push per task. Effects implemented one at a time (arc
 ## Phase 2: Foundational (pure)
 
 - [ ] T-F402 (FR-F401–F404, SC-F401) Tests + JSON fixtures `Packages/VisualCore/Tests/VisualCoreEffectsGraphTests/ValidationTests.swift`: valid chain order, tie-break, every rejection case, memory estimate incl. feedback, Codable round-trip, parameter clamping to schema ranges, unknown parameter keys warned
-- [ ] T-F403 Implement `EffectGraph.swift`, `PassSchemas.swift`, `EffectGraphValidation.swift` in `VisualCoreEffectsGraph`
+- [X] T-F403 Implement `EffectGraph.swift`, `PassSchemas.swift`, `EffectGraphValidation.swift` in `VisualCoreEffectsGraph` — Verified 2026-11-10: F04.t403-validation-a2 exit 0: 9 validation tests pass (a1 = test helper label mismatch, kept)
 - [ ] T-F404 (FR-F409, SC-F403) Tests `FlashLimiterModelTests.swift`: 30 Hz strobe over 1 s changes displayed mean ≤ 0.3; steady input converges; gain bounded
 - [ ] T-F405 Implement `FlashLimiterModel.swift`
 
