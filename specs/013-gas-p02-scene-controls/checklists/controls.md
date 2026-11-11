@@ -14,45 +14,47 @@ rule. Depth: phase gate. Audience: reviewer.
 
 ## Requirement Completeness
 
-- [ ] CHK001 Are the panel's elements (title, value, unit, constrained control, per-parameter and global reset) all specified? [Completeness, Spec §FR-A01-201]
-- [ ] CHK002 Are preset, palette and seed selection each specified with their effect on the composition? [Completeness, Spec §FR-A01-203]
-- [ ] CHK003 Are all three outcomes of opening composition data (corrupt, future version, correctable) defined? [Completeness, Spec §FR-A01-205]
+- [x] CHK001 Are the panel's elements (title, value, unit, constrained control, per-parameter and global reset) all specified? [Completeness, Spec §FR-A01-201]
+- [x] CHK002 Are preset, palette and seed selection each specified with their effect on the composition? [Completeness, Spec §FR-A01-203]
+- [x] CHK003 Are all three outcomes of opening composition data (corrupt, future version, correctable) defined? [Completeness, Spec §FR-A01-205]
 
 ## Requirement Clarity
 
-- [ ] CHK004 Is the reset target defined as the preset baseline rather than the schema defaults? [Clarity, Spec §Clarifications]
-- [ ] CHK005 Are the time bounds, speed bounds, wrap behavior and per-frame cap quantified? [Clarity, Spec §Clarifications, §Edge Cases]
-- [ ] CHK006 Is "immediate preview" quantified as "by the next rendered frame"? [Clarity, Spec §FR-A01-202]
+- [x] CHK004 Is the reset target defined as the preset baseline rather than the schema defaults? [Clarity, Spec §Clarifications]
+- [x] CHK005 Are the time bounds, speed bounds, wrap behavior and per-frame cap quantified? [Clarity, Spec §Clarifications, §Edge Cases]
+- [x] CHK006 Is "immediate preview" quantified as "by the next rendered frame"? [Clarity, Spec §FR-A01-202]
 
 ## Architecture Ownership
 
-- [ ] CHK007 Is each reusable piece (clock, editor, panel) assigned to a named VisualCore module, with its obligations? [Consistency, Spec §FR-A01-206, Constitution II]
-- [ ] CHK008 Is it explicit that controls never create a render host or rebuild shaders? [Completeness, Spec §FR-A01-202, §Edge Cases]
+- [x] CHK007 Is each reusable piece (clock, editor, panel) assigned to a named VisualCore module, with its obligations? [Consistency, Spec §FR-A01-206, Constitution II]
+- [x] CHK008 Is it explicit that controls never create a render host or rebuild shaders? [Completeness, Spec §FR-A01-202, §Edge Cases]
 
 ## Privacy and Input Safety
 
-- [ ] CHK009 Is the launch-data path limited (DEBUG only, size cap, untrusted) so it cannot become a shipping input channel? [Coverage, Spec §Clarifications]
-- [ ] CHK010 Are offline, no-permission and no-ProjectM constraints restated? [Consistency, Spec §FR-A01-208]
+- [x] CHK009 Is the launch-data path limited (DEBUG only, size cap, untrusted) so it cannot become a shipping input channel? [Coverage, Spec §Clarifications]
+- [x] CHK010 Are offline, no-permission and no-ProjectM constraints restated? [Consistency, Spec §FR-A01-208]
 
 ## Lifecycle and Edge Cases
 
-- [ ] CHK011 Is the behavior after returning from the background (no time jump) specified? [Edge Case, Spec §Clarifications]
-- [ ] CHK012 Is particle-family behavior on seed or palette change defined deterministically? [Edge Case, Spec §Edge Cases]
-- [ ] CHK013 Is data left unmodified when opening fails? [Exception Flow, Spec §FR-A01-205]
+- [x] CHK011 Is the behavior after returning from the background (no time jump) specified? [Edge Case, Spec §Clarifications]
+- [x] CHK012 Is particle-family behavior on seed or palette change defined deterministically? [Edge Case, Spec §Edge Cases]
+- [x] CHK013 Is data left unmodified when opening fails? [Exception Flow, Spec §FR-A01-205]
 
 ## Accessibility
 
-- [ ] CHK014 Are VoiceOver label, value, increment/decrement and reset labelling specified for every control? [Coverage, Spec §FR-A01-207]
-- [ ] CHK015 Is Reduce Motion's effect on playback, scrub and pause each defined? [Clarity, Spec §US2/AC4]
+- [x] CHK014 Are VoiceOver label, value, increment/decrement and reset labelling specified for every control? [Coverage, Spec §FR-A01-207]
+- [x] CHK015 Is Reduce Motion's effect on playback, scrub and pause each defined? [Clarity, Spec §US2/AC4]
 
 ## Testability, Performance and Release
 
-- [ ] CHK016 Do the success criteria name exact counts (20 parameters, 4 families, 3 failure classes, both runtimes)? [Measurability, Spec §SC-A01-201–205]
-- [ ] CHK017 Is it stated that no device-performance claim is made for live control changes? [Non-Functional, Spec §Assumptions]
-- [ ] CHK018 Are deferred items (saving, export, canvas gestures, iPad inspector) named with their phases? [Scope, Spec §Assumptions, §Clarifications]
-- [ ] CHK019 Is the VisualCore contract update (G-CLOCK closed) required and verifiable? [Traceability, Spec §FR-A01-209]
+- [x] CHK016 Do the success criteria name exact counts (20 parameters, 4 families, 3 failure classes, both runtimes)? [Measurability, Spec §SC-A01-201–205]
+- [x] CHK017 Is it stated that no device-performance claim is made for live control changes? [Non-Functional, Spec §Assumptions]
+- [x] CHK018 Are deferred items (saving, export, canvas gestures, iPad inspector) named with their phases? [Scope, Spec §Assumptions, §Clarifications]
+- [x] CHK019 Is the VisualCore contract update (G-CLOCK closed) required and verifiable? [Traceability, Spec §FR-A01-209]
 
 ## Notes
 
+- Reviewed 2026-11-10 under the owner's delegation (CLAUDE.md §2): 19/19 satisfied by the spec as clarified (no fixes
+  needed: reset target, time bounds, launch-data limits and deferrals are recorded in Clarifications and Assumptions).
 - Generated unchecked. The reviewer marks items `[x]` when satisfied. `/speckit-implement` reads the markers but
   does not change them.
