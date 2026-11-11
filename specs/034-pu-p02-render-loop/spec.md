@@ -27,6 +27,79 @@ Canonical overrides:
 - **Out of scope here:** trails and blending options (Phase 03), multiple emitters in the UI and the scene editor
   (Phases 03–04), saving scenes (Phase 04), and profiling numbers (Phase 05).
 
+## Clarifications
+
+### Session 2026-11-11
+
+Answered autonomously under the owner's standing approval (CLAUDE.md §2), choosing the recommended option each time.
+Facts checked in code:
+- `ParticleForce` has `gravity`, `drag` and `attractor` (constant pull within a radius, skipped within 1e-9 of the
+  center); the Phase 01 replay fixture uses `attractor`.
+- `QualityPolicy` (VisualCoreDiagnostics) steps tiers by `FramePacing.Thermal` and Low Power Mode with hysteresis. A02
+  reads `ProcessInfo` thermal state and Low Power Mode itself, through an app-local seam.
+- `ParticleRenderer` draws instanced quads with premultiplied alpha through a `ResourceRegistry`.
+- `RenderHost.renderOffscreen(width:height:time:)` returns a `StillImage`.
+- A01's `ParticlesArtScene` is an app-local `RenderScene` around `ParticleRenderer`.
+
+- Q: How are the new forces added to VisualCore, and what are their bounds? → A: `ParticleForce` gains four cases:
+  - `.repulsor(point:strength:radius:)`: a push away from the point with linear falloff to 0 at the radius,
+    |a| ≤ strength;
+  - `.gravityWell(point:strength:softening:)`: a = s·d/(|d|²+ε²)^{3/2}, so
+    |a| ≤ 2s/(3√3·ε²);
+  - `.wind(velocity:rate:)`: a = rate·(w − v);
+  - `.vortex(point:strength:radius:)`: a tangential push (counter-clockwise for a positive strength) with linear
+    falloff, |a| ≤ |strength|.
+
+  At the exact center the direction is undefined, so repulsor, gravity well and vortex give 0 there.
+  `ParticleForce.clamped()` maps non-finite values to 0 and clamps:
+  - strength: ±10,000, or 0…1e9 for the gravity well;
+  - radius: 1…2,000;
+  - softening: 1…500;
+  - rate: 0…10;
+  - wind speed: ≤ 2,000.
+
+  The system steps with clamped forces. The existing cases are unchanged for valid values, so A01 and the Phase 01
+  fixture keep their checksums. Each case has a public `bound` (largest acceleration magnitude) for the tests; wind's
+  bound depends on the velocity: rate·(|w| + |v|).
+- Q: How is the particle budget defined and applied? → A:
+  - `ParticleBudget` in VisualCoreDiagnostics has shares `[1, 0.6, 0.35, 0.2]` for tiers 0–3 and a minimum of 100.
+  - `limit(requested:tier:)` = min(requested, max(minimum, ⌊requested × share⌋)).
+  - `ParticleSystem.liveLimit` is a settable value clamped to 1…capacity, defaulting to capacity. Emission stops
+    while `aliveCount ≥ liveLimit`, and every refused particle counts as dropped.
+  - `DeviceConditions.current()` (VisualCoreDiagnostics, public `ProcessInfo` only) reads the thermal state and Low
+    Power Mode, so apps share one reader.
+  - The sandbox uses `QualityPolicy(tierCount: 4, lowPowerCeiling: 1)` and decides once per frame. The requested
+    limit is the scene's limit (default 4,000).
+- Q: How does a person place and change the one force? → A: The app core gains `PlacedForce` (kind, world position,
+  strength multiplier 0.1…2, default 1). Its defaults are:
+  - attractor: 300, radius 300;
+  - repulsor: 400, radius 250;
+  - gravity well: 2,000,000, softening 40;
+  - wind: 120 units/s from the center toward the tapped point, rate 0.8;
+  - vortex: 250, radius 300.
+
+  The force occupies scene force slot 0 through `SceneSimulation.setPlacedForce(_:)`, applied live. The controls are:
+  - a kind menu: None, Attractor, Repulsor, Gravity well, Wind, Vortex;
+  - tap to place and drag to move;
+  - a "Center" button;
+  - four nudge buttons of 50 units each;
+  - a strength slider.
+
+  `SceneForce` gains the same four cases. Adding cases keeps every version-1 file valid, so the schema stays 1.
+- Q: Where does the GPU drawing live, and how is it tested? → A: `ParticleLayerScene` in VisualCoreRendering is a
+  generic `RenderScene` that:
+  - clears to a background color;
+  - fits a world rectangle into the drawable (aspect fit, y up) with `Camera2D` and `ViewMetrics`;
+  - draws `[ParticleInstance]` from a source closure with `ParticleRenderer`.
+
+  It is reusable by A09 and A19. Package tests on both simulators render it offscreen and check the pixels (SC-A04-205).
+  The sandbox hosts it in `RenderHost`/`RenderSurface`. The model advances the simulation from the scene's frame time
+  on the main actor; the drawing reads a copy. A host error shows the CPU preview, with a note in the UI.
+- Q: How do UI tests drive heat and Low Power Mode? → A: Launch arguments `-uitestThermal
+  nominal|fair|serious|critical` and `-uitestLowPower YES` replace `DeviceConditions` in DEBUG builds only. Release
+  builds read `ProcessInfo` alone. A short decision interval for tests is not needed: with serious heat the first
+  decision steps down at once.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Place and move one force (Priority: P1) 🎯
