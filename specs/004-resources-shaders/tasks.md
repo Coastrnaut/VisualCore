@@ -16,7 +16,7 @@ IDs `T-F3##`. Tick only with `— Verified YYYY-MM-DD: <command/result>`. One co
 
 - [X] T-F302 [P] Tests `Packages/VisualCore/Tests/VisualCoreShaderSourceTests/SHA256Tests.swift`: NIST vectors ("", "abc", 448-bit, 1 MB 'a') — Verified 2026-11-10: 4 NIST vector tests written (run-check F03.t302-sha256)
 - [X] T-F303 [P] Implement `Packages/VisualCore/Sources/VisualCoreShaderSource/SHA256.swift` — Verified 2026-11-10: F03.t302-sha256 exit 0: 4/4 NIST vectors incl. 1M 'a' pass
-- [ ] T-F304 (FR-F301–F303, FR-F317, SC-F302) Tests `ShaderLibraryTests.swift`: version insertion, defines after version, nested includes with line map (file/line per expanded line), 64 KiB limit, depth 8 limit, cycle, unknown include (file+line), `#version 100` rejected, variant keys differ by defines
+- [X] T-F304 (FR-F301–F303, FR-F317, SC-F302) Tests `ShaderLibraryTests.swift`: version insertion, defines after version, nested includes with line map (file/line per expanded line), 64 KiB limit, depth 8 limit, cycle, unknown include (file+line), `#version 100` rejected, variant keys differ by defines — Verified 2026-11-10: 11 tests committed first (8518ee7), all pass in F03.t305-shaderlibrary
 - [X] T-F305 (FR-F301–F303, FR-F317) Implement `ShaderLibrary.swift`, `LineMap` (in same file), errors `ShaderSourceError` — Verified 2026-11-10: F03.t305-shaderlibrary exit 0: 11 ShaderLibrary tests pass
 - [ ] T-F306 (FR-F304) Tests `InfoLogParserTests.swift` for `ERROR: 0:N: msg`, warnings, unparseable → raw "unknown"; mapping through `ExpandedShader`
 - [ ] T-F307 (FR-F304) Implement `InfoLogParser.swift`, `ShaderDiagnostic`, `ShaderStage`
