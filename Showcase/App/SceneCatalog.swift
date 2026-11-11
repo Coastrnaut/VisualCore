@@ -50,6 +50,10 @@ enum SceneCatalog {
                             summary: "A ripple shader bends the image wherever you touch.",
                             accessibilityDescription: "Diagonal colored stripes that ripple outward from your finger.",
                             interactionHint: "Touch or drag anywhere to move the ripple.") { DistortionScene(settings: $0) },
+            SceneDescriptor(id: "particles", title: "Particle System",
+                            summary: "Thousands of particles with gravity; drag to spawn, pinch to zoom.",
+                            accessibilityDescription: "A dark space where glowing particles fountain up and fall toward a horizontal bar.",
+                            interactionHint: "Drag to spawn particles. Pinch with two fingers to zoom.") { ParticleShowcaseScene(settings: $0) },
         ]
     }
 

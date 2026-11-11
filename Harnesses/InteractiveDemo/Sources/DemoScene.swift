@@ -97,9 +97,8 @@ final class DemoScene: RenderScene {
             particles.emitters[0].isEmitting = false
         }
         switch pinch.state {
-        case .began:
-            lastPinchScale = pinch.scale
-        case .changed:
+        case .began, .changed:
+            if pinch.state == .began { lastPinchScale = 1 }   // the change that began the pinch counts too
             let factor = pinch.scale / lastPinchScale
             if let c = pinch.center, let anchor = metrics.toCamera(c), factor.isFinite, factor > 0 {
                 camera.zoom(by: factor, around: anchor)

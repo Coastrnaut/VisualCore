@@ -134,3 +134,27 @@ final class DistortionTests: XCTestCase {
         XCTAssertEqual(r.host.resources.stats.leaked, 0)
     }
 }
+
+@MainActor
+final class ParticleSceneTests: XCTestCase {
+    func testDragSpawnsAndPinchZooms() throws {
+        let scene = ParticleShowcaseScene(settings: SceneTestSupport.settings())
+        let r = try SceneTestSupport.render(scene, frames: 1, size: CGSize(width: 64, height: 64))
+        scene.scale = Double(r.width) / 64
+        XCTAssertNil(scene.errorMessage)
+        XCTAssertEqual(scene.particleCount, 0)
+        scene.handle(PointerEvent(id: 1, phase: .began, location: Vec2(32, 32), timestamp: 0))
+        scene.handle(PointerEvent(id: 1, phase: .moved, location: Vec2(40, 30), timestamp: 0.1))
+        for _ in 0..<5 { _ = r.host.renderOneFrame(present: false) }
+        XCTAssertGreaterThan(scene.particleCount, 0)
+        XCTAssertTrue(scene.status.hasPrefix("particles="))
+        scene.handle(PointerEvent(id: 1, phase: .ended, location: Vec2(40, 30), timestamp: 0.2))
+        scene.handle(PointerEvent(id: 2, phase: .began, location: Vec2(22, 32), timestamp: 1))
+        scene.handle(PointerEvent(id: 3, phase: .began, location: Vec2(42, 32), timestamp: 1))
+        scene.handle(PointerEvent(id: 3, phase: .moved, location: Vec2(52, 32), timestamp: 1.1))
+        scene.handle(PointerEvent(id: 2, phase: .moved, location: Vec2(12, 32), timestamp: 1.2))
+        XCTAssertGreaterThan(scene.camera.zoom, 1.5, "pinch from 20 to 40 pt doubles the zoom")
+        r.host.destroy()
+        XCTAssertEqual(r.host.resources.stats.leaked, 0)
+    }
+}
