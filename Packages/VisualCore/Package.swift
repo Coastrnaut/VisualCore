@@ -15,7 +15,8 @@ let package = Package(
     targets: [
         .target(name: "VisualCoreMath"),
         .target(name: "VisualCoreSimulation", dependencies: ["VisualCoreMath"]),
-        .target(name: "VisualCoreScenes", dependencies: ["VisualCoreMath"]),
+        // Scenes → Simulation (feature 023 T-A02-501; research R1): SyntheticGestureScript uses SeededRandom. Pure and acyclic (R2, R3).
+        .target(name: "VisualCoreScenes", dependencies: ["VisualCoreMath", "VisualCoreSimulation"]),
         .target(name: "VisualCoreShaderSource"),
         .target(name: "VisualCoreEffectsGraph"),
         .target(name: "VisualCoreDiagnostics"),

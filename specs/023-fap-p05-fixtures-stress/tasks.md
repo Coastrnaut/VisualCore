@@ -23,7 +23,7 @@ research R1–R7, data model, contract, quickstart).
 
 ## Phase 1: Foundational — VisualCore additions (blocks US2, US4, US5)
 
-- [ ] T-A02-501 Write `SyntheticGestureScriptTests` first, then add
+- [X] T-A02-501 Write `SyntheticGestureScriptTests` first, then add — Verified 2026-11-11: — Verified 2026-11-11: SyntheticGestureScript (VisualCoreScenes, documented, baseline +9 lines) with Scenes→Simulation edge; SyntheticGestureScriptTests 11/11 (identical/different seeds, 100 seeds×600 frames in bounds, began→moved×n→ended, strictly increasing timestamps, staggered starts, clamps, fallbacks, seed 0=1, negative frame, speed) in run-check A02-P05/t501-host-visualcore swift test exit 0; t501-checks public-api, dependencies, docs, compliance 4/4 PASS
   `Packages/VisualCore/Sources/VisualCoreScenes/SyntheticGestureScript.swift`.
   - **Rules** (data model): `seed` "0 → 1"; `pointerCount` "clamped 1…10"; `strokeSamples` "clamped 1…240";
     `speed` "finite, clamped 0…20,000"; `viewSize` "finite, > 0, else 1×1"; `frameInterval` default 1/60.

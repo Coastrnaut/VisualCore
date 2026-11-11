@@ -602,6 +602,7 @@ VisualCoreScenes | func | public func add(_ child: SceneNode)
 VisualCoreScenes | func | public func clampedLongEdge(_ longEdge: Int) -> Int
 VisualCoreScenes | func | public func contains(_ p: Vec2) -> Bool
 VisualCoreScenes | func | public func drawList(parentTransform: Mat3 = .identity) -> [(node: SceneNode, world: Mat3)]
+VisualCoreScenes | func | public func events(forFrame frame: Int) -> [PointerEvent]
 VisualCoreScenes | func | public func fromCamera(_ c: Vec2) -> Vec2?
 VisualCoreScenes | func | public func fromNDC(_ n: Vec2) -> Vec2?
 VisualCoreScenes | func | public func fromPixels(_ p: Vec2) -> Vec2?
@@ -634,10 +635,12 @@ VisualCoreScenes | init | public init(minAngle: Double = 0)
 VisualCoreScenes | init | public init(minChange: Double = 0)
 VisualCoreScenes | init | public init(minDistance: Double = 10)
 VisualCoreScenes | init | public init(minDuration: Double = 0.5, maxDistance: Double = 10)
+VisualCoreScenes | init | public init(seed: UInt64, pointerCount: Int = 1, strokeSamples: Int = 30, speed: Double = 600,
 VisualCoreScenes | init | public init(size: Vec2, scale: Double)
 VisualCoreScenes | init | public init(spacing: Double, maxSamplesPerUpdate: Int = 16, smoothing: Double = 0.5)
 VisualCoreScenes | init | public init(width: Int, height: Int)
 VisualCoreScenes | init | public init?(id: String, title: String, width: Int, height: Int)
+VisualCoreScenes | let | public let frameInterval: Double
 VisualCoreScenes | let | public let height: Int
 VisualCoreScenes | let | public let id: Int
 VisualCoreScenes | let | public let id: String
@@ -645,12 +648,17 @@ VisualCoreScenes | let | public let maxEdge: Int
 VisualCoreScenes | let | public let maxPixels: Int
 VisualCoreScenes | let | public let maxSamplesPerUpdate: Int
 VisualCoreScenes | let | public let phase: PointerPhase
+VisualCoreScenes | let | public let pointerCount: Int
 VisualCoreScenes | let | public let position: Vec2
+VisualCoreScenes | let | public let seed: UInt64
 VisualCoreScenes | let | public let smoothing: Double
 VisualCoreScenes | let | public let spacing: Double
+VisualCoreScenes | let | public let speed: Double
+VisualCoreScenes | let | public let strokeSamples: Int
 VisualCoreScenes | let | public let timestamp: Double
 VisualCoreScenes | let | public let title: String
 VisualCoreScenes | let | public let velocity: Vec2
+VisualCoreScenes | let | public let viewSize: Vec2
 VisualCoreScenes | let | public let width: Int
 VisualCoreScenes | let | public static let builtIns: [ExportAspect]
 VisualCoreScenes | let | public static let defaultMaxPixels
@@ -680,6 +688,7 @@ VisualCoreScenes | struct | public struct PointerTracker: Sendable
 VisualCoreScenes | struct | public struct PointerVelocityTracker: Sendable
 VisualCoreScenes | struct | public struct RotateRecognizer: GestureRecognizer
 VisualCoreScenes | struct | public struct Sample: Sendable, Equatable
+VisualCoreScenes | struct | public struct SyntheticGestureScript: Sendable, Equatable
 VisualCoreScenes | struct | public struct TapRecognizer: GestureRecognizer
 VisualCoreScenes | struct | public struct ViewMetrics: Sendable, Equatable
 VisualCoreScenes | var | public private(set) var active: [Int: Vec2]
