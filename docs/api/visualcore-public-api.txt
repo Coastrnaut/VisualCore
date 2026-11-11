@@ -47,10 +47,12 @@ VisualCoreAutomation | var | public var schema
 VisualCoreAutomation | var | public var startedAt: String
 VisualCoreAutomation | var | public var timeToFirstFrameMs: Double?
 VisualCoreDiagnostics | enum | public enum DiagnosticsInfo
+VisualCoreDiagnostics | enum | public enum Level: String, Sendable, CaseIterable
 VisualCoreDiagnostics | enum | public enum RenderLifecycleState: String, Sendable, Codable, CaseIterable
 VisualCoreDiagnostics | enum | public enum ResourceBudgetError: Error, Equatable, Sendable
 VisualCoreDiagnostics | enum | public enum ResourceKind: String, CaseIterable, Sendable, Codable
 VisualCoreDiagnostics | enum | public enum Thermal: Int, Sendable, Codable, CaseIterable
+VisualCoreDiagnostics | func | public func relative(to reference: RenderCostEstimate) -> Double
 VisualCoreDiagnostics | func | public mutating func abandonAll() -> Int
 VisualCoreDiagnostics | func | public mutating func allocate(_ kind: ResourceKind, bytes amount: Int) throws(ResourceBudgetError)
 VisualCoreDiagnostics | func | public mutating func decide(thermal: FramePacing.Thermal, lowPower: Bool, now: Double) -> Int
@@ -62,10 +64,13 @@ VisualCoreDiagnostics | func | public mutating func transition(to next: RenderLi
 VisualCoreDiagnostics | func | public mutating func warn(_ message: String) -> Bool
 VisualCoreDiagnostics | func | public static func clampedDelta(_ delta: Double) -> Double
 VisualCoreDiagnostics | func | public static func isAllowed(from: RenderLifecycleState, to: RenderLifecycleState) -> Bool
+VisualCoreDiagnostics | func | public static func level(ratio: Double, lightMax: Double = 2, moderateMax: Double = 10) -> Level
+VisualCoreDiagnostics | func | public static func text(ratio: Double) -> String
 VisualCoreDiagnostics | init | public init(budget: ResourceBudget = ResourceBudget())
 VisualCoreDiagnostics | init | public init(from: RenderLifecycleState, to: RenderLifecycleState, generation: Int, accepted: Bool)
 VisualCoreDiagnostics | init | public init(historyLimit: Int = 256)
 VisualCoreDiagnostics | init | public init(minimum: Int, maximum: Int, preferred: Int)
+VisualCoreDiagnostics | init | public init(pixels: Double, iterations: Double, samples: Double = 1)
 VisualCoreDiagnostics | init | public init(thermal: Thermal, lowPower: Bool, requestedMaxFPS: Int)
 VisualCoreDiagnostics | init | public init(tierCount: Int, lowPowerCeiling: Int = 1, decisionInterval: Double = 2, calmPeriod: Double = 10)
 VisualCoreDiagnostics | init | public init(total: Int = ResourceBudget.defaultTotal, perKind: [ResourceKind: Int] = [:])
@@ -76,9 +81,12 @@ VisualCoreDiagnostics | let | public let decisionInterval: Double
 VisualCoreDiagnostics | let | public let from: RenderLifecycleState
 VisualCoreDiagnostics | let | public let generation: Int
 VisualCoreDiagnostics | let | public let historyLimit: Int
+VisualCoreDiagnostics | let | public let iterations: Double
 VisualCoreDiagnostics | let | public let lowPowerCeiling: Int
 VisualCoreDiagnostics | let | public let maxFPS: Int
+VisualCoreDiagnostics | let | public let pixels: Double
 VisualCoreDiagnostics | let | public let renderScale: Double
+VisualCoreDiagnostics | let | public let samples: Double
 VisualCoreDiagnostics | let | public let tierCount: Int
 VisualCoreDiagnostics | let | public let to: RenderLifecycleState
 VisualCoreDiagnostics | let | public static let defaultTotal
@@ -88,6 +96,7 @@ VisualCoreDiagnostics | let | public static let version
 VisualCoreDiagnostics | struct | public struct FramePacing: Sendable, Equatable
 VisualCoreDiagnostics | struct | public struct QualityPolicy: Sendable, Equatable
 VisualCoreDiagnostics | struct | public struct Range: Sendable, Equatable
+VisualCoreDiagnostics | struct | public struct RenderCostEstimate: Sendable, Equatable
 VisualCoreDiagnostics | struct | public struct RenderLifecycle: Sendable
 VisualCoreDiagnostics | struct | public struct RenderLifecycleEvent: Sendable, Codable, Equatable
 VisualCoreDiagnostics | struct | public struct ResourceBudget: Sendable, Equatable
@@ -117,6 +126,7 @@ VisualCoreDiagnostics | var | public var staleRejected: Int
 VisualCoreDiagnostics | var | public var total: Int
 VisualCoreDiagnostics | var | public var totalBytes: Int
 VisualCoreDiagnostics | var | public var warnings: [String]
+VisualCoreDiagnostics | var | public var work: Double
 VisualCoreEffects | class | public final class EffectRenderer
 VisualCoreEffects | class | public final class EffectScene: RenderScene
 VisualCoreEffects | enum | public enum EffectsInfo

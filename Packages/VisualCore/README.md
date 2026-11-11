@@ -11,7 +11,7 @@ iOS 26+ inside apps. The package map and dependency rules R1–R5 are in
 | VisualCoreScenes | input mapping, pointer tracking and velocity, seeded synthetic gesture scripts, mesh generators, export geometry |
 | VisualCoreShaderSource | shader library, includes, line maps, diagnostics parsing |
 | VisualCoreEffectsGraph | effect DAG model, validation, quotas, flash-limiter model |
-| VisualCoreDiagnostics | render lifecycle state machine, frame statistics, reports |
+| VisualCoreDiagnostics | render lifecycle state machine, frame statistics, reports, relative render-cost estimates (RenderCostEstimate) |
 | VisualCoreAudioDSP | **placeholder, not built yet** — planned: lock-free ring, FFT, bands, RMS, onsets ([ADR-0006](../../docs/decisions/ADR-0006-unbuilt-readme-modules.md)) |
 | VisualCorePersistence | `DocumentStore` (versioned envelopes, atomic writes, migrations, per-file problem reports), A01-P03; app-owned temporary folders (TemporaryFolder); named, favoritable document libraries (NamedLibrary), A03-P03 |
 | VisualCoreParameters | parameter schemas (units, ranges, linear/log sliders), resolution, palettes (sRGB, linear-light sampling), presets, stable `ParameterHash` |

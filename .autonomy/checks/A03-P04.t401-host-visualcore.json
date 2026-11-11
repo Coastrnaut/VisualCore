@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/VisualCore",
+    "--filter",
+    "RenderCostEstimateTests"
+  ],
+  "command": "swift test --package-path Packages/VisualCore --filter RenderCostEstimateTests",
+  "elapsed_seconds": 5.243,
+  "exit_code": 0,
+  "finished": "2026-11-11T13:49:27+00:00",
+  "log": ".autonomy/logs/A03-P04.t401-host-visualcore.log",
+  "log_sha256": "3a69d455a24417ca439b1c4c1331cc8c045bb348b4d5ff6f74705497dca5374c",
+  "name": "t401-host-visualcore",
+  "stage": "A03-P04",
+  "started": "2026-11-11T13:49:22+00:00",
+  "timed_out": false
+}
