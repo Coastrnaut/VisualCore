@@ -128,4 +128,24 @@ enum EffectShaders {
     out vec4 color;
     void main() { color = mix(texture(u_input, uv), texture(u_history, uv), u_decay); }
     """
+
+    /// Rec. 709 luma of the input (sampled into a 16×16 target for the mean).
+    static let luma = """
+    precision mediump float;
+    uniform sampler2D u_input;
+    in vec2 uv;
+    out vec4 color;
+    void main() { float y = dot(texture(u_input, uv).rgb, vec3(0.2126, 0.7152, 0.0722)); color = vec4(y, y, y, 1.0); }
+    """
+
+    /// color × gain + bias (gain darkens, bias lifts) so the displayed mean equals the adapted value.
+    static let gainBias = """
+    precision mediump float;
+    uniform sampler2D u_input;
+    uniform float u_gain;
+    uniform float u_bias;
+    in vec2 uv;
+    out vec4 color;
+    void main() { vec4 c = texture(u_input, uv); color = vec4(clamp(c.rgb * u_gain + u_bias, 0.0, 1.0), c.a); }
+    """
 }

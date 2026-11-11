@@ -32,7 +32,7 @@ IDs `T-F4##`. One commit + push per task. Effects implemented one at a time (arc
 
 ## Phase 4: US3 — Reduce Flashing (P2)
 
-- [ ] T-F414 [US3] `flashLimit` pass (16×16 luma readback → FlashLimiterModel gain) + sim test with alternating black/white input over 30 frames at Δt=1/30
+- [X] T-F414 [US3] `flashLimit` pass (16×16 luma readback → FlashLimiterModel gain) + sim test with alternating black/white input over 30 frames at Δt=1/30 — Verified 2026-11-10: F04.t414-flashlimit-ios27 exit 0: 30-frame 30 Hz strobe, per-frame change ≤ 0.3/30·255+2, range ≤ 0.3·255+2
 
 ## Phase 5: Integration & Polish
 

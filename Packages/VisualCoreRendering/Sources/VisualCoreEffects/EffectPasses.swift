@@ -1,6 +1,7 @@
 // EffectPasses.swift — built-in pass runners (feature 005; FR-F405, FR-F406). Each pass owns its
 // program(s) (from the registry cache) and draws into a pooled target supplied by EffectRenderer.
 import CVisualCoreGL
+import VisualCoreEffectsGraph
 import VisualCoreRendering
 
 /// Everything a pass needs for one frame.
@@ -187,5 +188,45 @@ final class FeedbackPass: EffectPassRunner {
     func release(_ registry: ResourceRegistry) {
         if let history { registry.release(history) }
         history = nil
+    }
+}
+
+/// `flashLimit` (Reduce Flashing, FR-F409): measures mean Rec. 709 luma over a 16×16 grid, advances
+/// FlashLimiterModel and applies its gain/bias so the displayed mean changes ≤ limit per second.
+@MainActor
+final class FlashLimitPass: EffectPassRunner {
+    static let grid = 16
+    private let luma: ShaderProgram, apply: ShaderProgram
+    private var model: FlashLimiterModel?
+    private var probe: RenderTarget?
+
+    init(registry: ResourceRegistry) throws {
+        luma = try registry.program(vertex: EffectShaders.vertex, fragment: EffectShaders.luma)
+        apply = try registry.program(vertex: EffectShaders.vertex, fragment: EffectShaders.gainBias)
+    }
+
+    func run(_ io: PassIO) throws {
+        guard let input = io.inputs["input"] else { return }
+        let limit = Double(io.params.scalar("limit", 0.3))
+        if model?.limitPerSecond != limit { model = FlashLimiterModel(limitPerSecond: limit) }
+        if probe == nil {
+            probe = try io.registry.makeRenderTarget(width: Self.grid, height: Self.grid, label: "flash limiter probe")
+        }
+        guard let probe else { return }
+        drawFullscreen(luma, into: probe, textures: [("input", input)])
+        let pixels = probe.readPixels()
+        let count = max(1, pixels.count / 4)
+        let mean = stride(from: 0, to: pixels.count, by: 4).reduce(0.0) { $0 + Double(pixels[$1]) } / Double(count) / 255
+        let step = model!.step(measured: mean, dt: io.delta)
+        drawFullscreen(apply, into: io.output, textures: [("input", input)]) { p in
+            p.set("u_gain", Float(step.gain))
+            p.set("u_bias", Float(step.bias))
+        }
+    }
+
+    func release(_ registry: ResourceRegistry) {
+        if let probe { registry.release(probe) }
+        probe = nil
+        model = nil
     }
 }

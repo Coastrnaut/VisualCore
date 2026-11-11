@@ -1,0 +1,26 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/VisualCoreRendering",
+    "--scheme",
+    "VisualCoreRendering-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--result-name",
+    "F04-t414-ios27"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --result-name F04-t414-ios27",
+  "elapsed_seconds": 5.619,
+  "exit_code": 0,
+  "finished": "2026-11-11T00:24:05+00:00",
+  "log": ".autonomy/logs/F04.t414-flashlimit-ios27.log",
+  "log_sha256": "c1b015a1226b14859d214c301852c0d915a4268c0150815566a59422515c3f22",
+  "name": "t414-flashlimit-ios27",
+  "stage": "F04",
+  "started": "2026-11-11T00:23:59+00:00",
+  "timed_out": false
+}

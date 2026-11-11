@@ -94,6 +94,7 @@ public final class EffectRenderer {
         case "distort": return try DistortPass(registry: registry)
         case "composite": return try CompositePass(registry: registry)
         case "feedback": return try FeedbackPass(registry: registry)
+        case "flashLimit": return try FlashLimitPass(registry: registry)
         default: throw EffectGraphError.unknownType(type, pass: "")
         }
     }
