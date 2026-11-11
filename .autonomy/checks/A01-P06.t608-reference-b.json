@@ -1,0 +1,25 @@
+{
+  "argv": [
+    "python3",
+    "scripts/release_check.py",
+    "--log-dir",
+    ".autonomy/logs/a01p06-t608-ref-b",
+    "--json",
+    ".autonomy/logs/a01p06-t608-ref-b/summary.json",
+    "--only",
+    "reference-test-anglerendering-ios27",
+    "reference-test-anglerendering-ios26",
+    "projectm-reference-ios27",
+    "projectm-reference-ios26"
+  ],
+  "command": "python3 scripts/release_check.py --log-dir .autonomy/logs/a01p06-t608-ref-b --json .autonomy/logs/a01p06-t608-ref-b/summary.json --only reference-test-anglerendering-ios27 reference-test-anglerendering-ios26 projectm-reference-ios27 projectm-reference-ios26",
+  "elapsed_seconds": 23.29,
+  "exit_code": 0,
+  "finished": "2026-11-11T07:15:33+00:00",
+  "log": ".autonomy/logs/A01-P06.t608-reference-b.log",
+  "log_sha256": "e527670dd3561fe9528aa45d1e93f7e8d39cf396d6f6f9fe089fe22758a92259",
+  "name": "t608-reference-b",
+  "stage": "A01-P06",
+  "started": "2026-11-11T07:15:09+00:00",
+  "timed_out": false
+}

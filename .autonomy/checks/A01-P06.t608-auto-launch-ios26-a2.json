@@ -1,0 +1,24 @@
+{
+  "argv": [
+    "python3",
+    "scripts/run_automation_sim.py",
+    "--app",
+    "Build/DerivedData/GenerativeArtStudio/Build/Products/Debug-iphonesimulator/GenerativeArtStudio.app",
+    "--runtime",
+    "26.5",
+    "--mode",
+    "launch",
+    "--out",
+    ".autonomy/logs/a01p06-automation/ios26"
+  ],
+  "command": "python3 scripts/run_automation_sim.py --app Build/DerivedData/GenerativeArtStudio/Build/Products/Debug-iphonesimulator/GenerativeArtStudio.app --runtime 26.5 --mode launch --out .autonomy/logs/a01p06-automation/ios26",
+  "elapsed_seconds": 1.911,
+  "exit_code": 0,
+  "finished": "2026-11-11T07:14:30+00:00",
+  "log": ".autonomy/logs/A01-P06.t608-auto-launch-ios26-a2.log",
+  "log_sha256": "9a46983dc6410ede6984d66fe55190fee022a2caa240bda0122f8aea0771bc56",
+  "name": "t608-auto-launch-ios26-a2",
+  "stage": "A01-P06",
+  "started": "2026-11-11T07:14:28+00:00",
+  "timed_out": false
+}

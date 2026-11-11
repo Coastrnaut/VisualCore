@@ -84,7 +84,7 @@ or App Store Connect action. Owner steps are written down, never performed.
 
 ## Phase 4: US4 — Device tests ready; build reproducible (P2)
 
-- [ ] T-A01-608 [US4] Add `Apps/GenerativeArtStudio/App/AppAutomation.swift` (`#if DEBUG || VISUALCORE_AUTOMATION`;
+- [X] T-A01-608 [US4] Add `Apps/GenerativeArtStudio/App/AppAutomation.swift` (`#if DEBUG || VISUALCORE_AUTOMATION`; — Verified 2026-11-11: App/AppAutomation.swift (#if DEBUG || VISUALCORE_AUTOMATION; the default Gradient Noise composition through VisualCoreAutomation.AutomationView; display scale configured) and the root view routes to it when VISUALCORE_AUTORUN is set; project.yml links VisualCoreAutomation (empty in Release). The spec requires the app version in reports, so AutomationReport gained appVersion/appBuild from the bundle (additive, baseline 895). run-check A01-P06/t608-rendering-ios27/ios26 TEST SUCCEEDED; t608-debug-build-a2; run_automation_sim smoke/launch/lifecycle on 27.2 and 26.5 (t608-auto-*-a2) all pass with appVersion 1.0.0, build 1, model and OS; lifecycle leaked 0 (simulator rehearsal, not device evidence); t608-app-release: Release build, 0 automation symbols and trigger strings, privacy 3=3, release items 13/13; t608-showcase-release 2/2; reference regression t608-reference-a 3/3 + b 4/4 = 7/7; checklist automation row added (FR-A01-608, SC-A01-604)
   hosts the default Gradient Noise composition through `AutomationView`) and route `GenerativeArtStudioApp` to it
   when `AutomationRunner.requestedMode()` is set. Add the VisualCoreAutomation product to the app in `project.yml`.
   Rehearse smoke, launch and lifecycle with `run_automation_sim.py` on 27.2 and 26.5 (6 reports). Build Release and

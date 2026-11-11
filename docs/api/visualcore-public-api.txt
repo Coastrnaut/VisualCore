@@ -23,6 +23,8 @@ VisualCoreAutomation | struct | public struct AutomationReport: Codable, Equatab
 VisualCoreAutomation | struct | public struct AutomationView: UIViewRepresentable
 VisualCoreAutomation | struct | public struct FrameTimeStats: Codable, Equatable, Sendable
 VisualCoreAutomation | var | public private(set) var lastReportURL: URL?
+VisualCoreAutomation | var | public var appBuild: String?
+VisualCoreAutomation | var | public var appVersion: String?
 VisualCoreAutomation | var | public var bundleID: String
 VisualCoreAutomation | var | public var cycles: Int?
 VisualCoreAutomation | var | public var deviceModel: String

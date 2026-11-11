@@ -13,6 +13,16 @@ struct GenerativeArtStudioApp: App {
     }
 
     var body: some Scene {
-        WindowGroup { GalleryView().environment(accessibility).tint(AccessibleColors.accent) }
+        WindowGroup {
+            #if DEBUG || VISUALCORE_AUTOMATION
+            if let mode = AppAutomation.mode {
+                AppAutomation.root(mode: mode)
+            } else {
+                GalleryView().environment(accessibility).tint(AccessibleColors.accent)
+            }
+            #else
+            GalleryView().environment(accessibility).tint(AccessibleColors.accent)
+            #endif
+        }
     }
 }

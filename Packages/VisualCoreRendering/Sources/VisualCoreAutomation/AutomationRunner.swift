@@ -50,6 +50,8 @@ public final class AutomationRunner {
     public func run(mode: String, frames: Int = 120) -> AutomationReport {
         var report = AutomationReport(mode: mode, bundleID: bundleID, deviceModel: Self.deviceModel(), osVersion: Self.osVersion(),
                                       startedAt: ISO8601DateFormatter().string(from: Date()), result: "pass")
+        report.appVersion = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String
+        report.appBuild = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String
         switch mode {
         case "smoke": smoke(&report, frames: frames)
         case "launch": launch(&report)

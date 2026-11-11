@@ -173,6 +173,9 @@ targets:
         product: VisualCoreEffects
       - package: VisualCore
         product: VisualCoreEffectsGraph
+      # Empty unless DEBUG || VISUALCORE_AUTOMATION (feature 017 T-A01-608; Release has zero automation symbols).
+      - package: VisualCoreRendering
+        product: VisualCoreAutomation
   GenerativeArtStudioTests:
     type: bundle.unit-test
     platform: iOS

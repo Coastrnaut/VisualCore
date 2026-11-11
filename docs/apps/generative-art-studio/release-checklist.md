@@ -27,6 +27,7 @@ Release candidate 1.0.0 (1), bundle `dev.visualcore.GenerativeArtStudio` (approv
 | Build | 0 automation symbols and trigger strings in Release | verified | `A01-P06/t605-release-symbols` |
 | Build | Signing team, archive and upload | owner-action | build-and-archive.md §5 steps 1–3 |
 | Store | App Store Connect record and submission | owner-action | build-and-archive.md §5 step 4 |
+| Device | Automation runner (smoke, launch, lifecycle) ready; reports carry app version, build, device and OS | verified | `A01-P06/t608-auto-*-ios27-a2`, `t608-auto-*-ios26-a2` (simulator rehearsal only, not device evidence) |
 | Device | D1 iPhone 15 iOS 27.0.1: install, smoke, launch, lifecycle, rendering, export, accessibility | pending-campaign-ii | `scripts/run_device_campaign.py` after IMPLEMENTATION-LOCK |
 | Device | D2 iPad Pro M5 iPadOS 27.2: same rows | pending-campaign-ii | Same, after D1 |
 | Device | D3 iPad A16 iPadOS 26.5 (never updated): same rows | pending-campaign-ii | Same, after D2 |

@@ -39,6 +39,10 @@ public struct AutomationReport: Codable, Equatable, Sendable {
     public var osVersion: String
     /// UTC start time, ISO 8601.
     public var startedAt: String
+    /// The app's `CFBundleShortVersionString` (feature 017; absent in reports written before it).
+    public var appVersion: String?
+    /// The app's `CFBundleVersion` (feature 017).
+    public var appBuild: String?
     /// Frames rendered during the run.
     public var frames = 0
     /// Per-frame render time statistics (`smoke`, `lifecycle`).
