@@ -50,7 +50,7 @@ Checkpoints: `validate_docs`, `check_dependencies`, `check_compliance` and `chec
 
 ## Phase 3: User Story 2 — pinch and Brush size (P1)
 
-- [ ] T-A02-404 [US2] In `PlaygroundView.swift`, feed `PointerTracker` and `PinchRecognizer`. When a second finger
+- [X] T-A02-404 [US2] In `PlaygroundView.swift`, feed `PointerTracker` and `PinchRecognizer`. When a second finger — Verified 2026-11-11: PlaygroundModel feeds VisualCore PointerTracker then PinchRecognizer; the second finger cancels every stroke in progress (tracker cancel + queue forget) and enters pinch mode until all fingers lift; brushRadius = start x pinch.scale clamped 0.005...0.25. Adjust 'Brush' section with the Brush size slider (fap.adjust.brush, spoken 'N% of the canvas'). PinchTests 3: distance 200 -> 400 doubles the radius (0.04 -> 0.08 within 1%) with 0 new splats, painting resumes after lift; scale clamped to 0.25 and 0.005; a stroke ends when the second finger lands with no further splats (SC-A02-402; analyze C1). run-check A02-P04/t404-app-27 and t404-app-26 TEST SUCCEEDED, enumeration guard 41/41 each, audit clean (FR-A02-404)
   goes down, cancel both strokes and enter pinch mode, with "brushRadius = start × scale, clamped 0.005…0.25". Add
   the Brush size slider (`fap.adjust.brush`, spoken as a percentage of the canvas). Add `PinchTests` with scripted
   events: spreading to twice the distance doubles the radius, clamping works, and 0 splats come from pinching

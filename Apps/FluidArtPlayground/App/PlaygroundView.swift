@@ -49,6 +49,13 @@ final class PlaygroundModel {
     /// Test seam: monotonic seconds (default: CACurrentMediaTime).
     var clock: () -> Double = { CACurrentMediaTime() }
     private var tracker = PointerVelocityTracker(spacing: 1)
+    /// Pinch to resize the brush (feature 022; spec 022 clarification 2): VisualCore's PointerTracker and
+    /// PinchRecognizer, fed in that order.
+    private var pointers = PointerTracker()
+    private var pinch = PinchRecognizer()
+    private var pinchStartRadius = 0.04
+    /// True from the second finger landing until every finger has lifted; no splats are made meanwhile.
+    private(set) var pinching = false
 
     init(configuration: FluidConfiguration = FluidConfiguration(), maxEdge: Int = 512) {
         scene = FluidFieldsScene(configuration: configuration, maxEdge: maxEdge)
@@ -97,9 +104,33 @@ final class PlaygroundModel {
         return scene.configuration.brushRadius * Double(min(size.width, size.height)) / 2
     }
 
-    /// One touch event from the canvas: resampled by the tracker, converted and queued.
+    /// One touch event from the canvas: a pinch resizes the brush; otherwise the event is resampled by the tracker,
+    /// converted and queued.
     func handle(_ event: PointerEvent) {
         guard let size = host?.view.bounds.size else { return }
+        pointers.handle(event)
+        pinch.handle(event, tracker: pointers)
+        if !pinching, pointers.count >= 2 {
+            // The second finger ends every stroke in progress; pinch mode takes over until all fingers lift.
+            pinching = true
+            pinchStartRadius = configuration.brushRadius
+            for id in pointers.active.keys {
+                _ = tracker.handle(PointerEvent(id: id, phase: .cancelled, location: event.location, timestamp: event.timestamp))
+                queue.forget(pointer: id)
+            }
+        }
+        if pinching {
+            if pinch.state.isActive {
+                let range = FluidConfiguration.brushRadiusRange
+                let radius = min(max(pinchStartRadius * pinch.scale, range.lowerBound), range.upperBound)
+                if radius != configuration.brushRadius { configuration.brushRadius = radius }
+            }
+            if pointers.count == 0 {
+                pinching = false
+                pinch.reset()
+            }
+            return
+        }
         if tracker.activeCount == 0, abs(tracker.spacing - spacing) > 1e-9 {
             tracker = PointerVelocityTracker(spacing: spacing)
         }

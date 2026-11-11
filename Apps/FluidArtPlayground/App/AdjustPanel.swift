@@ -23,6 +23,16 @@ struct AdjustPanel: View {
                 }
                 .headerProminence(.increased)
                 Section {
+                    slider("Brush size", id: "fap.adjust.brush", value: $model.configuration.brushRadius,
+                           range: FluidConfiguration.brushRadiusRange, step: 0.005,
+                           text: "\(Int((model.configuration.brushRadius * 100).rounded()))%", unit: "of the canvas")
+                } header: {
+                    Text("Brush")
+                } footer: {
+                    EmptyView()
+                }
+                .headerProminence(.increased)
+                Section {
                     slider("Viscosity", id: "fap.adjust.viscosity", value: $model.configuration.viscosity,
                            range: FluidConfiguration.viscosityRange, step: 0.05,
                            text: String(format: "%.2f", model.configuration.viscosity), unit: "")
