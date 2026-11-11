@@ -12,8 +12,8 @@
 
 | Package | Modules | Runs on |
 |---|---|---|
-| `Packages/VisualCore` | `VisualCoreMath`, `VisualCoreSimulation`, `VisualCoreScenes`, `VisualCoreShaderSource`, `VisualCoreEffectsGraph`, `VisualCoreDiagnostics`, `VisualCoreParameters`, `VisualCoreTestSupport` (test-only: image comparison) (+ placeholders `VisualCoreAudioDSP`, `VisualCorePersistence`) | macOS host and iOS |
-| `Packages/VisualCoreRendering` | `VisualCoreRendering` (incl. `ShaderBundle`, `vc/*.glsl`, `FullScreenShaderScene`), `VisualCoreEffects`, `VisualCoreUI` (`RenderSurface`), `VisualCoreAutomation` (Debug/measurement only) (+ placeholder `VisualCoreAudio`) | iOS / iPadOS 26+ |
+| `Packages/VisualCore` | `VisualCoreMath`, `VisualCoreSimulation`, `VisualCoreScenes`, `VisualCoreShaderSource`, `VisualCoreEffectsGraph`, `VisualCoreDiagnostics`, `VisualCoreParameters` (incl. `ParameterEditor`), `VisualCoreTestSupport` (test-only: image comparison) (+ placeholders `VisualCoreAudioDSP`, `VisualCorePersistence`) | macOS host and iOS |
+| `Packages/VisualCoreRendering` | `VisualCoreRendering` (incl. `ShaderBundle`, `vc/*.glsl`, `FullScreenShaderScene`), `VisualCoreEffects`, `VisualCoreUI` (`RenderSurface`, `ParameterPanel`), `VisualCoreAutomation` (Debug/measurement only) (+ placeholder `VisualCoreAudio`) | iOS / iPadOS 26+ |
 
 The [package map](../specs/002-architecture-contracts/contracts/package-map.md) lists what each module owns and the
 dependency rules. `scripts/check_dependencies.py` enforces them.

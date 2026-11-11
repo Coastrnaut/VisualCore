@@ -109,5 +109,5 @@ before the next.
 
 ## Phase 5: Convergence
 
-- [ ] T-A01-211 Document SceneClock, ParameterEditor and ParameterPanel in `docs/release/support-matrix.md`, `docs/release/known-limitations.md` (built-since note), `docs/getting-started.md` and the VisualCoreSimulation/VisualCoreParameters rows of `specs/002-architecture-contracts/contracts/package-map.md` per FR-A01-206 / Constitution V (partial)
+- [X] T-A01-211 Document SceneClock, ParameterEditor and ParameterPanel in `docs/release/support-matrix.md`, `docs/release/known-limitations.md` (built-since note), `docs/getting-started.md` and the VisualCoreSimulation/VisualCoreParameters rows of `specs/002-architecture-contracts/contracts/package-map.md` per FR-A01-206 / Constitution V (partial) — Verified 2026-11-10: support-matrix.md (SceneClock/ParameterEditor host-verified, ParameterPanel simulator-verified rows, A01-P02), known-limitations.md built-since note, getting-started.md module table, package-map rows for VisualCoreSimulation (SceneClock) and VisualCoreParameters (ParameterEditor); validate_docs PASS incl. links
 - [ ] T-A01-212 Add a unit test that `SceneModel.host` stays the same object across editor, preset, palette, seed, play/pause and scrub changes per the edge case "opening the panel never creates another render host" (partial)

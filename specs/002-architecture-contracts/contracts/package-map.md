@@ -5,14 +5,14 @@ Supersedes the table in ADR-0003 where they differ (ADR-0003 is corrected to poi
 | Package / product | Platform | Owns | Public surface | May depend on | Audit trace |
 |---|---|---|---|---|---|
 | `Packages/VisualCore` · `VisualCoreMath` | host + iOS | vectors, matrices, quaternions, cameras, easing | value types | Foundation | gap: input/scenes/math |
-| · `VisualCoreSimulation` | host + iOS | fixed-step clock, seeded RNG, timelines, particle pool, NaN guard | value types, protocols | Math | gap: deterministic simulation |
+| · `VisualCoreSimulation` | host + iOS | fixed-step clock, seeded RNG, timelines, particle pool, NaN guard, `SceneClock` (A01-P02) | value types, protocols | Math | gap: deterministic simulation |
 | · `VisualCoreScenes` | host + iOS | input mapping, pointer tracking, mesh generators, scene graph model | value types | Math | gap: input/scenes |
 | · `VisualCoreShaderSource` | host + iOS | shader library, include preprocessing, line maps, diagnostics parsing | value types | Foundation | gap: shader library (U-F003-adjacent) |
 | · `VisualCoreEffectsGraph` | host + iOS | effect DAG model, validation, quotas, flash-limiter model | value types | Foundation | gap: multi-pass graph; reference `CFlashLimiter` idea |
 | · `VisualCoreDiagnostics` | host + iOS | `RenderLifecycle`, frame stats, missed slots, reports | value types | Foundation | gap: lifecycle; reference `FrameRateMeter`, `QualityGovernor` ideas |
 | · `VisualCoreAudioDSP` | host + iOS | SPSC ring, FFT, bands, RMS, onset | value types | Foundation | reference `AudioCore` (reusable candidate) |
 | · `VisualCorePersistence` | host + iOS | versioned envelopes, atomic writes, migrations | value types | Foundation | constitution IX |
-| · `VisualCoreParameters` | host + iOS | parameter schemas (units, ranges, transforms), resolution, palettes, presets, stable parameter hash | value types | Foundation (added A01-P01, feature 012) | gap G-PARAMS (A01 contract) |
+| · `VisualCoreParameters` | host + iOS | parameter schemas (units, ranges, transforms), resolution, palettes, presets, stable parameter hash, `ParameterEditor` (A01-P02) | value types | Foundation (added A01-P01, feature 012) | gap G-PARAMS (A01 contract) |
 | · `VisualCoreTestSupport` | host + iOS | fake clock, fixtures, image compare | test-only | all pure modules | constitution IV |
 | `Packages/VisualCoreRendering` · `CVisualCoreEGL` | iOS | EGL subset declarations (pinned ANGLE constants) | C | libEGL | reference `CANGLE` |
 | · `CVisualCoreGL` | iOS | generated ES 3.0 table (`vcgl*`) | C | libEGL, libGLESv2 | gap: full GL table |

@@ -46,5 +46,7 @@ results describe that app, not VisualCore (CLAUDE.md §12).
 | SwiftUI render surface (`VisualCoreUI.RenderSurface`) | verified (simulator), A01-P01 |
 | Parameter schemas, palettes, presets (`VisualCoreParameters`) | verified (host), A01-P01 |
 | Bundled shaders, GLSL library, full-screen scenes | verified (simulator), A01-P01 |
+| Scene clock (`VisualCoreSimulation.SceneClock`), parameter editing (`ParameterEditor`) | verified (host), A01-P02 |
+| SwiftUI parameter panel (`VisualCoreUI.ParameterPanel`) | verified (simulator), A01-P02 |
 | System/App audio capture | unsupported (not offered). On D3 (iPadOS 26.5) it must show as unavailable. |
 | Live home-screen wallpaper | unsupported (no public API) |
