@@ -13,6 +13,18 @@ plus the canonical override: the app lives under `Showcase/{App,Resources,Shader
 native accessible SwiftUI UI, shows live lifecycle/context-loss diagnostics, ships a repeatable smoke test, and
 defers device measurements to campaign II (constitution V). Scene list from README Phase 6.
 
+## Clarifications
+
+### Session 2026-11-10
+
+Answered autonomously under the owner's standing approval (CLAUDE.md §2), recommended option chosen.
+
+- Q: Where does the Showcase's project specification live? → A: In the repository-root XcodeGen `project.yml` (README §8: the single source of truth for the Showcase and, later, all 25 app targets), with the Showcase target sourced from `Showcase/{App,Resources,Shaders}` and its tests from `Showcase/Tests`; harnesses keep their own specs.
+- Q: How is the build-time dependency audit performed? → A: A deterministic script `scripts/audit_showcase_dependencies.py` that checks four layers — the XcodeGen spec (targets, packages, framework references), the resolved Swift package graph, the Showcase source imports, and the built app's Mach-O files (linked libraries and symbols) — against a deny-list (ProjectM, projectM-iOS, ProjectMBridge, PresetLibrary, MilkDrop, CaptureKit and the other reference modules from rule R1); it ships with contaminated fixtures tested by `scripts/test_scripts.py`, and runs before every Showcase test.
+- Q: How do people navigate between scenes on iPhone and iPad? → A: A `NavigationSplitView` (scene list sidebar, scene detail) that collapses to a stack on iPhone; the diagnostics panel is an overlay toggled from the toolbar; one render host per open scene, destroyed when the scene closes.
+- Q: How is a shader compile error demonstrated without breaking the shipping scene? → A: A debug-only launch argument `-showcaseInjectShaderError YES` makes the gradient scene load a bundled broken shader; the scene then shows the parsed error (file and line) and a "Retry" button; the normal build never loads it.
+- Q: What identifiers and placeholders does the Showcase use? → A: Placeholder bundle id `dev.visualcore.Showcase` and display name "VisualCore Showcase" until the owner approves branding (CLAUDE.md §8); unsigned simulator builds; accessibility identifiers `showcase.scene.<id>`, `showcase.diagnostics`, `showcase.contextLoss`.
+
 ## User Scenarios & Testing *(mandatory)*
 
 Users: developers evaluating or adopting VisualCore (including the authors of the 25 apps), reviewers checking
@@ -107,16 +119,16 @@ imports and the built binary; it fails on any ProjectM dependency and passes for
 
 ### Functional Requirements
 
-- **FR-F601**: The Showcase MUST be an independently buildable iOS/iPadOS app under `Showcase/` with its own project specification, scheme and tests, depending only on VisualCore packages (no ProjectM engine, preset or reference-bridge modules at compile or run time).
+- **FR-F601**: The Showcase MUST be an independently buildable iOS/iPadOS app under `Showcase/` with its own target and scheme in the root `project.yml`, and its own tests, depending only on VisualCore packages (no ProjectM engine, preset or reference-bridge modules at compile or run time).
 - **FR-F602**: It MUST render through the shared VisualCore render host on the existing ANGLE-backed path.
 - **FR-F603**: It MUST provide at least five scenes: (1) shader gradient + texture sample, (2) animated geometry, (3) touch-interactive distortion, (4) particle system, (5) multi-pass post-processing. An audio-reactive scene is out of scope until the audio input layer exists (feature F08 or later apps).
-- **FR-F604**: Shaders MUST be loaded from bundled shader files through the VisualCore shader library, including at least one include; compile errors MUST be shown with file and line.
+- **FR-F604**: Shaders MUST be loaded from bundled shader files through the VisualCore shader library, including at least one include; compile errors MUST be shown with file and line (demonstrated by the debug launch argument `-showcaseInjectShaderError YES`, with a Retry button).
 - **FR-F605**: The post-processing scene MUST run an effect graph of at least three passes, toggleable, showing the active pass order.
 - **FR-F606**: Scenes MUST respond to touch: distortion follows a drag; particles spawn on drag and the camera zooms on pinch.
 - **FR-F607**: A diagnostics panel MUST show frame rate, presented frames, lifecycle state, context generation, live GPU resources and bytes, peak bytes, warnings and the last error, refreshed at least twice per second, and offer "Simulate context loss".
 - **FR-F608**: Opening another scene or leaving a scene MUST release its GPU resources (zero leaked after teardown).
-- **FR-F609**: The UI MUST be native SwiftUI with VoiceOver labels and hints, Dynamic Type, Reduce Motion and Reduce Flashing support.
-- **FR-F610**: A build-time dependency audit MUST verify the Showcase does not link or import ProjectM engine targets (project spec, package graph, source imports, built binary symbols and frameworks) and MUST fail on a contaminated fixture.
+- **FR-F609**: The UI MUST be native SwiftUI (a split view that collapses to a stack on iPhone) with VoiceOver labels and hints, Dynamic Type, Reduce Motion and Reduce Flashing support; accessibility identifiers `showcase.scene.<id>`, `showcase.diagnostics`, `showcase.contextLoss`.
+- **FR-F610**: A build-time dependency audit (`scripts/audit_showcase_dependencies.py`) MUST verify the Showcase does not link or import ProjectM engine targets across four layers — project spec, resolved package graph, source imports, built binary libraries and symbols — using the rule-R1 deny-list, MUST fail on each contaminated fixture, and MUST run before the Showcase tests.
 - **FR-F611**: A repeatable smoke test MUST open every scene, verify frames advance with no error, exercise touch and context loss, and run on iOS 27.2 and 26.5 simulators.
 - **FR-F612**: The Showcase MUST include a README describing scenes, how to build, run the smoke test and the audit.
 
@@ -139,5 +151,5 @@ imports and the built binary; it fails on any ProjectM dependency and passes for
 ## Assumptions
 
 - Simulator runs are functional evidence only; frame rate, thermal and memory on D1–D3 belong to campaign II (constitution V).
-- The Showcase is a developer showcase, not an App Store product in this phase; bundle id and branding are placeholders until the owner approves (CLAUDE.md §8).
+- The Showcase is a developer showcase, not an App Store product in this phase; bundle id `dev.visualcore.Showcase` and the name are placeholders until the owner approves (CLAUDE.md §8).
 - The texture is a small, original, generated asset committed with the app (no third-party license).
