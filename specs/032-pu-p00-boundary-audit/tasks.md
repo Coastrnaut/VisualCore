@@ -16,7 +16,7 @@ reference regression.
 
 ## Phase 1: Setup
 
-- [ ] T-A04-001 Create `docs/apps/particle-universe/regression-baseline.md` with the phase-start commit (the A04 `speckit-constitution` commit `d425f7d`, before any A04 file) and the reference pin `d93edd1`, the base of the no-change diff for `Packages/` and `External/` (FR-A04-007).
+- [X] T-A04-001 Create `docs/apps/particle-universe/regression-baseline.md` with the phase-start commit (the A04 `speckit-constitution` commit `d425f7d`, before any A04 file) and the reference pin `d93edd1`, the base of the no-change diff for `Packages/` and `External/` (FR-A04-007). — Verified 2026-11-11: — Verified 2026-11-11: docs/apps/particle-universe/regression-baseline.md with phase-start commit d425f7d (the A04 speckit-constitution commit, before any A04 file) and the reference pin d93edd1 (git -C External/projectm-ios rev-parse: d93edd1)
 
 ## Phase 2: US1 — Evidence-backed integration matrix (P1) 🎯
 
