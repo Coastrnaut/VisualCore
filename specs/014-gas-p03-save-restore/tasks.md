@@ -61,7 +61,7 @@ regression; after each phase, `validate_docs.py`.
 
 ## Phase 3: US4 — Rapid edits never leak (P1)
 
-- [ ] T-A01-306 [US4] Add a rapid-edit leak test to `LibraryRenderTests.swift` or a new `RapidEditLeakTests.swift`: for each of the 4 families, 200 palette, seed and preset edits applied with a frame between them; live program, texture and render-target counts equal the starting counts; 0 leaked after destroy (FR-A01-308, SC-A01-305). Run on both runtimes.
+- [X] T-A01-306 [US4] Add a rapid-edit leak test to `LibraryRenderTests.swift` or a new `RapidEditLeakTests.swift`: for each of the 4 families, 200 palette, seed and preset edits applied with a frame between them; live program, texture and render-target counts equal the starting counts; 0 leaked after destroy (FR-A01-308, SC-A01-305). Run on both runtimes. — Verified 2026-11-10: Tests/Unit/RapidEditLeakTests.swift: per family 200 palette/seed/preset edits with a rendered frame between each; live program/texture/framebuffer/renderbuffer/buffer/vertexArray counts unchanged (gradient/raymarch/tiling 1→1, particles 3→3), leaked 0, 0 after destroy; run-check A01-P03/t306-leak-ios27 + ios26 passed (FR-A01-308, SC-A01-305)
 
 ## Phase 4: Polish
 

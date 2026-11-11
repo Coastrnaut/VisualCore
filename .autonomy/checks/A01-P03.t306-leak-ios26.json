@@ -1,0 +1,32 @@
+{
+  "argv": [
+    "xcodebuild",
+    "test",
+    "-project",
+    "VisualCore.xcodeproj",
+    "-scheme",
+    "GenerativeArtStudio",
+    "-only-testing:GenerativeArtStudioTests/RapidEditLeakTests",
+    "-destination",
+    "platform=iOS Simulator,id=EC7498FF-31FF-4491-9666-B0D32785203C",
+    "-derivedDataPath",
+    "Build/DerivedData/GenerativeArtStudio",
+    "-resultBundlePath",
+    ".autonomy/xcresults/A01-P03-t306-ios26.xcresult",
+    "-test-timeouts-enabled",
+    "YES",
+    "-default-test-execution-time-allowance",
+    "180",
+    "CODE_SIGNING_ALLOWED=NO"
+  ],
+  "command": "xcodebuild test -project VisualCore.xcodeproj -scheme GenerativeArtStudio -only-testing:GenerativeArtStudioTests/RapidEditLeakTests -destination 'platform=iOS Simulator,id=EC7498FF-31FF-4491-9666-B0D32785203C' -derivedDataPath Build/DerivedData/GenerativeArtStudio -resultBundlePath .autonomy/xcresults/A01-P03-t306-ios26.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 180 CODE_SIGNING_ALLOWED=NO",
+  "elapsed_seconds": 6.728,
+  "exit_code": 0,
+  "finished": "2026-11-11T04:37:03+00:00",
+  "log": ".autonomy/logs/A01-P03.t306-leak-ios26.log",
+  "log_sha256": "52733a4d5cd0649f4b88ffa70859951ace1d08d5dea72bb2a3752d62b6ba75ed",
+  "name": "t306-leak-ios26",
+  "stage": "A01-P03",
+  "started": "2026-11-11T04:36:56+00:00",
+  "timed_out": false
+}
