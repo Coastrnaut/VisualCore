@@ -1,0 +1,26 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Apps/ParticleUniverse/ParticleUniverseCore",
+    "--scheme",
+    "ParticleUniverseCore",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--result-name",
+    "A04-P01-t109-ios27"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Apps/ParticleUniverse/ParticleUniverseCore --scheme ParticleUniverseCore --destination sim-27.2 --action test --result-name A04-P01-t109-ios27",
+  "elapsed_seconds": 8.936,
+  "exit_code": 0,
+  "finished": "2026-11-11T17:13:44+00:00",
+  "log": ".autonomy/logs/A04-P01.t109-replay-ios27.log",
+  "log_sha256": "c721b6d876b90d7d99d8c90eb0c5ec237bb090340c773fa860914b9f2c84506b",
+  "name": "t109-replay-ios27",
+  "stage": "A04-P01",
+  "started": "2026-11-11T17:13:35+00:00",
+  "timed_out": false
+}

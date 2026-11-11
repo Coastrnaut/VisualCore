@@ -1,0 +1,97 @@
+{
+  "controls" : [
+    {
+      "command" : {
+        "moveAttractor" : {
+          "index" : 0,
+          "x" : 150,
+          "y" : 100
+        }
+      },
+      "step" : 120
+    },
+    {
+      "command" : {
+        "burst" : {
+          "count" : 200,
+          "emitter" : 1
+        }
+      },
+      "step" : 240
+    },
+    {
+      "command" : {
+        "setEmitting" : {
+          "emitter" : 0,
+          "on" : false
+        }
+      },
+      "step" : 360
+    }
+  ],
+  "expected" : {
+    "checksum" : "0xbc360a1dadba83a",
+    "dropped" : 0,
+    "live" : 1434,
+    "positions" : [
+      [
+        "0xc05229c61c3d7144",
+        "0xc07951db569ead10"
+      ],
+      [
+        "0x4027b66a06ff7021",
+        "0x404597f2f802b53f"
+      ],
+      [
+        "0xc01be496e50e09fe",
+        "0xc05533acd9c84084"
+      ],
+      [
+        "0xc04a8a8b282a8501",
+        "0xc0751065cc7c2d43"
+      ],
+      [
+        "0x4043312a23de6c84",
+        "0x4050e3cdac16f784"
+      ],
+      [
+        "0x405924173413be5d",
+        "0x405042ab89fdeb3d"
+      ],
+      [
+        "0xc030955a5276f3ec",
+        "0xc0001811a2961716"
+      ],
+      [
+        "0xc0563953028576b3",
+        "0xc0722629ae0333b7"
+      ]
+    ]
+  },
+  "scene" : {
+    "emitters" : [
+      {
+        "family" : "fountain"
+      },
+      {
+        "family" : "firework"
+      }
+    ],
+    "forces" : [
+      {
+        "attractor" : {
+          "radius" : 300,
+          "strength" : 300,
+          "x" : 0,
+          "y" : 0
+        }
+      }
+    ],
+    "particleLimit" : 4000,
+    "seed" : 24301,
+    "timeScale" : 1,
+    "version" : 1
+  },
+  "schema" : 1,
+  "steps" : 600
+}
