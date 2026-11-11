@@ -24,6 +24,12 @@ public struct FluidConfiguration: Sendable, Equatable, Codable {
     public static let pressureIterationRange = 1...80
     /// Bounds of the velocity range used for RGBA8 velocity encoding, in cells per step.
     public static let velocityRangeBounds = 0.5...64.0
+    /// Brush radius bounds, as a fraction of the shorter grid edge (feature 020).
+    public static let brushRadiusRange = 0.005...0.25
+    /// Force scale bounds (feature 020).
+    public static let forceScaleRange = 0.0...4.0
+    /// Bounds of the splats applied per frame (feature 020).
+    public static let splatsPerFrameRange = 1...64
 
     /// Schema version; only 1 exists.
     public var version = 1
@@ -43,6 +49,12 @@ public struct FluidConfiguration: Sendable, Equatable, Codable {
     public var velocityRange = 4.0
     /// Seed of the initial dye pattern.
     public var seed: UInt64 = 1
+    /// Splat radius as a fraction of the shorter grid edge (0.005…0.25).
+    public var brushRadius = 0.04
+    /// Multiplier from finger velocity to fluid force (0…4).
+    public var forceScale = 1.0
+    /// Most splats applied in one frame (1…64); extra splats are thinned evenly along each path.
+    public var maxSplatsPerFrame = 16
 
     /// The defaults.
     public init() {}
@@ -80,6 +92,12 @@ public struct FluidConfiguration: Sendable, Equatable, Codable {
         note("pressureIterations", pressureIterations, out.pressureIterations)
         out.velocityRange = real(velocityRange, Self.velocityRangeBounds, defaults.velocityRange)
         noteReal("velocityRange", velocityRange, out.velocityRange, &issues)
+        out.brushRadius = real(brushRadius, Self.brushRadiusRange, defaults.brushRadius)
+        noteReal("brushRadius", brushRadius, out.brushRadius, &issues)
+        out.forceScale = real(forceScale, Self.forceScaleRange, defaults.forceScale)
+        noteReal("forceScale", forceScale, out.forceScale, &issues)
+        out.maxSplatsPerFrame = min(max(maxSplatsPerFrame, Self.splatsPerFrameRange.lowerBound), Self.splatsPerFrameRange.upperBound)
+        note("maxSplatsPerFrame", maxSplatsPerFrame, out.maxSplatsPerFrame)
         return (out, issues)
     }
 

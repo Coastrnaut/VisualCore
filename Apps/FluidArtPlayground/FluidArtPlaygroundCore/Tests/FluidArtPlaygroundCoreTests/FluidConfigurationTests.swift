@@ -13,6 +13,9 @@ final class FluidConfigurationTests: XCTestCase {
         XCTAssertEqual(c.velocityDissipation, 0.2)
         XCTAssertEqual(c.pressureIterations, 20)
         XCTAssertEqual(c.velocityRange, 4.0)
+        XCTAssertEqual(c.brushRadius, 0.04)
+        XCTAssertEqual(c.forceScale, 1.0)
+        XCTAssertEqual(c.maxSplatsPerFrame, 16)
     }
 
     /// At least 8 out-of-range cases are clamped (or reset) and reported (SC-A02-103).
@@ -32,6 +35,14 @@ final class FluidConfigurationTests: XCTestCase {
             ("velocityRange", { $0.velocityRange = 0.01 }, { $0.velocityRange == 0.5 }),
             ("velocityRange", { $0.velocityRange = -.infinity }, { $0.velocityRange == 4.0 }),
             ("version", { $0.version = 7 }, { $0.version == 1 }),
+            // Feature 020 T-A02-206 (FR-A02-209): splat settings.
+            ("brushRadius", { $0.brushRadius = 0.0001 }, { $0.brushRadius == 0.005 }),
+            ("brushRadius", { $0.brushRadius = 3 }, { $0.brushRadius == 0.25 }),
+            ("brushRadius", { $0.brushRadius = .nan }, { $0.brushRadius == 0.04 }),
+            ("forceScale", { $0.forceScale = -2 }, { $0.forceScale == 0 }),
+            ("forceScale", { $0.forceScale = .infinity }, { $0.forceScale == 1 }),
+            ("maxSplatsPerFrame", { $0.maxSplatsPerFrame = 0 }, { $0.maxSplatsPerFrame == 1 }),
+            ("maxSplatsPerFrame", { $0.maxSplatsPerFrame = 1000 }, { $0.maxSplatsPerFrame == 64 }),
         ]
         XCTAssertGreaterThanOrEqual(cases.count, 8)
         for (field, mutate, check) in cases {

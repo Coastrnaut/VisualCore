@@ -54,7 +54,7 @@ contains additions only.
 
 ## Phase 3: User Story 1 — Swipe to inject dye and motion (P1) 🎯
 
-- [ ] T-A02-206 [P] [US1] Tests first, then add the splat settings to `FluidConfiguration.swift`:
+- [X] T-A02-206 [P] [US1] Tests first, then add the splat settings to `FluidConfiguration.swift`: — Verified 2026-11-11: FluidConfiguration gains brushRadius (0.04; 0.005...0.25; non-finite -> default), forceScale (1; 0...4; non-finite -> default) and maxSplatsPerFrame (16; 1...64), validated and reported like the Phase 01 fields; FluidConfigurationTests now cover 21 out-of-range cases (7 new) plus the new defaults, still idempotent. run-check A02-P02/t206-core-test swift test 15/15 pass (FR-A02-209)
   - "brushRadius 0.04 in 0.005…0.25, non-finite → default";
   - "forceScale 1 in 0…4, non-finite → default";
   - "maxSplatsPerFrame 16 in 1…64".
