@@ -1,0 +1,22 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_app_isolation.py",
+    "--app",
+    "Apps/FluidArtPlayground",
+    "--built-app",
+    "Build/DerivedData/release-FluidArtPlayground-Release/Build/Products/Release-iphoneos/FluidArtPlayground.app",
+    "--allow-usage",
+    "NSPhotoLibraryAddUsageDescription"
+  ],
+  "command": "python3 scripts/check_app_isolation.py --app Apps/FluidArtPlayground --built-app Build/DerivedData/release-FluidArtPlayground-Release/Build/Products/Release-iphoneos/FluidArtPlayground.app --allow-usage NSPhotoLibraryAddUsageDescription",
+  "elapsed_seconds": 0.083,
+  "exit_code": 0,
+  "finished": "2026-11-11T11:28:22+00:00",
+  "log": ".autonomy/logs/A02-P06.t607-isolation.log",
+  "log_sha256": "c58cf5cdee9d6690e65e6a91f8b79003d93b0739b8472a04186fad2edb346e4a",
+  "name": "t607-isolation",
+  "stage": "A02-P06",
+  "started": "2026-11-11T11:28:22+00:00",
+  "timed_out": false
+}

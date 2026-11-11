@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "python3",
+    "scripts/release_check.py",
+    "--only",
+    "app-release-fluid-art-playground",
+    "--log-dir",
+    ".autonomy/logs/t607-app-release"
+  ],
+  "command": "python3 scripts/release_check.py --only app-release-fluid-art-playground --log-dir .autonomy/logs/t607-app-release",
+  "elapsed_seconds": 4.998,
+  "exit_code": 0,
+  "finished": "2026-11-11T11:28:13+00:00",
+  "log": ".autonomy/logs/A02-P06.t607-app-release.log",
+  "log_sha256": "b59f75b1c73be4c018359fa6820fb8867525eedbd9742e1f8f79af7fb174c9c7",
+  "name": "t607-app-release",
+  "stage": "A02-P06",
+  "started": "2026-11-11T11:28:08+00:00",
+  "timed_out": false
+}

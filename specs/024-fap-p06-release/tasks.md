@@ -89,7 +89,7 @@ IDs are `T-A02-6##`, with one commit per task (`scripts/tick_task.py`). Commands
   - The missing-bundle fallback text is covered by VisualCoreUI's existing `AcknowledgementsViewTests` (analyze G2).
 
   Run on 27.2 and 26.5, plus `check_licenses.py` (FR-A02-604, SC-A02-604).
-- [ ] T-A02-607 [US2] [US4] Write `docs/apps/fluid-art-playground/`:
+- [X] T-A02-607 [US2] [US4] Write `docs/apps/fluid-art-playground/`: — Verified 2026-11-11: — Verified 2026-11-11: docs/apps/fluid-art-playground/: release.json (FluidArtPlayground, dev.visualcore.FluidArtPlayground, 1.0.0 (1), NSPhotoLibraryAddUsageDescription, 4 required docs, checklist, privacyManifest/icon/licenses); privacy-and-credits.md (nothing persisted + tmp/Captures, permission with UI path, 2 manifest categories with code sites, credits/licenses, icon provenance, Debug-only automation reports note, migration starting point, privacy-policy text); store-listing.md (12 claims -> tests, removed wording); build-and-archive.md (unsigned commands, rehearsal with --seed, owner-only steps); release-checklist.md (26 rows: verified/pending-campaign-ii/owner-action). run-check A02-P06/t607-app-release PASS (dependency audit, Release BUILD SUCCEEDED, 0 automation symbols, privacy 2/2, 13/13 release items); t607-isolation PASS
   - `release.json`: scheme, bundle, 1.0.0 (1), the allowed usage string, required docs, checklist, and the
     privacyManifest, icon and licenses flags.
   - `privacy-and-credits.md`: stored data (none, plus the temporary capture folder); the permission with its exact
