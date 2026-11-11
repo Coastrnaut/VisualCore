@@ -81,7 +81,7 @@ research R1–R7, data model, contract, quickstart).
 
 ## Phase 3: User Story 2 — Deterministic seeded test mode (P1)
 
-- [ ] T-A02-506 [US2] Add `Apps/FluidArtPlayground/App/TestMode.swift` (`#if DEBUG || VISUALCORE_AUTOMATION`).
+- [X] T-A02-506 [US2] Add `Apps/FluidArtPlayground/App/TestMode.swift` (`#if DEBUG || VISUALCORE_AUTOMATION`). — Verified 2026-11-11: — Verified 2026-11-11: TestMode (DEBUG||VISUALCORE_AUTOMATION; fixed 1/60 s, tier pinned via deviceState/clock, max force and splat cap, SyntheticGestureScript 4 pointers/30 samples/1,200 pt/s fed through PlaygroundModel.paint once per stepped frame via beforeDrain; SHA-256 digest of readPixels); DeterminismTests 3: seed 7 x2 byte-identical (digest bf16079c…, 1,122 splats), seeds 7/8 differ in 73.5% of pixels, several pointers paint without pinching; run-check A02-P05/t506-app-ios27 and t506-app-ios26 TEST SUCCEEDED (same digest on both runtimes), enumeration 57/57 each
   `TestMode.configure(model:seed:)` sets:
   - `fixedDelta = 1/60`;
   - the quality tier pinned to Full (the `deviceState` and `clock` seams);

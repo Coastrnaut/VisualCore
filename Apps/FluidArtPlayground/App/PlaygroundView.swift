@@ -132,6 +132,12 @@ final class PlaygroundModel {
             }
             return
         }
+        paint(event, viewSize: size)
+    }
+
+    /// The painting path of one event (no pinch recognition): resampled by the tracker, converted and queued. The
+    /// deterministic test mode feeds its multi-pointer script here, since several fingers would otherwise pinch.
+    func paint(_ event: PointerEvent, viewSize size: CGSize) {
         if tracker.activeCount == 0, abs(tracker.spacing - spacing) > 1e-9 {
             tracker = PointerVelocityTracker(spacing: spacing)
         }
@@ -139,6 +145,12 @@ final class PlaygroundModel {
         let samples = tracker.handle(event)
         queue.add(samples, viewSize: SIMD2(Double(size.width), Double(size.height)))
     }
+
+    /// Called at the start of every stepped frame with that frame's index (from 0), before the queue is drained.
+    /// The deterministic test mode (feature 023 T-A02-506) feeds its scripted touches here.
+    var beforeDrain: ((Int) -> Void)?
+    /// Stepped frames drained since creation.
+    private(set) var drainedFrames = 0
 
     /// The control alternative to swiping: one deterministic splash, announced to VoiceOver.
     func addSplash() {
@@ -150,6 +162,8 @@ final class PlaygroundModel {
     /// Called once per stepped frame: decide the tier, apply its iterations to the scene and drain the queue under its
     /// splat cap. The queue itself is never cleared by a tier change.
     private func drain() -> [Splat] {
+        beforeDrain?(drainedFrames)
+        drainedFrames += 1
         let state = deviceState()
         let decided = policy.decide(thermal: state.thermal, lowPower: state.lowPower, now: clock())
         if decided != tier {
