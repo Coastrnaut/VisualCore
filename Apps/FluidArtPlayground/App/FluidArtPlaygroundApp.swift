@@ -7,6 +7,12 @@ import VisualCoreUI
 
 @main
 struct FluidArtPlaygroundApp: App {
+    /// Crash recovery (feature 024 T-A02-602; FR-A02-605): captures left by a killed session are removed before any
+    /// scene exists, including automation launches.
+    init() {
+        CaptureModel.folder.removeAll()
+    }
+
     var body: some Scene {
         // The VisualCore accessible accent keeps prominent buttons above 4.5:1 in light and dark (feature 020 audit).
         WindowGroup {

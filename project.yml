@@ -234,6 +234,8 @@ targets:
       - package: FluidArtPlaygroundCore
         product: FluidArtPlaygroundCore
       - package: VisualCore
+        product: VisualCorePersistence
+      - package: VisualCore
         product: VisualCoreSimulation
       - package: VisualCore
         product: VisualCoreScenes

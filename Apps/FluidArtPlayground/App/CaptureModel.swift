@@ -3,9 +3,11 @@
 // host's own context (no second context), ExportGeometry for the size and StillImageEncoder for the PNG. The scene is
 // paused for the render so a capture never advances the simulation. Only the latest PNG exists, in the temporary
 // directory, and it is deleted when the playground closes. Saving to Photos happens only through the system share
-// sheet (NSPhotoLibraryAddUsageDescription).
+// sheet (NSPhotoLibraryAddUsageDescription). Feature 024 (T-A02-602; FR-A02-605): captures live in VisualCore's
+// TemporaryFolder `tmp/Captures`, which the app empties at launch, so a killed session leaves nothing behind.
 import Foundation
 import Observation
+import VisualCorePersistence
 import VisualCoreRendering
 import VisualCoreScenes
 
@@ -17,6 +19,9 @@ final class CaptureModel {
         case done(URL)
         case failed(String)
     }
+
+    /// The app-owned folder of capture files (emptied at launch; feature 024).
+    nonisolated static let folder = TemporaryFolder(name: "Captures")
 
     /// Long edge of a capture in pixels (capped by the device).
     static let longEdge = 2048
@@ -41,7 +46,7 @@ final class CaptureModel {
             let image = try host.renderOffscreen(width: size.width, height: size.height, time: 0)
             let png = try StillImageEncoder.pngData(image)
             removeFile()
-            let url = FileManager.default.temporaryDirectory.appendingPathComponent("FluidArt-\(UUID().uuidString).png")
+            let url = try Self.folder.makeFileURL(prefix: "FluidArt", extension: "png")
             try png.write(to: url, options: .atomic)
             lastImage = image
             state = .done(url)

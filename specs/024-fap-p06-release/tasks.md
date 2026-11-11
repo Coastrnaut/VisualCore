@@ -36,7 +36,7 @@ IDs are `T-A02-6##`, with one commit per task (`scripts/tick_task.py`). Commands
 
 ## Phase 2: User Story 3 — crash recovery and no persistence (P2, foundational for docs)
 
-- [ ] T-A02-602 [US3] Capture and launch cleanup:
+- [X] T-A02-602 [US3] Capture and launch cleanup: — Verified 2026-11-11: — Verified 2026-11-11: CaptureModel writes through TemporaryFolder(name: "Captures") (static folder), FluidArtPlaygroundApp.init empties it before any scene, FAP depends on VisualCorePersistence; CrashRecoveryTests 3 (3 stale captures + stray file -> 0 via the App init, outside file untouched; missing folder 0 and unreadable folder no crash; captures in tmp/Captures, only the latest, removed on close); run-check A02-P06/t602-app-ios27 and t602-app-ios26 TEST SUCCEEDED, enumeration 79/79 each
   - `Apps/FluidArtPlayground/App/CaptureModel.swift`: write through `TemporaryFolder(name: "Captures")`
     (`static let folder`).
   - `Apps/FluidArtPlayground/App/FluidArtPlaygroundApp.swift`: `init()` calls `CaptureModel.folder.removeAll()`
