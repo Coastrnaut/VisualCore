@@ -32,7 +32,7 @@ tests); written with or before each piece. IDs `T-F6##`. One commit + push per t
 
 ## Phase 5: Polish & Cross-Cutting
 
-- [ ] T-F611 `Showcase/README.md` (scenes, build, smoke test, audit, placeholders awaiting owner branding)
+- [X] T-F611 `Showcase/README.md` (scenes, build, smoke test, audit, placeholders awaiting owner branding) — Verified 2026-11-10: F06.t611-readme exit 0 (validate_docs): Showcase/README.md documents the 5 scenes, accessibility, diagnostics, build/test commands, smoke test scope, the 4-layer audit and the placeholder identity
 - [ ] T-F612 Full verification: audit on the built Showcase (0 findings), script tests, Showcase unit + UI tests on iOS 27.2 and 26.5, generic-iOS Showcase build, VisualCoreRendering sim tests, host tests, R1–R5, compliance, docs, reference regression
 - [ ] T-F613 {device} Showcase frame pacing, thermal and memory per scene on D1/D2/D3 — **deferred to campaign II** (constitution V)
 
