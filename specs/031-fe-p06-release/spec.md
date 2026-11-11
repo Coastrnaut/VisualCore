@@ -22,6 +22,27 @@ Canonical overrides:
 - **Owner-only:** signing, App Store Connect, agreements and purchases stay with the owner (`BLOCKED_OWNER_ACTION`
   where a step needs them).
 
+## Clarifications
+
+### Session 2026-11-11
+
+Answered autonomously under the owner's standing approval (CLAUDE.md §2), choosing the recommended option each time.
+Facts checked in code:
+- `DocumentStore` writes atomically and, on load, removes its own `.…tmp-…` leftovers and reads only `*.json` files;
+- A02's icon is a deterministic offscreen render with a provenance test (`IconRenderTests`);
+- the release tools (`bundle_licenses.py`, `check_privacy_manifest.py`, `check_app_release.py`,
+  `check_app_isolation.py`, `check_release_symbols.py`) take an app and a release manifest.
+
+- Q: What does the icon show? → A: The app's own render: the Seahorse Valley tour's second stop in the Sunset palette,
+  cap 500, animation off, 1024 × 1024, opaque. A provenance test re-renders it and compares with the committed PNG
+  (mean difference ≤ 1/255); setting `FE_WRITE_ICON=1` writes it.
+- Q: What happens to a bookmark write that was interrupted? → A: The store's own leftover temporary files are removed
+  on the next load and the intact bookmarks load; any other non-bookmark file in the folder is ignored and left in
+  place.
+- Q: Where does the version-1 bookmark fixture come from, and can it change? → A: It is a JSON file written once by the
+  current build into `Apps/FractalExplorer/Tests/Fixtures/bookmark-v1.json` and committed. Tests only read it; a
+  schema change must add a migration and a new fixture, never edit this one.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Nothing about the person leaves the device or is stored without need (Priority: P1) 🎯
@@ -75,7 +96,8 @@ A person's bookmarks keep working after an update, and a crash leaves no clutter
    all fields intact; a bookmark file from a newer schema is reported and left untouched.
 2. **Given** capture files left by a killed session, **Then** they are removed at the next launch, before any screen.
 3. **Given** a bookmark write interrupted (a leftover temporary file next to the bookmarks), **Then** the library
-   loads the intact bookmarks and leaves the leftover alone.
+   loads the intact bookmarks, removes its own leftover temporary file, and leaves any other file alone
+   (clarification 2).
 
 ---
 
