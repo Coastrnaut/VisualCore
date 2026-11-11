@@ -16,7 +16,7 @@ The reference `External/projectm-ios` is never written.
 
 ## Phase 2: Foundational
 
-- [ ] T-F703 [P] `SyntheticSignal.swift` (deterministic 44.1 kHz stereo sweep + beat pulses, chunked to ≤ engine max) and `ImageDiff.swift` (mean abs diff, fraction within 8) with tests `Tests/SyntheticSignalTests.swift`
+- [X] T-F703 [P] `SyntheticSignal.swift` (deterministic 44.1 kHz stereo sweep + beat pulses, chunked to ≤ engine max) and `ImageDiff.swift` (mean abs diff, fraction within 8) with tests `Tests/SyntheticSignalTests.swift` — Verified 2026-11-10: F07.t703-signal-diff-a2 TEST SUCCEEDED (iOS 27.2): signal deterministic, bounded |x|≤1, continues across calls; 735 frames per 1/60 s split into ≤300-frame engine calls; ImageDiff mean/within-8/pass rule and lit fraction verified (a1 = mutating call on a temporary in the test)
 
 ## Phase 3: Batch 2a — GL state handoff and VisualCore effects over the engine (US3, P2)
 

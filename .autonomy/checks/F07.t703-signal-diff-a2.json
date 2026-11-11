@@ -1,0 +1,31 @@
+{
+  "argv": [
+    "xcodebuild",
+    "test",
+    "-project",
+    "Harnesses/ProjectMReference/ProjectMReference.xcodeproj",
+    "-scheme",
+    "ProjectMReference",
+    "-destination",
+    "platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D",
+    "-derivedDataPath",
+    "Build/DerivedData/ProjectMReference",
+    "-resultBundlePath",
+    ".autonomy/xcresults/F07-t703-20261110-204616.xcresult",
+    "-test-timeouts-enabled",
+    "YES",
+    "-default-test-execution-time-allowance",
+    "180",
+    "CODE_SIGNING_ALLOWED=NO"
+  ],
+  "command": "xcodebuild test -project Harnesses/ProjectMReference/ProjectMReference.xcodeproj -scheme ProjectMReference -destination 'platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D' -derivedDataPath Build/DerivedData/ProjectMReference -resultBundlePath .autonomy/xcresults/F07-t703-20261110-204616.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 180 CODE_SIGNING_ALLOWED=NO",
+  "elapsed_seconds": 3.149,
+  "exit_code": 0,
+  "finished": "2026-11-11T01:46:19+00:00",
+  "log": ".autonomy/logs/F07.t703-signal-diff-a2.log",
+  "log_sha256": "2ef558d992468d3a6a780a0c9d5c82436b3ca09389ae7b12d8182721c0da3713",
+  "name": "t703-signal-diff-a2",
+  "stage": "F07",
+  "started": "2026-11-11T01:46:16+00:00",
+  "timed_out": false
+}
