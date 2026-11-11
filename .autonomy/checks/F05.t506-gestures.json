@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/VisualCore"
+  ],
+  "command": "swift test --package-path Packages/VisualCore",
+  "elapsed_seconds": 3.821,
+  "exit_code": 1,
+  "finished": "2026-11-11T00:41:26+00:00",
+  "log": ".autonomy/logs/F05.t506-gestures.log",
+  "log_sha256": "b7196a27e62c1587c5f253ba470e9b438696a939251eb85640aa0c8e454b9764",
+  "name": "t506-gestures",
+  "stage": "F05",
+  "started": "2026-11-11T00:41:22+00:00",
+  "timed_out": false
+}
