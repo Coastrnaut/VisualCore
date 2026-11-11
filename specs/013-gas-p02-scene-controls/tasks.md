@@ -106,3 +106,8 @@ T-A01-210.
 
 VisualCore pieces first (the reuse rule), then the domain editor, then the live UI, then recovery. Each step is green
 before the next.
+
+## Phase 5: Convergence
+
+- [ ] T-A01-211 Document SceneClock, ParameterEditor and ParameterPanel in `docs/release/support-matrix.md`, `docs/release/known-limitations.md` (built-since note), `docs/getting-started.md` and the VisualCoreSimulation/VisualCoreParameters rows of `specs/002-architecture-contracts/contracts/package-map.md` per FR-A01-206 / Constitution V (partial)
+- [ ] T-A01-212 Add a unit test that `SceneModel.host` stays the same object across editor, preset, palette, seed, play/pause and scrub changes per the edge case "opening the panel never creates another render host" (partial)
