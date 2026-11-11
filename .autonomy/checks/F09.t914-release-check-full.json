@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "python3",
+    "scripts/release_check.py",
+    "--json",
+    ".autonomy/logs/release-check-full-summary.json"
+  ],
+  "command": "python3 scripts/release_check.py --json .autonomy/logs/release-check-full-summary.json",
+  "elapsed_seconds": 574.684,
+  "exit_code": 0,
+  "finished": "2026-11-11T02:59:10+00:00",
+  "log": ".autonomy/logs/F09.t914-release-check-full.log",
+  "log_sha256": "bd0ac2581533d5bf8d966cdb5cd40ce3cd66c9038eee3e241e2a4d7540379dde",
+  "name": "t914-release-check-full",
+  "stage": "F09",
+  "started": "2026-11-11T02:49:35+00:00",
+  "timed_out": false
+}
