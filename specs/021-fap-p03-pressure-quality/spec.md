@@ -19,6 +19,55 @@ Canonical overrides:
 - Controls are native and accessible.
 - Evidence is host and simulator only.
 
+## Clarifications
+
+### Session 2026-11-11
+
+Answered autonomously under the owner's standing delegation (CLAUDE.md §2), recommended option in each case.
+
+- Q: Which discrete equations define divergence, pressure and projection? → A: The grid is cell-centered with a cell
+  size of 1.
+  - Divergence: `d = 0.5·((u_R − u_L) + (v_T − v_B))`.
+  - Pressure starts at 0 every step (stateless and deterministic) and runs N Jacobi iterations of
+    `p' = (p_L + p_R + p_B + p_T − d) / 4`.
+  - Projection: `u −= 0.5·(p_R − p_L)` and `v −= 0.5·(p_T − p_B)`.
+
+  Neighbors outside the grid:
+  - Pressure uses the center value (zero normal gradient) in both modes.
+  - Velocity, with walls: the center cell with its normal component negated. Open: the center cell unchanged.
+  - Walls also set the normal component of the edge cells to 0 after projection.
+- Q: How are the new scalar fields stored, including the 8-bit fallback? → A: Divergence and pressure use the same
+  storage as the velocity, in the R channel. In 8-bit fallback storage they use `SignedRangeEncoding.unorm8`, with
+  ranges of 2 × and 4 × the velocity range (cells/s and cells²/s). Values beyond are clamped, never wrapped, and the
+  CPU reference models the same encoding.
+- Q: How is viscosity applied? → A: Implicit diffusion with `ν = viscosity × 50` cells² per second and 8 fixed Jacobi
+  iterations of `x' = (x_L + x_R + x_B + x_T + α·b) / (4 + α)`, with `α = 1/(ν·Δt)`, using the same neighbor rules
+  as the velocity. It is skipped at viscosity 0.
+- Q: What are the quality policy's rules? → A:
+  - Tiers are ordered best first.
+  - A decision is at most every 2 s (the decision interval).
+  - A serious or critical thermal state, or Low Power Mode above its ceiling, steps one tier down per decision.
+  - Stepping up one tier requires 10 s of calm (a nominal or fair thermal state and no Low Power Mode).
+  - The Low Power ceiling is the second tier, and the floor is the last tier.
+
+  The app's tiers are:
+  - **Full**: the user's iterations and splat cap.
+  - **Reduced**: half the iterations, at least 1.
+  - **Minimal**: a quarter of the iterations, at least 1, and half the splat cap.
+
+  The panel shows "Quality: <tier> (automatic)".
+- Q: In what order does one step run now, and what is the default edge mode? → A:
+  1. Splats.
+  2. Advect velocity.
+  3. Viscosity.
+  4. Divergence.
+  5. Pressure.
+  6. Gradient subtraction and the walls rule.
+  7. Advect dye by the projected velocity.
+
+  The default edge mode is walls. Phase 02 fixtures keep their meaning: their CPU references move to the full-step
+  reference (`FluidSolver.step`), and uniform-motion fixtures use open edges.
+
 ## User Scenarios & Testing *(mandatory)*
 
 Users:
@@ -144,7 +193,7 @@ The app maps tiers to iterations and splat cap, which unit tests verify.
   pressure, gradient and advection. No pass reads outside the grid in either mode.
 - **FR-A02-304**: The app MUST apply viscosity as implicit diffusion of velocity (skipped at viscosity 0). The GPU
   matches the CPU reference.
-- **FR-A02-305**: The configuration MUST gain the boundary mode. Viscosity and pressure iterations, stored since
+- **FR-A02-305**: The configuration MUST gain the boundary mode (walls by default). Viscosity and pressure iterations, stored since
   Phase 01, are now used. All values are validated and reported as before.
 - **FR-A02-306**: An accessible Adjust panel MUST let users change viscosity, dye dissipation, velocity dissipation,
   pressure iterations and the boundary mode, and reset to defaults. Each control shows and announces its effective
