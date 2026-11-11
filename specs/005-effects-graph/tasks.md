@@ -26,7 +26,7 @@ IDs `T-F4##`. One commit + push per task. Effects implemented one at a time (arc
 - [X] T-F408 [US2] `blur` pass (separable, radius clamp 1–32) + pixel test (single bright pixel spreads, peak drops, energy ≈ conserved ±5%) — Verified 2026-11-10: F04.t408-blur-ios27 exit 0: peak drops, spreads 2 texels, far stays 0, energy within 5%
 - [X] T-F409 [US2] `bloom` pass (threshold, intensity, radius, hdr) + pixel test (near bright area brightens; far dark stays dark) — Verified 2026-11-10: F04.t409-bloom-ios27 exit 0: near pixel +>10, far dark within 2, block stays white
 - [X] T-F410 [US2] `distort` pass (strength, frequency, time) + pixel test (strength 0 = identity; strength > 0 moves a stripe) — Verified 2026-11-10: F04.t410-distort-ios27 exit 0: strength 0 max diff 0; strength 0.1 moves stripe on >4 rows
-- [ ] T-F411 [US2] `composite` pass (two inputs, alpha over/add) + pixel test
+- [X] T-F411 [US2] `composite` pass (two inputs, alpha over/add) + pixel test — Verified 2026-11-10: F04.t411-composite-ios27 exit 0: over@0.5 → (128,0,128)±2; add → (≥254,0,≥254)
 - [ ] T-F412 [US2] `feedback` pass with history target (FR-F412) + test (decay 0.5 converges; cleared on resize/recreation)
 - [ ] T-F413 [US2] (FR-F408, SC-F404) Fault injection: forced pass compile failure → pass-through, graph output present, reported once
 

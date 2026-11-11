@@ -98,4 +98,23 @@ enum EffectShaders {
         color = texture(u_input, clamp(uv + offset, 0.0, 1.0));
     }
     """
+
+    /// Mode 0: alpha "over" scaled by opacity; mode 1: additive.
+    static let composite = """
+    precision mediump float;
+    uniform sampler2D u_base;
+    uniform sampler2D u_overlay;
+    uniform float u_mode;
+    uniform float u_opacity;
+    in vec2 uv;
+    out vec4 color;
+    void main() {
+        vec4 b = texture(u_base, uv);
+        vec4 o = texture(u_overlay, uv);
+        float a = o.a * u_opacity;
+        vec3 over = mix(b.rgb, o.rgb, a);
+        vec3 add = min(b.rgb + o.rgb * u_opacity, vec3(1.0));
+        color = vec4(u_mode < 0.5 ? over : add, max(b.a, a));
+    }
+    """
 }

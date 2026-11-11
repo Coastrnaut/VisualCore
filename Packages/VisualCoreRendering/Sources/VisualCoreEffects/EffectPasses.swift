@@ -133,3 +133,19 @@ final class DistortPass: EffectPassRunner {
         }
     }
 }
+
+/// `composite`: base + overlay, mode 0 = over (alpha × opacity), mode 1 = add.
+@MainActor
+final class CompositePass: EffectPassRunner {
+    private let program: ShaderProgram
+    init(registry: ResourceRegistry) throws {
+        program = try registry.program(vertex: EffectShaders.vertex, fragment: EffectShaders.composite)
+    }
+    func run(_ io: PassIO) throws {
+        guard let base = io.inputs["base"], let overlay = io.inputs["overlay"] else { return }
+        drawFullscreen(program, into: io.output, textures: [("base", base), ("overlay", overlay)]) { p in
+            p.set("u_mode", io.params.scalar("mode", 0))
+            p.set("u_opacity", io.params.scalar("opacity", 1))
+        }
+    }
+}
