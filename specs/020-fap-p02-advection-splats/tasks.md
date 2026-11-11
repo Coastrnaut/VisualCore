@@ -39,7 +39,7 @@ contains additions only.
 
   Add `PointerVelocityTrackerTests` with ≥ 8 cases (SC-A02-204). Add `///` docs and a VisualCore README section;
   update the package-map row.
-- [ ] T-A02-203 [P] Write tests first, then add `FieldGrid.sampleBilinear(cellX:cellY:channel:)` and
+- [X] T-A02-203 [P] Write tests first, then add `FieldGrid.sampleBilinear(cellX:cellY:channel:)` and — Verified 2026-11-11: FieldGrid.sampleBilinear(cellX:cellY:channel:) and sampleBilinear(cellX:cellY:) in VisualCoreSimulation (cell centers at i + 0.5, edge-clamped indices, a + (b - a)*t in x then y) with /// docs and a README note; FieldGridTests +4 (exact at centers, linear interpolation, edge clamping including far outside, the documented arithmetic order). run-check A02-P02/t203-visualcore-host swift test: all pass (FieldGridTests 13/13, XCTest 18 + Swift Testing suites, 0 failures); API baseline updated (additions) then PASS
   `sampleBilinear(cellX:cellY:)` to `Packages/VisualCore/Sources/VisualCoreSimulation/FieldGrid.swift`:
   - "p = coord − 0.5, i0 = floor(p), t = p − i0, indices clamped to the edge, lerp a + (b − a)·t in x then y".
 

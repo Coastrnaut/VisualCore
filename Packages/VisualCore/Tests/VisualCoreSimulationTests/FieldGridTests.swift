@@ -75,6 +75,45 @@ final class FieldGridTests: XCTestCase {
         }
     }
 
+    // Feature 020 T-A02-203: exact bilinear sampling with clamp-to-edge (FR-A02-202; research R1).
+    private func ramp() -> FieldGrid {
+        var g = FieldGrid(width: 4, height: 3, channels: 2)
+        for y in 0..<3 { for x in 0..<4 { g[x, y, 0] = Float(x); g[x, y, 1] = Float(10 * y) } }
+        return g
+    }
+
+    func testBilinearAtCentersIsExact() {
+        let g = ramp()
+        for y in 0..<3 { for x in 0..<4 {
+            XCTAssertEqual(g.sampleBilinear(cellX: Float(x) + 0.5, cellY: Float(y) + 0.5), [Float(x), Float(10 * y)])
+        } }
+    }
+
+    func testBilinearInterpolatesLinearly() {
+        let g = ramp()
+        XCTAssertEqual(g.sampleBilinear(cellX: 1.0, cellY: 0.5, channel: 0), 0.5, "midpoint between cells 0 and 1")
+        XCTAssertEqual(g.sampleBilinear(cellX: 2.25, cellY: 1.5, channel: 0), 1.75, accuracy: 1e-6)
+        XCTAssertEqual(g.sampleBilinear(cellX: 1.5, cellY: 1.25, channel: 1), 7.5, accuracy: 1e-6)
+    }
+
+    func testBilinearClampsToEdge() {
+        let g = ramp()
+        XCTAssertEqual(g.sampleBilinear(cellX: -5, cellY: 0.5, channel: 0), 0)
+        XCTAssertEqual(g.sampleBilinear(cellX: 0.2, cellY: 0.5, channel: 0), 0, "inside the first half cell")
+        XCTAssertEqual(g.sampleBilinear(cellX: 99, cellY: 99), [3, 20])
+        XCTAssertEqual(g.sampleBilinear(cellX: 3.75, cellY: -1, channel: 1), 0)
+    }
+
+    func testBilinearUsesTheDocumentedFormula() {
+        // a + (b − a)·t in x, then in y: the same arithmetic order as vc_fieldBilinear on the GPU.
+        var g = FieldGrid(width: 2, height: 2, channels: 1)
+        g.values = [0.1, 0.7, 0.3, 0.9]
+        let tx: Float = 0.3, ty: Float = 0.6
+        let bottom = Float(0.1) + (Float(0.7) - Float(0.1)) * tx
+        let top = Float(0.3) + (Float(0.9) - Float(0.3)) * tx
+        XCTAssertEqual(g.sampleBilinear(cellX: 0.5 + tx, cellY: 0.5 + ty, channel: 0), bottom + (top - bottom) * ty)
+    }
+
     func testUnorm8RoundingAndStall() {
         XCTAssertEqual(StoragePrecision.unorm8.round(-0.2), 0)
         XCTAssertEqual(StoragePrecision.unorm8.round(1.7), 1)

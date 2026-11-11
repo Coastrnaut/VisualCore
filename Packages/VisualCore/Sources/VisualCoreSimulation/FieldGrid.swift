@@ -122,3 +122,32 @@ public struct FieldGrid: Sendable, Equatable {
         return out
     }
 }
+
+// Feature 020 T-A02-203 (FR-A02-202; research R1): exact bilinear sampling, the CPU twin of `vc_fieldBilinear`.
+extension FieldGrid {
+    /// Channel `channel` at a continuous cell coordinate (cell centers at `i + 0.5`), interpolated bilinearly with
+    /// indices clamped to the edge. With `p = coord − 0.5`, `i0 = floor(p)` and `t = p − i0`, it computes
+    /// `a + (b − a)·t` along x and then along y, in that order, so a GPU pass using the same formula matches exactly.
+    public func sampleBilinear(cellX: Float, cellY: Float, channel: Int) -> Float {
+        let px = cellX - 0.5, py = cellY - 0.5
+        let fx = px.rounded(.down), fy = py.rounded(.down)
+        let tx = px - fx, ty = py - fy
+        let x0 = Self.clampIndex(fx, width), x1 = Self.clampIndex(fx + 1, width)
+        let y0 = Self.clampIndex(fy, height), y1 = Self.clampIndex(fy + 1, height)
+        let a = self[x0, y0, channel], b = self[x1, y0, channel]
+        let c = self[x0, y1, channel], d = self[x1, y1, channel]
+        let bottom = a + (b - a) * tx
+        let top = c + (d - c) * tx
+        return bottom + (top - bottom) * ty
+    }
+
+    /// Every channel at a continuous cell coordinate (see `sampleBilinear(cellX:cellY:channel:)`).
+    public func sampleBilinear(cellX: Float, cellY: Float) -> [Float] {
+        (0..<channels).map { sampleBilinear(cellX: cellX, cellY: cellY, channel: $0) }
+    }
+
+    private static func clampIndex(_ i: Float, _ count: Int) -> Int {
+        guard i.isFinite else { return 0 }
+        return Int(min(max(i, 0), Float(count - 1)))
+    }
+}

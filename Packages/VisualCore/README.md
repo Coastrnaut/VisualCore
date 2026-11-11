@@ -76,7 +76,9 @@ row-major from the bottom row up, as in GL. `StoragePrecision` (`float32`, `floa
 way GPU storage does after every step. GLES leaves the rounding of half-float color writes implementation-defined,
 and the iOS 27.2 and 26.5 simulators truncate, so compare against both half modes. Half precision uses portable round-to-nearest-even with no `Float16` dependency;
 unorm8 is clamped to 0…1 and stored as n/255. Its `tolerance` is one storage step (1e-6, 1e-3, 1.5/255), so a GPU pass
-can be compared with a CPU reference of the same precision. `SignedRangeEncoding` stores −range…range in 0…1, with
+can be compared with a CPU reference of the same precision. `FieldGrid.sampleBilinear(cellX:cellY:)` interpolates exactly, with cell centers at `i + 0.5` and the edge clamped,
+using `a + (b − a)·t` in x and then y. It is the CPU twin of the `vc/field.glsl` shader include, so semi-Lagrangian
+advection references match the GPU. `SignedRangeEncoding` stores −range…range in 0…1, with
 zero at 0.5, for RGBA8 fallbacks. `TimeStepPolicy` gives one bounded step per frame (1/240…1/30 s; invalid deltas
 use the minimum), so a resume after a pause takes neither a huge step nor a catch-up loop.
 

@@ -772,6 +772,8 @@ VisualCoreSimulation | func | public func padded(toChannels count: Int, fill: Fl
 VisualCoreSimulation | func | public func resolve(_ system: SystemAccessibility) -> EffectiveAccessibility
 VisualCoreSimulation | func | public func round(_ x: Float) -> Float
 VisualCoreSimulation | func | public func rounded(to precision: StoragePrecision) -> FieldGrid
+VisualCoreSimulation | func | public func sampleBilinear(cellX: Float, cellY: Float) -> [Float]
+VisualCoreSimulation | func | public func sampleBilinear(cellX: Float, cellY: Float, channel: Int) -> Float
 VisualCoreSimulation | func | public func save(to defaults: UserDefaults, keyPrefix prefix: String)
 VisualCoreSimulation | func | public func value(at t: Double) -> Double
 VisualCoreSimulation | func | public func value(of name: String) -> Double?
