@@ -23,6 +23,46 @@ public struct RenderCapabilities: Sendable, Equatable, Codable {
     /// GL_MAX_RENDERBUFFER_SIZE in pixels (feature 015 T-A01-402).
     public var maxRenderbufferSize = 0
 
+    /// Fragment-shader `highp` float precision (feature 027 T-A03-202; G-PRECISION); nil when not queried. Optional so
+    /// earlier stored reports still decode.
+    public var fragmentHighp: ShaderPrecision?
+    /// Fragment-shader `mediump` float precision; nil when not queried.
+    public var fragmentMediump: ShaderPrecision?
+
+    /// A float format's range and precision as reported by `glGetShaderPrecisionFormat`: the representable magnitude
+    /// is about 2^rangeMin…2^rangeMax and the relative precision 2^−precisionBits (precisionBits is the mantissa
+    /// length; 23 for IEEE single precision). All zero means the format is unsupported.
+    public struct ShaderPrecision: Sendable, Equatable, Codable {
+        /// log2 of the smallest representable magnitude (absolute value of the reported minimum).
+        public var rangeMin: Int
+        /// log2 of the largest representable magnitude.
+        public var rangeMax: Int
+        /// Mantissa bits.
+        public var precisionBits: Int
+        /// True when the format is supported (any non-zero field).
+        public var isSupported: Bool { rangeMin != 0 || rangeMax != 0 || precisionBits != 0 }
+        /// Creates a report.
+        public init(rangeMin: Int, rangeMax: Int, precisionBits: Int) {
+            self.rangeMin = rangeMin; self.rangeMax = rangeMax; self.precisionBits = precisionBits
+        }
+    }
+
+    /// The mantissa bits a fragment shader can rely on: `highp` if supported, else `mediump`, else `fallback`
+    /// (10, the GLSL ES minimum for `mediump`).
+    public func fragmentMantissaBits(fallback: Int = 10) -> Int {
+        if let h = fragmentHighp, h.isSupported, h.precisionBits > 0 { return h.precisionBits }
+        if let m = fragmentMediump, m.isSupported, m.precisionBits > 0 { return m.precisionBits }
+        return fallback
+    }
+
+    /// The fragment precision of `type` (GL_HIGH_FLOAT, GL_MEDIUM_FLOAT) in the current context.
+    static func fragmentPrecision(_ type: Int32) -> ShaderPrecision {
+        var range: [GLint] = [0, 0]
+        var precision: GLint = 0
+        vcglGetShaderPrecisionFormat(GLenum(GL_FRAGMENT_SHADER), GLenum(type), &range, &precision)
+        return ShaderPrecision(rangeMin: Int(range[0]), rangeMax: Int(range[1]), precisionBits: Int(precision))
+    }
+
     /// A width and height in pixels.
     public struct Size: Sendable, Equatable, Codable {
         /// Width in pixels.
@@ -69,6 +109,8 @@ public struct RenderCapabilities: Sendable, Equatable, Codable {
         var maxRenderbuffer: GLint = 0
         vcglGetIntegerv(GLenum(GL_MAX_RENDERBUFFER_SIZE), &maxRenderbuffer)
         caps.maxRenderbufferSize = Int(maxRenderbuffer)
+        caps.fragmentHighp = fragmentPrecision(GL_HIGH_FLOAT)
+        caps.fragmentMediump = fragmentPrecision(GL_MEDIUM_FLOAT)
         return caps
     }
 }

@@ -458,6 +458,7 @@ VisualCoreRendering | func | public func destroy()
 VisualCoreRendering | func | public func draw(_ particles: [ParticleInstance], camera: Camera2D, metrics: ViewMetrics) throws
 VisualCoreRendering | func | public func draw(_ root: SceneNode, camera: Camera2D, metrics: ViewMetrics) throws
 VisualCoreRendering | func | public func draw(model: Mat4 = .identity, camera: OrbitCamera, aspect: Double, color: Vec4) throws
+VisualCoreRendering | func | public func fragmentMantissaBits(fallback: Int = 10) -> Int
 VisualCoreRendering | func | public func makeBuffer(bytes: Int, label: String) throws -> GPUBuffer
 VisualCoreRendering | func | public func makeRenderTarget(width: Int, height: Int, format: TextureFormat = .rgba8, label: String) throws -> RenderTarget
 VisualCoreRendering | func | public func makeTexture(width: Int, height: Int, format: TextureFormat = .rgba8, label: String) throws -> Texture
@@ -510,6 +511,7 @@ VisualCoreRendering | init | public init(extensionReported: Bool, probeComplete:
 VisualCoreRendering | init | public init(files: [String: String])
 VisualCoreRendering | init | public init(fragment: String, fragmentName: String, bundle: ShaderBundle)
 VisualCoreRendering | init | public init(mesh: Mesh, registry: ResourceRegistry) throws
+VisualCoreRendering | init | public init(rangeMin: Int, rangeMax: Int, precisionBits: Int)
 VisualCoreRendering | init | public init(red: Float = 0, green: Float = 0, blue: Float = 0)
 VisualCoreRendering | init | public init(registry: ResourceRegistry) throws
 VisualCoreRendering | init | public init(registry: ResourceRegistry, fragment: String, inputs: [String], label: String,
@@ -570,6 +572,7 @@ VisualCoreRendering | struct | public struct GPUHandle: Sendable, Equatable
 VisualCoreRendering | struct | public struct RenderCapabilities: Sendable, Equatable, Codable
 VisualCoreRendering | struct | public struct RenderContext: Equatable
 VisualCoreRendering | struct | public struct Run: Sendable, Equatable
+VisualCoreRendering | struct | public struct ShaderPrecision: Sendable, Equatable, Codable
 VisualCoreRendering | struct | public struct Size: Sendable, Equatable, Codable
 VisualCoreRendering | struct | public struct StillImage: Sendable, Equatable
 VisualCoreRendering | struct | public struct Uniform: Sendable, Equatable
@@ -598,11 +601,14 @@ VisualCoreRendering | var | public var cachedProgramCount: Int
 VisualCoreRendering | var | public var eglVendor
 VisualCoreRendering | var | public var extensions: [String]
 VisualCoreRendering | var | public var fixedTime: Double?
+VisualCoreRendering | var | public var fragmentHighp: ShaderPrecision?
+VisualCoreRendering | var | public var fragmentMediump: ShaderPrecision?
 VisualCoreRendering | var | public var framePacing: FramePacing
 VisualCoreRendering | var | public var generation: Int
 VisualCoreRendering | var | public var glVersion
 VisualCoreRendering | var | public var glslVersion
 VisualCoreRendering | var | public var height: Int
+VisualCoreRendering | var | public var isSupported: Bool
 VisualCoreRendering | var | public var isValid: Bool
 VisualCoreRendering | var | public var lifecycleHistory: [RenderLifecycleEvent]
 VisualCoreRendering | var | public var lightDirection
@@ -614,6 +620,9 @@ VisualCoreRendering | var | public var names: [String]
 VisualCoreRendering | var | public var palette: [SIMD3<Float>]
 VisualCoreRendering | var | public var parameters: [String: Double]
 VisualCoreRendering | var | public var pointerHandler: ((PointerEvent) -> Void)?
+VisualCoreRendering | var | public var precisionBits: Int
+VisualCoreRendering | var | public var rangeMax: Int
+VisualCoreRendering | var | public var rangeMin: Int
 VisualCoreRendering | var | public var red: Float, green: Float, blue: Float
 VisualCoreRendering | var | public var rejectedTransitions: Int
 VisualCoreRendering | var | public var renderer

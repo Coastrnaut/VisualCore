@@ -27,7 +27,7 @@ amendments), the plan, research R1–R4, the data model, the contract and the qu
   - non-finite or non-positive input gives `beyondLimit` with a margin of 0.
 
   Add docs, the README note and the baseline entry. Run `swift test` (FR-A03-205).
-- [ ] T-A03-202 Add `ShaderPrecision` and the optional `fragmentHighp` and `fragmentMediump` properties to
+- [X] T-A03-202 Add `ShaderPrecision` and the optional `fragmentHighp` and `fragmentMediump` properties to — Verified 2026-11-11: — Verified 2026-11-11: RenderCapabilities.ShaderPrecision (rangeMin, rangeMax, precisionBits, isSupported) and optional fragmentHighp/fragmentMediump filled in query via vcglGetShaderPrecisionFormat(GL_FRAGMENT_SHADER, GL_HIGH_FLOAT/GL_MEDIUM_FLOAT), fragmentMantissaBits(fallback: 10); RenderCapabilitiesPrecisionTests 3 (reported on both simulators: highp 23 bits, range 127 — simulator context only; fallbacks; earlier JSON without the keys decodes and round trips) — run-check A03-P02/t202-rendering-27 and -26 TEST SUCCEEDED, enumeration 141/141 each; baseline +9, t202-checks 4/4; ProjectM regression t202-reference-a 3/3 + t202-reference-b 4/4; A01 and A02 build-for-testing succeeded
   `RenderCapabilities` (VisualCoreRendering). Fill them in `query` with `vcglGetShaderPrecisionFormat`.
   - Add `RenderCapabilitiesPrecisionTests`:
     - on both simulator runtimes the values are present and `highp` bits ≥ `mediump` bits (analyze C1); the simulator values are logged as context;
