@@ -154,3 +154,7 @@ No CRITICAL findings; coverage is 100%.
 
 MVP = Phase 1–2 + US1 + US2 (splats and advection matching the CPU). Then US3 (touch and splash), then the contract
 and checks. Seal only after converge appends nothing.
+
+## Phase 7: Convergence
+
+- [ ] T-A02-216 Build the playground's `SplatQueue` from `scene.configuration` after the host has set the scene up (so a device-capped grid also caps the cells-per-point conversion), and add a `PlaygroundModelTests` case where `maxEdge` caps the grid and the queue's configuration follows it, per FR-A02-204 / data-model SplatQueue (partial)
