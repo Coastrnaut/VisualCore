@@ -20,7 +20,7 @@ IDs are `T-A01-4##`, with one commit and push per task (`scripts/tick_task.py`).
 
 ## Phase 1: Foundational — VisualCore exporter (US3; blocks US1 and US2)
 
-- [ ] T-A01-401 [US3] Add `Packages/VisualCore/Sources/VisualCoreScenes/ExportGeometry.swift` with `ExportAspect`
+- [X] T-A01-401 [US3] Add `Packages/VisualCore/Sources/VisualCoreScenes/ExportGeometry.swift` with `ExportAspect` — Verified 2026-11-10: VisualCoreScenes/ExportGeometry.swift (ExportAspect with failable init and built-ins square/portrait/landscape/story, ExportSize, ExportGeometry with even rounding, maxEdge/8192/64 MP caps) + ExportGeometryTests 4/4: 12 combinations exact (1080: 1080x1080, 864x1080, 1080x608, 608x1080; 2048 and 4096 rows), caps, pixel cap 8192² → 8000², invalid ratios rejected; run-check A01-P04/t401-visualcore-host swift test exit 0; contract init? noted
   (built-ins `square` 1:1, `portrait` 4:5, `landscape` 16:9, `story` 9:16), `ExportSize` and `ExportGeometry`:
   - long edge = min(longEdge, maxEdge, 8192);
   - short edge = 2 × round(long × short ratio ÷ long ratio ÷ 2), clamped to [2, long];

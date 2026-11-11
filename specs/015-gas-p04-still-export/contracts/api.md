@@ -4,7 +4,7 @@
 // VisualCoreScenes (pure)
 public struct ExportAspect: Sendable, Hashable, Identifiable {
   public let id: String; public let title: String; public let width: Int; public let height: Int
-  public init(id: String, title: String, width: Int, height: Int)
+  public init?(id: String, title: String, width: Int, height: Int)   // nil unless both terms > 0
   public static let square, portrait, landscape, story: ExportAspect; public static let builtIns: [ExportAspect]
 }
 public struct ExportSize: Sendable, Hashable { public let width: Int; public let height: Int; public var pixelCount: Int }
