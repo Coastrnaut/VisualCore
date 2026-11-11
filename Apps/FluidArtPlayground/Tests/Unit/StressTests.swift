@@ -3,6 +3,7 @@ import FluidArtPlaygroundCore
 import VisualCoreMath
 import VisualCoreRendering
 import VisualCoreScenes
+import VisualCoreSimulation
 import XCTest
 @testable import FluidArtPlayground
 
@@ -66,5 +67,50 @@ final class StressTests: XCTestCase {
         XCTAssertEqual(model.scene.lastDrained, model.scene.configuration.maxSplatsPerFrame, "exactly the cap applied")
         XCTAssertEqual(model.queue.pendingCount, 0, "the rest were dropped by the cap, not carried over")
         XCTAssertNil(model.scene.fieldCheck().firstBad)
+    }
+
+    /// T-A02-513 (edge case "a non-finite value appearing"; FR-A02-507): each detector fires on real field values,
+    /// the automation check reports it, and nothing crashes.
+    func testFieldCheckDetectsBadValues() throws {
+        func scene(dye: SIMD4<Float>, velocity: (Int) -> SIMD2<Float>) throws -> (FluidFieldsScene, RenderHost) {
+            var c = FluidConfiguration()
+            c.gridWidth = 16
+            c.gridHeight = 16
+            let scene = FluidFieldsScene(configuration: c, seed: .uniform(dye))
+            var v = FieldGrid(width: 16, height: 16, channels: 4)
+            for cell in 0..<256 { let f = velocity(cell); v.values[cell * 4] = f.x; v.values[cell * 4 + 1] = f.y }
+            scene.initialVelocityOverride = v
+            scene.paused = true
+            let host = try RenderHost(scene: scene)
+            host.view.frame = CGRect(x: 0, y: 0, width: 32, height: 32)
+            host.view.layoutIfNeeded()
+            XCTAssertTrue(host.renderOneFrame(present: false))
+            return (scene, host)
+        }
+        let cases: [(String, SIMD4<Float>, (Int) -> SIMD2<Float>, String)] = [
+            ("NaN velocity", SIMD4(0.5, 0.5, 0.5, 1), { $0 == 37 ? SIMD2(.nan, 0) : .zero }, "velocity not finite at (5, 2)"),
+            ("infinite dye", SIMD4(.infinity, 0.5, 0.5, 1), { _ in .zero }, "dye not finite at (0, 0)"),
+            ("dye 5", SIMD4(5, 0.5, 0.5, 1), { _ in .zero }, "dye out of 0…4 at (0, 0)"),
+            ("fast velocity", SIMD4(0.5, 0.5, 0.5, 1), { _ in SIMD2(2_000, 0) }, "moves past the grid at (0, 0)"),
+        ]
+        for (name, dye, velocity, expected) in cases {
+            let (scene, host) = try scene(dye: dye, velocity: velocity)
+            defer { host.destroy() }
+            let check = scene.fieldCheck()
+            XCTAssertFalse(check.passed, name)
+            XCTAssertTrue(check.firstBad?.contains(expected) ?? false, "\(name): \(check.firstBad ?? "nil")")
+            print("field check \(name): \(check.firstBad ?? "nil")")
+        }
+        // The automation check returns the same finding for a model whose fields went bad.
+        let model = TestMode.makeModel(seed: 1, viewSize: CGSize(width: 100, height: 200))
+        defer { model.close() }
+        let host = try XCTUnwrap(model.host)
+        var bad = FieldGrid(width: model.scene.configuration.gridWidth, height: model.scene.configuration.gridHeight, channels: 4)
+        bad.values[0] = .nan
+        model.scene.initialVelocityOverride = bad
+        model.scene.paused = true
+        host.recreateContext()
+        XCTAssertTrue(host.renderOneFrame(present: false))
+        XCTAssertEqual(AppAutomation.check(model), "velocity not finite at (0, 0)")
     }
 }

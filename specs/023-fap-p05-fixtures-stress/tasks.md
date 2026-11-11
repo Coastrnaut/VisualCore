@@ -202,7 +202,7 @@ Story order: US1 (MVP) → US2 → US3 → US4 → detail → US5 → polish.
 
 ## Phase 9: Convergence
 
-- [ ] T-A02-513 Add a `fieldCheck` detection test to `StressTests`. Seed the scene with a NaN velocity cell, an
+- [X] T-A02-513 Add a `fieldCheck` detection test to `StressTests`. Seed the scene with a NaN velocity cell, an — Verified 2026-11-11: — Verified 2026-11-11: StressTests.testFieldCheckDetectsBadValues seeds real bad fields (NaN velocity -> 'velocity not finite at (5, 2)', infinite dye, dye 5 -> 'dye out of 0…4', 2,000 cells/s on 16^2 -> 'moves past the grid') and a test-mode model with a NaN cell -> AppAutomation.check 'velocity not finite at (0, 0)', no crash; run-check A02-P05/t513-app-ios27 and t513-app-ios26 (StressTests) TEST SUCCEEDED; full-suite runs follow in the converge pass
   infinite dye cell, dye 5 and |v|·Δt beyond the grid. Assert each gives its `firstBad` message, that
   `AppAutomation.check` returns it, and that nothing crashes. Covers the edge case "a non-finite value appearing"
   and FR-A02-507 (partial).
