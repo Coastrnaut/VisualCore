@@ -57,3 +57,13 @@ struct PulseView: UIViewRepresentable {
 
 `vcgl*` functions come from `CVisualCoreGL` (`import CVisualCoreGL`). The host keeps rendering while the
 coordinator holds it, and it suspends in the background on its own.
+
+## Resources and shaders (feature 004)
+
+Every `RenderHost` owns one `ResourceRegistry` (`context.resources`). It creates textures, buffers,
+render targets (pooled with `acquireTarget`/`recycle`) and programs (`program(vertex:fragment:defines:library:)`,
+cached by SHA-256, LRU 64, recompiled after context recreation). Budgets refuse over-limit requests;
+handles from an older context generation are rejected and counted; `stats` reports live counts, bytes,
+peak, stale rejections, leaks, shader failures and deduplicated warnings. Shader sources are GLSL ES 3.00
+with `#include "name"` from a `ShaderLibrary`; compile errors name the original file and line.
+Color-space policy: [docs/rendering/color-space.md](../../docs/rendering/color-space.md).
