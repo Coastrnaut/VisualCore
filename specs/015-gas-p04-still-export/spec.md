@@ -14,6 +14,30 @@ G-EXPORT) are built in VisualCoreRendering (constitution Principle II). Evidence
 manual's Phase 04 MVP line (the versioned document store with favorites and duplication) was delivered in Phase 03
 and is regression-checked here.
 
+## Clarifications
+
+### Session 2026-11-10
+
+Answered autonomously under the owner's standing approval (CLAUDE.md §2); the recommended option was chosen in each case.
+
+- Q: How are pixel dimensions derived from a size and an aspect? → A: The long edge equals the chosen size. The short
+  edge is size × (short ratio ÷ long ratio), rounded to the nearest even number. For 1080: Square 1080×1080, Portrait
+  864×1080, Landscape 1080×608 (16:9 with a long edge of 1080), Story 608×1080.
+- Q: What is the "device maximum render size"? → A: The smallest of the renderer's maximum texture size, maximum
+  render-buffer size and maximum viewport dimension, as reported by the VisualCore host. It is further capped at
+  8192 px and 64 million pixels per export. Size options above the cap are clamped to it, and the clamped value is
+  shown.
+- Q: How does point-sized content keep its proportions? → A: For the export, the scene's points-to-pixels factor is
+  set to (export height in pixels) ÷ (on-screen height in points), and restored afterwards. Shader-only families
+  are resolution-independent already.
+- Q: How is the image delivered, and which permission text is used? → A: The PNG is written to the app's temporary
+  folder as `<name>-<width>x<height>.png` and offered with the system share sheet. The app declares the Photos
+  add-only usage description: "Saves exported artwork to your photo library when you choose Save Image." No other
+  permission is requested, and the temporary file is removed when the export sheet closes.
+- Q: Where does export work run, and what does the user see meanwhile? → A: On the main thread, where the VisualCore
+  host owns the GL context. A progress indicator shows while it runs and playback is paused. No duration target is
+  claimed; device timing is measured in campaign II.
+
 ## User Scenarios & Testing *(mandatory)*
 
 Users: creators who want repeatable exports (manual §2, journey 3), plus app developers reusing the VisualCore
@@ -76,7 +100,8 @@ API-baseline entry. The ProjectM regression still passes.
 
 ### Edge Cases
 
-- Aspect ratios produce whole, even pixel dimensions, and the long edge equals the chosen size.
+- Aspect ratios produce whole, even pixel dimensions, and the long edge equals the chosen size (for example 864×1080
+  for Portrait 4:5 at 1080).
 - An export is rendered at a higher resolution than the screen. Point-sized content (particles) keeps its on-screen
   proportions.
 - An export while playing uses the time at the moment Export was pressed. Playback is paused during the export and
