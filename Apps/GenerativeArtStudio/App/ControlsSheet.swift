@@ -63,7 +63,7 @@ struct ControlsSheet: View {
                         Text(String(model.document.seed))
                             .font(.footnote.monospacedDigit())
                             .textSelection(.enabled)
-                            .accessibilityLabel("Seed \(model.document.seed)")
+                            .accessibilityLabel(Text(verbatim: "Seed " + String(model.document.seed)))
                             .accessibilityIdentifier("gas.seed.value")
                         Spacer()
                         Button("Shuffle") {

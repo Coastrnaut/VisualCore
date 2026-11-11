@@ -62,7 +62,7 @@ after each phase, run `validate_docs.py`.
   - seed: `gas.seed.value` and `gas.seed.shuffle`;
   - `ParameterPanel` bound to the editor;
   - changes applied immediately to the live scene.
-- [ ] T-A01-208 [US1] Add `Apps/GenerativeArtStudio/Tests/Unit/ControlsRenderTests.swift`:
+- [X] T-A01-208 [US1] Add `Apps/GenerativeArtStudio/Tests/Unit/ControlsRenderTests.swift`: — Verified 2026-11-10: ControlsRenderTests + ControlsUITests. run-check A01-P02/t208-app-ios27-a2 (unit 11/11) + t208-app-ios27-a3 (ControlsUITests 2/2 after the seed accessibility-label fix: verbatim 'Seed 2024', not localized '2,024') + t208-app-ios26 full scheme 15/15 TEST SUCCEEDED. SC-A01-202: first parameter change mean 7.0–77.3/255 per family, reset all within2=1.0; SC-A01-203: paused t=2.0 twice max 0 for all families (t=3.5 differs 9.3–14.2); live palette+seed edit equals fresh render max 0; UI: Pause/Play label, Time slider scrubbed and frozen while paused, preset sets seed 2024, palette selected trait, shuffle changes seed, Warp slider value and Reset Warp; screenshot reviewed
   - for each family, changing one parameter by ≥ 25% of its normalized range changes the image (mean ≥ 1/255), and
     reset all returns the preset image (≥ 99% within 2/255) (SC-A01-202);
   - a paused clock scrubbed to t renders identical images twice (max 0) (SC-A01-203);
