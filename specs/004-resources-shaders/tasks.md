@@ -25,13 +25,13 @@ IDs `T-F3##`. Tick only with `— Verified YYYY-MM-DD: <command/result>`. One co
 
 ## Phase 3: US1 — Shaders with clear errors (P1) 🎯 MVP
 
-- [ ] T-F310 [US1] (SC-F301, FR-F305) Sim tests `ShaderProgramTests.swift`: real ANGLE compile error in an included snippet maps to snippet file/line; failed replacement keeps the old program drawing; captured raw ANGLE log matches InfoLogParser format
+- [ ] T-F310 [US1] (SC-F301, FR-F305) Sim tests `ShaderProgramTests.swift`: real ANGLE compile error in an included snippet maps to snippet file/line; failed replacement keeps the old program drawing; captured raw ANGLE log is printed to the test log and matches the InfoLogParser fixture format
 - [ ] T-F311 [US1] Implement `Packages/VisualCoreRendering/Sources/VisualCoreRendering/ShaderProgram.swift` (compile/link via vcgl, uniform table from active uniforms, `ShaderError`)
 
 ## Phase 4: US2 — Textures, buffers, framebuffers (P1)
 
 - [ ] T-F312 [US2] (SC-F303, SC-F305, FR-F310, FR-F313) Sim tests `ResourceRegistryTests.swift`: over-budget refusal, stale handle rejected after recreation, zero live after teardown across 100 recreations, render target render+readback, size validation, trimPools on memory warning
-- [ ] T-F313 [US2] Implement `ResourceRegistry.swift` + `GPUObjects.swift` (Texture, GPUBuffer, RenderTarget, GPUHandle, TextureFormat) and attach one registry per `RenderHost` exposed through `RenderContext.resources`; leak accounting on recreation/destroy without GL calls on dead contexts (FR-F316); memory-warning hook
+- [ ] T-F313 [US2] Implement `ResourceRegistry.swift` + `GPUObjects.swift` (Texture, GPUBuffer, RenderTarget, GPUHandle, TextureFormat) and attach one registry per `RenderHost` exposed through `RenderContext.resources` (`RenderContext` drops `Sendable` because it is valid only inside main-thread callbacks; equality = generation, size, framebuffer, registry identity); leak accounting on recreation/destroy without GL calls on dead contexts (FR-F316); memory-warning hook
 
 ## Phase 5: US3 — Variants, cache, uniforms (P2)
 

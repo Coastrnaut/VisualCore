@@ -24,4 +24,6 @@ public struct ResourceLedger { public mutating func allocate(_ kind: ResourceKin
 public enum ShaderError: Error { case source(ShaderSourceError), compile([ShaderDiagnostic]), link([ShaderDiagnostic]) }
 ```
 
+`RenderContext` gains `public let resources: ResourceRegistry` and is no longer `Sendable` (main-thread callbacks only; analyze I1, 2026-11-10).
+
 Errors and limits per `specs/002-architecture-contracts/contracts/resources-shaders-errors.md`.

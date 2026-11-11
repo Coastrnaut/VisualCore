@@ -12,35 +12,37 @@ Depth: standard gate review. The focus areas come verbatim from the archive prom
 
 ## Resource Leaks
 
-- [ ] CHK001 Is "leak" defined precisely (live at teardown) and is the expected count after teardown stated? [Clarity, Spec §FR-F311, §SC-F303]
-- [ ] CHK002 Are byte-estimation rules specified for every resource kind so budget checks are reproducible? [Completeness, Plan research R-F304]
-- [ ] CHK003 Are memory-pressure release requirements measurable (what is freed, what remains)? [Measurability, Spec §FR-F312]
-- [ ] CHK004 Is the default budget and per-kind override specified, with the refusal behavior? [Clarity, Spec §FR-F309]
+- [x] CHK001 Is "leak" defined precisely (live at teardown) and is the expected count after teardown stated? [Clarity, Spec §FR-F311, §SC-F303]
+- [x] CHK002 Are byte-estimation rules specified for every resource kind so budget checks are reproducible? [Completeness, Plan research R-F304]
+- [x] CHK003 Are memory-pressure release requirements measurable (what is freed, what remains)? [Measurability, Spec §FR-F312]
+- [x] CHK004 Is the default budget and per-kind override specified, with the refusal behavior? [Clarity, Spec §FR-F309]
 
 ## Invalid Lifecycle Use
 
-- [ ] CHK005 Is the behavior for using an older-generation handle specified (rejected, counted, no GPU call)? [Completeness, Spec §FR-F310]
-- [ ] CHK006 Is it specified what happens to live objects on recreation, including that no GL delete happens on a dead context? [Clarity, Spec §FR-F316]
-- [ ] CHK007 Is registry ownership (one per host) consistent with the lifecycle contract's per-context resource rules? [Consistency, Spec §Clarifications]
-- [ ] CHK008 Are size-validation rules (non-zero, ≤ max texture size) specified for every creation path? [Coverage, Spec §FR-F313]
+- [x] CHK005 Is the behavior for using an older-generation handle specified (rejected, counted, no GPU call)? [Completeness, Spec §FR-F310]
+- [x] CHK006 Is it specified what happens to live objects on recreation, including that no GL delete happens on a dead context? [Clarity, Spec §FR-F316]
+- [x] CHK007 Is registry ownership (one per host) consistent with the lifecycle contract's per-context resource rules? [Consistency, Spec §Clarifications]
+- [x] CHK008 Are size-validation rules (non-zero, ≤ max texture size) specified for every creation path? [Coverage, Spec §FR-F313]
 
 ## Shader Diagnostics
 
-- [ ] CHK009 Are the diagnostic fields and their sources (line map, stage) fully specified? [Completeness, Spec §FR-F304]
-- [ ] CHK010 Is fallback behavior defined for unparseable info logs? [Edge Case, Spec §Edge Cases]
-- [ ] CHK011 Are all source-rejection cases enumerated with distinct errors (size, depth, cycle, unknown include, version)? [Coverage, Spec §FR-F302, §FR-F317]
-- [ ] CHK012 Is "never replace a working program" stated with an observable outcome? [Measurability, Spec §FR-F305]
-- [ ] CHK013 Is uniform mismatch reporting deduplicated with a defined scope (per program + uniform)? [Clarity, Spec §FR-F307]
+- [x] CHK009 Are the diagnostic fields and their sources (line map, stage) fully specified? [Completeness, Spec §FR-F304]
+- [x] CHK010 Is fallback behavior defined for unparseable info logs? [Edge Case, Spec §Edge Cases]
+- [x] CHK011 Are all source-rejection cases enumerated with distinct errors (size, depth, cycle, unknown include, version)? [Coverage, Spec §FR-F302, §FR-F317]
+- [x] CHK012 Is "never replace a working program" stated with an observable outcome? [Measurability, Spec §FR-F305]
+- [x] CHK013 Is uniform mismatch reporting deduplicated with a defined scope (per program + uniform)? [Clarity, Spec §FR-F307]
 
 ## Compatibility
 
-- [ ] CHK014 Is the accepted shading-language version stated and consistent with the ES 3.0 context? [Consistency, Spec §FR-F317]
-- [ ] CHK015 Is preservation of ProjectM shader behavior specified (engine shaders untouched; coexistence demonstrated in F07)? [Coverage, Spec §Input, Plan §Incremental ProjectM migration]
-- [ ] CHK016 Is the cache key definition complete (both stages, defines ordering) and the invalidation trigger stated? [Clarity, Spec §FR-F306]
-- [ ] CHK017 Is the color-space policy specified for both 8-bit and float targets? [Completeness, Spec §FR-F315]
-- [ ] CHK018 Is pixel-identical behavior of migrated sample scenes a measurable criterion? [Measurability, Spec §SC-F306]
+- [x] CHK014 Is the accepted shading-language version stated and consistent with the ES 3.0 context? [Consistency, Spec §FR-F317]
+- [x] CHK015 Is preservation of ProjectM shader behavior specified (engine shaders untouched; coexistence demonstrated in F07)? [Coverage, Spec §Input, Plan §Incremental ProjectM migration]
+- [x] CHK016 Is the cache key definition complete (both stages, defines ordering) and the invalidation trigger stated? [Clarity, Spec §FR-F306]
+- [x] CHK017 Is the color-space policy specified for both 8-bit and float targets? [Completeness, Spec §FR-F315]
+- [x] CHK018 Is pixel-identical behavior of migrated sample scenes a measurable criterion? [Measurability, Spec §SC-F306]
 
 ## Notes
+
+- Reviewed 2026-11-10 by the agent as reviewer under the owner's standing approval: 18/18 satisfied by spec (FR-F301–FR-F317, SC-F301–SC-F306), plan/research and the API contract after analyze remediation.
 
 - Mark items `[x]` only after review confirms the requirement-quality criterion is satisfied
 - Leave items unchecked when they still require clarification, correction, or reviewer evaluation

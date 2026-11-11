@@ -20,6 +20,7 @@ parts go in the host-testable package. Contract: `specs/002-architecture-contrac
 
 Answered autonomously under the owner's standing approval (CLAUDE.md §2), recommended option chosen.
 
+- Q: Apply the `/speckit-analyze` remediation (I1 RenderContext carries the registry and drops Sendable; U1 captured ANGLE log fixture)? → A: Yes, applied 2026-11-10 (no critical findings).
 - Q: Who owns the resource registry? → A: Each render host owns exactly one registry, bound to its context. There is no global registry, because contexts are unshared and objects never cross hosts.
 - Q: What happens to live GPU objects when the context is recreated or lost? → A: Scenes release their objects in `teardown` before recreation. Anything still live afterwards is counted as leaked and then forgotten **without** GL delete calls, because the old context is gone. Every handle of the old generation becomes stale.
 - Q: Which shading language versions are accepted? → A: GLSL ES 3.00 only (`#version 300 es`, added when absent). Any other `#version` line is rejected with a diagnostic, matching the ES 3.0 context.
