@@ -76,7 +76,7 @@ The cases are `fountain`, `curtain`, `halo` and `firework`. Each has:
 - **SceneEmitter:** `family`, plus an optional `position` override (finite).
 - **SceneForce:** a Codable mirror of `gravity(x,y)`, `drag(k ≥ 0)` and `attractor(x, y, strength, radius > 0)`.
 - **`validate() throws(SceneError)`:** the cases are `unsupportedVersion(Int)`, `nonFinite(field)`,
-  `limitOutOfRange(Int)`, `timeScaleOutOfRange(Double)`, `emitterCount(Int)` and `forceCount(Int)`. `decode` validates.
+  `limitOutOfRange(Int)`, `timeScaleOutOfRange(Double)`, `emitterCount(Int)`, `forceCount(Int)` and `invalidForce(index)` (negative drag or a non-positive attractor radius; added in T-A04-111). `decode` validates.
 
 ### SceneCommand (enum, Codable, Equatable)
 
