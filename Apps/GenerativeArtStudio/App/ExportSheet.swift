@@ -18,8 +18,12 @@ enum ExportRunner {
     /// The image for `options` at the clock's current time. Playback is paused for the export and restored after;
     /// point-sized content is scaled so it keeps its on-screen proportions (FR-A01-406).
     static func render(_ model: SceneModel, options: ExportOptions) throws -> StillImage {
+        try render(model, size: options.size)
+    }
+
+    /// The image at an explicit pixel size (tests and previews use sizes outside the offered options).
+    static func render(_ model: SceneModel, size: ExportSize) throws -> StillImage {
         guard let host = model.host else { throw OffscreenRenderError.unavailable("Rendering is unavailable.") }
-        let size = options.size
         let wasPlaying = model.clocked.clock.isPlaying
         let liveScale = model.scene.displayScale
         model.clocked.clock.pause()

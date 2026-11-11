@@ -88,7 +88,7 @@ IDs are `T-A01-4##`, with one commit and push per task (`scripts/tick_task.py`).
   Add the Export toolbar button `gas.export` in `SceneScreen.swift`. Add `NSPhotoLibraryAddUsageDescription` "Saves
   exported artwork to your photo library when you choose Save Image." to the app Info.plist in `project.yml`
   (FR-A01-401, FR-A01-403, FR-A01-407, FR-A01-409).
-- [ ] T-A01-406 [US1] Add `Apps/GenerativeArtStudio/Tests/Unit/ExportRenderTests.swift`:
+- [X] T-A01-406 [US1] Add `Apps/GenerativeArtStudio/Tests/Unit/ExportRenderTests.swift`: — Verified 2026-11-10: Tests/Unit/ExportRenderTests.swift (ExportRunner.render(_:size:) helper added): 12 combinations exported and decoded, exact sizes 1080x1080…2304x4096, alpha none-skip, sRGB (SC-A01-401); 2 exports per family identical, max 0 for 4 families (SC-A01-402); 2× and 4× exports box-downscaled vs the on-screen frame in a 320×240 pt view, mean 0.04–0.49/255 for 4 families (≤ 6; the 64×48 fixture's aliased tile edges gave 6.6 at 4×, so the realistic view size is used and recorded), live frame identical after export (SC-A01-403); particles proportions measured by the 4× downscaled match (0.16) against a negative control without the export scale (27.6), replacing the analyze A1 pixel-fraction measure with a stronger one (FR-A01-406); Info.plist has only NSPhotoLibraryAddUsageDescription with the clarified text (FR-A01-407). run-check A01-P04/t406-unit-ios27 25/25 and t406-unit-ios26 25/25
   - the 12 combinations decode to the exact dimensions with no alpha and sRGB (SC-A01-401);
   - 2 exports per family are identical (SC-A01-402);
   - a 2× export box-downscaled versus the on-screen render has mean ≤ 6/255 for 4 families (SC-A01-403);
