@@ -57,6 +57,14 @@ Facts checked in code:
   32-bit GPU iteration legitimately diverges from 64-bit CPU iteration at caps up to 2,000, which says nothing about
   bookmark reproduction.
 
+### Session 2026-11-11 (implementation finding, T-A03-504)
+
+- Q: How exactly do the clamp and the breakdown combine in the verdict? → A: Fail when a step the app calls reliable is
+  drawn below 99%, or when the device breaks down within the ladder but the app never clamps. A breakdown inside the
+  near-limit zone, before the clamp, does not fail: those steps already carry the "details may blur" banner
+  (clarification 1 keeps them unjudged). Each step is drawn as a 64 × 64-pixel patch at the screen's own plane step
+  per device pixel, so the measurement matches what a person sees, not a shrunken whole view.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Measure the device's real precision limit (Priority: P1) 🎯
@@ -76,7 +84,7 @@ reports and checks the precision limit the app enforces against what the device 
    the app's precision level at that step.
 2. **Given** the ladder, **Then** the report names the deepest zoom the app allows (its clamp) and the first zoom at
    which agreement falls below 99% (the measured breakdown). The run passes only if every step the app calls reliable
-   agrees ≥ 99% and the clamp comes at or before the breakdown (clarification 1).
+   agrees ≥ 99% and, when the device breaks down within the ladder, the app clamps somewhere (finding T-A03-504).
 3. **Given** a device that reports no usable high precision, **Then** the report says which fallback was used.
 
 ---
