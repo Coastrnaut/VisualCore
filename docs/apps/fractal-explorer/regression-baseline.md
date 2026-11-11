@@ -33,3 +33,10 @@ Fractal Explorer (gaps G-VIEWPORT, G-PRECISION, G-COST, G-TOUR) reruns these ste
 
 `A03-P01/t101-reference-a` 3/3 (pin `d93edd1` unchanged) and `t101-reference-b` 4/4: **7/7 pass**, unchanged. A01
 (`t101-build-GenerativeArtStudio`) and A02 (`t101-build-FluidArtPlayground`) build against the changed packages.
+
+## A03-P02 rerun after `PrecisionAdvisor` and `RenderCapabilities` fragment precision (2026-11-11)
+
+`A03-P02/t202-reference-a` 3/3 (pin `d93edd1` unchanged) and `t202-reference-b` 4/4: **7/7 pass**, unchanged. A01
+(`t202-build-GenerativeArtStudio`) and A02 (`t202-build-FluidArtPlayground`) build against the changed packages. The
+VisualCoreRendering package tests pass on both runtimes (`t202-rendering-27`, `t202-rendering-26`, enumeration
+141/141). The simulator reports highp with 23 mantissa bits; that is context, not device evidence.

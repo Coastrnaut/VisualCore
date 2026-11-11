@@ -1,8 +1,9 @@
-// AccessibilityAuditUITests — feature 026 T-A03-105 (SC-A03-103; constitution A03 accessibility), following A02's
+// AccessibilityAuditUITests — feature 026 T-A03-105, feature 027 T-A03-208 (SC-A03-103; constitution A03 accessibility), following A02's
 // audit (feature 020).
 // Runs the system accessibility audit on home and playground at the default and the largest accessibility text size,
 // following the A01 pattern (feature 016). Documented exclusions (spec 020 Clarifications): contrast of the artwork
-// inside the live canvas, navigation-bar chrome, and findings without an element. Each ignored finding is logged.
+// inside the live canvas, navigation-bar chrome, contrast of text scrolled partly under the navigation bar (feature
+// 027), and findings without an element. Each ignored finding is logged.
 import Foundation
 import XCTest
 
@@ -36,6 +37,15 @@ final class AccessibilityAuditUITests: XCTestCase {
                 print("A11Y-AUDIT ignored (navigation-bar chrome): \(description)")
                 return true
             }
+            // Feature 027: text scrolled partly under the translucent navigation bar is measured against the bar's blur,
+            // not its own background (seen on iOS 26.5 at XXXL after scrolling to the zoom controls). Its reported frame is clipped
+            // to the visible area, so its top sits on the bar's bottom edge.
+            if issue.auditType == .contrast, let frame = e?.frame,
+               bars.contains(where: { frame.minY >= $0.minY && frame.minY <= $0.maxY + 0.5 }) {
+                ignored.append(description)
+                print("A11Y-AUDIT ignored (text scrolled under the navigation bar): \(description)")
+                return true
+            }
             if e == nil {
                 ignored.append(description)
                 print("A11Y-AUDIT ignored (no element identified by the audit): \(description)")
@@ -63,6 +73,17 @@ final class AccessibilityAuditUITests: XCTestCase {
         app.segmentedControls["fe.mode"].buttons["Julia"].tap()
         XCTAssertTrue(app.staticTexts["fe.seed"].waitForExistence(timeout: 10))
         try audit(app, "explorer julia [\(label)]", types: types)
+        // Feature 027 T-A03-208: the explorer with the precision banner, reached through the zoom controls.
+        // Julia is centered at 0, where float spacing never limits the zoom, so go back to Mandelbrot (center −0.5).
+        app.segmentedControls["fe.mode"].buttons["Mandelbrot"].tap()
+        let banner = app.descendants(matching: .any)["fe.precision"]
+        let zoomIn = app.buttons["fe.zoomIn"]
+        for _ in 0..<40 where !banner.exists {
+            for _ in 0..<3 where !zoomIn.isHittable { app.swipeUp() }
+            zoomIn.tap()
+        }
+        XCTAssertTrue(banner.exists)
+        try audit(app, "explorer precision banner [\(label)]", types: types)
     }
 
     func testAuditDefaultTextSize() throws { try run(textSize: nil) }

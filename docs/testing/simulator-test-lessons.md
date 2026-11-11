@@ -131,3 +131,18 @@ speaks and what the screen shows, not exact values. Sheets at a medium detent wi
   models; prefix domain types (`FractalPreview`).
 - **Round before choosing a number format.** A zoom of 9999.9999 printed "10000×" in the "whole number" branch;
   compare the rounded value to the scientific-notation threshold.
+
+## Feature 027 (A03-P02)
+
+- **Make a gesture anchor exact per event, not cumulatively.** A cumulative pinch scale missed the midpoint's first
+  shift and drifted the anchor by 2%. Applying each event's midpoint pan, then its distance ratio about the new
+  midpoint, keeps the plane point under the fingers within 1e-9.
+- **Keep the visible zoom constant across layout.** On iOS 26.5 the first layout pass gave zoom 0.96×. Resizing keeps
+  the plane width across the shorter side.
+- **Precision depends on where you are.** Floats near 0 are dense, so Julia mode at center 0 never reaches the
+  precision clamp through the zoom buttons. Tests that need the limit go to a center away from 0 (Mandelbrot at −0.5).
+- **Audit frames are clipped to the visible area.** On iOS 26.5 at XXXL, text scrolled partly under the translucent
+  navigation bar failed contrast; its reported frame started exactly on the bar's bottom edge. The exclusion matches
+  that edge and logs every ignored finding.
+- **Avoid `pow` with integer literals in tests that import both Foundation and simd-based modules.** The call was
+  ambiguous; use a literal constant.

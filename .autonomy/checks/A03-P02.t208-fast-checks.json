@@ -1,0 +1,32 @@
+{
+  "argv": [
+    "python3",
+    "scripts/release_check.py",
+    "--only",
+    "docs",
+    "app-contracts",
+    "compliance",
+    "dependencies",
+    "public-api",
+    "licenses",
+    "script-tests",
+    "host-visualcore",
+    "documented-api-fractal-explorer",
+    "isolation-fractal-explorer",
+    "host-fractal-explorer-core",
+    "--log-dir",
+    ".autonomy/logs/a03p02-t208-fast",
+    "--json",
+    ".autonomy/logs/a03p02-t208-fast.json"
+  ],
+  "command": "python3 scripts/release_check.py --only docs app-contracts compliance dependencies public-api licenses script-tests host-visualcore documented-api-fractal-explorer isolation-fractal-explorer host-fractal-explorer-core --log-dir .autonomy/logs/a03p02-t208-fast --json .autonomy/logs/a03p02-t208-fast.json",
+  "elapsed_seconds": 24.667,
+  "exit_code": 0,
+  "finished": "2026-11-11T12:42:12+00:00",
+  "log": ".autonomy/logs/A03-P02.t208-fast-checks.log",
+  "log_sha256": "17ef05b5c0725bddaacc08a6ef864df6edee93cbfd5a6f7d62b341be26298bef",
+  "name": "t208-fast-checks",
+  "stage": "A03-P02",
+  "started": "2026-11-11T12:41:47+00:00",
+  "timed_out": false
+}

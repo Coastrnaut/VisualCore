@@ -104,7 +104,7 @@ amendments), the plan, research R1–R4, the data model, the contract and the qu
 
 ## Phase 6: Polish
 
-- [ ] T-A03-208 Update `ExplorerUITests` (zoom controls, palette, animate) and the audit (explorer with the
+- [X] T-A03-208 Update `ExplorerUITests` (zoom controls, palette, animate) and the audit (explorer with the — Verified 2026-11-11: — Verified 2026-11-11: ExplorerUITests +1 (zoom in/out/reset change the canvas label 2×/0.5×/1×, palette Sunset -> Ocean, animate toggles, zoom buttons reach 'Near precision limit' then 'Precision limit reached — zoom stops here' in banner and canvas label, further zoom-in is a no-op, reset clears) and the audit with the precision banner (Mandelbrot, reached through the zoom controls) at default size and XXXL; first runs t208-app-ios27/26 failed (audit zoomed in Julia at center 0, where floats never limit), -2 failed on iOS 26.5 XXXL contrast of text scrolled under the navigation bar (documented, logged exclusion added), run-check A03-P02/t208-app-ios27-4 and t208-app-ios26-4 TEST SUCCEEDED, enumeration 24/24 each; contract gate A03-P02 (M03 and M10 available, G-PRECISION closed, decision reason) check_app_contract PASS 10 rows/34 citations; regression baseline A03-P02 section; simulator lessons feature 027; t208-fast-checks 11/11 PASS
   precision banner forced near the limit through the zoom controls), at default size and XXXL on both runtimes.
 
   Then:

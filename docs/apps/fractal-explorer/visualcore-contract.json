@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "app": "fractal-explorer",
-  "gate": "A03-P01",
+  "gate": "A03-P02",
   "date": "2026-11-11",
   "inventory": [
     {
@@ -247,26 +247,32 @@
       "id": "M03",
       "capability": "Precision management",
       "source": "brainstorm",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderCapabilities.swift",
-          "symbol": "RenderCapabilities",
+          "symbol": "RenderCapabilities.fragmentHighp",
           "product": "VisualCoreRendering",
           "public": true
         },
         {
-          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FloatRenderSupport.swift",
-          "symbol": "FloatRenderSupport",
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderCapabilities.swift",
+          "symbol": "ShaderPrecision",
           "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/PrecisionAdvisor.swift",
+          "symbol": "PrecisionAdvisor",
+          "product": "VisualCoreMath",
           "public": true
         }
       ],
       "example": {
-        "file": "Apps/FluidArtPlayground/App/FluidFieldsScene.swift",
-        "symbol": "FluidFieldsScene"
+        "file": "Apps/FractalExplorer/App/ExplorerView.swift",
+        "symbol": "ExplorerModel"
       },
-      "notes": "No Swift highp precision query; 32-bit shader floats assumed, no double. Gap G-PRECISION (research R3)."
+      "notes": "Closed by G-PRECISION in A03-P02: the fragment highp/mediump range and precision bits are queried by RenderCapabilities (simulator values are context only) and PrecisionAdvisor turns mantissa bits, coordinate magnitude and pixel step into reliable / near / beyond-limit levels and a minimum pixel step. Device precision is measured in campaign II before any claim."
     },
     {
       "id": "M04",
@@ -350,8 +356,8 @@
         }
       ],
       "example": {
-        "file": "Apps/FluidArtPlayground/App/PlaygroundView.swift",
-        "symbol": "PlaygroundModel"
+        "file": "Apps/FractalExplorer/App/ExplorerView.swift",
+        "symbol": "ExplorerModel"
       },
       "notes": "The anchored complex-plane mapping is part of G-VIEWPORT (research R6)."
     },
@@ -434,26 +440,26 @@
       "id": "M10",
       "capability": "Visible precision limits with graceful clamping",
       "source": "v0.1 feature 06",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
-          "file": "Packages/VisualCore/Sources/VisualCoreMath/Camera2D.swift",
-          "symbol": "Camera2D.zoomRange",
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/PrecisionAdvisor.swift",
+          "symbol": "PrecisionAdvisor.minimumPixelStep",
           "product": "VisualCoreMath",
           "public": true
         },
         {
-          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderCapabilities.swift",
-          "symbol": "RenderCapabilities",
-          "product": "VisualCoreRendering",
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/PlaneViewport.swift",
+          "symbol": "PlaneViewport",
+          "product": "VisualCoreMath",
           "public": true
         }
       ],
       "example": {
-        "file": "Apps/GenerativeArtStudio/App/ParticlesArtScene.swift",
-        "symbol": "ParticlesArtScene"
+        "file": "Apps/FractalExplorer/App/ExplorerView.swift",
+        "symbol": "ExplorerModel"
       },
-      "notes": "The clamp/warning UI is app content; the advisor is G-PRECISION (research R10)."
+      "notes": "A03-P02: ExplorerModel clamps the viewport's units per point at PrecisionAdvisor.minimumPixelStep for the shader's reported mantissa bits, shows 'Near precision limit — details may blur' / 'Precision limit reached — zoom stops here', announces each change once and appends it to the canvas description (PrecisionClampTests, ExplorerUITests, audit)."
     }
   ],
   "gaps": [
@@ -491,7 +497,8 @@
       "owner": "VisualCore:VisualCoreRendering",
       "phase": 2,
       "test": "Simulator test: a RenderCapabilities fragment-precision query returns the reported highp range and precision bits (recorded as context, never device evidence); host tests: a VisualCoreMath precision advisor derives reliable / warn / clamp thresholds from mantissa bits and units per pixel; device precision is measured in campaign II before any claim",
-      "justification": "Found in A03-P00 (research R3): any shader app that zooms or accumulates needs to know its float precision; the query belongs to VisualCoreRendering (GL) and the pure advisor to VisualCoreMath (R2)."
+      "justification": "Found in A03-P00 (research R3): any shader app that zooms or accumulates needs to know its float precision; the query belongs to VisualCoreRendering (GL) and the pure advisor to VisualCoreMath (R2).",
+      "closed": "A03-P02"
     },
     {
       "id": "G-COST",
@@ -675,7 +682,8 @@
       "Double precision on the GPU is not assumed: 32-bit shader floats are the baseline, zoom is clamped at the measured limit and the limit is shown (A03 truthful precision); perturbation and emulated double stay later ideas.",
       "Reference regression baseline recorded green 7/7 (T-A03-003) and the empty shell builds and passes its smoke test on both simulator runtimes (T-A03-005).",
       "Phase 01 starts with G-VIEWPORT in VisualCoreMath and the app's GPU-free escape-time reference (G-FRACTAL).",
-      "A03-P01: Mandelbrot and Julia modes with accessible explanations and spoken descriptions run on a deterministic CPU reference preview (no GPU yet); PlaneViewport closes G-VIEWPORT in VisualCoreMath and FractalMath closes G-FRACTAL with the known-point fixtures; ProjectM regression 7/7."
+      "A03-P01: Mandelbrot and Julia modes with accessible explanations and spoken descriptions run on a deterministic CPU reference preview (no GPU yet); PlaneViewport closes G-VIEWPORT in VisualCoreMath and FractalMath closes G-FRACTAL with the known-point fixtures; ProjectM regression 7/7.",
+      "A03-P02: the escape-time shader runs in VisualCore's FullScreenShaderScene behind RenderHost (EGL owned only by the host) and matches the FractalMath CPU reference on 64x64 grids (Mandelbrot 100%, Julia 99.9% boundary-only); anchored pinch/pan keeps the plane point under the fingers within 1e-9; five palettes with Reduce-Motion-aware animation; G-PRECISION closed (RenderCapabilities fragment precision + PrecisionAdvisor) with a visible, announced zoom clamp; ProjectM regression 7/7."
     ],
     "blockers": []
   }
