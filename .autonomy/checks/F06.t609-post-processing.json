@@ -1,0 +1,32 @@
+{
+  "argv": [
+    "xcodebuild",
+    "test",
+    "-project",
+    "VisualCore.xcodeproj",
+    "-scheme",
+    "Showcase",
+    "-destination",
+    "platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D",
+    "-derivedDataPath",
+    "Build/DerivedData/Showcase",
+    "-resultBundlePath",
+    ".autonomy/xcresults/F06-t609-20261110-201542.xcresult",
+    "-test-timeouts-enabled",
+    "YES",
+    "-default-test-execution-time-allowance",
+    "180",
+    "CODE_SIGNING_ALLOWED=NO",
+    "-only-testing:ShowcaseTests"
+  ],
+  "command": "xcodebuild test -project VisualCore.xcodeproj -scheme Showcase -destination 'platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D' -derivedDataPath Build/DerivedData/Showcase -resultBundlePath .autonomy/xcresults/F06-t609-20261110-201542.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 180 CODE_SIGNING_ALLOWED=NO -only-testing:ShowcaseTests",
+  "elapsed_seconds": 5.479,
+  "exit_code": 0,
+  "finished": "2026-11-11T01:15:48+00:00",
+  "log": ".autonomy/logs/F06.t609-post-processing.log",
+  "log_sha256": "aeaa68f9caff86ecd3f1449558800c60f88b21a3038f166f79eca14d5e9b22e9",
+  "name": "t609-post-processing",
+  "stage": "F06",
+  "started": "2026-11-11T01:15:42+00:00",
+  "timed_out": false
+}

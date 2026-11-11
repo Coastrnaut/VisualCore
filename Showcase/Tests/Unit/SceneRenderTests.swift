@@ -4,6 +4,7 @@ import XCTest
 import VisualCoreMath
 import VisualCoreRendering
 import VisualCoreScenes
+import VisualCoreEffects
 @testable import Showcase
 
 @MainActor
@@ -156,5 +157,45 @@ final class ParticleSceneTests: XCTestCase {
         XCTAssertGreaterThan(scene.camera.zoom, 1.5, "pinch from 20 to 40 pt doubles the zoom")
         r.host.destroy()
         XCTAssertEqual(r.host.resources.stats.leaked, 0)
+    }
+}
+
+@MainActor
+final class PostProcessingTests: XCTestCase {
+    private func meanAbsDiff(_ a: [UInt8], _ b: [UInt8]) -> Double {
+        guard a.count == b.count, !a.isEmpty else { return .infinity }
+        return Double(zip(a, b).reduce(0) { $0 + abs(Int($1.0) - Int($1.1)) }) / Double(a.count)
+    }
+
+    func testEffectChangesOutputAndOffMatchesContent() throws {
+        let settings = SceneTestSupport.settings(reduceMotion: true)
+        settings.reduceFlashing = false
+        let scene = PostProcessingScene(settings: settings)
+        let r = try SceneTestSupport.render(scene, frames: 2)
+        XCTAssertNil(scene.errorMessage)
+        XCTAssertEqual(scene.status, "passes=grade>glow>wave")
+        XCTAssertEqual(scene.effect.renderer?.lastOrder, ["grade", "glow", "wave"])
+        let on = r.host.readPixels()
+        scene.effectsEnabled = false
+        _ = r.host.renderOneFrame(present: false); _ = r.host.renderOneFrame(present: false)
+        XCTAssertEqual(scene.status, "passes=off")
+        let off = r.host.readPixels()
+        let reference = try SceneTestSupport.render(AnimatedGeometryScene(settings: settings), frames: 2)
+        XCTAssertGreaterThan(meanAbsDiff(on, off), 2, "the effect visibly changes the image")
+        XCTAssertLessThan(meanAbsDiff(off, reference.pixels), 0.5, "effect off shows the content unchanged")
+        scene.effectsEnabled = true
+        _ = r.host.renderOneFrame(present: false)
+        XCTAssertEqual(scene.status, "passes=grade>glow>wave", "toggling back restores the graph")
+        r.host.destroy(); reference.host.destroy()
+        XCTAssertEqual(r.host.resources.stats.leaked, 0)
+    }
+
+    func testReduceFlashingAppendsLimiter() throws {
+        let settings = SceneTestSupport.settings()
+        settings.reduceFlashing = true
+        let scene = PostProcessingScene(settings: settings)
+        let r = try SceneTestSupport.render(scene, frames: 2)
+        XCTAssertEqual(scene.status, "passes=grade>glow>wave>\(EffectScene.flashLimitPassID)")
+        r.host.destroy()
     }
 }

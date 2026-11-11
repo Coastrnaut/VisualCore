@@ -15,11 +15,14 @@ protocol ShowcaseRenderScene: RenderScene {
     func handle(_ event: PointerEvent)
     /// Rebuilds after a recoverable error (Retry button).
     func retry()
+    /// Post-processing on/off for scenes that have it (shown as `showcase.effectToggle`); nil when not applicable.
+    var effectsEnabled: Bool? { get set }
 }
 
 extension ShowcaseRenderScene {
     func handle(_ event: PointerEvent) {}
     func retry() {}
+    var effectsEnabled: Bool? { get { nil } set {} }
 }
 
 struct SceneDescriptor: Identifiable {
@@ -54,6 +57,10 @@ enum SceneCatalog {
                             summary: "Thousands of particles with gravity; drag to spawn, pinch to zoom.",
                             accessibilityDescription: "A dark space where glowing particles fountain up and fall toward a horizontal bar.",
                             interactionHint: "Drag to spawn particles. Pinch with two fingers to zoom.") { ParticleShowcaseScene(settings: $0) },
+            SceneDescriptor(id: "post-processing", title: "Multi-pass Post-processing",
+                            summary: "Color grade, bloom glow and wave distortion over the animated shapes; toggle it off to compare.",
+                            accessibilityDescription: "The spinning cube and sphere with a warm color grade, a soft glow and a gentle wave.",
+                            interactionHint: "Use the Post-processing switch to compare. Drag to orbit.") { PostProcessingScene(settings: $0) },
         ]
     }
 

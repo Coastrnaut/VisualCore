@@ -48,6 +48,13 @@ struct SceneHostView: View {
                         .font(.footnote.monospacedDigit())
                         .accessibilityIdentifier("showcase.status")
                         .accessibilityLabel(sceneHost.status)
+                    if sceneHost.scene.effectsEnabled != nil {
+                        Toggle("Post-processing", isOn: Binding(
+                            get: { sceneHost.scene.effectsEnabled ?? false },
+                            set: { sceneHost.scene.effectsEnabled = $0; sceneHost.sample() }))
+                            .accessibilityIdentifier("showcase.effectToggle")
+                            .fixedSize()
+                    }
                     if showDiagnostics {
                         DiagnosticsOverlay(snapshot: sceneHost.snapshot) { sceneHost.simulateContextLoss() }
                     }
