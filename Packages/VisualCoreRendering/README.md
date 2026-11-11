@@ -210,6 +210,9 @@ These pieces are for GPU simulations and feedback effects that read the previous
 
   `run(pair:input:)` steps a `PingPongTarget` and swaps only on success. Passes built from the same source share one
   cached program, so create one pass per source.
+- `FieldPass.runObserver` (feature 022, nil by default) receives a `FieldPass.Run` (label, output texture or
+  framebuffer, input textures) for every validated run, just before it draws. Tests can use it to prove across whole
+  frames that no pass samples its output.
 - `#include "vc/field.glsl"` in a field pass (passes resolve VisualCore includes by default through
   `ShaderBundle.visualCoreIncludes`, or take `library:`) provides two functions (feature 020):
   - `vc_fieldTexel(f, cell)`: a clamped `texelFetch`;

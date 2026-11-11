@@ -107,6 +107,30 @@ final class FieldPassTests: XCTestCase {
         }
     }
 
+    /// Feature 022 T-A02-401: every validated run is reported with its inputs and output; rejected runs are not.
+    func testRunObserverReportsValidatedRuns() throws {
+        let scene = ClosureScene()
+        let host = try makeFieldHost(scene)
+        defer { host.destroy(); FieldPass.runObserver = nil }
+        var runs: [FieldPass.Run] = []
+        FieldPass.runObserver = { runs.append($0) }
+        try withContext(host, scene) { context in
+            let r = context.resources
+            let pair = try PingPongTarget(registry: r, width: 4, height: 4, format: .rgba8, label: "p")
+            defer { pair.release() }
+            let pass = try FieldPass(registry: r, fragment: Self.scale, inputs: ["uField"], label: "scale")
+            defer { pass.release() }
+            let read = pair.read.colorTexture, write = pair.write.colorTexture
+            try pass.run(pair: pair, input: "uField", uniforms: ["uFactor": .float(1)])
+            XCTAssertThrowsError(try pass.run(output: .target(pair.read), inputs: ["uField": pair.read]))
+            try pass.run(output: .framebuffer(name: context.framebuffer, width: 4, height: 4), inputs: ["uField": pair.read])
+            XCTAssertEqual(runs.count, 2, "the rejected run is not reported")
+            XCTAssertEqual(runs[0], FieldPass.Run(label: "scale", output: write, outputIsFramebuffer: false, inputs: ["uField": read]))
+            XCTAssertTrue(runs[1].outputIsFramebuffer)
+            XCTAssertFalse(runs.contains { !$0.outputIsFramebuffer && $0.inputs.values.contains($0.output) })
+        }
+    }
+
     func testStaleAfterContextRecreation() throws {
         let scene = ClosureScene()
         let host = try makeFieldHost(scene)

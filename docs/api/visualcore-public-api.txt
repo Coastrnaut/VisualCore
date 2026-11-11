@@ -495,6 +495,7 @@ VisualCoreRendering | let | public let generation: Int
 VisualCoreRendering | let | public let handle: GPUHandle
 VisualCoreRendering | let | public let height: Int
 VisualCoreRendering | let | public let index: Int
+VisualCoreRendering | let | public let inputs: [String: UInt32]
 VisualCoreRendering | let | public let inputs: [String]
 VisualCoreRendering | let | public let kind: ResourceKind
 VisualCoreRendering | let | public let label: String
@@ -503,6 +504,8 @@ VisualCoreRendering | let | public let location: GLint
 VisualCoreRendering | let | public let mesh: Mesh
 VisualCoreRendering | let | public let name: GLuint
 VisualCoreRendering | let | public let name: UInt32
+VisualCoreRendering | let | public let output: UInt32
+VisualCoreRendering | let | public let outputIsFramebuffer: Bool
 VisualCoreRendering | let | public let pixelHeight: Int
 VisualCoreRendering | let | public let pixelWidth: Int
 VisualCoreRendering | let | public let probeComplete: Bool
@@ -533,9 +536,11 @@ VisualCoreRendering | struct | public struct FrameInfo: Sendable, Equatable
 VisualCoreRendering | struct | public struct GPUHandle: Sendable, Equatable
 VisualCoreRendering | struct | public struct RenderCapabilities: Sendable, Equatable, Codable
 VisualCoreRendering | struct | public struct RenderContext: Equatable
+VisualCoreRendering | struct | public struct Run: Sendable, Equatable
 VisualCoreRendering | struct | public struct Size: Sendable, Equatable, Codable
 VisualCoreRendering | struct | public struct StillImage: Sendable, Equatable
 VisualCoreRendering | struct | public struct Uniform: Sendable, Equatable
+VisualCoreRendering | var | @MainActor public static var runObserver: ((Run) -> Void)?
 VisualCoreRendering | var | public internal(set) static var lastFailureLog
 VisualCoreRendering | var | public internal(set) var maxTextureSize
 VisualCoreRendering | var | public private(set) var cacheHits

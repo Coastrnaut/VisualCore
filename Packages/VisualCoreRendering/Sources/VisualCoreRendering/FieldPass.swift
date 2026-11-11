@@ -56,6 +56,22 @@ public final class FieldPass {
         case framebuffer(name: UInt32, width: Int, height: Int)
     }
 
+    /// One validated run, as reported to `runObserver` just before drawing (feature 022; FR-A02-407).
+    public struct Run: Sendable, Equatable {
+        /// The pass label.
+        public let label: String
+        /// The output: a render target's color texture name, or a framebuffer name for framebuffer output.
+        public let output: UInt32
+        /// True when `output` is a framebuffer (screen or offscreen host target), not a texture.
+        public let outputIsFramebuffer: Bool
+        /// Input sampler names mapped to the color texture names they sample.
+        public let inputs: [String: UInt32]
+    }
+
+    /// Observes every validated field-pass run, app-wide (nil by default; set by tests and diagnostics to audit that
+    /// no pass samples its output across whole frames).
+    @MainActor public static var runObserver: ((Run) -> Void)?
+
     /// Sampler names, bound to texture units 0, 1, … in this order.
     public let inputs: [String]
     /// Diagnostic label.
@@ -110,6 +126,14 @@ public final class FieldPass {
             (framebuffer, width, height) = (name, w, h)
         }
 
+        if let observer = Self.runObserver {
+            let output: (UInt32, Bool) = switch output {
+            case .target(let t): (t.colorTexture, false)
+            case .framebuffer(let name, _, _): (name, true)
+            }
+            observer(Run(label: label, output: output.0, outputIsFramebuffer: output.1,
+                         inputs: supplied.mapValues { $0.colorTexture }))
+        }
         vcglBindFramebuffer(GLenum(GL_FRAMEBUFFER), framebuffer)
         vcglViewport(0, 0, GLsizei(width), GLsizei(height))
         let blend = vcglIsEnabled(GLenum(GL_BLEND)) == GLboolean(GL_TRUE)

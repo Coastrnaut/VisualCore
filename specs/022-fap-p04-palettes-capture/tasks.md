@@ -16,7 +16,7 @@ Checkpoints: `validate_docs`, `check_dependencies`, `check_compliance` and `chec
 
 ## Phase 1: Foundational — VisualCore pass run observer (blocks US4)
 
-- [ ] T-A02-401 Add `FieldPass.Run` and `@MainActor static var runObserver` in
+- [X] T-A02-401 Add `FieldPass.Run` and `@MainActor static var runObserver` in — Verified 2026-11-11: FieldPass.Run (label, output texture or framebuffer, outputIsFramebuffer, input textures) and the @MainActor static runObserver (nil by default; called after validation, just before the draw) with /// docs and a README note; FieldPassTests +1 (a pair run reports the write texture with the read as input, a rejected inputIsOutput run is not reported, framebuffer output flagged). run-check A02-P04/t401-rendering-27 and t401-rendering-26 TEST SUCCEEDED, enumeration guard 134/134 each; API baseline updated (additions) then PASS; ProjectM regression t401-reference-a 3/3 + t401-reference-b 4/4 (FR-A02-407)
   `Packages/VisualCoreRendering/Sources/VisualCoreRendering/FieldPass.swift` (called after validation, before the
   draw; for a target output, `output` is its color texture name). Extend `FieldPassTests` (one run is reported with
   the right input and output names; a rejected run reports nothing). Add docs, README, baseline. Run the package
