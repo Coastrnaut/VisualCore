@@ -48,6 +48,16 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: dev.visualcore.Showcase
         PRODUCT_NAME: Showcase
         GENERATE_INFOPLIST_FILE: NO
+        # The audit script reads the repository and the built app (outside the script sandbox).
+        ENABLE_USER_SCRIPT_SANDBOXING: NO
+    postBuildScripts:
+      # FR-F610: every Showcase build fails if it depends on a ProjectM engine/preset/bridge module (before any test runs).
+      - name: Dependency audit (FR-F610)
+        basedOnDependencyAnalysis: false
+        script: |
+          set -e
+          env -i PATH=/usr/bin:/bin:/usr/sbin:/sbin HOME="$HOME" DEVELOPER_DIR="$DEVELOPER_DIR" \
+            /usr/bin/python3 "$SRCROOT/scripts/audit_showcase_dependencies.py" --root "$SRCROOT" --app "$TARGET_BUILD_DIR/$WRAPPER_NAME"
     dependencies:
       - package: VisualCore
         product: VisualCoreMath

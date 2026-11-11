@@ -230,6 +230,26 @@ class ShowcaseAuditTests(unittest.TestCase):
         code, out = self.run_audit("clean")
         self.assertEqual(code, 0, out)
 
+    def test_comments_and_build_scripts_are_not_structure(self):
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            (root / "Showcase" / "App").mkdir(parents=True)
+            (root / "Showcase" / "App" / "A.swift").write_text("import SwiftUI\n")
+            spec = (self.FIX / "clean" / "project.yml").read_text().replace(
+                "    type: application\n",
+                "    type: application\n    # Must never depend on ProjectM (comment)\n"
+                "    postBuildScripts:\n      - name: Audit ProjectM independence\n        script: |\n          echo projectm\n")
+            (root / "project.yml").write_text(spec)
+            code, out = self.run_audit_at(root)
+            self.assertEqual(code, 0, out)
+
+    def run_audit_at(self, root: Path, *extra: str) -> tuple[int, str]:
+        import contextlib, io
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(io.StringIO()):
+            code = audit.main(["--root", str(root), "--skip-packages", *extra])
+        return code, out.getvalue()
+
     def test_import_contamination(self):
         code, out = self.run_audit("import")
         self.assertEqual(code, 1)

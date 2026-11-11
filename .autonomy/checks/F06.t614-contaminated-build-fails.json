@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "sh",
+    "-c",
+    "! xcodebuild build -project VisualCore.xcodeproj -scheme Showcase -destination \"generic/platform=iOS Simulator\" -derivedDataPath Build/DerivedData/ShowcaseProbe CODE_SIGNING_ALLOWED=NO"
+  ],
+  "command": "sh -c '! xcodebuild build -project VisualCore.xcodeproj -scheme Showcase -destination \"generic/platform=iOS Simulator\" -derivedDataPath Build/DerivedData/ShowcaseProbe CODE_SIGNING_ALLOWED=NO'",
+  "elapsed_seconds": 10.281,
+  "exit_code": 0,
+  "finished": "2026-11-11T01:27:37+00:00",
+  "log": ".autonomy/logs/F06.t614-contaminated-build-fails.log",
+  "log_sha256": "86a7a84fe4d66c27da088296778963040f9a7bf86227bb61f8a3f358bfb92113",
+  "name": "t614-contaminated-build-fails",
+  "stage": "F06",
+  "started": "2026-11-11T01:27:26+00:00",
+  "timed_out": false
+}

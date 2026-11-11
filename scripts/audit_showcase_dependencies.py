@@ -92,7 +92,22 @@ def audit_spec(spec: Path, target: str) -> tuple[list[str], list[str], dict[str,
         raise ValueError(f"target {target!r} not found in {spec}")
     findings, checked = [], [f"{spec.name}:{target}"]
     used = set()
-    for line in block:
+    # Judge structure only: drop YAML comments and the bodies of build-script phases (names and shell text).
+    structural, script_indent = [], None
+    for raw in block:
+        line = re.sub(r"\s+#.*$|^\s*#.*$", "", raw)
+        indent = len(raw) - len(raw.lstrip())
+        if script_indent is not None:
+            if raw.strip() and indent <= script_indent:
+                script_indent = None
+            else:
+                continue
+        if re.match(r"^\s*(pre|post)BuildScripts:\s*$", line) or re.match(r"^\s*buildToolPlugins:\s*$", line):
+            script_indent = indent
+            continue
+        if line.strip():
+            structural.append(line)
+    for line in structural:
         if re.match(r"^\s*-?\s*package:\s*(\S+)", line):
             used.add(re.match(r"^\s*-?\s*package:\s*(\S+)", line).group(1))
         m = re.match(r"^\s*(?:-\s*)?(?:product|target|framework|sdk|path):\s*(\S+)", line)
