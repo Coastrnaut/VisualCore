@@ -46,7 +46,7 @@ push per task. Each subsystem is implemented separately (supplied prompt). Paths
 
 ## Phase 6: US4 — Minimal 3D camera and meshes (P3)
 
-- [ ] T-F515 [US4] Tests first `VisualCoreMathTests/OrbitCameraTests.swift` (AC1 origin → NDC (0,0), center ray hits origin; pitch clamped ±89°; zoom keeps distance > 0), then `VisualCoreMath/OrbitCamera.swift`
+- [X] T-F515 [US4] Tests first `VisualCoreMathTests/OrbitCameraTests.swift` (AC1 origin → NDC (0,0), center ray hits origin; pitch clamped ±89°; zoom keeps distance > 0), then `VisualCoreMath/OrbitCamera.swift` — Verified 2026-11-10: F05.t515-orbit-camera exit 0: 4 tests — AC1 target → NDC (0,0), center ray passes through origin; handedness and depth order; pitch clamp ±89°, distance clamp, invalid inputs ignored; orbit keeps distance
 - [ ] T-F516 [US4] Tests first `VisualCoreScenesTests/MeshTests.swift` (AC2 sphere 16×8 counts, unit normals; cube 24 vertices/36 indices; plane; segments "3–256", rings "2–256", subdivisions "≤ 256" clamped), then `VisualCoreScenes/MeshGenerators.swift`
 - [ ] T-F517 [US4] Sim test first `VisualCoreRenderingTests/MeshRendererTests.swift` (lit sphere: center brighter than limb, background outside; recreation/teardown), then `VisualCoreRendering/MeshRenderer.swift` (Lambert)
 
