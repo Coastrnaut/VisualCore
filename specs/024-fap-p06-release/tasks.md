@@ -80,7 +80,7 @@ IDs are `T-A02-6##`, with one commit per task (`scripts/tick_task.py`). Commands
     source check; app frame timing 35F9.1).
 
   Rebuild, then: scan 0 undeclared and 0 unused; `check_release_symbols.py` 0 (FR-A02-601, SC-A02-601).
-- [ ] T-A02-606 [US2] Acknowledgements:
+- [X] T-A02-606 [US2] Acknowledgements: — Verified 2026-11-11: — Verified 2026-11-11: FAP bundle_licenses.py post-build phase (Licenses/ with licenses.json in the app), home link fap.home.acknowledgements -> AcknowledgementsView(identifierPrefix: "fap.acknowledgements"); AcknowledgementsUITests (ANGLE BSD-3-Clause with full text, VisualCore = this repository incl. the app) and the audit's new acknowledgements screen at default and XXXL: run-check A02-P06/t606-ui-ios27 and t606-ui-ios26 TEST SUCCEEDED, no audit issues; t606-licenses PASS; missing-bundle fallback text is covered by VisualCoreUI AcknowledgementsViewTests (analyze G2)
   - `project.yml`: the FAP `bundle_licenses.py` post-build phase, as in A01.
   - The home link `fap.home.acknowledgements` opens `AcknowledgementsView(identifierPrefix: "fap.acknowledgements")`.
   - Add `Apps/FluidArtPlayground/Tests/UI/AcknowledgementsUITests.swift`: the screen opens and lists ANGLE,

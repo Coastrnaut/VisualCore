@@ -1,4 +1,4 @@
-// AccessibilityAuditUITests — feature 020 T-A02-213 (paused state: feature 023 T-A02-505) (SC-A02-205; analyze U1; constitution A02 accessibility).
+// AccessibilityAuditUITests — feature 020 T-A02-213 (paused state: feature 023 T-A02-505; Acknowledgements: feature 024 T-A02-606) (SC-A02-205; analyze U1; constitution A02 accessibility).
 // Runs the system accessibility audit on home and playground at the default and the largest accessibility text size,
 // following the A01 pattern (feature 016). Documented exclusions (spec 020 Clarifications): contrast of the artwork
 // inside the live canvas, navigation-bar chrome, and findings without an element. Each ignored finding is logged.
@@ -71,6 +71,15 @@ final class AccessibilityAuditUITests: XCTestCase {
         app.buttons["fap.capture"].tap()
         XCTAssertTrue(app.buttons["fap.capture.share"].waitForExistence(timeout: 30))
         try audit(app, "capture [\(label)]", types: types)
+        // Feature 024: the Acknowledgements screen, reached from home.
+        app.buttons["fap.capture.done"].tap()
+        app.navigationBars.buttons.element(boundBy: 0).tap()
+        let acknowledgements = app.descendants(matching: .any)["fap.home.acknowledgements"]
+        XCTAssertTrue(acknowledgements.waitForExistence(timeout: 10))
+        for _ in 0..<3 where !acknowledgements.isHittable { app.swipeUp() }
+        acknowledgements.tap()
+        XCTAssertTrue(app.descendants(matching: .any)["fap.acknowledgements.angle"].waitForExistence(timeout: 5))
+        try audit(app, "acknowledgements [\(label)]", types: types)
     }
 
     func testAuditDefaultTextSize() throws { try run(textSize: nil) }

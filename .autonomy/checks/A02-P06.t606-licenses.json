@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_licenses.py"
+  ],
+  "command": "python3 scripts/check_licenses.py",
+  "elapsed_seconds": 5.732,
+  "exit_code": 0,
+  "finished": "2026-11-11T11:27:13+00:00",
+  "log": ".autonomy/logs/A02-P06.t606-licenses.log",
+  "log_sha256": "7d7d6eb4e2350adc65375750d0bd73a507255f5d7387f0d60cefe0fb9289de59",
+  "name": "t606-licenses",
+  "stage": "A02-P06",
+  "started": "2026-11-11T11:27:08+00:00",
+  "timed_out": false
+}

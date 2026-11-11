@@ -60,6 +60,14 @@ struct HomeView: View {
                 }
                 .buttonStyle(.borderedProminent)
                 .accessibilityIdentifier("fap.home.open")
+                // Feature 024 T-A02-606 (FR-A02-604): the bundled license texts (bundle_licenses.py), shown by VisualCoreUI.
+                NavigationLink {
+                    AcknowledgementsView(identifierPrefix: "fap.acknowledgements")
+                } label: {
+                    Label("Acknowledgements", systemImage: "doc.text")
+                        .frame(minHeight: 44)
+                }
+                .accessibilityIdentifier("fap.home.acknowledgements")
             }
             .padding()
             .frame(maxWidth: .infinity)
