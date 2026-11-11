@@ -164,7 +164,7 @@ the math end to end before Phase 02 replaces it with the GPU render, and it beco
   - the exterior points 2, 1+i and −2.1, with their exact escape counts;
   - the four Julia samples:
     - c = 0, z = 0.5: interior;
-    - c = 0, z = 1.5: exterior, count 2 (|z₁|² = 5.0625);
+    - c = 0, z = 1.5: exterior, count 1 (z₁ = 2.25, |z₁|² = 5.0625 > 4);
     - c = −1, z = 0: interior (period 2);
     - c = −0.8+0.156i, z = 2: exterior, count 1.
 - **FR-A03-104**: VisualCore MUST provide a generic double-precision complex-plane viewport (G-VIEWPORT), with
