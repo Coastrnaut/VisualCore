@@ -36,14 +36,19 @@ final class SceneHost {
     private var timer: Timer?
     private var lastSample: (frames: Int, time: CFTimeInterval)?
 
-    init(scene: ShowcaseRenderScene) {
+    /// Set when no render host could be created (edge case "rendering unavailable"); shown by SceneHostView.
+    private(set) var unavailableMessage: String?
+
+    /// `makeHost` is injectable so tests can simulate a device without a usable renderer.
+    init(scene: ShowcaseRenderScene, makeHost: (ShowcaseRenderScene) throws -> RenderHost = { try RenderHost(scene: $0) }) {
         self.scene = scene
         do {
-            let host = try RenderHost(scene: scene)
+            let host = try makeHost(scene)
             host.pointerHandler = { [weak scene] e in scene?.handle(e) }
             self.host = host
         } catch {
-            snapshot.error = "Rendering unavailable: \(error)"
+            unavailableMessage = "Rendering unavailable: \(error)"
+            snapshot.error = unavailableMessage
         }
         timer = Timer.scheduledTimer(withTimeInterval: 0.25, repeats: true) { [weak self] _ in
             MainActor.assumeIsolated { self?.sample() }

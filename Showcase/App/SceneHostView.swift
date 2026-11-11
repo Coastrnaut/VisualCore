@@ -35,7 +35,15 @@ struct SceneHostView: View {
 
     var body: some View {
         ZStack(alignment: .top) {
-            if let sceneHost {
+            if let sceneHost, let message = sceneHost.unavailableMessage {
+                ContentUnavailableView {
+                    Label("Rendering unavailable", systemImage: "exclamationmark.triangle")
+                } description: {
+                    Text(message)
+                }
+                .accessibilityElement(children: .combine)
+                .accessibilityIdentifier("showcase.error")
+            } else if let sceneHost {
                 RenderCanvas(sceneHost: sceneHost)
                     .ignoresSafeArea(edges: .bottom)
                     .accessibilityElement(children: .ignore)
