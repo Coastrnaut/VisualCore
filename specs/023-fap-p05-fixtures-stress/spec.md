@@ -50,9 +50,10 @@ delta), `RenderHost.renderFrame` (renders nothing unless active), `FramePacing.c
      frame.
 - Q: Is the simulation resolution setting (MVP-06, "configurable simulation resolution with thermal downgrade") in
   this phase? → A: Yes. Thermal downgrade already shipped (feature 021). This phase adds a "Simulation detail" picker
-  (Low 64, Medium 128, High 256 cells on the short edge; the long edge follows the canvas aspect, capped at 512). The
-  default stays Medium. A change rebuilds only the field targets on the next frame and restarts from the seed. The
-  stress fixture covers High. Release packaging is not delayed.
+  with square grids: Low 64×64, Medium 128×128 (the default, unchanged from features 019–022) and High 256×256. Each
+  is capped by the device's maximum render size. A change rebuilds only the field targets on the next frame and
+  restarts from the seed. The stress fixture covers High. (Refined at planning: square grids keep today's default
+  picture and need no layout-time rebuild; see research R4.)
 - Q: Where does "Reset" restore the dye from? → A: The seeded pattern for the current seed, in the current palette's
   splat colors (as at first open). The velocity and pressure are cleared to zero, written as encoded zero in 8-bit
   storage.
@@ -216,8 +217,8 @@ writes a JSON report and exits, and that the Release build contains no automatio
   app.
 - **FR-A02-509**: The app MUST NOT create or own EGL displays, contexts or surfaces. All GPU work goes through the
   VisualCore host, and the isolation check enforces this.
-- **FR-A02-511**: The Adjust panel MUST offer a "Simulation detail" picker (Low, Medium, High = 64, 128, 256 cells
-  on the short edge; the long edge follows the canvas aspect, capped at 512). A change rebuilds only the field targets
+- **FR-A02-511**: The Adjust panel MUST offer a "Simulation detail" picker (Low, Medium, High = 64×64, 128×128,
+  256×256 cells, capped by the device's maximum render size). A change rebuilds only the field targets
   on the next frame and restarts from the seed. It is accessible and covered by unit and UI tests (MVP-06).
 - **FR-A02-510**: The contract and the device-campaign plan MUST record the automation modes, their report fields,
   and the "device run pending implementation lock" status. The checks MUST pass.
@@ -246,8 +247,8 @@ writes a JSON report and exits, and that the Release build contains no automatio
   simulated 10-minute suspension, with a time step of at most 1/30 s.
 - **SC-A02-505**: The stress fixture finds 0 non-finite or out-of-range values over 600 frames in each storage, and
   never more than the cap per frame.
-- **SC-A02-507**: Each simulation detail level gives the documented grid for a 1:2 canvas (64×128, 128×256,
-  256×512), and switching levels keeps 0 leaked resources over 10 switches.
+- **SC-A02-507**: Each simulation detail level gives its documented grid (64×64, 128×128, 256×256), and switching
+  levels keeps 0 leaked resources over 10 switches.
 - **SC-A02-506**: Simulator rehearsal: each automation mode writes a report with result "pass" and exits. The Release
   build has 0 automation symbols. API review, documented-API, isolation, contract, ProjectM regression (7/7) and app
   tests on both runtimes all pass.
