@@ -85,7 +85,7 @@ contains additions only.
 
 ## Phase 4: User Story 2 — Dye and motion are carried by the flow (P1)
 
-- [ ] T-A02-210 [P] [US2] Tests first, then add `Advection.swift` (Core): the semi-Lagrangian step in the order of
+- [X] T-A02-210 [P] [US2] Tests first, then add `Advection.swift` (Core): the semi-Lagrangian step in the order of — Verified 2026-11-11: Advection (Core): semi-Lagrangian step (velocity by itself, then dye by the advected velocity; dissipation factor folded in; FieldGrid.sampleBilinear clamp-to-edge; storage rounding; 8-bit velocity decoded for the backtrace and decode/scale/re-encode for the advected velocity), numerical diffusion documented. AdvectionTests 6: zero velocity keeps the pattern unchanged and bounded for 120 steps on 8x8 and 16x16 (FR-A02-207), a uniform 0.5-cell-per-step shift moves the center of mass by exactly 2 cells in 4 steps with mass conserved and visible diffusion (US2 AC2), a uniform field stays uniform (US2 AC3), a backtrace outside clamps to the edge, zero velocity equals Phase 01 dissipation in float16/float16TowardZero/unorm8, and encoded zero velocity moves nothing. run-check A02-P02/t210-core-test swift test 33/33 pass (FR-A02-206)
   clarification 5, with the dissipation factor, `FieldGrid.sampleBilinear`, precision rounding, and 8-bit velocity
   decode/encode. `AdvectionTests`: zero velocity is the identity; a uniform half-cell shift; a uniform field stays
   uniform; edges are clamped.
