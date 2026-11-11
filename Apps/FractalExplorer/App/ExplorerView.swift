@@ -5,7 +5,9 @@ import CoreGraphics
 import FractalExplorerCore
 import SwiftUI
 import VisualCoreMath
+import VisualCoreParameters
 import VisualCoreRendering
+import VisualCoreSimulation
 import VisualCoreScenes
 import VisualCoreUI
 
@@ -34,11 +36,24 @@ final class ExplorerModel {
     private(set) var droppedResults = 0
     private var task: Task<Void, Never>?
 
-    /// `fragment` is a test seam (an invalid source exercises the fallback).
-    init(size: Vec2 = Vec2(390, 844), fragment: String = FractalShaders.fragment) {
+    // MARK: Palettes (feature 027 T-A03-206; FR-A03-203)
+
+    /// The offered VisualCore built-in palettes (Monochrome omitted: two stops make poor escape bands).
+    static let paletteIDs = ["sunset", "ocean", "forest", "neon", "ember"]
+    /// The selected palette.
+    var paletteID: String { didSet { if Self.paletteIDs.contains(paletteID) { scene.snapshot.paletteID = paletteID } else { paletteID = oldValue } } }
+    /// Palette animation along the bands; defaults to off under Reduce Motion.
+    var animate: Bool { didSet { scene.snapshot.animate = animate } }
+
+    /// `fragment` is a test seam (an invalid source exercises the fallback); `system` reads Reduce Motion (default: the
+    /// system's, through VisualCoreUI's observer).
+    init(size: Vec2 = Vec2(390, 844), fragment: String = FractalShaders.fragment,
+         system: SystemAccessibility = SystemAccessibilityObserver.systemValues()) {
         let initial = FractalState(size: size)
         state = initial
-        scene = FractalScene(snapshot: .init(state: initial), fragment: fragment)
+        paletteID = "sunset"
+        animate = !system.reduceMotion
+        scene = FractalScene(snapshot: .init(state: initial, paletteID: "sunset", animate: !system.reduceMotion), fragment: fragment)
         host = try? RenderHost(scene: scene)
         host?.pointerHandler = { [weak self] event in self?.handle(event) }
         if usingFallback { refresh() }
@@ -188,6 +203,15 @@ struct ExplorerView: View {
                         .fixedSize(horizontal: false, vertical: true)
                         .accessibilityIdentifier("fe.fallback")
                 }
+                Picker("Palette", selection: $model.paletteID) {
+                    ForEach(ExplorerModel.paletteIDs, id: \.self) { id in
+                        Text(Palette.builtIn(id)?.name ?? id).tag(id)
+                    }
+                }
+                .accessibilityIdentifier("fe.palette")
+                Toggle("Animate colors", isOn: $model.animate)
+                    .accessibilityHint("Lets the palette flow along the bands")
+                    .accessibilityIdentifier("fe.animate")
                 if model.state.mode == .julia {
                     Text("Seed: \(FractalState.complex(model.state.juliaSeed))")
                         .accessibilityIdentifier("fe.seed")

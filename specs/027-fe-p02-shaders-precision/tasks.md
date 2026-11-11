@@ -78,7 +78,7 @@ amendments), the plan, research R1–R4, the data model, the contract and the qu
 
 ## Phase 4: User Story 2 — palettes (P1)
 
-- [ ] T-A03-206 [US2] Add the palette picker `fe.palette` (Sunset by default, then Ocean, Forest, Neon and Ember) and
+- [X] T-A03-206 [US2] Add the palette picker `fe.palette` (Sunset by default, then Ocean, Forest, Neon and Ember) and — Verified 2026-11-11: — Verified 2026-11-11: palette picker fe.palette (Sunset default, Ocean, Forest, Neon, Ember; others refused) and fe.animate toggle; animation defaults off under Reduce Motion (SystemAccessibilityObserver.systemValues / injectable SystemAccessibility); FractalScene clock paused when off. PaletteTests 3: each palette's linear stops reach the inner FullScreenShaderScene, animation off gives identical offscreen frames 1 s apart and on changes them, Reduce Motion defaults off but can be turned on — run-check A03-P02/t206-app-ios27 and t206-app-ios26 TEST SUCCEEDED, enumeration 19/19 each
   the `fe.animate` toggle. Reduce Motion turns animation off by default (VisualCoreUI `SystemAccessibilityObserver`).
   The clock pauses while animation is off.
 
