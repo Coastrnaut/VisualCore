@@ -7,7 +7,9 @@ Read-only audit of the tree at gate A01-P06 (2026-11-11), for a GPU fluid solver
   intermediate targets. There is no reusable "field" type that swaps a read and a write target and forbids
   read/write on the same texture. Status: `requires adaptation`. Owner: VisualCoreRendering, a new `PingPongTarget`
   (a pair, swap, generation-safe, budget-accounted) in the phase that first renders the solver (Phase 02).
-- **R2 Texture feedback.** VisualCoreEffects `FeedbackPass` keeps a history target across frames. It is an effect
+- **R2 Texture feedback.** VisualCoreEffects' `feedback` pass type keeps a history target across frames. Its runner
+  (`FeedbackPass`) is internal; the public surface is the effect-graph description run by `EffectRenderer` and
+  `EffectScene`, which is what the matrix cites. It is an effect
   over an image, not a simulation field. Status: `available` for display feedback (example: `EffectRendererTests`);
   simulation feedback uses R1.
 - **R3 GPU simulation techniques.** Full-screen passes come from `FullScreenShaderScene` and the effect passes' vertex
