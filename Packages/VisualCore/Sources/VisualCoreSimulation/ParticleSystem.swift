@@ -29,17 +29,20 @@ public struct Emitter: Sendable, Equatable {
     public var shape: EmitterShape
     /// Periodic burst emission in addition to `rate` (default nil: none).
     public var burst: EmitterBurst?
+    /// When true, `direction` is measured from the shape's outward direction at the spawn point: the radius for a ring,
+    /// the line's angle for a line; no effect for a point (default false). Feature 033: rings that emit outward.
+    public var radial: Bool
 
     /// Defaults: 100 particles/s, 1 s life, speed 50–100, pointing +y with a full 2π spread, size 4→0, opaque→transparent
     /// white, a point shape and no periodic bursts.
     public init(position: Vec2 = .zero, rate: Double = 100, lifetime: ClosedRange<Double> = 1...1,
                 speed: ClosedRange<Double> = 50...100, direction: Double = .pi / 2, spread: Double = 2 * .pi,
                 startSize: Double = 4, endSize: Double = 0, startColor: Vec4 = Vec4(1, 1, 1, 1), endColor: Vec4 = Vec4(1, 1, 1, 0),
-                shape: EmitterShape = .point, burst: EmitterBurst? = nil) {
+                shape: EmitterShape = .point, burst: EmitterBurst? = nil, radial: Bool = false) {
         self.position = position; self.rate = rate; self.lifetime = lifetime; self.speed = speed
         self.direction = direction; self.spread = spread
         self.startSize = startSize; self.endSize = endSize; self.startColor = startColor; self.endColor = endColor
-        self.shape = shape; self.burst = burst
+        self.shape = shape; self.burst = burst; self.radial = radial
     }
 }
 
@@ -166,7 +169,7 @@ public struct ParticleSystem: Sendable {
 
     private mutating func spawn(from e: Int, _ em: Emitter) {
         guard aliveCount < capacity else { droppedCount += 1; return }
-        let angle = em.direction + (random.double() - 0.5) * em.spread
+        var angle = em.direction + (random.double() - 0.5) * em.spread
         let speed = random.range(em.speed)
         // Shape offset after angle and speed: a point draws nothing, keeping earlier seeded results identical (R2).
         let i = aliveCount
@@ -175,6 +178,13 @@ public struct ParticleSystem: Sendable {
         } else {
             let offset = em.shape.sampleOffset(&random)
             px[i] = em.position.x + offset.x; py[i] = em.position.y + offset.y
+            if em.radial {
+                switch em.shape {
+                case .point: break
+                case .line(_, let a): angle += a
+                case .ring: if offset.x != 0 || offset.y != 0 { angle += atan2(offset.y, offset.x) }
+                }
+            }
         }
         vx[i] = cos(angle) * speed; vy[i] = sin(angle) * speed
         age[i] = 0

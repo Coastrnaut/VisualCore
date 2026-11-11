@@ -19,6 +19,8 @@
 
 - New field `shape: EmitterShape = .point`.
 - New field `burst: EmitterBurst? = nil`.
+- New field `radial: Bool = false` (added in T-A04-105 for Halo): when true, `direction` is measured from the shape's
+  outward direction at the spawn point (the radius for a ring, the line's angle for a line); no extra random draw.
 - New function `clamped() -> Emitter`:
   - non-finite values → the default;
   - rate 0…20,000; lifetime 0.01…3,600 (ordered; widened from 60 during T-A04-102 for the baselines’ 100 s); speed 0…10,000 (ordered); sizes 0…512; spread 0…2π;

@@ -178,3 +178,22 @@ private func spawnPositions(_ emitter: Emitter, count: Int, seed: UInt64 = 7) ->
     let decoded = try JSONDecoder().decode(EmitterBurst.self, from: try JSONEncoder().encode(b))
     #expect(decoded == b)
 }
+
+@Test func radialRingsEmitOutward() {
+    // Feature 033 (Halo): with `radial`, direction 0 and no spread, every velocity points away from the center.
+    var ps = ParticleSystem(capacity: 1_000, seed: 21)
+    ps.emitters = [Emitter(position: Vec2(5, 5), rate: 0, lifetime: 9...9, speed: 10...10, direction: 0, spread: 0,
+                           shape: .ring(radius: 100), radial: true)]
+    ps.burst(1_000)
+    ps.step(dt)
+    for i in 0..<ps.aliveCount {
+        let out = Vec2(ps.px[i] - 5, ps.py[i] - 5) / 100
+        let v = Vec2(ps.vx[i], ps.vy[i]) / 10
+        #expect(abs(out.x * v.x + out.y * v.y - 1) < 1e-9)
+    }
+    // Without `radial` the direction stays absolute.
+    var flat = ParticleSystem(capacity: 10, seed: 21)
+    flat.emitters = [Emitter(rate: 0, lifetime: 9...9, speed: 10...10, direction: 0, spread: 0, shape: .ring(radius: 100))]
+    flat.burst(10); flat.step(dt)
+    #expect((0..<flat.aliveCount).allSatisfy { abs(flat.vx[$0] - 10) < 1e-12 && abs(flat.vy[$0]) < 1e-12 })
+}

@@ -1077,6 +1077,7 @@ VisualCoreSimulation | var | public var name: String
 VisualCoreSimulation | var | public var offset: Double
 VisualCoreSimulation | var | public var playbackRate: Double
 VisualCoreSimulation | var | public var position: Vec2
+VisualCoreSimulation | var | public var radial: Bool
 VisualCoreSimulation | var | public var rate
 VisualCoreSimulation | var | public var rate: Double
 VisualCoreSimulation | var | public var reduceFlashing: AccessibilityChoice

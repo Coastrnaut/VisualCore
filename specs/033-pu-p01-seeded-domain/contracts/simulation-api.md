@@ -12,6 +12,7 @@ public struct EmitterBurst: Sendable, Equatable, Codable { public var count: Int
 extension Emitter {
     public var shape: EmitterShape      // stored, default .point
     public var burst: EmitterBurst?     // stored, default nil
+    public var radial: Bool             // stored, default false; direction relative to the shape's outward direction (T-A04-105)
     public func clamped() -> Emitter
     public static let rateRange, lifetimeRange, speedRange, sizeRange, extentRange: ClosedRange<Double>
 }
