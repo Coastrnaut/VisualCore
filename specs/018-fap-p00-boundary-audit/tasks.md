@@ -25,8 +25,8 @@ commit and push per task (`scripts/tick_task.py`). Review checkpoint: after each
     advection/diffusion, touch forces, blending/post. Four v0.1 rows: quality/thermal, pause/reset/seeded,
     still capture, float targets.
 
-  Each row cites only public non-test symbols, with an example consumer. Render it to  with
-  . Run  (SC-A02-001, SC-A02-002).
+  Each row cites only public non-test symbols, with an example consumer. Render it to `visualcore-contract.md` with
+  `--render`. Run `check_app_contract.py --app fluid-art-playground` (SC-A02-001, SC-A02-002).
 
 ## Phase 3: US2 — Host, thread, build and regression baseline (P1)
 
