@@ -14,44 +14,46 @@ data safety. Depth: phase gate. Audience: reviewer.
 
 ## Requirement Completeness
 
-- [ ] CHK001 Are save, update-in-place and reopen behaviors all specified, including identity and times? [Completeness, Spec §FR-A01-301, §FR-A01-303]
-- [ ] CHK002 Are favorite, duplicate, rename and delete each specified, with their rules? [Completeness, Spec §FR-A01-304]
-- [ ] CHK003 Is every unreadable-file class (corrupt, newer, wrong kind, too large) named with its outcome? [Completeness, Spec §FR-A01-305]
+- [x] CHK001 Are save, update-in-place and reopen behaviors all specified, including identity and times? [Completeness, Spec §FR-A01-301, §FR-A01-303]
+- [x] CHK002 Are favorite, duplicate, rename and delete each specified, with their rules? [Completeness, Spec §FR-A01-304]
+- [x] CHK003 Is every unreadable-file class (corrupt, newer, wrong kind, too large) named with its outcome? [Completeness, Spec §FR-A01-305]
 
 ## Requirement Clarity
 
-- [ ] CHK004 Is the ordering rule fully specified, including the tie-break? [Clarity, Spec §FR-A01-302, Clarifications]
-- [ ] CHK005 Are name normalization rules (trim, length, empty) quantified? [Clarity, Spec §FR-A01-304, §Edge Cases]
-- [ ] CHK006 Is "atomic" defined in user-observable terms (old or new complete file)? [Clarity, Spec §FR-A01-306]
+- [x] CHK004 Is the ordering rule fully specified, including the tie-break? [Clarity, Spec §FR-A01-302, Clarifications]
+- [x] CHK005 Are name normalization rules (trim, length, empty) quantified? [Clarity, Spec §FR-A01-304, §Edge Cases]
+- [x] CHK006 Is "atomic" defined in user-observable terms (old or new complete file)? [Clarity, Spec §FR-A01-306]
 
 ## Data Safety and Privacy
 
-- [ ] CHK007 Is it explicit that user files are never modified, moved or deleted automatically? [Coverage, Spec §FR-A01-305]
-- [ ] CHK008 Are the storage location and data protection specified, with nothing leaving the device? [Completeness, Spec §FR-A01-310, Clarifications]
-- [ ] CHK009 Is write-failure behavior (storage full) specified? [Exception Flow, Spec §Edge Cases]
+- [x] CHK007 Is it explicit that user files are never modified, moved or deleted automatically? [Coverage, Spec §FR-A01-305]
+- [x] CHK008 Are the storage location and data protection specified, with nothing leaving the device? [Completeness, Spec §FR-A01-310, Clarifications]
+- [x] CHK009 Is write-failure behavior (storage full) specified? [Exception Flow, Spec §Edge Cases]
 
 ## Architecture Ownership
 
-- [ ] CHK010 Is the generic store assigned to VisualCorePersistence, with its obligations (tests, docs, API baseline, regression)? [Consistency, Spec §FR-A01-309, Constitution II]
-- [ ] CHK011 Is the migration policy (older migrated, newer rejected, rewrite only on save) consistent across the requirements and edge cases? [Consistency, Spec §FR-A01-307, §Edge Cases]
+- [x] CHK010 Is the generic store assigned to VisualCorePersistence, with its obligations (tests, docs, API baseline, regression)? [Consistency, Spec §FR-A01-309, Constitution II]
+- [x] CHK011 Is the migration policy (older migrated, newer rejected, rewrite only on save) consistent across the requirements and edge cases? [Consistency, Spec §FR-A01-307, §Edge Cases]
 
 ## Lifecycle and GPU Resources
 
-- [ ] CHK012 Is the rapid-edit leak gate quantified (edit count, resource kinds, baseline comparison)? [Measurability, Spec §FR-A01-308, SC-A01-305]
-- [ ] CHK013 Is the behavior defined when the currently open composition is deleted? [Edge Case, Spec §Edge Cases]
+- [x] CHK012 Is the rapid-edit leak gate quantified (edit count, resource kinds, baseline comparison)? [Measurability, Spec §FR-A01-308, SC-A01-305]
+- [x] CHK013 Is the behavior defined when the currently open composition is deleted? [Edge Case, Spec §Edge Cases]
 
 ## Accessibility
 
-- [ ] CHK014 Are labels, hints, delete confirmation and Dynamic Type required for the library and save controls? [Coverage, Spec §FR-A01-310]
+- [x] CHK014 Are labels, hints, delete confirmation and Dynamic Type required for the library and save controls? [Coverage, Spec §FR-A01-310]
 
 ## Testability and Release
 
-- [ ] CHK015 Do the success criteria name counts (≥ 30 entries, 4 families, 2 bad of 7 files, both runtimes)? [Measurability, Spec §SC-A01-301–306]
-- [ ] CHK016 Is reopen-after-relaunch reproducibility tied to the Phase 01 tolerance? [Consistency, Spec §FR-A01-303, SC-A01-302]
-- [ ] CHK017 Are out-of-scope items (thumbnails, sync, sharing, import/export) named with their phase or non-goal? [Scope, Spec §Assumptions]
-- [ ] CHK018 Is the VisualCore contract update (G-PERSIST closed, M08 available) required? [Traceability, Spec §FR-A01-311]
+- [x] CHK015 Do the success criteria name counts (≥ 30 entries, 4 families, 2 bad of 7 files, both runtimes)? [Measurability, Spec §SC-A01-301–306]
+- [x] CHK016 Is reopen-after-relaunch reproducibility tied to the Phase 01 tolerance? [Consistency, Spec §FR-A01-303, SC-A01-302]
+- [x] CHK017 Are out-of-scope items (thumbnails, sync, sharing, import/export) named with their phase or non-goal? [Scope, Spec §Assumptions]
+- [x] CHK018 Is the VisualCore contract update (G-PERSIST closed, M08 available) required? [Traceability, Spec §FR-A01-311]
 
 ## Notes
 
+- Reviewed 2026-11-10 under the owner's delegation (CLAUDE.md §2): 18/18 satisfied by the spec as clarified (layout,
+  atomicity, versions, UI placement and ordering are recorded in Clarifications; no fixes needed).
 - Generated unchecked. The reviewer marks items `[x]` when satisfied. `/speckit-implement` reads the markers but
   does not change them.
