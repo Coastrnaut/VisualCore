@@ -73,3 +73,7 @@ then polish. Each task is committed on its own after its tests pass.
 - C1: plan row VIII aligned with the spec (Phase 06 declares FileTimestamp C617.1).
 - U1: `NamedLibrary.duplicate` is VisualCore API only; the app does not show it in this slice (recorded in the spec).
 - 0 critical issues.
+
+## Phase 7: Convergence
+
+- [ ] T-A03-311 Report unreadable bookmark files to the person: in `Apps/FractalExplorer/App/BookmarksView.swift` show "N bookmark file(s) could not be read and were left unchanged." (`fe.bookmarks.problems`) when `model.bookmarks.problems` is not empty, also with an empty list. Add `BookmarksView.problemsText(count:)` with unit tests (0 → nil, 1 singular, 3 plural), and run on both runtimes, per US2/AC3 (partial)
