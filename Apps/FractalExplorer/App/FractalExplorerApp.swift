@@ -16,7 +16,19 @@ struct FractalExplorerApp: App {
     static func cleanUpCaptures() -> Int { StillCapture.folder(named: ExplorerModel.captureFolderName).removeAll() }
 
     var body: some Scene {
-        WindowGroup { HomeView().tint(AccessibleColors.accent) }
+        WindowGroup {
+            // Device-campaign automation (feature 030 T-A03-505): only in DEBUG || VISUALCORE_AUTOMATION builds and only
+            // with VISUALCORE_AUTORUN in the launch environment.
+            #if DEBUG || VISUALCORE_AUTOMATION
+            if let mode = AppAutomation.mode {
+                AppAutomation.root(mode: mode)
+            } else {
+                HomeView().tint(AccessibleColors.accent)
+            }
+            #else
+            HomeView().tint(AccessibleColors.accent)
+            #endif
+        }
     }
 }
 

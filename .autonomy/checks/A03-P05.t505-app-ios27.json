@@ -1,0 +1,31 @@
+{
+  "argv": [
+    "xcodebuild",
+    "test",
+    "-project",
+    "VisualCore.xcodeproj",
+    "-scheme",
+    "FractalExplorer",
+    "-destination",
+    "platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D",
+    "-derivedDataPath",
+    "Build/DerivedData/FractalExplorer",
+    "-resultBundlePath",
+    ".autonomy/xcresults/a03p05-t505-ios27.xcresult",
+    "-test-timeouts-enabled",
+    "YES",
+    "-default-test-execution-time-allowance",
+    "300",
+    "CODE_SIGNING_ALLOWED=NO"
+  ],
+  "command": "xcodebuild test -project VisualCore.xcodeproj -scheme FractalExplorer -destination 'platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D' -derivedDataPath Build/DerivedData/FractalExplorer -resultBundlePath .autonomy/xcresults/a03p05-t505-ios27.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 300 CODE_SIGNING_ALLOWED=NO",
+  "elapsed_seconds": 280.45,
+  "exit_code": 65,
+  "finished": "2026-11-11T15:18:28+00:00",
+  "log": ".autonomy/logs/A03-P05.t505-app-ios27.log",
+  "log_sha256": "58c6d2c7a78d3a36008f41f40cd30a44a31f3937b502087faf17e865bcf97435",
+  "name": "t505-app-ios27",
+  "stage": "A03-P05",
+  "started": "2026-11-11T15:13:48+00:00",
+  "timed_out": false
+}

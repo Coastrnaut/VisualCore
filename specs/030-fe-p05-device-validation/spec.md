@@ -65,6 +65,14 @@ Facts checked in code:
   (clarification 1 keeps them unjudged). Each step is drawn as a 64 × 64-pixel patch at the screen's own plane step
   per device pixel, so the measurement matches what a person sees, not a shrunken whole view.
 
+### Session 2026-11-11 (implementation finding, T-A03-505)
+
+- Q: What does "agreement" mean for a ladder patch? → A: The share of patch pixels explained by the CPU reference: the
+  escape class matches, or the CPU class changes within one pixel. The first simulator run used plain class matching
+  and found 97.4% at zoom 16 (a "reliable" step): the Seahorse patch at screen resolution is full of boundary
+  filaments, where 32-bit and 64-bit arithmetic legitimately differ (feature 027's boundary rule). Precision breakdown
+  makes blocks wider than one pixel, which the explained share still detects.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Measure the device's real precision limit (Priority: P1) 🎯

@@ -346,6 +346,9 @@ targets:
       # Feature 028 (A03-P03): bookmarks on VisualCore NamedLibrary.
       - package: VisualCore
         product: VisualCorePersistence
+      # Feature 030 (A03-P05): empty unless DEBUG || VISUALCORE_AUTOMATION (Release has zero automation symbols).
+      - package: VisualCoreRendering
+        product: VisualCoreAutomation
     postBuildScripts:
       # FR-A03-006: the build fails if the app depends on ProjectM engine/preset/bridge modules.
       - name: Dependency audit (FR-A03-006)

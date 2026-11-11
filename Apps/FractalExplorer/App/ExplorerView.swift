@@ -23,7 +23,7 @@ final class ExplorerModel {
             guard state != oldValue else { return }
             if state.mode != oldValue.mode, !tourChangingMode { stopTour() }
             scene.snapshot.state = state
-            if usingFallback { refresh() }
+            if usingFallback, hosted { refresh() }
         }
     }
     /// The GPU scene (VisualCore FullScreenShaderScene inside).
@@ -64,7 +64,8 @@ final class ExplorerModel {
     /// (UI tests pass `-uitestTemporaryBookmarks` for a fresh folder per launch).
     init(size: Vec2 = Vec2(390, 844), fragment: String = FractalShaders.fragment,
          system: SystemAccessibility = SystemAccessibilityObserver.systemValues(),
-         bookmarksDirectory: URL? = nil) {
+         bookmarksDirectory: URL? = nil, hosted: Bool = true) {
+        self.hosted = hosted
         reduceMotion = system.reduceMotion
         bookmarks = .bookmarks(directory: bookmarksDirectory ?? Self.defaultBookmarksDirectory())
         let initial = FractalState(size: size)
@@ -72,10 +73,14 @@ final class ExplorerModel {
         paletteID = "sunset"
         animate = !system.reduceMotion
         scene = FractalScene(snapshot: .init(state: initial, paletteID: "sunset", animate: !system.reduceMotion), fragment: fragment)
-        host = try? RenderHost(scene: scene)
+        host = hosted ? try? RenderHost(scene: scene) : nil
         host?.pointerHandler = { [weak self] event in self?.handle(event) }
-        if usingFallback { refresh() }
+        if usingFallback, hosted { refresh() }
     }
+
+    /// False for automation (feature 030 T-A03-505): another owner (VisualCore's AutomationView) hosts `scene`, so the
+    /// model makes no render host and no CPU fallback previews.
+    let hosted: Bool
 
     // MARK: Gestures (feature 027 T-A03-205; FR-A03-202; clarification 4)
 

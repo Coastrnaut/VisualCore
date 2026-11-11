@@ -27,7 +27,8 @@ public enum PrecisionLadder {
         public let level: PrecisionMode.Level
         /// True when the app would clamp this zoom (it never shows it).
         public let clamped: Bool
-        /// Share of patch pixels whose escape class matches the CPU reference (0…1).
+        /// Share of patch pixels explained by the CPU reference (0…1): the class matches, or the pixel lies next to a
+        /// CPU class change (boundary pixels may differ between 32-bit and 64-bit arithmetic; feature 027's rule).
         public let agreement: Double
 
         /// Creates a step.
