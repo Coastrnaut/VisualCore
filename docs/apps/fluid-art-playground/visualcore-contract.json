@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "app": "fluid-art-playground",
-  "gate": "A02-P02",
+  "gate": "A02-P03",
   "date": "2026-11-11",
   "inventory": [
     {
@@ -274,7 +274,7 @@
       "id": "M04",
       "capability": "Shader-based advection and diffusion effects",
       "source": "brainstorm",
-      "status": "upstream gap",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ShaderBundle.swift",
@@ -305,7 +305,7 @@
         "file": "Apps/FluidArtPlayground/App/FluidFieldsScene.swift",
         "symbol": "FluidFieldsScene"
       },
-      "notes": "A02-P02: semi-Lagrangian advection and Gaussian splats are implemented app-local (FluidShaders.advect/splat with CPU references Advection and Splat in FluidArtPlaygroundCore), on the reusable exact sampler vc/field.glsl = FieldGrid.sampleBilinear; GPU equals CPU on 8x8 and 16x16 in both storages on iOS 27.2 and 26.5. Divergence, pressure (Jacobi) and projection remain for Phase 03 (gap G-SOLVER stays open, app-local by the A02 rule)."
+      "notes": "A02-P02/P03: semi-Lagrangian advection, splats, implicit viscosity, divergence, Jacobi pressure and projection with walls/open edges are implemented app-local by the A02 rule (FluidShaders with CPU references Advection, Splat and FluidSolver in FluidArtPlaygroundCore), on reusable VisualCore machinery (FieldPass, PingPongTarget, vc/field.glsl = FieldGrid.sampleBilinear). GPU equals CPU on 8x8 and 16x16 in both storages on iOS 27.2 and 26.5; 0 out-of-grid reads. The model is artistic, not physical."
     },
     {
       "id": "M05",
@@ -379,8 +379,20 @@
       "id": "M07",
       "capability": "Configurable simulation resolution with thermal downgrade",
       "source": "v0.1 feature 06",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/QualityPolicy.swift",
+          "symbol": "QualityPolicy",
+          "product": "VisualCoreDiagnostics",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/QualityPolicy.swift",
+          "symbol": "QualityPolicy.decide",
+          "product": "VisualCoreDiagnostics",
+          "public": true
+        },
         {
           "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/FramePacing.swift",
           "symbol": "FramePacing",
@@ -389,10 +401,10 @@
         }
       ],
       "example": {
-        "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
-        "symbol": "RenderHost"
+        "file": "Apps/FluidArtPlayground/App/PlaygroundView.swift",
+        "symbol": "PlaygroundModel"
       },
-      "notes": "FramePacing maps thermal state and Low Power Mode to render scale and FPS; no generic quality-tier policy (grid scale, iterations, splat cap) exists (gap G-QUALITY)."
+      "notes": "Closed in A02-P03 (G-QUALITY): QualityPolicy steps tiers down on serious/critical thermal state or Low Power above a ceiling and up after a calm period, at most once per decision interval; the app maps tiers to pressure iterations first, then the splat cap (FluidQuality). Real thermal behavior is measured in campaign II."
     },
     {
       "id": "M08",
@@ -543,7 +555,8 @@
       "owner": "app-local",
       "phase": 3,
       "test": "App-domain solver: advection and splats done in A02-P02 (GPU = CPU reference on 8x8 and 16x16, both storages, both runtimes; AdvectionFixtureTests, SplatFixtureTests); divergence, Jacobi pressure and projection in Phase 03 against the same CPU-reference standard; kept in the app by the A02 rule (artistic model, not a VisualCore renderer)",
-      "justification": "Constitution A02: the fluid solver is an isolated app-domain component with a CPU reference, not a new VisualCore renderer; its equations are product content (artistic model). The reusable machinery it runs on (G-PINGPONG, G-FIELDPASS, G-FLOATRT) is assigned to VisualCore."
+      "justification": "Constitution A02: the fluid solver is an isolated app-domain component with a CPU reference, not a new VisualCore renderer; its equations are product content (artistic model). The reusable machinery it runs on (G-PINGPONG, G-FIELDPASS, G-FLOATRT) is assigned to VisualCore.",
+      "closed": "A02-P03"
     },
     {
       "id": "G-POINTERVEL",
@@ -562,9 +575,11 @@
         "M07"
       ],
       "kind": "adaptation",
-      "owner": "VisualCore:VisualCoreSimulation",
+      "owner": "VisualCore:VisualCoreDiagnostics",
       "phase": 3,
-      "test": "QualityPolicy host tests: tiers map to grid scale, solver iterations and splat cap; thermal 'serious'/'critical' and Low Power Mode step the tier down and recovery steps it up with hysteresis; consumes VisualCoreDiagnostics FramePacing inputs"
+      "test": "QualityPolicy host tests: tiers map to grid scale, solver iterations and splat cap; thermal 'serious'/'critical' and Low Power Mode step the tier down and recovery steps it up with hysteresis; consumes VisualCoreDiagnostics FramePacing inputs",
+      "closed": "A02-P03",
+      "justification": "Owner moved from VisualCoreSimulation to VisualCoreDiagnostics (feature 021 research R1): the policy consumes FramePacing.Thermal, which lives in Diagnostics; Simulation depends only on Math."
     },
     {
       "id": "G-CPUFIELD",

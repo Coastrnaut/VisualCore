@@ -97,7 +97,7 @@ IDs are `T-A02-3##`, with one commit and push per task (`scripts/tick_task.py`).
 
 ## Phase 6: Polish
 
-- [ ] T-A02-309 Update `visualcore-contract.json`:
+- [X] T-A02-309 Update `visualcore-contract.json`: — Verified 2026-11-11: visualcore-contract.json gate A02-P03: M07 available (QualityPolicy, QualityPolicy.decide, FramePacing; example PlaygroundModel); M04 available (solver complete app-local on VisualCore machinery); G-QUALITY closed in A02-P03 with the owner moved to VisualCore:VisualCoreDiagnostics (justification research R1); G-SOLVER closed in A02-P03. All 7 gaps are now closed and all 10 rows available. check_app_contract --app fluid-art-playground --render PASS: 10 rows, 47 citations, 7 gaps, decision go (FR-A02-309)
   - G-QUALITY closed in A02-P03, with the owner changed to VisualCore:VisualCoreDiagnostics (justification R1);
   - G-SOLVER closed in A02-P03;
   - M07 available;
