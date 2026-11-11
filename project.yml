@@ -21,6 +21,8 @@ packages:
     path: Apps/GenerativeArtStudio/Core
   FluidArtPlaygroundCore:
     path: Apps/FluidArtPlayground/FluidArtPlaygroundCore
+  FractalExplorerCore:
+    path: Apps/FractalExplorer/FractalExplorerCore
 settings:
   base:
     SWIFT_VERSION: "6.0"

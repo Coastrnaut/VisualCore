@@ -91,8 +91,10 @@ value, and NaN/Inf guards.
    iterations (exterior). The escape counts are exact.
 2. **Given** the Julia iteration with c = 0, **When** points |z| < 1 and |z| > 1 are tested, **Then** the inside
    points stay bounded and the outside points escape. With c = −1, z = 0 stays bounded.
-3. **Given** any escaping point, **When** its smooth escape value is computed, **Then** it is finite and between n−1
-   and n+1 for escape count n. For points that never escape it is reported as interior.
+3. **Given** any escaping point, **When** its smooth escape value is computed, **Then** it is finite and lies in
+   [n, n + 1 + log₂(1/ln 2)] ≈ [n, n + 1.53] for escape count n with R = 2 and |c| ≤ 2.1. The bound is derived from
+   log|zₙ| ∈ (ln 2, ln 6.41] (corrected in implementation; the first draft's [n−1, n+1] was wrong at |zₙ| just
+   above 2). For points that never escape it is reported as interior.
 4. **Given** a non-finite c, z or parameter, **When** it is iterated, **Then** it is rejected or treated as escaping
    at step 0. It never produces NaN output.
 

@@ -33,7 +33,7 @@ research R1–R4, the data model, the contract and the quickstart.
 
 ## Phase 2: User Story 2 — fractal math (P1)
 
-- [ ] T-A03-102 [US2] Write tests first, then add `Apps/FractalExplorer/FractalExplorerCore`:
+- [X] T-A03-102 [US2] Write tests first, then add `Apps/FractalExplorer/FractalExplorerCore`: — Verified 2026-11-11: — Verified 2026-11-11: Apps/FractalExplorer/FractalExplorerCore (package on VisualCoreMath; in project.yml packages) with FractalMath.escape/mandelbrot/julia (escape when |z|^2 > R^2 after step n, smooth n + 1 - log2(log|z_n|), interior at cap, non-finite input escapes at 0 with smooth 0, cap 1...10,000, R >= 2); FractalMathTests 6: Mandelbrot interior 0, -1, -0.1+0.1i; exterior 2->2, 1+i->2, -2.1->1; Julia c=0 z=0.5 interior, z=1.5 count 1, c=-1 z=0 interior, c=-0.8+0.156i z=2 count 1; smooth bounds; NaN/Inf; validation. The first run (t102-core-test) failed on the spec's smooth bound [n-1, n+1], which is wrong for |z_n| just above 2; the spec now states the derived [n, n+1+log2(1/ln 2)] and run-check A03-P01/t102-core-test-2 passes 6/6
   - `Package.swift`, depending on VisualCoreMath;
   - `FractalMath.swift`:
     - `escape(z0:c:cap:radius:)`: escape when |z|² > R² after step n; count n; smooth value
