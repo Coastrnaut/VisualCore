@@ -1,0 +1,31 @@
+{
+  "argv": [
+    "xcodebuild",
+    "test",
+    "-project",
+    "Harnesses/SecondConsumer/SecondConsumer.xcodeproj",
+    "-scheme",
+    "SecondConsumer",
+    "-destination",
+    "platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D",
+    "-derivedDataPath",
+    "Build/DerivedData/SecondConsumer",
+    "-resultBundlePath",
+    ".autonomy/xcresults/F08-t807-ios27-20261110-211341.xcresult",
+    "-test-timeouts-enabled",
+    "YES",
+    "-default-test-execution-time-allowance",
+    "180",
+    "CODE_SIGNING_ALLOWED=NO"
+  ],
+  "command": "xcodebuild test -project Harnesses/SecondConsumer/SecondConsumer.xcodeproj -scheme SecondConsumer -destination 'platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D' -derivedDataPath Build/DerivedData/SecondConsumer -resultBundlePath .autonomy/xcresults/F08-t807-ios27-20261110-211341.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 180 CODE_SIGNING_ALLOWED=NO",
+  "elapsed_seconds": 38.529,
+  "exit_code": 0,
+  "finished": "2026-11-11T02:14:19+00:00",
+  "log": ".autonomy/logs/F08.t807-smoke-ios27.log",
+  "log_sha256": "eaccb98a70c3d739117c717ff52d48c998f15aa8e243d1d40b6ee475e2bf1f5e",
+  "name": "t807-smoke-ios27",
+  "stage": "F08",
+  "started": "2026-11-11T02:13:41+00:00",
+  "timed_out": false
+}
