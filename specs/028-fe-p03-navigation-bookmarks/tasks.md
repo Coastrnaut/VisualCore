@@ -27,13 +27,13 @@ plan, research R1–R5, the data model, the contract and the quickstart.
 ## Phase 2: User Story 1 and 2 — bookmarks save and return (P1) 🎯
 
 - [ ] T-A03-304 [US1] [US2] Write `BookmarkTests` first, then add `Apps/FractalExplorer/FractalExplorerCore/Sources/FractalExplorerCore/Bookmark.swift`: `Bookmark` (mode, framing with "|x|,|y| ≤ 4 for center; span finite > 0", juliaSeed finite, iterationCap "1…10,000", escapeRadius "≥ 2, finite", paletteID "one of sunset, ocean, forest, neon, ember", precision), `PrecisionMode` (format "gpu-float32", mantissaBits "1…64", level "reliable" | "nearLimit" | "beyondLimit"), `validated()`, `Bookmark(state:paletteID:precision:)` and `apply(to:)`; `BookmarkLibrary` wrapping `NamedLibrary<Bookmark>` (kind `dev.visualcore.fe.bookmark`, schema 1, `Application Support/Bookmarks`). Package depends on VisualCorePersistence. Tests: round trip over 100 random views × 5 sizes (bit-exact center, 1e-12 span), invalid fields reported as damaged, library save/reload in a `TemporaryFolder` (FR-A03-303, SC-A03-301).
-- [ ] T-A03-305 [US1] [US2] Model and UI in `Apps/FractalExplorer/App/ExplorerView.swift` and new `Apps/FractalExplorer/App/BookmarksView.swift`: `resize(to:)` through `PlaneFraming`; `saveBookmark(name:)`, `open(_:)`, rename/favorite/delete; the `fe.bookmarks` button, sheet `fe.bookmarks.list` with rows (name, center, zoom, level when not reliable), empty-state text, `fe.bookmark.save` with the name alert (`fe.bookmark.name`), swipe actions, context menu and accessibility actions; a write failure alert. `project.yml`: app links VisualCorePersistence. Add `NavigationModelTests` (save → reload → open at another size returns the state; damaged file listed as a problem; write failure leaves state unchanged). Run on both runtimes (FR-A03-304, US1, US2).
+- [ ] T-A03-305 [US1] [US2] Model and UI in `Apps/FractalExplorer/App/ExplorerView.swift` and new `Apps/FractalExplorer/App/BookmarksView.swift`: `saveBookmark(name:)`, `open(_:)`, rename/favorite/delete; the `fe.bookmarks` button, sheet `fe.bookmarks.list` with rows (name, center, zoom, level when not reliable), empty-state text, `fe.bookmark.save` with the name alert (`fe.bookmark.name`), swipe actions, context menu and accessibility actions; a write failure alert. `project.yml`: app links VisualCorePersistence. Add `NavigationModelTests` (save → reload → open at another size returns the state; damaged file listed as a problem; write failure leaves state unchanged). Run on both runtimes (FR-A03-304, US1, US2).
 
 **Checkpoint**: MVP — save and return.
 
 ## Phase 3: Regression fixture — aspect changes (P1)
 
-- [ ] T-A03-306 [US2] Add `Apps/FractalExplorer/Tests/Unit/AspectTests.swift`: 100 random resizes keep the center exactly and the span within 1e-12 with one scale for both axes; the GPU default Mandelbrot at 64×32 and 32×64 agrees with the CPU reference ≥ 99% (boundary-only). Run on both runtimes (FR-A03-306, SC-A03-302, SC-A03-303).
+- [ ] T-A03-306 [US2] Change `ExplorerModel.resize(to:)` to go through `PlaneFraming` (analyze D1), then add `Apps/FractalExplorer/Tests/Unit/AspectTests.swift`: 100 random resizes keep the center exactly and the span within 1e-12 with one scale for both axes; the GPU default Mandelbrot at 64×32 and 32×64 agrees with the CPU reference ≥ 99% (boundary-only). Run on both runtimes (FR-A03-306, SC-A03-302, SC-A03-303).
 
 ## Phase 4: User Story 3 — precision mode travels (P2)
 
@@ -46,12 +46,13 @@ plan, research R1–R5, the data model, the contract and the quickstart.
 
 ## Phase 6: Polish
 
-- [ ] T-A03-310 Add `Apps/FractalExplorer/Tests/UI/BookmarkUITests.swift` (save with a name, list, open after changing the view, rename, favorite, delete; Go to with a valid and an invalid input) and extend the audit with the bookmarks sheet and the Go to sheet at default size and XXXL. Run on both runtimes. Then: contract (gate A03-P03, M07 and M02 evidence with PlaneFraming and NamedLibrary, gaps G-FRAMING and G-LIBRARY added as closed, G-COST moved to phase 4, A01 adoption follow-up in the notes), regression baseline section, simulator lessons, fast checks (FR-A03-307, SC-A03-305, SC-A03-306).
+- [ ] T-A03-310 Add `Apps/FractalExplorer/Tests/UI/BookmarkUITests.swift` (empty-state text before the first save (analyze G1), save with a name, list, open after changing the view, rename, favorite, delete; Go to with a valid and an invalid input) and extend the audit with the bookmarks sheet and the Go to sheet at default size and XXXL. Run on both runtimes. Then: contract (gate A03-P03, M07 and M02 evidence with PlaneFraming and NamedLibrary, gaps G-FRAMING and G-LIBRARY added as closed, G-COST moved to phase 4, A01 adoption follow-up in the notes), regression baseline section, simulator lessons, fast checks (FR-A03-307, SC-A03-305, SC-A03-306).
 
 ## Dependencies
 
 - T-A03-301 and T-A03-302 are independent; both precede T-A03-303 and every story.
-- T-A03-304 → T-A03-305 → T-A03-306 and T-A03-307.
+- T-A03-304 → T-A03-305 → T-A03-307.
+- T-A03-306 needs only T-A03-301 (analyze D1).
 - T-A03-308 is independent of 304–307 (pure parsing); T-A03-309 needs 305 (the model) and 308.
 - T-A03-310 runs last.
 
@@ -64,3 +65,11 @@ plan, research R1–R5, the data model, the contract and the quickstart.
 
 MVP = Phases 1–2 (save and return, with the VisualCore pieces). Then the aspect fixture, precision mode and Go to,
 then polish. Each task is committed on its own after its tests pass.
+
+## Analyze remediation (2026-11-11, applied under CLAUDE.md §2)
+
+- D1: the span-keeping resize moved into T-A03-306, which now depends only on T-A03-301.
+- G1: the empty-state text is covered by `BookmarkUITests`.
+- C1: plan row VIII aligned with the spec (Phase 06 declares FileTimestamp C617.1).
+- U1: `NamedLibrary.duplicate` is VisualCore API only; the app does not show it in this slice (recorded in the spec).
+- 0 critical issues.

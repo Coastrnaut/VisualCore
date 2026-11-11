@@ -60,7 +60,7 @@ open).
 | IV. Host-testable, test first | Framing, library, bookmark and Go to parsing are host-tested first. | PASS |
 | V/VI. Evidence | Simulator and host only, with run-check; precision values are context. | PASS |
 | VII. Accessible UI | Sheets, labelled fields, accessibility actions for row operations, audit at default and XXXL. | PASS |
-| VIII. Privacy | Local files in the container only; no permissions or networking; privacy manifest unchanged (FileTimestamp already declared later in P06 if needed). | PASS |
+| VIII. Privacy | Local files in the container only; no permissions or networking. The store's file-attribute read is a FileTimestamp required-reason API; the Phase 06 privacy manifest (from the built-app scan) must declare C617.1. | PASS |
 | IX. Bounded input | Name ≤ 60, |x|,|y| ≤ 4, zoom (0, 1e15], cap 1…10,000, R ≥ 2, finite checks, 256 KiB files. | PASS |
 | A03 truthful precision | Precision mode stored; clamp and note on open. | PASS |
 

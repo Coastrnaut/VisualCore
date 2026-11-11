@@ -155,7 +155,8 @@ A person types a center and a zoom (from a book or a website) and goes there.
   - reload that reports unreadable or invalid entries without deleting them;
   - a caller-supplied validation of the payload.
 
-  It has host tests, docs and a baseline entry. A01's existing library is not changed in this phase.
+  It has host tests, docs and a baseline entry. A01's existing library is not changed in this phase. Duplicate is VisualCore API only;
+  the explorer does not offer it in this slice (analyze U1).
 - **FR-A03-303**: The app MUST store bookmarks through that library in `Application Support/Bookmarks`, with schema
   version 1. A bookmark holds mode, framing, Julia seed, iteration cap, escape radius, palette id and precision mode
   (format, mantissa bits, level). Loading validates every field.
