@@ -3,17 +3,18 @@
 **Applies to the new VisualCore monorepo, not the existing `Coastrnaut/projectm-ios` repository.**
 **Primary operator:** Claude Code in the **Code tab of Claude Desktop**, using a **local session on the project Mac**. Do not use Claude Code CLI, `claude -p`, the Claude Agent SDK, or a Python subprocess that invokes Claude. This file is the concise mandatory agent contract; **`README.md` is the full product and engineering specification**, including unchanged archived versions of the original VisualCore README, AppsBrainstorm, all 25 app implementation manuals, the owner's original ProjectM-iOS `CLAUDE.md`, and `devices.md`.
 
-## 0. Session handoff (2026-11-11) — read first on any new machine
+## 0. Starting a session and the standing owner rules — read first
 
-The workflow moved from the original project Mac to a Mac Studio. **Machine setup and the exact resume point are in
-[`setup.md`](setup.md)** (§1–8 environment, §9 checkpoint, §10.1 the one-shot resume prompt). Checkpoint summary:
+**Machine setup** for a new Mac is in [`setup.md`](setup.md) (§1–8; §10.1 is a one-shot resume prompt). setup.md §9
+is a dated snapshot from the 2026-11-11 machine move, not the live state.
 
-- 33 gates passed; the next gate is **A04-P02** (feature `specs/034-pu-p02-render-loop`).
-- Specify and clarify are committed. **Resume at `/speckit-plan`** with the verbatim prompt from
-  `python3 scripts/speckit_prompts.py --feature 034`.
-- Write the gitignored `.specify/feature.json` (`{"feature_directory": "specs/034-pu-p02-render-loop"}`) and run
-  `desktop_runbook.py bootstrap` first; `.autonomy/context/` is not in git.
-- Simulator UDIDs differ per Mac: choose simulators by runtime (`sim-27.2`, `sim-26.5`), never reuse old UDIDs.
+**Find the live state on disk each time; this file does not track progress:**
+- `python3 Tools/python/desktop_runbook.py status` gives the next gate (bootstrap first if `.autonomy/context/` is
+  missing; it is not in git).
+- The gate's feature directory is `specs/<NNN>-*`; NNN follows the ADR-0004 mapping in §7.
+- Its `tasks.md` and its last `speckit-*` commits (`git log`) show which Spec Kit command comes next.
+- Point the gitignored `.specify/feature.json` at that directory.
+- Simulator UDIDs differ per Mac: choose simulators by runtime (`sim-27.2`, `sim-26.5`), never from old logs.
 
 **Standing owner rules carried over from the previous machine's Claude memory.** Per-machine memory does not sync, so
 the rules are kept here. Each is also stated in the sections below; on conflict, the later dated owner rule in this

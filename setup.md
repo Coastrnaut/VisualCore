@@ -322,7 +322,7 @@ Never use the Claude CLI (`claude`, `claude -p`), the Agent SDK, or any Python t
 deterministic tools only.
 
 1. Read the governing files first, in order, with bounded reads:
-   - CLAUDE.md, completely. §0 "Session handoff" and its five standing owner rules come first.
+   - CLAUDE.md, completely. §0 (how to find the live state, and the five standing owner rules) comes first.
    - setup.md §9, the exact checkpoint.
    - README.md, only the canonical chapters you need.
 
