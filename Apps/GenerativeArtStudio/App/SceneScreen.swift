@@ -20,11 +20,12 @@ final class SceneModel {
     /// Time scale under Reduce Motion (edge case: slower animation; full behavior in Phase 05).
     static let reducedMotionTimeScale = 0.5
 
-    init(family: SceneFamily, reduceMotion: Bool, makeHost: (RenderScene) throws -> RenderHost = { try RenderHost(scene: $0) }) {
+    init(family: SceneFamily, reduceMotion: Bool, bundle: ShaderBundle = ArtSceneFactory.shaders,
+         makeHost: (RenderScene) throws -> RenderHost = { try RenderHost(scene: $0) }) {
         self.family = family
         document = (try? ArtDocument.from(family.defaultPreset, family: family.id).validated().document)
             ?? ArtDocument(family: family.id, seed: 0, paletteID: family.defaultPaletteID, parameters: [:])
-        scene = ArtSceneFactory.makeScene(for: document)
+        scene = ArtSceneFactory.makeScene(for: document, bundle: bundle)
         scene.timeScale = reduceMotion ? Self.reducedMotionTimeScale : 1
         do { host = try makeHost(scene) } catch { errorMessage = "Rendering unavailable: \(error)" }
         timer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { [weak self] _ in

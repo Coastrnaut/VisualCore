@@ -37,4 +37,17 @@ final class SceneCleanupTests: XCTestCase {
         slow.close(); normal.close()
         XCTAssertEqual((slow.host?.resources.stats.leaked ?? 0) + (normal.host?.resources.stats.leaked ?? 0), 0)
     }
+
+    func testSceneModelSurfacesShaderErrorsForTheScreen() throws {
+        let broken = ShaderBundle(files: ["geometric-tiling.frag": "precision highp float;\nout vec4 color;\nvoid main() {\n  color = vec4(undefinedValue);\n}\n"])
+        let model = SceneModel(family: FamilyCatalog.family(.geometricTiling), reduceMotion: false, bundle: broken)
+        let host = try XCTUnwrap(model.host)
+        host.view.frame = CGRect(origin: .zero, size: ArtRender.size)
+        host.view.layoutIfNeeded()
+        XCTAssertTrue(host.renderOneFrame(present: false))
+        model.refreshError()
+        XCTAssertTrue(model.errorMessage?.hasPrefix("geometric-tiling.frag:4:") ?? false, model.errorMessage ?? "nil")
+        model.close()
+        XCTAssertEqual(host.resources.stats.leaked, 0)
+    }
 }

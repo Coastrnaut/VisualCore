@@ -131,3 +131,12 @@ private func generatedDocuments(count: Int = 60) -> [ArtDocument] {
         #expect(cursor.instances(at: t) == ParticleReplay.instances(for: doc, at: t), "t = \(t)")
     }
 }
+
+@Test func migrationHookIsAppliedAndIdentityForVersion1() throws {
+    let doc = try ArtDocument(family: .geometricTiling, seed: 77, paletteID: "neon", parameters: ["cells": 9]).validated().document
+    #expect(ArtDocument.migrate(doc) == doc, "schema 1 is current: migration is the identity")
+    #expect(try ArtDocument.decode(doc.canonicalJSON()).document == doc, "decode runs migrate then validate")
+    // A stored version-1 document written by hand (keys in a different order) decodes to the same document.
+    let handWritten = #"{"seed":"77","schemaVersion":1,"previewTime":0,"parameters":{"cells":9},"paletteID":"neon","id":"\#(doc.id.uuidString)","familyID":"geometric-tiling"}"#
+    #expect(try ArtDocument.decode(Data(handWritten.utf8)).document == doc)
+}
