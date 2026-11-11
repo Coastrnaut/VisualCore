@@ -48,7 +48,7 @@ research R1–R7, data model, contract, quickstart).
 
 ## Phase 2: User Story 1 — Pause, Step, Resume, Reset (P1) 🎯 MVP
 
-- [ ] T-A02-503 [P] [US1] Write tests first, then add
+- [X] T-A02-503 [P] [US1] Write tests first, then add — Verified 2026-11-11: — Verified 2026-11-11: SimulationControl (paused, stepEnabled, Pause/Resume label, step hint, 4 announcements) and FluidDetail (64/128/256 square, names, 'Medium, 128 by 128 cells', nearest level by shorter edge, apply keeps tuning) in FluidArtPlaygroundCore; SimulationControlTests 3 + FluidDetailTests 3; run-check A02-P05/t503-core-test swift test 55/55 pass; t503-docapi PASS
   `Apps/FluidArtPlayground/FluidArtPlaygroundCore/Sources/FluidArtPlaygroundCore/SimulationControl.swift`: `paused`,
   `stepEnabled`, `pauseLabel` ("Pause"/"Resume"), `stepHint` and the four announcements (data model). Also add
   `FluidDetail.swift`: low, medium and high with edges 64, 128 and 256; `name`; `init(grid:)` gives the nearest
