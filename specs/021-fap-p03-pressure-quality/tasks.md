@@ -61,7 +61,7 @@ IDs are `T-A02-3##`, with one commit and push per task (`scripts/tick_task.py`).
   scene, created and released with the others. Implement the pipeline of clarification 5 with
   `update(configuration:)` (edge mode, viscosity, dissipation and iterations take effect the next frame without a
   rebuild). Update the Phase 02 fixtures' references to `FluidSolver.step`, with open edges for uniform motion.
-- [ ] T-A02-306 [US1] [US2] Add `Apps/FluidArtPlayground/Tests/Unit/ProjectionFixtureTests.swift` and
+- [X] T-A02-306 [US1] [US2] Add `Apps/FluidArtPlayground/Tests/Unit/ProjectionFixtureTests.swift` and — Verified 2026-11-11: ProjectionFixtureTests 4 and BoundaryFixtureTests 1 on real 8x8 and 16x16 in both storages: a divergent field projected with 20 iterations equals the CPU FluidSolver reference (half-float 0.0; 8-bit within per-pass tolerance, max 4/255 velocity, 10/255 dye) and the GPU interior divergence falls (2336 -> 1104); uniform motion with open edges is unchanged; viscosity 0.5 matches; live update applies 5 iterations, open edges and viscosity next frame with no rebuild and the grid kept; walls give zero normal velocity at every edge cell while open keeps the outward flow, and the CPU access log shows 0 out-of-grid reads (7296/29184 reads) (SC-A02-301, SC-A02-303, FR-A02-304, FR-A02-306). run-check A02-P03/t306-app-27 and t306-app-26 TEST SUCCEEDED, enumeration guard 31/31 each
   `BoundaryFixtureTests.swift`, on 8×8 and 16×16 grids in both storages:
   - a splat-driven divergent field projected with 20 iterations, GPU = CPU (SC-A02-301);
   - walls versus open near the edges (US2 AC1–AC2);
