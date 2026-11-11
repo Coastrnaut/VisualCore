@@ -15,13 +15,13 @@ final class ResourceRegistryTests: XCTestCase {
     }
 
     func testOverBudgetTextureIsRefusedWithoutAllocating() throws {
-        var error: Error?
+        var caught: Error?
         let scene = ProbeScene(setup: { ctx in
-            do { _ = try ctx.resources.makeTexture(width: 1024, height: 1024, label: "too big") } catch { error = $0 as Error }
+            do { _ = try ctx.resources.makeTexture(width: 1024, height: 1024, label: "too big") } catch let e { caught = e }
         })
         let h = try host(scene, budget: ResourceBudget(total: 1 << 20))
-        guard case .overBudget(.texture, requested: 4 << 20, available: 1 << 20)? = error as? ResourceBudgetError else {
-            return XCTFail("expected overBudget, got \(String(describing: error))")
+        guard case .overBudget(.texture, requested: 4 << 20, available: 1 << 20)? = caught as? ResourceBudgetError else {
+            return XCTFail("expected overBudget, got \(String(describing: caught))")
         }
         XCTAssertEqual(h.resources.stats.liveCount[.texture], 0)
         XCTAssertEqual(h.resources.stats.totalBytes, 0)
