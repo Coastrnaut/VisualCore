@@ -42,7 +42,7 @@ The report is `Documents/visualcore-automation-<mode>-<timestamp>.json` (schema 
 On a pass the message is:
 
 ```
-digest=<SHA-256 of the dye field> steps=<n> splats=<n> maxVelocity=<cells/s> maxDye=<v> maxPressure=<v> grid=<w>x<h> storage=<float16|unorm8>
+digest=<SHA-256 of the dye field> steps=<n> splats=<n> rebuilds=<context rebuilds> maxVelocity=<cells/s> maxDye=<v> maxPressure=<v> grid=<w>x<h> storage=<float16|unorm8>
 ```
 
 The digest is compared between repeated runs on the same device. Across devices only finiteness, ranges and step

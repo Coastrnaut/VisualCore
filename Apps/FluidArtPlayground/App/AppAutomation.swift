@@ -31,11 +31,13 @@ enum AppAutomation {
         return model.scene.fieldCheck().firstBad
     }
 
-    /// The note of a passing run: the dye digest and the field extremes.
+    /// The note of a passing run: the dye digest, steps, splats, context rebuilds (so a recreated context is recorded,
+    /// not hidden) and the field extremes.
     static func note(_ model: PlaygroundModel) -> String {
         let check = model.scene.fieldCheck()
         let digest = TestMode.fieldDigest(model.scene) ?? "unavailable"
         return "digest=\(digest) steps=\(model.scene.stepCount) splats=\(model.scene.appliedSplats) "
+            + "rebuilds=\(model.scene.rebuildCount) "
             + "maxVelocity=\(check.maxVelocity) maxDye=\(check.maxDye) maxPressure=\(check.maxPressure) "
             + "grid=\(model.scene.configuration.gridWidth)x\(model.scene.configuration.gridHeight) "
             + "storage=\(model.scene.precision.map { "\($0)" } ?? "none")"

@@ -45,6 +45,7 @@ final class AutomationTests: XCTestCase {
         let message = try XCTUnwrap(report.message)
         XCTAssertTrue(message.hasPrefix("digest="), message)
         XCTAssertTrue(message.contains("steps=60"), message)
+        XCTAssertTrue(message.contains("rebuilds=0"), message)
         XCTAssertGreaterThan(model.scene.appliedSplats, 0)
         print("automation smoke: \(message)")
     }
@@ -64,6 +65,8 @@ final class AutomationTests: XCTestCase {
         XCTAssertEqual(report.result, "pass", report.message ?? "")
         XCTAssertEqual(report.leaked, 0)
         XCTAssertGreaterThanOrEqual(model.scene.rebuildCount, 2, "context recreated during the run")
+        XCTAssertTrue(report.message?.contains("rebuilds=\(model.scene.rebuildCount)") ?? false,
+                      "the report records the rebuilds: \(report.message ?? "")")
     }
 
     /// An injected bad check fails the run with its message and exit code 1.

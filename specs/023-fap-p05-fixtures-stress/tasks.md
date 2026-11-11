@@ -208,6 +208,6 @@ Story order: US1 (MVP) → US2 → US3 → US4 → detail → US5 → polish.
   and FR-A02-507 (partial).
 - [X] T-A02-514 Extend `ControlTests`: after `resetCanvas()`, viscosity, palette, brush radius and detail are — Verified 2026-11-11: — Verified 2026-11-11: ControlTests.testResetKeepsTuning (viscosity 0.4, palette ink, brush 0.1, detail Low; scene configuration equal before/after resetCanvas, resetCount 1); run-check A02-P05/t514-app-ios27 and t514-app-ios26 (ControlTests) TEST SUCCEEDED
   unchanged. Covers US1/AC4 (partial).
-- [ ] T-A02-515 Add `rebuilds=<n>` (`scene.rebuildCount`) to `AppAutomation.note`, and assert it in
+- [X] T-A02-515 Add `rebuilds=<n>` (`scene.rebuildCount`) to `AppAutomation.note`, and assert it in — Verified 2026-11-11: — Verified 2026-11-11: AppAutomation.note adds rebuilds=<scene.rebuildCount> (device-campaign.md report format updated); AutomationTests assert rebuilds=0 for smoke and rebuilds=<n>=rebuildCount (>=2) for lifecycle; run-check A02-P05/t515-app-ios27 and t515-app-ios26 (AutomationTests) TEST SUCCEEDED
   `AutomationTests.testLifecycleRebuildsAndPasses`, so the report records context recreation. Covers the edge case
   "context loss during the test mode" (partial).
