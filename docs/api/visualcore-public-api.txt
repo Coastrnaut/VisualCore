@@ -600,6 +600,7 @@ VisualCoreScenes | func | public func toWorld(_ p: Vec2, camera: Camera2D) -> Ve
 VisualCoreScenes | func | public func worldToNDC(camera: Camera2D) -> Mat3?
 VisualCoreScenes | func | public func worldTransform() -> Mat3
 VisualCoreScenes | func | public mutating func handle(_ e: PointerEvent) -> Bool
+VisualCoreScenes | func | public mutating func handle(_ e: PointerEvent) -> [Sample]
 VisualCoreScenes | func | public mutating func handle(_ e: PointerEvent, tracker: PointerTracker)
 VisualCoreScenes | func | public mutating func reset()
 VisualCoreScenes | func | public mutating func tick(now: Double)
@@ -617,13 +618,22 @@ VisualCoreScenes | init | public init(minChange: Double = 0)
 VisualCoreScenes | init | public init(minDistance: Double = 10)
 VisualCoreScenes | init | public init(minDuration: Double = 0.5, maxDistance: Double = 10)
 VisualCoreScenes | init | public init(size: Vec2, scale: Double)
+VisualCoreScenes | init | public init(spacing: Double, maxSamplesPerUpdate: Int = 16, smoothing: Double = 0.5)
 VisualCoreScenes | init | public init(width: Int, height: Int)
 VisualCoreScenes | init | public init?(id: String, title: String, width: Int, height: Int)
 VisualCoreScenes | let | public let height: Int
+VisualCoreScenes | let | public let id: Int
 VisualCoreScenes | let | public let id: String
 VisualCoreScenes | let | public let maxEdge: Int
 VisualCoreScenes | let | public let maxPixels: Int
+VisualCoreScenes | let | public let maxSamplesPerUpdate: Int
+VisualCoreScenes | let | public let phase: PointerPhase
+VisualCoreScenes | let | public let position: Vec2
+VisualCoreScenes | let | public let smoothing: Double
+VisualCoreScenes | let | public let spacing: Double
+VisualCoreScenes | let | public let timestamp: Double
 VisualCoreScenes | let | public let title: String
+VisualCoreScenes | let | public let velocity: Vec2
 VisualCoreScenes | let | public let width: Int
 VisualCoreScenes | let | public static let builtIns: [ExportAspect]
 VisualCoreScenes | let | public static let defaultMaxPixels
@@ -631,6 +641,7 @@ VisualCoreScenes | let | public static let hardMaxEdge
 VisualCoreScenes | let | public static let landscape
 VisualCoreScenes | let | public static let maxPointers
 VisualCoreScenes | let | public static let maxPolygonPoints
+VisualCoreScenes | let | public static let minimumInterval
 VisualCoreScenes | let | public static let portrait
 VisualCoreScenes | let | public static let ringRange
 VisualCoreScenes | let | public static let segmentRange
@@ -649,23 +660,29 @@ VisualCoreScenes | struct | public struct Mesh: Sendable, Equatable
 VisualCoreScenes | struct | public struct PinchRecognizer: GestureRecognizer
 VisualCoreScenes | struct | public struct PointerEvent: Sendable, Equatable
 VisualCoreScenes | struct | public struct PointerTracker: Sendable
+VisualCoreScenes | struct | public struct PointerVelocityTracker: Sendable
 VisualCoreScenes | struct | public struct RotateRecognizer: GestureRecognizer
+VisualCoreScenes | struct | public struct Sample: Sendable, Equatable
 VisualCoreScenes | struct | public struct TapRecognizer: GestureRecognizer
 VisualCoreScenes | struct | public struct ViewMetrics: Sendable, Equatable
 VisualCoreScenes | var | public private(set) var active: [Int: Vec2]
 VisualCoreScenes | var | public private(set) var angle
+VisualCoreScenes | var | public private(set) var cappedUpdates
 VisualCoreScenes | var | public private(set) var center: Vec2?
 VisualCoreScenes | var | public private(set) var children: [SceneNode]
 VisualCoreScenes | var | public private(set) var endTime: Double?
 VisualCoreScenes | var | public private(set) var ignored
+VisualCoreScenes | var | public private(set) var ignoredPointers
 VisualCoreScenes | var | public private(set) var location: Vec2?
 VisualCoreScenes | var | public private(set) var order: [Int]
+VisualCoreScenes | var | public private(set) var rejectedSamples
 VisualCoreScenes | var | public private(set) var scale
 VisualCoreScenes | var | public private(set) var start: [Int: Vec2]
 VisualCoreScenes | var | public private(set) var state: GestureState
 VisualCoreScenes | var | public private(set) var translation: Vec2
 VisualCoreScenes | var | public private(set) var velocity: Vec2
 VisualCoreScenes | var | public private(set) weak var parent: SceneNode?
+VisualCoreScenes | var | public var activeCount: Int
 VisualCoreScenes | var | public var aspect: Double?
 VisualCoreScenes | var | public var bounded: Primitive
 VisualCoreScenes | var | public var centroid: Vec2?

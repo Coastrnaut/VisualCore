@@ -27,7 +27,7 @@ contains additions only.
 
 ## Phase 2: Foundational — VisualCore pieces (blocks US1, US2, US4)
 
-- [ ] T-A02-202 [P] [US4] Write tests first, then implement `PointerVelocityTracker` in
+- [X] T-A02-202 [P] [US4] Write tests first, then implement `PointerVelocityTracker` in — Verified 2026-11-11: PointerVelocityTracker in VisualCoreScenes (resampling at spacing, EMA velocity with the raw first move, intervals < 1 ms keep the previous velocity, began/ended/cancelled semantics, 10 pointers, per-update cap including the newest location, counters) with /// docs; PointerVelocityTrackerTests 11 cases (SC-A02-204 needs >= 8). run-check A02-P02/t202-visualcore-host swift test: all pass (179 Swift Testing, 0 failures); API baseline updated (additions) then check_public_api PASS; README 'Touches as forces' and package-map row; check_dependencies PASS
   `Packages/VisualCore/Sources/VisualCoreScenes/PointerVelocityTracker.swift`, per the contract and research R4:
   - "spacing > 0 else 1; cap 1…256; 0 < α ≤ 1 else 0.5";
   - began: 1 sample with velocity 0;

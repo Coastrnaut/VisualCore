@@ -8,7 +8,7 @@ iOS 26+ inside apps. The package map and dependency rules R1–R5 are in
 |---|---|
 | VisualCoreMath | vectors, matrices, quaternions, cameras, easing |
 | VisualCoreSimulation | fixed-step clock, seeded RNG, timelines, particle pool, NaN guard, CPU field grids, storage precision, time-step policy |
-| VisualCoreScenes | input mapping, pointer tracking, mesh generators, export geometry |
+| VisualCoreScenes | input mapping, pointer tracking and velocity, mesh generators, export geometry |
 | VisualCoreShaderSource | shader library, includes, line maps, diagnostics parsing |
 | VisualCoreEffectsGraph | effect DAG model, validation, quotas, flash-limiter model |
 | VisualCoreDiagnostics | render lifecycle state machine, frame statistics, reports |
@@ -48,6 +48,15 @@ Conversions round-trip within 0.001 pt (SC-F501) and return nil for a zero-size 
 for time-based transitions). Defaults: tap ≤ 10 pt and ≤ 0.3 s; double-tap second tap within 0.3 s and 30 pt;
 long-press ≥ 0.5 s within 10 pt; drag after 10 pt. Pinch and rotate run together; a second finger cancels an
 active drag and fails a pending tap. At most 10 pointers; more are ignored and counted.
+
+**Touches as forces** (`PointerVelocityTracker`, feature 020): turns pointer events into samples at most `spacing`
+points apart along each finger's path, each with a smoothed velocity in points per second.
+- **Smoothing**: an exponential average with α = `smoothing`. The first move uses the raw velocity, and intervals
+  under 1 ms keep the previous velocity.
+- **Phases**: `began` gives one still sample, `ended` a final sample, and `cancelled` nothing.
+- **Limits**: at most 10 pointers and `maxSamplesPerUpdate` samples per update (the newest location is always
+  included). Non-finite events are rejected. Every limit is counted.
+- **Uses**: fluid splats, physics pushes and brush strokes get a continuous trail with bounded work.
 
 **Timing and determinism** (`VisualCoreSimulation`): `FixedStepClock` (1/120 s, ≤ 8 steps per frame, excess
 time dropped and counted, 1e-9 s boundary tolerance, invalid deltas = 0). `SeededRandom` is xoshiro256** seeded
