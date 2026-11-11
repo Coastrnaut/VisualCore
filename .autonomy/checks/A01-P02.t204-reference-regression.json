@@ -1,0 +1,28 @@
+{
+  "argv": [
+    "python3",
+    "scripts/release_check.py",
+    "--log-dir",
+    ".autonomy/logs/a01-p02-regression",
+    "--json",
+    ".autonomy/logs/a01-p02-regression/summary.json",
+    "--only",
+    "reference-engine-xcframework",
+    "reference-build-projectm-ios-sim",
+    "reference-test-anglerendering-ios27",
+    "reference-test-anglerendering-ios26",
+    "reference-clean",
+    "projectm-reference-ios27",
+    "projectm-reference-ios26"
+  ],
+  "command": "python3 scripts/release_check.py --log-dir .autonomy/logs/a01-p02-regression --json .autonomy/logs/a01-p02-regression/summary.json --only reference-engine-xcframework reference-build-projectm-ios-sim reference-test-anglerendering-ios27 reference-test-anglerendering-ios26 reference-clean projectm-reference-ios27 projectm-reference-ios26",
+  "elapsed_seconds": 48.263,
+  "exit_code": 0,
+  "finished": "2026-11-11T04:03:45+00:00",
+  "log": ".autonomy/logs/A01-P02.t204-reference-regression.log",
+  "log_sha256": "1714bbd08a18f945c24a5dde5832f483bcb364e87d76d953f6b3370a62e32611",
+  "name": "t204-reference-regression",
+  "stage": "A01-P02",
+  "started": "2026-11-11T04:02:57+00:00",
+  "timed_out": false
+}

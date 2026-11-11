@@ -156,3 +156,10 @@ Compile errors do not throw. `errorMessage` becomes `file:line: message`, and th
 `RenderSurface(host:accessibilityLabel:accessibilityHint:)` (VisualCoreUI) shows a host's view in SwiftUI as one
 accessible image element. The screen that created the host destroys it.
 
+`ParameterPanel(editor:)` (VisualCoreUI, feature 013) is a SwiftUI `Section` for any `ParameterEditor` binding. Each row
+shows the title, the value with its unit, a slider over the normalized position (logarithmic parameters move by ratio)
+and a reset button when the value is modified; a "Reset all" button follows the rows. VoiceOver reads the title as
+the label and the formatted value as the value, and increment/decrement move by 5%. Identifiers are
+`vc.param.<name>`, `vc.param.<name>.reset` and `vc.param.resetAll`. `ParameterPanelModel.rows(_:)` exposes the same
+content for tests.
+

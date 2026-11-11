@@ -37,7 +37,7 @@ after each phase, run `validate_docs.py`.
   Add the VisualCoreUI → VisualCoreParameters dependency in Package.swift and the package-map row. Add
   `Tests/VisualCoreUITests/ParameterPanelTests.swift` (hosted view: every parameter has a row, accessibility values
   are formatted, increment and decrement change the binding within range).
-- [ ] T-A01-204 [US4] Update the API baseline and READMEs (SceneClock, ParameterEditor, ParameterPanel). Run the
+- [X] T-A01-204 [US4] Update the API baseline and READMEs (SceneClock, ParameterEditor, ParameterPanel). Run the — Verified 2026-11-10: READMEs document ParameterEditor, SceneClock and ParameterPanel; API baseline matches (all documented); run-check A01-P02/t204-visualcore-host swift test green; package tests on both runtimes green (A01-P02/t203-ui-ios27 + ios26); t204-reference-regression 7/7 pass (FR-A01-206)
   VisualCore host tests, the VisualCoreRendering package tests on iOS 27.2 and 26.5, and the reference regression
   (7 steps) (FR-A01-206).
 

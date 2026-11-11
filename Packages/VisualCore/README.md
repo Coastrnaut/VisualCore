@@ -83,3 +83,19 @@ FNV-1a key (16 hex digits), suitable for caches that persist across launches.
 `ImageDifference` with `meanAbsolute`, `maxAbsolute` and `fractionWithin(_:)` over RGB channels.
 `ImageStatistics.meanLuminance(_:)` and `distinctColors(_:)` flag blank renders.
 
+`ParameterEditor(schema:values:)` (feature 013) holds the values being edited plus the baseline that reset returns to.
+- `set(_:to:)` clamps a value and refuses non-finite ones.
+- `set(_:normalized:)` takes a slider position; a non-finite position counts as 0.
+- `reset(_:)` and `resetAll()` return to the baseline; `isModified(_:)` and `modifiedNames` report changes.
+- `rebase(_:)` replaces the baseline.
+- `formatted(_:)` gives the value with 3 significant digits and its unit.
+
+## Scene clock (feature 013, A01-P02)
+
+`SceneClock(duration:speed:isPlaying:)` turns frame deltas into deterministic scene time, without using the wall
+clock.
+- `advance(by:)` caps one delta at 0.25 s, so returning from the background never jumps. It multiplies by `speed`
+  (0…4) and by 0.5 when `reducedMotion` is on, and wraps at `duration`.
+- `scrub(to:)` clamps to the timeline.
+- `play()`, `pause()` and `toggle()` switch state; paused time never changes.
+
