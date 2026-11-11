@@ -10,7 +10,7 @@ tests); written with or before each piece. IDs `T-F6##`. One commit + push per t
 
 ## Phase 1: Setup
 
-- [ ] T-F601 Root `project.yml` (XcodeGen 2.46.0) with targets `Showcase` (application, sources `Showcase/App`, resources `Showcase/Resources`, `Showcase/Shaders`), `ShowcaseTests` (`Showcase/Tests/Unit`), `ShowcaseUITests` (`Showcase/Tests/UI`), local packages `Packages/VisualCore` and `Packages/VisualCoreRendering`, bundle id `dev.visualcore.Showcase`, `Configs/Signing.xcconfig`; a minimal app shell that builds unsigned for the simulator
+- [X] T-F601 Root `project.yml` (XcodeGen 2.46.0) with targets `Showcase` (application, sources `Showcase/App`, resources `Showcase/Resources`, `Showcase/Shaders`), `ShowcaseTests` (`Showcase/Tests/Unit`), `ShowcaseUITests` (`Showcase/Tests/UI`), local packages `Packages/VisualCore` and `Packages/VisualCoreRendering`, bundle id `dev.visualcore.Showcase`, `Configs/Signing.xcconfig`; a minimal app shell that builds unsigned for the simulator — Verified 2026-11-10: F06.t601-shell-build TEST BUILD SUCCEEDED (XcodeGen 2.46.0 root project.yml, unsigned) + F06.t601-shell-test TEST EXECUTE SUCCEEDED on iOS 27.2: hosted unit test (bundle id dev.visualcore.Showcase) and launch UI test pass
 
 ## Phase 2: Foundational — independence (US5, P1) and shared infrastructure
 

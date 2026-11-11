@@ -1,0 +1,101 @@
+# project.yml — repository-root XcodeGen spec (README §8: single source of truth for the Showcase and, later,
+# all 25 app targets). XcodeGen 2.46.0. Generated VisualCore.xcodeproj is gitignored.
+# Simulator/CI builds are unsigned (CODE_SIGNING_ALLOWED=NO); device signing comes only from the owner's
+# gitignored Configs/Signing.local.xcconfig via Configs/Signing.xcconfig.
+# The Showcase must never depend on ProjectM engine/preset/bridge modules (FR-F610; scripts/audit_showcase_dependencies.py).
+name: VisualCore
+options:
+  bundleIdPrefix: dev.visualcore
+  deploymentTarget:
+    iOS: "26.0"
+  createIntermediateGroups: true
+configFiles:
+  Debug: Configs/Signing.xcconfig
+  Release: Configs/Signing.xcconfig
+packages:
+  VisualCore:
+    path: Packages/VisualCore
+  VisualCoreRendering:
+    path: Packages/VisualCoreRendering
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    TARGETED_DEVICE_FAMILY: "1,2"
+targets:
+  Showcase:
+    type: application
+    platform: iOS
+    sources:
+      - path: Showcase/App
+      - path: Showcase/Shaders
+        type: folder
+        buildPhase: resources
+      - path: Showcase/Resources
+    info:
+      path: Showcase/Generated/Info.plist
+      properties:
+        CFBundleDisplayName: VisualCore Showcase
+        CFBundleShortVersionString: "0.1.0"
+        CFBundleVersion: "1"
+        ITSAppUsesNonExemptEncryption: false
+        UILaunchScreen: {}
+        UIApplicationSceneManifest:
+          UIApplicationSupportsMultipleScenes: false
+        UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait, UIInterfaceOrientationLandscapeLeft, UIInterfaceOrientationLandscapeRight]
+        UISupportedInterfaceOrientations~ipad: [UIInterfaceOrientationPortrait, UIInterfaceOrientationPortraitUpsideDown, UIInterfaceOrientationLandscapeLeft, UIInterfaceOrientationLandscapeRight]
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: dev.visualcore.Showcase
+        PRODUCT_NAME: Showcase
+        GENERATE_INFOPLIST_FILE: NO
+    dependencies:
+      - package: VisualCore
+        product: VisualCoreMath
+      - package: VisualCore
+        product: VisualCoreSimulation
+      - package: VisualCore
+        product: VisualCoreScenes
+      - package: VisualCore
+        product: VisualCoreShaderSource
+      - package: VisualCore
+        product: VisualCoreEffectsGraph
+      - package: VisualCore
+        product: VisualCoreDiagnostics
+      - package: VisualCoreRendering
+        product: VisualCoreRendering
+      - package: VisualCoreRendering
+        product: VisualCoreEffects
+  ShowcaseTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources: [Showcase/Tests/Unit]
+    info:
+      path: Showcase/Generated/ShowcaseTests-Info.plist
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: dev.visualcore.ShowcaseTests
+        GENERATE_INFOPLIST_FILE: NO
+    dependencies:
+      - target: Showcase
+  ShowcaseUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources: [Showcase/Tests/UI]
+    info:
+      path: Showcase/Generated/ShowcaseUITests-Info.plist
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: dev.visualcore.ShowcaseUITests
+        GENERATE_INFOPLIST_FILE: NO
+        TEST_TARGET_NAME: Showcase
+    dependencies:
+      - target: Showcase
+schemes:
+  Showcase:
+    build:
+      targets:
+        Showcase: all
+        ShowcaseTests: [test]
+        ShowcaseUITests: [test]
+    test:
+      targets: [ShowcaseTests, ShowcaseUITests]

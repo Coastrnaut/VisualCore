@@ -1,0 +1,31 @@
+{
+  "argv": [
+    "xcodebuild",
+    "test-without-building",
+    "-project",
+    "VisualCore.xcodeproj",
+    "-scheme",
+    "Showcase",
+    "-destination",
+    "platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D",
+    "-derivedDataPath",
+    "Build/DerivedData/Showcase",
+    "-resultBundlePath",
+    ".autonomy/xcresults/F06-t601-20261110-200539.xcresult",
+    "-test-timeouts-enabled",
+    "YES",
+    "-default-test-execution-time-allowance",
+    "180",
+    "CODE_SIGNING_ALLOWED=NO"
+  ],
+  "command": "xcodebuild test-without-building -project VisualCore.xcodeproj -scheme Showcase -destination 'platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D' -derivedDataPath Build/DerivedData/Showcase -resultBundlePath .autonomy/xcresults/F06-t601-20261110-200539.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 180 CODE_SIGNING_ALLOWED=NO",
+  "elapsed_seconds": 14.515,
+  "exit_code": 0,
+  "finished": "2026-11-11T01:05:53+00:00",
+  "log": ".autonomy/logs/F06.t601-shell-test.log",
+  "log_sha256": "0ef3779da1ddfbb23ea1531662880addabab1a9e02ec2e537d5539e9c37c769e",
+  "name": "t601-shell-test",
+  "stage": "F06",
+  "started": "2026-11-11T01:05:39+00:00",
+  "timed_out": false
+}
