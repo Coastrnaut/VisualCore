@@ -68,3 +68,14 @@ named tests are green.
 VisualCore gaps first (they are the reusable value and everything depends on them), then the scene schema and
 simulation, the replay fixture, the time tests, the UI (MVP: families with bounded counts), then contract, regression
 and fast checks.
+
+## Analyze remediation (2026-11-11, applied under CLAUDE.md §2)
+
+- U1 (medium): the replay fixture scene includes the force `attractor(0, 0, strength 300, radius 300)`, so the step-120
+  control `moveAttractor(index: 0, x: 150, y: 100)` has a target (T-A04-109).
+- U2 (low): the step-240 control is `burst(emitter: 1, count: 200)` (Firework); the step-360 control is
+  `setEmitting(emitter: 0, on: false)` (Fountain).
+- I1 (low): execution order follows the Dependencies section (111 → 108 → 105/109/110 → 106 → 107).
+- T1 (low): simulator package tests for the app core use `scripts/xcodebuild_package.py --package
+  Apps/ParticleUniverse/ParticleUniverseCore --scheme ParticleUniverseCore --destination sim-27.2|sim-26.5 --action test`.
+- 0 critical issues; coverage 13/13 requirements.
