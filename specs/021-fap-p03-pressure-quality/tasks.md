@@ -76,7 +76,7 @@ IDs are `T-A02-3##`, with one commit and push per task (`scripts/tick_task.py`).
 
 ## Phase 4: User Story 3 — Adjust panel (P1)
 
-- [ ] T-A02-307 [US3] Add `Apps/FluidArtPlayground/App/AdjustPanel.swift`, per the contract identifiers:
+- [X] T-A02-307 [US3] Add `Apps/FluidArtPlayground/App/AdjustPanel.swift`, per the contract identifiers: — Verified 2026-11-11: AdjustPanel (viscosity, dye fade, motion fade and quality sliders with value+unit accessibility values, walls/open picker, 'Quality: <tier> (automatic)' label, Reset) and PlaygroundModel.configuration (didSet -> scene.update, no rebuild) with resetConfiguration; Adjust toolbar button and sheet (large detent by default, opaque background, accessible accent, header prominence, top margin clear of the iOS 26 glass button shadow; spec clarification 7). AdjustUITests: every control changes the value shown and spoken, edges switch, Reset restores 20 iterations/0.00/walls, back on the canvas. AccessibilityAuditUITests audit the Adjust sheet at default size and XXXL: 0 issues (only the documented exclusions ignored). run-check A02-P03/t307-app-27-5 and t307-app-26-3 TEST SUCCEEDED, enumeration guard 32/32 each (earlier failing attempts kept as evidence); isolation PASS (FR-A02-306, SC-A02-305)
   - sliders for viscosity (0–1), dye fade (0–10 per s), motion fade (0–10 per s) and quality (1–80 iterations);
   - an edge picker;
   - a tier label;

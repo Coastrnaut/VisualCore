@@ -18,11 +18,18 @@ final class PlaygroundModel {
     private(set) var failure: String?
     private(set) var splashes = 0
     private(set) var queue: SplatQueue
+    /// The live tuning (feature 021): every change reaches the scene on the next frame without a rebuild.
+    var configuration: FluidConfiguration {
+        didSet { scene.update(configuration: configuration) }
+    }
+    /// The automatic quality tier's name (feature 021 T-A02-308 sets it from the quality policy).
+    private(set) var tierName = "Full"
     private var tracker = PointerVelocityTracker(spacing: 1)
 
     init(configuration: FluidConfiguration = FluidConfiguration(), maxEdge: Int = 512) {
         scene = FluidFieldsScene(configuration: configuration, maxEdge: maxEdge)
         queue = SplatQueue(configuration: configuration)
+        self.configuration = scene.configuration
         scene.splatSource = { [weak self] in self?.drain() ?? [] }
         do {
             let host = try RenderHost(scene: scene)
@@ -34,6 +41,15 @@ final class PlaygroundModel {
         // Setup ran inside RenderHost.init and may have capped the grid by the device; forces convert with the grid
         // the fields really use (feature 020 T-A02-216).
         queue = SplatQueue(configuration: scene.configuration)
+        self.configuration = scene.configuration
+    }
+
+    /// Returns every tuning value to its default (the grid stays as set up).
+    func resetConfiguration() {
+        var c = FluidConfiguration()
+        c.gridWidth = configuration.gridWidth
+        c.gridHeight = configuration.gridHeight
+        configuration = c
     }
 
     /// Resampling spacing in points: half the brush radius on the current view (spec 020 clarification 3).
@@ -76,6 +92,8 @@ final class PlaygroundModel {
 
 struct PlaygroundView: View {
     @State private var model: PlaygroundModel?
+    @State private var adjusting = false
+    @State private var detent = PresentationDetent.large
 
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -109,6 +127,26 @@ struct PlaygroundView: View {
         // Painting with rightward drags must not navigate back (iOS 26 content swipe-back); the edge swipe and the
         // back button still leave the screen (VisualCoreUI, feature 020).
         .contentSwipeBackDisabled()
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                Button {
+                    adjusting = true
+                } label: {
+                    Label("Adjust", systemImage: "slider.horizontal.3")
+                }
+                .accessibilityIdentifier("fap.adjust")
+                .disabled(model?.host == nil)
+            }
+        }
+        .sheet(isPresented: $adjusting) {
+            if let model {
+                // Opens large so every control is reachable; medium shows the canvas while tuning. The opaque
+                // background keeps text contrast independent of the artwork behind the sheet (feature 021 audit).
+                AdjustPanel(model: model)
+                    .presentationDetents([.medium, .large], selection: $detent)
+                    .presentationBackground(Color(uiColor: .systemGroupedBackground))
+            }
+        }
         .onAppear {
             if model == nil { model = PlaygroundModel() }
         }

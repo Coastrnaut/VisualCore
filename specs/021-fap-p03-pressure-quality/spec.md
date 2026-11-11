@@ -78,6 +78,18 @@ Answered autonomously under the owner's standing delegation (CLAUDE.md §2), rec
   (20, cost-bounded) nor the scheme changes. SC-A02-302 now requires a strict decrease and ≥ 40% at 20 iterations,
   with the measured values recorded.
 
+- Q: (found during implementation, T-A02-307) How does the Adjust sheet stay legible and testable? → A: It opens at
+  the large detent (medium remains available) and paints an opaque grouped background, because iOS 26 keeps sheets
+  translucent and the canvas showed through behind the text.
+  - Section headers use increased prominence, explanatory text is a regular row (footers are forced to secondary
+    text), and Reset uses the accessible accent instead of destructive red, since it only resets tuning.
+  - A top content margin keeps the first header clear of the iOS 26 glass Done button's shadow, which the audit read
+    as low contrast.
+  - The UI test moves the quality slider to 5% rather than exactly 0, because the iOS 26 slider ignores a drag to the
+    exact start.
+
+  The audit exclusions stay A01's (navigation-bar chrome; findings with no element).
+
 ## User Scenarios & Testing *(mandatory)*
 
 Users:
