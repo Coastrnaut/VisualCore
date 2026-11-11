@@ -1,0 +1,32 @@
+{
+  "argv": [
+    "xcodebuild",
+    "test",
+    "-project",
+    "VisualCore.xcodeproj",
+    "-scheme",
+    "Showcase",
+    "-destination",
+    "platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D",
+    "-derivedDataPath",
+    "Build/DerivedData/Showcase",
+    "-resultBundlePath",
+    ".autonomy/xcresults/F06-t607-20261110-201312.xcresult",
+    "-test-timeouts-enabled",
+    "YES",
+    "-default-test-execution-time-allowance",
+    "180",
+    "CODE_SIGNING_ALLOWED=NO",
+    "-only-testing:ShowcaseTests"
+  ],
+  "command": "xcodebuild test -project VisualCore.xcodeproj -scheme Showcase -destination 'platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D' -derivedDataPath Build/DerivedData/Showcase -resultBundlePath .autonomy/xcresults/F06-t607-20261110-201312.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 180 CODE_SIGNING_ALLOWED=NO -only-testing:ShowcaseTests",
+  "elapsed_seconds": 3.633,
+  "exit_code": 0,
+  "finished": "2026-11-11T01:13:16+00:00",
+  "log": ".autonomy/logs/F06.t607-distortion-a2.log",
+  "log_sha256": "5146409eff505f7ae2764b8f80a116d070c5b0d8f14fb1d619517c29848f0ab1",
+  "name": "t607-distortion-a2",
+  "stage": "F06",
+  "started": "2026-11-11T01:13:12+00:00",
+  "timed_out": false
+}

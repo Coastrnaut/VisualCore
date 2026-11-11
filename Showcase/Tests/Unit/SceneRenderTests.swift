@@ -98,3 +98,39 @@ final class AnimatedGeometryTests: XCTestCase {
         r.host.destroy()
     }
 }
+
+@MainActor
+final class DistortionTests: XCTestCase {
+    func testRippleFollowsTouchAndLeavesFarPixels() throws {
+        let scene = DistortionScene(settings: SceneTestSupport.settings(reduceMotion: true))
+        let r = try SceneTestSupport.render(scene, frames: 1, size: CGSize(width: 64, height: 64))
+        scene.scale = Double(r.width) / 64
+        XCTAssertNil(scene.errorMessage)
+        XCTAssertEqual(scene.status, "touch=none")
+        let before = r.host.readPixels()
+        scene.handle(PointerEvent(id: 1, phase: .began, location: Vec2(32, 32), timestamp: 0))
+        scene.handle(PointerEvent(id: 1, phase: .moved, location: Vec2(20, 40), timestamp: 0.1))
+        XCTAssertEqual(scene.status, "touch=20,40")
+        XCTAssertEqual(scene.strength, 1)
+        _ = r.host.renderOneFrame(present: false)
+        let after = r.host.readPixels()
+        // Compare a ring around the touch (view point (20, 40) → pixels, rows bottom-up) and a far corner.
+        let s = Double(r.width) / 64
+        let cx = Int(20 * s), cy = r.height - Int(40 * s)
+        var changed = 0
+        for dy in stride(from: -Int(10 * s), through: Int(10 * s), by: 2) {
+            for dx in stride(from: -Int(10 * s), through: Int(10 * s), by: 2) {
+                let x = cx + dx, y = cy + dy
+                guard x >= 0, y >= 0, x < r.width, y < r.height else { continue }
+                if SceneTestSupport.px(before, r.width, x, y) != SceneTestSupport.px(after, r.width, x, y) { changed += 1 }
+            }
+        }
+        XCTAssertGreaterThan(changed, 10, "pixels near the finger are displaced")
+        XCTAssertEqual(SceneTestSupport.px(before, r.width, r.width - 2, 1), SceneTestSupport.px(after, r.width, r.width - 2, 1),
+                       "the far corner is unchanged")
+        scene.handle(PointerEvent(id: 1, phase: .ended, location: Vec2(20, 40), timestamp: 0.2))
+        XCTAssertEqual(scene.status, "touch=none")
+        r.host.destroy()
+        XCTAssertEqual(r.host.resources.stats.leaked, 0)
+    }
+}

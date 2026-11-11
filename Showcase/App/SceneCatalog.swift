@@ -46,6 +46,10 @@ enum SceneCatalog {
                             summary: "Lit 3D meshes spinning on a timeline; drag to orbit the camera.",
                             accessibilityDescription: "A blue cube on the left and an orange sphere on the right, gently spinning and bobbing.",
                             interactionHint: "Drag to orbit the camera around the shapes.") { AnimatedGeometryScene(settings: $0) },
+            SceneDescriptor(id: "distortion", title: "Touch Distortion",
+                            summary: "A ripple shader bends the image wherever you touch.",
+                            accessibilityDescription: "Diagonal colored stripes that ripple outward from your finger.",
+                            interactionHint: "Touch or drag anywhere to move the ripple.") { DistortionScene(settings: $0) },
         ]
     }
 
