@@ -1,0 +1,6 @@
+{ "version": 1, "output": "final",
+  "passes": [
+    { "id": "grade", "type": "colorMatrix", "inputs": { "input": "scene" }, "output": "graded" },
+    { "id": "soft", "type": "blur", "inputs": { "input": "graded" }, "output": "blurred", "scale": 0.5, "params": { "radius": [6] } },
+    { "id": "mix", "type": "composite", "inputs": { "base": "graded", "overlay": "blurred" }, "output": "final", "params": { "mode": [1], "opacity": [0.5] } }
+  ] }

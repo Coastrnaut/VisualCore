@@ -1,0 +1,6 @@
+{ "version": 1, "output": "c",
+  "passes": [
+    { "id": "A", "type": "copy", "inputs": { "input": "scene" }, "output": "a" },
+    { "id": "B", "type": "copy", "inputs": { "input": "c" }, "output": "b" },
+    { "id": "C", "type": "copy", "inputs": { "input": "b" }, "output": "c" }
+  ] }

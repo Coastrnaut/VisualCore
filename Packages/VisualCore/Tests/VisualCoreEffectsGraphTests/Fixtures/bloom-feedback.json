@@ -1,0 +1,5 @@
+{ "version": 1, "output": "trail",
+  "passes": [
+    { "id": "glow", "type": "bloom", "inputs": { "input": "scene" }, "output": "glowing", "params": { "hdr": [1], "threshold": [0.7] } },
+    { "id": "echo", "type": "feedback", "inputs": { "input": "glowing" }, "output": "trail", "params": { "decay": [0.8] } }
+  ] }
