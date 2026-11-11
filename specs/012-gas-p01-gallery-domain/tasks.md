@@ -104,3 +104,9 @@ T-A01-106 simulator runs complete (one Xcode lane).
 
 Build the VisualCore blocks first (the reuse rule), then the pure domain, then the gallery slice. Each checkpoint is
 green before moving on.
+
+## Phase 6: Convergence
+
+- [ ] T-A01-113 Update `docs/release/known-limitations.md`, `docs/release/support-matrix.md`, `docs/getting-started.md` and the ADR-0006 status note so VisualCoreParameters, VisualCoreUI `RenderSurface` and VisualCoreTestSupport `ImageComparison` are listed as built, with only their remaining parts as limitations, per FR-A01-108 / Constitution V (contradicts)
+- [ ] T-A01-114 Make the shader bundle injectable into `SceneModel` (`Apps/GenerativeArtStudio/App/SceneScreen.swift`) and add a unit test that a broken family shader reaches `SceneModel.errorMessage` with `file:line`, per FR-A01-110 (partial)
+- [ ] T-A01-115 Add a domain test that `ArtDocument.decode` applies `migrate` and that migration is the identity for schema 1, per the edge case "older versions migrated (hook tested)" (partial)
