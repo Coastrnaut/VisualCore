@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "python3",
+    "scripts/test_scripts.py"
+  ],
+  "command": "python3 scripts/test_scripts.py",
+  "elapsed_seconds": 0.526,
+  "exit_code": 0,
+  "finished": "2026-11-11T01:28:53+00:00",
+  "log": ".autonomy/logs/F06.converge2-test_scripts.log",
+  "log_sha256": "43713aaf4fe3e37a331682c6778aeb761da354b2d497022089e675708b8dedc7",
+  "name": "converge2-test_scripts",
+  "stage": "F06",
+  "started": "2026-11-11T01:28:53+00:00",
+  "timed_out": false
+}

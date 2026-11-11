@@ -1,0 +1,218 @@
+{
+  "checks": [
+    {
+      "attestation": ".autonomy/checks/F06.converge2-showcase-ios26.json",
+      "command": "xcodebuild test -project VisualCore.xcodeproj -scheme Showcase -destination 'platform=iOS Simulator,id=EC7498FF-31FF-4491-9666-B0D32785203C' -derivedDataPath Build/DerivedData/Showcase -resultBundlePath .autonomy/xcresults/F06-converge2-ios26-20261110-203112.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 180 CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F06.converge2-showcase-ios26.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F06.converge2-showcase-ios27.json",
+      "command": "xcodebuild test -project VisualCore.xcodeproj -scheme Showcase -destination 'platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D' -derivedDataPath Build/DerivedData/Showcase -resultBundlePath .autonomy/xcresults/F06-converge2-ios27-20261110-202900.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 180 CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F06.converge2-showcase-ios27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F06.converge2-test_scripts.json",
+      "command": "python3 scripts/test_scripts.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F06.converge2-test_scripts.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F06.t601-shell-build.json",
+      "command": "xcodebuild build-for-testing -project VisualCore.xcodeproj -scheme Showcase -destination 'platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D' -derivedDataPath Build/DerivedData/Showcase CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F06.t601-shell-build.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F06.t601-shell-test.json",
+      "command": "xcodebuild test-without-building -project VisualCore.xcodeproj -scheme Showcase -destination 'platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D' -derivedDataPath Build/DerivedData/Showcase -resultBundlePath .autonomy/xcresults/F06-t601-20261110-200539.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 180 CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F06.t601-shell-test.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F06.t602-audit-showcase.json",
+      "command": "python3 scripts/audit_showcase_dependencies.py --app Build/DerivedData/Showcase/Build/Products/Debug-iphonesimulator/Showcase.app",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F06.t602-audit-showcase.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F06.t602-audit-tests.json",
+      "command": "python3 scripts/test_scripts.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F06.t602-audit-tests.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F06.t603-texture-upload-ios27.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --result-name F06-t603-ios27",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F06.t603-texture-upload-ios27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F06.t604-infrastructure.json",
+      "command": "xcodebuild test -project VisualCore.xcodeproj -scheme Showcase -destination 'platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D' -derivedDataPath Build/DerivedData/Showcase -resultBundlePath .autonomy/xcresults/F06-t604-20261110-200945.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 180 CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F06.t604-infrastructure.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F06.t605-gradient-texture.json",
+      "command": "xcodebuild test -project VisualCore.xcodeproj -scheme Showcase -destination 'platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D' -derivedDataPath Build/DerivedData/Showcase -resultBundlePath .autonomy/xcresults/F06-t605-20261110-201108.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 180 CODE_SIGNING_ALLOWED=NO -only-testing:ShowcaseTests",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F06.t605-gradient-texture.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F06.t606-animated-geometry.json",
+      "command": "xcodebuild test -project VisualCore.xcodeproj -scheme Showcase -destination 'platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D' -derivedDataPath Build/DerivedData/Showcase -resultBundlePath .autonomy/xcresults/F06-t606-20261110-201159.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 180 CODE_SIGNING_ALLOWED=NO -only-testing:ShowcaseTests",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F06.t606-animated-geometry.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F06.t607-distortion-a2.json",
+      "command": "xcodebuild test -project VisualCore.xcodeproj -scheme Showcase -destination 'platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D' -derivedDataPath Build/DerivedData/Showcase -resultBundlePath .autonomy/xcresults/F06-t607-20261110-201312.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 180 CODE_SIGNING_ALLOWED=NO -only-testing:ShowcaseTests",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F06.t607-distortion-a2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F06.t608-demo-pinch-regression.json",
+      "command": "xcodebuild test -project Harnesses/InteractiveDemo/InteractiveDemo.xcodeproj -scheme InteractiveDemo -destination 'platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D' -derivedDataPath Build/DerivedData/InteractiveDemo -resultBundlePath .autonomy/xcresults/F06-t608-demo-20261110-201418.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 180 CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F06.t608-demo-pinch-regression.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F06.t608-particles-a2.json",
+      "command": "xcodebuild test -project VisualCore.xcodeproj -scheme Showcase -destination 'platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D' -derivedDataPath Build/DerivedData/Showcase -resultBundlePath .autonomy/xcresults/F06-t608-20261110-201414.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 180 CODE_SIGNING_ALLOWED=NO -only-testing:ShowcaseTests",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F06.t608-particles-a2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F06.t609-post-processing.json",
+      "command": "xcodebuild test -project VisualCore.xcodeproj -scheme Showcase -destination 'platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D' -derivedDataPath Build/DerivedData/Showcase -resultBundlePath .autonomy/xcresults/F06-t609-20261110-201542.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 180 CODE_SIGNING_ALLOWED=NO -only-testing:ShowcaseTests",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F06.t609-post-processing.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F06.t610-smoke-ios26.json",
+      "command": "xcodebuild test -project VisualCore.xcodeproj -scheme Showcase -destination 'platform=iOS Simulator,id=EC7498FF-31FF-4491-9666-B0D32785203C' -derivedDataPath Build/DerivedData/Showcase -resultBundlePath .autonomy/xcresults/F06-t610-ios26-20261110-202204.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 180 CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F06.t610-smoke-ios26.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F06.t610-smoke-ios27-a2.json",
+      "command": "xcodebuild test -project VisualCore.xcodeproj -scheme Showcase -destination 'platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D' -derivedDataPath Build/DerivedData/Showcase -resultBundlePath .autonomy/xcresults/F06-t610-ios27-20261110-201948.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 180 CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F06.t610-smoke-ios27-a2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F06.t611-readme.json",
+      "command": "python3 scripts/validate_docs.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F06.t611-readme.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F06.t612-audit-device.json",
+      "command": "python3 scripts/audit_showcase_dependencies.py --app Build/DerivedData/ShowcaseDevice/Build/Products/Debug-iphoneos/Showcase.app",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F06.t612-audit-device.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F06.t612-audit-sim.json",
+      "command": "python3 scripts/audit_showcase_dependencies.py --app Build/DerivedData/Showcase/Build/Products/Debug-iphonesimulator/Showcase.app",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F06.t612-audit-sim.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F06.t612-check_compliance.json",
+      "command": "python3 scripts/check_compliance.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F06.t612-check_compliance.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F06.t612-check_dependencies.json",
+      "command": "python3 scripts/check_dependencies.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F06.t612-check_dependencies.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F06.t612-host.json",
+      "command": "swift test --package-path Packages/VisualCore",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F06.t612-host.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F06.t612-ref-clean.json",
+      "command": "python3 scripts/check_reference_clean.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F06.t612-ref-clean.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F06.t612-ref-ios26.json",
+      "command": "python3 scripts/run_reference_baseline.py --step test-anglerendering-ios26",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F06.t612-ref-ios26.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F06.t612-ref-ios27.json",
+      "command": "python3 scripts/run_reference_baseline.py --step test-anglerendering-ios27",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F06.t612-ref-ios27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F06.t612-showcase-generic-ios.json",
+      "command": "xcodebuild build -project VisualCore.xcodeproj -scheme Showcase -destination generic/platform=iOS -derivedDataPath Build/DerivedData/ShowcaseDevice CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F06.t612-showcase-generic-ios.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F06.t612-sim-ios26.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-26.5 --action test --result-name F06-t612-ios26",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F06.t612-sim-ios26.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F06.t612-sim-ios27.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --result-name F06-t612-ios27",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F06.t612-sim-ios27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F06.t612-test_scripts.json",
+      "command": "python3 scripts/test_scripts.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F06.t612-test_scripts.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F06.t612-validate_docs.json",
+      "command": "python3 scripts/validate_docs.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F06.t612-validate_docs.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F06.t614-build-with-audit-a2.json",
+      "command": "xcodebuild build -project VisualCore.xcodeproj -scheme Showcase -destination 'generic/platform=iOS Simulator' -derivedDataPath Build/DerivedData/Showcase CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F06.t614-build-with-audit-a2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F06.t614-contaminated-build-fails.json",
+      "command": "sh -c '! xcodebuild build -project VisualCore.xcodeproj -scheme Showcase -destination \"generic/platform=iOS Simulator\" -derivedDataPath Build/DerivedData/ShowcaseProbe CODE_SIGNING_ALLOWED=NO'",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F06.t614-contaminated-build-fails.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F06.t615-t616-scenehost.json",
+      "command": "xcodebuild test -project VisualCore.xcodeproj -scheme Showcase -destination 'platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D' -derivedDataPath Build/DerivedData/Showcase -resultBundlePath .autonomy/xcresults/F06-t615-20261110-202806.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 180 CODE_SIGNING_ALLOWED=NO -only-testing:ShowcaseTests",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F06.t615-t616-scenehost.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F06.t617-plan-sync.json",
+      "command": "sh /private/tmp/claude-501/-Users-coast--claude-spares-spare-cfXtKj/51106fd1-e87b-442d-aa28-d54231dd3fe4/scratchpad/f06_plan_check.sh /Users/coast/Documents/GIT/VisualCore",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F06.t617-plan-sync.log"
+    }
+  ],
+  "generated": "2026-11-11T01:33:34+00:00",
+  "method": "deterministic-run-check",
+  "stage": "F06",
+  "status": "pass"
+}
