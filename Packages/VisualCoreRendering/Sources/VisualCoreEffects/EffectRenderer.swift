@@ -49,16 +49,21 @@ public final class EffectRenderer {
         lastOrder = validated.order
         lastWarnings = validated.warnings
         var outputs: [String: RenderTarget] = [effectSceneSource: scene]
-        for id in validated.order {
-            guard let pass = graph.passes.first(where: { $0.id == id }) else { continue }
+        let passes = validated.order.compactMap { id in graph.passes.first { $0.id == id } }
+        // FR-F407: the step after which each output is no longer read; it then goes back to the pool.
+        var lastUse: [String: Int] = [:]
+        for (step, pass) in passes.enumerated() {
+            for slot in PassSchemas.schema(for: pass.type)?.inputs ?? [] { if let s = pass.inputs[slot] { lastUse[s] = step } }
+        }
+        for (step, pass) in passes.enumerated() {
             let width = max(1, Int((Double(scene.width) * pass.scale).rounded()))
             let height = max(1, Int((Double(scene.height) * pass.scale).rounded()))
-            let params = validated.parameters[id] ?? [:]
+            let params = validated.parameters[pass.id] ?? [:]
             let format: TextureFormat = pass.type == "bloom" && (params["hdr"]?.first ?? 0) >= 0.5 ? .rgba16f : .rgba8
             let target = try registry.acquireTarget(width: width, height: height, format: format)
             heldTargets.append(target)
             var inputs: [String: RenderTarget] = [:]
-            for (slot, source) in pass.inputs { inputs[slot] = outputs[source] }
+            for slot in PassSchemas.schema(for: pass.type)?.inputs ?? [] { inputs[slot] = pass.inputs[slot].flatMap { outputs[$0] } }
             let io = PassIO(inputs: inputs, output: target, params: params, time: time, delta: delta, registry: registry)
             if let runner = runner(for: pass) {
                 do { try runner.run(io) } catch { fail(pass.id, error) ; try passThrough(io) }
@@ -66,6 +71,12 @@ public final class EffectRenderer {
                 try passThrough(io)
             }
             outputs[pass.output] = target
+            for source in Set(inputs.keys.compactMap { pass.inputs[$0] })
+            where lastUse[source] == step && source != effectSceneSource && source != graph.output {
+                if let done = outputs[source], let i = heldTargets.firstIndex(where: { $0 === done }) {
+                    registry.recycle(heldTargets.remove(at: i))
+                }
+            }
         }
         guard let result = outputs[graph.output] else { throw EffectGraphError.missingOutput(graph.output) }
         return result

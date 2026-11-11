@@ -31,6 +31,34 @@ final class EffectRendererTests: XCTestCase {
         XCTAssertEqual(host.resources.stats.warnings.filter { $0.contains("effect pass B failed") }.count, 1)
     }
 
+    // T-F419 (FR-F407): intermediate targets go back to the pool after their last consumer in the frame.
+    func testIntermediateTargetsAreRecycledWithinTheFrame() throws {
+        var added = 0, pixel = SIMD4<Int>(0, 0, 0, 0), diamond = SIMD4<Int>(0, 0, 0, 0)
+        _ = try EffectHarness.run { ctx in
+            let red = try EffectHarness.solid(1, 0, 0, in: ctx)
+            let chain = try EffectRenderer(graph: EffectHarness.graph((0..<4).map { i in
+                EffectPassDescription(id: "P\(i)", type: "copy", inputs: ["input": i == 0 ? "scene" : "o\(i - 1)"], output: "o\(i)")
+            }, output: "o3"), registry: ctx.resources)
+            let before = ctx.resources.stats.liveCount[.framebuffer] ?? 0
+            pixel = EffectHarness.pixel(try chain.render(scene: red, time: 0, delta: 0).readPixels(), width: 16, x: 3, y: 3)
+            added = (ctx.resources.stats.liveCount[.framebuffer] ?? 0) - before
+            // Diamond: A feeds both B and C, so A must survive until C has run.
+            let swap: [Double] = [0, 0, 1, 0,  0, 1, 0, 0,  1, 0, 0, 0,  0, 0, 0, 1]
+            let d = try EffectRenderer(graph: EffectHarness.graph([
+                EffectPassDescription(id: "A", type: "copy", inputs: ["input": "scene"], output: "a"),
+                EffectPassDescription(id: "B", type: "colorMatrix", inputs: ["input": "a"], output: "b", params: ["matrix": swap]),
+                EffectPassDescription(id: "C", type: "copy", inputs: ["input": "a"], output: "c"),
+                EffectPassDescription(id: "D", type: "composite", inputs: ["base": "c", "overlay": "b"], output: "d",
+                                      params: ["mode": [1]]),
+            ], output: "d"), registry: ctx.resources)
+            diamond = EffectHarness.pixel(try d.render(scene: red, time: 0, delta: 0).readPixels(), width: 16, x: 3, y: 3)
+        }
+        XCTAssertEqual(added, 2, "a 4-pass chain ping-pongs between two pooled targets")
+        XCTAssertGreaterThanOrEqual(pixel.x, 254)
+        XCTAssertGreaterThanOrEqual(diamond.x, 254, "C still read A (red) after B ran")
+        XCTAssertGreaterThanOrEqual(diamond.z, 254, "B swapped red to blue; add composite keeps both")
+    }
+
     // MARK: EffectScene (T-F415; FR-F410, FR-F411, SC-F405)
 
     private static let swapGraph = EffectHarness.graph([

@@ -1,0 +1,26 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/VisualCoreRendering",
+    "--scheme",
+    "VisualCoreRendering-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--result-name",
+    "F04-t419-ios27"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --result-name F04-t419-ios27",
+  "elapsed_seconds": 3.145,
+  "exit_code": 65,
+  "finished": "2026-11-11T00:29:26+00:00",
+  "log": ".autonomy/logs/F04.t419-recycle-ios27.log",
+  "log_sha256": "46cfa916f74e3d11bf4a5b8dc793e93a327754fe1d923da4801847f2f03da0d7",
+  "name": "t419-recycle-ios27",
+  "stage": "F04",
+  "started": "2026-11-11T00:29:23+00:00",
+  "timed_out": false
+}
