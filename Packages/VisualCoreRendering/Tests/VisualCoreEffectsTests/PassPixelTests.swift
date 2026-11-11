@@ -40,4 +40,24 @@ final class PassPixelTests: XCTestCase {
         XCTAssertEqual(caught as? EffectGraphError, .cycle(["A", "B"]))
         XCTAssertEqual(host.resources.compileCount, 0)
     }
+
+    // MARK: colorMatrix (T-F407)
+
+    func testColorMatrixSwapsRedAndBlueAndAddsOffset() throws {
+        var out: [UInt8] = []
+        _ = try EffectHarness.run { ctx in
+            let scene = try EffectHarness.solid(1, 0, 0, in: ctx)
+            // Row-major: R' = B, G' = G, B' = R, A' = A; offset adds 0.2 to green.
+            let swap: [Double] = [0, 0, 1, 0,  0, 1, 0, 0,  1, 0, 0, 0,  0, 0, 0, 1]
+            let r = try EffectRenderer(graph: EffectHarness.graph([
+                EffectPassDescription(id: "M", type: "colorMatrix", inputs: ["input": "scene"], output: "m",
+                                      params: ["matrix": swap, "offset": [0, 0.2, 0, 0]]),
+            ], output: "m"), registry: ctx.resources)
+            out = try r.render(scene: scene, time: 0, delta: 0).readPixels()
+        }
+        let p = EffectHarness.pixel(out, width: 16, x: 3, y: 3)
+        XCTAssertLessThanOrEqual(p.x, 1)
+        XCTAssertEqual(p.y, 51, accuracy: 1)
+        XCTAssertGreaterThanOrEqual(p.z, 254)
+    }
 }
