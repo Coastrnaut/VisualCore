@@ -28,3 +28,16 @@ python3 scripts/release_check.py --only reference-test-anglerendering-ios27 refe
 
 **7/7 steps pass**, the same table as A01's baseline. These are simulator results, not device evidence. Any later
 A02 phase that changes VisualCore reruns this set and compares against this table (constitution II-a, A02 rules).
+
+## A02-P01 rerun after the VisualCore change (2026-11-11)
+
+Feature 019 added `PingPongTarget`, `FieldPass`, `FloatRenderSupport` and the float upload/readback to
+VisualCoreRendering, and `FieldGrid`, `StoragePrecision`, `SignedRangeEncoding` and `TimeStepPolicy` to
+VisualCoreSimulation. The API baseline diff contains additions only. Same two chunks, run under stage A02-P01:
+
+| Chunk | run-check | Result |
+|---|---|---|
+| reference-engine-xcframework, reference-build-projectm-ios-sim, reference-clean | `A02-P01/t107-reference-a` | 3/3 pass (reference pin `d93edd1` unchanged) |
+| reference-test-anglerendering-ios27/ios26, projectm-reference-ios27/ios26 | `A02-P01/t107-reference-b` | 4/4 pass (ANGLERendering 14/14 and ProjectMReference 17/17 on both runtimes) |
+
+**7/7 steps pass**, unchanged from the phase-start table. These are simulator results, not device evidence.

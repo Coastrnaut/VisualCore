@@ -81,7 +81,7 @@ runtimes, then the ProjectM regression 7/7.
   with the enumeration guard for the 4 new classes. Run `check_public_api.py --update` (additions only) and
   `check_documented_api.py --sources Packages/VisualCoreRendering/Sources`. Update the README section for the new
   types and the package-map / support-matrix entries.
-- [ ] T-A02-107 [US2] Run the ProjectM reference regression in two run-check chunks (3/3 + 4/4) after the VisualCore
+- [X] T-A02-107 [US2] Run the ProjectM reference regression in two run-check chunks (3/3 + 4/4) after the VisualCore — Verified 2026-11-11: run-check A02-P01/t107-reference-a 3/3 (engine xcframework, projectM-iOS simulator build, reference clean at d93edd1) and t107-reference-b 4/4 (ANGLERendering 14/14 and ProjectMReference 17/17 on iOS 27.2 and 26.5) = 7/7 after the VisualCore change; appended to docs/apps/fluid-art-playground/regression-baseline.md (US2 AC3, SC-A02-105)
   change. Append the results to `docs/apps/fluid-art-playground/regression-baseline.md` (US2 AC3, SC-A02-105).
 
 ## Phase 4: User Story 1 — Bounded velocity and dye fields evolve correctly (P1) 🎯 MVP
