@@ -44,6 +44,8 @@ IDs are `T-A02-6##`, with one commit per task (`scripts/tick_task.py`). Commands
   - `project.yml`: the FAP target depends on `VisualCorePersistence`.
   - Add `Apps/FluidArtPlayground/Tests/Unit/CrashRecoveryTests.swift`:
     - 3 stale captures and 1 file outside the folder → cleanup leaves 0 inside and the outside file untouched;
+    - a non-capture file inside the app-owned folder is removed too;
+    - an unreadable folder (permissions 000) → no crash, and the result is reported;
     - a missing folder → 0;
     - a capture lands in `tmp/Captures`, only the latest exists, and close removes it.
 
@@ -84,6 +86,7 @@ IDs are `T-A02-6##`, with one commit per task (`scripts/tick_task.py`). Commands
   - Add `Apps/FluidArtPlayground/Tests/UI/AcknowledgementsUITests.swift`: the screen opens and lists ANGLE,
     VisualCore and the app.
   - `AccessibilityAuditUITests` gains the screen (default size and XXXL).
+  - The missing-bundle fallback text is covered by VisualCoreUI's existing `AcknowledgementsViewTests` (analyze G2).
 
   Run on 27.2 and 26.5, plus `check_licenses.py` (FR-A02-604, SC-A02-604).
 - [ ] T-A02-607 [US2] [US4] Write `docs/apps/fluid-art-playground/`:
@@ -105,8 +108,11 @@ IDs are `T-A02-6##`, with one commit per task (`scripts/tick_task.py`). Commands
 
 - [ ] T-A02-608 [US5] Review every user-visible string in `Apps/FluidArtPlayground/App/*.swift`, the store listing
   and the README's A02 section against the implemented features. Remove any promise, "later phases" or performance
-  wording. Add a `PrivacyTests`-style unit test that scans the home and store copy for banned words ("coming soon",
-  "later", "fps", "frames per second", "physically accurate", "battery"). Run on 27.2 (FR-A02-609).
+  wording. Expose the home copy as `HomeView.summary` (a static constant). Add `Apps/FluidArtPlayground/Tests/Unit/CopyTests.swift`,
+  which scans `HomeView.summary` and `docs/apps/fluid-art-playground/store-listing.md` (read through `#filePath`;
+  the simulator shares the host file system) for banned words ("coming soon", "later phase", "fps", "frames per
+  second", "physically accurate", "battery"), and checks that each store claim row names an existing test. Run on
+  27.2 and 26.5 (FR-A02-609; analyze U1).
 
 ## Phase 5: Polish and cross-cutting
 
@@ -123,10 +129,18 @@ IDs are `T-A02-6##`, with one commit per task (`scripts/tick_task.py`). Commands
   - the fast checks;
   - update the release checklist's test rows with these run names (FR-A02-610, SC-A02-604, SC-A02-606).
 
+## Analyze remediation (2026-11-11, applied under CLAUDE.md §2)
+
+- U1: the CopyTests file and how it reads its inputs.
+- G1: crash-recovery edge cases.
+- G2: cites the existing VisualCoreUI tests.
+- D1: the order of T-A02-604 and T-A02-605.
+
 ## Dependencies
 
 - T-A02-601 blocks T-A02-602.
 - T-A02-602 blocks T-A02-603.
+- T-A02-604 runs before T-A02-605, so the scanned Release build includes the asset catalog (analyze D1).
 - T-A02-604, T-A02-605 and T-A02-606 block T-A02-607.
 - T-A02-607 blocks T-A02-608 and T-A02-610.
 - T-A02-609 runs before T-A02-610.
