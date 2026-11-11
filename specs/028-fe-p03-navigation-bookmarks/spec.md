@@ -135,6 +135,9 @@ A person types a center and a zoom (from a book or a website) and goes there.
 - Duplicate names are allowed; identity is a generated identifier.
 - More than 500 bookmarks: no limit is needed for this slice; the list is lazy.
 - A bookmark of Julia mode opened while in Mandelbrot mode: the mode switches with the bookmark.
+- A failed bookmark write (disk full, write error): an alert says the bookmark was not saved; the list and the
+  current view are unchanged (checklist CHK002).
+- No bookmarks yet: the sheet shows "No bookmarks yet. Save the current view to come back to it later." (CHK004).
 
 ## Requirements *(mandatory)*
 
@@ -207,6 +210,9 @@ A person types a center and a zoom (from a book or a website) and goes there.
 - The span across the shorter side is the natural size-independent zoom measure (the default views use it).
 - Coordinates are typed with "." as the decimal separator or the locale's separator; both are accepted.
 - Precision levels and bits come from the Phase 02 advisor and capabilities; simulator values are context only.
+- The bookmark store reads file attributes (the file size check), a FileTimestamp required-reason API. The app's
+  privacy manifest is created from the built-app scan in the release phase (Phase 06) and must declare it (C617.1,
+  as A02 does) (checklist CHK017).
 - The iteration-cost estimate (G-COST) moves to Phase 04, which names it as its MVP; Phase 03 keeps the cap fixed.
 
 ## Traceability
