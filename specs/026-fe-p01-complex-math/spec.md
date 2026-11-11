@@ -150,7 +150,10 @@ the math end to end before Phase 02 replaces it with the GPU render, and it beco
 
 - **FR-A03-101**: The app MUST offer Mandelbrot and Julia modes through an accessible control.
   - Each mode has a short explanation (visible and spoken).
-  - The picture has a spoken description with the mode, the center, the zoom and, for Julia, the seed.
+  - The picture has a spoken description with the mode, the center, the zoom and, for Julia, the seed. For example:
+    "Mandelbrot set, centered at −0.5 + 0i, zoom 1×", or "Julia set for seed −0.8 + 0.156i, centered at 0 + 0i,
+    zoom 1×". Coordinates use up to 6 significant digits. The zoom is relative to the default framing: a whole
+    number below 10,000×, otherwise scientific notation (for example 2.5e7×).
 - **FR-A03-102**: The app MUST compute the escape-time iteration z ← z² + c on the CPU:
   - Mandelbrot: z₀ = 0, c = the point;
   - Julia: z₀ = the point, c = the seed;
@@ -159,7 +162,11 @@ the math end to end before Phase 02 replaces it with the GPU render, and it beco
 - **FR-A03-103**: Known-point fixtures MUST pass:
   - the Mandelbrot interior points 0, −1 and −0.1+0.1i;
   - the exterior points 2, 1+i and −2.1, with their exact escape counts;
-  - the Julia samples for c = 0 (unit-circle rule) and c = −1 (z = 0 bounded).
+  - the four Julia samples:
+    - c = 0, z = 0.5: interior;
+    - c = 0, z = 1.5: exterior, count 2 (|z₁|² = 5.0625);
+    - c = −1, z = 0: interior (period 2);
+    - c = −0.8+0.156i, z = 2: exterior, count 1.
 - **FR-A03-104**: VisualCore MUST provide a generic double-precision complex-plane viewport (G-VIEWPORT), with
   tests, docs, the API baseline and the ProjectM regression. It has:
   - a center (re, im), units per point, and a view size in points;
