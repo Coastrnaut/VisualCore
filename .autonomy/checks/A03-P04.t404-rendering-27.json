@@ -1,0 +1,26 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/VisualCoreRendering",
+    "--scheme",
+    "VisualCoreRendering-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--result-name",
+    "a03p04-t404-rendering-27"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --result-name a03p04-t404-rendering-27",
+  "elapsed_seconds": 14.335,
+  "exit_code": 0,
+  "finished": "2026-11-11T13:52:27+00:00",
+  "log": ".autonomy/logs/A03-P04.t404-rendering-27.log",
+  "log_sha256": "a6194157ccb7292d1e098091f05ff846e350f10118d3daf9919feacc43a8fb88",
+  "name": "t404-rendering-27",
+  "stage": "A03-P04",
+  "started": "2026-11-11T13:52:12+00:00",
+  "timed_out": false
+}

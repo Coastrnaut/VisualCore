@@ -1,0 +1,25 @@
+{
+  "argv": [
+    "python3",
+    "scripts/release_check.py",
+    "--only",
+    "public-api",
+    "dependencies",
+    "docs",
+    "compliance",
+    "--log-dir",
+    ".autonomy/logs/a03p04-t404",
+    "--json",
+    ".autonomy/logs/a03p04-t404.json"
+  ],
+  "command": "python3 scripts/release_check.py --only public-api dependencies docs compliance --log-dir .autonomy/logs/a03p04-t404 --json .autonomy/logs/a03p04-t404.json",
+  "elapsed_seconds": 0.979,
+  "exit_code": 0,
+  "finished": "2026-11-11T13:52:44+00:00",
+  "log": ".autonomy/logs/A03-P04.t404-checks.log",
+  "log_sha256": "2303475054be4f71b26a1adc403a02c74675c812f036736a8ef39eb78e84ebca",
+  "name": "t404-checks",
+  "stage": "A03-P04",
+  "started": "2026-11-11T13:52:43+00:00",
+  "timed_out": false
+}

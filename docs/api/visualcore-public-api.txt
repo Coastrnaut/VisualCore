@@ -499,6 +499,7 @@ VisualCoreRendering | class | public final class RenderTarget: GPUResource
 VisualCoreRendering | class | public final class ResourceRegistry
 VisualCoreRendering | class | public final class ShaderBundle: Sendable
 VisualCoreRendering | class | public final class ShaderProgram
+VisualCoreRendering | class | public final class StillCapture
 VisualCoreRendering | class | public final class Texture: GPUResource
 VisualCoreRendering | enum | public enum FieldPassError: Error, Equatable, Sendable
 VisualCoreRendering | enum | public enum FieldUniform: Sendable, Equatable
@@ -509,6 +510,7 @@ VisualCoreRendering | enum | public enum RenderHostError: Error, Equatable, Send
 VisualCoreRendering | enum | public enum RenderingInfo
 VisualCoreRendering | enum | public enum ResourceError: Error, Equatable, Sendable
 VisualCoreRendering | enum | public enum ShaderError: Error, Equatable, Sendable
+VisualCoreRendering | enum | public enum State: Equatable, Sendable
 VisualCoreRendering | enum | public enum StillImageEncoder
 VisualCoreRendering | enum | public enum TextureFormat: Sendable, Equatable
 VisualCoreRendering | func | public func acquireTarget(width: Int, height: Int, format: TextureFormat = .rgba8) throws -> RenderTarget
@@ -518,6 +520,7 @@ VisualCoreRendering | func | public func bind()
 VisualCoreRendering | func | public func bind(target: Int32 = GL_ARRAY_BUFFER)
 VisualCoreRendering | func | public func bind(unit: Int)
 VisualCoreRendering | func | public func bindColor(unit: Int)
+VisualCoreRendering | func | public func capture(host: RenderHost, size: ExportSize, prefix: String) -> State
 VisualCoreRendering | func | public func destroy()
 VisualCoreRendering | func | public func draw(_ particles: [ParticleInstance], camera: Camera2D, metrics: ViewMetrics) throws
 VisualCoreRendering | func | public func draw(_ root: SceneNode, camera: Camera2D, metrics: ViewMetrics) throws
@@ -537,6 +540,7 @@ VisualCoreRendering | func | public func redirected(to framebuffer: UInt32, widt
 VisualCoreRendering | func | public func release()
 VisualCoreRendering | func | public func release(_ program: ShaderProgram)
 VisualCoreRendering | func | public func release(_ resource: some GPUResource)
+VisualCoreRendering | func | public func removeFile()
 VisualCoreRendering | func | public func render(_ context: RenderContext, frame: FrameInfo) throws
 VisualCoreRendering | func | public func renderOffscreen(width: Int, height: Int, time: Double) throws(OffscreenRenderError) -> StillImage
 VisualCoreRendering | func | public func renderOneFrame(present: Bool = true) -> Bool
@@ -565,6 +569,8 @@ VisualCoreRendering | func | public func upload(rgbaFloats values: [Float]) -> B
 VisualCoreRendering | func | public func use()
 VisualCoreRendering | func | public func warn(_ message: String) -> Bool
 VisualCoreRendering | func | public nonisolated static func == (a: RenderContext, b: RenderContext) -> Bool
+VisualCoreRendering | func | public nonisolated static func folder(named name: String) -> TemporaryFolder
+VisualCoreRendering | func | public nonisolated static func message(for error: OffscreenRenderError) -> String
 VisualCoreRendering | func | public static func detect(in registry: ResourceRegistry) -> FloatRenderSupport
 VisualCoreRendering | func | public static func pngData(_ image: StillImage) throws(OffscreenRenderError) -> Data
 VisualCoreRendering | func | public static func resetForVisualCore(framebuffer: UInt32, width: Int, height: Int)
@@ -573,6 +579,7 @@ VisualCoreRendering | init | public convenience init(fragmentName: String, bundl
 VisualCoreRendering | init | public init()
 VisualCoreRendering | init | public init(extensionReported: Bool, probeComplete: Bool)
 VisualCoreRendering | init | public init(files: [String: String])
+VisualCoreRendering | init | public init(folder: TemporaryFolder)
 VisualCoreRendering | init | public init(fragment: String, fragmentName: String, bundle: ShaderBundle)
 VisualCoreRendering | init | public init(mesh: Mesh, registry: ResourceRegistry) throws
 VisualCoreRendering | init | public init(rangeMin: Int, rangeMax: Int, precisionBits: Int)
@@ -588,6 +595,7 @@ VisualCoreRendering | let | public let cacheKey: String
 VisualCoreRendering | let | public let colorTexture: GLuint
 VisualCoreRendering | let | public let delta: Double
 VisualCoreRendering | let | public let extensionReported: Bool
+VisualCoreRendering | let | public let folder: TemporaryFolder
 VisualCoreRendering | let | public let format: TextureFormat
 VisualCoreRendering | let | public let framebuffer: UInt32
 VisualCoreRendering | let | public let generation: Int
@@ -649,12 +657,14 @@ VisualCoreRendering | var | public private(set) var compileCount
 VisualCoreRendering | var | public private(set) var errorMessage: String?
 VisualCoreRendering | var | public private(set) var generation: Int
 VisualCoreRendering | var | public private(set) var lastError: RenderHostError?
+VisualCoreRendering | var | public private(set) var lastImage: StillImage?
 VisualCoreRendering | var | public private(set) var lastInstanceCount
 VisualCoreRendering | var | public private(set) var lastTriangleCount
 VisualCoreRendering | var | public private(set) var pixelSize: (width: Int, height: Int)
 VisualCoreRendering | var | public private(set) var presentedFrameCount
 VisualCoreRendering | var | public private(set) var read: RenderTarget
 VisualCoreRendering | var | public private(set) var resources: ResourceRegistry
+VisualCoreRendering | var | public private(set) var state
 VisualCoreRendering | var | public private(set) var swapCount
 VisualCoreRendering | var | public private(set) var write: RenderTarget
 VisualCoreRendering | var | public var ambient

@@ -28,7 +28,8 @@ let package = Package(
                                .product(name: "VisualCoreShaderSource", package: "VisualCore"),
                                .product(name: "VisualCoreMath", package: "VisualCore"),
                                .product(name: "VisualCoreSimulation", package: "VisualCore"),
-                               .product(name: "VisualCoreScenes", package: "VisualCore")],
+                               .product(name: "VisualCoreScenes", package: "VisualCore"),
+                               .product(name: "VisualCorePersistence", package: "VisualCore")],
                 // VisualCore GLSL include library (vc/*.glsl), loaded by ShaderBundle (feature 012).
                 resources: [.copy("GLSL")],
                 linkerSettings: [.linkedFramework("QuartzCore"), .linkedFramework("UIKit")]),
@@ -55,7 +56,8 @@ let package = Package(
                                    .product(name: "VisualCoreDiagnostics", package: "VisualCore"),
                                    .product(name: "VisualCoreMath", package: "VisualCore"),
                                    .product(name: "VisualCoreSimulation", package: "VisualCore"),
-                                   .product(name: "VisualCoreScenes", package: "VisualCore")]),
+                                   .product(name: "VisualCoreScenes", package: "VisualCore"),
+                                   .product(name: "VisualCorePersistence", package: "VisualCore")]),
     ],
     swiftLanguageModes: [.v6]
 )
