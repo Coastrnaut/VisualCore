@@ -108,4 +108,4 @@ No CRITICAL findings; coverage is 100%.
 
 ## Phase 7: Convergence
 
-- [ ] T-A02-409 Extend `CaptureTests`: for each palette, the capture's corner pixel equals the on-screen frame's corner pixel (`host.readPixels()`, within 3/255); splats queued before a capture are still applied on the next stepped frame (capture drops no touches), per SC-A02-403 and the spec edge case "capture during an active swipe" (partial)
+- [X] T-A02-409 Extend `CaptureTests`: for each palette, the capture's corner pixel equals the on-screen frame's corner pixel (`host.readPixels()`, within 3/255); splats queued before a capture are still applied on the next stepped frame (capture drops no touches), per SC-A02-403 and the spec edge case "capture during an active swipe" (partial) — Verified 2026-11-11: — Verified 2026-11-11: CaptureTests testCaptureCornersEqualOnScreenFrame (ink/smoke/glow, bottom corners vs host.readPixels within 3/255) and testCaptureDuringSwipeDropsNoTouches (queue kept through capture, all queued splats applied on the next frame) pass on iOS 27.2 and 26.5 (run-check A02-P04 conv409-app-ios27-2, conv409-app-ios26; enumeration guard conv409-enum-ios27/26 exit 0)
