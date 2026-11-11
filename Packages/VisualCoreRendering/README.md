@@ -67,3 +67,24 @@ handles from an older context generation are rejected and counted; `stats` repor
 peak, stale rejections, leaks, shader failures and deduplicated warnings. Shader sources are GLSL ES 3.00
 with `#include "name"` from a `ShaderLibrary`; compile errors name the original file and line.
 Color-space policy: [docs/rendering/color-space.md](../../docs/rendering/color-space.md).
+
+## Effects (feature 005)
+
+`EffectScene(content:graph:)` renders any scene into a target, runs a validated `EffectGraphDescription`
+(JSON-codable, version 1, ≤ 32 passes, 256 MiB texture quota, cycles and missing inputs rejected before
+GPU work) and presents the result. A pass that fails passes its first input through and is reported once.
+`reduceFlashing = true` appends the flash limiter (displayed mean luminance changes ≤ 0.3 per second).
+
+| Type | Inputs | Parameters (default, range) |
+|---|---|---|
+| `copy` | input | — |
+| `colorMatrix` | input | `matrix` 16 values row-major (identity, −10…10), `offset` 4 values (0, −1…1) |
+| `blur` | input | `radius` (4, 1…32); separable Gaussian, σ = radius / 2 |
+| `bloom` | input | `threshold` (0.8, 0…1), `intensity` (1, 0…4), `radius` (8, 1…32), `hdr` (0, 0…1 → rgba16f) |
+| `distort` | input | `strength` (0.02, 0…0.2), `frequency` (8, 0…64), `speed` (1, 0…10) |
+| `composite` | base, overlay | `mode` (0 over, 1 add), `opacity` (1, 0…1) |
+| `feedback` | input | `decay` (0.9, 0…1); owns a history target, cleared on resize/recreation |
+| `flashLimit` | input | `limit` (0.3, 0.05…1) luminance change per second |
+
+Out-of-range values are clamped and unknown keys are ignored with a warning. Defaults are generated
+from `PassSchemas` in `VisualCoreEffectsGraph`; per-effect GPU cost on devices is measured in campaign II.
