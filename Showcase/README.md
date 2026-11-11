@@ -5,7 +5,8 @@ ANGLE-backed `RenderHost` and uses only VisualCore packages — **no ProjectM en
 module at compile or run time** (feature 007, ledger gate F06; spec `specs/007-showcase-app/`).
 
 > Developer showcase, not an App Store product. Bundle id `dev.visualcore.Showcase` and the name
-> "VisualCore Showcase" are placeholders until the owner approves branding and provisioning (CLAUDE.md §8).
+> "VisualCore Showcase" are owner-approved (owner ruling 2026-11-10); device signing still uses only the owner's
+> local `Configs/Signing.local.xcconfig`.
 
 ## Scenes
 

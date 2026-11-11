@@ -152,5 +152,5 @@ imports and the built binary; it fails on any ProjectM dependency and passes for
 ## Assumptions
 
 - Simulator runs are functional evidence only; frame rate, thermal and memory on D1–D3 belong to campaign II (constitution V).
-- The Showcase is a developer showcase, not an App Store product in this phase; bundle id `dev.visualcore.Showcase` and the name are placeholders until the owner approves (CLAUDE.md §8).
+- The Showcase is a developer showcase, not an App Store product in this phase; bundle id `dev.visualcore.Showcase` and the name "VisualCore Showcase" were approved by the owner (owner ruling 2026-11-10).
 - The texture is a small, original, generated asset committed with the app (no third-party license).
