@@ -49,6 +49,26 @@ The digest is compared between repeated runs on the same device. Across devices 
 counts are compared (spec 023 assumptions). The report holds no personal data and stays in the app container until
 copied.
 
+## On-device privacy inspection (per device, CLAUDE.md §9)
+
+After the runs on each device, inspect the app's container:
+
+1. List the whole app container with `xcrun devicectl device info files --device <id> --domain-type
+   appDataContainer --domain-identifier dev.visualcore.FluidArtPlayground --json-output <file>`.
+2. Copy `Library/Preferences/dev.visualcore.FluidArtPlayground.plist` (if present) with `devicectl device copy
+   from`, and list its keys. The allowed list of app keys is **empty**: the app stores no settings. System-written
+   keys (Apple, NS and UIKit prefixes) are listed with their provenance.
+3. Explain every entry, and never suppress unknown ones:
+   - `Library/Caches` (including Metal shader caches with `.pcm` files, which are not audio);
+   - `Library/Preferences`, `Library/SplashBoard` and `Library/Saved Application State`;
+   - Debug or measurement-build automation reports in Documents (`visualcore-automation-*.json`);
+   - an empty `tmp/Captures`.
+
+   Any other file fails the row.
+4. Record the listing (without UDIDs or serials) with the device report.
+
+This mirrors the simulator `PrivacyTests.testSessionStoresNothing`. The simulator result is not device evidence.
+
 ## Rows for the campaign (all pending)
 
 | Device | Runs per mode | Seeds | Status |

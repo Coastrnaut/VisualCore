@@ -31,7 +31,7 @@ Release candidate 1.0.0 (1), bundle `dev.visualcore.FluidArtPlayground` (approve
 | Build | Signing team, archive and upload | owner-action | build-and-archive.md §5 steps 1–3 |
 | Store | App Store Connect record and submission | owner-action | build-and-archive.md §5 step 4 |
 | Device | Automation runner (smoke, launch, lifecycle) with seed, post-run field check and digest | verified | `A02-P05/t511-rehearse-smoke`, `-launch`, `-lifecycle` (simulator rehearsal only, not device evidence); [device-campaign.md](device-campaign.md) |
-| Device | D1 iPhone 15 iOS 27.0.1: install, smoke, launch, lifecycle, rendering, capture, accessibility | pending-campaign-ii | `scripts/run_device_campaign.py` after IMPLEMENTATION-LOCK |
+| Device | D1 iPhone 15 iOS 27.0.1: install, smoke, launch, lifecycle, rendering, capture, accessibility, container and defaults privacy | pending-campaign-ii | `scripts/run_device_campaign.py` after IMPLEMENTATION-LOCK |
 | Device | D2 iPad Pro M5 iPadOS 27.2: same rows | pending-campaign-ii | Same, after D1 |
 | Device | D3 iPad A16 iPadOS 26.5 (never updated): same rows | pending-campaign-ii | Same, after D2 |
 | Performance | Frame pacing, launch time, thermal behavior and GPU memory on devices | pending-campaign-ii | No number is claimed before device evidence |

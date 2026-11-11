@@ -164,7 +164,7 @@ step green).
 
 ## Phase 7: Convergence
 
-- [ ] T-A02-611 Add the on-device privacy inspection to the device plan. In `docs/apps/fluid-art-playground/release-checklist.md`, D1–D3 rows gain "container and defaults privacy". In `device-campaign.md`, add a section on
+- [X] T-A02-611 Add the on-device privacy inspection to the device plan. In `docs/apps/fluid-art-playground/release-checklist.md`, D1–D3 rows gain "container and defaults privacy". In `device-campaign.md`, add a section on — Verified 2026-11-11: — Verified 2026-11-11: release-checklist D1 row (D2/D3 'same rows') gains container and defaults privacy; device-campaign.md 'On-device privacy inspection' (devicectl appDataContainer listing, preferences plist keys vs an empty allowed list, explained system entries and Debug-only reports, never suppressed, no UDIDs recorded); run-check A02-P06/t611-release 2/2 PASS (app-release-fluid-art-playground incl. checklist parsing, docs)
   the procedure:
   - `devicectl device info files --domain-type appDataContainer` lists the whole container;
   - the app's defaults keys are compared with the allowed list, which is empty;
