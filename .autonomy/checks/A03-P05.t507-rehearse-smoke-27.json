@@ -1,0 +1,26 @@
+{
+  "argv": [
+    "python3",
+    "scripts/run_automation_sim.py",
+    "--app",
+    "Build/DerivedData/FractalExplorer/Build/Products/Debug-iphonesimulator/FractalExplorer.app",
+    "--runtime",
+    "27.2",
+    "--mode",
+    "smoke",
+    "--out",
+    ".autonomy/logs/a03p05-automation-27",
+    "--timeout",
+    "360"
+  ],
+  "command": "python3 scripts/run_automation_sim.py --app Build/DerivedData/FractalExplorer/Build/Products/Debug-iphonesimulator/FractalExplorer.app --runtime 27.2 --mode smoke --out .autonomy/logs/a03p05-automation-27 --timeout 360",
+  "elapsed_seconds": 4.052,
+  "exit_code": 0,
+  "finished": "2026-11-11T15:37:55+00:00",
+  "log": ".autonomy/logs/A03-P05.t507-rehearse-smoke-27.log",
+  "log_sha256": "b9eb283e3854f344db3f615e0d30e13608086e9b377900358165bc003de3c7fd",
+  "name": "t507-rehearse-smoke-27",
+  "stage": "A03-P05",
+  "started": "2026-11-11T15:37:51+00:00",
+  "timed_out": false
+}

@@ -1,0 +1,26 @@
+{
+  "argv": [
+    "python3",
+    "scripts/run_automation_sim.py",
+    "--app",
+    "Build/DerivedData/FractalExplorer/Build/Products/Debug-iphonesimulator/FractalExplorer.app",
+    "--runtime",
+    "27.2",
+    "--mode",
+    "precision",
+    "--out",
+    ".autonomy/logs/a03p05-automation-27",
+    "--timeout",
+    "360"
+  ],
+  "command": "python3 scripts/run_automation_sim.py --app Build/DerivedData/FractalExplorer/Build/Products/Debug-iphonesimulator/FractalExplorer.app --runtime 27.2 --mode precision --out .autonomy/logs/a03p05-automation-27 --timeout 360",
+  "elapsed_seconds": 4.326,
+  "exit_code": 0,
+  "finished": "2026-11-11T15:38:03+00:00",
+  "log": ".autonomy/logs/A03-P05.t507-rehearse-precision-27.log",
+  "log_sha256": "ea5ed9a9d55a48344141953fe301a1e0e3972bfc08978b0d3085ea8d001209b3",
+  "name": "t507-rehearse-precision-27",
+  "stage": "A03-P05",
+  "started": "2026-11-11T15:37:59+00:00",
+  "timed_out": false
+}

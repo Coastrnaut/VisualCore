@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_release_symbols.py",
+    "--expect-present",
+    "--app",
+    "Build/DerivedData/measure-FractalExplorer/Build/Products/Release-iphoneos/FractalExplorer.app"
+  ],
+  "command": "python3 scripts/check_release_symbols.py --expect-present --app Build/DerivedData/measure-FractalExplorer/Build/Products/Release-iphoneos/FractalExplorer.app",
+  "elapsed_seconds": 0.101,
+  "exit_code": 0,
+  "finished": "2026-11-11T15:40:23+00:00",
+  "log": ".autonomy/logs/A03-P05.t507-measure-symbols.log",
+  "log_sha256": "a593e2f3bf24d7c6670658619601c244b126249552a279cd9fa9319e924f1e1a",
+  "name": "t507-measure-symbols",
+  "stage": "A03-P05",
+  "started": "2026-11-11T15:40:23+00:00",
+  "timed_out": false
+}
