@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_test_enumeration.py",
+    "--sources",
+    "Apps/FluidArtPlayground/Tests",
+    "--log",
+    ".autonomy/logs/A02-P06.t610-app-all-ios27.log"
+  ],
+  "command": "python3 scripts/check_test_enumeration.py --sources Apps/FluidArtPlayground/Tests --log .autonomy/logs/A02-P06.t610-app-all-ios27.log",
+  "elapsed_seconds": 0.027,
+  "exit_code": 0,
+  "finished": "2026-11-11T11:33:10+00:00",
+  "log": ".autonomy/logs/A02-P06.t610-guard-ios27.log",
+  "log_sha256": "0dd0acac3c5dc7da5714f231369cf83e896f48ec8ab1ee0e033946504ab253bf",
+  "name": "t610-guard-ios27",
+  "stage": "A02-P06",
+  "started": "2026-11-11T11:33:10+00:00",
+  "timed_out": false
+}

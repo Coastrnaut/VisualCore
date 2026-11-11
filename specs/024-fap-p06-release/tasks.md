@@ -123,7 +123,7 @@ IDs are `T-A02-6##`, with one commit per task (`scripts/tick_task.py`). Commands
   - Simulator lessons.
 
   Run the fast checks with `check_app_contract.py --render` (FR-A02-610).
-- [ ] T-A02-610 Final verification:
+- [X] T-A02-610 Final verification: — Verified 2026-11-11: — Verified 2026-11-11: full FluidArtPlayground suites run-check A02-P06/t610-app-all-ios27 and t610-app-all-ios26 TEST SUCCEEDED, enumeration guard 85/85 each (t610-guard-ios27/26); t610-app-release 7/7 (docs, app-contracts, compliance, dependencies, public-api, licenses, app-release-fluid-art-playground with the checklist's updated test row); fast checks t609-fast-checks 14/14
   - the full app suites on iOS 27.2 and 26.5 with the guard;
   - `release_check.py --only app-release-fluid-art-playground`;
   - the fast checks;

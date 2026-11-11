@@ -19,7 +19,7 @@ Release candidate 1.0.0 (1), bundle `dev.visualcore.FluidArtPlayground` (approve
 | Credits | License texts bundled and shown (Acknowledgements) | verified | `A02-P06/t606-ui-ios27`, `t606-ui-ios26`; `bundle_licenses.py`; `A02-P06/t606-licenses` |
 | Credits | No ProjectM or LGPL code linked | verified | Dependency audit build phase (FR-A02-006); `check_dependencies.py` R1–R5 |
 | Accessibility | Audit at default and largest text sizes (home, playground, paused playground, Adjust, capture, Acknowledgements); documented exclusions only for canvas artwork and navigation-bar chrome | verified | `A02-P06/t606-ui-ios27`, `t606-ui-ios26` |
-| Tests | Full app suites, enumeration-guarded, both runtimes | verified | `A02-P06/t602-app-ios27`, `t602-app-ios26` (79/79 each); final runs in T-A02-610 |
+| Tests | Full app suites, enumeration-guarded, both runtimes | verified | `A02-P06/t610-app-all-ios27`, `t610-app-all-ios26` (85/85 each, `t610-guard-*` PASS) |
 | Tests | Numerical fixtures 1–5, stress (600 frames per storage) and determinism | verified | `A02-P05` seal (`conv1-app-ios27`, `conv1-app-ios26`, 76/76 each) |
 | Data | No stored data, so no migration; schema version 1 documented as the future starting point | verified | `PrivacyTests.testSessionStoresNothing`; [privacy-and-credits.md](privacy-and-credits.md) |
 | Data | Crash recovery: stale captures removed at launch; files outside untouched | verified | `CrashRecoveryTests` (`A02-P06/t602-app-ios27`, `t602-app-ios26`) |
