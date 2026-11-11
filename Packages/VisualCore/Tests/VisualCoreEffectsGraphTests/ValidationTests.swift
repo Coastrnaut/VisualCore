@@ -8,7 +8,7 @@ private func fixture(_ name: String) throws -> EffectGraphDescription {
     return try JSONDecoder().decode(EffectGraphDescription.self, from: Data(contentsOf: url))
 }
 
-private func pass(_ id: String, _ type: String = "copy", _ inputs: [String: String] = ["input": "scene"],
+private func pass(_ id: String, _ type: String = "copy", inputs: [String: String] = ["input": "scene"],
                   out: String? = nil, scale: Double = 1, params: [String: [Double]] = [:]) -> EffectPassDescription {
     EffectPassDescription(id: id, type: type, inputs: inputs, output: out ?? id.lowercased(), scale: scale, params: params)
 }
@@ -28,7 +28,7 @@ private func validate(_ g: EffectGraphDescription, quota: Int = 256 << 20) throw
     let g = EffectGraphDescription(version: 1, passes: [
         pass("Z", inputs: ["input": "scene"], out: "z"),
         pass("A", inputs: ["input": "scene"], out: "a"),
-        pass("M", "composite", ["base": "z", "overlay": "a"], out: "m"),
+        pass("M", "composite", inputs: ["base": "z", "overlay": "a"], out: "m"),
     ], output: "m")
     #expect(try validate(g).order == ["Z", "A", "M"])
 }
@@ -57,7 +57,7 @@ private func validate(_ g: EffectGraphDescription, quota: Int = 256 << 20) throw
     #expect(throws: EffectGraphError.missingInput(pass: "A", input: "input", source: "nowhere")) {
         try validate(EffectGraphDescription(version: 1, passes: [pass("A", inputs: ["input": "nowhere"])], output: "a")) }
     #expect(throws: EffectGraphError.missingSlot(pass: "M", slot: "overlay")) {
-        try validate(EffectGraphDescription(version: 1, passes: [pass("M", "composite", ["base": "scene"])], output: "m")) }
+        try validate(EffectGraphDescription(version: 1, passes: [pass("M", "composite", inputs: ["base": "scene"])], output: "m")) }
     #expect(throws: EffectGraphError.invalidScale(pass: "A", 0)) {
         try validate(EffectGraphDescription(version: 1, passes: [pass("A", scale: 0)], output: "a")) }
     #expect(throws: EffectGraphError.invalidScale(pass: "A", 1.5)) {
