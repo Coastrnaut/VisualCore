@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_app_contract.py",
+    "--app",
+    "generative-art-studio"
+  ],
+  "command": "python3 scripts/check_app_contract.py --app generative-art-studio",
+  "elapsed_seconds": 0.029,
+  "exit_code": 1,
+  "finished": "2026-11-11T03:22:31+00:00",
+  "log": ".autonomy/logs/A01-P00.t004-contract-citations.log",
+  "log_sha256": "27945963b91f4593d9495abe2242dc52e101ca0353a0246226c26e92a1eb3be2",
+  "name": "t004-contract-citations",
+  "stage": "A01-P00",
+  "started": "2026-11-11T03:22:31+00:00",
+  "timed_out": false
+}

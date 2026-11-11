@@ -1,0 +1,375 @@
+{
+  "schema": 1,
+  "app": "generative-art-studio",
+  "gate": "A01-P00",
+  "date": "2026-11-10",
+  "inventory": [
+    {
+      "area": "Package products",
+      "description": "Pure, host-testable modules: Math, Simulation, Scenes, ShaderSource, EffectsGraph, Diagnostics (+ placeholders AudioDSP, Persistence, TestSupport). iOS modules: Rendering, Effects, Automation (Debug/measurement) (+ placeholders UI, Audio). Rules R1–R5 enforced by scripts/check_dependencies.py.",
+      "paths": [
+        "Packages/VisualCore/Package.swift",
+        "Packages/VisualCoreRendering/Package.swift",
+        "specs/002-architecture-contracts/contracts/package-map.md"
+      ],
+      "owner": "VisualCore packages (ADR-0003)"
+    },
+    {
+      "area": "EGL render host and thread",
+      "description": "RenderHost owns the EGL display/context/surfaces over ANGLE's Metal backend, a CAMetalLayer RenderView, a frame scheduler and context generations. All GL work runs on the main thread (@MainActor; dispatchPrecondition in DEBUG). pause/resume, recreateContext (context loss) and destroy; scenes implement RenderScene setup/resize/render/teardown.",
+      "paths": [
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderScene.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderView.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FrameScheduler.swift"
+      ],
+      "owner": "VisualCoreRendering (ADR-0002 seam)"
+    },
+    {
+      "area": "Resources and budgets",
+      "description": "ResourceRegistry creates textures, buffers, render targets and programs under a ResourceBudget, pools render targets, caches programs, counts leaks and rejects stale handles after a generation change.",
+      "paths": [
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GPUObjects.swift",
+        "Packages/VisualCore/Sources/VisualCoreDiagnostics/ResourceLedger.swift"
+      ],
+      "owner": "VisualCoreRendering + VisualCoreDiagnostics"
+    },
+    {
+      "area": "Shaders",
+      "description": "ShaderLibrary expands includes and defines with line maps; ResourceRegistry.program compiles/links through ANGLE and reports ShaderDiagnostic file:line; color-space policy in docs/rendering/color-space.md.",
+      "paths": [
+        "Packages/VisualCore/Sources/VisualCoreShaderSource/ShaderLibrary.swift",
+        "Packages/VisualCore/Sources/VisualCoreShaderSource/InfoLogParser.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
+        "docs/rendering/color-space.md"
+      ],
+      "owner": "VisualCoreShaderSource + VisualCoreRendering"
+    },
+    {
+      "area": "Effects",
+      "description": "Versioned effect-graph description, validator (≤ 32 passes, memory quota) and GPU executor with 8 pass types; EffectScene wraps any scene and adds the Reduce Flashing limiter.",
+      "paths": [
+        "Packages/VisualCore/Sources/VisualCoreEffectsGraph/EffectGraph.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreEffects/EffectScene.swift"
+      ],
+      "owner": "VisualCoreEffectsGraph + VisualCoreEffects"
+    },
+    {
+      "area": "Scenes, input, simulation",
+      "description": "Pointer tracking and tap/drag/pinch/rotate recognizers, scene graph and mesh generators; fixed-step clock, seeded RNG, timelines/tweens and particle system; primitive/particle/mesh renderers and the UIKit touch adapter.",
+      "paths": [
+        "Packages/VisualCore/Sources/VisualCoreScenes/GestureRecognizers.swift",
+        "Packages/VisualCore/Sources/VisualCoreSimulation/Timeline.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/PrimitiveRenderer.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderView+Touches.swift"
+      ],
+      "owner": "VisualCoreScenes + VisualCoreSimulation + VisualCoreRendering"
+    },
+    {
+      "area": "Build",
+      "description": "XcodeGen 2.46.0 specs (root project.yml for Showcase and app targets; harness specs), package schemes via scripts/xcodebuild_package.py, unsigned simulator builds, scripts/release_check.py (30 steps) and CI.",
+      "paths": [
+        "project.yml",
+        "scripts/xcodebuild_package.py",
+        "scripts/release_check.py",
+        ".github/workflows/ci.yml"
+      ],
+      "owner": "repository tooling"
+    },
+    {
+      "area": "ProjectM regression",
+      "description": "Reference pinned at d93edd1 (ADR-0005), read-only; baseline steps via scripts/run_reference_baseline.py, read-only check scripts/check_reference_clean.py, ProjectMReference harness tests.",
+      "paths": [
+        "scripts/run_reference_baseline.py",
+        "scripts/check_reference_clean.py",
+        "Harnesses/ProjectMReference/ProjectMReference.yml"
+      ],
+      "owner": "reference adapter (harness only)"
+    },
+    {
+      "area": "Source ownership",
+      "description": "Apps own product composition, content and one-off rules (Apps/<Name>/); VisualCore owns reusable logic (constitution 1.2.0 Principle II 'Maximize reuse'); ProjectM stays in the harness (R1).",
+      "paths": [
+        "specs/002-architecture-contracts/contracts/package-map.md",
+        ".specify/memory/constitution.md"
+      ],
+      "owner": "constitution + package map"
+    }
+  ],
+  "matrix": [
+    {
+      "id": "M01",
+      "capability": "Shader pipelines and shader asset management",
+      "source": "brainstorm",
+      "status": "requires adaptation",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreShaderSource/ShaderLibrary.swift",
+          "symbol": "ShaderLibrary.expand",
+          "product": "VisualCoreShaderSource",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
+          "symbol": "ResourceRegistry.program",
+          "product": "VisualCoreRendering",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Showcase/App/BundleShaders.swift",
+        "symbol": "BundleShaders.library"
+      },
+      "notes": "Bundle loading lives only in the Showcase; no shared GLSL include library (noise, palettes, SDF, sRGB)."
+    },
+    {
+      "id": "M02",
+      "capability": "Animation and time-based parameters",
+      "source": "brainstorm",
+      "status": "requires adaptation",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/Timeline.swift",
+          "symbol": "Timeline",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/Timeline.swift",
+          "symbol": "Tween",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/FixedStepClock.swift",
+          "symbol": "FixedStepClock",
+          "product": "VisualCoreSimulation",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Harnesses/InteractiveDemo/Sources/DemoScene.swift",
+        "symbol": "DemoScene"
+      },
+      "notes": "No pausable/scrubbable/speed-scaled scene clock separating document time from wall time."
+    },
+    {
+      "id": "M03",
+      "capability": "Render targets and framebuffer management",
+      "source": "brainstorm",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
+          "symbol": "ResourceRegistry.makeRenderTarget",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GPUObjects.swift",
+          "symbol": "RenderTarget",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreEffects/EffectScene.swift",
+          "symbol": "EffectScene",
+          "product": "VisualCoreEffects",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Showcase/App/Scenes/PostProcessingScene.swift",
+        "symbol": "PostProcessingScene"
+      }
+    },
+    {
+      "id": "M04",
+      "capability": "Procedural textures and geometry",
+      "source": "brainstorm",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/MeshGenerators.swift",
+          "symbol": "Mesh.uvSphere",
+          "product": "VisualCoreScenes",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/PrimitiveRenderer.swift",
+          "symbol": "PrimitiveRenderer",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GPUObjects.swift",
+          "symbol": "Texture.upload",
+          "product": "VisualCoreRendering",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Showcase/App/Scenes/AnimatedGeometryScene.swift",
+        "symbol": "AnimatedGeometryScene"
+      },
+      "notes": "Shader-side noise arrives with the shared GLSL library (G-GLSLLIB)."
+    },
+    {
+      "id": "M05",
+      "capability": "Presets and user-adjustable parameters",
+      "source": "brainstorm",
+      "status": "upstream gap",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreEffectsGraph/PassSchemas.swift",
+          "symbol": "ParameterSpec",
+          "product": "VisualCoreEffectsGraph",
+          "public": true
+        }
+      ],
+      "notes": "ParameterSpec is effects-pass specific (range/default only): no units, UI transform, presets or stable hash."
+    },
+    {
+      "id": "M06",
+      "capability": "Touch interaction and gesture controls",
+      "source": "brainstorm",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/PointerTracker.swift",
+          "symbol": "PointerTracker",
+          "product": "VisualCoreScenes",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/GestureRecognizers.swift",
+          "symbol": "DragRecognizer",
+          "product": "VisualCoreScenes",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/GestureRecognizers.swift",
+          "symbol": "PinchRecognizer",
+          "product": "VisualCoreScenes",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderView+Touches.swift",
+          "symbol": "RenderHost.pointerHandler",
+          "product": "VisualCoreRendering",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Harnesses/SecondConsumer/Sources/GardenScene.swift",
+        "symbol": "GardenScene"
+      }
+    },
+    {
+      "id": "M07",
+      "capability": "Seed-based reproducibility",
+      "source": "v0.1 feature 03",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/SeededRandom.swift",
+          "symbol": "SeededRandom",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/ParticleSystem.swift",
+          "symbol": "ParticleSystem",
+          "product": "VisualCoreSimulation",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Showcase/App/Scenes/ParticleShowcaseScene.swift",
+        "symbol": "ParticleShowcaseScene"
+      }
+    },
+    {
+      "id": "M08",
+      "capability": "Versioned local document store",
+      "source": "v0.1 feature 04",
+      "status": "upstream gap",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCorePersistence/Module.swift",
+          "symbol": "PersistenceInfo",
+          "product": "VisualCorePersistence",
+          "public": true
+        }
+      ],
+      "notes": "VisualCorePersistence is a placeholder (ADR-0006): no envelope, atomic write or migrations."
+    },
+    {
+      "id": "M09",
+      "capability": "Offscreen still export with color space and aspect",
+      "source": "v0.1 feature 05",
+      "status": "requires adaptation",
+      "evidence": [
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GPUObjects.swift",
+          "symbol": "RenderTarget.readPixels",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
+          "symbol": "ResourceRegistry.makeRenderTarget",
+          "product": "VisualCoreRendering",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/VisualCoreRendering/Tests/VisualCoreEffectsTests/PassPixelTests.swift",
+        "symbol": "PassPixelTests"
+      },
+      "notes": "Readback exists; no capped offscreen render → flipped, sRGB-tagged PNG exporter."
+    },
+    {
+      "id": "M10",
+      "capability": "Scene pause, time scrub and reduced motion",
+      "source": "v0.1 feature 06",
+      "status": "requires adaptation",
+      "evidence": [
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+          "symbol": "RenderHost.pause",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+          "symbol": "RenderHost.resume",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/FramePacing.swift",
+          "symbol": "FramePacing",
+          "product": "VisualCoreDiagnostics",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Showcase/App/ShowcaseSettings.swift",
+        "symbol": "ShowcaseSettings"
+      },
+      "notes": "Scrub needs the scene clock (G-CLOCK); accessibility settings and SwiftUI surface exist only in the Showcase (G-UI)."
+    }
+  ],
+  "gaps": [],
+  "traceability": [],
+  "negative": [],
+  "decision": {
+    "result": "go",
+    "reasons": [
+      "Pending T-A01-009"
+    ],
+    "blockers": []
+  }
+}
