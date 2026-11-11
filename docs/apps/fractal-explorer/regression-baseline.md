@@ -46,3 +46,10 @@ VisualCoreRendering package tests pass on both runtimes (`t202-rendering-27`, `t
 `A03-P03/t303-reference-a` 3/3 (pin `d93edd1` unchanged) and `t303-reference-b` 4/4: **7/7 pass**, unchanged. A01
 (`t303-build-GenerativeArtStudio`) and A02 (`t303-build-FluidArtPlayground`) build from clean derived data against the
 changed packages. A01's own `CompositionLibrary` is unchanged; adopting `NamedLibrary` there is a follow-up.
+
+## A03-P04 rerun after `RenderCostEstimate`, `FramingFlight`/`TourTimeline` and `StillCapture` (2026-11-11)
+
+`A03-P04/t405-reference-a` 3/3 (pin `d93edd1` unchanged) and `t405-reference-b` 4/4: **7/7 pass**, unchanged, after
+VisualCoreRendering gained the pure VisualCorePersistence dependency. A01 (`t405-build-GenerativeArtStudio`) and A02
+(`t405-build-FluidArtPlayground`) build from clean derived data. A02's own `CaptureModel` is unchanged; adopting
+`StillCapture` there is a follow-up.

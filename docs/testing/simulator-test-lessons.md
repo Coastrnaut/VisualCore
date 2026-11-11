@@ -160,3 +160,17 @@ speaks and what the screen shows, not exact values. Sheets at a medium detent wi
 - **One rule for one judgement.** Saving a bookmark at the clamp first recorded "near limit" while the banner said
   "limit reached", because the two used different thresholds. Both now call `PrecisionMode.level`.
 - **`xcodegen generate` after adding app files**, or the build cannot find the new type.
+
+## Feature 029 (A03-P04)
+
+- **Compare with the spacing of the binade that holds the value.** `Float16(m).ulp` first converts m, and
+  1.999999 × 2ᵏ rounds up to 2ᵏ⁺¹ whose spacing is twice as large; the fixture used 2^(⌊log₂ m⌋ − bits) and checked
+  that formula against the hardware types where the conversion does not round up.
+- **Curated content must pass the same precision rules as user input.** A tour stop that was only "near the limit" on
+  a 1024-pt iPad canvas would have shown the banner during a tour; the test checks every stop at 320, 390 and 1024 pt.
+- **Longer pages scroll content past both screen edges during audits.** Text under the top bar (or above the
+  screen) and text cut by the bottom edge are measured against blur and edge effects. The audit logs and skips
+  contrast findings for frames that start above the bar's bottom or end below the window; everything else still
+  fails.
+- **When a test file changes after one runtime passed, rerun that runtime too**, so both runtimes' evidence covers
+  the same test code.

@@ -1,9 +1,9 @@
-// AccessibilityAuditUITests — feature 026 T-A03-105, feature 027 T-A03-208 (SC-A03-103; constitution A03 accessibility), following A02's
+// AccessibilityAuditUITests — feature 026 T-A03-105, feature 027 T-A03-208, features 028–029 (SC-A03-103; constitution A03 accessibility), following A02's
 // audit (feature 020).
 // Runs the system accessibility audit on home and playground at the default and the largest accessibility text size,
 // following the A01 pattern (feature 016). Documented exclusions (spec 020 Clarifications): contrast of the artwork
 // inside the live canvas, navigation-bar chrome, contrast of text scrolled partly under the navigation bar (feature
-// 027), and findings without an element. Each ignored finding is logged.
+// 027) or cut by the bottom edge of the screen (feature 029), and findings without an element. Each ignored finding is logged.
 import Foundation
 import XCTest
 
@@ -21,6 +21,7 @@ final class AccessibilityAuditUITests: XCTestCase {
     private func audit(_ app: XCUIApplication, _ screen: String, types: XCUIAccessibilityAuditType) throws -> [String] {
         let ignored = FindingLog()
         let bars = app.navigationBars.allElementsBoundByIndex.map { $0.frame }
+        let windowFrame = app.windows.firstMatch.frame
         try app.performAccessibilityAudit(for: types) { issue in
             let e = issue.element
             let id = e?.identifier ?? ""
@@ -39,12 +40,19 @@ final class AccessibilityAuditUITests: XCTestCase {
             }
             // Feature 027: text scrolled partly under the translucent navigation bar is measured against the bar's blur,
             // not its own background (seen on iOS 26.5 at XXXL after scrolling to the zoom controls). Its reported frame starts on or
-            // above the bar's bottom edge (clipped there, or above the screen when scrolled further; feature 029) and
-            // continues below the bar.
+            // above the bar's bottom edge (clipped there, or above the screen when scrolled further; feature 029) ; text scrolled
+            // entirely above it counts too (feature 029).
             if issue.auditType == .contrast, let frame = e?.frame,
-               bars.contains(where: { frame.minY <= $0.maxY + 0.5 && frame.maxY > $0.maxY }) {
+               bars.contains(where: { frame.minY <= $0.maxY + 0.5 }) {
                 ignored.append(description)
                 print("A11Y-AUDIT ignored (text scrolled under the navigation bar): \(description)")
+                return true
+            }
+            // Feature 029: text cut by the window's bottom edge (scrolled partly or fully below the screen) is measured
+            // against the bottom scroll-edge effect, not its own background.
+            if issue.auditType == .contrast, let frame = e?.frame, frame.maxY > windowFrame.maxY {
+                ignored.append(description)
+                print("A11Y-AUDIT ignored (text cut by the bottom edge of the screen): \(description)")
                 return true
             }
             if e == nil {
@@ -91,6 +99,21 @@ final class AccessibilityAuditUITests: XCTestCase {
         try audit(app, "bookmarks list [\(label)]", types: types)
         app.buttons["fe.bookmarks.done"].tap()
         XCTAssertTrue(app.segmentedControls["fe.mode"].waitForExistence(timeout: 5))
+        // Feature 029 T-A03-410: the cap and cost controls, a capture result, the tours sheet and a playing tour.
+        let capture = app.buttons["fe.capture"]
+        for _ in 0..<6 where !(capture.exists && capture.isHittable) { app.swipeUp() }
+        capture.tap()
+        XCTAssertTrue(app.descendants(matching: .any)["fe.capture.share"].waitForExistence(timeout: 20))
+        try audit(app, "cost and capture [\(label)]", types: types)
+        app.buttons["fe.tours"].tap()
+        XCTAssertTrue(app.descendants(matching: .any)["fe.tour.seahorse"].waitForExistence(timeout: 5))
+        try audit(app, "tours sheet [\(label)]", types: types)
+        app.descendants(matching: .any)["fe.tour.seahorse"].tap()
+        let caption = app.descendants(matching: .any)["fe.tour.caption"]
+        XCTAssertTrue(caption.waitForExistence(timeout: 10))
+        for _ in 0..<6 where !caption.isHittable { app.swipeUp() }
+        if app.buttons["fe.tour.stop"].exists { app.buttons["fe.tour.stop"].tap() }
+        try audit(app, "tour caption [\(label)]", types: types)
         // Feature 027 T-A03-208: the explorer with the precision banner, reached through the zoom controls.
         // Julia is centered at 0, where float spacing never limits the zoom, so go back to Mandelbrot (center −0.5).
         app.segmentedControls["fe.mode"].buttons["Mandelbrot"].tap()
