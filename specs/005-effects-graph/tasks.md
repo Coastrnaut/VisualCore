@@ -23,7 +23,7 @@ IDs `T-F4##`. One commit + push per task. Effects implemented one at a time (arc
 
 - [X] T-F406 [US2] Renderer core + `copy`: `EffectRenderer` (validated order, pooled targets, recycle, full-screen triangle), `EffectShaders.swift`; pixel test copy == input — Verified 2026-11-10: F04.t406-copy-ios27-a2 exit 0: copy pixel test + pre-GPU cycle rejection pass (2 effects tests; 31 rendering tests still pass; a1 = registry.warn access, made public)
 - [X] T-F407 [US2] `colorMatrix` pass + pixel test (red→blue swap; offset) — Verified 2026-11-10: F04.t407-colormatrix-ios27 exit 0: red→blue swap + 0.2 green offset within 1/255
-- [ ] T-F408 [US2] `blur` pass (separable, radius clamp 1–32) + pixel test (single bright pixel spreads, peak drops, energy ≈ conserved ±5%)
+- [X] T-F408 [US2] `blur` pass (separable, radius clamp 1–32) + pixel test (single bright pixel spreads, peak drops, energy ≈ conserved ±5%) — Verified 2026-11-10: F04.t408-blur-ios27 exit 0: peak drops, spreads 2 texels, far stays 0, energy within 5%
 - [ ] T-F409 [US2] `bloom` pass (threshold, intensity, radius, hdr) + pixel test (near bright area brightens; far dark stays dark)
 - [ ] T-F410 [US2] `distort` pass (strength, frequency, time) + pixel test (strength 0 = identity; strength > 0 moves a stripe)
 - [ ] T-F411 [US2] `composite` pass (two inputs, alpha over/add) + pixel test

@@ -1,0 +1,26 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/VisualCoreRendering",
+    "--scheme",
+    "VisualCoreRendering-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--result-name",
+    "F04-t408-ios27"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --result-name F04-t408-ios27",
+  "elapsed_seconds": 4.857,
+  "exit_code": 0,
+  "finished": "2026-11-11T00:20:48+00:00",
+  "log": ".autonomy/logs/F04.t408-blur-ios27.log",
+  "log_sha256": "ef0aba8bf6a19353fa8259a7c1fecfc79f2cbc4d00143089898587c9ff8e54b5",
+  "name": "t408-blur-ios27",
+  "stage": "F04",
+  "started": "2026-11-11T00:20:43+00:00",
+  "timed_out": false
+}

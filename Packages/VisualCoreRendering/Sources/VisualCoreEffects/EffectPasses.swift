@@ -71,3 +71,27 @@ final class ColorMatrixPass: EffectPassRunner {
         }
     }
 }
+
+/// `blur`: separable Gaussian (horizontal into a pooled temporary, then vertical), radius 1–32.
+@MainActor
+final class BlurPass: EffectPassRunner {
+    private let program: ShaderProgram
+    init(registry: ResourceRegistry) throws {
+        program = try registry.program(vertex: EffectShaders.vertex, fragment: EffectShaders.blur)
+    }
+    func run(_ io: PassIO) throws {
+        guard let input = io.inputs["input"] else { return }
+        try BlurPass.blur(program, input: input, output: io.output, radius: io.params.scalar("radius", 4), registry: io.registry)
+    }
+
+    static func blur(_ program: ShaderProgram, input: RenderTarget, output: RenderTarget, radius: Float, registry: ResourceRegistry) throws {
+        let temp = try registry.acquireTarget(width: output.width, height: output.height, format: output.format)
+        defer { registry.recycle(temp) }
+        drawFullscreen(program, into: temp, textures: [("input", input)]) { p in
+            p.set("u_direction", SIMD2<Float>(1, 0)); p.set("u_radius", radius)
+        }
+        drawFullscreen(program, into: output, textures: [("input", temp)]) { p in
+            p.set("u_direction", SIMD2<Float>(0, 1)); p.set("u_radius", radius)
+        }
+    }
+}

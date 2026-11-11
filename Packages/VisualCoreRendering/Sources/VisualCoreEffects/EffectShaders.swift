@@ -28,4 +28,28 @@ enum EffectShaders {
     out vec4 color;
     void main() { color = clamp(u_matrix * texture(u_input, uv) + u_offset, 0.0, 1.0); }
     """
+
+    /// One direction of a separable Gaussian: 9 taps spaced `u_step` texels apart, σ = radius / 2.
+    static let blur = """
+    precision highp float;
+    uniform sampler2D u_input;
+    uniform vec2 u_direction;   // (1,0) or (0,1) in texels
+    uniform float u_radius;
+    in vec2 uv;
+    out vec4 color;
+    void main() {
+        vec2 texel = 1.0 / vec2(textureSize(u_input, 0));
+        float sigma = max(u_radius * 0.5, 0.5);
+        float spacing = max(u_radius / 4.0, 1.0);
+        vec4 sum = vec4(0.0);
+        float weights = 0.0;
+        for (int i = -4; i <= 4; i++) {
+            float x = float(i) * spacing;
+            float w = exp(-(x * x) / (2.0 * sigma * sigma));
+            sum += w * texture(u_input, uv + u_direction * texel * x);
+            weights += w;
+        }
+        color = sum / weights;
+    }
+    """
 }
