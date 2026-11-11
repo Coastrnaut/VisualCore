@@ -38,6 +38,12 @@ final class FluidFieldsScene: RenderScene {
     var fixedDelta: Double?
     /// When true, frames show the dye without stepping.
     var paused = false
+    /// One step requested while paused (feature 023 FR-A02-501); cleared by the next frame.
+    private(set) var stepRequested = false
+    /// A field reset requested for the next frame (feature 023 FR-A02-503).
+    private(set) var resetRequested = false
+    /// Field resets applied since creation.
+    private(set) var resetCount = 0
 
     /// The grid edge cap used by the last setup: `min(maxEdge, resources.maxTextureSize)` (FR-A02-101).
     private(set) var effectiveMaxEdge = 512
@@ -136,7 +142,8 @@ final class FluidFieldsScene: RenderScene {
     /// The dye at step 0, before storage rounding.
     func initialDye() -> FieldGrid {
         switch seed {
-        case .pattern: DyeSeed.pattern(width: configuration.gridWidth, height: configuration.gridHeight, seed: configuration.seed)
+        case .pattern: DyeSeed.pattern(width: configuration.gridWidth, height: configuration.gridHeight, seed: configuration.seed,
+                                       colors: palette.splatColors)
         case .uniform(let rgba): DyeSeed.uniform(width: configuration.gridWidth, height: configuration.gridHeight, rgba: rgba)
         }
     }
@@ -181,10 +188,35 @@ final class FluidFieldsScene: RenderScene {
         }
     }
 
+    /// Runs exactly one step on the next frame while paused; ignored (and cleared) while running (FR-A02-501).
+    func requestStep() { stepRequested = true }
+
+    /// On the next frame: the starting dye (current seed and palette), zero velocity, pressure and divergence, step
+    /// count 0, no pending splats. The renderer and the targets are kept; the pause state is unchanged (FR-A02-503).
+    func resetFields() { resetRequested = true }
+
+    private func applyReset(velocity: PingPongTarget, dye: PingPongTarget) throws {
+        resetRequested = false
+        guard uploadSeed(velocity.read, initialVelocity().values) else { throw FluidSceneError.seedUploadFailed("velocity") }
+        guard uploadSeed(dye.read, initialDye().values) else { throw FluidSceneError.seedUploadFailed("dye") }
+        if let fillPass {
+            for pair in [pressure, divergenceField].compactMap({ $0 }) {
+                try fillPass.run(output: .target(pair.read), inputs: [:], uniforms: activeUniforms(fillPass))
+            }
+        }
+        pendingSplats.removeAll()
+        stepCount = 0
+        policy = TimeStepPolicy()
+        resetCount += 1
+    }
+
     func render(_ context: RenderContext, frame: FrameInfo) throws {
         guard let velocity, let dye, let advect, let splat, let display else { return }
         do {
-            if !paused {
+            if resetRequested { try applyReset(velocity: velocity, dye: dye) }
+            let stepping = !paused || stepRequested
+            stepRequested = false
+            if stepping {
                 let dt = policy.clamp(fixedDelta ?? frame.delta)
                 lastStep = dt
                 if let splatSource { pendingSplats += splatSource() }
@@ -207,7 +239,7 @@ final class FluidFieldsScene: RenderScene {
             try display.run(output: .framebuffer(name: context.framebuffer, width: context.pixelWidth, height: context.pixelHeight),
                             inputs: ["uDye": dye.read], uniforms: paletteUniforms)
         } catch {
-            lastError = error
+            if let pass = error as? FieldPassError { lastError = pass }
             throw error
         }
     }
@@ -226,6 +258,12 @@ final class FluidFieldsScene: RenderScene {
                 "uCenter": .float(encoding?.center ?? 0.5), "uRangeV": .float(v), "uRangeD": .float(v * 2), "uRangeP": .float(v * 4)]
     }
 
+    /// The shared solver uniforms (plus `extra`) that `pass`'s program actually uses: the compiler removes unused
+    /// ones, and FieldPass rejects names that are not active.
+    private func activeUniforms(_ pass: FieldPass, _ extra: [String: FieldUniform] = [:]) -> [String: FieldUniform] {
+        solverUniforms.merging(extra) { $1 }.filter { pass.program.uniforms[$0.key] != nil }
+    }
+
     /// The pressure iterations used now: the quality tier's value, never more than the configured value.
     var activePressureIterations: Int {
         min(configuration.pressureIterations, max(1, qualityIterations ?? configuration.pressureIterations))
@@ -235,11 +273,8 @@ final class FluidFieldsScene: RenderScene {
     private func solve(velocity: PingPongTarget, dt: Double) throws(FieldPassError) {
         guard let divergenceField, let pressure, let scratch, let divergencePass, let fillPass, let pressurePass,
               let gradientPass, let diffusePass, let copyPass else { return }
-        let common = solverUniforms
-        // Each pass gets the shared uniforms its program actually uses (the compiler removes unused ones, and
-        // FieldPass rejects names that are not active).
         func uniforms(_ pass: FieldPass, _ extra: [String: FieldUniform] = [:]) -> [String: FieldUniform] {
-            common.merging(extra) { $1 }.filter { pass.program.uniforms[$0.key] != nil }
+            activeUniforms(pass, extra)
         }
         if configuration.viscosity > 0 {
             try copyPass.run(output: .target(scratch.write), inputs: ["uField": velocity.read])

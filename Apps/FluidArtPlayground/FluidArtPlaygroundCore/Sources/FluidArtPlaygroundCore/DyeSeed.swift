@@ -20,8 +20,11 @@ public enum DyeSeed {
         return g
     }
 
-    /// Eight soft palette-colored blobs placed by `SeededRandom(seed:)`; RGB in 0…1, alpha 1. Deterministic.
-    public static func pattern(width: Int, height: Int, seed: UInt64) -> FieldGrid {
+    /// Eight soft blobs placed by `SeededRandom(seed:)`, colored from `colors` (default `palette`; an empty list uses
+    /// `palette`); RGB in 0…1, alpha 1. Deterministic. Feature 023 passes the active palette's splat colors so the
+    /// starting picture and Reset match the palette (spec 023 clarification 5).
+    public static func pattern(width: Int, height: Int, seed: UInt64, colors: [SIMD3<Float>] = palette) -> FieldGrid {
+        let palette = colors.isEmpty ? Self.palette : colors
         var g = FieldGrid(width: width, height: height, channels: 4)
         var rng = SeededRandom(seed: seed)
         let w = Float(g.width), h = Float(g.height), scale = min(w, h)

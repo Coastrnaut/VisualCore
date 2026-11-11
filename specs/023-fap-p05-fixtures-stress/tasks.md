@@ -54,7 +54,7 @@ research R1–R7, data model, contract, quickstart).
   `FluidDetail.swift`: low, medium and high with edges 64, 128 and 256; `name`; `init(grid:)` gives the nearest
   level; `apply(to:)`. Write `SimulationControlTests` and `FluidDetailTests`, then run the host Core tests
   (FR-A02-501, FR-A02-511).
-- [ ] T-A02-504 [US1] Scene in `Apps/FluidArtPlayground/App/FluidFieldsScene.swift`:
+- [X] T-A02-504 [US1] Scene in `Apps/FluidArtPlayground/App/FluidFieldsScene.swift`: — Verified 2026-11-11: — Verified 2026-11-11: FluidFieldsScene.requestStep (one-shot, one step while paused, cleared while running), resetFields (seed dye in the active palette's colors via DyeSeed.pattern(colors:), encoded zero velocity, fill pressure/divergence, stepCount 0, pending splats cleared, pause kept); ControlTests 4 (step x3 +3, touches while paused applied on Step, reset velocity exactly 0 and dye = seed within one storage step in half-float and RGBA8, capture after steps keeps stepCount); run-check A02-P05/t504-app-ios27-2 and t504-app-ios26 TEST SUCCEEDED, enumeration 52/52 each; t504-core-test 55/55
   - `requestStep()`: a one-shot flag; while paused, one full step runs in `render` (drain, splats, advect, solve,
     advect dye); while running, the flag is cleared.
   - `resetFields()`: on the next render, upload the seed dye (current palette's colors) and zero velocity (encoded),

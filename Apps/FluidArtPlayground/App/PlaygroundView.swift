@@ -57,8 +57,9 @@ final class PlaygroundModel {
     /// True from the second finger landing until every finger has lifted; no splats are made meanwhile.
     private(set) var pinching = false
 
-    init(configuration: FluidConfiguration = FluidConfiguration(), maxEdge: Int = 512) {
-        scene = FluidFieldsScene(configuration: configuration, maxEdge: maxEdge)
+    /// `forceFallback` stores the fields in RGBA8 even where half-float works (tests of the fallback path).
+    init(configuration: FluidConfiguration = FluidConfiguration(), maxEdge: Int = 512, forceFallback: Bool = false) {
+        scene = FluidFieldsScene(configuration: configuration, forceFallback: forceFallback, maxEdge: maxEdge)
         queue = SplatQueue(configuration: configuration)
         self.configuration = scene.configuration
         effects = EffectScene(content: scene, graph: Self.glowGraph)
