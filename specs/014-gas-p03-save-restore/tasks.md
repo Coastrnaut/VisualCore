@@ -78,4 +78,4 @@ The VisualCore store first, then the domain library, then the UI, then the leak 
 
 ## Phase 5: Convergence
 
-- [ ] T-A01-308 Add `LibraryModel` unit tests in `Apps/GenerativeArtStudio/Tests/Unit/LibraryModelTests.swift`: an unwritable library directory makes `save` return nil and set `errorMessage`, with entries unchanged; 2 bad files among good ones give `problemCount == 2` per the edge case "write failure" and FR-A01-305 (partial)
+- [X] T-A01-308 Add `LibraryModel` unit tests in `Apps/GenerativeArtStudio/Tests/Unit/LibraryModelTests.swift`: an unwritable library directory makes `save` return nil and set `errorMessage`, with entries unchanged; 2 bad files among good ones give `problemCount == 2` per the edge case "write failure" and FR-A01-305 (partial) — Verified 2026-11-10: Tests/Unit/LibraryModelTests.swift: blocked (non-directory) library path → save returns nil, errorMessage set, entries empty; 2 bad files among 1 good → entries 1, problemCount 2; run-check A01-P03/t308-model-ios27 + ios26 GenerativeArtStudioTests all pass
