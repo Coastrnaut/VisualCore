@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "bash",
+    "-c",
+    "n=$(python3 scripts/release_check.py --list | wc -l | tr -d \" \"); echo \"steps: $n\"; test \"$n\" = 53"
+  ],
+  "command": "bash -c 'n=$(python3 scripts/release_check.py --list | wc -l | tr -d \" \"); echo \"steps: $n\"; test \"$n\" = 53'",
+  "elapsed_seconds": 0.03,
+  "exit_code": 0,
+  "finished": "2026-11-11T16:57:10+00:00",
+  "log": ".autonomy/logs/A04-P00.t008-step-count.log",
+  "log_sha256": "b5dac849d5ca871f9cc9660f3c6ec4792fbf43392ffa735e187d0e7cdadd5f4e",
+  "name": "t008-step-count",
+  "stage": "A04-P00",
+  "started": "2026-11-11T16:57:10+00:00",
+  "timed_out": false
+}

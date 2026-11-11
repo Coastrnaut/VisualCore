@@ -54,4 +54,4 @@ Matrix first (the evidence every later phase relies on), then the baseline, shel
 
 ## Phase 7: Convergence
 
-- [ ] T-A04-008 Correct the contract inventory's "Build" entry: `release_check.py --list` gives 53 steps at A04-P00, not the 47 recorded at A03-P00; re-render and check the contract, per FR-A04-001 (partial)
+- [X] T-A04-008 Correct the contract inventory's "Build" entry: `release_check.py --list` gives 53 steps at A04-P00, not the 47 recorded at A03-P00; re-render and check the contract, per FR-A04-001 (partial) — Verified 2026-11-11: — Verified 2026-11-11: the Build inventory entry now gives 53 steps at A04-P00 (run-check A04-P00/t008-step-count: release_check.py --list = 53); contract re-rendered and checked in t008-contract PASS (10 rows, 30 citations, 5 gaps)
