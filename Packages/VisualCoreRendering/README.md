@@ -97,6 +97,7 @@ from `PassSchemas` in `VisualCoreEffectsGraph`; per-effect GPU cost on devices i
 |---|---|---|
 | `PrimitiveRenderer` | a `SceneNode` tree (rect, circle 12–128 segments, line, ear-clipped polygon) | one batched triangle list, premultiplied alpha |
 | `ParticleRenderer` | `[ParticleInstance]` (≤ 100,000) | instanced soft-edged quads, size = world diameter |
+| `ParticleLayerScene` (feature 034) | a `RenderScene`: background + `[ParticleInstance]` from a source closure per frame | aspect-fits a `WorldRect` (y up) with `fit(world:viewSize:)`; `worldPoint`/`viewPoint` map taps with the same fit |
 | `MeshRenderer` | a `Mesh` through an `OrbitCamera` | Lambert + ambient, back faces culled; enable depth testing yourself when the framebuffer has depth |
 
 All three allocate through `ResourceRegistry`, rebuild their GPU objects on the first draw after a context

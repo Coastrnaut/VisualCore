@@ -144,7 +144,6 @@ private struct StatusView: View {
                 .accessibilityIdentifier("pu.sandbox.effective")
             Text(model.rendererText)
                 .font(.footnote)
-                .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
                 .accessibilityIdentifier("pu.sandbox.renderer")
         }

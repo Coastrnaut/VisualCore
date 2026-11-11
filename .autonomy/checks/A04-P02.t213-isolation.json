@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "python3",
+    "scripts/release_check.py",
+    "--only",
+    "isolation-particle-universe",
+    "documented-api-particle-universe"
+  ],
+  "command": "python3 scripts/release_check.py --only isolation-particle-universe documented-api-particle-universe",
+  "elapsed_seconds": 0.365,
+  "exit_code": 1,
+  "finished": "2026-11-11T23:54:09+00:00",
+  "log": ".autonomy/logs/A04-P02.t213-isolation.log",
+  "log_sha256": "71a0aeef286ecac6a08455bf0db3c2074057481904dcc143d3229648ed356a51",
+  "name": "t213-isolation",
+  "stage": "A04-P02",
+  "started": "2026-11-11T23:54:09+00:00",
+  "timed_out": false
+}

@@ -101,3 +101,34 @@ extension SandboxUITests {
         XCTAssertEqual(counts(app).0, paused)
     }
 }
+
+extension SandboxUITests {
+    /// Feature 034 T-A04-214 (US4 AC2; FR-A04-206): the GPU stage draws the scene; it advances while playing and
+    /// holds while paused. Context recreation is covered by ParticleLayerSceneTests (analyze E1).
+    func testGPUStageAdvancesAndHolds() {
+        let app = openSandbox()
+        XCTAssertEqual(app.staticTexts["pu.sandbox.renderer"].label, "Renderer: GPU")
+        let start = Date()
+        while counts(app).0 == 0, Date().timeIntervalSince(start) < 10 { Thread.sleep(forTimeInterval: 0.25) }
+        let a = counts(app).0
+        Thread.sleep(forTimeInterval: 0.5)
+        XCTAssertNotEqual(counts(app).0, a, "the GPU frames advance the simulation")
+        app.buttons["pu.sandbox.play"].tap()
+        let held = counts(app).0
+        Thread.sleep(forTimeInterval: 1)
+        XCTAssertEqual(counts(app).0, held, "paused: the GPU stage redraws the held state")
+        app.descendants(matching: .any)["pu.sandbox.canvas"].coordinate(withNormalizedOffset: CGVector(dx: 0.25, dy: 0.75)).tap()
+        XCTAssertTrue(app.staticTexts["pu.sandbox.force"].label.hasPrefix("Force: Attractor at (-"), "taps work over the GPU stage")
+    }
+
+    /// Feature 034 T-A04-214 (US4 AC3): when the GPU path fails the CPU preview takes over with a note.
+    func testCPUFallbackKeepsWorking() {
+        let app = openSandbox(["-uitestRendererFailure", "YES"])
+        XCTAssertTrue(app.staticTexts["pu.sandbox.renderer"].label.hasPrefix("Renderer: CPU preview ("))
+        let start = Date()
+        while counts(app).0 == 0, Date().timeIntervalSince(start) < 10 { Thread.sleep(forTimeInterval: 0.25) }
+        XCTAssertGreaterThan(counts(app).0, 0, "the CPU preview advances the scene")
+        app.descendants(matching: .any)["pu.sandbox.canvas"].coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
+        XCTAssertTrue(app.staticTexts["pu.sandbox.force"].label.hasPrefix("Force: Attractor at ("))
+    }
+}

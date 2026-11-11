@@ -9,7 +9,7 @@
 | C5 | VisualCoreSimulation | `liveLimit` ∈ 1…capacity; live ≤ liveLimit; dropped = demand − created (SC-A04-203) | `LiveLimitTests` |
 | C6 | VisualCoreDiagnostics | `ParticleBudget.limit(requested:tier:)` per data model; never above requested | `ParticleBudgetTests` |
 | C7 | VisualCoreDiagnostics | `DeviceConditions.current()` uses only `ProcessInfo` public API | `ParticleBudgetTests`, `check_compliance.py` |
-| C8 | VisualCoreRendering | `ParticleLayerScene` clears, aspect-fits the world rect (y up), draws with `ParticleRenderer`; centers lit, far pixels background in 3 fixed states (SC-A04-205); recreation redraws the same pixels | `ParticleLayerSceneTests` on sim-27.2 and sim-26.5 |
+| C8 | VisualCoreRendering | `ParticleLayerScene` (with `WorldRect`, `fit`, `worldPoint`, `viewPoint`) clears, aspect-fits the world rect (y up), draws with `ParticleRenderer`; centers lit, far pixels background in 3 fixed states (SC-A04-205); recreation redraws the same pixels | `ParticleLayerSceneTests` on sim-27.2 and sim-26.5 |
 
 Every public symbol has `///` docs; `scripts/check_public_api.py --update` records the baseline. ProjectM types never
 appear in these APIs.

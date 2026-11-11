@@ -1,0 +1,32 @@
+{
+  "argv": [
+    "xcodebuild",
+    "test",
+    "-project",
+    "VisualCore.xcodeproj",
+    "-scheme",
+    "ParticleUniverse",
+    "-destination",
+    "platform=iOS Simulator,id=4E32B01D-7911-4A64-A944-877DDD445BC0",
+    "-derivedDataPath",
+    "Build/DerivedData/ParticleUniverse",
+    "-resultBundlePath",
+    ".autonomy/xcresults/A04-P02-t214-audit-ios27-a.xcresult",
+    "-only-testing:ParticleUniverseUITests/AccessibilityAuditUITests",
+    "-test-timeouts-enabled",
+    "YES",
+    "-default-test-execution-time-allowance",
+    "180",
+    "CODE_SIGNING_ALLOWED=NO"
+  ],
+  "command": "xcodebuild test -project VisualCore.xcodeproj -scheme ParticleUniverse -destination 'platform=iOS Simulator,id=4E32B01D-7911-4A64-A944-877DDD445BC0' -derivedDataPath Build/DerivedData/ParticleUniverse -resultBundlePath .autonomy/xcresults/A04-P02-t214-audit-ios27-a.xcresult -only-testing:ParticleUniverseUITests/AccessibilityAuditUITests -test-timeouts-enabled YES -default-test-execution-time-allowance 180 CODE_SIGNING_ALLOWED=NO",
+  "elapsed_seconds": 41.745,
+  "exit_code": 0,
+  "finished": "2026-11-11T23:45:34+00:00",
+  "log": ".autonomy/logs/A04-P02.t214-audit-ios27-a.log",
+  "log_sha256": "ad81f9a6fb18b99cefdea71a0a0b5e5eea4c8ff081700660a67e624916294623",
+  "name": "t214-audit-ios27-a",
+  "stage": "A04-P02",
+  "started": "2026-11-11T23:44:52+00:00",
+  "timed_out": false
+}

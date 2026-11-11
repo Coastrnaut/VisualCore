@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "python3",
+    "-c",
+    "\nimport re,sys\ns=open('Apps/ParticleUniverse/App/DeviceConditionsSource.swift').read()\nreads=[m.start() for m in re.finditer(r'uitest', s)]\nblocks=[(m.start(), s.index('#endif', m.start())) for m in re.finditer(r'#if DEBUG', s)]\noutside=[r for r in reads if not any(a<r<b for a,b in blocks) and not s[:r].rsplit(chr(10),1)[-1].lstrip().startswith('//')]\nprint('uitest reads', len(reads), 'outside DEBUG (non-comment)', len(outside)); sys.exit(1 if outside else 0)\n"
+  ],
+  "command": "python3 -c '\nimport re,sys\ns=open('\"'\"'Apps/ParticleUniverse/App/DeviceConditionsSource.swift'\"'\"').read()\nreads=[m.start() for m in re.finditer(r'\"'\"'uitest'\"'\"', s)]\nblocks=[(m.start(), s.index('\"'\"'#endif'\"'\"', m.start())) for m in re.finditer(r'\"'\"'#if DEBUG'\"'\"', s)]\noutside=[r for r in reads if not any(a<r<b for a,b in blocks) and not s[:r].rsplit(chr(10),1)[-1].lstrip().startswith('\"'\"'//'\"'\"')]\nprint('\"'\"'uitest reads'\"'\"', len(reads), '\"'\"'outside DEBUG (non-comment)'\"'\"', len(outside)); sys.exit(1 if outside else 0)\n'",
+  "elapsed_seconds": 0.017,
+  "exit_code": 0,
+  "finished": "2026-11-11T23:54:09+00:00",
+  "log": ".autonomy/logs/A04-P02.t211-debug-seam.log",
+  "log_sha256": "8c95caddd65abacb3bd1af13f783e9301626c905620136c3d40bf708b84e9ba8",
+  "name": "t211-debug-seam",
+  "stage": "A04-P02",
+  "started": "2026-11-11T23:54:09+00:00",
+  "timed_out": false
+}

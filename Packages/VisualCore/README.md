@@ -79,6 +79,11 @@ the tier:
 - **Stepping up**: one tier up after `calmPeriod` seconds (default 10) of a nominal or fair state without Low Power.
 - **Limits**: at most one change per `decisionInterval` (default 2 s), never below the last tier.
 
+**Particle budget and device conditions** (feature 034, gap G-PQUALITY): `ParticleBudget` turns a tier into a count
+cap, `limit(requested:tier:) = min(requested, max(minimum, ⌊requested × share⌋))` (`.standard`: shares 1, 0.6, 0.35,
+0.2, minimum 100). `DeviceConditions.current()` reads the thermal state and Low Power Mode from `ProcessInfo` for
+`QualityPolicy.decide`. `ParticleSystem.liveLimit` applies the cap: emission stops at it, nobody is removed.
+
 Time is passed in, so decisions are deterministic and host-testable. `reset()` returns to the best tier.
 
 **CPU field references** (`VisualCoreSimulation`, feature 019): a `FieldGrid` is a W×H grid with 1…4 channels,
@@ -99,7 +104,9 @@ f(1)=1), `Tween` (repeat count or forever, autoreverse) and `Timeline` (play, pa
 
 **Scenes and particles**: `SceneNode` (TRS transform, z-order, visibility, primitive rect/circle/line/polygon
 ≤ 256 points, hit testing); `ParticleSystem` (capacity 10,000 default, ≤ 100,000; `Emitter`s with rate, burst, lifetime, speed, direction/spread,
-size and color over life; `ParticleForce` gravity/drag/attractor; NaN removal, `checksum()`; `instances()` →
+size and color over life; `ParticleForce` gravity/drag/attractor and (feature 034, G-FIELDS) repulsor, softened
+`gravityWell`, `wind` and `vortex`, each with `clamped()`, `bound(speed:)` and `acceleration(at:velocity:)`, finite at
+every position including the center; `liveLimit`; NaN removal, `checksum()`; `instances()` →
 `ParticleInstance` for `ParticleRenderer`); 3D: `OrbitCamera` (pitch ±89°, `project`, `ray`), `Mesh.plane/cube/uvSphere`
 (segments 3–256, rings 2–256, subdivisions ≤ 256).
 
