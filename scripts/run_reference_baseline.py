@@ -79,6 +79,22 @@ def steps() -> dict[str, tuple[list[str], Path]]:
     }
 
 
+# XcodeGen spec that generates each reference project. The generated .xcodeproj is gitignored, so a fresh clone has
+# none (setup.md §6, found on the Mac Studio 2026-11-11: build-projectm-ios-sim failed in 0.6 s).
+PROJECT_SPECS = {"ProjectM-iOS.xcodeproj": "project.yml", "RendererLab.xcodeproj": "RendererLab.yml"}
+
+
+def missing_project_generation(cmd: list[str]) -> list[str] | None:
+    """The `xcodegen generate` command to run first when `cmd` builds a reference project that does not exist yet."""
+    if "-project" not in cmd:
+        return None
+    project = Path(cmd[cmd.index("-project") + 1])
+    spec = PROJECT_SPECS.get(project.name)
+    if spec is None or project.exists():
+        return None
+    return ["xcodegen", "generate", "--spec", spec]
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     g = ap.add_mutually_exclusive_group(required=True)
@@ -98,6 +114,12 @@ def main() -> int:
         raise SystemExit("devicectl is forbidden in the baseline")
     for p in (DERIVED, RESULTS):
         p.mkdir(parents=True, exist_ok=True)
+    generate = missing_project_generation(cmd)
+    if generate:
+        print("Project missing; generating it first:\n$", " ".join(generate), flush=True)
+        code = subprocess.run(generate, cwd=REF, check=False).returncode
+        if code != 0:
+            return code
     print("Step:", args.step, "| cwd:", cwd, "\n$", " ".join(cmd), flush=True)
     return subprocess.run(cmd, cwd=cwd, env={**os.environ, "NSUnbufferedIO": "YES"}, check=False).returncode
 

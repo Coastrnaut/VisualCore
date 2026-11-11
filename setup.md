@@ -339,6 +339,11 @@ trail is wanted on the new machine; doing so is optional.
 
 All three must pass. The second and third take about 2 minutes.
 
+On a fresh clone, the reference app's Xcode project (`External/projectm-ios/ProjectM-iOS.xcodeproj`, gitignored)
+does not exist yet. `reference-build-projectm-ios-sim` generates it from `project.yml` before building; until
+2026-11-11 the step failed in under a second without it. The build also needs the ANGLE frameworks (§6) and the
+five preset submodules (§5).
+
 ```bash
 python3 scripts/verify_environment.py
 ```

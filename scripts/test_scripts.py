@@ -172,6 +172,18 @@ class BaselineDestinationTests(unittest.TestCase):
         with self.assertRaises(SystemExit):
             baseline.destination("platform=iOS,id=00008120-001A2B3C4D5E6F70")
 
+    def test_missing_reference_project_is_generated_first(self):
+        # A fresh clone has no generated .xcodeproj (setup.md §6); the build step generates it first.
+        missing = ["xcodebuild", "-project", "/nonexistent/ProjectM-iOS.xcodeproj", "-scheme", "projectM-iOS", "build"]
+        self.assertEqual(baseline.missing_project_generation(missing), ["xcodegen", "generate", "--spec", "project.yml"])
+        lab = ["xcodebuild", "-project", "/nonexistent/RendererLab.xcodeproj", "build"]
+        self.assertEqual(baseline.missing_project_generation(lab), ["xcodegen", "generate", "--spec", "RendererLab.yml"])
+        self.assertIsNone(baseline.missing_project_generation(["xcodebuild", "test", "-scheme", "ANGLERendering"]))
+        with tempfile.TemporaryDirectory() as d:
+            existing = Path(d) / "ProjectM-iOS.xcodeproj"
+            existing.mkdir()
+            self.assertIsNone(baseline.missing_project_generation(["xcodebuild", "-project", str(existing), "build"]))
+
 
 PURE_PKG = """// swift-tools-version: 6.0
 import PackageDescription
