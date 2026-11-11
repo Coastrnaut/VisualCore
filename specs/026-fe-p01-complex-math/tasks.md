@@ -21,7 +21,7 @@ research R1–R4, the data model, the contract and the quickstart.
 ## Phase 1: Foundational — VisualCore PlaneViewport (blocks US3)
 
 - [ ] T-A03-101 Write `PlaneViewportTests` first (`Packages/VisualCore/Tests/VisualCoreMathTests/PlaneViewportTests.swift`,
-  at least 8 tests per the contract). Then add `Packages/VisualCore/Sources/VisualCoreMath/PlaneViewport.swift` with:
+  at least 8 tests per the contract, including a zero or non-finite size keeping the last valid size; analyze G1). Then add `Packages/VisualCore/Sources/VisualCoreMath/PlaneViewport.swift` with:
   - center: `Vec2`, finite, otherwise (0, 0);
   - `unitsPerPoint`: clamped to 1e-15…1e3, with `wasClamped`;
   - size: a non-positive or non-finite size keeps the previous valid size, initially 1×1;
@@ -61,7 +61,7 @@ research R1–R4, the data model, the contract and the quickstart.
 
   Add `FractalExplanations.swift` (one text per mode, including the Mandelbrot–Julia relation and the note about
   seeds outside |c| ≤ 2) and `Preview.swift` (at most 160 samples per side, grayscale ramp, black interior,
-  deterministic, with `requestID`). Write the tests first: validation, description format, explanations, preview
+  deterministic, with `requestID`). Write the tests first: validation (cap 0 → 1, cap 20,000 → 10,000, radius 1 → 2, a non-finite seed; analyze G1), description format, explanations, preview
   origin and c = 2 pixels, determinism (FR-A03-101, FR-A03-105, FR-A03-106, SC-A03-104).
 
 ## Phase 3: User Story 1 — explorer UI (P1) 🎯
@@ -93,7 +93,14 @@ research R1–R4, the data model, the contract and the quickstart.
   documented-api-fractal-explorer, isolation-fractal-explorer and host-fractal-explorer-core (FR-A03-107,
   SC-A03-105).
 
+## Analyze remediation (2026-11-11, applied under CLAUDE.md §2)
+
+- G1: the edge-case tests are named.
+- D1: the speculative edge 101 → 102 is dropped.
+- 0 critical issues.
+
 ## Dependencies
 
-- T-A03-101 → T-A03-102 → T-A03-103 → T-A03-104 → T-A03-105.
+- T-A03-101 and T-A03-102 are independent.
+- Both block T-A03-103, then T-A03-104 → T-A03-105 (analyze D1).
 - T-A03-106 runs last.
