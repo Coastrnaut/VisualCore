@@ -84,7 +84,8 @@ public struct FractalState: Sendable, Equatable {
         return s.replacingOccurrences(of: "-", with: "−")
     }
 
-    private static func zoomText(_ z: Double) -> String {
+    /// The zoom as spoken: a whole number below 10,000×, scientific above, two significant digits below 1×.
+    public static func zoomText(_ z: Double) -> String {
         if z.rounded() >= 10_000 {
             let exponent = Int(log10(z).rounded(.down))
             var mantissa = z / pow(10, Double(exponent))

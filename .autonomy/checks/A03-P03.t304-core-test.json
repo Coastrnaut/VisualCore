@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Apps/FractalExplorer/FractalExplorerCore"
+  ],
+  "command": "swift test --package-path Apps/FractalExplorer/FractalExplorerCore",
+  "elapsed_seconds": 3.636,
+  "exit_code": 0,
+  "finished": "2026-11-11T12:59:45+00:00",
+  "log": ".autonomy/logs/A03-P03.t304-core-test.log",
+  "log_sha256": "3debf6727328518e33b156551ab673e1971e7abe1fcabc09775b2bb64d8cc98e",
+  "name": "t304-core-test",
+  "stage": "A03-P03",
+  "started": "2026-11-11T12:59:42+00:00",
+  "timed_out": false
+}

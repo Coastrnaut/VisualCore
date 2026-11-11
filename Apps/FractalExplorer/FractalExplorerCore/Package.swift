@@ -1,6 +1,7 @@
 // swift-tools-version: 6.0
 // FractalExplorerCore — the app's GPU-free domain (feature 026 A03-P01): the escape-time iteration with its CPU
-// reference, the validated fractal state, mode explanations and the bounded CPU preview. Host-testable with
+// reference, the validated fractal state, mode explanations, the bounded CPU preview, and bookmarks (feature 028) on
+// VisualCorePersistence.NamedLibrary. Host-testable with
 // `swift test`. The generic plane viewport lives in VisualCoreMath (constitution Principle II, A03 reuse rule); this
 // package holds only fractal-specific rules.
 import PackageDescription
@@ -11,9 +12,11 @@ let package = Package(
     products: [.library(name: "FractalExplorerCore", targets: ["FractalExplorerCore"])],
     dependencies: [.package(name: "VisualCore", path: "../../../Packages/VisualCore")],
     targets: [
-        .target(name: "FractalExplorerCore", dependencies: [.product(name: "VisualCoreMath", package: "VisualCore")]),
+        .target(name: "FractalExplorerCore", dependencies: [.product(name: "VisualCoreMath", package: "VisualCore"),
+                                                     .product(name: "VisualCorePersistence", package: "VisualCore")]),
         .testTarget(name: "FractalExplorerCoreTests", dependencies: ["FractalExplorerCore",
-                                                                    .product(name: "VisualCoreMath", package: "VisualCore")]),
+                                                                    .product(name: "VisualCoreMath", package: "VisualCore"),
+                                                                    .product(name: "VisualCorePersistence", package: "VisualCore")]),
     ],
     swiftLanguageModes: [.v6]
 )

@@ -1,0 +1,26 @@
+{
+  "argv": [
+    "python3",
+    "scripts/release_check.py",
+    "--only",
+    "docs",
+    "dependencies",
+    "compliance",
+    "documented-api-fractal-explorer",
+    "isolation-fractal-explorer",
+    "--log-dir",
+    ".autonomy/logs/a03p03-t304",
+    "--json",
+    ".autonomy/logs/a03p03-t304.json"
+  ],
+  "command": "python3 scripts/release_check.py --only docs dependencies compliance documented-api-fractal-explorer isolation-fractal-explorer --log-dir .autonomy/logs/a03p03-t304 --json .autonomy/logs/a03p03-t304.json",
+  "elapsed_seconds": 1.354,
+  "exit_code": 0,
+  "finished": "2026-11-11T12:59:52+00:00",
+  "log": ".autonomy/logs/A03-P03.t304-checks.log",
+  "log_sha256": "2e6a62ff40840159bd6f4fb09786a11b783d175a7246170c5b1c988b02c9a590",
+  "name": "t304-checks",
+  "stage": "A03-P03",
+  "started": "2026-11-11T12:59:51+00:00",
+  "timed_out": false
+}
