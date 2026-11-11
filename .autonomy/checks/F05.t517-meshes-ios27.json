@@ -1,0 +1,26 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/VisualCoreRendering",
+    "--scheme",
+    "VisualCoreRendering-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--result-name",
+    "F05-t517-ios27"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --result-name F05-t517-ios27",
+  "elapsed_seconds": 15.654,
+  "exit_code": 65,
+  "finished": "2026-11-11T00:51:23+00:00",
+  "log": ".autonomy/logs/F05.t517-meshes-ios27.log",
+  "log_sha256": "6e27041a4691b0aefdc1da1946f4573b27c8d933a0126a42feedbbccb296ce44",
+  "name": "t517-meshes-ios27",
+  "stage": "F05",
+  "started": "2026-11-11T00:51:07+00:00",
+  "timed_out": false
+}

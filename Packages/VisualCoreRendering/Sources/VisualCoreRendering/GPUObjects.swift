@@ -80,6 +80,14 @@ public final class GPUBuffer: GPUResource {
         vcglBindBuffer(GLenum(target), handle.name)
         values.withUnsafeBytes { vcglBufferSubData(GLenum(target), 0, count, $0.baseAddress) }
     }
+
+    /// Uploads 32-bit indices (at most the allocated size), e.g. into GL_ELEMENT_ARRAY_BUFFER (feature 006 T-F517).
+    public func upload(indices: [UInt32], target: Int32 = GL_ELEMENT_ARRAY_BUFFER) {
+        guard !released, let registry, registry.accept(generation: handle.generation) else { return }
+        let count = min(indices.count * MemoryLayout<UInt32>.size, handle.bytes)
+        vcglBindBuffer(GLenum(target), handle.name)
+        indices.withUnsafeBytes { vcglBufferSubData(GLenum(target), 0, count, $0.baseAddress) }
+    }
 }
 
 /// A framebuffer with one color texture; accounted as one `framebuffer` entry carrying the color bytes.
