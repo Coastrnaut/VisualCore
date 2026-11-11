@@ -18,7 +18,7 @@ commit and push per task (`scripts/tick_task.py`). Review checkpoint: after each
 
 ## Phase 2: US1 — Evidence-backed integration matrix (P1) 🎯
 
-- [ ] T-A02-002 [US1] Write `docs/apps/fluid-art-playground/visualcore-contract.json` (schema 1, app
+- [X] T-A02-002 [US1] Write `docs/apps/fluid-art-playground/visualcore-contract.json` (schema 1, app — Verified 2026-11-11: docs/apps/fluid-art-playground/visualcore-contract.json (schema 1, gate A02-P00): 15 inventory areas (A01's 10 refreshed + render targets/formats/pooling, feedback and full-screen passes, pointer input, frame pacing/thermal/time, still capture/release tooling), every path exists; matrix M01-M10 (available: M02 feedback, M06 blending/post, M08 pause/reset/seeded, M09 still capture; requires adaptation: M01 ping-pong, M03 GPU simulation, M05 touch forces, M07 quality/thermal, M10 half-float targets; upstream gap: M04 advection/diffusion, app-local by the A02 rule), every row with public non-test evidence, a product and an example consumer. run-check A02-P00/t002-contract-citations: 0 citation problems; the remaining checker findings are the gap entries and decision owned by T-A02-006 (the checker renders the Markdown view only for a passing contract, so --render runs in T-A02-006)
   `fluid-art-playground`, gate A02-P00):
   - `inventory` covering every area in FR-A02-001, each with paths;
   - `matrix` rows M01–M10 per research R1–R10. Six brainstorm rows: ping-pong, feedback, GPU simulation,

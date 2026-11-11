@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "python3",
+    "-c",
+    "import subprocess,sys;r=subprocess.run([sys.executable,'scripts/check_app_contract.py','--app','fluid-art-playground'],capture_output=True,text=True);print(r.stdout);bad=[l for l in r.stdout.splitlines() if l.startswith('PROBLEM') and 'gap entry' not in l and 'decision' not in l];print('citation problems:',len(bad));sys.exit(1 if bad else 0)"
+  ],
+  "command": "python3 -c 'import subprocess,sys;r=subprocess.run([sys.executable,'\"'\"'scripts/check_app_contract.py'\"'\"','\"'\"'--app'\"'\"','\"'\"'fluid-art-playground'\"'\"'],capture_output=True,text=True);print(r.stdout);bad=[l for l in r.stdout.splitlines() if l.startswith('\"'\"'PROBLEM'\"'\"') and '\"'\"'gap entry'\"'\"' not in l and '\"'\"'decision'\"'\"' not in l];print('\"'\"'citation problems:'\"'\"',len(bad));sys.exit(1 if bad else 0)'",
+  "elapsed_seconds": 0.043,
+  "exit_code": 0,
+  "finished": "2026-11-11T07:34:59+00:00",
+  "log": ".autonomy/logs/A02-P00.t002-contract-citations.log",
+  "log_sha256": "ab78a2070a411f315ae0e89d150b4ae06c179e99181969b7ceb92bdca0adc2df",
+  "name": "t002-contract-citations",
+  "stage": "A02-P00",
+  "started": "2026-11-11T07:34:58+00:00",
+  "timed_out": false
+}

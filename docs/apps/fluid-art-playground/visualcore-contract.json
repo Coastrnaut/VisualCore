@@ -1,0 +1,447 @@
+{
+  "schema": 1,
+  "app": "fluid-art-playground",
+  "gate": "A02-P00",
+  "date": "2026-11-11",
+  "inventory": [
+    {
+      "area": "Package products",
+      "description": "Pure, host-testable modules (Packages/VisualCore): Math, Simulation (SceneClock, FixedStepClock, SeededRandom, AccessibilityPreferences), Scenes (PointerTracker, ExportGeometry), ShaderSource, EffectsGraph, Diagnostics (FramePacing), Parameters, Persistence, TestSupport (+ placeholder AudioDSP). iOS modules (Packages/VisualCoreRendering): Rendering, Effects, UI, Automation (Debug/measurement) (+ placeholder Audio). Rules R1-R5 enforced by scripts/check_dependencies.py.",
+      "paths": [
+        "Packages/VisualCore/Package.swift",
+        "Packages/VisualCoreRendering/Package.swift",
+        "specs/002-architecture-contracts/contracts/package-map.md"
+      ],
+      "owner": "VisualCore packages (ADR-0003)"
+    },
+    {
+      "area": "EGL render host and thread",
+      "description": "RenderHost owns the EGL display/context/surfaces over ANGLE's Metal backend, a CAMetalLayer RenderView, a frame scheduler and context generations. All GL work runs on the main thread (@MainActor; dispatchPrecondition in DEBUG). pause/resume, recreateContext (context loss) and destroy; scenes implement RenderScene setup/resize/render/teardown.",
+      "paths": [
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderScene.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderView.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FrameScheduler.swift"
+      ],
+      "owner": "VisualCoreRendering (ADR-0002 seam)"
+    },
+    {
+      "area": "Resources and budgets",
+      "description": "ResourceRegistry creates textures, buffers, render targets and programs under a ResourceBudget, pools render targets, caches programs, counts leaks and rejects stale handles after a generation change.",
+      "paths": [
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GPUObjects.swift",
+        "Packages/VisualCore/Sources/VisualCoreDiagnostics/ResourceLedger.swift"
+      ],
+      "owner": "VisualCoreRendering + VisualCoreDiagnostics"
+    },
+    {
+      "area": "Shaders",
+      "description": "ShaderLibrary expands includes and defines with line maps; ResourceRegistry.program compiles/links through ANGLE and reports ShaderDiagnostic file:line; color-space policy in docs/rendering/color-space.md.",
+      "paths": [
+        "Packages/VisualCore/Sources/VisualCoreShaderSource/ShaderLibrary.swift",
+        "Packages/VisualCore/Sources/VisualCoreShaderSource/InfoLogParser.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
+        "docs/rendering/color-space.md"
+      ],
+      "owner": "VisualCoreShaderSource + VisualCoreRendering"
+    },
+    {
+      "area": "Effects",
+      "description": "Versioned effect-graph description, validator (≤ 32 passes, memory quota) and GPU executor with 8 pass types; EffectScene wraps any scene and adds the Reduce Flashing limiter.",
+      "paths": [
+        "Packages/VisualCore/Sources/VisualCoreEffectsGraph/EffectGraph.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreEffects/EffectScene.swift"
+      ],
+      "owner": "VisualCoreEffectsGraph + VisualCoreEffects"
+    },
+    {
+      "area": "Scenes, input, simulation",
+      "description": "Pointer tracking and tap/drag/pinch/rotate recognizers, scene graph and mesh generators; fixed-step clock, seeded RNG, timelines/tweens and particle system; primitive/particle/mesh renderers and the UIKit touch adapter.",
+      "paths": [
+        "Packages/VisualCore/Sources/VisualCoreScenes/GestureRecognizers.swift",
+        "Packages/VisualCore/Sources/VisualCoreSimulation/Timeline.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/PrimitiveRenderer.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderView+Touches.swift"
+      ],
+      "owner": "VisualCoreScenes + VisualCoreSimulation + VisualCoreRendering"
+    },
+    {
+      "area": "Build",
+      "description": "XcodeGen 2.46.0 specs (root project.yml for Showcase and app targets; harness specs), package schemes via scripts/xcodebuild_package.py, unsigned simulator builds, scripts/release_check.py (30 steps) and CI.",
+      "paths": [
+        "project.yml",
+        "scripts/xcodebuild_package.py",
+        "scripts/release_check.py",
+        ".github/workflows/ci.yml"
+      ],
+      "owner": "repository tooling"
+    },
+    {
+      "area": "ProjectM regression",
+      "description": "Reference pinned at d93edd1 (ADR-0005), read-only; baseline steps via scripts/run_reference_baseline.py, read-only check scripts/check_reference_clean.py, ProjectMReference harness tests.",
+      "paths": [
+        "scripts/run_reference_baseline.py",
+        "scripts/check_reference_clean.py",
+        "Harnesses/ProjectMReference/ProjectMReference.yml"
+      ],
+      "owner": "reference adapter (harness only)"
+    },
+    {
+      "area": "Source ownership",
+      "description": "Apps own product composition, content and one-off rules (Apps/<Name>/); VisualCore owns reusable logic (constitution 1.2.0 Principle II 'Maximize reuse'); ProjectM stays in the harness (R1).",
+      "paths": [
+        "specs/002-architecture-contracts/contracts/package-map.md",
+        ".specify/memory/constitution.md"
+      ],
+      "owner": "constitution + package map"
+    },
+    {
+      "area": "Test support",
+      "description": "VisualCoreTestSupport (test targets only): ImageComparison/ImageDifference/ImageStatistics for pixel tests (A01-P01).",
+      "paths": [
+        "Packages/VisualCore/Sources/VisualCoreTestSupport/ImageComparison.swift"
+      ],
+      "owner": "VisualCoreTestSupport"
+    },
+    {
+      "area": "Render targets, formats and pooling (fluid fields)",
+      "description": "ResourceRegistry.makeRenderTarget(width:height:format:label:) creates an FBO with one color texture (TextureFormat rgba8/rgba16f/r8), checks completeness (ResourceError.incompleteFramebuffer) and accounts bytes against ResourceBudget; acquireTarget/recycle pool targets; RenderTarget.bind/bindColor/readPixels. No ping-pong pair type and no half-float capability query yet.",
+      "paths": [
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GPUObjects.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderCapabilities.swift"
+      ],
+      "owner": "VisualCoreRendering"
+    },
+    {
+      "area": "Feedback history and full-screen passes",
+      "description": "The effect graph's 'feedback' pass keeps a history target across frames (runner internal; public surface EffectRenderer/EffectScene over EffectGraphDescription). FullScreenShaderScene draws one bundled fragment shader with u_time/u_resolution/u_seed/u_palette/u_<param> uniforms; ShaderBundle loads app shaders with the vc/*.glsl library.",
+      "paths": [
+        "Packages/VisualCoreRendering/Sources/VisualCoreEffects/EffectRenderer.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreEffects/EffectScene.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FullScreenShaderScene.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ShaderBundle.swift"
+      ],
+      "owner": "VisualCoreEffects, VisualCoreRendering"
+    },
+    {
+      "area": "Pointer input",
+      "description": "RenderView turns UIKit touches into PointerEvents (id, phase, position in points); PointerTracker keeps active pointers; tap/drag/pinch recognizers in VisualCoreScenes. No per-pointer velocity or rate-capped resampling yet.",
+      "paths": [
+        "Packages/VisualCore/Sources/VisualCoreScenes/PointerTracker.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderView+Touches.swift",
+        "Packages/VisualCore/Sources/VisualCoreScenes/GestureRecognizers.swift"
+      ],
+      "owner": "VisualCoreScenes, VisualCoreRendering"
+    },
+    {
+      "area": "Frame pacing, thermal state and time",
+      "description": "FramePacing derives max FPS and render scale from thermal state and Low Power Mode (applied by RenderHost's FrameScheduler); SceneClock (play/pause/scrub/rate), FixedStepClock (fixed simulation steps), SeededRandom (xoshiro256**).",
+      "paths": [
+        "Packages/VisualCore/Sources/VisualCoreDiagnostics/FramePacing.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FrameScheduler.swift",
+        "Packages/VisualCore/Sources/VisualCoreSimulation/FixedStepClock.swift",
+        "Packages/VisualCore/Sources/VisualCoreSimulation/SceneClock.swift"
+      ],
+      "owner": "VisualCoreDiagnostics, VisualCoreRendering, VisualCoreSimulation"
+    },
+    {
+      "area": "Still capture and release tooling",
+      "description": "RenderHost.renderOffscreen + StillImageEncoder (opaque sRGB PNG) + ExportGeometry (A01-P04); release tooling shared by every app: check_privacy_manifest.py, check_app_release.py, bundle_licenses.py, AutomationView, AcknowledgementsView (A01-P06).",
+      "paths": [
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/StillImage.swift",
+        "Packages/VisualCore/Sources/VisualCoreScenes/ExportGeometry.swift",
+        "scripts/check_app_release.py",
+        "Packages/VisualCoreRendering/Sources/VisualCoreAutomation/AutomationView.swift"
+      ],
+      "owner": "VisualCoreRendering, VisualCoreScenes, VisualCoreAutomation, scripts"
+    }
+  ],
+  "matrix": [
+    {
+      "id": "M01",
+      "capability": "Ping-pong framebuffers",
+      "source": "brainstorm",
+      "status": "requires adaptation",
+      "evidence": [
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
+          "symbol": "ResourceRegistry.makeRenderTarget",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
+          "symbol": "ResourceRegistry.acquireTarget",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GPUObjects.swift",
+          "symbol": "RenderTarget.bindColor",
+          "product": "VisualCoreRendering",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/VisualCoreRendering/Sources/VisualCoreEffects/EffectRenderer.swift",
+        "symbol": "EffectRenderer"
+      },
+      "notes": "Targets and pooling exist; a reusable read/write pair that swaps and forbids sampling the bound write target does not (gap G-PINGPONG)."
+    },
+    {
+      "id": "M02",
+      "capability": "Texture feedback",
+      "source": "brainstorm",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreEffects/EffectRenderer.swift",
+          "symbol": "EffectRenderer",
+          "product": "VisualCoreEffects",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreEffects/EffectScene.swift",
+          "symbol": "EffectScene",
+          "product": "VisualCoreEffects",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreEffectsGraph/EffectGraph.swift",
+          "symbol": "EffectPassDescription",
+          "product": "VisualCoreEffectsGraph",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/VisualCoreRendering/Tests/VisualCoreEffectsTests/PassPixelTests.swift",
+        "symbol": "PassPixelTests"
+      },
+      "notes": "The 'feedback' pass type keeps display history across frames; simulation fields use M01."
+    },
+    {
+      "id": "M03",
+      "capability": "GPU simulation techniques",
+      "source": "brainstorm",
+      "status": "requires adaptation",
+      "evidence": [
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FullScreenShaderScene.swift",
+          "symbol": "FullScreenShaderScene",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ShaderProgram.swift",
+          "symbol": "ShaderProgram.set",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
+          "symbol": "ResourceRegistry.program",
+          "product": "VisualCoreRendering",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Apps/GenerativeArtStudio/App/ArtSceneFactory.swift",
+        "symbol": "ArtSceneFactory"
+      },
+      "notes": "Full-screen fragment passes exist inside scenes and the effect graph; no generic 'program + named inputs -> target' field pass for multi-pass simulation (gap G-FIELDPASS)."
+    },
+    {
+      "id": "M04",
+      "capability": "Shader-based advection and diffusion effects",
+      "source": "brainstorm",
+      "status": "upstream gap",
+      "evidence": [
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ShaderBundle.swift",
+          "symbol": "ShaderBundle",
+          "product": "VisualCoreRendering",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Apps/GenerativeArtStudio/App/ArtSceneFactory.swift",
+        "symbol": "ArtSceneFactory"
+      },
+      "notes": "No fluid shaders in VisualCore by design: the solver equations are app-domain with a CPU reference (constitution A02). Shaders ship through ShaderBundle; closest consumer is A01's bundled fragment passes (gap G-SOLVER, app-local)."
+    },
+    {
+      "id": "M05",
+      "capability": "Touch input as simulation forces",
+      "source": "brainstorm",
+      "status": "requires adaptation",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/PointerTracker.swift",
+          "symbol": "PointerTracker",
+          "product": "VisualCoreScenes",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/PointerTracker.swift",
+          "symbol": "PointerEvent",
+          "product": "VisualCoreScenes",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Showcase/App/Scenes/DistortionScene.swift",
+        "symbol": "DistortionScene"
+      },
+      "notes": "Pointer positions and phases exist; per-pointer velocity and rate-capped resampling into splats do not (gap G-POINTERVEL)."
+    },
+    {
+      "id": "M06",
+      "capability": "Color blending and post-processing",
+      "source": "brainstorm",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreParameters/Palette.swift",
+          "symbol": "Palette",
+          "product": "VisualCoreParameters",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreEffects/EffectScene.swift",
+          "symbol": "EffectScene",
+          "product": "VisualCoreEffects",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreEffects/EffectRenderer.swift",
+          "symbol": "EffectRenderer",
+          "product": "VisualCoreEffects",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Apps/GenerativeArtStudio/Core/Sources/GenerativeArtStudioCore/FamilyCatalog.swift",
+        "symbol": "FamilyCatalog"
+      },
+      "notes": "Palettes (exact sRGB, linear sampling) and bloom/composite/color-matrix passes."
+    },
+    {
+      "id": "M07",
+      "capability": "Configurable simulation resolution with thermal downgrade",
+      "source": "v0.1 feature 06",
+      "status": "requires adaptation",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/FramePacing.swift",
+          "symbol": "FramePacing",
+          "product": "VisualCoreDiagnostics",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+        "symbol": "RenderHost"
+      },
+      "notes": "FramePacing maps thermal state and Low Power Mode to render scale and FPS; no generic quality-tier policy (grid scale, iterations, splat cap) exists (gap G-QUALITY)."
+    },
+    {
+      "id": "M08",
+      "capability": "Pause, reset and deterministic seeded test mode",
+      "source": "v0.1 feature 05",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/SceneClock.swift",
+          "symbol": "SceneClock",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/FixedStepClock.swift",
+          "symbol": "FixedStepClock",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/SeededRandom.swift",
+          "symbol": "SeededRandom",
+          "product": "VisualCoreSimulation",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Apps/GenerativeArtStudio/App/ClockedArtScene.swift",
+        "symbol": "ClockedArtScene"
+      },
+      "notes": "Play/pause/scrub clock, fixed simulation steps and a seeded RNG."
+    },
+    {
+      "id": "M09",
+      "capability": "Still capture",
+      "source": "v0.1 feature 05",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+          "symbol": "RenderHost.renderOffscreen",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/StillImage.swift",
+          "symbol": "StillImageEncoder",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/ExportGeometry.swift",
+          "symbol": "ExportGeometry",
+          "product": "VisualCoreScenes",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Apps/GenerativeArtStudio/App/ExportSheet.swift",
+        "symbol": "ExportRunner"
+      },
+      "notes": "Offscreen render on the host's context, opaque sRGB PNG, capped sizes (A01-P04)."
+    },
+    {
+      "id": "M10",
+      "capability": "Half-float render targets with fallback",
+      "source": "v0.1 feature 01 (velocity and pressure fields)",
+      "status": "requires adaptation",
+      "evidence": [
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GPUObjects.swift",
+          "symbol": "TextureFormat",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
+          "symbol": "ResourceRegistry.makeRenderTarget",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderCapabilities.swift",
+          "symbol": "RenderCapabilities",
+          "product": "VisualCoreRendering",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/VisualCoreRendering/Sources/VisualCoreEffects/EffectRenderer.swift",
+        "symbol": "EffectRenderer"
+      },
+      "notes": "rgba16f targets exist (used by HDR bloom) and incomplete framebuffers throw; no support query for EXT_color_buffer_half_float/float and no fallback policy (gap G-FLOATRT). The matrix assumes no support."
+    }
+  ],
+  "gaps": [],
+  "traceability": [],
+  "negative": [],
+  "decision": {}
+}
