@@ -59,7 +59,7 @@ both simulators and the reference regression. IDs are `T-A01-0##`. Each task get
 
 ## Phase 6: US4 — Gap register and stop/go decision (P2)
 
-- [ ] T-A01-009 [US4] Add to the contract JSON:
+- [X] T-A01-009 [US4] Add to the contract JSON: — Verified 2026-11-10: visualcore-contract.json gaps G-SHADERLOAD/G-GLSLLIB/G-EXPORT→VisualCoreRendering, G-CLOCK→VisualCoreSimulation, G-PARAMS→new VisualCoreParameters, G-PERSIST→VisualCorePersistence, G-UI→VisualCoreUI (all VisualCore-owned, phases 1–4, test intents); traceability brainstorm + v0.1 features 01–06 + journeys 1–3 (SC-A01-007); 8 negative rules with sources; decision go, no blockers, citing the recorded regression (T-A01-006) and shell results (T-A01-008); narrative added; run-check A01-P00/t009-gap-register PASS 10 rows, 32 citations, 7 gaps (SC-A01-005)
   - the `gaps` register (G-SHADERLOAD, G-GLSLLIB → VisualCoreRendering; G-CLOCK → VisualCoreSimulation; G-PARAMS → new VisualCoreParameters; G-PERSIST → VisualCorePersistence; G-EXPORT → VisualCoreRendering `StillExporter`; G-UI → VisualCoreUI), each with a phase and a test;
   - `traceability` (v0.1 features 01–06 and journeys 1–3 → matrix rows → phases);
   - `negative` rules with sources (FR-A01-011);
