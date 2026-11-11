@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Apps/ParticleUniverse/ParticleUniverseCore"
+  ],
+  "command": "swift test --package-path Apps/ParticleUniverse/ParticleUniverseCore",
+  "elapsed_seconds": 8.931,
+  "exit_code": 0,
+  "finished": "2026-11-11T17:04:17+00:00",
+  "log": ".autonomy/logs/A04-P01.t101-package-test.log",
+  "log_sha256": "f910d61e9748a328cb0df409a2a891aba95026ff11ec6666b028e54975870baf",
+  "name": "t101-package-test",
+  "stage": "A04-P01",
+  "started": "2026-11-11T17:04:08+00:00",
+  "timed_out": false
+}

@@ -17,7 +17,7 @@ named tests are green.
 
 ## Phase 1: Setup
 
-- [ ] T-A04-101 Create the app domain package `Apps/ParticleUniverse/ParticleUniverseCore/Package.swift` (swift-tools 6.0, iOS 26 / macOS 15, depends on VisualCore products VisualCoreSimulation and VisualCoreMath; test target `ParticleUniverseCoreTests`), a placeholder source `Sources/ParticleUniverseCore/Module.swift`, the `project.yml` package entry `ParticleUniverseCore` and its dependency on the `ParticleUniverse` target; `swift build` the package and build the app for the generic simulator (FR-A04-105).
+- [X] T-A04-101 Create the app domain package `Apps/ParticleUniverse/ParticleUniverseCore/Package.swift` (swift-tools 6.0, iOS 26 / macOS 15, depends on VisualCore products VisualCoreSimulation and VisualCoreMath; test target `ParticleUniverseCoreTests`), a placeholder source `Sources/ParticleUniverseCore/Module.swift`, the `project.yml` package entry `ParticleUniverseCore` and its dependency on the `ParticleUniverse` target; `swift build` the package and build the app for the generic simulator (FR-A04-105). — Verified 2026-11-11: Apps/ParticleUniverse/ParticleUniverseCore (Package.swift on VisualCoreSimulation and VisualCoreMath, Module.swift, ModuleTests, Fixtures folder); project.yml package ParticleUniverseCore linked by the ParticleUniverse target. run-check A04-P01/t101-package-test swift test exit 0 (1 test); t101-build BUILD SUCCEEDED for the generic iOS Simulator with the post-build dependency audit
 
 ## Phase 2: Foundational — VisualCore gaps (blocking for all stories)
 

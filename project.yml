@@ -23,6 +23,8 @@ packages:
     path: Apps/FluidArtPlayground/FluidArtPlaygroundCore
   FractalExplorerCore:
     path: Apps/FractalExplorer/FractalExplorerCore
+  ParticleUniverseCore:
+    path: Apps/ParticleUniverse/ParticleUniverseCore
 settings:
   base:
     SWIFT_VERSION: "6.0"
@@ -397,7 +399,7 @@ targets:
     dependencies:
       - target: FractalExplorer
   ParticleUniverse:
-    # A04 Particle Universe (feature 032 A04-P00): app shell; the particle domain and rendering arrive in Phases 01–02.
+    # A04 Particle Universe (feature 032 A04-P00): app shell; feature 033 (A04-P01) adds the seeded particle domain; the GPU loop arrives in Phase 02.
     type: application
     platform: iOS
     sources:
@@ -424,6 +426,13 @@ targets:
       # Feature 032 (A04-P00): accessible colors only; no render host yet.
       - package: VisualCoreRendering
         product: VisualCoreUI
+      # Feature 033 (A04-P01): the GPU-free particle domain and the VisualCore simulation it builds on.
+      - package: ParticleUniverseCore
+        product: ParticleUniverseCore
+      - package: VisualCore
+        product: VisualCoreSimulation
+      - package: VisualCore
+        product: VisualCoreMath
     postBuildScripts:
       # FR-A04-006: the build fails if the app depends on ProjectM engine/preset/bridge modules.
       - name: Dependency audit (FR-A04-006)

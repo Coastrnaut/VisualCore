@@ -1,0 +1,25 @@
+{
+  "argv": [
+    "xcodebuild",
+    "build",
+    "-project",
+    "VisualCore.xcodeproj",
+    "-scheme",
+    "ParticleUniverse",
+    "-destination",
+    "generic/platform=iOS Simulator",
+    "-derivedDataPath",
+    "Build/DerivedData/ParticleUniverse",
+    "CODE_SIGNING_ALLOWED=NO"
+  ],
+  "command": "xcodebuild build -project VisualCore.xcodeproj -scheme ParticleUniverse -destination 'generic/platform=iOS Simulator' -derivedDataPath Build/DerivedData/ParticleUniverse CODE_SIGNING_ALLOWED=NO",
+  "elapsed_seconds": 6.528,
+  "exit_code": 0,
+  "finished": "2026-11-11T17:04:23+00:00",
+  "log": ".autonomy/logs/A04-P01.t101-build.log",
+  "log_sha256": "1139fcdcce348d0a82659900402a937f54953e1b9f173cd524b61a069f6488ce",
+  "name": "t101-build",
+  "stage": "A04-P01",
+  "started": "2026-11-11T17:04:17+00:00",
+  "timed_out": false
+}
