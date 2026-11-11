@@ -30,8 +30,9 @@ vec3 normalAt(vec3 p) {
 }
 
 void main() {
-    vec2 uv = (v_uv - 0.5) * vec2(u_resolution.x / u_resolution.y, 1.0);
-    vec3 ro = vec3(0.0, 0.0, 3.2 / u_zoom);
+    // Normalize by the narrow axis so the composition fits portrait and landscape views alike.
+    vec2 uv = (v_uv - 0.5) * u_resolution / min(u_resolution.x, u_resolution.y);
+    vec3 ro = vec3(0.0, 0.0, 5.0 / u_zoom);
     vec3 rd = normalize(vec3(uv, -1.6));
     float t = 0.0, closest = 1e9;
     bool hit = false;

@@ -156,6 +156,20 @@ targets:
         product: VisualCoreRendering
       - package: VisualCoreRendering
         product: VisualCoreUI
+  GenerativeArtStudioTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources: [Apps/GenerativeArtStudio/Tests/Unit]
+    info:
+      path: Apps/GenerativeArtStudio/Generated/Tests-Info.plist
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: dev.visualcore.GenerativeArtStudioTests
+        GENERATE_INFOPLIST_FILE: NO
+    dependencies:
+      - target: GenerativeArtStudio
+      - package: VisualCore
+        product: VisualCoreTestSupport
   GenerativeArtStudioUITests:
     type: bundle.ui-testing
     platform: iOS
@@ -182,6 +196,7 @@ schemes:
     build:
       targets:
         GenerativeArtStudio: all
+        GenerativeArtStudioTests: [test]
         GenerativeArtStudioUITests: [test]
     test:
-      targets: [GenerativeArtStudioUITests]
+      targets: [GenerativeArtStudioTests, GenerativeArtStudioUITests]
