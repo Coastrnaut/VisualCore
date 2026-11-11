@@ -43,7 +43,10 @@ Checkpoints: `validate_docs`, `check_dependencies`, `check_compliance` and `chec
   - pairwise mean difference ≥ 10%;
   - probes match `displayColor` within 3/255 for ink and smoke;
   - glow spreads beyond the dye with bloom;
-  - switching keeps the fields (SC-A02-401).
+  - switching keeps the fields (SC-A02-401);
+  - with Reduce Flashing, the glow's effective graph contains the flash limiter (FR-A02-403; analyze C4).
+
+  Add the VisualCoreEffects product to the app target in `project.yml` (analyze C3).
 
 ## Phase 3: User Story 2 — pinch and Brush size (P1)
 
@@ -51,7 +54,8 @@ Checkpoints: `validate_docs`, `check_dependencies`, `check_compliance` and `chec
   goes down, cancel both strokes and enter pinch mode, with "brushRadius = start × scale, clamped 0.005…0.25". Add
   the Brush size slider (`fap.adjust.brush`, spoken as a percentage of the canvas). Add `PinchTests` with scripted
   events: spreading to twice the distance doubles the radius, clamping works, and 0 splats come from pinching
-  fingers (SC-A02-402).
+  fingers (SC-A02-402). Also cover a one-finger stroke followed by a second finger: the stroke ends and no further
+  splats come from it (analyze C1).
 
 ## Phase 4: User Story 3 — capture (P2)
 
@@ -67,7 +71,8 @@ Checkpoints: `validate_docs`, `check_dependencies`, `check_compliance` and `chec
   - an opaque PNG of the expected size;
   - the step count unchanged;
   - palette probes match the on-screen frame;
-  - a too-large size refused with a message (SC-A02-403).
+  - a too-large size refused with a message, with `scene.paused` restored to its previous value (SC-A02-403;
+    analyze C2).
 
 ## Phase 5: User Story 4 — pass isolation (P1)
 
@@ -81,6 +86,16 @@ Checkpoints: `validate_docs`, `check_dependencies`, `check_compliance` and `chec
   the audit to the new controls. Run the app tests on 27.2 and 26.5 (SC-A02-405).
 - [ ] T-A02-408 Update the contract (reused pieces in M02/M06/M09 notes; the observer recorded), then run the release
   fast steps, the isolation check with the allowed usage key, and an A01 build. Add lessons (FR-A02-408, SC-A02-406).
+
+## Analyze remediation (2026-11-11)
+
+Applied under the owner's delegated approval (CLAUDE.md §2):
+- C1: a pinch-during-stroke test was added to T-A02-404.
+- C2: the pause restore on capture failure was added to T-A02-405.
+- C3: the VisualCoreEffects dependency was added to T-A02-403.
+- C4: the flash limiter test was added to T-A02-403.
+
+No CRITICAL findings; coverage is 100%.
 
 ## Dependencies
 
