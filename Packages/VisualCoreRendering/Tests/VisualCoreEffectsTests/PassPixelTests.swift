@@ -104,4 +104,35 @@ final class PassPixelTests: XCTestCase {
                        "far dark pixels unchanged (below threshold)")
         XCTAssertGreaterThanOrEqual(EffectHarness.pixel(after, width: 32, x: 15, y: 15).x, 254)
     }
+
+    // MARK: distort (T-F410)
+
+    private func stripeDistort(strength: Double) throws -> (before: [UInt8], after: [UInt8]) {
+        var before: [UInt8] = [], after: [UInt8] = []
+        _ = try EffectHarness.run { ctx in
+            let scene = try EffectHarness.solid(0, 0, 0, size: 32, in: ctx)
+            vcglEnable(GLenum(GL_SCISSOR_TEST)); vcglScissor(15, 0, 2, 32)
+            vcglClearColor(1, 1, 1, 1); vcglClear(GLbitfield(GL_COLOR_BUFFER_BIT)); vcglDisable(GLenum(GL_SCISSOR_TEST))
+            before = scene.readPixels()
+            let r = try EffectRenderer(graph: EffectHarness.graph([
+                EffectPassDescription(id: "D", type: "distort", inputs: ["input": "scene"], output: "d",
+                                      params: ["strength": [strength], "frequency": [2], "speed": [0]]),
+            ], output: "d"), registry: ctx.resources)
+            after = try r.render(scene: scene, time: 0, delta: 0).readPixels()
+        }
+        return (before, after)
+    }
+
+    func testDistortWithZeroStrengthIsTheIdentity() throws {
+        let (before, after) = try stripeDistort(strength: 0)
+        XCTAssertEqual(zip(before, after).map { abs(Int($0) - Int($1)) }.max(), 0)
+    }
+
+    func testDistortMovesAStripe() throws {
+        let (before, after) = try stripeDistort(strength: 0.1)
+        let movedRows = (0..<32).filter { y in
+            EffectHarness.pixel(after, width: 32, x: 15, y: y).x != EffectHarness.pixel(before, width: 32, x: 15, y: y).x
+        }
+        XCTAssertGreaterThan(movedRows.count, 4, "the stripe is displaced on several rows")
+    }
 }
