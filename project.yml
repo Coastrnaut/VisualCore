@@ -433,6 +433,11 @@ targets:
         product: VisualCoreSimulation
       - package: VisualCore
         product: VisualCoreMath
+      # Feature 034 (A04-P02): the GPU render loop (RenderHost, ParticleLayerScene) and quality tiers.
+      - package: VisualCoreRendering
+        product: VisualCoreRendering
+      - package: VisualCore
+        product: VisualCoreDiagnostics
     postBuildScripts:
       # FR-A04-006: the build fails if the app depends on ProjectM engine/preset/bridge modules.
       - name: Dependency audit (FR-A04-006)

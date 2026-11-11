@@ -12,10 +12,12 @@ let package = Package(
     dependencies: [.package(name: "VisualCore", path: "../../../Packages/VisualCore")],
     targets: [
         .target(name: "ParticleUniverseCore", dependencies: [.product(name: "VisualCoreSimulation", package: "VisualCore"),
-                                                             .product(name: "VisualCoreMath", package: "VisualCore")]),
+                                                             .product(name: "VisualCoreMath", package: "VisualCore"),
+                                                             .product(name: "VisualCoreDiagnostics", package: "VisualCore")]),
         .testTarget(name: "ParticleUniverseCoreTests", dependencies: ["ParticleUniverseCore",
                                                                       .product(name: "VisualCoreSimulation", package: "VisualCore"),
-                                                                      .product(name: "VisualCoreMath", package: "VisualCore")],
+                                                                      .product(name: "VisualCoreMath", package: "VisualCore"),
+                                                                      .product(name: "VisualCoreDiagnostics", package: "VisualCore")],
                     resources: [.copy("Fixtures")]),
     ],
     swiftLanguageModes: [.v6]

@@ -18,7 +18,7 @@ passes and the named tests are green.
 
 ## Phase 1: Setup
 
-- [ ] T-A04-201 Add the `VisualCoreDiagnostics` product to `Apps/ParticleUniverse/ParticleUniverseCore/Package.swift` (target and test target) and the `ParticleUniverse` target's dependencies in `project.yml` (`VisualCore` product `VisualCoreDiagnostics`, `VisualCoreRendering` product `VisualCoreRendering` for `RenderHost`/`ParticleLayerScene`; analyze U1); `swift build` the package and build the app for the generic iOS Simulator with the post-build dependency audit (plan "Dependency direction").
+- [X] T-A04-201 Add the `VisualCoreDiagnostics` product to `Apps/ParticleUniverse/ParticleUniverseCore/Package.swift` (target and test target) and the `ParticleUniverse` target's dependencies in `project.yml` (`VisualCore` product `VisualCoreDiagnostics`, `VisualCoreRendering` product `VisualCoreRendering` for `RenderHost`/`ParticleLayerScene`; analyze U1); `swift build` the package and build the app for the generic iOS Simulator with the post-build dependency audit (plan "Dependency direction"). — Verified 2026-11-11: ParticleUniverseCore Package.swift gains VisualCoreDiagnostics (target and tests); project.yml ParticleUniverse target gains VisualCoreRendering and VisualCoreDiagnostics. run-check A04-P02/t201-package-build exit 0; t201-build BUILD SUCCEEDED for the generic iOS Simulator with the dependency audit
 
 ## Phase 2: Foundational — VisualCore gaps (blocking for all stories)
 
