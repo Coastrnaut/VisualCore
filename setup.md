@@ -85,6 +85,42 @@ Make sure `python3` resolves to Homebrew's 3.15 (`/opt/homebrew/bin/python3`):
 which python3 && python3 --version
 ```
 
+**If it prints `/usr/bin/python3` and `Python 3.9.x`,** you have macOS's built-in Python, which is too old (the
+scripts need ≥ 3.10). Fix it like this:
+
+1. Check that Homebrew's Python is installed and linked. This is also the reinstall if it is missing:
+
+   ```bash
+   brew install python@3.15 && brew link --overwrite python@3.15
+   ```
+
+2. Make sure Homebrew's folder comes first on `PATH` in every new terminal. This adds the line only if it is missing:
+
+   ```bash
+   grep -q 'brew shellenv' ~/.zprofile 2>/dev/null || echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zprofile
+   ```
+
+3. Load it in this terminal and clear zsh's cached command paths:
+
+   ```bash
+   eval "$(/opt/homebrew/bin/brew shellenv)" && hash -r
+   ```
+
+4. Check again. Expect `/opt/homebrew/bin/python3` and `Python 3.15.x`:
+
+   ```bash
+   which python3 && python3 --version
+   ```
+
+If it still shows `/usr/bin/python3`, something in `~/.zshrc` puts `/usr/bin` first. Add Homebrew's Python folder to
+the end of `~/.zshrc`, then open a new terminal:
+
+```bash
+echo 'export PATH="/opt/homebrew/bin:$PATH"' >> ~/.zshrc
+```
+
+Never remove or replace `/usr/bin/python3`; macOS owns it.
+
 ### 3.3 Pin XcodeGen 2.46.0 and CMake 4.4.5 if Homebrew installed other versions
 
 ```bash
