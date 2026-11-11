@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/VisualCore",
+    "--filter",
+    "VisualCoreEffectsGraphTests"
+  ],
+  "command": "swift test --package-path Packages/VisualCore --filter VisualCoreEffectsGraphTests",
+  "elapsed_seconds": 2.788,
+  "exit_code": 0,
+  "finished": "2026-11-11T00:18:11+00:00",
+  "log": ".autonomy/logs/F04.t405-flashlimiter.log",
+  "log_sha256": "c9484318df758adff64aed1d52b5bb596908b4f5e642d8fcb364a5a85bcf370c",
+  "name": "t405-flashlimiter",
+  "stage": "F04",
+  "started": "2026-11-11T00:18:08+00:00",
+  "timed_out": false
+}
