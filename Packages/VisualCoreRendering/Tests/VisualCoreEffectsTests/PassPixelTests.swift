@@ -81,4 +81,27 @@ final class PassPixelTests: XCTestCase {
         XCTAssertEqual(EffectHarness.pixel(after, width: 32, x: 2, y: 2).x, 0, "far pixels stay black")
         XCTAssertEqual(Double(red(after)), Double(red(before)), accuracy: Double(red(before)) * 0.05, "energy kept within 5%")
     }
+
+    // MARK: bloom (T-F409)
+
+    func testBloomBrightensNearBrightAreasAndLeavesFarDarkPixels() throws {
+        var before: [UInt8] = [], after: [UInt8] = []
+        _ = try EffectHarness.run { ctx in
+            let scene = try EffectHarness.solid(0.05, 0.05, 0.05, size: 32, in: ctx)
+            vcglEnable(GLenum(GL_SCISSOR_TEST)); vcglScissor(14, 14, 4, 4)
+            vcglClearColor(1, 1, 1, 1); vcglClear(GLbitfield(GL_COLOR_BUFFER_BIT)); vcglDisable(GLenum(GL_SCISSOR_TEST))
+            before = scene.readPixels()
+            let r = try EffectRenderer(graph: EffectHarness.graph([
+                EffectPassDescription(id: "G", type: "bloom", inputs: ["input": "scene"], output: "g",
+                                      params: ["threshold": [0.7], "intensity": [1], "radius": [4]]),
+            ], output: "g"), registry: ctx.resources)
+            after = try r.render(scene: scene, time: 0, delta: 0).readPixels()
+        }
+        let nearBefore = EffectHarness.pixel(before, width: 32, x: 12, y: 15).x
+        let nearAfter = EffectHarness.pixel(after, width: 32, x: 12, y: 15).x
+        XCTAssertGreaterThan(nearAfter, nearBefore + 10, "glow spills next to the bright block")
+        XCTAssertEqual(EffectHarness.pixel(after, width: 32, x: 2, y: 2).x, EffectHarness.pixel(before, width: 32, x: 2, y: 2).x, accuracy: 2,
+                       "far dark pixels unchanged (below threshold)")
+        XCTAssertGreaterThanOrEqual(EffectHarness.pixel(after, width: 32, x: 15, y: 15).x, 254)
+    }
 }
