@@ -6,6 +6,7 @@ import FractalExplorerCore
 import SwiftUI
 import VisualCoreMath
 import VisualCoreRendering
+import VisualCoreScenes
 import VisualCoreUI
 
 /// The explorer's state, its GPU scene on VisualCore's render host, and the CPU-reference preview used as the fallback
@@ -39,7 +40,62 @@ final class ExplorerModel {
         state = initial
         scene = FractalScene(snapshot: .init(state: initial), fragment: fragment)
         host = try? RenderHost(scene: scene)
+        host?.pointerHandler = { [weak self] event in self?.handle(event) }
         if usingFallback { refresh() }
+    }
+
+    // MARK: Gestures (feature 027 T-A03-205; FR-A03-202; clarification 4)
+
+    private var pointers = PointerTracker()
+    private var pinch = PinchRecognizer()
+    private var lastPoint: [Int: Vec2] = [:]
+    /// True while a two-finger pinch is driving the view.
+    private(set) var pinching = false
+
+    /// Applies a new viewport (the single place later phases clamp it).
+    func apply(_ viewport: PlaneViewport) {
+        if viewport != state.viewport { state.viewport = viewport }
+    }
+
+    /// One canvas touch event. Two fingers (VisualCore PointerTracker order, PinchRecognizer state) pinch and pan
+    /// incrementally per event: from the fingers' previous positions to their current ones, the view pans by the
+    /// midpoint's movement and zooms by the distance ratio about the new midpoint — so the plane point under the
+    /// midpoint follows it exactly. One finger pans by its own movement, so a finger left after a pinch keeps panning
+    /// without a jump.
+    func handle(_ e: PointerEvent) {
+        let previous = lastPoint
+        pointers.handle(e)
+        pinch.handle(e, tracker: pointers)
+        if e.phase == .moved, pointers.count >= 2 {
+            let ids = Array(pointers.order.prefix(2))
+            if let a0 = previous[ids[0]], let b0 = previous[ids[1]],
+               let a1 = pointers.active[ids[0]], let b1 = pointers.active[ids[1]] {
+                pinching = true
+                let mid0 = (a0 + b0) / 2, mid1 = (a1 + b1) / 2
+                let d0 = a0.distance(to: b0), d1 = a1.distance(to: b1)
+                var v = state.viewport.panned(by: mid1 - mid0)
+                if d0 > 0, d1 > 0 { v = v.pinched(by: d1 / d0, anchor: mid1) }
+                apply(v)
+            }
+        } else if e.phase == .moved, pointers.count == 1, let last = previous[e.id] {
+            apply(state.viewport.panned(by: e.location - last))
+        }
+        switch e.phase {
+        case .began, .moved: lastPoint[e.id] = e.location
+        case .ended, .cancelled: lastPoint[e.id] = nil
+        }
+        if pointers.count < 2 { pinching = false }
+        if pointers.count == 0 { pinch.reset(); lastPoint.removeAll() }
+    }
+
+    /// Zoom in ×2 about the view's middle (the control alternative to pinching).
+    func zoomIn() { apply(state.viewport.pinched(by: 2, anchor: state.viewport.size / 2)) }
+    /// Zoom out ×0.5 about the view's middle.
+    func zoomOut() { apply(state.viewport.pinched(by: 0.5, anchor: state.viewport.size / 2)) }
+    /// Back to the mode's default framing at the current size.
+    func resetView() {
+        apply(PlaneViewport.framing(width: FractalState.defaultWidth(for: state.mode),
+                                    center: FractalState.defaultCenter(for: state.mode), size: state.viewport.size))
     }
 
     /// True when the GPU picture is unavailable (no host, or the shader failed); the CPU preview is shown instead.
@@ -114,6 +170,18 @@ struct ExplorerView: View {
                     .fixedSize(horizontal: false, vertical: true)
                     .accessibilityIdentifier("fe.mode.explanation")
                 canvas
+                HStack {
+                    Button { model.zoomOut() } label: { Label("Zoom out", systemImage: "minus.magnifyingglass") }
+                        .accessibilityIdentifier("fe.zoomOut")
+                    Spacer()
+                    Button { model.resetView() } label: { Label("Reset view", systemImage: "arrow.counterclockwise") }
+                        .accessibilityIdentifier("fe.resetView")
+                    Spacer()
+                    Button { model.zoomIn() } label: { Label("Zoom in", systemImage: "plus.magnifyingglass") }
+                        .accessibilityIdentifier("fe.zoomIn")
+                }
+                .buttonStyle(.bordered)
+                .labelStyle(.titleAndIcon)
                 if model.usingFallback, let error = model.scene.errorMessage {
                     Text("The graphics shader could not run, so a simpler preview is shown. (\(error))")
                         .font(.footnote)

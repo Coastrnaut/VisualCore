@@ -71,6 +71,18 @@ case. These facts were checked in code:
 - Q: What happens to the CPU preview? → A: It stays as the reference used by the GPU agreement fixture, and as the
   fallback picture when the shader fails to compile. It is no longer the normal picture.
 
+### Session 2026-11-11 (implementation finding, T-A03-205)
+
+- Q: Can VisualCore's `DragRecognizer` carry the pan after a pinch? → A: No. A second finger makes it terminal, and its
+  10-point start threshold would cause a jump. One-finger pan therefore uses `PointerTracker` positions. The pinch
+  is computed per event from both fingers' previous and current positions (the tracker's order):
+  1. pan by the midpoint's movement;
+  2. zoom by the distance ratio about the new midpoint.
+
+  `PinchRecognizer` stays in the mapping for the gesture state. The first draft applied the recognizer's cumulative
+  scale without the midpoint's first shift. That drifted the anchor by 2% (GestureTests caught it), and was fixed
+  this way.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Explore with pinch and pan on a live GPU picture (Priority: P1) 🎯

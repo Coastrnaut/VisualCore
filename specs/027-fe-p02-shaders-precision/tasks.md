@@ -61,7 +61,7 @@ amendments), the plan, research R1–R4, the data model, the contract and the qu
 
 ## Phase 3: User Story 1 — gestures (P1)
 
-- [ ] T-A03-205 [US1] Add the gesture mapping in the model:
+- [X] T-A03-205 [US1] Add the gesture mapping in the model: — Verified 2026-11-11: — Verified 2026-11-11: ExplorerModel gesture mapping (RenderHost.pointerHandler -> VisualCore PointerTracker + PinchRecognizer; per-event two-finger pan by midpoint movement then anchored zoom by distance ratio; one-finger pan from tracker positions, so a finger left after a pinch pans without a jump; DragRecognizer cannot hand over mid-sequence — spec implementation clarification) and fe.zoomIn/fe.zoomOut/fe.resetView. GestureTests 5: symmetric pinch keeps the plane point under the midpoint within 1e-9 relative and 1 pt on screen up to 7x, moving pinch follows the midpoint, drag exact, lift mid-pinch no jump/no zoom change, controls. The first run t205-app-ios27/26 failed (2% anchor drift from the cumulative-scale approach); fixed; run-check A03-P02/t205-app-ios27-2 and t205-app-ios26-2 TEST SUCCEEDED, enumeration 16/16 each
   - `PointerTracker` → `PinchRecognizer` (incremental scale about the center, then the center movement as a pan) and
     `DragRecognizer` (incremental translation);
   - a finger lift mid-pinch restarts the drag without a jump;
