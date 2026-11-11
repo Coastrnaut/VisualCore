@@ -1,0 +1,24 @@
+{
+  "argv": [
+    "python3",
+    "scripts/audit_showcase_dependencies.py",
+    "--spec",
+    "Harnesses/SecondConsumer/SecondConsumer.yml",
+    "--target",
+    "SecondConsumer",
+    "--sources",
+    "Harnesses/SecondConsumer",
+    "--app",
+    "Build/DerivedData/SecondConsumer/Build/Products/Debug-iphonesimulator/SecondConsumer.app"
+  ],
+  "command": "python3 scripts/audit_showcase_dependencies.py --spec Harnesses/SecondConsumer/SecondConsumer.yml --target SecondConsumer --sources Harnesses/SecondConsumer --app Build/DerivedData/SecondConsumer/Build/Products/Debug-iphonesimulator/SecondConsumer.app",
+  "elapsed_seconds": 0.828,
+  "exit_code": 0,
+  "finished": "2026-11-11T02:09:37+00:00",
+  "log": ".autonomy/logs/F08.t802-audit-secondconsumer.log",
+  "log_sha256": "9bd77354560508c0e02ed8011196a3d7e49a95d92dfe9ac3928ad3ed299401d8",
+  "name": "t802-audit-secondconsumer",
+  "stage": "F08",
+  "started": "2026-11-11T02:09:36+00:00",
+  "timed_out": false
+}

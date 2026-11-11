@@ -250,6 +250,19 @@ class ShowcaseAuditTests(unittest.TestCase):
             code = audit.main(["--root", str(root), "--skip-packages", *extra])
         return code, out.getvalue()
 
+    def test_harness_spec_package_paths_resolve_relative_to_the_spec(self):
+        # Feature 009 T-F802: SecondConsumer.yml uses ../../Packages paths; its packages are audited, not mis-resolved.
+        spec = HERE.parent / "Harnesses" / "SecondConsumer" / "SecondConsumer.yml"
+        if not spec.exists():
+            self.skipTest("no SecondConsumer harness")
+        import contextlib, io
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(io.StringIO()):
+            code = audit.main(["--spec", "Harnesses/SecondConsumer/SecondConsumer.yml", "--target", "SecondConsumer",
+                               "--sources", "Harnesses/SecondConsumer"])
+        self.assertEqual(code, 0, out.getvalue())
+        self.assertIn("packages: checked 3", out.getvalue(), "GardenKit, VisualCore, VisualCoreRendering")
+
     def test_import_contamination(self):
         code, out = self.run_audit("import")
         self.assertEqual(code, 1)

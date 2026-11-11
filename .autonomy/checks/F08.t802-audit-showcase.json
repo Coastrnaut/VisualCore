@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "python3",
+    "scripts/audit_showcase_dependencies.py"
+  ],
+  "command": "python3 scripts/audit_showcase_dependencies.py",
+  "elapsed_seconds": 0.394,
+  "exit_code": 0,
+  "finished": "2026-11-11T02:09:38+00:00",
+  "log": ".autonomy/logs/F08.t802-audit-showcase.log",
+  "log_sha256": "21b83e0adfdb84b2a95f65729bd456329005b20e979fcec7deb697623fc95226",
+  "name": "t802-audit-showcase",
+  "stage": "F08",
+  "started": "2026-11-11T02:09:37+00:00",
+  "timed_out": false
+}

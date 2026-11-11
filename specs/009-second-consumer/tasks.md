@@ -14,7 +14,7 @@ One commit + push per task.
 
 ## Phase 2: Foundational — checks (US2, P1)
 
-- [ ] T-F802 [US2] `scripts/audit_showcase_dependencies.py`: resolve `packages:` paths relative to the spec file's directory; test in `scripts/test_scripts.py` (harness-style spec with `../../` paths); audit run on `Harnesses/SecondConsumer/SecondConsumer.yml` with target `SecondConsumer`
+- [X] T-F802 [US2] `scripts/audit_showcase_dependencies.py`: resolve `packages:` paths relative to the spec file's directory; test in `scripts/test_scripts.py` (harness-style spec with `../../` paths); audit run on `Harnesses/SecondConsumer/SecondConsumer.yml` with target `SecondConsumer` — Verified 2026-11-10: F08.t802-audit-tests: 29 script tests OK incl. new harness-spec case; F08.t802-audit-secondconsumer: spec 4, packages 3 (GardenKit, VisualCore, VisualCoreRendering), imports 12, binary 5 Mach-O — 0 findings; F08.t802-audit-showcase still exit 0 (root spec unaffected)
 - [ ] T-F803 [US2] `scripts/check_documented_api.py` (public VisualCore types/free functions referenced by the consumer must be named in package READMEs or `specs/*/contracts/*.md`; exit 0/1/2) with fixtures `scripts/fixtures/documented_api/{documented,undocumented}/` and tests in `scripts/test_scripts.py`
 
 ## Phase 3: US1 — game (P1) 🎯

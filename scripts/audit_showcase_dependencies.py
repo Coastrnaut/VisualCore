@@ -252,7 +252,8 @@ def main(argv: list[str] | None = None) -> int:
         report["layers"]["spec"] = {"checked": c1, "findings": f1}
         f2, c2 = [], []
         if not args.skip_packages:
-            roots = [root / loc for loc in used.values() if loc and not loc.startswith(("http", "git@"))]
+            # Package paths are relative to the spec file's directory (harness specs live below the repository root).
+            roots = [(spec.parent / loc).resolve() for loc in used.values() if loc and not loc.startswith(("http", "git@"))]
             f2, c2 = audit_packages([r for r in roots if not denied_text(str(r))])
             f2 += [f"packages: spec package path {r}" for r in roots if denied_text(str(r))]
         report["layers"]["packages"] = {"checked": c2, "findings": f2}
