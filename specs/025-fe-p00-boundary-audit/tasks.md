@@ -101,3 +101,10 @@ description: "Task list for feature 025 — Fractal Explorer Phase 00 boundary a
 ## Implementation strategy
 
 The matrix first (US1), then the baseline, the shell and the decision, reusing the A01-P00 tooling unchanged.
+
+## Phase 7: Convergence
+
+- [ ] T-A03-008 Correct the contract inventory's "Build" entry. `scripts/release_check.py` lists 47 steps today, not
+  30. Describe the step families instead: shared checks, per-app documented-API/isolation/host/app steps, the
+  per-app release steps from `release.json`, and the reference regression. Then re-render the contract and run
+  `check_app_contract.py --app fractal-explorer`. Covers FR-A03-001 (partial).
