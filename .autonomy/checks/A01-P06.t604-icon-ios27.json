@@ -1,0 +1,32 @@
+{
+  "argv": [
+    "xcodebuild",
+    "test",
+    "-project",
+    "VisualCore.xcodeproj",
+    "-scheme",
+    "GenerativeArtStudio",
+    "-destination",
+    "platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D",
+    "-derivedDataPath",
+    "Build/DerivedData/GenerativeArtStudio",
+    "-resultBundlePath",
+    ".autonomy/xcresults/a01p06-t604-ios27-1794380313.xcresult",
+    "-test-timeouts-enabled",
+    "YES",
+    "-default-test-execution-time-allowance",
+    "300",
+    "-only-testing:GenerativeArtStudioTests/IconRenderTests",
+    "CODE_SIGNING_ALLOWED=NO"
+  ],
+  "command": "xcodebuild test -project VisualCore.xcodeproj -scheme GenerativeArtStudio -destination 'platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D' -derivedDataPath Build/DerivedData/GenerativeArtStudio -resultBundlePath .autonomy/xcresults/a01p06-t604-ios27-1794380313.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 300 -only-testing:GenerativeArtStudioTests/IconRenderTests CODE_SIGNING_ALLOWED=NO",
+  "elapsed_seconds": 5.177,
+  "exit_code": 0,
+  "finished": "2026-11-11T06:58:38+00:00",
+  "log": ".autonomy/logs/A01-P06.t604-icon-ios27.log",
+  "log_sha256": "bfde5ba644402c9ebaebc53cf6c59ef58045c75dda38395c818a87afc92fce59",
+  "name": "t604-icon-ios27",
+  "stage": "A01-P06",
+  "started": "2026-11-11T06:58:33+00:00",
+  "timed_out": false
+}

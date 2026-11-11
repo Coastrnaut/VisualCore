@@ -46,7 +46,7 @@ or App Store Connect action. Owner steps are written down, never performed.
 
 ## Phase 2: US1 + US2 — Privacy, icon, metadata, documents (P1) 🎯
 
-- [ ] T-A01-604 [US2] Add the app icon:
+- [X] T-A01-604 [US2] Add the app icon: — Verified 2026-11-11: App icon: Resources/Assets.xcassets/AppIcon.appiconset (single 1024 universal) with icon-1024.png = the app's own render of Gradient Noise 'Dusk' at t = 12 s through ExportRunner.render + StillImageEncoder (written once with TEST_RUNNER_GAS_WRITE_ICON=1 after a black bootstrap PNG; viewed: 1024×1024 RGB, no alpha); Tests/Unit/IconRenderTests.swift checks the committed icon against a fresh render. project.yml: Resources folder, ASSETCATALOG_COMPILER_APPICON_NAME AppIcon, CFBundleShortVersionString 1.0.0, CFBundleVersion 1. Built app has CFBundleIcons/CFBundleIconName AppIcon + Assets.car and version 1.0.0. run-check A01-P06/t604-icon-ios27 + ios26: provenance mean 0.0 max 0, passed (FR-A01-604)
   - `Apps/GenerativeArtStudio/Tests/Unit/IconRenderTests.swift` renders "Dusk" at t = 12 s at 1024² through
     `ExportRunner.render`; with `GAS_WRITE_ICON=1` it writes the PNG, otherwise it compares (mean ≤ 1/255);
   - commit `Apps/GenerativeArtStudio/Resources/Assets.xcassets/AppIcon.appiconset/{Contents.json,icon-1024.png}`;
