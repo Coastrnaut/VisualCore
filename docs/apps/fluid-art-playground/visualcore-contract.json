@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "app": "fluid-art-playground",
-  "gate": "A02-P01",
+  "gate": "A02-P02",
   "date": "2026-11-11",
   "inventory": [
     {
@@ -281,23 +281,47 @@
           "symbol": "ShaderBundle",
           "product": "VisualCoreRendering",
           "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ShaderBundle.swift",
+          "symbol": "ShaderBundle.visualCoreIncludes",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/FieldGrid.swift",
+          "symbol": "FieldGrid.sampleBilinear",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FieldPass.swift",
+          "symbol": "FieldPass",
+          "product": "VisualCoreRendering",
+          "public": true
         }
       ],
       "example": {
-        "file": "Apps/GenerativeArtStudio/App/ArtSceneFactory.swift",
-        "symbol": "ArtSceneFactory"
+        "file": "Apps/FluidArtPlayground/App/FluidFieldsScene.swift",
+        "symbol": "FluidFieldsScene"
       },
-      "notes": "No fluid shaders in VisualCore by design: the solver equations are app-domain with a CPU reference (constitution A02). Shaders ship through ShaderBundle; closest consumer is A01's bundled fragment passes (gap G-SOLVER, app-local)."
+      "notes": "A02-P02: semi-Lagrangian advection and Gaussian splats are implemented app-local (FluidShaders.advect/splat with CPU references Advection and Splat in FluidArtPlaygroundCore), on the reusable exact sampler vc/field.glsl = FieldGrid.sampleBilinear; GPU equals CPU on 8x8 and 16x16 in both storages on iOS 27.2 and 26.5. Divergence, pressure (Jacobi) and projection remain for Phase 03 (gap G-SOLVER stays open, app-local by the A02 rule)."
     },
     {
       "id": "M05",
       "capability": "Touch input as simulation forces",
       "source": "brainstorm",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
-          "file": "Packages/VisualCore/Sources/VisualCoreScenes/PointerTracker.swift",
-          "symbol": "PointerTracker",
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/PointerVelocityTracker.swift",
+          "symbol": "PointerVelocityTracker",
+          "product": "VisualCoreScenes",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/PointerVelocityTracker.swift",
+          "symbol": "PointerVelocityTracker.handle",
           "product": "VisualCoreScenes",
           "public": true
         },
@@ -306,13 +330,19 @@
           "symbol": "PointerEvent",
           "product": "VisualCoreScenes",
           "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/ContentSwipeBack.swift",
+          "symbol": "contentSwipeBackDisabled",
+          "product": "VisualCoreUI",
+          "public": true
         }
       ],
       "example": {
-        "file": "Showcase/App/Scenes/DistortionScene.swift",
-        "symbol": "DistortionScene"
+        "file": "Apps/FluidArtPlayground/App/PlaygroundView.swift",
+        "symbol": "PlaygroundModel"
       },
-      "notes": "Pointer positions and phases exist; per-pointer velocity and rate-capped resampling into splats do not (gap G-POINTERVEL)."
+      "notes": "Closed in A02-P02 (G-POINTERVEL): PointerVelocityTracker resamples each finger at a spacing with a smoothed velocity, caps work per update and rejects invalid input; the app SplatQueue turns samples into capped splats; contentSwipeBackDisabled keeps paint drags from the iOS 26 content swipe-back."
     },
     {
       "id": "M06",
@@ -511,8 +541,8 @@
       ],
       "kind": "upstream",
       "owner": "app-local",
-      "phase": 2,
-      "test": "App-domain solver (advection Phase 02, divergence/Jacobi/projection Phase 03): GPU passes match the Core package's CPU reference on 8x8 and 16x16 grids within a stated tolerance; kept in the app by the A02 rule (artistic model, not a VisualCore renderer)",
+      "phase": 3,
+      "test": "App-domain solver: advection and splats done in A02-P02 (GPU = CPU reference on 8x8 and 16x16, both storages, both runtimes; AdvectionFixtureTests, SplatFixtureTests); divergence, Jacobi pressure and projection in Phase 03 against the same CPU-reference standard; kept in the app by the A02 rule (artistic model, not a VisualCore renderer)",
       "justification": "Constitution A02: the fluid solver is an isolated app-domain component with a CPU reference, not a new VisualCore renderer; its equations are product content (artistic model). The reusable machinery it runs on (G-PINGPONG, G-FIELDPASS, G-FLOATRT) is assigned to VisualCore."
     },
     {
@@ -523,7 +553,8 @@
       "kind": "adaptation",
       "owner": "VisualCore:VisualCoreScenes",
       "phase": 2,
-      "test": "PointerVelocityTracker host tests: per-pointer velocity from timestamped samples, multi-touch independence, capped samples per frame and smooth resampling between samples; the app's SplatQueue consumes it"
+      "test": "PointerVelocityTracker host tests: per-pointer velocity from timestamped samples, multi-touch independence, capped samples per frame and smooth resampling between samples; the app's SplatQueue consumes it",
+      "closed": "A02-P02"
     },
     {
       "id": "G-QUALITY",

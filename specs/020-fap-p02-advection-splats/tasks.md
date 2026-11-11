@@ -116,7 +116,7 @@ contains additions only.
 
 ## Phase 6: Polish
 
-- [ ] T-A02-214 Update `docs/apps/fluid-art-playground/visualcore-contract.json`:
+- [X] T-A02-214 Update `docs/apps/fluid-art-playground/visualcore-contract.json`: — Verified 2026-11-11: visualcore-contract.json gate A02-P02: M05 available (PointerVelocityTracker, .handle, PointerEvent, contentSwipeBackDisabled; example PlaygroundModel), G-POINTERVEL closed in A02-P02; M04 stays an upstream gap with new evidence (ShaderBundle.visualCoreIncludes, FieldGrid.sampleBilinear, FieldPass; example FluidFieldsScene) and notes that advection and splats are done; G-SOLVER kept open, moved to phase 3 for divergence/Jacobi/projection. check_app_contract --app fluid-art-playground --render PASS: 10 rows, 45 citations, 7 gaps, decision go (FR-A02-210)
   - G-POINTERVEL closed in A02-P02;
   - G-SOLVER notes record advection and splats as done, with the pressure solve left for Phase 03;
   - M04 and M05 rows updated with the new evidence.
