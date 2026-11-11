@@ -10,7 +10,7 @@ import VisualCoreScenes
 @MainActor
 final class ParticlesArtScene: ArtScene {
     let background: FullScreenShaderScene
-    private let document: ArtDocument
+    private(set) var document: ArtDocument
     private var renderer: ParticleRenderer?
     private var cursor: ParticleReplayCursor?
     private var pixelSize = (1, 1)
@@ -24,6 +24,12 @@ final class ParticlesArtScene: ArtScene {
     init(document: ArtDocument, background: FullScreenShaderScene) {
         self.document = document
         self.background = background
+    }
+
+    /// Switches to an edited composition; the next frame replays it to the current time (deterministic).
+    func update(document: ArtDocument) {
+        self.document = document
+        cursor = nil
     }
 
     private var pointSize: Vec2 { Vec2(Double(pixelSize.0) / max(displayScale, 1), Double(pixelSize.1) / max(displayScale, 1)) }

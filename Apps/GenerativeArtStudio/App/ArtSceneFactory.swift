@@ -41,6 +41,17 @@ enum ArtSceneFactory {
         }
     }
 
+    /// Applies an edited composition to a live scene (uniform values, palette, seed offsets; particles replay restart).
+    /// Values are read at render time, so rapid edits apply only the latest one at the next frame.
+    static func apply(_ document: ArtDocument, to scene: ArtScene) {
+        if let shader = scene as? FullScreenShaderScene {
+            configure(shader, document: document)
+        } else if let particles = scene as? ParticlesArtScene {
+            particles.update(document: document)
+            configure(particles.background, document: document)
+        }
+    }
+
     /// Binds a document's values, palette (linear light) and seed offsets.
     static func configure(_ scene: FullScreenShaderScene, document: ArtDocument) {
         scene.parameters = document.parameters

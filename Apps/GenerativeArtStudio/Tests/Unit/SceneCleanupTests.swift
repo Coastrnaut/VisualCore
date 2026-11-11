@@ -32,8 +32,9 @@ final class SceneCleanupTests: XCTestCase {
     func testReduceMotionHalvesTheTimeScale() {
         let slow = SceneModel(family: FamilyCatalog.family(.particles), reduceMotion: true)
         let normal = SceneModel(family: FamilyCatalog.family(.particles), reduceMotion: false)
-        XCTAssertEqual(slow.scene.timeScale, 0.5)
-        XCTAssertEqual(normal.scene.timeScale, 1)
+        XCTAssertTrue(slow.clocked.clock.reducedMotion)
+        XCTAssertFalse(normal.clocked.clock.reducedMotion)
+        XCTAssertEqual(SceneModel.reducedMotionTimeScale, 0.5)
         slow.close(); normal.close()
         XCTAssertEqual((slow.host?.resources.stats.leaked ?? 0) + (normal.host?.resources.stats.leaked ?? 0), 0)
     }
