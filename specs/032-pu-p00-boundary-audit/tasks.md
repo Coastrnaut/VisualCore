@@ -1,0 +1,48 @@
+---
+
+description: "Task list for feature 032 — Particle Universe Phase 00 boundary audit (ledger gate A04-P00)"
+---
+
+# Tasks: Particle Universe — Phase 00 boundary audit
+
+**Input**: `/specs/032-pu-p00-boundary-audit/`.
+
+**Tests** are required: the shared contract check; the shell smoke test on both simulators, enumeration-guarded; the
+reference regression.
+
+**Conventions**: IDs `T-A04-0##`, one commit and push per task (`scripts/tick_task.py`); commands through
+`run-check --stage A04-P00`. Review checkpoint after each phase: `validate_docs.py` and
+`check_app_contract.py --app particle-universe` pass.
+
+## Phase 1: Setup
+
+- [ ] T-A04-001 Create `docs/apps/particle-universe/regression-baseline.md` with the phase-start commit (the A04 `speckit-constitution` commit `d425f7d`, before any A04 file) and the reference pin `d93edd1`, the base of the no-change diff for `Packages/` and `External/` (FR-A04-007).
+
+## Phase 2: US1 — Evidence-backed integration matrix (P1) 🎯
+
+- [ ] T-A04-002 [US1] Write `docs/apps/particle-universe/visualcore-contract.json` (schema 1, app `particle-universe`, gate A04-P00): an `inventory` covering every area in FR-A04-001 with paths; `matrix` rows M01–M10 per research R1–R10 (five brainstorm rows: GPU-oriented simulation, buffer management, instanced rendering, blending and trails, interaction parameters; five v0.1 rows: emitter families with bounded counts, attractors/repulsors/gravity/wind, size/lifetime/gradient/trail strength, pause/reseed/save, device-adaptive quality and reduced flash). Each row cites only public non-test symbols with an example consumer. Run `check_app_contract.py --app particle-universe`; citation problems must be 0 (SC-A04-001, SC-A04-002).
+
+## Phase 3: US2 — Host, thread, build and regression baseline (P1)
+
+- [ ] T-A04-003 [US2] Run the 7-step reference regression in two `run-check` chunks (A04-P00) and record the steps, commands and results in `docs/apps/particle-universe/regression-baseline.md` (FR-A04-004, SC-A04-004).
+
+## Phase 4: US3 — Compilable empty app shell (P1)
+
+- [ ] T-A04-004 [US3] Add the shell: `Apps/ParticleUniverse/App/ParticleUniverseApp.swift` (@main SwiftUI app, `HomeView` with title "Particle Universe", identifier `pu.home.title`, accessibility label and header trait, container `pu.home`, accent tint via VisualCoreUI `AccessibleColors`); `project.yml` target `ParticleUniverse` (bundle `dev.visualcore.ParticleUniverse`, iOS 26.0, version 0.1.0 (1), `ITSAppUsesNonExemptEncryption` false, the dependency-audit post-build script, no usage descriptions), target `ParticleUniverseUITests` and the scheme; Info.plists generated under the gitignored `Apps/ParticleUniverse/Generated/`. Build for the generic iOS Simulator and run `check_dependencies.py` (FR-A04-005, FR-A04-006).
+- [ ] T-A04-005 [US3] Add `Apps/ParticleUniverse/Tests/UI/LaunchSmokeUITests.swift` (launch, `pu.home.title` exists with label "Particle Universe") and run it on iOS 27.2 and 26.5, enumeration-guarded (SC-A04-003).
+
+## Phase 5: US4 — Gap register and stop/go decision (P2)
+
+- [ ] T-A04-006 [US4] Complete the contract JSON: `gaps` for every non-available row (G-EMITTERS VisualCoreSimulation phase 1; G-FIELDS VisualCoreSimulation phase 2; G-PQUALITY VisualCoreDiagnostics phase 2; G-BLENDTRAIL VisualCoreRendering phase 3; G-PSCENE app-local on NamedLibrary phase 4; G-GPUSIM later idea with the CPU decision) each with a test intent; `traceability` for v0.1 features 01–06 and journeys 1–3; `negative` rules (FR-A04-011); the go/stop `decision`. Render and check (FR-A04-008–011, SC-A04-005, SC-A04-007).
+
+## Phase 6: Polish
+
+- [ ] T-A04-007 Confirm `git diff --stat d425f7d..HEAD -- Packages External` is empty (SC-A04-006); run the release-check fast steps (docs, app-contracts, compliance, dependencies, licenses, script-tests) and the documented-API check for `Apps/ParticleUniverse`.
+
+## Dependencies
+
+- 001 first; 002 and 003 independent; 004 → 005; 006 after 002; 007 last.
+
+## Implementation strategy
+
+Matrix first (the evidence every later phase relies on), then the baseline, shell, register and checks.
