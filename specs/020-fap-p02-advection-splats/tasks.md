@@ -60,7 +60,7 @@ contains additions only.
   - "maxSplatsPerFrame 16 in 1…64".
 
   Extend `FluidConfigurationTests` (FR-A02-209).
-- [ ] T-A02-207 [US1] Tests first, then add `Splat.swift` (Core):
+- [X] T-A02-207 [US1] Tests first, then add `Splat.swift` (Core): — Verified 2026-11-11: Splat (validated init: nil for non-finite, position 0...1, radius 0.005...0.25, |force| <= 10,000 scaled keeping direction, color 0...1, wasClamped; center/radiusCells/weight exp(-d^2/r^2) in cells; CPU apply: velocity channels 0-1 += force*w (optionally decoded and re-encoded), dye RGB += color*w, alpha unchanged, rounded to storage). SplatTests 5: validation, Gaussian weight and aspect, dye/force values at a cell, corner splat stays finite in-grid (analyze C2), encoded velocity clamps and does not wrap, unorm dye saturates. run-check A02-P02/t207-core-test swift test 20/20 pass (FR-A02-203, FR-A02-205)
   - validated init: nil for non-finite input; position clamped 0…1; radius 0.005…0.25; |force| ≤ 10,000 (scaled);
     color 0…1; `wasClamped`;
   - the CPU `apply(to:dye:precision:velocityEncoding:)` Gaussian `exp(−d²/r²)`, with d in cells (aspect-correct) and
