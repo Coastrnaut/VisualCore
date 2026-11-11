@@ -26,7 +26,7 @@ IDs `T-F3##`. Tick only with `— Verified YYYY-MM-DD: <command/result>`. One co
 ## Phase 3: US1 — Shaders with clear errors (P1) 🎯 MVP
 
 - [ ] T-F310 [US1] (SC-F301, FR-F305) Sim tests `ShaderProgramTests.swift`: real ANGLE compile error in an included snippet maps to snippet file/line; failed replacement keeps the old program drawing; captured raw ANGLE log is printed to the test log and matches the InfoLogParser fixture format
-- [ ] T-F311 [US1] Implement `Packages/VisualCoreRendering/Sources/VisualCoreRendering/ShaderProgram.swift` (compile/link via vcgl, uniform table from active uniforms, `ShaderError`)
+- [X] T-F311 [US1] Implement `Packages/VisualCoreRendering/Sources/VisualCoreRendering/ShaderProgram.swift` (compile/link via vcgl, uniform table from active uniforms, `ShaderError`) — Verified 2026-11-10: F03.t311-shaderprogram-ios27 exit 0, 21/21 (ShaderProgram + registry.program core; textures/buffers/targets remain T-F313)
 
 ## Phase 4: US2 — Textures, buffers, framebuffers (P1)
 

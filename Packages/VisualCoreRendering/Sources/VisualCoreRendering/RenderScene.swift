@@ -2,14 +2,23 @@
 // Contract: specs/003-rendering-lifecycle/contracts/render-host-api.md.
 import VisualCoreDiagnostics
 
-/// Everything a scene may use during a host callback. Valid only inside that callback.
-public struct RenderContext: Sendable, Equatable {
+/// Everything a scene may use during a host callback. Valid only inside that callback, on the main
+/// thread, so it is not `Sendable` (feature 004 analyze I1).
+@MainActor
+public struct RenderContext: Equatable {
     /// Context generation (Constitution III): GPU objects from another generation are invalid.
     public let generation: Int
     public let pixelWidth: Int
     public let pixelHeight: Int
     /// The framebuffer to draw into (0 = the window surface).
     public let framebuffer: UInt32
+    /// The host's resource registry (one per host; feature 004).
+    public let resources: ResourceRegistry
+
+    public nonisolated static func == (a: RenderContext, b: RenderContext) -> Bool {
+        a.generation == b.generation && a.pixelWidth == b.pixelWidth && a.pixelHeight == b.pixelHeight
+            && a.framebuffer == b.framebuffer && a.resources === b.resources
+    }
 }
 
 /// Timing of one frame.

@@ -1,0 +1,26 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/VisualCoreRendering",
+    "--scheme",
+    "VisualCoreRendering-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--result-name",
+    "F03-t311-ios27"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --result-name F03-t311-ios27",
+  "elapsed_seconds": 6.942,
+  "exit_code": 0,
+  "finished": "2026-11-11T00:08:34+00:00",
+  "log": ".autonomy/logs/F03.t311-shaderprogram-ios27.log",
+  "log_sha256": "a32609e038954a67dc68cf870f5d648d345b826d59f0cb79b6a8a9a837f855e2",
+  "name": "t311-shaderprogram-ios27",
+  "stage": "F03",
+  "started": "2026-11-11T00:08:27+00:00",
+  "timed_out": false
+}

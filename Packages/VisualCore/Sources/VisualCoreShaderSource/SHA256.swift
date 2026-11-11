@@ -55,3 +55,14 @@ enum SHA256 {
 
     private static func rotr(_ x: UInt32, _ n: UInt32) -> UInt32 { (x >> n) | (x << (32 - n)) }
 }
+
+/// Program cache keys (FR-F306): SHA-256 over both expanded stages, whose text already contains the
+/// sorted `#define` lines, so variants with different defines get different keys.
+public enum ShaderCacheKey {
+    public static func make(vertex: ExpandedShader, fragment: ExpandedShader) -> String {
+        SHA256.hex(of: Array(vertex.text.utf8) + [0] + Array(fragment.text.utf8))
+    }
+
+    /// SHA-256 hex of arbitrary text (fixtures, reports).
+    public static func sha256Hex(_ text: String) -> String { SHA256.hex(of: Array(text.utf8)) }
+}

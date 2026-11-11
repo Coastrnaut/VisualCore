@@ -30,6 +30,8 @@ public final class RenderHost {
     public private(set) var pixelSize: (width: Int, height: Int) = (0, 0)
     public private(set) var presentedFrameCount = 0
     public var framePacing: FramePacing { scheduler.pacing }
+    /// GPU objects of this host (feature 004): budgets, stale/leak accounting, program creation.
+    public private(set) var resources: ResourceRegistry
 
     // MARK: Private state
 
@@ -62,13 +64,14 @@ public final class RenderHost {
 
     /// Creates the context and runs `scene.setup`. The window surface is created on the first layout
     /// with a non-zero size. Throws `RenderHostError.unsupported` when ANGLE cannot provide ES 3.0.
-    public init(scene: RenderScene, maxFramesPerSecond: Int = 60) throws {
+    public init(scene: RenderScene, maxFramesPerSecond: Int = 60, budget: ResourceBudget = ResourceBudget()) throws {
         Self.assertMainThread()
         (display, config) = try EGLDisplayProvider.shared()
         self.scene = scene
         self.maxFramesPerSecond = maxFramesPerSecond
         (context, placeholder) = try Self.makeContext(display: display, config: config)
         surface = nil
+        resources = ResourceRegistry(budget: budget, generation: 0)
         let missing = vcglLoadFromEGL()
         guard missing == 0 else {
             eglMakeCurrent(display, nil, nil, nil)
@@ -77,6 +80,7 @@ public final class RenderHost {
             throw RenderHostError.unsupported("\(missing) OpenGL ES 3.0 entry points missing from ANGLE")
         }
         lifecycle.transition(to: .surfaceReady)
+        resources.contextDidStart(generation: lifecycle.generation)
         capabilities = RenderCapabilities.query(display: display)
         setupScene()
         renderView.onLayout = { [weak self] in self?.layoutSurface() }
@@ -131,7 +135,8 @@ public final class RenderHost {
     // MARK: Scene
 
     private var renderContext: RenderContext {
-        RenderContext(generation: lifecycle.generation, pixelWidth: pixelSize.width, pixelHeight: pixelSize.height, framebuffer: 0)
+        RenderContext(generation: lifecycle.generation, pixelWidth: pixelSize.width, pixelHeight: pixelSize.height, framebuffer: 0,
+                      resources: resources)
     }
 
     private func setupScene() {
@@ -294,6 +299,8 @@ public final class RenderHost {
     public func recreateContext() {
         guard state != .destroyed, state != .uninitialized else { return }
         teardownScene()
+        makeCurrent()
+        resources.contextWillEnd()
         eglMakeCurrent(display, nil, nil, nil)
         if let surface { eglDestroySurface(display, surface) }
         surface = nil
@@ -313,6 +320,7 @@ public final class RenderHost {
             return
         }
         _ = vcglLoadFromEGL()
+        resources.contextDidStart(generation: lifecycle.generation)
         setupScene()
         layoutSurface()
         if state == .reinitialized { enterSurfaceInvalid() }   // no valid size yet
@@ -415,6 +423,8 @@ public final class RenderHost {
         for t in notificationTokens { NotificationCenter.default.removeObserver(t) }
         notificationTokens.removeAll()
         teardownScene()
+        makeCurrent()
+        resources.contextWillEnd()
         eglMakeCurrent(display, nil, nil, nil)
         if let surface { eglDestroySurface(display, surface) }
         if let placeholder { eglDestroySurface(display, placeholder) }
