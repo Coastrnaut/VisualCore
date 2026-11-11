@@ -19,7 +19,7 @@ IDs `T-F3##`. Tick only with `— Verified YYYY-MM-DD: <command/result>`. One co
 - [X] T-F304 (FR-F301–F303, FR-F317, SC-F302) Tests `ShaderLibraryTests.swift`: version insertion, defines after version, nested includes with line map (file/line per expanded line), 64 KiB limit, depth 8 limit, cycle, unknown include (file+line), `#version 100` rejected, variant keys differ by defines — Verified 2026-11-10: 11 tests committed first (8518ee7), all pass in F03.t305-shaderlibrary
 - [X] T-F305 (FR-F301–F303, FR-F317) Implement `ShaderLibrary.swift`, `LineMap` (in same file), errors `ShaderSourceError` — Verified 2026-11-10: F03.t305-shaderlibrary exit 0: 11 ShaderLibrary tests pass
 - [ ] T-F306 (FR-F304) Tests `InfoLogParserTests.swift` for `ERROR: 0:N: msg`, warnings, unparseable → raw "unknown"; mapping through `ExpandedShader`
-- [ ] T-F307 (FR-F304) Implement `InfoLogParser.swift`, `ShaderDiagnostic`, `ShaderStage`
+- [X] T-F307 (FR-F304) Implement `InfoLogParser.swift`, `ShaderDiagnostic`, `ShaderStage` — Verified 2026-11-10: F03.t307-infolog exit 0: 4 parser tests pass (19 total in module)
 - [ ] T-F308 (FR-F309–F311, SC-F305) Tests `Packages/VisualCore/Tests/VisualCoreDiagnosticsTests/ResourceLedgerTests.swift`: per-kind/total budgets, refusal without change, release to zero, peak, stale, leak accounting, warnings dedupe
 - [ ] T-F309 (FR-F309–F311) Implement `Packages/VisualCore/Sources/VisualCoreDiagnostics/ResourceLedger.swift`
 
