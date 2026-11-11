@@ -1,0 +1,22 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/VisualCoreRendering",
+    "--scheme",
+    "VisualCoreRendering-Package",
+    "--destination",
+    "generic-ios"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination generic-ios",
+  "elapsed_seconds": 5.152,
+  "exit_code": 0,
+  "finished": "2026-11-11T00:59:28+00:00",
+  "log": ".autonomy/logs/F05.t522-generic-ios.log",
+  "log_sha256": "214e2ca850c0f2f8017079afff3cb66a230c33675bedb6a3daf49d13338ffe05",
+  "name": "t522-generic-ios",
+  "stage": "F05",
+  "started": "2026-11-11T00:59:23+00:00",
+  "timed_out": false
+}

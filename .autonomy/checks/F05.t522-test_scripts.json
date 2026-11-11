@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "python3",
+    "scripts/test_scripts.py"
+  ],
+  "command": "python3 scripts/test_scripts.py",
+  "elapsed_seconds": 0.194,
+  "exit_code": 0,
+  "finished": "2026-11-11T00:59:36+00:00",
+  "log": ".autonomy/logs/F05.t522-test_scripts.log",
+  "log_sha256": "3c0e24e793e21bdd81098697edc85a6e806448b5df64680cdc34b798571a9ef1",
+  "name": "t522-test_scripts",
+  "stage": "F05",
+  "started": "2026-11-11T00:59:36+00:00",
+  "timed_out": false
+}

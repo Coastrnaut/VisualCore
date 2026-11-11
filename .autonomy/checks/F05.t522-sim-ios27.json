@@ -1,0 +1,26 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/VisualCoreRendering",
+    "--scheme",
+    "VisualCoreRendering-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--result-name",
+    "F05-t522-ios27"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --result-name F05-t522-ios27",
+  "elapsed_seconds": 6.237,
+  "exit_code": 0,
+  "finished": "2026-11-11T00:59:06+00:00",
+  "log": ".autonomy/logs/F05.t522-sim-ios27.log",
+  "log_sha256": "89d1a37c1767bd63a0b7ca3b96492d17dd758370bfd61880a5c8e382f9e96810",
+  "name": "t522-sim-ios27",
+  "stage": "F05",
+  "started": "2026-11-11T00:58:59+00:00",
+  "timed_out": false
+}
