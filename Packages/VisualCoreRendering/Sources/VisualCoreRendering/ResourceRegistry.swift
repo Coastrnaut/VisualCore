@@ -31,6 +31,7 @@ public final class ResourceRegistry {
     /// Called by the host after scene teardown and before the old context is destroyed: anything
     /// still live is counted as leaked and forgotten (no GL calls on a dead context).
     func contextWillEnd() {
+        pool.removeAll()   // pooled targets are live objects: counted by abandonAll below
         ledger.abandonAll()
         willEndContext()
     }
@@ -42,6 +43,126 @@ public final class ResourceRegistry {
     var willEndContext: () -> Void = {}
 
     func warn(_ message: String) -> Bool { ledger.warn(message) }
+
+    // MARK: Textures, buffers, render targets (FR-F308, FR-F313)
+
+    /// Set by the host from its capabilities.
+    var maxTextureSize = 4096
+
+    private func validate(_ width: Int, _ height: Int) throws(ResourceError) {
+        guard width > 0, height > 0, width <= maxTextureSize, height <= maxTextureSize else {
+            throw .invalidSize(width: width, height: height, max: maxTextureSize)
+        }
+    }
+
+    public func makeTexture(width: Int, height: Int, format: TextureFormat = .rgba8, label: String) throws -> Texture {
+        try validate(width, height)
+        let bytes = width * height * format.bytesPerPixel
+        try ledger.allocate(.texture, bytes: bytes)
+        let name = Self.allocateTexture(width: width, height: height, format: format)
+        return Texture(handle: GPUHandle(kind: .texture, name: name, bytes: bytes, generation: generation, label: label),
+                       width: width, height: height, format: format, registry: self)
+    }
+
+    public func makeBuffer(bytes: Int, label: String) throws -> GPUBuffer {
+        try ledger.allocate(.buffer, bytes: bytes)
+        var name: GLuint = 0
+        vcglGenBuffers(1, &name)
+        vcglBindBuffer(GLenum(GL_ARRAY_BUFFER), name)
+        vcglBufferData(GLenum(GL_ARRAY_BUFFER), bytes, nil, GLenum(GL_DYNAMIC_DRAW))
+        return GPUBuffer(handle: GPUHandle(kind: .buffer, name: name, bytes: bytes, generation: generation, label: label), registry: self)
+    }
+
+    public func makeRenderTarget(width: Int, height: Int, format: TextureFormat = .rgba8, label: String) throws -> RenderTarget {
+        try validate(width, height)
+        let bytes = width * height * format.bytesPerPixel
+        try ledger.allocate(.framebuffer, bytes: bytes)
+        let texture = Self.allocateTexture(width: width, height: height, format: format)
+        var framebuffer: GLuint = 0
+        vcglGenFramebuffers(1, &framebuffer)
+        vcglBindFramebuffer(GLenum(GL_FRAMEBUFFER), framebuffer)
+        vcglFramebufferTexture2D(GLenum(GL_FRAMEBUFFER), GLenum(GL_COLOR_ATTACHMENT0), GLenum(GL_TEXTURE_2D), texture, 0)
+        let status = vcglCheckFramebufferStatus(GLenum(GL_FRAMEBUFFER))
+        guard status == GLenum(GL_FRAMEBUFFER_COMPLETE) else {
+            vcglDeleteFramebuffers(1, &framebuffer)
+            var t = texture
+            vcglDeleteTextures(1, &t)
+            ledger.release(.framebuffer, bytes: bytes)
+            throw ResourceError.incompleteFramebuffer(status)
+        }
+        return RenderTarget(handle: GPUHandle(kind: .framebuffer, name: framebuffer, bytes: bytes, generation: generation, label: label),
+                            colorTexture: texture, width: width, height: height, format: format, registry: self)
+    }
+
+    private static func allocateTexture(width: Int, height: Int, format: TextureFormat) -> GLuint {
+        var name: GLuint = 0
+        vcglGenTextures(1, &name)
+        vcglBindTexture(GLenum(GL_TEXTURE_2D), name)
+        let f = format.gl
+        vcglTexImage2D(GLenum(GL_TEXTURE_2D), 0, f.internal, GLsizei(width), GLsizei(height), 0, f.format, f.type, nil)
+        vcglTexParameteri(GLenum(GL_TEXTURE_2D), GLenum(GL_TEXTURE_MIN_FILTER), GL_LINEAR)
+        vcglTexParameteri(GLenum(GL_TEXTURE_2D), GLenum(GL_TEXTURE_MAG_FILTER), GL_LINEAR)
+        vcglTexParameteri(GLenum(GL_TEXTURE_2D), GLenum(GL_TEXTURE_WRAP_S), GL_CLAMP_TO_EDGE)
+        vcglTexParameteri(GLenum(GL_TEXTURE_2D), GLenum(GL_TEXTURE_WRAP_T), GL_CLAMP_TO_EDGE)
+        return name
+    }
+
+    /// Releases a texture, buffer or render target. Stale or already released objects are ignored
+    /// (their GL names died with the old context).
+    public func release(_ resource: some GPUResource) {
+        switch resource {
+        case let t as Texture:
+            guard !t.released else { return }
+            t.released = true
+            guard accept(generation: t.handle.generation) else { return }
+            var name = t.handle.name
+            vcglDeleteTextures(1, &name)
+        case let b as GPUBuffer:
+            guard !b.released else { return }
+            b.released = true
+            guard accept(generation: b.handle.generation) else { return }
+            var name = b.handle.name
+            vcglDeleteBuffers(1, &name)
+        case let r as RenderTarget:
+            guard !r.released else { return }
+            r.released = true
+            guard accept(generation: r.handle.generation) else { return }
+            var fb = r.handle.name, tex = r.colorTexture
+            vcglDeleteFramebuffers(1, &fb)
+            vcglDeleteTextures(1, &tex)
+        default:
+            return
+        }
+        ledger.release(resource.handle.kind, bytes: resource.handle.bytes)
+    }
+
+    // MARK: Render-target pool (FR-F312)
+
+    private struct PoolKey: Hashable { let width: Int, height: Int, format: String }
+    private var pool: [PoolKey: [RenderTarget]] = [:]
+
+    /// A pooled target of this size and format (reused when one is free).
+    public func acquireTarget(width: Int, height: Int, format: TextureFormat = .rgba8) throws -> RenderTarget {
+        let key = PoolKey(width: width, height: height, format: "\(format)")
+        if var free = pool[key], let target = free.popLast() {
+            pool[key] = free
+            return target
+        }
+        return try makeRenderTarget(width: width, height: height, format: format, label: "pool \(width)x\(height)")
+    }
+
+    /// Returns a target to the pool for reuse.
+    public func recycle(_ target: RenderTarget) {
+        guard !target.released, target.handle.generation == generation else { return }
+        pool[PoolKey(width: target.width, height: target.height, format: "\(target.format)"), default: []].append(target)
+    }
+
+    /// Frees every pooled (unused) target, e.g. on a memory warning.
+    public func trimPools() {
+        let free = pool.values.flatMap { $0 }
+        pool.removeAll()
+        for target in free { release(target) }
+    }
 
     // MARK: Programs (FR-F301–FR-F307)
 

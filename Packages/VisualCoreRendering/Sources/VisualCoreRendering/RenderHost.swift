@@ -82,6 +82,7 @@ public final class RenderHost {
         lifecycle.transition(to: .surfaceReady)
         resources.contextDidStart(generation: lifecycle.generation)
         capabilities = RenderCapabilities.query(display: display)
+        resources.maxTextureSize = capabilities.maxTextureSize
         setupScene()
         renderView.onLayout = { [weak self] in self?.layoutSurface() }
         renderView.onWindowChange = { [weak self] inWindow in self?.windowChanged(inWindow) }
@@ -277,6 +278,13 @@ public final class RenderHost {
                 vcglFinish()   // iOS forbids GPU work in the background: drain before suspending
                 self.backgrounded = true
                 self.applySuspension()
+            }
+        })
+        notificationTokens.append(center.addObserver(forName: UIApplication.didReceiveMemoryWarningNotification, object: nil, queue: .main) { [weak self] _ in
+            MainActor.assumeIsolated {
+                guard let self, self.state != .destroyed else { return }
+                self.makeCurrent()
+                self.resources.trimPools()   // FR-F312
             }
         })
         notificationTokens.append(center.addObserver(forName: UIApplication.willEnterForegroundNotification, object: nil, queue: .main) { [weak self] _ in
