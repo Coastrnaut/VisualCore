@@ -88,7 +88,7 @@ IDs are `T-A02-3##`, with one commit and push per task (`scripts/tick_task.py`).
 
 ## Phase 5: User Story 4 — automatic quality (P2)
 
-- [ ] T-A02-308 [US4] Tests first: add `FluidQuality.swift` (Core): tiers Full, Reduced and Minimal, with
+- [X] T-A02-308 [US4] Tests first: add `FluidQuality.swift` (Core): tiers Full, Reduced and Minimal, with — Verified 2026-11-11: FluidQuality (Core: Full/Reduced/Minimal; Reduced halves iterations, Minimal quarters them and halves the splat cap, floors 1; FluidQualityTests 2) and PlaygroundModel wiring: VisualCore QualityPolicy decides each stepped frame from injectable deviceState (ProcessInfo thermalState and isLowPowerModeEnabled by default) and clock (CACurrentMediaTime), sets scene.qualityIterations and drains the queue under the tier's splat cap; tier and tierName shown in Adjust. QualityWiringTests 3: serious -> Reduced with 10 iterations and the full splat cap, then Minimal with 5 iterations and 8 splats drained from 20 queued (the queue is not cleared); Low Power ceiling held and recovery to Full after 10 s calm; user iterations are the upper bound (6 -> 3 at critical). run-check A02-P03/t308-core-test pass; t308-app-27 and t308-app-26 TEST SUCCEEDED, enumeration guard 35/35 each; isolation and documented-API PASS (FR-A02-308)
   "Reduced = max(1, it/2); Minimal = max(1, it/4) and max(1, cap/2)". Wire `QualityPolicy` into `PlaygroundModel`:
   `ProcessInfo.thermalState` and `isLowPowerModeEnabled` are read every frame through an injectable provider. The
   tier's iterations and splat cap reach the scene and the queue drain. The tier label is shown. Add

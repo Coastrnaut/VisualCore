@@ -4,7 +4,9 @@
 // become evenly spaced samples (VisualCore PointerVelocityTracker) and capped splats (SplatQueue), drained once per
 // rendered frame. "Add splash" is the control alternative to swiping. Touch paths are never recorded or stored.
 import FluidArtPlaygroundCore
+import QuartzCore
 import SwiftUI
+import VisualCoreDiagnostics
 import VisualCoreMath
 import VisualCoreRendering
 import VisualCoreScenes
@@ -22,8 +24,19 @@ final class PlaygroundModel {
     var configuration: FluidConfiguration {
         didSet { scene.update(configuration: configuration) }
     }
-    /// The automatic quality tier's name (feature 021 T-A02-308 sets it from the quality policy).
-    private(set) var tierName = "Full"
+    /// The automatic quality tier (feature 021 T-A02-308; FR-A02-308), decided every stepped frame by VisualCore's
+    /// QualityPolicy from the thermal state and Low Power Mode, read locally and never stored.
+    private(set) var tier = 0
+    /// The current tier's name, shown in the Adjust panel.
+    private(set) var tierName = FluidQuality.name(0)
+    private var policy = QualityPolicy(tierCount: FluidQuality.tierCount)
+    /// Test seam: the device state (default: ProcessInfo's thermal state and Low Power Mode).
+    var deviceState: () -> (thermal: FramePacing.Thermal, lowPower: Bool) = {
+        let info = ProcessInfo.processInfo
+        return (FramePacing.Thermal(rawValue: info.thermalState.rawValue) ?? .nominal, info.isLowPowerModeEnabled)
+    }
+    /// Test seam: monotonic seconds (default: CACurrentMediaTime).
+    var clock: () -> Double = { CACurrentMediaTime() }
     private var tracker = PointerVelocityTracker(spacing: 1)
 
     init(configuration: FluidConfiguration = FluidConfiguration(), maxEdge: Int = 512) {
@@ -76,7 +89,19 @@ final class PlaygroundModel {
         AccessibilityNotification.Announcement("Splash added").post()
     }
 
-    private func drain() -> [Splat] { queue.drain() }
+    /// Called once per stepped frame: decide the tier, apply its iterations to the scene and drain the queue under its
+    /// splat cap. The queue itself is never cleared by a tier change.
+    private func drain() -> [Splat] {
+        let state = deviceState()
+        let decided = policy.decide(thermal: state.thermal, lowPower: state.lowPower, now: clock())
+        if decided != tier {
+            tier = decided
+            tierName = FluidQuality.name(decided)
+        }
+        let parameters = FluidQuality.parameters(tier: tier, configuration: configuration)
+        scene.qualityIterations = parameters.iterations
+        return queue.drain(max: parameters.splatCap)
+    }
 
     /// The spoken canvas value.
     var description: String {
