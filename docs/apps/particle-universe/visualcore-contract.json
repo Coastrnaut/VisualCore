@@ -1,0 +1,479 @@
+{
+  "schema": 1,
+  "app": "particle-universe",
+  "gate": "A04-P00",
+  "date": "2026-11-11",
+  "inventory": [
+    {
+      "area": "Package products",
+      "description": "Pure, host-testable modules (Packages/VisualCore): Math, Simulation (SceneClock, FixedStepClock, SeededRandom, AccessibilityPreferences), Scenes (PointerTracker, ExportGeometry), ShaderSource, EffectsGraph, Diagnostics (FramePacing), Parameters, Persistence, TestSupport (+ placeholder AudioDSP). iOS modules (Packages/VisualCoreRendering): Rendering, Effects, UI, Automation (Debug/measurement) (+ placeholder Audio). Rules R1-R5 enforced by scripts/check_dependencies.py.",
+      "paths": [
+        "Packages/VisualCore/Package.swift",
+        "Packages/VisualCoreRendering/Package.swift",
+        "specs/002-architecture-contracts/contracts/package-map.md"
+      ],
+      "owner": "VisualCore packages (ADR-0003)"
+    },
+    {
+      "area": "EGL render host and thread",
+      "description": "RenderHost owns the EGL display/context/surfaces over ANGLE's Metal backend, a CAMetalLayer RenderView, a frame scheduler and context generations. All GL work runs on the main thread (@MainActor; dispatchPrecondition in DEBUG). pause/resume, recreateContext (context loss) and destroy; scenes implement RenderScene setup/resize/render/teardown.",
+      "paths": [
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderScene.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderView.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FrameScheduler.swift"
+      ],
+      "owner": "VisualCoreRendering (ADR-0002 seam)"
+    },
+    {
+      "area": "Resources and budgets",
+      "description": "ResourceRegistry creates textures, buffers, render targets and programs under a ResourceBudget, pools render targets, caches programs, counts leaks and rejects stale handles after a generation change.",
+      "paths": [
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GPUObjects.swift",
+        "Packages/VisualCore/Sources/VisualCoreDiagnostics/ResourceLedger.swift"
+      ],
+      "owner": "VisualCoreRendering + VisualCoreDiagnostics"
+    },
+    {
+      "area": "Shaders",
+      "description": "ShaderLibrary expands includes and defines with line maps; ResourceRegistry.program compiles/links through ANGLE and reports ShaderDiagnostic file:line; color-space policy in docs/rendering/color-space.md.",
+      "paths": [
+        "Packages/VisualCore/Sources/VisualCoreShaderSource/ShaderLibrary.swift",
+        "Packages/VisualCore/Sources/VisualCoreShaderSource/InfoLogParser.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
+        "docs/rendering/color-space.md"
+      ],
+      "owner": "VisualCoreShaderSource + VisualCoreRendering"
+    },
+    {
+      "area": "Effects",
+      "description": "Versioned effect-graph description, validator (≤ 32 passes, memory quota) and GPU executor with 8 pass types; EffectScene wraps any scene and adds the Reduce Flashing limiter.",
+      "paths": [
+        "Packages/VisualCore/Sources/VisualCoreEffectsGraph/EffectGraph.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreEffects/EffectScene.swift"
+      ],
+      "owner": "VisualCoreEffectsGraph + VisualCoreEffects"
+    },
+    {
+      "area": "Scenes, input, simulation",
+      "description": "Pointer tracking and tap/drag/pinch/rotate recognizers, scene graph and mesh generators; fixed-step clock, seeded RNG, timelines/tweens and particle system; primitive/particle/mesh renderers and the UIKit touch adapter.",
+      "paths": [
+        "Packages/VisualCore/Sources/VisualCoreScenes/GestureRecognizers.swift",
+        "Packages/VisualCore/Sources/VisualCoreSimulation/Timeline.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/PrimitiveRenderer.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderView+Touches.swift"
+      ],
+      "owner": "VisualCoreScenes + VisualCoreSimulation + VisualCoreRendering"
+    },
+    {
+      "area": "Build",
+      "description": "XcodeGen 2.46.0 specs (root project.yml for Showcase and app targets; harness specs), package schemes via scripts/xcodebuild_package.py, unsigned simulator builds, and scripts/release_check.py (47 steps at A03-P00, listed by --list): shared checks (docs, compliance, dependencies, public API, licenses, script tests, contracts), per-app documented-API, isolation, host and simulator app steps, per-app release steps generated from docs/apps/<slug>/release.json, and the reference regression steps.",
+      "paths": [
+        "project.yml",
+        "scripts/xcodebuild_package.py",
+        "scripts/release_check.py",
+        ".github/workflows/ci.yml"
+      ],
+      "owner": "repository tooling"
+    },
+    {
+      "area": "ProjectM regression",
+      "description": "Reference pinned at d93edd1 (ADR-0005), read-only; baseline steps via scripts/run_reference_baseline.py, read-only check scripts/check_reference_clean.py, ProjectMReference harness tests.",
+      "paths": [
+        "scripts/run_reference_baseline.py",
+        "scripts/check_reference_clean.py",
+        "Harnesses/ProjectMReference/ProjectMReference.yml"
+      ],
+      "owner": "reference adapter (harness only)"
+    },
+    {
+      "area": "Source ownership",
+      "description": "Apps own product composition, content and one-off rules (Apps/<Name>/); VisualCore owns reusable logic (constitution 1.2.0 Principle II 'Maximize reuse'); ProjectM stays in the harness (R1).",
+      "paths": [
+        "specs/002-architecture-contracts/contracts/package-map.md",
+        ".specify/memory/constitution.md"
+      ],
+      "owner": "constitution + package map"
+    },
+    {
+      "area": "Test support",
+      "description": "VisualCoreTestSupport (test targets only): ImageComparison/ImageDifference/ImageStatistics for pixel tests (A01-P01).",
+      "paths": [
+        "Packages/VisualCore/Sources/VisualCoreTestSupport/ImageComparison.swift"
+      ],
+      "owner": "VisualCoreTestSupport"
+    },
+    {
+      "area": "Pointer input",
+      "description": "RenderView turns UIKit touches into PointerEvents (id, phase, position in points); PointerTracker keeps active pointers; tap/drag/pinch recognizers in VisualCoreScenes. No per-pointer velocity or rate-capped resampling yet.",
+      "paths": [
+        "Packages/VisualCore/Sources/VisualCoreScenes/PointerTracker.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderView+Touches.swift",
+        "Packages/VisualCore/Sources/VisualCoreScenes/GestureRecognizers.swift"
+      ],
+      "owner": "VisualCoreScenes, VisualCoreRendering"
+    },
+    {
+      "area": "Frame pacing, thermal state and time",
+      "description": "FramePacing derives max FPS and render scale from thermal state and Low Power Mode (applied by RenderHost's FrameScheduler); SceneClock (play/pause/scrub/rate), FixedStepClock (fixed simulation steps), SeededRandom (xoshiro256**).",
+      "paths": [
+        "Packages/VisualCore/Sources/VisualCoreDiagnostics/FramePacing.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FrameScheduler.swift",
+        "Packages/VisualCore/Sources/VisualCoreSimulation/FixedStepClock.swift",
+        "Packages/VisualCore/Sources/VisualCoreSimulation/SceneClock.swift"
+      ],
+      "owner": "VisualCoreDiagnostics, VisualCoreRendering, VisualCoreSimulation"
+    },
+    {
+      "area": "Still capture and release tooling",
+      "description": "RenderHost.renderOffscreen + StillImageEncoder (opaque sRGB PNG) + ExportGeometry (A01-P04); release tooling shared by every app: check_privacy_manifest.py, check_app_release.py, bundle_licenses.py, AutomationView, AcknowledgementsView (A01-P06). A02-P06 reuses the release tooling unchanged and adds VisualCorePersistence.TemporaryFolder (app-owned short-lived files, emptied at launch) for capture crash recovery.",
+      "paths": [
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/StillImage.swift",
+        "Packages/VisualCore/Sources/VisualCoreScenes/ExportGeometry.swift",
+        "scripts/check_app_release.py",
+        "Packages/VisualCoreRendering/Sources/VisualCoreAutomation/AutomationView.swift",
+        "Packages/VisualCore/Sources/VisualCorePersistence/TemporaryFolder.swift"
+      ],
+      "owner": "VisualCoreRendering, VisualCoreScenes, VisualCoreAutomation, scripts, VisualCorePersistence"
+    },
+    {
+      "area": "Palettes, color and parameter animation",
+      "description": "Palette (sample, builtIns) and ParameterSchema in VisualCoreParameters; Tween/Timeline and SceneClock in VisualCoreSimulation; EasingCurve in VisualCoreMath.",
+      "paths": [
+        "Packages/VisualCore/Sources/VisualCoreParameters/Palette.swift",
+        "Packages/VisualCore/Sources/VisualCoreSimulation/Timeline.swift",
+        "Packages/VisualCore/Sources/VisualCoreSimulation/SceneClock.swift",
+        "Packages/VisualCore/Sources/VisualCoreMath/Easing.swift"
+      ],
+      "owner": "VisualCoreParameters, VisualCoreSimulation, VisualCoreMath"
+    },
+    {
+      "area": "Cameras and coordinate transforms",
+      "description": "Camera2D (pan/zoom/rotate in points, zoom clamped 0.1…100) and ViewMetrics (points↔pixels). No double-precision complex-plane viewport (gap G-VIEWPORT).",
+      "paths": [
+        "Packages/VisualCore/Sources/VisualCoreMath/Camera2D.swift",
+        "Packages/VisualCore/Sources/VisualCoreScenes/ViewMetrics.swift"
+      ],
+      "owner": "VisualCoreMath, VisualCoreScenes"
+    },
+    {
+      "area": "Persistence and temporary files",
+      "description": "DocumentStore (versioned envelopes, atomic writes, migrations, per-file problems; A01 library) and TemporaryFolder (short-lived files emptied at launch; A02 captures).",
+      "paths": [
+        "Packages/VisualCore/Sources/VisualCorePersistence/DocumentStore.swift",
+        "Packages/VisualCore/Sources/VisualCorePersistence/TemporaryFolder.swift"
+      ],
+      "owner": "VisualCorePersistence"
+    },
+    {
+      "area": "Particle simulation",
+      "description": "ParticleSystem (VisualCoreSimulation): seeded, deterministic, fixed-capacity CPU simulation (default 10,000, cap 100,000; dropped emissions counted) with Emitter (point source, rate, lifetime, speed, direction cone, start/end size and color) and ParticleForce (gravity, drag, radius-bounded attractor); checksum() for replay; instances() for drawing. A01's ParticleReplay is the consumer.",
+      "paths": [
+        "Packages/VisualCore/Sources/VisualCoreSimulation/ParticleSystem.swift",
+        "Apps/GenerativeArtStudio/Core/Sources/GenerativeArtStudioCore/ParticleReplay.swift"
+      ],
+      "owner": "VisualCoreSimulation"
+    },
+    {
+      "area": "Particle drawing",
+      "description": "ParticleRenderer (VisualCoreRendering): instanced soft-edged quads (vcglDrawArraysInstanced) from ParticleInstance arrays through a per-frame instance buffer in the ResourceRegistry; premultiplied 'over' blending only; rebuilt after context recreation. A01's ParticlesArtScene is the consumer.",
+      "paths": [
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ParticleRenderer.swift",
+        "Apps/GenerativeArtStudio/App/ParticlesArtScene.swift"
+      ],
+      "owner": "VisualCoreRendering"
+    },
+    {
+      "area": "Render targets and field passes (trails)",
+      "description": "PingPongTarget and FieldPass (VisualCoreRendering, A02): two textures swapped each pass and a fragment pass into a target — the basis for a decaying trail texture; FloatRenderSupport reports half-float support.",
+      "paths": [
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/PingPongTarget.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FieldPass.swift",
+        "Apps/FluidArtPlayground/App/FluidFieldsScene.swift"
+      ],
+      "owner": "VisualCoreRendering"
+    },
+    {
+      "area": "Quality tiers and accessibility",
+      "description": "QualityPolicy (VisualCoreDiagnostics) picks a tier from thermal state and Low Power Mode with hysteresis; AccessibilityPreferences / SystemAccessibility (VisualCoreSimulation) carry Reduce Motion and Reduce Flashing. A02's PlaygroundModel uses both.",
+      "paths": [
+        "Packages/VisualCore/Sources/VisualCoreDiagnostics/QualityPolicy.swift",
+        "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPreferences.swift",
+        "Apps/FluidArtPlayground/App/PlaygroundView.swift"
+      ],
+      "owner": "VisualCoreDiagnostics, VisualCoreSimulation"
+    },
+    {
+      "area": "Saved scenes",
+      "description": "NamedLibrary (VisualCorePersistence, A03) on DocumentStore: named, favoritable documents with schema versions, damage reports and caller validation; A03's Bookmark is the consumer.",
+      "paths": [
+        "Packages/VisualCore/Sources/VisualCorePersistence/NamedLibrary.swift",
+        "Apps/FractalExplorer/FractalExplorerCore/Sources/FractalExplorerCore/Bookmark.swift"
+      ],
+      "owner": "VisualCorePersistence"
+    }
+  ],
+  "matrix": [
+    {
+      "id": "M01",
+      "capability": "GPU-oriented particle simulation",
+      "source": "brainstorm",
+      "status": "requires adaptation",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/ParticleSystem.swift",
+          "symbol": "ParticleSystem",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/FixedStepClock.swift",
+          "symbol": "FixedStepClock",
+          "product": "VisualCoreSimulation",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Apps/GenerativeArtStudio/Core/Sources/GenerativeArtStudioCore/ParticleReplay.swift",
+        "symbol": "ParticleReplay"
+      },
+      "notes": "OpenGL ES 3.0 through ANGLE has no compute shaders here; the simulation stays on the CPU in VisualCore's deterministic ParticleSystem and only drawing is on the GPU (research R1). GPU-side state (render-to-texture) is a later idea (G-GPUSIM)."
+    },
+    {
+      "id": "M02",
+      "capability": "Buffer management",
+      "source": "brainstorm",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
+          "symbol": "ResourceRegistry",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ParticleRenderer.swift",
+          "symbol": "ParticleRenderer",
+          "product": "VisualCoreRendering",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Apps/GenerativeArtStudio/App/ParticlesArtScene.swift",
+        "symbol": "ParticlesArtScene"
+      },
+      "notes": "Per-frame instance upload into a registry-owned buffer, released and rebuilt with the context (research R2)."
+    },
+    {
+      "id": "M03",
+      "capability": "Instanced rendering",
+      "source": "brainstorm",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ParticleRenderer.swift",
+          "symbol": "ParticleRenderer.draw",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/ParticleSystem.swift",
+          "symbol": "ParticleInstance",
+          "product": "VisualCoreSimulation",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Apps/GenerativeArtStudio/App/ParticlesArtScene.swift",
+        "symbol": "ParticlesArtScene"
+      },
+      "notes": "Instanced soft-edged quads (research R3)."
+    },
+    {
+      "id": "M04",
+      "capability": "Blending and trails",
+      "source": "brainstorm",
+      "status": "requires adaptation",
+      "evidence": [
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/PingPongTarget.swift",
+          "symbol": "PingPongTarget",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FieldPass.swift",
+          "symbol": "FieldPass",
+          "product": "VisualCoreRendering",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Apps/FluidArtPlayground/App/FluidFieldsScene.swift",
+        "symbol": "FluidFieldsScene"
+      },
+      "notes": "Only premultiplied 'over' blending exists; additive blending and a trail-decay pass are gap G-BLENDTRAIL (research R4)."
+    },
+    {
+      "id": "M05",
+      "capability": "Interaction and simulation parameters",
+      "source": "brainstorm",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/PointerTracker.swift",
+          "symbol": "PointerTracker",
+          "product": "VisualCoreScenes",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/GestureRecognizers.swift",
+          "symbol": "PinchRecognizer",
+          "product": "VisualCoreScenes",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreParameters/ParameterSchema.swift",
+          "symbol": "ParameterSchema",
+          "product": "VisualCoreParameters",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Apps/FluidArtPlayground/App/PlaygroundView.swift",
+        "symbol": "PlaygroundModel"
+      },
+      "notes": "Touch-to-force mapping is app content on these (research R5)."
+    },
+    {
+      "id": "M06",
+      "capability": "Multiple emitter families with bounded particle counts",
+      "source": "v0.1 feature 01",
+      "status": "requires adaptation",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/ParticleSystem.swift",
+          "symbol": "Emitter",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/ParticleSystem.swift",
+          "symbol": "ParticleSystem",
+          "product": "VisualCoreSimulation",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Apps/GenerativeArtStudio/Core/Sources/GenerativeArtStudioCore/ParticleReplay.swift",
+        "symbol": "ParticleReplay"
+      },
+      "notes": "One emitter kind (point + cone); the pool is capped. Emitter shapes are gap G-EMITTERS (research R6)."
+    },
+    {
+      "id": "M07",
+      "capability": "Point attractors, repulsors and gravity/wind fields",
+      "source": "v0.1 feature 02",
+      "status": "requires adaptation",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/ParticleSystem.swift",
+          "symbol": "ParticleForce",
+          "product": "VisualCoreSimulation",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Apps/GenerativeArtStudio/Core/Sources/GenerativeArtStudioCore/ParticleReplay.swift",
+        "symbol": "ParticleReplay"
+      },
+      "notes": "gravity, drag and a radius-bounded attractor exist; repulsors with falloff, wind and singularity-safe softening are gap G-FIELDS (research R7)."
+    },
+    {
+      "id": "M08",
+      "capability": "Adjustable particle size, lifetime, color gradient and trail strength",
+      "source": "v0.1 feature 03",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/ParticleSystem.swift",
+          "symbol": "Emitter",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreParameters/Palette.swift",
+          "symbol": "Palette",
+          "product": "VisualCoreParameters",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Apps/GenerativeArtStudio/Core/Sources/GenerativeArtStudioCore/ParticleReplay.swift",
+        "symbol": "ParticleReplay"
+      },
+      "notes": "Size and lifetime ranges and start/end colors exist; multi-stop gradients map through Palette; trail strength depends on G-BLENDTRAIL (research R8)."
+    },
+    {
+      "id": "M09",
+      "capability": "Pause, reseed and save a scene",
+      "source": "v0.1 feature 05",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/SeededRandom.swift",
+          "symbol": "SeededRandom",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCorePersistence/NamedLibrary.swift",
+          "symbol": "NamedLibrary",
+          "product": "VisualCorePersistence",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Apps/FractalExplorer/FractalExplorerCore/Sources/FractalExplorerCore/Bookmark.swift",
+        "symbol": "Bookmark"
+      },
+      "notes": "Seeded systems replay exactly (checksum); scenes persist as app content on NamedLibrary (G-PSCENE, research R9)."
+    },
+    {
+      "id": "M10",
+      "capability": "Device-adaptive quality and reduced-flash mode",
+      "source": "v0.1 feature 06",
+      "status": "requires adaptation",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/QualityPolicy.swift",
+          "symbol": "QualityPolicy",
+          "product": "VisualCoreDiagnostics",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPreferences.swift",
+          "symbol": "AccessibilityPreferences",
+          "product": "VisualCoreSimulation",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Apps/FluidArtPlayground/App/PlaygroundView.swift",
+        "symbol": "PlaygroundModel"
+      },
+      "notes": "Tiers exist; a particle-count mapping per tier is gap G-PQUALITY (research R10). Reduce Flashing is available."
+    }
+  ],
+  "gaps": [],
+  "traceability": [],
+  "negative": [],
+  "decision": {
+    "result": "go",
+    "reasons": [
+      "pending (T-A04-006)"
+    ],
+    "blockers": []
+  }
+}
