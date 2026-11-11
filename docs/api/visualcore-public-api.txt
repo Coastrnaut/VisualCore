@@ -688,7 +688,16 @@ VisualCoreSimulation | var | public var startSize: Double, endSize: Double
 VisualCoreSimulation | var | public var to: Double
 VisualCoreSimulation | var | public var totalDuration: Double?
 VisualCoreSimulation | var | public var tween: Tween
+VisualCoreTestSupport | enum | public enum ImageComparison
+VisualCoreTestSupport | enum | public enum ImageStatistics
 VisualCoreTestSupport | enum | public enum TestSupportInfo
+VisualCoreTestSupport | func | public func fractionWithin(_ tolerance: Int) -> Double
+VisualCoreTestSupport | func | public static func compare(_ a: [UInt8], _ b: [UInt8]) -> ImageDifference
+VisualCoreTestSupport | func | public static func distinctColors(_ rgba: [UInt8]) -> Int
+VisualCoreTestSupport | func | public static func meanLuminance(_ rgba: [UInt8]) -> Double
+VisualCoreTestSupport | let | public let maxAbsolute: Int
+VisualCoreTestSupport | let | public let meanAbsolute: Double
 VisualCoreTestSupport | let | public static let version
+VisualCoreTestSupport | struct | public struct ImageDifference: Sendable, Equatable
 VisualCoreUI | enum | public enum UIInfo
 VisualCoreUI | let | public static let version

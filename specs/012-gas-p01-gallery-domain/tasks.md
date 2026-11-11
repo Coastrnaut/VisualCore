@@ -32,7 +32,7 @@ regression.
 
   Add `///` docs and tests in `Packages/VisualCore/Tests/VisualCoreParametersTests/` covering each rule, normalized
   slider mapping (linear and log), hash stability and sensitivity, and Codable round trips including seed 2^64−1.
-- [ ] T-A01-103 [P] [US3] Implement `Packages/VisualCore/Sources/VisualCoreTestSupport/ImageComparison.swift` (`ImageDifference`, `ImageComparison.compare`, `ImageStatistics.meanLuminance/distinctColors`, RGB channels only; mismatched lengths give an infinite difference). Add tests in a new `VisualCoreTestSupportTests` target.
+- [X] T-A01-103 [P] [US3] Implement `Packages/VisualCore/Sources/VisualCoreTestSupport/ImageComparison.swift` (`ImageDifference`, `ImageComparison.compare`, `ImageStatistics.meanLuminance/distinctColors`, RGB channels only; mismatched lengths give an infinite difference). Add tests in a new `VisualCoreTestSupportTests` target. — Verified 2026-11-10: VisualCoreTestSupport/ImageComparison.swift: ImageDifference (meanAbsolute, maxAbsolute, fractionWithin), ImageComparison.compare (RGB only; mismatch → infinite), ImageStatistics.meanLuminance (Rec.709) / distinctColors (5-bit); run-check A01-P01/t103-testsupport-tests: 5/5 pass; API baseline +9 documented
 - [ ] T-A01-104 [US3] In VisualCoreRendering:
   - add `ShaderProgram.set(_:vec3Array:)`;
   - add `ShaderBundle` (loads `*.vert`, `*.frag` and `*.glsl` from a bundle subdirectory into `ShaderLibrary`, and preloads `vc/*.glsl` from `Bundle.module`);
