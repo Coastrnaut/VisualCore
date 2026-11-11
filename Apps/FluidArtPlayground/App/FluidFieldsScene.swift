@@ -133,6 +133,10 @@ final class FluidFieldsScene: RenderScene {
     /// Queues splats for the next stepped frame (already capped by the app's SplatQueue).
     func enqueue(_ splats: [Splat]) { pendingSplats += splats }
 
+    /// Called once at the start of every stepped frame for that frame's splats (the playground drains its capped
+    /// SplatQueue here, so the per-frame cap is per rendered frame).
+    var splatSource: (() -> [Splat])?
+
     private func applySplats(velocity: PingPongTarget, dye: PingPongTarget, splat: FieldPass) throws(FieldPassError) {
         let batch = pendingSplats
         pendingSplats.removeAll()
@@ -160,6 +164,7 @@ final class FluidFieldsScene: RenderScene {
             if !paused {
                 let dt = policy.clamp(fixedDelta ?? frame.delta)
                 lastStep = dt
+                if let splatSource { pendingSplats += splatSource() }
                 try applySplats(velocity: velocity, dye: dye, splat: splat)
                 let encoded = FieldUniform.int(storage == .rgba8 ? 1 : 0)
                 let range = FieldUniform.float(velocityRangeCellsPerSecond)

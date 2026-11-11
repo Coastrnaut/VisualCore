@@ -1,10 +1,13 @@
-// PlaygroundView.swift — the fluid canvas screen (feature 019 T-A02-112; FR-A02-106; contracts/app-fields.md).
-// The screen owns exactly one RenderHost (VisualCore's audited EGL host) and destroys it when it goes away. The app
-// creates no EGL context of its own. The host suspends itself in the background; on resume the frame delta is
-// clamped (FramePacing, then TimeStepPolicy), so the fields never take an oversized step.
+// PlaygroundView.swift — the fluid canvas screen (feature 019 T-A02-112; feature 020 T-A02-213; FR-A02-106,
+// FR-A02-208; contracts/app-splats.md). The screen owns exactly one RenderHost (VisualCore's audited EGL host) and
+// destroys it when it goes away; the app creates no EGL context. Touches arrive through `RenderHost.pointerHandler`,
+// become evenly spaced samples (VisualCore PointerVelocityTracker) and capped splats (SplatQueue), drained once per
+// rendered frame. "Add splash" is the control alternative to swiping. Touch paths are never recorded or stored.
 import FluidArtPlaygroundCore
 import SwiftUI
+import VisualCoreMath
 import VisualCoreRendering
+import VisualCoreScenes
 import VisualCoreUI
 
 @MainActor
@@ -13,20 +16,53 @@ final class PlaygroundModel {
     let scene: FluidFieldsScene
     private(set) var host: RenderHost?
     private(set) var failure: String?
+    private(set) var splashes = 0
+    private(set) var queue: SplatQueue
+    private var tracker = PointerVelocityTracker(spacing: 1)
 
     init(configuration: FluidConfiguration = FluidConfiguration()) {
         scene = FluidFieldsScene(configuration: configuration)
+        queue = SplatQueue(configuration: configuration)
+        scene.splatSource = { [weak self] in self?.drain() ?? [] }
         do {
-            host = try RenderHost(scene: scene)
+            let host = try RenderHost(scene: scene)
+            host.pointerHandler = { [weak self] event in self?.handle(event) }
+            self.host = host
         } catch {
             failure = "The graphics view could not start: \(error)"
         }
     }
 
+    /// Resampling spacing in points: half the brush radius on the current view (spec 020 clarification 3).
+    var spacing: Double {
+        guard let size = host?.view.bounds.size, size.width > 0, size.height > 0 else { return 1 }
+        return scene.configuration.brushRadius * Double(min(size.width, size.height)) / 2
+    }
+
+    /// One touch event from the canvas: resampled by the tracker, converted and queued.
+    func handle(_ event: PointerEvent) {
+        guard let size = host?.view.bounds.size else { return }
+        if tracker.activeCount == 0, abs(tracker.spacing - spacing) > 1e-9 {
+            tracker = PointerVelocityTracker(spacing: spacing)
+        }
+        if event.phase == .cancelled { queue.forget(pointer: event.id) }
+        let samples = tracker.handle(event)
+        queue.add(samples, viewSize: SIMD2(Double(size.width), Double(size.height)))
+    }
+
+    /// The control alternative to swiping: one deterministic splash, announced to VoiceOver.
+    func addSplash() {
+        queue.addSplash()
+        splashes += 1
+        AccessibilityNotification.Announcement("Splash added").post()
+    }
+
+    private func drain() -> [Splat] { queue.drain() }
+
     /// The spoken canvas value.
     var description: String {
         FluidCanvasDescription.text(configuration: scene.configuration, storage: scene.precision ?? .unorm8,
-                                    paused: scene.paused || host?.state != .active)
+                                    paused: scene.paused || host?.state != .active, splashes: splashes)
     }
 
     func close() {
@@ -39,12 +75,23 @@ struct PlaygroundView: View {
     @State private var model: PlaygroundModel?
 
     var body: some View {
-        ZStack {
+        ZStack(alignment: .bottom) {
             if let model, let host = model.host {
                 RenderSurface(host: host, accessibilityLabel: model.description,
-                              accessibilityHint: "Fluid canvas. Dye fades over time; touch interaction comes in a later version.")
+                              accessibilityHint: "Fluid canvas. Swipe to paint with dye; the Add splash button does the same without a gesture.")
                     .ignoresSafeArea(edges: .bottom)
                     .accessibilityIdentifier("fap.canvas")
+                Button {
+                    model.addSplash()
+                } label: {
+                    Label("Add splash", systemImage: "drop.fill")
+                        .font(.headline)
+                        .frame(minHeight: 44)
+                }
+                .buttonStyle(.borderedProminent)
+                .accessibilityHint("Adds a burst of dye and motion at the center")
+                .accessibilityIdentifier("fap.splash")
+                .padding(.bottom, 24)
             } else if let failure = model?.failure {
                 Text(failure)
                     .multilineTextAlignment(.center)
@@ -56,6 +103,9 @@ struct PlaygroundView: View {
         }
         .navigationTitle("Playground")
         .navigationBarTitleDisplayMode(.inline)
+        // Painting with rightward drags must not navigate back (iOS 26 content swipe-back); the edge swipe and the
+        // back button still leave the screen (VisualCoreUI, feature 020).
+        .contentSwipeBackDisabled()
         .onAppear {
             if model == nil { model = PlaygroundModel() }
         }

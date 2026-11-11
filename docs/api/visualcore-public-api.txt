@@ -929,6 +929,7 @@ VisualCoreUI | class | public final class SystemAccessibilityObserver
 VisualCoreUI | enum | public enum AccessibleColors
 VisualCoreUI | enum | public enum ParameterPanelModel
 VisualCoreUI | enum | public enum UIInfo
+VisualCoreUI | func | public func contentSwipeBackDisabled(_ disabled: Bool = true) -> some View
 VisualCoreUI | func | public func makeUIView(context: Context) -> UIView
 VisualCoreUI | func | public func refresh()
 VisualCoreUI | func | public func text(for entry: Entry) -> String

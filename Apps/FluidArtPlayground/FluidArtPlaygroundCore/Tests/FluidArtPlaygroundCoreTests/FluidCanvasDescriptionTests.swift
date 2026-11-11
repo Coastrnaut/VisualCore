@@ -16,5 +16,7 @@ final class FluidCanvasDescriptionTests: XCTestCase {
         var fast = c
         fast.dyeDissipation = 6
         XCTAssertTrue(FluidCanvasDescription.text(configuration: fast, storage: .float16, paused: false).hasPrefix("Dye pattern quickly fading"))
+        XCTAssertTrue(FluidCanvasDescription.text(configuration: c, storage: .float16, paused: false, splashes: 1).hasSuffix(", 1 splash added"))
+        XCTAssertTrue(FluidCanvasDescription.text(configuration: c, storage: .float16, paused: false, splashes: 3).hasSuffix(", 3 splashes added"))
     }
 }

@@ -4,8 +4,9 @@ import VisualCoreSimulation
 
 /// Text VoiceOver reads for the fluid canvas.
 public enum FluidCanvasDescription {
-    /// For example "Dye pattern slowly fading, 128 by 128 grid, half-float storage".
-    public static func text(configuration c: FluidConfiguration, storage: StoragePrecision, paused: Bool) -> String {
+    /// For example "Dye pattern slowly fading, 128 by 128 grid, half-float storage, 2 splashes added".
+    /// The splash count is only mentioned once at least one splash was added (feature 020).
+    public static func text(configuration c: FluidConfiguration, storage: StoragePrecision, paused: Bool, splashes: Int = 0) -> String {
         let state: String
         if paused {
             state = "paused"
@@ -21,6 +22,7 @@ public enum FluidCanvasDescription {
         case .float16, .float16TowardZero: "half-float storage"
         case .unorm8: "8-bit storage"
         }
-        return "Dye pattern \(state), \(c.gridWidth) by \(c.gridHeight) grid, \(storageText)"
+        let splashText = splashes > 0 ? ", \(splashes) \(splashes == 1 ? "splash" : "splashes") added" : ""
+        return "Dye pattern \(state), \(c.gridWidth) by \(c.gridHeight) grid, \(storageText)\(splashText)"
     }
 }

@@ -60,6 +60,17 @@ Answered autonomously under the owner's standing delegation (CLAUDE.md §2), rec
   are updated accordingly (feature 019 FR-A02-101 said 16…512; amended here, because no user setting or stored file
   exists yet).
 
+- Q: (found during implementation, T-A02-213) What keeps a painting drag from navigating back, and which
+  accessibility audit findings may be ignored? → A: iOS 26 added a full-width content swipe-back to navigation
+  stacks. On the iOS 26.5 simulator a rightward drag on the canvas left the screen. VisualCoreUI gained
+  `.contentSwipeBackDisabled()`, which turns off only that gesture while the playground is visible; the edge swipe and
+  the back button still work.
+
+  The audit (home and playground, default size and XXXL) follows A01's documented exclusions: canvas artwork contrast,
+  navigation-bar chrome, and findings without an element. None were hit. The two real findings were fixed:
+  - prominent buttons nearly failed contrast, so they now use VisualCoreUI's accessible accent;
+  - the home text clipped at XXXL, so home now scrolls.
+
 ## User Scenarios & Testing *(mandatory)*
 
 Users:

@@ -241,6 +241,14 @@ pickers for both settings and a full-contrast row that explains them and shows t
 pass the system accessibility audit at default and the largest text sizes. `AccessibleColors.accent` (#0040DD light,
 #409CFF dark) keeps tinted text at ≥ 4.5:1 contrast, and `AccessibleColors.contrastRatio` computes WCAG ratios.
 
+## Canvas gestures in navigation stacks (feature 020, A02-P02)
+
+Since iOS 26, a navigation stack also pops on a horizontal swipe anywhere in its content. On a canvas where people
+draw or paint with drags, a rightward stroke would leave the screen; this was observed on the iOS 26.5 simulator.
+Apply `.contentSwipeBackDisabled()` to the canvas screen. It turns off only
+`interactiveContentPopGestureRecognizer` while the screen is visible and restores the previous setting when it
+disappears. The edge swipe and the back button keep working.
+
 ## Acknowledgements (feature 017, A01-P06)
 
 `scripts/bundle_licenses.py --out <bundle>/Licenses` (run as a build phase) writes the license text of every
