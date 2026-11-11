@@ -59,8 +59,9 @@ public final class ResourceRegistry {
 
     // MARK: Textures, buffers, render targets (FR-F308, FR-F313)
 
-    /// Set by the host from its capabilities.
-    var maxTextureSize = 4096
+    /// The context's maximum texture edge in pixels (GL_MAX_TEXTURE_SIZE), set by the host from its capabilities.
+    /// Scenes size their own targets (for example simulation grids) within it; larger targets are refused.
+    public internal(set) var maxTextureSize = 4096
 
     private func validate(_ width: Int, _ height: Int) throws(ResourceError) {
         guard width > 0, height > 0, width <= maxTextureSize, height <= maxTextureSize else {

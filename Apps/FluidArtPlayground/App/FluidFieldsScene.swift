@@ -6,6 +6,12 @@ import FluidArtPlaygroundCore
 import VisualCoreRendering
 import VisualCoreSimulation
 
+/// Why the fields could not be built.
+enum FluidSceneError: Error, Equatable {
+    /// A seed could not be written to its field (`"velocity"` or `"dye"`).
+    case seedUploadFailed(String)
+}
+
 @MainActor
 final class FluidFieldsScene: RenderScene {
     /// The initial dye.
@@ -21,14 +27,18 @@ final class FluidFieldsScene: RenderScene {
     let seed: SeedKind
     /// Use RGBA8 storage even when half-float targets work (tests of the fallback).
     let forceFallback: Bool
-    /// Largest grid edge the device allows (from `RenderHost.maxRenderSize`).
+    /// An extra grid edge cap; the device's maximum texture size also applies at setup.
     let maxEdge: Int
 
+    /// Test seam: writes a seed into a target (default `upload(rgbaFloats:)`).
+    var uploadSeed: (RenderTarget, [Float]) -> Bool = { $0.upload(rgbaFloats: $1) }
     /// Test seam: replaces the frame delta before it is clamped.
     var fixedDelta: Double?
     /// When true, frames show the dye without stepping.
     var paused = false
 
+    /// The grid edge cap used by the last setup: `min(maxEdge, resources.maxTextureSize)` (FR-A02-101).
+    private(set) var effectiveMaxEdge = 512
     private(set) var configuration: FluidConfiguration
     private(set) var issues: [ConfigurationIssue] = []
     private(set) var storage: TextureFormat?
@@ -66,8 +76,9 @@ final class FluidFieldsScene: RenderScene {
         setupCount += 1
         stepCount = 0
         policy = TimeStepPolicy()
-        (configuration, issues) = requested.validated(maxEdge: maxEdge)
         let r = context.resources
+        effectiveMaxEdge = min(maxEdge, r.maxTextureSize)
+        (configuration, issues) = requested.validated(maxEdge: effectiveMaxEdge)
         let format = FloatRenderSupport.detect(in: r).storageFormat(forceFallback: forceFallback)
         storage = format
         let w = configuration.gridWidth, h = configuration.gridHeight
@@ -78,8 +89,8 @@ final class FluidFieldsScene: RenderScene {
             self.dye = dye
             dissipate = try FieldPass(registry: r, fragment: FluidShaders.dissipate, inputs: ["uField"], label: "fap.dissipate")
             display = try FieldPass(registry: r, fragment: FluidShaders.display, inputs: ["uDye"], label: "fap.display")
-            velocity.read.upload(rgbaFloats: initialVelocity().values)
-            dye.read.upload(rgbaFloats: initialDye().values)
+            guard uploadSeed(velocity.read, initialVelocity().values) else { throw FluidSceneError.seedUploadFailed("velocity") }
+            guard uploadSeed(dye.read, initialDye().values) else { throw FluidSceneError.seedUploadFailed("dye") }
         } catch {
             releaseAll()
             throw error

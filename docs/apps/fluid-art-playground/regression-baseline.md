@@ -45,3 +45,7 @@ VisualCoreSimulation. The API baseline diff contains additions only. Same two ch
 ### Rerun after `StoragePrecision.float16TowardZero` (2026-11-11, T-A02-111)
 
 `A02-P01/t111-reference-a` 3/3 and `t111-reference-b` 4/4: **7/7 pass**, unchanged.
+
+### Rerun after `ResourceRegistry.maxTextureSize` became public (2026-11-11, T-A02-116)
+
+`A02-P01/t116-reference-a` 3/3 and `t116-reference-b` 4/4: **7/7 pass**, unchanged.

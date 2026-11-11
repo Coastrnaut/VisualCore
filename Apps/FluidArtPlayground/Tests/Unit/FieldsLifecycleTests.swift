@@ -107,3 +107,42 @@ final class FieldsLifecycleTests: XCTestCase {
         XCTAssertEqual(scene.dye?.swapCount, 0)
     }
 }
+
+/// Feature 019 T-A02-116 (FR-A02-101): the grid is capped by the device limit and by an explicit cap, and reported.
+@MainActor
+final class GridCapTests: XCTestCase {
+    func testGridIsCappedByDeviceAndExplicitLimit() throws {
+        var c = FluidConfiguration()
+        c.gridWidth = 512
+        c.gridHeight = 300
+        let device = FluidFieldsScene(configuration: c)
+        let host = try RenderHost(scene: device)
+        defer { host.destroy() }
+        XCTAssertEqual(device.effectiveMaxEdge, min(512, host.resources.maxTextureSize))
+        XCTAssertEqual([device.configuration.gridWidth, device.configuration.gridHeight], [512, 300])
+
+        let capped = FluidFieldsScene(configuration: c, maxEdge: 64)
+        let host2 = try RenderHost(scene: capped)
+        defer { host2.destroy() }
+        XCTAssertEqual(capped.effectiveMaxEdge, 64)
+        XCTAssertEqual([capped.configuration.gridWidth, capped.configuration.gridHeight], [64, 64])
+        XCTAssertEqual(Set(capped.issues.map(\.field)), ["gridWidth", "gridHeight"])
+        XCTAssertEqual(capped.dye?.width, 64, "the GPU fields use the capped size")
+    }
+}
+
+/// Feature 019 T-A02-117 (FR-A02-107): a failed seed upload fails setup and leaves nothing allocated.
+@MainActor
+final class SeedUploadFailureTests: XCTestCase {
+    func testFailedSeedUploadThrowsAndReleasesEverything() throws {
+        let scene = FluidFieldsScene(configuration: FluidConfiguration())
+        scene.uploadSeed = { _, _ in false }
+        let host = try RenderHost(scene: scene)
+        defer { host.destroy() }
+        XCTAssertNil(scene.velocity)
+        XCTAssertNil(scene.dye)
+        XCTAssertEqual(host.resources.stats.liveCount[.framebuffer, default: 0], 0, "both pairs were released")
+        guard case .scene(let message)? = host.lastError else { return XCTFail("expected a scene error, got \(String(describing: host.lastError))") }
+        XCTAssertTrue(message.contains("seedUploadFailed"), message)
+    }
+}

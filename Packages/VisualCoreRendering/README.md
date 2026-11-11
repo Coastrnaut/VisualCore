@@ -193,7 +193,8 @@ These pieces are for GPU simulations and feedback effects that read the previous
 - `FloatRenderSupport.detect(in: context.resources)` reports whether the context lists a color-buffer float
   extension and whether a 4×4 RGBA16F probe target works; `supported` requires both. The result is cached per
   context generation, and the probe target is released. `storageFormat(forceFallback:)` returns `.rgba16f`, or the
-  RGBA8 fallback. With RGBA8, store signed values with `VisualCoreSimulation.SignedRangeEncoding`.
+  RGBA8 fallback. With RGBA8, store signed values with `VisualCoreSimulation.SignedRangeEncoding`. Size grids within
+  `context.resources.maxTextureSize` (the context's `GL_MAX_TEXTURE_SIZE`).
   `RenderCapabilities.reportsColorBufferHalfFloat` is the extension half alone.
 - `RenderTarget.upload(rgbaFloats:)` and `readFloatPixels()` move exact RGBA floats in both directions, rows
   bottom-up. RGBA8 is quantized to n/255. Use them to seed fields and to compare them with a CPU reference

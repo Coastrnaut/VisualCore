@@ -15,6 +15,8 @@ final class FloatRenderSupportTests: XCTestCase {
             let after = context.resources.stats
             XCTAssertEqual(before.liveCount, after.liveCount, "the probe target is released")
             XCTAssertEqual(support.extensionReported, host.capabilities.reportsColorBufferHalfFloat)
+            XCTAssertEqual(context.resources.maxTextureSize, host.capabilities.maxTextureSize, "scenes can size grids within it")
+            XCTAssertGreaterThan(context.resources.maxTextureSize, 0)
             // Independent probe: a raw RGBA16F framebuffer.
             var tex: GLuint = 0, fbo: GLuint = 0
             vcglGenTextures(1, &tex)

@@ -525,6 +525,7 @@ VisualCoreRendering | struct | public struct Size: Sendable, Equatable, Codable
 VisualCoreRendering | struct | public struct StillImage: Sendable, Equatable
 VisualCoreRendering | struct | public struct Uniform: Sendable, Equatable
 VisualCoreRendering | var | public internal(set) static var lastFailureLog
+VisualCoreRendering | var | public internal(set) var maxTextureSize
 VisualCoreRendering | var | public private(set) var cacheHits
 VisualCoreRendering | var | public private(set) var capabilities
 VisualCoreRendering | var | public private(set) var compileCount
