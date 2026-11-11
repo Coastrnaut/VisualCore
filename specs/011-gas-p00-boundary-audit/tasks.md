@@ -15,7 +15,7 @@ both simulators and the reference regression. IDs are `T-A01-0##`. Each task get
 
 ## Phase 2: Foundational — app-neutral contract checker (blocks US1 and US4)
 
-- [ ] T-A01-002 [P] Create checker fixtures `scripts/fixtures/app_contract/good/` and `scripts/fixtures/app_contract/bad/`. Each holds a mini repository (`Packages/X/Package.swift` with a `.library` product, a source file with public and internal declarations, and `docs/apps/demo/visualcore-contract.{json,md}`). The bad fixture contains:
+- [X] T-A01-002 [P] Create checker fixtures `scripts/fixtures/app_contract/good/` and `scripts/fixtures/app_contract/bad/`. Each holds a mini repository (`Packages/X/Package.swift` with a `.library` product, a source file with public and internal declarations, and `docs/apps/demo/visualcore-contract.{json,md}`). The bad fixture contains: — Verified 2026-11-10: scripts/fixtures/app_contract/{good,bad}: mini repos (Packages/Demo with literal + mapped .library products, public/internal declarations, test file, External/ref) and demo contracts; bad covers missing file/symbol, non-public, unknown product, uncovered row, test and External evidence, bare upstream gap, unjustified app-local gap, go-with-blockers; exercised by run-check A01-P00/t002-003-checker-tests
   - a missing file;
   - a missing symbol;
   - a non-public evidence item for `public: true`;

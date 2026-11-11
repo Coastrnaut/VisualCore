@@ -33,6 +33,7 @@ licenses = load("check_licenses")
 autosim = load("run_automation_sim")
 relsym = load("check_release_symbols")
 relcheck = load("release_check")
+appcontract = load("check_app_contract")
 try:
     deps = load("check_dependencies")
 except FileNotFoundError:
@@ -514,6 +515,69 @@ class VersionTests(unittest.TestCase):
         self.assertGreaterEqual(len(found), 14)
         self.assertEqual(set(found.values()), {"1.0.0-rc.1"}, found)
         self.assertTrue((root / "docs/release/release-notes-1.0.0-rc.1.md").is_file())
+
+
+class AppContractTests(unittest.TestCase):
+    """Feature 011 T-A01-003: app-neutral VisualCore contract checker (FR-A01-003)."""
+    FIX = HERE / "fixtures" / "app_contract"
+
+    def run_checker(self, root: Path, *extra: str) -> tuple[int, str]:
+        import contextlib, io
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(io.StringIO()):
+            code = appcontract.main(["--app", "demo", "--root", str(root), *extra])
+        return code, out.getvalue()
+
+    def test_good_fixture_passes(self):
+        code, out = self.run_checker(self.FIX / "good")
+        self.assertEqual(code, 0, out)
+        self.assertIn("PASS: 2 rows, 2 citations, 1 gaps, decision go", out)
+
+    def test_bad_fixture_reports_every_problem_by_row(self):
+        code, out = self.run_checker(self.FIX / "bad")
+        self.assertEqual(code, 1)
+        for expected in ["M01: Packages/Demo/Sources/DemoKit/Nope.swift:Widget: file not found",
+                         "M02: Packages/Demo/Sources/DemoKit/Widget.swift:Widget.twirl: symbol 'twirl' not declared public",
+                         "M03: Packages/Demo/Sources/DemoKit/Widget.swift:Widget.hidden: symbol 'hidden' not declared public",
+                         "M04: Packages/Demo/Sources/DemoKit/Widget.swift:Widget: unknown product 'Nonexistent'",
+                         "M05: requires adaptation row has no gap entry",
+                         "M06: Packages/Demo/Tests/DemoKitTests/WidgetTests.swift:WidgetProbe: evidence must be shippable",
+                         "M07: External/ref/Engine.swift:Engine: evidence must be shippable",
+                         "M08: upstream gap needs evidence or notes",
+                         "G-LOCAL: app-local gap needs a justification",
+                         "decision: go with blockers"]:
+            self.assertIn(expected, out)
+        self.assertIn("FAIL: 10 problem(s)", out)
+
+    def test_products_include_mapped_array_names(self):
+        self.assertEqual(appcontract.products(self.FIX / "good"), {"DemoKit", "DemoExtra"})
+        real = appcontract.products(HERE.parent)
+        self.assertTrue({"VisualCoreMath", "VisualCoreRendering", "VisualCoreEffects"} <= real)
+
+    def test_render_is_idempotent(self):
+        import shutil
+        with tempfile.TemporaryDirectory() as t:
+            root = Path(t) / "good"
+            shutil.copytree(self.FIX / "good", root)
+            md = root / "docs/apps/demo/visualcore-contract.md"
+            self.assertEqual(self.run_checker(root, "--render")[0], 0)
+            first = md.read_text()
+            self.assertIn("| M01 | spin |", first)
+            self.assertIn("**GO**", first)
+            self.run_checker(root, "--render")
+            self.assertEqual(md.read_text(), first)
+
+    def test_schema_errors_exit_2(self):
+        with tempfile.TemporaryDirectory() as t:
+            d = Path(t) / "docs/apps/demo"
+            d.mkdir(parents=True)
+            (d / "visualcore-contract.json").write_text('{"schema": 1, "surprise": true}')
+            self.assertEqual(self.run_checker(Path(t))[0], 2)
+            (d / "visualcore-contract.json").write_text('{"schema": 2}')
+            self.assertEqual(self.run_checker(Path(t))[0], 2)
+            (d / "visualcore-contract.json").write_text('{"schema": 1, "matrix": [{"id": "M", "notes": "' + "x" * 2001 + '"}]}')
+            self.assertEqual(self.run_checker(Path(t))[0], 2)
+        self.assertEqual(appcontract.main(["--app", "../etc"]), 2)
 
 
 if __name__ == "__main__":

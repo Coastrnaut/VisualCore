@@ -1,0 +1,11 @@
+{"schema": 1, "app": "demo", "gate": "A00-P00", "date": "2026-11-10",
+ "inventory": [{"area": "widgets", "description": "spinning", "paths": ["Packages/Demo/Sources/DemoKit/Widget.swift"], "owner": "DemoKit"}],
+ "matrix": [
+  {"id": "M01", "capability": "spin", "source": "brainstorm", "status": "available",
+   "evidence": [{"file": "Packages/Demo/Sources/DemoKit/Widget.swift", "symbol": "Widget.spin", "product": "DemoKit", "public": true}],
+   "example": {"file": "Packages/Demo/Tests/DemoKitTests/WidgetTests.swift", "symbol": "testSpin"}},
+  {"id": "M02", "capability": "wobble", "source": "v0.1 feature 01", "status": "upstream gap", "evidence": [], "notes": "not built"}],
+ "gaps": [{"id": "G-WOBBLE", "matrix": ["M02"], "kind": "upstream", "owner": "VisualCore:DemoKit", "phase": 2, "test": "wobble unit test"}],
+ "traceability": [{"item": "v0.1 feature 01", "matrix": ["M02"], "phases": [2]}],
+ "negative": [{"rule": "no networking", "source": "constitution"}],
+ "decision": {"result": "go", "reasons": ["all gaps additive"], "blockers": []}}
