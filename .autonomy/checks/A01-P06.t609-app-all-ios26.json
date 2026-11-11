@@ -1,0 +1,31 @@
+{
+  "argv": [
+    "xcodebuild",
+    "test",
+    "-project",
+    "VisualCore.xcodeproj",
+    "-scheme",
+    "GenerativeArtStudio",
+    "-destination",
+    "platform=iOS Simulator,id=EC7498FF-31FF-4491-9666-B0D32785203C",
+    "-derivedDataPath",
+    "Build/DerivedData/GenerativeArtStudio",
+    "-resultBundlePath",
+    ".autonomy/xcresults/a01p06-t609-ios26-1794381713.xcresult",
+    "-test-timeouts-enabled",
+    "YES",
+    "-default-test-execution-time-allowance",
+    "300",
+    "CODE_SIGNING_ALLOWED=NO"
+  ],
+  "command": "xcodebuild test -project VisualCore.xcodeproj -scheme GenerativeArtStudio -destination 'platform=iOS Simulator,id=EC7498FF-31FF-4491-9666-B0D32785203C' -derivedDataPath Build/DerivedData/GenerativeArtStudio -resultBundlePath .autonomy/xcresults/a01p06-t609-ios26-1794381713.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 300 CODE_SIGNING_ALLOWED=NO",
+  "elapsed_seconds": 338.95,
+  "exit_code": 0,
+  "finished": "2026-11-11T07:27:32+00:00",
+  "log": ".autonomy/logs/A01-P06.t609-app-all-ios26.log",
+  "log_sha256": "0ec8e5a0f6451ac6de9e7849322b6cff259816e4883ed9bfe037ffba12aa2c87",
+  "name": "t609-app-all-ios26",
+  "stage": "A01-P06",
+  "started": "2026-11-11T07:21:53+00:00",
+  "timed_out": false
+}

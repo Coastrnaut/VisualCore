@@ -1,0 +1,30 @@
+{
+  "argv": [
+    "python3",
+    "scripts/release_check.py",
+    "--log-dir",
+    ".autonomy/logs/a01p06-t609-fast",
+    "--json",
+    ".autonomy/logs/a01p06-t609-fast/summary.json",
+    "--only",
+    "docs",
+    "app-contracts",
+    "compliance",
+    "dependencies",
+    "public-api",
+    "licenses",
+    "script-tests",
+    "host-visualcore",
+    "documented-api-showcase"
+  ],
+  "command": "python3 scripts/release_check.py --log-dir .autonomy/logs/a01p06-t609-fast --json .autonomy/logs/a01p06-t609-fast/summary.json --only docs app-contracts compliance dependencies public-api licenses script-tests host-visualcore documented-api-showcase",
+  "elapsed_seconds": 19.781,
+  "exit_code": 0,
+  "finished": "2026-11-11T07:28:03+00:00",
+  "log": ".autonomy/logs/A01-P06.t609-release-fast.log",
+  "log_sha256": "4c97708d036bbc0107bd452da92903ed22e2a679e0604de458d27c07fe8009c4",
+  "name": "t609-release-fast",
+  "stage": "A01-P06",
+  "started": "2026-11-11T07:27:43+00:00",
+  "timed_out": false
+}

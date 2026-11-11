@@ -92,7 +92,7 @@ or App Store Connect action. Owner steps are written down, never performed.
 
 ## Phase 5: Polish
 
-- [ ] T-A01-609 Run `release_check.py --only app-release-generative-art-studio` and the fast steps, the full app
+- [X] T-A01-609 Run `release_check.py --only app-release-generative-art-studio` and the fast steps, the full app — Verified 2026-11-11: Final release run: run-check A01-P06/t609-app-all-ios27 + t609-app-all-ios26 full app scheme 54/54 each, guard PASS 54/54 (includes AccessibilityAuditUITests as the Phase 06 accessibility re-verification, Phase 01–06 suites); t609-release-fast 9/9 (docs, app-contracts, compliance, dependencies, public-api, licenses, script-tests, host-visualcore, documented-api-showcase); t609-documented-api-app PASS; t609-app-release: Release build, 13 license texts, dependency audit, 0 automation symbols, privacy 3=3, release items 13/13. support-matrix rows for the Generative Art Studio release candidate and the release tooling; release-checklist evidence for tests and accessibility (FR-A01-611, SC-A01-605, SC-A01-606)
   suites on both runtimes (enumeration-guarded, including `AccessibilityAuditUITests` as the manual's Phase 06
   accessibility re-verification; analyze C1), the contract check and the documented API. Update the
   `release-checklist.md` evidence column and `docs/release/support-matrix.md` (Generative Art Studio: release

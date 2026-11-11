@@ -17,7 +17,8 @@ Release candidate 1.0.0 (1), bundle `dev.visualcore.GenerativeArtStudio` (approv
 | Assets | Version 1.0.0 (1) and the export-compliance key | verified | `project.yml`; `check_app_release.py` |
 | Credits | License texts bundled and shown (Acknowledgements) | verified | `A01-P06/t610-ui-ios27`, `t610-ui-ios26`; `bundle_licenses.py`; `check_licenses.py` |
 | Credits | No ProjectM or LGPL code linked | verified | Dependency audit build phase (FR-A01-006); `check_dependencies.py` R1–R5 |
-| Accessibility | Audit at default and largest text sizes; documented exclusions only for navigation-bar chrome | verified | `A01-P05` seal; `A01-P06/t610-ui-*` |
+| Accessibility | Audit at default and largest text sizes; documented exclusions only for navigation-bar chrome | verified | `A01-P05` seal; `A01-P06/t610-ui-*`; `t609-app-all-ios27`/`ios26` |
+| Tests | Full app suites, 54 tests per runtime, enumeration-guarded | verified | `A01-P06/t609-app-all-ios27`, `t609-app-all-ios26` (+ `-guard` PASS 54/54) |
 | Data | Release-format library (schema v1) opens unchanged: 4 compositions, 0 problems, identical renders | verified | `A01-P06/t607-core-tests` (LibraryMigrationFixtureTests); `t607-crash-ios27`, `t607-crash-ios26` |
 | Data | Crash recovery: interrupted save keeps the previous file; stale exports removed at launch | verified | `A01-P06/t607-crash-ios27`, `t607-crash-ios26` (CrashRecoveryTests) |
 | Store | Listing text with claim → test traceability | verified | [store-listing.md](store-listing.md) |
