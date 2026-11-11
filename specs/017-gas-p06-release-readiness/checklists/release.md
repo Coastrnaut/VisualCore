@@ -15,38 +15,42 @@ Audience: reviewer.
 
 ## Requirement Completeness
 
-- [ ] CHK001 Are all manifest fields (tracking, domains, collected data, accessed API categories with reasons) required explicitly? [Completeness, Spec §FR-A01-601]
-- [ ] CHK002 Is every manual Phase 06 deliverable (privacy strings, accessibility, asset/credit review, migration, device tests, crash recovery, build/archive) mapped to a requirement? [Completeness, Spec §FR-A01-601–611]
-- [ ] CHK003 Are the contents of the privacy-and-credits document enumerated? [Completeness, Spec §FR-A01-605]
-- [ ] CHK004 Are the items the release-readiness check covers enumerated? [Completeness, Spec §FR-A01-610]
+- [x] CHK001 Are all manifest fields (tracking, domains, collected data, accessed API categories with reasons) required explicitly? [Completeness, Spec §FR-A01-601]
+- [x] CHK002 Is every manual Phase 06 deliverable (privacy strings, accessibility, asset/credit review, migration, device tests, crash recovery, build/archive) mapped to a requirement? [Completeness, Spec §FR-A01-601–611]
+- [x] CHK003 Are the contents of the privacy-and-credits document enumerated? [Completeness, Spec §FR-A01-605]
+- [x] CHK004 Are the items the release-readiness check covers enumerated? [Completeness, Spec §FR-A01-610]
 
 ## Requirement Clarity
 
-- [ ] CHK005 Is "required-reason API use" defined with a detection method and a category list? [Clarity, Spec §Clarifications]
-- [ ] CHK006 Are the approved reasons named, with a rule for categories that have no fitting reason? [Clarity, Spec §Clarifications]
-- [ ] CHK007 Are the icon's size, opacity, source composition and provenance specified? [Clarity, Spec §FR-A01-604, §Clarifications]
-- [ ] CHK008 Are the checklist statuses defined as a closed set with an evidence or steps obligation? [Clarity, Spec §FR-A01-606, §Key Entities]
+- [x] CHK005 Is "required-reason API use" defined with a detection method and a category list? [Clarity, Spec §Clarifications]
+- [x] CHK006 Are the approved reasons named, with a rule for categories that have no fitting reason? [Clarity, Spec §Clarifications]
+- [x] CHK007 Are the icon's size, opacity, source composition and provenance specified? [Clarity, Spec §FR-A01-604, §Clarifications]
+- [x] CHK008 Are the checklist statuses defined as a closed set with an evidence or steps obligation? [Clarity, Spec §FR-A01-606, §Key Entities]
 
 ## Requirement Consistency
 
-- [ ] CHK009 Do the permission requirements agree across this phase (Photos add-only), Phase 04 and the privacy summary? [Consistency, Spec §FR-A01-603]
-- [ ] CHK010 Is the "no device action" rule consistent between the device-test requirement and the automation requirement? [Consistency, Spec §FR-A01-608, §US4]
+- [x] CHK009 Do the permission requirements agree across this phase (Photos add-only), Phase 04 and the privacy summary? [Consistency, Spec §FR-A01-603]
+- [x] CHK010 Is the "no device action" rule consistent between the device-test requirement and the automation requirement? [Consistency, Spec §FR-A01-608, §US4]
 
 ## Scenario and Edge Case Coverage
 
-- [ ] CHK011 Are crash scenarios (killed during export or save) specified with their cleanup scope and the files that must never be touched? [Coverage, Spec §US3, §Clarifications]
-- [ ] CHK012 Is a sensitive API used only inside a library addressed? [Edge Case, Spec §Edge Cases]
-- [ ] CHK013 Is an automation trigger in a Release build addressed? [Edge Case, Spec §Edge Cases, §SC-A01-604]
-- [ ] CHK014 Are owner-only steps listed with the rule that they are never performed or simulated? [Coverage, Spec §Edge Cases, §FR-A01-609]
+- [x] CHK011 Are crash scenarios (killed during export or save) specified with their cleanup scope and the files that must never be touched? [Coverage, Spec §US3, §Clarifications]
+- [x] CHK012 Is a sensitive API used only inside a library addressed? [Edge Case, Spec §Edge Cases]
+- [x] CHK013 Is an automation trigger in a Release build addressed? [Edge Case, Spec §Edge Cases, §SC-A01-604]
+- [x] CHK014 Are owner-only steps listed with the rule that they are never performed or simulated? [Coverage, Spec §Edge Cases, §FR-A01-609]
 
 ## Privacy, Lifecycle and Release Constraints
 
-- [ ] CHK015 Is the privacy summary required to agree with the manifest and with observed behavior, not sample text? [Privacy, Spec §US1, §FR-A01-605]
-- [ ] CHK016 Is store text required to trace each claim to a passing test? [Release, Spec §FR-A01-606, §SC-A01-605]
-- [ ] CHK017 Is the migration requirement pinned to a committed fixture of the current format? [Lifecycle, Spec §FR-A01-607, §SC-A01-603]
-- [ ] CHK018 Is reuse of the release tooling across all apps required? [Architecture, Spec §FR-A01-602, §FR-A01-610]
+- [x] CHK015 Is the privacy summary required to agree with the manifest and with observed behavior, not sample text? [Privacy, Spec §US1, §FR-A01-605]
+- [x] CHK016 Is store text required to trace each claim to a passing test? [Release, Spec §FR-A01-606, §SC-A01-605]
+- [x] CHK017 Is the migration requirement pinned to a committed fixture of the current format? [Lifecycle, Spec §FR-A01-607, §SC-A01-603]
+- [x] CHK018 Is reuse of the release tooling across all apps required? [Architecture, Spec §FR-A01-602, §FR-A01-610]
 
 ## Performance and Assumptions
 
-- [ ] CHK019 Is the ban on performance claims without device evidence explicit, with campaign II named as the source? [Performance, Spec §FR-A01-611, §Assumptions]
-- [ ] CHK020 Are the version, bundle ID and privacy-policy hosting assumptions recorded? [Assumption, Spec §Assumptions]
+- [x] CHK019 Is the ban on performance claims without device evidence explicit, with campaign II named as the source? [Performance, Spec §FR-A01-611, §Assumptions]
+- [x] CHK020 Are the version, bundle ID and privacy-policy hosting assumptions recorded? [Assumption, Spec §Assumptions]
+
+## Review
+
+Reviewed 2026-11-11 under the owner's delegated approval (CLAUDE.md §2): 20/20 satisfied by spec.md as clarified.
