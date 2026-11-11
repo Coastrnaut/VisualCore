@@ -1,0 +1,31 @@
+{
+  "argv": [
+    "xcodebuild",
+    "test",
+    "-project",
+    "Harnesses/SecondConsumer/SecondConsumer.xcodeproj",
+    "-scheme",
+    "SecondConsumer",
+    "-destination",
+    "platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D",
+    "-derivedDataPath",
+    "Build/DerivedData/SecondConsumer",
+    "-resultBundlePath",
+    ".autonomy/xcresults/F08-t811-ios27-20261110-211658.xcresult",
+    "-test-timeouts-enabled",
+    "YES",
+    "-default-test-execution-time-allowance",
+    "180",
+    "CODE_SIGNING_ALLOWED=NO"
+  ],
+  "command": "xcodebuild test -project Harnesses/SecondConsumer/SecondConsumer.xcodeproj -scheme SecondConsumer -destination 'platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D' -derivedDataPath Build/DerivedData/SecondConsumer -resultBundlePath .autonomy/xcresults/F08-t811-ios27-20261110-211658.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 180 CODE_SIGNING_ALLOWED=NO",
+  "elapsed_seconds": 52.923,
+  "exit_code": 0,
+  "finished": "2026-11-11T02:17:51+00:00",
+  "log": ".autonomy/logs/F08.t811-background-ios27.log",
+  "log_sha256": "cea9c388d3e7aef95c770a19b1a331e293748d52d2226afb9f0deaa89519ce7a",
+  "name": "t811-background-ios27",
+  "stage": "F08",
+  "started": "2026-11-11T02:16:58+00:00",
+  "timed_out": false
+}

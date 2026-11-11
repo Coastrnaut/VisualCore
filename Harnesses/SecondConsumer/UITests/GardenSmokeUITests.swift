@@ -72,6 +72,20 @@ final class GardenSmokeUITests: XCTestCase {
         XCTAssertEqual(value("planted", app), 1, "the same spot maps to the same world point (too close / not ready)")
     }
 
+    // T-F811 (spec edge case): time spent in the background does not advance growth.
+    @MainActor func testBackgroundTimeDoesNotGrowFlowers() {
+        let app = launch(reduceMotion: false)
+        point(app, 180, 450).tap()
+        eventually(3, "planted") { value("planted", app) == 1 }
+        XCUIDevice.shared.press(.home)
+        sleep(6)                       // longer than the 4 s growth time
+        app.activate()
+        XCTAssertTrue(app.staticTexts["garden.diagnostics"].waitForExistence(timeout: 10))
+        RunLoop.current.run(until: Date().addingTimeInterval(0.6))
+        XCTAssertEqual(value("blooming", app), 0, "no bloom right after returning: \(app.staticTexts["garden.diagnostics"].label)")
+        eventually(8, "blooms later, once active time has passed") { value("blooming", app) == 1 }
+    }
+
     @MainActor func testReduceMotionHarvestHasNoBurst() {
         let app = launch(reduceMotion: true)
         point(app, 180, 450).tap()
