@@ -341,6 +341,9 @@ targets:
         product: VisualCoreSimulation
       - package: VisualCore
         product: VisualCoreParameters
+      # Feature 028 (A03-P03): bookmarks on VisualCore NamedLibrary.
+      - package: VisualCore
+        product: VisualCorePersistence
     postBuildScripts:
       # FR-A03-006: the build fails if the app depends on ProjectM engine/preset/bridge modules.
       - name: Dependency audit (FR-A03-006)

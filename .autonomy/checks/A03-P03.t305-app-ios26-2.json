@@ -1,0 +1,31 @@
+{
+  "argv": [
+    "xcodebuild",
+    "test",
+    "-project",
+    "VisualCore.xcodeproj",
+    "-scheme",
+    "FractalExplorer",
+    "-destination",
+    "platform=iOS Simulator,id=EC7498FF-31FF-4491-9666-B0D32785203C",
+    "-derivedDataPath",
+    "Build/DerivedData/FractalExplorer",
+    "-resultBundlePath",
+    ".autonomy/xcresults/a03p03-t305-ios26-2.xcresult",
+    "-test-timeouts-enabled",
+    "YES",
+    "-default-test-execution-time-allowance",
+    "300",
+    "CODE_SIGNING_ALLOWED=NO"
+  ],
+  "command": "xcodebuild test -project VisualCore.xcodeproj -scheme FractalExplorer -destination 'platform=iOS Simulator,id=EC7498FF-31FF-4491-9666-B0D32785203C' -derivedDataPath Build/DerivedData/FractalExplorer -resultBundlePath .autonomy/xcresults/a03p03-t305-ios26-2.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 300 CODE_SIGNING_ALLOWED=NO",
+  "elapsed_seconds": 92.754,
+  "exit_code": 0,
+  "finished": "2026-11-11T13:04:50+00:00",
+  "log": ".autonomy/logs/A03-P03.t305-app-ios26-2.log",
+  "log_sha256": "82db92ed2644f759b289cc941c742cab0cacc685c27f175320c939e5ef8f906b",
+  "name": "t305-app-ios26-2",
+  "stage": "A03-P03",
+  "started": "2026-11-11T13:03:18+00:00",
+  "timed_out": false
+}

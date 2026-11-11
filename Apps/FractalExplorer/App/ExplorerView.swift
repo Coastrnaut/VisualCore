@@ -6,6 +6,7 @@ import FractalExplorerCore
 import SwiftUI
 import VisualCoreMath
 import VisualCoreParameters
+import VisualCorePersistence
 import VisualCoreRendering
 import VisualCoreSimulation
 import VisualCoreScenes
@@ -39,7 +40,7 @@ final class ExplorerModel {
     // MARK: Palettes (feature 027 T-A03-206; FR-A03-203)
 
     /// The offered VisualCore built-in palettes (Monochrome omitted: two stops make poor escape bands).
-    static let paletteIDs = ["sunset", "ocean", "forest", "neon", "ember"]
+    static let paletteIDs = Bookmark.paletteIDs
     /// The selected palette.
     var paletteID: String { didSet { if Self.paletteIDs.contains(paletteID) { scene.snapshot.paletteID = paletteID } else { paletteID = oldValue } } }
     /// Palette animation along the bands; defaults to off under Reduce Motion.
@@ -47,8 +48,20 @@ final class ExplorerModel {
 
     /// `fragment` is a test seam (an invalid source exercises the fallback); `system` reads Reduce Motion (default: the
     /// system's, through VisualCoreUI's observer).
+    // MARK: Bookmarks (feature 028 T-A03-305; FR-A03-304)
+
+    /// The saved locations (VisualCore NamedLibrary of `Bookmark`).
+    var bookmarks: BookmarkLibrary
+    /// The last bookmark operation's failure, shown as an alert; nil when there is none.
+    var bookmarkError: String?
+
+    /// `fragment` is a test seam (an invalid source exercises the fallback); `system` reads Reduce Motion (default: the
+    /// system's, through VisualCoreUI's observer); `bookmarksDirectory` defaults to `Application Support/Bookmarks`
+    /// (UI tests pass `-uitestTemporaryBookmarks` for a fresh folder per launch).
     init(size: Vec2 = Vec2(390, 844), fragment: String = FractalShaders.fragment,
-         system: SystemAccessibility = SystemAccessibilityObserver.systemValues()) {
+         system: SystemAccessibility = SystemAccessibilityObserver.systemValues(),
+         bookmarksDirectory: URL? = nil) {
+        bookmarks = .bookmarks(directory: bookmarksDirectory ?? Self.defaultBookmarksDirectory())
         let initial = FractalState(size: size)
         state = initial
         paletteID = "sunset"
@@ -117,6 +130,57 @@ final class ExplorerModel {
     /// The canvas's spoken description: the state's, plus the precision notice when there is one.
     var canvasDescription: String {
         notice.text.map { "\(state.spokenDescription). \($0)" } ?? state.spokenDescription
+    }
+
+    static func defaultBookmarksDirectory() -> URL {
+        if ProcessInfo.processInfo.arguments.contains("-uitestTemporaryBookmarks") {
+            return FileManager.default.temporaryDirectory.appendingPathComponent("uitest-bookmarks-\(UUID().uuidString)")
+        }
+        return BookmarkLibrary.defaultDirectory(named: "Bookmarks")
+    }
+
+    /// Re-reads the bookmark folder (the sheet opens).
+    func reloadBookmarks() { bookmarks.reload() }
+
+    /// Saves the current view under `name`; a failure leaves the list and the view unchanged and sets `bookmarkError`.
+    @discardableResult
+    func saveBookmark(name: String) -> BookmarkLibrary.Entry? {
+        let precision = PrecisionMode(viewport: state.viewport, mantissaBits: mantissaBits, pixelsPerPoint: pixelsPerPoint)
+        do {
+            return try bookmarks.save(Bookmark(state: state, paletteID: paletteID, precision: precision), name: name)
+        } catch {
+            bookmarkError = "The bookmark was not saved. \(Self.describe(error))"
+            return nil
+        }
+    }
+
+    /// Opens a bookmark: mode, seed, cap, radius and palette, then its framing at the current canvas size through
+    /// `apply` (so the precision clamp of feature 027 applies).
+    func open(_ id: UUID) {
+        guard let b = bookmarks.entry(id)?.payload else { return }
+        let target = b.state(size: state.viewport.size)
+        state = target
+        paletteID = b.paletteID
+        apply(target.viewport)
+    }
+
+    /// Renames a bookmark.
+    func renameBookmark(_ id: UUID, to name: String) { perform { try $0.rename(id, to: name) } }
+    /// Marks or unmarks a favorite.
+    func setFavorite(_ id: UUID, _ favorite: Bool) { perform { try $0.setFavorite(id, favorite) } }
+    /// Deletes a bookmark.
+    func deleteBookmark(_ id: UUID) { perform { try $0.delete(id) } }
+
+    private func perform(_ op: (inout BookmarkLibrary) throws -> Void) {
+        do { try op(&bookmarks) } catch { bookmarkError = "The change was not saved. \(Self.describe(error))" }
+    }
+
+    private static func describe(_ error: any Error) -> String {
+        switch error as? StoreProblem {
+        case .writeFailed: "The file could not be written."
+        case .notFound: "The bookmark no longer exists."
+        default: "The bookmark could not be stored."
+        }
     }
 
     /// Applies a new viewport, clamping its scale so one device pixel never falls below one representable step of the
@@ -248,6 +312,7 @@ final class ExplorerModel {
 
 struct ExplorerView: View {
     @State private var model = ExplorerModel()
+    @State private var showingBookmarks = false
 
     var body: some View {
         ScrollView {
@@ -304,7 +369,14 @@ struct ExplorerView: View {
             }
             .padding()
         }
-        .onDisappear { model.close() }
+        .onDisappear { if !showingBookmarks { model.close() } }
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                Button { showingBookmarks = true } label: { Label("Bookmarks", systemImage: "bookmark") }
+                    .accessibilityIdentifier("fe.bookmarks")
+            }
+        }
+        .sheet(isPresented: $showingBookmarks) { BookmarksView(model: model) }
         .navigationTitle("Explorer")
         .navigationBarTitleDisplayMode(.inline)
         .tint(AccessibleColors.accent)
