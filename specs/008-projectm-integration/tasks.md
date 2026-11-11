@@ -48,4 +48,4 @@ MVP = engine on the VisualCore host (T-F705). Each batch closes with its own evi
 
 ## Phase 6: Convergence
 
-- [ ] T-F715 Sync `contracts/projectm-adapter.md`, `data-model.md` and the plan's source listing with the code (EngineFramebufferPath as a RenderScene with captureNextFrame/captured; ImageDiff.Result with passes(noiseFloorWithin8:); ProjectMScene requestPreset/viewports/loader, no useStateReset; RenderContext.redirected; EngineNoiseFloorTests), verified by a symbol check per plan: contracts (partial)
+- [X] T-F715 Sync `contracts/projectm-adapter.md`, `data-model.md` and the plan's source listing with the code (EngineFramebufferPath as a RenderScene with captureNextFrame/captured; ImageDiff.Result with passes(noiseFloorWithin8:); ProjectMScene requestPreset/viewports/loader, no useStateReset; RenderContext.redirected; EngineNoiseFloorTests), verified by a symbol check per plan: contracts (partial) — Verified 2026-11-10: F07.t715-contract-sync exit 0: 25 checks — 17 contract APIs/identifiers found in code, 7 listed test files exist, no stale useStateReset; validate_docs PASS

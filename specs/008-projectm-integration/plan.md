@@ -42,9 +42,12 @@ PASS (LGPL: engine framework dynamic, harness not distributed, recorded in resea
 specs/008-projectm-integration/{plan,research,data-model,quickstart}.md, contracts/projectm-adapter.md, tasks.md
 Harnesses/ProjectMReference/ProjectMReference.yml
 Harnesses/ProjectMReference/Sources/{ProjectMReferenceApp,ProjectMScene,SyntheticSignal,EngineFramebufferPath,ImageDiff}.swift
-Harnesses/ProjectMReference/Tests/{ProjectMSceneTests,BaselineComparisonTests,LifecycleStressTests,EffectsOverEngineTests,SyntheticSignalTests}.swift
+Harnesses/ProjectMReference/Tests/{HarnessLinkTests,ProjectMSceneTests,BaselineComparisonTests,EngineNoiseFloorTests,LifecycleStressTests,EffectsOverEngineTests,SyntheticSignalTests}.swift
+Harnesses/ProjectMReference/README.md
 Packages/VisualCoreRendering/Sources/VisualCoreRendering/GLState.swift          # batch 2a helper
 Packages/VisualCoreRendering/Tests/VisualCoreRenderingTests/GLStateTests.swift
+Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderScene.swift      # RenderContext.redirected (T-F706)
+Packages/VisualCoreRendering/Sources/VisualCoreEffects/EffectScene.swift         # content rendered into its scene target
 docs/architecture/migration-log.md                                              # rows 2a, 2 + retained section
 ```
 
