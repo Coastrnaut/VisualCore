@@ -67,3 +67,8 @@ The API baseline diff contains additions, plus one source-compatible signature c
 
 `A02-P02/t215-reference-a` 3/3 and `t215-reference-b` 4/4: **7/7 pass**, unchanged. A01 Generative Art Studio also
 builds against the changed packages (`t215-gas-build-2`, after clearing its stale DerivedData).
+
+## A02-P03 rerun after `QualityPolicy` (2026-11-11)
+
+`A02-P03/t302-reference-a` 3/3 (pin `d93edd1` unchanged) and `t302-reference-b` 4/4 (ANGLERendering 14/14 and
+ProjectMReference 17/17 on iOS 27.2 and 26.5): **7/7 pass**, unchanged.

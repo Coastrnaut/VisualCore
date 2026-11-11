@@ -28,7 +28,7 @@ IDs are `T-A02-3##`, with one commit and push per task (`scripts/tick_task.py`).
 
   `QualityPolicyTests` cover ≥ 8 cases (SC-A02-304). Add `///` docs, a README section, the package-map row and the API
   baseline.
-- [ ] T-A02-302 Run the ProjectM regression (3/3 + 4/4) after the VisualCore change and append the results to
+- [X] T-A02-302 Run the ProjectM regression (3/3 + 4/4) after the VisualCore change and append the results to — Verified 2026-11-11: run-check A02-P03/t302-reference-a 3/3 and t302-reference-b 4/4 (ANGLERendering 14/14, ProjectMReference 17/17 on iOS 27.2 and 26.5) = 7/7 after QualityPolicy; appended to regression-baseline.md (FR-A02-307)
   `regression-baseline.md` (FR-A02-307).
 - [ ] T-A02-303 [P] Tests first: add `BoundaryMode` ("walls default, open") and `boundaryMode` to
   `FluidConfiguration`. Add `VisualCoreDiagnostics` to the app dependencies in `project.yml` only; Core needs no new
