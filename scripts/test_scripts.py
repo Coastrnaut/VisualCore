@@ -35,6 +35,7 @@ relsym = load("check_release_symbols")
 relcheck = load("release_check")
 appcontract = load("check_app_contract")
 enumeration = load("check_test_enumeration")
+privacy = load("check_privacy_manifest")
 try:
     deps = load("check_dependencies")
 except FileNotFoundError:
@@ -617,6 +618,38 @@ class TestEnumerationTests(unittest.TestCase):
             log.write_text(log.read_text() + "Test Case '-[T.BUITests testTwo]' passed (1 s).\n")
             self.assertEqual(enumeration.main(["--sources", str(d / "src"), "--log", str(log)]), 0)
             self.assertEqual(enumeration.main(["--sources", str(d / "nope"), "--log", str(log)]), 2)
+
+
+class PrivacyManifestTests(unittest.TestCase):
+    clean = {"NSPrivacyTracking": False, "NSPrivacyTrackingDomains": [], "NSPrivacyCollectedDataTypes": [],
+             "NSPrivacyAccessedAPITypes": []}
+
+    def test_detects_each_category(self):
+        found = privacy.scan(["_OBJC_CLASS_$_NSUserDefaults", "_stat$INODE64", "_mach_absolute_time", "_statfs$INODE64",
+                              "_printf"], ["activeInputModes"])
+        self.assertEqual(set(found), {f"NSPrivacyAccessedAPICategory{c}" for c in
+                                      ["UserDefaults", "FileTimestamp", "SystemBootTime", "DiskSpace", "ActiveKeyboards"]})
+        self.assertEqual(privacy.scan(["_printf", "_malloc"], ["hello"]), {})
+        self.assertIn("NSPrivacyAccessedAPICategoryFileTimestamp", privacy.scan([], ["NSFileModificationDate"]))
+
+    def test_compare_reports_undeclared_unused_and_violations(self):
+        detected = {"NSPrivacyAccessedAPICategoryUserDefaults": ["x"]}
+        ok = dict(self.clean, NSPrivacyAccessedAPITypes=[{"NSPrivacyAccessedAPIType": "NSPrivacyAccessedAPICategoryUserDefaults",
+                                                         "NSPrivacyAccessedAPITypeReasons": ["CA92.1"]}])
+        r = privacy.compare(detected, ok)
+        self.assertEqual((r["undeclared"], r["unused"], r["violations"]), ([], [], []))
+        r = privacy.compare(detected, self.clean)
+        self.assertEqual(r["undeclared"], ["NSPrivacyAccessedAPICategoryUserDefaults"])
+        r = privacy.compare({}, ok)
+        self.assertEqual(r["unused"], ["NSPrivacyAccessedAPICategoryUserDefaults"])
+        r = privacy.compare({}, dict(self.clean, NSPrivacyTracking=True, NSPrivacyCollectedDataTypes=[{"a": 1}]))
+        self.assertEqual(len(r["violations"]), 2)
+        bad = dict(self.clean, NSPrivacyAccessedAPITypes=[{"NSPrivacyAccessedAPIType": "X", "NSPrivacyAccessedAPITypeReasons": []}])
+        self.assertTrue(any("no reason" in v for v in privacy.compare({}, bad)["violations"]))
+
+    def test_bad_input_exits_2(self):
+        with tempfile.TemporaryDirectory() as t:
+            self.assertEqual(privacy.main(["--app", str(Path(t) / "Missing.app")]), 2)
 
 
 if __name__ == "__main__":

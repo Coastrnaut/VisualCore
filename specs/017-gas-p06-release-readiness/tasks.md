@@ -19,7 +19,7 @@ or App Store Connect action. Owner steps are written down, never performed.
 
 ## Phase 1: Foundational — shared release tooling (US1, US2; blocks app work)
 
-- [ ] T-A01-601 [US1] Add `scripts/check_privacy_manifest.py`:
+- [X] T-A01-601 [US1] Add `scripts/check_privacy_manifest.py`: — Verified 2026-11-11: scripts/check_privacy_manifest.py: TABLE of required-reason categories (UserDefaults, FileTimestamp, SystemBootTime, DiskSpace, ActiveKeyboards) matched on nm -u symbols and strings -a of the main executable, every embedded framework and every loose .dylib (Debug builds put app code in <App>.debug.dylib; found during the real-binary check); compare() reports undeclared/unused categories and violations (tracking, domains, collected data, empty reasons); exit 0/1/2. PrivacyManifestTests 3/3 in test_scripts.py (per-category detection incl. string-only evidence, undeclared/unused/violations, bad input exit 2). Real-binary check on the GAS Debug build: UserDefaults (_OBJC_CLASS_$_NSUserDefaults), FileTimestamp (_stat), SystemBootTime (_CACurrentMediaTime/_mach_absolute_time). run-check A01-P06/t601-script-tests 58/58 and t601-script-tests-a2 58/58 after the dylib addition
   - `scan(symbols, strings) -> categories` from a table (UserDefaults, FileTimestamp, SystemBootTime, DiskSpace,
     ActiveKeyboards) per research R1/R2;
   - `compare(detected, manifest)` → undeclared, unused and violations (tracking true, domains or collected types
