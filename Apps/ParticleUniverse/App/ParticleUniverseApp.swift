@@ -1,6 +1,6 @@
 // ParticleUniverseApp.swift — Particle Universe app shell (feature 032 A04-P00 T-A04-004; FR-A04-005).
-// Phase 00 shell; Phase 01 (feature 033) adds the sandbox link (CPU preview of the seeded particle domain). No render
-// host, no permissions, no networking yet; the GPU loop arrives in Phase 02 (docs/apps/particle-universe/visualcore-contract.md).
+// Phase 00 shell; Phase 01 (feature 033) adds the sandbox link (CPU preview of the seeded particle domain).
+// Phase 02 (feature 034) draws the sandbox on the GPU through VisualCore. No permissions, no networking.
 import SwiftUI
 import VisualCoreUI
 
@@ -27,7 +27,7 @@ struct HomeView: View {
                     .accessibilityLabel("Particle Universe")
                     .accessibilityIdentifier("pu.home.title")
                 // Only implemented features (constitution A04 truthful claims).
-                Text("A particle sandbox: choose an emitter family, play, pause and step a seeded scene, or try a new seed.")
+                Text("A particle sandbox: choose an emitter family, place and drag one force (attractor, repulsor, gravity well, wind or vortex), play, pause and step a seeded scene, or try a new seed.")
                     .font(.body)
                     .multilineTextAlignment(.center)
                     .fixedSize(horizontal: false, vertical: true)
