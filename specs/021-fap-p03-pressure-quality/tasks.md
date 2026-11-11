@@ -1,0 +1,117 @@
+---
+
+description: "Task list for feature 021 — Fluid Art Playground Phase 03 pressure projection and quality control (ledger gate A02-P03)"
+---
+
+# Tasks: Fluid Art Playground — Phase 03 Pressure projection and quality control
+
+**Input**: `/specs/021-fap-p03-pressure-quality/` (spec with 5 clarifications, plan, research R1–R8, data model,
+contract, quickstart).
+
+**Tests** are required: host suites; app unit and UI tests on iOS 27.2 and 26.5 with the enumeration guard
+(`xcodegen generate` after adding files); the ProjectM regression after the VisualCore change; an A01 build check.
+IDs are `T-A02-3##`, with one commit and push per task (`scripts/tick_task.py`). Commands run through `run-check
+--stage A02-P03`. Review checkpoint after each phase: `validate_docs`, `check_dependencies`, `check_compliance` and
+`check_app_isolation`.
+
+## Phase 1: Setup and foundational
+
+- [ ] T-A02-301 [P] [US4] Tests first, then add `QualityPolicy` in
+  `Packages/VisualCore/Sources/VisualCoreDiagnostics/QualityPolicy.swift`:
+  - "tierCount ≥ 1; lowPowerCeiling 0…tierCount−1 default 1; decisionInterval > 0 default 2 s; calmPeriod > 0 default
+    10 s";
+  - step down on serious or critical, or on Low Power above the ceiling;
+  - step up one tier after the calm period;
+  - at most one change per interval;
+  - a non-finite `now` keeps the tier;
+  - `reset()` and counters.
+
+  `QualityPolicyTests` cover ≥ 8 cases (SC-A02-304). Add `///` docs, a README section, the package-map row and the API
+  baseline.
+- [ ] T-A02-302 Run the ProjectM regression (3/3 + 4/4) after the VisualCore change and append the results to
+  `regression-baseline.md` (FR-A02-307).
+- [ ] T-A02-303 [P] Tests first: add `BoundaryMode` ("walls default, open") and `boundaryMode` to
+  `FluidConfiguration`. Add `VisualCoreDiagnostics` to the Core package and to the app dependencies in `project.yml`.
+  Extend `FluidConfigurationTests` (FR-A02-305).
+
+## Phase 2: User Stories 1 and 2 — projection and boundaries, CPU reference (P1)
+
+- [ ] T-A02-304 [US1] [US2] Tests first, then add `FluidSolver.swift` (Core), following clarifications 1–5:
+  - `divergence`, `jacobiPressure` (starting at 0), `subtractGradient` (walls rule), `diffuse` (8 iterations,
+    ν = viscosity × 50);
+  - the full `step` in the order of clarification 5;
+  - 8-bit encodings for velocity, divergence (2×) and pressure (4×);
+  - an access log of neighbor indices.
+
+  `FluidSolverTests` cover:
+  - divergence of known fields;
+  - Jacobi on a point source;
+  - a divergence reduction ≥ 50% at 20 iterations, never increasing over 5/10/20/40 (SC-A02-302);
+  - a divergence-free field unchanged under open edges;
+  - zero velocity through the walls after projection;
+  - zero out-of-grid reads in both modes on 8×8 (SC-A02-303);
+  - viscosity 0 skipped;
+  - `step` with no splats and zero velocity equals Phase 02's `Advection.step` result.
+
+## Phase 3: User Stories 1 and 2 — GPU passes (P1)
+
+- [ ] T-A02-305 [US1] [US2] Add divergence, pressure, gradient and diffuse fragments to `FluidShaders.swift`
+  (`texelFetch` with explicit edge branches; `uWalls`; encodings). Add pressure, divergence and scratch pairs to the
+  scene, created and released with the others. Implement the pipeline of clarification 5 with
+  `update(configuration:)` (edge mode, viscosity, dissipation and iterations take effect the next frame without a
+  rebuild). Update the Phase 02 fixtures' references to `FluidSolver.step`, with open edges for uniform motion.
+- [ ] T-A02-306 [US1] [US2] Add `Apps/FluidArtPlayground/Tests/Unit/ProjectionFixtureTests.swift` and
+  `BoundaryFixtureTests.swift`, on 8×8 and 16×16 grids in both storages:
+  - a splat-driven divergent field projected with 20 iterations, GPU = CPU (SC-A02-301);
+  - walls versus open near the edges (US2 AC1–AC2);
+  - a uniform field under open edges unchanged (US1 AC3);
+  - a live configuration change taking effect without a rebuild.
+
+  Run the app tests on iOS 27.2 and 26.5 with the guard.
+
+## Phase 4: User Story 3 — Adjust panel (P1)
+
+- [ ] T-A02-307 [US3] Add `Apps/FluidArtPlayground/App/AdjustPanel.swift`, per the contract identifiers:
+  - sliders for viscosity (0–1), dye fade (0–10 per s), motion fade (0–10 per s) and quality (1–80 iterations);
+  - an edge picker;
+  - a tier label;
+  - Reset.
+
+  Each control's accessibility value includes its unit. In `PlaygroundView.swift`, add the `fap.adjust` button and
+  sheet; `PlaygroundModel.configuration` updates are forwarded to `scene.update`. Add `AdjustUITests`: change each
+  control, check the value shown, reset (SC-A02-305). Extend the audit test with the Adjust sheet.
+
+## Phase 5: User Story 4 — automatic quality (P2)
+
+- [ ] T-A02-308 [US4] Tests first: add `FluidQuality.swift` (Core): tiers Full, Reduced and Minimal, with
+  "Reduced = max(1, it/2); Minimal = max(1, it/4) and max(1, cap/2)". Wire `QualityPolicy` into `PlaygroundModel`:
+  `ProcessInfo.thermalState` and `isLowPowerModeEnabled` are read every frame through an injectable provider. The
+  tier's iterations and splat cap reach the scene and the queue drain. The tier label is shown. Add
+  `QualityWiringTests` with injected states: serious → Reduced iterations next frame; the queue is not cleared; the
+  label updates (FR-A02-308).
+
+## Phase 6: Polish
+
+- [ ] T-A02-309 Update `visualcore-contract.json`:
+  - G-QUALITY closed in A02-P03, with the owner changed to VisualCore:VisualCoreDiagnostics (justification R1);
+  - G-SOLVER closed in A02-P03;
+  - M07 available;
+  - M04 available or with updated evidence.
+
+  Run `check_app_contract --render` (FR-A02-309).
+- [ ] T-A02-310 Run the release fast steps, plus host, documented-API and isolation checks; rerun the ProjectM
+  regression if VisualCore changed after T-A02-302; build A01; add lessons (SC-A02-306).
+
+## Dependencies
+
+- T-A02-301, then T-A02-302. T-A02-303 can run in parallel with T-A02-301.
+- T-A02-304 needs T-A02-303.
+- T-A02-305 needs T-A02-304, then T-A02-306.
+- T-A02-307 needs T-A02-305.
+- T-A02-308 needs T-A02-301 and T-A02-305.
+- Polish comes last.
+
+## Implementation strategy
+
+MVP = Phases 1–3 (projection and boundaries matching the CPU). Then the Adjust panel, then automatic quality, then
+the contract and checks. Seal only after converge appends nothing.
