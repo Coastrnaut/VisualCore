@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "sh",
+    "/private/tmp/claude-501/-Users-coast--claude-spares-spare-cfXtKj/51106fd1-e87b-442d-aa28-d54231dd3fe4/scratchpad/f06_plan_check.sh",
+    "/Users/coast/Documents/GIT/VisualCore"
+  ],
+  "command": "sh /private/tmp/claude-501/-Users-coast--claude-spares-spare-cfXtKj/51106fd1-e87b-442d-aa28-d54231dd3fe4/scratchpad/f06_plan_check.sh /Users/coast/Documents/GIT/VisualCore",
+  "elapsed_seconds": 0.01,
+  "exit_code": 0,
+  "finished": "2026-11-11T01:28:43+00:00",
+  "log": ".autonomy/logs/F06.t617-plan-sync.log",
+  "log_sha256": "c97f8d7b03241be1ed5a29f9351850704cc9a855c7d1dec2ba7ed011a7674517",
+  "name": "t617-plan-sync",
+  "stage": "F06",
+  "started": "2026-11-11T01:28:43+00:00",
+  "timed_out": false
+}

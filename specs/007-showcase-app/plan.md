@@ -48,15 +48,16 @@ specs/007-showcase-app/{plan,research,data-model,quickstart}.md, contracts/showc
 ```text
 project.yml                                   # root XcodeGen spec: Showcase + ShowcaseTests + ShowcaseUITests
 Showcase/README.md
-Showcase/App/{ShowcaseApp,SceneCatalog,SceneHostView,DiagnosticsOverlay,ShowcaseSettings}.swift
+Showcase/App/{ShowcaseApp,SceneCatalog,SceneHost,SceneHostView,DiagnosticsOverlay,ShowcaseSettings}.swift
 Showcase/App/Scenes/{GradientTextureScene,AnimatedGeometryScene,DistortionScene,ParticleShowcaseScene,PostProcessingScene}.swift
 Showcase/App/BundleShaders.swift              # loads Shaders/*.glsl into a ShaderLibrary
-Showcase/Shaders/{common.glsl,gradient.vert,gradient.frag,broken.frag,ripple.frag}
-Showcase/Resources/{checker.png,Assets.xcassets}
-Showcase/Tests/Unit/{SceneCatalogTests,BundleShaderTests,SceneRenderTests}.swift
+Showcase/Shaders/{common.glsl,gradient.vert,gradient.frag,broken.frag,stripes.frag,ripple.frag}
+Showcase/Resources/checker.png                # original generated 64×64 checkerboard (no asset catalog yet)
+Showcase/Tests/Unit/{SceneCatalogTests,BundleShaderTests,SceneHostTests,SceneRenderTests}.swift
 Showcase/Tests/UI/ShowcaseSmokeUITests.swift
-scripts/audit_showcase_dependencies.py + tests/fixtures in scripts/fixtures/showcase_audit/
+scripts/audit_showcase_dependencies.py (also a Showcase post-build phase) + fixtures in scripts/fixtures/showcase_audit/
 Packages/VisualCoreRendering/Sources/VisualCoreRendering/GPUObjects.swift   # + Texture.upload(rgba:)
+Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift  # program(…vertexName:fragmentName:)
 ```
 
 **Structure Decision**: README §4 layout (`Showcase/App, Resources, Shaders, Tests`) and root `project.yml`
