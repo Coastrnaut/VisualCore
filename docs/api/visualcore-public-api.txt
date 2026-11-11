@@ -203,13 +203,18 @@ VisualCoreMath | func | public func dot(_ b: Vec3) -> Double
 VisualCoreMath | func | public func dot(_ b: Vec4) -> Double
 VisualCoreMath | func | public func ease(_ t: Double, _ curve: EasingCurve, _ mode: EasingMode = .inOut) -> Double
 VisualCoreMath | func | public func mix(_ b: Vec4, _ t: Double) -> Vec4
+VisualCoreMath | func | public func panned(by delta: Vec2) -> PlaneViewport
+VisualCoreMath | func | public func pinched(by scale: Double, anchor: Vec2) -> PlaneViewport
+VisualCoreMath | func | public func plane(fromScreen p: Vec2) -> Vec2
 VisualCoreMath | func | public func project(_ p: Vec3, aspect: Double) -> Vec3
 VisualCoreMath | func | public func projection(aspect: Double) -> Mat4
 VisualCoreMath | func | public func ray(ndc: Vec2, aspect: Double) -> (origin: Vec3, direction: Vec3)
+VisualCoreMath | func | public func resized(to newSize: Vec2) -> PlaneViewport
 VisualCoreMath | func | public func rotate(_ v: Vec3) -> Vec3
 VisualCoreMath | func | public func row(_ i: Int) -> Vec3
 VisualCoreMath | func | public func row(_ i: Int) -> Vec4
 VisualCoreMath | func | public func scaled(by s: Vec2) -> Vec2
+VisualCoreMath | func | public func screen(fromPlane p: Vec2) -> Vec2
 VisualCoreMath | func | public func slerp(_ to: Quat, _ t: Double) -> Quat
 VisualCoreMath | func | public func view() -> Mat4
 VisualCoreMath | func | public func viewProjection(aspect: Double) -> Mat4
@@ -238,6 +243,7 @@ VisualCoreMath | func | public static func - (a: Vec4, b: Vec4) -> Vec4
 VisualCoreMath | func | public static func -= (a: inout Vec2, b: Vec2)
 VisualCoreMath | func | public static func / (a: Vec2, s: Double) -> Vec2
 VisualCoreMath | func | public static func / (a: Vec3, s: Double) -> Vec3
+VisualCoreMath | func | public static func framing(width: Double, center: Vec2, size: Vec2) -> PlaneViewport
 VisualCoreMath | func | public static func lookAt(eye: Vec3, target: Vec3, up: Vec3) -> Mat4
 VisualCoreMath | func | public static func perspective(fovY: Double, aspect: Double, near: Double, far: Double) -> Mat4
 VisualCoreMath | func | public static func rotation(_ a: Double) -> Mat3
@@ -255,10 +261,13 @@ VisualCoreMath | init | public init(_ x: Double, _ y: Double, _ z: Double)
 VisualCoreMath | init | public init(_ x: Double, _ y: Double, _ z: Double, _ w: Double)
 VisualCoreMath | init | public init(axis: Vec3, angle: Double)
 VisualCoreMath | init | public init(center: Vec2 = .zero, zoom: Double = 1, rotation: Double = 0)
+VisualCoreMath | init | public init(center: Vec2, unitsPerPoint: Double, size: Vec2)
 VisualCoreMath | init | public init(target: Vec3 = .zero, distance: Double = 5, yaw: Double = 0, pitch: Double = 0,
 VisualCoreMath | init | public init(x: Double, y: Double, z: Double, w: Double)
 VisualCoreMath | let | public static let distanceRange: ClosedRange<Double>
 VisualCoreMath | let | public static let identity
+VisualCoreMath | let | public static let maxUnitsPerPoint
+VisualCoreMath | let | public static let minUnitsPerPoint
 VisualCoreMath | let | public static let pitchLimit
 VisualCoreMath | let | public static let version
 VisualCoreMath | let | public static let zero
@@ -267,10 +276,15 @@ VisualCoreMath | struct | public struct Camera2D: Sendable, Equatable
 VisualCoreMath | struct | public struct Mat3: Sendable, Equatable
 VisualCoreMath | struct | public struct Mat4: Sendable, Equatable
 VisualCoreMath | struct | public struct OrbitCamera: Sendable, Equatable
+VisualCoreMath | struct | public struct PlaneViewport: Sendable, Equatable
 VisualCoreMath | struct | public struct Quat: Sendable, Equatable
 VisualCoreMath | struct | public struct Vec2: Sendable, Equatable, Hashable, Codable
 VisualCoreMath | struct | public struct Vec3: Sendable, Equatable, Hashable, Codable
 VisualCoreMath | struct | public struct Vec4: Sendable, Equatable, Hashable, Codable
+VisualCoreMath | var | public private(set) var center: Vec2
+VisualCoreMath | var | public private(set) var size: Vec2
+VisualCoreMath | var | public private(set) var unitsPerPoint: Double
+VisualCoreMath | var | public private(set) var wasClamped: Bool
 VisualCoreMath | var | public var c0: Vec3, c1: Vec3, c2: Vec3
 VisualCoreMath | var | public var c0: Vec4, c1: Vec4, c2: Vec4, c3: Vec4
 VisualCoreMath | var | public var center: Vec2

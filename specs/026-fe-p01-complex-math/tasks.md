@@ -20,7 +20,7 @@ research R1–R4, the data model, the contract and the quickstart.
 
 ## Phase 1: Foundational — VisualCore PlaneViewport (blocks US3)
 
-- [ ] T-A03-101 Write `PlaneViewportTests` first (`Packages/VisualCore/Tests/VisualCoreMathTests/PlaneViewportTests.swift`,
+- [X] T-A03-101 Write `PlaneViewportTests` first (`Packages/VisualCore/Tests/VisualCoreMathTests/PlaneViewportTests.swift`, — Verified 2026-11-11: — Verified 2026-11-11: VisualCoreMath.PlaneViewport (center, unitsPerPoint clamped 1e-15...1e3 with wasClamped, size with last-valid fallback, plane(fromScreen:)/screen(fromPlane:) y-up plane, pinched(by:anchor:), panned(by:), resized(to:), framing(width:center:size:)), documented, README and baseline; PlaneViewportTests 8/8 (round trip < 1e-9 pt, anchored pinch drift < 1e-12 relative over 1e-6...1e6, clamps, pan, 100 random resizes keep center and square pixels, invalid inputs incl. zero/NaN size, framing) in run-check A03-P01/t101-host-visualcore; t101-checks 4/4; ProjectM regression t101-reference-a 3/3 + t101-reference-b 4/4; A01 and A02 build-for-testing succeeded
   at least 8 tests per the contract, including a zero or non-finite size keeping the last valid size; analyze G1). Then add `Packages/VisualCore/Sources/VisualCoreMath/PlaneViewport.swift` with:
   - center: `Vec2`, finite, otherwise (0, 0);
   - `unitsPerPoint`: clamped to 1e-15…1e3, with `wasClamped`;
