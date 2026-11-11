@@ -118,6 +118,10 @@ def validate(root: Path, data: dict) -> list[str]:
     problems: list[str] = []
     known = products(root)
     rows = {r.get("id"): r for r in data.get("matrix", [])}
+    for entry in data.get("inventory", []):
+        for path in entry.get("paths", []):
+            if not (root / path).exists():
+                problems.append(f"inventory {entry.get('area')}: path {path} not found")
     covered = {m for g in data.get("gaps", []) for m in g.get("matrix", [])}
     for row in data.get("matrix", []):
         rid = row.get("id", "?")
@@ -144,8 +148,8 @@ def validate(root: Path, data: dict) -> list[str]:
             why = symbol_problem(root, ex.get("file", ""), ex.get("symbol", ""), False)
             if why:
                 problems.append(f"{rid}: example {ex.get('file')}:{ex.get('symbol')}: {why}")
-        elif status != "upstream gap":
-            problems.append(f"{rid}: needs an example consumer")
+        else:
+            problems.append(f"{rid}: needs an example consumer (SC: every row, upstream gaps cite the closest consumer)")
         if status in ("requires adaptation", "upstream gap") and rid not in covered:
             problems.append(f"{rid}: {status} row has no gap entry")
     for gap in data.get("gaps", []):

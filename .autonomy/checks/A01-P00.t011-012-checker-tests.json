@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "python3",
+    "scripts/test_scripts.py"
+  ],
+  "command": "python3 scripts/test_scripts.py",
+  "elapsed_seconds": 7.05,
+  "exit_code": 0,
+  "finished": "2026-11-11T03:26:51+00:00",
+  "log": ".autonomy/logs/A01-P00.t011-012-checker-tests.log",
+  "log_sha256": "7c59bcaf19d9a5014fd64364c0b42a8b08e9c02ed1b50fb181d502801c0104f4",
+  "name": "t011-012-checker-tests",
+  "stage": "A01-P00",
+  "started": "2026-11-11T03:26:44+00:00",
+  "timed_out": false
+}

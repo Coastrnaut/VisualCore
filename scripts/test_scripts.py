@@ -531,7 +531,7 @@ class AppContractTests(unittest.TestCase):
     def test_good_fixture_passes(self):
         code, out = self.run_checker(self.FIX / "good")
         self.assertEqual(code, 0, out)
-        self.assertIn("PASS: 2 rows, 2 citations, 1 gaps, decision go", out)
+        self.assertIn("PASS: 2 rows, 3 citations, 1 gaps, decision go", out)
 
     def test_bad_fixture_reports_every_problem_by_row(self):
         code, out = self.run_checker(self.FIX / "bad")
@@ -545,9 +545,11 @@ class AppContractTests(unittest.TestCase):
                          "M07: External/ref/Engine.swift:Engine: evidence must be shippable",
                          "M08: upstream gap needs evidence or notes",
                          "G-LOCAL: app-local gap needs a justification",
-                         "decision: go with blockers"]:
+                         "decision: go with blockers",
+                         "M08: needs an example consumer",
+                         "inventory ghost: path Packages/Demo/Sources/DemoKit/Gone.swift not found"]:
             self.assertIn(expected, out)
-        self.assertIn("FAIL: 10 problem(s)", out)
+        self.assertIn("FAIL: 12 problem(s)", out)
 
     def test_products_include_mapped_array_names(self):
         self.assertEqual(appcontract.products(self.FIX / "good"), {"DemoKit", "DemoExtra"})

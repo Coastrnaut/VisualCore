@@ -88,5 +88,5 @@ only when every task carries evidence and converge appends nothing.
 
 ## Phase 8: Convergence
 
-- [ ] T-A01-011 Give matrix rows M05 and M08 example consumers in `docs/apps/generative-art-studio/visualcore-contract.json`, and make `scripts/check_app_contract.py` require an example on every row (bad-fixture case + test) per SC-A01-002 (partial)
+- [X] T-A01-011 Give matrix rows M05 and M08 example consumers in `docs/apps/generative-art-studio/visualcore-contract.json`, and make `scripts/check_app_contract.py` require an example on every row (bad-fixture case + test) per SC-A01-002 (partial) — Verified 2026-11-10: M05 example EffectGraphValidator (EffectGraphValidation.swift consumes ParameterSpec), M08 example everyPureModuleStartsAtZeroDotOne (ScaffoldTests reads PersistenceInfo.version); checker now requires an example on every row; run-check A01-P00/t011-012-checker-tests OK (bad fixture reports M08 missing example, 12 problems), t011-012-contract-check PASS 10 rows, 34 citations, 7 gaps (SC-A01-002 10/10)
 - [ ] T-A01-012 Make `scripts/check_app_contract.py` verify that every inventory path exists (bad-fixture case + test) per FR-A01-001 (partial)

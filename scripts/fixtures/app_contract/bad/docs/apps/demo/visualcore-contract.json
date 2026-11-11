@@ -1,29 +1,172 @@
-{"schema": 1, "app": "demo", "gate": "A00-P00", "date": "2026-11-10",
- "inventory": [],
+{
+ "schema": 1,
+ "app": "demo",
+ "gate": "A00-P00",
+ "date": "2026-11-10",
+ "inventory": [
+  {
+   "area": "ghost",
+   "description": "stale path",
+   "paths": [
+    "Packages/Demo/Sources/DemoKit/Gone.swift"
+   ],
+   "owner": "DemoKit"
+  }
+ ],
  "matrix": [
-  {"id": "M01", "capability": "missing file", "source": "x", "status": "available",
-   "evidence": [{"file": "Packages/Demo/Sources/DemoKit/Nope.swift", "symbol": "Widget", "product": "DemoKit", "public": true}],
-   "example": {"file": "Packages/Demo/Tests/DemoKitTests/WidgetTests.swift", "symbol": "testSpin"}},
-  {"id": "M02", "capability": "missing symbol", "source": "x", "status": "available",
-   "evidence": [{"file": "Packages/Demo/Sources/DemoKit/Widget.swift", "symbol": "Widget.twirl", "product": "DemoKit", "public": true}],
-   "example": {"file": "Packages/Demo/Tests/DemoKitTests/WidgetTests.swift", "symbol": "testSpin"}},
-  {"id": "M03", "capability": "internal only", "source": "x", "status": "available",
-   "evidence": [{"file": "Packages/Demo/Sources/DemoKit/Widget.swift", "symbol": "Widget.hidden", "product": "DemoKit", "public": true}],
-   "example": {"file": "Packages/Demo/Tests/DemoKitTests/WidgetTests.swift", "symbol": "testSpin"}},
-  {"id": "M04", "capability": "unknown product", "source": "x", "status": "available",
-   "evidence": [{"file": "Packages/Demo/Sources/DemoKit/Widget.swift", "symbol": "Widget", "product": "Nonexistent", "public": true}],
-   "example": {"file": "Packages/Demo/Tests/DemoKitTests/WidgetTests.swift", "symbol": "testSpin"}},
-  {"id": "M05", "capability": "no gap", "source": "x", "status": "requires adaptation",
-   "evidence": [{"file": "Packages/Demo/Sources/DemoKit/Widget.swift", "symbol": "Widget", "product": "DemoExtra", "public": true}],
-   "example": {"file": "Packages/Demo/Tests/DemoKitTests/WidgetTests.swift", "symbol": "testSpin"}},
-  {"id": "M06", "capability": "test evidence", "source": "x", "status": "available",
-   "evidence": [{"file": "Packages/Demo/Tests/DemoKitTests/WidgetTests.swift", "symbol": "WidgetProbe", "product": "DemoKit", "public": true}],
-   "example": {"file": "Packages/Demo/Tests/DemoKitTests/WidgetTests.swift", "symbol": "testSpin"}},
-  {"id": "M07", "capability": "projectm only", "source": "x", "status": "available",
-   "evidence": [{"file": "External/ref/Engine.swift", "symbol": "Engine", "product": "DemoKit", "public": true}],
-   "example": {"file": "Packages/Demo/Tests/DemoKitTests/WidgetTests.swift", "symbol": "testSpin"}},
-  {"id": "M08", "capability": "bare gap", "source": "x", "status": "upstream gap", "evidence": []}],
- "gaps": [{"id": "G-LOCAL", "matrix": ["M08"], "kind": "upstream", "owner": "app-local", "phase": 3, "test": "t"}],
+  {
+   "id": "M01",
+   "capability": "missing file",
+   "source": "x",
+   "status": "available",
+   "evidence": [
+    {
+     "file": "Packages/Demo/Sources/DemoKit/Nope.swift",
+     "symbol": "Widget",
+     "product": "DemoKit",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/Demo/Tests/DemoKitTests/WidgetTests.swift",
+    "symbol": "testSpin"
+   }
+  },
+  {
+   "id": "M02",
+   "capability": "missing symbol",
+   "source": "x",
+   "status": "available",
+   "evidence": [
+    {
+     "file": "Packages/Demo/Sources/DemoKit/Widget.swift",
+     "symbol": "Widget.twirl",
+     "product": "DemoKit",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/Demo/Tests/DemoKitTests/WidgetTests.swift",
+    "symbol": "testSpin"
+   }
+  },
+  {
+   "id": "M03",
+   "capability": "internal only",
+   "source": "x",
+   "status": "available",
+   "evidence": [
+    {
+     "file": "Packages/Demo/Sources/DemoKit/Widget.swift",
+     "symbol": "Widget.hidden",
+     "product": "DemoKit",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/Demo/Tests/DemoKitTests/WidgetTests.swift",
+    "symbol": "testSpin"
+   }
+  },
+  {
+   "id": "M04",
+   "capability": "unknown product",
+   "source": "x",
+   "status": "available",
+   "evidence": [
+    {
+     "file": "Packages/Demo/Sources/DemoKit/Widget.swift",
+     "symbol": "Widget",
+     "product": "Nonexistent",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/Demo/Tests/DemoKitTests/WidgetTests.swift",
+    "symbol": "testSpin"
+   }
+  },
+  {
+   "id": "M05",
+   "capability": "no gap",
+   "source": "x",
+   "status": "requires adaptation",
+   "evidence": [
+    {
+     "file": "Packages/Demo/Sources/DemoKit/Widget.swift",
+     "symbol": "Widget",
+     "product": "DemoExtra",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/Demo/Tests/DemoKitTests/WidgetTests.swift",
+    "symbol": "testSpin"
+   }
+  },
+  {
+   "id": "M06",
+   "capability": "test evidence",
+   "source": "x",
+   "status": "available",
+   "evidence": [
+    {
+     "file": "Packages/Demo/Tests/DemoKitTests/WidgetTests.swift",
+     "symbol": "WidgetProbe",
+     "product": "DemoKit",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/Demo/Tests/DemoKitTests/WidgetTests.swift",
+    "symbol": "testSpin"
+   }
+  },
+  {
+   "id": "M07",
+   "capability": "projectm only",
+   "source": "x",
+   "status": "available",
+   "evidence": [
+    {
+     "file": "External/ref/Engine.swift",
+     "symbol": "Engine",
+     "product": "DemoKit",
+     "public": true
+    }
+   ],
+   "example": {
+    "file": "Packages/Demo/Tests/DemoKitTests/WidgetTests.swift",
+    "symbol": "testSpin"
+   }
+  },
+  {
+   "id": "M08",
+   "capability": "bare gap",
+   "source": "x",
+   "status": "upstream gap",
+   "evidence": []
+  }
+ ],
+ "gaps": [
+  {
+   "id": "G-LOCAL",
+   "matrix": [
+    "M08"
+   ],
+   "kind": "upstream",
+   "owner": "app-local",
+   "phase": 3,
+   "test": "t"
+  }
+ ],
  "traceability": [],
  "negative": [],
- "decision": {"result": "go", "reasons": [], "blockers": ["second renderer needed"]}}
+ "decision": {
+  "result": "go",
+  "reasons": [],
+  "blockers": [
+   "second renderer needed"
+  ]
+ }
+}

@@ -228,7 +228,11 @@
           "public": true
         }
       ],
-      "notes": "ParameterSpec is effects-pass specific (range/default only): no units, UI transform, presets or stable hash."
+      "notes": "ParameterSpec is effects-pass specific (range/default only): no units, UI transform, presets or stable hash.",
+      "example": {
+        "file": "Packages/VisualCore/Sources/VisualCoreEffectsGraph/EffectGraphValidation.swift",
+        "symbol": "EffectGraphValidator"
+      }
     },
     {
       "id": "M06",
@@ -303,7 +307,11 @@
           "public": true
         }
       ],
-      "notes": "VisualCorePersistence is a placeholder (ADR-0006): no envelope, atomic write or migrations."
+      "notes": "VisualCorePersistence is a placeholder (ADR-0006): no envelope, atomic write or migrations.",
+      "example": {
+        "file": "Packages/VisualCore/Tests/VisualCoreScaffoldTests/ScaffoldTests.swift",
+        "symbol": "everyPureModuleStartsAtZeroDotOne"
+      }
     },
     {
       "id": "M09",
