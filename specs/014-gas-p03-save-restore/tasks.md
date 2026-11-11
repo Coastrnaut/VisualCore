@@ -12,7 +12,7 @@ regression; after each phase, `validate_docs.py`.
 
 ## Phase 1: Foundational — VisualCorePersistence store (US5; blocks US1–US3)
 
-- [ ] T-A01-301 [US5] Implement `Packages/VisualCore/Sources/VisualCorePersistence/{Envelope,Migration,DocumentStore}.swift` per contracts/api.md:
+- [X] T-A01-301 [US5] Implement `Packages/VisualCore/Sources/VisualCorePersistence/{Envelope,Migration,DocumentStore}.swift` per contracts/api.md: — Verified 2026-11-10: VisualCorePersistence: Envelope.swift (DocumentEnvelope, StoreProblem incl. invalidID), Migration.swift (MigrationChain over JSON objects, MigrationError), DocumentStore.swift (atomic temp+replace with test hook, id rule, size limit checked before reading, load report with per-file problems and temp cleanup, load(id:)/delete/exists, ISO 8601 dates, sorted keys) + VisualCorePersistenceTests; run-check A01-P03/t301-persistence-tests 6/6: round trip/update/delete, missing dir created, interrupted write keeps old file + temp cleanup, 5 bad of 10 files reported and byte-identical, v0 migrated on load without rewrite, invalid ids and oversize writes rejected; R1-R5 PASS; API baseline updated
   - envelope with sorted keys and ISO 8601 `savedAt`;
   - `MigrationChain` over JSON objects;
   - `DocumentStore<Value>`:

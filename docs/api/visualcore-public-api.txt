@@ -337,8 +337,37 @@ VisualCoreParameters | var | public var defaults: [String: Double]
 VisualCoreParameters | var | public var linearStops: [SIMD3<Double>]
 VisualCoreParameters | var | public var modifiedNames: [String]
 VisualCoreParameters | var | public var range: ClosedRange<Double>
+VisualCorePersistence | enum | public enum MigrationError: Error, Equatable, Sendable
 VisualCorePersistence | enum | public enum PersistenceInfo
+VisualCorePersistence | enum | public enum StoreProblem: Error, Equatable, Sendable
+VisualCorePersistence | func | public func delete(id: String) throws(StoreProblem)
+VisualCorePersistence | func | public func exists(id: String) -> Bool
+VisualCorePersistence | func | public func load() -> LoadReport<Value>
+VisualCorePersistence | func | public func load(id: String) throws(StoreProblem) -> StoredItem<Value>
+VisualCorePersistence | func | public func migrate(_ payload: [String: Any], from version: Int) throws -> [String: Any]
+VisualCorePersistence | func | public func save(_ value: Value, id: String, now: Date = Date()) throws(StoreProblem)
+VisualCorePersistence | init | public init(currentVersion: Int, steps: [Int: Step] = [:])
+VisualCorePersistence | init | public init(directory: URL, kind: String, migrations: MigrationChain, maxBytes: Int = 256 * 1024)
+VisualCorePersistence | init | public init(kind: String, schemaVersion: Int, savedAt: Date)
+VisualCorePersistence | let | public let currentVersion: Int
+VisualCorePersistence | let | public let directory: URL
+VisualCorePersistence | let | public let id: String
+VisualCorePersistence | let | public let items: [StoredItem<Value>]
+VisualCorePersistence | let | public let kind: String
+VisualCorePersistence | let | public let maxBytes: Int
+VisualCorePersistence | let | public let migratedFrom: Int?
+VisualCorePersistence | let | public let migrations: MigrationChain
+VisualCorePersistence | let | public let problems: [StoreProblem]
+VisualCorePersistence | let | public let savedAt: Date
+VisualCorePersistence | let | public let schemaVersion: Int
+VisualCorePersistence | let | public let value: Value
 VisualCorePersistence | let | public static let version
+VisualCorePersistence | struct | public struct DocumentEnvelope: Sendable, Equatable
+VisualCorePersistence | struct | public struct DocumentStore<Value: Codable & Sendable>: Sendable
+VisualCorePersistence | struct | public struct LoadReport<Value: Sendable>: Sendable
+VisualCorePersistence | struct | public struct MigrationChain: Sendable
+VisualCorePersistence | struct | public struct StoredItem<Value: Sendable>: Sendable
+VisualCorePersistence | typealias | public typealias Step = @Sendable ([String: Any]) throws -> [String: Any]
 VisualCoreRendering | class | public final class ClearColorScene: RenderScene
 VisualCoreRendering | class | public final class FullScreenShaderScene: RenderScene
 VisualCoreRendering | class | public final class GPUBuffer: GPUResource

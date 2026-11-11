@@ -34,6 +34,7 @@ let package = Package(
         .testTarget(name: "VisualCoreDiagnosticsTests", dependencies: ["VisualCoreDiagnostics"]),
         .testTarget(name: "VisualCoreParametersTests", dependencies: ["VisualCoreParameters"]),
         .testTarget(name: "VisualCoreTestSupportTests", dependencies: ["VisualCoreTestSupport"]),
+        .testTarget(name: "VisualCorePersistenceTests", dependencies: ["VisualCorePersistence"]),
         .testTarget(name: "VisualCoreShaderSourceTests", dependencies: ["VisualCoreShaderSource"]),
         .testTarget(name: "VisualCoreEffectsGraphTests", dependencies: ["VisualCoreEffectsGraph"], resources: [.copy("Fixtures")]),
         .testTarget(name: "VisualCoreScaffoldTests",
