@@ -11,7 +11,8 @@
                 "evidence": [ { "file": "...", "symbol": "Type[.member]", "product": "VisualCoreX", "public": true } ],
                 "example": { "file": "...", "symbol": "..." }, "notes": "..." } ],
   "gaps": [ { "id": "G-…", "matrix": ["M05"], "kind": "adaptation|upstream",
-              "owner": "VisualCore:<Module>|app-local", "justification": "...", "phase": 1, "test": "..." } ],
+              "owner": "VisualCore:<Module>|app-local", "justification": "...", "phase": 1, "test": "...",
+              "closed": "A01-P01 (optional: gate that closed the gap; closed gaps no longer cover open rows)" } ],
   "traceability": [ { "item": "v0.1 feature 01 | journey 1 | brainstorm", "matrix": ["M01"], "phases": [2] } ],
   "negative": [ { "rule": "...", "source": "..." } ],
   "decision": { "result": "go|stop", "reasons": ["..."], "blockers": [] }

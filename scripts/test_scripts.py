@@ -551,6 +551,26 @@ class AppContractTests(unittest.TestCase):
             self.assertIn(expected, out)
         self.assertIn("FAIL: 12 problem(s)", out)
 
+    def test_closed_gaps_do_not_cover_open_rows(self):
+        import shutil
+        with tempfile.TemporaryDirectory() as t:
+            root = Path(t) / "good"
+            shutil.copytree(self.FIX / "good", root)
+            path = root / "docs/apps/demo/visualcore-contract.json"
+            data = json.loads(path.read_text())
+            data["gaps"][0]["closed"] = "A00-P01"
+            path.write_text(json.dumps(data))
+            code, out = self.run_checker(root)
+            self.assertEqual(code, 1)
+            self.assertIn("M02: upstream gap row has no gap entry", out)
+            data["matrix"][1]["status"] = "available"
+            data["matrix"][1]["evidence"] = [{"file": "Packages/Demo/Sources/DemoKit/Widget.swift", "symbol": "Widget", "product": "DemoKit", "public": True}]
+            path.write_text(json.dumps(data))
+            self.assertEqual(self.run_checker(root)[0], 0)
+            data["gaps"][0]["closed"] = "yesterday"
+            path.write_text(json.dumps(data))
+            self.assertIn("closed must name the gate", self.run_checker(root)[1])
+
     def test_products_include_mapped_array_names(self):
         self.assertEqual(appcontract.products(self.FIX / "good"), {"DemoKit", "DemoExtra"})
         real = appcontract.products(HERE.parent)

@@ -80,7 +80,7 @@ regression.
 
 ## Phase 5: Polish and cross-cutting
 
-- [ ] T-A01-112 Update `docs/apps/generative-art-studio/visualcore-contract.json`:
+- [X] T-A01-112 Update `docs/apps/generative-art-studio/visualcore-contract.json`: — Verified 2026-11-10: docs/apps/generative-art-studio/visualcore-contract.json (gate A01-P01): M01 and M05 now available with ShaderBundle/FullScreenShaderScene/ShaderLibrary and VisualCoreParameters evidence; G-SHADERLOAD, G-GLSLLIB, G-PARAMS closed in A01-P01; G-UI narrowed to the accessibility settings model; Test support inventory row; checker supports optional gap 'closed' (closed gaps do not cover open rows; test added; 011 data model documented); check_app_contract PASS 10 rows, 39 citations, 7 gaps; run-check A01-P01/t112-release-fast 9/9 (docs, app-contracts, compliance, dependencies, public API, documented API Showcase, licenses, script tests, host VisualCore); t112-documented-api-app PASS
   - M01 and M05 become `available` with the new evidence;
   - G-SHADERLOAD, G-GLSLLIB and G-PARAMS are closed (phase 1);
   - G-UI keeps only the accessibility-settings part (phase 2);

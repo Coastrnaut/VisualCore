@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_documented_api.py",
+    "--sources",
+    "Apps/GenerativeArtStudio"
+  ],
+  "command": "python3 scripts/check_documented_api.py --sources Apps/GenerativeArtStudio",
+  "elapsed_seconds": 0.138,
+  "exit_code": 0,
+  "finished": "2026-11-11T03:53:39+00:00",
+  "log": ".autonomy/logs/A01-P01.t112-documented-api-app.log",
+  "log_sha256": "346c494245c433ba0829729cd15654dcbc518ea5e0b24ecda161df0c93121380",
+  "name": "t112-documented-api-app",
+  "stage": "A01-P01",
+  "started": "2026-11-11T03:53:38+00:00",
+  "timed_out": false
+}

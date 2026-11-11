@@ -30,7 +30,7 @@ KEYS = {
     "matrix": {"id", "capability", "source", "status", "evidence", "example", "notes"},
     "evidence": {"file", "symbol", "product", "public"},
     "example": {"file", "symbol"},
-    "gaps": {"id", "matrix", "kind", "owner", "justification", "phase", "test"},
+    "gaps": {"id", "matrix", "kind", "owner", "justification", "phase", "test", "closed"},
     "traceability": {"item", "matrix", "phases"},
     "negative": {"rule", "source"},
     "decision": {"result", "reasons", "blockers"},
@@ -122,7 +122,7 @@ def validate(root: Path, data: dict) -> list[str]:
         for path in entry.get("paths", []):
             if not (root / path).exists():
                 problems.append(f"inventory {entry.get('area')}: path {path} not found")
-    covered = {m for g in data.get("gaps", []) for m in g.get("matrix", [])}
+    open_covered = {m for g in data.get("gaps", []) if not g.get("closed") for m in g.get("matrix", [])}
     for row in data.get("matrix", []):
         rid = row.get("id", "?")
         status = row.get("status")
@@ -150,7 +150,7 @@ def validate(root: Path, data: dict) -> list[str]:
                 problems.append(f"{rid}: example {ex.get('file')}:{ex.get('symbol')}: {why}")
         else:
             problems.append(f"{rid}: needs an example consumer (SC: every row, upstream gaps cite the closest consumer)")
-        if status in ("requires adaptation", "upstream gap") and rid not in covered:
+        if status in ("requires adaptation", "upstream gap") and rid not in open_covered:
             problems.append(f"{rid}: {status} row has no gap entry")
     for gap in data.get("gaps", []):
         gid = gap.get("id", "?")
@@ -165,6 +165,8 @@ def validate(root: Path, data: dict) -> list[str]:
             problems.append(f"{gid}: phase must be 1-6")
         if not gap.get("test"):
             problems.append(f"{gid}: needs a test intent")
+        if gap.get("closed") is not None and not re.fullmatch(r"A\d{2}-P\d{2}", str(gap["closed"])):
+            problems.append(f"{gid}: closed must name the gate that closed it (e.g. A01-P01)")
         for m in gap.get("matrix", []):
             if m not in rows:
                 problems.append(f"{gid}: references unknown matrix row {m}")
@@ -199,10 +201,11 @@ def render(data: dict) -> str:
         ex = f"`{r['example']['symbol']}` ({r['example']['file']})" if r.get("example") else "—"
         out.append(f"| {r['id']} | {cell(r['capability'])} | {cell(r.get('source'))} | **{r['status']}** | "
                    f"{cell(ev) or cell(r.get('notes'))} | {cell(ex)} |")
-    out += ["", "### Gap register", "", "| ID | Rows | Kind | Owner | Phase | Test | Justification |",
-            "|---|---|---|---|---|---|---|"]
+    out += ["", "### Gap register", "", "| ID | Rows | Kind | Owner | Phase | Status | Test | Justification |",
+            "|---|---|---|---|---|---|---|---|"]
     out += [f"| {g['id']} | {cell(g.get('matrix'))} | {g.get('kind')} | {cell(g.get('owner'))} | {g.get('phase')} | "
-            f"{cell(g.get('test'))} | {cell(g.get('justification'))} |" for g in data.get("gaps", [])]
+            f"{'closed in ' + g['closed'] if g.get('closed') else 'open'} | {cell(g.get('test'))} | {cell(g.get('justification'))} |"
+            for g in data.get("gaps", [])]
     out += ["", "### Traceability", "", "| Item | Matrix rows | Phases |", "|---|---|---|"]
     out += [f"| {cell(t['item'])} | {cell(t.get('matrix'))} | {cell(t.get('phases'))} |"
             for t in data.get("traceability", [])]

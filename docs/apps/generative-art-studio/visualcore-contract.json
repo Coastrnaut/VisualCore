@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "app": "generative-art-studio",
-  "gate": "A01-P00",
+  "gate": "A01-P01",
   "date": "2026-11-10",
   "inventory": [
     {
@@ -95,6 +95,14 @@
         ".specify/memory/constitution.md"
       ],
       "owner": "constitution + package map"
+    },
+    {
+      "area": "Test support",
+      "description": "VisualCoreTestSupport (test targets only): ImageComparison/ImageDifference/ImageStatistics for pixel tests (A01-P01).",
+      "paths": [
+        "Packages/VisualCore/Sources/VisualCoreTestSupport/ImageComparison.swift"
+      ],
+      "owner": "VisualCoreTestSupport"
     }
   ],
   "matrix": [
@@ -102,26 +110,32 @@
       "id": "M01",
       "capability": "Shader pipelines and shader asset management",
       "source": "brainstorm",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ShaderBundle.swift",
+          "symbol": "ShaderBundle",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FullScreenShaderScene.swift",
+          "symbol": "FullScreenShaderScene",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
         {
           "file": "Packages/VisualCore/Sources/VisualCoreShaderSource/ShaderLibrary.swift",
           "symbol": "ShaderLibrary.expand",
           "product": "VisualCoreShaderSource",
           "public": true
-        },
-        {
-          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
-          "symbol": "ResourceRegistry.program",
-          "product": "VisualCoreRendering",
-          "public": true
         }
       ],
       "example": {
-        "file": "Showcase/App/BundleShaders.swift",
-        "symbol": "BundleShaders.library"
+        "file": "Apps/GenerativeArtStudio/App/ArtSceneFactory.swift",
+        "symbol": "ArtSceneFactory.makeScene"
       },
-      "notes": "Bundle loading lives only in the Showcase; no shared GLSL include library (noise, palettes, SDF, sRGB)."
+      "notes": "Closed in A01-P01: ShaderBundle + VisualCore GLSL library vc/*.glsl + FullScreenShaderScene."
     },
     {
       "id": "M02",
@@ -213,25 +227,43 @@
         "file": "Showcase/App/Scenes/AnimatedGeometryScene.swift",
         "symbol": "AnimatedGeometryScene"
       },
-      "notes": "Shader-side noise arrives with the shared GLSL library (G-GLSLLIB)."
+      "notes": "Shader-side noise and SDFs now come from vc/noise.glsl and vc/sdf.glsl (A01-P01)."
     },
     {
       "id": "M05",
       "capability": "Presets and user-adjustable parameters",
       "source": "brainstorm",
-      "status": "upstream gap",
+      "status": "available",
       "evidence": [
         {
-          "file": "Packages/VisualCore/Sources/VisualCoreEffectsGraph/PassSchemas.swift",
-          "symbol": "ParameterSpec",
-          "product": "VisualCoreEffectsGraph",
+          "file": "Packages/VisualCore/Sources/VisualCoreParameters/ParameterSchema.swift",
+          "symbol": "ParameterSchema.resolve",
+          "product": "VisualCoreParameters",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreParameters/Palette.swift",
+          "symbol": "Palette.sample",
+          "product": "VisualCoreParameters",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreParameters/Preset.swift",
+          "symbol": "Preset",
+          "product": "VisualCoreParameters",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreParameters/ParameterHash.swift",
+          "symbol": "ParameterHash.of",
+          "product": "VisualCoreParameters",
           "public": true
         }
       ],
-      "notes": "ParameterSpec is effects-pass specific (range/default only): no units, UI transform, presets or stable hash.",
+      "notes": "Closed in A01-P01: new pure module VisualCoreParameters.",
       "example": {
-        "file": "Packages/VisualCore/Sources/VisualCoreEffectsGraph/EffectGraphValidation.swift",
-        "symbol": "EffectGraphValidator"
+        "file": "Apps/GenerativeArtStudio/Core/Sources/GenerativeArtStudioCore/FamilyCatalog.swift",
+        "symbol": "FamilyCatalog"
       }
     },
     {
@@ -361,13 +393,19 @@
           "symbol": "FramePacing",
           "product": "VisualCoreDiagnostics",
           "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FullScreenShaderScene.swift",
+          "symbol": "FullScreenShaderScene",
+          "product": "VisualCoreRendering",
+          "public": true
         }
       ],
       "example": {
         "file": "Showcase/App/ShowcaseSettings.swift",
         "symbol": "ShowcaseSettings"
       },
-      "notes": "Scrub needs the scene clock (G-CLOCK); accessibility settings and SwiftUI surface exist only in the Showcase (G-UI)."
+      "notes": "FullScreenShaderScene has fixedTime/timeScale and VisualCoreUI has RenderSurface (A01-P01); a scrubbable SceneClock (G-CLOCK) and the accessibility settings model (G-UI) remain."
     }
   ],
   "gaps": [
@@ -378,8 +416,9 @@
       ],
       "kind": "adaptation",
       "owner": "VisualCore:VisualCoreRendering",
-      "phase": 2,
-      "test": "BundleShaderLoader loads .vert/.frag/.glsl from a bundle, resolves includes and reports file:line on a broken shader (simulator test); the Showcase migrates to it"
+      "phase": 1,
+      "test": "BundleShaderLoader loads .vert/.frag/.glsl from a bundle, resolves includes and reports file:line on a broken shader (simulator test); the Showcase migrates to it",
+      "closed": "A01-P01"
     },
     {
       "id": "G-GLSLLIB",
@@ -389,8 +428,9 @@
       ],
       "kind": "upstream",
       "owner": "VisualCore:VisualCoreRendering",
-      "phase": 2,
-      "test": "Bundled VisualCore GLSL includes (noise, hash, palettes, SDF, sRGB transfer) compile in every stage on both simulator runtimes; pixel tests for sRGB encode/decode"
+      "phase": 1,
+      "test": "Bundled VisualCore GLSL includes (noise, hash, palettes, SDF, sRGB transfer) compile in every stage on both simulator runtimes; pixel tests for sRGB encode/decode",
+      "closed": "A01-P01"
     },
     {
       "id": "G-CLOCK",
@@ -411,7 +451,8 @@
       "kind": "upstream",
       "owner": "VisualCore:VisualCoreParameters",
       "phase": 1,
-      "test": "New pure module host tests: schema validation (units, ranges, defaults), clamping and NaN/Inf rejection, preset sets, stable parameter hash, Codable round trip"
+      "test": "New pure module host tests: schema validation (units, ranges, defaults), clamping and NaN/Inf rejection, preset sets, stable parameter hash, Codable round trip",
+      "closed": "A01-P01"
     },
     {
       "id": "G-PERSIST",
@@ -441,7 +482,7 @@
       "kind": "upstream",
       "owner": "VisualCore:VisualCoreUI",
       "phase": 2,
-      "test": "RenderSurface SwiftUI host plus accessibility settings model (Reduce Motion/Flashing, canvas description) with UI tests in the app"
+      "test": "RenderSurface done in A01-P01 (RenderSurfaceTests); remaining: accessibility settings model (Reduce Motion/Flashing, canvas description) with app UI tests"
     }
   ],
   "traceability": [
@@ -596,7 +637,8 @@
       "Every brainstorm capability maps to existing VisualCore API (4 available) or an additive gap (6 rows).",
       "All 7 gaps are additive VisualCore modules or helpers owned per Principle II; none needs a second renderer, a fork, private API or networking.",
       "Reference regression baseline recorded green (T-A01-006) and the empty shell builds on both simulator runtimes (T-A01-008).",
-      "Phase 01 starts with G-PARAMS (VisualCoreParameters) and the app's GPU-free domain."
+      "Phase 01 starts with G-PARAMS (VisualCoreParameters) and the app's GPU-free domain.",
+      "A01-P01 closed G-SHADERLOAD, G-GLSLLIB and G-PARAMS in VisualCore; M01 and M05 are now available."
     ],
     "blockers": []
   }
