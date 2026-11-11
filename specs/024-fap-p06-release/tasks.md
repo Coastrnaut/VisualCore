@@ -161,3 +161,15 @@ IDs are `T-A02-6##`, with one commit per task (`scripts/tick_task.py`). Commands
 
 Review checkpoints: after T-A02-601 (API and regression), T-A02-605 (manifest equals scan) and T-A02-607 (release
 step green).
+
+## Phase 7: Convergence
+
+- [ ] T-A02-611 Add the on-device privacy inspection to the device plan. In `docs/apps/fluid-art-playground/release-checklist.md`, D1–D3 rows gain "container and defaults privacy". In `device-campaign.md`, add a section on
+  the procedure:
+  - `devicectl device info files --domain-type appDataContainer` lists the whole container;
+  - the app's defaults keys are compared with the allowed list, which is empty;
+  - known system entries (Caches, Preferences, SplashBoard, Saved Application State) and Debug-only automation
+    reports are explained, never suppressed.
+
+  Covers US4 AC2, research R5 and CLAUDE.md §9 (partial). Then run `release_check.py --only
+  app-release-fluid-art-playground docs`.
