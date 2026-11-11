@@ -21,6 +21,31 @@ Canonical overrides:
 - **Reuse:** A02's still-capture path is generalized into VisualCore rendering (still capture) instead of being
   copied. Export sizes, the PNG encoder, temporary folders, offscreen rendering and easing curves are reused.
 
+## Clarifications
+
+### Session 2026-11-11
+
+Answered autonomously under the owner's standing approval (CLAUDE.md §2), choosing the recommended option each time.
+Facts checked in code:
+- `RenderHost.renderOffscreen(width:height:time:)` renders the host's scene on its own context and is limited by
+  `maxRenderSize`;
+- the fractal scene sets the shader time from its clock on every render, and the clock stops while animation is off;
+- `ExportGeometry.size(longEdge:aspect:)` caps by device edge, 8192 px and 64 Mpx; `ease(_:_:_:)` with
+  `EasingCurve`/`EasingMode` exists in VisualCoreMath;
+- A01 and A02 already declare the Photos add-only usage text for the share sheet.
+
+- Q: What happens when a 4096 px capture would make each pixel finer than the precision limit, although the screen
+  view is fine? → A: The capture's long edge is reduced until its pixel step is at the advisor's minimum (never below
+  the canvas's own pixel size), and the message says "Captured at N px — the precision limit allows no more detail
+  here". Upscaling past real precision is never presented as detail.
+- Q: How does the center move during a tour flight so that the target stays in view? → A: The log of the span is
+  interpolated with easing. The center moves in proportion to the span change: c = c₁ + (c₀ − c₁)·(s − s₁)/(s₀ − s₁)
+  (linear when the spans are equal). This keeps the target's offset within |c₁ − c₀|/s₀ of the view. When the target
+  is outside the starting view (|c₁ − c₀| > s₀/2), the flight first zooms out to a framing that contains both
+  points (center at the midpoint, span = max(s₀, s₁, 2·|c₁ − c₀|)), then zooms in.
+- Q: What does the iteration control look like? → A: A slider on a log scale from 50 to 10,000 (whole numbers),
+  with ÷2 and ×2 buttons (`fe.cap.down`, `fe.cap.up`). The label reads "Iterations: N". Changes apply immediately.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Choose the iteration cap and see what it costs (Priority: P1) 🎯
@@ -34,8 +59,8 @@ much more work the picture takes, as a relative figure that never pretends to be
 
 **Acceptance Scenarios**:
 
-1. **Given** the explorer, **When** the person sets the cap with the control (50 to 10,000, in steps that double or
-   halve, plus fine adjustment), **Then** the picture uses the new cap and the canvas description names it.
+1. **Given** the explorer, **When** the person sets the cap with the control (a log-scale slider from 50 to 10,000,
+   plus ÷2 and ×2 buttons), **Then** the picture uses the new cap and the canvas description names it.
 2. **Given** any cap and canvas, **Then** a line reads "Render cost: N× the default view" (N relative to cap 200 on
    the same canvas, two significant digits), with a word level: light (≤ 2×), moderate (≤ 10×), heavy (> 10×).
 3. **Given** a heavy cost, **Then** the line adds "may be slow on this device" and the cap is not refused.
@@ -54,7 +79,7 @@ A person saves the current view as a large image to share or keep.
 
 1. **Given** the explorer, **When** Capture is tapped, **Then** a PNG of the current view (same center, span and
    palette, the animation frozen) is made at 4096 pixels on the long edge, in the canvas aspect, capped by the
-   device's render limit, and a share button offers it.
+   device's render limit and by the precision limit (clarification 1), and a share button offers it.
 2. **Given** the image, **Then** its content matches the live view: escape classes at 64 sample points agree with the
    CPU reference at the same plane points (≥ 99%, boundary only).
 3. **Given** a capture failure (size too large, render error), **Then** a message says so and nothing is left on disk.
@@ -74,8 +99,9 @@ A person picks a curated tour; the view travels smoothly between famous places w
 **Acceptance Scenarios**:
 
 1. **Given** the Tours list (three tours: Seahorse Valley, Elephant Valley, Mini Mandelbrot), **When** a tour starts,
-   **Then** the view moves from stop to stop: the zoom changes at a constant rate on a log scale with eased start and
-   end, and the center follows so that the target stays in view; each stop holds 3 seconds with its caption.
+   **Then** the view moves from stop to stop: the zoom changes on a log scale with eased start and end, and the
+   center follows so that the target stays in view (clarification 2); each flight takes 4 seconds and each stop holds
+   3 seconds with its caption.
 2. **Given** Reduce Motion, **Then** the tour jumps between stops without the zoom flight and holds each stop.
 3. **Given** a running tour, **When** the person touches the canvas or taps Stop, **Then** the tour stops at the
    current view, which stays.
