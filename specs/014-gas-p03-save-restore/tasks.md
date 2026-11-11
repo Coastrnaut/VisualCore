@@ -45,7 +45,7 @@ regression; after each phase, `validate_docs.py`.
   (SC-A01-301); ordering; duplicate independence; rename rules; delete; update in place keeps the identity and
   advances `modifiedAt`; saving with the id of a deleted entry recreates it (the open composition survives deletion;
   analyze C1); bad files reported (SC-A01-304).
-- [ ] T-A01-304 [US1] Add `Apps/GenerativeArtStudio/App/LibraryView.swift` and `LibraryModel`:
+- [X] T-A01-304 [US1] Add `Apps/GenerativeArtStudio/App/LibraryView.swift` and `LibraryModel`: — Verified 2026-11-10: App: LibraryModel (CompositionLibrary in Application Support/Compositions; DEBUG -gasLibraryDir override; error surfacing), LibraryView (gas.library, rows gas.library.row.<uuid> with symbol/name/family/time/swatch, star gas.library.favorite.<uuid>, menu gas.library.more.<uuid> → duplicate/rename/delete, rename alert, delete confirmationDialog gas.library.confirmDelete, problems banner, empty state), gallery Route navigation + Library button gas.library.open, SceneScreen Save gas.save (name alert gas.save.name/confirm on first save, in place afterwards, recreate if deleted while open, gas.save.error alert); Core CompositionEditor(family:document:) (+ test). run-check A01-P03/t304-app-build BUILD SUCCEEDED; t304-core-tests 23/23; documented API PASS. UI behavior verified by T-A01-305
   - list `gas.library`, rows `gas.library.row.<uuid>` with name, family symbol, palette swatch, modified time and a
     favorite star;
   - row actions `gas.library.favorite`, `gas.library.duplicate`, `gas.library.rename` and `gas.library.delete` with a

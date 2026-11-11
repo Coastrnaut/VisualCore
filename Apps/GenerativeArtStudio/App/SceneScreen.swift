@@ -91,8 +91,16 @@ final class SceneModel {
 
 struct SceneScreen: View {
     let family: SceneFamily
-    /// Composition data to open (DEBUG launch data in this phase).
+    /// Saved compositions (save target).
+    var library: LibraryModel? = nil
+    /// Composition data to open (DEBUG launch data).
     var openingData: Data? = nil
+    /// The saved entry being edited, if any; saves update it in place.
+    var entry: LibraryEntry? = nil
+    @State private var entryID: UUID?
+    @State private var entryName = ""
+    @State private var askingName = false
+    @State private var saveError: String?
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.displayScale) private var displayScale
     @State private var model: SceneModel?
@@ -146,6 +154,12 @@ struct SceneScreen: View {
                 Text(family.title).font(.headline).accessibilityIdentifier("gas.scene.title")
             }
             ToolbarItem(placement: .topBarTrailing) {
+                Button { save() } label: { Image(systemName: "square.and.arrow.down") }
+                    .accessibilityLabel(entryID == nil ? "Save" : "Save changes")
+                    .accessibilityIdentifier("gas.save")
+                    .disabled(model == nil || library == nil)
+            }
+            ToolbarItem(placement: .topBarTrailing) {
                 Button { showControls = true } label: { Image(systemName: "slider.horizontal.3") }
                     .accessibilityLabel("Controls")
                     .accessibilityIdentifier("gas.controls.open")
@@ -159,9 +173,19 @@ struct SceneScreen: View {
                     .presentationBackgroundInteraction(.enabled(upThrough: .medium))
             }
         }
+        .alert("Save composition", isPresented: $askingName) {
+            TextField("Name", text: $entryName).accessibilityIdentifier("gas.save.name")
+            Button("Save") { commitSave() }.accessibilityIdentifier("gas.save.confirm")
+            Button("Cancel", role: .cancel) {}
+        }
+        .alert("Couldn’t save", isPresented: Binding(get: { saveError != nil }, set: { if !$0 { saveError = nil } })) {
+            Button("OK") { saveError = nil }.accessibilityIdentifier("gas.save.error")
+        } message: { Text(saveError ?? "") }
         .onAppear {
             if model == nil {
-                let m = SceneModel(family: family, reduceMotion: reduceMotion, opening: openingData)
+                if let entry, entryID == nil { entryID = entry.id; entryName = entry.name }
+                let start = entry.map { CompositionEditor(family: family, document: $0.document) }
+                let m = SceneModel(family: family, reduceMotion: reduceMotion, editor: start, opening: openingData)
                 m.scene.displayScale = Double(displayScale)
                 model = m
             }
@@ -169,6 +193,28 @@ struct SceneScreen: View {
         .onDisappear {
             model?.close()
             model = nil
+        }
+    }
+
+    private func save() {
+        guard model != nil, library != nil else { return }
+        if entryID == nil {
+            entryName = entryName.isEmpty ? family.title : entryName
+            askingName = true
+        } else {
+            commitSave()
+        }
+    }
+
+    private func commitSave() {
+        guard let model, let library else { return }
+        // A deleted entry that is still open is recreated by saving with its id (edge case).
+        if let saved = library.save(model.document, name: entryName, id: entryID) {
+            entryID = saved.id
+            entryName = saved.name
+        } else {
+            saveError = library.errorMessage
+            library.errorMessage = nil
         }
     }
 }

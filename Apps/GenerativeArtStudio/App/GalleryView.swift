@@ -3,15 +3,23 @@ import GenerativeArtStudioCore
 import SwiftUI
 import VisualCoreParameters
 
+/// Navigation targets: a family's default preset, or a saved composition.
+enum Route: Hashable {
+    case family(SceneFamilyID)
+    case entry(UUID)
+    case library
+}
+
 struct GalleryView: View {
-    @State private var path: [SceneFamilyID] = []
+    @State private var path: [Route] = []
+    @State private var library = LibraryModel()
 
     var body: some View {
         NavigationStack(path: $path) {
             List {
                 Section {
                     ForEach(FamilyCatalog.all) { family in
-                        NavigationLink(value: family.id) { FamilyRow(family: family) }
+                        NavigationLink(value: Route.family(family.id)) { FamilyRow(family: family) }
                             .accessibilityElement(children: .combine)
                             .accessibilityLabel(family.title)
                             .accessibilityHint(family.summary)
@@ -29,13 +37,34 @@ struct GalleryView: View {
             }
             .accessibilityIdentifier("gas.gallery")
             .navigationTitle("Gallery")
-            .navigationDestination(for: SceneFamilyID.self) { id in
-                SceneScreen(family: FamilyCatalog.family(id), openingData: id == LaunchComposition.family ? LaunchComposition.data : nil)
+            .navigationDestination(for: Route.self) { route in
+                switch route {
+                case .family(let id):
+                    SceneScreen(family: FamilyCatalog.family(id), library: library,
+                                openingData: id == LaunchComposition.family ? LaunchComposition.data : nil)
+                case .entry(let id):
+                    if let entry = library.library.entry(id), let family = entry.document.family {
+                        SceneScreen(family: family, library: library, entry: entry)
+                    } else {
+                        ContentUnavailableView("Composition not found", systemImage: "questionmark.folder")
+                    }
+                case .library:
+                    LibraryView(model: library) { entry in path.append(.entry(entry.id)) }
+                }
+            }
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button { path.append(.library) } label: { Label("Library", systemImage: "books.vertical") }
+                        .accessibilityIdentifier("gas.library.open")
+                }
             }
             .onAppear {
                 // DEBUG launch data opens its scene directly (recovery path, feature 013).
-                if LaunchComposition.data != nil, path.isEmpty { path = [LaunchComposition.family] }
+                if LaunchComposition.data != nil, path.isEmpty { path = [.family(LaunchComposition.family)] }
             }
+            .alert("Library", isPresented: Binding(get: { library.errorMessage != nil }, set: { if !$0 { library.errorMessage = nil } })) {
+                Button("OK") { library.errorMessage = nil }
+            } message: { Text(library.errorMessage ?? "") }
         }
     }
 }

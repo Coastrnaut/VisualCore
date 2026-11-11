@@ -29,6 +29,17 @@ public struct CompositionEditor: Sendable {
             ?? (try! ParameterEditor(schema: family.schema))
     }
 
+    /// Edits an existing (e.g. saved) composition of `family`; reset returns to its saved values. A composition of
+    /// another family or one that fails validation starts from the default preset instead.
+    public init(family: SceneFamily, document: ArtDocument) {
+        self.init(family: family)
+        guard document.familyID == family.id.rawValue, let (valid, warnings) = try? document.validated() else { return }
+        composition = valid
+        presetID = nil
+        notes = warnings
+        try? editor.rebase(valid.parameters)
+    }
+
     /// Applies a preset: its seed, palette and values; the editor baseline becomes the preset values.
     public mutating func choosePreset(_ id: String) {
         guard let preset = family.presets.first(where: { $0.id == id }) else { return }

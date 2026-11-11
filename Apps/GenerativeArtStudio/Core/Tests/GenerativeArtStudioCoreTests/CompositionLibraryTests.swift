@@ -102,3 +102,17 @@ private let t0 = Date(timeIntervalSince1970: 1_800_000_000)
     reopened.reload()
     #expect(reopened.entry(saved.id) == saved)
 }
+
+@Test func editorOpensASavedCompositionWithItsValuesAsBaseline() throws {
+    var e = CompositionEditor(family: FamilyCatalog.family(.raymarchedShapes))
+    e.setParameter("blend", normalized: 1)
+    e.setSeed(42)
+    let saved = e.composition
+    var reopened = CompositionEditor(family: FamilyCatalog.family(.raymarchedShapes), document: saved)
+    #expect(reopened.composition == saved && reopened.presetID == nil)
+    reopened.setParameter("blend", normalized: 0)
+    reopened.resetAll()
+    #expect(reopened.composition.parameters == saved.parameters, "reset returns to the saved values")
+    let wrong = CompositionEditor(family: FamilyCatalog.family(.particles), document: saved)
+    #expect(wrong.composition.familyID == "particles" && wrong.presetID != nil)
+}
