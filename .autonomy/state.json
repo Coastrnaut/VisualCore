@@ -1363,8 +1363,14 @@
       "status": "pass"
     },
     "F09": {
-      "attempts": [],
-      "status": "pending"
+      "attempts": [
+        {
+          "at": "2026-11-11T03:14:35+00:00",
+          "evidence": ".autonomy/evidence/F09.json",
+          "result": "pass"
+        }
+      ],
+      "status": "pass"
     },
     "IMPLEMENTATION-LOCK": {
       "attempts": [],
@@ -1375,5 +1381,5 @@
       "status": "pending"
     }
   },
-  "updated": "2026-11-11T02:19:17+00:00"
+  "updated": "2026-11-11T03:14:35+00:00"
 }

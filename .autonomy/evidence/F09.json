@@ -1,0 +1,320 @@
+{
+  "checks": [
+    {
+      "attestation": ".autonomy/checks/F09.t901-public-api-tests.json",
+      "command": "python3 scripts/test_scripts.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F09.t901-public-api-tests.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F09.t902-generic-ios.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination generic-ios",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F09.t902-generic-ios.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F09.t902-host.json",
+      "command": "swift test --package-path Packages/VisualCore",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F09.t902-host.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F09.t902-public-api.json",
+      "command": "python3 scripts/check_public_api.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F09.t902-public-api.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F09.t903-automation-ios26.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-26.5 --action test --result-name F09-t903-ios26",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F09.t903-automation-ios26.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F09.t903-automation-ios27.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --result-name F09-t903-ios27",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F09.t903-automation-ios27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F09.t903-generic-ios.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination generic-ios --action build --result-name F09-t903-generic",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F09.t903-generic-ios.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F09.t904-automation-pkg-ios26.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-26.5 --action test --result-name F09-t904-pkg-ios26",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F09.t904-automation-pkg-ios26.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F09.t904-automation-pkg-ios27.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --result-name F09-t904-pkg-ios27",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F09.t904-automation-pkg-ios27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F09.t904-measurement-symbols.json",
+      "command": "python3 scripts/check_release_symbols.py --expect-present --app Build/DerivedData/Showcase-measurement/Build/Products/Release-iphoneos/Showcase.app",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F09.t904-measurement-symbols.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F09.t904-release-symbols.json",
+      "command": "python3 scripts/check_release_symbols.py --app Build/DerivedData/Showcase-release/Build/Products/Release-iphoneos/Showcase.app",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F09.t904-release-symbols.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F09.t904-showcase-measurement.json",
+      "command": "xcodebuild build -project VisualCore.xcodeproj -scheme Showcase -configuration Release -destination generic/platform=iOS -derivedDataPath Build/DerivedData/Showcase-measurement CODE_SIGNING_ALLOWED=NO SWIFT_ACTIVE_COMPILATION_CONDITIONS=VISUALCORE_AUTOMATION",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F09.t904-showcase-measurement.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F09.t904-showcase-release.json",
+      "command": "xcodebuild build -project VisualCore.xcodeproj -scheme Showcase -configuration Release -destination generic/platform=iOS -derivedDataPath Build/DerivedData/Showcase-release CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F09.t904-showcase-release.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F09.t904-showcase-sim-debug-a2.json",
+      "command": "xcodebuild build -project VisualCore.xcodeproj -scheme Showcase -configuration Debug -destination 'generic/platform=iOS Simulator' -derivedDataPath Build/DerivedData/Showcase-auto CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F09.t904-showcase-sim-debug-a2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F09.t904-showcase-sim-debug-a3.json",
+      "command": "xcodebuild build -project VisualCore.xcodeproj -scheme Showcase -configuration Debug -destination 'generic/platform=iOS Simulator' -derivedDataPath Build/DerivedData/Showcase-auto CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F09.t904-showcase-sim-debug-a3.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F09.t904-showcase-tests-ios27.json",
+      "command": "xcodebuild test -project VisualCore.xcodeproj -scheme Showcase -destination 'platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D' -derivedDataPath Build/DerivedData/Showcase-auto -resultBundlePath .autonomy/xcresults/F09-t904-showcase-ios27.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 180 CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F09.t904-showcase-tests-ios27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F09.t904-sim-ios26-launch-a2.json",
+      "command": "python3 scripts/run_automation_sim.py --app Build/DerivedData/Showcase-auto/Build/Products/Debug-iphonesimulator/Showcase.app --runtime 26.5 --mode launch --out .autonomy/logs/automation-sim/ios26",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F09.t904-sim-ios26-launch-a2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F09.t904-sim-ios26-launch.json",
+      "command": "python3 scripts/run_automation_sim.py --app Build/DerivedData/Showcase-auto/Build/Products/Debug-iphonesimulator/Showcase.app --runtime 26.5 --mode launch --out .autonomy/logs/automation-sim/ios26",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F09.t904-sim-ios26-launch.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F09.t904-sim-ios26-lifecycle.json",
+      "command": "python3 scripts/run_automation_sim.py --app Build/DerivedData/Showcase-auto/Build/Products/Debug-iphonesimulator/Showcase.app --runtime 26.5 --mode lifecycle --out .autonomy/logs/automation-sim/ios26",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F09.t904-sim-ios26-lifecycle.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F09.t904-sim-ios26-smoke.json",
+      "command": "python3 scripts/run_automation_sim.py --app Build/DerivedData/Showcase-auto/Build/Products/Debug-iphonesimulator/Showcase.app --runtime 26.5 --mode smoke --out .autonomy/logs/automation-sim/ios26",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F09.t904-sim-ios26-smoke.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F09.t904-sim-ios27-launch-a2.json",
+      "command": "python3 scripts/run_automation_sim.py --app Build/DerivedData/Showcase-auto/Build/Products/Debug-iphonesimulator/Showcase.app --runtime 27.2 --mode launch --out .autonomy/logs/automation-sim/ios27",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F09.t904-sim-ios27-launch-a2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F09.t904-sim-ios27-launch.json",
+      "command": "python3 scripts/run_automation_sim.py --app Build/DerivedData/Showcase-auto/Build/Products/Debug-iphonesimulator/Showcase.app --runtime 27.2 --mode launch --out .autonomy/logs/automation-sim/ios27",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F09.t904-sim-ios27-launch.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F09.t904-sim-ios27-lifecycle.json",
+      "command": "python3 scripts/run_automation_sim.py --app Build/DerivedData/Showcase-auto/Build/Products/Debug-iphonesimulator/Showcase.app --runtime 27.2 --mode lifecycle --out .autonomy/logs/automation-sim/ios27",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F09.t904-sim-ios27-lifecycle.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F09.t904-sim-ios27-smoke.json",
+      "command": "python3 scripts/run_automation_sim.py --app Build/DerivedData/Showcase-auto/Build/Products/Debug-iphonesimulator/Showcase.app --runtime 27.2 --mode smoke --out .autonomy/logs/automation-sim/ios27",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F09.t904-sim-ios27-smoke.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F09.t905-shaders-pkg-ios26.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-26.5 --action test --result-name F09-t905-pkg-ios26",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F09.t905-shaders-pkg-ios26.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F09.t905-shaders-pkg-ios27.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --result-name F09-t905-pkg-ios27",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F09.t905-shaders-pkg-ios27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F09.t905-showcase-unit-ios26.json",
+      "command": "xcodebuild test -project VisualCore.xcodeproj -scheme Showcase -only-testing:ShowcaseTests -destination 'platform=iOS Simulator,id=EC7498FF-31FF-4491-9666-B0D32785203C' -derivedDataPath Build/DerivedData/Showcase-auto -resultBundlePath .autonomy/xcresults/F09-t905-showcase-ios26.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 180 CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F09.t905-showcase-unit-ios26.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F09.t905-showcase-unit-ios27.json",
+      "command": "xcodebuild test -project VisualCore.xcodeproj -scheme Showcase -only-testing:ShowcaseTests -destination 'platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D' -derivedDataPath Build/DerivedData/Showcase-auto -resultBundlePath .autonomy/xcresults/F09-t905-showcase-ios27.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 180 CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F09.t905-showcase-unit-ios27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F09.t906-sweep-demo-ios26.json",
+      "command": "xcodebuild test -project Harnesses/InteractiveDemo/InteractiveDemo.xcodeproj -scheme InteractiveDemo -only-testing:InteractiveDemoTests -destination 'platform=iOS Simulator,id=EC7498FF-31FF-4491-9666-B0D32785203C' -derivedDataPath Build/DerivedData/InteractiveDemo -resultBundlePath .autonomy/xcresults/F09-t906-demo-ios26.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 180 CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F09.t906-sweep-demo-ios26.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F09.t906-sweep-demo-ios27.json",
+      "command": "xcodebuild test -project Harnesses/InteractiveDemo/InteractiveDemo.xcodeproj -scheme InteractiveDemo -only-testing:InteractiveDemoTests -destination 'platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D' -derivedDataPath Build/DerivedData/InteractiveDemo -resultBundlePath .autonomy/xcresults/F09-t906-demo-ios27.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 180 CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F09.t906-sweep-demo-ios27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F09.t906-sweep-garden-ios26.json",
+      "command": "xcodebuild test -project Harnesses/SecondConsumer/SecondConsumer.xcodeproj -scheme SecondConsumer -only-testing:SecondConsumerTests -destination 'platform=iOS Simulator,id=EC7498FF-31FF-4491-9666-B0D32785203C' -derivedDataPath Build/DerivedData/SecondConsumer -resultBundlePath .autonomy/xcresults/F09-t906-garden-ios26.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 180 CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F09.t906-sweep-garden-ios26.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F09.t906-sweep-garden-ios27.json",
+      "command": "xcodebuild test -project Harnesses/SecondConsumer/SecondConsumer.xcodeproj -scheme SecondConsumer -only-testing:SecondConsumerTests -destination 'platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D' -derivedDataPath Build/DerivedData/SecondConsumer -resultBundlePath .autonomy/xcresults/F09-t906-garden-ios27.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 180 CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F09.t906-sweep-garden-ios27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F09.t906-sweep-showcase-ios26.json",
+      "command": "xcodebuild test -project VisualCore.xcodeproj -scheme Showcase -only-testing:ShowcaseTests -destination 'platform=iOS Simulator,id=EC7498FF-31FF-4491-9666-B0D32785203C' -derivedDataPath Build/DerivedData/Showcase-auto -resultBundlePath .autonomy/xcresults/F09-t906-showcase-ios26.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 180 CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F09.t906-sweep-showcase-ios26.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F09.t906-sweep-showcase-ios27-a2.json",
+      "command": "xcodebuild test -project VisualCore.xcodeproj -scheme Showcase -only-testing:ShowcaseTests -destination 'platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D' -derivedDataPath Build/DerivedData/Showcase-auto -resultBundlePath .autonomy/xcresults/F09-t906-showcase-ios27-a2.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 180 CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F09.t906-sweep-showcase-ios27-a2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F09.t906-sweep-showcase-ios27.json",
+      "command": "xcodebuild test -project VisualCore.xcodeproj -scheme Showcase -only-testing:ShowcaseTests -destination 'platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D' -derivedDataPath Build/DerivedData/Showcase-auto -resultBundlePath .autonomy/xcresults/F09-t906-showcase-ios27.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 180 CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F09.t906-sweep-showcase-ios27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F09.t907-license-tests.json",
+      "command": "python3 scripts/test_scripts.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F09.t907-license-tests.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F09.t907-licenses.json",
+      "command": "python3 scripts/check_licenses.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F09.t907-licenses.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F09.t908-release-check-fast.json",
+      "command": "python3 scripts/release_check.py --only docs compliance dependencies public-api documented-api-showcase documented-api-interactive-demo documented-api-second-consumer licenses script-tests host-visualcore host-gardenkit",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F09.t908-release-check-fast.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F09.t909-host-baselines.json",
+      "command": "swift run -c release --package-path Packages/VisualCore VisualCoreBaselines --json",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F09.t909-host-baselines.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F09.t909-showcase-measurement-sim.json",
+      "command": "xcodebuild build -project VisualCore.xcodeproj -scheme Showcase -configuration Release -destination 'generic/platform=iOS Simulator' -derivedDataPath Build/DerivedData/Showcase-measurement-sim CODE_SIGNING_ALLOWED=NO SWIFT_ACTIVE_COMPILATION_CONDITIONS=VISUALCORE_AUTOMATION",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F09.t909-showcase-measurement-sim.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F09.t909-simulator-baselines.json",
+      "command": "python3 scripts/simulator_baselines.py --app Build/DerivedData/Showcase-measurement-sim/Build/Products/Release-iphonesimulator/Showcase.app",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F09.t909-simulator-baselines.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F09.t913-host-visualcore.json",
+      "command": "swift test --package-path Packages/VisualCore",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F09.t913-host-visualcore.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F09.t913-script-tests.json",
+      "command": "python3 scripts/test_scripts.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F09.t913-script-tests.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F09.t914-release-check-full.json",
+      "command": "python3 scripts/release_check.py --json .autonomy/logs/release-check-full-summary.json",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F09.t914-release-check-full.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F09.t918-visualcore-sim-build-a2.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCore --scheme VisualCore-Package --destination generic-sim --action build",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F09.t918-visualcore-sim-build-a2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F09.t919-sweep-pkg-ios26.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-26.5 --action test --result-name F09-t919-pkg-ios26",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F09.t919-sweep-pkg-ios26.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F09.t919-sweep-pkg-ios27.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --result-name F09-t919-pkg-ios27",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F09.t919-sweep-pkg-ios27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F09.t920-doc-links.json",
+      "command": "python3 scripts/test_scripts.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F09.t920-doc-links.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F09.t921-release-check-audit.json",
+      "command": "python3 scripts/release_check.py --only script-tests showcase-release-build release-symbols projectm-independence",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F09.t921-release-check-audit.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F09.t924-release-chunk1.json",
+      "command": "python3 scripts/release_check.py --log-dir .autonomy/logs/release-check-final --json .autonomy/logs/release-check-final/summary-1.json --only docs compliance dependencies public-api documented-api-showcase documented-api-interactive-demo documented-api-second-consumer licenses script-tests host-visualcore host-gardenkit xcodegen rendering-sim-ios27 showcase-ios27 interactive-demo-ios27",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F09.t924-release-chunk1.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F09.t924-release-chunk2.json",
+      "command": "python3 scripts/release_check.py --log-dir .autonomy/logs/release-check-final --json .autonomy/logs/release-check-final/summary-2.json --only second-consumer-ios27 projectm-reference-ios27 rendering-sim-ios26 showcase-ios26 interactive-demo-ios26 second-consumer-ios26 projectm-reference-ios26",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F09.t924-release-chunk2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F09.t924-release-chunk3.json",
+      "command": "python3 scripts/release_check.py --log-dir .autonomy/logs/release-check-final --json .autonomy/logs/release-check-final/summary-3.json --skip docs compliance dependencies public-api documented-api-showcase documented-api-interactive-demo documented-api-second-consumer licenses script-tests host-visualcore host-gardenkit xcodegen rendering-sim-ios27 showcase-ios27 interactive-demo-ios27 second-consumer-ios27 projectm-reference-ios27 rendering-sim-ios26 showcase-ios26 interactive-demo-ios26 second-consumer-ios26 projectm-reference-ios26",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F09.t924-release-chunk3.log"
+    }
+  ],
+  "generated": "2026-11-11T03:14:35+00:00",
+  "method": "deterministic-run-check",
+  "stage": "F09",
+  "status": "pass"
+}
