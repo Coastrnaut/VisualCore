@@ -36,7 +36,7 @@ IDs `T-F3##`. Tick only with `— Verified YYYY-MM-DD: <command/result>`. One co
 ## Phase 5: US3 — Variants, cache, uniforms (P2)
 
 - [ ] T-F314 [US3] (SC-F304, FR-F306, FR-F307) Sim tests: compile count stays 1 for repeated requests; cleared after recreation; LRU bound 64; uniform type mismatch reported once and not applied
-- [ ] T-F315 [US3] Implement program cache (SHA-256 key, LRU 64) and uniform validation in `ResourceRegistry`/`ShaderProgram`
+- [X] T-F315 [US3] Implement program cache (SHA-256 key, LRU 64) and uniform validation in `ResourceRegistry`/`ShaderProgram` — Verified 2026-11-10: F03.t315-cache-ios27 exit 0, 31/31
 
 ## Phase 6: Polish
 

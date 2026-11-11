@@ -31,9 +31,13 @@ public final class ResourceRegistry {
     /// Called by the host after scene teardown and before the old context is destroyed: anything
     /// still live is counted as leaked and forgotten (no GL calls on a dead context).
     func contextWillEnd() {
-        pool.removeAll()   // pooled targets are live objects: counted by abandonAll below
-        ledger.abandonAll()
+        // Registry-owned objects are released properly while the old context is still current.
+        trimPools()
+        for program in cache.values { release(program) }
+        cache.removeAll()
+        lru.removeAll()
         willEndContext()
+        ledger.abandonAll()   // anything still live belongs to a scene that leaked it
     }
 
     /// Called by the host once the new context exists.
@@ -179,6 +183,12 @@ public final class ResourceRegistry {
             throw ShaderError.source(error)
         }
         let key = ShaderCacheKey.make(vertex: v, fragment: f)
+        if let cached = cache[key], !cached.released {
+            cacheHits += 1
+            touch(key)
+            return cached
+        }
+        compileCount += 1
         let (vs, vDiag) = ShaderProgram.compileShader(GLenum(GL_VERTEX_SHADER), v, stage: .vertex)
         try ledger.allocate(.shader, bytes: 0)
         let (fs, fDiag) = ShaderProgram.compileShader(GLenum(GL_FRAGMENT_SHADER), f, stage: .fragment)
@@ -204,13 +214,38 @@ public final class ResourceRegistry {
         vcglDetachShader(name, vs)
         vcglDetachShader(name, fs)
         try ledger.allocate(.program, bytes: 0)
-        return ShaderProgram(name: name, generation: generation, cacheKey: key, registry: self)
+        let program = ShaderProgram(name: name, generation: generation, cacheKey: key, registry: self)
+        cache[key] = program
+        touch(key)
+        if cache.count > Self.maxCachedPrograms, let oldest = lru.first {
+            if let evicted = cache[oldest] { release(evicted) }
+        }
+        return program
+    }
+
+    // MARK: Program cache (FR-F306)
+
+    public static let maxCachedPrograms = 64
+    private var cache: [String: ShaderProgram] = [:]
+    private var lru: [String] = []
+    /// Programs actually compiled and linked, and requests served from the cache.
+    public private(set) var compileCount = 0
+    public private(set) var cacheHits = 0
+    public var cachedProgramCount: Int { cache.count }
+
+    private func touch(_ key: String) {
+        lru.removeAll { $0 == key }
+        lru.append(key)
     }
 
     /// Deletes a program created by this registry (no-op if stale or already released).
     public func release(_ program: ShaderProgram) {
         guard !program.released else { return }
         program.released = true
+        if cache[program.cacheKey] === program {
+            cache[program.cacheKey] = nil
+            lru.removeAll { $0 == program.cacheKey }
+        }
         guard accept(generation: program.generation) else { return }
         vcglDeleteProgram(program.name)
         ledger.release(.program, bytes: 0)

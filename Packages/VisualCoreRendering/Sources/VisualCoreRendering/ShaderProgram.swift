@@ -42,6 +42,35 @@ public final class ShaderProgram {
         vcglUseProgram(name)
     }
 
+    // MARK: Validated uniforms (FR-F307). Call after use(); mismatches are warned once and not applied.
+
+    public func set(_ name: String, _ v: Float) { apply(name, [GL_FLOAT]) { vcglUniform1f($0, v) } }
+    public func set(_ name: String, _ v: SIMD2<Float>) { apply(name, [GL_FLOAT_VEC2]) { vcglUniform2f($0, v.x, v.y) } }
+    public func set(_ name: String, _ v: SIMD3<Float>) { apply(name, [GL_FLOAT_VEC3]) { vcglUniform3f($0, v.x, v.y, v.z) } }
+    public func set(_ name: String, _ v: SIMD4<Float>) { apply(name, [GL_FLOAT_VEC4]) { vcglUniform4f($0, v.x, v.y, v.z, v.w) } }
+    /// Integers and sampler units.
+    public func set(_ name: String, _ v: Int32) {
+        apply(name, [GL_INT, GL_BOOL, GL_SAMPLER_2D, GL_SAMPLER_3D, GL_SAMPLER_CUBE]) { vcglUniform1i($0, v) }
+    }
+    /// A column-major 4×4 matrix (16 floats).
+    public func set(_ name: String, matrix4 m: [Float]) {
+        guard m.count == 16 else { _ = registry?.warn("\(cacheKey.prefix(8)):\(name) matrix needs 16 floats"); return }
+        apply(name, [GL_FLOAT_MAT4]) { location in m.withUnsafeBufferPointer { vcglUniformMatrix4fv(location, 1, GLboolean(GL_FALSE), $0.baseAddress) } }
+    }
+
+    private func apply(_ name: String, _ accepted: [Int32], _ write: (GLint) -> Void) {
+        guard !released, let registry, registry.accept(generation: generation) else { return }
+        guard let uniform = uniforms[name] else {
+            _ = registry.warn("\(cacheKey.prefix(8)):\(name) is not an active uniform")
+            return
+        }
+        guard accepted.contains(where: { GLenum($0) == uniform.type }) else {
+            _ = registry.warn("\(cacheKey.prefix(8)):\(name) type mismatch (declared 0x\(String(uniform.type, radix: 16)))")
+            return
+        }
+        write(uniform.location)
+    }
+
     private static func activeUniforms(_ program: GLuint) -> [String: Uniform] {
         var count: GLint = 0
         vcglGetProgramiv(program, GLenum(GL_ACTIVE_UNIFORMS), &count)
