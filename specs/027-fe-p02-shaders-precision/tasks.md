@@ -20,7 +20,7 @@ amendments), the plan, research R1–R4, the data model, the contract and the qu
 
 ## Phase 1: Foundational — VisualCore G-PRECISION (blocks US4)
 
-- [ ] T-A03-201 Write `PrecisionAdvisorTests` first, with at least 7 cases from the contract. Then add
+- [X] T-A03-201 Write `PrecisionAdvisorTests` first, with at least 7 cases from the contract. Then add — Verified 2026-11-11: — Verified 2026-11-11: VisualCoreMath.PrecisionAdvisor (assess: ulp = max(|m|, step) * 2^-bits, margin = step/ulp, reliable >= 16, nearLimit 1...16, beyondLimit < 1, invalid input beyond with margin 0; minimumPixelStep; bits clamped 1...64), documented, README and baseline; PrecisionAdvisorTests 7/7 (thresholds at 10/16/23 bits, margin in ulps, zero magnitude not blocked, monotonic minimum, invalid input, more bits smaller step, clamp) in run-check A03-P02/t201-host-visualcore; t201-checks 4/4
   `Packages/VisualCore/Sources/VisualCoreMath/PrecisionAdvisor.swift`:
   - `assess(mantissaBits:magnitude:pixelStep:)` and `minimumPixelStep(mantissaBits:magnitude:)`;
   - `nearLimitMargin` = 16;

@@ -1,0 +1,23 @@
+{
+  "argv": [
+    "python3",
+    "scripts/release_check.py",
+    "--only",
+    "public-api",
+    "dependencies",
+    "docs",
+    "compliance",
+    "--log-dir",
+    ".autonomy/logs/t201-fe-checks"
+  ],
+  "command": "python3 scripts/release_check.py --only public-api dependencies docs compliance --log-dir .autonomy/logs/t201-fe-checks",
+  "elapsed_seconds": 1.153,
+  "exit_code": 0,
+  "finished": "2026-11-11T12:03:39+00:00",
+  "log": ".autonomy/logs/A03-P02.t201-checks.log",
+  "log_sha256": "d0a4390596c7f5416faddbf57c92508ff9352d6b8926490d8fda801ed8037e6c",
+  "name": "t201-checks",
+  "stage": "A03-P02",
+  "started": "2026-11-11T12:03:38+00:00",
+  "timed_out": false
+}
