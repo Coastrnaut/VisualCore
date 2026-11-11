@@ -206,7 +206,7 @@ Story order: US1 (MVP) → US2 → US3 → US4 → detail → US5 → polish.
   infinite dye cell, dye 5 and |v|·Δt beyond the grid. Assert each gives its `firstBad` message, that
   `AppAutomation.check` returns it, and that nothing crashes. Covers the edge case "a non-finite value appearing"
   and FR-A02-507 (partial).
-- [ ] T-A02-514 Extend `ControlTests`: after `resetCanvas()`, viscosity, palette, brush radius and detail are
+- [X] T-A02-514 Extend `ControlTests`: after `resetCanvas()`, viscosity, palette, brush radius and detail are — Verified 2026-11-11: — Verified 2026-11-11: ControlTests.testResetKeepsTuning (viscosity 0.4, palette ink, brush 0.1, detail Low; scene configuration equal before/after resetCanvas, resetCount 1); run-check A02-P05/t514-app-ios27 and t514-app-ios26 (ControlTests) TEST SUCCEEDED
   unchanged. Covers US1/AC4 (partial).
 - [ ] T-A02-515 Add `rebuilds=<n>` (`scene.rebuildCount`) to `AppAutomation.note`, and assert it in
   `AutomationTests.testLifecycleRebuildsAndPasses`, so the report records context recreation. Covers the edge case

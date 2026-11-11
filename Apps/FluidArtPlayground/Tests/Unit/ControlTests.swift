@@ -140,4 +140,26 @@ final class ControlTests: XCTestCase {
         model.step()
         XCTAssertFalse(model.scene.stepRequested, "Step does nothing while running")
     }
+
+    /// T-A02-514 (US1 AC4): Reset keeps viscosity, palette, brush radius and detail.
+    func testResetKeepsTuning() throws {
+        let model = try makeModel()
+        defer { model.close() }
+        let host = try XCTUnwrap(model.host)
+        XCTAssertTrue(host.renderOneFrame(present: false))
+        model.configuration.viscosity = 0.4
+        model.configuration.paletteID = "ink"
+        model.configuration.brushRadius = 0.1
+        model.setDetail(.low)
+        XCTAssertTrue(host.renderOneFrame(present: false))
+        let before = model.scene.configuration
+        model.resetCanvas()
+        XCTAssertTrue(host.renderOneFrame(present: false))
+        XCTAssertEqual(model.scene.resetCount, 1)
+        XCTAssertEqual(model.scene.configuration, before, "the scene's configuration is unchanged by Reset")
+        XCTAssertEqual(model.configuration.viscosity, 0.4)
+        XCTAssertEqual(model.configuration.paletteID, "ink")
+        XCTAssertEqual(model.configuration.brushRadius, 0.1)
+        XCTAssertEqual(model.detail, .low)
+    }
 }
