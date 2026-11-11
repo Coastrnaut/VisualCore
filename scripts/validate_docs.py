@@ -9,6 +9,7 @@ Checks:
      carries a `— Verified YYYY-MM-DD:` annotation (Constitution VI).
   4. Every ADR in docs/decisions has a Date and Status line.
   5. Every FR/SC referenced from plan.md/tasks.md/contracts exists in some spec.
+  6. Every relative Markdown link in docs/, package READMEs and sample READMEs resolves (feature 010 T-F920).
 Exit 1 on any problem. Standard library only.
 """
 from __future__ import annotations
@@ -22,6 +23,24 @@ DEF = re.compile(r"\*\*((?:FR|SC)-[A-Z0-9]+-?\d{3})\*\*")
 REF = re.compile(r"\b((?:FR|SC)-(?:F|A\d{2}-)\d{3})\b")
 TASK = re.compile(r"^- \[( |x|X)\] (T-(?:F|A\d{2}-)\d{3})\b(.*)$", re.M)
 TOKEN = re.compile(r"\[[A-Z][A-Z0-9_]{2,}\]")
+LINK = re.compile(r"\]\(([^)\s]+)\)")
+FENCE = re.compile(r"```.*?```", re.S)
+LINKED_DOCS = ["docs/**/*.md", "Packages/*/README.md", "Showcase/README.md", "Harnesses/*/README.md"]
+
+
+def broken_links(root: Path) -> list[str]:
+    """Relative links (outside code fences) whose target file or directory does not exist."""
+    problems = []
+    for pattern in LINKED_DOCS:
+        for doc in sorted(root.glob(pattern)):
+            text = FENCE.sub("", doc.read_text(encoding="utf-8"))
+            for target in LINK.findall(text):
+                if re.match(r"^[a-z][a-z0-9+.-]*:", target) or target.startswith("#"):
+                    continue
+                path = target.split("#", 1)[0]
+                if path and not (doc.parent / path).exists():
+                    problems.append(f"{doc.relative_to(root)}: broken link {target}")
+    return problems
 
 
 def namespace(feature_dir: Path) -> str:
@@ -78,6 +97,7 @@ def validate(root: Path = ROOT) -> list[str]:
         text = adr.read_text(encoding="utf-8")
         if not re.search(r"\*\*Date:\*\* \d{4}-\d{2}-\d{2}", text) or "**Status:**" not in text:
             problems.append(f"{adr.name}: missing Date/Status")
+    problems += broken_links(root)
     return problems
 
 

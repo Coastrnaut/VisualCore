@@ -93,6 +93,15 @@ class DocsTests(unittest.TestCase):
             self.assertTrue(any("duplicated" in p or "defined in" in p for p in probs))
             self.assertTrue(any("Verified" in p for p in probs))
 
+    def test_broken_relative_link(self):
+        with tempfile.TemporaryDirectory() as t:
+            d = Path(t)
+            self.make(d, "- **FR-F001**: a\n")
+            (d / "docs/guide.md").write_text("[ok](decisions/) [web](https://example.com) [anchor](#x)\n"
+                                             "[gone](missing.md#part)\n```\n[in code](nowhere.md)\n```\n")
+            probs = docs.validate(d)
+            self.assertEqual([p for p in probs if "broken link" in p], ["docs/guide.md: broken link missing.md#part"])
+
     def test_namespace(self):
         with tempfile.TemporaryDirectory() as t:
             d = Path(t)
