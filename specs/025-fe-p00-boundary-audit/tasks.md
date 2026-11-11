@@ -40,7 +40,7 @@ description: "Task list for feature 025 — Fractal Explorer Phase 00 boundary a
 
 ## Phase 3: US2 — Host, thread, build and regression baseline (P1)
 
-- [ ] T-A03-003 [US2] Run the 7-step reference regression in two `run-check` chunks (A03-P00). Record the steps,
+- [X] T-A03-003 [US2] Run the 7-step reference regression in two `run-check` chunks (A03-P00). Record the steps, — Verified 2026-11-11: — Verified 2026-11-11: run-check A03-P00/t003-reference-a 3/3 (engine xcframework, projectM-iOS simulator build, reference clean at d93edd1) and t003-reference-b 4/4 (ANGLERendering 14/14 on iOS 27.2 and 26.5, ProjectMReference 17/17 on both) = 7/7; steps, commands and results recorded in docs/apps/fractal-explorer/regression-baseline.md (FR-A03-004, SC-A03-004)
   commands and results in `docs/apps/fractal-explorer/regression-baseline.md` (FR-A03-004, SC-A03-004).
 
 ## Phase 4: US3 — Compilable empty app shell (P1)
