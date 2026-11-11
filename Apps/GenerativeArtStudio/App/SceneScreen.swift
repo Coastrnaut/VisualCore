@@ -1,6 +1,6 @@
 // SceneScreen.swift — one family rendering live through the shared VisualCore host (feature 012 T-A01-110; FR-A01-102,
 // FR-A01-110, FR-A01-112; controls and clock: feature 013). The screen owns exactly one RenderHost and destroys it when
-// it goes away.
+// it goes away. Still export: feature 015 (ExportSheet).
 import GenerativeArtStudioCore
 import Observation
 import SwiftUI
@@ -105,6 +105,7 @@ struct SceneScreen: View {
     @Environment(\.displayScale) private var displayScale
     @State private var model: SceneModel?
     @State private var showControls = false
+    @State private var exportModel: ExportModel?
 
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -160,6 +161,14 @@ struct SceneScreen: View {
                     .disabled(model == nil || library == nil)
             }
             ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    if let model { exportModel = ExportModel(scene: model, name: entryName.isEmpty ? family.title : entryName) }
+                } label: { Image(systemName: "square.and.arrow.up") }
+                    .accessibilityLabel("Export")
+                    .accessibilityIdentifier("gas.export")
+                    .disabled(model?.host == nil)
+            }
+            ToolbarItem(placement: .topBarTrailing) {
                 Button { showControls = true } label: { Image(systemName: "slider.horizontal.3") }
                     .accessibilityLabel("Controls")
                     .accessibilityIdentifier("gas.controls.open")
@@ -172,6 +181,9 @@ struct SceneScreen: View {
                     .presentationDetents([.medium, .large])
                     .presentationBackgroundInteraction(.enabled(upThrough: .medium))
             }
+        }
+        .sheet(item: $exportModel) { export in
+            ExportSheet(model: export)
         }
         .alert("Save composition", isPresented: $askingName) {
             TextField("Name", text: $entryName).accessibilityIdentifier("gas.save.name")

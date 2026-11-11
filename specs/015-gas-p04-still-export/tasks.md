@@ -77,7 +77,7 @@ IDs are `T-A01-4##`, with one commit and push per task (`scripts/tick_task.py`).
 
   Add the VisualCoreScenes dependency to Core if missing. Add `ExportOptionsTests.swift`: the 12 sizes, the cap at
   maxEdge 2048 giving [1080, 2048], file names, and the label.
-- [ ] T-A01-405 [US1] Add `Apps/GenerativeArtStudio/App/ExportSheet.swift`:
+- [X] T-A01-405 [US1] Add `Apps/GenerativeArtStudio/App/ExportSheet.swift`: — Verified 2026-11-10: App ExportSheet.swift: ExportRunner (pause clock, export displayScale = exportHeight ÷ on-screen point height, host.renderOffscreen at clock time, StillImageEncoder PNG, tmp/Exports/<name>-<w>x<h>.png, restore scale and playback via defer, readable failure messages), ExportModel (options capped by host.maxRenderSize, 240 px crop preview rendered through the same path, phases idle/rendering/ready/failed, file removed on option change and sheet close), ExportSheet (gas.export.size/aspect pickers with accessibility values, gas.export.dimensions, gas.export.format 'Opaque · sRGB', gas.export.preview, gas.export.run, gas.export.progress, ShareLink gas.export.share, gas.export.error, gas.export.done); SceneScreen Export toolbar button gas.export; project.yml NSPhotoLibraryAddUsageDescription (built Info.plist verified). run-check A01-P04/t405-app-build BUILD SUCCEEDED; documented API PASS; compliance PASS. Behavior verified by T-A01-406/407
   - `ExportRunner`: pause the clock, take time = clock.time, set the particles `displayScale` = h ÷ on-screen point
     height, call `host.renderOffscreen`, then `pngData`, then write `tmp/Exports/<file>`; restore the scale and
     playback;
