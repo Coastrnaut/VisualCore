@@ -137,3 +137,8 @@ contract.
 Applied autonomously (CLAUDE.md §2): C1 → T-A01-408 suspended-host export; C2 → T-A01-406 usage-string check;
 C3 → T-A01-407 accessibility values, T-A01-409 compliance; I1 → research R7 wording; A1 → T-A01-406 particle measure.
 0 critical issues.
+
+## Phase 5: Convergence
+
+- [ ] T-A01-410 Add `ExportModel` tests in `Apps/GenerativeArtStudio/Tests/Unit/ExportModelTests.swift`: after `run()` the phase is `.ready(url)` and the file exists in `tmp/Exports` named `<name>-<w>x<h>.png`; changing options removes it and returns to `.idle`; `removeFile()` (sheet close) deletes it; a failed export (8 MiB budget) gives `.failed` with a readable message, per spec Clarifications (temporary file lifetime) and the edge case "export file stays available until the sheet closes" (partial)
+- [ ] T-A01-411 Post VoiceOver announcements in `Apps/GenerativeArtStudio/App/ExportSheet.swift` when an export starts ("Rendering W × H px"), finishes ("Export ready") or fails (the message), through a testable `ExportModel.announcement` string, and cover it in `ExportModelTests`, per plan Constitution Check VII and FR-A01-409 (partial)
