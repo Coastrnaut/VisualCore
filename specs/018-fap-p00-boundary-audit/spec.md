@@ -18,6 +18,32 @@
 - It reuses the app-neutral contract checker built in A01-P00.
 - Evidence is host and simulator only.
 
+## Clarifications
+
+### Session 2026-11-11
+
+Answered autonomously under the owner's standing approval (CLAUDE.md §2); the recommended option was chosen in each case.
+
+- Q: Where do the inventory, matrix and gap register live, and how are citations checked? → A: In
+  `docs/apps/fluid-art-playground/visualcore-contract.json` (machine-readable, the same schema as A01) rendered to
+  `visualcore-contract.md`, and checked by the shared `scripts/check_app_contract.py --app fluid-art-playground`. The
+  release check's `app-contracts` step picks it up automatically.
+- Q: What exactly is the app shell? → A: A thin SwiftUI app target `FluidArtPlayground` in the root `project.yml`
+  (sources in `Apps/FluidArtPlayground/App/`), plus a UI smoke-test target. It has a titled home screen only, with no
+  rendering code and no app-local package. The domain package arrives in Phase 01 (manual §5 file policy: no empty
+  files).
+- Q: Which ProjectM regression steps form the baseline? → A: The same 7 steps as A01: `engine-xcframework`,
+  `build-projectm-ios-sim`, `test-anglerendering-ios27`, `test-anglerendering-ios26`, `check_reference_clean.py`, and
+  the ProjectMReference harness tests on both runtimes.
+- Q: How does the audit treat half-float render targets, which the solver's velocity and pressure fields need? → A:
+  As `requires adaptation`. `TextureFormat.rgba16f` exists and `makeRenderTarget` already throws
+  `incompleteFramebuffer` when a format is not renderable. There is no capability query, though, and the only
+  consumer is the HDR bloom pass. The register assigns a support query and a documented RGBA8 fallback to
+  VisualCoreRendering in the phase that first renders the solver, and the matrix assumes no support.
+- Q: Does the shell need permissions, and are performance targets set? → A: No permission, usage description or
+  networking. No performance target is set or measured. Simulation budgets come in later phases as quality-profile
+  data, and device measurement is campaign II.
+
 ## User Scenarios & Testing *(mandatory)*
 
 Users: the engineer (agent) who implements Fluid Art Playground phases 01–06, the owner reviewing the stop/go
