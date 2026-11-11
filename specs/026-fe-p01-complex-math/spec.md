@@ -22,6 +22,34 @@ Canonical overrides:
   - G-FRACTAL in the app: the escape-time CPU reference.
 - GPU shaders and the precision probe are Phase 02.
 
+## Clarifications
+
+### Session 2026-11-11
+
+Answered autonomously under the owner's standing approval (CLAUDE.md §2); the recommended option was chosen in each
+case.
+
+- Q: What exactly is the escape rule, and what counts do the exterior fixtures expect? → A: Iterate z ← z² + c. After
+  step n (n = 1, 2, …), the point escapes when |z|² > R² (default R = 2). The count is that n. Points still bounded
+  after the cap are interior. The expected counts are therefore c = 2 → 2 (z₁ = 2 is not > 2; z₂ = 6), c = 1+i → 2,
+  and c = −2.1 → 1. The smooth value is n + 1 − log₂(log|zₙ|), computed in double. The anchored-pinch and fixture
+  tolerances are as in the success criteria.
+- Q: What is the VisualCore viewport called and where does it live? → A: `PlaneViewport` in VisualCoreMath (pure,
+  Double, rule R2). The generic name fits any 2D-plane app, and `Camera2D` stays unchanged. It provides:
+  - `center` as `Vec2` in plane units, `unitsPerPoint`, and `size` in points;
+  - `plane(fromScreen:)` and `screen(fromPlane:)`, with y down on screen and up in the plane;
+  - `pinched(by:anchor:)`, `panned(by:)` and `resized(to:)`;
+  - `scale` limits `minUnitsPerPoint` (1e-15) and `maxUnitsPerPoint` (1e3), with `wasClamped`.
+- Q: Where does app domain code live? → A: A local Swift package `Apps/FractalExplorer/FractalExplorerCore` (the A02
+  layout), with `FractalMath` (the escape iteration), `FractalState` and `FractalExplanations` (mode texts).
+  Host-tested with `swift test`, and linked by the app.
+- Q: How is the CPU preview bounded, and how does it avoid blocking the UI? → A: At most 160 × 160 samples, iteration
+  cap ≤ 10,000, computed in a detached task. Each request carries an identifier; a result for an older identifier is
+  dropped. Colors come from a fixed grayscale ramp of the smooth value, with black for interior points. The palette
+  system is Phase 02/03.
+- Q: What are the defaults? → A: Mandelbrot: center (−0.5, 0), framed so the plane width −2.5…1.5 fits the shorter
+  side. Julia: seed c = −0.8 + 0.156i, center 0, width 3.2. Iteration cap 200, escape radius 2.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Choose Mandelbrot or Julia and understand what each shows (Priority: P1) 🎯
