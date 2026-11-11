@@ -96,6 +96,11 @@ public struct SceneSimulation: Sendable {
         placedForce = force
         runner.mutate { $0.setPlacedForce(force?.particleForce) }
     }
+    /// The current emission ceiling (≤ the scene's particle limit); see `ParticleSystem.liveLimit` (feature 034).
+    public var liveLimit: Int { runner.simulation.system.liveLimit }
+    /// Sets the emission ceiling (clamped to 1…the scene's particle limit); live particles above it are not removed.
+    public mutating func setLiveLimit(_ limit: Int) { runner.mutate { $0.system.liveLimit = limit } }
+
     /// The forces the particles currently feel, in order (placed force, scene forces, family forces).
     public var activeForces: [ParticleForce] { runner.simulation.system.forces }
 

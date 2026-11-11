@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Apps/ParticleUniverse/ParticleUniverseCore"
+  ],
+  "command": "swift test --package-path Apps/ParticleUniverse/ParticleUniverseCore",
+  "elapsed_seconds": 15.306,
+  "exit_code": 1,
+  "finished": "2026-11-11T23:28:50+00:00",
+  "log": ".autonomy/logs/A04-P02.t210-quality.log",
+  "log_sha256": "4abb6ebe013022540cb0165829ae2d9571ddae57ba9056f829d5b20d9a91bff1",
+  "name": "t210-quality",
+  "stage": "A04-P02",
+  "started": "2026-11-11T23:28:34+00:00",
+  "timed_out": false
+}
