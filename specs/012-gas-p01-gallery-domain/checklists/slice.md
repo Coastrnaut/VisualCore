@@ -14,42 +14,44 @@ Depth: phase gate. Audience: reviewer.
 
 ## Requirement Completeness
 
-- [ ] CHK001 Are all four scene families named with stable ids and required gallery fields? [Completeness, Spec §FR-A01-101]
-- [ ] CHK002 Is every composition field specified with its type and range, including the seed width and preview-time bounds? [Completeness, Spec §FR-A01-103, Clarifications]
-- [ ] CHK003 Are the parameter schema attributes (unit, range, default, transform) and the resolution rules fully listed? [Completeness, Spec §FR-A01-104]
+- [x] CHK001 Are all four scene families named with stable ids and required gallery fields? [Completeness, Spec §FR-A01-101]
+- [x] CHK002 Is every composition field specified with its type and range, including the seed width and preview-time bounds? [Completeness, Spec §FR-A01-103, Clarifications]
+- [x] CHK003 Are the parameter schema attributes (unit, range, default, transform) and the resolution rules fully listed? [Completeness, Spec §FR-A01-104]
 
 ## Requirement Clarity
 
-- [ ] CHK004 Is "genuinely distinct" quantified with a measurable difference threshold? [Clarity, Spec §FR-A01-107, SC-A01-104]
-- [ ] CHK005 Is "within GPU tolerance" quantified with channel tolerance and mean bounds? [Clarity, Spec §SC-A01-103]
-- [ ] CHK006 Is "non-blank" defined measurably? [Clarity, Spec §SC-A01-101]
-- [ ] CHK007 Is the mapping from parameters and seed to shader inputs specified unambiguously? [Clarity, Spec §Clarifications]
+- [x] CHK004 Is "genuinely distinct" quantified with a measurable difference threshold? [Clarity, Spec §FR-A01-107, SC-A01-104]
+- [x] CHK005 Is "within GPU tolerance" quantified with channel tolerance and mean bounds? [Clarity, Spec §SC-A01-103]
+- [x] CHK006 Is "non-blank" defined measurably? [Clarity, Spec §SC-A01-101]
+- [x] CHK007 Is the mapping from parameters and seed to shader inputs specified unambiguously? [Clarity, Spec §Clarifications]
 
 ## Architecture Ownership
 
-- [ ] CHK008 Does each reusable piece have a named owning VisualCore module, with app-only content kept in the app? [Consistency, Spec §FR-A01-108, Constitution II]
-- [ ] CHK009 Is it required that the app create no EGL or GL lifecycle of its own? [Completeness, Spec §FR-A01-102]
-- [ ] CHK010 Are the obligations for VisualCore changes (tests, docs, API baseline, reference regression, Showcase migration) stated? [Completeness, Spec §FR-A01-108, §FR-A01-109]
+- [x] CHK008 Does each reusable piece have a named owning VisualCore module, with app-only content kept in the app? [Consistency, Spec §FR-A01-108, Constitution II]
+- [x] CHK009 Is it required that the app create no EGL or GL lifecycle of its own? [Completeness, Spec §FR-A01-102]
+- [x] CHK010 Are the obligations for VisualCore changes (tests, docs, API baseline, reference regression, Showcase migration) stated? [Completeness, Spec §FR-A01-108, §FR-A01-109]
 
 ## Lifecycle and Edge Cases
 
-- [ ] CHK011 Are context-loss and teardown requirements defined, with a zero-leak criterion? [Coverage, Spec §FR-A01-110, SC-A01-105]
-- [ ] CHK012 Are invalid-document cases (non-finite values, unknown family or palette, newer schema) each given a defined outcome? [Edge Case, Spec §Edge Cases]
-- [ ] CHK013 Is shader-compile failure behavior specified for the user? [Exception Flow, Spec §FR-A01-110]
+- [x] CHK011 Are context-loss and teardown requirements defined, with a zero-leak criterion? [Coverage, Spec §FR-A01-110, SC-A01-105]
+- [x] CHK012 Are invalid-document cases (non-finite values, unknown family or palette, newer schema) each given a defined outcome? [Edge Case, Spec §Edge Cases]
+- [x] CHK013 Is shader-compile failure behavior specified for the user? [Exception Flow, Spec §FR-A01-110]
 
 ## Privacy, Accessibility and Release
 
-- [ ] CHK014 Are offline, no-permission and no-ProjectM constraints restated for this phase? [Consistency, Spec §FR-A01-111]
-- [ ] CHK015 Are accessibility requirements specified for the gallery rows and the canvas? [Coverage, Spec §FR-A01-112]
-- [ ] CHK016 Is the update to the VisualCore contract (closed gaps, phases) required and verifiable? [Traceability, Spec §FR-A01-113]
+- [x] CHK014 Are offline, no-permission and no-ProjectM constraints restated for this phase? [Consistency, Spec §FR-A01-111]
+- [x] CHK015 Are accessibility requirements specified for the gallery rows and the canvas? [Coverage, Spec §FR-A01-112]
+- [x] CHK016 Is the update to the VisualCore contract (closed gaps, phases) required and verifiable? [Traceability, Spec §FR-A01-113]
 
 ## Testability and Performance
 
-- [ ] CHK017 Do the success criteria name both simulator runtimes and the minimum test-set sizes? [Measurability, Spec §SC-A01-101–103]
-- [ ] CHK018 Is preview work bounded (replay cap, particle count) instead of left to a performance claim? [Non-Functional, Spec §Clarifications, Plan §Technical Context]
-- [ ] CHK019 Are out-of-scope items (controls, scrub, saving, export) explicitly deferred to named phases? [Scope, Spec §Assumptions]
+- [x] CHK017 Do the success criteria name both simulator runtimes and the minimum test-set sizes? [Measurability, Spec §SC-A01-101–103]
+- [x] CHK018 Is preview work bounded (replay cap, particle count) instead of left to a performance claim? [Non-Functional, Spec §Clarifications, Plan §Technical Context]
+- [x] CHK019 Are out-of-scope items (controls, scrub, saving, export) explicitly deferred to named phases? [Scope, Spec §Assumptions]
 
 ## Notes
 
+- Reviewed 2026-11-10 under the owner's delegation (CLAUDE.md §2): 19/19 satisfied. CHK002 and CHK018 were fixed first
+  by adding the preview-time bounds (FR-A01-103) and the 10,000-particle cap (Edge Cases).
 - Generated unchecked. The reviewer marks items `[x]` when satisfied. `/speckit-implement` reads the markers but
   does not change them.

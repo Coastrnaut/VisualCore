@@ -122,7 +122,8 @@ ProjectM regression still passes.
 - A scene shader fails to compile: the scene shows a readable error with file and line, and the gallery stays usable.
 - Context loss while a scene is showing: the scene rebuilds from the document (CPU state) with no leaked resources.
 - Seed 0 and the maximum seed (2^64−1) are valid and deterministic (seeds reach shaders only as derived offsets).
-- A particles preview time above 120 s is clamped to 120 s, which bounds the deterministic replay work.
+- A particles preview time above 120 s is clamped to 120 s, and a particle system holds at most 10,000 particles,
+  which bounds the deterministic replay work.
 - Reduce Motion is on: scenes still render, at a slower animation rate (full reduced-motion behavior arrives in
   Phase 05).
 
@@ -146,7 +147,7 @@ ProjectM regression still passes.
   - seed (unsigned 64-bit);
   - palette id;
   - parameter values by name;
-  - preview time in seconds.
+  - preview time in seconds (clamped to 0…120).
 
   It MUST validate on decode and encode canonically (sorted keys, stable number formatting).
 - **FR-A01-104**: Parameter schemas MUST declare each parameter's name, unit, minimum, maximum, default and UI
