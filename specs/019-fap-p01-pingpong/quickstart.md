@@ -7,7 +7,7 @@ Every command below is wrapped in `python3 Tools/python/desktop_runbook.py run-c
 1. **Host tests**. Expected: all pass, including the new FieldGrid, TimeStepPolicy, configuration and dissipation
    suites.
    - `swift test --package-path Packages/VisualCore`
-   - `swift test --package-path Apps/FluidArtPlayground/Core`
+   - `swift test --package-path Apps/FluidArtPlayground/FluidArtPlaygroundCore`
 2. **Rendering package tests**, one runtime per call. Expected: PingPongTarget, FieldPass, FloatRenderSupport and
    FloatTransfer pass.
    - `python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --result-name fap-p01-rendering-27`

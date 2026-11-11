@@ -18,7 +18,7 @@ each followed by the enumeration guard, plus the ProjectM regression after the V
 
 ## Phase 1: Setup
 
-- [ ] T-A02-101 Create the GPU-free package `Apps/FluidArtPlayground/Core`, which depends only on VisualCore's
+- [X] T-A02-101 Create the GPU-free package `Apps/FluidArtPlayground/FluidArtPlaygroundCore`, which depends only on VisualCore's — Verified 2026-11-11: GPU-free package Apps/FluidArtPlayground/FluidArtPlaygroundCore (renamed from Core: SwiftPM package identity collided with Apps/GenerativeArtStudio/Core, research R10) depends only on VisualCoreSimulation; project.yml registers it, the app links FluidArtPlaygroundCore, VisualCoreSimulation, VisualCoreRendering and VisualCoreUI, new FluidArtPlaygroundTests unit target in the scheme. run-check A02-P01/t101-core-test-2 swift test 1/1 pass; t101-app-build-2 TEST BUILD SUCCEEDED (generic iOS Simulator) with the dependency audit PASS (no ProjectM); check_dependencies R1-R5 PASS
   `VisualCoreSimulation`:
   - `Package.swift`: swift-tools 6.0, iOS 26 / macOS 15;
   - `Sources/FluidArtPlaygroundCore/Module.swift` with the module doc;
@@ -26,7 +26,7 @@ each followed by the enumeration guard, plus the ProjectM regression after the V
 
   Register it under `packages:` in `project.yml`, add the app dependencies on `FluidArtPlaygroundCore`,
   `VisualCoreRendering` and `VisualCoreUI`, and add a `FluidArtPlaygroundTests` unit-test target to the scheme.
-  Acceptance: `swift build --package-path Apps/FluidArtPlayground/Core`, `xcodegen generate` and a generic simulator
+  Acceptance: `swift build --package-path Apps/FluidArtPlayground/FluidArtPlaygroundCore`, `xcodegen generate` and a generic simulator
   build with the dependency audit all pass.
 
 ## Phase 2: Foundational — generic CPU pieces in VisualCore (G-CPUFIELD; blocks US1 and US2)
@@ -90,7 +90,7 @@ runtimes, then the ProjectM regression 7/7.
 both runtimes and both storages.
 
 - [ ] T-A02-108 [P] [US1] Tests first, then the implementation of `FluidConfiguration.swift` in
-  `Apps/FluidArtPlayground/Core/Sources/FluidArtPlaygroundCore/`:
+  `Apps/FluidArtPlayground/FluidArtPlaygroundCore/Sources/FluidArtPlaygroundCore/`:
   - fields and bounds verbatim from data-model.md:
     - "gridWidth/gridHeight 16…512, then ≤ maxEdge";
     - "dyeDissipation/velocityDissipation 0…10, NaN → default";
@@ -106,7 +106,7 @@ both runtimes and both storages.
   in [0, 1], and `zeroVelocity`) and `FluidCanvasDescription.swift`. Tests: `DissipationTests` (d = 0 identity; the
   closed form after N float32 steps; 1,000 steps at d = 10 stay finite and ≥ 0; unorm8 stalls as predicted),
   `DyeSeedTests` (determinism, range), `FluidCanvasDescriptionTests`. Acceptance: `swift test --package-path
-  Apps/FluidArtPlayground/Core` passes.
+  Apps/FluidArtPlayground/FluidArtPlaygroundCore` passes.
 - [ ] T-A02-110 [US1] Add `Apps/FluidArtPlayground/App/FluidShaders.swift`, with an original-work license header:
   - a dissipate fragment, `uField`, `uFactor`, and `uEncoded`/`uRange` for RGBA8 signed velocity;
   - a display fragment, `uDye`, with a dark background.

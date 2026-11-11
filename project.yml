@@ -19,6 +19,8 @@ packages:
     path: Packages/VisualCoreRendering
   GenerativeArtStudioCore:
     path: Apps/GenerativeArtStudio/Core
+  FluidArtPlaygroundCore:
+    path: Apps/FluidArtPlayground/FluidArtPlaygroundCore
 settings:
   base:
     SWIFT_VERSION: "6.0"
@@ -204,7 +206,7 @@ targets:
     dependencies:
       - target: GenerativeArtStudio
   FluidArtPlayground:
-    # A02 Fluid Art Playground (feature 018 A02-P00): app shell; solver and rendering arrive in Phases 01–02.
+    # A02 Fluid Art Playground (feature 018 A02-P00 shell; feature 019 A02-P01 fields, ping-pong and canvas).
     type: application
     platform: iOS
     sources:
@@ -227,6 +229,15 @@ targets:
         PRODUCT_NAME: FluidArtPlayground
         GENERATE_INFOPLIST_FILE: NO
         ENABLE_USER_SCRIPT_SANDBOXING: NO
+    dependencies:
+      - package: FluidArtPlaygroundCore
+        product: FluidArtPlaygroundCore
+      - package: VisualCore
+        product: VisualCoreSimulation
+      - package: VisualCoreRendering
+        product: VisualCoreRendering
+      - package: VisualCoreRendering
+        product: VisualCoreUI
     postBuildScripts:
       # FR-A02-006: the build fails if the app depends on ProjectM engine/preset/bridge modules.
       - name: Dependency audit (FR-A02-006)
@@ -236,6 +247,20 @@ targets:
           env -i PATH=/usr/bin:/bin:/usr/sbin:/sbin HOME="$HOME" DEVELOPER_DIR="$DEVELOPER_DIR" \
             /usr/bin/python3 "$SRCROOT/scripts/audit_showcase_dependencies.py" --root "$SRCROOT" --spec project.yml \
             --target FluidArtPlayground --sources Apps/FluidArtPlayground --app "$TARGET_BUILD_DIR/$WRAPPER_NAME"
+  FluidArtPlaygroundTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources: [Apps/FluidArtPlayground/Tests/Unit]
+    info:
+      path: Apps/FluidArtPlayground/Generated/Tests-Info.plist
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: dev.visualcore.FluidArtPlaygroundTests
+        GENERATE_INFOPLIST_FILE: NO
+    dependencies:
+      - target: FluidArtPlayground
+      - package: VisualCore
+        product: VisualCoreTestSupport
   FluidArtPlaygroundUITests:
     type: bundle.ui-testing
     platform: iOS
@@ -270,6 +295,7 @@ schemes:
     build:
       targets:
         FluidArtPlayground: all
+        FluidArtPlaygroundTests: [test]
         FluidArtPlaygroundUITests: [test]
     test:
-      targets: [FluidArtPlaygroundUITests]
+      targets: [FluidArtPlaygroundTests, FluidArtPlaygroundUITests]

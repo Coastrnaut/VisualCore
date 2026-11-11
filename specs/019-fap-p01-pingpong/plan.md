@@ -128,7 +128,7 @@ Packages/VisualCoreRendering/Sources/VisualCoreRendering/
 Packages/VisualCoreRendering/Tests/VisualCoreRenderingTests/
 └── FloatRenderSupportTests.swift, PingPongTargetTests.swift, FieldPassTests.swift, FloatTransferTests.swift  # NEW
 
-Apps/FluidArtPlayground/Core/                       # NEW GPU-free package FluidArtPlaygroundCore
+Apps/FluidArtPlayground/FluidArtPlaygroundCore/                       # NEW GPU-free package FluidArtPlaygroundCore
 ├── Package.swift
 ├── Sources/FluidArtPlaygroundCore/
 │   ├── Module.swift

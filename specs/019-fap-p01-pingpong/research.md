@@ -112,3 +112,12 @@ All Technical Context items were resolved; none remain NEEDS CLARIFICATION.
   Each case runs in both storages (half-float when supported, plus forced RGBA8) on iOS 27.2 and 26.5. A 1,000-step
   CPU run at `d = 10` checks for no NaN and no negatives (SC-A02-103).
 - **Rationale**: this covers identity, moderate and strong decay, and it is fast.
+
+## R10 Local package directory name (found during T-A02-101)
+
+- **Decision**: the app's domain package lives in `Apps/FluidArtPlayground/FluidArtPlaygroundCore`, not in
+  `Apps/FluidArtPlayground/Core`. From now on, every app's domain package directory is named `<App>Core`.
+- **Rationale**: SwiftPM and Xcode derive a local package's identity from the last path component. A second
+  `…/Core` package collided with `Apps/GenerativeArtStudio/Core`: the xcodebuild log for
+  `t101-app-build` shows "Core: (null)" and "Missing package product 'FluidArtPlaygroundCore'".
+- **Alternatives**: renaming A01's sealed package (it would churn a sealed gate's paths for no benefit).
