@@ -189,6 +189,25 @@ def app_release_steps(root: Path = ROOT) -> list[Step]:
     return out
 
 
+def missing_projects(argv: list[str], cwd: Path) -> list[tuple[Path, Path]]:
+    """(project, XcodeGen spec) for every `.xcodeproj` named in `argv` that does not exist yet. Generated projects are
+    gitignored, so a fresh clone has none (setup.md §8, Mac Studio 2026-11-11). The spec is `<dir>/<name>.yml`, or
+    `<dir>/project.yml` for VisualCore.xcodeproj."""
+    out: list[tuple[Path, Path]] = []
+    for arg in argv:
+        if not arg.endswith(".xcodeproj"):
+            continue
+        project = (cwd / arg) if not Path(arg).is_absolute() else Path(arg)
+        if project.exists():
+            continue
+        for spec in (project.with_suffix(".yml"), project.parent / "project.yml"):
+            if spec.is_file():
+                if (project, spec) not in out:
+                    out.append((project, spec))
+                break
+    return out
+
+
 def run_step(step: Step, log_dir: Path, udids: dict[str, str]) -> Result:
     log = log_dir / f"{step.name}.log"
     argv = list(step.argv)
@@ -199,9 +218,18 @@ def run_step(step: Step, log_dir: Path, udids: dict[str, str]) -> Result:
                 if step.needs_simulator not in udids:
                     udids[step.needs_simulator] = simulator_udid(step.needs_simulator)
                 argv = [a.replace("{udid}", udids[step.needs_simulator]) for a in argv]
-            out.write("$ " + " ".join(argv) + "\n")
-            out.flush()
-            code = subprocess.run(argv, cwd=step.cwd, stdout=out, stderr=subprocess.STDOUT, timeout=step.timeout).returncode
+            code = 0
+            for project, spec in missing_projects(argv, step.cwd):
+                out.write(f"Project missing ({project.name}); generating it first:\n$ xcodegen generate --spec {spec}\n")
+                out.flush()
+                code = subprocess.run(["xcodegen", "generate", "--spec", str(spec)], cwd=spec.parent, stdout=out,
+                                      stderr=subprocess.STDOUT, timeout=step.timeout).returncode
+                if code != 0:
+                    break
+            if code == 0:
+                out.write("$ " + " ".join(argv) + "\n")
+                out.flush()
+                code = subprocess.run(argv, cwd=step.cwd, stdout=out, stderr=subprocess.STDOUT, timeout=step.timeout).returncode
             status = "pass" if code == 0 else "fail"
         except subprocess.TimeoutExpired:
             code, status = None, "timeout"

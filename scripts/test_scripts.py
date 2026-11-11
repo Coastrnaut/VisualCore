@@ -507,6 +507,24 @@ class AppIsolationTests(unittest.TestCase):
 class ReleaseCheckTests(unittest.TestCase):
     """Feature 010 T-F908: release-check runner logic (step list, selection, logs, summary, failure handling)."""
 
+    def test_missing_projects_are_found_with_their_specs(self):
+        # Fresh clone (setup.md §8): generated .xcodeproj files are missing; each is generated from its XcodeGen spec.
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            (root / "project.yml").write_text("name: VisualCore\n")
+            harness = root / "Harnesses" / "ProjectMReference"
+            harness.mkdir(parents=True)
+            (harness / "ProjectMReference.yml").write_text("name: ProjectMReference\n")
+            argv = ["xcodebuild", "test", "-project", "Harnesses/ProjectMReference/ProjectMReference.xcodeproj",
+                    "-scheme", "ProjectMReference"]
+            self.assertEqual(relcheck.missing_projects(argv, root),
+                             [(harness / "ProjectMReference.xcodeproj", harness / "ProjectMReference.yml")])
+            self.assertEqual(relcheck.missing_projects(["xcodebuild", "-project", "VisualCore.xcodeproj"], root),
+                             [(root / "VisualCore.xcodeproj", root / "project.yml")])
+            (root / "VisualCore.xcodeproj").mkdir()
+            self.assertEqual(relcheck.missing_projects(["xcodebuild", "-project", "VisualCore.xcodeproj"], root), [])
+            self.assertEqual(relcheck.missing_projects(["swift", "test"], root), [])
+
     def test_step_list_covers_every_release_gate(self):
         names = [s.name for s in relcheck.steps("X")]
         self.assertEqual(len(names), len(set(names)))
