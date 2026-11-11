@@ -97,7 +97,15 @@ public struct ParticleSystem: Sendable {
     public var forces: [ParticleForce] = []
     /// Live particles (0…`capacity`).
     public private(set) var aliveCount = 0
-    /// Particles not emitted because the pool was full.
+    /// The current emission ceiling (feature 034, G-PQUALITY): clamped to 1…`capacity`, default `capacity`. While
+    /// `aliveCount ≥ liveLimit` new particles are refused and counted in `droppedCount`; lowering it removes nobody.
+    /// Configuration, not state: it is not part of `checksum()`.
+    public var liveLimit: Int {
+        get { storedLiveLimit ?? capacity }
+        set { storedLiveLimit = min(max(newValue, 1), capacity) }
+    }
+    private var storedLiveLimit: Int?
+    /// Particles not emitted because the pool was full or the live limit was reached.
     public private(set) var droppedCount = 0
     /// Particles removed because their state became NaN or infinite.
     public private(set) var nanRemoved = 0
@@ -186,7 +194,7 @@ public struct ParticleSystem: Sendable {
     }
 
     private mutating func spawn(from e: Int, _ em: Emitter) {
-        guard aliveCount < capacity else { droppedCount += 1; return }
+        guard aliveCount < capacity, aliveCount < liveLimit else { droppedCount += 1; return }
         var angle = em.direction + (random.double() - 0.5) * em.spread
         let speed = random.range(em.speed)
         // Shape offset after angle and speed: a point draws nothing, keeping earlier seeded results identical (R2).

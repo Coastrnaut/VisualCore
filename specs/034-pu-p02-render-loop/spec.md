@@ -255,7 +255,8 @@ positions, plus UI tests of the live scene.
 - **SC-A04-202**: 10,000 steps with particles spawned on a force center remove 0 non-finite particles, for every force
   kind.
 - **SC-A04-203**: With a demand of 10× the requested limit, live ≤ effective limit ≤ requested limit at every step,
-  and dropped = demand − created.
+  and dropped = demand − created. After the limit is lowered, live never grows while above it and falls to it as
+  older particles expire (US3 AC2: nothing is deleted; clarified in T-A04-203).
 - **SC-A04-204**: A synthetic serious thermal state lowers the effective limit within one decision interval. After the
   calm period it rises again.
 - **SC-A04-205**: In offscreen renders of 3 fixed states, 100% of particle centers are lit and 100% of sampled

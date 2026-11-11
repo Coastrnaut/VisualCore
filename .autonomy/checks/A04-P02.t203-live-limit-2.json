@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/VisualCore",
+    "--filter",
+    "LiveLimitTests|ParticleSystemTests|ParticleForceFieldTests"
+  ],
+  "command": "swift test --package-path Packages/VisualCore --filter 'LiveLimitTests|ParticleSystemTests|ParticleForceFieldTests'",
+  "elapsed_seconds": 17.778,
+  "exit_code": 0,
+  "finished": "2026-11-11T23:25:16+00:00",
+  "log": ".autonomy/logs/A04-P02.t203-live-limit-2.log",
+  "log_sha256": "0a198d2ffd1d74aacb47a5d7dd5413c6db69021f45319cfaf9429aa96246ba0c",
+  "name": "t203-live-limit-2",
+  "stage": "A04-P02",
+  "started": "2026-11-11T23:24:58+00:00",
+  "timed_out": false
+}
