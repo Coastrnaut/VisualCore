@@ -27,3 +27,19 @@ schedules the audio taps/DSP, game-controller input, a shared TestSupport image-
 - **Add a new foundation feature now:** rejected. The ledger fixes ten foundation gates (ADR-0004), and building audio
   without its first consumer risks an unused API.
 - **Leave it undocumented:** rejected. It would over-claim the release.
+
+## Status update (2026-11-10, after A01-P01)
+
+The following were built as shared modules in feature 012:
+- `VisualCoreParameters` (new);
+- `VisualCoreUI.RenderSurface`;
+- `VisualCoreTestSupport` image comparison;
+- `VisualCoreRendering` `ShaderBundle`, the GLSL library and `FullScreenShaderScene`.
+
+Still open:
+- audio (A06–A08);
+- controllers;
+- the TestSupport fake clock and fixtures;
+- the VisualCoreUI accessibility settings model and diagnostics overlay;
+- asset metrics.
+

@@ -43,6 +43,8 @@ results describe that app, not VisualCore (CLAUDE.md §12).
 | AutomationRunner (`DEBUG \|\| VISUALCORE_AUTOMATION` only) | verified (simulator); zero symbols in Release verified |
 | Audio acquisition and DSP features | **Not implemented** (placeholder modules). See known limitations. |
 | Game-controller input | **Not implemented**. See known limitations. |
-| SwiftUI render surface (`VisualCoreUI`) | **Not implemented** (placeholder). Apps host `RenderHost.view` through UIKit representables. |
+| SwiftUI render surface (`VisualCoreUI.RenderSurface`) | verified (simulator), A01-P01 |
+| Parameter schemas, palettes, presets (`VisualCoreParameters`) | verified (host), A01-P01 |
+| Bundled shaders, GLSL library, full-screen scenes | verified (simulator), A01-P01 |
 | System/App audio capture | unsupported (not offered). On D3 (iPadOS 26.5) it must show as unavailable. |
 | Live home-screen wallpaper | unsupported (no public API) |

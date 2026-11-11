@@ -107,6 +107,6 @@ green before moving on.
 
 ## Phase 6: Convergence
 
-- [ ] T-A01-113 Update `docs/release/known-limitations.md`, `docs/release/support-matrix.md`, `docs/getting-started.md` and the ADR-0006 status note so VisualCoreParameters, VisualCoreUI `RenderSurface` and VisualCoreTestSupport `ImageComparison` are listed as built, with only their remaining parts as limitations, per FR-A01-108 / Constitution V (contradicts)
+- [X] T-A01-113 Update `docs/release/known-limitations.md`, `docs/release/support-matrix.md`, `docs/getting-started.md` and the ADR-0006 status note so VisualCoreParameters, VisualCoreUI `RenderSurface` and VisualCoreTestSupport `ImageComparison` are listed as built, with only their remaining parts as limitations, per FR-A01-108 / Constitution V (contradicts) — Verified 2026-11-10: known-limitations.md (built-since-rc.1 note; TestSupport and VisualCoreUI rows narrowed to remaining parts), support-matrix.md (RenderSurface, VisualCoreParameters, shader bundles rows with verified status), getting-started.md module table, ADR-0006 status update; validate_docs PASS incl. links
 - [ ] T-A01-114 Make the shader bundle injectable into `SceneModel` (`Apps/GenerativeArtStudio/App/SceneScreen.swift`) and add a unit test that a broken family shader reaches `SceneModel.errorMessage` with `file:line`, per FR-A01-110 (partial)
 - [ ] T-A01-115 Add a domain test that `ArtDocument.decode` applies `migrate` and that migration is the identity for schema 1, per the edge case "older versions migrated (hook tested)" (partial)
