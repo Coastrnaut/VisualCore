@@ -11,7 +11,7 @@ both simulators and the reference regression. IDs are `T-A01-0##`. Each task get
 
 ## Phase 1: Setup
 
-- [ ] T-A01-001 Record the phase-start commit in `docs/apps/generative-art-studio/regression-baseline.md` (header only), so the no-change diff check for `Packages/` and `External/` (FR-A01-007) has a base
+- [X] T-A01-001 Record the phase-start commit in `docs/apps/generative-art-studio/regression-baseline.md` (header only), so the no-change diff check for `Packages/` and `External/` (FR-A01-007) has a base — Verified 2026-11-10: docs/apps/generative-art-studio/regression-baseline.md records phase-start commit 8172b76 (git log confirms: Seal F09) and the reference pins; validate_docs PASS
 
 ## Phase 2: Foundational — app-neutral contract checker (blocks US1 and US4)
 
