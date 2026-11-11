@@ -81,7 +81,7 @@ description: "Task list for feature 025 — Fractal Explorer Phase 00 boundary a
 
 ## Phase 6: Polish
 
-- [ ] T-A03-007 Confirm that `git diff --stat 343d251..HEAD -- Packages External` is empty (SC-A03-006). Run the
+- [X] T-A03-007 Confirm that `git diff --stat 343d251..HEAD -- Packages External` is empty (SC-A03-006). Run the — Verified 2026-11-11: — Verified 2026-11-11: run-check A03-P00/t007-no-shared-changes: git diff --stat 343d251..HEAD -- Packages External is empty (log holds only the command header; SC-A03-006); t007-release-fast 6/6 (docs, app-contracts incl. all three apps' contracts, compliance, dependencies R1-R5, licenses, script-tests); t007-documented-api PASS for Apps/FractalExplorer
   release-check fast steps (docs, app-contracts, compliance, dependencies, licenses, script-tests) and the
   documented-API check for `Apps/FractalExplorer`.
 

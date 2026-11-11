@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "git",
+    "diff",
+    "--stat",
+    "343d251..HEAD",
+    "--",
+    "Packages",
+    "External"
+  ],
+  "command": "git diff --stat 343d251..HEAD -- Packages External",
+  "elapsed_seconds": 0.011,
+  "exit_code": 0,
+  "finished": "2026-11-11T11:45:25+00:00",
+  "log": ".autonomy/logs/A03-P00.t007-no-shared-changes.log",
+  "log_sha256": "69b2516e16ac1c53fa2030580ecd8f1d746f0d141bbbb2f6781849e351441e47",
+  "name": "t007-no-shared-changes",
+  "stage": "A03-P00",
+  "started": "2026-11-11T11:45:25+00:00",
+  "timed_out": false
+}

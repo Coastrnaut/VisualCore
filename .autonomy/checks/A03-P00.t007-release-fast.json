@@ -1,0 +1,25 @@
+{
+  "argv": [
+    "python3",
+    "scripts/release_check.py",
+    "--only",
+    "docs",
+    "app-contracts",
+    "compliance",
+    "dependencies",
+    "licenses",
+    "script-tests",
+    "--log-dir",
+    ".autonomy/logs/t007-fe-release-fast"
+  ],
+  "command": "python3 scripts/release_check.py --only docs app-contracts compliance dependencies licenses script-tests --log-dir .autonomy/logs/t007-fe-release-fast",
+  "elapsed_seconds": 14.604,
+  "exit_code": 0,
+  "finished": "2026-11-11T11:45:39+00:00",
+  "log": ".autonomy/logs/A03-P00.t007-release-fast.log",
+  "log_sha256": "3ffebbea21bf7990df5dce00b43475de4faf4d7ed67efe920658e3feba4dd6b8",
+  "name": "t007-release-fast",
+  "stage": "A03-P00",
+  "started": "2026-11-11T11:45:25+00:00",
+  "timed_out": false
+}
