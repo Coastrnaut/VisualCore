@@ -13,32 +13,38 @@ accessibility requirement quality. Depth: standard (gate review); audience: gate
 
 ## Dependency Audit (must-have from the supplied prompt)
 
-- [ ] CHK001 Is "ProjectM engine target" defined by an explicit deny-list rather than left to interpretation? [Clarity, Spec §FR-F610, Clarifications]
-- [ ] CHK002 Are all layers the audit must inspect (spec, package graph, imports, binary) enumerated? [Completeness, Spec §FR-F610]
-- [ ] CHK003 Is the distinction between forbidden ProjectM modules and the permitted ANGLE renderer frameworks stated? [Clarity, Gap]
-- [ ] CHK004 Are contaminated-fixture requirements specified per layer so detection can be measured? [Measurability, Spec §SC-F602]
-- [ ] CHK005 Is it specified when the audit runs (before tests / per build) and what a failure blocks? [Completeness, Spec §FR-F610]
-- [ ] CHK006 Is the audit's output (exit codes, report contents) defined? [Clarity, Gap]
+- [x] CHK001 Is "ProjectM engine target" defined by an explicit deny-list rather than left to interpretation? [Clarity, Spec §FR-F610, Clarifications]
+- [x] CHK002 Are all layers the audit must inspect (spec, package graph, imports, binary) enumerated? [Completeness, Spec §FR-F610]
+- [x] CHK003 Is the distinction between forbidden ProjectM modules and the permitted ANGLE renderer frameworks stated? [Clarity, Spec §FR-F610]
+- [x] CHK004 Are contaminated-fixture requirements specified per layer so detection can be measured? [Measurability, Spec §SC-F602]
+- [x] CHK005 Is it specified when the audit runs (before tests / per build) and what a failure blocks? [Completeness, Spec §FR-F610]
+- [x] CHK006 Is the audit's output (exit codes, report contents) defined? [Clarity, Spec §FR-F610]
 
 ## Scenes and Interaction
 
-- [ ] CHK007 Is the minimum scene set enumerated with each scene's purpose? [Completeness, Spec §FR-F603]
-- [ ] CHK008 Is the out-of-scope status of the audio-reactive scene stated with a reason? [Clarity, Spec §FR-F603]
-- [ ] CHK009 Are shader-loading requirements (bundled files, include, error reporting with file and line) specific? [Clarity, Spec §FR-F604]
-- [ ] CHK010 Is "at least one post-processing effect" quantified (pass count, toggle, visible pass order)? [Measurability, Spec §FR-F605]
-- [ ] CHK011 Are touch behaviors defined per interactive scene? [Completeness, Spec §FR-F606]
+- [x] CHK007 Is the minimum scene set enumerated with each scene's purpose? [Completeness, Spec §FR-F603]
+- [x] CHK008 Is the out-of-scope status of the audio-reactive scene stated with a reason? [Clarity, Spec §FR-F603]
+- [x] CHK009 Are shader-loading requirements (bundled files, include, error reporting with file and line) specific? [Clarity, Spec §FR-F604]
+- [x] CHK010 Is "at least one post-processing effect" quantified (pass count, toggle, visible pass order)? [Measurability, Spec §FR-F605]
+- [x] CHK011 Are touch behaviors defined per interactive scene? [Completeness, Spec §FR-F606]
 
 ## Diagnostics, Lifecycle and Recovery
 
-- [ ] CHK012 Are the diagnostics fields and refresh rate specified? [Completeness, Spec §FR-F607]
-- [ ] CHK013 Are context-loss recovery expectations quantified (generation change, resume time, leaks)? [Measurability, Spec §SC-F605]
-- [ ] CHK014 Are resource-release requirements on scene switching specified? [Coverage, Spec §FR-F608]
-- [ ] CHK015 Are background/foreground lifecycle expectations defined? [Coverage, Spec §US4]
-- [ ] CHK016 Are failure states (no renderer, missing shader/texture) given user-visible requirements? [Coverage, Spec §Edge Cases]
+- [x] CHK012 Are the diagnostics fields and refresh rate specified? [Completeness, Spec §FR-F607]
+- [x] CHK013 Are context-loss recovery expectations quantified (generation change, resume time, leaks)? [Measurability, Spec §SC-F605]
+- [x] CHK014 Are resource-release requirements on scene switching specified? [Coverage, Spec §FR-F608]
+- [x] CHK015 Are background/foreground lifecycle expectations defined? [Coverage, Spec §US4]
+- [x] CHK016 Are failure states (no renderer, missing shader/texture) given user-visible requirements? [Coverage, Spec §Edge Cases]
 
 ## Accessibility and Non-Functional
 
-- [ ] CHK017 Are VoiceOver, Dynamic Type, Reduce Motion and Reduce Flashing requirements stated for scenes and controls? [Coverage, Spec §FR-F609, §SC-F604]
-- [ ] CHK018 Is the deferral of device performance measurement explicit? [Non-Functional, Spec §Assumptions, Constitution V]
-- [ ] CHK019 Are the smoke test's scope and runtimes defined so the "repeatable" requirement is verifiable? [Measurability, Spec §FR-F611, §SC-F601]
-- [ ] CHK020 Are placeholder identity (bundle id, name) and the owner-approval dependency documented? [Dependency, Spec §Assumptions]
+- [x] CHK017 Are VoiceOver, Dynamic Type, Reduce Motion and Reduce Flashing requirements stated for scenes and controls? [Coverage, Spec §FR-F609, §SC-F604]
+- [x] CHK018 Is the deferral of device performance measurement explicit? [Non-Functional, Spec §Assumptions, Constitution V]
+- [x] CHK019 Are the smoke test's scope and runtimes defined so the "repeatable" requirement is verifiable? [Measurability, Spec §FR-F611, §SC-F601]
+- [x] CHK020 Are placeholder identity (bundle id, name) and the owner-approval dependency documented? [Dependency, Spec §Assumptions]
+
+## Notes
+
+- Reviewed 2026-11-10 by the agent under the owner's standing delegation (CLAUDE.md §2): 20/20 satisfied after one spec edit —
+  FR-F610 now separates the forbidden ProjectM modules from the permitted ANGLE frameworks (CHK003) and defines exit codes and
+  report output (CHK006). `/speckit-implement` reads these markers and does not change them.
