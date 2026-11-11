@@ -67,9 +67,68 @@ final class ExplorerModel {
     /// True while a two-finger pinch is driving the view.
     private(set) var pinching = false
 
-    /// Applies a new viewport (the single place later phases clamp it).
+    // MARK: Precision limit (feature 027 T-A03-207; FR-A03-206; clarification 2)
+
+    /// What the precision banner shows.
+    enum PrecisionNotice: Equatable {
+        case none, near, reached
+        var text: String? {
+            switch self {
+            case .none: nil
+            case .near: "Near precision limit — details may blur"
+            case .reached: "Precision limit reached — zoom stops here"
+            }
+        }
+    }
+
+    /// Test seam: the shader's mantissa bits (default: the host's reported fragment precision, highp → mediump → 10).
+    var mantissaBitsOverride: Int?
+    /// Test seam: device pixels per point (default: the host view's display scale, else 2).
+    var pixelsPerPointOverride: Double?
+    /// The current precision notice.
+    private(set) var notice = PrecisionNotice.none
+    /// VoiceOver announcements made for notice changes (tests).
+    private(set) var announcements: [String] = []
+
+    /// The mantissa bits the shader works with.
+    var mantissaBits: Int { mantissaBitsOverride ?? host?.capabilities.fragmentMantissaBits() ?? 10 }
+    /// Device pixels per point.
+    var pixelsPerPoint: Double {
+        pixelsPerPointOverride ?? host.map { Double($0.view.traitCollection.displayScale) }.flatMap { $0 > 0 ? $0 : nil } ?? 2
+    }
+
+    /// The canvas's spoken description: the state's, plus the precision notice when there is one.
+    var canvasDescription: String {
+        notice.text.map { "\(state.spokenDescription). \($0)" } ?? state.spokenDescription
+    }
+
+    /// Applies a new viewport, clamping its scale so one device pixel never falls below one representable step of the
+    /// coordinates (VisualCoreMath.PrecisionAdvisor with the shader's mantissa bits), then updates the notice.
     func apply(_ viewport: PlaneViewport) {
-        if viewport != state.viewport { state.viewport = viewport }
+        var v = viewport
+        let magnitude = max(abs(v.center.x), abs(v.center.y))
+        let minStep = PrecisionAdvisor.minimumPixelStep(mantissaBits: mantissaBits, magnitude: magnitude)
+        let minUnitsPerPoint = minStep * pixelsPerPoint
+        var clamped = false
+        if v.unitsPerPoint < minUnitsPerPoint {
+            v = PlaneViewport(center: v.center, unitsPerPoint: minUnitsPerPoint, size: v.size)
+            clamped = true
+        }
+        if v != state.viewport { state.viewport = v }
+        updateNotice(clamped: clamped)
+    }
+
+    private func updateNotice(clamped: Bool) {
+        let v = state.viewport
+        let status = PrecisionAdvisor.assess(mantissaBits: mantissaBits, magnitude: max(abs(v.center.x), abs(v.center.y)),
+                                             pixelStep: v.unitsPerPoint / pixelsPerPoint)
+        let next: PrecisionNotice = clamped || status.margin < 1.000_001 ? .reached : (status.level == .reliable ? .none : .near)
+        guard next != notice else { return }
+        notice = next
+        if let text = next.text {
+            announcements.append(text)
+            AccessibilityNotification.Announcement(text).post()
+        }
     }
 
     /// One canvas touch event. Two fingers (VisualCore PointerTracker order, PinchRecognizer state) pinch and pan
@@ -197,6 +256,11 @@ struct ExplorerView: View {
                 }
                 .buttonStyle(.bordered)
                 .labelStyle(.titleAndIcon)
+                if let text = model.notice.text {
+                    Label(text, systemImage: "exclamationmark.triangle")
+                        .fixedSize(horizontal: false, vertical: true)
+                        .accessibilityIdentifier("fe.precision")
+                }
                 if model.usingFallback, let error = model.scene.errorMessage {
                     Text("The graphics shader could not run, so a simpler preview is shown. (\(error))")
                         .font(.footnote)
@@ -229,14 +293,14 @@ struct ExplorerView: View {
         GeometryReader { geo in
             Group {
                 if let host = model.host, !model.usingFallback {
-                    RenderSurface(host: host, accessibilityLabel: model.state.spokenDescription,
+                    RenderSurface(host: host, accessibilityLabel: model.canvasDescription,
                                   accessibilityHint: "Fractal picture. Pinch to zoom and drag to move; the zoom buttons do the same.")
                 } else if let image = model.image {
                     Image(decorative: image, scale: 1)
                         .resizable()
                         .interpolation(.none)
                         .accessibilityElement()
-                        .accessibilityLabel(model.state.spokenDescription)
+                        .accessibilityLabel(model.canvasDescription)
                         .accessibilityAddTraits(.isImage)
                 } else {
                     Color.black

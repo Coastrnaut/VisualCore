@@ -91,7 +91,7 @@ amendments), the plan, research R1–R4, the data model, the contract and the qu
 
 ## Phase 5: User Story 4 — precision limit (P2)
 
-- [ ] T-A03-207 [US4] In the model:
+- [X] T-A03-207 [US4] In the model: — Verified 2026-11-11: — Verified 2026-11-11: ExplorerModel precision limit: mantissa bits from host.capabilities.fragmentMantissaBits() (highp -> mediump -> 10, test seam), pixel step = unitsPerPoint / display scale; apply(_:) raises unitsPerPoint to PrecisionAdvisor.minimumPixelStep * scale so zoom stops; notice none/near/reached with the FR-A03-206 texts in the fe.precision banner, AccessibilityNotification.Announcement once per state change, canvas description ends with the notice. PrecisionClampTests 4: repeated zoom-ins pass none->near->reached and stop exactly at 0.5*2^-23*3 units/pt, zoom-in at the limit is a no-op, 2 announcements for 2 changes, zoom-out clears; 10 bits clamp >1000x earlier than 23; no host -> 10 bits; pinch cannot pass the limit. The first runs t207-app-ios27/26 failed to compile (ambiguous pow in the test); run-check A03-P02/t207-app-ios27-2 and t207-app-ios26-2 TEST SUCCEEDED, enumeration 23/23 each
   - read `host.capabilities.fragmentHighp` (falling back to `mediump`, then 10 bits);
   - clamp the viewport's units per point so the per-pixel step stays ≥ the advisor's minimum;
   - show the `fe.precision` banner with the FR-A03-206 wording;
