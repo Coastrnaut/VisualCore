@@ -22,6 +22,41 @@ Canonical overrides:
 - Reusable pieces, such as a seeded synthetic gesture script, go in VisualCore with tests, docs, the API baseline and
   the ProjectM regression.
 
+## Clarifications
+
+### Session 2026-11-11
+
+Answered autonomously under the owner's standing delegation (CLAUDE.md §2), recommended option in each case. Facts
+were checked in code: `AutomationRunner` (modes smoke, launch, lifecycle; `renderOneFrame` uses a fixed 1/60 s
+delta), `RenderHost.renderFrame` (renders nothing unless active), `FramePacing.clampedDelta` (≤ 0.1 s) and
+`TimeStepPolicy.clamp` (1/240…1/30 s; invalid deltas give 1/240 s).
+
+- Q: How does a device stress run detect numerical blow-up, when the automation runner only knows whether frames
+  rendered? → A: VisualCoreAutomation gains one generic, app-supplied **post-run check**: an optional closure that
+  `AutomationView` passes to `AutomationRunner`. It runs after the mode's frames and returns nil (pass) or a failure
+  message. A failure sets the report's result to "fail" with that message. The fluid app's check reads its velocity,
+  pressure and dye fields back and checks that every value is finite and in range. It also puts the final picture's
+  digest in the report. No app-specific stress mode is added: smoke (frames), launch and lifecycle (pause, resume
+  and context recreation) are run with the aggressive seeded script.
+- Q: How is the test mode's seed passed, and what is it? → A: A generic launch-environment key in VisualCoreAutomation,
+  `VISUALCORE_AUTORUN_SEED` (an unsigned 64-bit integer; missing, 0 or invalid gives 1), read by
+  `AutomationRunner.requestedSeed()`. It is only compiled with the rest of the automation code. Determinism is
+  claimed for two fresh scenes with the same seed and frame count, on the same runtime and device.
+- Q: What exactly does fixture 5 measure? → A: Three parts, all automated:
+  1. While the host is paused (backgrounded), it renders no frames, so the step count does not change.
+  2. The first frame after resume runs exactly one step.
+  3. A frame with any delta (600 s, 0, negative or not finite) runs exactly one step, with a time step in
+     1/240…1/30 s. The scene has no catch-up loop, so the step count never rises by more than one per rendered
+     frame.
+- Q: Is the simulation resolution setting (MVP-06, "configurable simulation resolution with thermal downgrade") in
+  this phase? → A: Yes. Thermal downgrade already shipped (feature 021). This phase adds a "Simulation detail" picker
+  (Low 64, Medium 128, High 256 cells on the short edge; the long edge follows the canvas aspect, capped at 512). The
+  default stays Medium. A change rebuilds only the field targets on the next frame and restarts from the seed. The
+  stress fixture covers High. Release packaging is not delayed.
+- Q: Where does "Reset" restore the dye from? → A: The seeded pattern for the current seed, in the current palette's
+  splat colors (as at first open). The velocity and pressure are cleared to zero, written as encoded zero in 8-bit
+  storage.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 — Pause, step a frame, resume and reset (Priority: P1)
@@ -175,11 +210,15 @@ writes a JSON report and exits, and that the Release build contains no automatio
 - **FR-A02-507**: A stress fixture MUST run the aggressive script for 600 frames per storage and assert that every
   read-back value is finite and within its encoding range, and that the per-frame splat cap holds.
 - **FR-A02-508**: The app MUST register the fluid scene with VisualCore's automation runner (smoke, launch and
-  lifecycle modes) in the deterministic test mode. This code is compiled only under `DEBUG || VISUALCORE_AUTOMATION`
+  lifecycle modes) in the deterministic test mode, with the seed from `VISUALCORE_AUTORUN_SEED` and a post-run field
+  check (clarification 1) added to VisualCoreAutomation as a generic, documented hook. This code is compiled only under `DEBUG || VISUALCORE_AUTOMATION`
   and triggered only by the launch environment. The Release symbol check MUST report zero automation symbols for the
   app.
 - **FR-A02-509**: The app MUST NOT create or own EGL displays, contexts or surfaces. All GPU work goes through the
   VisualCore host, and the isolation check enforces this.
+- **FR-A02-511**: The Adjust panel MUST offer a "Simulation detail" picker (Low, Medium, High = 64, 128, 256 cells
+  on the short edge; the long edge follows the canvas aspect, capped at 512). A change rebuilds only the field targets
+  on the next frame and restarts from the seed. It is accessible and covered by unit and UI tests (MVP-06).
 - **FR-A02-510**: The contract and the device-campaign plan MUST record the automation modes, their report fields,
   and the "device run pending implementation lock" status. The checks MUST pass.
 
@@ -207,6 +246,8 @@ writes a JSON report and exits, and that the Release build contains no automatio
   simulated 10-minute suspension, with a time step of at most 1/30 s.
 - **SC-A02-505**: The stress fixture finds 0 non-finite or out-of-range values over 600 frames in each storage, and
   never more than the cap per frame.
+- **SC-A02-507**: Each simulation detail level gives the documented grid for a 1:2 canvas (64×128, 128×256,
+  256×512), and switching levels keeps 0 leaked resources over 10 switches.
 - **SC-A02-506**: Simulator rehearsal: each automation mode writes a report with result "pass" and exits. The Release
   build has 0 automation symbols. API review, documented-API, isolation, contract, ProjectM regression (7/7) and app
   tests on both runtimes all pass.
@@ -216,10 +257,9 @@ writes a JSON report and exits, and that the Release build contains no automatio
 - Capture (MVP-05's fourth item) is complete from feature 022. This phase only checks capture after Step.
 - Byte-identical determinism is claimed per runtime and device, not across GPUs. Across devices only the structural
   properties (finite, bounded, the same step count) are compared.
-- The automation runner's existing modes (smoke, launch, lifecycle) are enough. An app-specific stress mode is not
-  added unless the plan shows a gap.
-- The highest grid size is the configuration's existing maximum. Exposing grid resolution as a user setting (MVP-06)
-  is evaluated in planning; if it is deferred, it is recorded for Phase 06.
+- The automation runner's existing modes (smoke, launch, lifecycle) are used with the aggressive script, plus the
+  generic post-run check (clarification 1). No app-specific mode is added.
+- The simulation detail picker (MVP-06) is in this phase (clarification 4). Thermal downgrade shipped in feature 021.
 - No persistence is added. Seed and frame count come from the launch environment only in test builds.
 - Performance thresholds are not invented. Device frame times are recorded in the device campaign and judged by a
   later acceptance ADR (manual §12).
@@ -234,6 +274,7 @@ writes a JSON report and exits, and that the Release build contains no automatio
 | Manual §11 fixtures 1–5 | FR-A02-506, SC-A02-504 |
 | Manual Phase 05 gate (suspend/resume bounded catch-up) | FR-A02-506 fixture 5 |
 | Manual Phase 05 gate (EGL/context only in the VisualCore host) | FR-A02-509 |
+| MVP-06 configurable simulation resolution | FR-A02-511 |
 | Manual §13 risks 2 and 3 (solver cost, touch floods) | FR-A02-507, SC-A02-505 |
 | Manual §11 simulator/device separation, CLAUDE.md §9 automation | FR-A02-508, FR-A02-510, SC-A02-506 |
 
