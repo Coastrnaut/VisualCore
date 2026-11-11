@@ -1,0 +1,58 @@
+# VisualCore CI (feature 010 T-F912; FR-F910). Fast host-only gates: docs, compliance, dependency rules, script tests,
+# public API, documented API, licenses and host Swift tests. Simulator, reference and Release-symbol gates need the
+# prebuilt ANGLE frameworks and run locally through scripts/release_check.py (see docs/index.md).
+# Only the reference submodule is fetched, shallow and non-recursive (its license texts are inventoried); its
+# ~12 GB nested ANGLE tree is never cloned.
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    runs-on: macos-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Reference submodule (shallow, non-recursive)
+        run: git submodule update --init --depth 1 External/projectm-ios
+      - name: Ledger and source archive
+        run: python3 Tools/python/desktop_runbook.py validate
+      - name: Docs
+        run: python3 scripts/validate_docs.py
+      - name: Compliance
+        run: python3 scripts/check_compliance.py
+      - name: Dependency rules
+        run: python3 scripts/check_dependencies.py
+      - name: Public API
+        run: python3 scripts/check_public_api.py
+      - name: Documented API (all consumers)
+        run: |
+          python3 scripts/check_documented_api.py --sources Showcase/App
+          python3 scripts/check_documented_api.py --sources Harnesses/InteractiveDemo
+          python3 scripts/check_documented_api.py --sources Harnesses/SecondConsumer
+      - name: Licenses
+        run: python3 scripts/check_licenses.py
+      - name: Script tests
+        run: python3 scripts/test_scripts.py
+
+  host-tests:
+    runs-on: macos-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Toolchain
+        run: swift --version
+      - name: VisualCore host tests
+        run: swift test --package-path Packages/VisualCore
+      - name: GardenKit host tests
+        run: swift test --package-path Harnesses/SecondConsumer/GardenKit
