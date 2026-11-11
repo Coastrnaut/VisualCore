@@ -116,7 +116,7 @@ IDs are `T-A02-6##`, with one commit per task (`scripts/tick_task.py`). Commands
 
 ## Phase 5: Polish and cross-cutting
 
-- [ ] T-A02-609 Contract and notes:
+- [X] T-A02-609 Contract and notes: — Verified 2026-11-11: — Verified 2026-11-11: contract gate A02-P06 (TemporaryFolder in the release-tooling inventory and as M09 evidence; gap G-TMPFOLDER closed with the A01 LaunchCleanup reuse-debt note and owner; decision reason) rendered: check_app_contract PASS 10 rows/50 citations/10 gaps; regression-baseline A02-P06 section (t601-reference-a 3/3 + -b 4/4, t601-a01-build); simulator lessons feature 024; run-check A02-P06/t609-fast-checks 14/14 PASS
   - `visualcore-contract.json`: gate A02-P06, `TemporaryFolder` in the inventory, a reuse-debt note "A01
     LaunchCleanup → TemporaryFolder (owner: next A01 change)", and a decision reason; render it.
   - Regression baseline (ProjectM rerun after T-A02-601).

@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "app": "fluid-art-playground",
-  "gate": "A02-P05",
+  "gate": "A02-P06",
   "date": "2026-11-11",
   "inventory": [
     {
@@ -148,14 +148,15 @@
     },
     {
       "area": "Still capture and release tooling",
-      "description": "RenderHost.renderOffscreen + StillImageEncoder (opaque sRGB PNG) + ExportGeometry (A01-P04); release tooling shared by every app: check_privacy_manifest.py, check_app_release.py, bundle_licenses.py, AutomationView, AcknowledgementsView (A01-P06).",
+      "description": "RenderHost.renderOffscreen + StillImageEncoder (opaque sRGB PNG) + ExportGeometry (A01-P04); release tooling shared by every app: check_privacy_manifest.py, check_app_release.py, bundle_licenses.py, AutomationView, AcknowledgementsView (A01-P06). A02-P06 reuses the release tooling unchanged and adds VisualCorePersistence.TemporaryFolder (app-owned short-lived files, emptied at launch) for capture crash recovery.",
       "paths": [
         "Packages/VisualCoreRendering/Sources/VisualCoreRendering/StillImage.swift",
         "Packages/VisualCore/Sources/VisualCoreScenes/ExportGeometry.swift",
         "scripts/check_app_release.py",
-        "Packages/VisualCoreRendering/Sources/VisualCoreAutomation/AutomationView.swift"
+        "Packages/VisualCoreRendering/Sources/VisualCoreAutomation/AutomationView.swift",
+        "Packages/VisualCore/Sources/VisualCorePersistence/TemporaryFolder.swift"
       ],
-      "owner": "VisualCoreRendering, VisualCoreScenes, VisualCoreAutomation, scripts"
+      "owner": "VisualCoreRendering, VisualCoreScenes, VisualCoreAutomation, scripts, VisualCorePersistence"
     }
   ],
   "matrix": [
@@ -472,13 +473,19 @@
           "symbol": "ExportGeometry",
           "product": "VisualCoreScenes",
           "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCorePersistence/TemporaryFolder.swift",
+          "symbol": "TemporaryFolder",
+          "product": "VisualCorePersistence",
+          "public": true
         }
       ],
       "example": {
         "file": "Apps/GenerativeArtStudio/App/ExportSheet.swift",
         "symbol": "ExportRunner"
       },
-      "notes": "Offscreen render on the host's context, opaque sRGB PNG, capped sizes (A01-P04). A02-P04: still capture reuses RenderHost.renderOffscreen, ExportGeometry and StillImageEncoder with the scene paused (CaptureModel); share via the system share sheet with NSPhotoLibraryAddUsageDescription."
+      "notes": "Offscreen render on the host's context, opaque sRGB PNG, capped sizes (A01-P04). A02-P04: still capture reuses RenderHost.renderOffscreen, ExportGeometry and StillImageEncoder with the scene paused (CaptureModel); share via the system share sheet with NSPhotoLibraryAddUsageDescription. A02-P06: captures live in TemporaryFolder 'Captures' (tmp/Captures), removed on close and at launch (crash recovery)."
     },
     {
       "id": "M10",
@@ -628,6 +635,18 @@
       "test": "AutomationRunnerTests +4 (seed parsing, check pass with note, check fail, unknown mode unchecked) on both runtimes; ProjectM regression 7/7; app AutomationTests 4",
       "justification": "Found in A02-P05 (research R2-R3): device runs must verify domain invariants and pass a seed; a generic app-supplied post-run check and seed key keep the runner app-neutral.",
       "closed": "A02-P05"
+    },
+    {
+      "id": "G-TMPFOLDER",
+      "matrix": [
+        "M09"
+      ],
+      "kind": "adaptation",
+      "owner": "VisualCore:VisualCorePersistence",
+      "phase": 6,
+      "test": "TemporaryFolderTests 6 (sanitized names, unique files, removeAll counts, missing folder, outside files untouched, subfolders); app CrashRecoveryTests 3 on iOS 27.2 and 26.5; ProjectM regression 7/7",
+      "justification": "Found in A02-P06 (research R1): an app-owned temporary folder emptied at launch is needed by every app that exports or captures files. Reuse debt: A01's app-local LaunchCleanup (tmp/Exports) should adopt it at the next A01 change (owner: that change's gate).",
+      "closed": "A02-P06"
     }
   ],
   "traceability": [
@@ -789,7 +808,8 @@
       "Half-float targets are not assumed: support is queried and an RGBA8 fallback is planned (G-FLOATRT), so no unverified GPU feature is a dependency.",
       "Reference regression baseline recorded green 7/7 (T-A02-003) and the empty shell builds and passes its smoke test on both simulator runtimes (T-A02-005).",
       "Phase 01 starts with G-PINGPONG, G-FLOATRT and G-FIELDPASS in VisualCoreRendering and the app's GPU-free solver reference.",
-      "A02-P05: MVP-05 (pause, step, reset, deterministic seeded test mode) and MVP-06 (simulation detail) are implemented; the manual's fixtures 1-5 pass as one suite; a 600-frame stress run found and fixed unbounded splats in half-float storage; device stress automation is ready and rehearsed on simulators only (device runs pending the implementation lock)."
+      "A02-P05: MVP-05 (pause, step, reset, deterministic seeded test mode) and MVP-06 (simulation detail) are implemented; the manual's fixtures 1-5 pass as one suite; a 600-frame stress run found and fixed unbounded splats in half-float storage; device stress automation is ready and rehearsed on simulators only (device runs pending the implementation lock).",
+      "A02-P06: release-ready on simulators: privacy manifest equals the Release scan (2 categories), one usage string, nothing persisted, icon from the app's own render, bundled licenses, release check 13/13; device rows pending campaign II and owner-only store steps recorded."
     ],
     "blockers": []
   }

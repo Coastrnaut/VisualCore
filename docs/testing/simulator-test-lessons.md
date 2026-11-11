@@ -106,3 +106,16 @@ speaks and what the screen shows, not exact values. Sheets at a medium detent wi
   smaller window. Scroll until each queried element exists before reading its label.
 - **One host per scene under automation.** `AutomationView` owns the RenderHost, so the app model must be able to run
   unhosted (`hosted: false`) with a stand-in canvas size.
+
+## Feature 024 (A02-P06)
+
+- **Bootstrap the privacy manifest from the scan.** Ship an empty manifest once, build Release, and read the
+  scanner's undeclared categories. Then declare exactly those, with reasons from source checks. Never declare a
+  category speculatively.
+- **Look at a generated icon before committing it.** The stress settings of the test mode produced a washed-out
+  white icon that still passed the provenance test. A gentle setting (default force, few slow strokes) gives a
+  readable one. Provenance proves origin, not quality.
+- **Simulator tests can read repository files through `#filePath`.** That lets a unit test check repository
+  documents, such as store claims mapped to existing tests.
+- **App containers keep Debug-only artifacts across runs.** A rehearsal report from an earlier automation launch was
+  still in Documents. Privacy tests must list and explain such entries, not fail on them or hide them.

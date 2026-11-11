@@ -1,0 +1,33 @@
+{
+  "argv": [
+    "python3",
+    "scripts/release_check.py",
+    "--only",
+    "docs",
+    "app-contracts",
+    "compliance",
+    "dependencies",
+    "public-api",
+    "licenses",
+    "script-tests",
+    "host-visualcore",
+    "documented-api-fluid-art-playground",
+    "isolation-fluid-art-playground",
+    "host-fluid-art-playground-core",
+    "documented-api-generative-art-studio",
+    "isolation-generative-art-studio",
+    "host-generative-art-studio-core",
+    "--log-dir",
+    ".autonomy/logs/t609-fast-checks"
+  ],
+  "command": "python3 scripts/release_check.py --only docs app-contracts compliance dependencies public-api licenses script-tests host-visualcore documented-api-fluid-art-playground isolation-fluid-art-playground host-fluid-art-playground-core documented-api-generative-art-studio isolation-generative-art-studio host-generative-art-studio-core --log-dir .autonomy/logs/t609-fast-checks",
+  "elapsed_seconds": 28.829,
+  "exit_code": 0,
+  "finished": "2026-11-11T11:30:05+00:00",
+  "log": ".autonomy/logs/A02-P06.t609-fast-checks.log",
+  "log_sha256": "bf0e4cd61da478e489fc20d39e93ef2173943a08d032bef3b0909773f83bf993",
+  "name": "t609-fast-checks",
+  "stage": "A02-P06",
+  "started": "2026-11-11T11:29:37+00:00",
+  "timed_out": false
+}
