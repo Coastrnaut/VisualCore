@@ -26,6 +26,15 @@ Rationale: the ANGLE → Metal path is the only renderer with recorded device ev
   patches through an owner-approved ADR.
 - Packages are small, independently testable and acyclic. Boundaries are drawn only where the
   Phase 0 audit of real code supports them (`docs/architecture/reusable-component-inventory.md`).
+- **Maximize reuse (owner instruction 2026-11-10):** app logic that another app could use MUST be
+  built in a VisualCore module, generalized and app-neutral. App targets keep only product composition, content, copy,
+  branding and genuinely one-off rules. Each such VisualCore change MUST ship with:
+  - package tests and public `///` docs;
+  - an API-baseline update;
+  - the ProjectM reference regression (II-a).
+
+  The owner's standing instruction is the approval for these upstream changes. Each app phase plan MUST
+  say which VisualCore module owns each component.
 
 ### II-a. Preserve the Reference and Prove It
 
@@ -131,9 +140,41 @@ Rationale: the ANGLE → Metal path is the only renderer with recorded device ev
   `FR-Fk##`/`SC-Fk##`/`T-Fk##`; app NN phase P `FR-ANN-P##`/`SC-ANN-P##`/`T-ANN-P##`), validated by
   `scripts/validate_docs.py` (ADR-0004). Every command runs with its supplied archive prompt and every
   feature ends with converge plus its fix loop (`docs/process/speckit-prompt-manifest.json`).
-- Commit locally after verified tasks, LF line endings, no co-author or generator trailers; no
-  push to any remote without explicit owner authorization.
+- Commit after every verified task, skill and fileset change, with LF line endings and no co-author or generator
+  trailers. Push to `origin` (`Coastrnaut/VisualCore`, `main`) right after each commit, as the owner authorized
+  on 2026-11-10. Never force-push, and never push to another remote.
 - One writer per repository file; at most 10 concurrent agents; one Xcode/test lane per Mac.
+
+## App-Scoped Rules
+
+App rules add to the suite principles and never weaken them. Each app lives in this monorepo under
+`Apps/<Name>/` with bundle id `dev.visualcore.<Name>`; there is no separate app repository and no
+second `projectm-ios` submodule.
+
+### A01 Generative Art Studio (`Apps/GenerativeArtStudio/`, `dev.visualcore.GenerativeArtStudio`)
+
+Ratified from the app manual's constitution prompt (2026-11-10).
+
+- **Consumer, not fork:** a standalone iOS/iPadOS VisualCore consumer and never a fork of projectm-ios. It
+  uses only audited VisualCore public APIs over the OpenGL ES → ANGLE → Metal integration. It MUST NOT
+  create its own EGL/ANGLE initialization path or link ProjectM engine code.
+- **GPU-free domain:** domain rules and persisted files (documents, parameter schemas, gallery, export
+  jobs) MUST be testable without GPU access, through host `swift test`.
+- **Offline-first:** no networking. Any permission (such as saving to Photos) is disclosed before use
+  and requested only through public APIs.
+- **Bounded GPU:**
+  - every texture, render target and export size is capped;
+  - shader parameters are validated and clamped before upload;
+  - context loss rebuilds everything from versioned CPU state.
+- **Accessibility:** native SwiftUI controls with VoiceOver labels, Dynamic Type, Reduce Motion and Reduce
+  Flashing. The canvas has a spoken description.
+- **Licenses and truthful claims:** every bundled asset and shader records its license and author. The
+  app makes no unsupported scientific or platform claims.
+- **Regression when VisualCore changes:** any VisualCore change made for this app MUST be followed by the
+  ProjectM reference regression (`scripts/run_reference_baseline.py` steps and `check_reference_clean.py`).
+- **Python only:** repository automation uses Python 3; there is no PowerShell dependency.
+- **One phase at a time:** implement only one Spec Kit phase at a time (one ledger gate, ADR-0004), in order
+  A01-P00 → A01-P06.
 
 ## Governance
 
@@ -147,4 +188,4 @@ Rationale: the ANGLE → Metal path is the only renderer with recorded device ev
 - Every gate review checks compliance with Principles I–X (including II-a); `scripts/check_compliance.py` enforces
   the mechanically checkable rules.
 
-**Version**: 1.1.0 | **Ratified**: 2026-11-10 | **Last Amended**: 2026-11-10
+**Version**: 1.2.0 | **Ratified**: 2026-11-10 | **Last Amended**: 2026-11-10
