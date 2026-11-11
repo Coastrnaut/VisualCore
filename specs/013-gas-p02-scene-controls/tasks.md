@@ -1,0 +1,103 @@
+---
+
+description: "Task list for feature 013 — Generative Art Studio Phase 02 scene controls (ledger gate A01-P02)"
+---
+
+# Tasks: Generative Art Studio — Phase 02 Shader scenes and parameter controls
+
+**Input**: `/specs/013-gas-p02-scene-controls/`. **Tests** are required: host, package simulator, app pixel tests and
+UI tests on both runtimes, and the reference regression. IDs are `T-A01-2##`, with one commit and push per task
+(`scripts/tick_task.py`). **Checkpoints:** after Phase 2, run the API baseline, R1–R5 and the reference regression;
+after each phase, run `validate_docs.py`.
+
+## Phase 1: Foundational — VisualCore building blocks (US4; blocks US1–US3)
+
+- [ ] T-A01-201 [P] [US4] Implement `Packages/VisualCore/Sources/VisualCoreSimulation/SceneClock.swift` per data-model.md:
+  - `duration` 120 by default and > 0; time in 0 ≤ t < duration;
+  - speed clamped to 0…4; `maxDelta` 0.25 s; reduced-motion factor 0.5;
+  - wrap modulo duration; scrub clamps; non-finite input ignored.
+
+  Add tests in `Packages/VisualCore/Tests/VisualCoreSimulationTests/SceneClockTests.swift`: advance, pause freezes,
+  scrub, wrap, delta cap, speed clamp, reduced motion, NaN ignored, determinism.
+- [ ] T-A01-202 [P] [US4] Implement `Packages/VisualCore/Sources/VisualCoreParameters/ParameterEditor.swift` per contracts/api.md:
+  - `set(to:)` returns false for an unknown name or a non-finite value and clamps otherwise;
+  - `set(normalized:)` clamps the position and treats non-finite as 0;
+  - reset, resetAll, isModified, modifiedNames, rebase;
+  - `formatted` gives 3 significant digits plus the unit.
+
+  Add tests in `Packages/VisualCore/Tests/VisualCoreParametersTests/ParameterEditorTests.swift`.
+- [ ] T-A01-203 [US4] Implement `Packages/VisualCoreRendering/Sources/VisualCoreUI/ParameterPanel.swift`:
+  - a Form section with a title, value-with-unit text, a Slider on the normalized position and a reset per row,
+    plus Reset all;
+  - accessibility: label = title, value = formatted value, adjustable ±5%;
+  - identifiers `vc.param.<name>`, `vc.param.<name>.reset` and `vc.param.resetAll`.
+
+  Add the VisualCoreUI → VisualCoreParameters dependency in Package.swift and the package-map row. Add
+  `Tests/VisualCoreUITests/ParameterPanelTests.swift` (hosted view: every parameter has a row, accessibility values
+  are formatted, increment and decrement change the binding within range).
+- [ ] T-A01-204 [US4] Update the API baseline and READMEs (SceneClock, ParameterEditor, ParameterPanel). Run the
+  VisualCore host tests, the VisualCoreRendering package tests on iOS 27.2 and 26.5, and the reference regression
+  (7 steps) (FR-A01-206).
+
+## Phase 2: US1 + US2 — Controls on the live scene (P1) 🎯
+
+- [ ] T-A01-205 [US1] Implement `Apps/GenerativeArtStudio/Core/Sources/GenerativeArtStudioCore/CompositionEditor.swift` per data-model.md:
+  - `choosePreset` rebases the editor;
+  - `choosePalette`, `setSeed`, `shuffleSeed(using:)`, `setParameter(normalized:)`, `resetParameter`/`resetAll`;
+  - the composition always validated; `useDefault`.
+
+  Add `Apps/GenerativeArtStudio/Core/Tests/GenerativeArtStudioCoreTests/CompositionEditorTests.swift`:
+  - every one of the 20 parameters stays in range at 0, 1, −1, 2, NaN and ±∞ positions (SC-A01-201);
+  - reset returns to the preset baseline;
+  - the preset, palette and seed choices take effect.
+- [ ] T-A01-206 [US2] Add `Apps/GenerativeArtStudio/App/ClockedArtScene.swift` (wraps an ArtScene and advances a `SceneClock` each frame by `frame.delta`, then renders at `fixedTime = clock.time`) and `ArtSceneFactory.apply(_ composition:, to scene:)` (uniforms, palette and seed offsets; a particles cursor reset). Update `SceneScreen.swift`/`SceneModel` to own the editor and clock (Reduce Motion → `clock.reducedMotion`).
+- [ ] T-A01-207 [US1] Add `Apps/GenerativeArtStudio/App/ControlsSheet.swift`:
+  - presented from `gas.controls.open`, sheet `gas.controls.sheet` with medium and large detents;
+  - time row: `gas.time.playPause`, the `gas.time.scrub` slider over 0…120 s, and `gas.time.value`;
+  - preset buttons `gas.preset.<id>` and palette buttons `gas.palette.<id>`;
+  - seed: `gas.seed.value` and `gas.seed.shuffle`;
+  - `ParameterPanel` bound to the editor;
+  - changes applied immediately to the live scene.
+- [ ] T-A01-208 [US1] Add `Apps/GenerativeArtStudio/Tests/Unit/ControlsRenderTests.swift`:
+  - for each family, changing one parameter by ≥ 25% of its normalized range changes the image (mean ≥ 1/255), and
+    reset all returns the preset image (≥ 99% within 2/255) (SC-A01-202);
+  - a paused clock scrubbed to t renders identical images twice (max 0) (SC-A01-203);
+  - a particles palette or seed change equals a fresh render of the new composition;
+  - Reduce Motion → `clock.reducedMotion`.
+
+  Add `Apps/GenerativeArtStudio/Tests/UI/ControlsUITests.swift`: open the sheet, move a slider and see the value
+  text change, reset, play/pause toggles its label, scrub sets the time label, pick a preset and a palette, shuffle
+  changes the seed text. Run on iOS 27.2 and 26.5.
+
+## Phase 3: US3 — Recoverable corrupt or future compositions (P1)
+
+- [ ] T-A01-209 [US3] Add `CompositionEditor.open(_:) -> OpenResult` and `RecoverableError` (`title`/`message`), with tests:
+  - corrupt data, a future version (7) and an unknown family each fail and keep the previous composition;
+  - correctable data opens with notes (SC-A01-204).
+
+  Add `Apps/GenerativeArtStudio/App/LaunchComposition.swift` (`#if DEBUG` `-gasComposition` base64, ≤ 64 KiB, opens
+  the family's scene) and a recovery banner in SceneScreen (`gas.recovery.message`, `gas.recovery.useDefault`). Add
+  `Apps/GenerativeArtStudio/Tests/UI/RecoveryUITests.swift`: corrupt and future-version launches show the message;
+  Use default shows the canvas without the banner; a correctable launch shows no error.
+
+## Phase 4: Polish
+
+- [ ] T-A01-210 Update `docs/apps/generative-art-studio/visualcore-contract.json`:
+  - G-CLOCK closed (A01-P02);
+  - M02 available, with SceneClock evidence;
+  - M10 evidence updated, with G-UI still open for the accessibility settings model;
+  - new evidence for ParameterEditor and ParameterPanel.
+
+  Render it. Run `check_app_contract`, the documented API for the app, and release-check fast steps (docs,
+  app-contracts, compliance, dependencies, public API, licenses, script tests, host-visualcore) (FR-A01-209,
+  SC-A01-205).
+
+## Dependencies
+
+T-A01-201, T-A01-202 (parallel) → T-A01-203 → T-A01-204 → T-A01-205 → T-A01-206 → T-A01-207 → T-A01-208 → T-A01-209 →
+T-A01-210.
+
+## Implementation strategy
+
+VisualCore pieces first (the reuse rule), then the domain editor, then the live UI, then recovery. Each step is green
+before the next.
