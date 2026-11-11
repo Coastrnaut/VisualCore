@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_dependencies.py"
+  ],
+  "command": "python3 scripts/check_dependencies.py",
+  "elapsed_seconds": 0.176,
+  "exit_code": 0,
+  "finished": "2026-11-11T00:36:15+00:00",
+  "log": ".autonomy/logs/F05.t501-deps.log",
+  "log_sha256": "152bbb5031d2f17c4fe899135e411087fa4d3cca368d178f141c9d3eb9e7621c",
+  "name": "t501-deps",
+  "stage": "F05",
+  "started": "2026-11-11T00:36:15+00:00",
+  "timed_out": false
+}

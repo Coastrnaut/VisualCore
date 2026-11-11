@@ -11,7 +11,7 @@ push per task. Each subsystem is implemented separately (supplied prompt). Paths
 
 ## Phase 1: Setup
 
-- [ ] T-F501 Add test targets `VisualCoreMathTests`, `VisualCoreSimulationTests`, `VisualCoreScenesTests` to `Packages/VisualCore/Package.swift`; add `VisualCoreSimulation` and `VisualCoreScenes` dependencies to the `VisualCoreRendering` target in `Packages/VisualCoreRendering/Package.swift` and amend the `VisualCoreRendering` row of `specs/002-architecture-contracts/contracts/package-map.md` (owns primitive/particle/mesh drawing and the touch adapter)
+- [X] T-F501 Add test targets `VisualCoreMathTests`, `VisualCoreSimulationTests`, `VisualCoreScenesTests` to `Packages/VisualCore/Package.swift`; add `VisualCoreSimulation` and `VisualCoreScenes` dependencies to the `VisualCoreRendering` target in `Packages/VisualCoreRendering/Package.swift` and amend the `VisualCoreRendering` row of `specs/002-architecture-contracts/contracts/package-map.md` (owns primitive/particle/mesh drawing and the touch adapter) — Verified 2026-11-10: F05.t501-host/-deps/-generic-ios exit 0: 3 new test targets link and run; R1-R5 pass with Rendering→Simulation/Scenes; generic-iOS build succeeds; package map row amended
 
 ## Phase 2: Foundational — math (blocks every story)
 

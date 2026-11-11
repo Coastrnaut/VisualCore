@@ -15,7 +15,7 @@ Supersedes the table in ADR-0003 where they differ (ADR-0003 is corrected to poi
 | · `VisualCoreTestSupport` | host + iOS | fake clock, fixtures, image compare | test-only | all pure modules | constitution IV |
 | `Packages/VisualCoreRendering` · `CVisualCoreEGL` | iOS | EGL subset declarations (pinned ANGLE constants) | C | libEGL | reference `CANGLE` |
 | · `CVisualCoreGL` | iOS | generated ES 3.0 table (`vcgl*`) | C | libEGL, libGLESv2 | gap: full GL table |
-| · `VisualCoreRendering` | iOS | `RenderHost`, `RenderView`, capabilities, resources, programs | classes (`@MainActor`) | C shims, pure modules | reference `ANGLERenderer` sequence (ADR-0002) |
+| · `VisualCoreRendering` | iOS | `RenderHost`, `RenderView` (+ touch adapter → `PointerEvent`), capabilities, resources, programs, primitive/particle/mesh drawing (F05, feature 006) | classes (`@MainActor`) | C shims, pure modules | reference `ANGLERenderer` sequence (ADR-0002) |
 | · `VisualCoreEffects` | iOS | GPU passes, target pool, graph executor | classes | Rendering, EffectsGraph | gap: effects |
 | · `VisualCoreUI` | iOS | SwiftUI `RenderSurface`, diagnostics overlay, accessibility helpers | views | Rendering, Diagnostics | gap: native UI |
 | · `VisualCoreAudio` | iOS | AVAudioEngine mic/in-app taps → DSP | classes | AudioDSP | reference `AudioCore` lessons |

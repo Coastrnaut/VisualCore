@@ -26,7 +26,9 @@ let package = Package(
                 dependencies: ["CVisualCoreEGL", "CVisualCoreGL",
                                .product(name: "VisualCoreDiagnostics", package: "VisualCore"),
                                .product(name: "VisualCoreShaderSource", package: "VisualCore"),
-                               .product(name: "VisualCoreMath", package: "VisualCore")],
+                               .product(name: "VisualCoreMath", package: "VisualCore"),
+                               .product(name: "VisualCoreSimulation", package: "VisualCore"),
+                               .product(name: "VisualCoreScenes", package: "VisualCore")],
                 linkerSettings: [.linkedFramework("QuartzCore"), .linkedFramework("UIKit")]),
         .target(name: "VisualCoreEffects",
                 dependencies: ["VisualCoreRendering", .product(name: "VisualCoreEffectsGraph", package: "VisualCore")]),
@@ -40,7 +42,10 @@ let package = Package(
                                    .product(name: "VisualCoreEffectsGraph", package: "VisualCore")]),
         .testTarget(name: "VisualCoreRenderingTests",
                     dependencies: ["VisualCoreRendering", "CVisualCoreGL",
-                                   .product(name: "VisualCoreDiagnostics", package: "VisualCore")]),
+                                   .product(name: "VisualCoreDiagnostics", package: "VisualCore"),
+                                   .product(name: "VisualCoreMath", package: "VisualCore"),
+                                   .product(name: "VisualCoreSimulation", package: "VisualCore"),
+                                   .product(name: "VisualCoreScenes", package: "VisualCore")]),
     ],
     swiftLanguageModes: [.v6]
 )
