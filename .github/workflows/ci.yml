@@ -1,6 +1,6 @@
 # VisualCore CI (feature 010 T-F912; FR-F910). Fast host-only gates: docs, compliance, dependency rules, script tests,
-# public API, documented API, licenses and host Swift tests. Simulator, reference and Release-symbol gates need the
-# prebuilt ANGLE frameworks and run locally through scripts/release_check.py (see docs/index.md).
+# public API, documented API, licenses, host Swift tests and an iOS Simulator build of the pure package. Rendering,
+# reference and Release-symbol gates need the prebuilt ANGLE frameworks and run locally through scripts/release_check.py (see docs/index.md).
 # Only the reference submodule is fetched, shallow and non-recursive (its license texts are inventoried); its
 # ~12 GB nested ANGLE tree is never cloned.
 name: ci
@@ -56,3 +56,17 @@ jobs:
         run: swift test --package-path Packages/VisualCore
       - name: GardenKit host tests
         run: swift test --package-path Harnesses/SecondConsumer/GardenKit
+
+  simulator-build:
+    # US5/AC1: an iOS Simulator build of the pure VisualCore package (no ANGLE frameworks needed). Rendering, Showcase
+    # and harness simulator tests need the locally built ANGLE frameworks and run in scripts/release_check.py.
+    runs-on: macos-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+      - name: Xcode
+        run: xcodebuild -version
+      - name: Build VisualCore for the iOS Simulator
+        run: >
+          python3 scripts/xcodebuild_package.py --package Packages/VisualCore --scheme VisualCore-Package
+          --destination generic-sim --action build
