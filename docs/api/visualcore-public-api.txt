@@ -720,4 +720,11 @@ VisualCoreTestSupport | let | public let meanAbsolute: Double
 VisualCoreTestSupport | let | public static let version
 VisualCoreTestSupport | struct | public struct ImageDifference: Sendable, Equatable
 VisualCoreUI | enum | public enum UIInfo
+VisualCoreUI | func | public func makeUIView(context: Context) -> UIView
+VisualCoreUI | func | public func updateUIView(_ uiView: UIView, context: Context)
+VisualCoreUI | init | public init(host: RenderHost, accessibilityLabel: String, accessibilityHint: String? = nil)
+VisualCoreUI | let | public let accessibilityHint: String?
+VisualCoreUI | let | public let accessibilityLabel: String
+VisualCoreUI | let | public let host: RenderHost
 VisualCoreUI | let | public static let version
+VisualCoreUI | struct | public struct RenderSurface: UIViewRepresentable

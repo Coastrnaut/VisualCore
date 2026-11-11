@@ -39,6 +39,7 @@ let package = Package(
         .target(name: "VisualCoreAudio", dependencies: [.product(name: "VisualCoreAudioDSP", package: "VisualCore")],
                 linkerSettings: [.linkedFramework("AVFAudio")]),
         .target(name: "VisualCoreAutomation", dependencies: ["VisualCoreRendering", .product(name: "VisualCoreDiagnostics", package: "VisualCore")]),
+        .testTarget(name: "VisualCoreUITests", dependencies: ["VisualCoreUI", "VisualCoreRendering"]),
         .testTarget(name: "VisualCoreAutomationTests", dependencies: ["VisualCoreAutomation", "VisualCoreRendering"]),
         .testTarget(name: "VisualCoreEffectsTests",
                     dependencies: ["VisualCoreEffects", "VisualCoreRendering", "CVisualCoreGL",
