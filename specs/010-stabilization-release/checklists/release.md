@@ -12,28 +12,33 @@ Focus: the archived prompt's release items and its rule "do not claim untested s
 
 ## Claims and Limitations
 
-- [ ] CHK001 Is "supported" defined by required evidence per row (simulator vs device)? [Clarity, Spec §FR-F902]
-- [ ] CHK002 Are devices required to stay "pending" until device evidence exists? [Consistency, Spec §FR-F902, §SC-F906]
-- [ ] CHK003 Are unsupported capabilities enumerated with reasons? [Completeness, Spec §FR-F903]
-- [ ] CHK004 Is the CI scope limitation (ANGLE-dependent builds local-only) disclosed? [Clarity, Spec §FR-F912]
+- [x] CHK001 Is "supported" defined by required evidence per row (simulator vs device)? [Clarity, Spec §FR-F902]
+- [x] CHK002 Are devices required to stay "pending" until device evidence exists? [Consistency, Spec §FR-F902, §SC-F906]
+- [x] CHK003 Are unsupported capabilities enumerated with reasons? [Completeness, Spec §FR-F903]
+- [x] CHK004 Is the CI scope limitation (ANGLE-dependent builds local-only) disclosed? [Clarity, Spec §FR-F912]
 
 ## Verification Completeness
 
-- [ ] CHK005 Does the release check enumerate every suite it must run? [Completeness, Spec §FR-F906]
-- [ ] CHK006 Is shader validation scope (built-in + bundled, both runtimes, expected-failure fixtures) specified? [Clarity, Spec §FR-F907]
-- [ ] CHK007 Is resource cleanup measurable (zero leaks after teardown and context loss)? [Measurability, Spec §FR-F908, §SC-F904]
-- [ ] CHK008 Is the public-API rule (documentation + baseline) objectively checkable? [Measurability, Spec §FR-F901]
-- [ ] CHK009 Are performance baselines required to carry their environment and a non-device label? [Clarity, Spec §FR-F905]
+- [x] CHK005 Does the release check enumerate every suite it must run? [Completeness, Spec §FR-F906]
+- [x] CHK006 Is shader validation scope (built-in + bundled, both runtimes, expected-failure fixtures) specified? [Clarity, Spec §FR-F907]
+- [x] CHK007 Is resource cleanup measurable (zero leaks after teardown and context loss)? [Measurability, Spec §FR-F908, §SC-F904]
+- [x] CHK008 Is the public-API rule (documentation + baseline) objectively checkable? [Measurability, Spec §FR-F901]
+- [x] CHK009 Are performance baselines required to carry their environment and a non-device label? [Clarity, Spec §FR-F905]
 
 ## Automation Safety
 
-- [ ] CHK010 Is the automation build condition and Release absence verifiable? [Measurability, Spec §FR-F914, §SC-F905]
-- [ ] CHK011 Are unknown modes and non-hanging behavior specified? [Coverage, Spec §Edge Cases, §Clarifications]
-- [ ] CHK012 Is absence of URL/remote triggers stated? [Completeness, Spec §FR-F914]
+- [x] CHK010 Is the automation build condition and Release absence verifiable? [Measurability, Spec §FR-F914, §SC-F905]
+- [x] CHK011 Are unknown modes and non-hanging behavior specified? [Coverage, Spec §Edge Cases, §Clarifications]
+- [x] CHK012 Is absence of URL/remote triggers stated? [Completeness, Spec §FR-F914]
 
 ## Licensing, Docs, Versioning
 
-- [ ] CHK013 Is an LGPL analysis required for the engine's linkage? [Completeness, Spec §FR-F909]
-- [ ] CHK014 Does the license check fail on unknown licenses? [Measurability, Spec §FR-F909, §Edge Cases]
-- [ ] CHK015 Are documentation deliverables enumerated? [Completeness, Spec §FR-F910]
-- [ ] CHK016 Is the version and its meaning (release candidate pending devices) stated? [Clarity, Spec §FR-F913, §Clarifications]
+- [x] CHK013 Is an LGPL analysis required for the engine's linkage? [Completeness, Spec §FR-F909]
+- [x] CHK014 Does the license check fail on unknown licenses? [Measurability, Spec §FR-F909, §Edge Cases]
+- [x] CHK015 Are documentation deliverables enumerated? [Completeness, Spec §FR-F910]
+- [x] CHK016 Is the version and its meaning (release candidate pending devices) stated? [Clarity, Spec §FR-F913, §Clarifications]
+
+## Notes
+
+- Reviewed 2026-11-10 by the agent under the owner's standing delegation (CLAUDE.md §2): 16/16 satisfied (the clarifications
+  fixed version, API baseline, automation modes, CI scope and baseline sources). `/speckit-implement` reads these markers.
