@@ -50,6 +50,18 @@ targets:
         product: VisualCoreScenes
       - package: VisualCoreRendering
         product: VisualCoreRendering
+  InteractiveDemoTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources: [Tests]
+    info:
+      path: Generated/Tests-Info.plist
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: dev.visualcore.harness.InteractiveDemoTests
+        GENERATE_INFOPLIST_FILE: NO
+    dependencies:
+      - target: InteractiveDemo
   InteractiveDemoUITests:
     type: bundle.ui-testing
     platform: iOS
@@ -67,6 +79,7 @@ schemes:
     build:
       targets:
         InteractiveDemo: all
+        InteractiveDemoTests: [test]
         InteractiveDemoUITests: [test]
     test:
-      targets: [InteractiveDemoUITests]
+      targets: [InteractiveDemoTests, InteractiveDemoUITests]

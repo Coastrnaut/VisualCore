@@ -74,6 +74,18 @@ targets:
         product: VisualCoreRendering
       - package: VisualCoreRendering
         product: VisualCoreEffects
+  SecondConsumerTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources: [Tests]
+    info:
+      path: Generated/Tests-Info.plist
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: dev.visualcore.harness.SecondConsumerTests
+        GENERATE_INFOPLIST_FILE: NO
+    dependencies:
+      - target: SecondConsumer
   SecondConsumerUITests:
     type: bundle.ui-testing
     platform: iOS
@@ -92,6 +104,7 @@ schemes:
     build:
       targets:
         SecondConsumer: all
+        SecondConsumerTests: [test]
         SecondConsumerUITests: [test]
     test:
-      targets: [SecondConsumerUITests]
+      targets: [SecondConsumerTests, SecondConsumerUITests]

@@ -1,0 +1,32 @@
+{
+  "argv": [
+    "xcodebuild",
+    "test",
+    "-project",
+    "Harnesses/SecondConsumer/SecondConsumer.xcodeproj",
+    "-scheme",
+    "SecondConsumer",
+    "-only-testing:SecondConsumerTests",
+    "-destination",
+    "platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D",
+    "-derivedDataPath",
+    "Build/DerivedData/SecondConsumer",
+    "-resultBundlePath",
+    ".autonomy/xcresults/F09-t906-garden-ios27.xcresult",
+    "-test-timeouts-enabled",
+    "YES",
+    "-default-test-execution-time-allowance",
+    "180",
+    "CODE_SIGNING_ALLOWED=NO"
+  ],
+  "command": "xcodebuild test -project Harnesses/SecondConsumer/SecondConsumer.xcodeproj -scheme SecondConsumer -only-testing:SecondConsumerTests -destination 'platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D' -derivedDataPath Build/DerivedData/SecondConsumer -resultBundlePath .autonomy/xcresults/F09-t906-garden-ios27.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 180 CODE_SIGNING_ALLOWED=NO",
+  "elapsed_seconds": 7.011,
+  "exit_code": 0,
+  "finished": "2026-11-11T02:38:17+00:00",
+  "log": ".autonomy/logs/F09.t906-sweep-garden-ios27.log",
+  "log_sha256": "2c189b36e9d6c4ff551518b9a8da9ab4e8380aeafe1a3d10c6eab143bc1799ad",
+  "name": "t906-sweep-garden-ios27",
+  "stage": "F09",
+  "started": "2026-11-11T02:38:10+00:00",
+  "timed_out": false
+}
