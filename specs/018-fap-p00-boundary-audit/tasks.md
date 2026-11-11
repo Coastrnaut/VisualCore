@@ -12,7 +12,7 @@ commit and push per task (`scripts/tick_task.py`). Review checkpoint: after each
 
 ## Phase 1: Setup
 
-- [X] T-A02-001 Create `docs/apps/fluid-art-playground/regression-baseline.md` with the phase-start commit — Verified 2026-11-11 (corrected): the first tick (commit faf1198) was recorded although the file had not been written (a failed shell step); the file now exists with phase-start commit 06091bb (git cat-file -t: commit) and the reference pin d93edd1 (git -C External/projectm-ios rev-parse --short HEAD); validate_docs PASS
+- [X] T-A02-001 Create `docs/apps/fluid-art-playground/regression-baseline.md` with the phase-start commit — Verified 2026-11-11: (corrected) the first tick (commit faf1198) was recorded although the file had not been written (a failed shell step); the file now exists with phase-start commit 06091bb (git cat-file -t: commit) and the reference pin d93edd1 (git -C External/projectm-ios rev-parse --short HEAD); validate_docs PASS
   `06091bb` and the reference pin `d93edd1`, so the no-change diff for `Packages/` and `External/` (FR-A02-007) has
   a base.
 
