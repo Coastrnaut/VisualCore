@@ -2,7 +2,7 @@
 // VisualCoreRendering — iOS-only modules over the owner's prebuilt ANGLE (Metal backend) frameworks,
 // reused in place from the read-only reference (ADR-0002; built by its scripts/build_angle_xcframework.py
 // at pin 29d1823). Package map and rules R1–R5: specs/002-architecture-contracts/contracts/package-map.md.
-// Version 0.1.0. Tests run on iOS simulators.
+// Version 1.0.0-rc.1. Tests run on iOS simulators.
 import PackageDescription
 
 let package = Package(

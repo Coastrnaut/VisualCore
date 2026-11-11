@@ -14,5 +14,5 @@ import VisualCoreTestSupport
     let versions = [MathInfo.version, SimulationInfo.version, ScenesInfo.version, ShaderSourceInfo.version,
                     EffectsGraphInfo.version, DiagnosticsInfo.version, AudioDSPInfo.version,
                     PersistenceInfo.version, TestSupportInfo.version]
-    #expect(versions.allSatisfy { $0 == "0.1.0" })
+    #expect(versions.allSatisfy { $0 == "1.0.0-rc.1" })
 }

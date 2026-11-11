@@ -490,5 +490,21 @@ class ReleaseCheckTests(unittest.TestCase):
                 self.assertEqual(relcheck.main(["--log-dir", d], step_factory=fake), 0)
 
 
+class VersionTests(unittest.TestCase):
+    """Feature 010 T-F913: every module carries the same release version (1.0.0-rc.1)."""
+
+    def test_every_module_version_matches(self):
+        import re
+        root = HERE.parent
+        found = {}
+        for f in sorted(root.glob("Packages/*/Sources/*/Module.swift")):
+            m = re.search(r'version = "([^"]+)"', f.read_text())
+            self.assertIsNotNone(m, f"{f} has no version constant")
+            found[f.parent.name] = m.group(1)
+        self.assertGreaterEqual(len(found), 14)
+        self.assertEqual(set(found.values()), {"1.0.0-rc.1"}, found)
+        self.assertTrue((root / "docs/release/release-notes-1.0.0-rc.1.md").is_file())
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

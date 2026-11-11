@@ -1,6 +1,6 @@
 // swift-tools-version: 6.0
 // VisualCore — pure, host-testable modules (no GPU, no UIKit). Package map and rules R1–R5:
-// specs/002-architecture-contracts/contracts/package-map.md (ADR-0003). Version 0.1.0.
+// specs/002-architecture-contracts/contracts/package-map.md (ADR-0003). Version 1.0.0-rc.1.
 import PackageDescription
 
 let pure = ["VisualCoreMath", "VisualCoreSimulation", "VisualCoreScenes", "VisualCoreShaderSource",

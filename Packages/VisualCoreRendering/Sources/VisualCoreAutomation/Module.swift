@@ -5,6 +5,6 @@
 /// Module version (semantic versioning).
 public enum AutomationInfo {
     /// Semantic version of the VisualCoreAutomation module.
-    public static let version = "0.1.0"
+    public static let version = "1.0.0-rc.1"
 }
 #endif

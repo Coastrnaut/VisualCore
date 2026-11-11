@@ -35,7 +35,7 @@ targets:
       path: Showcase/Generated/Info.plist
       properties:
         CFBundleDisplayName: VisualCore Showcase
-        CFBundleShortVersionString: "0.1.0"
+        CFBundleShortVersionString: "1.0.0"
         CFBundleVersion: "1"
         ITSAppUsesNonExemptEncryption: false
         UILaunchScreen: {}

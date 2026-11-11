@@ -24,7 +24,7 @@ swift test --package-path Packages/VisualCore
 python3 scripts/check_dependencies.py
 ```
 
-Version 0.1.0 (semantic versioning; 0.x until the F09 stabilization gate).
+Version 1.0.0-rc.1 (semantic versioning; release candidate from the F09 stabilization gate — see [release notes](../../docs/release/release-notes-1.0.0-rc.1.md)).
 
 ## Input, animation, scenes and particles (feature 006, gate F05)
 
