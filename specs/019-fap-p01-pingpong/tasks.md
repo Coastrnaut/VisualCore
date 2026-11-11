@@ -139,7 +139,7 @@ both runtimes and both storages.
   - pause and resume with the scene phase.
 
   In `FluidArtPlaygroundApp.swift`, the home link `fap.home.open` opens it.
-- [ ] T-A02-113 [US3] Add `Apps/FluidArtPlayground/Tests/Unit/FieldsLifecycleTests.swift`:
+- [X] T-A02-113 [US3] Add `Apps/FluidArtPlayground/Tests/Unit/FieldsLifecycleTests.swift`: — Verified 2026-11-11: FieldsLifecycleTests 4 (context loss in both storages: rebuildCount 1, stepCount reset, live counts and bytes per category equal to the first setup, leaked 0, no stale use, >= 1% lit pixels after the rebuild; dt clamp 10 s -> 1/30 with exactly one step, NaN -> 1/240; the canvas is lit and mean dye strictly decreases over 30 steps; paused does not step) and PlaygroundUITests 1 (home fap.home.open -> fap.canvas whose label starts 'Dye pattern' and names the 128 by 128 grid, 'Playground' nav bar, no failure text, back returns home). run-check A02-P01/t113-app-27 (iOS 27.2) and t113-app-26 (iOS 26.5): TEST SUCCEEDED, enumeration guard 11/11 each (SC-A02-104)
   - after `recreateContext`, `rebuildCount` is 1, the stats' live counts per category equal those after the first
     setup, the scene uses no stale handle, and the readback is non-blank;
   - the Δt clamp: `fixedDelta` 10 s → one step of 1/30, and NaN → 1/240;
