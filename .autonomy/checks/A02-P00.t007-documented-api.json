@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_documented_api.py",
+    "--sources",
+    "Apps/FluidArtPlayground"
+  ],
+  "command": "python3 scripts/check_documented_api.py --sources Apps/FluidArtPlayground",
+  "elapsed_seconds": 0.064,
+  "exit_code": 0,
+  "finished": "2026-11-11T07:38:57+00:00",
+  "log": ".autonomy/logs/A02-P00.t007-documented-api.log",
+  "log_sha256": "a406c7b577e72af4a5125e115958d32828cece583ef42ba79729b4dd8de9849f",
+  "name": "t007-documented-api",
+  "stage": "A02-P00",
+  "started": "2026-11-11T07:38:57+00:00",
+  "timed_out": false
+}

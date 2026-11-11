@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "python3",
+    "-c",
+    "import subprocess,sys;out=subprocess.run(['git','diff','--stat','06091bb..HEAD','--','Packages','External'],capture_output=True,text=True).stdout;print(out or '(no changes under Packages/ or External/)');sys.exit(1 if out.strip() else 0)"
+  ],
+  "command": "python3 -c 'import subprocess,sys;out=subprocess.run(['\"'\"'git'\"'\"','\"'\"'diff'\"'\"','\"'\"'--stat'\"'\"','\"'\"'06091bb..HEAD'\"'\"','\"'\"'--'\"'\"','\"'\"'Packages'\"'\"','\"'\"'External'\"'\"'],capture_output=True,text=True).stdout;print(out or '\"'\"'(no changes under Packages/ or External/)'\"'\"');sys.exit(1 if out.strip() else 0)'",
+  "elapsed_seconds": 0.03,
+  "exit_code": 0,
+  "finished": "2026-11-11T07:38:43+00:00",
+  "log": ".autonomy/logs/A02-P00.t007-no-shared-changes.log",
+  "log_sha256": "2e2cebf761f3cdd8ccedaaf84ae79d472dcca8b4ca9bf95f85d2205753e57bd8",
+  "name": "t007-no-shared-changes",
+  "stage": "A02-P00",
+  "started": "2026-11-11T07:38:43+00:00",
+  "timed_out": false
+}

@@ -59,7 +59,7 @@ commit and push per task (`scripts/tick_task.py`). Review checkpoint: after each
 
 ## Phase 6: Polish
 
-- [ ] T-A02-007 Confirm that `git diff --stat 06091bb..HEAD -- Packages External` is empty (SC-A02-006). Run the
+- [X] T-A02-007 Confirm that `git diff --stat 06091bb..HEAD -- Packages External` is empty (SC-A02-006). Run the — Verified 2026-11-11: run-check A02-P00/t007-no-shared-changes: git diff --stat 06091bb..HEAD -- Packages External is empty (SC-A02-006); t007-release-fast 6/6 (docs, app-contracts incl. both apps' contracts, compliance, dependencies R1-R5, licenses, script-tests); t007-documented-api PASS for Apps/FluidArtPlayground
   release-check fast steps (docs, app-contracts, compliance, dependencies, licenses) and the documented-API check for
   `Apps/FluidArtPlayground`.
 

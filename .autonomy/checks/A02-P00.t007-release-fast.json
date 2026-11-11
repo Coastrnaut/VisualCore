@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "python3",
+    "scripts/release_check.py",
+    "--log-dir",
+    ".autonomy/logs/a02p00-t007-fast",
+    "--json",
+    ".autonomy/logs/a02p00-t007-fast/summary.json",
+    "--only",
+    "docs",
+    "app-contracts",
+    "compliance",
+    "dependencies",
+    "licenses",
+    "script-tests"
+  ],
+  "command": "python3 scripts/release_check.py --log-dir .autonomy/logs/a02p00-t007-fast --json .autonomy/logs/a02p00-t007-fast/summary.json --only docs app-contracts compliance dependencies licenses script-tests",
+  "elapsed_seconds": 13.575,
+  "exit_code": 0,
+  "finished": "2026-11-11T07:38:57+00:00",
+  "log": ".autonomy/logs/A02-P00.t007-release-fast.log",
+  "log_sha256": "2b4c3afd634ada5adf08b3670c6d43f325bdc953e14f8a21ddfd0af87ef4031e",
+  "name": "t007-release-fast",
+  "stage": "A02-P00",
+  "started": "2026-11-11T07:38:43+00:00",
+  "timed_out": false
+}
