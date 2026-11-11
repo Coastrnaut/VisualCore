@@ -30,12 +30,13 @@ and UI tests on iOS 27.2 and 26.5 under the enumeration guard; the ProjectM regr
 
 ## Phase 3: User Story 2 — capture (P1)
 
-- [ ] T-A03-407 [US2] Tests first, then `FractalExplorerCore/.../CaptureSizing.swift` per research R5 (precision-limited long edge, never below the canvas long edge in pixels). In the model: `StillCapture` from `StillCapture.folder(named: "Captures")`, `capture()` freezes animation, sizes with `CaptureSizing` then `ExportGeometry(maxEdge: host.maxRenderSize)` at 4096, sets the message "Captured at N px — the precision limit allows no more detail here" when reduced; view: `fe.capture` (disabled without a size), `fe.capture.share` ShareLink, `fe.capture.message`, `fe.capture.error`; remove the file on leaving; empty the folder at launch in `FractalExplorerApp.swift`; `project.yml` `NSPhotoLibraryAddUsageDescription` and VisualCoreDiagnostics link. `CaptureSizingTests` (host) and `CaptureTests` (64-point CPU agreement ≥ 99%, aspect, precision-reduced size, failure leaves no file, file removed on close). Both runtimes (FR-A03-405, SC-A03-403).
+- [ ] T-A03-407 [US2] Tests first, then `FractalExplorerCore/.../CaptureSizing.swift` per research R5 (precision-limited long edge, never below the canvas long edge in pixels). In the model: `StillCapture` from `StillCapture.folder(named: "Captures")`, `capture()` freezes animation, sizes with `CaptureSizing` then `ExportGeometry(maxEdge: host.maxRenderSize)` at 4096, sets the message "Captured at N px — the precision limit allows no more detail here" when reduced; view: `fe.capture` (disabled without a size), `fe.capture.share` ShareLink, `fe.capture.message`, `fe.capture.error`; remove the file on leaving; empty the folder at launch in `FractalExplorerApp.swift`; `project.yml` `NSPhotoLibraryAddUsageDescription` and VisualCoreDiagnostics link. `CaptureSizingTests` (host) and `CaptureTests` (64-point CPU agreement ≥ 99%, aspect, precision-reduced size, failure leaves no file, file removed on close, the launch cleanup empties the folder (analyze G2)). Both runtimes (FR-A03-405, SC-A03-403).
 
 ## Phase 4: User Story 3 — tours (P2)
 
 - [ ] T-A03-408 [US3] Tests first, then `FractalExplorerCore/.../FractalTours.swift` (three tours per research R7; stop centers "|x|,|y| ≤ 4", span > 0, captions "≤ 120 characters"); `FractalToursTests` (ids, stops valid, every stop reliable or near at 23 bits on a 3× display). Run `swift test`.
-- [ ] T-A03-409 [US3] Add `Apps/FractalExplorer/App/TourPlayer.swift` (TourTimeline driven by `tick(now:)` from a `TimelineView(.animation)` in the explorer; framing applied through `apply`; caption `fe.tour.caption` announced once per stop; stops on touch, `fe.tour.stop`, leaving, background, mode change; switches to Mandelbrot) and `Apps/FractalExplorer/App/ToursView.swift` (sheet `fe.tours` with rows `fe.tour.<id>`). `TourPlayerTests` (tick sequence reaches each stop and finishes; Reduce Motion jumps; touch stops and keeps the view; caption announcements once per stop). Both runtimes (FR-A03-406, SC-A03-402).
+- [ ] T-A03-409 [US3] Add `Apps/FractalExplorer/App/TourPlayer.swift` (TourTimeline driven by `tick(now:)` from a `TimelineView(.animation)` in the explorer; framing applied through `apply`; caption `fe.tour.caption` announced once per stop; stops on touch, `fe.tour.stop`, leaving, background, mode change; switches to Mandelbrot) and `Apps/FractalExplorer/App/ToursView.swift` (sheet `fe.tours` with rows `fe.tour.<id>`). `TourPlayerTests` (tick sequence reaches each stop and finishes; Reduce Motion jumps; touch stops and keeps the view; caption announcements once per stop; a cap change during a tour applies and the tour
+  continues (analyze G1)). Both runtimes (FR-A03-406, SC-A03-402).
 
 ## Phase 5: Polish
 
@@ -43,7 +44,8 @@ and UI tests on iOS 27.2 and 26.5 under the enumeration guard; the ProjectM regr
 
 ## Dependencies
 
-- 401, 402, 403 and 404 are independent; all precede 405 and the stories.
+- 401, 402, 403 and 404 are independent; 405 follows them and must pass before the seal (stories do not wait for it;
+  analyze D1).
 - 406 needs 401. 407 needs 404. 408 needs 402; 409 needs 408.
 - 410 runs last.
 
@@ -55,3 +57,10 @@ and UI tests on iOS 27.2 and 26.5 under the enumeration guard; the ProjectM regr
 ## Implementation strategy
 
 MVP = Phase 1 + US1 (cap and cost). Then capture, tours, polish. Each task committed after its tests pass.
+
+## Analyze remediation (2026-11-11, applied under CLAUDE.md §2)
+
+- D1: stories no longer wait for the regression task; it still gates the seal.
+- G1: a cap change during a tour is tested in T-A03-409.
+- G2: the launch cleanup is tested in T-A03-407.
+- 0 critical issues.
