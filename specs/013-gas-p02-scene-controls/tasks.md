@@ -43,7 +43,7 @@ after each phase, run `validate_docs.py`.
 
 ## Phase 2: US1 + US2 — Controls on the live scene (P1) 🎯
 
-- [ ] T-A01-205 [US1] Implement `Apps/GenerativeArtStudio/Core/Sources/GenerativeArtStudioCore/CompositionEditor.swift` per data-model.md:
+- [X] T-A01-205 [US1] Implement `Apps/GenerativeArtStudio/Core/Sources/GenerativeArtStudioCore/CompositionEditor.swift` per data-model.md: — Verified 2026-11-10: GenerativeArtStudioCore/CompositionEditor.swift (preset → rebase baseline, palette, setSeed/shuffleSeed, setParameter normalized, updateEditor from panel binding, reset/resetAll, useDefault; composition always validated); run-check A01-P02/t205-core-tests 14/14: all 20 parameters in range for positions 0,1,−1,2,NaN,±∞ (SC-A01-201), reset targets preset baseline, palette-only change, seed shuffle, schema-mismatch editor ignored
   - `choosePreset` rebases the editor;
   - `choosePalette`, `setSeed`, `shuffleSeed(using:)`, `setParameter(normalized:)`, `resetParameter`/`resetAll`;
   - the composition always validated; `useDefault`.
