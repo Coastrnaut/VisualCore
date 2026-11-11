@@ -57,7 +57,7 @@ description: "Task list for feature 025 — Fractal Explorer Phase 00 boundary a
     `Apps/FractalExplorer/Generated/`.
 
   Build for the generic iOS Simulator and run `check_dependencies.py` (FR-A03-005, FR-A03-006).
-- [ ] T-A03-005 [US3] Add `Apps/FractalExplorer/Tests/UI/LaunchSmokeUITests.swift`: launch, `fe.home.title` exists,
+- [X] T-A03-005 [US3] Add `Apps/FractalExplorer/Tests/UI/LaunchSmokeUITests.swift`: launch, `fe.home.title` exists, — Verified 2026-11-11: — Verified 2026-11-11: Apps/FractalExplorer/Tests/UI/LaunchSmokeUITests.swift (launch, fe.home.title exists, label 'Fractal Explorer'). run-check A03-P00/t005-smoke-ios27 and t005-smoke-ios26 TEST SUCCEEDED, each confirmed by the enumeration guard (t005-smoke-*-guard PASS 1/1); the builds ran the dependency audit (SC-A03-003, FR-A03-006)
   label "Fractal Explorer". Run it on iOS 27.2 and 26.5, enumeration-guarded (SC-A03-003, FR-A03-006).
 
 ## Phase 5: US4 — Gap register and stop/go decision (P2)

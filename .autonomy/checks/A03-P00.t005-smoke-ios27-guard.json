@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_test_enumeration.py",
+    "--sources",
+    "Apps/FractalExplorer/Tests",
+    "--log",
+    ".autonomy/logs/A03-P00.t005-smoke-ios27.log"
+  ],
+  "command": "python3 scripts/check_test_enumeration.py --sources Apps/FractalExplorer/Tests --log .autonomy/logs/A03-P00.t005-smoke-ios27.log",
+  "elapsed_seconds": 0.024,
+  "exit_code": 0,
+  "finished": "2026-11-11T11:44:20+00:00",
+  "log": ".autonomy/logs/A03-P00.t005-smoke-ios27-guard.log",
+  "log_sha256": "744ba76046979a1befd240610a304c0cb3187e2e2f3303a76810f55a08707052",
+  "name": "t005-smoke-ios27-guard",
+  "stage": "A03-P00",
+  "started": "2026-11-11T11:44:20+00:00",
+  "timed_out": false
+}
