@@ -1,0 +1,248 @@
+{
+  "checks": [
+    {
+      "attestation": ".autonomy/checks/F05.t501-deps.json",
+      "command": "python3 scripts/check_dependencies.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F05.t501-deps.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F05.t501-generic-ios.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination generic-ios",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F05.t501-generic-ios.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F05.t501-host.json",
+      "command": "swift test --package-path Packages/VisualCore",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F05.t501-host.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F05.t502-linear-algebra.json",
+      "command": "swift test --package-path Packages/VisualCore",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F05.t502-linear-algebra.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F05.t503-camera2d.json",
+      "command": "swift test --package-path Packages/VisualCore",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F05.t503-camera2d.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F05.t504-coordinates.json",
+      "command": "swift test --package-path Packages/VisualCore",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F05.t504-coordinates.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F05.t505-pointers-a3.json",
+      "command": "swift test --package-path Packages/VisualCore",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F05.t505-pointers-a3.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F05.t506-gestures-a2.json",
+      "command": "swift test --package-path Packages/VisualCore",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F05.t506-gestures-a2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F05.t507-clock.json",
+      "command": "swift test --package-path Packages/VisualCore",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F05.t507-clock.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F05.t508-random-a2.json",
+      "command": "swift test --package-path Packages/VisualCore",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F05.t508-random-a2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F05.t509-easing.json",
+      "command": "swift test --package-path Packages/VisualCore",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F05.t509-easing.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F05.t510-timeline.json",
+      "command": "swift test --package-path Packages/VisualCore",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F05.t510-timeline.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F05.t511-scene-graph-a2.json",
+      "command": "swift test --package-path Packages/VisualCore",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F05.t511-scene-graph-a2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F05.t511-scene-graph.json",
+      "command": "swift test --package-path Packages/VisualCore",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F05.t511-scene-graph.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F05.t512-particles.json",
+      "command": "swift test --package-path Packages/VisualCore",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F05.t512-particles.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F05.t513-primitives-ios27.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --result-name F05-t513-ios27",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F05.t513-primitives-ios27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F05.t514-particles-ios27-a2.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --result-name F05-t514-ios27-a2",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F05.t514-particles-ios27-a2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F05.t515-orbit-camera.json",
+      "command": "swift test --package-path Packages/VisualCore",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F05.t515-orbit-camera.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F05.t516-meshes.json",
+      "command": "swift test --package-path Packages/VisualCore",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F05.t516-meshes.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F05.t517-meshes-ios27-a2.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --result-name F05-t517-ios27-a2",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F05.t517-meshes-ios27-a2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F05.t518-touch-ios27.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --result-name F05-t518-ios27",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F05.t518-touch-ios27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F05.t519-demo-build-sim.json",
+      "command": "xcodebuild build -project Harnesses/InteractiveDemo/InteractiveDemo.xcodeproj -scheme InteractiveDemo -destination 'generic/platform=iOS Simulator' -derivedDataPath Build/DerivedData/InteractiveDemo CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F05.t519-demo-build-sim.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F05.t520-demo-no-projectm-a2.json",
+      "command": "sh -c 'n=0; total=0; for f in $(find \"Build/DerivedData/InteractiveDemo/Build/Products/Debug-iphonesimulator/InteractiveDemo.app\" -type f); do file \"$f\" | grep -q Mach-O || continue; c=$(nm -a \"$f\" 2>/dev/null | grep -i -c -E '\"'\"'projectm|milkdrop'\"'\"'); s=$(nm -a \"$f\" 2>/dev/null | wc -l); echo \"$c projectm/milkdrop of $s symbols: $f\"; n=$((n+c)); total=$((total+1)); done; echo \"Mach-O files scanned: $total; matches: $n\"; [ $total -ge 4 ] && [ $n -eq 0 ]'",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F05.t520-demo-no-projectm-a2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F05.t520-demo-no-projectm.json",
+      "command": "sh -c 'for f in \"Build/DerivedData/InteractiveDemo/Build/Products/Debug-iphonesimulator/InteractiveDemo.app/InteractiveDemo\" \"Build/DerivedData/InteractiveDemo/Build/Products/Debug-iphonesimulator/InteractiveDemo.app\"/Frameworks/*.framework/*; do [ -f \"$f\" ] && file \"$f\" | grep -q Mach-O && { echo \"scan $f\"; nm -a \"$f\" 2>/dev/null | grep -i -c -E '\"'\"'projectm|milkdrop'\"'\"'; }; done; ! (for f in \"Build/DerivedData/InteractiveDemo/Build/Products/Debug-iphonesimulator/InteractiveDemo.app/InteractiveDemo\" \"Build/DerivedData/InteractiveDemo/Build/Products/Debug-iphonesimulator/InteractiveDemo.app\"/Frameworks/*.framework/*; do [ -f \"$f\" ] && nm -a \"$f\" 2>/dev/null; done | grep -i -q -E '\"'\"'projectm|milkdrop'\"'\"')'",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F05.t520-demo-no-projectm.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F05.t520-demo-uitest-ios26.json",
+      "command": "xcodebuild test -project Harnesses/InteractiveDemo/InteractiveDemo.xcodeproj -scheme InteractiveDemo -destination 'platform=iOS Simulator,id=EC7498FF-31FF-4491-9666-B0D32785203C' -derivedDataPath Build/DerivedData/InteractiveDemo -resultBundlePath .autonomy/xcresults/F05-t520-ios26-20261110-195725.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 180 CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F05.t520-demo-uitest-ios26.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F05.t520-demo-uitest-ios27-a2.json",
+      "command": "xcodebuild test -project Harnesses/InteractiveDemo/InteractiveDemo.xcodeproj -scheme InteractiveDemo -destination 'platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D' -derivedDataPath Build/DerivedData/InteractiveDemo -resultBundlePath .autonomy/xcresults/F05-t520-ios27-20261110-195638.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 180 CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F05.t520-demo-uitest-ios27-a2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F05.t521-docs.json",
+      "command": "python3 scripts/validate_docs.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F05.t521-docs.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F05.t522-check_compliance.json",
+      "command": "python3 scripts/check_compliance.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F05.t522-check_compliance.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F05.t522-check_dependencies.json",
+      "command": "python3 scripts/check_dependencies.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F05.t522-check_dependencies.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F05.t522-demo-generic-ios.json",
+      "command": "xcodebuild build -project Harnesses/InteractiveDemo/InteractiveDemo.xcodeproj -scheme InteractiveDemo -destination generic/platform=iOS -derivedDataPath Build/DerivedData/InteractiveDemo CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F05.t522-demo-generic-ios.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F05.t522-generic-ios.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination generic-ios",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F05.t522-generic-ios.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F05.t522-host.json",
+      "command": "swift test --package-path Packages/VisualCore",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F05.t522-host.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F05.t522-ref-clean.json",
+      "command": "python3 scripts/check_reference_clean.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F05.t522-ref-clean.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F05.t522-ref-ios26.json",
+      "command": "python3 scripts/run_reference_baseline.py --step test-anglerendering-ios26",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F05.t522-ref-ios26.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F05.t522-ref-ios27.json",
+      "command": "python3 scripts/run_reference_baseline.py --step test-anglerendering-ios27",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F05.t522-ref-ios27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F05.t522-sim-ios26.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-26.5 --action test --result-name F05-t522-ios26",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F05.t522-sim-ios26.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F05.t522-sim-ios27.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --result-name F05-t522-ios27",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F05.t522-sim-ios27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F05.t522-test_scripts.json",
+      "command": "python3 scripts/test_scripts.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F05.t522-test_scripts.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F05.t522-validate_docs.json",
+      "command": "python3 scripts/validate_docs.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F05.t522-validate_docs.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F05.t524-contract-sync.json",
+      "command": "sh /private/tmp/claude-501/-Users-coast--claude-spares-spare-cfXtKj/51106fd1-e87b-442d-aa28-d54231dd3fe4/scratchpad/f05_contract_check.sh /Users/coast/Documents/GIT/VisualCore",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F05.t524-contract-sync.log"
+    }
+  ],
+  "generated": "2026-11-11T01:01:27+00:00",
+  "method": "deterministic-run-check",
+  "stage": "F05",
+  "status": "pass"
+}
