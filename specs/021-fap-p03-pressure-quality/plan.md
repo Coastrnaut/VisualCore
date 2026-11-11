@@ -65,7 +65,6 @@ Apps/FluidArtPlayground/FluidArtPlaygroundCore/Sources/FluidArtPlaygroundCore/
 ├── FluidConfiguration.swift   # EDIT boundaryMode (walls default), BoundaryMode enum
 ├── FluidSolver.swift          # NEW divergence, Jacobi pressure, gradient, walls rule, viscosity, full step
 └── FluidQuality.swift         # NEW tiers Full/Reduced/Minimal → iterations and splat cap
-Apps/FluidArtPlayground/FluidArtPlaygroundCore/Package.swift   # EDIT + VisualCoreDiagnostics (QualityPolicy)
 Apps/FluidArtPlayground/FluidArtPlaygroundCore/Tests/FluidArtPlaygroundCoreTests/
 └── FluidSolverTests.swift, FluidQualityTests.swift, FluidConfigurationTests.swift (EDIT)
 Apps/FluidArtPlayground/App/

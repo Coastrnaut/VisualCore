@@ -31,7 +31,8 @@ IDs are `T-A02-3##`, with one commit and push per task (`scripts/tick_task.py`).
 - [ ] T-A02-302 Run the ProjectM regression (3/3 + 4/4) after the VisualCore change and append the results to
   `regression-baseline.md` (FR-A02-307).
 - [ ] T-A02-303 [P] Tests first: add `BoundaryMode` ("walls default, open") and `boundaryMode` to
-  `FluidConfiguration`. Add `VisualCoreDiagnostics` to the Core package and to the app dependencies in `project.yml`.
+  `FluidConfiguration`. Add `VisualCoreDiagnostics` to the app dependencies in `project.yml` only; Core needs no new
+  dependency (analyze I1).
   Extend `FluidConfigurationTests` (FR-A02-305).
 
 ## Phase 2: User Stories 1 and 2 — projection and boundaries, CPU reference (P1)
@@ -65,7 +66,11 @@ IDs are `T-A02-3##`, with one commit and push per task (`scripts/tick_task.py`).
   - a splat-driven divergent field projected with 20 iterations, GPU = CPU (SC-A02-301);
   - walls versus open near the edges (US2 AC1–AC2);
   - a uniform field under open edges unchanged (US1 AC3);
+  - viscosity 0.5, GPU = CPU (FR-A02-304; analyze C1);
   - a live configuration change taking effect without a rebuild.
+
+  Out-of-grid reads are proven by the CPU access log, plus clamped `texelFetch` and exact edge comparisons on the GPU
+  (plan R4; analyze C2).
 
   Run the app tests on iOS 27.2 and 26.5 with the guard.
 
@@ -101,6 +106,15 @@ IDs are `T-A02-3##`, with one commit and push per task (`scripts/tick_task.py`).
   Run `check_app_contract --render` (FR-A02-309).
 - [ ] T-A02-310 Run the release fast steps, plus host, documented-API and isolation checks; rerun the ProjectM
   regression if VisualCore changed after T-A02-302; build A01; add lessons (SC-A02-306).
+
+## Analyze remediation (2026-11-11)
+
+Applied under the owner's delegated approval (CLAUDE.md §2):
+- C1: the viscosity fixture was added to T-A02-306.
+- I1: the speculative Core → VisualCoreDiagnostics dependency was removed (app only).
+- C2: the out-of-bounds proof method is recorded.
+
+No CRITICAL findings; coverage is 100%.
 
 ## Dependencies
 
