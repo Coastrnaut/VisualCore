@@ -68,7 +68,7 @@ contains additions only.
 
   `SplatTests` (FR-A02-203, FR-A02-205), including a corner splat at (0, 0) that stays finite and changes only
   in-grid cells (spec edge case; analyze C2).
-- [ ] T-A02-208 [US1] Tests first, then add `SplatQueue.swift` (Core):
+- [X] T-A02-208 [US1] Tests first, then add `SplatQueue.swift` (Core): — Verified 2026-11-11: SplatQueue (tracker samples -> splats: normalized y-flipped position, force = velocity x cells-per-point x forceScale, color per pointer by order mod 6 released on ended/forget; deterministic splash bursts at the center rotated by 137.5 degrees with force 600 and palette k mod 6; even capped drain keeping first and newest in order, cap 1 keeps the newest; pending capacity 1024 dropping the oldest; counters dropped/totalQueued/splashCount). SplatQueueTests 7: spacing along the path and y flip (SC-A02-201, US1 AC1), per-finger direction, colors and the 250 cells/s conversion (US1 AC2), even cap with the newest kept and the excess counted (US1 AC3), cap of 1, splash determinism and golden angle, invalid view size and pending capacity, forget. run-check A02-P02/t208-core-test swift test 27/27 pass (FR-A02-204)
   - `add(samples, viewSize:)`: y flipped and normalized; force = velocity × cells-per-point × forceScale; color by
     pointer order modulo 6;
   - `addSplash()` (research R6);
