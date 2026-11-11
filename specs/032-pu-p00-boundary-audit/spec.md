@@ -22,6 +22,38 @@ Canonical overrides:
 - It reuses the app-neutral contract checker built in A01-P00, as A02 and A03 did.
 - Evidence is host and simulator only.
 
+## Clarifications
+
+### Session 2026-11-11
+
+Answered autonomously under the owner's standing approval (CLAUDE.md §2); the recommended option was chosen in each
+case. Facts were checked in code:
+- `ParticleSystem` (VisualCoreSimulation) is a deterministic, seeded, fixed-capacity CPU simulation (default 10,000,
+  hard cap 100,000) with one emitter kind (point source with a direction cone) and forces `gravity`, `drag` and a
+  radius-bounded `attractor`;
+- `ParticleRenderer` (VisualCoreRendering) draws `ParticleInstance`s as instanced soft-edged quads with premultiplied
+  "over" blending only; A01's `ParticlesArtScene` is its consumer;
+- `PingPongTarget` and `FieldPass` exist (A02) and can carry a decaying trail texture;
+- `QualityPolicy` (VisualCoreDiagnostics) gives tiers from thermal state and Low Power Mode;
+- `NamedLibrary`, `DocumentStore`, `StillCapture`, `TemporaryFolder` exist for saved scenes and capture.
+
+- Q: Where do the inventory, matrix and gap register live? → A: In `docs/apps/particle-universe/visualcore-contract.json`
+  (the shared schema), rendered to `visualcore-contract.md` and checked by `scripts/check_app_contract.py --app
+  particle-universe`.
+- Q: Does the simulation run on the GPU? → A: No. OpenGL ES 3.0 through ANGLE offers no compute shaders here, so the
+  simulation stays on the CPU in VisualCore's `ParticleSystem` (deterministic, testable, bounded) and only drawing is
+  on the GPU (instanced quads). The matrix records "GPU-oriented particle simulation" as `requires adaptation`:
+  render-to-texture particle state is a later idea, not MVP.
+- Q: Which gaps does the register expect, and who owns them? → A: Reusable gaps go to VisualCore:
+  - emitter families (point, line, ring, burst) with bounded counts → VisualCoreSimulation, Phase 01;
+  - repulsors, wind and falloff fields with singularity-safe forces → VisualCoreSimulation, Phase 02;
+  - additive blending and a trail-decay pass on `PingPongTarget` → VisualCoreRendering, Phase 03;
+  - a particle-count quality tier mapping → VisualCoreDiagnostics, Phase 02;
+  - scene schema and presets stay app content on `NamedLibrary` (Phase 04).
+- Q: What exactly is the app shell? → A: A thin SwiftUI target `ParticleUniverse` in the root `project.yml` (sources in
+  `Apps/ParticleUniverse/App/`) plus a UI smoke-test target; a titled home screen only; no render host, no package yet.
+- Q: Which ProjectM regression steps form the baseline? → A: The same 7 steps as A01–A03, in two `run-check` chunks.
+
 ## User Scenarios & Testing *(mandatory)*
 
 Users:
