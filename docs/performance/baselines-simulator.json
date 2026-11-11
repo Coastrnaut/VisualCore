@@ -1,0 +1,46 @@
+{
+  "app": "Showcase measurement build (Release + VISUALCORE_AUTOMATION)",
+  "evidence": "simulator baseline \u2014 not device evidence (constitution V)",
+  "host": {
+    "macOS": "27.2",
+    "machine": "arm64",
+    "xcode": "Xcode 27.2 27B52"
+  },
+  "runtimes": {
+    "26.5": {
+      "launch": {
+        "allPassed": true,
+        "runs": 10,
+        "timeToFirstFrameMaxMs": 18.951,
+        "timeToFirstFrameMedianMs": 11.658
+      },
+      "model": "iPhone18,1",
+      "osVersion": "26.5.0",
+      "smoke": {
+        "allPassed": true,
+        "frameTimeMedianMs": 4.038,
+        "frameTimeP95Ms": 20.672,
+        "framesPerRun": 300,
+        "runs": 3
+      }
+    },
+    "27.2": {
+      "launch": {
+        "allPassed": true,
+        "runs": 10,
+        "timeToFirstFrameMaxMs": 24.939,
+        "timeToFirstFrameMedianMs": 12.451
+      },
+      "model": "iPhone19,2",
+      "osVersion": "27.2.0",
+      "smoke": {
+        "allPassed": true,
+        "frameTimeMedianMs": 4.592,
+        "frameTimeP95Ms": 20.651,
+        "framesPerRun": 300,
+        "runs": 3
+      }
+    }
+  },
+  "schema": 1
+}

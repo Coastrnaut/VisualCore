@@ -1,0 +1,22 @@
+{
+  "argv": [
+    "swift",
+    "run",
+    "-c",
+    "release",
+    "--package-path",
+    "Packages/VisualCore",
+    "VisualCoreBaselines",
+    "--json"
+  ],
+  "command": "swift run -c release --package-path Packages/VisualCore VisualCoreBaselines --json",
+  "elapsed_seconds": 2.142,
+  "exit_code": 0,
+  "finished": "2026-11-11T02:41:10+00:00",
+  "log": ".autonomy/logs/F09.t909-host-baselines.log",
+  "log_sha256": "b5f31392eda309a7e302954ce98c24c5082c056e8973a247ed19e92816db99e8",
+  "name": "t909-host-baselines",
+  "stage": "F09",
+  "started": "2026-11-11T02:41:08+00:00",
+  "timed_out": false
+}

@@ -27,7 +27,7 @@ Release symbol check). IDs `T-F9##`. One commit + push per task.
 
 ## Phase 4: US2 + US5 — documentation and release (P1/P2)
 
-- [ ] T-F909 [US5] Performance baselines: `VisualCoreBaselines` executable → `docs/performance/baselines-host.json`; automation smoke/launch on both simulators → `docs/performance/baselines-simulator.json`; `docs/performance/README.md` (environment, not device evidence)
+- [X] T-F909 [US5] Performance baselines: `VisualCoreBaselines` executable → `docs/performance/baselines-host.json`; automation smoke/launch on both simulators → `docs/performance/baselines-simulator.json`; `docs/performance/README.md` (environment, not device evidence) — Verified 2026-11-10: run-check F09/t909-host-baselines (VisualCoreBaselines release, 15 repeats: particle-step-10k 66.4 µs, effect-graph-validate-16 12.6 µs, shader-expand 37.4 µs, coord roundtrip 0.027 µs) → docs/performance/baselines-host.json; t909-showcase-measurement-sim + t909-simulator-baselines (smoke 3×300 frames, launch ×10, all pass on iOS 27.2 and 26.5) → baselines-simulator.json; README marks both not device evidence
 - [ ] T-F910 [US2] `docs/release/support-matrix.md` and `docs/release/known-limitations.md`
 - [ ] T-F911 [US5] `docs/index.md`, `docs/getting-started.md` (module overview, samples: Showcase and Lumen Garden), links from README
 - [ ] T-F912 [US5] `.github/workflows/ci.yml` (docs, compliance, dependencies, script tests, public API, licenses, host swift tests); push and confirm the run with `gh run list`/`gh run watch`

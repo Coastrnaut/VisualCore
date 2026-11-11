@@ -20,6 +20,9 @@ let package = Package(
         .target(name: "VisualCoreDiagnostics"),
         .target(name: "VisualCoreAudioDSP"),
         .target(name: "VisualCorePersistence"),
+        // Host performance baselines (feature 010 T-F909); an executable, never a library dependency.
+        .executableTarget(name: "VisualCoreBaselines",
+                          dependencies: ["VisualCoreMath", "VisualCoreSimulation", "VisualCoreScenes", "VisualCoreShaderSource", "VisualCoreEffectsGraph"]),
         // Test-only (rule R5): never a dependency of a product target.
         .target(name: "VisualCoreTestSupport", dependencies: ["VisualCoreMath", "VisualCoreSimulation"]),
         .testTarget(name: "VisualCoreMathTests", dependencies: ["VisualCoreMath"]),

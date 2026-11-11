@@ -1,0 +1,53 @@
+{
+  "configuration": "release",
+  "evidence": "host baseline \u2014 not device evidence (constitution V)",
+  "host": {
+    "cores": "18",
+    "cpu": "Apple M5 Pro",
+    "model": "Mac17,8",
+    "os": "macOS 27.2.0"
+  },
+  "measurements": [
+    {
+      "maxMicroseconds": 82.99513333333333,
+      "medianMicroseconds": 66.4,
+      "minMicroseconds": 55.49651666666667,
+      "name": "particle-step-10k",
+      "note": "ParticleSystem.step(1/60) with 10,000 live particles, gravity + drag",
+      "operationsPerRepeat": 60,
+      "repeats": 15,
+      "unit": "\u00b5s/op"
+    },
+    {
+      "maxMicroseconds": 12.840917,
+      "medianMicroseconds": 12.577958,
+      "minMicroseconds": 12.428417,
+      "name": "effect-graph-validate-16",
+      "note": "EffectGraphValidator.validate: 16-pass chain at 1920\u00d71080",
+      "operationsPerRepeat": 1000,
+      "repeats": 15,
+      "unit": "\u00b5s/op"
+    },
+    {
+      "maxMicroseconds": 39.36775,
+      "medianMicroseconds": 37.416333,
+      "minMicroseconds": 36.912290999999996,
+      "name": "shader-expand-include",
+      "note": "ShaderLibrary.expand: nested includes, ~85 lines, line map",
+      "operationsPerRepeat": 1000,
+      "repeats": 15,
+      "unit": "\u00b5s/op"
+    },
+    {
+      "maxMicroseconds": 0.02803417,
+      "medianMicroseconds": 0.02734541,
+      "minMicroseconds": 0.02580542,
+      "name": "coordinate-mapping-roundtrip",
+      "note": "ViewMetrics point \u2192 world \u2192 point through a rotated, zoomed Camera2D",
+      "operationsPerRepeat": 100000,
+      "repeats": 15,
+      "unit": "\u00b5s/op"
+    }
+  ],
+  "schema": 1
+}
