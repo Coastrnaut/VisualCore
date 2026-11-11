@@ -353,6 +353,13 @@ targets:
       - package: VisualCoreRendering
         product: VisualCoreAutomation
     postBuildScripts:
+      # T-A03-604: bundle the shipped components' license texts for the Acknowledgements screen (as A01 and A02).
+      - name: Bundle licenses (T-A03-604)
+        basedOnDependencyAnalysis: false
+        script: |
+          set -e
+          env -i PATH=/usr/bin:/bin:/usr/sbin:/sbin HOME="$HOME" \
+            /usr/bin/python3 "$SRCROOT/scripts/bundle_licenses.py" --out "$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/Licenses"
       # FR-A03-006: the build fails if the app depends on ProjectM engine/preset/bridge modules.
       - name: Dependency audit (FR-A03-006)
         basedOnDependencyAnalysis: false

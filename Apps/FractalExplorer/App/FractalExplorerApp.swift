@@ -59,6 +59,14 @@ struct HomeView: View {
                 }
                 .buttonStyle(.borderedProminent)
                 .accessibilityIdentifier("fe.home.open")
+                // Feature 031 T-A03-604 (FR-A03-602): the bundled license texts (bundle_licenses.py), shown by VisualCoreUI.
+                NavigationLink {
+                    AcknowledgementsView(identifierPrefix: "fe.acknowledgements")
+                } label: {
+                    Label("Acknowledgements", systemImage: "doc.text")
+                        .frame(minHeight: 44)
+                }
+                .accessibilityIdentifier("fe.home.acknowledgements")
             }
             .padding()
             .accessibilityElement(children: .contain)

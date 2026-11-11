@@ -76,6 +76,14 @@ final class AccessibilityAuditUITests: XCTestCase {
         let open = app.buttons["fe.home.open"]
         XCTAssertTrue(open.waitForExistence(timeout: 10))
         try audit(app, "home [\(label)]", types: types)
+        // Feature 031 T-A03-604: the Acknowledgements screen.
+        let acknowledgements = app.descendants(matching: .any)["fe.home.acknowledgements"]
+        for _ in 0..<3 where !acknowledgements.isHittable { app.swipeUp() }
+        acknowledgements.tap()
+        XCTAssertTrue(app.descendants(matching: .any)["fe.acknowledgements.angle"].waitForExistence(timeout: 5))
+        try audit(app, "acknowledgements [\(label)]", types: types)
+        app.navigationBars.buttons.element(boundBy: 0).tap()
+        XCTAssertTrue(open.waitForExistence(timeout: 5))
         for _ in 0..<3 where !open.isHittable { app.swipeUp() }
         open.tap()
         XCTAssertTrue(app.segmentedControls["fe.mode"].waitForExistence(timeout: 10))
