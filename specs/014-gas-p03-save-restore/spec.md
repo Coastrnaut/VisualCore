@@ -19,6 +19,29 @@
 
 Evidence is host and simulator only.
 
+## Clarifications
+
+### Session 2026-11-10
+
+Answered autonomously under the owner's standing approval (CLAUDE.md §2); the recommended option was chosen in each case.
+
+- Q: How are compositions laid out on disk? → A: One JSON file per composition, named `<identity>.json`, in
+  `Application Support/Compositions/`. Each file is an envelope: kind `dev.visualcore.gas.composition`, schema
+  version, saved time in ISO 8601 UTC, and the library entry as payload. Per-file size limit is 256 KiB. Files of
+  another kind or with another extension are reported and ignored.
+- Q: How is "atomic" achieved, and what protects the data at rest? → A: The file is written to a temporary file in
+  the same folder and then replaced in one step, so readers never see a partial file. Files use the default iOS
+  data protection (complete until first user authentication). There is no extra encryption, since the content is not
+  sensitive.
+- Q: How are versions handled? → A: The library entry has schema version 1, wrapping ArtDocument v1. The store applies
+  an ordered migration chain (vN → vN+1) on load. Versions above the current one are reported as "newer version"
+  and left untouched. The chain is proven by a test-only version-0 fixture.
+- Q: Where do save and the library live in the UI? → A: The scene screen gains a "Save" toolbar button, which asks
+  for a name on first save and saves in place afterwards. The gallery gains a "Library" toolbar button that opens
+  the library list. Opening an entry shows its scene, and later saves update that entry.
+- Q: How are times and ordering defined? → A: Created and modified times are stored as UTC instants. Ordering is
+  favorites first, then modified time descending, then name ascending as a stable tie-break.
+
 ## User Scenarios & Testing *(mandatory)*
 
 Users: makers who want to keep and revisit their compositions (manual §2 journeys 1 and 2), plus app developers
@@ -126,7 +149,7 @@ still passes.
 
 - Name handling: empty or whitespace-only names become "Untitled", names are trimmed and longer than 60 characters
   are cut, and duplicate names are allowed (identity is not the name).
-- A file larger than the size limit is reported as unreadable and is never loaded into memory in full.
+- A file larger than the size limit (256 KiB) is reported as unreadable and is never loaded into memory in full.
 - A file of another kind in the folder is ignored and reported.
 - An older schema version is migrated on load. The file is rewritten in the current version only when the user saves
   it again.
@@ -141,7 +164,7 @@ still passes.
 - **FR-A01-301**: The user MUST be able to save the current composition with a name, from the scene screen. Saving an
   already saved composition MUST update it in place (same identity, newer modification time).
 - **FR-A01-302**: The library MUST list saved compositions with name, family and modification time: favorites first,
-  then most recently modified first.
+  then most recently modified first, with ties broken by name.
 - **FR-A01-303**: Reopening a saved composition MUST restore its seed, palette and parameters exactly, and render the
   same image at a fixed time within the Phase 01 tolerance, also after an app relaunch.
 - **FR-A01-304**: The library MUST support favorite/unfavorite, duplicate (new identity, "<name> copy",
