@@ -59,5 +59,5 @@ MVP = US1 (diagnostics from real ANGLE errors). Then registry, cache/uniforms, m
 
 ## Phase 7: Convergence
 
-- [ ] T-F320 Align `specs/004-resources-shaders/data-model.md` with code (`ExpandedShader.origins`, `defines` as emitted lines, `GPUHandle` without `id`, `SourceOrigin`) per plan: data-model (contradicts)
+- [X] T-F320 Align `specs/004-resources-shaders/data-model.md` with code (`ExpandedShader.origins`, `defines` as emitted lines, `GPUHandle` without `id`, `SourceOrigin`) per plan: data-model (contradicts) — Verified 2026-11-10: data-model.md matches ShaderLibrary.swift (SourceOrigin, origins, defines lines) and GPUObjects.swift (GPUHandle fields)
 - [ ] T-F321 Document `ShaderCacheKey`, render-target pool (`acquireTarget`/`recycle`), cache counters, `ResourceError`, `TextureFormat`, `GPUBuffer`/`RenderTarget` members in `contracts/resources-shaders-api.md` per plan: contracts (unrequested)
