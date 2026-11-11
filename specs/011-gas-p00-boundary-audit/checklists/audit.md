@@ -13,45 +13,47 @@ Focus: the manual's three Phase 00 acceptance gates and the owner's reuse rule. 
 
 ## Requirement Completeness
 
-- [ ] CHK001 Are all three manual acceptance gates required: integration matrix, compilable shell, and written stop/go decision? [Completeness, Spec §FR-A01-002, §FR-A01-005, §FR-A01-009]
-- [ ] CHK002 Does the inventory requirement list every area named in the prompt: package products, EGL host, render thread, shader and resource APIs, build steps, source ownership and regression tests? [Completeness, Spec §FR-A01-001, §FR-A01-004]
-- [ ] CHK003 Are all six brainstorm capabilities and the version-0.1 needs enumerated as matrix rows? [Completeness, Spec §FR-A01-002, SC-A01-002]
-- [ ] CHK004 Are negative requirements listed, each with its forbidding source? [Completeness, Spec §FR-A01-011]
+- [x] CHK001 Are all three manual acceptance gates required: integration matrix, compilable shell, and written stop/go decision? [Completeness, Spec §FR-A01-002, §FR-A01-005, §FR-A01-009]
+- [x] CHK002 Does the inventory requirement list every area named in the prompt: package products, EGL host, render thread, shader and resource APIs, build steps, source ownership and regression tests? [Completeness, Spec §FR-A01-001, §FR-A01-004]
+- [x] CHK003 Are all six brainstorm capabilities and the version-0.1 needs enumerated as matrix rows? [Completeness, Spec §FR-A01-002, SC-A01-002]
+- [x] CHK004 Are negative requirements listed, each with its forbidding source? [Completeness, Spec §FR-A01-011]
 
 ## Requirement Clarity
 
-- [ ] CHK005 Are the three matrix statuses defined unambiguously, including how a placeholder module is classified? [Clarity, Spec §Edge Cases]
-- [ ] CHK006 Is "evidence" defined precisely (file, public symbol, package product), and are test-only citations excluded? [Clarity, Spec §Edge Cases, §FR-A01-003]
-- [ ] CHK007 Is the stop condition stated concretely (second renderer, fork, private API, networking)? [Clarity, Spec §FR-A01-009]
+- [x] CHK005 Are the three matrix statuses defined unambiguously, including how a placeholder module is classified? [Clarity, Spec §Edge Cases]
+- [x] CHK006 Is "evidence" defined precisely (file, public symbol, package product), and are test-only citations excluded? [Clarity, Spec §Edge Cases, §FR-A01-003]
+- [x] CHK007 Is the stop condition stated concretely (second renderer, fork, private API, networking)? [Clarity, Spec §FR-A01-009]
 
 ## Architecture Ownership
 
-- [ ] CHK008 Does every gap entry require an owning VisualCore module, or a justified app-local exception, per the reuse principle? [Consistency, Spec §FR-A01-008, Constitution II]
-- [ ] CHK009 Is the prohibition on modifying VisualCore or ProjectM in this phase measurable? [Measurability, Spec §FR-A01-007, SC-A01-006]
-- [ ] CHK010 Is ProjectM independence of the new app target required and verifiable? [Coverage, Spec §FR-A01-006]
+- [x] CHK008 Does every gap entry require an owning VisualCore module, or a justified app-local exception, per the reuse principle? [Consistency, Spec §FR-A01-008, Constitution II]
+- [x] CHK009 Is the prohibition on modifying VisualCore or ProjectM in this phase measurable? [Measurability, Spec §FR-A01-007, SC-A01-006]
+- [x] CHK010 Is ProjectM independence of the new app target required and verifiable? [Coverage, Spec §FR-A01-006]
 
 ## Privacy and Platform
 
-- [ ] CHK011 Are permissions and networking for the shell explicitly excluded, with later permissions deferred to a named phase? [Completeness, Spec §Clarifications, §FR-A01-005]
-- [ ] CHK012 Are unsupported claims (device performance) excluded until campaign II? [Consistency, Spec §FR-A01-011, Constitution V]
+- [x] CHK011 Are permissions and networking for the shell explicitly excluded, with later permissions deferred to a named phase? [Completeness, Spec §Clarifications, §FR-A01-005]
+- [x] CHK012 Are unsupported claims (device performance) excluded until campaign II? [Consistency, Spec §FR-A01-011, Constitution V]
 
 ## iOS Lifecycle
 
-- [ ] CHK013 Is it explicit that Phase 00 creates no render host or GPU lifecycle, and which later phase introduces one? [Clarity, Plan §Lifecycle contract, Gap]
+- [x] CHK013 Is it explicit that Phase 00 creates no render host or GPU lifecycle, and which later phase introduces one? [Clarity, Plan §Lifecycle contract, Gap]
 
 ## Testability and Acceptance
 
-- [ ] CHK014 Are all success criteria quantified with counts or percentages? [Measurability, Spec §SC-A01-001–007]
-- [ ] CHK015 Are both simulator runtimes required for the shell smoke test? [Coverage, Spec §SC-A01-003]
-- [ ] CHK016 Is the regression baseline defined by named steps, with a failure treated as a blocker rather than waived? [Clarity, Spec §FR-A01-004, §Edge Cases]
+- [x] CHK014 Are all success criteria quantified with counts or percentages? [Measurability, Spec §SC-A01-001–007]
+- [x] CHK015 Are both simulator runtimes required for the shell smoke test? [Coverage, Spec §SC-A01-003]
+- [x] CHK016 Is the regression baseline defined by named steps, with a failure treated as a blocker rather than waived? [Clarity, Spec §FR-A01-004, §Edge Cases]
 
 ## Performance and Release
 
-- [ ] CHK017 Is it explicit that no performance budget is set in Phase 00, and where budgets are set later? [Clarity, Spec §Clarifications]
-- [ ] CHK018 Are bundle identity and target location fixed so later release work cannot drift? [Consistency, Spec §FR-A01-005]
-- [ ] CHK019 Does traceability require every version-0.1 feature and journey to map to a phase? [Coverage, Spec §FR-A01-010, SC-A01-007]
+- [x] CHK017 Is it explicit that no performance budget is set in Phase 00, and where budgets are set later? [Clarity, Spec §Clarifications]
+- [x] CHK018 Are bundle identity and target location fixed so later release work cannot drift? [Consistency, Spec §FR-A01-005]
+- [x] CHK019 Does traceability require every version-0.1 feature and journey to map to a phase? [Coverage, Spec §FR-A01-010, SC-A01-007]
 
 ## Notes
 
+- Reviewed 2026-11-10 under the owner's delegation (CLAUDE.md §2): 19/19 satisfied. CHK005 and CHK013 were fixed
+  first by adding status definitions (Key Entities) and the no-render-host rule (FR-A01-005).
 - Generated unchecked. The reviewer marks items `[x]` when satisfied. `/speckit-implement` reads the markers but
   does not change them.

@@ -161,7 +161,8 @@ owner module, a phase and a test intent. The decision states go or stop with rea
   the ProjectMReference harness tests on both runtimes.
 - **FR-A01-005**: The phase MUST create a compilable, empty app shell under `Apps/GenerativeArtStudio/` with bundle
   identity `dev.visualcore.GenerativeArtStudio`. It builds unsigned for both simulator runtimes, shows a titled
-  home screen with an accessibility label, and passes a launch smoke test. The shell requests no permissions and declares no usage descriptions or networking.
+  home screen with an accessibility label, and passes a launch smoke test. The shell requests no permissions and declares no usage descriptions or networking. It
+  creates no render host or GPU resources; rendering and its lifecycle arrive in Phase 02.
 - **FR-A01-006**: The shell MUST NOT link ProjectM engine, preset or bridge modules. The existing dependency audit
   MUST cover the new target.
 - **FR-A01-007**: The phase MUST NOT modify any VisualCore package source, the ProjectM reference or its pins. This is
@@ -190,6 +191,10 @@ owner module, a phase and a test intent. The decision states go or stop with rea
 - **Inventory entry**: area, description, file path(s), owner (package/module or script), notes.
 - **Matrix row**: capability, source (brainstorm or v0.1 feature), status, evidence (file, symbol, product), example
   consumer, notes.
+  Status meanings:
+  - `available`: a public VisualCore symbol already delivers the capability, and a consumer uses it.
+  - `requires adaptation`: the pieces exist but need a reusable helper, or exist only in a sample or test.
+  - `upstream gap`: missing, or only a placeholder module.
 - **Gap entry**: capability, gap type (adaptation or upstream), owning module (VisualCore module or app-local with
   justification), closing phase, test intent.
 - **Decision record**: go/stop, date, blockers, assumptions, evidence links.
