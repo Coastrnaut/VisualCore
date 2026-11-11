@@ -85,3 +85,8 @@ T-A01-001. T-A01-007 → T-A01-008. T-A01-010 runs last.
 
 MVP = US1 (the checked matrix), then US2 and US3 (baseline and shell), then US4 (decision). The phase is complete
 only when every task carries evidence and converge appends nothing.
+
+## Phase 8: Convergence
+
+- [ ] T-A01-011 Give matrix rows M05 and M08 example consumers in `docs/apps/generative-art-studio/visualcore-contract.json`, and make `scripts/check_app_contract.py` require an example on every row (bad-fixture case + test) per SC-A01-002 (partial)
+- [ ] T-A01-012 Make `scripts/check_app_contract.py` verify that every inventory path exists (bad-fixture case + test) per FR-A01-001 (partial)
