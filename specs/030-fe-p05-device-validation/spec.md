@@ -85,7 +85,8 @@ records frame times, so tours and capture can be judged on each device.
 
 1. **Given** the tour mode, **Then** all three tours are played at 60 steps per second of tour time with a frame drawn
    per step, and the report records frame-time statistics (minimum, median, 95th percentile, maximum; CPU-side, never
-   called GPU time) and the frame count.
+   called GPU time), the frame count, and the thermal state and Low Power Mode at the start and the end (checklist
+   CHK003).
 2. **Given** each tour stop, **Then** a still at 1024 px on the long edge is captured and compared with the CPU
    reference at 64 sample points (≥ 99%); the report records the agreement per stop, and the run fails if any stop
    falls below.
@@ -162,6 +163,7 @@ The operator has one page saying what to run on D1, D2 and D3, what each report 
 - No physical-device install, launch or test in this phase.
 - No performance or precision claim from simulator runs; their reports are rehearsal data.
 - No automation entry by URL, notification or any remote input.
+- Reports carry the device model and OS version only: no device identifiers, names or user data (checklist CHK012).
 
 ### Key Entities
 
