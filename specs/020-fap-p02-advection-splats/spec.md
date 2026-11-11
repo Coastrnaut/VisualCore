@@ -20,6 +20,40 @@ Canonical overrides:
 - Every gesture has a control alternative.
 - Evidence is host and simulator only.
 
+## Clarifications
+
+### Session 2026-11-11
+
+Answered autonomously under the owner's standing delegation (CLAUDE.md §2), recommended option in each case.
+
+- Q: In which units is motion stored, and how does advection trace back? → A: Velocity is stored in grid cells per
+  second. Each step samples the source at `cell center − Δt · v` (in cells). The 8-bit fallback encodes velocity with
+  range `velocityRange × 60` cells per second (`velocityRange` keeps its Phase 01 meaning of cells per 1/60 s step).
+- Q: What exactly does a splat add? → A: With `d` the distance from the splat center in cells (aspect-correct) and
+  `r = radius × shorter grid edge`, velocity gains `force · exp(−d²/r²)`, and dye RGB gains `color · exp(−d²/r²)`.
+  Dye alpha is unchanged. Half-float dye is not clamped, and the display clamps. 8-bit storage clamps at 1.
+- Q: What are the resampling spacing, the caps and the velocity smoothing? → A:
+  - Spacing is half the brush radius in view points (`radius × shorter view edge / 2`).
+  - At most 16 samples per pointer per update.
+  - Velocity is an exponential moving average with α = 0.5 (the first move uses the raw velocity), and samples
+    closer than 1 ms reuse the previous velocity.
+  - Force in cells per second = finger velocity in points per second × cells per point × `forceScale` (0…4,
+    default 1).
+  - Per-frame splat cap: 1…64, default 16.
+  - Brush radius: 0.005…0.25 of the shorter edge, default 0.04.
+- Q: How can GPU interpolation equal the CPU reference when GPU texture filtering uses reduced sub-texel precision?
+  → A: Passes do not use hardware filtering for advection. They fetch the four neighboring cells (clamped to the
+  edge) and weight them in 32-bit float from the cell coordinate, exactly as the CPU sampler does. Hardware filtering
+  is kept only for display scaling.
+- Q: In what order does one step apply its passes? → A:
+  1. Drain the capped splats.
+  2. Splat each into velocity, then into dye.
+  3. Advect velocity by itself.
+  4. Advect dye by the advected velocity.
+
+  Dissipation is applied inside both advection passes (`× 1/(1 + d·Δt)`). The "Add splash" control queues burst *k*
+  at the canvas center with angle `k × 137.5°`, force 600 cells per second and palette color `k mod 6`.
+
 ## User Scenarios & Testing *(mandatory)*
 
 Users:
@@ -156,18 +190,19 @@ and the API baseline are updated, and the ProjectM regression passes.
   chosen evenly along each path and always include the newest; the excess is counted.
 - **FR-A02-205**: The app MUST apply splats to the velocity and dye fields with a Gaussian falloff. The GPU result
   matches the CPU reference within one storage step.
-- **FR-A02-206**: The app MUST advect velocity and dye semi-Lagrangian style every step, using exact bilinear
-  sampling and clamp-to-edge, with the configured dissipation folded in. The numerical diffusion is documented. The
+- **FR-A02-206**: The app MUST advect velocity and dye semi-Lagrangian style every step, in the order of clarification
+  5, using exact bilinear sampling and clamp-to-edge, with the configured dissipation folded in. The numerical diffusion is documented. The
   GPU matches the CPU reference on 8×8 and 16×16 grids.
 - **FR-A02-207**: With zero velocity and zero dissipation, a known dye pattern MUST stay unchanged within one storage
   step and bounded by its initial range for 120 steps (manual regression fixture).
 - **FR-A02-208**: The playground MUST turn real multi-touch on the canvas into splats through the VisualCore tracker
   and the app queue. An "Add splash" button MUST provide the same injection without a gesture, with a VoiceOver
   announcement.
-- **FR-A02-209**: The configuration MUST gain the splat settings, validated and reported like the existing fields:
-  - brush radius;
-  - force scale;
-  - per-frame cap.
+- **FR-A02-209**: The configuration MUST gain the splat settings, validated and reported like the existing fields
+  (non-finite values become the default):
+  - brush radius: 0.005…0.25 of the shorter edge, default 0.04;
+  - force scale: 0…4, default 1;
+  - per-frame cap: 1…64, default 16.
 - **FR-A02-210**: The VisualCore contract MUST be updated: G-POINTERVEL closed, G-SOLVER partially closed (advection
   and splats; the pressure solve remains for Phase 03), M04 and M05 rows updated. The checks MUST pass, including the
   ProjectM regression after the VisualCore change. The app MUST stay offline, request no permissions and keep EGL
