@@ -36,7 +36,7 @@ IDs `T-F4##`. One commit + push per task. Effects implemented one at a time (arc
 
 ## Phase 5: Integration & Polish
 
-- [ ] T-F415 (FR-F410, FR-F411, SC-F405) `EffectScene` wrapping a content scene; sim test scene+3-pass graph renders; resize and recreation rebuild; `reduceFlashing` appends the limiter
+- [X] T-F415 (FR-F410, FR-F411, SC-F405) `EffectScene` wrapping a content scene; sim test scene+3-pass graph renders; resize and recreation rebuild; `reduceFlashing` appends the limiter — Verified 2026-11-10: F04.t415-effectscene-ios27 exit 0: 3-pass graph swaps gradient colors on screen; resize + recreation keep rendering, leaked 0 after destroy; reduceFlashing appends __flashLimit
 - [ ] T-F416 Document pass schemas in `Packages/VisualCoreRendering/README.md`
 - [ ] T-F417 Full verification: host tests, sim 27.2 + 26.5, generic iOS, dependencies, compliance, docs, reference regression
 - [ ] T-F418 {device} Per-effect GPU cost on D1/D2/D3 — **deferred to campaign II** (constitution V; not a gap for F04); automation mode to be added with the AutomationRunner (F09)
