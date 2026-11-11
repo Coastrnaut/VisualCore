@@ -284,10 +284,18 @@ VisualCoreParameters | enum | public enum ParametersInfo
 VisualCoreParameters | func | public func clamped(_ value: Double) -> Double
 VisualCoreParameters | func | public func definition(_ name: String) -> ParameterDefinition?
 VisualCoreParameters | func | public func encode(to encoder: Encoder) throws
+VisualCoreParameters | func | public func formatted(_ name: String) -> String
+VisualCoreParameters | func | public func isModified(_ name: String) -> Bool
+VisualCoreParameters | func | public func normalized(_ name: String) -> Double
 VisualCoreParameters | func | public func normalized(_ value: Double) -> Double
 VisualCoreParameters | func | public func resolve(_ supplied: [String: Double]) throws(ParameterError) -> ResolvedParameters
 VisualCoreParameters | func | public func sample(_ t: Double) -> SIMD3<Double>
 VisualCoreParameters | func | public func value(normalized t: Double) -> Double
+VisualCoreParameters | func | public mutating func rebase(_ values: [String: Double]) throws(ParameterError)
+VisualCoreParameters | func | public mutating func reset(_ name: String)
+VisualCoreParameters | func | public mutating func resetAll()
+VisualCoreParameters | func | public mutating func set(_ name: String, normalized t: Double) -> Bool
+VisualCoreParameters | func | public mutating func set(_ name: String, to value: Double) -> Bool
 VisualCoreParameters | func | public static func builtIn(_ id: String) -> Palette?
 VisualCoreParameters | func | public static func canonical(scope: String, seed: UInt64, paletteID: String, values: [String: Double]) -> String
 VisualCoreParameters | func | public static func linear(fromSRGB c: Double) -> Double
@@ -298,6 +306,7 @@ VisualCoreParameters | init | public init(from decoder: Decoder) throws
 VisualCoreParameters | init | public init(id: String, name: String, stops: [SIMD3<Double>]) throws(ParameterError)
 VisualCoreParameters | init | public init(id: String, title: String, seed: UInt64, paletteID: String, values: [String: Double])
 VisualCoreParameters | init | public init(name: String, title: String, unit: String = "", range: ClosedRange<Double>, defaultValue: Double,
+VisualCoreParameters | init | public init(schema: ParameterSchema, values: [String: Double] = [:]) throws(ParameterError)
 VisualCoreParameters | let | public let defaultValue: Double
 VisualCoreParameters | let | public let definitions: [ParameterDefinition]
 VisualCoreParameters | let | public let id: String
@@ -305,6 +314,7 @@ VisualCoreParameters | let | public let maximum: Double
 VisualCoreParameters | let | public let minimum: Double
 VisualCoreParameters | let | public let name: String
 VisualCoreParameters | let | public let paletteID: String
+VisualCoreParameters | let | public let schema: ParameterSchema
 VisualCoreParameters | let | public let seed: UInt64
 VisualCoreParameters | let | public let stops: [SIMD3<Double>]
 VisualCoreParameters | let | public let title: String
@@ -317,11 +327,15 @@ VisualCoreParameters | let | public static let maxParameters
 VisualCoreParameters | let | public static let version
 VisualCoreParameters | struct | public struct Palette: Codable, Equatable, Sendable, Identifiable
 VisualCoreParameters | struct | public struct ParameterDefinition: Codable, Equatable, Sendable
+VisualCoreParameters | struct | public struct ParameterEditor: Sendable, Equatable
 VisualCoreParameters | struct | public struct ParameterSchema: Sendable, Equatable
 VisualCoreParameters | struct | public struct Preset: Codable, Equatable, Sendable, Identifiable
 VisualCoreParameters | struct | public struct ResolvedParameters: Sendable, Equatable
+VisualCoreParameters | var | public private(set) var baseline: [String: Double]
+VisualCoreParameters | var | public private(set) var values: [String: Double]
 VisualCoreParameters | var | public var defaults: [String: Double]
 VisualCoreParameters | var | public var linearStops: [SIMD3<Double>]
+VisualCoreParameters | var | public var modifiedNames: [String]
 VisualCoreParameters | var | public var range: ClosedRange<Double>
 VisualCorePersistence | enum | public enum PersistenceInfo
 VisualCorePersistence | let | public static let version
@@ -630,6 +644,7 @@ VisualCoreSimulation | func | public func instances() -> [ParticleInstance]
 VisualCoreSimulation | func | public func value(at t: Double) -> Double
 VisualCoreSimulation | func | public func value(of name: String) -> Double?
 VisualCoreSimulation | func | public mutating func add(_ tween: Tween, at offset: Double = 0, name: String)
+VisualCoreSimulation | func | public mutating func advance(by delta: Double)
 VisualCoreSimulation | func | public mutating func advance(by dt: Double) -> Int
 VisualCoreSimulation | func | public mutating func advance(by dt: Double) -> [TimelineEvent]
 VisualCoreSimulation | func | public mutating func burst(_ count: Int, from index: Int = 0)
@@ -638,30 +653,40 @@ VisualCoreSimulation | func | public mutating func float() -> Float
 VisualCoreSimulation | func | public mutating func int(_ r: ClosedRange<Int>) -> Int
 VisualCoreSimulation | func | public mutating func next() -> UInt64
 VisualCoreSimulation | func | public mutating func normal(mean: Double = 0, deviation: Double = 1) -> Double
+VisualCoreSimulation | func | public mutating func pause()
+VisualCoreSimulation | func | public mutating func play()
 VisualCoreSimulation | func | public mutating func range(_ r: ClosedRange<Double>) -> Double
 VisualCoreSimulation | func | public mutating func resetAccumulator()
+VisualCoreSimulation | func | public mutating func scrub(to newTime: Double)
 VisualCoreSimulation | func | public mutating func seek(to t: Double)
 VisualCoreSimulation | func | public mutating func step(_ dt: Double)
+VisualCoreSimulation | func | public mutating func toggle()
 VisualCoreSimulation | init | public init()
 VisualCoreSimulation | init | public init(capacity: Int = ParticleSystem.defaultCapacity, seed: UInt64 = 0)
+VisualCoreSimulation | init | public init(duration: Double = 120, speed: Double = 1, isPlaying: Bool = true)
 VisualCoreSimulation | init | public init(from: Double, to: Double, duration: Double, curve: EasingCurve = .linear, mode: EasingMode = .inOut,
 VisualCoreSimulation | init | public init(position: Vec2 = .zero, rate: Double = 100, lifetime: ClosedRange<Double> = 1...1,
 VisualCoreSimulation | init | public init(position: Vec2, size: Double, color: Vec4)
 VisualCoreSimulation | init | public init(seed: UInt64)
 VisualCoreSimulation | init | public init(step: Double = 1.0 / 120, maxSteps: Int = 8)
 VisualCoreSimulation | let | public let capacity: Int
+VisualCoreSimulation | let | public let duration: Double
 VisualCoreSimulation | let | public let maxSteps: Int
 VisualCoreSimulation | let | public let seed: UInt64
 VisualCoreSimulation | let | public let step: Double
 VisualCoreSimulation | let | public static let boundaryTolerance
 VisualCoreSimulation | let | public static let defaultCapacity
 VisualCoreSimulation | let | public static let maxCapacity
+VisualCoreSimulation | let | public static let maxDelta
+VisualCoreSimulation | let | public static let reducedMotionFactor
+VisualCoreSimulation | let | public static let speedRange
 VisualCoreSimulation | let | public static let version
 VisualCoreSimulation | struct | public struct Emitter: Sendable, Equatable
 VisualCoreSimulation | struct | public struct Entry: Sendable, Equatable
 VisualCoreSimulation | struct | public struct FixedStepClock: Sendable, Equatable
 VisualCoreSimulation | struct | public struct ParticleInstance: Sendable, Equatable
 VisualCoreSimulation | struct | public struct ParticleSystem: Sendable
+VisualCoreSimulation | struct | public struct SceneClock: Sendable, Equatable
 VisualCoreSimulation | struct | public struct SeededRandom: RandomNumberGenerator, Sendable, Equatable
 VisualCoreSimulation | struct | public struct SplitMix64: RandomNumberGenerator, Sendable
 VisualCoreSimulation | struct | public struct Timeline: Sendable
@@ -672,10 +697,12 @@ VisualCoreSimulation | var | public private(set) var droppedCount
 VisualCoreSimulation | var | public private(set) var droppedTime
 VisualCoreSimulation | var | public private(set) var entries: [Entry]
 VisualCoreSimulation | var | public private(set) var invalidDeltas
+VisualCoreSimulation | var | public private(set) var isPlaying: Bool
 VisualCoreSimulation | var | public private(set) var nanRemoved
 VisualCoreSimulation | var | public private(set) var random: SeededRandom
 VisualCoreSimulation | var | public private(set) var state: UInt64
 VisualCoreSimulation | var | public private(set) var time
+VisualCoreSimulation | var | public private(set) var time: Double
 VisualCoreSimulation | var | public private(set) var totalSteps
 VisualCoreSimulation | var | public var alpha: Double
 VisualCoreSimulation | var | public var autoreverses: Bool
@@ -698,10 +725,12 @@ VisualCoreSimulation | var | public var position: Vec2
 VisualCoreSimulation | var | public var rate
 VisualCoreSimulation | var | public var rate: Double
 VisualCoreSimulation | var | public var reduceMotion
+VisualCoreSimulation | var | public var reducedMotion
 VisualCoreSimulation | var | public var repeatCount: Int?
 VisualCoreSimulation | var | public var simulatedTime: Double
 VisualCoreSimulation | var | public var size: Double
 VisualCoreSimulation | var | public var speed: ClosedRange<Double>
+VisualCoreSimulation | var | public var speed: Double
 VisualCoreSimulation | var | public var spread: Double
 VisualCoreSimulation | var | public var startColor: Vec4, endColor: Vec4
 VisualCoreSimulation | var | public var startSize: Double, endSize: Double
