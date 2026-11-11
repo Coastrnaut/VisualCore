@@ -1,0 +1,26 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/VisualCoreRendering",
+    "--scheme",
+    "VisualCoreRendering-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--result-name",
+    "F06-t603-ios27"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --result-name F06-t603-ios27",
+  "elapsed_seconds": 6.432,
+  "exit_code": 0,
+  "finished": "2026-11-11T01:08:17+00:00",
+  "log": ".autonomy/logs/F06.t603-texture-upload-ios27.log",
+  "log_sha256": "655be4bbd5bbecd102f8e884e078d272552845e819b040f53cb0733e3cead1d8",
+  "name": "t603-texture-upload-ios27",
+  "stage": "F06",
+  "started": "2026-11-11T01:08:11+00:00",
+  "timed_out": false
+}

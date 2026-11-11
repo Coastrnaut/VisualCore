@@ -58,6 +58,21 @@ public final class Texture: GPUResource {
         vcglActiveTexture(GLenum(GL_TEXTURE0 + Int32(unit)))
         vcglBindTexture(GLenum(GL_TEXTURE_2D), handle.name)
     }
+
+    /// Uploads tightly packed RGBA8 pixels, rows bottom-up (GL order), replacing the whole texture
+    /// (feature 007 T-F603). Returns false for a non-rgba8 texture, a size mismatch or a stale/released texture.
+    @discardableResult
+    public func upload(rgba pixels: [UInt8]) -> Bool {
+        guard format == .rgba8, pixels.count == width * height * 4,
+              !released, let registry, registry.accept(generation: handle.generation) else { return false }
+        vcglBindTexture(GLenum(GL_TEXTURE_2D), handle.name)
+        vcglPixelStorei(GLenum(GL_UNPACK_ALIGNMENT), 1)
+        pixels.withUnsafeBytes {
+            vcglTexSubImage2D(GLenum(GL_TEXTURE_2D), 0, 0, 0, GLsizei(width), GLsizei(height),
+                              GLenum(GL_RGBA), GLenum(GL_UNSIGNED_BYTE), $0.baseAddress)
+        }
+        return vcglGetError() == GLenum(GL_NO_ERROR)
+    }
 }
 
 @MainActor
