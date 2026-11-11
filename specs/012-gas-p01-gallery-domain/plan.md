@@ -56,8 +56,8 @@ scene screens. The Showcase migrates to `ShaderBundle`.
 Packages/VisualCore/Package.swift                                   # + VisualCoreParameters target/product/tests
 Packages/VisualCore/Sources/VisualCoreParameters/{Module,ParameterSchema,Palette,Preset,ParameterHash}.swift
 Packages/VisualCore/Tests/VisualCoreParametersTests/*.swift
-Packages/VisualCore/Sources/VisualCoreTestSupport/ImageComparison.swift (+ tests in VisualCoreScaffoldTests or new target)
-Packages/VisualCoreRendering/Package.swift                          # Rendering resources (GLSL), deps (Parameters), UI deps
+Packages/VisualCore/Sources/VisualCoreTestSupport/ImageComparison.swift (+ new test target VisualCoreTestSupportTests)
+Packages/VisualCoreRendering/Package.swift                          # Rendering resources (GLSL), UI deps
 Packages/VisualCoreRendering/Sources/VisualCoreRendering/{ShaderBundle,FullScreenShaderScene}.swift, ShaderProgram.swift (+vec3Array)
 Packages/VisualCoreRendering/Sources/VisualCoreRendering/GLSL/vc/{hash,noise,palette,sdf,color}.glsl
 Packages/VisualCoreRendering/Sources/VisualCoreUI/RenderSurface.swift
@@ -76,8 +76,9 @@ docs/apps/generative-art-studio/visualcore-contract.json            # gaps close
 
 **Dependency direction**: App → GenerativeArtStudioCore → VisualCoreParameters and VisualCoreSimulation (pure). App →
 VisualCoreRendering, VisualCoreUI → pure modules. Tests → VisualCoreTestSupport. VisualCoreParameters depends only
-on Foundation (rule R2). VisualCoreRendering gains a dependency on VisualCoreParameters, so `FullScreenShaderScene`
-can bind palettes; this is a pure→iOS direction, allowed by the package map. The package-map row is amended.
+on Foundation (rule R2). VisualCoreRendering does **not** depend on VisualCoreParameters (analyze D1):
+`FullScreenShaderScene` takes plain parameter values and linear `SIMD3<Float>` palette stops, and the app converts
+`Palette` to stops.
 
 **Lifecycle contract**:
 1. `SceneScreen` creates one `RenderHost(scene:)` per opened family and shows it in `RenderSurface`.

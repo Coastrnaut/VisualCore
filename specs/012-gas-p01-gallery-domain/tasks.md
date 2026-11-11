@@ -17,7 +17,7 @@ regression.
 
 ## Phase 1: Setup
 
-- [ ] T-A01-101 Add the `VisualCoreParameters` target, product and test target to `Packages/VisualCore/Package.swift` (Foundation only, rule R2). Amend the package-map row in `specs/002-architecture-contracts/contracts/package-map.md` (new module; VisualCoreRendering → Parameters). Add `Apps/GenerativeArtStudio/Core/Package.swift` (`GenerativeArtStudioCore`, macOS 15 + iOS 26, depending on `../../../Packages/VisualCore` products Parameters, Simulation and Math) with an empty test target.
+- [ ] T-A01-101 Add the `VisualCoreParameters` target, product and test target to `Packages/VisualCore/Package.swift` (Foundation only, rule R2). Add a package-map row for the new module in `specs/002-architecture-contracts/contracts/package-map.md` (pure, depends on Foundation only). Add `Apps/GenerativeArtStudio/Core/Package.swift` (`GenerativeArtStudioCore`, macOS 15 + iOS 26, depending on `../../../Packages/VisualCore` products Parameters, Simulation and Math) with an empty test target.
 
 ## Phase 2: Foundational — VisualCore building blocks (US3; blocks US1 and US2)
 
@@ -38,7 +38,7 @@ regression.
   - add `ShaderBundle` (loads `*.vert`, `*.frag` and `*.glsl` from a bundle subdirectory into `ShaderLibrary`, and preloads `vc/*.glsl` from `Bundle.module`);
   - add the GLSL library `Sources/VisualCoreRendering/GLSL/vc/{hash,noise,palette,sdf,color}.glsl` (package resources);
   - add `FullScreenShaderScene` (built-in vertex shader; binds `u_time`/`fixedTime`, `u_resolution`, `u_seed`, `u_palette[8]`/`u_paletteCount` and `u_<param>`; `errorMessage` = `file:line: message`);
-  - add Package.swift resources and the Parameters dependency.
+  - add Package.swift resources (no dependency on VisualCoreParameters; analyze D1).
 
   Tests in `Tests/VisualCoreRenderingTests/{ShaderBundleTests,FullScreenShaderSceneTests}.swift`: every `vc/*.glsl`
   include compiles in a fragment; uniforms bind; a fixed time is deterministic (two renders match exactly); a broken
@@ -65,15 +65,18 @@ regression.
 - [ ] T-A01-109 [US1] Add the app shaders `Apps/GenerativeArtStudio/Shaders/{gradient-noise,raymarched-shapes,geometric-tiling,particles-background}.frag` (using `vc/*.glsl`), plus `Apps/GenerativeArtStudio/App/{ArtSceneFactory,ParticlesArtScene}.swift` (a family's document → RenderScene: FullScreenShaderScene for three families, background + ParticleRenderer for particles). Update `project.yml` with the Core package, the VisualCore products (Parameters, Simulation, Math, Scenes, Rendering, UI) and the Shaders resources folder.
 - [ ] T-A01-110 [US1] Add `Apps/GenerativeArtStudio/App/{GalleryView,SceneScreen}.swift` and update `GenerativeArtStudioApp.swift`:
   - gallery list `gas.gallery` with rows `gas.family.<id>` (symbol, palette swatch, title, summary, preset count, label and hint);
-  - `SceneScreen` owns one RenderHost via RenderSurface (`gas.scene.canvas`, the family's accessibility description), shows `gas.scene.error` on shader errors, and destroys the host on disappear.
+  - `SceneScreen` owns one RenderHost via RenderSurface (`gas.scene.canvas`, the family's accessibility description), shows `gas.scene.error` on shader errors, and destroys the host on disappear. Under Reduce Motion the animation
+    time scale is 0.5 (an injectable flag; edge case).
 - [ ] T-A01-111 [US1] Add an app unit-test target `GenerativeArtStudioTests` (hosted) with `Apps/GenerativeArtStudio/Tests/Unit/{RenderDeterminismTests,FamilyDistinctnessTests,SceneCleanupTests}.swift`, using `VisualCoreTestSupport`:
   - non-blank: ≥ 2 distinct colors and mean luminance 0.02–0.98 (SC-A01-101);
   - determinism, including after a round trip: ≥ 99% within 2/255 and mean ≤ 0.5/255 (SC-A01-103);
   - distinctness: 6 pairs with mean ≥ 20/255, and seeds of the same family with mean ≥ 2/255 (SC-A01-104);
-  - context loss and destroy leak 0 (SC-A01-105).
+  - context loss and destroy leak 0 (SC-A01-105);
+  - a family with a broken fragment exposes `file:line` via the scene's error message (FR-A01-110);
+  - the time scale is 0.5 under Reduce Motion (edge case).
 
-  Add `Apps/GenerativeArtStudio/Tests/UI/GalleryUITests.swift`: four rows, and opening each shows the canvas with no
-  error. Run unit and UI tests on iOS 27.2 and 26.5.
+  Add `Apps/GenerativeArtStudio/Tests/UI/GalleryUITests.swift`: four rows with their labels and hints, and opening each
+  shows the canvas with no error (FR-A01-112). Run unit and UI tests on iOS 27.2 and 26.5.
 
 ## Phase 5: Polish and cross-cutting
 
