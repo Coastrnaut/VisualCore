@@ -112,3 +112,21 @@ safety, automation, and the final release run.
 
 Applied autonomously (CLAUDE.md §2): U1 → T-A01-607 fixture generator; C1 → T-A01-609 names the accessibility audit. 0
 critical issues.
+
+## Phase 6: Implement-time addition (2026-11-11)
+
+Found while writing the T-A01-606 credits: `docs/legal/THIRD_PARTY_NOTICES.md` requires every distributed app to
+bundle the shipped components' license texts and show them in an acknowledgements screen, and the app has neither.
+It runs before T-A01-606, so the documents describe a real screen.
+
+- [ ] T-A01-610 [US2] Add the shared license bundling and acknowledgements screen (constitution II; FR-A01-605):
+  - `scripts/bundle_licenses.py --out <dir>` writes `licenses.json` (id, name, license, file) and one text per
+    `scope: shipped` component in `docs/legal/third-party.json`. ANGLE texts are copied read-only from the pinned
+    reference; VisualCore uses `LICENSE`; the Penner easing BSD-3 text and the xoshiro public-domain note are
+    generated with their attribution. Tests in `test_scripts.py`.
+  - VisualCoreUI `AcknowledgementsView` and `LicenseInventory` (loads `Licenses/licenses.json` from a bundle; a list
+    with name and license, and a detail page with the full selectable text), with simulator tests.
+  - `check_app_release.py`: a `licenses` item (every shipped component present in the bundled index).
+  - App: a `project.yml` build phase that runs the script into the app bundle's `Licenses` folder; Settings About
+    links to Acknowledgements (`gas.settings.acknowledgements`); a UI test opens it and finds ANGLE's BSD text; the
+    accessibility audit covers it.
