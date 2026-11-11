@@ -23,6 +23,54 @@ Canonical overrides:
 - **Verification and truthful precision:** the GPU escape classes are checked against the FractalMath CPU reference.
   Zoom is clamped at the precision limit, and the limit is shown.
 
+## Clarifications
+
+### Session 2026-11-11
+
+Answered autonomously under the owner's standing approval (CLAUDE.md §2); the recommended option was chosen in each
+case. These facts were checked in code:
+- `RenderCapabilities.query` reads GL limits and strings, but no shader precision;
+- `vcglGetShaderPrecisionFormat` exists in the C table;
+- `FullScreenShaderScene(fragment:fragmentName:bundle:)` binds `u_time` (`fixedTime`), `u_resolution`, `u_palette[8]`
+  and `u_paletteCount`, plus `u_<name>` floats from `parameters`;
+- `PinchRecognizer` gives a cumulative `scale` and `center`;
+- `DragRecognizer` gives a cumulative `translation`;
+- `RenderHost.pointerHandler` delivers `PointerEvent`s in view points;
+- there is no per-frame hook on the host. A01 wraps a scene to drive its clock (`ClockedArtScene`).
+
+- Q: How are shader precision values added without breaking stored capability reports? → A: As optional
+  properties `fragmentHighp: ShaderPrecision?` and `fragmentMediump: ShaderPrecision?` on `RenderCapabilities`.
+  `ShaderPrecision` holds `rangeMin`, `rangeMax` and `precisionBits`. Optional fields keep the synthesized Codable
+  compatible with earlier JSON. They are filled in `RenderCapabilities.query` through `vcglGetShaderPrecisionFormat`
+  (GL_FRAGMENT_SHADER, GL_HIGH_FLOAT / GL_MEDIUM_FLOAT).
+- Q: What does the precision advisor compute? → A: `PrecisionAdvisor.assess(mantissaBits:magnitude:pixelStep:)`.
+  The quantities are:
+  - ulp = max(|magnitude|, pixelStep) · 2^−bits;
+  - margin = pixelStep / ulp;
+  - the result: *reliable* when margin ≥ 16, *near limit* when 1 ≤ margin < 16, *beyond* when < 1;
+  - `minimumPixelStep(mantissaBits:magnitude:)` = max(|magnitude|, tiny) · 2^−bits.
+
+  The app uses the larger of |center.x| and |center.y| as the magnitude, the reported `highp` precision bits
+  (falling back to `mediump`, then 10), and the per-pixel plane step.
+- Q: How does the shader receive the view, and how is the palette animated without a host frame hook? → A: An
+  app-local `FractalScene` wraps `FullScreenShaderScene`. Each frame it:
+  1. advances a VisualCore `SceneClock` (paused when animation is off);
+  2. sets `fixedTime` to the clock time;
+  3. copies the model's snapshot into `parameters`: `centerX`, `centerY`, `step` (plane units per pixel), `mode`
+     (0 or 1), `seedX`, `seedY`, `cap`, `radius` and `rate` (0.05 cycles per second);
+  4. sets the palette.
+
+  The fragment maps `gl_FragCoord` to the plane as center + (frag − resolution/2) · step (y up). It iterates up to
+  10,000 steps with an early break at the cap.
+- Q: How do gestures map to the viewport? → A: Through VisualCore's `PointerTracker`, then `PinchRecognizer` and
+  `DragRecognizer`, as A02 does.
+  - While pinching, the incremental scale (scale / previous scale) is applied about the current center (anchored),
+    then the center's movement is applied as a pan.
+  - While dragging, the incremental translation is applied.
+  - When a finger lifts mid-pinch, the drag restarts from the remaining finger without a jump.
+- Q: What happens to the CPU preview? → A: It stays as the reference used by the GPU agreement fixture, and as the
+  fallback picture when the shader fails to compile. It is no longer the normal picture.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Explore with pinch and pan on a live GPU picture (Priority: P1) 🎯
