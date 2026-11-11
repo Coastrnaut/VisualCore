@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "app": "particle-universe",
-  "gate": "A04-P00",
+  "gate": "A04-P01",
   "date": "2026-11-11",
   "inventory": [
     {
@@ -219,7 +219,7 @@
       "id": "M01",
       "capability": "GPU-oriented particle simulation",
       "source": "brainstorm",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCore/Sources/VisualCoreSimulation/ParticleSystem.swift",
@@ -232,13 +232,25 @@
           "symbol": "FixedStepClock",
           "product": "VisualCoreSimulation",
           "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/FixedStepRunner.swift",
+          "symbol": "FixedStepRunner",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/FixedStepRunner.swift",
+          "symbol": "ControlStream",
+          "product": "VisualCoreSimulation",
+          "public": true
         }
       ],
       "example": {
-        "file": "Apps/GenerativeArtStudio/Core/Sources/GenerativeArtStudioCore/ParticleReplay.swift",
-        "symbol": "ParticleReplay"
+        "file": "Apps/ParticleUniverse/ParticleUniverseCore/Sources/ParticleUniverseCore/SceneSimulation.swift",
+        "symbol": "SceneSimulation"
       },
-      "notes": "OpenGL ES 3.0 through ANGLE has no compute shaders here; the simulation stays on the CPU in VisualCore's deterministic ParticleSystem and only drawing is on the GPU (research R1). GPU-side state (render-to-texture) is a later idea (G-GPUSIM)."
+      "notes": "Closed in A04-P01 (G-SIMSTEP): FixedStepRunner over the FixedStepSimulation protocol (ParticleSystem conforms) — fixed 1/120 s steps, at most 8 per frame with dropped time counted, pause/resume without catch-up, invalid frames counted, and a ControlStream applied by step index so replays match however frames are split; the committed replay fixture (replay-v1.json) is bit-exact on the macOS host and both simulators. The simulation stays on the CPU (no compute shaders on OpenGL ES through ANGLE, research R1); drawing moves to the GPU in Phase 02."
     },
     {
       "id": "M02",
@@ -350,8 +362,20 @@
       "id": "M06",
       "capability": "Multiple emitter families with bounded particle counts",
       "source": "v0.1 feature 01",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/EmitterShape.swift",
+          "symbol": "EmitterShape",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/EmitterShape.swift",
+          "symbol": "EmitterBurst",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
         {
           "file": "Packages/VisualCore/Sources/VisualCoreSimulation/ParticleSystem.swift",
           "symbol": "Emitter",
@@ -366,10 +390,10 @@
         }
       ],
       "example": {
-        "file": "Apps/GenerativeArtStudio/Core/Sources/GenerativeArtStudioCore/ParticleReplay.swift",
-        "symbol": "ParticleReplay"
+        "file": "Apps/ParticleUniverse/ParticleUniverseCore/Sources/ParticleUniverseCore/EmitterFamily.swift",
+        "symbol": "EmitterFamily"
       },
-      "notes": "One emitter kind (point + cone); the pool is capped. Emitter shapes are gap G-EMITTERS (research R6)."
+      "notes": "Closed in A04-P01 (G-EMITTERS): EmitterShape point/line/ring, EmitterBurst, Emitter.radial and Emitter.clamped() in VisualCoreSimulation; a point draws no extra random number, so A01 and the baselines are unchanged. The app's four families (Fountain, Curtain, Halo, Firework) stay within the scene limit (100-20,000) with drops counted."
     },
     {
       "id": "M07",
@@ -476,7 +500,8 @@
       "owner": "VisualCore:VisualCoreSimulation",
       "phase": 1,
       "test": "Host tests: the CPU particle simulation advances in fixed steps with capped substeps per frame and a bounded catch-up after a pause or background (no unbounded fast-forward); replaying a seed with the same controls and fixed-step stream reproduces position fixtures exactly (checksum)",
-      "justification": "Found in A04-P00 (research R1): the OpenGL ES path has no compute shaders, so the 'GPU-oriented' simulation is a bounded CPU simulation drawn on the GPU; every particle or physics app (A09, A11, A19) needs the same deterministic stepping. GPU-side state stays a later idea."
+      "justification": "Found in A04-P00 (research R1): the OpenGL ES path has no compute shaders, so the 'GPU-oriented' simulation is a bounded CPU simulation drawn on the GPU; every particle or physics app (A09, A11, A19) needs the same deterministic stepping. GPU-side state stays a later idea.",
+      "closed": "A04-P01"
     },
     {
       "id": "G-EMITTERS",
@@ -487,7 +512,8 @@
       "owner": "VisualCore:VisualCoreSimulation",
       "phase": 1,
       "test": "Host tests: point, line, ring and burst emitter shapes spawn inside their shape with the seeded generator; totals never exceed the pool capacity and drops are counted; invalid parameters are clamped",
-      "justification": "Found in A04-P00 (research R6): emitter shapes are generic particle machinery (A09 Digital Aquarium bubbles, A19 Living Wallpapers)."
+      "justification": "Found in A04-P00 (research R6): emitter shapes are generic particle machinery (A09 Digital Aquarium bubbles, A19 Living Wallpapers).",
+      "closed": "A04-P01"
     },
     {
       "id": "G-FIELDS",
@@ -665,7 +691,8 @@
       "All gaps are additive and reusable: G-SIMSTEP and G-EMITTERS and G-FIELDS (VisualCoreSimulation), G-PQUALITY (VisualCoreDiagnostics), G-BLENDTRAIL (VisualCoreRendering); scene presets stay app content on NamedLibrary. None needs a second renderer, compute shaders, a fork, private API or networking.",
       "The simulation stays on the CPU (deterministic, bounded) and only drawing uses the GPU, because the OpenGL ES path offers no compute shaders (research R1); counts are capped and tiered (risk 3), additive blending gets a reduced-flash cap (risk 2), and instanced drawing is already proven by A01 (risk 1).",
       "Reference regression baseline recorded green 7/7 (T-A04-003) and the empty shell builds and passes its smoke test on both simulator runtimes (T-A04-005).",
-      "Phase 01 starts with G-SIMSTEP and G-EMITTERS in VisualCoreSimulation and the app's seeded scene model."
+      "Phase 01 starts with G-SIMSTEP and G-EMITTERS in VisualCoreSimulation and the app's seeded scene model.",
+      "A04-P01: a seeded, GPU-free particle domain — four emitter families with bounded counts on VisualCore's new emitter shapes and bursts (G-EMITTERS), a versioned validated ParticleScene, and VisualCore's FixedStepRunner (G-SIMSTEP) with a committed replay fixture that is bit-exact on host and both simulators; the sandbox shows a CPU preview with live and dropped counts, play/pause/step and new seed."
     ],
     "blockers": []
   }

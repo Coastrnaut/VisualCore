@@ -48,7 +48,7 @@ named tests are green.
 
 ## Phase 7: Polish & cross-cutting
 
-- [ ] T-A04-112 Update `docs/apps/particle-universe/visualcore-contract.json` (gate A04-P01; G-SIMSTEP and G-EMITTERS closed with the new public symbols as evidence and the tests; M01 and M06 rows updated) and re-render the `.md`; `check_app_contract.py --app particle-universe` passes (FR-A04-107).
+- [X] T-A04-112 Update `docs/apps/particle-universe/visualcore-contract.json` (gate A04-P01; G-SIMSTEP and G-EMITTERS closed with the new public symbols as evidence and the tests; M01 and M06 rows updated) and re-render the `.md`; `check_app_contract.py --app particle-universe` passes (FR-A04-107). — Verified 2026-11-11: docs/apps/particle-universe/visualcore-contract.json gate A04-P01: G-SIMSTEP and G-EMITTERS closed (A04-P01); M01 and M06 now available, with evidence FixedStepRunner, ControlStream, EmitterShape, EmitterBurst, Emitter and ParticleSystem and examples SceneSimulation and EmitterFamily; A04-P01 decision reason added; .md re-rendered. run-check A04-P01/t112-contract-2 PASS (10 rows, 34 citations, 5 gaps, decision go)
 - [ ] T-A04-113 Run the ProjectM reference regression in two chunks (3/3, 4/4), rebuild A01 and A02 for testing from clean derived data, run the VisualCore package tests on iOS 27.2 and 26.5, and record the rerun in `docs/apps/particle-universe/regression-baseline.md` (FR-A04-107).
 - [ ] T-A04-114 Run the release-check fast steps (docs, app-contracts, compliance, dependencies, public-api, licenses, script-tests, host-visualcore, documented-api-particle-universe, isolation-particle-universe) and the ParticleUniverseCore host tests.
 

@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_app_contract.py",
+    "--app",
+    "particle-universe",
+    "--render"
+  ],
+  "command": "python3 scripts/check_app_contract.py --app particle-universe --render",
+  "elapsed_seconds": 0.027,
+  "exit_code": 0,
+  "finished": "2026-11-11T17:24:04+00:00",
+  "log": ".autonomy/logs/A04-P01.t112-contract-2.log",
+  "log_sha256": "757c40ee34d6d8952b19b9479e39084c01b01baf3e8bbd7df86103dfe755df4f",
+  "name": "t112-contract-2",
+  "stage": "A04-P01",
+  "started": "2026-11-11T17:24:04+00:00",
+  "timed_out": false
+}
