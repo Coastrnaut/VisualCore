@@ -48,7 +48,7 @@ regression.
 
 ## Phase 3: US2 — Deterministic, versioned domain contract (P1)
 
-- [ ] T-A01-107 [US2] Implement `Apps/GenerativeArtStudio/Core/Sources/GenerativeArtStudioCore/{SceneFamily,FamilyCatalog,ArtDocument,SeedOffsets,ParticleReplay}.swift` per data-model.md:
+- [X] T-A01-107 [US2] Implement `Apps/GenerativeArtStudio/Core/Sources/GenerativeArtStudioCore/{SceneFamily,FamilyCatalog,ArtDocument,SeedOffsets,ParticleReplay}.swift` per data-model.md: — Verified 2026-11-10: GenerativeArtStudioCore: SceneFamilyID/SceneKind/SceneFamily, FamilyCatalog (4 families, schemas, 2 presets each, VisualCore palettes), ArtDocument v1 (validated(): newer/zero version, unknown family, non-finite → errors; resolve; palette fallback; previewTime 0…120; canonicalJSON sorted with string seed; hash; decode+migrate hook), SeedOffsets (SeededRandom), ParticleReplay (≤10,000, 1/60 steps to min(t,120)); swift build OK, exercised by run-check A01-P01/t108-core-tests; R1-R5 PASS
   - four families with schemas, default palettes and ≥ 1 preset each;
   - `ArtDocument` v1 with validation (unknown family or newer schema throws; non-finite throws; resolve through the schema; unknown palette falls back with a warning; previewTime clamped to 0…120), canonical JSON (sorted keys, seed as a string), `hash`, and a migrate hook;
   - `SeedOffsets` (first four `SeededRandom` outputs);
