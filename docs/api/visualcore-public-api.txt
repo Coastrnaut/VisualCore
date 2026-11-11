@@ -396,6 +396,7 @@ VisualCorePersistence | enum | public enum MigrationError: Error, Equatable, Sen
 VisualCorePersistence | enum | public enum PersistenceInfo
 VisualCorePersistence | enum | public enum StoreProblem: Error, Equatable, Sendable
 VisualCorePersistence | func | public func delete(id: String) throws(StoreProblem)
+VisualCorePersistence | func | public func entry(_ id: UUID) -> Entry?
 VisualCorePersistence | func | public func exists(id: String) -> Bool
 VisualCorePersistence | func | public func load() -> LoadReport<Value>
 VisualCorePersistence | func | public func load(id: String) throws(StoreProblem) -> StoredItem<Value>
@@ -403,8 +404,18 @@ VisualCorePersistence | func | public func makeFileURL(prefix: String, extension
 VisualCorePersistence | func | public func migrate(_ payload: [String: Any], from version: Int) throws -> [String: Any]
 VisualCorePersistence | func | public func removeAll() -> Int
 VisualCorePersistence | func | public func save(_ value: Value, id: String, now: Date = Date()) throws(StoreProblem)
+VisualCorePersistence | func | public mutating func delete(_ id: UUID) throws(StoreProblem)
+VisualCorePersistence | func | public mutating func duplicate(_ id: UUID, now: Date = Date()) throws(StoreProblem) -> Entry
+VisualCorePersistence | func | public mutating func reload()
+VisualCorePersistence | func | public mutating func rename(_ id: UUID, to name: String, now: Date = Date()) throws(StoreProblem)
+VisualCorePersistence | func | public mutating func save(_ payload: Payload, name: String, id: UUID? = nil, now: Date = Date()) throws(StoreProblem) -> Entry
+VisualCorePersistence | func | public mutating func setFavorite(_ id: UUID, _ favorite: Bool) throws(StoreProblem)
+VisualCorePersistence | func | public static func defaultDirectory(named name: String) -> URL
+VisualCorePersistence | func | public static func normalizedName(_ raw: String) -> String
 VisualCorePersistence | init | public init(currentVersion: Int, steps: [Int: Step] = [:])
+VisualCorePersistence | init | public init(directory: URL, kind: String, migrations: MigrationChain,
 VisualCorePersistence | init | public init(directory: URL, kind: String, migrations: MigrationChain, maxBytes: Int = 256 * 1024)
+VisualCorePersistence | init | public init(id: UUID, name: String, favorite: Bool, createdAt: Date, modifiedAt: Date, payload: Payload)
 VisualCorePersistence | init | public init(kind: String, schemaVersion: Int, savedAt: Date)
 VisualCorePersistence | init | public init(name: String, base: URL = FileManager.default.temporaryDirectory)
 VisualCorePersistence | let | public let currentVersion: Int
@@ -418,17 +429,30 @@ VisualCorePersistence | let | public let migrations: MigrationChain
 VisualCorePersistence | let | public let problems: [StoreProblem]
 VisualCorePersistence | let | public let savedAt: Date
 VisualCorePersistence | let | public let schemaVersion: Int
+VisualCorePersistence | let | public let store: DocumentStore<Entry>
 VisualCorePersistence | let | public let url: URL
+VisualCorePersistence | let | public let validate: @Sendable (Payload) -> Payload?
 VisualCorePersistence | let | public let value: Value
 VisualCorePersistence | let | public static let version
 VisualCorePersistence | struct | public struct DocumentEnvelope: Sendable, Equatable
 VisualCorePersistence | struct | public struct DocumentStore<Value: Codable & Sendable>: Sendable
+VisualCorePersistence | struct | public struct Entry: Codable, Equatable, Sendable, Identifiable
 VisualCorePersistence | struct | public struct LoadReport<Value: Sendable>: Sendable
 VisualCorePersistence | struct | public struct MigrationChain: Sendable
+VisualCorePersistence | struct | public struct NamedLibrary<Payload: Codable & Sendable & Equatable>: Sendable
 VisualCorePersistence | struct | public struct StoredItem<Value: Sendable>: Sendable
 VisualCorePersistence | struct | public struct TemporaryFolder: Sendable, Equatable
 VisualCorePersistence | typealias | public typealias Step = @Sendable ([String: Any]) throws -> [String: Any]
+VisualCorePersistence | var | public private(set) var entries: [Entry]
+VisualCorePersistence | var | public private(set) var problems: [StoreProblem]
+VisualCorePersistence | var | public static var maxNameLength: Int
+VisualCorePersistence | var | public var createdAt: Date
+VisualCorePersistence | var | public var favorite: Bool
 VisualCorePersistence | var | public var fileCount: Int
+VisualCorePersistence | var | public var id: UUID
+VisualCorePersistence | var | public var modifiedAt: Date
+VisualCorePersistence | var | public var name: String
+VisualCorePersistence | var | public var payload: Payload
 VisualCoreRendering | class | public final class ClearColorScene: RenderScene
 VisualCoreRendering | class | public final class FieldPass
 VisualCoreRendering | class | public final class FullScreenShaderScene: RenderScene
