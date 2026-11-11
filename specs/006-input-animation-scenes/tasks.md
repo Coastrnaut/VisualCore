@@ -1,0 +1,79 @@
+---
+
+description: "Task list for feature 006 — Phase 5 input, animation, scenes, particles (ledger gate F05)"
+---
+
+# Tasks: Phase 5 — Input, Animation, Scenes and Procedural Graphics
+
+**Input**: `/specs/006-input-animation-scenes/` · **Tests**: required by the archived prompt (coordinate mapping,
+animation timing, state transitions) and constitution IV; written first in each task. IDs `T-F5##`. One commit +
+push per task. Each subsystem is implemented separately (supplied prompt). Paths are repo-relative.
+
+## Phase 1: Setup
+
+- [ ] T-F501 Add test targets `VisualCoreMathTests`, `VisualCoreSimulationTests`, `VisualCoreScenesTests` to `Packages/VisualCore/Package.swift`; add `VisualCoreSimulation` and `VisualCoreScenes` dependencies to the `VisualCoreRendering` target in `Packages/VisualCoreRendering/Package.swift` and amend the `VisualCoreRendering` row of `specs/002-architecture-contracts/contracts/package-map.md` (owns primitive/particle/mesh drawing and the touch adapter)
+
+## Phase 2: Foundational — math (blocks every story)
+
+- [ ] T-F502 Tests + implementation of `Vec2/Vec3/Vec4`, `Mat3` (2D affine), `Mat4` (column-major), `Quat` (unit, slerp) in `Packages/VisualCore/Sources/VisualCoreMath/{Vectors,Matrix4,Quaternion}.swift`, tests `Packages/VisualCore/Tests/VisualCoreMathTests/LinearAlgebraTests.swift` (inverse·m = identity within 1e-12, quaternion rotation matches matrix)
+- [ ] T-F503 Tests + implementation of `Camera2D` (`zoom` clamped to "[0.1, 100]", `rotation` radians; matrix and inverse) in `VisualCoreMath/Camera2D.swift`, tests `VisualCoreMathTests/Camera2DTests.swift`
+
+## Phase 3: US1 — Map touches into the scene (P1) 🎯 MVP
+
+**Independent test**: host conversions through every space and back; gesture state sequences from scripted events.
+
+- [ ] T-F504 [US1] Tests first `Packages/VisualCore/Tests/VisualCoreScenesTests/CoordinateTests.swift` (AC1 390×844@3 → NDC 0,0 and pixel 585,1266; AC2 zoom 2 pan (10,0) → world (10,0); SC-F501 round trip ≤ 0.001 pt over scales 1/2/3 × aspects 9:19.5, 3:4, 1:1, 16:9 × camera transforms; zero size → nil), then `ViewMetrics` in `VisualCoreScenes/ViewMetrics.swift`
+- [ ] T-F505 [US1] Tests first `VisualCoreScenesTests/PointerTrackerTests.swift` (≤ 10 pointers, 11th ignored and counted, cancel removes), then `PointerTracker` + `PointerEvent` in `VisualCoreScenes/PointerTracker.swift`
+- [ ] T-F506 [US1] Tests first `VisualCoreScenesTests/GestureTests.swift` covering every transition of tap, double-tap, long-press, drag, pinch, rotate incl. cancel and fail (SC-F503), thresholds tap "≤ 10 pt and ≤ 0.3 s", double-tap "within 0.3 s and 30 pt", long-press "≥ 0.5 s within 10 pt", drag "after 10 pt", AC3 pinch 100→200 pt = 2.0, AC4 cancelled touch → cancelled, second finger cancels drag and fails pending tap; then `VisualCoreScenes/GestureRecognizers.swift`
+
+## Phase 4: US2 — Deterministic animation and update timing (P1)
+
+**Independent test**: host frame-time sequences, golden RNG, timeline sampling.
+
+- [ ] T-F507 [US2] Tests first `Packages/VisualCore/Tests/VisualCoreSimulationTests/FixedStepClockTests.swift` (AC1 120 steps from 60 × 1/60 s, alpha ∈ [0,1); AC2 2 s stall → 8 steps, dropped time counted; NaN/negative/inf delta → 0), then `VisualCoreSimulation/FixedStepClock.swift`
+- [ ] T-F508 [US2] Tests first `VisualCoreSimulationTests/SeededRandomTests.swift` (golden first 8 outputs for seed 42 from the xoshiro256**/SplitMix64 reference, double ∈ [0,1), range bounds, normal mean/variance ±5% over 100k), then `VisualCoreSimulation/SeededRandom.swift`
+- [ ] T-F509 [US2] Tests first `VisualCoreMathTests/EasingTests.swift` (every curve × mode: f(0)=0, f(1)=1, inOut(0.5)=0.5 for symmetric curves), then `VisualCoreMath/Easing.swift`
+- [ ] T-F510 [US2] Tests first `VisualCoreSimulationTests/TimelineTests.swift` (AC4 samples 0/0.5/1, pause, resume, reverse (rate −1), seek, repeat count and forever, autoreverse, completion events fired once, zero duration jumps to end, `reduceMotion` jumps to end and disables repeats), then `VisualCoreSimulation/{Tween,Timeline}.swift`
+
+## Phase 5: US3 — Particles and 2D scene primitives (P2)
+
+**Independent test**: host emission/pool/transform/hit tests; simulator pixel tests for drawing.
+
+- [ ] T-F511 [US3] Tests first `VisualCoreScenesTests/SceneGraphTests.swift` (AC3 parent 90° + child (1,0) → (0,1); z-order and visibility; hit test topmost; polygon clamped to "≤ 256 points"), then `VisualCoreScenes/SceneGraph.swift` (`SceneNode`, `Primitive`)
+- [ ] T-F512 [US3] Tests first `VisualCoreSimulationTests/ParticleSystemTests.swift` (AC1 100/s × 1 s life → 99–101 alive after 2 s; AC2 capacity 10,000 never exceeded, dropped counted; capacity clamped to "≤ 100,000"; gravity/drag/attractor; NaN particle removed and counted; SC-F502 10,000-step checksum identical twice and at 60 vs 120 Hz feeding), then `VisualCoreSimulation/ParticleSystem.swift`
+- [ ] T-F513 [US3] Sim test first `Packages/VisualCoreRendering/Tests/VisualCoreRenderingTests/PrimitiveRendererTests.swift` (AC4 red circle r=8 center red, 12 px away background; rect and line pixels; camera zoom doubles size; recreation rebuilds; teardown leaks 0), then `VisualCoreRendering/PrimitiveRenderer.swift` (batched triangles, circle "≤ 128 segments")
+- [ ] T-F514 [US3] Sim test first `VisualCoreRenderingTests/ParticleRendererTests.swift` (instances drawn at expected pixels with color; 10,000 instances draw without error; recreation and teardown), then `VisualCoreRendering/ParticleRenderer.swift` (instanced quads)
+
+## Phase 6: US4 — Minimal 3D camera and meshes (P3)
+
+- [ ] T-F515 [US4] Tests first `VisualCoreMathTests/OrbitCameraTests.swift` (AC1 origin → NDC (0,0), center ray hits origin; pitch clamped ±89°; zoom keeps distance > 0), then `VisualCoreMath/OrbitCamera.swift`
+- [ ] T-F516 [US4] Tests first `VisualCoreScenesTests/MeshTests.swift` (AC2 sphere 16×8 counts, unit normals; cube 24 vertices/36 indices; plane; segments "3–256", rings "2–256", subdivisions "≤ 256" clamped), then `VisualCoreScenes/MeshGenerators.swift`
+- [ ] T-F517 [US4] Sim test first `VisualCoreRenderingTests/MeshRendererTests.swift` (lit sphere: center brighter than limb, background outside; recreation/teardown), then `VisualCoreRendering/MeshRenderer.swift` (Lambert)
+
+## Phase 7: US5 — Standalone interactive demo (P2)
+
+- [ ] T-F518 [US5] Sim test first `VisualCoreRenderingTests/TouchAdapterTests.swift` (synthesized began/moved/ended/cancelled → `PointerEvent`s in points with ids and timestamps), then `VisualCoreRendering/RenderView+Touches.swift` (`pointerHandler`)
+- [ ] T-F519 [US5] Demo harness `Harnesses/InteractiveDemo/{InteractiveDemo.yml,Sources/*.swift}`: drag spawns particles, pinch zooms `Camera2D`, timeline animates shapes, Reduce Motion (system or `-uitestReduceMotion`) disables inertia and jumps tweens, diagnostics `demo.diagnostics` label `particles=<n> zoom=<z> state=<running|paused>`, VoiceOver labels, Dynamic Type; unsigned simulator build
+- [ ] T-F520 [US5] UI test `Harnesses/InteractiveDemo/UITests/InteractiveDemoUITests.swift` (AC1 drag → particles > 0; AC2 pinch → zoom > 1; AC3 background/foreground → no burst beyond step cap) on iOS 27.2 and 26.5; `nm` of the built demo shows zero ProjectM symbols (SC-F505)
+
+## Phase 8: Polish & Cross-Cutting
+
+- [ ] T-F521 Document the interaction modules in `Packages/VisualCore/README.md` and `Packages/VisualCoreRendering/README.md` (coordinate spaces, gesture thresholds, determinism scope, bounds)
+- [ ] T-F522 Full verification: host tests, sim 27.2 + 26.5, generic iOS, demo build/UI test, dependencies R1–R5, compliance, scripts, docs, reference regression
+- [ ] T-F523 {device} Per-device particle/primitive/mesh draw cost and demo frame pacing on D1/D2/D3 — **deferred to campaign II** (constitution V); automation mode added with the AutomationRunner (F09)
+
+## Dependencies
+
+Setup → T-F502/T-F503 (math) → US1 (T-F504→T-F505→T-F506) and US2 (T-F507…T-F510) can proceed independently →
+US3 (T-F511, T-F512 need math/RNG; T-F513 needs T-F511; T-F514 needs T-F512) → US4 (T-F515→T-F516→T-F517) →
+US5 (T-F518 → T-F519 needs all subsystems → T-F520) → Polish.
+
+## Parallel Opportunities
+
+Pure subsystems in different files could run in parallel ([P]-eligible: T-F504, T-F507, T-F508, T-F509), but the
+owner's one-commit-per-task cadence and one-writer rule mean they are executed sequentially here.
+
+## Implementation Strategy
+
+MVP = math + US1 coordinates/gestures. Then timing (US2), primitives/particles (US3), 3D (US4), demo (US5). Each
+subsystem lands with its tests and its own commit and push.
