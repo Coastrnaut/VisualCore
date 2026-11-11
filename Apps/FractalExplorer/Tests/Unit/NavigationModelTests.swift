@@ -148,3 +148,39 @@ final class BookmarkPrecisionTests: XCTestCase {
         XCTAssertTrue(BookmarksView.label(entry).hasSuffix("At precision limit"), BookmarksView.label(entry))
     }
 }
+
+// Feature 028 T-A03-309 (FR-A03-305; US4 AC1–AC3).
+@MainActor
+final class GoToModelTests: XCTestCase {
+    private func model() -> ExplorerModel {
+        let m = ExplorerModel(size: Vec2(300, 400),
+                              bookmarksDirectory: FileManager.default.temporaryDirectory.appendingPathComponent("fe-goto-\(UUID().uuidString)"))
+        m.close()
+        m.mantissaBitsOverride = 23
+        m.pixelsPerPointOverride = 3
+        return m
+    }
+
+    func testGoToCentersAndZooms() {
+        let m = model()
+        XCTAssertNil(m.goTo(real: "-0.743643887", imaginary: "0.131825904", zoom: "1000", locale: Locale(identifier: "en_US")))
+        XCTAssertEqual(m.state.viewport.center, Vec2(-0.743643887, 0.131825904))
+        XCTAssertEqual(m.state.spokenDescription, "Mandelbrot set, centered at −0.743644 + 0.131826i, zoom 1000×")
+    }
+
+    func testInvalidInputChangesNothing() {
+        let m = model()
+        let before = m.state
+        XCTAssertEqual(m.goTo(real: "x", imaginary: "0", zoom: "1")?.message, "Enter a number")
+        XCTAssertEqual(m.goTo(real: "0", imaginary: "9", zoom: "1")?.field, .imaginary)
+        XCTAssertEqual(m.goTo(real: "0", imaginary: "0", zoom: "-1")?.field, .zoom)
+        XCTAssertEqual(m.state, before)
+    }
+
+    func testZoomBeyondTheLimitIsClamped() {
+        let m = model()
+        XCTAssertNil(m.goTo(real: "-0.75", imaginary: "0.1", zoom: "1e15", locale: Locale(identifier: "en_US")))
+        XCTAssertEqual(m.notice, .reached)
+        XCTAssertEqual(m.state.viewport.center, Vec2(-0.75, 0.1))
+    }
+}

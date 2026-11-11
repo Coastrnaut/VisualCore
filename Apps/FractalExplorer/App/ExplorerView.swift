@@ -177,6 +177,20 @@ final class ExplorerModel {
             : "Shown at this device's precision limit (\(bits) bits)"
     }
 
+    /// Go to coordinates (feature 028 T-A03-309; FR-A03-305; clarification 1): centers the typed point at the typed
+    /// magnification (span = default width ÷ zoom) through `apply`, so the precision clamp applies. Invalid input
+    /// changes nothing and returns the problem.
+    @discardableResult
+    func goTo(real: String, imaginary: String, zoom: String, locale: Locale = .current) -> GoToError? {
+        switch GoToInput.parse(real: real, imaginary: imaginary, zoom: zoom, locale: locale) {
+        case .success(let target):
+            apply(target.framing(for: state.mode).viewport(size: state.viewport.size))
+            return nil
+        case .failure(let error):
+            return error
+        }
+    }
+
     /// Renames a bookmark.
     func renameBookmark(_ id: UUID, to name: String) { perform { try $0.rename(id, to: name) } }
     /// Marks or unmarks a favorite.
@@ -326,6 +340,7 @@ final class ExplorerModel {
 struct ExplorerView: View {
     @State private var model = ExplorerModel()
     @State private var showingBookmarks = false
+    @State private var showingGoTo = false
 
     var body: some View {
         ScrollView {
@@ -394,8 +409,13 @@ struct ExplorerView: View {
                 Button { showingBookmarks = true } label: { Label("Bookmarks", systemImage: "bookmark") }
                     .accessibilityIdentifier("fe.bookmarks")
             }
+            ToolbarItem(placement: .primaryAction) {
+                Button { showingGoTo = true } label: { Label("Go to coordinates", systemImage: "location.magnifyingglass") }
+                    .accessibilityIdentifier("fe.goto")
+            }
         }
         .sheet(isPresented: $showingBookmarks) { BookmarksView(model: model) }
+        .sheet(isPresented: $showingGoTo) { GoToView(model: model) }
         .navigationTitle("Explorer")
         .navigationBarTitleDisplayMode(.inline)
         .tint(AccessibleColors.accent)
