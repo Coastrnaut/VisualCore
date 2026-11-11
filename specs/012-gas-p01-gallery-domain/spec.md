@@ -13,6 +13,32 @@
 goes into VisualCore modules (gap register `docs/apps/generative-art-studio/visualcore-contract.json`). The app keeps
 only product composition, content and one-off rules. Evidence is host and simulator only.
 
+## Clarifications
+
+### Session 2026-11-10
+
+Answered autonomously under the owner's standing approval (CLAUDE.md §2); the recommended option was chosen in each case.
+
+- Q: Where does the app-specific domain code live? → A: In a SwiftPM package `Apps/GenerativeArtStudio/Core`
+  (`GenerativeArtStudioCore`). It is host-testable with `swift test` and depends only on the pure VisualCore modules
+  (`VisualCoreParameters`, `VisualCoreSimulation`, `VisualCoreMath`). The iOS app target holds the UI and the
+  scene adapters.
+- Q: How does a 64-bit seed reach shaders, which only have 32-bit floats? → A: The seed feeds
+  `SeededRandom` (SplitMix64) on the CPU. That generator derives four uniform offsets in [0, 1) (`u_seed` as a
+  vec4) and any per-instance values. Shaders never see the raw 64-bit value. Equal seeds give equal offsets, and
+  seeds 0 and 2^64−1 are valid.
+- Q: How do parameter values reach shaders? → A: Every resolved parameter `name` binds to a float uniform
+  `u_<name>` by the VisualCore full-screen scene. `u_time` (explicit preview or animation time), `u_resolution` and
+  `u_seed` are always bound. A palette binds `u_palette[8]` (vec3, linear light) and `u_paletteCount`. Unknown
+  uniforms are ignored, and missing uniforms are reported once as warnings.
+- Q: How is the particles family made deterministic at an arbitrary time? → A: The particle system is seeded from
+  the document seed and simulated from t = 0 in fixed 1/60 s steps up to the requested time. Time is capped at
+  120 s (7,200 steps), so a preview never does unbounded work, and the same seed and time always give the same
+  particles.
+- Q: What do gallery entries show before rendered thumbnails exist (Phase 04)? → A: An SF Symbol per family plus a
+  swatch of the default palette, with title, description and preset count. The live render appears only on the
+  scene screen, so the gallery never creates a render host per row.
+
 ## User Scenarios & Testing *(mandatory)*
 
 Users: casual makers and visual artists (manual §2 audiences), and the developers of the other 24 apps who reuse the
@@ -95,7 +121,8 @@ ProjectM regression still passes.
   yet; the hook is tested).
 - A scene shader fails to compile: the scene shows a readable error with file and line, and the gallery stays usable.
 - Context loss while a scene is showing: the scene rebuilds from the document (CPU state) with no leaked resources.
-- Seed 0 and the maximum seed (2^64−1) are valid and deterministic.
+- Seed 0 and the maximum seed (2^64−1) are valid and deterministic (seeds reach shaders only as derived offsets).
+- A particles preview time above 120 s is clamped to 120 s, which bounds the deterministic replay work.
 - Reduce Motion is on: scenes still render, at a slower animation rate (full reduced-motion behavior arrives in
   Phase 05).
 
@@ -128,7 +155,7 @@ ProjectM regression still passes.
 - **FR-A01-105**: A stable parameter hash MUST be computed from family, seed, palette and resolved parameter values. It
   is equal for equal compositions and differs when any of them changes. It is used later to cache thumbnails.
 - **FR-A01-106**: Rendering a composition MUST depend only on the document and an explicit time (no wall clock and no
-  unseeded randomness). Two renders of the same document and time match within the GPU tolerance.
+  unseeded randomness). Particles replay from t = 0 in fixed 1/60 s steps, capped at 120 s. Two renders of the same document and time match within the GPU tolerance.
 - **FR-A01-107**: The four families MUST be pairwise visually distinct at the same seed and time: mean absolute
   channel difference ≥ 20/255 between every pair at a fixed size.
 - **FR-A01-108**: These reusable pieces MUST live in VisualCore modules (Principle II):
