@@ -19,8 +19,9 @@ private func spawnPositions(_ emitter: Emitter, count: Int, seed: UInt64 = 7) ->
 }
 
 @Test func pointSpawnsExactlyAtThePosition() {
-    let p = spawnPositions(Emitter(position: Vec2(12, -3)), count: 1_000)
-    #expect(p.count == 1_000)
+    // SC-A04-101: 10,000 spawns per shape.
+    let p = spawnPositions(Emitter(position: Vec2(12, -3)), count: 10_000)
+    #expect(p.count == 10_000)
     #expect(p.allSatisfy { $0 == Vec2(12, -3) })
 }
 

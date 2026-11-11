@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/VisualCore",
+    "--filter",
+    "EmitterShapeTests"
+  ],
+  "command": "swift test --package-path Packages/VisualCore --filter EmitterShapeTests",
+  "elapsed_seconds": 3.041,
+  "exit_code": 0,
+  "finished": "2026-11-11T17:28:33+00:00",
+  "log": ".autonomy/logs/A04-P01.t116-point-spawns.log",
+  "log_sha256": "80d313236167c87324c60852c49ba9f74a34f998003fd55e35722daac7d15365",
+  "name": "t116-point-spawns",
+  "stage": "A04-P01",
+  "started": "2026-11-11T17:28:30+00:00",
+  "timed_out": false
+}
