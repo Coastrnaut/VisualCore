@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_reference_clean.py"
+  ],
+  "command": "python3 scripts/check_reference_clean.py",
+  "elapsed_seconds": 5.408,
+  "exit_code": 0,
+  "finished": "2026-11-11T01:51:25+00:00",
+  "log": ".autonomy/logs/F07.t707-ref-clean.log",
+  "log_sha256": "78a0349432de9f3df5432b3acfc593f8688e21a4b667287a570eeb85a180a3e1",
+  "name": "t707-ref-clean",
+  "stage": "F07",
+  "started": "2026-11-11T01:51:19+00:00",
+  "timed_out": false
+}
