@@ -76,7 +76,7 @@ The owner can submit the app without inventing anything.
 
 1. **Given** the app, **Then** it has an icon made from its own render (no third-party art), version 1.0.0 (1), and an
    Acknowledgements screen reachable from the home screen listing every bundled third-party component with its full
-   license text.
+   license text, and it declares that it uses no non-exempt encryption (export compliance; checklist CHK002).
 2. **Given** the release folder, **Then** it contains the release manifest, privacy and credits, store listing,
    build and archive instructions, and the release checklist, and the release check passes.
 
@@ -168,7 +168,9 @@ and store copy promise only what exists.
 
 ## Assumptions
 
-- The owner signs, archives and submits; build instructions describe the steps and mark them owner-only.
+- The owner signs, archives and submits; build instructions describe the steps and mark them owner-only. Store items
+  only the owner can provide — privacy policy URL, support URL, the EULA choice, age rating answers and the upload of
+  screenshots — are listed in the store listing as `BLOCKED_OWNER_ACTION` (checklist CHK003).
 - The device campaign (after the implementation lock) supplies all device evidence named in the checklist.
 - The bundle ID `dev.visualcore.FractalExplorer` is the approved placeholder identity.
 
