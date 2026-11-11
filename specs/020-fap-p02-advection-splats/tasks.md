@@ -66,7 +66,8 @@ contains additions only.
   - the CPU `apply(to:dye:precision:velocityEncoding:)` Gaussian `exp(−d²/r²)`, with d in cells (aspect-correct) and
     r = radius × min(W, H).
 
-  `SplatTests` (FR-A02-203, FR-A02-205).
+  `SplatTests` (FR-A02-203, FR-A02-205), including a corner splat at (0, 0) that stays finite and changes only
+  in-grid cells (spec edge case; analyze C2).
 - [ ] T-A02-208 [US1] Tests first, then add `SplatQueue.swift` (Core):
   - `add(samples, viewSize:)`: y flipped and normalized; force = velocity × cells-per-point × forceScale; color by
     pointer order modulo 6;
@@ -79,7 +80,8 @@ contains additions only.
   `uPoint`/`uRadius`/`uValue`/`uEncoded`/`uRange`/`uVelocity`; encoded 8-bit velocity is decoded, added and clamped).
   Add `FluidFieldsScene.enqueue(_:)` and drain-then-apply in `render`. Add
   `Apps/FluidArtPlayground/Tests/Unit/SplatFixtureTests.swift`: one splat on 8×8 and 16×16, both storages, GPU vs
-  `Splat.apply` within one storage step (US1 AC4).
+  `Splat.apply` within one storage step (US1 AC4). Also test that splats enqueued before `recreateContext` are applied
+  after the rebuild (spec edge case; analyze C3).
 
 ## Phase 4: User Story 2 — Dye and motion are carried by the flow (P1)
 
@@ -107,7 +109,10 @@ contains additions only.
   - the canvas label reports the splashes added.
 
   Update `PlaygroundUITests`: tap splash → the label contains "1 splash added"; a drag keeps the app responsive.
-  Rerun the accessibility audit on the playground screen (SC-A02-205).
+  Add a unit test that feeds `PointerEvent`s through the model's pointer handler and asserts queued, then applied,
+  splats (FR-A02-208; analyze C1). Create `Apps/FluidArtPlayground/Tests/UI/AccessibilityAuditUITests.swift` (A01
+  pattern) auditing home and playground at the default size and at XXXL. Document the exclusions (canvas artwork
+  contrast) in the spec Clarifications (SC-A02-205; analyze U1).
 
 ## Phase 6: Polish
 
@@ -119,6 +124,17 @@ contains additions only.
   Render it and run `check_app_contract --render`.
 - [ ] T-A02-215 Run the release fast steps, the documented-API and isolation checks and the host domain tests through
   `release_check.py --only …` (SC-A02-206), and add any new lessons to `docs/testing/simulator-test-lessons.md`.
+
+## Analyze remediation (2026-11-11)
+
+Applied under the owner's delegated approval (CLAUDE.md §2):
+- C1: a pointer-to-splat unit test was added to T-A02-213.
+- C2: a corner splat test was added to T-A02-207.
+- C3: a pending-splats-survive-context-loss test was added to T-A02-209.
+- U1: the A02 accessibility audit UI test was added to T-A02-213.
+- I1: Core's VisualCoreScenes dependency is justified (a pure module, needed for the tracker `Sample`).
+
+No CRITICAL findings; coverage is 100%.
 
 ## Dependencies
 
