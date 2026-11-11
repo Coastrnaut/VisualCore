@@ -78,8 +78,9 @@ and the iOS 27.2 and 26.5 simulators truncate, so compare against both half mode
 unorm8 is clamped to 0…1 and stored as n/255. Its `tolerance` is one storage step (1e-6, 1e-3, 1.5/255), so a GPU pass
 can be compared with a CPU reference of the same precision. `FieldGrid.sampleBilinear(cellX:cellY:)` interpolates exactly, with cell centers at `i + 0.5` and the edge clamped,
 using `a + (b − a)·t` in x and then y. It is the CPU twin of the `vc/field.glsl` shader include, so semi-Lagrangian
-advection references match the GPU. `SignedRangeEncoding` stores −range…range in 0…1, with
-zero at 0.5, for RGBA8 fallbacks. `TimeStepPolicy` gives one bounded step per frame (1/240…1/30 s; invalid deltas
+advection references match the GPU. `SignedRangeEncoding` stores −range…range in 0…1 for RGBA8 fallbacks.
+Use `SignedRangeEncoding.unorm8(range:)`, which puts zero at the exactly storable 128/255. With a 0.5 center, a field
+at rest would decode to a small non-zero value and drift. `TimeStepPolicy` gives one bounded step per frame (1/240…1/30 s; invalid deltas
 use the minimum), so a resume after a pause takes neither a huge step nor a catch-up loop.
 
 **Animation**: `ease(_:_:_:)` (linear, quad, cubic, sine, expo, back, elastic, bounce × in/out/inOut; f(0)=0,

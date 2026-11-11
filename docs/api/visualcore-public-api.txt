@@ -799,6 +799,7 @@ VisualCoreSimulation | func | public mutating func step(_ dt: Double)
 VisualCoreSimulation | func | public mutating func toggle()
 VisualCoreSimulation | func | public static func keys(prefix: String) -> (reduceMotion: String, reduceFlashing: String)
 VisualCoreSimulation | func | public static func load(from defaults: UserDefaults, keyPrefix prefix: String) -> AccessibilityPreferences
+VisualCoreSimulation | func | public static func unorm8(range: Float) -> SignedRangeEncoding?
 VisualCoreSimulation | init | public init()
 VisualCoreSimulation | init | public init(capacity: Int = ParticleSystem.defaultCapacity, seed: UInt64 = 0)
 VisualCoreSimulation | init | public init(duration: Double = 120, speed: Double = 1, isPlaying: Bool = true)
@@ -814,9 +815,10 @@ VisualCoreSimulation | init | public init(seed: UInt64)
 VisualCoreSimulation | init | public init(step: Double = 1.0 / 120, maxSteps: Int = 8)
 VisualCoreSimulation | init | public init(storedValue: String?)
 VisualCoreSimulation | init | public init(width: Int, height: Int, channels: Int, fill: Float = 0)
-VisualCoreSimulation | init | public init?(range: Float)
+VisualCoreSimulation | init | public init?(range: Float, center: Float = 0.5)
 VisualCoreSimulation | init | public init?(width: Int, height: Int, channels: Int, values: [Float])
 VisualCoreSimulation | let | public let capacity: Int
+VisualCoreSimulation | let | public let center: Float
 VisualCoreSimulation | let | public let channels: Int
 VisualCoreSimulation | let | public let duration: Double
 VisualCoreSimulation | let | public let height: Int

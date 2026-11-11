@@ -76,7 +76,7 @@ contains additions only.
 
   `SplatQueueTests` cover spacing (SC-A02-201), per-pointer direction (US1 AC2), the cap including the newest
   (US1 AC3), splash determinism, and cancel (FR-A02-204).
-- [ ] T-A02-209 [US1] Add a splat fragment to `FluidShaders.swift` (`#include "vc/field.glsl"`; uniforms
+- [X] T-A02-209 [US1] Add a splat fragment to `FluidShaders.swift` (`#include "vc/field.glsl"`; uniforms — Verified 2026-11-11: Splat fragment (texelFetch base, Gaussian in cells from gl_FragCoord, encoded velocity decode/add/clamp with uCenter, dye RGB add with alpha kept) and FluidFieldsScene.enqueue / applySplats before the step (pendingSplats survive context loss; appliedSplats, lastDrained); velocity stored in cells/s with RGBA8 range velocityRange x 60 (clarification 1). Found and fixed: zero velocity was not storable in unorm8 with a 0.5 center (decoded about 1.9 cells/s), so VisualCore SignedRangeEncoding gained center: and unorm8(range:) (zero at 128/255; SignedRangeEncodingTests +1; README; API baseline updated, the old init replaced by a source-compatible defaulted parameter) and the shaders take uCenter. SplatFixtureTests 3: one splat on 8x8 and 16x16 in both storages equals the CPU reference (max diff 0.0; half matched float16TowardZero), pending splats survive recreateContext (analyze C3), RGBA8 zero velocity exact after 10 steps. run-check A02-P02/t209-visualcore-host pass; t209-app-27 TEST SUCCEEDED, enumeration guard 16/16 (US1 AC4)
   `uPoint`/`uRadius`/`uValue`/`uEncoded`/`uRange`/`uVelocity`; encoded 8-bit velocity is decoded, added and clamped).
   Add `FluidFieldsScene.enqueue(_:)` and drain-then-apply in `render`. Add
   `Apps/FluidArtPlayground/Tests/Unit/SplatFixtureTests.swift`: one splat on 8×8 and 16×16, both storages, GPU vs

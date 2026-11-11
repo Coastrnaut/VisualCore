@@ -49,7 +49,13 @@ final class FluidFieldsScene: RenderScene {
     private(set) var lastError: FieldPassError?
     private(set) var velocity: PingPongTarget?
     private(set) var dye: PingPongTarget?
+    /// Splats applied since creation, and in the last frame (feature 020).
+    private(set) var appliedSplats = 0
+    private(set) var lastDrained = 0
+    /// Splats waiting for the next stepped frame (CPU state; survives a context loss).
+    private(set) var pendingSplats: [Splat] = []
     private var dissipate: FieldPass?
+    private var splat: FieldPass?
     private var display: FieldPass?
     private var policy = TimeStepPolicy()
 
@@ -67,8 +73,12 @@ final class FluidFieldsScene: RenderScene {
         storage.map { $0 == .rgba16f ? .float16 : .unorm8 }
     }
 
-    private var encoding: SignedRangeEncoding? {
-        storage == .rgba8 ? SignedRangeEncoding(range: Float(configuration.velocityRange)) : nil
+    /// Velocity is stored in cells per second; RGBA8 storage encodes ±`velocityRange × 60` (spec 020 clarification 1).
+    var velocityRangeCellsPerSecond: Float { Float(configuration.velocityRange * 60) }
+
+    /// The encoding of stored velocity in RGBA8 storage (nil for half-float).
+    var encoding: SignedRangeEncoding? {
+        storage == .rgba8 ? SignedRangeEncoding.unorm8(range: velocityRangeCellsPerSecond) : nil
     }
 
     func setup(_ context: RenderContext) throws {
@@ -88,6 +98,7 @@ final class FluidFieldsScene: RenderScene {
             let dye = try PingPongTarget(registry: r, width: w, height: h, format: format, label: "fap.dye")
             self.dye = dye
             dissipate = try FieldPass(registry: r, fragment: FluidShaders.dissipate, inputs: ["uField"], label: "fap.dissipate")
+            splat = try FieldPass(registry: r, fragment: FluidShaders.splat, inputs: ["uField"], label: "fap.splat")
             display = try FieldPass(registry: r, fragment: FluidShaders.display, inputs: ["uDye"], label: "fap.display")
             guard uploadSeed(velocity.read, initialVelocity().values) else { throw FluidSceneError.seedUploadFailed("velocity") }
             guard uploadSeed(dye.read, initialDye().values) else { throw FluidSceneError.seedUploadFailed("dye") }
@@ -116,21 +127,48 @@ final class FluidFieldsScene: RenderScene {
 
     func resize(_ context: RenderContext) {}
 
+    /// Queues splats for the next stepped frame (already capped by the app's SplatQueue).
+    func enqueue(_ splats: [Splat]) { pendingSplats += splats }
+
+    private func applySplats(velocity: PingPongTarget, dye: PingPongTarget, splat: FieldPass) throws(FieldPassError) {
+        let batch = pendingSplats
+        pendingSplats.removeAll()
+        lastDrained = batch.count
+        let w = configuration.gridWidth, h = configuration.gridHeight
+        for s in batch {
+            let point = FieldUniform.vec2(s.center(width: w, height: h))
+            let radius = FieldUniform.float(s.radiusCells(width: w, height: h))
+            try splat.run(pair: velocity, input: "uField", uniforms: [
+                "uPoint": point, "uRadius": radius, "uValue": .vec4(SIMD4(s.force.x, s.force.y, 0, 0)),
+                "uEncoded": .int(storage == .rgba8 ? 1 : 0), "uRange": .float(velocityRangeCellsPerSecond),
+                "uCenter": .float(encoding?.center ?? 0.5), "uVelocity": .int(1),
+            ])
+            try splat.run(pair: dye, input: "uField", uniforms: [
+                "uPoint": point, "uRadius": radius, "uValue": .vec4(s.color),
+                "uEncoded": .int(0), "uRange": .float(1), "uCenter": .float(0.5), "uVelocity": .int(0),
+            ])
+            appliedSplats += 1
+        }
+    }
+
     func render(_ context: RenderContext, frame: FrameInfo) throws {
-        guard let velocity, let dye, let dissipate, let display else { return }
+        guard let velocity, let dye, let dissipate, let splat, let display else { return }
         do {
             if !paused {
                 let dt = policy.clamp(fixedDelta ?? frame.delta)
                 lastStep = dt
+                try applySplats(velocity: velocity, dye: dye, splat: splat)
                 try dissipate.run(pair: velocity, input: "uField", uniforms: [
                     "uFactor": .float(Dissipation.factor(d: configuration.velocityDissipation, dt: dt)),
                     "uEncoded": .int(storage == .rgba8 ? 1 : 0),
-                    "uRange": .float(Float(configuration.velocityRange)),
+                    "uRange": .float(velocityRangeCellsPerSecond),
+                    "uCenter": .float(encoding?.center ?? 0.5),
                 ])
                 try dissipate.run(pair: dye, input: "uField", uniforms: [
                     "uFactor": .float(Dissipation.factor(d: configuration.dyeDissipation, dt: dt)),
                     "uEncoded": .int(0),
                     "uRange": .float(1),
+                    "uCenter": .float(0.5),
                 ])
                 stepCount += 1
             }
@@ -148,10 +186,12 @@ final class FluidFieldsScene: RenderScene {
         velocity?.release()
         dye?.release()
         dissipate?.release()
+        splat?.release()
         display?.release()
         velocity = nil
         dye = nil
         dissipate = nil
+        splat = nil
         display = nil
     }
 
