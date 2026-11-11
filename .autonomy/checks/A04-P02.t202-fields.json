@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/VisualCore",
+    "--filter",
+    "ParticleForceFieldTests|ParticleSystemTests"
+  ],
+  "command": "swift test --package-path Packages/VisualCore --filter 'ParticleForceFieldTests|ParticleSystemTests'",
+  "elapsed_seconds": 21.212,
+  "exit_code": 1,
+  "finished": "2026-11-11T23:21:02+00:00",
+  "log": ".autonomy/logs/A04-P02.t202-fields.log",
+  "log_sha256": "6ec0275696f195f08d2fddf5562485562de17dc5880b8872dc478a63d86043b2",
+  "name": "t202-fields",
+  "stage": "A04-P02",
+  "started": "2026-11-11T23:20:41+00:00",
+  "timed_out": false
+}

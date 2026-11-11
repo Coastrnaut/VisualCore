@@ -24,9 +24,12 @@ No public exhaustive `switch` over `ParticleForce` exists outside `ParticleSyste
 
 ## R1. Clamping without changing existing results
 
-- **Decision:** `clamped()` range-clamps the four new cases to the clarified limits. For the existing cases it only
-  maps non-finite numbers to 0 and a negative drag to 0; finite gravity, non-negative drag and any finite attractor
-  pass through bit-for-bit. `step` clamps the force list **once per step** (`forces.map { $0.clamped() }`), then runs
+- **Decision:** `clamped()` range-clamps the four new cases to the clarified limits. For the existing cases it maps
+  non-finite numbers to 0 and applies wide "legacy" ranges (gravity components and attractor strength ±1e6, drag
+  0…1e6, attractor radius 0…1e12, centers ±1e12) that no existing scene approaches (A01: gravity ±400, drag ≤ 2), so
+  their values pass through bit-for-bit. Implementation note (T-A04-202): the first version passed every finite
+  value through and failed FR-A04-202 for values near 1e300 (an infinite bound), hence the legacy ranges. Wind is
+  scaled through its largest component (no overflow) to just under 2,000 so clamping is idempotent. `step` clamps the force list **once per step** (`forces.map { $0.clamped() }`), then runs
   the unchanged per-particle arithmetic for the old cases.
 - **Rationale:** A01, `VisualCoreBaselines`, the harnesses and `replay-v1.json` use only valid old-case values, so their
   checksums cannot change. Every case still has a finite bound (gravity |g|, drag k·|v|, attractor |s|).

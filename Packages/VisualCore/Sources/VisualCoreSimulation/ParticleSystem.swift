@@ -2,6 +2,8 @@
 // (feature 006 T-F512; FR-F507, FR-F511, FR-F512; research R6). Structure of arrays, swap-remove,
 // semi-implicit Euler; advance it with fixed steps (FixedStepClock) for frame-rate independence.
 // Feature 033 (A04-P01, G-EMITTERS): emitter shapes, burst emission and clamped emitters (EmitterShape.swift).
+// Feature 034 (A04-P02, G-FIELDS): repulsor, gravity well, wind and vortex forces, clamped once per step
+// (ParticleForceFields.swift).
 import Foundation
 import VisualCoreMath
 
@@ -54,6 +56,18 @@ public enum ParticleForce: Sendable, Equatable {
     case drag(Double)
     /// Pulls toward `point` with `strength` (units/s²), only within `radius`.
     case attractor(point: Vec2, strength: Double, radius: Double)
+    /// Pushes away from `point` with `strength · (1 − distance/radius)` (units/s²) inside `radius`; 0 at the center
+    /// (feature 034, G-FIELDS). A negative strength pulls.
+    case repulsor(point: Vec2, strength: Double, radius: Double)
+    /// Softened point gravity toward `point`: a = strength · d / (|d|² + softening²)^{3/2}. An artistic field, not
+    /// a physical N-body force; finite everywhere and 0 at the center (feature 034, G-FIELDS).
+    case gravityWell(point: Vec2, strength: Double, softening: Double)
+    /// Pulls each particle's velocity toward `velocity` at `rate` per second: a = rate · (velocity − v)
+    /// (feature 034, G-FIELDS).
+    case wind(velocity: Vec2, rate: Double)
+    /// Turns particles around `point`: a tangential push of `strength · (1 − distance/radius)` (units/s²) inside
+    /// `radius`, counter-clockwise for a positive strength; 0 at the center (feature 034, G-FIELDS).
+    case vortex(point: Vec2, strength: Double, radius: Double)
 }
 
 /// What a renderer needs per particle.
@@ -121,17 +135,21 @@ public struct ParticleSystem: Sendable {
             age[i] += dt
             if age[i] >= life[i] { remove(i) } else { i += 1 }
         }
-        // 2. Forces, integration, NaN guard.
+        // 2. Forces (clamped once per step, feature 034 research R1), integration, NaN guard.
+        let active = forces.map { $0.clamped() }
         i = 0
         while i < aliveCount {
             var ax = 0.0, ay = 0.0
-            for f in forces {
+            for f in active {
                 switch f {
                 case .gravity(let g): ax += g.x; ay += g.y
                 case .drag(let k): ax -= k * vx[i]; ay -= k * vy[i]
                 case .attractor(let p, let s, let r):
                     let dx = p.x - px[i], dy = p.y - py[i], d = (dx * dx + dy * dy).squareRoot()
                     if d > 1e-9 && d <= r { ax += s * dx / d; ay += s * dy / d }
+                case .repulsor, .gravityWell, .wind, .vortex:
+                    let a = f.acceleration(at: Vec2(px[i], py[i]), velocity: Vec2(vx[i], vy[i]))
+                    ax += a.x; ay += a.y
                 }
             }
             vx[i] += ax * dt; vy[i] += ay * dt
@@ -144,14 +162,14 @@ public struct ParticleSystem: Sendable {
         // 3. Emit from clamped emitters (FR-A04-102): continuous rate, then periodic bursts, then requested bursts.
         if accumulators.count != emitters.count { accumulators = Array(accumulators.prefix(emitters.count)) + Array(repeating: 0, count: max(0, emitters.count - accumulators.count)) }
         if burstClocks.count != emitters.count { burstClocks = Array(burstClocks.prefix(emitters.count)) + Array(repeating: -1, count: max(0, emitters.count - burstClocks.count)) }
-        let active = emitters.map { $0.clamped() }
-        for (e, emitter) in active.enumerated() where emitter.isEmitting && emitter.rate > 0 {
+        let sources = emitters.map { $0.clamped() }
+        for (e, emitter) in sources.enumerated() where emitter.isEmitting && emitter.rate > 0 {
             accumulators[e] += emitter.rate * dt
             let n = Int((accumulators[e] + 1e-9).rounded(.down))
             accumulators[e] = max(0, accumulators[e] - Double(n))
-            for _ in 0..<n { spawn(from: e, active[e]) }
+            for _ in 0..<n { spawn(from: e, sources[e]) }
         }
-        for (e, emitter) in active.enumerated() {
+        for (e, emitter) in sources.enumerated() {
             guard emitter.isEmitting, let b = emitter.burst else { continue }
             if burstClocks[e] < 0 {
                 burstClocks[e] = 0
@@ -163,7 +181,7 @@ public struct ParticleSystem: Sendable {
             }
             for _ in 0..<b.count { spawn(from: e, emitter) }
         }
-        for b in pendingBursts where emitters.indices.contains(b.emitter) { for _ in 0..<b.count { spawn(from: b.emitter, active[b.emitter]) } }
+        for b in pendingBursts where emitters.indices.contains(b.emitter) { for _ in 0..<b.count { spawn(from: b.emitter, sources[b.emitter]) } }
         pendingBursts.removeAll()
     }
 

@@ -6,17 +6,17 @@
 
 | Case | Parameters | Clamp (`clamped()`) | `bound(speed:)` |
 |---|---|---|---|
-| `gravity(Vec2)` (existing) | acceleration | non-finite → 0 | `|g|` |
-| `drag(Double)` (existing) | k | non-finite or < 0 → 0 | `k · speed` |
-| `attractor(point:strength:radius:)` (existing) | point, s, r | non-finite → 0 | `|s|` |
+| `gravity(Vec2)` (existing) | acceleration | non-finite → 0; components ±1e6 | `|g|` |
+| `drag(Double)` (existing) | k | non-finite → 0; 0…1e6 | `k · speed` |
+| `attractor(point:strength:radius:)` (existing) | point, s, r | non-finite → 0; s ±1e6; r 0…1e12 | `|s|` |
 | `repulsor(point:strength:radius:)` | point, s, r | s ±10,000; r 1…2,000 | `|s|` |
 | `gravityWell(point:strength:softening:)` | point, s, ε | s 0…1e9; ε 1…500 | `2s/(3√3·ε²)` |
 | `wind(velocity:rate:)` | w, rate | |w| ≤ 2,000 (scaled down); rate 0…10 | `rate · (|w| + speed)` |
 | `vortex(point:strength:radius:)` | point, s, r | s ±10,000; r 1…2,000 | `|s|` |
 
-Non-finite point components become 0 in every case. Public constants: `ParticleForce.strengthLimit = 10_000`,
+Non-finite point components become 0 and centers are clamped to ±1e12 in every case. Public constants: `ParticleForce.strengthLimit = 10_000`,
 `gravityWellStrengthLimit = 1e9`, `radiusRange = 1...2_000`, `softeningRange = 1...500`, `rateRange = 0...10`,
-`maxWindSpeed = 2_000`. `acceleration(at:velocity:) -> Vec2` evaluates one (already clamped) force — used by tests and
+`maxWindSpeed = 2_000`, `legacyLimit = 1e6`, `maxCoordinate = 1e12`. `acceleration(at:velocity:) -> Vec2` evaluates one (already clamped) force — used by tests and
 by the new cases in `step`.
 
 ### ParticleSystem.liveLimit (VisualCoreSimulation)
