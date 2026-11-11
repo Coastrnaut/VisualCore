@@ -1,0 +1,200 @@
+{
+  "checks": [
+    {
+      "attestation": ".autonomy/checks/A03-P06.t601-app-ios26-2.json",
+      "command": "xcodebuild test -project VisualCore.xcodeproj -scheme FractalExplorer -destination 'platform=iOS Simulator,id=EC7498FF-31FF-4491-9666-B0D32785203C' -derivedDataPath Build/DerivedData/FractalExplorer -resultBundlePath .autonomy/xcresults/a03p06-t601-ios26-2.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 300 CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A03-P06.t601-app-ios26-2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A03-P06.t601-app-ios27-2.json",
+      "command": "xcodebuild test -project VisualCore.xcodeproj -scheme FractalExplorer -destination 'platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D' -derivedDataPath Build/DerivedData/FractalExplorer -resultBundlePath .autonomy/xcresults/a03p06-t601-ios27-2.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 300 CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A03-P06.t601-app-ios27-2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A03-P06.t601-enum-ios26-2.json",
+      "command": "python3 scripts/check_test_enumeration.py --sources Apps/FractalExplorer/Tests --log .autonomy/logs/A03-P06.t601-app-ios26-2.log",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A03-P06.t601-enum-ios26-2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A03-P06.t601-enum-ios27-2.json",
+      "command": "python3 scripts/check_test_enumeration.py --sources Apps/FractalExplorer/Tests --log .autonomy/logs/A03-P06.t601-app-ios27-2.log",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A03-P06.t601-enum-ios27-2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A03-P06.t601-privacy-scan.json",
+      "command": "python3 scripts/check_privacy_manifest.py --app Build/DerivedData/release-FractalExplorer-Release/Build/Products/Release-iphoneos/FractalExplorer.app",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A03-P06.t601-privacy-scan.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A03-P06.t601-release-build-2.json",
+      "command": "xcodebuild build -project VisualCore.xcodeproj -scheme FractalExplorer -configuration Release -destination generic/platform=iOS -derivedDataPath Build/DerivedData/release-FractalExplorer-Release CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A03-P06.t601-release-build-2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A03-P06.t601-release-build.json",
+      "command": "xcodebuild build -project VisualCore.xcodeproj -scheme FractalExplorer -configuration Release -destination generic/platform=iOS -derivedDataPath Build/DerivedData/release-FractalExplorer-Release CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A03-P06.t601-release-build.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A03-P06.t602-isolation.json",
+      "command": "python3 scripts/check_app_isolation.py --app Apps/FractalExplorer --built-app Build/DerivedData/release-FractalExplorer-Release/Build/Products/Release-iphoneos/FractalExplorer.app --allow-usage NSPhotoLibraryAddUsageDescription",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A03-P06.t602-isolation.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A03-P06.t603-app-ios26.json",
+      "command": "xcodebuild test -project VisualCore.xcodeproj -scheme FractalExplorer -destination 'platform=iOS Simulator,id=EC7498FF-31FF-4491-9666-B0D32785203C' -derivedDataPath Build/DerivedData/FractalExplorer -resultBundlePath .autonomy/xcresults/a03p06-t603-ios26.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 300 CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A03-P06.t603-app-ios26.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A03-P06.t603-app-ios27.json",
+      "command": "xcodebuild test -project VisualCore.xcodeproj -scheme FractalExplorer -destination 'platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D' -derivedDataPath Build/DerivedData/FractalExplorer -resultBundlePath .autonomy/xcresults/a03p06-t603-ios27.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 300 CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A03-P06.t603-app-ios27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A03-P06.t603-enum-ios26.json",
+      "command": "python3 scripts/check_test_enumeration.py --sources Apps/FractalExplorer/Tests --log .autonomy/logs/A03-P06.t603-app-ios26.log",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A03-P06.t603-enum-ios26.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A03-P06.t603-enum-ios27.json",
+      "command": "python3 scripts/check_test_enumeration.py --sources Apps/FractalExplorer/Tests --log .autonomy/logs/A03-P06.t603-app-ios27.log",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A03-P06.t603-enum-ios27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A03-P06.t603-write-icon.json",
+      "command": "xcodebuild test -project VisualCore.xcodeproj -scheme FractalExplorer -destination 'platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D' -derivedDataPath Build/DerivedData/FractalExplorer -resultBundlePath .autonomy/xcresults/a03p06-t603-write.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 300 CODE_SIGNING_ALLOWED=NO -only-testing:FractalExplorerTests/IconRenderTests",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A03-P06.t603-write-icon.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A03-P06.t604-app-ios26.json",
+      "command": "xcodebuild test -project VisualCore.xcodeproj -scheme FractalExplorer -destination 'platform=iOS Simulator,id=EC7498FF-31FF-4491-9666-B0D32785203C' -derivedDataPath Build/DerivedData/FractalExplorer -resultBundlePath .autonomy/xcresults/a03p06-t604-ios26.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 300 CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A03-P06.t604-app-ios26.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A03-P06.t604-app-ios27.json",
+      "command": "xcodebuild test -project VisualCore.xcodeproj -scheme FractalExplorer -destination 'platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D' -derivedDataPath Build/DerivedData/FractalExplorer -resultBundlePath .autonomy/xcresults/a03p06-t604-ios27.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 300 CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A03-P06.t604-app-ios27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A03-P06.t604-enum-ios26.json",
+      "command": "python3 scripts/check_test_enumeration.py --sources Apps/FractalExplorer/Tests --log .autonomy/logs/A03-P06.t604-app-ios26.log",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A03-P06.t604-enum-ios26.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A03-P06.t604-enum-ios27.json",
+      "command": "python3 scripts/check_test_enumeration.py --sources Apps/FractalExplorer/Tests --log .autonomy/logs/A03-P06.t604-app-ios27.log",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A03-P06.t604-enum-ios27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A03-P06.t605-app-ios26.json",
+      "command": "xcodebuild test -project VisualCore.xcodeproj -scheme FractalExplorer -destination 'platform=iOS Simulator,id=EC7498FF-31FF-4491-9666-B0D32785203C' -derivedDataPath Build/DerivedData/FractalExplorer -resultBundlePath .autonomy/xcresults/a03p06-t605-ios26.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 300 CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A03-P06.t605-app-ios26.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A03-P06.t605-app-ios27.json",
+      "command": "xcodebuild test -project VisualCore.xcodeproj -scheme FractalExplorer -destination 'platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D' -derivedDataPath Build/DerivedData/FractalExplorer -resultBundlePath .autonomy/xcresults/a03p06-t605-ios27.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 300 CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A03-P06.t605-app-ios27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A03-P06.t605-enum-ios26.json",
+      "command": "python3 scripts/check_test_enumeration.py --sources Apps/FractalExplorer/Tests --log .autonomy/logs/A03-P06.t605-app-ios26.log",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A03-P06.t605-enum-ios26.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A03-P06.t605-enum-ios27.json",
+      "command": "python3 scripts/check_test_enumeration.py --sources Apps/FractalExplorer/Tests --log .autonomy/logs/A03-P06.t605-app-ios27.log",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A03-P06.t605-enum-ios27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A03-P06.t605-write-fixture.json",
+      "command": "xcodebuild test -project VisualCore.xcodeproj -scheme FractalExplorer -destination 'platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D' -derivedDataPath Build/DerivedData/FractalExplorer -resultBundlePath .autonomy/xcresults/a03p06-t605-write.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 300 CODE_SIGNING_ALLOWED=NO -only-testing:FractalExplorerTests/MigrationTests/testWriteFixtureOnceWhenRequested",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A03-P06.t605-write-fixture.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A03-P06.t606-app-ios26.json",
+      "command": "xcodebuild test -project VisualCore.xcodeproj -scheme FractalExplorer -destination 'platform=iOS Simulator,id=EC7498FF-31FF-4491-9666-B0D32785203C' -derivedDataPath Build/DerivedData/FractalExplorer -resultBundlePath .autonomy/xcresults/a03p06-t606-ios26.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 300 CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A03-P06.t606-app-ios26.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A03-P06.t606-app-ios27.json",
+      "command": "xcodebuild test -project VisualCore.xcodeproj -scheme FractalExplorer -destination 'platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D' -derivedDataPath Build/DerivedData/FractalExplorer -resultBundlePath .autonomy/xcresults/a03p06-t606-ios27.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 300 CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A03-P06.t606-app-ios27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A03-P06.t606-app-release.json",
+      "command": "python3 scripts/release_check.py --only app-release-fractal-explorer --log-dir .autonomy/logs/a03p06-t606-release --json .autonomy/logs/a03p06-t606-release.json",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A03-P06.t606-app-release.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A03-P06.t606-enum-ios26.json",
+      "command": "python3 scripts/check_test_enumeration.py --sources Apps/FractalExplorer/Tests --log .autonomy/logs/A03-P06.t606-app-ios26.log",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A03-P06.t606-enum-ios26.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A03-P06.t606-enum-ios27.json",
+      "command": "python3 scripts/check_test_enumeration.py --sources Apps/FractalExplorer/Tests --log .autonomy/logs/A03-P06.t606-app-ios27.log",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A03-P06.t606-enum-ios27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A03-P06.t607-app-all-ios26.json",
+      "command": "xcodebuild test -project VisualCore.xcodeproj -scheme FractalExplorer -destination 'platform=iOS Simulator,id=EC7498FF-31FF-4491-9666-B0D32785203C' -derivedDataPath Build/DerivedData/FractalExplorer -resultBundlePath .autonomy/xcresults/a03p06-t607-ios26.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 300 CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A03-P06.t607-app-all-ios26.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A03-P06.t607-app-all-ios27.json",
+      "command": "xcodebuild test -project VisualCore.xcodeproj -scheme FractalExplorer -destination 'platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D' -derivedDataPath Build/DerivedData/FractalExplorer -resultBundlePath .autonomy/xcresults/a03p06-t607-ios27.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 300 CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A03-P06.t607-app-all-ios27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A03-P06.t607-fast-checks.json",
+      "command": "python3 scripts/release_check.py --only docs app-contracts compliance dependencies public-api licenses script-tests host-visualcore documented-api-fractal-explorer isolation-fractal-explorer host-fractal-explorer-core --log-dir .autonomy/logs/a03p06-t607-fast --json .autonomy/logs/a03p06-t607-fast.json",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A03-P06.t607-fast-checks.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A03-P06.t607-guard-ios26.json",
+      "command": "python3 scripts/check_test_enumeration.py --sources Apps/FractalExplorer/Tests --log .autonomy/logs/A03-P06.t607-app-all-ios26.log",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A03-P06.t607-guard-ios26.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A03-P06.t607-guard-ios27.json",
+      "command": "python3 scripts/check_test_enumeration.py --sources Apps/FractalExplorer/Tests --log .autonomy/logs/A03-P06.t607-app-all-ios27.log",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A03-P06.t607-guard-ios27.log"
+    }
+  ],
+  "generated": "2026-11-11T16:48:08+00:00",
+  "method": "deterministic-run-check",
+  "stage": "A03-P06",
+  "status": "pass"
+}
