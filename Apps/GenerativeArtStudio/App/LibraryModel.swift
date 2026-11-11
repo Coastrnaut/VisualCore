@@ -20,7 +20,9 @@ final class LibraryModel {
     static var directory: URL {
         #if DEBUG
         if let override = UserDefaults.standard.string(forKey: "gasLibraryDir"), !override.isEmpty {
-            return URL(fileURLWithPath: override, isDirectory: true)
+            // Relative names resolve inside the app's temporary folder (UI tests; survives relaunches of the same install).
+            return override.hasPrefix("/") ? URL(fileURLWithPath: override, isDirectory: true)
+                : FileManager.default.temporaryDirectory.appendingPathComponent(override, isDirectory: true)
         }
         #endif
         return CompositionLibrary.defaultDirectory()

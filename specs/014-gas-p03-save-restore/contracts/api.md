@@ -20,9 +20,15 @@ public struct DocumentStore<Value: Codable & Sendable>: Sendable {
 }
 ```
 
-App UI identifiers:
-- `gas.library.open` (gallery toolbar), `gas.library`, `gas.library.row.<uuid>`, `gas.library.problems`,
+App UI identifiers (as shipped):
+- `gas.library.open` (gallery toolbar), `gas.library`, rows `gas.library.row.<uuid>`, `gas.library.problems`,
   `gas.library.empty`;
-- row actions: `gas.library.favorite`, `gas.library.duplicate`, `gas.library.rename`, `gas.library.delete`, and the
-  confirmation `gas.library.confirmDelete`;
-- scene: `gas.save` (toolbar), the name field `gas.save.name`, and `gas.save.confirm`.
+- per-row star `gas.library.favorite.<uuid>` and actions menu `gas.library.more.<uuid>`;
+- menu items `gas.library.duplicate`, `gas.library.rename` and `gas.library.delete`;
+- the rename alert `gas.library.renameField`/`gas.library.renameConfirm`;
+- the delete alert `gas.library.confirmDelete`/`gas.library.cancelDelete`. An alert was used instead of a
+  confirmation dialog because it presents the same way, with an explicit Cancel, on every iOS 26/27 device.
+- Scene: `gas.save` (toolbar; label "Save", or "Save changes" when editing a saved entry), the name alert
+  `gas.save.name`/`gas.save.confirm`, and the failure alert `gas.save.error`.
+
+SwiftUI alert text fields and buttons are found through `app.alerts`, since identifiers are not always exposed there.

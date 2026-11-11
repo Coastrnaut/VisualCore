@@ -34,11 +34,11 @@ struct LibraryView: View {
                 .accessibilityIdentifier("gas.library.renameConfirm")
             Button("Cancel", role: .cancel) { renaming = nil }
         }
-        .confirmationDialog("Delete “\(deleting?.name ?? "")”?", isPresented: Binding(get: { deleting != nil }, set: { if !$0 { deleting = nil } }),
-                            titleVisibility: .visible) {
+        .alert("Delete “\(deleting?.name ?? "")”?", isPresented: Binding(get: { deleting != nil }, set: { if !$0 { deleting = nil } })) {
             Button("Delete", role: .destructive) { if let e = deleting { model.delete(e.id) }; deleting = nil }
                 .accessibilityIdentifier("gas.library.confirmDelete")
             Button("Cancel", role: .cancel) { deleting = nil }
+                .accessibilityIdentifier("gas.library.cancelDelete")
         } message: { Text("This can’t be undone.") }
     }
 
