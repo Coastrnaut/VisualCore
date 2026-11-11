@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/VisualCore"
+  ],
+  "command": "swift test --package-path Packages/VisualCore",
+  "elapsed_seconds": 6.978,
+  "exit_code": 0,
+  "finished": "2026-11-11T00:46:20+00:00",
+  "log": ".autonomy/logs/F05.t512-particles.log",
+  "log_sha256": "ff123aa73d61767641baf293447b94e03e1c3ea2cf05062935f7dac3157e72e8",
+  "name": "t512-particles",
+  "stage": "F05",
+  "started": "2026-11-11T00:46:13+00:00",
+  "timed_out": false
+}
