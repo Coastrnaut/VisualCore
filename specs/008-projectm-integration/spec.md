@@ -15,6 +15,18 @@ allows reference modules) drives the **unmodified** ProjectM engine through Visu
 boundaries 2a and 2 are completed here; the reference pin is `d93edd1` (ADR-0005); device measurements are
 deferred to campaign II (constitution V).
 
+## Clarifications
+
+### Session 2026-11-10
+
+Answered autonomously under the owner's standing approval (CLAUDE.md §2), best option chosen.
+
+- Q: How is the "reference path" rendered for the baseline comparison, given the reference renderer's frame and readback methods are internal? → A: In-process A/B in lockstep: two unmodified `ProjectMEngine` instances on the same ANGLE path receive the same preset, PCM and frame sequence; path A reproduces the reference renderer's sequence (`renderFrameToFramebuffer` into an offscreen framebuffer owned by the harness, as `ANGLERenderer.renderFrame` does into its surface), path B renders through the VisualCore `RenderHost` scene. Frames are compared pairwise. The reference's own `testRendersTheUpstreamTestPreset` (ANGLERendering, passing at `d93edd1`) is the Phase 0 baseline sanity check.
+- Q: Where does the adapter live and what may it link? → A: `Harnesses/ProjectMReference` with its own `ProjectMReference.yml`, linking local packages `Packages/VisualCoreRendering` (VisualCoreRendering, VisualCoreEffects) and the reference `External/projectm-ios/Packages/ProjectMBridge` (read-only); no AudioCore, PresetLibrary, CaptureKit or StoreKit. Rule R1 and the Showcase audit keep everything else ProjectM-free.
+- Q: How is GL state handed between the engine and VisualCore? → A: A small app-neutral helper in VisualCoreRendering resets the GL state VisualCore relies on (vertex array, program, buffers, blend/depth/cull/scissor/stencil off, color mask, active texture unit, unpack alignment, framebuffer and viewport) after any foreign renderer draws; it belongs in VisualCore because any third-party GL engine sharing a context needs it.
+- Q: What audio drives the engine in tests? → A: A deterministic synthesized stereo signal (sine sweep plus beat pulses) generated in the harness and fed in chunks no larger than the engine's per-call maximum; real audio capture stays in the reference and no audio-source compatibility is claimed.
+- Q: What are the migration batches and their before/after evidence? → A: Batch 2a (GL state handoff + VisualCore effects over the engine) and batch 2 (engine on the VisualCore host). Before = reference regression and ANGLERendering preset render at `d93edd1` (ADR-0005 evidence) plus the path-A frames; after = harness tests, the A/B comparison and the reference regression rerun. Each batch gets its own migration-log row.
+
 ## User Scenarios & Testing *(mandatory)*
 
 Users: the VisualCore maintainers and the owner, who need proof that the shared framework can host the existing
@@ -91,7 +103,7 @@ ProjectM-specific and why.
 - Engine creation fails (no context or engine error): the harness shows the error and keeps the host alive.
 - Missing preset file or texture search path: reported; previous preset continues.
 - Zero-size view before layout: no engine call with a zero viewport.
-- Audio buffer larger than the engine's per-call maximum: split into allowed chunks.
+- Audio buffer larger than the engine's per-call maximum: split into allowed chunks (tests use a deterministic synthesized signal; no capture).
 - Reduce Flashing on: the limiter bounds the engine output's mean-luminance change.
 
 ## Requirements *(mandatory)*
@@ -101,9 +113,9 @@ ProjectM-specific and why.
 - **FR-F701**: A `Harnesses/ProjectMReference` app with its own project specification MUST host the unmodified ProjectM engine (through the reference `ProjectMBridge`) in a VisualCore render scene on the existing ANGLE path; it is the only target allowed to link reference modules (rule R1).
 - **FR-F702**: The engine MUST be created with the VisualCore host's GL entry-point loader, sized from the host's drawable, rendered into the host's framebuffer each frame, and released on teardown with its context current (migration-log boundary 2).
 - **FR-F703**: On context recreation the engine MUST be recreated on the new context and its current preset reloaded; on resize/rotation its viewport MUST follow.
-- **FR-F704**: VisualCore resources, programs and effect graphs MUST coexist with the engine in one context: GL state the engine leaves behind must not break VisualCore drawing, and vice versa (migration-log boundary 2a). Any reusable state-handoff helper belongs in VisualCore and must be app-neutral.
-- **FR-F705**: A baseline comparison MUST render the same preset/audio/frames through the reference renderer path and the VisualCore path and report image difference against a documented tolerance.
-- **FR-F706**: Each migration batch MUST record before/after evidence (reference path vs VisualCore path, reference regression results) in `docs/architecture/migration-log.md`.
+- **FR-F704**: VisualCore resources, programs and effect graphs MUST coexist with the engine in one context: GL state the engine leaves behind must not break VisualCore drawing, and vice versa (migration-log boundary 2a). The state-handoff helper (reset of vertex array, program, buffers, blend/depth/cull/scissor/stencil, color mask, active texture, unpack alignment, framebuffer and viewport) lives in VisualCoreRendering and is app-neutral.
+- **FR-F705**: A baseline comparison MUST render the same preset/audio/frames in lockstep through the reference renderer's sequence (path A: engine into an offscreen framebuffer) and the VisualCore host (path B) and report the pairwise image difference against the SC-F702 tolerance.
+- **FR-F706**: Each migration batch (2a: GL state handoff + effects over the engine; 2: engine on the VisualCore host) MUST record before evidence (reference regression and preset render at the pin, path-A frames) and after evidence (harness tests, A/B comparison, reference regression rerun) in `docs/architecture/migration-log.md`.
 - **FR-F707**: Lifecycle regression tests MUST cover repeated suspend/resume, resize/rotation, context recreation and destruction with zero leaked VisualCore resources.
 - **FR-F708**: ProjectM engine, MilkDrop/preset handling (preset library, warm-up, purchases) and app behavior MUST stay in the submodule; the harness adds no preset library, StoreKit or audio-capture code and claims no audio-source compatibility.
 - **FR-F709**: The reference MUST remain unmodified (clean check before/after), its ANGLE and engine pins unchanged, and the full reference regression MUST pass at the current pin.
