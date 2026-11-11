@@ -45,7 +45,7 @@
 
 ## StoragePrecision (VisualCoreSimulation)
 
-- `.float32`, `.float16`, `.unorm8`.
+- `.float32`, `.float16`, `.float16TowardZero` (truncating half writes, found in T-A02-111), `.unorm8`.
 - `round(_ x: Float) -> Float`.
 - `step: Float`, the comparison tolerance: 1e-3 for float16 at values ≤ 1, 1.5/255 for unorm8, 1e-6 for float32.
 
@@ -81,7 +81,7 @@
 - **FieldPass.Output**: `.target(RenderTarget)`, `.framebuffer(name: UInt32, width: Int, height: Int)`.
 - **FieldUniform**: `.float(Float)`, `.vec2(SIMD2<Float>)`, `.vec4(SIMD4<Float>)`, `.int(Int32)`.
 - **FieldPassError**: `inputIsOutput(String)`, `missingInput(String)`, `unknownInput(String)`,
-  `unknownUniform(String)`, `stale`, `compile(String)`.
+  `unknownUniform(String)`, `uniformTypeMismatch(String)`, `stale`, `compile(String)`.
 - **RenderTarget additions**: `upload(rgbaFloats: [Float]) -> Bool`, `readFloatPixels() -> [Float]`.
 
 ## Relationships
