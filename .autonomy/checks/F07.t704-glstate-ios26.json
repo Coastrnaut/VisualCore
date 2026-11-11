@@ -1,0 +1,26 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/VisualCoreRendering",
+    "--scheme",
+    "VisualCoreRendering-Package",
+    "--destination",
+    "sim-26.5",
+    "--action",
+    "test",
+    "--result-name",
+    "F07-t704-ios26"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-26.5 --action test --result-name F07-t704-ios26",
+  "elapsed_seconds": 13.064,
+  "exit_code": 0,
+  "finished": "2026-11-11T01:47:18+00:00",
+  "log": ".autonomy/logs/F07.t704-glstate-ios26.log",
+  "log_sha256": "956260bbf4af00324d6cc4d287b0f198a90191746d28dbe5cdde8f6aa8f6c77e",
+  "name": "t704-glstate-ios26",
+  "stage": "F07",
+  "started": "2026-11-11T01:47:05+00:00",
+  "timed_out": false
+}
