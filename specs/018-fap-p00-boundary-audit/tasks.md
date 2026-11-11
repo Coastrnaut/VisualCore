@@ -43,7 +43,7 @@ commit and push per task (`scripts/tick_task.py`). Review checkpoint: after each
   - `project.yml` targets `FluidArtPlayground` (bundle `dev.visualcore.FluidArtPlayground`, iOS 26.0, version
     0.1.0, the dependency-audit post-build script for the new target, no VisualCore product yet, no usage
     descriptions) and `FluidArtPlaygroundUITests`, plus the scheme.
-- [ ] T-A02-005 [US3] Add `Apps/FluidArtPlayground/Tests/UI/LaunchSmokeUITests.swift` (launch, title exists, label
+- [X] T-A02-005 [US3] Add `Apps/FluidArtPlayground/Tests/UI/LaunchSmokeUITests.swift` (launch, title exists, label — Verified 2026-11-11: Apps/FluidArtPlayground/Tests/UI/LaunchSmokeUITests.swift (launch, fap.home.title exists, label 'Fluid Art Playground'). run-check A02-P00/t005-smoke-ios27 and t005-smoke-ios26 TEST SUCCEEDED, each confirmed by the enumeration guard (t005-smoke-*-guard PASS 1/1); the builds ran the dependency audit (no ProjectM dependency) (SC-A02-003, FR-A02-006)
   "Fluid Art Playground"). Run it on iOS 27.2 and 26.5, enumeration-guarded (SC-A02-003, FR-A02-006).
 
 ## Phase 5: US4 — Gap register and stop/go decision (P2)

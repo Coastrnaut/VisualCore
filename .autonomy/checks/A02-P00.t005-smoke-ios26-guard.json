@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_test_enumeration.py",
+    "--sources",
+    "Apps/FluidArtPlayground/Tests/UI",
+    "--log",
+    ".autonomy/logs/A02-P00.t005-smoke-ios26.log"
+  ],
+  "command": "python3 scripts/check_test_enumeration.py --sources Apps/FluidArtPlayground/Tests/UI --log .autonomy/logs/A02-P00.t005-smoke-ios26.log",
+  "elapsed_seconds": 0.022,
+  "exit_code": 0,
+  "finished": "2026-11-11T07:37:36+00:00",
+  "log": ".autonomy/logs/A02-P00.t005-smoke-ios26-guard.log",
+  "log_sha256": "9a62ba677f69d57f50e89ded8a688a6d99c9cb3f6f7a6d75c6903886fb2be985",
+  "name": "t005-smoke-ios26-guard",
+  "stage": "A02-P00",
+  "started": "2026-11-11T07:37:36+00:00",
+  "timed_out": false
+}
