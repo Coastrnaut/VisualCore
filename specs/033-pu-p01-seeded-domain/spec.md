@@ -43,8 +43,7 @@ Facts checked in code:
   `.line(halfLength:angle:)`, `.ring(radius:)`, default `.point`) and `burst: EmitterBurst?` (`count`, `interval`
   seconds, default nil). A point draws no extra random number; a line draws one (position along the segment); a ring
   draws one (angle on the circle). A burst emits `count` particles at step times 0, interval, 2·interval, … through
-  its own accumulator. Shape positions are offsets from `position`.
-- Q: What are the clamp ranges? → A: `Emitter.clamped()` maps non-finite values to the default and clamps: rate
+  its own accumulator. Shape positions are offsets from `position`. Clamp ranges: `Emitter.clamped()` maps non-finite values to the default and clamps: rate
   0…20,000 per second; burst count 1…5,000; burst interval 1/60…60 s; lifetime 0.01…60 s; speed 0…10,000; sizes
   0…512; half length and radius 0…10,000; spread 0…2π. Every value A01 and the baselines use lies inside these ranges,
   so their results stay unchanged. The system applies `clamped()` when it reads an emitter.
