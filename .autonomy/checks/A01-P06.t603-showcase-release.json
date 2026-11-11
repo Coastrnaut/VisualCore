@@ -1,0 +1,24 @@
+{
+  "argv": [
+    "python3",
+    "scripts/release_check.py",
+    "--log-dir",
+    ".autonomy/logs/a01p06-t603-showcase-rel",
+    "--json",
+    ".autonomy/logs/a01p06-t603-showcase-rel/summary.json",
+    "--only",
+    "showcase-release-build",
+    "release-symbols",
+    "projectm-independence"
+  ],
+  "command": "python3 scripts/release_check.py --log-dir .autonomy/logs/a01p06-t603-showcase-rel --json .autonomy/logs/a01p06-t603-showcase-rel/summary.json --only showcase-release-build release-symbols projectm-independence",
+  "elapsed_seconds": 12.823,
+  "exit_code": 0,
+  "finished": "2026-11-11T06:56:35+00:00",
+  "log": ".autonomy/logs/A01-P06.t603-showcase-release.log",
+  "log_sha256": "96df152f36b2923597dd4d840c82f445563af23ec3b7ef2474b5cbea7d449a7c",
+  "name": "t603-showcase-release",
+  "stage": "A01-P06",
+  "started": "2026-11-11T06:56:22+00:00",
+  "timed_out": false
+}

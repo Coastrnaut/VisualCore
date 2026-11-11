@@ -13,67 +13,20 @@ enum ShowcaseAutomation {
     static let mode = AutomationRunner.requestedMode()
 }
 
-/// Full-screen gradient scene that runs the requested mode once it is laid out in a window.
+/// Full-screen gradient scene that runs the requested mode once it is laid out in a window (VisualCoreAutomation's
+/// shared `AutomationView`, feature 017 T-A01-603).
 struct AutomationRootView: View {
     let mode: String
     let settings: ShowcaseSettings
     var body: some View {
-        AutomationCanvas(mode: mode, settings: settings)
+        AutomationView(mode: mode, bundleID: Bundle.main.bundleIdentifier ?? "dev.visualcore.Showcase",
+                       makeScene: { GradientTextureScene(settings: settings) },
+                       configure: { scene, scale in
+                           if scale > 0 { (scene as? GradientTextureScene)?.scale = Double(scale) }
+                       })
             .ignoresSafeArea()
             .accessibilityLabel("Automation run: \(mode)")
             .accessibilityIdentifier("showcase.automation")
-    }
-}
-
-private struct AutomationCanvas: UIViewRepresentable {
-    let mode: String
-    let settings: ShowcaseSettings
-
-    final class Coordinator {
-        var host: RenderHost?
-        var scene: GradientTextureScene?
-        var runner: AutomationRunner?
-        var started = false
-    }
-
-    func makeCoordinator() -> Coordinator { Coordinator() }
-
-    func makeUIView(context: Context) -> UIView {
-        let container = UIView()
-        container.backgroundColor = .black
-        let scene = GradientTextureScene(settings: settings)
-        do {
-            let host = try RenderHost(scene: scene)
-            host.view.frame = container.bounds
-            host.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-            container.addSubview(host.view)
-            context.coordinator.host = host
-            context.coordinator.scene = scene
-            context.coordinator.runner = AutomationRunner(host: host, bundleID: Bundle.main.bundleIdentifier ?? "dev.visualcore.Showcase")
-        } catch {
-            // No renderer: still write an error report so the campaign never waits on a silent app.
-            let fallback = try? RenderHost(scene: ClearColorScene(red: 0, green: 0, blue: 0))
-            if let fallback {
-                AutomationRunner(host: fallback, bundleID: Bundle.main.bundleIdentifier ?? "dev.visualcore.Showcase")
-                    .run(mode: "renderer-unavailable")
-            } else {
-                exit(2)
-            }
-        }
-        return container
-    }
-
-    func updateUIView(_ uiView: UIView, context: Context) {
-        let coordinator = context.coordinator
-        guard !coordinator.started, let runner = coordinator.runner else { return }
-        coordinator.started = true
-        let scale = uiView.traitCollection.displayScale
-        if scale > 0 { coordinator.scene?.scale = Double(scale) }
-        // Run after the first layout pass so the surface has its real size.
-        DispatchQueue.main.async {
-            uiView.layoutIfNeeded()
-            runner.run(mode: mode, frames: AutomationRunner.requestedFrames())
-        }
     }
 }
 #endif

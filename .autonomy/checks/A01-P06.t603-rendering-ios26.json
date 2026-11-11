@@ -1,0 +1,26 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/VisualCoreRendering",
+    "--scheme",
+    "VisualCoreRendering-Package",
+    "--destination",
+    "sim-26.5",
+    "--action",
+    "test",
+    "--result-name",
+    "a01p06-t603-rendering-ios26"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-26.5 --action test --result-name a01p06-t603-rendering-ios26",
+  "elapsed_seconds": 7.511,
+  "exit_code": 0,
+  "finished": "2026-11-11T06:51:42+00:00",
+  "log": ".autonomy/logs/A01-P06.t603-rendering-ios26.log",
+  "log_sha256": "f5aca45400cdbca1134967a9650817499ed327e39cbec9d759aa239ba302bde7",
+  "name": "t603-rendering-ios26",
+  "stage": "A01-P06",
+  "started": "2026-11-11T06:51:35+00:00",
+  "timed_out": false
+}

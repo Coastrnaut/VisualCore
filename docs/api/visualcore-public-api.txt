@@ -4,17 +4,23 @@ VisualCoreAudio | let | public static let version
 VisualCoreAudioDSP | enum | public enum AudioDSPInfo
 VisualCoreAudioDSP | let | public static let version
 VisualCoreAutomation | class | public final class AutomationRunner
+VisualCoreAutomation | class | public final class Coordinator
 VisualCoreAutomation | enum | public enum AutomationInfo
+VisualCoreAutomation | func | public func makeCoordinator() -> Coordinator
+VisualCoreAutomation | func | public func makeUIView(context: Context) -> UIView
 VisualCoreAutomation | func | public func run(mode: String, frames: Int = 120) -> AutomationReport
+VisualCoreAutomation | func | public func updateUIView(_ uiView: UIView, context: Context)
 VisualCoreAutomation | func | public nonisolated static func requestedFrames(environment: [String: String] = ProcessInfo.processInfo.environment) -> Int
 VisualCoreAutomation | func | public nonisolated static func requestedMode(environment: [String: String] = ProcessInfo.processInfo.environment) -> String?
 VisualCoreAutomation | init | public init(host: RenderHost, bundleID: String, outputDirectory: URL? = nil, terminate: @escaping (Int32) -> Void =
+VisualCoreAutomation | init | public init(mode: String, bundleID: String, makeScene: @escaping @MainActor () -> RenderScene,
 VisualCoreAutomation | init | public init?(samples: [Double])
 VisualCoreAutomation | let | public nonisolated static let environmentKey
 VisualCoreAutomation | let | public nonisolated static let framesKey
 VisualCoreAutomation | let | public nonisolated static let knownModes
 VisualCoreAutomation | let | public static let version
 VisualCoreAutomation | struct | public struct AutomationReport: Codable, Equatable, Sendable
+VisualCoreAutomation | struct | public struct AutomationView: UIViewRepresentable
 VisualCoreAutomation | struct | public struct FrameTimeStats: Codable, Equatable, Sendable
 VisualCoreAutomation | var | public private(set) var lastReportURL: URL?
 VisualCoreAutomation | var | public var bundleID: String

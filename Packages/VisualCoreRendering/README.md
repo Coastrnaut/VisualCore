@@ -125,8 +125,10 @@ from 1 to 10,000 (default 120). No URL scheme or remote trigger can start a run.
 `Documents/visualcore-automation-<mode>-<UTC>.json` (`AutomationReport`, schema 1), then exits with code 0
 (pass), 1 (fail) or 2 (error, unknown mode). A measurement build is Release plus
 `SWIFT_ACTIVE_COMPILATION_CONDITIONS=VISUALCORE_AUTOMATION`. On a simulator, `scripts/run_automation_sim.py` runs
-one mode; these results are rehearsals, not device evidence. The Showcase wires this up in
-`Showcase/App/ShowcaseAutomation.swift`.
+one mode; these results are rehearsals, not device evidence. `AutomationView(mode:bundleID:makeScene:configure:)` (feature 017) hosts any scene full screen and runs the mode
+after the first layout. Each app uses it from a `#if DEBUG || VISUALCORE_AUTOMATION` branch of its root view, as
+`Showcase/App/ShowcaseAutomation.swift` does. If no renderer can be created it still writes a `renderer-unavailable`
+report.
 
 ## Shader bundles, the GLSL library and full-screen scenes (feature 012, A01-P01)
 

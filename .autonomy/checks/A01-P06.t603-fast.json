@@ -1,0 +1,26 @@
+{
+  "argv": [
+    "python3",
+    "scripts/release_check.py",
+    "--log-dir",
+    ".autonomy/logs/a01p06-t603-fast",
+    "--json",
+    ".autonomy/logs/a01p06-t603-fast/summary.json",
+    "--only",
+    "docs",
+    "dependencies",
+    "public-api",
+    "compliance",
+    "documented-api-showcase"
+  ],
+  "command": "python3 scripts/release_check.py --log-dir .autonomy/logs/a01p06-t603-fast --json .autonomy/logs/a01p06-t603-fast/summary.json --only docs dependencies public-api compliance documented-api-showcase",
+  "elapsed_seconds": 0.806,
+  "exit_code": 0,
+  "finished": "2026-11-11T06:56:42+00:00",
+  "log": ".autonomy/logs/A01-P06.t603-fast.log",
+  "log_sha256": "a1aea56d30fa82096d3dd68249ca98f967832d985485377da2e04e1fcf4504da",
+  "name": "t603-fast",
+  "stage": "A01-P06",
+  "started": "2026-11-11T06:56:42+00:00",
+  "timed_out": false
+}
