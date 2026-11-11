@@ -450,12 +450,224 @@
       "notes": "The clamp/warning UI is app content; the advisor is G-PRECISION (research R10)."
     }
   ],
-  "gaps": [],
-  "traceability": [],
-  "negative": [],
+  "gaps": [
+    {
+      "id": "G-VIEWPORT",
+      "matrix": [
+        "M02"
+      ],
+      "kind": "adaptation",
+      "owner": "VisualCore:VisualCoreMath",
+      "phase": 1,
+      "test": "Host tests: a double-precision complex-plane viewport maps screen points to plane points with aspect correction; an anchored pinch keeps the touched plane point fixed within 1e-12 relative; an aspect or size change keeps the center; zoom far beyond Camera2D's 100x; NaN/Inf rejected",
+      "justification": "Found in A03-P00 (research R2): every 2D-plane app (A16 Simulation Lab, A22 Shader Studio) needs a precise plane viewport; Camera2D's contract (point space, zoom 0.1-100, used by A01) stays unchanged."
+    },
+    {
+      "id": "G-FRACTAL",
+      "matrix": [
+        "M01"
+      ],
+      "kind": "upstream",
+      "owner": "app-local",
+      "phase": 1,
+      "test": "App-domain CPU reference: Mandelbrot origin interior, c = 2 exterior, known Julia samples; smooth escape value finite; NaN/Inf guarded; later the GPU escape counts equal the CPU reference on small grids within float32 limits (Phase 02)",
+      "justification": "Constitution A03: the escape-time formulas are fractal-specific product content with a CPU reference; the reusable machinery they run on (FullScreenShaderScene/FieldPass, G-VIEWPORT, G-PRECISION) is VisualCore."
+    },
+    {
+      "id": "G-PRECISION",
+      "matrix": [
+        "M03",
+        "M10"
+      ],
+      "kind": "adaptation",
+      "owner": "VisualCore:VisualCoreRendering",
+      "phase": 2,
+      "test": "Simulator test: a RenderCapabilities fragment-precision query returns the reported highp range and precision bits (recorded as context, never device evidence); host tests: a VisualCoreMath precision advisor derives reliable / warn / clamp thresholds from mantissa bits and units per pixel; device precision is measured in campaign II before any claim",
+      "justification": "Found in A03-P00 (research R3): any shader app that zooms or accumulates needs to know its float precision; the query belongs to VisualCoreRendering (GL) and the pure advisor to VisualCoreMath (R2)."
+    },
+    {
+      "id": "G-COST",
+      "matrix": [
+        "M08"
+      ],
+      "kind": "adaptation",
+      "owner": "VisualCore:VisualCoreDiagnostics",
+      "phase": 3,
+      "test": "Host tests: a relative work estimate (pixels x iterations x samples) is monotonic in each factor, labelled relative (never a time), and combines with QualityPolicy for interactive iteration reduction",
+      "justification": "Found in A03-P00 (research R8): iteration- or sample-bound shaders (A22 Shader Studio, A24 Graphics Benchmark Lab) need the same pre-flight estimate."
+    },
+    {
+      "id": "G-TOUR",
+      "matrix": [
+        "M09"
+      ],
+      "kind": "adaptation",
+      "owner": "VisualCore:VisualCoreMath",
+      "phase": 4,
+      "test": "Host tests: log-scale zoom interpolation between two viewports is monotonic and ends exactly on the target; eased with EasingCurve; Reduce Motion skips the animation",
+      "justification": "Found in A03-P00 (research R9): tours between saved views need zoom interpolated in log space; a small generic helper on the G-VIEWPORT type."
+    }
+  ],
+  "traceability": [
+    {
+      "item": "brainstorm: interactive Mandelbrot/Julia explorer with smooth zooming, animated palettes and adjustable parameters",
+      "matrix": [
+        "M01",
+        "M02",
+        "M03",
+        "M04",
+        "M05"
+      ],
+      "phases": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "item": "v0.1 feature 01 — Mandelbrot and Julia modes with accessible explanations",
+      "matrix": [
+        "M01"
+      ],
+      "phases": [
+        1,
+        2
+      ]
+    },
+    {
+      "item": "v0.1 feature 02 — continuous pinch/pan and animated palette controls",
+      "matrix": [
+        "M02",
+        "M04",
+        "M05",
+        "M06"
+      ],
+      "phases": [
+        2,
+        3
+      ]
+    },
+    {
+      "item": "v0.1 feature 03 — location bookmarks with coordinates and precision mode",
+      "matrix": [
+        "M07"
+      ],
+      "phases": [
+        3
+      ]
+    },
+    {
+      "item": "v0.1 feature 04 — adjustable iteration cap with render-cost estimate",
+      "matrix": [
+        "M08"
+      ],
+      "phases": [
+        3
+      ]
+    },
+    {
+      "item": "v0.1 feature 05 — still capture and curated guided tours",
+      "matrix": [
+        "M09"
+      ],
+      "phases": [
+        4
+      ]
+    },
+    {
+      "item": "v0.1 feature 06 — visible limits and graceful clamping at the precision limit",
+      "matrix": [
+        "M03",
+        "M10"
+      ],
+      "phases": [
+        2,
+        5
+      ]
+    },
+    {
+      "item": "journey 1 — start from a curated location, pinch to zoom and drag to pan",
+      "matrix": [
+        "M02",
+        "M06"
+      ],
+      "phases": [
+        2,
+        3
+      ]
+    },
+    {
+      "item": "journey 2 — switch Mandelbrot/Julia and scrub the Julia seed",
+      "matrix": [
+        "M01",
+        "M04"
+      ],
+      "phases": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "item": "journey 3 — save a bookmark; render a still with a visible precision warning",
+      "matrix": [
+        "M07",
+        "M09",
+        "M10"
+      ],
+      "phases": [
+        3,
+        4
+      ]
+    }
+  ],
+  "negative": [
+    {
+      "rule": "No unlimited deep zoom claimed on 32-bit floating point",
+      "source": "manual §2 explicit non-goals; constitution A03 truthful precision"
+    },
+    {
+      "rule": "No scientific claims about precision beyond verified shader support",
+      "source": "manual §2 explicit non-goals; §13 risk 1"
+    },
+    {
+      "rule": "No community gallery and no user-coded formulas",
+      "source": "manual §2 explicit non-goals"
+    },
+    {
+      "rule": "No Metal renderer or second backend to solve precision",
+      "source": "manual §6 domain-specific engineering rule; constitution I"
+    },
+    {
+      "rule": "No networking, accounts or cloud sync",
+      "source": "manual §3; constitution VIII and A03 offline-first"
+    },
+    {
+      "rule": "No EGL context or render host owned by the app",
+      "source": "manual §4 contracts; constitution I and III"
+    },
+    {
+      "rule": "No ProjectM engine, preset or bridge dependency",
+      "source": "CLAUDE.md §4; FR-A03-006"
+    },
+    {
+      "rule": "No unbounded iteration loops that freeze the UI",
+      "source": "manual §13 risk 2; constitution A03 bounded GPU"
+    },
+    {
+      "rule": "No device-performance or precision claims before campaign II",
+      "source": "constitution V and VI; CLAUDE.md §1"
+    }
+  ],
   "decision": {
-    "result": "pending",
-    "reasons": [],
+    "result": "go",
+    "reasons": [
+      "Every capability maps to existing VisualCore API (6 available: fragment shaders, animation, palettes, pinch/pan, bookmarks, capture) or an additive gap (4 adaptation rows).",
+      "All gaps are additive: G-VIEWPORT and G-TOUR (VisualCoreMath), G-PRECISION (VisualCoreRendering query + VisualCoreMath advisor) and G-COST (VisualCoreDiagnostics) are reusable helpers owned per Principle II; the escape-time formulas stay app-local with a CPU reference by the A03 rule (G-FRACTAL). None needs a second renderer, a fork, private API or networking.",
+      "Double precision on the GPU is not assumed: 32-bit shader floats are the baseline, zoom is clamped at the measured limit and the limit is shown (A03 truthful precision); perturbation and emulated double stay later ideas.",
+      "Reference regression baseline recorded green 7/7 (T-A03-003) and the empty shell builds and passes its smoke test on both simulator runtimes (T-A03-005).",
+      "Phase 01 starts with G-VIEWPORT in VisualCoreMath and the app's GPU-free escape-time reference (G-FRACTAL)."
+    ],
     "blockers": []
   }
 }

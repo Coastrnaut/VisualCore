@@ -62,7 +62,7 @@ description: "Task list for feature 025 — Fractal Explorer Phase 00 boundary a
 
 ## Phase 5: US4 — Gap register and stop/go decision (P2)
 
-- [ ] T-A03-006 [US4] Complete the contract JSON:
+- [X] T-A03-006 [US4] Complete the contract JSON: — Verified 2026-11-11: — Verified 2026-11-11: visualcore-contract.json completed: 5 gaps (G-VIEWPORT -> VisualCoreMath phase 1; G-FRACTAL app-local phase 1 with the A03 CPU-reference justification; G-PRECISION -> VisualCoreRendering query + VisualCoreMath advisor phase 2, simulator value context only; G-COST -> VisualCoreDiagnostics phase 3; G-TOUR -> VisualCoreMath phase 4), each with a test intent; traceability for the brainstorm, features 01-06 and journeys 1-3 to phases; 9 negative rules with sources; decision go with 5 reasons and 0 blockers. visualcore-contract.md rendered between the generated markers (first render t006-contract failed: the Markdown file with markers did not exist yet). run-check A03-P00/t006-contract-2 PASS: 10 rows, 32 citations, 5 gaps, decision go (FR-A03-008-011, SC-A03-005, SC-A03-007)
   - `gaps` for every non-available row, each with an owner module, a phase and a test:
     - G-VIEWPORT: VisualCoreMath, phase 1. Test: an anchored pinch keeps the touched plane point fixed within 1e-12
       relative, and an aspect change keeps the center.
