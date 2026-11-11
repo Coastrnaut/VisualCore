@@ -79,3 +79,8 @@ and fast checks.
 - T1 (low): simulator package tests for the app core use `scripts/xcodebuild_package.py --package
   Apps/ParticleUniverse/ParticleUniverseCore --scheme ParticleUniverseCore --destination sim-27.2|sim-26.5 --action test`.
 - 0 critical issues; coverage 13/13 requirements.
+
+## Phase 8: Convergence
+
+- [ ] T-A04-115 Move the play-state rules into VisualCore and test them. Add `PlaybackState` (VisualCoreSimulation) with host tests: the person's play/pause intent, background suspension that resumes only if the scene was playing, and a paused start under Reduce Motion. Use it in `Apps/ParticleUniverse/App/SceneModel.swift`. Add a UI test that sends the app to the background and back: a playing scene keeps playing, and a paused one stays paused. Also update the API baseline. Per spec edge cases (backgrounding, Reduce Motion), plan "Lifecycle contracts" and CHK017 (partial)
+- [ ] T-A04-116 Raise the point-shape spawn test in `Packages/VisualCore/Tests/VisualCoreSimulationTests/EmitterShapeTests.swift` to 10,000 spawns per SC-A04-101 (partial)
