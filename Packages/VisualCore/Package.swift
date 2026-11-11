@@ -23,6 +23,7 @@ let package = Package(
         // Test-only (rule R5): never a dependency of a product target.
         .target(name: "VisualCoreTestSupport", dependencies: ["VisualCoreMath", "VisualCoreSimulation"]),
         .testTarget(name: "VisualCoreDiagnosticsTests", dependencies: ["VisualCoreDiagnostics"]),
+        .testTarget(name: "VisualCoreShaderSourceTests", dependencies: ["VisualCoreShaderSource"]),
         .testTarget(name: "VisualCoreScaffoldTests",
                     dependencies: ["VisualCoreMath", "VisualCoreSimulation", "VisualCoreScenes", "VisualCoreShaderSource",
                                    "VisualCoreEffectsGraph", "VisualCoreDiagnostics", "VisualCoreAudioDSP",
