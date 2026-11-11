@@ -14,38 +14,42 @@ app-domain with a CPU reference, and the reuse rule. Depth: phase gate. Audience
 
 ## Requirement Completeness
 
-- [ ] CHK001 Are all three manual acceptance gates required: integration matrix, compilable shell and written stop/go decision? [Completeness, Spec §FR-A02-002, §FR-A02-005, §FR-A02-009]
-- [ ] CHK002 Does the inventory requirement name the areas a GPU fluid solver depends on (render-target formats and pooling, feedback history, pointer input, frame pacing and thermal policy, offscreen export)? [Completeness, Spec §FR-A02-001]
-- [ ] CHK003 Are all six brainstorm capabilities and four version 0.1 needs enumerated as matrix rows? [Completeness, Spec §FR-A02-002, §SC-A02-002]
-- [ ] CHK004 Are negative requirements listed, each with its forbidding source? [Completeness, Spec §FR-A02-011]
+- [x] CHK001 Are all three manual acceptance gates required: integration matrix, compilable shell and written stop/go decision? [Completeness, Spec §FR-A02-002, §FR-A02-005, §FR-A02-009]
+- [x] CHK002 Does the inventory requirement name the areas a GPU fluid solver depends on (render-target formats and pooling, feedback history, pointer input, frame pacing and thermal policy, offscreen export)? [Completeness, Spec §FR-A02-001]
+- [x] CHK003 Are all six brainstorm capabilities and four version 0.1 needs enumerated as matrix rows? [Completeness, Spec §FR-A02-002, §SC-A02-002]
+- [x] CHK004 Are negative requirements listed, each with its forbidding source? [Completeness, Spec §FR-A02-011]
 
 ## Requirement Clarity
 
-- [ ] CHK005 Are the three matrix statuses and the evidence rule (file, public non-test symbol, product) defined unambiguously? [Clarity, Spec §FR-A02-002, §Edge Cases]
-- [ ] CHK006 Is the treatment of half-float render targets (status, detection, fallback ownership) stated without assuming support? [Clarity, Spec §Edge Cases, §Clarifications]
-- [ ] CHK007 Are the stop conditions concrete, including an unverified GPU feature without a fallback? [Clarity, Spec §FR-A02-009]
+- [x] CHK005 Are the three matrix statuses and the evidence rule (file, public non-test symbol, product) defined unambiguously? [Clarity, Spec §FR-A02-002, §Edge Cases]
+- [x] CHK006 Is the treatment of half-float render targets (status, detection, fallback ownership) stated without assuming support? [Clarity, Spec §Edge Cases, §Clarifications]
+- [x] CHK007 Are the stop conditions concrete, including an unverified GPU feature without a fallback? [Clarity, Spec §FR-A02-009]
 
 ## Architecture Ownership
 
-- [ ] CHK008 Does every gap entry require an owning VisualCore module or a justified app-local exception? [Consistency, Spec §FR-A02-008, Constitution II]
-- [ ] CHK009 Is it explicit that the fluid equations stay app-domain with a CPU reference while generic machinery goes to VisualCore? [Consistency, Spec §FR-A02-008, Constitution A02]
-- [ ] CHK010 Is the no-modification rule for VisualCore and ProjectM measurable? [Measurability, Spec §FR-A02-007, §SC-A02-006]
-- [ ] CHK011 Is ProjectM independence of the new target required and verifiable? [Coverage, Spec §FR-A02-006]
+- [x] CHK008 Does every gap entry require an owning VisualCore module or a justified app-local exception? [Consistency, Spec §FR-A02-008, Constitution II]
+- [x] CHK009 Is it explicit that the fluid equations stay app-domain with a CPU reference while generic machinery goes to VisualCore? [Consistency, Spec §FR-A02-008, Constitution A02]
+- [x] CHK010 Is the no-modification rule for VisualCore and ProjectM measurable? [Measurability, Spec §FR-A02-007, §SC-A02-006]
+- [x] CHK011 Is ProjectM independence of the new target required and verifiable? [Coverage, Spec §FR-A02-006]
 
 ## Privacy, Lifecycle and Platform
 
-- [ ] CHK012 Are permissions and networking for the shell explicitly excluded? [Completeness, Spec §FR-A02-005, §Clarifications]
-- [ ] CHK013 Is it explicit that Phase 00 creates no render host or GPU resources? [Clarity, Spec §FR-A02-005]
-- [ ] CHK014 Are physical-accuracy and device-performance claims excluded? [Consistency, Spec §FR-A02-011, Constitution V]
+- [x] CHK012 Are permissions and networking for the shell explicitly excluded? [Completeness, Spec §FR-A02-005, §Clarifications]
+- [x] CHK013 Is it explicit that Phase 00 creates no render host or GPU resources? [Clarity, Spec §FR-A02-005]
+- [x] CHK014 Are physical-accuracy and device-performance claims excluded? [Consistency, Spec §FR-A02-011, Constitution V]
 
 ## Testability and Acceptance
 
-- [ ] CHK015 Are all success criteria quantified with counts or percentages? [Measurability, Spec §SC-A02-001–007]
-- [ ] CHK016 Are both simulator runtimes required for the shell smoke test? [Coverage, Spec §SC-A02-003]
-- [ ] CHK017 Is the regression baseline defined by named steps, with failure treated as a blocker? [Clarity, Spec §Clarifications, §Edge Cases]
+- [x] CHK015 Are all success criteria quantified with counts or percentages? [Measurability, Spec §SC-A02-001–007]
+- [x] CHK016 Are both simulator runtimes required for the shell smoke test? [Coverage, Spec §SC-A02-003]
+- [x] CHK017 Is the regression baseline defined by named steps, with failure treated as a blocker? [Clarity, Spec §Clarifications, §Edge Cases]
 
 ## Performance and Release
 
-- [ ] CHK018 Is it explicit that no performance budget is set in Phase 00, and where budgets come from later? [Clarity, Spec §Clarifications]
-- [ ] CHK019 Are the bundle identity and target location fixed? [Consistency, Spec §FR-A02-005]
-- [ ] CHK020 Does traceability require every version 0.1 feature and journey to map to a phase? [Coverage, Spec §FR-A02-010, §SC-A02-007]
+- [x] CHK018 Is it explicit that no performance budget is set in Phase 00, and where budgets come from later? [Clarity, Spec §Clarifications]
+- [x] CHK019 Are the bundle identity and target location fixed? [Consistency, Spec §FR-A02-005]
+- [x] CHK020 Does traceability require every version 0.1 feature and journey to map to a phase? [Coverage, Spec §FR-A02-010, §SC-A02-007]
+
+## Review
+
+Reviewed 2026-11-11 under the owner's delegated approval (CLAUDE.md §2): 20/20 satisfied by spec.md as clarified.
