@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "sh",
+    "-c",
+    "n=0; total=0; for f in $(find \"Build/DerivedData/InteractiveDemo/Build/Products/Debug-iphonesimulator/InteractiveDemo.app\" -type f); do file \"$f\" | grep -q Mach-O || continue; c=$(nm -a \"$f\" 2>/dev/null | grep -i -c -E 'projectm|milkdrop'); s=$(nm -a \"$f\" 2>/dev/null | wc -l); echo \"$c projectm/milkdrop of $s symbols: $f\"; n=$((n+c)); total=$((total+1)); done; echo \"Mach-O files scanned: $total; matches: $n\"; [ $total -ge 4 ] && [ $n -eq 0 ]"
+  ],
+  "command": "sh -c 'n=0; total=0; for f in $(find \"Build/DerivedData/InteractiveDemo/Build/Products/Debug-iphonesimulator/InteractiveDemo.app\" -type f); do file \"$f\" | grep -q Mach-O || continue; c=$(nm -a \"$f\" 2>/dev/null | grep -i -c -E '\"'\"'projectm|milkdrop'\"'\"'); s=$(nm -a \"$f\" 2>/dev/null | wc -l); echo \"$c projectm/milkdrop of $s symbols: $f\"; n=$((n+c)); total=$((total+1)); done; echo \"Mach-O files scanned: $total; matches: $n\"; [ $total -ge 4 ] && [ $n -eq 0 ]'",
+  "elapsed_seconds": 0.254,
+  "exit_code": 0,
+  "finished": "2026-11-11T00:58:17+00:00",
+  "log": ".autonomy/logs/F05.t520-demo-no-projectm-a2.log",
+  "log_sha256": "28dfc23b26d326e9016ad499fcd1fb9918e72da5dbfd040b251f5f762846ff11",
+  "name": "t520-demo-no-projectm-a2",
+  "stage": "F05",
+  "started": "2026-11-11T00:58:17+00:00",
+  "timed_out": false
+}

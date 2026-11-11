@@ -42,7 +42,9 @@ final class DemoController {
     }
 
     private func applyReduceMotion() {
-        let override = UserDefaults.standard.object(forKey: "uitestReduceMotion") as? Bool
+        // Launch arguments land in the argument domain as strings ("YES"/"NO"); bool(forKey:) parses them.
+        let defaults = UserDefaults.standard
+        let override: Bool? = defaults.object(forKey: "uitestReduceMotion") == nil ? nil : defaults.bool(forKey: "uitestReduceMotion")
         scene.reduceMotion = override ?? UIAccessibility.isReduceMotionEnabled
     }
 }

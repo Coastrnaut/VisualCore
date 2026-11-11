@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "sh",
+    "-c",
+    "for f in \"Build/DerivedData/InteractiveDemo/Build/Products/Debug-iphonesimulator/InteractiveDemo.app/InteractiveDemo\" \"Build/DerivedData/InteractiveDemo/Build/Products/Debug-iphonesimulator/InteractiveDemo.app\"/Frameworks/*.framework/*; do [ -f \"$f\" ] && file \"$f\" | grep -q Mach-O && { echo \"scan $f\"; nm -a \"$f\" 2>/dev/null | grep -i -c -E 'projectm|milkdrop'; }; done; ! (for f in \"Build/DerivedData/InteractiveDemo/Build/Products/Debug-iphonesimulator/InteractiveDemo.app/InteractiveDemo\" \"Build/DerivedData/InteractiveDemo/Build/Products/Debug-iphonesimulator/InteractiveDemo.app\"/Frameworks/*.framework/*; do [ -f \"$f\" ] && nm -a \"$f\" 2>/dev/null; done | grep -i -q -E 'projectm|milkdrop')"
+  ],
+  "command": "sh -c 'for f in \"Build/DerivedData/InteractiveDemo/Build/Products/Debug-iphonesimulator/InteractiveDemo.app/InteractiveDemo\" \"Build/DerivedData/InteractiveDemo/Build/Products/Debug-iphonesimulator/InteractiveDemo.app\"/Frameworks/*.framework/*; do [ -f \"$f\" ] && file \"$f\" | grep -q Mach-O && { echo \"scan $f\"; nm -a \"$f\" 2>/dev/null | grep -i -c -E '\"'\"'projectm|milkdrop'\"'\"'; }; done; ! (for f in \"Build/DerivedData/InteractiveDemo/Build/Products/Debug-iphonesimulator/InteractiveDemo.app/InteractiveDemo\" \"Build/DerivedData/InteractiveDemo/Build/Products/Debug-iphonesimulator/InteractiveDemo.app\"/Frameworks/*.framework/*; do [ -f \"$f\" ] && nm -a \"$f\" 2>/dev/null; done | grep -i -q -E '\"'\"'projectm|milkdrop'\"'\"')'",
+  "elapsed_seconds": 0.199,
+  "exit_code": 0,
+  "finished": "2026-11-11T00:58:08+00:00",
+  "log": ".autonomy/logs/F05.t520-demo-no-projectm.log",
+  "log_sha256": "09133179e70dfaa38405e8f2b467589f06ce25724fcca6a13bb0fb36edc6104c",
+  "name": "t520-demo-no-projectm",
+  "stage": "F05",
+  "started": "2026-11-11T00:58:08+00:00",
+  "timed_out": false
+}

@@ -1,0 +1,31 @@
+{
+  "argv": [
+    "xcodebuild",
+    "test",
+    "-project",
+    "Harnesses/InteractiveDemo/InteractiveDemo.xcodeproj",
+    "-scheme",
+    "InteractiveDemo",
+    "-destination",
+    "platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D",
+    "-derivedDataPath",
+    "Build/DerivedData/InteractiveDemo",
+    "-resultBundlePath",
+    ".autonomy/xcresults/F05-t520-ios27-20261110-195533.xcresult",
+    "-test-timeouts-enabled",
+    "YES",
+    "-default-test-execution-time-allowance",
+    "180",
+    "CODE_SIGNING_ALLOWED=NO"
+  ],
+  "command": "xcodebuild test -project Harnesses/InteractiveDemo/InteractiveDemo.xcodeproj -scheme InteractiveDemo -destination 'platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D' -derivedDataPath Build/DerivedData/InteractiveDemo -resultBundlePath .autonomy/xcresults/F05-t520-ios27-20261110-195533.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 180 CODE_SIGNING_ALLOWED=NO",
+  "elapsed_seconds": 53.908,
+  "exit_code": 65,
+  "finished": "2026-11-11T00:56:27+00:00",
+  "log": ".autonomy/logs/F05.t520-demo-uitest-ios27.log",
+  "log_sha256": "fdbd30f1ed79539ab4151d7255bc2582b2fca2fbffd22aff1c973c6f953469e5",
+  "name": "t520-demo-uitest-ios27",
+  "stage": "F05",
+  "started": "2026-11-11T00:55:33+00:00",
+  "timed_out": false
+}
