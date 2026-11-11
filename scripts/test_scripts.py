@@ -32,6 +32,7 @@ publicapi = load("check_public_api")
 licenses = load("check_licenses")
 autosim = load("run_automation_sim")
 relsym = load("check_release_symbols")
+relcheck = load("release_check")
 try:
     deps = load("check_dependencies")
 except FileNotFoundError:
@@ -440,6 +441,53 @@ class AutomationScriptTests(unittest.TestCase):
               "0000000100003000 T _$s19VisualCoreRendering10RenderHostC\n")
         self.assertEqual(len(relsym.automation_symbols(nm)), 1)
         self.assertEqual(relsym.automation_symbols("0000 T _main\n"), [])
+
+
+class ReleaseCheckTests(unittest.TestCase):
+    """Feature 010 T-F908: release-check runner logic (step list, selection, logs, summary, failure handling)."""
+
+    def test_step_list_covers_every_release_gate(self):
+        names = [s.name for s in relcheck.steps("X")]
+        self.assertEqual(len(names), len(set(names)))
+        for required in ["docs", "compliance", "dependencies", "public-api", "licenses", "script-tests", "host-visualcore",
+                         "host-gardenkit", "documented-api-showcase", "documented-api-second-consumer",
+                         "rendering-sim-ios27", "rendering-sim-ios26", "showcase-ios27", "showcase-ios26",
+                         "interactive-demo-ios26", "second-consumer-ios27", "projectm-reference-ios26",
+                         "reference-clean", "showcase-release-build", "release-symbols"]:
+            self.assertIn(required, names)
+        self.assertLess(names.index("showcase-release-build"), names.index("release-symbols"))
+        for s in relcheck.steps("X"):
+            self.assertNotIn("devicectl", " ".join(s.argv))
+            self.assertNotIn("platform=iOS,id=", " ".join(s.argv))
+
+    def test_select_only_skip_and_unknown(self):
+        all_steps = relcheck.steps("X")
+        self.assertEqual([s.name for s in relcheck.select(all_steps, ["docs", "licenses"], None)], ["docs", "licenses"])
+        self.assertNotIn("docs", [s.name for s in relcheck.select(all_steps, None, ["docs"])])
+        with self.assertRaises(SystemExit):
+            relcheck.select(all_steps, ["nope"], None)
+
+    def test_runner_logs_each_step_and_fails_overall_on_one_failure(self):
+        import contextlib, io
+        fake = lambda stamp: [relcheck.Step("ok", [sys.executable, "-c", "print('fine')"]),
+                              relcheck.Step("bad", [sys.executable, "-c", "import sys; print('boom'); sys.exit(3)"]),
+                              relcheck.Step("slow", [sys.executable, "-c", "import time; time.sleep(5)"], timeout=1)]
+        with tempfile.TemporaryDirectory() as d:
+            with contextlib.redirect_stdout(io.StringIO()):
+                code = relcheck.main(["--log-dir", d], step_factory=fake)
+            self.assertEqual(code, 1)
+            summary = json.loads((Path(d) / "summary.json").read_text())
+            self.assertEqual([(x["name"], x["status"], x["exit_code"]) for x in summary["steps"]],
+                             [("ok", "pass", 0), ("bad", "fail", 3), ("slow", "timeout", None)])
+            self.assertEqual(summary["result"], "fail")
+            self.assertIn("boom", (Path(d) / "bad.log").read_text())
+
+    def test_all_pass(self):
+        import contextlib, io
+        fake = lambda stamp: [relcheck.Step("ok", [sys.executable, "-c", "pass"])]
+        with tempfile.TemporaryDirectory() as d:
+            with contextlib.redirect_stdout(io.StringIO()):
+                self.assertEqual(relcheck.main(["--log-dir", d], step_factory=fake), 0)
 
 
 if __name__ == "__main__":
