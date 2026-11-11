@@ -29,7 +29,7 @@ Methods: `plane(fromScreen:)`, `screen(fromPlane:)`, `pinched(by:anchor:)`, `pan
 - smooth: Double;
 - interior: Bool.
 
-## Preview (app)
+## FractalPreview (app)
 
 - width, height: ≤ 160;
 - rgba: [UInt8] (4 × width × height);

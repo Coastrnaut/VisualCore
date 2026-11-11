@@ -70,7 +70,7 @@ final class FractalStateTests: XCTestCase {
     func testPreviewKnownPixelsAndDeterminism() {
         var s = FractalState(size: Vec2(300, 300))
         s.viewport = PlaneViewport.framing(width: 6, center: .zero, size: Vec2(300, 300))   // x in -3...3
-        let p = Preview.render(s, maxSide: 120, requestID: 7)
+        let p = FractalPreview.render(s, maxSide: 120, requestID: 7)
         XCTAssertEqual(p.width, 120)
         XCTAssertEqual(p.height, 120)
         XCTAssertEqual(p.requestID, 7)
@@ -81,10 +81,10 @@ final class FractalStateTests: XCTestCase {
         let origin = pixel(.zero), two = pixel(Vec2(2.02, 0))
         XCTAssertEqual(p.rgb(origin.0, origin.1), [0, 0, 0], "origin is interior (black)")
         XCTAssertGreaterThan(p.rgb(two.0, two.1)[0], 0, "c = 2 is exterior")
-        XCTAssertEqual(Preview.render(s, maxSide: 120, requestID: 8).rgba, p.rgba, "deterministic")
-        let wide = Preview.render(FractalState(size: Vec2(400, 800)), maxSide: 160, requestID: 1)
+        XCTAssertEqual(FractalPreview.render(s, maxSide: 120, requestID: 8).rgba, p.rgba, "deterministic")
+        let wide = FractalPreview.render(FractalState(size: Vec2(400, 800)), maxSide: 160, requestID: 1)
         XCTAssertEqual(wide.height, 160)
         XCTAssertEqual(wide.width, 80, "aspect kept, longer side = maxSide")
-        XCTAssertEqual(Preview.render(s, maxSide: 999, requestID: 1).width, Preview.maximumSide, "budget capped")
+        XCTAssertEqual(FractalPreview.render(s, maxSide: 999, requestID: 1).width, FractalPreview.maximumSide, "budget capped")
     }
 }

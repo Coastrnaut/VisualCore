@@ -194,7 +194,7 @@ the math end to end before Phase 02 replaces it with the GPU render, and it beco
 - **Complex-plane viewport** (VisualCore): center (re, im), units per point, view size (points), zoom limits.
 - **Fractal state** (app): mode, viewport, Julia seed, iteration cap, escape radius.
 - **Escape result** (app): escape count, smooth value, interior flag.
-- **Preview** (app): width × height colors for a view and parameters, with a request identifier.
+- **FractalPreview** (app; renamed from Preview, which collides with SwiftUI): width × height colors for a view and parameters, with a request identifier.
 
 ## Success Criteria *(mandatory)*
 

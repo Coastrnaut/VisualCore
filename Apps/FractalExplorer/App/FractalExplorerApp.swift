@@ -1,13 +1,14 @@
 // FractalExplorerApp.swift — Fractal Explorer app shell (feature 025 A03-P00 T-A03-004; FR-A03-005).
-// Phase 00 is a titled home screen only: no render host, no permissions, no networking. The complex-plane domain,
+// Phase 00 shell; Phase 01 (feature 026) adds the explorer link. No render host, no permissions, no networking. The complex-plane domain,
 // its CPU reference and rendering arrive in Phases 01–02 through VisualCore modules
 // (docs/apps/fractal-explorer/visualcore-contract.md).
 import SwiftUI
+import VisualCoreUI
 
 @main
 struct FractalExplorerApp: App {
     var body: some Scene {
-        WindowGroup { HomeView() }
+        WindowGroup { HomeView().tint(AccessibleColors.accent) }
     }
 }
 
@@ -28,6 +29,16 @@ struct HomeView: View {
                 Text("An explorer for the Mandelbrot and Julia sets.")
                     .font(.body)
                     .multilineTextAlignment(.center)
+                // Feature 026 T-A03-104: the explorer (Mandelbrot and Julia modes with explanations).
+                NavigationLink {
+                    ExplorerView()
+                } label: {
+                    Label("Open explorer", systemImage: "play.fill")
+                        .font(.headline)
+                        .frame(minHeight: 44)
+                }
+                .buttonStyle(.borderedProminent)
+                .accessibilityIdentifier("fe.home.open")
             }
             .padding()
             .accessibilityElement(children: .contain)

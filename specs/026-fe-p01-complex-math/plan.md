@@ -25,7 +25,7 @@ by a GPU-free escape-time reference and shown as a bounded CPU preview. The part
 
 **Testing**:
 - host `swift test` for VisualCore (`PlaneViewportTests`) and FractalExplorerCore (`FractalMathTests`,
-  `FractalStateTests`, `FractalExplanationsTests`, `PreviewTests`);
+  `FractalStateTests`, the preview checks inside `FractalStateTests`);
 - app unit and UI tests on iOS 27.2 and 26.5 with the guard;
 - the accessibility audit at default size and XXXL;
 - the ProjectM regression after the VisualCore addition.
@@ -69,7 +69,7 @@ Apps/FractalExplorer/FractalExplorerCore/Sources/FractalExplorerCore/
 ├── FractalMath.swift          # escape iteration, smooth value, EscapeResult
 ├── FractalState.swift         # mode, viewport, seed, cap, radius (validated), defaults, spoken description
 ├── FractalExplanations.swift  # mode texts
-└── Preview.swift              # deterministic bounded RGBA preview of a state
+└── FractalPreview.swift              # deterministic bounded RGBA preview of a state
 Apps/FractalExplorer/FractalExplorerCore/Tests/FractalExplorerCoreTests/*.swift  # NEW
 Apps/FractalExplorer/App/FractalExplorerApp.swift   # EDIT home link to the explorer
 Apps/FractalExplorer/App/ExplorerView.swift         # NEW mode picker, explanation, preview image, model

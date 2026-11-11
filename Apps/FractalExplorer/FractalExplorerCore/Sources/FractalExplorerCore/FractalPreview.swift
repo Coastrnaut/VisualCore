@@ -1,10 +1,10 @@
-// Preview.swift — a deterministic, bounded CPU picture of a fractal state (feature 026 T-A03-103; FR-A03-106;
+// FractalPreview.swift — a deterministic, bounded CPU picture of a fractal state (feature 026 T-A03-103; FR-A03-106;
 // clarification 4). It proves the math end to end before the Phase 02 GPU render and becomes its comparison fixture.
 import Foundation
 import VisualCoreMath
 
 /// RGBA pixels of a state's current view, at most `maximumSide` on the longer side, with the request that made it.
-public struct Preview: Sendable, Equatable {
+public struct FractalPreview: Sendable, Equatable {
     /// The pixel budget per side.
     public static let maximumSide = 160
 
@@ -25,7 +25,7 @@ public struct Preview: Sendable, Equatable {
 
     /// Renders `state` at most `maxSide` (≤ `maximumSide`) pixels on the longer side, keeping the view's aspect.
     /// Interior points are black; escaping points get a gray from the smooth value (brighter near the set).
-    public static func render(_ state: FractalState, maxSide: Int = maximumSide, requestID: Int) -> Preview {
+    public static func render(_ state: FractalState, maxSide: Int = maximumSide, requestID: Int) -> FractalPreview {
         let side = min(max(maxSide, 1), maximumSide)
         let size = state.viewport.size
         let scale = Double(side) / max(size.x, size.y)
@@ -40,6 +40,6 @@ public struct Preview: Sendable, Equatable {
                 bytes[i] = v; bytes[i + 1] = v; bytes[i + 2] = v
             }
         }
-        return Preview(width: w, height: h, rgba: bytes, requestID: requestID)
+        return FractalPreview(width: w, height: h, rgba: bytes, requestID: requestID)
     }
 }

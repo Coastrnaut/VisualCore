@@ -60,13 +60,13 @@ research R1–R4, the data model, the contract and the quickstart.
   - `spokenDescription`, formatted per FR-A03-101.
 
   Add `FractalExplanations.swift` (one text per mode, including the Mandelbrot–Julia relation and the note about
-  seeds outside |c| ≤ 2) and `Preview.swift` (at most 160 samples per side, grayscale ramp, black interior,
+  seeds outside |c| ≤ 2) and `FractalPreview.swift` (at most 160 samples per side, grayscale ramp, black interior,
   deterministic, with `requestID`). Write the tests first: validation (cap 0 → 1, cap 20,000 → 10,000, radius 1 → 2, a non-finite seed; analyze G1), description format, explanations, preview
   origin and c = 2 pixels, determinism (FR-A03-101, FR-A03-105, FR-A03-106, SC-A03-104).
 
 ## Phase 3: User Story 1 — explorer UI (P1) 🎯
 
-- [ ] T-A03-104 [US1] [US4] Add `Apps/FractalExplorer/App/ExplorerView.swift`:
+- [X] T-A03-104 [US1] [US4] Add `Apps/FractalExplorer/App/ExplorerView.swift`: — Verified 2026-11-11: — Verified 2026-11-11: App/ExplorerView.swift (ExplorerModel @MainActor @Observable: preview in a detached task, request ids, stale results dropped and counted; segmented fe.mode picker, fe.mode.explanation, fe.canvas image labelled with the spoken description, fe.seed in Julia mode), home link fe.home.open, project.yml (app links FractalExplorerCore, VisualCoreMath, VisualCoreUI; FractalExplorerTests unit target; scheme runs unit + UI tests); Core type renamed Preview -> FractalPreview (collides with SwiftUI; spec/plan/data model updated; t104-app-ios27 first failed to compile on the ambiguity); ExplorerModelTests 3 (defaults + preview + image, mode switch changes explanation/description/picture, stale result dropped and newest of 5 requests shown); run-check A03-P01/t104-app-ios27-2 and t104-app-ios26-2 TEST SUCCEEDED, enumeration 4/4 each; t104-core-test 12/12; t104-isolation PASS
   - `ExplorerModel` (`@MainActor @Observable`), which computes the preview in a detached task and drops stale
     request identifiers;
   - a segmented `fe.mode` picker;

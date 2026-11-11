@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_test_enumeration.py",
+    "--sources",
+    "Apps/FractalExplorer/Tests",
+    "--log",
+    ".autonomy/logs/A03-P01.t104-app-ios27.log"
+  ],
+  "command": "python3 scripts/check_test_enumeration.py --sources Apps/FractalExplorer/Tests --log .autonomy/logs/A03-P01.t104-app-ios27.log",
+  "elapsed_seconds": 0.022,
+  "exit_code": 1,
+  "finished": "2026-11-11T11:55:21+00:00",
+  "log": ".autonomy/logs/A03-P01.t104-enum-ios27.log",
+  "log_sha256": "b14f10e0a1fad324982ecdf1d42b84b0688d374e5911e1ee0a67ed16addc464c",
+  "name": "t104-enum-ios27",
+  "stage": "A03-P01",
+  "started": "2026-11-11T11:55:21+00:00",
+  "timed_out": false
+}

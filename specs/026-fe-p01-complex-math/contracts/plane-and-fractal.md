@@ -36,7 +36,7 @@ public enum FractalMath {
 }
 public struct FractalState: Sendable, Equatable { … ; public var spokenDescription: String }
 public enum FractalExplanations { public static func text(for: FractalMode) -> String }
-public struct Preview { public static func render(_ state: FractalState, maxSide: Int = 160, requestID: Int) -> Preview }
+public struct FractalPreview { public static func render(_ state: FractalState, maxSide: Int = 160, requestID: Int) -> FractalPreview }
 ```
 
 ## App UI
