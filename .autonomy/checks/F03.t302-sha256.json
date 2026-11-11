@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/VisualCore",
+    "--filter",
+    "VisualCoreShaderSourceTests"
+  ],
+  "command": "swift test --package-path Packages/VisualCore --filter VisualCoreShaderSourceTests",
+  "elapsed_seconds": 3.985,
+  "exit_code": 0,
+  "finished": "2026-11-11T00:04:07+00:00",
+  "log": ".autonomy/logs/F03.t302-sha256.log",
+  "log_sha256": "0f4d6ab0de78275e1b266c877bc39c512c283e1c788689531807f4d1cb9ddd13",
+  "name": "t302-sha256",
+  "stage": "F03",
+  "started": "2026-11-11T00:04:03+00:00",
+  "timed_out": false
+}

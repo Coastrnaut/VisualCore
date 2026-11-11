@@ -14,7 +14,7 @@ IDs `T-F3##`. Tick only with `— Verified YYYY-MM-DD: <command/result>`. One co
 
 ## Phase 2: Foundational (pure, host-tested)
 
-- [ ] T-F302 [P] Tests `Packages/VisualCore/Tests/VisualCoreShaderSourceTests/SHA256Tests.swift`: NIST vectors ("", "abc", 448-bit, 1 MB 'a')
+- [X] T-F302 [P] Tests `Packages/VisualCore/Tests/VisualCoreShaderSourceTests/SHA256Tests.swift`: NIST vectors ("", "abc", 448-bit, 1 MB 'a') — Verified 2026-11-10: 4 NIST vector tests written (run-check F03.t302-sha256)
 - [ ] T-F303 [P] Implement `Packages/VisualCore/Sources/VisualCoreShaderSource/SHA256.swift`
 - [ ] T-F304 (FR-F301–F303, FR-F317, SC-F302) Tests `ShaderLibraryTests.swift`: version insertion, defines after version, nested includes with line map (file/line per expanded line), 64 KiB limit, depth 8 limit, cycle, unknown include (file+line), `#version 100` rejected, variant keys differ by defines
 - [ ] T-F305 (FR-F301–F303, FR-F317) Implement `ShaderLibrary.swift`, `LineMap` (in same file), errors `ShaderSourceError`
