@@ -580,6 +580,7 @@ VisualCoreScenes | init | public init(minChange: Double = 0)
 VisualCoreScenes | init | public init(minDistance: Double = 10)
 VisualCoreScenes | init | public init(minDuration: Double = 0.5, maxDistance: Double = 10)
 VisualCoreScenes | init | public init(size: Vec2, scale: Double)
+VisualCoreScenes | init | public init(width: Int, height: Int)
 VisualCoreScenes | init | public init?(id: String, title: String, width: Int, height: Int)
 VisualCoreScenes | let | public let height: Int
 VisualCoreScenes | let | public let id: String

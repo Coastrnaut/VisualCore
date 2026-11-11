@@ -15,8 +15,10 @@ let package = Package(
             .product(name: "VisualCoreSimulation", package: "VisualCore"),
             .product(name: "VisualCoreMath", package: "VisualCore"),
             .product(name: "VisualCorePersistence", package: "VisualCore"),
+            .product(name: "VisualCoreScenes", package: "VisualCore"),
         ]),
-        .testTarget(name: "GenerativeArtStudioCoreTests", dependencies: ["GenerativeArtStudioCore"]),
+        .testTarget(name: "GenerativeArtStudioCoreTests", dependencies: ["GenerativeArtStudioCore",
+                                                                     .product(name: "VisualCoreScenes", package: "VisualCore")]),
     ],
     swiftLanguageModes: [.v6]
 )

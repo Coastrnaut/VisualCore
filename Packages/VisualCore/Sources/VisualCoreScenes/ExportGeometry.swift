@@ -53,6 +53,12 @@ public struct ExportSize: Sendable, Hashable {
     public var pixelCount: Int { width * height }
     /// The longer edge in pixels.
     public var longEdge: Int { max(width, height) }
+
+    /// A size in pixels (for comparisons and fixtures; `ExportGeometry` produces even sizes).
+    public init(width: Int, height: Int) {
+        self.width = width
+        self.height = height
+    }
 }
 
 /// Derives export pixel sizes from a requested long edge and an aspect, capped by a device edge limit, a hard 8192 px

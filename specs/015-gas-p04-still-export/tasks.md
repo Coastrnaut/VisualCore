@@ -67,7 +67,7 @@ IDs are `T-A01-4##`, with one commit and push per task (`scripts/tick_task.py`).
 
 ## Phase 2: US1 — Export one full-resolution still (P1) 🎯
 
-- [ ] T-A01-404 [US1] Add `Apps/GenerativeArtStudio/Core/Sources/GenerativeArtStudioCore/ExportOptions.swift`:
+- [X] T-A01-404 [US1] Add `Apps/GenerativeArtStudio/Core/Sources/GenerativeArtStudioCore/ExportOptions.swift`: — Verified 2026-11-10: Core ExportOptions.swift (offered long edges 1080/2048/4096, aspect, maxEdge; size via VisualCore ExportGeometry; availableLongEdges clamped + deduplicated; dimensionsLabel; fileName sanitized <name>-<w>x<h>.png, ASCII letters/digits/-/_ kept, others '-', empty 'Untitled', stem ≤ 60; formatLabel 'Opaque · sRGB'); Core depends on VisualCoreScenes; VisualCore ExportSize gained a public init (baseline 839). ExportOptionsTests 4/4 (12 distinct sizes incl. 864×1080 and 1080×608, caps [1080, 2048] at maxEdge 2048 and [1080, 2048, 3000] at 3000, file names, label); run-check A01-P04/t404-core-tests-a2 27/27 pass (a1 failed to compile on the internal ExportSize init, fixed)
   - `longEdge` ∈ {1080, 2048, 4096}, `aspect`, `maxEdge`;
   - `size` via `ExportGeometry`;
   - `availableLongEdges` (clamped, deduplicated);
