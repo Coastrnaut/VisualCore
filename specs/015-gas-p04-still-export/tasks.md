@@ -32,7 +32,7 @@ IDs are `T-A01-4##`, with one commit and push per task (`scripts/tick_task.py`).
   - all edges even;
   - caps at maxEdge, 8192 and 64 MP;
   - invalid ratios rejected.
-- [ ] T-A01-402 [US3] Extend VisualCoreRendering:
+- [X] T-A01-402 [US3] Extend VisualCoreRendering: — Verified 2026-11-10: VisualCoreRendering: RenderCapabilities.maxRenderbufferSize; RenderHost.maxRenderSize (min of texture/renderbuffer/viewport limits), maxOffscreenPixels 64 MP, renderOffscreen(width:height:time:) on the host's own context (size validated before GPU work; registry target released, framebuffer 0 rebound and live resize restored via defer; live sceneFailed untouched); StillImage.swift (StillImage top-down with bottom-up flip, OffscreenRenderError, StillImageEncoder.pngData opaque sRGB via CGImage noneSkipLast + ImageIO). OffscreenExportTests 9/9: exact sizes + top-down quadrants, PNG decode sRGB/no alpha/identical RGB, flip and size validation, live frame identical after export, 8 MiB budget 2048² fails .resource(overBudget) with live counts unchanged and retry OK, scene throw leaves live scene running, invalid sizes refused with no allocation, destroyed host unavailable, maxRenderSize ≥ 4096; run-check A01-P04/t402-rendering-ios27 + ios26 TEST SUCCEEDED
   - `RenderCapabilities.maxRenderbufferSize` (queried from `GL_MAX_RENDERBUFFER_SIZE`);
   - `RenderHost.maxRenderSize` = min(maxTextureSize, maxRenderbufferSize, maxViewport.width, maxViewport.height),
     0 without a context;

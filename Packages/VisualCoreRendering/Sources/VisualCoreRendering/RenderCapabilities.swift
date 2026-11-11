@@ -20,6 +20,8 @@ public struct RenderCapabilities: Sendable, Equatable, Codable {
     public var maxTextureSize = 0
     /// GL_MAX_VIEWPORT_DIMS in pixels.
     public var maxViewport = Size(width: 0, height: 0)
+    /// GL_MAX_RENDERBUFFER_SIZE in pixels (feature 015 T-A01-402).
+    public var maxRenderbufferSize = 0
 
     /// A width and height in pixels.
     public struct Size: Sendable, Equatable, Codable {
@@ -57,6 +59,9 @@ public struct RenderCapabilities: Sendable, Equatable, Codable {
         var dims: [GLint] = [0, 0]
         vcglGetIntegerv(GLenum(GL_MAX_VIEWPORT_DIMS), &dims)
         caps.maxViewport = Size(width: Int(dims[0]), height: Int(dims[1]))
+        var maxRenderbuffer: GLint = 0
+        vcglGetIntegerv(GLenum(GL_MAX_RENDERBUFFER_SIZE), &maxRenderbuffer)
+        caps.maxRenderbufferSize = Int(maxRenderbuffer)
         return caps
     }
 }

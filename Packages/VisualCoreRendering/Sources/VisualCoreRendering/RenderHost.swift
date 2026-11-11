@@ -432,6 +432,61 @@ public final class RenderHost {
         return vcglGetError() == GLenum(GL_NO_ERROR) ? pixels : []
     }
 
+    // MARK: Offscreen still export (feature 015 T-A01-402; FR-A01-402, FR-A01-405, FR-A01-408)
+
+    /// Pixel-count cap per offscreen render (64 million).
+    public static let maxOffscreenPixels = 64_000_000
+
+    /// The largest edge an offscreen render may use: min(max texture, max renderbuffer, max viewport width and
+    /// height); 0 before a context reported its limits.
+    public var maxRenderSize: Int {
+        let c = capabilities
+        let limits = [c.maxTextureSize, c.maxRenderbufferSize, c.maxViewport.width, c.maxViewport.height]
+        return limits.contains { $0 <= 0 } ? 0 : limits.min() ?? 0
+    }
+
+    /// Renders the current scene into a `width`×`height` registry render target at frame time `time`, on this host's
+    /// context, and returns the pixels top-down. The size is validated before any GPU work. On every path the
+    /// target is released, framebuffer 0 is rebound and the scene is resized back to the live surface; a failure
+    /// never marks the live scene failed.
+    public func renderOffscreen(width: Int, height: Int, time: Double) throws(OffscreenRenderError) -> StillImage {
+        Self.assertMainThread()
+        guard state != .destroyed, context != nil else { throw .unavailable("host destroyed or without a context") }
+        guard sceneReady, !sceneFailed else { throw .unavailable("scene not set up or failed") }
+        let limit = maxRenderSize
+        guard width > 0, height > 0, width <= limit, height <= limit, width * height <= Self.maxOffscreenPixels else {
+            throw .invalidSize(width: width, height: height, max: limit)
+        }
+        makeCurrent()
+        let target: RenderTarget
+        do {
+            target = try resources.makeRenderTarget(width: width, height: height, label: "offscreen-export")
+        } catch {
+            throw .resource(String(describing: error))
+        }
+        let offscreen = renderContext.redirected(to: target.handle.name, width: width, height: height)
+        defer {
+            resources.release(target)
+            vcglBindFramebuffer(GLenum(GL_FRAMEBUFFER), 0)
+            if surface != nil {
+                makeCurrent()
+                scene.resize(renderContext)
+            }
+        }
+        scene.resize(offscreen)
+        target.bind()
+        vcglViewport(0, 0, GLsizei(width), GLsizei(height))
+        let frame = FrameInfo(index: frameIndex, time: time, delta: 0, targetTimestamp: CACurrentMediaTime())
+        do {
+            try scene.render(offscreen, frame: frame)
+        } catch {
+            throw .scene(String(describing: error))
+        }
+        let pixels = target.readPixels()
+        guard let image = StillImage(width: width, height: height, bottomUpRGBA: pixels) else { throw .readback }
+        return image
+    }
+
     // MARK: Teardown (FR-F209)
 
     /// Contract order: stop frames → scene teardown with the context current → unbind → destroy
