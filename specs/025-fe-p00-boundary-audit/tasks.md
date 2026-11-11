@@ -1,0 +1,94 @@
+---
+
+description: "Task list for feature 025 — Fractal Explorer Phase 00 boundary audit (ledger gate A03-P00)"
+---
+
+# Tasks: Fractal Explorer — Phase 00 boundary audit
+
+**Input**: `/specs/025-fe-p00-boundary-audit/`.
+
+**Tests** are required:
+- the shared contract check;
+- the shell smoke test on both simulators, enumeration-guarded;
+- the reference regression.
+
+**Conventions**:
+- IDs are `T-A03-0##`, with one commit and push per task (`scripts/tick_task.py`).
+- Commands run through `run-check --stage A03-P00`.
+- Review checkpoint after each phase: `validate_docs.py` and `check_app_contract.py --app fractal-explorer` pass.
+
+## Phase 1: Setup
+
+- [ ] T-A03-001 Create `docs/apps/fractal-explorer/regression-baseline.md` with the phase-start commit (the
+  `speckit-constitution` commit `343d251`, before any A03 file) and the reference pin `d93edd1`. This gives the
+  no-change diff for `Packages/` and `External/` (FR-A03-007) its base.
+
+## Phase 2: US1 — Evidence-backed integration matrix (P1) 🎯
+
+- [ ] T-A03-002 [US1] Write `docs/apps/fractal-explorer/visualcore-contract.json` (schema 1, app `fractal-explorer`,
+  gate A03-P00):
+  - an `inventory` covering every area in FR-A03-001, each with paths;
+  - `matrix` rows M01–M10 per research R1–R10:
+    - five brainstorm rows: fragment shaders, coordinate transforms, precision, parameter animation, palettes;
+    - five v0.1 rows: pinch/pan camera, bookmarks, iteration cap with cost estimate, capture and tours, precision
+      clamping.
+
+  Each row cites only public non-test symbols and has an example consumer. Upstream-gap and adaptation rows cite the
+  closest existing consumer. Run `check_app_contract.py --app fractal-explorer`; citation problems must be 0
+  (SC-A03-001, SC-A03-002).
+
+## Phase 3: US2 — Host, thread, build and regression baseline (P1)
+
+- [ ] T-A03-003 [US2] Run the 7-step reference regression in two `run-check` chunks (A03-P00). Record the steps,
+  commands and results in `docs/apps/fractal-explorer/regression-baseline.md` (FR-A03-004, SC-A03-004).
+
+## Phase 4: US3 — Compilable empty app shell (P1)
+
+- [ ] T-A03-004 [US3] Add the shell:
+  - `Apps/FractalExplorer/App/FractalExplorerApp.swift`: an @main SwiftUI app with `HomeView`, title "Fractal
+    Explorer", identifier `fe.home.title`, accessibility label and header trait, container `fe.home`;
+  - `project.yml` target `FractalExplorer`:
+    - bundle `dev.visualcore.FractalExplorer`, iOS 26.0, version 0.1.0 (1);
+    - `ITSAppUsesNonExemptEncryption` false;
+    - the dependency-audit post-build script;
+    - no VisualCore product yet and no usage descriptions;
+  - `project.yml` target `FractalExplorerUITests`, plus the scheme. Info.plists are generated under the gitignored
+    `Apps/FractalExplorer/Generated/`.
+
+  Build for the generic iOS Simulator and run `check_dependencies.py` (FR-A03-005, FR-A03-006).
+- [ ] T-A03-005 [US3] Add `Apps/FractalExplorer/Tests/UI/LaunchSmokeUITests.swift`: launch, `fe.home.title` exists,
+  label "Fractal Explorer". Run it on iOS 27.2 and 26.5, enumeration-guarded (SC-A03-003, FR-A03-006).
+
+## Phase 5: US4 — Gap register and stop/go decision (P2)
+
+- [ ] T-A03-006 [US4] Complete the contract JSON:
+  - `gaps` for every non-available row, each with an owner module, a phase and a test:
+    - G-VIEWPORT: VisualCoreMath, phase 1. Test: an anchored pinch keeps the touched plane point fixed within 1e-12
+      relative, and an aspect change keeps the center.
+    - G-FRACTAL: app-local, phase 1, with a CPU reference. Test: known interior and exterior points.
+    - G-PRECISION: VisualCoreRendering query plus a VisualCoreMath advisor, phase 2. Test: the advisor's thresholds
+      are derived from the mantissa bits, and a simulator query returns the reported `highp` precision.
+    - G-COST: VisualCoreDiagnostics, phase 3. Test: the estimate is monotonic in pixels, iterations and samples.
+    - G-TOUR: the viewport's log-zoom interpolation, phase 4.
+  - `traceability` for v0.1 features 01–06 and journeys 1–3;
+  - the `negative` rules (FR-A03-011);
+  - the go/stop `decision` with reasons.
+
+  Render it and run the check (FR-A03-008–011, SC-A03-005, SC-A03-007).
+
+## Phase 6: Polish
+
+- [ ] T-A03-007 Confirm that `git diff --stat 343d251..HEAD -- Packages External` is empty (SC-A03-006). Run the
+  release-check fast steps (docs, app-contracts, compliance, dependencies, licenses, script-tests) and the
+  documented-API check for `Apps/FractalExplorer`.
+
+## Dependencies
+
+- T-A03-001 → T-A03-002 → T-A03-006.
+- T-A03-003 is independent.
+- T-A03-004 → T-A03-005.
+- T-A03-007 runs last.
+
+## Implementation strategy
+
+The matrix first (US1), then the baseline, the shell and the decision, reusing the A01-P00 tooling unchanged.
