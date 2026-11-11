@@ -20,6 +20,51 @@ Canonical overrides:
   steps (CLAUDE.md §5).
 - No measured performance claim without device evidence.
 
+## Clarifications
+
+### Session 2026-11-11
+
+Answered autonomously under the owner's standing delegation (CLAUDE.md §2), recommended option in each case. The
+following were checked in code:
+- `AcknowledgementsView(identifierPrefix:)` and `LicenseInventory(bundle:)` in VisualCoreUI;
+- `bundle_licenses.py`, run as a post-build phase that reads `docs/legal/third-party.json` (`scope: shipped`);
+- A01's `LaunchCleanup`, which is app-local and removes `tmp/Exports`;
+- `CaptureModel`, which writes `FluidArt-<uuid>.png` directly in `tmp`;
+- the absence of any `UserDefaults` or `@AppStorage` in the app's sources.
+
+- Q: Which VisualCore component owns the temporary capture folder and its cleanup at launch? → A: A new
+  `TemporaryFolder` in VisualCorePersistence (Foundation only, rule R2):
+  - `init(name:)` under the temporary directory;
+  - `makeFileURL(prefix:extension:)` for unique names;
+  - `removeAll() -> Int`, which ignores errors.
+
+  The playground writes captures through it (`tmp/Captures`), and the app empties it at launch. A01 keeps its own
+  `LaunchCleanup` for this gate; switching A01 to the helper is recorded as reuse debt in the contract. Changing a
+  sealed app's tested code is outside this gate.
+- Q: How is the app icon produced, and how is its provenance checked? → A: Through the deterministic test mode: seed
+  3, the Glowing dye palette, 90 frames, rendered offscreen at 1024×1024 through `RenderHost.renderOffscreen` and
+  encoded with `StillImageEncoder`. `IconRenderTests` writes it once (with `FAP_WRITE_ICON=1`) and otherwise
+  compares a fresh render with the committed PNG (mean ≤ 1/255), as A01 does.
+- Q: Where is the Acknowledgements screen reached? → A: From a home-screen link "Acknowledgements"
+  (`fap.home.acknowledgements`), which opens `AcknowledgementsView(identifierPrefix: "fap.acknowledgements")`. The
+  licenses come from the same post-build `bundle_licenses.py` phase as A01. The accessibility audit covers the
+  screen.
+- Q: Which required-reason categories will the manifest declare? → A: Exactly what `check_privacy_manifest.py`
+  finds in the Release build. The app has no UserDefaults of its own, so UserDefaults is declared only if the scan
+  finds it (for example inside a framework), with the reason matching that site. ANGLE's FileTimestamp (C617.1) and
+  SystemBootTime (35F9.1) findings reuse A01's source-checked reasons. Frame timing in the app is also SystemBootTime
+  35F9.1.
+- Q: Which claims may the store listing make? → A: Only behaviors with a passing automated test:
+  - swipe to paint; Add splash;
+  - three palettes; pinch or slider brush size;
+  - viscosity, fade, quality and edges in Adjust; Simulation detail; automatic quality when hot or in Low Power;
+  - pause, step and reset;
+  - still capture with share or save;
+  - VoiceOver and Dynamic Type support.
+
+  No frame rate, battery, device-compatibility or physical-accuracy claim is allowed. The listing says the fluid is
+  "an artistic simulation", per manual §13.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 — Privacy is declared truthfully (Priority: P1)
@@ -150,8 +195,9 @@ with the implemented features.
   non-exempt encryption) are set.
 - **FR-A02-604**: The app MUST bundle the shipped components' license texts at build time and show them on an
   Acknowledgements screen reachable from the home screen, using VisualCoreUI's `AcknowledgementsView`.
-- **FR-A02-605**: Temporary captures MUST live in one app-owned temporary folder, and that folder MUST be emptied at
-  launch (crash recovery). The folder handling is a reusable VisualCore component (constitution II).
+- **FR-A02-605**: Temporary captures MUST live in one app-owned temporary folder (`tmp/Captures`), and that folder
+  MUST be emptied at launch (crash recovery). The folder handling is VisualCorePersistence's `TemporaryFolder`
+  (clarification 1), with tests, docs, the API baseline and the ProjectM regression.
 - **FR-A02-606**: The app MUST persist nothing: no UserDefaults keys of its own and no files outside the temporary
   capture folder. A test asserts this, and the docs record configuration schema version 1 as the starting point for
   any future migration.
