@@ -204,6 +204,7 @@ VisualCoreMath | func | public func dot(_ b: Vec2) -> Double
 VisualCoreMath | func | public func dot(_ b: Vec3) -> Double
 VisualCoreMath | func | public func dot(_ b: Vec4) -> Double
 VisualCoreMath | func | public func ease(_ t: Double, _ curve: EasingCurve, _ mode: EasingMode = .inOut) -> Double
+VisualCoreMath | func | public func encode(to encoder: any Encoder) throws
 VisualCoreMath | func | public func mix(_ b: Vec4, _ t: Double) -> Vec4
 VisualCoreMath | func | public func panned(by delta: Vec2) -> PlaneViewport
 VisualCoreMath | func | public func pinched(by scale: Double, anchor: Vec2) -> PlaneViewport
@@ -220,6 +221,7 @@ VisualCoreMath | func | public func screen(fromPlane p: Vec2) -> Vec2
 VisualCoreMath | func | public func slerp(_ to: Quat, _ t: Double) -> Quat
 VisualCoreMath | func | public func view() -> Mat4
 VisualCoreMath | func | public func viewProjection(aspect: Double) -> Mat4
+VisualCoreMath | func | public func viewport(size: Vec2) -> PlaneViewport
 VisualCoreMath | func | public mutating func orbit(dYaw: Double, dPitch: Double)
 VisualCoreMath | func | public mutating func pan(by delta: Vec2)
 VisualCoreMath | func | public mutating func zoom(by factor: Double)
@@ -260,17 +262,22 @@ VisualCoreMath | func | public static func trs(_ t: Vec2, _ r: Double, _ s: Vec2
 VisualCoreMath | init | public init(_ c0: Vec3, _ c1: Vec3, _ c2: Vec3)
 VisualCoreMath | init | public init(_ c0: Vec4, _ c1: Vec4, _ c2: Vec4, _ c3: Vec4)
 VisualCoreMath | init | public init(_ v: Vec3, _ w: Double)
+VisualCoreMath | init | public init(_ viewport: PlaneViewport)
 VisualCoreMath | init | public init(_ x: Double, _ y: Double)
 VisualCoreMath | init | public init(_ x: Double, _ y: Double, _ z: Double)
 VisualCoreMath | init | public init(_ x: Double, _ y: Double, _ z: Double, _ w: Double)
 VisualCoreMath | init | public init(axis: Vec3, angle: Double)
 VisualCoreMath | init | public init(center: Vec2 = .zero, zoom: Double = 1, rotation: Double = 0)
+VisualCoreMath | init | public init(center: Vec2, span: Double)
 VisualCoreMath | init | public init(center: Vec2, unitsPerPoint: Double, size: Vec2)
+VisualCoreMath | init | public init(from decoder: any Decoder) throws
 VisualCoreMath | init | public init(target: Vec3 = .zero, distance: Double = 5, yaw: Double = 0, pitch: Double = 0,
 VisualCoreMath | init | public init(x: Double, y: Double, z: Double, w: Double)
+VisualCoreMath | let | public let center: Vec2
 VisualCoreMath | let | public let level: Level
 VisualCoreMath | let | public let margin: Double
 VisualCoreMath | let | public let minimumPixelStep: Double
+VisualCoreMath | let | public let span: Double
 VisualCoreMath | let | public static let distanceRange: ClosedRange<Double>
 VisualCoreMath | let | public static let identity
 VisualCoreMath | let | public static let maxUnitsPerPoint
@@ -284,6 +291,7 @@ VisualCoreMath | struct | public struct Camera2D: Sendable, Equatable
 VisualCoreMath | struct | public struct Mat3: Sendable, Equatable
 VisualCoreMath | struct | public struct Mat4: Sendable, Equatable
 VisualCoreMath | struct | public struct OrbitCamera: Sendable, Equatable
+VisualCoreMath | struct | public struct PlaneFraming: Sendable, Equatable, Hashable, Codable
 VisualCoreMath | struct | public struct PlaneViewport: Sendable, Equatable
 VisualCoreMath | struct | public struct Quat: Sendable, Equatable
 VisualCoreMath | struct | public struct Status: Sendable, Equatable

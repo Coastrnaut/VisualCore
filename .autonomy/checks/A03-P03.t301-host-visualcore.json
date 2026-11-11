@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/VisualCore"
+  ],
+  "command": "swift test --package-path Packages/VisualCore",
+  "elapsed_seconds": 8.291,
+  "exit_code": 0,
+  "finished": "2026-11-11T12:55:36+00:00",
+  "log": ".autonomy/logs/A03-P03.t301-host-visualcore.log",
+  "log_sha256": "ee586d1d5f07fc88b6299520bdef377718682106fb5bd4d403b727401eb54fb9",
+  "name": "t301-host-visualcore",
+  "stage": "A03-P03",
+  "started": "2026-11-11T12:55:28+00:00",
+  "timed_out": false
+}

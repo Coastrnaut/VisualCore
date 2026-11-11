@@ -1,0 +1,25 @@
+{
+  "argv": [
+    "python3",
+    "scripts/release_check.py",
+    "--only",
+    "public-api",
+    "dependencies",
+    "docs",
+    "compliance",
+    "--log-dir",
+    ".autonomy/logs/a03p03-t301b",
+    "--json",
+    ".autonomy/logs/a03p03-t301b.json"
+  ],
+  "command": "python3 scripts/release_check.py --only public-api dependencies docs compliance --log-dir .autonomy/logs/a03p03-t301b --json .autonomy/logs/a03p03-t301b.json",
+  "elapsed_seconds": 0.919,
+  "exit_code": 0,
+  "finished": "2026-11-11T12:55:53+00:00",
+  "log": ".autonomy/logs/A03-P03.t301-checks-2.log",
+  "log_sha256": "7ed4d6dda742cd273f7d5a2ff6289207cbd2f08257f57299705b825ea1d13480",
+  "name": "t301-checks-2",
+  "stage": "A03-P03",
+  "started": "2026-11-11T12:55:52+00:00",
+  "timed_out": false
+}

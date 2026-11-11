@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/VisualCore",
+    "--filter",
+    "PlaneFramingTests"
+  ],
+  "command": "swift test --package-path Packages/VisualCore --filter PlaneFramingTests",
+  "elapsed_seconds": 2.357,
+  "exit_code": 0,
+  "finished": "2026-11-11T12:55:55+00:00",
+  "log": ".autonomy/logs/A03-P03.t301-host-visualcore-2.log",
+  "log_sha256": "6f976c39b570490f50fbcd3db0e99f80b24fc9898c1293b39dba707e2fc3ea20",
+  "name": "t301-host-visualcore-2",
+  "stage": "A03-P03",
+  "started": "2026-11-11T12:55:53+00:00",
+  "timed_out": false
+}

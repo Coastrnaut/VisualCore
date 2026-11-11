@@ -6,7 +6,7 @@ iOS 26+ inside apps. The package map and dependency rules R1–R5 are in
 
 | Product | Purpose |
 |---|---|
-| VisualCoreMath | vectors, matrices, quaternions, cameras, double-precision plane viewports (PlaneViewport), precision advice (PrecisionAdvisor), easing |
+| VisualCoreMath | vectors, matrices, quaternions, cameras, double-precision plane viewports (PlaneViewport) and size-independent framings (PlaneFraming), precision advice (PrecisionAdvisor), easing |
 | VisualCoreSimulation | fixed-step clock, seeded RNG, timelines, particle pool, NaN guard, CPU field grids, storage precision, time-step policy |
 | VisualCoreScenes | input mapping, pointer tracking and velocity, seeded synthetic gesture scripts, mesh generators, export geometry |
 | VisualCoreShaderSource | shader library, includes, line maps, diagnostics parsing |
