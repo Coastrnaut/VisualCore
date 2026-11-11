@@ -84,6 +84,8 @@ final class ExportModel: Identifiable {
     var options: ExportOptions { didSet { if options != oldValue { invalidate() } } }
     private(set) var phase: Phase = .idle
     private(set) var preview: UIImage?
+    /// The last VoiceOver announcement (start, finish or failure of an export); also posted to VoiceOver.
+    private(set) var announcement: String?
 
     /// Long edge of the crop preview in pixels.
     static let previewEdge = 240
@@ -109,10 +111,23 @@ final class ExportModel: Identifiable {
     func run() async {
         removeFile()
         phase = .rendering
+        announce("Rendering \(options.dimensionsLabel)")
         await Task.yield()
         try? await Task.sleep(for: .milliseconds(50))   // let the progress indicator draw before the main thread works
-        do { phase = .ready(try ExportRunner.export(scene, options: options, name: name)) }
-        catch { phase = .failed(ExportRunner.message(for: error)) }
+        do {
+            phase = .ready(try ExportRunner.export(scene, options: options, name: name))
+            announce("Export ready")
+        } catch {
+            let message = ExportRunner.message(for: error)
+            phase = .failed(message)
+            announce(message)
+        }
+    }
+
+    /// FR-A01-409: progress and results are spoken, not only shown.
+    private func announce(_ text: String) {
+        announcement = text
+        AccessibilityNotification.Announcement(text).post()
     }
 
     /// Deletes the finished file (sheet closed or options changed).
