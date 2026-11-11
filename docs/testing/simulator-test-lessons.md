@@ -174,3 +174,16 @@ speaks and what the screen shows, not exact values. Sheets at a medium detent wi
   fails.
 - **When a test file changes after one runtime passed, rerun that runtime too**, so both runtimes' evidence covers
   the same test code.
+
+## Feature 030 (A03-P05)
+
+- **Compare like with like.** A reproduction check that compared reopened bookmarks with the 64-bit CPU reference
+  failed on legitimate 32-bit iteration divergence at high caps; comparing the GPU picture with the original GPU
+  picture at shared plane points tests what the fixture claims.
+- **Boundary pixels are not precision errors.** A precision ladder at a boundary point measured 97% plain agreement
+  at a "reliable" zoom. Counting a pixel as explained when the CPU class changes within one pixel (feature 027's rule)
+  separates arithmetic noise at the boundary from real blocking.
+- **Measure at the size people see.** The ladder draws 64-pixel patches at the screen's own plane step per device
+  pixel; a shrunken whole view would hide precision loss by a factor of the screen size.
+- **Write rehearsal numbers from the reports, not from memory.** The unit-test canvas and the simulator screen gave
+  different breakdown steps (7 vs 6); the task note was corrected in a follow-up commit.

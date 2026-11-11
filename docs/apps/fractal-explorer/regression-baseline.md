@@ -53,3 +53,9 @@ changed packages. A01's own `CompositionLibrary` is unchanged; adopting `NamedLi
 VisualCoreRendering gained the pure VisualCorePersistence dependency. A01 (`t405-build-GenerativeArtStudio`) and A02
 (`t405-build-FluidArtPlayground`) build from clean derived data. A02's own `CaptureModel` is unchanged; adopting
 `StillCapture` there is a follow-up.
+
+## A03-P05 rerun after the VisualCoreAutomation app modes (2026-11-11)
+
+`A03-P05/t502-reference-a` 3/3 (pin `d93edd1` unchanged) and `t502-reference-b` 4/4: **7/7 pass**, unchanged. A01
+(`t502-build-GenerativeArtStudio`) and A02 (`t502-build-FluidArtPlayground`) build from clean derived data, and A02's
+own automation tests pass unchanged (`t501-a02-automation`, 4/4).
