@@ -20,3 +20,14 @@ Reference at `d93edd1`, unmodified (`F07.t701-before-reference-clean`). Baseline
 (`F07.pin-d93edd1-*`): engine xcframework, projectM-iOS/CaptureLab/RendererLab builds, ANGLERendering 14/14 on
 iOS 27.2 and 26.5 (includes `testRendersTheUpstreamTestPreset`, the Phase 0 preset-render check), reference audit
 PASS. These are the "before" results for batches 2a and 2; each batch adds its "after" results to its row.
+
+## Retained in ProjectM (deliberately not extracted; FR-F710, archived Phase 7 "do not force extraction")
+
+| ProjectM part (reference) | Why it stays in the submodule |
+|---|---|
+| `ProjectMBridge` + `ProjectM.xcframework` (engine, MilkDrop/preset evaluation) | The engine is the product the reference ships; its semantics must not change (Phase 7 rule) and its LGPL linkage stays a separate dynamic framework. VisualCore only hosts it (boundary 2). |
+| `PresetLibrary` (index, packs, search, exclusions), `ANGLERenderer.prewarm` warm-up scheduling | Tightly coupled to MilkDrop presets and the reference's feature 002 performance work (d93edd1); no other app has presets. |
+| Purchases / StoreKit, library unlock (`LibraryStore`, coordinators) | Product- and account-specific; owner-only business boundary. |
+| `AudioCore`, `CaptureKit`, `CaptureUI` (microphone, in-app playback, System/App Capture) | Capture claims need 10-minute device diagnostics (CLAUDE.md §5); VisualCore apps get their own `VisualCoreAudio` (F08+) instead of inheriting capture behavior. |
+| `CFlashLimiter` | VisualCore has its own host-tested `FlashLimiterModel` + GPU pass (feature 005); the reference keeps its C limiter so the shipping app is unchanged. |
+| The reference `ANGLERenderer` EGL lifecycle itself | The shipping app keeps it; VisualCore re-implements the same sequence app-neutrally (boundary 1). Switching the shipping app to VisualCore would be a reference change, which needs an owner decision and a separate reviewed ADR. |
