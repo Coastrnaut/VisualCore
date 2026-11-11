@@ -170,6 +170,11 @@ and the API baseline are updated, and the ProjectM regression passes.
 - A velocity above the storable range in 8-bit fallback storage: it is clamped to the range, never wrapped.
 - Advection that traces back outside the grid: edge values are used (clamp to edge), never undefined data.
 - A non-finite touch location or timestamp: the sample is rejected and counted.
+- A context loss with splats pending: the queue is CPU state and survives. The fields are rebuilt from the
+  configuration (Phase 01), and the pending splats apply on the next frame.
+- The app goes to the background mid-swipe: the system cancels the touches, so that finger's tracker state is
+  dropped and nothing more is queued. Splats already queued apply when rendering resumes, still under the per-frame
+  cap.
 
 ## Requirements *(mandatory)*
 
@@ -238,6 +243,9 @@ and the API baseline are updated, and the ProjectM regression passes.
 - The model is artistic, not physical (constitution A02). Pressure projection, viscosity and boundary modes arrive in
   Phase 03. Pinch to change the brush radius, palettes and capture arrive in Phase 04. Phase 02 uses clamp-to-edge
   everywhere.
+- Fluid motion in this phase only comes from the user (swipes or the splash control). Nothing moves on its own
+  except the slow dissipation fade, so Reduce Motion needs no extra behavior yet. Phase 04 revisits it with palettes
+  and bloom.
 - Simulator timing is not evidence. Frame-time budgets come with the quality policy (Phase 03) and campaign II.
 - Nothing is persisted in this phase, and the configuration stays at schema version 1 (no stored files exist yet).
 - Release items wait for Phase 06. The app stays at version 0.1.0 (1).
@@ -262,4 +270,6 @@ and the API baseline are updated, and the ProjectM regression passes.
 - No claim of physical accuracy.
 - No pass may sample the texture it writes.
 - No unbounded touch processing: the samples per update and the splats per frame are capped.
+- No recording, persisting or transmitting of touch paths. Samples live only in memory until they are drained into
+  the fields.
 - No gesture without a control alternative.
