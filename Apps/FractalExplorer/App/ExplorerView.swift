@@ -1,36 +1,63 @@
-// ExplorerView.swift — the explorer screen (feature 026 T-A03-104; FR-A03-101, FR-A03-106): an accessible mode picker,
-// the mode explanation, and the CPU-reference preview of the current view with its spoken description. No render host
-// and no GPU resources in Phase 01; Phase 02 replaces the preview with the VisualCore-hosted GPU render and keeps this
-// model.
+// ExplorerView.swift — the explorer screen (feature 026 T-A03-104; feature 027 T-A03-204): an accessible mode picker,
+// the mode explanation, and the GPU picture on VisualCore's render host (RenderSurface), with the CPU-reference preview
+// as the fallback when the shader cannot run. The app owns no EGL context.
 import CoreGraphics
 import FractalExplorerCore
 import SwiftUI
 import VisualCoreMath
+import VisualCoreRendering
 import VisualCoreUI
 
-/// The explorer's state and its preview; the preview is computed off the main actor and stale results are dropped.
+/// The explorer's state, its GPU scene on VisualCore's render host, and the CPU-reference preview used as the fallback
+/// picture when the shader cannot run (feature 027 T-A03-204; clarification 5).
 @MainActor
 @Observable
 final class ExplorerModel {
-    /// The fractal state (mode, viewport, seed, cap, radius).
-    var state: FractalState { didSet { if state != oldValue { refresh() } } }
-    /// The latest preview for the current request, if computed.
+    /// The fractal state (mode, viewport, seed, cap, radius); every change reaches the next frame.
+    var state: FractalState {
+        didSet {
+            guard state != oldValue else { return }
+            scene.snapshot.state = state
+            if usingFallback { refresh() }
+        }
+    }
+    /// The GPU scene (VisualCore FullScreenShaderScene inside).
+    let scene: FractalScene
+    /// The one render host (VisualCore's audited EGL host); nil if it could not start.
+    private(set) var host: RenderHost?
+    /// The latest CPU preview for the current request (fallback only).
     private(set) var preview: FractalPreview?
-    /// The identifier of the latest request.
+    /// The identifier of the latest preview request.
     private(set) var requestID = 0
-    /// Results that arrived for an older request and were discarded (tests).
+    /// Preview results that arrived for an older request and were discarded (tests).
     private(set) var droppedResults = 0
     private var task: Task<Void, Never>?
 
-    init(size: Vec2 = Vec2(390, 844)) {
-        state = FractalState(size: size)
-        refresh()
+    /// `fragment` is a test seam (an invalid source exercises the fallback).
+    init(size: Vec2 = Vec2(390, 844), fragment: String = FractalShaders.fragment) {
+        let initial = FractalState(size: size)
+        state = initial
+        scene = FractalScene(snapshot: .init(state: initial), fragment: fragment)
+        host = try? RenderHost(scene: scene)
+        if usingFallback { refresh() }
     }
+
+    /// True when the GPU picture is unavailable (no host, or the shader failed); the CPU preview is shown instead.
+    var usingFallback: Bool { host == nil || scene.errorMessage != nil }
 
     /// The current mode's explanation.
     var explanation: String { FractalExplanations.text(for: state.mode) }
 
-    /// Starts a preview for the current state; a newer request supersedes it.
+    /// The view's size changed (layout, rotation, split view): the viewport keeps its center and the plane width across
+    /// the shorter side, so the zoom and the visible content stay the same (square pixels via PlaneViewport).
+    func resize(to size: Vec2) {
+        let old = state.viewport
+        guard size.isFinite, size.x > 0, size.y > 0, size != old.size else { return }
+        let width = old.unitsPerPoint * min(old.size.x, old.size.y)
+        state.viewport = PlaneViewport(center: old.center, unitsPerPoint: width / min(size.x, size.y), size: size)
+    }
+
+    /// Starts a CPU preview for the current state; a newer request supersedes it.
     func refresh() {
         requestID += 1
         let id = requestID, snapshot = state
@@ -54,7 +81,14 @@ final class ExplorerModel {
         while preview?.requestID != requestID { await Task.yield(); try? await Task.sleep(nanoseconds: 5_000_000) }
     }
 
-    /// The preview as an image.
+    /// Destroys the host (the screen went away).
+    func close() {
+        task?.cancel()
+        host?.destroy()
+        host = nil
+    }
+
+    /// The CPU preview as an image.
     var image: CGImage? {
         guard let p = preview else { return nil }
         let data = Data(p.rgba) as CFData
@@ -80,6 +114,12 @@ struct ExplorerView: View {
                     .fixedSize(horizontal: false, vertical: true)
                     .accessibilityIdentifier("fe.mode.explanation")
                 canvas
+                if model.usingFallback, let error = model.scene.errorMessage {
+                    Text("The graphics shader could not run, so a simpler preview is shown. (\(error))")
+                        .font(.footnote)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .accessibilityIdentifier("fe.fallback")
+                }
                 if model.state.mode == .julia {
                     Text("Seed: \(FractalState.complex(model.state.juliaSeed))")
                         .accessibilityIdentifier("fe.seed")
@@ -87,26 +127,34 @@ struct ExplorerView: View {
             }
             .padding()
         }
+        .onDisappear { model.close() }
         .navigationTitle("Explorer")
         .navigationBarTitleDisplayMode(.inline)
         .tint(AccessibleColors.accent)
     }
 
     private var canvas: some View {
-        Group {
-            if let image = model.image {
-                Image(decorative: image, scale: 1)
-                    .resizable()
-                    .interpolation(.none)
-                    .aspectRatio(contentMode: .fit)
-            } else {
-                Color.black.aspectRatio(390.0 / 844.0, contentMode: .fit)
+        GeometryReader { geo in
+            Group {
+                if let host = model.host, !model.usingFallback {
+                    RenderSurface(host: host, accessibilityLabel: model.state.spokenDescription,
+                                  accessibilityHint: "Fractal picture. Pinch to zoom and drag to move; the zoom buttons do the same.")
+                } else if let image = model.image {
+                    Image(decorative: image, scale: 1)
+                        .resizable()
+                        .interpolation(.none)
+                        .accessibilityElement()
+                        .accessibilityLabel(model.state.spokenDescription)
+                        .accessibilityAddTraits(.isImage)
+                } else {
+                    Color.black
+                }
             }
+            .onAppear { model.resize(to: Vec2(Double(geo.size.width), Double(geo.size.height))) }
+            .onChange(of: geo.size) { _, size in model.resize(to: Vec2(Double(size.width), Double(size.height))) }
         }
+        .aspectRatio(3.0 / 4.0, contentMode: .fit)
         .frame(maxWidth: .infinity)
-        .accessibilityElement()
-        .accessibilityLabel(model.state.spokenDescription)
-        .accessibilityAddTraits(.isImage)
         .accessibilityIdentifier("fe.canvas")
     }
 }

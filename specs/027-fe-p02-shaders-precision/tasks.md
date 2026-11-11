@@ -47,7 +47,7 @@ amendments), the plan, research R1–R4, the data model, the contract and the qu
   Add `GPUAgreementTests`. Render 64 × 64 offscreen views of the default Mandelbrot and Julia scenes. Expect class
   agreement of at least 99%, with boundary-only disagreements, the origin interior and c = 2 exterior. Run on 27.2
   and 26.5 (FR-A03-201, FR-A03-207, SC-A03-202).
-- [ ] T-A03-204 [US1] Update `ExplorerModel` and `ExplorerView`:
+- [X] T-A03-204 [US1] Update `ExplorerModel` and `ExplorerView`: — Verified 2026-11-11: — Verified 2026-11-11: ExplorerModel owns one RenderHost(FractalScene) shown through VisualCoreUI RenderSurface (fe.canvas, spoken description, hint), close() on disappear; CPU preview only as the fallback when the shader fails (fe.fallback notice); resize keeps center and the width across the shorter side so zoom stays constant (the first iOS 26.5 run t204-app-ios26 failed at zoom 0.96× after layout; fixed). ExplorerModelTests 4: GPU hosted and following state/resize/close, forced shader failure shows the CPU fallback, recreateContext keeps the view, stale previews dropped (analyze G1) — run-check A03-P02/t204-app-ios27-2 and t204-app-ios26-2 TEST SUCCEEDED, enumeration 11/11 each
   - one `RenderHost(scene: FractalScene)` shown through `RenderSurface` with the label `fe.canvas`, and `close()` on
     disappear;
   - the CPU preview stays as the fallback when the shader reports an error;
