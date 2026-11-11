@@ -17,6 +17,10 @@ public final class EffectScene: RenderScene {
     public var graph: EffectGraphDescription { didSet { rebuildPending = true } }
     /// Appends the Reduce-Flashing limiter (FR-F409) as the final pass.
     public var reduceFlashing = false { didSet { if reduceFlashing != oldValue { rebuildPending = true } } }
+    /// When true, the content renders straight into the host framebuffer: the graph and limiter are skipped and the
+    /// renderer keeps its state (feature 016 T-A01-502). Use it when no effect is wanted, or for still exports that
+    /// must not be limited.
+    public var bypassEffects = false
     /// Maximum change of displayed mean luminance per second; a change rebuilds the graph (FR-F409).
     public var flashLimitPerSecond = 0.3 { didSet { if flashLimitPerSecond != oldValue, reduceFlashing { rebuildPending = true } } }
     /// The last graph-build, render or scene-target error; cleared when the renderer rebuilds successfully.
@@ -59,8 +63,14 @@ public final class EffectScene: RenderScene {
         content.resize(context)
     }
 
-    /// Renders content into the scene target, runs the graph (rebuilding it when pending) and draws the output into `context.framebuffer`.
+    /// Renders content into the scene target, runs the graph (rebuilding it when pending) and draws the output into `context.framebuffer`; with `bypassEffects` the content draws into `context.framebuffer` directly.
     public func render(_ context: RenderContext, frame: FrameInfo) throws {
+        if bypassEffects {
+            vcglBindFramebuffer(GLenum(GL_FRAMEBUFFER), context.framebuffer)
+            vcglViewport(0, 0, GLsizei(context.pixelWidth), GLsizei(context.pixelHeight))
+            try content.render(context, frame: frame)
+            return
+        }
         if sceneTarget == nil { try makeSceneTarget(context) }
         guard let sceneTarget, let present else { return }
         if rebuildPending {
