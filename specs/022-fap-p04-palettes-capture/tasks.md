@@ -82,7 +82,7 @@ Checkpoints: `validate_docs`, `check_dependencies`, `check_compliance` and `chec
 
 ## Phase 6: UI, contract and checks
 
-- [ ] T-A02-407 Add `PaletteCaptureUITests` (pick each palette, change Brush size, capture → share sheet) and extend
+- [X] T-A02-407 Add `PaletteCaptureUITests` (pick each palette, change Brush size, capture → share sheet) and extend — Verified 2026-11-11: PaletteCaptureUITests: the canvas names the glowing dye palette; Adjust picks Ink and resizes the brush (value spoken as a percentage of the canvas); the canvas label then names the ink palette; Capture shows 'Captured W x H pixels' and a hittable share control, and tapping it presents the system share sheet. The audit now covers the capture sheet at default size and XXXL. Fixed on the way: the canvas description read the unobserved scene configuration, so the label did not follow palette changes (now reads the observed model configuration); the capture sheet clipped text at XXXL (scrolls, wraps, opens large). run-check A02-P04/t407-app-27-3 and t407-app-26 TEST SUCCEEDED, enumeration guard 46/46 each, 0 audit issues (earlier failing attempts kept) (SC-A02-405)
   the audit to the new controls. Run the app tests on 27.2 and 26.5 (SC-A02-405).
 - [ ] T-A02-408 Update the contract (reused pieces in M02/M06/M09 notes; the observer recorded), then run the release
   fast steps, the isolation check with the allowed usage key, and an A01 build. Add lessons (FR-A02-408, SC-A02-406).

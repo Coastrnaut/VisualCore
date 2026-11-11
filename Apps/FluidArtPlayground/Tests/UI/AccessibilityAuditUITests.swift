@@ -62,6 +62,10 @@ final class AccessibilityAuditUITests: XCTestCase {
         app.buttons["fap.adjust"].tap()
         XCTAssertTrue(app.sliders["fap.adjust.viscosity"].waitForExistence(timeout: 10))
         try audit(app, "adjust [\(label)]", types: types)
+        app.buttons["fap.adjust.done"].tap()
+        app.buttons["fap.capture"].tap()
+        XCTAssertTrue(app.buttons["fap.capture.share"].waitForExistence(timeout: 30))
+        try audit(app, "capture [\(label)]", types: types)
     }
 
     func testAuditDefaultTextSize() throws { try run(textSize: nil) }

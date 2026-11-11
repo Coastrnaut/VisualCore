@@ -164,7 +164,8 @@ final class PlaygroundModel {
 
     /// The spoken canvas value.
     var description: String {
-        FluidCanvasDescription.text(configuration: scene.configuration, storage: scene.precision ?? .unorm8,
+        // Reads the observed `configuration` so VoiceOver's label follows palette and tuning changes.
+        FluidCanvasDescription.text(configuration: configuration, storage: scene.precision ?? .unorm8,
                                     paused: scene.paused || host?.state != .active, splashes: splashes)
     }
 
@@ -268,29 +269,40 @@ struct PlaygroundView: View {
 struct CaptureSheet: View {
     let capture: CaptureModel
     @Environment(\.dismiss) private var dismiss
+    @State private var detent = PresentationDetent.large
 
     var body: some View {
         NavigationStack {
+            ScrollView {
             VStack(spacing: 20) {
                 switch capture.state {
                 case .done(let url):
                     if let image = capture.lastImage {
                         Text("Captured \(image.width) × \(image.height) pixels.")
+                            .fixedSize(horizontal: false, vertical: true)
                             .accessibilityIdentifier("fap.capture.message")
                     }
                     ShareLink(item: url) {
-                        Label("Share or Save Image", systemImage: "square.and.arrow.up").frame(minHeight: 44)
+                        Label {
+                            Text("Share or Save Image").fixedSize(horizontal: false, vertical: true)
+                        } icon: {
+                            Image(systemName: "square.and.arrow.up")
+                        }
+                        .frame(minHeight: 44)
                     }
                     .buttonStyle(.borderedProminent)
                     .accessibilityIdentifier("fap.capture.share")
                 case .failed(let message):
-                    Text(message).multilineTextAlignment(.center).accessibilityIdentifier("fap.capture.message")
+                    Text(message).multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
+                        .accessibilityIdentifier("fap.capture.message")
                 case .idle:
                     Text("Nothing captured yet.").accessibilityIdentifier("fap.capture.message")
                 }
             }
+            .fixedSize(horizontal: false, vertical: true)
             .padding()
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .frame(maxWidth: .infinity)
+            }
             .background(Color(uiColor: .systemGroupedBackground))
             .tint(AccessibleColors.accent)
             .navigationTitle("Capture")
@@ -301,7 +313,7 @@ struct CaptureSheet: View {
                 }
             }
         }
-        .presentationDetents([.medium])
+        .presentationDetents([.medium, .large], selection: $detent)
         .presentationBackground(Color(uiColor: .systemGroupedBackground))
     }
 }
