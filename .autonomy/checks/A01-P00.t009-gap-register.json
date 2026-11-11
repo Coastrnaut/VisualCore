@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_app_contract.py",
+    "--app",
+    "generative-art-studio",
+    "--render"
+  ],
+  "command": "python3 scripts/check_app_contract.py --app generative-art-studio --render",
+  "elapsed_seconds": 0.031,
+  "exit_code": 0,
+  "finished": "2026-11-11T03:22:55+00:00",
+  "log": ".autonomy/logs/A01-P00.t009-gap-register.log",
+  "log_sha256": "c70b0ed955caadebc44c607ee5dcbc4d74161d11c97d5082e74b451e3d79bfc0",
+  "name": "t009-gap-register",
+  "stage": "A01-P00",
+  "started": "2026-11-11T03:22:55+00:00",
+  "timed_out": false
+}
