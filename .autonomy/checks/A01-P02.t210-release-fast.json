@@ -1,0 +1,25 @@
+{
+  "argv": [
+    "python3",
+    "scripts/release_check.py",
+    "--only",
+    "docs",
+    "app-contracts",
+    "compliance",
+    "dependencies",
+    "public-api",
+    "licenses",
+    "script-tests",
+    "host-visualcore"
+  ],
+  "command": "python3 scripts/release_check.py --only docs app-contracts compliance dependencies public-api licenses script-tests host-visualcore",
+  "elapsed_seconds": 19.471,
+  "exit_code": 0,
+  "finished": "2026-11-11T04:16:14+00:00",
+  "log": ".autonomy/logs/A01-P02.t210-release-fast.log",
+  "log_sha256": "e481ad59a13f72ff43667cf51fc3e36273901f5c6f2a8fa92c836192e035836e",
+  "name": "t210-release-fast",
+  "stage": "A01-P02",
+  "started": "2026-11-11T04:15:55+00:00",
+  "timed_out": false
+}

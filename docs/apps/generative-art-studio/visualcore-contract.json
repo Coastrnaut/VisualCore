@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "app": "generative-art-studio",
-  "gate": "A01-P01",
+  "gate": "A01-P02",
   "date": "2026-11-10",
   "inventory": [
     {
@@ -141,32 +141,32 @@
       "id": "M02",
       "capability": "Animation and time-based parameters",
       "source": "brainstorm",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/SceneClock.swift",
+          "symbol": "SceneClock.advance",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/SceneClock.swift",
+          "symbol": "SceneClock.scrub",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
         {
           "file": "Packages/VisualCore/Sources/VisualCoreSimulation/Timeline.swift",
           "symbol": "Timeline",
           "product": "VisualCoreSimulation",
           "public": true
-        },
-        {
-          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/Timeline.swift",
-          "symbol": "Tween",
-          "product": "VisualCoreSimulation",
-          "public": true
-        },
-        {
-          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/FixedStepClock.swift",
-          "symbol": "FixedStepClock",
-          "product": "VisualCoreSimulation",
-          "public": true
         }
       ],
       "example": {
-        "file": "Harnesses/InteractiveDemo/Sources/DemoScene.swift",
-        "symbol": "DemoScene"
+        "file": "Apps/GenerativeArtStudio/App/ClockedArtScene.swift",
+        "symbol": "ClockedArtScene"
       },
-      "notes": "No pausable/scrubbable/speed-scaled scene clock separating document time from wall time."
+      "notes": "Closed in A01-P02: SceneClock (play/pause/scrub/speed/reduced motion)."
     },
     {
       "id": "M03",
@@ -258,9 +258,21 @@
           "symbol": "ParameterHash.of",
           "product": "VisualCoreParameters",
           "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreParameters/ParameterEditor.swift",
+          "symbol": "ParameterEditor",
+          "product": "VisualCoreParameters",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/ParameterPanel.swift",
+          "symbol": "ParameterPanel",
+          "product": "VisualCoreUI",
+          "public": true
         }
       ],
-      "notes": "Closed in A01-P01: new pure module VisualCoreParameters.",
+      "notes": "VisualCoreParameters (A01-P01) plus ParameterEditor and VisualCoreUI ParameterPanel (A01-P02).",
       "example": {
         "file": "Apps/GenerativeArtStudio/Core/Sources/GenerativeArtStudioCore/FamilyCatalog.swift",
         "symbol": "FamilyCatalog"
@@ -377,35 +389,29 @@
       "status": "requires adaptation",
       "evidence": [
         {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/SceneClock.swift",
+          "symbol": "SceneClock",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
           "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
           "symbol": "RenderHost.pause",
           "product": "VisualCoreRendering",
           "public": true
         },
         {
-          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
-          "symbol": "RenderHost.resume",
-          "product": "VisualCoreRendering",
-          "public": true
-        },
-        {
-          "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/FramePacing.swift",
-          "symbol": "FramePacing",
-          "product": "VisualCoreDiagnostics",
-          "public": true
-        },
-        {
-          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FullScreenShaderScene.swift",
-          "symbol": "FullScreenShaderScene",
-          "product": "VisualCoreRendering",
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/RenderSurface.swift",
+          "symbol": "RenderSurface",
+          "product": "VisualCoreUI",
           "public": true
         }
       ],
       "example": {
-        "file": "Showcase/App/ShowcaseSettings.swift",
-        "symbol": "ShowcaseSettings"
+        "file": "Apps/GenerativeArtStudio/App/ControlsSheet.swift",
+        "symbol": "ControlsSheet"
       },
-      "notes": "FullScreenShaderScene has fixedTime/timeScale and VisualCoreUI has RenderSurface (A01-P01); a scrubbable SceneClock (G-CLOCK) and the accessibility settings model (G-UI) remain."
+      "notes": "Pause/scrub/Reduce Motion rate via SceneClock (A01-P02); the VisualCoreUI accessibility settings model (G-UI) remains for Phase 05."
     }
   ],
   "gaps": [
@@ -441,7 +447,8 @@
       "kind": "adaptation",
       "owner": "VisualCore:VisualCoreSimulation",
       "phase": 2,
-      "test": "SceneClock host tests: pause holds time, scrub sets time, speed scales delta, reduced motion caps rate, deterministic sequence for fixed inputs"
+      "test": "SceneClock host tests: pause holds time, scrub sets time, speed scales delta, reduced motion caps rate, deterministic sequence for fixed inputs",
+      "closed": "A01-P02"
     },
     {
       "id": "G-PARAMS",
@@ -481,7 +488,7 @@
       ],
       "kind": "upstream",
       "owner": "VisualCore:VisualCoreUI",
-      "phase": 2,
+      "phase": 5,
       "test": "RenderSurface done in A01-P01 (RenderSurfaceTests); remaining: accessibility settings model (Reduce Motion/Flashing, canvas description) with app UI tests"
     }
   ],
@@ -638,7 +645,8 @@
       "All 7 gaps are additive VisualCore modules or helpers owned per Principle II; none needs a second renderer, a fork, private API or networking.",
       "Reference regression baseline recorded green (T-A01-006) and the empty shell builds on both simulator runtimes (T-A01-008).",
       "Phase 01 starts with G-PARAMS (VisualCoreParameters) and the app's GPU-free domain.",
-      "A01-P01 closed G-SHADERLOAD, G-GLSLLIB and G-PARAMS in VisualCore; M01 and M05 are now available."
+      "A01-P01 closed G-SHADERLOAD, G-GLSLLIB and G-PARAMS in VisualCore; M01 and M05 are now available.",
+      "A01-P02 closed G-CLOCK (SceneClock) and added ParameterEditor and ParameterPanel to VisualCore; M02 is available."
     ],
     "blockers": []
   }

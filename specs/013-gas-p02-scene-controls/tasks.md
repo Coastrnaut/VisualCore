@@ -87,7 +87,7 @@ after each phase, run `validate_docs.py`.
 
 ## Phase 4: Polish
 
-- [ ] T-A01-210 Update `docs/apps/generative-art-studio/visualcore-contract.json`:
+- [X] T-A01-210 Update `docs/apps/generative-art-studio/visualcore-contract.json`: — Verified 2026-11-10: visualcore-contract.json gate A01-P02: M02 available (SceneClock evidence, ClockedArtScene example), M05 + ParameterEditor/ParameterPanel, M10 updated (SceneClock, RenderHost.pause, RenderSurface; G-UI moved to phase 5), G-CLOCK closed A01-P02; rendered; run-check A01-P02/t210-release-fast 8/8 (docs, app-contracts, compliance, dependencies, public API, licenses, script tests, host VisualCore); t210-documented-api-app PASS
   - G-CLOCK closed (A01-P02);
   - M02 available, with SceneClock evidence;
   - M10 evidence updated, with G-UI still open for the accessibility settings model;
