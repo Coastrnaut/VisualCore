@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "app": "generative-art-studio",
-  "gate": "A01-P04",
+  "gate": "A01-P05",
   "date": "2026-11-10",
   "inventory": [
     {
@@ -410,7 +410,7 @@
       "id": "M10",
       "capability": "Scene pause, time scrub and reduced motion",
       "source": "v0.1 feature 06",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCore/Sources/VisualCoreSimulation/SceneClock.swift",
@@ -429,13 +429,31 @@
           "symbol": "RenderSurface",
           "product": "VisualCoreUI",
           "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPreferences.swift",
+          "symbol": "AccessibilityPreferences",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/SystemAccessibilityObserver.swift",
+          "symbol": "SystemAccessibilityObserver",
+          "product": "VisualCoreUI",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreEffects/EffectScene.swift",
+          "symbol": "EffectScene.bypassEffects",
+          "product": "VisualCoreEffects",
+          "public": true
         }
       ],
       "example": {
-        "file": "Apps/GenerativeArtStudio/App/ControlsSheet.swift",
-        "symbol": "ControlsSheet"
+        "file": "Apps/GenerativeArtStudio/App/SceneScreen.swift",
+        "symbol": "SceneModel.apply"
       },
-      "notes": "Pause/scrub/Reduce Motion rate via SceneClock (A01-P02); the VisualCoreUI accessibility settings model (G-UI) remains for Phase 05."
+      "notes": "Closed in A01-P05: SceneClock pause/scrub/rate (A01-P02) plus AccessibilityPreferences (system/on/off resolution), SystemAccessibilityObserver (Reduce Motion, Dim Flashing Lights) and EffectScene.bypassEffects with the Reduce-Flashing limiter; app Settings apply live."
     }
   ],
   "gaps": [
@@ -515,7 +533,8 @@
       "kind": "upstream",
       "owner": "VisualCore:VisualCoreUI",
       "phase": 5,
-      "test": "RenderSurface done in A01-P01 (RenderSurfaceTests); remaining: accessibility settings model (Reduce Motion/Flashing, canvas description) with app UI tests"
+      "test": "RenderSurfaceTests (A01-P01); AccessibilityPreferencesTests (host, 12 resolutions); SystemAccessibilityObserverTests and EffectSceneBypassTests (simulator); app AccessibilityApplyTests, SettingsUITests, AccessibilityAuditUITests at two text sizes",
+      "closed": "A01-P05"
     }
   ],
   "traceability": [

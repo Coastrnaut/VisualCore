@@ -1,0 +1,29 @@
+{
+  "argv": [
+    "python3",
+    "scripts/release_check.py",
+    "--log-dir",
+    ".autonomy/logs/a01p05-t509-fast",
+    "--json",
+    ".autonomy/logs/a01p05-t509-fast/summary.json",
+    "--only",
+    "docs",
+    "app-contracts",
+    "compliance",
+    "dependencies",
+    "public-api",
+    "licenses",
+    "script-tests",
+    "host-visualcore"
+  ],
+  "command": "python3 scripts/release_check.py --log-dir .autonomy/logs/a01p05-t509-fast --json .autonomy/logs/a01p05-t509-fast/summary.json --only docs app-contracts compliance dependencies public-api licenses script-tests host-visualcore",
+  "elapsed_seconds": 19.973,
+  "exit_code": 0,
+  "finished": "2026-11-11T06:21:05+00:00",
+  "log": ".autonomy/logs/A01-P05.t509-release-fast.log",
+  "log_sha256": "3909daf9ebf6e29338a33008a95946d0a3d27d875ee2108140bf0abffb97cd1c",
+  "name": "t509-release-fast",
+  "stage": "A01-P05",
+  "started": "2026-11-11T06:20:45+00:00",
+  "timed_out": false
+}

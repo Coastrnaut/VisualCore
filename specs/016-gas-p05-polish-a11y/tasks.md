@@ -111,7 +111,7 @@ IDs are `T-A01-5##`, with one commit and push per task (`scripts/tick_task.py`).
 
 ## Phase 5: Polish
 
-- [ ] T-A01-509 Update `docs/apps/generative-art-studio/visualcore-contract.json` (G-UI closed at A01-P05; M10
+- [X] T-A01-509 Update `docs/apps/generative-art-studio/visualcore-contract.json` (G-UI closed at A01-P05; M10 — Verified 2026-11-11: visualcore-contract.json gate A01-P05: M10 available (SceneClock, RenderHost.pause, RenderSurface + AccessibilityPreferences, SystemAccessibilityObserver, EffectScene.bypassEffects; SceneModel.apply example), G-UI closed A01-P05 with the actual tests named; all 10 rows available and all 7 gaps closed; rendered; check PASS 10 rows, 47 citations. regression-baseline.md Phase 05 section: reference 7/7 after the VisualCore change, app suite counts with the enumeration guard, lifecycle fixture results, audit scope, and the remaining documented exclusions (navigation-bar Done buttons and the inline title only). run-check A01-P05/t509-release-fast 8/8 (docs, app-contracts, compliance incl. offline, dependencies incl. no ProjectM, public-api, licenses, script-tests incl. the enumeration guard test, host-visualcore); t509-documented-api-app PASS; full suites with the current app code: t507-ui-all-ios27 13/13 + t507-ui-all-ios26-a2 13/13, t508-unit-ios27/ios26 36/36 (each enumeration-guarded) (FR-A01-507, FR-A01-508, SC-A01-505)
   available with AccessibilityPreferences, SystemAccessibilityObserver and EffectScene evidence) and render it.
   Update `docs/apps/generative-art-studio/regression-baseline.md` with the audit exclusions and the lifecycle
   fixture. Run `check_app_contract`, the documented API, the release-check fast steps and the full app suites on both
