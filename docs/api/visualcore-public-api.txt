@@ -49,9 +49,11 @@ VisualCoreDiagnostics | enum | public enum ResourceKind: String, CaseIterable, S
 VisualCoreDiagnostics | enum | public enum Thermal: Int, Sendable, Codable, CaseIterable
 VisualCoreDiagnostics | func | public mutating func abandonAll() -> Int
 VisualCoreDiagnostics | func | public mutating func allocate(_ kind: ResourceKind, bytes amount: Int) throws(ResourceBudgetError)
+VisualCoreDiagnostics | func | public mutating func decide(thermal: FramePacing.Thermal, lowPower: Bool, now: Double) -> Int
 VisualCoreDiagnostics | func | public mutating func noteShaderFailure()
 VisualCoreDiagnostics | func | public mutating func noteStale()
 VisualCoreDiagnostics | func | public mutating func release(_ kind: ResourceKind, bytes amount: Int)
+VisualCoreDiagnostics | func | public mutating func reset()
 VisualCoreDiagnostics | func | public mutating func transition(to next: RenderLifecycleState) -> Bool
 VisualCoreDiagnostics | func | public mutating func warn(_ message: String) -> Bool
 VisualCoreDiagnostics | func | public static func clampedDelta(_ delta: Double) -> Double
@@ -61,20 +63,26 @@ VisualCoreDiagnostics | init | public init(from: RenderLifecycleState, to: Rende
 VisualCoreDiagnostics | init | public init(historyLimit: Int = 256)
 VisualCoreDiagnostics | init | public init(minimum: Int, maximum: Int, preferred: Int)
 VisualCoreDiagnostics | init | public init(thermal: Thermal, lowPower: Bool, requestedMaxFPS: Int)
+VisualCoreDiagnostics | init | public init(tierCount: Int, lowPowerCeiling: Int = 1, decisionInterval: Double = 2, calmPeriod: Double = 10)
 VisualCoreDiagnostics | init | public init(total: Int = ResourceBudget.defaultTotal, perKind: [ResourceKind: Int] = [:])
 VisualCoreDiagnostics | let | public let accepted: Bool
 VisualCoreDiagnostics | let | public let budget: ResourceBudget
+VisualCoreDiagnostics | let | public let calmPeriod: Double
+VisualCoreDiagnostics | let | public let decisionInterval: Double
 VisualCoreDiagnostics | let | public let from: RenderLifecycleState
 VisualCoreDiagnostics | let | public let generation: Int
 VisualCoreDiagnostics | let | public let historyLimit: Int
+VisualCoreDiagnostics | let | public let lowPowerCeiling: Int
 VisualCoreDiagnostics | let | public let maxFPS: Int
 VisualCoreDiagnostics | let | public let renderScale: Double
+VisualCoreDiagnostics | let | public let tierCount: Int
 VisualCoreDiagnostics | let | public let to: RenderLifecycleState
 VisualCoreDiagnostics | let | public static let defaultTotal
 VisualCoreDiagnostics | let | public static let maximumDelta
 VisualCoreDiagnostics | let | public static let minimumFPS
 VisualCoreDiagnostics | let | public static let version
 VisualCoreDiagnostics | struct | public struct FramePacing: Sendable, Equatable
+VisualCoreDiagnostics | struct | public struct QualityPolicy: Sendable, Equatable
 VisualCoreDiagnostics | struct | public struct Range: Sendable, Equatable
 VisualCoreDiagnostics | struct | public struct RenderLifecycle: Sendable
 VisualCoreDiagnostics | struct | public struct RenderLifecycleEvent: Sendable, Codable, Equatable
@@ -85,6 +93,9 @@ VisualCoreDiagnostics | var | public private(set) var generation
 VisualCoreDiagnostics | var | public private(set) var history: [RenderLifecycleEvent]
 VisualCoreDiagnostics | var | public private(set) var rejectedTransitions
 VisualCoreDiagnostics | var | public private(set) var state: RenderLifecycleState
+VisualCoreDiagnostics | var | public private(set) var stepsDown
+VisualCoreDiagnostics | var | public private(set) var stepsUp
+VisualCoreDiagnostics | var | public private(set) var tier
 VisualCoreDiagnostics | var | public var canRender: Bool
 VisualCoreDiagnostics | var | public var leaked: Int
 VisualCoreDiagnostics | var | public var liveBytes: [ResourceKind: Int]

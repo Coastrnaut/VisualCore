@@ -71,6 +71,16 @@ iOS). `FramePacing.Thermal` (`nominal`, `fair`, `serious`, `critical`) mirrors
 state caps the rate at 30 fps (never below 30), and a critical state also scales rendering to 0.75. Simulations
 receive frame deltas clamped to `FramePacing.maximumDelta` (0.1 s).
 
+**Quality tiers** (`QualityPolicy`, feature 021): an app defines an ordered list of tiers (0 is the best) and what
+each one means, for example solver iterations, particle counts or effect passes. `decide(thermal:lowPower:now:)` picks
+the tier:
+- **Stepping down**: one tier down on a serious or critical thermal state, or when Low Power Mode is on and the tier
+  is better than `lowPowerCeiling`.
+- **Stepping up**: one tier up after `calmPeriod` seconds (default 10) of a nominal or fair state without Low Power.
+- **Limits**: at most one change per `decisionInterval` (default 2 s), never below the last tier.
+
+Time is passed in, so decisions are deterministic and host-testable. `reset()` returns to the best tier.
+
 **CPU field references** (`VisualCoreSimulation`, feature 019): a `FieldGrid` is a W×H grid with 1…4 channels,
 row-major from the bottom row up, as in GL. `StoragePrecision` (`float32`, `float16`, `float16TowardZero`, `unorm8`) rounds values the
 way GPU storage does after every step. GLES leaves the rounding of half-float color writes implementation-defined,

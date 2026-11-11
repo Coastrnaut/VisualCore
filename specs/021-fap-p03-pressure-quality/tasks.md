@@ -16,7 +16,7 @@ IDs are `T-A02-3##`, with one commit and push per task (`scripts/tick_task.py`).
 
 ## Phase 1: Setup and foundational
 
-- [ ] T-A02-301 [P] [US4] Tests first, then add `QualityPolicy` in
+- [X] T-A02-301 [P] [US4] Tests first, then add `QualityPolicy` in — Verified 2026-11-11: QualityPolicy in VisualCoreDiagnostics (tierCount >= 1, lowPowerCeiling clamped default 1, decisionInterval 2 s and calmPeriod 10 s with fallbacks; serious/critical or Low Power above the ceiling step down one tier per interval; calm (nominal/fair, no Low Power) for calmPeriod steps up one tier; floor; non-finite now keeps the tier; reset; counters) with /// docs, README 'Quality tiers', package-map and support-matrix rows. QualityPolicyTests 9 (SC-A02-304 needs >= 8). run-check A02-P03/t301-visualcore-host swift test: all pass (188 Swift Testing, 0 failures); API baseline updated (additions) then PASS; check_dependencies PASS
   `Packages/VisualCore/Sources/VisualCoreDiagnostics/QualityPolicy.swift`:
   - "tierCount ≥ 1; lowPowerCeiling 0…tierCount−1 default 1; decisionInterval > 0 default 2 s; calmPeriod > 0 default
     10 s";

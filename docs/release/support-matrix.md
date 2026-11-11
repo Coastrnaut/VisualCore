@@ -54,6 +54,7 @@ results describe that app, not VisualCore (CLAUDE.md §12).
 | CPU field references (`FieldGrid`, `StoragePrecision`, `SignedRangeEncoding`, `TimeStepPolicy`) | verified (host), A02-P01 |
 | Exact field sampling (`vc/field.glsl` = `FieldGrid.sampleBilinear`) | verified (simulator iOS 27.2 and 26.5; host), A02-P02 |
 | Touch velocity tracking (`PointerVelocityTracker`) | verified (host), A02-P02 |
+| Quality tiers (`QualityPolicy`) | verified (host, injected states), A02-P03; real thermal behavior pending campaign II |
 | Release tooling (`check_privacy_manifest.py`, `check_app_release.py`, `bundle_licenses.py`, `VisualCoreAutomation.AutomationView`, `VisualCoreUI.AcknowledgementsView`) | verified (host and simulator), A01-P06 |
 | Accessibility preferences (`AccessibilityPreferences`, `SystemAccessibilityObserver`) and `EffectScene.bypassEffects` | verified (host and simulator), A01-P05; system flags on devices pending campaign II |
 | Offscreen still export (`RenderHost.renderOffscreen`, `StillImageEncoder` opaque sRGB PNG, `ExportGeometry`) | verified (simulator and host), A01-P04; device size limits pending campaign II |

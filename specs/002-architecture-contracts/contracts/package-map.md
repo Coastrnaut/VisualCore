@@ -9,7 +9,7 @@ Supersedes the table in ADR-0003 where they differ (ADR-0003 is corrected to poi
 | · `VisualCoreScenes` | host + iOS | input mapping, pointer tracking, mesh generators, scene graph model, export geometry (`ExportGeometry`, A01-P04), `PointerVelocityTracker` (A02-P02) | value types | Math | gap: input/scenes |
 | · `VisualCoreShaderSource` | host + iOS | shader library, include preprocessing, line maps, diagnostics parsing | value types | Foundation | gap: shader library (U-F003-adjacent) |
 | · `VisualCoreEffectsGraph` | host + iOS | effect DAG model, validation, quotas, flash-limiter model | value types | Foundation | gap: multi-pass graph; reference `CFlashLimiter` idea |
-| · `VisualCoreDiagnostics` | host + iOS | `RenderLifecycle`, frame stats, missed slots, reports | value types | Foundation | gap: lifecycle; reference `FrameRateMeter`, `QualityGovernor` ideas |
+| · `VisualCoreDiagnostics` | host + iOS | `RenderLifecycle`, frame stats, missed slots, reports, `QualityPolicy` (A02-P03) | value types | Foundation | gap: lifecycle; reference `FrameRateMeter`, `QualityGovernor` ideas |
 | · `VisualCoreAudioDSP` | host + iOS | SPSC ring, FFT, bands, RMS, onset | value types | Foundation | reference `AudioCore` (reusable candidate) |
 | · `VisualCorePersistence` | host + iOS | `DocumentStore`: versioned envelopes, atomic writes, migrations, per-file problems (built A01-P03) | value types | Foundation | constitution IX |
 | · `VisualCoreParameters` | host + iOS | parameter schemas (units, ranges, transforms), resolution, palettes, presets, stable parameter hash, `ParameterEditor` (A01-P02) | value types | Foundation (added A01-P01, feature 012) | gap G-PARAMS (A01 contract) |
