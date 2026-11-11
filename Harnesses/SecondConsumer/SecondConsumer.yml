@@ -45,6 +45,18 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: dev.visualcore.harness.SecondConsumer
         GENERATE_INFOPLIST_FILE: NO
+        ENABLE_USER_SCRIPT_SANDBOXING: NO
+    postBuildScripts:
+      # FR-F806: the build fails if the game depends on ProjectM engine/preset/bridge modules or uses undocumented VisualCore API.
+      - name: Dependency and documented-API checks (FR-F806)
+        basedOnDependencyAnalysis: false
+        script: |
+          set -e
+          ROOT="$SRCROOT/../.."
+          env -i PATH=/usr/bin:/bin:/usr/sbin:/sbin HOME="$HOME" DEVELOPER_DIR="$DEVELOPER_DIR" \
+            /usr/bin/python3 "$ROOT/scripts/audit_showcase_dependencies.py" --root "$ROOT" --spec Harnesses/SecondConsumer/SecondConsumer.yml \
+            --target SecondConsumer --sources Harnesses/SecondConsumer --app "$TARGET_BUILD_DIR/$WRAPPER_NAME"
+          /usr/bin/python3 "$ROOT/scripts/check_documented_api.py" --root "$ROOT" --sources Harnesses/SecondConsumer
     dependencies:
       - package: GardenKit
         product: GardenKit

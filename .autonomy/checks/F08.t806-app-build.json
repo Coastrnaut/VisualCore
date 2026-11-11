@@ -1,0 +1,25 @@
+{
+  "argv": [
+    "xcodebuild",
+    "build",
+    "-project",
+    "Harnesses/SecondConsumer/SecondConsumer.xcodeproj",
+    "-scheme",
+    "SecondConsumer",
+    "-destination",
+    "generic/platform=iOS Simulator",
+    "-derivedDataPath",
+    "Build/DerivedData/SecondConsumer",
+    "CODE_SIGNING_ALLOWED=NO"
+  ],
+  "command": "xcodebuild build -project Harnesses/SecondConsumer/SecondConsumer.xcodeproj -scheme SecondConsumer -destination 'generic/platform=iOS Simulator' -derivedDataPath Build/DerivedData/SecondConsumer CODE_SIGNING_ALLOWED=NO",
+  "elapsed_seconds": 4.528,
+  "exit_code": 0,
+  "finished": "2026-11-11T02:12:53+00:00",
+  "log": ".autonomy/logs/F08.t806-app-build.log",
+  "log_sha256": "207cf4693ae2c8135ac9864123fbc756b068108e1055d09f4c850e905b85f086",
+  "name": "t806-app-build",
+  "stage": "F08",
+  "started": "2026-11-11T02:12:49+00:00",
+  "timed_out": false
+}
