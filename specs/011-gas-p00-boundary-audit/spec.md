@@ -15,6 +15,31 @@ each needed capability as available / requires adaptation / upstream gap, and na
 own each reusable gap later (constitution 1.2.0, Principle II "Maximize reuse"). Evidence is host and simulator only
 (constitution V).
 
+## Clarifications
+
+### Session 2026-11-10
+
+Answered autonomously under the owner's standing approval (CLAUDE.md §2); the recommended option was chosen in each case.
+
+- Q: Where do the inventory, matrix and gap register live, and how are citations checked? → A: In
+  `docs/apps/generative-art-studio/visualcore-contract.md` (human-readable) generated from
+  `visualcore-contract.json` (machine-readable rows). A new, app-neutral `scripts/check_app_contract.py --app <slug>`
+  verifies every cited file and symbol. It is reusable by all 25 apps (Principle II, "Maximize reuse").
+- Q: What exactly is the app shell in Phase 00? → A: A thin SwiftUI app target `GenerativeArtStudio` in the root
+  `project.yml` (sources in `Apps/GenerativeArtStudio/App/`), plus a UI smoke-test target. It has a titled home
+  screen only, with no rendering code and no app-local package yet. Domain and reusable packages are created in the
+  phase that first needs them, so no empty files are pre-created (manual §5 file policy).
+- Q: Which ProjectM regression steps form the baseline? → A: The reference steps `engine-xcframework`,
+  `build-projectm-ios-sim`, `test-anglerendering-ios27` and `test-anglerendering-ios26`; `check_reference_clean.py`;
+  and the `ProjectMReference` harness tests on both simulator runtimes. These are the same steps the release check
+  runs.
+- Q: Does the shell need any permission or privacy declaration? → A: No. It requests no permission and declares no
+  usage description and no networking. The Photos add-only permission needed for still export is decided in
+  Phase 04 and disclosed before use (A01 offline-first rule).
+- Q: Are any performance targets set or measured in Phase 00? → A: No. The phase records only the existing host and
+  simulator baselines as context. Frame and export budgets are set in Phases 02/04 and measured on devices only in
+  campaign II (constitution V); the matrix may not claim device performance.
+
 ## User Scenarios & Testing *(mandatory)*
 
 Users: the engineer (agent) who implements Generative Art Studio phases 01–06, the owner reviewing the stop/go
@@ -109,6 +134,7 @@ owner module, a phase and a test intent. The decision states go or stop with rea
 - A citation that points to test code only: evidence must include a public, non-test symbol. A test may serve as the
   example consumer.
 - The reference build or its regression fails: the phase is blocked and recorded, never waived.
+- A performance figure from a simulator or host run: may be cited as context only, never as a device or budget claim.
 - A matrix row with no consumer anywhere in the repository: classified `requires adaptation` until an example
   exists.
 
@@ -128,13 +154,14 @@ owner module, a phase and a test intent. The decision states go or stop with rea
 
   Each row has the status `available` / `requires adaptation` / `upstream gap`, the evidence (file, public symbol,
   package product) and an example consumer.
-- **FR-A01-003**: Matrix citations MUST be machine-checked: every cited file exists and every cited symbol is declared
-  in it. A failure names the row and citation.
-- **FR-A01-004**: The phase MUST record the baseline ProjectM regression (reference build, its renderer tests on both
-  simulator runtimes, read-only check) with the commands run and their results.
+- **FR-A01-003**: Matrix citations MUST be machine-checked by an app-neutral contract checker. Every cited file must
+  exist and every cited symbol must be declared in it. A failure names the row and the citation.
+- **FR-A01-004**: The phase MUST record the baseline ProjectM regression with the commands run and their results:
+  the reference engine build and app build, its renderer tests on both simulator runtimes, the read-only check, and
+  the ProjectMReference harness tests on both runtimes.
 - **FR-A01-005**: The phase MUST create a compilable, empty app shell under `Apps/GenerativeArtStudio/` with bundle
   identity `dev.visualcore.GenerativeArtStudio`. It builds unsigned for both simulator runtimes, shows a titled
-  home screen with an accessibility label, and passes a launch smoke test.
+  home screen with an accessibility label, and passes a launch smoke test. The shell requests no permissions and declares no usage descriptions or networking.
 - **FR-A01-006**: The shell MUST NOT link ProjectM engine, preset or bridge modules. The existing dependency audit
   MUST cover the new target.
 - **FR-A01-007**: The phase MUST NOT modify any VisualCore package source, the ProjectM reference or its pins. This is
