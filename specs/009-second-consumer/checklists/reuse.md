@@ -13,27 +13,32 @@ dependency check, build/run smoke test). Depth: standard; audience: gate reviewe
 
 ## Independence and Documented APIs
 
-- [ ] CHK001 Is "documented VisualCore API" defined with a checkable source of truth? [Clarity, Spec §FR-F806, Clarifications]
-- [ ] CHK002 Are the capability areas the consumer must exercise enumerated? [Completeness, Spec §FR-F802, §SC-F804]
-- [ ] CHK003 Is the dependency check's scope (layers, deny-list, when it runs) specified for this target? [Completeness, Spec §FR-F806]
-- [ ] CHK004 Are contaminated/undocumented fixtures required for both checks? [Measurability, Spec §SC-F802]
+- [x] CHK001 Is "documented VisualCore API" defined with a checkable source of truth? [Clarity, Spec §FR-F806, Clarifications]
+- [x] CHK002 Are the capability areas the consumer must exercise enumerated? [Completeness, Spec §FR-F802, §SC-F804]
+- [x] CHK003 Is the dependency check's scope (layers, deny-list, when it runs) specified for this target? [Completeness, Spec §FR-F806]
+- [x] CHK004 Are contaminated/undocumented fixtures required for both checks? [Measurability, Spec §SC-F802]
 
 ## Gameplay Requirements
 
-- [ ] CHK005 Are all gameplay constants quantified (growth, spacing, harvest radius, capacity, particle rates)? [Clarity, Spec §FR-F803]
-- [ ] CHK006 Are stage transitions of a flower defined? [Completeness, Spec §Key Entities]
-- [ ] CHK007 Are negative interactions (tap on growing seed, too-close plant, full garden) specified? [Coverage, Spec §US1 AC5, §Edge Cases]
-- [ ] CHK008 Is determinism of the model specified (fixed step, seed)? [Clarity, Spec §FR-F804]
+- [x] CHK005 Are all gameplay constants quantified (growth, spacing, harvest radius, capacity, particle rates)? [Clarity, Spec §FR-F803]
+- [x] CHK006 Are stage transitions of a flower defined? [Completeness, Spec §Key Entities]
+- [x] CHK007 Are negative interactions (tap on growing seed, too-close plant, full garden) specified? [Coverage, Spec §US1 AC5, §Edge Cases]
+- [x] CHK008 Is determinism of the model specified (fixed step, seed)? [Clarity, Spec §FR-F804]
 
 ## Smoke Test and Lifecycle
 
-- [ ] CHK009 Is the smoke scenario concrete enough to have a single expected outcome (score exactly 1)? [Measurability, Spec §SC-F801]
-- [ ] CHK010 Are both simulator runtimes required? [Completeness, Spec §FR-F807]
-- [ ] CHK011 Are background/foreground and rotation behaviors specified? [Coverage, Spec §Edge Cases]
+- [x] CHK009 Is the smoke scenario concrete enough to have a single expected outcome (score exactly 1)? [Measurability, Spec §SC-F801]
+- [x] CHK010 Are both simulator runtimes required? [Completeness, Spec §FR-F807]
+- [x] CHK011 Are background/foreground and rotation behaviors specified? [Coverage, Spec §Edge Cases]
 
 ## Non-Functional and Assumptions
 
-- [ ] CHK012 Are accessibility requirements (VoiceOver, Reduce Motion) stated? [Non-Functional, Spec §FR-F805]
-- [ ] CHK013 Is persistence explicitly out of scope? [Clarity, Spec §Clarifications]
-- [ ] CHK014 Is device performance deferral stated? [Non-Functional, Spec §Assumptions]
-- [ ] CHK015 Is the harness identity/bundle id pattern documented? [Dependency, Spec §Assumptions]
+- [x] CHK012 Are accessibility requirements (VoiceOver, Reduce Motion) stated? [Non-Functional, Spec §FR-F805]
+- [x] CHK013 Is persistence explicitly out of scope? [Clarity, Spec §Clarifications]
+- [x] CHK014 Is device performance deferral stated? [Non-Functional, Spec §Assumptions]
+- [x] CHK015 Is the harness identity/bundle id pattern documented? [Dependency, Spec §Assumptions]
+
+## Notes
+
+- Reviewed 2026-11-10 by the agent under the owner's standing delegation (CLAUDE.md §2): 15/15 satisfied without spec edits
+  (clarifications already quantified constants, the documented-API rule and the audit reuse). `/speckit-implement` reads these markers.
