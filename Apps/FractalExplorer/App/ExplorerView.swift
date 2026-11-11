@@ -21,6 +21,7 @@ final class ExplorerModel {
     var state: FractalState {
         didSet {
             guard state != oldValue else { return }
+            if state.mode != oldValue.mode, !tourChangingMode { stopTour() }
             scene.snapshot.state = state
             if usingFallback { refresh() }
         }
@@ -64,6 +65,7 @@ final class ExplorerModel {
     init(size: Vec2 = Vec2(390, 844), fragment: String = FractalShaders.fragment,
          system: SystemAccessibility = SystemAccessibilityObserver.systemValues(),
          bookmarksDirectory: URL? = nil) {
+        reduceMotion = system.reduceMotion
         bookmarks = .bookmarks(directory: bookmarksDirectory ?? Self.defaultBookmarksDirectory())
         let initial = FractalState(size: size)
         state = initial
@@ -242,6 +244,38 @@ final class ExplorerModel {
         }
     }
 
+    // MARK: Tours (feature 029 T-A03-409; FR-A03-406; US3)
+
+    /// The tour player (VisualCore TourTimeline inside).
+    let tour = TourPlayer()
+    /// Reduce Motion at launch (tours jump between stops when on).
+    private let reduceMotion: Bool
+    private var tourChangingMode = false
+    private var applyingTour = false
+
+    /// Starts the tour `id` from the current view (switching to Mandelbrot, the tours' mode).
+    func startTour(_ id: String, now: Double = ProcessInfo.processInfo.systemUptime) {
+        guard let t = FractalTours.tour(id) else { return }
+        if state.mode != t.mode {
+            tourChangingMode = true
+            state.mode = t.mode
+            tourChangingMode = false
+        }
+        tour.start(t, from: PlaneFraming(state.viewport), now: now, reduceMotion: reduceMotion)
+        tourTick(now: now)
+    }
+
+    /// Advances the tour to `now` and shows its framing (through `apply`, so the precision clamp applies).
+    func tourTick(now: Double = ProcessInfo.processInfo.systemUptime) {
+        guard let s = tour.tick(now: now) else { return }
+        applyingTour = true
+        apply(s.framing.viewport(size: state.viewport.size))
+        applyingTour = false
+    }
+
+    /// Stops the tour where it is; the view stays.
+    func stopTour() { tour.stop() }
+
     /// Renames a bookmark.
     func renameBookmark(_ id: UUID, to name: String) { perform { try $0.rename(id, to: name) } }
     /// Marks or unmarks a favorite.
@@ -265,6 +299,7 @@ final class ExplorerModel {
     /// coordinates (VisualCoreMath.PrecisionAdvisor with the shader's mantissa bits), then updates the notice.
     func apply(_ viewport: PlaneViewport) {
         bookmarkNote = nil
+        if !applyingTour, tour.isPlaying || tour.caption != nil { tour.clear() }
         var v = viewport
         let magnitude = max(abs(v.center.x), abs(v.center.y))
         let minStep = PrecisionAdvisor.minimumPixelStep(mantissaBits: mantissaBits, magnitude: magnitude)
@@ -297,6 +332,7 @@ final class ExplorerModel {
     /// midpoint follows it exactly. One finger pans by its own movement, so a finger left after a pinch keeps panning
     /// without a jump.
     func handle(_ e: PointerEvent) {
+        if e.phase == .began { tour.clear() }
         let previous = lastPoint
         pointers.handle(e)
         pinch.handle(e, tracker: pointers)
@@ -372,6 +408,7 @@ final class ExplorerModel {
 
     /// Destroys the host (the screen went away).
     func close() {
+        tour.clear()
         capture.removeFile()
         task?.cancel()
         host?.destroy()
@@ -393,6 +430,8 @@ struct ExplorerView: View {
     @State private var model = ExplorerModel()
     @State private var showingBookmarks = false
     @State private var showingGoTo = false
+    @State private var showingTours = false
+    @Environment(\.scenePhase) private var scenePhase
 
     var body: some View {
         ScrollView {
@@ -461,6 +500,7 @@ struct ExplorerView: View {
                         .fixedSize(horizontal: false, vertical: true)
                         .accessibilityIdentifier("fe.cost")
                 }
+                tourControls
                 captureControls
                 Picker("Palette", selection: $model.paletteID) {
                     ForEach(ExplorerModel.paletteIDs, id: \.self) { id in
@@ -488,12 +528,38 @@ struct ExplorerView: View {
                 Button { showingGoTo = true } label: { Label("Go to coordinates", systemImage: "location.magnifyingglass") }
                     .accessibilityIdentifier("fe.goto")
             }
+            ToolbarItem(placement: .primaryAction) {
+                Button { showingTours = true } label: { Label("Tours", systemImage: "map") }
+                    .accessibilityIdentifier("fe.tours")
+            }
+        }
+        .sheet(isPresented: $showingTours) { ToursView(model: model) }
+        .onChange(of: scenePhase) { _, phase in if phase != .active { model.stopTour() } }
+        .task(id: model.tour.isPlaying) {
+            // The tour's frame loop: about 60 ticks per second while a tour plays (feature 029 T-A03-409).
+            while model.tour.isPlaying, !Task.isCancelled {
+                model.tourTick()
+                try? await Task.sleep(nanoseconds: 16_000_000)
+            }
         }
         .sheet(isPresented: $showingBookmarks) { BookmarksView(model: model) }
         .sheet(isPresented: $showingGoTo) { GoToView(model: model) }
         .navigationTitle("Explorer")
         .navigationBarTitleDisplayMode(.inline)
         .tint(AccessibleColors.accent)
+    }
+
+    @ViewBuilder private var tourControls: some View {
+        if let caption = model.tour.caption {
+            Label(caption, systemImage: "map")
+                .fixedSize(horizontal: false, vertical: true)
+                .accessibilityIdentifier("fe.tour.caption")
+        }
+        if model.tour.isPlaying {
+            Button { model.stopTour() } label: { Label("Stop tour", systemImage: "stop.fill") }
+                .buttonStyle(.bordered)
+                .accessibilityIdentifier("fe.tour.stop")
+        }
     }
 
     @ViewBuilder private var captureControls: some View {
