@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_test_enumeration.py",
+    "--sources",
+    "Apps/ParticleUniverse/Tests",
+    "--log",
+    ".autonomy/logs/A04-P00.t005-smoke-ios27.log"
+  ],
+  "command": "python3 scripts/check_test_enumeration.py --sources Apps/ParticleUniverse/Tests --log .autonomy/logs/A04-P00.t005-smoke-ios27.log",
+  "elapsed_seconds": 0.022,
+  "exit_code": 0,
+  "finished": "2026-11-11T16:55:15+00:00",
+  "log": ".autonomy/logs/A04-P00.t005-enum-ios27.log",
+  "log_sha256": "8c01b7c546f5284d3d58f041cd4671676cbe5bdca48c4f8567fd4d14ae10d385",
+  "name": "t005-enum-ios27",
+  "stage": "A04-P00",
+  "started": "2026-11-11T16:55:15+00:00",
+  "timed_out": false
+}
