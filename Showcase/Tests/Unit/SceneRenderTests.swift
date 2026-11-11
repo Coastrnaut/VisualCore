@@ -130,7 +130,7 @@ final class DistortionTests: XCTestCase {
         XCTAssertEqual(SceneTestSupport.px(before, r.width, r.width - 2, 1), SceneTestSupport.px(after, r.width, r.width - 2, 1),
                        "the far corner is unchanged")
         scene.handle(PointerEvent(id: 1, phase: .ended, location: Vec2(20, 40), timestamp: 0.2))
-        XCTAssertEqual(scene.status, "touch=none")
+        XCTAssertEqual(scene.status, "touch=none last=20,40")
         r.host.destroy()
         XCTAssertEqual(r.host.resources.stats.leaked, 0)
     }

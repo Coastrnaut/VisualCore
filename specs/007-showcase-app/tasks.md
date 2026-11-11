@@ -28,7 +28,7 @@ tests); written with or before each piece. IDs `T-F6##`. One commit + push per t
 
 ## Phase 4: US1/US3/US4 — smoke test (P1/P2)
 
-- [ ] T-F610 [US1] [US3] [US4] XCUITest `Showcase/Tests/UI/ShowcaseSmokeUITests.swift`: every scene opens and frames advance with `error=none` within 2 s; drag/pinch on particles; drag on distortion; effect toggle; context loss (gen +1, frames resume ≤ 1 s, leaked=0); background/foreground; rotation to landscape keeps rendering and drag mapping; largest accessibility text size keeps the list usable; injected shader error shows file and line — on iOS 27.2 and 26.5
+- [X] T-F610 [US1] [US3] [US4] XCUITest `Showcase/Tests/UI/ShowcaseSmokeUITests.swift`: every scene opens and frames advance with `error=none` within 2 s; drag/pinch on particles; drag on distortion; effect toggle; context loss (gen +1, frames resume ≤ 1 s, leaked=0); background/foreground; rotation to landscape keeps rendering and drag mapping; largest accessibility text size keeps the list usable; injected shader error shows file and line — on iOS 27.2 and 26.5 — Verified 2026-11-10: F06.t610-smoke-ios27-a2 and F06.t610-smoke-ios26 TEST SUCCEEDED: 14 hosted unit/pixel tests + 8 smoke UI tests on each runtime — all 5 scenes present frames with error=none, leaked=0; particles drag/pinch; distortion follows finger and survives landscape rotation; post-processing toggle off/on; context loss gen+1 and frames resume; background/foreground active again; injected shader error broken.frag:5 + Retry; rows reachable at AccessibilityXXXL (a1 = NSPredicate wait missed a 4 Hz status update; replaced by 0.1 s polling)
 
 ## Phase 5: Polish & Cross-Cutting
 

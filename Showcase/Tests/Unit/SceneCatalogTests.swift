@@ -17,6 +17,8 @@ final class SceneCatalogTests: XCTestCase {
 
     func testAppCatalogIsValid() {
         XCTAssertEqual(SceneCatalog.problems(SceneCatalog.all), [])
+        // FR-F603: the five README Phase 6 scenes, in order.
+        XCTAssertEqual(SceneCatalog.all.map(\.id), ["gradient-texture", "animated-geometry", "distortion", "particles", "post-processing"])
     }
 
     func testBundleIdentifier() { XCTAssertEqual(Bundle.main.bundleIdentifier, "dev.visualcore.Showcase") }

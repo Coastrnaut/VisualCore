@@ -7,9 +7,11 @@
 | `showcase.scene.<id>` | scene list row | label = title, hint = summary |
 | `showcase.canvas` | render surface | label = scene accessibility description, hint = interaction hint, direct interaction |
 | `showcase.diagnostics` | static text | `frames=… fps=… state=… gen=… live=… bytes=… peak=… warnings=… leaked=… error=…` |
-| `showcase.status` | static text | scene status string |
+| `showcase.status` | static text | scene status: `shader=… texture=WxH`, `yaw=… pitch=… spin=on/off`, `touch=x,y` / `touch=none last=x,y`, `particles=n zoom=z`, `passes=a>b>c` / `passes=off` |
 | `showcase.contextLoss` | button | "Simulate context loss" |
 | `showcase.effectToggle` | toggle (post-processing) | "Post-processing" on/off |
+| `showcase.error` / `showcase.retry` | text / button | scene error (`file:line: message`) and Retry |
+| `showcase.reduceFlashing` | toggle (scene list) | Reduce Flashing |
 | `showcase.diagnosticsToggle` | toolbar button | "Show diagnostics" / "Hide diagnostics" |
 
 Launch arguments: `-uitestReduceMotion YES|NO`, `-showcaseInjectShaderError YES` (debug builds only).

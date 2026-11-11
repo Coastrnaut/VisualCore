@@ -15,14 +15,17 @@ final class DistortionScene: ShowcaseRenderScene {
     private var metrics = ViewMetrics(size: .zero, scale: 1)
     private var tracker = PointerTracker()
     private(set) var touch: Vec2?          // view points
+    private var lastTouch: Vec2?
     private var center = Vec2(0.5, 0.5)    // uv
     private(set) var strength = 0.0
     private var time = 0.0
     private(set) var errorMessage: String?
     var scale = 1.0
+    /// `touch=x,y` while touching; afterwards `touch=none last=x,y` so tests can read where the drag ended.
     var status: String {
-        guard let t = touch else { return "touch=none" }
-        return "touch=\(Int(t.x.rounded())),\(Int(t.y.rounded()))"
+        func fmt(_ p: Vec2) -> String { "\(Int(p.x.rounded())),\(Int(p.y.rounded()))" }
+        if let t = touch { return "touch=\(fmt(t))" }
+        return lastTouch.map { "touch=none last=\(fmt($0))" } ?? "touch=none"
     }
 
     init(settings: ShowcaseSettings) { self.settings = settings }
@@ -31,6 +34,7 @@ final class DistortionScene: ShowcaseRenderScene {
         tracker.handle(event)
         if let id = tracker.order.first, let p = tracker.active[id] {
             touch = p
+            lastTouch = p
             if let ndc = metrics.toNDC(p) { center = Vec2((ndc.x + 1) / 2, (ndc.y + 1) / 2) }
             strength = 1
         } else if tracker.count == 0 {
