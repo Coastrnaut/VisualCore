@@ -1,0 +1,32 @@
+{
+  "argv": [
+    "xcodebuild",
+    "test",
+    "-project",
+    "VisualCore.xcodeproj",
+    "-scheme",
+    "Showcase",
+    "-only-testing:ShowcaseTests",
+    "-destination",
+    "platform=iOS Simulator,id=EC7498FF-31FF-4491-9666-B0D32785203C",
+    "-derivedDataPath",
+    "Build/DerivedData/Showcase-auto",
+    "-resultBundlePath",
+    ".autonomy/xcresults/F09-t905-showcase-ios26.xcresult",
+    "-test-timeouts-enabled",
+    "YES",
+    "-default-test-execution-time-allowance",
+    "180",
+    "CODE_SIGNING_ALLOWED=NO"
+  ],
+  "command": "xcodebuild test -project VisualCore.xcodeproj -scheme Showcase -only-testing:ShowcaseTests -destination 'platform=iOS Simulator,id=EC7498FF-31FF-4491-9666-B0D32785203C' -derivedDataPath Build/DerivedData/Showcase-auto -resultBundlePath .autonomy/xcresults/F09-t905-showcase-ios26.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 180 CODE_SIGNING_ALLOWED=NO",
+  "elapsed_seconds": 9.443,
+  "exit_code": 0,
+  "finished": "2026-11-11T02:37:00+00:00",
+  "log": ".autonomy/logs/F09.t905-showcase-unit-ios26.log",
+  "log_sha256": "5a9744dc65ceb13cadef5fe248e83c0e45c0b6740863c4e3fd2197c4475c499a",
+  "name": "t905-showcase-unit-ios26",
+  "stage": "F09",
+  "started": "2026-11-11T02:36:50+00:00",
+  "timed_out": false
+}

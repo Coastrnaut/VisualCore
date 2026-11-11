@@ -2,6 +2,12 @@
 // full-screen triangle; inputs are sampled as `u_<slot>` (e.g. `u_input`, `u_base`, `u_overlay`).
 
 enum EffectShaders {
+    /// Every built-in fragment source by name; shader validation compiles each one (feature 010 T-F905).
+    static var fragments: [String: String] {
+        ["copy": copy, "colorMatrix": colorMatrix, "blur": blur, "brightPass": brightPass, "addScaled": addScaled,
+         "distort": distort, "composite": composite, "feedback": feedback, "luma": luma, "gainBias": gainBias]
+    }
+
     static let vertex = """
     out vec2 uv;
     void main() {

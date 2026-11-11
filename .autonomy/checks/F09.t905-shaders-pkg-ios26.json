@@ -1,0 +1,26 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/VisualCoreRendering",
+    "--scheme",
+    "VisualCoreRendering-Package",
+    "--destination",
+    "sim-26.5",
+    "--action",
+    "test",
+    "--result-name",
+    "F09-t905-pkg-ios26"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-26.5 --action test --result-name F09-t905-pkg-ios26",
+  "elapsed_seconds": 5.416,
+  "exit_code": 0,
+  "finished": "2026-11-11T02:36:36+00:00",
+  "log": ".autonomy/logs/F09.t905-shaders-pkg-ios26.log",
+  "log_sha256": "1e3c31b5bb68116bf41f3df43d2a658f594396450e48e136e597db467cc5b99e",
+  "name": "t905-shaders-pkg-ios26",
+  "stage": "F09",
+  "started": "2026-11-11T02:36:31+00:00",
+  "timed_out": false
+}
