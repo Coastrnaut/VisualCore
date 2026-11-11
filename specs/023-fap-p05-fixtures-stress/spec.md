@@ -84,6 +84,8 @@ frame counter, the canvas, and VoiceOver's announcements at each step.
    kept. Tuning values (viscosity, palette, brush) are unchanged.
 5. **Given** the simulation is running, **When** Step is shown, **Then** Step is disabled and its accessibility hint
    says to pause first.
+6. **Given** any state, **When** the person picks another Simulation detail level, **Then** the canvas restarts from
+   the seed at that level's grid, strokes in progress end, and the pause state is kept (FR-A02-511).
 
 ---
 

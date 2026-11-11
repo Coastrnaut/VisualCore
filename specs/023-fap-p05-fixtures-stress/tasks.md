@@ -65,7 +65,8 @@ research R1–R7, data model, contract, quickstart).
   - Step while running gives +0;
   - touches queued while paused are applied by the next Step;
   - after Reset the velocity readback is exactly zero (decoded) and the dye equals the seed within one storage
-    step, in both storages.
+    step, in both storages;
+  - a capture while paused after steps leaves the step count unchanged (analyze G2).
 
   Run on 27.2 and 26.5 with the guard (FR-A02-501–503, SC-A02-501).
 - [ ] T-A02-505 [US1] Model and UI in `Apps/FluidArtPlayground/App/PlaygroundView.swift`:
@@ -74,7 +75,8 @@ research R1–R7, data model, contract, quickstart).
   - toolbar controls `fap.pause`, `fap.step` (disabled while running, with the hint) and `fap.reset` ("Reset canvas");
   - VoiceOver announcements.
 
-  Add `ControlsUITests` (`Apps/FluidArtPlayground/Tests/UI/ControlsUITests.swift`), and add the controls to the
+  Add a model unit test: Reset during an active swipe drops that stroke's later samples, and painting resumes on the
+  next touch (analyze G3). Add `ControlsUITests` (`Apps/FluidArtPlayground/Tests/UI/ControlsUITests.swift`), and add the controls to the
   accessibility audit at default size and XXXL. Run on 27.2 and 26.5 (FR-A02-501, SC-A02-501).
 
 ## Phase 3: User Story 2 — Deterministic seeded test mode (P1)
@@ -101,7 +103,8 @@ research R1–R7, data model, contract, quickstart).
   5. bounded catch-up:
      - (a) while the host is paused, `renderOneFrame` returns false and the step count does not change;
      - (b) the first frame after `resume()` gives +1 step;
-     - (c) deltas of 600, 0, −1 and NaN each give exactly one step, with `lastStep` in 1/240…1/30.
+     - (c) deltas of 600, 0, −1 and NaN each give exactly one step, with `lastStep` in 1/240…1/30;
+     - (d) a paused scene, suspended and resumed, stays paused with +0 steps (analyze G1).
 
   Run on 27.2 and 26.5 (FR-A02-506, SC-A02-504).
 
@@ -116,7 +119,7 @@ research R1–R7, data model, contract, quickstart).
   - in 8-bit, not all values at the extremes.
 
   It returns `firstBad`. Add `StressTests`: 600 test-mode frames with 10 pointers at maximum force and 80 iterations,
-  per storage (half-float and forced 8-bit), with `fieldCheck()` every 60 frames. A touch flood stays ≤ the cap per
+  per storage (half-float and forced 8-bit), with `fieldCheck()` every 60 frames. A touch flood (10 pointers × 30 samples in one frame) stays ≤ the cap per
   frame (`lastDrained`), and the queue stays bounded. Run on 27.2 and 26.5 (FR-A02-507, SC-A02-505).
 
 ## Phase 6: Simulation detail (MVP-06, FR-A02-511)
@@ -163,9 +166,16 @@ research R1–R7, data model, contract, quickstart).
   script-tests host-visualcore documented-api-fluid-art-playground isolation-fluid-art-playground
   host-fluid-art-playground-core`), the ProjectM regression and the A01 build (FR-A02-510, SC-A02-506).
 
+## Analyze remediation (2026-11-11, applied under CLAUDE.md §2)
+
+- D1: dropped the speculative edge T-A02-501 → T-A02-507.
+- U1: added US1 scenario 6 to the spec.
+- G1–G3: added tests to T-A02-507, T-A02-504 and T-A02-505.
+- A1: quantified the touch flood in T-A02-508.
+
 ## Dependencies
 
-- T-A02-501 blocks T-A02-506, T-A02-507, T-A02-508 and T-A02-510.
+- T-A02-501 blocks T-A02-506, T-A02-508 and T-A02-510.
 - T-A02-502 blocks T-A02-510.
 - T-A02-503 blocks T-A02-504, T-A02-505 and T-A02-509.
 - T-A02-504 blocks T-A02-505.
