@@ -58,6 +58,23 @@ final class FieldGridTests: XCTestCase {
         #endif
     }
 
+    func testFloat16TowardZeroTruncates() {
+        let p = StoragePrecision.float16TowardZero
+        XCTAssertEqual(p.round(0.5), 0.5)
+        XCTAssertEqual(p.round(1 + 0x1p-10 * 0.99), 1, "below the next half value truncates down")
+        XCTAssertEqual(p.round(-(1 + 0x1p-10 * 0.99)), -1, "toward zero for negatives")
+        XCTAssertEqual(p.round(0.8), 0.7998046875)
+        XCTAssertEqual(p.round(1e6), 65504, "saturates")
+        XCTAssertEqual(p.tolerance, 1e-3)
+        var rng = SeededRandom(seed: 5)
+        for _ in 0..<2000 {
+            let x = Float(rng.double() * 2)
+            let t = p.round(x), n = StoragePrecision.float16.round(x)
+            XCTAssertLessThanOrEqual(t, x)
+            XCTAssertLessThanOrEqual(abs(t - n), x < 1 ? 0x1p-11 : 0x1p-10, "at most one half step apart")
+        }
+    }
+
     func testUnorm8RoundingAndStall() {
         XCTAssertEqual(StoragePrecision.unorm8.round(-0.2), 0)
         XCTAssertEqual(StoragePrecision.unorm8.round(1.7), 1)

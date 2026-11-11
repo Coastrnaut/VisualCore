@@ -4,7 +4,7 @@ These types are pure Swift, `Sendable` and host-testable with `swift test --pack
 
 ```swift
 public enum StoragePrecision: String, Sendable, Codable, CaseIterable {
-    case float32, float16, unorm8
+    case float32, float16, float16TowardZero, unorm8   // float16TowardZero: truncating GPU half writes (T-A02-111)
     public func round(_ x: Float) -> Float     // float16: Float(Float16(x)); unorm8: round(clamp(x,0,1)*255)/255
     public var tolerance: Float { get }        // float32 1e-6, float16 1e-3 (values <= 1), unorm8 1.5/255
 }

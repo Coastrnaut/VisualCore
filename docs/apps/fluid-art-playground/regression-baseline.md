@@ -41,3 +41,7 @@ VisualCoreSimulation. The API baseline diff contains additions only. Same two ch
 | reference-test-anglerendering-ios27/ios26, projectm-reference-ios27/ios26 | `A02-P01/t107-reference-b` | 4/4 pass (ANGLERendering 14/14 and ProjectMReference 17/17 on both runtimes) |
 
 **7/7 steps pass**, unchanged from the phase-start table. These are simulator results, not device evidence.
+
+### Rerun after `StoragePrecision.float16TowardZero` (2026-11-11, T-A02-111)
+
+`A02-P01/t111-reference-a` 3/3 and `t111-reference-b` 4/4: **7/7 pass**, unchanged.

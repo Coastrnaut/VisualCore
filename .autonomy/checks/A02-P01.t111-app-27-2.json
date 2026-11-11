@@ -1,0 +1,31 @@
+{
+  "argv": [
+    "xcodebuild",
+    "test",
+    "-project",
+    "VisualCore.xcodeproj",
+    "-scheme",
+    "FluidArtPlayground",
+    "-destination",
+    "platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D",
+    "-derivedDataPath",
+    "Build/DerivedData/FluidArtPlayground",
+    "-resultBundlePath",
+    ".autonomy/xcresults/a02p01-t111-app-27-2.xcresult",
+    "-test-timeouts-enabled",
+    "YES",
+    "-default-test-execution-time-allowance",
+    "300",
+    "CODE_SIGNING_ALLOWED=NO"
+  ],
+  "command": "xcodebuild test -project VisualCore.xcodeproj -scheme FluidArtPlayground -destination 'platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D' -derivedDataPath Build/DerivedData/FluidArtPlayground -resultBundlePath .autonomy/xcresults/a02p01-t111-app-27-2.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 300 CODE_SIGNING_ALLOWED=NO",
+  "elapsed_seconds": 23.593,
+  "exit_code": 65,
+  "finished": "2026-11-11T08:01:55+00:00",
+  "log": ".autonomy/logs/A02-P01.t111-app-27-2.log",
+  "log_sha256": "9813b244f9b34f1297ec06f0e35686484b702d02405f51127bcc778f480ed1d3",
+  "name": "t111-app-27-2",
+  "stage": "A02-P01",
+  "started": "2026-11-11T08:01:32+00:00",
+  "timed_out": false
+}

@@ -40,6 +40,12 @@ Answered autonomously under the owner's standing delegation (CLAUDE.md §2), rec
   Otherwise the fallback is RGBA8, with signed velocity encoded as `v / vmax · 0.5 + 0.5` (vmax from the
   configuration, default 4 cells per step). The active format is reported. A test-only override forces the
   fallback.
+- Q: (found during implementation, T-A02-111) Which rounding does the GPU use when it writes half-float targets?
+  → A: GLES leaves it implementation-defined. On the iOS 27.2 simulator, writes truncate (round toward zero): with
+  `d = 1`, 60 steps gave 0.2908 on the GPU against 0.2964 for a nearest-even reference, a drift of about 2.4e-4 per
+  step, while uploads round to nearest. The half-float fixture therefore compares against references for both modes
+  (`float16`, `float16TowardZero`). The closer one must be within one storage step (1e-3), and the matched mode is
+  recorded. Device modes are recorded in campaign II. The RGBA8 path is unchanged.
 - Q: What state do the fields have after a context loss? → A: Field contents are never carried across contexts.
   Both pairs are recreated and re-seeded from the configuration's initial state, the step counter resets, and the
   rebuild is reported with 0 leaked or stale resources.
@@ -143,7 +149,8 @@ apart when the dissipation is above 0.
   target different from the one it reads, and the fields are bounded by the configuration.
 - **FR-A02-104**: Uniform dye at rest MUST decay only according to the configured dissipation: each step multiplies by
   `1 / (1 + d·Δt)`. After a fixed number of steps, the GPU result matches the precision-matched CPU reference within one
-  storage step per channel (1e-3 half-float; 1.5/255 for the RGBA8 fallback).
+  storage step per channel (1e-3 half-float; 1.5/255 for the RGBA8 fallback). For half-float, the reference uses the
+  GPU's write rounding (nearest-even or toward zero, whichever is implementation-defined), as in clarification 6.
 - **FR-A02-105**: VisualCore MUST provide, with tests, docs and an API-baseline update, followed by a passing ProjectM
   regression:
   - a reusable ping-pong render-target pair: swap, a read/write guard, budget accounting, release;

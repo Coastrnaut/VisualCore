@@ -27,6 +27,10 @@ All Technical Context items were resolved; none remain NEEDS CLARIFICATION.
   untested).
 - **Risk**: the GPU computes in `highp` float and then stores. A ties case could round differently from the CPU, so
   the tolerance allows one storage step.
+- **Revision (T-A02-111, observed)**: half-float color writes truncate on the iOS 27.2 simulator. This is a
+  systematic difference, not a ties case. `StoragePrecision.float16TowardZero` was added to VisualCore, and the
+  fixture accepts the closer of the two half references (spec clarification 6). Assuming nearest-even only would
+  have failed against real behavior; loosening the tolerance would have hidden real bugs.
 
 ## R3 Half-float support decision
 

@@ -9,6 +9,10 @@ public enum StoragePrecision: String, Sendable, Codable, CaseIterable {
     case float32
     /// IEEE half precision (RGBA16F targets), round to nearest even; overflow gives ±infinity.
     case float16
+    /// IEEE half precision with round toward zero; overflow saturates at ±65504. GLES leaves the float-to-half
+    /// rounding of color writes implementation-defined, and some GPUs truncate (observed on the iOS 27.2 simulator,
+    /// feature 019). Compare against both half modes when the mode is unknown.
+    case float16TowardZero
     /// 8-bit normalized (RGBA8 targets): clamped to 0…1 and rounded to n/255.
     case unorm8
 
@@ -19,28 +23,30 @@ public enum StoragePrecision: String, Sendable, Codable, CaseIterable {
         case .unorm8:
             guard !x.isNaN else { return 0 }
             return (min(max(x, 0), 1) * 255).rounded(.toNearestOrEven) / 255
-        case .float16: return Self.roundToHalf(x)
+        case .float16: return Self.roundToHalf(x, .toNearestOrEven)
+        case .float16TowardZero: return Self.roundToHalf(x, .towardZero)
         }
     }
 
-    /// Comparison tolerance of one storage step: 1e-6 (float32), 1e-3 (float16, for values up to 1),
+    /// Comparison tolerance of one storage step: 1e-6 (float32), 1e-3 (both half modes, for values up to 1),
     /// 1.5/255 (unorm8).
     public var tolerance: Float {
         switch self {
         case .float32: 1e-6
-        case .float16: 1e-3
+        case .float16, .float16TowardZero: 1e-3
         case .unorm8: 1.5 / 255
         }
     }
 
     /// Portable half rounding (no `Float16`, so it also runs on Intel macOS hosts).
-    static func roundToHalf(_ x: Float) -> Float {
+    static func roundToHalf(_ x: Float, _ rule: FloatingPointRoundingRule) -> Float {
         guard x.isFinite else { return x }
         let a = abs(x)
+        if rule == .towardZero, a >= 65504 { return x < 0 ? -65504 : 65504 }
         if a >= 65520 { return x < 0 ? -.infinity : .infinity }   // past the largest half (65504) plus half a step
         // Half has 10 fraction bits; below 2^-14 it is subnormal with a fixed step of 2^-24.
         let step: Float = a < 0x1p-14 ? 0x1p-24 : Float(sign: .plus, exponent: a.exponent - 10, significand: 1)
-        let q = (a / step).rounded(.toNearestOrEven) * step
+        let q = (a / step).rounded(rule) * step
         return x < 0 ? -q : q
     }
 }

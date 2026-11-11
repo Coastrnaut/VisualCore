@@ -18,7 +18,7 @@ public enum FluidCanvasDescription {
         }
         let storageText = switch storage {
         case .float32: "32-bit float storage"
-        case .float16: "half-float storage"
+        case .float16, .float16TowardZero: "half-float storage"
         case .unorm8: "8-bit storage"
         }
         return "Dye pattern \(state), \(c.gridWidth) by \(c.gridHeight) grid, \(storageText)"
