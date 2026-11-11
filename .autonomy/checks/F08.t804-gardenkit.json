@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Harnesses/SecondConsumer/GardenKit"
+  ],
+  "command": "swift test --package-path Harnesses/SecondConsumer/GardenKit",
+  "elapsed_seconds": 2.43,
+  "exit_code": 0,
+  "finished": "2026-11-11T02:11:15+00:00",
+  "log": ".autonomy/logs/F08.t804-gardenkit.log",
+  "log_sha256": "1037a02a5bfe27cbf5f83f582412062aebf80d26aa159db45921545854ba9071",
+  "name": "t804-gardenkit",
+  "stage": "F08",
+  "started": "2026-11-11T02:11:12+00:00",
+  "timed_out": false
+}

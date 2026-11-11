@@ -5,6 +5,6 @@ import SwiftUI
 @main
 struct SecondConsumerApp: App {
     var body: some Scene {
-        WindowGroup { Text("Lumen Garden \(GardenKitInfo.version)").accessibilityIdentifier("garden.title") }
+        WindowGroup { Text("Lumen Garden").accessibilityIdentifier("garden.title") }
     }
 }
