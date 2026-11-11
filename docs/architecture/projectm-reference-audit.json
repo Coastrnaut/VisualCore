@@ -86,11 +86,11 @@
   ],
   "bridge_sources_sha256": {
     "Packages/ANGLERendering/Package.swift": "91416687c9ce123776556e4197f1a58d0d1a04b0ffbdcf7d5af1d8d41789657c",
-    "Packages/ANGLERendering/Sources/ANGLERendering/ANGLERenderer.swift": "4ffea095733cb6d43bec6ac4b9190c8c386ef91f751fb51aef0c1f26b66106c6",
+    "Packages/ANGLERendering/Sources/ANGLERendering/ANGLERenderer.swift": "03018863e8384819bd6f6e90f714186fa74a63bb581234498a6b7c6641bcd137",
     "Packages/ANGLERendering/Sources/ANGLERendering/PresetPrewarmer.swift": "34379f4767e6d7625b9686416cf0dc2126c207d739f60b423b7f9ca733b9b6b1",
     "Packages/ANGLERendering/Sources/CANGLE/CANGLE.c": "3206808b30df441ab424395210ec12b38b95ad1fa019f812eef72910bbc02dec",
     "Packages/ANGLERendering/Sources/CANGLE/include/CANGLE.h": "17b4a0a457cc53d290113146bb16ecccc8730f199ee8c87faca7ed22d5c4dd27",
-    "Packages/ANGLERendering/Tests/ANGLERenderingTests/ANGLERendererTests.swift": "d79a45d8e83e66e670c4f8b7ba5b5b21509f9fb16c51911890374a2ff600b5b1",
+    "Packages/ANGLERendering/Tests/ANGLERenderingTests/ANGLERendererTests.swift": "56c9757cce0545e4a57f66b563e986cea709b1bfe5f0066896322aa10109b5a4",
     "Packages/ANGLERendering/Tests/ANGLERenderingTests/FlashLimiterTests.swift": "9ed18f42fa7c21846d934a49fa78d49e97291ade981417e766c8f8968c51ad1a"
   },
   "build_scripts": {
@@ -142,7 +142,7 @@
   "projectm_xcframework_present": true,
   "reference": {
     "clean": true,
-    "commit": "1ad0b9953a9f33497005e95b63889a68e34f5a8d",
+    "commit": "d93edd178525444f86ed8b9f1e70aee7412871b2",
     "path": "External/projectm-ios",
     "superproject_pin": "1ad0b9953a9f33497005e95b63889a68e34f5a8d"
   },

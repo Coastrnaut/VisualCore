@@ -11,7 +11,7 @@ The reference `External/projectm-ios` is never written.
 
 ## Phase 1: Setup and "before" evidence
 
-- [ ] T-F701 Before evidence: `check_reference_clean.py`, reference `test-anglerendering-ios27/26` and `audit_projectm_reference.py` at `d93edd1` (recorded as F07 checks; ADR-0005 run counts if unchanged) and a pre-change migration-log note
+- [X] T-F701 Before evidence: `check_reference_clean.py`, reference `test-anglerendering-ios27/26` and `audit_projectm_reference.py` at `d93edd1` (recorded as F07 checks; ADR-0005 run counts if unchanged) and a pre-change migration-log note — Verified 2026-11-10: F07.t701-before-reference-clean exit 0 at d93edd1; baseline F07.pin-d93edd1-* (full reference regression, ANGLERendering 14/14 both runtimes incl. upstream preset render, audit PASS) recorded as the before evidence in migration-log.md
 - [ ] T-F702 Harness skeleton `Harnesses/ProjectMReference/{ProjectMReference.yml,Sources/ProjectMReferenceApp.swift,Tests/}` linking VisualCoreRendering, VisualCoreEffects and the reference `ProjectMBridge` (local path), bundle id `dev.visualcore.harness.ProjectMReference`; unsigned simulator build; `check_dependencies.py` still passes (R1)
 
 ## Phase 2: Foundational

@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_reference_clean.py"
+  ],
+  "command": "python3 scripts/check_reference_clean.py",
+  "elapsed_seconds": 5.067,
+  "exit_code": 0,
+  "finished": "2026-11-11T01:42:07+00:00",
+  "log": ".autonomy/logs/F07.pin-d93edd1-reference-clean.log",
+  "log_sha256": "2d264c055d52a41379ce4a021ec75122e72c26190428cdc0283df65368b9c206",
+  "name": "pin-d93edd1-reference-clean",
+  "stage": "F07",
+  "started": "2026-11-11T01:42:02+00:00",
+  "timed_out": false
+}
