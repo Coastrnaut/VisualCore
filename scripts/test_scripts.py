@@ -29,6 +29,7 @@ baseline = load("run_reference_baseline")
 audit = load("audit_showcase_dependencies")
 docapi = load("check_documented_api")
 publicapi = load("check_public_api")
+licenses = load("check_licenses")
 try:
     deps = load("check_dependencies")
 except FileNotFoundError:
@@ -371,6 +372,27 @@ class PublicApiTests(unittest.TestCase):
     def test_missing_packages_is_usage_error(self):
         with tempfile.TemporaryDirectory() as d:
             self.assertEqual(self.run_check(Path(d))[0], 2)
+
+
+class LicenseTests(unittest.TestCase):
+    """Feature 010 T-F907 (FR-F909)."""
+
+    def run_check(self, root: Path) -> tuple[int, str]:
+        import contextlib, io
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(io.StringIO()):
+            code = licenses.main(["--root", str(root)])
+        return code, out.getvalue()
+
+    def test_repository_dependencies_are_inventoried(self):
+        code, out = self.run_check(HERE.parent)
+        self.assertEqual(code, 0, out)
+        self.assertIn("binary libEGL", out)
+
+    def test_unknown_binary_fails(self):
+        code, out = self.run_check(HERE / "fixtures" / "licenses" / "unknown")
+        self.assertEqual(code, 1)
+        self.assertIn("binary target Mystery", out)
 
 
 if __name__ == "__main__":

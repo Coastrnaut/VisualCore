@@ -4,7 +4,9 @@
 import Foundation
 import VisualCoreMath
 
+/// A particle source: continuous emission rate plus per-particle lifetime, speed, direction cone, and size/color ramps.
 public struct Emitter: Sendable, Equatable {
+    /// Spawn point in world units.
     public var position: Vec2
     /// Particles per second (continuous emission; fractional rates accumulate).
     public var rate: Double
@@ -16,10 +18,14 @@ public struct Emitter: Sendable, Equatable {
     public var direction: Double
     /// Total cone angle, radians (2π = all directions).
     public var spread: Double
+    /// Particle diameter (world units) at birth and at death, interpolated linearly over its life.
     public var startSize: Double, endSize: Double
+    /// Particle RGBA at birth and at death, interpolated linearly over its life.
     public var startColor: Vec4, endColor: Vec4
+    /// When false the emitter stops continuous emission (default true); `burst` still works.
     public var isEmitting = true
 
+    /// Defaults: 100 particles/s, 1 s life, speed 50–100, pointing +y with a full 2π spread, size 4→0, opaque→transparent white.
     public init(position: Vec2 = .zero, rate: Double = 100, lifetime: ClosedRange<Double> = 1...1,
                 speed: ClosedRange<Double> = 50...100, direction: Double = .pi / 2, spread: Double = 2 * .pi,
                 startSize: Double = 4, endSize: Double = 0, startColor: Vec4 = Vec4(1, 1, 1, 1), endColor: Vec4 = Vec4(1, 1, 1, 0)) {
@@ -29,6 +35,7 @@ public struct Emitter: Sendable, Equatable {
     }
 }
 
+/// A force applied to every live particle each step (accelerations add up).
 public enum ParticleForce: Sendable, Equatable {
     /// Constant acceleration.
     case gravity(Vec2)
@@ -40,25 +47,36 @@ public enum ParticleForce: Sendable, Equatable {
 
 /// What a renderer needs per particle.
 public struct ParticleInstance: Sendable, Equatable {
+    /// Center in world units.
     public var position: Vec2
     /// Diameter in world units.
     public var size: Double
+    /// RGBA color.
     public var color: Vec4
+    /// Creates an instance from a position, diameter and RGBA color.
     public init(position: Vec2, size: Double, color: Vec4) { self.position = position; self.size = size; self.color = color }
 }
 
+/// Deterministic fixed-capacity particle simulation: same seed, emitters, forces and steps give the same state (see `checksum()`).
 public struct ParticleSystem: Sendable {
+    /// Default pool size: 10,000 particles.
     public static let defaultCapacity = 10_000
+    /// Hard cap on the pool size: 100,000 particles (larger requests are clamped).
     public static let maxCapacity = 100_000
 
+    /// Pool size, clamped to 1…`maxCapacity`; emission beyond it is dropped and counted in `droppedCount`.
     public let capacity: Int
+    /// Particle sources; a particle's size and color come from the emitter that spawned it.
     public var emitters: [Emitter] = []
+    /// Forces applied to every live particle on each step.
     public var forces: [ParticleForce] = []
+    /// Live particles (0…`capacity`).
     public private(set) var aliveCount = 0
     /// Particles not emitted because the pool was full.
     public private(set) var droppedCount = 0
     /// Particles removed because their state became NaN or infinite.
     public private(set) var nanRemoved = 0
+    /// The seeded generator used for emission; its state advances with every spawn.
     public private(set) var random: SeededRandom
 
     // Structure of arrays, valid in 0..<aliveCount (internal for tests).
@@ -66,6 +84,7 @@ public struct ParticleSystem: Sendable {
     private var accumulators: [Double] = []
     private var pendingBursts: [(emitter: Int, count: Int)] = []
 
+    /// Creates an empty pool of `capacity` particles (clamped to 1…100,000) seeded with `seed` (default 0).
     public init(capacity: Int = ParticleSystem.defaultCapacity, seed: UInt64 = 0) {
         let c = min(max(capacity, 1), Self.maxCapacity)
         self.capacity = c
@@ -80,6 +99,7 @@ public struct ParticleSystem: Sendable {
         pendingBursts.append((index, count))
     }
 
+    /// Advances by `dt` seconds: ages and expires, applies forces (semi-implicit Euler), removes NaN/infinite particles, then emits; ignores non-finite or non-positive `dt`.
     public mutating func step(_ dt: Double) {
         guard dt.isFinite, dt > 0 else { return }
         // 1. Age and expire.

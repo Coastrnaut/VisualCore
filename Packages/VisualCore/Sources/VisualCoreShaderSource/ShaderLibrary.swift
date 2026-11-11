@@ -10,10 +10,13 @@ import Foundation
 
 /// Where an expanded line came from.
 public struct SourceOrigin: Sendable, Equatable, Hashable, Codable {
+    /// Source name the line came from, or `<generated>` for synthesized lines.
     public let file: String
     /// 1-based line in `file`; 0 for generated lines.
     public let line: Int
+    /// Creates an origin for 1-based `line` of `file`.
     public init(file: String, line: Int) { self.file = file; self.line = line }
+    /// Origin of synthesized lines (`#version`, `#define`): file `<generated>`, line 0.
     public static let generated = SourceOrigin(file: "<generated>", line: 0)
 }
 
@@ -29,6 +32,7 @@ public enum ShaderSourceError: Error, Equatable, Sendable {
 
 /// The result of expansion: GLSL text plus a line map.
 public struct ExpandedShader: Sendable, Equatable {
+    /// Expanded GLSL ES 3.00 text, lines joined with `\n`, at most 64 KiB of UTF-8.
     public let text: String
     /// `origins[i]` is the origin of expanded line `i + 1`.
     public let origins: [SourceOrigin]
@@ -42,17 +46,24 @@ public struct ExpandedShader: Sendable, Equatable {
     }
 }
 
+/// Named GLSL ES 3.00 sources expanded with `#include "name"` (depth ≤ 8, ≤ 64 KiB) and injected `#define`s.
 public struct ShaderLibrary: Sendable {
+    /// Maximum UTF-8 size of an expanded shader (64 KiB); larger results throw `tooLarge`.
     public static let maxExpandedBytes = 64 * 1024
+    /// Maximum `#include` nesting depth (8); deeper nesting throws `tooDeep`.
     public static let maxIncludeDepth = 8
+    /// The only accepted version directive, emitted as expanded line 1.
     public static let versionLine = "#version 300 es"
 
     private var sources: [String: String] = [:]
 
+    /// Creates an empty library.
     public init() {}
 
+    /// Registers `text` under `name`, replacing any source already registered with that name.
     public mutating func add(_ name: String, _ text: String) { sources[name] = text }
 
+    /// Whether a source is registered under `name`.
     public func contains(_ name: String) -> Bool { sources[name] != nil }
 
     /// Expands a named source.

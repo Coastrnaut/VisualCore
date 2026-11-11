@@ -8,7 +8,9 @@ import VisualCoreDiagnostics
 public struct RenderContext: Equatable {
     /// Context generation (Constitution III): GPU objects from another generation are invalid.
     public let generation: Int
+    /// Drawable width in pixels (not points).
     public let pixelWidth: Int
+    /// Drawable height in pixels (not points).
     public let pixelHeight: Int
     /// The framebuffer to draw into (0 = the window surface).
     public let framebuffer: UInt32
@@ -22,6 +24,7 @@ public struct RenderContext: Equatable {
         RenderContext(generation: generation, pixelWidth: width, pixelHeight: height, framebuffer: framebuffer, resources: resources)
     }
 
+    /// Equal when generation, pixel size, framebuffer and registry identity match.
     public nonisolated static func == (a: RenderContext, b: RenderContext) -> Bool {
         a.generation == b.generation && a.pixelWidth == b.pixelWidth && a.pixelHeight == b.pixelHeight
             && a.framebuffer == b.framebuffer && a.resources === b.resources
@@ -30,11 +33,13 @@ public struct RenderContext: Equatable {
 
 /// Timing of one frame.
 public struct FrameInfo: Sendable, Equatable {
+    /// Zero-based frame number since the host started rendering.
     public let index: Int
     /// Seconds since the host started rendering.
     public let time: Double
     /// Seconds since the previous frame, clamped to 0…0.1 (FramePacing.clampedDelta).
     public let delta: Double
+    /// The display link's target presentation time (CACurrentMediaTime seconds).
     public let targetTimestamp: Double
 }
 

@@ -4,12 +4,16 @@
 // re-implemented as a pure, host-tested model. The GPU pass measures the frame's mean Rec. 709 luma
 // and applies `color * gain + bias` so the displayed mean equals `displayed`.
 
+/// Reduce Flashing model: limits how fast the displayed mean luminance (0…1) may change.
 public struct FlashLimiterModel: Sendable, Equatable {
+    /// Maximum change of displayed mean luminance per second (default 0.3).
     public let limitPerSecond: Double
     /// Frames longer than this (pauses, debugger) are treated as this long.
     public static let maxDelta = 0.1
+    /// Current displayed mean luminance; nil before the first frame or after `reset()`.
     public private(set) var adapted: Double?
 
+    /// Creates a limiter allowing `limitPerSecond` luminance change per second (default 0.3).
     public init(limitPerSecond: Double = 0.3) { self.limitPerSecond = limitPerSecond }
 
     /// Advances one frame with the measured mean luminance (0…1).
@@ -30,5 +34,6 @@ public struct FlashLimiterModel: Sendable, Equatable {
         }
     }
 
+    /// Forgets the adapted luminance so the next frame is shown unmodified.
     public mutating func reset() { adapted = nil }
 }

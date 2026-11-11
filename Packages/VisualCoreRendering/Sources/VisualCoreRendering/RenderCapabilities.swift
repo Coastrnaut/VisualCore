@@ -2,21 +2,34 @@
 import CVisualCoreEGL
 import CVisualCoreGL
 
+/// What the current ANGLE ES context reports, captured once per context generation.
 public struct RenderCapabilities: Sendable, Equatable, Codable {
+    /// GL_VERSION string.
     public var glVersion = ""
+    /// GL_SHADING_LANGUAGE_VERSION string.
     public var glslVersion = ""
+    /// GL_RENDERER string.
     public var renderer = ""
+    /// GL_VENDOR string.
     public var vendor = ""
+    /// EGL_VENDOR string of the display.
     public var eglVendor = ""
+    /// Extension names reported via glGetStringi.
     public var extensions: [String] = []
+    /// GL_MAX_TEXTURE_SIZE in pixels.
     public var maxTextureSize = 0
+    /// GL_MAX_VIEWPORT_DIMS in pixels.
     public var maxViewport = Size(width: 0, height: 0)
 
+    /// A width and height in pixels.
     public struct Size: Sendable, Equatable, Codable {
+        /// Width in pixels.
         public var width: Int
+        /// Height in pixels.
         public var height: Int
     }
 
+    /// Creates an empty report (no context queried).
     public init() {}
 
     /// Queries the current context. Call with a context current.

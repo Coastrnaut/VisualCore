@@ -1,16 +1,21 @@
 // FixedStepClock.swift — fixed-timestep accumulator decoupling simulation from the display rate
 // (feature 006 T-F507; FR-F503, FR-F511; research R3, after Glenn Fiedler's "Fix Your Timestep!").
 
+/// Converts variable frame deltas into a bounded number of fixed simulation steps.
 public struct FixedStepClock: Sendable, Equatable {
     /// An accumulator this close below a step boundary counts as reaching it (spec A1), so 60 frames of
     /// 1/60 s give exactly 120 steps of 1/120 s despite floating-point rounding.
     public static let boundaryTolerance = 1e-9
 
+    /// Fixed step length in seconds (default 1/120; invalid values fall back to it).
     public let step: Double
+    /// Most steps returned per frame, clamped to 1…8; time beyond it goes to `droppedTime`.
     public let maxSteps: Int
+    /// Elapsed seconds not yet consumed by a step (< `step` after each advance).
     public private(set) var accumulator = 0.0
     /// Simulation time lost to the per-frame step cap (stalls, debugger, backgrounding).
     public private(set) var droppedTime = 0.0
+    /// Steps returned since creation, after the cap.
     public private(set) var totalSteps = 0
     /// Frames whose delta was NaN, infinite or negative (treated as zero).
     public private(set) var invalidDeltas = 0

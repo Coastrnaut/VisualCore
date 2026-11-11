@@ -3,7 +3,9 @@
 // center, y up); ViewMetrics then maps camera space to view points, pixels and NDC.
 import Foundation
 
+/// Pan, zoom and rotate camera for 2D scenes (world units are points at zoom 1, y up).
 public struct Camera2D: Sendable, Equatable {
+    /// Allowed zoom magnifications; values outside are clamped.
     public static let zoomRange: ClosedRange<Double> = 0.1...100
 
     /// World point shown at the view center.
@@ -13,6 +15,7 @@ public struct Camera2D: Sendable, Equatable {
     /// Counter-clockwise rotation of the world on screen, radians.
     public var rotation: Double
 
+    /// Creates a camera; `zoom` is clamped to `zoomRange` (non-finite becomes 1).
     public init(center: Vec2 = .zero, zoom: Double = 1, rotation: Double = 0) {
         self.center = center
         self.zoom = Camera2D.clampZoom(zoom)

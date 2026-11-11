@@ -3,10 +3,12 @@
 // elastic overshoot in between by design.
 import Foundation
 
+/// Easing curve family (Penner-style); `back` and `elastic` overshoot between the ends.
 public enum EasingCurve: String, CaseIterable, Sendable, Codable {
     case linear, quad, cubic, sine, expo, back, elastic, bounce
 }
 
+/// Whether the curve accelerates (`in`), decelerates (`out`) or both (`inOut`).
 public enum EasingMode: String, CaseIterable, Sendable, Codable {
     case `in`, out, inOut
 }

@@ -2,5 +2,6 @@
 
 /// Module version (semantic versioning; 0.x until the F09 stabilization gate).
 public enum EffectsInfo {
+    /// Semantic version of the VisualCoreEffects module.
     public static let version = "0.1.0"
 }

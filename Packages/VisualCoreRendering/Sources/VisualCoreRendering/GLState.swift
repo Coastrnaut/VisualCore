@@ -5,6 +5,7 @@
 // assumptions is cheaper than saving/restoring every state with glGet* each frame.
 import CVisualCoreGL
 
+/// Resets shared GL state after a foreign renderer drew in a VisualCore context.
 public enum GLState {
     /// Restores the state VisualCore renderers rely on: vertex array 0, program 0, array/element buffers 0,
     /// blending/depth/stencil/culling/scissor disabled, full color mask, texture unit 0 with no 2D texture,

@@ -22,7 +22,7 @@ Release symbol check). IDs `T-F9##`. One commit + push per task.
 
 - [ ] T-F905 [US3] Shader validation: `ShaderValidationTests` in VisualCoreRendering/VisualCoreEffects (every built-in program) and in Showcase unit tests (every bundled shader; `broken.frag` must fail with file/line) on iOS 27.2 and 26.5
 - [ ] T-F906 [US3] Cleanup sweep: a test that runs every Showcase scene, the InteractiveDemo scene and the Lumen Garden scene through setup → frames → context loss → frames → destroy and asserts 0 leaked
-- [ ] T-F907 [US3] `scripts/check_licenses.py` (+ tests) and `docs/legal/{THIRD_PARTY_NOTICES.md,lgpl-analysis.md}`
+- [X] T-F907 [US3] `scripts/check_licenses.py` (+ tests) and `docs/legal/{THIRD_PARTY_NOTICES.md,lgpl-analysis.md}` — Verified 2026-11-10: F09.t907-licenses PASS: 21 inventory components, every dependency (libEGL, libGLESv2, ProjectMBridge) mapped with allowed license and text; LGPL only in harness scope. F09.t907-license-tests: 37 script tests OK incl. unknown-binary fixture failing. docs/legal/THIRD_PARTY_NOTICES.md and lgpl-analysis.md (engine dynamic, harness not distributed, obligations if ever shipped)
 - [ ] T-F908 [US3] `scripts/release_check.py` (+ tests for the runner logic): runs public API, licenses, docs, compliance, dependency rules, documented API (all consumers), script tests, host tests (VisualCore, GardenKit), rendering/effects sims both runtimes, Showcase/InteractiveDemo/SecondConsumer/ProjectMReference tests, reference regression + clean, Release symbol check; per-step summary and JSON
 
 ## Phase 4: US2 + US5 — documentation and release (P1/P2)

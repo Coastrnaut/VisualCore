@@ -4,9 +4,11 @@
 import CVisualCoreGL
 import VisualCoreDiagnostics
 
+/// Color formats for registry textures and render targets.
 public enum TextureFormat: Sendable, Equatable {
     case rgba8, rgba16f, r8
 
+    /// Bytes per pixel used for budget accounting (rgba8 4, rgba16f 8, r8 1).
     public var bytesPerPixel: Int {
         switch self { case .rgba8: 4; case .rgba16f: 8; case .r8: 1 }
     }
@@ -19,6 +21,7 @@ public enum TextureFormat: Sendable, Equatable {
     }
 }
 
+/// Errors creating textures and render targets.
 public enum ResourceError: Error, Equatable, Sendable {
     /// Zero or larger than the context's maximum texture size (FR-F313).
     case invalidSize(width: Int, height: Int, max: Int)
@@ -28,22 +31,32 @@ public enum ResourceError: Error, Equatable, Sendable {
 
 /// Bookkeeping shared by every registry object.
 public struct GPUHandle: Sendable, Equatable {
+    /// Which ledger category the object is accounted under.
     public let kind: ResourceKind
+    /// The GL object name (texture, buffer or framebuffer id).
     public let name: UInt32
+    /// Bytes charged to the registry's budget for this object.
     public let bytes: Int
+    /// Context generation that created the object; use from another generation is rejected and counted as stale.
     public let generation: Int
+    /// Diagnostic label shown in resource reports and leak lists.
     public let label: String
 }
 
+/// A GPU object created and accounted by a ResourceRegistry (main thread only).
 @MainActor
 public protocol GPUResource: AnyObject {
     var handle: GPUHandle { get }
 }
 
+/// A 2D texture owned by a ResourceRegistry; bound or uploaded only in its creating generation until released.
 @MainActor
 public final class Texture: GPUResource {
+    /// Registry bookkeeping: GL name, accounted bytes, generation and label.
     public let handle: GPUHandle
+    /// Size in pixels.
     public let width: Int, height: Int
+    /// Pixel format, which determines the accounted bytes.
     public let format: TextureFormat
     weak var registry: ResourceRegistry?
     var released = false
@@ -75,14 +88,17 @@ public final class Texture: GPUResource {
     }
 }
 
+/// A GL buffer of fixed byte size owned by a ResourceRegistry; operations are ignored when stale or released.
 @MainActor
 public final class GPUBuffer: GPUResource {
+    /// Registry bookkeeping: GL name, allocated bytes, generation and label.
     public let handle: GPUHandle
     weak var registry: ResourceRegistry?
     var released = false
 
     init(handle: GPUHandle, registry: ResourceRegistry) { self.handle = handle; self.registry = registry }
 
+    /// Binds to `target` (array buffer by default); rejected (and counted) when stale or released.
     public func bind(target: Int32 = GL_ARRAY_BUFFER) {
         guard !released, let registry, registry.accept(generation: handle.generation) else { return }
         vcglBindBuffer(GLenum(target), handle.name)
@@ -108,9 +124,13 @@ public final class GPUBuffer: GPUResource {
 /// A framebuffer with one color texture; accounted as one `framebuffer` entry carrying the color bytes.
 @MainActor
 public final class RenderTarget: GPUResource {
+    /// Registry bookkeeping: framebuffer name, accounted color bytes, generation and label.
     public let handle: GPUHandle
+    /// GL name of the color attachment texture.
     public let colorTexture: GLuint
+    /// Size in pixels.
     public let width: Int, height: Int
+    /// Pixel format of the color attachment.
     public let format: TextureFormat
     weak var registry: ResourceRegistry?
     var released = false

@@ -5,11 +5,15 @@ import CVisualCoreGL
 import VisualCoreDiagnostics
 import VisualCoreShaderSource
 
+/// Creates and tracks one host's GPU objects on the main thread against budgets, rejects stale context generations and reports leaks.
 @MainActor
 public final class ResourceRegistry {
+    /// Current context generation; objects from other generations are rejected and counted as stale.
     public private(set) var generation: Int
     private var ledger: ResourceLedger
+    /// Byte budgets (total and per kind) enforced on allocation.
     public var budget: ResourceBudget { ledger.budget }
+    /// Snapshot of live counts, bytes, peaks, stale rejections, leaks and warnings.
     public var stats: ResourceLedger.Snapshot { ledger.snapshot }
 
     init(budget: ResourceBudget, generation: Int) {
@@ -61,6 +65,7 @@ public final class ResourceRegistry {
         }
     }
 
+    /// Creates a width×height texture (pixels), charging width×height×bytesPerPixel; throws on invalid size or over budget.
     public func makeTexture(width: Int, height: Int, format: TextureFormat = .rgba8, label: String) throws -> Texture {
         try validate(width, height)
         let bytes = width * height * format.bytesPerPixel
@@ -70,6 +75,7 @@ public final class ResourceRegistry {
                        width: width, height: height, format: format, registry: self)
     }
 
+    /// Creates a dynamic GL buffer of `bytes`, charged to the budget; throws when over budget.
     public func makeBuffer(bytes: Int, label: String) throws -> GPUBuffer {
         try ledger.allocate(.buffer, bytes: bytes)
         var name: GLuint = 0
@@ -79,6 +85,7 @@ public final class ResourceRegistry {
         return GPUBuffer(handle: GPUHandle(kind: .buffer, name: name, bytes: bytes, generation: generation, label: label), registry: self)
     }
 
+    /// Creates a framebuffer with one color texture (pixels), charged as a framebuffer entry; throws on invalid size, over budget or an incomplete framebuffer.
     public func makeRenderTarget(width: Int, height: Int, format: TextureFormat = .rgba8, label: String) throws -> RenderTarget {
         try validate(width, height)
         let bytes = width * height * format.bytesPerPixel
@@ -229,12 +236,15 @@ public final class ResourceRegistry {
 
     // MARK: Program cache (FR-F306)
 
+    /// Maximum cached programs; the least recently used is released beyond this.
     public static let maxCachedPrograms = 64
     private var cache: [String: ShaderProgram] = [:]
     private var lru: [String] = []
     /// Programs actually compiled and linked, and requests served from the cache.
     public private(set) var compileCount = 0
+    /// Program requests served from the cache instead of compiling.
     public private(set) var cacheHits = 0
+    /// Programs currently held in the cache.
     public var cachedProgramCount: Int { cache.count }
 
     private func touch(_ key: String) {

@@ -5,8 +5,11 @@ import Foundation
 
 /// SplitMix64, used to expand a 64-bit seed into xoshiro state.
 public struct SplitMix64: RandomNumberGenerator, Sendable {
+    /// Current 64-bit state (advanced by the golden-ratio increment on each draw).
     public private(set) var state: UInt64
+    /// Starts from `seed` as the initial state.
     public init(seed: UInt64) { state = seed }
+    /// Next 64-bit output (SplitMix64 finalizer).
     public mutating func next() -> UInt64 {
         state &+= 0x9E37_79B9_7F4A_7C15
         var z = state
@@ -19,8 +22,10 @@ public struct SplitMix64: RandomNumberGenerator, Sendable {
 /// Deterministic random numbers for simulations; conforms to `RandomNumberGenerator`.
 public struct SeededRandom: RandomNumberGenerator, Sendable, Equatable {
     private var s0: UInt64, s1: UInt64, s2: UInt64, s3: UInt64
+    /// The seed this generator was created with.
     public let seed: UInt64
 
+    /// Seeds the four xoshiro256** state words from SplitMix64(`seed`); identical on every platform.
     public init(seed: UInt64) {
         self.seed = seed
         var sm = SplitMix64(seed: seed)
@@ -29,6 +34,7 @@ public struct SeededRandom: RandomNumberGenerator, Sendable, Equatable {
 
     @inline(__always) private static func rotl(_ x: UInt64, _ k: UInt64) -> UInt64 { (x << k) | (x >> (64 - k)) }
 
+    /// Next 64-bit xoshiro256** output.
     public mutating func next() -> UInt64 {
         let result = Self.rotl(s1 &* 5, 7) &* 9
         let t = s1 << 17

@@ -9,12 +9,16 @@ public enum RenderLifecycleState: String, Sendable, Codable, CaseIterable {
 
 /// One recorded transition attempt.
 public struct RenderLifecycleEvent: Sendable, Codable, Equatable {
+    /// State before the attempt.
     public let from: RenderLifecycleState
+    /// Requested state.
     public let to: RenderLifecycleState
     /// Context generation after the transition (unchanged when rejected).
     public let generation: Int
+    /// Whether the transition was allowed and applied.
     public let accepted: Bool
 
+    /// Creates an event record.
     public init(from: RenderLifecycleState, to: RenderLifecycleState, generation: Int, accepted: Bool) {
         self.from = from
         self.to = to
@@ -25,13 +29,18 @@ public struct RenderLifecycleEvent: Sendable, Codable, Equatable {
 
 /// The allowed-transition table, the context generation and a bounded history.
 public struct RenderLifecycle: Sendable {
+    /// Current state (starts `uninitialized`; `destroyed` is terminal).
     public private(set) var state: RenderLifecycleState = .uninitialized
     /// 0 before the first context; +1 on entering `surfaceReady` or `reinitialized` (FR-F208).
     public private(set) var generation = 0
+    /// Most recent transition attempts, accepted and rejected, oldest first (at most `historyLimit`).
     public private(set) var history: [RenderLifecycleEvent] = []
+    /// Disallowed transition attempts since creation.
     public private(set) var rejectedTransitions = 0
+    /// Maximum events kept in `history` (≥ 1; default 256).
     public let historyLimit: Int
 
+    /// Starts `uninitialized` at generation 0; `historyLimit` is clamped to ≥ 1.
     public init(historyLimit: Int = 256) {
         self.historyLimit = max(1, historyLimit)
     }

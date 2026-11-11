@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "note": "Feature 010 T-F907 (FR-F909). Every dependency found by scripts/check_licenses.py must map to an entry here. License texts for ANGLE and the engine live in the pinned reference at External/projectm-ios/Apps/projectM-iOS/Resources/Licenses/ (read-only) and must be bundled by any distributed app.",
+  "allowedLicenses": ["MIT", "BSD-3-Clause", "BSD-2-Clause", "Apache-2.0", "Apache-2.0 WITH LLVM-exception", "Zlib", "NCSA", "blessing", "CC0-1.0", "WTFPL", "Unlicense", "LicenseRef-PublicDomain", "LGPL-2.1"],
+  "harnessOnlyLicenses": ["LGPL-2.1"],
+  "components": [
+    {"id": "visualcore", "name": "VisualCore (this repository)", "license": "MIT", "scope": "shipped", "text": "LICENSE"},
+    {"id": "angle", "name": "ANGLE (owner fork Coastrnaut/angle@ios, pin 29d1823)", "license": "BSD-3-Clause", "scope": "shipped", "binaries": ["libEGL", "libGLESv2"], "text": "External/projectm-ios/Apps/projectM-iOS/Resources/Licenses/angle-ANGLE.txt"},
+    {"id": "angle-libc++", "name": "libc++ (inside ANGLE)", "license": "Apache-2.0 WITH LLVM-exception", "scope": "shipped", "text": "External/projectm-ios/Apps/projectM-iOS/Resources/Licenses/angle-libc++.txt"},
+    {"id": "angle-libc++abi", "name": "libc++abi (inside ANGLE)", "license": "Apache-2.0 WITH LLVM-exception", "scope": "shipped", "text": "External/projectm-ios/Apps/projectM-iOS/Resources/Licenses/angle-libc++abi.txt"},
+    {"id": "angle-abseil-cpp", "name": "abseil-cpp (inside ANGLE)", "license": "Apache-2.0", "scope": "shipped", "text": "External/projectm-ios/Apps/projectM-iOS/Resources/Licenses/angle-abseil-cpp.txt"},
+    {"id": "angle-astc-encoder", "name": "astc-encoder (inside ANGLE)", "license": "Apache-2.0", "scope": "shipped", "text": "External/projectm-ios/Apps/projectM-iOS/Resources/Licenses/angle-astc-encoder.txt"},
+    {"id": "angle-llvm-libc", "name": "llvm-libc (inside ANGLE)", "license": "MIT, NCSA", "scope": "shipped", "text": "External/projectm-ios/Apps/projectM-iOS/Resources/Licenses/angle-llvm-libc.txt"},
+    {"id": "angle-perfetto", "name": "perfetto (inside ANGLE)", "license": "blessing, BSD-3-Clause, Apache-2.0", "scope": "shipped", "text": "External/projectm-ios/Apps/projectM-iOS/Resources/Licenses/angle-perfetto.txt"},
+    {"id": "angle-protobuf", "name": "protobuf (inside ANGLE)", "license": "BSD-3-Clause", "scope": "shipped", "text": "External/projectm-ios/Apps/projectM-iOS/Resources/Licenses/angle-protobuf.txt"},
+    {"id": "angle-vulkan-headers", "name": "Vulkan-Headers (inside ANGLE)", "license": "Apache-2.0", "scope": "shipped", "text": "External/projectm-ios/Apps/projectM-iOS/Resources/Licenses/angle-vulkan-headers.txt"},
+    {"id": "angle-zlib", "name": "zlib (inside ANGLE)", "license": "Zlib", "scope": "shipped", "text": "External/projectm-ios/Apps/projectM-iOS/Resources/Licenses/angle-zlib.txt"},
+    {"id": "projectm", "name": "libprojectM (Coastrnaut/projectm@ios, pin c88894e) via ProjectMBridge", "license": "LGPL-2.1", "scope": "harness", "packages": ["ProjectMBridge"], "binaries": ["ProjectM"], "text": "External/projectm-ios/Apps/projectM-iOS/Resources/Licenses/projectm.txt"},
+    {"id": "glad", "name": "glad loader (inside the engine)", "license": "WTFPL, CC0-1.0, Apache-2.0", "scope": "harness", "text": "External/projectm-ios/Apps/projectM-iOS/Resources/Licenses/glad.txt"},
+    {"id": "glm", "name": "GLM (inside the engine)", "license": "MIT", "scope": "harness", "text": "External/projectm-ios/Apps/projectM-iOS/Resources/Licenses/glm.txt"},
+    {"id": "hlslparser", "name": "hlslparser (inside the engine)", "license": "MIT", "scope": "harness", "text": "External/projectm-ios/Apps/projectM-iOS/Resources/Licenses/hlslparser.txt"},
+    {"id": "projectm-eval", "name": "projectm-eval (inside the engine)", "license": "MIT", "scope": "harness", "text": "External/projectm-ios/Apps/projectM-iOS/Resources/Licenses/projectm-eval.txt"},
+    {"id": "stb_image", "name": "stb_image (inside the engine)", "license": "MIT, Unlicense", "scope": "harness", "text": "External/projectm-ios/Apps/projectM-iOS/Resources/Licenses/stb_image.txt"},
+    {"id": "xoshiro", "name": "xoshiro256** / SplitMix64 algorithms (Blackman & Vigna), re-implemented in VisualCoreSimulation", "license": "LicenseRef-PublicDomain", "scope": "shipped", "text": "docs/legal/THIRD_PARTY_NOTICES.md"},
+    {"id": "easing", "name": "Easing curves after Robert Penner's equations, re-implemented from the published formulas in VisualCoreMath", "license": "BSD-3-Clause", "scope": "shipped", "text": "docs/legal/THIRD_PARTY_NOTICES.md"},
+    {"id": "xcodegen", "name": "XcodeGen 2.46.0 (build tool, not shipped)", "license": "MIT", "scope": "tool", "text": "docs/legal/THIRD_PARTY_NOTICES.md"},
+    {"id": "spec-kit", "name": "GitHub Spec Kit 1.4.1.dev0 (process tooling, not shipped)", "license": "MIT", "scope": "tool", "text": "docs/legal/THIRD_PARTY_NOTICES.md"}
+  ]
+}

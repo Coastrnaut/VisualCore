@@ -7,9 +7,12 @@ import Foundation
 import VisualCoreMath
 import VisualCoreScenes
 
+/// Draws a 2D SceneNode tree as one batched, premultiplied-alpha triangle list on the main thread; GPU objects are rebuilt after a context recreation.
 @MainActor
 public final class PrimitiveRenderer {
+    /// Upper bound on segments per circle.
     public static let maxCircleSegments = 128
+    /// Lower bound on segments per circle.
     public static let minCircleSegments = 12
 
     let registry: ResourceRegistry
@@ -31,6 +34,7 @@ public final class PrimitiveRenderer {
     void main() { color = v_color; }
     """
 
+    /// Creates the vertex buffer and compiles the primitive program; throws on shader errors.
     public init(registry: ResourceRegistry) throws {
         self.registry = registry
         vertices = DynamicVertexBuffer(registry: registry, label: "primitives")
@@ -70,6 +74,7 @@ public final class PrimitiveRenderer {
         vcglDisableVertexAttribArray(1)
     }
 
+    /// Releases the vertex buffer and program back to the registry.
     public func release() {
         vertices.release()
         if let program { registry.release(program) }

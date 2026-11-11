@@ -3,16 +3,25 @@
 import Foundation
 import VisualCoreMath
 
+/// Indexed triangle mesh with per-vertex positions, normals and UVs; triangles wind counter-clockwise from outside.
 public struct Mesh: Sendable, Equatable {
+    /// Vertex positions in model space.
     public var positions: [Vec3]
+    /// Unit vertex normals, one per position.
     public var normals: [Vec3]
+    /// Texture coordinates in 0…1, one per position.
     public var uvs: [Vec2]
+    /// Triangle-list indices into the vertex arrays (three per triangle).
     public var indices: [UInt32]
 
+    /// Allowed quads per side for `plane(subdivisions:)`; values outside are clamped.
     public static let subdivisionRange = 1...256
+    /// Allowed longitude segments for `uvSphere`; values outside are clamped.
     public static let segmentRange = 3...256
+    /// Allowed latitude rings for `uvSphere`; values outside are clamped.
     public static let ringRange = 2...256
 
+    /// Number of triangles (`indices.count / 3`).
     public var triangleCount: Int { indices.count / 3 }
 
     /// Position + normal per vertex, 6 floats each (for GL upload).

@@ -2,5 +2,6 @@
 
 /// Module version (semantic versioning; 0.x until the F09 stabilization gate).
 public enum AudioInfo {
+    /// Semantic version of the VisualCoreAudio module.
     public static let version = "0.1.0"
 }

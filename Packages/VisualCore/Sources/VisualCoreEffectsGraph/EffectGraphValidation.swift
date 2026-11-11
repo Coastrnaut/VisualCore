@@ -1,6 +1,7 @@
 // EffectGraphValidation.swift — rejects unsafe graphs before any GPU work and orders the rest
 // (feature 005 T-F403; FR-F402–FR-F404, FR-F406; contract specs/005-effects-graph/contracts/effects-api.md).
 
+/// Why an effect graph was rejected before any GPU work.
 public enum EffectGraphError: Error, Equatable, Sendable {
     case unsupportedVersion(Int)
     case tooManyPasses(Int)
@@ -15,18 +16,24 @@ public enum EffectGraphError: Error, Equatable, Sendable {
     case overQuota(bytes: Int, quota: Int)
 }
 
+/// A graph that passed validation: execution order, memory estimate, resolved parameters and warnings.
 public struct ValidatedGraph: Sendable, Equatable {
     /// Pass ids in execution order.
     public let order: [String]
+    /// Estimated render-target bytes (4 B/px, 8 B/px for HDR bloom, doubled for feedback history).
     public let estimatedBytes: Int
     /// Parameters after defaults and clamping, per pass id.
     public let parameters: [String: [String: [Double]]]
+    /// Non-fatal notes, such as unknown parameters or input slots that were ignored.
     public let warnings: [String]
 }
 
+/// Validates effect graphs and computes their execution order and memory cost.
 public enum EffectGraphValidator {
+    /// Default render-target memory quota: 256 MiB.
     public static let defaultQuota = 256 << 20
 
+    /// Validates `graph` for a `width`×`height` view; throws `EffectGraphError` on a bad version, more than 32 passes, duplicate ids/outputs, unknown types, missing slots or inputs, scale outside 0<s≤1, missing output, cycles or exceeding `quotaBytes`.
     public static func validate(_ graph: EffectGraphDescription, width: Int, height: Int,
                                 quotaBytes: Int = defaultQuota) throws(EffectGraphError) -> ValidatedGraph {
         guard graph.version == EffectGraphDescription.currentVersion else { throw .unsupportedVersion(graph.version) }

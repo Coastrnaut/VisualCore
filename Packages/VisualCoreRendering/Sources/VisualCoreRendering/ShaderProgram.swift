@@ -3,6 +3,7 @@
 import CVisualCoreGL
 import VisualCoreShaderSource
 
+/// Shader failures from source expansion, compilation or linking.
 public enum ShaderError: Error, Equatable, Sendable {
     /// Rejected before any GPU work (size, depth, cycle, unknown include, version).
     case source(ShaderSourceError)
@@ -10,17 +11,26 @@ public enum ShaderError: Error, Equatable, Sendable {
     case link([ShaderDiagnostic])
 }
 
+/// A linked GLSL ES 3.00 program with its active-uniform table, created only by ResourceRegistry.program; stale after a context recreation.
 @MainActor
 public final class ShaderProgram {
+    /// An active uniform as reported by glGetActiveUniform.
     public struct Uniform: Sendable, Equatable {
+        /// Uniform location.
         public let location: GLint
+        /// GL type enum (for example GL_FLOAT_VEC4).
         public let type: GLenum
+        /// Array size (1 for non-arrays).
         public let size: GLint
     }
 
+    /// GL program name.
     public let name: GLuint
+    /// Context generation that created the program.
     public let generation: Int
+    /// Lowercase SHA-256 hex of the expanded vertex and fragment sources; the registry cache key.
     public let cacheKey: String
+    /// Active uniforms by name.
     public let uniforms: [String: Uniform]
     weak var registry: ResourceRegistry?
     var released = false
@@ -44,9 +54,13 @@ public final class ShaderProgram {
 
     // MARK: Validated uniforms (FR-F307). Call after use(); mismatches are warned once and not applied.
 
+    /// Sets a float uniform; call after `use()`; a missing or mistyped uniform is warned once and not applied.
     public func set(_ name: String, _ v: Float) { apply(name, [GL_FLOAT]) { vcglUniform1f($0, v) } }
+    /// Sets a vec2 uniform; call after `use()`; mismatches are warned once and not applied.
     public func set(_ name: String, _ v: SIMD2<Float>) { apply(name, [GL_FLOAT_VEC2]) { vcglUniform2f($0, v.x, v.y) } }
+    /// Sets a vec3 uniform; call after `use()`; mismatches are warned once and not applied.
     public func set(_ name: String, _ v: SIMD3<Float>) { apply(name, [GL_FLOAT_VEC3]) { vcglUniform3f($0, v.x, v.y, v.z) } }
+    /// Sets a vec4 uniform; call after `use()`; mismatches are warned once and not applied.
     public func set(_ name: String, _ v: SIMD4<Float>) { apply(name, [GL_FLOAT_VEC4]) { vcglUniform4f($0, v.x, v.y, v.z, v.w) } }
     /// Integers and sampler units.
     public func set(_ name: String, _ v: Int32) {

@@ -2,5 +2,6 @@
 
 /// Module version (semantic versioning; 0.x until the F09 stabilization gate).
 public enum PersistenceInfo {
+    /// Semantic version of this module (0.x until the F09 stabilization gate).
     public static let version = "0.1.0"
 }

@@ -59,6 +59,7 @@ enum SHA256 {
 /// Program cache keys (FR-F306): SHA-256 over both expanded stages, whose text already contains the
 /// sorted `#define` lines, so variants with different defines get different keys.
 public enum ShaderCacheKey {
+    /// Lowercase SHA-256 hex over the vertex text, a NUL separator and the fragment text.
     public static func make(vertex: ExpandedShader, fragment: ExpandedShader) -> String {
         SHA256.hex(of: Array(vertex.text.utf8) + [0] + Array(fragment.text.utf8))
     }

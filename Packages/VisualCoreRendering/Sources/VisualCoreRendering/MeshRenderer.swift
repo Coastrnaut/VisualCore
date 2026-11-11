@@ -6,15 +6,18 @@ import CVisualCoreGL
 import VisualCoreMath
 import VisualCoreScenes
 
+/// Draws a Mesh with Lambert lighting through an OrbitCamera on the main thread; GPU buffers are rebuilt after a context recreation.
 @MainActor
 public final class MeshRenderer {
     let registry: ResourceRegistry
+    /// The mesh whose positions, normals and indices are uploaded.
     public let mesh: Mesh
     private var program: ShaderProgram?
     private var vertexBuffer: GPUBuffer?
     private var indexBuffer: GPUBuffer?
     /// Direction toward the light in world space.
     public var lightDirection = Vec3(0.3, 0.6, 1).normalized
+    /// Ambient light fraction (0…1) added to the Lambert term.
     public var ambient = 0.15
 
     static let vertexSource = """
@@ -41,6 +44,7 @@ public final class MeshRenderer {
     }
     """
 
+    /// Uploads the mesh into registry buffers and compiles the shader; throws on budget or shader errors.
     public init(mesh: Mesh, registry: ResourceRegistry) throws {
         self.mesh = mesh
         self.registry = registry
@@ -79,6 +83,7 @@ public final class MeshRenderer {
         vcglDisableVertexAttribArray(0); vcglDisableVertexAttribArray(1)
     }
 
+    /// Releases the vertex and index buffers and the program back to the registry.
     public func release() {
         if let vertexBuffer { registry.release(vertexBuffer) }
         if let indexBuffer { registry.release(indexBuffer) }

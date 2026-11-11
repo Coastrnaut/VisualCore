@@ -2,6 +2,7 @@
 // (feature 006 T-F511; FR-F506, FR-F512). World space is y-up (Camera2D).
 import VisualCoreMath
 
+/// Filled 2D shape drawn at a scene node's local origin.
 public enum Primitive: Sendable, Equatable {
     /// Axis-aligned rectangle of `size`, centered on the node origin.
     case rect(Vec2)
@@ -10,6 +11,7 @@ public enum Primitive: Sendable, Equatable {
     /// Simple polygon (≤ 256 points, even-odd fill).
     case polygon([Vec2])
 
+    /// Maximum polygon vertex count kept by `bounded`; extra points are dropped.
     public static let maxPolygonPoints = 256
 
     /// The primitive with sizes made non-negative and finite and the polygon truncated to 256 points (FR-F512).
@@ -48,20 +50,28 @@ public enum Primitive: Sendable, Equatable {
 
 /// A node in a 2D scene: transform, z-order, visibility, an optional filled primitive and children.
 public final class SceneNode {
+    /// Caller-defined identifier (not required to be unique; default empty).
     public var id: String
+    /// Translation relative to the parent, in world units (y-up).
     public var position: Vec2
     /// Counter-clockwise, radians.
     public var rotation: Double
+    /// Per-axis scale relative to the parent (default 1, 1).
     public var scale: Vec2
     /// Draw order among siblings (higher on top; ties keep insertion order).
     public var z: Int
+    /// When false, this node and its whole subtree are skipped by `drawList` (default true).
     public var isVisible = true
+    /// Shape drawn by this node; assignments are normalized through `Primitive.bounded`.
     public var primitive: Primitive? { didSet { if let p = primitive, p != p.bounded { primitive = p.bounded } } }
     /// Premultiplication happens at draw time; components 0…1.
     public var color: Vec4
+    /// Child nodes in insertion order.
     public private(set) var children: [SceneNode] = []
+    /// Owning parent node (weak); nil for a root or detached node.
     public private(set) weak var parent: SceneNode?
 
+    /// Creates a node; `primitive` is normalized through `bounded`, `color` defaults to opaque white.
     public init(id: String = "", position: Vec2 = .zero, rotation: Double = 0, scale: Vec2 = Vec2(1, 1), z: Int = 0,
                 primitive: Primitive? = nil, color: Vec4 = Vec4(1, 1, 1, 1)) {
         self.id = id; self.position = position; self.rotation = rotation; self.scale = scale; self.z = z
@@ -69,17 +79,20 @@ public final class SceneNode {
         self.color = color
     }
 
+    /// Appends `child`, detaching it from any previous parent first.
     public func add(_ child: SceneNode) {
         child.removeFromParent()
         child.parent = self
         children.append(child)
     }
 
+    /// Detaches this node from its parent; no-op for a root.
     public func removeFromParent() {
         parent?.children.removeAll { $0 === self }
         parent = nil
     }
 
+    /// Translate × rotate × scale matrix from local to parent space.
     public var localTransform: Mat3 { Mat3.trs(position, rotation, scale) }
 
     /// Local → world, through all ancestors.

@@ -2,22 +2,28 @@
 // FR-F502, FR-F512). Pure: a UIKit adapter (VisualCoreRendering RenderView) produces the events.
 import VisualCoreMath
 
+/// Touch phase of a pointer event, mirroring UITouch phases.
 public enum PointerPhase: String, Sendable, Codable {
     case began, moved, ended, cancelled
 }
 
+/// One timestamped touch sample for a single pointer.
 public struct PointerEvent: Sendable, Equatable {
+    /// Stable identifier of the pointer for the lifetime of its touch.
     public var id: Int
+    /// Whether the pointer began, moved, ended or was cancelled.
     public var phase: PointerPhase
     /// Location in view points (origin top-left).
     public var location: Vec2
     /// Seconds (monotonic, e.g. UITouch.timestamp).
     public var timestamp: Double
+    /// Creates an event; `location` is in view points (top-left origin) and `timestamp` in monotonic seconds.
     public init(id: Int, phase: PointerPhase, location: Vec2, timestamp: Double) {
         self.id = id; self.phase = phase; self.location = location; self.timestamp = timestamp
     }
 }
 
+/// Tracks active pointers (up to `maxPointers`), their start locations and touch-down order; rejects non-finite and unknown events.
 public struct PointerTracker: Sendable {
     /// More simultaneous touches are ignored (edge case; FR-F512).
     public static let maxPointers = 10
@@ -32,8 +38,10 @@ public struct PointerTracker: Sendable {
     public private(set) var ignored = 0
     private var ignoredIDs: Set<Int> = []
 
+    /// Creates a tracker with no active pointers.
     public init() {}
 
+    /// Number of currently active pointers.
     public var count: Int { active.count }
 
     /// Applies an event; returns false when it was ignored (over the limit, unknown id, non-finite location).

@@ -10,18 +10,24 @@
 import Foundation
 import VisualCoreMath
 
+/// Lifecycle state of a gesture recognizer (continuous: possible → began → changed → ended/cancelled/failed; discrete: possible → recognized/failed/cancelled).
 public enum GestureState: String, Sendable, Equatable {
     case possible, began, changed, ended, cancelled, failed, recognized
+    /// True for ended, cancelled, failed and recognized; the recognizer ignores events until the next first finger lands.
     public var isTerminal: Bool { [.ended, .cancelled, .failed, .recognized].contains(self) }
+    /// True while a continuous gesture is in progress (began or changed).
     public var isActive: Bool { self == .began || self == .changed }
 }
 
+/// A deterministic, timer-free gesture state machine fed with pointer events and `tick(now:)`.
 public protocol GestureRecognizer: Sendable {
+    /// Current recognition state.
     var state: GestureState { get }
     /// `tracker` must already include `event`.
     mutating func handle(_ event: PointerEvent, tracker: PointerTracker)
     /// Advances time-based transitions without an event.
     mutating func tick(now: Double)
+    /// Returns to `possible` and clears all tracked touches and results.
     mutating func reset()
 }
 
@@ -34,24 +40,32 @@ extension GestureRecognizer {
 
 // MARK: Tap
 
+/// Recognizes a single-finger tap that lifts within `maxDistance` points and `maxDuration` seconds; a second finger fails it.
 public struct TapRecognizer: GestureRecognizer {
+    /// Maximum movement from the touch-down point, in points (default 10).
     public var maxDistance = 10.0
+    /// Maximum touch-down-to-lift time, in seconds (default 0.3).
     public var maxDuration = 0.3
+    /// `recognized` on a valid tap; `failed` on too much movement, too long a hold or a second finger.
     public private(set) var state: GestureState = .possible
+    /// Lift location of the recognized tap, in view points; nil until recognized.
     public private(set) var location: Vec2?
     private var start: (id: Int, at: Vec2, time: Double)?
     /// Time the recognized tap ended (used by DoubleTapRecognizer).
     public private(set) var endTime: Double?
 
+    /// Creates a tap recognizer with the given movement (points) and duration (seconds) limits.
     public init(maxDistance: Double = 10, maxDuration: Double = 0.3) {
         self.maxDistance = maxDistance; self.maxDuration = maxDuration
     }
 
+    /// Returns to `possible` and clears the pending touch, location and end time.
     public mutating func reset() { state = .possible; start = nil; location = nil; endTime = nil }
 
     /// A finger is down and the tap is still undecided.
     var isTracking: Bool { state == .possible && start != nil }
 
+    /// Tracks the first finger; recognizes on lift within the limits, otherwise fails (or cancels on a cancelled touch).
     public mutating func handle(_ e: PointerEvent, tracker: PointerTracker) {
         if state.isTerminal { guard startsOver(e, tracker) else { return }; reset() }
         switch e.phase {
@@ -71,6 +85,7 @@ public struct TapRecognizer: GestureRecognizer {
         }
     }
 
+    /// Fails a pending tap once more than `maxDuration` seconds have passed since touch-down.
     public mutating func tick(now: Double) {
         if state == .possible, let s = start, now - s.time > maxDuration { state = .failed }
     }
@@ -78,20 +93,28 @@ public struct TapRecognizer: GestureRecognizer {
 
 // MARK: Double tap
 
+/// Recognizes two taps whose second touch-down is within `maxInterval` seconds of the first tap's lift and within `maxSeparation` points of it.
 public struct DoubleTapRecognizer: GestureRecognizer {
+    /// Maximum time from the first tap's lift to the second touch-down, in seconds (default 0.3).
     public var maxInterval = 0.3
+    /// Maximum distance between the two tap locations, in points (default 30).
     public var maxSeparation = 30.0
+    /// `recognized` after a valid second tap; `failed` when either tap fails or the interval or separation is exceeded.
     public private(set) var state: GestureState = .possible
+    /// Location of the second tap, in view points; nil until recognized.
     public private(set) var location: Vec2?
     private var tap = TapRecognizer()
     private var first: (at: Vec2, time: Double)?
 
+    /// Creates a double-tap recognizer with the given interval (seconds) and separation (points) limits.
     public init(maxInterval: Double = 0.3, maxSeparation: Double = 30) {
         self.maxInterval = maxInterval; self.maxSeparation = maxSeparation
     }
 
+    /// Returns to `possible` and forgets the first tap.
     public mutating func reset() { state = .possible; tap.reset(); first = nil; location = nil }
 
+    /// Feeds the event to the inner tap recognizer and combines its result with the first tap's time and location.
     public mutating func handle(_ e: PointerEvent, tracker: PointerTracker) {
         if state.isTerminal { guard startsOver(e, tracker) else { return }; reset() }
         if e.phase == .began, let f = first, e.timestamp - f.time > maxInterval { state = .failed; return }
@@ -112,6 +135,7 @@ public struct DoubleTapRecognizer: GestureRecognizer {
         }
     }
 
+    /// Fails when the current tap times out or no second tap lands within `maxInterval` seconds of the first.
     public mutating func tick(now: Double) {
         guard state == .possible else { return }
         if tap.isTracking {
@@ -125,19 +149,27 @@ public struct DoubleTapRecognizer: GestureRecognizer {
 
 // MARK: Long press
 
+/// Recognizes a single finger held for at least `minDuration` seconds without moving more than `maxDistance` points.
 public struct LongPressRecognizer: GestureRecognizer {
+    /// Minimum hold time, in seconds (default 0.5).
     public var minDuration = 0.5
+    /// Maximum movement during the hold, in points (default 10).
     public var maxDistance = 10.0
+    /// `recognized` once the hold completes; `failed` on movement, an early lift or a second finger.
     public private(set) var state: GestureState = .possible
+    /// Touch-down location of the recognized press, in view points; nil until recognized.
     public private(set) var location: Vec2?
     private var start: (id: Int, at: Vec2, time: Double)?
 
+    /// Creates a long-press recognizer with the given hold time (seconds) and movement limit (points).
     public init(minDuration: Double = 0.5, maxDistance: Double = 10) {
         self.minDuration = minDuration; self.maxDistance = maxDistance
     }
 
+    /// Returns to `possible` and clears the pending touch and location.
     public mutating func reset() { state = .possible; start = nil; location = nil }
 
+    /// Tracks the first finger, first evaluating whether the hold already completed by the event's timestamp.
     public mutating func handle(_ e: PointerEvent, tracker: PointerTracker) {
         if state.isTerminal { guard startsOver(e, tracker) else { return }; reset() }
         if state == .possible { tick(now: e.timestamp) }   // the hold may have completed before this event
@@ -155,6 +187,7 @@ public struct LongPressRecognizer: GestureRecognizer {
         }
     }
 
+    /// Recognizes the press once `minDuration` seconds have elapsed since touch-down.
     public mutating func tick(now: Double) {
         if state == .possible, let s = start, now - s.time >= minDuration { state = .recognized; location = s.at }
     }
@@ -162,9 +195,13 @@ public struct LongPressRecognizer: GestureRecognizer {
 
 // MARK: Drag
 
+/// Continuous single-finger drag that begins after moving more than `minDistance` points; a second finger cancels it.
 public struct DragRecognizer: GestureRecognizer {
+    /// Movement from the touch-down point required to begin, in points (default 10).
     public var minDistance = 10.0
+    /// Continuous state: began after `minDistance`, changed on later moves, ended on lift; failed if lifted before beginning.
     public private(set) var state: GestureState = .possible
+    /// Current finger location, in view points; nil before touch-down.
     public private(set) var location: Vec2?
     /// Finger offset from where it landed.
     public private(set) var translation: Vec2 = .zero
@@ -173,12 +210,15 @@ public struct DragRecognizer: GestureRecognizer {
     private var start: (id: Int, at: Vec2)?
     private var last: (at: Vec2, time: Double)?
 
+    /// Creates a drag recognizer that begins after `minDistance` points of movement.
     public init(minDistance: Double = 10) { self.minDistance = minDistance }
 
+    /// Returns to `possible` and zeroes location, translation and velocity.
     public mutating func reset() {
         state = .possible; start = nil; last = nil; location = nil; translation = .zero; velocity = .zero
     }
 
+    /// Updates location, translation and velocity from the tracked finger and advances the drag state.
     public mutating func handle(_ e: PointerEvent, tracker: PointerTracker) {
         if state.isTerminal { guard startsOver(e, tracker) else { return }; reset() }
         switch e.phase {
@@ -205,6 +245,7 @@ public struct DragRecognizer: GestureRecognizer {
         }
     }
 
+    /// No-op: dragging has no time-based transitions.
     public mutating func tick(now: Double) {}
 }
 
@@ -230,19 +271,25 @@ struct TwoFinger: Sendable {
     }
 }
 
+/// Continuous two-finger pinch reporting `scale` relative to the initial finger distance.
 public struct PinchRecognizer: GestureRecognizer {
     /// Change in finger distance (points) before the pinch begins.
     public var minChange = 0.0
+    /// Continuous state: began once the distance changes by more than `minChange`; failed if only one finger came and went.
     public private(set) var state: GestureState = .possible
     /// Current distance / initial distance.
     public private(set) var scale = 1.0
+    /// Midpoint between the two tracked fingers, in view points; nil before the first move.
     public private(set) var center: Vec2?
     private var fingers = TwoFinger()
 
+    /// Creates a pinch recognizer that begins after the finger distance changes by `minChange` points.
     public init(minChange: Double = 0) { self.minChange = minChange }
 
+    /// Returns to `possible`, resets `scale` to 1 and forgets the tracked fingers.
     public mutating func reset() { state = .possible; scale = 1; center = nil; fingers = TwoFinger() }
 
+    /// Tracks the first two fingers and updates scale and center when either moves; lifting one ends the pinch.
     public mutating func handle(_ e: PointerEvent, tracker: PointerTracker) {
         if state.isTerminal { guard startsOver(e, tracker) else { return }; reset() }
         switch e.phase {
@@ -263,22 +310,29 @@ public struct PinchRecognizer: GestureRecognizer {
         }
     }
 
+    /// No-op: pinching has no time-based transitions.
     public mutating func tick(now: Double) {}
 }
 
+/// Continuous two-finger rotation reporting `angle` relative to the initial finger vector.
 public struct RotateRecognizer: GestureRecognizer {
     /// Rotation (radians) before the gesture begins.
     public var minAngle = 0.0
+    /// Continuous state: began once |angle| exceeds `minAngle`; failed if only one finger came and went.
     public private(set) var state: GestureState = .possible
     /// Counter-clockwise on screen, radians in (-π, π] relative to the start.
     public private(set) var angle = 0.0
+    /// Midpoint between the two tracked fingers, in view points; nil before the first move.
     public private(set) var center: Vec2?
     private var fingers = TwoFinger()
 
+    /// Creates a rotate recognizer that begins after `minAngle` radians of rotation.
     public init(minAngle: Double = 0) { self.minAngle = minAngle }
 
+    /// Returns to `possible`, resets `angle` to 0 and forgets the tracked fingers.
     public mutating func reset() { state = .possible; angle = 0; center = nil; fingers = TwoFinger() }
 
+    /// Tracks the first two fingers and updates angle and center when either moves; lifting one ends the rotation.
     public mutating func handle(_ e: PointerEvent, tracker: PointerTracker) {
         if state.isTerminal { guard startsOver(e, tracker) else { return }; reset() }
         switch e.phase {
@@ -300,5 +354,6 @@ public struct RotateRecognizer: GestureRecognizer {
         }
     }
 
+    /// No-op: rotation has no time-based transitions.
     public mutating func tick(now: Double) {}
 }

@@ -3,25 +3,36 @@
 // `ERROR: <string>:<line>: <message>` / `WARNING: ...`; anything else is kept as a raw message.
 import Foundation
 
+/// Pipeline step that produced an info log: vertex compile, fragment compile or program link.
 public enum ShaderStage: String, Sendable, Codable { case vertex, fragment, link }
 
+/// One compiler or linker message mapped back to its original source file and line.
 public struct ShaderDiagnostic: Sendable, Equatable, Codable, CustomStringConvertible {
+    /// Whether the message is an `ERROR:` or a `WARNING:`.
     public enum Severity: String, Sendable, Codable { case error, warning }
+    /// Original source name, `<generated>` for synthesized lines, or `unknown` when unmapped.
     public let file: String
     /// 1-based line in `file`; 0 when unknown.
     public let line: Int
+    /// Stage whose info log produced the message.
     public let stage: ShaderStage
+    /// Error or warning; unstructured log lines are reported as errors.
     public let severity: Severity
+    /// Message text without the severity and location prefix.
     public let message: String
 
+    /// Creates a diagnostic from its parts.
     public init(file: String, line: Int, stage: ShaderStage, severity: Severity, message: String) {
         self.file = file; self.line = line; self.stage = stage; self.severity = severity; self.message = message
     }
 
+    /// `file:line: severity [stage]: message`.
     public var description: String { "\(file):\(line): \(severity.rawValue) [\(stage.rawValue)]: \(message)" }
 }
 
+/// Parses GL/ANGLE compile and link info logs into `ShaderDiagnostic`s.
 public enum InfoLogParser {
+    /// Splits `log` into diagnostics, mapping `ERROR:`/`WARNING: <string>:<line>:` lines through `map` (file `unknown` and the expanded line when nil); skips translator summary lines and reports other lines as `unknown:0` errors.
     public static func parse(_ log: String, stage: ShaderStage, map: ExpandedShader?) -> [ShaderDiagnostic] {
         var out: [ShaderDiagnostic] = []
         for raw in log.components(separatedBy: .newlines) {

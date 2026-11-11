@@ -5,23 +5,30 @@ import CVisualCoreGL
 import VisualCoreEffectsGraph
 import VisualCoreRendering
 
+/// A RenderScene wrapper that renders `content` off-screen, runs an effect graph over it and copies the result to the host framebuffer (main thread only).
 @MainActor
 public final class EffectScene: RenderScene {
+    /// Pass id and output name of the appended Reduce-Flashing limiter pass.
     public static let flashLimitPassID = "__flashLimit"
 
+    /// The wrapped scene; its setup, resize, render and teardown are forwarded.
     public let content: RenderScene
+    /// The app's effect graph; assigning it rebuilds the renderer on the next frame.
     public var graph: EffectGraphDescription { didSet { rebuildPending = true } }
     /// Appends the Reduce-Flashing limiter (FR-F409) as the final pass.
     public var reduceFlashing = false { didSet { if reduceFlashing != oldValue { rebuildPending = true } } }
     /// Maximum change of displayed mean luminance per second; a change rebuilds the graph (FR-F409).
     public var flashLimitPerSecond = 0.3 { didSet { if flashLimitPerSecond != oldValue, reduceFlashing { rebuildPending = true } } }
+    /// The last graph-build, render or scene-target error; cleared when the renderer rebuilds successfully.
     public private(set) var lastError: Error?
+    /// The current effect renderer; nil before the first frame or when the effective graph failed to build.
     public private(set) var renderer: EffectRenderer?
 
     private var sceneTarget: RenderTarget?
     private var present: ShaderProgram?
     private var rebuildPending = true
 
+    /// Wraps `content` with `graph`; GPU work starts in `setup`.
     public init(content: RenderScene, graph: EffectGraphDescription) {
         self.content = content
         self.graph = graph
@@ -37,6 +44,7 @@ public final class EffectScene: RenderScene {
         return g
     }
 
+    /// Sets up the content, compiles the present program and creates the pixel-sized scene target.
     public func setup(_ context: RenderContext) throws {
         try content.setup(context)
         present = try context.resources.program(vertex: EffectShaders.vertex, fragment: EffectShaders.copy)
@@ -44,12 +52,14 @@ public final class EffectScene: RenderScene {
         if context.pixelWidth > 0, context.pixelHeight > 0 { try makeSceneTarget(context) }
     }
 
+    /// Recreates the scene target at the new pixel size, invalidates the renderer's GPU state and resizes the content; errors go to `lastError`.
     public func resize(_ context: RenderContext) {
         do { try makeSceneTarget(context) } catch { lastError = error }
         renderer?.invalidate()
         content.resize(context)
     }
 
+    /// Renders content into the scene target, runs the graph (rebuilding it when pending) and draws the output into `context.framebuffer`.
     public func render(_ context: RenderContext, frame: FrameInfo) throws {
         if sceneTarget == nil { try makeSceneTarget(context) }
         guard let sceneTarget, let present else { return }
@@ -83,6 +93,7 @@ public final class EffectScene: RenderScene {
         vcglDrawArrays(GLenum(GL_TRIANGLES), 0, 3)
     }
 
+    /// Releases the renderer, scene target and present program, then tears down the content.
     public func teardown(_ context: RenderContext) {
         renderer?.invalidate()
         renderer = nil

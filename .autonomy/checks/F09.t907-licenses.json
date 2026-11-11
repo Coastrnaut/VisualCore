@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_licenses.py"
+  ],
+  "command": "python3 scripts/check_licenses.py",
+  "elapsed_seconds": 4.418,
+  "exit_code": 0,
+  "finished": "2026-11-11T02:24:50+00:00",
+  "log": ".autonomy/logs/F09.t907-licenses.log",
+  "log_sha256": "d587d6651983902287b6cd944e877b3e5d968e2a3bfcd67fec4d889d41a6e235",
+  "name": "t907-licenses",
+  "stage": "F09",
+  "started": "2026-11-11T02:24:45+00:00",
+  "timed_out": false
+}

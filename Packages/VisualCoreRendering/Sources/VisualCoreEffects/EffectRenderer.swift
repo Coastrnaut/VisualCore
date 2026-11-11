@@ -4,15 +4,19 @@ import CVisualCoreGL
 import VisualCoreEffectsGraph
 import VisualCoreRendering
 
+/// Runs a validated effect graph over a scene target on the main thread, using pooled render targets from the registry; rebuilds its GPU state after a context generation change and passes a failed pass's first input through.
 @MainActor
 public final class EffectRenderer {
+    /// The graph description this renderer executes (validated structurally at init, per frame for the view size).
     public let graph: EffectGraphDescription
+    /// Render-target memory quota in bytes for one frame of the graph; exceeding it fails validation.
     public let quotaBytes: Int
     let registry: ResourceRegistry
     /// Passes that failed to build or run this generation; they pass their first input through.
     public private(set) var failedPasses: Set<String> = []
     /// Execution order of the last frame (tests, diagnostics).
     public private(set) var lastOrder: [String] = []
+    /// Non-fatal validator notes (ignored parameters or slots) from the last rendered frame.
     public private(set) var lastWarnings: [String] = []
     /// Test hook: passes forced to fail at build time (fault injection, T-F413).
     var injectedFailures: Set<String> = []

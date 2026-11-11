@@ -15,20 +15,30 @@ import QuartzCore
 import UIKit
 import VisualCoreDiagnostics
 
+/// App-neutral render host over ANGLE's Metal backend: owns the EGL context and surface, drives a RenderScene from CADisplayLink on the main thread, and tracks lifecycle states and context generations.
 @MainActor
 public final class RenderHost {
     // MARK: Public state
 
+    /// The view whose CAMetalLayer backs the window surface; add it to the hierarchy.
     public var view: UIView { renderView }
+    /// Current lifecycle state.
     public var state: RenderLifecycleState { lifecycle.state }
+    /// Current context generation; incremented on every context recreation.
     public var generation: Int { lifecycle.generation }
+    /// Lifecycle events in order, for diagnostics and tests.
     public var lifecycleHistory: [RenderLifecycleEvent] { lifecycle.history }
+    /// Count of invalid lifecycle transitions that were rejected.
     public var rejectedTransitions: Int { lifecycle.rejectedTransitions }
+    /// Capabilities reported by the current context.
     public private(set) var capabilities = RenderCapabilities()
+    /// The most recent host error (surface, context or scene), if any.
     public private(set) var lastError: RenderHostError?
     /// The window surface size in pixels ((0, 0) without a surface).
     public private(set) var pixelSize: (width: Int, height: Int) = (0, 0)
+    /// Frames presented with eglSwapBuffers since creation.
     public private(set) var presentedFrameCount = 0
+    /// The display-link pacing currently in effect.
     public var framePacing: FramePacing { scheduler.pacing }
     /// GPU objects of this host (feature 004): budgets, stale/leak accounting, program creation.
     public private(set) var resources: ResourceRegistry
@@ -252,6 +262,7 @@ public final class RenderHost {
         applySuspension()
     }
 
+    /// Clears the app-requested pause; rendering resumes unless the app is in the background or there is no surface.
     public func resume() {
         appPaused = false
         applySuspension()

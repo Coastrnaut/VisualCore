@@ -6,11 +6,13 @@ import VisualCoreMath
 import VisualCoreScenes
 import VisualCoreSimulation
 
+/// Draws particles as instanced soft-edged quads on the main thread; GPU objects are rebuilt after a context recreation.
 @MainActor
 public final class ParticleRenderer {
     let registry: ResourceRegistry
     private var program: ShaderProgram?
     private let instances: DynamicVertexBuffer
+    /// Instances drawn by the last call (0 when nothing was drawn).
     public private(set) var lastInstanceCount = 0
 
     static let vertexSource = """
@@ -35,6 +37,7 @@ public final class ParticleRenderer {
     void main() { color = v_color * (1.0 - smoothstep(0.8, 1.0, length(v_local))); }
     """
 
+    /// Creates the instance buffer and compiles the particle program; throws on shader errors.
     public init(registry: ResourceRegistry) throws {
         self.registry = registry
         instances = DynamicVertexBuffer(registry: registry, label: "particle instances")
@@ -71,6 +74,7 @@ public final class ParticleRenderer {
         lastInstanceCount = count
     }
 
+    /// Releases the instance buffer and program back to the registry.
     public func release() {
         instances.release()
         if let program { registry.release(program) }

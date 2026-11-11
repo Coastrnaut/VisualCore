@@ -3,18 +3,24 @@
 // `reduceMotion` (clarification 2026-11-10) makes tweens jump to their end values and disables repeats.
 import VisualCoreMath
 
+/// Eases a scalar from `from` to `to`; its value is a pure function of time.
 public struct Tween: Sendable, Equatable {
+    /// Start value.
     public var from: Double
+    /// End value.
     public var to: Double
     /// Seconds per pass (≥ 0; zero jumps straight to the end value).
     public var duration: Double
+    /// Easing curve (default linear).
     public var curve: EasingCurve
+    /// Which ends of the curve are eased (default in-out).
     public var mode: EasingMode
     /// Number of passes (≥ 1); nil repeats forever.
     public var repeatCount: Int?
     /// Every second pass runs backwards (ping-pong).
     public var autoreverses: Bool
 
+    /// Non-finite or negative durations become 0; `repeatCount` is clamped to ≥ 1 (default one pass, no autoreverse).
     public init(from: Double, to: Double, duration: Double, curve: EasingCurve = .linear, mode: EasingMode = .inOut,
                 repeatCount: Int? = 1, autoreverses: Bool = false) {
         self.from = from; self.to = to
@@ -33,6 +39,7 @@ public struct Tween: Sendable, Equatable {
         return autoreverses && n % 2 == 0 ? from : to
     }
 
+    /// Value `t` seconds after the tween starts (negative or non-finite `t` counts as 0; past the end gives `finalValue`).
     public func value(at t: Double) -> Double {
         guard duration > 0 else { return finalValue }
         let t = t.isFinite ? max(0, t) : 0
@@ -47,6 +54,7 @@ public struct Tween: Sendable, Equatable {
     var single: Tween { var t = self; t.repeatCount = 1; t.autoreverses = false; return t }
 }
 
+/// Boundaries crossed by `Timeline.advance(by:)`.
 public enum TimelineEvent: Sendable, Equatable {
     /// A tween reached its end while playing forwards.
     case completed(String)
@@ -56,22 +64,30 @@ public enum TimelineEvent: Sendable, Equatable {
     case finished
 }
 
+/// Named tweens placed at offsets on one playhead, with pause, seek, reverse rate and Reduce Motion.
 public struct Timeline: Sendable {
+    /// A tween placed on the timeline.
     public struct Entry: Sendable, Equatable {
+        /// Lookup key for `value(of:)` and event payloads.
         public var name: String
+        /// The tween being played.
         public var tween: Tween
+        /// Start time in seconds from the timeline origin (≥ 0).
         public var offset: Double
     }
 
+    /// Tweens in insertion order.
     public private(set) var entries: [Entry] = []
     /// Playback position in seconds, within [0, duration].
     public private(set) var time = 0.0
     /// Playback speed; negative plays in reverse.
     public var rate = 1.0
+    /// While true, `advance(by:)` does nothing and returns no events (default false).
     public var isPaused = false
     /// Jump tweens to their end values and ignore repeats.
     public var reduceMotion = false
 
+    /// Creates an empty timeline at time 0, rate 1, not paused.
     public init() {}
 
     /// Adds a tween starting `offset` seconds into the timeline (names should be unique).
@@ -84,8 +100,10 @@ public struct Timeline: Sendable {
 
     /// Length of the timeline; infinite when a tween repeats forever.
     public var duration: Double { entries.map(end).max() ?? 0 }
+    /// True at the end when playing forwards (rate ≥ 0), or at time 0 when playing backwards.
     public var isFinished: Bool { rate >= 0 ? time >= duration : time <= 0 }
 
+    /// Current value of the first entry named `name`, or nil when there is none (its final value under Reduce Motion).
     public func value(of name: String) -> Double? {
         guard let e = entries.first(where: { $0.name == name }) else { return nil }
         if reduceMotion { return effective(e).finalValue }
