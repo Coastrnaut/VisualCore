@@ -1,0 +1,24 @@
+{
+  "argv": [
+    "python3",
+    "scripts/release_check.py",
+    "--only",
+    "reference-engine-xcframework",
+    "reference-build-projectm-ios-sim",
+    "reference-clean",
+    "--log-dir",
+    ".autonomy/logs/t502-reference-a",
+    "--json",
+    ".autonomy/logs/t502-reference-a.json"
+  ],
+  "command": "python3 scripts/release_check.py --only reference-engine-xcframework reference-build-projectm-ios-sim reference-clean --log-dir .autonomy/logs/t502-reference-a --json .autonomy/logs/t502-reference-a.json",
+  "elapsed_seconds": 25.317,
+  "exit_code": 0,
+  "finished": "2026-11-11T10:10:32+00:00",
+  "log": ".autonomy/logs/A02-P05.t502-reference-a.log",
+  "log_sha256": "4b0b72685fa1479a894d1a2326f820a8bfd6bf952fdc5148cf67764397d6c5d3",
+  "name": "t502-reference-a",
+  "stage": "A02-P05",
+  "started": "2026-11-11T10:10:07+00:00",
+  "timed_out": false
+}

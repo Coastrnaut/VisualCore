@@ -84,4 +84,49 @@ final class AutomationRunnerTests: XCTestCase {
         let s = FrameTimeStats(samples: Array(1...20).map(Double.init))!
         XCTAssertEqual(s.min, 1); XCTAssertEqual(s.max, 20); XCTAssertEqual(s.median, 10.5); XCTAssertEqual(s.p95, 19)
     }
+
+    // MARK: feature 023 T-A02-502 (FR-A02-508)
+
+    func testSeedParsing() {
+        XCTAssertEqual(AutomationRunner.requestedSeed(environment: [:]), 1)
+        XCTAssertEqual(AutomationRunner.requestedSeed(environment: ["VISUALCORE_AUTORUN_SEED": "0"]), 1)
+        XCTAssertEqual(AutomationRunner.requestedSeed(environment: ["VISUALCORE_AUTORUN_SEED": "abc"]), 1)
+        XCTAssertEqual(AutomationRunner.requestedSeed(environment: ["VISUALCORE_AUTORUN_SEED": "-4"]), 1)
+        XCTAssertEqual(AutomationRunner.requestedSeed(environment: ["VISUALCORE_AUTORUN_SEED": "7"]), 7)
+        XCTAssertEqual(AutomationRunner.requestedSeed(environment: ["VISUALCORE_AUTORUN_SEED": "18446744073709551615"]), .max)
+    }
+
+    func testPassingCheckKeepsPassAndAddsTheNote() throws {
+        let r = runner()
+        var calls = 0
+        r.postRunCheck = { calls += 1; return nil }
+        r.checkNote = { "digest=abc" }
+        let report = r.run(mode: "smoke", frames: 5)
+        XCTAssertEqual(calls, 1)
+        XCTAssertEqual(report.result, "pass")
+        XCTAssertEqual(report.message, "digest=abc")
+        XCTAssertEqual(codes, [0])
+        XCTAssertEqual(try decode(r), report)
+    }
+
+    func testFailingCheckFailsTheRun() throws {
+        let r = runner()
+        r.postRunCheck = { "dye not finite at (3, 4)" }
+        r.checkNote = { "unused" }
+        let report = r.run(mode: "lifecycle", frames: 50)
+        XCTAssertEqual(report.result, "fail")
+        XCTAssertEqual(report.message, "dye not finite at (3, 4)")
+        XCTAssertEqual(report.leaked, 0, "frame data is kept")
+        XCTAssertEqual(codes, [1])
+    }
+
+    func testCheckNotCalledForUnknownMode() {
+        let r = runner()
+        var calls = 0
+        r.postRunCheck = { calls += 1; return "x" }
+        let report = r.run(mode: "bogus")
+        XCTAssertEqual(calls, 0)
+        XCTAssertEqual(report.result, "error")
+        XCTAssertEqual(codes, [2])
+    }
 }

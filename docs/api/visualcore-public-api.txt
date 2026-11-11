@@ -12,12 +12,14 @@ VisualCoreAutomation | func | public func run(mode: String, frames: Int = 120) -
 VisualCoreAutomation | func | public func updateUIView(_ uiView: UIView, context: Context)
 VisualCoreAutomation | func | public nonisolated static func requestedFrames(environment: [String: String] = ProcessInfo.processInfo.environment) -> Int
 VisualCoreAutomation | func | public nonisolated static func requestedMode(environment: [String: String] = ProcessInfo.processInfo.environment) -> String?
+VisualCoreAutomation | func | public nonisolated static func requestedSeed(environment: [String: String] = ProcessInfo.processInfo.environment) -> UInt64
 VisualCoreAutomation | init | public init(host: RenderHost, bundleID: String, outputDirectory: URL? = nil, terminate: @escaping (Int32) -> Void =
 VisualCoreAutomation | init | public init(mode: String, bundleID: String, makeScene: @escaping @MainActor () -> RenderScene,
 VisualCoreAutomation | init | public init?(samples: [Double])
 VisualCoreAutomation | let | public nonisolated static let environmentKey
 VisualCoreAutomation | let | public nonisolated static let framesKey
 VisualCoreAutomation | let | public nonisolated static let knownModes
+VisualCoreAutomation | let | public nonisolated static let seedKey
 VisualCoreAutomation | let | public static let version
 VisualCoreAutomation | struct | public struct AutomationReport: Codable, Equatable, Sendable
 VisualCoreAutomation | struct | public struct AutomationView: UIViewRepresentable
@@ -26,6 +28,7 @@ VisualCoreAutomation | var | public private(set) var lastReportURL: URL?
 VisualCoreAutomation | var | public var appBuild: String?
 VisualCoreAutomation | var | public var appVersion: String?
 VisualCoreAutomation | var | public var bundleID: String
+VisualCoreAutomation | var | public var checkNote: (@MainActor () -> String?)?
 VisualCoreAutomation | var | public var cycles: Int?
 VisualCoreAutomation | var | public var deviceModel: String
 VisualCoreAutomation | var | public var frameTimeMs: FrameTimeStats?
@@ -38,6 +41,7 @@ VisualCoreAutomation | var | public var min: Double
 VisualCoreAutomation | var | public var mode: String
 VisualCoreAutomation | var | public var osVersion: String
 VisualCoreAutomation | var | public var p95: Double
+VisualCoreAutomation | var | public var postRunCheck: (@MainActor () -> String?)?
 VisualCoreAutomation | var | public var result: String
 VisualCoreAutomation | var | public var schema
 VisualCoreAutomation | var | public var startedAt: String

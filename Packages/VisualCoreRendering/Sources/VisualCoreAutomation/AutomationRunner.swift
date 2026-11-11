@@ -14,6 +14,8 @@ public final class AutomationRunner {
     public nonisolated static let environmentKey = "VISUALCORE_AUTORUN"
     /// Environment variable with the frame count (default 120, clamped 1…10,000).
     public nonisolated static let framesKey = "VISUALCORE_AUTORUN_FRAMES"
+    /// Environment variable with the deterministic test-mode seed (feature 023 T-A02-502; default 1).
+    public nonisolated static let seedKey = "VISUALCORE_AUTORUN_SEED"
     /// Supported modes.
     public nonisolated static let knownModes = ["smoke", "launch", "lifecycle"]
 
@@ -22,6 +24,12 @@ public final class AutomationRunner {
     private let outputDirectory: URL
     private let terminate: (Int32) -> Void
     private let created = CACurrentMediaTime()
+    /// An app-supplied domain check run after a mode's frames, before the report is written (feature 023
+    /// T-A02-502; FR-A02-508). It returns nil for a pass, or a message, which sets the result to "fail". It is not
+    /// called for unknown modes. On a pass the runner keeps any message the check left in `checkNote`.
+    public var postRunCheck: (@MainActor () -> String?)?
+    /// Optional detail the app adds to a passing report (for example a picture digest), read after `postRunCheck`.
+    public var checkNote: (@MainActor () -> String?)?
     /// File written by the last run.
     public private(set) var lastReportURL: URL?
 
@@ -38,6 +46,12 @@ public final class AutomationRunner {
     /// The mode requested by the launch environment, if any.
     public nonisolated static func requestedMode(environment: [String: String] = ProcessInfo.processInfo.environment) -> String? {
         environment[environmentKey].flatMap { $0.isEmpty ? nil : $0 }
+    }
+
+    /// The seed requested by the launch environment: an unsigned 64-bit integer; missing, 0 or invalid gives 1.
+    public nonisolated static func requestedSeed(environment: [String: String] = ProcessInfo.processInfo.environment) -> UInt64 {
+        guard let text = environment[seedKey], let value = UInt64(text.trimmingCharacters(in: .whitespaces)), value != 0 else { return 1 }
+        return value
     }
 
     /// The frame count requested by the launch environment (default 120, clamped 1…10,000).
@@ -59,6 +73,14 @@ public final class AutomationRunner {
         default:
             report.result = "error"
             report.message = "unknown mode '\(mode)'; known: \(Self.knownModes.joined(separator: ", "))"
+        }
+        if Self.knownModes.contains(mode), report.result == "pass" || report.result == "fail" {
+            if let failure = postRunCheck?() {
+                report.result = "fail"
+                report.message = [report.message, failure].compactMap { $0 }.joined(separator: "; ")
+            } else if report.result == "pass", let note = checkNote?() {
+                report.message = note
+            }
         }
         write(report)
         terminate(report.result == "pass" ? 0 : (report.result == "fail" ? 1 : 2))

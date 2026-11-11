@@ -1,0 +1,25 @@
+{
+  "argv": [
+    "xcodebuild",
+    "build",
+    "-project",
+    "VisualCore.xcodeproj",
+    "-scheme",
+    "Showcase",
+    "-destination",
+    "platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D",
+    "-derivedDataPath",
+    "Build/DerivedData/Showcase-t502",
+    "CODE_SIGNING_ALLOWED=NO"
+  ],
+  "command": "xcodebuild build -project VisualCore.xcodeproj -scheme Showcase -destination 'platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D' -derivedDataPath Build/DerivedData/Showcase-t502 CODE_SIGNING_ALLOWED=NO",
+  "elapsed_seconds": 8.203,
+  "exit_code": 0,
+  "finished": "2026-11-11T10:11:33+00:00",
+  "log": ".autonomy/logs/A02-P05.t502-showcase-build.log",
+  "log_sha256": "610d0613bbb2d0bfd8c6ce143f8a01d17215a99daad162b3aa5257abc210e63f",
+  "name": "t502-showcase-build",
+  "stage": "A02-P05",
+  "started": "2026-11-11T10:11:24+00:00",
+  "timed_out": false
+}

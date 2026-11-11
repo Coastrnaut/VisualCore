@@ -34,7 +34,7 @@ research R1–R7, data model, contract, quickstart).
   - **Docs**: /// docs, the README module note and the public-API baseline (`check_public_api.py --update`).
   - **Tests** (≥ 9, the contract list): run `swift test --package-path Packages/VisualCore`, then
     `check_dependencies.py` (FR-A02-505, SC-A02-503).
-- [ ] T-A02-502 Add to VisualCoreAutomation:
+- [X] T-A02-502 Add to VisualCoreAutomation: — Verified 2026-11-11: — Verified 2026-11-11: AutomationRunner.seedKey/requestedSeed (missing/0/invalid -> 1), postRunCheck + checkNote (after smoke/launch/lifecycle, fail sets result and message, not called for unknown modes), AutomationView postRunCheck/checkNote parameters with defaults; AutomationRunnerTests +4; run-check A02-P05/t502-rendering-27 and -26 TEST SUCCEEDED, enumeration 138/138 each; baseline updated, t502-checks 4/4; ProjectM regression t502-reference-a 3/3 + t502-reference-b 4/4; A01 build-for-testing (t502-a01-build) and Showcase build (t502-showcase-build) succeed
   - `AutomationRunner.seedKey` ("VISUALCORE_AUTORUN_SEED") and `requestedSeed(environment:)` (missing, 0 or invalid
     give 1);
   - `public var postRunCheck: (@MainActor () -> String?)?`, called after smoke, launch and lifecycle and before the
