@@ -25,7 +25,8 @@ regression; after each phase, `validate_docs.py`.
     - `load(id:)`, `delete(id:)`, `exists(id:)`.
 
   Add a `VisualCorePersistenceTests` target with tests for: round trip; update in place; an interrupted write keeps
-  the old file; bad files are reported and left byte-identical; migration from a v0 fixture; newer version rejected;
+  the old file; bad files are reported and left byte-identical; migration from a v0 fixture (the file stays byte-identical on load; rewritten only by a
+  later save; analyze C3); newer version rejected;
   invalid ids; missing directory created.
 - [ ] T-A01-302 [US5] Update the API baseline, the VisualCore README section "Persistence", `docs/release/{support-matrix,known-limitations}.md` and the package-map row (Persistence built). Run the host tests and the reference regression (7 steps) (FR-A01-309).
 
@@ -42,7 +43,8 @@ regression; after each phase, `validate_docs.py`.
   Add the VisualCorePersistence dependency to the Core package and the app (`project.yml`). Add tests in
   `CompositionLibraryTests.swift`: ≥ 30 generated round trips including seed 2^64−1 and all families
   (SC-A01-301); ordering; duplicate independence; rename rules; delete; update in place keeps the identity and
-  advances `modifiedAt`; bad files reported (SC-A01-304).
+  advances `modifiedAt`; saving with the id of a deleted entry recreates it (the open composition survives deletion;
+  analyze C1); bad files reported (SC-A01-304).
 - [ ] T-A01-304 [US1] Add `Apps/GenerativeArtStudio/App/LibraryView.swift` and `LibraryModel`:
   - list `gas.library`, rows `gas.library.row.<uuid>` with name, family symbol, palette swatch, modified time and a
     favorite star;
@@ -51,7 +53,8 @@ regression; after each phase, `validate_docs.py`.
   - a problems banner `gas.library.problems` and an empty state `gas.library.empty`.
 
   Add the gallery toolbar button `gas.library.open`. Save from the scene: toolbar `gas.save`, a name alert
-  (`gas.save.name`, `gas.save.confirm`) on first save, and update in place afterwards. Opening an entry shows its
+  (`gas.save.name`, `gas.save.confirm`) on first save, and update in place afterwards. A failed save shows an alert `gas.save.error`, and the previous version
+  stays (analyze C2). Deleting the open composition leaves the scene open as unsaved (analyze C1). Opening an entry shows its
   scene bound to the entry id. The store lives in `Application Support/Compositions`; UI tests use an isolated
   directory from the launch argument `-gasLibraryDir` (DEBUG only).
 - [ ] T-A01-305 [US1] Add `Apps/GenerativeArtStudio/Tests/Unit/LibraryRenderTests.swift` (save → new store instance → reload → render at a fixed time matches the pre-save image, ≥ 99% within 2/255, for 4 families) (SC-A01-302). Add `Apps/GenerativeArtStudio/Tests/UI/LibraryUITests.swift` covering: save with a name, the library lists it, relaunch, it is still there; favorite moves it first; duplicate adds "<name> copy"; rename; delete with confirmation, where cancel keeps it (SC-A01-303). Run on iOS 27.2 and 26.5.
