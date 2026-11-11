@@ -38,3 +38,14 @@ Release symbol check). IDs `T-F9##`. One commit + push per task.
 ## Dependencies
 
 T-F901 → T-F902; T-F903 → T-F904; T-F905/T-F906/T-F907 → T-F908; T-F909 needs T-F904; T-F910–T-F913 after; T-F914 last.
+
+## Phase 5: Convergence
+
+- [ ] T-F916 Mark placeholder modules (VisualCoreAudioDSP, VisualCorePersistence, VisualCoreTestSupport) as placeholders in `Packages/VisualCore/README.md`, linking ADR-0006, per SC-F906 / Constitution V (contradicts)
+- [ ] T-F917 Add an "Unsupported capabilities" section (system/app audio capture, home-screen live wallpaper, direct Metal rendering) with reasons to `docs/release/known-limitations.md` per US2/AC2, FR-F903 (partial)
+- [ ] T-F918 Add a CI job building `Packages/VisualCore` for generic iOS Simulator in `.github/workflows/ci.yml` and verify the run per US5/AC1, FR-F912 (partial)
+- [ ] T-F919 Add `Packages/VisualCoreRendering/Tests/VisualCoreRenderingTests/CleanupSweepTests.swift` (GradientQuadScene, ClearColorScene, EffectScene over ClearColorScene: setup → frames → context loss → frames → destroy, 0 leaked) on both runtimes per FR-F908, plan touch-point (partial)
+- [ ] T-F920 Add a relative-link check over `docs/`, package READMEs and sample READMEs to `scripts/validate_docs.py` (+ test with a broken-link fixture) per FR-F910 (partial)
+- [ ] T-F921 Add an explicit `projectm-independence` step (audit_showcase_dependencies.py on the Showcase Release app) to `scripts/release_check.py` (+ test) per FR-F904 (partial)
+- [ ] T-F922 Add a Status column (`verified (simulator)` / `pending campaign II` / `unsupported`) to every row of `docs/release/support-matrix.md` per data-model support matrix row (partial)
+- [ ] T-F923 Sync `contracts/release-contract.md` and `quickstart.md` with the shipped CLIs (`release_check --only/--skip/--json/--log-dir`, `run_automation_sim --app --runtime --mode --out`, `simulator_baselines.py`, `check_release_symbols.py`) and `AutomationRunner.init(host:bundleID:outputDirectory:terminate:)` with nonisolated statics per plan: contracts (partial)
