@@ -45,3 +45,7 @@ T-F701 → T-F702 → T-F703 → T-F704 → T-F705 → T-F706 → T-F707 (batch 
 ## Implementation Strategy
 
 MVP = engine on the VisualCore host (T-F705). Each batch closes with its own evidence before the next starts.
+
+## Phase 6: Convergence
+
+- [ ] T-F715 Sync `contracts/projectm-adapter.md`, `data-model.md` and the plan's source listing with the code (EngineFramebufferPath as a RenderScene with captureNextFrame/captured; ImageDiff.Result with passes(noiseFloorWithin8:); ProjectMScene requestPreset/viewports/loader, no useStateReset; RenderContext.redirected; EngineNoiseFloorTests), verified by a symbol check per plan: contracts (partial)
