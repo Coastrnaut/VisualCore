@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/VisualCore"
+  ],
+  "command": "swift test --package-path Packages/VisualCore",
+  "elapsed_seconds": 2.861,
+  "exit_code": 0,
+  "finished": "2026-11-11T00:28:42+00:00",
+  "log": ".autonomy/logs/F04.t423-unknown-slots.log",
+  "log_sha256": "4b155f3632ea8527644eee8abc8de99bce9fb129f649ea550dfd78b94d409c25",
+  "name": "t423-unknown-slots",
+  "stage": "F04",
+  "started": "2026-11-11T00:28:39+00:00",
+  "timed_out": false
+}

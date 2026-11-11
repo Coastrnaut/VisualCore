@@ -107,3 +107,14 @@ private func validate(_ g: EffectGraphDescription, quota: Int = 256 << 20) throw
     ], output: "e")
     #expect(throws: EffectGraphError.cycle(["B", "C"])) { try validate(g) }
 }
+
+// T-F423 (FR-F406): undeclared input slots are warned about and do not add ordering edges.
+@Test func undeclaredInputSlotsAreWarnedAndIgnored() throws {
+    let g = EffectGraphDescription(passes: [
+        EffectPassDescription(id: "A", type: "copy", inputs: ["input": "scene", "extra": "b"], output: "a"),
+        EffectPassDescription(id: "B", type: "copy", inputs: ["input": "a"], output: "b"),
+    ], output: "b")
+    let v = try validate(g)
+    #expect(v.order == ["A", "B"])
+    #expect(v.warnings == ["A: unknown input slot 'extra' ignored"])
+}

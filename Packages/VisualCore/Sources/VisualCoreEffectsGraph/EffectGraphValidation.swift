@@ -57,6 +57,9 @@ public enum EffectGraphValidator {
             for key in p.params.keys.sorted() where schema.parameters[key] == nil {
                 warnings.append("\(p.id): unknown parameter '\(key)' ignored")
             }
+            for slot in p.inputs.keys.sorted() where !schema.inputs.contains(slot) {
+                warnings.append("\(p.id): unknown input slot '\(slot)' ignored")
+            }
             parameters[p.id] = resolved
         }
         guard outputs[graph.output] != nil else { throw .missingOutput(graph.output) }
@@ -77,7 +80,7 @@ public enum EffectGraphValidator {
         var indegree: [String: Int] = [:]
         var dependents: [String: [String]] = [:]
         for p in passes {
-            let producers = Set(p.inputs.values.compactMap { outputs[$0] })
+            let producers = declaredProducers(p, outputs: outputs)
             indegree[p.id] = producers.count
             for producer in producers { dependents[producer, default: []].append(p.id) }
         }
@@ -99,7 +102,7 @@ public enum EffectGraphValidator {
             let ordered = Set(order)
             var producersOf: [String: [String]] = [:]
             for p in passes where !ordered.contains(p.id) {
-                producersOf[p.id] = Set(p.inputs.values.compactMap { outputs[$0] }).filter { !ordered.contains($0) }.sorted()
+                producersOf[p.id] = declaredProducers(p, outputs: outputs).filter { !ordered.contains($0) }.sorted()
             }
             func reachesItself(_ start: String) -> Bool {
                 var stack = producersOf[start] ?? [], seen = Set<String>()
@@ -112,5 +115,11 @@ public enum EffectGraphValidator {
             throw .cycle(passes.map(\.id).filter { !ordered.contains($0) && reachesItself($0) })
         }
         return order
+    }
+
+    /// Producers of a pass's schema-declared input slots; undeclared slots are ignored (FR-F406).
+    private static func declaredProducers(_ p: EffectPassDescription, outputs: [String: String]) -> Set<String> {
+        let slots = PassSchemas.schema(for: p.type)?.inputs ?? []
+        return Set(slots.compactMap { p.inputs[$0] }.compactMap { outputs[$0] })
     }
 }
