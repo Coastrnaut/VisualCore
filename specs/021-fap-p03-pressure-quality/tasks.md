@@ -104,7 +104,7 @@ IDs are `T-A02-3##`, with one commit and push per task (`scripts/tick_task.py`).
   - M04 available or with updated evidence.
 
   Run `check_app_contract --render` (FR-A02-309).
-- [ ] T-A02-310 Run the release fast steps, plus host, documented-API and isolation checks; rerun the ProjectM
+- [X] T-A02-310 Run the release fast steps, plus host, documented-API and isolation checks; rerun the ProjectM — Verified 2026-11-11: run-check A02-P03/t310-release-fast 14/14 (docs, app-contracts, compliance, dependencies, public-api, licenses, script-tests, host-visualcore, documented-api/isolation/host-core for both apps); VisualCore unchanged since the t302 regression (git diff 5e07f99..HEAD -- Packages empty), so no rerun was needed; A01 GenerativeArtStudio build-for-testing succeeds (t310-gas-build); lessons added to docs/testing/simulator-test-lessons.md (SC-A02-306)
   regression if VisualCore changed after T-A02-302; build A01; add lessons (SC-A02-306).
 
 ## Analyze remediation (2026-11-11)

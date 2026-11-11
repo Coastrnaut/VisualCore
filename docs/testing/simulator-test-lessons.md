@@ -61,3 +61,21 @@ speaks and what the screen shows, not exact values. Sheets at a medium detent wi
   concurrency in a UI test class. Poll the element's label with a short run loop instead.
 - **Other apps' DerivedData goes stale after VisualCore API changes.** Clear `Build/DerivedData/<App>` before
   rebuilding each consumer.
+
+## Feature 021 (A02-P03)
+
+- **Sheets on iOS 26 stay translucent.** `presentationBackground` alone was not enough. The form paints its own
+  opaque background (`scrollContentBackground(.hidden)` plus a grouped background color), or the canvas shows
+  through and fails contrast.
+- **Glass bar buttons cast shadows the audit samples.** On iOS 26.5 the shadow of the Done button overlapped the
+  first section header's frame and was flagged as low contrast. A top content margin fixed the layout; no exclusion
+  was added.
+- **Secondary system styles.** Section footers are forced to secondary text, and destructive buttons are system red;
+  both nearly fail contrast on grouped backgrounds. Use prominent headers, regular rows for explanations and the
+  accessible accent for non-destructive actions.
+- **Sliders in UI tests.** On iOS 26, `adjust(toNormalizedSliderPosition: 0)` does not move a slider whose thumb is
+  away from the start. Move to a position just inside the range and assert the direction of the change.
+- **Inactive uniforms.** `FieldPass` rejects uniforms the compiler removed. Shared uniform sets are filtered per pass
+  with `pass.program.uniforms`.
+- **Measure before setting thresholds.** A 50% divergence-reduction target written before measuring was not reachable
+  with the standard scheme. Set criteria from measured fixture data and record the numbers.
