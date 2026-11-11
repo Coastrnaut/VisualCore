@@ -12,7 +12,7 @@ commit and push per task (`scripts/tick_task.py`). Review checkpoint: after each
 
 ## Phase 1: Setup
 
-- [ ] T-A02-001 Create `docs/apps/fluid-art-playground/regression-baseline.md` with the phase-start commit
+- [X] T-A02-001 Create `docs/apps/fluid-art-playground/regression-baseline.md` with the phase-start commit — Verified 2026-11-11: docs/apps/fluid-art-playground/regression-baseline.md created with phase-start commit  (verified with git cat-file) and the reference pin d93edd1 (git -C External/projectm-ios rev-parse); validate_docs PASS
   `06091bb` and the reference pin `d93edd1`, so the no-change diff for `Packages/` and `External/` (FR-A02-007) has
   a base.
 
