@@ -59,6 +59,7 @@ final class AccessibilityAuditUITests: XCTestCase {
 
     private func run(textSize: String?) throws {
         let app = XCUIApplication()
+        app.launchArguments += ["-uitestTemporaryBookmarks"]
         if let textSize { app.launchArguments += ["-UIPreferredContentSizeCategoryName", textSize] }
         app.launch()
         let label = textSize ?? "default"
@@ -73,6 +74,22 @@ final class AccessibilityAuditUITests: XCTestCase {
         app.segmentedControls["fe.mode"].buttons["Julia"].tap()
         XCTAssertTrue(app.staticTexts["fe.seed"].waitForExistence(timeout: 10))
         try audit(app, "explorer julia [\(label)]", types: types)
+        // Feature 028 T-A03-310: the Go to sheet and the bookmark sheet (empty, then with one bookmark).
+        app.buttons["fe.goto"].tap()
+        XCTAssertTrue(app.textFields["fe.goto.real"].waitForExistence(timeout: 5))
+        try audit(app, "go to sheet [\(label)]", types: types)
+        app.buttons["fe.goto.cancel"].tap()
+        app.buttons["fe.bookmarks"].tap()
+        XCTAssertTrue(app.staticTexts["fe.bookmarks.empty"].waitForExistence(timeout: 5))
+        try audit(app, "bookmarks empty [\(label)]", types: types)
+        app.buttons["fe.bookmark.save"].tap()
+        XCTAssertTrue(app.alerts.textFields.firstMatch.waitForExistence(timeout: 5))
+        app.alerts.textFields.firstMatch.typeText("Audit")
+        app.alerts.buttons["Save"].firstMatch.tap()
+        XCTAssertTrue(app.descendants(matching: .any)["fe.bookmark.row.0"].waitForExistence(timeout: 5))
+        try audit(app, "bookmarks list [\(label)]", types: types)
+        app.buttons["fe.bookmarks.done"].tap()
+        XCTAssertTrue(app.segmentedControls["fe.mode"].waitForExistence(timeout: 5))
         // Feature 027 T-A03-208: the explorer with the precision banner, reached through the zoom controls.
         // Julia is centered at 0, where float spacing never limits the zoom, so go back to Mandelbrot (center −0.5).
         app.segmentedControls["fe.mode"].buttons["Mandelbrot"].tap()

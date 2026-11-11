@@ -40,3 +40,9 @@ Fractal Explorer (gaps G-VIEWPORT, G-PRECISION, G-COST, G-TOUR) reruns these ste
 (`t202-build-GenerativeArtStudio`) and A02 (`t202-build-FluidArtPlayground`) build against the changed packages. The
 VisualCoreRendering package tests pass on both runtimes (`t202-rendering-27`, `t202-rendering-26`, enumeration
 141/141). The simulator reports highp with 23 mantissa bits; that is context, not device evidence.
+
+## A03-P03 rerun after `PlaneFraming` and `NamedLibrary` (2026-11-11)
+
+`A03-P03/t303-reference-a` 3/3 (pin `d93edd1` unchanged) and `t303-reference-b` 4/4: **7/7 pass**, unchanged. A01
+(`t303-build-GenerativeArtStudio`) and A02 (`t303-build-FluidArtPlayground`) build from clean derived data against the
+changed packages. A01's own `CompositionLibrary` is unchanged; adopting `NamedLibrary` there is a follow-up.

@@ -88,6 +88,7 @@ struct BookmarksView: View {
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
+            .contentShape(Rectangle())   // the whole row opens the bookmark, not only its text
         }
         .buttonStyle(.plain)
         .accessibilityElement(children: .ignore)

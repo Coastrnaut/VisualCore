@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "app": "fractal-explorer",
-  "gate": "A03-P02",
+  "gate": "A03-P03",
   "date": "2026-11-11",
   "inventory": [
     {
@@ -225,6 +225,12 @@
           "public": true
         },
         {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/PlaneFraming.swift",
+          "symbol": "PlaneFraming",
+          "product": "VisualCoreMath",
+          "public": true
+        },
+        {
           "file": "Packages/VisualCore/Sources/VisualCoreMath/Camera2D.swift",
           "symbol": "Camera2D",
           "product": "VisualCoreMath",
@@ -368,17 +374,29 @@
       "status": "available",
       "evidence": [
         {
+          "file": "Packages/VisualCore/Sources/VisualCorePersistence/NamedLibrary.swift",
+          "symbol": "NamedLibrary",
+          "product": "VisualCorePersistence",
+          "public": true
+        },
+        {
           "file": "Packages/VisualCore/Sources/VisualCorePersistence/DocumentStore.swift",
           "symbol": "DocumentStore",
           "product": "VisualCorePersistence",
           "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/PlaneFraming.swift",
+          "symbol": "PlaneFraming",
+          "product": "VisualCoreMath",
+          "public": true
         }
       ],
       "example": {
-        "file": "Apps/GenerativeArtStudio/Core/Sources/GenerativeArtStudioCore/CompositionLibrary.swift",
-        "symbol": "CompositionLibrary"
+        "file": "Apps/FractalExplorer/FractalExplorerCore/Sources/FractalExplorerCore/Bookmark.swift",
+        "symbol": "Bookmark"
       },
-      "notes": "The bookmark schema is app content (research R7)."
+      "notes": "A03-P03: bookmarks are a VisualCore NamedLibrary<Bookmark> (G-LIBRARY, generalized from A01's CompositionLibrary; A01 adoption is a recorded follow-up) with a PlaneFraming (G-FRAMING) and the precision mode; the bookmark schema and validation are app content (research R7)."
     },
     {
       "id": "M08",
@@ -507,9 +525,9 @@
       ],
       "kind": "adaptation",
       "owner": "VisualCore:VisualCoreDiagnostics",
-      "phase": 3,
+      "phase": 4,
       "test": "Host tests: a relative work estimate (pixels x iterations x samples) is monotonic in each factor, labelled relative (never a time), and combines with QualityPolicy for interactive iteration reduction",
-      "justification": "Found in A03-P00 (research R8): iteration- or sample-bound shaders (A22 Shader Studio, A24 Graphics Benchmark Lab) need the same pre-flight estimate."
+      "justification": "Found in A03-P00 (research R8): iteration- or sample-bound shaders (A22 Shader Studio, A24 Graphics Benchmark Lab) need the same pre-flight estimate. Moved to Phase 04 in A03-P03 (spec 028 Assumptions): the manual names the cost estimate as Phase 04's MVP."
     },
     {
       "id": "G-TOUR",
@@ -521,6 +539,31 @@
       "phase": 4,
       "test": "Host tests: log-scale zoom interpolation between two viewports is monotonic and ends exactly on the target; eased with EasingCurve; Reduce Motion skips the animation",
       "justification": "Found in A03-P00 (research R9): tours between saved views need zoom interpolated in log space; a small generic helper on the G-VIEWPORT type."
+    },
+    {
+      "id": "G-FRAMING",
+      "matrix": [
+        "M02",
+        "M07"
+      ],
+      "kind": "adaptation",
+      "owner": "VisualCore:VisualCoreMath",
+      "phase": 3,
+      "test": "Host tests: a size-independent framing (center + span across the shorter side) round-trips through PlaneViewport with a bit-exact center and the span within 1e-12 over 100 views x 5 sizes; portrait to landscape keeps square pixels; invalid values fall back; Codable validates",
+      "justification": "Found in A03-P03: saved views and resizes of any 2D plane app (A16 Simulation Lab, A22 Shader Studio) need the shape-independent framing; PlaneViewport.resized keeps the scale, not the span.",
+      "closed": "A03-P03"
+    },
+    {
+      "id": "G-LIBRARY",
+      "matrix": [
+        "M07"
+      ],
+      "kind": "adaptation",
+      "owner": "VisualCore:VisualCorePersistence",
+      "phase": 3,
+      "test": "Host tests: a generic named-document library on DocumentStore saves, reloads, renames, favorites, duplicates and deletes with name normalization and ordering; damaged, newer-version and invalid files are reported and kept",
+      "justification": "Found in A03-P03 (owner reuse rule): A01's CompositionLibrary pattern is product-neutral and needed by A03 and later apps that save named documents; adopting it in A01 is a follow-up, not part of this gate.",
+      "closed": "A03-P03"
     }
   ],
   "traceability": [
@@ -683,7 +726,8 @@
       "Reference regression baseline recorded green 7/7 (T-A03-003) and the empty shell builds and passes its smoke test on both simulator runtimes (T-A03-005).",
       "Phase 01 starts with G-VIEWPORT in VisualCoreMath and the app's GPU-free escape-time reference (G-FRACTAL).",
       "A03-P01: Mandelbrot and Julia modes with accessible explanations and spoken descriptions run on a deterministic CPU reference preview (no GPU yet); PlaneViewport closes G-VIEWPORT in VisualCoreMath and FractalMath closes G-FRACTAL with the known-point fixtures; ProjectM regression 7/7.",
-      "A03-P02: the escape-time shader runs in VisualCore's FullScreenShaderScene behind RenderHost (EGL owned only by the host) and matches the FractalMath CPU reference on 64x64 grids (Mandelbrot 100%, Julia 99.9% boundary-only); anchored pinch/pan keeps the plane point under the fingers within 1e-9; five palettes with Reduce-Motion-aware animation; G-PRECISION closed (RenderCapabilities fragment precision + PrecisionAdvisor) with a visible, announced zoom clamp; ProjectM regression 7/7."
+      "A03-P02: the escape-time shader runs in VisualCore's FullScreenShaderScene behind RenderHost (EGL owned only by the host) and matches the FractalMath CPU reference on 64x64 grids (Mandelbrot 100%, Julia 99.9% boundary-only); anchored pinch/pan keeps the plane point under the fingers within 1e-9; five palettes with Reduce-Motion-aware animation; G-PRECISION closed (RenderCapabilities fragment precision + PrecisionAdvisor) with a visible, announced zoom clamp; ProjectM regression 7/7.",
+      "A03-P03: bookmarks keep mode, framing, seed, cap, radius, palette and precision mode in a VisualCore NamedLibrary and reopen exactly on any canvas shape (center bit-exact, span within 1e-12); a bookmark deeper than this device's precision opens clamped with a note; Go to coordinates; resizes keep the framing with square pixels (GPU 64x32 and 32x64 match the CPU reference 100%); G-FRAMING and G-LIBRARY closed; ProjectM regression 7/7."
     ],
     "blockers": []
   }

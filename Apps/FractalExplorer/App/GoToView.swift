@@ -15,20 +15,23 @@ struct GoToView: View {
         NavigationStack {
             Form {
                 Section {
-                    TextField("Real part, for example −0.743643887", text: $real)
+                    Text("Coordinates between −4 and 4. Zoom 1 shows the whole set; the precision limit still applies.")
+                        .fixedSize(horizontal: false, vertical: true)
+                        .accessibilityIdentifier("fe.goto.hint")
+                }
+                Section {
+                    TextField("Real part", text: $real, prompt: Text("−0.75"), axis: .vertical)
                         .keyboardType(.numbersAndPunctuation)
                         .accessibilityLabel("Real part")
                         .accessibilityIdentifier("fe.goto.real")
-                    TextField("Imaginary part, for example 0.131825904", text: $imaginary)
+                    TextField("Imaginary part", text: $imaginary, prompt: Text("0.1"), axis: .vertical)
                         .keyboardType(.numbersAndPunctuation)
                         .accessibilityLabel("Imaginary part")
                         .accessibilityIdentifier("fe.goto.imaginary")
-                    TextField("Zoom, for example 1000", text: $zoom)
+                    TextField("Zoom", text: $zoom, prompt: Text("1000"), axis: .vertical)
                         .keyboardType(.numbersAndPunctuation)
                         .accessibilityLabel("Zoom")
                         .accessibilityIdentifier("fe.goto.zoom")
-                } footer: {
-                    Text("Coordinates between −4 and 4. Zoom 1 shows the whole set; the precision limit still applies.")
                 }
                 if let error {
                     Text("\(Self.fieldName(error.field)): \(error.message)")

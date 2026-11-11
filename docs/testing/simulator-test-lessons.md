@@ -146,3 +146,17 @@ speaks and what the screen shows, not exact values. Sheets at a medium detent wi
   that edge and logs every ignored finding.
 - **Avoid `pow` with integer literals in tests that import both Foundation and simd-based modules.** The call was
   ambiguous; use a literal constant.
+
+## Feature 028 (A03-P03)
+
+- **Give list-row buttons a full-width hit shape.** A `.plain` button in a `List` row only hits its opaque content, so
+  a UI test tapping the row's center (blank space) did nothing. `.contentShape(Rectangle())` fixed the app, not just
+  the test.
+- **Clearing a text field in UI tests:** "Select All" from the edit menu was flaky. Tapping the field's right end and
+  typing delete keys is reliable; a plain `tap()` can put the cursor at the start.
+- **Form headers and footers fail contrast.** Their secondary gray "nearly passed" the audit. Put explanatory text in
+  a section body instead.
+- **Long placeholders clip at XXXL.** Use short prompts with labels and `axis: .vertical` fields so text wraps.
+- **One rule for one judgement.** Saving a bookmark at the clamp first recorded "near limit" while the banner said
+  "limit reached", because the two used different thresholds. Both now call `PrecisionMode.level`.
+- **`xcodegen generate` after adding app files**, or the build cannot find the new type.
