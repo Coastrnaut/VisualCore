@@ -36,3 +36,8 @@ One commit + push per task.
 ## Dependencies
 
 T-F801 → T-F802/T-F803 → T-F804 → T-F805 → T-F806 → T-F807 → T-F808 → T-F809.
+
+## Phase 6: Convergence
+
+- [ ] T-F811 Add a smoke case to `Harnesses/SecondConsumer/UITests/GardenSmokeUITests.swift`: plant, send the app to the background for 6 s, return → no bloom within the first second back (growth did not jump by the background time), bloom later; on iOS 27.2 and 26.5 per spec Edge Cases: background/foreground (partial)
+- [ ] T-F812 Sync `specs/009-second-consumer/contracts/second-consumer.md` with the code (Garden.interact/InteractionResult, Flower.hue, Garden.time/maxBreeze, garden.title/garden.hint identifiers), verified by a symbol check per plan: contracts (partial)
