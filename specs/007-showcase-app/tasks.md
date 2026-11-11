@@ -20,15 +20,15 @@ tests); written with or before each piece. IDs `T-F6##`. One commit + push per t
 
 ## Phase 3: US1–US3 — scenes one at a time (P1) 🎯
 
-- [ ] T-F605 [US2] Scene 1 gradient + texture: `Showcase/Shaders/{common.glsl,gradient.vert,gradient.frag,broken.frag}`, generated `Showcase/Resources/checker.png`, `GradientTextureScene.swift`; `-showcaseInjectShaderError YES` shows the parsed error with file and line and a Retry button
+- [ ] T-F605 [US2] Scene 1 gradient + texture: `Showcase/Shaders/{common.glsl,gradient.vert,gradient.frag,broken.frag}`, generated `Showcase/Resources/checker.png`, `GradientTextureScene.swift`; `-showcaseInjectShaderError YES` shows the parsed error with file and line and a Retry button; hosted pixel test `Showcase/Tests/Unit/SceneRenderTests.swift` samples the checker texture (alternating light/dark cells) and the gradient
 - [ ] T-F606 [US1] Scene 2 animated geometry: `AnimatedGeometryScene.swift` (MeshRenderer cube + sphere on an OrbitCamera, Timeline spin, drag orbits; Reduce Motion stops spin)
 - [ ] T-F607 [US3] Scene 3 touch-interactive distortion: `DistortionScene.swift` + `Showcase/Shaders/ripple.frag` (content rendered to a target, ripple pass centered on the drag; status `touch=x,y`)
 - [ ] T-F608 [US3] Scene 4 particles: `ParticleShowcaseScene.swift` (ParticleSystem + Primitive/ParticleRenderer, drag spawns, pinch zooms; status `particles=n zoom=z`)
-- [ ] T-F609 [US2] Scene 5 multi-pass post-processing: `PostProcessingScene.swift` (EffectScene over animated content, graph colorMatrix → bloom → distort, Reduce Flashing appends flashLimit, toggle, status `passes=a>b>c` or `passes=off`)
+- [ ] T-F609 [US2] Scene 5 multi-pass post-processing: `PostProcessingScene.swift` (EffectScene over animated content, graph colorMatrix → bloom → distort, Reduce Flashing appends flashLimit, toggle, status `passes=a>b>c` or `passes=off`); `SceneRenderTests` shows effect-on output differs from effect-off and effect-off equals the content
 
 ## Phase 4: US1/US3/US4 — smoke test (P1/P2)
 
-- [ ] T-F610 [US1] [US3] [US4] XCUITest `Showcase/Tests/UI/ShowcaseSmokeUITests.swift`: every scene opens and frames advance with `error=none` within 2 s; drag/pinch on particles; drag on distortion; effect toggle; context loss (gen +1, frames resume ≤ 1 s, leaked=0); background/foreground; largest accessibility text size keeps the list usable; injected shader error shows file and line — on iOS 27.2 and 26.5
+- [ ] T-F610 [US1] [US3] [US4] XCUITest `Showcase/Tests/UI/ShowcaseSmokeUITests.swift`: every scene opens and frames advance with `error=none` within 2 s; drag/pinch on particles; drag on distortion; effect toggle; context loss (gen +1, frames resume ≤ 1 s, leaked=0); background/foreground; rotation to landscape keeps rendering and drag mapping; largest accessibility text size keeps the list usable; injected shader error shows file and line — on iOS 27.2 and 26.5
 
 ## Phase 5: Polish & Cross-Cutting
 

@@ -51,9 +51,9 @@ Showcase/README.md
 Showcase/App/{ShowcaseApp,SceneCatalog,SceneHostView,DiagnosticsOverlay,ShowcaseSettings}.swift
 Showcase/App/Scenes/{GradientTextureScene,AnimatedGeometryScene,DistortionScene,ParticleShowcaseScene,PostProcessingScene}.swift
 Showcase/App/BundleShaders.swift              # loads Shaders/*.glsl into a ShaderLibrary
-Showcase/Shaders/{common.glsl,gradient.vert,gradient.frag,broken.frag}
+Showcase/Shaders/{common.glsl,gradient.vert,gradient.frag,broken.frag,ripple.frag}
 Showcase/Resources/{checker.png,Assets.xcassets}
-Showcase/Tests/Unit/{SceneCatalogTests,BundleShaderTests}.swift
+Showcase/Tests/Unit/{SceneCatalogTests,BundleShaderTests,SceneRenderTests}.swift
 Showcase/Tests/UI/ShowcaseSmokeUITests.swift
 scripts/audit_showcase_dependencies.py + tests/fixtures in scripts/fixtures/showcase_audit/
 Packages/VisualCoreRendering/Sources/VisualCoreRendering/GPUObjects.swift   # + Texture.upload(rgba:)
