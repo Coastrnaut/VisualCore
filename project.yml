@@ -215,6 +215,7 @@ targets:
       path: Apps/FluidArtPlayground/Generated/Info.plist
       properties:
         CFBundleDisplayName: Fluid Art Playground
+        NSPhotoLibraryAddUsageDescription: Fluid Art Playground saves your captured picture to Photos only when you choose Save Image.
         CFBundleShortVersionString: "0.1.0"
         CFBundleVersion: "1"
         ITSAppUsesNonExemptEncryption: false

@@ -59,7 +59,7 @@ Checkpoints: `validate_docs`, `check_dependencies`, `check_compliance` and `chec
 
 ## Phase 4: User Story 3 — capture (P2)
 
-- [ ] T-A02-405 [US3] Add `CaptureModel.swift`:
+- [X] T-A02-405 [US3] Add `CaptureModel.swift`: — Verified 2026-11-11: CaptureModel (A01's VisualCore export path: ExportGeometry(maxEdge: host.maxRenderSize) at 2048 on the long edge in the canvas aspect, scene paused around RenderHost.renderOffscreen and restored, StillImageEncoder PNG, only the latest temporary file kept and removed on close, failure messages) with the Capture toolbar button (fap.capture), CaptureSheet (fap.capture.share ShareLink, fap.capture.message) and NSPhotoLibraryAddUsageDescription in project.yml. CaptureTests 3: an opaque 1024x2048 PNG in the 1:2 canvas aspect with the step count unchanged, pause restored, previous file deleted, removed on close; a too-large size refused with the message and the pause state restored both ways (analyze C2); captures show each palette's background exactly in a corner (ink 245/240/224, smoke 10/10/13, glow 0/0/0). run-check A02-P04/t405-app-27-2 and t405-app-26 TEST SUCCEEDED, enumeration guard 44/44 each; check_app_isolation with the built app and --allow-usage NSPhotoLibraryAddUsageDescription PASS (FR-A02-405, FR-A02-406, SC-A02-403)
   - `ExportGeometry(maxEdge: host.maxRenderSize)` at 2048 on the long edge in the view aspect;
   - pause, `renderOffscreen`, restore;
   - `StillImageEncoder.pngData`;

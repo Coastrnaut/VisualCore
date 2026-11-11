@@ -168,7 +168,16 @@ final class PlaygroundModel {
                                     paused: scene.paused || host?.state != .active, splashes: splashes)
     }
 
+    /// Still capture (feature 022).
+    let capture = CaptureModel()
+
+    func captureStill() {
+        guard let host else { return }
+        capture.capture(host: host, scene: scene, viewSize: host.view.bounds.size)
+    }
+
     func close() {
+        capture.removeFile()
         host?.destroy()
         host = nil
     }
@@ -177,6 +186,7 @@ final class PlaygroundModel {
 struct PlaygroundView: View {
     @State private var model: PlaygroundModel?
     @State private var adjusting = false
+    @State private var showingCapture = false
     @State private var detent = PresentationDetent.large
 
     var body: some View {
@@ -214,6 +224,16 @@ struct PlaygroundView: View {
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 Button {
+                    model?.captureStill()
+                    showingCapture = true
+                } label: {
+                    Label("Capture", systemImage: "camera")
+                }
+                .accessibilityIdentifier("fap.capture")
+                .disabled(model?.host == nil)
+            }
+            ToolbarItem(placement: .primaryAction) {
+                Button {
                     adjusting = true
                 } label: {
                     Label("Adjust", systemImage: "slider.horizontal.3")
@@ -221,6 +241,9 @@ struct PlaygroundView: View {
                 .accessibilityIdentifier("fap.adjust")
                 .disabled(model?.host == nil)
             }
+        }
+        .sheet(isPresented: $showingCapture) {
+            if let model { CaptureSheet(capture: model.capture) }
         }
         .sheet(isPresented: $adjusting) {
             if let model {
@@ -238,5 +261,47 @@ struct PlaygroundView: View {
             model?.close()
             model = nil
         }
+    }
+}
+
+/// The result of a capture: share or save the picture, or read why it failed.
+struct CaptureSheet: View {
+    let capture: CaptureModel
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        NavigationStack {
+            VStack(spacing: 20) {
+                switch capture.state {
+                case .done(let url):
+                    if let image = capture.lastImage {
+                        Text("Captured \(image.width) × \(image.height) pixels.")
+                            .accessibilityIdentifier("fap.capture.message")
+                    }
+                    ShareLink(item: url) {
+                        Label("Share or Save Image", systemImage: "square.and.arrow.up").frame(minHeight: 44)
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .accessibilityIdentifier("fap.capture.share")
+                case .failed(let message):
+                    Text(message).multilineTextAlignment(.center).accessibilityIdentifier("fap.capture.message")
+                case .idle:
+                    Text("Nothing captured yet.").accessibilityIdentifier("fap.capture.message")
+                }
+            }
+            .padding()
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(Color(uiColor: .systemGroupedBackground))
+            .tint(AccessibleColors.accent)
+            .navigationTitle("Capture")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Done") { dismiss() }.accessibilityIdentifier("fap.capture.done")
+                }
+            }
+        }
+        .presentationDetents([.medium])
+        .presentationBackground(Color(uiColor: .systemGroupedBackground))
     }
 }
