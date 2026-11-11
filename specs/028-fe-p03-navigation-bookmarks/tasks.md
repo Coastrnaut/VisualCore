@@ -33,7 +33,7 @@ plan, research R1–R5, the data model, the contract and the quickstart.
 
 ## Phase 3: Regression fixture — aspect changes (P1)
 
-- [ ] T-A03-306 [US2] Change `ExplorerModel.resize(to:)` to go through `PlaneFraming` (analyze D1), then add `Apps/FractalExplorer/Tests/Unit/AspectTests.swift`: 100 random resizes keep the center exactly and the span within 1e-12 with one scale for both axes; the GPU default Mandelbrot at 64×32 and 32×64 agrees with the CPU reference ≥ 99% (boundary-only). Run on both runtimes (FR-A03-306, SC-A03-302, SC-A03-303).
+- [X] T-A03-306 [US2] Change `ExplorerModel.resize(to:)` to go through `PlaneFraming` (analyze D1), then add `Apps/FractalExplorer/Tests/Unit/AspectTests.swift`: 100 random resizes keep the center exactly and the span within 1e-12 with one scale for both axes; the GPU default Mandelbrot at 64×32 and 32×64 agrees with the CPU reference ≥ 99% (boundary-only). Run on both runtimes (FR-A03-306, SC-A03-302, SC-A03-303). — Verified 2026-11-11: — Verified 2026-11-11: ExplorerModel.resize(to:) through VisualCore PlaneFraming (analyze D1); AspectTests 3: 100 random resizes 200...1400 pt keep the center exactly, the span within 1e-12 and one scale for both axes, invalid size ignored; GPU default Mandelbrot after a shape change at 64x32 and 32x64 matches the CPU reference 100.0% with 0 unexplained on both runtimes — run-check A03-P03/t306-app-ios27 and t306-app-ios26 TEST SUCCEEDED, enumeration 33/33 each
 
 ## Phase 4: User Story 3 — precision mode travels (P2)
 

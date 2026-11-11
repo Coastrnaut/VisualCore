@@ -259,13 +259,12 @@ final class ExplorerModel {
     /// The current mode's explanation.
     var explanation: String { FractalExplanations.text(for: state.mode) }
 
-    /// The view's size changed (layout, rotation, split view): the viewport keeps its center and the plane width across
-    /// the shorter side, so the zoom and the visible content stay the same (square pixels via PlaneViewport).
+    /// The view's size changed (layout, rotation, split view): the viewport keeps its center and the span across the
+    /// shorter side through VisualCore's `PlaneFraming` (feature 028 T-A03-306; FR-A03-306), so the zoom and the visible
+    /// content stay the same with square pixels.
     func resize(to size: Vec2) {
-        let old = state.viewport
-        guard size.isFinite, size.x > 0, size.y > 0, size != old.size else { return }
-        let width = old.unitsPerPoint * min(old.size.x, old.size.y)
-        state.viewport = PlaneViewport(center: old.center, unitsPerPoint: width / min(size.x, size.y), size: size)
+        guard size.isFinite, size.x > 0, size.y > 0, size != state.viewport.size else { return }
+        state.viewport = PlaneFraming(state.viewport).viewport(size: size)
     }
 
     /// Starts a CPU preview for the current state; a newer request supersedes it.
