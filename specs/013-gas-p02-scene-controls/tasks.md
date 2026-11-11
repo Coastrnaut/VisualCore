@@ -12,7 +12,7 @@ after each phase, run `validate_docs.py`.
 
 ## Phase 1: Foundational — VisualCore building blocks (US4; blocks US1–US3)
 
-- [ ] T-A01-201 [P] [US4] Implement `Packages/VisualCore/Sources/VisualCoreSimulation/SceneClock.swift` per data-model.md:
+- [X] T-A01-201 [P] [US4] Implement `Packages/VisualCore/Sources/VisualCoreSimulation/SceneClock.swift` per data-model.md: — Verified 2026-11-10: VisualCoreSimulation/SceneClock.swift (delta cap 0.25 s, speed 0…4, reduced motion 0.5×, wrap at duration, clamped scrub, non-finite ignored); run-check A01-P02/t201-202-host-a2: SceneClockTests 6/6 pass (advance/pause/toggle, delta cap and bad input, scrub clamp and wrap, speed clamp, reduced motion halves playback only, determinism); API baseline updated
   - `duration` 120 by default and > 0; time in 0 ≤ t < duration;
   - speed clamped to 0…4; `maxDelta` 0.25 s; reduced-motion factor 0.5;
   - wrap modulo duration; scrub clamps; non-finite input ignored.
