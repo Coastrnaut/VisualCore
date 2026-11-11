@@ -131,3 +131,16 @@ contract.
 
 Applied autonomously (CLAUDE.md §2): C1 → T-A01-505 background-change case; U1 → T-A01-502 notification delivery. 0
 critical issues.
+
+## Phase 6: Convergence
+
+- [ ] T-A01-510 Move the reusable accessibility-settings pieces into VisualCore per Constitution II (Maximize reuse) and FR-A01-506 (partial):
+  - `AccessibilityPreferences.load(from: UserDefaults-like store, keyPrefix:)` / `save(to:keyPrefix:)` with the keys
+    `<prefix>.reduceMotion` / `<prefix>.reduceFlashing` (raw `AccessibilityChoice`; unknown or absent → System), in
+    `Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPreferences.swift` with host tests;
+  - VisualCoreUI `AccessibilitySettingsSection` (System/On/Off pickers bound to `AccessibilityPreferences`,
+    identifier prefix parameter, full-contrast explanation row showing the device setting from
+    `SystemAccessibilityObserver`) and `AccessibleColors.accent` (#0040DD light / #409CFF dark), in
+    `Packages/VisualCoreRendering/Sources/VisualCoreUI/`, with simulator tests;
+  - docs, API baseline, R1–R5 and the ProjectM regression (7 steps).
+- [ ] T-A01-511 Adopt them in `Apps/GenerativeArtStudio/App/{SettingsView,SceneScreen,GenerativeArtStudioApp}.swift`, keeping the identifiers `gas.settings.*` and the keys `gas.a11y.*`; delete `AppColors.swift` and `AccessibilityStorage`; rerun the full unit and UI suites (including the accessibility audit) on iOS 27.2 and 26.5, enumeration-guarded, per Constitution II (partial)
