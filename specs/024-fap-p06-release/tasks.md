@@ -50,7 +50,7 @@ IDs are `T-A02-6##`, with one commit per task (`scripts/tick_task.py`). Commands
     - a capture lands in `tmp/Captures`, only the latest exists, and close removes it.
 
   Run on 27.2 and 26.5 (FR-A02-605, SC-A02-603).
-- [ ] T-A02-603 [US1] [US3] Add `Apps/FluidArtPlayground/Tests/Unit/PrivacyTests.swift`:
+- [X] T-A02-603 [US1] [US3] Add `Apps/FluidArtPlayground/Tests/Unit/PrivacyTests.swift`: — Verified 2026-11-11: — Verified 2026-11-11: PrivacyTests 2: exactly NSPhotoLibraryAddUsageDescription with the documented text; a session (paint, tune, pause, detail, capture, close) leaves 0 defaults keys (0 system), Documents only the Debug-only rehearsal report on 27.2 (listed, excluded) and empty on 26.5, Library only Caches/Preferences/Saved Application State/SplashBoard, capture folder 0; run-check A02-P06/t603-app-ios27 and t603-app-ios26 (PrivacyTests) TEST SUCCEEDED; full-suite runs follow in T-A02-610
   - the built app's Info.plist has exactly one `NS*UsageDescription`, `NSPhotoLibraryAddUsageDescription`, with the
     documented text;
   - after a session that opens the playground, paints, captures and closes, the app's defaults domain has 0 keys
