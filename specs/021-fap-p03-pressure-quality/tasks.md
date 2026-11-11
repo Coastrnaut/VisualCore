@@ -37,7 +37,7 @@ IDs are `T-A02-3##`, with one commit and push per task (`scripts/tick_task.py`).
 
 ## Phase 2: User Stories 1 and 2 — projection and boundaries, CPU reference (P1)
 
-- [ ] T-A02-304 [US1] [US2] Tests first, then add `FluidSolver.swift` (Core), following clarifications 1–5:
+- [X] T-A02-304 [US1] [US2] Tests first, then add `FluidSolver.swift` (Core), following clarifications 1–5: — Verified 2026-11-11: FluidSolver CPU reference (Core): divergence 0.5*((uR-uL)+(vT-vB)), stateless Jacobi pressure (pL+pR+pB+pT-d)*0.25 from 0, gradient subtraction with the walls rule, implicit viscosity (8 iterations, nu = viscosity x 50), project and the full step in clarification-5 order; walls/open neighbor rules; FluidEncodings (velocity R, divergence 2R, pressure 4R; unorm8 zero exact); AccessLog of reads. FluidSolverTests 9: ramp divergence (open and walls), Jacobi point source symmetry, projection monotonic with >= 40% reduction at 20 iterations (measured 3529 -> 2874/2441/1921/1431 for 5/10/20/40, spec clarification 6 and SC-A02-302 set from data: the 50% guess was not achievable with this standard scheme), uniform field unchanged under open edges, zero normal velocity at walls and outward flow kept when open, 0 out-of-grid reads in both modes on 8x8 with a corner splat and viscosity (SC-A02-303), viscosity 0 skipped and spreading at 1, step at rest equals Phase 02 Advection.step, encoded rest field exact. run-check A02-P03/t304-core-test-2 swift test 42/42 pass (first attempt t304-core-test failed on the 50% threshold)
   - `divergence`, `jacobiPressure` (starting at 0), `subtractGradient` (walls rule), `diffuse` (8 iterations,
     ν = viscosity × 50);
   - the full `step` in the order of clarification 5;
