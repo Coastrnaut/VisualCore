@@ -1,0 +1,26 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/VisualCoreRendering",
+    "--scheme",
+    "VisualCoreRendering-Package",
+    "--destination",
+    "sim-26.5",
+    "--action",
+    "test",
+    "--result-name",
+    "F09-t919-pkg-ios26"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-26.5 --action test --result-name F09-t919-pkg-ios26",
+  "elapsed_seconds": 5.417,
+  "exit_code": 0,
+  "finished": "2026-11-11T03:01:27+00:00",
+  "log": ".autonomy/logs/F09.t919-sweep-pkg-ios26.log",
+  "log_sha256": "80c2e79869f561a830c79711d3c2185c304659f831f78836ad8afdc99346fe96",
+  "name": "t919-sweep-pkg-ios26",
+  "stage": "F09",
+  "started": "2026-11-11T03:01:22+00:00",
+  "timed_out": false
+}
