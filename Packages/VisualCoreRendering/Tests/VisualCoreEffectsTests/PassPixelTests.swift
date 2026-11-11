@@ -192,4 +192,25 @@ final class PassPixelTests: XCTestCase {
         XCTAssertEqual(liveAfterTeardown - (host.resources.stats.liveCount[.framebuffer] ?? 0), 0)
         XCTAssertEqual(host.resources.stats.leaked, 0)
     }
+
+    // MARK: flashLimit (T-F414; SC-F403)
+
+    func testFlashLimitBoundsAThirtyHertzStrobe() throws {
+        var displayed: [Int] = []
+        _ = try EffectHarness.run { ctx in
+            let black = try EffectHarness.solid(0, 0, 0, in: ctx)
+            let white = try EffectHarness.solid(1, 1, 1, in: ctx)
+            let r = try EffectRenderer(graph: EffectHarness.graph([
+                EffectPassDescription(id: "L", type: "flashLimit", inputs: ["input": "scene"], output: "l", params: ["limit": [0.3]]),
+            ], output: "l"), registry: ctx.resources)
+            _ = try r.render(scene: black, time: 0, delta: 1.0 / 30)      // adapt to black first
+            for frame in 1...30 {
+                let scene = frame % 2 == 0 ? black : white
+                displayed.append(EffectHarness.pixel(try r.render(scene: scene, time: 0, delta: 1.0 / 30).readPixels(), width: 16, x: 8, y: 8).x)
+            }
+        }
+        let perFrame = 0.3 / 30 * 255
+        for i in 1..<displayed.count { XCTAssertLessThanOrEqual(Double(abs(displayed[i] - displayed[i - 1])), perFrame + 2) }
+        XCTAssertLessThanOrEqual(Double(displayed.max()! - displayed.min()!), 0.3 * 255 + 2, "≤ 0.3 per second")
+    }
 }
