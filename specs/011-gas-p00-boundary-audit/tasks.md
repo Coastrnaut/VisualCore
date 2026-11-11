@@ -46,7 +46,7 @@ both simulators and the reference regression. IDs are `T-A01-0##`. Each task get
 
 ## Phase 4: US2 — Host, thread, build and regression baseline (P1)
 
-- [ ] T-A01-006 [US2] Run the baseline regression under `run-check` stage A01-P00:
+- [X] T-A01-006 [US2] Run the baseline regression under `run-check` stage A01-P00: — Verified 2026-11-10: run-check A01-P00/t006-reference-regression: release_check.py 7/7 pass (engine xcframework, projectM-iOS sim build, ANGLERendering 14/14 on iOS 27.2 and 26.5, reference clean at d93edd1, ProjectMReference 17/17 on both runtimes); recorded in docs/apps/generative-art-studio/regression-baseline.md (SC-A01-004)
   - `release_check.py --only reference-engine-xcframework reference-build-projectm-ios-sim reference-test-anglerendering-ios27 reference-test-anglerendering-ios26 reference-clean projectm-reference-ios27 projectm-reference-ios26`.
 
   Record the commands, results and check names in `docs/apps/generative-art-studio/regression-baseline.md`
