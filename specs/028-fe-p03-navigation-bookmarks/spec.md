@@ -20,6 +20,31 @@ Canonical overrides:
 - **Maximize reuse:** the named-document library pattern (A01's `CompositionLibrary`) and the size-independent
   plane framing are generalized into VisualCore, not written again in the app.
 
+## Clarifications
+
+### Session 2026-11-11
+
+Answered autonomously under the owner's standing approval (CLAUDE.md §2), choosing the recommended option each time.
+Facts checked in code:
+- `DocumentStore` reports `newerVersion`, `corrupt`, `wrongKind` and `tooLarge` without touching the file, and limits
+  documents to 256 KiB;
+- `FractalState.zoom` = default width ÷ (units per point × shorter side), with default widths 4 (Mandelbrot) and
+  3.2 (Julia);
+- `PlaneViewport.resized(to:)` keeps the units per point (not the span), so the explorer's span-keeping resize
+  belongs in the new framing type.
+
+- Q: What does the "zoom" typed in Go to mean? → A: The same magnification the canvas description speaks: the mode's
+  default width divided by the span across the shorter side. Go to sets span = default width ÷ zoom, so a typed
+  1000× reads back as "zoom 1000×".
+- Q: When is the precision note shown after opening a bookmark? → A: Only when the precision clamp changed the
+  opened view (the saved span is finer than this device's limit). It names the saved bits and the bits in use. It
+  disappears on the next zoom out, pan or reset. A bookmark saved with more bits that still fits shows no note.
+- Q: How are the bookmark controls presented? → A: A Bookmarks button (`fe.bookmarks`) in the explorer opens a sheet
+  with the list and a Save current view button (`fe.bookmark.save`). Saving asks for a name in an alert text field.
+  Rows use swipe actions and context menus (rename, favorite, delete) plus accessibility actions, so VoiceOver can
+  use them. Go to (`fe.goto`) opens a sheet with three fields and a Go button. Sheets keep the canvas unchanged
+  underneath.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Save the current location as a bookmark (Priority: P1) 🎯
@@ -133,10 +158,12 @@ A person types a center and a zoom (from a book or a website) and goes there.
   (format, mantissa bits, level). Loading validates every field.
 - **FR-A03-304**: The explorer MUST offer Save bookmark (`fe.bookmark.save`, with a name field) and a Bookmarks list
   (`fe.bookmarks`). Each row shows the name, the center and the zoom (and the precision level when it is not
-  reliable), and offers open, rename, favorite and delete. Opening restores the state per US2 and applies the precision clamp
-  with the US3 note (`fe.bookmark.note`).
+  reliable), and offers open, rename, favorite and delete (swipe actions, context menu and accessibility actions).
+  Opening restores the state per US2 and applies the precision clamp. When the clamp changes the opened view, the
+  US3 note (`fe.bookmark.note`) is shown until the next zoom, pan or reset.
 - **FR-A03-305**: The explorer MUST offer Go to coordinates (`fe.goto`) with real part, imaginary part and zoom
-  fields. Input is validated per US4 with an inline error (`fe.goto.error`).
+  fields. The zoom is the spoken magnification (span = default width ÷ zoom). Input is validated per US4 with an
+  inline error (`fe.goto.error`).
 - **FR-A03-306**: Canvas resizes MUST keep the center and the span across the shorter side, using the VisualCore
   framing (regression fixture), and the GPU picture MUST stay undistorted at non-square sizes. GPU classes match the
   CPU reference at 64 × 32 and 32 × 64 within the Phase 02 tolerance.
