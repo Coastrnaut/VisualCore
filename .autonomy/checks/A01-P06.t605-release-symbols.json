@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_release_symbols.py",
+    "--app",
+    "Build/DerivedData/release-GenerativeArtStudio-Release/Build/Products/Release-iphoneos/GenerativeArtStudio.app"
+  ],
+  "command": "python3 scripts/check_release_symbols.py --app Build/DerivedData/release-GenerativeArtStudio-Release/Build/Products/Release-iphoneos/GenerativeArtStudio.app",
+  "elapsed_seconds": 0.099,
+  "exit_code": 0,
+  "finished": "2026-11-11T07:00:08+00:00",
+  "log": ".autonomy/logs/A01-P06.t605-release-symbols.log",
+  "log_sha256": "36a5bfe8ebe8ce903e9e75b5d3489cffe5fcd2debb55f7286bc374c1b493360d",
+  "name": "t605-release-symbols",
+  "stage": "A01-P06",
+  "started": "2026-11-11T07:00:08+00:00",
+  "timed_out": false
+}

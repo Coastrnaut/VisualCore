@@ -632,6 +632,8 @@ class PrivacyManifestTests(unittest.TestCase):
                                       ["UserDefaults", "FileTimestamp", "SystemBootTime", "DiskSpace", "ActiveKeyboards"]})
         self.assertEqual(privacy.scan(["_printf", "_malloc"], ["hello"]), {})
         self.assertIn("NSPrivacyAccessedAPICategoryFileTimestamp", privacy.scan([], ["NSFileModificationDate"]))
+        self.assertIn("NSPrivacyAccessedAPICategoryUserDefaults",
+                      privacy.scan(["_$s7SwiftUI10AppStorageV12wrappedValuexvg"], []), "@AppStorage counts as UserDefaults")
 
     def test_compare_reports_undeclared_unused_and_violations(self):
         detected = {"NSPrivacyAccessedAPICategoryUserDefaults": ["x"]}

@@ -26,7 +26,9 @@ PREFIX = "NSPrivacyAccessedAPICategory"
 
 # Category → (symbol regexes matched against undefined/imported symbols, string regexes matched against binary strings).
 TABLE: dict[str, tuple[list[str], list[str]]] = {
-    "UserDefaults": ([r"_OBJC_CLASS_\$_NSUserDefaults$", r"^_?CFPreferences(Copy|Set|Get)"], [r"^NSUserDefaults$"]),
+    # SwiftUI's @AppStorage and @SceneStorage read and write UserDefaults on the app's behalf.
+    "UserDefaults": ([r"_OBJC_CLASS_\$_NSUserDefaults$", r"^_?CFPreferences(Copy|Set|Get)", r"7SwiftUI10AppStorageV"],
+                     [r"^NSUserDefaults$"]),
     "FileTimestamp": ([r"^_?(f|l)?stat(64)?(\$INODE64)?$", r"^_?f?getattrlist(bulk)?$", r"^_?getattrlistat$"],
                       [r"^NSFile(Creation|Modification)Date$", r"^NSURL(Creation|ContentModification|ContentAccess)DateKey$"]),
     "SystemBootTime": ([r"^_?mach_absolute_time$", r"^_?CACurrentMediaTime$", r"systemUptime"], [r"^systemUptime$"]),

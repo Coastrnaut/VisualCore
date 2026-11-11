@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_privacy_manifest.py",
+    "--app",
+    "Build/DerivedData/release-GenerativeArtStudio-Release/Build/Products/Release-iphoneos/GenerativeArtStudio.app",
+    "--json",
+    ".autonomy/logs/a01p06-privacy-report.json"
+  ],
+  "command": "python3 scripts/check_privacy_manifest.py --app Build/DerivedData/release-GenerativeArtStudio-Release/Build/Products/Release-iphoneos/GenerativeArtStudio.app --json .autonomy/logs/a01p06-privacy-report.json",
+  "elapsed_seconds": 0.143,
+  "exit_code": 0,
+  "finished": "2026-11-11T07:00:08+00:00",
+  "log": ".autonomy/logs/A01-P06.t605-privacy-scan.log",
+  "log_sha256": "1039196720001438ed2fd661dce375d5b065638ebeecea1ac64182e6f5d817f1",
+  "name": "t605-privacy-scan",
+  "stage": "A01-P06",
+  "started": "2026-11-11T07:00:08+00:00",
+  "timed_out": false
+}
