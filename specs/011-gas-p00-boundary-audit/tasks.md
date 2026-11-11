@@ -20,6 +20,9 @@ both simulators and the reference regression. IDs are `T-A01-0##`. Each task get
   - a missing symbol;
   - a non-public evidence item for `public: true`;
   - an unknown product;
+  - evidence in a test file;
+  - evidence under `External/` (ProjectM only);
+  - an `upstream gap` row with neither evidence nor notes;
   - a non-`available` row with no gap;
   - an app-local gap without justification;
   - a `go` decision with blockers.
@@ -28,6 +31,8 @@ both simulators and the reference regression. IDs are `T-A01-0##`. Each task get
   - ≤ 200 rows per list and strings ≤ 2,000 chars; unknown keys rejected;
   - declaration regex, with `public` required when `"public": true`, and `Type.member` checks;
   - products parsed from `Packages/*/Package.swift`;
+  - evidence rejected under `Tests/`, `External/` and `Harnesses/` (examples allowed there);
+  - `upstream gap` rows need evidence or notes;
   - `--render` writes the block between the `<!-- BEGIN GENERATED -->`/`<!-- END GENERATED -->` markers;
   - exit codes 0, 1 and 2.
 

@@ -22,7 +22,7 @@ links no VisualCore product yet; rendering arrives in Phase 02. · **Storage**: 
 **Testing**: `scripts/test_scripts.py` (checker logic plus a fixture), XCUITest launch smoke on iOS 27.2 and 26.5,
 reference regression steps · **Target Platform**: iOS/iPadOS 26.0+ · **Project Type**: iOS app in a monorepo ·
 **Performance Goals**: none in this phase (spec clarification 5) · **Constraints**: no VisualCore or ProjectM edits,
-no networking, no permissions, unsigned simulator builds · **Scale/Scope**: 1 script, 1 JSON contract, 2 docs, 1 app
+no networking, no permissions, unsigned simulator builds · **Scale/Scope**: 2 scripts (new checker; `release_check.py` gains the `app-contracts` step), 1 JSON contract, 2 docs, 1 app
 target, 1 UI test target.
 
 ## Constitution Check
@@ -59,6 +59,7 @@ docs/apps/generative-art-studio/regression-baseline.md     # ProjectM regression
 scripts/check_app_contract.py                               # app-neutral: --app <slug> [--render]
 scripts/fixtures/app_contract/{good,bad}/…                  # checker test fixtures
 scripts/test_scripts.py                                     # + AppContractTests
+scripts/release_check.py                                    # + step app-contracts (every docs/apps/*/visualcore-contract.json)
 Apps/GenerativeArtStudio/App/GenerativeArtStudioApp.swift   # @main SwiftUI shell, titled home
 Apps/GenerativeArtStudio/Tests/UI/LaunchSmokeUITests.swift  # launch + title + accessibility label
 project.yml                                                 # + targets GenerativeArtStudio, GenerativeArtStudioUITests, scheme

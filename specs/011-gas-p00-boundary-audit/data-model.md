@@ -20,8 +20,10 @@
 
 Validation rules (checker):
 - `status` and `kind` come from the enumerations above.
-- Every matrix row has ≥ 1 evidence item, unless its status is `upstream gap`, where evidence may cite the
-  placeholder.
+- Every `available` or `requires adaptation` row has ≥ 1 evidence item. An `upstream gap` row cites the placeholder
+  or the closest existing symbol, or has `evidence: []` with a non-empty `notes` reason (analyze A1).
+- Evidence files MUST NOT be under `Tests/`, `External/` or `Harnesses/`: evidence is shippable VisualCore API, and
+  ProjectM-only capabilities count as unavailable. An `example` may be a test, sample or harness (analyze E1).
 - Every evidence and example file exists, and its symbol is declared in it (with `public` when `public: true`).
 - `product` must be a library product declared in a `Packages/*/Package.swift`.
 - Every non-`available` row is referenced by ≥ 1 gap.
