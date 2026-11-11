@@ -124,7 +124,7 @@ research R1–R7, data model, contract, quickstart).
 
 ## Phase 6: Simulation detail (MVP-06, FR-A02-511)
 
-- [ ] T-A02-509 [US1] Add `rebuildFields(configuration:)` to the scene. On the next render it runs `releaseAll` and
+- [X] T-A02-509 [US1] Add `rebuildFields(configuration:)` to the scene. On the next render it runs `releaseAll` and — Verified 2026-11-11: — Verified 2026-11-11: FluidFieldsScene.rebuildFields (next frame: releaseAll + setup with the new grid and device cap; falls back to the previous grid on failure, rebuildFellBack), PlaygroundModel.detail/setDetail (ends strokes, drops queued touches, keeps pause and tuning, queue rebuilt for the validated grid; syncGrid + message after a fallback), Adjust picker fap.adjust.detail with value 'Medium, 128 by 128 cells'; DetailTests 5 (64/128/256 grids, 10 switches 0 leaks and live count back to Medium, maxEdge 100 caps High, failed upload falls back with message, change during a swipe), AdjustUITests picker (tier row now scrolled into the lazy Form on iOS 26.5); run-check A02-P05/t509-app-ios27-2 and t509-app-ios26-2 TEST SUCCEEDED, enumeration 70/70 each
   `setup` with the new grid, falling back to the previous grid on failure with `lastError`. The model applies the
   detail: it ends strokes, empties and rebuilds the queue for the validated grid, and keeps pause. The Adjust → Solver
   picker `fap.adjust.detail` ("Simulation detail", value "Medium, 128 by 128 cells") follows. Add `DetailTests`: each

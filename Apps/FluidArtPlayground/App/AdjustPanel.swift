@@ -56,6 +56,18 @@ struct AdjustPanel: View {
                     }
                     .pickerStyle(.segmented)
                     .accessibilityIdentifier("fap.adjust.edges")
+                    // Feature 023 FR-A02-511 (MVP-06): the grid size; a change restarts the canvas from the seed.
+                    Picker("Simulation detail", selection: Binding(get: { model.detail }, set: { model.setDetail($0) })) {
+                        ForEach(FluidDetail.allCases, id: \.self) { Text($0.name).tag($0) }
+                    }
+                    .pickerStyle(.segmented)
+                    .accessibilityLabel("Simulation detail")
+                    .accessibilityValue(model.detail.accessibilityValue)
+                    .accessibilityHint("Changes the fluid grid; the canvas restarts from the starting picture")
+                    .accessibilityIdentifier("fap.adjust.detail")
+                    if let message = model.detailMessage {
+                        Text(message).accessibilityIdentifier("fap.adjust.detail.message")
+                    }
                     Text("Quality: \(model.tierName) (automatic)")
                         .accessibilityIdentifier("fap.adjust.tier")
                     // A regular row, not a footer: footers are forced to secondary text, which fails contrast here.

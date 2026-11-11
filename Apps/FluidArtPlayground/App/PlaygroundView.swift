@@ -162,6 +162,7 @@ final class PlaygroundModel {
     /// Called once per stepped frame: decide the tier, apply its iterations to the scene and drain the queue under its
     /// splat cap. The queue itself is never cleared by a tier change.
     private func drain() -> [Splat] {
+        syncGrid()
         beforeDrain?(drainedFrames)
         drainedFrames += 1
         let state = deviceState()
@@ -225,6 +226,40 @@ final class PlaygroundModel {
 
     private func announce(_ announcement: SimulationControl.Announcement) {
         AccessibilityNotification.Announcement(announcement.text).post()
+    }
+
+    // MARK: Simulation detail (feature 023 T-A02-509; FR-A02-511, MVP-06)
+
+    /// The current grid level (a device-capped grid keeps its level).
+    var detail: FluidDetail { FluidDetail(grid: configuration) }
+    /// Set when a requested level could not be built on this device.
+    private(set) var detailMessage: String?
+
+    /// Switches the grid: strokes end, queued touches are dropped, and the fields restart from the seed at the new
+    /// size on the next frame. The pause state and every other setting are kept.
+    func setDetail(_ level: FluidDetail) {
+        guard level != detail || detailMessage != nil else { return }
+        endStrokes()
+        _ = queue.drain()
+        var c = configuration
+        level.apply(to: &c)
+        let validated = c.validated(maxEdge: scene.effectiveMaxEdge).0
+        detailMessage = nil
+        scene.rebuildFields(configuration: validated)
+        configuration = validated
+        queue = SplatQueue(configuration: validated)
+    }
+
+    /// After a rebuild, follows the grid the scene really built (it may have fallen back).
+    private func syncGrid() {
+        let built = scene.configuration
+        guard built.gridWidth != configuration.gridWidth || built.gridHeight != configuration.gridHeight else { return }
+        var c = configuration
+        c.gridWidth = built.gridWidth
+        c.gridHeight = built.gridHeight
+        configuration = c
+        queue = SplatQueue(configuration: built)
+        if scene.rebuildFellBack { detailMessage = "That detail level is not available on this device." }
     }
 
     /// Still capture (feature 022).

@@ -1,4 +1,4 @@
-// AdjustUITests — feature 021 T-A02-307 (FR-A02-306; US3 AC1–AC3; SC-A02-305): every Adjust control changes the
+// AdjustUITests — feature 021 T-A02-307 (detail picker: feature 023 T-A02-509) (FR-A02-306; US3 AC1–AC3; SC-A02-305): every Adjust control changes the
 // value shown and spoken, and Reset returns the defaults.
 import XCTest
 
@@ -43,7 +43,19 @@ final class AdjustUITests: XCTestCase {
         for _ in 0..<4 where !edges.isHittable { app.swipeUp() }
         edges.buttons["Open"].tap()
         XCTAssertTrue(edges.buttons["Open"].isSelected)
-        XCTAssertTrue(app.staticTexts["fap.adjust.tier"].label.hasPrefix("Quality: "))
+        // The Form is lazy: scroll until the tier row exists (below the detail picker since feature 023).
+        let tier = app.staticTexts["fap.adjust.tier"]
+        for _ in 0..<4 where !tier.exists { app.swipeUp() }
+        XCTAssertTrue(tier.label.hasPrefix("Quality: "))
+
+        // Feature 023 T-A02-509: the Simulation detail picker (MVP-06).
+        let detail = app.segmentedControls["fap.adjust.detail"]
+        for _ in 0..<4 where !detail.isHittable { app.swipeUp() }
+        XCTAssertTrue(detail.buttons["Medium"].isSelected)
+        detail.buttons["Low"].tap()
+        XCTAssertTrue(detail.buttons["Low"].isSelected)
+        detail.buttons["Medium"].tap()
+        XCTAssertTrue(detail.buttons["Medium"].isSelected)
 
         let reset = app.buttons["fap.adjust.reset"]
         for _ in 0..<4 where !reset.isHittable { app.swipeUp() }

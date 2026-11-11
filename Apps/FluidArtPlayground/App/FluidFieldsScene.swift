@@ -22,8 +22,9 @@ final class FluidFieldsScene: RenderScene {
         case uniform(SIMD4<Float>)
     }
 
-    /// The configuration as requested; `configuration` holds the validated one once set up.
-    let requested: FluidConfiguration
+    /// The configuration as requested; `configuration` holds the validated one once set up. A Simulation detail
+    /// change replaces it through `rebuildFields(configuration:)` (feature 023).
+    private(set) var requested: FluidConfiguration
     let seed: SeedKind
     /// Use RGBA8 storage even when half-float targets work (tests of the fallback).
     let forceFallback: Bool
@@ -190,6 +191,32 @@ final class FluidFieldsScene: RenderScene {
         }
     }
 
+    /// A grid change waiting for the next frame (feature 023 FR-A02-511).
+    private(set) var pendingRebuild: FluidConfiguration?
+    /// True when the last grid change could not be built and the previous grid was restored.
+    private(set) var rebuildFellBack = false
+
+    /// Rebuilds the field targets for `configuration`'s grid on the next frame (Simulation detail; FR-A02-511):
+    /// the passes and fields are released and set up again with the device cap, restarting from the seed. If that
+    /// fails, the previous grid is set up again and `rebuildFellBack` is set. The renderer is kept.
+    func rebuildFields(configuration new: FluidConfiguration) { pendingRebuild = new }
+
+    private func applyRebuild(_ new: FluidConfiguration, context: RenderContext) throws {
+        pendingRebuild = nil
+        let previous = requested
+        releaseAll()
+        requested = new
+        do {
+            try setup(context)
+            rebuildFellBack = false
+        } catch {
+            requested = previous
+            rebuildFellBack = true
+            try setup(context)
+        }
+        resetRequested = false
+    }
+
     /// Runs exactly one step on the next frame while paused; ignored (and cleared) while running (FR-A02-501).
     func requestStep() { stepRequested = true }
 
@@ -213,6 +240,7 @@ final class FluidFieldsScene: RenderScene {
     }
 
     func render(_ context: RenderContext, frame: FrameInfo) throws {
+        if let pendingRebuild { try applyRebuild(pendingRebuild, context: context) }
         guard let velocity, let dye, let advect, let splat, let display else { return }
         do {
             if resetRequested { try applyReset(velocity: velocity, dye: dye) }
