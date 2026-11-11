@@ -46,7 +46,9 @@ public final class ResourceRegistry {
     /// Hook for caches (programs, pools) to drop GL names of the ending context.
     var willEndContext: () -> Void = {}
 
-    func warn(_ message: String) -> Bool { ledger.warn(message) }
+    /// Records a deduplicated warning in the ledger (shown in diagnostics); returns true when new.
+    @discardableResult
+    public func warn(_ message: String) -> Bool { ledger.warn(message) }
 
     // MARK: Textures, buffers, render targets (FR-F308, FR-F313)
 
