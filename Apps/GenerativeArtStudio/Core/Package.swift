@@ -14,6 +14,7 @@ let package = Package(
             .product(name: "VisualCoreParameters", package: "VisualCore"),
             .product(name: "VisualCoreSimulation", package: "VisualCore"),
             .product(name: "VisualCoreMath", package: "VisualCore"),
+            .product(name: "VisualCorePersistence", package: "VisualCore"),
         ]),
         .testTarget(name: "GenerativeArtStudioCoreTests", dependencies: ["GenerativeArtStudioCore"]),
     ],

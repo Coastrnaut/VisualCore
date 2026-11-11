@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Apps/GenerativeArtStudio/Core"
+  ],
+  "command": "swift test --package-path Apps/GenerativeArtStudio/Core",
+  "elapsed_seconds": 5.411,
+  "exit_code": 0,
+  "finished": "2026-11-11T04:24:16+00:00",
+  "log": ".autonomy/logs/A01-P03.t303-core-tests-a2.log",
+  "log_sha256": "56fc9537c693ebd28c56ab07d99cc44adfbdfde5c937f77b6870d2293be0b995",
+  "name": "t303-core-tests-a2",
+  "stage": "A01-P03",
+  "started": "2026-11-11T04:24:11+00:00",
+  "timed_out": false
+}

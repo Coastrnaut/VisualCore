@@ -32,7 +32,7 @@ regression; after each phase, `validate_docs.py`.
 
 ## Phase 2: US1 + US2 — Save, reopen and organize (P1) 🎯
 
-- [ ] T-A01-303 [US1] Implement `Apps/GenerativeArtStudio/Core/Sources/GenerativeArtStudioCore/CompositionLibrary.swift`:
+- [X] T-A01-303 [US1] Implement `Apps/GenerativeArtStudio/Core/Sources/GenerativeArtStudioCore/CompositionLibrary.swift`: — Verified 2026-11-10: Core CompositionLibrary.swift (LibraryEntry schema 1; CompositionLibrary over VisualCore DocumentStore kind dev.visualcore.gas.composition; ordering favorites→modified desc→name; normalizedName; save/update-in-place/recreate-if-deleted, duplicate, rename, setFavorite, delete, reload with problems; whole-second times so reloads compare equal); Core + app depend on VisualCorePersistence; run-check A01-P03/t303-core-tests-a2 22/22: 32 round trips incl. seed 2^64-1/0 and 4 families (SC-A01-301), ordering + persistence, update in place, duplicate independence, rename rules, delete and recreate, 2 bad files reported and byte-identical (SC-A01-304), fractional-second reload equality
   - `LibraryEntry` (schema 1);
   - `CompositionLibrary` over `DocumentStore<LibraryEntry>`, kind `dev.visualcore.gas.composition`;
   - ordering: favorites, then modified descending, then name;

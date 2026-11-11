@@ -152,6 +152,8 @@ targets:
         product: VisualCoreMath
       - package: VisualCore
         product: VisualCoreScenes
+      - package: VisualCore
+        product: VisualCorePersistence
       - package: VisualCoreRendering
         product: VisualCoreRendering
       - package: VisualCoreRendering
