@@ -50,3 +50,13 @@ Further checks:
   149/149 each).
 - The VisualCore host suite passes, including the baselines (`t104-visualcore-2`, `t105-visualcore`).
 - A01's `ParticleReplay` is unchanged (`t104-a01-core`).
+
+## A04-P01 rerun after `PlaybackState` (T-A04-115, 2026-11-11)
+
+Results after adding `PlaybackState` to VisualCoreSimulation:
+- `A04-P01/t115-reference-a`: 4/4 (with public-api; pin `d93edd1` unchanged).
+- `t115-reference-b`: 4/4.
+- The ProjectM regression is **7/7 pass** on the first attempt.
+- A01 (`t115-build-GenerativeArtStudio`) and A02 (`t115-build-FluidArtPlayground`) build for testing from clean
+  derived data.
+- The VisualCore host suite passes (`t115-visualcore`).

@@ -31,6 +31,8 @@ public struct FixedStepRunner<Simulation: FixedStepSimulation, Command> {
     public mutating func pause(); public mutating func resume()
     public mutating func mutate(_ body: (inout Simulation) -> Void)   // direct edits (e.g. live attractor drag)
 }
+// T-A04-115 (convergence): play/pause intent, background suspension, Reduce Motion start paused
+public struct PlaybackState { public init(reduceMotion: Bool, autoplay: Bool = true); public var isRunning: Bool; play(); pause(); toggle(); enterBackground(); enterForeground() }
 ```
 
 ## Guarantees

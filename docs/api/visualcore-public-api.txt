@@ -937,6 +937,8 @@ VisualCoreSimulation | func | public mutating func advance(frame dt: Double) -> 
 VisualCoreSimulation | func | public mutating func burst(_ count: Int, from index: Int = 0)
 VisualCoreSimulation | func | public mutating func clamp(_ delta: Double) -> Double
 VisualCoreSimulation | func | public mutating func double() -> Double
+VisualCoreSimulation | func | public mutating func enterBackground()
+VisualCoreSimulation | func | public mutating func enterForeground()
 VisualCoreSimulation | func | public mutating func float() -> Float
 VisualCoreSimulation | func | public mutating func int(_ r: ClosedRange<Int>) -> Int
 VisualCoreSimulation | func | public mutating func mutate(_ body: (inout Simulation) -> Void)
@@ -968,6 +970,7 @@ VisualCoreSimulation | init | public init(position: Vec2 = .zero, rate: Double =
 VisualCoreSimulation | init | public init(position: Vec2, size: Double, color: Vec4)
 VisualCoreSimulation | init | public init(reduceMotion: AccessibilityChoice = .system, reduceFlashing: AccessibilityChoice = .system)
 VisualCoreSimulation | init | public init(reduceMotion: Bool = false, dimFlashingLights: Bool = false)
+VisualCoreSimulation | init | public init(reduceMotion: Bool, autoplay: Bool = true)
 VisualCoreSimulation | init | public init(reduceMotion: Bool, reduceFlashing: Bool)
 VisualCoreSimulation | init | public init(seed: UInt64)
 VisualCoreSimulation | init | public init(simulation: Simulation, clock: FixedStepClock = FixedStepClock(), stream: ControlStream<Command> = ControlStream(),
@@ -1023,6 +1026,7 @@ VisualCoreSimulation | struct | public struct FixedStepClock: Sendable, Equatabl
 VisualCoreSimulation | struct | public struct FixedStepRunner<Simulation: FixedStepSimulation, Command>
 VisualCoreSimulation | struct | public struct ParticleInstance: Sendable, Equatable
 VisualCoreSimulation | struct | public struct ParticleSystem: Sendable
+VisualCoreSimulation | struct | public struct PlaybackState: Sendable, Equatable
 VisualCoreSimulation | struct | public struct SceneClock: Sendable, Equatable
 VisualCoreSimulation | struct | public struct SeededRandom: RandomNumberGenerator, Sendable, Equatable
 VisualCoreSimulation | struct | public struct SignedRangeEncoding: Sendable, Equatable
@@ -1041,6 +1045,7 @@ VisualCoreSimulation | var | public private(set) var droppedTime
 VisualCoreSimulation | var | public private(set) var entries: [Entry]
 VisualCoreSimulation | var | public private(set) var invalidCount
 VisualCoreSimulation | var | public private(set) var invalidDeltas
+VisualCoreSimulation | var | public private(set) var isInBackground
 VisualCoreSimulation | var | public private(set) var isPaused
 VisualCoreSimulation | var | public private(set) var isPlaying: Bool
 VisualCoreSimulation | var | public private(set) var nanRemoved
@@ -1051,6 +1056,7 @@ VisualCoreSimulation | var | public private(set) var stepIndex
 VisualCoreSimulation | var | public private(set) var time
 VisualCoreSimulation | var | public private(set) var time: Double
 VisualCoreSimulation | var | public private(set) var totalSteps
+VisualCoreSimulation | var | public private(set) var wantsToPlay: Bool
 VisualCoreSimulation | var | public var alpha: Double
 VisualCoreSimulation | var | public var autoreverses: Bool
 VisualCoreSimulation | var | public var burst: EmitterBurst?
@@ -1070,6 +1076,7 @@ VisualCoreSimulation | var | public var isEmitting
 VisualCoreSimulation | var | public var isFinished: Bool
 VisualCoreSimulation | var | public var isFinite: Bool
 VisualCoreSimulation | var | public var isPaused
+VisualCoreSimulation | var | public var isRunning: Bool
 VisualCoreSimulation | var | public var lifetime: ClosedRange<Double>
 VisualCoreSimulation | var | public var minValue: Float
 VisualCoreSimulation | var | public var mode: EasingMode

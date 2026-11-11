@@ -11,21 +11,23 @@ final class SceneModel {
     private(set) var family: EmitterFamily
     /// The scene seed; "New seed" moves to the next one deterministically.
     private(set) var seed: UInt64
-    /// Whether the scene advances on frames.
-    private(set) var isPlaying: Bool
+    /// Play/pause choice and background suspension (VisualCore `PlaybackState`, feature 033 T-A04-115).
+    private(set) var playback: PlaybackState
+    /// Whether the scene advances on frames now.
+    var isPlaying: Bool { playback.isRunning }
     /// The running simulation.
     private(set) var simulation: SceneSimulation
     /// Particles to draw, copied after each advance.
     private(set) var particles: [ParticleInstance] = []
 
     @ObservationIgnored private var lastFrame: Date?
-    @ObservationIgnored private var playingBeforeBackground = false
 
     /// Starts with `family` and `seed`; under Reduce Motion the scene starts paused (spec edge cases, CHK017).
     init(family: EmitterFamily = .fountain, seed: UInt64 = 1, reduceMotion: Bool) {
-        self.family = family; self.seed = seed; isPlaying = !reduceMotion
+        self.family = family; self.seed = seed
+        playback = PlaybackState(reduceMotion: reduceMotion)
         simulation = Self.makeSimulation(family, seed)
-        if reduceMotion { simulation.pause() }
+        syncSimulation()
     }
 
     private static func makeSimulation(_ family: EmitterFamily, _ seed: UInt64) -> SceneSimulation {
@@ -55,8 +57,13 @@ final class SceneModel {
 
     /// Plays or pauses; resuming never catches up the paused time.
     func setPlaying(_ playing: Bool) {
-        isPlaying = playing
-        if playing { simulation.resume() } else { simulation.pause() }
+        if playing { playback.play() } else { playback.pause() }
+        syncSimulation()
+    }
+
+    /// Mirrors `playback.isRunning` into the simulation; resuming discards accumulated time.
+    private func syncSimulation() {
+        if playback.isRunning { simulation.resume() } else { simulation.pause() }
         lastFrame = nil
     }
 
@@ -75,18 +82,18 @@ final class SceneModel {
 
     /// Background pauses; returning resumes only if the scene was playing.
     func enterBackground() {
-        playingBeforeBackground = isPlaying
-        setPlaying(false)
+        playback.enterBackground()
+        syncSimulation()
     }
 
     func enterForeground() {
-        if playingBeforeBackground { setPlaying(true) }
+        playback.enterForeground()
+        syncSimulation()
     }
 
     private func rebuild() {
         simulation = Self.makeSimulation(family, seed)
-        if !isPlaying { simulation.pause() }
         particles = []
-        lastFrame = nil
+        syncSimulation()
     }
 }

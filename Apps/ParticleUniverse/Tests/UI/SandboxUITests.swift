@@ -5,7 +5,7 @@ import XCTest
 final class SandboxUITests: XCTestCase {
     override func setUp() { continueAfterFailure = false }
 
-    private func openSandbox(_ extraArguments: [String] = []) -> XCUIApplication {
+    func openSandbox(_ extraArguments: [String] = []) -> XCUIApplication {
         let app = XCUIApplication()
         app.launchArguments += extraArguments
         app.launch()
@@ -17,7 +17,7 @@ final class SandboxUITests: XCTestCase {
     }
 
     /// (live, limit) from "Live particles: N of LIMIT".
-    private func counts(_ app: XCUIApplication) -> (Int, Int) {
+    func counts(_ app: XCUIApplication) -> (Int, Int) {
         let parts = app.staticTexts["pu.sandbox.live"].label.components(separatedBy: CharacterSet.decimalDigits.inverted)
             .filter { !$0.isEmpty }.compactMap(Int.init)
         XCTAssertEqual(parts.count, 2, app.staticTexts["pu.sandbox.live"].label)
@@ -70,5 +70,34 @@ final class SandboxUITests: XCTestCase {
         XCTAssertEqual(counts(app).0, 0, "a new seed restarts the scene")
         step.tap()
         XCTAssertGreaterThan(counts(app).0, 0)
+    }
+}
+
+extension SandboxUITests {
+    /// Feature 033 T-A04-115 (spec edge cases: background): a playing scene plays again after the background; a paused
+    /// scene stays paused.
+    func testBackgroundRoundTripKeepsThePersonsChoice() {
+        let app = openSandbox()
+        let play = app.buttons["pu.sandbox.play"]
+        XCUIDevice.shared.press(.home)
+        XCTAssertTrue(app.wait(for: .runningBackground, timeout: 10) || app.wait(for: .runningBackgroundSuspended, timeout: 10))
+        app.activate()
+        XCTAssertTrue(app.wait(for: .runningForeground, timeout: 10))
+        XCTAssertTrue(play.waitForExistence(timeout: 5))
+        XCTAssertEqual(play.label, "Pause", "still playing after the background")
+        let before = counts(app).0
+        Thread.sleep(forTimeInterval: 1)
+        XCTAssertNotEqual(counts(app).0, before, "the scene advances again")
+
+        play.tap()                                         // pause
+        XCTAssertEqual(play.label, "Play")
+        let paused = counts(app).0
+        XCUIDevice.shared.press(.home)
+        _ = app.wait(for: .runningBackgroundSuspended, timeout: 10)
+        app.activate()
+        XCTAssertTrue(app.wait(for: .runningForeground, timeout: 10))
+        XCTAssertEqual(play.label, "Play", "a paused scene stays paused")
+        Thread.sleep(forTimeInterval: 1)
+        XCTAssertEqual(counts(app).0, paused)
     }
 }
