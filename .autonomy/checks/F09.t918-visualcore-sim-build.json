@@ -1,0 +1,23 @@
+{
+  "argv": [
+    "xcodebuild",
+    "build",
+    "-scheme",
+    "VisualCore-Package",
+    "-destination",
+    "generic/platform=iOS Simulator",
+    "-derivedDataPath",
+    "Build/DerivedData/VisualCore-generic-sim",
+    "CODE_SIGNING_ALLOWED=NO"
+  ],
+  "command": "xcodebuild build -scheme VisualCore-Package -destination 'generic/platform=iOS Simulator' -derivedDataPath Build/DerivedData/VisualCore-generic-sim CODE_SIGNING_ALLOWED=NO",
+  "elapsed_seconds": 0.569,
+  "exit_code": 65,
+  "finished": "2026-11-11T03:02:56+00:00",
+  "log": ".autonomy/logs/F09.t918-visualcore-sim-build.log",
+  "log_sha256": "18cbd17169e4c1f9fdd27bda75ac6905cf0ed151574e7eae6031d07dc9df9c2b",
+  "name": "t918-visualcore-sim-build",
+  "stage": "F09",
+  "started": "2026-11-11T03:02:56+00:00",
+  "timed_out": false
+}

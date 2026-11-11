@@ -1,0 +1,24 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/VisualCore",
+    "--scheme",
+    "VisualCore-Package",
+    "--destination",
+    "generic-sim",
+    "--action",
+    "build"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCore --scheme VisualCore-Package --destination generic-sim --action build",
+  "elapsed_seconds": 4.963,
+  "exit_code": 0,
+  "finished": "2026-11-11T03:03:09+00:00",
+  "log": ".autonomy/logs/F09.t918-visualcore-sim-build-a2.log",
+  "log_sha256": "455247cab8715300bc544b125b15c7d65a320f74a092286fc9f96428bb88016d",
+  "name": "t918-visualcore-sim-build-a2",
+  "stage": "F09",
+  "started": "2026-11-11T03:03:04+00:00",
+  "timed_out": false
+}
