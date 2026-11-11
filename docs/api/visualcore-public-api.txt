@@ -368,11 +368,14 @@ VisualCorePersistence | func | public func delete(id: String) throws(StoreProble
 VisualCorePersistence | func | public func exists(id: String) -> Bool
 VisualCorePersistence | func | public func load() -> LoadReport<Value>
 VisualCorePersistence | func | public func load(id: String) throws(StoreProblem) -> StoredItem<Value>
+VisualCorePersistence | func | public func makeFileURL(prefix: String, extension ext: String) throws -> URL
 VisualCorePersistence | func | public func migrate(_ payload: [String: Any], from version: Int) throws -> [String: Any]
+VisualCorePersistence | func | public func removeAll() -> Int
 VisualCorePersistence | func | public func save(_ value: Value, id: String, now: Date = Date()) throws(StoreProblem)
 VisualCorePersistence | init | public init(currentVersion: Int, steps: [Int: Step] = [:])
 VisualCorePersistence | init | public init(directory: URL, kind: String, migrations: MigrationChain, maxBytes: Int = 256 * 1024)
 VisualCorePersistence | init | public init(kind: String, schemaVersion: Int, savedAt: Date)
+VisualCorePersistence | init | public init(name: String, base: URL = FileManager.default.temporaryDirectory)
 VisualCorePersistence | let | public let currentVersion: Int
 VisualCorePersistence | let | public let directory: URL
 VisualCorePersistence | let | public let id: String
@@ -384,6 +387,7 @@ VisualCorePersistence | let | public let migrations: MigrationChain
 VisualCorePersistence | let | public let problems: [StoreProblem]
 VisualCorePersistence | let | public let savedAt: Date
 VisualCorePersistence | let | public let schemaVersion: Int
+VisualCorePersistence | let | public let url: URL
 VisualCorePersistence | let | public let value: Value
 VisualCorePersistence | let | public static let version
 VisualCorePersistence | struct | public struct DocumentEnvelope: Sendable, Equatable
@@ -391,7 +395,9 @@ VisualCorePersistence | struct | public struct DocumentStore<Value: Codable & Se
 VisualCorePersistence | struct | public struct LoadReport<Value: Sendable>: Sendable
 VisualCorePersistence | struct | public struct MigrationChain: Sendable
 VisualCorePersistence | struct | public struct StoredItem<Value: Sendable>: Sendable
+VisualCorePersistence | struct | public struct TemporaryFolder: Sendable, Equatable
 VisualCorePersistence | typealias | public typealias Step = @Sendable ([String: Any]) throws -> [String: Any]
+VisualCorePersistence | var | public var fileCount: Int
 VisualCoreRendering | class | public final class ClearColorScene: RenderScene
 VisualCoreRendering | class | public final class FieldPass
 VisualCoreRendering | class | public final class FullScreenShaderScene: RenderScene

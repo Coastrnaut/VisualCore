@@ -1,0 +1,23 @@
+{
+  "argv": [
+    "python3",
+    "scripts/release_check.py",
+    "--only",
+    "public-api",
+    "dependencies",
+    "docs",
+    "compliance",
+    "--log-dir",
+    ".autonomy/logs/t601-checks"
+  ],
+  "command": "python3 scripts/release_check.py --only public-api dependencies docs compliance --log-dir .autonomy/logs/t601-checks",
+  "elapsed_seconds": 0.841,
+  "exit_code": 0,
+  "finished": "2026-11-11T11:14:46+00:00",
+  "log": ".autonomy/logs/A02-P06.t601-checks.log",
+  "log_sha256": "272ecbeabb1ff35186a60071bb063f7916b5e6668c80d4cea2adba93c096b0ca",
+  "name": "t601-checks",
+  "stage": "A02-P06",
+  "started": "2026-11-11T11:14:45+00:00",
+  "timed_out": false
+}

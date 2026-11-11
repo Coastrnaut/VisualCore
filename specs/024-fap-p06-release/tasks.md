@@ -21,7 +21,7 @@ IDs are `T-A02-6##`, with one commit per task (`scripts/tick_task.py`). Commands
 
 ## Phase 1: Foundational — VisualCore TemporaryFolder (blocks US3)
 
-- [ ] T-A02-601 Write `TemporaryFolderTests` first
+- [X] T-A02-601 Write `TemporaryFolderTests` first — Verified 2026-11-11: — Verified 2026-11-11: VisualCorePersistence.TemporaryFolder (strict folder names -> Temporary, makeFileURL unique sanitized names inside the folder, fileCount regular files, removeAll counts and ignores errors), documented, README and baseline (+6 lines); TemporaryFolderTests 6/6 in run-check A02-P06/t601-host-visualcore-2 (first run failed on a URL trailing-slash comparison in the test, fixed); t601-checks 4/4; ProjectM regression t601-reference-a 3/3 + t601-reference-b 4/4; A01 build-for-testing t601-a01-build succeeded
   (`Packages/VisualCore/Tests/VisualCorePersistenceTests/TemporaryFolderTests.swift`, at least 6 tests per the
   contract). Then add `Packages/VisualCore/Sources/VisualCorePersistence/TemporaryFolder.swift`:
   - `init(name:base:)`: "name is a single path component; empty, `.`, `..` or one containing `/` → `Temporary`";
