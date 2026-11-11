@@ -7,6 +7,7 @@
 #if DEBUG || VISUALCORE_AUTOMATION
 import FractalExplorerCore
 import Foundation
+import QuartzCore
 import SwiftUI
 import VisualCoreAutomation
 import VisualCoreMath
@@ -117,9 +118,110 @@ enum AppAutomation {
         if !verdict.pass { report.result = "fail"; report.message = verdict.reason }
     }
 
+    // MARK: tour (US2)
+
+    /// Share of 64 sample points (8 × 8) of a capture of `state` explained by the CPU reference (class match, or a CPU
+    /// class change within one capture pixel).
+    static func sampleAgreement(_ image: StillImage, state: FractalState) -> Double {
+        let size = state.viewport.size
+        func cpu(_ x: Int, _ y: Int) -> Bool {
+            let screen = Vec2((Double(x) + 0.5) / Double(image.width) * size.x, (Double(y) + 0.5) / Double(image.height) * size.y)
+            return state.escape(at: state.viewport.plane(fromScreen: screen)).interior
+        }
+        var explained = 0
+        for j in 0..<8 { for i in 0..<8 {
+            let x = (i * 2 + 1) * image.width / 16, y = (j * 2 + 1) * image.height / 16
+            let p = image.pixel(x: x, y: y)
+            let gpu = Int(p.x) <= 1 && Int(p.y) <= 1 && Int(p.z) <= 1
+            let c = cpu(x, y)
+            if gpu == c { explained += 1; continue }
+            var boundary = false
+            for dy in -1...1 { for dx in -1...1 where cpu(x + dx, y + dy) != c { boundary = true } }
+            if boundary { explained += 1 }
+        } }
+        return Double(explained) / 64
+    }
+
+    static func thermalName(_ t: ProcessInfo.ThermalState) -> String {
+        switch t {
+        case .nominal: "nominal"
+        case .fair: "fair"
+        case .serious: "serious"
+        case .critical: "critical"
+        @unknown default: "unknown"
+        }
+    }
+
+    /// The tour mode: every curated tour at 60 tour steps per second with a timed presented frame per step (capped per
+    /// tour by `frameCap` when VISUALCORE_AUTORUN_FRAMES is given), a still per stop at min(1024 px, the device limit)
+    /// checked at 64 points, thermal state and Low Power Mode at the start and end. No capture file is left.
+    static func tour(_ m: ExplorerModel, host: RenderHost, report: inout AutomationReport, frameCap: Int?) {
+        let ppp = scale(of: host), canvas = canvas(of: host)
+        m.mantissaBitsOverride = host.capabilities.fragmentMantissaBits()
+        m.pixelsPerPointOverride = ppp
+        m.state = FractalState(size: canvas)
+        let info = ProcessInfo.processInfo
+        var details = ["thermalStart": thermalName(info.thermalState), "lowPowerStart": "\(info.isLowPowerModeEnabled)"]
+        let capture = StillCapture(folder: StillCapture.folder(named: "AutomationCaptures"))
+        let aspect = ExportAspect(id: "canvas", title: "Canvas", width: Int(canvas.x.rounded()), height: Int(canvas.y.rounded()))
+        let size = aspect.map { ExportGeometry(maxEdge: host.maxRenderSize).size(longEdge: 1024, aspect: $0) }
+        var samples: [Double] = []
+        var failures = 0
+        var agreements: [Double] = []
+        for t in FractalTours.all {
+            let timeline = t.timeline(from: PlaneFraming(m.state.viewport), reduceMotion: false)
+            var steps = Int((timeline.duration * 60).rounded(.up))
+            if let frameCap { steps = min(steps, max(1, frameCap)) }
+            var captured = Set<Int>()
+            var perTour: [String] = []
+            func captureStop(_ index: Int) {
+                guard let size else { return }
+                m.apply(t.stops[index].framing.viewport(size: canvas))
+                var a = 0.0
+                if case .done = capture.capture(host: host, size: size, prefix: "Tour"), let image = capture.lastImage {
+                    a = sampleAgreement(image, state: m.state)
+                }
+                capture.removeFile()
+                agreements.append(a)
+                perTour.append("\(a)")
+                captured.insert(index)
+            }
+            for i in 0..<steps {
+                let s = timeline.state(at: Double(i) / 60)
+                m.apply(s.framing.viewport(size: canvas))
+                let start = CACurrentMediaTime()
+                if host.renderOneFrame(present: true) { samples.append((CACurrentMediaTime() - start) * 1000) } else { failures += 1 }
+                if s.phase != .flying, !captured.contains(s.stopIndex) { captureStop(s.stopIndex) }
+            }
+            for index in t.stops.indices where !captured.contains(index) { captureStop(index) }
+            details["agreement.\(t.id)"] = perTour.joined(separator: ", ")
+        }
+        details["thermalEnd"] = thermalName(info.thermalState)
+        details["lowPowerEnd"] = "\(info.isLowPowerModeEnabled)"
+        report.frames = samples.count
+        report.frameTimeMs = FrameTimeStats(samples: samples)
+        report.measurements = ["tours": Double(FractalTours.all.count), "stops": Double(agreements.count),
+                               "minStopAgreement": agreements.min() ?? 0, "captureLongEdge": Double(size?.longEdge ?? 0)]
+        report.details = details
+        let leftover = capture.folder.fileCount
+        if failures > 0 || leftover > 0 || agreements.contains(where: { $0 < 0.99 }) || size == nil {
+            report.result = "fail"
+            report.message = "frames failed: \(failures), files left: \(leftover), stops below 99%: \(agreements.filter { $0 < 0.99 }.count)"
+        }
+    }
+
     /// The app's own modes for VisualCore's AutomationView.
-    static func appModes(_ m: ExplorerModel) -> [String: @MainActor (RenderScene, RenderHost, inout AutomationReport, Int) -> Void] {
-        ["precision": { _, host, report, _ in precision(m, host: host, report: &report) }]
+    /// `tourFrameCap` defaults to VISUALCORE_AUTORUN_FRAMES when that is set (none otherwise).
+    static func appModes(_ m: ExplorerModel, tourFrameCap: Int? = defaultTourFrameCap())
+        -> [String: @MainActor (RenderScene, RenderHost, inout AutomationReport, Int) -> Void] {
+        let cap = tourFrameCap
+        return ["precision": { _, host, report, _ in precision(m, host: host, report: &report) },
+                "tour": { _, host, report, _ in tour(m, host: host, report: &report, frameCap: cap) }]
+    }
+
+    /// The frames-per-tour cap from the launch environment, if given.
+    static func defaultTourFrameCap() -> Int? {
+        ProcessInfo.processInfo.environment[AutomationRunner.framesKey] != nil ? AutomationRunner.requestedFrames() : nil
     }
 
     /// The full-screen run: AutomationView hosts the explorer's scene and runs the mode, then the check.

@@ -61,3 +61,36 @@ final class AutomationModeTests: XCTestCase {
         XCTAssertEqual(report.frames, 10)
     }
 }
+
+// Feature 030 T-A03-506 (FR-A03-503; US2): the tour mode with a frame cap (as VISUALCORE_AUTORUN_FRAMES would give).
+@MainActor
+final class TourModeTests: XCTestCase {
+    func testTourModeCapturesEveryStopAndLeavesNoFile() throws {
+        let model = AppAutomation.makeModel()
+        let host = try RenderHost(scene: model.scene)
+        defer { host.destroy() }
+        host.view.frame = CGRect(x: 0, y: 0, width: 390, height: 844)
+        host.view.layoutIfNeeded()
+        let dir = FileManager.default.temporaryDirectory.appendingPathComponent("fe-tour-mode-\(UUID().uuidString)")
+        defer { try? FileManager.default.removeItem(at: dir) }
+        var codes: [Int32] = []
+        let runner = AutomationRunner(host: host, bundleID: "dev.visualcore.FractalExplorer", outputDirectory: dir) { codes.append($0) }
+        runner.appModes = AppAutomation.appModes(model, tourFrameCap: 30)
+            .mapValues { mode in { host, report, frames in mode(model.scene, host, &report, frames) } }
+        let report = runner.run(mode: "tour")
+        XCTAssertEqual(report.result, "pass", report.message ?? "")
+        XCTAssertEqual(codes, [0])
+        XCTAssertEqual(report.frames, 90, "30 frames per tour")
+        XCTAssertNotNil(report.frameTimeMs)
+        let m = try XCTUnwrap(report.measurements)
+        XCTAssertEqual(m["tours"], 3)
+        XCTAssertEqual(m["stops"], 9, "every stop is captured even when the frames are capped")
+        XCTAssertGreaterThanOrEqual(m["minStopAgreement"] ?? 0, 0.99)
+        XCTAssertEqual(m["captureLongEdge"], 1024)
+        for key in ["thermalStart", "thermalEnd", "lowPowerStart", "lowPowerEnd", "agreement.seahorse", "agreement.elephant", "agreement.mini"] {
+            XCTAssertNotNil(report.details?[key], key)
+        }
+        XCTAssertEqual(StillCapture.folder(named: "AutomationCaptures").fileCount, 0)
+        print("tour rehearsal (simulator, not device evidence): \(m) \(report.frameTimeMs.map { "\($0)" } ?? "")")
+    }
+}
