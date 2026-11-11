@@ -35,7 +35,8 @@ description: "Task list for feature 025 — Fractal Explorer Phase 00 boundary a
 
   Each row cites only public non-test symbols and has an example consumer. Upstream-gap and adaptation rows cite the
   closest existing consumer. Run `check_app_contract.py --app fractal-explorer`; citation problems must be 0
-  (SC-A03-001, SC-A03-002).
+  (SC-A03-001, SC-A03-002). The checker renders the Markdown view only for a passing contract, so `--render` runs in
+  T-A03-006 (analyze U1).
 
 ## Phase 3: US2 — Host, thread, build and regression baseline (P1)
 
@@ -67,7 +68,9 @@ description: "Task list for feature 025 — Fractal Explorer Phase 00 boundary a
       relative, and an aspect change keeps the center.
     - G-FRACTAL: app-local, phase 1, with a CPU reference. Test: known interior and exterior points.
     - G-PRECISION: VisualCoreRendering query plus a VisualCoreMath advisor, phase 2. Test: the advisor's thresholds
-      are derived from the mantissa bits, and a simulator query returns the reported `highp` precision.
+      are derived from the mantissa bits, and a simulator query returns the reported `highp` precision. That simulator
+      value is recorded as context only; device precision is measured in campaign II before any claim (constitution
+      V; analyze C1).
     - G-COST: VisualCoreDiagnostics, phase 3. Test: the estimate is monotonic in pixels, iterations and samples.
     - G-TOUR: the viewport's log-zoom interpolation, phase 4.
   - `traceability` for v0.1 features 01–06 and journeys 1–3;
@@ -81,6 +84,12 @@ description: "Task list for feature 025 — Fractal Explorer Phase 00 boundary a
 - [ ] T-A03-007 Confirm that `git diff --stat 343d251..HEAD -- Packages External` is empty (SC-A03-006). Run the
   release-check fast steps (docs, app-contracts, compliance, dependencies, licenses, script-tests) and the
   documented-API check for `Apps/FractalExplorer`.
+
+## Analyze remediation (2026-11-11, applied under CLAUDE.md §2)
+
+- C1: simulator precision is context only.
+- U1: rendering happens in T-A03-006.
+- 0 critical issues.
 
 ## Dependencies
 
