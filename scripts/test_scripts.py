@@ -28,6 +28,7 @@ refinv = load("inventory_reference")
 baseline = load("run_reference_baseline")
 audit = load("audit_showcase_dependencies")
 docapi = load("check_documented_api")
+publicapi = load("check_public_api")
 try:
     deps = load("check_dependencies")
 except FileNotFoundError:
@@ -328,6 +329,48 @@ class DocumentedApiTests(unittest.TestCase):
         import contextlib, io
         with contextlib.redirect_stderr(io.StringIO()), contextlib.redirect_stdout(io.StringIO()):
             self.assertEqual(docapi.main(["--root", str(self.FIX), "--sources", "missing"]), 2)
+
+
+class PublicApiTests(unittest.TestCase):
+    """Feature 010 T-F901 (FR-F901, SC-F901)."""
+    FIX = HERE / "fixtures" / "public_api"
+
+    def run_check(self, root: Path, *extra: str) -> tuple[int, str]:
+        import contextlib, io
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(io.StringIO()):
+            code = publicapi.main(["--root", str(root), *extra])
+        return code, out.getvalue()
+
+    def test_undocumented_declaration_is_named(self):
+        with tempfile.TemporaryDirectory() as d:
+            import shutil
+            shutil.copytree(self.FIX / "Packages", Path(d) / "Packages")
+            code, out = self.run_check(Path(d), "--update")
+            self.assertEqual(code, 1)
+            self.assertIn("UNDOCUMENTED", out)
+            self.assertIn("undocumentedMethod", out)
+            self.assertEqual(out.count("UNDOCUMENTED"), 1, out)
+            self.assertIn("public declarations: 5", out)
+
+    def test_baseline_detects_surface_changes(self):
+        with tempfile.TemporaryDirectory() as d:
+            import shutil
+            shutil.copytree(self.FIX / "Packages", Path(d) / "Packages")
+            lib = Path(d) / "Packages/Lib/Sources/Lib/Lib.swift"
+            lib.write_text(lib.read_text().replace("    public func undocumentedMethod() {}\n", "    /// Now documented.\n    public func undocumentedMethod() {}\n"))
+            code, _ = self.run_check(Path(d), "--update")
+            self.assertEqual(code, 0)
+            code, out = self.run_check(Path(d))
+            self.assertEqual(code, 0, out)
+            lib.write_text(lib.read_text() + "\n/// Added later.\npublic func added() {}\n")
+            code, out = self.run_check(Path(d))
+            self.assertEqual(code, 1)
+            self.assertIn("ADDED   Lib | func | public func added()", out)
+
+    def test_missing_packages_is_usage_error(self):
+        with tempfile.TemporaryDirectory() as d:
+            self.assertEqual(self.run_check(Path(d))[0], 2)
 
 
 if __name__ == "__main__":

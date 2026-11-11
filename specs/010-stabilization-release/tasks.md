@@ -10,7 +10,7 @@ Release symbol check). IDs `T-F9##`. One commit + push per task.
 
 ## Phase 1: US1 — public API (P1) 🎯
 
-- [ ] T-F901 [US1] `scripts/check_public_api.py` (+ tests in `scripts/test_scripts.py` with fixtures `scripts/fixtures/public_api/`): documentation comment on every public declaration, surface vs `docs/api/visualcore-public-api.txt`, `--update`; first run reports the undocumented declarations
+- [X] T-F901 [US1] `scripts/check_public_api.py` (+ tests in `scripts/test_scripts.py` with fixtures `scripts/fixtures/public_api/`): documentation comment on every public declaration, surface vs `docs/api/visualcore-public-api.txt`, `--update`; first run reports the undocumented declarations — Verified 2026-11-10: F09.t901-public-api-tests: 35 script tests OK (undocumented method named, baseline added/removed detection, usage error); first real run: 618 public declarations, 458 undocumented (fixed in T-F902)
 - [ ] T-F902 [US1] Document every flagged public declaration in `Packages/*/Sources`, then generate and commit the baseline; check passes
 
 ## Phase 2: US4 — automation (P2)
