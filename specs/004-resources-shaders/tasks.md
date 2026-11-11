@@ -56,3 +56,8 @@ T-F302 ∥ T-F304 ∥ T-F306 ∥ T-F308 (separate test files).
 ## Implementation Strategy
 
 MVP = US1 (diagnostics from real ANGLE errors). Then registry, cache/uniforms, migrate samples.
+
+## Phase 7: Convergence
+
+- [ ] T-F320 Align `specs/004-resources-shaders/data-model.md` with code (`ExpandedShader.origins`, `defines` as emitted lines, `GPUHandle` without `id`, `SourceOrigin`) per plan: data-model (contradicts)
+- [ ] T-F321 Document `ShaderCacheKey`, render-target pool (`acquireTarget`/`recycle`), cache counters, `ResourceError`, `TextureFormat`, `GPUBuffer`/`RenderTarget` members in `contracts/resources-shaders-api.md` per plan: contracts (unrequested)
