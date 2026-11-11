@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/VisualCore",
+    "--filter",
+    "PrecisionSpacingTests"
+  ],
+  "command": "swift test --package-path Packages/VisualCore --filter PrecisionSpacingTests",
+  "elapsed_seconds": 2.298,
+  "exit_code": 0,
+  "finished": "2026-11-11T13:51:23+00:00",
+  "log": ".autonomy/logs/A03-P04.t403-host-visualcore-2.log",
+  "log_sha256": "bb2b66c49e9dd543a94a58f755bdc3b83e4245c201f58030c1ac0cc0364595de",
+  "name": "t403-host-visualcore-2",
+  "stage": "A03-P04",
+  "started": "2026-11-11T13:51:21+00:00",
+  "timed_out": false
+}
