@@ -13,6 +13,18 @@ invocation), plus the canonical override: pure graph validation lives in `Visual
 and GPU passes in `VisualCoreEffects`. Device performance measurement is deferred to campaign II;
 this phase records simulator functional evidence only.
 
+## Clarifications
+
+### Session 2026-11-10
+
+Answered autonomously under the owner's standing approval (CLAUDE.md §2), recommended option chosen.
+
+- Q: Where does the Reduce-Flashing limiter run? → A: As a built-in `flashLimit` pass type that graphs can include, and automatically as the final step of `EffectScene` when its `reduceFlashing` flag is on. Apps set the flag from their own setting, which defaults to on when the system Reduce Motion setting is on (there is no public Dim Flashing Lights API to read).
+- Q: How is "mean luminance" measured? → A: Rec. 709 luma of the sRGB-encoded output, averaged over a 16×16 downsampled grid. The GPU limiter keeps an adapted value and scales the frame toward it, so the displayed mean moves at most `limit × Δt` per frame.
+- Q: How are feedback histories stored? → A: One history target per feedback pass, at that pass's output size. It is cleared (to the current input) on first use, resize and context recreation.
+- Q: How are pass parameters encoded? → A: `params: [String: [Double]]` (scalars are 1-element arrays), JSON-codable. Each pass type documents its keys, defaults and clamping ranges; unknown keys are ignored with a warning.
+- Q: What happens downstream of a failed pass? → A: The failed pass outputs a copy of its first input, so downstream passes keep their inputs and the graph always produces a final image (SC-F404).
+
 ## User Scenarios & Testing *(mandatory)*
 
 Users: developers of effect-heavy apps (Effects Composer, Visual Programming Lab, Shader Studio,
@@ -80,7 +92,8 @@ simulator test that the GPU limiter pass bounds the change per frame.
 ### Functional Requirements
 
 - **FR-F401**: A graph description MUST list passes with id, type, named inputs (another pass output
-  or `scene`), one output, resolution scale (0 < s ≤ 1) and parameters; it MUST be versioned
+  or `scene`), one output, resolution scale (0 < s ≤ 1) and parameters (`[String: [Double]]`, documented
+  defaults and clamps, unknown keys warned); it MUST be versioned
   (version 1) and serializable.
 - **FR-F402**: Validation MUST reject unsupported version, more than 32 passes, duplicate ids or
   outputs, unknown types, missing inputs, cycles (naming the cycle), invalid scales, missing graph
@@ -89,6 +102,8 @@ simulator test that the GPU limiter pass bounds the change per frame.
   declaration order).
 - **FR-F404**: Memory estimation MUST sum width·scale × height·scale × bytes-per-pixel per distinct
   output plus feedback history buffers.
+- **FR-F412**: Each feedback pass MUST own one history target at its output size, cleared on first use,
+  resize and recreation.
 - **FR-F405**: Built-in passes MUST include copy, color matrix (4×4 + offset), separable Gaussian
   blur (radius 1–32), bloom/glow (threshold, intensity, radius), displacement distortion (strength,
   frequency, time), alpha composite (two inputs) and feedback (decay, previous-frame blend).
@@ -97,7 +112,8 @@ simulator test that the GPU limiter pass bounds the change per frame.
 - **FR-F407**: Intermediate targets MUST come from the registry's pool and be recycled after use within a frame.
 - **FR-F408**: A failing pass MUST degrade to pass-through (copy of its first input) and be reported
   once per graph build.
-- **FR-F409**: A Reduce-Flashing limiter MUST bound the change of displayed mean luminance per
+- **FR-F409**: A Reduce-Flashing limiter (pass type `flashLimit`, and the final step of `EffectScene` when
+  `reduceFlashing` is on), measuring Rec. 709 luma over a 16×16 grid, MUST bound the change of displayed mean luminance per
   second (default 0.3) using a host-testable model and a GPU pass that applies it.
 - **FR-F410**: An `EffectScene` MUST wrap any scene: render it into the `scene` target, run the
   graph, present the output, so the Showcase can use effects without ProjectM.
