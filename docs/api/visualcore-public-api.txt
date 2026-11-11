@@ -509,6 +509,7 @@ VisualCoreRendering | class | public final class FullScreenShaderScene: RenderSc
 VisualCoreRendering | class | public final class GPUBuffer: GPUResource
 VisualCoreRendering | class | public final class GradientQuadScene: RenderScene
 VisualCoreRendering | class | public final class MeshRenderer
+VisualCoreRendering | class | public final class ParticleLayerScene: RenderScene
 VisualCoreRendering | class | public final class ParticleRenderer
 VisualCoreRendering | class | public final class PingPongTarget
 VisualCoreRendering | class | public final class PrimitiveRenderer
@@ -590,11 +591,16 @@ VisualCoreRendering | func | public nonisolated static func == (a: RenderContext
 VisualCoreRendering | func | public nonisolated static func folder(named name: String) -> TemporaryFolder
 VisualCoreRendering | func | public nonisolated static func message(for error: OffscreenRenderError) -> String
 VisualCoreRendering | func | public static func detect(in registry: ResourceRegistry) -> FloatRenderSupport
+VisualCoreRendering | func | public static func fit(world: WorldRect, viewSize: Vec2) -> (camera: Camera2D, metrics: ViewMetrics)?
 VisualCoreRendering | func | public static func pngData(_ image: StillImage) throws(OffscreenRenderError) -> Data
 VisualCoreRendering | func | public static func resetForVisualCore(framebuffer: UInt32, width: Int, height: Int)
+VisualCoreRendering | func | public static func square(halfExtent: Double) -> WorldRect
+VisualCoreRendering | func | public static func viewPoint(_ worldPoint: Vec2, viewSize: Vec2, world: WorldRect) -> Vec2?
+VisualCoreRendering | func | public static func worldPoint(_ viewPoint: Vec2, viewSize: Vec2, world: WorldRect) -> Vec2?
 VisualCoreRendering | init | public convenience init(bundle: Bundle, subdirectory: String? = "Shaders")
 VisualCoreRendering | init | public convenience init(fragmentName: String, bundle: ShaderBundle)
 VisualCoreRendering | init | public init()
+VisualCoreRendering | init | public init(center: Vec2, size: Vec2)
 VisualCoreRendering | init | public init(extensionReported: Bool, probeComplete: Bool)
 VisualCoreRendering | init | public init(files: [String: String])
 VisualCoreRendering | init | public init(folder: TemporaryFolder)
@@ -606,6 +612,7 @@ VisualCoreRendering | init | public init(registry: ResourceRegistry) throws
 VisualCoreRendering | init | public init(registry: ResourceRegistry, fragment: String, inputs: [String], label: String,
 VisualCoreRendering | init | public init(registry: ResourceRegistry, width: Int, height: Int, format: TextureFormat, label: String) throws
 VisualCoreRendering | init | public init(scene: RenderScene, maxFramesPerSecond: Int = 60, budget: ResourceBudget = ResourceBudget()) throws
+VisualCoreRendering | init | public init(world: WorldRect, background: Vec4 = Vec4(0, 0, 0, 1), source: @escaping @MainActor (FrameInfo) -> [ParticleInstance])
 VisualCoreRendering | init | public init?(width: Int, height: Int, bottomUpRGBA: [UInt8])
 VisualCoreRendering | init | public init?(width: Int, height: Int, topDownRGBA rgba: [UInt8])
 VisualCoreRendering | let | public let bytes: Int
@@ -666,6 +673,7 @@ VisualCoreRendering | struct | public struct ShaderPrecision: Sendable, Equatabl
 VisualCoreRendering | struct | public struct Size: Sendable, Equatable, Codable
 VisualCoreRendering | struct | public struct StillImage: Sendable, Equatable
 VisualCoreRendering | struct | public struct Uniform: Sendable, Equatable
+VisualCoreRendering | struct | public struct WorldRect: Sendable, Equatable
 VisualCoreRendering | var | @MainActor public static var runObserver: ((Run) -> Void)?
 VisualCoreRendering | var | public internal(set) static var lastFailureLog
 VisualCoreRendering | var | public internal(set) var maxTextureSize
@@ -675,6 +683,7 @@ VisualCoreRendering | var | public private(set) var compileCount
 VisualCoreRendering | var | public private(set) var errorMessage: String?
 VisualCoreRendering | var | public private(set) var generation: Int
 VisualCoreRendering | var | public private(set) var lastError: RenderHostError?
+VisualCoreRendering | var | public private(set) var lastError: String?
 VisualCoreRendering | var | public private(set) var lastImage: StillImage?
 VisualCoreRendering | var | public private(set) var lastInstanceCount
 VisualCoreRendering | var | public private(set) var lastTriangleCount
@@ -686,10 +695,12 @@ VisualCoreRendering | var | public private(set) var state
 VisualCoreRendering | var | public private(set) var swapCount
 VisualCoreRendering | var | public private(set) var write: RenderTarget
 VisualCoreRendering | var | public var ambient
+VisualCoreRendering | var | public var background: Vec4
 VisualCoreRendering | var | public var budget: ResourceBudget
 VisualCoreRendering | var | public var bytes: Int
 VisualCoreRendering | var | public var bytesPerPixel: Int
 VisualCoreRendering | var | public var cachedProgramCount: Int
+VisualCoreRendering | var | public var center: Vec2
 VisualCoreRendering | var | public var eglVendor
 VisualCoreRendering | var | public var extensions: [String]
 VisualCoreRendering | var | public var fixedTime: Double?
@@ -720,6 +731,7 @@ VisualCoreRendering | var | public var rejectedTransitions: Int
 VisualCoreRendering | var | public var renderer
 VisualCoreRendering | var | public var reportsColorBufferHalfFloat: Bool
 VisualCoreRendering | var | public var seedOffsets: SIMD4<Float>
+VisualCoreRendering | var | public var size: Vec2
 VisualCoreRendering | var | public var state: RenderLifecycleState
 VisualCoreRendering | var | public var stats: ResourceLedger.Snapshot
 VisualCoreRendering | var | public var supported: Bool
@@ -727,6 +739,7 @@ VisualCoreRendering | var | public var timeScale: Double
 VisualCoreRendering | var | public var vendor
 VisualCoreRendering | var | public var view: UIView
 VisualCoreRendering | var | public var width: Int
+VisualCoreRendering | var | public var world: WorldRect
 VisualCoreScenes | class | public final class SceneNode
 VisualCoreScenes | enum | public enum GestureState: String, Sendable, Equatable
 VisualCoreScenes | enum | public enum PointerPhase: String, Sendable, Codable

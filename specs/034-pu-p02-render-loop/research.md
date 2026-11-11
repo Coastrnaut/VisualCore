@@ -77,8 +77,9 @@ Floating-point: the falloff factor is in [0, 1] and the unit vector has length �
 - **Decision:** `ParticleLayerScene(world: WorldRect, background: Vec4, source: @MainActor (FrameInfo) -> [ParticleInstance])`.
   `WorldRect` is center + size. For a drawable of `w × h` pixels, `camera(forPixelWidth:height:)` returns
   `Camera2D(center: world.center, zoom: min(w/W, h/H))` used with `ViewMetrics(size: (w, h), scale: 1)` — aspect fit, y
-  up. A static `fitCamera(world:viewSize:)` is public so the app maps tap points with `ViewMetrics.toWorld` using the
-  same math. Errors from the renderer's creation are kept in `lastError` and rethrown from `render` so the host
+  up. Public static `fit(world:viewSize:)`, `worldPoint` and `viewPoint` let the app map tap points with the same math.
+  Implementation note (T-A04-212): the fit scale is carried by `ViewMetrics` (camera zoom 1), because
+  `Camera2D.zoom` is clamped to 0.1…100 and a 1,000-unit world in a small view would need less. Errors from the renderer's creation are kept in `lastError` and rethrown from `render` so the host
   reports them (`RenderHostError.scene`).
 - **Rationale:** reusable by A09 (aquarium) and A19 (wallpapers); the app writes no GL.
 
@@ -95,7 +96,7 @@ Floating-point: the falloff factor is in [0, 1] and the unit vector has length �
 ## R8. Placement input
 
 - **Decision:** a transparent SwiftUI overlay with `DragGesture(minimumDistance: 0)` over the square stage: first
-  touch places (or moves) the force, changes move it. Points map to world through `ParticleLayerScene.fitCamera` and
+  touch places (or moves) the force, changes move it. Points map to world through `ParticleLayerScene.worldPoint` and
   `ViewMetrics.toWorld`, then clamp to the world square −500…500. Controls: kind menu, Center, four 50-unit nudges,
   strength slider 0.1…2. Wind's direction is from the world center toward the force position; at the exact center it
   blows toward +x.

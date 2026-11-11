@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_test_enumeration.py",
+    "--sources",
+    "Packages/VisualCoreRendering/Tests",
+    "--log",
+    ".autonomy/logs/A04-P02.t212-rendering-ios26.log"
+  ],
+  "command": "python3 scripts/check_test_enumeration.py --sources Packages/VisualCoreRendering/Tests --log .autonomy/logs/A04-P02.t212-rendering-ios26.log",
+  "elapsed_seconds": 0.025,
+  "exit_code": 0,
+  "finished": "2026-11-11T23:31:42+00:00",
+  "log": ".autonomy/logs/A04-P02.t212-enum-ios26.log",
+  "log_sha256": "c70a0bf20bcc361caccd657598d81a5b4d6bade80d5bb42b56b2cda3d14bfe4f",
+  "name": "t212-enum-ios26",
+  "stage": "A04-P02",
+  "started": "2026-11-11T23:31:42+00:00",
+  "timed_out": false
+}

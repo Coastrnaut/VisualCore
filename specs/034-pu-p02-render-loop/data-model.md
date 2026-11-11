@@ -45,7 +45,8 @@ nominal`.
 | `struct WorldRect { center: Vec2; size: Vec2 }` | world area that must stay visible (aspect fit) |
 | `init(world:background:source:)` | `source: @MainActor (FrameInfo) -> [ParticleInstance]` |
 | `var world`, `var background` | settable between frames |
-| `static func fitCamera(world:viewSize:) -> Camera2D` | aspect-fit camera for a view size (points or pixels) |
+| `static func fit(world:viewSize:) -> (camera: Camera2D, metrics: ViewMetrics)?` | aspect fit for a view size (points or pixels); the camera keeps zoom 1 and the metrics carry the fit scale, so `Camera2D.zoomRange` never limits it (T-A04-212) |
+| `static func worldPoint(_:viewSize:world:)`, `viewPoint(_:viewSize:world:)` | tap mapping and projection with the same fit |
 | `lastInstanceCount`, `lastError` | diagnostics for the app and tests |
 
 Lifecycle: `setup` creates a `ParticleRenderer`; `render` clears to `background`, calls `source(frame)`, draws;
