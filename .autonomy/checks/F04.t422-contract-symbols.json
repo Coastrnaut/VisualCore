@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "sh",
+    "/private/tmp/claude-501/-Users-coast--claude-spares-spare-cfXtKj/51106fd1-e87b-442d-aa28-d54231dd3fe4/scratchpad/contract_check.sh",
+    "/Users/coast/Documents/GIT/VisualCore"
+  ],
+  "command": "sh /private/tmp/claude-501/-Users-coast--claude-spares-spare-cfXtKj/51106fd1-e87b-442d-aa28-d54231dd3fe4/scratchpad/contract_check.sh /Users/coast/Documents/GIT/VisualCore",
+  "elapsed_seconds": 0.067,
+  "exit_code": 0,
+  "finished": "2026-11-11T00:30:28+00:00",
+  "log": ".autonomy/logs/F04.t422-contract-symbols.log",
+  "log_sha256": "7d1c9d3e720eb29b84f17cabfac062fc5d663be3dcc427978aff690c2db7cc79",
+  "name": "t422-contract-symbols",
+  "stage": "F04",
+  "started": "2026-11-11T00:30:28+00:00",
+  "timed_out": false
+}
