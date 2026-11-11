@@ -122,7 +122,7 @@ contains additions only.
   - M04 and M05 rows updated with the new evidence.
 
   Render it and run `check_app_contract --render`.
-- [ ] T-A02-215 Run the release fast steps, the documented-API and isolation checks and the host domain tests through
+- [X] T-A02-215 Run the release fast steps, the documented-API and isolation checks and the host domain tests through — Verified 2026-11-11: run-check A02-P02/t215-release-fast 14/14 (docs, app-contracts, compliance, dependencies, public-api, licenses, script-tests, host-visualcore, documented-api/isolation/host-core for fluid-art-playground and generative-art-studio); ProjectM regression rerun after the later VisualCore changes t215-reference-a 3/3 + t215-reference-b 4/4; A01 GenerativeArtStudio build-for-testing succeeds against the changed packages (t215-gas-build-2; the first attempt failed on stale DerivedData). Lessons added to docs/testing/simulator-test-lessons.md (SC-A02-206)
   `release_check.py --only …` (SC-A02-206), and add any new lessons to `docs/testing/simulator-test-lessons.md`.
 
 ## Analyze remediation (2026-11-11)

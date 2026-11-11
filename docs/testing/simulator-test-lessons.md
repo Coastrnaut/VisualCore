@@ -46,3 +46,18 @@ speaks and what the screen shows, not exact values. Sheets at a medium detent wi
   `StoragePrecision.float16` and `.float16TowardZero` references and record which mode matched; never loosen the
   tolerance instead.
 - **`run-check` never overwrites.** Rerun under a new attempt name (`-2`, `-3`). Failed attempts stay as evidence.
+
+## Feature 020 (A02-P02)
+
+- **Validated configurations can change what a fixture runs.** A configuration clamp (a minimum grid edge of 16)
+  silently turned "8×8" fixtures into 16×16 ones. Assert the size actually built (`scene.dye?.width`), not just the
+  size requested, and print the real value in fixture logs.
+- **iOS 26 content swipe-back.** A navigation stack pops on a horizontal swipe anywhere in the content. Canvas
+  screens with drag gestures apply `VisualCoreUI.contentSwipeBackDisabled()`. UI tests should include a horizontal
+  drag and then assert that the screen is still present. The iOS 26.5 runtime showed the bug; iOS 27.2 did not.
+- **Exactly storable zero.** In 8-bit storage, a signed encoding centered at 0.5 is not storable, so a field at rest
+  drifts. Use `SignedRangeEncoding.unorm8(range:)`.
+- **Swift 6 UI tests.** `expectation(for:evaluatedWith:)` plus `waitForExpectations` does not compile under strict
+  concurrency in a UI test class. Poll the element's label with a short run loop instead.
+- **Other apps' DerivedData goes stale after VisualCore API changes.** Clear `Build/DerivedData/<App>` before
+  rebuilding each consumer.

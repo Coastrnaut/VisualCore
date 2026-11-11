@@ -62,3 +62,8 @@ The API baseline diff contains additions, plus one source-compatible signature c
 | reference-test-anglerendering-ios27/ios26, projectm-reference-ios27/ios26 | `A02-P02/t205-reference-b` | 4/4 pass (ANGLERendering 14/14 and ProjectMReference 17/17 on both runtimes) |
 
 **7/7 steps pass**, unchanged.
+
+### Rerun after `SignedRangeEncoding.center` and `contentSwipeBackDisabled` (2026-11-11, T-A02-215)
+
+`A02-P02/t215-reference-a` 3/3 and `t215-reference-b` 4/4: **7/7 pass**, unchanged. A01 Generative Art Studio also
+builds against the changed packages (`t215-gas-build-2`, after clearing its stale DerivedData).
