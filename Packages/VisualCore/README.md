@@ -8,7 +8,7 @@ iOS 26+ inside apps. The package map and dependency rules R1–R5 are in
 |---|---|
 | VisualCoreMath | vectors, matrices, quaternions, cameras, easing |
 | VisualCoreSimulation | fixed-step clock, seeded RNG, timelines, particle pool, NaN guard |
-| VisualCoreScenes | input mapping, pointer tracking, mesh generators |
+| VisualCoreScenes | input mapping, pointer tracking, mesh generators, export geometry |
 | VisualCoreShaderSource | shader library, includes, line maps, diagnostics parsing |
 | VisualCoreEffectsGraph | effect DAG model, validation, quotas, flash-limiter model |
 | VisualCoreDiagnostics | render lifecycle state machine, frame statistics, reports |
@@ -111,4 +111,16 @@ clock.
   never modified, moved or deleted.
 - **Migrations**: `MigrationChain(currentVersion:steps:)` upgrades older payloads (JSON objects) step by step on
   load. The file is rewritten only by a later save. Newer versions are rejected.
+
+## Export geometry (feature 015, A01-P04)
+
+`ExportGeometry(maxEdge:maxPixels:)` turns a requested long edge and an `ExportAspect` (built-ins `square` 1:1,
+`portrait` 4:5, `landscape` 16:9, `story` 9:16, or any positive ratio) into an even `ExportSize`:
+
+- long edge = min(requested, `maxEdge`, 8192);
+- short edge = the ratio's share of the long edge, rounded to an even number (1080 at 4:5 → 864 × 1080; at 16:9 →
+  1080 × 608);
+- the long edge shrinks in steps of 2 until width × height ≤ `maxPixels` (default 64 million).
+
+Pass `RenderHost.maxRenderSize` as `maxEdge` to stay within the device's renderer limits.
 

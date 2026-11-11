@@ -55,7 +55,7 @@ IDs are `T-A01-4##`, with one commit and push per task (`scripts/tick_task.py`).
   - `maxRenderSize` ≥ 4096.
 
   Run on iOS 27.2 and 26.5.
-- [ ] T-A01-403 [US3] Update the docs:
+- [X] T-A01-403 [US3] Update the docs: — Verified 2026-11-10: API baseline 838 declarations (+38: ExportAspect/ExportSize/ExportGeometry, StillImage, OffscreenRenderError, StillImageEncoder, RenderHost.maxRenderSize/maxOffscreenPixels/renderOffscreen, RenderCapabilities.maxRenderbufferSize), 0 undocumented; VisualCore README 'Export geometry', VisualCoreRendering README 'Offscreen still export', package map rows (Scenes, Rendering), support-matrix row (A01-P04), known-limitations built note, getting-started module table; run-check A01-P04/t403-deps-api-host 5/5 (docs, dependencies R1-R5, public-api, compliance, host-visualcore); t403-reference-a 3/3 + t403-reference-b 4/4 = reference regression 7/7 (FR-A01-408, SC-A01-405)
   - API baseline (`check_public_api.py --update`);
   - `Packages/VisualCoreRendering/README.md` "Offscreen still export";
   - the VisualCoreScenes README section;

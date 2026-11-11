@@ -163,3 +163,22 @@ the label and the formatted value as the value, and increment/decrement move by 
 `vc.param.<name>`, `vc.param.<name>.reset` and `vc.param.resetAll`. `ParameterPanelModel.rows(_:)` exposes the same
 content for tests.
 
+## Offscreen still export (feature 015, A01-P04)
+
+`host.renderOffscreen(width:height:time:)` renders the host's current scene at any size on the host's own context
+(no second context) and returns a `StillImage`: RGBA8, rows top-down. The scene gets a `RenderContext` redirected to
+a registry render target, with `FrameInfo.time` = `time` and `delta` 0. Afterwards the target is released and the
+scene is resized back to the live surface, also when the export fails. A failure throws `OffscreenRenderError`
+(`.unavailable`, `.invalidSize`, `.resource`, `.scene`, `.readback`) and never marks the live scene failed.
+
+- `host.maxRenderSize` is the smallest of the max texture, renderbuffer and viewport sizes. Sizes above it, or above
+  64 million pixels (`RenderHost.maxOffscreenPixels`), are refused before any GPU work.
+- `StillImageEncoder.pngData(_:)` writes an opaque PNG tagged sRGB (alpha is dropped).
+- Scenes that size content in points (for example particles) should scale it for the export's pixel size; shader
+  scenes that use `u_resolution` need nothing.
+
+```swift
+let size = ExportGeometry(maxEdge: host.maxRenderSize).size(longEdge: 2048, aspect: .portrait)   // 1638 × 2048
+let png = try StillImageEncoder.pngData(host.renderOffscreen(width: size.width, height: size.height, time: 4.0))
+```
+

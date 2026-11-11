@@ -1,0 +1,26 @@
+{
+  "argv": [
+    "python3",
+    "scripts/release_check.py",
+    "--log-dir",
+    ".autonomy/logs/a01p04-t403-fast",
+    "--json",
+    ".autonomy/logs/a01p04-t403-fast/summary.json",
+    "--only",
+    "docs",
+    "dependencies",
+    "public-api",
+    "compliance",
+    "host-visualcore"
+  ],
+  "command": "python3 scripts/release_check.py --log-dir .autonomy/logs/a01p04-t403-fast --json .autonomy/logs/a01p04-t403-fast/summary.json --only docs dependencies public-api compliance host-visualcore",
+  "elapsed_seconds": 6.522,
+  "exit_code": 0,
+  "finished": "2026-11-11T04:49:31+00:00",
+  "log": ".autonomy/logs/A01-P04.t403-deps-api-host.log",
+  "log_sha256": "e08719f164a45f926d24c9f08a8befa46d7c440890b959a8a6ca4d134ec6148b",
+  "name": "t403-deps-api-host",
+  "stage": "A01-P04",
+  "started": "2026-11-11T04:49:25+00:00",
+  "timed_out": false
+}

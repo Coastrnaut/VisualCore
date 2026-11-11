@@ -382,10 +382,12 @@ VisualCoreRendering | class | public final class ShaderBundle: Sendable
 VisualCoreRendering | class | public final class ShaderProgram
 VisualCoreRendering | class | public final class Texture: GPUResource
 VisualCoreRendering | enum | public enum GLState
+VisualCoreRendering | enum | public enum OffscreenRenderError: Error, Equatable, Sendable
 VisualCoreRendering | enum | public enum RenderHostError: Error, Equatable, Sendable
 VisualCoreRendering | enum | public enum RenderingInfo
 VisualCoreRendering | enum | public enum ResourceError: Error, Equatable, Sendable
 VisualCoreRendering | enum | public enum ShaderError: Error, Equatable, Sendable
+VisualCoreRendering | enum | public enum StillImageEncoder
 VisualCoreRendering | enum | public enum TextureFormat: Sendable, Equatable
 VisualCoreRendering | func | public func acquireTarget(width: Int, height: Int, format: TextureFormat = .rgba8) throws -> RenderTarget
 VisualCoreRendering | func | public func addErrorObserver(_ observer: @escaping @MainActor (RenderHostError) -> Void)
@@ -402,6 +404,7 @@ VisualCoreRendering | func | public func makeBuffer(bytes: Int, label: String) t
 VisualCoreRendering | func | public func makeRenderTarget(width: Int, height: Int, format: TextureFormat = .rgba8, label: String) throws -> RenderTarget
 VisualCoreRendering | func | public func makeTexture(width: Int, height: Int, format: TextureFormat = .rgba8, label: String) throws -> Texture
 VisualCoreRendering | func | public func pause()
+VisualCoreRendering | func | public func pixel(x: Int, y: Int) -> SIMD4<UInt8>
 VisualCoreRendering | func | public func program(vertex: String, fragment: String, defines: [String: String] = [:],
 VisualCoreRendering | func | public func readPixels() -> [UInt8]
 VisualCoreRendering | func | public func recreateContext()
@@ -411,6 +414,7 @@ VisualCoreRendering | func | public func release()
 VisualCoreRendering | func | public func release(_ program: ShaderProgram)
 VisualCoreRendering | func | public func release(_ resource: some GPUResource)
 VisualCoreRendering | func | public func render(_ context: RenderContext, frame: FrameInfo) throws
+VisualCoreRendering | func | public func renderOffscreen(width: Int, height: Int, time: Double) throws(OffscreenRenderError) -> StillImage
 VisualCoreRendering | func | public func renderOneFrame(present: Bool = true) -> Bool
 VisualCoreRendering | func | public func replaceScene(_ newScene: RenderScene)
 VisualCoreRendering | func | public func resize(_ context: RenderContext)
@@ -432,6 +436,7 @@ VisualCoreRendering | func | public func upload(rgba pixels: [UInt8]) -> Bool
 VisualCoreRendering | func | public func use()
 VisualCoreRendering | func | public func warn(_ message: String) -> Bool
 VisualCoreRendering | func | public nonisolated static func == (a: RenderContext, b: RenderContext) -> Bool
+VisualCoreRendering | func | public static func pngData(_ image: StillImage) throws(OffscreenRenderError) -> Data
 VisualCoreRendering | func | public static func resetForVisualCore(framebuffer: UInt32, width: Int, height: Int)
 VisualCoreRendering | init | public convenience init(bundle: Bundle, subdirectory: String? = "Shaders")
 VisualCoreRendering | init | public convenience init(fragmentName: String, bundle: ShaderBundle)
@@ -442,6 +447,8 @@ VisualCoreRendering | init | public init(mesh: Mesh, registry: ResourceRegistry)
 VisualCoreRendering | init | public init(red: Float = 0, green: Float = 0, blue: Float = 0)
 VisualCoreRendering | init | public init(registry: ResourceRegistry) throws
 VisualCoreRendering | init | public init(scene: RenderScene, maxFramesPerSecond: Int = 60, budget: ResourceBudget = ResourceBudget()) throws
+VisualCoreRendering | init | public init?(width: Int, height: Int, bottomUpRGBA: [UInt8])
+VisualCoreRendering | init | public init?(width: Int, height: Int, topDownRGBA rgba: [UInt8])
 VisualCoreRendering | let | public let bytes: Int
 VisualCoreRendering | let | public let cacheKey: String
 VisualCoreRendering | let | public let colorTexture: GLuint
@@ -450,6 +457,7 @@ VisualCoreRendering | let | public let format: TextureFormat
 VisualCoreRendering | let | public let framebuffer: UInt32
 VisualCoreRendering | let | public let generation: Int
 VisualCoreRendering | let | public let handle: GPUHandle
+VisualCoreRendering | let | public let height: Int
 VisualCoreRendering | let | public let index: Int
 VisualCoreRendering | let | public let kind: ResourceKind
 VisualCoreRendering | let | public let label: String
@@ -461,15 +469,18 @@ VisualCoreRendering | let | public let name: UInt32
 VisualCoreRendering | let | public let pixelHeight: Int
 VisualCoreRendering | let | public let pixelWidth: Int
 VisualCoreRendering | let | public let resources: ResourceRegistry
+VisualCoreRendering | let | public let rgba: [UInt8]
 VisualCoreRendering | let | public let size: GLint
 VisualCoreRendering | let | public let targetTimestamp: Double
 VisualCoreRendering | let | public let time: Double
 VisualCoreRendering | let | public let type: GLenum
 VisualCoreRendering | let | public let uniforms: [String: Uniform]
+VisualCoreRendering | let | public let width: Int
 VisualCoreRendering | let | public let width: Int, height: Int
 VisualCoreRendering | let | public static let extensions: Set<String>
 VisualCoreRendering | let | public static let maxCachedPrograms
 VisualCoreRendering | let | public static let maxCircleSegments
+VisualCoreRendering | let | public static let maxOffscreenPixels
 VisualCoreRendering | let | public static let maxPaletteStops
 VisualCoreRendering | let | public static let minCircleSegments
 VisualCoreRendering | let | public static let version
@@ -482,6 +493,7 @@ VisualCoreRendering | struct | public struct GPUHandle: Sendable, Equatable
 VisualCoreRendering | struct | public struct RenderCapabilities: Sendable, Equatable, Codable
 VisualCoreRendering | struct | public struct RenderContext: Equatable
 VisualCoreRendering | struct | public struct Size: Sendable, Equatable, Codable
+VisualCoreRendering | struct | public struct StillImage: Sendable, Equatable
 VisualCoreRendering | struct | public struct Uniform: Sendable, Equatable
 VisualCoreRendering | var | public internal(set) static var lastFailureLog
 VisualCoreRendering | var | public private(set) var cacheHits
@@ -509,6 +521,8 @@ VisualCoreRendering | var | public var glslVersion
 VisualCoreRendering | var | public var height: Int
 VisualCoreRendering | var | public var lifecycleHistory: [RenderLifecycleEvent]
 VisualCoreRendering | var | public var lightDirection
+VisualCoreRendering | var | public var maxRenderSize: Int
+VisualCoreRendering | var | public var maxRenderbufferSize
 VisualCoreRendering | var | public var maxTextureSize
 VisualCoreRendering | var | public var maxViewport
 VisualCoreRendering | var | public var names: [String]
@@ -531,6 +545,7 @@ VisualCoreScenes | enum | public enum PointerPhase: String, Sendable, Codable
 VisualCoreScenes | enum | public enum Primitive: Sendable, Equatable
 VisualCoreScenes | enum | public enum ScenesInfo
 VisualCoreScenes | func | public func add(_ child: SceneNode)
+VisualCoreScenes | func | public func clampedLongEdge(_ longEdge: Int) -> Int
 VisualCoreScenes | func | public func contains(_ p: Vec2) -> Bool
 VisualCoreScenes | func | public func drawList(parentTransform: Mat3 = .identity) -> [(node: SceneNode, world: Mat3)]
 VisualCoreScenes | func | public func fromCamera(_ c: Vec2) -> Vec2?
@@ -540,6 +555,7 @@ VisualCoreScenes | func | public func fromWorld(_ w: Vec2, camera: Camera2D) -> 
 VisualCoreScenes | func | public func hitTest(_ world: Vec2) -> SceneNode?
 VisualCoreScenes | func | public func interleavedPositionNormal() -> [Float]
 VisualCoreScenes | func | public func removeFromParent()
+VisualCoreScenes | func | public func size(longEdge: Int, aspect: ExportAspect) -> ExportSize
 VisualCoreScenes | func | public func toCamera(_ p: Vec2) -> Vec2?
 VisualCoreScenes | func | public func toNDC(_ p: Vec2) -> Vec2?
 VisualCoreScenes | func | public func toPixels(_ p: Vec2) -> Vec2?
@@ -557,21 +573,39 @@ VisualCoreScenes | init | public init()
 VisualCoreScenes | init | public init(id: Int, phase: PointerPhase, location: Vec2, timestamp: Double)
 VisualCoreScenes | init | public init(id: String = "", position: Vec2 = .zero, rotation: Double = 0, scale: Vec2 = Vec2(1, 1), z: Int = 0,
 VisualCoreScenes | init | public init(maxDistance: Double = 10, maxDuration: Double = 0.3)
+VisualCoreScenes | init | public init(maxEdge: Int, maxPixels: Int = ExportGeometry.defaultMaxPixels)
 VisualCoreScenes | init | public init(maxInterval: Double = 0.3, maxSeparation: Double = 30)
 VisualCoreScenes | init | public init(minAngle: Double = 0)
 VisualCoreScenes | init | public init(minChange: Double = 0)
 VisualCoreScenes | init | public init(minDistance: Double = 10)
 VisualCoreScenes | init | public init(minDuration: Double = 0.5, maxDistance: Double = 10)
 VisualCoreScenes | init | public init(size: Vec2, scale: Double)
+VisualCoreScenes | init | public init?(id: String, title: String, width: Int, height: Int)
+VisualCoreScenes | let | public let height: Int
+VisualCoreScenes | let | public let id: String
+VisualCoreScenes | let | public let maxEdge: Int
+VisualCoreScenes | let | public let maxPixels: Int
+VisualCoreScenes | let | public let title: String
+VisualCoreScenes | let | public let width: Int
+VisualCoreScenes | let | public static let builtIns: [ExportAspect]
+VisualCoreScenes | let | public static let defaultMaxPixels
+VisualCoreScenes | let | public static let hardMaxEdge
+VisualCoreScenes | let | public static let landscape
 VisualCoreScenes | let | public static let maxPointers
 VisualCoreScenes | let | public static let maxPolygonPoints
+VisualCoreScenes | let | public static let portrait
 VisualCoreScenes | let | public static let ringRange
 VisualCoreScenes | let | public static let segmentRange
+VisualCoreScenes | let | public static let square
+VisualCoreScenes | let | public static let story
 VisualCoreScenes | let | public static let subdivisionRange
 VisualCoreScenes | let | public static let version
 VisualCoreScenes | protocol | public protocol GestureRecognizer: Sendable
 VisualCoreScenes | struct | public struct DoubleTapRecognizer: GestureRecognizer
 VisualCoreScenes | struct | public struct DragRecognizer: GestureRecognizer
+VisualCoreScenes | struct | public struct ExportAspect: Sendable, Hashable, Identifiable
+VisualCoreScenes | struct | public struct ExportGeometry: Sendable, Equatable
+VisualCoreScenes | struct | public struct ExportSize: Sendable, Hashable
 VisualCoreScenes | struct | public struct LongPressRecognizer: GestureRecognizer
 VisualCoreScenes | struct | public struct Mesh: Sendable, Equatable
 VisualCoreScenes | struct | public struct PinchRecognizer: GestureRecognizer
@@ -599,15 +633,18 @@ VisualCoreScenes | var | public var bounded: Primitive
 VisualCoreScenes | var | public var centroid: Vec2?
 VisualCoreScenes | var | public var color: Vec4
 VisualCoreScenes | var | public var count: Int
+VisualCoreScenes | var | public var effectiveMaxEdge: Int
 VisualCoreScenes | var | public var id: Int
 VisualCoreScenes | var | public var id: String
 VisualCoreScenes | var | public var indices: [UInt32]
 VisualCoreScenes | var | public var isActive: Bool
+VisualCoreScenes | var | public var isLandscape: Bool
 VisualCoreScenes | var | public var isTerminal: Bool
 VisualCoreScenes | var | public var isValid: Bool
 VisualCoreScenes | var | public var isVisible
 VisualCoreScenes | var | public var localTransform: Mat3
 VisualCoreScenes | var | public var location: Vec2
+VisualCoreScenes | var | public var longEdge: Int
 VisualCoreScenes | var | public var maxDistance
 VisualCoreScenes | var | public var maxDuration
 VisualCoreScenes | var | public var maxInterval
@@ -618,6 +655,7 @@ VisualCoreScenes | var | public var minDistance
 VisualCoreScenes | var | public var minDuration
 VisualCoreScenes | var | public var normals: [Vec3]
 VisualCoreScenes | var | public var phase: PointerPhase
+VisualCoreScenes | var | public var pixelCount: Int
 VisualCoreScenes | var | public var pixelSize: Vec2
 VisualCoreScenes | var | public var position: Vec2
 VisualCoreScenes | var | public var positions: [Vec3]

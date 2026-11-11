@@ -6,7 +6,7 @@ Supersedes the table in ADR-0003 where they differ (ADR-0003 is corrected to poi
 |---|---|---|---|---|---|
 | `Packages/VisualCore` · `VisualCoreMath` | host + iOS | vectors, matrices, quaternions, cameras, easing | value types | Foundation | gap: input/scenes/math |
 | · `VisualCoreSimulation` | host + iOS | fixed-step clock, seeded RNG, timelines, particle pool, NaN guard, `SceneClock` (A01-P02) | value types, protocols | Math | gap: deterministic simulation |
-| · `VisualCoreScenes` | host + iOS | input mapping, pointer tracking, mesh generators, scene graph model | value types | Math | gap: input/scenes |
+| · `VisualCoreScenes` | host + iOS | input mapping, pointer tracking, mesh generators, scene graph model, export geometry (`ExportGeometry`, A01-P04) | value types | Math | gap: input/scenes |
 | · `VisualCoreShaderSource` | host + iOS | shader library, include preprocessing, line maps, diagnostics parsing | value types | Foundation | gap: shader library (U-F003-adjacent) |
 | · `VisualCoreEffectsGraph` | host + iOS | effect DAG model, validation, quotas, flash-limiter model | value types | Foundation | gap: multi-pass graph; reference `CFlashLimiter` idea |
 | · `VisualCoreDiagnostics` | host + iOS | `RenderLifecycle`, frame stats, missed slots, reports | value types | Foundation | gap: lifecycle; reference `FrameRateMeter`, `QualityGovernor` ideas |
@@ -16,7 +16,7 @@ Supersedes the table in ADR-0003 where they differ (ADR-0003 is corrected to poi
 | · `VisualCoreTestSupport` | host + iOS | fake clock, fixtures, image compare | test-only | all pure modules | constitution IV |
 | `Packages/VisualCoreRendering` · `CVisualCoreEGL` | iOS | EGL subset declarations (pinned ANGLE constants) | C | libEGL | reference `CANGLE` |
 | · `CVisualCoreGL` | iOS | generated ES 3.0 table (`vcgl*`) | C | libEGL, libGLESv2 | gap: full GL table |
-| · `VisualCoreRendering` | iOS | `RenderHost`, `RenderView` (+ touch adapter → `PointerEvent`), capabilities, resources, programs, primitive/particle/mesh drawing (F05, feature 006) | classes (`@MainActor`) | C shims, pure modules | reference `ANGLERenderer` sequence (ADR-0002) |
+| · `VisualCoreRendering` | iOS | `RenderHost`, `RenderView` (+ touch adapter → `PointerEvent`), capabilities, resources, programs, primitive/particle/mesh drawing (F05, feature 006), offscreen still export (`renderOffscreen`, `StillImage`, `StillImageEncoder`; A01-P04) | classes (`@MainActor`) | C shims, pure modules | reference `ANGLERenderer` sequence (ADR-0002) |
 | · `VisualCoreEffects` | iOS | GPU passes, target pool, graph executor | classes | Rendering, EffectsGraph | gap: effects |
 | · `VisualCoreUI` | iOS | SwiftUI `RenderSurface` (A01-P01), `ParameterPanel` (A01-P02), diagnostics overlay and accessibility helpers (planned) | views | Rendering, Diagnostics, Parameters (amended A01-P02, feature 013) | gap: native UI |
 | · `VisualCoreAudio` | iOS | AVAudioEngine mic/in-app taps → DSP | classes | AudioDSP | reference `AudioCore` lessons |

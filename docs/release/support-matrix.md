@@ -49,5 +49,6 @@ results describe that app, not VisualCore (CLAUDE.md §12).
 | Scene clock (`VisualCoreSimulation.SceneClock`), parameter editing (`ParameterEditor`) | verified (host), A01-P02 |
 | SwiftUI parameter panel (`VisualCoreUI.ParameterPanel`) | verified (simulator), A01-P02 |
 | Versioned document store (`VisualCorePersistence.DocumentStore`) | verified (host), A01-P03 |
+| Offscreen still export (`RenderHost.renderOffscreen`, `StillImageEncoder` opaque sRGB PNG, `ExportGeometry`) | verified (simulator and host), A01-P04; device size limits pending campaign II |
 | System/App audio capture | unsupported (not offered). On D3 (iPadOS 26.5) it must show as unavailable. |
 | Live home-screen wallpaper | unsupported (no public API) |
