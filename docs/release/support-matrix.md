@@ -15,33 +15,34 @@ physical device has been tested yet.** Device rows stay "pending campaign II" un
 
 ## Simulators: verified (development evidence, not device support)
 
-| Runtime | Simulator | Verified |
-|---|---|---|
-| iOS 27.2 | iPhone 18 Pro | VisualCoreRendering/Effects/Automation tests, Showcase, InteractiveDemo, Lumen Garden, ProjectMReference tests; automation smoke/launch/lifecycle |
-| iOS 26.5 | iPhone 17 Pro Max | Same set |
+| Runtime | Simulator | Status | Verified |
+|---|---|---|---|
+| iOS 27.2 | iPhone 18 Pro | verified (simulator) | VisualCoreRendering/Effects/Automation tests, Showcase, InteractiveDemo, Lumen Garden, ProjectMReference tests; automation smoke/launch/lifecycle |
+| iOS 26.5 | iPhone 17 Pro Max | verified (simulator) | Same set |
 
 ## Physical devices: pending campaign II
 
-| ID | Device | OS | VisualCore status |
-|---|---|---|---|
-| D1 | iPhone 15 (`iPhone15,4`) | iOS 27.0.1 (24A446) | **pending campaign II**, not tested |
-| D2 | iPad Pro 13-inch M5 (`iPad17,3`) | iPadOS 27.2 (24B119) | **pending campaign II**, not tested |
-| D3 | iPad A16 (`iPad15,7`) | iPadOS 26.5 (23F77), never updated | **pending campaign II**, not tested |
+| ID | Device | OS | Status | Evidence |
+|---|---|---|---|---|
+| D1 | iPhone 15 (`iPhone15,4`) | iOS 27.0.1 (24A446) | pending campaign II | none yet (campaign II) |
+| D2 | iPad Pro 13-inch M5 (`iPad17,3`) | iPadOS 27.2 (24B119) | pending campaign II | none yet (campaign II) |
+| D3 | iPad A16 (`iPad15,7`) | iPadOS 26.5 (23F77), never updated | pending campaign II | none yet (campaign II) |
+| other | any other device | any other OS | unsupported | untested |
 
 Other devices and OS versions are **unsupported (untested)**. The ProjectM-iOS reference app's earlier device
 results describe that app, not VisualCore (CLAUDE.md §12).
 
 ## Capabilities
 
-| Capability | Status |
+| Capability | Status (`verified (simulator)` / `unsupported` / not built) |
 |---|---|
-| Render host lifecycle, context loss and recreation, resource budgets | Implemented; verified on simulators |
-| Shader library (includes, defines, file/line diagnostics) | Implemented; verified on simulators |
-| Effects graph (8 pass types, pooled targets, Reduce Flashing limiter) | Implemented; verified on simulators |
-| 2D/3D primitives, particles, meshes, touch input | Implemented; verified on simulators |
-| AutomationRunner (`DEBUG \|\| VISUALCORE_AUTOMATION` only) | Implemented; zero symbols in Release verified |
+| Render host lifecycle, context loss and recreation, resource budgets | verified (simulator) |
+| Shader library (includes, defines, file/line diagnostics) | verified (simulator) |
+| Effects graph (8 pass types, pooled targets, Reduce Flashing limiter) | verified (simulator) |
+| 2D/3D primitives, particles, meshes, touch input | verified (simulator) |
+| AutomationRunner (`DEBUG \|\| VISUALCORE_AUTOMATION` only) | verified (simulator); zero symbols in Release verified |
 | Audio acquisition and DSP features | **Not implemented** (placeholder modules). See known limitations. |
 | Game-controller input | **Not implemented**. See known limitations. |
 | SwiftUI render surface (`VisualCoreUI`) | **Not implemented** (placeholder). Apps host `RenderHost.view` through UIKit representables. |
-| System/App audio capture | **Not offered.** On D3 (iPadOS 26.5) it must show as unavailable. |
-| Live home-screen wallpaper | **Not offered** (no public API) |
+| System/App audio capture | unsupported (not offered). On D3 (iPadOS 26.5) it must show as unavailable. |
+| Live home-screen wallpaper | unsupported (no public API) |

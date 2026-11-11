@@ -10,6 +10,16 @@ VisualCore 1.0.0-rc.1 is a **release candidate verified on iOS simulators only**
 2. **Performance baselines are host and simulator numbers** ([docs/performance](../performance/README.md)). They catch
    regressions; they are not targets and not device claims.
 
+## Unsupported capabilities
+
+| Capability | Status | Reason |
+|---|---|---|
+| System / other-app audio capture | Not offered | No public iOS API for arbitrary system audio capture is used; ReplayKit or entitlement workarounds are prohibited (CLAUDE.md §5). The iOS 27 System/App Capture evaluation belongs to the ProjectM-iOS product, not VisualCore, and must show as unavailable on iPadOS 26.5 (D3). |
+| Home-screen live wallpaper | Not offered | iOS has no public API for third-party live home-screen wallpapers (CLAUDE.md §4). |
+| Direct Metal rendering | Not offered by design | The only renderer is OpenGL ES through ANGLE's Metal backend; a second renderer is prohibited (CLAUDE.md §4). |
+| Microphone / in-app playback audio | Not built yet | See ADR-0006; any source claim needs a ten-minute real-device diagnostic. |
+| User-authored GLSL | Not offered | Shaders are bundled, versioned assets; a shader editor needs strict input and resource bounds (planned with A22 Shader Studio). |
+
 ## Modules planned in the README layout but not built yet (ADR-0006)
 
 | README entry | Missing part | Where it will be built |

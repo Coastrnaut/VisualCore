@@ -41,7 +41,7 @@ T-F901 → T-F902; T-F903 → T-F904; T-F905/T-F906/T-F907 → T-F908; T-F909 ne
 
 ## Phase 5: Convergence
 
-- [ ] T-F916 Mark placeholder modules (VisualCoreAudioDSP, VisualCorePersistence, VisualCoreTestSupport) as placeholders in `Packages/VisualCore/README.md`, linking ADR-0006, per SC-F906 / Constitution V (contradicts)
+- [X] T-F916 Mark placeholder modules (VisualCoreAudioDSP, VisualCorePersistence, VisualCoreTestSupport) as placeholders in `Packages/VisualCore/README.md`, linking ADR-0006, per SC-F906 / Constitution V (contradicts) — Verified 2026-11-10: Packages/VisualCore/README.md rows for VisualCoreAudioDSP, VisualCorePersistence, VisualCoreTestSupport now say 'placeholder, not built yet' with planned scope and ADR-0006 link; validate_docs PASS
 - [ ] T-F917 Add an "Unsupported capabilities" section (system/app audio capture, home-screen live wallpaper, direct Metal rendering) with reasons to `docs/release/known-limitations.md` per US2/AC2, FR-F903 (partial)
 - [ ] T-F918 Add a CI job building `Packages/VisualCore` for generic iOS Simulator in `.github/workflows/ci.yml` and verify the run per US5/AC1, FR-F912 (partial)
 - [ ] T-F919 Add `Packages/VisualCoreRendering/Tests/VisualCoreRenderingTests/CleanupSweepTests.swift` (GradientQuadScene, ClearColorScene, EffectScene over ClearColorScene: setup → frames → context loss → frames → destroy, 0 leaked) on both runtimes per FR-F908, plan touch-point (partial)

@@ -12,9 +12,9 @@ iOS 26+ inside apps. The package map and dependency rules R1–R5 are in
 | VisualCoreShaderSource | shader library, includes, line maps, diagnostics parsing |
 | VisualCoreEffectsGraph | effect DAG model, validation, quotas, flash-limiter model |
 | VisualCoreDiagnostics | render lifecycle state machine, frame statistics, reports |
-| VisualCoreAudioDSP | lock-free ring, FFT, bands, RMS, onsets |
-| VisualCorePersistence | versioned documents, atomic writes, migrations |
-| VisualCoreTestSupport | fake clock and fixtures (test targets only, rule R5) |
+| VisualCoreAudioDSP | **placeholder, not built yet** — planned: lock-free ring, FFT, bands, RMS, onsets ([ADR-0006](../../docs/decisions/ADR-0006-unbuilt-readme-modules.md)) |
+| VisualCorePersistence | **placeholder, not built yet** — planned: versioned documents, atomic writes, migrations (first app that persists documents) |
+| VisualCoreTestSupport | **placeholder, not built yet** — planned: fake clock, fixtures, image baselines (test targets only, rule R5; ADR-0006) |
 
 Imports allowed (R2): Foundation-level system modules (`Foundation`, `Dispatch`, `os`, `simd`,
 `Accelerate`, `Synchronization`) and other modules of this package.
