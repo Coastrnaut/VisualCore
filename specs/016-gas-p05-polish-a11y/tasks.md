@@ -71,7 +71,7 @@ IDs are `T-A01-5##`, with one commit and push per task (`scripts/tick_task.py`).
   - `project.yml`: add the VisualCoreEffects product to the app.
 
   (FR-A01-501, FR-A01-502)
-- [ ] T-A01-505 [US1] Add `Apps/GenerativeArtStudio/Tests/Unit/AccessibilityApplyTests.swift`:
+- [X] T-A01-505 [US1] Add `Apps/GenerativeArtStudio/Tests/Unit/AccessibilityApplyTests.swift`: — Verified 2026-11-11: Tests/Unit/AccessibilityApplyTests.swift (SceneModel gained a sceneOverride test seam; the override gets the real clock + EffectScene wrapping): rate 1/60 → 0.5/60 on the next frame after apply and back (SC-A01-501); black/white alternation unlimited max Δ 1.0, with system Dim Flashing Lights + choice System the per-frame mean-luma change is 0.0039 ≤ bound 0.3/60 + 1/255 = 0.0089 after the start frame (the limiter seeds on the toggle frame, so that frame is the content's own transition; spec edge case refined to say so); an export meanwhile is unlimited (pixel 0 or 255), the limiter renderer instance is unchanged, no jump after it, and Off overrides system On (SC-A01-502); a system change while backgrounded applies on the first frame after foreground (analyze C1). Tests/UI/SettingsUITests.swift: System defaults, footer and About, set Reduce Motion On, relaunch keeps On, reset (launch-argument defaults were dropped because the argument domain masks @AppStorage writes). run-check A01-P05/t505-apply-settings-ios27 + ios26 4/4 passed, 0 failed
   - `apply` switches the clock rate (0.5×/1×) and the limiter within one frame;
   - a black↔white alternating test scene wrapped like the app's gives a per-frame mean-luma change ≤ 0.3 × (1/60) +
     1/255 with Reduce Flashing, and about 1 without;

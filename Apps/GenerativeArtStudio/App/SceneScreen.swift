@@ -41,7 +41,7 @@ final class SceneModel {
     static let reducedMotionTimeScale = SceneClock.reducedMotionFactor
 
     init(family: SceneFamily, reduceMotion: Bool, bundle: ShaderBundle = ArtSceneFactory.shaders,
-         editor initial: CompositionEditor? = nil, opening data: Data? = nil,
+         editor initial: CompositionEditor? = nil, opening data: Data? = nil, sceneOverride: ArtScene? = nil,
          makeHost: (RenderScene) throws -> RenderHost = { try RenderHost(scene: $0) }) {
         self.family = family
         var start = initial ?? CompositionEditor(family: family)
@@ -56,7 +56,8 @@ final class SceneModel {
             }
         }
         editor = start
-        scene = ArtSceneFactory.makeScene(for: start.composition, bundle: bundle)
+        // `sceneOverride` is a test seam: any ArtScene gets the same clock and effect wrapping as a real family.
+        scene = sceneOverride ?? ArtSceneFactory.makeScene(for: start.composition, bundle: bundle)
         var clock = SceneClock()
         clock.reducedMotion = reduceMotion
         clocked = ClockedArtScene(inner: scene, clock: clock)

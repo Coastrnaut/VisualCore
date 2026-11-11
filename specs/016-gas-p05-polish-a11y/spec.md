@@ -120,7 +120,9 @@ the system values. Docs and the API baseline are updated, and the ProjectM regre
 
 - The system setting changes while a scene is open, or while the app is in the background: the new value applies
   on return, without reopening the scene.
-- Reduce Flashing is turned on during playback: limiting begins without a visible jump. Exports are rendered without
+- Reduce Flashing is turned on during playback: limiting starts from the frame shown at that moment and adds no jump
+  of its own. That one frame is the content's own transition; every later frame is limited (refined at implement,
+  T-A01-505). Exports are rendered without
   the limiter (a still cannot flash), and the live limiter state is kept.
 - The app choice "Off" overrides a system setting that is on. This is the user's explicit choice, and the Settings
   screen says so.
