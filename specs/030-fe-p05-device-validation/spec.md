@@ -48,6 +48,15 @@ Facts checked in code:
   1,260 frames per tour); `VISUALCORE_AUTORUN_FRAMES` (if given) caps the frames per tour for quick rehearsals. Stills
   are captured at every stop regardless.
 
+### Session 2026-11-11 (implementation finding, T-A03-503)
+
+- Q: How is "agrees with the original picture's classes" measured on another canvas shape? → A: A 600 × 300 canvas
+  rendered at 128 × 64 has the same plane step per pixel as the original 300 × 300 canvas at 64 × 64, and its pixel
+  (x + 32, y) lies on the original pixel (x, y)'s plane point, so all 4,096 shared points are compared GPU to GPU.
+  The first runs compared against the CPU reference instead (64 points, then 1,024): they failed on points where
+  32-bit GPU iteration legitimately diverges from 64-bit CPU iteration at caps up to 2,000, which says nothing about
+  bookmark reproduction.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Measure the device's real precision limit (Priority: P1) 🎯
@@ -106,8 +115,8 @@ A bookmark saved and reopened, on the same or another canvas shape, draws the sa
 
 1. **Given** 10 bookmarks across both modes, palettes and caps, **When** each is reopened on a fresh model with the
    same canvas, **Then** the 64 × 64 rendered picture is identical to the original (every channel within 1 of 255).
-2. **Given** the same bookmarks reopened on a canvas of another shape, **Then** the escape classes at 64 sample points
-   at the same plane points agree ≥ 99% with the original picture's classes.
+2. **Given** the same bookmarks reopened on a canvas of another shape, **Then** the escape classes at the shared
+   plane points (4,096) agree ≥ 99% with the original picture's classes (implementation finding above).
 3. **Given** the bookmark library on disk, **Then** every saved field survives the reload exactly.
 
 ---

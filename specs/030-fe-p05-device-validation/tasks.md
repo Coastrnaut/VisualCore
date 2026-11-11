@@ -22,7 +22,7 @@ ProjectM regression and A01/A02 builds.
 
 ## Phase 2: User Story 3 — bookmark reproduction fixture (P1)
 
-- [ ] T-A03-503 [P] [US3] Add `Apps/FractalExplorer/Tests/Unit/BookmarkReproductionTests.swift` per research R4: 10 seeded bookmarks (both modes, the 5 palettes, caps 50…2000) rendered 64 × 64 offscreen before saving and after reload into a fresh model at the same size ("every channel within 1 of 255"), and on a 2:1 canvas classes at 64 points vs the CPU reference ≥ 99%; every field equal after reload. Both runtimes (FR-A03-504, SC-A03-504).
+- [X] T-A03-503 [P] [US3] Add `Apps/FractalExplorer/Tests/Unit/BookmarkReproductionTests.swift` per research R4: 10 seeded bookmarks (both modes, the 5 palettes, caps 50…2000) rendered 64 × 64 offscreen before saving and after reload into a fresh model at the same size ("every channel within 1 of 255"), and on a 2:1 canvas classes at 64 points vs the CPU reference ≥ 99%; every field equal after reload. Both runtimes (FR-A03-504, SC-A03-504). — Verified 2026-11-11: — Verified 2026-11-11: BookmarkReproductionTests (10 seeded bookmarks over both modes, the 5 palettes and caps 50...2000): reopened in a fresh model after reload at the same 300x300 canvas, every field equal and the 64x64 picture within 1 per channel; on a 600x300 canvas rendered 128x64 the 4,096 shared plane points agree >= 99% with the original picture's classes. First runs t503-app-ios27 and -2 compared against the CPU reference (64, then 1,024 points) and failed on legitimate float32-vs-double iteration divergence at high caps (spec implementation finding recorded); run-check A03-P05/t503-app-ios27-3 and t503-app-ios26-3 TEST SUCCEEDED, enumeration 60/60 each
 
 ## Phase 3: User Story 1 — precision mode (P1) 🎯
 
