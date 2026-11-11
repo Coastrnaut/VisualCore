@@ -5,8 +5,10 @@ enum ImageDiff {
         var meanAbs: Double
         /// Fraction of pixels whose R, G and B each differ by at most 8.
         var within8: Double
-        /// SC-F702: mean ≤ 2 and ≥ 99% of pixels within 8.
+        /// Strict absolute form (mean ≤ 2 and ≥ 99% within 8) — used where no engine noise is involved.
         var passes: Bool { meanAbs <= 2 && within8 >= 0.99 }
+        /// SC-F702 (amended 2026-11-10): mean ≤ 2 and within-8 no worse than the engine's own noise floor − 1 pp, ≥ 95%.
+        func passes(noiseFloorWithin8 floor: Double) -> Bool { meanAbs <= 2 && within8 >= max(0.95, floor - 0.01) }
         var description: String { String(format: "meanAbs=%.3f within8=%.4f", meanAbs, within8) }
     }
 

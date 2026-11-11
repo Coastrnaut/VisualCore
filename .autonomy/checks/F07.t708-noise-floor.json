@@ -1,0 +1,33 @@
+{
+  "argv": [
+    "xcodebuild",
+    "test",
+    "-project",
+    "Harnesses/ProjectMReference/ProjectMReference.xcodeproj",
+    "-scheme",
+    "ProjectMReference",
+    "-destination",
+    "platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D",
+    "-derivedDataPath",
+    "Build/DerivedData/ProjectMReference",
+    "-resultBundlePath",
+    ".autonomy/xcresults/F07-t708-noise-20261110-205304.xcresult",
+    "-test-timeouts-enabled",
+    "YES",
+    "-default-test-execution-time-allowance",
+    "180",
+    "CODE_SIGNING_ALLOWED=NO",
+    "-only-testing:ProjectMReferenceTests/EngineNoiseFloorTests",
+    "-only-testing:ProjectMReferenceTests/BaselineComparisonTests"
+  ],
+  "command": "xcodebuild test -project Harnesses/ProjectMReference/ProjectMReference.xcodeproj -scheme ProjectMReference -destination 'platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D' -derivedDataPath Build/DerivedData/ProjectMReference -resultBundlePath .autonomy/xcresults/F07-t708-noise-20261110-205304.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 180 CODE_SIGNING_ALLOWED=NO -only-testing:ProjectMReferenceTests/EngineNoiseFloorTests -only-testing:ProjectMReferenceTests/BaselineComparisonTests",
+  "elapsed_seconds": 12.927,
+  "exit_code": 65,
+  "finished": "2026-11-11T01:53:17+00:00",
+  "log": ".autonomy/logs/F07.t708-noise-floor.log",
+  "log_sha256": "15d75ca05008974fd8932e329dc567ec0e16e394c137697f746d461c832eece8",
+  "name": "t708-noise-floor",
+  "stage": "F07",
+  "started": "2026-11-11T01:53:04+00:00",
+  "timed_out": false
+}

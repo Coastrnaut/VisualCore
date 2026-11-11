@@ -1,0 +1,32 @@
+{
+  "argv": [
+    "xcodebuild",
+    "test",
+    "-project",
+    "Harnesses/ProjectMReference/ProjectMReference.xcodeproj",
+    "-scheme",
+    "ProjectMReference",
+    "-destination",
+    "platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D",
+    "-derivedDataPath",
+    "Build/DerivedData/ProjectMReference",
+    "-resultBundlePath",
+    ".autonomy/xcresults/F07-t708-20261110-205346.xcresult",
+    "-test-timeouts-enabled",
+    "YES",
+    "-default-test-execution-time-allowance",
+    "180",
+    "CODE_SIGNING_ALLOWED=NO",
+    "-only-testing:ProjectMReferenceTests/BaselineComparisonTests"
+  ],
+  "command": "xcodebuild test -project Harnesses/ProjectMReference/ProjectMReference.xcodeproj -scheme ProjectMReference -destination 'platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D' -derivedDataPath Build/DerivedData/ProjectMReference -resultBundlePath .autonomy/xcresults/F07-t708-20261110-205346.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 180 CODE_SIGNING_ALLOWED=NO -only-testing:ProjectMReferenceTests/BaselineComparisonTests",
+  "elapsed_seconds": 5.02,
+  "exit_code": 0,
+  "finished": "2026-11-11T01:53:51+00:00",
+  "log": ".autonomy/logs/F07.t708-baseline-a3.log",
+  "log_sha256": "6783ce5aaa4a224300ba30803d7566eef50418d52755476024af13f62866cc41",
+  "name": "t708-baseline-a3",
+  "stage": "F07",
+  "started": "2026-11-11T01:53:46+00:00",
+  "timed_out": false
+}
