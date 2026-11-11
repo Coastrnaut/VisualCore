@@ -32,7 +32,8 @@ IDs are `T-A01-5##`, with one commit and push per task (`scripts/tick_task.py`).
 - [ ] T-A01-502 [US4] Add `Packages/VisualCoreRendering/Sources/VisualCoreUI/SystemAccessibilityObserver.swift`
   (`@MainActor @Observable`; the source can be replaced; `systemValues()` from `UIAccessibility.isReduceMotionEnabled`
   and `MADimFlashingLightsEnabled()`; refresh on `UIAccessibility.reduceMotionStatusDidChangeNotification` and
-  `kMADimFlashingLightsChangedNotification`; observers removed on deinit). Add the VisualCoreUI → VisualCoreSimulation
+  `kMADimFlashingLightsChangedNotification` (a local-center notification, observed through `NotificationCenter.default`
+  as `Notification.Name(kMADimFlashingLightsChangedNotification as String)`; analyze U1); observers removed on deinit). Add the VisualCoreUI → VisualCoreSimulation
   dependency in `Packages/VisualCoreRendering/Package.swift`. Add `EffectScene.bypassEffects` in
   `Sources/VisualCoreEffects/EffectScene.swift`: when true, the content renders directly into the host framebuffer,
   the graph and limiter are skipped and the renderer is untouched.
@@ -76,6 +77,8 @@ IDs are `T-A01-5##`, with one commit and push per task (`scripts/tick_task.py`).
     1/255 with Reduce Flashing, and about 1 without;
   - an export while limiting equals the unlimited content (max difference 0), and the limiter renderer instance is
     unchanged afterwards.
+  - a system change delivered while the host is suspended (backgrounded) takes effect on the first frame after
+    foreground (spec edge case; analyze C1).
 
   Add `Tests/UI/SettingsUITests.swift`: defaults "System"; set Reduce Motion to "On"; relaunch and the value is kept;
   the footer text. Run both on iOS 27.2 and 26.5 (SC-A01-501, SC-A01-502).
@@ -123,3 +126,8 @@ screen). T-A01-508 needs T-A01-504 (the EffectScene wrapper). T-A01-509 runs las
 
 VisualCore first (Principle II), then the settings wiring, the canvas and audit, the lifecycle fixture, and the
 contract.
+
+## Analyze remediation (2026-11-11)
+
+Applied autonomously (CLAUDE.md §2): C1 → T-A01-505 background-change case; U1 → T-A01-502 notification delivery. 0
+critical issues.

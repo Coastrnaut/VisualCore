@@ -37,3 +37,6 @@ APIs verified by the read-only audit (2026-11-11):
   (ignored) only for issues whose element is `gas.scene.canvas` and whose type is contrast. Each ignored issue is
   logged, and the documented list is kept in the regression baseline. The largest text size is set with the launch
   arguments `-UIPreferredContentSizeCategoryName UICTContentSizeCategoryAccessibilityXXXL`.
+- **R8 Flashing-light notification.** `kMADimFlashingLightsChangedNotification` is posted on the local notification
+  center, which bridges to `NotificationCenter.default`, so it is observed by name like the Reduce Motion
+  notification (analyze U1).
