@@ -20,8 +20,8 @@ final class PlaygroundModel {
     private(set) var queue: SplatQueue
     private var tracker = PointerVelocityTracker(spacing: 1)
 
-    init(configuration: FluidConfiguration = FluidConfiguration()) {
-        scene = FluidFieldsScene(configuration: configuration)
+    init(configuration: FluidConfiguration = FluidConfiguration(), maxEdge: Int = 512) {
+        scene = FluidFieldsScene(configuration: configuration, maxEdge: maxEdge)
         queue = SplatQueue(configuration: configuration)
         scene.splatSource = { [weak self] in self?.drain() ?? [] }
         do {
@@ -31,6 +31,9 @@ final class PlaygroundModel {
         } catch {
             failure = "The graphics view could not start: \(error)"
         }
+        // Setup ran inside RenderHost.init and may have capped the grid by the device; forces convert with the grid
+        // the fields really use (feature 020 T-A02-216).
+        queue = SplatQueue(configuration: scene.configuration)
     }
 
     /// Resampling spacing in points: half the brush radius on the current view (spec 020 clarification 3).

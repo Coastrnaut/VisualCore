@@ -44,6 +44,18 @@ final class PlaygroundModelTests: XCTestCase {
         XCTAssertEqual(model.queue.pendingCount, 1)
     }
 
+    /// T-A02-216: the queue converts forces with the grid the fields really use, also when setup capped it.
+    func testQueueFollowsSetUpGrid() throws {
+        var c = FluidConfiguration()
+        c.gridWidth = 256
+        c.gridHeight = 256
+        let model = PlaygroundModel(configuration: c, maxEdge: 64)
+        defer { model.close() }
+        XCTAssertEqual(model.scene.configuration.gridWidth, 64)
+        XCTAssertEqual(model.queue.configuration.gridWidth, 64)
+        XCTAssertEqual(model.queue.configuration.gridHeight, 64)
+    }
+
     func testSplashIsQueuedAppliedAndDescribed() throws {
         let (model, ref) = try makeModel()
         defer { model.close() }
