@@ -1,0 +1,47 @@
+---
+
+description: "Task list for feature 008 — Phase 7 ProjectM integration (ledger gate F07)"
+---
+
+# Tasks: Phase 7 — ProjectM Integration and Regression Hardening
+
+**Input**: `/specs/008-projectm-integration/` · **Tests**: required (simulator harness tests, A/B baseline, lifecycle stress,
+GLState test). IDs `T-F7##`. One commit + push per task. Two migration batches (2a, 2), each with before/after evidence.
+The reference `External/projectm-ios` is never written.
+
+## Phase 1: Setup and "before" evidence
+
+- [ ] T-F701 Before evidence: `check_reference_clean.py`, reference `test-anglerendering-ios27/26` and `audit_projectm_reference.py` at `d93edd1` (recorded as F07 checks; ADR-0005 run counts if unchanged) and a pre-change migration-log note
+- [ ] T-F702 Harness skeleton `Harnesses/ProjectMReference/{ProjectMReference.yml,Sources/ProjectMReferenceApp.swift,Tests/}` linking VisualCoreRendering, VisualCoreEffects and the reference `ProjectMBridge` (local path), bundle id `dev.visualcore.harness.ProjectMReference`; unsigned simulator build; `check_dependencies.py` still passes (R1)
+
+## Phase 2: Foundational
+
+- [ ] T-F703 [P] `SyntheticSignal.swift` (deterministic 44.1 kHz stereo sweep + beat pulses, chunked to ≤ engine max) and `ImageDiff.swift` (mean abs diff, fraction within 8) with tests `Tests/SyntheticSignalTests.swift`
+
+## Phase 3: Batch 2a — GL state handoff and VisualCore effects over the engine (US3, P2)
+
+- [ ] T-F704 [US3] `GLState.resetForVisualCore(framebuffer:width:height:)` in `Packages/VisualCoreRendering/Sources/VisualCoreRendering/GLState.swift` with `GLStateTests.swift` (dirty state — VAO, program, buffers, blend, depth, cull, scissor, color mask, texture unit, unpack alignment — is reset; a VisualCore draw after a dirtying draw is correct); VisualCoreRendering sim tests on 27.2 + 26.5
+- [ ] T-F705 [US1] `ProjectMScene.swift`: engine created with `vcEGLLoadProc` in setup, viewport from the host, PCM from `SyntheticSignal`, `renderFrameToFramebuffer(context.framebuffer)`, `GLState.resetForVisualCore` after each engine frame, release in teardown, recreated per context generation with the preset reloaded, failed preset keeps the previous one; tests `Tests/ProjectMSceneTests.swift` (AC1 non-uniform changing frames over 30 frames with `100-square.milk`; AC2 resize follows; AC3 recreation recreates and resumes, leaked 0; AC4 failed preset keeps rendering; zero-size layout makes no engine call)
+- [ ] T-F706 [US3] `Tests/EffectsOverEngineTests.swift`: `EffectScene(content: ProjectMScene, graph: color swap)` output is the swapped engine image (R↔B channel correlation), engine keeps rendering; Reduce Flashing appends the limiter and bounds the mean-luminance change per frame
+- [ ] T-F707 Batch 2a "after" evidence: reference `test-anglerendering-ios27/26` + clean check rerun; migration-log row 2a completed (implementation, why VisualCore, before/after, behavior change)
+
+## Phase 4: Batch 2 — engine on the VisualCore host, baseline and lifecycle (US1, US2, US4, P1/P2)
+
+- [ ] T-F708 [US2] `EngineFramebufferPath.swift` (path A: engine into an offscreen RenderTarget, the reference renderer's sequence) and `Tests/BaselineComparisonTests.swift`: lockstep A/B over 60 frames with `100-square.milk` and the same signal → mean abs diff ≤ 2 and ≥ 99% pixels within 8 (SC-F702); numbers written to the test log
+- [ ] T-F709 [US4] `Tests/LifecycleStressTests.swift`: 20 pause/resume cycles, 10 resizes, 3 context recreations, destroy → continuous rendering, `enginesCreated` == generations, leaked 0 (SC-F703)
+- [ ] T-F710 [US1] Harness app UI: preset picker of the upstream test presets, diagnostics (engine generation, frames, preset, error, ledger), Reduce Flashing toggle; simulator launch screenshot check
+- [ ] T-F711 Batch 2 "after" evidence: harness tests on iOS 27.2 and 26.5, reference regression rerun + clean check; migration-log row 2 completed
+
+## Phase 5: Polish
+
+- [ ] T-F712 [US5] Migration log "Retained in ProjectM" section (preset library/warm-up, purchases, audio capture, CFlashLimiter, reference EGL renderer) with reasons (FR-F710); `Harnesses/ProjectMReference/README.md` (purpose, linkage, LGPL note, how to run)
+- [ ] T-F713 Full verification: harness tests both runtimes, VisualCore host + rendering sims, Showcase build + audit, R1–R5, compliance, scripts, docs, reference regression and clean check
+- [ ] T-F714 {device} Engine-on-VisualCore frame pacing and A/B on D1/D2/D3 — **deferred to campaign II** (constitution V)
+
+## Dependencies
+
+T-F701 → T-F702 → T-F703 → T-F704 → T-F705 → T-F706 → T-F707 (batch 2a sealed) → T-F708 → T-F709 → T-F710 → T-F711 (batch 2 sealed) → T-F712 → T-F713.
+
+## Implementation Strategy
+
+MVP = engine on the VisualCore host (T-F705). Each batch closes with its own evidence before the next starts.
