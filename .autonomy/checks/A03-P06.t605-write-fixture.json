@@ -1,0 +1,32 @@
+{
+  "argv": [
+    "xcodebuild",
+    "test",
+    "-project",
+    "VisualCore.xcodeproj",
+    "-scheme",
+    "FractalExplorer",
+    "-destination",
+    "platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D",
+    "-derivedDataPath",
+    "Build/DerivedData/FractalExplorer",
+    "-resultBundlePath",
+    ".autonomy/xcresults/a03p06-t605-write.xcresult",
+    "-test-timeouts-enabled",
+    "YES",
+    "-default-test-execution-time-allowance",
+    "300",
+    "CODE_SIGNING_ALLOWED=NO",
+    "-only-testing:FractalExplorerTests/MigrationTests/testWriteFixtureOnceWhenRequested"
+  ],
+  "command": "xcodebuild test -project VisualCore.xcodeproj -scheme FractalExplorer -destination 'platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D' -derivedDataPath Build/DerivedData/FractalExplorer -resultBundlePath .autonomy/xcresults/a03p06-t605-write.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 300 CODE_SIGNING_ALLOWED=NO -only-testing:FractalExplorerTests/MigrationTests/testWriteFixtureOnceWhenRequested",
+  "elapsed_seconds": 7.598,
+  "exit_code": 0,
+  "finished": "2026-11-11T16:16:34+00:00",
+  "log": ".autonomy/logs/A03-P06.t605-write-fixture.log",
+  "log_sha256": "bb8c76e6876fa37e85a09859fff6de13bd928b8a5021eeb2bc0ef55bc8ba24d0",
+  "name": "t605-write-fixture",
+  "stage": "A03-P06",
+  "started": "2026-11-11T16:16:26+00:00",
+  "timed_out": false
+}
