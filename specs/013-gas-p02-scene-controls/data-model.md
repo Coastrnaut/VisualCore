@@ -21,6 +21,6 @@
   - `setSeed(UInt64)` and `shuffleSeed(using: inout some RandomNumberGenerator)`;
   - `setParameter(name, normalized:)` and `resetParameter`/`resetAll`;
   - `open(Data) -> OpenResult`; `useDefault()`.
-- `OpenResult`: `.opened(notes: [String])` | `.failed(RecoverableError)`.
-- `RecoverableError`: `.corrupt(String)` | `.unsupportedVersion(Int)` | `.unknownFamily(String)`. Each provides
+- `OpenResult`: `.opened(notes: [String])` | `.failed(CompositionOpenError)`.
+- `CompositionOpenError`: `.corrupt(String)` | `.unsupportedVersion(Int)` | `.unknownFamily(String)`. Each provides
   `title` and `message`, the user-facing text.

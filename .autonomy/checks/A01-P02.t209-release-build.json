@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "xcodebuild",
+    "build",
+    "-project",
+    "VisualCore.xcodeproj",
+    "-scheme",
+    "GenerativeArtStudio",
+    "-configuration",
+    "Release",
+    "-destination",
+    "generic/platform=iOS",
+    "-derivedDataPath",
+    "Build/DerivedData/GenerativeArtStudio-Release",
+    "CODE_SIGNING_ALLOWED=NO"
+  ],
+  "command": "xcodebuild build -project VisualCore.xcodeproj -scheme GenerativeArtStudio -configuration Release -destination generic/platform=iOS -derivedDataPath Build/DerivedData/GenerativeArtStudio-Release CODE_SIGNING_ALLOWED=NO",
+  "elapsed_seconds": 12.064,
+  "exit_code": 0,
+  "finished": "2026-11-11T04:15:33+00:00",
+  "log": ".autonomy/logs/A01-P02.t209-release-build.log",
+  "log_sha256": "1a4f5cb791ace8cf1e37dc9506432be7ed6744007066179ad831ea7e5cdfe960",
+  "name": "t209-release-build",
+  "stage": "A01-P02",
+  "started": "2026-11-11T04:15:21+00:00",
+  "timed_out": false
+}

@@ -4,8 +4,10 @@ import SwiftUI
 import VisualCoreParameters
 
 struct GalleryView: View {
+    @State private var path: [SceneFamilyID] = []
+
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $path) {
             List {
                 Section {
                     ForEach(FamilyCatalog.all) { family in
@@ -27,7 +29,13 @@ struct GalleryView: View {
             }
             .accessibilityIdentifier("gas.gallery")
             .navigationTitle("Gallery")
-            .navigationDestination(for: SceneFamilyID.self) { id in SceneScreen(family: FamilyCatalog.family(id)) }
+            .navigationDestination(for: SceneFamilyID.self) { id in
+                SceneScreen(family: FamilyCatalog.family(id), openingData: id == LaunchComposition.family ? LaunchComposition.data : nil)
+            }
+            .onAppear {
+                // DEBUG launch data opens its scene directly (recovery path, feature 013).
+                if LaunchComposition.data != nil, path.isEmpty { path = [LaunchComposition.family] }
+            }
         }
     }
 }

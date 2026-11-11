@@ -76,7 +76,7 @@ after each phase, run `validate_docs.py`.
 
 ## Phase 3: US3 — Recoverable corrupt or future compositions (P1)
 
-- [ ] T-A01-209 [US3] Add `CompositionEditor.open(_:) -> OpenResult` and `RecoverableError` (`title`/`message`), with tests:
+- [X] T-A01-209 [US3] Add `CompositionEditor.open(_:) -> OpenResult` and `CompositionOpenError` (`title`/`message`), with tests: — Verified 2026-11-10: Core: CompositionOpenError (renamed from RecoverableError — Foundation protocol clash; docs updated) with title/message, OpenResult, CompositionEditor.open(_:fallback:) and mutating open(_:) (64 KiB cap; failure keeps previous composition; data unmodified); App: LaunchComposition (#if DEBUG -gasComposition base64), SceneModel opening/recovery/useDefault/notes, recovery banner (gas.recovery.message/useDefault), notes pill (gas.open.notes), gallery auto-navigation. run-check A01-P02/t209-core-tests-a2 17/17 (corrupt, version 7, unknown family, oversize, correctable notes, keep-previous); t209-app-ios27 + ios26 18/18 TEST SUCCEEDED incl. RecoveryUITests 3/3; t209-release-build: 0 'gasComposition' strings in the Release binary
   - corrupt data, a future version (7) and an unknown family each fail and keep the previous composition;
   - correctable data opens with notes (SC-A01-204).
 
