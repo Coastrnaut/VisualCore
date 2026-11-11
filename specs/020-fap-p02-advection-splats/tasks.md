@@ -49,7 +49,7 @@ contains additions only.
   parameter to `FieldPass.init`. Add `FieldBilinearTests` (GPU = CPU within 1e-5 at 64 coordinates, including outside
   ones, in RGBA16F). Run the package tests on iOS 27.2 and 26.5 with the enumeration guard, `check_public_api
   --update` (additions only), and the README, package-map and support-matrix updates.
-- [ ] T-A02-205 Run the ProjectM regression in two chunks (3/3 + 4/4) after the VisualCore changes and append the
+- [X] T-A02-205 Run the ProjectM regression in two chunks (3/3 + 4/4) after the VisualCore changes and append the — Verified 2026-11-11: run-check A02-P02/t205-reference-a 3/3 (engine xcframework, projectM-iOS simulator build, reference clean at d93edd1) and t205-reference-b 4/4 (ANGLERendering 14/14 and ProjectMReference 17/17 on iOS 27.2 and 26.5) = 7/7; appended to docs/apps/fluid-art-playground/regression-baseline.md (FR-A02-210)
   results to `docs/apps/fluid-art-playground/regression-baseline.md` (FR-A02-210).
 
 ## Phase 3: User Story 1 — Swipe to inject dye and motion (P1) 🎯

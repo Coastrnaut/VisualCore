@@ -49,3 +49,16 @@ VisualCoreSimulation. The API baseline diff contains additions only. Same two ch
 ### Rerun after `ResourceRegistry.maxTextureSize` became public (2026-11-11, T-A02-116)
 
 `A02-P01/t116-reference-a` 3/3 and `t116-reference-b` 4/4: **7/7 pass**, unchanged.
+
+## A02-P02 rerun after the VisualCore change (2026-11-11)
+
+Feature 020 added `PointerVelocityTracker` (VisualCoreScenes), `FieldGrid.sampleBilinear` (VisualCoreSimulation),
+`vc/field.glsl`, `ShaderBundle.visualCoreIncludes` and the `FieldPass` `library:` parameter (VisualCoreRendering).
+The API baseline diff contains additions, plus one source-compatible signature change.
+
+| Chunk | run-check | Result |
+|---|---|---|
+| reference-engine-xcframework, reference-build-projectm-ios-sim, reference-clean | `A02-P02/t205-reference-a` | 3/3 pass (pin `d93edd1` unchanged) |
+| reference-test-anglerendering-ios27/ios26, projectm-reference-ios27/ios26 | `A02-P02/t205-reference-b` | 4/4 pass (ANGLERendering 14/14 and ProjectMReference 17/17 on both runtimes) |
+
+**7/7 steps pass**, unchanged.
