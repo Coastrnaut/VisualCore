@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/VisualCore",
+    "--filter",
+    "FramingFlightTests|TourTimelineTests"
+  ],
+  "command": "swift test --package-path Packages/VisualCore --filter 'FramingFlightTests|TourTimelineTests'",
+  "elapsed_seconds": 4.405,
+  "exit_code": 0,
+  "finished": "2026-11-11T13:50:35+00:00",
+  "log": ".autonomy/logs/A03-P04.t402-host-visualcore.log",
+  "log_sha256": "5b45edac732df59713ccc41941abc6bdcd4e36e7a8bf928c805e9ebb27b965ad",
+  "name": "t402-host-visualcore",
+  "stage": "A03-P04",
+  "started": "2026-11-11T13:50:31+00:00",
+  "timed_out": false
+}
