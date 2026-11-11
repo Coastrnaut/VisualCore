@@ -25,7 +25,8 @@ commit and push per task (`scripts/tick_task.py`). Review checkpoint: after each
     advection/diffusion, touch forces, blending/post. Four v0.1 rows: quality/thermal, pause/reset/seeded,
     still capture, float targets.
 
-  Each row cites only public non-test symbols, with an example consumer. Render it to `visualcore-contract.md` with
+  Each row cites only public non-test symbols, with an example consumer. The shared checker requires one on every
+  row, so upstream-gap rows cite the closest existing consumer (analyze I1). Render it to `visualcore-contract.md` with
   `--render`. Run `check_app_contract.py --app fluid-art-playground` (SC-A02-001, SC-A02-002).
 
 ## Phase 3: US2 — Host, thread, build and regression baseline (P1)
@@ -49,6 +50,7 @@ commit and push per task (`scripts/tick_task.py`). Review checkpoint: after each
 
 - [ ] T-A02-006 [US4] Complete the contract JSON:
   - `gaps` for every non-available row, with an owner module, a phase and a test;
+    the ping-pong gap's test MUST reject binding the read target as the write target (A02 rule; analyze C1);
   - `traceability` for v0.1 features 01–06 and journeys 1–3;
   - `negative` rules (FR-A02-011);
   - `decision` go/stop with reasons.
@@ -68,3 +70,8 @@ T-A02-001 → T-A02-002 → T-A02-006; T-A02-003 is independent; T-A02-004 → T
 ## Implementation strategy
 
 The matrix first (US1), then the baseline, the shell and the decision, reusing the A01-P00 tooling unchanged.
+
+## Analyze remediation (2026-11-11)
+
+Applied autonomously (CLAUDE.md §2): I1 → T-A02-002 example on every row; C1 → T-A02-006 ping-pong test intent. 0
+critical issues.
