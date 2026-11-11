@@ -1,0 +1,85 @@
+# SecondConsumer — "Lumen Garden", the second VisualCore consumer (feature 009, ledger gate F08; ADR-0003 package map).
+# Proves VisualCore is reusable on its own: only documented VisualCore APIs, no ProjectM (checked by
+# scripts/audit_showcase_dependencies.py and scripts/check_documented_api.py). Harness, not an App Store product.
+# Generate: xcodegen generate --spec Harnesses/SecondConsumer/SecondConsumer.yml
+name: SecondConsumer
+options:
+  bundleIdPrefix: dev.visualcore.harness
+  deploymentTarget:
+    iOS: "26.0"
+  createIntermediateGroups: true
+configFiles:
+  Debug: ../../Configs/Signing.xcconfig
+  Release: ../../Configs/Signing.xcconfig
+packages:
+  GardenKit:
+    path: GardenKit
+  VisualCore:
+    path: ../../Packages/VisualCore
+  VisualCoreRendering:
+    path: ../../Packages/VisualCoreRendering
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    TARGETED_DEVICE_FAMILY: "1,2"
+targets:
+  SecondConsumer:
+    type: application
+    platform: iOS
+    sources:
+      - path: Sources
+      - path: Shaders
+        type: folder
+        buildPhase: resources
+    info:
+      path: Generated/Info.plist
+      properties:
+        CFBundleDisplayName: Lumen Garden
+        CFBundleShortVersionString: "0.1.0"
+        CFBundleVersion: "1"
+        ITSAppUsesNonExemptEncryption: false
+        UILaunchScreen: {}
+        UIApplicationSceneManifest:
+          UIApplicationSupportsMultipleScenes: false
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: dev.visualcore.harness.SecondConsumer
+        GENERATE_INFOPLIST_FILE: NO
+    dependencies:
+      - package: GardenKit
+        product: GardenKit
+      - package: VisualCore
+        product: VisualCoreMath
+      - package: VisualCore
+        product: VisualCoreSimulation
+      - package: VisualCore
+        product: VisualCoreScenes
+      - package: VisualCore
+        product: VisualCoreShaderSource
+      - package: VisualCore
+        product: VisualCoreEffectsGraph
+      - package: VisualCoreRendering
+        product: VisualCoreRendering
+      - package: VisualCoreRendering
+        product: VisualCoreEffects
+  SecondConsumerUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources: [UITests]
+    info:
+      path: Generated/UITests-Info.plist
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: dev.visualcore.harness.SecondConsumerUITests
+        GENERATE_INFOPLIST_FILE: NO
+        TEST_TARGET_NAME: SecondConsumer
+    dependencies:
+      - target: SecondConsumer
+schemes:
+  SecondConsumer:
+    build:
+      targets:
+        SecondConsumer: all
+        SecondConsumerUITests: [test]
+    test:
+      targets: [SecondConsumerUITests]

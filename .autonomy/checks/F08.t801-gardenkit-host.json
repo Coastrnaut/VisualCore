@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Harnesses/SecondConsumer/GardenKit"
+  ],
+  "command": "swift test --package-path Harnesses/SecondConsumer/GardenKit",
+  "elapsed_seconds": 8.222,
+  "exit_code": 0,
+  "finished": "2026-11-11T02:08:53+00:00",
+  "log": ".autonomy/logs/F08.t801-gardenkit-host.log",
+  "log_sha256": "65eb85bace085880d6b210daacb58172d310e86fde453649be3965b668594601",
+  "name": "t801-gardenkit-host",
+  "stage": "F08",
+  "started": "2026-11-11T02:08:45+00:00",
+  "timed_out": false
+}

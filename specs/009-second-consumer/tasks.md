@@ -10,7 +10,7 @@ One commit + push per task.
 
 ## Phase 1: Setup
 
-- [ ] T-F801 `Harnesses/SecondConsumer/GardenKit/Package.swift` (depends on local VisualCore: Math, Simulation) and `Harnesses/SecondConsumer/SecondConsumer.yml` (app + UI test targets, packages GardenKit, VisualCore, VisualCoreRendering; bundle id `dev.visualcore.harness.SecondConsumer`); shell app builds unsigned for the simulator
+- [X] T-F801 `Harnesses/SecondConsumer/GardenKit/Package.swift` (depends on local VisualCore: Math, Simulation) and `Harnesses/SecondConsumer/SecondConsumer.yml` (app + UI test targets, packages GardenKit, VisualCore, VisualCoreRendering; bundle id `dev.visualcore.harness.SecondConsumer`); shell app builds unsigned for the simulator — Verified 2026-11-10: F08.t801-gardenkit-host exit 0 (swift test on the Mac, GardenKit links VisualCore pure modules); F08.t801-shell-test TEST SUCCEEDED (iOS 27.2): SecondConsumer.yml app + UI test target build unsigned and the shell launches
 
 ## Phase 2: Foundational — checks (US2, P1)
 
