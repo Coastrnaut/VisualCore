@@ -19,6 +19,7 @@ this phase records simulator functional evidence only.
 
 Answered autonomously under the owner's standing approval (CLAUDE.md §2), recommended option chosen.
 
+- Q: Apply the `/speckit-analyze` remediation (E1 clamp/unknown-key tests; C1 device task deferred)? → A: Yes, applied 2026-11-10 (no critical findings).
 - Q: Where does the Reduce-Flashing limiter run? → A: As a built-in `flashLimit` pass type that graphs can include, and automatically as the final step of `EffectScene` when its `reduceFlashing` flag is on. Apps set the flag from their own setting, which defaults to on when the system Reduce Motion setting is on (there is no public Dim Flashing Lights API to read).
 - Q: How is "mean luminance" measured? → A: Rec. 709 luma of the sRGB-encoded output, averaged over a 16×16 downsampled grid. The GPU limiter keeps an adapted value and scales the frame toward it, so the displayed mean moves at most `limit × Δt` per frame.
 - Q: How are feedback histories stored? → A: One history target per feedback pass, at that pass's output size. It is cleared (to the current input) on first use, resize and context recreation.

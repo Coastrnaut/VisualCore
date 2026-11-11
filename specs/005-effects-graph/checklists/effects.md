@@ -12,36 +12,38 @@ No phase-specific focus was supplied (standard workflow), so the default focus i
 
 ## Per-Effect Contracts
 
-- [ ] CHK001 Does every built-in pass type specify its input slots and output? [Completeness, Spec §FR-F405, §FR-F406]
-- [ ] CHK002 Are configuration keys, defaults and clamp ranges specified for each pass type? [Clarity, Spec §FR-F401, §FR-F406]
-- [ ] CHK003 Is resource ownership per pass (targets from the pool, feedback history) specified? [Completeness, Spec §FR-F407, §FR-F412]
-- [ ] CHK004 Does each pass type have a numeric, testable expected outcome? [Measurability, Spec §SC-F402]
-- [ ] CHK005 Is failure behavior for each pass (pass-through, single report) specified? [Coverage, Spec §FR-F408]
+- [x] CHK001 Does every built-in pass type specify its input slots and output? [Completeness, Spec §FR-F405, §FR-F406]
+- [x] CHK002 Are configuration keys, defaults and clamp ranges specified for each pass type? [Clarity, Spec §FR-F401, §FR-F406]
+- [x] CHK003 Is resource ownership per pass (targets from the pool, feedback history) specified? [Completeness, Spec §FR-F407, §FR-F412]
+- [x] CHK004 Does each pass type have a numeric, testable expected outcome? [Measurability, Spec §SC-F402]
+- [x] CHK005 Is failure behavior for each pass (pass-through, single report) specified? [Coverage, Spec §FR-F408]
 
 ## Graph Safety
 
-- [ ] CHK006 Is every rejection case enumerated with a distinct error? [Completeness, Spec §FR-F402]
-- [ ] CHK007 Is the execution-order rule (topological, tie-break) unambiguous? [Clarity, Spec §FR-F403]
-- [ ] CHK008 Is the memory estimate formula specified, including feedback histories? [Clarity, Spec §FR-F404]
-- [ ] CHK009 Are limits (32 passes, 256 MiB, scale range, blur radius) stated as numbers? [Measurability, Spec §FR-F402, §FR-F405]
+- [x] CHK006 Is every rejection case enumerated with a distinct error? [Completeness, Spec §FR-F402]
+- [x] CHK007 Is the execution-order rule (topological, tie-break) unambiguous? [Clarity, Spec §FR-F403]
+- [x] CHK008 Is the memory estimate formula specified, including feedback histories? [Clarity, Spec §FR-F404]
+- [x] CHK009 Are limits (32 passes, 256 MiB, scale range, blur radius) stated as numbers? [Measurability, Spec §FR-F402, §FR-F405]
 
 ## Recovery and Lifecycle
 
-- [ ] CHK010 Are resize and context-recreation requirements specified for targets, programs and histories? [Coverage, Spec §FR-F411, §FR-F412]
-- [ ] CHK011 Is behavior downstream of a failed pass specified? [Edge Case, Spec §Clarifications]
+- [x] CHK010 Are resize and context-recreation requirements specified for targets, programs and histories? [Coverage, Spec §FR-F411, §FR-F412]
+- [x] CHK011 Is behavior downstream of a failed pass specified? [Edge Case, Spec §Clarifications]
 
 ## Accessibility and Performance
 
-- [ ] CHK012 Is the Reduce-Flashing measure (luma, grid, limit per second) quantified? [Clarity, Spec §FR-F409, §SC-F403]
-- [ ] CHK013 Is the default for the Reduce-Flashing flag and its source specified? [Completeness, Spec §Clarifications]
-- [ ] CHK014 Is device performance measurement explicitly deferred to campaign II rather than silently omitted? [Consistency, Spec §Assumptions, Constitution V]
+- [x] CHK012 Is the Reduce-Flashing measure (luma, grid, limit per second) quantified? [Clarity, Spec §FR-F409, §SC-F403]
+- [x] CHK013 Is the default for the Reduce-Flashing flag and its source specified? [Completeness, Spec §Clarifications]
+- [x] CHK014 Is device performance measurement explicitly deferred to campaign II rather than silently omitted? [Consistency, Spec §Assumptions, Constitution V]
 
 ## Integration
 
-- [ ] CHK015 Is ProjectM independence of the effects measurable (Showcase usage without ProjectM symbols)? [Measurability, Spec §SC-F405]
-- [ ] CHK016 Is the graph format versioned and serializable for apps that persist user graphs? [Completeness, Spec §FR-F401]
+- [x] CHK015 Is ProjectM independence of the effects measurable (Showcase usage without ProjectM symbols)? [Measurability, Spec §SC-F405]
+- [x] CHK016 Is the graph format versioned and serializable for apps that persist user graphs? [Completeness, Spec §FR-F401]
 
 ## Notes
+
+- Reviewed 2026-11-10 by the agent as reviewer under the owner's standing approval: 16/16 satisfied by spec (FR-F401–FR-F412, SC-F401–SC-F405), clarifications, data model and contract.
 
 - Mark items `[x]` only after review confirms the requirement-quality criterion is satisfied
 - Leave items unchecked when they still require clarification, correction, or reviewer evaluation
