@@ -34,7 +34,7 @@ public struct GPUHandle { kind, name, bytes, generation, label }   // every Text
 Texture.bind(unit:) · GPUBuffer.bind(target:), upload(_:target:) · RenderTarget.bind(), bindColor(unit:), readPixels(), colorTexture
 ResourceRegistry.acquireTarget(width:height:format:) / recycle(_:)      // pool, freed by trimPools() and on memory warnings
 ResourceRegistry.compileCount, cacheHits, cachedProgramCount, maxCachedPrograms (64), budget
-ShaderProgram.set(_:Float|SIMD2|SIMD3|SIMD4|Int32), set(_:matrix4:), uniforms, generation, cacheKey, lastFailureLog (static)
+ShaderProgram.use(), set(_:Float|SIMD2|SIMD3|SIMD4|Int32), set(_:matrix4:), uniforms: [String: Uniform] (Uniform = location, type, size), generation, cacheKey, lastFailureLog (static)
 RenderHost(scene:maxFramesPerSecond:budget:), RenderHost.resources
 ```
 
