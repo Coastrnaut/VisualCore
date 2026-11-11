@@ -13,7 +13,8 @@ let package = Package(
     dependencies: [.package(name: "VisualCore", path: "../../../Packages/VisualCore")],
     targets: [
         .target(name: "FractalExplorerCore", dependencies: [.product(name: "VisualCoreMath", package: "VisualCore"),
-                                                     .product(name: "VisualCorePersistence", package: "VisualCore")]),
+                                                     .product(name: "VisualCorePersistence", package: "VisualCore"),
+                                                     .product(name: "VisualCoreDiagnostics", package: "VisualCore")]),
         .testTarget(name: "FractalExplorerCoreTests", dependencies: ["FractalExplorerCore",
                                                                     .product(name: "VisualCoreMath", package: "VisualCore"),
                                                                     .product(name: "VisualCorePersistence", package: "VisualCore")]),

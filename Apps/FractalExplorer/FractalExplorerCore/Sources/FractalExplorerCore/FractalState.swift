@@ -66,7 +66,9 @@ public struct FractalState: Sendable, Equatable {
     /// Coordinates use up to 6 significant digits; the zoom is a whole number below 10,000×, scientific above, and two
     /// significant digits below 1×.
     public var spokenDescription: String {
-        let place = "centered at \(Self.complex(viewport.center)), zoom \(Self.zoomText(zoom))"
+        // Feature 029 T-A03-406 (FR-A03-404): the iteration cap is named when it is not the default 200.
+        let iterations = iterationCap == 200 ? "" : ", \(iterationCap) iterations"
+        let place = "centered at \(Self.complex(viewport.center)), zoom \(Self.zoomText(zoom))\(iterations)"
         switch mode {
         case .mandelbrot: return "Mandelbrot set, \(place)"
         case .julia: return "Julia set for seed \(Self.complex(juliaSeed)), \(place)"

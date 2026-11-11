@@ -191,6 +191,24 @@ final class ExplorerModel {
         }
     }
 
+    // MARK: Iteration cap and cost (feature 029 T-A03-406; FR-A03-404; US1)
+
+    /// The iteration cap (the control's range 50…10,000; a bookmark may hold a smaller cap, which is kept).
+    var cap: Int {
+        get { state.iterationCap }
+        set { state.iterationCap = CapControl.clamp(newValue) }
+    }
+    /// Halves the cap (at least 50).
+    func halveCap() { cap = CapControl.halved(cap) }
+    /// Doubles the cap (at most 10,000).
+    func doubleCap() { cap = CapControl.doubled(cap) }
+    /// Device pixels of the canvas.
+    var canvasPixels: Double {
+        state.viewport.size.x * state.viewport.size.y * pixelsPerPoint * pixelsPerPoint
+    }
+    /// "Render cost: N× the default view (level)" for the current cap and canvas.
+    var costText: String { CapControl.costText(cap: cap, pixels: canvasPixels) }
+
     /// Renames a bookmark.
     func renameBookmark(_ id: UUID, to name: String) { perform { try $0.rename(id, to: name) } }
     /// Marks or unmarks a favorite.
@@ -386,6 +404,28 @@ struct ExplorerView: View {
                         .font(.footnote)
                         .fixedSize(horizontal: false, vertical: true)
                         .accessibilityIdentifier("fe.fallback")
+                }
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Iterations: \(model.cap)")
+                        .accessibilityHidden(true)
+                    HStack {
+                        Button { model.halveCap() } label: { Label("Halve iterations", systemImage: "divide") }
+                            .labelStyle(.iconOnly)
+                            .accessibilityIdentifier("fe.cap.down")
+                        Slider(value: Binding(get: { CapControl.position(cap: model.cap) },
+                                              set: { model.cap = CapControl.cap(position: $0) }))
+                            .accessibilityLabel("Iterations")
+                            .accessibilityValue("\(model.cap) iterations")
+                            .accessibilityIdentifier("fe.cap")
+                        Button { model.doubleCap() } label: { Label("Double iterations", systemImage: "multiply") }
+                            .labelStyle(.iconOnly)
+                            .accessibilityIdentifier("fe.cap.up")
+                    }
+                    .buttonStyle(.bordered)
+                    Text(model.costText)
+                        .font(.footnote)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .accessibilityIdentifier("fe.cost")
                 }
                 Picker("Palette", selection: $model.paletteID) {
                     ForEach(ExplorerModel.paletteIDs, id: \.self) { id in

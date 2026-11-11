@@ -38,10 +38,11 @@ final class AccessibilityAuditUITests: XCTestCase {
                 return true
             }
             // Feature 027: text scrolled partly under the translucent navigation bar is measured against the bar's blur,
-            // not its own background (seen on iOS 26.5 at XXXL after scrolling to the zoom controls). Its reported frame is clipped
-            // to the visible area, so its top sits on the bar's bottom edge.
+            // not its own background (seen on iOS 26.5 at XXXL after scrolling to the zoom controls). Its reported frame starts on or
+            // above the bar's bottom edge (clipped there, or above the screen when scrolled further; feature 029) and
+            // continues below the bar.
             if issue.auditType == .contrast, let frame = e?.frame,
-               bars.contains(where: { frame.minY >= $0.minY && frame.minY <= $0.maxY + 0.5 }) {
+               bars.contains(where: { frame.minY <= $0.maxY + 0.5 && frame.maxY > $0.maxY }) {
                 ignored.append(description)
                 print("A11Y-AUDIT ignored (text scrolled under the navigation bar): \(description)")
                 return true
