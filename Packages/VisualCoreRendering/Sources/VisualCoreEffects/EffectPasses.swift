@@ -17,6 +17,12 @@ struct PassIO {
 @MainActor
 protocol EffectPassRunner: AnyObject {
     func run(_ io: PassIO) throws
+    /// Releases GPU objects the pass owns beyond a frame (feedback histories). Default: none.
+    func release(_ registry: ResourceRegistry)
+}
+
+extension EffectPassRunner {
+    func release(_ registry: ResourceRegistry) {}
 }
 
 /// Draws a full-screen triangle with `program` into `target`, binding `textures` as `u_<slot>`.
@@ -147,5 +153,39 @@ final class CompositePass: EffectPassRunner {
             p.set("u_mode", io.params.scalar("mode", 0))
             p.set("u_opacity", io.params.scalar("opacity", 1))
         }
+    }
+}
+
+/// `feedback`: blends the input with the previous output (decay 0–1). Owns one history target at its
+/// output size, cleared to the input on first use and on size changes (FR-F412).
+@MainActor
+final class FeedbackPass: EffectPassRunner {
+    private let blend: ShaderProgram, copy: ShaderProgram
+    private var history: RenderTarget?
+
+    init(registry: ResourceRegistry) throws {
+        blend = try registry.program(vertex: EffectShaders.vertex, fragment: EffectShaders.feedback)
+        copy = try registry.program(vertex: EffectShaders.vertex, fragment: EffectShaders.copy)
+    }
+
+    func run(_ io: PassIO) throws {
+        guard let input = io.inputs["input"] else { return }
+        if let h = history, h.width != io.output.width || h.height != io.output.height { release(io.registry) }
+        if history == nil {
+            let h = try io.registry.makeRenderTarget(width: io.output.width, height: io.output.height,
+                                                     format: io.output.format, label: "feedback history")
+            drawFullscreen(copy, into: h, textures: [("input", input)])
+            history = h
+        }
+        guard let history else { return }
+        drawFullscreen(blend, into: io.output, textures: [("input", input), ("history", history)]) {
+            $0.set("u_decay", io.params.scalar("decay", 0.9))
+        }
+        drawFullscreen(copy, into: history, textures: [("input", io.output)])
+    }
+
+    func release(_ registry: ResourceRegistry) {
+        if let history { registry.release(history) }
+        history = nil
     }
 }

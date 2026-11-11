@@ -1,0 +1,26 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/VisualCoreRendering",
+    "--scheme",
+    "VisualCoreRendering-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--result-name",
+    "F04-t412-ios27"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --result-name F04-t412-ios27",
+  "elapsed_seconds": 4.792,
+  "exit_code": 0,
+  "finished": "2026-11-11T00:23:11+00:00",
+  "log": ".autonomy/logs/F04.t412-feedback-ios27.log",
+  "log_sha256": "613e0832f29c52eaf3f9c744e18da4d61eab31ade84938263f035c4941fe18a5",
+  "name": "t412-feedback-ios27",
+  "stage": "F04",
+  "started": "2026-11-11T00:23:06+00:00",
+  "timed_out": false
+}

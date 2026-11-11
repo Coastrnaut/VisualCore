@@ -33,6 +33,8 @@ public final class EffectRenderer {
     /// Drops GPU state (programs, histories); the next frame rebuilds it. Called on resize/recreation.
     public func invalidate() {
         releaseHeld()
+        // Objects of an ended context died with it; release only same-generation ones.
+        if generation == registry.generation { for runner in runners.values { runner.release(registry) } }
         runners.removeAll()
         fallback = nil
         failedPasses.removeAll()
@@ -91,6 +93,7 @@ public final class EffectRenderer {
         case "bloom": return try BloomPass(registry: registry)
         case "distort": return try DistortPass(registry: registry)
         case "composite": return try CompositePass(registry: registry)
+        case "feedback": return try FeedbackPass(registry: registry)
         default: throw EffectGraphError.unknownType(type, pass: "")
         }
     }

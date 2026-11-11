@@ -117,4 +117,15 @@ enum EffectShaders {
         color = vec4(u_mode < 0.5 ? over : add, max(b.a, a));
     }
     """
+
+    /// output = input × (1 − decay) + history × decay.
+    static let feedback = """
+    precision mediump float;
+    uniform sampler2D u_input;
+    uniform sampler2D u_history;
+    uniform float u_decay;
+    in vec2 uv;
+    out vec4 color;
+    void main() { color = mix(texture(u_input, uv), texture(u_history, uv), u_decay); }
+    """
 }
