@@ -13,7 +13,8 @@ public final class EffectScene: RenderScene {
     public var graph: EffectGraphDescription { didSet { rebuildPending = true } }
     /// Appends the Reduce-Flashing limiter (FR-F409) as the final pass.
     public var reduceFlashing = false { didSet { if reduceFlashing != oldValue { rebuildPending = true } } }
-    public var flashLimitPerSecond = 0.3
+    /// Maximum change of displayed mean luminance per second; a change rebuilds the graph (FR-F409).
+    public var flashLimitPerSecond = 0.3 { didSet { if flashLimitPerSecond != oldValue, reduceFlashing { rebuildPending = true } } }
     public private(set) var lastError: Error?
     public private(set) var renderer: EffectRenderer?
 

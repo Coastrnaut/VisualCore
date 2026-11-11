@@ -110,4 +110,24 @@ final class EffectRendererTests: XCTestCase {
         XCTAssertTrue(host.renderOneFrame(present: false))
         XCTAssertEqual(scene.renderer?.lastOrder.last, EffectScene.flashLimitPassID)
     }
+
+    // T-F421 (FR-F409): changing the limit after the graph is built takes effect on the next frame.
+    func testChangingTheFlashLimitRebuildsTheGraph() throws {
+        let scene = EffectScene(content: ClearColorScene(red: 1, green: 1, blue: 1), graph: Self.swapGraph)
+        scene.reduceFlashing = true
+        let host = try RenderHost(scene: scene)
+        host.view.frame = CGRect(x: 0, y: 0, width: 16, height: 16)
+        host.view.layoutIfNeeded()
+        XCTAssertTrue(host.renderOneFrame(present: false))
+        let first = scene.renderer
+        scene.flashLimitPerSecond = 0.1
+        XCTAssertTrue(host.renderOneFrame(present: false))
+        XCTAssertFalse(scene.renderer === first, "a new renderer was built")
+        let limiter = scene.renderer?.graph.passes.first { $0.id == EffectScene.flashLimitPassID }
+        XCTAssertEqual(limiter?.params["limit"], [0.1])
+        scene.flashLimitPerSecond = 0.1
+        let same = scene.renderer
+        XCTAssertTrue(host.renderOneFrame(present: false))
+        XCTAssertTrue(scene.renderer === same, "an unchanged value does not rebuild")
+    }
 }
