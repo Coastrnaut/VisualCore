@@ -127,3 +127,7 @@ amendments), the plan, research R1–R4, the data model, the contract and the qu
 - T-A03-203 → T-A03-204.
 - T-A03-205 and T-A03-206 can run in parallel after 204 (analyze D1).
 - Both block T-A03-207 → T-A03-208.
+
+## Phase 7: Convergence
+
+- [ ] T-A03-209 Show where the shader's precision assumption comes from: in `ExplorerModel`, add `precisionSource` (for example "Shader precision: highp, 23 bits" or "Shader precision: assumed 10 bits — the graphics driver reported no usable highp or mediump float precision"). Show it as a footnote `fe.precision.source` beneath the banner. Add unit tests for the highp, mediump-only and no-report cases, and run on both runtimes, per US4/AC3 (partial)
