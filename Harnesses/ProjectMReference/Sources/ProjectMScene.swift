@@ -27,6 +27,10 @@ final class ProjectMScene: RenderScene {
 
     var hasEngine: Bool { engine != nil }
 
+    /// A preset change requested from UI; applied at the start of the next render, when the context is current.
+    private var pendingPreset: String?
+    func requestPreset(path: String) { pendingPreset = path }
+
     /// Loads another preset; on failure the previous preset keeps running (reference FR-045) and false is returned.
     @discardableResult
     func loadPreset(path: String) -> Bool {
@@ -63,6 +67,7 @@ final class ProjectMScene: RenderScene {
 
     func render(_ context: RenderContext, frame: FrameInfo) throws {
         guard let engine, context.pixelWidth > 0, context.pixelHeight > 0 else { return }
+        if let path = pendingPreset { pendingPreset = nil; loadPreset(path: path) }
         if viewports.last.map({ $0.width != context.pixelWidth || $0.height != context.pixelHeight }) ?? true {
             applyViewport(context, to: engine)
         }

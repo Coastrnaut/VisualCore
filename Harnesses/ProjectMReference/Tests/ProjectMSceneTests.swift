@@ -101,3 +101,19 @@ final class ProjectMSceneTests: XCTestCase {
         host.destroy()
     }
 }
+
+@MainActor
+final class PresetRequestTests: XCTestCase {
+    // T-F710: UI preset requests are applied inside the next render (context current).
+    func testRequestedPresetAppliesOnNextFrame() throws {
+        let scene = ProjectMScene(presetPath: HarnessSupport.preset("100-square.milk"))
+        let host = try HarnessSupport.host(scene)
+        _ = host.renderOneFrame(present: false)
+        scene.requestPreset(path: HarnessSupport.preset("200-wave.milk"))
+        XCTAssertTrue(scene.presetPath.hasSuffix("100-square.milk"), "not applied outside a frame")
+        XCTAssertTrue(host.renderOneFrame(present: false))
+        XCTAssertTrue(scene.presetPath.hasSuffix("200-wave.milk"))
+        XCTAssertFalse(ReferenceModel.presets.isEmpty, "the picker lists the upstream test presets")
+        host.destroy()
+    }
+}
