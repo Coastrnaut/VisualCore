@@ -67,4 +67,23 @@ final class SplatTests: XCTestCase {
         XCTAssertEqual(dye[4, 4, 0], 1, "8-bit dye saturates at 1")
         XCTAssertEqual(enc.decode(velocity[0, 0, 1]), 0, accuracy: 2 * 240 / 255, "zero stays zero")
     }
+
+    /// Feature 023 T-A02-508: repeated splats stay bounded — velocity per component within ±velocityLimit, dye within
+    /// 0…dyeCeiling — so half-float storage cannot blow up where 8-bit storage clamps.
+    func testRepeatedSplatsStayBounded() throws {
+        let s = try XCTUnwrap(Splat(position: SIMD2(0.5, 0.5), radius: 0.2, force: SIMD2(9_000, -9_000), color: SIMD4(1, 1, 1, 1)))
+        var velocity = FieldGrid(width: 8, height: 8, channels: 4)
+        var dye = DyeSeed.uniform(width: 8, height: 8, rgba: SIMD4(0, 0, 0, 1))
+        for _ in 0..<50 { s.apply(velocity: &velocity, dye: &dye, precision: .float16, velocityLimit: 240) }
+        XCTAssertEqual(velocity[4, 4, 0], 240)
+        XCTAssertEqual(velocity[4, 4, 1], -240)
+        XCTAssertLessThanOrEqual(velocity.values.map(abs).max() ?? 0, 240)
+        XCTAssertEqual(dye[4, 4, 0], Splat.dyeCeiling)
+        XCTAssertEqual(dye[4, 4, 3], 1, "alpha unchanged")
+        XCTAssertLessThanOrEqual(dye.values.max() ?? 0, Splat.dyeCeiling)
+        var unlimited = FieldGrid(width: 8, height: 8, channels: 4)
+        var dye2 = dye
+        s.apply(velocity: &unlimited, dye: &dye2, precision: .float32)
+        XCTAssertGreaterThan(unlimited[4, 4, 0], 5_000, "no limit given: the weighted force is added as is")
+    }
 }

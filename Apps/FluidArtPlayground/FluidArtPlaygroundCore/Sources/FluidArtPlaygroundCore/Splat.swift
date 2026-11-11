@@ -52,16 +52,24 @@ public struct Splat: Sendable, Equatable {
         return Foundation.exp(-(d.x * d.x + d.y * d.y) / (r * r))
     }
 
+    /// The largest dye amount a splat leaves in any channel (feature 023 T-A02-508): dye accumulates under
+    /// repeated splats, so it is bounded where it is added. 2 keeps smoke able to reach near-white and ink near-black.
+    public static let dyeCeiling: Float = 2
+
     /// CPU reference. Velocity channels 0–1 gain `force · w`, decoded and re-encoded with `velocityEncoding` when
-    /// it is given. Dye RGB gains `color · w`, and alpha is unchanged. Every changed value is rounded to `precision`.
+    /// it is given; otherwise each component is clamped to ±`velocityLimit` (cells per second) when that is given,
+    /// the same bound the 8-bit encoding imposes (feature 023). Dye RGB gains `color · w`, clamped to
+    /// 0…`dyeCeiling`, and alpha is unchanged. Every changed value is rounded to `precision`.
     public func apply(velocity: inout FieldGrid, dye: inout FieldGrid, precision: StoragePrecision,
-                      velocityEncoding: SignedRangeEncoding? = nil) {
+                      velocityEncoding: SignedRangeEncoding? = nil, velocityLimit: Float? = nil) {
         for y in 0..<velocity.height {
             for x in 0..<velocity.width {
                 let w = weight(cellX: Float(x) + 0.5, cellY: Float(y) + 0.5, width: velocity.width, height: velocity.height)
                 for c in 0..<min(2, velocity.channels) {
                     let v = velocity[x, y, c]
-                    let next = velocityEncoding.map { $0.encode($0.decode(v) + force[c] * w) } ?? v + force[c] * w
+                    let raw = v + force[c] * w
+                    let next = velocityEncoding.map { $0.encode($0.decode(v) + force[c] * w) }
+                        ?? velocityLimit.map { Swift.min(Swift.max(raw, -$0), $0) } ?? raw
                     velocity[x, y, c] = precision.round(next)
                 }
             }
@@ -69,7 +77,9 @@ public struct Splat: Sendable, Equatable {
         for y in 0..<dye.height {
             for x in 0..<dye.width {
                 let w = weight(cellX: Float(x) + 0.5, cellY: Float(y) + 0.5, width: dye.width, height: dye.height)
-                for c in 0..<min(3, dye.channels) { dye[x, y, c] = precision.round(dye[x, y, c] + color[c] * w) }
+                for c in 0..<min(3, dye.channels) {
+                    dye[x, y, c] = precision.round(Swift.min(Swift.max(dye[x, y, c] + color[c] * w, 0), Self.dyeCeiling))
+                }
             }
         }
     }

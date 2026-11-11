@@ -72,6 +72,7 @@ enum FluidShaders {
     uniform float uRange;
     uniform float uCenter;
     uniform int uVelocity;
+    uniform float uDyeMax;
     in vec2 v_uv;
     out vec4 color;
     void main() {
@@ -83,10 +84,10 @@ enum FluidShaders {
                 vec2 v = (base.xy - uCenter) * 2.0 * uRange + uValue.xy * w;
                 color = vec4(clamp(v / uRange * 0.5 + uCenter, 0.0, 1.0), base.zw);
             } else {
-                color = vec4(base.xy + uValue.xy * w, base.zw);
+                color = vec4(clamp(base.xy + uValue.xy * w, -uRange, uRange), base.zw);
             }
         } else {
-            color = vec4(base.rgb + uValue.rgb * w, base.a);
+            color = vec4(clamp(base.rgb + uValue.rgb * w, 0.0, uDyeMax), base.a);
         }
     }
     """

@@ -197,7 +197,11 @@ public enum FluidSolver {
     public static func step(velocity: inout FieldGrid, dye: inout FieldGrid, splats: [Splat], configuration c: FluidConfiguration,
                             pressureIterations: Int, dt: Double, precision: StoragePrecision, encodings: FluidEncodings,
                             log: inout AccessLog) {
-        for s in splats { s.apply(velocity: &velocity, dye: &dye, precision: precision, velocityEncoding: encodings.velocity) }
+        let limit = Float(c.velocityRange * 60)   // cells per second, the 8-bit storage range (feature 023)
+        for s in splats {
+            s.apply(velocity: &velocity, dye: &dye, precision: precision, velocityEncoding: encodings.velocity,
+                    velocityLimit: encodings.velocity == nil ? limit : nil)
+        }
         velocity = Advection.advect(velocity, by: velocity, dt: dt, factor: Dissipation.factor(d: c.velocityDissipation, dt: dt),
                                     precision: precision, velocityEncoding: encodings.velocity, sourceIsVelocity: true)
         velocity = diffuse(velocity: velocity, viscosity: c.viscosity, dt: dt, mode: c.boundaryMode, precision: precision,

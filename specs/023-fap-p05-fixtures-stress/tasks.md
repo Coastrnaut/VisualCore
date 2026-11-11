@@ -110,7 +110,7 @@ research R1–R7, data model, contract, quickstart).
 
 ## Phase 5: User Story 4 — Stability under stress (P2)
 
-- [ ] T-A02-508 [US4] Add `fieldCheck()` to `FluidFieldsScene`. It reads velocity, pressure and dye back
+- [X] T-A02-508 [US4] Add `fieldCheck()` to `FluidFieldsScene`. It reads velocity, pressure and dye back — Verified 2026-11-11: — Verified 2026-11-11: FluidFieldsScene.fieldCheck() (finite; dye 0..4; |v|*dt <= longer edge; |p| <= 1e4; RGBA8 not all at extremes). The first stress run FAILED in half-float (|v| 34,688 cells/s, dye 89.5, |p| 4.9e4; run-check t508-app-ios27 exit 65); fixed at the cause: splats clamp velocity per component to +-velocityRange*60 and dye to 0..2 in the shader and the CPU reference (Splat.apply velocityLimit, Splat.dyeCeiling; SplatTests +1; spec implementation clarification). StressTests 3: 600 frames on 256^2 with 10 pointers, max force, 80 iterations: half-float max |v| 382, dye 1.97, |p| 2,168; RGBA8 |v| 341, |p| 956; 0 failed checks, <= cap per frame; touch flood exactly the cap. run-check A02-P05/t508-core-test-3 56/56, t508-app-ios27-2 and t508-app-ios26 TEST SUCCEEDED, enumeration 65/65 each
   (`readFloatPixels`, velocity decoded in 8-bit) and checks:
   - all values finite;
   - dye in 0…4;

@@ -179,10 +179,12 @@ final class FluidFieldsScene: RenderScene {
                 "uPoint": point, "uRadius": radius, "uValue": .vec4(SIMD4(s.force.x, s.force.y, 0, 0)),
                 "uEncoded": .int(storage == .rgba8 ? 1 : 0), "uRange": .float(velocityRangeCellsPerSecond),
                 "uCenter": .float(encoding?.center ?? 0.5), "uVelocity": .int(1),
+                "uDyeMax": .float(Splat.dyeCeiling),
             ])
             try splat.run(pair: dye, input: "uField", uniforms: [
                 "uPoint": point, "uRadius": radius, "uValue": .vec4(s.color),
                 "uEncoded": .int(0), "uRange": .float(1), "uCenter": .float(0.5), "uVelocity": .int(0),
+                "uDyeMax": .float(Splat.dyeCeiling),
             ])
             appliedSplats += 1
         }
@@ -340,6 +342,66 @@ final class FluidFieldsScene: RenderScene {
         guard let dye, let grid = FieldGrid(width: dye.width, height: dye.height, channels: 4, values: dye.read.readFloatPixels())
         else { return nil }
         return grid
+    }
+
+    /// The result of `fieldCheck()`: blow-up detectors, not physics claims (spec 023 FR-A02-507).
+    struct FieldCheck: Equatable {
+        /// Largest velocity magnitude in cells per second.
+        var maxVelocity: Float = 0
+        /// Largest dye channel.
+        var maxDye: Float = 0
+        /// Largest |pressure|.
+        var maxPressure: Float = 0
+        /// The first failed rule, or nil when every value is finite and in range.
+        var firstBad: String?
+        /// True when no rule failed.
+        var passed: Bool { firstBad == nil }
+    }
+
+    /// Reads velocity, pressure and dye back and checks them (feature 023 T-A02-508; FR-A02-507): all values
+    /// finite; dye channels in 0…4; |v|·Δt ≤ the longer grid edge; |p| ≤ 10⁴; in RGBA8 storage the velocity must not
+    /// sit entirely at the encoding's extremes. Call between frames with the host's context current.
+    func fieldCheck() -> FieldCheck {
+        var check = FieldCheck()
+        guard let velocity, let dye, let pressure else {
+            check.firstBad = "fields not set up"
+            return check
+        }
+        let cells = velocity.width * velocity.height
+        let rawV = velocity.read.readFloatPixels(), rawD = dye.read.readFloatPixels(), rawP = pressure.read.readFloatPixels()
+        guard rawV.count == cells * 4, rawD.count == cells * 4, rawP.count == cells * 4 else {
+            check.firstBad = "readback failed"
+            return check
+        }
+        let pressureEncoding = storage == .rgba8 ? SignedRangeEncoding.unorm8(range: velocityRangeCellsPerSecond * 4) : nil
+        let dt = Float(lastStep > 0 ? lastStep : 1.0 / 60)
+        let edge = Float(max(velocity.width, velocity.height))
+        var extremes = 0
+        for cell in 0..<cells {
+            let x = cell % velocity.width, y = cell / velocity.width
+            let vx = encoding?.decode(rawV[cell * 4]) ?? rawV[cell * 4]
+            let vy = encoding?.decode(rawV[cell * 4 + 1]) ?? rawV[cell * 4 + 1]
+            if storage == .rgba8 {
+                for c in 0..<2 where rawV[cell * 4 + c] <= 0 || rawV[cell * 4 + c] >= 1 { extremes += 1 }
+            }
+            let speed = (vx * vx + vy * vy).squareRoot()
+            let p = pressureEncoding?.decode(rawP[cell * 4]) ?? rawP[cell * 4]
+            let d = rawD[cell * 4..<cell * 4 + 3]
+            check.maxVelocity = max(check.maxVelocity, speed.isFinite ? speed : .infinity)
+            check.maxPressure = max(check.maxPressure, abs(p))
+            check.maxDye = max(check.maxDye, d.max() ?? 0)
+            guard check.firstBad == nil else { continue }
+            if !speed.isFinite { check.firstBad = "velocity not finite at (\(x), \(y))" }
+            else if !p.isFinite { check.firstBad = "pressure not finite at (\(x), \(y))" }
+            else if d.contains(where: { !$0.isFinite }) { check.firstBad = "dye not finite at (\(x), \(y))" }
+            else if d.contains(where: { $0 < 0 || $0 > 4 }) { check.firstBad = "dye out of 0…4 at (\(x), \(y))" }
+            else if speed * dt > edge { check.firstBad = "velocity \(speed) cells/s moves past the grid at (\(x), \(y))" }
+            else if abs(p) > 10_000 { check.firstBad = "pressure \(p) beyond 10⁴ at (\(x), \(y))" }
+        }
+        if check.firstBad == nil, storage == .rgba8, extremes == cells * 2 {
+            check.firstBad = "velocity saturated at the encoding's extremes everywhere"
+        }
+        return check
     }
 
     /// The current velocity (2 channels, decoded from RGBA8 storage when needed).

@@ -58,6 +58,19 @@ delta), `RenderHost.renderFrame` (renders nothing unless active), `FramePacing.c
   splat colors (as at first open). The velocity and pressure are cleared to zero, written as encoded zero in 8-bit
   storage.
 
+### Session 2026-11-11 (implementation finding, T-A02-508)
+
+- Q: The first stress run failed in half-float storage. Velocity reached 34,688 cells/s (578 cells per step on a
+  256² grid), dye reached 89.5 and |pressure| reached 4.9×10⁴, because splats added force and dye without any bound.
+  8-bit storage passed only because its encoding clamps. How is this fixed? → A: Splats bound what they add, in every
+  storage and in the CPU reference (`Splat.apply`):
+  - each velocity component is clamped to ±`velocityRange × 60` cells/s, the range 8-bit storage already imposes;
+  - each dye channel is clamped to 0…2 (`Splat.dyeCeiling`), so smoke can still reach near-white and ink
+    near-black.
+
+  After the fix: half-float max |v| 382 cells/s, dye 1.97, |p| 2,168; RGBA8 max |v| 341 cells/s. The blow-up
+  detectors in FR-A02-507 are unchanged.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 — Pause, step a frame, resume and reset (Priority: P1)
