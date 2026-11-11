@@ -167,6 +167,10 @@ later phases can save it and the renderer can be rebuilt from it.
   at the limit.
 - Changing the family or the seed restarts the scene from the seed; it never mixes the old population into the replay.
 - The preview is drawn from a copy of the current particles; the drawing never changes the simulation.
+- A control command naming an emitter or attractor that does not exist is ignored and counted; it never crashes or
+  changes another element (checklist CHK005).
+- Going to the background pauses the scene; returning resumes it only if it was playing, without catching up the
+  time spent away. Under Reduce Motion the scene starts paused (checklist CHK017).
 
 ## Requirements *(mandatory)*
 
