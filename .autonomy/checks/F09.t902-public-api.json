@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_public_api.py"
+  ],
+  "command": "python3 scripts/check_public_api.py",
+  "elapsed_seconds": 0.054,
+  "exit_code": 0,
+  "finished": "2026-11-11T02:25:19+00:00",
+  "log": ".autonomy/logs/F09.t902-public-api.log",
+  "log_sha256": "0bbde74face6efa53c8e8964cbd30ad623ce4da35354819c21638f826484dff2",
+  "name": "t902-public-api",
+  "stage": "F09",
+  "started": "2026-11-11T02:25:19+00:00",
+  "timed_out": false
+}
