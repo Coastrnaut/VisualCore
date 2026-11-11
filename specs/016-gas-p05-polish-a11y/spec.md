@@ -14,6 +14,26 @@ is built in VisualCore (constitution Principle II). The manual's Phase 05 regres
 and foreground recreation restores the scene without stale GL handles. Evidence is host and simulator only. The
 manual's Phase 05 MVP line (still export) was delivered in Phase 04 and is regression-checked here.
 
+## Clarifications
+
+### Session 2026-11-11
+
+Answered autonomously under the owner's standing approval (CLAUDE.md §2); the recommended option was chosen in each case.
+
+- Q: What playback rate counts as "reduced" under Reduce Motion? → A: 0.5×, VisualCore's existing reduced-motion
+  factor. Scrubbing and paused time are unaffected.
+- Q: What bound does Reduce Flashing guarantee? → A: VisualCore's flash limiter keeps the displayed mean brightness
+  change at or below 0.3 of full scale per second. Per frame that is 0.3 × the frame interval, plus 1/255 for
+  rounding.
+- Q: Is an export limited when Reduce Flashing is on? → A: No. A still image cannot flash, so exports render the
+  composition without the limiter. The live limiter's state is kept, so the live view does not jump afterwards.
+- Q: Where do the system values come from? → A: Public accessibility APIs only: the system Reduce Motion flag and the
+  system "Dim Flashing Lights" flag (available since iOS 16.4; the app's minimum is iOS 26), each with its change
+  notification. For tests, the source can be replaced with fixed values. No permission is involved.
+- Q: Which audit findings may be documented instead of fixed? → A: Only findings about the artwork inside the live
+  canvas (for example, the contrast of generated colors), because the canvas is one described image element and not
+  text. Each one is listed with its reason. Every other finding is fixed.
+
 ## User Scenarios & Testing *(mandatory)*
 
 Users: people who rely on Reduce Motion, flashing-light sensitivity settings, VoiceOver or large text (manual §2
@@ -100,8 +120,8 @@ the system values. Docs and the API baseline are updated, and the ProjectM regre
 
 - The system setting changes while a scene is open, or while the app is in the background: the new value applies
   on return, without reopening the scene.
-- Reduce Flashing is turned on during playback: limiting begins without a visible jump, and exports are not limited.
-  An export is a still image, so no flashing can occur.
+- Reduce Flashing is turned on during playback: limiting begins without a visible jump. Exports are rendered without
+  the limiter (a still cannot flash), and the live limiter state is kept.
 - The app choice "Off" overrides a system setting that is on. This is the user's explicit choice, and the Settings
   screen says so.
 - A context loss while the export sheet is open: the next export works.
@@ -114,13 +134,14 @@ the system values. Docs and the API baseline are updated, and the ProjectM regre
 
 - **FR-A01-501**: The app MUST provide Settings with Reduce Motion and Reduce Flashing, each set to System (default),
   On or Off. Choices persist on the device only.
-- **FR-A01-502**: The effective Reduce Motion MUST slow scene playback to the reduced rate. The effective Reduce
+- **FR-A01-502**: The effective Reduce Motion MUST slow scene playback to the reduced rate (0.5×). The effective Reduce
   Flashing MUST limit per-frame brightness change in the live scene through the VisualCore flash limiter. Both apply
   to an open scene within one frame of a change.
 - **FR-A01-503**: The live canvas MUST expose an accessibility description with the family, preset (or "custom"),
   palette, seed and play state, updated when any of them changes.
 - **FR-A01-504**: Every app screen MUST pass the automated accessibility audit at the default text size and at the
-  largest accessibility text size. Each issue found is fixed or documented with its reason.
+  largest accessibility text size. Every issue found is fixed. Only findings about the artwork inside the live canvas
+  may be documented with their reason instead.
 - **FR-A01-505**: Background/foreground cycles and context recreation MUST restore every family at the same scene
   time, with 0 stale-object uses after recovery and 0 leaks. Export MUST work after recovery.
 - **FR-A01-506**: The reusable accessibility settings MUST live in VisualCore:
@@ -147,7 +168,8 @@ the system values. Docs and the API baseline are updated, and the ProjectM regre
 - **SC-A01-501**: All 9 system × choice combinations per setting resolve as defined (18 cases). An open scene's rate
   and flash limiting follow a change within one frame. Choices survive relaunch.
 - **SC-A01-502**: With Reduce Flashing effective, a full-screen black↔white alternation is shown with a per-frame
-  brightness change of at most the limiter's bound. Without it, the change is unlimited.
+  mean brightness change of at most 0.3 × frame interval + 1/255. Without it, the change is the full alternation. An
+  export taken meanwhile equals the unlimited composition.
 - **SC-A01-503**: The accessibility audit reports 0 unresolved issues on 6 screens at 2 text sizes on both runtimes.
 - **SC-A01-504**: For 4 families, after background/foreground and after context recreation, the image at the same
   time matches the earlier one (mean difference ≤ 1/255). Stale uses after recovery = 0, and leaks = 0. 20 cycles
@@ -159,7 +181,7 @@ the system values. Docs and the API baseline are updated, and the ProjectM regre
 
 - Quality presets (manual Settings row "quality") need device measurements and are out of scope until campaign II.
   Settings shows only accessibility choices and an About line.
-- The system flashing-light setting is read through the public accessibility API. Simulators report it off unless
-  the test overrides the system value through the model's injectable source.
+- The system flashing-light setting is read through the public accessibility API. Simulators report it off, so tests
+  supply system values through the replaceable source.
 - Human review of VoiceOver on real devices is campaign II work. Here the automated audit and labels are the
   evidence.
