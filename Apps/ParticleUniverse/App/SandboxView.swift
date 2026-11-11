@@ -29,33 +29,36 @@ struct SandboxView: View {
 
 private struct SandboxContent: View {
     let model: SceneModel
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
+    /// Segmented at regular sizes; a menu at accessibility sizes, where four segments would clip their titles.
+    @ViewBuilder private var familyPicker: some View {
+        let picker = Picker("Emitter family", selection: Binding(get: { model.family }, set: { model.select($0) })) {
+            ForEach(EmitterFamily.allCases, id: \.self) { Text($0.title).tag($0) }
+        }
+        if dynamicTypeSize.isAccessibilitySize {
+            picker.pickerStyle(.menu)
+        } else {
+            picker.pickerStyle(.segmented)
+        }
+    }
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 12) {
-                Picker("Emitter family", selection: Binding(get: { model.family }, set: { model.select($0) })) {
-                    ForEach(EmitterFamily.allCases, id: \.self) { Text($0.title).tag($0) }
-                }
-                .pickerStyle(.segmented)
-                .accessibilityIdentifier("pu.sandbox.family")
+                familyPicker
+                    .accessibilityIdentifier("pu.sandbox.family")
                 Text(model.family.spokenDescription)
                     .font(.callout)
                     .fixedSize(horizontal: false, vertical: true)
                     .accessibilityIdentifier("pu.sandbox.description")
-                ParticlePreview(particles: model.particles, playing: model.isPlaying) { model.frame(at: $0) }
+                // Per-frame state (particles, counts) is read only inside these two views, so the picker and buttons
+                // are not rebuilt on every frame (a rebuild each frame swallowed segment taps).
+                ParticlePreview(model: model)
                     .aspectRatio(1, contentMode: .fit)
                     .frame(maxWidth: 640)
                     .frame(maxWidth: .infinity)
-                    .accessibilityElement()
-                    .accessibilityLabel(model.canvasDescription)
-                    .accessibilityAddTraits(.isImage)
-                    .accessibilityIdentifier("pu.sandbox.canvas")
-                Text(model.liveText)
-                    .font(.body.monospacedDigit())
-                    .accessibilityIdentifier("pu.sandbox.live")
-                Text(model.droppedText)
-                    .font(.body.monospacedDigit())
-                    .accessibilityIdentifier("pu.sandbox.dropped")
+                CountsView(model: model)
                 ViewThatFits(in: .horizontal) {
                     HStack(spacing: 12) { controls }
                     VStack(alignment: .leading, spacing: 12) { controls }
@@ -86,15 +89,30 @@ private struct SandboxContent: View {
     }
 }
 
-/// Draws a copy of the particles: the world square −500…500 fitted into the view, y up. Calls `onFrame` with each
-/// display frame's date while playing.
-private struct ParticlePreview: View {
-    let particles: [ParticleInstance]
-    let playing: Bool
-    let onFrame: (Date) -> Void
+/// The live and dropped counts.
+private struct CountsView: View {
+    let model: SceneModel
 
     var body: some View {
-        TimelineView(.animation(minimumInterval: nil, paused: !playing)) { timeline in
+        VStack(alignment: .leading, spacing: 4) {
+            Text(model.liveText)
+                .font(.body.monospacedDigit())
+                .accessibilityIdentifier("pu.sandbox.live")
+            Text(model.droppedText)
+                .font(.body.monospacedDigit())
+                .accessibilityIdentifier("pu.sandbox.dropped")
+        }
+    }
+}
+
+/// Draws a copy of the particles: the world square −500…500 fitted into the view, y up. Advances the model with each
+/// display frame's date while playing.
+private struct ParticlePreview: View {
+    let model: SceneModel
+
+    var body: some View {
+        let particles = model.particles
+        TimelineView(.animation(minimumInterval: nil, paused: !model.isPlaying)) { timeline in
             Canvas { context, size in
                 context.fill(Path(CGRect(origin: .zero, size: size)), with: .color(.black))
                 let scale = min(size.width, size.height) / 1_000
@@ -106,8 +124,12 @@ private struct ParticlePreview: View {
                     context.fill(Path(ellipseIn: CGRect(x: x - d / 2, y: y - d / 2, width: d, height: d)), with: .color(color))
                 }
             }
-            .onChange(of: timeline.date) { _, date in onFrame(date) }
+            .onChange(of: timeline.date) { _, date in model.frame(at: date) }
         }
         .clipShape(RoundedRectangle(cornerRadius: 12))
+        .accessibilityElement()
+        .accessibilityLabel(model.canvasDescription)
+        .accessibilityAddTraits(.isImage)
+        .accessibilityIdentifier("pu.sandbox.canvas")
     }
 }
