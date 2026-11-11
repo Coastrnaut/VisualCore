@@ -45,7 +45,7 @@ description: "Task list for feature 025 — Fractal Explorer Phase 00 boundary a
 
 ## Phase 4: US3 — Compilable empty app shell (P1)
 
-- [ ] T-A03-004 [US3] Add the shell:
+- [X] T-A03-004 [US3] Add the shell: — Verified 2026-11-11: — Verified 2026-11-11: Apps/FractalExplorer/App/FractalExplorerApp.swift (@main SwiftUI shell; HomeView with the title 'Fractal Explorer', header trait, accessibility label and identifier fe.home.title, container fe.home; no render host, permissions or networking; no promise copy); project.yml targets FractalExplorer (dev.visualcore.FractalExplorer, iOS 26.0, 0.1.0 (1), ITSAppUsesNonExemptEncryption false, no usage descriptions, no VisualCore product yet, dependency-audit post-build phase) and FractalExplorerUITests, scheme FractalExplorer; Info.plists under the gitignored Apps/*/Generated/. run-check A03-P00/t004-shell-build BUILD SUCCEEDED for generic iOS Simulator with the audit 'PASS: no ProjectM engine/preset/bridge dependency'; built Info.plist has the bundle id and 0 usage descriptions; t004-dependencies R1-R5 PASS (FR-A03-005, FR-A03-006)
   - `Apps/FractalExplorer/App/FractalExplorerApp.swift`: an @main SwiftUI app with `HomeView`, title "Fractal
     Explorer", identifier `fe.home.title`, accessibility label and header trait, container `fe.home`;
   - `project.yml` target `FractalExplorer`:
