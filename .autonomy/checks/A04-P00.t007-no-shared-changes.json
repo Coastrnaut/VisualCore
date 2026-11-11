@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "bash",
+    "-c",
+    "out=$(git diff --stat d425f7d..HEAD -- Packages External); echo \"diff: [$out]\"; test -z \"$out\""
+  ],
+  "command": "bash -c 'out=$(git diff --stat d425f7d..HEAD -- Packages External); echo \"diff: [$out]\"; test -z \"$out\"'",
+  "elapsed_seconds": 0.012,
+  "exit_code": 0,
+  "finished": "2026-11-11T16:56:21+00:00",
+  "log": ".autonomy/logs/A04-P00.t007-no-shared-changes.log",
+  "log_sha256": "3a0bf4c96d18d28153b9be8c5ff892b81ba8e766b6cb98d7df3f366ccd5ecb0e",
+  "name": "t007-no-shared-changes",
+  "stage": "A04-P00",
+  "started": "2026-11-11T16:56:21+00:00",
+  "timed_out": false
+}

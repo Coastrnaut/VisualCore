@@ -37,7 +37,7 @@ reference regression.
 
 ## Phase 6: Polish
 
-- [ ] T-A04-007 Confirm `git diff --stat d425f7d..HEAD -- Packages External` is empty (SC-A04-006); run the release-check fast steps (docs, app-contracts, compliance, dependencies, licenses, script-tests) and the documented-API check for `Apps/ParticleUniverse`.
+- [X] T-A04-007 Confirm `git diff --stat d425f7d..HEAD -- Packages External` is empty (SC-A04-006); run the release-check fast steps (docs, app-contracts, compliance, dependencies, licenses, script-tests) and the documented-API check for `Apps/ParticleUniverse`. — Verified 2026-11-11: — Verified 2026-11-11: run-check A04-P00/t007-no-shared-changes: git diff --stat d425f7d..HEAD -- Packages External is empty (SC-A04-006); t007-fast-checks 8/8 (docs, app-contracts incl. particle-universe, compliance, dependencies, licenses, script-tests, documented-api-particle-universe, isolation-particle-universe)
 
 ## Dependencies
 
