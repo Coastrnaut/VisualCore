@@ -18,17 +18,20 @@ public struct AutomationView: UIViewRepresentable {
     let outputDirectory: URL?
     let postRunCheck: (@MainActor (RenderScene) -> String?)?
     let checkNote: (@MainActor (RenderScene) -> String?)?
+    let appModes: [String: @MainActor (RenderScene, RenderHost, inout AutomationReport, Int) -> Void]
     let terminate: (Int32) -> Void
 
     /// `configure` receives the scene and the view's display scale just before the run (for point-sized content).
     /// `outputDirectory` and `terminate` are passed to `AutomationRunner` (defaults: Documents, and exiting the app).
     /// `postRunCheck` and `checkNote` receive the scene and become the runner's domain check and pass note (feature
-    /// 023 T-A02-502).
+    /// 023 T-A02-502). `appModes` are the app's own measurement modes, each receiving the scene, the host, the report
+    /// and the frame count (feature 030 T-A03-501; G-AUTOMODE).
     public init(mode: String, bundleID: String, makeScene: @escaping @MainActor () -> RenderScene,
                 configure: (@MainActor (RenderScene, CGFloat) -> Void)? = nil,
                 outputDirectory: URL? = nil,
                 postRunCheck: (@MainActor (RenderScene) -> String?)? = nil,
                 checkNote: (@MainActor (RenderScene) -> String?)? = nil,
+                appModes: [String: @MainActor (RenderScene, RenderHost, inout AutomationReport, Int) -> Void] = [:],
                 terminate: @escaping (Int32) -> Void = { exit($0) }) {
         self.mode = mode
         self.bundleID = bundleID
@@ -37,6 +40,7 @@ public struct AutomationView: UIViewRepresentable {
         self.outputDirectory = outputDirectory
         self.postRunCheck = postRunCheck
         self.checkNote = checkNote
+        self.appModes = appModes
         self.terminate = terminate
     }
 
@@ -67,6 +71,7 @@ public struct AutomationView: UIViewRepresentable {
             let runner = AutomationRunner(host: host, bundleID: bundleID, outputDirectory: outputDirectory, terminate: terminate)
             if let postRunCheck { runner.postRunCheck = { postRunCheck(scene) } }
             if let checkNote { runner.checkNote = { checkNote(scene) } }
+            runner.appModes = appModes.mapValues { mode in { host, report, frames in mode(scene, host, &report, frames) } }
             context.coordinator.runner = runner
         } catch {
             if let fallback = try? RenderHost(scene: ClearColorScene(red: 0, green: 0, blue: 0)) {

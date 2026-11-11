@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_test_enumeration.py",
+    "--sources",
+    "Packages/VisualCoreRendering/Tests",
+    "--log",
+    ".autonomy/logs/A03-P05.t501-rendering-27.log"
+  ],
+  "command": "python3 scripts/check_test_enumeration.py --sources Packages/VisualCoreRendering/Tests --log .autonomy/logs/A03-P05.t501-rendering-27.log",
+  "elapsed_seconds": 0.029,
+  "exit_code": 0,
+  "finished": "2026-11-11T14:54:31+00:00",
+  "log": ".autonomy/logs/A03-P05.t501-enum-27.log",
+  "log_sha256": "0f4eed86cb6e5695fb5057a3f5a6942eb18a9a5042e9f0f5dcf17e43b2e84b12",
+  "name": "t501-enum-27",
+  "stage": "A03-P05",
+  "started": "2026-11-11T14:54:31+00:00",
+  "timed_out": false
+}

@@ -130,3 +130,81 @@ final class AutomationRunnerTests: XCTestCase {
         XCTAssertEqual(codes, [2])
     }
 }
+
+// Feature 030 T-A03-501 (FR-A03-501, SC-A03-501; contract automation-modes): app-defined modes.
+@MainActor
+final class AutomationAppModeTests: XCTestCase {
+    private var host: RenderHost!
+    private var dir: URL!
+    private var codes: [Int32] = []
+
+    override func setUp() async throws {
+        host = try RenderHost(scene: ClearColorScene(red: 0.2, green: 0.4, blue: 0.6))
+        host.view.frame = CGRect(x: 0, y: 0, width: 32, height: 32)
+        host.view.layoutIfNeeded()
+        dir = FileManager.default.temporaryDirectory.appendingPathComponent("automation-app-\(UUID().uuidString)")
+        codes = []
+    }
+
+    override func tearDown() async throws { host.destroy() }
+
+    private func runner() -> AutomationRunner {
+        AutomationRunner(host: host, bundleID: "dev.visualcore.tests", outputDirectory: dir) { [weak self] in self?.codes.append($0) }
+    }
+
+    func testAppModeRunsAndFillsMeasurements() throws {
+        let r = runner()
+        var seenFrames = 0
+        r.appModes["probe"] = { host, report, frames in
+            seenFrames = frames
+            report.frames = host.renderOneFrame(present: false) ? 1 : 0
+            report.measurements = ["answer": 42, "bits": 23]
+            report.details = ["note": "fine"]
+        }
+        r.checkNote = { "note from the app" }
+        let report = r.run(mode: "probe", frames: 7)
+        XCTAssertEqual(report.result, "pass")
+        XCTAssertEqual(seenFrames, 7)
+        XCTAssertEqual(report.frames, 1)
+        XCTAssertEqual(report.measurements?["answer"], 42)
+        XCTAssertEqual(report.details?["note"], "fine")
+        XCTAssertEqual(report.message, "note from the app", "app modes get the pass note like built-ins")
+        XCTAssertEqual(codes, [0])
+        let decoded = try JSONDecoder().decode(AutomationReport.self, from: Data(contentsOf: try XCTUnwrap(r.lastReportURL)))
+        XCTAssertEqual(decoded, report)
+        XCTAssertEqual(r.allModes, ["smoke", "launch", "lifecycle", "probe"])
+    }
+
+    func testDomainCheckFailsAnAppMode() {
+        let r = runner()
+        r.appModes["probe"] = { _, report, _ in report.frames = 1 }
+        r.postRunCheck = { "value out of range" }
+        let report = r.run(mode: "probe")
+        XCTAssertEqual(report.result, "fail")
+        XCTAssertEqual(report.message, "value out of range")
+        XCTAssertEqual(codes, [1])
+    }
+
+    func testBuiltInNameWinsAndUnknownListsAppModes() {
+        let r = runner()
+        var called = false
+        r.appModes["smoke"] = { _, _, _ in called = true }
+        r.appModes["tour"] = { _, _, _ in }
+        let smoke = r.run(mode: "smoke", frames: 3)
+        XCTAssertFalse(called)
+        XCTAssertEqual(smoke.frames, 3)
+        XCTAssertTrue(smoke.message?.contains("app mode 'smoke' ignored") == true, smoke.message ?? "")
+        let unknown = r.run(mode: "nope")
+        XCTAssertEqual(unknown.result, "error")
+        XCTAssertEqual(unknown.message, "unknown mode 'nope'; known: smoke, launch, lifecycle, tour")
+    }
+
+    func testReportsWithoutTheNewFieldsDecode() throws {
+        let old = #"{"schema":1,"mode":"smoke","bundleID":"b","deviceModel":"m","osVersion":"27.2.0","startedAt":"2026-11-11T00:00:00Z","frames":3,"result":"pass"}"#
+        let report = try JSONDecoder().decode(AutomationReport.self, from: Data(old.utf8))
+        XCTAssertNil(report.measurements)
+        XCTAssertNil(report.details)
+        let encoded = String(decoding: try JSONEncoder().encode(report), as: UTF8.self)
+        XCTAssertFalse(encoded.contains("measurements"), "nil fields are omitted")
+    }
+}

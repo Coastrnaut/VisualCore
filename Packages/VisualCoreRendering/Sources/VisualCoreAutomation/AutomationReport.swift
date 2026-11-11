@@ -57,5 +57,11 @@ public struct AutomationReport: Codable, Equatable, Sendable {
     public var result: String
     /// Human-readable detail for `fail`/`error`.
     public var message: String?
+    /// Numeric measurements an app mode adds (feature 030 T-A03-501; G-AUTOMODE), for example a precision ladder's
+    /// clamp step. Optional: omitted when nil, and reports without it still decode.
+    public var measurements: [String: Double]?
+    /// Text details an app mode adds (feature 030 T-A03-501), for example a per-step table. Optional like
+    /// `measurements`.
+    public var details: [String: String]?
 }
 #endif

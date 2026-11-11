@@ -16,8 +16,22 @@ public final class AutomationRunner {
     public nonisolated static let framesKey = "VISUALCORE_AUTORUN_FRAMES"
     /// Environment variable with the deterministic test-mode seed (feature 023 T-A02-502; default 1).
     public nonisolated static let seedKey = "VISUALCORE_AUTORUN_SEED"
-    /// Supported modes.
+    /// Supported built-in modes.
     public nonisolated static let knownModes = ["smoke", "launch", "lifecycle"]
+
+    /// An app-defined measurement mode (feature 030 T-A03-501; gap G-AUTOMODE): it runs against the one render host
+    /// and fills the report (result, message, frames, frame-time statistics, `measurements`, `details`). The third
+    /// argument is the requested frame count.
+    public typealias AppMode = @MainActor (RenderHost, inout AutomationReport, Int) -> Void
+
+    /// The app's own modes by name. A name equal to a built-in mode is ignored (the built-in runs, and the message
+    /// says so). App modes get the same `postRunCheck` and `checkNote` as built-in modes.
+    public var appModes: [String: AppMode] = [:]
+
+    /// Every mode this runner can run: the built-in modes first, then the app's (sorted).
+    public var allModes: [String] {
+        Self.knownModes + appModes.keys.filter { !Self.knownModes.contains($0) }.sorted()
+    }
 
     private let host: RenderHost
     private let bundleID: String
@@ -71,10 +85,18 @@ public final class AutomationRunner {
         case "launch": launch(&report)
         case "lifecycle": lifecycle(&report, frames: frames)
         default:
-            report.result = "error"
-            report.message = "unknown mode '\(mode)'; known: \(Self.knownModes.joined(separator: ", "))"
+            if let handler = appModes[mode] {
+                handler(host, &report, frames)
+            } else {
+                report.result = "error"
+                report.message = "unknown mode '\(mode)'; known: \(allModes.joined(separator: ", "))"
+            }
         }
-        if Self.knownModes.contains(mode), report.result == "pass" || report.result == "fail" {
+        if Self.knownModes.contains(mode), appModes[mode] != nil {
+            let note = "app mode '\(mode)' ignored: the built-in mode ran"
+            report.message = [report.message, note].compactMap { $0 }.joined(separator: "; ")
+        }
+        if allModes.contains(mode), report.result == "pass" || report.result == "fail" {
             if let failure = postRunCheck?() {
                 report.result = "fail"
                 report.message = [report.message, failure].compactMap { $0 }.joined(separator: "; ")
