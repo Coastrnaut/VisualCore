@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "python3",
+    "scripts/validate_docs.py"
+  ],
+  "command": "python3 scripts/validate_docs.py",
+  "elapsed_seconds": 0.023,
+  "exit_code": 0,
+  "finished": "2026-11-11T02:15:46+00:00",
+  "log": ".autonomy/logs/F08.t808-readme.log",
+  "log_sha256": "918d7d219393a76d44df9f9da5b43f679f8053f9335549ae627776c6679e8cf5",
+  "name": "t808-readme",
+  "stage": "F08",
+  "started": "2026-11-11T02:15:46+00:00",
+  "timed_out": false
+}

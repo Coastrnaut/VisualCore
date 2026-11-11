@@ -29,7 +29,7 @@ One commit + push per task.
 
 ## Phase 5: Polish
 
-- [ ] T-F808 `Harnesses/SecondConsumer/README.md` (what it proves, capability map to documented APIs, how to run checks and smoke test)
+- [X] T-F808 `Harnesses/SecondConsumer/README.md` (what it proves, capability map to documented APIs, how to run checks and smoke test) — Verified 2026-11-10: F08.t808-readme exit 0 (validate_docs): README covers the game, the capability→documented-API map, GardenKit host tests, both checks (also post-build) and the smoke test
 - [ ] T-F809 Full verification: GardenKit host tests, documented-API check, audit (spec + built app), smoke test both runtimes, host + rendering regression, R1–R5, compliance, scripts, docs
 - [ ] T-F810 {device} Lumen Garden frame pacing on D1/D2/D3 — **deferred to campaign II** (constitution V)
 
