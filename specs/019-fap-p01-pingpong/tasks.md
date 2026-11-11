@@ -193,3 +193,8 @@ No CRITICAL findings; coverage is 100%.
 
 MVP = Setup + Foundational + US2 + US1: a GPU dissipation fixture that matches the CPU. Then US3 (the visible canvas
 and lifecycle), then the contract and checks. The gate is sealed only after converge appends nothing.
+
+## Phase 7: Convergence
+
+- [ ] T-A02-116 Cap the grid by the real device limit. Expose the registry's maximum texture size read-only in VisualCoreRendering (`ResourceRegistry.maxTextureSize`, `public internal(set)`, with docs and the API baseline), validate the configuration in `FluidFieldsScene.setup` with `min(maxEdge, resources.maxTextureSize)`, and add a unit test where a small cap clamps the grid and is reported. Then rerun the package tests, the app tests and the ProjectM regression, per FR-A02-101 (partial)
+- [ ] T-A02-117 Make `FluidFieldsScene.setup` throw (and release everything) when a seed `upload(rgbaFloats:)` returns false, with a unit test of the failure path, per FR-A02-107 / plan lifecycle step 1 (partial)
