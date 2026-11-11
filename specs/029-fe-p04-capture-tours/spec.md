@@ -129,7 +129,9 @@ magnitudes.
 ### Edge Cases
 
 - A cap set while a tour runs: the tour continues; the cap applies.
-- The canvas has no size yet: Capture is disabled.
+- The canvas has no size yet: Capture is disabled, and the cost line uses the default canvas until the first layout
+  (CHK019).
+- The app moves to the background during a tour: the tour stops at the current view (CHK015).
 - A capture on a device whose render limit is below 4096: the long edge is the limit (aspect kept).
 - A tour started in Julia mode: the tour switches to Mandelbrot (its stops are Mandelbrot places).
 - Leaving the explorer during a tour or capture: the tour stops and the file is deleted.
@@ -155,7 +157,8 @@ magnitudes.
   a failure message (`fe.capture.error`); the app declares the Photos add-only usage text for saving from the share
   sheet.
 - **FR-A03-406**: The explorer MUST offer Tours (`fe.tours`) with three curated Mandelbrot tours, a caption
-  (`fe.tour.caption`) and Stop (`fe.tour.stop`) per US3, honouring Reduce Motion.
+  (`fe.tour.caption`) and Stop (`fe.tour.stop`) per US3, honouring Reduce Motion. Each stop's caption is announced
+  to VoiceOver once when the stop is reached (checklist CHK004).
 - **FR-A03-407**: The precision advisor's smallest step MUST be checked against the true float spacing for 23 and 10
   bits (US4), as a host regression fixture.
 - **FR-A03-408**: The contract MUST record G-COST and G-TOUR closed and the still capture added (G-CAPTURE), the checks
