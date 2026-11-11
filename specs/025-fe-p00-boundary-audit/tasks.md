@@ -25,7 +25,7 @@ description: "Task list for feature 025 — Fractal Explorer Phase 00 boundary a
 
 ## Phase 2: US1 — Evidence-backed integration matrix (P1) 🎯
 
-- [ ] T-A03-002 [US1] Write `docs/apps/fractal-explorer/visualcore-contract.json` (schema 1, app `fractal-explorer`,
+- [X] T-A03-002 [US1] Write `docs/apps/fractal-explorer/visualcore-contract.json` (schema 1, app `fractal-explorer`, — Verified 2026-11-11: — Verified 2026-11-11: docs/apps/fractal-explorer/visualcore-contract.json (schema 1, gate A03-P00): 18 inventory areas (13 refreshed from A02 + full-screen passes/uniforms, shader precision and capabilities, palettes/color/animation, cameras and transforms, persistence and temporary files), every path exists; matrix M01-M10 (available: M01 fragment shaders, M04 animation, M05 palettes, M06 pinch/pan, M07 bookmarks, M09 capture/tours; requires adaptation: M02 transforms, M03 precision, M08 cost estimate, M10 precision clamp), public non-test evidence with products and an example consumer type on every row. run-check A03-P00/t002-contract-citations-2: 0 citation problems (the first run t002-contract-citations flagged example symbols not declared in their files, fixed to the consumer types); remaining findings are the gap entries and decision owned by T-A03-006
   gate A03-P00):
   - an `inventory` covering every area in FR-A03-001, each with paths;
   - `matrix` rows M01–M10 per research R1–R10:

@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_app_contract.py",
+    "--app",
+    "fractal-explorer"
+  ],
+  "command": "python3 scripts/check_app_contract.py --app fractal-explorer",
+  "elapsed_seconds": 0.027,
+  "exit_code": 1,
+  "finished": "2026-11-11T11:41:59+00:00",
+  "log": ".autonomy/logs/A03-P00.t002-contract-citations-2.log",
+  "log_sha256": "933538d7cf6e2f38a5586dd63a3d844e534997ef5b5e0bfdb928eeb79234d9e3",
+  "name": "t002-contract-citations-2",
+  "stage": "A03-P00",
+  "started": "2026-11-11T11:41:59+00:00",
+  "timed_out": false
+}
