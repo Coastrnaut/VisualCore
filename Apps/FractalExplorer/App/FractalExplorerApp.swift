@@ -3,10 +3,18 @@
 // its CPU reference and rendering arrive in Phases 01–02 through VisualCore modules
 // (docs/apps/fractal-explorer/visualcore-contract.md).
 import SwiftUI
+import VisualCoreRendering
 import VisualCoreUI
 
 @main
 struct FractalExplorerApp: App {
+    /// Feature 029 (T-A03-407; US2 AC4): captures from a previous run are removed at launch.
+    init() { Self.cleanUpCaptures() }
+
+    /// Empties `tmp/Captures`; returns the number of files removed.
+    @discardableResult
+    static func cleanUpCaptures() -> Int { StillCapture.folder(named: ExplorerModel.captureFolderName).removeAll() }
+
     var body: some Scene {
         WindowGroup { HomeView().tint(AccessibleColors.accent) }
     }

@@ -310,6 +310,8 @@ targets:
       path: Apps/FractalExplorer/Generated/Info.plist
       properties:
         CFBundleDisplayName: Fractal Explorer
+        # Feature 029 (FR-A03-405): the share sheet's "Save Image" uses Photos add-only access; the app never calls PhotoKit.
+        NSPhotoLibraryAddUsageDescription: Fractal Explorer saves your captured picture to Photos only when you choose Save Image.
         CFBundleShortVersionString: "0.1.0"
         CFBundleVersion: "1"
         ITSAppUsesNonExemptEncryption: false

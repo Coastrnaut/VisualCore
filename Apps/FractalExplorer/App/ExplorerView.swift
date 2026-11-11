@@ -209,6 +209,39 @@ final class ExplorerModel {
     /// "Render cost: N× the default view (level)" for the current cap and canvas.
     var costText: String { CapControl.costText(cap: cap, pixels: canvasPixels) }
 
+    // MARK: Still capture (feature 029 T-A03-407; FR-A03-405; US2; clarification 1)
+
+    /// The app-owned capture folder `tmp/Captures` (emptied at launch).
+    nonisolated static let captureFolderName = "Captures"
+    /// The latest capture (VisualCore StillCapture).
+    let capture = StillCapture(folder: StillCapture.folder(named: ExplorerModel.captureFolderName))
+    /// What the capture line says after a capture ("Captured at N px…"), or nil.
+    private(set) var captureMessage: String?
+    /// Test seam: the export size instead of the computed one.
+    var captureSizeOverride: ExportSize?
+
+    /// True when a capture can be made (a host and a laid-out canvas).
+    var canCapture: Bool { host != nil && !usingFallback && state.viewport.size.x > 1 && state.viewport.size.y > 1 }
+
+    /// Captures the current view as a PNG: the long edge is 4096 px, lowered by the precision limit (never below the
+    /// canvas) and by the device (ExportGeometry); animation is frozen during the render.
+    func captureStill() {
+        captureMessage = nil
+        guard let host, canCapture,
+              let aspect = ExportAspect(id: "canvas", title: "Canvas", width: max(1, Int(state.viewport.size.x.rounded())),
+                                        height: max(1, Int(state.viewport.size.y.rounded()))) else { return }
+        let sizing = CaptureSizing.longEdge(viewport: state.viewport, pixelsPerPoint: pixelsPerPoint, mantissaBits: mantissaBits)
+        let size = captureSizeOverride ?? ExportGeometry(maxEdge: host.maxRenderSize).size(longEdge: sizing.longEdge, aspect: aspect)
+        let wasAnimating = scene.snapshot.animate
+        scene.snapshot.animate = false
+        defer { scene.snapshot.animate = wasAnimating }
+        if case .done = capture.capture(host: host, size: size, prefix: "Fractal") {
+            captureMessage = sizing.limited && size.longEdge <= sizing.longEdge
+                ? "Captured at \(size.longEdge) px — the precision limit allows no more detail here"
+                : "Captured at \(size.longEdge) px"
+        }
+    }
+
     /// Renames a bookmark.
     func renameBookmark(_ id: UUID, to name: String) { perform { try $0.rename(id, to: name) } }
     /// Marks or unmarks a favorite.
@@ -339,6 +372,7 @@ final class ExplorerModel {
 
     /// Destroys the host (the screen went away).
     func close() {
+        capture.removeFile()
         task?.cancel()
         host?.destroy()
         host = nil
@@ -427,6 +461,7 @@ struct ExplorerView: View {
                         .fixedSize(horizontal: false, vertical: true)
                         .accessibilityIdentifier("fe.cost")
                 }
+                captureControls
                 Picker("Palette", selection: $model.paletteID) {
                     ForEach(ExplorerModel.paletteIDs, id: \.self) { id in
                         Text(Palette.builtIn(id)?.name ?? id).tag(id)
@@ -459,6 +494,30 @@ struct ExplorerView: View {
         .navigationTitle("Explorer")
         .navigationBarTitleDisplayMode(.inline)
         .tint(AccessibleColors.accent)
+    }
+
+    @ViewBuilder private var captureControls: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Button { model.captureStill() } label: { Label("Capture", systemImage: "camera") }
+                    .buttonStyle(.bordered)
+                    .disabled(!model.canCapture)
+                    .accessibilityHint("Makes a large picture of this view to share or save")
+                    .accessibilityIdentifier("fe.capture")
+                if case .done(let url) = model.capture.state {
+                    ShareLink(item: url) { Label("Share picture", systemImage: "square.and.arrow.up") }
+                        .accessibilityIdentifier("fe.capture.share")
+                }
+            }
+            if let message = model.captureMessage {
+                Text(message).font(.footnote).fixedSize(horizontal: false, vertical: true)
+                    .accessibilityIdentifier("fe.capture.message")
+            }
+            if case .failed(let error) = model.capture.state {
+                Text(error).font(.footnote).fixedSize(horizontal: false, vertical: true)
+                    .accessibilityIdentifier("fe.capture.error")
+            }
+        }
     }
 
     private var canvas: some View {
