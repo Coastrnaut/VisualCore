@@ -22,7 +22,7 @@ push per task. Each subsystem is implemented separately (supplied prompt). Paths
 
 **Independent test**: host conversions through every space and back; gesture state sequences from scripted events.
 
-- [ ] T-F504 [US1] Tests first `Packages/VisualCore/Tests/VisualCoreScenesTests/CoordinateTests.swift` (AC1 390×844@3 → NDC 0,0 and pixel 585,1266; AC2 zoom 2 pan (10,0) → world (10,0); SC-F501 round trip ≤ 0.001 pt over scales 1/2/3 × aspects 9:19.5, 3:4, 1:1, 16:9 × camera transforms; zero size → nil), then `ViewMetrics` in `VisualCoreScenes/ViewMetrics.swift`
+- [ ] T-F504 [US1] Tests first `Packages/VisualCore/Tests/VisualCoreScenesTests/CoordinateTests.swift` (AC1 390×844@3 → NDC 0,0 and pixel 585,1266; AC2 zoom 2 pan (10,0) → world (10,0); SC-F501 round trip ≤ 0.001 pt over scales 1/2/3 × aspects 9:19.5, 3:4, 1:1, 16:9 × camera transforms; zero size → nil; after a size change (rotation) conversions use the new size), then `ViewMetrics` in `VisualCoreScenes/ViewMetrics.swift`
 - [ ] T-F505 [US1] Tests first `VisualCoreScenesTests/PointerTrackerTests.swift` (≤ 10 pointers, 11th ignored and counted, cancel removes), then `PointerTracker` + `PointerEvent` in `VisualCoreScenes/PointerTracker.swift`
 - [ ] T-F506 [US1] Tests first `VisualCoreScenesTests/GestureTests.swift` covering every transition of tap, double-tap, long-press, drag, pinch, rotate incl. cancel and fail (SC-F503), thresholds tap "≤ 10 pt and ≤ 0.3 s", double-tap "within 0.3 s and 30 pt", long-press "≥ 0.5 s within 10 pt", drag "after 10 pt", AC3 pinch 100→200 pt = 2.0, AC4 cancelled touch → cancelled, second finger cancels drag and fails pending tap; then `VisualCoreScenes/GestureRecognizers.swift`
 
@@ -30,7 +30,7 @@ push per task. Each subsystem is implemented separately (supplied prompt). Paths
 
 **Independent test**: host frame-time sequences, golden RNG, timeline sampling.
 
-- [ ] T-F507 [US2] Tests first `Packages/VisualCore/Tests/VisualCoreSimulationTests/FixedStepClockTests.swift` (AC1 120 steps from 60 × 1/60 s, alpha ∈ [0,1); AC2 2 s stall → 8 steps, dropped time counted; NaN/negative/inf delta → 0), then `VisualCoreSimulation/FixedStepClock.swift`
+- [ ] T-F507 [US2] Tests first `Packages/VisualCore/Tests/VisualCoreSimulationTests/FixedStepClockTests.swift` (AC1 120 steps from 60 × 1/60 s, alpha ∈ [0,1); AC2 2 s stall → 8 steps, dropped time counted; NaN/negative/inf delta → 0; 1e-9 s step-boundary tolerance; a clock+RNG replay of 10,000 frames is bit-identical twice), then `VisualCoreSimulation/FixedStepClock.swift`
 - [ ] T-F508 [US2] Tests first `VisualCoreSimulationTests/SeededRandomTests.swift` (golden first 8 outputs for seed 42 from the xoshiro256**/SplitMix64 reference, double ∈ [0,1), range bounds, normal mean/variance ±5% over 100k), then `VisualCoreSimulation/SeededRandom.swift`
 - [ ] T-F509 [US2] Tests first `VisualCoreMathTests/EasingTests.swift` (every curve × mode: f(0)=0, f(1)=1, inOut(0.5)=0.5 for symmetric curves), then `VisualCoreMath/Easing.swift`
 - [ ] T-F510 [US2] Tests first `VisualCoreSimulationTests/TimelineTests.swift` (AC4 samples 0/0.5/1, pause, resume, reverse (rate −1), seek, repeat count and forever, autoreverse, completion events fired once, zero duration jumps to end, `reduceMotion` jumps to end and disables repeats), then `VisualCoreSimulation/{Tween,Timeline}.swift`
