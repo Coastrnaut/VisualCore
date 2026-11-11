@@ -466,13 +466,206 @@
       "notes": "Tiers exist; a particle-count mapping per tier is gap G-PQUALITY (research R10). Reduce Flashing is available."
     }
   ],
-  "gaps": [],
-  "traceability": [],
-  "negative": [],
+  "gaps": [
+    {
+      "id": "G-SIMSTEP",
+      "matrix": [
+        "M01"
+      ],
+      "kind": "adaptation",
+      "owner": "VisualCore:VisualCoreSimulation",
+      "phase": 1,
+      "test": "Host tests: the CPU particle simulation advances in fixed steps with capped substeps per frame and a bounded catch-up after a pause or background (no unbounded fast-forward); replaying a seed with the same controls and fixed-step stream reproduces position fixtures exactly (checksum)",
+      "justification": "Found in A04-P00 (research R1): the OpenGL ES path has no compute shaders, so the 'GPU-oriented' simulation is a bounded CPU simulation drawn on the GPU; every particle or physics app (A09, A11, A19) needs the same deterministic stepping. GPU-side state stays a later idea."
+    },
+    {
+      "id": "G-EMITTERS",
+      "matrix": [
+        "M06"
+      ],
+      "kind": "adaptation",
+      "owner": "VisualCore:VisualCoreSimulation",
+      "phase": 1,
+      "test": "Host tests: point, line, ring and burst emitter shapes spawn inside their shape with the seeded generator; totals never exceed the pool capacity and drops are counted; invalid parameters are clamped",
+      "justification": "Found in A04-P00 (research R6): emitter shapes are generic particle machinery (A09 Digital Aquarium bubbles, A19 Living Wallpapers)."
+    },
+    {
+      "id": "G-FIELDS",
+      "matrix": [
+        "M07"
+      ],
+      "kind": "adaptation",
+      "owner": "VisualCore:VisualCoreSimulation",
+      "phase": 2,
+      "test": "Host tests: repulsors, falloff attractors, wind and vortex fields produce finite accelerations for every position including exactly at the center (softened singularities, fixture 4); accelerations are bounded",
+      "justification": "Found in A04-P00 (research R7): force fields are reused by physics and creature apps (A11, A09)."
+    },
+    {
+      "id": "G-PQUALITY",
+      "matrix": [
+        "M10"
+      ],
+      "kind": "adaptation",
+      "owner": "VisualCore:VisualCoreDiagnostics",
+      "phase": 2,
+      "test": "Host tests: a particle-budget mapping gives each QualityPolicy tier a count cap; a high requested count respects the configured cap and drops with the tier under heat or Low Power Mode (fixture 2)",
+      "justification": "Found in A04-P00 (research R10): count-based quality is generic to any instanced workload."
+    },
+    {
+      "id": "G-BLENDTRAIL",
+      "matrix": [
+        "M04"
+      ],
+      "kind": "adaptation",
+      "owner": "VisualCore:VisualCoreRendering",
+      "phase": 3,
+      "test": "Package tests on both runtimes: ParticleRenderer draws with an additive blend option; a trail-decay pass on PingPongTarget fades by a set factor per frame, and resizing or clearing the trail targets leaks no textures (fixture 3); reduced-flash mode caps brightness",
+      "justification": "Found in A04-P00 (research R4): additive glow and decaying trails are generic effects for many apps (A10 Neon Arcade, A21 Aurora)."
+    }
+  ],
+  "traceability": [
+    {
+      "item": "brainstorm: creative particle system with gravitational fields, attractors, trails, emitters and touch interaction",
+      "matrix": [
+        "M01",
+        "M02",
+        "M03",
+        "M04",
+        "M05"
+      ],
+      "phases": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "item": "v0.1 feature 01 — multiple emitter families with bounded particle counts",
+      "matrix": [
+        "M06"
+      ],
+      "phases": [
+        1
+      ]
+    },
+    {
+      "item": "v0.1 feature 02 — point attractors, repulsors and gravity/wind fields",
+      "matrix": [
+        "M07"
+      ],
+      "phases": [
+        2
+      ]
+    },
+    {
+      "item": "v0.1 feature 03 — adjustable size, lifetime, color gradient and trail strength",
+      "matrix": [
+        "M08",
+        "M04"
+      ],
+      "phases": [
+        3
+      ]
+    },
+    {
+      "item": "v0.1 feature 04 — instanced/sprite batch rendering with performance fallback",
+      "matrix": [
+        "M02",
+        "M03",
+        "M10"
+      ],
+      "phases": [
+        2,
+        4
+      ]
+    },
+    {
+      "item": "v0.1 feature 05 — pause/reseed/save a scene",
+      "matrix": [
+        "M09"
+      ],
+      "phases": [
+        1,
+        4,
+        5
+      ]
+    },
+    {
+      "item": "v0.1 feature 06 — device-adaptive quality and reduced-flash mode",
+      "matrix": [
+        "M10"
+      ],
+      "phases": [
+        2,
+        3,
+        5
+      ]
+    },
+    {
+      "item": "journey 1 — starfield preset, tap to create an attractor, drag to move it",
+      "matrix": [
+        "M05",
+        "M07"
+      ],
+      "phases": [
+        2,
+        4
+      ]
+    },
+    {
+      "item": "journey 2 — change emitter type and particle lifetime, toggle trails",
+      "matrix": [
+        "M06",
+        "M08",
+        "M04"
+      ],
+      "phases": [
+        1,
+        3
+      ]
+    },
+    {
+      "item": "journey 3 — pause, reseed and replay a deterministic scene",
+      "matrix": [
+        "M09",
+        "M01"
+      ],
+      "phases": [
+        1,
+        5
+      ]
+    }
+  ],
+  "negative": [
+    {
+      "rule": "No unlimited-N or exact N-body physical simulation; the sandbox is artistic",
+      "source": "manual §2 explicit non-goals; constitution A04 truthful claims"
+    },
+    {
+      "rule": "No online preset marketplace",
+      "source": "manual §2 explicit non-goals"
+    },
+    {
+      "rule": "No networked multi-user simulation and no networking",
+      "source": "manual §2 explicit non-goals; constitution A04 offline-first"
+    },
+    {
+      "rule": "No compute-shader or Metal simulation path; no second renderer",
+      "source": "constitution Principle I and A04 consumer rule; research R1"
+    },
+    {
+      "rule": "No particle-count or frame-rate claims before device measurements (campaign II)",
+      "source": "constitution V and A04 truthful claims; manual §12"
+    }
+  ],
   "decision": {
     "result": "go",
     "reasons": [
-      "pending (T-A04-006)"
+      "Every capability maps to existing VisualCore API (5 available: buffer management, instanced rendering, interaction parameters, size/lifetime/gradient, pause/reseed/save) or an additive gap (5 adaptation rows).",
+      "All gaps are additive and reusable: G-SIMSTEP and G-EMITTERS and G-FIELDS (VisualCoreSimulation), G-PQUALITY (VisualCoreDiagnostics), G-BLENDTRAIL (VisualCoreRendering); scene presets stay app content on NamedLibrary. None needs a second renderer, compute shaders, a fork, private API or networking.",
+      "The simulation stays on the CPU (deterministic, bounded) and only drawing uses the GPU, because the OpenGL ES path offers no compute shaders (research R1); counts are capped and tiered (risk 3), additive blending gets a reduced-flash cap (risk 2), and instanced drawing is already proven by A01 (risk 1).",
+      "Reference regression baseline recorded green 7/7 (T-A04-003) and the empty shell builds and passes its smoke test on both simulator runtimes (T-A04-005).",
+      "Phase 01 starts with G-SIMSTEP and G-EMITTERS in VisualCoreSimulation and the app's seeded scene model."
     ],
     "blockers": []
   }
