@@ -46,6 +46,14 @@ public enum SceneForce: Codable, Equatable, Sendable {
     case drag(k: Double)
     /// Pull toward (x, y) with `strength` (units/s²) within `radius` > 0.
     case attractor(x: Double, y: Double, strength: Double, radius: Double)
+    /// Push away from (x, y) with linear falloff; |strength| ≤ 10,000, radius 1…2,000 (feature 034).
+    case repulsor(x: Double, y: Double, strength: Double, radius: Double)
+    /// Softened point gravity toward (x, y); strength 0…1e9, softening 1…500 (feature 034).
+    case gravityWell(x: Double, y: Double, strength: Double, softening: Double)
+    /// Pull velocities toward (vx, vy), speed ≤ 2,000, at `rate` 0…10 per second (feature 034).
+    case wind(vx: Double, vy: Double, rate: Double)
+    /// Counter-clockwise swirl around (x, y) for a positive strength; |strength| ≤ 10,000, radius 1…2,000 (feature 034).
+    case vortex(x: Double, y: Double, strength: Double, radius: Double)
 
     /// The VisualCore force.
     public var particleForce: ParticleForce {
@@ -53,6 +61,10 @@ public enum SceneForce: Codable, Equatable, Sendable {
         case .gravity(let x, let y): .gravity(Vec2(x, y))
         case .drag(let k): .drag(k)
         case .attractor(let x, let y, let s, let r): .attractor(point: Vec2(x, y), strength: s, radius: r)
+        case .repulsor(let x, let y, let s, let r): .repulsor(point: Vec2(x, y), strength: s, radius: r)
+        case .gravityWell(let x, let y, let s, let e): .gravityWell(point: Vec2(x, y), strength: s, softening: e)
+        case .wind(let vx, let vy, let rate): .wind(velocity: Vec2(vx, vy), rate: rate)
+        case .vortex(let x, let y, let s, let r): .vortex(point: Vec2(x, y), strength: s, radius: r)
         }
     }
 
@@ -60,15 +72,25 @@ public enum SceneForce: Codable, Equatable, Sendable {
         switch self {
         case .gravity(let x, let y): [x, y]
         case .drag(let k): [k]
-        case .attractor(let x, let y, let s, let r): [x, y, s, r]
+        case .attractor(let x, let y, let s, let r), .repulsor(let x, let y, let s, let r), .vortex(let x, let y, let s, let r): [x, y, s, r]
+        case .gravityWell(let x, let y, let s, let e): [x, y, s, e]
+        case .wind(let vx, let vy, let rate): [vx, vy, rate]
         }
     }
 
+    /// The ranges equal VisualCore's `ParticleForce.clamped()` ranges, so a valid scene is never altered by clamping.
     var isInRange: Bool {
+        let strength = -ParticleForce.strengthLimit...ParticleForce.strengthLimit
         switch self {
-        case .gravity: true
-        case .drag(let k): k >= 0
-        case .attractor(_, _, _, let r): r > 0
+        case .gravity: return true
+        case .drag(let k): return k >= 0
+        case .attractor(_, _, _, let r): return r > 0
+        case .repulsor(_, _, let s, let r), .vortex(_, _, let s, let r):
+            return strength.contains(s) && ParticleForce.radiusRange.contains(r)
+        case .gravityWell(_, _, let s, let e):
+            return (0...ParticleForce.gravityWellStrengthLimit).contains(s) && ParticleForce.softeningRange.contains(e)
+        case .wind(let vx, let vy, let rate):
+            return Vec2(vx, vy).length <= ParticleForce.maxWindSpeed && ParticleForce.rateRange.contains(rate)
         }
     }
 }

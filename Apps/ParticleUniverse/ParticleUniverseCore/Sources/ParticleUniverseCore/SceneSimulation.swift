@@ -6,10 +6,12 @@ import VisualCoreSimulation
 
 /// The steppable state: the particle system plus the bookkeeping commands need.
 public struct SceneState: FixedStepSimulation, Sendable {
-    /// The particle pool (scene forces first, then the families' forces).
+    /// The particle pool (the placed force if any, then scene forces, then the families' forces).
     public internal(set) var system: ParticleSystem
-    /// Number of scene forces at the start of `system.forces` (the indices `moveAttractor` may address).
+    /// Number of scene forces in `system.forces` (the indices `moveAttractor` may address).
     public let sceneForceCount: Int
+    /// Whether `system.forces[0]` is a placed force (feature 034); scene forces then start at index 1.
+    public internal(set) var hasPlacedForce = false
     /// Commands ignored because their index named nothing suitable.
     public internal(set) var ignoredCommands = 0
 
@@ -18,13 +20,24 @@ public struct SceneState: FixedStepSimulation, Sendable {
     /// The particle system's checksum.
     public func checksum() -> UInt64 { system.checksum() }
 
+    /// Places, replaces or removes the placed force in slot 0 (feature 034).
+    public mutating func setPlacedForce(_ force: ParticleForce?) {
+        switch (force, hasPlacedForce) {
+        case (let f?, true): system.forces[0] = f
+        case (let f?, false): system.forces.insert(f, at: 0); hasPlacedForce = true
+        case (nil, true): system.forces.removeFirst(); hasPlacedForce = false
+        case (nil, false): break
+        }
+    }
+
     /// Applies one command (ignoring and counting invalid ones).
     public mutating func apply(_ command: SceneCommand) {
         switch command {
         case .moveAttractor(let index, let x, let y):
+            let slot = index + (hasPlacedForce ? 1 : 0)
             guard index >= 0, index < sceneForceCount, x.isFinite, y.isFinite,
-                  case .attractor(_, let s, let r) = system.forces[index] else { ignoredCommands += 1; return }
-            system.forces[index] = .attractor(point: Vec2(x, y), strength: s, radius: r)
+                  case .attractor(_, let s, let r) = system.forces[slot] else { ignoredCommands += 1; return }
+            system.forces[slot] = .attractor(point: Vec2(x, y), strength: s, radius: r)
         case .burst(let emitter, let count):
             guard system.emitters.indices.contains(emitter) else { ignoredCommands += 1; return }
             system.burst(min(max(count, EmitterBurst.countRange.lowerBound), EmitterBurst.countRange.upperBound), from: emitter)
@@ -75,6 +88,16 @@ public struct SceneSimulation: Sendable {
     public mutating func resume() { runner.resume() }
     /// Applies a command now (live interaction); it is not part of the replay stream.
     public mutating func apply(_ command: SceneCommand) { runner.mutate { $0.apply(command) } }
+
+    /// The force a person placed, if any (feature 034, FR-A04-204). It acts from the next step.
+    public private(set) var placedForce: PlacedForce?
+    /// Places, moves, changes or removes (nil) the placed force; it occupies force slot 0 ahead of the scene's forces.
+    public mutating func setPlacedForce(_ force: PlacedForce?) {
+        placedForce = force
+        runner.mutate { $0.setPlacedForce(force?.particleForce) }
+    }
+    /// The forces the particles currently feel, in order (placed force, scene forces, family forces).
+    public var activeForces: [ParticleForce] { runner.simulation.system.forces }
 
     /// Whether frames are ignored.
     public var isPaused: Bool { runner.isPaused }

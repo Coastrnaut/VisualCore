@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Apps/ParticleUniverse/ParticleUniverseCore"
+  ],
+  "command": "swift test --package-path Apps/ParticleUniverse/ParticleUniverseCore",
+  "elapsed_seconds": 2.781,
+  "exit_code": 0,
+  "finished": "2026-11-11T23:27:32+00:00",
+  "log": ".autonomy/logs/A04-P02.t206-placed.log",
+  "log_sha256": "6b585beb13f019f926b675cd94922c192d26fc93cdb0cd0dd7ec199b2300b731",
+  "name": "t206-placed",
+  "stage": "A04-P02",
+  "started": "2026-11-11T23:27:29+00:00",
+  "timed_out": false
+}
