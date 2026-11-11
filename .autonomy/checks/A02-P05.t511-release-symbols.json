@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_release_symbols.py",
+    "--app",
+    "Build/DerivedData/release-FluidArtPlayground-Release/Build/Products/Release-iphoneos/FluidArtPlayground.app"
+  ],
+  "command": "python3 scripts/check_release_symbols.py --app Build/DerivedData/release-FluidArtPlayground-Release/Build/Products/Release-iphoneos/FluidArtPlayground.app",
+  "elapsed_seconds": 0.105,
+  "exit_code": 0,
+  "finished": "2026-11-11T10:59:43+00:00",
+  "log": ".autonomy/logs/A02-P05.t511-release-symbols.log",
+  "log_sha256": "94b67e37407e3db177ab5bc8577783ae01eeaede9d2907803d0b84def52a1555",
+  "name": "t511-release-symbols",
+  "stage": "A02-P05",
+  "started": "2026-11-11T10:59:43+00:00",
+  "timed_out": false
+}

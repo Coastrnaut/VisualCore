@@ -431,6 +431,8 @@ class AutomationScriptTests(unittest.TestCase):
     def test_launch_env_and_command(self):
         self.assertEqual(autosim.launch_env("smoke", None), {"SIMCTL_CHILD_VISUALCORE_AUTORUN": "smoke"})
         self.assertEqual(autosim.launch_env("smoke", 50)["SIMCTL_CHILD_VISUALCORE_AUTORUN_FRAMES"], "50")
+        self.assertEqual(autosim.launch_env("smoke", None, 7)["SIMCTL_CHILD_VISUALCORE_AUTORUN_SEED"], "7")
+        self.assertNotIn("SIMCTL_CHILD_VISUALCORE_AUTORUN_SEED", autosim.launch_env("smoke", None))
         self.assertEqual(autosim.launch_command("U", "dev.visualcore.Showcase")[2:4], ["launch", "--terminate-running-process"])
 
     def test_newest_report(self):

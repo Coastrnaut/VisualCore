@@ -44,10 +44,12 @@ def launch_command(udid: str, bundle: str) -> list[str]:
     return ["xcrun", "simctl", "launch", "--terminate-running-process", udid, bundle]
 
 
-def launch_env(mode: str, frames: int | None) -> dict[str, str]:
+def launch_env(mode: str, frames: int | None, seed: int | None = None) -> dict[str, str]:
     env = {"SIMCTL_CHILD_VISUALCORE_AUTORUN": mode}
     if frames:
         env["SIMCTL_CHILD_VISUALCORE_AUTORUN_FRAMES"] = str(frames)
+    if seed is not None:  # feature 023 T-A02-511: the deterministic test-mode seed
+        env["SIMCTL_CHILD_VISUALCORE_AUTORUN_SEED"] = str(seed)
     return env
 
 
@@ -66,6 +68,7 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--runtime", required=True, help="iOS simulator runtime, e.g. 27.2")
     ap.add_argument("--mode", required=True)
     ap.add_argument("--frames", type=int)
+    ap.add_argument("--seed", type=int, help="VISUALCORE_AUTORUN_SEED for apps with a seeded test mode")
     ap.add_argument("--out", required=True, type=Path)
     ap.add_argument("--timeout", type=float, default=120)
     ap.add_argument("--dry-run", action="store_true")
@@ -76,7 +79,7 @@ def main(argv: list[str] | None = None) -> int:
             bundle = bundle_id(a.app)
         except OSError:
             pass
-        env = " ".join(f"{k}={v}" for k, v in launch_env(a.mode, a.frames).items())
+        env = " ".join(f"{k}={v}" for k, v in launch_env(a.mode, a.frames, a.seed).items())
         for c in (["xcrun", "simctl", "boot", udid], ["xcrun", "simctl", "install", udid, str(a.app)]):
             print("$", " ".join(c))
         print("$", env, " ".join(launch_command(udid, bundle)))
@@ -93,7 +96,7 @@ def main(argv: list[str] | None = None) -> int:
         old.unlink()
     import os
     started = time.time()
-    r = run(launch_command(udid, bundle), env={**os.environ, **launch_env(a.mode, a.frames)})
+    r = run(launch_command(udid, bundle), env={**os.environ, **launch_env(a.mode, a.frames, a.seed)})
     if r.returncode != 0:
         print(r.stdout, r.stderr, file=sys.stderr)
         return 1

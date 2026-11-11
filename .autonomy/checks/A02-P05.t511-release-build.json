@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "xcodebuild",
+    "build",
+    "-project",
+    "VisualCore.xcodeproj",
+    "-scheme",
+    "FluidArtPlayground",
+    "-configuration",
+    "Release",
+    "-destination",
+    "generic/platform=iOS",
+    "-derivedDataPath",
+    "Build/DerivedData/release-FluidArtPlayground-Release",
+    "CODE_SIGNING_ALLOWED=NO"
+  ],
+  "command": "xcodebuild build -project VisualCore.xcodeproj -scheme FluidArtPlayground -configuration Release -destination generic/platform=iOS -derivedDataPath Build/DerivedData/release-FluidArtPlayground-Release CODE_SIGNING_ALLOWED=NO",
+  "elapsed_seconds": 14.408,
+  "exit_code": 0,
+  "finished": "2026-11-11T10:59:43+00:00",
+  "log": ".autonomy/logs/A02-P05.t511-release-build.log",
+  "log_sha256": "d5483e7927512a6571501e822de8cdf9e49bf0d17565d57cacbfe375915099ef",
+  "name": "t511-release-build",
+  "stage": "A02-P05",
+  "started": "2026-11-11T10:59:28+00:00",
+  "timed_out": false
+}

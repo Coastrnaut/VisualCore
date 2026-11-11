@@ -142,7 +142,7 @@ research R1–R7, data model, contract, quickstart).
   - Add `AutomationTests`: a fake terminate gives result "pass" with a digest; an injected bad check gives "fail".
 
   Run on 27.2 and 26.5 (FR-A02-508).
-- [ ] T-A02-511 [US5] Simulator rehearsal (not device evidence):
+- [X] T-A02-511 [US5] Simulator rehearsal (not device evidence): — Verified 2026-11-11: — Verified 2026-11-11 (simulator rehearsal, NOT device evidence): run_automation_sim.py gains --seed (test_scripts 67/67, t511-script-tests); iOS 27.2 simulator with SEED=7: smoke pass (120 frames, p95 21.6 ms, digest 36f8d7c3…, |v| 273), launch pass (first frame 18.2 ms), lifecycle pass (12 cycles, 0 leaks) — run-check A02-P05/t511-rehearse-smoke/-launch/-lifecycle exit 0, reports in .autonomy/logs/a02p05-automation (gitignored); Release generic-iOS build (t511-release-build) has 0 automation symbols and 0 trigger strings (t511-release-symbols; nm shows 0 AppAutomation/TestMode symbols), the Release+VISUALCORE_AUTOMATION measurement build has 480 (t511-measure-symbols --expect-present); isolation with the built app PASS (t511-isolation, only NSPhotoLibraryAddUsageDescription)
   1. Install the Debug app on the 27.2 simulator.
   2. For smoke, launch and lifecycle, run `simctl launch` with `SIMCTL_CHILD_VISUALCORE_AUTORUN=<mode>` and
      `SIMCTL_CHILD_VISUALCORE_AUTORUN_SEED=7`.

@@ -1,0 +1,28 @@
+{
+  "argv": [
+    "python3",
+    "scripts/run_automation_sim.py",
+    "--app",
+    "Build/DerivedData/FluidArtPlayground/Build/Products/Debug-iphonesimulator/FluidArtPlayground.app",
+    "--runtime",
+    "27.2",
+    "--mode",
+    "launch",
+    "--seed",
+    "7",
+    "--out",
+    ".autonomy/logs/a02p05-automation",
+    "--timeout",
+    "180"
+  ],
+  "command": "python3 scripts/run_automation_sim.py --app Build/DerivedData/FluidArtPlayground/Build/Products/Debug-iphonesimulator/FluidArtPlayground.app --runtime 27.2 --mode launch --seed 7 --out .autonomy/logs/a02p05-automation --timeout 180",
+  "elapsed_seconds": 1.78,
+  "exit_code": 0,
+  "finished": "2026-11-11T10:59:21+00:00",
+  "log": ".autonomy/logs/A02-P05.t511-rehearse-launch.log",
+  "log_sha256": "f41f2667d8a56d2e0a6415ef0a532321ea7946499e60b306951fb98e03f8ac05",
+  "name": "t511-rehearse-launch",
+  "stage": "A02-P05",
+  "started": "2026-11-11T10:59:19+00:00",
+  "timed_out": false
+}
