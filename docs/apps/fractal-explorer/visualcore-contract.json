@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "app": "fractal-explorer",
-  "gate": "A03-P00",
+  "gate": "A03-P01",
   "date": "2026-11-11",
   "inventory": [
     {
@@ -210,14 +210,20 @@
         "file": "Apps/GenerativeArtStudio/App/ArtSceneFactory.swift",
         "symbol": "FullScreenShaderScene"
       },
-      "notes": "The escape-time shader is app content (A03 rule) with a CPU reference (research R1)."
+      "notes": "The escape-time shader is app content (A03 rule) with a CPU reference (research R1). A03-P01: the escape-time CPU reference (FractalMath, G-FRACTAL) passes the known-point fixtures; the GPU shader in Phase 02 is checked against it."
     },
     {
       "id": "M02",
       "capability": "Coordinate transforms",
       "source": "brainstorm",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/PlaneViewport.swift",
+          "symbol": "PlaneViewport",
+          "product": "VisualCoreMath",
+          "public": true
+        },
         {
           "file": "Packages/VisualCore/Sources/VisualCoreMath/Camera2D.swift",
           "symbol": "Camera2D",
@@ -232,10 +238,10 @@
         }
       ],
       "example": {
-        "file": "Apps/GenerativeArtStudio/App/ParticlesArtScene.swift",
-        "symbol": "ParticlesArtScene"
+        "file": "Apps/FractalExplorer/FractalExplorerCore/Sources/FractalExplorerCore/FractalState.swift",
+        "symbol": "FractalState"
       },
-      "notes": "Camera2D clamps zoom to 0.1…100 in point space; a double-precision complex-plane viewport with anchored pinch is gap G-VIEWPORT (research R2)."
+      "notes": "Closed in A03-P01 (G-VIEWPORT): PlaneViewport (VisualCoreMath) — Double center and units per point, square pixels at any aspect, anchored pinch (drift < 1e-12 relative over 1e-6...1e6), pan, resize, clamp 1e-15...1e3 with wasClamped; Camera2D unchanged."
     },
     {
       "id": "M03",
@@ -460,7 +466,8 @@
       "owner": "VisualCore:VisualCoreMath",
       "phase": 1,
       "test": "Host tests: a double-precision complex-plane viewport maps screen points to plane points with aspect correction; an anchored pinch keeps the touched plane point fixed within 1e-12 relative; an aspect or size change keeps the center; zoom far beyond Camera2D's 100x; NaN/Inf rejected",
-      "justification": "Found in A03-P00 (research R2): every 2D-plane app (A16 Simulation Lab, A22 Shader Studio) needs a precise plane viewport; Camera2D's contract (point space, zoom 0.1-100, used by A01) stays unchanged."
+      "justification": "Found in A03-P00 (research R2): every 2D-plane app (A16 Simulation Lab, A22 Shader Studio) needs a precise plane viewport; Camera2D's contract (point space, zoom 0.1-100, used by A01) stays unchanged.",
+      "closed": "A03-P01"
     },
     {
       "id": "G-FRACTAL",
@@ -471,7 +478,8 @@
       "owner": "app-local",
       "phase": 1,
       "test": "App-domain CPU reference: Mandelbrot origin interior, c = 2 exterior, known Julia samples; smooth escape value finite; NaN/Inf guarded; later the GPU escape counts equal the CPU reference on small grids within float32 limits (Phase 02)",
-      "justification": "Constitution A03: the escape-time formulas are fractal-specific product content with a CPU reference; the reusable machinery they run on (FullScreenShaderScene/FieldPass, G-VIEWPORT, G-PRECISION) is VisualCore."
+      "justification": "Constitution A03: the escape-time formulas are fractal-specific product content with a CPU reference; the reusable machinery they run on (FullScreenShaderScene/FieldPass, G-VIEWPORT, G-PRECISION) is VisualCore.",
+      "closed": "A03-P01"
     },
     {
       "id": "G-PRECISION",
@@ -666,7 +674,8 @@
       "All gaps are additive: G-VIEWPORT and G-TOUR (VisualCoreMath), G-PRECISION (VisualCoreRendering query + VisualCoreMath advisor) and G-COST (VisualCoreDiagnostics) are reusable helpers owned per Principle II; the escape-time formulas stay app-local with a CPU reference by the A03 rule (G-FRACTAL). None needs a second renderer, a fork, private API or networking.",
       "Double precision on the GPU is not assumed: 32-bit shader floats are the baseline, zoom is clamped at the measured limit and the limit is shown (A03 truthful precision); perturbation and emulated double stay later ideas.",
       "Reference regression baseline recorded green 7/7 (T-A03-003) and the empty shell builds and passes its smoke test on both simulator runtimes (T-A03-005).",
-      "Phase 01 starts with G-VIEWPORT in VisualCoreMath and the app's GPU-free escape-time reference (G-FRACTAL)."
+      "Phase 01 starts with G-VIEWPORT in VisualCoreMath and the app's GPU-free escape-time reference (G-FRACTAL).",
+      "A03-P01: Mandelbrot and Julia modes with accessible explanations and spoken descriptions run on a deterministic CPU reference preview (no GPU yet); PlaneViewport closes G-VIEWPORT in VisualCoreMath and FractalMath closes G-FRACTAL with the known-point fixtures; ProjectM regression 7/7."
     ],
     "blockers": []
   }

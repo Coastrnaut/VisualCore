@@ -87,7 +87,7 @@ research R1–R4, the data model, the contract and the quickstart.
 
 ## Phase 4: Polish
 
-- [ ] T-A03-106 Update the contract: gate A03-P01, G-VIEWPORT and G-FRACTAL closed, PlaneViewport in the M02
+- [X] T-A03-106 Update the contract: gate A03-P01, G-VIEWPORT and G-FRACTAL closed, PlaneViewport in the M02 — Verified 2026-11-11: — Verified 2026-11-11: contract gate A03-P01 (M02 available with PlaneViewport evidence and FractalState example; G-VIEWPORT and G-FRACTAL closed; decision reason) rendered, check_app_contract PASS 10 rows/33 citations/5 gaps; regression-baseline A03-P01 section (t101-reference-a 3/3 + -b 4/4, A01/A02 builds); simulator lessons feature 026; run-check A03-P01/t106-fast-checks 11/11 PASS (incl. host-fractal-explorer-core, documented-api and isolation for the app)
   evidence, decision reason. Also update the regression baseline and the simulator lessons. Run the fast checks:
   docs, app-contracts, compliance, dependencies, public-api, licenses, script-tests, host-visualcore,
   documented-api-fractal-explorer, isolation-fractal-explorer and host-fractal-explorer-core (FR-A03-107,

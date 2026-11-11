@@ -119,3 +119,15 @@ speaks and what the screen shows, not exact values. Sheets at a medium detent wi
   documents, such as store claims mapped to existing tests.
 - **App containers keep Debug-only artifacts across runs.** A rehearsal report from an earlier automation launch was
   still in Documents. Privacy tests must list and explain such entries, not fail on them or hide them.
+
+## Feature 026 (A03-P01)
+
+- **Derive numeric bounds before writing them into a spec.** The smooth escape value's range was first written as
+  [n−1, n+1], and the fixture failed at |zₙ| just above 2. Deriving the bound (log|zₙ| ∈ (ln 2, ln 6.41]) gave
+  [n, n + 1.53]. Correct the spec and record why; do not loosen the test.
+- **Hand-check fixture counts.** For c = 0 and z₀ = 1.5, |z₁|² = 5.06 already escapes at step 1. A miscounted
+  expectation was caught at checklist time.
+- **App domain type names must not shadow SwiftUI's.** `Preview` collides with SwiftUI's `Preview` inside `@Observable`
+  models; prefix domain types (`FractalPreview`).
+- **Round before choosing a number format.** A zoom of 9999.9999 printed "10000×" in the "whole number" branch;
+  compare the rounded value to the scientific-notation threshold.

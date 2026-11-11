@@ -28,3 +28,8 @@ python3 scripts/release_check.py --only reference-test-anglerendering-ios27 refe
 
 **7/7 pass.** These are simulator results: a regression baseline, not device evidence. Any VisualCore change made for
 Fractal Explorer (gaps G-VIEWPORT, G-PRECISION, G-COST, G-TOUR) reruns these steps (constitution A03).
+
+## A03-P01 rerun after `PlaneViewport` (2026-11-11)
+
+`A03-P01/t101-reference-a` 3/3 (pin `d93edd1` unchanged) and `t101-reference-b` 4/4: **7/7 pass**, unchanged. A01
+(`t101-build-GenerativeArtStudio`) and A02 (`t101-build-FluidArtPlayground`) build against the changed packages.
