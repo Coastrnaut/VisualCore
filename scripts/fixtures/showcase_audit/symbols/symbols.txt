@@ -1,0 +1,2 @@
+0000000000001000 T _vc_render
+0000000000002000 T _projectm_opengl_render_frame

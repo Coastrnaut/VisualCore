@@ -26,6 +26,7 @@ inventory = load("inventory_devices")
 clean = load("check_reference_clean")
 refinv = load("inventory_reference")
 baseline = load("run_reference_baseline")
+audit = load("audit_showcase_dependencies")
 try:
     deps = load("check_dependencies")
 except FileNotFoundError:
@@ -212,6 +213,60 @@ class DependencyCheckerTests(unittest.TestCase):
         f = self.base()
         f["Packages/VisualCore/Package.swift"] = PURE_PKG.replace('.target(name: "VisualCoreSimulation", dependencies: ["VisualCoreMath"])', '.target(name: "VisualCoreSimulation", dependencies: ["VisualCoreMath", "VisualCoreTestSupport"])')
         self.assertIn("R5", self.rules(f))
+
+
+class ShowcaseAuditTests(unittest.TestCase):
+    """Feature 007 T-F602 (FR-F610, SC-F602): every contaminated fixture fails and names the item."""
+    FIX = HERE / "fixtures" / "showcase_audit"
+
+    def run_audit(self, name: str, *extra: str) -> tuple[int, str]:
+        import contextlib, io
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(io.StringIO()):
+            code = audit.main(["--root", str(self.FIX / name), "--skip-packages", *extra])
+        return code, out.getvalue()
+
+    def test_clean_passes(self):
+        code, out = self.run_audit("clean")
+        self.assertEqual(code, 0, out)
+
+    def test_import_contamination(self):
+        code, out = self.run_audit("import")
+        self.assertEqual(code, 1)
+        self.assertIn("imports: App/B.swift imports ProjectMBridge", out)
+
+    def test_package_contamination(self):
+        code, out = self.run_audit("package")
+        self.assertEqual(code, 1)
+        self.assertIn("spec: package ProjectMReference (External/projectm-ios)", out)
+        self.assertIn("ProjectMBridge", out)
+
+    def test_framework_contamination(self):
+        code, out = self.run_audit("framework", "--app", str(self.FIX / "framework" / "app_bundle"))
+        self.assertEqual(code, 1)
+        self.assertIn("binary: bundle contains Frameworks/ProjectM.framework", out)
+
+    def test_symbol_contamination(self):
+        code, out = self.run_audit("symbols", "--symbols-file", str(self.FIX / "symbols" / "symbols.txt"))
+        self.assertEqual(code, 1)
+        self.assertIn("1 denied symbols", out)
+
+    def test_allowed_angle_paths_and_usage_errors(self):
+        self.assertFalse(audit.denied_text("../../External/projectm-ios/Build/ANGLEFrameworks/libEGL.xcframework"))
+        self.assertTrue(audit.denied_text("../../External/projectm-ios/Build/ProjectM.xcframework"))
+        import contextlib, io
+        with contextlib.redirect_stderr(io.StringIO()), contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(audit.main(["--root", str(self.FIX / "clean"), "--target", "Missing", "--skip-packages"]), 2)
+
+    def test_real_repository_spec_packages_and_imports_are_clean(self):
+        if not (HERE.parent / "project.yml").exists():
+            self.skipTest("no root project.yml")
+        import contextlib, io
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(io.StringIO()):
+            code = audit.main([])
+        self.assertEqual(code, 0, out.getvalue())
+        self.assertIn("packages: checked 2", out.getvalue())
 
 
 if __name__ == "__main__":

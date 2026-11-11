@@ -1,0 +1,17 @@
+name: Fixture
+packages:
+  VisualCore:
+    path: Packages/VisualCore
+  ProjectMReference:
+    path: External/projectm-ios
+targets:
+  Showcase:
+    type: application
+    platform: iOS
+    sources:
+      - path: Showcase/App
+    dependencies:
+      - package: VisualCore
+        product: VisualCoreMath
+      - package: ProjectMReference
+        product: ProjectMBridge

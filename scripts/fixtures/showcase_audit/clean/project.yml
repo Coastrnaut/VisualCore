@@ -1,0 +1,13 @@
+name: Fixture
+packages:
+  VisualCore:
+    path: Packages/VisualCore
+targets:
+  Showcase:
+    type: application
+    platform: iOS
+    sources:
+      - path: Showcase/App
+    dependencies:
+      - package: VisualCore
+        product: VisualCoreMath
