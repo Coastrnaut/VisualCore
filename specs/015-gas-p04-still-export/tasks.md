@@ -105,7 +105,7 @@ IDs are `T-A01-4##`, with one commit and push per task (`scripts/tick_task.py`).
 
 ## Phase 3: US2 — Exports stay within device limits (P1)
 
-- [ ] T-A01-408 [US2] Add to `ExportRenderTests.swift`:
+- [X] T-A01-408 [US2] Add to `ExportRenderTests.swift`: — Verified 2026-11-11: ExportRenderTests: testOverBudgetExportFailsReadablyWithoutLeaks (8 MiB budget, 2048² export → 'Not enough graphics memory…', live counts unchanged, renderOneFrame true, lastError nil, 256² retry OK; SC-A01-404); testOptionsStayWithinDeviceLimit (available edges and size ≤ host.maxRenderSize, maxRenderSize+2 refused with 'larger than this device'); testExportOnSuspendedHostAndRetryAfterResume (paused host exports cleanly with counts unchanged, retry after resume identical); testPlaybackIsRestored (playing state and time preserved). Passed in run-check A01-P04/t406-unit-ios27 and t406-unit-ios26 (8 of 8 test passes)
   - a host with an 8 MiB budget fails an export through `ExportRunner` with a readable message, then
     `renderOneFrame` succeeds and live counts are unchanged (SC-A01-404);
   - options never exceed `host.maxRenderSize`;
