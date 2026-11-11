@@ -1,0 +1,32 @@
+{
+  "argv": [
+    "python3",
+    "scripts/release_check.py",
+    "--only",
+    "docs",
+    "app-contracts",
+    "compliance",
+    "dependencies",
+    "public-api",
+    "licenses",
+    "script-tests",
+    "host-visualcore",
+    "documented-api-particle-universe",
+    "isolation-particle-universe",
+    "host-particle-universe-core",
+    "--log-dir",
+    ".autonomy/logs/A04-P01-cf",
+    "--json",
+    ".autonomy/logs/A04-P01-cf.json"
+  ],
+  "command": "python3 scripts/release_check.py --only docs app-contracts compliance dependencies public-api licenses script-tests host-visualcore documented-api-particle-universe isolation-particle-universe host-particle-universe-core --log-dir .autonomy/logs/A04-P01-cf --json .autonomy/logs/A04-P01-cf.json",
+  "elapsed_seconds": 26.254,
+  "exit_code": 0,
+  "finished": "2026-11-11T17:35:04+00:00",
+  "log": ".autonomy/logs/A04-P01.converge-fast-checks.log",
+  "log_sha256": "e6c97231c08bf2eff030e98f053d8866288b42bff7694dae7528e2b49309239a",
+  "name": "converge-fast-checks",
+  "stage": "A04-P01",
+  "started": "2026-11-11T17:34:38+00:00",
+  "timed_out": false
+}
