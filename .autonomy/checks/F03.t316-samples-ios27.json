@@ -1,0 +1,26 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/VisualCoreRendering",
+    "--scheme",
+    "VisualCoreRendering-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--result-name",
+    "F03-t316-ios27"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --result-name F03-t316-ios27",
+  "elapsed_seconds": 3.79,
+  "exit_code": 0,
+  "finished": "2026-11-11T00:11:31+00:00",
+  "log": ".autonomy/logs/F03.t316-samples-ios27.log",
+  "log_sha256": "8928795bd53a288a7703c36ac15bef389b986dad46d29f03b656f8f16b141e7f",
+  "name": "t316-samples-ios27",
+  "stage": "F03",
+  "started": "2026-11-11T00:11:27+00:00",
+  "timed_out": false
+}
