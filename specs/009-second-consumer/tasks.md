@@ -1,0 +1,38 @@
+---
+
+description: "Task list for feature 009 — Phase 8 second consumer (ledger gate F08)"
+---
+
+# Tasks: Phase 8 — Reuse Validation with a Second Consumer
+
+**Input**: `/specs/009-second-consumer/` · **Tests**: required (GardenKit host tests, check fixtures, smoke UI test). IDs `T-F8##`.
+One commit + push per task.
+
+## Phase 1: Setup
+
+- [ ] T-F801 `Harnesses/SecondConsumer/GardenKit/Package.swift` (depends on local VisualCore: Math, Simulation) and `Harnesses/SecondConsumer/SecondConsumer.yml` (app + UI test targets, packages GardenKit, VisualCore, VisualCoreRendering; bundle id `dev.visualcore.harness.SecondConsumer`); shell app builds unsigned for the simulator
+
+## Phase 2: Foundational — checks (US2, P1)
+
+- [ ] T-F802 [US2] `scripts/audit_showcase_dependencies.py`: resolve `packages:` paths relative to the spec file's directory; test in `scripts/test_scripts.py` (harness-style spec with `../../` paths); audit run on `Harnesses/SecondConsumer/SecondConsumer.yml` with target `SecondConsumer`
+- [ ] T-F803 [US2] `scripts/check_documented_api.py` (public VisualCore types/free functions referenced by the consumer must be named in package READMEs or `specs/*/contracts/*.md`; exit 0/1/2) with fixtures `scripts/fixtures/documented_api/{documented,undocumented}/` and tests in `scripts/test_scripts.py`
+
+## Phase 3: US1 — game (P1) 🎯
+
+- [ ] T-F804 [US1] GardenKit tests first `Tests/GardenKitTests/GardenTests.swift` (plant, spacing 40 → `.tooClose`, capacity 24 → `.full` and harvested slot reuse, growth 4 s → bloom, tap within 30 of a bloom harvests (+1), tap on a growing seed → `.notReady`, breeze decay, deterministic replay), then `Sources/GardenKit/Garden.swift`
+- [ ] T-F805 [US1] `Sources/GardenScene.swift` + `Shaders/field.vert/.frag`: background shader via `ResourceRegistry.program(…library:)`, flowers via `PrimitiveRenderer` (scaled by growth), particles via `ParticleSystem` + `ParticleRenderer` (shedding, harvest burst, breeze force), all inside `EffectScene` with bloom; fixed-step `FixedStepClock`; tap/drag through `TapRecognizer`/`DragRecognizer` and `ViewMetrics.toWorld`; Reduce Motion lowers rates and drops bursts; accumulator reset on foreground
+- [ ] T-F806 [US1] `Sources/SecondConsumerApp.swift`: SwiftUI shell, `garden.canvas` (VoiceOver label/hint, direct interaction), `garden.diagnostics` label `planted=… blooming=… score=… particles=…`, Reset button; post-build dependency-audit phase in `SecondConsumer.yml`; simulator launch screenshot
+
+## Phase 4: US3 — smoke test (P2)
+
+- [ ] T-F807 [US3] `UITests/GardenSmokeUITests.swift`: plant 3 (planted=3), too-close tap ignored, wait for bloom (blooming ≥ 1), harvest one (score=1, particles rise), drag breeze, tap growing seed does not score — on iOS 27.2 and 26.5
+
+## Phase 5: Polish
+
+- [ ] T-F808 `Harnesses/SecondConsumer/README.md` (what it proves, capability map to documented APIs, how to run checks and smoke test)
+- [ ] T-F809 Full verification: GardenKit host tests, documented-API check, audit (spec + built app), smoke test both runtimes, host + rendering regression, R1–R5, compliance, scripts, docs
+- [ ] T-F810 {device} Lumen Garden frame pacing on D1/D2/D3 — **deferred to campaign II** (constitution V)
+
+## Dependencies
+
+T-F801 → T-F802/T-F803 → T-F804 → T-F805 → T-F806 → T-F807 → T-F808 → T-F809.
