@@ -30,7 +30,7 @@ or App Store Connect action. Owner steps are written down, never performed.
 
   Add `PrivacyManifestTests` to `scripts/test_scripts.py`: detection per category, undeclared, unused, the tracking
   violation and bad input (exit 2). Run `test_scripts.py`.
-- [ ] T-A01-602 [US2] Add `scripts/check_app_release.py --app X.app --config docs/apps/<slug>/release.json`, checking
+- [X] T-A01-602 [US2] Add `scripts/check_app_release.py --app X.app --config docs/apps/<slug>/release.json`, checking — Verified 2026-11-11: scripts/check_app_release.py: bundle id, version/build, ITSAppUsesNonExemptEncryption key, NS*UsageDescription keys exactly the allowed set and non-empty, PrivacyInfo.xcprivacy in bundle, compiled icon (CFBundleIconName/CFBundleIcons + Assets.car), required docs, checklist rows with status in {verified, pending-campaign-ii, owner-action} and non-empty evidence; exit 0/1/2. release_check.py app_release_steps(): one app-release-<slug> step per docs/apps/*/release.json (unsigned generic-iOS Release build → check_release_symbols → check_privacy_manifest → check_app_release); release.json gains a scheme field (data-model updated). AppReleaseTests 3/3 (pass + usage/version/encryption/icon/manifest failures; checklist status/evidence rules; bad input exit 2). run-check A01-P06/t602-script-tests 61/61 OK
   bundle ID, version and build, the `ITSAppUsesNonExemptEncryption` key, "NS*UsageDescription keys ⊆ allowed (and
   every allowed key present)", `PrivacyInfo.xcprivacy` in the bundle, a compiled icon (`CFBundleIcons` or
   `CFBundleIconName` plus `Assets.car`), required docs, and that every checklist row has status ∈ {verified,

@@ -123,7 +123,33 @@ def steps(stamp: str) -> list[Step]:
     s.append(Step("release-symbols", [PY, "scripts/check_release_symbols.py", "--app", release_app]))
     # FR-F904: explicit ProjectM-independence audit of the shipping Showcase (spec, packages, imports, binary).
     s.append(Step("projectm-independence", [PY, "scripts/audit_showcase_dependencies.py", "--root", ".", "--app", release_app]))
+    s += app_release_steps()
     return s
+
+
+def app_release_steps(root: Path = ROOT) -> list[Step]:
+    """Per app with docs/apps/<slug>/release.json (feature 017 T-A01-602): an unsigned generic-iOS Release build, then
+    the shipping-symbol, privacy-manifest and release-readiness checks on the built app."""
+    out: list[Step] = []
+    for config in sorted(root.glob("docs/apps/*/release.json")):
+        slug = config.parent.name
+        try:
+            data = json.loads(config.read_text())
+            scheme = data["scheme"]
+        except (ValueError, KeyError):
+            continue
+        derived = f"Build/DerivedData/release-{scheme}-Release"
+        app = f"{derived}/Build/Products/Release-iphoneos/{scheme}.app"
+        out.append(Step(f"app-release-{slug}", [PY, "-c",
+            "import subprocess,sys;a=sys.argv[1:];"
+            "steps=[['xcodebuild','build','-project','VisualCore.xcodeproj','-scheme',a[0],'-configuration','Release',"
+            "'-destination','generic/platform=iOS','-derivedDataPath',a[1],'CODE_SIGNING_ALLOWED=NO'],"
+            "[sys.executable,'scripts/check_release_symbols.py','--app',a[2]],"
+            "[sys.executable,'scripts/check_privacy_manifest.py','--app',a[2]],"
+            "[sys.executable,'scripts/check_app_release.py','--app',a[2],'--config',a[3]]];"
+            "sys.exit(next((r for r in (subprocess.run(c).returncode for c in steps) if r),0))",
+            scheme, derived, app, str(config.relative_to(root))]))
+    return out
 
 
 def run_step(step: Step, log_dir: Path, udids: dict[str, str]) -> Result:

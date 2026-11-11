@@ -36,6 +36,7 @@ relcheck = load("release_check")
 appcontract = load("check_app_contract")
 enumeration = load("check_test_enumeration")
 privacy = load("check_privacy_manifest")
+appreleasecheck = load("check_app_release")
 try:
     deps = load("check_dependencies")
 except FileNotFoundError:
@@ -650,6 +651,55 @@ class PrivacyManifestTests(unittest.TestCase):
     def test_bad_input_exits_2(self):
         with tempfile.TemporaryDirectory() as t:
             self.assertEqual(privacy.main(["--app", str(Path(t) / "Missing.app")]), 2)
+
+
+class AppReleaseTests(unittest.TestCase):
+    def make(self, d: Path, info: dict, icon=True, manifest=True):
+        import plistlib
+        app = d / "X.app"
+        app.mkdir()
+        with open(app / "Info.plist", "wb") as f:
+            plistlib.dump(info, f)
+        if manifest:
+            (app / "PrivacyInfo.xcprivacy").write_bytes(b"x")
+        if icon:
+            (app / "Assets.car").write_bytes(b"x")
+        (d / "docs").mkdir()
+        (d / "docs" / "a.md").write_text("x")
+        (d / "docs" / "check.md").write_text("| Area | Item | Status | Evidence |\n|---|---|---|---|\n"
+                                             "| Privacy | manifest | verified | scan |\n| Store | upload | owner-action | steps |\n")
+        return app
+
+    good = {"CFBundleIdentifier": "dev.x", "CFBundleShortVersionString": "1.0.0", "CFBundleVersion": "1",
+            "ITSAppUsesNonExemptEncryption": False, "CFBundleIconName": "AppIcon", "NSPhotoLibraryAddUsageDescription": "Saves."}
+    config = {"bundleID": "dev.x", "version": "1.0.0", "build": 1, "allowedUsageDescriptions": ["NSPhotoLibraryAddUsageDescription"],
+              "requiredDocs": ["docs/a.md"], "checklist": "docs/check.md"}
+
+    def run_check(self, info, **kw):
+        with tempfile.TemporaryDirectory() as t:
+            d = Path(t)
+            app = self.make(d, info, **kw)
+            return {n: ok for n, ok, _ in appreleasecheck.check(app, self.config, d)}
+
+    def test_passes_and_each_failure(self):
+        self.assertTrue(all(self.run_check(self.good).values()))
+        self.assertFalse(self.run_check(dict(self.good, NSCameraUsageDescription="x"))["usage descriptions"])
+        self.assertFalse(self.run_check(dict(self.good, CFBundleShortVersionString="0.1"))["version"])
+        info = dict(self.good); del info["ITSAppUsesNonExemptEncryption"]
+        self.assertFalse(self.run_check(info)["export compliance key"])
+        self.assertFalse(self.run_check(self.good, icon=False)["app icon"])
+        self.assertFalse(self.run_check(self.good, manifest=False)["privacy manifest"])
+
+    def test_checklist_rows_need_status_and_evidence(self):
+        ok = "| Area | Item | Status | Evidence |\n|---|---|---|---|\n| A | b | pending-campaign-ii | D1-D3 rows |\n"
+        self.assertEqual(appreleasecheck.checklist_problems(ok), [])
+        self.assertTrue(appreleasecheck.checklist_problems(ok.replace("pending-campaign-ii", "done")))
+        self.assertTrue(appreleasecheck.checklist_problems(ok.replace("D1-D3 rows", "")))
+        self.assertTrue(appreleasecheck.checklist_problems("no table"))
+
+    def test_bad_input_exits_2(self):
+        with tempfile.TemporaryDirectory() as t:
+            self.assertEqual(appreleasecheck.main(["--app", str(Path(t) / "Y.app"), "--config", str(Path(t) / "c.json")]), 2)
 
 
 if __name__ == "__main__":
