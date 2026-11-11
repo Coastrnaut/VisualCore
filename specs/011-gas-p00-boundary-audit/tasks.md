@@ -26,7 +26,7 @@ both simulators and the reference regression. IDs are `T-A01-0##`. Each task get
   - a non-`available` row with no gap;
   - an app-local gap without justification;
   - a `go` decision with blockers.
-- [ ] T-A01-003 Implement `scripts/check_app_contract.py` per `contracts/app-contract.md` and `data-model.md` (schema 1):
+- [X] T-A01-003 Implement `scripts/check_app_contract.py` per `contracts/app-contract.md` and `data-model.md` (schema 1): — Verified 2026-11-10: scripts/check_app_contract.py (schema 1, strict keys, bounds, enumerations, declaration/public checks incl. Type.member, product parsing, evidence location rule, gap/traceability/decision rules, --render, exits 0/1/2); run-check A01-P00/t002-003-checker-tests: 53 script tests OK incl. AppContractTests 5/5 (good PASS, bad 10 problems by row, products incl. real repo, render idempotent, schema/usage exit 2); compliance, dependencies, public API, docs, licenses PASS
   - enumerations `status` ∈ {available, requires adaptation, upstream gap} and `kind` ∈ {adaptation, upstream};
   - ≤ 200 rows per list and strings ≤ 2,000 chars; unknown keys rejected;
   - declaration regex, with `public` required when `"public": true`, and `Type.member` checks;
