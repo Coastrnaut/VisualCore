@@ -1,0 +1,26 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/VisualCoreRendering",
+    "--scheme",
+    "VisualCoreRendering-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--result-name",
+    "F08-t809-ios27"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --result-name F08-t809-ios27",
+  "elapsed_seconds": 4.493,
+  "exit_code": 0,
+  "finished": "2026-11-11T02:16:16+00:00",
+  "log": ".autonomy/logs/F08.t809-vc-sim-ios27.log",
+  "log_sha256": "c74893f04d33464efb885a29d97e398622108c73585478490f461bdece64b7b9",
+  "name": "t809-vc-sim-ios27",
+  "stage": "F08",
+  "started": "2026-11-11T02:16:12+00:00",
+  "timed_out": false
+}

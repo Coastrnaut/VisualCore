@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_documented_api.py",
+    "--sources",
+    "Harnesses/SecondConsumer"
+  ],
+  "command": "python3 scripts/check_documented_api.py --sources Harnesses/SecondConsumer",
+  "elapsed_seconds": 0.099,
+  "exit_code": 0,
+  "finished": "2026-11-11T02:15:56+00:00",
+  "log": ".autonomy/logs/F08.t809-docapi.log",
+  "log_sha256": "35b70d91f82325bc2ac6bfa8ac7ffc79e8aeb8bcd03ea34ee1801718f4f770f4",
+  "name": "t809-docapi",
+  "stage": "F08",
+  "started": "2026-11-11T02:15:56+00:00",
+  "timed_out": false
+}

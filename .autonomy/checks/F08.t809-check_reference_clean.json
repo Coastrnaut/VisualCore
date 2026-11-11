@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_reference_clean.py"
+  ],
+  "command": "python3 scripts/check_reference_clean.py",
+  "elapsed_seconds": 5.164,
+  "exit_code": 0,
+  "finished": "2026-11-11T02:16:23+00:00",
+  "log": ".autonomy/logs/F08.t809-check_reference_clean.log",
+  "log_sha256": "bf5713ec646cbde21e4135b900e5100a3c8f26e4fe6ac9f1ca24bc13cf231774",
+  "name": "t809-check_reference_clean",
+  "stage": "F08",
+  "started": "2026-11-11T02:16:18+00:00",
+  "timed_out": false
+}

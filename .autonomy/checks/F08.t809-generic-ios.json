@@ -1,0 +1,25 @@
+{
+  "argv": [
+    "xcodebuild",
+    "build",
+    "-project",
+    "Harnesses/SecondConsumer/SecondConsumer.xcodeproj",
+    "-scheme",
+    "SecondConsumer",
+    "-destination",
+    "generic/platform=iOS",
+    "-derivedDataPath",
+    "Build/DerivedData/SecondConsumerDevice",
+    "CODE_SIGNING_ALLOWED=NO"
+  ],
+  "command": "xcodebuild build -project Harnesses/SecondConsumer/SecondConsumer.xcodeproj -scheme SecondConsumer -destination generic/platform=iOS -derivedDataPath Build/DerivedData/SecondConsumerDevice CODE_SIGNING_ALLOWED=NO",
+  "elapsed_seconds": 9.471,
+  "exit_code": 0,
+  "finished": "2026-11-11T02:16:06+00:00",
+  "log": ".autonomy/logs/F08.t809-generic-ios.log",
+  "log_sha256": "72da8a426d790c11de8f34aaf70e5a494ccc9d67799cd11eb6ccc088fb5639e1",
+  "name": "t809-generic-ios",
+  "stage": "F08",
+  "started": "2026-11-11T02:15:57+00:00",
+  "timed_out": false
+}
