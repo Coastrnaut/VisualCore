@@ -151,7 +151,7 @@ both runtimes and both storages.
 
 ## Phase 6: Polish and cross-cutting
 
-- [ ] T-A02-114 Update `docs/apps/fluid-art-playground/visualcore-contract.json`:
+- [X] T-A02-114 Update `docs/apps/fluid-art-playground/visualcore-contract.json`: — Verified 2026-11-11: visualcore-contract.json gate A02-P01: M01, M03 and M10 are available with new evidence (PingPongTarget, FieldPass, FieldUniform, FloatRenderSupport, RenderCapabilities.reportsColorBufferHalfFloat, RenderTarget.readFloatPixels, FieldGrid, StoragePrecision, TimeStepPolicy, SignedRangeEncoding) and example consumer FluidFieldsScene; G-PINGPONG, G-FLOATRT and G-FIELDPASS closed in A02-P01; G-CPUFIELD added and closed. check_app_contract --app fluid-art-playground --render PASS: 10 rows, 40 citations, 7 gaps, decision go; .md re-rendered (FR-A02-109)
   - G-PINGPONG, G-FLOATRT and G-FIELDPASS are closed (phase 1, with test evidence);
   - G-CPUFIELD is added and closed;
   - M01, M03 and M10 are `available`, citing the new symbols.

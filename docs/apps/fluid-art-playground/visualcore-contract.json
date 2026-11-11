@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "app": "fluid-art-playground",
-  "gate": "A02-P00",
+  "gate": "A02-P01",
   "date": "2026-11-11",
   "inventory": [
     {
@@ -163,32 +163,38 @@
       "id": "M01",
       "capability": "Ping-pong framebuffers",
       "source": "brainstorm",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/PingPongTarget.swift",
+          "symbol": "PingPongTarget",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/PingPongTarget.swift",
+          "symbol": "PingPongTarget.swap",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FieldPass.swift",
+          "symbol": "FieldPass.run",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
         {
           "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
           "symbol": "ResourceRegistry.makeRenderTarget",
           "product": "VisualCoreRendering",
           "public": true
-        },
-        {
-          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
-          "symbol": "ResourceRegistry.acquireTarget",
-          "product": "VisualCoreRendering",
-          "public": true
-        },
-        {
-          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GPUObjects.swift",
-          "symbol": "RenderTarget.bindColor",
-          "product": "VisualCoreRendering",
-          "public": true
         }
       ],
       "example": {
-        "file": "Packages/VisualCoreRendering/Sources/VisualCoreEffects/EffectRenderer.swift",
-        "symbol": "EffectRenderer"
+        "file": "Apps/FluidArtPlayground/App/FluidFieldsScene.swift",
+        "symbol": "FluidFieldsScene"
       },
-      "notes": "Targets and pooling exist; a reusable read/write pair that swaps and forbids sampling the bound write target does not (gap G-PINGPONG)."
+      "notes": "Closed in A02-P01 (G-PINGPONG): PingPongTarget swaps read/write targets with budget accounting and idempotent release; FieldPass refuses to sample its output (inputIsOutput). Verified by PingPongTargetTests/FieldPassTests and the app dissipation fixture on iOS 27.2 and 26.5."
     },
     {
       "id": "M02",
@@ -225,32 +231,44 @@
       "id": "M03",
       "capability": "GPU simulation techniques",
       "source": "brainstorm",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
-          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FullScreenShaderScene.swift",
-          "symbol": "FullScreenShaderScene",
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FieldPass.swift",
+          "symbol": "FieldPass",
           "product": "VisualCoreRendering",
           "public": true
         },
         {
-          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ShaderProgram.swift",
-          "symbol": "ShaderProgram.set",
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FieldPass.swift",
+          "symbol": "FieldUniform",
           "product": "VisualCoreRendering",
           "public": true
         },
         {
-          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
-          "symbol": "ResourceRegistry.program",
-          "product": "VisualCoreRendering",
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/FieldGrid.swift",
+          "symbol": "FieldGrid",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/FieldGrid.swift",
+          "symbol": "StoragePrecision",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/TimeStepPolicy.swift",
+          "symbol": "TimeStepPolicy",
+          "product": "VisualCoreSimulation",
           "public": true
         }
       ],
       "example": {
-        "file": "Apps/GenerativeArtStudio/App/ArtSceneFactory.swift",
-        "symbol": "ArtSceneFactory"
+        "file": "Apps/FluidArtPlayground/App/FluidFieldsScene.swift",
+        "symbol": "FluidFieldsScene"
       },
-      "notes": "Full-screen fragment passes exist inside scenes and the effect graph; no generic 'program + named inputs -> target' field pass for multi-pass simulation (gap G-FIELDPASS)."
+      "notes": "Closed in A02-P01 (G-FIELDPASS, G-CPUFIELD): FieldPass runs a program with named sampler inputs and typed uniforms into a target or framebuffer; FieldGrid/StoragePrecision give a precision-matched CPU reference (half-float writes truncate on the simulators, so float16TowardZero exists); TimeStepPolicy bounds the step. The solver equations stay app-local (G-SOLVER, M04)."
     },
     {
       "id": "M04",
@@ -412,32 +430,44 @@
       "id": "M10",
       "capability": "Half-float render targets with fallback",
       "source": "v0.1 feature 01 (velocity and pressure fields)",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
-          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GPUObjects.swift",
-          "symbol": "TextureFormat",
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FloatRenderSupport.swift",
+          "symbol": "FloatRenderSupport",
           "product": "VisualCoreRendering",
           "public": true
         },
         {
-          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
-          "symbol": "ResourceRegistry.makeRenderTarget",
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FloatRenderSupport.swift",
+          "symbol": "FloatRenderSupport.storageFormat",
           "product": "VisualCoreRendering",
           "public": true
         },
         {
           "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderCapabilities.swift",
-          "symbol": "RenderCapabilities",
+          "symbol": "RenderCapabilities.reportsColorBufferHalfFloat",
           "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GPUObjects.swift",
+          "symbol": "RenderTarget.readFloatPixels",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/SignedRangeEncoding.swift",
+          "symbol": "SignedRangeEncoding",
+          "product": "VisualCoreSimulation",
           "public": true
         }
       ],
       "example": {
-        "file": "Packages/VisualCoreRendering/Sources/VisualCoreEffects/EffectRenderer.swift",
-        "symbol": "EffectRenderer"
+        "file": "Apps/FluidArtPlayground/App/FluidFieldsScene.swift",
+        "symbol": "FluidFieldsScene"
       },
-      "notes": "rgba16f targets exist (used by HDR bloom) and incomplete framebuffers throw; no support query for EXT_color_buffer_half_float/float and no fallback policy (gap G-FLOATRT). The matrix assumes no support."
+      "notes": "Closed in A02-P01 (G-FLOATRT): the support query needs the color-buffer float extension and a working RGBA16F probe (both true on the iOS 27.2 and 26.5 simulators); RGBA8 fallback with signed-range velocity encoding is tested by forcing it. Device support is recorded in campaign II."
     }
   ],
   "gaps": [
@@ -449,7 +479,8 @@
       "kind": "adaptation",
       "owner": "VisualCore:VisualCoreRendering",
       "phase": 1,
-      "test": "PingPongTarget simulator tests: swap alternates read/write targets, binding the read target as the write target is rejected (A02 rule), both targets are budget-accounted and released with 0 leaks after context loss; app fixture: uniform dye at rest decays only by the configured dissipation"
+      "test": "PingPongTarget simulator tests: swap alternates read/write targets, binding the read target as the write target is rejected (A02 rule), both targets are budget-accounted and released with 0 leaks after context loss; app fixture: uniform dye at rest decays only by the configured dissipation",
+      "closed": "A02-P01"
     },
     {
       "id": "G-FLOATRT",
@@ -459,7 +490,8 @@
       "kind": "adaptation",
       "owner": "VisualCore:VisualCoreRendering",
       "phase": 1,
-      "test": "RenderCapabilities half-float render-target support query agrees with a framebuffer-completeness probe on both simulator runtimes; a forced 'unsupported' path selects the documented RGBA8 fallback"
+      "test": "RenderCapabilities half-float render-target support query agrees with a framebuffer-completeness probe on both simulator runtimes; a forced 'unsupported' path selects the documented RGBA8 fallback",
+      "closed": "A02-P01"
     },
     {
       "id": "G-FIELDPASS",
@@ -469,7 +501,8 @@
       "kind": "adaptation",
       "owner": "VisualCore:VisualCoreRendering",
       "phase": 1,
-      "test": "FieldPass simulator tests: a program with named sampler inputs renders into a target with typed uniforms, rejects an input that is also the output, and matches a CPU-computed result on a tiny grid"
+      "test": "FieldPass simulator tests: a program with named sampler inputs renders into a target with typed uniforms, rejects an input that is also the output, and matches a CPU-computed result on a tiny grid",
+      "closed": "A02-P01"
     },
     {
       "id": "G-SOLVER",
@@ -501,6 +534,18 @@
       "owner": "VisualCore:VisualCoreSimulation",
       "phase": 3,
       "test": "QualityPolicy host tests: tiers map to grid scale, solver iterations and splat cap; thermal 'serious'/'critical' and Low Power Mode step the tier down and recovery steps it up with hysteresis; consumes VisualCoreDiagnostics FramePacing inputs"
+    },
+    {
+      "id": "G-CPUFIELD",
+      "matrix": [
+        "M03"
+      ],
+      "kind": "adaptation",
+      "owner": "VisualCore:VisualCoreSimulation",
+      "phase": 1,
+      "test": "Host tests: FieldGrid shape/difference/padding; StoragePrecision float32/float16 (cross-checked with Float16)/float16TowardZero/unorm8 rounding and the unorm8 stall; SignedRangeEncoding round trip; TimeStepPolicy clamp with invalid deltas. App fixture: GPU dissipation equals the precision-matched CPU reference (max diff 0.0) on iOS 27.2 and 26.5",
+      "justification": "Found in A02-P01 (research R6): CPU references for GPU grid passes and precision-matched comparison are generic (A09, A16, A22 need them), so they go to VisualCore per Principle II.",
+      "closed": "A02-P01"
     }
   ],
   "traceability": [
