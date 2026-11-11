@@ -28,7 +28,7 @@ IDs `T-F4##`. One commit + push per task. Effects implemented one at a time (arc
 - [X] T-F410 [US2] `distort` pass (strength, frequency, time) + pixel test (strength 0 = identity; strength > 0 moves a stripe) — Verified 2026-11-10: F04.t410-distort-ios27 exit 0: strength 0 max diff 0; strength 0.1 moves stripe on >4 rows
 - [X] T-F411 [US2] `composite` pass (two inputs, alpha over/add) + pixel test — Verified 2026-11-10: F04.t411-composite-ios27 exit 0: over@0.5 → (128,0,128)±2; add → (≥254,0,≥254)
 - [X] T-F412 [US2] `feedback` pass with history target (FR-F412) + test (decay 0.5 converges; cleared on resize/recreation) — Verified 2026-11-10: F04.t412-feedback-ios27 exit 0: 0 → 128±2 → 191±3, resize clears to 255, no leaks
-- [ ] T-F413 [US2] (FR-F408, SC-F404) Fault injection: forced pass compile failure → pass-through, graph output present, reported once
+- [X] T-F413 [US2] (FR-F408, SC-F404) Fault injection: forced pass compile failure → pass-through, graph output present, reported once — Verified 2026-11-10: F04.t413-fault-ios27 exit 0: injected failure on B → red passed through 3 frames, failedPasses={B}, 1 warning
 
 ## Phase 4: US3 — Reduce Flashing (P2)
 

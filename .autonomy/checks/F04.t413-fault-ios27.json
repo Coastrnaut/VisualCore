@@ -1,0 +1,26 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/VisualCoreRendering",
+    "--scheme",
+    "VisualCoreRendering-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--result-name",
+    "F04-t413-ios27"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --result-name F04-t413-ios27",
+  "elapsed_seconds": 4.266,
+  "exit_code": 0,
+  "finished": "2026-11-11T00:23:31+00:00",
+  "log": ".autonomy/logs/F04.t413-fault-ios27.log",
+  "log_sha256": "9c327a9aafd0c08ae8a8e52b595da7ee297e6af3714c49a2c3059257b7a9b32f",
+  "name": "t413-fault-ios27",
+  "stage": "F04",
+  "started": "2026-11-11T00:23:27+00:00",
+  "timed_out": false
+}
