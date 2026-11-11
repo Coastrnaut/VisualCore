@@ -142,7 +142,20 @@ The Spec Kit skills are committed in `.claude/skills/speckit-*`, and `.specify/`
 needed to inspect or upgrade. **Never re-run `specify init`** in this repo (CLAUDE.md §7).
 
 ```bash
-uv tool install specify-cli --from git+https://github.com/github/spec-kit.git && echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.zprofile
+uv tool install specify-cli --from git+https://github.com/github/spec-kit.git
+```
+
+uv installs tools into `~/.local/bin` and warns if that folder is not on `PATH` yet ("`/Users/<you>/.local/bin` is
+not on your PATH"). Add it to your shell config once; uv's command does this without duplicating lines:
+
+```bash
+uv tool update-shell
+```
+
+Load it into the current terminal and check:
+
+```bash
+export PATH="$HOME/.local/bin:$PATH" && hash -r && specify version
 ```
 
 ### 3.5 GitHub sign-in (👤 owner)
