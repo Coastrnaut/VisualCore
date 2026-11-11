@@ -58,7 +58,7 @@ push per task. Each subsystem is implemented separately (supplied prompt). Paths
 
 ## Phase 8: Polish & Cross-Cutting
 
-- [ ] T-F521 Document the interaction modules in `Packages/VisualCore/README.md` and `Packages/VisualCoreRendering/README.md` (coordinate spaces, gesture thresholds, determinism scope, bounds)
+- [X] T-F521 Document the interaction modules in `Packages/VisualCore/README.md` and `Packages/VisualCoreRendering/README.md` (coordinate spaces, gesture thresholds, determinism scope, bounds) — Verified 2026-11-10: F05.t521-docs exit 0 (validate_docs): VisualCore README documents coordinate spaces table, gesture thresholds, determinism scope, animation, bounds; VisualCoreRendering README documents the three renderers, lifecycle and pointerHandler
 - [ ] T-F522 Full verification: host tests, sim 27.2 + 26.5, generic iOS, demo build/UI test, dependencies R1–R5, compliance, scripts, docs, reference regression
 - [ ] T-F523 {device} Per-device particle/primitive/mesh draw cost and demo frame pacing on D1/D2/D3 — **deferred to campaign II** (constitution V); automation mode added with the AutomationRunner (F09)
 

@@ -25,3 +25,40 @@ python3 scripts/check_dependencies.py
 ```
 
 Version 0.1.0 (semantic versioning; 0.x until the F09 stabilization gate).
+
+## Input, animation, scenes and particles (feature 006, gate F05)
+
+Contract: [`specs/006-input-animation-scenes/contracts/interaction-api.md`](../../specs/006-input-animation-scenes/contracts/interaction-api.md).
+
+**Coordinate spaces** (`VisualCoreScenes.ViewMetrics`, `VisualCoreMath.Camera2D`):
+
+| Space | Origin | Axes | Units |
+|---|---|---|---|
+| view points | top-left | x right, y down | UIKit points |
+| pixels | top-left | x right, y down | points × `scale` |
+| NDC | center | x right, y up | −1…1 |
+| camera | view center | x right, y up | points |
+| world | `Camera2D.center` | x right, y up | points at zoom 1 (`zoom` 0.1…100) |
+
+Conversions round-trip within 0.001 pt (SC-F501) and return nil for a zero-size view.
+`worldToNDC(camera:)` is the matrix renderers use.
+
+**Gestures** (`PointerTracker` + recognizers; feed the tracker first, then each recognizer; call `tick(now:)`
+for time-based transitions). Defaults: tap ≤ 10 pt and ≤ 0.3 s; double-tap second tap within 0.3 s and 30 pt;
+long-press ≥ 0.5 s within 10 pt; drag after 10 pt. Pinch and rotate run together; a second finger cancels an
+active drag and fails a pending tap. At most 10 pointers; more are ignored and counted.
+
+**Timing and determinism** (`VisualCoreSimulation`): `FixedStepClock` (1/120 s, ≤ 8 steps per frame, excess
+time dropped and counted, 1e-9 s boundary tolerance, invalid deltas = 0). `SeededRandom` is xoshiro256** seeded
+through SplitMix64; integer sequences are identical on every platform. Simulations driven by the clock and the
+generator are bit-identical per platform and independent of the display rate (proven at 60 and 120 Hz); float
+identity across CPU architectures is not promised.
+
+**Animation**: `ease(_:_:_:)` (linear, quad, cubic, sine, expo, back, elastic, bounce × in/out/inOut; f(0)=0,
+f(1)=1), `Tween` (repeat count or forever, autoreverse) and `Timeline` (play, pause, seek, reverse via negative
+`rate`, completion events once per pass, `reduceMotion` jumps to end values and disables repeats).
+
+**Scenes and particles**: `SceneNode` (TRS transform, z-order, visibility, primitive rect/circle/line/polygon
+≤ 256 points, hit testing); `ParticleSystem` (capacity 10,000 default, ≤ 100,000; emitters, gravity/drag/attractor,
+NaN removal, `checksum()`); 3D: `OrbitCamera` (pitch ±89°, `project`, `ray`), `Mesh.plane/cube/uvSphere`
+(segments 3–256, rings 2–256, subdivisions ≤ 256).

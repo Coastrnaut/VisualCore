@@ -88,3 +88,17 @@ GPU work) and presents the result. A pass that fails passes its first input thro
 
 Out-of-range values are clamped and unknown keys are ignored with a warning. Defaults are generated
 from `PassSchemas` in `VisualCoreEffectsGraph`; per-effect GPU cost on devices is measured in campaign II.
+
+## Drawing and touches (feature 006)
+
+| Type | Draws | Notes |
+|---|---|---|
+| `PrimitiveRenderer` | a `SceneNode` tree (rect, circle 12–128 segments, line, ear-clipped polygon) | one batched triangle list, premultiplied alpha |
+| `ParticleRenderer` | `[ParticleInstance]` (≤ 100,000) | instanced soft-edged quads, size = world diameter |
+| `MeshRenderer` | a `Mesh` through an `OrbitCamera` | Lambert + ambient, back faces culled; enable depth testing yourself when the framebuffer has depth |
+
+All three allocate through `ResourceRegistry`, rebuild their GPU objects on the first draw after a context
+recreation and free them in `release()` (call it from `teardown`). `RenderHost.pointerHandler` delivers UIKit
+touches as `PointerEvent`s (view points, `UITouch.timestamp`, stable ids) and enables multi-touch; touches are
+cancelled when the view leaves its window. A runnable example is `Harnesses/InteractiveDemo` (XcodeGen; drag spawns
+particles, pinch zooms, Reduce Motion honored, UI-tested on iOS 27.2 and 26.5).
