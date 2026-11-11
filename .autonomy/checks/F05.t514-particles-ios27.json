@@ -1,0 +1,26 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/VisualCoreRendering",
+    "--scheme",
+    "VisualCoreRendering-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--result-name",
+    "F05-t514-ios27"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --result-name F05-t514-ios27",
+  "elapsed_seconds": 2.541,
+  "exit_code": 65,
+  "finished": "2026-11-11T00:48:57+00:00",
+  "log": ".autonomy/logs/F05.t514-particles-ios27.log",
+  "log_sha256": "ccc323c0d8fc36fbf810c6b052da850a645eabc002a78c3d3d2962b673cf071b",
+  "name": "t514-particles-ios27",
+  "stage": "F05",
+  "started": "2026-11-11T00:48:54+00:00",
+  "timed_out": false
+}

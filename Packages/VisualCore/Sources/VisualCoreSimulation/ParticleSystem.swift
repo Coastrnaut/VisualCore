@@ -41,8 +41,10 @@ public enum ParticleForce: Sendable, Equatable {
 /// What a renderer needs per particle.
 public struct ParticleInstance: Sendable, Equatable {
     public var position: Vec2
+    /// Diameter in world units.
     public var size: Double
     public var color: Vec4
+    public init(position: Vec2, size: Double, color: Vec4) { self.position = position; self.size = size; self.color = color }
 }
 
 public struct ParticleSystem: Sendable {
