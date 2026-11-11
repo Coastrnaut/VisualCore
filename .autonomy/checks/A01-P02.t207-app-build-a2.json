@@ -1,0 +1,25 @@
+{
+  "argv": [
+    "xcodebuild",
+    "build",
+    "-project",
+    "VisualCore.xcodeproj",
+    "-scheme",
+    "GenerativeArtStudio",
+    "-destination",
+    "generic/platform=iOS Simulator",
+    "-derivedDataPath",
+    "Build/DerivedData/GenerativeArtStudio",
+    "CODE_SIGNING_ALLOWED=NO"
+  ],
+  "command": "xcodebuild build -project VisualCore.xcodeproj -scheme GenerativeArtStudio -destination 'generic/platform=iOS Simulator' -derivedDataPath Build/DerivedData/GenerativeArtStudio CODE_SIGNING_ALLOWED=NO",
+  "elapsed_seconds": 3.198,
+  "exit_code": 0,
+  "finished": "2026-11-11T04:06:10+00:00",
+  "log": ".autonomy/logs/A01-P02.t207-app-build-a2.log",
+  "log_sha256": "784604d3dda10424ff5eb26cc7a683cf5746e09b3c75a33c20ac2411b323aa05",
+  "name": "t207-app-build-a2",
+  "stage": "A01-P02",
+  "started": "2026-11-11T04:06:07+00:00",
+  "timed_out": false
+}

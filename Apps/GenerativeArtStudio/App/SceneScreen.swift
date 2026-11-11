@@ -71,6 +71,7 @@ struct SceneScreen: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.displayScale) private var displayScale
     @State private var model: SceneModel?
+    @State private var showControls = false
 
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -97,6 +98,19 @@ struct SceneScreen: View {
         .toolbar {
             ToolbarItem(placement: .principal) {
                 Text(family.title).font(.headline).accessibilityIdentifier("gas.scene.title")
+            }
+            ToolbarItem(placement: .topBarTrailing) {
+                Button { showControls = true } label: { Image(systemName: "slider.horizontal.3") }
+                    .accessibilityLabel("Controls")
+                    .accessibilityIdentifier("gas.controls.open")
+                    .disabled(model?.host == nil)
+            }
+        }
+        .sheet(isPresented: $showControls) {
+            if let model {
+                ControlsSheet(model: model)
+                    .presentationDetents([.medium, .large])
+                    .presentationBackgroundInteraction(.enabled(upThrough: .medium))
             }
         }
         .onAppear {
