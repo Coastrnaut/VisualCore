@@ -11,11 +11,11 @@ import VisualCoreRendering
 @MainActor
 public final class AutomationRunner {
     /// Environment variable naming the mode.
-    public static let environmentKey = "VISUALCORE_AUTORUN"
+    public nonisolated static let environmentKey = "VISUALCORE_AUTORUN"
     /// Environment variable with the frame count (default 120, clamped 1…10,000).
-    public static let framesKey = "VISUALCORE_AUTORUN_FRAMES"
+    public nonisolated static let framesKey = "VISUALCORE_AUTORUN_FRAMES"
     /// Supported modes.
-    public static let knownModes = ["smoke", "launch", "lifecycle"]
+    public nonisolated static let knownModes = ["smoke", "launch", "lifecycle"]
 
     private let host: RenderHost
     private let bundleID: String
@@ -36,12 +36,12 @@ public final class AutomationRunner {
     }
 
     /// The mode requested by the launch environment, if any.
-    public static func requestedMode(environment: [String: String] = ProcessInfo.processInfo.environment) -> String? {
+    public nonisolated static func requestedMode(environment: [String: String] = ProcessInfo.processInfo.environment) -> String? {
         environment[environmentKey].flatMap { $0.isEmpty ? nil : $0 }
     }
 
     /// The frame count requested by the launch environment (default 120, clamped 1…10,000).
-    public static func requestedFrames(environment: [String: String] = ProcessInfo.processInfo.environment) -> Int {
+    public nonisolated static func requestedFrames(environment: [String: String] = ProcessInfo.processInfo.environment) -> Int {
         min(max(environment[framesKey].flatMap(Int.init) ?? 120, 1), 10_000)
     }
 
@@ -78,7 +78,9 @@ public final class AutomationRunner {
     }
 
     private func launch(_ report: inout AutomationReport) {
-        for _ in 0..<600 where timedFrame() == nil {}
+        // Stop at the first presented frame (up to 600 attempts while the surface becomes ready).
+        var attempts = 0
+        while host.presentedFrameCount == 0, attempts < 600 { _ = timedFrame(); attempts += 1 }
         report.frames = host.presentedFrameCount
         if host.presentedFrameCount > 0 {
             report.timeToFirstFrameMs = (CACurrentMediaTime() - created) * 1000

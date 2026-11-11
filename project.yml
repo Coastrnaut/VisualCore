@@ -75,6 +75,9 @@ targets:
         product: VisualCoreRendering
       - package: VisualCoreRendering
         product: VisualCoreEffects
+      # Empty unless DEBUG || VISUALCORE_AUTOMATION (feature 010 T-F904; Release has zero automation symbols).
+      - package: VisualCoreRendering
+        product: VisualCoreAutomation
   ShowcaseTests:
     type: bundle.unit-test
     platform: iOS

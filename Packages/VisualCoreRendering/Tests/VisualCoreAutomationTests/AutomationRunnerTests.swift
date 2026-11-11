@@ -49,7 +49,7 @@ final class AutomationRunnerTests: XCTestCase {
         let report = runner().run(mode: "launch")
         XCTAssertEqual(report.result, "pass")
         XCTAssertNotNil(report.timeToFirstFrameMs)
-        XCTAssertGreaterThan(report.frames, 0)
+        XCTAssertEqual(report.frames, 1, "launch stops at the first presented frame")
         XCTAssertEqual(codes, [0])
     }
 

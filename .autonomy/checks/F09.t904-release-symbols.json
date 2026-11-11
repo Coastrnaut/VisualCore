@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_release_symbols.py",
+    "--app",
+    "Build/DerivedData/Showcase-release/Build/Products/Release-iphoneos/Showcase.app"
+  ],
+  "command": "python3 scripts/check_release_symbols.py --app Build/DerivedData/Showcase-release/Build/Products/Release-iphoneos/Showcase.app",
+  "elapsed_seconds": 0.101,
+  "exit_code": 0,
+  "finished": "2026-11-11T02:32:19+00:00",
+  "log": ".autonomy/logs/F09.t904-release-symbols.log",
+  "log_sha256": "1f6ce1b13eed26e530ab079042511fc6a53d4babc288679bc1b089ebbff0bd19",
+  "name": "t904-release-symbols",
+  "stage": "F09",
+  "started": "2026-11-11T02:32:19+00:00",
+  "timed_out": false
+}

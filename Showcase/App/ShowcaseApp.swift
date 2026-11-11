@@ -6,7 +6,17 @@ import SwiftUI
 struct ShowcaseApp: App {
     @State private var settings = ShowcaseSettings()
     var body: some Scene {
-        WindowGroup { ShowcaseRoot(settings: settings) }
+        WindowGroup {
+            #if DEBUG || VISUALCORE_AUTOMATION
+            if let mode = ShowcaseAutomation.mode {
+                AutomationRootView(mode: mode, settings: settings)
+            } else {
+                ShowcaseRoot(settings: settings)
+            }
+            #else
+            ShowcaseRoot(settings: settings)
+            #endif
+        }
     }
 }
 

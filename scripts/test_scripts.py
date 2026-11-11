@@ -30,6 +30,8 @@ audit = load("audit_showcase_dependencies")
 docapi = load("check_documented_api")
 publicapi = load("check_public_api")
 licenses = load("check_licenses")
+autosim = load("run_automation_sim")
+relsym = load("check_release_symbols")
 try:
     deps = load("check_dependencies")
 except FileNotFoundError:
@@ -393,6 +395,51 @@ class LicenseTests(unittest.TestCase):
         code, out = self.run_check(HERE / "fixtures" / "licenses" / "unknown")
         self.assertEqual(code, 1)
         self.assertIn("binary target Mystery", out)
+
+
+class AutomationScriptTests(unittest.TestCase):
+    """Feature 010 T-F904: simulator automation runner and Release symbol check logic."""
+
+    def test_pick_simulator_by_runtime_not_name(self):
+        data = {"devices": {
+            "com.apple.CoreSimulator.SimRuntime.iOS-26-5": [{"name": "iPad Air", "udid": "P", "isAvailable": True},
+                                                             {"name": "iPhone 17", "udid": "A", "isAvailable": True}],
+            "com.apple.CoreSimulator.SimRuntime.iOS-27-2": [{"name": "iPhone 18", "udid": "B", "isAvailable": False},
+                                                             {"name": "iPhone 18 Pro", "udid": "C", "isAvailable": True}]}}
+        self.assertEqual(autosim.pick_simulator(data, "26.5"), "A")
+        self.assertEqual(autosim.pick_simulator(data, "27.2"), "C")
+        with self.assertRaises(SystemExit):
+            autosim.pick_simulator(data, "25.0")
+
+    def test_launch_env_and_command(self):
+        self.assertEqual(autosim.launch_env("smoke", None), {"SIMCTL_CHILD_VISUALCORE_AUTORUN": "smoke"})
+        self.assertEqual(autosim.launch_env("smoke", 50)["SIMCTL_CHILD_VISUALCORE_AUTORUN_FRAMES"], "50")
+        self.assertEqual(autosim.launch_command("U", "dev.visualcore.Showcase")[2:4], ["launch", "--terminate-running-process"])
+
+    def test_newest_report(self):
+        with tempfile.TemporaryDirectory() as d:
+            docs_dir = Path(d)
+            self.assertIsNone(autosim.newest_report(docs_dir, "smoke"))
+            for name in ["visualcore-automation-smoke-20261110T100000Z.json", "visualcore-automation-smoke-20261110T110000Z.json",
+                         "visualcore-automation-launch-20261110T120000Z.json"]:
+                (docs_dir / name).write_text("{}")
+            self.assertEqual(autosim.newest_report(docs_dir, "smoke").name, "visualcore-automation-smoke-20261110T110000Z.json")
+
+    def test_dry_run_prints_commands(self):
+        import contextlib, io
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            code = autosim.main(["--app", "/nonexistent/Showcase.app", "--runtime", "27.2", "--mode", "launch",
+                                 "--out", "/tmp/x", "--dry-run"])
+        self.assertEqual(code, 0)
+        self.assertIn("SIMCTL_CHILD_VISUALCORE_AUTORUN=launch", out.getvalue())
+
+    def test_symbol_filter(self):
+        nm = ("0000000100001000 T _main\n"
+              "0000000100002000 T _$s20VisualCoreAutomation16AutomationRunnerC3run4mode6framesAA0C6ReportVSS_SitF\n"
+              "0000000100003000 T _$s19VisualCoreRendering10RenderHostC\n")
+        self.assertEqual(len(relsym.automation_symbols(nm)), 1)
+        self.assertEqual(relsym.automation_symbols("0000 T _main\n"), [])
 
 
 if __name__ == "__main__":

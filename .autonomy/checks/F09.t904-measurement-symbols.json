@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_release_symbols.py",
+    "--expect-present",
+    "--app",
+    "Build/DerivedData/Showcase-measurement/Build/Products/Release-iphoneos/Showcase.app"
+  ],
+  "command": "python3 scripts/check_release_symbols.py --expect-present --app Build/DerivedData/Showcase-measurement/Build/Products/Release-iphoneos/Showcase.app",
+  "elapsed_seconds": 0.095,
+  "exit_code": 0,
+  "finished": "2026-11-11T02:32:32+00:00",
+  "log": ".autonomy/logs/F09.t904-measurement-symbols.log",
+  "log_sha256": "8491f222934deada1d3086873e4e8632fed0be8bca88e27c06a46fe259b3b350",
+  "name": "t904-measurement-symbols",
+  "stage": "F09",
+  "started": "2026-11-11T02:32:32+00:00",
+  "timed_out": false
+}

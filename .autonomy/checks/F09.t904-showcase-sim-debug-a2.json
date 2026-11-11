@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "xcodebuild",
+    "build",
+    "-project",
+    "VisualCore.xcodeproj",
+    "-scheme",
+    "Showcase",
+    "-configuration",
+    "Debug",
+    "-destination",
+    "generic/platform=iOS Simulator",
+    "-derivedDataPath",
+    "Build/DerivedData/Showcase-auto",
+    "CODE_SIGNING_ALLOWED=NO"
+  ],
+  "command": "xcodebuild build -project VisualCore.xcodeproj -scheme Showcase -configuration Debug -destination 'generic/platform=iOS Simulator' -derivedDataPath Build/DerivedData/Showcase-auto CODE_SIGNING_ALLOWED=NO",
+  "elapsed_seconds": 4.256,
+  "exit_code": 0,
+  "finished": "2026-11-11T02:30:35+00:00",
+  "log": ".autonomy/logs/F09.t904-showcase-sim-debug-a2.log",
+  "log_sha256": "c2a03685672d74315a4d164cd7b9866a6282d3b5364e71bc63c8caf5caa8f413",
+  "name": "t904-showcase-sim-debug-a2",
+  "stage": "F09",
+  "started": "2026-11-11T02:30:30+00:00",
+  "timed_out": false
+}

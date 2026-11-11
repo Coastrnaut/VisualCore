@@ -102,3 +102,26 @@ recreation and free them in `release()` (call it from `teardown`). `RenderHost.p
 touches as `PointerEvent`s (view points, `UITouch.timestamp`, stable ids) and enables multi-touch; touches are
 cancelled when the view leaves its window. A runnable example is `Harnesses/InteractiveDemo` (XcodeGen; drag spawns
 particles, pinch zooms, Reduce Motion honored, UI-tested on iOS 27.2 and 26.5).
+
+`ClearColorScene(red:green:blue:)` is the smallest `RenderScene`: it clears the framebuffer to one color. Use it as a
+placeholder or a fallback scene when an app has nothing else to draw.
+
+## Automation (feature 010)
+
+`VisualCoreAutomation` compiles only under `DEBUG || VISUALCORE_AUTOMATION`; in a shipping Release build the module is
+empty (`scripts/check_release_symbols.py` checks the built app for zero automation symbols). An app starts a run only
+from the launch environment `VISUALCORE_AUTORUN=<mode>`. Optionally, `VISUALCORE_AUTORUN_FRAMES` sets the frame count,
+from 1 to 10,000 (default 120). No URL scheme or remote trigger can start a run.
+
+| Mode | Measures | Fails when |
+|---|---|---|
+| `smoke` | frame-time min/median/p95/max over N frames | any frame fails to render |
+| `launch` | runner creation → first presented frame | no frame within 600 attempts |
+| `lifecycle` | max(5, N/10) pause/resume cycles, context recreation every third | a frame fails or a resource leaks |
+
+`AutomationRunner(host:bundleID:)`'s `run(mode:frames:)` writes
+`Documents/visualcore-automation-<mode>-<UTC>.json` (`AutomationReport`, schema 1), then exits with code 0
+(pass), 1 (fail) or 2 (error, unknown mode). A measurement build is Release plus
+`SWIFT_ACTIVE_COMPILATION_CONDITIONS=VISUALCORE_AUTOMATION`. On a simulator, `scripts/run_automation_sim.py` runs
+one mode; these results are rehearsals, not device evidence. The Showcase wires this up in
+`Showcase/App/ShowcaseAutomation.swift`.

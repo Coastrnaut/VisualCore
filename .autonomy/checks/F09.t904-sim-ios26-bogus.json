@@ -1,0 +1,24 @@
+{
+  "argv": [
+    "python3",
+    "scripts/run_automation_sim.py",
+    "--app",
+    "Build/DerivedData/Showcase-auto/Build/Products/Debug-iphonesimulator/Showcase.app",
+    "--runtime",
+    "26.5",
+    "--mode",
+    "bogus",
+    "--out",
+    ".autonomy/logs/automation-sim/ios26"
+  ],
+  "command": "python3 scripts/run_automation_sim.py --app Build/DerivedData/Showcase-auto/Build/Products/Debug-iphonesimulator/Showcase.app --runtime 26.5 --mode bogus --out .autonomy/logs/automation-sim/ios26",
+  "elapsed_seconds": 1.867,
+  "exit_code": 1,
+  "finished": "2026-11-11T02:31:26+00:00",
+  "log": ".autonomy/logs/F09.t904-sim-ios26-bogus.log",
+  "log_sha256": "22faa0f4d9d5ee672a9032d0cb6c79fcd0df412f638de4cabe6132a0d83a5417",
+  "name": "t904-sim-ios26-bogus",
+  "stage": "F09",
+  "started": "2026-11-11T02:31:24+00:00",
+  "timed_out": false
+}

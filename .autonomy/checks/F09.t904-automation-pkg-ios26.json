@@ -1,0 +1,26 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/VisualCoreRendering",
+    "--scheme",
+    "VisualCoreRendering-Package",
+    "--destination",
+    "sim-26.5",
+    "--action",
+    "test",
+    "--result-name",
+    "F09-t904-pkg-ios26"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-26.5 --action test --result-name F09-t904-pkg-ios26",
+  "elapsed_seconds": 5.349,
+  "exit_code": 0,
+  "finished": "2026-11-11T02:31:48+00:00",
+  "log": ".autonomy/logs/F09.t904-automation-pkg-ios26.log",
+  "log_sha256": "c0a7fde33eeb22400c5efec3bf777d9d60973354ab290d8a9d9cee2c52e332fe",
+  "name": "t904-automation-pkg-ios26",
+  "stage": "F09",
+  "started": "2026-11-11T02:31:43+00:00",
+  "timed_out": false
+}
