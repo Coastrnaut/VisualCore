@@ -3,6 +3,7 @@
 // use after a context recreation is rejected and counted (FR-F310).
 import CVisualCoreGL
 import VisualCoreDiagnostics
+import VisualCoreSimulation
 
 /// Color formats for registry textures and render targets.
 public enum TextureFormat: Sendable, Equatable {
@@ -151,6 +152,47 @@ public final class RenderTarget: GPUResource {
         guard !released, let registry, registry.accept(generation: handle.generation) else { return }
         vcglActiveTexture(GLenum(GL_TEXTURE0 + Int32(unit)))
         vcglBindTexture(GLenum(GL_TEXTURE_2D), colorTexture)
+    }
+
+    /// Replaces the whole color texture with RGBA float values, rows bottom-up (feature 019; G-FLOATRT, research R4).
+    /// `.rgba16f` uploads the floats (rounded to half precision by GL); `.rgba8` clamps each value to 0…1 and stores
+    /// it as n/255. Returns false for `.r8`, a count other than width × height × 4, or a stale or released target.
+    @discardableResult
+    public func upload(rgbaFloats values: [Float]) -> Bool {
+        guard format != .r8, values.count == width * height * 4,
+              !released, let registry, registry.accept(generation: handle.generation) else { return false }
+        vcglBindTexture(GLenum(GL_TEXTURE_2D), colorTexture)
+        vcglPixelStorei(GLenum(GL_UNPACK_ALIGNMENT), 1)
+        if format == .rgba16f {
+            values.withUnsafeBytes {
+                vcglTexSubImage2D(GLenum(GL_TEXTURE_2D), 0, 0, 0, GLsizei(width), GLsizei(height),
+                                  GLenum(GL_RGBA), GLenum(GL_FLOAT), $0.baseAddress)
+            }
+        } else {
+            let bytes = values.map { UInt8(StoragePrecision.unorm8.round($0) * 255) }
+            bytes.withUnsafeBytes {
+                vcglTexSubImage2D(GLenum(GL_TEXTURE_2D), 0, 0, 0, GLsizei(width), GLsizei(height),
+                                  GLenum(GL_RGBA), GLenum(GL_UNSIGNED_BYTE), $0.baseAddress)
+            }
+        }
+        vcglPixelStorei(GLenum(GL_UNPACK_ALIGNMENT), 4)
+        return vcglGetError() == GLenum(GL_NO_ERROR)
+    }
+
+    /// The color attachment as RGBA floats, rows bottom-up (feature 019): `.rgba16f` is read as GL floats, `.rgba8`
+    /// as bytes divided by 255. Empty for `.r8`, a GL error, or a stale or released target. Leaves this target bound.
+    public func readFloatPixels() -> [Float] {
+        guard format != .r8, !released, let registry, registry.accept(generation: handle.generation) else { return [] }
+        vcglBindFramebuffer(GLenum(GL_FRAMEBUFFER), handle.name)
+        let count = width * height * 4
+        if format == .rgba8 {
+            var bytes = [UInt8](repeating: 0, count: count)
+            vcglReadPixels(0, 0, GLsizei(width), GLsizei(height), GLenum(GL_RGBA), GLenum(GL_UNSIGNED_BYTE), &bytes)
+            return vcglGetError() == GLenum(GL_NO_ERROR) ? bytes.map { Float($0) / 255 } : []
+        }
+        var floats = [Float](repeating: 0, count: count)
+        vcglReadPixels(0, 0, GLsizei(width), GLsizei(height), GLenum(GL_RGBA), GLenum(GL_FLOAT), &floats)
+        return vcglGetError() == GLenum(GL_NO_ERROR) ? floats : []
     }
 
     /// RGBA8 readback of the color attachment, rows bottom-up (tests, exports).

@@ -47,7 +47,7 @@ each followed by the enumeration guard, plus the ProjectM regression after the V
 **Goal**: G-PINGPONG, G-FLOATRT and G-FIELDPASS. **Independent test**: the VisualCoreRendering package tests on both
 runtimes, then the ProjectM regression 7/7.
 
-- [ ] T-A02-103 [US2] Add `RenderTarget.upload(rgbaFloats:)` and `readFloatPixels()` in
+- [X] T-A02-103 [US2] Add `RenderTarget.upload(rgbaFloats:)` and `readFloatPixels()` in — Verified 2026-11-11: RenderTarget.upload(rgbaFloats:) (rgba16f GL_FLOAT, rgba8 unorm8-quantized) and readFloatPixels(); RenderCapabilities.reportsColorBufferHalfFloat and currentExtensions(); FloatRenderSupport (extension + 4x4 RGBA16F probe, released, cached per generation, storageFormat(forceFallback:)); tests FieldTestSupport, FloatTransferTests 3, FloatRenderSupportTests 4. run-check A02-P01/t103-rendering-27-2: VisualCoreRendering package TEST SUCCEEDED on iOS 27.2, 0 failures; enumeration guard 7/7 new tests passed, none skipped; detect reports extension=true probe=true, matching the raw probe (the first attempt t103-rendering-27 failed to compile: main-actor isolation, fixed)
   `Packages/VisualCoreRendering/Sources/VisualCoreRendering/GPUObjects.swift`:
   - rgba16f uses `GL_RGBA`/`GL_FLOAT`;
   - rgba8 is quantized on the CPU and read back normalized;

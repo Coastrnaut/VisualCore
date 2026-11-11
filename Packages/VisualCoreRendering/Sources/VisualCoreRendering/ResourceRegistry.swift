@@ -47,6 +47,9 @@ public final class ResourceRegistry {
     /// Called by the host once the new context exists.
     func contextDidStart(generation: Int) { self.generation = generation }
 
+    /// Half-float support detected for a generation (FloatRenderSupport.detect, feature 019).
+    var floatSupportCache: (generation: Int, value: FloatRenderSupport)?
+
     /// Hook for caches (programs, pools) to drop GL names of the ending context.
     var willEndContext: () -> Void = {}
 

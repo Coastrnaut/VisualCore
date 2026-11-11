@@ -31,6 +31,19 @@ public struct RenderCapabilities: Sendable, Equatable, Codable {
         public var height: Int
     }
 
+    /// True when the extension list includes `GL_EXT_color_buffer_half_float` or `GL_EXT_color_buffer_float`,
+    /// the extensions that make RGBA16F color-renderable (feature 019; see FloatRenderSupport for the probe).
+    public var reportsColorBufferHalfFloat: Bool { extensions.contains(where: FloatRenderSupport.isFloatColorExtension) }
+
+    /// Extension names of the current context.
+    static func currentExtensions() -> [String] {
+        var count: GLint = 0
+        vcglGetIntegerv(GLenum(GL_NUM_EXTENSIONS), &count)
+        return (0..<max(0, Int(count))).compactMap { i in
+            vcglGetStringi(GLenum(GL_EXTENSIONS), GLuint(i)).map { String(cString: UnsafeRawPointer($0).assumingMemoryBound(to: CChar.self)) }
+        }
+    }
+
     /// Creates an empty report (no context queried).
     public init() {}
 
@@ -46,13 +59,7 @@ public struct RenderCapabilities: Sendable, Equatable, Codable {
         caps.renderer = string(GL_RENDERER)
         caps.vendor = string(GL_VENDOR)
         if let v = eglQueryString(display, EGL_VENDOR) { caps.eglVendor = String(cString: v) }
-        var count: GLint = 0
-        vcglGetIntegerv(GLenum(GL_NUM_EXTENSIONS), &count)
-        for i in 0..<max(0, Int(count)) {
-            if let p = vcglGetStringi(GLenum(GL_EXTENSIONS), GLuint(i)) {
-                caps.extensions.append(String(cString: UnsafeRawPointer(p).assumingMemoryBound(to: CChar.self)))
-            }
-        }
+        caps.extensions = currentExtensions()
         var maxTexture: GLint = 0
         vcglGetIntegerv(GLenum(GL_MAX_TEXTURE_SIZE), &maxTexture)
         caps.maxTextureSize = Int(maxTexture)
