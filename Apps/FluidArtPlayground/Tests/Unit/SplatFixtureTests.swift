@@ -51,6 +51,7 @@ final class SplatFixtureTests: XCTestCase {
                 defer { host.destroy() }
                 XCTAssertTrue(host.renderOneFrame(present: false))   // set up and show the seed
                 let precision = try XCTUnwrap(scene.precision)
+                XCTAssertEqual([scene.configuration.gridWidth, scene.dye?.width], [size, size], "the fixture really runs at \(size)×\(size)")
                 scene.paused = false
                 scene.enqueue([splat])
                 XCTAssertTrue(host.renderOneFrame(present: false))
@@ -63,13 +64,15 @@ final class SplatFixtureTests: XCTestCase {
                     var velocity = scene.initialVelocity().rounded(to: precision)
                     var dye = scene.initialDye().rounded(to: precision)
                     splat.apply(velocity: &velocity, dye: &dye, precision: mode, velocityEncoding: scene.encoding)
-                    // Zero dissipation: the dissipate pass multiplies by exactly 1.
+                    // The same frame then advects (feature 020 T-A02-211; clarification 5), with zero dissipation.
+                    Advection.step(velocity: &velocity, dye: &dye, dt: 1.0 / 60, velocityDissipation: 0, dyeDissipation: 0,
+                                   precision: mode, velocityEncoding: scene.encoding)
                     dyeRefs.append(dye.values)
                     velocityRefs.append(velocity.values)
                 }
                 let gpuDye = try XCTUnwrap(scene.dye?.read.readFloatPixels())
                 let gpuVelocity = try XCTUnwrap(scene.velocity?.read.readFloatPixels())
-                let tol = precision.tolerance
+                let tol = precision.tolerance * 2   // two stored passes: splat, then advect
                 let dyeDiff = closestDifference(gpuDye, dyeRefs, tolerance: tol, relative: false)
                 let velDiff = closestDifference(gpuVelocity, velocityRefs, tolerance: tol, relative: precision != .unorm8)
                 XCTAssertLessThanOrEqual(dyeDiff.worst, tol, "dye \(size)x\(size) \(precision)")

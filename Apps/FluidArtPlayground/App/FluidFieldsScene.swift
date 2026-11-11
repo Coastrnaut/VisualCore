@@ -32,6 +32,8 @@ final class FluidFieldsScene: RenderScene {
 
     /// Test seam: writes a seed into a target (default `upload(rgbaFloats:)`).
     var uploadSeed: (RenderTarget, [Float]) -> Bool = { $0.upload(rgbaFloats: $1) }
+    /// Test seam: the starting velocity (RGBA, cells per second, unencoded) instead of zero.
+    var initialVelocityOverride: FieldGrid?
     /// Test seam: replaces the frame delta before it is clamped.
     var fixedDelta: Double?
     /// When true, frames show the dye without stepping.
@@ -54,7 +56,7 @@ final class FluidFieldsScene: RenderScene {
     private(set) var lastDrained = 0
     /// Splats waiting for the next stepped frame (CPU state; survives a context loss).
     private(set) var pendingSplats: [Splat] = []
-    private var dissipate: FieldPass?
+    private var advect: FieldPass?
     private var splat: FieldPass?
     private var display: FieldPass?
     private var policy = TimeStepPolicy()
@@ -97,7 +99,7 @@ final class FluidFieldsScene: RenderScene {
             self.velocity = velocity
             let dye = try PingPongTarget(registry: r, width: w, height: h, format: format, label: "fap.dye")
             self.dye = dye
-            dissipate = try FieldPass(registry: r, fragment: FluidShaders.dissipate, inputs: ["uField"], label: "fap.dissipate")
+            advect = try FieldPass(registry: r, fragment: FluidShaders.advect, inputs: ["uVelocity", "uSource"], label: "fap.advect")
             splat = try FieldPass(registry: r, fragment: FluidShaders.splat, inputs: ["uField"], label: "fap.splat")
             display = try FieldPass(registry: r, fragment: FluidShaders.display, inputs: ["uDye"], label: "fap.display")
             guard uploadSeed(velocity.read, initialVelocity().values) else { throw FluidSceneError.seedUploadFailed("velocity") }
@@ -118,7 +120,8 @@ final class FluidFieldsScene: RenderScene {
 
     /// The velocity at step 0 as uploaded (RGBA; RG encoded for RGBA8 storage).
     func initialVelocity() -> FieldGrid {
-        var v = DyeSeed.zeroVelocity(width: configuration.gridWidth, height: configuration.gridHeight).padded(toChannels: 4)
+        var v = initialVelocityOverride.flatMap { $0.width == configuration.gridWidth && $0.height == configuration.gridHeight ? $0.padded(toChannels: 4) : nil }
+            ?? DyeSeed.zeroVelocity(width: configuration.gridWidth, height: configuration.gridHeight).padded(toChannels: 4)
         if let encoding {
             for i in v.values.indices where i % 4 < 2 { v.values[i] = encoding.encode(v.values[i]) }
         }
@@ -152,23 +155,23 @@ final class FluidFieldsScene: RenderScene {
     }
 
     func render(_ context: RenderContext, frame: FrameInfo) throws {
-        guard let velocity, let dye, let dissipate, let splat, let display else { return }
+        guard let velocity, let dye, let advect, let splat, let display else { return }
         do {
             if !paused {
                 let dt = policy.clamp(fixedDelta ?? frame.delta)
                 lastStep = dt
                 try applySplats(velocity: velocity, dye: dye, splat: splat)
-                try dissipate.run(pair: velocity, input: "uField", uniforms: [
-                    "uFactor": .float(Dissipation.factor(d: configuration.velocityDissipation, dt: dt)),
-                    "uEncoded": .int(storage == .rgba8 ? 1 : 0),
-                    "uRange": .float(velocityRangeCellsPerSecond),
-                    "uCenter": .float(encoding?.center ?? 0.5),
+                let encoded = FieldUniform.int(storage == .rgba8 ? 1 : 0)
+                let range = FieldUniform.float(velocityRangeCellsPerSecond)
+                let center = FieldUniform.float(encoding?.center ?? 0.5)
+                // Clarification 5: velocity advects itself, then dye moves with the advected velocity.
+                try advect.run(pair: velocity, input: "uSource", extraInputs: ["uVelocity": velocity.read], uniforms: [
+                    "uDt": .float(Float(dt)), "uFactor": .float(Dissipation.factor(d: configuration.velocityDissipation, dt: dt)),
+                    "uEncodedVelocity": encoded, "uSourceIsVelocity": .int(1), "uRange": range, "uCenter": center,
                 ])
-                try dissipate.run(pair: dye, input: "uField", uniforms: [
-                    "uFactor": .float(Dissipation.factor(d: configuration.dyeDissipation, dt: dt)),
-                    "uEncoded": .int(0),
-                    "uRange": .float(1),
-                    "uCenter": .float(0.5),
+                try advect.run(pair: dye, input: "uSource", extraInputs: ["uVelocity": velocity.read], uniforms: [
+                    "uDt": .float(Float(dt)), "uFactor": .float(Dissipation.factor(d: configuration.dyeDissipation, dt: dt)),
+                    "uEncodedVelocity": encoded, "uSourceIsVelocity": .int(0), "uRange": range, "uCenter": center,
                 ])
                 stepCount += 1
             }
@@ -185,12 +188,12 @@ final class FluidFieldsScene: RenderScene {
     private func releaseAll() {
         velocity?.release()
         dye?.release()
-        dissipate?.release()
+        advect?.release()
         splat?.release()
         display?.release()
         velocity = nil
         dye = nil
-        dissipate = nil
+        advect = nil
         splat = nil
         display = nil
     }

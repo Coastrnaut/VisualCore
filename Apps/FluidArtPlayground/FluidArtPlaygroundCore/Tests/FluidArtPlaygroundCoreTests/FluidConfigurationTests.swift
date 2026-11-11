@@ -22,8 +22,8 @@ final class FluidConfigurationTests: XCTestCase {
     func testOutOfRangeValuesAreClampedAndReported() {
         let cases: [(String, (inout FluidConfiguration) -> Void, (FluidConfiguration) -> Bool)] = [
             ("gridWidth", { $0.gridWidth = 4096 }, { $0.gridWidth == 512 }),
-            ("gridWidth", { $0.gridWidth = 2 }, { $0.gridWidth == 16 }),
-            ("gridHeight", { $0.gridHeight = -5 }, { $0.gridHeight == 16 }),
+            ("gridWidth", { $0.gridWidth = 2 }, { $0.gridWidth == 8 }),
+            ("gridHeight", { $0.gridHeight = -5 }, { $0.gridHeight == 8 }),
             ("gridHeight", { $0.gridHeight = 9999 }, { $0.gridHeight == 512 }),
             ("dyeDissipation", { $0.dyeDissipation = 50 }, { $0.dyeDissipation == 10 }),
             ("dyeDissipation", { $0.dyeDissipation = -1 }, { $0.dyeDissipation == 0 }),
@@ -62,7 +62,7 @@ final class FluidConfigurationTests: XCTestCase {
         let (c, issues) = raw.validated(maxEdge: 256)
         XCTAssertEqual([c.gridWidth, c.gridHeight], [256, 256])
         XCTAssertEqual(Set(issues.map(\.field)), ["gridWidth", "gridHeight"])
-        XCTAssertEqual(raw.validated(maxEdge: 8).0.gridWidth, 16, "the minimum edge wins over a tiny device cap")
+        XCTAssertEqual(raw.validated(maxEdge: 4).0.gridWidth, 8, "the minimum edge wins over a tiny device cap")
     }
 
     func testIssueDescribesRequestedAndApplied() {

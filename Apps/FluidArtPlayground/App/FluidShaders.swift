@@ -3,7 +3,8 @@
 // Every fragment runs through VisualCore's FieldPass and receives `v_uv` from the full-screen vertex shader.
 
 enum FluidShaders {
-    /// Multiplies a field by `uFactor` = 1 / (1 + d·Δt). With `uEncoded` = 1, the RG channels hold signed velocity
+    /// Multiplies a field by `uFactor` = 1 / (1 + d·Δt). Phase 01's dissipation pass, which the scene no longer
+    /// uses since feature 020 folded dissipation into `advect` (kept for the guard test and as a reference). With `uEncoded` = 1, the RG channels hold signed velocity
     /// encoded as v / uRange · 0.5 + uCenter (RGBA8 fallback, uCenter = 128/255): decode, scale, re-encode, so zero stays
     /// exactly zero.
     static let dissipate = """
@@ -22,6 +23,38 @@ enum FluidShaders {
             color = vec4(clamp(s / uRange * 0.5 + uCenter, 0.0, 1.0), v.zw);
         } else {
             color = v * uFactor;
+        }
+    }
+    """
+
+    /// Semi-Lagrangian advection (feature 020; spec clarifications 1 and 5; research R1): each cell samples
+    /// `uSource` at `gl_FragCoord − uDt·v` with VisualCore's exact `vc_fieldBilinear` (clamp-to-edge), where `v` is
+    /// the cell's own velocity in cells per second (decoded with `uCenter`/`uRange` in 8-bit storage), and multiplies
+    /// by the dissipation factor. Encoded velocity sources are decoded, scaled and re-encoded. It matches
+    /// `Advection.advect` (Core) operation for operation.
+    static let advect = """
+    precision highp float;
+    #include "vc/field.glsl"
+    uniform sampler2D uVelocity;
+    uniform sampler2D uSource;
+    uniform float uDt;
+    uniform float uFactor;
+    uniform int uEncodedVelocity;
+    uniform int uSourceIsVelocity;
+    uniform float uRange;
+    uniform float uCenter;
+    in vec2 v_uv;
+    out vec4 color;
+    void main() {
+        vec4 vel = texelFetch(uVelocity, ivec2(gl_FragCoord.xy), 0);
+        vec2 v = uEncodedVelocity == 1 ? (vel.xy - uCenter) * 2.0 * uRange : vel.xy;
+        vec2 src = gl_FragCoord.xy - uDt * v;
+        vec4 s = vc_fieldBilinear(uSource, src);
+        if (uSourceIsVelocity == 1 && uEncodedVelocity == 1) {
+            vec2 sv = (s.xy - uCenter) * 2.0 * uRange * uFactor;
+            color = vec4(clamp(sv / uRange * 0.5 + uCenter, 0.0, 1.0), s.zw);
+        } else {
+            color = s * uFactor;
         }
     }
     """

@@ -54,6 +54,12 @@ Answered autonomously under the owner's standing delegation (CLAUDE.md §2), rec
   Dissipation is applied inside both advection passes (`× 1/(1 + d·Δt)`). The "Add splash" control queues burst *k*
   at the canvas center with angle `k × 137.5°`, force 600 cells per second and palette color `k mod 6`.
 
+- Q: (found during implementation, T-A02-211) The Phase 01 configuration clamps grid edges to at least 16, so can
+  fixtures really run on 8×8? → A: No. The "8×8" runs had silently been 16×16. The minimum grid edge is lowered to 8
+  (`FluidConfiguration.gridEdgeRange` = 8…512), and every fixture asserts its actual grid size. Phase 01's bounds tests
+  are updated accordingly (feature 019 FR-A02-101 said 16…512; amended here, because no user setting or stored file
+  exists yet).
+
 ## User Scenarios & Testing *(mandatory)*
 
 Users:

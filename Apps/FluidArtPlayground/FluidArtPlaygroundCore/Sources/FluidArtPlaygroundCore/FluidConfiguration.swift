@@ -15,7 +15,7 @@ public struct ConfigurationIssue: Sendable, Equatable, Codable {
 /// Simulation settings for the playground (version 1). Values outside their bounds are corrected by `validated`.
 public struct FluidConfiguration: Sendable, Equatable, Codable {
     /// Grid edge bounds before the device cap.
-    public static let gridEdgeRange = 16...512
+    public static let gridEdgeRange = 8...512   // 8 since feature 020: CPU-reference fixtures run on 8×8
     /// Dissipation bounds, per second.
     public static let dissipationRange = 0.0...10.0
     /// Viscosity bounds (stored now, used in Phase 03).
@@ -33,9 +33,9 @@ public struct FluidConfiguration: Sendable, Equatable, Codable {
 
     /// Schema version; only 1 exists.
     public var version = 1
-    /// Simulation grid width in cells (16…512, then ≤ the device's maximum render size).
+    /// Simulation grid width in cells (8…512, then ≤ the device's maximum render size).
     public var gridWidth = 128
-    /// Simulation grid height in cells (16…512, then ≤ the device's maximum render size).
+    /// Simulation grid height in cells (8…512, then ≤ the device's maximum render size).
     public var gridHeight = 128
     /// Dye dissipation per second (0…10): each step multiplies dye by 1 / (1 + d·Δt).
     public var dyeDissipation = 1.0
@@ -60,7 +60,7 @@ public struct FluidConfiguration: Sendable, Equatable, Codable {
     public init() {}
 
     /// The configuration with every value in bounds, and one issue per corrected field. Non-finite numbers become
-    /// the field's default. Grid edges are clamped to 16…512 and then to `maxEdge` (never below 16).
+    /// the field's default. Grid edges are clamped to 8…512 and then to `maxEdge` (never below 8).
     /// Validating a validated configuration returns no issues.
     public func validated(maxEdge: Int = 512) -> (FluidConfiguration, issues: [ConfigurationIssue]) {
         let defaults = FluidConfiguration()
