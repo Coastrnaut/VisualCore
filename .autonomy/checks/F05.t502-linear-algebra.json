@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/VisualCore"
+  ],
+  "command": "swift test --package-path Packages/VisualCore",
+  "elapsed_seconds": 4.474,
+  "exit_code": 0,
+  "finished": "2026-11-11T00:37:45+00:00",
+  "log": ".autonomy/logs/F05.t502-linear-algebra.log",
+  "log_sha256": "93b5a9f5369dfdaa1e5b54f7d2602b34434ca0d19eee87df7eca37cc65133b62",
+  "name": "t502-linear-algebra",
+  "stage": "F05",
+  "started": "2026-11-11T00:37:41+00:00",
+  "timed_out": false
+}
