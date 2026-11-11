@@ -66,7 +66,7 @@ sets it up again.
 **Scale/Scope**:
 - 3 new VisualCoreRendering types plus 1 readback/upload extension.
 - 3 new VisualCoreSimulation types.
-- 1 new app Core package (4 source files).
+- 1 new app Core package (5 source files).
 - 1 scene and 1 canvas view in the app.
 - About 12 test classes.
 
@@ -134,9 +134,10 @@ Apps/FluidArtPlayground/Core/                       # NEW GPU-free package Fluid
 │   ├── Module.swift
 │   ├── FluidConfiguration.swift  # bounds, clamping, issues, Codable v1
 │   ├── Dissipation.swift         # factor 1/(1+d·Δt); CPU step over FieldGrid with precision
-│   └── DyeSeed.swift             # deterministic seed pattern (SeededRandom), uniform fixture
+│   ├── DyeSeed.swift             # deterministic seed pattern (SeededRandom), uniform fixture
+│   └── FluidCanvasDescription.swift  # spoken canvas value
 └── Tests/FluidArtPlaygroundCoreTests/
-    ├── FluidConfigurationTests.swift, DissipationTests.swift, DyeSeedTests.swift
+    ├── FluidConfigurationTests.swift, DissipationTests.swift, DyeSeedTests.swift, FluidCanvasDescriptionTests.swift
 Apps/FluidArtPlayground/App/
 ├── FluidArtPlaygroundApp.swift   # EDIT home gains "Open playground" navigation
 ├── FluidFieldsScene.swift        # NEW RenderScene: velocity + dye PingPongTargets, dissipation + display FieldPasses

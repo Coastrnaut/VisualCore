@@ -114,7 +114,8 @@ both runtimes and both storages.
   Add `FluidFieldsScene.swift` per contracts/app-fields.md:
   - storage selection;
   - two `PingPongTarget`s;
-  - seed upload;
+  - seed upload (velocity goes through `SignedRangeEncoding(range: velocityRange)` when the storage is RGBA8, so zero
+    is stored as 0.5; analyze U1);
   - the per-frame clamped `Δt` (`TimeStepPolicy`);
   - dissipation on both pairs, then display to the framebuffer;
   - `stepCount`, `rebuildCount`, the `fixedDelta` test seam, and `readDye()`/`readVelocity()`;
@@ -122,7 +123,9 @@ both runtimes and both storages.
 - [ ] T-A02-111 [US1] Add `Apps/FluidArtPlayground/Tests/Unit/DissipationFixtureTests.swift`: for d ∈ {0, 1, 5},
   60 steps at Δt = 1/60, a 16×16 grid with uniform (0.8, 0.8, 0.8, 1), in half-float (when supported) and forced
   RGBA8, `max|GPU − CPU(precision)| ≤ tolerance`. Zero velocity stays at 0 in both storages. Every simulation pass
-  writes to a target other than its input (`swapCount` == 2 per step; a guard test expects `inputIsOutput`).
+  writes to a target other than its input (`swapCount` == 2 per step; a guard test expects `inputIsOutput`). After 0
+  steps, the GPU readback of `DyeSeed.pattern(seed:)` equals the CPU seed rounded to the storage precision, within
+  tolerance (FR-A02-110; analyze C2).
   Acceptance: SC-A02-101 and SC-A02-102 on iOS 27.2 and 26.5 (one run-check each), with the enumeration guard.
 
 ## Phase 5: User Story 3 — See the fields on screen (P2)
@@ -156,8 +159,20 @@ both runtimes and both storages.
   Re-render the `.md` and run `check_app_contract.py --app fluid-art-playground --render` (FR-A02-109).
 - [ ] T-A02-115 Run all checks: `check_documented_api.py --sources Apps/FluidArtPlayground`, `check_dependencies.py`,
   `check_compliance.py`, `check_licenses.py`, `validate_docs.py`, `test_scripts.py`, and the release fast steps.
-  Confirm that the app has no networking, no usage descriptions and no ProjectM linkage (dependency audit)
+  Confirm that the app has no networking, no usage descriptions and no ProjectM linkage (dependency audit). A source
+  check finds no `CVisualCoreEGL` import and no `egl` call under `Apps/FluidArtPlayground` (FR-A02-106; analyze C1)
   (SC-A02-105).
+
+## Analyze remediation (2026-11-11)
+
+Applied under the owner's delegated approval (CLAUDE.md §2):
+- C1: the no-EGL source check was added to T-A02-115.
+- C2: the GPU seed equality check was added to T-A02-111.
+- U1: the RGBA8 velocity encoding on upload was added to T-A02-110.
+- I1: the plan's Core file count and tree were fixed.
+- N1: Reduce Motion is out of scope until user-driven motion arrives in Phase 02. Phase 01 shows only a slow fade.
+
+No CRITICAL findings; coverage is 100%.
 
 ## Dependencies
 
