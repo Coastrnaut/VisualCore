@@ -1,0 +1,194 @@
+{
+  "checks": [
+    {
+      "attestation": ".autonomy/checks/F08.t801-gardenkit-host.json",
+      "command": "swift test --package-path Harnesses/SecondConsumer/GardenKit",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F08.t801-gardenkit-host.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F08.t801-shell-test.json",
+      "command": "xcodebuild test -project Harnesses/SecondConsumer/SecondConsumer.xcodeproj -scheme SecondConsumer -destination 'platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D' -derivedDataPath Build/DerivedData/SecondConsumer -resultBundlePath .autonomy/xcresults/F08-t801-20261110-210853.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 180 CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F08.t801-shell-test.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F08.t802-audit-secondconsumer.json",
+      "command": "python3 scripts/audit_showcase_dependencies.py --spec Harnesses/SecondConsumer/SecondConsumer.yml --target SecondConsumer --sources Harnesses/SecondConsumer --app Build/DerivedData/SecondConsumer/Build/Products/Debug-iphonesimulator/SecondConsumer.app",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F08.t802-audit-secondconsumer.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F08.t802-audit-showcase.json",
+      "command": "python3 scripts/audit_showcase_dependencies.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F08.t802-audit-showcase.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F08.t802-audit-tests.json",
+      "command": "python3 scripts/test_scripts.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F08.t802-audit-tests.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F08.t803-docapi-Harnesses-InteractiveDemo.json",
+      "command": "python3 scripts/check_documented_api.py --sources Harnesses/InteractiveDemo",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F08.t803-docapi-Harnesses-InteractiveDemo.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F08.t803-docapi-Harnesses-ProjectMReference.json",
+      "command": "python3 scripts/check_documented_api.py --sources Harnesses/ProjectMReference",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F08.t803-docapi-Harnesses-ProjectMReference.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F08.t803-docapi-Harnesses-SecondConsumer.json",
+      "command": "python3 scripts/check_documented_api.py --sources Harnesses/SecondConsumer",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F08.t803-docapi-Harnesses-SecondConsumer.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F08.t803-docapi-showcase-a2.json",
+      "command": "python3 scripts/check_documented_api.py --sources Showcase",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F08.t803-docapi-showcase-a2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F08.t803-docapi-tests.json",
+      "command": "python3 scripts/test_scripts.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F08.t803-docapi-tests.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F08.t804-gardenkit.json",
+      "command": "swift test --package-path Harnesses/SecondConsumer/GardenKit",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F08.t804-gardenkit.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F08.t805-docapi.json",
+      "command": "python3 scripts/check_documented_api.py --sources Harnesses/SecondConsumer",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F08.t805-docapi.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F08.t805-scene-build.json",
+      "command": "xcodebuild build -project Harnesses/SecondConsumer/SecondConsumer.xcodeproj -scheme SecondConsumer -destination 'generic/platform=iOS Simulator' -derivedDataPath Build/DerivedData/SecondConsumer CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F08.t805-scene-build.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F08.t806-app-build.json",
+      "command": "xcodebuild build -project Harnesses/SecondConsumer/SecondConsumer.xcodeproj -scheme SecondConsumer -destination 'generic/platform=iOS Simulator' -derivedDataPath Build/DerivedData/SecondConsumer CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F08.t806-app-build.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F08.t807-smoke-ios26.json",
+      "command": "xcodebuild test -project Harnesses/SecondConsumer/SecondConsumer.xcodeproj -scheme SecondConsumer -destination 'platform=iOS Simulator,id=EC7498FF-31FF-4491-9666-B0D32785203C' -derivedDataPath Build/DerivedData/SecondConsumer -resultBundlePath .autonomy/xcresults/F08-t807-ios26-20261110-211425.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 180 CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F08.t807-smoke-ios26.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F08.t807-smoke-ios27.json",
+      "command": "xcodebuild test -project Harnesses/SecondConsumer/SecondConsumer.xcodeproj -scheme SecondConsumer -destination 'platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D' -derivedDataPath Build/DerivedData/SecondConsumer -resultBundlePath .autonomy/xcresults/F08-t807-ios27-20261110-211341.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 180 CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F08.t807-smoke-ios27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F08.t808-readme.json",
+      "command": "python3 scripts/validate_docs.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F08.t808-readme.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F08.t809-audit-app.json",
+      "command": "python3 scripts/audit_showcase_dependencies.py --spec Harnesses/SecondConsumer/SecondConsumer.yml --target SecondConsumer --sources Harnesses/SecondConsumer --app Build/DerivedData/SecondConsumer/Build/Products/Debug-iphonesimulator/SecondConsumer.app",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F08.t809-audit-app.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F08.t809-check_compliance.json",
+      "command": "python3 scripts/check_compliance.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F08.t809-check_compliance.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F08.t809-check_dependencies.json",
+      "command": "python3 scripts/check_dependencies.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F08.t809-check_dependencies.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F08.t809-check_reference_clean.json",
+      "command": "python3 scripts/check_reference_clean.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F08.t809-check_reference_clean.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F08.t809-docapi.json",
+      "command": "python3 scripts/check_documented_api.py --sources Harnesses/SecondConsumer",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F08.t809-docapi.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F08.t809-gardenkit.json",
+      "command": "swift test --package-path Harnesses/SecondConsumer/GardenKit",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F08.t809-gardenkit.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F08.t809-generic-ios.json",
+      "command": "xcodebuild build -project Harnesses/SecondConsumer/SecondConsumer.xcodeproj -scheme SecondConsumer -destination generic/platform=iOS -derivedDataPath Build/DerivedData/SecondConsumerDevice CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F08.t809-generic-ios.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F08.t809-host.json",
+      "command": "swift test --package-path Packages/VisualCore",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F08.t809-host.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F08.t809-test_scripts.json",
+      "command": "python3 scripts/test_scripts.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F08.t809-test_scripts.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F08.t809-validate_docs.json",
+      "command": "python3 scripts/validate_docs.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F08.t809-validate_docs.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F08.t809-vc-sim-ios27.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --result-name F08-t809-ios27",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F08.t809-vc-sim-ios27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F08.t811-background-ios26.json",
+      "command": "xcodebuild test -project Harnesses/SecondConsumer/SecondConsumer.xcodeproj -scheme SecondConsumer -destination 'platform=iOS Simulator,id=EC7498FF-31FF-4491-9666-B0D32785203C' -derivedDataPath Build/DerivedData/SecondConsumer -resultBundlePath .autonomy/xcresults/F08-t811-ios26-20261110-211751.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 180 CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F08.t811-background-ios26.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F08.t811-background-ios27.json",
+      "command": "xcodebuild test -project Harnesses/SecondConsumer/SecondConsumer.xcodeproj -scheme SecondConsumer -destination 'platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D' -derivedDataPath Build/DerivedData/SecondConsumer -resultBundlePath .autonomy/xcresults/F08-t811-ios27-20261110-211658.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 180 CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F08.t811-background-ios27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/F08.t812-contract-sync.json",
+      "command": "sh /private/tmp/claude-501/-Users-coast--claude-spares-spare-cfXtKj/51106fd1-e87b-442d-aa28-d54231dd3fe4/scratchpad/f08_contract_check.sh /Users/coast/Documents/GIT/VisualCore",
+      "exit_code": 0,
+      "log": ".autonomy/logs/F08.t812-contract-sync.log"
+    }
+  ],
+  "generated": "2026-11-11T02:19:17+00:00",
+  "method": "deterministic-run-check",
+  "stage": "F08",
+  "status": "pass"
+}
