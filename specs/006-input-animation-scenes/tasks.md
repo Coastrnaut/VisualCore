@@ -16,7 +16,7 @@ push per task. Each subsystem is implemented separately (supplied prompt). Paths
 ## Phase 2: Foundational — math (blocks every story)
 
 - [X] T-F502 Tests + implementation of `Vec2/Vec3/Vec4`, `Mat3` (2D affine), `Mat4` (column-major), `Quat` (unit, slerp) in `Packages/VisualCore/Sources/VisualCoreMath/{Vectors,Matrix4,Quaternion}.swift`, tests `Packages/VisualCore/Tests/VisualCoreMathTests/LinearAlgebraTests.swift` (inverse·m = identity within 1e-12, quaternion rotation matches matrix) — Verified 2026-11-10: F05.t502-linear-algebra exit 0: 6 tests — Mat3/Mat4 inverse·m = identity within 1e-12 (1e-9 projection), quaternion rotation = matrix, slerp, column-major floats
-- [ ] T-F503 Tests + implementation of `Camera2D` (`zoom` clamped to "[0.1, 100]", `rotation` radians; matrix and inverse) in `VisualCoreMath/Camera2D.swift`, tests `VisualCoreMathTests/Camera2DTests.swift`
+- [X] T-F503 Tests + implementation of `Camera2D` (`zoom` clamped to "[0.1, 100]", `rotation` radians; matrix and inverse) in `VisualCoreMath/Camera2D.swift`, tests `VisualCoreMathTests/Camera2DTests.swift` — Verified 2026-11-10: F05.t503-camera2d exit 0: 5 tests — zoom clamp 0.1-100 and NaN, round trip ≤1e-9, AC2 center (10,0), pinch keeps anchor, pan follows finger
 
 ## Phase 3: US1 — Map touches into the scene (P1) 🎯 MVP
 
