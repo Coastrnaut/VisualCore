@@ -101,8 +101,9 @@ dissipation, rendered through the shared VisualCore host. VoiceOver describes th
 
 **Why this priority**: It is the smallest visible vertical slice. Touch input arrives in Phase 02.
 
-**Independent Test**: Open the canvas in a UI test. It exists with a spoken description, and the rendered image is
-non-blank and changes over time as the dye fades.
+**Independent Test**: Open the canvas in a UI test. It exists with a spoken description. In the scene readback, at
+least 1% of pixels are non-black, and the mean dye intensity strictly decreases between two frames at least 30 steps
+apart when the dissipation is above 0.
 
 **Acceptance Scenarios**:
 
@@ -134,7 +135,8 @@ non-blank and changes over time as the dye fades.
   - dye and velocity dissipation;
   - viscosity and pressure iterations (stored and validated now, used in Phase 03).
 
-  Out-of-range values are clamped and reported.
+  Out-of-range values are clamped and reported. A non-finite value (NaN or infinity) is replaced by the field's
+  default and reported. Validation is idempotent.
 - **FR-A02-102**: The app MUST provide a GPU-free CPU reference for the fields and for the dissipation step,
   testable on the host.
 - **FR-A02-103**: The app MUST keep the velocity and dye fields on the GPU in ping-pong pairs. Every step writes to a
@@ -153,8 +155,15 @@ non-blank and changes over time as the dye fades.
   leaked resources.
 - **FR-A02-108**: The simulation time step MUST be clamped to 1/240…1/30 s. Resuming after a pause takes exactly one
   clamped step, never a catch-up loop.
-- **FR-A02-109**: The VisualCore contract MUST be updated: G-PINGPONG, G-FLOATRT and G-FIELDPASS closed; M01, M03 and
-  M10 available. The contract check MUST pass. The app MUST stay offline and link no ProjectM module.
+- **FR-A02-109**: The VisualCore contract MUST be updated and the contract check MUST pass:
+  - G-PINGPONG, G-FLOATRT and G-FIELDPASS are closed;
+  - the generic CPU pieces added in this phase (field grid, storage-precision rounding, signed-range encoding,
+    time-step policy) are recorded and closed as G-CPUFIELD;
+  - M01, M03 and M10 are available.
+
+  The app MUST stay offline, request no permissions, persist no data in this phase, and link no ProjectM module.
+- **FR-A02-110**: The canvas seed pattern MUST be deterministic for a given configuration seed: the same seed gives
+  the same initial dye on the CPU and the GPU.
 
 ### Key Entities
 
@@ -174,7 +183,8 @@ non-blank and changes over time as the dye fades.
   guard and a test).
 - **SC-A02-103**: Out-of-range configurations (at least 8 cases) are clamped and reported. No NaN or negative dye
   appears in 1,000 CPU steps at maximum dissipation.
-- **SC-A02-104**: Context loss and rebuild leak 0 resources, and the canvas keeps rendering.
+- **SC-A02-104**: After a context loss and rebuild, the resource registry's live counts per category equal the counts
+  after the first setup (0 leaked). The scene uses no stale handle, and the canvas keeps rendering.
 - **SC-A02-105**: The API review, documented-API check, contract check, ProjectM regression (7/7) and the app tests on
   both runtimes all pass.
 
@@ -185,3 +195,7 @@ non-blank and changes over time as the dye fades.
 - Device-specific half-float support is confirmed in campaign II. Here the query is checked against a probe on the
   simulators.
 - No user settings or persistence in this phase.
+- Phase 01 sets no frame-time budget. Simulator timing is not evidence. Frame-time and thermal budgets come from the
+  quality policy (Phase 03, G-QUALITY) and are measured on devices in campaign II.
+- Release items (version bump, icon, privacy manifest, store documents) are out of scope until Phase 06. The app
+  stays at version 0.1.0 (1).
