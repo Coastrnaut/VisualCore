@@ -176,6 +176,39 @@ Ratified from the app manual's constitution prompt (2026-11-10).
 - **One phase at a time:** implement only one Spec Kit phase at a time (one ledger gate, ADR-0004), in order
   A01-P00 → A01-P06.
 
+### A02 Fluid Art Playground (`Apps/FluidArtPlayground/`, `dev.visualcore.FluidArtPlayground`)
+
+Ratified from the app manual's constitution prompt (2026-11-11).
+
+- **Consumer, not fork:** a standalone iOS/iPadOS VisualCore consumer and never a fork of projectm-ios. It
+  uses only audited VisualCore public APIs over the OpenGL ES → ANGLE → Metal integration. It MUST NOT
+  create its own EGL/ANGLE initialization path, a second renderer, or link ProjectM engine code.
+- **Isolated solver with a CPU reference:** the fluid solver (advection, divergence, pressure, projection,
+  splats) is an app-domain component, not a new VisualCore renderer. It MUST have a CPU reference
+  implementation on tiny grids that the GPU passes are checked against. The model is artistic and is never
+  presented as physically accurate.
+- **Reuse first (Principle II):** generic machinery the solver needs (ping-pong render targets, feedback
+  passes, touch-to-force mapping, quality and thermal policy) goes into VisualCore with tests, docs, the API
+  baseline and the reference regression. Only fluid-specific rules, content and UI stay in the app.
+- **GPU-free domain:** domain rules and persisted files (configurations, splat queues, quality profiles,
+  saved scenes) MUST be testable without GPU access, through host `swift test`.
+- **Offline-first:** no networking. Any permission is disclosed before use and requested only through
+  public APIs.
+- **Bounded GPU:**
+  - grid sizes, pressure iterations, splats per frame and render targets are capped by a quality profile;
+  - delta time is clamped after suspension;
+  - no pass reads and writes the same texture;
+  - context loss rebuilds everything from versioned CPU state.
+- **Accessibility:** native SwiftUI controls with VoiceOver labels, Dynamic Type, Reduce Motion and Reduce
+  Flashing. The canvas has a spoken description, and every gesture has a control alternative.
+- **Licenses and truthful claims:** every bundled asset and shader records its license and author. No
+  scientific or physical-accuracy claims.
+- **Regression when VisualCore changes:** any VisualCore change made for this app MUST be followed by the
+  ProjectM reference regression (`scripts/run_reference_baseline.py` steps and `check_reference_clean.py`).
+- **Python only:** repository automation uses Python 3; there is no PowerShell dependency.
+- **One phase at a time:** implement only one Spec Kit phase at a time (one ledger gate, ADR-0004), in order
+  A02-P00 → A02-P06.
+
 ## Governance
 
 - Precedence: real Apple/toolchain behavior → canonical README chapters 1–18 and `CLAUDE.md` →
@@ -188,4 +221,4 @@ Ratified from the app manual's constitution prompt (2026-11-10).
 - Every gate review checks compliance with Principles I–X (including II-a); `scripts/check_compliance.py` enforces
   the mechanically checkable rules.
 
-**Version**: 1.2.0 | **Ratified**: 2026-11-10 | **Last Amended**: 2026-11-10
+**Version**: 1.3.0 | **Ratified**: 2026-11-10 | **Last Amended**: 2026-11-11
