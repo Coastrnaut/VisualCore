@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/VisualCore"
+  ],
+  "command": "swift test --package-path Packages/VisualCore",
+  "elapsed_seconds": 3.905,
+  "exit_code": 0,
+  "finished": "2026-11-11T00:44:26+00:00",
+  "log": ".autonomy/logs/F05.t510-timeline.log",
+  "log_sha256": "7bff1320449a9d6bb2059d8fbd4002b914657b21801b114a08c9350fee6c9c73",
+  "name": "t510-timeline",
+  "stage": "F05",
+  "started": "2026-11-11T00:44:22+00:00",
+  "timed_out": false
+}
