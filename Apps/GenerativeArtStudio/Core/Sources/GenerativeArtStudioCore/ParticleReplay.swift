@@ -39,3 +39,33 @@ public enum ParticleReplay {
         return system
     }
 }
+
+/// Live, incremental replay: advancing to a later time steps forward at the fixed rate; going back rebuilds from 0. The
+/// state at any time equals `ParticleReplay.instances(for:at:)`, so live frames and still previews agree.
+public struct ParticleReplayCursor: Sendable {
+    /// The document being replayed.
+    public let document: ArtDocument
+    /// World height the system was built for.
+    public let worldHeight: Double
+    /// Fixed steps taken so far.
+    public private(set) var steps = 0
+    private var system: ParticleSystem
+
+    /// A cursor at t = 0.
+    public init(document: ArtDocument, worldHeight: Double = 600) {
+        self.document = document
+        self.worldHeight = worldHeight
+        system = ParticleReplay.makeSystem(document, worldHeight: worldHeight)
+    }
+
+    /// Moves to `time` (clamped to 0…120 s) and returns the particles there.
+    public mutating func instances(at time: Double) -> [ParticleInstance] {
+        let target = Int((min(max(time.isFinite ? time : 0, 0), ArtDocument.maxPreviewTime) / ParticleReplay.step).rounded())
+        if target < steps {
+            system = ParticleReplay.makeSystem(document, worldHeight: worldHeight)
+            steps = 0
+        }
+        while steps < target { system.step(ParticleReplay.step); steps += 1 }
+        return system.instances()
+    }
+}

@@ -17,6 +17,8 @@ packages:
     path: Packages/VisualCore
   VisualCoreRendering:
     path: Packages/VisualCoreRendering
+  GenerativeArtStudioCore:
+    path: Apps/GenerativeArtStudio/Core
 settings:
   base:
     SWIFT_VERSION: "6.0"
@@ -104,11 +106,14 @@ targets:
     dependencies:
       - target: Showcase
   GenerativeArtStudio:
-    # A01 Generative Art Studio (feature 011 A01-P00): Phase 00 shell, no VisualCore products linked yet.
+    # A01 Generative Art Studio (features 011–012): gallery and scene families on VisualCore.
     type: application
     platform: iOS
     sources:
       - path: Apps/GenerativeArtStudio/App
+      - path: Apps/GenerativeArtStudio/Shaders
+        type: folder
+        buildPhase: resources
     info:
       path: Apps/GenerativeArtStudio/Generated/Info.plist
       properties:
@@ -136,6 +141,21 @@ targets:
           env -i PATH=/usr/bin:/bin:/usr/sbin:/sbin HOME="$HOME" DEVELOPER_DIR="$DEVELOPER_DIR" \
             /usr/bin/python3 "$SRCROOT/scripts/audit_showcase_dependencies.py" --root "$SRCROOT" --spec project.yml \
             --target GenerativeArtStudio --sources Apps/GenerativeArtStudio --app "$TARGET_BUILD_DIR/$WRAPPER_NAME"
+    dependencies:
+      - package: GenerativeArtStudioCore
+        product: GenerativeArtStudioCore
+      - package: VisualCore
+        product: VisualCoreParameters
+      - package: VisualCore
+        product: VisualCoreSimulation
+      - package: VisualCore
+        product: VisualCoreMath
+      - package: VisualCore
+        product: VisualCoreScenes
+      - package: VisualCoreRendering
+        product: VisualCoreRendering
+      - package: VisualCoreRendering
+        product: VisualCoreUI
   GenerativeArtStudioUITests:
     type: bundle.ui-testing
     platform: iOS

@@ -123,3 +123,11 @@ private func generatedDocuments(count: Int = 60) -> [ArtDocument] {
     #expect(atMax.count <= ParticleReplay.capacity)
     #expect(a.allSatisfy { $0.position.x.isFinite && $0.position.y.isFinite })
 }
+
+@Test func replayCursorMatchesFullReplay() throws {
+    let doc = try ArtDocument.from(FamilyCatalog.family(.particles).presets[1], family: .particles).validated().document
+    var cursor = ParticleReplayCursor(document: doc)
+    for t in [0.5, 1.0, 3.25, 2.0, 200] {   // forward, forward, forward, backward (rebuild), beyond the cap
+        #expect(cursor.instances(at: t) == ParticleReplay.instances(for: doc, at: t), "t = \(t)")
+    }
+}
