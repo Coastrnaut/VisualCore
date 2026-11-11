@@ -250,6 +250,42 @@ Ratified from the app manual's constitution prompt (2026-11-11).
 - **One phase at a time:** implement only one Spec Kit phase at a time (one ledger gate, ADR-0004), in order
   A03-P00 → A03-P06.
 
+### A04 Particle Universe (`Apps/ParticleUniverse/`, `dev.visualcore.ParticleUniverse`)
+
+Ratified from the app manual's constitution prompt (2026-11-11).
+
+- **Consumer, not fork:** a standalone iOS/iPadOS VisualCore consumer and never a fork of projectm-ios. It
+  uses only audited VisualCore public APIs over the OpenGL ES → ANGLE → Metal integration. It MUST NOT
+  create its own EGL/ANGLE initialization path, a second renderer, or link ProjectM engine code.
+- **Reuse first (Principle II):** generic machinery goes into VisualCore with tests, docs, the API baseline
+  and the reference regression. This covers:
+  - emitters, forces and fields, and the seeded fixed-step particle simulation;
+  - particle buffers and instanced/batched drawing;
+  - blending, trails and decay targets;
+  - interaction-to-force mapping and quality tiers;
+  - scene presets and scene persistence.
+
+  The manual's rule "extract VisualCoreParticles only after a second app needs it" is already met: A01 uses
+  VisualCore's `ParticleSystem` and `ParticleRenderer`. Only the curated presets, copy and UI stay in the app.
+- **GPU-free domain:** particle and emitter rules, force fields, the fixed-step CPU reference, scene schemas
+  and persisted scenes MUST be testable without GPU access, through host `swift test`.
+- **Truthful claims:** the simulation is an artistic sandbox, not an exact N-body or physical simulation;
+  particle counts and frame rates are claimed only from device measurements.
+- **Offline-first:** no networking, accounts or online preset marketplace. Any permission (such as saving to
+  Photos) is disclosed before use and requested only through public APIs.
+- **Bounded GPU:** particle counts, emitters, trail targets and capture sizes are capped; quality tiers lower
+  the load under heat or Low Power Mode; parameters are validated and clamped before upload; context loss
+  rebuilds everything from versioned CPU state.
+- **Accessibility:** native SwiftUI controls with VoiceOver labels, Dynamic Type, Reduce Motion and Reduce
+  Flashing (a reduced-flash mode limits bright pulses and trail flicker). The canvas has a spoken description
+  of the scene, and every gesture has a control alternative.
+- **Licenses:** every bundled preset, texture, palette and shader records its license and author.
+- **Regression when VisualCore changes:** any VisualCore change made for this app MUST be followed by the
+  ProjectM reference regression (`scripts/run_reference_baseline.py` steps and `check_reference_clean.py`).
+- **Python only:** repository automation uses Python 3; there is no PowerShell dependency.
+- **One phase at a time:** implement only one Spec Kit phase at a time (one ledger gate, ADR-0004), in order
+  A04-P00 → A04-P06.
+
 ## Governance
 
 - Precedence: real Apple/toolchain behavior → canonical README chapters 1–18 and `CLAUDE.md` →
@@ -262,4 +298,4 @@ Ratified from the app manual's constitution prompt (2026-11-11).
 - Every gate review checks compliance with Principles I–X (including II-a); `scripts/check_compliance.py` enforces
   the mechanically checkable rules.
 
-**Version**: 1.4.0 | **Ratified**: 2026-11-10 | **Last Amended**: 2026-11-11
+**Version**: 1.5.0 | **Ratified**: 2026-11-10 | **Last Amended**: 2026-11-11

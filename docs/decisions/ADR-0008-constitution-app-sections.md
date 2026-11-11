@@ -28,3 +28,10 @@ layout (CLAUDE.md §4).
 
 The A03 Phase 00 audit maps each manual component to a VisualCore owner or a recorded gap. Later apps keep
 appending one subsection per app with a MINOR bump and a line in this ADR series.
+
+## Amendment 1.5.0 (2026-11-11): A04 Particle Universe
+
+Adds the "A04 Particle Universe" section from the app manual's `/speckit-constitution` prompt (feature 032), a MINOR
+bump under this ADR's rule. It records that VisualCore already owns particle simulation and drawing (A01), so the
+manual's "extract only after a second app needs it" condition is met and new generic particle machinery goes into
+VisualCore.
