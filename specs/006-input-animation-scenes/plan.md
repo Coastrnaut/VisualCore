@@ -51,13 +51,13 @@ specs/006-input-animation-scenes/
 ### Source Code
 
 ```text
-Packages/VisualCore/Sources/VisualCoreMath/{Vectors,Matrix4,Quaternion,Camera2D,OrbitCamera,Easing}.swift
-Packages/VisualCore/Sources/VisualCoreSimulation/{FixedStepClock,SeededRandom,Tween,Timeline,ParticleSystem}.swift
+Packages/VisualCore/Sources/VisualCoreMath/{Vectors,Matrix,Quaternion,Camera2D,OrbitCamera,Easing}.swift
+Packages/VisualCore/Sources/VisualCoreSimulation/{FixedStepClock,SeededRandom,Timeline (Tween + Timeline),ParticleSystem}.swift
 Packages/VisualCore/Sources/VisualCoreScenes/{ViewMetrics,PointerTracker,GestureRecognizers,SceneGraph,MeshGenerators}.swift
 Packages/VisualCore/Tests/{VisualCoreMathTests,VisualCoreSimulationTests,VisualCoreScenesTests}/
-Packages/VisualCoreRendering/Sources/VisualCoreRendering/{RenderView+Touches,PrimitiveRenderer,ParticleRenderer,MeshRenderer}.swift
+Packages/VisualCoreRendering/Sources/VisualCoreRendering/{RenderView+Touches,DynamicVertexBuffer,PrimitiveRenderer,ParticleRenderer,MeshRenderer}.swift
 Packages/VisualCoreRendering/Tests/VisualCoreRenderingTests/{PrimitiveRendererTests,ParticleRendererTests,MeshRendererTests,TouchAdapterTests}.swift
-Harnesses/InteractiveDemo/{InteractiveDemo.yml,Sources/*.swift,UITests/InteractiveDemoUITests.swift}
+Harnesses/InteractiveDemo/{InteractiveDemo.yml,Sources/{InteractiveDemoApp,DemoScene,DemoModel}.swift,UITests/InteractiveDemoUITests.swift}
 ```
 
 **Structure Decision**: follows the package map (Math / Simulation / Scenes ownership). The map's

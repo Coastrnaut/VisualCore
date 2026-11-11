@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "sh",
+    "/private/tmp/claude-501/-Users-coast--claude-spares-spare-cfXtKj/51106fd1-e87b-442d-aa28-d54231dd3fe4/scratchpad/f05_contract_check.sh",
+    "/Users/coast/Documents/GIT/VisualCore"
+  ],
+  "command": "sh /private/tmp/claude-501/-Users-coast--claude-spares-spare-cfXtKj/51106fd1-e87b-442d-aa28-d54231dd3fe4/scratchpad/f05_contract_check.sh /Users/coast/Documents/GIT/VisualCore",
+  "elapsed_seconds": 0.116,
+  "exit_code": 0,
+  "finished": "2026-11-11T01:01:12+00:00",
+  "log": ".autonomy/logs/F05.t524-contract-sync.log",
+  "log_sha256": "78ae973f2b318509e21d52e3e23bf46d22d22ad9a3ab90275de09738d7977a00",
+  "name": "t524-contract-sync",
+  "stage": "F05",
+  "started": "2026-11-11T01:01:12+00:00",
+  "timed_out": false
+}
