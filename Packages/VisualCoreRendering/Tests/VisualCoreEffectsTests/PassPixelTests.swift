@@ -135,4 +135,32 @@ final class PassPixelTests: XCTestCase {
         }
         XCTAssertGreaterThan(movedRows.count, 4, "the stripe is displaced on several rows")
     }
+
+    // MARK: composite (T-F411)
+
+    /// Base = red scene; overlay = the scene turned blue by a colorMatrix; composited with `mode`.
+    private func composite(mode: Double, opacity: Double) throws -> SIMD4<Int> {
+        var out: [UInt8] = []
+        _ = try EffectHarness.run { ctx in
+            let red = try EffectHarness.solid(1, 0, 0, in: ctx)
+            let toBlue: [Double] = [0, 0, 0, 0,  0, 0, 0, 0,  1, 0, 0, 0,  0, 0, 0, 1]
+            let r = try EffectRenderer(graph: EffectHarness.graph([
+                EffectPassDescription(id: "O", type: "colorMatrix", inputs: ["input": "scene"], output: "o", params: ["matrix": toBlue]),
+                EffectPassDescription(id: "C", type: "composite", inputs: ["base": "scene", "overlay": "o"], output: "c",
+                                      params: ["mode": [mode], "opacity": [opacity]]),
+            ], output: "c"), registry: ctx.resources)
+            out = try r.render(scene: red, time: 0, delta: 0).readPixels()
+        }
+        return EffectHarness.pixel(out, width: 16, x: 4, y: 4)
+    }
+
+    func testCompositeOverAtHalfOpacity() throws {
+        let p = try composite(mode: 0, opacity: 0.5)
+        XCTAssertEqual(p.x, 128, accuracy: 2); XCTAssertEqual(p.y, 0, accuracy: 1); XCTAssertEqual(p.z, 128, accuracy: 2)
+    }
+
+    func testCompositeAdd() throws {
+        let p = try composite(mode: 1, opacity: 1)
+        XCTAssertGreaterThanOrEqual(p.x, 254); XCTAssertGreaterThanOrEqual(p.z, 254)
+    }
 }
