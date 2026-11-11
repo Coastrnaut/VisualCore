@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "python3",
+    "scripts/validate_docs.py"
+  ],
+  "command": "python3 scripts/validate_docs.py",
+  "elapsed_seconds": 0.026,
+  "exit_code": 0,
+  "finished": "2026-11-11T00:31:01+00:00",
+  "log": ".autonomy/logs/F04.converge2-docs.log",
+  "log_sha256": "b262798c292556b3b51a91a5cd1be73ad792d4b4ec2fd2cf22b68b3a9aa6a25f",
+  "name": "converge2-docs",
+  "stage": "F04",
+  "started": "2026-11-11T00:31:01+00:00",
+  "timed_out": false
+}

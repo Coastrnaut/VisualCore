@@ -1313,8 +1313,14 @@
       "status": "pass"
     },
     "F04": {
-      "attempts": [],
-      "status": "pending"
+      "attempts": [
+        {
+          "at": "2026-11-11T00:31:12+00:00",
+          "evidence": ".autonomy/evidence/F04.json",
+          "result": "pass"
+        }
+      ],
+      "status": "pass"
     },
     "F05": {
       "attempts": [],
@@ -1345,5 +1351,5 @@
       "status": "pending"
     }
   },
-  "updated": "2026-11-11T00:13:41+00:00"
+  "updated": "2026-11-11T00:31:12+00:00"
 }

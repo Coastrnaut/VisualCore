@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/VisualCore"
+  ],
+  "command": "swift test --package-path Packages/VisualCore",
+  "elapsed_seconds": 1.619,
+  "exit_code": 0,
+  "finished": "2026-11-11T00:30:45+00:00",
+  "log": ".autonomy/logs/F04.converge2-host.log",
+  "log_sha256": "e0823cb2b6ee7c088d4235951a5c3ddb7581b232fade84dc78d6bc8c19e00e73",
+  "name": "converge2-host",
+  "stage": "F04",
+  "started": "2026-11-11T00:30:44+00:00",
+  "timed_out": false
+}
