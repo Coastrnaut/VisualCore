@@ -1,0 +1,86 @@
+{
+  "checks": [
+    {
+      "attestation": ".autonomy/checks/A04-P00.t003-reference-a.json",
+      "command": "python3 scripts/release_check.py --only reference-engine-xcframework reference-build-projectm-ios-sim reference-clean --log-dir .autonomy/logs/t003-pu-reference-a --json .autonomy/logs/t003-pu-reference-a.json",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P00.t003-reference-a.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P00.t003-reference-b.json",
+      "command": "python3 scripts/release_check.py --only reference-test-anglerendering-ios27 reference-test-anglerendering-ios26 projectm-reference-ios27 projectm-reference-ios26 --log-dir .autonomy/logs/t003-pu-reference-b --json .autonomy/logs/t003-pu-reference-b.json",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P00.t003-reference-b.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P00.t004-build.json",
+      "command": "xcodebuild build -project VisualCore.xcodeproj -scheme ParticleUniverse -destination 'generic/platform=iOS Simulator' -derivedDataPath Build/DerivedData/ParticleUniverse CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P00.t004-build.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P00.t004-dependencies.json",
+      "command": "python3 scripts/check_dependencies.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P00.t004-dependencies.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P00.t005-enum-ios26.json",
+      "command": "python3 scripts/check_test_enumeration.py --sources Apps/ParticleUniverse/Tests --log .autonomy/logs/A04-P00.t005-smoke-ios26.log",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P00.t005-enum-ios26.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P00.t005-enum-ios27.json",
+      "command": "python3 scripts/check_test_enumeration.py --sources Apps/ParticleUniverse/Tests --log .autonomy/logs/A04-P00.t005-smoke-ios27.log",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P00.t005-enum-ios27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P00.t005-smoke-ios26.json",
+      "command": "xcodebuild test -project VisualCore.xcodeproj -scheme ParticleUniverse -destination 'platform=iOS Simulator,id=EC7498FF-31FF-4491-9666-B0D32785203C' -derivedDataPath Build/DerivedData/ParticleUniverse -resultBundlePath .autonomy/xcresults/a04p00-t005-ios26.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 180 CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P00.t005-smoke-ios26.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P00.t005-smoke-ios27.json",
+      "command": "xcodebuild test -project VisualCore.xcodeproj -scheme ParticleUniverse -destination 'platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D' -derivedDataPath Build/DerivedData/ParticleUniverse -resultBundlePath .autonomy/xcresults/a04p00-t005-ios27.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 180 CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P00.t005-smoke-ios27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P00.t006-contract-2.json",
+      "command": "python3 scripts/check_app_contract.py --app particle-universe --render",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P00.t006-contract-2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P00.t007-fast-checks.json",
+      "command": "python3 scripts/release_check.py --only docs app-contracts compliance dependencies licenses script-tests documented-api-particle-universe isolation-particle-universe --log-dir .autonomy/logs/a04p00-t007-fast --json .autonomy/logs/a04p00-t007-fast.json",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P00.t007-fast-checks.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P00.t007-no-shared-changes.json",
+      "command": "bash -c 'out=$(git diff --stat d425f7d..HEAD -- Packages External); echo \"diff: [$out]\"; test -z \"$out\"'",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P00.t007-no-shared-changes.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P00.t008-contract.json",
+      "command": "python3 scripts/check_app_contract.py --app particle-universe --render",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P00.t008-contract.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P00.t008-step-count.json",
+      "command": "bash -c 'n=$(python3 scripts/release_check.py --list | wc -l | tr -d \" \"); echo \"steps: $n\"; test \"$n\" = 53'",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P00.t008-step-count.log"
+    }
+  ],
+  "generated": "2026-11-11T16:58:16+00:00",
+  "method": "deterministic-run-check",
+  "stage": "A04-P00",
+  "status": "pass"
+}
