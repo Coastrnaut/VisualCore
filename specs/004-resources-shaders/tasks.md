@@ -43,7 +43,7 @@ IDs `T-F3##`. Tick only with `— Verified YYYY-MM-DD: <command/result>`. One co
 - [X] T-F316 (FR-F314, SC-F306) Move `GradientQuadScene` onto `ResourceRegistry.program`; remove `MinimalProgram`; existing pixel tests unchanged and passing — Verified 2026-11-10: GradientQuadScene uses ResourceRegistry.program; MinimalProgram removed; gradient pixel tests unchanged and pass (F03.t316-samples-ios27/ios26, 31/31 each)
 - [X] T-F317 (FR-F315) Link `docs/rendering/color-space.md` from the package README — Verified 2026-11-10: README section links docs/rendering/color-space.md
 - [ ] T-F318 Run host tests, sim tests on 27.2/26.5, generic-iOS build, dependencies, compliance, docs via run-check
-- [ ] T-F319 Add migration-log boundary 2a (planned F07) to `docs/architecture/migration-log.md`
+- [X] T-F319 Add migration-log boundary 2a (planned F07) to `docs/architecture/migration-log.md` — Verified 2026-11-10: migration-log.md row 2a (planned F07)
 
 ## Dependencies
 
