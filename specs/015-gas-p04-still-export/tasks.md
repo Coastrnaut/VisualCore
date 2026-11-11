@@ -117,7 +117,7 @@ IDs are `T-A01-4##`, with one commit and push per task (`scripts/tick_task.py`).
 
 ## Phase 4: Polish
 
-- [ ] T-A01-409 Update `docs/apps/generative-art-studio/visualcore-contract.json` (G-EXPORT closed at A01-P04; M09
+- [X] T-A01-409 Update `docs/apps/generative-art-studio/visualcore-contract.json` (G-EXPORT closed at A01-P04; M09 — Verified 2026-11-11: visualcore-contract.json gate A01-P04: M09 available (RenderHost.renderOffscreen, RenderHost.maxRenderSize, StillImageEncoder, ExportGeometry; ExportRunner example), G-EXPORT closed A01-P04 with the actual tests named; rendered; check PASS 10 rows, 44 citations, 7 gaps. run-check A01-P04/t409-release-fast 8/8 (docs, app-contracts, compliance incl. offline, dependencies R1-R5 incl. no ProjectM, public-api, licenses, script-tests, host-visualcore); t409-documented-api-app failed on undocumented ResourceBudget (used by tests) → documented in the VisualCoreRendering README → t409-documented-api-app-a2 PASS; full UI suite incl. Phase 03 LibraryUITests: t409-ui-all-ios27 9/9; t409-ui-all-ios26 enumerated only 8 suites (ExportUITests missing, cause not determined, not counted as evidence) → t409-ui-all-ios26-a2 9/9 incl. ExportUITests (FR-A01-410, SC-A01-405)
   available with renderOffscreen, StillImageEncoder and ExportGeometry evidence) and render it. Run
   `check_app_contract`, the documented API for the app, the release-check fast steps (including compliance and dependency rules: offline, no ProjectM; analyze C3) and the
   Phase 03 library tests

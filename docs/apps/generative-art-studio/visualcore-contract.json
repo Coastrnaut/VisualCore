@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "app": "generative-art-studio",
-  "gate": "A01-P03",
+  "gate": "A01-P04",
   "date": "2026-11-10",
   "inventory": [
     {
@@ -373,26 +373,38 @@
       "id": "M09",
       "capability": "Offscreen still export with color space and aspect",
       "source": "v0.1 feature 05",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
-          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GPUObjects.swift",
-          "symbol": "RenderTarget.readPixels",
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+          "symbol": "RenderHost.renderOffscreen",
           "product": "VisualCoreRendering",
           "public": true
         },
         {
-          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
-          "symbol": "ResourceRegistry.makeRenderTarget",
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+          "symbol": "RenderHost.maxRenderSize",
           "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/StillImage.swift",
+          "symbol": "StillImageEncoder",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/ExportGeometry.swift",
+          "symbol": "ExportGeometry",
+          "product": "VisualCoreScenes",
           "public": true
         }
       ],
       "example": {
-        "file": "Packages/VisualCoreRendering/Tests/VisualCoreEffectsTests/PassPixelTests.swift",
-        "symbol": "PassPixelTests"
+        "file": "Apps/GenerativeArtStudio/App/ExportSheet.swift",
+        "symbol": "ExportRunner"
       },
-      "notes": "Readback exists; no capped offscreen render → flipped, sRGB-tagged PNG exporter."
+      "notes": "Closed in A01-P04: RenderHost.renderOffscreen (same context, capped by maxRenderSize and 64 MP), StillImage top-down readback, StillImageEncoder opaque sRGB PNG, ExportGeometry aspect/long-edge math."
     },
     {
       "id": "M10",
@@ -492,7 +504,8 @@
       "kind": "adaptation",
       "owner": "VisualCore:VisualCoreRendering",
       "phase": 4,
-      "test": "StillExporter simulator tests: capped size, aspect crop, vertical flip, PNG with sRGB profile, pixel check against an on-screen frame"
+      "test": "OffscreenExportTests (simulator): exact size, top-down quadrants, opaque sRGB PNG round trip, live frame restored, over-budget failure without leaks; ExportGeometryTests (host); app ExportRenderTests: 12 combinations, determinism, downscaled match with the on-screen frame",
+      "closed": "A01-P04"
     },
     {
       "id": "G-UI",

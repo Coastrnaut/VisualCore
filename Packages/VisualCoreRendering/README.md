@@ -64,7 +64,9 @@ Every `RenderHost` owns one `ResourceRegistry` (`context.resources`). It creates
 render targets (pooled with `acquireTarget`/`recycle`) and programs (`program(vertex:fragment:defines:library:)`,
 cached by SHA-256, LRU 64, recompiled after context recreation). Budgets refuse over-limit requests;
 handles from an older context generation are rejected and counted; `stats` reports live counts, bytes,
-peak, stale rejections, leaks, shader failures and deduplicated warnings. Shader sources are GLSL ES 3.00
+peak, stale rejections, leaks, shader failures and deduplicated warnings. The budget is a `ResourceBudget`
+(256 MiB total by default, optional per-kind caps) passed as `RenderHost(scene:budget:)`; a small budget is an easy
+way to test a scene's over-budget path. Shader sources are GLSL ES 3.00
 with `#include "name"` from a `ShaderLibrary`; compile errors name the original file and line.
 Color-space policy: [docs/rendering/color-space.md](../../docs/rendering/color-space.md).
 
