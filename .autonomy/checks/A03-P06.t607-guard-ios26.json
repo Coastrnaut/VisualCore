@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_test_enumeration.py",
+    "--sources",
+    "Apps/FractalExplorer/Tests",
+    "--log",
+    ".autonomy/logs/A03-P06.t607-app-all-ios26.log"
+  ],
+  "command": "python3 scripts/check_test_enumeration.py --sources Apps/FractalExplorer/Tests --log .autonomy/logs/A03-P06.t607-app-all-ios26.log",
+  "elapsed_seconds": 0.026,
+  "exit_code": 0,
+  "finished": "2026-11-11T16:47:27+00:00",
+  "log": ".autonomy/logs/A03-P06.t607-guard-ios26.log",
+  "log_sha256": "47251030e0d1576bd86f8da7c29ab38fc15431ba8d91d50f42de882af9b67472",
+  "name": "t607-guard-ios26",
+  "stage": "A03-P06",
+  "started": "2026-11-11T16:47:27+00:00",
+  "timed_out": false
+}

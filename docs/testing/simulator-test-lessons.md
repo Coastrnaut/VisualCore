@@ -187,3 +187,12 @@ speaks and what the screen shows, not exact values. Sheets at a medium detent wi
   pixel; a shrunken whole view would hide precision loss by a factor of the screen size.
 - **Write rehearsal numbers from the reports, not from memory.** The unit-test canvas and the simulator screen gave
   different breakdown steps (7 vs 6); the task note was corrected in a follow-up commit.
+
+## Feature 031 (A03-P06)
+
+- **Check provenance before allowing a container entry.** `Library/LanguageModeling/en-dynamic.lm` appeared after UI
+  tests typed into text fields; it is the system keyboard's lexicon. The privacy test allows the folder only when it
+  holds nothing but `*-dynamic.lm`, and prints every entry.
+- **Write golden fixtures once and never edit them.** The v1 bookmark fixture is written by the current build only
+  when absent (`FE_WRITE_FIXTURE=1`); a schema change adds a migration and a new fixture.
+- **Give apps with longer home text a scroll view**, so the largest accessibility size does not clip.
