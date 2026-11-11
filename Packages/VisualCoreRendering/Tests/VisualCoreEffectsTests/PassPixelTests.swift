@@ -60,4 +60,25 @@ final class PassPixelTests: XCTestCase {
         XCTAssertEqual(p.y, 51, accuracy: 1)
         XCTAssertGreaterThanOrEqual(p.z, 254)
     }
+
+    // MARK: blur (T-F408)
+
+    func testBlurSpreadsABrightBlockLowersItsPeakAndKeepsEnergy() throws {
+        var before: [UInt8] = [], after: [UInt8] = []
+        _ = try EffectHarness.run { ctx in
+            let scene = try EffectHarness.solid(0, 0, 0, size: 32, in: ctx)
+            vcglEnable(GLenum(GL_SCISSOR_TEST)); vcglScissor(14, 14, 4, 4)
+            vcglClearColor(1, 1, 1, 1); vcglClear(GLbitfield(GL_COLOR_BUFFER_BIT)); vcglDisable(GLenum(GL_SCISSOR_TEST))
+            before = scene.readPixels()
+            let r = try EffectRenderer(graph: EffectHarness.graph([
+                EffectPassDescription(id: "B", type: "blur", inputs: ["input": "scene"], output: "b", params: ["radius": [4]]),
+            ], output: "b"), registry: ctx.resources)
+            after = try r.render(scene: scene, time: 0, delta: 0).readPixels()
+        }
+        func red(_ p: [UInt8]) -> Int { stride(from: 0, to: p.count, by: 4).reduce(0) { $0 + Int(p[$1]) } }
+        XCTAssertLessThan(EffectHarness.pixel(after, width: 32, x: 15, y: 15).x, 250, "peak drops")
+        XCTAssertGreaterThan(EffectHarness.pixel(after, width: 32, x: 12, y: 15).x, 10, "spreads two texels out")
+        XCTAssertEqual(EffectHarness.pixel(after, width: 32, x: 2, y: 2).x, 0, "far pixels stay black")
+        XCTAssertEqual(Double(red(after)), Double(red(before)), accuracy: Double(red(before)) * 0.05, "energy kept within 5%")
+    }
 }
