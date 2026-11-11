@@ -1,0 +1,26 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/VisualCoreRendering",
+    "--scheme",
+    "VisualCoreRendering-Package",
+    "--destination",
+    "sim-26.5",
+    "--action",
+    "test",
+    "--result-name",
+    "F04-final-ios26"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-26.5 --action test --result-name F04-final-ios26",
+  "elapsed_seconds": 16.405,
+  "exit_code": 0,
+  "finished": "2026-11-11T00:25:42+00:00",
+  "log": ".autonomy/logs/F04.sim-tests-ios26.log",
+  "log_sha256": "da71722eb485949b2f750a8345462a9911afbe9543b28d72cd0ad5d728e76e80",
+  "name": "sim-tests-ios26",
+  "stage": "F04",
+  "started": "2026-11-11T00:25:26+00:00",
+  "timed_out": false
+}

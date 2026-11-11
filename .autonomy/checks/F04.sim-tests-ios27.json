@@ -1,0 +1,26 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/VisualCoreRendering",
+    "--scheme",
+    "VisualCoreRendering-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--result-name",
+    "F04-final-ios27"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --result-name F04-final-ios27",
+  "elapsed_seconds": 3.755,
+  "exit_code": 0,
+  "finished": "2026-11-11T00:25:26+00:00",
+  "log": ".autonomy/logs/F04.sim-tests-ios27.log",
+  "log_sha256": "a6ceaeb251dfa76d4d90cfc4c737bd0ef5d3f61d171619da8c7c4ad9b071b807",
+  "name": "sim-tests-ios27",
+  "stage": "F04",
+  "started": "2026-11-11T00:25:22+00:00",
+  "timed_out": false
+}

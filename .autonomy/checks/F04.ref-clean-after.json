@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_reference_clean.py"
+  ],
+  "command": "python3 scripts/check_reference_clean.py",
+  "elapsed_seconds": 6.004,
+  "exit_code": 0,
+  "finished": "2026-11-11T00:26:16+00:00",
+  "log": ".autonomy/logs/F04.ref-clean-after.log",
+  "log_sha256": "0346a995659d61863d8e06bf4c6eaa63a036779a58f55a555dd56eb757a18c79",
+  "name": "ref-clean-after",
+  "stage": "F04",
+  "started": "2026-11-11T00:26:10+00:00",
+  "timed_out": false
+}
