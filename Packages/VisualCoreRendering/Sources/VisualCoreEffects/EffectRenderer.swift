@@ -86,6 +86,7 @@ public final class EffectRenderer {
     static func makeRunner(type: String, registry: ResourceRegistry) throws -> EffectPassRunner {
         switch type {
         case "copy": return try CopyPass(registry: registry)
+        case "colorMatrix": return try ColorMatrixPass(registry: registry)
         default: throw EffectGraphError.unknownType(type, pass: "")
         }
     }

@@ -51,3 +51,23 @@ final class CopyPass: EffectPassRunner {
         drawFullscreen(program, into: io.output, textures: [("input", input)])
     }
 }
+
+/// `colorMatrix`: output = clamp(M · input + offset). `matrix` is 16 values, row-major.
+@MainActor
+final class ColorMatrixPass: EffectPassRunner {
+    private let program: ShaderProgram
+    init(registry: ResourceRegistry) throws {
+        program = try registry.program(vertex: EffectShaders.vertex, fragment: EffectShaders.colorMatrix)
+    }
+    func run(_ io: PassIO) throws {
+        guard let input = io.inputs["input"] else { return }
+        let m = (io.params["matrix"] ?? []).map(Float.init)
+        // Row-major parameter → column-major GL matrix.
+        let columnMajor: [Float] = m.count == 16 ? (0..<16).map { m[($0 % 4) * 4 + $0 / 4] } : [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]
+        let o = (io.params["offset"] ?? [0, 0, 0, 0]).map(Float.init) + [0, 0, 0, 0]
+        drawFullscreen(program, into: io.output, textures: [("input", input)]) { p in
+            p.set("u_matrix", matrix4: columnMajor)
+            p.set("u_offset", SIMD4<Float>(o[0], o[1], o[2], o[3]))
+        }
+    }
+}

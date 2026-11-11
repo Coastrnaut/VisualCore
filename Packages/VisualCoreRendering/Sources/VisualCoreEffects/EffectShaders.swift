@@ -18,4 +18,14 @@ enum EffectShaders {
     out vec4 color;
     void main() { color = texture(u_input, uv); }
     """
+
+    static let colorMatrix = """
+    precision mediump float;
+    uniform sampler2D u_input;
+    uniform mat4 u_matrix;
+    uniform vec4 u_offset;
+    in vec2 uv;
+    out vec4 color;
+    void main() { color = clamp(u_matrix * texture(u_input, uv) + u_offset, 0.0, 1.0); }
+    """
 }
