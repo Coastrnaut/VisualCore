@@ -186,6 +186,10 @@ writes a JSON report and exits, and that the Release build contains no automatio
   reports failure, and the app does not crash.
 - Test-mode seed 0 or a missing seed: falls back to the default seed 1.
 - A frame count beyond the automation limit: clamped to the runner's maximum.
+- A Simulation detail change during a swipe: the active strokes end, the touch queue is emptied (forces were
+  converted for the old grid), the pause state is kept and the canvas restarts from the seed.
+- A detail level larger than the device allows: capped by the device's maximum render size, as at first open. If
+  the new fields cannot be allocated, the previous grid is restored and a message says the level is unavailable.
 - Context loss during the test mode: the scene rebuilds from the seed. The report records the loss rather than
   hiding it.
 
@@ -209,11 +213,17 @@ writes a JSON report and exits, and that the Release build contains no automatio
 - **FR-A02-506**: The fixture suite MUST name and run the §11 fixtures 1–5 on both simulator runtimes. Fixture 5 MUST
   show that a long suspension causes at most one bounded step per rendered frame after resume.
 - **FR-A02-507**: A stress fixture MUST run the aggressive script for 600 frames per storage and assert that every
-  read-back value is finite and within its encoding range, and that the per-frame splat cap holds.
+  read-back value is finite and within its encoding range, and that the per-frame splat cap holds. The ranges are blow-up detectors, not physics claims:
+  - dye: every channel in 0…4;
+  - velocity: |v|·Δt ≤ the grid's longer edge (no cell moves farther than the grid in one step);
+  - pressure: |p| ≤ 10⁴.
+
+  In 8-bit storage, the decoded values must also not all sit at the encoding's extremes.
 - **FR-A02-508**: The app MUST register the fluid scene with VisualCore's automation runner (smoke, launch and
   lifecycle modes) in the deterministic test mode, with the seed from `VISUALCORE_AUTORUN_SEED` and a post-run field
   check (clarification 1) added to VisualCoreAutomation as a generic, documented hook. This code is compiled only under `DEBUG || VISUALCORE_AUTOMATION`
-  and triggered only by the launch environment. The Release symbol check MUST report zero automation symbols for the
+  and triggered only by the launch environment. In the lifecycle mode, after each context recreation the scene rebuilds
+  from the seed, and the post-run check still passes. The Release symbol check MUST report zero automation symbols for the
   app.
 - **FR-A02-509**: The app MUST NOT create or own EGL displays, contexts or surfaces. All GPU work goes through the
   VisualCore host, and the isolation check enforces this.
@@ -240,7 +250,7 @@ writes a JSON report and exits, and that the Release build contains no automatio
   touches across a pause; after Reset, the velocity is exactly zero and the dye equals the seeded pattern within one
   storage step. The checks pass in unit and UI tests on both runtimes.
 - **SC-A02-502**: Two test-mode runs with the same seed and 120 frames give byte-identical pictures. Runs with two
-  different seeds differ in at least 1% of pixels.
+  different seeds differ in at least 1% of pixels, where a pixel differs if any channel differs.
 - **SC-A02-503**: The synthetic gesture script gives identical events for identical inputs, and stays within the view
   bounds for 100 seeds. Each run has began-before-moved-before-ended per pointer and strictly increasing timestamps.
 - **SC-A02-504**: Fixtures 1–5 pass on iOS 27.2 and 26.5. Fixture 5 shows at most 1 step for the first frame after a
@@ -261,6 +271,8 @@ writes a JSON report and exits, and that the Release build contains no automatio
 - The automation runner's existing modes (smoke, launch, lifecycle) are used with the aggressive script, plus the
   generic post-run check (clarification 1). No app-specific mode is added.
 - The simulation detail picker (MVP-06) is in this phase (clarification 4). Thermal downgrade shipped in feature 021.
+- The simulator GPU is assumed deterministic for identical work. If the determinism test shows otherwise, it fails
+  and the spec is revisited; tolerances are not loosened silently.
 - No persistence is added. Seed and frame count come from the launch environment only in test builds.
 - Performance thresholds are not invented. Device frame times are recorded in the device campaign and judged by a
   later acceptance ADR (manual §12).
@@ -286,3 +298,5 @@ writes a JSON report and exits, and that the Release build contains no automatio
 - No second renderer, EGL context or ProjectM linkage, no networking, and no new permission.
 - Reset never rebuilds the renderer or changes tuning; Step never runs while the simulation is running.
 - No invented performance thresholds.
+- The test mode stores nothing except the automation report in the app's own Documents folder, and nothing leaves
+  the device. The report holds no personal data (model identifier, OS, build, frame statistics, result).
