@@ -19,7 +19,7 @@ description: "Task list for feature 025 — Fractal Explorer Phase 00 boundary a
 
 ## Phase 1: Setup
 
-- [ ] T-A03-001 Create `docs/apps/fractal-explorer/regression-baseline.md` with the phase-start commit (the
+- [X] T-A03-001 Create `docs/apps/fractal-explorer/regression-baseline.md` with the phase-start commit (the — Verified 2026-11-11: — Verified 2026-11-11: docs/apps/fractal-explorer/regression-baseline.md with phase-start commit 343d251 (git cat-file -t: commit) and reference pin d93edd1 (git -C External/projectm-ios rev-parse --short HEAD); validate_docs PASS
   `speckit-constitution` commit `343d251`, before any A03 file) and the reference pin `d93edd1`. This gives the
   no-change diff for `Packages/` and `External/` (FR-A03-007) its base.
 
