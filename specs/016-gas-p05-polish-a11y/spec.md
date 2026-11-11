@@ -108,7 +108,7 @@ leaks. An export after recovery matches an export before.
 Other apps reuse the settings model. It combines system Reduce Motion and the flashing-light setting with an app
 choice (System, On or Off) into effective values, and it observes system changes.
 
-**Independent Test**: Host tests cover all 9 combinations per setting. Simulator tests show the observer reflects
+**Independent Test**: Host tests cover all 6 combinations per setting. Simulator tests show the observer reflects
 the system values. Docs and the API baseline are updated, and the ProjectM regression passes.
 
 **Acceptance Scenarios**:
@@ -165,7 +165,8 @@ the system values. Docs and the API baseline are updated, and the ProjectM regre
 
 ### Measurable Outcomes
 
-- **SC-A01-501**: All 9 system × choice combinations per setting resolve as defined (18 cases). An open scene's rate
+- **SC-A01-501**: All 6 system × choice combinations per setting resolve as defined (12 cases; corrected at plan
+  from "9 … 18", which miscounted 2 system states × 3 choices). An open scene's rate
   and flash limiting follow a change within one frame. Choices survive relaunch.
 - **SC-A01-502**: With Reduce Flashing effective, a full-screen black↔white alternation is shown with a per-frame
   mean brightness change of at most 0.3 × frame interval + 1/255. Without it, the change is the full alternation. An
