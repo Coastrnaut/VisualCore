@@ -52,7 +52,7 @@ push per task. Each subsystem is implemented separately (supplied prompt). Paths
 
 ## Phase 7: US5 — Standalone interactive demo (P2)
 
-- [ ] T-F518 [US5] Sim test first `VisualCoreRenderingTests/TouchAdapterTests.swift` (synthesized began/moved/ended/cancelled → `PointerEvent`s in points with ids and timestamps), then `VisualCoreRendering/RenderView+Touches.swift` (`pointerHandler`)
+- [X] T-F518 [US5] Sim test first `VisualCoreRenderingTests/TouchAdapterTests.swift` (synthesized began/moved/ended/cancelled → `PointerEvent`s in points with ids and timestamps), then `VisualCoreRendering/RenderView+Touches.swift` (`pointerHandler`) — Verified 2026-11-10: F05.t518-touch-ios27 exit 0: 3 sim tests — stable ids, phases, point locations, timestamps, ids not reused; unknown touches ignored; window removal cancels all; RenderHost.pointerHandler toggles multi-touch and drives a PinchRecognizer to scale 2; 46 rendering tests pass
 - [ ] T-F519 [US5] Demo harness `Harnesses/InteractiveDemo/{InteractiveDemo.yml,Sources/*.swift}`: drag spawns particles, pinch zooms `Camera2D`, timeline animates shapes, Reduce Motion (system or `-uitestReduceMotion`) disables inertia and jumps tweens, diagnostics `demo.diagnostics` label `particles=<n> zoom=<z> state=<running|paused>`, VoiceOver labels, Dynamic Type; unsigned simulator build
 - [ ] T-F520 [US5] UI test `Harnesses/InteractiveDemo/UITests/InteractiveDemoUITests.swift` (AC1 drag → particles > 0; AC2 pinch → zoom > 1; AC3 background/foreground → no burst beyond step cap) on iOS 27.2 and 26.5; `nm` of the built demo shows zero ProjectM symbols (SC-F505)
 

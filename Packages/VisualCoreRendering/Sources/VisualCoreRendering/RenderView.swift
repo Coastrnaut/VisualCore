@@ -8,6 +8,8 @@ final class RenderView: UIView {
     var metalLayer: CAMetalLayer { layer as! CAMetalLayer }
     var onLayout: (() -> Void)?
     var onWindowChange: ((Bool) -> Void)?
+    /// UIKit touches → PointerEvents (RenderView+Touches.swift, feature 006).
+    let touchTranslator = TouchTranslator()
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -28,6 +30,7 @@ final class RenderView: UIView {
 
     override func didMoveToWindow() {
         super.didMoveToWindow()
+        if window == nil { touchTranslator.cancelAll(timestamp: ProcessInfo.processInfo.systemUptime) }
         onWindowChange?(window != nil)
     }
 }

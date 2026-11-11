@@ -1,0 +1,26 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/VisualCoreRendering",
+    "--scheme",
+    "VisualCoreRendering-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--result-name",
+    "F05-t518-ios27"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --result-name F05-t518-ios27",
+  "elapsed_seconds": 6.125,
+  "exit_code": 0,
+  "finished": "2026-11-11T00:52:27+00:00",
+  "log": ".autonomy/logs/F05.t518-touch-ios27.log",
+  "log_sha256": "f2a0e23e2f821901569ac41bbcbec7fede4000f292ce47d945ee65e7dd027c15",
+  "name": "t518-touch-ios27",
+  "stage": "F05",
+  "started": "2026-11-11T00:52:21+00:00",
+  "timed_out": false
+}

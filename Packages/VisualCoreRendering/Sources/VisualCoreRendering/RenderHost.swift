@@ -36,7 +36,7 @@ public final class RenderHost {
     // MARK: Private state
 
     private var lifecycle = RenderLifecycle()
-    private let renderView = RenderView(frame: .zero)
+    let renderView = RenderView(frame: .zero)
     private let display: EGLDisplay
     private let config: EGLConfig
     private var context: EGLContext?
