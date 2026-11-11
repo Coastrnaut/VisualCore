@@ -8,6 +8,10 @@ struct GenerativeArtStudioApp: App {
     /// System Reduce Motion and Dim Flashing Lights, shared by every screen (feature 016).
     @State private var accessibility = SystemAccessibilityObserver()
 
+    init() {
+        LaunchCleanup.run()   // crash recovery: stale exports from a killed session (feature 017)
+    }
+
     var body: some Scene {
         WindowGroup { GalleryView().environment(accessibility).tint(AccessibleColors.accent) }
     }

@@ -18,6 +18,8 @@ Release candidate 1.0.0 (1), bundle `dev.visualcore.GenerativeArtStudio` (approv
 | Credits | License texts bundled and shown (Acknowledgements) | verified | `A01-P06/t610-ui-ios27`, `t610-ui-ios26`; `bundle_licenses.py`; `check_licenses.py` |
 | Credits | No ProjectM or LGPL code linked | verified | Dependency audit build phase (FR-A01-006); `check_dependencies.py` R1–R5 |
 | Accessibility | Audit at default and largest text sizes; documented exclusions only for navigation-bar chrome | verified | `A01-P05` seal; `A01-P06/t610-ui-*` |
+| Data | Release-format library (schema v1) opens unchanged: 4 compositions, 0 problems, identical renders | verified | `A01-P06/t607-core-tests` (LibraryMigrationFixtureTests); `t607-crash-ios27`, `t607-crash-ios26` |
+| Data | Crash recovery: interrupted save keeps the previous file; stale exports removed at launch | verified | `A01-P06/t607-crash-ios27`, `t607-crash-ios26` (CrashRecoveryTests) |
 | Store | Listing text with claim → test traceability | verified | [store-listing.md](store-listing.md) |
 | Store | Store name and final bundle ID | owner-action | Decide before the first upload; the bundle ID is permanent |
 | Store | Screenshots at the required sizes | owner-action | Capture from simulators at App Store sizes when preparing the submission |

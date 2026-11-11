@@ -71,7 +71,7 @@ or App Store Connect action. Owner steps are written down, never performed.
 
 ## Phase 3: US3 — Saved work survives updates and crashes (P1)
 
-- [ ] T-A01-607 [US3] Add `Apps/GenerativeArtStudio/Core/Tests/GenerativeArtStudioCoreTests/Fixtures/library-v1/`
+- [X] T-A01-607 [US3] Add `Apps/GenerativeArtStudio/Core/Tests/GenerativeArtStudioCoreTests/Fixtures/library-v1/` — Verified 2026-11-11: Core Tests/Fixtures/library-v1/ (4 schema-v1 envelopes, one per family, written once by CompositionLibrary via GAS_WRITE_FIXTURE=1 with fixed ids, names, values and times) + LibraryMigrationFixtureTests: 4 entries, 0 problems, documents equal the expected compositions, files byte-identical after load; App/LaunchCleanup.swift (@MainActor, removes only tmp/Exports) called from GenerativeArtStudioApp.init; Tests/Unit/CrashRecoveryTests.swift 3/3 (stale exports removed and library untouched; an interrupted save's temporary file is cleaned on load, 0 problems, previous files byte-identical; fixture compositions equal fresh documents and render with max 0 difference); release-checklist rows for migration and crash recovery. run-check A01-P06/t607-core-tests 31/31; t607-crash-ios27 + ios26 3/3, enumeration-guarded (FR-A01-607, SC-A01-603)
   (4 envelope files, one per family, kind `dev.visualcore.gas.composition`, schemaVersion 1, written by the current
   `CompositionLibrary` through a generator test that runs only with `GAS_WRITE_FIXTURE=1`, with fixed ids, names and
   times; analyze U1) and `LibraryMigrationFixtureTests.swift`: 4 entries, 0 problems, documents equal to the
