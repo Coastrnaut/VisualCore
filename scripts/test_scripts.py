@@ -462,9 +462,10 @@ class ReleaseCheckTests(unittest.TestCase):
                          "host-gardenkit", "documented-api-showcase", "documented-api-second-consumer",
                          "rendering-sim-ios27", "rendering-sim-ios26", "showcase-ios27", "showcase-ios26",
                          "interactive-demo-ios26", "second-consumer-ios27", "projectm-reference-ios26",
-                         "reference-clean", "showcase-release-build", "release-symbols"]:
+                         "reference-clean", "showcase-release-build", "release-symbols", "projectm-independence"]:
             self.assertIn(required, names)
         self.assertLess(names.index("showcase-release-build"), names.index("release-symbols"))
+        self.assertLess(names.index("showcase-release-build"), names.index("projectm-independence"))
         for s in relcheck.steps("X"):
             self.assertNotIn("devicectl", " ".join(s.argv))
             self.assertNotIn("platform=iOS,id=", " ".join(s.argv))

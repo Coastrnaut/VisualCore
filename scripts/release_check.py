@@ -12,7 +12,8 @@ Runs every release gate in order and writes one log per step directly to a file 
 Steps cover: docs, compliance, dependency rules, public API, documented API (every consumer), licenses, script
 tests, host Swift tests (VisualCore, GardenKit), rendering/effects/automation simulator tests on iOS 27.2 and 26.5,
 Showcase / InteractiveDemo / SecondConsumer / ProjectMReference tests on both runtimes, the reference baseline
-and the read-only check, and the Release symbol check (zero automation symbols). Simulators and generic iOS only;
+and the read-only check, the Release symbol check (zero automation symbols) and the ProjectM-independence
+audit of the shipping Showcase. Simulators and generic iOS only;
 physical devices are never used here (constitution V). Exit 0 only when every selected step passed.
 """
 from __future__ import annotations
@@ -115,6 +116,8 @@ def steps(stamp: str) -> list[Step]:
                                              "-derivedDataPath", "Build/DerivedData/release-Showcase-Release",
                                              "CODE_SIGNING_ALLOWED=NO"]))
     s.append(Step("release-symbols", [PY, "scripts/check_release_symbols.py", "--app", release_app]))
+    # FR-F904: explicit ProjectM-independence audit of the shipping Showcase (spec, packages, imports, binary).
+    s.append(Step("projectm-independence", [PY, "scripts/audit_showcase_dependencies.py", "--root", ".", "--app", release_app]))
     return s
 
 
