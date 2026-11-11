@@ -15,38 +15,42 @@ Audience: reviewer.
 
 ## Requirement Completeness
 
-- [ ] CHK001 Are both settings, their three choices, the default and the persistence scope specified? [Completeness, Spec §FR-A01-501]
-- [ ] CHK002 Is the content of the canvas description (every field, and when it updates) defined? [Completeness, Spec §FR-A01-503]
-- [ ] CHK003 Are all screens subject to the accessibility audit enumerated, with both text sizes? [Completeness, Spec §FR-A01-504, §SC-A01-503]
-- [ ] CHK004 Are the reusable VisualCore pieces (model, observer) listed with their test, doc and baseline obligations? [Completeness, Spec §FR-A01-506]
+- [x] CHK001 Are both settings, their three choices, the default and the persistence scope specified? [Completeness, Spec §FR-A01-501]
+- [x] CHK002 Is the content of the canvas description (every field, and when it updates) defined? [Completeness, Spec §FR-A01-503]
+- [x] CHK003 Are all screens subject to the accessibility audit enumerated, with both text sizes? [Completeness, Spec §FR-A01-504, §SC-A01-503]
+- [x] CHK004 Are the reusable VisualCore pieces (model, observer) listed with their test, doc and baseline obligations? [Completeness, Spec §FR-A01-506]
 
 ## Requirement Clarity
 
-- [ ] CHK005 Is "reduced rate" quantified? [Clarity, Spec §FR-A01-502, §Clarifications]
-- [ ] CHK006 Is the flash-limiting bound stated numerically and per frame? [Clarity, Spec §SC-A01-502, §Clarifications]
-- [ ] CHK007 Is "restores the same image" quantified with a tolerance and a time reference? [Clarity, Spec §SC-A01-504]
-- [ ] CHK008 Is the boundary between findings that must be fixed and findings that may be documented defined objectively? [Clarity, Spec §FR-A01-504, §Clarifications]
+- [x] CHK005 Is "reduced rate" quantified? [Clarity, Spec §FR-A01-502, §Clarifications]
+- [x] CHK006 Is the flash-limiting bound stated numerically and per frame? [Clarity, Spec §SC-A01-502, §Clarifications]
+- [x] CHK007 Is "restores the same image" quantified with a tolerance and a time reference? [Clarity, Spec §SC-A01-504]
+- [x] CHK008 Is the boundary between findings that must be fixed and findings that may be documented defined objectively? [Clarity, Spec §FR-A01-504, §Clarifications]
 
 ## Requirement Consistency
 
-- [ ] CHK009 Is the export behavior under Reduce Flashing consistent between the edge cases, the clarifications and SC-A01-502? [Consistency, Spec §Edge Cases, §SC-A01-502]
-- [ ] CHK010 Is the combination count in SC-A01-501 consistent with 2 system states × 3 choices? [Consistency, Spec §SC-A01-501, §US4]
+- [x] CHK009 Is the export behavior under Reduce Flashing consistent between the edge cases, the clarifications and SC-A01-502? [Consistency, Spec §Edge Cases, §SC-A01-502]
+- [x] CHK010 Is the combination count in SC-A01-501 consistent with 2 system states × 3 choices? [Consistency, Spec §SC-A01-501, §US4]
 
 ## Scenario and Edge Case Coverage
 
-- [ ] CHK011 Are system-setting changes while a scene is open, and while backgrounded, covered? [Coverage, Spec §Edge Cases]
-- [ ] CHK012 Is the "app choice Off overrides system On" case specified, including how the user is told? [Edge Case, Spec §Edge Cases]
-- [ ] CHK013 Are repeated background cycles bounded with a measurable no-growth criterion? [Edge Case, Spec §SC-A01-504]
-- [ ] CHK014 Is context loss with the export sheet open addressed? [Edge Case, Spec §Edge Cases]
+- [x] CHK011 Are system-setting changes while a scene is open, and while backgrounded, covered? [Coverage, Spec §Edge Cases]
+- [x] CHK012 Is the "app choice Off overrides system On" case specified, including how the user is told? [Edge Case, Spec §Edge Cases]
+- [x] CHK013 Are repeated background cycles bounded with a measurable no-growth criterion? [Edge Case, Spec §SC-A01-504]
+- [x] CHK014 Is context loss with the export sheet open addressed? [Edge Case, Spec §Edge Cases]
 
 ## Privacy, Lifecycle and Release Constraints
 
-- [ ] CHK015 Is it stated that reading accessibility settings needs no permission, and that choices stay on the device? [Privacy, Spec §FR-A01-501, §FR-A01-508, §Clarifications]
-- [ ] CHK016 Are stale-object use and leak expectations after recovery stated as numbers? [Lifecycle, Spec §FR-A01-505, §SC-A01-504]
-- [ ] CHK017 Is it stated that the system values come only from public APIs, and is the simulator limitation documented? [Platform, Spec §Clarifications, §Assumptions]
-- [ ] CHK018 Are offline, no-new-permission and no-ProjectM constraints restated for this phase? [Release, Spec §FR-A01-508]
+- [x] CHK015 Is it stated that reading accessibility settings needs no permission, and that choices stay on the device? [Privacy, Spec §FR-A01-501, §FR-A01-508, §Clarifications]
+- [x] CHK016 Are stale-object use and leak expectations after recovery stated as numbers? [Lifecycle, Spec §FR-A01-505, §SC-A01-504]
+- [x] CHK017 Is it stated that the system values come only from public APIs, and is the simulator limitation documented? [Platform, Spec §Clarifications, §Assumptions]
+- [x] CHK018 Are offline, no-new-permission and no-ProjectM constraints restated for this phase? [Release, Spec §FR-A01-508]
 
 ## Performance and Assumptions
 
-- [ ] CHK019 Is it clear that no performance claim is made, and are quality presets explicitly deferred? [Performance, Spec §Assumptions]
-- [ ] CHK020 Is the deferral of human VoiceOver review to campaign II recorded? [Assumption, Spec §Assumptions]
+- [x] CHK019 Is it clear that no performance claim is made, and are quality presets explicitly deferred? [Performance, Spec §Assumptions]
+- [x] CHK020 Is the deferral of human VoiceOver review to campaign II recorded? [Assumption, Spec §Assumptions]
+
+## Review
+
+Reviewed 2026-11-11 under the owner's delegated approval (CLAUDE.md §2): 20/20 satisfied by spec.md as clarified (CHK010 after the plan-time count correction).
