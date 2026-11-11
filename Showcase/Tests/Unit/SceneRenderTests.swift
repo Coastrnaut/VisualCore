@@ -1,7 +1,9 @@
 // SceneRenderTests — feature 007 hosted pixel tests per scene (analyze remediation U1).
 import CVisualCoreGL
 import XCTest
+import VisualCoreMath
 import VisualCoreRendering
+import VisualCoreScenes
 @testable import Showcase
 
 @MainActor
@@ -55,6 +57,44 @@ final class SceneRenderTests: XCTestCase {
         _ = r.host.renderOneFrame(present: false)
         XCTAssertNil(scene.errorMessage)
         XCTAssertEqual(scene.status, "shader=gradient.frag texture=64x64")
+        r.host.destroy()
+    }
+}
+
+@MainActor
+final class AnimatedGeometryTests: XCTestCase {
+    func testMeshesRenderAndAnimate() throws {
+        let scene = AnimatedGeometryScene(settings: SceneTestSupport.settings())
+        let r = try SceneTestSupport.render(scene, frames: 1)
+        XCTAssertNil(scene.errorMessage)
+        // Sample where the object centers project with the scene's camera (distance 6, pitch 0.25).
+        let cam = OrbitCamera(distance: 6, pitch: 0.25), aspect = Double(r.width) / Double(r.height)
+        func at(_ p: Vec3) -> SIMD4<Int> {
+            let n = cam.project(p, aspect: aspect)
+            return SceneTestSupport.px(r.pixels, r.width, Int((n.x + 1) / 2 * Double(r.width)), Int((n.y + 1) / 2 * Double(r.height)))
+        }
+        let cube = at(Vec3(-1.6, 0, 0)), sphere = at(Vec3(1.6, 0, 0))
+        XCTAssertGreaterThan(cube.z, cube.x, "blue cube on the left \(cube)")
+        XCTAssertGreaterThan(sphere.x, sphere.z, "orange sphere on the right \(sphere)")
+        let spin0 = scene.spin
+        for _ in 0..<10 { _ = r.host.renderOneFrame(present: false) }
+        XCTAssertNotEqual(scene.spin, spin0, "the timeline advances")
+        r.host.destroy()
+        XCTAssertEqual(r.host.resources.stats.leaked, 0)
+    }
+
+    func testReduceMotionStopsSpinAndDragOrbits() throws {
+        let scene = AnimatedGeometryScene(settings: SceneTestSupport.settings(reduceMotion: true))
+        let r = try SceneTestSupport.render(scene, frames: 1)
+        let spin0 = scene.spin
+        for _ in 0..<10 { _ = r.host.renderOneFrame(present: false) }
+        XCTAssertEqual(scene.spin, spin0)
+        XCTAssertTrue(scene.status.hasSuffix("spin=off"))
+        let yaw0 = scene.status
+        scene.handle(PointerEvent(id: 1, phase: .began, location: Vec2(10, 10), timestamp: 0))
+        scene.handle(PointerEvent(id: 1, phase: .moved, location: Vec2(40, 10), timestamp: 0.1))
+        scene.handle(PointerEvent(id: 1, phase: .moved, location: Vec2(90, 10), timestamp: 0.2))
+        XCTAssertNotEqual(scene.status, yaw0, "drag orbits the camera")
         r.host.destroy()
     }
 }

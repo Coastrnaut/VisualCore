@@ -1,0 +1,32 @@
+{
+  "argv": [
+    "xcodebuild",
+    "test",
+    "-project",
+    "VisualCore.xcodeproj",
+    "-scheme",
+    "Showcase",
+    "-destination",
+    "platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D",
+    "-derivedDataPath",
+    "Build/DerivedData/Showcase",
+    "-resultBundlePath",
+    ".autonomy/xcresults/F06-t606-20261110-201159.xcresult",
+    "-test-timeouts-enabled",
+    "YES",
+    "-default-test-execution-time-allowance",
+    "180",
+    "CODE_SIGNING_ALLOWED=NO",
+    "-only-testing:ShowcaseTests"
+  ],
+  "command": "xcodebuild test -project VisualCore.xcodeproj -scheme Showcase -destination 'platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D' -derivedDataPath Build/DerivedData/Showcase -resultBundlePath .autonomy/xcresults/F06-t606-20261110-201159.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 180 CODE_SIGNING_ALLOWED=NO -only-testing:ShowcaseTests",
+  "elapsed_seconds": 5.038,
+  "exit_code": 0,
+  "finished": "2026-11-11T01:12:04+00:00",
+  "log": ".autonomy/logs/F06.t606-animated-geometry.log",
+  "log_sha256": "926505e5f1b44f7a7b265aa1586ba5b15e5bbad4b162790a7c3c8a49b7cc46d2",
+  "name": "t606-animated-geometry",
+  "stage": "F06",
+  "started": "2026-11-11T01:11:59+00:00",
+  "timed_out": false
+}

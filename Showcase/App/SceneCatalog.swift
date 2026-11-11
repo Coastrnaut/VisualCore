@@ -42,6 +42,10 @@ enum SceneCatalog {
                             summary: "Shaders loaded from bundled files with an include, plus a bundled texture.",
                             accessibilityDescription: "Left half: a slowly shifting rainbow gradient. Right half: a gray checkerboard texture.",
                             interactionHint: "No touch interaction. Use diagnostics to inspect the renderer.") { GradientTextureScene(settings: $0) },
+            SceneDescriptor(id: "animated-geometry", title: "Animated Geometry",
+                            summary: "Lit 3D meshes spinning on a timeline; drag to orbit the camera.",
+                            accessibilityDescription: "A blue cube on the left and an orange sphere on the right, gently spinning and bobbing.",
+                            interactionHint: "Drag to orbit the camera around the shapes.") { AnimatedGeometryScene(settings: $0) },
         ]
     }
 
