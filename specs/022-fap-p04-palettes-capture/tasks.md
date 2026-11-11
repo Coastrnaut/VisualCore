@@ -1,0 +1,92 @@
+---
+
+description: "Task list for feature 022 — Fluid Art Playground Phase 04 interaction and capture UX (ledger gate A02-P04)"
+---
+
+# Tasks: Fluid Art Playground — Phase 04 Interaction and capture UX
+
+**Input**: `/specs/022-fap-p04-palettes-capture/` (spec with 5 clarifications, plan, research R1–R5, data model,
+contract, quickstart).
+
+**Tests** are required: host Core tests; the VisualCoreRendering package tests and app unit and UI tests on iOS 27.2
+and 26.5 with the guard (`xcodegen generate` after adding files); the ProjectM regression; an A01 build. IDs are
+`T-A02-4##`, with one commit per task (`scripts/tick_task.py`). Commands run through `run-check --stage A02-P04`.
+Checkpoints: `validate_docs`, `check_dependencies`, `check_compliance` and `check_app_isolation` (allowing
+`NSPhotoLibraryAddUsageDescription` only).
+
+## Phase 1: Foundational — VisualCore pass run observer (blocks US4)
+
+- [ ] T-A02-401 Add `FieldPass.Run` and `@MainActor static var runObserver` in
+  `Packages/VisualCoreRendering/Sources/VisualCoreRendering/FieldPass.swift` (called after validation, before the
+  draw; for a target output, `output` is its color texture name). Extend `FieldPassTests` (one run is reported with
+  the right input and output names; a rejected run reports nothing). Add docs, README, baseline. Run the package
+  tests on 27.2 and 26.5, then the ProjectM regression 3/3 + 4/4 (FR-A02-407).
+
+## Phase 2: User Story 1 — palettes (P1) 🎯
+
+- [ ] T-A02-402 [P] [US1] Tests first, then add `FluidPalette.swift` (Core), following clarification 1:
+  - "ink paper (0.96, 0.94, 0.88), exp(−2·dye)";
+  - "smoke bg (0.04, 0.04, 0.05), 1 − exp(−1.5·luma)";
+  - "glow black + clamped dye";
+  - exactly 6 splat colors each;
+  - `displayColor(dye:)` as the CPU reference.
+
+  Add `paletteID` to `FluidConfiguration` ("unknown → glow, reported"). `SplatQueue` colors come from the palette.
+  `FluidCanvasDescription` names the palette. Tests: `FluidPaletteTests` and extensions of `FluidConfigurationTests`
+  and `SplatQueueTests`.
+- [ ] T-A02-403 [US1] Add the display shader modes (`uMode`, `uBackground`) and the palette uniforms to
+  `FluidFieldsScene`. Wrap the host scene in `EffectScene(content:graph:)` with a bloom graph ("threshold 0.6,
+  intensity 1.2, radius 8"), bypassed unless the palette is glow, with `reduceFlashing` from
+  `SystemAccessibilityObserver`. Add a palette picker (`fap.adjust.palette`) to the Adjust panel. Add
+  `PaletteRenderTests`:
+  - the same field rendered in each palette;
+  - pairwise mean difference ≥ 10%;
+  - probes match `displayColor` within 3/255 for ink and smoke;
+  - glow spreads beyond the dye with bloom;
+  - switching keeps the fields (SC-A02-401).
+
+## Phase 3: User Story 2 — pinch and Brush size (P1)
+
+- [ ] T-A02-404 [US2] In `PlaygroundView.swift`, feed `PointerTracker` and `PinchRecognizer`. When a second finger
+  goes down, cancel both strokes and enter pinch mode, with "brushRadius = start × scale, clamped 0.005…0.25". Add
+  the Brush size slider (`fap.adjust.brush`, spoken as a percentage of the canvas). Add `PinchTests` with scripted
+  events: spreading to twice the distance doubles the radius, clamping works, and 0 splats come from pinching
+  fingers (SC-A02-402).
+
+## Phase 4: User Story 3 — capture (P2)
+
+- [ ] T-A02-405 [US3] Add `CaptureModel.swift`:
+  - `ExportGeometry(maxEdge: host.maxRenderSize)` at 2048 on the long edge in the view aspect;
+  - pause, `renderOffscreen`, restore;
+  - `StillImageEncoder.pngData`;
+  - a temporary file, replacing the previous one and deleted on close;
+  - a message on failure.
+
+  Add the capture button and `ShareLink` (`fap.capture`, `fap.capture.share`, `fap.capture.message`). Add
+  `NSPhotoLibraryAddUsageDescription` (clarification 5) to `project.yml`. Add `CaptureTests`:
+  - an opaque PNG of the expected size;
+  - the step count unchanged;
+  - palette probes match the on-screen frame;
+  - a too-large size refused with a message (SC-A02-403).
+
+## Phase 5: User Story 4 — pass isolation (P1)
+
+- [ ] T-A02-406 [US4] Add `PassIsolationTests` using `FieldPass.runObserver`: 10 frames in every palette and both
+  storages, with splats, viscosity and projection on. Assert 0 runs where an input equals the output, and the run
+  count per frame equals the expected list (SC-A02-404).
+
+## Phase 6: UI, contract and checks
+
+- [ ] T-A02-407 Add `PaletteCaptureUITests` (pick each palette, change Brush size, capture → share sheet) and extend
+  the audit to the new controls. Run the app tests on 27.2 and 26.5 (SC-A02-405).
+- [ ] T-A02-408 Update the contract (reused pieces in M02/M06/M09 notes; the observer recorded), then run the release
+  fast steps, the isolation check with the allowed usage key, and an A01 build. Add lessons (FR-A02-408, SC-A02-406).
+
+## Dependencies
+
+- T-A02-401 is first (VisualCore).
+- T-A02-402 can run in parallel with it.
+- T-A02-403 needs T-A02-402.
+- T-A02-404 and T-A02-405 need T-A02-403 (the playground view).
+- T-A02-406 needs T-A02-401 and T-A02-403.
+- T-A02-407 and T-A02-408 come last.
