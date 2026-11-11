@@ -1,0 +1,194 @@
+{
+  "checks": [
+    {
+      "attestation": ".autonomy/checks/A02-P01.t101-app-build-2.json",
+      "command": "xcodebuild build-for-testing -project VisualCore.xcodeproj -scheme FluidArtPlayground -destination 'generic/platform=iOS Simulator' -derivedDataPath Build/DerivedData/FluidArtPlayground CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A02-P01.t101-app-build-2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A02-P01.t101-core-test-2.json",
+      "command": "swift test --package-path Apps/FluidArtPlayground/FluidArtPlaygroundCore",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A02-P01.t101-core-test-2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A02-P01.t101-core-test.json",
+      "command": "swift test --package-path Apps/FluidArtPlayground/Core",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A02-P01.t101-core-test.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A02-P01.t102-visualcore-host.json",
+      "command": "swift test --package-path Packages/VisualCore",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A02-P01.t102-visualcore-host.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A02-P01.t103-rendering-27-2.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --result-name a02p01-t103-rendering-27-2",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A02-P01.t103-rendering-27-2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A02-P01.t104-rendering-27-2.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --result-name a02p01-t104-rendering-27-2",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A02-P01.t104-rendering-27-2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A02-P01.t106-rendering-26.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-26.5 --action test --result-name a02p01-t106-rendering-26",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A02-P01.t106-rendering-26.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A02-P01.t107-reference-a.json",
+      "command": "python3 scripts/release_check.py --only reference-engine-xcframework reference-build-projectm-ios-sim reference-clean --log-dir .autonomy/logs/a02p01-ref --json .autonomy/logs/a02p01-ref/a.json",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A02-P01.t107-reference-a.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A02-P01.t107-reference-b.json",
+      "command": "python3 scripts/release_check.py --only reference-test-anglerendering-ios27 reference-test-anglerendering-ios26 projectm-reference-ios27 projectm-reference-ios26 --log-dir .autonomy/logs/a02p01-ref --json .autonomy/logs/a02p01-ref/b.json",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A02-P01.t107-reference-b.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A02-P01.t108-core-test.json",
+      "command": "swift test --package-path Apps/FluidArtPlayground/FluidArtPlaygroundCore",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A02-P01.t108-core-test.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A02-P01.t109-core-test.json",
+      "command": "swift test --package-path Apps/FluidArtPlayground/FluidArtPlaygroundCore",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A02-P01.t109-core-test.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A02-P01.t110-app-build.json",
+      "command": "xcodebuild build-for-testing -project VisualCore.xcodeproj -scheme FluidArtPlayground -destination 'generic/platform=iOS Simulator' -derivedDataPath Build/DerivedData/FluidArtPlayground CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A02-P01.t110-app-build.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A02-P01.t111-app-26.json",
+      "command": "xcodebuild test -project VisualCore.xcodeproj -scheme FluidArtPlayground -destination 'platform=iOS Simulator,id=EC7498FF-31FF-4491-9666-B0D32785203C' -derivedDataPath Build/DerivedData/FluidArtPlayground -resultBundlePath .autonomy/xcresults/a02p01-t111-app-26.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 300 CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A02-P01.t111-app-26.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A02-P01.t111-app-27-3.json",
+      "command": "xcodebuild test -project VisualCore.xcodeproj -scheme FluidArtPlayground -destination 'platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D' -derivedDataPath Build/DerivedData/FluidArtPlayground -resultBundlePath .autonomy/xcresults/a02p01-t111-app-27-3.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 300 CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A02-P01.t111-app-27-3.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A02-P01.t111-app-27.json",
+      "command": "xcodebuild test -project VisualCore.xcodeproj -scheme FluidArtPlayground -destination 'platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D' -derivedDataPath Build/DerivedData/FluidArtPlayground -resultBundlePath .autonomy/xcresults/a02p01-t111-app-27.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 300 CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A02-P01.t111-app-27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A02-P01.t111-reference-a.json",
+      "command": "python3 scripts/release_check.py --only reference-engine-xcframework reference-build-projectm-ios-sim reference-clean --log-dir .autonomy/logs/a02p01-ref2 --json .autonomy/logs/a02p01-ref2/a.json",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A02-P01.t111-reference-a.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A02-P01.t111-reference-b.json",
+      "command": "python3 scripts/release_check.py --only reference-test-anglerendering-ios27 reference-test-anglerendering-ios26 projectm-reference-ios27 projectm-reference-ios26 --log-dir .autonomy/logs/a02p01-ref2 --json .autonomy/logs/a02p01-ref2/b.json",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A02-P01.t111-reference-b.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A02-P01.t111-visualcore-host.json",
+      "command": "swift test --package-path Packages/VisualCore",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A02-P01.t111-visualcore-host.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A02-P01.t112-app-build.json",
+      "command": "xcodebuild build-for-testing -project VisualCore.xcodeproj -scheme FluidArtPlayground -destination 'generic/platform=iOS Simulator' -derivedDataPath Build/DerivedData/FluidArtPlayground CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A02-P01.t112-app-build.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A02-P01.t113-app-26.json",
+      "command": "xcodebuild test -project VisualCore.xcodeproj -scheme FluidArtPlayground -destination 'platform=iOS Simulator,id=EC7498FF-31FF-4491-9666-B0D32785203C' -derivedDataPath Build/DerivedData/FluidArtPlayground -resultBundlePath .autonomy/xcresults/a02p01-t113-app-26.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 300 CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A02-P01.t113-app-26.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A02-P01.t113-app-27.json",
+      "command": "xcodebuild test -project VisualCore.xcodeproj -scheme FluidArtPlayground -destination 'platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D' -derivedDataPath Build/DerivedData/FluidArtPlayground -resultBundlePath .autonomy/xcresults/a02p01-t113-app-27.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 300 CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A02-P01.t113-app-27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A02-P01.t115-isolation.json",
+      "command": "python3 scripts/check_app_isolation.py --app Apps/FluidArtPlayground --built-app Build/DerivedData/FluidArtPlayground/Build/Products/Debug-iphonesimulator/FluidArtPlayground.app",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A02-P01.t115-isolation.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A02-P01.t115-no-egl-network.json",
+      "command": "python3 .autonomy/logs/a02p01-t115/no_egl_check.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A02-P01.t115-no-egl-network.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A02-P01.t115-release-fast-2.json",
+      "command": "python3 scripts/release_check.py --only docs app-contracts compliance dependencies public-api licenses script-tests documented-api-fluid-art-playground isolation-fluid-art-playground host-fluid-art-playground-core documented-api-generative-art-studio isolation-generative-art-studio host-generative-art-studio-core --log-dir .autonomy/logs/a02p01-t115b --json .autonomy/logs/a02p01-t115b/summary.json",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A02-P01.t115-release-fast-2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A02-P01.t115-release-fast.json",
+      "command": "python3 scripts/release_check.py --only docs app-contracts compliance dependencies public-api licenses script-tests documented-api-fluid-art-playground documented-api-generative-art-studio host-fluid-art-playground-core host-generative-art-studio-core --log-dir .autonomy/logs/a02p01-t115 --json .autonomy/logs/a02p01-t115/summary.json",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A02-P01.t115-release-fast.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A02-P01.t116-app-26.json",
+      "command": "xcodebuild test -project VisualCore.xcodeproj -scheme FluidArtPlayground -destination 'platform=iOS Simulator,id=EC7498FF-31FF-4491-9666-B0D32785203C' -derivedDataPath Build/DerivedData/FluidArtPlayground -resultBundlePath .autonomy/xcresults/a02p01-t116-app-26.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 300 CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A02-P01.t116-app-26.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A02-P01.t116-app-27.json",
+      "command": "xcodebuild test -project VisualCore.xcodeproj -scheme FluidArtPlayground -destination 'platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D' -derivedDataPath Build/DerivedData/FluidArtPlayground -resultBundlePath .autonomy/xcresults/a02p01-t116-app-27.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 300 CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A02-P01.t116-app-27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A02-P01.t116-reference-a.json",
+      "command": "python3 scripts/release_check.py --only reference-engine-xcframework reference-build-projectm-ios-sim reference-clean --log-dir .autonomy/logs/a02p01-ref3 --json .autonomy/logs/a02p01-ref3/a.json",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A02-P01.t116-reference-a.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A02-P01.t116-reference-b.json",
+      "command": "python3 scripts/release_check.py --only reference-test-anglerendering-ios27 reference-test-anglerendering-ios26 projectm-reference-ios27 projectm-reference-ios26 --log-dir .autonomy/logs/a02p01-ref3 --json .autonomy/logs/a02p01-ref3/b.json",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A02-P01.t116-reference-b.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A02-P01.t116-rendering-26.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-26.5 --action test --result-name a02p01-t116-rendering-26",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A02-P01.t116-rendering-26.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A02-P01.t116-rendering-27.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --result-name a02p01-t116-rendering-27",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A02-P01.t116-rendering-27.log"
+    }
+  ],
+  "generated": "2026-11-11T08:14:31+00:00",
+  "method": "deterministic-run-check",
+  "stage": "A02-P01",
+  "status": "pass"
+}
