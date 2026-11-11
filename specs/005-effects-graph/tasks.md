@@ -48,3 +48,11 @@ Setup → T-F402/T-F403 → T-F404/T-F405 → T-F406 → T-F407…T-F412 (one at
 ## Implementation Strategy
 
 MVP = validation + copy/colorMatrix/blur. Each effect lands with its own test and commit.
+
+## Phase 6: Convergence
+
+- [ ] T-F419 Recycle each intermediate target to the pool right after its last consumer runs within the frame (keep the scene and graph output), with a sim test that a 4-pass chain holds fewer live targets than passes, in `Packages/VisualCoreRendering/Sources/VisualCoreEffects/EffectRenderer.swift` per FR-F407 (partial)
+- [ ] T-F420 Make `EffectGraphError.cycle` name only the passes on the cycle (not downstream dependents), with a host test, in `Packages/VisualCore/Sources/VisualCoreEffectsGraph/EffectGraphValidation.swift` per US1/AC2 (partial)
+- [ ] T-F421 Rebuild the effect graph when `EffectScene.flashLimitPerSecond` changes, with a sim test, in `Packages/VisualCoreRendering/Sources/VisualCoreEffects/EffectScene.swift` per FR-F409 (contradicts)
+- [ ] T-F422 Update `specs/005-effects-graph/contracts/effects-api.md` and `data-model.md` to match the public API (render signature, EffectScene.reduceFlashing/effectiveGraph/flashLimitPassID, FlashLimiterModel bias, lastOrder/lastWarnings, ResourceRegistry.warn) per plan: contracts (partial)
+- [ ] T-F423 Warn (once per pass and slot) about input slots a pass declares that its schema does not define, with a host test, in `EffectGraphValidation.swift` per FR-F406 (partial)
