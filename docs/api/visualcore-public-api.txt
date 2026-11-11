@@ -57,7 +57,9 @@ VisualCoreDiagnostics | enum | public enum RenderLifecycleState: String, Sendabl
 VisualCoreDiagnostics | enum | public enum ResourceBudgetError: Error, Equatable, Sendable
 VisualCoreDiagnostics | enum | public enum ResourceKind: String, CaseIterable, Sendable, Codable
 VisualCoreDiagnostics | enum | public enum Thermal: Int, Sendable, Codable, CaseIterable
+VisualCoreDiagnostics | func | public func limit(requested: Int, tier: Int) -> Int
 VisualCoreDiagnostics | func | public func relative(to reference: RenderCostEstimate) -> Double
+VisualCoreDiagnostics | func | public func share(tier: Int) -> Double
 VisualCoreDiagnostics | func | public mutating func abandonAll() -> Int
 VisualCoreDiagnostics | func | public mutating func allocate(_ kind: ResourceKind, bytes amount: Int) throws(ResourceBudgetError)
 VisualCoreDiagnostics | func | public mutating func decide(thermal: FramePacing.Thermal, lowPower: Bool, now: Double) -> Int
@@ -68,6 +70,7 @@ VisualCoreDiagnostics | func | public mutating func reset()
 VisualCoreDiagnostics | func | public mutating func transition(to next: RenderLifecycleState) -> Bool
 VisualCoreDiagnostics | func | public mutating func warn(_ message: String) -> Bool
 VisualCoreDiagnostics | func | public static func clampedDelta(_ delta: Double) -> Double
+VisualCoreDiagnostics | func | public static func current() -> DeviceConditions
 VisualCoreDiagnostics | func | public static func isAllowed(from: RenderLifecycleState, to: RenderLifecycleState) -> Bool
 VisualCoreDiagnostics | func | public static func level(ratio: Double, lightMax: Double = 2, moderateMax: Double = 10) -> Level
 VisualCoreDiagnostics | func | public static func text(ratio: Double) -> String
@@ -76,6 +79,8 @@ VisualCoreDiagnostics | init | public init(from: RenderLifecycleState, to: Rende
 VisualCoreDiagnostics | init | public init(historyLimit: Int = 256)
 VisualCoreDiagnostics | init | public init(minimum: Int, maximum: Int, preferred: Int)
 VisualCoreDiagnostics | init | public init(pixels: Double, iterations: Double, samples: Double = 1)
+VisualCoreDiagnostics | init | public init(shares: [Double], minimum: Int)
+VisualCoreDiagnostics | init | public init(thermal: FramePacing.Thermal, lowPower: Bool)
 VisualCoreDiagnostics | init | public init(thermal: Thermal, lowPower: Bool, requestedMaxFPS: Int)
 VisualCoreDiagnostics | init | public init(tierCount: Int, lowPowerCeiling: Int = 1, decisionInterval: Double = 2, calmPeriod: Double = 10)
 VisualCoreDiagnostics | init | public init(total: Int = ResourceBudget.defaultTotal, perKind: [ResourceKind: Int] = [:])
@@ -89,16 +94,22 @@ VisualCoreDiagnostics | let | public let historyLimit: Int
 VisualCoreDiagnostics | let | public let iterations: Double
 VisualCoreDiagnostics | let | public let lowPowerCeiling: Int
 VisualCoreDiagnostics | let | public let maxFPS: Int
+VisualCoreDiagnostics | let | public let minimum: Int
 VisualCoreDiagnostics | let | public let pixels: Double
 VisualCoreDiagnostics | let | public let renderScale: Double
 VisualCoreDiagnostics | let | public let samples: Double
+VisualCoreDiagnostics | let | public let shares: [Double]
 VisualCoreDiagnostics | let | public let tierCount: Int
 VisualCoreDiagnostics | let | public let to: RenderLifecycleState
 VisualCoreDiagnostics | let | public static let defaultTotal
 VisualCoreDiagnostics | let | public static let maximumDelta
 VisualCoreDiagnostics | let | public static let minimumFPS
+VisualCoreDiagnostics | let | public static let nominal
+VisualCoreDiagnostics | let | public static let standard
 VisualCoreDiagnostics | let | public static let version
+VisualCoreDiagnostics | struct | public struct DeviceConditions: Sendable, Equatable
 VisualCoreDiagnostics | struct | public struct FramePacing: Sendable, Equatable
+VisualCoreDiagnostics | struct | public struct ParticleBudget: Sendable, Equatable
 VisualCoreDiagnostics | struct | public struct QualityPolicy: Sendable, Equatable
 VisualCoreDiagnostics | struct | public struct Range: Sendable, Equatable
 VisualCoreDiagnostics | struct | public struct RenderCostEstimate: Sendable, Equatable
@@ -119,6 +130,7 @@ VisualCoreDiagnostics | var | public var leaked: Int
 VisualCoreDiagnostics | var | public var liveBytes: [ResourceKind: Int]
 VisualCoreDiagnostics | var | public var liveCount: [ResourceKind: Int]
 VisualCoreDiagnostics | var | public var liveTotal: Int
+VisualCoreDiagnostics | var | public var lowPower: Bool
 VisualCoreDiagnostics | var | public var maximum: Int
 VisualCoreDiagnostics | var | public var minimum: Int
 VisualCoreDiagnostics | var | public var peakBytes: Int
@@ -128,6 +140,7 @@ VisualCoreDiagnostics | var | public var range: Range
 VisualCoreDiagnostics | var | public var shaderFailures: Int
 VisualCoreDiagnostics | var | public var snapshot: Snapshot
 VisualCoreDiagnostics | var | public var staleRejected: Int
+VisualCoreDiagnostics | var | public var thermal: FramePacing.Thermal
 VisualCoreDiagnostics | var | public var total: Int
 VisualCoreDiagnostics | var | public var totalBytes: Int
 VisualCoreDiagnostics | var | public var warnings: [String]
@@ -911,10 +924,13 @@ VisualCoreSimulation | enum | public enum ParticleForce: Sendable, Equatable
 VisualCoreSimulation | enum | public enum SimulationInfo
 VisualCoreSimulation | enum | public enum StoragePrecision: String, Sendable, Codable, CaseIterable
 VisualCoreSimulation | enum | public enum TimelineEvent: Sendable, Equatable
+VisualCoreSimulation | func | public func acceleration(at position: Vec2, velocity: Vec2) -> Vec2
+VisualCoreSimulation | func | public func bound(speed: Double = 0) -> Double
 VisualCoreSimulation | func | public func checksum() -> UInt64
 VisualCoreSimulation | func | public func clamped() -> Emitter
 VisualCoreSimulation | func | public func clamped() -> EmitterBurst
 VisualCoreSimulation | func | public func clamped() -> EmitterShape
+VisualCoreSimulation | func | public func clamped() -> ParticleForce
 VisualCoreSimulation | func | public func commands(at step: Int) -> [Command]
 VisualCoreSimulation | func | public func decode(_ u: Float) -> Float
 VisualCoreSimulation | func | public func encode(_ v: Float) -> Float
@@ -1002,16 +1018,23 @@ VisualCoreSimulation | let | public static let boundaryTolerance
 VisualCoreSimulation | let | public static let countRange: ClosedRange<Int>
 VisualCoreSimulation | let | public static let defaultCapacity
 VisualCoreSimulation | let | public static let extentRange: ClosedRange<Double>
+VisualCoreSimulation | let | public static let gravityWellStrengthLimit
 VisualCoreSimulation | let | public static let intervalRange: ClosedRange<Double>
+VisualCoreSimulation | let | public static let legacyLimit
 VisualCoreSimulation | let | public static let lifetimeRange: ClosedRange<Double>
 VisualCoreSimulation | let | public static let maxCapacity
+VisualCoreSimulation | let | public static let maxCoordinate
 VisualCoreSimulation | let | public static let maxDelta
+VisualCoreSimulation | let | public static let maxWindSpeed
+VisualCoreSimulation | let | public static let radiusRange: ClosedRange<Double>
 VisualCoreSimulation | let | public static let rateRange: ClosedRange<Double>
 VisualCoreSimulation | let | public static let reducedMotionFactor
 VisualCoreSimulation | let | public static let sizeRange: ClosedRange<Double>
+VisualCoreSimulation | let | public static let softeningRange: ClosedRange<Double>
 VisualCoreSimulation | let | public static let speedRange
 VisualCoreSimulation | let | public static let speedRange: ClosedRange<Double>
 VisualCoreSimulation | let | public static let spreadRange: ClosedRange<Double>
+VisualCoreSimulation | let | public static let strengthLimit
 VisualCoreSimulation | let | public static let version
 VisualCoreSimulation | protocol | public protocol FixedStepSimulation
 VisualCoreSimulation | struct | public struct AccessibilityPreferences: Sendable, Equatable, Codable
@@ -1078,6 +1101,7 @@ VisualCoreSimulation | var | public var isFinite: Bool
 VisualCoreSimulation | var | public var isPaused
 VisualCoreSimulation | var | public var isRunning: Bool
 VisualCoreSimulation | var | public var lifetime: ClosedRange<Double>
+VisualCoreSimulation | var | public var liveLimit: Int
 VisualCoreSimulation | var | public var minValue: Float
 VisualCoreSimulation | var | public var mode: EasingMode
 VisualCoreSimulation | var | public var name: String

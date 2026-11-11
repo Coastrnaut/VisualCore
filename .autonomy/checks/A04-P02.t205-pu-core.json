@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Apps/ParticleUniverse/ParticleUniverseCore"
+  ],
+  "command": "swift test --package-path Apps/ParticleUniverse/ParticleUniverseCore",
+  "elapsed_seconds": 2.77,
+  "exit_code": 0,
+  "finished": "2026-11-11T23:25:56+00:00",
+  "log": ".autonomy/logs/A04-P02.t205-pu-core.log",
+  "log_sha256": "0ecd1aeead0eae35fdc179b7f113afb00954fb602cffd767a850b8cbd2b26d79",
+  "name": "t205-pu-core",
+  "stage": "A04-P02",
+  "started": "2026-11-11T23:25:53+00:00",
+  "timed_out": false
+}
