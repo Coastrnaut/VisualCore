@@ -28,7 +28,7 @@ regression; after each phase, `validate_docs.py`.
   the old file; bad files are reported and left byte-identical; migration from a v0 fixture (the file stays byte-identical on load; rewritten only by a
   later save; analyze C3); newer version rejected;
   invalid ids; missing directory created.
-- [ ] T-A01-302 [US5] Update the API baseline, the VisualCore README section "Persistence", `docs/release/{support-matrix,known-limitations}.md` and the package-map row (Persistence built). Run the host tests and the reference regression (7 steps) (FR-A01-309).
+- [X] T-A01-302 [US5] Update the API baseline, the VisualCore README section "Persistence", `docs/release/{support-matrix,known-limitations}.md` and the package-map row (Persistence built). Run the host tests and the reference regression (7 steps) (FR-A01-309). — Verified 2026-11-10: VisualCore README Persistence section + module row, support-matrix (DocumentStore host-verified A01-P03), known-limitations built note, getting-started module table, package-map row (built A01-P03); API baseline matches; validate_docs PASS; run-check A01-P03/t302-visualcore-host swift test green; t302-reference-regression 7/7 pass (FR-A01-309)
 
 ## Phase 2: US1 + US2 — Save, reopen and organize (P1) 🎯
 

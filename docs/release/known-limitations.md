@@ -24,7 +24,8 @@ VisualCore 1.0.0-rc.1 is a **release candidate verified on iOS simulators only**
 
 Built since rc.1: `VisualCoreParameters` (new), `VisualCoreUI.RenderSurface`, `VisualCoreTestSupport` image comparison,
 and `VisualCoreRendering` `ShaderBundle`, the `vc/*.glsl` library and `FullScreenShaderScene` (feature 012).
-Feature 013 added `SceneClock`, `ParameterEditor` and `VisualCoreUI.ParameterPanel`. The table
+Feature 013 added `SceneClock`, `ParameterEditor` and `VisualCoreUI.ParameterPanel`. Feature 014 built
+`VisualCorePersistence` (`DocumentStore`). The table
 lists what remains.
 
 | README entry | Missing part | Where it will be built |

@@ -13,7 +13,7 @@ iOS 26+ inside apps. The package map and dependency rules R1–R5 are in
 | VisualCoreEffectsGraph | effect DAG model, validation, quotas, flash-limiter model |
 | VisualCoreDiagnostics | render lifecycle state machine, frame statistics, reports |
 | VisualCoreAudioDSP | **placeholder, not built yet** — planned: lock-free ring, FFT, bands, RMS, onsets ([ADR-0006](../../docs/decisions/ADR-0006-unbuilt-readme-modules.md)) |
-| VisualCorePersistence | **placeholder, not built yet** — planned: versioned documents, atomic writes, migrations (first app that persists documents) |
+| VisualCorePersistence | `DocumentStore` (versioned envelopes, atomic writes, migrations, per-file problem reports), A01-P03 |
 | VisualCoreParameters | parameter schemas (units, ranges, linear/log sliders), resolution, palettes (sRGB, linear-light sampling), presets, stable `ParameterHash` |
 | VisualCoreTestSupport | test-only (rule R5): `ImageComparison`, `ImageDifference`, `ImageStatistics` for pixel tests; fake clock and fixtures still planned (ADR-0006) |
 
@@ -98,4 +98,17 @@ clock.
   (0…4) and by 0.5 when `reducedMotion` is on, and wraps at `duration`.
 - `scrub(to:)` clamps to the timeline.
 - `play()`, `pause()` and `toggle()` switch state; paused time never changes.
+
+## Persistence (feature 014, A01-P03)
+
+`DocumentStore<Value>(directory:kind:migrations:maxBytes:)` keeps `Codable` values as `<id>.json` envelopes
+(`kind`, `schemaVersion`, ISO 8601 `savedAt`, `payload`).
+
+- **Writes** (`save(_:id:)`) go to a hidden temporary file in the same folder and then replace the target, so a crash
+  leaves either the old or the new complete file. Ids match `^[A-Za-z0-9._-]{1,128}$`.
+- **Reads**: `load()` returns a `LoadReport` of readable `StoredItem`s plus one `StoreProblem` per unreadable file:
+  `.corrupt`, `.wrongKind`, `.newerVersion` or `.tooLarge`. The size is checked before reading. Problem files are
+  never modified, moved or deleted.
+- **Migrations**: `MigrationChain(currentVersion:steps:)` upgrades older payloads (JSON objects) step by step on
+  load. The file is rewritten only by a later save. Newer versions are rejected.
 
