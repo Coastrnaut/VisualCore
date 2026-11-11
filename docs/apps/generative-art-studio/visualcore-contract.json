@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "app": "generative-art-studio",
-  "gate": "A01-P02",
+  "gate": "A01-P03",
   "date": "2026-11-10",
   "inventory": [
     {
@@ -342,19 +342,31 @@
       "id": "M08",
       "capability": "Versioned local document store",
       "source": "v0.1 feature 04",
-      "status": "upstream gap",
+      "status": "available",
       "evidence": [
         {
-          "file": "Packages/VisualCore/Sources/VisualCorePersistence/Module.swift",
-          "symbol": "PersistenceInfo",
+          "file": "Packages/VisualCore/Sources/VisualCorePersistence/DocumentStore.swift",
+          "symbol": "DocumentStore.save",
+          "product": "VisualCorePersistence",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCorePersistence/DocumentStore.swift",
+          "symbol": "DocumentStore.load",
+          "product": "VisualCorePersistence",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCorePersistence/Migration.swift",
+          "symbol": "MigrationChain",
           "product": "VisualCorePersistence",
           "public": true
         }
       ],
-      "notes": "VisualCorePersistence is a placeholder (ADR-0006): no envelope, atomic write or migrations.",
+      "notes": "Closed in A01-P03: VisualCorePersistence DocumentStore (envelope, atomic writes, migrations, per-file problems).",
       "example": {
-        "file": "Packages/VisualCore/Tests/VisualCoreScaffoldTests/ScaffoldTests.swift",
-        "symbol": "everyPureModuleStartsAtZeroDotOne"
+        "file": "Apps/GenerativeArtStudio/Core/Sources/GenerativeArtStudioCore/CompositionLibrary.swift",
+        "symbol": "CompositionLibrary"
       }
     },
     {
@@ -469,7 +481,8 @@
       "kind": "upstream",
       "owner": "VisualCore:VisualCorePersistence",
       "phase": 3,
-      "test": "Host tests: versioned envelope, atomic write, migration chain, unsupported/truncated/corrupt files rejected safely, duplicate and favorite metadata"
+      "test": "Host tests: versioned envelope, atomic write, migration chain, unsupported/truncated/corrupt files rejected safely, duplicate and favorite metadata",
+      "closed": "A01-P03"
     },
     {
       "id": "G-EXPORT",
@@ -646,7 +659,8 @@
       "Reference regression baseline recorded green (T-A01-006) and the empty shell builds on both simulator runtimes (T-A01-008).",
       "Phase 01 starts with G-PARAMS (VisualCoreParameters) and the app's GPU-free domain.",
       "A01-P01 closed G-SHADERLOAD, G-GLSLLIB and G-PARAMS in VisualCore; M01 and M05 are now available.",
-      "A01-P02 closed G-CLOCK (SceneClock) and added ParameterEditor and ParameterPanel to VisualCore; M02 is available."
+      "A01-P02 closed G-CLOCK (SceneClock) and added ParameterEditor and ParameterPanel to VisualCore; M02 is available.",
+      "A01-P03 closed G-PERSIST (VisualCorePersistence DocumentStore); M08 is available."
     ],
     "blockers": []
   }

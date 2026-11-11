@@ -65,7 +65,7 @@ regression; after each phase, `validate_docs.py`.
 
 ## Phase 4: Polish
 
-- [ ] T-A01-307 Update `docs/apps/generative-art-studio/visualcore-contract.json` (G-PERSIST closed A01-P03; M08 available with DocumentStore evidence and a CompositionLibrary example) and render it. Run `check_app_contract`, the documented API for the app, and the release-check fast steps (FR-A01-311, SC-A01-306).
+- [X] T-A01-307 Update `docs/apps/generative-art-studio/visualcore-contract.json` (G-PERSIST closed A01-P03; M08 available with DocumentStore evidence and a CompositionLibrary example) and render it. Run `check_app_contract`, the documented API for the app, and the release-check fast steps (FR-A01-311, SC-A01-306). — Verified 2026-11-10: visualcore-contract.json gate A01-P03: M08 available (DocumentStore.save/load, MigrationChain evidence; CompositionLibrary example), G-PERSIST closed A01-P03; rendered; check PASS; run-check A01-P03/t307-release-fast 8/8; t307-documented-api-app PASS (FR-A01-311, SC-A01-306)
 
 ## Dependencies
 
