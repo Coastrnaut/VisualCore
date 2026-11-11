@@ -70,6 +70,12 @@ final class AccessibilityAuditUITests: XCTestCase {
         app.buttons["gas.settings.open"].tap()
         XCTAssertTrue(element(app, "gas.settings.reduceMotion").waitForExistence(timeout: 5))
         try audit(app, "settings [\(label)]", types: types)
+        let acknowledgements = element(app, "gas.settings.acknowledgements")
+        for _ in 0..<3 where !acknowledgements.isHittable { app.swipeUp() }
+        acknowledgements.tap()
+        XCTAssertTrue(element(app, "gas.acknowledgements.angle").waitForExistence(timeout: 5))
+        try audit(app, "acknowledgements [\(label)]", types: types)
+        app.navigationBars.buttons.element(boundBy: 0).tap()
         app.buttons["gas.settings.done"].tap()
 
         app.buttons["gas.library.open"].tap()

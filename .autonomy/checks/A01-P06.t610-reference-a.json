@@ -1,0 +1,24 @@
+{
+  "argv": [
+    "python3",
+    "scripts/release_check.py",
+    "--log-dir",
+    ".autonomy/logs/a01p06-t610-ref-a",
+    "--json",
+    ".autonomy/logs/a01p06-t610-ref-a/summary.json",
+    "--only",
+    "reference-engine-xcframework",
+    "reference-build-projectm-ios-sim",
+    "reference-clean"
+  ],
+  "command": "python3 scripts/release_check.py --log-dir .autonomy/logs/a01p06-t610-ref-a --json .autonomy/logs/a01p06-t610-ref-a/summary.json --only reference-engine-xcframework reference-build-projectm-ios-sim reference-clean",
+  "elapsed_seconds": 24.545,
+  "exit_code": 0,
+  "finished": "2026-11-11T07:08:38+00:00",
+  "log": ".autonomy/logs/A01-P06.t610-reference-a.log",
+  "log_sha256": "d518a960780f852f47c58e5308a798df7d0c8c82057f115141cb60c5003541ce",
+  "name": "t610-reference-a",
+  "stage": "A01-P06",
+  "started": "2026-11-11T07:08:13+00:00",
+  "timed_out": false
+}

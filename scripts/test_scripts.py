@@ -10,6 +10,7 @@ import unittest
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
+ROOT_DIR = HERE.parent
 
 
 def load(name: str):
@@ -37,6 +38,7 @@ appcontract = load("check_app_contract")
 enumeration = load("check_test_enumeration")
 privacy = load("check_privacy_manifest")
 appreleasecheck = load("check_app_release")
+licensebundle = load("bundle_licenses")
 try:
     deps = load("check_dependencies")
 except FileNotFoundError:
@@ -702,6 +704,30 @@ class AppReleaseTests(unittest.TestCase):
     def test_bad_input_exits_2(self):
         with tempfile.TemporaryDirectory() as t:
             self.assertEqual(appreleasecheck.main(["--app", str(Path(t) / "Y.app"), "--config", str(Path(t) / "c.json")]), 2)
+
+
+class BundleLicensesTests(unittest.TestCase):
+    def test_bundles_shipped_texts_and_generated_attributions(self):
+        with tempfile.TemporaryDirectory() as t:
+            d = Path(t)
+            (d / "L.txt").write_text("MIT text")
+            inv = {"components": [
+                {"id": "a", "name": "A", "license": "MIT", "scope": "shipped", "text": "L.txt"},
+                {"id": "easing", "name": "Easing", "license": "BSD-3-Clause", "scope": "shipped", "text": "notices"},
+                {"id": "h", "name": "Harness", "license": "LGPL-2.1", "scope": "harness", "text": "L.txt"}]}
+            self.assertEqual(licensebundle.bundle(inv, d / "out", d), [])
+            index = json.loads((d / "out" / "licenses.json").read_text())
+            self.assertEqual([e["id"] for e in index], ["a", "easing"], "harness-only components are never bundled")
+            self.assertIn("Robert Penner", (d / "out" / "easing.txt").read_text())
+            inv["components"][0]["text"] = "missing.txt"
+            self.assertEqual(len(licensebundle.bundle(inv, d / "out2", d)), 1)
+
+    def test_real_inventory_bundles_every_shipped_component(self):
+        with tempfile.TemporaryDirectory() as t:
+            self.assertEqual(licensebundle.main(["--out", str(Path(t) / "L")]), 0)
+            inv = json.loads((ROOT_DIR / "docs/legal/third-party.json").read_text())
+            shipped = {c["id"] for c in inv["components"] if c["scope"] == "shipped"}
+            self.assertEqual({e["id"] for e in json.loads((Path(t) / "L" / "licenses.json").read_text())}, shipped)
 
 
 if __name__ == "__main__":

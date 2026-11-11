@@ -18,7 +18,8 @@ or external package dependency must map to an entry with an allowed license and 
 
 The full license texts for ANGLE and its components are kept, unmodified, in the pinned reference at
 `External/projectm-ios/Apps/projectM-iOS/Resources/Licenses/`. **Every distributed app must bundle these texts** and show
-them (the 25 apps add an acknowledgements screen in their own phases).
+them. `scripts/bundle_licenses.py` bundles them, and `VisualCoreUI.AcknowledgementsView` shows them (feature 017; Generative
+ArtStudio is the first adopter).
 
 ## Algorithms re-implemented in VisualCore (no third-party code copied)
 

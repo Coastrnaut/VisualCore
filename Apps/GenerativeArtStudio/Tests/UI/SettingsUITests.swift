@@ -49,4 +49,22 @@ final class SettingsUITests: XCTestCase {
         choose(again, element(again, "gas.settings.reduceMotion"), prefix: "System")   // reset for other tests
         again.buttons["gas.settings.done"].tap()
     }
+
+    // T-A01-610: the bundled licenses are shown; ANGLE's full BSD text opens from the list.
+    func testAcknowledgementsShowBundledLicenses() {
+        let app = XCUIApplication()
+        app.launch()
+        openSettings(app)
+        let link = element(app, "gas.settings.acknowledgements")
+        for _ in 0..<3 where !link.isHittable { app.swipeUp() }
+        link.tap()
+        let angle = element(app, "gas.acknowledgements.angle")
+        XCTAssertTrue(angle.waitForExistence(timeout: 5), "ANGLE row")
+        XCTAssertTrue(angle.label.contains("BSD-3-Clause"), angle.label)
+        XCTAssertTrue(element(app, "gas.acknowledgements.visualcore").exists)
+        angle.tap()
+        let text = element(app, "gas.acknowledgements.text")
+        XCTAssertTrue(text.waitForExistence(timeout: 5))
+        XCTAssertTrue(text.label.contains("ANGLE Project Authors") || text.label.contains("Redistribution"), String(text.label.prefix(120)))
+    }
 }

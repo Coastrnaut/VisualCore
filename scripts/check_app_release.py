@@ -72,6 +72,12 @@ def check(app: Path, config: dict, root: Path = ROOT) -> list[tuple[str, bool, s
         item("app icon", has_icon and (app / "Assets.car").is_file(), "CFBundleIconName/CFBundleIcons + Assets.car")
     for doc in config.get("requiredDocs", []):
         item(f"doc {doc}", (root / doc).is_file(), "")
+    if config.get("licenses", False):
+        index = app / "Licenses" / "licenses.json"
+        inventory = json.loads((root / "docs/legal/third-party.json").read_text())
+        shipped = {c["id"] for c in inventory.get("components", []) if c.get("scope") == "shipped"}
+        bundled = {e["id"] for e in json.loads(index.read_text())} if index.is_file() else set()
+        item("bundled licenses", shipped <= bundled, f"missing {sorted(shipped - bundled)}")
     checklist = config.get("checklist")
     if checklist:
         path = root / checklist

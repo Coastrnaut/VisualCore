@@ -137,6 +137,13 @@ targets:
         GENERATE_INFOPLIST_FILE: NO
         ENABLE_USER_SCRIPT_SANDBOXING: NO
     postBuildScripts:
+      # T-A01-610: bundle the shipped components' license texts for the Acknowledgements screen (THIRD_PARTY_NOTICES.md).
+      - name: Bundle licenses (T-A01-610)
+        basedOnDependencyAnalysis: false
+        script: |
+          set -e
+          env -i PATH=/usr/bin:/bin:/usr/sbin:/sbin HOME="$HOME" \
+            /usr/bin/python3 "$SRCROOT/scripts/bundle_licenses.py" --out "$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/Licenses"
       # FR-A01-006: the build fails if the app depends on ProjectM engine/preset/bridge modules.
       - name: Dependency audit (FR-A01-006)
         basedOnDependencyAnalysis: false

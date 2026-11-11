@@ -202,3 +202,12 @@ back. Set it to true around `renderOffscreen` so a still export is not limited.
 pickers for both settings and a full-contrast row that explains them and shows the device setting. It was built to
 pass the system accessibility audit at default and the largest text sizes. `AccessibleColors.accent` (#0040DD light,
 #409CFF dark) keeps tinted text at ≥ 4.5:1 contrast, and `AccessibleColors.contrastRatio` computes WCAG ratios.
+
+## Acknowledgements (feature 017, A01-P06)
+
+`scripts/bundle_licenses.py --out <bundle>/Licenses` (run as a build phase) writes the license text of every
+`scope: shipped` component in `docs/legal/third-party.json`, plus a `licenses.json` index. `AcknowledgementsView`
+(VisualCoreUI) lists them with their licenses, and each row opens the full, selectable text. `LicenseInventory` loads
+the index. `scripts/check_app_release.py` verifies that every shipped component is bundled when the app's
+`release.json` sets `"licenses": true`.
+

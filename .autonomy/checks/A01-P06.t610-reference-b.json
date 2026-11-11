@@ -1,0 +1,25 @@
+{
+  "argv": [
+    "python3",
+    "scripts/release_check.py",
+    "--log-dir",
+    ".autonomy/logs/a01p06-t610-ref-b",
+    "--json",
+    ".autonomy/logs/a01p06-t610-ref-b/summary.json",
+    "--only",
+    "reference-test-anglerendering-ios27",
+    "reference-test-anglerendering-ios26",
+    "projectm-reference-ios27",
+    "projectm-reference-ios26"
+  ],
+  "command": "python3 scripts/release_check.py --log-dir .autonomy/logs/a01p06-t610-ref-b --json .autonomy/logs/a01p06-t610-ref-b/summary.json --only reference-test-anglerendering-ios27 reference-test-anglerendering-ios26 projectm-reference-ios27 projectm-reference-ios26",
+  "elapsed_seconds": 23.113,
+  "exit_code": 0,
+  "finished": "2026-11-11T07:09:01+00:00",
+  "log": ".autonomy/logs/A01-P06.t610-reference-b.log",
+  "log_sha256": "60c0a040a91345e32471e5ed5915e970ccfbbb100d6b20d51ff8f48ff70d9651",
+  "name": "t610-reference-b",
+  "stage": "A01-P06",
+  "started": "2026-11-11T07:08:38+00:00",
+  "timed_out": false
+}

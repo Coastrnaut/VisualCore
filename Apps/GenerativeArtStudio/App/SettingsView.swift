@@ -35,6 +35,10 @@ struct SettingsView: View {
                 Section("About") {
                     Text("Works offline. No account, no tracking.")
                         .accessibilityIdentifier("gas.settings.about")
+                    NavigationLink("Acknowledgements") {
+                        AcknowledgementsView(identifierPrefix: "gas.acknowledgements")
+                    }
+                    .accessibilityIdentifier("gas.settings.acknowledgements")
                 }
             }
             .headerProminence(.increased)
