@@ -28,7 +28,7 @@ after each phase, run `validate_docs.py`.
 
   Add tests in `Packages/VisualCore/Tests/VisualCoreParametersTests/ParameterEditorTests.swift`, including that
   resetting an unchanged parameter is a no-op (analyze C2).
-- [ ] T-A01-203 [US4] Implement `Packages/VisualCoreRendering/Sources/VisualCoreUI/ParameterPanel.swift`:
+- [X] T-A01-203 [US4] Implement `Packages/VisualCoreRendering/Sources/VisualCoreUI/ParameterPanel.swift`: — Verified 2026-11-10: VisualCoreUI/ParameterPanel.swift (ParameterRow, ParameterPanelModel.rows/adjust ±5%, ParameterPanel Form section: title, value+unit, slider on normalized position, reset when modified, Reset all; VoiceOver label=title, value=formatted, adjustable; identifiers vc.param.*); VisualCoreUI → VisualCoreParameters in Package.swift and package map; R1-R5 PASS; run-check A01-P02/t203-ui-ios27 + ios26: ParameterPanelTests 3/3 (rows/order/format/modified, adjust stays in range incl. log, hosted render), package green; API baseline updated
   - a Form section with a title, value-with-unit text, a Slider on the normalized position and a reset per row,
     plus Reset all;
   - accessibility: label = title, value = formatted value, adjustable ±5%;

@@ -748,12 +748,25 @@ VisualCoreTestSupport | let | public let maxAbsolute: Int
 VisualCoreTestSupport | let | public let meanAbsolute: Double
 VisualCoreTestSupport | let | public static let version
 VisualCoreTestSupport | struct | public struct ImageDifference: Sendable, Equatable
+VisualCoreUI | enum | public enum ParameterPanelModel
 VisualCoreUI | enum | public enum UIInfo
 VisualCoreUI | func | public func makeUIView(context: Context) -> UIView
 VisualCoreUI | func | public func updateUIView(_ uiView: UIView, context: Context)
+VisualCoreUI | func | public static func adjust(_ editor: inout ParameterEditor, _ name: String, up: Bool)
+VisualCoreUI | func | public static func rows(_ editor: ParameterEditor) -> [ParameterRow]
+VisualCoreUI | init | public init(editor: Binding<ParameterEditor>)
 VisualCoreUI | init | public init(host: RenderHost, accessibilityLabel: String, accessibilityHint: String? = nil)
 VisualCoreUI | let | public let accessibilityHint: String?
 VisualCoreUI | let | public let accessibilityLabel: String
 VisualCoreUI | let | public let host: RenderHost
+VisualCoreUI | let | public let id: String
+VisualCoreUI | let | public let isModified: Bool
+VisualCoreUI | let | public let position: Double
+VisualCoreUI | let | public let title: String
+VisualCoreUI | let | public let value: String
+VisualCoreUI | let | public static let adjustStep
 VisualCoreUI | let | public static let version
+VisualCoreUI | struct | public struct ParameterPanel: View
+VisualCoreUI | struct | public struct ParameterRow: Sendable, Equatable, Identifiable
 VisualCoreUI | struct | public struct RenderSurface: UIViewRepresentable
+VisualCoreUI | var | public var body: some View
