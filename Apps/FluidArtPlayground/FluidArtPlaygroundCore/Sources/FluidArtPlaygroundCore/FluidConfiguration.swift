@@ -65,6 +65,8 @@ public struct FluidConfiguration: Sendable, Equatable, Codable {
     public var maxSplatsPerFrame = 16
     /// Edge behavior (walls by default).
     public var boundaryMode = BoundaryMode.walls
+    /// The look: `ink`, `smoke` or `glow` (default; feature 022). Unknown ids become `glow`.
+    public var paletteID = "glow"
 
     /// The defaults.
     public init() {}
@@ -106,6 +108,8 @@ public struct FluidConfiguration: Sendable, Equatable, Codable {
         noteReal("brushRadius", brushRadius, out.brushRadius, &issues)
         out.forceScale = real(forceScale, Self.forceScaleRange, defaults.forceScale)
         noteReal("forceScale", forceScale, out.forceScale, &issues)
+        out.paletteID = FluidPalette.named(paletteID).id
+        note("paletteID", paletteID, out.paletteID)
         out.maxSplatsPerFrame = min(max(maxSplatsPerFrame, Self.splatsPerFrameRange.lowerBound), Self.splatsPerFrameRange.upperBound)
         note("maxSplatsPerFrame", maxSplatsPerFrame, out.maxSplatsPerFrame)
         return (out, issues)

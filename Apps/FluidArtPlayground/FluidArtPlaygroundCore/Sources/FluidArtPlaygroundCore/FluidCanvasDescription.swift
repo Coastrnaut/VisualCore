@@ -23,6 +23,7 @@ public enum FluidCanvasDescription {
         case .unorm8: "8-bit storage"
         }
         let splashText = splashes > 0 ? ", \(splashes) \(splashes == 1 ? "splash" : "splashes") added" : ""
-        return "Dye pattern \(state), \(c.gridWidth) by \(c.gridHeight) grid, \(storageText)\(splashText)"
+        let paletteText = ", \(FluidPalette.named(c.paletteID).name.lowercased()) palette"
+        return "Dye pattern \(state), \(c.gridWidth) by \(c.gridHeight) grid, \(storageText)\(paletteText)\(splashText)"
     }
 }

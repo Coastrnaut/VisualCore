@@ -15,7 +15,7 @@ public struct SplatQueue: Sendable {
     public static let splashAngleDegrees = 137.5
 
     /// The validated configuration (grid size, brush radius, force scale, cap).
-    public let configuration: FluidConfiguration
+    public private(set) var configuration: FluidConfiguration
     /// Splats dropped by the per-frame cap or the pending capacity.
     public private(set) var dropped = 0
     /// Splats ever queued.
@@ -31,6 +31,12 @@ public struct SplatQueue: Sendable {
         self.configuration = configuration.validated().0
     }
 
+    /// Applies new settings (palette, brush, force, cap) to future splats; pending splats are kept (feature 022).
+    public mutating func update(configuration new: FluidConfiguration) { configuration = new.validated().0 }
+
+    /// The palette new splats take their colors from.
+    public var palette: FluidPalette { FluidPalette.named(configuration.paletteID) }
+
     /// Splats waiting for a frame.
     public var pendingCount: Int { pending.count }
     /// Pointers that currently hold a color.
@@ -44,12 +50,12 @@ public struct SplatQueue: Sendable {
         let cellsPerPoint = SIMD2(Double(configuration.gridWidth) / viewSize.x, Double(configuration.gridHeight) / viewSize.y)
         for s in samples {
             let index = colorIndex[s.id] ?? {
-                let i = nextColor % DyeSeed.palette.count
+                let i = nextColor % palette.splatColors.count
                 nextColor += 1
                 colorIndex[s.id] = i
                 return i
             }()
-            let rgb = DyeSeed.palette[index]
+            let rgb = palette.splatColors[index % palette.splatColors.count]
             let position = SIMD2(Float(s.position.x / viewSize.x), Float(1 - s.position.y / viewSize.y))
             let force = SIMD2(Float(s.velocity.x * cellsPerPoint.x), Float(-s.velocity.y * cellsPerPoint.y)) * Float(configuration.forceScale)
             if let splat = Splat(position: position, radius: Float(configuration.brushRadius), force: force,
@@ -69,7 +75,7 @@ public struct SplatQueue: Sendable {
         let k = splashCount
         let angle = Double(k) * Self.splashAngleDegrees * .pi / 180
         let force = SIMD2(Float(cos(angle)), Float(sin(angle))) * Self.splashForce
-        let rgb = DyeSeed.palette[k % DyeSeed.palette.count]
+        let rgb = palette.splatColors[k % palette.splatColors.count]
         splashCount += 1
         if let splat = Splat(position: SIMD2(0.5, 0.5), radius: Float(configuration.brushRadius), force: force, color: SIMD4(rgb, 1)) {
             push(splat)

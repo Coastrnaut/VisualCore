@@ -44,6 +44,7 @@ final class FluidConfigurationTests: XCTestCase {
             ("forceScale", { $0.forceScale = .infinity }, { $0.forceScale == 1 }),
             ("maxSplatsPerFrame", { $0.maxSplatsPerFrame = 0 }, { $0.maxSplatsPerFrame == 1 }),
             ("maxSplatsPerFrame", { $0.maxSplatsPerFrame = 1000 }, { $0.maxSplatsPerFrame == 64 }),
+            ("paletteID", { $0.paletteID = "neon" }, { $0.paletteID == "glow" }),
         ]
         XCTAssertGreaterThanOrEqual(cases.count, 8)
         for (field, mutate, check) in cases {

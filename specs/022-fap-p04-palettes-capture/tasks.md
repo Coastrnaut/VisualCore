@@ -24,7 +24,7 @@ Checkpoints: `validate_docs`, `check_dependencies`, `check_compliance` and `chec
 
 ## Phase 2: User Story 1 — palettes (P1) 🎯
 
-- [ ] T-A02-402 [P] [US1] Tests first, then add `FluidPalette.swift` (Core), following clarification 1:
+- [X] T-A02-402 [P] [US1] Tests first, then add `FluidPalette.swift` (Core), following clarification 1: — Verified 2026-11-11: FluidPalette (Core): Ink (paper 0.96/0.94/0.88, exp(-2*dye), absorptive ink colors), Smoke (bg 0.04/0.04/0.05, toward 0.92 by 1-exp(-1.5*luma), gray splats), Glowing dye (black + clamped dye, glow flag); six splat colors each; displayColor as the CPU reference; FluidConfiguration.paletteID (default glow, unknown -> glow, reported); SplatQueue colors from the palette with update(configuration:) keeping pending splats; FluidCanvasDescription names the palette. Tests: FluidPaletteTests 4, FluidConfigurationTests (+1 case), SplatQueueTests +1, FluidCanvasDescriptionTests updated. run-check A02-P04/t402-core-test swift test 49/49 pass (FR-A02-401)
   - "ink paper (0.96, 0.94, 0.88), exp(−2·dye)";
   - "smoke bg (0.04, 0.04, 0.05), 1 − exp(−1.5·luma)";
   - "glow black + clamped dye";

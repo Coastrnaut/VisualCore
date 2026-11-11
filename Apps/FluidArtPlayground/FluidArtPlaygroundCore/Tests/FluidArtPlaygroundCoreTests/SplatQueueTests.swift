@@ -105,6 +105,21 @@ final class SplatQueueTests: XCTestCase {
         XCTAssertEqual(q.dropped, 10, "the oldest are dropped beyond the pending capacity")
     }
 
+    /// Feature 022: splat colors come from the active palette; changing it keeps pending splats.
+    func testPaletteColors() {
+        var c = FluidConfiguration()
+        c.paletteID = "smoke"
+        var q = SplatQueue(configuration: c)
+        q.addSplash()
+        XCTAssertEqual(q.drain()[0].color, SIMD4(FluidPalette.named("smoke").splatColors[0], 1))
+        q.addSplash()
+        c.paletteID = "ink"
+        q.update(configuration: c)
+        XCTAssertEqual(q.pendingCount, 1, "pending splats are kept")
+        q.addSplash()
+        XCTAssertEqual(q.drain()[1].color, SIMD4(FluidPalette.named("ink").splatColors[2], 1))
+    }
+
     func testForgetReleasesPointerColor() {
         var q = queue()
         var tracker = PointerVelocityTracker(spacing: 1000)
