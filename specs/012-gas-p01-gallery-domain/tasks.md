@@ -21,7 +21,7 @@ regression.
 
 ## Phase 2: Foundational — VisualCore building blocks (US3; blocks US1 and US2)
 
-- [ ] T-A01-102 [P] [US3] Implement `Packages/VisualCore/Sources/VisualCoreParameters/{Module,ParameterSchema,Palette,Preset,ParameterHash}.swift` per data-model.md:
+- [X] T-A01-102 [P] [US3] Implement `Packages/VisualCore/Sources/VisualCoreParameters/{Module,ParameterSchema,Palette,Preset,ParameterHash}.swift` per data-model.md: — Verified 2026-11-10: VisualCoreParameters: ParameterDefinition/Schema/Transform/Error, ResolvedParameters, Palette (exact sRGB, linear-light sample, 6 built-ins), Preset (string seed), ParameterHash (FNV-1a 64, pinned 78a5b4bc32dcc753 computed in Python); run-check A01-P01/t102-parameters-tests-a2: whole VisualCore host suite green incl. 7 parameter tests (validation, resolve rules, linear/log sliders, palettes, Codable re-validation incl. seed 2^64-1, hash stability/sensitivity); API baseline +44 documented declarations; R1-R5 PASS
   - names `^[a-zA-Z][a-zA-Z0-9_]{0,31}$`; finite range with min < max; default within range;
   - ≤ 64 parameters with unique names; `logarithmic` requires minimum > 0;
   - resolve rules: non-finite throws, out-of-range clamps with a warning, missing takes the default, unknown is dropped with a warning;

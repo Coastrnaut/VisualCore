@@ -277,8 +277,52 @@ VisualCoreMath | var | public var x: Double, y: Double, z: Double, w: Double
 VisualCoreMath | var | public var xyz: Vec3
 VisualCoreMath | var | public var yaw: Double
 VisualCoreMath | var | public var zoom: Double
+VisualCoreParameters | enum | public enum ParameterError: Error, Equatable, Sendable
+VisualCoreParameters | enum | public enum ParameterHash
+VisualCoreParameters | enum | public enum ParameterTransform: String, Codable, Sendable, CaseIterable
 VisualCoreParameters | enum | public enum ParametersInfo
+VisualCoreParameters | func | public func clamped(_ value: Double) -> Double
+VisualCoreParameters | func | public func definition(_ name: String) -> ParameterDefinition?
+VisualCoreParameters | func | public func encode(to encoder: Encoder) throws
+VisualCoreParameters | func | public func normalized(_ value: Double) -> Double
+VisualCoreParameters | func | public func resolve(_ supplied: [String: Double]) throws(ParameterError) -> ResolvedParameters
+VisualCoreParameters | func | public func sample(_ t: Double) -> SIMD3<Double>
+VisualCoreParameters | func | public func value(normalized t: Double) -> Double
+VisualCoreParameters | func | public static func builtIn(_ id: String) -> Palette?
+VisualCoreParameters | func | public static func canonical(scope: String, seed: UInt64, paletteID: String, values: [String: Double]) -> String
+VisualCoreParameters | func | public static func linear(fromSRGB c: Double) -> Double
+VisualCoreParameters | func | public static func of(scope: String, seed: UInt64, paletteID: String, values: [String: Double]) -> String
+VisualCoreParameters | func | public static func sRGB(fromLinear c: Double) -> Double
+VisualCoreParameters | init | public init(_ definitions: [ParameterDefinition]) throws(ParameterError)
+VisualCoreParameters | init | public init(from decoder: Decoder) throws
+VisualCoreParameters | init | public init(id: String, name: String, stops: [SIMD3<Double>]) throws(ParameterError)
+VisualCoreParameters | init | public init(id: String, title: String, seed: UInt64, paletteID: String, values: [String: Double])
+VisualCoreParameters | init | public init(name: String, title: String, unit: String = "", range: ClosedRange<Double>, defaultValue: Double,
+VisualCoreParameters | let | public let defaultValue: Double
+VisualCoreParameters | let | public let definitions: [ParameterDefinition]
+VisualCoreParameters | let | public let id: String
+VisualCoreParameters | let | public let maximum: Double
+VisualCoreParameters | let | public let minimum: Double
+VisualCoreParameters | let | public let name: String
+VisualCoreParameters | let | public let paletteID: String
+VisualCoreParameters | let | public let seed: UInt64
+VisualCoreParameters | let | public let stops: [SIMD3<Double>]
+VisualCoreParameters | let | public let title: String
+VisualCoreParameters | let | public let transform: ParameterTransform
+VisualCoreParameters | let | public let unit: String
+VisualCoreParameters | let | public let values: [String: Double]
+VisualCoreParameters | let | public let warnings: [String]
+VisualCoreParameters | let | public static let builtIns: [Palette]
+VisualCoreParameters | let | public static let maxParameters
 VisualCoreParameters | let | public static let version
+VisualCoreParameters | struct | public struct Palette: Codable, Equatable, Sendable, Identifiable
+VisualCoreParameters | struct | public struct ParameterDefinition: Codable, Equatable, Sendable
+VisualCoreParameters | struct | public struct ParameterSchema: Sendable, Equatable
+VisualCoreParameters | struct | public struct Preset: Codable, Equatable, Sendable, Identifiable
+VisualCoreParameters | struct | public struct ResolvedParameters: Sendable, Equatable
+VisualCoreParameters | var | public var defaults: [String: Double]
+VisualCoreParameters | var | public var linearStops: [SIMD3<Double>]
+VisualCoreParameters | var | public var range: ClosedRange<Double>
 VisualCorePersistence | enum | public enum PersistenceInfo
 VisualCorePersistence | let | public static let version
 VisualCoreRendering | class | public final class ClearColorScene: RenderScene
