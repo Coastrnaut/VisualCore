@@ -92,19 +92,26 @@ IDs are `T-A01-4##`, with one commit and push per task (`scripts/tick_task.py`).
   - the 12 combinations decode to the exact dimensions with no alpha and sRGB (SC-A01-401);
   - 2 exports per family are identical (SC-A01-402);
   - a 2× export box-downscaled versus the on-screen render has mean ≤ 6/255 for 4 families (SC-A01-403);
-  - particle proportions: particle sizes in the export scale with the export (FR-A01-406).
+  - particle proportions: the fraction of non-background pixels in a 1× and a 2× particles export differs by
+    ≤ 15% relative (FR-A01-406; analyze A1);
+  - the Info.plist has `NSPhotoLibraryAddUsageDescription` equal to the clarified text and no other
+    `NS*UsageDescription` key (FR-A01-407; analyze C2).
 
   Run on iOS 27.2 and 26.5.
 - [ ] T-A01-407 [US1] Add `Apps/GenerativeArtStudio/Tests/UI/ExportUITests.swift`: open Export; change size and
   aspect, and the dimension label updates (for example "864 × 1080 px"); the format label; run the export; the share
-  control appears; close the sheet; the scene is still interactive. Run on iOS 27.2 and 26.5.
+  control appears; close the sheet; the scene is still interactive. The size and aspect pickers expose labels and values (FR-A01-409;
+  analyze C3). Run on iOS 27.2 and 26.5.
 
 ## Phase 3: US2 — Exports stay within device limits (P1)
 
 - [ ] T-A01-408 [US2] Add to `ExportRenderTests.swift`:
   - a host with an 8 MiB budget fails an export through `ExportRunner` with a readable message, then
     `renderOneFrame` succeeds and live counts are unchanged (SC-A01-404);
-  - options never exceed `host.maxRenderSize`.
+  - options never exceed `host.maxRenderSize`;
+  - an export on a suspended host (`host.pause()`, as when backgrounded) succeeds or fails cleanly with 0 leaks, and a
+    retry after `resume()` succeeds. The export is one synchronous main-actor call, so backgrounding cannot interrupt
+    it midway (spec edge case; analyze C1).
 
   Run on both runtimes.
 
@@ -112,7 +119,8 @@ IDs are `T-A01-4##`, with one commit and push per task (`scripts/tick_task.py`).
 
 - [ ] T-A01-409 Update `docs/apps/generative-art-studio/visualcore-contract.json` (G-EXPORT closed at A01-P04; M09
   available with renderOffscreen, StillImageEncoder and ExportGeometry evidence) and render it. Run
-  `check_app_contract`, the documented API for the app, the release-check fast steps and the Phase 03 library tests
+  `check_app_contract`, the documented API for the app, the release-check fast steps (including compliance and dependency rules: offline, no ProjectM; analyze C3) and the
+  Phase 03 library tests
   (FR-A01-410, SC-A01-405).
 
 ## Dependencies
@@ -123,3 +131,9 @@ T-A01-401 → T-A01-402 → T-A01-403 → T-A01-404 → T-A01-405 → T-A01-406 
 
 The VisualCore exporter first (Principle II), then the domain options, the UI, the pixel tests, the limits, and the
 contract.
+
+## Analyze remediation (2026-11-10)
+
+Applied autonomously (CLAUDE.md §2): C1 → T-A01-408 suspended-host export; C2 → T-A01-406 usage-string check;
+C3 → T-A01-407 accessibility values, T-A01-409 compliance; I1 → research R7 wording; A1 → T-A01-406 particle measure.
+0 critical issues.

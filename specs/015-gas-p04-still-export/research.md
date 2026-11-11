@@ -34,7 +34,7 @@ APIs verified by the read-only audit (2026-11-10):
   offscreen at 2× the size. It box-downscales the export by 2 and compares the mean absolute difference, which must
   be ≤ 6/255.
 - **R7 Failure path.** A host is built with `ResourceBudget(total: 8 MiB)`, and an export of 2048² (16 MiB) fails
-  with `.resource(.overBudget)`. A later `renderOneFrame` still succeeds and live counts equal those before the
+  with `.resource("…overBudget…")`. A later `renderOneFrame` still succeeds and live counts equal those before the
   export. This is a real failure path with no test-only hook.
 - **R8 Share and Photos.** SwiftUI `ShareLink(item: url)` presents the system share sheet. "Save Image" there uses
   add-only access, which needs `NSPhotoLibraryAddUsageDescription`. The app never calls PhotoKit itself.
