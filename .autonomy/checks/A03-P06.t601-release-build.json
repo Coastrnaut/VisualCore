@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "xcodebuild",
+    "build",
+    "-project",
+    "VisualCore.xcodeproj",
+    "-scheme",
+    "FractalExplorer",
+    "-configuration",
+    "Release",
+    "-destination",
+    "generic/platform=iOS",
+    "-derivedDataPath",
+    "Build/DerivedData/release-FractalExplorer-Release",
+    "CODE_SIGNING_ALLOWED=NO"
+  ],
+  "command": "xcodebuild build -project VisualCore.xcodeproj -scheme FractalExplorer -configuration Release -destination generic/platform=iOS -derivedDataPath Build/DerivedData/release-FractalExplorer-Release CODE_SIGNING_ALLOWED=NO",
+  "elapsed_seconds": 2.758,
+  "exit_code": 0,
+  "finished": "2026-11-11T15:45:15+00:00",
+  "log": ".autonomy/logs/A03-P06.t601-release-build.log",
+  "log_sha256": "ae41b6b0c18d93523b22ad8d7c23498428b39ea494d747dc21818d36920c4496",
+  "name": "t601-release-build",
+  "stage": "A03-P06",
+  "started": "2026-11-11T15:45:13+00:00",
+  "timed_out": false
+}

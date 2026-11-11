@@ -306,6 +306,8 @@ targets:
     platform: iOS
     sources:
       - path: Apps/FractalExplorer/App
+      # Feature 031 (A03-P06): privacy manifest and the app icon.
+      - path: Apps/FractalExplorer/Resources
     info:
       path: Apps/FractalExplorer/Generated/Info.plist
       properties:

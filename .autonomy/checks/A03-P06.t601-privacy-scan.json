@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_privacy_manifest.py",
+    "--app",
+    "Build/DerivedData/release-FractalExplorer-Release/Build/Products/Release-iphoneos/FractalExplorer.app"
+  ],
+  "command": "python3 scripts/check_privacy_manifest.py --app Build/DerivedData/release-FractalExplorer-Release/Build/Products/Release-iphoneos/FractalExplorer.app",
+  "elapsed_seconds": 0.144,
+  "exit_code": 0,
+  "finished": "2026-11-11T15:45:48+00:00",
+  "log": ".autonomy/logs/A03-P06.t601-privacy-scan.log",
+  "log_sha256": "3734125770b7ad83374d32a6194e80b3b653db761f63845af6428cc88ae42575",
+  "name": "t601-privacy-scan",
+  "stage": "A03-P06",
+  "started": "2026-11-11T15:45:48+00:00",
+  "timed_out": false
+}
