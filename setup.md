@@ -263,11 +263,18 @@ git submodule update --init External/projectm-ios
 git -C External/projectm-ios submodule update --init --depth 1 Vendor/projectM Vendor/angle
 ```
 
+The engine has its own nested submodule, `vendor/projectm-eval` (pinned `22fb0cf`). Without it, the engine build in
+§6 fails with "…/Vendor/projectM/vendor/projectm-eval does not contain a CMakeLists.txt file":
+
+```bash
+git -C External/projectm-ios/Vendor/projectM submodule update --init --recursive
+```
+
 ```bash
 git -C External/projectm-ios submodule update --init --depth 1 Vendor/presets/cream-of-the-crop Vendor/presets/projectm-classic Vendor/presets/milkdrop-original Vendor/presets/en-d Vendor/presets/milkdrop-texture-pack
 ```
 
-Check the pins: `d93edd1…`, `c88894e…` and `29d1823…`.
+Check the pins: `d93edd1…`, `c88894e…`, `29d1823…` and (inside the engine) `22fb0cf…`.
 
 ```bash
 git submodule status && git -C External/projectm-ios submodule status
