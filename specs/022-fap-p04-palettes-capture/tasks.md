@@ -105,3 +105,7 @@ No CRITICAL findings; coverage is 100%.
 - T-A02-404 and T-A02-405 need T-A02-403 (the playground view).
 - T-A02-406 needs T-A02-401 and T-A02-403.
 - T-A02-407 and T-A02-408 come last.
+
+## Phase 7: Convergence
+
+- [ ] T-A02-409 Extend `CaptureTests`: for each palette, the capture's corner pixel equals the on-screen frame's corner pixel (`host.readPixels()`, within 3/255); splats queued before a capture are still applied on the next stepped frame (capture drops no touches), per SC-A02-403 and the spec edge case "capture during an active swipe" (partial)
