@@ -53,7 +53,7 @@ regression.
   - `ArtDocument` v1 with validation (unknown family or newer schema throws; non-finite throws; resolve through the schema; unknown palette falls back with a warning; previewTime clamped to 0…120), canonical JSON (sorted keys, seed as a string), `hash`, and a migrate hook;
   - `SeedOffsets` (first four `SeededRandom` outputs);
   - `ParticleReplay` (capacity ≤ 10,000, fixed 1/60 steps to min(t, 120)).
-- [ ] T-A01-108 [US2] Add tests in `Apps/GenerativeArtStudio/Core/Tests/GenerativeArtStudioCoreTests/`:
+- [X] T-A01-108 [US2] Add tests in `Apps/GenerativeArtStudio/Core/Tests/GenerativeArtStudioCoreTests/`: — Verified 2026-11-10: run-check A01-P01/t108-core-tests: 8/8 pass — catalog (4 families, presets in range, unique ids), 60 generated documents incl. seeds 0 and 2^64-1 round-trip equal with equal hash and byte-stable canonical JSON (SC-A01-102), every validation outcome, corrupt/negative-seed/future-version decode rejection, hash sensitivity (5 distinct) and id/time independence, seed offsets, particle replay determinism, seed sensitivity, 120 s cap, capacity
   - ≥ 50 generated documents round-trip equal with an equal hash, including seeds 0 and 2^64−1 (SC-A01-102);
   - each invalid case gets its documented outcome;
   - the hash changes when any field changes;
