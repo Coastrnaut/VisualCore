@@ -1,6 +1,7 @@
 // AccessibilityPreferences.swift — the app's motion and flashing choices combined with the system settings
 // (feature 016 T-A01-501; gap G-UI; FR-A01-501, FR-A01-502, FR-A01-506; research R1, R2). Pure, host-testable logic
 // shared by every animated app; VisualCoreUI.SystemAccessibilityObserver supplies the system values on iOS.
+import Foundation
 
 /// One accessibility choice in an app's settings: follow the system, or force on or off.
 public enum AccessibilityChoice: String, Sendable, Codable, CaseIterable, Identifiable {
@@ -89,5 +90,29 @@ public struct AccessibilityPreferences: Sendable, Equatable, Codable {
     public func resolve(_ system: SystemAccessibility) -> EffectiveAccessibility {
         EffectiveAccessibility(reduceMotion: reduceMotion.resolve(system.reduceMotion),
                                reduceFlashing: reduceFlashing.resolve(system.dimFlashingLights))
+    }
+}
+
+// MARK: Storage (feature 016 T-A01-510; constitution II)
+
+extension AccessibilityPreferences {
+    /// The two `UserDefaults` keys for a prefix: `<prefix>.reduceMotion` and `<prefix>.reduceFlashing` (raw
+    /// `AccessibilityChoice` values). Apps can use them with SwiftUI's `@AppStorage`.
+    public static func keys(prefix: String) -> (reduceMotion: String, reduceFlashing: String) {
+        ("\(prefix).reduceMotion", "\(prefix).reduceFlashing")
+    }
+
+    /// Reads the choices stored under `prefix`; absent or unknown values become `.system`.
+    public static func load(from defaults: UserDefaults, keyPrefix prefix: String) -> AccessibilityPreferences {
+        let k = keys(prefix: prefix)
+        return AccessibilityPreferences(reduceMotion: AccessibilityChoice(storedValue: defaults.string(forKey: k.reduceMotion)),
+                                        reduceFlashing: AccessibilityChoice(storedValue: defaults.string(forKey: k.reduceFlashing)))
+    }
+
+    /// Stores both choices under `prefix` as raw values.
+    public func save(to defaults: UserDefaults, keyPrefix prefix: String) {
+        let k = Self.keys(prefix: prefix)
+        defaults.set(reduceMotion.rawValue, forKey: k.reduceMotion)
+        defaults.set(reduceFlashing.rawValue, forKey: k.reduceFlashing)
     }
 }

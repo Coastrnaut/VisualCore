@@ -134,4 +134,7 @@ Pass `RenderHost.maxRenderSize` as `maxEdge` to stay within the device's rendere
 - `playbackRate` is `SceneClock.reducedMotionFactor` (0.5) under Reduce Motion, else 1;
 - `AccessibilityChoice(storedValue:)` and decoding turn an unknown stored value into `.system`.
 
+- `AccessibilityPreferences.keys(prefix:)`, `load(from:keyPrefix:)` and `save(to:keyPrefix:)` store the choices in
+  `UserDefaults` as `<prefix>.reduceMotion` and `<prefix>.reduceFlashing` (the keys also work with `@AppStorage`).
+
 On iOS, `VisualCoreUI.SystemAccessibilityObserver` supplies the system values.

@@ -195,3 +195,8 @@ change notifications. Pass `source:` to supply fixed values in tests. Combine it
 Reduce-Flashing limiter, and leaves the renderer's state alone. Wrap a scene once and set
 `bypassEffects = !reduceFlashing`: the default path then costs nothing, and the limiter does not jump when it comes
 back. Set it to true around `renderOffscreen` so a still export is not limited.
+
+`AccessibilitySettingsSection(preferences:system:identifierPrefix:)` is a ready-made form section: System/On/Off
+pickers for both settings and a full-contrast row that explains them and shows the device setting. It was built to
+pass the system accessibility audit at default and the largest text sizes. `AccessibleColors.accent` (#0040DD light,
+#409CFF dark) keeps tinted text at ≥ 4.5:1 contrast, and `AccessibleColors.contrastRatio` computes WCAG ratios.

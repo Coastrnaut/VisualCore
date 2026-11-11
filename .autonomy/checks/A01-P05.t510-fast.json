@@ -1,0 +1,26 @@
+{
+  "argv": [
+    "python3",
+    "scripts/release_check.py",
+    "--log-dir",
+    ".autonomy/logs/a01p05-t510-fast",
+    "--json",
+    ".autonomy/logs/a01p05-t510-fast/summary.json",
+    "--only",
+    "docs",
+    "dependencies",
+    "public-api",
+    "compliance",
+    "host-visualcore"
+  ],
+  "command": "python3 scripts/release_check.py --log-dir .autonomy/logs/a01p05-t510-fast --json .autonomy/logs/a01p05-t510-fast/summary.json --only docs dependencies public-api compliance host-visualcore",
+  "elapsed_seconds": 6.075,
+  "exit_code": 1,
+  "finished": "2026-11-11T06:22:53+00:00",
+  "log": ".autonomy/logs/A01-P05.t510-fast.log",
+  "log_sha256": "c215da95916a423056e648ada86bf1e27234bc4108616914b849632a0dffdedc",
+  "name": "t510-fast",
+  "stage": "A01-P05",
+  "started": "2026-11-11T06:22:47+00:00",
+  "timed_out": false
+}

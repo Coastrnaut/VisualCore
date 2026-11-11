@@ -27,7 +27,8 @@ and `VisualCoreRendering` `ShaderBundle`, the `vc/*.glsl` library and `FullScree
 Feature 013 added `SceneClock`, `ParameterEditor` and `VisualCoreUI.ParameterPanel`. Feature 014 built
 `VisualCorePersistence` (`DocumentStore`). Feature 015 added offscreen still export (`RenderHost.renderOffscreen`,
 `StillImage`, `StillImageEncoder`) and `VisualCoreScenes.ExportGeometry`. Feature 016 added `AccessibilityPreferences`,
-`VisualCoreUI.SystemAccessibilityObserver` and `EffectScene.bypassEffects`. The table
+`VisualCoreUI.SystemAccessibilityObserver`, `AccessibilitySettingsSection`, `AccessibleColors` and
+`EffectScene.bypassEffects`. The table
 lists what remains.
 
 | README entry | Missing part | Where it will be built |

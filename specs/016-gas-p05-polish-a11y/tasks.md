@@ -134,7 +134,7 @@ critical issues.
 
 ## Phase 6: Convergence
 
-- [ ] T-A01-510 Move the reusable accessibility-settings pieces into VisualCore per Constitution II (Maximize reuse) and FR-A01-506 (partial):
+- [X] T-A01-510 Move the reusable accessibility-settings pieces into VisualCore per Constitution II (Maximize reuse) and FR-A01-506 (partial): — Verified 2026-11-11: VisualCoreSimulation: AccessibilityPreferences.keys(prefix:), load(from:keyPrefix:), save(to:keyPrefix:) (<prefix>.reduceMotion/.reduceFlashing raw values; unknown/absent → System) + host test storageRoundTripAndFallback. VisualCoreUI/AccessibilitySettingsSection.swift: AccessibilitySettingsSection(preferences:system:identifierPrefix:) (System/On/Off pickers with accessibility values, full-contrast explanation row with the device setting, prominent header) and AccessibleColors (accent #0040DD/#409CFF, WCAG contrastRatio) + AccessibilitySettingsSectionTests 3/3 (explanation text, hosts in a Form and writes the binding, accent ≥ 4.5:1 on white, grouped and black). API baseline 875 (0 undocumented after documenting body); READMEs, package map, getting-started, known-limitations. run-check A01-P05/t510-fast-a2 5/5 (t510-fast failed on the undocumented body, fixed); t510-rendering-ios27/ios26 TEST SUCCEEDED; reference regression t510-reference-a 3/3 + b 4/4 = 7/7
   - `AccessibilityPreferences.load(from: UserDefaults-like store, keyPrefix:)` / `save(to:keyPrefix:)` with the keys
     `<prefix>.reduceMotion` / `<prefix>.reduceFlashing` (raw `AccessibilityChoice`; unknown or absent → System), in
     `Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPreferences.swift` with host tests;
