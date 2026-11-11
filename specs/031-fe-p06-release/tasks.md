@@ -29,7 +29,7 @@ R1–R4, the data model, the contract and the quickstart.
 
 ## Phase 4: User Story 4 — copy, documents and verification (P1)
 
-- [ ] T-A03-606 [US4] Home description lists only implemented features; `Tests/Unit/CopyTests.swift` (home text and `docs/apps/fractal-explorer/store-listing.md` contain no forbidden claim per research R4 and name only implemented features). Write `docs/apps/fractal-explorer/{release.json,privacy-and-credits.md,store-listing.md,build-and-archive.md,release-checklist.md}` (owner-only items `BLOCKED_OWNER_ACTION`; D1–D3 rows pending: automation modes, container and defaults privacy, VoiceOver pass). Run `release_check.py --only app-release-fractal-explorer` (FR-A03-604, FR-A03-605).
+- [ ] T-A03-606 [US4] Home description lists only implemented features; `Tests/Unit/CopyTests.swift` (home text and `docs/apps/fractal-explorer/store-listing.md` contain no forbidden claim per research R4 and name only implemented features). Write `docs/apps/fractal-explorer/{release.json,privacy-and-credits.md,store-listing.md,build-and-archive.md,release-checklist.md}` (owner-only items `BLOCKED_OWNER_ACTION`; D1–D3 rows pending: automation modes, container and defaults privacy, VoiceOver pass). Run `release_check.py --only app-release-fractal-explorer`, whose `check_app_release.py` also verifies the export-compliance key, the usage descriptions and the compiled icon, and whose symbol check confirms 0 automation symbols (analyze G1) (FR-A03-604, FR-A03-605).
 - [ ] T-A03-607 Final verification: full FractalExplorer suites on 27.2 and 26.5 under the guard, host tests, `release_check.py` fast checks + `app-release-fractal-explorer`; contract gate A03-P06; lessons (FR-A03-606, SC-A03-604).
 
 ## Dependencies
@@ -41,3 +41,8 @@ R1–R4, the data model, the contract and the quickstart.
 ## Implementation strategy
 
 Privacy first (it shapes the bundle), then assets and credits, data, copy and documents, final verification.
+
+## Analyze remediation (2026-11-11, applied under CLAUDE.md §2)
+
+- G1: export compliance is verified by `check_app_release.py` in T-A03-606.
+- 0 critical issues.
