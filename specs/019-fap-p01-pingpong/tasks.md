@@ -77,7 +77,7 @@ runtimes, then the ProjectM regression 7/7.
   - missing or unknown input and uniform errors;
   - `stale` after a context recreation;
   - a pair run swaps exactly once.
-- [ ] T-A02-106 [US2] Run the VisualCoreRendering package tests on iOS 27.2 and then on 26.5 (separate run-checks),
+- [X] T-A02-106 [US2] Run the VisualCoreRendering package tests on iOS 27.2 and then on 26.5 (separate run-checks), — Verified 2026-11-11: run-check A02-P01/t106-rendering-26: VisualCoreRendering package TEST SUCCEEDED on iOS 26.5, enumeration guard 129/129 (half-float extension=true probe=true); iOS 27.2 full run t104-rendering-27-2 enumeration guard 129/129; check_public_api --update (27 additions, 0 removed, baseline 950 lines) then PASS; check_documented_api --sources Packages/VisualCoreRendering/Sources PASS (a pre-existing gap for FramePacing.Thermal, failing before this feature too, was fixed with a Frame pacing section in the VisualCore README); VisualCoreRendering README section 'Ping-pong fields, field passes and half-float targets', package-map and support-matrix rows updated; check_dependencies, check_compliance and validate_docs PASS
   with the enumeration guard for the 4 new classes. Run `check_public_api.py --update` (additions only) and
   `check_documented_api.py --sources Packages/VisualCoreRendering/Sources`. Update the README section for the new
   types and the package-map / support-matrix entries.

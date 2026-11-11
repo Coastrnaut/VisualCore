@@ -1,0 +1,26 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/VisualCoreRendering",
+    "--scheme",
+    "VisualCoreRendering-Package",
+    "--destination",
+    "sim-26.5",
+    "--action",
+    "test",
+    "--result-name",
+    "a02p01-t106-rendering-26"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-26.5 --action test --result-name a02p01-t106-rendering-26",
+  "elapsed_seconds": 8.884,
+  "exit_code": 0,
+  "finished": "2026-11-11T07:55:23+00:00",
+  "log": ".autonomy/logs/A02-P01.t106-rendering-26.log",
+  "log_sha256": "5c24096404d1ac52f5f4d17aecb5cf64155131a583c222067720139f244598b7",
+  "name": "t106-rendering-26",
+  "stage": "A02-P01",
+  "started": "2026-11-11T07:55:14+00:00",
+  "timed_out": false
+}

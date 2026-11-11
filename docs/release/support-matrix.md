@@ -50,6 +50,8 @@ results describe that app, not VisualCore (CLAUDE.md §12).
 | SwiftUI parameter panel (`VisualCoreUI.ParameterPanel`) | verified (simulator), A01-P02 |
 | Versioned document store (`VisualCorePersistence.DocumentStore`) | verified (host), A01-P03 |
 | Generative Art Studio 1.0.0 (1) | release candidate on the iOS 27.2 and 26.5 simulators (A01-P06): privacy manifest = scan, icon, licenses, automation-ready; D1–D3 pending campaign II; signing and submission are owner actions |
+| GPU fields: `PingPongTarget`, `FieldPass`, `FloatRenderSupport`, `RenderTarget.upload(rgbaFloats:)`/`readFloatPixels()` | verified (simulator iOS 27.2 and 26.5; half-float supported on both), A02-P01; device half-float support pending campaign II |
+| CPU field references (`FieldGrid`, `StoragePrecision`, `SignedRangeEncoding`, `TimeStepPolicy`) | verified (host), A02-P01 |
 | Release tooling (`check_privacy_manifest.py`, `check_app_release.py`, `bundle_licenses.py`, `VisualCoreAutomation.AutomationView`, `VisualCoreUI.AcknowledgementsView`) | verified (host and simulator), A01-P06 |
 | Accessibility preferences (`AccessibilityPreferences`, `SystemAccessibilityObserver`) and `EffectScene.bypassEffects` | verified (host and simulator), A01-P05; system flags on devices pending campaign II |
 | Offscreen still export (`RenderHost.renderOffscreen`, `StillImageEncoder` opaque sRGB PNG, `ExportGeometry`) | verified (simulator and host), A01-P04; device size limits pending campaign II |

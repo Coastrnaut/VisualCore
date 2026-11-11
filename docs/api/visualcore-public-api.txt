@@ -378,11 +378,13 @@ VisualCorePersistence | struct | public struct MigrationChain: Sendable
 VisualCorePersistence | struct | public struct StoredItem<Value: Sendable>: Sendable
 VisualCorePersistence | typealias | public typealias Step = @Sendable ([String: Any]) throws -> [String: Any]
 VisualCoreRendering | class | public final class ClearColorScene: RenderScene
+VisualCoreRendering | class | public final class FieldPass
 VisualCoreRendering | class | public final class FullScreenShaderScene: RenderScene
 VisualCoreRendering | class | public final class GPUBuffer: GPUResource
 VisualCoreRendering | class | public final class GradientQuadScene: RenderScene
 VisualCoreRendering | class | public final class MeshRenderer
 VisualCoreRendering | class | public final class ParticleRenderer
+VisualCoreRendering | class | public final class PingPongTarget
 VisualCoreRendering | class | public final class PrimitiveRenderer
 VisualCoreRendering | class | public final class RenderHost
 VisualCoreRendering | class | public final class RenderTarget: GPUResource
@@ -390,8 +392,11 @@ VisualCoreRendering | class | public final class ResourceRegistry
 VisualCoreRendering | class | public final class ShaderBundle: Sendable
 VisualCoreRendering | class | public final class ShaderProgram
 VisualCoreRendering | class | public final class Texture: GPUResource
+VisualCoreRendering | enum | public enum FieldPassError: Error, Equatable, Sendable
+VisualCoreRendering | enum | public enum FieldUniform: Sendable, Equatable
 VisualCoreRendering | enum | public enum GLState
 VisualCoreRendering | enum | public enum OffscreenRenderError: Error, Equatable, Sendable
+VisualCoreRendering | enum | public enum Output
 VisualCoreRendering | enum | public enum RenderHostError: Error, Equatable, Sendable
 VisualCoreRendering | enum | public enum RenderingInfo
 VisualCoreRendering | enum | public enum ResourceError: Error, Equatable, Sendable
@@ -415,6 +420,7 @@ VisualCoreRendering | func | public func makeTexture(width: Int, height: Int, fo
 VisualCoreRendering | func | public func pause()
 VisualCoreRendering | func | public func pixel(x: Int, y: Int) -> SIMD4<UInt8>
 VisualCoreRendering | func | public func program(vertex: String, fragment: String, defines: [String: String] = [:],
+VisualCoreRendering | func | public func readFloatPixels() -> [Float]
 VisualCoreRendering | func | public func readPixels() -> [UInt8]
 VisualCoreRendering | func | public func recreateContext()
 VisualCoreRendering | func | public func recycle(_ target: RenderTarget)
@@ -428,6 +434,8 @@ VisualCoreRendering | func | public func renderOneFrame(present: Bool = true) ->
 VisualCoreRendering | func | public func replaceScene(_ newScene: RenderScene)
 VisualCoreRendering | func | public func resize(_ context: RenderContext)
 VisualCoreRendering | func | public func resume()
+VisualCoreRendering | func | public func run(output: Output, inputs supplied: [String: RenderTarget],
+VisualCoreRendering | func | public func run(pair: PingPongTarget, input: String, extraInputs: [String: RenderTarget] = [:],
 VisualCoreRendering | func | public func set(_ name: String, _ v: Float)
 VisualCoreRendering | func | public func set(_ name: String, _ v: Int32)
 VisualCoreRendering | func | public func set(_ name: String, _ v: SIMD2<Float>)
@@ -437,24 +445,31 @@ VisualCoreRendering | func | public func set(_ name: String, matrix4 m: [Float])
 VisualCoreRendering | func | public func set(_ name: String, vec3Array values: [SIMD3<Float>])
 VisualCoreRendering | func | public func setup(_ context: RenderContext) throws
 VisualCoreRendering | func | public func source(_ name: String) -> String?
+VisualCoreRendering | func | public func storageFormat(forceFallback: Bool = false) -> TextureFormat
+VisualCoreRendering | func | public func swap()
 VisualCoreRendering | func | public func teardown(_ context: RenderContext)
 VisualCoreRendering | func | public func trimPools()
 VisualCoreRendering | func | public func upload(_ values: [Float], target: Int32 = GL_ARRAY_BUFFER)
 VisualCoreRendering | func | public func upload(indices: [UInt32], target: Int32 = GL_ELEMENT_ARRAY_BUFFER)
 VisualCoreRendering | func | public func upload(rgba pixels: [UInt8]) -> Bool
+VisualCoreRendering | func | public func upload(rgbaFloats values: [Float]) -> Bool
 VisualCoreRendering | func | public func use()
 VisualCoreRendering | func | public func warn(_ message: String) -> Bool
 VisualCoreRendering | func | public nonisolated static func == (a: RenderContext, b: RenderContext) -> Bool
+VisualCoreRendering | func | public static func detect(in registry: ResourceRegistry) -> FloatRenderSupport
 VisualCoreRendering | func | public static func pngData(_ image: StillImage) throws(OffscreenRenderError) -> Data
 VisualCoreRendering | func | public static func resetForVisualCore(framebuffer: UInt32, width: Int, height: Int)
 VisualCoreRendering | init | public convenience init(bundle: Bundle, subdirectory: String? = "Shaders")
 VisualCoreRendering | init | public convenience init(fragmentName: String, bundle: ShaderBundle)
 VisualCoreRendering | init | public init()
+VisualCoreRendering | init | public init(extensionReported: Bool, probeComplete: Bool)
 VisualCoreRendering | init | public init(files: [String: String])
 VisualCoreRendering | init | public init(fragment: String, fragmentName: String, bundle: ShaderBundle)
 VisualCoreRendering | init | public init(mesh: Mesh, registry: ResourceRegistry) throws
 VisualCoreRendering | init | public init(red: Float = 0, green: Float = 0, blue: Float = 0)
 VisualCoreRendering | init | public init(registry: ResourceRegistry) throws
+VisualCoreRendering | init | public init(registry: ResourceRegistry, fragment: String, inputs: [String], label: String) throws(FieldPassError)
+VisualCoreRendering | init | public init(registry: ResourceRegistry, width: Int, height: Int, format: TextureFormat, label: String) throws
 VisualCoreRendering | init | public init(scene: RenderScene, maxFramesPerSecond: Int = 60, budget: ResourceBudget = ResourceBudget()) throws
 VisualCoreRendering | init | public init?(width: Int, height: Int, bottomUpRGBA: [UInt8])
 VisualCoreRendering | init | public init?(width: Int, height: Int, topDownRGBA rgba: [UInt8])
@@ -462,12 +477,14 @@ VisualCoreRendering | let | public let bytes: Int
 VisualCoreRendering | let | public let cacheKey: String
 VisualCoreRendering | let | public let colorTexture: GLuint
 VisualCoreRendering | let | public let delta: Double
+VisualCoreRendering | let | public let extensionReported: Bool
 VisualCoreRendering | let | public let format: TextureFormat
 VisualCoreRendering | let | public let framebuffer: UInt32
 VisualCoreRendering | let | public let generation: Int
 VisualCoreRendering | let | public let handle: GPUHandle
 VisualCoreRendering | let | public let height: Int
 VisualCoreRendering | let | public let index: Int
+VisualCoreRendering | let | public let inputs: [String]
 VisualCoreRendering | let | public let kind: ResourceKind
 VisualCoreRendering | let | public let label: String
 VisualCoreRendering | let | public let library: ShaderLibrary
@@ -477,6 +494,8 @@ VisualCoreRendering | let | public let name: GLuint
 VisualCoreRendering | let | public let name: UInt32
 VisualCoreRendering | let | public let pixelHeight: Int
 VisualCoreRendering | let | public let pixelWidth: Int
+VisualCoreRendering | let | public let probeComplete: Bool
+VisualCoreRendering | let | public let program: ShaderProgram
 VisualCoreRendering | let | public let resources: ResourceRegistry
 VisualCoreRendering | let | public let rgba: [UInt8]
 VisualCoreRendering | let | public let size: GLint
@@ -497,6 +516,7 @@ VisualCoreRendering | let | public static let vertexSource
 VisualCoreRendering | let | public static let visualCoreLibrary: [String: String]
 VisualCoreRendering | protocol | public protocol GPUResource: AnyObject
 VisualCoreRendering | protocol | public protocol RenderScene: AnyObject
+VisualCoreRendering | struct | public struct FloatRenderSupport: Sendable, Equatable
 VisualCoreRendering | struct | public struct FrameInfo: Sendable, Equatable
 VisualCoreRendering | struct | public struct GPUHandle: Sendable, Equatable
 VisualCoreRendering | struct | public struct RenderCapabilities: Sendable, Equatable, Codable
@@ -515,9 +535,13 @@ VisualCoreRendering | var | public private(set) var lastInstanceCount
 VisualCoreRendering | var | public private(set) var lastTriangleCount
 VisualCoreRendering | var | public private(set) var pixelSize: (width: Int, height: Int)
 VisualCoreRendering | var | public private(set) var presentedFrameCount
+VisualCoreRendering | var | public private(set) var read: RenderTarget
 VisualCoreRendering | var | public private(set) var resources: ResourceRegistry
+VisualCoreRendering | var | public private(set) var swapCount
+VisualCoreRendering | var | public private(set) var write: RenderTarget
 VisualCoreRendering | var | public var ambient
 VisualCoreRendering | var | public var budget: ResourceBudget
+VisualCoreRendering | var | public var bytes: Int
 VisualCoreRendering | var | public var bytesPerPixel: Int
 VisualCoreRendering | var | public var cachedProgramCount: Int
 VisualCoreRendering | var | public var eglVendor
@@ -528,6 +552,7 @@ VisualCoreRendering | var | public var generation: Int
 VisualCoreRendering | var | public var glVersion
 VisualCoreRendering | var | public var glslVersion
 VisualCoreRendering | var | public var height: Int
+VisualCoreRendering | var | public var isValid: Bool
 VisualCoreRendering | var | public var lifecycleHistory: [RenderLifecycleEvent]
 VisualCoreRendering | var | public var lightDirection
 VisualCoreRendering | var | public var maxRenderSize: Int
@@ -541,9 +566,11 @@ VisualCoreRendering | var | public var pointerHandler: ((PointerEvent) -> Void)?
 VisualCoreRendering | var | public var red: Float, green: Float, blue: Float
 VisualCoreRendering | var | public var rejectedTransitions: Int
 VisualCoreRendering | var | public var renderer
+VisualCoreRendering | var | public var reportsColorBufferHalfFloat: Bool
 VisualCoreRendering | var | public var seedOffsets: SIMD4<Float>
 VisualCoreRendering | var | public var state: RenderLifecycleState
 VisualCoreRendering | var | public var stats: ResourceLedger.Snapshot
+VisualCoreRendering | var | public var supported: Bool
 VisualCoreRendering | var | public var timeScale: Double
 VisualCoreRendering | var | public var vendor
 VisualCoreRendering | var | public var view: UIView

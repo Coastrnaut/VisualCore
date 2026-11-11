@@ -186,6 +186,37 @@ let size = ExportGeometry(maxEdge: host.maxRenderSize).size(longEdge: 2048, aspe
 let png = try StillImageEncoder.pngData(host.renderOffscreen(width: size.width, height: size.height, time: 4.0))
 ```
 
+## Ping-pong fields, field passes and half-float targets (feature 019, A02-P01)
+
+These pieces are for GPU simulations and feedback effects that read the previous state and write the next one.
+
+- `FloatRenderSupport.detect(in: context.resources)` reports whether the context lists a color-buffer float
+  extension and whether a 4×4 RGBA16F probe target works; `supported` requires both. The result is cached per
+  context generation, and the probe target is released. `storageFormat(forceFallback:)` returns `.rgba16f`, or the
+  RGBA8 fallback. With RGBA8, store signed values with `VisualCoreSimulation.SignedRangeEncoding`.
+  `RenderCapabilities.reportsColorBufferHalfFloat` is the extension half alone.
+- `RenderTarget.upload(rgbaFloats:)` and `readFloatPixels()` move exact RGBA floats in both directions, rows
+  bottom-up. RGBA8 is quantized to n/255. Use them to seed fields and to compare them with a CPU reference
+  (`FieldGrid`, `StoragePrecision`).
+- `PingPongTarget` holds two equal targets. Passes sample `read`, draw into `write`, then `swap()`. Both targets are
+  budget-accounted (`bytes`), `release()` is idempotent, and `isValid` turns false after a context recreation.
+- `FieldPass` compiles a fragment against `FullScreenShaderScene.vertexSource` (`in vec2 v_uv`) with named
+  `sampler2D` inputs. `run(output:inputs:uniforms:)` checks everything before drawing:
+  - exactly the declared inputs are supplied;
+  - no input is the output (`inputIsOutput`);
+  - uniforms are active and of the right type;
+  - nothing is stale.
+
+  `run(pair:input:)` steps a `PingPongTarget` and swaps only on success. Passes built from the same source share one
+  cached program, so create one pass per source.
+
+```swift
+let format = FloatRenderSupport.detect(in: context.resources).storageFormat()
+let dye = try PingPongTarget(registry: context.resources, width: 128, height: 128, format: format, label: "dye")
+let fade = try FieldPass(registry: context.resources, fragment: fadeSource, inputs: ["uField"], label: "fade")
+try fade.run(pair: dye, input: "uField", uniforms: ["uFactor": .float(0.98)])   // reads dye.read, writes, swaps
+```
+
 ## Accessibility settings and effect bypass (feature 016, A01-P05)
 
 `SystemAccessibilityObserver` (VisualCoreUI, `@Observable`) publishes `current: SystemAccessibility`. Its values come
