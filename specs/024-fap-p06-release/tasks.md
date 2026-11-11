@@ -73,7 +73,7 @@ IDs are `T-A02-6##`, with one commit per task (`scripts/tick_task.py`). Commands
     `CFBundleShortVersionString` 1.0.0 and `CFBundleVersion` 1.
 
   Run on 27.2 and 26.5 (FR-A02-603, SC-A02-602).
-- [ ] T-A02-605 [US1] Build Release for generic iOS (unsigned) and run `check_privacy_manifest.py --app` to read
+- [X] T-A02-605 [US1] Build Release for generic iOS (unsigned) and run `check_privacy_manifest.py --app` to read — Verified 2026-11-11: — Verified 2026-11-11: Resources/PrivacyInfo.xcprivacy (tracking false, no domains, no collected data; FileTimestamp C617.1 = _stat in ANGLE libEGL, same pin and source check as A01; SystemBootTime 35F9.1 = CACurrentMediaTime/systemUptime frame timing in the app and mach_absolute_time in libGLESv2; no UserDefaults: the app stores none). A bootstrap empty manifest scan (t605-release-build-2) showed exactly these 2 undeclared; after: run-check A02-P06/t605-release-build-3 BUILD SUCCEEDED with the manifest in the bundle, t605-privacy-scan PASS 2 detected / 2 declared, t605-release-symbols 0
   the required-reason categories. Write `Apps/FluidArtPlayground/Resources/PrivacyInfo.xcprivacy` with:
   - tracking false, no domains, no collected data;
   - exactly the found categories, with reasons (ANGLE FileTimestamp C617.1 and SystemBootTime 35F9.1 as in A01's

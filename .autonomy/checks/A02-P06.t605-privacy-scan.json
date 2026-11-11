@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_privacy_manifest.py",
+    "--app",
+    "Build/DerivedData/release-FluidArtPlayground-Release/Build/Products/Release-iphoneos/FluidArtPlayground.app"
+  ],
+  "command": "python3 scripts/check_privacy_manifest.py --app Build/DerivedData/release-FluidArtPlayground-Release/Build/Products/Release-iphoneos/FluidArtPlayground.app",
+  "elapsed_seconds": 0.135,
+  "exit_code": 0,
+  "finished": "2026-11-11T11:24:30+00:00",
+  "log": ".autonomy/logs/A02-P06.t605-privacy-scan.log",
+  "log_sha256": "e9a7b767a1941057a781152e5d3fb0df2e6646ca0fdf18ecd24386d95552b68f",
+  "name": "t605-privacy-scan",
+  "stage": "A02-P06",
+  "started": "2026-11-11T11:24:30+00:00",
+  "timed_out": false
+}
