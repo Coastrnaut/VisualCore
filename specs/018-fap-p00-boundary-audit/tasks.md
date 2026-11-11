@@ -31,7 +31,7 @@ commit and push per task (`scripts/tick_task.py`). Review checkpoint: after each
 
 ## Phase 3: US2 — Host, thread, build and regression baseline (P1)
 
-- [ ] T-A02-003 [US2] Run the 7-step reference regression in two `run-check` chunks (A02-P00), and record the steps,
+- [X] T-A02-003 [US2] Run the 7-step reference regression in two `run-check` chunks (A02-P00), and record the steps, — Verified 2026-11-11: run-check A02-P00/t003-reference-a 3/3 (engine xcframework, projectM-iOS simulator build, reference clean at d93edd1) and t003-reference-b 4/4 (ANGLERendering 14/14 on iOS 27.2 and 26.5, ProjectMReference 17/17 on both) = 7/7; steps, commands and results recorded in docs/apps/fluid-art-playground/regression-baseline.md (FR-A02-004, SC-A02-004)
   commands and results in `docs/apps/fluid-art-playground/regression-baseline.md` (FR-A02-004, SC-A02-004).
 
 ## Phase 4: US3 — Compilable empty app shell (P1)
