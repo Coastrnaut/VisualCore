@@ -277,6 +277,8 @@ VisualCoreMath | var | public var x: Double, y: Double, z: Double, w: Double
 VisualCoreMath | var | public var xyz: Vec3
 VisualCoreMath | var | public var yaw: Double
 VisualCoreMath | var | public var zoom: Double
+VisualCoreParameters | enum | public enum ParametersInfo
+VisualCoreParameters | let | public static let version
 VisualCorePersistence | enum | public enum PersistenceInfo
 VisualCorePersistence | let | public static let version
 VisualCoreRendering | class | public final class ClearColorScene: RenderScene

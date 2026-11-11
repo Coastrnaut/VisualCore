@@ -17,7 +17,7 @@ regression.
 
 ## Phase 1: Setup
 
-- [ ] T-A01-101 Add the `VisualCoreParameters` target, product and test target to `Packages/VisualCore/Package.swift` (Foundation only, rule R2). Add a package-map row for the new module in `specs/002-architecture-contracts/contracts/package-map.md` (pure, depends on Foundation only). Add `Apps/GenerativeArtStudio/Core/Package.swift` (`GenerativeArtStudioCore`, macOS 15 + iOS 26, depending on `../../../Packages/VisualCore` products Parameters, Simulation and Math) with an empty test target.
+- [X] T-A01-101 Add the `VisualCoreParameters` target, product and test target to `Packages/VisualCore/Package.swift` (Foundation only, rule R2). Add a package-map row for the new module in `specs/002-architecture-contracts/contracts/package-map.md` (pure, depends on Foundation only). Add `Apps/GenerativeArtStudio/Core/Package.swift` (`GenerativeArtStudioCore`, macOS 15 + iOS 26, depending on `../../../Packages/VisualCore` products Parameters, Simulation and Math) with an empty test target. — Verified 2026-11-10: Packages/VisualCore/Package.swift: VisualCoreParameters target/product + VisualCoreParametersTests + VisualCoreTestSupportTests; package-map row added (Foundation only); Apps/GenerativeArtStudio/Core/Package.swift (GenerativeArtStudioCore → VisualCore Parameters/Simulation/Math); run-check A01-P01/t101-visualcore-host and t101-core-host swift test pass; check_dependencies R1-R5 PASS; API baseline updated (+ParametersInfo)
 
 ## Phase 2: Foundational — VisualCore building blocks (US3; blocks US1 and US2)
 

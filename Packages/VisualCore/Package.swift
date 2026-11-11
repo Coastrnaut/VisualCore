@@ -4,7 +4,8 @@
 import PackageDescription
 
 let pure = ["VisualCoreMath", "VisualCoreSimulation", "VisualCoreScenes", "VisualCoreShaderSource",
-            "VisualCoreEffectsGraph", "VisualCoreDiagnostics", "VisualCoreAudioDSP", "VisualCorePersistence"]
+            "VisualCoreEffectsGraph", "VisualCoreDiagnostics", "VisualCoreAudioDSP", "VisualCorePersistence",
+            "VisualCoreParameters"]
 
 let package = Package(
     name: "VisualCore",
@@ -20,6 +21,8 @@ let package = Package(
         .target(name: "VisualCoreDiagnostics"),
         .target(name: "VisualCoreAudioDSP"),
         .target(name: "VisualCorePersistence"),
+        // Parameter schemas, palettes, presets and stable hashes (feature 012 A01-P01; Foundation only, rule R2).
+        .target(name: "VisualCoreParameters"),
         // Host performance baselines (feature 010 T-F909); an executable, never a library dependency.
         .executableTarget(name: "VisualCoreBaselines",
                           dependencies: ["VisualCoreMath", "VisualCoreSimulation", "VisualCoreScenes", "VisualCoreShaderSource", "VisualCoreEffectsGraph"]),
@@ -29,6 +32,8 @@ let package = Package(
         .testTarget(name: "VisualCoreSimulationTests", dependencies: ["VisualCoreSimulation", "VisualCoreMath"]),
         .testTarget(name: "VisualCoreScenesTests", dependencies: ["VisualCoreScenes", "VisualCoreMath"]),
         .testTarget(name: "VisualCoreDiagnosticsTests", dependencies: ["VisualCoreDiagnostics"]),
+        .testTarget(name: "VisualCoreParametersTests", dependencies: ["VisualCoreParameters"]),
+        .testTarget(name: "VisualCoreTestSupportTests", dependencies: ["VisualCoreTestSupport"]),
         .testTarget(name: "VisualCoreShaderSourceTests", dependencies: ["VisualCoreShaderSource"]),
         .testTarget(name: "VisualCoreEffectsGraphTests", dependencies: ["VisualCoreEffectsGraph"], resources: [.copy("Fixtures")]),
         .testTarget(name: "VisualCoreScaffoldTests",
