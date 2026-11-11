@@ -109,4 +109,35 @@ final class ControlTests: XCTestCase {
         XCTAssertEqual(model.scene.stepCount, 2)
         XCTAssertTrue(model.scene.paused)
     }
+
+    /// T-A02-505 (analyze G3): Reset during a swipe ends that stroke (its later samples add nothing); painting resumes
+    /// with the next touch. The model's controls follow SimulationControl and keep the pause.
+    func testResetDuringSwipeEndsTheStroke() throws {
+        let model = try makeModel()
+        defer { model.close() }
+        let host = try XCTUnwrap(model.host)
+        model.togglePause()
+        XCTAssertTrue(model.control.paused)
+        XCTAssertTrue(model.scene.paused)
+        model.handle(PointerEvent(id: 1, phase: .began, location: Vec2(20, 50), timestamp: 0))
+        model.handle(PointerEvent(id: 1, phase: .moved, location: Vec2(40, 60), timestamp: 0.05))
+        XCTAssertGreaterThan(model.queue.pendingCount, 0)
+        model.resetCanvas()
+        XCTAssertEqual(model.queue.pendingCount, 0, "queued touches are dropped")
+        model.handle(PointerEvent(id: 1, phase: .moved, location: Vec2(60, 70), timestamp: 0.1))
+        model.handle(PointerEvent(id: 1, phase: .ended, location: Vec2(70, 80), timestamp: 0.15))
+        XCTAssertEqual(model.queue.pendingCount, 0, "the ended stroke adds nothing")
+        XCTAssertTrue(host.renderOneFrame(present: false))
+        XCTAssertEqual(model.scene.resetCount, 1)
+        XCTAssertTrue(model.control.paused, "Reset keeps the pause")
+        model.handle(PointerEvent(id: 2, phase: .began, location: Vec2(30, 30), timestamp: 0.2))
+        XCTAssertGreaterThan(model.queue.pendingCount, 0, "a new touch paints again")
+        model.step()
+        XCTAssertTrue(host.renderOneFrame(present: false))
+        XCTAssertEqual(model.scene.stepCount, 1)
+        model.togglePause()
+        XCTAssertFalse(model.scene.paused)
+        model.step()
+        XCTAssertFalse(model.scene.stepRequested, "Step does nothing while running")
+    }
 }

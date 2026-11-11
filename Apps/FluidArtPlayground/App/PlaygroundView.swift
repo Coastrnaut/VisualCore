@@ -167,7 +167,50 @@ final class PlaygroundModel {
     var description: String {
         // Reads the observed `configuration` so VoiceOver's label follows palette and tuning changes.
         FluidCanvasDescription.text(configuration: configuration, storage: scene.precision ?? .unorm8,
-                                    paused: scene.paused || host?.state != .active, splashes: splashes)
+                                    paused: control.paused || scene.paused || host?.state != .active, splashes: splashes)
+    }
+
+    // MARK: Pause, Step, Reset (feature 023 T-A02-505; FR-A02-501–FR-A02-503)
+
+    /// Running or paused, with the control labels and hints (FluidArtPlaygroundCore).
+    private(set) var control = SimulationControl()
+    /// Resets applied (shown nowhere; read by tests).
+    private(set) var resets = 0
+
+    /// Pauses or resumes the simulation; the canvas keeps displaying while paused.
+    func togglePause() {
+        let announcement = control.toggle()
+        scene.paused = control.paused
+        announce(announcement)
+    }
+
+    /// Runs exactly one simulation step on the next frame; only while paused.
+    func step() {
+        guard control.stepEnabled else { return }
+        scene.requestStep()
+        announce(.stepped)
+    }
+
+    /// Back to the starting picture: strokes in progress end, queued touches are dropped, the fields restart from the
+    /// seed on the next frame. The pause state, tuning, palette and brush are kept; the renderer is not rebuilt.
+    func resetCanvas() {
+        endStrokes()
+        _ = queue.drain()
+        scene.resetFields()
+        resets += 1
+        announce(.reset)
+    }
+
+    /// Ends every active stroke (the fingers must lift and touch again to paint).
+    private func endStrokes() {
+        for id in pointers.active.keys {
+            _ = tracker.handle(PointerEvent(id: id, phase: .cancelled, location: Vec2(0, 0), timestamp: clock()))
+            queue.forget(pointer: id)
+        }
+    }
+
+    private func announce(_ announcement: SimulationControl.Announcement) {
+        AccessibilityNotification.Announcement(announcement.text).post()
     }
 
     /// Still capture (feature 022).
@@ -233,6 +276,35 @@ struct PlaygroundView: View {
                 }
                 .accessibilityIdentifier("fap.capture")
                 .disabled(model?.host == nil)
+            }
+            // Pause, Step and Reset (feature 023 FR-A02-501): VoiceOver reads each label, value and hint.
+            ToolbarItemGroup(placement: .bottomBar) {
+                if let model, model.host != nil {
+                    Button {
+                        model.togglePause()
+                    } label: {
+                        Label(model.control.pauseLabel, systemImage: model.control.paused ? "play.fill" : "pause.fill")
+                    }
+                    .accessibilityIdentifier("fap.pause")
+                    .accessibilityHint(model.control.paused ? "Continues the simulation" : "Freezes the fluid; the picture stays on screen")
+                    Spacer()
+                    Button {
+                        model.step()
+                    } label: {
+                        Label("Step", systemImage: "forward.frame.fill")
+                    }
+                    .accessibilityIdentifier("fap.step")
+                    .accessibilityHint(model.control.stepHint)
+                    .disabled(!model.control.stepEnabled)
+                    Spacer()
+                    Button {
+                        model.resetCanvas()
+                    } label: {
+                        Label("Reset canvas", systemImage: "arrow.counterclockwise")
+                    }
+                    .accessibilityIdentifier("fap.reset")
+                    .accessibilityHint("Returns the fluid to the starting picture; your settings are kept")
+                }
             }
             ToolbarItem(placement: .primaryAction) {
                 Button {

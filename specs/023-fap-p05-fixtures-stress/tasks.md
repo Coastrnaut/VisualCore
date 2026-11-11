@@ -69,7 +69,7 @@ research R1–R7, data model, contract, quickstart).
   - a capture while paused after steps leaves the step count unchanged (analyze G2).
 
   Run on 27.2 and 26.5 with the guard (FR-A02-501–503, SC-A02-501).
-- [ ] T-A02-505 [US1] Model and UI in `Apps/FluidArtPlayground/App/PlaygroundView.swift`:
+- [X] T-A02-505 [US1] Model and UI in `Apps/FluidArtPlayground/App/PlaygroundView.swift`: — Verified 2026-11-11: — Verified 2026-11-11: PlaygroundModel.togglePause/step/resetCanvas (SimulationControl; reset ends active strokes, drops queued touches, keeps pause/tuning; VoiceOver announcements), bottom-bar fap.pause/fap.step (disabled while running, hint)/fap.reset, canvas description follows the observed pause; ControlTests.testResetDuringSwipeEndsTheStroke, ControlsUITests.testPauseStepResetResume, audit gains the paused playground (default + XXXL, no new issues); run-check A02-P05/t505-app-ios27 and t505-app-ios26 TEST SUCCEEDED, enumeration 54/54 each
   - `togglePause()`, `step()`, `resetCanvas()`; reset ends active strokes, empties the queue, keeps pause and tuning,
     and renders one frame so a paused canvas shows the seed;
   - toolbar controls `fap.pause`, `fap.step` (disabled while running, with the hint) and `fap.reset` ("Reset canvas");

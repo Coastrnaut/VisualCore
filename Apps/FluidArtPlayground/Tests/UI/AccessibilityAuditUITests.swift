@@ -1,4 +1,4 @@
-// AccessibilityAuditUITests — feature 020 T-A02-213 (SC-A02-205; analyze U1; constitution A02 accessibility).
+// AccessibilityAuditUITests — feature 020 T-A02-213 (paused state: feature 023 T-A02-505) (SC-A02-205; analyze U1; constitution A02 accessibility).
 // Runs the system accessibility audit on home and playground at the default and the largest accessibility text size,
 // following the A01 pattern (feature 016). Documented exclusions (spec 020 Clarifications): contrast of the artwork
 // inside the live canvas, navigation-bar chrome, and findings without an element. Each ignored finding is logged.
@@ -59,6 +59,11 @@ final class AccessibilityAuditUITests: XCTestCase {
         open.tap()
         XCTAssertTrue(app.buttons["fap.splash"].waitForExistence(timeout: 10))
         try audit(app, "playground [\(label)]", types: types)
+        // Feature 023: the paused state (Resume, an enabled Step, Reset canvas).
+        app.buttons["fap.pause"].tap()
+        XCTAssertTrue(app.buttons["fap.step"].waitForExistence(timeout: 5))
+        try audit(app, "playground paused [\(label)]", types: types)
+        app.buttons["fap.pause"].tap()
         app.buttons["fap.adjust"].tap()
         XCTAssertTrue(app.sliders["fap.adjust.viscosity"].waitForExistence(timeout: 10))
         try audit(app, "adjust [\(label)]", types: types)
