@@ -19,7 +19,7 @@
   `lerp(a, b, t) = a + (b − a)·t` in x then y.
 - `sampleBilinear(cellX:cellY:) -> [Float]` (all channels).
 
-## FluidConfiguration additions (app Core, still version 1)
+## FluidConfiguration additions (app Core, still version 1; grid edge minimum lowered to 8, clarification 6)
 
 | Field | Default | Bounds |
 |---|---|---|
@@ -40,7 +40,8 @@
 
 ## SplatQueue (app Core)
 
-- `init(configuration:, gridSize:)`.
+- `init(configuration:)`: the grid size comes from the configuration. The playground passes the set-up
+  `scene.configuration`, so a device-capped grid is respected (T-A02-216).
 - `add(_ samples: [PointerVelocityTracker.Sample], viewSize: SIMD2<Double>)`:
   - converts each sample to a splat: y is flipped and normalized;
   - force = velocity (points/s) × (grid cells / view points per axis) × forceScale;
