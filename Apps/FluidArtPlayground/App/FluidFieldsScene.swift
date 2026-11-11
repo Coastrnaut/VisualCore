@@ -205,11 +205,18 @@ final class FluidFieldsScene: RenderScene {
                 stepCount += 1
             }
             try display.run(output: .framebuffer(name: context.framebuffer, width: context.pixelWidth, height: context.pixelHeight),
-                            inputs: ["uDye": dye.read])
+                            inputs: ["uDye": dye.read], uniforms: paletteUniforms)
         } catch {
             lastError = error
             throw error
         }
+    }
+
+    /// The display uniforms of the active palette (feature 022).
+    var palette: FluidPalette { FluidPalette.named(configuration.paletteID) }
+    private var paletteUniforms: [String: FieldUniform] {
+        let p = palette
+        return ["uMode": .int(Int32(p.mode.rawValue)), "uBackground": .vec4(SIMD4(p.background, 1))]
     }
 
     /// The solver uniforms shared by every pass (encoding, ranges, edge mode).

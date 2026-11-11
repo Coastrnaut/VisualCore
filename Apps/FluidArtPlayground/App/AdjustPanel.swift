@@ -13,6 +13,16 @@ struct AdjustPanel: View {
         NavigationStack {
             Form {
                 Section {
+                    Picker("Palette", selection: $model.configuration.paletteID) {
+                        ForEach(FluidPalette.all) { Text($0.name).tag($0.id) }
+                    }
+                    .pickerStyle(.segmented)
+                    .accessibilityIdentifier("fap.adjust.palette")
+                } header: {
+                    Text("Look")
+                }
+                .headerProminence(.increased)
+                Section {
                     slider("Viscosity", id: "fap.adjust.viscosity", value: $model.configuration.viscosity,
                            range: FluidConfiguration.viscosityRange, step: 0.05,
                            text: String(format: "%.2f", model.configuration.viscosity), unit: "")

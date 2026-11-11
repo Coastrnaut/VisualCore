@@ -242,6 +242,10 @@ targets:
         product: VisualCoreRendering
       - package: VisualCoreRendering
         product: VisualCoreUI
+      - package: VisualCoreRendering
+        product: VisualCoreEffects
+      - package: VisualCore
+        product: VisualCoreEffectsGraph
     postBuildScripts:
       # FR-A02-006: the build fails if the app depends on ProjectM engine/preset/bridge modules.
       - name: Dependency audit (FR-A02-006)

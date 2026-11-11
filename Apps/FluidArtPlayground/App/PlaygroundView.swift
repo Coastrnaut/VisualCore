@@ -7,6 +7,8 @@ import FluidArtPlaygroundCore
 import QuartzCore
 import SwiftUI
 import VisualCoreDiagnostics
+import VisualCoreEffects
+import VisualCoreEffectsGraph
 import VisualCoreMath
 import VisualCoreRendering
 import VisualCoreScenes
@@ -16,13 +18,22 @@ import VisualCoreUI
 @Observable
 final class PlaygroundModel {
     let scene: FluidFieldsScene
+    /// Wraps the fluid scene with VisualCore's effect graph: a bloom for Glowing dye, bypassed for Ink and Smoke,
+    /// with the flash limiter under Reduce Flashing (feature 022 FR-A02-403).
+    let effects: EffectScene
+    /// The system's Reduce Flashing ("Dim Flashing Lights") and Reduce Motion state.
+    let accessibility = SystemAccessibilityObserver()
     private(set) var host: RenderHost?
     private(set) var failure: String?
     private(set) var splashes = 0
     private(set) var queue: SplatQueue
     /// The live tuning (feature 021): every change reaches the scene on the next frame without a rebuild.
     var configuration: FluidConfiguration {
-        didSet { scene.update(configuration: configuration) }
+        didSet {
+            scene.update(configuration: configuration)
+            queue.update(configuration: scene.configuration)
+            applyEffects()
+        }
     }
     /// The automatic quality tier (feature 021 T-A02-308; FR-A02-308), decided every stepped frame by VisualCore's
     /// QualityPolicy from the thermal state and Low Power Mode, read locally and never stored.
@@ -43,9 +54,10 @@ final class PlaygroundModel {
         scene = FluidFieldsScene(configuration: configuration, maxEdge: maxEdge)
         queue = SplatQueue(configuration: configuration)
         self.configuration = scene.configuration
+        effects = EffectScene(content: scene, graph: Self.glowGraph)
         scene.splatSource = { [weak self] in self?.drain() ?? [] }
         do {
-            let host = try RenderHost(scene: scene)
+            let host = try RenderHost(scene: effects)
             host.pointerHandler = { [weak self] event in self?.handle(event) }
             self.host = host
         } catch {
@@ -55,6 +67,20 @@ final class PlaygroundModel {
         // the fields really use (feature 020 T-A02-216).
         queue = SplatQueue(configuration: scene.configuration)
         self.configuration = scene.configuration
+        applyEffects()
+    }
+
+    /// The glow: VisualCore's bloom (threshold 0.6, intensity 1.2, radius 8; spec 022 clarification 1).
+    static let glowGraph = EffectGraphDescription(passes: [
+        EffectPassDescription(id: "glow", type: "bloom", inputs: ["input": "scene"], output: "glow",
+                              params: ["threshold": [0.6], "intensity": [1.2], "radius": [8]]),
+    ], output: "glow")
+
+    /// Glow only for Glowing dye; Reduce Flashing adds VisualCore's flash limiter.
+    func applyEffects() {
+        effects.bypassEffects = !scene.palette.glow
+        accessibility.refresh()
+        effects.reduceFlashing = accessibility.current.dimFlashingLights
     }
 
     /// Returns every tuning value to its default (the grid stays as set up).
@@ -98,6 +124,8 @@ final class PlaygroundModel {
             tier = decided
             tierName = FluidQuality.name(decided)
         }
+        // Follows Reduce Flashing changes during the session (EffectScene rebuilds only on a change).
+        effects.reduceFlashing = accessibility.current.dimFlashingLights
         let parameters = FluidQuality.parameters(tier: tier, configuration: configuration)
         scene.qualityIterations = parameters.iterations
         return queue.drain(max: parameters.splatCap)

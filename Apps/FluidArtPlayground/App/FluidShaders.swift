@@ -212,15 +212,28 @@ enum FluidShaders {
     void main() { color = texelFetch(uField, ivec2(gl_FragCoord.xy), 0); }
     """
 
-    /// Shows the dye over a near-black background.
+    /// Shows the dye in the active palette (feature 022; spec 022 clarification 1). `uMode` 0 ink:
+    /// `paper·exp(−2·dye)`; 1 smoke: background toward 0.92 by `1 − exp(−1.5·luma)`; 2 glow: clamped dye on black
+    /// (the bloom is VisualCore's effect graph). Matches FluidPalette.displayColor.
     static let display = """
     precision highp float;
     uniform sampler2D uDye;
+    uniform int uMode;
+    uniform vec4 uBackground;
     in vec2 v_uv;
     out vec4 color;
     void main() {
-        vec3 dye = clamp(texture(uDye, v_uv).rgb, 0.0, 1.0);
-        color = vec4(max(dye, vec3(0.02, 0.02, 0.04)), 1.0);
+        vec3 d = max(texture(uDye, v_uv).rgb, vec3(0.0));
+        vec3 c;
+        if (uMode == 0) {
+            c = uBackground.rgb * exp(-2.0 * d);
+        } else if (uMode == 1) {
+            float l = 0.2126 * d.r + 0.7152 * d.g + 0.0722 * d.b;
+            c = uBackground.rgb + (vec3(0.92) - uBackground.rgb) * (1.0 - exp(-1.5 * l));
+        } else {
+            c = min(d, vec3(1.0));
+        }
+        color = vec4(c, 1.0);
     }
     """
 }
