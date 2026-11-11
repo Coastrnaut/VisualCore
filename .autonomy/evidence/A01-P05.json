@@ -1,0 +1,206 @@
+{
+  "checks": [
+    {
+      "attestation": ".autonomy/checks/A01-P05.t501-visualcore-host.json",
+      "command": "swift test --package-path Packages/VisualCore",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A01-P05.t501-visualcore-host.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A01-P05.t502-rendering-ios26.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-26.5 --action test --result-name a01p05-t502-rendering-ios26",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A01-P05.t502-rendering-ios26.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A01-P05.t502-rendering-ios27.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --result-name a01p05-t502-rendering-ios27",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A01-P05.t502-rendering-ios27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A01-P05.t503-fast.json",
+      "command": "python3 scripts/release_check.py --log-dir .autonomy/logs/a01p05-t503-fast --json .autonomy/logs/a01p05-t503-fast/summary.json --only docs dependencies public-api compliance host-visualcore",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A01-P05.t503-fast.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A01-P05.t503-reference-a.json",
+      "command": "python3 scripts/release_check.py --log-dir .autonomy/logs/a01p05-t503-ref-a --json .autonomy/logs/a01p05-t503-ref-a/summary.json --only reference-engine-xcframework reference-build-projectm-ios-sim reference-clean",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A01-P05.t503-reference-a.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A01-P05.t503-reference-b.json",
+      "command": "python3 scripts/release_check.py --log-dir .autonomy/logs/a01p05-t503-ref-b --json .autonomy/logs/a01p05-t503-ref-b/summary.json --only reference-test-anglerendering-ios27 reference-test-anglerendering-ios26 projectm-reference-ios27 projectm-reference-ios26",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A01-P05.t503-reference-b.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A01-P05.t504-app-all-ios26.json",
+      "command": "xcodebuild test -project VisualCore.xcodeproj -scheme GenerativeArtStudio -destination 'platform=iOS Simulator,id=EC7498FF-31FF-4491-9666-B0D32785203C' -derivedDataPath Build/DerivedData/GenerativeArtStudio -resultBundlePath .autonomy/xcresults/a01p05-t504-ios26-1794375404.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 180 CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A01-P05.t504-app-all-ios26.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A01-P05.t504-app-all-ios27.json",
+      "command": "xcodebuild test -project VisualCore.xcodeproj -scheme GenerativeArtStudio -destination 'platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D' -derivedDataPath Build/DerivedData/GenerativeArtStudio -resultBundlePath .autonomy/xcresults/a01p05-t504-ios27-1794375183.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 180 CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A01-P05.t504-app-all-ios27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A01-P05.t505-apply-settings-ios26.json",
+      "command": "xcodebuild test -project VisualCore.xcodeproj -scheme GenerativeArtStudio -destination 'platform=iOS Simulator,id=EC7498FF-31FF-4491-9666-B0D32785203C' -derivedDataPath Build/DerivedData/GenerativeArtStudio -resultBundlePath .autonomy/xcresults/a01p05-t505-ios26-1794375839.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 180 -only-testing:GenerativeArtStudioTests/AccessibilityApplyTests -only-testing:GenerativeArtStudioUITests/SettingsUITests CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A01-P05.t505-apply-settings-ios26.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A01-P05.t505-apply-settings-ios27.json",
+      "command": "xcodebuild test -project VisualCore.xcodeproj -scheme GenerativeArtStudio -destination 'platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D' -derivedDataPath Build/DerivedData/GenerativeArtStudio -resultBundlePath .autonomy/xcresults/a01p05-t505-ios27-1794375806.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 180 -only-testing:GenerativeArtStudioTests/AccessibilityApplyTests -only-testing:GenerativeArtStudioUITests/SettingsUITests CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A01-P05.t505-apply-settings-ios27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A01-P05.t506-app-build.json",
+      "command": "xcodebuild build -project VisualCore.xcodeproj -scheme GenerativeArtStudio -destination 'platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D' -derivedDataPath Build/DerivedData/GenerativeArtStudio CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A01-P05.t506-app-build.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A01-P05.t506-core-tests-a2.json",
+      "command": "swift test --package-path Apps/GenerativeArtStudio/Core",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A01-P05.t506-core-tests-a2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A01-P05.t507-enumeration-guard-ios27.json",
+      "command": "python3 scripts/check_test_enumeration.py --sources Apps/GenerativeArtStudio/Tests/UI --log .autonomy/logs/A01-P05.t507-ui-all-ios27.log",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A01-P05.t507-enumeration-guard-ios27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A01-P05.t507-enumeration-guard.json",
+      "command": "python3 scripts/check_test_enumeration.py --sources Apps/GenerativeArtStudio/Tests/UI --log .autonomy/logs/A01-P05.t507-ui-all-ios26-a2.log",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A01-P05.t507-enumeration-guard.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A01-P05.t507-ui-all-ios26-a2.json",
+      "command": "xcodebuild test -project VisualCore.xcodeproj -scheme GenerativeArtStudio -destination 'platform=iOS Simulator,id=EC7498FF-31FF-4491-9666-B0D32785203C' -derivedDataPath Build/DerivedData/GenerativeArtStudio -resultBundlePath .autonomy/xcresults/a01p05-t507-ios26-a2-1794377559.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 300 -only-testing:GenerativeArtStudioUITests CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A01-P05.t507-ui-all-ios26-a2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A01-P05.t507-ui-all-ios26.json",
+      "command": "xcodebuild test -project VisualCore.xcodeproj -scheme GenerativeArtStudio -destination 'platform=iOS Simulator,id=EC7498FF-31FF-4491-9666-B0D32785203C' -derivedDataPath Build/DerivedData/GenerativeArtStudio -resultBundlePath .autonomy/xcresults/a01p05-t507-ios26-1794377363.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 300 -only-testing:GenerativeArtStudioUITests CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A01-P05.t507-ui-all-ios26.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A01-P05.t507-ui-all-ios27.json",
+      "command": "xcodebuild test -project VisualCore.xcodeproj -scheme GenerativeArtStudio -destination 'platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D' -derivedDataPath Build/DerivedData/GenerativeArtStudio -resultBundlePath .autonomy/xcresults/a01p05-t507-ios27-1794377087.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 300 -only-testing:GenerativeArtStudioUITests CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A01-P05.t507-ui-all-ios27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A01-P05.t508-enumeration-ios26.json",
+      "command": "python3 scripts/check_test_enumeration.py --sources Apps/GenerativeArtStudio/Tests/Unit --log .autonomy/logs/A01-P05.t508-unit-ios26.log",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A01-P05.t508-enumeration-ios26.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A01-P05.t508-enumeration-ios27.json",
+      "command": "python3 scripts/check_test_enumeration.py --sources Apps/GenerativeArtStudio/Tests/Unit --log .autonomy/logs/A01-P05.t508-unit-ios27.log",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A01-P05.t508-enumeration-ios27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A01-P05.t508-unit-ios26.json",
+      "command": "xcodebuild test -project VisualCore.xcodeproj -scheme GenerativeArtStudio -destination 'platform=iOS Simulator,id=EC7498FF-31FF-4491-9666-B0D32785203C' -derivedDataPath Build/DerivedData/GenerativeArtStudio -resultBundlePath .autonomy/xcresults/a01p05-t508-ios26-1794377964.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 180 -only-testing:GenerativeArtStudioTests CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A01-P05.t508-unit-ios26.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A01-P05.t508-unit-ios27.json",
+      "command": "xcodebuild test -project VisualCore.xcodeproj -scheme GenerativeArtStudio -destination 'platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D' -derivedDataPath Build/DerivedData/GenerativeArtStudio -resultBundlePath .autonomy/xcresults/a01p05-t508-ios27-1794377925.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 180 -only-testing:GenerativeArtStudioTests CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A01-P05.t508-unit-ios27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A01-P05.t509-documented-api-app.json",
+      "command": "python3 scripts/check_documented_api.py --sources Apps/GenerativeArtStudio",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A01-P05.t509-documented-api-app.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A01-P05.t509-release-fast.json",
+      "command": "python3 scripts/release_check.py --log-dir .autonomy/logs/a01p05-t509-fast --json .autonomy/logs/a01p05-t509-fast/summary.json --only docs app-contracts compliance dependencies public-api licenses script-tests host-visualcore",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A01-P05.t509-release-fast.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A01-P05.t510-fast-a2.json",
+      "command": "python3 scripts/release_check.py --log-dir .autonomy/logs/a01p05-t510-fast-a2 --json .autonomy/logs/a01p05-t510-fast-a2/summary.json --only docs dependencies public-api compliance host-visualcore",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A01-P05.t510-fast-a2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A01-P05.t510-reference-a.json",
+      "command": "python3 scripts/release_check.py --log-dir .autonomy/logs/a01p05-t510-ref-a --json .autonomy/logs/a01p05-t510-ref-a/summary.json --only reference-engine-xcframework reference-build-projectm-ios-sim reference-clean",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A01-P05.t510-reference-a.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A01-P05.t510-reference-b.json",
+      "command": "python3 scripts/release_check.py --log-dir .autonomy/logs/a01p05-t510-ref-b --json .autonomy/logs/a01p05-t510-ref-b/summary.json --only reference-test-anglerendering-ios27 reference-test-anglerendering-ios26 projectm-reference-ios27 projectm-reference-ios26",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A01-P05.t510-reference-b.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A01-P05.t510-rendering-ios26.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-26.5 --action test --result-name a01p05-t510-rendering-ios26",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A01-P05.t510-rendering-ios26.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A01-P05.t510-rendering-ios27.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --result-name a01p05-t510-rendering-ios27",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A01-P05.t510-rendering-ios27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A01-P05.t511-app-all-ios26-guard.json",
+      "command": "python3 scripts/check_test_enumeration.py --sources Apps/GenerativeArtStudio/Tests --log .autonomy/logs/A01-P05.t511-app-all-ios26.log",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A01-P05.t511-app-all-ios26-guard.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A01-P05.t511-app-all-ios26.json",
+      "command": "xcodebuild test -project VisualCore.xcodeproj -scheme GenerativeArtStudio -destination 'platform=iOS Simulator,id=EC7498FF-31FF-4491-9666-B0D32785203C' -derivedDataPath Build/DerivedData/GenerativeArtStudio -resultBundlePath .autonomy/xcresults/a01p05-t511-ios26-1794378737.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 300 CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A01-P05.t511-app-all-ios26.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A01-P05.t511-app-all-ios27-a2-guard.json",
+      "command": "python3 scripts/check_test_enumeration.py --sources Apps/GenerativeArtStudio/Tests --log .autonomy/logs/A01-P05.t511-app-all-ios27-a2.log",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A01-P05.t511-app-all-ios27-a2-guard.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A01-P05.t511-app-all-ios27-a2.json",
+      "command": "xcodebuild test -project VisualCore.xcodeproj -scheme GenerativeArtStudio -destination 'platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D' -derivedDataPath Build/DerivedData/GenerativeArtStudio -resultBundlePath .autonomy/xcresults/a01p05-t511-ios27-a2-1794379059.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 300 CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A01-P05.t511-app-all-ios27-a2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A01-P05.t511-controls-ios26.json",
+      "command": "xcodebuild test -project VisualCore.xcodeproj -scheme GenerativeArtStudio -destination 'platform=iOS Simulator,id=EC7498FF-31FF-4491-9666-B0D32785203C' -derivedDataPath Build/DerivedData/GenerativeArtStudio -resultBundlePath .autonomy/xcresults/a01p05-t511-controls-ios26-1794379381.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 300 -only-testing:GenerativeArtStudioUITests/ControlsUITests CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A01-P05.t511-controls-ios26.log"
+    }
+  ],
+  "generated": "2026-11-11T06:44:08+00:00",
+  "method": "deterministic-run-check",
+  "stage": "A01-P05",
+  "status": "pass"
+}
