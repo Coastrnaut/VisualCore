@@ -178,7 +178,7 @@ clamp, and that the spoken description includes the limit.
   - a one-finger drag pans exactly with the finger;
   - the mapping uses VisualCore's pointer tracker and recognizers;
   - Zoom in (×2), Zoom out (×0.5) and Reset view controls are the alternatives.
-- **FR-A03-203**: A palette control MUST offer at least 4 VisualCore palettes. An animation toggle shifts the
+- **FR-A03-203**: A palette control MUST offer the VisualCore built-in palettes Sunset (default), Ocean, Forest, Neon and Ember. Monochrome is omitted, since its two stops make poor escape bands. An animation toggle shifts the
   palette along the bands at a fixed rate. It defaults to off when Reduce Motion is on.
 - **FR-A03-204**: VisualCore MUST report the fragment shader's `highp` and `mediump` float precision (range and
   mantissa bits) as part of the render capabilities (G-PRECISION), with tests, docs, the baseline and the ProjectM
@@ -186,8 +186,12 @@ clamp, and that the spoken description includes the limit.
 - **FR-A03-205**: VisualCore MUST provide a pure precision advisor (G-PRECISION). Given the mantissa bits, the
   coordinate magnitude and the pixel step, it returns *reliable*, *near limit* (< 16 steps) or *beyond limit*
   (< 1 step), and the smallest allowed pixel step. It has host tests, docs and a baseline entry.
-- **FR-A03-206**: The app MUST clamp zooming at the advisor's smallest step, show and announce "Near precision
-  limit" and "Precision limit reached", and include the state in the spoken description.
+- **FR-A03-206**: The app MUST clamp zooming at the advisor's smallest step and show a banner (`fe.precision`) below
+  the canvas.
+  - The banner says "Near precision limit — details may blur" or "Precision limit reached — zoom stops here".
+  - VoiceOver announces the text once each time the state changes, not on every frame.
+  - The banner disappears when the view is reliable again.
+  - The spoken description ends with the state when it is not reliable.
 - **FR-A03-207**: GPU escape classes MUST match the CPU reference on known 64 × 64 views in both modes (≥ 99% of
   pixels, with disagreements only next to boundary pixels). The origin and c = 2 pixels are checked.
 - **FR-A03-208**: The contract MUST record G-PRECISION as closed, with the reused VisualCore pieces. The checks MUST
