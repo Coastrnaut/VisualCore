@@ -94,7 +94,22 @@ public enum EffectGraphValidator {
             }
         }
         guard order.count == passes.count else {
-            throw .cycle(passes.map(\.id).filter { !order.contains($0) })
+            // Unordered passes are on a cycle or downstream of one; name only those on a cycle
+            // (a pass that reaches itself through unordered producers) — US1/AC2.
+            let ordered = Set(order)
+            var producersOf: [String: [String]] = [:]
+            for p in passes where !ordered.contains(p.id) {
+                producersOf[p.id] = Set(p.inputs.values.compactMap { outputs[$0] }).filter { !ordered.contains($0) }.sorted()
+            }
+            func reachesItself(_ start: String) -> Bool {
+                var stack = producersOf[start] ?? [], seen = Set<String>()
+                while let n = stack.popLast() {
+                    if n == start { return true }
+                    if seen.insert(n).inserted { stack.append(contentsOf: producersOf[n] ?? []) }
+                }
+                return false
+            }
+            throw .cycle(passes.map(\.id).filter { !ordered.contains($0) && reachesItself($0) })
         }
         return order
     }

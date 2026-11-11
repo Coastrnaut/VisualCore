@@ -95,3 +95,15 @@ private func validate(_ g: EffectGraphDescription, quota: Int = 256 << 20) throw
     }
     #expect(PassSchemas.maxPasses == 32)
 }
+
+// T-F420 (US1/AC2): only passes on the cycle are named, not passes downstream of it.
+@Test func cycleErrorExcludesDownstreamPasses() throws {
+    let g = EffectGraphDescription(passes: [
+        EffectPassDescription(id: "A", type: "copy", inputs: ["input": "scene"], output: "a"),
+        EffectPassDescription(id: "B", type: "copy", inputs: ["input": "c"], output: "b"),
+        EffectPassDescription(id: "C", type: "copy", inputs: ["input": "b"], output: "c"),
+        EffectPassDescription(id: "D", type: "copy", inputs: ["input": "c"], output: "d"),
+        EffectPassDescription(id: "E", type: "composite", inputs: ["base": "d", "overlay": "a"], output: "e"),
+    ], output: "e")
+    #expect(throws: EffectGraphError.cycle(["B", "C"])) { try validate(g) }
+}
