@@ -37,7 +37,7 @@ passes and the named tests are green.
 
 ## Phase 4: US2 — Forces never break the simulation (P1)
 
-- [ ] T-A04-209 [US2] Add `Tests/ParticleUniverseCoreTests/PlacedForceStabilityTests.swift`: for every placed kind at strength 2, a scene whose emitter sits exactly on the force, 10,000 fixed steps: 0 non-finite removals and every live position finite (SC-A04-202 at the app level, manual fixture 4).
+- [X] T-A04-209 [US2] Add `Tests/ParticleUniverseCoreTests/PlacedForceStabilityTests.swift`: for every placed kind at strength 2, a scene whose emitter sits exactly on the force, 10,000 fixed steps: 0 non-finite removals and every live position finite (SC-A04-202 at the app level, manual fixture 4). — Verified 2026-11-11: SceneSimulation.nonFiniteRemoved added; PlacedForceStabilityTests (5 kinds x 4 families): each family's emitter placed exactly on the force at strength 2, 10,000 fixed steps, 0 non-finite removals, every instance finite, particles alive. run-check A04-P02/t209-stability exit 0
 
 ## Phase 5: US3 — The particle count yields to the quality controller (P1)
 

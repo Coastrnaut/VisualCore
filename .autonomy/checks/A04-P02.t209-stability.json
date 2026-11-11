@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Apps/ParticleUniverse/ParticleUniverseCore",
+    "--filter",
+    "PlacedForceStabilityTests"
+  ],
+  "command": "swift test --package-path Apps/ParticleUniverse/ParticleUniverseCore --filter PlacedForceStabilityTests",
+  "elapsed_seconds": 15.055,
+  "exit_code": 0,
+  "finished": "2026-11-11T23:28:09+00:00",
+  "log": ".autonomy/logs/A04-P02.t209-stability.log",
+  "log_sha256": "9de3f1507529e67fee336972dc1b44d1c7a36223555cee58edc5e9a9da71c835",
+  "name": "t209-stability",
+  "stage": "A04-P02",
+  "started": "2026-11-11T23:27:54+00:00",
+  "timed_out": false
+}

@@ -107,6 +107,8 @@ public struct SceneSimulation: Sendable {
     public var liveCount: Int { runner.simulation.system.aliveCount }
     /// Particles not created because the limit was reached.
     public var droppedCount: Int { runner.simulation.system.droppedCount }
+    /// Particles removed because their state became NaN or infinite (feature 034: stays 0 for every placed force).
+    public var nonFiniteRemoved: Int { runner.simulation.system.nanRemoved }
     /// Commands ignored because their index named nothing suitable.
     public var ignoredCommands: Int { runner.simulation.ignoredCommands }
     /// Frames with an invalid time (NaN, infinite or negative).
