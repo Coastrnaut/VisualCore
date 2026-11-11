@@ -332,6 +332,15 @@ targets:
         product: VisualCoreMath
       - package: VisualCoreRendering
         product: VisualCoreUI
+      # Feature 027 (A03-P02): GPU render, gestures, palette clock and palettes.
+      - package: VisualCoreRendering
+        product: VisualCoreRendering
+      - package: VisualCore
+        product: VisualCoreScenes
+      - package: VisualCore
+        product: VisualCoreSimulation
+      - package: VisualCore
+        product: VisualCoreParameters
     postBuildScripts:
       # FR-A03-006: the build fails if the app depends on ProjectM engine/preset/bridge modules.
       - name: Dependency audit (FR-A03-006)

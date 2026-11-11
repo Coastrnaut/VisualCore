@@ -37,7 +37,7 @@ amendments), the plan, research R1–R4, the data model, the contract and the qu
 
 ## Phase 2: User Stories 1 and 3 — GPU render (P1) 🎯
 
-- [ ] T-A03-203 [US1] [US3] Add `Apps/FractalExplorer/App/FractalShaders.swift`, the fragment source per research R3.
+- [X] T-A03-203 [US1] [US3] Add `Apps/FractalExplorer/App/FractalShaders.swift`, the fragment source per research R3. — Verified 2026-11-11: — Verified 2026-11-11: App/FractalShaders.swift (escape-time fragment matching FractalMath: z²+c, |z|²>R² after step n, smooth n+1-log2(log|z|), loop bounded 10,000 with break at u_cap, palette via vc/palette.glsl, interior black) and App/FractalScene.swift (wraps VisualCore FullScreenShaderScene; SceneClock paused when animation off; uniforms centerX/centerY/step (plane units per pixel)/mode/seed/cap/radius/rate; linear-light palette stops); project.yml links VisualCoreRendering/Scenes/Simulation/Parameters. GPUAgreementTests 3: Mandelbrot 64x64 100.0% agreement (origin interior, c=2 exterior), Julia 99.90% with 0 unexplained (boundary-only), clock frozen/advancing with animation — run-check A03-P02/t203-app-ios27 and t203-app-ios26 TEST SUCCEEDED, enumeration guard on both
   Add `FractalScene.swift`, which wraps `FullScreenShaderScene`:
   - a clock, the uniforms, the palette and the error pass-through;
   - parameters `centerX`, `centerY`, `step`, `mode`, `seedX`, `seedY`, `cap`, `radius` and `rate`.
