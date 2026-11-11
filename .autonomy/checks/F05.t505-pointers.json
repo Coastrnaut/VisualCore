@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/VisualCore"
+  ],
+  "command": "swift test --package-path Packages/VisualCore",
+  "elapsed_seconds": 1.649,
+  "exit_code": 1,
+  "finished": "2026-11-11T00:39:14+00:00",
+  "log": ".autonomy/logs/F05.t505-pointers.log",
+  "log_sha256": "8582efa999dbde6e7725bb8a63f3a8a5002afbe91e3098aa8a6adeda410a0aaa",
+  "name": "t505-pointers",
+  "stage": "F05",
+  "started": "2026-11-11T00:39:12+00:00",
+  "timed_out": false
+}
