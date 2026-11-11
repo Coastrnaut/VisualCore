@@ -73,7 +73,8 @@ or App Store Connect action. Owner steps are written down, never performed.
 
 - [ ] T-A01-607 [US3] Add `Apps/GenerativeArtStudio/Core/Tests/GenerativeArtStudioCoreTests/Fixtures/library-v1/`
   (4 envelope files, one per family, kind `dev.visualcore.gas.composition`, schemaVersion 1, written by the current
-  `CompositionLibrary`) and `LibraryMigrationFixtureTests.swift`: 4 entries, 0 problems, documents equal to the
+  `CompositionLibrary` through a generator test that runs only with `GAS_WRITE_FIXTURE=1`, with fixed ids, names and
+  times; analyze U1) and `LibraryMigrationFixtureTests.swift`: 4 entries, 0 problems, documents equal to the
   expected compositions, files byte-identical after load. Add `App/LaunchCleanup.swift` (removes only `tmp/Exports`),
   called from `GenerativeArtStudioApp.init`, and `Tests/Unit/CrashRecoveryTests.swift`:
   - stale export and store temporary files are removed by cleanup and load, and saved files are untouched;
@@ -92,7 +93,8 @@ or App Store Connect action. Owner steps are written down, never performed.
 ## Phase 5: Polish
 
 - [ ] T-A01-609 Run `release_check.py --only app-release-generative-art-studio` and the fast steps, the full app
-  suites on both runtimes (enumeration-guarded), the contract check and the documented API. Update the
+  suites on both runtimes (enumeration-guarded, including `AccessibilityAuditUITests` as the manual's Phase 06
+  accessibility re-verification; analyze C1), the contract check and the documented API. Update the
   `release-checklist.md` evidence column and `docs/release/support-matrix.md` (Generative Art Studio: release
   candidate on simulators, devices pending campaign II) (FR-A01-611, SC-A01-606).
 
@@ -105,3 +107,8 @@ nothing new; T-A01-609 runs last.
 
 Shared tooling and the automation view first (Principle II), then the app artifacts each check needs, then data
 safety, automation, and the final release run.
+
+## Analyze remediation (2026-11-11)
+
+Applied autonomously (CLAUDE.md §2): U1 → T-A01-607 fixture generator; C1 → T-A01-609 names the accessibility audit. 0
+critical issues.
