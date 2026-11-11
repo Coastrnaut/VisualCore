@@ -16,6 +16,7 @@ final class FluidConfigurationTests: XCTestCase {
         XCTAssertEqual(c.brushRadius, 0.04)
         XCTAssertEqual(c.forceScale, 1.0)
         XCTAssertEqual(c.maxSplatsPerFrame, 16)
+        XCTAssertEqual(c.boundaryMode, .walls)
     }
 
     /// At least 8 out-of-range cases are clamped (or reset) and reported (SC-A02-103).
@@ -75,6 +76,7 @@ final class FluidConfigurationTests: XCTestCase {
 
     func testCodableRoundTrip() throws {
         var c = FluidConfiguration()
+        c.boundaryMode = .open
         c.seed = 0xDEAD_BEEF
         c.gridWidth = 64
         let data = try JSONEncoder().encode(c)

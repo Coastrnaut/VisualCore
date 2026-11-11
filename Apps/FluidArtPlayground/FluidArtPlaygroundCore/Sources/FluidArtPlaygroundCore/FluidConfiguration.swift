@@ -12,6 +12,14 @@ public struct ConfigurationIssue: Sendable, Equatable, Codable {
     public let applied: String
 }
 
+/// How the canvas edges behave (feature 021; spec 021 clarification 1).
+public enum BoundaryMode: String, Sendable, Codable, CaseIterable {
+    /// Fluid slides along the edges and cannot leave: velocity through an edge is zero after projection.
+    case walls
+    /// Fluid and dye flow out: edge cells keep their velocity.
+    case open
+}
+
 /// Simulation settings for the playground (version 1). Values outside their bounds are corrected by `validated`.
 public struct FluidConfiguration: Sendable, Equatable, Codable {
     /// Grid edge bounds before the device cap.
@@ -55,6 +63,8 @@ public struct FluidConfiguration: Sendable, Equatable, Codable {
     public var forceScale = 1.0
     /// Most splats applied in one frame (1…64); extra splats are thinned evenly along each path.
     public var maxSplatsPerFrame = 16
+    /// Edge behavior (walls by default).
+    public var boundaryMode = BoundaryMode.walls
 
     /// The defaults.
     public init() {}

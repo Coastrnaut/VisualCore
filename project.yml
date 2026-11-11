@@ -236,6 +236,8 @@ targets:
         product: VisualCoreSimulation
       - package: VisualCore
         product: VisualCoreScenes
+      - package: VisualCore
+        product: VisualCoreDiagnostics
       - package: VisualCoreRendering
         product: VisualCoreRendering
       - package: VisualCoreRendering
