@@ -20,7 +20,7 @@ IDs are `T-A01-5##`, with one commit and push per task (`scripts/tick_task.py`).
 
 ## Phase 1: Foundational — VisualCore accessibility settings (US4; blocks US1)
 
-- [ ] T-A01-501 [US4] Add `Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPreferences.swift`:
+- [X] T-A01-501 [US4] Add `Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPreferences.swift`: — Verified 2026-11-11: VisualCoreSimulation/AccessibilityPreferences.swift: AccessibilityChoice (system/on/off, titles, init(storedValue:) and lenient Codable: unknown → system), SystemAccessibility, EffectiveAccessibility (playbackRate = SceneClock.reducedMotionFactor 0.5 or 1), AccessibilityPreferences.resolve. AccessibilityPreferencesTests 4/4: 12 resolution cases, Off overrides system On, playback rate, stored values + Codable incl. unknown raw value; run-check A01-P05/t501-visualcore-host swift test exit 0
   - `AccessibilityChoice` (`system`, `on` and `off`; String raw values; `title` "System", "On" or "Off"; the rule
     "unknown raw → `system`" through `init(storedValue:)`);
   - `SystemAccessibility`;
