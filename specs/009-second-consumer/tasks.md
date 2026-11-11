@@ -25,7 +25,7 @@ One commit + push per task.
 
 ## Phase 4: US3 — smoke test (P2)
 
-- [ ] T-F807 [US3] `UITests/GardenSmokeUITests.swift`: plant 3 (planted=3), too-close tap ignored, wait for bloom (blooming ≥ 1), harvest one (score=1, particles rise), drag breeze, tap growing seed does not score — on iOS 27.2 and 26.5
+- [ ] T-F807 [US3] `UITests/GardenSmokeUITests.swift`: plant 3 (planted=3), too-close tap ignored, wait for bloom (blooming ≥ 1), harvest one (score=1, particles rise), drag breeze, tap growing seed does not score; after rotating to landscape a tap still plants (planted +1); with `-uitestReduceMotion YES` a harvest produces no burst (particles stay below the burst size) — on iOS 27.2 and 26.5
 
 ## Phase 5: Polish
 
