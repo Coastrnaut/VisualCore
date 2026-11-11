@@ -9,6 +9,6 @@ struct GenerativeArtStudioApp: App {
     @State private var accessibility = SystemAccessibilityObserver()
 
     var body: some Scene {
-        WindowGroup { GalleryView().environment(accessibility).tint(AppColors.accent) }
+        WindowGroup { GalleryView().environment(accessibility).tint(AccessibleColors.accent) }
     }
 }

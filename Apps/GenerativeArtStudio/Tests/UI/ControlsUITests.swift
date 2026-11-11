@@ -26,9 +26,15 @@ final class ControlsUITests: XCTestCase {
         XCTAssertEqual(scrub.label, "Time")
         scrub.adjust(toNormalizedSliderPosition: 0.5)
         let value = app.staticTexts["gas.time.value"]
+        // XCUITest maps the normalized position through the slider's frame and thumb insets, so the exact second
+        // depends on layout; what matters is a mid-timeline scrub (35–65% of 120 s) that the value label reports
+        // exactly as the slider speaks it (feature 016: the 44-pt play button narrowed the slider).
+        func seconds(_ s: String) -> Double? { Double(s.split(separator: " ").first ?? "") }
         let deadline = Date().addingTimeInterval(5)
-        while !(value.label.hasPrefix("5") || value.label.hasPrefix("6")), Date() < deadline { usleep(200_000) }
-        XCTAssertTrue(value.label.hasPrefix("5") || value.label.hasPrefix("6"), "scrubbed to about 60 s: \(value.label)")
+        while !((seconds(value.label) ?? 0) > 1), Date() < deadline { usleep(200_000) }
+        let t = seconds(value.label) ?? -1
+        XCTAssertTrue((42...78).contains(t), "scrubbed to mid-timeline: \(value.label)")
+        XCTAssertEqual(seconds((scrub.value as? String) ?? ""), t, "label matches the slider's spoken value")
         let paused = value.label
         sleep(1)
         XCTAssertEqual(value.label, paused, "time stays put while paused")

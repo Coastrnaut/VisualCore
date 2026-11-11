@@ -44,3 +44,4 @@ Showcase and the 25 VisualCore apps. Start with [Getting started](getting-starte
 
 `python3 scripts/release_check.py --list` lists every release gate. Run them all with
 `python3 scripts/release_check.py`.
+- [Simulator test lessons](testing/simulator-test-lessons.md): silent short test enumerations, stale package frameworks in app DerivedData, layout-independent UI assertions.

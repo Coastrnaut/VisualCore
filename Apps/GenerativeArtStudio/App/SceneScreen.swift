@@ -125,8 +125,8 @@ struct SceneScreen: View {
     @State private var askingName = false
     @State private var saveError: String?
     @Environment(SystemAccessibilityObserver.self) private var systemAccessibility
-    @AppStorage(AccessibilityStorage.reduceMotionKey) private var motionChoice = AccessibilityChoice.system.rawValue
-    @AppStorage(AccessibilityStorage.reduceFlashingKey) private var flashingChoice = AccessibilityChoice.system.rawValue
+    @AppStorage(AppAccessibility.keys.reduceMotion) private var motionChoice = AccessibilityChoice.system.rawValue
+    @AppStorage(AppAccessibility.keys.reduceFlashing) private var flashingChoice = AccessibilityChoice.system.rawValue
     @Environment(\.displayScale) private var displayScale
     @State private var model: SceneModel?
     @State private var showControls = false
@@ -243,7 +243,7 @@ struct SceneScreen: View {
 
     /// System flags combined with the stored choices (FR-A01-501, FR-A01-502).
     private var effectiveAccessibility: EffectiveAccessibility {
-        AccessibilityStorage.preferences(motion: motionChoice, flashing: flashingChoice).resolve(systemAccessibility.current)
+        AppAccessibility.preferences(motion: motionChoice, flashing: flashingChoice).resolve(systemAccessibility.current)
     }
 
     private func save() {

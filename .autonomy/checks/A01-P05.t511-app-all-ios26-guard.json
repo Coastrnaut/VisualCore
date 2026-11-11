@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_test_enumeration.py",
+    "--sources",
+    "Apps/GenerativeArtStudio/Tests",
+    "--log",
+    ".autonomy/logs/A01-P05.t511-app-all-ios26.log"
+  ],
+  "command": "python3 scripts/check_test_enumeration.py --sources Apps/GenerativeArtStudio/Tests --log .autonomy/logs/A01-P05.t511-app-all-ios26.log",
+  "elapsed_seconds": 0.022,
+  "exit_code": 0,
+  "finished": "2026-11-11T06:43:39+00:00",
+  "log": ".autonomy/logs/A01-P05.t511-app-all-ios26-guard.log",
+  "log_sha256": "262c33aa06d285c303b86f1202999e0b9e0d794ddb2849085c6a12b9f00a9faa",
+  "name": "t511-app-all-ios26-guard",
+  "stage": "A01-P05",
+  "started": "2026-11-11T06:43:39+00:00",
+  "timed_out": false
+}
