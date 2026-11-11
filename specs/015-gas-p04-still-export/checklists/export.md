@@ -14,38 +14,42 @@ the share/Photos privacy surface. Depth: phase gate. Audience: reviewer.
 
 ## Requirement Completeness
 
-- [ ] CHK001 Are the offered sizes and aspect ratios listed exhaustively, with the crop preview required? [Completeness, Spec §FR-A01-401]
-- [ ] CHK002 Is the pixel-dimension derivation for every size × aspect pair defined, including rounding? [Completeness, Spec §Clarifications, §Edge Cases]
-- [ ] CHK003 Are the output format, alpha and color profile all stated, with no alternative options? [Completeness, Spec §FR-A01-403]
-- [ ] CHK004 Is the scene time used for an export specified for both paused and playing scenes? [Completeness, Spec §US1-AS3, §Edge Cases]
-- [ ] CHK005 Are the reusable VisualCore operations enumerated, with their test, doc and baseline obligations? [Completeness, Spec §FR-A01-408]
-- [ ] CHK006 Is the contract update (G-EXPORT closed, M09 available) required explicitly? [Completeness, Spec §FR-A01-410]
+- [x] CHK001 Are the offered sizes and aspect ratios listed exhaustively, with the crop preview required? [Completeness, Spec §FR-A01-401]
+- [x] CHK002 Is the pixel-dimension derivation for every size × aspect pair defined, including rounding? [Completeness, Spec §Clarifications, §Edge Cases]
+- [x] CHK003 Are the output format, alpha and color profile all stated, with no alternative options? [Completeness, Spec §FR-A01-403]
+- [x] CHK004 Is the scene time used for an export specified for both paused and playing scenes? [Completeness, Spec §US1-AS3, §Edge Cases]
+- [x] CHK005 Are the reusable VisualCore operations enumerated, with their test, doc and baseline obligations? [Completeness, Spec §FR-A01-408]
+- [x] CHK006 Is the contract update (G-EXPORT closed, M09 available) required explicitly? [Completeness, Spec §FR-A01-410]
 
 ## Requirement Clarity
 
-- [ ] CHK007 Is "device maximum render size" defined in terms of measurable renderer limits and fixed caps? [Clarity, Spec §Clarifications]
-- [ ] CHK008 Is "matches an on-screen render" quantified with a tolerance and a comparison method? [Clarity, Spec §FR-A01-404, §SC-A01-403]
-- [ ] CHK009 Is "point-sized content keeps its proportions" defined with a concrete scale rule? [Clarity, Spec §FR-A01-406, §Clarifications]
+- [x] CHK007 Is "device maximum render size" defined in terms of measurable renderer limits and fixed caps? [Clarity, Spec §Clarifications]
+- [x] CHK008 Is "matches an on-screen render" quantified with a tolerance and a comparison method? [Clarity, Spec §FR-A01-404, §SC-A01-403]
+- [x] CHK009 Is "point-sized content keeps its proportions" defined with a concrete scale rule? [Clarity, Spec §FR-A01-406, §Clarifications]
 
 ## Requirement Consistency
 
-- [ ] CHK010 Are the 12 combinations in SC-A01-401 consistent with the size cap rule (capped values counted, not dropped)? [Consistency, Spec §SC-A01-401, §FR-A01-401]
-- [ ] CHK011 Is the "no second render host or EGL context" requirement consistent with the reuse requirement for other apps? [Consistency, Spec §FR-A01-402, §FR-A01-408]
+- [x] CHK010 Are the 12 combinations in SC-A01-401 consistent with the size cap rule (capped values counted, not dropped)? [Consistency, Spec §SC-A01-401, §FR-A01-401]
+- [x] CHK011 Is the "no second render host or EGL context" requirement consistent with the reuse requirement for other apps? [Consistency, Spec §FR-A01-402, §FR-A01-408]
 
 ## Scenario and Edge Case Coverage
 
-- [ ] CHK012 Are failure scenarios (memory, over-limit size, render failure) specified with user-visible outcomes and leak expectations? [Coverage, Spec §US2, §FR-A01-405]
-- [ ] CHK013 Is backgrounding during an export addressed, with retry behavior? [Edge Case, Spec §Edge Cases]
-- [ ] CHK014 Are share and save failures, and the lifetime of the temporary file, specified? [Edge Case, Spec §Edge Cases, §Clarifications]
+- [x] CHK012 Are failure scenarios (memory, over-limit size, render failure) specified with user-visible outcomes and leak expectations? [Coverage, Spec §US2, §FR-A01-405]
+- [x] CHK013 Is backgrounding during an export addressed, with retry behavior? [Edge Case, Spec §Edge Cases]
+- [x] CHK014 Are share and save failures, and the lifetime of the temporary file, specified? [Edge Case, Spec §Edge Cases, §Clarifications]
 
 ## Privacy and Release Constraints
 
-- [ ] CHK015 Is the only permission (Photos add-only) named with its exact usage text, and are other permissions excluded? [Privacy, Spec §FR-A01-407, §Clarifications]
-- [ ] CHK016 Are offline operation and the absence of ProjectM linkage required? [Release, Spec §FR-A01-409]
-- [ ] CHK017 Are accessibility requirements (labels, values, Dynamic Type) stated for every export control? [Accessibility, Spec §FR-A01-409]
+- [x] CHK015 Is the only permission (Photos add-only) named with its exact usage text, and are other permissions excluded? [Privacy, Spec §FR-A01-407, §Clarifications]
+- [x] CHK016 Are offline operation and the absence of ProjectM linkage required? [Release, Spec §FR-A01-409]
+- [x] CHK017 Are accessibility requirements (labels, values, Dynamic Type) stated for every export control? [Accessibility, Spec §FR-A01-409]
 
 ## Performance, Lifecycle and Assumptions
 
-- [ ] CHK018 Is the absence of a duration target stated, with device timing deferred to campaign II? [Performance, Spec §Clarifications, §Assumptions]
-- [ ] CHK019 Is the thread that owns the export (the GL context owner) and the playback state during export specified? [Lifecycle, Spec §Clarifications]
-- [ ] CHK020 Are out-of-scope items (video, transparency, thumbnails) explicitly excluded? [Scope, Spec §Assumptions]
+- [x] CHK018 Is the absence of a duration target stated, with device timing deferred to campaign II? [Performance, Spec §Clarifications, §Assumptions]
+- [x] CHK019 Is the thread that owns the export (the GL context owner) and the playback state during export specified? [Lifecycle, Spec §Clarifications]
+- [x] CHK020 Are out-of-scope items (video, transparency, thumbnails) explicitly excluded? [Scope, Spec §Assumptions]
+
+## Review
+
+Reviewed 2026-11-10 under the owner's delegated approval (CLAUDE.md §2): 20/20 satisfied by spec.md as clarified.
