@@ -58,7 +58,7 @@ runtimes, then the ProjectM regression 7/7.
   `FloatTransferTests.swift` (round trip in both formats; the unorm8 quantization step) and
   `FloatRenderSupportTests.swift` (detect agrees with an independent probe; the forced fallback gives `.rgba8`; the
   ledger is unchanged after detect).
-- [ ] T-A02-104 [US2] Add `PingPongTarget.swift`:
+- [X] T-A02-104 [US2] Add `PingPongTarget.swift`: — Verified 2026-11-11: PingPongTarget (read/write, swap, swapCount, bytes, isValid, idempotent release, a failed second allocation releases the first); PingPongTargetTests 4 (swap alternates and read !== write; ledger count and bytes +2 / restored after release; budget-limited second allocation leaks nothing; context recreation invalidates and stale bind is counted). run-check A02-P01/t104-rendering-27-2: VisualCoreRendering package TEST SUCCEEDED on iOS 27.2; enumeration guard 15/15 new tests passed (first attempt t104-rendering-27 failed to compile: missing VisualCoreDiagnostics import in the test, fixed)
   - `read`/`write`, `swap()`, `swapCount`, `bytes` (2·w·h·bpp), `isValid`;
   - `release()` is idempotent;
   - a failed second allocation releases the first.
