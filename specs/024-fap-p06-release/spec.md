@@ -178,6 +178,12 @@ with the implemented features.
 - A required-reason category appears in a Debug build but not in Release: only the Release build is authoritative.
 - Acknowledgements at the largest accessibility text size: no clipped text.
 - A store claim that depends on a device (frame rate, thermal behavior): removed, or marked pending, never stated.
+- Captures written directly in the temporary directory by earlier builds (`tmp/FluidArt-*.png`): left to the
+  system's temporary-file cleanup. Launch cleanup touches only `tmp/Captures`. No build with the old location was
+  ever distributed.
+- The license bundle is missing or empty: the Acknowledgements screen shows VisualCoreUI's "No license information
+  is bundled with this build." The post-build phase and `check_app_release.py` (licenses item) fail before such a
+  build can ship.
 - The owner has not created `Configs/Signing.local.xcconfig`: the unsigned build and all checks still run. Signing is
   an `owner-action` row.
 
@@ -196,7 +202,8 @@ with the implemented features.
 - **FR-A02-604**: The app MUST bundle the shipped components' license texts at build time and show them on an
   Acknowledgements screen reachable from the home screen, using VisualCoreUI's `AcknowledgementsView`.
 - **FR-A02-605**: Temporary captures MUST live in one app-owned temporary folder (`tmp/Captures`), and that folder
-  MUST be emptied at launch (crash recovery). The folder handling is VisualCorePersistence's `TemporaryFolder`
+  MUST be emptied at launch, before any scene exists, including automation launches (crash recovery). This extends
+  feature 022's rule that only the latest capture exists and is removed when the playground closes. The folder handling is VisualCorePersistence's `TemporaryFolder`
   (clarification 1), with tests, docs, the API baseline and the ProjectM regression.
 - **FR-A02-606**: The app MUST persist nothing: no UserDefaults keys of its own and no files outside the temporary
   capture folder. A test asserts this, and the docs record configuration schema version 1 as the starting point for
@@ -270,3 +277,5 @@ with the implemented features.
 - No new permission, no networking, no tracking, no analytics.
 - No migration code for data that does not exist; no persisted settings in this release.
 - No second renderer or EGL context; no ProjectM or LGPL code linked.
+- Debug and automation builds may write automation reports to Documents. They are never shipped (0 automation symbols
+  in Release), so they are outside the release privacy statement. The privacy document says so.
