@@ -17,6 +17,29 @@ Principle II):
 
 Evidence is host and simulator only.
 
+## Clarifications
+
+### Session 2026-11-10
+
+Answered autonomously under the owner's standing approval (CLAUDE.md §2); the recommended option was chosen in each case.
+
+- Q: Before saving exists (Phase 03), how does composition data reach the scene screen for the recovery path? →
+  A: Through a launch argument `-gasComposition <base64 JSON>`, honored only in DEBUG builds and treated as
+  untrusted input (size cap 64 KiB). It opens the scene for its family. Saving and file import replace this in
+  Phase 03; the same classification code (FR-A01-205) is reused there.
+- Q: How does time advance, and what happens after the app was in the background? → A: The clock adds frame delta ×
+  speed (0…4×) × the reduced-motion factor (0.5 when Reduce Motion is on) while playing. Each delta is capped at
+  0.25 s, so returning from the background never jumps. Time wraps at 120 s back to 0, scrub sets the time directly
+  (clamped to 0…120 s), and pausing freezes it. Scenes always render the clock's time as an explicit time, so a
+  paused scene is deterministic.
+- Q: Where does the parameter panel appear on iPhone and iPad? → A: In a sheet with medium and large detents on both,
+  so the scene stays visible above it. There is no separate iPad inspector in this phase; layout polish is Phase 05.
+- Q: How is a new seed chosen when the user shuffles? → A: From the system random generator, once per tap. The chosen
+  seed then fully determines the composition. Seeds are shown as text so they can be compared, and are not editable
+  in this phase.
+- Q: What exactly does "Reset" reset to? → A: The resolved values of the currently selected preset (its baseline),
+  not the schema defaults. Choosing another preset replaces the baseline.
+
 ## User Scenarios & Testing *(mandatory)*
 
 Users: casual makers and visual artists (manual §2), plus app developers reusing the VisualCore controls.
@@ -110,7 +133,9 @@ passes.
 ### Edge Cases
 
 - A parameter's slider position is non-finite or outside 0–1: it is clamped, never stored as NaN.
-- Scrubbing past 120 s or below 0 clamps to 0…120 s. Speed is limited to 0…4×.
+- Scrubbing past 120 s or below 0 clamps to 0…120 s. Speed is limited to 0…4×. Playback wraps from 120 s to 0, and a
+  single frame delta never exceeds 0.25 s.
+- Launch composition data larger than 64 KiB, or not valid base64, is treated as corrupt (recoverable error).
 - Resetting a parameter that is unchanged is a no-op.
 - Changing the palette or seed of the particles family restarts the particle replay from the same time
   (deterministic).
