@@ -1,0 +1,31 @@
+{
+  "argv": [
+    "xcodebuild",
+    "test",
+    "-project",
+    "Harnesses/ProjectMReference/ProjectMReference.xcodeproj",
+    "-scheme",
+    "ProjectMReference",
+    "-destination",
+    "platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D",
+    "-derivedDataPath",
+    "Build/DerivedData/ProjectMReference",
+    "-resultBundlePath",
+    ".autonomy/xcresults/F07-t702-20261110-204515.xcresult",
+    "-test-timeouts-enabled",
+    "YES",
+    "-default-test-execution-time-allowance",
+    "180",
+    "CODE_SIGNING_ALLOWED=NO"
+  ],
+  "command": "xcodebuild test -project Harnesses/ProjectMReference/ProjectMReference.xcodeproj -scheme ProjectMReference -destination 'platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D' -derivedDataPath Build/DerivedData/ProjectMReference -resultBundlePath .autonomy/xcresults/F07-t702-20261110-204515.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 180 CODE_SIGNING_ALLOWED=NO",
+  "elapsed_seconds": 12.973,
+  "exit_code": 0,
+  "finished": "2026-11-11T01:45:28+00:00",
+  "log": ".autonomy/logs/F07.t702-harness-skeleton.log",
+  "log_sha256": "cf6434b88412f8d44613612ff43f9872b9118ea258cc38951b6d0a5c8be255a0",
+  "name": "t702-harness-skeleton",
+  "stage": "F07",
+  "started": "2026-11-11T01:45:15+00:00",
+  "timed_out": false
+}

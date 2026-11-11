@@ -1,0 +1,74 @@
+# ProjectMReference — the ProjectM reference adapter (feature 008, ledger gate F07; contract
+# specs/008-projectm-integration/contracts/projectm-adapter.md, FR-F109 in specs/002-architecture-contracts).
+# The ONLY target allowed to link reference modules (rule R1). It drives the UNMODIFIED ProjectM engine
+# (External/projectm-ios @ d93edd1, read-only) through VisualCore's render host. Tester tool, not distributed:
+# the LGPL engine stays the reference's dynamic ProjectM.xcframework (built by the reference's own script).
+# Generate: xcodegen generate --spec Harnesses/ProjectMReference/ProjectMReference.yml
+name: ProjectMReference
+options:
+  bundleIdPrefix: dev.visualcore.harness
+  deploymentTarget:
+    iOS: "26.0"
+  createIntermediateGroups: true
+configFiles:
+  Debug: ../../Configs/Signing.xcconfig
+  Release: ../../Configs/Signing.xcconfig
+packages:
+  VisualCore:
+    path: ../../Packages/VisualCore
+  VisualCoreRendering:
+    path: ../../Packages/VisualCoreRendering
+  ProjectMBridge:
+    path: ../../External/projectm-ios/Packages/ProjectMBridge
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    TARGETED_DEVICE_FAMILY: "1,2"
+targets:
+  ProjectMReference:
+    type: application
+    platform: iOS
+    sources: [Sources]
+    info:
+      path: Generated/Info.plist
+      properties:
+        CFBundleDisplayName: ProjectM Reference
+        CFBundleShortVersionString: "0.1.0"
+        CFBundleVersion: "1"
+        ITSAppUsesNonExemptEncryption: false
+        UILaunchScreen: {}
+        UIApplicationSceneManifest:
+          UIApplicationSupportsMultipleScenes: false
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: dev.visualcore.harness.ProjectMReference
+        GENERATE_INFOPLIST_FILE: NO
+    dependencies:
+      - package: VisualCoreRendering
+        product: VisualCoreRendering
+      - package: VisualCoreRendering
+        product: VisualCoreEffects
+      - package: VisualCore
+        product: VisualCoreEffectsGraph
+      - package: ProjectMBridge
+        product: ProjectMBridge
+  ProjectMReferenceTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources: [Tests]
+    info:
+      path: Generated/Tests-Info.plist
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: dev.visualcore.harness.ProjectMReferenceTests
+        GENERATE_INFOPLIST_FILE: NO
+    dependencies:
+      - target: ProjectMReference
+schemes:
+  ProjectMReference:
+    build:
+      targets:
+        ProjectMReference: all
+        ProjectMReferenceTests: [test]
+    test:
+      targets: [ProjectMReferenceTests]
