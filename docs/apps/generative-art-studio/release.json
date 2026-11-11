@@ -1,0 +1,18 @@
+{
+  "schema": 1,
+  "scheme": "GenerativeArtStudio",
+  "bundleID": "dev.visualcore.GenerativeArtStudio",
+  "version": "1.0.0",
+  "build": 1,
+  "allowedUsageDescriptions": ["NSPhotoLibraryAddUsageDescription"],
+  "requiredDocs": [
+    "docs/apps/generative-art-studio/privacy-and-credits.md",
+    "docs/apps/generative-art-studio/store-listing.md",
+    "docs/apps/generative-art-studio/build-and-archive.md",
+    "docs/apps/generative-art-studio/release-checklist.md"
+  ],
+  "checklist": "docs/apps/generative-art-studio/release-checklist.md",
+  "privacyManifest": true,
+  "icon": true,
+  "licenses": true
+}

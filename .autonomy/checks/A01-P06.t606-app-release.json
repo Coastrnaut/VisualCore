@@ -1,0 +1,22 @@
+{
+  "argv": [
+    "python3",
+    "scripts/release_check.py",
+    "--log-dir",
+    ".autonomy/logs/a01p06-t606-app-release",
+    "--json",
+    ".autonomy/logs/a01p06-t606-app-release/summary.json",
+    "--only",
+    "app-release-generative-art-studio"
+  ],
+  "command": "python3 scripts/release_check.py --log-dir .autonomy/logs/a01p06-t606-app-release --json .autonomy/logs/a01p06-t606-app-release/summary.json --only app-release-generative-art-studio",
+  "elapsed_seconds": 6.463,
+  "exit_code": 0,
+  "finished": "2026-11-11T07:10:23+00:00",
+  "log": ".autonomy/logs/A01-P06.t606-app-release.log",
+  "log_sha256": "32dfd1e71819dd270483ae5fbdb715e3fcfcf1ee34af709690cdc7cd0f0d6511",
+  "name": "t606-app-release",
+  "stage": "A01-P06",
+  "started": "2026-11-11T07:10:16+00:00",
+  "timed_out": false
+}
