@@ -14,7 +14,8 @@ iOS 26+ inside apps. The package map and dependency rules R1–R5 are in
 | VisualCoreDiagnostics | render lifecycle state machine, frame statistics, reports |
 | VisualCoreAudioDSP | **placeholder, not built yet** — planned: lock-free ring, FFT, bands, RMS, onsets ([ADR-0006](../../docs/decisions/ADR-0006-unbuilt-readme-modules.md)) |
 | VisualCorePersistence | **placeholder, not built yet** — planned: versioned documents, atomic writes, migrations (first app that persists documents) |
-| VisualCoreTestSupport | **placeholder, not built yet** — planned: fake clock, fixtures, image baselines (test targets only, rule R5; ADR-0006) |
+| VisualCoreParameters | parameter schemas (units, ranges, linear/log sliders), resolution, palettes (sRGB, linear-light sampling), presets, stable `ParameterHash` |
+| VisualCoreTestSupport | test-only (rule R5): `ImageComparison`, `ImageDifference`, `ImageStatistics` for pixel tests; fake clock and fixtures still planned (ADR-0006) |
 
 Imports allowed (R2): Foundation-level system modules (`Foundation`, `Dispatch`, `os`, `simd`,
 `Accelerate`, `Synchronization`) and other modules of this package.
@@ -63,3 +64,22 @@ f(1)=1), `Tween` (repeat count or forever, autoreverse) and `Timeline` (play, pa
 size and color over life; `ParticleForce` gravity/drag/attractor; NaN removal, `checksum()`; `instances()` →
 `ParticleInstance` for `ParticleRenderer`); 3D: `OrbitCamera` (pitch ±89°, `project`, `ray`), `Mesh.plane/cube/uvSphere`
 (segments 3–256, rings 2–256, subdivisions ≤ 256).
+
+## Parameters (feature 012, A01-P01)
+
+`ParameterDefinition(name:title:unit:range:defaultValue:transform:)` validates a user-adjustable value. Names match
+`^[a-zA-Z][a-zA-Z0-9_]{0,31}$`, and ranges must be finite; `logarithmic` needs a minimum above 0.
+`normalized(_:)`/`value(normalized:)` map to slider positions. `ParameterSchema.resolve(_:)` throws `.nonFinite` for
+NaN or ±∞, clamps out-of-range values, fills defaults and drops unknown names (each with a warning in
+`ResolvedParameters.warnings`).
+
+`Palette` stores 2–8 sRGB stops. `sample(_:)` interpolates in linear light, `linearStops` are what shaders receive,
+and there are six `Palette.builtIns`.
+
+`Preset` encodes its 64-bit seed as a decimal string. `ParameterHash.of(scope:seed:paletteID:values:)` is a stable
+FNV-1a key (16 hex digits), suitable for caches that persist across launches.
+
+`VisualCoreTestSupport` (test targets only) compares RGBA8 buffers. `ImageComparison.compare(a, b)` gives an
+`ImageDifference` with `meanAbsolute`, `maxAbsolute` and `fractionWithin(_:)` over RGB channels.
+`ImageStatistics.meanLuminance(_:)` and `distinctColors(_:)` flag blank renders.
+

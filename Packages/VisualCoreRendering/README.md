@@ -10,7 +10,7 @@ renderer and no `dlsym`; GL entry points come from the generated `CVisualCoreGL`
 | CVisualCoreEGL, CVisualCoreGL | EGL subset and generated ES 3.0 table (`scripts/generate_vcgl.py`) |
 | VisualCoreRendering | `RenderHost`, `RenderView`, lifecycle, capabilities, resources, programs |
 | VisualCoreEffects | GPU passes, render-target pool, effect-graph executor |
-| VisualCoreUI | SwiftUI render surface, diagnostics overlay, accessibility helpers |
+| VisualCoreUI | `RenderSurface` (SwiftUI host for a caller-owned `RenderHost`); diagnostics overlay and accessibility helpers planned |
 | VisualCoreAudio | AVAudioEngine microphone / in-app playback taps → DSP features |
 | VisualCoreAutomation | AutomationRunner (`DEBUG \|\| VISUALCORE_AUTOMATION` only) |
 
@@ -125,3 +125,34 @@ from 1 to 10,000 (default 120). No URL scheme or remote trigger can start a run.
 `SWIFT_ACTIVE_COMPILATION_CONDITIONS=VISUALCORE_AUTOMATION`. On a simulator, `scripts/run_automation_sim.py` runs
 one mode; these results are rehearsals, not device evidence. The Showcase wires this up in
 `Showcase/App/ShowcaseAutomation.swift`.
+
+## Shader bundles, the GLSL library and full-screen scenes (feature 012, A01-P01)
+
+`ShaderBundle(bundle:subdirectory:)` loads an app's `.vert`, `.frag` and `.glsl` files (default folder `Shaders`). Use
+`ShaderBundle(files:)` for in-memory sources. Its `library` also contains the **VisualCore GLSL library**, included
+with:
+
+```glsl
+#include "vc/hash.glsl"     // vc_pcg, vc_hash11, vc_hash21, vc_hash22
+#include "vc/noise.glsl"    // vc_valueNoise, vc_gradientNoise, vc_fbm(p, octaves, lacunarity, gain)
+#include "vc/palette.glsl"  // uniform vec3 u_palette[8]; uniform int u_paletteCount; vc_palette(t) (linear light)
+#include "vc/sdf.glsl"      // vc_sdSphere, vc_sdBox, vc_sdTorus, vc_smoothUnion, vc_rotate
+#include "vc/color.glsl"    // vc_srgbEncode, vc_srgbDecode (exact transfer functions)
+```
+
+Every library file has an include guard, so a file may be included more than once.
+
+`FullScreenShaderScene(fragmentName:bundle:)` draws one fragment shader over the view. The vertex shader gives
+`in vec2 v_uv`. The scene binds whichever of these the shader declares:
+- `u_time`: `fixedTime`, else frame time × `timeScale`;
+- `u_resolution`;
+- `u_seed`: `seedOffsets`;
+- `u_palette`/`u_paletteCount`: `palette`, linear stops;
+- one float `u_<name>` per entry in `parameters`.
+
+Compile errors do not throw. `errorMessage` becomes `file:line: message`, and the view clears to dark gray.
+`ShaderProgram.set(_:vec3Array:)` writes `vec3` array uniforms up to their declared size.
+
+`RenderSurface(host:accessibilityLabel:accessibilityHint:)` (VisualCoreUI) shows a host's view in SwiftUI as one
+accessible image element. The screen that created the host destroys it.
+
