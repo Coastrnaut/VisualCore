@@ -154,6 +154,9 @@ of the frame.
 - Switching to Glowing dye with Reduce Flashing on: the glow stays steady (the flash limiter applies).
 - A capture larger than the device allows: refused before any GPU work, with a message.
 - Photos permission: only requested by the system share sheet when the user chooses to save, with a disclosed reason.
+- The app is backgrounded during a capture: the capture completes or fails with a message, and the scene's pause
+  state is restored either way.
+- Leaving the playground deletes the temporary capture file. Only the most recent capture ever exists on disk.
 
 ## Requirements *(mandatory)*
 
@@ -163,7 +166,7 @@ of the frame.
   color, splat colors and a display mode (subtractive ink, monochrome smoke, additive glow). They are stored as
   versioned data and covered by tests.
 - **FR-A02-402**: Switching palettes MUST take effect on the next frame without rebuilding the fields. The palette
-  choice is available as a picker in the Adjust panel.
+  choice is available as a picker in the Adjust panel, and the spoken canvas description names the active palette.
 - **FR-A02-403**: Glowing dye MUST add a glow through VisualCore's effect graph, honoring Reduce Flashing through
   VisualCore's flash limiter. Other palettes bypass the effect.
 - **FR-A02-404**: A two-finger pinch on the canvas MUST scale the brush radius by the pinch scale, within bounds,
@@ -213,6 +216,9 @@ of the frame.
 - The export size reuses A01's geometry rules: a 2048-point long edge by default, capped by the device's maximum
   render size.
 - Simulator rendering is not color-calibrated; probe tolerances are relative to the same renderer.
+- The glow adds one effect-graph bloom (bounded by VisualCore's pass limits) only for Glowing dye. Its device cost is
+  measured in campaign II, and quality tiers do not change it in this phase.
+- The new Photos usage key is recorded for Phase 06's privacy manifest and release review.
 
 ## Traceability
 
