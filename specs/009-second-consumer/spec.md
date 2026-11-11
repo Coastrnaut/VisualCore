@@ -12,6 +12,18 @@
 canonical override: lives in `Harnesses/SecondConsumer` with its own XcodeGen spec (package map, ADR-0003); device
 measurements deferred to campaign II (constitution V).
 
+## Clarifications
+
+### Session 2026-11-10
+
+Answered autonomously under the owner's standing approval (CLAUDE.md §2), best option chosen.
+
+- Q: What are the gameplay constants? → A: Growth to bloom takes 4 s of simulated time; minimum spacing between flowers 40 world units (points at zoom 1); a tap within 30 units of a bloom harvests it; capacity 24 flowers; bloom sheds 30 particles/s; harvest burst 80 particles; breeze = drag velocity scaled, decaying with a 1 s time constant.
+- Q: Where does the game model live so it is host-testable? → A: In a small local Swift package `Harnesses/SecondConsumer/GardenKit` (depends only on VisualCoreMath and VisualCoreSimulation), tested with `swift test` on the Mac; the app target renders it. This also demonstrates the app-domain pattern the 25 apps will follow (domain logic in a host-testable package).
+- Q: How does the documented-API check decide what is "documented"? → A: `scripts/check_documented_api.py` collects every public type and free function declared in VisualCore package sources, finds which of them the consumer's sources reference by name, and requires each referenced name to appear in a VisualCore package README or a `specs/*/contracts/*.md` file; it fails listing undocumented names. Fixtures exercise a pass and an undocumented-use failure.
+- Q: How is the dependency check reused for a target outside the root project? → A: The four-layer `audit_showcase_dependencies.py` is run with `--spec Harnesses/SecondConsumer/SecondConsumer.yml --target SecondConsumer --sources Harnesses/SecondConsumer`; package paths are resolved relative to the spec file's directory (needed for harness specs), and it also runs as a post-build phase of the game target.
+- Q: Is any game state persisted between launches? → A: No; the garden and score live for the session only (no storage, no network, no permissions). Background time is not simulated: the fixed-step clock's accumulator is reset on return to the foreground.
+
 ## User Scenarios & Testing *(mandatory)*
 
 Users: a person playing a tiny, calm generative game ("Lumen Garden"), and the maintainers, who use it as proof that
@@ -65,7 +77,7 @@ A maintainer runs one command that builds the game and runs its smoke test on bo
 
 - Tapping where a flower already grows does not plant a second one on top (minimum spacing).
 - More than the garden capacity (24 flowers): the oldest harvested spot is reused; planting beyond capacity is refused with a visible hint.
-- Background/foreground: growth does not jump forward by the time spent in the background.
+- Background/foreground: growth does not jump forward by the time spent in the background (accumulator reset on return).
 - Reduce Motion: drifting particles are fewer and slower, no screen-wide bursts; growth still completes.
 - Rotation/resize: flowers keep their world positions; touches map correctly.
 
@@ -75,10 +87,10 @@ A maintainer runs one command that builds the game and runs its smoke test on bo
 
 - **FR-F801**: The game MUST live in `Harnesses/SecondConsumer` with its own project specification and depend only on VisualCore packages; it MUST NOT reference ProjectM engine, preset or reference-bridge modules.
 - **FR-F802**: It MUST render through the VisualCore render host and use VisualCore's documented APIs for: resources/shaders (its own bundled background shader through the shader library), primitives and particles, an effect graph (glow), input (tap and drag recognizers, coordinate mapping) and deterministic timing.
-- **FR-F803**: Gameplay: plant on tap (minimum spacing, capacity 24), growth over a fixed duration to bloom, bloomed flowers shed particles, tap on a bloom harvests it (+1 score, burst), drag sets the breeze force.
-- **FR-F804**: Game state MUST be a pure, host-testable model (planting, spacing, capacity, growth, harvest, score) advanced on a fixed step with a seeded random generator.
+- **FR-F803**: Gameplay: plant on tap (minimum spacing 40, capacity 24), growth over 4 s to bloom, bloomed flowers shed 30 particles/s, a tap within 30 of a bloom harvests it (+1 score, 80-particle burst), drag sets the breeze force (decays with a 1 s time constant).
+- **FR-F804**: Game state MUST be a pure, host-testable model in the local package `GardenKit` (planting, spacing, capacity, growth, harvest, score, breeze) advanced on a fixed step with a seeded random generator; the session state is not persisted.
 - **FR-F805**: Accessible diagnostics MUST expose planted, blooming, harvested/score and particle counts for UI tests, plus VoiceOver labels and a Reduce Motion behavior.
-- **FR-F806**: A dependency check MUST prove the game has no ProjectM dependency (reusing the four-layer audit), and a documented-API check MUST prove every VisualCore symbol it uses is documented; both MUST fail on contaminated fixtures.
+- **FR-F806**: A dependency check MUST prove the game has no ProjectM dependency (the four-layer audit run on the harness spec, with package paths resolved relative to the spec, also as a post-build phase), and `scripts/check_documented_api.py` MUST prove every VisualCore public type/function the game references is named in a package README or feature contract; both MUST fail on contaminated fixtures.
 - **FR-F807**: A build/run smoke test MUST build the game and run its UI test on iOS 27.2 and 26.5 simulators.
 
 ### Key Entities
