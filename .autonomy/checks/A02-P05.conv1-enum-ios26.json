@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_test_enumeration.py",
+    "--sources",
+    "Apps/FluidArtPlayground/Tests",
+    "--log",
+    ".autonomy/logs/A02-P05.conv1-app-ios26.log"
+  ],
+  "command": "python3 scripts/check_test_enumeration.py --sources Apps/FluidArtPlayground/Tests --log .autonomy/logs/A02-P05.conv1-app-ios26.log",
+  "elapsed_seconds": 0.027,
+  "exit_code": 0,
+  "finished": "2026-11-11T11:08:58+00:00",
+  "log": ".autonomy/logs/A02-P05.conv1-enum-ios26.log",
+  "log_sha256": "c7ae54f9f1fe9e842e616d76e217e5bcdc2fde67ba8c231267c08df148a58c7d",
+  "name": "conv1-enum-ios26",
+  "stage": "A02-P05",
+  "started": "2026-11-11T11:08:58+00:00",
+  "timed_out": false
+}
