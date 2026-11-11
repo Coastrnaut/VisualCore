@@ -14,38 +14,44 @@ state transitions, primitives, particles, justified 3D, demo). Depth: standard; 
 
 ## Requirement Completeness
 
-- [ ] CHK001 Are all coordinate spaces and the direction of each axis defined (points, pixels, NDC, world)? [Completeness, Spec §FR-F501]
-- [ ] CHK002 Is every gesture type's full state sequence, including cancel and fail paths, specified? [Completeness, Spec §FR-F502, §SC-F503]
-- [ ] CHK003 Are the particle emitter, life and force parameters enumerated with defaults or ranges? [Completeness, Spec §FR-F507]
-- [ ] CHK004 Are the supported 2D primitive shapes and their attributes listed? [Completeness, Spec §FR-F506]
-- [ ] CHK005 Are resource release and rebuild requirements stated for every GL drawing component? [Completeness, Spec §FR-F508]
-- [ ] CHK006 Is the demo's diagnostics readout format specified so UI tests can read it? [Completeness, Spec §FR-F510]
+- [x] CHK001 Are all coordinate spaces and the direction of each axis defined (points, pixels, NDC, world)? [Completeness, Spec §FR-F501]
+- [x] CHK002 Is every gesture type's full state sequence, including cancel and fail paths, specified? [Completeness, Spec §FR-F502, §SC-F503]
+- [x] CHK003 Are the particle emitter, life and force parameters enumerated with defaults or ranges? [Completeness, Spec §FR-F507]
+- [x] CHK004 Are the supported 2D primitive shapes and their attributes listed? [Completeness, Spec §FR-F506]
+- [x] CHK005 Are resource release and rebuild requirements stated for every GL drawing component? [Completeness, Spec §FR-F508]
+- [x] CHK006 Is the demo's diagnostics readout format specified so UI tests can read it? [Completeness, Spec §FR-F510]
 
 ## Requirement Clarity
 
-- [ ] CHK007 Is "deterministic" defined with its scope (per platform, bit-identical, frame-rate independent)? [Clarity, Spec §FR-F511, §Assumptions]
-- [ ] CHK008 Are gesture thresholds quantified (distance, time) rather than described qualitatively? [Clarity, Spec §FR-F502]
-- [ ] CHK009 Is the 3D scope bounded with an explicit justification and exclusions? [Clarity, Spec §FR-F509]
-- [ ] CHK010 Is the fixed-step behavior after a stall (step cap, dropped time) quantified? [Clarity, Spec §FR-F503]
+- [x] CHK007 Is "deterministic" defined with its scope (per platform, bit-identical, frame-rate independent)? [Clarity, Spec §FR-F511, §Assumptions]
+- [x] CHK008 Are gesture thresholds quantified (distance, time) rather than described qualitatively? [Clarity, Spec §FR-F502]
+- [x] CHK009 Is the 3D scope bounded with an explicit justification and exclusions? [Clarity, Spec §FR-F509]
+- [x] CHK010 Is the fixed-step behavior after a stall (step cap, dropped time) quantified? [Clarity, Spec §FR-F503]
 
 ## Requirement Consistency
 
-- [ ] CHK011 Are particle capacity limits consistent between requirements, edge cases and success criteria? [Consistency, Spec §FR-F507, §SC-F504]
-- [ ] CHK012 Is the Reduce Motion behavior consistent between the clarifications, FR-F505 and FR-F510? [Consistency, Spec §Clarifications]
+- [x] CHK011 Are particle capacity limits consistent between requirements, edge cases and success criteria? [Consistency, Spec §FR-F507, §SC-F504]
+- [x] CHK012 Is the Reduce Motion behavior consistent between the clarifications, FR-F505 and FR-F510? [Consistency, Spec §Clarifications]
 
 ## Acceptance Criteria Quality
 
-- [ ] CHK013 Does every acceptance scenario state a numeric or binary expected outcome? [Measurability, Spec §User Stories]
-- [ ] CHK014 Is the coordinate round-trip tolerance stated with units and the parameter matrix (scales, aspects)? [Measurability, Spec §SC-F501]
+- [x] CHK013 Does every acceptance scenario state a numeric or binary expected outcome? [Measurability, Spec §User Stories]
+- [x] CHK014 Is the coordinate round-trip tolerance stated with units and the parameter matrix (scales, aspects)? [Measurability, Spec §SC-F501]
 
 ## Scenario & Edge Case Coverage
 
-- [ ] CHK015 Are invalid inputs (zero-size view, NaN/negative delta, >10 touches, zero-duration tween) addressed? [Coverage, Spec §Edge Cases]
-- [ ] CHK016 Are lifecycle scenarios (background/foreground, context recreation, rotation) specified for input, timing and drawing? [Coverage, Spec §US5, §Edge Cases]
-- [ ] CHK017 Are bounds for user-controllable sizes (polygon points, mesh resolution, circle segments) defined? [Coverage, Gap]
+- [x] CHK015 Are invalid inputs (zero-size view, NaN/negative delta, >10 touches, zero-duration tween) addressed? [Coverage, Spec §Edge Cases]
+- [x] CHK016 Are lifecycle scenarios (background/foreground, context recreation, rotation) specified for input, timing and drawing? [Coverage, Spec §US5, §Edge Cases]
+- [x] CHK017 Are bounds for user-controllable sizes (polygon points, mesh resolution, circle segments) defined? [Coverage, Spec §FR-F512]
 
 ## Non-Functional, Dependencies & Assumptions
 
-- [ ] CHK018 Is the deferral of device performance measurement to campaign II stated with its owning task? [Non-Functional, Spec §Assumptions, Constitution V]
-- [ ] CHK019 Are accessibility requirements for the demo's interactive UI specified? [Non-Functional, Constitution VII]
-- [ ] CHK020 Is the "no ProjectM dependency" requirement measurable for the demo? [Dependency, Spec §SC-F505]
+- [x] CHK018 Is the deferral of device performance measurement to campaign II stated with its owning task? [Non-Functional, Spec §Assumptions, Constitution V]
+- [x] CHK019 Are accessibility requirements for the demo's interactive UI specified? [Non-Functional, Spec §FR-F510, Constitution VII]
+- [x] CHK020 Is the "no ProjectM dependency" requirement measurable for the demo? [Dependency, Spec §SC-F505]
+
+## Notes
+
+- Reviewed 2026-11-10 by the agent under the owner's standing delegation (CLAUDE.md §2): 20/20 satisfied after spec edits —
+  CHK006/CHK019 (FR-F510 now names the diagnostics identifier/label format, VoiceOver labels and Dynamic Type) and
+  CHK017 (new FR-F512 bounds). `/speckit-implement` reads these markers and does not change them.
