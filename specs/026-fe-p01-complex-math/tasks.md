@@ -50,7 +50,7 @@ research R1–R4, the data model, the contract and the quickstart.
     - NaN and Inf inputs.
 
   Add the package to `project.yml` and run `swift test` (FR-A03-102, FR-A03-103, SC-A03-101).
-- [ ] T-A03-103 [US1] [US2] Add `FractalState.swift`:
+- [X] T-A03-103 [US1] [US2] Add `FractalState.swift`: — Verified 2026-11-11: — Verified 2026-11-11: FractalState (mode with reframing on change, PlaneViewport, seed keeping the last finite value, cap 1...10,000 default 200, radius >= 2, defaults per clarification 5, zoom, escape(at:), spokenDescription 'Mandelbrot set, centered at −0.5 + 0i, zoom 1×' with 6 significant digits and zoom 37× / 1e4× / 2.5e7×), FractalExplanations (z² + c, seed, connected, dust), Preview (<= 160 per side keeping aspect, black interior, gray ramp, deterministic, requestID); FractalStateTests 6 incl. validation edge cases (analyze G1); run-check A03-P01/t103-core-test-3 12/12 (earlier runs t103-core-test-2 failed on the zoom text format at 9999.99... and was fixed by rounding before the scientific threshold)
   - mode;
   - viewport;
   - seed;
