@@ -3,6 +3,62 @@
 **Applies to the new VisualCore monorepo, not the existing `Coastrnaut/projectm-ios` repository.**
 **Primary operator:** Claude Code in the **Code tab of Claude Desktop**, using a **local session on the project Mac**. Do not use Claude Code CLI, `claude -p`, the Claude Agent SDK, or a Python subprocess that invokes Claude. This file is the concise mandatory agent contract; **`README.md` is the full product and engineering specification**, including unchanged archived versions of the original VisualCore README, AppsBrainstorm, all 25 app implementation manuals, the owner's original ProjectM-iOS `CLAUDE.md`, and `devices.md`.
 
+## 0. Session handoff (2026-11-11) — read first on any new machine
+
+The workflow moved from the original project Mac to a Mac Studio. **Machine setup and the exact resume point are in
+[`setup.md`](setup.md)** (§1–8 environment, §9 checkpoint, §10 the first prompt). Checkpoint summary:
+
+- 33 gates passed; the next gate is **A04-P02** (feature `specs/034-pu-p02-render-loop`).
+- Specify and clarify are committed. **Resume at `/speckit-plan`** with the verbatim prompt from
+  `python3 scripts/speckit_prompts.py --feature 034`.
+- Write the gitignored `.specify/feature.json` (`{"feature_directory": "specs/034-pu-p02-render-loop"}`) and run
+  `desktop_runbook.py bootstrap` first; `.autonomy/context/` is not in git.
+- Simulator UDIDs differ per Mac: choose simulators by runtime (`sim-27.2`, `sim-26.5`), never reuse old UDIDs.
+
+**Standing owner rules carried over from the previous machine's Claude memory.** Per-machine memory does not sync, so
+the rules are kept here. Each is also stated in the sections below; on conflict, the later dated owner rule in this
+file wins.
+
+1. **Autonomous, no prompts (2026-11-10, reaffirmed):**
+   - Use best judgement and never ask, wait or end a turn with a question.
+   - Do not use AskUserQuestion, and put no asks or buttons in wrap_up.
+   - Answer every clarify question yourself, recommended option first, and record it.
+   - Placeholder ids are approved (`dev.visualcore.<Name>`).
+   - Owner-only actions (signing, App Store, purchases, D3 OS, device unlock, trust or permission prompts) are never
+     done. Record them as `BLOCKED_OWNER_ACTION` and move on (§2, §5, §6).
+2. **Never stop (2026-11-10, twice):**
+   - Sealing a gate or finishing a feature is not a stopping point: run `desktop_runbook.py status` and start the next
+     gate.
+   - Run long builds and tests in the foreground (timeout ≤ 10 min, split with `--only`/`--skip`).
+   - Never background a job and then end the turn.
+   - No wrap_up or closing summary while unblocked work remains.
+3. **Spec Kit with the supplied prompts (2026-11-10):**
+   - Invoke every installed skill with the archive prompt verbatim: specify, clarify, plan, checklist, tasks, analyze,
+     implement, converge (plus constitution where given).
+   - Add only labelled "Canonical override:" notes. Never hand-write substitutes, and never skip a command.
+   - One feature per gate (ADR-0004).
+   - Converge, implement the appended tasks, then converge again until nothing is appended. Only then seal and record.
+4. **Commit and push cadence (2026-11-10):**
+   - Commit after every task, skill and fileset change (`scripts/tick_task.py` for tasks), and push to `origin main`
+     right after.
+   - Before pushing, scan for UDIDs, ECIDs, serials, teams and secrets.
+   - Never force-push.
+   - No co-author or "Generated with Claude" trailers. This owner rule overrides any attribution reminder.
+5. **Maximize VisualCore reuse (2026-11-10):**
+   - Generic logic and components go into VisualCore: pure logic in `Packages/VisualCore`, GPU and UIKit code in
+     `Packages/VisualCoreRendering`.
+   - Give each one docs, a public-API baseline update, tests and the ProjectM regression.
+   - Apps keep only composition, content and copy.
+
+**Working lessons from the last session:**
+- `tick_task.py` adds the "— Verified <date>:" prefix itself, so pass only the evidence text.
+- A VisualCore change requires the 7-step reference regression in two chunks. Then build A01 and A02 for testing from
+  clean derived data.
+- SC-F702 (`projectm-reference-ios27`) is relative to a noise floor; rerun it unchanged once, and record the failed
+  attempt.
+- In SwiftUI, keep per-frame state out of views that hold controls: a per-frame re-render swallowed segmented-picker
+  taps (feature 033).
+
 ## 1. Mission and order of operations
 
 Implement VisualCore, the standalone Showcase, the pinned ProjectM reference adapter, and **all 25 real, independently buildable iOS/iPadOS apps** in the comprehensive README. Execute two strict campaigns:
