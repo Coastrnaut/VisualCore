@@ -56,7 +56,7 @@ IDs are `T-A01-5##`, with one commit and push per task (`scripts/tick_task.py`).
 
 ## Phase 2: US1 — Motion and flashing follow my settings (P1) 🎯
 
-- [ ] T-A01-504 [US1] Wire the app:
+- [X] T-A01-504 [US1] Wire the app: — Verified 2026-11-11: App: GenerativeArtStudioApp provides one SystemAccessibilityObserver; SettingsView (pickers gas.settings.reduceMotion/reduceFlashing with System (On/Off) option titles and accessibility values, @AppStorage gas.a11y.*, footer 'Off overrides the system setting', About 'Works offline. No account, no tracking.', Done); Gallery Settings button gas.settings.open; SceneModel host scene = EffectScene(clocked, one copy pass) with bypass by default, apply(_:) sets clock.reducedMotion, timeScale, reduceFlashing and bypassEffects = !reduceFlashing, called on appear and onChange of the effective settings; ExportRunner forces bypass during the render and restores it; project.yml adds VisualCoreEffects + VisualCoreEffectsGraph. Two export tests now compare live counts with the pre-export counts (the wrapper owns one scene target). A stale VisualCoreSimulation framework in the gitignored app DerivedData was cleared. run-check A01-P05/t504-app-all-ios27 + ios26 37/37 passed, 0 failed (Phase 01–04 regression); documented API PASS; compliance PASS. Behavior verified by T-A01-505
   - `GenerativeArtStudioApp.swift` provides one `SystemAccessibilityObserver` in the environment;
   - new `App/SettingsView.swift`: pickers `gas.settings.reduceMotion` and `gas.settings.reduceFlashing` with
     `@AppStorage("gas.a11y.reduceMotion")` and `("gas.a11y.reduceFlashing")`; footer `gas.settings.footer` "Off

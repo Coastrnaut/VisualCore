@@ -4,6 +4,8 @@
 import GenerativeArtStudioCore
 import Observation
 import SwiftUI
+import VisualCoreEffects
+import VisualCoreEffectsGraph
 import VisualCoreParameters
 import VisualCoreRendering
 import VisualCoreSimulation
@@ -20,6 +22,10 @@ final class SceneModel {
     var document: ArtDocument { editor.composition }
     let scene: ArtScene
     let clocked: ClockedArtScene
+    /// The host's scene: `clocked` wrapped for the Reduce-Flashing limiter, bypassed unless it is effective (feature 016).
+    let effect: EffectScene
+    /// The accessibility settings currently applied.
+    private(set) var accessibility = EffectiveAccessibility(reduceMotion: false, reduceFlashing: false)
     private(set) var host: RenderHost?
     private(set) var errorMessage: String?
     /// Set when opened data could not be used; the screen offers "Use default".
@@ -55,9 +61,12 @@ final class SceneModel {
         clock.reducedMotion = reduceMotion
         clocked = ClockedArtScene(inner: scene, clock: clock)
         scene.timeScale = reduceMotion ? Self.reducedMotionTimeScale : 1
+        effect = EffectScene(content: clocked, graph: Self.limiterGraph)
+        effect.bypassEffects = true
         recoveryError = failure
         openNotes = notes
-        do { host = try makeHost(clocked) } catch { errorMessage = "Rendering unavailable: \(error)" }
+        accessibility = EffectiveAccessibility(reduceMotion: reduceMotion, reduceFlashing: false)
+        do { host = try makeHost(effect) } catch { errorMessage = "Rendering unavailable: \(error)" }
         timer = Timer.scheduledTimer(withTimeInterval: 0.25, repeats: true) { [weak self] _ in
             MainActor.assumeIsolated { self?.refresh() }
         }
@@ -77,6 +86,19 @@ final class SceneModel {
         editor.useDefault()
         recoveryError = nil
         openNotes = []
+    }
+
+    /// A one-pass copy graph; the limiter is appended by `EffectScene.reduceFlashing`.
+    static let limiterGraph = EffectGraphDescription(
+        passes: [EffectPassDescription(id: "copy", type: "copy", inputs: ["input": effectSceneSource], output: "out")], output: "out")
+
+    /// Applies effective accessibility settings to the open scene; takes effect on the next frame (FR-A01-502).
+    func apply(_ effective: EffectiveAccessibility) {
+        accessibility = effective
+        clocked.clock.reducedMotion = effective.reduceMotion
+        scene.timeScale = effective.playbackRate
+        effect.reduceFlashing = effective.reduceFlashing
+        effect.bypassEffects = !effective.reduceFlashing
     }
 
     func togglePlay() { clocked.clock.toggle(); refresh() }
@@ -101,7 +123,9 @@ struct SceneScreen: View {
     @State private var entryName = ""
     @State private var askingName = false
     @State private var saveError: String?
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(SystemAccessibilityObserver.self) private var systemAccessibility
+    @AppStorage(AccessibilityStorage.reduceMotionKey) private var motionChoice = AccessibilityChoice.system.rawValue
+    @AppStorage(AccessibilityStorage.reduceFlashingKey) private var flashingChoice = AccessibilityChoice.system.rawValue
     @Environment(\.displayScale) private var displayScale
     @State private var model: SceneModel?
     @State private var showControls = false
@@ -197,15 +221,23 @@ struct SceneScreen: View {
             if model == nil {
                 if let entry, entryID == nil { entryID = entry.id; entryName = entry.name }
                 let start = entry.map { CompositionEditor(family: family, document: $0.document) }
-                let m = SceneModel(family: family, reduceMotion: reduceMotion, editor: start, opening: openingData)
+                let m = SceneModel(family: family, reduceMotion: effectiveAccessibility.reduceMotion, editor: start,
+                                   opening: openingData)
                 m.scene.displayScale = Double(displayScale)
+                m.apply(effectiveAccessibility)
                 model = m
             }
         }
+        .onChange(of: effectiveAccessibility) { _, effective in model?.apply(effective) }
         .onDisappear {
             model?.close()
             model = nil
         }
+    }
+
+    /// System flags combined with the stored choices (FR-A01-501, FR-A01-502).
+    private var effectiveAccessibility: EffectiveAccessibility {
+        AccessibilityStorage.preferences(motion: motionChoice, flashing: flashingChoice).resolve(systemAccessibility.current)
     }
 
     private func save() {

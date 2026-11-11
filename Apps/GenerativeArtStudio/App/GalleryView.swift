@@ -13,6 +13,7 @@ enum Route: Hashable {
 struct GalleryView: View {
     @State private var path: [Route] = []
     @State private var library = LibraryModel()
+    @State private var showSettings = false
 
     var body: some View {
         NavigationStack(path: $path) {
@@ -53,11 +54,16 @@ struct GalleryView: View {
                 }
             }
             .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button { showSettings = true } label: { Label("Settings", systemImage: "gearshape") }
+                        .accessibilityIdentifier("gas.settings.open")
+                }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button { path.append(.library) } label: { Label("Library", systemImage: "books.vertical") }
                         .accessibilityIdentifier("gas.library.open")
                 }
             }
+            .sheet(isPresented: $showSettings) { SettingsView() }
             .onAppear {
                 // DEBUG launch data opens its scene directly (recovery path, feature 013).
                 if LaunchComposition.data != nil, path.isEmpty { path = [.family(LaunchComposition.family)] }

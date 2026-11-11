@@ -55,6 +55,7 @@ final class ExportRenderTests: XCTestCase {
         let m = try model(.gradientNoise)
         defer { m.close() }
         let maxEdge = try XCTUnwrap(m.host).maxRenderSize
+        let liveBefore = try XCTUnwrap(m.host).resources.stats.liveCount
         XCTAssertGreaterThanOrEqual(maxEdge, 4096)
         for edge in ExportOptions.offeredLongEdges {
             for aspect in ExportAspect.builtIns {
@@ -70,7 +71,7 @@ final class ExportRenderTests: XCTestCase {
                 print("SC-A01-401 \(edge) \(aspect.id): \(image.width)x\(image.height) alpha=\(image.alphaInfo.rawValue)")
             }
         }
-        XCTAssertEqual(try XCTUnwrap(m.host).resources.stats.liveCount[.framebuffer], 0)
+        XCTAssertEqual(try XCTUnwrap(m.host).resources.stats.liveCount, liveBefore, "every export target released")
     }
 
     // SC-A01-402: the same composition and time export to identical pixels.

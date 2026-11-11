@@ -160,6 +160,10 @@ targets:
         product: VisualCoreRendering
       - package: VisualCoreRendering
         product: VisualCoreUI
+      - package: VisualCoreRendering
+        product: VisualCoreEffects
+      - package: VisualCore
+        product: VisualCoreEffectsGraph
   GenerativeArtStudioTests:
     type: bundle.unit-test
     platform: iOS

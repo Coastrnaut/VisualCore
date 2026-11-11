@@ -62,6 +62,7 @@ final class ExportModelTests: XCTestCase {
     func testFailedExportIsReadable() async throws {
         let scene = try sceneModel(budget: ResourceBudget(total: 8 << 20))
         defer { scene.close() }
+        let liveBefore = try XCTUnwrap(scene.host).resources.stats.liveCount
         let model = ExportModel(scene: scene, name: "Big")
         model.options.longEdge = 2048
         model.options.aspect = .square
@@ -69,6 +70,6 @@ final class ExportModelTests: XCTestCase {
         guard case .failed(let message) = model.phase else { return XCTFail("phase \(model.phase)") }
         XCTAssertTrue(message.contains("graphics memory"), message)
         XCTAssertEqual(model.announcement, message, "T-A01-411 failure announced")
-        XCTAssertEqual(try XCTUnwrap(scene.host).resources.stats.liveCount[.framebuffer], 0)
+        XCTAssertEqual(try XCTUnwrap(scene.host).resources.stats.liveCount, liveBefore, "no export target left behind")
     }
 }

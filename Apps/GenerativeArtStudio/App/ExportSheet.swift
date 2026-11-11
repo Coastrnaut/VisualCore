@@ -26,8 +26,11 @@ enum ExportRunner {
         guard let host = model.host else { throw OffscreenRenderError.unavailable("Rendering is unavailable.") }
         let wasPlaying = model.clocked.clock.isPlaying
         let liveScale = model.scene.displayScale
+        let liveBypass = model.effect.bypassEffects
         model.clocked.clock.pause()
+        model.effect.bypassEffects = true   // a still cannot flash: no limiter, and its live state is kept (feature 016)
         defer {
+            model.effect.bypassEffects = liveBypass
             model.scene.displayScale = liveScale
             if wasPlaying { model.clocked.clock.play() }
             model.refresh()
