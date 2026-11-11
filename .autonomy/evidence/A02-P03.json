@@ -1,0 +1,104 @@
+{
+  "checks": [
+    {
+      "attestation": ".autonomy/checks/A02-P03.t301-visualcore-host.json",
+      "command": "swift test --package-path Packages/VisualCore",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A02-P03.t301-visualcore-host.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A02-P03.t302-reference-a.json",
+      "command": "python3 scripts/release_check.py --only reference-engine-xcframework reference-build-projectm-ios-sim reference-clean --log-dir .autonomy/logs/a02p03-ref --json .autonomy/logs/a02p03-ref/a.json",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A02-P03.t302-reference-a.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A02-P03.t302-reference-b.json",
+      "command": "python3 scripts/release_check.py --only reference-test-anglerendering-ios27 reference-test-anglerendering-ios26 projectm-reference-ios27 projectm-reference-ios26 --log-dir .autonomy/logs/a02p03-ref --json .autonomy/logs/a02p03-ref/b.json",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A02-P03.t302-reference-b.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A02-P03.t303-core-test.json",
+      "command": "swift test --package-path Apps/FluidArtPlayground/FluidArtPlaygroundCore",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A02-P03.t303-core-test.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A02-P03.t304-core-test-2.json",
+      "command": "swift test --package-path Apps/FluidArtPlayground/FluidArtPlaygroundCore",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A02-P03.t304-core-test-2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A02-P03.t305-app-27.json",
+      "command": "xcodebuild test -project VisualCore.xcodeproj -scheme FluidArtPlayground -destination 'platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D' -derivedDataPath Build/DerivedData/FluidArtPlayground -resultBundlePath .autonomy/xcresults/a02p03-t305-app-27.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 300 CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A02-P03.t305-app-27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A02-P03.t306-app-26.json",
+      "command": "xcodebuild test -project VisualCore.xcodeproj -scheme FluidArtPlayground -destination 'platform=iOS Simulator,id=EC7498FF-31FF-4491-9666-B0D32785203C' -derivedDataPath Build/DerivedData/FluidArtPlayground -resultBundlePath .autonomy/xcresults/a02p03-t306-app-26.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 300 CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A02-P03.t306-app-26.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A02-P03.t306-app-27.json",
+      "command": "xcodebuild test -project VisualCore.xcodeproj -scheme FluidArtPlayground -destination 'platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D' -derivedDataPath Build/DerivedData/FluidArtPlayground -resultBundlePath .autonomy/xcresults/a02p03-t306-app-27.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 300 CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A02-P03.t306-app-27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A02-P03.t307-app-26-3.json",
+      "command": "xcodebuild test -project VisualCore.xcodeproj -scheme FluidArtPlayground -destination 'platform=iOS Simulator,id=EC7498FF-31FF-4491-9666-B0D32785203C' -derivedDataPath Build/DerivedData/FluidArtPlayground -resultBundlePath .autonomy/xcresults/a02p03-t307-app-26-3.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 300 CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A02-P03.t307-app-26-3.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A02-P03.t307-app-27-4.json",
+      "command": "xcodebuild test -project VisualCore.xcodeproj -scheme FluidArtPlayground -destination 'platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D' -derivedDataPath Build/DerivedData/FluidArtPlayground -resultBundlePath .autonomy/xcresults/a02p03-t307-app-27-4.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 300 CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A02-P03.t307-app-27-4.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A02-P03.t307-app-27-5.json",
+      "command": "xcodebuild test -project VisualCore.xcodeproj -scheme FluidArtPlayground -destination 'platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D' -derivedDataPath Build/DerivedData/FluidArtPlayground -resultBundlePath .autonomy/xcresults/a02p03-t307-app-27-5.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 300 CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A02-P03.t307-app-27-5.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A02-P03.t308-app-26.json",
+      "command": "xcodebuild test -project VisualCore.xcodeproj -scheme FluidArtPlayground -destination 'platform=iOS Simulator,id=EC7498FF-31FF-4491-9666-B0D32785203C' -derivedDataPath Build/DerivedData/FluidArtPlayground -resultBundlePath .autonomy/xcresults/a02p03-t308-app-26.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 300 CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A02-P03.t308-app-26.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A02-P03.t308-app-27.json",
+      "command": "xcodebuild test -project VisualCore.xcodeproj -scheme FluidArtPlayground -destination 'platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D' -derivedDataPath Build/DerivedData/FluidArtPlayground -resultBundlePath .autonomy/xcresults/a02p03-t308-app-27.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 300 CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A02-P03.t308-app-27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A02-P03.t308-core-test.json",
+      "command": "swift test --package-path Apps/FluidArtPlayground/FluidArtPlaygroundCore",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A02-P03.t308-core-test.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A02-P03.t310-gas-build.json",
+      "command": "xcodebuild build-for-testing -project VisualCore.xcodeproj -scheme GenerativeArtStudio -destination 'generic/platform=iOS Simulator' -derivedDataPath Build/DerivedData/GenerativeArtStudio CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A02-P03.t310-gas-build.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A02-P03.t310-release-fast.json",
+      "command": "python3 scripts/release_check.py --only docs app-contracts compliance dependencies public-api licenses script-tests host-visualcore documented-api-fluid-art-playground isolation-fluid-art-playground host-fluid-art-playground-core documented-api-generative-art-studio isolation-generative-art-studio host-generative-art-studio-core --log-dir .autonomy/logs/a02p03-t310 --json .autonomy/logs/a02p03-t310/summary.json",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A02-P03.t310-release-fast.log"
+    }
+  ],
+  "generated": "2026-11-11T09:21:02+00:00",
+  "method": "deterministic-run-check",
+  "stage": "A02-P03",
+  "status": "pass"
+}
