@@ -1,0 +1,26 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/VisualCoreRendering",
+    "--scheme",
+    "VisualCoreRendering-Package",
+    "--destination",
+    "sim-26.5",
+    "--action",
+    "test",
+    "--result-name",
+    "F07-pin-ios26"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-26.5 --action test --result-name F07-pin-ios26",
+  "elapsed_seconds": 13.888,
+  "exit_code": 0,
+  "finished": "2026-11-11T01:41:41+00:00",
+  "log": ".autonomy/logs/F07.pin-d93edd1-vc-sim-ios26.log",
+  "log_sha256": "46f2c604e3a2d9460c2c515becaf0e22299e7b8f8bb7c9fa62cb4cadea7d31c2",
+  "name": "pin-d93edd1-vc-sim-ios26",
+  "stage": "F07",
+  "started": "2026-11-11T01:41:27+00:00",
+  "timed_out": false
+}

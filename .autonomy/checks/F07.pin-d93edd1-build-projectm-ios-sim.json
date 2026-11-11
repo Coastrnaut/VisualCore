@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "python3",
+    "scripts/run_reference_baseline.py",
+    "--step",
+    "build-projectm-ios-sim"
+  ],
+  "command": "python3 scripts/run_reference_baseline.py --step build-projectm-ios-sim",
+  "elapsed_seconds": 5.764,
+  "exit_code": 0,
+  "finished": "2026-11-11T01:40:24+00:00",
+  "log": ".autonomy/logs/F07.pin-d93edd1-build-projectm-ios-sim.log",
+  "log_sha256": "8237f99d78bc3322805a6942a63ecad429d7bb3c51cc84a932f943c170fb0086",
+  "name": "pin-d93edd1-build-projectm-ios-sim",
+  "stage": "F07",
+  "started": "2026-11-11T01:40:18+00:00",
+  "timed_out": false
+}

@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "python3",
+    "scripts/audit_projectm_reference.py"
+  ],
+  "command": "python3 scripts/audit_projectm_reference.py",
+  "elapsed_seconds": 8.004,
+  "exit_code": 0,
+  "finished": "2026-11-11T01:41:05+00:00",
+  "log": ".autonomy/logs/F07.pin-d93edd1-audit-reference.log",
+  "log_sha256": "5e4170c6698e085bec4cc6597c12c5a9b2deafe3d95fc13ef9d7d67bb35ee990",
+  "name": "pin-d93edd1-audit-reference",
+  "stage": "F07",
+  "started": "2026-11-11T01:40:57+00:00",
+  "timed_out": false
+}

@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "python3",
+    "scripts/run_reference_baseline.py",
+    "--step",
+    "xcodegen-rendererlab"
+  ],
+  "command": "python3 scripts/run_reference_baseline.py --step xcodegen-rendererlab",
+  "elapsed_seconds": 0.245,
+  "exit_code": 0,
+  "finished": "2026-11-11T01:40:18+00:00",
+  "log": ".autonomy/logs/F07.pin-d93edd1-xcodegen-rendererlab.log",
+  "log_sha256": "be6488c0a155b3c29eee0e937afaef9d2b8a8974d445c899c3948e35f8c4d306",
+  "name": "pin-d93edd1-xcodegen-rendererlab",
+  "stage": "F07",
+  "started": "2026-11-11T01:40:18+00:00",
+  "timed_out": false
+}

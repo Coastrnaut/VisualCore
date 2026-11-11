@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "python3",
+    "scripts/run_reference_baseline.py",
+    "--step",
+    "engine-xcframework"
+  ],
+  "command": "python3 scripts/run_reference_baseline.py --step engine-xcframework",
+  "elapsed_seconds": 18.066,
+  "exit_code": 0,
+  "finished": "2026-11-11T01:40:18+00:00",
+  "log": ".autonomy/logs/F07.pin-d93edd1-engine-xcframework.log",
+  "log_sha256": "1c9524d607610f8d17248e1efd2aaa9f08c262e9e0d595ca731a1b5fecee3c73",
+  "name": "pin-d93edd1-engine-xcframework",
+  "stage": "F07",
+  "started": "2026-11-11T01:40:00+00:00",
+  "timed_out": false
+}

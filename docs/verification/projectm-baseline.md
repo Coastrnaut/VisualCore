@@ -59,3 +59,19 @@ See `specs/001-baseline-audit/quickstart.md`, or `python3 scripts/run_reference_
 * Other reference package tests (AudioCore, CaptureKit, Diagnostics, CaptureUI, PresetLibrary,
   ProjectMBridge, Rendering) are inventoried but not part of the renderer baseline (research R-F005).
 * Device behavior of the reference is historical (VC-016) and is not re-tested here.
+
+## Pin d93edd1 (2026-11-10, ADR-0005)
+
+Owner instruction: pull the latest projectm-ios commit and update the submodule. `1ad0b99` → `d93edd1` (7 reference
+commits: feature 002 T239–T250; renderer change limited to the delayed preset warm-up in `ANGLERenderer.prewarm`).
+Nested pins unchanged: ANGLE `29d1823`, projectM `c88894e`, all preset packs.
+
+| Check (ledger F07, `pin-d93edd1-*`) | Result |
+|---|---|
+| engine xcframework (`build_projectm_xcframework.py`) | exit 0 |
+| XcodeGen main + RendererLab | exit 0 |
+| projectM-iOS, CaptureLab, RendererLab simulator builds; projectM-iOS generic-iOS build | exit 0 |
+| ANGLERendering tests iOS 27.2 / 26.5 | 14/14 each (13 before + 1 new warm-up test) |
+| `audit_projectm_reference.py` (pins, engine framework commit, ANGLE tree 12.1 GB intact) | PASS, no problems |
+| rendering-pipeline citations | 48 citations, 0 unresolved |
+| VisualCore: host tests; VisualCoreRendering sim iOS 27.2 / 26.5; Showcase build + dependency audit | all exit 0 |

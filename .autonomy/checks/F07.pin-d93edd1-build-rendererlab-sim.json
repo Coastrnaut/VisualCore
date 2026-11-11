@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "python3",
+    "scripts/run_reference_baseline.py",
+    "--step",
+    "build-rendererlab-sim"
+  ],
+  "command": "python3 scripts/run_reference_baseline.py --step build-rendererlab-sim",
+  "elapsed_seconds": 5.159,
+  "exit_code": 0,
+  "finished": "2026-11-11T01:40:33+00:00",
+  "log": ".autonomy/logs/F07.pin-d93edd1-build-rendererlab-sim.log",
+  "log_sha256": "c5e1bd29bea5f32be94c24e0a1d0a2040a124e2081cbc6c375ba2739defa6922",
+  "name": "pin-d93edd1-build-rendererlab-sim",
+  "stage": "F07",
+  "started": "2026-11-11T01:40:28+00:00",
+  "timed_out": false
+}

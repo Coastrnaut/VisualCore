@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/VisualCore"
+  ],
+  "command": "swift test --package-path Packages/VisualCore",
+  "elapsed_seconds": 6.709,
+  "exit_code": 0,
+  "finished": "2026-11-11T01:41:23+00:00",
+  "log": ".autonomy/logs/F07.pin-d93edd1-vc-host.log",
+  "log_sha256": "4fc540ffde799b7a00e1e8703f3f995487346764abce5bc25078c146f604aa64",
+  "name": "pin-d93edd1-vc-host",
+  "stage": "F07",
+  "started": "2026-11-11T01:41:16+00:00",
+  "timed_out": false
+}

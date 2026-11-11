@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "python3",
+    "scripts/inventory_reference.py",
+    "--check-citations"
+  ],
+  "command": "python3 scripts/inventory_reference.py --check-citations",
+  "elapsed_seconds": 0.037,
+  "exit_code": 2,
+  "finished": "2026-11-11T01:41:16+00:00",
+  "log": ".autonomy/logs/F07.pin-d93edd1-citations.log",
+  "log_sha256": "63a3326d1d386d7ec51aa01f880952ee7caeb0be830bc561c7e051da26a3d349",
+  "name": "pin-d93edd1-citations",
+  "stage": "F07",
+  "started": "2026-11-11T01:41:16+00:00",
+  "timed_out": false
+}

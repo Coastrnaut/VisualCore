@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "python3",
+    "scripts/run_reference_baseline.py",
+    "--step",
+    "build-capturelab-sim"
+  ],
+  "command": "python3 scripts/run_reference_baseline.py --step build-capturelab-sim",
+  "elapsed_seconds": 4.094,
+  "exit_code": 0,
+  "finished": "2026-11-11T01:40:28+00:00",
+  "log": ".autonomy/logs/F07.pin-d93edd1-build-capturelab-sim.log",
+  "log_sha256": "75435d01674f070b2d6647fd3214cb7117b94be98a417669c06f7bbb9ef8760a",
+  "name": "pin-d93edd1-build-capturelab-sim",
+  "stage": "F07",
+  "started": "2026-11-11T01:40:24+00:00",
+  "timed_out": false
+}
