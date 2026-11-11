@@ -89,7 +89,7 @@ runtimes, then the ProjectM regression 7/7.
 **Goal**: FR-A02-101…104, 108 and 110. **Independent test**: the host Core tests, then the GPU dissipation fixture on
 both runtimes and both storages.
 
-- [ ] T-A02-108 [P] [US1] Tests first, then the implementation of `FluidConfiguration.swift` in
+- [X] T-A02-108 [P] [US1] Tests first, then the implementation of `FluidConfiguration.swift` in — Verified 2026-11-11: FluidConfiguration (version 1; grid 16...512 then <= maxEdge; dissipations 0...10 with non-finite -> default; viscosity 0...1; pressure iterations 1...80; velocityRange 0.5...64; seed) with ConfigurationIssue and idempotent validated(maxEdge:); FluidConfigurationTests 5, including 14 out-of-range cases (>= 8, with NaN/infinity), device cap, issue text and Codable round trip. run-check A02-P01/t108-core-test swift test 6/6 pass (SC-A02-103 part 1)
   `Apps/FluidArtPlayground/FluidArtPlaygroundCore/Sources/FluidArtPlaygroundCore/`:
   - fields and bounds verbatim from data-model.md:
     - "gridWidth/gridHeight 16…512, then ≤ maxEdge";
