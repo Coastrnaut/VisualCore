@@ -5,6 +5,6 @@ final class ShowcaseLaunchUITests: XCTestCase {
     @MainActor func testLaunches() {
         let app = XCUIApplication()
         app.launch()
-        XCTAssertTrue(app.staticTexts["showcase.title"].waitForExistence(timeout: 15))
+        XCTAssertTrue(app.navigationBars["VisualCore"].waitForExistence(timeout: 15))
     }
 }

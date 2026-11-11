@@ -1,0 +1,31 @@
+{
+  "argv": [
+    "xcodebuild",
+    "test",
+    "-project",
+    "VisualCore.xcodeproj",
+    "-scheme",
+    "Showcase",
+    "-destination",
+    "platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D",
+    "-derivedDataPath",
+    "Build/DerivedData/Showcase",
+    "-resultBundlePath",
+    ".autonomy/xcresults/F06-t604-20261110-200945.xcresult",
+    "-test-timeouts-enabled",
+    "YES",
+    "-default-test-execution-time-allowance",
+    "180",
+    "CODE_SIGNING_ALLOWED=NO"
+  ],
+  "command": "xcodebuild test -project VisualCore.xcodeproj -scheme Showcase -destination 'platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D' -derivedDataPath Build/DerivedData/Showcase -resultBundlePath .autonomy/xcresults/F06-t604-20261110-200945.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 180 CODE_SIGNING_ALLOWED=NO",
+  "elapsed_seconds": 17.429,
+  "exit_code": 0,
+  "finished": "2026-11-11T01:10:03+00:00",
+  "log": ".autonomy/logs/F06.t604-infrastructure.log",
+  "log_sha256": "35aa8811e8c6425c24a7fff7c928a1f90ee398a73189082e7da764729b7f9173",
+  "name": "t604-infrastructure",
+  "stage": "F06",
+  "started": "2026-11-11T01:09:45+00:00",
+  "timed_out": false
+}
