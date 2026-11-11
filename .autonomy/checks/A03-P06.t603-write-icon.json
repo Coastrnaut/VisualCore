@@ -1,0 +1,32 @@
+{
+  "argv": [
+    "xcodebuild",
+    "test",
+    "-project",
+    "VisualCore.xcodeproj",
+    "-scheme",
+    "FractalExplorer",
+    "-destination",
+    "platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D",
+    "-derivedDataPath",
+    "Build/DerivedData/FractalExplorer",
+    "-resultBundlePath",
+    ".autonomy/xcresults/a03p06-t603-write.xcresult",
+    "-test-timeouts-enabled",
+    "YES",
+    "-default-test-execution-time-allowance",
+    "300",
+    "CODE_SIGNING_ALLOWED=NO",
+    "-only-testing:FractalExplorerTests/IconRenderTests"
+  ],
+  "command": "xcodebuild test -project VisualCore.xcodeproj -scheme FractalExplorer -destination 'platform=iOS Simulator,id=19108E51-71E5-4862-9C7F-6CBC357C060D' -derivedDataPath Build/DerivedData/FractalExplorer -resultBundlePath .autonomy/xcresults/a03p06-t603-write.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 300 CODE_SIGNING_ALLOWED=NO -only-testing:FractalExplorerTests/IconRenderTests",
+  "elapsed_seconds": 8.54,
+  "exit_code": 0,
+  "finished": "2026-11-11T15:56:40+00:00",
+  "log": ".autonomy/logs/A03-P06.t603-write-icon.log",
+  "log_sha256": "769f8dc91326b8e1368f319d2a19f96c2ac886721f5b43df85a38c3cacc5ed35",
+  "name": "t603-write-icon",
+  "stage": "A03-P06",
+  "started": "2026-11-11T15:56:31+00:00",
+  "timed_out": false
+}
