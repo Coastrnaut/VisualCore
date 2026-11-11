@@ -906,11 +906,16 @@ VisualCoreShaderSource | struct | public struct ShaderLibrary: Sendable
 VisualCoreShaderSource | struct | public struct SourceOrigin: Sendable, Equatable, Hashable, Codable
 VisualCoreShaderSource | var | public var description: String
 VisualCoreSimulation | enum | public enum AccessibilityChoice: String, Sendable, Codable, CaseIterable, Identifiable
+VisualCoreSimulation | enum | public enum EmitterShape: Sendable, Equatable, Codable
 VisualCoreSimulation | enum | public enum ParticleForce: Sendable, Equatable
 VisualCoreSimulation | enum | public enum SimulationInfo
 VisualCoreSimulation | enum | public enum StoragePrecision: String, Sendable, Codable, CaseIterable
 VisualCoreSimulation | enum | public enum TimelineEvent: Sendable, Equatable
 VisualCoreSimulation | func | public func checksum() -> UInt64
+VisualCoreSimulation | func | public func clamped() -> Emitter
+VisualCoreSimulation | func | public func clamped() -> EmitterBurst
+VisualCoreSimulation | func | public func clamped() -> EmitterShape
+VisualCoreSimulation | func | public func commands(at step: Int) -> [Command]
 VisualCoreSimulation | func | public func decode(_ u: Float) -> Float
 VisualCoreSimulation | func | public func encode(_ v: Float) -> Float
 VisualCoreSimulation | func | public func instances() -> [ParticleInstance]
@@ -928,26 +933,33 @@ VisualCoreSimulation | func | public mutating func add(_ tween: Tween, at offset
 VisualCoreSimulation | func | public mutating func advance(by delta: Double)
 VisualCoreSimulation | func | public mutating func advance(by dt: Double) -> Int
 VisualCoreSimulation | func | public mutating func advance(by dt: Double) -> [TimelineEvent]
+VisualCoreSimulation | func | public mutating func advance(frame dt: Double) -> Int
 VisualCoreSimulation | func | public mutating func burst(_ count: Int, from index: Int = 0)
 VisualCoreSimulation | func | public mutating func clamp(_ delta: Double) -> Double
 VisualCoreSimulation | func | public mutating func double() -> Double
 VisualCoreSimulation | func | public mutating func float() -> Float
 VisualCoreSimulation | func | public mutating func int(_ r: ClosedRange<Int>) -> Int
+VisualCoreSimulation | func | public mutating func mutate(_ body: (inout Simulation) -> Void)
 VisualCoreSimulation | func | public mutating func next() -> UInt64
 VisualCoreSimulation | func | public mutating func normal(mean: Double = 0, deviation: Double = 1) -> Double
 VisualCoreSimulation | func | public mutating func pause()
 VisualCoreSimulation | func | public mutating func play()
 VisualCoreSimulation | func | public mutating func range(_ r: ClosedRange<Double>) -> Double
 VisualCoreSimulation | func | public mutating func resetAccumulator()
+VisualCoreSimulation | func | public mutating func resume()
+VisualCoreSimulation | func | public mutating func run(steps: Int)
 VisualCoreSimulation | func | public mutating func scrub(to newTime: Double)
 VisualCoreSimulation | func | public mutating func seek(to t: Double)
 VisualCoreSimulation | func | public mutating func step(_ dt: Double)
+VisualCoreSimulation | func | public mutating func stepOnce()
 VisualCoreSimulation | func | public mutating func toggle()
 VisualCoreSimulation | func | public static func keys(prefix: String) -> (reduceMotion: String, reduceFlashing: String)
 VisualCoreSimulation | func | public static func load(from defaults: UserDefaults, keyPrefix prefix: String) -> AccessibilityPreferences
 VisualCoreSimulation | func | public static func unorm8(range: Float) -> SignedRangeEncoding?
 VisualCoreSimulation | init | public init()
+VisualCoreSimulation | init | public init(_ entries: [(step: Int, command: Command)] = [])
 VisualCoreSimulation | init | public init(capacity: Int = ParticleSystem.defaultCapacity, seed: UInt64 = 0)
+VisualCoreSimulation | init | public init(count: Int, interval: Double)
 VisualCoreSimulation | init | public init(duration: Double = 120, speed: Double = 1, isPlaying: Bool = true)
 VisualCoreSimulation | init | public init(from decoder: Decoder) throws
 VisualCoreSimulation | init | public init(from: Double, to: Double, duration: Double, curve: EasingCurve = .linear, mode: EasingMode = .inOut,
@@ -958,7 +970,9 @@ VisualCoreSimulation | init | public init(reduceMotion: AccessibilityChoice = .s
 VisualCoreSimulation | init | public init(reduceMotion: Bool = false, dimFlashingLights: Bool = false)
 VisualCoreSimulation | init | public init(reduceMotion: Bool, reduceFlashing: Bool)
 VisualCoreSimulation | init | public init(seed: UInt64)
+VisualCoreSimulation | init | public init(simulation: Simulation, clock: FixedStepClock = FixedStepClock(), stream: ControlStream<Command> = ControlStream(),
 VisualCoreSimulation | init | public init(step: Double = 1.0 / 120, maxSteps: Int = 8)
+VisualCoreSimulation | init | public init(step: Int, command: Command)
 VisualCoreSimulation | init | public init(storedValue: String?)
 VisualCoreSimulation | init | public init(width: Int, height: Int, channels: Int, fill: Float = 0)
 VisualCoreSimulation | init | public init?(range: Float, center: Float = 0.5)
@@ -966,7 +980,9 @@ VisualCoreSimulation | init | public init?(width: Int, height: Int, channels: In
 VisualCoreSimulation | let | public let capacity: Int
 VisualCoreSimulation | let | public let center: Float
 VisualCoreSimulation | let | public let channels: Int
+VisualCoreSimulation | let | public let command: Command
 VisualCoreSimulation | let | public let duration: Double
+VisualCoreSimulation | let | public let entries: [Entry]
 VisualCoreSimulation | let | public let height: Int
 VisualCoreSimulation | let | public let maxStep: Double
 VisualCoreSimulation | let | public let maxSteps: Int
@@ -976,20 +992,35 @@ VisualCoreSimulation | let | public let reduceFlashing: Bool
 VisualCoreSimulation | let | public let reduceMotion: Bool
 VisualCoreSimulation | let | public let seed: UInt64
 VisualCoreSimulation | let | public let step: Double
+VisualCoreSimulation | let | public let step: Int
+VisualCoreSimulation | let | public let stream: ControlStream<Command>
 VisualCoreSimulation | let | public let width: Int
 VisualCoreSimulation | let | public static let boundaryTolerance
+VisualCoreSimulation | let | public static let countRange: ClosedRange<Int>
 VisualCoreSimulation | let | public static let defaultCapacity
+VisualCoreSimulation | let | public static let extentRange: ClosedRange<Double>
+VisualCoreSimulation | let | public static let intervalRange: ClosedRange<Double>
+VisualCoreSimulation | let | public static let lifetimeRange: ClosedRange<Double>
 VisualCoreSimulation | let | public static let maxCapacity
 VisualCoreSimulation | let | public static let maxDelta
+VisualCoreSimulation | let | public static let rateRange: ClosedRange<Double>
 VisualCoreSimulation | let | public static let reducedMotionFactor
+VisualCoreSimulation | let | public static let sizeRange: ClosedRange<Double>
 VisualCoreSimulation | let | public static let speedRange
+VisualCoreSimulation | let | public static let speedRange: ClosedRange<Double>
+VisualCoreSimulation | let | public static let spreadRange: ClosedRange<Double>
 VisualCoreSimulation | let | public static let version
+VisualCoreSimulation | protocol | public protocol FixedStepSimulation
 VisualCoreSimulation | struct | public struct AccessibilityPreferences: Sendable, Equatable, Codable
+VisualCoreSimulation | struct | public struct ControlStream<Command>
 VisualCoreSimulation | struct | public struct EffectiveAccessibility: Sendable, Equatable
 VisualCoreSimulation | struct | public struct Emitter: Sendable, Equatable
+VisualCoreSimulation | struct | public struct EmitterBurst: Sendable, Equatable, Codable
+VisualCoreSimulation | struct | public struct Entry
 VisualCoreSimulation | struct | public struct Entry: Sendable, Equatable
 VisualCoreSimulation | struct | public struct FieldGrid: Sendable, Equatable
 VisualCoreSimulation | struct | public struct FixedStepClock: Sendable, Equatable
+VisualCoreSimulation | struct | public struct FixedStepRunner<Simulation: FixedStepSimulation, Command>
 VisualCoreSimulation | struct | public struct ParticleInstance: Sendable, Equatable
 VisualCoreSimulation | struct | public struct ParticleSystem: Sendable
 VisualCoreSimulation | struct | public struct SceneClock: Sendable, Equatable
@@ -1004,21 +1035,27 @@ VisualCoreSimulation | subscript | public subscript(x: Int, y: Int, c: Int) -> F
 VisualCoreSimulation | var | public private(set) var accumulator
 VisualCoreSimulation | var | public private(set) var aliveCount
 VisualCoreSimulation | var | public private(set) var clampedCount
+VisualCoreSimulation | var | public private(set) var clock: FixedStepClock
 VisualCoreSimulation | var | public private(set) var droppedCount
 VisualCoreSimulation | var | public private(set) var droppedTime
 VisualCoreSimulation | var | public private(set) var entries: [Entry]
 VisualCoreSimulation | var | public private(set) var invalidCount
 VisualCoreSimulation | var | public private(set) var invalidDeltas
+VisualCoreSimulation | var | public private(set) var isPaused
 VisualCoreSimulation | var | public private(set) var isPlaying: Bool
 VisualCoreSimulation | var | public private(set) var nanRemoved
 VisualCoreSimulation | var | public private(set) var random: SeededRandom
+VisualCoreSimulation | var | public private(set) var simulation: Simulation
 VisualCoreSimulation | var | public private(set) var state: UInt64
+VisualCoreSimulation | var | public private(set) var stepIndex
 VisualCoreSimulation | var | public private(set) var time
 VisualCoreSimulation | var | public private(set) var time: Double
 VisualCoreSimulation | var | public private(set) var totalSteps
 VisualCoreSimulation | var | public var alpha: Double
 VisualCoreSimulation | var | public var autoreverses: Bool
+VisualCoreSimulation | var | public var burst: EmitterBurst?
 VisualCoreSimulation | var | public var color: Vec4
+VisualCoreSimulation | var | public var count: Int
 VisualCoreSimulation | var | public var curve: EasingCurve
 VisualCoreSimulation | var | public var dimFlashingLights: Bool
 VisualCoreSimulation | var | public var direction: Double
@@ -1028,6 +1065,7 @@ VisualCoreSimulation | var | public var finalValue: Double
 VisualCoreSimulation | var | public var forces: [ParticleForce]
 VisualCoreSimulation | var | public var from: Double
 VisualCoreSimulation | var | public var id: String
+VisualCoreSimulation | var | public var interval: Double
 VisualCoreSimulation | var | public var isEmitting
 VisualCoreSimulation | var | public var isFinished: Bool
 VisualCoreSimulation | var | public var isFinite: Bool
@@ -1047,6 +1085,7 @@ VisualCoreSimulation | var | public var reduceMotion: AccessibilityChoice
 VisualCoreSimulation | var | public var reduceMotion: Bool
 VisualCoreSimulation | var | public var reducedMotion
 VisualCoreSimulation | var | public var repeatCount: Int?
+VisualCoreSimulation | var | public var shape: EmitterShape
 VisualCoreSimulation | var | public var simulatedTime: Double
 VisualCoreSimulation | var | public var size: Double
 VisualCoreSimulation | var | public var speed: ClosedRange<Double>

@@ -52,14 +52,17 @@ private let size = Vec2(390, 844)
 
 @Test func resizeKeepsCenterAndSquarePixels() {
     var v = PlaneViewport(center: Vec2(0.3, -0.2), unitsPerPoint: 0.004, size: size)
-    var rng = SystemRandomNumberGenerator()
+    // Seeded (feature 033 T-A04-104): the earlier SystemRandomNumberGenerator made the tolerance check flaky.
+    var rng = SplitMix64Test(state: 0x5EED)
     for _ in 0..<100 {
         let s = Vec2(Double.random(in: 1...3000, using: &rng), Double.random(in: 1...3000, using: &rng))
         v = v.resized(to: s)
         #expect(v.plane(fromScreen: s / 2).distance(to: Vec2(0.3, -0.2)) < 1e-12)
         let dx = v.plane(fromScreen: Vec2(10, 0)) - v.plane(fromScreen: .zero)
         let dy = v.plane(fromScreen: .zero) - v.plane(fromScreen: Vec2(0, 10))
-        #expect(abs(dx.x - dy.y) < 1e-15, "square pixels")
+        // Square pixels up to rounding: the points' plane coordinates reach about ±12, whose spacing is ~1.8e-15, so
+        // compare relative to the step (|dx.x| = 0.04) with a 1e-12 bound instead of an absolute 1e-15.
+        #expect(abs(dx.x - dy.y) <= 1e-12 * abs(dx.x), "square pixels")
     }
 }
 
@@ -82,4 +85,16 @@ private let size = Vec2(390, 844)
     #expect(portrait.plane(fromScreen: Vec2(0, 400)).x == -2.5)
     let landscape = PlaneViewport.framing(width: 4, center: .zero, size: Vec2(800, 400))
     #expect(abs(landscape.unitsPerPoint - 0.01) < 1e-15, "the shorter side (height) spans the width")
+}
+
+/// Deterministic generator for the resize test (SplitMix64).
+private struct SplitMix64Test: RandomNumberGenerator {
+    var state: UInt64
+    mutating func next() -> UInt64 {
+        state &+= 0x9E37_79B9_7F4A_7C15
+        var z = state
+        z = (z ^ (z >> 30)) &* 0xBF58_476D_1CE4_E5B9
+        z = (z ^ (z >> 27)) &* 0x94D0_49BB_1331_11EB
+        return z ^ (z >> 31)
+    }
 }
