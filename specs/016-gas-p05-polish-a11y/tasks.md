@@ -98,7 +98,7 @@ IDs are `T-A01-5##`, with one commit and push per task (`scripts/tick_task.py`).
 
 ## Phase 4: US3 — Scenes survive backgrounding and context loss (P1)
 
-- [ ] T-A01-508 [US3] Add `Apps/GenerativeArtStudio/Tests/Unit/LifecycleRegressionTests.swift`. For 4 families,
+- [X] T-A01-508 [US3] Add `Apps/GenerativeArtStudio/Tests/Unit/LifecycleRegressionTests.swift`. For 4 families, — Verified 2026-11-11: Tests/Unit/LifecycleRegressionTests.swift (the manual's Phase 05 regression fixture), 5 tests: background/foreground for 4 families → no frame while backgrounded, same time, image mean 0.0 max 0; recreateContext for 4 families → new generation, leaked 0, stale delta over 5 frames 0, image mean 0.0 max 0, live counts one for one; 20 background cycles + 3 recreations with live counts unchanged and 0 leaked; export after recovery identical to export before (max 0) for 4 families; the Reduce Flashing limiter graph is rebuilt after recreation with no error or leak. run-check A01-P05/t508-unit-ios27 + ios26 36/36 unit tests each, confirmed by t508-enumeration-ios27/ios26 PASS 36/36 (FR-A01-505, SC-A01-504)
   paused at t:
   - posting `didEnterBackground` then `willEnterForeground`: `renderOneFrame` is false while backgrounded and true
     after; the image matches (mean ≤ 1/255);

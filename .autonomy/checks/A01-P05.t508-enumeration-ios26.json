@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_test_enumeration.py",
+    "--sources",
+    "Apps/GenerativeArtStudio/Tests/Unit",
+    "--log",
+    ".autonomy/logs/A01-P05.t508-unit-ios26.log"
+  ],
+  "command": "python3 scripts/check_test_enumeration.py --sources Apps/GenerativeArtStudio/Tests/Unit --log .autonomy/logs/A01-P05.t508-unit-ios26.log",
+  "elapsed_seconds": 0.023,
+  "exit_code": 0,
+  "finished": "2026-11-11T06:20:11+00:00",
+  "log": ".autonomy/logs/A01-P05.t508-enumeration-ios26.log",
+  "log_sha256": "2d9d1e1a9c889e97219e93e354c51777085bf09ccb98d97f542798993db8a395",
+  "name": "t508-enumeration-ios26",
+  "stage": "A01-P05",
+  "started": "2026-11-11T06:20:11+00:00",
+  "timed_out": false
+}
