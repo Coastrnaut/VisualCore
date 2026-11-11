@@ -77,3 +77,7 @@ owner's one-commit-per-task cadence and one-writer rule mean they are executed s
 
 MVP = math + US1 coordinates/gestures. Then timing (US2), primitives/particles (US3), 3D (US4), demo (US5). Each
 subsystem lands with its tests and its own commit and push.
+
+## Phase 9: Convergence
+
+- [ ] T-F524 Sync `specs/006-input-animation-scenes/contracts/interaction-api.md` (RenderHost.pointerHandler; Camera2D zoom(by:around:)/pan(by:); DragRecognizer translation/velocity; FixedStepClock resetAccumulator/invalidDeltas/simulatedTime; GPUBuffer.upload(indices:); Mesh.interleavedPositionNormal; ParticleInstance init; renderer lastInstanceCount/lastTriangleCount; demo identifiers demo.steps/demo.canvas/demo.toggle/demo.reset) and the plan's source listing (Matrix.swift, Timeline.swift, DynamicVertexBuffer.swift) with the code, verified by a symbol check per plan: contracts (partial)
