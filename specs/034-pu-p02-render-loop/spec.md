@@ -188,9 +188,19 @@ positions, plus UI tests of the live scene.
 - A tap outside the world square places the force at the nearest point inside it.
 - A strength outside its range is clamped. A non-finite strength is ignored.
 - The tier changes at most once per decision interval (VisualCore `QualityPolicy` hysteresis).
-- A requested limit below the minimum budget uses the minimum (100).
+- The effective limit never drops below the minimum budget (100) unless the requested limit itself is lower; it never
+  exceeds the requested limit (checklist CHK012, research R3).
 - Choosing a different force kind replaces the force and keeps its position. Removing the force leaves the family's
-  own forces only.
+  own forces only. Kind and strength changes take effect on the next simulation step (CHK010).
+- Wind blows from the world center toward the force position; a wind placed exactly at the center blows toward +x
+  (CHK005).
+- In the background the render host is paused together with the simulation, and it resumes with it (CHK019).
+- Under Reduce Motion the scene starts paused on both the GPU path and the CPU preview (CHK020).
+- At accessibility text sizes the force controls wrap into a column, like the Phase 01 controls (CHK027).
+- Offscreen pixel test (SC-A04-205): the three fixed states are (a) one emitter's burst at the center, (b) particles
+  pulled by an attractor, (c) particles under a vortex, each drawn over a black background. "Lit" means the pixel's
+  brightest channel is the particle color's dominant channel and is at least 128; "background" means all color
+  channels are 0 (CHK007, CHK008).
 
 ## Requirements *(mandatory)*
 
