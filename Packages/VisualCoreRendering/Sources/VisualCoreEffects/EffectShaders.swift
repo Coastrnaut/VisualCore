@@ -81,4 +81,21 @@ enum EffectShaders {
         color = vec4(min(b.rgb + u_intensity * texture(u_overlay, uv).rgb, vec3(1.0)), b.a);
     }
     """
+
+    /// Sinusoidal displacement: uv += strength × (sin, cos)(2π · frequency · uv.yx + time · speed).
+    static let distort = """
+    precision highp float;
+    uniform sampler2D u_input;
+    uniform float u_strength;
+    uniform float u_frequency;
+    uniform float u_phase;
+    in vec2 uv;
+    out vec4 color;
+    void main() {
+        float a = 6.2831853 * u_frequency * uv.y + u_phase;
+        float b = 6.2831853 * u_frequency * uv.x + u_phase;
+        vec2 offset = u_strength * vec2(sin(a), cos(b));
+        color = texture(u_input, clamp(uv + offset, 0.0, 1.0));
+    }
+    """
 }

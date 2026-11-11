@@ -89,6 +89,7 @@ public final class EffectRenderer {
         case "colorMatrix": return try ColorMatrixPass(registry: registry)
         case "blur": return try BlurPass(registry: registry)
         case "bloom": return try BloomPass(registry: registry)
+        case "distort": return try DistortPass(registry: registry)
         default: throw EffectGraphError.unknownType(type, pass: "")
         }
     }

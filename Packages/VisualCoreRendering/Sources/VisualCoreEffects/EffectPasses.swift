@@ -116,3 +116,20 @@ final class BloomPass: EffectPassRunner {
         drawFullscreen(add, into: io.output, textures: [("base", input), ("overlay", glow)]) { $0.set("u_intensity", io.params.scalar("intensity", 1)) }
     }
 }
+
+/// `distort`: animated sinusoidal displacement (strength 0–0.2 of the image, frequency, speed).
+@MainActor
+final class DistortPass: EffectPassRunner {
+    private let program: ShaderProgram
+    init(registry: ResourceRegistry) throws {
+        program = try registry.program(vertex: EffectShaders.vertex, fragment: EffectShaders.distort)
+    }
+    func run(_ io: PassIO) throws {
+        guard let input = io.inputs["input"] else { return }
+        drawFullscreen(program, into: io.output, textures: [("input", input)]) { p in
+            p.set("u_strength", io.params.scalar("strength", 0.02))
+            p.set("u_frequency", io.params.scalar("frequency", 8))
+            p.set("u_phase", Float(io.time) * io.params.scalar("speed", 1))
+        }
+    }
+}
