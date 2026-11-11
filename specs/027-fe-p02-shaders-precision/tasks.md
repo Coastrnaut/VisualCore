@@ -30,7 +30,7 @@ amendments), the plan, research R1–R4, the data model, the contract and the qu
 - [ ] T-A03-202 Add `ShaderPrecision` and the optional `fragmentHighp` and `fragmentMediump` properties to
   `RenderCapabilities` (VisualCoreRendering). Fill them in `query` with `vcglGetShaderPrecisionFormat`.
   - Add `RenderCapabilitiesPrecisionTests`:
-    - on a host the values are present and `highp` bits ≥ `mediump` bits; the simulator values are logged as context;
+    - on both simulator runtimes the values are present and `highp` bits ≥ `mediump` bits (analyze C1); the simulator values are logged as context;
     - JSON without the new keys still decodes.
   - Run the package tests on 27.2 and 26.5 with the guard.
   - Run the ProjectM regression (3/3 + 4/4) and build A01 and A02 (FR-A03-204).
@@ -53,7 +53,11 @@ amendments), the plan, research R1–R4, the data model, the contract and the qu
   - the CPU preview stays as the fallback when the shader reports an error;
   - the size follows the view, and the pixel scale goes to the scene.
 
-  Update the existing model and UI tests. Run on both runtimes (FR-A03-201).
+  Update the existing model and UI tests. Add two tests (analyze G1):
+  - a forced shader failure (an invalid fragment) shows the CPU preview fallback;
+  - `recreateContext` keeps the view state.
+
+  Run on both runtimes (FR-A03-201).
 
 ## Phase 3: User Story 1 — gestures (P1)
 
@@ -110,7 +114,16 @@ amendments), the plan, research R1–R4, the data model, the contract and the qu
 
   Covers FR-A03-208 and SC-A03-204–205.
 
+## Analyze remediation (2026-11-11, applied under CLAUDE.md §2)
+
+- G1: fallback and context-loss tests.
+- D1: palette independent of gestures.
+- C1: precision tests run on the simulators.
+- 0 critical issues.
+
 ## Dependencies
 
 - T-A03-201 and T-A03-202 are independent; both block T-A03-207.
-- T-A03-203 → T-A03-204 → T-A03-205, T-A03-206 → T-A03-207 → T-A03-208.
+- T-A03-203 → T-A03-204.
+- T-A03-205 and T-A03-206 can run in parallel after 204 (analyze D1).
+- Both block T-A03-207 → T-A03-208.
