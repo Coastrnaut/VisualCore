@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "app": "particle-universe",
-  "gate": "A04-P01",
+  "gate": "A04-P02",
   "date": "2026-11-11",
   "inventory": [
     {
@@ -269,13 +269,19 @@
           "symbol": "ParticleRenderer",
           "product": "VisualCoreRendering",
           "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ParticleLayerScene.swift",
+          "symbol": "ParticleLayerScene",
+          "product": "VisualCoreRendering",
+          "public": true
         }
       ],
       "example": {
-        "file": "Apps/GenerativeArtStudio/App/ParticlesArtScene.swift",
-        "symbol": "ParticlesArtScene"
+        "file": "Apps/ParticleUniverse/App/ParticleStage.swift",
+        "symbol": "ParticleStage"
       },
-      "notes": "Per-frame instance upload into a registry-owned buffer, released and rebuilt with the context (research R2)."
+      "notes": "Per-frame instance upload into a registry-owned buffer, released and rebuilt with the context (research R2). A04-P02: the sandbox draws through the generic ParticleLayerScene in VisualCore's RenderHost (pixel-tested offscreen on both runtimes)."
     },
     {
       "id": "M03",
@@ -294,13 +300,19 @@
           "symbol": "ParticleInstance",
           "product": "VisualCoreSimulation",
           "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ParticleLayerScene.swift",
+          "symbol": "ParticleLayerScene",
+          "product": "VisualCoreRendering",
+          "public": true
         }
       ],
       "example": {
-        "file": "Apps/GenerativeArtStudio/App/ParticlesArtScene.swift",
-        "symbol": "ParticlesArtScene"
+        "file": "Apps/ParticleUniverse/App/ParticleStage.swift",
+        "symbol": "ParticleStage"
       },
-      "notes": "Instanced soft-edged quads (research R3)."
+      "notes": "Instanced soft-edged quads (research R3). A04-P02: the sandbox draws through the generic ParticleLayerScene in VisualCore's RenderHost (pixel-tested offscreen on both runtimes)."
     },
     {
       "id": "M04",
@@ -399,7 +411,7 @@
       "id": "M07",
       "capability": "Point attractors, repulsors and gravity/wind fields",
       "source": "v0.1 feature 02",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCore/Sources/VisualCoreSimulation/ParticleSystem.swift",
@@ -409,10 +421,10 @@
         }
       ],
       "example": {
-        "file": "Apps/GenerativeArtStudio/Core/Sources/GenerativeArtStudioCore/ParticleReplay.swift",
-        "symbol": "ParticleReplay"
+        "file": "Apps/ParticleUniverse/ParticleUniverseCore/Sources/ParticleUniverseCore/PlacedForce.swift",
+        "symbol": "PlacedForce"
       },
-      "notes": "gravity, drag and a radius-bounded attractor exist; repulsors with falloff, wind and singularity-safe softening are gap G-FIELDS (research R7)."
+      "notes": "Closed in A04-P02 (G-FIELDS): ParticleForce gains repulsor, softened gravityWell, wind and vortex with clamped(), bound(speed:) and acceleration(at:velocity:) (ParticleForceFields.swift); every force is finite and within its bound at its center, 1e-12 from it and on a 101x101 grid, and 10,000 steps from each center remove no particle; the original cases step bit-identically (replay-v1.json, A01, baselines). The gravity well is an artistic softened field."
     },
     {
       "id": "M08",
@@ -468,12 +480,30 @@
       "id": "M10",
       "capability": "Device-adaptive quality and reduced-flash mode",
       "source": "v0.1 feature 06",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/QualityPolicy.swift",
           "symbol": "QualityPolicy",
           "product": "VisualCoreDiagnostics",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/ParticleBudget.swift",
+          "symbol": "ParticleBudget",
+          "product": "VisualCoreDiagnostics",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/DeviceConditions.swift",
+          "symbol": "DeviceConditions",
+          "product": "VisualCoreDiagnostics",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/ParticleSystem.swift",
+          "symbol": "ParticleSystem",
+          "product": "VisualCoreSimulation",
           "public": true
         },
         {
@@ -484,10 +514,10 @@
         }
       ],
       "example": {
-        "file": "Apps/FluidArtPlayground/App/PlaygroundView.swift",
-        "symbol": "PlaygroundModel"
+        "file": "Apps/ParticleUniverse/ParticleUniverseCore/Sources/ParticleUniverseCore/SceneQuality.swift",
+        "symbol": "SceneQuality"
       },
-      "notes": "Tiers exist; a particle-count mapping per tier is gap G-PQUALITY (research R10). Reduce Flashing is available."
+      "notes": "Closed in A04-P02 (G-PQUALITY): ParticleBudget maps QualityPolicy tiers to count caps (1, 0.6, 0.35, 0.2, minimum 100), DeviceConditions reads heat and Low Power Mode from ProcessInfo, and ParticleSystem.liveLimit applies the cap without removing live particles (fixture 2). Reduce Flashing is available; the trail brightness cap is G-BLENDTRAIL (Phase 03)."
     }
   ],
   "gaps": [
@@ -524,7 +554,8 @@
       "owner": "VisualCore:VisualCoreSimulation",
       "phase": 2,
       "test": "Host tests: repulsors, falloff attractors, wind and vortex fields produce finite accelerations for every position including exactly at the center (softened singularities, fixture 4); accelerations are bounded",
-      "justification": "Found in A04-P00 (research R7): force fields are reused by physics and creature apps (A11, A09)."
+      "justification": "Found in A04-P00 (research R7): force fields are reused by physics and creature apps (A11, A09).",
+      "closed": "A04-P02"
     },
     {
       "id": "G-PQUALITY",
@@ -535,7 +566,8 @@
       "owner": "VisualCore:VisualCoreDiagnostics",
       "phase": 2,
       "test": "Host tests: a particle-budget mapping gives each QualityPolicy tier a count cap; a high requested count respects the configured cap and drops with the tier under heat or Low Power Mode (fixture 2)",
-      "justification": "Found in A04-P00 (research R10): count-based quality is generic to any instanced workload."
+      "justification": "Found in A04-P00 (research R10): count-based quality is generic to any instanced workload.",
+      "closed": "A04-P02"
     },
     {
       "id": "G-BLENDTRAIL",
@@ -692,7 +724,8 @@
       "The simulation stays on the CPU (deterministic, bounded) and only drawing uses the GPU, because the OpenGL ES path offers no compute shaders (research R1); counts are capped and tiered (risk 3), additive blending gets a reduced-flash cap (risk 2), and instanced drawing is already proven by A01 (risk 1).",
       "Reference regression baseline recorded green 7/7 (T-A04-003) and the empty shell builds and passes its smoke test on both simulator runtimes (T-A04-005).",
       "Phase 01 starts with G-SIMSTEP and G-EMITTERS in VisualCoreSimulation and the app's seeded scene model.",
-      "A04-P01: a seeded, GPU-free particle domain — four emitter families with bounded counts on VisualCore's new emitter shapes and bursts (G-EMITTERS), a versioned validated ParticleScene, and VisualCore's FixedStepRunner (G-SIMSTEP) with a committed replay fixture that is bit-exact on host and both simulators; the sandbox shows a CPU preview with live and dropped counts, play/pause/step and new seed; ProjectM regression 7/7 after the VisualCore change (one noise-floor retry recorded)."
+      "A04-P01: a seeded, GPU-free particle domain — four emitter families with bounded counts on VisualCore's new emitter shapes and bursts (G-EMITTERS), a versioned validated ParticleScene, and VisualCore's FixedStepRunner (G-SIMSTEP) with a committed replay fixture that is bit-exact on host and both simulators; the sandbox shows a CPU preview with live and dropped counts, play/pause/step and new seed; ProjectM regression 7/7 after the VisualCore change (one noise-floor retry recorded).",
+      "A04-P02: one placed force (attractor, repulsor, gravity well, wind or vortex) placed by tap, dragged, or moved by Center, nudges and a strength slider, on VisualCore's bounded force fields (G-FIELDS closed); the live particle limit follows QualityPolicy tiers through VisualCore's ParticleBudget and DeviceConditions (G-PQUALITY closed); the sandbox draws on the GPU through VisualCore's generic ParticleLayerScene in RenderHost, with the CPU preview as a fallback. No app GL or EGL."
     ],
     "blockers": []
   }
