@@ -40,7 +40,7 @@ named tests are green.
 
 ## Phase 5: US3 — Bounded time (P1)
 
-- [ ] T-A04-110 [US3] Add `Tests/ParticleUniverseCoreTests/SceneTimeTests.swift`: a 10 s frame runs ≤ 8 steps; pause, advance 30 s, resume → 0 steps for the paused time; NaN/negative/infinite frames run 0 steps and are counted; time scale 0.25 and 2 change step counts only (SC-A04-104).
+- [X] T-A04-110 [US3] Add `Tests/ParticleUniverseCoreTests/SceneTimeTests.swift`: a 10 s frame runs ≤ 8 steps; pause, advance 30 s, resume → 0 steps for the paused time; NaN/negative/infinite frames run 0 steps and are counted; time scale 0.25 and 2 change step counts only (SC-A04-104). — Verified 2026-11-11: SceneTimeTests.swift 4 tests: a 10 s frame runs 8 steps with over 9.9 s dropped; pause, 30 s of frames, resume runs 0 steps for the paused time and the state is unchanged; NaN, negative and infinite frames run 0 steps and count 4 invalid frames; time scale 0.25/1/2 gives 30/120/240 steps for 1 s of frames and the slow scene equals the same number of plain steps. run-check A04-P01/t110-time exit 0 (20 tests)
 
 ## Phase 6: US4 — Validated, versioned scene (P2)
 
