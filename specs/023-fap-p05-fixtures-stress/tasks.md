@@ -133,7 +133,7 @@ research R1–R7, data model, contract, quickstart).
 
 ## Phase 7: User Story 5 — Device stress automation, rehearsed on simulators (P3)
 
-- [ ] T-A02-510 [US5] Add `Apps/FluidArtPlayground/App/AppAutomation.swift` (`#if DEBUG || VISUALCORE_AUTOMATION`).
+- [X] T-A02-510 [US5] Add `Apps/FluidArtPlayground/App/AppAutomation.swift` (`#if DEBUG || VISUALCORE_AUTOMATION`). — Verified 2026-11-11: — Verified 2026-11-11: AppAutomation (DEBUG||VISUALCORE_AUTOMATION; unhosted PlaygroundModel(hosted: false) in the test mode with AutomationRunner.requestedSeed, AutomationView hosts model.effects, postRunCheck = lastError/fieldCheck, checkNote = dye-field SHA-256 digest + steps/splats/extremes/grid/storage), App routes on VISUALCORE_AUTORUN, project.yml links VisualCoreAutomation; home copy updated to what ships. AutomationTests 4 (smoke pass with digest 1f7219bf… steps=60, same seed same digest and different seed differs, lifecycle rebuilds with 0 leaks and passes, injected failure -> fail/exit 1); run-check A02-P05/t510-app-ios27 and t510-app-ios26 TEST SUCCEEDED (same digest on both), enumeration 74/74 each
   `root(mode:)` builds a `PlaygroundModel` in the test mode with `AutomationRunner.requestedSeed()`. It passes the
   model's effect scene to `AutomationView`, with a post-run check that returns `fieldCheck`'s failure, or nil with the
   message `digest=… maxVelocity=… maxDye=…`.

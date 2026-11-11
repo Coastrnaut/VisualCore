@@ -58,18 +58,23 @@ final class PlaygroundModel {
     private(set) var pinching = false
 
     /// `forceFallback` stores the fields in RGBA8 even where half-float works (tests of the fallback path).
-    init(configuration: FluidConfiguration = FluidConfiguration(), maxEdge: Int = 512, forceFallback: Bool = false) {
+    /// `hosted: false` creates no RenderHost: another VisualCore host (the automation view, feature 023) hosts
+    /// `effects` instead, and `canvasSize` stands in for the view size.
+    init(configuration: FluidConfiguration = FluidConfiguration(), maxEdge: Int = 512, forceFallback: Bool = false,
+         hosted: Bool = true) {
         scene = FluidFieldsScene(configuration: configuration, forceFallback: forceFallback, maxEdge: maxEdge)
         queue = SplatQueue(configuration: configuration)
         self.configuration = scene.configuration
         effects = EffectScene(content: scene, graph: Self.glowGraph)
         scene.splatSource = { [weak self] in self?.drain() ?? [] }
-        do {
-            let host = try RenderHost(scene: effects)
-            host.pointerHandler = { [weak self] event in self?.handle(event) }
-            self.host = host
-        } catch {
-            failure = "The graphics view could not start: \(error)"
+        if hosted {
+            do {
+                let host = try RenderHost(scene: effects)
+                host.pointerHandler = { [weak self] event in self?.handle(event) }
+                self.host = host
+            } catch {
+                failure = "The graphics view could not start: \(error)"
+            }
         }
         // Setup ran inside RenderHost.init and may have capped the grid by the device; forces convert with the grid
         // the fields really use (feature 020 T-A02-216).
@@ -100,8 +105,11 @@ final class PlaygroundModel {
     }
 
     /// Resampling spacing in points: half the brush radius on the current view (spec 020 clarification 3).
+    /// The view size used for touch spacing when there is no own host (the test mode under automation).
+    var canvasSize: CGSize?
+
     var spacing: Double {
-        guard let size = host?.view.bounds.size, size.width > 0, size.height > 0 else { return 1 }
+        guard let size = host?.view.bounds.size ?? canvasSize, size.width > 0, size.height > 0 else { return 1 }
         return scene.configuration.brushRadius * Double(min(size.width, size.height)) / 2
     }
 

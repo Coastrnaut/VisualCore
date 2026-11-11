@@ -247,6 +247,9 @@ targets:
         product: VisualCoreEffects
       - package: VisualCore
         product: VisualCoreEffectsGraph
+      # Empty unless DEBUG || VISUALCORE_AUTOMATION (feature 023 T-A02-510; Release has zero automation symbols).
+      - package: VisualCoreRendering
+        product: VisualCoreAutomation
     postBuildScripts:
       # FR-A02-006: the build fails if the app depends on ProjectM engine/preset/bridge modules.
       - name: Dependency audit (FR-A02-006)

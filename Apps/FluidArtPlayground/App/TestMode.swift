@@ -45,6 +45,7 @@ enum TestMode {
     /// Puts an existing model into the test mode (its configuration seed is kept as built).
     static func configure(_ model: PlaygroundModel, seed: UInt64, script: Script = Script(), viewSize: CGSize) {
         model.scene.fixedDelta = 1.0 / 60
+        if model.host == nil { model.canvasSize = viewSize }
         model.deviceState = { (.nominal, false) }
         model.clock = { 0 }
         let gestures = SyntheticGestureScript(seed: seed, pointerCount: script.pointers, strokeSamples: script.strokeSamples,
@@ -53,6 +54,14 @@ enum TestMode {
             guard let model else { return }
             for event in gestures.events(forFrame: frame) { model.paint(event, viewSize: viewSize) }
         }
+    }
+
+    /// SHA-256 (hex) of the dye field's float readback: the simulation state, independent of the screen size;
+    /// nil before setup or on a readback failure. Call with the host's context current.
+    static func fieldDigest(_ scene: FluidFieldsScene) -> String? {
+        guard let dye = scene.readDye() else { return nil }
+        let bytes = dye.values.withUnsafeBufferPointer { Data(buffer: $0) }
+        return SHA256.hash(data: bytes).map { String(format: "%02x", $0) }.joined()
     }
 
     /// SHA-256 (hex) of the on-screen picture; nil when nothing can be read back.
