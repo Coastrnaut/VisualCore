@@ -54,7 +54,8 @@ public final class PingPongTarget {
 ```swift
 public enum FieldUniform: Sendable, Equatable { case float(Float), vec2(SIMD2<Float>), vec4(SIMD4<Float>), int(Int32) }
 public enum FieldPassError: Error, Equatable, Sendable {
-    case inputIsOutput(String), missingInput(String), unknownInput(String), unknownUniform(String), stale, compile(String)
+    case inputIsOutput(String), missingInput(String), unknownInput(String), unknownUniform(String),
+         uniformTypeMismatch(String), stale, compile(String)
 }
 public final class FieldPass {
     public enum Output { case target(RenderTarget), framebuffer(name: UInt32, width: Int, height: Int) }
@@ -67,12 +68,14 @@ public final class FieldPass {
 }
 ```
 
-- Each fragment receives `in vec2 vUV` from `FullScreenShaderScene.vertexSource`. Samplers are bound to units in the
+- Each fragment receives `in vec2 v_uv` from `FullScreenShaderScene.vertexSource`. Samplers are bound to units in the
   order of `inputs`. The pass sets the viewport to the output size, and blending is disabled for the pass (GLState
   restored).
 - Checks happen before any draw:
   - every name in `inputs` must be supplied, and no other;
   - no input may share a GL texture with the output;
-  - uniform names must exist in the program.
+  - uniform names must be active uniforms of the program (the compiler removes unused ones);
+  - each uniform's type must match its declaration (`uniformTypeMismatch`).
+- Passes built from identical sources share one cached program, so create one pass per source and release it once.
 - **Test**: an additive pass of two inputs matches a CPU result on a 4×4 grid; `inputIsOutput` is thrown when
   `pair.read` is passed as the output; `unknownUniform`; `stale` after a context recreation.

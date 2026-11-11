@@ -65,7 +65,7 @@ runtimes, then the ProjectM regression 7/7.
 
   Tests in `PingPongTargetTests.swift`: swap alternates and `read !== write`; the ledger bytes; release restores the
   ledger; after `recreateContext` the pair is invalid and stale use is counted.
-- [ ] T-A02-105 [US2] Add `FieldPass.swift` with `FieldUniform`, `FieldPassError` and `FieldPass.Output`.
+- [X] T-A02-105 [US2] Add `FieldPass.swift` with `FieldUniform`, `FieldPassError` and `FieldPass.Output`. — Verified 2026-11-11: FieldPass (FieldUniform, FieldPassError incl. uniformTypeMismatch, Output .target/.framebuffer; validation before any draw; blend/scissor restored; pair step swaps only on success; source committed with 080889f); FieldPassTests 4: the two-input additive pass on 4x4 matches the CPU within one storage step (rgba16f on this runtime); inputIsOutput when pair.read is the output, missing/unknown input, unknown uniform, type mismatch, compile error, no swap on failure; the pair step writes the other target and swaps once; stale after context recreation. run-check A02-P01/t104-rendering-27-2 TEST SUCCEEDED on iOS 27.2, enumeration guard 15/15; contract doc aligned (v_uv, uniformTypeMismatch, shared programs)
   - `run(output:inputs:uniforms:)` validates before drawing: every listed input is supplied and no other; no input
     is the output (`inputIsOutput`); uniform names exist (`unknownUniform`); handles are current (`stale`). The
     viewport is the output size, with blend disabled and restored.
