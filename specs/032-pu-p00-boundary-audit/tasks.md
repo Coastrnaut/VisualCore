@@ -46,3 +46,8 @@ reference regression.
 ## Implementation strategy
 
 Matrix first (the evidence every later phase relies on), then the baseline, shell, register and checks.
+
+## Analyze remediation (2026-11-11, applied under CLAUDE.md §2)
+
+- C1 (low): the shell's VisualCoreUI link (accent color only) is consistent with FR-A04-005/006; no change.
+- 0 critical issues; coverage 18/18 requirements.
