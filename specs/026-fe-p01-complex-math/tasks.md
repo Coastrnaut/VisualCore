@@ -81,7 +81,7 @@ research R1–R4, the data model, the contract and the quickstart.
   - `ExplorerModelTests` (mode switch, stale result dropped, default state).
 
   Run on 27.2 and 26.5 with the guard (FR-A03-101, FR-A03-106).
-- [ ] T-A03-105 [US1] Add `Apps/FractalExplorer/Tests/UI/ExplorerUITests.swift` (open, switch modes, explanation
+- [X] T-A03-105 [US1] Add `Apps/FractalExplorer/Tests/UI/ExplorerUITests.swift` (open, switch modes, explanation — Verified 2026-11-11: — Verified 2026-11-11: Tests/UI/ExplorerUITests (opens in Mandelbrot, explanation and canvas label 'Mandelbrot set, centered at −0.5 + 0i, zoom 1×', switch to Julia: explanation mentions the seed, label 'Julia set for seed −0.8 + 0.156i, centered at 0 + 0i, zoom 1×', fe.seed shown, back to Mandelbrot) and AccessibilityAuditUITests (home, explorer Mandelbrot and Julia at default size and XXXL with A02's documented exclusions) — run-check A03-P01/t105-app-ios27 and t105-app-ios26 TEST SUCCEEDED, no audit issues, enumeration 7/7 each
   and canvas label change) and `AccessibilityAuditUITests.swift` (home and explorer in both modes, at default size
   and XXXL, using A02's exclusions). Run on 27.2 and 26.5 (SC-A03-103).
 
