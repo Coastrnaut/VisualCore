@@ -25,6 +25,64 @@ Canonical overrides:
   attractor (G-FIELDS, Phase 02), quality tiers (G-PQUALITY, Phase 02), trails and blending (Phase 03), saving scenes
   (Phase 04).
 
+## Clarifications
+
+### Session 2026-11-11
+
+Answered autonomously under the owner's standing approval (CLAUDE.md §2), choosing the recommended option each time.
+Facts checked in code:
+- `ParticleSystem` (VisualCoreSimulation) has `Emitter` (position, rate, lifetime, speed, direction, spread, size and
+  color ramps), `ParticleForce` (gravity, drag, attractor), a pool with `droppedCount` and `nanRemoved`, `burst(_:from:)`
+  and an FNV-1a `checksum()`;
+- `FixedStepClock` has `step` (default 1/120 s), `maxSteps` (clamped 1…8), `droppedTime`, `invalidDeltas` and
+  `resetAccumulator()`;
+- A01's `ParticleReplay` and the `VisualCoreBaselines` checksum use point emitters, so the default shape must draw no
+  extra random numbers.
+
+- Q: How are the emitter shapes and bursts added to VisualCore? → A: `Emitter` gains `shape: EmitterShape` (`.point`,
+  `.line(halfLength:angle:)`, `.ring(radius:)`, default `.point`) and `burst: EmitterBurst?` (`count`, `interval`
+  seconds, default nil). A point draws no extra random number; a line draws one (position along the segment); a ring
+  draws one (angle on the circle). A burst emits `count` particles at step times 0, interval, 2·interval, … through
+  its own accumulator. Shape positions are offsets from `position`.
+- Q: What are the clamp ranges? → A: `Emitter.clamped()` maps non-finite values to the default and clamps: rate
+  0…20,000 per second; burst count 1…5,000; burst interval 1/60…60 s; lifetime 0.01…60 s; speed 0…10,000; sizes
+  0…512; half length and radius 0…10,000; spread 0…2π. Every value A01 and the baselines use lies inside these ranges,
+  so their results stay unchanged. The system applies `clamped()` when it reads an emitter.
+- Q: What does the fixed-step runner look like? → A: `FixedStepRunner<Simulation: FixedStepSimulation, Command>` in
+  VisualCoreSimulation. The protocol has `mutating func step(_ dt: Double)` and `func checksum() -> UInt64`, and
+  `ParticleSystem` conforms. The runner:
+  - owns a `FixedStepClock` (step 1/120 s, cap 8 per frame);
+  - provides `pause()` and `resume()`, where resume discards accumulated time;
+  - keeps `stepIndex` and a `ControlStream<Command>`, an ordered list of (step index, command), applying each command
+    through a caller closure just before its step;
+  - returns from `advance(frame:)` the steps it ran.
+
+  Applying commands at step indices makes replays independent of the frame lengths.
+- Q: What are the scene defaults and limits? → A: The world is a square from −500 to 500 world units on both axes, and
+  the preview fits it into the view. `ParticleScene` version 1 has:
+  - particle limit: default 4,000, range 100…20,000;
+  - emitters: at most 8;
+  - time scale: 0.25…2, default 1;
+  - seed: any `UInt64`;
+  - forces: the existing VisualCore gravity, drag and attractor, with finite values.
+
+  The families are:
+  - Fountain: point at (0, −400), 600/s, upward cone of 0.6 rad, life 2–4 s, with gravity;
+  - Curtain: line at (0, 450), half length 400, 800/s, downward, life 2–3 s;
+  - Halo: ring of radius 200 at the origin, 700/s, outward;
+  - Firework: point at the origin, bursts of 400 every 1.5 s, full spread, with drag 0.8.
+- Q: Where is the replay fixture, and on which platforms must it match? → A:
+  `Apps/ParticleUniverse/ParticleUniverseCore/Tests/ParticleUniverseCoreTests/Fixtures/replay-v1.json`. It holds:
+  - seed 0x5EED, the Fountain and Firework families, and 600 steps;
+  - controls: move the attractor at step 120, burst at step 240, stop Fountain emission at step 360;
+  - the expected checksum, live count and the first 8 positions.
+
+  It must match bit for bit on the macOS host and in the iOS simulators. It is written once with `PU_WRITE_FIXTURE=1`
+  and never edited. Platforms with a different math library, such as Linux, are not claimed.
+- Q: How does the preview run, and how does it respect Reduce Motion? → A: A SwiftUI `Canvas` inside a `TimelineView`
+  advances the runner with each frame's time and draws a copy of `instances()`. Under Reduce Motion the scene starts
+  paused, with Play and Step controls. The drawing never writes to the simulation.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Pick an emitter family and see a bounded particle scene (Priority: P1) 🎯
