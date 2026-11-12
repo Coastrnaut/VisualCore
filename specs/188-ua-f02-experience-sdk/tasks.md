@@ -154,6 +154,11 @@ the symbol checks of the pure module. The shell's hook and the symbol checks of 
 - L1 (low, not applied): the symbol tool is not a CI step. CI is the subject of UA-F10; until then the four
   symbol checks are gate evidence (T-U02-050).
 
+`/speckit-analyze` run 2 (same day, after the fixes): 57 of 57 functional requirements and 10 of 10 success
+criteria are named by at least one task; 54 tasks, each mapped to a requirement, a story or an evidence command;
+plan.md and tasks.md name the same source files; every check name of quickstart.md has a task; no constitution
+conflict. No critical, high or medium finding remains; L1 stays deferred.
+
 ## Dependencies & Execution Order
 
 - Phase 1 blocks everything. Phase 2 blocks every story: T-U02-005 first (the other foundational types use its
