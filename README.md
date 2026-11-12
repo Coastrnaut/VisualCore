@@ -103,7 +103,7 @@ the [reference pipeline](docs/architecture/current-rendering-pipeline.md) that `
 | `docs/` | architecture, API baseline, decisions, catalog, migration, release notes, legal notices, planning archive |
 | `.autonomy/` | evidence ledgers: `state.json`, `evidence/` and `checks/` (legacy), `migration/ledger.json` (unified app) |
 | `.specify/`, `.claude/skills/` | Spec Kit configuration and constitution; the committed Spec Kit skills |
-| `.github/workflows/` | `ci.yml` |
+| `.github/workflows/` | `ci.yml` (checks, host tests, simulator build), `push-scan.yml` (scan of every pushed range) |
 
 `project.yml` is the XcodeGen specification for the Showcase and the four apps. Xcode projects and build output are
 generated locally and are not committed.
@@ -141,9 +141,12 @@ Xcode projects generated with XcodeGen and an iOS simulator; [setup.md](setup.md
 results are development evidence, not device evidence.
 
 CI ([.github/workflows/ci.yml](.github/workflows/ci.yml)) runs on pushes to `main` and on pull requests, on macOS
-runners: the ledger, documentation, compliance, dependency, public-API, documented-API, license and script checks;
-`swift test` for `Packages/VisualCore` and the harness package `GardenKit`; and an iOS Simulator build of the pure
-package. It runs no rendering tests, because those need the locally built ANGLE frameworks.
+runners: the ledger, documentation, steering-document, planning-archive, planning-index, migration-ledger,
+compliance, dependency, public-API, documented-API, license and script checks; `swift test` for
+`Packages/VisualCore` and the harness package `GardenKit`; and an iOS Simulator build of the pure package. It runs
+no rendering tests, because those need the locally built ANGLE frameworks. A second workflow
+([.github/workflows/push-scan.yml](.github/workflows/push-scan.yml)) repeats the pre-push scan over the commits of
+every push and pull request; it is never cancelled by a newer push.
 
 ## Documentation
 

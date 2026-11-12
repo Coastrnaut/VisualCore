@@ -3086,6 +3086,7 @@ VisualCore/
 ├── .claude/skills/speckit-*      existing   nine Spec Kit skills
 ├── .specify/                     modify     constitution 2.0.0 (CONSTITUTION-2)
 ├── .github/workflows/ci.yml      modify     validators and the unified build (UA-F00, UA-F10)
+├── .github/workflows/push-scan.yml  existing  scan of every pushed range, never cancelled (UA-F00)
 ├── .autonomy/
 │   ├── state.json, evidence/, checks/        existing   legacy ledger (never reset)
 │   └── migration/ledger.json, evidence/, checks/   existing   migration ledger
@@ -3106,7 +3107,7 @@ VisualCore/
 ├── Showcase/                     existing   non-shipping framework showcase
 ├── Harnesses/                    existing   InteractiveDemo, SecondConsumer, ProjectMReference
 ├── External/projectm-ios/        existing   pinned read-only submodule
-├── Configs/                      existing   toolchain.json, Signing.xcconfig (the local signing file is never committed)
+├── Configs/                      existing   toolchain.json, Signing.xcconfig (the local signing file is never committed), simulator-identifier-hashes.json
 ├── Tools/python/desktop_runbook.py   existing   legacy ledger tool
 ├── scripts/                      modify     + build_catalog.py, verify_experiences.py, run_device_campaign.py
 ├── specs/                        modify     001–035 existing; 036–550 and rNN-* as features are specified
@@ -3444,7 +3445,10 @@ stopping point.
 - A task is ticked only after its acceptance proof was reproduced in this session, in the form
   `- [X] <id> … — Verified YYYY-MM-DD: <command and result>`. `python3 scripts/tick_task.py <spec_dir> <task-id>
   "<evidence>" "<commit subject>"` does this, validates the documents and commits; it adds the "— Verified" prefix
-  itself and pushes only when the branch is `main`.
+  itself and pushes only when the branch is `main` and the pre-push scan is clean. It refuses without changing a
+  file when the task is missing, ticked or listed twice or the evidence is empty or has a line break; when the
+  validation fails after the tick it restores the task list and commits nothing; when the scan finds something or
+  the push fails, the commit stays local and the tool says so.
 - `{device}` tasks stay open until the device campaign. `{owner}` tasks stay open until the owner acts. Neither
   blocks a simulator gate, and neither is ever ticked from a simulator result.
 - Evidence is a real command run through `run-check`. Logs go to `.autonomy/logs/` (not tracked); attestations
@@ -5389,12 +5393,21 @@ missing rows, duplicate run ids, model mismatches, OS changes between runs and g
 
 ### 24.1 Continuous integration
 
-Today CI runs the host gates on every push and pull request: legacy ledger and archive validation, document
-validation, compliance, dependency rules, public and documented API, licenses, script tests, host tests, and a
-simulator build of the framework. Nothing in CI is signed. Planned: UA-F00 adds
-`scripts/validate_autocreator.py`, `scripts/planning_archive.py verify`, `scripts/planning_index.py verify` and
-`scripts/migration_ledger.py validate`; UA-F10 adds the unified app's simulator build. Expensive simulator suites
-stay local, run through `scripts/release_check.py` in chunks of ten minutes or less.
+Today CI runs the host gates on every push and pull request (`.github/workflows/ci.yml`): legacy ledger and
+archive validation, document validation, the steering validators (`scripts/validate_autocreator.py`,
+`scripts/planning_archive.py verify`, `scripts/planning_index.py verify`, `scripts/migration_ledger.py validate`),
+compliance, dependency rules, public and documented API, licenses, script tests, host tests, and a simulator build
+of the framework. Nothing in CI is signed. Planned: UA-F10 adds the unified app's simulator build. Expensive
+simulator suites stay local, run through `scripts/release_check.py` in chunks of ten minutes or less.
+
+A second workflow, `.github/workflows/push-scan.yml`, runs `scripts/prepush_scan.py` over exactly the commits of
+each push (from the commit before the push to the pushed commit) and of each pull request (from the merge base to
+its head), with the full history. It is the detection behind the rule that commits are pushed only through
+`scripts/tick_task.py` or `scripts/prepush_scan.py --push`: a push made any other way is still read. Its
+concurrency group is the commit itself and it never cancels, because a cancelled scan would leave commits unread;
+`ci.yml` may cancel, because its checks describe the newest commit. The scan gives the verdict of the development
+Mac: simulator identifiers are accepted only through the tracked hashes of
+`Configs/simulator-identifier-hashes.json` (`python3 scripts/prepush_scan.py --record-simulators` adds them).
 
 Rules for CI changes: every job has a timeout and a concurrency group; caches of the reference frameworks are
 keyed by the Xcode build, the fork commits and the build flags; `[skip ci]` is used only for documentation-only

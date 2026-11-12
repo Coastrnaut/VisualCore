@@ -379,7 +379,7 @@
    "action": "modify",
    "by": "UA-F00, UA-F01, UA-F09, UA-F13",
    "state": "pending",
-   "note": "Adds build_catalog.py, verify_experiences.py, run_device_campaign.py; existing checks are extended, not replaced."
+   "note": "Adds build_catalog.py, verify_experiences.py, run_device_campaign.py; existing checks are extended, not replaced. UA-F00 has done its part (validate_docs.py, tick_task.py, prepush_scan.py, migration_ledger.py, planning_index.py); the entry stays pending for UA-F01, UA-F09 and UA-F13."
   },
   {
    "from": "specs",
@@ -435,7 +435,7 @@
    "action": "modify",
    "by": "UA-F00, UA-F10",
    "state": "pending",
-   "note": "Adds the steering validators and the unified app's simulator build."
+   "note": "Adds the steering validators and the unified app's simulator build. UA-F00 has added the steering validators and the separate workflow push-scan.yml; the entry stays pending for UA-F10."
   },
   {
    "from": "docs/archive/planning",
