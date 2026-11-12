@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/VisualCore",
+    "--filter",
+    "ExperienceConformanceTests"
+  ],
+  "command": "swift test --package-path Packages/VisualCore --filter ExperienceConformanceTests",
+  "elapsed_seconds": 2.159,
+  "exit_code": 0,
+  "finished": "2026-11-12T11:34:53+00:00",
+  "gate": "UA-F02",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F02.us7-conformance.log",
+  "log_sha256": "5a132298c3f97f416f37b5afc19a0cff4de9abe755614c024eb2a9ff47d31277",
+  "name": "us7-conformance",
+  "started": "2026-11-12T11:34:51+00:00",
+  "timed_out": false
+}
