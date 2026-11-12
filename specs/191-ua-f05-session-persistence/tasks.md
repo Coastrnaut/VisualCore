@@ -1,0 +1,123 @@
+---
+
+description: "Task list for feature 191 — UA-F05 session state, per-experience persistence, reset and restore (migration ledger gate UA-F05)"
+---
+
+# Tasks: UA-F05 — Session state, per-experience persistence, reset and restore
+
+**Input**: `specs/191-ua-f05-session-persistence/` (spec, plan, research, data-model, contracts/persistence-api.md,
+quickstart).
+
+**Tests** are required by the specification (acceptance items 1 to 6): Swift Testing on the host for the pure
+types, package tests on the iOS 27.2 and iOS 26.5 simulators for the session, XCTest and XCUITest in the app's
+test bundles, and `unittest` in `scripts/test_scripts.py`. A test file is written before the code it proves;
+where an agent writes test and code of one unit together, the tick says so.
+
+**Conventions**: ids `T-U05-###`; one commit per task through `scripts/tick_task.py`; a test task and the
+implementation it proves are committed together so that `main` is never red; the API baseline is updated in every
+commit that adds a public framework symbol; gate evidence through
+`python3 scripts/migration_ledger.py run-check --gate UA-F05 --name <check-name> -- <command>` (simulator and
+reference commands with `--timeout 600`). "The commit before the feature" is `0f2fcd3`. Signatures are those of
+contracts/persistence-api.md; names, limits and rules those of data-model.md. `[P]` marks a task whose files no
+other open task writes; such tasks may go to parallel agents, which write files only; the lead builds, tests,
+ticks and commits. App test runs use the chunks of whole test classes (`-a` routes; `-b` settings and launch;
+`-c` unit classes; `-d` launcher and first run; `-e` persistence). A converge audit runs before the evidence
+round, so that the evidence is recorded once on the final sources. Review checkpoint after each phase.
+
+## Phase 1: Setup
+
+- [ ] T-U05-001 [P] Add the option `--no-direct-storage <path> …` to `scripts/check_app_isolation.py` (exit 1 with file and line when a source names `UserDefaults`, `FileManager`, `NSHomeDirectory`, `NSTemporaryDirectory`, `applicationSupportDirectory`, `documentDirectory` or `cachesDirectory`; comments are not code) and the option `--no-crash-on-stored-data <path> …` (exit 1 with file and line for a forced `try`, `fatalError`, `preconditionFailure`, `precondition(`, `assertionFailure` or a forced unwrap in a source that reads stored data), each with tests in `scripts/test_scripts.py`. Proof: `python3 scripts/test_scripts.py` passes (FR-U05-006, FR-U05-071).
+
+## Phase 2: Foundational — the pure types (block every story)
+
+- [ ] T-U05-002 [P] Tests first: `Packages/VisualCore/Tests/VisualCoreExperienceTests/ExperienceStorageTests.swift` — two handles on one root and one defaults suite each write a file and a value and see only their own in `list`, `read`, `value` and `valueKeys`; the 20 escaping names of SC-U05-001 (`..`, `../x`, `a/b`, `/abs`, `a\\b`, an empty name, 129 characters, a leading dot, a space, a colon, `state.json`, `quarantine-1.json`, another experience's folder name with a separator, percent-encoded separators, a newline, a null character, a tilde path, `.`, a trailing slash, a name with a unicode separator) are each refused with `.invalidName` or `.reservedName` for write, read, remove and `setValue`, and nothing is changed; `list` hides `state.json`, `quarantine-<n>.json` and hidden files; quotas (`maxBytes = 16 MiB` of files, `maxFiles = 64`, `maxValues = 64`, `maxValueBytes = 4_096`; the saved state and quarantined copies do not count) refuse the write that would exceed them and leave the earlier content; an interrupted write (a test hook before the replace) leaves the complete earlier file and one hidden temporary file; `remove` and `read` of a missing file give `.notFound`; `removeValues(of:in:)` removes exactly the keys of one prefix and `removeAllValues(in:)` every `exp.` key and nothing else; the `code` of every `StorageError`.
+- [ ] T-U05-003 Implement `Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift` (`StorageQuota`, `StorageError`, `ExperienceStorage`: names of 1 to 128 characters of `A-Z a-z 0-9 . _ -` that do not start with a dot; reserved `state.json` and `quarantine-<n>.json`; atomic writes through `.<name>.tmp-<uuid>` in the folder) with `///` on every public symbol; T-U05-002 passes (FR-U05-001 to FR-U05-005).
+- [ ] T-U05-004 [P] Tests first: `Packages/VisualCore/Tests/VisualCoreExperienceTests/SavedStateStoreTests.swift` — `load` gives `.none` without a file; `save` then `load` gives the equal snapshot; a second `save` of the same snapshot returns false and leaves the file's bytes and modification date; the 8 unreadable files of SC-U05-004 at the file level and above it (cut off, not JSON, wrong checksum, another experience's id, unknown format, larger than 1,048,576 bytes — and, through `SavedStateProblem(failureCode:)`, `snapshot.newer-schema` with `newer == true` and `snapshot.missing-migration`) give `.unreadable` with the expected code, and `load` changes no byte; `save` over an unreadable file quarantines it first; `quarantine` moves `state.json` to `quarantine-1.json`, then `-2`, `-3`, and a fourth removes `quarantine-1.json` (at most 3, lowest number first; SC-U05-009 with 5 in a row); `quarantined` lists by rising number; `quarantine` without a state gives nil; a save interrupted at each of its steps (before the temporary file is complete, before the replace) leaves the complete earlier state readable and at most one hidden file that `removeLeftovers()` removes and counts (SC-U05-005); `remove` removes only `state.json`.
+- [ ] T-U05-005 Implement `Packages/VisualCore/Sources/VisualCoreExperience/SavedStateStore.swift` (`SavedStateProblem`, `SavedStateLoad`, `SavedStateStore` with `stateFileName = "state.json"`, `maxQuarantined = 3`; the file is read only up to `ExperienceSnapshot.maxBytes`); T-U05-004 passes (FR-U05-012, FR-U05-013, FR-U05-015, FR-U05-030, FR-U05-032).
+- [ ] T-U05-006 [P] Tests first: `Packages/VisualCore/Tests/VisualCoreExperienceTests/SnapshotMigrationCheckTests.swift` — for the sample core (schema 2) the example of version 1 (`SampleExperience.snapshotV1(seed: 42)` with `snapshotV1Digest`) gives no problem; no example gives one problem that names version 1; a wrong expected digest, a text that is no snapshot, a snapshot of another id and an example that claims version 2 each give one problem; a core with schema 1 needs no example.
+- [ ] T-U05-007 Implement `Packages/VisualCore/Sources/VisualCoreExperience/SnapshotMigrationCheck.swift` (`MigrationExample`, `SnapshotMigrationCheck.problems(for:id:examples:)`); T-U05-006 passes (FR-U05-050, FR-U05-051; SC-U05-007).
+- [ ] T-U05-008 [P] Tests first: `Packages/VisualCore/Tests/VisualCoreExperienceTests/ContainerInventoryTests.swift` — rules match whole paths and keys; `unlisted(files:keys:)` returns nothing for listed items and `file:<path>` or `key:<name>` for each stray one; a rule with an invalid pattern and a system rule without an origin are refused; a rule set with an entry that names an unlock, purchase, advertising or tracking value is not needed by any listed item of the app's list (the app's list is checked in its own test).
+- [ ] T-U05-009 Implement `Packages/VisualCore/Sources/VisualCoreExperience/ContainerInventory.swift` (`InventoryRule`, `InventoryError`, `ContainerInventory`); T-U05-008 passes (FR-U05-060, FR-U05-061).
+- [ ] T-U05-010 [P] Tests first in `Packages/VisualCore/Tests/VisualCoreExperienceTests/ShellModelTests.swift`, then `ShellModel.swift`: `ShellPreferences.unreadableCopyKey == "vc.shell.preferences.unreadable"`; `ShellPreferences.migratedVersions` equals every version from 1 below `schema` (empty today), and the test fails by construction when the schema rises without a migration (FR-U05-052).
+- [ ] T-U05-011 Record the public API of Phase 2: `python3 scripts/check_public_api.py --update`; the check passes with 0 undocumented symbols and the baseline lost no line. Proof: `swift test --package-path Packages/VisualCore --filter 'VisualCoreExperienceTests|VisualCorePersistenceTests'` passes.
+
+## Phase 3: User Story 3 - Each experience reaches only its own storage (Priority: P1)
+
+**Goal**: an experience gets its handle from the shell and cannot reach anything else.
+**Independent test**: the host tests of T-U05-002 and the app unit test of this phase.
+
+- [ ] T-U05-012 [US3] Add `storage: ExperienceStorage` to `ExperienceLaunch` in `Apps/VisualCore/App/ExperienceRegistry.swift`; `AppModel.open` builds it from the experience id, the data root and the defaults of the environment; the debug experience (`Apps/VisualCore/App/DebugSupport/DebugExperience.swift`) keeps its handle and writes one value (`opens`) through it at each set-up; `-vcSeedData` in `DebugLaunch.swift` writes through handles; unit tests in `Apps/VisualCore/Tests/Unit/AppModelTests.swift`: the factory receives a handle of its own id; two fixture experiences opened one after the other each see only their own value; `python3 scripts/check_app_isolation.py --no-direct-storage Apps/VisualCore/App/DebugSupport/DebugExperience.swift Packages/VisualCore/Sources/VisualCoreTestSupport/SampleExperienceCore.swift` passes (FR-U05-002, FR-U05-006).
+
+## Phase 4: User Story 1 - Come back and find the experience where it was left (Priority: P1) 🎯 MVP
+
+**Goal**: the state is saved without any action and restored at the next open and after an end of the app.
+**Independent test**: `SessionRestoreTests`, the app unit tests and `PersistenceUITests`.
+
+- [ ] T-U05-013 [US1] Tests first: `Packages/VisualCoreRendering/Tests/VisualCoreExperienceHostTests/SessionRestoreTests.swift` — `checkpoint()` hands the open experience's snapshot to the sink while running and while suspended and does nothing when idle, preparing or failed; a sink that throws is counted and stops nothing; with `refusedSnapshotFails` a snapshot of a newer schema, one without a migration, and one whose content does not give its digest each end `open` with `.failed`, stage `.restore`, the snapshot error's code, no render host created (`hostsAlive == 0`), the factory called once, and no sink call; without the flag the open goes on as before (`lastRestoreRefusal` set, running); a valid snapshot restores the same digest, seed and step with the flag set; a retry after a restore failure fails the same way.
+- [ ] T-U05-014 [US1] Add `refusedSnapshotFails` to `Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceOpenRequest.swift` and, in `ExperienceSession.swift`, the failure at the restore stage and `checkpoint()`; update the API baseline; T-U05-013 passes on both simulator runtimes (FR-U05-030, FR-U05-031, FR-U05-010).
+- [ ] T-U05-015 [US1] In `Apps/VisualCore/App/AppModel.swift`: create the session with a sink that saves through `SavedStateStore` (a failure goes to `diagnostics.lastSaveFailure`); at `open`, `load` the stored state and pass it with `refusedSnapshotFails`; watch the action port's revision and schedule one `checkpoint()` 5 seconds after a change (the delay comes from a replaceable sleep so that tests script it), cancelled when the experience closes; remove leftover temporary files once at start (`diagnostics.leftoversRemoved`). Unit tests in `AppModelTests.swift`, written first: a state changed by actions is restored after a close and by a new model on the same storage (same digest, seed and step); an accepted action is followed by exactly one save when the scripted delay ends and by none before; several actions inside the delay give one save; no action gives no save during 30 scripted seconds; a state equal to the stored one is not written again (file date unchanged); a failed experience and a cancelled preparation save nothing; a save failure (a file in the place of the folder) is recorded and the experience keeps running; a suspension saves once (FR-U05-010 to FR-U05-015, FR-U05-020 to FR-U05-022; SC-U05-003).
+- [ ] T-U05-016 [US1] Interface tests, written first: `Apps/VisualCore/Tests/UI/PersistenceUITests.swift` — tap the debug experience three times, end the app, start it again: the restored route is the experience and its summary shows three taps (SC-U05-002 with the route, the experience and the search text in 3 of 3 cases); leave the experience and open it again: the taps are kept; the test class is added to the app test chunks as `-e` and the project is regenerated. Proved on the phone and the tablet of both runtimes in the evidence tasks; here on the phone of iOS 27.2 (FR-U05-021).
+
+## Phase 5: User Story 2 - A saved state that cannot be read never crashes and never vanishes (Priority: P1)
+
+**Goal**: a message with Reset and Back, a quarantined copy, no crash, no overwrite.
+**Independent test**: app unit tests with damaged files and `PersistenceUITests` with the debug argument.
+
+- [ ] T-U05-017 [US2] In the app: `AppModel.unreadable` (experience id and `SavedStateProblem`), set when `load` gives `.unreadable` (no open) and when an open fails at the restore stage (the session is taken back to idle first); `resetUnreadable()` (quarantine, then a fresh open) and `dismissUnreadable()` (back to the catalog, nothing changed); `Apps/VisualCore/App/UnreadableStateView.swift` shown by `ExperienceRouteView` with the identifiers `vc.unreadable`, `vc.unreadable.reset`, `vc.unreadable.back`, string resources in `AppStrings.swift` and `Localizable.xcstrings` (a text for a damaged state and one for a state written by a newer version), buttons of at least 44 points. Unit tests in `AppModelTests.swift`, written first: the 8 unreadable states of SC-U05-004 (six through files, two through a debug core whose restore refuses) each give the notice with the expected code, no running experience, an unchanged file; Back keeps the file byte for byte; Reset leaves one quarantined copy and a running experience in the state of a fresh preparation with the same seed; opening again without Reset shows the notice again; five unreadable states in a row leave three copies (FR-U05-030 to FR-U05-034; SC-U05-004, SC-U05-009).
+- [ ] T-U05-018 [US2] Debug argument `-vcDamageState <truncated|garbage|newer|other>` in `DebugLaunch.swift` (damages every stored state before the model starts; `newer` writes a valid snapshot of schema 99, `other` one of another experience id) and interface tests in `PersistenceUITests.swift`: after taps and an end of the app, a start with each of the four kinds shows `vc.unreadable` on the restored experience route, with the newer-version text for `newer`; Back shows the catalog and a further start shows the message again; Reset shows a running experience with zero taps; the message passes the accessibility audit at the default and the largest text size and its two buttons are at least 44 by 44 points (FR-U05-031, FR-U05-033).
+
+## Phase 6: User Story 4 - Start one experience afresh, or everything (Priority: P2)
+
+- [ ] T-U05-019 [US4] In `AppModel.reset` remove the defaults values of the experience (`ExperienceStorage.removeValues`) or of all (`removeAllValues`) and, for all data, the unreadable copy of the preferences; clear the unreadable notice; keep the order close, then remove. Unit tests in `Apps/VisualCore/Tests/Unit/StoreTests.swift`, written first: of three fixture experiences with a saved state, a file, a value and a quarantined copy each, the reset of one removes 100% of its items and 0 of the others' and leaves the preferences; the reset of all leaves no experience folder, no `exp.` key and no preferences and shows the welcome; a reset of an open experience leaves no saved state from its close; the reset experience opens in the state of a fresh preparation with the same seed; data of an id the catalog does not hold is removed by the reset of all (FR-U05-040 to FR-U05-044; SC-U05-006).
+
+## Phase 7: User Story 5 - A state saved by an older version still opens (Priority: P2)
+
+- [ ] T-U05-020 [US5] Add `migrationProblems: @Sendable () async -> [String]` to `ExperienceRegistration` (built from the core type and its examples) and an app unit test that runs it for every registration of the real registry and of the fixture registry (the debug core has schema 1 and needs none); a session test in `SessionRestoreTests.swift` that the sample's version 1 snapshot restores through an open and that the snapshot handed to the sink afterwards has the current schema version (FR-U05-023, FR-U05-051).
+- [ ] T-U05-021 [P] [US5] In `Apps/VisualCore/App/PreferencesStore.swift` keep one copy of an unreadable or newer stored value under `ShellPreferences.unreadableCopyKey` before the value is first overwritten; unit tests in `StoreTests.swift`, written first: the copy equals the unreadable bytes, is written once, and is removed by the reset of all (FR-U05-052).
+
+## Phase 8: User Story 6 - The app's container holds only what is allowed (Priority: P2)
+
+- [ ] T-U05-022 [US6] `Apps/VisualCore/App/DebugSupport/DebugInventory.swift` (debug builds only): the allow-list of data-model section 5 as `InventoryRule` values, a reader of every file below the container's `Documents`, `Library` and `tmp` folders and of every key of the app's defaults domain, and the text `inventory: <n> files, <m> keys; unlisted: <items or none>` shown in the settings diagnostics with the identifier `vc.inventory`; debug argument `-vcStrayItems` (one stray file in Application Support and one stray defaults key). A unit test that the app's rule list is accepted by `ContainerInventory`, that every system rule has an origin and that no rule's pattern or writer names an unlock, purchase, advertising, tracking or account value (FR-U05-060 to FR-U05-063, FR-U05-073).
+- [ ] T-U05-023 [US6] Interface tests in `PersistenceUITests.swift`: after the scripted use (open, taps, background, end, damaged start, Reset, reset of one, reset of all, open again) the inventory text ends with `unlisted: none` on the phone and the tablet of both runtimes; with `-vcStrayItems` it names the stray file and the stray key. Every file or key the system writes that the run shows is added to the allow-list as a system rule with the observation that established it, and the list as built is recorded in data-model.md (FR-U05-062; SC-U05-008).
+
+## Phase 9: Framework obligations and documents
+
+- [ ] T-U05-024 API baseline, rules and boundaries (FR-U05-070 to FR-U05-073; SC-U05-010): `python3 scripts/check_public_api.py --update` leaves no difference and the check passes with 0 undocumented symbols; the baseline lost no line since `0f2fcd3`; `git diff --stat 0f2fcd3 -- External Vendor Showcase Harnesses Apps/GenerativeArtStudio Apps/FluidArtPlayground Apps/FractalExplorer Apps/ParticleUniverse` prints nothing; `python3 scripts/check_dependencies.py`, `python3 scripts/check_compliance.py`, the three `documented-api` checks and `python3 scripts/check_app_isolation.py --no-crash-on-stored-data Packages/VisualCore/Sources/VisualCoreExperience/SavedStateStore.swift Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift Apps/VisualCore/App/PreferencesStore.swift` pass.
+- [ ] T-U05-025 Documents as built: Auto-Creator.md sections 11.4 (restore stage, checkpoint), 11.7 (the unreadable-state message, debug arguments), 15.1 (handle, saved state, quarantine, resets, migration examples, inventory) and 16 (new files), edited in place; `python3 scripts/render_autocreator.py` and `python3 scripts/validate_autocreator.py` pass; data-model.md gains an "As built" section with the allow-list as built.
+- [ ] T-U05-026 Run a read-only audit of the implementation against the specification before the evidence round (`/speckit-converge`); implement what it appends; only then record the evidence.
+- [ ] T-U05-027 Consumers: after `python3 scripts/release_check.py --only xcodegen`, build for testing into `Build/DerivedData/ua-f05-<Scheme>` the schemes `Showcase`, `GenerativeArtStudio`, `FluidArtPlayground`, `FractalExplorer`, `ParticleUniverse` and the harness projects `InteractiveDemo` and `SecondConsumer`, recorded as `build-<Scheme>`: exit 0 seven times, no tracked file changed.
+
+## Phase 10: Evidence and convergence
+
+- [ ] T-U05-028 Evidence `persistence-host`: `swift test --package-path Packages/VisualCore --filter 'VisualCoreExperienceTests|VisualCorePersistenceTests'`; and `host-visualcore`: `swift test --package-path Packages/VisualCore`.
+- [ ] T-U05-029 Evidence `pure-ios27`, `pure-ios26`, `rendering-ios27` and `rendering-ios26`: the package tests on both simulator runtimes (`--result-name ua-f05-ios27`, `ua-f05-ios26` for the rendering package).
+- [ ] T-U05-030 Evidence of the app on the final sources: `xcodegen`, `app-build`, and the 20 chunks `app-phone-ios27-a/-b/-c/-d/-e`, `app-tablet-ios27-a/-b/-c/-d/-e`, `app-phone-ios26-a/-b/-c/-d/-e`, `app-tablet-ios26-a/-b/-c/-d/-e` with `python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime <27.2|26.5> --kind <phone|tablet> --only-testing …` (chunk `-e` is `VisualCoreUITests/PersistenceUITests`, the brief's second evidence command).
+- [ ] T-U05-031 Evidence `release-build`, `release-symbols` (`python3 scripts/check_release_symbols.py --app <release app> --forbid DebugLaunch DebugExperience DebugInventory vcDamageState vcStrayItems vc.inventory`: 0 found; the debug build contains them with `--expect-present`), `privacy-manifest`, `compliance`, `app-isolation`, `storage-rule`, `stored-data-rule`, `public-api`, `dependencies`.
+- [ ] T-U05-032 Evidence `reference-a` and `reference-b`: the two chunks of the ProjectM reference regression (3 of 3 and 4 of 4).
+- [ ] T-U05-033 Evidence `script-tests`, `docs`, `steering`; then confirm with `gh run list` that the `ci` and `push-scan` runs of the last pushed commit succeeded (no open-ended wait: a queued run is checked again later while other work goes on).
+- [ ] T-U05-034 Run `/speckit-converge` for UA-F05; run `/speckit-implement` for every task it appends and `/speckit-converge` again, until a run appends nothing; then `python3 scripts/migration_ledger.py seal --gate UA-F05` and `python3 scripts/migration_ledger.py record --gate UA-F05`.
+- [ ] T-U05-035 {device} After ImplementationLock-100 and the device campaign, on D1, D2 and D3: take the container inventory of the installed app after a scripted use and compare it with the allow-list; add every file or key the devices show that the simulators did not, each with its origin (FR-U05-074). Not run before the lock (`python3 scripts/migration_ledger.py guard-device`); does not block the gate.
+
+No `{owner}` task: the brief names no owner-only item.
+
+## Dependencies and order
+
+- Phase 1 → Phase 2 → the stories. US3 (Phase 3) needs T-U05-003. US1 (Phase 4) needs T-U05-005 and Phase 3's
+  handle in the launch value. US2 (Phase 5) needs US1's open path. US4 (Phase 6) needs T-U05-003, T-U05-005 and
+  US2's notice. US5 (Phase 7) needs T-U05-007 and US1. US6 (Phase 8) needs T-U05-009 and every earlier phase for
+  its scripted use. Phases 9 and 10 come last.
+- One writer per file: `AppModel.swift` is written by T-U05-012, T-U05-015, T-U05-017 and T-U05-019 in this
+  order, by the lead; `AppModelTests.swift` and `PersistenceUITests.swift` likewise; `ExperienceSession.swift` by
+  T-U05-014.
+
+## Parallel opportunities
+
+- Phase 2: the four test-and-source pairs (T-U05-002/003, 004/005, 006/007, 008/009) are independent; each pair
+  can go to one agent. T-U05-001 and T-U05-010 touch files nothing else touches.
+- T-U05-021 touches only `PreferencesStore.swift` and `StoreTests.swift` (after T-U05-019 for the latter).
+
+## Implementation strategy
+
+MVP is Phase 1 to Phase 4 (a state that survives an end of the app). Then US2 (unreadable states), US4
+(resets), US5 (migrations), US6 (inventory). A converge audit before the evidence round; the evidence is
+recorded once, on the final sources.
