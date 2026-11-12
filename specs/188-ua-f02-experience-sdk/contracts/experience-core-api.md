@@ -78,6 +78,18 @@ public enum ExperienceError: Error, Sendable, Equatable {
 
 Codes are part of the API: they never change once released.
 
+Further public members, as built:
+
+| Member | Value or rule |
+|---|---|
+| `ExperienceFailure.unspecifiedCode` | `experience.unspecified`, the code that replaces one that is not well formed |
+| `ExperienceFailure.maxCodeLength` | 64 |
+| `ExperienceFailure.maxMessageLength` | 500 |
+| `ExperienceFailure.isValidCode(_:)` | true for 1 to 64 characters of `a-z`, `0-9`, `.` and `-` |
+| `ExperienceEngine.preparationFailedCode` | `experience.preparation-failed`, for an error of a core that is neither an `ExperienceFailure` nor an `ExperienceError` |
+| `ExperienceScenario.tooLargeCode` | `experience.scenario-too-large` (automation builds only) |
+| `ExperienceScenario.isWithinLimits` | false above 10,000 entries or 1,000,000 steps in total (automation builds only) |
+
 ## Lifecycle (`ExperienceLifecycle.swift`)
 
 ```swift
