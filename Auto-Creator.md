@@ -2741,8 +2741,8 @@ builds of both modules.
   experience and arguments that erase the app's data and skip the welcome; none of it is in a release build.
 - The app's tests run with `python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime <27.2|26.5> --kind
   <phone|tablet>`: the simulator is chosen by runtime and kind (for a phone the narrowest available one), and
-  the enumeration guard runs on the log. A tablet run is made in chunks of whole test classes with
-  `--only-testing`, each under ten minutes; the guard then covers the classes of the chunk.
+  the enumeration guard runs on the log. A run is made in chunks of whole test classes with `--only-testing`,
+  each under ten minutes; the guard then covers the classes of the chunk.
 - As built by UA-F04: settings and about are list rows above the tiles, and the way back from a route is a row
   of its content (a navigation bar clips text at the largest sizes and keeps its buttons below 44 points); the
   search is a text field in the first row; a registration's factory receives the stored reduce-motion and

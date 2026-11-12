@@ -96,6 +96,22 @@ func scrollCatalog(_ app: XCUIApplication) {
     if list.exists { list.swipeUp() } else { app.swipeUp() }
 }
 
+/// Scrolls the route `route` (its own content, not the catalog beside it) up to eight times until `element` exists
+/// and can be tapped; fails the test at the caller's line when it never does. Rows of a long form exist only near
+/// the screen, so a small phone has to scroll before a row can be found.
+@MainActor
+@discardableResult
+func scrollRoute(_ app: XCUIApplication, _ route: String, to element: XCUIElement,
+                 file: StaticString = #filePath, line: UInt = #line) -> Bool {
+    let root = app.descendants(matching: .any).matching(identifier: route).firstMatch
+    for _ in 0..<8 where !(element.exists && element.isHittable) {
+        if root.exists { root.swipeUp() } else { app.swipeUp() }
+    }
+    let found = element.exists && element.isHittable
+    XCTAssertTrue(found, "not reached by scrolling \(route): \(element)", file: file, line: line)
+    return found
+}
+
 /// Scrolls the catalog until `element` exists and can be tapped, then taps it.
 @MainActor
 func revealAndTap(_ app: XCUIApplication, _ element: XCUIElement, file: StaticString = #filePath, line: UInt = #line) {

@@ -88,5 +88,7 @@ arguments, last reset (what was removed). Readable in debug builds through the i
   created with and the list of arguments that were not understood (always empty there, because nothing reads the
   arguments). The handling itself (`DebugLaunch`, `DebugExperience`, `hideWelcomeForThisLaunch`) does not exist.
 - The app test runner takes the narrowest available phone simulator of the runtime (an iPhone 13 mini was
-  created for both runtimes); a tablet run is recorded in three chunks, each under ten minutes.
+  created for both runtimes). With the convergence tests a run of all classes takes longer than ten minutes on
+  every device, so each run is recorded in four chunks of whole test classes (`-a` routes; `-b` settings and
+  launch; `-c` the three unit test classes; `-d` launcher and first run); the four chunks name every test class.
 - The seed of an opened experience is derived from its id (a stable value); UA-F05 will supply stored seeds.

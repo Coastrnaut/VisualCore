@@ -69,7 +69,9 @@ final class SettingsUITests: XCTestCase {
         XCTAssertTrue(waitUntilGone(element(app, "vc.welcome")))
         openSettings(app)
 
-        revealAndTap(app, element(app, "vc.settings.reset.all"))
+        let resetAll = element(app, "vc.settings.reset.all")
+        scrollRoute(app, "vc.route.settings", to: resetAll)
+        resetAll.tap()
         let confirm = element(app, "vc.settings.reset.confirm")
         waitFor(confirm, timeout: VC.wait, "the reset asks for a confirmation")
         XCTAssertFalse(element(app, "vc.welcome").exists, "nothing is reset before the confirmation")
@@ -84,8 +86,7 @@ final class SettingsUITests: XCTestCase {
         waitFor(element(app, "vc.route.catalog"))
         openSettings(app)
         let privacy = element(app, "vc.settings.privacy")
-        waitFor(privacy, timeout: VC.wait)
-        for _ in 0..<5 where !privacy.isHittable { scrollCatalog(app) }
+        scrollRoute(app, "vc.route.settings", to: privacy)
         let statement = text(app, of: "vc.settings.privacy").lowercased()
         for word in ["collect", "network", "advertising", "account"] {
             XCTAssertTrue(statement.contains(word), "the privacy statement lacks '\(word)': \(statement)")
@@ -124,20 +125,21 @@ final class SettingsUITests: XCTestCase {
                 .filter { !fixed.contains($0) }.sorted()
         }
         let all = element(app, "vc.settings.reset.all")
-        waitFor(all, timeout: VC.wait)
-        for _ in 0..<5 where !all.isHittable { scrollCatalog(app) }
+        scrollRoute(app, "vc.route.settings", to: all)
         let before = rows()
         XCTAssertEqual(before.count, 2, "two experiences have data: \(before)")
         let target = before[0]
 
-        revealAndTap(app, element(app, target))
+        scrollRoute(app, "vc.route.settings", to: element(app, target))
+        element(app, target).tap()
         let cancel = element(app, "vc.settings.reset.cancel")
         waitFor(cancel, timeout: VC.wait, "the reset asks for a confirmation")
         cancel.tap()
         XCTAssertTrue(waitUntilGone(cancel))
         XCTAssertEqual(rows(), before, "Cancel removes nothing")
 
-        revealAndTap(app, element(app, target))
+        scrollRoute(app, "vc.route.settings", to: element(app, target))
+        element(app, target).tap()
         let confirm = element(app, "vc.settings.reset.confirm")
         waitFor(confirm, timeout: VC.wait)
         confirm.tap()
