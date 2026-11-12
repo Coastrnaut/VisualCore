@@ -91,4 +91,7 @@ arguments, last reset (what was removed). Readable in debug builds through the i
   created for both runtimes). With the convergence tests a run of all classes takes longer than ten minutes on
   every device, so each run is recorded in four chunks of whole test classes (`-a` routes; `-b` settings and
   launch; `-c` the three unit test classes; `-d` launcher and first run); the four chunks name every test class.
+- The model follows the session's state and applies the stored quality override each time the session reaches
+  running, so that an experience reopened by the Retry of the failure view gets it too (convergence 2, T-U04-049).
+- The app test runner stops a run after `--max-seconds` (default 540) and names the last test that started.
 - The seed of an opened experience is derived from its id (a stable value); UA-F05 will supply stored seeds.
