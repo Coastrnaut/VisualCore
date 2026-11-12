@@ -2556,17 +2556,29 @@ Names without that mark exist in the source today.
 
 ### 11.2 Catalog and identity
 
-- Pure module `VisualCoreExperience` (new, in `Packages/VisualCore`) defines `ExperienceID`,
-  `ExperienceDescriptor`, `ExperienceTier`, `ExperienceCategory` and a validated `CatalogManifest`.
-- `scripts/build_catalog.py` (new) derives the runtime manifest `Catalog/experiences.json` (new) from the planning
-  catalog and the registered experiences; `Catalog/categories.json` (new) holds category order and titles;
-  `Catalog/path-map.json` (new) records every source move of the migration.
-- The loader rejects unknown schema versions, duplicate ids, missing fields, non-finite numbers and oversized
-  files with typed errors (constitution IX).
+- Pure module `VisualCoreExperience` (in `Packages/VisualCore`, UA-F01) defines `ExperienceCode`, `ExperienceID`,
+  `ExperienceDescriptor`, `ExperienceTier`, `ExperienceKind`, `ExperienceCategory`, a validated `CatalogManifest`,
+  `CategoryList`, `CatalogSearch`, `RegistryReport` and `SourceMoveMap`. Every name derived from an experience
+  comes from `ExperienceID`: the gate `X-<code>`, the storage namespace and evidence name (the id) and the
+  accessibility prefix `experience.<id>`.
+- `scripts/build_catalog.py` derives the runtime manifest `Catalog/experiences.json` from the planning catalog,
+  the migration ledger (availability) and `Catalog/registrations.json`, where an integrated experience declares
+  its capabilities, quality tiers, tile colors and content facts; `Catalog/categories.json` holds category order
+  and titles; `Catalog/path-map.json` records every executed source move (the plan of the moves is
+  `docs/migration/path-map.json`). `python3 scripts/build_catalog.py --check` proves that the committed files and
+  the copies the package tests use are what the tool writes; CI runs it.
+- The loader refuses data over 1,048,576 bytes, unknown schema versions, keys the schema does not define,
+  duplicate ids, missing fields, values over their limits and numbers that are not finite, whole and in range,
+  each with one typed `CatalogError` (constitution IX). The launch allocation (50 free, 50 premium) is a rule of
+  the loader, not data.
 - A registry check proves a one-to-one match between manifest entries marked available and registered
-  factories. A committed golden list of shipped ids makes any change of an id a test failure.
+  factories. `Catalog/experience-ids.golden.txt` lists all 300 ids of the planning catalog and only grows: any
+  change of an id is a test failure.
+- Search folds text without any language setting (compatibility decomposition, no combining marks, lower case,
+  dotless i as i) and orders results by the weakest field a word needed (title, tags, summary), then by catalog
+  order.
 
-Proposed schema of the runtime manifest (`Catalog/experiences.json`, schema version 1; UA-F01 fixes it):
+Schema of the runtime manifest (`Catalog/experiences.json`, schema version 1):
 
 | Field | Type | Meaning |
 |---|---|---|
@@ -2577,10 +2589,10 @@ Proposed schema of the runtime manifest (`Catalog/experiences.json`, schema vers
 | `tier` | `free` or `premium` | what the entitlement gate reads |
 | `category`, `family`, `tags` | string, string, list | launcher grouping and search |
 | `order` | number | catalog order |
-| `palette`, `tile_seed` | list of colors, number | what the launcher draws the tile from |
+| `palette`, `tile_seed` | list of `#RRGGBB` colors, number | what the launcher draws the tile from; the seed is derived from the id |
 | `capabilities` | list | for example `microphone`, `export-image`; drives usage descriptions and the privacy audit |
 | `quality_tiers` | list | declared tier names |
-| `content` | object | for a game: level count, the bundled level catalog with seeds and witness hashes, and its SHA-256 |
+| `content` | object or null | for a registered game: `levels` and `catalog_sha256` of its bundled level catalog; the level catalog itself is a separate file of the game's features |
 | `available` | boolean | true only when `X-<code>` is pass |
 
 Data models that the features define (all versioned, all with bounded decoding): the experience descriptor above;

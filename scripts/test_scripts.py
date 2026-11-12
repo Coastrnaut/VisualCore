@@ -1890,7 +1890,8 @@ class GovernanceTests(unittest.TestCase):
         # FR-U00-050 to FR-U00-052: four validators as steps of ci.yml, the scan of the pushed range in its own workflow.
         ci = self.files[".github/workflows/ci.yml"]
         for command in ("python3 scripts/validate_autocreator.py", "python3 scripts/planning_archive.py verify",
-                        "python3 scripts/planning_index.py verify", "python3 scripts/migration_ledger.py validate"):
+                        "python3 scripts/planning_index.py verify", "python3 scripts/migration_ledger.py validate",
+                        "python3 scripts/build_catalog.py --check"):
             self.assertRegex(ci, r"run: " + re.escape(command) + r"\s*\n", command)
         self.assertTrue(".github/workflows/push-scan.yml" in self.files, "the scan workflow does not exist")
         scan = self.files[".github/workflows/push-scan.yml"]

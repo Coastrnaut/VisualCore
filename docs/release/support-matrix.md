@@ -45,6 +45,7 @@ results describe that app, not VisualCore (CLAUDE.md §12).
 | Game-controller input | **Not implemented**. See known limitations. |
 | SwiftUI render surface (`VisualCoreUI.RenderSurface`) | verified (simulator), A01-P01 |
 | Parameter schemas, palettes, presets (`VisualCoreParameters`) | verified (host), A01-P01 |
+| Experience identity and runtime catalog (`VisualCoreExperience`: `ExperienceID`, `CatalogManifest`, search, registry check) | verified (host and simulator), UA-F01 |
 | Bundled shaders, GLSL library, full-screen scenes | verified (simulator), A01-P01 |
 | Scene clock (`VisualCoreSimulation.SceneClock`), parameter editing (`ParameterEditor`) | verified (host), A01-P02 |
 | SwiftUI parameter panel (`VisualCoreUI.ParameterPanel`) | verified (simulator), A01-P02 |

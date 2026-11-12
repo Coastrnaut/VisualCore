@@ -39,6 +39,9 @@ jobs:
         run: python3 scripts/planning_index.py verify
       - name: Migration ledger
         run: python3 scripts/migration_ledger.py validate
+      # Feature 187 (UA-F01): the committed runtime catalog is exactly what the build tool derives.
+      - name: Runtime catalog
+        run: python3 scripts/build_catalog.py --check
       - name: Compliance
         run: python3 scripts/check_compliance.py
       - name: Dependency rules
