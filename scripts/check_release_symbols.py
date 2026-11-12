@@ -42,6 +42,9 @@ def binaries(app: Path) -> list[Path]:
                 found.append(executable(f))
             except (OSError, KeyError):
                 pass
+        found += sorted(fw.glob("*.dylib"))
+    # Loose libraries beside the executable (a debug build keeps the app's code in `<name>.debug.dylib`).
+    found += sorted(app.glob("*.dylib"))
     return found
 
 

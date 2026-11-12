@@ -1127,6 +1127,19 @@ class ForbiddenTextTests(unittest.TestCase):
                 code = relsym.main(["--app", str(app)] + args)
         return code, out.getvalue()
 
+    def test_loose_libraries_of_the_app_are_searched(self):
+        """A debug build keeps the app's code in `<name>.debug.dylib` beside the executable; the search covers loose
+        libraries in the app folder and in Frameworks."""
+        import plistlib
+        with tempfile.TemporaryDirectory() as d:
+            app = Path(d) / "VisualCore.app"
+            (app / "Frameworks").mkdir(parents=True)
+            (app / "Info.plist").write_bytes(plistlib.dumps({"CFBundleExecutable": "VisualCore"}))
+            for path in (app / "VisualCore", app / "VisualCore.debug.dylib", app / "Frameworks" / "libX.dylib"):
+                path.write_bytes(b"x")
+            self.assertEqual([p.relative_to(app).as_posix() for p in relsym.binaries(app)],
+                             ["VisualCore", "Frameworks/libX.dylib", "VisualCore.debug.dylib"])
+
     def test_no_hit_passes(self):
         code, out = self.check(["--forbid", "DebugLaunch", "vcFixtureCatalog"])
         self.assertEqual(code, 0)
