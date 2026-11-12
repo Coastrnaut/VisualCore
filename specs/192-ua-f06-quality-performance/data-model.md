@@ -130,3 +130,25 @@ and keeps reading version 1.
 `docs/performance/budgets.md`: a table with the columns `Budget`, `Proposal`, `Status`, `Confirmed by`. `Status`
 is `proposal` until a device measurement is linked. `Confirmed by` names devices (D1, D2, D3), the scenario and
 the number of samples.
+
+## 9. As built (recorded after T-U06-029)
+
+- `QualityPolicy` gained `forgetTiming()` (keeps the tier, restarts the calm period); `QualityGovernor.resume()`
+  uses it. The contract had said the policy's API stays unchanged.
+- The pin is stored as given; `levelInForce` clamps it to the levels of the experience.
+- The session does not use `PacingMeter.skipNext()`: it forgets the time of the last presented frame at a
+  suspension, so that no interval spans the time away.
+- The level in force is applied through `Experience.setQualityTier` when the experience is ready, active or
+  suspended; an experience whose logic refuses the level keeps the level it has.
+- Late compilations are computed when a record is read: compilations since the baseline taken when the session
+  became running, plus those counted before a context rebuild. After a context loss that the host repairs itself
+  the baseline is taken again at the next drawn frame.
+- The presenter variants of the tests (late compilation, leak) are private types of their test files, not
+  additions to `SamplePresenter.swift`.
+- The endurance run draws its 36,000 frames without presenting them and takes well under a second on the
+  simulator: it proves that app memory and ledger bytes do not grow, not rendering throughput.
+- The app's launch start is `AppLaunch.start`, taken in the app type's initializer; a first start is one that finds
+  no stored preferences (also after a reset of all data).
+- `ShellID.performance` and `SettingsView.performanceText` exist only in debug builds.
+- The sample core gained the fault `WrongProfileCount` for the conformance test.
+

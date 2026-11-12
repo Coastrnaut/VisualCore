@@ -1,5 +1,7 @@
 # Performance baselines (feature 010 T-F909; FR-F905)
 
+Simulator numbers are development signals, not device performance.
+
 **These are host and simulator numbers. They are not device evidence** (constitution V). Device performance
 claims come only from campaign II on D1 (iPhone15,4, iOS 27.0.1), D2 (iPad17,3, iPadOS 27.2) and
 D3 (iPad15,7, iPadOS 26.5), using real AutomationRunner reports. The baselines here exist to catch regressions
@@ -40,3 +42,8 @@ Simulator GPU timing comes from the Mac's GPU through the simulator, so it says 
 
 Rerun both commands on a quiet Mac, with no other build running, and commit the JSON together with the change that
 explains it. Compare only against baselines recorded on the same host model.
+
+## Budgets
+
+The performance budgets of the unified app are proposals with their confirming device measurements:
+[budgets.md](budgets.md) (feature 192, UA-F06). `python3 scripts/check_performance_docs.py` checks both files.

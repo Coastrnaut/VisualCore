@@ -2690,8 +2690,10 @@ builds of both modules.
   its resource registry is empty, and only then prepares the next. Of two competing opens the newest wins; the
   other ends as superseded.
 - Activation order: resolve entitlement (the caller, before it asks the session) → `prepare(seed:)` → restore the
-  given snapshot → create the render host with the budget → activate → first frame → interactive. Each stage is
-  timed separately for the evidence record. A render host exists only after a successful preparation.
+  given snapshot → apply the quality level in force → create the render host with the budget (the scene's set-up
+  compiles the shaders) → activate → first frame → interactive. Each stage is timed separately for the evidence
+  record: preparation, set-up with the number of programs compiled, and the time to the first presented frame. A
+  render host exists only after a successful preparation.
 - Deactivation order: stop clocks → final snapshot → begin deactivation → destroy the render host → read the
   counts → end deactivation (zero live and zero leaked resources, or a recorded leak failure) → idle.
 - The session's decisions (its seven states and their legal changes, the order of a close, the memory-pressure
@@ -2804,6 +2806,16 @@ instance count, iteration count, effect passes). The profile builds on the exist
 state or Low Power Mode and recover after the calm period. A tier change never changes domain state. A settings
 override lets a person pin a tier.
 
+As built by UA-F06: `QualityProfile` (one to eight named levels, each with a resolution share, an element share,
+an iteration share and a number of effect passes; no budget rises from one level to the next) is declared by an
+experience's logic (`ExperienceCore.qualityProfile`) and checked by the conformance run against its tier count and
+by the app's registry test against the catalog's level names. `QualityGovernor` gives the level in force: the
+pinned level, or the tier of the existing `QualityPolicy` for the device conditions, decided at most once per
+second. The session owns the governor: it applies the level after the preparation and before a render host exists,
+decides again while the experience runs, takes no decision while it is suspended, and applies a changed pin at
+once. The app only hands the stored override to the session. The frame scheduler's own reaction to heat (frame-rate
+cap and resolution factor) is unchanged and multiplies with the level's resolution share.
+
 ### 12.5 Budgets
 
 Budgets are written as proposals in `docs/performance/` together with the device measurement that will confirm
@@ -2839,6 +2851,17 @@ to confirm on devices:
 - Launch time takes one sample per process launch. The first launch after installation belongs to onboarding and
   is excluded.
 - A result that only just passes is repeated and reported with its variance.
+- As built by UA-F06: the session produces one `PerformanceRecord` (version 1) per opened experience, which the
+  evidence record of UA-F09 embeds: launch time (from the first code of the app to the usable launcher, once per
+  process, first start marked), preparation, shader set-up and programs compiled, late compilations (programs
+  compiled after the experience became interactive; rebuilds after a lost context are counted apart), the time to
+  the first presented frame, pacing from the interval between presented frames (`PacingMeter`: on-time and missed
+  refreshes, median, 95th and 99th percentile from fixed bins, constant memory), memory footprint
+  (`ProcessMemory`), graphics bytes with their peak, the level in force, thermal state and Low Power Mode. An
+  absent measurement has no value. `GrowthRule` judges a series of samples; the endurance scenario of the sample
+  experience (36,000 drawn frames, 72,000 steps) passes it on the simulator. The budgets are in
+  `docs/performance/budgets.md`, checked by `scripts/check_performance_docs.py`. The on-screen frame meter of
+  this section is built by UA-F09 on these counts.
 - Data the launcher sorts or indexes is sorted at build time, not at launch.
 
 ## 13. Shared features and reuse
@@ -3167,7 +3190,7 @@ VisualCore/
 ├── External/projectm-ios/        existing   pinned read-only submodule
 ├── Configs/                      existing   toolchain.json, Signing.xcconfig (the local signing file is never committed), simulator-identifier-hashes.json
 ├── Tools/python/desktop_runbook.py   existing   legacy ledger tool
-├── scripts/                      modify     + build_catalog.py, check_experience_symbols.py, xcodebuild_app.py, verify_experiences.py, run_device_campaign.py
+├── scripts/                      modify     + build_catalog.py, check_experience_symbols.py, xcodebuild_app.py, check_performance_docs.py, verify_experiences.py, run_device_campaign.py
 ├── specs/                        modify     001–035 existing; 036–550 and rNN-* as features are specified
 └── docs/
     ├── decisions/                modify     ADR-0001 … ADR-0009, then ADR-0010 (constitution 2.0.0)

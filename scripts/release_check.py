@@ -82,6 +82,9 @@ def steps(stamp: str) -> list[Step]:
     s = [
         Step("docs", [PY, "scripts/validate_docs.py"]),
         Step("compliance", [PY, "scripts/check_compliance.py"]),
+        # Feature 192 (UA-F06): budgets are proposals with their confirming device measurement; simulator numbers
+        # carry the notice.
+        Step("performance-docs", [PY, "scripts/check_performance_docs.py"]),
         Step("dependencies", [PY, "scripts/check_dependencies.py"]),
         Step("public-api", [PY, "scripts/check_public_api.py"]),
         Step("documented-api-showcase", [PY, "scripts/check_documented_api.py", "--sources", "Showcase/App"]),

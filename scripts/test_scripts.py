@@ -911,6 +911,75 @@ class ReleaseCheckTests(unittest.TestCase):
         self.assertEqual(names.index("visualcore-app-build"), names.index("xcodegen") + 1)
 
 
+class PerformanceDocsTests(unittest.TestCase):
+    """Feature UA-F06 T-U06-030 (FR-U06-060 to FR-U06-062): check_performance_docs.py."""
+
+    tool = load("check_performance_docs")
+    NOTICE = "Simulator numbers are development signals, not device performance."
+    HEAD = "| Budget | Proposal | Status | Confirmed by |\n|---|---|---|---|\n"
+    GOOD = "| Frame pacing | 95% on time | proposal | D1, D2, D3: scenario steady, 200 samples per device |\n"
+
+    def run_on(self, files: dict[str, str]):
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            for name, text in files.items():
+                (root / name).write_text(text)
+            problems, count, rows = self.tool.check(root, root)
+        return problems, count, rows
+
+    def test_a_proposal_with_a_device_measurement_passes(self):
+        problems, files, rows = self.run_on({"budgets.md": "# B\n\n" + self.HEAD + self.GOOD
+                                             + "| Build size | recorded | proposal | tooling: release build of UA-F10 |\n"})
+        self.assertEqual(problems, [])
+        self.assertEqual((files, rows), (1, 2))
+
+    def test_a_row_without_its_measurement_fails_with_file_and_line(self):
+        cases = {
+            "| Launch | fast | proposal | |\n": "lacks its confirming measurement",
+            "| Launch | fast | proposal | later |\n": "lacks its confirming measurement",
+            "| Launch | fast | proposal | D1 only |\n": "lacks its confirming measurement",
+            "| Launch | fast | proposal | 200 samples |\n": "lacks its confirming measurement",
+            "| Launch | fast | proposal | tooling: |\n": "lacks its confirming measurement",
+            "| Launch | fast | measured | D1: 200 samples |\n": "neither proposal nor confirmed",
+            "| Launch | fast | confirmed | D1: 200 samples |\n": "confirmed without a link",
+            "| Launch |  | proposal | D1: 200 samples |\n": "needs a budget and a proposal",
+        }
+        for row, expected in cases.items():
+            problems, _, _ = self.run_on({"budgets.md": self.HEAD + row})
+            self.assertEqual(len(problems), 1, row)
+            self.assertTrue(problems[0].startswith("budgets.md:3: "), problems[0])
+            self.assertIn(expected, problems[0])
+        ok, _, _ = self.run_on({"budgets.md": self.HEAD
+                                + "| Launch | fast | confirmed | D1: 200 samples, [report](r.md) |\n"})
+        self.assertEqual(ok, [])
+
+    def test_a_simulator_number_without_the_notice_fails(self):
+        text = "# Baselines\n\nMedian on the simulator: 12.4 ms.\n"
+        problems, _, _ = self.run_on({"budgets.md": self.HEAD + self.GOOD, "notes.md": text})
+        self.assertEqual(len(problems), 1)
+        self.assertTrue(problems[0].startswith("notes.md:3: a simulator is mentioned without the notice"), problems[0])
+        problems, _, _ = self.run_on({"budgets.md": self.HEAD + self.GOOD, "notes.md": self.NOTICE + "\n" + text})
+        self.assertEqual(problems, [])
+
+    def test_a_directory_without_a_budget_table_fails(self):
+        problems, _, rows = self.run_on({"notes.md": "# nothing\n"})
+        self.assertEqual(rows, 0)
+        self.assertEqual(len(problems), 1)
+        self.assertIn("no budget table", problems[0])
+
+    def test_the_real_documents_pass_and_the_tool_exits_with_the_right_codes(self):
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            code = self.tool.main([])
+        self.assertEqual(code, 0, out.getvalue())
+        self.assertIn("8 budget rows", out.getvalue().splitlines()[-1])
+        with contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(self.tool.main(["--dir", "docs/no-such-directory"]), 2)
+        listing = subprocess.run([sys.executable, str(HERE / "release_check.py"), "--list"],
+                                 capture_output=True, text=True, check=True).stdout
+        self.assertIn("performance-docs: ", listing)
+
+
 class UnifiedAppTargetTests(unittest.TestCase):
     """Feature UA-F04 T-U04-045 (FR-U04-001, FR-U04-070): the project has exactly one application target marked as
     the shippable one, with one unit-test and one interface-test target, and the standing isolation step of every
