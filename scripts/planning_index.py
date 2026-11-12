@@ -693,11 +693,11 @@ UNIFIED_BOUNDARIES = (
     "never performed."
 )
 UNIFIED_DISCIPLINE = (
-    "DISCIPLINE: work in Claude Desktop Code on branch migration/unified-app-plan (never the Claude CLI, never a push to "
-    "main). Reference only APIs verified in the current source; every name marked (new) or proposed in the brief must "
+    "DISCIPLINE: work in Claude Desktop Code on branch main (never the Claude CLI); commit after every task and push "
+    "with python3 scripts/prepush_scan.py --push. Reference only APIs verified in the current source; every name marked (new) or proposed in the brief must "
     "be confirmed or corrected against real code and the correction recorded. Never claim device performance from "
     "simulator results. Tick a task only with reproduced evidence in the form '- [X] <id> ... \u2014 Verified YYYY-MM-DD: "
-    "<command and result>'. Commit after every task without trailers."
+    "<command and result>'. Commits carry no trailers."
 )
 
 

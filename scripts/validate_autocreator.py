@@ -63,7 +63,8 @@ SKILLS = ["constitution", "specify", "clarify", "plan", "checklist", "tasks", "a
 PLANNED_SCRIPTS = {"scripts/build_catalog.py", "scripts/verify_experiences.py", "scripts/run_device_campaign.py"}
 PROMPT_MUST_CONTAIN = [
     "STEP 0", "CHECKPOINT REPORT", "STEP 1", "ORDER OF WORK", "DONE MEANS", "STOP CONDITIONS", "REPORT AT THE END",
-    "migration/unified-app-plan", "python3 scripts/migration_ledger.py status", "python3 scripts/migration_ledger.py next",
+    "on branch main", "python3 scripts/prepush_scan.py --push", "python3 scripts/migration_ledger.py status",
+    "python3 scripts/migration_ledger.py next",
     "python3 Tools/python/desktop_runbook.py status", "python3 scripts/validate_autocreator.py", "guard-device",
     "ImplementationLock-100", "LOCK-FREE-50", "LOCK-PREMIUM-50", "UA-F08", "1.99", "/speckit-converge", "CONSTITUTION-2",
     "iPhone15,4", "iPad17,3", "iPad15,7", "iPadOS 26.5", "NEVER update", "BLOCKED_OWNER_ACTION", "add-round", "xcodebuild",
@@ -355,7 +356,7 @@ def check_bootstrap(text: str) -> list[str]:
         problems.append(f"CLAUDE.md is {len(text.encode())} bytes; the bootstrap must stay under 12,000")
     for needle in ("Auto-Creator.md", ".specify/memory/constitution.md", "scripts/migration_ledger.py status",
                    "Tools/python/desktop_runbook.py status", "DO NOT UPDATE D3", "ImplementationLock-100",
-                   "BLOCKED_OWNER_ACTION", "migration/unified-app-plan", "No advertising"):
+                   "BLOCKED_OWNER_ACTION", "scripts/prepush_scan.py", "No advertising"):
         if needle not in text:
             problems.append(f"CLAUDE.md lacks {needle!r}")
     return problems

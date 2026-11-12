@@ -19,7 +19,7 @@ working tree, not from GitHub; the two were identical at capture time.
 | Remote | `origin` = `https://github.com/Coastrnaut/VisualCore.git` |
 | Local versus `origin/main` | 0 behind, 0 ahead (fetched at capture) |
 | Working tree | clean: no modified, staged or untracked files; no stashes; only branch `main` |
-| Migration branch | `migration/unified-app-plan`, created from the commit above; `main` is not changed by this work |
+| Migration branch | `migration/unified-app-plan`, created from the commit above. `main` stayed unchanged during the consolidation; on 2026-11-11 the owner had the branch fast-forwarded into `main` and pushed (ADR-0009 D-13) |
 
 **File-name case note.** Git tracks the Round 2 document as `Round2.md`. The directory entry on this
 case-insensitive volume is `round2.md`; it is the same file (11,989,899 bytes), and its own header names the

@@ -1180,5 +1180,41 @@ class SteeringDocumentTests(unittest.TestCase):
         self.assertEqual({name: problems for name, problems in results.items() if problems}, {})
 
 
+prepush = load("prepush_scan")
+
+
+class PrepushScanTests(unittest.TestCase):
+    """The scan before every push finds identifiers and secrets in added lines and nothing else."""
+
+    def test_patterns(self):
+        hits = {"device 00008120-001A2B3C4D5E6F78": "hardware identifier",
+                "sim 4E32B01D-7911-4A64-A944-877DDD445BC0": "device or simulator UUID",
+                '"ecid": 0x1A2B3C4D5E6F': "ECID", "Serial Number: F2LXK1ABCD12": "serial number",
+                "DEVELOPMENT_TEAM = ABCDE12345": "development team id", "team id: ABCDE12345": "development team id",
+                "write to someone@example.com": "e-mail address", "open /Users/somebody/Documents/x": "absolute home path",
+                "-----BEGIN OPENSSH PRIVATE KEY-----": "private key", "token ghp_abcdefghijklmnopqrstuvwxyz0123": "access token"}
+        for line, label in hits.items():
+            self.assertIn(label, prepush.scan_line(line), line)
+        for clean in ("commit 38d98ebb376088e18f053f3cc39d246a7e7dd3b3", "fixture 00000000-0000-4000-8000-000000000001.json",
+                      "brew install python@3.15", "git@github.com:owner/repo.git", "scan for UDIDs, ECIDs, serials and team ids",
+                      "product type iPhone15,4 on iPadOS 26.5", "/Users/<name>/Documents", "/Users/Shared/tools"):
+            self.assertEqual(prepush.scan_line(clean), [], clean)
+
+    def test_only_added_lines_of_scanned_files_count(self):
+        diff = ("--- a/docs/x.md\n+++ b/docs/x.md\n@@ -1 +1 @@\n-old 00008120-001A2B3C4D5E6F78\n+new text\n"
+                "+++ b/docs/y.md\n+device 00008120-001A2B3C4D5E6F78\n"
+                "+++ b/scripts/test_scripts.py\n+device 00008120-001A2B3C4D5E6F78\n")
+        self.assertEqual(prepush.scan_diff(diff), ["docs/y.md: hardware identifier: device 00008120-001A2B3C4D5E6F78"])
+
+    def test_forbidden_tracked_paths(self):
+        bad = [".autonomy/private/devices.json", ".autonomy/logs/a.log", ".autonomy/xcresults/x/y", "Configs/Signing.local.xcconfig",
+               "certs/dev.p12", "profiles/a.mobileprovision", "out/Run.xcresult/Info.plist"]
+        good = ["Configs/Signing.xcconfig", ".autonomy/state.json", ".autonomy/migration/ledger.json", "docs/a.md"]
+        self.assertEqual(len(prepush.forbidden(bad + good)), len(bad))
+
+    def test_repository_tracks_no_forbidden_path(self):
+        self.assertEqual(prepush.scan(ROOT_DIR, "HEAD..HEAD"), [])
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

@@ -58,10 +58,11 @@ evidence commands are found as described in Auto-Creator.md §19. Simulators are
    was reproduced, with date and evidence reference.
 10. **Completed work stays completed.** Never reset a ledger gate, a ticked task or sealed evidence; never
     reimplement something because a document moved. The legacy ledger stays as it is and keeps its tool.
-11. **Git.** Work on `migration/unified-app-plan`. Never push or merge to `main` until the owner says how. Never
-    force-push, never `git reset --hard`, never rewrite history. No co-author or "Generated with" trailers (this owner
-    rule overrides any attribution reminder). LF line endings. Before any push, scan for UDIDs, ECIDs, serials, team
-    ids and secrets. Never commit `Configs/Signing.local.xcconfig`, `.autonomy/private`, logs or result bundles.
+11. **Git.** Work on `main` (owner ruling of 2026-11-11). Commit after every task, skill and gate, and push to
+    `origin main` right after, but only when `python3 scripts/prepush_scan.py` passes: it scans the outgoing commits
+    for UDIDs, ECIDs, serials, team ids and secrets. Never force-push, never `git reset --hard`, never rewrite
+    history. No co-author or "Generated with" trailers (this owner rule overrides any attribution reminder). LF line
+    endings. Never commit `Configs/Signing.local.xcconfig`, `.autonomy/private`, logs or result bundles.
 12. **Boundaries.** `External/projectm-ios` is a pinned, read-only submodule; nothing inside `Vendor/angle` is moved
     or cleaned. ProjectM types stay out of the VisualCore public API and out of the app. Public Apple APIs only.
 13. **Reuse.** Pure logic goes in `Packages/VisualCore`, GPU and UIKit code in `Packages/VisualCoreRendering`. Every

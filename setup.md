@@ -162,14 +162,14 @@ print `22fb0cf…`; the `reference-clean` step (section 8.1) fails if a nested s
 
 ### 5.1 Branches
 
-- `main` holds the state before the consolidation: the plan for 25 separate apps, its documents in the repository
-  root and the legacy ledger ([baseline](docs/migration/pre-fable-baseline.md)).
-- The consolidation and migration work is on `migration/unified-app-plan` ([plan](docs/migration/migration-plan.md)).
-  The branch is local until the owner decides how to merge it and whether to push it (ADR-0009 D-13, OD-04, OD-05).
-- A fresh clone from GitHub therefore sees only `main`, unless the owner has pushed the branch. Until then the branch
-  reaches another Mac only through the owner, for example as the Git bundle kept outside the repository (OD-05).
-- On `main`, this file is the earlier guide ([archived copy](docs/archive/planning/root/setup-2026-11-11.md)) and, of
-  the tools in section 9, only `desktop_runbook.py` exists. Sections 1 to 6 and 8 apply to both branches.
+- All work is on `main`, and `main` is pushed to `origin` after every commit (ADR-0009 D-13, owner ruling of
+  2026-11-11). A fresh clone of `main` therefore has everything this guide describes.
+- The state before the consolidation is commit `38d98eb` ([baseline](docs/migration/pre-fable-baseline.md)); the
+  earlier form of this guide is archived ([copy](docs/archive/planning/root/setup-2026-11-11.md)).
+- The consolidation was made on the branch `migration/unified-app-plan` ([plan](docs/migration/migration-plan.md))
+  and fast-forwarded into `main`. That branch is a local record and is not used any more.
+- Before any push, `python3 scripts/prepush_scan.py` must pass; `python3 scripts/prepush_scan.py --push` scans and
+  pushes.
 
 ## 6. Build the reference engine binaries
 
@@ -260,7 +260,7 @@ Progress is in Git and in two ledgers, never in a document or in the memory of a
 `.autonomy/migration/ledger.json`, written only by `scripts/migration_ledger.py`. The legacy gates F00 to A25-P06 are
 in `.autonomy/state.json` with `.autonomy/evidence/` and `.autonomy/checks/`, written only by
 `Tools/python/desktop_runbook.py`. `Auto-Creator.md` section 25 describes the ledgers and recovery. Run these commands
-on `migration/unified-app-plan`, in this order:
+on `main`, in this order:
 
 | Command | What it does |
 |---|---|
@@ -290,7 +290,7 @@ exact steps, and other work continues (`CLAUDE.md` section 3).
 - **Devices.** Pairing (per Mac), trust prompts, Developer Mode, unlocking and operating-system updates. The devices are
   D1 (iPhone 15), D2 (iPad Pro 13-inch M5) and D3 (iPad A16). **D3 must stay on iPadOS 26.5 and is never updated.**
 - **App Store Connect and publishing.** The app record, the agreements, the in-app product, the sandbox tester and
-  every submission (ADR-0009 OD-06); merging to `main` and pushing the migration branch (section 5.1).
+  every submission (ADR-0009 OD-06).
 
 No install, launch or test of the unified app on a physical device is allowed before the gate
 `ImplementationLock-100` is recorded (ADR-0009 D-07). `python3 scripts/migration_ledger.py guard-device` exits 0 only

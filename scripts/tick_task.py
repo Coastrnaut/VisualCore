@@ -5,9 +5,9 @@
 
 Refuses if the task is missing or already ticked, if `validate_docs.py` fails, or if the evidence is
 empty. Appends `— Verified YYYY-MM-DD: <evidence>` (Constitution VI), stages all changes and commits
-without trailers. It pushes only when the current branch is `main` (the pre-migration cadence); on any other
-branch, such as `migration/unified-app-plan`, nothing is pushed (ADR-0009 D-13). `--no-push` skips the push on
-`main` too.
+without trailers. On `main` it then runs `scripts/prepush_scan.py` and pushes to `origin main` only when the scan
+is clean (owner rule: scan before every push; ADR-0009 D-13). On any other branch nothing is pushed. `--no-push`
+skips the push on `main` too.
 """
 from __future__ import annotations
 
@@ -48,6 +48,10 @@ def main() -> int:
     if branch != "main":
         print(f"not pushed: branch {branch or '(detached)'} is not main (ADR-0009 D-13)")
     elif not args.no_push:
+        scan = subprocess.run([sys.executable, str(ROOT / "scripts" / "prepush_scan.py")], cwd=ROOT)
+        if scan.returncode != 0:
+            raise SystemExit("committed but NOT pushed: the pre-push scan found something; fix it, then run "
+                             "python3 scripts/prepush_scan.py --push")
         subprocess.run(["git", "push", "-q", "origin", "main"], cwd=ROOT, check=True)
     print(subprocess.run(["git", "log", "--oneline", "-1"], cwd=ROOT, capture_output=True, text=True).stdout.strip())
     return 0

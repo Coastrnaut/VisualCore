@@ -200,7 +200,7 @@ M0 Consolidation ──► M1 Governance ──► M2 Walking skeleton ──►
 
 | Phase | If it goes wrong | Why this is safe |
 |---|---|---|
-| M0 | `git revert` the consolidation commits, or check out `main` | `main` is untouched; the baseline manifest and the outside `git bundle` reproduce the starting state exactly |
+| M0 | `git revert` the consolidation commits (`38d98eb..` the commit that records `M0-CONSOLIDATION`) | commit `38d98eb`, the baseline manifest and the outside `git bundle` reproduce the starting state exactly |
 | M1 | revert the constitution commit | the amendment is one commit with its own ADR |
 | M2 | revert the feature's commits | new modules and the new target do not change existing targets |
 | M3, step 1–4 | remove the adapter | the standalone app is still intact and buildable |
