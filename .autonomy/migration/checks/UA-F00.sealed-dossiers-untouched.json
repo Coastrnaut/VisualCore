@@ -1,0 +1,22 @@
+{
+  "argv": [
+    "git",
+    "diff",
+    "--quiet",
+    "a1bc833",
+    "--",
+    "specs/0[0-2][0-9]-*",
+    "specs/03[0-5]-*"
+  ],
+  "command": "git diff --quiet a1bc833 -- 'specs/0[0-2][0-9]-*' 'specs/03[0-5]-*'",
+  "elapsed_seconds": 0.01,
+  "exit_code": 0,
+  "finished": "2026-11-12T05:17:21+00:00",
+  "gate": "UA-F00",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F00.sealed-dossiers-untouched.log",
+  "log_sha256": "7d844b5c1a2afc1680c17b1244858faca6111ecf2e9e7ed0f7755576cbfacf22",
+  "name": "sealed-dossiers-untouched",
+  "started": "2026-11-12T05:17:21+00:00",
+  "timed_out": false
+}
