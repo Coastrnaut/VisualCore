@@ -100,6 +100,7 @@ specs/035-pu-p03-trails-emitters/
 
 ```text
 Packages/VisualCore/Sources/VisualCoreSimulation/TrailDecay.swift            # new: factor(strength:delta:), step8(_:factor:)
+Packages/VisualCore/Sources/VisualCoreSimulation/ParticleSystem.swift        # extended: liveCount(source:) (research R4; analyze U1)
 Packages/VisualCore/Tests/VisualCoreSimulationTests/TrailDecayTests.swift    # new
 Packages/VisualCoreRendering/Sources/VisualCoreRendering/
 ├── ParticleRenderer.swift        # extended: ParticleBlend, draw(_:camera:metrics:blend:) (default .normal)
