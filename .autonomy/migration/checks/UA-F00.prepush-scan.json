@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "python3",
+    "scripts/prepush_scan.py"
+  ],
+  "command": "python3 scripts/prepush_scan.py",
+  "elapsed_seconds": 0.143,
+  "exit_code": 0,
+  "finished": "2026-11-12T05:17:17+00:00",
+  "gate": "UA-F00",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F00.prepush-scan.log",
+  "log_sha256": "471fb94d4b0c40139273415ad8fc29acee8d29aa0b3f40559df4a0728d0009be",
+  "name": "prepush-scan",
+  "started": "2026-11-12T05:17:17+00:00",
+  "timed_out": false
+}
