@@ -12,6 +12,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest import mock
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -1278,27 +1279,119 @@ prepush = load("prepush_scan")
 
 
 class PrepushScanTests(unittest.TestCase):
-    """The scan before every push finds identifiers and secrets in added lines and nothing else."""
+    """The scan before every push finds identifiers and secrets in added lines and nothing else. Every pattern and
+    every forbidden path class the scanner lists has a fixture here (feature 186, FR-U00-020 to FR-U00-026)."""
 
-    def test_patterns(self):
-        hits = {"device 00008120-001A2B3C4D5E6F78": "hardware identifier",
-                "sim 1A2B3C4D-5E6F-4A7B-8C9D-0E1F2A3B4C5D": "device or simulator UUID",
-                '"ecid": 0x1A2B3C4D5E6F': "ECID", "Serial Number: F2LXK1ABCD12": "serial number",
-                "DEVELOPMENT_TEAM = ABCDE12345": "development team id", "team id: ABCDE12345": "development team id",
-                "write to someone@example.com": "e-mail address", "open /Users/somebody/Documents/x": "absolute home path",
-                "-----BEGIN OPENSSH PRIVATE KEY-----": "private key", "token ghp_abcdefghijklmnopqrstuvwxyz0123": "access token"}
-        for line, label in hits.items():
-            self.assertIn(label, prepush.scan_line(line), line)
-        for clean in ("commit 38d98ebb376088e18f053f3cc39d246a7e7dd3b3", "fixture 00000000-0000-4000-8000-000000000001.json",
-                      "brew install python@3.15", "git@github.com:owner/repo.git", "scan for UDIDs, ECIDs, serials and team ids",
-                      "product type iPhone15,4 on iPadOS 26.5", "/Users/<name>/Documents", "/Users/Shared/tools"):
+    SIM = "1A2B3C4D-5E6F-4A7B-8C9D-0E1F2A3B4C5D"
+    # label: (a line that is a finding, a line that is not). Token-like values are assembled so that no complete
+    # look-alike stands in this file.
+    PATTERN_FIXTURES = {
+        "hardware identifier": ("device 00008120-001A2B3C4D5E6F78", "commit 38d98ebb376088e18f053f3cc39d246a7e7dd3b3"),
+        "device or simulator UUID": ("sim " + SIM, "fixture 00000000-0000-4000-8000-000000000001.json"),
+        "ECID": ('"ecid": 0x1A2B3C4D5E6F', "scan for UDIDs, ECIDs, serials and team ids"),
+        "serial number": ("Serial Number: F2LXK1ABCD12", "serial numbers are never tracked"),
+        "development team setting": ("DEVELOPMENT_TEAM = ABCDE12345", "DEVELOPMENT_TEAM is set in the local signing file"),
+        "development team id": ("team id: ABCDE12345", "the team id stays with the owner"),
+        "e-mail address": ("write to someone@example.com", "git@github.com:owner/repo.git"),
+        "absolute home path": ("open /Users/somebody/Documents/x", "/Users/<name>/Documents and /Users/Shared/tools"),
+        "private key": ("-----BEGIN OPENSSH " + "PRIVATE KEY-----", "the private key never leaves the keychain"),
+        "GitHub token": ("token ghp_" + "abcdefghijklmnopqrstuvwxyz0123", "a ghp_ token is never written down"),
+        "GitHub fine-grained token": ("github_pat_" + "11ABCDEFG0abcdefghijkl_mnop", "github_pat_ tokens are refused"),
+        "Anthropic API key": ("key sk-ant-" + "api03-abcdefghij", "sk-ant- keys are refused"),
+        "AWS access key id": ("AKIA" + "IOSFODNN7EXAMPLE", "AKIA followed by sixteen characters"),
+    }
+    # label: (a path that must never be tracked, a similar path that may be)
+    FORBIDDEN_FIXTURES = {
+        "private device data": (".autonomy/private/devices.json", ".autonomy/migration/ledger.json"),
+        "logs": (".autonomy/logs/a.log", "docs/logs/readme.md"),
+        "result bundles": ("out/Run.xcresult/Info.plist", ".autonomy/evidence/F00.json"),
+        "reports": (".autonomy/reports/run.json", "docs/verification/report.md"),
+        "local signing file": ("Configs/Signing.local.xcconfig", "Configs/Signing.xcconfig"),
+        "provisioning profile": ("profiles/a.mobileprovision", "docs/provisioning.md"),
+        "key store": ("certs/dev.p12", "docs/p12-notes.md"),
+        "signing key": ("keys/AuthKey_ABC.p8", "docs/p8.md"),
+        "certificate": ("certs/dev.cer", "docs/certificates.md"),
+    }
+
+    def test_every_pattern_has_a_finding_and_a_clean_fixture(self):
+        labels = [label for label, _ in prepush.PATTERNS]
+        self.assertEqual(len(labels), len(set(labels)), "pattern labels are unique")
+        for label in labels:
+            self.assertIn(label, self.PATTERN_FIXTURES, f"scan pattern without a fixture: {label}")
+        self.assertEqual(set(self.PATTERN_FIXTURES) - set(labels), set(), "fixture for a pattern the scanner does not list")
+        self.assertEqual(len(labels), 13)
+        for label, (finding, clean) in self.PATTERN_FIXTURES.items():
+            self.assertEqual(prepush.scan_line(finding), [label], finding)
             self.assertEqual(prepush.scan_line(clean), [], clean)
 
-    def test_known_simulators_are_not_findings(self):
-        line = "xcodebuild test -destination id=1A2B3C4D-5E6F-4A7B-8C9D-0E1F2A3B4C5D"
+    def test_every_forbidden_path_class_has_fixtures(self):
+        labels = [label for label, _ in prepush.FORBIDDEN]
+        for label in labels:
+            self.assertIn(label, self.FORBIDDEN_FIXTURES, f"forbidden path class without a fixture: {label}")
+        self.assertEqual(set(self.FORBIDDEN_FIXTURES) - set(labels), set())
+        self.assertEqual(len(labels), 9)
+        for label, (bad, good) in self.FORBIDDEN_FIXTURES.items():
+            self.assertEqual(prepush.forbidden([bad, good]), [f"{bad}: this path must never be tracked ({label})"])
+        self.assertEqual(len(prepush.forbidden([".autonomy/xcresults/x/y", ".autonomy/state.json", "docs/a.md"])), 1)
+
+    def test_allowed_look_alikes(self):
+        for clean in ("brew install python@3.15", "git@github.com:owner/repo.git", "product type iPhone15,4 on iPadOS 26.5",
+                      "/Users/<name>/Documents", "/Users/Shared/tools", "id 00000000-0000-4000-8000-00000000ABCD"):
+            self.assertEqual(prepush.scan_line(clean), [], clean)
+
+    def test_simulator_identifiers_are_accepted_by_hash_only(self):
+        line = "xcodebuild test -destination id=" + self.SIM
+        recorded = frozenset({prepush.identifier_hash(self.SIM)})
+        self.assertEqual(prepush.identifier_hash(self.SIM.lower()), prepush.identifier_hash(self.SIM))
         self.assertEqual(prepush.scan_line(line), ["device or simulator UUID"])
-        self.assertEqual(prepush.scan_line(line, frozenset({"1A2B3C4D-5E6F-4A7B-8C9D-0E1F2A3B4C5D"})), [])
-        self.assertEqual(prepush.scan_line(line.lower(), frozenset({"1A2B3C4D-5E6F-4A7B-8C9D-0E1F2A3B4C5D"})), [])
+        self.assertEqual(prepush.scan_line(line, recorded), [])
+        self.assertEqual(prepush.scan_line(line.lower(), recorded), [])
+        unrecorded = prepush.scan_line(line, frozenset(), frozenset({self.SIM}))
+        self.assertEqual(len(unrecorded), 1)
+        self.assertIn("simulator identifier not recorded", unrecorded[0])
+        self.assertIn("python3 scripts/prepush_scan.py --record-simulators", unrecorded[0])
+
+    def test_recording_keeps_hashes_sorted_and_stores_no_identifier(self):
+        with tempfile.TemporaryDirectory() as t:
+            root = Path(t)
+            self.assertEqual(prepush.load_hashes(root), frozenset())
+            other = "9F8E7D6C-5B4A-4321-8FED-CBA987654321"
+            self.assertEqual(prepush.record_simulators(root, {self.SIM, other.lower()}), 2)
+            path = root / prepush.HASHES
+            first = path.read_bytes()
+            data = json.loads(first)
+            self.assertEqual(data["schema"], 1)
+            self.assertEqual(data["sha256"], sorted({prepush.identifier_hash(self.SIM), prepush.identifier_hash(other)}))
+            self.assertNotRegex(first.decode(), r"[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-")
+            self.assertEqual(prepush.record_simulators(root, {self.SIM, other}), 0)
+            self.assertEqual(path.read_bytes(), first)
+            third = "0A0B0C0D-1E1F-4A2B-9C3D-4E5F6A7B8C9D"
+            self.assertEqual(prepush.record_simulators(root, {third}), 1)
+            self.assertEqual(len(prepush.load_hashes(root)), 3)
+            self.assertLessEqual(set(data["sha256"]), set(prepush.load_hashes(root)))
+
+    def test_unreadable_hash_list_and_simulator_list(self):
+        with tempfile.TemporaryDirectory() as t:
+            root = Path(t)
+            path = root / prepush.HASHES
+            path.parent.mkdir(parents=True)
+            for damaged in ('{"schema": 2, "sha256": []}', "{not json", '{"schema": 1, "sha256": ["' + self.SIM + '"]}'):
+                path.write_text(damaged)
+                with self.assertRaises(ValueError) as raised:
+                    prepush.load_hashes(root)
+                self.assertIn("Configs/simulator-identifier-hashes.json: cannot be read", str(raised.exception))
+                with self.assertRaises(ValueError):
+                    prepush.record_simulators(root, {self.SIM})
+                self.assertEqual(path.read_text(), damaged)
+            path.unlink()
+            with mock.patch.object(prepush, "simulator_identifiers", return_value=None), contextlib.redirect_stdout(io.StringIO()):
+                self.assertEqual(prepush.main(["--record-simulators"], root), 1)
+            self.assertFalse(path.exists())
+            with mock.patch.object(prepush, "simulator_identifiers", return_value=frozenset({self.SIM})), \
+                    contextlib.redirect_stdout(io.StringIO()) as out:
+                self.assertEqual(prepush.main(["--record-simulators"], root), 0)
+            self.assertIn("1 new", out.getvalue())
+            self.assertEqual(prepush.load_hashes(root), frozenset({prepush.identifier_hash(self.SIM)}))
 
     def test_only_added_lines_of_scanned_files_count(self):
         diff = ("--- a/docs/x.md\n+++ b/docs/x.md\n@@ -1 +1 @@\n-old 00008120-001A2B3C4D5E6F78\n+new text\n"
@@ -1306,11 +1399,76 @@ class PrepushScanTests(unittest.TestCase):
                 "+++ b/scripts/test_scripts.py\n+device 00008120-001A2B3C4D5E6F78\n")
         self.assertEqual(prepush.scan_diff(diff), ["docs/y.md: hardware identifier: device 00008120-001A2B3C4D5E6F78"])
 
-    def test_forbidden_tracked_paths(self):
-        bad = [".autonomy/private/devices.json", ".autonomy/logs/a.log", ".autonomy/xcresults/x/y", "Configs/Signing.local.xcconfig",
-               "certs/dev.p12", "profiles/a.mobileprovision", "out/Run.xcresult/Info.plist"]
-        good = ["Configs/Signing.xcconfig", ".autonomy/state.json", ".autonomy/migration/ledger.json", "docs/a.md"]
-        self.assertEqual(len(prepush.forbidden(bad + good)), len(bad))
+    def sandbox(self):
+        box = GitSandbox()
+        self.addCleanup(box.cleanup)
+        return box
+
+    def run_main(self, box, *argv):
+        with contextlib.redirect_stdout(io.StringIO()) as out:
+            code = prepush.main(list(argv), box.root)
+        return code, out.getvalue()
+
+    def test_scan_of_a_repository_without_a_simulator_list(self):
+        # A CI runner has no simulator list of the development Mac: the tracked hash list alone decides.
+        box = self.sandbox()
+        box.write("docs/run.md", "xcodebuild test -destination id=" + self.SIM + "\n")
+        box.commit_all("a recorded command")
+        with mock.patch.object(prepush, "simulator_identifiers", return_value=None):
+            self.assertEqual(prepush.scan(box.root), ["docs/run.md: device or simulator UUID: xcodebuild test -destination id=" + self.SIM])
+            prepush.record_simulators(box.root, {self.SIM})
+            self.assertEqual(prepush.scan(box.root), [])
+            (box.root / prepush.HASHES).write_text("{not json")
+            findings = prepush.scan(box.root)
+        self.assertTrue(any("Configs/simulator-identifier-hashes.json: cannot be read" in f for f in findings), findings)
+        self.assertTrue(any("device or simulator UUID" in f for f in findings), findings)
+
+    def test_unreadable_range_is_a_finding(self):
+        box = self.sandbox()
+        findings = prepush.scan(box.root, "0000000000000000000000000000000000000000..HEAD")
+        self.assertEqual(len(findings), 1)
+        self.assertTrue(findings[0].startswith("cannot read 0000000000000000000000000000000000000000..HEAD"), findings)
+        code, out = self.run_main(box, "--range", "no-such-commit..HEAD")
+        self.assertEqual(code, 1)
+        self.assertIn("FINDING: cannot read", out)
+
+    def test_range_with_one_seeded_finding_fails(self):
+        box = self.sandbox()
+        box.write("docs/clean.md", "nothing private\n")
+        box.commit_all("clean")
+        self.assertEqual(self.run_main(box, "--range", "HEAD~1..HEAD")[0], 0)
+        box.write("docs/leak.md", "write to someone@example.com\n")
+        box.commit_all("a leak")
+        code, out = self.run_main(box, "--range", "HEAD~1..HEAD")
+        self.assertEqual(code, 1)
+        self.assertIn("FINDING: docs/leak.md: e-mail address", out)
+        self.assertIn("1 findings", out)
+        self.assertEqual(self.run_main(box, "--range", "HEAD~2..HEAD~1")[0], 0)
+
+    def test_push_only_when_clean_and_on_main(self):
+        box = self.sandbox()
+        box.write("docs/clean.md", "nothing private\n")
+        clean = box.commit_all("clean")
+        self.assertEqual(self.run_main(box, "--push")[0], 0)
+        self.assertEqual(box.remote_head(), clean)
+        box.write("docs/leak.md", "device 00008120-001A2B3C4D5E6F78\n")
+        box.commit_all("a leak")
+        self.assertEqual(self.run_main(box, "--push")[0], 1)
+        self.assertEqual(box.remote_head(), clean)
+        box.git("reset", "-q", "--hard", clean)
+        box.git("checkout", "-q", "-b", "work")
+        box.write("docs/more.md", "still clean\n")
+        box.commit_all("on a branch")
+        code, out = self.run_main(box, "--push")
+        self.assertEqual(code, 1)
+        self.assertIn("not pushed: branch work is not main", out)
+        self.assertEqual(box.remote_head(), clean)
+
+    def test_forbidden_tracked_path_is_a_finding(self):
+        box = self.sandbox()
+        box.write(".autonomy/reports/run.json", "{}\n")
+        box.commit_all("a report that must not be tracked")
+        self.assertIn(".autonomy/reports/run.json: this path must never be tracked (reports)", prepush.scan(box.root))
 
     def test_repository_tracks_no_forbidden_path(self):
         self.assertEqual(prepush.scan(ROOT_DIR, "HEAD..HEAD"), [])
