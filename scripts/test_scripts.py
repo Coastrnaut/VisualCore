@@ -235,6 +235,18 @@ class DocsTests(unittest.TestCase):
             seen[ns] = g["id"]
         self.assertEqual(len(seen), 823)
 
+    def test_duplicated_task_names_both_places(self):
+        # FR-U00-005: a task id listed twice, in one task list or in two dossiers, is reported with both places.
+        with tempfile.TemporaryDirectory() as t:
+            d = Path(t)
+            self.make(d, "- **FR-F001**: a\n", "- [ ] T-F001 first\n- [ ] T-F001 again\n")
+            other = d / "specs/002-y"
+            other.mkdir()
+            (other / "tasks.md").write_text("- [ ] T-F001 in another dossier\n")
+            probs = docs.validate(d)
+            self.assertIn("task T-F001 duplicated in specs/001-x/tasks.md and specs/001-x/tasks.md", probs)
+            self.assertIn("task T-F001 duplicated in specs/001-x/tasks.md and specs/002-y/tasks.md", probs)
+
     def test_every_dossier_is_counted(self):
         # research G-05: round directories are dossiers too.
         with tempfile.TemporaryDirectory() as t:
@@ -1078,7 +1090,11 @@ class MigrationLedgerTests(unittest.TestCase):
         waiting = [why for g, why in actions if "legacy" in why]
         self.assertEqual(len(waiting), 1)
         self.assertIn("A04-P04", waiting[0])
+        legacy_before = (self.root / ledgertool.LEGACY).read_bytes()
         self.refuses("legacy:A04-P04", "run-check", "--gate", "X-A04", "--name", "x", "--", sys.executable, "ok.py")
+        self.refuses("legacy:A04-P04", "seal", "--gate", "X-A04")
+        self.refuses("legacy:A04-P04", "record", "--gate", "X-A04")
+        self.assertEqual((self.root / ledgertool.LEGACY).read_bytes(), legacy_before)  # FR-U00-035: the legacy ledger is never written
 
     def test_tampered_evidence_is_detected(self):
         self.pass_gate("M0-CONSOLIDATION")
@@ -1167,6 +1183,39 @@ class MigrationLedgerTests(unittest.TestCase):
         self.force({"M0-CONSOLIDATION": "pass"})
         self.assertIn("M0-CONSOLIDATION: pass without recorded evidence", ledgertool.validate(self.root))
 
+    def test_missing_evidence_and_early_device_gates_are_reported(self):
+        # FR-U00-037
+        self.pass_gate("M0-CONSOLIDATION")
+        (self.root / ledgertool.EVIDENCE / "M0-CONSOLIDATION.json").unlink()
+        self.assertIn("M0-CONSOLIDATION: evidence file missing: .autonomy/migration/evidence/M0-CONSOLIDATION.json",
+                      ledgertool.validate(self.root))
+        self.force({"DEV1-A01": "pass"})
+        problems = ledgertool.validate(self.root)
+        self.assertIn("DEV1-A01: device gate recorded before ImplementationLock-100", problems)
+        self.assertIn("DEV1-A01: pass without recorded evidence", problems)
+
+    def test_log_without_attestation_is_not_evidence(self):
+        # Edge case "cancellation": an interrupted check leaves at most a log, which no seal accepts.
+        log = self.root / ledgertool.LOGS / "M0-CONSOLIDATION.interrupted.log"
+        log.parent.mkdir(parents=True, exist_ok=True)
+        log.write_text("Command: python3 ok.py\n")
+        self.refuses("no new run-check attestation", "seal", "--gate", "M0-CONSOLIDATION")
+        self.assertFalse((self.root / ledgertool.EVIDENCE / "M0-CONSOLIDATION.json").exists())
+
+    def test_unrecorded_evidence_is_replaced_by_the_next_seal(self):
+        # Edge case "lifecycle interruption": a session ended between seal and record.
+        ok = ["--", sys.executable, "ok.py"]
+        self.assertEqual(self.run_tool("run-check", "--gate", "M0-CONSOLIDATION", "--name", "a", *ok), 0)
+        self.assertEqual(self.run_tool("seal", "--gate", "M0-CONSOLIDATION"), 0)
+        self.assertEqual(self.run_tool("run-check", "--gate", "M0-CONSOLIDATION", "--name", "b", *ok), 0)
+        self.assertEqual(self.run_tool("seal", "--gate", "M0-CONSOLIDATION"), 0)
+        evidence = json.loads((self.root / ledgertool.EVIDENCE / "M0-CONSOLIDATION.json").read_text())
+        self.assertEqual([c["name"] for c in evidence["passing_checks"]], ["a", "b"])
+        self.assertEqual(evidence["revision_number"], 1)
+        self.assertFalse((self.root / ledgertool.EVIDENCE / "M0-CONSOLIDATION.r2.json").exists())
+        self.assertEqual(self.run_tool("record", "--gate", "M0-CONSOLIDATION"), 0)
+        self.assertEqual(ledgertool.validate(self.root), [])
+
     def test_only_device_rows_may_fail(self):
         self.assertNotEqual(self.run_tool("run-check", "--gate", "M0-CONSOLIDATION", "--name", "bad", "--", sys.executable, "bad.py"), 0)
         self.assertEqual(self.run_tool("seal", "--gate", "M0-CONSOLIDATION", "--allow-failures"), 0)
@@ -1221,6 +1270,10 @@ class SteeringDocumentTests(unittest.TestCase):
             for stage, text in prompts.items():
                 self.assertTrue(text.startswith(f"/speckit-{stage} "), (b["id"], stage))
                 self.assertIn(f"FR-{b['namespace']}-###", text)
+                ns = b["namespace"]
+                self.assertTrue(text.split("\n")[-1].startswith(
+                    f"Canonical override: feature directory specs/{b['number']}-{b['slug']}; requirement ids FR-{ns}-###, "
+                    f"success criteria SC-{ns}-###, task ids T-{ns}-###"), (b["id"], stage))  # FR-U00-042
         bad = self.copy(self.briefs)
         bad["features"][3]["acceptance"] = []
         bad["features"][4]["number"] = 250
@@ -1526,6 +1579,34 @@ class PrepushScanTests(unittest.TestCase):
         self.assertEqual(code, 1)
         self.assertIn("not pushed: branch work is not main", out)
         self.assertEqual(box.remote_head(), clean)
+
+    def test_three_dot_range_reads_the_commits_since_the_merge_base(self):
+        # FR-U00-051: the range of a pull request, <base>...<head>. What the base branch did after the fork is not
+        # part of it; a two-dot range would report a line the base deleted as if the head had added it.
+        box = self.sandbox()
+        box.write("docs/old.md", "write to someone@example.com\n")
+        box.commit_all("an old line that both branches start with")
+        box.git("checkout", "-q", "-b", "feature")
+        box.write("docs/new.md", "device 00008120-001A2B3C4D5E6F78\n")
+        box.commit_all("the pull request adds a finding")
+        box.git("checkout", "-q", "main")
+        (box.root / "docs/old.md").unlink()
+        box.commit_all("the base deletes the old line after the fork")
+        self.assertEqual(prepush.scan(box.root, "main...feature"),
+                         ["docs/new.md: hardware identifier: device 00008120-001A2B3C4D5E6F78"])
+        self.assertEqual(len(prepush.scan(box.root, "main..feature")), 2)
+        self.assertEqual(self.run_main(box, "--range", "main...feature")[0], 1)
+
+    def test_output_is_bounded(self):
+        # Edge case "large input": at most 40 findings are printed, then the rest is counted.
+        box = self.sandbox()
+        box.write("docs/many.md", "".join(f"line {n}: write to person{n}@example.com\n" for n in range(45)))
+        box.commit_all("45 findings")
+        code, out = self.run_main(box, "--range", "HEAD~1..HEAD")
+        self.assertEqual(code, 1)
+        self.assertEqual(out.count("FINDING:"), 40)
+        self.assertIn("… and 5 more", out)
+        self.assertIn("45 findings", out)
 
     def test_forbidden_tracked_path_is_a_finding(self):
         box = self.sandbox()

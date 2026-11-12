@@ -44,6 +44,9 @@ Each is recorded for the gate with
    `gh run list --branch main --workflow ci --limit 1` and
    `gh run list --branch main --workflow push-scan --limit 1` show a run for that commit;
    `gh run watch <id> --exit-status` ends with success for both.
+   The pull-request path of `push-scan.yml` (range `<base>...<head>`) is proven by the self-test
+   `test_three_dot_range_reads_the_commits_since_the_merge_base`; it has not run on GitHub, because the repository
+   has no pull request. Its first real run happens with the first pull request.
 
 Details of the commands are in [contracts/tools.md](contracts/tools.md) and [contracts/ci.md](contracts/ci.md); the
 data formats are in [data-model.md](data-model.md).

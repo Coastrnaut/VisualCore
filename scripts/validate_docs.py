@@ -141,7 +141,7 @@ def validate(root: Path = ROOT) -> list[str]:
                 if not shape.fullmatch(ident.split("-", 1)[1]):
                     problems.append(f"{tasks_md.relative_to(root)}: {ident} outside namespace {ns}")
                 if ident in tasks:
-                    problems.append(f"task {ident} duplicated ({tasks[ident]})")
+                    problems.append(f"task {ident} duplicated in {tasks[ident]} and {tasks_md.relative_to(root)}")
                 tasks[ident] = str(tasks_md.relative_to(root))
                 if mark in "xX" and not re.search(r"— Verified \d{4}-\d{2}-\d{2}:", rest):
                     problems.append(f"{ident} ticked without '— Verified YYYY-MM-DD:' annotation")

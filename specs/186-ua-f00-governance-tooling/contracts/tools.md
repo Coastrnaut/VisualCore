@@ -13,7 +13,7 @@ temporary copy.
 | A directory under `specs/` is outside the map | `PROBLEM: specs/<name>: feature directory outside the numbering map (ADR-0009 D-11)`, exit 1 | FR-U00-002 |
 | A defined id does not match the id shape of its directory | `PROBLEM: specs/<dir>/spec.md: <id> outside namespace <ns>`, exit 1 | FR-U00-003 |
 | A task id does not match the id shape of its directory | `PROBLEM: specs/<dir>/tasks.md: <id> outside namespace <ns>`, exit 1 | FR-U00-004 |
-| An id is defined twice | `PROBLEM: <id> defined in <place> and <place>` or `PROBLEM: task <id> duplicated (<place>)`, exit 1 | FR-U00-005 |
+| An id is defined twice | `PROBLEM: <id> defined in <place> and <place>` or `PROBLEM: task <id> duplicated in <place> and <place>`, exit 1 | FR-U00-005 |
 | Existing checks (verified tick, undefined reference, decision record header, link, constitution) | unchanged messages, exit 1 | FR-U00-006 |
 
 For tests: `namespace(feature_dir) -> str` (empty outside the map), `id_shape(feature_dir) -> re.Pattern | None`,
