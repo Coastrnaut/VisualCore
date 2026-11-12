@@ -1,0 +1,28 @@
+{
+  "argv": [
+    "python3",
+    "scripts/release_check.py",
+    "--only",
+    "docs",
+    "app-contracts",
+    "compliance",
+    "dependencies",
+    "public-api",
+    "licenses",
+    "script-tests",
+    "host-visualcore",
+    "documented-api-particle-universe",
+    "isolation-particle-universe",
+    "host-particle-universe-core"
+  ],
+  "command": "python3 scripts/release_check.py --only docs app-contracts compliance dependencies public-api licenses script-tests host-visualcore documented-api-particle-universe isolation-particle-universe host-particle-universe-core",
+  "elapsed_seconds": 38.426,
+  "exit_code": 0,
+  "finished": "2026-11-12T01:07:04+00:00",
+  "log": ".autonomy/logs/A04-P03.t315-fast-checks.log",
+  "log_sha256": "261b43ed04d19bb2d19c76fad67c44b92234b9f28dd63a487809a34c757b19ac",
+  "name": "t315-fast-checks",
+  "stage": "A04-P03",
+  "started": "2026-11-12T01:06:25+00:00",
+  "timed_out": false
+}
