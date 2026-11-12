@@ -1,0 +1,310 @@
+{
+  "schema": 1,
+  "note": "Briefs for the new unified-app features (ADR-0009). Source of the Spec Kit prompts rendered into Auto-Creator.md section 20 and of the UA gates in the migration ledger. Paths marked (new) do not exist yet; names of new types are proposals to be confirmed against real code during /speckit-plan.",
+  "constitution_amendment": {
+    "target_version": "2.0.0",
+    "prompt": "/speckit-constitution Amend the VisualCore constitution from 1.5.0 to 2.0.0 (MAJOR: scope and Principle V are redefined) to adopt ADR-0009. Keep Principles I, II, II-a, III, IV, VI, VII, VIII, IX and X and every app-scoped rule for A01-A04 in force; change only what ADR-0009 changes, and record a dated rationale that cites ADR-0009. Required amendments: (1) Scope: one iPhone/iPad application, VisualCore, with one shippable app target and modular registered experiences; the Showcase and the harnesses stay non-shipping; the 25 original apps and all round games are experiences, not separate apps. (2) Add Principle XI, One App and Stable Experience Identity: exactly one shippable app target and bundle identifier; every experience has an immutable id '<code>.<slug>' from docs/catalog/experience-catalog.json; experiences never depend on each other; ProjectM types stay out of the app. (3) Add Principle XII, One Purchase and No Advertising (NON-NEGOTIABLE): free download; exactly one non-consumable StoreKit 2 product at USD 1.99 unlocking every premium experience including future ones; no ads, ad SDKs, ad identifiers, rewarded ads, subscriptions, consumables, external payment paths, dark patterns or required accounts; premium gating at routing and at experience activation; the test-only entitlement fixture must be absent from shipping Release binaries. (4) Add Principle XIII, Code-Driven Visuals: all worlds and signature effects are GLSL, procedural meshes, SDFs, particles and deterministic animation on the existing OpenGL ES to ANGLE to Metal path; no required human-made models, purchased art packs, prompt-generated images or external image services. (5) Redefine Principle V, Implementation Before Devices: all 100 launch experiences (50 free, 50 premium) are implemented and pass host and simulator acceptance, and ImplementationLock-100 is recorded by scripts/migration_ledger.py, before any physical-device install, launch or test of the unified app; then D1, D2, D3 in that order, 100 experiences each; D3 stays on iPadOS 26.5; historical device observations never certify the unified build. (6) Principle VIII: one PrivacyInfo.xcprivacy for the app, audited against the built product. (7) Development Workflow: feature numbering and ID namespaces of Auto-Creator.md section 19; the legacy ledger .autonomy/state.json keeps the A-phase gates; .autonomy/migration-ledger.json holds every new gate; commits stay on the migration branch and are never pushed to main until the owner merges. (8) App-Scoped Rules: keep the A01-A04 rules, reworded from 'app' to 'experience' only where the directory or target wording would otherwise be false. (9) Governance precedence: Apple and toolchain behavior and observed tests, then Auto-Creator.md and CLAUDE.md, then this constitution and ADRs, then the planning archive, then generated code. Do not delete or weaken any requirement that ADR-0009 does not supersede. After amending, update the Sync Impact Report, run python3 scripts/validate_docs.py, and write ADR-0010 recording the amendment."
+  },
+  "features": [
+    {
+      "id": "UA-F00", "number": 186, "slug": "ua-f00-governance-tooling", "namespace": "U00",
+      "title": "Governance tooling: feature numbering, validators and ledger operation",
+      "depends_on": [],
+      "sources": ["Auto-Creator.md sections 19 and 25", "ADR-0009 D-11, D-12", "ADR-0004", "scripts/validate_docs.py", "scripts/tick_task.py", "scripts/migration_ledger.py"],
+      "absorbs": ["R02-F01 (Round 1 evidence audit: replaced by the baseline and the ledgers)"],
+      "scope": "Make the repository tooling understand the unified numbering map so that every later feature can be specified, validated, ticked and recorded mechanically: extend scripts/validate_docs.py namespaces, make scripts/tick_task.py safe on the migration branch, wire the new validators into CI, and keep scripts/migration_ledger.py as the only writer of the migration ledger.",
+      "acceptance": [
+        "validate_docs.py accepts spec directories 186-200 (namespace U<kk>), 201-234 (R02F<ff>), 301-550 (R02G<gg><ff>) and specs/rNN-fFF-* / specs/rNN-gGG-FF-* (RnnFff / RnnGggff), enforces unique FR/SC/T ids inside each namespace, and still passes the 35 existing dossiers unchanged",
+        "Each new namespace has a positive and a negative fixture test in scripts/test_scripts.py",
+        "tick_task.py ticks tasks of every namespace, never pushes unless the current branch is main and --push is given, and refuses when validate_docs.py fails",
+        "For every pending feature of the launch scope, a test proves that a non-empty prompt exists for all eight stages (scripts/speckit_prompts.py for 036-185, scripts/planning_index.py prompt for archived and UA features)",
+        "migration_ledger.py self-tests cover: dependency order refusal, duplicate attestation refusal, changed-log refusal, device gate before ImplementationLock-100 refusal, Claude CLI refusal, legacy-gate requirement of X-A gates",
+        ".github/workflows/ci.yml runs validate_autocreator.py, planning_archive.py verify, planning_index.py verify and migration_ledger.py validate"
+      ],
+      "evidence": ["python3 scripts/test_scripts.py", "python3 scripts/validate_docs.py", "python3 scripts/validate_autocreator.py", "python3 scripts/migration_ledger.py validate"],
+      "device": [], "owner": [],
+      "out_of_scope": ["Any app or framework source", "Changing the legacy ledger or its tool"]
+    },
+    {
+      "id": "UA-F01", "number": 187, "slug": "ua-f01-experience-catalog", "namespace": "U01",
+      "title": "Experience catalog and stable identity",
+      "depends_on": ["UA-F00"],
+      "sources": ["Auto-Creator.md sections 5 and 11.2", "ADR-0009 D-01, D-02, D-06", "docs/catalog/experience-catalog.json", "Packages/VisualCore (VisualCoreParameters, VisualCorePersistence for bounded decoding patterns)"],
+      "absorbs": [],
+      "scope": "Add the pure module VisualCoreExperience to Packages/VisualCore (new) with ExperienceID, ExperienceDescriptor, ExperienceTier, ExperienceCategory and a validated CatalogManifest, plus the runtime manifest Catalog/experiences.json, Catalog/categories.json, Catalog/path-map.json (all new) and scripts/build_catalog.py (new) that derives the runtime manifest from the planning catalog and the registered experiences.",
+      "acceptance": [
+        "Experience ids are exactly '<code>.<slug>' of docs/catalog/experience-catalog.json; a committed golden list makes any change of a shipped id a test failure",
+        "Among launch experiences the manifest holds exactly 50 free (A01-A25, R02-G01..G25) and 50 premium (R03-G01..R04-G25); any other allocation fails validation",
+        "Every experience has one launcher category (create, audio, play, learn, ambient, tools, puzzle) and its family as a tag; search over title, summary and tags is deterministic and locale-independent",
+        "The loader rejects unknown schema versions, duplicate ids, missing fields, non-finite numbers and files over the size cap (Constitution IX) with typed errors",
+        "The runtime manifest lists an experience as available only when its integration gate X-<code> is pass in the migration ledger; planned experiences are never shown as available",
+        "A pure registry check proves a one-to-one match between manifest entries and registered factories; it is reused by the app tests",
+        "Public API documented, API baseline updated, package tests added, ProjectM reference regression rerun"
+      ],
+      "evidence": ["swift test --package-path Packages/VisualCore --filter VisualCoreExperienceTests", "python3 scripts/build_catalog.py --check", "python3 scripts/check_public_api.py", "python3 scripts/release_check.py --only reference-engine-xcframework reference-build-projectm-ios-sim reference-clean"],
+      "device": [], "owner": [],
+      "out_of_scope": ["Launcher UI", "StoreKit"]
+    },
+    {
+      "id": "UA-F02", "number": 188, "slug": "ua-f02-experience-sdk", "namespace": "U02",
+      "title": "ExperienceKit: the experience contract",
+      "depends_on": ["UA-F01"],
+      "sources": ["Auto-Creator.md sections 6 and 11.3", "ADR-0009 D-05", "Packages/VisualCoreRendering (RenderScene, RenderHost, RenderSurface)", "Packages/VisualCore (FixedStepRunner, PlaybackState, DocumentStore, MigrationChain, RenderLifecycle)"],
+      "absorbs": ["R02-F23 puzzle contract (the lifecycle and digest parts; solver certification stays in R02-F23)"],
+      "scope": "Define the contract every experience implements, adapting existing VisualCore surfaces instead of duplicating them: lifecycle (prepare(seed:), activate, suspend, resume, deactivate), fixed-step update, draw through RenderScene, normalized input with typed accept or reject, snapshot, restore, reset, diagnostics and automation hooks. Pure parts (state machine, snapshot envelope, digests, conformance helpers) go in VisualCoreExperience; the SwiftUI and RenderHost parts go in a new module VisualCoreExperienceHost in Packages/VisualCoreRendering.",
+      "acceptance": [
+        "The lifecycle is a pure reducer (registered, preparing, ready, active, suspended, deactivating, inactive, failed) with exhaustive transition tests; illegal transitions are rejected and counted",
+        "prepare(seed:) is deterministic: the same seed gives the same initial state digest; a reusable ExperienceConformance test helper checks this for any experience",
+        "restore(snapshot()) reproduces the digest; reset() equals a fresh prepare with the same seed; snapshots are versioned envelopes with migrations",
+        "Input is normalized into domain actions; a rejected action leaves the digest unchanged and returns a typed reason",
+        "Update runs in fixed steps independent of frame rate; drawing reads immutable state; no GPU result decides an outcome",
+        "Diagnostics expose state, seed, step index, quality tier, live GPU resource counts, last error and digest",
+        "Automation hooks compile only under DEBUG or VISUALCORE_AUTOMATION",
+        "A sample experience used only by tests exercises the whole contract on the host and on both simulator runtimes; public API documented and baselined"
+      ],
+      "evidence": ["swift test --package-path Packages/VisualCore --filter VisualCoreExperienceTests", "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --result-name ua-f02-ios27", "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-26.5 --action test --result-name ua-f02-ios26"],
+      "device": [], "owner": [],
+      "out_of_scope": ["The session host", "Any real experience"]
+    },
+    {
+      "id": "UA-F03", "number": 189, "slug": "ua-f03-experience-host", "namespace": "U03",
+      "title": "Experience host and session lifecycle",
+      "depends_on": ["UA-F02"],
+      "sources": ["Auto-Creator.md sections 11.4 to 11.6", "ADR-0009 D-05", "Packages/VisualCoreRendering (RenderHost, ResourceRegistry, ResourceBudget, FrameScheduler)", "Packages/VisualCore (ResourceLedger, QualityPolicy, DeviceConditions)"],
+      "absorbs": ["R02-F04 GPU resource ownership (session-level rules)", "R02-F25 shared shell (session part)"],
+      "scope": "Implement ExperienceSession and ExperienceHostView in VisualCoreExperienceHost: one active experience at a time, RenderHost creation through the session with a resource budget, activation and deactivation with proof of zero live GPU resources, failure isolation, cancellation, scene-phase handling, memory-pressure handling and context-loss recovery.",
+      "acceptance": [
+        "Only one session is active; opening another deactivates the first before the new one prepares",
+        "After deactivation the session's ResourceRegistry reports zero live resources and zero leaked; 50 open and close cycles of the sample experience keep these at zero on both simulator runtimes",
+        "An error in prepare, setup or render shows a failure view with Retry and Back; the app stays usable and the failure is recorded in diagnostics",
+        "Leaving during prepare cancels the work; no callback arrives after deactivation",
+        "Background suspends (clock stopped, host paused) and foreground resumes without catching up; interruptions are honored",
+        "A memory warning sheds caches; if the session is still over its budget it deactivates with a message",
+        "A forced context recreation rebuilds GPU objects from CPU state and keeps the state digest",
+        "Experience and app sources contain no direct GL or EGL calls (scripts/check_app_isolation.py extended to experience modules)"
+      ],
+      "evidence": ["python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --result-name ua-f03-ios27", "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-26.5 --action test --result-name ua-f03-ios26", "python3 scripts/check_app_isolation.py --app Apps/VisualCore"],
+      "device": ["Memory and thermal behavior of long sessions on D1, D2 and D3 (after ImplementationLock-100)"], "owner": [],
+      "out_of_scope": ["Launcher and settings UI", "Purchases"]
+    },
+    {
+      "id": "UA-F04", "number": 190, "slug": "ua-f04-app-shell", "namespace": "U04",
+      "title": "The VisualCore app shell: launcher, navigation, settings and onboarding",
+      "depends_on": ["UA-F01", "UA-F03"],
+      "sources": ["Auto-Creator.md sections 11.1 and 11.7", "ADR-0009 D-01", "project.yml", "Packages/VisualCoreRendering/Sources/VisualCoreUI"],
+      "absorbs": ["R02-F25 shared native shell", "R02-F26 input and accessibility contract (shell-level parts)"],
+      "scope": "Create Apps/VisualCore/ (new) as the only shippable app target: SwiftUI launcher with categories and search, routes (catalog, experience, settings, about), free and premium labels, onboarding to a first working experience, settings (accessibility, quality, data reset, privacy text) and acknowledgements. Placeholder bundle id dev.visualcore.VisualCore; display name VisualCore.",
+      "acceptance": [
+        "project.yml defines one application target VisualCore with unit and UI test targets; it builds unsigned for the generic iOS Simulator",
+        "The launcher shows every available experience grouped by category, with search; each tile has a stable accessibility identifier vc.tile.<id> and a text label of its tier (not color alone)",
+        "Routes catalog, experience, settings and about work on iPhone and iPad layouts and through Dynamic Type XXXL without clipped controls",
+        "First run reaches a running free experience with no account, purchase or permission prompt",
+        "Settings offer Reduce Motion and Reduce Flashing choices (VisualCoreUI), a quality override, per-experience and global data reset, and the privacy statement",
+        "The app makes no network request; the offline rule of scripts/check_compliance.py covers Apps/VisualCore",
+        "UI tests and accessibility audits pass on iOS 27.x and 26.5 simulators with the enumeration guard; the DEBUG-only launch argument -openExperience <id> opens one experience for tests"
+      ],
+      "evidence": ["xcodegen generate --spec project.yml", "xcodebuild test -project VisualCore.xcodeproj -scheme VisualCore -destination \"platform=iOS Simulator,id=<27.x udid>\" -test-timeouts-enabled YES -default-test-execution-time-allowance 180 CODE_SIGNING_ALLOWED=NO", "python3 scripts/check_test_enumeration.py --sources Apps/VisualCore/Tests --log <log>", "python3 scripts/check_compliance.py"],
+      "device": ["Launcher layout and VoiceOver spot check on D1, D2, D3 (manual VoiceOver is non-gating)"],
+      "owner": ["Verify that the App Store name VisualCore is available and choose the final bundle identifier before distribution"],
+      "out_of_scope": ["StoreKit and the paywall (UA-F08)", "Individual experiences"]
+    },
+    {
+      "id": "UA-F05", "number": 191, "slug": "ua-f05-session-persistence", "namespace": "U05",
+      "title": "Session state, per-experience persistence, reset and restore",
+      "depends_on": ["UA-F03", "UA-F04"],
+      "sources": ["Auto-Creator.md section 15.1", "Packages/VisualCore/Sources/VisualCorePersistence (DocumentStore, NamedLibrary, MigrationChain)"],
+      "absorbs": ["R02-F28 profile migration and atomic save engine"],
+      "scope": "Give each experience an isolated storage namespace and the app a restorable session: storage root Application Support/Experiences/<id>/ and defaults prefix exp.<id>., autosave at suspend and safe points, restore after relaunch, per-experience and global reset, versioned migrations and a container inventory test.",
+      "acceptance": [
+        "An experience can only reach its own storage through its context; a test proves two experiences cannot read each other's data",
+        "The last route, last experience and catalog filter are restored after termination and relaunch",
+        "Autosave is atomic; a truncated, corrupted or newer-version snapshot produces a recoverable message with Reset, keeps a quarantined copy, and never crashes",
+        "Reset experience clears exactly that namespace; Reset all data clears every namespace and the session state",
+        "Each experience with stored data has a migration test from every earlier schema version",
+        "A container inventory test lists only allowed files and defaults keys (StoreKit and Metal cache files are allowed after their provenance is checked)"
+      ],
+      "evidence": ["swift test --package-path Packages/VisualCore --filter 'VisualCoreExperienceTests|VisualCorePersistenceTests'", "xcodebuild test -project VisualCore.xcodeproj -scheme VisualCore -only-testing:VisualCoreUITests/PersistenceUITests -destination \"platform=iOS Simulator,id=<udid>\" CODE_SIGNING_ALLOWED=NO"],
+      "device": ["Container inventory on a real device after the campaign"], "owner": [],
+      "out_of_scope": ["iCloud or any sync"]
+    },
+    {
+      "id": "UA-F06", "number": 192, "slug": "ua-f06-quality-performance", "namespace": "U06",
+      "title": "Quality profiles and performance observability",
+      "depends_on": ["UA-F03"],
+      "sources": ["Auto-Creator.md section 12", "Packages/VisualCore/Sources/VisualCoreDiagnostics (QualityPolicy, DeviceConditions, FramePacing, ParticleBudget, RenderCostEstimate)", "docs/performance/README.md"],
+      "absorbs": ["R02-F32 frame pacing and D3 thermal adaptation", "R03-F09 and R04-F09 benchmark preparation"],
+      "scope": "Define QualityProfile (tiers mapped to concrete budgets) per experience on top of QualityPolicy and DeviceConditions, a settings override, and metrics for launch, first frame (prepare, shader compilation and first present measured separately), frame pacing, memory and GPU ledger bytes, written into the evidence records.",
+      "acceptance": [
+        "Every experience declares tiers; a tier change never changes the domain state digest",
+        "Tiers step down under serious thermal state or Low Power Mode and recover after the calm period (existing QualityPolicy semantics)",
+        "Evidence records contain launch time, prepare time, shader compile time, first-present time, frame pacing counts, memory footprint, GPU bytes and thermal state",
+        "Budgets are written as proposals in docs/performance with the device measurement that will confirm them; simulator numbers are never presented as performance results",
+        "Shaders are compiled during prepare, not on the first interactive frame",
+        "A 10-minute scenario shows no unbounded growth of memory or GPU bytes on the simulator"
+      ],
+      "evidence": ["swift test --package-path Packages/VisualCore --filter VisualCoreDiagnosticsTests", "python3 scripts/verify_experiences.py --only <sample id> --scenario endurance --runtime 27"],
+      "device": ["Frame pacing, memory, thermal and shader-compile measurements on D1, D2, D3 with at least 200 samples for percentage criteria"], "owner": [],
+      "out_of_scope": ["Tuning individual experiences"]
+    },
+    {
+      "id": "UA-F07", "number": 193, "slug": "ua-f07-legacy-adoption", "namespace": "U07",
+      "title": "Adoption of the existing apps A01 to A04 as experiences",
+      "depends_on": ["UA-F02", "UA-F03", "UA-F04", "UA-F05"],
+      "sources": ["Auto-Creator.md section 17", "docs/migration/migration-plan.md", "Apps/GenerativeArtStudio, Apps/FluidArtPlayground, Apps/FractalExplorer, Apps/ParticleUniverse", "specs/011 to specs/035"],
+      "absorbs": [],
+      "scope": "Expose Generative Art Studio, Fluid Art Playground, Fractal Explorer and the implemented phases of Particle Universe as experiences of the unified app through thin adapters, without changing domain behavior; port their UI tests; move their sources along the path map with git mv after parity is proven; retire each standalone target only then.",
+      "acceptance": [
+        "The four Core packages pass their existing host tests unchanged; committed fixtures and checksums stay bit-identical (A01 replay and baselines, A02 and A03 fixtures, A04 replay-v1.json)",
+        "Each adopted experience passes the ExperienceConformance helper and the session host tests",
+        "Every UI test of the standalone apps has a counterpart in the unified app; a mapping table lists old and new test names and the enumeration guard proves none was lost",
+        "Sources move with git mv to the paths of docs/migration/migration-plan.md only after the two items above pass; Catalog/path-map.json records each move",
+        "A standalone target is removed from project.yml only after its experience is verified in the unified app on both simulator runtimes",
+        "The legacy ledger is unchanged; X-A01, X-A02 and X-A03 are recorded in the migration ledger; X-A04 stays pending until A04-P04..P06 are sealed",
+        "ProjectM reference regression 7 of 7 and reference-clean after any VisualCore change; docs/apps release dossiers stay as history with a note that store listings are superseded"
+      ],
+      "evidence": ["swift test --package-path <each Core package>", "python3 scripts/verify_experiences.py --only a01.generative-art-studio a02.fluid-art-playground a03.fractal-explorer --runtime 27 26", "python3 scripts/release_check.py --only reference-test-anglerendering-ios27 reference-test-anglerendering-ios26 projectm-reference-ios27 projectm-reference-ios26"],
+      "device": [], "owner": [],
+      "out_of_scope": ["New features for these apps", "A04-P04..P06 (run from the archived prompts)"]
+    },
+    {
+      "id": "UA-F08", "number": 194, "slug": "ua-f08-entitlement-store", "namespace": "U08",
+      "title": "Premium entitlement and the single StoreKit 2 purchase",
+      "depends_on": ["UA-F01", "UA-F03", "UA-F04"],
+      "sources": ["Auto-Creator.md section 14", "ADR-0009 D-03, D-04", "docs/archive/planning/playbook (StoreKit lessons)", "scripts/check_release_symbols.py"],
+      "absorbs": ["R02-F27 premium entitlement and zero-ads compliance (the entitlement part; 'no StoreKit' is superseded)"],
+      "scope": "Add the module VisualCoreStore (new, Packages/VisualCoreRendering) with a PurchaseController on StoreKit 2 behind a StoreClient protocol (live and fake), the EntitlementState policy in VisualCoreExperience, gating at routing and at session activation, the paywall and restore UI in the app shell, a local .storekit configuration with exactly one non-consumable product, and the DEBUG-only entitlement fixture.",
+      "acceptance": [
+        "Exactly one product exists: non-consumable, placeholder id dev.visualcore.VisualCore.premium, USD 1.99 in the local .storekit file; a test fails if another product, a subscription or a consumable is added",
+        "Entitlement comes only from verified Transaction.currentEntitlements and Transaction.updates; no unlock flag is stored anywhere (source scan and container inventory)",
+        "A premium experience is refused both by routing and by session activation without entitlement; free experiences never query the store and work when StoreKit is unavailable",
+        "Purchase, pending (Ask to Buy), cancel, failure, restore, refund or revocation and family-shared ownership each have a tested state and accessible UI",
+        "A previously verified entitlement works offline; a device that never purchased shows an honest locked state offline",
+        "Tests use SKTestSession with cleared transactions and no synced application id, a fake store in the unit-test host, and the fixture -uitestEntitlement free|premium|revoked in UI tests",
+        "The Release binary contains no fixture symbol or string and links no advertising, analytics or tracking framework (scripts/check_release_symbols.py extended)",
+        "Paywall copy states a one-time purchase that unlocks current and future premium experiences; no timers, nagging or external purchase paths"
+      ],
+      "evidence": ["swift test --package-path Packages/VisualCore --filter VisualCoreExperienceTests", "xcodebuild test -project VisualCore.xcodeproj -scheme VisualCore -only-testing:VisualCoreTests/StoreTests -destination \"platform=iOS Simulator,id=<udid>\" CODE_SIGNING_ALLOWED=NO", "python3 scripts/check_release_symbols.py --app <Release app>"],
+      "device": ["Purchase sheet, Ask to Buy and restore on a real device with a sandbox account"],
+      "owner": ["Create the non-consumable in App Store Connect, accept the Paid Apps agreement, set the price, decide Family Sharing, provide a sandbox tester"],
+      "out_of_scope": ["Any second product", "Server-side validation", "Accounts"]
+    },
+    {
+      "id": "UA-F09", "number": 195, "slug": "ua-f09-verification-runner", "namespace": "U09",
+      "title": "Experience verification runner and evidence schema",
+      "depends_on": ["UA-F02", "UA-F03", "UA-F04"],
+      "sources": ["Auto-Creator.md sections 6 and 22", "Packages/VisualCoreRendering/Sources/VisualCoreAutomation (AutomationRunner, AutomationReport)", "scripts/run_automation_sim.py", "scripts/check_test_enumeration.py"],
+      "absorbs": ["R02-F29 golden harness", "R02-F31 device automation harness and report schema (simulator part)", "R03-F11 and R04-F11 evidence collection (simulator part)"],
+      "scope": "Build the single deterministic verification runner: a scenario manifest per experience, an in-app scenario runner compiled only for DEBUG or VISUALCORE_AUTOMATION, the host driver scripts/verify_experiences.py (new) for host tests and simulator scenarios, the versioned evidence schema with its validator, and the no-placeholder audits.",
+      "acceptance": [
+        "Every experience ships the scenarios launch-first-frame, input-response, completion, rejection, save-restore, reset, suspend-resume, teardown-reentry and cancel-prepare, expressed as domain actions",
+        "The in-app runner runs one scenario by experience id and seed, writes evidence JSON and exits; it cannot be reached from a URL or any public input",
+        "verify_experiences.py runs host tests and simulator scenarios per runtime, collects JSON, screenshots and result bundles, is resumable with --only and --skip, and exits non-zero on any failure",
+        "Evidence records follow the schema of Auto-Creator.md section 22.3 and are checked by a validator with self-tests",
+        "Audits fail on TODO or placeholder markers in shipped sources, on raster art other than the generated app icon, on scenarios that bypass the real reducer, and on content counts below the source specification",
+        "Rendered frames pass non-blank and semantic probe checks; golden images are supporting evidence only",
+        "Each record names the simulator runtime build, device type, Xcode build, commit and app binary hash",
+        "The driver has self-tests with the sample experience, including a deliberately failing scenario"
+      ],
+      "evidence": ["python3 scripts/test_scripts.py", "python3 scripts/verify_experiences.py --self-test", "python3 scripts/verify_experiences.py --only <sample id> --runtime 27 26"],
+      "device": [], "owner": [],
+      "out_of_scope": ["Physical devices (UA-F13)"]
+    },
+    {
+      "id": "UA-F10", "number": 196, "slug": "ua-f10-build-ci", "namespace": "U10",
+      "title": "Build, project and CI consolidation",
+      "depends_on": ["UA-F04"],
+      "sources": ["Auto-Creator.md sections 16 and 24", "project.yml", ".github/workflows/ci.yml", "scripts/release_check.py", "scripts/check_dependencies.py"],
+      "absorbs": ["R02-F30 suite build matrix", "R03-F10 and R04-F10 target integration (one target instead of 25)"],
+      "scope": "Consolidate the build: one application target in project.yml, experience packages Packages/ExperiencesCreative, ExperiencesRound02, ExperiencesRound03 and ExperiencesRound04 (new) with validated manifests, dependency rules for experiences, release_check.py steps for the unified app split into chunks under ten minutes, CI jobs, and recorded build-time and size budgets.",
+      "acceptance": [
+        "project.yml has exactly one application target that is shippable; harnesses keep their own specs; standalone app targets disappear as UA-F07 completes",
+        "Experience modules depend only on the VisualCore framework packages; scripts/check_dependencies.py fails on an experience importing another experience or any ProjectM module",
+        "Package manifests of the experience packages are generated or validated from the catalog; a missing or extra target fails",
+        "release_check.py offers unified-app steps (unit, UI in chunks, experience verification subsets), each finishing within ten minutes",
+        "CI runs the host gates on every push and pull request and builds the app for the simulator; nothing in CI needs signing",
+        "Clean-build time, incremental build time and app size are recorded at each milestone; a module-granularity change needs an ADR with the measurement"
+      ],
+      "evidence": ["xcodegen generate --spec project.yml", "python3 scripts/check_dependencies.py", "python3 scripts/release_check.py --only docs compliance dependencies public-api licenses script-tests", "xcodebuild build -project VisualCore.xcodeproj -scheme VisualCore -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO"],
+      "device": [], "owner": [],
+      "out_of_scope": ["Signing, archives and distribution"]
+    },
+    {
+      "id": "UA-F11", "number": 197, "slug": "ua-f11-compliance", "namespace": "U11",
+      "title": "Privacy, licensing, no-advertising audit and distinctiveness",
+      "depends_on": ["UA-F04", "UA-F10"],
+      "sources": ["Auto-Creator.md section 15", "scripts/check_privacy_manifest.py", "scripts/check_licenses.py", "scripts/bundle_licenses.py", "docs/legal"],
+      "absorbs": ["R02-F33 distinctiveness and release packaging", "R03-F12 and R04-F12 originality, legal and no-ads audits (pre-device part)"],
+      "scope": "One privacy manifest audited against the built app, usage descriptions only for capabilities of registered experiences, a no-advertising scan of linked frameworks, symbols and strings, bundled license notices, proof that ProjectM is not linked into the app, a distinctiveness matrix over the launch experiences, and truthful metadata inputs.",
+      "acceptance": [
+        "PrivacyInfo.xcprivacy matches the required-reason APIs found in the built app (scripts/check_privacy_manifest.py)",
+        "Info.plist usage descriptions exist only for capabilities declared by registered experiences",
+        "A scan of the built app finds no advertising, analytics or tracking SDK, no AdSupport or AppTrackingTransparency use and no ad identifiers; any finding fails the gate",
+        "ANGLE notices and every third-party license are bundled and shown in the app; docs/legal/third-party.json is complete",
+        "A symbol and dependency scan proves no ProjectM engine or preset code is in the app",
+        "A distinctiveness matrix (core abstraction, player action, win rule) shows no two launch experiences share a mechanic; near-duplicates are redesigned or merged before lock",
+        "Metadata inputs are generated only from experiences whose integration gate is pass"
+      ],
+      "evidence": ["python3 scripts/check_privacy_manifest.py --app <built app>", "python3 scripts/check_licenses.py", "python3 scripts/check_compliance.py", "python3 scripts/check_release_symbols.py --app <Release app>"],
+      "device": [], "owner": ["Legal review of licenses and App Store answers", "Trademark and name clearance"],
+      "out_of_scope": ["Submitting anything to App Store Connect"]
+    },
+    {
+      "id": "UA-F12", "number": 198, "slug": "ua-f12-implementation-lock", "namespace": "U12",
+      "title": "ImplementationLock-100: independent verification of all 100 experiences",
+      "depends_on": ["UA-F09", "UA-F10", "UA-F11"],
+      "sources": ["Auto-Creator.md section 22", "ADR-0009 D-07", "scripts/migration_ledger.py"],
+      "absorbs": ["R02-F34 cross-game reconciliation and evidence lock", "legacy gate IMPLEMENTATION-LOCK"],
+      "scope": "Provide the independent rerun that proves 100 of 100: scripts/verify_experiences.py --lock on a clean tree with fresh derived data, the lock manifest docs/verification/implementation-lock-100.json (new), and the rule that only scripts/migration_ledger.py may record the gate ImplementationLock-100 from a valid manifest.",
+      "acceptance": [
+        "The lock run starts from a clean working tree at one commit and fresh derived data, and reruns host tests, package tests, shader compilation, UI flows and every scenario set for all 100 experiences on the iOS 27.x and 26.5 simulators",
+        "The lock manifest records commit, tree hash, catalog hash, tool versions, simulator runtimes and, per experience, the evidence file hashes and results",
+        "migration_ledger.py records ImplementationLock-100 only when the manifest validates: 100 entries, 50 free and 50 premium, all pass, purchase scenarios pass, audits pass",
+        "A capability that needs hardware may be listed as pending hardware verification; no core gameplay, rendering, persistence or purchase requirement may be listed there",
+        "Any change of tracked source after the lock invalidates it; the re-lock procedure is documented and tested",
+        "The device guard of migration_ledger.py refuses every D gate until the lock is pass"
+      ],
+      "evidence": ["python3 scripts/verify_experiences.py --lock", "python3 scripts/migration_ledger.py validate", "python3 scripts/migration_ledger.py guard-device"],
+      "device": [], "owner": [],
+      "out_of_scope": ["Running devices"]
+    },
+    {
+      "id": "UA-F13", "number": 199, "slug": "ua-f13-device-lab", "namespace": "U13",
+      "title": "Device lab: the D1, D2, D3 campaign for 100 experiences",
+      "depends_on": ["UA-F12"],
+      "sources": ["Auto-Creator.md section 23", "docs/archive/planning/playbook (devicectl lessons)", "scripts/inventory_devices.py", "Packages/VisualCoreRendering/Sources/VisualCoreAutomation"],
+      "absorbs": ["R02-F31 device automation harness (device part)", "R03-F11 and R04-F11 device fixtures", "legacy gates D1-A01 to D3-A25 and DEVICE-RECONCILE"],
+      "scope": "Write scripts/run_device_campaign.py (new): refuse before the lock, discover D1, D2 and D3 by product type, record the live OS and build, install one signed automation build per device, run every experience by id with its scenario set, pull JSON exports and result bundles, apply the stop rules, and produce the per-device and per-experience evidence and the reconciliation report. It is noninteractive and has a dry-run mode.",
+      "acceptance": [
+        "The script refuses to run when ImplementationLock-100 is not pass or the tree differs from the locked commit",
+        "Devices are matched by hardwareProperties.productType (iPhone15,4, iPad17,3, iPad15,7); the live OS and build are recorded; D3 is refused with a blocker if it is not on iPadOS 26.5; no UDID is written to a tracked file",
+        "One Release build with VISUALCORE_AUTOMATION is installed once per device; each experience runs by id and exports its evidence JSON, which is copied back with devicectl",
+        "Percentage criteria use at least 200 samples; launch, first frame, frame pacing, memory and thermal state are recorded per experience",
+        "A renderer or test-integrity failure halts the campaign on that device; a localized failure is recorded and the campaign continues; reconciliation lists every non-pass row",
+        "Owner-needed states (locked device, trust, signing, permissions, purchase sheet) produce BLOCKED_OWNER_ACTION with exact steps and never wait for input; --dry-run prints the plan",
+        "The shipping Release binary has no automation symbols (nm check)"
+      ],
+      "evidence": ["python3 scripts/run_device_campaign.py --dry-run", "python3 scripts/test_scripts.py", "python3 scripts/check_release_symbols.py --app <Release app>"],
+      "device": ["All 300 rows: 100 experiences on D1, then D2, then D3"],
+      "owner": ["Provision signing (Configs/Signing.local.xcconfig), unlock and trust devices, keep D3 on iPadOS 26.5, grant microphone permission, operate purchase sheets"],
+      "out_of_scope": ["Any device test before the lock", "Updating device operating systems"]
+    },
+    {
+      "id": "UA-F14", "number": 200, "slug": "ua-f14-release-preparation", "namespace": "U14",
+      "title": "Release preparation (owner-gated)",
+      "depends_on": ["UA-F11", "UA-F13"],
+      "sources": ["Auto-Creator.md section 24", "docs/archive/planning/playbook (App Store Connect and release)", "docs/release"],
+      "absorbs": ["R02-F33 release packaging (one app instead of 25)"],
+      "scope": "Prepare, without submitting: version and build numbers, the archive configuration, screenshots captured from real runs with a provenance manifest, metadata drafts derived from the verified catalog, the StoreKit product checklist, review notes and the final compliance run.",
+      "acceptance": [
+        "Version and build numbers are set in project.yml; an unsigned archive build succeeds",
+        "Every screenshot comes from a real simulator or device run and is listed with experience id, seed, commit and device in a provenance manifest; no mock-ups",
+        "Name, subtitle, description, keywords, privacy answers, in-app purchase name and description and review notes are drafted from experiences that are implemented and verified; future content is described as planned",
+        "The final compliance, privacy, license and symbol checks pass on the release candidate",
+        "Nothing is uploaded or submitted; the owner checklist lists every remaining manual step"
+      ],
+      "evidence": ["python3 scripts/release_check.py", "python3 scripts/check_app_release.py --app <archive app>"],
+      "device": [], "owner": ["Signing and upload", "App Store Connect record, agreements, pricing, in-app purchase submission, review submission"],
+      "out_of_scope": ["Submission to App Review"]
+    }
+  ]
+}

@@ -122,6 +122,11 @@ def bullets(lines: list[str], start: int, stop_patterns: tuple[str, ...] = ("#",
 # Original 25 creative apps (the manuals embedded in the archived specification)
 # --------------------------------------------------------------------------------------------------------------
 
+# Launcher category of each original-app source category; every round game is a puzzle with its family as a tag.
+LAUNCHER_CATEGORY = {"Creative and visual": "create", "Music and audio": "audio",
+                     "Games and interactive experiences": "play", "Education and science": "learn",
+                     "Ambient and lifestyle": "ambient", "Developer and creator tools": "tools"}
+
 FEATURE_TAIL = " Acceptance requires an implemented behavior and a test or documented manual verification—not a screenshot mock."
 RISK_TAIL = " Document owner, verification method, and a release blocker condition in `docs/decisions/`."
 
@@ -215,7 +220,8 @@ def parse_original(root: Path, ledger: dict) -> tuple[list[dict], list[dict]]:
         experiences.append({
             "code": code, "name": name, "slug": slugify(name), "id": f"{code.lower()}.{slugify(name)}",
             "collection": "original", "collection_position": number, "kind": "creative-app",
-            "tier": "free", "release": "launch", "family": category, "wave": roster[number]["wave"],
+            "tier": "free", "release": "launch", "family": category, "launcher_category": LAUNCHER_CATEGORY[category],
+            "wave": roster[number]["wave"],
             "score": None, "source_candidate": f"AppsBrainstorm catalog item {number}", "legacy_target": target,
             "design": {
                 "summary": summary, "brainstorm_concept": quote, "primary_capability": roster[number]["capability"],
@@ -346,7 +352,8 @@ def parse_round2(root: Path) -> tuple[list[dict], list[dict], dict]:
         experiences.append({
             "code": code, "name": name, "slug": slugify(name), "id": f"{code.lower()}.{slugify(name)}",
             "collection": "round-02", "collection_position": pos, "kind": "game", "tier": "free", "release": "launch",
-            "family": ident["Category"], "score": roster[pos]["score"], "source_candidate": roster[pos]["candidate"],
+            "family": ident["Category"], "launcher_category": "puzzle",
+            "score": roster[pos]["score"], "source_candidate": roster[pos]["candidate"],
             "source_rank": int(ident["Comparative rank"].split("/")[0]), "provenance": "original-500",
             "design": {
                 "pitch": story.get("Player fantasy", "").rstrip("."), "hero_art": story.get("Signature spectacle", "").rstrip("."),
@@ -428,9 +435,11 @@ def parse_round(root: Path, n: int) -> tuple[list[dict], list[dict], dict]:
         j = heads[k + 1][0] if k + 1 < len(heads) else stop
         prompts = block_prompts(lines, i, j, m.group(1))
         need(list(prompts) == STAGES, f"{m.group(1)}: expected 8 stage prompts, found {list(prompts)}")
+        target = re.search(r"active Spec Kit feature directory: (specs/[^/]+)/", lines[prompts["specify"][0]])
         features.append({
             "id": m.group(1), "source_id": m.group(1), "kind": "shared-round-feature", "round": n, "experience": None,
-            "title": m.group(2).strip(), "spec_dir_proposed": None, "deliverable": contracts[m.group(1)].split(": ", 1)[-1],
+            "title": m.group(2).strip(), "spec_dir_proposed": target.group(1) if target else None,
+            "deliverable": contracts[m.group(1)].split(": ", 1)[-1],
             "consumers": "ALL", "depends_on": "previous feature of the round (F12 closes after the device campaign)",
             "source": span(rel, lines, i, j), "prompts": prompts, "prompts_file": rel.as_posix(),
         })
@@ -486,7 +495,8 @@ def parse_round(root: Path, n: int) -> tuple[list[dict], list[dict], dict]:
             "code": code, "name": name, "slug": slugify(name), "id": f"{code.lower()}.{slugify(name)}",
             "collection": f"round-{n:02d}", "collection_position": pos, "kind": "game",
             "tier": "premium" if n in (3, 4) else "premium-backlog", "release": "launch" if n in (3, 4) else "backlog",
-            "family": roster[pos]["family"], "score": roster[pos]["score"], "source_candidate": roster[pos]["candidate"],
+            "family": roster[pos]["family"], "launcher_category": "puzzle",
+            "score": roster[pos]["score"], "source_candidate": roster[pos]["candidate"],
             "source_rank": int(roster[pos]["source_rank"]) if roster[pos]["source_rank"].isdigit() else roster[pos]["source_rank"],
             "provenance": "supplemental-provisional" if supplemental else "original-500", "score_basis": src.group(2),
             "design": {
