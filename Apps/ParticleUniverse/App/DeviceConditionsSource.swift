@@ -1,7 +1,7 @@
 // DeviceConditionsSource.swift — where the sandbox reads heat and Low Power Mode (feature 034 A04-P02 T-A04-211;
 // FR-A04-205; spec clarification 5; research R9). Release builds read VisualCore's DeviceConditions.current()
 // (public ProcessInfo API) only; DEBUG builds also accept the UI-test launch arguments `-uitestThermal
-// nominal|fair|serious|critical` and `-uitestLowPower YES`, and `-uitestRendererFailure YES` (US4 AC3).
+// nominal|fair|serious|critical` and `-uitestLowPower YES`, `-uitestRendererFailure YES` (US4 AC3) and `-uitestReduceMotion YES` (T-A04-218).
 import Foundation
 import VisualCoreDiagnostics
 
@@ -18,6 +18,15 @@ enum DeviceConditionsSource {
         if d.object(forKey: "uitestLowPower") != nil { c.lowPower = d.bool(forKey: "uitestLowPower") }
         #endif
         return c
+    }
+
+    /// DEBUG only: behave as if Reduce Motion were on (UI tests of the paused start, spec edge cases CHK020).
+    static var forcedReduceMotion: Bool {
+        #if DEBUG
+        UserDefaults.standard.bool(forKey: "uitestReduceMotion")
+        #else
+        false
+        #endif
     }
 
     /// DEBUG only: start in the CPU preview as if the GPU path had failed (UI tests of the fallback note).

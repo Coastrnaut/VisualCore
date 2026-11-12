@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_test_enumeration.py",
+    "--sources",
+    "Apps/ParticleUniverse/Tests/UI/SandboxUITests.swift",
+    "--log",
+    ".autonomy/logs/A04-P02.t218-ui-ios27.log"
+  ],
+  "command": "python3 scripts/check_test_enumeration.py --sources Apps/ParticleUniverse/Tests/UI/SandboxUITests.swift --log .autonomy/logs/A04-P02.t218-ui-ios27.log",
+  "elapsed_seconds": 0.022,
+  "exit_code": 2,
+  "finished": "2026-11-12T00:03:14+00:00",
+  "log": ".autonomy/logs/A04-P02.t218-enum-ios27.log",
+  "log_sha256": "e4c632418a94156b766533dfca227509bc0d30a6f58cb69cf303a8fbf0fb5d0a",
+  "name": "t218-enum-ios27",
+  "stage": "A04-P02",
+  "started": "2026-11-12T00:03:14+00:00",
+  "timed_out": false
+}

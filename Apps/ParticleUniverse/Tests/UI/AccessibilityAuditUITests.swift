@@ -49,6 +49,9 @@ final class AccessibilityAuditUITests: XCTestCase {
 
     private func run(textSize: String?) throws {
         let app = XCUIApplication()
+        // Start paused (feature 034 T-A04-218 seam) so no per-frame text changes while the audit samples the screen;
+        // at XXXL the Play button is off-screen and tapping it first scrolled the page mid-audit.
+        app.launchArguments += ["-uitestReduceMotion", "YES"]
         if let textSize { app.launchArguments += ["-UIPreferredContentSizeCategoryName", textSize] }
         app.launch()
         let label = textSize ?? "default"
@@ -58,7 +61,7 @@ final class AccessibilityAuditUITests: XCTestCase {
         try audit(app, "home [\(label)]", types: types)
         open.tap()
         XCTAssertTrue(app.descendants(matching: .any)["pu.sandbox.canvas"].waitForExistence(timeout: 10))
-        app.buttons["pu.sandbox.play"].tap()   // pause, so the audit sees a stable screen
+        XCTAssertEqual(app.buttons["pu.sandbox.play"].label, "Play", "paused, so the audit sees a stable screen")
         try audit(app, "sandbox [\(label)]", types: types)
         app.swipeUp()
         try audit(app, "sandbox scrolled [\(label)]", types: types)

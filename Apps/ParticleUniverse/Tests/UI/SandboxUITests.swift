@@ -132,3 +132,20 @@ extension SandboxUITests {
         XCTAssertTrue(app.staticTexts["pu.sandbox.force"].label.hasPrefix("Force: Attractor at ("))
     }
 }
+
+extension SandboxUITests {
+    /// Feature 034 T-A04-218 (spec edge cases, CHK020; constitution VII): under Reduce Motion the GPU stage starts
+    /// paused and holds until the person presses Play.
+    func testReduceMotionStartsPausedOnTheGPUStage() {
+        let app = openSandbox(["-uitestReduceMotion", "YES"])
+        XCTAssertEqual(app.staticTexts["pu.sandbox.renderer"].label, "Renderer: GPU")
+        let play = app.buttons["pu.sandbox.play"]
+        XCTAssertEqual(play.label, "Play", "starts paused")
+        Thread.sleep(forTimeInterval: 1)
+        XCTAssertEqual(counts(app).0, 0, "nothing advances while paused")
+        play.tap()
+        let start = Date()
+        while counts(app).0 == 0, Date().timeIntervalSince(start) < 5 { Thread.sleep(forTimeInterval: 0.25) }
+        XCTAssertGreaterThan(counts(app).0, 0, "Play starts the GPU stage")
+    }
+}

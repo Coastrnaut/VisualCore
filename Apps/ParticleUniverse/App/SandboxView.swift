@@ -20,7 +20,7 @@ struct SandboxView: View {
         .navigationBarTitleDisplayMode(.inline)
         // Dragging the force to the right must not navigate back; the back button and edge swipe still work.
         .contentSwipeBackDisabled()
-        .onAppear { if model == nil { model = SceneModel(reduceMotion: reduceMotion) } }
+        .onAppear { if model == nil { model = SceneModel(reduceMotion: reduceMotion || DeviceConditionsSource.forcedReduceMotion) } }
         .onDisappear {
             model?.tearDown()
             model = nil

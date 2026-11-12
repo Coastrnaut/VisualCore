@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "python3",
+    "-c",
+    "\nimport re,sys\ns=open('Apps/ParticleUniverse/App/DeviceConditionsSource.swift').read()\nreads=[m.start() for m in re.finditer(r'forKey: \"uitest', s)]\nblocks=[(m.start(), s.index('#endif', m.start())) for m in re.finditer(r'#if DEBUG', s)]\nout=[r for r in reads if not any(a<r<b for a,b in blocks)]\nprint('uitest UserDefaults reads', len(reads), 'outside DEBUG', len(out)); sys.exit(1 if out else 0)"
+  ],
+  "command": "python3 -c '\nimport re,sys\ns=open('\"'\"'Apps/ParticleUniverse/App/DeviceConditionsSource.swift'\"'\"').read()\nreads=[m.start() for m in re.finditer(r'\"'\"'forKey: \"uitest'\"'\"', s)]\nblocks=[(m.start(), s.index('\"'\"'#endif'\"'\"', m.start())) for m in re.finditer(r'\"'\"'#if DEBUG'\"'\"', s)]\nout=[r for r in reads if not any(a<r<b for a,b in blocks)]\nprint('\"'\"'uitest UserDefaults reads'\"'\"', len(reads), '\"'\"'outside DEBUG'\"'\"', len(out)); sys.exit(1 if out else 0)'",
+  "elapsed_seconds": 0.014,
+  "exit_code": 0,
+  "finished": "2026-11-12T00:03:15+00:00",
+  "log": ".autonomy/logs/A04-P02.t218-debug-seam.log",
+  "log_sha256": "f8db2bcb55a9dea1cbde1cf6d9c943a73d7900d716e904ef3ec07daf8068ee65",
+  "name": "t218-debug-seam",
+  "stage": "A04-P02",
+  "started": "2026-11-12T00:03:15+00:00",
+  "timed_out": false
+}
