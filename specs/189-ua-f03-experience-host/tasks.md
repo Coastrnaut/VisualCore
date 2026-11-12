@@ -110,3 +110,7 @@ collected at the end on the final sources.
 - A test task is committed together with the implementation task that follows it.
 - An agent's report is not evidence: every proof command is run by the lead before the task is ticked.
 - T-U03-025 is a device task: it stays open and does not block the gate, which is recorded by T-U03-024.
+
+## Phase 7: Convergence
+
+- [ ] T-U03-026 Name `SessionStrings` (its `Key` cases and `text(_:)`) in `specs/189-ua-f03-experience-host/contracts/session-api.md`, with the seven keys of the string catalog; proof: a script finds every public name of the session's five source files in the contract or the data model, except the members SwiftUI requires (`body`, `makeBody`), per plan: Public API (partial)
