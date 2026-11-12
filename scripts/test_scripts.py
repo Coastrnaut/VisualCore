@@ -2,8 +2,11 @@
 """Unit tests for the deterministic VisualCore scripts (T-F006). Run: python3 scripts/test_scripts.py"""
 from __future__ import annotations
 
+import contextlib
+import datetime
 import hashlib
 import importlib.util
+import io
 import json
 import subprocess
 import sys
@@ -1386,6 +1389,109 @@ class GitSandboxTests(unittest.TestCase):
         box.git("push", "-q", "origin", "main")
         self.assertEqual(box.remote_head(), second)
         self.assertEqual(docs.validate(box.root), [])
+
+
+class TickTaskTests(unittest.TestCase):
+    """tick_task.py ticks one verified task of any namespace, refuses without changing anything, and pushes only
+    on main after a clean scan (feature 186, FR-U00-010 to FR-U00-014)."""
+
+    FORMS = {"001-x": "F0{:02d}", "035-x": "A04-3{:02d}", "186-x": "U00-{:03d}", "205-x": "R02F05-{:03d}",
+             "301-x": "R02G0101-{:03d}", "r03-f01-x": "R03F01-{:03d}", "r03-g01-01-x": "R03G0101-{:03d}"}
+
+    def setUp(self):
+        self.box = GitSandbox()
+        self.addCleanup(self.box.cleanup)
+        for name, form in self.FORMS.items():
+            self.box.write(f"specs/{name}/spec.md", f"- **FR-{form.format(1)}**: a\n")
+            self.box.write(f"specs/{name}/tasks.md", f"- [ ] T-{form.format(1)} first task\n- [ ] T-{form.format(2)} second task\n")
+        self.box.commit_all("dossiers")
+        self.box.git("push", "-q", "origin", "main")
+
+    def tick(self, *argv):
+        with contextlib.redirect_stdout(io.StringIO()):
+            return ticktool.main(list(argv), self.box.root)
+
+    def refused(self, *argv) -> str:
+        with self.assertRaises(SystemExit) as raised:
+            self.tick(*argv)
+        self.assertNotIn(raised.exception.code, (0, None))
+        return str(raised.exception)
+
+    def tasks(self, name="186-x") -> bytes:
+        return (self.box.root / "specs" / name / "tasks.md").read_bytes()
+
+    def test_ticks_a_task_of_every_directory_form_and_pushes_on_main(self):
+        today = datetime.date.today().isoformat()
+        for name, form in self.FORMS.items():
+            before = self.box.commits()
+            self.assertEqual(self.tick(f"specs/{name}", f"T-{form.format(1)}", "cmd: 3 tests OK", f"tick {name}"), 0, name)
+            lines = self.tasks(name).decode().splitlines()
+            self.assertEqual(lines[0], f"- [X] T-{form.format(1)} first task — Verified {today}: cmd: 3 tests OK", name)
+            self.assertEqual(lines[1], f"- [ ] T-{form.format(2)} second task", name)
+            self.assertEqual(self.box.commits(), before + 1, name)
+            self.assertEqual(self.box.last_message().strip(), f"tick {name}")
+            self.assertEqual(self.box.remote_head(), self.box.head(), name)
+        self.assertEqual(self.box.git("status", "--short"), "")
+
+    def test_refusals_change_nothing(self):
+        self.box.write("specs/186-x/tasks.md", self.tasks().decode() + "- [X] T-U00-003 done — Verified 2026-11-11: x\n"
+                       "- [ ] T-U00-004 twice\n- [ ] T-U00-004 twice again\n")
+        self.box.commit_all("more tasks")
+        before, commits = self.tasks(), self.box.commits()
+        cases = {"task list missing": ("specs/190-none", "T-U04-001", "e", "m"), "task missing": ("specs/186-x", "T-U00-099", "e", "m"),
+                 "already ticked": ("specs/186-x", "T-U00-003", "e", "m"), "listed twice": ("specs/186-x", "T-U00-004", "e", "m"),
+                 "empty evidence": ("specs/186-x", "T-U00-001", "  ", "m"), "evidence with a line break": ("specs/186-x", "T-U00-001", "a\nb", "m")}
+        for label, argv in cases.items():
+            self.assertTrue(self.refused(*argv), label)
+            self.assertEqual(self.tasks(), before, label)
+            self.assertEqual(self.box.commits(), commits, label)
+        self.assertEqual(self.box.git("status", "--short"), "")
+
+    def test_failed_validation_restores_the_task_list(self):
+        self.box.write("specs/186-x/tasks.md", self.tasks().decode() + "- [ ] T-U01-001 a task of another feature\n")
+        self.box.commit_all("a foreign task")
+        before, commits = self.tasks(), self.box.commits()
+        message = self.refused("specs/186-x", "T-U00-001", "e", "m")
+        self.assertIn("T-U01-001 outside namespace U00", message)
+        self.assertEqual(self.tasks(), before)
+        self.assertEqual(self.box.commits(), commits)
+
+    def test_other_branch_commits_without_pushing(self):
+        self.box.git("checkout", "-q", "-b", "work")
+        remote = self.box.remote_head()
+        self.assertEqual(self.tick("specs/186-x", "T-U00-001", "e", "on a branch"), 0)
+        self.assertEqual(self.box.last_message().strip(), "on a branch")
+        self.assertEqual(self.box.remote_head(), remote)
+
+    def test_no_push_flag_keeps_the_commit_local(self):
+        remote = self.box.remote_head()
+        self.assertEqual(self.tick("specs/186-x", "T-U00-001", "e", "local only", "--no-push"), 0)
+        self.assertEqual(self.box.remote_head(), remote)
+        self.assertNotEqual(self.box.head(), remote)
+
+    def test_finding_keeps_the_commit_local(self):
+        self.box.write("docs/leak.md", "device 00008120-001A2B3C4D5E6F78\n")
+        remote, commits = self.box.remote_head(), self.box.commits()
+        message = self.refused("specs/186-x", "T-U00-001", "e", "with a finding")
+        self.assertIn("NOT pushed", message)
+        self.assertIn("python3 scripts/prepush_scan.py --push", message)
+        self.assertEqual(self.box.commits(), commits + 1)
+        self.assertEqual(self.box.remote_head(), remote)
+
+    def test_failed_push_keeps_the_commit_local(self):
+        self.box.git("remote", "set-url", "origin", str(self.box.remote.parent / "gone.git"))
+        commits = self.box.commits()
+        message = self.refused("specs/186-x", "T-U00-001", "e", "remote is gone")
+        self.assertIn("NOT pushed", message)
+        self.assertIn("python3 scripts/prepush_scan.py --push", message)
+        self.assertEqual(self.box.commits(), commits + 1)
+
+    def test_commit_has_no_trailer(self):
+        self.assertEqual(self.tick("specs/186-x", "T-U00-001", "e", "subject only", "--no-push"), 0)
+        message = self.box.last_message()
+        self.assertEqual(message.strip(), "subject only")
+        for trailer in ("Co-Authored-By", "Generated with"):
+            self.assertNotIn(trailer, message)
 
 
 def ledger_tree_hash() -> str:
