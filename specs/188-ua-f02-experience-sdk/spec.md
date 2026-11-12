@@ -302,8 +302,9 @@ hand-written copies of the same tests.
   states.
 - **FR-U02-003**: Every other transition, including a transition from a state to itself, MUST be rejected: the
   state stays, a rejected counter grows by one and the attempt is recorded as rejected.
-- **FR-U02-004**: The lifecycle MUST keep a bounded history of transition attempts (accepted and rejected, oldest
-  dropped first) and the count of rejected attempts since creation.
+- **FR-U02-004**: The lifecycle MUST keep a bounded history of transition attempts (accepted and rejected, at most
+  64 unless the caller sets another limit of at least 1, oldest dropped first) and the count of rejected attempts
+  since creation.
 - **FR-U02-005**: Entering failed MUST store the error as last error. The last error MUST stay readable until the
   next preparation succeeds.
 - **FR-U02-006**: Each operation of the contract MUST be legal only in these states: prepare in registered,
@@ -332,8 +333,8 @@ hand-written copies of the same tests.
   sequences and finite floating-point numbers, and that way MUST refuse a number that is not finite. The encoding
   MUST mark the type and the length of every field, so that two different sequences of fields never give the same
   bytes.
-- **FR-U02-016**: The core's preparation MAY run off the main actor. It MUST check for cancellation at bounded
-  intervals. A preparation result that arrives after cancellation, after deactivation began or after a newer
+- **FR-U02-016**: The core's preparation MAY run off the main actor. It MUST check for cancellation between its
+  units of work, often enough that a cancelled preparation ends within 1 second in the test environments. A preparation result that arrives after cancellation, after deactivation began or after a newer
   preparation started MUST be discarded.
 - **FR-U02-017**: The caller MUST be able to set a time limit for preparation. Exceeding it MUST be a failure with
   its own stable code.
@@ -341,15 +342,16 @@ hand-written copies of the same tests.
 **Fixed-step update**
 
 - **FR-U02-020**: The domain state MUST advance only in fixed steps of a length the experience declares, between
-  1/240 s and 1/30 s. An update MUST receive the step index and MUST make no graphics call.
+  1/240 s and 1/30 s; without a declaration the length is 1/120 s, and a declared length outside the range MUST be
+  brought to the nearest end of the range. An update MUST receive the step index and MUST make no graphics call.
 - **FR-U02-021**: The steps run for a given amount of simulated time MUST NOT depend on how that time is divided
   into frames, as long as no frame exceeds the per-frame step limit.
 - **FR-U02-022**: The number of steps per frame MUST be limited (at most 8). Time beyond the limit MUST be counted
   as dropped and MUST NOT be made up later.
 - **FR-U02-023**: A frame time that is negative or not finite MUST run no step and MUST be counted.
 - **FR-U02-024**: Suspension MUST stop stepping. Resuming MUST NOT run steps for the time spent suspended.
-- **FR-U02-025**: The step index MUST start at 0 after preparation and after reset, MUST grow by one per step and
-  MUST be restored by a snapshot.
+- **FR-U02-025**: The step index MUST be a 64-bit count that starts at 0 after preparation and after reset, grows by
+  one per step and is restored by a snapshot.
 
 **Input**
 
@@ -360,7 +362,8 @@ hand-written copies of the same tests.
   and their ranges.
 - **FR-U02-032**: The answer to an action MUST be accepted, or rejected with a typed reason. The reasons MUST
   include at least: unknown control, wrong number of values, value not finite, value out of range, not allowed in
-  the current lifecycle state, and refused by the experience's rules with an experience-defined code.
+  the current lifecycle state, a step index that is not the current one, and refused by the experience's rules
+  with an experience-defined code.
 - **FR-U02-033**: A rejected action MUST leave the digest unchanged.
 - **FR-U02-034**: The checks for unknown control, number of values, finiteness and range MUST be made by the
   contract before the experience's own code sees the action.
@@ -379,10 +382,11 @@ hand-written copies of the same tests.
   digest, seed and step index.
 - **FR-U02-042**: A snapshot of an older schema version MUST be migrated step by step with the existing
   MigrationChain. A missing migration step MUST be a typed refusal.
-- **FR-U02-043**: Restore MUST refuse, with a distinct typed reason each: a snapshot of another experience, a
-  newer schema version or an unknown envelope format, a payload that does not decode, a checksum mismatch, and an
+- **FR-U02-043**: Restore MUST refuse, with a distinct typed reason each: a snapshot of another experience, an
+  unknown envelope format, a newer schema version, a payload that does not decode, a checksum mismatch, and an
   encoded snapshot larger than 1,048,576 bytes. When a snapshot of the current schema version restores to a state
-  whose digest differs from the digest in the envelope, that MUST be a typed refusal too.
+  whose digest differs from the digest in the envelope, that MUST be a typed refusal too. Together with the
+  missing migration step of FR-U02-042 these are eight typed reasons.
 - **FR-U02-044**: A refused restore MUST leave the running state exactly as it was (same digest, same step
   index).
 - **FR-U02-045**: Reset MUST give the state of a fresh preparation with the current seed: equal digest, step
@@ -401,11 +405,13 @@ hand-written copies of the same tests.
   MUST decide an outcome or enter the digest.
 - **FR-U02-052**: GPU objects MUST be created through the host's resource registry at activation or in scene
   setup, MUST be rebuilt from CPU state after a context loss, and MUST all be released when deactivation ends: the
-  live count and the leaked count of the host are then 0.
+  live count and the leaked count of the host are then 0. An object that is still live or leaked at that moment
+  MUST be reported as a typed failure, and the lifecycle MUST become failed instead of inactive.
 - **FR-U02-053**: Everything that touches the graphics context MUST run on the main actor. CPU work of
   preparation MAY run elsewhere when it is pure and hands finished values to the main actor.
-- **FR-U02-054**: An experience MUST accept a quality tier out of the tiers it declares. Changing the tier MUST
-  NOT change the digest.
+- **FR-U02-054**: An experience MUST accept a quality tier out of the tiers it declares (at least one; tier 0 is
+  the best). A tier it did not declare MUST be refused with a typed reason. Changing the tier MUST NOT change the
+  digest.
 - **FR-U02-055**: An experience MUST offer cache shedding for memory pressure. Shedding MUST NOT change the
   digest, and whatever was shed MUST be rebuilt on demand.
 - **FR-U02-056**: An experience MUST offer its native controls and a text that describes its current state for
@@ -416,7 +422,8 @@ hand-written copies of the same tests.
 
 - **FR-U02-060**: Every experience MUST expose one diagnostics value with: experience id, lifecycle state, seed,
   step index, quality tier, live GPU resource counts (objects, bytes, leaked), last error (stable code and text)
-  and digest. An item that does not exist yet MUST be reported as absent.
+  and digest, and the counters of this contract: rejected transitions, refused operations, accepted and rejected
+  actions, dropped time and invalid frames. An item that does not exist yet MUST be reported as absent.
 - **FR-U02-061**: Diagnostics MUST be readable in every lifecycle state without side effects, and MUST be a value
   that can be written into an evidence file.
 - **FR-U02-062**: Scenario hooks for automation (run a script of seed, steps and actions; read the results) MUST
@@ -435,7 +442,8 @@ hand-written copies of the same tests.
   it, and MUST be bounded: the caller sets the seeds, steps and actions it uses.
 - **FR-U02-072**: A sample experience used only by tests MUST exercise the whole contract: on the host the pure
   parts, and on the iOS 27.x and iOS 26.5 simulators the parts that need a render host. The sample MUST NOT be
-  part of any shipped product.
+  part of any shipped product: only test targets may depend on the module that holds it, and the dependency check
+  of the repository MUST fail otherwise.
 - **FR-U02-073**: For each check of the helper there MUST be a deliberately broken variant of the sample that
   fails exactly that check.
 
@@ -489,8 +497,8 @@ hand-written copies of the same tests.
   seeds the digest equals a committed value on the host and on both simulator runtimes.
 - **SC-U02-003**: At 100 different points of a run, snapshot and restore reproduce digest, seed and step index in
   100% of the cases; reset equals a fresh preparation in 100% of 32 tried seeds; a committed version-1 snapshot
-  restores to its committed digest; each of the six refusal reasons is produced by its fixture, and the running
-  digest is unchanged in every refusal.
+  restores to its committed digest; each of the eight typed refusal reasons is produced by its fixture, and the
+  running digest is unchanged in every refusal.
 - **SC-U02-004**: Every rejection reason is produced by at least one row of the action table, and the digest is
   unchanged after 100% of the rejected actions; a replay of 200 recorded actions reproduces the digest.
 - **SC-U02-005**: Two seconds of simulated time fed as 60, 120, 240 and irregular frames give the same step count
@@ -554,7 +562,7 @@ unique requirements and what happens to each:
 | Source | Requirement |
 |---|---|
 | Acceptance 1 (pure lifecycle reducer, exhaustive tests, illegal transitions rejected and counted) | FR-U02-001–007, US1, SC-U02-001 |
-| Acceptance 2 (deterministic preparation, conformance helper checks it) | FR-U02-010–017, FR-U02-070, US2, SC-U02-002, SC-U02-010 |
+| Acceptance 2 (deterministic preparation, conformance helper checks it) | FR-U02-010–017, FR-U02-070, FR-U02-071, US2, SC-U02-002, SC-U02-010 |
 | Acceptance 3 (restore reproduces the digest, reset equals fresh preparation, versioned envelopes with migrations) | FR-U02-040–047, US3, SC-U02-003 |
 | Acceptance 4 (normalized input, rejection leaves the digest unchanged, typed reason) | FR-U02-030–036, US4, SC-U02-004 |
 | Acceptance 5 (fixed steps independent of frame rate, drawing reads immutable state, no GPU result decides) | FR-U02-020–025, FR-U02-050–052, US2, US5, SC-U02-005 |
@@ -564,7 +572,7 @@ unique requirements and what happens to each:
 | Scope: suspend, resume, deactivate, tier, cache shedding | FR-U02-006, FR-U02-024, FR-U02-052, FR-U02-054, FR-U02-055 |
 | Out of scope: session host, real experiences | FR-U02-084 |
 | Auto-Creator.md section 6.1 (E-03, E-04, E-05, E-06, E-08, E-09, E-10, E-11, E-13) | FR-U02-030–036, FR-U02-010–025, FR-U02-040–047, FR-U02-045, FR-U02-024, FR-U02-052, FR-U02-011, FR-U02-016, FR-U02-012, FR-U02-054 |
-| Auto-Creator.md section 11.3 (operations, states, conformance helper), 11.5 (threads), 11.6 (failure, cancellation, no traps) | FR-U02-001–007, FR-U02-070, FR-U02-053, FR-U02-011, FR-U02-012, FR-U02-085 |
+| Auto-Creator.md section 11.3 (operations, states, conformance helper), 11.5 (threads), 11.6 (failure, cancellation, no traps) | FR-U02-001–007, FR-U02-070, FR-U02-053, FR-U02-011, FR-U02-012, FR-U02-063, FR-U02-085 |
 | ADR-0009 D-05 (one contract that adapts the existing surfaces) | FR-U02-080, FR-U02-081 |
 | Constitution II (reuse obligations), III (lifecycle and context generation), IX (bounded untrusted input), XI (identity), XIII (code-driven visuals) | FR-U02-082, FR-U02-083, FR-U02-052, FR-U02-043, FR-U02-085, FR-U02-056, FR-U02-050 |
 | R02-F23 (lifecycle and digest parts) | section "Absorbed source requirements" |
