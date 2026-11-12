@@ -261,6 +261,10 @@ public final class ExperienceSession {
                 try experience.restore(snapshot)
             } catch {
                 lastRestoreRefusal = error.failure
+                if request.refusedSnapshotFails {
+                    // No render host exists yet and the sink is not called: the stored state stays as it is.
+                    return .failed(fail(SessionFailure(error.failure, stage: .restore)))
+                }
             }
         }
 
@@ -336,6 +340,14 @@ public final class ExperienceSession {
             return .superseded
         }
         return await open(lastRequest)
+    }
+
+    /// Hands the open experience's snapshot to the sink now (feature 191, FR-U05-010): a safe point between a
+    /// suspension and a close. Only a running or suspended session does it; otherwise nothing happens. A
+    /// snapshot that cannot be taken and a sink that throws are counted as at a suspension and stop nothing.
+    public func checkpoint() {
+        guard state == .running || state == .suspended, let experience else { return }
+        handOutSnapshot(of: experience)
     }
 
     // MARK: Close

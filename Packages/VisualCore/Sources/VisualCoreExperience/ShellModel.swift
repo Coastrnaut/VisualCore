@@ -84,6 +84,11 @@ public struct ShellPreferences: Sendable, Equatable, Codable {
     public static let maxSearchLength = 100
     /// The key the app stores the preferences under.
     public static let storageKey = "vc.shell.preferences"
+    /// The key the app stores the copy of an unreadable session state under (feature 191).
+    public static let unreadableCopyKey = "vc.shell.preferences.unreadable"
+    /// The earlier schema versions for which a migration to the current schema exists. It must hold every
+    /// version from 1 below `schema`; empty while the schema is 1.
+    public static var migratedVersions: [Int] { [] }
     /// The note of `decode` for data that is damaged, oversized or of an unknown shape.
     public static let noteUnreadable = "preferences.unreadable"
     /// The note of `decode` for data written by a newer schema.

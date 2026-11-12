@@ -47,13 +47,13 @@ File `state.json` in the experience's folder: the text of `ExperienceSnapshot.en
 |---|---|
 | `load(_ id:) -> SavedStateLoad` | `.none` without the file; `.unreadable(problem)` when the file is larger than the limit, cannot be read, is not a snapshot (`SnapshotError`), or names another experience; else `.state(snapshot)` |
 | `save(_ snapshot:) throws(StorageError) -> Bool` | false and no write when the stored bytes equal the new text; otherwise an atomic write and true |
-| `quarantine(_ id:reason:) throws(StorageError) -> String?` | moves `state.json` to `quarantine-<n>.json` (n = the highest existing n + 1, starting at 1); keeps at most 3 copies, removing the lowest n first; nil without a state |
+| `quarantine(_ id:) throws(StorageError) -> String?` | moves `state.json` to `quarantine-<n>.json` (n = the highest existing n + 1, starting at 1); keeps at most 3 copies, removing the lowest n first; nil without a state |
 | `quarantined(_ id:) -> [String]` | the names of the copies, by rising n |
 | `removeLeftovers() -> Int` | removes every hidden temporary file in every namespace folder; the number removed |
 | `remove(_ id:)` | removes `state.json` (used by tests and debug support) |
 
-`SavedStateProblem`: `code: String` (the `SnapshotError` code, `state.too-large`, `state.unreadable-file` or
-`snapshot.wrong-experience`), `newer: Bool` (true for `snapshot.newer-schema`), `init(error: SnapshotError)`,
+`SavedStateProblem`: `code: String` (the `SnapshotError` code — `snapshot.too-large` for a file above the limit,
+`snapshot.wrong-experience` for a state of another experience — or `state.unreadable-file`), `newer: Bool` (true for `snapshot.newer-schema`), `init(error: SnapshotError)`,
 `init(failureCode: String)` (from a session failure of the restore stage).
 
 State transitions of an open:

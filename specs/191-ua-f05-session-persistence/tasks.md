@@ -26,7 +26,7 @@ round, so that the evidence is recorded once on the final sources. Review checkp
 
 ## Phase 1: Setup
 
-- [ ] T-U05-001 [P] Add the option `--no-direct-storage <path> …` to `scripts/check_app_isolation.py` (exit 1 with file and line when a source names `UserDefaults`, `FileManager`, `NSHomeDirectory`, `NSTemporaryDirectory`, `applicationSupportDirectory`, `documentDirectory` or `cachesDirectory`; comments are not code) and the option `--no-crash-on-stored-data <path> …` (exit 1 with file and line for a forced `try`, `fatalError`, `preconditionFailure`, `precondition(`, `assertionFailure` or a forced unwrap in a source that reads stored data), each with tests in `scripts/test_scripts.py`. Proof: `python3 scripts/test_scripts.py` passes (FR-U05-006, FR-U05-071).
+- [X] T-U05-001 [P] Add the option `--no-direct-storage <path> …` to `scripts/check_app_isolation.py` (exit 1 with file and line when a source names `UserDefaults`, `FileManager`, `NSHomeDirectory`, `NSTemporaryDirectory`, `applicationSupportDirectory`, `documentDirectory` or `cachesDirectory`; comments are not code) and the option `--no-crash-on-stored-data <path> …` (exit 1 with file and line for a forced `try`, `fatalError`, `preconditionFailure`, `precondition(`, `assertionFailure` or a forced unwrap in a source that reads stored data), each with tests in `scripts/test_scripts.py`. Proof: `python3 scripts/test_scripts.py` passes (FR-U05-006, FR-U05-071). — Verified 2026-11-12: python3 scripts/test_scripts.py: Ran 234 tests, OK (StorageRuleTests 15); the module rule of feature 187 now names the two storage files as its only exceptions
 
 ## Phase 2: Foundational — the pure types (block every story)
 

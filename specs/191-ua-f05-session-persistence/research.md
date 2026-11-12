@@ -86,11 +86,17 @@ Foundation; the tests the brief's first evidence command runs can cover it. **Al
 host module (not reachable by a pure experience module); `DocumentStore` as the handle (its envelope and kinds
 are not what an experience wants for arbitrary files).
 
+**Correction at implementation (2026-11-12)**: the source rule of feature 187 (FR-U01-036, script test
+`ExperienceModuleTests`) forbade `FileManager` and `UserDefaults` in every file of `VisualCoreExperience`. The
+rule now names the two storage files (`ExperienceStorage.swift`: both names; `SavedStateStore.swift`:
+`FileManager`) as the only exceptions; every other file of the module and every other forbidden word stay as
+they were, and the test fails when one of the two files disappears.
+
 ### R2. The saved state
 
 **Decision**: `SavedStateStore` (new, `VisualCoreExperience`): `load(_ id:) -> SavedStateLoad` (`.none`,
 `.state(ExperienceSnapshot)`, `.unreadable(SavedStateProblem)`), `save(_ snapshot:) -> Bool` (false when the stored
-text is equal), `quarantine(_ id:reason:)`, `quarantined(_ id:)`, `removeLeftovers()`. The file is
+text is equal), `quarantine(_ id:)`, `quarantined(_ id:)`, `removeLeftovers()`. The file is
 `Experiences/<id>/state.json` with the snapshot's own text; quarantined copies are `quarantine-<n>.json` with
 rising n, at most 3. The file is read only up to `ExperienceSnapshot.maxBytes`.
 **Rationale**: clarification 2 (one version system). **Alternative**: `DocumentStore<ExperienceSnapshot>` (two

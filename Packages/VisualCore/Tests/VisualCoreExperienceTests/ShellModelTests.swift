@@ -466,4 +466,16 @@ import Testing
         #expect(one != .all)
         #expect(one == ResetPlan.experience(known[1]))
     }
+
+    // MARK: - Session state keys and migrations (feature 191 T-U05-010; FR-U05-052)
+
+    @Test func unreadableCopyKeyIsItsOwnKey() {
+        #expect(ShellPreferences.unreadableCopyKey == "vc.shell.preferences.unreadable")
+        #expect(ShellPreferences.unreadableCopyKey != ShellPreferences.storageKey)
+    }
+
+    /// Fails by construction when `schema` rises without a migration from every earlier version.
+    @Test func migratedVersionsHoldEveryEarlierSchema() {
+        #expect(ShellPreferences.migratedVersions == Array(1..<ShellPreferences.schema))
+    }
 }

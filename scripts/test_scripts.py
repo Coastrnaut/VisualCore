@@ -809,6 +809,196 @@ class ExperienceIsolationTests(unittest.TestCase):
         self.assertEqual(self.run_main("--app", self.root / "App" / "A.swift"), (2, ""))
 
 
+class StorageRuleTests(unittest.TestCase):
+    """Feature UA-F05 T-U05-001: `--no-direct-storage` and `--no-crash-on-stored-data` (FR-U05-006, FR-U05-071)."""
+
+    CLEAN = "import VisualCore\nlet x = 1\n"
+    STORAGE_PASS = "Swift files use no storage directly"
+    CRASH_PASS = "Swift files read stored data without a deliberate crash"
+
+    def setUp(self):
+        self._tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self._tmp.cleanup)
+        self.root = Path(self._tmp.name)
+
+    def write(self, rel: str, text: str) -> Path:
+        p = self.root / rel
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_text(text)
+        return p
+
+    def run_main(self, *args) -> tuple[int, str]:
+        out, err = io.StringIO(), io.StringIO()
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+            try:
+                code = isolation.main([str(a) for a in args])
+            except SystemExit as e:
+                code = e.code
+        return code, out.getvalue()
+
+    def test_each_storage_name_is_reported_with_file_and_line(self):
+        uses = {"UserDefaults": "let d = UserDefaults.standard",
+                "FileManager": "let m = FileManager.default",
+                "NSHomeDirectory": "let h = NSHomeDirectory()",
+                "NSTemporaryDirectory": "let t = NSTemporaryDirectory()",
+                "applicationSupportDirectory": "let a = URL.applicationSupportDirectory",
+                "documentDirectory": "let u = urls(for: .documentDirectory, in: .userDomainMask)",
+                "cachesDirectory": "let c = URL.cachesDirectory"}
+        self.assertEqual(sorted(uses), sorted(isolation.STORAGE))
+        for name, code_line in uses.items():
+            with self.subTest(name):
+                bad = self.write(f"{name}.swift", f"import Foundation\n\n{code_line}\n")
+                self.assertEqual(self.run_main("--no-direct-storage", bad),
+                                 (1, f"  FAIL {bad}:3: {name}\nFAIL: 1 direct uses of storage in 1 Swift files\n"))
+
+    def test_storage_names_are_whole_identifiers_and_every_use_counts(self):
+        bad = self.write("A.swift", "let a = MyUserDefaults()\nlet b = FileManagerLike()\nlet documentDirectoryName = 1\n"
+                                    "let c = FileManager.default; let d = UserDefaults.standard\n")
+        self.assertEqual(self.run_main("--no-direct-storage", bad),
+                         (1, f"  FAIL {bad}:4: FileManager\n  FAIL {bad}:4: UserDefaults\n"
+                             "FAIL: 2 direct uses of storage in 1 Swift files\n"))
+
+    def test_storage_names_in_comments_and_strings_are_not_findings(self):
+        good = self.write("A.swift", "// UserDefaults and FileManager in a comment\n"
+                                     "/* NSHomeDirectory()\n   NSTemporaryDirectory() /* nested cachesDirectory */\n"
+                                     "   documentDirectory */\n"
+                                     'let a = "UserDefaults, FileManager, applicationSupportDirectory"\n'
+                                     'let b = """\n  NSHomeDirectory() and "cachesDirectory"\n  """\n'
+                                     'let c = #"a "FileManager" \\(documentDirectory)"#\n'
+                                     'let d = "an escaped \\" quote, then UserDefaults"\n'
+                                     "let e = 1 // cachesDirectory\n")
+        self.assertEqual(self.run_main("--no-direct-storage", good), (0, f"PASS: 1 {self.STORAGE_PASS}\n"))
+
+    def test_line_numbers_survive_comments_and_strings_and_interpolation_is_code(self):
+        bad = self.write("A.swift", "/* two\n   lines */\nlet a = \"\"\"\n  text\n  \"\"\"\n"
+                                    "let b = FileManager.default // FileManager\n"
+                                    'let c = "home: \\(NSHomeDirectory()) UserDefaults"\n')
+        self.assertEqual(self.run_main("--no-direct-storage", bad),
+                         (1, f"  FAIL {bad}:6: FileManager\n  FAIL {bad}:7: NSHomeDirectory\n"
+                             "FAIL: 2 direct uses of storage in 1 Swift files\n"))
+
+    def test_a_clean_file_passes_both_options(self):
+        good = self.write("A.swift", self.CLEAN)
+        self.assertEqual(self.run_main("--no-direct-storage", good), (0, f"PASS: 1 {self.STORAGE_PASS}\n"))
+        self.assertEqual(self.run_main("--no-crash-on-stored-data", good), (0, f"PASS: 1 {self.CRASH_PASS}\n"))
+        self.assertEqual(self.run_main("--no-direct-storage", good, "--no-crash-on-stored-data", good),
+                         (0, f"PASS: 1 {self.STORAGE_PASS}\nPASS: 1 {self.CRASH_PASS}\n"))
+
+    def test_a_directory_is_searched_recursively(self):
+        self.write("Src/A.swift", self.CLEAN)
+        self.write("Src/notes.txt", "UserDefaults try! fatalError()\n")
+        deep = self.write("Src/Sub/Deeper/B.swift", "let a = 1\nlet d = UserDefaults.standard\nlet v = a as! Int\n")
+        test = self.write("Src/Tests/T.swift", "let m = FileManager.default\nlet v = try! f()\n")
+        src = self.root / "Src"
+        self.assertEqual(self.run_main("--no-direct-storage", src),
+                         (1, f"  FAIL {deep}:2: UserDefaults\n  FAIL {test}:1: FileManager\n"
+                             "FAIL: 2 direct uses of storage in 3 Swift files\n"))
+        self.assertEqual(self.run_main("--no-crash-on-stored-data", src),
+                         (1, f"  FAIL {deep}:3: forced cast\n  FAIL {test}:2: try!\n"
+                             "FAIL: 2 deliberate crashes in 3 Swift files\n"))
+
+    def test_files_and_directories_together_count_each_file_once(self):
+        a = self.write("Src/A.swift", self.CLEAN)
+        other = self.write("Other/C.swift", self.CLEAN)
+        self.assertEqual(self.run_main("--no-direct-storage", self.root / "Src", a, other),
+                         (0, f"PASS: 2 {self.STORAGE_PASS}\n"))
+
+    def test_a_missing_path_and_an_empty_directory_are_errors(self):
+        missing, empty = self.root / "Missing.swift", self.root / "Empty"
+        empty.mkdir()
+        (empty / "notes.txt").write_text("nothing\n")
+        good = self.write("A.swift", self.CLEAN)
+        for option, passed in (("--no-direct-storage", self.STORAGE_PASS), ("--no-crash-on-stored-data", self.CRASH_PASS)):
+            with self.subTest(option):
+                self.assertEqual(self.run_main(option, missing), (1, f"FAIL: {missing} — no Swift sources found\n"))
+                self.assertEqual(self.run_main(option, empty), (1, f"FAIL: {empty} — no Swift sources found\n"))
+                self.assertEqual(self.run_main(option, missing, good, empty),
+                                 (1, f"FAIL: {missing} — no Swift sources found\n"
+                                     f"FAIL: {empty} — no Swift sources found\nPASS: 1 {passed}\n"))
+                self.assertEqual(self.run_main(option), (2, ""))
+
+    def test_each_crash_construct_is_reported_with_file_and_line(self):
+        cases = [("let v = try! decode(data)", "try!"),
+                 ('fatalError("unreadable")', "fatalError("),
+                 ("preconditionFailure()", "preconditionFailure("),
+                 ("precondition(count > 0)", "precondition("),
+                 ('assertionFailure("no")', "assertionFailure("),
+                 ("assert(count > 0)", "assert("),
+                 ("let v = value!", "forced unwrap"),
+                 ("let v = call()!", "forced unwrap"),
+                 ("let v = items[0]!", "forced unwrap"),
+                 ("let v = value!.count", "forced unwrap"),
+                 ("let v = any as! Int", "forced cast"),
+                 ("var x: Int!", "forced unwrap"),
+                 ('let s = "n: \\(value!)"', "forced unwrap")]
+        for number, (code_line, what) in enumerate(cases):
+            with self.subTest(code_line):
+                bad = self.write(f"C{number}.swift", f"import Foundation\n// a comment\n\n{code_line}\n")
+                self.assertEqual(self.run_main("--no-crash-on-stored-data", bad),
+                                 (1, f"  FAIL {bad}:4: {what}\nFAIL: 1 deliberate crashes in 1 Swift files\n"))
+
+    def test_several_crashes_are_ordered_by_line_and_column(self):
+        bad = self.write("A.swift", "let a = try! f()!\nfunc g() {\n    precondition(a as! Bool)\n}\n")
+        self.assertEqual(self.run_main("--no-crash-on-stored-data", bad),
+                         (1, f"  FAIL {bad}:1: try!\n  FAIL {bad}:1: forced unwrap\n  FAIL {bad}:3: precondition(\n"
+                             f"  FAIL {bad}:3: forced cast\nFAIL: 4 deliberate crashes in 1 Swift files\n"))
+
+    def test_negations_and_comparisons_are_not_crashes(self):
+        good = self.write("A.swift", "if a != b { }\nif a!=b { }\nif a !== b { }\nlet n = !flag\n"
+                                     "guard !list.isEmpty else { return }\nif ready && !done || (!other) { }\n"
+                                     "let t = try? f()\nlet u = try f()\nlet c = any as? Int\nlet o: Int? = nil\n"
+                                     "XCTAssert(n)\nlet preconditions = [!n]\nobject.assertions(1)\n")
+        self.assertEqual(self.run_main("--no-crash-on-stored-data", good), (0, f"PASS: 1 {self.CRASH_PASS}\n"))
+
+    def test_crashes_in_comments_and_strings_are_not_findings(self):
+        good = self.write("A.swift", 'let s = "wow!"\n// done!\nlet t = "try! fatalError() value!" // assert(x)\n'
+                                     "/* precondition(a)\n   items[0]! as! Int */\n"
+                                     'let m = """\n  call()! and "quoted!"\n  """\nlet r = #"raw! \\(x!)"#\n'
+                                     'let i = "count: \\(list.count) items!"\n')
+        self.assertEqual(self.run_main("--no-crash-on-stored-data", good), (0, f"PASS: 1 {self.CRASH_PASS}\n"))
+
+    def test_both_options_together_fail_when_either_fails(self):
+        clean = self.write("Clean.swift", self.CLEAN)
+        stores = self.write("Stores.swift", "let d = UserDefaults.standard\n")
+        crashes = self.write("Crashes.swift", "let v = value!\n")
+        self.assertEqual(self.run_main("--no-direct-storage", stores, "--no-crash-on-stored-data", clean),
+                         (1, f"  FAIL {stores}:1: UserDefaults\nFAIL: 1 direct uses of storage in 1 Swift files\n"
+                             f"PASS: 1 {self.CRASH_PASS}\n"))
+        self.assertEqual(self.run_main("--no-direct-storage", clean, "--no-crash-on-stored-data", crashes),
+                         (1, f"PASS: 1 {self.STORAGE_PASS}\n  FAIL {crashes}:1: forced unwrap\n"
+                             "FAIL: 1 deliberate crashes in 1 Swift files\n"))
+        self.assertEqual(self.run_main("--no-direct-storage", stores, "--no-crash-on-stored-data", crashes)[0], 1)
+        # each option checks only its own rule
+        self.assertEqual(self.run_main("--no-direct-storage", crashes, "--no-crash-on-stored-data", stores)[0], 0)
+
+    def test_the_options_combine_with_the_existing_ones(self):
+        self.write("App/A.swift", self.CLEAN)
+        self.write("One/A.swift", self.CLEAN)
+        stores = self.write("App/Stores.swift", "let d = UserDefaults.standard\n")
+        app, one = self.root / "App", self.root / "One"
+        code, out = self.run_main("--app", app, "--experiences", one, "--require-sources", "--no-direct-storage", app)
+        self.assertEqual(code, 1)
+        self.assertEqual(out, f"PASS: {app} — 2 app Swift files, 0 isolation problems\n"
+                              f"PASS: {one} — 1 Swift files, 0 isolation problems, 0 test files left out\n"
+                              f"  FAIL {stores}:1: UserDefaults\nFAIL: 1 direct uses of storage in 2 Swift files\n")
+        bad = self.write("One/B.swift", "func f() { glClear(1) }\n")
+        code, out = self.run_main("--experiences", one, "--no-crash-on-stored-data", one)
+        self.assertEqual(code, 1)
+        self.assertEqual(out, f"  FAIL {bad}:1: glClear(\n"
+                              f"FAIL: {one} — 2 Swift files, 1 isolation problems, 0 test files left out\n"
+                              f"PASS: 2 {self.CRASH_PASS}\n")
+
+    def test_code_only_keeps_length_and_line_breaks(self):
+        text = 'let a = "x // y" /* c\n d */ + b // tail\nlet c = #"raw "q" \\n"# + """\n  m \\(v + f("s")) n\n  """\n'
+        code = isolation.code_only(text)
+        self.assertEqual(len(code), len(text))
+        self.assertEqual(code.count("\n"), text.count("\n"))
+        self.assertEqual(code.split("\n")[0].rstrip(), 'let a = "      "')
+        self.assertEqual(code.split("\n")[1].rstrip(), "      + b")
+        self.assertIn('v + f(" ")', code)
+        self.assertNotIn("raw", code)
+
+
 class ReleaseCheckTests(unittest.TestCase):
     """Feature 010 T-F908: release-check runner logic (step list, selection, logs, summary, failure handling)."""
 
@@ -2904,6 +3094,10 @@ class ExperienceModuleTests(unittest.TestCase):
     SOURCES = ROOT_DIR / "Packages/VisualCore/Sources/VisualCoreExperience"
     FORBIDDEN = ("Locale", "localized", "Date(", "FileManager", "URLSession", "ProcessInfo", "UserDefaults", "NotificationCenter",
                  "DispatchQueue", "Bundle.")
+    # UA-F05 (feature 191, research R1 and R2): the storage handle and the saved-state store are the two files of
+    # the module that reach files and defaults, each confined to one experience's namespace. Every other word stays
+    # forbidden in them, and every other file of the module stays without storage.
+    STORAGE_FILES = {"ExperienceStorage.swift": ("FileManager", "UserDefaults"), "SavedStateStore.swift": ("FileManager",)}
 
     def test_module_reads_no_clock_language_file_or_network(self):
         files = sorted(self.SOURCES.glob("*.swift"))
@@ -2912,6 +3106,8 @@ class ExperienceModuleTests(unittest.TestCase):
             text = path.read_text(encoding="utf-8")
             code = "\n".join(line.split("//")[0] for line in text.splitlines())
             for word in self.FORBIDDEN:
+                if word in self.STORAGE_FILES.get(path.name, ()):
+                    continue
                 self.assertNotIn(word, code, f"{path.name} names {word}")
             imports = set(re.findall(r"^import\s+(\w+)", text, re.M))
             # UA-F02 adds the pure modules the experience contract adapts; nothing else may be imported.
@@ -2919,6 +3115,8 @@ class ExperienceModuleTests(unittest.TestCase):
             allowed = {"Foundation", "VisualCoreMath", "VisualCoreSimulation", "VisualCorePersistence",
                        "VisualCoreDiagnostics"}
             self.assertLessEqual(imports, allowed, f"{path.name} imports {sorted(imports)}")
+        for name in self.STORAGE_FILES:
+            self.assertTrue((self.SOURCES / name).is_file(), f"{name} is named as a storage file and does not exist")
 
     def test_package_test_tool_passes_language_and_region(self):
         tool = load("xcodebuild_package")
