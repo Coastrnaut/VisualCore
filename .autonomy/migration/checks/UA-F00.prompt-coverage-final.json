@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "python3",
+    "scripts/planning_index.py",
+    "coverage"
+  ],
+  "command": "python3 scripts/planning_index.py coverage",
+  "elapsed_seconds": 0.15,
+  "exit_code": 0,
+  "finished": "2026-11-12T05:27:08+00:00",
+  "gate": "UA-F00",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F00.prompt-coverage-final.log",
+  "log_sha256": "1a1b23ae09769c6950af6a731c0a448fa65d218a70812b328122e85da9b33acc",
+  "name": "prompt-coverage-final",
+  "started": "2026-11-12T05:27:08+00:00",
+  "timed_out": false
+}

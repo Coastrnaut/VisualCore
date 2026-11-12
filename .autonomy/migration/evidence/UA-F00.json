@@ -1,0 +1,221 @@
+{
+  "branch": "main",
+  "dirty": false,
+  "dirty_paths": [],
+  "failed_attempts": [],
+  "gate": "UA-F00",
+  "ledger": "migration",
+  "passing_checks": [
+    {
+      "command": "python3 scripts/planning_archive.py verify",
+      "exit_code": 0,
+      "finished": "2026-11-12T05:27:08+00:00",
+      "log": ".autonomy/logs/migration/UA-F00.archive-final.log",
+      "log_sha256": "b86dc5b5b4cb3547e6025cc5e131539ab1c4077d4ef6ddd5b8726fa98cc63466",
+      "name": "archive-final"
+    },
+    {
+      "command": "python3 scripts/planning_archive.py verify",
+      "exit_code": 0,
+      "finished": "2026-11-12T05:17:19+00:00",
+      "log": ".autonomy/logs/migration/UA-F00.archive.log",
+      "log_sha256": "e212166f6962430bf5e90c66d0b89e2b747a98b6898022f3d683c8c78b028ba4",
+      "name": "archive"
+    },
+    {
+      "command": "gh run watch 43161163562 --exit-status",
+      "exit_code": 0,
+      "finished": "2026-11-12T05:26:49+00:00",
+      "log": ".autonomy/logs/migration/UA-F00.ci-run-final.log",
+      "log_sha256": "cdb19e8429e5de7603733985bd024bbe00833dd54f71bcf71963ec2d725b596d",
+      "name": "ci-run-final"
+    },
+    {
+      "command": "gh run watch 43160046073 --exit-status",
+      "exit_code": 0,
+      "finished": "2026-11-12T05:16:06+00:00",
+      "log": ".autonomy/logs/migration/UA-F00.ci-run.log",
+      "log_sha256": "7dd446f8be0d75e5621d08dbcc5dd9f7c3145d95e642ef2459c60faed686fd4c",
+      "name": "ci-run"
+    },
+    {
+      "command": "python3 scripts/validate_docs.py",
+      "exit_code": 0,
+      "finished": "2026-11-12T05:27:07+00:00",
+      "log": ".autonomy/logs/migration/UA-F00.docs-final.log",
+      "log_sha256": "0742de6f5af31484522c86668a5de7ad4bccfb2c2dca5cf16621b2a52947e145",
+      "name": "docs-final"
+    },
+    {
+      "command": "python3 scripts/validate_docs.py",
+      "exit_code": 0,
+      "finished": "2026-11-12T05:16:57+00:00",
+      "log": ".autonomy/logs/migration/UA-F00.docs.log",
+      "log_sha256": "5d04a1482a888d66c46936a9a8c207ec08e19308632ac267f3cb717d2c386fe1",
+      "name": "docs"
+    },
+    {
+      "command": "python3 scripts/planning_index.py verify",
+      "exit_code": 0,
+      "finished": "2026-11-12T05:27:09+00:00",
+      "log": ".autonomy/logs/migration/UA-F00.index-final.log",
+      "log_sha256": "9d1f00313bc4ecc3fa12b75e4fa66b8a6ab5deae6c39b7ea92c2e8fde3fa4dc4",
+      "name": "index-final"
+    },
+    {
+      "command": "python3 scripts/planning_index.py verify",
+      "exit_code": 0,
+      "finished": "2026-11-12T05:17:20+00:00",
+      "log": ".autonomy/logs/migration/UA-F00.index.log",
+      "log_sha256": "e4ba2350fd57427aa8fc9efc8feff620a3ed27d608d11972028ded82f5199f1e",
+      "name": "index"
+    },
+    {
+      "command": "python3 scripts/migration_ledger.py validate",
+      "exit_code": 0,
+      "finished": "2026-11-12T05:27:08+00:00",
+      "log": ".autonomy/logs/migration/UA-F00.ledger-final.log",
+      "log_sha256": "818a5548b2307c4f0b214ed483065776f5ee90add49384d87dccbd1d3fc8145f",
+      "name": "ledger-final"
+    },
+    {
+      "command": "python3 scripts/migration_ledger.py validate",
+      "exit_code": 0,
+      "finished": "2026-11-12T05:17:02+00:00",
+      "log": ".autonomy/logs/migration/UA-F00.ledger.log",
+      "log_sha256": "b7b03510327c640d8994cc46b4f687c1807ddb515a9de3da43a9a71fed4e4339",
+      "name": "ledger"
+    },
+    {
+      "command": "python3 scripts/prepush_scan.py --range a1bc833..HEAD",
+      "exit_code": 0,
+      "finished": "2026-11-12T05:17:17+00:00",
+      "log": ".autonomy/logs/migration/UA-F00.prepush-scan-feature.log",
+      "log_sha256": "62965a79614258cae7401938eca821f5072a8002bd506b3b2c1757727e79a875",
+      "name": "prepush-scan-feature"
+    },
+    {
+      "command": "python3 scripts/prepush_scan.py --range a1bc833..HEAD",
+      "exit_code": 0,
+      "finished": "2026-11-12T05:27:08+00:00",
+      "log": ".autonomy/logs/migration/UA-F00.prepush-scan-final.log",
+      "log_sha256": "f87294a7de8d7b174cc887d00458c8a01c220c568856cd6e9a3529e00dcbf8dd",
+      "name": "prepush-scan-final"
+    },
+    {
+      "command": "python3 scripts/prepush_scan.py",
+      "exit_code": 0,
+      "finished": "2026-11-12T05:17:17+00:00",
+      "log": ".autonomy/logs/migration/UA-F00.prepush-scan.log",
+      "log_sha256": "471fb94d4b0c40139273415ad8fc29acee8d29aa0b3f40559df4a0728d0009be",
+      "name": "prepush-scan"
+    },
+    {
+      "command": "python3 scripts/planning_index.py coverage",
+      "exit_code": 0,
+      "finished": "2026-11-12T05:27:08+00:00",
+      "log": ".autonomy/logs/migration/UA-F00.prompt-coverage-final.log",
+      "log_sha256": "1a1b23ae09769c6950af6a731c0a448fa65d218a70812b328122e85da9b33acc",
+      "name": "prompt-coverage-final"
+    },
+    {
+      "command": "python3 scripts/planning_index.py coverage",
+      "exit_code": 0,
+      "finished": "2026-11-12T05:17:19+00:00",
+      "log": ".autonomy/logs/migration/UA-F00.prompt-coverage.log",
+      "log_sha256": "9a24e5fe553b3e1fe397facdb542824c920ec4e8d30b427d88366bf699b169d6",
+      "name": "prompt-coverage"
+    },
+    {
+      "command": "gh run watch 43161163583 --exit-status",
+      "exit_code": 0,
+      "finished": "2026-11-12T05:25:18+00:00",
+      "log": ".autonomy/logs/migration/UA-F00.push-scan-run-final.log",
+      "log_sha256": "7d5a900381718e0b5cd3e8fc38687b7b12c9d502615294e2b53c01f0c8cd197a",
+      "name": "push-scan-run-final"
+    },
+    {
+      "command": "gh run watch 43160046054 --exit-status",
+      "exit_code": 0,
+      "finished": "2026-11-12T05:15:36+00:00",
+      "log": ".autonomy/logs/migration/UA-F00.push-scan-run.log",
+      "log_sha256": "461e56b174427d6943faef1a407d5619a97583b033174705ac2279336a6b7c8b",
+      "name": "push-scan-run"
+    },
+    {
+      "command": "git diff --quiet a1bc833 -- Apps Packages Showcase Harnesses External Vendor Tools .autonomy/state.json",
+      "exit_code": 0,
+      "finished": "2026-11-12T05:27:09+00:00",
+      "log": ".autonomy/logs/migration/UA-F00.scope-untouched-final.log",
+      "log_sha256": "9202a97553412bbcb2bd4ec3f15bfcb23bcd736367d82fd16715665b36a75eb4",
+      "name": "scope-untouched-final"
+    },
+    {
+      "command": "git diff --quiet a1bc833 -- Apps Packages Showcase Harnesses External Vendor Tools .autonomy/state.json",
+      "exit_code": 0,
+      "finished": "2026-11-12T05:17:21+00:00",
+      "log": ".autonomy/logs/migration/UA-F00.scope-untouched.log",
+      "log_sha256": "d24f7ad3735ba402dfaba1e0a5274081800e1e7c294401160317e7d6554d7651",
+      "name": "scope-untouched"
+    },
+    {
+      "command": "python3 scripts/test_scripts.py",
+      "exit_code": 0,
+      "finished": "2026-11-12T05:27:07+00:00",
+      "log": ".autonomy/logs/migration/UA-F00.script-tests-final.log",
+      "log_sha256": "78b3f17c209d83494036ae13879f73338206da0290a4f082e1486cc3d2edf058",
+      "name": "script-tests-final"
+    },
+    {
+      "command": "python3 scripts/test_scripts.py",
+      "exit_code": 0,
+      "finished": "2026-11-12T05:16:55+00:00",
+      "log": ".autonomy/logs/migration/UA-F00.script-tests.log",
+      "log_sha256": "f228d950a4751cb879e16261b9ba3db3ba96c7d6aa749d00f3d4cfc99834eec2",
+      "name": "script-tests"
+    },
+    {
+      "command": "git diff --quiet a1bc833 -- 'specs/0[0-2][0-9]-*' 'specs/03[0-5]-*'",
+      "exit_code": 0,
+      "finished": "2026-11-12T05:27:09+00:00",
+      "log": ".autonomy/logs/migration/UA-F00.sealed-dossiers-untouched-final.log",
+      "log_sha256": "d379d4836e49e38405094a38ba6db195d0d9c2cf218f23f182f9e03f83370abf",
+      "name": "sealed-dossiers-untouched-final"
+    },
+    {
+      "command": "git diff --quiet a1bc833 -- 'specs/0[0-2][0-9]-*' 'specs/03[0-5]-*'",
+      "exit_code": 0,
+      "finished": "2026-11-12T05:17:21+00:00",
+      "log": ".autonomy/logs/migration/UA-F00.sealed-dossiers-untouched.log",
+      "log_sha256": "7d844b5c1a2afc1680c17b1244858faca6111ecf2e9e7ed0f7755576cbfacf22",
+      "name": "sealed-dossiers-untouched"
+    },
+    {
+      "command": "python3 scripts/validate_autocreator.py",
+      "exit_code": 0,
+      "finished": "2026-11-12T05:27:08+00:00",
+      "log": ".autonomy/logs/migration/UA-F00.steering-final.log",
+      "log_sha256": "ac99eaa2d9e5337024d6f7d81e1df6bba54183c21cc2d053ceddeed07f5a5288",
+      "name": "steering-final"
+    },
+    {
+      "command": "python3 scripts/validate_autocreator.py",
+      "exit_code": 0,
+      "finished": "2026-11-12T05:17:00+00:00",
+      "log": ".autonomy/logs/migration/UA-F00.steering.log",
+      "log_sha256": "f4f2291b3161d24e1371b5d927bda6b00512a98b7fc07689175bbd6e8e13400f",
+      "name": "steering"
+    },
+    {
+      "command": "git diff --quiet 801527b HEAD -- scripts .github Configs",
+      "exit_code": 0,
+      "finished": "2026-11-12T05:27:09+00:00",
+      "log": ".autonomy/logs/migration/UA-F00.unchanged-since-ci.log",
+      "log_sha256": "e4c595a00f315b4603a6399c89a6c090046362696b684843b7a4f21cadf9cf68",
+      "name": "unchanged-since-ci"
+    }
+  ],
+  "revision": "801527bfb52a29185df975f715f5bee70e79e60e",
+  "revision_number": 1,
+  "sealed": "2026-11-12T05:27:26+00:00"
+}

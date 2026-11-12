@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "gh",
+    "run",
+    "watch",
+    "43161163583",
+    "--exit-status"
+  ],
+  "command": "gh run watch 43161163583 --exit-status",
+  "elapsed_seconds": 0.561,
+  "exit_code": 0,
+  "finished": "2026-11-12T05:25:18+00:00",
+  "gate": "UA-F00",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F00.push-scan-run-final.log",
+  "log_sha256": "7d5a900381718e0b5cd3e8fc38687b7b12c9d502615294e2b53c01f0c8cd197a",
+  "name": "push-scan-run-final",
+  "started": "2026-11-12T05:25:17+00:00",
+  "timed_out": false
+}

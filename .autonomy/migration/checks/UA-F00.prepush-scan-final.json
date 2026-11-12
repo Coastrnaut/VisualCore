@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "python3",
+    "scripts/prepush_scan.py",
+    "--range",
+    "a1bc833..HEAD"
+  ],
+  "command": "python3 scripts/prepush_scan.py --range a1bc833..HEAD",
+  "elapsed_seconds": 0.162,
+  "exit_code": 0,
+  "finished": "2026-11-12T05:27:08+00:00",
+  "gate": "UA-F00",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F00.prepush-scan-final.log",
+  "log_sha256": "f87294a7de8d7b174cc887d00458c8a01c220c568856cd6e9a3529e00dcbf8dd",
+  "name": "prepush-scan-final",
+  "started": "2026-11-12T05:27:08+00:00",
+  "timed_out": false
+}

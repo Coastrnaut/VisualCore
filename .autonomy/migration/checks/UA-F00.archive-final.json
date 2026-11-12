@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "python3",
+    "scripts/planning_archive.py",
+    "verify"
+  ],
+  "command": "python3 scripts/planning_archive.py verify",
+  "elapsed_seconds": 0.106,
+  "exit_code": 0,
+  "finished": "2026-11-12T05:27:08+00:00",
+  "gate": "UA-F00",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F00.archive-final.log",
+  "log_sha256": "b86dc5b5b4cb3547e6025cc5e131539ab1c4077d4ef6ddd5b8726fa98cc63466",
+  "name": "archive-final",
+  "started": "2026-11-12T05:27:08+00:00",
+  "timed_out": false
+}

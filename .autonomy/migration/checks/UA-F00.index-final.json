@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "python3",
+    "scripts/planning_index.py",
+    "verify"
+  ],
+  "command": "python3 scripts/planning_index.py verify",
+  "elapsed_seconds": 0.421,
+  "exit_code": 0,
+  "finished": "2026-11-12T05:27:09+00:00",
+  "gate": "UA-F00",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F00.index-final.log",
+  "log_sha256": "9d1f00313bc4ecc3fa12b75e4fa66b8a6ab5deae6c39b7ea92c2e8fde3fa4dc4",
+  "name": "index-final",
+  "started": "2026-11-12T05:27:08+00:00",
+  "timed_out": false
+}

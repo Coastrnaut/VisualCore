@@ -2,7 +2,7 @@
  "schema": 1,
  "name": "VisualCore unified-app migration ledger (ADR-0009)",
  "created": "2026-11-12T02:54:10+00:00",
- "updated": "2026-11-12T04:37:45+00:00",
+ "updated": "2026-11-12T05:27:26+00:00",
  "rules": [
   "Only scripts/migration_ledger.py writes this file.",
   "The legacy ledger .autonomy/state.json is never reset or rewritten by the migration; its passed gates stay passed.",
@@ -79,7 +79,7 @@
  "gates": [
   {"id":"M0-CONSOLIDATION","kind":"milestone","title":"Planning corpus consolidated: archive, catalog, Auto-Creator.md, validators","depends":[],"status":"pass","attempts":[{"at":"2026-11-12T04:02:43+00:00","result":"pass","evidence":".autonomy/migration/evidence/M0-CONSOLIDATION.json","evidence_sha256":"d02ec94c43bb288b1f9bfc6339e28da020cbd7569c58f2100ab9d64e6b8d4c13","revision":"866b68172e19b08a25ca0cd05917d0a44e1df910","note":"Consolidation of 2026-11-11: archive, catalog, Auto-Creator.md, ledgers, validators. Documentation and tooling only; no app or framework source changed."},{"at":"2026-11-12T04:15:15+00:00","result":"pass","evidence":".autonomy/migration/evidence/M0-CONSOLIDATION.r2.json","evidence_sha256":"3a01de31f4d63d12d41d4e4914a679d3f027fbbd15fd4baf30e30ad7ee13f647","revision":"841b20be1951c60f06effba3e87943e65e9abea9","note":"Re-verified on main after the owner's ruling of 2026-11-11 (push to main and work from main); Git rules and the pre-push scan changed, nothing else."}]},
   {"id":"CONSTITUTION-2","kind":"governance","title":"Constitution amended to 2.0.0 for the single app (ADR-0009)","depends":["M0-CONSOLIDATION"],"status":"pass","attempts":[{"at":"2026-11-12T04:37:45+00:00","result":"pass","evidence":".autonomy/migration/evidence/CONSTITUTION-2.json","evidence_sha256":"c2b47fe2082867397a29812e1c70e4b99358a16e4988ae122726ed858ae5431b","revision":"42cdb8ee6731c7817db2815cdd66c9ce0551bb32"}]},
-  {"id":"UA-F00","kind":"unified-feature","title":"Governance tooling: feature numbering, validators and ledger operation","depends":["CONSTITUTION-2"],"status":"pending","attempts":[],"spec_dir":"specs/186-ua-f00-governance-tooling"},
+  {"id":"UA-F00","kind":"unified-feature","title":"Governance tooling: feature numbering, validators and ledger operation","depends":["CONSTITUTION-2"],"status":"pass","attempts":[{"at":"2026-11-12T05:27:26+00:00","result":"pass","evidence":".autonomy/migration/evidence/UA-F00.json","evidence_sha256":"5340ddc5e384e68414cc691cbcddebbca39a17f11e6a4340a95ccf08c1f1aed1","revision":"801527bfb52a29185df975f715f5bee70e79e60e"}],"spec_dir":"specs/186-ua-f00-governance-tooling"},
   {"id":"UA-F01","kind":"unified-feature","title":"Experience catalog and stable identity","depends":["CONSTITUTION-2","UA-F00"],"status":"pending","attempts":[],"spec_dir":"specs/187-ua-f01-experience-catalog"},
   {"id":"UA-F02","kind":"unified-feature","title":"ExperienceKit: the experience contract","depends":["CONSTITUTION-2","UA-F01"],"status":"pending","attempts":[],"spec_dir":"specs/188-ua-f02-experience-sdk"},
   {"id":"UA-F03","kind":"unified-feature","title":"Experience host and session lifecycle","depends":["CONSTITUTION-2","UA-F02"],"status":"pending","attempts":[],"spec_dir":"specs/189-ua-f03-experience-host"},
