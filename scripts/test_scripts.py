@@ -115,6 +115,17 @@ class DocsTests(unittest.TestCase):
             self.make(d, "- **FR-F101**: phase 1 id inside the phase 0 feature\n")
             self.assertTrue(any("namespace" in p for p in docs.validate(d)))
 
+    def test_archive_links_are_not_checked(self):
+        # ADR-0009: docs/archive/ holds verbatim historical documents; their relative links point at old locations.
+        with tempfile.TemporaryDirectory() as t:
+            d = Path(t)
+            self.make(d, "- **FR-F001**: a\n")
+            (d / "docs/archive/planning").mkdir(parents=True)
+            (d / "docs/archive/planning/old.md").write_text("[moved](round3.md)\n")
+            (d / "docs/live.md").write_text("[gone](round3.md)\n")
+            probs = [p for p in docs.validate(d) if "broken link" in p]
+            self.assertEqual(probs, ["docs/live.md: broken link round3.md"])
+
 
 class InventoryTests(unittest.TestCase):
     def test_simulated_devices_ignored_and_d3_drift(self):

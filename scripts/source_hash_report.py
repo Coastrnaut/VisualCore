@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Source hash and requirement-preservation report (T-F004).
 
-Re-verifies the 33 archived sources embedded in README.md (SHA-256 per block), compares them with
+Re-verifies the 33 archived sources embedded in the archived specification (the former root README.md, moved
+unchanged to docs/archive/planning/root/ by ADR-0009; SHA-256 per block), compares them with
 the extracted copies in .autonomy/context, and maps each app manual to its ledger gates and
 planned spec directory. Writes docs/verification/source-hashes.json. Exit 1 on any mismatch.
 """
@@ -16,10 +17,11 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 SOURCE = re.compile(r"<!-- SOURCE-BEGIN: ([^\s]+) SHA256=([a-f0-9]{64}) -->\n(.*?)<!-- SOURCE-END: \1 -->", re.S)
 OUT = ROOT / "docs" / "verification" / "source-hashes.json"
+ARCHIVED_README = ROOT / "docs" / "archive" / "planning" / "root" / "README-2026-11-10-full-specification.md"
 
 
 def main() -> int:
-    readme = (ROOT / "README.md").read_text(encoding="utf-8")
+    readme = ARCHIVED_README.read_text(encoding="utf-8")
     rows, problems = [], []
     for m in SOURCE.finditer(readme):
         name, want, content = m.groups()

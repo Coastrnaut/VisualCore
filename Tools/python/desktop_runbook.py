@@ -2,7 +2,8 @@
 """Deterministic, stdlib-only ledger for Claude Code *Desktop* sessions.
 
 This module NEVER starts Claude, calls an LLM endpoint, or executes an AI agent.
-Run it from the new VisualCore repository root with README.md present.
+Run it from the VisualCore repository root. The 33 preserved source documents are read from the archived
+specification (the former root README.md, moved unchanged by ADR-0009).
 """
 import argparse
 import datetime as dt
@@ -18,7 +19,8 @@ import tempfile
 import time
 
 ROOT = Path.cwd()
-README = ROOT / "README.md"
+# The former root README.md, byte-identical (ADR-0009). It embeds the 33 hash-checked source documents.
+README = ROOT / "docs/archive/planning/root/README-2026-11-10-full-specification.md"
 STATE_DIR = ROOT / ".autonomy"
 STATE = STATE_DIR / "state.json"
 EVIDENCE = STATE_DIR / "evidence"
@@ -74,7 +76,7 @@ def digest(data):
 
 def all_sources():
     if not README.is_file():
-        fail("README.md missing in current working directory")
+        fail(f"archived specification missing: {README.relative_to(ROOT)} (run from the repository root)")
     doc = README.read_text(encoding="utf-8")
     matches = list(SOURCE_REGEX.finditer(doc))
     if len(matches) != 33:

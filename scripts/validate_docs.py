@@ -10,6 +10,8 @@ Checks:
   4. Every ADR in docs/decisions has a Date and Status line.
   5. Every FR/SC referenced from plan.md/tasks.md/contracts exists in some spec.
   6. Every relative Markdown link in docs/, package READMEs and sample READMEs resolves (feature 010 T-F920).
+     `docs/archive/` is excluded: it holds verbatim historical documents whose links refer to their old locations
+     (ADR-0009).
 Exit 1 on any problem. Standard library only.
 """
 from __future__ import annotations
@@ -26,6 +28,7 @@ TOKEN = re.compile(r"\[[A-Z][A-Z0-9_]{2,}\]")
 LINK = re.compile(r"\]\(([^)\s]+)\)")
 FENCE = re.compile(r"```.*?```", re.S)
 LINKED_DOCS = ["docs/**/*.md", "Packages/*/README.md", "Showcase/README.md", "Harnesses/*/README.md"]
+UNCHECKED_LINK_DIRS = ("docs/archive/",)
 
 
 def broken_links(root: Path) -> list[str]:
@@ -33,6 +36,8 @@ def broken_links(root: Path) -> list[str]:
     problems = []
     for pattern in LINKED_DOCS:
         for doc in sorted(root.glob(pattern)):
+            if doc.relative_to(root).as_posix().startswith(UNCHECKED_LINK_DIRS):
+                continue
             text = FENCE.sub("", doc.read_text(encoding="utf-8"))
             for target in LINK.findall(text):
                 if re.match(r"^[a-z][a-z0-9+.-]*:", target) or target.startswith("#"):
