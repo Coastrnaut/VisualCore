@@ -69,7 +69,28 @@ final class FirstRunUITests: XCTestCase {
         let app = launchApp(arguments: [VC.reset, VC.fixture, VC.skipWelcome, VC.openExperience, id])
         waitFor(element(app, "vc.route.experience"))
         waitFor(element(app, VC.canvas), timeout: VC.firstWait)
-        waitFor(element(app, "vc.exp.\(id).tap"), timeout: VC.wait, "the control of the experience \(id)")
+        waitFor(element(app, "experience.\(id).tap"), timeout: VC.wait, "the control of the experience \(id)")
+    }
+
+    /// FR-U04-043: the argument alone opens the experience directly on a first start; the welcome is not shown
+    /// over it and stays unseen, so the next start without the argument shows it.
+    @MainActor
+    func testOpenExperienceArgumentOpensDirectlyOnAFirstStart() {
+        let first = launchApp(arguments: [VC.reset, VC.fixture, VC.skipWelcome])
+        waitFor(element(first, "vc.route.catalog"))
+        let free = firstTile(first, tier: "Free")
+        waitFor(free, timeout: VC.wait)
+        let id = String(free.identifier.dropFirst(VC.tilePrefix.count))
+        first.terminate()
+
+        let app = launchApp(arguments: [VC.reset, VC.fixture, VC.openExperience, id])
+        waitFor(element(app, "vc.route.experience"))
+        waitFor(element(app, VC.canvas), timeout: VC.firstWait)
+        waitFor(element(app, "experience.\(id).tap"), timeout: VC.wait)
+        XCTAssertFalse(element(app, "vc.welcome").exists, "the welcome does not cover the opened experience")
+
+        let second = relaunch(app, arguments: [VC.fixture])
+        waitFor(element(second, "vc.welcome"), timeout: VC.firstWait, "the welcome was not marked as seen")
     }
 
     @MainActor

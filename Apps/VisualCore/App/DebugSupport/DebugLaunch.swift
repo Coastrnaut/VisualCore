@@ -7,7 +7,7 @@
 //   -vcResetData           remove the stored preferences and every experience folder before the model starts
 //   -vcSkipWelcome         mark the welcome as seen before the model starts
 //   -vcDamagedCatalog      use catalog data that cannot be read, so that the launcher shows its error state
-//   -vcFailingExperience   with the fixture: the first free fixture experience fails when it is set up
+//   -vcFailingExperience   with the fixture: every fixture experience fails when it is set up
 //   -vcSeedData            create a data folder with one file for the first two free fixture experiences
 //   -openExperience <id>   open that experience directly after the start, without the welcome (which stays
 //                          unseen); an id that cannot be opened is recorded in the diagnostics and the catalog,
@@ -56,8 +56,8 @@ enum DebugLaunch {
             environment.catalogData = fixtureCatalogData
             environment.categoriesData = fixtureCategoriesData
             environment.registry = empty ? [] : fixtureRegistry
-            if !empty, arguments.contains(failingExperienceArgument), let first = fixtureFreeIDs.first {
-                environment.registry[0] = DebugExperience.failingRegistration(for: first)
+            if !empty, arguments.contains(failingExperienceArgument) {
+                environment.registry = fixtureFreeIDs.map(DebugExperience.failingRegistration(for:))
             }
         }
         if arguments.contains(damagedCatalogArgument) {

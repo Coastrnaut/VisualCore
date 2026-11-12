@@ -8,9 +8,11 @@ import VisualCoreExperience
 /// The launcher: search, tiles by category and the ways to the settings and the about page.
 struct LauncherView: View {
     let model: AppModel
-    /// The text of the search field. It is cut to the model's limit as it is typed, so that the field never shows
-    /// more than the model holds (FR-U04-022).
-    @State private var typed = ""
+    /// Counts the times typed text was cut to the model's limit. It is the identity of the search field: a cut
+    /// replaces the field by a new one that shows the text the model holds, because a field that is being typed
+    /// in does not take a shorter text back from its binding (FR-U04-022). The focus is given to the new field.
+    @State private var cuts = 0
+    @FocusState private var searchFocused: Bool
 
     var body: some View {
         List {
@@ -60,12 +62,24 @@ struct LauncherView: View {
         .contentShape(Rectangle())
     }
 
+    /// The search text of the model. A longer text is cut to `ShellPreferences.maxSearchLength` characters.
+    private var searchText: Binding<String> {
+        Binding(get: { model.searchText }, set: { text in
+            let kept = String(text.prefix(ShellPreferences.maxSearchLength))
+            if model.searchText != kept { model.searchText = kept }
+            if kept != text {
+                cuts &+= 1
+                Task { @MainActor in searchFocused = true }
+            }
+        })
+    }
+
     private var searchField: some View {
         HStack(spacing: 8) {
             Image(systemName: "magnifyingglass")
                 .accessibilityHidden(true)
             // A vertical axis lets the prompt and the text wrap at the largest text sizes instead of clipping.
-            TextField(AppStrings.text(.catalogSearch), text: $typed, axis: .vertical)
+            TextField(AppStrings.text(.catalogSearch), text: searchText, axis: .vertical)
                 .lineLimit(1...4)
                 .font(.body)
                 .textInputAutocapitalization(.never)
@@ -74,15 +88,8 @@ struct LauncherView: View {
                 .frame(minHeight: 44)
                 .accessibilityLabel(AppStrings.text(.catalogSearch))
                 .accessibilityIdentifier(ShellID.search)
-                .onAppear { typed = model.searchText }
-                .onChange(of: typed) { _, text in
-                    let kept = String(text.prefix(ShellPreferences.maxSearchLength))
-                    if kept != text { typed = kept }
-                    if model.searchText != kept { model.searchText = kept }
-                }
-                .onChange(of: model.searchText) { _, text in
-                    if typed != text { typed = text }
-                }
+                .focused($searchFocused)
+                .id(cuts)
             if !model.searchText.isEmpty {
                 Button {
                     model.searchText = ""

@@ -87,7 +87,7 @@ final class SettingsUITests: XCTestCase {
         waitFor(privacy, timeout: VC.wait)
         for _ in 0..<5 where !privacy.isHittable { scrollCatalog(app) }
         let statement = text(app, of: "vc.settings.privacy").lowercased()
-        for word in ["collect", "network", "advertising"] {
+        for word in ["collect", "network", "advertising", "account"] {
             XCTAssertTrue(statement.contains(word), "the privacy statement lacks '\(word)': \(statement)")
         }
     }
@@ -103,6 +103,48 @@ final class SettingsUITests: XCTestCase {
         XCTAssertTrue(version.exists, "the app's version")
         let acknowledgements = element(app, "vc.about.acknowledgements")
         waitFor(acknowledgements, timeout: VC.wait)
+        // FR-U04-054: the acknowledgements open and list what the app contains.
+        revealAndTap(app, acknowledgements)
+        let entries = app.descendants(matching: .any)
+            .matching(NSPredicate(format: "identifier BEGINSWITH %@", "vc.acknowledgements."))
+        XCTAssertTrue(entries.firstMatch.waitForExistence(timeout: VC.wait), "the acknowledgements list an entry")
+        XCTAssertGreaterThan(entries.count, 0)
+    }
+
+    /// FR-U04-052: the reset of one experience asks first; Cancel removes nothing, Confirm removes only the
+    /// data of that experience. `-vcSeedData` gives two fixture experiences a data folder.
+    @MainActor
+    func testResetOfOneExperienceAsksFirstAndRemovesOnlyThatExperience() {
+        let app = launchApp(arguments: Self.fresh + [VC.seedData])
+        waitFor(element(app, "vc.route.catalog"))
+        openSettings(app)
+        let fixed = ["vc.settings.reset.all", "vc.settings.reset.confirm", "vc.settings.reset.cancel"]
+        func rows() -> [String] {
+            elements(app, prefix: "vc.settings.reset.").allElementsBoundByIndex.map(\.identifier)
+                .filter { !fixed.contains($0) }.sorted()
+        }
+        let all = element(app, "vc.settings.reset.all")
+        waitFor(all, timeout: VC.wait)
+        for _ in 0..<5 where !all.isHittable { scrollCatalog(app) }
+        let before = rows()
+        XCTAssertEqual(before.count, 2, "two experiences have data: \(before)")
+        let target = before[0]
+
+        revealAndTap(app, element(app, target))
+        let cancel = element(app, "vc.settings.reset.cancel")
+        waitFor(cancel, timeout: VC.wait, "the reset asks for a confirmation")
+        cancel.tap()
+        XCTAssertTrue(waitUntilGone(cancel))
+        XCTAssertEqual(rows(), before, "Cancel removes nothing")
+
+        revealAndTap(app, element(app, target))
+        let confirm = element(app, "vc.settings.reset.confirm")
+        waitFor(confirm, timeout: VC.wait)
+        confirm.tap()
+        XCTAssertTrue(waitUntilGone(element(app, target)), "the data of the chosen experience is removed")
+        XCTAssertEqual(rows(), [before[1]], "the data of the other experience stays")
+        XCTAssertTrue(element(app, "vc.route.settings").exists)
+        XCTAssertFalse(element(app, "vc.welcome").exists, "the reset of one experience keeps the preferences")
     }
 
     @MainActor

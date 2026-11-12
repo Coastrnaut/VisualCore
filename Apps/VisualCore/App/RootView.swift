@@ -43,6 +43,33 @@ extension View {
     }
 }
 
+/// The way back from a route, as a row of the content and not as a bar button: a navigation bar keeps its
+/// buttons 36 points high and clips their text at the largest sizes; this row is at least 44 points high and
+/// wraps its text (FR-U04-035).
+struct RouteBackRow: View {
+    let title: String
+    let identifier: String
+    let action: @MainActor () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 12) {
+                Image(systemName: "chevron.backward")
+                    .accessibilityHidden(true)
+                Text(title)
+                    .font(.body)
+                    .multilineTextAlignment(.leading)
+                    .fixedSize(horizontal: false, vertical: true)
+                Spacer(minLength: 0)
+            }
+            .foregroundStyle(Color(uiColor: .label))
+            .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+            .contentShape(Rectangle())
+        }
+        .accessibilityIdentifier(identifier)
+    }
+}
+
 /// The root view: welcome, or the launcher beside (or below) the current route.
 struct RootView: View {
     let model: AppModel

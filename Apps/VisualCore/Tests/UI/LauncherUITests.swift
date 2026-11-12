@@ -8,6 +8,61 @@ final class LauncherUITests: XCTestCase {
 
     private static let fixtureLaunch = [VC.reset, VC.fixture, VC.skipWelcome]
 
+    /// FR-U04-021: the label of a tile is its title and its tier.
+    @MainActor
+    func testATileLabelIsTheTitleAndTheTier() throws {
+        let app = launchApp(arguments: Self.fixtureLaunch)
+        waitFor(element(app, "vc.route.catalog"))
+        waitFor(tile(app).firstMatch, timeout: VC.wait)
+        let pattern = try NSRegularExpression(pattern: "^(.+), (Free|Premium)$")
+        var checked = 0
+        for item in tile(app).allElementsBoundByIndex {
+            let label = item.label
+            let match = pattern.firstMatch(in: label, range: NSRange(label.startIndex..., in: label))
+            let found = try XCTUnwrap(match, "'\(label)' is not '<title>, <tier>'")
+            let title = (label as NSString).substring(with: found.range(at: 1))
+            let id = String(item.identifier.dropFirst(VC.tilePrefix.count))
+            XCTAssertFalse(title.trimmingCharacters(in: .whitespaces).isEmpty)
+            XCTAssertNotEqual(title, id, "the title is a name, not the id")
+            checked += 1
+        }
+        XCTAssertGreaterThan(checked, 0)
+    }
+
+    /// FR-U04-022: the search field shows and holds at most 100 characters.
+    @MainActor
+    func testTheSearchFieldHoldsAtMost100Characters() {
+        let app = launchApp(arguments: Self.fixtureLaunch)
+        waitFor(element(app, "vc.route.catalog"))
+        let field = element(app, "vc.search")
+        waitFor(field, timeout: VC.wait)
+        field.tap()
+        field.typeText(String(repeating: "q", count: 108))
+        let shown = field.value as? String ?? ""
+        XCTAssertEqual(shown.count, 100, "the field shows '\(shown)'")
+        XCTAssertEqual(shown, String(repeating: "q", count: 100))
+        waitFor(element(app, "vc.nomatch"), timeout: VC.wait)
+        let second = relaunch(app, arguments: [VC.fixture, VC.skipWelcome])
+        let again = element(second, "vc.search")
+        waitFor(again)
+        XCTAssertEqual((again.value as? String ?? "").count, 100, "the stored text has 100 characters")
+    }
+
+    /// FR-U04-024: a catalog that cannot be loaded gives a message with the error's code; the app stays usable.
+    @MainActor
+    func testADamagedCatalogShowsItsCodeAndTheAppStaysUsable() {
+        let app = launchApp(arguments: [VC.reset, VC.skipWelcome, VC.damagedCatalog])
+        waitFor(element(app, "vc.route.catalog"))
+        let message = element(app, "vc.error")
+        waitFor(message, timeout: VC.wait)
+        XCTAssertTrue(text(app, of: "vc.error").contains("catalog.unreadable"), text(app, of: "vc.error"))
+        XCTAssertEqual(tile(app).count, 0)
+        XCTAssertFalse(element(app, "vc.empty").exists)
+        openSettings(app)
+        let second = relaunch(app, arguments: [VC.skipWelcome, VC.damagedCatalog])
+        waitFor(element(second, "vc.route.settings"), timeout: VC.firstWait, "the route is restored without a catalog")
+    }
+
     @MainActor
     func testSixTilesUnderThreeHeadingsWithTierText() {
         let app = launchApp(arguments: Self.fixtureLaunch)

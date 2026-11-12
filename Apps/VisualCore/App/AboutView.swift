@@ -17,6 +17,9 @@ struct AboutView: View {
     var body: some View {
         List {
             Section {
+                RouteBackRow(title: AppStrings.text(.navDone), identifier: ShellID.navDone) { model.go(.catalog) }
+            }
+            Section {
                 Text(AppStrings.text(.appName))
                     .font(.title.bold())
                     .accessibilityAddTraits(.isHeader)
@@ -39,11 +42,5 @@ struct AboutView: View {
         .routeRoot(ShellID.routeAbout)
         .navigationTitle(AppStrings.text(.aboutTitle))
         .navigationBarBackButtonHidden(true)
-        .toolbar {
-            ToolbarItem(placement: .topBarLeading) {
-                Button(AppStrings.text(.navDone)) { model.go(.catalog) }
-                    .accessibilityIdentifier(ShellID.navDone)
-            }
-        }
     }
 }

@@ -10,21 +10,23 @@ struct ExperienceRouteView: View {
     let id: ExperienceID
 
     var body: some View {
-        ExperienceHostView(session: model.session)
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .routeRoot(ShellID.routeExperience)
-            .navigationTitle(model.descriptor(for: id)?.title ?? id.rawValue)
-            .navigationBarTitleDisplayMode(.inline)
-            .navigationBarBackButtonHidden(true)
-            .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    Button(AppStrings.text(.experienceBack)) { model.closeExperience() }
-                        .accessibilityIdentifier(ShellID.experienceBack)
-                }
+        VStack(spacing: 0) {
+            RouteBackRow(title: AppStrings.text(.experienceBack), identifier: ShellID.experienceBack) {
+                model.closeExperience()
             }
-            .onChange(of: model.session.state) { _, state in
-                // The session's own views (cancel, back after a failure or a message) end in idle: leave the route.
-                if state == .idle, model.route == .experience(id) { model.closeExperience() }
-            }
+            .buttonStyle(.plain)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 4)
+            ExperienceHostView(session: model.session)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+        }
+        .routeRoot(ShellID.routeExperience)
+        .navigationTitle(model.descriptor(for: id)?.title ?? id.rawValue)
+        .navigationBarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden(true)
+        .onChange(of: model.session.state) { _, state in
+            // The session's own views (cancel, back after a failure or a message) end in idle: leave the route.
+            if state == .idle, model.route == .experience(id) { model.closeExperience() }
+        }
     }
 }

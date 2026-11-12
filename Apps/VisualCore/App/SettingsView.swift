@@ -27,6 +27,9 @@ struct SettingsView: View {
 
     var body: some View {
         Form {
+            Section {
+                RouteBackRow(title: AppStrings.text(.navDone), identifier: ShellID.navDone) { model.go(.catalog) }
+            }
             AccessibilitySettingsSection(preferences: accessibility, system: system.current,
                                          identifierPrefix: ShellID.settingsPrefix)
             qualitySection
@@ -48,12 +51,6 @@ struct SettingsView: View {
         .routeRoot(ShellID.routeSettings)
         .navigationTitle(AppStrings.text(.settingsTitle))
         .navigationBarBackButtonHidden(true)
-        .toolbar {
-            ToolbarItem(placement: .topBarLeading) {
-                Button(AppStrings.text(.navDone)) { model.go(.catalog) }
-                    .accessibilityIdentifier(ShellID.navDone)
-            }
-        }
         .onAppear { model.refreshDataNamespaces() }
         .sheet(item: $pending, onDismiss: carryOut) { request in
             ResetConfirmationView(question: request.question) {

@@ -2,6 +2,7 @@
 // show their root at the default and the largest accessibility text size and pass the audit; a tile opens the
 // experience and back returns; the last route, experience and search text come back after a termination; on a
 // tablet in landscape the catalog and the content are visible together.
+import UIKit
 import XCTest
 
 final class RoutesUITests: XCTestCase {
@@ -120,6 +121,97 @@ final class RoutesUITests: XCTestCase {
         waitFor(element(second, "vc.empty"), timeout: VC.wait)
         XCTAssertFalse(element(second, "vc.route.experience").exists)
         XCTAssertFalse(element(second, VC.canvas).exists)
+    }
+
+    // MARK: Failure, rotation and touch targets (T-U04-040 to T-U04-042)
+
+    /// Edge case: an experience that fails to open shows the failure view with Retry and Back; Back leads to
+    /// the catalog and the app stays usable.
+    @MainActor
+    func testAFailingExperienceShowsRetryAndBackAndTheAppStaysUsable() {
+        let app = launchApp(arguments: Self.fresh + [VC.failingExperience])
+        waitFor(element(app, "vc.route.catalog"))
+        revealAndTap(app, firstTile(app, tier: "Free"))
+        waitFor(element(app, "session.failure"), timeout: VC.firstWait)
+        XCTAssertTrue(element(app, "vc.route.experience").exists)
+        XCTAssertFalse(element(app, VC.canvas).exists)
+        let retry = element(app, "session.retry")
+        waitFor(retry, timeout: VC.wait)
+        retry.tap()
+        waitFor(element(app, "session.failure"), timeout: VC.firstWait, "a retry fails again and shows the view again")
+        let back = element(app, "session.back")
+        waitFor(back, timeout: VC.wait)
+        back.tap()
+        XCTAssertTrue(waitUntilGone(element(app, "session.failure")))
+        waitFor(element(app, "vc.route.catalog"), timeout: VC.wait)
+        XCTAssertFalse(element(app, "vc.route.experience").exists)
+        openSettings(app)
+    }
+
+    /// FR-U04-032, edge case rotation: a running experience survives rotations, on a phone and on a tablet.
+    @MainActor
+    func testARunningExperienceSurvivesRotations() {
+        addTeardownBlock { @MainActor in XCUIDevice.shared.orientation = .portrait }
+        XCUIDevice.shared.orientation = .portrait
+        let app = launchApp(arguments: Self.fresh)
+        openFirstFree(app)
+        let canvas = element(app, VC.canvas)
+        for orientation in [UIDeviceOrientation.landscapeLeft, .portrait, .landscapeRight, .portrait] {
+            XCUIDevice.shared.orientation = orientation
+            usleep(1_500_000)
+            XCTAssertTrue(element(app, "vc.route.experience").exists, "route after rotation \(orientation.rawValue)")
+            XCTAssertTrue(canvas.exists, "canvas after rotation \(orientation.rawValue)")
+            XCTAssertFalse(element(app, "session.failure").exists)
+            XCTAssertFalse(element(app, "session.message").exists)
+        }
+        let window = app.windows.firstMatch.frame
+        XCTAssertGreaterThan(window.height, window.width, "portrait again")
+    }
+
+    /// The buttons, switches and text fields of the app on what is shown, with their frames.
+    @MainActor
+    private func assertTouchTargets(_ app: XCUIApplication, _ screen: String, atLeast expected: Int,
+                                    file: StaticString = #filePath, line: UInt = #line) {
+        let window = app.windows.firstMatch.frame
+        var checked: [String] = []
+        for type in [XCUIElement.ElementType.button, .switch, .textField, .textView] {
+            for item in app.descendants(matching: type).allElementsBoundByIndex {
+                let id = item.identifier
+                guard id.hasPrefix("vc.") || id.hasPrefix("session.") || id.hasPrefix("experience."),
+                      item.exists, window.contains(item.frame) else { continue }
+                let frame = item.frame
+                XCTAssertGreaterThanOrEqual(frame.width, 44, "\(screen): \(id) is \(frame.size)", file: file, line: line)
+                XCTAssertGreaterThanOrEqual(frame.height, 44, "\(screen): \(id) is \(frame.size)", file: file, line: line)
+                checked.append(id)
+            }
+        }
+        print("TOUCH-TARGETS \(screen): \(checked.count) controls of at least 44 by 44: \(checked)")
+        XCTAssertGreaterThanOrEqual(checked.count, expected, "\(screen): \(checked)", file: file, line: line)
+    }
+
+    /// FR-U04-035: at the largest text size every control that is fully on screen is at least 44 by 44 points,
+    /// on each route; the Back and Done controls of the navigation bar are among them.
+    @MainActor
+    func testTouchTargetsAreAtLeast44PointsAtTheLargestTextSize() {
+        continueAfterFailure = true
+        let app = launchApp(arguments: Self.fresh, largeText: true)
+        waitFor(element(app, "vc.route.catalog"))
+        assertTouchTargets(app, "catalog", atLeast: 2)
+        openFirstFree(app)
+        waitFor(element(app, "vc.experience.back"), timeout: VC.wait)
+        assertTouchTargets(app, "experience", atLeast: 1)
+        XCTAssertGreaterThanOrEqual(element(app, "vc.experience.back").frame.height, 44)
+        element(app, "vc.experience.back").tap()
+        waitFor(element(app, "vc.route.catalog"), timeout: VC.wait)
+        openSettings(app)
+        waitFor(element(app, "vc.nav.done"), timeout: VC.wait)
+        assertTouchTargets(app, "settings", atLeast: 2)
+        XCTAssertGreaterThanOrEqual(element(app, "vc.nav.done").frame.height, 44)
+        element(app, "vc.nav.done").tap()
+        waitFor(element(app, "vc.route.catalog"), timeout: VC.wait)
+        openAbout(app)
+        waitFor(element(app, "vc.nav.done"), timeout: VC.wait)
+        assertTouchTargets(app, "about", atLeast: 1)
     }
 
     // MARK: Regular width
