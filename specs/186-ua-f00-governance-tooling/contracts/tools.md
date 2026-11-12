@@ -28,7 +28,7 @@ For tests: `namespace(feature_dir) -> str` (empty outside the map), `id_shape(fe
 | Validation fails after the tick | the task list is restored to its previous bytes; the first problems are printed; no commit; exit not 0 | FR-U00-012 |
 | Branch is not `main` | commit made; `not pushed: branch <name> is not main (ADR-0009 D-13)`; exit 0 | FR-U00-014 |
 | Branch is `main`, scan clean, no `--no-push` | commit made and pushed with `git push origin main` (no force); exit 0 | FR-U00-014 |
-| Branch is `main`, scan has a finding | commit stays local; `committed but NOT pushed: …`; exit not 0 | FR-U00-014 |
+| Branch is `main`, scan has a finding, or the push fails | commit stays local; `committed but NOT pushed: …` with the command `python3 scripts/prepush_scan.py --push`; exit not 0 | FR-U00-014 |
 
 For tests: `main(argv, root) -> int`.
 

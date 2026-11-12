@@ -257,6 +257,8 @@ locally against a range with a seeded finding and see it fail.
   that changed after it was recorded is reported by the ledger validation.
 - **Look-alike ids**: an id whose namespace part merely begins with the feature's namespace (a longer feature
   number with the same first digits) is rejected.
+- **Push fails**: the remote cannot be reached or rejects the push after a clean scan. The commit stays local; the
+  tick tool ends with a failure; the same commit is pushed later with the scan's push command.
 - **Two tools, one push**: a push made with plain Git bypasses both tools. It cannot be prevented by tracked files;
   the CI scan of the pushed range is what detects it.
 - **Memory pressure**: does not apply; these are short host commands.
@@ -298,7 +300,8 @@ locally against a range with a seeded finding and see it fail.
 **Ticking, committing and pushing**
 
 - **FR-U00-010**: The tick tool MUST tick exactly one unticked task of any namespace of the numbering map and
-  append `— Verified <today>: <evidence>` to its line.
+  append `— Verified <today>: <evidence>` to its line, where `<today>` is the local date of the machine that
+  ticks, written as YYYY-MM-DD.
 - **FR-U00-011**: The tick tool MUST refuse, change no file and make no commit when the task is missing, is
   already ticked, matches more than one line, when the evidence is empty or contains a line break, or when the task
   list does not exist.
@@ -307,7 +310,8 @@ locally against a range with a seeded finding and see it fail.
 - **FR-U00-013**: The tick tool MUST commit without co-author or generator trailers.
 - **FR-U00-014**: The tick tool MUST push only when the checkout is on `main` and only after the pre-push scan
   passes, to `origin main` and never with force. On another branch it MUST push nothing. When the scan has a
-  finding, the commit MUST stay local and the tool MUST end with a failure that states it was not pushed.
+  finding, or when the push itself fails, the commit MUST stay local and the tool MUST end with a failure that
+  states it was not pushed and names the command that pushes later.
 - **FR-U00-015**: The tick tool and the pre-push scan MUST remain the two documented ways a commit is pushed; a
   self-test MUST prove that no other tracked script or workflow pushes. No Git hook is installed and no local Git
   configuration is changed.
@@ -355,7 +359,9 @@ locally against a range with a seeded finding and see it fail.
 - **FR-U00-038**: Each refusal of FR-U00-030 to FR-U00-037 MUST be proven by a self-test that works on a temporary
   copy; the self-tests MUST NOT change the real ledger, its checks or its evidence.
 - **FR-U00-039**: The migration ledger tool MUST remain the only writer of the migration ledger: a self-test MUST
-  fail when another tracked script or workflow names the ledger file outside a reviewed list of readers.
+  fail when another tracked script or workflow names the ledger file outside a reviewed list of readers, or when a
+  reader writes to it. The list of readers is part of the self-tests, so adding a reader is a visible change to
+  that list.
 
 **Prompt coverage**
 
@@ -390,7 +396,8 @@ locally against a range with a seeded finding and see it fail.
 - **FR-U00-060**: This feature MUST NOT change any app or framework source, the reference submodule, the vendored
   ANGLE tree, the legacy ledger or the legacy ledger tool.
 - **FR-U00-061**: Every tool of this feature MUST use only the Python standard library and MUST NOT start the
-  Claude CLI, call a model or use the network; pushing through Git is the single exception.
+  Claude CLI, call a model or use the network; pushing through Git is the single exception. The tools contain no
+  advertising, analytics or tracking code and need no account.
 
 ### Absorbed source requirements
 
@@ -462,6 +469,9 @@ and by the consolidation. Its archived specify prompt names six things to verify
   `git push`, so the tools are the documented ways, a self-test proves that nothing else in the repository pushes,
   and the CI scan detects a push that bypassed them (Clarifications).
 - A SHA-256 hash of a simulator identifier reveals nothing about the identifier and cannot be used as one.
+- Accessibility requirements do not apply: the feature has no user interface, and the tools print plain text.
+- The evidence of FR-U00-053 depends on GitHub Actions running the workflows and on the `gh` command being signed
+  in on the development Mac. If either is unavailable, the gate waits; the run is never assumed.
 - CI runs on GitHub-hosted macOS runners as today, with a shallow checkout of the reference submodule only.
 - Timing in SC-U00-009 is a host measurement on the development Mac. It is not a device or app performance claim.
 - The owner's ruling of 2026-11-11 stands: work happens on `main` and is pushed after every commit.
