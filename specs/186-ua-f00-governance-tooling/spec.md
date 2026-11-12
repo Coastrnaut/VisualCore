@@ -26,6 +26,41 @@ Canonical overrides:
   `Tools/python/desktop_runbook.py`.
 - **Device-only and owner-only items:** none.
 
+## Clarifications
+
+### Session 2026-11-11
+
+Answered by the engineer under the owner's standing delegation (ADR-0004 decision 3), recommended option first. No
+question concerned a VisualCore or Apple API, a thread-ownership rule or a device measurement: the feature has none.
+
+- Q: How does the scan in CI reach the same verdict as the scan on the development Mac for the identifiers of that
+  Mac's simulators, which only that Mac can list? → A: Through one tracked list of SHA-256 hashes of those
+  identifiers. A scan command records the hashes from the Mac's simulator list; the scan, on the Mac and in CI,
+  accepts an identifier of that form only when its hash is in the list. A simulator of the Mac that is not recorded
+  yet is a finding that names the recording command. Rejected: accepting identifiers by file path (identifiers of
+  physical devices have the same form and would pass), and tracking readable identifiers (they would be copied
+  into commands).
+- Q: Which commits does the scan read in CI, given that CI cancels a running check when a newer push arrives? → A:
+  The scan is a job that a newer push never cancels. It fetches the full history and reads the commits from the
+  commit before the push to the pushed commit, or, for a pull request, from the merge base to its head. When the
+  earlier commit is unknown or cannot be reached, the job fails. Rejected: scanning inside the cancellable job (a
+  cancelled run would leave its commits unread) and scanning the whole history on every push (old, already
+  published lines would fail every run).
+- Q: How is "the tick tool and the scan are the only way a commit is pushed" backed, since tracked files cannot stop
+  a plain Git push? → A: By procedure, by a self-test that no other tracked script or workflow pushes, and by the CI
+  scan that reads every pushed range. No Git hook is installed: a hook lives in untracked local configuration, can
+  be skipped with a flag, and changing the owner's local Git configuration is not this feature's business.
+- Q: Do the stricter id rules (exact namespace, task ids included) apply to the 35 sealed dossiers as well? → A:
+  Yes, one rule for every dossier. The exact shape per directory form is: foundation F<k> followed by two digits,
+  original app phase A<nn>-<p> followed by two digits, and every new namespace followed by a hyphen and three
+  digits. The 35 dossiers already conform (checked on 2026-11-11: 0 deviations among their defined ids and task
+  ids), so none of their files changes.
+- Q: Must the override note of an archived round feature name the exact feature directory and id forms, as the
+  notes of the unified-app features do, or is the reference to the numbering section enough? → A: It names them.
+  The prompt tool adds one generated sentence with the feature's directory from the ledger and its three id forms,
+  derived by the same rule the validator uses. The archived prompt text and the three canonical override
+  paragraphs stay unchanged. This removes a manual derivation that would otherwise be repeated for 788 features.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - A dossier of any planned feature validates in its own namespace (Priority: P1) 🎯
@@ -110,8 +145,8 @@ per forbidden class, and they fail when the scanner gains a pattern that no test
 1. **Given** an added line with a value of any pattern the scan lists, **When** the scan runs, **Then** it reports
    a finding with the pattern's name and exits with a failure.
 2. **Given** an added line with a look-alike that is allowed (a synthetic identifier, an identifier of a simulator
-   of the development Mac, the allowed service address, a placeholder home path), **When** the scan runs, **Then**
-   it reports nothing.
+   of the development Mac whose hash is recorded, the allowed service address, a placeholder home path), **When**
+   the scan runs, **Then** it reports nothing.
 3. **Given** a tracked path of any forbidden class, **When** the scan runs, **Then** it reports the path.
 4. **Given** a commit range that cannot be read, **When** the scan runs, **Then** it reports that as a finding and
    never as a pass.
@@ -235,15 +270,20 @@ locally against a range with a seeded finding and see it fail.
 - **FR-U00-001**: The document validator MUST accept a dossier in every directory form of the numbering map and
   derive its id namespace: 001–010 (foundation), 011–185 (original app phases), 186–200 (unified-app features,
   U<kk>), 201–234 (Round 2 shared features, R02F<ff>), 301–550 (Round 2 game features, R02G<gg><ff>), `rNN-fFF-*`
-  (shared features of Rounds 3–12, RnnFff) and `rNN-gGG-FF-*` (game features of Rounds 3–12, RnnGggff).
+  (shared features of Rounds 3–12, RnnFff) and `rNN-gGG-FF-*` (game features of Rounds 3–12, RnnGggff). Every
+  feature directory that the migration ledger names MUST map to exactly one namespace, and no two of them to the
+  same one.
 - **FR-U00-002**: The document validator MUST report a feature directory that the numbering map does not contain:
   a number from 235 to 300 or above 550, a round directory whose round is not 03 to 12, and a game directory
   without a feature number.
 - **FR-U00-003**: The document validator MUST report every requirement id and success-criterion id defined in a
-  specification that is not in the namespace of its directory, naming the id and the expected namespace. An id
-  whose namespace part only begins with the expected namespace MUST be reported too.
+  specification that is not in the namespace of its directory, naming the id and the expected namespace. The id
+  MUST have the exact shape of its directory form: the foundation namespace followed by two digits, the app-phase
+  namespace followed by two digits, and every other namespace followed by a hyphen and three digits. An id whose
+  namespace part only begins with the expected namespace MUST be reported too.
 - **FR-U00-004**: The document validator MUST report every task id in a task list that is not in the namespace of
-  its directory.
+  its directory, by the same exact shape. FR-U00-003 and FR-U00-004 apply to every dossier, the 35 sealed ones
+  included.
 - **FR-U00-005**: The document validator MUST report a requirement id, success-criterion id or task id that is
   defined more than once, in one dossier or across dossiers, naming both places.
 - **FR-U00-006**: The document validator MUST keep its existing checks: a ticked task carries
@@ -269,7 +309,8 @@ locally against a range with a seeded finding and see it fail.
   passes, to `origin main` and never with force. On another branch it MUST push nothing. When the scan has a
   finding, the commit MUST stay local and the tool MUST end with a failure that states it was not pushed.
 - **FR-U00-015**: The tick tool and the pre-push scan MUST remain the two documented ways a commit is pushed; a
-  self-test MUST prove that no other tracked script or workflow pushes.
+  self-test MUST prove that no other tracked script or workflow pushes. No Git hook is installed and no local Git
+  configuration is changed.
 
 **Pre-push scan**
 
@@ -286,8 +327,12 @@ locally against a range with a seeded finding and see it fail.
 - **FR-U00-024**: The pre-push scan MUST report a range it cannot read as a finding, and when asked to push it MUST
   push only without findings and only on `main`, never with force.
 - **FR-U00-025**: The pre-push scan MUST give the same verdict for the same commits on the development Mac and in
-  CI: an identifier of a simulator of the development Mac that recorded evidence contains is not a finding in
-  either place, and no list of readable identifiers is tracked to achieve that.
+  CI. It accepts an identifier of the simulator form only when the SHA-256 hash of the identifier is in one tracked
+  list; no readable identifier is tracked. An identifier of a simulator of the development Mac whose hash is not in
+  the list MUST be a finding that names the command that records it.
+- **FR-U00-026**: A scan command MUST record the hashes of the development Mac's current simulator identifiers in
+  the tracked list, keep the hashes already recorded, and write the list sorted so that recording twice changes
+  nothing. Where the simulator list cannot be read, it MUST change nothing and say so.
 
 **Migration ledger**
 
@@ -322,14 +367,19 @@ locally against a range with a seeded finding and see it fail.
   written into the test, MUST skip superseded features, and MUST name the feature and the stage of every missing or
   empty prompt.
 - **FR-U00-042**: Every prompt of a migration-ledger feature printed with the override MUST end with a labelled
-  `Canonical override:` note that names the feature directory and the three id forms of its namespace.
+  `Canonical override` note that names the feature directory and the three id forms of its namespace. For an
+  archived round feature the prompt tool adds them as one generated sentence, with the directory of the ledger and
+  the namespace the validator derives from it; the archived prompt text and the canonical override paragraphs MUST
+  stay unchanged.
 
 **Continuous integration**
 
 - **FR-U00-050**: CI MUST run, on every push to `main` and on every pull request, the steering validator, the
   archive verifier, the index verifier and the migration ledger validation, and a failure of any MUST fail the run.
-- **FR-U00-051**: CI MUST run the pre-push scan over exactly the commits of the push or the pull request, and a
-  finding, a forbidden tracked path or an unreadable range MUST fail the run.
+- **FR-U00-051**: CI MUST run the pre-push scan over exactly the commits of the push (from the commit before the
+  push to the pushed commit) or of the pull request (from the merge base to its head), with the full history
+  fetched. The scan job MUST NOT be cancelled by a newer push. A finding, a forbidden tracked path, an unknown
+  earlier commit or an unreadable range MUST fail the run.
 - **FR-U00-052**: The CI steps MUST need no signing, no secret and no network access beyond fetching the
   repository.
 - **FR-U00-053**: The workflow change MUST be confirmed by a real run on the pushed commit that ends in success;
@@ -385,7 +435,8 @@ and by the consolidation. Its archived specify prompt names six things to verify
   leaves the task file byte-identical and adds 0 commits; out of the three push situations (other branch, finding,
   clean on `main`) exactly one pushes.
 - **SC-U00-005**: Every scan pattern and every forbidden path class has at least 1 finding case and 1 clean case;
-  the coverage self-test fails when one is missing.
+  the coverage self-test fails when one is missing. The tracked hash list holds 1 hash for each simulator of the
+  development Mac at the time of recording and 0 readable identifiers, and recording a second time changes 0 bytes.
 - **SC-U00-006**: Each of the 6 ledger refusals named in the acceptance list has at least 1 self-test, and the hash
   of the real ledger is identical before and after the self-tests.
 - **SC-U00-007**: The prompt coverage test finds a non-empty prompt for 100% of the pending launch features in all 8
@@ -408,7 +459,9 @@ and by the consolidation. Its archived specify prompt names six things to verify
   and a unified-app feature, shared round feature or game feature of Rounds 2 to 4 that is pending in the migration
   ledger. Superseded shared features are never run and need no prompts.
 - "The only way a commit is pushed" is a rule of procedure backed by detection: tracked files cannot stop a plain
-  `git push`, so the tools are the documented ways and the CI scan detects a push that bypassed them.
+  `git push`, so the tools are the documented ways, a self-test proves that nothing else in the repository pushes,
+  and the CI scan detects a push that bypassed them (Clarifications).
+- A SHA-256 hash of a simulator identifier reveals nothing about the identifier and cannot be used as one.
 - CI runs on GitHub-hosted macOS runners as today, with a shallow checkout of the reference submodule only.
 - Timing in SC-U00-009 is a host measurement on the development Mac. It is not a device or app performance claim.
 - The owner's ruling of 2026-11-11 stands: work happens on `main` and is pushed after every commit.
@@ -423,7 +476,7 @@ and by the consolidation. Its archived specify prompt names six things to verify
 | Acceptance 4 (eight prompts for every pending launch feature) | FR-U00-040–042, US5, SC-U00-007 |
 | Acceptance 5 (ledger self-tests for the six refusals) | FR-U00-030–038, US4, SC-U00-006 |
 | Acceptance 6 (CI runs the four validators) | FR-U00-050, FR-U00-052, FR-U00-053, US6, SC-U00-008 |
-| Acceptance 7 (scan self-tests for every pattern and forbidden path; CI scans the pushed range) | FR-U00-020–025, FR-U00-051, US3, US6, SC-U00-005, SC-U00-008 |
+| Acceptance 7 (scan self-tests for every pattern and forbidden path; CI scans the pushed range) | FR-U00-020–026, FR-U00-051, US3, US6, SC-U00-005, SC-U00-008 |
 | Scope: the ledger tool is the only writer of the migration ledger | FR-U00-039 |
 | Scope: the tick tool and the scan are the only way a commit is pushed | FR-U00-015 |
 | Out of scope: app and framework source, legacy ledger and its tool | FR-U00-060, SC-U00-010 |
