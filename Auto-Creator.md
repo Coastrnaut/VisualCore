@@ -3450,8 +3450,11 @@ python3 Tools/python/desktop_runbook.py record --stage <GATE> --evidence .autono
 python3 scripts/planning_index.py build
 ```
 
-Commit after every skill, every task and every recorded gate. Then take the next gate; sealing a gate is not a
-stopping point.
+Commit after every skill, every task and every recorded gate. Then take the next gate in the same turn. Nothing in
+this loop is a stopping point: not a finished skill, task, feature, gate or milestone, not a progress note and not
+a long conversation (the app summarizes the context by itself). The loop runs without a pause until the device
+campaign of the 100 launch experiences; only the four stop conditions of section 28 end a turn (owner ruling of
+2026-11-12).
 
 ### 19.4 Tasks, ticks and evidence
 
@@ -5566,8 +5569,10 @@ changing a brief, the shared-feature map or the catalog, run `python3 scripts/re
 6. Repair from the last passing commit and its logs, never by marking a gate. Retries are bounded; a failing
    service is retried with a pause, not in a tight loop.
 
-A session that ends for any reason leaves the repository in a committed state whenever it can: commit after every
-task, never leave a build running in the background, never end between `seal` and `record`.
+A session does not end by its own choice (section 19.3): it ends only on a stop condition of section 28 or when
+something outside interrupts it. Because an interruption can come at any moment, the repository is kept in a
+committed state throughout: commit after every task, never leave a build running in the background, never pause
+between `seal` and `record`.
 
 The owner may set up a scheduled task of Claude Desktop that starts a session with the continuation prompt. Such a
 task runs only while the app is open and the Mac is awake. It is optional and not part of this procedure.
@@ -5800,12 +5805,16 @@ Stop and report only when one of these is true:
      diverged from origin/main, a missing submodule, foreign uncommitted changes that conflict with the task);
   d. continuing would require a physical-device action before ImplementationLock-100, an update of D3, a purchase,
      a submission, or anything else this prompt forbids.
-Otherwise continue. When the context runs low, commit, make sure nothing runs in the background, and end the turn
-with the report below; the next session starts again at STEP 0 with this same prompt.
+Otherwise NEVER STOP (owner ruling of 2026-11-12). Finishing a skill, a task, a feature, a gate, a milestone or a
+progress note is never a reason to end the turn: take the next gate in the same turn and keep engineering in one
+continuous loop until the device campaign of the 100 launch experiences is reached, and through it as far as the
+rules allow. A long conversation is not a reason either: the app summarizes the context by itself, so commit and
+keep working; after a summary, rerun the STEP 0 commands and continue with the first unticked task. Progress is
+read from the ledgers and the commits, so do not stop to report it.
 If the owner writes during the work, answer briefly and continue. Sealing a gate is never a reason to pause.
 
-REPORT AT THE END OF EVERY SESSION
-State exactly: gates recorded this session (ids); files changed; checks run and their results; what is unverified;
-blocked gates with the owner steps; branch, HEAD and whether the tree is clean; the next gate. Never describe a
-plan, a document or a simulator result as proof of device behavior or of a completed migration.
+REPORT AT THE END (only when a stop condition ends the work, or when the owner asks for a report)
+State exactly: gates recorded since the last report (ids); files changed; checks run and their results; what is
+unverified; blocked gates with the owner steps; branch, HEAD and whether the tree is clean; the next gate. Never
+describe a plan, a document or a simulator result as proof of device behavior or of a completed migration.
 ```

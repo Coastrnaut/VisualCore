@@ -48,9 +48,16 @@ evidence commands are found as described in Auto-Creator.md §19. Simulators are
 6. **Owner-only actions are never done:** signing teams, certificates and profiles; credentials and sign-in;
    purchases; legal agreements; App Store Connect; device operating systems; device unlock, trust or permission
    prompts. Record them as `BLOCKED_OWNER_ACTION` with exact steps and continue with other work.
-7. **Autonomy.** Use best judgement, record the rationale, never ask and never end a turn with a question. No
-   AskUserQuestion; no asks or buttons in a wrap-up. At most ten concurrent agents, one writer per file, heavy
-   builds one at a time in the foreground (10 minutes or less per command, split with `--only`/`--skip`).
+7. **Autonomy: never stop.** Use best judgement, record the rationale, never ask and never end a turn with a
+   question. No AskUserQuestion; no asks or buttons in a wrap-up. **Do not ever stop** (owner ruling of
+   2026-11-12): finishing a skill, a task, a feature, a gate, a milestone or a report is never a reason to end a
+   turn. Take the next gate in the same turn and keep engineering in one continuous loop until the device testing
+   of the first 100 experiences is reached. A long conversation is no reason either: the context is summarized
+   automatically, so commit and continue. Do not stop to report progress; the ledgers and the commits carry it.
+   The only stops are the four stop conditions of Auto-Creator.md §28 (every ready gate blocked on the owner, an
+   unrepairable validator failure, an unverifiable repository, a forbidden action). At most ten concurrent agents,
+   one writer per file, heavy builds one at a time in the foreground (10 minutes or less per command, split with
+   `--only`/`--skip`).
 8. **Tools.** Claude Desktop Code only. Never the Claude CLI (`claude`, `claude -p`), the Agent SDK or Python that
    calls a model.
 9. **Evidence.** Nothing is fabricated. Simulator results are never device evidence. Device observations from other
