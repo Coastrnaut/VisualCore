@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "python3",
+    "scripts/validate_docs.py"
+  ],
+  "command": "python3 scripts/validate_docs.py",
+  "elapsed_seconds": 0.037,
+  "exit_code": 0,
+  "finished": "2026-11-12T00:15:47+00:00",
+  "log": ".autonomy/logs/A04-P02.t219-docs.log",
+  "log_sha256": "2924b419867b07f07a989b454e387285844f4643e87c5e83ed81fd42fda88a2d",
+  "name": "t219-docs",
+  "stage": "A04-P02",
+  "started": "2026-11-12T00:15:47+00:00",
+  "timed_out": false
+}

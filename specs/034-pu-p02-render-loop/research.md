@@ -90,6 +90,10 @@ Floating-point: the falloff factor is in [0, 1] and the unit vector has length â
   unchanged `TimelineView` â†’ `frame(at:)`. `rendererMode` selects which one is shown; a `RenderHost` init throw or a
   non-`contextLost` error switches to `.cpuFallback`. The renderer status text says "Renderer: GPU" or "Renderer: CPU
   preview (<reason>)".
+- **Quality clock (T-A04-219):** quality decisions use one monotonic clock, `ProcessInfo.systemUptime`, on both the
+  GPU and the CPU path, instead of the host frame time or the preview's dates named in the plan. Reason: the time base
+  stays the same when the screen falls back from the GPU to the CPU preview, so `QualityPolicy`'s decision interval
+  and calm period never jump. The simulation itself still advances by each path's frame time.
 - **Feature 033 lesson:** per-frame state is read only in small leaf views (counts, effective limit, force text), so
   the controls are not rebuilt per frame.
 
