@@ -146,7 +146,7 @@ real run.
 checks run on a clean tree after the last source change.
 
 - [X] T-U00-025 Record `script-tests`: `python3 scripts/migration_ledger.py run-check --gate UA-F00 --name script-tests -- python3 scripts/test_scripts.py`. Expected result: exit 0; the attestation's `elapsed_seconds` is under 300 (SC-U00-009); the evidence text gives the test count and the elapsed time. — Verified 2026-11-12: run-check UA-F00/script-tests: python3 scripts/test_scripts.py exit 0; Ran 140 tests, OK; elapsed under 20 seconds on this Mac, far below the 300 seconds of SC-U00-009; the log ends with 'ledger tree unchanged'
-- [ ] T-U00-026 Record `docs`: `… --name docs -- python3 scripts/validate_docs.py`. Expected result: exit 0, `PASS … 0 problems`.
+- [X] T-U00-026 Record `docs`: `… --name docs -- python3 scripts/validate_docs.py`. Expected result: exit 0, `PASS … 0 problems`. — Verified 2026-11-12: run-check UA-F00/docs: python3 scripts/validate_docs.py exit 0, 'PASS: 36 feature dossiers checked, 0 problems'
 - [ ] T-U00-027 Record `steering`: `… --name steering -- python3 scripts/validate_autocreator.py`. Expected result: exit 0, `PASS: steering documents, 16 checks, 0 problems`.
 - [ ] T-U00-028 Record `ledger`: `… --name ledger -- python3 scripts/migration_ledger.py validate`. Expected result: exit 0, `PASS: migration ledger, 0 problems`.
 - [ ] T-U00-029 Record `prepush-scan`: `… --name prepush-scan -- python3 scripts/prepush_scan.py`. Expected result: exit 0, `PASS: pre-push scan … 0 findings`.
