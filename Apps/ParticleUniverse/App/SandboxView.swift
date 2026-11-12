@@ -1,9 +1,12 @@
 // SandboxView.swift — family picker, live and dropped counts, play/pause/step/new seed (feature 033 A04-P01 T-A04-106;
 // FR-A04-106). Feature 034 (A04-P02): the GPU stage (VisualCore RenderHost + ParticleLayerScene) with the CPU Canvas
 // preview as fallback, one placed force with tap/drag and control alternatives, and the effective particle limit
-// (contracts/app-ui.md). The app makes no GL or EGL call.
+// (contracts/app-ui.md). The app makes no GL or EGL call. Feature 035 (A04-P03): EmitterControls, OverrideControls
+// and TrailControls (specs/035-pu-p03-trails-emitters/contracts/app-ui.md).
 import ParticleUniverseCore
 import SwiftUI
+import VisualCoreParameters
+import VisualCoreRendering
 import VisualCoreSimulation
 import VisualCoreUI
 
@@ -54,6 +57,7 @@ private struct SandboxContent: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 12) {
+                EmitterControls(model: model)
                 familyPicker
                     .accessibilityIdentifier("pu.sandbox.family")
                 Text(model.family.spokenDescription)
@@ -72,6 +76,8 @@ private struct SandboxContent: View {
                     VStack(alignment: .leading, spacing: 12) { playbackControls }
                 }
                 ForceControls(model: model)
+                OverrideControls(model: model)
+                TrailControls(model: model)
             }
             .padding()
         }
@@ -146,6 +152,100 @@ private struct StatusView: View {
                 .font(.footnote)
                 .fixedSize(horizontal: false, vertical: true)
                 .accessibilityIdentifier("pu.sandbox.renderer")
+        }
+    }
+}
+
+/// The emitter picker, the emitter count, Add and Remove (feature 035).
+private struct EmitterControls: View {
+    let model: SceneModel
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Picker("Emitter", selection: Binding(get: { model.selectedEmitter }, set: { model.selectEmitter($0) })) {
+                ForEach(Array(model.emitterTitles.enumerated()), id: \.offset) { i, title in Text(title).tag(i) }
+            }
+            .pickerStyle(.menu)
+            .accessibilityIdentifier("pu.sandbox.emitter")
+            Text(model.emittersText)
+                .fixedSize(horizontal: false, vertical: true)
+                .accessibilityIdentifier("pu.sandbox.emitters")
+            ViewThatFits(in: .horizontal) {
+                HStack(spacing: 12) { buttons }
+                VStack(alignment: .leading, spacing: 8) { buttons }
+            }
+        }
+    }
+
+    @ViewBuilder private var buttons: some View {
+        Button { model.addEmitter() } label: {
+            Label("Add emitter", systemImage: "plus.circle").frame(minHeight: 44)
+        }
+        .buttonStyle(.bordered)
+        .disabled(!model.canAddEmitter)
+        .accessibilityIdentifier("pu.sandbox.addEmitter")
+        Button { model.removeEmitter() } label: {
+            Label("Remove emitter", systemImage: "minus.circle").frame(minHeight: 44)
+        }
+        .buttonStyle(.bordered)
+        .disabled(!model.canRemoveEmitter)
+        .accessibilityIdentifier("pu.sandbox.removeEmitter")
+    }
+}
+
+/// Size, lifetime and color gradient of the selected emitter (feature 035).
+private struct OverrideControls: View {
+    let model: SceneModel
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Size \(model.sizeText)").accessibilityHidden(true)
+            Slider(value: Binding(get: { model.size }, set: { model.setSize($0) }), in: SceneEmitter.sizeRange) { Text("Size") }
+                .accessibilityValue(model.sizeText)
+                .accessibilityIdentifier("pu.sandbox.size")
+            Text("Lifetime \(model.lifetimeText)").accessibilityHidden(true)
+            Slider(value: Binding(get: { model.lifetime }, set: { model.setLifetime($0) }), in: SceneEmitter.lifetimeRange) { Text("Lifetime") }
+                .accessibilityValue(model.lifetimeText)
+                .accessibilityIdentifier("pu.sandbox.lifetime")
+            Picker("Colors", selection: Binding(get: { model.gradient }, set: { model.setGradient($0) })) {
+                Text("Family colors").tag(String?.none)
+                ForEach(Palette.builtIns) { Text($0.name).tag(String?.some($0.id)) }
+            }
+            .pickerStyle(.menu)
+            .accessibilityIdentifier("pu.sandbox.gradient")
+        }
+    }
+}
+
+/// Trails, their strength and the blend choice (feature 035); trails need the GPU stage.
+private struct TrailControls: View {
+    let model: SceneModel
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Toggle("Trails", isOn: Binding(get: { model.trailsOn }, set: { model.setTrails($0) }))
+                .disabled(!model.trailsAvailable)
+                .accessibilityIdentifier("pu.sandbox.trails")
+            Text("Trail strength \(model.trailStrengthText)").accessibilityHidden(true)
+            Slider(value: Binding(get: { model.trailStrength }, set: { model.setTrailStrength($0) }), in: TrailDecay.strengthRange) {
+                Text("Trail strength")
+            }
+            .disabled(!model.trailsAvailable || !model.trailsOn)
+            .accessibilityValue(model.trailStrengthText)
+            .accessibilityIdentifier("pu.sandbox.trailStrength")
+            Picker("Blend", selection: Binding(get: { model.blend }, set: { model.setBlend($0) })) {
+                Text("Normal").tag(ParticleBlend.normal)
+                Text("Additive").tag(ParticleBlend.additive)
+            }
+            .pickerStyle(.segmented)
+            .disabled(!model.trailsAvailable)
+            .accessibilityIdentifier("pu.sandbox.blend")
+            if let note = model.trailNote {
+                Text(note)
+                    .font(.footnote)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .accessibilityIdentifier("pu.sandbox.trailNote")
+            }
         }
     }
 }

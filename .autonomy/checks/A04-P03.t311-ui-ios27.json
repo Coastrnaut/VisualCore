@@ -1,0 +1,33 @@
+{
+  "argv": [
+    "xcodebuild",
+    "test",
+    "-project",
+    "VisualCore.xcodeproj",
+    "-scheme",
+    "ParticleUniverse",
+    "-destination",
+    "platform=iOS Simulator,id=4E32B01D-7911-4A64-A944-877DDD445BC0",
+    "-derivedDataPath",
+    "Build/DerivedData/ParticleUniverse",
+    "-resultBundlePath",
+    ".autonomy/xcresults/A04-P03-t311-ui-ios27.xcresult",
+    "-only-testing:ParticleUniverseUITests/SandboxEmitterUITests",
+    "-only-testing:ParticleUniverseUITests/SandboxTrailUITests",
+    "-test-timeouts-enabled",
+    "YES",
+    "-default-test-execution-time-allowance",
+    "180",
+    "CODE_SIGNING_ALLOWED=NO"
+  ],
+  "command": "xcodebuild test -project VisualCore.xcodeproj -scheme ParticleUniverse -destination 'platform=iOS Simulator,id=4E32B01D-7911-4A64-A944-877DDD445BC0' -derivedDataPath Build/DerivedData/ParticleUniverse -resultBundlePath .autonomy/xcresults/A04-P03-t311-ui-ios27.xcresult -only-testing:ParticleUniverseUITests/SandboxEmitterUITests -only-testing:ParticleUniverseUITests/SandboxTrailUITests -test-timeouts-enabled YES -default-test-execution-time-allowance 180 CODE_SIGNING_ALLOWED=NO",
+  "elapsed_seconds": 20.597,
+  "exit_code": 0,
+  "finished": "2026-11-12T00:38:24+00:00",
+  "log": ".autonomy/logs/A04-P03.t311-ui-ios27.log",
+  "log_sha256": "cbe0ccc7d89f9798aabe12c7a63536d64c5ad0c77794a1582a082a4b5a04ba43",
+  "name": "t311-ui-ios27",
+  "stage": "A04-P03",
+  "started": "2026-11-12T00:38:04+00:00",
+  "timed_out": false
+}

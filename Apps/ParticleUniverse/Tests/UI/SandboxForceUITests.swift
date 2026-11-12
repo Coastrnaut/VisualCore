@@ -30,18 +30,7 @@ final class SandboxForceUITests: XCTestCase {
         return (g(1), Int(g(2))!, Int(g(3))!, Double(g(4))!)
     }
 
-    /// Scrolls `e` into the middle of the window by dragging on the status texts (never on the canvas, which would
-    /// place the force), checking its frame after each drag.
-    private func reveal(_ e: XCUIElement, in app: XCUIApplication) {
-        let window = app.windows.firstMatch.frame
-        for _ in 0..<8 where !(e.isHittable && e.frame.minY > window.minY + 100 && e.frame.maxY < window.maxY - 60) {
-            let handle = app.staticTexts["pu.sandbox.force"].isHittable ? app.staticTexts["pu.sandbox.force"] : app.staticTexts["pu.sandbox.dropped"]
-            let from = handle.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
-            let dy: CGFloat = e.frame.midY > window.midY ? -160 : 160
-            from.press(forDuration: 0.05, thenDragTo: from.withOffset(CGVector(dx: 0, dy: dy)))
-        }
-        XCTAssertTrue(e.isHittable, "\(e.identifier) frame \(e.frame) in \(window)")
-    }
+    // `reveal(_:in:)` is shared in SandboxSupport.swift (feature 035).
 
     private func chooseKind(_ title: String, in app: XCUIApplication) {
         let menu = app.buttons["pu.sandbox.forceKind"]
