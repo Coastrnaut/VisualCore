@@ -32,20 +32,49 @@ TAIL_LINES = 15
 SAFE_NAME = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]*$")
 
 
-def pick_simulator(devices_json: dict, runtime: str, kind: str) -> tuple[str, str] | None:
-    """(identifier, name) of the first available simulator of iOS `runtime` whose name starts with the device family
-    of `kind`, or None when there is none. `devices_json` is the output of `xcrun simctl list -j devices available`."""
+def phone_widths(run=subprocess.run, load=None) -> dict[str, float]:
+    """Screen width in points for every simulator device type that states one, by device type identifier. Read from
+    `xcrun simctl list -j devicetypes` and each type's `capabilities.plist`; empty when that cannot be read."""
+    import plistlib
+    load = load or (lambda path: plistlib.loads(Path(path).read_bytes()))
+    try:
+        listing = run(["xcrun", "simctl", "list", "-j", "devicetypes"], capture_output=True, text=True)
+        types = json.loads(listing.stdout).get("devicetypes", []) if listing.returncode == 0 else []
+    except (OSError, ValueError):
+        return {}
+    widths: dict[str, float] = {}
+    for t in types:
+        try:
+            data = load(str(Path(t["bundlePath"]) / "Contents" / "Resources" / "capabilities.plist"))
+            screen = data.get("capabilities", data)["ScreenDimensionsCapability"]
+            widths[t["identifier"]] = float(screen["main-screen-width"]) / float(screen["main-screen-scale"])
+        except (OSError, ValueError, KeyError, TypeError, ZeroDivisionError):
+            continue
+    return widths
+
+
+def pick_simulator(devices_json: dict, runtime: str, kind: str,
+                   widths: dict[str, float] | None = None) -> tuple[str, str] | None:
+    """(identifier, name) of an available simulator of iOS `runtime` whose name starts with the device family of
+    `kind`, or None when there is none. A phone is the narrowest one whose device type has a width in `widths`
+    (FR-U04-035 asks for the smallest phone; the first of equal width wins); without widths, and for a tablet, it is
+    the first one. `devices_json` is the output of `xcrun simctl list -j devices available`."""
     prefix = KINDS.get(kind)
     if prefix is None:
         return None
+    found = []
     for key, devices in sorted(devices_json.get("devices", {}).items()):
         m = re.search(r"SimRuntime\.iOS-(\d+)-(\d+)$", key)
         if not m or f"{m.group(1)}.{m.group(2)}" != runtime:
             continue
         for d in devices:
             if d.get("isAvailable") and str(d.get("name", "")).startswith(prefix) and d.get("udid"):
-                return d["udid"], d["name"]
-    return None
+                found.append(d)
+    if not found:
+        return None
+    if kind == "phone" and widths:
+        found.sort(key=lambda d: widths.get(d.get("deviceTypeIdentifier", ""), float("inf")))   # stable
+    return found[0]["udid"], found[0]["name"]
 
 
 def test_command(project: str, scheme: str, udid: str, derived: str, only: list[str] | None) -> list[str]:
@@ -83,7 +112,8 @@ def enumeration_guard(sources: Path, log: Path, classes: list[str] | None = None
     return check_test_enumeration.main(argv)
 
 
-def main(argv: list[str] | None = None, root: Path = ROOT, run=subprocess.run, guard=enumeration_guard) -> int:
+def main(argv: list[str] | None = None, root: Path = ROOT, run=subprocess.run, guard=enumeration_guard,
+         widths=phone_widths) -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--scheme", required=True)
     ap.add_argument("--runtime", required=True, help="iOS runtime of the simulator, such as 27.2")
@@ -128,7 +158,7 @@ def main(argv: list[str] | None = None, root: Path = ROOT, run=subprocess.run, g
     if not isinstance(devices, dict):
         print(f"FAIL: {what} — the simulator list could not be read (xcrun simctl list -j devices available)")
         return 2
-    chosen = pick_simulator(devices, a.runtime, a.kind)
+    chosen = pick_simulator(devices, a.runtime, a.kind, widths() if a.kind == "phone" else None)
     if chosen is None:
         print(f"FAIL: {what} — no available {KINDS[a.kind]} simulator of iOS {a.runtime}")
         return 2

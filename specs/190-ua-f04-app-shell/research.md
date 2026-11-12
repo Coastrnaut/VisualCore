@@ -55,8 +55,10 @@ destinations of the same navigation. The experience route hosts `ExperienceHostV
 
 ### R6. Quality override and accessibility choices
 The app passes the stored tier to the experience after a successful open when the override is not automatic, and
-keeps `AccessibilityPreferences` in the preferences value; experiences receive both through the open path. What a
-tier means is UA-F06.
+keeps the two accessibility choices in the preferences value. An experience receives the tier after its open
+(`setQualityTier`) and the two choices at its open: the registration's factory is called with an `ExperienceLaunch`
+that carries them (corrected by the convergence task T-U04-033; before it only the tier reached an experience).
+What a tier means is UA-F06.
 
 ### R7. Running app tests on simulators
 New tool `scripts/xcodebuild_app.py --scheme VisualCore --runtime 27.2 --kind phone|tablet [--only-testing …]`:

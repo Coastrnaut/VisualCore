@@ -55,7 +55,8 @@ arguments, last reset (what was removed). Readable in debug builds through the i
 `vc.welcome.start`, `vc.settings.reduceMotion`, `vc.settings.reduceFlashing`, `vc.settings.quality`,
 `vc.settings.reset.all`, `vc.settings.reset.<id>`, `vc.settings.reset.confirm`, `vc.settings.reset.cancel`,
 `vc.settings.privacy`, `vc.about.acknowledgements`, `vc.experience.back`, `vc.premium.notice`,
-`vc.premium.dismiss`, `vc.diagnostics` (debug builds), and `vc.exp.<id>.<control>` inside an experience.
+`vc.premium.dismiss`, `vc.diagnostics` (debug builds), and `experience.<id>.<control>` inside an experience (the framework's
+`ExperienceID.accessibilityPrefix`).
 
 ## 7. As built (recorded after T-U04-011)
 
@@ -69,5 +70,23 @@ arguments, last reset (what was removed). Readable in debug builds through the i
   only when it is available and registered.
 - Section headings and reset rows use the label colour; the app's tint is the framework's contrast-checked
   accent. The destructive meaning of a reset is carried by its symbol and its confirmation, not by a red text.
-- `-vcSkipWelcome` marks the welcome as seen; `-openExperience` does not imply it.
+- `-vcSkipWelcome` marks the welcome as seen. `-openExperience <id>` opens its experience directly, also on a
+  first start: the welcome is hidden for that launch and stays unseen, so the next start without the argument
+  shows it (convergence, T-U04-034).
+- Further debug-only arguments (convergence): `-vcDamagedCatalog` (catalog data that cannot be read),
+  `-vcSeedData` (a data folder for the first two free fixture experiences) and `-vcFailingExperience` (every
+  fixture experience fails in its setup).
+- The way back from the experience, settings and about routes (`vc.experience.back`, `vc.nav.done`) is a row of
+  the content, not a bar button: a navigation bar keeps its buttons 36 points high, below the 44 points of
+  FR-U04-035 (found by the touch-target test of T-U04-040).
+- The registration's factory receives an `ExperienceLaunch` with the stored reduce-motion and reduce-flashing
+  choices (US5, acceptance scenario 1). Settings closes an open experience, so a changed choice reaches an
+  experience at its next open.
+- The search field is replaced by a new one when typed text is cut to 100 characters, and keeps the focus: a field
+  that is being typed in does not take a shorter text back from its binding.
+- What stays in a release build of the debug support is inert data only: the launch arguments the model was
+  created with and the list of arguments that were not understood (always empty there, because nothing reads the
+  arguments). The handling itself (`DebugLaunch`, `DebugExperience`, `hideWelcomeForThisLaunch`) does not exist.
+- The app test runner takes the narrowest available phone simulator of the runtime (an iPhone 13 mini was
+  created for both runtimes); a tablet run is recorded in three chunks, each under ten minutes.
 - The seed of an opened experience is derived from its id (a stable value); UA-F05 will supply stored seeds.

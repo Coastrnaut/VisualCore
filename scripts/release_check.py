@@ -153,7 +153,8 @@ def app_domain_steps(root: Path = ROOT) -> list[Step]:
     for app in app_dirs(root):
         rel = str(app.relative_to(root))
         out.append(Step(f"documented-api-{kebab(app.name)}", [PY, "scripts/check_documented_api.py", "--sources", rel]))
-        out.append(Step(f"isolation-{kebab(app.name)}", [PY, "scripts/check_app_isolation.py", "--app", rel]))
+        out.append(Step(f"isolation-{kebab(app.name)}", [PY, "scripts/check_app_isolation.py", "--app", rel,
+                                                        "--require-sources"]))
         for manifest in sorted(app.glob("*/Package.swift")):
             pkg = manifest.parent.name
             name = kebab(pkg) if pkg.startswith(app.name) else f"{kebab(app.name)}-{kebab(pkg)}"

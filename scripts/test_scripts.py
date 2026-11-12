@@ -911,6 +911,59 @@ class ReleaseCheckTests(unittest.TestCase):
         self.assertEqual(names.index("visualcore-app-build"), names.index("xcodegen") + 1)
 
 
+class UnifiedAppTargetTests(unittest.TestCase):
+    """Feature UA-F04 T-U04-045 (FR-U04-001, FR-U04-070): the project has exactly one application target marked as
+    the shippable one, with one unit-test and one interface-test target, and the standing isolation step of every
+    app fails when its sources are missing."""
+
+    @staticmethod
+    def targets() -> dict[str, list[str]]:
+        """Target name -> the lines of its block, from the `targets:` section of the root project.yml."""
+        lines = (HERE.parent / "project.yml").read_text().splitlines()
+        start = lines.index("targets:")
+        blocks: dict[str, list[str]] = {}
+        name = None
+        for line in lines[start + 1:]:
+            if line and not line.startswith((" ", "#")):
+                break
+            m = re.match(r"  ([A-Za-z0-9_]+):\s*$", line)
+            if m:
+                name = m.group(1)
+                blocks[name] = []
+            elif name:
+                blocks[name].append(line)
+        return blocks
+
+    def test_exactly_one_application_target_is_marked_shippable(self):
+        blocks = self.targets()
+        marked = [n for n, b in blocks.items() if any("only shippable application target" in l for l in b)]
+        self.assertEqual(marked, ["VisualCore"])
+        app = blocks["VisualCore"]
+        self.assertIn("    type: application", app)
+        self.assertTrue(any("PRODUCT_BUNDLE_IDENTIFIER: dev.visualcore.VisualCore" == l.strip() for l in app))
+        self.assertTrue(any("PRODUCT_MODULE_NAME: VisualCoreApp" == l.strip() for l in app))
+
+    def test_the_app_has_one_unit_test_and_one_interface_test_target(self):
+        blocks = self.targets()
+        testing = {n: b for n, b in blocks.items() if any(l.strip() == "- target: VisualCore" for l in b)}
+        self.assertEqual(sorted(testing), ["VisualCoreTests", "VisualCoreUITests"])
+        self.assertIn("    type: bundle.unit-test", testing["VisualCoreTests"])
+        self.assertIn("    type: bundle.ui-testing", testing["VisualCoreUITests"])
+
+    def test_the_app_links_no_unused_framework_product(self):
+        products = [l.split("product:")[1].strip() for l in self.targets()["VisualCore"] if "product:" in l]
+        self.assertEqual(products, ["VisualCoreExperience", "VisualCoreSimulation", "VisualCorePersistence",
+                                    "VisualCoreRendering", "VisualCoreUI", "VisualCoreExperienceHost"])
+
+    def test_the_standing_isolation_step_requires_sources(self):
+        listing = subprocess.run([sys.executable, str(HERE / "release_check.py"), "--list"],
+                                 capture_output=True, text=True, check=True).stdout
+        steps = [l for l in listing.splitlines() if l.startswith("isolation-")]
+        self.assertTrue(any(l.startswith("isolation-visual-core:") for l in steps), steps)
+        for line in steps:
+            self.assertTrue(line.endswith(" --require-sources"), line)
+
+
 class ComplianceScanReportTests(unittest.TestCase):
     """The compliance check says what it scanned, so a missing app folder cannot pass unseen (UA-F04)."""
 
@@ -972,6 +1025,47 @@ class AppTestRunnerTests(unittest.TestCase):
         self.assertEqual(pick(self.DEVICES, "26.5", "phone"), (self.PHONE_26, "iPhone 17"))
         self.assertEqual(pick(self.DEVICES, "26.5", "tablet"), (self.TABLET_26, "iPad Air 11-inch (M3)"))
 
+    def test_a_phone_is_the_narrowest_one_with_a_known_width(self):
+        """FR-U04-035 asks for the smallest phone: with widths the narrowest available phone of the runtime is taken;
+        a type without width comes last; a tablet stays the first one."""
+        devices = {"devices": {"com.apple.CoreSimulator.SimRuntime.iOS-27-2": [
+            {"udid": "P1", "name": "iPhone Wide", "isAvailable": True, "deviceTypeIdentifier": "t.wide"},
+            {"udid": "P2", "name": "iPhone Unknown", "isAvailable": True, "deviceTypeIdentifier": "t.unknown"},
+            {"udid": "P3", "name": "iPhone Narrow", "isAvailable": True, "deviceTypeIdentifier": "t.narrow"},
+            {"udid": "P4", "name": "iPhone Narrow Too", "isAvailable": True, "deviceTypeIdentifier": "t.narrow"},
+            {"udid": "P5", "name": "iPhone Gone", "isAvailable": False, "deviceTypeIdentifier": "t.tiny"},
+            {"udid": "T1", "name": "iPad Big", "isAvailable": True, "deviceTypeIdentifier": "t.big"},
+            {"udid": "T2", "name": "iPad Small", "isAvailable": True, "deviceTypeIdentifier": "t.small"}]}}
+        widths = {"t.wide": 440.0, "t.narrow": 390.0, "t.tiny": 320.0, "t.big": 1024.0, "t.small": 744.0}
+        pick = apprunner.pick_simulator
+        self.assertEqual(pick(devices, "27.2", "phone", widths), ("P3", "iPhone Narrow"))
+        self.assertEqual(pick(devices, "27.2", "phone", {}), ("P1", "iPhone Wide"))
+        self.assertEqual(pick(devices, "27.2", "phone"), ("P1", "iPhone Wide"))
+        self.assertEqual(pick(devices, "27.2", "tablet", widths), ("T1", "iPad Big"))
+
+    def test_phone_widths_are_points_from_the_device_type_capabilities(self):
+        types = {"devicetypes": [
+            {"identifier": "t.a", "bundlePath": "/types/a"}, {"identifier": "t.b", "bundlePath": "/types/b"},
+            {"identifier": "t.c", "bundlePath": "/types/c"}, {"identifier": "t.d"}]}
+        plists = {
+            "/types/a/Contents/Resources/capabilities.plist":
+                {"capabilities": {"ScreenDimensionsCapability": {"main-screen-width": 1170, "main-screen-scale": 3.0}}},
+            "/types/b/Contents/Resources/capabilities.plist":
+                {"ScreenDimensionsCapability": {"main-screen-width": 1320, "main-screen-scale": 3.0}},
+            "/types/c/Contents/Resources/capabilities.plist": {"capabilities": {}}}
+
+        def run(cmd, **kw):
+            self.assertEqual(cmd, ["xcrun", "simctl", "list", "-j", "devicetypes"])
+            return subprocess.CompletedProcess(cmd, 0, stdout=json.dumps(types), stderr="")
+
+        self.assertEqual(apprunner.phone_widths(run=run, load=lambda path: plists[path]), {"t.a": 390.0, "t.b": 440.0})
+        failing = lambda cmd, **kw: subprocess.CompletedProcess(cmd, 1, stdout="", stderr="no")
+        self.assertEqual(apprunner.phone_widths(run=failing, load=lambda path: {}), {})
+
+        def broken(cmd, **kw):
+            raise OSError("no xcrun")
+        self.assertEqual(apprunner.phone_widths(run=broken), {})
+
     def test_none_when_the_runtime_or_kind_has_none(self):
         pick = apprunner.pick_simulator
         self.assertIsNone(pick(self.DEVICES, "28.0", "phone"))
@@ -1013,7 +1107,7 @@ class AppTestRunnerTests(unittest.TestCase):
                 (root / "Apps" / "VisualCore" / "Tests").mkdir(parents=True)
             out = io.StringIO()
             with contextlib.redirect_stdout(out), contextlib.redirect_stderr(io.StringIO()):
-                code = apprunner.main(args, root=root, run=fake_run, guard=fake_guard)
+                code = apprunner.main(args, root=root, run=fake_run, guard=fake_guard, widths=lambda: {})
             files = sorted(str(p.relative_to(root)) for p in root.rglob("*.log"))
             guards = [(str(s.relative_to(root)), str(l.relative_to(root)), text) for s, l, text in guards]
             cwd_ok = all(kw.get("cwd") == root for c, kw in calls if c[0] == "xcodebuild")

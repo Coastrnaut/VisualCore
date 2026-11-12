@@ -41,8 +41,9 @@ most two taps. No device claim.
 **Constraints**: no network, no advertising, no account, no URL scheme, no usage description; debug support
 absent from release builds; no direct GL in app sources; texts in string resources; no raster art.
 
-**Scale/Scope**: 1 pure source file, about 12 app source files, 2 debug-only files, 3 resource files, 2 unit test
-files, 4 interface test files, 1 new tool, changes to `project.yml`.
+**Scale/Scope**: 1 pure source file, about 12 app source files, 2 debug-only files, 3 resource files, 3 unit test
+files (`AppModelTests`, `StoreTests`, `BundleTests`), 5 interface test files (`LaunchUITests`, `LauncherUITests`,
+`RoutesUITests`, `FirstRunUITests`, `SettingsUITests`) and their shared helper `AppUITestSupport.swift`, 1 new tool, changes to `project.yml`.
 
 ## Constitution Check
 

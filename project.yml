@@ -1,5 +1,6 @@
-# project.yml — repository-root XcodeGen spec (README §8: single source of truth for the Showcase and, later,
-# all 25 app targets). XcodeGen 2.46.0. Generated VisualCore.xcodeproj is gitignored.
+# project.yml — repository-root XcodeGen spec: the single source of truth for the unified app VisualCore (the only
+# shippable application target, ADR-0009), the Showcase and the four earlier standalone apps, which stay as
+# consumers of the framework and are not shipped. XcodeGen 2.46.0. Generated VisualCore.xcodeproj is gitignored.
 # Simulator/CI builds are unsigned (CODE_SIGNING_ALLOWED=NO); device signing comes only from the owner's
 # gitignored Configs/Signing.local.xcconfig via Configs/Signing.xcconfig.
 # The Showcase must never depend on ProjectM engine/preset/bridge modules (FR-F610; scripts/audit_showcase_dependencies.py).
@@ -500,8 +501,8 @@ targets:
         product: VisualCoreExperience
       - package: VisualCore
         product: VisualCoreSimulation
-      - package: VisualCore
-        product: VisualCoreDiagnostics
+      # VisualCorePersistence is used only by the debug experience (its core declares a migration chain); a package
+      # product cannot be linked for one configuration only.
       - package: VisualCore
         product: VisualCorePersistence
       - package: VisualCoreRendering

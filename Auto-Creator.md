@@ -2547,7 +2547,7 @@ Names without that mark exist in the source today.
   never waits for the store.
 - `Showcase`, the harnesses and, until they are retired, the four standalone apps remain non-shipping targets.
 - ProjectM engine and preset code is never linked into the app (checked on the built product).
-- The app target's Swift module is named `VisualCoreApp` (proposal) so that it cannot be confused with the
+- The app target's Swift module is named `VisualCoreApp` so that it cannot be confused with the
   framework package `VisualCore`; the display name stays VisualCore.
 - Placeholder identifiers approved by the owner stay as they are until OD-02 is decided: `dev.visualcore.<Name>`
   (the Showcase is `dev.visualcore.Showcase`, the harnesses `dev.visualcore.harness.*`). The App Store name is
@@ -2735,14 +2735,18 @@ builds of both modules.
   override, reset of one experience's data and of all data, the privacy statement, restore purchases, and
   acknowledgements (existing `AcknowledgementsView` and `LicenseInventory`).
 - Each tile shows the tier as text, not only as color or glyph. Accessibility identifiers are stable:
-  `vc.tile.<id>` for tiles, `vc.route.<name>` for routes, `vc.exp.<id>.<control>` inside an experience.
+  `vc.tile.<id>` for tiles, `vc.route.<name>` for routes, `experience.<id>.<control>` inside an experience.
 - A DEBUG-only launch argument `-openExperience <id>` opens one experience for tests. The debug support of the app
   (`Apps/VisualCore/App/DebugSupport/`, wholly inside `#if DEBUG`) also offers a fixture catalog, a debug
   experience and arguments that erase the app's data and skip the welcome; none of it is in a release build.
 - The app's tests run with `python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime <27.2|26.5> --kind
-  <phone|tablet>`: the simulator is chosen by runtime and kind, and the enumeration guard runs on the log.
-- As built by UA-F04: settings and about are list rows above the tiles (a navigation bar clips text at the
-  largest sizes); the search is a text field in the first row; the shell's pure decisions (launcher sections,
+  <phone|tablet>`: the simulator is chosen by runtime and kind (for a phone the narrowest available one), and
+  the enumeration guard runs on the log. A tablet run is made in chunks of whole test classes with
+  `--only-testing`, each under ten minutes; the guard then covers the classes of the chunk.
+- As built by UA-F04: settings and about are list rows above the tiles, and the way back from a route is a row
+  of its content (a navigation bar clips text at the largest sizes and keeps its buttons below 44 points); the
+  search is a text field in the first row; a registration's factory receives the stored reduce-motion and
+  reduce-flashing choices; the shell's pure decisions (launcher sections,
   startup, preferences, reset plan) live in `VisualCoreExperience` (`ShellModel.swift`).
 
 ## 12. Rendering, quality and performance
@@ -3145,7 +3149,7 @@ VisualCore/
 │   ├── state.json, evidence/, checks/        existing   legacy ledger (never reset)
 │   └── migration/ledger.json, evidence/, checks/   existing   migration ledger
 ├── Apps/
-│   ├── VisualCore/               new        the app: App/, Resources/, Tests/Unit, Tests/UI (UA-F04)
+│   ├── VisualCore/               existing   the app: App/, Resources/, Tests/Unit, Tests/UI (created by UA-F04)
 │   ├── GenerativeArtStudio/      move       → Packages/ExperiencesCreative/GenerativeArtStudio (UA-F07), then retire the target
 │   ├── FluidArtPlayground/       move       likewise
 │   ├── FractalExplorer/          move       likewise
@@ -3163,7 +3167,7 @@ VisualCore/
 ├── External/projectm-ios/        existing   pinned read-only submodule
 ├── Configs/                      existing   toolchain.json, Signing.xcconfig (the local signing file is never committed), simulator-identifier-hashes.json
 ├── Tools/python/desktop_runbook.py   existing   legacy ledger tool
-├── scripts/                      modify     + build_catalog.py, check_experience_symbols.py, verify_experiences.py, run_device_campaign.py
+├── scripts/                      modify     + build_catalog.py, check_experience_symbols.py, xcodebuild_app.py, verify_experiences.py, run_device_campaign.py
 ├── specs/                        modify     001–035 existing; 036–550 and rNN-* as features are specified
 └── docs/
     ├── decisions/                modify     ADR-0001 … ADR-0009, then ADR-0010 (constitution 2.0.0)
