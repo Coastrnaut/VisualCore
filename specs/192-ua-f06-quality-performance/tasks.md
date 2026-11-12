@@ -1,0 +1,132 @@
+---
+
+description: "Task list for feature 192 — UA-F06 quality profiles and performance observability (migration ledger gate UA-F06)"
+---
+
+# Tasks: UA-F06 — Quality profiles and performance observability
+
+**Input**: `specs/192-ua-f06-quality-performance/` (spec, plan, research, data-model, contracts/performance-api.md,
+quickstart).
+
+**Tests** are required by the specification (acceptance items 1 to 6): Swift Testing on the host for the pure
+types, package tests on the iOS 27.2 and iOS 26.5 simulators for the session, XCTest and XCUITest in the app's
+test bundles, and `unittest` in `scripts/test_scripts.py`. A test file is written before the code it proves;
+where an agent writes test and code of one unit together, the tick says so.
+
+**Conventions**: ids `T-U06-###`; one commit per task through `scripts/tick_task.py`; a test task and the
+implementation it proves are committed together so that `main` is never red; the API baseline is updated in every
+commit that adds a public framework symbol; gate evidence through
+`python3 scripts/migration_ledger.py run-check --gate UA-F06 --name <check-name> -- <command>` (simulator and
+reference commands with `--timeout 600`). "The commit before the feature" is `18693bb`. Signatures are those of
+contracts/performance-api.md; fields and rules those of data-model.md. `[P]` marks a task whose files no other
+open task writes; such tasks may go to parallel agents, which write files only; the lead builds, tests, ticks and
+commits. App test runs use the four chunks of whole test classes (`-a` routes; `-b` settings and launch; `-c`
+unit classes; `-d` launcher and first run). Review checkpoint after each phase.
+
+## Phase 1: Setup
+
+- [ ] T-U06-001 In `Packages/VisualCore/Package.swift` add `VisualCoreDiagnostics` to the dependencies of the target `VisualCoreExperience` and of the test target `VisualCoreExperienceTests`, and correct the comment above the target (it is no leaf). Proof: `swift build --package-path Packages/VisualCore` and `python3 scripts/check_dependencies.py` pass.
+- [ ] T-U06-002 [P] Add the option `--only-testing <id> …` to `scripts/xcodebuild_package.py` (each id passed to xcodebuild as `-only-testing:<id>`, test action only) with tests in `scripts/test_scripts.py`. Proof: `python3 scripts/test_scripts.py` passes.
+
+## Phase 2: Foundational — the pure types (block every story)
+
+- [ ] T-U06-003 [P] Tests first: `Packages/VisualCore/Tests/VisualCoreDiagnosticsTests/QualityProfileTests.swift` — a profile of three levels gives names and four budgets; the 12 invalid profiles of SC-U06-002 (no level, nine levels, empty name, 41-character name, duplicate name, resolution share 0, resolution share above 1, element share out of range, iteration share out of range, negative effect passes, a rising share, rising effect passes) are refused with the exact `QualityProfileError`; `level(_:)` clamps; `elements` and `iterations` follow `min(requested, max(minimum, floor(requested × share)))` and give 0 for a request of 0 or less; `uniform(levels:)` clamps to 1…8 and names `level-0` …; `QualityDeclaration.problems` reports a wrong count and wrong names and nothing for a match or for absent catalog names.
+- [ ] T-U06-004 Implement `Packages/VisualCore/Sources/VisualCoreDiagnostics/QualityProfile.swift` (`QualityLevel`, `QualityBudget`, `QualityProfileError`, `QualityProfile` with `maxLevels = 8`, names of 1 to 40 characters unique in the profile, resolution share more than 0 and at most 1, element and iteration share 0 to 1, effect passes 0 to 64, no budget rising from one level to the next, `QualityDeclaration`) with `///` on every public symbol; T-U06-003 passes (FR-U06-001 to FR-U06-004, FR-U06-006).
+- [ ] T-U06-005 [P] Tests first: `Packages/VisualCore/Tests/VisualCoreDiagnosticsTests/QualityGovernorTests.swift` — a script of at least 20 condition changes with times gives the expected level after every step in automatic mode (one step down per decision interval under serious or critical heat, Low Power level 1, no recovery under Low Power, one step up per calm period, no step up under oscillation) and the pinned level after every step with a pin; a pin beyond the last level gives the last level; decisions closer than 1 second change nothing; a non-finite time changes nothing; `setPin(nil)` starts from level 0; `resume()` restarts the calm period; one level never steps; the step counters follow the policy.
+- [ ] T-U06-006 Implement `Packages/VisualCore/Sources/VisualCoreDiagnostics/QualityGovernor.swift` on the existing `QualityPolicy` (Low Power ceiling `min(1, count − 1)`, `minimumInterval = 1`); T-U06-005 passes (FR-U06-010 to FR-U06-012, FR-U06-014).
+- [ ] T-U06-007 [P] Tests first: `Packages/VisualCore/Tests/VisualCoreDiagnosticsTests/PacingMeterTests.swift` — five scripted interval sequences with known late frames give exact `samples`, `onTime`, `missed`, `invalid`, `medianMs`, `p95Ms`, `p99Ms` (bins of 0.25 ms, upper edge); an interval of at most 1.5 periods is on time; a longer one misses `max(1, round(interval / period) − 1)`; non-finite, negative and zero intervals and bad periods are invalid and no sample; `skipNext()` drops one interval; intervals beyond 250 ms land in the last bin; the summary without samples has no percentile; the meter's size is the same after 1,000 and after 1,000,000 records; `PacingSummary` codes and decodes.
+- [ ] T-U06-008 Implement `Packages/VisualCore/Sources/VisualCoreDiagnostics/PacingMeter.swift` (`PacingMeter` with `binWidth = 0.00025`, `binCount = 1000`; `PacingSummary`); T-U06-007 passes (FR-U06-030 to FR-U06-032).
+- [ ] T-U06-009 [P] Tests first: `Packages/VisualCore/Tests/VisualCoreDiagnosticsTests/GrowthRuleTests.swift` — 59 samples give `.tooFewSamples(59)`; flat samples give `.flat(footprintChecked: true)`; graphics bytes above the warm-up maximum give `.grew(quantity: "gpu_bytes", by:)`; a footprint that rises by more than `max(8 MiB, 5%)` between the first quarter after the warm-up and the last quarter gives `.grew(quantity: "memory_footprint_bytes", by:)`, one just inside the margin passes; samples without footprint give `.flat(footprintChecked: false)`; growth inside the warm-up tenth is allowed.
+- [ ] T-U06-010 Implement `Packages/VisualCore/Sources/VisualCoreDiagnostics/GrowthRule.swift` (`ResourceSample`, `GrowthVerdict`, `GrowthRule` with `minimumSamples = 60`, `footprintMarginBytes = 8 MiB`, `footprintMarginShare = 0.05`); T-U06-009 passes (FR-U06-051).
+- [ ] T-U06-011 [P] Tests first: `Packages/VisualCore/Tests/VisualCoreDiagnosticsTests/PerformanceRecordTests.swift` — a record with every field set reads back equal and its text has sorted keys; a record with only the required fields has no key for an absent measurement; at least 8 refused texts with their codes (not JSON, not an object, version 2 `performance.newer-version`, version 0 `performance.unknown-version`, a missing required key, an unknown key, a wrong type, a non-finite or negative number, an unknown thermal name, more than 65,536 bytes); `passes` is false with a late compilation.
+- [ ] T-U06-012 Implement `Packages/VisualCore/Sources/VisualCoreDiagnostics/PerformanceRecord.swift` (`PerformanceRecord` version 1 with the keys of data-model section 5, `PerformanceRecordError` with stable codes, `LaunchTiming`); T-U06-011 passes (FR-U06-040 to FR-U06-042).
+- [ ] T-U06-013 Record the public API of Phase 2: `python3 scripts/check_public_api.py --update`; the check passes with 0 undocumented symbols and the baseline lost no line. Proof: `swift test --package-path Packages/VisualCore --filter VisualCoreDiagnosticsTests` passes.
+
+## Phase 3: User Story 1 - Each experience says in numbers what its quality levels mean (Priority: P1) 🎯 MVP
+
+**Goal**: an experience declares a profile; the count and the names are checked; a level change keeps the digest.
+**Independent test**: the conformance run of the sample core with its profile of three levels.
+
+- [ ] T-U06-014 [US1] Tests first in `Packages/VisualCore/Tests/VisualCoreExperienceTests/` (the conformance test file and a new `QualityDeclarationTests.swift`): a core without a declared profile has `uniform(levels: qualityTiers)`; the sample core's profile has three named levels; the conformance run reports `profileMatchesTiers` as passed for the sample core and as failed, naming the counts, for a test core whose profile has a different count; `tierKeepsDigest` still covers every level of the profile.
+- [ ] T-U06-015 [US1] Add `static var qualityProfile: QualityProfile` with its default to `Packages/VisualCore/Sources/VisualCoreExperience/ExperienceCore.swift`, the check `profileMatchesTiers` to `ExperienceConformance.swift`, and a declared profile of three levels to `Packages/VisualCore/Sources/VisualCoreTestSupport/SampleExperienceCore.swift`; update the API baseline; T-U06-014 passes (FR-U06-004, FR-U06-005; SC-U06-001).
+- [ ] T-U06-016 [US1] Give the debug experience a declared profile of two levels in `Apps/VisualCore/App/DebugSupport/DebugExperience.swift`, and add to `Apps/VisualCore/Tests/Unit/AppModelTests.swift` a test that every registered experience of the real registry has profile names equal to the catalog's `quality_tiers` (`QualityDeclaration.problems` is empty; today the registry is empty) and that the fixture experiences pass the count check. Proved in the app's unit chunk.
+
+## Phase 4: User Story 2 - Quality follows the device, and a pinned level stays pinned (Priority: P1)
+
+**Goal**: the session applies the level in force before the first frame and decides while running.
+**Independent test**: `SessionQualityTests` on the simulator with scripted conditions.
+
+- [ ] T-U06-017 [US2] Tests first: `Packages/VisualCoreRendering/Tests/VisualCoreExperienceHostTests/SessionQualityTests.swift` — with `qualityPin = 2` the experience's diagnostics show level 2 when the first frame is drawn, and after `retry()`; a pin beyond the profile gives the last level; with automatic and scripted `conditions` the level steps down and up as `refreshQuality(now:)` is called with scripted times; no level changes while suspended and the calm period restarts after a resume; changing `qualityPin` while an experience runs applies at once; the digest of the experience is the same as without any level change; `qualityLevel` is 0 without an experience.
+- [ ] T-U06-018 [US2] Add `var qualityProfile: QualityProfile { get }` with a default (`.single`) to the `Experience` protocol in `Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperiencePresenter.swift` and return the core's profile from `ExperienceShell.swift`.
+- [ ] T-U06-019 [US2] In `Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceSession.swift` add `qualityPin`, `conditions`, `qualityLevel` and `refreshQuality(now:)`: a `QualityGovernor` per open experience, the level in force applied after the preparation and before the render host exists, a decision from the frame hook at most once per second while running, none while suspended, `resume()` on resume; update the API baseline; T-U06-017 passes (FR-U06-010 to FR-U06-014).
+- [ ] T-U06-020 [US2] In `Apps/VisualCore/App/AppModel.swift` hand the stored override to `session.qualityPin` (at start and on every change) and remove the app's own `applyQualityOverride` and session watching; `lastAppliedTier` reads the session's level when a level is pinned; rewrite the settings note in `Apps/VisualCore/Resources/Localizable.xcstrings` (what automatic does; a pinned level beyond an experience's levels means its last level); adapt `Apps/VisualCore/Tests/Unit/AppModelTests.swift` (override at the first frame, after a retry). Proved in the app's unit chunk and the settings chunk (FR-U06-013, FR-U06-015).
+
+## Phase 5: User Story 3 - Opening is measured stage by stage; shaders never compile in an interactive frame (Priority: P1)
+
+**Goal**: separate times for preparation, shader set-up and first present; late compilations counted; one launch time.
+**Independent test**: `SessionPerformanceTests` on the simulator.
+
+- [ ] T-U06-021 [US3] Tests first: `Packages/VisualCoreRendering/Tests/VisualCoreExperienceHostTests/SessionPerformanceTests.swift` (stages part) and a presenter variant in `SamplePresenter.swift` that compiles a program in its tenth frame — after an open, `timings.prepare`, `timings.setup` and `timings.programsCompiled` are set and zero or more; without a display `timings.firstPresent` is nil and the record says `presented == false`; with presented frames (`renderOneFrame()` on a host with a surface) `firstPresent` is set once and does not change; a failed set-up leaves `prepare` set and `setup`, `firstPresent` nil; a cancelled preparation leaves every stage nil; 600 interactive frames of the sample give 0 late compilations; the late-compiling presenter gives exactly 1 and `passes == false`; a context recreation counts 1 rebuild and 0 late compilations; old encoded `SessionStageTimings` decode with the new fields nil.
+- [ ] T-U06-022 [US3] Add `setup`, `firstPresent` and `programsCompiled` to `SessionStageTimings` in `Packages/VisualCore/Sources/VisualCoreExperience/SessionLifecycle.swift` (with a coding test in `VisualCoreExperienceTests`), and `PresentedFrame` with `RenderHost.addPresentObserver(_:)` in `Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift` (called on the main thread after a successful present, with a test in the rendering tests); update the API baseline.
+- [ ] T-U06-023 [US3] In `ExperienceSession.swift` time the scene's set-up in the session's scene wrapper, read `resources.compileCount` at the end of the set-up, take the compile baseline when the session runs and after a context recreation (counted as a rebuild), count late compilations from the frame hook, and set `firstPresent` from the present observer; T-U06-021 passes (FR-U06-020 to FR-U06-023; SC-U06-004, SC-U06-005).
+- [ ] T-U06-024 [US3] Launch time in the app: take a start instant in the initializer of the app type (`Apps/VisualCore/App/VisualCoreApp.swift`), end it at the first appearance of the launcher or the welcome (`RootView.swift`), mark the first start (no stored preferences), hand `LaunchTiming` to `session.launch` once per process; link the product `VisualCoreDiagnostics` in `project.yml` and adapt the product-list test in `scripts/test_scripts.py`; unit tests in `AppModelTests.swift` (set once, first start marked, no render host exists before it is set). Proved in the app's unit chunk (FR-U06-024).
+
+## Phase 6: User Story 4 - Pacing, memory and graphics memory are observed and recorded (Priority: P2)
+
+**Goal**: one performance record per session.
+**Independent test**: `SessionPerformanceTests` (record part) and the app's interface test.
+
+- [ ] T-U06-025 [US4] Tests first: extend `SessionPerformanceTests.swift` (record part) — `performanceRecord` is nil without an experience and holds every required field while one is open; presented frames give pacing samples, a suspension and resume add no missed refresh; `memory_footprint_bytes` is present on the simulator and positive; `gpu_bytes` and `gpu_peak_bytes` equal the registry's statistics; a memory warning counts one memory event; after a close `lastPerformanceRecord` is the frozen record and `performanceRecord` is nil; the record's text reads back equal; a measured run has the same digest as an unmeasured one.
+- [ ] T-U06-026 [P] [US4] Add `Packages/VisualCoreRendering/Sources/VisualCoreRendering/ProcessMemory.swift` (`ProcessMemory.footprint() -> Int?` through `task_info`, nil when the call fails) with a test in the rendering tests (positive on the simulator); update the API baseline; `python3 scripts/check_privacy_manifest.py` still passes.
+- [ ] T-U06-027 [US4] In `ExperienceSession.swift` feed the `PacingMeter` from the present observer (period from the frame pacing's cap; first interval after a resume skipped), assemble `performanceRecord`, freeze `lastPerformanceRecord` at a close and after a failed open, add `launch`; update the API baseline; T-U06-025 passes (FR-U06-030 to FR-U06-034, FR-U06-040).
+- [ ] T-U06-028 [US4] Debug access in the app: `Apps/VisualCore/App/SettingsView.swift` shows the text of `session.lastPerformanceRecord` in the debug diagnostics with the identifier `vc.performance` (the identifier and the view exist only under `#if DEBUG`); `Apps/VisualCore/Tests/UI/SettingsUITests.swift` opens a fixture experience, leaves it, opens the settings and reads a record with `prepare_ms`, `setup_ms`, `first_present_ms`, pacing samples above 0, `late_compilations` 0 and `launch_ms`; `AppModelTests.swift` reads the record after an open and a close. Proved in the app's settings and unit chunks (FR-U06-043).
+
+## Phase 7: User Story 5 - Ten minutes of running do not grow memory or graphics memory (Priority: P2)
+
+- [ ] T-U06-029 [US5] Tests first, then the scenario: `Packages/VisualCoreRendering/Tests/VisualCoreExperienceHostTests/EnduranceTests.swift` and a leaking presenter variant in `SamplePresenter.swift` — the sample experience runs 36,000 drawn frames of 1/60 s (72,000 steps) with a scripted action every 600 frames, sampling `ProcessMemory.footprint()` and the registry's bytes every 600 frames (60 samples); `GrowthRule.judge` gives `.flat`; the state digest equals the digest of the same scenario run by the engine alone; the leaking presenter (one small texture more per frame, never released) gives `.grew(quantity: "gpu_bytes", …)` over 60 samples. The test must end in under five minutes on a simulator (FR-U06-050 to FR-U06-052; SC-U06-008).
+
+## Phase 8: User Story 6 - Budgets are proposals with their confirming device measurement (Priority: P3)
+
+- [ ] T-U06-030 [P] [US6] Tests first in `scripts/test_scripts.py`, then `scripts/check_performance_docs.py` and the step `performance-docs` in `scripts/release_check.py`: a budget table row without `proposal` status or without a confirming measurement that names D1, D2 or D3 and a sample count fails with file and line; a file under the directory that mentions a simulator without the notice "Simulator numbers are development signals, not device performance." fails; the real `docs/performance/` passes after T-U06-031.
+- [ ] T-U06-031 [P] [US6] Write `docs/performance/budgets.md` (the budgets of Auto-Creator.md section 12.5 as rows with `Budget`, `Proposal`, `Status` = `proposal`, `Confirmed by`: devices, scenario, samples; the limit of the launch measurement; the notice) and add the notice and a link to `docs/performance/README.md`. Proof: `python3 scripts/check_performance_docs.py` passes and a scratch copy with a simulator number without the notice fails (FR-U06-060 to FR-U06-062; SC-U06-009).
+
+## Phase 9: Framework obligations and documents
+
+- [ ] T-U06-032 API baseline, rules and boundaries (FR-U06-070 to FR-U06-072; SC-U06-010): `python3 scripts/check_public_api.py --update` leaves no difference and the check passes with 0 undocumented symbols; the baseline lost no line since `18693bb`; `git diff --stat 18693bb -- External Vendor Showcase Harnesses Apps/GenerativeArtStudio Apps/FluidArtPlayground Apps/FractalExplorer Apps/ParticleUniverse` prints nothing; `python3 scripts/check_dependencies.py`, `python3 scripts/check_privacy_manifest.py`, `python3 scripts/check_compliance.py` and the three `documented-api` checks pass; `python3 scripts/check_app_isolation.py --experiences Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost Packages/VisualCore/Sources/VisualCoreExperience` passes.
+- [ ] T-U06-033 Documents as built: Auto-Creator.md sections 11.4 (stage order with the level and the set-up), 12.4 to 12.6 (profile, governor, measurements, record, budgets document) and 16 (new files), edited in place; `python3 scripts/render_autocreator.py` and `python3 scripts/validate_autocreator.py` pass; data-model.md gains an "As built" section.
+- [ ] T-U06-034 Consumers: after `python3 scripts/release_check.py --only xcodegen`, build for testing into `Build/DerivedData/ua-f06-<Scheme>` the schemes `Showcase`, `GenerativeArtStudio`, `FluidArtPlayground`, `FractalExplorer`, `ParticleUniverse` and the harness projects `InteractiveDemo` and `SecondConsumer`, recorded as `build-<Scheme>`: exit 0 seven times, no tracked file changed.
+
+## Phase 10: Evidence and convergence
+
+- [ ] T-U06-035 Evidence `diagnostics-host`: `swift test --package-path Packages/VisualCore --filter VisualCoreDiagnosticsTests`; and `host-visualcore`: `swift test --package-path Packages/VisualCore`.
+- [ ] T-U06-036 Evidence `pure-ios27` and `pure-ios26`: the pure package tests on both simulator runtimes.
+- [ ] T-U06-037 Evidence `rendering-ios27` and `rendering-ios26`: the rendering package tests on both simulator runtimes (`--result-name ua-f06-ios27`, `ua-f06-ios26`).
+- [ ] T-U06-038 Evidence `endurance-ios27` and `endurance-ios26`: `python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --only-testing VisualCoreExperienceHostTests/EnduranceTests` (and `sim-26.5`).
+- [ ] T-U06-039 Evidence of the app on the final sources: `xcodegen`, `app-build`, and the 16 chunks `app-phone-ios27-a/-b/-c/-d`, `app-tablet-ios27-a/-b/-c/-d`, `app-phone-ios26-a/-b/-c/-d`, `app-tablet-ios26-a/-b/-c/-d` with `python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime <27.2|26.5> --kind <phone|tablet> --only-testing …`.
+- [ ] T-U06-040 Evidence `release-build`, `release-symbols` (`python3 scripts/check_release_symbols.py --app <release app> --forbid DebugLaunch DebugExperience vc.performance`: 0 found; the debug build contains them with `--expect-present`), `compliance`, `app-isolation`, `performance-docs`, `public-api`, `dependencies`.
+- [ ] T-U06-041 Evidence `reference-a` and `reference-b`: the two chunks of the ProjectM reference regression (3 of 3 and 4 of 4).
+- [ ] T-U06-042 Evidence `script-tests`, `docs`, `steering`; then confirm with `gh run list` that the `ci` and `push-scan` runs of the last pushed commit succeeded (no open-ended wait: a queued run is checked again later while other work goes on).
+- [ ] T-U06-043 Run `/speckit-converge` for UA-F06; run `/speckit-implement` for every task it appends and `/speckit-converge` again, until a run appends nothing; then `python3 scripts/migration_ledger.py seal --gate UA-F06` and `python3 scripts/migration_ledger.py record --gate UA-F06`.
+- [ ] T-U06-044 {device} After ImplementationLock-100, on D1, D2 and D3: frame pacing, memory footprint, thermal behaviour (automatic steps under real heat and Low Power Mode) and shader set-up time, with at least 200 samples for every percentage criterion, a wall-clock endurance run of ten minutes or more, cold and warm launch apart; the results confirm or correct the proposals of `docs/performance/budgets.md`. Not run before the lock (`python3 scripts/migration_ledger.py guard-device`); does not block the gate.
+
+No `{owner}` task: the brief names no owner-only item.
+
+## Dependencies and order
+
+- Phase 1 → Phase 2 → the stories. US1 (Phase 3) needs T-U06-004 and T-U06-001. US2 (Phase 4) needs US1's protocol
+  addition and T-U06-006. US3 (Phase 5) needs T-U06-012 for `LaunchTiming` and the session of Phase 4. US4
+  (Phase 6) needs US3's observer and T-U06-008, T-U06-012. US5 (Phase 7) needs T-U06-010 and T-U06-026. US6
+  (Phase 8) is independent. Phases 9 and 10 come last.
+- One writer per file: `ExperienceSession.swift` is written by T-U06-019, T-U06-023 and T-U06-027 in this order,
+  by the lead; `AppModelTests.swift` by T-U06-016, T-U06-020, T-U06-024, T-U06-028 in this order.
+
+## Parallel opportunities
+
+- Phase 2: the five test files (T-U06-003, 005, 007, 009, 011) and their five sources are independent pairs; each
+  pair can go to one agent.
+- T-U06-002, T-U06-026, T-U06-030 and T-U06-031 touch files nothing else touches.
+
+## Implementation strategy
+
+MVP is Phase 1 to Phase 3 (a declared, checked profile). Then US2 and US3 (the session), US4 (the record), US5
+(endurance), US6 (the document). Evidence is recorded once, on the final sources, after the last code change.
