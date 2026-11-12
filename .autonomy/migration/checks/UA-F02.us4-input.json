@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/VisualCore",
+    "--filter",
+    "ExperienceActionTests|ExperienceEngineInputTests"
+  ],
+  "command": "swift test --package-path Packages/VisualCore --filter 'ExperienceActionTests|ExperienceEngineInputTests'",
+  "elapsed_seconds": 2.039,
+  "exit_code": 0,
+  "finished": "2026-11-12T11:23:54+00:00",
+  "gate": "UA-F02",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F02.us4-input.log",
+  "log_sha256": "1fea1b51d509e34fc78f61be7adb01fd9f1941c7267b3f3351c66cd2945d6590",
+  "name": "us4-input",
+  "started": "2026-11-12T11:23:52+00:00",
+  "timed_out": false
+}
