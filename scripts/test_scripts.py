@@ -2213,6 +2213,32 @@ class BuildCatalogTests(unittest.TestCase):
             self.assertEqual(code, 1, argv)
             self.assertIn("a99.nothing", out, argv)
 
+    def test_backlog_round_enters_with_its_gate_and_ids_never_collide(self):
+        # Edge cases of the specification: backlog rounds (FR-U01-012) and colliding ids (FR-U01-044).
+        self.assertEqual(self.run_tool()[0], 0)
+        self.assertEqual(len(self.manifest()["experiences"]), 100)
+        self.assertFalse(any(e["code"].startswith("R05") for e in self.manifest()["experiences"]))
+        self.edit(".autonomy/migration/ledger.json", lambda ledger: ledger["gates"].append(
+            {"id": "X-R05-G01", "kind": "experience", "title": "backlog", "depends": [], "status": "pending", "attempts": []}))
+        code, out = self.run_tool()
+        self.assertEqual(code, 0)
+        self.assertIn("101 experiences, 50 free, 51 premium, 0 available", out)
+        last = self.manifest()["experiences"][-1]
+        self.assertEqual((last["code"], last["tier"], last["available"], last["order"]), ("R05-G01", "premium", False, 101))
+        before = self.tree()
+
+        def collide(catalog):
+            first, second = catalog["experiences"][0], catalog["experiences"][1]
+            second.update(code=first["code"], slug=first["slug"], id=first["id"])
+        self.edit("docs/catalog/experience-catalog.json", collide)
+        code, out = self.run_tool()
+        self.assertEqual(code, 1)
+        self.assertIn("docs/catalog/experience-catalog.json", out)
+        self.assertIn("twice", out)
+        after = self.tree()
+        after["docs/catalog/experience-catalog.json"] = before["docs/catalog/experience-catalog.json"]
+        self.assertEqual(after, before)
+
     def test_unreadable_or_misallocated_planning_catalog_is_an_error(self):
         planning = self.root / "docs/catalog/experience-catalog.json"
         good = planning.read_bytes()

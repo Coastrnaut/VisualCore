@@ -137,6 +137,14 @@ import Testing
         invalid(2, "palette", (0..<9).map { _ in "#000000" }); invalid(2, "palette", ["red"]); invalid(2, "palette", ["#12345G"])
         invalid(2, "capabilities", (0..<17).map { "c\($0)" }); invalid(2, "capabilities", [String(repeating: "c", count: 41)])
         invalid(2, "quality_tiers", (0..<9).map { "q\($0)" })
+        invalid(2, "tags", ["wave-mathematics", String(repeating: "t", count: 61)])
+        invalid(2, "quality_tiers", [String(repeating: "q", count: 41)])
+        let atTheLimits = ManifestBuilder.changing {
+            $0.set(2, "tags", ["wave-mathematics", String(repeating: "t", count: 60)])
+            $0.set(2, "quality_tiers", [String(repeating: "q", count: 40)])
+            $0.set(2, "capabilities", [String(repeating: "c", count: 40)])
+        }
+        #expect((try? CatalogManifest(data: atTheLimits)) != nil)
         invalid(2, "category", "puzzle")           // a creative experience is never a puzzle
         invalid(30, "category", "create")          // a game is always a puzzle
         invalid(2, "content", ["levels": 1, "catalog_sha256": String(repeating: "0", count: 64)])   // content belongs to games

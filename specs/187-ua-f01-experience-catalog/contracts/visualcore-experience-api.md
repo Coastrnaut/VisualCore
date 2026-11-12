@@ -22,6 +22,17 @@ them.
 | `RegistryReport` | struct: `missingRegistrations`, `unexpectedRegistrations`, `duplicates` (each `[ExperienceID]`, sorted), `isMatch` | FR-U01-050 |
 | `SourceMoveMap` | struct: `moves: [Move]` with `from`, `to`, `gate`, `commit`; `init(data: Data) throws(CatalogError)` | FR-U01-046 |
 
+Public symbols added while building, each needed outside the module:
+
+| Symbol | Why it is public |
+|---|---|
+| `CatalogManifest.launchCodes` | the 100 launch codes in catalog order; the app shell and its tests compare against the rule instead of copying it |
+| `ExperienceDescriptor.tag(forFamily:)` | the one definition of the tag form; the launcher groups puzzles by family with it |
+| `ExperienceID.maxSlugLength`, `SourceMoveMap.maxMoves` | the limits as values, for callers that validate before building data |
+| `RegistryReport.init(missingRegistrations:unexpectedRegistrations:duplicates:)`, `SourceMoveMap.Move.init(from:to:gate:commit:)`, `ExperienceContent.init(levels:catalogSHA256:)` | value types that tests of other modules construct for comparison |
+
+`ExperienceDescriptor` has no public initializer: a descriptor only comes out of a validated manifest.
+
 Behavior that the tests pin:
 
 - `ExperienceID(text).rawValue == text` for every valid text; an invalid text throws `malformed` with a reason.

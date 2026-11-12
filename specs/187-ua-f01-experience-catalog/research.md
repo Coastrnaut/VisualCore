@@ -80,10 +80,11 @@ Added names (new): `ExperienceCode`, `ExperienceKind`, `ExperienceIDError`, `Cat
 
 ## R5. One generated source, identical copies for the tests
 
-- **Decision**: `scripts/build_catalog.py` writes `Catalog/experiences.json`, `Catalog/categories.json` (when
-  missing; afterwards it only validates it), `Catalog/experience-ids.golden.txt` is committed by hand-run of
-  `--add-golden` and never rewritten otherwise, and the tool copies the four catalog files and the golden list
-  into `Packages/VisualCore/Tests/VisualCoreExperienceTests/Fixtures/Catalog/`. `--check` compares every file and
+- **Decision**: `scripts/build_catalog.py` writes `Catalog/experiences.json`; `Catalog/categories.json`,
+  `Catalog/registrations.json` and `Catalog/path-map.json` are written by hand and validated by the tool (as
+  built: the tool never writes them); `Catalog/experience-ids.golden.txt` is written only by `--add-golden` and
+  only grows; and the tool copies the four JSON files and the golden list into
+  `Packages/VisualCore/Tests/VisualCoreExperienceTests/Fixtures/Catalog/`. `--check` compares every file and
   copy with what it would write.
 - **Rationale**: SwiftPM test resources must be inside the test target's directory; a copy that a check keeps
   identical is simpler and more portable than reading repository paths from a simulator test.

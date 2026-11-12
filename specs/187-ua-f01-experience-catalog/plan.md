@@ -98,7 +98,7 @@ Packages/VisualCore/
 │   ├── CatalogSearch.swift                                  fold, search, ranking
 │   ├── RegistryReport.swift                                 registry check
 │   └── SourceMoveMap.swift                                  loader of Catalog/path-map.json
-├── Tests/VisualCoreExperienceTests/                new      Swift Testing; Fixtures/Catalog (copies), Fixtures/Damaged
+├── Tests/VisualCoreExperienceTests/                new      Swift Testing; Fixtures/Catalog (copies); damaged manifests are built in code by ManifestBuilder (as built: no Fixtures/Damaged folder)
 └── Tests/VisualCoreScaffoldTests/ScaffoldTests.swift  modify  version of the new module
 
 Catalog/                                            new
