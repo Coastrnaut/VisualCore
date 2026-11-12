@@ -69,3 +69,8 @@ appends nothing.
 ## Analyze fixes (2026-11-11, owner delegation)
 
 U1 plan lists `ParticleSystem.liveCount(source:)`; F1 SC-A04-303 aligned with research R1 (per-frame 1/255, cross-rate 2/255); E1 background round trip with trails in T-A04-312; E2 zero-size drawable in T-A04-305. No critical issues; no speculative dependencies.
+
+## Phase 7: Convergence
+
+- [ ] T-A04-316 Refresh Reduce Flashing in `Apps/ParticleUniverse/App/SceneModel.swift` when any of `SystemAccessibilityObserver.changeNotifications` arrives (observer added on init, removed in `tearDown()`), so the brightness cap follows the system setting while the sandbox is open; verify by build and the full UI scheme on both runtimes, per plan "Lifecycle contracts" (contradicts)
+- [ ] T-A04-317 Add a UI test in `Apps/ParticleUniverse/Tests/UI/SandboxEmitterUITests.swift`: changing the selected emitter's family keeps its size override, and removing the selected Emitter 3 selects Emitter 2; run on iOS 27.2 and 26.5 with the enumeration guard, per spec §Edge Cases (partial)
