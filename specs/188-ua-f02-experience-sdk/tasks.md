@@ -1,0 +1,172 @@
+---
+
+description: "Task list for feature 188 — UA-F02 ExperienceKit: the experience contract (migration ledger gate UA-F02)"
+---
+
+# Tasks: UA-F02 — ExperienceKit: the experience contract
+
+**Input**: `specs/188-ua-f02-experience-sdk/` (spec, plan, research, data-model,
+contracts/experience-core-api.md, contracts/experience-host-api.md, quickstart).
+
+**Tests** are required by the specification (acceptance items 1 to 8): Swift Testing in
+`Packages/VisualCore/Tests`, XCTest in `Packages/VisualCoreRendering/Tests/VisualCoreExperienceHostTests` and
+`unittest` in `scripts/test_scripts.py`, each written before the code it proves and seen to fail (a test file
+that does not compile yet counts as failing).
+
+**Conventions**: ids `T-U02-###`; one commit and push per task through `scripts/tick_task.py`; a test task and the
+implementation it proves are committed together so that `main` is never red, and the API baseline is updated in
+every commit that adds a public symbol; gate evidence through
+`python3 scripts/migration_ledger.py run-check --gate UA-F02 --name <check-name> -- <command>` (simulator, symbol
+and reference commands with `--timeout 600`). "The commit before the feature" is `da63929`. Every public symbol
+gets its `///` documentation in the task that adds it. Signatures are those of the two contracts; limits are
+those of research.md R12. `[P]` marks a task whose files no other open task writes: such tasks may be given to
+parallel agents, which write files only; the lead builds, tests, ticks and commits. Review checkpoint after each
+phase: the named tests and `python3 scripts/validate_docs.py` pass.
+
+**Order of stories**: by dependency, not by number: lifecycle (US1), determinism and the engine (US2), snapshots
+(US3), input (US4), diagnostics and automation (US6, its pure part), rendering (US5, with the shell's part of
+US6), conformance (US7).
+
+**Not applicable**: the brief names no device-only and no owner-only item, so there is no `{device}` and no
+`{owner}` task.
+
+## Phase 1: Setup
+
+- [ ] T-U02-001 Declare the modules: in `Packages/VisualCore/Package.swift` give `VisualCoreExperience` the dependencies `VisualCoreMath`, `VisualCoreSimulation` and `VisualCorePersistence`, give `VisualCoreShaderSource` the dependency `VisualCoreMath`, give `VisualCoreTestSupport` the added dependency `VisualCoreExperience`, and give the test target `VisualCoreExperienceTests` the added dependencies `VisualCoreTestSupport`, `VisualCorePersistence` and `VisualCoreSimulation`; in `Packages/VisualCoreRendering/Package.swift` add the target `VisualCoreExperienceHost` (dependencies `VisualCoreRendering` and the products `VisualCoreExperience` and `VisualCoreDiagnostics`), the library product of the same name, and the test target `VisualCoreExperienceHostTests` (dependencies `VisualCoreExperienceHost`, `VisualCoreRendering`, `CVisualCoreGL` and the products `VisualCoreExperience` and `VisualCoreTestSupport`); create `Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/Module.swift` (`ExperienceHostInfo.version = "1.0.0-rc.1"`) and `Packages/VisualCoreRendering/Tests/VisualCoreExperienceHostTests/ModuleTests.swift` (the version is not empty); set `ExperienceInfo.version` to `1.1.0-rc.1` in `Packages/VisualCore/Sources/VisualCoreExperience/Module.swift`. Proof: `swift build --package-path Packages/VisualCore`, `python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination generic-sim --action build` and `python3 scripts/check_dependencies.py` succeed.
+
+## Phase 2: Foundational (value types every story needs)
+
+- [ ] T-U02-002 [P] Write `Packages/VisualCore/Tests/VisualCoreMathTests/StableHashTests.swift`: SHA-256 of the empty message, of `abc`, of the 56-byte FIPS message `abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq` and of 1,000,000 times `a` equal the FIPS 180-4 values; `sha256` returns 32 bytes; `sha256Hex` is 64 lower-case hexadecimal digits. The file does not compile before T-U02-003.
+- [ ] T-U02-003 Move the implementation from `Packages/VisualCore/Sources/VisualCoreShaderSource/SHA256.swift` to the new `Packages/VisualCore/Sources/VisualCoreMath/StableHash.swift` as `public enum StableHash` (`sha256(_:)`, `sha256Hex(_:)`); `SHA256.swift` keeps `ShaderCacheKey`, which now calls `StableHash`. Proof: `swift test --package-path Packages/VisualCore --filter "StableHashTests|SHA256Tests"` passes with `SHA256Tests.swift` unchanged.
+- [ ] T-U02-004 Write `Packages/VisualCore/Tests/VisualCoreExperienceTests/ExperienceErrorTests.swift`: the code of every case of `DigestError`, `SnapshotError`, `ActionRejection`, `ActionResult` and `ExperienceError` equals the text in contracts/experience-core-api.md; `ExperienceFailure` replaces a code that is empty, longer than 64 characters or holds a character outside `a-z`, `0-9`, `.`, `-` by `experience.unspecified` and cuts a message to 500 characters; `ExperienceError.failure` carries the same code; `ExperienceFailure` survives a JSON round trip.
+- [ ] T-U02-005 Create `Packages/VisualCore/Sources/VisualCoreExperience/ExperienceError.swift` (`ExperienceFailure`, `DigestError`, `SnapshotError`, `ActionRejection`, `ActionResult`, `ExperienceError`, each with its codes) and `Packages/VisualCore/Sources/VisualCoreExperience/ExperienceLifecycle.swift` with the declarations `ExperienceLifecycleState`, `ExperienceOperation` and `ExperienceLifecycleEvent` only (FR-U02-001, FR-U02-063). Proof: `swift test --package-path Packages/VisualCore --filter ExperienceErrorTests` passes.
+- [ ] T-U02-006 [P] Write `Packages/VisualCore/Tests/VisualCoreExperienceTests/StateDigestTests.swift`: the byte layout of data-model.md section 3 field by field (a builder with one field hashes to `StableHash.sha256Hex` of the expected bytes); the domain is the first field; `("ab","c")` and `("a","bc")` differ; an `Int` and a `UInt64` of the same value differ; `add(count:)` separates `[1,2],[3]` from `[1],[2,3]`; −0.0 equals 0.0; NaN and both infinities throw `DigestError.nonFinite` with the field index; `StateDigest(hex:)` accepts exactly 64 lower-case hexadecimal digits and encodes as one JSON string.
+- [ ] T-U02-007 [P] Create `Packages/VisualCore/Sources/VisualCoreExperience/StateDigest.swift` (`StateDigest`, `DigestBuilder`; FR-U02-013, FR-U02-015). Proof: `swift test --package-path Packages/VisualCore --filter StateDigestTests` passes.
+- [ ] T-U02-008 [P] Write `Packages/VisualCore/Tests/VisualCoreExperienceTests/ExperienceActionTests.swift`: `ExperienceControl` drops ranges beyond 8; `ExperienceInput.validate` answers, in this order, unknown control, wrong value count, the first value that is not finite, the first value out of range, and nil for a well-formed action (a table of at least 12 rows, including a control without values and values on the range ends); `ExperienceInput.normalized` maps the corners and the centre of a 200 × 100 view to 0, 1 and 0.5, and returns nil outside the view, for a width or height of 0 or below, and for values that are not finite; `ExperienceAction` and `ScriptedAction` survive a JSON round trip.
+- [ ] T-U02-009 [P] Create `Packages/VisualCore/Sources/VisualCoreExperience/ExperienceAction.swift` (`ExperienceControl`, `ExperienceAction`, `ScriptedAction`, `ExperienceInput`; FR-U02-030, FR-U02-031, FR-U02-034, FR-U02-035). Proof: `swift test --package-path Packages/VisualCore --filter ExperienceActionTests` passes.
+
+**Checkpoint**: the value types exist; the engine can be written against them.
+
+## Phase 3: User Story 1 - An experience can only be driven in a legal order (Priority: P1) 🎯 MVP
+
+**Goal**: the lifecycle reducer. **Independent Test**: all 64 state pairs and all 96 operation cells.
+
+- [ ] T-U02-010 [P] [US1] Write `Packages/VisualCore/Tests/VisualCoreExperienceTests/LifecycleTests.swift`: a new lifecycle is registered; all 64 ordered pairs compared with the table of data-model.md section 1 (exactly 20 accepted, 44 rejected; a rejection keeps the state, adds exactly one to `rejectedTransitions` and is recorded with `accepted == false`); all 96 operation cells compared with section 2 (exactly 28 legal; `permit` throws `.illegalOperation(operation, in: state)` and adds exactly one to `rejectedOperations` otherwise); the seven-transition walk of US1 scenario 1; `fail` stores the failure and is rejected in failed; `transition(to: .failed)` stores `experience.unspecified`; preparing → ready clears `lastError`, every other transition keeps it; the history keeps at most `historyLimit` events (default 64, a limit below 1 becomes 1) and drops the oldest first.
+- [ ] T-U02-011 [P] [US1] Add `ExperienceLifecycle` to `Packages/VisualCore/Sources/VisualCoreExperience/ExperienceLifecycle.swift` (FR-U02-002 to FR-U02-006). Proof: `swift test --package-path Packages/VisualCore --filter LifecycleTests` passes.
+- [ ] T-U02-012 [US1] Acceptance of US1: record `python3 scripts/migration_ledger.py run-check --gate UA-F02 --name us1-lifecycle -- swift test --package-path Packages/VisualCore --filter LifecycleTests` (SC-U02-001).
+
+## Phase 4: User Story 2 - The same seed always gives the same experience (Priority: P1)
+
+**Goal**: the core protocol, the sample, the engine's preparation, lifecycle calls and fixed steps.
+**Independent Test**: 256 seeds twice; four frame patterns; cancellation.
+
+- [ ] T-U02-013 [US2] Create `Packages/VisualCore/Sources/VisualCoreExperience/ExperienceCore.swift`: the protocol `ExperienceCore` with its defaults (`qualityTiers` 1, `stepDuration` 1/120, empty `setQualityTier` and `shedCaches`, and for `Codable` cores `snapshotPayload()` with sorted keys and `restore(payload:seed:)`), as in the contract (FR-U02-010, FR-U02-020). Proof: `swift build --package-path Packages/VisualCore` succeeds.
+- [ ] T-U02-014 [P] [US2] Create `Packages/VisualCore/Sources/VisualCoreTestSupport/SampleExperienceCore.swift`: `SampleFaultKind`, the protocol `SampleFault`, one marker type per kind (`NoFault`, `UnseededPreparation`, `LossySnapshot`, `WrongReset`, `MutatingRejection`, `TierChangesState`, `SheddingChangesState`, `ClockInUpdate`, `SlowPreparation`, `FailingPreparation`) and `SampleExperienceCore<Fault>` exactly as data-model.md section 7 states (fields, controls `move`, `tone`, `ping`, rule codes `sample.wall` and `sample.no-move`, 3 tiers, schema version 2 with the step 1 → 2 that adds `"energy": 0`, preparation in 256 rounds of `SplitMix64` with a cancellation check between rounds, each fault's behavior). Proof: `swift build --package-path Packages/VisualCore` succeeds.
+- [ ] T-U02-015 [US2] Write `Packages/VisualCore/Tests/VisualCoreExperienceTests/ExperienceEngineTests.swift`: a new engine is registered with no core, seed or digest (`digest()` throws `.notPrepared`); `prepare` leads to ready with step index 0; `beginPreparation` twice is refused; a ticket of an older generation is discarded and counted; a `.cancelled` result ends in inactive; a failing preparation ends in failed with the code `sample.broken` and preparing again works; a preparation of the slow sample with a limit of 100 ms ends with `.preparationTimedOut`, and a cancelled one ends with `.cancelled` in less than 1 second (SC-U02-010); every operation of the engine that exists in this phase is refused in every state where data-model.md section 2 says so, without calling the core (the sample counts its calls) and with the digest unchanged; 256 seeds prepared twice give equal digests and at least 250 different ones (SC-U02-002); two seconds fed as 60, 120, 240 and irregular frames give 240 steps and one digest (SC-U02-005); a frame of 1 s runs 8 steps and counts dropped time; negative, NaN and infinite frame times run no step and are counted; suspend, ten seconds, resume adds 0 steps; `run(steps:)` runs exactly that many; a declared step length outside 1/240…1/30 is clamped.
+- [ ] T-U02-016 [US2] Create `Packages/VisualCore/Sources/VisualCoreExperience/ExperienceEngine.swift` with `PreparationTicket` and the engine's stored properties, `init`, `beginPreparation`, the static `prepare`, `completePreparation`, the convenience `prepare`, `activate`, `suspend`, `resume`, `beginDeactivation`, `finishDeactivation(gpu:)` (the leak rule comes in T-U02-034), `fail`, `advance(frame:)`, `run(steps:)` and `digest()` (FR-U02-006, FR-U02-007, FR-U02-011, FR-U02-012, FR-U02-014, FR-U02-016, FR-U02-017, FR-U02-021 to FR-U02-025). Proof: `swift test --package-path Packages/VisualCore --filter ExperienceEngineTests` passes.
+- [ ] T-U02-017 [US2] Create `Packages/VisualCore/Sources/VisualCoreTestSupport/SampleExperience.swift` (`id` = `a99.contract-sample`, `plan`, `goldenDigests` for the seeds 0, 1, 2, 42, 1,000, 65,535, 4,294,967,296 and 18,446,744,073,709,551,615, computed once on the host and committed) and `Packages/VisualCore/Tests/VisualCoreExperienceTests/SampleExperienceTests.swift` (each committed digest is reproduced after preparation; a run of 240 steps from seed 42 reproduces a second committed digest). Proof: `swift test --package-path Packages/VisualCore --filter SampleExperienceTests` passes on the host; the simulators follow in T-U02-052.
+- [ ] T-U02-018 [US2] Acceptance of US2: record `run-check --gate UA-F02 --name us2-engine -- swift test --package-path Packages/VisualCore --filter "ExperienceEngineTests|SampleExperienceTests|StateDigestTests"`.
+
+## Phase 5: User Story 3 - Work is captured, brought back and reset exactly (Priority: P1)
+
+**Goal**: the snapshot envelope and the engine's snapshot, restore and reset.
+**Independent Test**: 100 round trips, a version-1 snapshot, one fixture per refusal.
+
+- [ ] T-U02-019 [P] [US3] Write `Packages/VisualCore/Tests/VisualCoreExperienceTests/ExperienceSnapshotTests.swift`: the encoded form has exactly the eight keys of data-model.md section 4 in sorted order, the seed as decimal text (also for the largest 64-bit value) and no white space between tokens; encoding twice gives the same bytes and decode-then-encode gives the bytes that were decoded; `init(data:)` answers `tooLarge` above 1,048,576 bytes, `corrupt` for text that is not JSON, for a missing or mistyped key, for a malformed id, seed or digest and for a payload that is not a JSON object, `unknownFormat` for format 2, and `checksumMismatch` for a changed payload; `init(experience:…payload:)` refuses a payload that is not a UTF-8 JSON object and one that makes the snapshot too large; a snapshot saved through `DocumentStore<ExperienceSnapshot>` in a temporary folder (kind = the id's storage namespace, size limit 2 MiB) loads equal, and a file with a changed payload is reported as a corrupt file.
+- [ ] T-U02-020 [P] [US3] Create `Packages/VisualCore/Sources/VisualCoreExperience/ExperienceSnapshot.swift` (FR-U02-040, FR-U02-043, FR-U02-046, FR-U02-047). Proof: `swift test --package-path Packages/VisualCore --filter ExperienceSnapshotTests` passes.
+- [ ] T-U02-021 [US3] Write `Packages/VisualCore/Tests/VisualCoreExperienceTests/ExperienceEngineStateTests.swift` and add `SampleExperience.snapshotV1(seed:)` with its committed expected digest to `Packages/VisualCore/Sources/VisualCoreTestSupport/SampleExperience.swift`: at 100 points of a run with steps and actions, snapshot, encode, decode and restore into an engine prepared with another seed reproduce digest, seed and step index (SC-U02-003); two snapshots of the same state are equal; reset equals the first digest for 32 seeds and sets the step index to 0; after a restore, reset gives the state of the restored seed; the version-1 snapshot restores to its committed digest and `energy` 0; each of the eight typed refusals (`wrongExperience`, `unknownFormat` at decoding, `newerSchema`, `missingMigration` for a snapshot of schema 0, `corrupt`, `checksumMismatch`, `tooLarge` at decoding, `stateMismatch`) leaves digest, seed and step index unchanged; snapshot, restore and reset are refused in the states of data-model.md section 2 where they are not legal.
+- [ ] T-U02-022 [US3] Add `snapshot()`, `restore(_:)` and `reset()` to `Packages/VisualCore/Sources/VisualCoreExperience/ExperienceEngine.swift` in the check order of data-model.md section 4 (FR-U02-041, FR-U02-042, FR-U02-044, FR-U02-045). Proof: `swift test --package-path Packages/VisualCore --filter ExperienceEngineStateTests` passes.
+- [ ] T-U02-023 [US3] Acceptance of US3: record `run-check --gate UA-F02 --name us3-snapshots -- swift test --package-path Packages/VisualCore --filter "ExperienceSnapshotTests|ExperienceEngineStateTests"`.
+
+## Phase 6: User Story 4 - Every input is accepted or refused with a reason (Priority: P1)
+
+**Goal**: the engine's action door. **Independent Test**: the action table and a replay.
+
+- [ ] T-U02-024 [US4] Write `Packages/VisualCore/Tests/VisualCoreExperienceTests/ExperienceEngineInputTests.swift`: a table that produces every rejection code (`action.unknown-control`, `action.wrong-value-count`, `action.non-finite`, `action.out-of-range`, `action.not-active` in each of the seven states other than active, `action.wrong-step`, `action.rule.sample.wall`, `action.rule.sample.no-move`) with the digest unchanged after each (SC-U02-004); accepted actions change the state as data-model.md section 7 states and are counted, rejected ones are counted; the core is not called for an action the contract refuses; with the fault `MutatingRejection` the engine still leaves the digest unchanged; a recorded run of 200 actions at their step indices replays on a fresh engine with the same seed to the same digest, and `handle(_:)` with the recorded step indices gives the same results.
+- [ ] T-U02-025 [US4] Add `handle(control:values:)` and `handle(_:)` to `Packages/VisualCore/Sources/VisualCoreExperience/ExperienceEngine.swift` (FR-U02-032, FR-U02-033, FR-U02-034, FR-U02-036). Proof: `swift test --package-path Packages/VisualCore --filter ExperienceEngineInputTests` passes.
+- [ ] T-U02-026 [US4] Acceptance of US4: record `run-check --gate UA-F02 --name us4-input -- swift test --package-path Packages/VisualCore --filter "ExperienceActionTests|ExperienceEngineInputTests"`.
+
+## Phase 7: User Story 6 - The state of an experience can be read and scripted (Priority: P2), pure part
+
+**Goal**: diagnostics, scenario hooks and the symbol tool. **Independent Test**: diagnostics in all eight states;
+the symbol checks of the pure module. The shell's hook and the symbol checks of the host module follow in phase 8.
+
+- [ ] T-U02-027 [US6] Write `Packages/VisualCore/Tests/VisualCoreExperienceTests/ExperienceDiagnosticsTests.swift`: in each of the eight states the diagnostics hold the experience id, the state, the step index, the tier and the counters; seed and digest are absent before the first preparation and the digest is absent again after deactivation; `gpu` is absent unless counts are passed in; after a failure `lastError` holds code and text and stays until the next preparation succeeds; the encoded form has sorted keys, the seed as text and no key for an absent item; it decodes to an equal value (SC-U02-006, host part).
+- [ ] T-U02-028 [US6] Create `Packages/VisualCore/Sources/VisualCoreExperience/ExperienceDiagnostics.swift` (`GPUResourceCounts`, `ExperienceDiagnostics`) and add `diagnostics(gpu:)` to `ExperienceEngine.swift` (FR-U02-060, FR-U02-061). Proof: `swift test --package-path Packages/VisualCore --filter ExperienceDiagnosticsTests` passes.
+- [ ] T-U02-029 [US6] Write `Packages/VisualCore/Tests/VisualCoreExperienceTests/ExperienceScenarioTests.swift` (inside `#if DEBUG || VISUALCORE_AUTOMATION`): a scenario of 100 steps and 10 actions on seed 42 reports a committed digest, the step index 100 and ten result codes; `runScenario` equals preparing, activating and driving the engine by hand; a scenario with more than 10,000 entries or 1,000,000 steps reports `experience.scenario-too-large` and runs nothing; scenario and result survive a JSON round trip (SC-U02-007, script part).
+- [ ] T-U02-030 [US6] Create `Packages/VisualCore/Sources/VisualCoreExperience/ExperienceScenario.swift`, the whole file inside `#if DEBUG || VISUALCORE_AUTOMATION` (FR-U02-062). Proof: `swift test --package-path Packages/VisualCore --filter ExperienceScenarioTests` passes.
+- [ ] T-U02-031 [P] [US6] Add `ExperienceSymbolsTests` to `scripts/test_scripts.py` for the pure functions of the new tool: counting symbols that contain `ExperienceScenario` in a text of `nm` output; the verdict for (count, with flag) in the four combinations; the build commands for `pure` and `host` with and without the flag (the host command names the scheme `VisualCoreExperienceHost`, the configuration `Release` and a generic simulator destination, never a device); exit code 2 when no object file is found.
+- [ ] T-U02-032 [P] [US6] Create `scripts/check_experience_symbols.py` as contracts/experience-host-api.md states (build into `Build/experience-symbols/<module>[-flag]`, `xcrun nm` over the module's object files, verdict, exit codes 0, 1, 2). Proof: `python3 scripts/test_scripts.py` passes; `python3 scripts/check_experience_symbols.py --module pure` prints PASS with 0 symbols and `--module pure --with-flag` prints PASS with at least 1.
+
+## Phase 8: User Story 5 - The picture comes from the real renderer and owns nothing that matters (Priority: P2)
+
+**Goal**: quality tier, cache shedding and the leak rule in the engine; the module VisualCoreExperienceHost.
+**Independent Test**: the sample on a real render host on both simulator runtimes.
+
+- [ ] T-U02-033 [US5] Write `Packages/VisualCore/Tests/VisualCoreExperienceTests/ExperienceEngineQualityTests.swift`: each declared tier is accepted in ready, active and suspended and leaves the digest unchanged; tier 3 and tier −1 are refused with `.invalidTier`; the tier is applied again after a restore and after a new preparation; shedding leaves the digest unchanged and the sample rebuilds its cache on the next step; `finishDeactivation(gpu:)` with 0 objects and 0 leaked ends in inactive, and with a live or a leaked object ends in failed with `.gpuLeak` and the code `experience.gpu-leak`.
+- [ ] T-U02-034 [US5] Add `setQualityTier(_:)`, `shedCaches()` and the leak rule of `finishDeactivation(gpu:)` to `Packages/VisualCore/Sources/VisualCoreExperience/ExperienceEngine.swift` (FR-U02-052, FR-U02-054, FR-U02-055). Proof: `swift test --package-path Packages/VisualCore --filter ExperienceEngineQualityTests` passes.
+- [ ] T-U02-035 [P] [US5] Write `Packages/VisualCoreRendering/Tests/VisualCoreExperienceHostTests/SamplePresenter.swift` (as data-model.md section 7: one 1 × 1 texture through the registry in `setup`, released in `teardown`, clear colour from the state, call counters, a switch that makes `setup` or `draw` throw and a switch that keeps the texture in `teardown`) and `ShellRenderingTests.swift`: with a render host of 64 × 64 points the centre pixel shows (x / 15, y / 15, tone) within 2 of 255 after preparation; 120 frames in ready leave the digest unchanged; in active, frames run steps; after `recreateContext()` the sample draws again with a new texture and an unchanged digest; each tier and a cache shedding leave the digest unchanged and the next frame correct; `beginDeactivation`, `host.destroy()`, `finishDeactivation` end in inactive with 0 live and 0 leaked objects, also after a context recreation and also with `replaceScene` instead of `destroy`; a presenter that keeps its texture ends in failed with `experience.gpu-leak`; live objects are above 0 while active (SC-U02-006).
+- [ ] T-U02-036 [P] [US5] Write `Packages/VisualCoreRendering/Tests/VisualCoreExperienceHostTests/ShellLifecycleTests.swift`: `prepare` runs the core's preparation off the main thread and ends in ready; `cancelPreparation()` during the slow sample ends in inactive within 1 second, the pending `prepare` throws `.cancelled` or `.stalePreparation`, and the presenter's draw counter stays 0 afterwards; a failing preparation ends in failed and `prepare` again works; `setup` that throws ends in failed with `experience.setup-failed`, `draw` that throws with `experience.draw-failed`, and in both cases `beginDeactivation` and `finishDeactivation` still end in inactive with 0 objects; after `beginDeactivation` no `draw` reaches the presenter and `teardown` still does; in suspended, frames draw and run no step; `diagnostics` holds GPU counts once a context was seen and every listed item in each state; every operation refused by the engine is refused by the shell with the same error.
+- [ ] T-U02-037 [P] [US5] Write `Packages/VisualCoreRendering/Tests/VisualCoreExperienceHostTests/ShellPortTests.swift`: `port.send` reaches the engine and returns its result; `revision` grows after an accepted action, a restore and a reset and not after a rejected action; `summary` equals `presenter.describe` of the current state; `send(_:at:in:)` sends normalized coordinates and answers `.rejected(.outOfRange(index: 0))` outside the view without reaching the engine; `identifier("canvas")` is `experience.a99.contract-sample.canvas`; `controls` is the presenter's view; under `DEBUG` `shell.run(_:)` gives the result of the engine's scenario run.
+- [ ] T-U02-038 [US5] Create `Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperiencePresenter.swift` (`ExperiencePresenter` with its defaults, `Experience`), `ExperienceActionPort.swift` and `ExperienceShell.swift` (the shell, its scene and, inside `#if DEBUG || VISUALCORE_AUTOMATION`, `run(_:)`) as contracts/experience-host-api.md states (FR-U02-050 to FR-U02-053, FR-U02-056, FR-U02-062, FR-U02-080). Proof: `python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test` reports TEST SUCCEEDED with the three new test files.
+- [ ] T-U02-039 [US5] Acceptance of US5 and of the shell's part of US6: record `run-check --gate UA-F02 --name us5-ios27 --timeout 600 -- python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test` and the same with `--name us5-ios26` and `--destination sim-26.5`; then `python3 scripts/check_experience_symbols.py --module host` (0 symbols) and `--module host --with-flag` (at least 1) both print PASS.
+
+## Phase 9: User Story 7 - Any experience proves the contract with one call (Priority: P2)
+
+**Goal**: ExperienceConformance. **Independent Test**: the sample passes; each fault fails exactly its check.
+
+- [ ] T-U02-040 [US7] Write `Packages/VisualCore/Tests/VisualCoreExperienceTests/ExperienceConformanceTests.swift`: the sample without a fault passes all seven checks with `SampleExperience.plan`; each of the seven fault markers (`UnseededPreparation` → seedDeterminism, `LossySnapshot` → snapshotRoundTrip, `WrongReset` → resetEquivalence, `MutatingRejection` → rejectionKeepsDigest, `TierChangesState` → tierKeepsDigest, `SheddingChangesState` → sheddingKeepsDigest, `ClockInUpdate` → replayReproducesDigest) fails exactly its own check and the failure's detail names the seed; `FailingPreparation` fails seedDeterminism with the failure code in the detail; the report has one entry per check in the order of `ConformanceCheck.allCases` and survives a JSON round trip; a plan with 100 seeds, 20,000 steps per segment and 2,000 actions is cut to 64, 10,000 and 1,000; an empty seed list means seed 0; the whole run for the sample takes less than 10 seconds (SC-U02-008).
+- [ ] T-U02-041 [US7] Create `Packages/VisualCore/Sources/VisualCoreExperience/ExperienceConformance.swift` with the procedures of data-model.md section 6 (FR-U02-070, FR-U02-071, FR-U02-073). Proof: `swift test --package-path Packages/VisualCore --filter ExperienceConformanceTests` passes.
+- [ ] T-U02-042 [US7] Acceptance of US7: record `run-check --gate UA-F02 --name us7-conformance -- swift test --package-path Packages/VisualCore --filter ExperienceConformanceTests`.
+
+## Phase 10: Framework obligations and documents
+
+- [ ] T-U02-043 Documentation: describe the two modules in `Packages/VisualCore/README.md` (module table and a section "Experience contract" with the two-part shape and the conformance call) and `Packages/VisualCoreRendering/README.md` (module table and a section on `ExperienceShell`), add the contract to `docs/getting-started.md`, replace the illustrative sketch of Auto-Creator.md section 11.3 by the real shape and name the new files in section 16, and set the entries of `docs/migration/path-map.json` that this feature completes. Proof: `python3 scripts/render_autocreator.py --check`, `python3 scripts/validate_autocreator.py` and `python3 scripts/validate_docs.py` pass.
+- [ ] T-U02-044 API baseline and rules: `python3 scripts/check_public_api.py --update` leaves no difference (the baseline was updated task by task) and `python3 scripts/check_public_api.py` passes; every new public declaration has a `///` comment (the check reports 0 undocumented symbols for both packages); record `run-check --name public-api`, `--name dependencies -- python3 scripts/check_dependencies.py`, and `--name documented-api-showcase`, `documented-api-interactivedemo`, `documented-api-secondconsumer` with `python3 scripts/check_documented_api.py --sources <consumer sources>`.
+- [ ] T-U02-045 Consumers: after `python3 scripts/release_check.py --only xcodegen`, build for testing from new derived-data folders `Build/DerivedData/ua-f02-<Scheme>`: the schemes `Showcase`, `GenerativeArtStudio`, `FluidArtPlayground`, `FractalExplorer` and `ParticleUniverse` of `VisualCore.xcodeproj` and the harness projects `Harnesses/InteractiveDemo/InteractiveDemo.xcodeproj` and `Harnesses/SecondConsumer/SecondConsumer.xcodeproj`, each with `xcodebuild build-for-testing … -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO`, recorded as `build-<Scheme>`. Expected: TEST BUILD SUCCEEDED seven times and no tracked file changed.
+
+## Phase 11: Evidence and convergence
+
+- [ ] T-U02-046 Evidence `host-experience`: `swift test --package-path Packages/VisualCore --filter VisualCoreExperienceTests` (all tests pass).
+- [ ] T-U02-047 Evidence `host-visualcore`: `swift test --package-path Packages/VisualCore` (the whole package passes, including the unchanged `SHA256Tests`).
+- [ ] T-U02-048 Evidence `rendering-ios27`: `python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --result-name ua-f02-ios27` (TEST SUCCEEDED).
+- [ ] T-U02-049 Evidence `rendering-ios26`: `python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-26.5 --action test --result-name ua-f02-ios26` (TEST SUCCEEDED).
+- [ ] T-U02-050 Evidence `symbols-pure`, `symbols-pure-flag`, `symbols-host`, `symbols-host-flag`: the four calls of `python3 scripts/check_experience_symbols.py` (0 symbols without the flag, at least 1 with it; SC-U02-007).
+- [ ] T-U02-051 Evidence `reference-a` and `reference-b`: `python3 scripts/release_check.py --only reference-engine-xcframework reference-build-projectm-ios-sim reference-clean` (3 of 3) and `python3 scripts/release_check.py --only reference-test-anglerendering-ios27 reference-test-anglerendering-ios26 projectm-reference-ios27 projectm-reference-ios26` (4 of 4) (FR-U02-083).
+- [ ] T-U02-052 Evidence `pure-ios27` and `pure-ios26`: `python3 scripts/xcodebuild_package.py --package Packages/VisualCore --scheme VisualCore-Package --destination sim-27.2 --action test` and `--destination sim-26.5` (TEST SUCCEEDED; the committed digests match on both runtimes; SC-U02-002).
+- [ ] T-U02-053 Evidence `script-tests`, `docs`, `steering`: `python3 scripts/test_scripts.py`, `python3 scripts/validate_docs.py`, `python3 scripts/validate_autocreator.py`; then confirm that the `ci` and `push-scan` runs of the last pushed commit succeeded (`gh run list --branch main --limit 2`, `gh run watch <id> --exit-status`).
+- [ ] T-U02-054 Run `/speckit-converge` for UA-F02; run `/speckit-implement` for every task it appends and `/speckit-converge` again, until a run appends nothing; then `python3 scripts/migration_ledger.py seal --gate UA-F02` and `python3 scripts/migration_ledger.py record --gate UA-F02`.
+
+## Dependencies & Execution Order
+
+- Phase 1 blocks everything. Phase 2 blocks every story: T-U02-005 first (the other foundational types use its
+  errors), then the pairs 002/003, 006/007 and 008/009 in parallel (006/007 needs `StableHash` from 003 to
+  compile).
+- US1 (010 to 012) needs only T-U02-005. US2 (013 to 018) needs phases 2 and 3. US3 (019 to 023) and US4
+  (024 to 026) need the engine of US2. The pure part of US6 (027 to 032) needs US2; 031/032 need nothing but
+  T-U02-030 for the final proof. US5 (033 to 039) needs US2, US3, US4 and the diagnostics of 028. US7
+  (040 to 042) needs US2, US3, US4 and T-U02-034.
+- `ExperienceEngine.swift` has one writer at a time: T-U02-016, 022, 025, 028, 034 in this order.
+- Phases 10 and 11 come last; T-U02-046 to T-U02-053 run on the final sources, one heavy build at a time.
+
+### Parallel Opportunities
+
+- After T-U02-005: 002+003, 006+007, 008+009, 010+011, 014 (written against the contract) and 031+032.
+- After T-U02-016: 019+020 beside the lead's work on 021/022.
+- Before T-U02-038: 035, 036 and 037 are three files for three writers.
+
+## Implementation Strategy
+
+MVP is US1 with the foundational types: a lifecycle that cannot be driven wrongly. Each further story adds one
+group of tests and the code that makes them pass, and ends with a recorded acceptance run. The host module comes
+after the pure engine is complete, so that simulator time is spent once. Evidence for the gate is collected only
+at the end, on the final sources.
+
+## Notes
+
+- A test task is committed together with the implementation task that follows it (first tick carries both, the
+  second tick only this file), so `main` and CI stay green commit by commit.
+- An agent's report is not evidence: every proof command above is run by the lead before the task is ticked.
+- Golden digests are computed once on the host and then must be reproduced by both simulator runtimes; a
+  mismatch there is a defect in the digest or in the sample, never a reason to change the committed value
+  without finding the cause.
