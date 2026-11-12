@@ -92,7 +92,7 @@ the [reference pipeline](docs/architecture/current-rendering-pipeline.md) that `
 | `Packages/VisualCoreRendering/` | iOS modules over ANGLE: render host, resources, shaders, effects, UI, automation |
 | `Showcase/` | developer Showcase app; not an App Store product |
 | `Apps/` | four standalone creative apps: `GenerativeArtStudio/` (A01), `FluidArtPlayground/` (A02), `FractalExplorer/` (A03), `ParticleUniverse/` (A04) |
-| `Apps/VisualCore/` | **planned**: the single app target; does not exist yet |
+| `Apps/VisualCore/` | the single shippable app target (UA-F04): launcher, routes, settings, about; no experience is registered yet, so the launcher shows its empty statement. Tests: `python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime 27.2 --kind phone` (or `tablet`, or runtime `26.5`) |
 | `Packages/Experiences*/` | **planned**: one package per collection of experiences (`ExperiencesCreative`, `ExperiencesRound02`, `ExperiencesRound03`, `ExperiencesRound04`; ADR-0009, D-06); none exists yet |
 | `Harnesses/` | non-shipping test hosts: `InteractiveDemo/`, `SecondConsumer/` (Lumen Garden, a small sample game), `ProjectMReference/` |
 | `External/projectm-ios/` | pinned, read-only Git submodule: reference app, reference regression and source of the ANGLE build |

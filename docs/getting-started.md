@@ -63,3 +63,11 @@ python3 scripts/release_check.py --list
 
 Simulator results are development evidence only. Device support is decided by campaign II
 ([support matrix](release/support-matrix.md)).
+
+## 7. The unified app
+
+`Apps/VisualCore/` is the one shippable app (target and scheme `VisualCore`, Swift module `VisualCoreApp`). Generate
+the project with `xcodegen generate --spec project.yml`, then run its unit and interface tests on a simulator chosen
+by runtime and kind: `python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime 27.2 --kind phone`.
+Experiences are registered in `Apps/VisualCore/App/ExperienceRegistry.swift`; the launcher shows an experience only
+when the catalog marks it available and it is registered.

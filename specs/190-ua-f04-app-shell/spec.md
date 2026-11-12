@@ -239,8 +239,9 @@ violation and see the check fail.
 
 - **FR-U04-010**: The app MUST hold one explicit list of registered experiences: for each an id and a factory.
   Nothing is discovered or loaded dynamically.
-- **FR-U04-011**: At start the app MUST compare the registered ids with the available entries of the catalog. An
-  experience MUST be shown only when it is available in the catalog and registered. Every mismatch MUST be
+- **FR-U04-011**: At start the app MUST compare the registered ids with the available entries of the catalog. A
+  free experience MUST be shown only when it is available in the catalog and registered; an available premium
+  entry is shown with its tier text and opens only the statement of FR-U04-012. Every mismatch MUST be
   recorded in the app's diagnostics and MUST fail the app's unit tests.
 - **FR-U04-012**: A premium experience MUST NOT be opened by this feature: until the purchase feature exists,
   premium tiles are shown with their tier text and open a plain statement that premium experiences are not yet

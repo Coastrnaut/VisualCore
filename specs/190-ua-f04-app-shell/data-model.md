@@ -50,7 +50,24 @@ arguments, last reset (what was removed). Readable in debug builds through the i
 
 ## 6. Identifiers
 
-`vc.tile.<id>`, `vc.route.catalog|experience|settings|about`, `vc.nav.settings`, `vc.nav.about`, `vc.search`, `vc.empty`, `vc.nomatch`,
-`vc.error`, `vc.welcome`, `vc.welcome.start`, `vc.settings.quality`, `vc.settings.reset.all`,
-`vc.settings.reset.<id>`, `vc.settings.privacy`, `vc.about.acknowledgements`, `vc.experience.back`,
-`vc.premium.notice`.
+`vc.tile.<id>`, `vc.section.<category id>`, `vc.route.catalog|experience|settings|about`, `vc.nav.settings`,
+`vc.nav.about`, `vc.nav.done`, `vc.search`, `vc.search.clear`, `vc.empty`, `vc.nomatch`, `vc.error`, `vc.welcome`,
+`vc.welcome.start`, `vc.settings.reduceMotion`, `vc.settings.reduceFlashing`, `vc.settings.quality`,
+`vc.settings.reset.all`, `vc.settings.reset.<id>`, `vc.settings.reset.confirm`, `vc.settings.reset.cancel`,
+`vc.settings.privacy`, `vc.about.acknowledgements`, `vc.experience.back`, `vc.premium.notice`,
+`vc.premium.dismiss`, `vc.diagnostics` (debug builds), and `vc.exp.<id>.<control>` inside an experience.
+
+## 7. As built (recorded after T-U04-011)
+
+- Settings and about are reached through two list rows above the tiles, not through toolbar items: a navigation
+  bar clips text at the largest accessibility sizes and its tinted text does not reach the audit's contrast.
+- The search field is a text field in the first list row; it wraps at the largest text sizes.
+- The welcome replaces the navigation instead of covering it; the reset confirmation and the premium notice are
+  sheets with their own buttons.
+- An available premium entry is shown as a tile even without a registration and opens the premium notice; it is
+  listed in the diagnostics as a registry mismatch until the purchase feature registers it. A free entry is shown
+  only when it is available and registered.
+- Section headings and reset rows use the label colour; the app's tint is the framework's contrast-checked
+  accent. The destructive meaning of a reset is carried by its symbol and its confirmation, not by a red text.
+- `-vcSkipWelcome` marks the welcome as seen; `-openExperience` does not imply it.
+- The seed of an opened experience is derived from its id (a stable value); UA-F05 will supply stored seeds.

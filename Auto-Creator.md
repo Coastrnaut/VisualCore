@@ -2535,7 +2535,7 @@ Names without that mark exist in the source today.
 
 ### 11.1 App target and shell
 
-- `Apps/VisualCore/` (new) is the only shippable target. It contains the SwiftUI app type, the launcher, search,
+- `Apps/VisualCore/` (created by UA-F04) is the only shippable target. It contains the SwiftUI app type, the launcher, search,
   category views, the experience route, settings, the about and acknowledgements screens, the paywall and the
   onboarding. It owns navigation, accessibility identifiers, free and premium labelling and the app lifecycle.
 - The app links the framework packages and the experience packages statically. Experiences are registered in
@@ -2736,7 +2736,14 @@ builds of both modules.
   acknowledgements (existing `AcknowledgementsView` and `LicenseInventory`).
 - Each tile shows the tier as text, not only as color or glyph. Accessibility identifiers are stable:
   `vc.tile.<id>` for tiles, `vc.route.<name>` for routes, `vc.exp.<id>.<control>` inside an experience.
-- A DEBUG-only launch argument `-openExperience <id>` opens one experience for tests.
+- A DEBUG-only launch argument `-openExperience <id>` opens one experience for tests. The debug support of the app
+  (`Apps/VisualCore/App/DebugSupport/`, wholly inside `#if DEBUG`) also offers a fixture catalog, a debug
+  experience and arguments that erase the app's data and skip the welcome; none of it is in a release build.
+- The app's tests run with `python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime <27.2|26.5> --kind
+  <phone|tablet>`: the simulator is chosen by runtime and kind, and the enumeration guard runs on the log.
+- As built by UA-F04: settings and about are list rows above the tiles (a navigation bar clips text at the
+  largest sizes); the search is a text field in the first row; the shell's pure decisions (launcher sections,
+  startup, preferences, reset plan) live in `VisualCoreExperience` (`ShellModel.swift`).
 
 ## 12. Rendering, quality and performance
 
