@@ -62,6 +62,13 @@ evidence commands are found as described in Auto-Creator.md §19. Simulators are
    do not commit, push or run heavy builds; the lead invokes every Spec Kit skill, runs the builds one at a time
    in the foreground (10 minutes or less per command, split with `--only`/`--skip`), retests every agent result
    before a task is ticked (an agent's report is not evidence) and commits.
+   **No open-ended waits** (owner ruling of 2026-11-12): nothing is waited for without a limit. App tests run
+   through `scripts/xcodebuild_app.py`, which stops a run after `--max-seconds` (default 540) and names the test
+   it was on; a run that would not fit is split into chunks of whole test classes with `--only-testing`. A CI run
+   is checked with `gh run list`; `gh run watch` is used only for a run that is already `in_progress`, never for
+   a queued one, and other work goes on while a runner is awaited. A command that stops producing output for
+   several minutes is examined (log tail, process list) before anything else is started, and a real hang is
+   traced to its cause and fixed, not retried.
 8. **Tools.** Claude Desktop Code only. Never the Claude CLI (`claude`, `claude -p`), the Agent SDK or Python that
    calls a model.
 9. **Evidence.** Nothing is fabricated. Simulator results are never device evidence. Device observations from other

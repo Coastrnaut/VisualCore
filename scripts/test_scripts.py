@@ -1131,6 +1131,40 @@ class AppTestRunnerTests(unittest.TestCase):
                                                "(.autonomy/logs/app-tests/VisualCore-27.2-phone.log)")
         self.assertIn("** TEST RESULT **", out)            # the last lines of the log are repeated
 
+    def test_a_run_that_does_not_end_is_stopped_and_names_its_last_test(self):
+        """The runner hands its time limit to the process runner; when the limit is reached it fails with exit 3,
+        names the last test that started and says how to go on, instead of running into the caller's own limit."""
+        seen = {}
+
+        def slow_run(cmd, **kw):
+            if cmd[:2] == ["xcrun", "simctl"]:
+                return subprocess.CompletedProcess(cmd, 0, stdout=json.dumps(self.DEVICES), stderr="")
+            seen["timeout"] = kw.get("timeout")
+            kw["stdout"].write("Test Case '-[T.A testOne]' started.\nTest Case '-[T.A testOne]' passed (0.1 s).\n"
+                               "Test Case '-[T.B testHangs]' started.\n")
+            kw["stdout"].flush()
+            raise subprocess.TimeoutExpired(cmd, kw.get("timeout"))
+
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d).resolve()
+            (root / "Apps" / "VisualCore" / "Tests").mkdir(parents=True)
+            out = io.StringIO()
+            with contextlib.redirect_stdout(out), contextlib.redirect_stderr(io.StringIO()):
+                code = apprunner.main(self.BASE + ["--max-seconds", "7"], root=root, run=slow_run,
+                                      guard=lambda src, log: 0, widths=lambda: {})
+        self.assertEqual(code, 3)
+        self.assertEqual(seen["timeout"], 7)
+        last = out.getvalue().splitlines()[-1]
+        self.assertTrue(last.startswith("FAIL: VisualCore on iOS 27.2 phone — stopped after 7 s: "
+                                        "the last test started was T.B testHangs."), last)
+        self.assertIn("--only-testing", last)
+
+    def test_the_default_limit_is_below_ten_minutes_and_zero_disables_it(self):
+        code, out, calls, guards, files, cwd_ok = self.run_main(self.BASE)
+        self.assertEqual(calls[1][1]["timeout"], 540)
+        code, out, calls, guards, files, cwd_ok = self.run_main(self.BASE + ["--max-seconds", "0"])
+        self.assertIsNone(calls[1][1]["timeout"])
+
     def test_identifier_is_never_printed(self):
         for kind, udid, name in [("phone", self.PHONE_27, "iPhone 18"), ("tablet", self.TABLET_27, "iPad Pro 13-inch (M5)")]:
             code, out, calls, _, files, _ = self.run_main(["--scheme", "VisualCore", "--runtime", "27.2", "--kind", kind])

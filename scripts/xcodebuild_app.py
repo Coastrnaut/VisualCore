@@ -124,6 +124,9 @@ def main(argv: list[str] | None = None, root: Path = ROOT, run=subprocess.run, g
     ap.add_argument("--sources", default="Apps/VisualCore/Tests", help="test sources read by the enumeration guard")
     ap.add_argument("--log-name", help="log file name without extension (default <scheme>-<runtime>-<kind>)")
     ap.add_argument("--derived-data", help="default Build/DerivedData/app-<scheme>-<runtime>-<kind>")
+    ap.add_argument("--max-seconds", type=int, default=540,
+                    help="stop the run after this many seconds and name the test it was on (default 540, below the "
+                         "ten-minute limit of one foreground command); 0 disables the limit")
     try:
         a = ap.parse_args(argv)
     except SystemExit as e:
@@ -174,9 +177,17 @@ def main(argv: list[str] | None = None, root: Path = ROOT, run=subprocess.run, g
         shown = str(log)
     print(f"simulator: {name} (iOS {a.runtime})")
     print("$ " + " ".join(cmd).replace(udid, f"<{name}>"), flush=True)
+    limit = a.max_seconds if a.max_seconds and a.max_seconds > 0 else None
     try:
         with open(log, "w") as out:
-            code = run(cmd, cwd=root, stdout=out, stderr=subprocess.STDOUT).returncode
+            code = run(cmd, cwd=root, stdout=out, stderr=subprocess.STDOUT, timeout=limit).returncode
+    except subprocess.TimeoutExpired:
+        # The run did not end in time: a hung test, or more tests than fit. Say where it was and how to go on.
+        started = re.findall(r"Test Case '-\[(\S+ \S+)\]' started", log.read_text(errors="replace"))
+        where = f"the last test started was {started[-1]}" if started else "no test had started (still building)"
+        print(f"FAIL: {what} — stopped after {limit} s: {where}. Split the run into smaller chunks with "
+              f"--only-testing, or look for a test that never ends ({shown})")
+        return 3
     except OSError as e:
         print(f"FAIL: {what} — xcodebuild could not be started: {e}")
         return 1
