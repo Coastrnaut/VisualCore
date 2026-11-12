@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "source": "docs/archive/planning/embedded/sources/VisualCore-25-App-Specs-manifest.json",
+  "rows": [
+    {
+      "line": 1,
+      "heading": "(whole document)",
+      "target": "docs/archive/planning/ARCHIVE-MANIFEST.json",
+      "status": "implemented-and-verified",
+      "note": "JSON list of the 25 manuals (number, title, category, file, lines, bytes, SHA-256); no headings. All 25 archived manuals match it byte for byte; source hashes were sealed at gate F01 (check runbook-validate)."
+    }
+  ]
+}

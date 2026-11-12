@@ -1,0 +1,12 @@
+{
+ "schema": 1,
+ "source": "docs/archive/planning/root/START-HERE.md",
+ "rows": [
+  {"line": 1, "heading": "# VisualCore Rounds 3–12", "target": "docs/catalog/experience-catalog.json", "status": "superseded", "note": "D-10, D-14: this root index is replaced by the catalog (all 250 names in the same order as R03-G01..R12-G25; checked 2026-11-11) and Auto-Creator.md sections 5, 9 and 10. Round files: docs/archive/planning/rounds."},
+  {"line": 1, "heading": "(whole document)", "target": "AC-9", "status": "planned", "note": "Lines 5-6: rounds 3 and 4 (Harmonic Helix..Geode Locksmith, Icy Polyhedron..Prism Terrace) are the 50 premium launch experiences R03-G01..R04-G25, opened by the one USD 1.99 purchase (D-02, D-03). Order unchanged."},
+  {"line": 1, "heading": "(whole document)", "target": "AC-10", "status": "planned", "note": "Lines 7-14: rounds 5-12 (200 games) are the backlog of later premium additions, kept in descending score order (D-02). The final 26 (R11-G25 and all of round 12) carry explicitly provisional conservative scores."},
+  {"line": 1, "heading": "(whole document)", "target": "AC-22", "status": "superseded", "note": "Line 3: 'Run each round ONLY when the previous round is implemented and all physical device checks have genuine evidence' is replaced by D-07 (C-03): all 100 launch experiences pass on simulators before any device work."},
+  {"line": 1, "heading": "(whole document)", "target": "AC-3", "status": "planned", "note": "Line 3: 'plans and test requirements, not completed software' still holds at the consolidation: no game source exists (baseline section 5). Planning text is never evidence of implementation (CLAUDE.md rule 2)."},
+  {"line": 1, "heading": "(whole document)", "target": "archive", "status": "historical", "note": "The relative links round3.md..round12.md pointed at root files. Those moved to docs/archive/planning/rounds (D-14), so the links do not resolve from the archived copy; the archive is excluded from link checks."}
+ ]
+}

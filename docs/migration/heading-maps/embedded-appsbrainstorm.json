@@ -1,0 +1,685 @@
+{
+  "schema": 1,
+  "source": "docs/archive/planning/embedded/sources/AppsBrainstorm.md",
+  "rows": [
+    {
+      "line": 1,
+      "heading": "# VisualCore Application Brainstorm",
+      "target": "archive",
+      "status": "historical",
+      "note": "Title and metadata (status: exploration and planning, 2026-11-09). All 25 concepts later became mandatory and are now the free experiences A01-A25 (ADR-0009 D-02)."
+    },
+    {
+      "line": 11,
+      "heading": "## 1. Executive Summary",
+      "target": "AC-1",
+      "status": "superseded",
+      "note": "The portfolio of separate applications became registered experiences in one app (ADR-0009 D-01). The principle 'different capabilities of one engine, not ProjectM variants' still holds."
+    },
+    {
+      "line": 30,
+      "heading": "## 2. Existing Technical Foundation",
+      "target": "AC-12",
+      "status": "implemented-and-verified",
+      "note": "Section heading. The ANGLE-backed foundation was audited (gate F00) and wrapped by VisualCoreRendering.RenderHost (gate F02); see the subsections."
+    },
+    {
+      "line": 32,
+      "heading": "### 2.1 Rendering architecture",
+      "target": "AC-12",
+      "status": "implemented-and-verified",
+      "note": "Stack as built: app code, VisualCore modules, RenderHost over EGL, ANGLE Metal backend (ADR-0002, gate F02, docs/architecture/visualcore-architecture.md). The app boxes in the diagram are now experiences."
+    },
+    {
+      "line": 60,
+      "heading": "### 2.2 Important architectural decisions",
+      "target": "AC-12",
+      "status": "implemented-and-verified",
+      "note": "All eight decisions are in constitution I, II and II-a and were followed in gates F00-F09 (ADR-0002, ADR-0003). Native Metal stays excluded without a test-backed ADR (ADR-0009 D-09)."
+    },
+    {
+      "line": 71,
+      "heading": "### 2.3 VisualCore's intended role",
+      "target": "AC-13",
+      "status": "implemented-and-verified",
+      "note": "Built as optional modules driven by real consumers, not a game engine: 15 Swift modules in two packages (gates F01-F09, extended in A01-A04; API baseline docs/api/visualcore-public-api.txt)."
+    },
+    {
+      "line": 77,
+      "heading": "## 3. Application Idea Catalog",
+      "target": "AC-7",
+      "status": "superseded",
+      "note": "'Concepts, not commitments' no longer holds: all 25 are launch experiences in the free tier (ADR-0009 D-02). The concept texts are carried in docs/catalog/experience-catalog.json."
+    },
+    {
+      "line": 81,
+      "heading": "### 3.1 Creative and visual applications",
+      "target": "AC-7",
+      "status": "planned",
+      "note": "Family of A01-A05 (launcher category create). A01-A03 are complete standalone apps, A04 is partial, A05 is not started; all five still need their integration gates X-A01 to X-A05."
+    },
+    {
+      "line": 85,
+      "heading": "#### 1. Generative Art Studio",
+      "target": "AC-7",
+      "status": "implemented-and-verified",
+      "note": "A01: standalone app sealed by gates A01-P00 to A01-P06 (specs/011 to specs/017), simulators only. Adoption as experience a01.generative-art-studio (UA-F07, X-A01) and device rows are pending."
+    },
+    {
+      "line": 99,
+      "heading": "#### 2. Fluid Art Playground",
+      "target": "AC-7",
+      "status": "implemented-and-verified",
+      "note": "A02: standalone app sealed by gates A02-P00 to A02-P06 (specs/018 to specs/024), simulators only. Integration gate X-A02 and device rows are pending."
+    },
+    {
+      "line": 113,
+      "heading": "#### 3. Fractal Explorer",
+      "target": "AC-7",
+      "status": "implemented-and-verified",
+      "note": "A03: standalone app sealed by gates A03-P00 to A03-P06 (specs/025 to specs/031), simulators only. Integration gate X-A03 and device rows are pending."
+    },
+    {
+      "line": 126,
+      "heading": "#### 4. Particle Universe",
+      "target": "AC-7",
+      "status": "planned",
+      "note": "A04: gates A04-P00 to A04-P03 are sealed (specs/032 to specs/035); A04-P04 to A04-P06 and X-A04 are pending. Particles are simulated on the CPU and drawn instanced, not simulated on the GPU."
+    },
+    {
+      "line": 139,
+      "heading": "#### 5. Infinite Geometry",
+      "target": "AC-7",
+      "status": "planned",
+      "note": "A05: not started (gates A05-P00 to A05-P06, specs 039-045). Needs procedural meshes and 3D camera work beyond today's plane, cube and sphere generators and the single-mesh MeshRenderer."
+    },
+    {
+      "line": 152,
+      "heading": "### 3.2 Music, audio, and entertainment",
+      "target": "AC-7",
+      "status": "planned",
+      "note": "Family of A06-A09 (launcher category audio). None started. A06-A08 need VisualCoreAudio and VisualCoreAudioDSP, which are placeholders today (ADR-0006)."
+    },
+    {
+      "line": 156,
+      "heading": "#### 6. VisualCore Music Lab",
+      "target": "AC-7",
+      "status": "planned",
+      "note": "A06: not started (specs 046-052). Depends on microphone and in-app audio taps and FFT features that do not exist yet (ADR-0006). Capture of other apps' audio stays excluded."
+    },
+    {
+      "line": 169,
+      "heading": "#### 7. Audio Odyssey",
+      "target": "AC-7",
+      "status": "planned",
+      "note": "A07: not started (specs 053-059). Needs audio features and a depth-buffered 3D scene path that the framework lacks. 'Scene packs' must not become paid add-ons (ADR-0009 D-03)."
+    },
+    {
+      "line": 182,
+      "heading": "#### 8. Oscilloscope Studio",
+      "target": "AC-7",
+      "status": "planned",
+      "note": "A08: not started (specs 060-066). Line primitives exist; audio acquisition and waveform buffers do not. Microphone claims need device evidence, which comes only after the lock (ADR-0006 item 3, D-07)."
+    },
+    {
+      "line": 195,
+      "heading": "#### 9. Digital Aquarium",
+      "target": "AC-7",
+      "status": "planned",
+      "note": "A09: not started (specs 067-073). Fish, plants and habitats must be procedural (ADR-0009 D-09). The framework has flat 2D primitives and instanced particles but no textured sprite batch."
+    },
+    {
+      "line": 209,
+      "heading": "### 3.3 Games and interactive experiences",
+      "target": "AC-7",
+      "status": "planned",
+      "note": "Family of A10-A13 (launcher category play). None started. The framework has no collision or physics module yet."
+    },
+    {
+      "line": 213,
+      "heading": "#### 10. Neon Arcade",
+      "target": "AC-7",
+      "status": "planned",
+      "note": "A10: not started (specs 074-080). Fixed-step loop, touch input and particles exist; collision rules, sound, haptics and game-controller input do not (controllers: ADR-0006)."
+    },
+    {
+      "line": 227,
+      "heading": "#### 11. Physics Playground",
+      "target": "AC-7",
+      "status": "planned",
+      "note": "A11: not started (specs 081-087). Needs a deterministic rigid-body and spring solver; nothing of that kind exists in VisualCoreSimulation yet."
+    },
+    {
+      "line": 240,
+      "heading": "#### 12. Tiny Worlds",
+      "target": "AC-7",
+      "status": "planned",
+      "note": "A12: not started (specs 088-094). Needs depth-buffered 3D, materials and procedural meshes. 'Collectible environments' must remain free content of the free tier (ADR-0009 D-03)."
+    },
+    {
+      "line": 253,
+      "heading": "#### 13. Light Maze",
+      "target": "AC-7",
+      "status": "planned",
+      "note": "A13: not started (specs 095-101). A pure ray and reflection solver with level fixtures is to be built; render targets, shaders and touch input exist."
+    },
+    {
+      "line": 266,
+      "heading": "### 3.4 Education and scientific visualization",
+      "target": "AC-7",
+      "status": "planned",
+      "note": "Family of A14-A17 (launcher category learn). None started. Scientific content needs cited sources and units (constitution X); geometry must be generated by code (ADR-0009 D-09)."
+    },
+    {
+      "line": 270,
+      "heading": "#### 14. Solar System Explorer",
+      "target": "AC-7",
+      "status": "planned",
+      "note": "A14: not started (specs 102-108). Needs depth-buffered 3D spheres with materials and an orbit model with stated accuracy; planet surfaces must be procedural (ADR-0009 D-09)."
+    },
+    {
+      "line": 283,
+      "heading": "#### 15. Molecular Explorer",
+      "target": "AC-7",
+      "status": "planned",
+      "note": "A15: not started (specs 109-115). Needs instanced mesh drawing (only particles are instanced today), 3D picking and a bounded, fuzz-tested molecule parser."
+    },
+    {
+      "line": 296,
+      "heading": "#### 16. Simulation Lab",
+      "target": "AC-7",
+      "status": "planned",
+      "note": "A16: not started (specs 116-122). The field passes, ping-pong targets and CPU reference grids built for A02 (FieldPass, PingPongTarget, FieldGrid) are the starting point."
+    },
+    {
+      "line": 309,
+      "heading": "#### 17. Interactive Anatomy",
+      "target": "AC-7",
+      "status": "planned",
+      "note": "A17: not started (specs 123-129). Open conflict: the concept needs anatomical 3D models and textures, while ADR-0009 D-09 excludes human-made or purchased models and D-02 forbids substitution."
+    },
+    {
+      "line": 322,
+      "heading": "### 3.5 Ambient, personalization, and lifestyle",
+      "target": "AC-7",
+      "status": "planned",
+      "note": "Family of A18-A21 (launcher category ambient). None started. Long-running thermal and battery behavior can only be proven on devices, after the lock (ADR-0009 D-07)."
+    },
+    {
+      "line": 326,
+      "heading": "#### 18. Ambient Clock",
+      "target": "AC-7",
+      "status": "planned",
+      "note": "A18: not started (specs 130-136). Text stays native SwiftUI over the GL scene (no glyph renderer exists). 'Premium themes' contradicts the free tier and the single purchase (ADR-0009 D-03)."
+    },
+    {
+      "line": 339,
+      "heading": "#### 19. Living Wallpapers",
+      "target": "AC-7",
+      "status": "planned",
+      "note": "A19: not started (specs 137-143). Offscreen still export exists (RenderHost.renderOffscreen, A01-P04); video export does not. No live home-screen wallpaper claim (constitution VIII)."
+    },
+    {
+      "line": 352,
+      "heading": "#### 20. Digital Zen Garden",
+      "target": "AC-7",
+      "status": "planned",
+      "note": "A20: not started (specs 144-150). Touch input, feedback targets and DocumentStore persistence exist and are to be reused."
+    },
+    {
+      "line": 365,
+      "heading": "#### 21. Aurora",
+      "target": "AC-7",
+      "status": "planned",
+      "note": "A21: not started (specs 151-157). The noise GLSL library and particles exist. 'Optional soundscapes' would need procedural audio output, which the framework does not have."
+    },
+    {
+      "line": 378,
+      "heading": "### 3.6 Developer and creator tools",
+      "target": "AC-7",
+      "status": "planned",
+      "note": "Family of A22-A25 (launcher category tools). None started. User-authored shaders and graphs must be bounded and cycle-checked (constitution IX)."
+    },
+    {
+      "line": 382,
+      "heading": "#### 22. Shader Studio",
+      "target": "AC-7",
+      "status": "planned",
+      "note": "A22: not started (specs 158-164). ShaderLibrary and line-mapped diagnostics exist; user GLSL needs size, time and memory limits and a last-good fallback. Sharing must work without an account (D-03)."
+    },
+    {
+      "line": 395,
+      "heading": "#### 23. Visual Programming Lab",
+      "target": "AC-7",
+      "status": "planned",
+      "note": "A23: not started (specs 165-171). EffectGraphValidator (cycle rejection, quotas) is the base; a typed node-graph model and its serialization are new."
+    },
+    {
+      "line": 408,
+      "heading": "#### 24. Graphics Benchmark Lab",
+      "target": "AC-7",
+      "status": "planned",
+      "note": "A24: not started (specs 172-178). Its core value, GPU performance measurement, is device-only: under ADR-0009 D-07 it ships simulator-verified methods with results pending hardware verification."
+    },
+    {
+      "line": 421,
+      "heading": "#### 25. Effects Composer",
+      "target": "AC-7",
+      "status": "planned",
+      "note": "A25: not started (specs 179-185). Builds on VisualCoreEffects (eight pass types, limits of 32 passes and 256 MiB), Preset and offscreen export. User image import needs image decoding, which does not exist."
+    },
+    {
+      "line": 437,
+      "heading": "## 4. Initial Product Prioritization",
+      "target": "archive",
+      "status": "historical",
+      "note": "First-pass ranking of ten concepts without market data. Not used: the legacy ledger builds A01-A25 in numeric order (ADR-0009 D-12). The rank column survives only in the manuals index."
+    },
+    {
+      "line": 454,
+      "heading": "### 4.1 Selection criteria for a more rigorous ranking",
+      "target": "archive",
+      "status": "historical",
+      "note": "Ten criteria for a future scoring model; never applied to the 25 apps (the 62-criterion study in docs/brainstorm/ did this for the round games). Its monetization options are void (ADR-0009 D-03)."
+    },
+    {
+      "line": 473,
+      "heading": "## 5. Recommended Application Portfolio",
+      "target": "archive",
+      "status": "historical",
+      "note": "Brainstorming not selected: 'start with a small portfolio instead of all 25' was overruled first by the 25-app suite and now by the 100-experience launch scope (ADR-0009 D-02)."
+    },
+    {
+      "line": 477,
+      "heading": "### 5.1 First product: VisualCore Studio",
+      "target": "archive",
+      "status": "historical",
+      "note": "Never specified or built as a product. Its idea, one app combining generative art, fractals, particles and fluids with presets, is now served by the unified app itself (ADR-0009 D-01)."
+    },
+    {
+      "line": 511,
+      "heading": "### 5.2 Second product: Digital Aquarium",
+      "target": "AC-7",
+      "status": "planned",
+      "note": "Feature ideas for A09 (not started). The archived manual apps/09-digital-aquarium.md and the catalog are the specification; the 'second product' ordering was not adopted."
+    },
+    {
+      "line": 528,
+      "heading": "### 5.3 Third product: Simulation Lab",
+      "target": "AC-7",
+      "status": "planned",
+      "note": "Feature ideas for A16 (not started). The archived manual apps/16-simulation-lab.md and the catalog are the specification; the 'third product' ordering was not adopted."
+    },
+    {
+      "line": 545,
+      "heading": "### 5.4 Additional products after the first three",
+      "target": "AC-7",
+      "status": "planned",
+      "note": "Shader Studio (A22), Audio Odyssey (A07), Digital Zen Garden (A20) and Effects Composer (A25): all still required, none started."
+    },
+    {
+      "line": 554,
+      "heading": "## 6. VisualCore Capability-to-Application Validation Matrix",
+      "target": "AC-13",
+      "status": "planned",
+      "note": "Of 15 capabilities, 9 are sealed (EGL lifecycle, shaders, framebuffers, feedback, particles, gestures, offscreen, effect graph, presets). Sprites, 3D scenes, materials, audio, GPU profiling, assets are not."
+    },
+    {
+      "line": 576,
+      "heading": "### 6.1 Acceptance principle",
+      "target": "AC-13",
+      "status": "planned",
+      "note": "Still the rule for every framework capability: a real consumer, a behavioral contract, tests, a sample, lifecycle and error behavior, measurements and documentation (constitution II)."
+    },
+    {
+      "line": 590,
+      "heading": "## 7. Proposed VisualCore Module Ecosystem",
+      "target": "docs/decisions/ADR-0003-package-boundaries.md",
+      "status": "superseded",
+      "note": "The nine candidate areas were regrouped into the modules of two packages by ADR-0003 and package-map.md. The subsections name where each area lives today."
+    },
+    {
+      "line": 594,
+      "heading": "### 7.1 VisualCore Runtime",
+      "target": "Packages/VisualCoreRendering/Sources/VisualCoreRendering",
+      "status": "implemented-and-verified",
+      "note": "RenderHost, EGLDisplayProvider, RenderView, FrameScheduler and the RenderLifecycle states (gate F02, specs/003-rendering-lifecycle); simulators only."
+    },
+    {
+      "line": 604,
+      "heading": "### 7.2 VisualCore Graphics",
+      "target": "Packages/VisualCoreRendering/Sources/VisualCoreRendering",
+      "status": "implemented-and-verified",
+      "note": "ShaderProgram, Texture, GPUBuffer, RenderTarget, GLState, MeshRenderer, PrimitiveRenderer (gates F03, F05). No material system, and no depth or stencil attachment on targets or the window surface."
+    },
+    {
+      "line": 615,
+      "heading": "### 7.3 VisualCore Effects",
+      "target": "Packages/VisualCoreRendering/Sources/VisualCoreEffects",
+      "status": "implemented-and-verified",
+      "note": "Blur, bloom, distortion, color matrix, feedback, composite, copy and flash-limit passes (gate F04, specs/005-effects-graph); the graph model is in VisualCoreEffectsGraph."
+    },
+    {
+      "line": 626,
+      "heading": "### 7.4 VisualCore Animation",
+      "target": "Packages/VisualCore/Sources/VisualCoreSimulation",
+      "status": "implemented-and-verified",
+      "note": "No module of that name: Timeline, Tween, SceneClock and FixedStepRunner here, EasingCurve and TourTimeline in VisualCoreMath (gates F05, A01-P02, A03-P04). No scene-transition service."
+    },
+    {
+      "line": 636,
+      "heading": "### 7.5 VisualCore Particles",
+      "target": "Packages/VisualCore/Sources/VisualCoreSimulation",
+      "status": "implemented-and-verified",
+      "note": "ParticleSystem, Emitter, ParticleForce, TrailDecay here; ParticleRenderer and TrailLayer in VisualCoreRendering (gates F05, A04-P01 to A04-P03). Simulation runs on the CPU; drawing is instanced."
+    },
+    {
+      "line": 646,
+      "heading": "### 7.6 VisualCore Scenes",
+      "target": "Packages/VisualCore/Sources/VisualCoreScenes",
+      "status": "implemented-and-verified",
+      "note": "2D SceneNode graph, Mesh generators, pointer and gesture input; Camera2D and OrbitCamera in VisualCoreMath (gate F05). 3D is limited to one Lambert-lit mesh per MeshRenderer; no transitions."
+    },
+    {
+      "line": 656,
+      "heading": "### 7.7 VisualCore Audio",
+      "target": "docs/decisions/ADR-0006-unbuilt-readme-modules.md",
+      "status": "planned",
+      "note": "Deliberately not built in F00-F09 (ADR-0006): VisualCoreAudio and VisualCoreAudioDSP hold a version constant only. Due with A06-A08; ProjectM audio code stays in the reference."
+    },
+    {
+      "line": 666,
+      "heading": "### 7.8 VisualCore Assets",
+      "target": "AC-13",
+      "status": "planned",
+      "note": "ShaderBundle and Preset/NamedLibrary exist (A01-P01, A01-P03). Not built: image decoding into textures (needed for user image import in A25), asset validation and metrics. Art and models must be code (D-09)."
+    },
+    {
+      "line": 676,
+      "heading": "### 7.9 VisualCore Diagnostics",
+      "target": "Packages/VisualCore/Sources/VisualCoreDiagnostics",
+      "status": "implemented-and-verified",
+      "note": "Frame pacing, resource usage, lifecycle and device conditions here; shader diagnostics in VisualCoreShaderSource; reports in VisualCoreAutomation (gates F02, F03, F09). No GPU timing, no shared overlay."
+    },
+    {
+      "line": 688,
+      "heading": "## 8. Suggested Development Roadmap",
+      "target": "archive",
+      "status": "historical",
+      "note": "Earlier ordering of the roadmap; the README version was the one executed (F00-F09). Phases 6-8 here (Studio, Simulation Lab and Aquarium as the first apps) were not adopted."
+    },
+    {
+      "line": 692,
+      "heading": "### Phase 0 — Repository and rendering audit",
+      "target": "specs/001-baseline-audit",
+      "status": "implemented-and-verified",
+      "note": "Same work as README Phase 0: gate F00 with the ADR-0004 rework; audit documents in docs/architecture/, baseline in docs/verification/projectm-baseline.md. Observations are simulator-only."
+    },
+    {
+      "line": 717,
+      "heading": "### Phase 1 — Extract shared ANGLE/EGL integration",
+      "target": "specs/003-rendering-lifecycle",
+      "status": "implemented-and-verified",
+      "note": "Done as gate F02: RenderHost repeats the audited EGL sequence on the same ANGLE binaries (ADR-0002); the reference keeps building and passing its renderer tests."
+    },
+    {
+      "line": 734,
+      "heading": "### Phase 2 — Establish VisualCore shared APIs",
+      "target": "docs/api/visualcore-public-api.txt",
+      "status": "implemented-and-verified",
+      "note": "Public API of 15 modules, reviewed and baselined since gate F09 (scripts/check_public_api.py). Every listed area has a consumer except the audio placeholders."
+    },
+    {
+      "line": 750,
+      "heading": "### Phase 3 — Migrate ProjectM incrementally",
+      "target": "docs/architecture/migration-log.md",
+      "status": "implemented-and-verified",
+      "note": "Done as a harness, not inside ProjectM: Harnesses/ProjectMReference runs the unmodified engine on RenderHost (gate F07). The shipping app is untouched (read-only submodule, ADR-0002)."
+    },
+    {
+      "line": 766,
+      "heading": "### Phase 4 — Build reusable shader and effects infrastructure",
+      "target": "specs/005-effects-graph",
+      "status": "implemented-and-verified",
+      "note": "Shader services (gate F03), effects (F04), PingPongTarget (A02-P01), parameter binding and presets (VisualCoreParameters, A01-P01). First consumer was Generative Art Studio, not VisualCore Studio."
+    },
+    {
+      "line": 781,
+      "heading": "### Phase 5 — Add reusable scenes, particles, and interaction",
+      "target": "specs/006-input-animation-scenes",
+      "status": "implemented-and-verified",
+      "note": "Gate F05: 2D primitives, timelines, particles, cameras, gestures. Not built: textured sprites, scene transitions and anything beyond a single lit mesh in 3D."
+    },
+    {
+      "line": 796,
+      "heading": "### Phase 6 — Build the independent VisualCore Studio application",
+      "target": "archive",
+      "status": "historical",
+      "note": "Not selected: no VisualCore Studio app exists. Its acceptance test (a standalone app that needs no ProjectM code) was met by the Showcase (F06) and Generative Art Studio (A01)."
+    },
+    {
+      "line": 811,
+      "heading": "### Phase 7 — Build Simulation Lab",
+      "target": "AC-7",
+      "status": "planned",
+      "note": "Simulation Lab is A16 (not started, gates A16-P00 to A16-P06) and no longer an early framework phase. Its task list is covered by the archived manual."
+    },
+    {
+      "line": 823,
+      "heading": "### Phase 8 — Build Digital Aquarium",
+      "target": "AC-7",
+      "status": "planned",
+      "note": "Digital Aquarium is A09 (not started, gates A09-P00 to A09-P06) and no longer an early framework phase."
+    },
+    {
+      "line": 835,
+      "heading": "### Phase 9 — Stabilize, document, and release VisualCore",
+      "target": "specs/010-stabilization-release",
+      "status": "implemented-and-verified",
+      "note": "Gate F09: API and dependency review, documentation, licenses, CI, baselines, release notes 1.0.0-rc.1. 'Device validation' did not happen; support-matrix.md lists D1-D3 as pending."
+    },
+    {
+      "line": 851,
+      "heading": "## 9. Repository and Project Organization Considerations",
+      "target": "AC-16",
+      "status": "superseded",
+      "note": "The illustrative layout (Submodules/, Integrations/, eight packages, three apps) was not used: the submodule is at External/projectm-ios and packages follow ADR-0003; ADR-0009 D-06 sets the next layout."
+    },
+    {
+      "line": 897,
+      "heading": "### 9.1 Submodule setup example",
+      "target": "archive",
+      "status": "historical",
+      "note": "Example with the unused path Submodules/projectm-ios and an 'update --remote' command that the submodule rules forbid as an unattended step. The executed variant is README section 3.2."
+    },
+    {
+      "line": 920,
+      "heading": "## 10. Spec Kit and Claude Code Implementation Strategy",
+      "target": "AC-19",
+      "status": "implemented-and-verified",
+      "note": "Section heading. One Spec Kit feature per ledger gate (ADR-0004) with the installed hyphenated skills; 35 features are sealed (specs/001 to specs/035)."
+    },
+    {
+      "line": 926,
+      "heading": "### 10.1 Initial setup",
+      "target": ".specify",
+      "status": "implemented-and-verified",
+      "note": "Repository, submodule and Spec Kit were set up before gate F00 (ADR-0001), with the README variant of the commands (External/projectm-ios, Claude integration, Python scripts)."
+    },
+    {
+      "line": 957,
+      "heading": "### 10.2 Suggested Spec Kit workflow",
+      "target": "AC-19",
+      "status": "planned",
+      "note": "Still the rule: use the installed command names. Here they are the hyphenated /speckit-* skills, and converge is part of the sequence (ADR-0004, root CLAUDE.md rule 14)."
+    },
+    {
+      "line": 974,
+      "heading": "### 10.3 Constitution prompt",
+      "target": ".specify/memory/constitution.md",
+      "status": "implemented-and-verified",
+      "note": "This variant was not run (the README 10.1 prompt was; ADR-0004, feature 002). Its principles are in constitution 1.5.0 (I, II, II-a, V, X); 'every abstraction needs a consumer' was widened by ADR-0007."
+    },
+    {
+      "line": 1008,
+      "heading": "### 10.4 Phase 0: Repository audit",
+      "target": "specs/001-baseline-audit",
+      "status": "implemented-and-verified",
+      "note": "Variant prompt not run; the README 10.2 prompt was (ADR-0004). The four audit documents it asks for exist in docs/architecture/ (gate F00 and its rework)."
+    },
+    {
+      "line": 1054,
+      "heading": "### 10.5 Phase 1: Extract ANGLE/EGL integration",
+      "target": "specs/003-rendering-lifecycle",
+      "status": "implemented-and-verified",
+      "note": "Variant prompt not run; its scope was delivered by feature 003 (gate F02) from the README 10.4 prompt."
+    },
+    {
+      "line": 1082,
+      "heading": "### 10.6 Phase 2: VisualCore shared APIs",
+      "target": "specs/002-architecture-contracts",
+      "status": "implemented-and-verified",
+      "note": "Variant prompt not run; contracts and API rules came from feature 002 (gate F01 rework) and the reviewed API baseline from feature 010 (gate F09)."
+    },
+    {
+      "line": 1110,
+      "heading": "### 10.7 Phase 3: ProjectM migration",
+      "target": "specs/008-projectm-integration",
+      "status": "implemented-and-verified",
+      "note": "Variant prompt not run; delivered by feature 008 (gate F07) with the override that the reference is read-only and is driven through a harness."
+    },
+    {
+      "line": 1134,
+      "heading": "### 10.8 Phase 4: Shader and effects infrastructure",
+      "target": "specs/004-resources-shaders",
+      "status": "implemented-and-verified",
+      "note": "Variant prompt not run; delivered by features 004 and 005 (gates F03, F04) and by A01-P01 and A02-P01 for presets and ping-pong targets."
+    },
+    {
+      "line": 1157,
+      "heading": "### 10.9 Phase 5: Scenes, particles, and interaction",
+      "target": "specs/006-input-animation-scenes",
+      "status": "implemented-and-verified",
+      "note": "Variant prompt not run; delivered by feature 006 (gate F05). Its rule 'no complete game-engine architecture unless requirements demand it' still applies (AC-13)."
+    },
+    {
+      "line": 1181,
+      "heading": "### 10.10 Phase 6: VisualCore Studio application",
+      "target": "archive",
+      "status": "historical",
+      "note": "Prompt for an app that was not selected; never run. Its MVP list overlaps Generative Art Studio (A01, sealed)."
+    },
+    {
+      "line": 1207,
+      "heading": "### 10.11 Phase 7: Simulation Lab",
+      "target": "archive",
+      "status": "historical",
+      "note": "Not the prompt of record: A16 uses the prompts of its archived manual (features 116-122 in docs/process/speckit-prompt-manifest.json). The content requirement stays planned under AC-7."
+    },
+    {
+      "line": 1232,
+      "heading": "### 10.12 Phase 8: Digital Aquarium",
+      "target": "archive",
+      "status": "historical",
+      "note": "Not the prompt of record: A09 uses the prompts of its archived manual (features 067-073 in docs/process/speckit-prompt-manifest.json). The content requirement stays planned under AC-7."
+    },
+    {
+      "line": 1252,
+      "heading": "### 10.13 Phase 9: Stabilization and release",
+      "target": "specs/010-stabilization-release",
+      "status": "implemented-and-verified",
+      "note": "Variant prompt not run; delivered by feature 010 (gate F09) from the README 10.11 prompt. 'Supported-device validation' is still open."
+    },
+    {
+      "line": 1275,
+      "heading": "### 10.14 Bounded implementation loop",
+      "target": "AC-19",
+      "status": "planned",
+      "note": "Still the loop: specify, clarify, plan, checklist, tasks, analyze, implement in bounded increments, test, inspect the diff, commit. Never all phases in one run (ADR-0004)."
+    },
+    {
+      "line": 1295,
+      "heading": "## 11. Claude Code Repository Instructions",
+      "target": "AC-2",
+      "status": "superseded",
+      "note": "Suggested CLAUDE.md text; replaced by the agent contract (archived) and now by the small bootstrap of ADR-0009 D-10. Its rules are in the constitution and in Auto-Creator.md."
+    },
+    {
+      "line": 1349,
+      "heading": "## 12. Testing and Quality Strategy",
+      "target": "AC-22",
+      "status": "implemented-and-verified",
+      "note": "Section heading. Framework and regression tests exist and are sealed (gates F02-F09); performance validation on hardware has not started. See the subsections."
+    },
+    {
+      "line": 1351,
+      "heading": "### 12.1 Framework tests",
+      "target": "Packages/VisualCoreRendering/Tests",
+      "status": "implemented-and-verified",
+      "note": "All ten cases are covered by VisualCoreRenderingTests and VisualCoreEffectsTests on iOS 27.2 and 26.5 simulators (gates F02-F04; cleanup sweep F09 T-F906). Orientation on real devices is untested."
+    },
+    {
+      "line": 1365,
+      "heading": "### 12.2 Application regression tests",
+      "target": "AC-13",
+      "status": "implemented-and-verified",
+      "note": "ProjectM stays the permanent reference workload: scripts/run_reference_baseline.py and the harness lockstep comparison with a synthetic signal (gate F07) are rerun after framework changes. No device comparison."
+    },
+    {
+      "line": 1377,
+      "heading": "### 12.3 Performance validation",
+      "target": "AC-23",
+      "status": "implemented-but-unverified",
+      "note": "Measuring code exists (AutomationRunner frame statistics, DeviceConditions, simulator baselines from F09) but nothing was measured on hardware. The record fields carry into the device protocol."
+    },
+    {
+      "line": 1391,
+      "heading": "### 12.4 Platform constraints",
+      "target": "AC-4",
+      "status": "planned",
+      "note": "Standing facts: builds need macOS and Xcode, simulators never replace device performance tests, export features must use public platform APIs (constitution VIII). The Windows note is moot."
+    },
+    {
+      "line": 1400,
+      "heading": "## 13. Python Automation Opportunities",
+      "target": "scripts",
+      "status": "implemented-and-verified",
+      "note": "Realized in scripts/ under other names: inventory_reference.py, check_dependencies.py, check_licenses.py, simulator_baselines.py, run_reference_baseline.py (gates F00-F09). No shader script exists."
+    },
+    {
+      "line": 1419,
+      "heading": "## 14. Risks and Mitigations",
+      "target": "archive",
+      "status": "historical",
+      "note": "Risk register of the brainstorm; the mitigations were applied in F00-F09. 'Excessive product scope' and 'unvalidated market assumptions' were accepted by the owner (ADR-0009 D-02 fixes 100 experiences)."
+    },
+    {
+      "line": 1436,
+      "heading": "## 15. Product Strategy and Commercial Considerations",
+      "target": "AC-5",
+      "status": "superseded",
+      "note": "The monetization options (paid app, paid packs, feature unlock, subscription) are replaced by one USD 1.99 non-consumable for the premium library; A01-A25 are free forever (ADR-0009 D-02, D-03)."
+    },
+    {
+      "line": 1462,
+      "heading": "## 16. Recommended Long-Term Sequence",
+      "target": "archive",
+      "status": "historical",
+      "note": "Sequence not adopted (Studio, Fluid, Aquarium, Simulation Lab, Shader Studio). Actual order: F00-F09, then A01 to A25 numerically in the legacy ledger (ADR-0009 D-12)."
+    },
+    {
+      "line": 1483,
+      "heading": "## 17. Immediate Next Steps",
+      "target": "archive",
+      "status": "historical",
+      "note": "Ten bootstrap steps of 2026-11-09; steps 1-9 were completed by F00-F02. Step 10 ('the portfolio is a roadmap, not a commitment') was overruled: all 25 are required (ADR-0009 D-02)."
+    },
+    {
+      "line": 1496,
+      "heading": "## 18. Final Recommendation",
+      "target": "AC-1",
+      "status": "superseded",
+      "note": "The four-product portfolio (ProjectM, Studio, Aquarium, Simulation Lab) gave way to one app with 100 experiences (ADR-0009 D-01, D-02). The aim of a reusable foundation is unchanged (AC-13)."
+    }
+  ]
+}

@@ -1,0 +1,664 @@
+{
+ "schema": 1,
+ "source": "docs/archive/planning/rounds/round2.md",
+ "rows": [
+  {
+   "line": 1,
+   "heading": "# round2.md — VisualCore: 25 Code-Generated Premium Games, Stage Two",
+   "target": "AC-4",
+   "status": "superseded",
+   "note": "Front matter. 25 separate paid-once games after the Round 1 device campaign: superseded by D-01, D-02, D-03, D-07 (C-02, C-03). ANGLE path, code-only art, no ads, offline and no Claude CLI remain planned rules."
+  },
+  {
+   "line": 7,
+   "heading": "## Reader map and canonical precedence",
+   "target": "AC-2",
+   "status": "superseded",
+   "note": "README and round2.md as authorities replaced by Auto-Creator.md (D-10, C-09); the 'do not start Stage Two' device gate is void (C-03). Kept: real repository evidence beats assumed paths; shared features before games."
+  },
+  {
+   "line": 14,
+   "heading": "## 0. Live repository and technology findings — snapshot, not a promise about the checkout",
+   "target": "archive",
+   "status": "historical",
+   "note": "Public-repository snapshot of 2026-11-10 (GitHub trees, Spec Kit docs, Apple docs); current state is AC-3. Its lessons are restated elsewhere: eight-stage Spec Kit loop, measure D3, distinctiveness audit."
+  },
+  {
+   "line": 26,
+   "heading": "## 1. Mandatory Round One exit gate and owner-approved limits",
+   "target": "AC-18",
+   "status": "superseded",
+   "note": "Round 2 may start only after 25 apps and 75 device rows: superseded by D-07 (C-03, C-04). Kept principle: a ticked checklist without the underlying artifacts proves nothing."
+  },
+  {
+   "line": 28,
+   "heading": "### 1.1 Required gate assertions",
+   "target": "AC-3",
+   "status": "superseded",
+   "note": "R1-EXIT-01..10 audit replaced by the consolidation baseline and ledgers (R02-F01 absorbed by UA-F00; D-12); 75 device rows void (D-07, C-03, C-04). Kept: no unsourced PASS, never clean user work, independent rerun."
+  },
+  {
+   "line": 39,
+   "heading": "### 1.2 Device inventory carried forward, without guessed updates",
+   "target": "AC-23",
+   "status": "planned",
+   "note": "D1 iPhone15,4; D2 iPad17,3; D3 iPad15,7 kept on iPadOS 26.5 (D-08). Re-detect live OS and build with devicectl before each campaign; signing and unlock are owner-only. Same data: docs/verification/devices-observed.json."
+  },
+  {
+   "line": 46,
+   "heading": "### 1.3 Hard product and implementation guardrails",
+   "target": "AC-4",
+   "status": "planned",
+   "note": "Ten guardrails kept: offline, no ads or trackers, code-only reproducible art, touch-only completion, Swift cores and GLSL via ANGLE, public APIs, no min-OS raise, traced evidence, 10 agents max. Price/no-StoreKit: C-02."
+  },
+  {
+   "line": 58,
+   "heading": "## 2. Target monorepo layout: actual files to inspect or create, never wholesale replace",
+   "target": "AC-16",
+   "status": "superseded",
+   "note": "Per-game Apps/<Game> targets, VisualCoreGames.yml, six Round2* packages, 25 GameModules packages, per-game store folders: superseded by D-01, D-06 (C-05; listings: UA-F14). specs/599-round2-suite-audit: no slot in D-11."
+  },
+  {
+   "line": 187,
+   "heading": "### 2.1 Public contracts to stabilize before game work",
+   "target": "AC-11.3",
+   "status": "planned",
+   "note": "Sketch types (GameSeed, SimulationTick, DeterministicPuzzleState) are proposals; ExperienceKit of D-05 is canonical. Kept: CPU-testable cores, integer ticks, immutable snapshots, renderer never decides win or fail."
+  },
+  {
+   "line": 223,
+   "heading": "### 2.2 Quality and performance acceptance (proposals until D1–D3 measurement)",
+   "target": "AC-12",
+   "status": "planned",
+   "note": "Proposed targets: 60 fps with adaptive tiers; input-to-visible median < 80 ms, p95 < 150 ms; per-seed digests; 30-minute D3 run; no blocking shader compile; UI test reaches win, fail, undo, replay. Levels: 100 (C-07)."
+  },
+  {
+   "line": 237,
+   "heading": "## 3. Spec Kit and Claude Desktop integration: invocation rules",
+   "target": "AC-19",
+   "status": "planned",
+   "note": "One skill per action; check .specify/feature.json before each; converge loop for every feature; no claude CLI; specify CLI for setup only. R2-* ids become R02-* (C-10); its ledger states are replaced by D-12."
+  },
+  {
+   "line": 254,
+   "heading": "### 3.1 Constitution amendment — complete `/speckit-constitution` prompt (invoke once)",
+   "target": "AC-19",
+   "status": "superseded",
+   "note": "Stage Two amendment prompt (L256) must not be run: it encodes the Round 1 device prerequisite and a ban on paid IAP (C-03, C-02). Replaced by the 2.0.0 amendment named in ADR-0009 Consequences (gate CONSTITUTION-2)."
+  },
+  {
+   "line": 259,
+   "heading": "### 3.2 Large-document, bounded-context retrieval for Claude Desktop",
+   "target": "AC-21",
+   "status": "planned",
+   "note": "Never load the file whole: read the rules, the dependency table and only the active feature; never summarize unread parts. The mechanism is now scripts/planning_index.py with docs/catalog/feature-index.json (D-14)."
+  },
+  {
+   "line": 272,
+   "heading": "## 4. New VisualCore features FIRST — dependency order, consumers and complete Spec Kit prompts",
+   "target": "AC-13",
+   "status": "planned",
+   "note": "Shared features come before games; reconcile each with existing code and extend instead of duplicating; listed paths are proposals. Stable ids R2-Fnn are normalized to R02-Fnn (C-10, D-06)."
+  },
+  {
+   "line": 274,
+   "heading": "### 4.1 Overall feature-to-game dependency map",
+   "target": "AC-13",
+   "status": "planned",
+   "note": "34 shared features with consumers and dependencies. Migration ledger: 24 pending (F02-F24, F26) and 10 superseded by unified features (F01, F25, F27-F34 -> UA-F00, UA-F03..F06, UA-F08..F14; D-11, C-05)."
+  },
+  {
+   "line": 311,
+   "heading": "### 4.2 Full per-feature technical contracts and literal skill prompts",
+   "target": "AC-21",
+   "status": "planned",
+   "note": "Container of the 34 feature blocks R2-F01..F34 (L312-1978), indexed with hashes and prompt line ranges in docs/catalog/feature-index.json. Prompts run verbatim together with the canonical override notes."
+  },
+  {
+   "line": 1979,
+   "heading": "### 4.3 Round Two expanded engineering contracts — binding supplement to all 34 feature prompts",
+   "target": "AC-13",
+   "status": "planned",
+   "note": "Binds all 34 prompts: reuse audit first; 8 workstreams with own gates (100 witnessed levels per game, no placeholders); API sketches are proposals; optical truth boundary; artifact rule. Packages: D-06; IAP ban: C-02."
+  },
+  {
+   "line": 2029,
+   "heading": "## 5. Stage Two portfolio roster, user value, differentiating mechanics and commercial boundary",
+   "target": "AC-8",
+   "status": "planned",
+   "note": "The 25 games in rank order with research id, score, core action and hero graphics = R02-G01..G25 in docs/catalog/experience-catalog.json. Price column ($2.99 for 01-05, $3.99 for 06-25) superseded by D-02, D-03 (C-02)."
+  },
+  {
+   "line": 2059,
+   "heading": "## 6. Game-by-game implementation blueprints — 25 independently complete products",
+   "target": "AC-6",
+   "status": "planned",
+   "note": "Intro rule for the 25 chapters (L2061-29230, indexed in experience-catalog.json; AC-8): each game needs real 3D interaction, win/fail, solver-certified catalog, pause/replay, offline progress. Separate 'products': D-01."
+  },
+  {
+   "line": 29231,
+   "heading": "## 7. Strict autonomous project schedule and task graph",
+   "target": "AC-18",
+   "status": "superseded",
+   "note": "Per-round order (Round 1 devices, Round 2 lock, 75 rows) superseded by D-07 and D-08 (C-03, C-04). Principle kept at the scale of 100 experiences: implement and simulator-verify everything, then D1, D2, D3."
+  },
+  {
+   "line": 29233,
+   "heading": "### 7.1 Overall gate ledger",
+   "target": "AC-18",
+   "status": "superseded",
+   "note": "Gates R2-000 .. R2-FINAL-AUDIT replaced by the migration ledger (D-12), ImplementationLock-100 (D-07) and 300 device rows (D-08). R2-F34 moves before devices as UA-F12. Go/Pivot/No-Go per game is at odds with D-02."
+  },
+  {
+   "line": 29246,
+   "heading": "### 7.2 Deterministic checkpoint ledger JSON example",
+   "target": "AC-25",
+   "status": "superseded",
+   "note": ".autonomy/round2-state.json (visualcore.round2.ledger.v1) replaced by .autonomy/migration/ledger.json, written only by scripts/migration_ledger.py (D-12). Rules kept there: no skipped dependency, attempts, atomic writes."
+  },
+  {
+   "line": 29268,
+   "heading": "### 7.3 Scheduling, human limits and recovery",
+   "target": "AC-25",
+   "status": "planned",
+   "note": "The Desktop Code session is the only AI executor: no Python supervisor calling claude or a model API. Optional native scheduled continuation task. Owner-only prompts become BLOCKED_OWNER_ACTION; other work continues."
+  },
+  {
+   "line": 29271,
+   "heading": "### 7.4 Session restart and stuck-gate algorithm",
+   "target": "AC-25",
+   "status": "planned",
+   "note": "Restart loop: reread rules, inspect git and sources, take the lock with a lease, pick the first ready gate, run one skill, verify, update atomically, commit. No device run if the lock SHA differs. File names: D-12."
+  },
+  {
+   "line": 29296,
+   "heading": "## 8. Deterministic build, simulation and device-test command playbook",
+   "target": "AC-22",
+   "status": "planned",
+   "note": "Commands are templates: discover schemes, destinations and identifiers from live xcrun output; capture full output in files; never hide a failure behind '|| true'; set timeouts; limit parallel jobs."
+  },
+  {
+   "line": 29298,
+   "heading": "### 8.1 Initial environment and repository checks",
+   "target": "setup.md",
+   "status": "planned",
+   "note": "Equivalent checks exist: setup.md section 8 (scripts/verify_environment.py), scripts/inventory_devices.py and CLAUDE.md section 2 (git state). round2_preflight.py and its 75-device-row refusal are void (C-03)."
+  },
+  {
+   "line": 29315,
+   "heading": "### 8.2 XcodeGen and simulator commands",
+   "target": "AC-22",
+   "status": "planned",
+   "note": "Two simulator runtimes (iOS 26.5, 27.2), unsigned builds, result bundles, 180 s test allowance. Simulator results never prove device pacing or thermals; never overwrite a good reference image. Per-game schemes: C-05."
+  },
+  {
+   "line": 29334,
+   "heading": "### 8.3 Pixel and visual validation contract",
+   "target": "AC-22",
+   "status": "planned",
+   "note": "Hero scene at fixed camera and seed: screenshot plus semantic scene description; check histograms, black frames, NaNs, silhouette bounds; tolerant pixel compare; a human still judges 'stunning'. Harness is UA-F09."
+  },
+  {
+   "line": 29336,
+   "heading": "### 8.4 Physical-device automation — only after both implementation locks",
+   "target": "AC-23",
+   "status": "planned",
+   "note": "devicectl install, launch, file pull and device XCTest; automation writes one finite JSON and exits; device pre-unlocked; Release has no automation symbols. Gate is ImplementationLock-100 (D-07); one app build (C-05)."
+  },
+  {
+   "line": 29356,
+   "heading": "### 8.5 Complete D1/D2/D3 batch plan, no interleaving",
+   "target": "AC-23",
+   "status": "planned",
+   "note": "D1, then D2, then D3, never interleaved; 11 modes per game (launch .. stress-30m .. exit); failures kept and linked to reruns; D3 never updated. 25 games and 75 rows become 100 experiences and 300 rows (D-08, C-04)."
+  },
+  {
+   "line": 29363,
+   "heading": "### 8.6 JSON evidence schema — one file per game per device",
+   "target": "AC-22.3",
+   "status": "planned",
+   "note": "Fields: run id, device, OS and build, hashed UDID, git revision, lock-manifest hash, binary hash, seed, status, samples, xcresult. Validator rejects PASS without observed evidence. Per-game scheme/bundle: C-05."
+  },
+  {
+   "line": 29394,
+   "heading": "### 8.7 Measurement procedures adopted from ProjectM-iOS",
+   "target": "AC-12",
+   "status": "planned",
+   "note": "At least 200 samples for percentage criteria; an id per sample; shader load, draw, first frame and input response measured apart; CADisplayLink on-time slots; thermal state; container audit; no private counters."
+  },
+  {
+   "line": 29396,
+   "heading": "### 8.8 CI, repository, signing and compliance lessons",
+   "target": "AC-24",
+   "status": "planned",
+   "note": "Pinned XcodeGen, no committed .xcodeproj, untracked signing file, unsigned CI and simulator builds, cache keys with fork SHAs, no CI for devices. Its StoreKit paragraph (zero IAP, no .storekit file) is void: C-02, D-04."
+  },
+  {
+   "line": 29399,
+   "heading": "### 8.9 Privacy, trademark, legal and art-provenance checklist",
+   "target": "AC-15",
+   "status": "planned",
+   "note": "Source and binary scan for ad SDKs, ad identifiers, trackers, remote image pipelines, placeholder branding, copied art or audio, confusing titles; verify vendored licenses. StoreKit check must allow one product (C-02)."
+  },
+  {
+   "line": 29401,
+   "heading": "### 8.10 Distinctive original identities and anti-variant review",
+   "target": "AC-15.4",
+   "status": "planned",
+   "note": "Pairwise identity matrix (objective, inputs, state, scoring, progression, silhouette) with six named close pairs; owner UA-F11. Its remedy (combine or retire a near-duplicate) conflicts with D-02 (no substitution): open."
+  },
+  {
+   "line": 29404,
+   "heading": "## 9. ONE-SHOT MASTER PROMPT — paste once into Claude Desktop Code (not Terminal)",
+   "target": "AC-28",
+   "status": "superseded",
+   "note": "Stage Two one-shot prompt replaced by the continuation prompt of Auto-Creator.md (D-10); its Round 1 precondition and pricing rules are void (C-03, C-02). The source itself overrides it with section 13."
+  },
+  {
+   "line": 29429,
+   "heading": "## 10. Desktop-native continuation prompt, same repository",
+   "target": "AC-28",
+   "status": "superseded",
+   "note": "Continuation prompt tied to .autonomy/round2-state.json and round2.md; replaced by the continuation prompt of Auto-Creator.md and the migration ledger (D-10, D-12). Its device precondition is void (C-03)."
+  },
+  {
+   "line": 29433,
+   "heading": "## 11. Full source arguments and research lineage",
+   "target": "AC-26",
+   "status": "planned",
+   "note": "Appendix rule: the 25 outlines hold 75 claims, 300 reasons and 300 evidence items; they are hypotheses, not proof; never rewrite them silently; contradicting evidence goes in a dated addendum linked to tests (D-14)."
+  },
+  {
+   "line": 29435,
+   "heading": "### 11.1. Verbatim Round Two 25-game AssertionOutlines",
+   "target": "docs/brainstorm/Round-2-Top25-Complete-AssertionOutlines.md",
+   "status": "planned",
+   "note": "Embedded copy (L29437-31092) is line-identical to this tracked file. The per-game outlines (L29449-31073) are linked from experience-catalog.json; their acceptance contracts and kill criteria remain test inputs."
+  },
+  {
+   "line": 29437,
+   "heading": "# VisualCore — Refined Round 2: 25 Complete AssertionOutlines",
+   "target": "docs/brainstorm/Round-2-Top25-Complete-AssertionOutlines.md",
+   "status": "planned",
+   "note": "Header of the embedded outlines (2026-11-10). The build rule (100% procedural VisualCore/GLSL/ANGLE/Metal graphics) and 'never ads' stay; the price range $1.99–$4.99 paid once is superseded by D-03 (C-02)."
+  },
+  {
+   "line": 29441,
+   "heading": "## Reading guide: argument, reasons, evidence, counterarguments",
+   "target": "docs/brainstorm/Round-2-Top25-Complete-AssertionOutlines.md",
+   "status": "planned",
+   "note": "Structure: 3 claims x 4 reasons x 1 evidence item per game. Legend: observed external; analytical/design; acceptance contract (a falsifiable planned test, never a passed test). A high score is not a success."
+  },
+  {
+   "line": 31074,
+   "heading": "## Evidence and interpretation limitations",
+   "target": "docs/brainstorm/Round-2-Top25-Complete-AssertionOutlines.md",
+   "status": "planned",
+   "note": "Market evidence covers comparables and hardware evidence covers instrumentation, not results; every acceptance contract is a proposed experiment; recheck the competitive landscape before release (UA-F14)."
+  },
+  {
+   "line": 31078,
+   "heading": "## Key public sources",
+   "target": "docs/brainstorm/Round-2-Top25-Complete-AssertionOutlines.md",
+   "status": "historical",
+   "note": "13 source links of the outlines (Apple chart, Sensor Tower, SteamDB, Steam pages, ANGLE, Apple performance guidance, App Review guidelines, US Copyright Office). Reference list only."
+  },
+  {
+   "line": 31094,
+   "heading": "### 11.2. Original 500-game commercial research study (archived reference)",
+   "target": "docs/brainstorm/Round-2-Refined-Premium-Games-Study-500.md",
+   "status": "historical",
+   "note": "Embedded copy (L31097-32442) equals this tracked file line for line. Provenance only: scores are hypotheses and its sketches are replaced by the section 6 blueprints (L31095)."
+  },
+  {
+   "line": 31097,
+   "heading": "# VisualCore Premium 3D Games — Refined Round 2: 500 Candidates, Code-Only Graphics",
+   "target": "docs/brainstorm/Round-2-Refined-Premium-Games-Study-500.md",
+   "status": "historical",
+   "note": "Study header, baseline 2026-11-10: 500 ideas (200 inherited, 300 new), not prototypes; scores are screening judgments. Its business line (one upfront purchase, no IAP) is superseded by D-03 (C-02)."
+  },
+  {
+   "line": 31103,
+   "heading": "## Executive decision: launch a portfolio of experiments, not 25 clones",
+   "target": "docs/brainstorm/Round-2-Refined-Premium-Games-Study-500.md",
+   "status": "historical",
+   "note": "500 concepts x 62 criteria; 249 pass every gate; 25 shortlisted. 'a top-25 ranking is a decision to prototype, not a commitment to publish every candidate' is at odds with D-02 (all 100 ship)."
+  },
+  {
+   "line": 31107,
+   "heading": "### Hard requirements",
+   "target": "AC-4",
+   "status": "planned",
+   "note": "Six selection rules behind section 1.3: code-only art, the existing ANGLE path only, effect must embody a gameplay decision, bounded deterministic loops, originality. The $1.99-$4.99 bullet is superseded (C-02)."
+  },
+  {
+   "line": 31116,
+   "heading": "### Top 25 ordered for creative/technical prototyping",
+   "target": "docs/brainstorm/Round-2-Refined-Premium-Games-Study-500.md",
+   "status": "historical",
+   "note": "Ranked table of the 25 selected candidates; the order is R02-G01..G25 (source_rank and score in experience-catalog.json). Price column ($2.99 for 1-5, $3.99 for 6-25) superseded by D-02, D-03 (C-02)."
+  },
+  {
+   "line": 31146,
+   "heading": "## 1. Market evidence: what is known, and what is not",
+   "target": "docs/brainstorm/Round-2-Refined-Premium-Games-Study-500.md",
+   "status": "historical",
+   "note": "Market context (Sensor Tower 2025, Apple top-paid list, Steam precedents, Steam hardware survey) with stated limits: no sales forecast for these concepts. Contains no requirement."
+  },
+  {
+   "line": 31158,
+   "heading": "### A platform-portability precedent (verified from product listings)",
+   "target": "docs/brainstorm/Round-2-Refined-Premium-Games-Study-500.md",
+   "status": "historical",
+   "note": "Five PC comparables (Tiny Glade, Mini Metro, Dorfromantik, Glass Masquerade, Poly Bridge 3) with lessons and porting caveats. Genre precedents, not proposals to copy."
+  },
+  {
+   "line": 31168,
+   "heading": "## 2. Copyright, App Store policy and the danger of indistinguishable games",
+   "target": "AC-15.4",
+   "status": "planned",
+   "note": "Ideas are free, expression is not: no reused code, levels, names, audio or look. Document one distinct mechanic, content structure and experience per title (UA-F11). Guideline 4.3 many-apps risk eases under D-01."
+  },
+  {
+   "line": 31174,
+   "heading": "## 3. All 62 criteria, rubric and score calculation",
+   "target": "docs/brainstorm/Round-2-Refined-Premium-Games-Study-500.md",
+   "status": "historical",
+   "note": "Score = 0.30 x commercial (50 criteria, group multipliers) + 0.70 x visual (12 criteria); 1-5 ordinal judgments; eligibility is checked before ranking. Data: docs/brainstorm/Round-2-Refined-Premium-500x62-Scoring.csv."
+  },
+  {
+   "line": 31182,
+   "heading": "### Original 50 criteria (all retained)",
+   "target": "docs/brainstorm/Round-2-Refined-Premium-Games-Study-500.md",
+   "status": "historical",
+   "note": "Criteria M01-M10, C11-C20, P21-P30, U31-U40, E41-E50 with weights. P21 and P24 assume a paid-once $1.99-$4.99 game, a premise superseded by D-03 (C-02); the rest is scoring provenance."
+  },
+  {
+   "line": 31237,
+   "heading": "### 12 visual-production criteria (mandatory thresholds)",
+   "target": "docs/brainstorm/Round-2-Refined-Premium-Games-Study-500.md",
+   "status": "historical",
+   "note": "V01-V12 with minimum ratings (V06 zero image generation 4.90, V08 no manual art 4.90, V10 D3 budget 3.80) plus gates P23 >= 3.55, U36 >= 3.65, C12 >= 3.60. Selection thresholds, not product tests."
+  },
+  {
+   "line": 31256,
+   "heading": "## 4. Population and qualification audit",
+   "target": "docs/brainstorm/Round-2-Refined-Premium-Games-Study-500.md",
+   "status": "historical",
+   "note": "200 inherited + 300 new = 500 ids; 249 qualified (20 inherited, 229 new), 251 rejected; shortlist 4 inherited + 21 new."
+  },
+  {
+   "line": 31263,
+   "heading": "### Major threshold failures across rejected candidates (a concept may fail multiple checks)",
+   "target": "docs/brainstorm/Round-2-Refined-Premium-Games-Study-500.md",
+   "status": "historical",
+   "note": "Counts of rejected candidates per failed gate (V08 132, C12 130, V06 128, V01 119, V04 117 ...). Audit statistics only."
+  },
+  {
+   "line": 31282,
+   "heading": "### Category balance of the final portfolio",
+   "target": "docs/brainstorm/Round-2-Refined-Premium-Games-Study-500.md",
+   "status": "historical",
+   "note": "Shortlist count per mechanic family (15 families, at most two each). The family names are the 'family' field of docs/catalog/experience-catalog.json."
+  },
+  {
+   "line": 31302,
+   "heading": "## 5. Sensitivity: what changes if we trust visuals less or more?",
+   "target": "docs/brainstorm/Round-2-Refined-Premium-Games-Study-500.md",
+   "status": "historical",
+   "note": "Ranks of the 25 at 50% and 80% visual weight; differences under one point are ties; the family cap makes selected rank differ from raw rank. The order is frozen by D-02 regardless."
+  },
+  {
+   "line": 31336,
+   "heading": "## 6. Revenue economics without ads or in-app purchases",
+   "target": "AC-5",
+   "status": "superseded",
+   "note": "Per-app paid-once scenarios ($1.99 to $4.99; break-even example at $3.99) superseded by D-03: free download plus one USD 1.99 non-consumable (C-02). Text preserved in the tracked study under docs/brainstorm/."
+  },
+  {
+   "line": 31349,
+   "heading": "## 7. VisualCore architecture: code must create the art",
+   "target": "AC-12",
+   "status": "planned",
+   "note": "Pipeline Swift rule model -> VisualCore -> OpenGL ES 3.0/EGL via ANGLE -> Metal (D-09); forks stay pinned; 15 module names are proposals (AC-13); feature negotiation; no GLES compute, no costly volumetric raymarch."
+  },
+  {
+   "line": 31367,
+   "heading": "### Low-cost ways to appear luxurious",
+   "target": "AC-12",
+   "status": "planned",
+   "note": "Seven guidelines, e.g. band-limited gradients and restrained bloom, spline strips instead of volumes, approximate refraction, instancing and shader caching, deterministic generation, tests at phone scale."
+  },
+  {
+   "line": 31377,
+   "heading": "## 8. Implementation and physical-device strategy",
+   "target": "AC-23",
+   "status": "planned",
+   "note": "Freeze all code before the D1, D2, D3 campaign (D-07, D-08). Stated only here: documented 30 fps quality mode, 10 hero views per game, outside-player comprehension test, must-stop failure list. Rest is in sections 7-8."
+  },
+  {
+   "line": 31395,
+   "heading": "## 9. Top 25: original product hypotheses and implementation sketches",
+   "target": "docs/brainstorm/Round-2-Refined-Premium-Games-Study-500.md",
+   "status": "historical",
+   "note": "Container of 25 one-page sketches (premise, hook, packaging, risk, vertical slice). Replaced inside the source by the section 6 blueprints (L31095); kept for provenance."
+  },
+  {
+   "line": 31397,
+   "heading": "### 01. Aurora Loom — 94.80 / 100",
+   "target": "docs/brainstorm/Round-2-Refined-Premium-Games-Study-500.md",
+   "status": "historical",
+   "note": "Study sketch of R02-G01 Aurora Loom (candidate G162): premise, hook, top risk, vertical slice. Replaced by its section 6 blueprint (L31095); the $2.99 paid-once packaging is void (C-02)."
+  },
+  {
+   "line": 31417,
+   "heading": "### 02. Lissajous Labyrinth — 94.30 / 100",
+   "target": "docs/brainstorm/Round-2-Refined-Premium-Games-Study-500.md",
+   "status": "historical",
+   "note": "Study sketch of R02-G02 Lissajous Labyrinth (candidate G456): premise, hook, top risk, vertical slice. Replaced by its section 6 blueprint (L31095); the $2.99 paid-once packaging is void (C-02)."
+  },
+  {
+   "line": 31437,
+   "heading": "### 03. Wave Knot Keeper — 94.30 / 100",
+   "target": "docs/brainstorm/Round-2-Refined-Premium-Games-Study-500.md",
+   "status": "historical",
+   "note": "Study sketch of R02-G03 Wave Knot Keeper (candidate G466): premise, hook, top risk, vertical slice. Replaced by its section 6 blueprint (L31095); the $2.99 paid-once packaging is void (C-02)."
+  },
+  {
+   "line": 31457,
+   "heading": "### 04. Hue Compass — 94.21 / 100",
+   "target": "docs/brainstorm/Round-2-Refined-Premium-Games-Study-500.md",
+   "status": "historical",
+   "note": "Study sketch of R02-G04 Hue Compass (candidate G400): premise, hook, top risk, vertical slice. Replaced by its section 6 blueprint (L31095); the $2.99 paid-once packaging is void (C-02)."
+  },
+  {
+   "line": 31477,
+   "heading": "### 05. Colorfall Canyons — 94.13 / 100",
+   "target": "docs/brainstorm/Round-2-Refined-Premium-Games-Study-500.md",
+   "status": "historical",
+   "note": "Study sketch of R02-G05 Colorfall Canyons (candidate G161): premise, hook, top risk, vertical slice. Replaced by its section 6 blueprint (L31095); the $2.99 paid-once packaging is void (C-02)."
+  },
+  {
+   "line": 31497,
+   "heading": "### 06. Chrono Constellator — 94.02 / 100",
+   "target": "docs/brainstorm/Round-2-Refined-Premium-Games-Study-500.md",
+   "status": "historical",
+   "note": "Study sketch of R02-G06 Chrono Constellator (candidate G450): premise, hook, top risk, vertical slice. Replaced by its section 6 blueprint (L31095); the $3.99 paid-once packaging is void (C-02)."
+  },
+  {
+   "line": 31517,
+   "heading": "### 07. Amethyst Escape — 93.99 / 100",
+   "target": "docs/brainstorm/Round-2-Refined-Premium-Games-Study-500.md",
+   "status": "historical",
+   "note": "Study sketch of R02-G07 Amethyst Escape (candidate G299): premise, hook, top risk, vertical slice. Replaced by its section 6 blueprint (L31095); the $3.99 paid-once packaging is void (C-02)."
+  },
+  {
+   "line": 31537,
+   "heading": "### 08. Faceted Forge — 93.98 / 100",
+   "target": "docs/brainstorm/Round-2-Refined-Premium-Games-Study-500.md",
+   "status": "historical",
+   "note": "Study sketch of R02-G08 Faceted Forge (candidate G291): premise, hook, top risk, vertical slice. Replaced by its section 6 blueprint (L31095); the $3.99 paid-once packaging is void (C-02)."
+  },
+  {
+   "line": 31557,
+   "heading": "### 09. Nocturne Garden — 93.96 / 100",
+   "target": "docs/brainstorm/Round-2-Refined-Premium-Games-Study-500.md",
+   "status": "historical",
+   "note": "Study sketch of R02-G09 Nocturne Garden (candidate G368): premise, hook, top risk, vertical slice. Replaced by its section 6 blueprint (L31095); the $3.99 paid-once packaging is void (C-02)."
+  },
+  {
+   "line": 31577,
+   "heading": "### 10. Backwards Aurora — 93.96 / 100",
+   "target": "docs/brainstorm/Round-2-Refined-Premium-Games-Study-500.md",
+   "status": "historical",
+   "note": "Study sketch of R02-G10 Backwards Aurora (candidate G451): premise, hook, top risk, vertical slice. Replaced by its section 6 blueprint (L31095); the $3.99 paid-once packaging is void (C-02)."
+  },
+  {
+   "line": 31597,
+   "heading": "### 11. Echo Cartographer — 93.91 / 100",
+   "target": "docs/brainstorm/Round-2-Refined-Premium-Games-Study-500.md",
+   "status": "historical",
+   "note": "Study sketch of R02-G11 Echo Cartographer (candidate G181): premise, hook, top risk, vertical slice. Replaced by its section 6 blueprint (L31095); the $3.99 paid-once packaging is void (C-02)."
+  },
+  {
+   "line": 31617,
+   "heading": "### 12. Harmonic Bridges — 93.81 / 100",
+   "target": "docs/brainstorm/Round-2-Refined-Premium-Games-Study-500.md",
+   "status": "historical",
+   "note": "Study sketch of R02-G12 Harmonic Bridges (candidate G217): premise, hook, top risk, vertical slice. Replaced by its section 6 blueprint (L31095); the $3.99 paid-once packaging is void (C-02)."
+  },
+  {
+   "line": 31637,
+   "heading": "### 13. Acoustic Constellator — 93.81 / 100",
+   "target": "docs/brainstorm/Round-2-Refined-Premium-Games-Study-500.md",
+   "status": "historical",
+   "note": "Study sketch of R02-G13 Acoustic Constellator (candidate G230): premise, hook, top risk, vertical slice. Replaced by its section 6 blueprint (L31095); the $3.99 paid-once packaging is void (C-02)."
+  },
+  {
+   "line": 31657,
+   "heading": "### 14. Moonlit Mechanism — 93.73 / 100",
+   "target": "docs/brainstorm/Round-2-Refined-Premium-Games-Study-500.md",
+   "status": "historical",
+   "note": "Study sketch of R02-G14 Moonlit Mechanism (candidate G370): premise, hook, top risk, vertical slice. Replaced by its section 6 blueprint (L31095); the $3.99 paid-once packaging is void (C-02)."
+  },
+  {
+   "line": 31677,
+   "heading": "### 15. Voxel Origami — 93.70 / 100",
+   "target": "docs/brainstorm/Round-2-Refined-Premium-Games-Study-500.md",
+   "status": "historical",
+   "note": "Study sketch of R02-G15 Voxel Origami (candidate G426): premise, hook, top risk, vertical slice. Replaced by its section 6 blueprint (L31095); the $3.99 paid-once packaging is void (C-02)."
+  },
+  {
+   "line": 31697,
+   "heading": "### 16. Starlit Cartouche — 93.56 / 100",
+   "target": "docs/brainstorm/Round-2-Refined-Premium-Games-Study-500.md",
+   "status": "historical",
+   "note": "Study sketch of R02-G16 Starlit Cartouche (candidate G355): premise, hook, top risk, vertical slice. Replaced by its section 6 blueprint (L31095); the $3.99 paid-once packaging is void (C-02)."
+  },
+  {
+   "line": 31717,
+   "heading": "### 17. Celestial Eclipse Lab — 93.43 / 100",
+   "target": "docs/brainstorm/Round-2-Refined-Premium-Games-Study-500.md",
+   "status": "historical",
+   "note": "Study sketch of R02-G17 Celestial Eclipse Lab (candidate G359): premise, hook, top risk, vertical slice. Replaced by its section 6 blueprint (L31095); the $3.99 paid-once packaging is void (C-02)."
+  },
+  {
+   "line": 31737,
+   "heading": "### 18. Apsides Workshop — 93.14 / 100",
+   "target": "docs/brainstorm/Round-2-Refined-Premium-Games-Study-500.md",
+   "status": "historical",
+   "note": "Study sketch of R02-G18 Apsides Workshop (candidate G254): premise, hook, top risk, vertical slice. Replaced by its section 6 blueprint (L31095); the $3.99 paid-once packaging is void (C-02)."
+  },
+  {
+   "line": 31757,
+   "heading": "### 19. Microscopic Aurora — 93.06 / 100",
+   "target": "docs/brainstorm/Round-2-Refined-Premium-Games-Study-500.md",
+   "status": "historical",
+   "note": "Study sketch of R02-G19 Microscopic Aurora (candidate G415): premise, hook, top risk, vertical slice. Replaced by its section 6 blueprint (L31095); the $3.99 paid-once packaging is void (C-02)."
+  },
+  {
+   "line": 31777,
+   "heading": "### 20. Mushroom Weather — 93.04 / 100",
+   "target": "docs/brainstorm/Round-2-Refined-Premium-Games-Study-500.md",
+   "status": "historical",
+   "note": "Study sketch of R02-G20 Mushroom Weather (candidate G414): premise, hook, top risk, vertical slice. Replaced by its section 6 blueprint (L31095); the $3.99 paid-once packaging is void (C-02)."
+  },
+  {
+   "line": 31797,
+   "heading": "### 21. Binary Gardens — 93.00 / 100",
+   "target": "docs/brainstorm/Round-2-Refined-Premium-Games-Study-500.md",
+   "status": "historical",
+   "note": "Study sketch of R02-G21 Binary Gardens (candidate G249): premise, hook, top risk, vertical slice. Replaced by its section 6 blueprint (L31095); the $3.99 paid-once packaging is void (C-02)."
+  },
+  {
+   "line": 31817,
+   "heading": "### 22. Mycelium Architect — 92.91 / 100",
+   "target": "docs/brainstorm/Round-2-Refined-Premium-Games-Study-500.md",
+   "status": "historical",
+   "note": "Study sketch of R02-G22 Mycelium Architect (candidate G276): premise, hook, top risk, vertical slice. Replaced by its section 6 blueprint (L31095); the $3.99 paid-once packaging is void (C-02)."
+  },
+  {
+   "line": 31837,
+   "heading": "### 23. Erosion Painter — 92.90 / 100",
+   "target": "docs/brainstorm/Round-2-Refined-Premium-Games-Study-500.md",
+   "status": "historical",
+   "note": "Study sketch of R02-G23 Erosion Painter (candidate G321): premise, hook, top risk, vertical slice. Replaced by its section 6 blueprint (L31095); the $3.99 paid-once packaging is void (C-02)."
+  },
+  {
+   "line": 31857,
+   "heading": "### 24. Crystal Quarry — 92.90 / 100",
+   "target": "docs/brainstorm/Round-2-Refined-Premium-Games-Study-500.md",
+   "status": "historical",
+   "note": "Study sketch of R02-G24 Crystal Quarry (candidate G334): premise, hook, top risk, vertical slice. Replaced by its section 6 blueprint (L31095); the $3.99 paid-once packaging is void (C-02)."
+  },
+  {
+   "line": 31877,
+   "heading": "### 25. Starlight Surveyors — 92.84 / 100",
+   "target": "docs/brainstorm/Round-2-Refined-Premium-Games-Study-500.md",
+   "status": "historical",
+   "note": "Study sketch of R02-G25 Starlight Surveyors (candidate G122): premise, hook, top risk, vertical slice. Replaced by its section 6 blueprint (L31095); the $3.99 paid-once packaging is void (C-02)."
+  },
+  {
+   "line": 31897,
+   "heading": "## 10. Full 500-game ranked inventory",
+   "target": "docs/brainstorm/Round-2-Refined-Premium-Games-Study-500.md",
+   "status": "historical",
+   "note": "All 500 candidates by raw score with eligibility flag (table L31901-32402); not reviewed row by row. Machine data: docs/brainstorm/Round-2-Refined-Premium-500x62-Scoring.csv; later rounds draw from the same pool."
+  },
+  {
+   "line": 32404,
+   "heading": "## 11. Failure modes and the critical-thinking response",
+   "target": "docs/brainstorm/Round-2-Refined-Premium-Games-Study-500.md",
+   "status": "historical",
+   "note": "Six cautions: a visual demo is not a game; scores are not predictions; sources are not exhaustive; D3 technology risk; portfolio similarity; paid discovery costs. The rules are restated in sections 1.3, 2.2 and 8.10."
+  },
+  {
+   "line": 32418,
+   "heading": "## 12. Final recommendation: build only what the evidence earns",
+   "target": "docs/brainstorm/Round-2-Refined-Premium-Games-Study-500.md",
+   "status": "historical",
+   "note": "Recommends three first prototypes and a two-stage proof ('Only then select release waves'). Overtaken by D-02 (all 100 experiences in the first release, order fixed) and D-07."
+  },
+  {
+   "line": 32424,
+   "heading": "## Sources and audit references",
+   "target": "docs/brainstorm/Round-2-Refined-Premium-Games-Study-500.md",
+   "status": "historical",
+   "note": "15 source links. Names companion files Market-Evidence-Register.csv, Audit-Manifest.json, build_500_study.py and candidate_seeds.txt; none of them is in this repository."
+  },
+  {
+   "line": 32444,
+   "heading": "## 12. Final source-integrity and no-fabrication requirements",
+   "target": "AC-25",
+   "status": "planned",
+   "note": "No artificial progress: targets, planned rows, prompts, model claims and simulator screenshots are not device evidence; if SDK or source differ, fix ADR and command with proof. Preflight list partly void (C-01, C-09)."
+  },
+  {
+   "line": 32451,
+   "heading": "## 13. FINAL ONE-SHOT CLAUDE DESKTOP EXECUTION PROMPT — THIS IS THE LAST SECTION OF `round2.md`",
+   "target": "AC-28",
+   "status": "superseded",
+   "note": "Final Stage Two prompt (overrides section 9), replaced by the Auto-Creator.md continuation prompt (D-10; C-02, C-03, C-05). Carries 100-level catalogs (001-080 + 081-100), 80 QA scenarios, 15 storyboard scenes per game."
+  }
+ ]
+}

@@ -1,0 +1,48 @@
+{
+  "schema": 1,
+  "source": "docs/archive/planning/embedded/sources/VisualCore-25-App-Specs/INDEX.md",
+  "rows": [
+    {
+      "line": 1,
+      "heading": "# VisualCore — 25 standalone iOS app implementation manuals",
+      "target": "AC-7",
+      "status": "superseded",
+      "note": "The manuals are no longer plans for standalone apps but the design input of experiences A01-A25 (ADR-0009 D-01). They remain implementation plans, not evidence. Byte-identical copy of VisualCore-25-App-Specs-Index.md."
+    },
+    {
+      "line": 9,
+      "heading": "## Contents",
+      "target": "AC-7",
+      "status": "planned",
+      "note": "List of the 25 manuals with family and brainstorm rank; carried as A01-A25 in docs/catalog/experience-catalog.json. A01-A03 are sealed, A04 is partial, A05-A25 are not started."
+    },
+    {
+      "line": 39,
+      "heading": "## Recommended use",
+      "target": "AC-19",
+      "status": "superseded",
+      "note": "Audit first (F00) and one narrow first app (A01) were done. Separate app repositories gave way to the monorepo (ADR-0007) and to one app target (ADR-0009 D-01); per-app device validation to D-07."
+    },
+    {
+      "line": 47,
+      "heading": "## Shared technical rules",
+      "target": "AC-4",
+      "status": "planned",
+      "note": "Still binding: one ANGLE path, no ProjectM linkage in experiences, macOS and Xcode for builds and graphics QA, no other-app audio capture, no automatic live wallpaper, no unverified scientific or precision claims."
+    },
+    {
+      "line": 56,
+      "heading": "## Source and command documentation",
+      "target": "archive",
+      "status": "historical",
+      "note": "Reference links. Both original sources (README.md, AppsBrainstorm.md) are archived next to this file."
+    },
+    {
+      "line": 64,
+      "heading": "## Manifest checks",
+      "target": "docs/archive/planning/ARCHIVE-MANIFEST.json",
+      "status": "implemented-and-verified",
+      "note": "The counts hold for the archived files: 25 manuals, 16,168 lines, 1,347,611 bytes. Source hashes were sealed by desktop_runbook.py validate (gate F01, check runbook-validate) and by planning_archive.py verify."
+    }
+  ]
+}

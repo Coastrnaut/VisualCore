@@ -1,0 +1,55 @@
+{
+  "schema": 1,
+  "source": "docs/archive/planning/embedded/sources/ProjectM-iOS-CLAUDE.md",
+  "rows": [
+    {
+      "line": 1,
+      "heading": "# ProjectM-iOS — agent guide",
+      "target": "archive",
+      "status": "historical",
+      "note": "Agent guide of the separate ProjectM-iOS repository; its own constitution and spec govern there. ProjectM stays out of the app (ADR-0009 D-09). Lines 170-381 (playbook) are mapped by another reviewer."
+    },
+    {
+      "line": 8,
+      "heading": "## Rules that are easy to break",
+      "target": "AC-4",
+      "status": "planned",
+      "note": "Rules adopted here and still binding: public Apple APIs only (scripts/check_compliance.py), manual signing, D3 stays on iPadOS 26.5, honest task ticks, Vendor/angle never moved. The CaptureLab rule is ProjectM-only."
+    },
+    {
+      "line": 27,
+      "heading": "## Working with agents (owner preference, 2026-11-08)",
+      "target": "AC-19",
+      "status": "planned",
+      "note": "Still binding owner preference: at most 10 agents at once, one writer per file, an agent's report is not evidence, builds and simulator runs serialized on the one Mac, no device or owner tasks for agents."
+    },
+    {
+      "line": 43,
+      "heading": "## Where things stand (2026-11-08)",
+      "target": "archive",
+      "status": "historical",
+      "note": "Status history of ProjectM-iOS (stages, gates, feature 002 with its own USD 1.99 unlock, CI, toolchain, device runs). Its device and purchase results never certify VisualCore (ADR-0009 D-03, D-08)."
+    },
+    {
+      "line": 124,
+      "heading": "## Next tasks on the Mac, in order",
+      "target": "archive",
+      "status": "historical",
+      "note": "Task queue of ProjectM-iOS from 2026-11-08 (its tasks T010 to T056). No VisualCore requirement."
+    },
+    {
+      "line": 143,
+      "heading": "## Commands",
+      "target": "archive",
+      "status": "historical",
+      "note": "ProjectM-iOS command list. VisualCore ported the same patterns under its own scripts/ (validate_docs.py, check_compliance.py, verify_environment.py, test_scripts.py)."
+    },
+    {
+      "line": 162,
+      "heading": "## Conventions",
+      "target": "AC-24",
+      "status": "planned",
+      "note": "Still binding: commit after each task or skill, no co-author trailers, LF line endings (.gitattributes). The standing push-to-main approval is suspended on the migration branch (ADR-0009 D-13, C-08)."
+    }
+  ]
+}

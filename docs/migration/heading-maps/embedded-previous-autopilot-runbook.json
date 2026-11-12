@@ -1,0 +1,244 @@
+{
+  "schema": 1,
+  "source": "docs/archive/planning/embedded/sources/Previous-autopilot-runbook.md",
+  "rows": [
+    {
+      "line": 1,
+      "heading": "# VisualCore — Autonomous iOS Graphics Suite",
+      "target": "AC-1",
+      "status": "superseded",
+      "note": "Runbook of 2026-11-10 for a suite of 25 separately built apps; replaced by the Desktop runbook README and now by one app with experiences (ADR-0009 D-01, D-10). Its 'never invent a green result' rule stays."
+    },
+    {
+      "line": 11,
+      "heading": "## Navigation",
+      "target": "archive",
+      "status": "historical",
+      "note": "Table of contents. Section 19 (preserved manuals) is not part of this extracted file; the manuals are archived separately under docs/archive/planning/embedded/apps/."
+    },
+    {
+      "line": 35,
+      "heading": "## 1. Mission and non-negotiable constraints",
+      "target": "AC-4",
+      "status": "planned",
+      "note": "The nine must-nots stay binding; the five evidence terms (implemented to release-ready) live on as the status words of AC-2. '25 separately buildable products' and the source order are superseded (D-01, D-10)."
+    },
+    {
+      "line": 55,
+      "heading": "## 2. Updated architecture and critical decisions",
+      "target": "AC-13",
+      "status": "implemented-and-verified",
+      "note": "Section heading. The architecture below was confirmed against real code in gates F00-F02 (ADR-0002, ADR-0003); the subsections say what ADR-0009 changes."
+    },
+    {
+      "line": 57,
+      "heading": "### 2.1 Target dependency graph",
+      "target": "docs/architecture/visualcore-architecture.md",
+      "status": "implemented-and-verified",
+      "note": "Built as drawn below the app layer: a thin source-audited host (RenderHost) instead of moved ProjectM objects (ADR-0002, gate F02). The top layer is now one app with experiences (ADR-0009 D-01)."
+    },
+    {
+      "line": 84,
+      "heading": "### 2.2 Decision log for unattended implementation",
+      "target": "AC-4",
+      "status": "planned",
+      "note": "The runbook's own decisions 002-020 (not the repository's ADR files) remain rules, mostly in the constitution. Superseded: its 001 and 015 by ADR-0009 D-01, its 009 by the reuse rule of ADR-0007."
+    },
+    {
+      "line": 109,
+      "heading": "### 2.3 Architectural APIs to validate, not invent",
+      "target": "AC-13",
+      "status": "implemented-and-verified",
+      "note": "Validated and baselined in docs/api/visualcore-public-api.txt (gate F09, scripts/check_public_api.py). Still absent: audio FFT and envelope features (ADR-0006), a physics module and GPU frame counters."
+    },
+    {
+      "line": 126,
+      "heading": "### 2.4 Shared quality architecture",
+      "target": "AC-11.3",
+      "status": "planned",
+      "note": "Rule for ExperienceKit (ADR-0009 D-05): pure versioned snapshots, GPU objects as recreatable cache, atomic saves with migrations, explicit color and alpha conventions. Already practiced in A01-A03."
+    },
+    {
+      "line": 130,
+      "heading": "## 3. The 25-app suite and dependency-aware execution order",
+      "target": "AC-7",
+      "status": "planned",
+      "note": "All 25 stay required, now as free experiences. A01-A03 are sealed, A04 is partial; the legacy ledger continues in numeric order from A04-P04 (ADR-0009 D-12). The wave letters are only a priority hint."
+    },
+    {
+      "line": 166,
+      "heading": "## 4. Repository ownership, layout and dependency rules",
+      "target": "AC-16",
+      "status": "superseded",
+      "note": "25 app targets with own bundle ids are replaced by one target (ADR-0009 D-01, D-06). .autopilot/ became .autonomy/ (ADR-0001), packages follow ADR-0003, branch rules follow ADR-0009 D-13."
+    },
+    {
+      "line": 243,
+      "heading": "## 5. Environment, bootstrap and one-command launch",
+      "target": "archive",
+      "status": "historical",
+      "note": "Section heading. Host provisioning lives on in setup.md; the one-command supervisor launch described below belongs to the retired claude -p process."
+    },
+    {
+      "line": 245,
+      "heading": "### 5.1 Pre-provision the host once",
+      "target": "setup.md",
+      "status": "implemented-and-verified",
+      "note": "Mac with full Xcode 27.2 verified by scripts/verify_environment.py; three devices paired with Developer Mode (gate F00, checks verify-environment and device-inventory). Signing is still an owner action."
+    },
+    {
+      "line": 277,
+      "heading": "### 5.2 Put this file in an empty/new repository root and extract the supervisor",
+      "target": "archive",
+      "status": "historical",
+      "note": "autopilot.py was never extracted here. The former README replaced it with Tools/python/desktop_runbook.py and .autonomy/ (ADR-0001); a supervisor that starts claude -p is forbidden (CLAUDE.md rule 8)."
+    },
+    {
+      "line": 313,
+      "heading": "### 5.3 If developing from Windows 11",
+      "target": "archive",
+      "status": "historical",
+      "note": "Not applicable: all work happens on the project Mac. The fact that Windows, WSL or emulation cannot replace Xcode and real devices stands."
+    },
+    {
+      "line": 323,
+      "heading": "### 5.4 Permission model for an unattended Claude Code process",
+      "target": "archive",
+      "status": "historical",
+      "note": "Describes claude -p with the dontAsk mode, which is no longer used (Claude Desktop Code only). Surviving principle: least privilege and no credential shortcuts (AC-24)."
+    },
+    {
+      "line": 327,
+      "heading": "## 6. Copy-ready one-shot autonomous Claude prompt",
+      "target": "AC-28",
+      "status": "superseded",
+      "note": "Launch prompt for the claude -p supervisor and the 25-app suite. Replaced by the single continuation prompt of Auto-Creator.md (ADR-0009 D-10); it must not be reused."
+    },
+    {
+      "line": 346,
+      "heading": "## 7. Spec Kit: actual initialization and execution semantics",
+      "target": "AC-19",
+      "status": "implemented-and-verified",
+      "note": "Hyphenated skills under .claude/skills/speckit-*, one feature per gate, serial execution, no forced re-initialization: all in force (ADR-0001, ADR-0004) and applied in specs/001 to specs/035."
+    },
+    {
+      "line": 377,
+      "heading": "## 8. Supervisor design and restart policy",
+      "target": "AC-25",
+      "status": "superseded",
+      "note": "The external supervisor was replaced by desktop_runbook.py with hashed run-check attestations (ADR-0001) and scripts/migration_ledger.py (ADR-0009 D-12). Kept: reruns as proof; passed gates are never rerun."
+    },
+    {
+      "line": 406,
+      "heading": "## 9. VisualCore foundation: ten executable phases",
+      "target": ".autonomy/state.json",
+      "status": "implemented-and-verified",
+      "note": "F00-F09 are all pass in the legacy ledger (evidence .autonomy/evidence/F00.json to F09.json, specs/001 to specs/010). F08 used Lumen Garden, not Generative Art Studio. Device smoke was never run."
+    },
+    {
+      "line": 425,
+      "heading": "## 10. App implementation: 175 executable phase gates",
+      "target": "AC-18",
+      "status": "planned",
+      "note": "25 of 175 gates are sealed (A01-P00 to A04-P03); 150 continue in the legacy ledger (ADR-0009 D-12). Device evidence in Phases 05-06 and 'suite-final' are superseded by D-07 and ImplementationLock-100."
+    },
+    {
+      "line": 445,
+      "heading": "## 11. Automated simulator and physical-device test strategy",
+      "target": "AC-22",
+      "status": "planned",
+      "note": "Section heading. The test layers stay: Python checks, pure unit tests, shader and GL tests, simulator UI tests, then device runs. The device layers move behind ImplementationLock-100 (ADR-0009 D-07)."
+    },
+    {
+      "line": 447,
+      "heading": "### 11.1 Discovery before commands (no invented schemes, UDIDs or SDK)",
+      "target": "AC-22",
+      "status": "implemented-and-verified",
+      "note": "Schemes, simulators and devices are discovered, never guessed: scripts/xcodebuild_package.py picks simulators by runtime, scripts/inventory_devices.py lists devices (gate F00). suite-matrix.json was never written."
+    },
+    {
+      "line": 463,
+      "heading": "### 11.2 Simulator automation",
+      "target": "AC-22",
+      "status": "planned",
+      "note": "The method stays for the 100 experiences (UA-F09): discovered simulator, result bundles, lifecycle and failure cases, tolerance-based snapshots. Used so far by the A01-A03 UI tests and run_automation_sim.py."
+    },
+    {
+      "line": 486,
+      "heading": "### 11.3 Physical-device automation (pre-paired Mac farm)",
+      "target": "AC-23",
+      "status": "planned",
+      "note": "No device runner exists and none may run before ImplementationLock-100 (ADR-0009 D-07). Signing, trust and unlock are owner actions (OD-06). The scenario list and baseline labels carry over (UA-F13)."
+    },
+    {
+      "line": 512,
+      "heading": "### 11.4 Test farm scheduling and capacity",
+      "target": "AC-23",
+      "status": "planned",
+      "note": "Carry over: one destination per device, serialized performance runs with cool-down, bounded requeue on disconnect or low battery. Scheduled device suites before the lock are not allowed (ADR-0009 D-07)."
+    },
+    {
+      "line": 516,
+      "heading": "### 11.5 Objective image and numerical validation",
+      "target": "AC-22",
+      "status": "planned",
+      "note": "Carry over as verification rules: compile and framebuffer checks, tolerance-based image metrics, seeds, golden arrays, screenshots. Today only ImageComparison and ImageStatistics exist (A01-P01)."
+    },
+    {
+      "line": 520,
+      "heading": "### 11.6 CI division",
+      "target": "AC-24",
+      "status": "superseded",
+      "note": "The three-lane design for 26 targets was never built: ci.yml runs host checks only (F09) and heavy gates run locally (release_check.py). One target now (ADR-0009 C-05, UA-F10); there is no device farm."
+    },
+    {
+      "line": 526,
+      "heading": "## 12. App-specific mandatory test and acceptance matrix",
+      "target": "AC-7",
+      "status": "planned",
+      "note": "The per-app mandatory checks stay acceptance input for A01-A25. Rows 01-03 are met by sealed gates, 04 partly, 05-25 are open; device-only items (idle power, thermal, benchmarks) wait for the lock."
+    },
+    {
+      "line": 558,
+      "heading": "## 13. Quality/security/privacy/licensing policy",
+      "target": "AC-15",
+      "status": "planned",
+      "note": "Standing policy. Enforced so far by check_compliance.py, check_privacy_manifest.py, check_licenses.py and check_app_release.py (F09, A01-P06). An in-app purchase now exists by design (ADR-0009 D-03)."
+    },
+    {
+      "line": 571,
+      "heading": "## 14. Artifacts, telemetry, evidence and completion checks",
+      "target": "AC-25",
+      "status": "superseded",
+      "note": ".autopilot evidence, 186 gates and the 25-entry suite matrix are replaced by .autonomy attestations (ADR-0001) and by the two ledgers with ImplementationLock-100 (ADR-0009 D-07, D-12)."
+    },
+    {
+      "line": 611,
+      "heading": "## 15. Failure handling, decision defaults and no-prompt policy",
+      "target": "AC-25",
+      "status": "planned",
+      "note": "The 14 defaults stay valid: inspect real APIs, full MVP scope, measure first, ADR for tool changes, fix and rerun, blocked instead of faked, never accept legal terms, never drop a source detail."
+    },
+    {
+      "line": 632,
+      "heading": "## 16. Claude repository instructions to generate",
+      "target": "AC-2",
+      "status": "superseded",
+      "note": "CLAUDE.md text for a child of autopilot.py. Replaced by the root bootstrap CLAUDE.md of ADR-0009 D-10; its accuracy, verification and security lines live on in rules 6, 9 and 12 of that file."
+    },
+    {
+      "line": 652,
+      "heading": "## 17. Reference sources and source-fidelity contract",
+      "target": "AC-26",
+      "status": "superseded",
+      "note": "SOURCE-BEGIN/END blocks inside one README are replaced by the byte-identical archive with a manifest and scripts/planning_archive.py verify (ADR-0009 D-14). Kept: no source detail is dropped."
+    },
+    {
+      "line": 665,
+      "heading": "## 18. Runnable Python supervisor (embedded)",
+      "target": "archive",
+      "status": "historical",
+      "note": "Reference implementation of the retired supervisor, which starts claude -p children. Never extracted or run in this repository; Tools/python/desktop_runbook.py took its place (ADR-0001)."
+    }
+  ]
+}

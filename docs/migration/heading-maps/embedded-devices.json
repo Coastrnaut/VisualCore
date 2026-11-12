@@ -1,0 +1,34 @@
+{
+  "schema": 1,
+  "source": "docs/archive/planning/embedded/sources/devices.md",
+  "rows": [
+    {
+      "line": 1,
+      "heading": "# Test Devices (FR-032, FR-034)",
+      "target": "AC-23",
+      "status": "historical",
+      "note": "Header of the ProjectM-iOS device record (the FR numbers are that repository's). Its rule 'record exact values before any device testing' continues: live values are detected per campaign (ADR-0009 D-08)."
+    },
+    {
+      "line": 7,
+      "heading": "## Inventory (recorded 2026-11-08 from the project owner)",
+      "target": "AC-23",
+      "status": "historical",
+      "note": "Inventory facts of 2026-11-08: D1 iPhone15,4 on iOS 27.0.1, D2 iPad17,3 on iPadOS 27.2, D3 iPad15,7 on iPadOS 26.5. Seen again read-only at F00 (docs/verification/devices-observed.json). Re-detect before use."
+    },
+    {
+      "line": 19,
+      "heading": "## Project device set (FR-032, spec Clarifications 2026-11-08)",
+      "target": "AC-23",
+      "status": "planned",
+      "note": "Still binding: exactly these three devices, D1 is the reference, D3 is the only iOS 26 device and is never updated from iPadOS 26.5, the exact OS is recorded on every row. The capture-mode column is ProjectM-only."
+    },
+    {
+      "line": 34,
+      "heading": "## Not applicable (owner decision 2026-11-08)",
+      "target": "AC-23",
+      "status": "historical",
+      "note": "ProjectM-iOS ruling: no second iPhone, no iPhone on iOS 26, no current-generation iPhone. Lasting effect: claims cover only the tested device classes and OS versions (docs/release/support-matrix.md)."
+    }
+  ]
+}

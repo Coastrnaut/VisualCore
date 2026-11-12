@@ -1,0 +1,587 @@
+{
+  "schema": 1,
+  "source": "docs/archive/planning/embedded/sources/README.md",
+  "rows": [
+    {
+      "line": 1,
+      "heading": "# VisualCore",
+      "target": "archive",
+      "status": "historical",
+      "note": "Title block of the original framework plan (2026-11-09): new repository, projectm-ios submodule, Spec Kit with Claude Code, ANGLE path. All of it was realized in F00-F09; the scope is now set by ADR-0009."
+    },
+    {
+      "line": 2,
+      "heading": "## Comprehensive Architecture, Repository, and Spec-Kit Implementation Plan",
+      "target": "archive",
+      "status": "historical",
+      "note": "Subtitle with the metadata lines 4-9 (project type, reference repository, platform, rendering foundation). No requirement of its own."
+    },
+    {
+      "line": 13,
+      "heading": "## 1. Executive summary",
+      "target": "AC-13",
+      "status": "implemented-and-verified",
+      "note": "Reusable infrastructure was built around the proven renderer in gates F00-F09 (specs/001 to specs/010, release 1.0.0-rc.1, simulators only). ProjectM stays a read-only submodule and the reference."
+    },
+    {
+      "line": 29,
+      "heading": "### The intended result",
+      "target": "docs/release/release-notes-1.0.0-rc.1.md",
+      "status": "implemented-and-verified",
+      "note": "All seven results exist: repository, pinned submodule (d93edd1, ADR-0005), tested boundary (ADR-0002), modules, reference regression, Showcase (F06), one Spec Kit feature per gate (ADR-0004). Gates F00-F09."
+    },
+    {
+      "line": 41,
+      "heading": "## 2. Foundational architecture decisions",
+      "target": "AC-4",
+      "status": "implemented-and-verified",
+      "note": "Section heading. The five constraints became constitution principles I, II and II-a and are checked by scripts/check_compliance.py (from gate F01) and scripts/check_dependencies.py (gates F02-F09)."
+    },
+    {
+      "line": 45,
+      "heading": "### 2.1 Preserve the existing ANGLE-to-Metal renderer",
+      "target": "AC-12",
+      "status": "implemented-and-verified",
+      "note": "RenderHost links the same prebuilt ANGLE frameworks and repeats the audited EGL sequence (ADR-0002, gate F02, specs/003-rendering-lifecycle). The rule continues as ADR-0009 D-09."
+    },
+    {
+      "line": 89,
+      "heading": "### 2.2 VisualCore is not a ProjectM rewrite",
+      "target": "AC-13",
+      "status": "implemented-and-verified",
+      "note": "ProjectM types stay out: rule R1 in scripts/check_dependencies.py (gates F02-F09) and build-time audits of the Showcase and the second consumer (F06, F08). The candidate responsibilities became modules (F02-F05)."
+    },
+    {
+      "line": 115,
+      "heading": "### 2.3 Extract only proven boundaries",
+      "target": "docs/architecture/migration-log.md",
+      "status": "implemented-and-verified",
+      "note": "The six questions were answered per component in reusable-component-inventory.md (gate F00). Boundaries 1, 2a and 2 and the parts deliberately retained in ProjectM are logged here (gates F02, F07)."
+    },
+    {
+      "line": 128,
+      "heading": "### 2.4 Avoid an unnecessary second renderer",
+      "target": "AC-12",
+      "status": "implemented-and-verified",
+      "note": "The only renderer is OpenGL ES 3.0 through ANGLE (constitution I, scripts/check_compliance.py, gates F01-F09; known-limitations.md). Native Metal stays excluded unless a test-backed ADR says otherwise (D-09)."
+    },
+    {
+      "line": 132,
+      "heading": "### 2.5 Keep the submodule authoritative",
+      "target": "AC-4",
+      "status": "implemented-and-verified",
+      "note": "External/projectm-ios is pinned and read-only; scripts/check_reference_clean.py runs before and after reference work (ref-clean checks in gates F02-F09). The only pin move is recorded in ADR-0005."
+    },
+    {
+      "line": 140,
+      "heading": "## 3. Repository strategy",
+      "target": "AC-16",
+      "status": "implemented-and-verified",
+      "note": "Section heading. Repository, submodule and tooling exist as audited in gate F00 (docs/architecture/repository-audit.md). The layout itself was revised by ADR-0003 and again by ADR-0009 D-06."
+    },
+    {
+      "line": 142,
+      "heading": "### 3.1 New repository",
+      "target": "AC-16",
+      "status": "superseded",
+      "note": "The eight-package tree was replaced by two SwiftPM packages plus Showcase/ and Harnesses/ (ADR-0003, package-map.md). ADR-0009 D-06 adds one app target and one experience package per collection."
+    },
+    {
+      "line": 196,
+      "heading": "### 3.2 Add ProjectM as a submodule",
+      "target": "specs/001-baseline-audit",
+      "status": "implemented-and-verified",
+      "note": "Submodule registered at External/projectm-ios (.gitmodules) and audited read-only by scripts/audit_projectm_reference.py (gate F00, .autonomy/evidence/F00.json)."
+    },
+    {
+      "line": 234,
+      "heading": "### 3.3 Submodule update policy",
+      "target": "AC-4",
+      "status": "implemented-and-verified",
+      "note": "Applied once: pin moved deliberately from 1ad0b99 to d93edd1 with the full reference regression (ADR-0005, F07 checks pin-d93edd1-*). Work inside the submodule is not done here (constitution II)."
+    },
+    {
+      "line": 268,
+      "heading": "### 3.4 Submodule rules for Claude Code",
+      "target": "AC-4",
+      "status": "implemented-and-verified",
+      "note": "All eight rules are in constitution II and II-a and in root CLAUDE.md rule 12; scripts/check_reference_clean.py and scripts/audit_projectm_reference.py enforce them (gates F00, F02-F09)."
+    },
+    {
+      "line": 283,
+      "heading": "## 4. Initial technology and platform assumptions",
+      "target": "docs/architecture/repository-audit.md",
+      "status": "implemented-and-verified",
+      "note": "The audit confirmed every row (gate F00); toolchain pins are in Configs/toolchain.json and checked by scripts/verify_environment.py. Hardware verification on physical devices has not happened (AC-23)."
+    },
+    {
+      "line": 304,
+      "heading": "## 5. Proposed package responsibilities",
+      "target": "docs/decisions/ADR-0003-package-boundaries.md",
+      "status": "superseded",
+      "note": "ADR-0003 and specs/002-architecture-contracts/contracts/package-map.md consolidated the eight proposed packages into two SwiftPM packages with 15 Swift modules and two C shims."
+    },
+    {
+      "line": 308,
+      "heading": "### 5.1 `VisualCore`",
+      "target": "Packages/VisualCoreRendering/Sources/VisualCoreRendering",
+      "status": "implemented-and-verified",
+      "note": "No umbrella module was built (ADR-0003). Renderer creation is RenderHost and capability reporting is RenderCapabilities (gate F02); shared value types live in the pure modules of Packages/VisualCore."
+    },
+    {
+      "line": 322,
+      "heading": "### 5.2 `VisualCoreRendering`",
+      "target": "Packages/VisualCoreRendering/Sources/VisualCoreRendering",
+      "status": "implemented-and-verified",
+      "note": "RenderHost, EGLDisplayProvider, FrameScheduler, RenderView: lifecycle states, resize, context generations, main-thread ownership. Gate F02, specs/003-rendering-lifecycle; simulators only."
+    },
+    {
+      "line": 339,
+      "heading": "### 5.3 `VisualCoreResources`",
+      "target": "Packages/VisualCoreRendering/Sources/VisualCoreRendering",
+      "status": "implemented-and-verified",
+      "note": "No separate package: ResourceRegistry, Texture, GPUBuffer, RenderTarget, PingPongTarget here; ResourceLedger and ResourceBudget in VisualCoreDiagnostics. Gate F03, specs/004-resources-shaders."
+    },
+    {
+      "line": 352,
+      "heading": "### 5.4 `VisualCoreShaders`",
+      "target": "Packages/VisualCore/Sources/VisualCoreShaderSource",
+      "status": "implemented-and-verified",
+      "note": "ShaderLibrary (includes, defines, line maps), InfoLogParser, ShaderCacheKey; ShaderProgram, ShaderBundle and the program cache are in VisualCoreRendering. Gate F03; runtime validation F09 (T-F905)."
+    },
+    {
+      "line": 368,
+      "heading": "### 5.5 `VisualCoreEffects`",
+      "target": "Packages/VisualCoreRendering/Sources/VisualCoreEffects",
+      "status": "implemented-and-verified",
+      "note": "Eight pass types (copy, color matrix, blur, bloom, distort, composite, feedback, flash limit) on a validated graph (VisualCoreEffectsGraph). Gate F04, specs/005-effects-graph. No device verification."
+    },
+    {
+      "line": 383,
+      "heading": "### 5.6 `VisualCoreInput`",
+      "target": "Packages/VisualCore/Sources/VisualCoreScenes",
+      "status": "implemented-and-verified",
+      "note": "No separate package: PointerEvent, PointerTracker, six gesture recognizers, ViewMetrics; the RenderView touch adapter is in VisualCoreRendering. Gate F05. Game controllers were not built (ADR-0006)."
+    },
+    {
+      "line": 395,
+      "heading": "### 5.7 `VisualCoreDiagnostics`",
+      "target": "Packages/VisualCore/Sources/VisualCoreDiagnostics",
+      "status": "implemented-and-verified",
+      "note": "RenderLifecycle, FramePacing, ResourceLedger, QualityPolicy, DeviceConditions (gates F02, F03, A02-P03); frame statistics in VisualCoreAutomation (F09). No shared overlay, asset metrics or GPU timing (ADR-0006)."
+    },
+    {
+      "line": 411,
+      "heading": "### 5.8 `VisualCoreTestSupport`",
+      "target": "docs/decisions/ADR-0006-unbuilt-readme-modules.md",
+      "status": "planned",
+      "note": "Only ImageComparison and ImageStatistics exist (A01-P01, specs/012-gas-p01-gallery-domain). Fake clock, fixtures and mock services are still open in ADR-0006. Rule R5 keeps the module in test targets."
+    },
+    {
+      "line": 417,
+      "heading": "## 6. Dependency direction",
+      "target": "AC-13",
+      "status": "implemented-and-verified",
+      "note": "Rules R1-R5 (package-map.md) are enforced by scripts/check_dependencies.py in every gate since the F01 rework; Showcase link audit in F06. ADR-0009 D-06 adds: experiences never depend on each other."
+    },
+    {
+      "line": 446,
+      "heading": "## 7. Multi-phase implementation roadmap",
+      "target": ".autonomy/state.json",
+      "status": "implemented-and-verified",
+      "note": "All ten phases are sealed as legacy gates F00-F09, one Spec Kit feature each (specs/001 to specs/010, ADR-0004); evidence in .autonomy/evidence/F00.json to F09.json."
+    },
+    {
+      "line": 450,
+      "heading": "### Phase 0 — Repository integration and baseline audit",
+      "target": "specs/001-baseline-audit",
+      "status": "implemented-and-verified",
+      "note": "Gate F00 plus the ADR-0004 rework (checks f00rework-* in F02.json): five deliverables exist; the reference builds and passes 13 of 13 renderer tests on two simulator runtimes. No device timing was recorded."
+    },
+    {
+      "line": 483,
+      "heading": "### Phase 1 — Architecture constitution and integration contracts",
+      "target": "specs/002-architecture-contracts",
+      "status": "implemented-and-verified",
+      "note": "Gate F01 plus rework: constitution, visualcore-architecture.md, four contracts including package-map.md, ADR-0002 (render host seam) and ADR-0003. Zero ownership ambiguities recorded."
+    },
+    {
+      "line": 512,
+      "heading": "### Phase 2 — Extract shared rendering lifecycle",
+      "target": "specs/003-rendering-lifecycle",
+      "status": "implemented-and-verified",
+      "note": "Gate F02 (.autonomy/evidence/F02.json). The reference is read-only, so the lifecycle was re-implemented and proven against it; ProjectM call sites were not migrated (ADR-0002, ADR-0004)."
+    },
+    {
+      "line": 537,
+      "heading": "### Phase 3 — Shared GPU resource and shader services",
+      "target": "specs/004-resources-shaders",
+      "status": "implemented-and-verified",
+      "note": "Gate F03: resource registry with byte budgets and leak counters, shader library, diagnostics and program cache, tested on iOS 27.2 and 26.5 simulators. ProjectM itself does not consume them."
+    },
+    {
+      "line": 554,
+      "heading": "### Phase 4 — Reusable effects and render pipelines",
+      "target": "specs/005-effects-graph",
+      "status": "implemented-and-verified",
+      "note": "Gate F04: eight pass types on a validated graph with pooled targets, limits of 32 passes and 256 MiB; shown in the Showcase (F06). No device performance measurement."
+    },
+    {
+      "line": 572,
+      "heading": "### Phase 5 — Input, animation, scenes, and procedural graphics",
+      "target": "specs/006-input-animation-scenes",
+      "status": "implemented-and-verified",
+      "note": "Gate F05: pointers and gestures, cameras, easing, timelines, 2D scene graph, particles, plane, cube and sphere meshes, fixed-step loop, Harnesses/InteractiveDemo. Reusable transitions were not built."
+    },
+    {
+      "line": 590,
+      "heading": "### Phase 6 — Standalone VisualCore Showcase application",
+      "target": "specs/007-showcase-app",
+      "status": "implemented-and-verified",
+      "note": "Gate F06: Showcase/ with five scenes, shader loading, effects, input, diagnostics, smoke tests and a build-time ProjectM dependency audit. The optional audio-reactive scene was not built (ADR-0006)."
+    },
+    {
+      "line": 615,
+      "heading": "### Phase 7 — ProjectM integration and regression hardening",
+      "target": "specs/008-projectm-integration",
+      "status": "implemented-and-verified",
+      "note": "Gate F07: Harnesses/ProjectMReference drives the unmodified engine through RenderHost (lockstep comparison, lifecycle stress, zero leaks). The shipping ProjectM app keeps its own renderer (migration-log.md)."
+    },
+    {
+      "line": 632,
+      "heading": "### Phase 8 — Reuse validation with a second consumer",
+      "target": "specs/009-second-consumer",
+      "status": "implemented-and-verified",
+      "note": "Gate F08: Harnesses/SecondConsumer (Lumen Garden, GardenKit) uses only documented VisualCore API, with a dependency audit and smoke tests on both simulator runtimes."
+    },
+    {
+      "line": 645,
+      "heading": "### Phase 9 — Stabilization, documentation, and release",
+      "target": "specs/010-stabilization-release",
+      "status": "implemented-and-verified",
+      "note": "Gate F09: API baseline, licenses, support matrix, known limitations, CI, release notes 1.0.0-rc.1, host and simulator baselines. Device rows of the support matrix stay pending; no device was tested."
+    },
+    {
+      "line": 665,
+      "heading": "## 8. Spec Kit setup",
+      "target": "AC-19",
+      "status": "implemented-and-verified",
+      "note": "Section heading. Spec Kit 1.4.1.dev0 with the Claude integration and Python scripts is installed (.specify/, nine .claude/skills/speckit-* skills; ADR-0001) and was used for specs/001 to specs/035."
+    },
+    {
+      "line": 669,
+      "heading": "### 8.1 Install prerequisites",
+      "target": "setup.md",
+      "status": "superseded",
+      "note": "Replaced by setup.md and Configs/toolchain.json, whose pins scripts/verify_environment.py has checked since gate F00. The specify executable is not on PATH and the claude CLI is not used (ADR-0001 item 3)."
+    },
+    {
+      "line": 701,
+      "heading": "### 8.2 Initialize Spec Kit in the new VisualCore repository",
+      "target": ".specify",
+      "status": "implemented-and-verified",
+      "note": "Done once before F00 (commit b17f60f, ADR-0001 item 3) with the Claude integration and Python scripts; never re-initialized and never inside External/projectm-ios. Used by gates F00 to A04-P03."
+    },
+    {
+      "line": 727,
+      "heading": "### 8.3 Start Claude Code",
+      "target": "AC-19",
+      "status": "superseded",
+      "note": "The claude CLI launch and the dotted /speckit.* names are replaced: the installed skills are hyphenated /speckit-* and run inside Claude Desktop Code (ADR-0004 decision 2, ADR-0001 item 3)."
+    },
+    {
+      "line": 757,
+      "heading": "### 8.4 Spec Kit command purpose",
+      "target": "AC-19",
+      "status": "planned",
+      "note": "Still the procedure for every new feature: all nine skills in order, and no implement run on an ambiguous or inconsistent plan (ADR-0004, root CLAUDE.md rule 14). Applied in specs/001 to specs/035."
+    },
+    {
+      "line": 775,
+      "heading": "## 9. Spec Kit feature organization",
+      "target": "AC-19",
+      "status": "superseded",
+      "note": "The eleven example directories gave way to one feature per ledger gate: specs/001-010 for F00-F09 and 011-185 for the apps (ADR-0004), extended by ADR-0009 D-11. Feature branches are not used."
+    },
+    {
+      "line": 809,
+      "heading": "## 10. Initial Claude Code and Spec Kit prompts",
+      "target": "docs/process/speckit-prompt-manifest.json",
+      "status": "implemented-and-verified",
+      "note": "Section heading. Each prompt below was quoted verbatim in its skill invocation with labelled canonical overrides (ADR-0004); gates F00-F09. The prompts of features 001-185 are indexed in this manifest."
+    },
+    {
+      "line": 813,
+      "heading": "### 10.1 Establish the constitution",
+      "target": ".specify/memory/constitution.md",
+      "status": "implemented-and-verified",
+      "note": "Run through /speckit-constitution: constitution 1.0.0 to 1.1.0 (ADR-0004 amendment log, feature 002, F01 rework). Now 1.5.0; the amendment to 2.0.0 required by ADR-0009 is pending."
+    },
+    {
+      "line": 846,
+      "heading": "### 10.2 Phase 0 — repository audit specification",
+      "target": "specs/001-baseline-audit",
+      "status": "implemented-and-verified",
+      "note": "Prompt quoted verbatim as the input of feature 001 (gate F00 and its ADR-0004 rework), with the override: host and simulator only, no physical device."
+    },
+    {
+      "line": 926,
+      "heading": "### 10.3 Phase 1 — architecture specification",
+      "target": "specs/002-architecture-contracts",
+      "status": "implemented-and-verified",
+      "note": "Prompt quoted verbatim as the input of feature 002 (gate F01; rework checks f01rework-* sealed in .autonomy/evidence/F02.json)."
+    },
+    {
+      "line": 978,
+      "heading": "### 10.4 Phase 2 — rendering lifecycle extraction",
+      "target": "specs/003-rendering-lifecycle",
+      "status": "implemented-and-verified",
+      "note": "Prompt quoted verbatim in feature 003 (gate F02). Override: the reference renderer stays unchanged, so 'migrate ProjectM call sites' became a re-implementation proven by regression."
+    },
+    {
+      "line": 1036,
+      "heading": "### 10.5 Phase 3 — resources and shader services",
+      "target": "specs/004-resources-shaders",
+      "status": "implemented-and-verified",
+      "note": "Prompt quoted verbatim in feature 004 (gate F03, .autonomy/evidence/F03.json)."
+    },
+    {
+      "line": 1076,
+      "heading": "### 10.6 Phase 4 — reusable effects",
+      "target": "specs/005-effects-graph",
+      "status": "implemented-and-verified",
+      "note": "Prompt quoted verbatim in feature 005 (gate F04). 'Measure performance on physical devices' was not done: no device test has ever run in this repository."
+    },
+    {
+      "line": 1097,
+      "heading": "### 10.7 Phase 5 — input, animation, and scene primitives",
+      "target": "specs/006-input-animation-scenes",
+      "status": "implemented-and-verified",
+      "note": "Prompt quoted verbatim in feature 006 (gate F05), with the override that pure logic goes into host-testable modules."
+    },
+    {
+      "line": 1116,
+      "heading": "### 10.8 Phase 6 — standalone showcase",
+      "target": "specs/007-showcase-app",
+      "status": "implemented-and-verified",
+      "note": "Prompt quoted verbatim in feature 007 (gate F06). The build-time dependency audit it asks for is scripts/audit_showcase_dependencies.py."
+    },
+    {
+      "line": 1137,
+      "heading": "### 10.9 Phase 7 — ProjectM migration",
+      "target": "specs/008-projectm-integration",
+      "status": "implemented-and-verified",
+      "note": "Prompt quoted verbatim in feature 008 (gate F07). Override: External/projectm-ios stays read-only; the adapter lives in Harnesses/ProjectMReference."
+    },
+    {
+      "line": 1165,
+      "heading": "### 10.10 Phase 8 — second consumer",
+      "target": "specs/009-second-consumer",
+      "status": "implemented-and-verified",
+      "note": "Prompt quoted verbatim in feature 009 (gate F08); the consumer lives in Harnesses/SecondConsumer."
+    },
+    {
+      "line": 1181,
+      "heading": "### 10.11 Phase 9 — stabilization and release",
+      "target": "specs/010-stabilization-release",
+      "status": "implemented-and-verified",
+      "note": "Prompt quoted verbatim in feature 010 (gate F09). Its rule 'claim no device or OS version that was not tested' is kept in docs/release/support-matrix.md."
+    },
+    {
+      "line": 1199,
+      "heading": "## 11. Claude Code repository guidance",
+      "target": "AC-2",
+      "status": "superseded",
+      "note": "The suggested CLAUDE.md was replaced by the agent contract (archived under docs/archive/planning/root/) and now by the small bootstrap of ADR-0009 D-10. Its rules live on in the constitution."
+    },
+    {
+      "line": 1257,
+      "heading": "### 11.1 Suggested Claude Code skills",
+      "target": "archive",
+      "status": "historical",
+      "note": "The six project skills and five agent definitions were never created; only the nine speckit-* skills exist. Their jobs are done by scripts/. The one-writer rule for subagents survives (CLAUDE.md rule 7)."
+    },
+    {
+      "line": 1288,
+      "heading": "## 12. Python automation",
+      "target": "scripts",
+      "status": "implemented-and-verified",
+      "note": "Deterministic checks live in scripts/ (not Tools/python/): audit, dependency, license, API and release checks with unit tests in scripts/test_scripts.py (gates F01-F09). Python never calls a model."
+    },
+    {
+      "line": 1307,
+      "heading": "### 12.1 Submodule inspection script",
+      "target": "scripts/check_reference_clean.py",
+      "status": "implemented-and-verified",
+      "note": "Realized as this script and scripts/audit_projectm_reference.py (gate F00 check projectm-reference-audit; ref-clean checks in F02-F09) instead of Tools/python/inspect_submodule.py."
+    },
+    {
+      "line": 1358,
+      "heading": "### 12.2 Package dependency validation",
+      "target": "scripts/check_dependencies.py",
+      "status": "implemented-and-verified",
+      "note": "Checks rules R1-R5: rejects cycles and any ProjectM dependency outside the reference harness (feature 002 T-F103; run in every gate from the F01 rework on)."
+    },
+    {
+      "line": 1372,
+      "heading": "### 12.3 Shader validation",
+      "target": "specs/010-stabilization-release",
+      "status": "implemented-and-verified",
+      "note": "Done as runtime compile tests, not an offline validator: ShaderValidationTests compile every built-in and bundled shader on iOS 27.2 and 26.5 simulators (F09, T-F905). Device GPUs are unchecked."
+    },
+    {
+      "line": 1385,
+      "heading": "### 12.4 License validation",
+      "target": "AC-15.4",
+      "status": "implemented-and-verified",
+      "note": "scripts/check_licenses.py with docs/legal/third-party.json, THIRD_PARTY_NOTICES.md and lgpl-analysis.md (F09, T-F907); bundling by scripts/bundle_licenses.py (A01-P06). No license file is rewritten."
+    },
+    {
+      "line": 1399,
+      "heading": "## 13. Testing and quality strategy",
+      "target": "AC-22",
+      "status": "implemented-and-verified",
+      "note": "Section heading. Every layer except physical-device tests runs in scripts/release_check.py (gate F09, T-F914) on the host and on two simulator runtimes."
+    },
+    {
+      "line": 1401,
+      "heading": "### 13.1 Test layers",
+      "target": "AC-22",
+      "status": "implemented-and-verified",
+      "note": "Python checks, Swift host tests, shader validation, simulator integration tests, reference regression and Showcase smoke tests exist (gates F01-F09). There is no C/C++ test target; the device layer was never run."
+    },
+    {
+      "line": 1414,
+      "heading": "### 13.2 Regression requirements",
+      "target": "AC-13",
+      "status": "implemented-and-verified",
+      "note": "scripts/run_reference_baseline.py reruns the unmodified reference build and renderer tests at the pinned commit after framework changes (gates F02-F09, ADR-0005). Device model rows do not apply yet."
+    },
+    {
+      "line": 1427,
+      "heading": "### 13.3 Performance",
+      "target": "AC-12",
+      "status": "implemented-but-unverified",
+      "note": "Host and simulator baselines exist (docs/performance, F09 T-F909) as regression signals only. No device baseline and no regression budget has been measured. 'No arbitrary targets' stays the rule."
+    },
+    {
+      "line": 1442,
+      "heading": "### 13.4 Physical-device testing",
+      "target": "AC-23",
+      "status": "planned",
+      "note": "Rule kept: simulator results never support claims about GPU performance, thermals, frame pacing, memory pressure or real ANGLE-Metal behavior. Device runs follow ImplementationLock-100 (ADR-0009 D-07, D-08)."
+    },
+    {
+      "line": 1455,
+      "heading": "## 14. CI strategy",
+      "target": "AC-24",
+      "status": "implemented-and-verified",
+      "note": ".github/workflows/ci.yml runs checks, host tests and a simulator build of the pure package (F09 T-F912 and T-F918, run green). Rendering, Showcase and reference builds run locally (release_check.py)."
+    },
+    {
+      "line": 1508,
+      "heading": "## 15. Git workflow and pull request policy",
+      "target": "AC-24",
+      "status": "superseded",
+      "note": "Feature branches and pull requests were never used: work went straight to main (constitution 1.2.0, ADR-0007) and now stays on migration/unified-app-plan with no push or merge (ADR-0009 D-13)."
+    },
+    {
+      "line": 1545,
+      "heading": "## 16. Risks and mitigations",
+      "target": "archive",
+      "status": "historical",
+      "note": "Risk register of the framework extraction. Each mitigation was applied in F00-F09 (audit first, read-only pin, R1-R5 checks, license inventory, bounded Spec Kit runs); live rules are in AC-4, AC-13 and AC-19."
+    },
+    {
+      "line": 1563,
+      "heading": "## 17. Definition of done",
+      "target": "docs/release/release-notes-1.0.0-rc.1.md",
+      "status": "implemented-and-verified",
+      "note": "All 15 items are met at 1.0.0-rc.1 by gates F00-F09 (item 10 through the reference harness; item 14 documents devices as untested). It stays a release candidate: no physical device has been tested."
+    },
+    {
+      "line": 1585,
+      "heading": "## 18. Recommended first execution sequence",
+      "target": "archive",
+      "status": "historical",
+      "note": "Section heading. Bootstrap sequence of 2026-11-09; every step was carried out before or during F00-F02. The steps below name the record of each."
+    },
+    {
+      "line": 1589,
+      "heading": "### Step 1 — Create the new repository and add the submodule",
+      "target": "specs/001-baseline-audit",
+      "status": "implemented-and-verified",
+      "note": "Repository created and the submodule added at External/projectm-ios; audited in gate F00 (.autonomy/evidence/F00.json)."
+    },
+    {
+      "line": 1611,
+      "heading": "### Step 2 — Install and initialize Spec Kit",
+      "target": ".specify",
+      "status": "implemented-and-verified",
+      "note": "Spec Kit initialized with the Claude integration and Python scripts before F00 (commit b17f60f, ADR-0001); not inside the submodule. Used by gates F00 to A04-P03."
+    },
+    {
+      "line": 1621,
+      "heading": "### Step 3 — Add root Claude instructions",
+      "target": "AC-2",
+      "status": "superseded",
+      "note": "A root CLAUDE.md was created for F00 and grew into the agent contract (now archived). ADR-0009 D-10 replaced it with the small bootstrap that points to Auto-Creator.md."
+    },
+    {
+      "line": 1625,
+      "heading": "### Step 4 — Launch Claude Code",
+      "target": "archive",
+      "status": "historical",
+      "note": "CLI launch and /help check. Work now runs in Claude Desktop Code and the claude CLI is not used (root CLAUDE.md rule 8); the installed skill names remain the authority."
+    },
+    {
+      "line": 1633,
+      "heading": "### Step 5 — Run Phase 0 only",
+      "target": "specs/001-baseline-audit",
+      "status": "implemented-and-verified",
+      "note": "Phase 0 ran alone and changed no production source (gate F00; reference tree clean before and after, checks f00rework-clean-* in F02.json)."
+    },
+    {
+      "line": 1637,
+      "heading": "### Step 6 — Review the audit",
+      "target": "docs/architecture/repository-audit.md",
+      "status": "implemented-and-verified",
+      "note": "Reviewed by rerunnable checks instead of by hand: citation check of the pipeline trace, reference audit and baseline rebuild (F02 checks f00rework-*, repeated at pin d93edd1 in gate F07)."
+    },
+    {
+      "line": 1649,
+      "heading": "### Step 7 — Approve architecture before extraction",
+      "target": "docs/decisions/ADR-0002-render-host-seam.md",
+      "status": "implemented-and-verified",
+      "note": "ADR-0002, ADR-0003 and the four contracts of feature 002 were accepted at gate F01 before feature 003 started. Acceptance used the owner's standing delegation (ADR-0001, ADR-0004)."
+    },
+    {
+      "line": 1653,
+      "heading": "### Step 8 — Implement one phase at a time",
+      "target": "AC-19",
+      "status": "planned",
+      "note": "Still the rule: the full skill sequence per feature, implement scoped to one task group, build and tests between groups (ADR-0004, root CLAUDE.md rule 14). The dotted names are now hyphenated."
+    },
+    {
+      "line": 1672,
+      "heading": "## 19. Important implementation notes",
+      "target": "AC-4",
+      "status": "planned",
+      "note": "Standing constraints. The first seven were honoured in F00-F09; the last two (simulator or compile results never prove device behavior or unchanged visuals) bind all future evidence (constitution VI)."
+    },
+    {
+      "line": 1686,
+      "heading": "## 20. Reference documentation",
+      "target": "archive",
+      "status": "historical",
+      "note": "External links (Spec Kit, Claude Code, ProjectM iOS). The installed skill files and specify --help remain the authority for command syntax."
+    },
+    {
+      "line": 1701,
+      "heading": "## Final architectural direction",
+      "target": "AC-12",
+      "status": "implemented-and-verified",
+      "note": "Realized: the framework is built around the working ANGLE path, ProjectM stays the pinned reference, and the first deliverable was the verified audit and baseline (gate F00). Continues as ADR-0009 D-09."
+    }
+  ]
+}
