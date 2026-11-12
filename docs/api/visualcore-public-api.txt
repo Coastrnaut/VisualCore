@@ -216,25 +216,63 @@ VisualCoreEffectsGraph | var | public var passes: [EffectPassDescription]
 VisualCoreEffectsGraph | var | public var scale: Double
 VisualCoreEffectsGraph | var | public var type: String
 VisualCoreEffectsGraph | var | public var version: Int
+VisualCoreExperience | enum | public enum CatalogError: Error, Equatable, Sendable
+VisualCoreExperience | enum | public enum ExperienceCategory: String, Sendable, Equatable, CaseIterable
 VisualCoreExperience | enum | public enum ExperienceIDError: Error, Equatable, Sendable
 VisualCoreExperience | enum | public enum ExperienceInfo
+VisualCoreExperience | enum | public enum ExperienceKind: String, Sendable, Equatable, CaseIterable
+VisualCoreExperience | enum | public enum ExperienceTier: String, Sendable, Equatable, CaseIterable
 VisualCoreExperience | func | public func encode(to encoder: any Encoder) throws
+VisualCoreExperience | func | public func experience(_ id: ExperienceID) -> ExperienceDescriptor?
+VisualCoreExperience | func | public func experience(code: ExperienceCode) -> ExperienceDescriptor?
+VisualCoreExperience | func | public func experiences(in category: ExperienceCategory) -> [ExperienceDescriptor]
+VisualCoreExperience | func | public func families(in category: ExperienceCategory) -> [String]
 VisualCoreExperience | func | public static func < (lhs: ExperienceCode, rhs: ExperienceCode) -> Bool
 VisualCoreExperience | func | public static func < (lhs: ExperienceID, rhs: ExperienceID) -> Bool
+VisualCoreExperience | func | public static func tag(forFamily family: String) -> String
 VisualCoreExperience | init | public init(_ text: String) throws(ExperienceIDError)
+VisualCoreExperience | init | public init(data: Data) throws(CatalogError)
 VisualCoreExperience | init | public init(from decoder: any Decoder) throws
+VisualCoreExperience | init | public init(levels: Int, catalogSHA256: String)
 VisualCoreExperience | init | public init?(rawValue: String)
+VisualCoreExperience | let | public let capabilities: [String]
+VisualCoreExperience | let | public let catalogSHA256: String
+VisualCoreExperience | let | public let category: ExperienceCategory
 VisualCoreExperience | let | public let code: ExperienceCode
+VisualCoreExperience | let | public let content: ExperienceContent?
+VisualCoreExperience | let | public let experiences: [ExperienceDescriptor]
+VisualCoreExperience | let | public let family: String
+VisualCoreExperience | let | public let id: ExperienceID
+VisualCoreExperience | let | public let isAvailable: Bool
+VisualCoreExperience | let | public let kind: ExperienceKind
+VisualCoreExperience | let | public let levels: Int
 VisualCoreExperience | let | public let number: Int
+VisualCoreExperience | let | public let order: Int
+VisualCoreExperience | let | public let palette: [String]
+VisualCoreExperience | let | public let qualityTiers: [String]
 VisualCoreExperience | let | public let rawValue: String
 VisualCoreExperience | let | public let round: Int?
+VisualCoreExperience | let | public let schemaVersion: Int
 VisualCoreExperience | let | public let slug: String
+VisualCoreExperience | let | public let summary: String
+VisualCoreExperience | let | public let tags: [String]
 VisualCoreExperience | let | public let text: String
+VisualCoreExperience | let | public let tier: ExperienceTier
+VisualCoreExperience | let | public let tileSeed: UInt32
+VisualCoreExperience | let | public let title: String
+VisualCoreExperience | let | public static let maxBytes
+VisualCoreExperience | let | public static let maxEntries
 VisualCoreExperience | let | public static let maxSlugLength
+VisualCoreExperience | let | public static let supportedSchema
 VisualCoreExperience | let | public static let version
+VisualCoreExperience | struct | public struct CatalogManifest: Sendable, Equatable
 VisualCoreExperience | struct | public struct ExperienceCode: Hashable, Comparable, Sendable, CustomStringConvertible
+VisualCoreExperience | struct | public struct ExperienceContent: Sendable, Equatable
+VisualCoreExperience | struct | public struct ExperienceDescriptor: Sendable, Equatable, Identifiable
 VisualCoreExperience | struct | public struct ExperienceID: Hashable, Comparable, Sendable, RawRepresentable, Codable, CustomStringConvertible
 VisualCoreExperience | var | public var accessibilityPrefix: String
+VisualCoreExperience | var | public var available: [ExperienceDescriptor]
+VisualCoreExperience | var | public var code: ExperienceCode
 VisualCoreExperience | var | public var description: String
 VisualCoreExperience | var | public var evidenceName: String
 VisualCoreExperience | var | public var integrationGate: String
