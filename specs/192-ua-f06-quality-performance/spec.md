@@ -35,6 +35,18 @@ Canonical overrides:
   (not presented) frame; shader compilation is part of host creation and is not timed on its own; nothing
   measures the launch, frame intervals or the memory footprint.
 
+## Clarifications
+
+### Session 2026-11-12
+
+Answered by the lead under the owner's standing delegation; the recommended option was taken each time.
+
+- Q: Shaders cannot be compiled in the pure preparation of an experience's state, which has no display context — at which moment must they be compiled, and how is that proven? → A: In the set-up that follows the preparation and precedes activation (Auto-Creator.md §12.2 rule 3 speaks of "preparation" in this wider sense). The set-up is timed as its own stage with the number of programs compiled; the proof is that the number of compilations does not rise once the experience is interactive.
+- Q: Is the ten-minute scenario ten minutes on the wall clock or ten minutes of experience time? → A: Ten minutes of experience time: 72,000 fixed steps of 1/120 s with at least 36,000 frames really drawn, as fast as the simulator draws them, so that the run fits one command of under ten minutes. A wall-clock run of that length is part of the device task.
+- Q: The complete evidence record and its tool are UA-F09's — what does this feature deliver of it? → A: The performance part as its own versioned value (version 1) with one text form, produced by the session; UA-F09 embeds it unchanged. This feature adds no verification tool; it proves the record with package tests on both simulator runtimes and with the app's tests.
+- Q: Who decides the automatic level, how often, and how does it relate to the frame-rate cap that already reacts to heat? → A: The session decides, on the main thread: once when an experience opens (before its first frame) and then at most once per second while it runs, from the device conditions at that moment. The Low Power level is level 1 (the last level for an experience with one level). The existing reaction of the frame scheduler (30 frames per second under heat or Low Power Mode, three quarters of the resolution at critical heat) stays as it is and multiplies with the level's resolution share; both are named in the record.
+- Q: What counts as "no unbounded growth"? → A: The first tenth of the samples is the warm-up. Graphics bytes: the largest value after the warm-up must not exceed the largest value of the warm-up. Memory footprint: the median of the last quarter of the samples minus the median of the first quarter after the warm-up must not exceed 8 MiB or 5% of that first median, whichever is larger. At least 60 samples are taken.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Each experience says in numbers what its quality levels mean (Priority: P1) 🎯
@@ -256,22 +268,25 @@ count, and no row or sentence presents a simulator number as a result.
 - **FR-U06-010**: With the setting on automatic, the level of an open experience MUST follow the existing
   quality policy: one step down per decision interval while the thermal state is serious or critical, or while
   Low Power Mode is on and the level is above the Low Power level; one step up after each calm period without
-  heat and without Low Power Mode.
+  heat and without Low Power Mode. A decision is taken when an experience opens and then at most once per
+  second while it runs. The Low Power level is level 1, or the only level of an experience with one level.
 - **FR-U06-011**: The decisions MUST be taken only while an experience runs; a suspended or closed experience
   MUST neither change level nor count a decision, and a resume MUST start from the current conditions.
 - **FR-U06-012**: A pinned level MUST be applied whatever the device reports; a pinned level that an experience
   does not declare MUST be replaced by its last level.
 - **FR-U06-013**: The level in force (pinned, or the automatic level for the conditions at that moment) MUST be
   applied before the first frame of an experience is drawn, also after a retry.
-- **FR-U06-014**: The number of steps down and steps up of a session and the level in force MUST be readable
-  for the performance record.
+- **FR-U06-014**: The number of steps down and steps up of a session, the level in force, and the frame-rate cap
+  and resolution factor that the existing frame pacing applies under heat MUST be readable for the performance
+  record; that frame pacing stays as it is and multiplies with the level's resolution share.
 - **FR-U06-015**: The settings MUST say what automatic and a pinned level mean, and MUST keep the choice across
   restarts as today. This feature MUST NOT add a per-experience override.
 
 **Stage measurements**
 
 - **FR-U06-020**: An open MUST record separately, in milliseconds: the preparation of the experience's state,
-  the compilation of its shaders during set-up (with the number of programs compiled) and the time from the
+  the set-up that compiles its shaders, after the preparation and before activation (with the number of programs
+  compiled) and the time from the
   start of the open to the first frame that was presented on the display.
 - **FR-U06-021**: A stage that did not end MUST have no value. Zero MUST mean a measured zero.
 - **FR-U06-022**: The number of shader compilations after an experience became interactive MUST be counted as
@@ -295,7 +310,8 @@ count, and no row or sentence presents a simulator number as a result.
 
 **The performance record**
 
-- **FR-U06-040**: The measurements of a session MUST form one performance record with a version: launch time,
+- **FR-U06-040**: The measurements of a session MUST form one performance record with a version (version 1), which
+  the evidence record of UA-F09 embeds unchanged: launch time,
   preparation time, shader compilation time and count, late compilations, first present time, pacing counts and
   percentiles, memory footprint, graphics bytes (current and peak), quality level, steps down and up, thermal
   state, Low Power Mode, and whether frames were presented.
@@ -309,9 +325,12 @@ count, and no row or sentence presents a simulator number as a result.
 **Endurance**
 
 - **FR-U06-050**: An endurance scenario MUST exist for the sample experience: ten minutes of experience time
-  with every frame drawn, sampling the memory footprint and the graphics bytes at regular points.
-- **FR-U06-051**: A growth rule MUST judge the samples: after a warm-up the graphics bytes MUST NOT rise, and
-  the memory footprint MUST NOT rise by more than a stated margin; the rule MUST name the quantity that fails.
+  (72,000 fixed steps) with at least 36,000 frames really drawn, sampling the memory footprint and the graphics
+  bytes at 60 or more regular points. It MUST fit one command of under ten minutes on a simulator.
+- **FR-U06-051**: A growth rule MUST judge the samples. The first tenth is the warm-up. The largest graphics
+  bytes after the warm-up MUST NOT exceed the largest of the warm-up. The median memory footprint of the last
+  quarter minus the median of the first quarter after the warm-up MUST NOT exceed 8 MiB or 5% of that first
+  median, whichever is larger. The rule MUST name the quantity that fails and MUST refuse fewer than 60 samples.
 - **FR-U06-052**: The rule MUST fail for an experience that grows in every frame, and the endurance run MUST end
   with the same state digest as the same scenario without rendering.
 
@@ -375,13 +394,8 @@ count, and no row or sentence presents a simulator number as a result.
 
 ## Assumptions
 
-- "Shaders are compiled during prepare" means: before the first interactive frame. The pure preparation of an
-  experience's state has no display context, so compilation happens in the set-up that follows it; it is timed
-  as its own stage (clarified in `/speckit-clarify`).
-- "Ten minutes" is ten minutes of experience time with every frame drawn, not ten minutes of wall-clock time; a
-  wall-clock run of that length on real devices is part of the device task.
-- The complete evidence record and the tool that writes it are UA-F09's; this feature provides the performance
-  part with its own version and proves it through package tests and the app's tests.
+- The three decisions of the clarification session (when shaders compile, what ten minutes means, what part of
+  the evidence record this feature delivers) are binding and are not repeated here.
 - Thermal state and Low Power Mode cannot be produced on a simulator; the behaviour is proven with scripted
   conditions and times, and on devices later.
 - The global override of UA-F04 (automatic, or 0 to 7) stays; eight levels is also the largest profile.

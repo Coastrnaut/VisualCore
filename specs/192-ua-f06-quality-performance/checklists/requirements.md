@@ -36,3 +36,6 @@
   requirements speak of levels, budgets, stages and records. Three points are left to `/speckit-clarify` and are
   written as assumptions, not as markers: what "compiled during prepare" means, what "ten minutes" means, and
   how the performance part relates to the evidence record of UA-F09.
+- Validation run 2 (2026-11-12, after `/speckit-clarify`): 16 of 16 items still pass; five answers recorded
+  under Clarifications and applied to FR-U06-010, FR-U06-014, FR-U06-020, FR-U06-040, FR-U06-050, FR-U06-051
+  and the assumptions.
