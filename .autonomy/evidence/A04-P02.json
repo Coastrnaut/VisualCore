@@ -1,0 +1,278 @@
+{
+  "checks": [
+    {
+      "attestation": ".autonomy/checks/A04-P02.converge-fast-checks.json",
+      "command": "python3 scripts/release_check.py --only docs app-contracts compliance dependencies public-api licenses script-tests host-visualcore documented-api-particle-universe isolation-particle-universe host-particle-universe-core",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P02.converge-fast-checks.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P02.t201-build.json",
+      "command": "xcodebuild build -project VisualCore.xcodeproj -scheme ParticleUniverse -destination 'generic/platform=iOS Simulator' -derivedDataPath Build/DerivedData/ParticleUniverse CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P02.t201-build.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P02.t201-package-build.json",
+      "command": "swift build --package-path Apps/ParticleUniverse/ParticleUniverseCore",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P02.t201-package-build.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P02.t202-a01-core.json",
+      "command": "swift test --package-path Apps/GenerativeArtStudio/Core",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P02.t202-a01-core.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P02.t202-fields-3.json",
+      "command": "swift test --package-path Packages/VisualCore --filter 'ParticleForceFieldTests|ParticleSystemTests'",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P02.t202-fields-3.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P02.t202-pu-core.json",
+      "command": "swift test --package-path Apps/ParticleUniverse/ParticleUniverseCore",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P02.t202-pu-core.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P02.t202-visualcore.json",
+      "command": "swift test --package-path Packages/VisualCore",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P02.t202-visualcore.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P02.t203-live-limit-2.json",
+      "command": "swift test --package-path Packages/VisualCore --filter 'LiveLimitTests|ParticleSystemTests|ParticleForceFieldTests'",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P02.t203-live-limit-2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P02.t204-budget.json",
+      "command": "swift test --package-path Packages/VisualCore --filter 'ParticleBudgetTests|QualityPolicyTests'",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P02.t204-budget.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P02.t205-a01-core.json",
+      "command": "swift test --package-path Apps/GenerativeArtStudio/Core",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P02.t205-a01-core.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P02.t205-api.json",
+      "command": "python3 scripts/release_check.py --only public-api documented-api-particle-universe",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P02.t205-api.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P02.t205-pu-core.json",
+      "command": "swift test --package-path Apps/ParticleUniverse/ParticleUniverseCore",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P02.t205-pu-core.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P02.t205-visualcore.json",
+      "command": "swift test --package-path Packages/VisualCore",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P02.t205-visualcore.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P02.t206-placed.json",
+      "command": "swift test --package-path Apps/ParticleUniverse/ParticleUniverseCore",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P02.t206-placed.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P02.t207-build.json",
+      "command": "xcodebuild build -project VisualCore.xcodeproj -scheme ParticleUniverse -destination 'generic/platform=iOS Simulator' -derivedDataPath Build/DerivedData/ParticleUniverse CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P02.t207-build.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P02.t208-ui-ios27-2.json",
+      "command": "xcodebuild test -project VisualCore.xcodeproj -scheme ParticleUniverse -destination 'platform=iOS Simulator,id=4E32B01D-7911-4A64-A944-877DDD445BC0' -derivedDataPath Build/DerivedData/ParticleUniverse -resultBundlePath .autonomy/xcresults/A04-P02-t208-ui-ios27-2.xcresult -only-testing:ParticleUniverseUITests/SandboxForceUITests -test-timeouts-enabled YES -default-test-execution-time-allowance 180 CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P02.t208-ui-ios27-2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P02.t209-stability.json",
+      "command": "swift test --package-path Apps/ParticleUniverse/ParticleUniverseCore --filter PlacedForceStabilityTests",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P02.t209-stability.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P02.t210-quality-2.json",
+      "command": "swift test --package-path Apps/ParticleUniverse/ParticleUniverseCore",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P02.t210-quality-2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P02.t211-debug-seam.json",
+      "command": "python3 -c '\nimport re,sys\ns=open('\"'\"'Apps/ParticleUniverse/App/DeviceConditionsSource.swift'\"'\"').read()\nreads=[m.start() for m in re.finditer(r'\"'\"'uitest'\"'\"', s)]\nblocks=[(m.start(), s.index('\"'\"'#endif'\"'\"', m.start())) for m in re.finditer(r'\"'\"'#if DEBUG'\"'\"', s)]\noutside=[r for r in reads if not any(a<r<b for a,b in blocks) and not s[:r].rsplit(chr(10),1)[-1].lstrip().startswith('\"'\"'//'\"'\"')]\nprint('\"'\"'uitest reads'\"'\"', len(reads), '\"'\"'outside DEBUG (non-comment)'\"'\"', len(outside)); sys.exit(1 if outside else 0)\n'",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P02.t211-debug-seam.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P02.t212-api.json",
+      "command": "python3 scripts/release_check.py --only public-api documented-api-particle-universe",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P02.t212-api.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P02.t212-enum-ios26.json",
+      "command": "python3 scripts/check_test_enumeration.py --sources Packages/VisualCoreRendering/Tests --log .autonomy/logs/A04-P02.t212-rendering-ios26.log",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P02.t212-enum-ios26.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P02.t212-enum-ios27.json",
+      "command": "python3 scripts/check_test_enumeration.py --sources Packages/VisualCoreRendering/Tests --log .autonomy/logs/A04-P02.t212-rendering-ios27.log",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P02.t212-enum-ios27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P02.t212-rendering-ios26.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-26.5 --action test --result-name A04-P02-t212-rendering-ios26",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P02.t212-rendering-ios26.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P02.t212-rendering-ios27.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --result-name A04-P02-t212-rendering-ios27",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P02.t212-rendering-ios27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P02.t213-isolation-2.json",
+      "command": "python3 scripts/release_check.py --only isolation-particle-universe documented-api-particle-universe docs",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P02.t213-isolation-2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P02.t214-audit-ios27-a.json",
+      "command": "xcodebuild test -project VisualCore.xcodeproj -scheme ParticleUniverse -destination 'platform=iOS Simulator,id=4E32B01D-7911-4A64-A944-877DDD445BC0' -derivedDataPath Build/DerivedData/ParticleUniverse -resultBundlePath .autonomy/xcresults/A04-P02-t214-audit-ios27-a.xcresult -only-testing:ParticleUniverseUITests/AccessibilityAuditUITests -test-timeouts-enabled YES -default-test-execution-time-allowance 180 CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P02.t214-audit-ios27-a.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P02.t214-audit-ios27-b.json",
+      "command": "xcodebuild test -project VisualCore.xcodeproj -scheme ParticleUniverse -destination 'platform=iOS Simulator,id=4E32B01D-7911-4A64-A944-877DDD445BC0' -derivedDataPath Build/DerivedData/ParticleUniverse -resultBundlePath .autonomy/xcresults/A04-P02-t214-audit-ios27-b.xcresult -only-testing:ParticleUniverseUITests/AccessibilityAuditUITests -test-timeouts-enabled YES -default-test-execution-time-allowance 180 CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P02.t214-audit-ios27-b.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P02.t214-enum-ios26.json",
+      "command": "python3 scripts/check_test_enumeration.py --sources Apps/ParticleUniverse/Tests --log .autonomy/logs/A04-P02.t214-ui-ios26.log",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P02.t214-enum-ios26.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P02.t214-enum-ios27.json",
+      "command": "python3 scripts/check_test_enumeration.py --sources Apps/ParticleUniverse/Tests --log .autonomy/logs/A04-P02.t214-ui-ios27-2.log",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P02.t214-enum-ios27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P02.t214-ui-ios26.json",
+      "command": "xcodebuild test -project VisualCore.xcodeproj -scheme ParticleUniverse -destination 'platform=iOS Simulator,id=CBD788D3-41CE-4E45-BC5C-6B0D4C3442E3' -derivedDataPath Build/DerivedData/ParticleUniverse -resultBundlePath .autonomy/xcresults/A04-P02-t214-ui-ios26.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 180 CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P02.t214-ui-ios26.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P02.t214-ui-ios27-2.json",
+      "command": "xcodebuild test -project VisualCore.xcodeproj -scheme ParticleUniverse -destination 'platform=iOS Simulator,id=4E32B01D-7911-4A64-A944-877DDD445BC0' -derivedDataPath Build/DerivedData/ParticleUniverse -resultBundlePath .autonomy/xcresults/A04-P02-t214-ui-ios27-2.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 180 CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P02.t214-ui-ios27-2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P02.t215-contract.json",
+      "command": "python3 scripts/check_app_contract.py --app particle-universe",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P02.t215-contract.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P02.t216-build-FluidArtPlayground.json",
+      "command": "xcodebuild build-for-testing -project VisualCore.xcodeproj -scheme FluidArtPlayground -destination 'generic/platform=iOS Simulator' -derivedDataPath Build/DerivedData/FluidArtPlayground CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P02.t216-build-FluidArtPlayground.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P02.t216-build-GenerativeArtStudio.json",
+      "command": "xcodebuild build-for-testing -project VisualCore.xcodeproj -scheme GenerativeArtStudio -destination 'generic/platform=iOS Simulator' -derivedDataPath Build/DerivedData/GenerativeArtStudio CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P02.t216-build-GenerativeArtStudio.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P02.t216-reference-a.json",
+      "command": "python3 scripts/release_check.py --only reference-engine-xcframework reference-build-projectm-ios-sim reference-clean",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P02.t216-reference-a.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P02.t216-reference-b.json",
+      "command": "python3 scripts/release_check.py --only reference-test-anglerendering-ios27 reference-test-anglerendering-ios26 projectm-reference-ios27 projectm-reference-ios26",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P02.t216-reference-b.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P02.t217-fast-checks.json",
+      "command": "python3 scripts/release_check.py --only docs app-contracts compliance dependencies public-api licenses script-tests host-visualcore documented-api-particle-universe isolation-particle-universe host-particle-universe-core",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P02.t217-fast-checks.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P02.t218-debug-seam.json",
+      "command": "python3 -c '\nimport re,sys\ns=open('\"'\"'Apps/ParticleUniverse/App/DeviceConditionsSource.swift'\"'\"').read()\nreads=[m.start() for m in re.finditer(r'\"'\"'forKey: \"uitest'\"'\"', s)]\nblocks=[(m.start(), s.index('\"'\"'#endif'\"'\"', m.start())) for m in re.finditer(r'\"'\"'#if DEBUG'\"'\"', s)]\nout=[r for r in reads if not any(a<r<b for a,b in blocks)]\nprint('\"'\"'uitest UserDefaults reads'\"'\"', len(reads), '\"'\"'outside DEBUG'\"'\"', len(out)); sys.exit(1 if out else 0)'",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P02.t218-debug-seam.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P02.t218-enum-full-ios26.json",
+      "command": "python3 scripts/check_test_enumeration.py --sources Apps/ParticleUniverse/Tests --log .autonomy/logs/A04-P02.t218-full-ios26.log",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P02.t218-enum-full-ios26.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P02.t218-enum-full-ios27-2.json",
+      "command": "python3 scripts/check_test_enumeration.py --sources Apps/ParticleUniverse/Tests --log .autonomy/logs/A04-P02.t218-full-ios27-2.log",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P02.t218-enum-full-ios27-2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P02.t218-full-ios26.json",
+      "command": "xcodebuild test -project VisualCore.xcodeproj -scheme ParticleUniverse -destination 'platform=iOS Simulator,id=CBD788D3-41CE-4E45-BC5C-6B0D4C3442E3' -derivedDataPath Build/DerivedData/ParticleUniverse -resultBundlePath .autonomy/xcresults/A04-P02-t218-full-ios26.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 180 CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P02.t218-full-ios26.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P02.t218-full-ios27-2.json",
+      "command": "xcodebuild test -project VisualCore.xcodeproj -scheme ParticleUniverse -destination 'platform=iOS Simulator,id=4E32B01D-7911-4A64-A944-877DDD445BC0' -derivedDataPath Build/DerivedData/ParticleUniverse -resultBundlePath .autonomy/xcresults/A04-P02-t218-full-ios27-2.xcresult -test-timeouts-enabled YES -default-test-execution-time-allowance 180 CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P02.t218-full-ios27-2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P02.t218-ui-ios26.json",
+      "command": "xcodebuild test -project VisualCore.xcodeproj -scheme ParticleUniverse -destination 'platform=iOS Simulator,id=CBD788D3-41CE-4E45-BC5C-6B0D4C3442E3' -derivedDataPath Build/DerivedData/ParticleUniverse -resultBundlePath .autonomy/xcresults/A04-P02-t218-ui-ios26.xcresult -only-testing:ParticleUniverseUITests/SandboxUITests -test-timeouts-enabled YES -default-test-execution-time-allowance 180 CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P02.t218-ui-ios26.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P02.t218-ui-ios27.json",
+      "command": "xcodebuild test -project VisualCore.xcodeproj -scheme ParticleUniverse -destination 'platform=iOS Simulator,id=4E32B01D-7911-4A64-A944-877DDD445BC0' -derivedDataPath Build/DerivedData/ParticleUniverse -resultBundlePath .autonomy/xcresults/A04-P02-t218-ui-ios27.xcresult -only-testing:ParticleUniverseUITests/SandboxUITests -test-timeouts-enabled YES -default-test-execution-time-allowance 180 CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P02.t218-ui-ios27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P02.t219-docs.json",
+      "command": "python3 scripts/validate_docs.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P02.t219-docs.log"
+    }
+  ],
+  "generated": "2026-11-12T00:16:57+00:00",
+  "method": "deterministic-run-check",
+  "stage": "A04-P02",
+  "status": "pass"
+}
