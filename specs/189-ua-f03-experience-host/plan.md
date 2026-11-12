@@ -97,6 +97,7 @@ Packages/VisualCoreRendering/
 │   ├── SessionStrings.swift                                        new
 │   └── Resources/Localizable.xcstrings                             new
 └── Tests/VisualCoreExperienceHostTests/
+    ├── ModuleTests.swift                                           modify (every text key resolves)
     ├── SessionOpenCloseTests.swift                                 new (open, one at a time, 50 cycles, leak)
     ├── SessionFailureTests.swift                                   new (failure kinds, timeout, retry, back, cancellation)
     ├── SessionPhaseMemoryTests.swift                               new (phases, memory warning, context recreation, sink)
