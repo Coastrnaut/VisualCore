@@ -2,8 +2,10 @@
 """Unit tests for the deterministic VisualCore scripts (T-F006). Run: python3 scripts/test_scripts.py"""
 from __future__ import annotations
 
+import hashlib
 import importlib.util
 import json
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -1222,5 +1224,97 @@ class PrepushScanTests(unittest.TestCase):
         self.assertEqual(prepush.scan(ROOT_DIR, "HEAD..HEAD"), [])
 
 
+# ---------------------------------------------------------------- governance tooling (feature 186, UA-F00)
+
+ticktool = load("tick_task")
+phaseprompts = load("speckit_prompts")
+
+
+class GitSandbox:
+    """A temporary repository on `main` with a bare remote named origin, for the tools that commit and push
+    (T-U00-002). It holds a minimal constitution so that the document validator runs on it."""
+
+    def __init__(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        base = Path(self.tmp.name)
+        self.remote = base / "origin.git"
+        self.root = base / "work"
+        self.root.mkdir()
+        self.git("init", "-q", "--bare", "--initial-branch=main", str(self.remote), cwd=base)
+        self.git("init", "-q", "--initial-branch=main")
+        for key, value in (("user.name", "Sandbox"), ("user.email", "sandbox@invalid.example"),
+                           ("commit.gpgsign", "false"), ("core.hooksPath", "/dev/null")):
+            self.git("config", key, value)
+        self.git("remote", "add", "origin", str(self.remote))
+        self.write(".specify/memory/constitution.md", "# C\n**Version**: 1.0.0 | x\n")
+        self.write("docs/decisions/README.md", "decisions\n")
+        self.commit_all("first commit")
+        self.git("push", "-q", "-u", "origin", "main")
+
+    def git(self, *argv: str, cwd: Path | None = None) -> str:
+        done = subprocess.run(["git", *argv], cwd=cwd or self.root, capture_output=True, text=True, check=False)
+        if done.returncode != 0:
+            raise AssertionError(f"git {' '.join(argv)} failed: {done.stderr.strip()}")
+        return done.stdout.strip()
+
+    def write(self, rel: str, text: str) -> Path:
+        path = self.root / rel
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(text, encoding="utf-8")
+        return path
+
+    def commit_all(self, message: str) -> str:
+        self.git("add", "-A")
+        self.git("commit", "-q", "-m", message)
+        return self.head()
+
+    def head(self) -> str:
+        return self.git("rev-parse", "HEAD")
+
+    def remote_head(self) -> str:
+        return self.git("--git-dir", str(self.remote), "rev-parse", "refs/heads/main", cwd=self.remote.parent)
+
+    def commits(self) -> int:
+        return int(self.git("rev-list", "--count", "HEAD"))
+
+    def last_message(self) -> str:
+        return self.git("log", "-1", "--format=%B")
+
+    def cleanup(self) -> None:
+        self.tmp.cleanup()
+
+
+class GitSandboxTests(unittest.TestCase):
+    def test_sandbox_pushes_to_its_bare_remote(self):
+        box = GitSandbox()
+        self.addCleanup(box.cleanup)
+        self.assertEqual(box.git("branch", "--show-current"), "main")
+        self.assertEqual(box.commits(), 1)
+        self.assertEqual(box.remote_head(), box.head())
+        box.write("docs/a.md", "a\n")
+        second = box.commit_all("second")
+        self.assertNotEqual(box.remote_head(), second)
+        box.git("push", "-q", "origin", "main")
+        self.assertEqual(box.remote_head(), second)
+        self.assertEqual(docs.validate(box.root), [])
+
+
+def ledger_tree_hash() -> str:
+    """One hash over every file of the real migration ledger tree (FR-U00-038): the self-tests must not change it."""
+    digest = hashlib.sha256()
+    base = ROOT_DIR / ".autonomy" / "migration"
+    for path in sorted(base.rglob("*")):
+        if path.is_file():
+            digest.update(path.relative_to(base).as_posix().encode() + b"\0" + path.read_bytes() + b"\0")
+    return digest.hexdigest()
+
+
 if __name__ == "__main__":
-    unittest.main(verbosity=2)
+    tree_before = ledger_tree_hash()
+    program = unittest.main(verbosity=2, exit=False)
+    tree_after = ledger_tree_hash()
+    if tree_before != tree_after:
+        print("FAIL: the self-tests changed .autonomy/migration/ (FR-U00-038)")
+        sys.exit(1)
+    print(f"ledger tree unchanged: {tree_before[:16]}")
+    sys.exit(0 if program.result.wasSuccessful() else 1)
