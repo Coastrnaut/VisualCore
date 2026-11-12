@@ -170,12 +170,18 @@ public struct ExperienceEngine<Core: ExperienceCore>: Sendable {
         if wasPreparing { lifecycle.transition(to: .inactive) }
     }
 
-    /// Ends the leave: drops the core and moves to inactive. Legal only while deactivating.
+    /// Ends the leave: drops the core and moves to inactive. Legal only while deactivating. When `gpu` shows an
+    /// object that is still live or leaked, the lifecycle becomes failed instead and `.gpuLeak` is thrown.
     public mutating func finishDeactivation(gpu: GPUResourceCounts? = nil) throws(ExperienceError) {
         let state = lifecycle.state
         guard state == .deactivating else {
             lifecycle.transition(to: .inactive)
             throw .illegalOperation(.deactivate, in: state)
+        }
+        if let gpu, gpu.objects > 0 || gpu.leaked > 0 {
+            let error = ExperienceError.gpuLeak(live: gpu.objects, leaked: gpu.leaked)
+            lifecycle.fail(error.failure)
+            throw error
         }
         core = nil
         lifecycle.transition(to: .inactive)
@@ -216,6 +222,43 @@ public struct ExperienceEngine<Core: ExperienceCore>: Sendable {
             stepIndex += 1
         }
         core = current
+    }
+
+    // MARK: Quality and memory
+
+    /// Sets the quality tier (0 ..< the declared number of tiers). The tier never changes the digest; it is applied
+    /// again after a restore and after a new preparation. Legal while ready, active or suspended.
+    public mutating func setQualityTier(_ tier: Int) throws(ExperienceError) {
+        try lifecycle.permit(.setQualityTier)
+        let tiers = max(Core.qualityTiers, 1)
+        guard (0..<tiers).contains(tier) else { throw .invalidTier(tier, tiers: tiers) }
+        guard var current = core else { throw .notPrepared }
+        core = nil
+        current.setQualityTier(tier)
+        core = current
+        qualityTier = tier
+    }
+
+    /// Asks the core to drop what it can rebuild (memory pressure). Legal while ready, active or suspended.
+    public mutating func shedCaches() throws(ExperienceError) {
+        try lifecycle.permit(.shedCaches)
+        guard var current = core else { throw .notPrepared }
+        core = nil
+        current.shedCaches()
+        core = current
+    }
+
+    // MARK: Diagnostics
+
+    /// The readable state of the experience at this moment. Reading it changes nothing. `gpu` is passed in by the
+    /// owner of a render host; without one the counts are absent.
+    public func diagnostics(gpu: GPUResourceCounts? = nil) -> ExperienceDiagnostics {
+        ExperienceDiagnostics(experience: id, state: lifecycle.state, seed: seed, stepIndex: stepIndex,
+                              qualityTier: qualityTier, gpu: gpu, lastError: lifecycle.lastError, digest: try? digest(),
+                              rejectedTransitions: lifecycle.rejectedTransitions,
+                              rejectedOperations: lifecycle.rejectedOperations, acceptedActions: acceptedActions,
+                              rejectedActions: rejectedActions, droppedTime: clock.droppedTime,
+                              invalidFrames: clock.invalidDeltas)
     }
 
     // MARK: Input

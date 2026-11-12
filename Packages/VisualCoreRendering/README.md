@@ -13,6 +13,7 @@ renderer and no `dlsym`; GL entry points come from the generated `CVisualCoreGL`
 | VisualCoreUI | `RenderSurface` (SwiftUI host for a caller-owned `RenderHost`); diagnostics overlay and accessibility helpers planned |
 | VisualCoreAudio | AVAudioEngine microphone / in-app playback taps → DSP features |
 | VisualCoreAutomation | AutomationRunner (`DEBUG \|\| VISUALCORE_AUTOMATION` only) |
+| VisualCoreExperienceHost | the main-actor part of the experience contract: `ExperiencePresenter`, `ExperienceActionPort`, `ExperienceShell` and the type-erased `Experience` (UA-F02) |
 
 Contracts: [render lifecycle](../../specs/002-architecture-contracts/contracts/render-lifecycle.md),
 [resources, shaders, errors](../../specs/002-architecture-contracts/contracts/resources-shaders-errors.md).
@@ -262,3 +263,25 @@ disappears. The edge swipe and the back button keep working.
 the index. `scripts/check_app_release.py` verifies that every shipped component is bundled when the app's
 `release.json` sets `"licenses": true`.
 
+## Experience shell (feature 188, UA-F02)
+
+The main-actor part of an experience is a class that conforms to `ExperiencePresenter`: it creates its GPU objects
+through the registry in `setup`, releases them in `teardown`, and draws the core it is handed. `draw` receives the
+core as a value, so drawing cannot change the state. `ExperienceShell` joins a presenter with the pure
+`ExperienceEngine` of its core and offers one type-erased face, `Experience`, to whoever owns the render host.
+
+```swift
+let shell = ExperienceShell(id: myID, presenter: MyPresenter())
+try await shell.prepare(seed: 42, timeLimit: .seconds(10))   // the core's preparation runs off the main actor
+let host = try RenderHost(scene: shell.scene)                // the owner creates the host; the shell never does
+try shell.activate()                                         // frames now run fixed steps, then draw
+// …
+try shell.beginDeactivation()                                // nothing but teardown reaches the presenter now
+host.destroy()
+try shell.finishDeactivation()                               // inactive, or failed with experience.gpu-leak
+```
+
+Controls built by the presenter send actions through `ExperienceActionPort` (`send`, an observable `revision` and
+the state description for assistive technology; identifiers start with the catalog's accessibility prefix). An
+error of preparation, setup or drawing moves the lifecycle to failed and stays readable in `shell.diagnostics`.
+Contract: [experience-host-api.md](../../specs/188-ua-f02-experience-sdk/contracts/experience-host-api.md).

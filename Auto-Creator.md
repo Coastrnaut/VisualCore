@@ -2628,28 +2628,55 @@ Lifecycle states: `registered → preparing → ready → active ⇄ suspended �
 from any state. The lifecycle is a pure reducer with exhaustive transition tests; illegal transitions are rejected
 and counted.
 
-A reusable conformance helper (`ExperienceConformance`, new) runs these checks for any experience on the host: seed
-determinism, snapshot round trip, reset equivalence, rejection leaves the digest unchanged, tier change leaves the
-digest unchanged. Every experience's test target calls it.
+A reusable conformance helper (`ExperienceConformance`) runs these checks for the core of any experience on the
+host: seed determinism, snapshot round trip, reset equivalence, rejection leaves the digest unchanged, tier change
+leaves the digest unchanged, cache shedding leaves the digest unchanged, and replay reproduces the digest. Every
+experience's test target calls it.
 
-Sketch of the proposed shape (illustrative; UA-F02 fixes the real signatures):
+The shape UA-F02 built (contracts in `specs/188-ua-f02-experience-sdk/contracts/`): an experience has two parts.
+The author writes a pure, `Sendable` value type, the core, and a main-actor class, the presenter. The framework
+supplies the engine that drives the core through the lifecycle and the shell that joins both behind the
+type-erased protocol `Experience`, which is what the session host sees.
 
 ```swift
-@MainActor public protocol Experience: AnyObject {
-    func prepare(seed: UInt64) async throws
-    func activate() throws
-    func update(step: Int)
-    var scene: any RenderScene { get }
-    func handle(_ action: ExperienceAction) -> ActionResult
-    func snapshot() throws -> ExperienceSnapshot
-    func restore(_ snapshot: ExperienceSnapshot) throws
-    func reset() throws
-    func suspend()
-    func resume()
-    func deactivate()
-    var diagnostics: ExperienceDiagnostics { get }
+// VisualCoreExperience (pure): the domain state and its rules
+public protocol ExperienceCore: Sendable {
+    static var migrations: MigrationChain { get }       // schema version of the snapshot payload
+    static var controls: [ExperienceControl] { get }
+    static var qualityTiers: Int { get }
+    static var stepDuration: Double { get }             // 1/240 … 1/30 s, default 1/120
+    static func prepare(seed: UInt64) async throws -> Self
+    mutating func update(step: Int)
+    mutating func apply(_ action: ExperienceAction) -> ActionResult
+    mutating func reset()
+    mutating func setQualityTier(_ tier: Int)
+    mutating func shedCaches()
+    func writeDigest(into builder: inout DigestBuilder) throws(DigestError)
+    func snapshotPayload() throws -> Data
+    static func restore(payload: Data, seed: UInt64) throws -> Self
+}
+
+// VisualCoreExperienceHost (main actor): the picture and the controls
+@MainActor public protocol ExperiencePresenter: AnyObject {
+    associatedtype Core: ExperienceCore
+    func setup(_ context: RenderContext) throws
+    func resize(_ context: RenderContext)
+    func draw(_ core: Core, tier: Int, context: RenderContext, frame: FrameInfo) throws   // the core is a value
+    func teardown(_ context: RenderContext)
+    func shedCaches()
+    func describe(_ core: Core) -> String
+    func makeControls(_ port: ExperienceActionPort) -> AnyView
 }
 ```
+
+`ExperienceEngine<Core>` is a value type: it owns the lifecycle, the fixed-step clock and the core, checks every
+operation against the lifecycle first, validates actions before the core sees them, puts the state back when the
+core rejects an action, and compares a restored state with the digest in its snapshot. `ExperienceShell<Presenter>`
+runs the core's preparation off the main actor, asks the engine for steps on each frame while active, and ends a
+deactivation only when the render host's registry shows no live and no leaked object. The digest is SHA-256 over a
+typed, length-marked encoding (`DigestBuilder`, `StableHash`). Scenario hooks (`ExperienceScenario`) compile only
+under `DEBUG` or `VISUALCORE_AUTOMATION`; `scripts/check_experience_symbols.py` proves their absence from release
+builds of both modules.
 
 ### 11.4 Session host
 
@@ -3110,8 +3137,8 @@ VisualCore/
 │   ├── FractalExplorer/          move       likewise
 │   └── ParticleUniverse/         move       likewise
 ├── Packages/
-│   ├── VisualCore/               modify     + VisualCoreExperience, VisualCoreGeometry, VisualCorePuzzle
-│   ├── VisualCoreRendering/      modify     + VisualCoreExperienceHost, VisualCoreStore
+│   ├── VisualCore/               modify     + VisualCoreExperience (catalog UA-F01, experience contract UA-F02), VisualCoreGeometry, VisualCorePuzzle
+│   ├── VisualCoreRendering/      modify     + VisualCoreExperienceHost (presenter, port, shell: UA-F02; session: UA-F03), VisualCoreStore
 │   ├── ExperiencesCreative/      new        A01–A25: <Name>/Core, <Name>/Experience, <Name>/Shaders, tests
 │   ├── ExperiencesRound02/       new        R02-G01 … G25
 │   ├── ExperiencesRound03/       new        R03-G01 … G25
@@ -3122,7 +3149,7 @@ VisualCore/
 ├── External/projectm-ios/        existing   pinned read-only submodule
 ├── Configs/                      existing   toolchain.json, Signing.xcconfig (the local signing file is never committed), simulator-identifier-hashes.json
 ├── Tools/python/desktop_runbook.py   existing   legacy ledger tool
-├── scripts/                      modify     + build_catalog.py, verify_experiences.py, run_device_campaign.py
+├── scripts/                      modify     + build_catalog.py, check_experience_symbols.py, verify_experiences.py, run_device_campaign.py
 ├── specs/                        modify     001–035 existing; 036–550 and rNN-* as features are specified
 └── docs/
     ├── decisions/                modify     ADR-0001 … ADR-0009, then ADR-0010 (constitution 2.0.0)

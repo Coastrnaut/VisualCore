@@ -220,8 +220,10 @@ VisualCoreExperience | enum | public enum ActionRejection: Error, Sendable, Equa
 VisualCoreExperience | enum | public enum ActionResult: Sendable, Equatable, Codable
 VisualCoreExperience | enum | public enum CatalogError: Error, Equatable, Sendable
 VisualCoreExperience | enum | public enum CatalogSearch
+VisualCoreExperience | enum | public enum ConformanceCheck: String, Sendable, Codable, CaseIterable
 VisualCoreExperience | enum | public enum DigestError: Error, Sendable, Equatable
 VisualCoreExperience | enum | public enum ExperienceCategory: String, Sendable, Equatable, CaseIterable
+VisualCoreExperience | enum | public enum ExperienceConformance
 VisualCoreExperience | enum | public enum ExperienceError: Error, Sendable, Equatable
 VisualCoreExperience | enum | public enum ExperienceIDError: Error, Equatable, Sendable
 VisualCoreExperience | enum | public enum ExperienceInfo
@@ -231,8 +233,10 @@ VisualCoreExperience | enum | public enum ExperienceLifecycleState: String, Send
 VisualCoreExperience | enum | public enum ExperienceOperation: String, Sendable, Codable, CaseIterable
 VisualCoreExperience | enum | public enum ExperienceTier: String, Sendable, Equatable, CaseIterable
 VisualCoreExperience | enum | public enum SnapshotError: Error, Sendable, Equatable
+VisualCoreExperience | func | public func diagnostics(gpu: GPUResourceCounts? = nil) -> ExperienceDiagnostics
 VisualCoreExperience | func | public func digest() throws(ExperienceError) -> StateDigest
 VisualCoreExperience | func | public func encode(to encoder: any Encoder) throws
+VisualCoreExperience | func | public func encoded() throws -> Data
 VisualCoreExperience | func | public func encoded() throws(SnapshotError) -> Data
 VisualCoreExperience | func | public func experience(_ id: ExperienceID) -> ExperienceDescriptor?
 VisualCoreExperience | func | public func experience(code: ExperienceCode) -> ExperienceDescriptor?
@@ -265,9 +269,12 @@ VisualCoreExperience | func | public mutating func prepare(seed: UInt64, timeLim
 VisualCoreExperience | func | public mutating func reset() throws(ExperienceError)
 VisualCoreExperience | func | public mutating func restore(_ snapshot: ExperienceSnapshot) throws(ExperienceError)
 VisualCoreExperience | func | public mutating func resume() throws(ExperienceError)
+VisualCoreExperience | func | public mutating func run(_ scenario: ExperienceScenario) -> ExperienceScenarioResult
 VisualCoreExperience | func | public mutating func run(steps: Int) throws(ExperienceError)
 VisualCoreExperience | func | public mutating func setQualityTier(_ tier: Int)
+VisualCoreExperience | func | public mutating func setQualityTier(_ tier: Int) throws(ExperienceError)
 VisualCoreExperience | func | public mutating func shedCaches()
+VisualCoreExperience | func | public mutating func shedCaches() throws(ExperienceError)
 VisualCoreExperience | func | public mutating func snapshot() throws(ExperienceError) -> ExperienceSnapshot
 VisualCoreExperience | func | public mutating func suspend() throws(ExperienceError)
 VisualCoreExperience | func | public mutating func transition(to next: ExperienceLifecycleState) -> Bool
@@ -280,6 +287,8 @@ VisualCoreExperience | func | public static func isValidCode(_ code: String) -> 
 VisualCoreExperience | func | public static func normalized(x: Double, y: Double, width: Double, height: Double) -> (x: Double, y: Double)?
 VisualCoreExperience | func | public static func prepare(seed: UInt64, timeLimit: Duration? = nil) async -> Result<Core, ExperienceError>
 VisualCoreExperience | func | public static func restore(payload: Data, seed: UInt64) throws -> Self
+VisualCoreExperience | func | public static func run<Core: ExperienceCore>(_ core: Core.Type, id: ExperienceID,
+VisualCoreExperience | func | public static func runScenario(_ scenario: ExperienceScenario, id: ExperienceID) async -> ExperienceScenarioResult
 VisualCoreExperience | func | public static func tag(forFamily family: String) -> String
 VisualCoreExperience | func | public static func validate(control: String, values: [Double], controls: [ExperienceControl]) -> ActionRejection?
 VisualCoreExperience | init | public init(_ control: String, _ values: [Double] = [])
@@ -289,8 +298,10 @@ VisualCoreExperience | init | public init(control: String, values: [Double] = []
 VisualCoreExperience | init | public init(data: Data) throws(CatalogError)
 VisualCoreExperience | init | public init(data: Data) throws(SnapshotError)
 VisualCoreExperience | init | public init(data: Data, categories: CategoryList? = nil) throws(CatalogError)
+VisualCoreExperience | init | public init(digest: StateDigest?, stepIndex: Int, results: [String], error: ExperienceFailure?)
 VisualCoreExperience | init | public init(domain: String)
 VisualCoreExperience | init | public init(experience: ExperienceID, schemaVersion: Int, seed: UInt64, stepIndex: Int, digest: StateDigest,
+VisualCoreExperience | init | public init(experience: ExperienceID, state: ExperienceLifecycleState, seed: UInt64?, stepIndex: Int, qualityTier: Int,
 VisualCoreExperience | init | public init(from decoder: any Decoder) throws
 VisualCoreExperience | init | public init(from: ExperienceLifecycleState, to: ExperienceLifecycleState, accepted: Bool)
 VisualCoreExperience | init | public init(from: String, to: String, gate: String, commit: String)
@@ -300,22 +311,33 @@ VisualCoreExperience | init | public init(id: String, ranges: [ClosedRange<Doubl
 VisualCoreExperience | init | public init(levels: Int, catalogSHA256: String)
 VisualCoreExperience | init | public init(missingRegistrations: [ExperienceID], unexpectedRegistrations: [ExperienceID], duplicates: [ExperienceID])
 VisualCoreExperience | init | public init(objects: Int, bytes: Int, leaked: Int)
+VisualCoreExperience | init | public init(seed: UInt64, entries: [Entry])
+VisualCoreExperience | init | public init(seeds: [UInt64], stepsPerSegment: Int, actions: [ScriptedAction], rejected: [ScriptedAction])
+VisualCoreExperience | init | public init(steps: Int, action: ScriptedAction? = nil)
 VisualCoreExperience | init | public init?(hex: String)
 VisualCoreExperience | init | public init?(rawValue: String)
 VisualCoreExperience | let | public let accepted: Bool
+VisualCoreExperience | let | public let acceptedActions: Int
+VisualCoreExperience | let | public let action: ScriptedAction?
 VisualCoreExperience | let | public let bytes: Int
 VisualCoreExperience | let | public let capabilities: [String]
 VisualCoreExperience | let | public let catalogSHA256: String
 VisualCoreExperience | let | public let categories: [Entry]
 VisualCoreExperience | let | public let category: ExperienceCategory
+VisualCoreExperience | let | public let check: ConformanceCheck
 VisualCoreExperience | let | public let checksum: String
 VisualCoreExperience | let | public let code: ExperienceCode
 VisualCoreExperience | let | public let code: String
 VisualCoreExperience | let | public let commit: String
 VisualCoreExperience | let | public let content: ExperienceContent?
 VisualCoreExperience | let | public let control: String
+VisualCoreExperience | let | public let detail: String
 VisualCoreExperience | let | public let digest: StateDigest
+VisualCoreExperience | let | public let digest: StateDigest?
+VisualCoreExperience | let | public let droppedTime: Double
 VisualCoreExperience | let | public let duplicates: [ExperienceID]
+VisualCoreExperience | let | public let entries: [Entry]
+VisualCoreExperience | let | public let error: ExperienceFailure?
 VisualCoreExperience | let | public let experience: ExperienceID
 VisualCoreExperience | let | public let experiences: [ExperienceDescriptor]
 VisualCoreExperience | let | public let family: String
@@ -323,13 +345,16 @@ VisualCoreExperience | let | public let from: ExperienceLifecycleState
 VisualCoreExperience | let | public let from: String
 VisualCoreExperience | let | public let gate: String
 VisualCoreExperience | let | public let generation: Int
+VisualCoreExperience | let | public let gpu: GPUResourceCounts?
 VisualCoreExperience | let | public let hex: String
 VisualCoreExperience | let | public let historyLimit: Int
 VisualCoreExperience | let | public let id: ExperienceCategory
 VisualCoreExperience | let | public let id: ExperienceID
 VisualCoreExperience | let | public let id: String
+VisualCoreExperience | let | public let invalidFrames: Int
 VisualCoreExperience | let | public let isAvailable: Bool
 VisualCoreExperience | let | public let kind: ExperienceKind
+VisualCoreExperience | let | public let lastError: ExperienceFailure?
 VisualCoreExperience | let | public let leaked: Int
 VisualCoreExperience | let | public let levels: Int
 VisualCoreExperience | let | public let message: String
@@ -339,16 +364,25 @@ VisualCoreExperience | let | public let number: Int
 VisualCoreExperience | let | public let objects: Int
 VisualCoreExperience | let | public let order: Int
 VisualCoreExperience | let | public let palette: [String]
+VisualCoreExperience | let | public let passed: Bool
 VisualCoreExperience | let | public let payload: String
+VisualCoreExperience | let | public let qualityTier: Int
 VisualCoreExperience | let | public let qualityTiers: [String]
 VisualCoreExperience | let | public let ranges: [ClosedRange<Double>]
 VisualCoreExperience | let | public let rawValue: String
+VisualCoreExperience | let | public let rejectedActions: Int
+VisualCoreExperience | let | public let rejectedOperations: Int
+VisualCoreExperience | let | public let rejectedTransitions: Int
+VisualCoreExperience | let | public let results: [String]
 VisualCoreExperience | let | public let round: Int?
 VisualCoreExperience | let | public let schemaVersion: Int
 VisualCoreExperience | let | public let seed: UInt64
+VisualCoreExperience | let | public let seed: UInt64?
 VisualCoreExperience | let | public let slug: String
+VisualCoreExperience | let | public let state: ExperienceLifecycleState
 VisualCoreExperience | let | public let step: Int
 VisualCoreExperience | let | public let stepIndex: Int
+VisualCoreExperience | let | public let steps: Int
 VisualCoreExperience | let | public let summary: String
 VisualCoreExperience | let | public let tags: [String]
 VisualCoreExperience | let | public let text: String
@@ -361,31 +395,42 @@ VisualCoreExperience | let | public let unexpectedRegistrations: [ExperienceID]
 VisualCoreExperience | let | public let values: [Double]
 VisualCoreExperience | let | public static let format
 VisualCoreExperience | let | public static let launchCodes: [String]
+VisualCoreExperience | let | public static let maxActions
 VisualCoreExperience | let | public static let maxBytes
 VisualCoreExperience | let | public static let maxCodeLength
 VisualCoreExperience | let | public static let maxEntries
 VisualCoreExperience | let | public static let maxMessageLength
 VisualCoreExperience | let | public static let maxMoves
+VisualCoreExperience | let | public static let maxSeeds
 VisualCoreExperience | let | public static let maxSlugLength
+VisualCoreExperience | let | public static let maxSteps
+VisualCoreExperience | let | public static let maxStepsPerSegment
 VisualCoreExperience | let | public static let maxValues
 VisualCoreExperience | let | public static let supportedSchema
+VisualCoreExperience | let | public static let tooLargeCode
 VisualCoreExperience | let | public static let unspecifiedCode
 VisualCoreExperience | let | public static let version
 VisualCoreExperience | protocol | public protocol ExperienceCore: Sendable
 VisualCoreExperience | struct | public struct CatalogManifest: Sendable, Equatable
 VisualCoreExperience | struct | public struct CategoryList: Sendable, Equatable
+VisualCoreExperience | struct | public struct ConformancePlan: Sendable
+VisualCoreExperience | struct | public struct ConformanceReport: Sendable, Equatable, Codable
 VisualCoreExperience | struct | public struct DigestBuilder: Sendable
 VisualCoreExperience | struct | public struct Entry: Sendable, Equatable
+VisualCoreExperience | struct | public struct Entry: Sendable, Equatable, Codable
 VisualCoreExperience | struct | public struct ExperienceAction: Sendable, Equatable, Codable
 VisualCoreExperience | struct | public struct ExperienceCode: Hashable, Comparable, Sendable, CustomStringConvertible
 VisualCoreExperience | struct | public struct ExperienceContent: Sendable, Equatable
 VisualCoreExperience | struct | public struct ExperienceControl: Sendable, Equatable
 VisualCoreExperience | struct | public struct ExperienceDescriptor: Sendable, Equatable, Identifiable
+VisualCoreExperience | struct | public struct ExperienceDiagnostics: Sendable, Equatable, Codable
 VisualCoreExperience | struct | public struct ExperienceEngine<Core: ExperienceCore>: Sendable
 VisualCoreExperience | struct | public struct ExperienceFailure: Error, Sendable, Equatable, Codable
 VisualCoreExperience | struct | public struct ExperienceID: Hashable, Comparable, Sendable, RawRepresentable, Codable, CustomStringConvertible
 VisualCoreExperience | struct | public struct ExperienceLifecycle: Sendable, Equatable
 VisualCoreExperience | struct | public struct ExperienceLifecycleEvent: Sendable, Codable, Equatable
+VisualCoreExperience | struct | public struct ExperienceScenario: Sendable, Equatable, Codable
+VisualCoreExperience | struct | public struct ExperienceScenarioResult: Sendable, Equatable, Codable
 VisualCoreExperience | struct | public struct ExperienceSnapshot: Sendable, Equatable, Codable
 VisualCoreExperience | struct | public struct GPUResourceCounts: Sendable, Equatable, Codable
 VisualCoreExperience | struct | public struct Move: Sendable, Equatable
@@ -414,19 +459,66 @@ VisualCoreExperience | var | public static var qualityTiers: Int
 VisualCoreExperience | var | public static var schemaVersion: Int
 VisualCoreExperience | var | public static var stepDuration: Double
 VisualCoreExperience | var | public var accessibilityPrefix: String
+VisualCoreExperience | var | public var actions: [ScriptedAction]
 VisualCoreExperience | var | public var available: [ExperienceDescriptor]
 VisualCoreExperience | var | public var code: ExperienceCode
 VisualCoreExperience | var | public var code: String
 VisualCoreExperience | var | public var description: String
+VisualCoreExperience | var | public var effectiveActions: [ScriptedAction]
+VisualCoreExperience | var | public var effectiveSeeds: [UInt64]
+VisualCoreExperience | var | public var effectiveStepsPerSegment: Int
 VisualCoreExperience | var | public var evidenceName: String
+VisualCoreExperience | var | public var failed: [ConformanceCheck]
 VisualCoreExperience | var | public var failure: ExperienceFailure
 VisualCoreExperience | var | public var integrationGate: String
 VisualCoreExperience | var | public var isAccepted: Bool
 VisualCoreExperience | var | public var isMatch: Bool
 VisualCoreExperience | var | public var isOriginal: Bool
+VisualCoreExperience | var | public var isWithinLimits: Bool
+VisualCoreExperience | var | public var passed: Bool
+VisualCoreExperience | var | public var rejected: [ScriptedAction]
+VisualCoreExperience | var | public var seeds: [UInt64]
+VisualCoreExperience | var | public var stepsPerSegment: Int
 VisualCoreExperience | var | public var storageNamespace: String
+VisualCoreExperienceHost | class | public final class ExperienceActionPort
+VisualCoreExperienceHost | class | public final class ExperienceShell<Presenter: ExperiencePresenter>: Experience
 VisualCoreExperienceHost | enum | public enum ExperienceHostInfo
+VisualCoreExperienceHost | func | public func activate() throws(ExperienceError)
+VisualCoreExperienceHost | func | public func beginDeactivation() throws(ExperienceError)
+VisualCoreExperienceHost | func | public func cancelPreparation()
+VisualCoreExperienceHost | func | public func finishDeactivation() throws(ExperienceError)
+VisualCoreExperienceHost | func | public func handle(control: String, values: [Double] = []) -> ActionResult
+VisualCoreExperienceHost | func | public func identifier(_ name: String) -> String
+VisualCoreExperienceHost | func | public func prepare(seed: UInt64, timeLimit: Duration? = nil) async throws(ExperienceError)
+VisualCoreExperienceHost | func | public func reset() throws(ExperienceError)
+VisualCoreExperienceHost | func | public func resize(_ context: RenderContext)
+VisualCoreExperienceHost | func | public func restore(_ snapshot: ExperienceSnapshot) throws(ExperienceError)
+VisualCoreExperienceHost | func | public func resume() throws(ExperienceError)
+VisualCoreExperienceHost | func | public func run(_ scenario: ExperienceScenario) -> ExperienceScenarioResult
+VisualCoreExperienceHost | func | public func send(_ control: String, _ values: [Double] = []) -> ActionResult
+VisualCoreExperienceHost | func | public func send(_ control: String, at point: CGPoint, in size: CGSize) -> ActionResult
+VisualCoreExperienceHost | func | public func setQualityTier(_ tier: Int) throws(ExperienceError)
+VisualCoreExperienceHost | func | public func shedCaches()
+VisualCoreExperienceHost | func | public func shedCaches() throws(ExperienceError)
+VisualCoreExperienceHost | func | public func snapshot() throws(ExperienceError) -> ExperienceSnapshot
+VisualCoreExperienceHost | func | public func suspend() throws(ExperienceError)
+VisualCoreExperienceHost | init | public init(id: ExperienceID, presenter: Presenter, maxStepsPerFrame: Int = 8)
+VisualCoreExperienceHost | let | public let accessibilityPrefix: String
+VisualCoreExperienceHost | let | public let id: ExperienceID
+VisualCoreExperienceHost | let | public let port: ExperienceActionPort
+VisualCoreExperienceHost | let | public let presenter: Presenter
 VisualCoreExperienceHost | let | public static let version
+VisualCoreExperienceHost | protocol | public protocol Experience: AnyObject
+VisualCoreExperienceHost | protocol | public protocol ExperiencePresenter: AnyObject
+VisualCoreExperienceHost | var | public private(set) var engine: ExperienceEngine<Presenter.Core>
+VisualCoreExperienceHost | var | public private(set) var isSetUp
+VisualCoreExperienceHost | var | public private(set) var revision: Int
+VisualCoreExperienceHost | var | public private(set) var summary: String
+VisualCoreExperienceHost | var | public var accessibilitySummary: String
+VisualCoreExperienceHost | var | public var controls: AnyView
+VisualCoreExperienceHost | var | public var diagnostics: ExperienceDiagnostics
+VisualCoreExperienceHost | var | public var scene: any RenderScene
+VisualCoreExperienceHost | var | public var state: ExperienceLifecycleState
 VisualCoreMath | enum | public enum EasingCurve: String, CaseIterable, Sendable, Codable
 VisualCoreMath | enum | public enum EasingMode: String, CaseIterable, Sendable, Codable
 VisualCoreMath | enum | public enum Level: String, Sendable, Equatable
@@ -1419,7 +1511,9 @@ VisualCoreTestSupport | let | public static let acceptedActions: [ScriptedAction
 VisualCoreTestSupport | let | public static let digestAfter240Steps
 VisualCoreTestSupport | let | public static let goldenDigests: [(seed: UInt64, hex: String)]
 VisualCoreTestSupport | let | public static let id: ExperienceID
+VisualCoreTestSupport | let | public static let plan
 VisualCoreTestSupport | let | public static let rejectedActions: [ScriptedAction]
+VisualCoreTestSupport | let | public static let scenarioDigest
 VisualCoreTestSupport | let | public static let seeds: [UInt64]
 VisualCoreTestSupport | let | public static let snapshotV1Digest
 VisualCoreTestSupport | let | public static let stepsPerSegment

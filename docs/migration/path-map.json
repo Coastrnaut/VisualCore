@@ -299,7 +299,7 @@
    "action": "modify",
    "by": "UA-F01, UA-F02, R02-F05, R02-F23",
    "state": "pending",
-   "note": "Adds the pure modules VisualCoreExperience, VisualCoreGeometry and VisualCorePuzzle; existing modules keep their names and API."
+   "note": "Adds the pure modules VisualCoreExperience, VisualCoreGeometry and VisualCorePuzzle; existing modules keep their names and API. Done so far: VisualCoreExperience (UA-F01, UA-F02) and the public StableHash in VisualCoreMath (UA-F02); the entry stays pending for R02-F05 and R02-F23."
   },
   {
    "from": "Packages/VisualCoreRendering",
@@ -307,7 +307,7 @@
    "action": "modify",
    "by": "UA-F02, UA-F03, UA-F08",
    "state": "pending",
-   "note": "Adds VisualCoreExperienceHost and VisualCoreStore; existing modules keep their names and API."
+   "note": "Adds VisualCoreExperienceHost and VisualCoreStore; existing modules keep their names and API. Done so far: VisualCoreExperienceHost with presenter, port and shell (UA-F02); the entry stays pending for UA-F03 and UA-F08."
   },
   {
    "from": "project.yml",

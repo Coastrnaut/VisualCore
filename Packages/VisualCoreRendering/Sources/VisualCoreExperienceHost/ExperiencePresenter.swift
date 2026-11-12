@@ -1,0 +1,86 @@
+// ExperiencePresenter — feature 188 T-U02-038 (FR-U02-050 to FR-U02-053, FR-U02-056, FR-U02-062, FR-U02-080;
+// research R1; contract specs/188-ua-f02-experience-sdk/contracts/experience-host-api.md). The main-actor part an
+// author writes for an experience (GPU objects, drawing, controls, the state in words) and the face every
+// experience shows to the session host.
+import SwiftUI
+import VisualCoreExperience
+import VisualCoreRendering
+
+/// The main-actor part of an experience: it owns the GPU objects, draws the core and builds the controls.
+///
+/// A presenter never changes the state: `draw` receives the core as a value. It keeps no GPU object across
+/// `teardown`, because `setup` runs again after a context loss, and it never reads pixels back to decide anything.
+@MainActor
+public protocol ExperiencePresenter: AnyObject {
+    /// The pure core this presenter draws.
+    associatedtype Core: ExperienceCore
+
+    /// Creates the GPU objects through `context.resources`. Runs again after a context loss.
+    func setup(_ context: RenderContext) throws
+    /// Reacts to a new drawable size. Default: nothing.
+    func resize(_ context: RenderContext)
+    /// Draws `core` at the quality tier `tier` (0 is the best) into the framebuffer of `context`.
+    func draw(_ core: Core, tier: Int, context: RenderContext, frame: FrameInfo) throws
+    /// Releases every GPU object created since `setup`.
+    func teardown(_ context: RenderContext)
+    /// Drops caches that can be rebuilt. Default: nothing.
+    func shedCaches()
+    /// The state in words, for assistive technology.
+    func describe(_ core: Core) -> String
+    /// The native controls of the experience; they call `port.send`.
+    func makeControls(_ port: ExperienceActionPort) -> AnyView
+}
+
+extension ExperiencePresenter {
+    /// Does nothing: a presenter that does not depend on the drawable size needs no override.
+    public func resize(_ context: RenderContext) {}
+    /// Does nothing: a presenter without rebuildable caches needs no override.
+    public func shedCaches() {}
+}
+
+/// One experience as the session host sees it: lifecycle, scene, controls, state description and diagnostics.
+@MainActor
+public protocol Experience: AnyObject {
+    /// The experience's identifier.
+    var id: ExperienceID { get }
+    /// The current lifecycle state.
+    var state: ExperienceLifecycleState { get }
+    /// The scene to hand to a render host. The experience never creates, pauses or destroys the host.
+    var scene: any RenderScene { get }
+    /// The port the controls use to reach the experience.
+    var port: ExperienceActionPort { get }
+    /// The native controls of the experience.
+    var controls: AnyView { get }
+    /// The current state in words; empty while there is no state.
+    var accessibilitySummary: String { get }
+    /// The diagnostics of the experience, with GPU counts once a graphics context was seen.
+    var diagnostics: ExperienceDiagnostics { get }
+
+    /// Prepares the state from `seed` off the main actor, under an optional time limit; ends in ready.
+    func prepare(seed: UInt64, timeLimit: Duration?) async throws(ExperienceError)
+    /// Cancels a running preparation; without one it does nothing.
+    func cancelPreparation()
+    /// ready → active.
+    func activate() throws(ExperienceError)
+    /// active → suspended: frames are drawn, no step runs.
+    func suspend() throws(ExperienceError)
+    /// suspended → active, without catching up on the time spent suspended.
+    func resume() throws(ExperienceError)
+    /// Carries out an action made now with the control `control`, or rejects it with a typed reason.
+    @discardableResult func handle(control: String, values: [Double]) -> ActionResult
+    /// Captures the state as a versioned envelope.
+    func snapshot() throws(ExperienceError) -> ExperienceSnapshot
+    /// Replaces the state by the one in `snapshot`; a refused restore changes nothing.
+    func restore(_ snapshot: ExperienceSnapshot) throws(ExperienceError)
+    /// Returns to the state of a fresh preparation with the current seed.
+    func reset() throws(ExperienceError)
+    /// Sets the quality tier (0 is the best); the state's digest does not change.
+    func setQualityTier(_ tier: Int) throws(ExperienceError)
+    /// Drops caches that can be rebuilt, in the core and in the presenter; the state's digest does not change.
+    func shedCaches() throws(ExperienceError)
+    /// Starts leaving the experience: from now on the scene draws nothing.
+    func beginDeactivation() throws(ExperienceError)
+    /// Ends the leave after the render host was destroyed or its scene replaced; throws `.gpuLeak` when a GPU
+    /// object is still live or was leaked.
+    func finishDeactivation() throws(ExperienceError)
+}

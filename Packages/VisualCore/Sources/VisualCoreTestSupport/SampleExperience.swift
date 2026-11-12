@@ -44,6 +44,10 @@ public enum SampleExperience {
 
     // MARK: - Conformance plan (T-U02-040)
 
+    /// The conformance plan of the sample: `seeds`, `stepsPerSegment`, `acceptedActions` and `rejectedActions`.
+    public static let plan = ConformancePlan(seeds: seeds, stepsPerSegment: stepsPerSegment,
+                                             actions: acceptedActions, rejected: rejectedActions)
+
     // MARK: - Committed digests (T-U02-017)
 
     /// The digest of the sample right after preparation, for eight seeds. Computed once on the Mac host; the
@@ -61,6 +65,9 @@ public enum SampleExperience {
 
     /// The digest of the sample prepared with seed 42 after 240 steps.
     public static let digestAfter240Steps = "e1df502ae639bed10e7f3d7aead5c21c68a5c8e3fd0aa869818842b807805839"
+
+    /// The digest the scenario of `ExperienceScenarioTests` (seed 42, 100 steps, 10 actions) ends with.
+    public static let scenarioDigest = "da49fae412c4beddd24a3305b77f0f800d3c4324bbd23c18066acbba46410c60"
 
     // MARK: - Version-1 snapshot (migration tests)
 

@@ -12,8 +12,8 @@
 
 | Package | Modules | Runs on |
 |---|---|---|
-| `Packages/VisualCore` | `VisualCoreMath`, `VisualCoreSimulation`, `VisualCoreScenes`, `VisualCoreShaderSource`, `VisualCoreEffectsGraph`, `VisualCoreDiagnostics`, `VisualCoreParameters` (incl. `ParameterEditor`), `VisualCoreTestSupport` (test-only: image comparison), `VisualCorePersistence` (`DocumentStore`), `VisualCoreExperience` (experience identity and the validated runtime catalog) (+ placeholder `VisualCoreAudioDSP`) | macOS host and iOS |
-| `Packages/VisualCoreRendering` | `VisualCoreRendering` (incl. `ShaderBundle`, `vc/*.glsl`, `FullScreenShaderScene`, `renderOffscreen`/`StillImageEncoder`), `VisualCoreEffects`, `VisualCoreUI` (`RenderSurface`, `ParameterPanel`, `SystemAccessibilityObserver`, `AccessibilitySettingsSection`), `VisualCoreAutomation` (Debug/measurement only) (+ placeholder `VisualCoreAudio`) | iOS / iPadOS 26+ |
+| `Packages/VisualCore` | `VisualCoreMath`, `VisualCoreSimulation`, `VisualCoreScenes`, `VisualCoreShaderSource`, `VisualCoreEffectsGraph`, `VisualCoreDiagnostics`, `VisualCoreParameters` (incl. `ParameterEditor`), `VisualCoreTestSupport` (test-only: image comparison), `VisualCorePersistence` (`DocumentStore`), `VisualCoreExperience` (experience identity, the validated runtime catalog and the pure experience contract: core, engine, lifecycle, digest, snapshot, conformance) (+ placeholder `VisualCoreAudioDSP`) | macOS host and iOS |
+| `Packages/VisualCoreRendering` | `VisualCoreRendering` (incl. `ShaderBundle`, `vc/*.glsl`, `FullScreenShaderScene`, `renderOffscreen`/`StillImageEncoder`), `VisualCoreEffects`, `VisualCoreUI` (`RenderSurface`, `ParameterPanel`, `SystemAccessibilityObserver`, `AccessibilitySettingsSection`), `VisualCoreAutomation` (Debug/measurement only), `VisualCoreExperienceHost` (`ExperiencePresenter`, `ExperienceShell`: an experience on the render host) (+ placeholder `VisualCoreAudio`) | iOS / iPadOS 26+ |
 
 The [package map](../specs/002-architecture-contracts/contracts/package-map.md) lists what each module owns and the
 dependency rules. `scripts/check_dependencies.py` enforces them.

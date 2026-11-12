@@ -15,8 +15,8 @@ iOS 26+ inside apps. The package map and dependency rules R1–R5 are in
 | VisualCoreAudioDSP | **placeholder, not built yet** — planned: lock-free ring, FFT, bands, RMS, onsets ([ADR-0006](../../docs/decisions/ADR-0006-unbuilt-readme-modules.md)) |
 | VisualCorePersistence | `DocumentStore` (versioned envelopes, atomic writes, migrations, per-file problem reports), A01-P03; app-owned temporary folders (TemporaryFolder); named, favoritable document libraries (NamedLibrary), A03-P03 |
 | VisualCoreParameters | parameter schemas (units, ranges, linear/log sliders), resolution, palettes (sRGB, linear-light sampling), presets, stable `ParameterHash` |
-| VisualCoreExperience | experience identity (`ExperienceID`, `ExperienceCode`), descriptors, tiers and categories, the validated runtime catalog (`CatalogManifest`: bounded loading with typed errors, launch allocation, search, registry check), UA-F01 |
-| VisualCoreTestSupport | test-only (rule R5): `ImageComparison`, `ImageDifference`, `ImageStatistics` for pixel tests; fake clock and fixtures still planned (ADR-0006) |
+| VisualCoreExperience | experience identity (`ExperienceID`, `ExperienceCode`), descriptors, tiers and categories, the validated runtime catalog (`CatalogManifest`: bounded loading with typed errors, launch allocation, search, registry check), UA-F01; the pure part of the experience contract (`ExperienceCore`, `ExperienceEngine`, `ExperienceLifecycle`, `StateDigest`, `ExperienceSnapshot`, `ExperienceDiagnostics`, `ExperienceConformance`), UA-F02 |
+| VisualCoreTestSupport | test-only (rule R5): `ImageComparison`, `ImageDifference`, `ImageStatistics` for pixel tests; the sample experience `SampleExperienceCore` with its fault markers and `SampleExperience` (UA-F02); fake clock and fixtures still planned (ADR-0006) |
 
 Imports allowed (R2): Foundation-level system modules (`Foundation`, `Dispatch`, `os`, `simd`,
 `Accelerate`, `Synchronization`) and other modules of this package.
@@ -185,3 +185,35 @@ Pass `RenderHost.maxRenderSize` as `maxEdge` to stay within the device's rendere
   `UserDefaults` as `<prefix>.reduceMotion` and `<prefix>.reduceFlashing` (the keys also work with `@AppStorage`).
 
 On iOS, `VisualCoreUI.SystemAccessibilityObserver` supplies the system values.
+
+## Experience contract (feature 188, UA-F02)
+
+Every experience of the unified app has two parts. The pure part is a value type that conforms to `ExperienceCore`:
+it is prepared from a 64-bit seed, advances in fixed steps, carries out validated actions, writes its state into a
+`DigestBuilder` (SHA-256 through `StableHash` of VisualCoreMath) and can be captured in a versioned
+`ExperienceSnapshot`. `ExperienceEngine<Core>` drives a core through `ExperienceLifecycle` (registered, preparing,
+ready, active, suspended, deactivating, inactive, failed) and answers every call in every state: an operation that
+is not legal is refused with a typed error, counted, and never reaches the core.
+
+```swift
+var engine = ExperienceEngine<MyCore>(id: myID)
+try await engine.prepare(seed: 42)          // deterministic: the same seed gives the same digest
+try engine.activate()
+try engine.advance(frame: 1.0 / 60)         // fixed steps, at most 8 per frame, no catch-up after resume()
+let result = engine.handle(control: "move", values: [1, 0])   // .accepted or .rejected(reason); a rejection changes nothing
+let snapshot = try engine.snapshot()        // versioned envelope with seed, step index, digest and checksum
+try engine.restore(snapshot)                // typed refusal for a foreign, newer, damaged or mismatching snapshot
+try engine.reset()                          // the state of a fresh preparation with the same seed
+```
+
+Each experience's tests hand its core to the conformance helper, which runs seven checks and names every failure:
+
+```swift
+let report = await ExperienceConformance.run(MyCore.self, id: myID, plan: plan)
+#expect(report.passed, "\(report.failed)")
+```
+
+`ExperienceDiagnostics` is the readable state for evidence files (state, seed, step index, tier, GPU counts, last
+error, digest, counters). `ExperienceScenario` and the engine's `run(_:)` exist only under `DEBUG` or
+`VISUALCORE_AUTOMATION`; `scripts/check_experience_symbols.py` proves that a release build has none of them.
+Contract: [experience-core-api.md](../../specs/188-ua-f02-experience-sdk/contracts/experience-core-api.md).

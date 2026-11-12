@@ -2301,6 +2301,19 @@ class ExperienceSymbolsTests(unittest.TestCase):
     DEMANGLED = "VisualCoreExperience.ExperienceScenario.steps.getter : Swift.Int"
     DIRTY = CLEAN + "0000000000000040 T " + MANGLED + "\n"
 
+    def test_object_files_accept_the_toolchain_directory_name(self):
+        """Observed with Swift 6.4: the objects of target X lie below `X-t.build`; a similar name of another target
+        never counts."""
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            for rel in ("a/VisualCoreExperience-t.build/Objects-normal/arm64/One.o", "a/VisualCoreExperience.build/Two.o",
+                        "a/VisualCoreExperienceHost-t.build/Three.o", "a/VisualCoreExperienceTests.build/Four.o",
+                        "Products/Release/VisualCoreExperience.o"):
+                (root / rel).parent.mkdir(parents=True, exist_ok=True)
+                (root / rel).write_bytes(b"")
+            self.assertEqual([p.name for p in self.tool.object_files(root, "pure")], ["One.o", "Two.o"])
+            self.assertEqual([p.name for p in self.tool.object_files(root, "host")], ["Three.o"])
+
     def fake_run(self, build_code=0, nm_output="", objects=(), nm_code=0, demangle_code=0):
         """A stand-in for subprocess.run: the "build" creates the given object files below the build directory and
         the "demangler" knows the one abbreviated symbol of the fixtures."""

@@ -23,6 +23,7 @@ library only.
 from __future__ import annotations
 
 import argparse
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -67,12 +68,13 @@ def build_command(module: str, with_flag: bool, root: Path) -> tuple[list[str], 
 
 
 def object_files(build_dir: Path, module: str) -> list[Path]:
-    """Every object file below a directory named `<Target>.build` inside the build directory."""
-    marker = TARGETS[module] + ".build"
+    """Every object file below a directory named `<Target>.build` inside the build directory. The build system of
+    the Swift toolchain 6.4 names the directory `<Target>-t.build`; both forms count, other targets never do."""
+    marker = re.compile(r"^" + re.escape(TARGETS[module]) + r"(-[a-z])?\.build$")
     if not build_dir.is_dir():
         return []
     return sorted(p for p in build_dir.rglob("*.o")
-                  if p.is_file() and marker in p.relative_to(build_dir).parts[:-1])
+                  if p.is_file() and any(marker.match(part) for part in p.relative_to(build_dir).parts[:-1]))
 
 
 def main(argv: list[str] | None = None, root: Path = ROOT, run=subprocess.run) -> int:
