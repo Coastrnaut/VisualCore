@@ -280,7 +280,9 @@ count, and no row or sentence presents a simulator number as a result.
   and resolution factor that the existing frame pacing applies under heat MUST be readable for the performance
   record; that frame pacing stays as it is and multiplies with the level's resolution share.
 - **FR-U06-015**: The settings MUST say what automatic and a pinned level mean, and MUST keep the choice across
-  restarts as today. This feature MUST NOT add a per-experience override.
+  restarts as today. The text MUST be a string resource, MUST wrap at the largest accessibility text size and
+  MUST leave the settings route passing its accessibility audit. This feature MUST NOT add a per-experience
+  override.
 
 **Stage measurements**
 
@@ -289,17 +291,20 @@ count, and no row or sentence presents a simulator number as a result.
   compiled) and the time from the
   start of the open to the first frame that was presented on the display.
 - **FR-U06-021**: A stage that did not end MUST have no value. Zero MUST mean a measured zero.
-- **FR-U06-022**: The number of shader compilations after an experience became interactive MUST be counted as
-  late compilations; compilations after a replaced display context MUST be counted as a rebuild instead.
+- **FR-U06-022**: An experience is interactive from the moment its session runs after the activation. The number
+  of shader compilations after that moment MUST be counted as late compilations; compilations after a replaced display context MUST be counted as a rebuild instead.
 - **FR-U06-023**: The performance check of an experience MUST fail when it has one or more late compilations.
 - **FR-U06-024**: The app MUST record one launch time per process: from the earliest moment the app's own code
-  runs to the moment the launcher is usable, with a mark for the first start after an installation. Before the
-  launcher is usable the app MUST create no rendering context.
+  runs to the moment the launcher is usable, with a mark for the first start after an installation (a start that finds no stored preferences of the app).
+  Before the launcher is usable the app MUST create no rendering context. Time before the app's own code runs is
+  not observable by the app and is not part of the value.
 
 **Running measurements**
 
 - **FR-U06-030**: While an experience runs, the display refreshes MUST be counted: samples, on-time refreshes,
-  missed refreshes, and the median, 95th and 99th percentile of the interval between presented frames.
+  missed refreshes, and the median, 95th and 99th percentile of the interval between presented frames. A
+  refresh is on time when the interval is at most one and a half refresh periods at the frame-rate cap in force;
+  a longer interval misses the whole refresh periods it spans beyond the first.
 - **FR-U06-031**: Time spent suspended, the first frame after a resume and frame times that are not finite or
   run backwards MUST NOT be samples; invalid frame times MUST be counted.
 - **FR-U06-032**: The pacing MUST keep a bounded amount of data however long an experience runs.
@@ -313,8 +318,9 @@ count, and no row or sentence presents a simulator number as a result.
 - **FR-U06-040**: The measurements of a session MUST form one performance record with a version (version 1), which
   the evidence record of UA-F09 embeds unchanged: launch time,
   preparation time, shader compilation time and count, late compilations, first present time, pacing counts and
-  percentiles, memory footprint, graphics bytes (current and peak), quality level, steps down and up, thermal
-  state, Low Power Mode, and whether frames were presented.
+  percentiles, memory footprint, graphics bytes (current and peak), quality level and whether it is pinned, steps down
+  and up, the frame-rate cap and resolution factor of the frame pacing, thermal state, Low Power Mode, the number
+  of display-context rebuilds and of memory-pressure events, and whether frames were presented.
 - **FR-U06-041**: The record MUST have one text form that reads back to an equal record. A damaged text, a
   missing or unknown field or a newer version MUST be refused with a stable code.
 - **FR-U06-042**: The record MUST carry nothing that identifies a person or a device beyond what the evidence
@@ -371,6 +377,9 @@ count, and no row or sentence presents a simulator number as a result.
 
 ### Measurable Outcomes
 
+All ten outcomes are verified on the host or on simulators. None of them is a statement about the performance
+of a device; those belong to the device task of FR-U06-073.
+
 - **SC-U06-001**: For the sample experience and the debug experience, 100% of the declared levels have a name
   and four budgets, and switching through every level changes 0 state digests.
 - **SC-U06-002**: Of 12 invalid profiles (no level, nine levels, unnamed, duplicate name, each budget out of
@@ -403,6 +412,8 @@ count, and no row or sentence presents a simulator number as a result.
   is absent.
 - Battery level, charging and display brightness are device-only fields of the evidence record and are not
   measured here.
+- The on-screen frame meter that Auto-Creator.md section 12.6 describes for the device campaign is built with
+  the verification runner (UA-F09) from the pacing counts of this feature; this feature shows no meter.
 
 ## Absorbed source requirements
 
