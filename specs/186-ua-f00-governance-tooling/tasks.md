@@ -22,7 +22,7 @@ task. The brief names no device-only and no owner-only item, so there is no `{de
 
 ## Phase 1: Setup
 
-- [ ] T-U00-001 Confirm the starting state before any change: `python3 scripts/test_scripts.py` ends with `OK` (103 tests), `python3 scripts/validate_docs.py` prints `PASS: 36 feature dossiers checked, 0 problems`, `python3 scripts/migration_ledger.py show --gate UA-F00` prints `UNMET: none`, and `git status --short` is empty. Expected result: all four as stated; record the test count and the elapsed time as the baseline for SC-U00-009.
+- [X] T-U00-001 Confirm the starting state before any change: `python3 scripts/test_scripts.py` ends with `OK` (103 tests), `python3 scripts/validate_docs.py` prints `PASS: 36 feature dossiers checked, 0 problems`, `python3 scripts/migration_ledger.py show --gate UA-F00` prints `UNMET: none`, and `git status --short` is empty. Expected result: all four as stated; record the test count and the elapsed time as the baseline for SC-U00-009. — Verified 2026-11-11: python3 scripts/test_scripts.py: Ran 103 tests in 5.7 s, OK (baseline for SC-U00-009); validate_docs.py PASS 36 dossiers, 0 problems; migration_ledger.py show --gate UA-F00: UNMET none; git status --short empty
 
 ## Phase 2: Foundational (test harness; blocks every story)
 
