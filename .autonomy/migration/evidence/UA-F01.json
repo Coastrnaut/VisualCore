@@ -1,0 +1,349 @@
+{
+  "branch": "main",
+  "dirty": false,
+  "dirty_paths": [],
+  "failed_attempts": [],
+  "gate": "UA-F01",
+  "ledger": "migration",
+  "passing_checks": [
+    {
+      "command": "xcodebuild build-for-testing -project VisualCore.xcodeproj -scheme FluidArtPlayground -destination 'generic/platform=iOS Simulator' -derivedDataPath Build/DerivedData/ua-f01-FluidArtPlayground CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "finished": "2026-11-12T06:04:58+00:00",
+      "log": ".autonomy/logs/migration/UA-F01.build-FluidArtPlayground.log",
+      "log_sha256": "1bcbe7a8248bf03f813bfbe9fded58f3ab0b957bd6dda77bee794f77b9d5910a",
+      "name": "build-FluidArtPlayground"
+    },
+    {
+      "command": "xcodebuild build-for-testing -project VisualCore.xcodeproj -scheme FractalExplorer -destination 'generic/platform=iOS Simulator' -derivedDataPath Build/DerivedData/ua-f01-FractalExplorer CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "finished": "2026-11-12T06:05:12+00:00",
+      "log": ".autonomy/logs/migration/UA-F01.build-FractalExplorer.log",
+      "log_sha256": "adbb7880d0c8e2be0e29b16606e7923b0a1554124dd7c6f1d33c1164a67f3363",
+      "name": "build-FractalExplorer"
+    },
+    {
+      "command": "xcodebuild build-for-testing -project VisualCore.xcodeproj -scheme GenerativeArtStudio -destination 'generic/platform=iOS Simulator' -derivedDataPath Build/DerivedData/ua-f01-GenerativeArtStudio CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "finished": "2026-11-12T06:04:45+00:00",
+      "log": ".autonomy/logs/migration/UA-F01.build-GenerativeArtStudio.log",
+      "log_sha256": "3c206f0bc44dc38e0bb1991d7b452b332cb91cb2416d029b415c69dc596ecfc3",
+      "name": "build-GenerativeArtStudio"
+    },
+    {
+      "command": "xcodebuild build-for-testing -project Harnesses/InteractiveDemo/InteractiveDemo.xcodeproj -scheme InteractiveDemo -destination 'generic/platform=iOS Simulator' -derivedDataPath Build/DerivedData/ua-f01-InteractiveDemo CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "finished": "2026-11-12T06:05:32+00:00",
+      "log": ".autonomy/logs/migration/UA-F01.build-InteractiveDemo.log",
+      "log_sha256": "fd8d819a389d6ea786d5869c6900fdbdef6de755ce84994e8427b4fced346fd6",
+      "name": "build-InteractiveDemo"
+    },
+    {
+      "command": "xcodebuild build-for-testing -project VisualCore.xcodeproj -scheme ParticleUniverse -destination 'generic/platform=iOS Simulator' -derivedDataPath Build/DerivedData/ua-f01-ParticleUniverse CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "finished": "2026-11-12T06:05:23+00:00",
+      "log": ".autonomy/logs/migration/UA-F01.build-ParticleUniverse.log",
+      "log_sha256": "df817bfba04a1723e4e15ec029413f4fa1524a307dee623b13807ad5f0bc9cdc",
+      "name": "build-ParticleUniverse"
+    },
+    {
+      "command": "xcodebuild build-for-testing -project Harnesses/SecondConsumer/SecondConsumer.xcodeproj -scheme SecondConsumer -destination 'generic/platform=iOS Simulator' -derivedDataPath Build/DerivedData/ua-f01-SecondConsumer CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "finished": "2026-11-12T06:05:43+00:00",
+      "log": ".autonomy/logs/migration/UA-F01.build-SecondConsumer.log",
+      "log_sha256": "471b3a3bcfe73f9594e85d9452100d59e4702c433b1be573f900dc41049c3b0b",
+      "name": "build-SecondConsumer"
+    },
+    {
+      "command": "xcodebuild build-for-testing -project VisualCore.xcodeproj -scheme Showcase -destination 'generic/platform=iOS Simulator' -derivedDataPath Build/DerivedData/ua-f01-Showcase CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "finished": "2026-11-12T06:04:21+00:00",
+      "log": ".autonomy/logs/migration/UA-F01.build-Showcase.log",
+      "log_sha256": "5c65f50e56e8d2fedcef64cc5392c47a0e9799aafae010a261f1721201bdaa42",
+      "name": "build-Showcase"
+    },
+    {
+      "command": "python3 scripts/build_catalog.py --check",
+      "exit_code": 0,
+      "finished": "2026-11-12T06:15:55+00:00",
+      "log": ".autonomy/logs/migration/UA-F01.catalog-check-final.log",
+      "log_sha256": "3d0596bd1d2323629c63b1d5739baeab10c68c6ee34f9a91eb601cf967aaf73c",
+      "name": "catalog-check-final"
+    },
+    {
+      "command": "python3 scripts/build_catalog.py --check",
+      "exit_code": 0,
+      "finished": "2026-11-12T06:06:38+00:00",
+      "log": ".autonomy/logs/migration/UA-F01.catalog-check.log",
+      "log_sha256": "b035aef278a6dafb57919e4549a815b28b290d77030f71d06029262cb83775bc",
+      "name": "catalog-check"
+    },
+    {
+      "command": "gh run watch 43166628352 --exit-status",
+      "exit_code": 0,
+      "finished": "2026-11-12T06:16:21+00:00",
+      "log": ".autonomy/logs/migration/UA-F01.ci-run-final.log",
+      "log_sha256": "573f6f0078436b6922c4e4abd52d6a9f0a6303aae3afe310332ecf2ca7582d07",
+      "name": "ci-run-final"
+    },
+    {
+      "command": "gh run watch 43165875766 --exit-status",
+      "exit_code": 0,
+      "finished": "2026-11-12T06:09:44+00:00",
+      "log": ".autonomy/logs/migration/UA-F01.ci-run.log",
+      "log_sha256": "581aaa521f9048df9904556f8973d78efa754a4bdf78fd6b26a4d0fff023d0f5",
+      "name": "ci-run"
+    },
+    {
+      "command": "python3 scripts/check_dependencies.py",
+      "exit_code": 0,
+      "finished": "2026-11-12T06:15:56+00:00",
+      "log": ".autonomy/logs/migration/UA-F01.dependencies-final.log",
+      "log_sha256": "5f74f32bbf3a68d6273cdf1f94c98a668961a6236d0f6f8f9ccaffd17886e87a",
+      "name": "dependencies-final"
+    },
+    {
+      "command": "python3 scripts/check_dependencies.py",
+      "exit_code": 0,
+      "finished": "2026-11-12T06:06:39+00:00",
+      "log": ".autonomy/logs/migration/UA-F01.dependencies.log",
+      "log_sha256": "8e7eafa61eed49586bffa89539d3dbb443a07ac5a6dbc214d2cf72b669283f66",
+      "name": "dependencies"
+    },
+    {
+      "command": "python3 scripts/validate_docs.py",
+      "exit_code": 0,
+      "finished": "2026-11-12T06:15:56+00:00",
+      "log": ".autonomy/logs/migration/UA-F01.docs-final.log",
+      "log_sha256": "89f36d4a9130c5f9c101e7005099db597997a1a89d5369c76411b084d0e37866",
+      "name": "docs-final"
+    },
+    {
+      "command": "python3 scripts/validate_docs.py",
+      "exit_code": 0,
+      "finished": "2026-11-12T06:06:58+00:00",
+      "log": ".autonomy/logs/migration/UA-F01.docs.log",
+      "log_sha256": "4cd3f5aeb362c3eb32db316b00a006550f37f7513da69fc5306e5a6234f37df8",
+      "name": "docs"
+    },
+    {
+      "command": "git diff --quiet 4fbf9c3 HEAD -- Packages/VisualCore/Sources Packages/VisualCore/Package.swift",
+      "exit_code": 0,
+      "finished": "2026-11-12T06:15:57+00:00",
+      "log": ".autonomy/logs/migration/UA-F01.framework-unchanged-since-reference.log",
+      "log_sha256": "408bfa7a0cf60a1d9ec206f3ab33f430117c70d9fefb6493f9095c4a5bcdb1d8",
+      "name": "framework-unchanged-since-reference"
+    },
+    {
+      "command": "swift test --package-path Packages/VisualCore --filter VisualCoreExperienceTests",
+      "exit_code": 0,
+      "finished": "2026-11-12T06:14:01+00:00",
+      "log": ".autonomy/logs/migration/UA-F01.host-experience-final.log",
+      "log_sha256": "d78c169ccf63d94e1822be75a0a38ff54c3036ea263376f3a04a8118740c0c03",
+      "name": "host-experience-final"
+    },
+    {
+      "command": "swift test --package-path Packages/VisualCore --filter VisualCoreExperienceTests",
+      "exit_code": 0,
+      "finished": "2026-11-12T06:06:03+00:00",
+      "log": ".autonomy/logs/migration/UA-F01.host-experience.log",
+      "log_sha256": "b4f4224511ea913e87aa3177dfdc5682191986f702feb49edc42f2e2cbb9b670",
+      "name": "host-experience"
+    },
+    {
+      "command": "swift test --package-path Packages/VisualCore",
+      "exit_code": 0,
+      "finished": "2026-11-12T06:14:18+00:00",
+      "log": ".autonomy/logs/migration/UA-F01.host-visualcore-final.log",
+      "log_sha256": "c604dd35cc6e06bd4c1e0bbb0be4db90852656c0401ae52f6f7c540e320f85a6",
+      "name": "host-visualcore-final"
+    },
+    {
+      "command": "swift test --package-path Packages/VisualCore",
+      "exit_code": 0,
+      "finished": "2026-11-12T06:06:21+00:00",
+      "log": ".autonomy/logs/migration/UA-F01.host-visualcore.log",
+      "log_sha256": "b53470050263daf88539f6b91e45538a176d3bf74e9e5d4370eaec10916ca2cf",
+      "name": "host-visualcore"
+    },
+    {
+      "command": "python3 scripts/migration_ledger.py validate",
+      "exit_code": 0,
+      "finished": "2026-11-12T06:15:57+00:00",
+      "log": ".autonomy/logs/migration/UA-F01.ledger-final.log",
+      "log_sha256": "6ac16eb71f484a97157702625477964e9615aebbb6c164544f3d5f22a6bbeb37",
+      "name": "ledger-final"
+    },
+    {
+      "command": "python3 scripts/migration_ledger.py validate",
+      "exit_code": 0,
+      "finished": "2026-11-12T06:06:59+00:00",
+      "log": ".autonomy/logs/migration/UA-F01.ledger.log",
+      "log_sha256": "51f6e99a19837cc8b7751a0c0a444d4e43f907efce357ffd7e8dcd14cfde9d49",
+      "name": "ledger"
+    },
+    {
+      "command": "python3 scripts/prepush_scan.py --range 5166d7d..HEAD",
+      "exit_code": 0,
+      "finished": "2026-11-12T06:15:57+00:00",
+      "log": ".autonomy/logs/migration/UA-F01.prepush-scan-final.log",
+      "log_sha256": "95329a79e9ee7b8b1e3efc90ffb09f0127223f5732ace8c33d87e9d2bc767073",
+      "name": "prepush-scan-final"
+    },
+    {
+      "command": "python3 scripts/prepush_scan.py --range 5166d7d..HEAD",
+      "exit_code": 0,
+      "finished": "2026-11-12T06:07:00+00:00",
+      "log": ".autonomy/logs/migration/UA-F01.prepush-scan.log",
+      "log_sha256": "25ca2ea54517c0fac6c1d983767bf15ed530e46f4563e6216c67863ff8c6fdbc",
+      "name": "prepush-scan"
+    },
+    {
+      "command": "python3 scripts/check_public_api.py",
+      "exit_code": 0,
+      "finished": "2026-11-12T06:15:55+00:00",
+      "log": ".autonomy/logs/migration/UA-F01.public-api-final.log",
+      "log_sha256": "6681e3908b867de6fbe3dc6692f83a9144ccc7473c6a170be5dfb65207964ed7",
+      "name": "public-api-final"
+    },
+    {
+      "command": "python3 scripts/check_public_api.py",
+      "exit_code": 0,
+      "finished": "2026-11-12T06:06:39+00:00",
+      "log": ".autonomy/logs/migration/UA-F01.public-api.log",
+      "log_sha256": "fdad215aa7d3a64e6708e27960bf2f845c0e11765f28bee3a7bf765c5b8c9a05",
+      "name": "public-api"
+    },
+    {
+      "command": "gh run watch 43166628141 --exit-status",
+      "exit_code": 0,
+      "finished": "2026-11-12T06:16:07+00:00",
+      "log": ".autonomy/logs/migration/UA-F01.push-scan-run-final.log",
+      "log_sha256": "a421657eb93a033351a866f9a407d016c2bcb9d59db47c3eb7f1ae0a337cc2d2",
+      "name": "push-scan-run-final"
+    },
+    {
+      "command": "gh run watch 43165875737 --exit-status",
+      "exit_code": 0,
+      "finished": "2026-11-12T06:07:18+00:00",
+      "log": ".autonomy/logs/migration/UA-F01.push-scan-run.log",
+      "log_sha256": "28442fd157fb8b59d4f2e28bd8c0911ac27bad1c49d5fdcc607a1f15f4d96312",
+      "name": "push-scan-run"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only reference-engine-xcframework reference-build-projectm-ios-sim reference-clean",
+      "exit_code": 0,
+      "finished": "2026-11-12T06:02:31+00:00",
+      "log": ".autonomy/logs/migration/UA-F01.reference-a.log",
+      "log_sha256": "db54b0416c8316a83d80efe72f99aae8c0a0072c31c2d534e247f10b9c43dcd2",
+      "name": "reference-a"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only reference-test-anglerendering-ios27 reference-test-anglerendering-ios26 projectm-reference-ios27 projectm-reference-ios26",
+      "exit_code": 0,
+      "finished": "2026-11-12T06:03:43+00:00",
+      "log": ".autonomy/logs/migration/UA-F01.reference-b.log",
+      "log_sha256": "5dafdf8f3c8a62f8965b3d5c3f669ef76ddbb44a98577c39a6d0f539065340e5",
+      "name": "reference-b"
+    },
+    {
+      "command": "git diff --quiet 5166d7d -- Apps Showcase Harnesses Packages/VisualCoreRendering External Vendor Tools project.yml .autonomy/state.json docs/catalog/experience-catalog.json",
+      "exit_code": 0,
+      "finished": "2026-11-12T06:15:57+00:00",
+      "log": ".autonomy/logs/migration/UA-F01.scope-untouched-final.log",
+      "log_sha256": "71fb74952f85ffb0852bea8e0e61444fc66646e5d2ac1cddaae1cfa3419a71e7",
+      "name": "scope-untouched-final"
+    },
+    {
+      "command": "git diff --quiet 5166d7d -- Apps Showcase Harnesses Packages/VisualCoreRendering External Vendor Tools project.yml .autonomy/state.json docs/catalog/experience-catalog.json",
+      "exit_code": 0,
+      "finished": "2026-11-12T06:07:09+00:00",
+      "log": ".autonomy/logs/migration/UA-F01.scope-untouched.log",
+      "log_sha256": "2a1ded2e149307fbe5b845e1b05e90b0bdb0d635a5ca31653df08897a3138b50",
+      "name": "scope-untouched"
+    },
+    {
+      "command": "python3 scripts/test_scripts.py",
+      "exit_code": 0,
+      "finished": "2026-11-12T06:15:55+00:00",
+      "log": ".autonomy/logs/migration/UA-F01.script-tests-final.log",
+      "log_sha256": "217ea5470340f4b65d884b539bd986c62b1c7eed385d7178ce0bd5d3f74386cc",
+      "name": "script-tests-final"
+    },
+    {
+      "command": "python3 scripts/test_scripts.py",
+      "exit_code": 0,
+      "finished": "2026-11-12T06:06:58+00:00",
+      "log": ".autonomy/logs/migration/UA-F01.script-tests.log",
+      "log_sha256": "f2a57baa1b53ef9c676aa24b384c321e53625c4a9c5a4b2294ce73d40767ff96",
+      "name": "script-tests"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCore --scheme VisualCore-Package --destination sim-26.5 --action test",
+      "exit_code": 0,
+      "finished": "2026-11-12T06:15:28+00:00",
+      "log": ".autonomy/logs/migration/UA-F01.sim-ios26-final.log",
+      "log_sha256": "a43a87c2196c746fd50ed4bd494943fe7c2aedd54a12ce52800b4ae39f67b91b",
+      "name": "sim-ios26-final"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCore --scheme VisualCore-Package --destination sim-26.5 --action test",
+      "exit_code": 0,
+      "finished": "2026-11-12T06:01:00+00:00",
+      "log": ".autonomy/logs/migration/UA-F01.sim-ios26.log",
+      "log_sha256": "aaaceafda99d37ad23ea814a8373c6de9ee5f8a6f9c02f214fc0a3eab601cade",
+      "name": "sim-ios26"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCore --scheme VisualCore-Package --destination sim-27.2 --action test",
+      "exit_code": 0,
+      "finished": "2026-11-12T06:14:56+00:00",
+      "log": ".autonomy/logs/migration/UA-F01.sim-ios27-final.log",
+      "log_sha256": "829fc3fb7e95d726b3c29542b199fbd952421e626fd666ba31bcfe3947f6ef9b",
+      "name": "sim-ios27-final"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCore --scheme VisualCore-Package --destination sim-27.2 --action test --test-language tr --test-region TR",
+      "exit_code": 0,
+      "finished": "2026-11-12T06:01:46+00:00",
+      "log": ".autonomy/logs/migration/UA-F01.sim-ios27-tr.log",
+      "log_sha256": "f1272dbe9ec59263eb747f31e2ac0d3048028fed04805a2885c248d74f5ffd28",
+      "name": "sim-ios27-tr"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCore --scheme VisualCore-Package --destination sim-27.2 --action test",
+      "exit_code": 0,
+      "finished": "2026-11-12T06:00:13+00:00",
+      "log": ".autonomy/logs/migration/UA-F01.sim-ios27.log",
+      "log_sha256": "372f226cc27d3841414eb2a580c4e445d4804396db1b6e365b5b643a3528a761",
+      "name": "sim-ios27"
+    },
+    {
+      "command": "python3 scripts/validate_autocreator.py",
+      "exit_code": 0,
+      "finished": "2026-11-12T06:15:57+00:00",
+      "log": ".autonomy/logs/migration/UA-F01.steering-final.log",
+      "log_sha256": "f64c57396154fb877f4a78f2f3a15186d62ce4d68cc5eb55ee52b683568d31e6",
+      "name": "steering-final"
+    },
+    {
+      "command": "python3 scripts/validate_autocreator.py",
+      "exit_code": 0,
+      "finished": "2026-11-12T06:06:59+00:00",
+      "log": ".autonomy/logs/migration/UA-F01.steering.log",
+      "log_sha256": "1939fe6e4e601f48e94d94d60158b948d495cad63ee1c30a11f79818792dc0fa",
+      "name": "steering"
+    },
+    {
+      "command": "git diff --quiet eb9e64f HEAD -- scripts .github Configs Catalog Packages",
+      "exit_code": 0,
+      "finished": "2026-11-12T06:16:23+00:00",
+      "log": ".autonomy/logs/migration/UA-F01.unchanged-since-ci.log",
+      "log_sha256": "fdd4851045ae2ef2260a5ed90f3fa7a79b0b216207e2508338e9d4ce3df513e2",
+      "name": "unchanged-since-ci"
+    }
+  ],
+  "revision": "eb9e64fb0e6f4baad8a1dc45a6aa3621914e0db6",
+  "revision_number": 1,
+  "sealed": "2026-11-12T06:16:35+00:00"
+}

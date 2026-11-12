@@ -1,0 +1,23 @@
+{
+  "argv": [
+    "git",
+    "diff",
+    "--quiet",
+    "4fbf9c3",
+    "HEAD",
+    "--",
+    "Packages/VisualCore/Sources",
+    "Packages/VisualCore/Package.swift"
+  ],
+  "command": "git diff --quiet 4fbf9c3 HEAD -- Packages/VisualCore/Sources Packages/VisualCore/Package.swift",
+  "elapsed_seconds": 0.009,
+  "exit_code": 0,
+  "finished": "2026-11-12T06:15:57+00:00",
+  "gate": "UA-F01",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F01.framework-unchanged-since-reference.log",
+  "log_sha256": "408bfa7a0cf60a1d9ec206f3ab33f430117c70d9fefb6493f9095c4a5bcdb1d8",
+  "name": "framework-unchanged-since-reference",
+  "started": "2026-11-12T06:15:57+00:00",
+  "timed_out": false
+}

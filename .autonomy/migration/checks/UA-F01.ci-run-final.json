@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "gh",
+    "run",
+    "watch",
+    "43166628352",
+    "--exit-status"
+  ],
+  "command": "gh run watch 43166628352 --exit-status",
+  "elapsed_seconds": 14.762,
+  "exit_code": 0,
+  "finished": "2026-11-12T06:16:21+00:00",
+  "gate": "UA-F01",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F01.ci-run-final.log",
+  "log_sha256": "573f6f0078436b6922c4e4abd52d6a9f0a6303aae3afe310332ecf2ca7582d07",
+  "name": "ci-run-final",
+  "started": "2026-11-12T06:16:07+00:00",
+  "timed_out": false
+}

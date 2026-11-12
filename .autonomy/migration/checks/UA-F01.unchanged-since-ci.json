@@ -1,0 +1,26 @@
+{
+  "argv": [
+    "git",
+    "diff",
+    "--quiet",
+    "eb9e64f",
+    "HEAD",
+    "--",
+    "scripts",
+    ".github",
+    "Configs",
+    "Catalog",
+    "Packages"
+  ],
+  "command": "git diff --quiet eb9e64f HEAD -- scripts .github Configs Catalog Packages",
+  "elapsed_seconds": 0.011,
+  "exit_code": 0,
+  "finished": "2026-11-12T06:16:23+00:00",
+  "gate": "UA-F01",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F01.unchanged-since-ci.log",
+  "log_sha256": "fdd4851045ae2ef2260a5ed90f3fa7a79b0b216207e2508338e9d4ce3df513e2",
+  "name": "unchanged-since-ci",
+  "started": "2026-11-12T06:16:23+00:00",
+  "timed_out": false
+}
