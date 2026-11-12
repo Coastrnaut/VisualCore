@@ -466,7 +466,7 @@
    "to": "Apps/VisualCore",
    "action": "new",
    "by": "UA-F04",
-   "state": "pending",
+   "state": "done",
    "note": "The only shippable target: App/, Resources/, Tests/Unit, Tests/UI."
   },
   {
