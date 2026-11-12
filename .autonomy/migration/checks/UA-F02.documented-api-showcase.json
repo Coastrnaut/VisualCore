@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_documented_api.py",
+    "--sources",
+    "Showcase/App"
+  ],
+  "command": "python3 scripts/check_documented_api.py --sources Showcase/App",
+  "elapsed_seconds": 0.155,
+  "exit_code": 0,
+  "finished": "2026-11-12T11:35:38+00:00",
+  "gate": "UA-F02",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F02.documented-api-showcase.log",
+  "log_sha256": "baeb4d72c1cca3174ae8a3c4d4b2b1e0c68758992c7370709dd0a3e79b2151e4",
+  "name": "documented-api-showcase",
+  "started": "2026-11-12T11:35:38+00:00",
+  "timed_out": false
+}

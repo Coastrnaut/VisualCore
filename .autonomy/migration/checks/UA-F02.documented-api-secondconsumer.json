@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_documented_api.py",
+    "--sources",
+    "Harnesses/SecondConsumer/Sources"
+  ],
+  "command": "python3 scripts/check_documented_api.py --sources Harnesses/SecondConsumer/Sources",
+  "elapsed_seconds": 0.116,
+  "exit_code": 0,
+  "finished": "2026-11-12T11:35:39+00:00",
+  "gate": "UA-F02",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F02.documented-api-secondconsumer.log",
+  "log_sha256": "5b6e77e9fbc445a99e033ff323b2a63ee3553b80c92c15c58893ff6a65b83573",
+  "name": "documented-api-secondconsumer",
+  "started": "2026-11-12T11:35:39+00:00",
+  "timed_out": false
+}
