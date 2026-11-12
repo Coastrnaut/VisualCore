@@ -2232,6 +2232,36 @@ class BuildCatalogTests(unittest.TestCase):
         self.assertIn(".autonomy/migration/ledger.json", out)
 
 
+class ExperienceModuleTests(unittest.TestCase):
+    """Source-level rules of the pure module VisualCoreExperience (feature 187, FR-U01-036, FR-U01-024) and the test
+    options of the package test tool."""
+
+    SOURCES = ROOT_DIR / "Packages/VisualCore/Sources/VisualCoreExperience"
+    FORBIDDEN = ("Locale", "localized", "Date(", "FileManager", "URLSession", "ProcessInfo", "UserDefaults", "NotificationCenter",
+                 "DispatchQueue", "Bundle.")
+
+    def test_module_reads_no_clock_language_file_or_network(self):
+        files = sorted(self.SOURCES.glob("*.swift"))
+        self.assertGreaterEqual(len(files), 6)
+        for path in files:
+            text = path.read_text(encoding="utf-8")
+            code = "\n".join(line.split("//")[0] for line in text.splitlines())
+            for word in self.FORBIDDEN:
+                self.assertNotIn(word, code, f"{path.name} names {word}")
+            imports = set(re.findall(r"^import\s+(\w+)", text, re.M))
+            self.assertLessEqual(imports, {"Foundation"}, f"{path.name} imports {sorted(imports)}")
+
+    def test_package_test_tool_passes_language_and_region(self):
+        tool = load("xcodebuild_package")
+        base = ["-test-timeouts-enabled", "YES", "-default-test-execution-time-allowance", "180"]
+        self.assertEqual(tool.test_options(None, None), base)
+        self.assertEqual(tool.test_options("tr", "TR"), base + ["-testLanguage", "tr", "-testRegion", "TR"])
+        self.assertEqual(tool.test_options("de", None), base + ["-testLanguage", "de"])
+        for language, region in (("TR", None), ("turkish", None), (None, "tr"), (None, "TUR"), ("t r", None)):
+            with self.assertRaises(SystemExit):
+                tool.test_options(language, region)
+
+
 def ledger_tree_hash() -> str:
     """One hash over every file of the real migration ledger tree (FR-U00-038): the self-tests must not change it."""
     digest = hashlib.sha256()

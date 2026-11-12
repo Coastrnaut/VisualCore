@@ -217,6 +217,7 @@ VisualCoreEffectsGraph | var | public var scale: Double
 VisualCoreEffectsGraph | var | public var type: String
 VisualCoreEffectsGraph | var | public var version: Int
 VisualCoreExperience | enum | public enum CatalogError: Error, Equatable, Sendable
+VisualCoreExperience | enum | public enum CatalogSearch
 VisualCoreExperience | enum | public enum ExperienceCategory: String, Sendable, Equatable, CaseIterable
 VisualCoreExperience | enum | public enum ExperienceIDError: Error, Equatable, Sendable
 VisualCoreExperience | enum | public enum ExperienceInfo
@@ -227,21 +228,27 @@ VisualCoreExperience | func | public func experience(_ id: ExperienceID) -> Expe
 VisualCoreExperience | func | public func experience(code: ExperienceCode) -> ExperienceDescriptor?
 VisualCoreExperience | func | public func experiences(in category: ExperienceCategory) -> [ExperienceDescriptor]
 VisualCoreExperience | func | public func families(in category: ExperienceCategory) -> [String]
+VisualCoreExperience | func | public func search(_ text: String) -> [ExperienceDescriptor]
+VisualCoreExperience | func | public func title(of category: ExperienceCategory) -> String?
 VisualCoreExperience | func | public static func < (lhs: ExperienceCode, rhs: ExperienceCode) -> Bool
 VisualCoreExperience | func | public static func < (lhs: ExperienceID, rhs: ExperienceID) -> Bool
+VisualCoreExperience | func | public static func fold(_ text: String) -> String
 VisualCoreExperience | func | public static func tag(forFamily family: String) -> String
 VisualCoreExperience | init | public init(_ text: String) throws(ExperienceIDError)
 VisualCoreExperience | init | public init(data: Data) throws(CatalogError)
+VisualCoreExperience | init | public init(data: Data, categories: CategoryList? = nil) throws(CatalogError)
 VisualCoreExperience | init | public init(from decoder: any Decoder) throws
 VisualCoreExperience | init | public init(levels: Int, catalogSHA256: String)
 VisualCoreExperience | init | public init?(rawValue: String)
 VisualCoreExperience | let | public let capabilities: [String]
 VisualCoreExperience | let | public let catalogSHA256: String
+VisualCoreExperience | let | public let categories: [Entry]
 VisualCoreExperience | let | public let category: ExperienceCategory
 VisualCoreExperience | let | public let code: ExperienceCode
 VisualCoreExperience | let | public let content: ExperienceContent?
 VisualCoreExperience | let | public let experiences: [ExperienceDescriptor]
 VisualCoreExperience | let | public let family: String
+VisualCoreExperience | let | public let id: ExperienceCategory
 VisualCoreExperience | let | public let id: ExperienceID
 VisualCoreExperience | let | public let isAvailable: Bool
 VisualCoreExperience | let | public let kind: ExperienceKind
@@ -267,6 +274,8 @@ VisualCoreExperience | let | public static let maxSlugLength
 VisualCoreExperience | let | public static let supportedSchema
 VisualCoreExperience | let | public static let version
 VisualCoreExperience | struct | public struct CatalogManifest: Sendable, Equatable
+VisualCoreExperience | struct | public struct CategoryList: Sendable, Equatable
+VisualCoreExperience | struct | public struct Entry: Sendable, Equatable
 VisualCoreExperience | struct | public struct ExperienceCode: Hashable, Comparable, Sendable, CustomStringConvertible
 VisualCoreExperience | struct | public struct ExperienceContent: Sendable, Equatable
 VisualCoreExperience | struct | public struct ExperienceDescriptor: Sendable, Equatable, Identifiable

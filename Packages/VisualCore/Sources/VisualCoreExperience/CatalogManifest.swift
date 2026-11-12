@@ -21,12 +21,15 @@ public struct CatalogManifest: Sendable, Equatable {
     public let catalogSHA256: String
     /// All entries in ascending catalog order.
     public let experiences: [ExperienceDescriptor]
+    /// The folded search fields of `experiences`, index by index.
+    let searchFields: [CatalogSearch.Fields]
 
     /// Loads and validates a manifest.
     ///
     /// The checks run in a fixed order, so a file with several defects reports the first: size, JSON object, schema
-    /// version, top-level keys, entry count, every entry in turn, duplicates, ascending order, launch allocation.
-    public init(data: Data) throws(CatalogError) {
+    /// version, top-level keys, entry count, every entry in turn, duplicates, ascending order, launch allocation,
+    /// and, when a category list is given, that it holds the category of every entry.
+    public init(data: Data, categories: CategoryList? = nil) throws(CatalogError) {
         guard data.count <= Self.maxBytes else { throw .tooLarge(bytes: data.count, limit: Self.maxBytes) }
         let top = try JSONFields.root(of: data, name: "manifest")
         let schema = try top.whole("schema", Int(Int32.min)...Int(Int32.max))
@@ -54,6 +57,13 @@ public struct CatalogManifest: Sendable, Equatable {
             throw .outOfOrder(entry: entries[index].id.rawValue)
         }
         try Self.checkAllocation(entries)
+        if let categories {
+            let listed = Set(categories.categories.map(\.id))
+            if let foreign = entries.first(where: { !listed.contains($0.category) }) {
+                throw .invalidValue(entry: foreign.id.rawValue, field: "category", reason: "not in the category list")
+            }
+        }
+        searchFields = entries.map(CatalogSearch.Fields.init)
         schemaVersion = schema
         catalogSHA256 = hash
         experiences = entries

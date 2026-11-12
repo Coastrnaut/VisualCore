@@ -45,6 +45,21 @@ def destination(name: str) -> str:
     raise SystemExit("refused destination (simulator/generic only): " + name)
 
 
+def test_options(language: str | None, region: str | None) -> list[str]:
+    """The xcodebuild options of a test run: explicit timeouts, and the language and region when they are given
+    (feature 187: the catalog search must give the same results under another language setting)."""
+    options = ["-test-timeouts-enabled", "YES", "-default-test-execution-time-allowance", "180"]
+    if language:
+        if not (len(language) in (2, 3) and language.isalpha() and language.islower()):
+            raise SystemExit("--test-language is an ISO 639 code such as tr")
+        options += ["-testLanguage", language]
+    if region:
+        if not (len(region) == 2 and region.isalpha() and region.isupper()):
+            raise SystemExit("--test-region is an ISO 3166-1 code such as TR")
+        options += ["-testRegion", region]
+    return options
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--package", required=True)
@@ -52,6 +67,8 @@ def main() -> int:
     ap.add_argument("--destination", required=True)
     ap.add_argument("--action", choices=["build", "test"], default="build")
     ap.add_argument("--result-name", help="xcresult bundle name (test only)")
+    ap.add_argument("--test-language", help="ISO 639-1 language to run the tests in (test only; xcodebuild -testLanguage)")
+    ap.add_argument("--test-region", help="ISO 3166-1 region to run the tests in (test only; xcodebuild -testRegion)")
     args = ap.parse_args()
     pkg = (ROOT / args.package).resolve()
     if not (pkg / "Package.swift").is_file() or not pkg.is_relative_to(ROOT):
@@ -63,8 +80,9 @@ def main() -> int:
         name = args.result_name or f"{tag}-{dt.datetime.now().strftime('%Y%m%dT%H%M%S')}"
         bundle = ROOT / ".autonomy" / "xcresults" / f"{name}.xcresult"
         bundle.parent.mkdir(parents=True, exist_ok=True)
-        cmd += ["-resultBundlePath", str(bundle), "-test-timeouts-enabled", "YES",
-                "-default-test-execution-time-allowance", "180"]
+        cmd += ["-resultBundlePath", str(bundle)] + test_options(args.test_language, args.test_region)
+    elif args.test_language or args.test_region:
+        raise SystemExit("--test-language and --test-region need --action test")
     print("$ (cd", args.package, ")", " ".join(cmd), flush=True)
     return subprocess.run(cmd, cwd=pkg, check=False).returncode
 
