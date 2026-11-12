@@ -118,11 +118,15 @@ Packages/VisualCore/
     ├── VisualCoreMathTests/StableHashTests.swift        new (the vectors of the moved implementation)
     ├── VisualCoreShaderSourceTests/SHA256Tests.swift    existing (must stay green unchanged)
     └── VisualCoreExperienceTests/
+        ├── ExperienceErrorTests.swift                   new
         ├── LifecycleTests.swift                         new
         ├── StateDigestTests.swift                       new
         ├── ExperienceActionTests.swift                  new
         ├── ExperienceSnapshotTests.swift                new
-        ├── ExperienceEngineTests.swift                  new
+        ├── ExperienceEngineTests.swift                  new (preparation, lifecycle calls, fixed steps)
+        ├── ExperienceEngineStateTests.swift             new (snapshot, restore, reset)
+        ├── ExperienceEngineInputTests.swift             new (actions, replay)
+        ├── ExperienceEngineQualityTests.swift           new (tier, shedding, leak rule, all operation cells)
         ├── ExperienceDiagnosticsTests.swift             new
         ├── ExperienceConformanceTests.swift             new
         ├── ExperienceScenarioTests.swift                new
@@ -136,6 +140,7 @@ Packages/VisualCoreRendering/
 │   ├── ExperienceActionPort.swift                       new
 │   └── ExperienceShell.swift                            new (shell and its scene)
 └── Tests/VisualCoreExperienceHostTests/
+    ├── ModuleTests.swift                                new
     ├── SamplePresenter.swift                            new
     ├── ShellRenderingTests.swift                        new
     ├── ShellLifecycleTests.swift                        new
@@ -161,7 +166,7 @@ VisualCoreAutomation.
 ```text
 VisualCoreMath ◄── VisualCoreShaderSource                       (new edge: StableHash)
 VisualCoreMath, VisualCoreSimulation, VisualCorePersistence ◄── VisualCoreExperience
-VisualCoreExperience, VisualCoreMath, VisualCoreSimulation ◄── VisualCoreTestSupport            (tests only, rule R5)
+VisualCoreExperience, VisualCorePersistence, VisualCoreMath, VisualCoreSimulation ◄── VisualCoreTestSupport   (tests only, rule R5)
 VisualCoreRendering, VisualCoreDiagnostics, VisualCoreExperience ◄── VisualCoreExperienceHost
 VisualCoreExperienceHost, VisualCoreTestSupport, CVisualCoreGL ◄── VisualCoreExperienceHostTests
 later: session host (UA-F03), experiences ──► VisualCoreExperienceHost, VisualCoreExperience
