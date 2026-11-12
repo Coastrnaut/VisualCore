@@ -107,6 +107,17 @@ The owner of the render host (the session host of UA-F03, a test in this feature
 `RenderHost(scene: shell.scene)`, and between `beginDeactivation` and `finishDeactivation` destroys the host or
 replaces its scene. The shell never creates, pauses or destroys a render host.
 
+As built (recorded after T-U02-038):
+
+- The shell keeps the registry it saw with a strong reference. The render host owns its registry, so a weak
+  reference would be gone after the owner dropped the host, and `finishDeactivation` would skip the leak check.
+- `ExperienceShell.prepare` and `handle` have default arguments (`timeLimit: nil`, `values: []`); the protocol
+  requirements have none. `port` is a `public let`.
+- `beginDeactivation()` also cancels a preparation task that is still running. `cancelPreparation()` makes the
+  pending `prepare` throw `.stalePreparation`; cancelling the caller's task makes it throw `.cancelled`.
+- `port.revision` grows by one after a successful preparation, an accepted action, a restore, a reset, a scenario
+  run and every frame in active that ran at least one step. `setQualityTier` refreshes the summary only.
+
 Thread ownership: the shell, the presenter, the port and the scene run on the main actor, which is the thread of
 the graphics context (the render host asserts it). `Core.prepare` runs off the main actor; its result crosses to
 the main actor as a `Sendable` value.

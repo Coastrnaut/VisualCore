@@ -367,6 +367,10 @@ public enum ExperienceConformance {
 
 What each check does: data-model.md section 6. The helper imports no test framework.
 
+As built (T-U02-041): `ConformancePlan` also offers `maxSeeds` (64), `maxStepsPerSegment` (10,000), `maxActions`
+(1,000) and the values in use, `effectiveSeeds`, `effectiveStepsPerSegment` and `effectiveActions`. When a seed
+cannot be prepared, only the seed-determinism check is recorded as failed for it.
+
 ## Automation hooks (`ExperienceScenario.swift`, only under `DEBUG || VISUALCORE_AUTOMATION`)
 
 ```swift
