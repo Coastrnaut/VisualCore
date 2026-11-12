@@ -91,7 +91,7 @@ and availability (US4), categories and search (US5), registry (US6).
 - [ ] T-U01-019 Run the package tests on both simulator runtimes and once in another language: `python3 scripts/xcodebuild_package.py --package Packages/VisualCore --scheme VisualCore-Package --destination sim-27.2 --action test`, the same with `--destination sim-26.5`, and the 27.2 run again with `--test-language tr --test-region TR` (checks `sim-ios27`, `sim-ios26`, `sim-ios27-tr`). Expected result: `TEST SUCCEEDED` three times; the `VisualCoreExperienceTests` ran in each (named in the evidence with their count); the search table gives the same results under both language settings; a test prints the language and region it ran in (the tests may read them, the module never does), and the evidence quotes that line from the Turkish run. If xcodebuild does not apply the options to package tests, set the language of the chosen simulator with `xcrun simctl spawn <udid> defaults write` before the run and restore it afterwards, and record that route (FR-U01-024, FR-U01-060, SC-U01-004).
 - [ ] T-U01-020 Run the ProjectM reference regression, first chunk (check `reference-a`): `python3 scripts/release_check.py --only reference-engine-xcframework reference-build-projectm-ios-sim reference-clean`. Expected result: 3 of 3 pass; the reference is clean at its pin (FR-U01-061).
 - [ ] T-U01-021 Run the ProjectM reference regression, second chunk (check `reference-b`): `python3 scripts/release_check.py --only reference-test-anglerendering-ios27 reference-test-anglerendering-ios26 projectm-reference-ios27 projectm-reference-ios26`. Expected result: 4 of 4 pass, 7 of 7 in total; a noise-floor criterion that fails once is rerun unchanged once and the failed attempt stays in the record (FR-U01-061, SC-U01-009).
-- [ ] T-U01-022 Build the consumers of the package for testing from clean derived data: `xcodebuild build-for-testing -project VisualCore.xcodeproj -scheme <Scheme> -destination 'generic/platform=iOS Simulator' -derivedDataPath Build/DerivedData/<Scheme> CODE_SIGNING_ALLOWED=NO` for the schemes `Showcase`, `GenerativeArtStudio`, `FluidArtPlayground`, `FractalExplorer` and `ParticleUniverse`, after `xcodegen generate` (checks `build-<Scheme>`). Expected result: `TEST BUILD SUCCEEDED` five times.
+- [ ] T-U01-022 Build the consumers of the package for testing from clean derived data: `xcodebuild build-for-testing -project VisualCore.xcodeproj -scheme <Scheme> -destination 'generic/platform=iOS Simulator' -derivedDataPath Build/DerivedData/<Scheme> CODE_SIGNING_ALLOWED=NO` for the schemes `Showcase`, `GenerativeArtStudio`, `FluidArtPlayground`, `FractalExplorer` and `ParticleUniverse`, after `xcodegen generate` (checks `build-<Scheme>`), and the same for the harness projects `Harnesses/InteractiveDemo/InteractiveDemo.xcodeproj` (scheme `InteractiveDemo`) and `Harnesses/SecondConsumer/SecondConsumer.xcodeproj` (scheme `SecondConsumer`); the harness ProjectMReference is built and tested by the second reference chunk. Expected result: `TEST BUILD SUCCEEDED` seven times.
 
 ## Phase 10: Evidence and convergence
 
@@ -103,12 +103,14 @@ and availability (US4), categories and search (US5), registry (US6).
 
 ## Analyze fixes (2026-11-12, owner delegation)
 
-Run 1 found no critical finding. High, C1: FR-U01-036 had no test; T-U01-014 now adds a source-level purity test
+The first pass was made before the `/speckit-analyze` skill had been invoked for this feature; the skill was then
+run on the corrected artifacts and is counted as run 2. Run 1 found no critical finding. High, C1: FR-U01-036 had no test; T-U01-014 now adds a source-level purity test
 of the module. Medium: I1 FR-U01-001 states the bounds of the code numbers and of the slug that data-model.md
 uses; U1 T-U01-019 proves the language of the Turkish run by a printed line and names the fallback through the
-simulator's own setting. Low: C2 SC-U01-008 is referenced by T-U01-009. Run 2: 44 of 44 requirements and criteria
-are referenced by a task; no critical or high finding; the one tool behavior not yet observed (`-testLanguage` for
-package tests) has a stated fallback.
+simulator's own setting. Low: C2 SC-U01-008 is referenced by T-U01-009. Run 2 (under the skill): 44 of 44
+requirements and criteria are referenced by a task; no critical or high finding; one low finding, U2: T-U01-022
+now also builds the two harness consumers. The one tool behavior not yet observed (`-testLanguage` for package
+tests) has a stated fallback.
 
 ## Dependencies & Execution Order
 
