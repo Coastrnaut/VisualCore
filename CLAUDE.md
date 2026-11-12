@@ -17,10 +17,14 @@ operating procedure live in [`Auto-Creator.md`](Auto-Creator.md). Progress lives
 
 ```bash
 git status --short --branch && git log --oneline -5
-python3 scripts/migration_ledger.py status          # unified-app gates and the canonical next action
-python3 Tools/python/desktop_runbook.py status       # legacy gates F00..A25-P06 (run `bootstrap` first if .autonomy/context is missing)
-python3 scripts/validate_autocreator.py              # steering documents, catalog, archive and ledgers are consistent
+python3 scripts/migration_ledger.py status
+python3 Tools/python/desktop_runbook.py status
+python3 scripts/validate_autocreator.py
 ```
+
+The second command shows the unified-app gates and the next action; the third the legacy gates F00 … A25-P06 (run
+`python3 Tools/python/desktop_runbook.py bootstrap` first if `.autonomy/context/` is missing); the fourth proves
+that the steering documents, the catalog, the archive and the ledgers agree.
 
 The gate printed first by `migration_ledger.py next` is the next thing to do. Its feature directory, prompts and
 evidence commands are found as described in Auto-Creator.md §19. Simulators are chosen by runtime (`sim-27.2`,

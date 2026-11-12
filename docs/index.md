@@ -1,7 +1,8 @@
 # VisualCore documentation
 
 VisualCore is a reusable OpenGL ES (ANGLE/Metal) rendering framework for iOS and iPadOS apps. It is the base for the
-Showcase and the 25 VisualCore apps. Start with [Getting started](getting-started.md).
+Showcase and for the experiences of the single VisualCore app ([ADR-0009](decisions/ADR-0009-unified-app.md)). Start with
+[Getting started](getting-started.md).
 
 ## Use the framework
 
@@ -45,3 +46,14 @@ Showcase and the 25 VisualCore apps. Start with [Getting started](getting-starte
 `python3 scripts/release_check.py --list` lists every release gate. Run them all with
 `python3 scripts/release_check.py`.
 - [Simulator test lessons](testing/simulator-test-lessons.md): silent short test enumerations, stale package frameworks in app DerivedData, layout-independent UI assertions.
+
+## The VisualCore app (planned)
+
+| Topic | Document |
+|---|---|
+| Design and steering document | [Auto-Creator.md](../Auto-Creator.md) |
+| Decision record for the single app | [decisions/ADR-0009-unified-app.md](decisions/ADR-0009-unified-app.md) |
+| Migration plan and path map | [migration/migration-plan.md](migration/migration-plan.md) |
+| Catalog of all planned experiences and features | `catalog/experience-catalog.json`, `catalog/feature-index.json` |
+| State before the consolidation | [migration/pre-fable-baseline.md](migration/pre-fable-baseline.md) |
+| Original planning documents, archived unchanged | [archive/planning/README.md](archive/planning/README.md) |

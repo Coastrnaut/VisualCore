@@ -1,489 +1,300 @@
-# VisualCore — new Mac setup and session handoff
+# VisualCore — setup for a fresh clone on a new Mac
 
-This guide moves the VisualCore build machine, and the autonomous Claude Desktop session, onto a Mac Studio with a fresh
-macOS install. Follow it from top to bottom.
+This guide takes a new Mac to a checkout on which every check of section 8 passes. It covers the machine and the
+contributor tools only (ADR-0009 D-10): [`README.md`](README.md) says what the repository contains,
+[`Auto-Creator.md`](Auto-Creator.md) holds the design and the plan, [`CLAUDE.md`](CLAUDE.md) the rules that never
+bend, and progress is in the two ledgers (section 9), never in this file. The single VisualCore app decided in
+[ADR-0009](docs/decisions/ADR-0009-unified-app.md) does not exist yet, and nothing below builds it.
 
-- **Written:** 2026-11-11, on the current project Mac (Apple M5 Pro, macOS 27.2).
-- **The exact checkpoint to resume from:** §9.
+Steps marked **Owner only** need the owner's accounts, passwords or devices; Claude never performs them (section 10).
+A `sudo` command asks for the administrator password, which only the owner types. After the clone, commands run from
+the repository root. Pins last verified on 2026-11-11: `python3 scripts/verify_environment.py` printed `PASS`.
 
-**Steps marked 👤 are owner-only.** Claude must never do them: Apple ID, GitHub sign-in, Xcode licence, signing,
-device pairing. Every other step is a plain terminal command.
+## Contents
 
-## 1. Reference toolchain (must match)
+1. [Reference toolchain](#1-reference-toolchain)
+2. [Accounts and apps (owner only)](#2-accounts-and-apps-owner-only)
+3. [Command-line tools](#3-command-line-tools)
+4. [Simulator runtimes](#4-simulator-runtimes)
+5. [Clone the repository and its submodules](#5-clone-the-repository-and-its-submodules), [5.1 Branches](#51-branches)
+6. [Build the reference engine binaries](#6-build-the-reference-engine-binaries)
+7. [Machine-local state that is not in Git](#7-machine-local-state-that-is-not-in-git)
+8. [Verify the machine](#8-verify-the-machine)
+9. [Where the state lives and how to resume](#9-where-the-state-lives-and-how-to-resume)
+10. [The owner-only boundary](#10-the-owner-only-boundary)
 
-`scripts/verify_environment.py` checks these pins and must print `PASS` before any work.
+## 1. Reference toolchain
 
-| Tool | Version on the old Mac | How it is checked |
-|---|---|---|
-| macOS | 27.2 | `sw_vers` |
-| Xcode | **27.2 (27B52)** | `xcodebuild -version` |
-| iOS SDK | 27.2 | `xcrun --sdk iphoneos --show-sdk-version` |
-| Swift | **6.4.2** | `swift --version` |
-| XcodeGen | **2.46.0** | `xcodegen --version` |
-| CMake | **4.4.5** | `cmake --version` |
-| Python | 3.15.2 (Homebrew `python@3.15`; ≥ 3.10 required) | `python3 --version` |
-| iOS simulator runtimes | **iOS 27.2** and **iOS 26.5 (23F77)** | `xcrun simctl list runtimes` |
-| Git | 2.54.0 (Apple Git-157, from the Command Line Tools) | `git --version` |
-| Git LFS | Homebrew `git-lfs` | `git lfs version` |
-| GitHub CLI | 2.103.3 | `gh --version` |
-| uv | 0.13.7 | `uv --version` |
-| Spec Kit CLI (`specify`) | 1.4.1.dev0 (a uv tool; optional, the skills are committed) | `specify version` |
-| Homebrew | 7.0.13 | `brew --version` |
+`python3 scripts/verify_environment.py` is the acceptance check of the environment. It compares this Mac with the
+pins in [`Configs/toolchain.json`](Configs/toolchain.json), installs nothing, and must print `PASS` before any work.
 
-Homebrew packages installed on the old Mac (`brew leaves`): `cmake gh git-lfs python@3.15 uv xcodegen`.
+| Tool | Version | Checked by `verify_environment.py` | How to look it up |
+|---|---|---|---|
+| macOS | 27.2 | no | `sw_vers` |
+| Xcode | **27.2 (27B52)** | yes, version and build | `xcodebuild -version` |
+| iOS SDK | 27.2 | yes | `xcrun --sdk iphoneos --show-sdk-version` |
+| Swift | **6.4.2** | yes | `swift --version` |
+| XcodeGen | **2.46.0** | yes | `xcodegen --version` |
+| CMake | **4.4.5** | yes | `cmake --version` |
+| Python | 3.15.2 (Homebrew `python@3.15`; ≥ 3.10 required) | yes, the 3.10 minimum | `python3 --version` |
+| iOS simulator runtimes | **iOS 27.2** and **iOS 26.5 (23F77)** | yes, version only | `xcrun simctl list runtimes` |
+| Git | 2.54.0 (Apple Git-157, from the Command Line Tools) | no | `git --version` |
+| Git LFS | Homebrew `git-lfs` | no | `git lfs version` |
+| GitHub CLI | 2.103.3 | no | `gh --version` |
+| uv | 0.13.7 | no | `uv --version` |
+| Spec Kit CLI (`specify`) | 1.4.1.dev0 (a uv tool; optional, the skills are committed) | no | `specify version` |
+| Homebrew | 7.0.13 | no | `brew --version` |
 
-Do not "upgrade to latest" by habit. If Homebrew offers a newer XcodeGen or CMake than the pin, install the pinned
-version (§3.3) or record the difference before continuing (CLAUDE.md §8).
+The rows marked "no" are versions of the reference host, recorded for comparison; its Homebrew packages
+(`brew leaves`) were `cmake gh git-lfs python@3.15 uv xcodegen`. Runtimes are compared by version, not by build: the
+reference host recorded iOS 26.5 build 23F77 ([environment record](docs/verification/environment-F00.json)), and a
+second Mac with macOS 27.2.1 and iOS 26.5 build 23F73 passes. Do not upgrade by habit: if Homebrew offers a newer
+XcodeGen or CMake than the pin, install the pinned version (section 3.2) or record the difference before continuing.
 
-## 2. Accounts and apps (👤 owner)
+## 2. Accounts and apps (owner only)
 
-1. Sign in to macOS with the owner's Apple ID.
-2. Install **Xcode 27.2 (27B52)** from the Mac App Store or developer.apple.com. Then:
+1. Sign in to macOS with the owner's Apple account.
+2. Install **Xcode 27.2 (27B52)** from the Mac App Store or developer.apple.com. Then select it, accept the licence
+   and finish the first launch:
 
    ```bash
    sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
-   ```
-
-   ```bash
    sudo xcodebuild -license accept
-   ```
-
-   ```bash
    xcodebuild -runFirstLaunch
    ```
 
-3. Install **Claude Desktop**, sign in, and open the **Code** tab. Optionally install Google Chrome.
-4. In Xcode, Settings → Accounts, add the Apple developer account. This is only needed for the later device campaign;
-   simulator work is unsigned.
+3. Install **Claude Desktop**, sign in, and open the **Code** tab.
+4. In Xcode, Settings → Accounts, add the developer account. Only device work needs it; simulator work is unsigned.
 5. Keep the Mac awake while sessions run: System Settings → Energy, "Prevent automatic sleeping".
 
 ## 3. Command-line tools
 
-### 3.1 Homebrew
+**3.1 Homebrew, packages and Python.** The last line must print `/opt/homebrew/bin/python3` and `Python 3.15.x`.
 
 ```bash
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-```
-
-```bash
 echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zprofile && eval "$(/opt/homebrew/bin/brew shellenv)"
-```
-
-### 3.2 Packages
-
-```bash
 brew install python@3.15 uv gh git-lfs cmake xcodegen
-```
-
-```bash
 git lfs install
-```
-
-Make sure `python3` resolves to Homebrew's 3.15 (`/opt/homebrew/bin/python3`):
-
-```bash
 which python3 && python3 --version
 ```
 
-**If it prints `/usr/bin/python3` and `Python 3.9.x`,** you have macOS's built-in Python, which is too old (the
-scripts need ≥ 3.10). Fix it like this:
-
-1. Check that Homebrew's Python is installed and linked. This is also the reinstall if it is missing:
-
-   ```bash
-   brew install python@3.15 && brew link --overwrite python@3.15
-   ```
-
-2. Make sure Homebrew's folder comes first on `PATH` in every new terminal. This adds the line only if it is missing:
-
-   ```bash
-   grep -q 'brew shellenv' ~/.zprofile 2>/dev/null || echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zprofile
-   ```
-
-3. Load it in this terminal and clear zsh's cached command paths:
-
-   ```bash
-   eval "$(/opt/homebrew/bin/brew shellenv)" && hash -r
-   ```
-
-4. Check again. Expect `/opt/homebrew/bin/python3` and `Python 3.15.x`:
-
-   ```bash
-   which python3 && python3 --version
-   ```
-
-If it still shows `/usr/bin/python3`, something in `~/.zshrc` puts `/usr/bin` first. Add Homebrew's Python folder to
-the end of `~/.zshrc`, then open a new terminal:
+`/usr/bin/python3` with `Python 3.9.x` is macOS's own Python: too old (the scripts need 3.10 or later), and never to be
+removed or replaced. In that case run the first four lines below: they install and link Homebrew's Python, put Homebrew
+first on `PATH` for new terminals (only if the line is missing), load it here and check again. If the check still shows
+`/usr/bin/python3`, something in `~/.zshrc` puts `/usr/bin` first: run the last line too and open a new terminal.
 
 ```bash
+brew install python@3.15 && brew link --overwrite python@3.15
+grep -q 'brew shellenv' ~/.zprofile 2>/dev/null || echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zprofile
+eval "$(/opt/homebrew/bin/brew shellenv)" && hash -r
+which python3 && python3 --version
 echo 'export PATH="/opt/homebrew/bin:$PATH"' >> ~/.zshrc
 ```
 
-Never remove or replace `/usr/bin/python3`; macOS owns it.
-
-### 3.3 Pin XcodeGen 2.46.0 and CMake 4.4.5 if Homebrew installed other versions
+**3.2 Pin XcodeGen 2.46.0 and CMake 4.4.5.** The first line prints both versions. Run the second only if XcodeGen is
+not 2.46.0; it replaces the Homebrew package with the release binary. If CMake is not 4.4.5, use the official 4.4.5
+macOS installer from cmake.org, or `uv tool install cmake==4.4.5`, and put it first on `PATH`.
 
 ```bash
 xcodegen --version; cmake --version | head -1
-```
-
-If XcodeGen is not 2.46.0, install the release binary instead:
-
-```bash
 brew uninstall xcodegen; curl -fsSL -o /tmp/xcodegen.zip https://github.com/yonaskolb/XcodeGen/releases/download/2.46.0/xcodegen.zip && unzip -o /tmp/xcodegen.zip -d /tmp/xcodegen && sudo /tmp/xcodegen/xcodegen/install.sh
 ```
 
-If CMake is not 4.4.5, use the official 4.4.5 macOS installer from cmake.org, or `uv tool install cmake==4.4.5`, and
-put it first on `PATH`.
+**3.3 Spec Kit CLI (optional).** The nine Spec Kit skills are committed in `.claude/skills/speckit-*`, and `.specify/`
+is committed too, so the CLI is needed only to inspect or upgrade them. **Never re-run `specify init` here**: it can
+overwrite `.specify/` and `CLAUDE.md`. To install the CLI, run
+`uv tool install specify-cli --from git+https://github.com/github/spec-kit.git`, then `uv tool update-shell`, which
+puts uv's tool folder `~/.local/bin` on `PATH` for new terminals, and
+`export PATH="$HOME/.local/bin:$PATH" && hash -r && specify version`, which loads it here and checks the CLI.
 
-### 3.4 Spec Kit CLI (optional)
-
-The Spec Kit skills are committed in `.claude/skills/speckit-*`, and `.specify/` is committed too, so the CLI is only
-needed to inspect or upgrade. **Never re-run `specify init`** in this repo (CLAUDE.md §7).
-
-```bash
-uv tool install specify-cli --from git+https://github.com/github/spec-kit.git
-```
-
-uv installs tools into `~/.local/bin` and warns if that folder is not on `PATH` yet ("`/Users/<you>/.local/bin` is
-not on your PATH"). Add it to your shell config once; uv's command does this without duplicating lines:
-
-```bash
-uv tool update-shell
-```
-
-Load it into the current terminal and check:
-
-```bash
-export PATH="$HOME/.local/bin:$PATH" && hash -r && specify version
-```
-
-### 3.5 GitHub sign-in (👤 owner)
-
-Pushing to `Coastrnaut/VisualCore` requires the owner's GitHub credentials. Claude never signs in.
+**3.4 GitHub sign-in (owner only).** Pushing to `Coastrnaut/VisualCore` needs the owner's GitHub credentials; Claude
+never signs in. `.gitattributes` normalizes text files to LF. Commits carry no co-author or "Generated with" trailers.
 
 ```bash
 gh auth login
-```
-
-```bash
 gh auth setup-git
-```
-
-```bash
 git config --global user.name "Coastrnaut"
-```
-
-```bash
 git config --global user.email "<the owner's normal git email>"
-```
-
-```bash
 git config --global core.autocrlf input
 ```
 
-The repo enforces LF through `.gitattributes`. Commits use the owner's normal email and no co-author trailers.
-
 ## 4. Simulator runtimes
 
-First make sure the developer tools point at Xcode, not the Command Line Tools. Homebrew installs the Command Line
-Tools and selects them, which gives the error "tool 'xcodebuild' requires Xcode, but active developer directory
-'/Library/Developer/CommandLineTools' is a command line tools instance". Check:
-
-```bash
-xcode-select -p && xcodebuild -version
-```
-
-Expected: `/Applications/Xcode.app/Contents/Developer`, `Xcode 27.2` and `Build version 27B52`. If it shows
-`/Library/Developer/CommandLineTools` or the error above:
-
-1. 👤 Install Xcode 27.2 if `ls -d /Applications/Xcode*.app` lists nothing (§2).
-2. Select Xcode, using the app's actual name if it differs:
-
-   ```bash
-   sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
-   ```
-
-3. Accept the licence and finish the first launch:
-
-   ```bash
-   sudo xcodebuild -license accept
-   ```
-
-   ```bash
-   xcodebuild -runFirstLaunch
-   ```
-
-Then download the runtimes:
+`xcode-select -p && xcodebuild -version` must print `/Applications/Xcode.app/Contents/Developer`, `Xcode 27.2` and
+`Build version 27B52`. Homebrew installs and selects the Command Line Tools, which gives the error "tool 'xcodebuild'
+requires Xcode, but active developer directory '/Library/Developer/CommandLineTools' is a command line tools
+instance"; in that case repeat the three commands of section 2 (install Xcode first if `ls -d /Applications/Xcode*.app`
+lists nothing, and use the app's actual name if it differs). Then download the runtimes and confirm both are listed:
 
 ```bash
 xcodebuild -downloadPlatform iOS
-```
-
-This gives iOS 27.2 with Xcode 27.2. Then add iOS 26.5:
-
-```bash
 xcodebuild -downloadPlatform iOS -buildVersion 26.5
-```
-
-Confirm both:
-
-```bash
 xcrun simctl list runtimes | grep iOS
 ```
 
-The old Mac also had a second iOS 27.2 runtime (`24B91016s`, iPhone19-4); it is not needed.
-
-**Simulator UDIDs are machine-specific.** The repo's scripts choose simulators by runtime, never by UDID:
-`xcodebuild_package.py --destination sim-27.2`, `release_check.py` and `run_reference_baseline.py`. For direct
-`xcodebuild test` commands, look up the UDIDs again and use those:
-
-```bash
-xcrun simctl list devices available | grep -E "iOS 2[67]|iPhone" | head -20
-```
-
-The old Mac used iPhone simulators `19108E51-…` (27.2) and `EC7498FF-…` (26.5). Those IDs are invalid on the new Mac.
+The first command gives iOS 27.2 with Xcode 27.2; the second adds iOS 26.5. A second, device-specific iOS 27.2 runtime
+(`24B91016s`, iPhone19-4) may be listed as well; it is not needed, and the scripts do not select it. Simulator
+identifiers are machine-specific. The scripts choose a simulator by runtime, never by identifier:
+`xcodebuild_package.py --destination sim-27.2`, `release_check.py` and `run_reference_baseline.py` take the first
+available iPhone simulator of the runtime. For a direct `xcodebuild test` command, look the identifier up on this Mac
+with `xcrun simctl list devices available | grep -E "iOS 2[67]|iPhone" | head -20`; never copy one from an old log.
 
 ## 5. Clone the repository and its submodules
 
+The reference app is a read-only, pinned submodule: `External/projectm-ios` at `d93edd1`. Inside it, the engine fork
+is at `c88894e` and the ANGLE fork at `29d1823`, the engine has its own nested submodule `vendor/projectm-eval` at
+`22fb0cf`, and there are five shallow preset packs. Do **not** use `--recursive` at the top level: ANGLE's nested
+dependencies come from `gclient`, not from Git submodules.
+
 ```bash
 mkdir -p ~/Documents/GIT && cd ~/Documents/GIT && git clone https://github.com/Coastrnaut/VisualCore.git && cd VisualCore
-```
-
-The reference app is a **read-only, pinned** submodule (`External/projectm-ios` at `d93edd1`). Inside it, the engine
-fork is at `c88894e`, the ANGLE fork at `29d1823`, and there are five shallow preset packs.
-
-Do **not** use `--recursive` at the top level: ANGLE's nested dependencies come from `gclient`, not git submodules.
-
-```bash
 git submodule update --init External/projectm-ios
-```
-
-```bash
 git -C External/projectm-ios submodule update --init --depth 1 Vendor/projectM Vendor/angle
-```
-
-The engine has its own nested submodule, `vendor/projectm-eval` (pinned `22fb0cf`). Without it, the engine build in
-§6 fails with "…/Vendor/projectM/vendor/projectm-eval does not contain a CMakeLists.txt file":
-
-```bash
 git -C External/projectm-ios/Vendor/projectM submodule update --init --recursive
-```
-
-```bash
 git -C External/projectm-ios submodule update --init --depth 1 Vendor/presets/cream-of-the-crop Vendor/presets/projectm-classic Vendor/presets/milkdrop-original Vendor/presets/en-d Vendor/presets/milkdrop-texture-pack
-```
-
-Check the pins: `d93edd1…`, `c88894e…`, `29d1823…` and (inside the engine) `22fb0cf…`.
-
-```bash
 git submodule status && git -C External/projectm-ios submodule status
 ```
 
-## 6. Build the reference engine binaries (one time, network, about 12 GB, roughly an hour)
+Without the fourth command the engine build of section 6 fails with "…/Vendor/projectM/vendor/projectm-eval does not
+contain a CMakeLists.txt file". The last command must show `d93edd1…`, then `29d1823…` and `c88894e…`. It does not
+print `22fb0cf…`; the `reference-clean` step (section 8.1) fails if a nested submodule has left its recorded commit.
 
-The ProjectM reference regression (run after every VisualCore change) needs these artifacts. Run them inside the
-reference checkout with its own scripts (CLAUDE.md §4).
+### 5.1 Branches
 
-The ANGLE build clones Chromium `depot_tools` (pinned `c4cdaee…`) into `External/projectm-ios/Build/depot_tools`. It
-then runs `gclient sync`, which places about 12 GB inside `Vendor/angle`, all gitignored. **Never move, delete or clean
-`Vendor/angle`.** Outputs go only to `External/projectm-ios/Build/ANGLEFrameworks` and `Build/ProjectM.xcframework`.
+- `main` holds the state before the consolidation: the plan for 25 separate apps, its documents in the repository
+  root and the legacy ledger ([baseline](docs/migration/pre-fable-baseline.md)).
+- The consolidation and migration work is on `migration/unified-app-plan` ([plan](docs/migration/migration-plan.md)).
+  The branch is local until the owner decides how to merge it and whether to push it (ADR-0009 D-13, OD-04, OD-05).
+- A fresh clone from GitHub therefore sees only `main`, unless the owner has pushed the branch. Until then the branch
+  reaches another Mac only through the owner, for example as the Git bundle kept outside the repository (OD-05).
+- On `main`, this file is the earlier guide ([archived copy](docs/archive/planning/root/setup-2026-11-11.md)) and, of
+  the tools in section 9, only `desktop_runbook.py` exists. Sections 1 to 6 and 8 apply to both branches.
+
+## 6. Build the reference engine binaries
+
+Do this once per clone; it needs the network and about 12 GB of disk. `Packages/VisualCoreRendering` links the ANGLE
+frameworks built here, so the rendering tests, the Showcase, the harnesses and the apps do not build without them; the
+reference regression (section 8.1) also needs the engine framework. Run the reference's own scripts inside its checkout.
+The ANGLE build clones Chromium `depot_tools` (pinned `c4cdaee…`) into `External/projectm-ios/Build/depot_tools` and
+runs `gclient sync`, which places about 12 GB inside `Vendor/angle`, all gitignored. **Never move, delete or clean
+`Vendor/angle`.** All output stays under `External/projectm-ios/Build/`: `ANGLEFrameworks/` with `libEGL.xcframework`
+and `libGLESv2.xcframework` (device arm64; simulator arm64 and x86_64), and `ProjectM.xcframework`.
 
 ```bash
 cd ~/Documents/GIT/VisualCore/External/projectm-ios && python3 scripts/build_angle_xcframework.py
-```
-
-```bash
 cd ~/Documents/GIT/VisualCore/External/projectm-ios && python3 scripts/build_projectm_xcframework.py
-```
-
-```bash
 cd ~/Documents/GIT/VisualCore
 ```
 
-On the old Mac these existed as `External/projectm-ios/Build/ANGLEFrameworks/` (`libEGL` and `libGLESv2`
-xcframeworks with `ios-arm64`, `ios-sim-arm64` and `ios-sim-x64` slices) and `Build/ProjectM.xcframework`.
+## 7. Machine-local state that is not in Git
 
-## 7. Recreate the local ledger state
+A fresh clone does not have the following. Every path inside the repository is gitignored.
 
-These paths are gitignored and do not travel: `.autonomy/context/`, `logs/`, `xcresults/`, `private/` and
-`desktop.lock`. The ledger itself is committed: `.autonomy/state.json`, `.autonomy/evidence/` and
-`.autonomy/checks/`. `bootstrap` re-extracts the hash-verified source archive (the 25 app manuals and the original
-README) from `README.md` into `.autonomy/context/`, and never overwrites `state.json`.
+| Path | Content | How it comes back |
+|---|---|---|
+| `.autonomy/context/` | the 33 source documents (25 app manuals, 8 sources) extracted from the archived specification | `python3 Tools/python/desktop_runbook.py bootstrap` (section 9) |
+| `.autonomy/logs/`, `.autonomy/xcresults/` | command logs and Xcode result bundles | new runs write new ones; earlier ones exist only on the Mac that produced them |
+| `External/projectm-ios/Build/` | `depot_tools`, the ANGLE frameworks, `ProjectM.xcframework` | section 6 |
+| `Build/`, `*.xcodeproj`, generated `Info.plist` files | DerivedData and XcodeGen output | any build; `xcodegen generate` (section 8.2) |
+| `.specify/feature.json` | the directory of the Spec Kit feature in progress | written when a feature starts; see below |
+| `Configs/Signing.local.xcconfig` | the owner's signing team | **Owner only**, section 10 |
+| `.claude/settings.local.json` | local permission allow-lists | the session asks again, or Auto mode covers it |
+| `.autonomy/private/`, `.autonomy/reports/`, `.autonomy/desktop.lock/` | raw device inventories, reports, the session lock | created when needed; never committed |
+| `~/.claude/projects/<repo path>/memory/` | Claude's per-machine memory | it does not move; the standing rules are in `CLAUDE.md`, so a new session reads them from the repository |
 
-```bash
-python3 Tools/python/desktop_runbook.py bootstrap
-```
+`python3 Tools/python/desktop_runbook.py validate` re-checks the 33 embedded documents against their recorded hashes.
+`bootstrap` never overwrites `.autonomy/state.json` and is safe to repeat. Run both from the repository root.
 
-```bash
-python3 Tools/python/desktop_runbook.py validate
-```
+Each tracked attestation of a check records the SHA-256 of its log, so a log can be matched but not regenerated on
+another Mac. Logs of sealed gates are not needed for new work; copy `.autonomy/logs` and `.autonomy/xcresults` from
+the Mac that produced them only if the full audit trail is wanted. Sealing re-hashes the log of every passing check
+of the gate, so change Macs at a gate boundary or copy the logs of the gate in progress.
 
-```bash
-python3 Tools/python/desktop_runbook.py status
-```
+The Spec Kit scripts read the active feature from `.specify/feature.json`. To continue a feature that was started on
+another Mac, write the file with that feature's directory:
+`printf '{\n  "feature_directory": "specs/<feature directory>"\n}\n' > .specify/feature.json`.
 
-Expected: `STATE {'pass': 33, 'pending': 230, 'blocked': 0, 'fail': 0}; next=A04-P02 [pending]`.
+## 8. Verify the machine
 
-The Spec Kit scripts need the active feature in the gitignored `.specify/feature.json`:
-
-```bash
-printf '{\n  "feature_directory": "specs/034-pu-p02-render-loop"\n}\n' > .specify/feature.json
-```
-
-Logs and `.xcresult` bundles from earlier gates stay on the old Mac. Their SHA-256 hashes are in the committed
-attestations. Copy `~/Documents/GIT/VisualCore/.autonomy/logs` and `.autonomy/xcresults` over only if the full audit
-trail is wanted on the new machine; doing so is optional.
-
-## 8. Verify the machine before any work
-
-All three must pass. The second and third take about 2 minutes.
-
-On a fresh clone, no generated Xcode project exists yet (they are gitignored): the reference app's
-`ProjectM-iOS.xcodeproj`, `VisualCore.xcodeproj` and the harness projects such as
-`Harnesses/ProjectMReference/ProjectMReference.xcodeproj`. Every `release_check.py` step, and the reference
-baseline's build step, now generates any project it needs from the XcodeGen spec next to it before running. Until
-2026-11-11 those steps failed in under a second without them. To generate everything up front instead:
-
-```bash
-xcodegen generate --spec project.yml && for y in Harnesses/*/*.yml; do xcodegen generate --spec "$y"; done
-```
- The build also needs the ANGLE frameworks (§6) and the
-five preset submodules (§5).
+**8.1 Acceptance check, fast checks and reference regression.** All four commands must pass before any work.
+Simulator results are development evidence only, never device evidence.
 
 ```bash
 python3 scripts/verify_environment.py
-```
-
-```bash
 python3 scripts/release_check.py --only docs app-contracts compliance dependencies public-api licenses script-tests host-visualcore host-particle-universe-core
-```
-
-```bash
 python3 scripts/release_check.py --only reference-engine-xcframework reference-build-projectm-ios-sim reference-clean
-```
-
-Then, as the simulator baseline:
-
-```bash
 python3 scripts/release_check.py --only reference-test-anglerendering-ios27 reference-test-anglerendering-ios26 projectm-reference-ios27 projectm-reference-ios26
 ```
 
-Expected results are 3/3 and 4/4. `projectm-reference-ios27`'s SC-F702 check is measured against the engine's own
-noise floor and can fail rarely; rerun it unchanged once, and record the retry (as `A04-P01/t113-reference-b`).
+Expected: `PASS`, then 9/9, 3/3 and 4/4 steps passed. A `FAIL` line of the first command names every tool or runtime
+that is missing or differs from its pin. The second runs the static checks, the script tests and two host test suites,
+without a simulator. The third and fourth are the seven-step ProjectM reference regression that follows every
+framework change; the fourth uses both simulator runtimes. The SC-F702 check of `projectm-reference-ios27` is measured
+against the engine's own noise floor and can fail rarely: rerun that step unchanged once and record the retry.
 
-## 9. Exact resume point (checkpoint 2026-11-11)
+**8.2 Generated Xcode projects.** No generated project is in Git: `VisualCore.xcodeproj`, the harness projects such
+as `Harnesses/ProjectMReference/ProjectMReference.xcodeproj` and the reference's `ProjectM-iOS.xcodeproj` come from the
+XcodeGen spec next to them. A `release_check.py` step that names a project on its command line, and each build step of
+the reference baseline, generates a missing project first. The three `app-release-*` steps do not: generate everything
+up front (first line of 8.3) before running one alone. Generate again after adding a source file; a file added later
+is otherwise not compiled. The builds also need the ANGLE frameworks (section 6) and the five preset packs (section 5).
 
-- **Last commit:** `b588b00` "speckit-clarify: feature 034, five decisions (forces and bounds, budget and live limit,
-  placed force, ParticleLayerScene, UI seams)", then the handoff commit that adds this file. The tree is clean.
-- **Ledger:** 33 gates passed: F00–F09, A01-P00…P06, A02-P00…P06, A03-P00…P06, A04-P00 and A04-P01. The next gate is
-  **A04-P02**. No A04-P02 `run-check` exists yet.
-- **Feature in progress:** `specs/034-pu-p02-render-loop/`, Particle Universe Phase 02 "One emitter and one force in
-  the render loop".
-  - Done and committed: **specify** (spec and `checklists/requirements.md` 16/16) and **clarify** (5 decisions in the
-    spec's Clarifications section).
-  - **Next command: `/speckit-plan`.** It was started on the old Mac but produced nothing; only the blank template was
-    copied, and that was removed. Pass the verbatim archive prompt (`python3 scripts/speckit_prompts.py --feature
-    034`, item 3).
-  - Then run checklist → tasks → analyze → implement → converge (loop) → seal and record A04-P02.
-- **Plan inputs already decided in the spec's clarifications:**
-  - VisualCoreSimulation: new `ParticleForce` cases `.repulsor`, `.gravityWell`, `.wind` and `.vortex`, with bounds
-    and `clamped()`; the existing cases stay bit-identical (the Phase 01 fixture `replay-v1.json` and A01 must not
-    change).
-  - VisualCoreSimulation: `ParticleSystem.liveLimit`.
-  - VisualCoreDiagnostics: `ParticleBudget` (shares 1/0.6/0.35/0.2, minimum 100) and `DeviceConditions.current()`.
-  - VisualCoreRendering: a generic `ParticleLayerScene` RenderScene, pixel-tested offscreen in package tests on both
-    simulators.
-  - App: `PlacedForce` (kind, position, strength multiplier 0.1…2) and `SceneSimulation.setPlacedForce`; the
-    GPU-hosted sandbox with the CPU preview as fallback; `QualityPolicy(tierCount: 4, lowPowerCeiling: 1)`; DEBUG-only
-    UI seams `-uitestThermal` and `-uitestLowPower`.
-  - IDs: FR-A04-2##, SC-A04-2##, T-A04-2##; run-checks under stage `A04-P02`.
-- **After A04-P02:** A04-P03…P06 (features 035–038), then A05…A25 (features 039–185), the full-suite audit,
-  IMPLEMENTATION-LOCK, and the device campaign D1 → D2 → D3.
+**8.3 Single commands.** Project generation, the host tests of the pure package, the rendering package tests on the
+iOS 27.2 simulator (`--destination sim-26.5` selects the other runtime), and the list of all release steps:
 
-## 10. Start the Claude Desktop session on the Mac Studio
-
-1. Claude Desktop → **Code** → open the local folder `~/Documents/GIT/VisualCore`, using a local session on this Mac.
-   Choose Auto permission mode if offered.
-2. Paste the one-shot resume prompt in §10.1 as the first message, unchanged.
-3. Optional resilience: create one local scheduled task named `visualcore-continue` from the Desktop UI, as described
-   in CLAUDE.md §2. Use the same prompt.
-
-### 10.1 One-shot resume prompt (copy everything inside the block)
-
-```text
-You are the autonomous lead engineer for the VisualCore suite. You are in the Claude Desktop Code tab, in a local
-session on the owner's Mac Studio, in the repository ~/Documents/GIT/VisualCore (GitHub Coastrnaut/VisualCore, branch
-main). This session resumes work moved from another Mac on 2026-11-11.
-
-Never use the Claude CLI (`claude`, `claude -p`), the Agent SDK, or any Python that calls a model. Python scripts are
-deterministic tools only.
-
-1. Read the governing files first, in order, with bounded reads:
-   - CLAUDE.md, completely. §0 (how to find the live state, and the five standing owner rules) comes first.
-   - setup.md §9, the exact checkpoint.
-   - README.md, only the canonical chapters you need.
-
-   Rely on on-disk state and git history, never on memory of an earlier conversation.
-2. Check the machine:
-   - Run `python3 scripts/verify_environment.py`; it must print PASS.
-   - If `.autonomy/context/` is missing, run `python3 Tools/python/desktop_runbook.py bootstrap`, then `validate`.
-   - Run `python3 Tools/python/desktop_runbook.py status`. Expect 33 passed and next = A04-P02. If the ledger shows
-     later progress, resume from what it shows instead.
-   - If the reference artifacts (External/projectm-ios/Build/ANGLEFrameworks and Build/ProjectM.xcframework) are
-     missing, build them with the reference repo's own scripts as in setup.md §6. Never touch Vendor/angle beyond
-     that.
-   - Write `.specify/feature.json` = {"feature_directory": "specs/034-pu-p02-render-loop"}.
-   - Find this Mac's simulator UDIDs by runtime (iOS 27.2 and iOS 26.5). Never reuse UDIDs from old logs.
-   - If any machine check fails for an owner-only reason (Xcode licence, sign-in, GitHub auth), record
-     BLOCKED_OWNER_ACTION with exact steps, and keep doing the work that does not need it.
-3. Resume gate A04-P02, feature 034 "Particle Universe — Phase 02 One emitter and one force in the render loop".
-   - Specify and clarify are done and committed; the five clarification decisions in spec.md are binding.
-   - The next command is `/speckit-plan`.
-   - Print the per-feature prompts with `python3 scripts/speckit_prompts.py --feature 034`. Invoke every installed
-     skill with that prompt verbatim, adding only a labelled "Canonical override:" note: plan → checklist → tasks →
-     analyze → implement → converge.
-   - Then implement every converge-appended task and converge again, repeating until converge appends nothing.
-   - IDs are FR-A04-2##, SC-A04-2## and T-A04-2##. Use `desktop_runbook.py run-check --stage A04-P02` for every
-     command, and `scripts/tick_task.py` for every verified task (pass only the evidence text; it adds "— Verified
-     <date>:").
-   - Finish with seal and record for A04-P02, then commit and push.
-   - Every VisualCore change needs: public `///` docs, `check_public_api.py --update`, package tests, and the 7-step
-     ProjectM regression in two chunks (setup.md §8). After it, build A01 and A02 for testing from clean derived data.
-     The Phase 01 replay fixture and A01's checksums must stay bit-identical.
-4. Then continue without stopping:
-   - A04-P03…P06 (features 035–038);
-   - A05…A25 (one feature per gate; feature number = 10 + (NN−1)·7 + P + 1), each with its manual from
-     .autonomy/context/apps/NN-*.md, its per-app /speckit-constitution prompt, and all seven phases;
-   - then the full-suite audit and IMPLEMENTATION-LOCK.
-
-   No physical-device install, launch or test before the lock. After the lock, run the device campaign: all apps on D1,
-   then D2, then D3, exactly as CLAUDE.md §6 and §9 say. Never update D3 from iPadOS 26.5.
-5. Owner rules (CLAUDE.md §0, §2 and §8) apply throughout:
-   - Work fully autonomously with best judgement. Never ask the owner anything, and never end a turn with a question.
-     Answer clarify questions yourself and record them.
-   - Never stop at a milestone. Run long checks in the foreground with timeouts of 10 minutes or less, and never
-     background a job and then end the turn.
-   - Commit after every task, skill and fileset, and push to origin main right after. No co-author or "Generated
-     with" trailers. Scan for UDIDs, ECIDs, serials, teams and secrets before each push. Never force-push.
-   - Maximize VisualCore reuse: generic logic goes in Packages/VisualCore or Packages/VisualCoreRendering, and apps
-     stay thin.
-   - Public Apple APIs only. No fabricated evidence; simulator results are never device evidence.
-   - Never enter credentials, sign in, purchase, submit to App Store Connect, change signing, or answer device trust
-     or permission prompts. Record those as BLOCKED_OWNER_ACTION and continue with other work.
-   - External/projectm-ios stays read-only at its pin.
-
-Start now with step 1, give short progress notes as you go, and keep working gate after gate until a real host or
-context limit ends the session. Leave on-disk checkpoints (ledger, commits) so the next session can resume.
+```bash
+xcodegen generate --spec project.yml && for y in Harnesses/*/*.yml; do xcodegen generate --spec "$y"; done
+swift test --package-path Packages/VisualCore
+python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test
+python3 scripts/release_check.py --list
 ```
 
-## 11. Things that do not move automatically
+Without options, `python3 scripts/release_check.py` runs every step; split it with `--only` and `--skip` so that no
+command runs longer than 10 minutes. See also [`simulator-test-lessons.md`](docs/testing/simulator-test-lessons.md)
+(earlier simulator pitfalls) and [`getting-started.md`](docs/getting-started.md) (using the framework in code).
 
-- **Claude's per-machine memory** (`~/.claude/projects/<repo path>/memory/`) does not sync between Macs. Its five
-  standing owner rules are copied into **CLAUDE.md §0**, so the new session reads them.
-- **`Configs/Signing.local.xcconfig`:** it did not exist on the old Mac either. Simulator work is unsigned. 👤 The
-  owner creates it before the device campaign, with `DEVELOPMENT_TEAM = <team ID>`.
-- **Devices D1/D2/D3:** pairing and Developer Mode are per Mac. 👤 Pair them with the Mac Studio before the device
-  campaign, which comes after IMPLEMENTATION-LOCK. **Never update D3 from iPadOS 26.5.**
-- **`.claude/settings.local.json`** (local permission allow-lists) is gitignored. The new session asks again, or Auto
-  mode covers it.
+## 9. Where the state lives and how to resume
+
+Progress is in Git and in two ledgers, never in a document or in the memory of a session. The unified-app gates are in
+`.autonomy/migration/ledger.json`, written only by `scripts/migration_ledger.py`. The legacy gates F00 to A25-P06 are
+in `.autonomy/state.json` with `.autonomy/evidence/` and `.autonomy/checks/`, written only by
+`Tools/python/desktop_runbook.py`. `Auto-Creator.md` section 25 describes the ledgers and recovery. Run these commands
+on `migration/unified-app-plan`, in this order:
+
+| Command | What it does |
+|---|---|
+| `git status --short --branch` | Shows the current branch and every uncommitted or untracked file. |
+| `python3 scripts/migration_ledger.py status` | Prints the unified-app gates by kind and state, the next legacy gate and, under `NEXT`, the gates that are ready; the first of them is the next action. |
+| `python3 Tools/python/desktop_runbook.py bootstrap` | Needed once per clone because `.autonomy/context/` is not tracked: it extracts the source documents that the legacy gates read. |
+| `python3 Tools/python/desktop_runbook.py status` | Prints how many legacy gates pass and which one is next. |
+| `python3 scripts/validate_autocreator.py` | Checks that the steering documents, the catalog, the archive and the ledgers are consistent. |
+| `python3 scripts/migration_baseline.py verify` | Proves that the planning documents and the legacy evidence still have the content captured before the consolidation and that no gate passed at that time has been reset. |
+| `python3 scripts/planning_archive.py verify` | Proves that every document of the [planning archive](docs/archive/planning/README.md) is byte-identical to that baseline and that the extracted copies match. |
+| `python3 scripts/planning_index.py verify` | Re-parses the archive and confirms that the catalog and the feature index in `docs/catalog/` are up to date. |
+
+The prompt that continues the work is the last section of [`Auto-Creator.md`](Auto-Creator.md) (section 28). Open the
+repository folder in Claude Desktop → **Code** as a local session on this Mac, choose Auto permission mode if it is
+offered, and paste the prompt as the first message. It goes into a Claude Desktop Code session, never the Claude CLI.
+
+## 10. The owner-only boundary
+
+Claude never does any of the following. Work that reaches one of them is recorded as `BLOCKED_OWNER_ACTION` with the
+exact steps, and other work continues (`CLAUDE.md` section 3).
+
+- **Accounts and credentials.** Signing in to macOS, the Apple account, Xcode (Settings → Accounts), GitHub
+  (`gh auth login`) or Claude Desktop; typing the administrator password; accepting licences and legal agreements.
+- **Signing.** `Configs/Signing.local.xcconfig` is created by the owner and never committed; it is gitignored. It holds
+  `DEVELOPMENT_TEAM = <team ID>`, and `Configs/Signing.xcconfig` includes it when it exists. Simulator and generic
+  builds are unsigned (`CODE_SIGNING_ALLOWED=NO`). Certificates and profiles are the owner's.
+- **Devices.** Pairing (per Mac), trust prompts, Developer Mode, unlocking and operating-system updates. The devices are
+  D1 (iPhone 15), D2 (iPad Pro 13-inch M5) and D3 (iPad A16). **D3 must stay on iPadOS 26.5 and is never updated.**
+- **App Store Connect and publishing.** The app record, the agreements, the in-app product, the sandbox tester and
+  every submission (ADR-0009 OD-06); merging to `main` and pushing the migration branch (section 5.1).
+
+No install, launch or test of the unified app on a physical device is allowed before the gate
+`ImplementationLock-100` is recorded (ADR-0009 D-07). `python3 scripts/migration_ledger.py guard-device` exits 0 only
+after that; then the order is D1, D2, D3 (ADR-0009 D-08).
+
+Device identifiers (UDID, ECID, serial number), team identifiers, account names and secrets are never written into a
+tracked file. Raw device inventories stay in the gitignored `.autonomy/private/`.
