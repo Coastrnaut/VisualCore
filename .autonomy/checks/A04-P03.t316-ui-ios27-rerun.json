@@ -1,0 +1,33 @@
+{
+  "argv": [
+    "xcodebuild",
+    "test",
+    "-project",
+    "VisualCore.xcodeproj",
+    "-scheme",
+    "ParticleUniverse",
+    "-destination",
+    "platform=iOS Simulator,id=4E32B01D-7911-4A64-A944-877DDD445BC0",
+    "-derivedDataPath",
+    "Build/DerivedData/ParticleUniverse",
+    "-resultBundlePath",
+    ".autonomy/xcresults/A04-P03-t316-ui-ios27-rerun.xcresult",
+    "-only-testing:ParticleUniverseUITests/SandboxEmitterUITests/testFamilyChangeKeepsOverridesAndRemovalSelectsThePrevious",
+    "-only-testing:ParticleUniverseUITests/SandboxTrailUITests/testTrailsSurviveABackgroundRoundTrip",
+    "-test-timeouts-enabled",
+    "YES",
+    "-default-test-execution-time-allowance",
+    "180",
+    "CODE_SIGNING_ALLOWED=NO"
+  ],
+  "command": "xcodebuild test -project VisualCore.xcodeproj -scheme ParticleUniverse -destination 'platform=iOS Simulator,id=4E32B01D-7911-4A64-A944-877DDD445BC0' -derivedDataPath Build/DerivedData/ParticleUniverse -resultBundlePath .autonomy/xcresults/A04-P03-t316-ui-ios27-rerun.xcresult -only-testing:ParticleUniverseUITests/SandboxEmitterUITests/testFamilyChangeKeepsOverridesAndRemovalSelectsThePrevious -only-testing:ParticleUniverseUITests/SandboxTrailUITests/testTrailsSurviveABackgroundRoundTrip -test-timeouts-enabled YES -default-test-execution-time-allowance 180 CODE_SIGNING_ALLOWED=NO",
+  "elapsed_seconds": 72.211,
+  "exit_code": 0,
+  "finished": "2026-11-12T01:16:57+00:00",
+  "log": ".autonomy/logs/A04-P03.t316-ui-ios27-rerun.log",
+  "log_sha256": "6cfc98c67ccd42fbc3610b668e68bf0b29829b94eca076a70be748ebb1b237ea",
+  "name": "t316-ui-ios27-rerun",
+  "stage": "A04-P03",
+  "started": "2026-11-12T01:15:45+00:00",
+  "timed_out": false
+}

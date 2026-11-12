@@ -68,6 +68,8 @@ final class SceneModel {
     @ObservationIgnored private(set) var stage: ParticleStage?
 
     @ObservationIgnored private var lastFrame: Date?
+    /// Accessibility change observers (Reduce Flashing follows the system while the screen is open; T-A04-316).
+    @ObservationIgnored private var accessibilityTokens: [NSObjectProtocol] = []
     @ObservationIgnored private let conditions: () -> DeviceConditions
 
     /// Starts with `family` and `seed`; under Reduce Motion the scene starts paused (spec edge cases, CHK017/CHK020).
@@ -94,6 +96,11 @@ final class SceneModel {
             }
         }
         refreshAccessibility()
+        accessibilityTokens = SystemAccessibilityObserver.changeNotifications.map { name in
+            NotificationCenter.default.addObserver(forName: name, object: nil, queue: .main) { [weak self] _ in
+                MainActor.assumeIsolated { self?.refreshAccessibility() }
+            }
+        }
     }
 
     private static func makeSimulation(_ family: EmitterFamily, _ seed: UInt64) -> SceneSimulation {
@@ -377,6 +384,8 @@ final class SceneModel {
 
     /// Releases the GPU stage (the screen went away).
     func tearDown() {
+        accessibilityTokens.forEach { NotificationCenter.default.removeObserver($0) }
+        accessibilityTokens = []
         stage?.destroy()
         stage = nil
     }
