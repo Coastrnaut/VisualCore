@@ -3,6 +3,7 @@ import Testing
 import VisualCoreAudioDSP
 import VisualCoreDiagnostics
 import VisualCoreEffectsGraph
+import VisualCoreExperience
 import VisualCoreMath
 import VisualCorePersistence
 import VisualCoreScenes
@@ -13,6 +14,6 @@ import VisualCoreTestSupport
 @Test func everyPureModuleStartsAtZeroDotOne() {
     let versions = [MathInfo.version, SimulationInfo.version, ScenesInfo.version, ShaderSourceInfo.version,
                     EffectsGraphInfo.version, DiagnosticsInfo.version, AudioDSPInfo.version,
-                    PersistenceInfo.version, TestSupportInfo.version]
+                    PersistenceInfo.version, TestSupportInfo.version, ExperienceInfo.version]
     #expect(versions.allSatisfy { $0 == "1.0.0-rc.1" })
 }

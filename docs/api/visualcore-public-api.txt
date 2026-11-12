@@ -216,6 +216,8 @@ VisualCoreEffectsGraph | var | public var passes: [EffectPassDescription]
 VisualCoreEffectsGraph | var | public var scale: Double
 VisualCoreEffectsGraph | var | public var type: String
 VisualCoreEffectsGraph | var | public var version: Int
+VisualCoreExperience | enum | public enum ExperienceInfo
+VisualCoreExperience | let | public static let version
 VisualCoreMath | enum | public enum EasingCurve: String, CaseIterable, Sendable, Codable
 VisualCoreMath | enum | public enum EasingMode: String, CaseIterable, Sendable, Codable
 VisualCoreMath | enum | public enum Level: String, Sendable, Equatable

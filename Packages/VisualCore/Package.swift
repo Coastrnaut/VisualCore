@@ -5,7 +5,7 @@ import PackageDescription
 
 let pure = ["VisualCoreMath", "VisualCoreSimulation", "VisualCoreScenes", "VisualCoreShaderSource",
             "VisualCoreEffectsGraph", "VisualCoreDiagnostics", "VisualCoreAudioDSP", "VisualCorePersistence",
-            "VisualCoreParameters"]
+            "VisualCoreParameters", "VisualCoreExperience"]
 
 let package = Package(
     name: "VisualCore",
@@ -24,6 +24,9 @@ let package = Package(
         .target(name: "VisualCorePersistence"),
         // Parameter schemas, palettes, presets and stable hashes (feature 012 A01-P01; Foundation only, rule R2).
         .target(name: "VisualCoreParameters"),
+        // Experience identity and the validated runtime catalog of the unified app (feature 187 UA-F01; Foundation
+        // only, rule R2; a leaf: no other VisualCore module).
+        .target(name: "VisualCoreExperience"),
         // Host performance baselines (feature 010 T-F909); an executable, never a library dependency.
         .executableTarget(name: "VisualCoreBaselines",
                           dependencies: ["VisualCoreMath", "VisualCoreSimulation", "VisualCoreScenes", "VisualCoreShaderSource", "VisualCoreEffectsGraph"]),
@@ -36,12 +39,13 @@ let package = Package(
         .testTarget(name: "VisualCoreParametersTests", dependencies: ["VisualCoreParameters"]),
         .testTarget(name: "VisualCoreTestSupportTests", dependencies: ["VisualCoreTestSupport"]),
         .testTarget(name: "VisualCorePersistenceTests", dependencies: ["VisualCorePersistence"]),
+        .testTarget(name: "VisualCoreExperienceTests", dependencies: ["VisualCoreExperience"], resources: [.copy("Fixtures")]),
         .testTarget(name: "VisualCoreShaderSourceTests", dependencies: ["VisualCoreShaderSource"]),
         .testTarget(name: "VisualCoreEffectsGraphTests", dependencies: ["VisualCoreEffectsGraph"], resources: [.copy("Fixtures")]),
         .testTarget(name: "VisualCoreScaffoldTests",
                     dependencies: ["VisualCoreMath", "VisualCoreSimulation", "VisualCoreScenes", "VisualCoreShaderSource",
                                    "VisualCoreEffectsGraph", "VisualCoreDiagnostics", "VisualCoreAudioDSP",
-                                   "VisualCorePersistence", "VisualCoreTestSupport"]),
+                                   "VisualCorePersistence", "VisualCoreTestSupport", "VisualCoreExperience"]),
     ],
     swiftLanguageModes: [.v6]
 )
