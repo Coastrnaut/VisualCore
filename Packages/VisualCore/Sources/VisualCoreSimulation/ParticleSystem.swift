@@ -228,6 +228,14 @@ public struct ParticleSystem: Sendable {
         aliveCount -= 1
     }
 
+    /// Live particles spawned by emitter `source` (0 for an index with none). Feature 035: apps retire an emitter
+    /// slot and reuse it only once its particles are gone, so no live particle changes look (research R4).
+    public func liveCount(source index: Int) -> Int {
+        var n = 0
+        for i in 0..<aliveCount where source[i] == index { n += 1 }
+        return n
+    }
+
     /// Position, size and color of each live particle (size and color interpolated over life).
     public func instances() -> [ParticleInstance] {
         (0..<aliveCount).map { i in
