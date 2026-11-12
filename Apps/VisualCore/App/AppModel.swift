@@ -221,7 +221,9 @@ final class AppModel {
         premiumNotice = false
         lastAppliedTier = nil
         setRoute(.experience(id))
-        let request = ExperienceOpenRequest(id: id, seed: Self.seed(for: id), make: registration.make)
+        let launch = ExperienceLaunch(reduceMotion: preferences.reduceMotion,
+                                      reduceFlashing: preferences.reduceFlashing)
+        let request = ExperienceOpenRequest(id: id, seed: Self.seed(for: id)) { registration.make(launch) }
         switch await session.open(request) {
         case .running, .suspended:
             lastAppliedTier = applyQualityOverride()
@@ -300,6 +302,18 @@ final class AppModel {
             await open(first)
         }
     }
+
+    #if DEBUG
+    /// True once the debug launch arguments acted on this model. Kept on the model, not in a table by object
+    /// identity: the identity of a released model can be given to the next one.
+    var debugLaunchStarted = false
+
+    /// Hides the welcome for this launch without marking it as seen: the debug argument `-openExperience` opens
+    /// its experience directly, also on a first start (FR-U04-043). Exists only in builds made for testing.
+    func hideWelcomeForThisLaunch() {
+        if showWelcome { showWelcome = false }
+    }
+    #endif
 
     // MARK: - Settings
 

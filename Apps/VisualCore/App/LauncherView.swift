@@ -1,13 +1,16 @@
 // LauncherView — feature 190 T-U04-011 (FR-U04-020 to FR-U04-024, FR-U04-030; data-model sections 2 and 6). The
 // catalog route: a search field, then what the launcher state says — sections with headings and tiles, or one
-// of the three plain statements (nothing available, nothing found, catalog not loaded). The toolbar leads to the
-// settings and to the about page. The launcher creates no rendering context.
+// of the three plain statements (nothing available, nothing found, catalog not loaded). Two rows at the top of
+// the list lead to the settings and to the about page. The launcher creates no rendering context.
 import SwiftUI
 import VisualCoreExperience
 
 /// The launcher: search, tiles by category and the ways to the settings and the about page.
 struct LauncherView: View {
     let model: AppModel
+    /// The text of the search field. It is cut to the model's limit as it is typed, so that the field never shows
+    /// more than the model holds (FR-U04-022).
+    @State private var typed = ""
 
     var body: some View {
         List {
@@ -57,16 +60,12 @@ struct LauncherView: View {
         .contentShape(Rectangle())
     }
 
-    private var searchText: Binding<String> {
-        Binding(get: { model.searchText }, set: { model.searchText = $0 })
-    }
-
     private var searchField: some View {
         HStack(spacing: 8) {
             Image(systemName: "magnifyingglass")
                 .accessibilityHidden(true)
             // A vertical axis lets the prompt and the text wrap at the largest text sizes instead of clipping.
-            TextField(AppStrings.text(.catalogSearch), text: searchText, axis: .vertical)
+            TextField(AppStrings.text(.catalogSearch), text: $typed, axis: .vertical)
                 .lineLimit(1...4)
                 .font(.body)
                 .textInputAutocapitalization(.never)
@@ -75,6 +74,15 @@ struct LauncherView: View {
                 .frame(minHeight: 44)
                 .accessibilityLabel(AppStrings.text(.catalogSearch))
                 .accessibilityIdentifier(ShellID.search)
+                .onAppear { typed = model.searchText }
+                .onChange(of: typed) { _, text in
+                    let kept = String(text.prefix(ShellPreferences.maxSearchLength))
+                    if kept != text { typed = kept }
+                    if model.searchText != kept { model.searchText = kept }
+                }
+                .onChange(of: model.searchText) { _, text in
+                    if typed != text { typed = text }
+                }
             if !model.searchText.isEmpty {
                 Button {
                     model.searchText = ""

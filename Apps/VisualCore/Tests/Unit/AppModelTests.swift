@@ -3,8 +3,11 @@
 // tiles in three sections for the fixture; a premium tile gives the notice and no session; the quality override
 // is applied when an experience opens. The storage helper `TestStorage` is in StoreTests.swift.
 import Foundation
+import SwiftUI
 import VisualCoreExperience
 import VisualCoreExperienceHost
+import VisualCorePersistence
+import VisualCoreRendering
 import XCTest
 @testable import VisualCoreApp
 
@@ -59,7 +62,8 @@ final class AppModelTests: XCTestCase {
                                                               categories: try bundled("categories"),
                                                               registry: ExperienceRegistry.all))
         guard case .error(let code) = model.launcher else { return XCTFail("\(model.launcher)") }
-        XCTAssertFalse(code.isEmpty)
+        XCTAssertEqual(code, "catalog.unreadable")
+        XCTAssertEqual(model.diagnostics.catalog, "catalog.unreadable")
         XCTAssertEqual(model.shown.map(\.id), [])
     }
 
@@ -200,5 +204,209 @@ final class AppModelTests: XCTestCase {
         XCTAssertNil(model.session.experience)
         XCTAssertFalse(model.premiumNotice)
     }
+
+    // MARK: Convergence (T-U04-033, T-U04-034, T-U04-036 to T-U04-038, T-U04-041)
+
+    private func model(_ storage: TestStorage, registry: [ExperienceRegistration],
+                       arguments: [String] = []) -> AppModel {
+        AppModel(environment: storage.environment(catalog: DebugLaunch.fixtureCatalogData,
+                                                  categories: DebugLaunch.fixtureCategoriesData,
+                                                  registry: registry, arguments: arguments))
+    }
+
+    /// US5, acceptance scenario 1: the stored accessibility choices are the value an experience receives.
+    func testTheAccessibilityChoicesReachAnOpenedExperience() async throws {
+        let storage = try TestStorage(self)
+        let received = LaunchBox()
+        let registry = DebugLaunch.fixtureFreeIDs.map { free in
+            ExperienceRegistration(id: free) { launch in
+                received.values.append(launch)
+                return DebugExperience.make(id: free, launch: launch)
+            }
+        }
+        let model = model(storage, registry: registry)
+        let id = try XCTUnwrap(freeIDs(model).first)
+        let first = await model.open(id)
+        XCTAssertTrue(first)
+        XCTAssertEqual(received.values, [ExperienceLaunch(reduceMotion: .system, reduceFlashing: .system)])
+        model.closeExperience()
+
+        model.setAccessibility(reduceMotion: .on, reduceFlashing: .off)
+        let second = await model.open(id)
+        XCTAssertTrue(second)
+        XCTAssertEqual(received.values.last, ExperienceLaunch(reduceMotion: .on, reduceFlashing: .off))
+        XCTAssertEqual(received.values.count, 2, "the factory is called once per open")
+        model.closeExperience()
+
+        // A new model on the same storage hands over the stored choices.
+        let later = self.model(storage, registry: registry)
+        let third = await later.open(id)
+        XCTAssertTrue(third)
+        XCTAssertEqual(received.values.last, ExperienceLaunch(reduceMotion: .on, reduceFlashing: .off))
+        later.closeExperience()
+    }
+
+    /// FR-U04-011: a free experience without registration has no tile, and every mismatch is in the diagnostics.
+    func testARegistryThatMismatchesTheCatalogHidesTheTileAndIsReported() async throws {
+        let free = DebugLaunch.fixtureFreeIDs
+        let dropped = try XCTUnwrap(free.first)
+        let premium = try XCTUnwrap(DebugLaunch.fixturePremiumID)
+        let categories = try CategoryList(data: DebugLaunch.fixtureCategoriesData)
+        let manifest = try CatalogManifest(data: DebugLaunch.fixtureCatalogData, categories: categories)
+        let unavailable = try XCTUnwrap(manifest.experiences.first { !$0.isAvailable && $0.tier == .free }).id
+        let registry = free.dropFirst().map(DebugExperience.registration(for:))
+            + [DebugExperience.registration(for: unavailable)]
+        let model = model(try TestStorage(self), registry: Array(registry))
+
+        XCTAssertEqual(model.diagnostics.registryMismatches,
+                       [dropped.rawValue, unavailable.rawValue, premium.rawValue].sorted())
+        let ids = try tiles(model).map(experienceID(of:))
+        XCTAssertEqual(ids.count, 5, "four free tiles and the premium tile")
+        XCTAssertFalse(ids.contains(dropped), "an unregistered free experience has no tile")
+        XCTAssertFalse(ids.contains(unavailable), "a registered experience that is not available has no tile")
+        let opened = await model.open(dropped)
+        XCTAssertFalse(opened)
+        XCTAssertNil(model.session.experience)
+        XCTAssertTrue(model.diagnostics.text.contains("registryMismatches: "
+            + model.diagnostics.registryMismatches.joined(separator: ",")))
+
+        // The complete fixture registry leaves only the premium entry, which has no factory in this feature.
+        XCTAssertEqual(fixtureModel(try TestStorage(self)).diagnostics.registryMismatches, [premium.rawValue])
+    }
+
+    /// Edge case: `-openExperience` with an unknown id, a malformed id or no value leaves a note and no session.
+    func testOpenExperienceArgumentsThatCannotBeOpenedAreNoted() async throws {
+        let cases: [([String], [String])] = [
+            (["-openExperience", "a99.no-such-experience"], ["-openExperience a99.no-such-experience"]),
+            (["-openExperience", "Not An Id"], ["-openExperience Not An Id"]),
+            (["-vcFixtureCatalog", "-openExperience"], ["-openExperience"]),
+            (["-vcBogus", "-vcSkipWelcome"], ["-vcBogus"]),
+        ]
+        for (arguments, expected) in cases {
+            let model = model(try TestStorage(self), registry: DebugLaunch.fixtureRegistry, arguments: arguments)
+            await DebugLaunch.start(model)
+            XCTAssertEqual(model.diagnostics.unknownArguments, expected, "\(arguments)")
+            XCTAssertTrue(model.diagnostics.text.contains("unknownArguments: " + expected.joined(separator: ",")))
+            XCTAssertEqual(model.route, .catalog, "\(arguments)")
+            XCTAssertNil(model.session.experience, "\(arguments)")
+            XCTAssertTrue(model.showWelcome, "a first start keeps its welcome: \(arguments)")
+        }
+    }
+
+    /// FR-U04-043: `-openExperience <id>` opens directly on a first start; the welcome stays unseen.
+    func testOpenExperienceArgumentOpensDirectlyOnAFirstStart() async throws {
+        let storage = try TestStorage(self)
+        let id = try XCTUnwrap(DebugLaunch.fixtureFreeIDs.first)
+        let model = model(storage, registry: DebugLaunch.fixtureRegistry,
+                          arguments: ["-openExperience", id.rawValue])
+        XCTAssertTrue(model.showWelcome)
+        await DebugLaunch.start(model)
+        XCTAssertFalse(model.showWelcome, "the experience is not covered by the welcome")
+        XCTAssertEqual(model.route, .experience(id))
+        XCTAssertNotNil(model.session.experience)
+        XCTAssertEqual(model.diagnostics.unknownArguments, [])
+        XCTAssertFalse(PreferencesStore(defaults: storage.defaults).load().preferences.welcomeSeen,
+                       "the argument does not mark the welcome as seen")
+        model.closeExperience()
+    }
+
+    /// FR-U04-022: the model holds at most 100 characters of search text.
+    func testASearchTextOfMoreThan100CharactersIsHeldAs100() throws {
+        let storage = try TestStorage(self)
+        let model = fixtureModel(storage)
+        model.searchText = String(repeating: "a", count: 130)
+        XCTAssertEqual(model.searchText.count, 100)
+        XCTAssertEqual(PreferencesStore(defaults: storage.defaults).load().preferences.searchText.count, 100)
+    }
+
+    /// Edge case: an experience that fails to open keeps its route, where the session shows the failure view.
+    func testAFailedOpenKeepsTheExperienceRouteWithTheFailureState() async throws {
+        let storage = try TestStorage(self)
+        let id = try XCTUnwrap(DebugLaunch.fixtureFreeIDs.first)
+        let registry = [DebugExperience.failingRegistration(for: id)]
+            + DebugLaunch.fixtureFreeIDs.dropFirst().map(DebugExperience.registration(for:))
+        let model = model(storage, registry: registry)
+        let opened = await model.open(id)
+        XCTAssertFalse(opened)
+        XCTAssertEqual(model.session.state, .failed)
+        XCTAssertEqual(model.route, .experience(id))
+        XCTAssertNil(model.lastAppliedTier)
+        // The app stays usable: another experience opens, and the catalog is reachable.
+        let other = try XCTUnwrap(DebugLaunch.fixtureFreeIDs.dropFirst().first)
+        let second = await model.open(other)
+        XCTAssertTrue(second)
+        XCTAssertEqual(model.route, .experience(other))
+        model.closeExperience()
+        XCTAssertEqual(model.route, .catalog)
+        XCTAssertEqual(model.session.state, .idle)
+    }
+
+    /// Edge case: leaving while an experience prepares cancels the open and returns to the catalog.
+    func testLeavingWhileAnExperiencePreparesCancelsAndReturnsToTheCatalog() async throws {
+        let storage = try TestStorage(self)
+        let id = try XCTUnwrap(DebugLaunch.fixtureFreeIDs.first)
+        let registry = [ExperienceRegistration(id: id) { _ in ExperienceShell(id: id, presenter: SlowPresenter()) }]
+            + DebugLaunch.fixtureFreeIDs.dropFirst().map(DebugExperience.registration(for:))
+        let model = model(storage, registry: registry)
+        let task = Task { await model.open(id) }
+        for _ in 0..<500 where model.session.state != .preparing {
+            try await Task.sleep(nanoseconds: 10_000_000)
+        }
+        XCTAssertEqual(model.session.state, .preparing)
+        XCTAssertEqual(model.route, .experience(id))
+        model.closeExperience()
+        let opened = await task.value
+        XCTAssertFalse(opened)
+        XCTAssertEqual(model.route, .catalog)
+        XCTAssertEqual(model.session.state, .idle)
+        XCTAssertNil(model.session.experience)
+        XCTAssertEqual(PreferencesStore(defaults: storage.defaults).load().preferences.lastRoute, .catalog)
+    }
     #endif
 }
+
+#if DEBUG
+/// Collects what the shell hands to a factory.
+@MainActor
+private final class LaunchBox {
+    var values: [ExperienceLaunch] = []
+}
+
+/// A core whose preparation takes far longer than a test: it ends only by cancellation.
+private struct SlowCore: ExperienceCore, Codable, Equatable {
+    var value = 0
+
+    static var migrations: MigrationChain { MigrationChain(currentVersion: 1) }
+    static var controls: [ExperienceControl] { [] }
+    static var qualityTiers: Int { 1 }
+
+    static func prepare(seed: UInt64) async throws -> SlowCore {
+        try await Task.sleep(nanoseconds: 60_000_000_000)
+        return SlowCore()
+    }
+
+    mutating func update(step: Int) {}
+
+    mutating func apply(_ action: ExperienceAction) -> ActionResult {
+        .rejected(.unknownControl(action.control))
+    }
+
+    mutating func reset() {}
+
+    func writeDigest(into builder: inout DigestBuilder) throws(DigestError) {
+        builder.add(value)
+    }
+}
+
+/// The presenter of `SlowCore`; it is never set up, because the preparation never ends.
+@MainActor
+private final class SlowPresenter: ExperiencePresenter {
+    typealias Core = SlowCore
+
+    func setup(_ context: RenderContext) throws {}
+    func draw(_ core: SlowCore, tier: Int, context: RenderContext, frame: FrameInfo) throws {}
+    func teardown(_ context: RenderContext) {}
+    func describe(_ core: SlowCore) -> String { "" }
+    func makeControls(_ port: ExperienceActionPort) -> AnyView { AnyView(EmptyView()) }
+}
+#endif

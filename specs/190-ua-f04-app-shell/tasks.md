@@ -110,7 +110,7 @@ run and settings follow in the same app sources and are proven by their own inte
 - The real catalog has no available experience yet; the interface tests therefore use the debug fixture, and the
   shipping launcher's empty statement is itself tested.
 
-## Phase 9: Convergence
+## Phase 7: Convergence
 
 Appended by `/speckit-converge` run 1 (2026-11-12): two read-only audits of the code against the specification, the
 plan and the tasks, each finding checked against the source by the lead before it was written here.

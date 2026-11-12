@@ -6,8 +6,12 @@
 //   -vcEmptyRegistry       use the fixture catalog and register nothing
 //   -vcResetData           remove the stored preferences and every experience folder before the model starts
 //   -vcSkipWelcome         mark the welcome as seen before the model starts
-//   -openExperience <id>   open that experience after the start; an id that cannot be opened is recorded in the
-//                          diagnostics and the catalog is shown
+//   -vcDamagedCatalog      use catalog data that cannot be read, so that the launcher shows its error state
+//   -vcFailingExperience   with the fixture: the first free fixture experience fails when it is set up
+//   -vcSeedData            create a data folder with one file for the first two free fixture experiences
+//   -openExperience <id>   open that experience directly after the start, without the welcome (which stays
+//                          unseen); an id that cannot be opened is recorded in the diagnostics and the catalog,
+//                          or on a first start the welcome, is shown
 #if DEBUG
 import Foundation
 import VisualCoreExperience
@@ -18,10 +22,14 @@ enum DebugLaunch {
     static let emptyRegistryArgument = "-vcEmptyRegistry"
     static let resetDataArgument = "-vcResetData"
     static let skipWelcomeArgument = "-vcSkipWelcome"
+    static let damagedCatalogArgument = "-vcDamagedCatalog"
+    static let seedDataArgument = "-vcSeedData"
+    static let failingExperienceArgument = "-vcFailingExperience"
     static let openExperienceArgument = "-openExperience"
 
     /// The debug arguments that take no value.
-    static let flags = [fixtureCatalogArgument, emptyRegistryArgument, resetDataArgument, skipWelcomeArgument]
+    static let flags = [fixtureCatalogArgument, emptyRegistryArgument, resetDataArgument, skipWelcomeArgument,
+                        damagedCatalogArgument, seedDataArgument, failingExperienceArgument]
 
     // MARK: - Environment
 
@@ -48,6 +56,20 @@ enum DebugLaunch {
             environment.catalogData = fixtureCatalogData
             environment.categoriesData = fixtureCategoriesData
             environment.registry = empty ? [] : fixtureRegistry
+            if !empty, arguments.contains(failingExperienceArgument), let first = fixtureFreeIDs.first {
+                environment.registry[0] = DebugExperience.failingRegistration(for: first)
+            }
+        }
+        if arguments.contains(damagedCatalogArgument) {
+            environment.catalogData = Data("{ damaged".utf8)
+        }
+        if arguments.contains(seedDataArgument) {
+            let folders = ExperienceDataStore(root: base.dataRoot)
+            for id in fixtureFreeIDs.prefix(2) {
+                try? folders.ensure(namespace: id.storageNamespace)
+                try? Data("seed".utf8).write(to: folders.folder(for: id.storageNamespace)
+                    .appendingPathComponent("seed.txt"))
+            }
         }
         return environment
     }
@@ -70,22 +92,21 @@ enum DebugLaunch {
     /// It acts once per model.
     @MainActor
     static func start(_ model: AppModel) async {
-        guard !started.contains(ObjectIdentifier(model)) else { return }
-        started.insert(ObjectIdentifier(model))
+        guard !model.debugLaunchStarted else { return }
+        model.debugLaunchStarted = true
         model.noteUnknownArguments(unknownArguments(in: model.arguments))
         guard let text = openExperienceID(in: model.arguments) else {
             if model.arguments.last == openExperienceArgument { model.noteUnknownArguments([openExperienceArgument]) }
             return
         }
         if let id = ExperienceID(rawValue: text), model.shown.contains(where: { $0.id == id }) {
+            model.hideWelcomeForThisLaunch()
             await model.open(id)
         } else {
             model.noteUnknownArguments([openExperienceArgument + " " + text])
             model.go(.catalog)
         }
     }
-
-    @MainActor private static var started: Set<ObjectIdentifier> = []
 
     // MARK: - Fixture
 

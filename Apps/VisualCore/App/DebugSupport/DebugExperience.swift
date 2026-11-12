@@ -73,14 +73,21 @@ final class DebugPresenter: ExperiencePresenter {
 
     /// The id of the experience this presenter belongs to; part of the identifier of its control.
     let experienceID: ExperienceID
+    /// What the shell handed over when it opened the experience.
+    let launch: ExperienceLaunch
+    /// When true the setup throws, so that the session shows its failure view.
+    let failsSetup: Bool
     private let scene = ClearColorScene()
 
-    /// Creates the presenter of the debug experience registered as `experienceID`.
-    init(experienceID: ExperienceID) {
+    /// Creates the presenter of the debug experience registered as `experienceID`, opened with `launch`.
+    init(experienceID: ExperienceID, launch: ExperienceLaunch, failsSetup: Bool = false) {
         self.experienceID = experienceID
+        self.launch = launch
+        self.failsSetup = failsSetup
     }
 
     func setup(_ context: RenderContext) throws {
+        if failsSetup { throw DebugExperience.SetupFailure() }
         try scene.setup(context)
     }
 
@@ -100,7 +107,8 @@ final class DebugPresenter: ExperiencePresenter {
     }
 
     func describe(_ core: DebugExperienceCore) -> String {
-        "Debug experience, \(core.count) taps."
+        "Debug experience, \(core.count) taps. Motion \(launch.reduceMotion.rawValue), "
+            + "flashing \(launch.reduceFlashing.rawValue)."
     }
 
     func makeControls(_ port: ExperienceActionPort) -> AnyView {
@@ -133,20 +141,32 @@ private struct DebugControls: View {
 
 /// Builds the debug experience for a fixture id.
 enum DebugExperience {
-    /// The accessibility identifier of the tap button: `vc.exp.<id>.tap`.
+    /// The accessibility identifier of the tap button: `experience.<id>.tap`, built from the framework's prefix
+    /// for everything inside an experience (`ExperienceID.accessibilityPrefix`).
     static func tapIdentifier(for id: ExperienceID) -> String {
-        "vc.exp.\(id.rawValue).tap"
+        id.accessibilityPrefix + ".tap"
     }
 
-    /// The debug experience registered as `id`.
+    /// The debug experience registered as `id`, opened with `launch`.
     @MainActor
-    static func make(id: ExperienceID) -> any Experience {
-        ExperienceShell(id: id, presenter: DebugPresenter(experienceID: id))
+    static func make(id: ExperienceID, launch: ExperienceLaunch = ExperienceLaunch()) -> any Experience {
+        ExperienceShell(id: id, presenter: DebugPresenter(experienceID: id, launch: launch))
     }
 
     /// The registration of the debug experience for `id`.
     static func registration(for id: ExperienceID) -> ExperienceRegistration {
-        ExperienceRegistration(id: id) { make(id: id) }
+        ExperienceRegistration(id: id) { launch in make(id: id, launch: launch) }
+    }
+
+    /// The error of a debug experience whose setup is made to fail.
+    struct SetupFailure: Error {}
+
+    /// The registration of a debug experience for `id` whose setup always fails: the session ends the open in
+    /// its failure view.
+    static func failingRegistration(for id: ExperienceID) -> ExperienceRegistration {
+        ExperienceRegistration(id: id) { launch in
+            ExperienceShell(id: id, presenter: DebugPresenter(experienceID: id, launch: launch, failsSetup: true))
+        }
     }
 }
 #endif
