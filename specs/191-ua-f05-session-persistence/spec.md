@@ -228,7 +228,7 @@ add a stray file and see the check fail.
 - **Two starts in quick succession**: the second start reads what the first one completed; no partial file is
   taken as a state.
 - **Damaged or newer session state of the app**: as in UA-F04, the app starts with defaults and notes it; this
-  feature adds that the unreadable value is not overwritten before the person changed a preference.
+  feature adds that one copy of the unreadable value is kept before it is overwritten.
 
 ## Requirements *(mandatory)*
 
@@ -246,8 +246,8 @@ add a stray file and see the check fail.
   (`state.json`, `quarantine-<n>.json`) MUST be refused with a reason; a refused operation MUST change nothing,
   and a listing MUST NOT show the reserved files.
 - **FR-U05-004**: The storage of one experience MUST be bounded: at most 16 MiB of files and at most 64 files,
-  and at most 64 values of at most 4 KiB each. A write beyond a bound MUST be refused and MUST leave what was
-  stored intact.
+  and at most 64 values of at most 4 KiB each. The saved state and its quarantined copies do not count. A write
+  beyond a bound MUST be refused and MUST leave what was stored intact.
 - **FR-U05-005**: Writes through the handle MUST be atomic: after an interruption a file holds its complete
   earlier content or its complete new content.
 - **FR-U05-006**: Experience sources MUST NOT use the container's paths, the shared defaults or another
@@ -265,9 +265,9 @@ add a stray file and see the check fail.
 - **FR-U05-012**: The saved state MUST be the snapshot the experience contract defines, stored as its own text
   in the file `state.json` of the experience's folder; it MUST be at most 1 MiB. The snapshot's format and schema
   version are the only version of the stored state.
-- **FR-U05-013**: A save MUST be atomic and MUST NOT block the experience for longer than one save of the
-  largest allowed state takes; a failed save MUST keep the earlier stored state, MUST be recorded in the
-  diagnostics and MUST NOT stop the experience.
+- **FR-U05-013**: A save MUST be atomic and MUST be one write of at most 1 MiB; a save MUST NOT be repeated in a
+  loop when it fails. A failed save MUST keep the earlier stored state, MUST be recorded in the app's diagnostics
+  with its code and MUST NOT stop the experience; the next save point tries again.
 - **FR-U05-014**: The state of a failed experience and of a cancelled preparation MUST NOT be saved.
 - **FR-U05-015**: A leftover temporary file of an interrupted save MUST be removed at the next start and MUST
   never be read as a state.
@@ -291,7 +291,9 @@ add a stray file and see the check fail.
   a part of it.
 - **FR-U05-031**: An open with an unreadable state MUST end before any rendering context exists and before any
   fresh state is shown. The app MUST then show a message in plain words with the actions Reset and Back; the message MUST say when a newer version of the app wrote the state, and MUST carry a stable code
-  for the diagnostics.
+  for the app's diagnostics. Its texts MUST be string resources, its two actions MUST be at least 44 by 44
+  points, it MUST stay usable at the largest accessibility text size, and it MUST pass the accessibility audit
+  of the experience route.
 - **FR-U05-032**: Before anything is written over an unreadable state, a copy of it MUST be quarantined inside
   the experience's namespace. At most 3 quarantined copies MUST be kept per experience; the oldest MUST be
   removed first.
@@ -322,8 +324,10 @@ add a stray file and see the check fail.
   digest.
 - **FR-U05-051**: The check MUST fail when an example for an earlier version is missing, does not open or gives
   another digest, and it MUST run for every registered experience.
-- **FR-U05-052**: The app's own session state MUST keep its version; a later version MUST migrate an earlier
-  one instead of dropping it.
+- **FR-U05-052**: The app's own session state MUST keep its version, and a check MUST fail when a version below
+  the current one has no migration, so that a later version migrates an earlier value instead of dropping it.
+  Before an unreadable or newer stored value is overwritten, one copy of it MUST be kept; the reset of all data
+  removes it.
 
 **Inventory**
 
@@ -339,7 +343,9 @@ add a stray file and see the check fail.
 **Boundaries and verification**
 
 - **FR-U05-070**: Nothing this feature stores MUST leave the device: no sync, no network, no shared container.
-- **FR-U05-071**: Code that reads stored data in the shipped app MUST contain no deliberate crash on bad data.
+- **FR-U05-071**: Code that reads stored data in the shipped app MUST contain no deliberate crash on bad data: no
+  forced unwrap, no forced `try`, no trap or precondition in the sources that read a stored state, a stored value
+  or the session state; a check MUST fail when one is added.
 - **FR-U05-072**: Every public symbol added to the framework MUST be documented, the API baseline MUST be
   updated, and the reference regression MUST pass. Pure logic MUST be tested without a display.
 - **FR-U05-073**: Test access (seeding stored states, damaging them, reading the inventory) MUST exist only in
@@ -353,7 +359,8 @@ add a stray file and see the check fail.
 - **Storage handle**: what an experience is given to reach its namespace.
 - **Saved state**: the stored snapshot of one experience: experience id, schema version, seed, step, digest,
   content, checksum.
-- **Quarantined copy**: an unreadable saved state kept aside, with the time and the reason.
+- **Quarantined copy**: an unreadable saved state kept aside under a numbered name; the reason is in the app's
+  diagnostics at the moment it is quarantined.
 - **Unreadable-state message**: the reason (damaged, newer version), its code, the actions Reset and Back.
 - **Session state**: the app's own stored preferences (UA-F04): welcome seen, last route, catalog filter, the
   settings.
