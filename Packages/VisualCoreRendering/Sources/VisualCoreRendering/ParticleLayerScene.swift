@@ -2,6 +2,8 @@
 // fitting a world rectangle into the drawable (feature 034 A04-P02 T-A04-212; FR-A04-206; contract C8; research R6).
 // Reusable by any app that shows a 2D particle world (A04 sandbox, A09 aquarium, A19 wallpapers). GPU objects live
 // only between setup and teardown, so a context recreation rebuilds them; the particle state belongs to the caller.
+// Feature 035 (A04-P03, G-BLENDTRAIL): a blend choice, and trails and a brightness cap through a TrailLayer created
+// only while needed.
 import CVisualCoreGL
 import VisualCoreMath
 import VisualCoreScenes
@@ -29,6 +31,18 @@ public final class ParticleLayerScene: RenderScene {
     public var world: WorldRect
     /// The clear color (straight RGBA, 0…1).
     public var background: Vec4
+    /// How particles combine (default `.normal`, the feature 034 look).
+    public var blend: ParticleBlend = .normal
+    /// Trail strength, the fraction kept per 1/60 s (`TrailDecay.strengthRange`; default 0 = no trails).
+    public var trailStrength: Double = 0 { didSet { trailStrength = TrailDecay.clampedStrength(trailStrength) } }
+    /// The largest channel value shown, 0…1 (default 1 = no cap; Reduce Flashing uses a lower value).
+    public var brightnessCap: Double = 1 {
+        didSet { brightnessCap = brightnessCap.isFinite ? min(max(brightnessCap, 0), 1) : 1 }
+    }
+    /// The trail layer while trails or the cap are active (nil otherwise), for diagnostics and tests.
+    public private(set) var trailLayer: TrailLayer?
+    /// True while drawing goes through the trail layer.
+    public var usesTrailLayer: Bool { trailStrength > 0 || brightnessCap < 1 }
     /// Particles drawn in the last rendered frame.
     public private(set) var lastInstanceCount = 0
     /// The last setup or draw error, if any (also thrown to the host, which reports it).
@@ -36,6 +50,7 @@ public final class ParticleLayerScene: RenderScene {
 
     private let source: @MainActor (FrameInfo) -> [ParticleInstance]
     private var renderer: ParticleRenderer?
+    private var clearRequested = false
 
     /// Creates the scene. `source` is called once per rendered frame (on the main thread) and returns the particles
     /// to draw; it may advance a simulation with the frame's time. Particle sizes are diameters in world units.
@@ -82,19 +97,59 @@ public final class ParticleLayerScene: RenderScene {
     /// Nothing to rebuild: the fit is computed from the context each frame.
     public func resize(_ context: RenderContext) {}
 
-    /// Clears to `background`, asks the source for particles and draws them fitted into the drawable.
+    /// Erases the trails on the next frame (safe to call at any time).
+    public func clearTrails() { clearRequested = true }
+
+    /// Clears to `background`, asks the source for particles and draws them fitted into the drawable — directly, or
+    /// through the trail layer while `usesTrailLayer` (created at the drawable size, recreated on a size change,
+    /// released when no longer needed).
     public func render(_ context: RenderContext, frame: FrameInfo) throws {
+        let particles = source(frame)
+        lastInstanceCount = 0
+        guard usesTrailLayer else {
+            releaseTrailLayer()
+            try drawDirect(particles, context)
+            return
+        }
+        guard let renderer, let size = TrailLayer.fittedSize(width: context.pixelWidth, height: context.pixelHeight) else {
+            releaseTrailLayer()   // zero-size drawable: nothing to keep
+            return
+        }
+        if let layer = trailLayer, layer.width != size.width || layer.height != size.height || !layer.isValid { releaseTrailLayer() }
+        if trailLayer == nil {
+            do { trailLayer = try TrailLayer(registry: context.resources, width: size.width, height: size.height) } catch {
+                lastError = "trail layer: \(error)"
+                throw error
+            }
+            clearRequested = false
+        }
+        guard let layer = trailLayer, let fit = Self.fit(world: world, viewSize: Vec2(Double(layer.width), Double(layer.height))) else { return }
+        if clearRequested { layer.clear(); clearRequested = false }
+        layer.strength = trailStrength
+        layer.brightnessCap = brightnessCap
+        layer.background = SIMD3(Float(background.x), Float(background.y), Float(background.z))
+        let blend = self.blend
+        do {
+            try layer.frame(delta: frame.delta, output: .framebuffer(name: context.framebuffer, width: context.pixelWidth, height: context.pixelHeight)) { _ in
+                try renderer.draw(particles, camera: fit.camera, metrics: fit.metrics, blend: blend)
+            }
+            lastInstanceCount = renderer.lastInstanceCount
+        } catch {
+            lastError = "trail frame: \(error)"
+            throw error
+        }
+    }
+
+    private func drawDirect(_ particles: [ParticleInstance], _ context: RenderContext) throws {
         vcglBindFramebuffer(GLenum(GL_FRAMEBUFFER), context.framebuffer)
         vcglViewport(0, 0, GLsizei(context.pixelWidth), GLsizei(context.pixelHeight))
         let b = background
         vcglClearColor(Float(b.x), Float(b.y), Float(b.z), Float(b.w))
         vcglClear(GLbitfield(GL_COLOR_BUFFER_BIT))
-        let particles = source(frame)
-        lastInstanceCount = 0
         guard let renderer,
               let f = Self.fit(world: world, viewSize: Vec2(Double(context.pixelWidth), Double(context.pixelHeight))) else { return }
         do {
-            try renderer.draw(particles, camera: f.camera, metrics: f.metrics)
+            try renderer.draw(particles, camera: f.camera, metrics: f.metrics, blend: blend)
             lastInstanceCount = renderer.lastInstanceCount
         } catch {
             lastError = "particle draw: \(error)"
@@ -102,8 +157,14 @@ public final class ParticleLayerScene: RenderScene {
         }
     }
 
+    private func releaseTrailLayer() {
+        trailLayer?.release()
+        trailLayer = nil
+    }
+
     /// Releases the renderer's GPU objects.
     public func teardown(_ context: RenderContext) {
+        releaseTrailLayer()
         renderer?.release()
         renderer = nil
     }

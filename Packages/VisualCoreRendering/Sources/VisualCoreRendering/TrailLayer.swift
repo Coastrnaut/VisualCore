@@ -25,6 +25,10 @@ public final class TrailLayer {
         didSet { brightnessCap = brightnessCap.isFinite ? min(max(brightnessCap, 0), 1) : 1 }
     }
 
+    /// The opaque color under the trail in the composite (straight RGB 0…1, default black): the trail image is
+    /// premultiplied, so the output is `trail.rgb + background × (1 − trail.a)`, then capped.
+    public var background: SIMD3<Float> = .zero
+
     private var pair: PingPongTarget?
     private var decay: FieldPass?
     private var composite: FieldPass?
@@ -43,9 +47,13 @@ public final class TrailLayer {
     precision highp float;
     uniform sampler2D uTrail;
     uniform float uCap;
+    uniform vec4 uBackground;
     in vec2 v_uv;
     out vec4 color;
-    void main() { color = vec4(min(texture(uTrail, v_uv).rgb, vec3(uCap)), 1.0); }
+    void main() {
+        vec4 t = texture(uTrail, v_uv);
+        color = vec4(min(t.rgb + uBackground.rgb * (1.0 - t.a), vec3(uCap)), 1.0);
+    }
     """
 
     /// The target size for a drawable of `width` × `height`: the longer edge scaled down to `maxEdge`, each edge ≥ 1;
@@ -107,7 +115,8 @@ public final class TrailLayer {
         pair.write.bind()
         vcglViewport(0, 0, GLsizei(width), GLsizei(height))
         try draw(pair.write)
-        try composite.run(output: output, inputs: ["uTrail": pair.write], uniforms: ["uCap": .float(Float(brightnessCap))])
+        try composite.run(output: output, inputs: ["uTrail": pair.write], uniforms: ["uCap": .float(Float(brightnessCap)),
+                                                                                        "uBackground": .vec4(SIMD4(background, 1))])
         pair.swap()
     }
 

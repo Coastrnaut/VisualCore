@@ -520,11 +520,13 @@ VisualCoreRendering | class | public final class ShaderBundle: Sendable
 VisualCoreRendering | class | public final class ShaderProgram
 VisualCoreRendering | class | public final class StillCapture
 VisualCoreRendering | class | public final class Texture: GPUResource
+VisualCoreRendering | class | public final class TrailLayer
 VisualCoreRendering | enum | public enum FieldPassError: Error, Equatable, Sendable
 VisualCoreRendering | enum | public enum FieldUniform: Sendable, Equatable
 VisualCoreRendering | enum | public enum GLState
 VisualCoreRendering | enum | public enum OffscreenRenderError: Error, Equatable, Sendable
 VisualCoreRendering | enum | public enum Output
+VisualCoreRendering | enum | public enum ParticleBlend: Sendable, Equatable, CaseIterable
 VisualCoreRendering | enum | public enum RenderHostError: Error, Equatable, Sendable
 VisualCoreRendering | enum | public enum RenderingInfo
 VisualCoreRendering | enum | public enum ResourceError: Error, Equatable, Sendable
@@ -540,11 +542,14 @@ VisualCoreRendering | func | public func bind(target: Int32 = GL_ARRAY_BUFFER)
 VisualCoreRendering | func | public func bind(unit: Int)
 VisualCoreRendering | func | public func bindColor(unit: Int)
 VisualCoreRendering | func | public func capture(host: RenderHost, size: ExportSize, prefix: String) -> State
+VisualCoreRendering | func | public func clear()
+VisualCoreRendering | func | public func clearTrails()
 VisualCoreRendering | func | public func destroy()
-VisualCoreRendering | func | public func draw(_ particles: [ParticleInstance], camera: Camera2D, metrics: ViewMetrics) throws
+VisualCoreRendering | func | public func draw(_ particles: [ParticleInstance], camera: Camera2D, metrics: ViewMetrics, blend: ParticleBlend = .normal) throws
 VisualCoreRendering | func | public func draw(_ root: SceneNode, camera: Camera2D, metrics: ViewMetrics) throws
 VisualCoreRendering | func | public func draw(model: Mat4 = .identity, camera: OrbitCamera, aspect: Double, color: Vec4) throws
 VisualCoreRendering | func | public func fragmentMantissaBits(fallback: Int = 10) -> Int
+VisualCoreRendering | func | public func frame(delta: Double, output: FieldPass.Output, draw: (RenderTarget) throws -> Void) throws
 VisualCoreRendering | func | public func makeBuffer(bytes: Int, label: String) throws -> GPUBuffer
 VisualCoreRendering | func | public func makeRenderTarget(width: Int, height: Int, format: TextureFormat = .rgba8, label: String) throws -> RenderTarget
 VisualCoreRendering | func | public func makeTexture(width: Int, height: Int, format: TextureFormat = .rgba8, label: String) throws -> Texture
@@ -592,6 +597,7 @@ VisualCoreRendering | func | public nonisolated static func folder(named name: S
 VisualCoreRendering | func | public nonisolated static func message(for error: OffscreenRenderError) -> String
 VisualCoreRendering | func | public static func detect(in registry: ResourceRegistry) -> FloatRenderSupport
 VisualCoreRendering | func | public static func fit(world: WorldRect, viewSize: Vec2) -> (camera: Camera2D, metrics: ViewMetrics)?
+VisualCoreRendering | func | public static func fittedSize(width: Int, height: Int) -> (width: Int, height: Int)?
 VisualCoreRendering | func | public static func pngData(_ image: StillImage) throws(OffscreenRenderError) -> Data
 VisualCoreRendering | func | public static func resetForVisualCore(framebuffer: UInt32, width: Int, height: Int)
 VisualCoreRendering | func | public static func square(halfExtent: Double) -> WorldRect
@@ -610,6 +616,7 @@ VisualCoreRendering | init | public init(rangeMin: Int, rangeMax: Int, precision
 VisualCoreRendering | init | public init(red: Float = 0, green: Float = 0, blue: Float = 0)
 VisualCoreRendering | init | public init(registry: ResourceRegistry) throws
 VisualCoreRendering | init | public init(registry: ResourceRegistry, fragment: String, inputs: [String], label: String,
+VisualCoreRendering | init | public init(registry: ResourceRegistry, width: Int, height: Int) throws
 VisualCoreRendering | init | public init(registry: ResourceRegistry, width: Int, height: Int, format: TextureFormat, label: String) throws
 VisualCoreRendering | init | public init(scene: RenderScene, maxFramesPerSecond: Int = 60, budget: ResourceBudget = ResourceBudget()) throws
 VisualCoreRendering | init | public init(world: WorldRect, background: Vec4 = Vec4(0, 0, 0, 1), source: @escaping @MainActor (FrameInfo) -> [ParticleInstance])
@@ -654,6 +661,7 @@ VisualCoreRendering | let | public let width: Int, height: Int
 VisualCoreRendering | let | public static let extensions: Set<String>
 VisualCoreRendering | let | public static let maxCachedPrograms
 VisualCoreRendering | let | public static let maxCircleSegments
+VisualCoreRendering | let | public static let maxEdge
 VisualCoreRendering | let | public static let maxOffscreenPixels
 VisualCoreRendering | let | public static let maxPaletteStops
 VisualCoreRendering | let | public static let minCircleSegments
@@ -693,9 +701,13 @@ VisualCoreRendering | var | public private(set) var read: RenderTarget
 VisualCoreRendering | var | public private(set) var resources: ResourceRegistry
 VisualCoreRendering | var | public private(set) var state
 VisualCoreRendering | var | public private(set) var swapCount
+VisualCoreRendering | var | public private(set) var trailLayer: TrailLayer?
 VisualCoreRendering | var | public private(set) var write: RenderTarget
 VisualCoreRendering | var | public var ambient
+VisualCoreRendering | var | public var background: SIMD3<Float>
 VisualCoreRendering | var | public var background: Vec4
+VisualCoreRendering | var | public var blend: ParticleBlend
+VisualCoreRendering | var | public var brightnessCap: Double
 VisualCoreRendering | var | public var budget: ResourceBudget
 VisualCoreRendering | var | public var bytes: Int
 VisualCoreRendering | var | public var bytesPerPixel: Int
@@ -711,6 +723,7 @@ VisualCoreRendering | var | public var generation: Int
 VisualCoreRendering | var | public var glVersion
 VisualCoreRendering | var | public var glslVersion
 VisualCoreRendering | var | public var height: Int
+VisualCoreRendering | var | public var image: RenderTarget?
 VisualCoreRendering | var | public var isSupported: Bool
 VisualCoreRendering | var | public var isValid: Bool
 VisualCoreRendering | var | public var lifecycleHistory: [RenderLifecycleEvent]
@@ -734,8 +747,11 @@ VisualCoreRendering | var | public var seedOffsets: SIMD4<Float>
 VisualCoreRendering | var | public var size: Vec2
 VisualCoreRendering | var | public var state: RenderLifecycleState
 VisualCoreRendering | var | public var stats: ResourceLedger.Snapshot
+VisualCoreRendering | var | public var strength: Double
 VisualCoreRendering | var | public var supported: Bool
 VisualCoreRendering | var | public var timeScale: Double
+VisualCoreRendering | var | public var trailStrength: Double
+VisualCoreRendering | var | public var usesTrailLayer: Bool
 VisualCoreRendering | var | public var vendor
 VisualCoreRendering | var | public var view: UIView
 VisualCoreRendering | var | public var width: Int
@@ -937,6 +953,7 @@ VisualCoreSimulation | enum | public enum ParticleForce: Sendable, Equatable
 VisualCoreSimulation | enum | public enum SimulationInfo
 VisualCoreSimulation | enum | public enum StoragePrecision: String, Sendable, Codable, CaseIterable
 VisualCoreSimulation | enum | public enum TimelineEvent: Sendable, Equatable
+VisualCoreSimulation | enum | public enum TrailDecay
 VisualCoreSimulation | func | public func acceleration(at position: Vec2, velocity: Vec2) -> Vec2
 VisualCoreSimulation | func | public func bound(speed: Double = 0) -> Double
 VisualCoreSimulation | func | public func checksum() -> UInt64
@@ -948,6 +965,7 @@ VisualCoreSimulation | func | public func commands(at step: Int) -> [Command]
 VisualCoreSimulation | func | public func decode(_ u: Float) -> Float
 VisualCoreSimulation | func | public func encode(_ v: Float) -> Float
 VisualCoreSimulation | func | public func instances() -> [ParticleInstance]
+VisualCoreSimulation | func | public func liveCount(source index: Int) -> Int
 VisualCoreSimulation | func | public func maxAbsDifference(_ other: FieldGrid) -> Float?
 VisualCoreSimulation | func | public func padded(toChannels count: Int, fill: Float = 0) -> FieldGrid
 VisualCoreSimulation | func | public func resolve(_ system: SystemAccessibility) -> EffectiveAccessibility
@@ -984,8 +1002,12 @@ VisualCoreSimulation | func | public mutating func seek(to t: Double)
 VisualCoreSimulation | func | public mutating func step(_ dt: Double)
 VisualCoreSimulation | func | public mutating func stepOnce()
 VisualCoreSimulation | func | public mutating func toggle()
+VisualCoreSimulation | func | public static func clampedStrength(_ strength: Double) -> Double
+VisualCoreSimulation | func | public static func factor(strength: Double, delta: Double) -> Double
 VisualCoreSimulation | func | public static func keys(prefix: String) -> (reduceMotion: String, reduceFlashing: String)
 VisualCoreSimulation | func | public static func load(from defaults: UserDefaults, keyPrefix prefix: String) -> AccessibilityPreferences
+VisualCoreSimulation | func | public static func step8(_ value: UInt8, factor: Double, subtract: Double = 1) -> UInt8
+VisualCoreSimulation | func | public static func subtraction(delta: Double) -> Double
 VisualCoreSimulation | func | public static func unorm8(range: Float) -> SignedRangeEncoding?
 VisualCoreSimulation | init | public init()
 VisualCoreSimulation | init | public init(_ entries: [(step: Int, command: Command)] = [])
@@ -1048,6 +1070,7 @@ VisualCoreSimulation | let | public static let speedRange
 VisualCoreSimulation | let | public static let speedRange: ClosedRange<Double>
 VisualCoreSimulation | let | public static let spreadRange: ClosedRange<Double>
 VisualCoreSimulation | let | public static let strengthLimit
+VisualCoreSimulation | let | public static let strengthRange: ClosedRange<Double>
 VisualCoreSimulation | let | public static let version
 VisualCoreSimulation | protocol | public protocol FixedStepSimulation
 VisualCoreSimulation | struct | public struct AccessibilityPreferences: Sendable, Equatable, Codable

@@ -106,7 +106,8 @@ f(1)=1), `Tween` (repeat count or forever, autoreverse) and `Timeline` (play, pa
 ≤ 256 points, hit testing); `ParticleSystem` (capacity 10,000 default, ≤ 100,000; `Emitter`s with rate, burst, lifetime, speed, direction/spread,
 size and color over life; `ParticleForce` gravity/drag/attractor and (feature 034, G-FIELDS) repulsor, softened
 `gravityWell`, `wind` and `vortex`, each with `clamped()`, `bound(speed:)` and `acceleration(at:velocity:)`, finite at
-every position including the center; `liveLimit`; NaN removal, `checksum()`; `instances()` →
+every position including the center; `liveLimit`; `liveCount(source:)` (feature 035); `TrailDecay` (feature 035: frame-rate-independent fade of 8-bit trail
+images, `factor`, `subtraction`, `step8`); NaN removal, `checksum()`; `instances()` →
 `ParticleInstance` for `ParticleRenderer`); 3D: `OrbitCamera` (pitch ±89°, `project`, `ray`), `Mesh.plane/cube/uvSphere`
 (segments 3–256, rings 2–256, subdivisions ≤ 256).
 

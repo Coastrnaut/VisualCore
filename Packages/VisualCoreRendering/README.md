@@ -96,8 +96,9 @@ from `PassSchemas` in `VisualCoreEffectsGraph`; per-effect GPU cost on devices i
 | Type | Draws | Notes |
 |---|---|---|
 | `PrimitiveRenderer` | a `SceneNode` tree (rect, circle 12–128 segments, line, ear-clipped polygon) | one batched triangle list, premultiplied alpha |
-| `ParticleRenderer` | `[ParticleInstance]` (≤ 100,000) | instanced soft-edged quads, size = world diameter |
-| `ParticleLayerScene` (feature 034) | a `RenderScene`: background + `[ParticleInstance]` from a source closure per frame | aspect-fits a `WorldRect` (y up) with `fit(world:viewSize:)`; `worldPoint`/`viewPoint` map taps with the same fit |
+| `ParticleRenderer` | `[ParticleInstance]` (≤ 100,000) | instanced soft-edged quads, size = world diameter; `ParticleBlend` `.normal` (default) or `.additive` (feature 035) |
+| `ParticleLayerScene` (feature 034) | a `RenderScene`: background + `[ParticleInstance]` from a source closure per frame | aspect-fits a `WorldRect` (y up) with `fit(world:viewSize:)`; `worldPoint`/`viewPoint` map taps with the same fit; feature 035: `blend`, `trailStrength`, `brightnessCap`, `clearTrails()` |
+| `TrailLayer` (feature 035) | a fading trail image on an RGBA8 `PingPongTarget` | `frame(delta:output:draw:)`: decay (`TrailDecay`), draw on top, composite over `background` with `brightnessCap`; longer edge ≤ 2,048; `clear()`, `release()` |
 | `MeshRenderer` | a `Mesh` through an `OrbitCamera` | Lambert + ambient, back faces culled; enable depth testing yourself when the framebuffer has depth |
 
 All three allocate through `ResourceRegistry`, rebuild their GPU objects on the first draw after a context

@@ -126,3 +126,103 @@ final class ParticleLayerSceneTests: XCTestCase {
         XCTAssertEqual(tiny.camera.zoom, 1, "small views fit through the metrics, not the clamped camera zoom")
     }
 }
+
+/// Feature 035 T-A04-305 (FR-A04-302, FR-A04-303; contract C7): trails, the cap and the layer's lifetime in the scene.
+@MainActor
+final class ParticleLayerSceneTrailTests: XCTestCase {
+    private var host: RenderHost?
+    override func tearDown() { host?.destroy(); host = nil }
+
+    private func makeHost(_ scene: ParticleLayerScene) throws -> RenderHost {
+        let h = try RenderHost(scene: scene)
+        h.view.frame = CGRect(x: 0, y: 0, width: 32, height: 32)
+        h.view.layoutIfNeeded()
+        host = h
+        return h
+    }
+
+    /// The red channel at the view center after the last frame.
+    private func centerRed(_ h: RenderHost) -> Int {
+        let w = h.pixelSize.width, ht = h.pixelSize.height
+        return Int(h.readPixels()[((ht / 2) * w + w / 2) * 4])
+    }
+
+    func testAParticleLeavesAFadingStreakAndTurningTrailsOffReleasesTheLayer() throws {
+        var show = true
+        let world = ParticleLayerScene.WorldRect.square(halfExtent: 16)
+        let scene = ParticleLayerScene(world: world) { _ in
+            show ? [ParticleInstance(position: .zero, size: 12, color: Vec4(1, 0, 0, 1))] : []
+        }
+        scene.trailStrength = 0.95
+        let h = try makeHost(scene)
+        let before = h.resources.stats.liveCount[.framebuffer] ?? 0
+        XCTAssertTrue(h.renderOneFrame(present: false))
+        XCTAssertNotNil(scene.trailLayer)
+        XCTAssertEqual(h.resources.stats.liveCount[.framebuffer] ?? 0, before + 2)
+        XCTAssertGreaterThan(centerRed(h), 200, "the particle is drawn through the layer")
+        show = false
+        XCTAssertTrue(h.renderOneFrame(present: false))
+        let streak = centerRed(h)
+        XCTAssertGreaterThan(streak, 0, "a fading streak remains without the particle")
+        XCTAssertLessThan(streak, 256)
+        scene.clearTrails()
+        XCTAssertTrue(h.renderOneFrame(present: false))
+        XCTAssertEqual(centerRed(h), 0, "cleared")
+        scene.trailStrength = 0
+        XCTAssertTrue(h.renderOneFrame(present: false))
+        XCTAssertNil(scene.trailLayer, "no trails and no cap: the layer is released")
+        XCTAssertEqual(h.resources.stats.liveCount[.framebuffer] ?? 0, before)
+    }
+
+    func testCapRoutesThroughTheLayerAndAdditiveIsBounded() throws {
+        let world = ParticleLayerScene.WorldRect.square(halfExtent: 16)
+        let scene = ParticleLayerScene(world: world) { _ in
+            Array(repeating: ParticleInstance(position: .zero, size: 12, color: Vec4(1, 1, 1, 1)), count: 3)
+        }
+        scene.blend = .additive
+        scene.brightnessCap = 0.6
+        let h = try makeHost(scene)
+        XCTAssertTrue(h.renderOneFrame(present: false))
+        XCTAssertTrue(scene.usesTrailLayer)
+        XCTAssertNotNil(scene.trailLayer, "the cap needs the layer even without trails")
+        XCTAssertLessThanOrEqual(centerRed(h), 153)
+        XCTAssertGreaterThanOrEqual(centerRed(h), 152)
+    }
+
+    func testZeroSizeDrawableReleasesTheLayerWithoutError() throws {
+        // Drives an unhosted scene by hand inside one context: a normal frame creates the layer, a zero-size frame
+        // releases it without error (analyze E2).
+        let scene = ParticleLayerScene(world: .square(halfExtent: 16)) { _ in [] }
+        scene.trailStrength = 0.9
+        var createdThenReleased: (Bool, Bool)?
+        var renderError: Error?
+        let probe = ProbeScene(setup: { ctx in
+            do {
+                let target = try ctx.resources.makeRenderTarget(width: 16, height: 16, label: "zero-size probe")
+                defer { ctx.resources.release(target) }
+                let frame = FrameInfo(index: 0, time: 0, delta: 1.0 / 60, targetTimestamp: 0)
+                try scene.setup(ctx)
+                try scene.render(ctx.redirected(to: target.handle.name, width: 16, height: 16), frame: frame)
+                let created = scene.trailLayer != nil
+                try scene.render(ctx.redirected(to: target.handle.name, width: 0, height: 0), frame: frame)
+                createdThenReleased = (created, scene.trailLayer == nil)
+                scene.teardown(ctx)
+            } catch { renderError = error }
+        })
+        let h = try RenderHost(scene: probe)
+        host = h
+        XCTAssertNil(renderError)
+        XCTAssertEqual(createdThenReleased?.0, true, "a 16 × 16 frame creates the layer")
+        XCTAssertEqual(createdThenReleased?.1, true, "a zero-size frame releases it")
+    }
+
+    func testNoTrailsKeepsTheDirectPath() throws {
+        let scene = ParticleLayerScene(world: .square(halfExtent: 16)) { _ in [ParticleInstance(position: .zero, size: 12, color: Vec4(0, 1, 0, 1))] }
+        let h = try makeHost(scene)
+        XCTAssertTrue(h.renderOneFrame(present: false))
+        XCTAssertFalse(scene.usesTrailLayer)
+        XCTAssertNil(scene.trailLayer)
+        let w = h.pixelSize.width, ht = h.pixelSize.height
+        XCTAssertGreaterThan(Int(h.readPixels()[((ht / 2) * w + w / 2) * 4 + 1]), 200)
+    }
+}

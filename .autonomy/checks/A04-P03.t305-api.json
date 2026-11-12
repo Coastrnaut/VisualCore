@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "python3",
+    "scripts/release_check.py",
+    "--only",
+    "public-api",
+    "documented-api-particle-universe",
+    "docs"
+  ],
+  "command": "python3 scripts/release_check.py --only public-api documented-api-particle-universe docs",
+  "elapsed_seconds": 0.324,
+  "exit_code": 0,
+  "finished": "2026-11-12T00:31:50+00:00",
+  "log": ".autonomy/logs/A04-P03.t305-api.log",
+  "log_sha256": "493a149efa6da6a5407040184f3ac8af366a3399a63b4583a089470624f8d878",
+  "name": "t305-api",
+  "stage": "A04-P03",
+  "started": "2026-11-12T00:31:50+00:00",
+  "timed_out": false
+}

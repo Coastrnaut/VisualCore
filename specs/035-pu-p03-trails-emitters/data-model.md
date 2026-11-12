@@ -28,6 +28,7 @@ Live particles spawned by emitter index `source` (0 for an out-of-range index).
 | `width`, `height` | actual target size |
 | `strength` | 0…0.98 (clamped) |
 | `brightnessCap` | 0…1 (clamped, default 1) |
+| `background` | `SIMD3<Float>`, default black: the composite is `trail.rgb + background × (1 − trail.a)`, then capped (added in T-A04-305 so non-black scene backgrounds survive the composite) |
 | `clear()` | zeroes both targets |
 | `frame(delta:draw:output:) throws` | decay → `draw(writeTarget)` → composite to `output` (`FieldPass.Output`) with the cap → swap |
 | `release()` | releases the targets and passes; idempotent |
