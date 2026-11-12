@@ -26,7 +26,7 @@ unit classes; `-d` launcher and first run). Review checkpoint after each phase.
 ## Phase 1: Setup
 
 - [X] T-U06-001 In `Packages/VisualCore/Package.swift` add `VisualCoreDiagnostics` to the dependencies of the target `VisualCoreExperience` and of the test target `VisualCoreExperienceTests`, and correct the comment above the target (it is no leaf). Proof: `swift build --package-path Packages/VisualCore` and `python3 scripts/check_dependencies.py` pass. — Verified 2026-11-12: swift build and swift test --package-path Packages/VisualCore pass (227 experience tests among them); python3 scripts/check_dependencies.py: R1-R5 hold; the import rule of the script tests allows VisualCoreDiagnostics; VisualCoreTestSupport gained the same dependency for the sample core's profile
-- [ ] T-U06-002 [P] Add the option `--only-testing <id> …` to `scripts/xcodebuild_package.py` (each id passed to xcodebuild as `-only-testing:<id>`, test action only) with tests in `scripts/test_scripts.py`. Proof: `python3 scripts/test_scripts.py` passes.
+- [X] T-U06-002 [P] Add the option `--only-testing <id> …` to `scripts/xcodebuild_package.py` (each id passed to xcodebuild as `-only-testing:<id>`, test action only) with tests in `scripts/test_scripts.py`. Proof: `python3 scripts/test_scripts.py` passes. — Verified 2026-11-12: python3 scripts/test_scripts.py: 214 tests pass (test_package_test_tool_passes_only_testing)
 
 ## Phase 2: Foundational — the pure types (block every story)
 
