@@ -60,7 +60,7 @@ commits. Review checkpoint after each phase.
 ## Phase 6: Evidence and convergence
 
 - [X] T-U04-018 Evidence `xcodegen`: `xcodegen generate --spec project.yml`. — Verified 2026-11-12: run-check xcodegen exit 0
-- [ ] T-U04-019 Evidence `app-build`: `xcodebuild build -project VisualCore.xcodeproj -scheme VisualCore -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO` (SC-U04-001).
+- [X] T-U04-019 Evidence `app-build`: `xcodebuild build -project VisualCore.xcodeproj -scheme VisualCore -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO` (SC-U04-001). — Verified 2026-11-12: run-check app-build exit 0 (unsigned simulator build of scheme VisualCore)
 - [ ] T-U04-020 Evidence `app-phone-ios27`: `python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime 27.2 --kind phone` (the brief's `xcodebuild test` command with the resolved simulator, then `check_test_enumeration.py --sources Apps/VisualCore/Tests --log <log>`).
 - [ ] T-U04-021 Evidence `app-tablet-ios27-a`, `-b`, `-c`: the same with `--kind tablet`, in the three chunks of T-U04-012.
 - [ ] T-U04-022 Evidence `app-phone-ios26`: the same with `--runtime 26.5 --kind phone`.
