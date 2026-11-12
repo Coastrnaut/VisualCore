@@ -89,7 +89,7 @@ round, so that the evidence is recorded once on the final sources. Review checkp
 
 ## Phase 10: Evidence and convergence
 
-- [ ] T-U05-028 Evidence `persistence-host`: `swift test --package-path Packages/VisualCore --filter 'VisualCoreExperienceTests|VisualCorePersistenceTests'`; and `host-visualcore`: `swift test --package-path Packages/VisualCore`.
+- [X] T-U05-028 Evidence `persistence-host`: `swift test --package-path Packages/VisualCore --filter 'VisualCoreExperienceTests|VisualCorePersistenceTests'`; and `host-visualcore`: `swift test --package-path Packages/VisualCore`. — Verified 2026-11-12: run-check persistence-host and host-visualcore: exit 0
 - [ ] T-U05-029 Evidence `pure-ios27`, `pure-ios26`, `rendering-ios27` and `rendering-ios26`: the package tests on both simulator runtimes (`--result-name ua-f05-ios27`, `ua-f05-ios26` for the rendering package).
 - [ ] T-U05-030 Evidence of the app on the final sources: `xcodegen`, `app-build`, and the 20 chunks `app-phone-ios27-a/-b/-c/-d/-e`, `app-tablet-ios27-a/-b/-c/-d/-e`, `app-phone-ios26-a/-b/-c/-d/-e`, `app-tablet-ios26-a/-b/-c/-d/-e` with `python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime <27.2|26.5> --kind <phone|tablet> --only-testing …` (chunk `-e` is `VisualCoreUITests/PersistenceUITests`, the brief's second evidence command).
 - [ ] T-U05-031 Evidence `release-build`, `release-symbols` (`python3 scripts/check_release_symbols.py --app <release app> --forbid DebugLaunch DebugExperience DebugInventory vcDamageState vcStrayItems vc.inventory`: 0 found; the debug build contains them with `--expect-present`), `privacy-manifest`, `compliance`, `app-isolation`, `storage-rule`, `stored-data-rule`, `public-api`, `dependencies`.
