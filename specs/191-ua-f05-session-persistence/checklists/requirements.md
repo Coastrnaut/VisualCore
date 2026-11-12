@@ -35,3 +35,7 @@
   prefix, the persistence module) appear only where the brief names them; requirements speak of namespaces,
   handles, saved states, messages and resets. Points left to `/speckit-clarify` are written as assumptions, not
   as markers: what the storage handle is, when safe points occur, where quarantined copies live.
+- Validation run 2 (2026-11-12, after `/speckit-clarify`): 16 of 16 items still pass; five answers recorded under
+  Clarifications and applied to US1 scenario 5, FR-U05-002, FR-U05-003, FR-U05-011, FR-U05-012, FR-U05-031,
+  FR-U05-060, SC-U05-003 and the assumptions. The specification has 38 functional requirements.
+

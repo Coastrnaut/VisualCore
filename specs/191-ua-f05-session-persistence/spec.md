@@ -33,6 +33,18 @@ Canonical overrides:
   experience is registered yet, so the behaviour is proven with the sample experience and the app's debug
   experience.
 
+## Clarifications
+
+### Session 2026-11-12
+
+Answered by the lead under the owner's standing delegation; the recommended option was taken each time.
+
+- Q: How does an experience receive its storage handle when the pure part of an experience may not read stored data while it prepares? → A: Through its registration's factory: the value the shell hands to the factory at every open (today the two accessibility choices) also carries the storage handle. The handle is for the experience's own files and values (settings of its own, caches it wants to keep). The saved state is not the experience's business: the app takes it from the session and stores it, so the pure part stays free of storage.
+- Q: In which form and under which name is the saved state stored — inside the document store's envelope (a second version number) or as the snapshot's own text? → A: As the snapshot's own deterministic text in one file, `state.json`, in the experience's folder, written atomically. One version system only: the snapshot's format and schema version. Quarantined copies are files named `quarantine-<n>.json` beside it. Both names are reserved: the experience's handle cannot read, write, list or remove them.
+- Q: What counts as a state change for a save while an experience runs — every step of its animation, or an accepted action of the person? → A: An accepted action. While an experience runs, a save follows an accepted action by at most 5 seconds; steps that only pass time cause no save by themselves. At a suspension and at a close the state is saved when its text differs from the stored one, which includes the steps that passed.
+- Q: How does an unreadable state stop an open, given that some refusals (a newer schema, a missing migration, a content that does not give its digest) are only found when the experience restores? → A: The open ends as a failure of the restore stage before any render host exists: the opener asks the session to treat a refused snapshot as a failure (the session's default, to go on with the fresh state, stays for openers that do not ask). The app turns that failure into the unreadable-state message with Reset and Back. No fresh state is ever shown or saved over the unreadable one.
+- Q: What exactly does the inventory read, and how is it proven where the system itself writes files? → A: Every file under the app's data container (documents, application support, caches, preferences, temporary files) and every key of the app's own defaults domain, read inside the app in builds made for testing and compared by an interface test with an allow-list kept in the repository. An entry for something the system writes names the observation that established it (seen in the container of a fresh install before the app wrote anything, or documented by the platform); nothing unknown is ever skipped.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Come back and find the experience where it was left (Priority: P1) 🎯
@@ -59,8 +71,8 @@ with the one before; repeat with a close of the experience instead of an end of 
 4. **Given** a start of the app after it was ended, **When** the last route was an experience, **Then** the
    app returns to that experience with its saved state; the last route, the last experience and the catalog
    filter are as they were.
-5. **Given** an experience that never changed since it was opened, **When** it is suspended or closed,
-   **Then** what is stored for it is the same as before.
+5. **Given** an experience whose state is the same as the stored one, **When** it is suspended or closed,
+   **Then** nothing is written.
 6. **Given** a save that is interrupted at any point, **When** the app starts again, **Then** the stored state is
    either the complete earlier one or the complete new one, never a part of one.
 
@@ -226,12 +238,13 @@ add a stray file and see the check fail.
 
 - **FR-U05-001**: Each experience MUST have one storage namespace derived from its id: the folder
   `Application Support/Experiences/<id>/` and the defaults prefix `exp.<id>.`.
-- **FR-U05-002**: An experience MUST reach its storage only through one handle that is given to it when it is
-  created. The handle MUST offer reading, writing, listing and removing of named files in the experience's
+- **FR-U05-002**: An experience MUST reach its storage only through one handle that is given to its factory at
+  every open. The handle MUST offer reading, writing, listing and removing of named files in the experience's
   folder and of named values under its prefix, and nothing outside them.
 - **FR-U05-003**: A name MUST be 1 to 128 characters of letters, digits, `.`, `_` and `-`, and MUST NOT start
-  with a dot. Any other name, and any name that would leave the namespace, MUST be refused with a reason; a
-  refused operation MUST change nothing.
+  with a dot. Any other name, any name that would leave the namespace, and the reserved names of the saved state
+  (`state.json`, `quarantine-<n>.json`) MUST be refused with a reason; a refused operation MUST change nothing,
+  and a listing MUST NOT show the reserved files.
 - **FR-U05-004**: The storage of one experience MUST be bounded: at most 16 MiB of files and at most 64 files,
   and at most 64 values of at most 4 KiB each. A write beyond a bound MUST be refused and MUST leave what was
   stored intact.
@@ -245,10 +258,13 @@ add a stray file and see the check fail.
 - **FR-U05-010**: The state of an open experience MUST be saved without any action of the person: at every
   suspension, at every close (leaving, opening another experience, a close under memory pressure), and at safe
   points while it runs.
-- **FR-U05-011**: A safe point MUST follow an accepted state change by at most 5 seconds while the experience
-  keeps running; without a state change since the last save nothing MUST be written.
-- **FR-U05-012**: The saved state MUST be the snapshot the experience contract defines, stored in the
-  experience's namespace; it MUST be at most 1 MiB.
+- **FR-U05-011**: While an experience keeps running, a save MUST follow an accepted action of the person by at
+  most 5 seconds; steps that only pass time cause no save by themselves. At a suspension and at a close the
+  state MUST be saved when its text differs from the stored one. A state equal to the stored one MUST NOT be
+  written again.
+- **FR-U05-012**: The saved state MUST be the snapshot the experience contract defines, stored as its own text
+  in the file `state.json` of the experience's folder; it MUST be at most 1 MiB. The snapshot's format and schema
+  version are the only version of the stored state.
 - **FR-U05-013**: A save MUST be atomic and MUST NOT block the experience for longer than one save of the
   largest allowed state takes; a failed save MUST keep the earlier stored state, MUST be recorded in the
   diagnostics and MUST NOT stop the experience.
@@ -273,8 +289,8 @@ add a stray file and see the check fail.
   unknown format, of a newer schema version, without a migration from its version, or whose content does not
   give its digest MUST be treated as unreadable: the app MUST NOT crash and MUST NOT start the experience with
   a part of it.
-- **FR-U05-031**: For an unreadable state the app MUST show a message in plain words with the actions Reset
-  and Back; the message MUST say when a newer version of the app wrote the state, and MUST carry a stable code
+- **FR-U05-031**: An open with an unreadable state MUST end before any rendering context exists and before any
+  fresh state is shown. The app MUST then show a message in plain words with the actions Reset and Back; the message MUST say when a newer version of the app wrote the state, and MUST carry a stable code
   for the diagnostics.
 - **FR-U05-032**: Before anything is written over an unreadable state, a copy of it MUST be quarantined inside
   the experience's namespace. At most 3 quarantined copies MUST be kept per experience; the oldest MUST be
@@ -311,8 +327,8 @@ add a stray file and see the check fail.
 
 **Inventory**
 
-- **FR-U05-060**: An inventory MUST list every file of the app's data container and every key of the app's
-  defaults, and compare each with a written allow-list; anything unlisted MUST fail the check and be named.
+- **FR-U05-060**: An inventory MUST list every file of the app's data container (documents, application support,
+  caches, preferences, temporary files) and every key of the app's own defaults domain, and compare each with a written allow-list; anything unlisted MUST fail the check and be named.
 - **FR-U05-061**: The allow-list MUST state for every entry what writes it; an entry for something the system
   writes MUST state how its origin was established. Unknown items MUST never be suppressed.
 - **FR-U05-062**: The inventory MUST be taken in an interface test after a scripted use of the app (open, save,
@@ -356,8 +372,8 @@ task of FR-U05-074.
   removes 0 items of another experience or of the app; 2 experiences see only their own data.
 - **SC-U05-002**: After the app was ended and started again, the last route, the last experience and the
   catalog filter are restored in 3 of 3 cases, and the restored experience has the same state digest as before.
-- **SC-U05-003**: A state change is on disk at most 5 seconds after it was accepted; with no change, 0 bytes are
-  written by 10 further safe points.
+- **SC-U05-003**: An accepted action is on disk at most 5 seconds after it was accepted; without a further
+  action, 0 bytes are written during the next 30 seconds of running.
 - **SC-U05-004**: Of 8 unreadable states (cut off, not a state at all, wrong checksum, another experience,
   unknown format, newer version, missing migration, too large), 8 give the message with Reset and Back, 0 crash,
   and 0 are overwritten before Reset or a quarantine.
@@ -375,10 +391,9 @@ task of FR-U05-074.
 
 ## Assumptions
 
-- "Its context" is one storage handle per experience, given by the app when it creates the experience; the name
-  and the place of the type are decided in the plan.
-- A safe point is a moment at which the experience's state is consistent between two steps; the app chooses
-  them, the experience does not have to announce them.
+- The five decisions of the clarification session (how the handle arrives, the form and name of the saved
+  state, what triggers a save, how an unreadable state stops an open, what the inventory reads) are binding and
+  are not repeated here.
 - The seed of an experience stays the stable value UA-F04 derives from its id; the saved state carries it, and
   a reset returns to it.
 - The quarantined copies live inside the experience's namespace, so that the reset of that experience removes
