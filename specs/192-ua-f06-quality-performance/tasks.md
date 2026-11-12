@@ -98,7 +98,7 @@ unit classes; `-d` launcher and first run). Review checkpoint after each phase.
 
 ## Phase 10: Evidence and convergence
 
-- [ ] T-U06-035 Evidence `diagnostics-host`: `swift test --package-path Packages/VisualCore --filter VisualCoreDiagnosticsTests`; and `host-visualcore`: `swift test --package-path Packages/VisualCore`.
+- [X] T-U06-035 Evidence `diagnostics-host`: `swift test --package-path Packages/VisualCore --filter VisualCoreDiagnosticsTests`; and `host-visualcore`: `swift test --package-path Packages/VisualCore`. — Verified 2026-11-12: run-checks diagnostics-host (97 tests) and host-visualcore exit 0
 - [ ] T-U06-036 Evidence `pure-ios27` and `pure-ios26`: the pure package tests on both simulator runtimes.
 - [ ] T-U06-037 Evidence `rendering-ios27` and `rendering-ios26`: the rendering package tests on both simulator runtimes (`--result-name ua-f06-ios27`, `ua-f06-ios26`).
 - [ ] T-U06-038 Evidence `endurance-ios27` and `endurance-ios26`: `python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --only-testing VisualCoreExperienceHostTests/EnduranceTests` (and `sim-26.5`).
