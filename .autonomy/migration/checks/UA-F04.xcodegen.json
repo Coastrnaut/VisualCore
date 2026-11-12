@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "xcodegen",
+    "generate",
+    "--spec",
+    "project.yml"
+  ],
+  "command": "xcodegen generate --spec project.yml",
+  "elapsed_seconds": 0.065,
+  "exit_code": 0,
+  "finished": "2026-11-12T14:19:12+00:00",
+  "gate": "UA-F04",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F04.xcodegen.log",
+  "log_sha256": "7a58ae0a926da17a1182bce96829bdb2ff37bdfe2c04952ba853f0c34ca69f60",
+  "name": "xcodegen",
+  "started": "2026-11-12T14:19:12+00:00",
+  "timed_out": false
+}

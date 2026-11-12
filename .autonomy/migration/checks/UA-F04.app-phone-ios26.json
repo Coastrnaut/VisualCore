@@ -1,0 +1,23 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_app.py",
+    "--scheme",
+    "VisualCore",
+    "--runtime",
+    "26.5",
+    "--kind",
+    "phone"
+  ],
+  "command": "python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime 26.5 --kind phone",
+  "elapsed_seconds": 405.917,
+  "exit_code": 0,
+  "finished": "2026-11-12T14:33:57+00:00",
+  "gate": "UA-F04",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F04.app-phone-ios26.log",
+  "log_sha256": "c239c4ae71a1b8d1a0f9c477d0e81f27330fe225d19b07e8fede3d68e47e1025",
+  "name": "app-phone-ios26",
+  "started": "2026-11-12T14:27:11+00:00",
+  "timed_out": false
+}
