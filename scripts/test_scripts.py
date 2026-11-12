@@ -1805,17 +1805,21 @@ class GovernanceTests(unittest.TestCase):
     LEDGER_READERS = {"scripts/validate_autocreator.py", "scripts/render_autocreator.py", "scripts/build_traceability_matrix.py",
                       "scripts/planning_index.py"}
     PUSHERS = {"scripts/tick_task.py", "scripts/prepush_scan.py"}
+    SCRIPT_SUFFIXES = (".py", ".sh", ".bash", ".zsh", ".command", ".rb", ".yml", ".yaml")
+    NOT_OURS = ("External/", "Vendor/", "docs/archive/")
     TOOLS = ("validate_docs", "tick_task", "prepush_scan", "migration_ledger", "planning_index")
     NETWORK_MODULES = {"socket", "ssl", "urllib", "http", "ftplib", "smtplib", "poplib", "imaplib", "xmlrpc", "telnetlib",
                        "asyncio", "socketserver", "webbrowser"}
 
     @classmethod
     def setUpClass(cls):
-        # Tracked files and new files that are not ignored: a script written a moment ago is judged too.
-        listing = subprocess.run(["git", "ls-files", "--cached", "--others", "--exclude-standard", "scripts", "Tools/python", ".github"],
-                                 cwd=ROOT_DIR, capture_output=True, text=True, check=True).stdout.splitlines()
+        # Every script and workflow of the repository: tracked files and new files that are not ignored (a script
+        # written a moment ago is judged too), the Spec Kit scripts under .specify/ included. The read-only reference
+        # submodule, the vendored tree and the archive are not this repository's tools.
+        listing = subprocess.run(["git", "ls-files", "--cached", "--others", "--exclude-standard"], cwd=ROOT_DIR, capture_output=True,
+                                 text=True, check=True).stdout.splitlines()
         cls.files = {rel: (ROOT_DIR / rel).read_text(encoding="utf-8", errors="replace") for rel in listing
-                     if (ROOT_DIR / rel).is_file()}
+                     if rel.endswith(cls.SCRIPT_SUFFIXES) and not rel.startswith(cls.NOT_OURS) and (ROOT_DIR / rel).is_file()}
 
     def test_only_the_ledger_tool_writes_the_ledger(self):
         names_ledger = re.compile(r"migration/ledger\.json|migration_ledger\.LEDGER")
@@ -1829,12 +1833,20 @@ class GovernanceTests(unittest.TestCase):
                     self.assertIsNone(writes.search(line), f"{rel}:{number} writes the migration ledger")
 
     def test_only_two_tools_push(self):
-        pushes = re.compile(r"""["']git["'],\s*["']push["']""")
-        pushing = {rel for rel, text in self.files.items() if rel.endswith(".py") and rel != "scripts/test_scripts.py" and pushes.search(text)}
+        self.assertIn(".specify/scripts/bash/common.sh", self.files)  # the Spec Kit scripts are read too
+        self.assertIn(".github/workflows/push-scan.yml", self.files)
+        in_argument_list = re.compile(r"""["']git["'],\s*["']push["']""")
+        pushing = {rel for rel, text in self.files.items() if rel.endswith(".py") and rel != "scripts/test_scripts.py"
+                   and in_argument_list.search(text)}
         self.assertEqual(pushing, self.PUSHERS)
+        # A command line: `git push` outside a comment. The two tools mention it only in their descriptions.
+        on_command_line = re.compile(r"^(?!\s*#).*\bgit\s+(?:-\S+(?:\s+\S+)?\s+)*push\b", re.M)
+        for line, expected in (("git push origin main", True), ("  run: git -C repo push", True), ("echo ok && git -q push", True),
+                               ("# git push is done by the tool", False), ("python3 scripts/prepush_scan.py --push", False)):
+            self.assertEqual(bool(on_command_line.search(line)), expected, line)
         for rel, text in self.files.items():
-            if rel.startswith(".github/"):
-                self.assertNotRegex(text, r"git\s+push", f"{rel} pushes")
+            if not rel.endswith(".py"):
+                self.assertIsNone(on_command_line.search(text), f"{rel} pushes")
 
     def test_ci_runs_the_governance_checks(self):
         # FR-U00-050 to FR-U00-052: four validators as steps of ci.yml, the scan of the pushed range in its own workflow.
