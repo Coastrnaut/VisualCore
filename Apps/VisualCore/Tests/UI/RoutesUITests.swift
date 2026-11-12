@@ -22,7 +22,7 @@ final class RoutesUITests: XCTestCase {
         // In a short window (a phone in landscape) the tiles start below the search field and the navigation rows.
         var swipes = 0
         while !free.waitForExistence(timeout: 2), swipes < 4 {
-            app.swipeUp()
+            scrollCatalog(app)
             swipes += 1
         }
         waitFor(free, timeout: VC.wait)

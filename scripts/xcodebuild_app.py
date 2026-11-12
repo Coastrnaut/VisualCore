@@ -57,13 +57,30 @@ def test_command(project: str, scheme: str, udid: str, derived: str, only: list[
     return cmd + [f"-only-testing:{t}" for t in (only or [])]
 
 
-def enumeration_guard(sources: Path, log: Path) -> int:
-    """Runs scripts/check_test_enumeration.py in this process; returns its exit code."""
+def guard_classes(only_testing: list[str]) -> list[str]:
+    """The test classes named by `--only-testing` ids of the form `Target/Class[/method]`; empty when an id names a
+    whole target or a single method, because the guard can then only be run for everything or not at all."""
+    classes: list[str] = []
+    for item in only_testing:
+        parts = item.split("/")
+        if len(parts) != 2 or not parts[1]:
+            return []
+        if parts[1] not in classes:
+            classes.append(parts[1])
+    return classes
+
+
+def enumeration_guard(sources: Path, log: Path, classes: list[str] | None = None) -> int:
+    """Runs scripts/check_test_enumeration.py in this process; returns its exit code. With `classes` the guard is
+    limited to these test classes (a run in chunks, each chunk naming whole classes)."""
     here = str(Path(__file__).resolve().parent)
     if here not in sys.path:
         sys.path.insert(0, here)
     import check_test_enumeration
-    return check_test_enumeration.main(["--sources", str(sources), "--log", str(log)])
+    argv = ["--sources", str(sources), "--log", str(log)]
+    if classes:
+        argv += ["--only", *classes]
+    return check_test_enumeration.main(argv)
 
 
 def main(argv: list[str] | None = None, root: Path = ROOT, run=subprocess.run, guard=enumeration_guard) -> int:
@@ -140,7 +157,8 @@ def main(argv: list[str] | None = None, root: Path = ROOT, run=subprocess.run, g
     if code != 0:
         print(f"FAIL: {what} — tests failed, xcodebuild exit {code} ({shown})")
         return 1
-    guard_code = guard(sources, log)
+    classes = guard_classes(only)
+    guard_code = guard(sources, log, classes) if classes else guard(sources, log)
     if guard_code != 0:
         print(f"FAIL: {what} — tests passed but the enumeration guard failed, exit {guard_code} ({shown})")
         return 1

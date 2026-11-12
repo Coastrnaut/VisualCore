@@ -86,9 +86,18 @@ func waitUntilGone(_ element: XCUIElement, timeout: TimeInterval = VC.wait) -> B
 
 /// Scrolls up to five times until `element` can be tapped, then taps it.
 @MainActor
+func scrollCatalog(_ app: XCUIApplication) {
+    // On a tablet the catalog is the sidebar: a swipe on the app would scroll the detail. The catalog list is the
+    // first collection view in both layouts.
+    let list = app.collectionViews.firstMatch
+    if list.exists { list.swipeUp() } else { app.swipeUp() }
+}
+
+/// Scrolls the catalog until `element` exists and can be tapped, then taps it.
+@MainActor
 func revealAndTap(_ app: XCUIApplication, _ element: XCUIElement, file: StaticString = #filePath, line: UInt = #line) {
     guard waitFor(element, timeout: VC.wait, file: file, line: line) else { return }
-    for _ in 0..<5 where !element.isHittable { app.swipeUp() }
+    for _ in 0..<5 where !element.isHittable { scrollCatalog(app) }
     element.tap()
 }
 
@@ -102,7 +111,7 @@ func identifiers(_ app: XCUIApplication, prefix: String, expected: Int) -> [Stri
             seen.append(id)
         }
         if seen.count >= expected || attempt == 5 { break }
-        app.swipeUp()
+        scrollCatalog(app)
     }
     return seen
 }

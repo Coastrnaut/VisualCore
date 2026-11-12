@@ -11,25 +11,32 @@ struct LauncherView: View {
 
     var body: some View {
         List {
-            Section {
-                searchField
-            }
-            // Settings and about are rows of the list, not toolbar items: a navigation bar clips text at the
-            // largest accessibility sizes, a list row wraps it. They come before the tiles so that they are always
-            // in reach.
-            Section {
-                Button { model.go(.settings) } label: {
-                    navLabel(AppStrings.text(.navSettings), symbol: "gearshape")
+            Group {
+                Section {
+                    searchField
                 }
-                .accessibilityIdentifier(ShellID.navSettings)
-                Button { model.go(.about) } label: {
-                    navLabel(AppStrings.text(.navAbout), symbol: "info.circle")
+                // Settings and about are rows of the list, not toolbar items: a navigation bar clips text at the
+                // largest accessibility sizes, a list row wraps it. They come before the tiles so that they are always
+                // in reach.
+                Section {
+                    Button { model.go(.settings) } label: {
+                        navLabel(AppStrings.text(.navSettings), symbol: "gearshape")
+                    }
+                    .accessibilityIdentifier(ShellID.navSettings)
+                    Button { model.go(.about) } label: {
+                        navLabel(AppStrings.text(.navAbout), symbol: "info.circle")
+                    }
+                    .accessibilityIdentifier(ShellID.navAbout)
                 }
-                .accessibilityIdentifier(ShellID.navAbout)
+                content
             }
-            content
+            .listRowBackground(Color(uiColor: .secondarySystemGroupedBackground))
         }
         .listStyle(.insetGrouped)
+        // An opaque grouped background also where the catalog is a sidebar: the translucent sidebar material does
+        // not give text the contrast the accessibility audit asks for.
+        .scrollContentBackground(.hidden)
+        .background(Color(uiColor: .systemGroupedBackground))
         .headerProminence(.increased)
         .routeRoot(ShellID.routeCatalog)
         .navigationTitle(AppStrings.text(.catalogTitle))

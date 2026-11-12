@@ -25,7 +25,7 @@ final class LauncherUITests: XCTestCase {
                 sections.append(id)
             }
             if (tiers.count >= 6 && sections.count >= 3) || attempt == 5 { break }
-            app.swipeUp()
+            scrollCatalog(app)
         }
         XCTAssertEqual(tiers.count, 6, "tiles: \(tiers.keys.sorted())")
         XCTAssertEqual(sections.count, 3, "headings: \(sections)")
@@ -82,7 +82,7 @@ final class LauncherUITests: XCTestCase {
         waitFor(element(app, "vc.route.catalog"))
         waitFor(tile(app).firstMatch, timeout: VC.wait)
         let premium = firstTile(app, tier: "Premium")
-        for _ in 0..<5 where !premium.exists { app.swipeUp() }
+        for _ in 0..<5 where !premium.exists { scrollCatalog(app) }
         revealAndTap(app, premium)
         waitFor(element(app, "vc.premium.notice"), timeout: VC.wait)
         XCTAssertFalse(element(app, VC.canvas).exists, "a premium experience is not opened by this feature")

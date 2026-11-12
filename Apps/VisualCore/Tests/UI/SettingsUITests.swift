@@ -13,7 +13,7 @@ final class SettingsUITests: XCTestCase {
     @MainActor
     private func choose(_ app: XCUIApplication, _ picker: XCUIElement, option predicate: NSPredicate) {
         let before = picker.value as? String
-        for _ in 0..<5 where !picker.isHittable { app.swipeUp() }
+        for _ in 0..<5 where !picker.isHittable { scrollCatalog(app) }
         picker.tap()
         let option = app.buttons.matching(predicate).firstMatch
         XCTAssertTrue(option.waitForExistence(timeout: 5), "no option for \(predicate) in \(picker.identifier)")
@@ -85,7 +85,7 @@ final class SettingsUITests: XCTestCase {
         openSettings(app)
         let privacy = element(app, "vc.settings.privacy")
         waitFor(privacy, timeout: VC.wait)
-        for _ in 0..<5 where !privacy.isHittable { app.swipeUp() }
+        for _ in 0..<5 where !privacy.isHittable { scrollCatalog(app) }
         let statement = text(app, of: "vc.settings.privacy").lowercased()
         for word in ["collect", "network", "advertising"] {
             XCTAssertTrue(statement.contains(word), "the privacy statement lacks '\(word)': \(statement)")

@@ -938,6 +938,16 @@ class AppTestRunnerTests(unittest.TestCase):
         ],
     }}
 
+    def test_guard_is_limited_to_the_classes_of_a_chunk(self):
+        """A run in chunks names whole classes; the guard then checks only these. An id that names a target or a
+        single method gives no class list, so the guard runs for everything."""
+        tool = load("xcodebuild_app")
+        self.assertEqual(tool.guard_classes(["VisualCoreUITests/RoutesUITests", "VisualCoreTests/StoreTests"]),
+                         ["RoutesUITests", "StoreTests"])
+        self.assertEqual(tool.guard_classes(["VisualCoreUITests/RoutesUITests/testOne"]), [])
+        self.assertEqual(tool.guard_classes(["VisualCoreUITests"]), [])
+        self.assertEqual(tool.guard_classes([]), [])
+
     def test_picks_a_phone_and_a_tablet_by_runtime(self):
         pick = apprunner.pick_simulator
         self.assertEqual(pick(self.DEVICES, "27.2", "phone"), (self.PHONE_27, "iPhone 18"))   # the unavailable one is skipped
