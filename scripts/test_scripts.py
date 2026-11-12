@@ -860,5 +860,325 @@ class BundleLicensesTests(unittest.TestCase):
             self.assertEqual({e["id"] for e in json.loads((Path(t) / "L" / "licenses.json").read_text())}, shipped)
 
 
+# ---------------------------------------------------------------- unified-app steering tools (ADR-0009)
+
+ledgertool = load("migration_ledger")
+planidx = load("planning_index")
+render = load("render_autocreator")
+tracematrix = load("build_traceability_matrix")
+steering = load("validate_autocreator")
+
+
+class MigrationLedgerTests(unittest.TestCase):
+    """The migration ledger refuses everything that is not real, ordered evidence."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.root = Path(self.tmp.name)
+        for rel in ("docs/catalog/experience-catalog.json", "docs/catalog/feature-index.json",
+                    "docs/catalog/unified-app-features.json", ".autonomy/state.json"):
+            (self.root / rel).parent.mkdir(parents=True, exist_ok=True)
+            (self.root / rel).write_bytes((ROOT_DIR / rel).read_bytes())
+        (self.root / "ok.py").write_text("print('ok')\n")
+        (self.root / "bad.py").write_text("raise SystemExit(3)\n")
+        self.assertEqual(ledgertool.main(["init"], self.root), 0)
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def run_tool(self, *argv):
+        return ledgertool.main(list(argv), self.root)
+
+    def refuses(self, text, *argv):
+        with self.assertRaises(SystemExit) as raised:
+            self.run_tool(*argv)
+        self.assertIn(text, str(raised.exception))
+
+    def ledger(self):
+        return json.loads((self.root / ledgertool.LEDGER).read_text())
+
+    def force(self, statuses):
+        """Test helper only: write gate statuses directly, as no real tool may."""
+        data = self.ledger()
+        for g in data["gates"]:
+            if g["id"] in statuses:
+                g["status"] = statuses[g["id"]]
+        (self.root / ledgertool.LEDGER).write_text(ledgertool.dump_ledger(data))
+
+    def pass_gate(self, gate, name="ok"):
+        self.assertEqual(self.run_tool("run-check", "--gate", gate, "--name", name, "--", sys.executable, "ok.py"), 0)
+        self.assertEqual(self.run_tool("seal", "--gate", gate), 0)
+        self.assertEqual(self.run_tool("record", "--gate", gate), 0)
+
+    def test_structure(self):
+        data = self.ledger()
+        kinds = {}
+        for g in data["gates"]:
+            kinds[g["kind"]] = kinds.get(g["kind"], 0) + 1
+        self.assertEqual(kinds["experience"], 100)
+        self.assertEqual(kinds["device-row"], 300)
+        self.assertEqual(kinds["unified-feature"], 15)
+        self.assertEqual(kinds["game-feature"], 750)
+        self.assertEqual(ledgertool.validate(self.root), [])
+        self.assertEqual(data["gates"][0]["id"], "M0-CONSOLIDATION")
+        self.refuses("exists", "init")
+
+    def test_order_is_enforced(self):
+        self.refuses("not ready", "run-check", "--gate", "CONSTITUTION-2", "--name", "x", "--", sys.executable, "ok.py")
+        self.refuses("not ready", "run-check", "--gate", "UA-F08", "--name", "x", "--", sys.executable, "ok.py")
+        self.pass_gate("M0-CONSOLIDATION")
+        self.assertEqual(self.ledger()["gates"][0]["status"], "pass")
+        self.refuses("already pass", "run-check", "--gate", "M0-CONSOLIDATION", "--name", "again", "--", sys.executable, "ok.py")
+        self.pass_gate("CONSTITUTION-2")
+        self.assertEqual(ledgertool.validate(self.root), [])
+        self.assertEqual(ledgertool.next_actions(self.ledger(), ledgertool.legacy_state(self.root))[0][0]["id"], "UA-F00")
+
+    def test_purchase_waits_for_the_free_lock(self):
+        gates = {g["id"]: g for g in self.ledger()["gates"]}
+        self.assertIn("LOCK-FREE-50", gates["UA-F08"]["depends"])
+        self.assertIn("UA-F08", gates["R03-F02"]["depends"])
+        self.assertIn("UA-F08", gates["X-R03-G01"]["depends"])
+        self.assertNotIn("UA-F08", gates["X-R02-G01"]["depends"])
+        self.assertIn("UA-F13", gates["ImplementationLock-100"]["depends"])
+
+    def test_attestations_are_single_use_and_logs_are_hashed(self):
+        ok = ["--", sys.executable, "ok.py"]
+        self.assertEqual(self.run_tool("run-check", "--gate", "M0-CONSOLIDATION", "--name", "a", *ok), 0)
+        self.refuses("already recorded", "run-check", "--gate", "M0-CONSOLIDATION", "--name", "a", *ok)
+        log = self.root / ledgertool.LOGS / "M0-CONSOLIDATION.a.log"
+        log.write_text(log.read_text() + "edited\n")
+        self.refuses("changed since the command ran", "seal", "--gate", "M0-CONSOLIDATION")
+
+    def test_failed_command_cannot_pass_a_gate(self):
+        self.assertNotEqual(self.run_tool("run-check", "--gate", "M0-CONSOLIDATION", "--name", "bad", "--", sys.executable, "bad.py"), 0)
+        self.refuses("no passing attestation", "seal", "--gate", "M0-CONSOLIDATION")
+        self.refuses("seal the gate first", "record", "--gate", "M0-CONSOLIDATION")
+
+    def test_claude_cli_is_refused(self):
+        self.refuses("Claude CLI is prohibited", "run-check", "--gate", "M0-CONSOLIDATION", "--name", "x", "--", "claude", "-p", "hello")
+
+    def test_evidence_commands_are_argument_lists(self):
+        self.refuses("no shell wrapper", "run-check", "--gate", "M0-CONSOLIDATION", "--name", "x", "--", "/bin/sh", "-c", "true")
+        self.refuses("no shell wrapper", "run-check", "--gate", "M0-CONSOLIDATION", "--name", "x", "--", "zsh", "script.zsh")
+        self.refuses("no inline script", "run-check", "--gate", "M0-CONSOLIDATION", "--name", "x", "--", sys.executable, "-c", "print(1)")
+        self.refuses("requires a command", "run-check", "--gate", "M0-CONSOLIDATION", "--name", "x")
+        self.refuses("alphanumeric", "run-check", "--gate", "M0-CONSOLIDATION", "--name", "bad name", "--", sys.executable, "ok.py")
+
+    def test_devices_are_guarded_by_the_lock(self):
+        self.refuses("no physical-device", "guard-device")
+        self.refuses("not ready", "run-check", "--gate", "DEV1-A01", "--name", "x", "--", sys.executable, "ok.py")
+        self.force({"DEV1-A01": "pass"})
+        self.assertTrue(any("device gate recorded before" in p or "without recorded evidence" in p for p in ledgertool.validate(self.root)))
+
+    def test_original_apps_need_their_legacy_gates(self):
+        self.force({g: "pass" for g in ("M0-CONSOLIDATION", "CONSTITUTION-2", "UA-F00", "UA-F01", "UA-F02", "UA-F03", "UA-F04",
+                                         "UA-F05", "UA-F06", "UA-F07", "UA-F09", "UA-F10", "UA-F11", "UA-F12")})
+        data, legacy = self.ledger(), ledgertool.legacy_state(self.root)
+        gates = ledgertool.index_of(data)
+        self.assertEqual(ledgertool.unmet(gates["X-A01"], gates, legacy["stages"]), [])
+        self.assertIn("legacy:A04-P04", ledgertool.unmet(gates["X-A04"], gates, legacy["stages"]))
+        actions = ledgertool.next_actions(data, legacy, limit=40)
+        waiting = [why for g, why in actions if "legacy" in why]
+        self.assertEqual(len(waiting), 1)
+        self.assertIn("A04-P04", waiting[0])
+        self.refuses("legacy:A04-P04", "run-check", "--gate", "X-A04", "--name", "x", "--", sys.executable, "ok.py")
+
+    def test_tampered_evidence_is_detected(self):
+        self.pass_gate("M0-CONSOLIDATION")
+        evidence = self.root / ledgertool.EVIDENCE / "M0-CONSOLIDATION.json"
+        evidence.write_text(evidence.read_text().replace('"exit_code": 0', '"exit_code": 0 '))
+        self.assertTrue(any("evidence file changed" in p for p in ledgertool.validate(self.root)))
+
+    def test_reverification_keeps_every_revision(self):
+        self.pass_gate("M0-CONSOLIDATION")
+        ok = ["--", sys.executable, "ok.py"]
+        self.assertEqual(self.run_tool("run-check", "--gate", "M0-CONSOLIDATION", "--name", "second", "--reverify", *ok), 0)
+        self.assertEqual(self.run_tool("seal", "--gate", "M0-CONSOLIDATION", "--reverify"), 0)
+        self.assertEqual(self.run_tool("record", "--gate", "M0-CONSOLIDATION", "--reverify"), 0)
+        attempts = self.ledger()["gates"][0]["attempts"]
+        self.assertEqual([a["evidence"].rsplit("/", 1)[1] for a in attempts], ["M0-CONSOLIDATION.json", "M0-CONSOLIDATION.r2.json"])
+        second = json.loads((self.root / attempts[1]["evidence"]).read_text())
+        self.assertEqual([c["name"] for c in second["passing_checks"]], ["second"])
+        self.assertEqual(ledgertool.validate(self.root), [])
+        self.refuses("no new run-check attestation", "seal", "--gate", "M0-CONSOLIDATION", "--reverify")
+
+    def test_block_and_unblock(self):
+        self.assertEqual(self.run_tool("block", "--gate", "M0-CONSOLIDATION", "--reason", "BLOCKED_OWNER_ACTION: test"), 0)
+        self.refuses("is blocked", "run-check", "--gate", "M0-CONSOLIDATION", "--name", "x", "--", sys.executable, "ok.py")
+        self.assertEqual(self.run_tool("unblock", "--gate", "M0-CONSOLIDATION", "--note", "resolved"), 0)
+        self.assertEqual(self.ledger()["gates"][0]["status"], "pending")
+        self.refuses("after RELEASE-PREP", "add-round", "--round", "5")
+
+    def test_only_device_rows_may_fail(self):
+        self.assertNotEqual(self.run_tool("run-check", "--gate", "M0-CONSOLIDATION", "--name", "bad", "--", sys.executable, "bad.py"), 0)
+        self.assertEqual(self.run_tool("seal", "--gate", "M0-CONSOLIDATION", "--allow-failures"), 0)
+        self.refuses("only device rows may be recorded as fail", "record", "--gate", "M0-CONSOLIDATION", "--result", "fail")
+
+
+class SteeringDocumentTests(unittest.TestCase):
+    """validate_autocreator.py: each check accepts the good case and names the bad one."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.catalog = json.loads((ROOT_DIR / "docs/catalog/experience-catalog.json").read_text())
+        cls.index = json.loads((ROOT_DIR / "docs/catalog/feature-index.json").read_text())
+        cls.briefs = json.loads((ROOT_DIR / "docs/catalog/unified-app-features.json").read_text())
+        cls.doc = (ROOT_DIR / "Auto-Creator.md").read_text()
+
+    def copy(self, value):
+        return json.loads(json.dumps(value))
+
+    def test_catalog_allocation(self):
+        self.assertEqual(steering.check_catalog(self.catalog), [])
+        bad = self.copy(self.catalog)
+        bad["experiences"][30]["tier"] = "premium"                      # a Round 2 game sold as premium
+        self.assertTrue(any("free tier" in p for p in steering.check_catalog(bad)))
+        bad = self.copy(self.catalog)
+        bad["experiences"][120]["release"], bad["experiences"][120]["tier"] = "launch", "premium"   # a 101st launch experience
+        self.assertTrue(any("exactly 100" in p for p in steering.check_catalog(bad)))
+        bad = self.copy(self.catalog)
+        bad["experiences"][5]["id"] = bad["experiences"][4]["id"]
+        self.assertTrue(any("duplicate experience id" in p for p in steering.check_catalog(bad)))
+        bad = self.copy(self.catalog)
+        bad["experiences"][50], bad["experiences"][51] = bad["experiences"][51], bad["experiences"][50]   # queue reordered
+        self.assertTrue(steering.check_catalog(bad))
+
+    def test_game_specs(self):
+        self.assertEqual(steering.check_game_specs(self.catalog, self.index), [])
+        bad = self.copy(self.index)
+        victim = next(f for f in bad["features"] if f["id"] == "R03-G01-04")
+        del victim["prompts"]["converge"]
+        self.assertTrue(any("R03-G01-04: missing stage prompts converge" in p for p in steering.check_game_specs(self.catalog, bad)))
+        bad = self.copy(self.index)
+        bad["features"] = [f for f in bad["features"] if f["id"] != "R02-G07-10"]
+        self.assertTrue(any("R02-G07: expected ten game features" in p for p in steering.check_game_specs(self.catalog, bad)))
+        legacy = {"features": [{"feature": "040", "gate": "A05-P01", "commands": [{"command": "speckit-specify"}, {"command": "speckit-implement"}]}]}
+        self.assertTrue(any("does not end with implement and converge" in p for p in steering.check_game_specs(self.catalog, self.index, legacy)))
+
+    def test_briefs_and_prompts(self):
+        self.assertEqual(steering.check_briefs(self.briefs), [])
+        for b in self.briefs["features"]:
+            prompts = planidx.unified_prompts(b)
+            self.assertEqual(list(prompts), planidx.STAGES)
+            for stage, text in prompts.items():
+                self.assertTrue(text.startswith(f"/speckit-{stage} "), (b["id"], stage))
+                self.assertIn(f"FR-{b['namespace']}-###", text)
+        bad = self.copy(self.briefs)
+        bad["features"][3]["acceptance"] = []
+        bad["features"][4]["number"] = 250
+        bad["features"][5]["depends_on"] = ["UA-F99"]
+        problems = steering.check_briefs(bad)
+        for needle in ("UA-F03: empty acceptance", "numbers are not 186..200", "UA-F05: depends on unknown feature UA-F99"):
+            self.assertTrue(any(needle in p for p in problems), needle)
+
+    def test_structure(self):
+        self.assertEqual(steering.check_structure(self.doc, self.catalog, self.briefs), [])
+        self.assertTrue(any("not numbered" in p for p in steering.check_structure(self.doc.replace("\n## 12. ", "\n## 13. ", 1), self.catalog, self.briefs)))
+        self.assertTrue(any("no card for A05" in p for p in steering.check_structure(self.doc.replace("### A05 Infinite Geometry", "### A05 Renamed"), self.catalog, self.briefs)))
+        self.assertTrue(any("missing anchor" in p for p in steering.check_structure(self.doc + "\n[x](#no-such-heading)\n", self.catalog, self.briefs)))
+        self.assertTrue(any("duplicate requirement ids: E-01" in p for p in steering.check_structure(self.doc + "\n| E-01 again | x |\n", self.catalog, self.briefs)))
+        self.assertTrue(any("UA-F02: no /speckit-converge" in p for p in steering.check_structure(self.doc.replace("#### UA-F02 `/speckit-converge`", "#### UA-F02 converge"), self.catalog, self.briefs)))
+
+    def test_continuation_prompt_is_last_and_complete(self):
+        self.assertEqual(steering.check_continuation(self.doc), [])
+        self.assertTrue(steering.check_continuation(self.doc + "\n## 29. Afterword\n\ntext\n"))
+        self.assertTrue(any("ends the file" in p for p in steering.check_continuation(self.doc + "\nA trailing remark.\n")))
+        self.assertTrue(any("STOP CONDITIONS" in p for p in steering.check_continuation(self.doc.replace("STOP CONDITIONS", "WHEN TO PAUSE"))))
+        self.assertTrue(any("guard-device" in p for p in steering.check_continuation(self.doc.replace("guard-device", "guard"))))
+        swapped = self.doc.replace("  3. UA-F08: the single USD 1.99 StoreKit 2 unlock with SKTestSession tests.\n", "")
+        swapped = swapped.replace("  1. Unified-app features first:", "  0. UA-F08: the single USD 1.99 StoreKit 2 unlock first.\n  1. Unified-app features first:")
+        self.assertTrue(any("order of work" in p for p in steering.check_continuation(swapped)))
+        self.assertTrue(any("user interface" in p for p in steering.check_continuation(self.doc.replace("Do not operate the Xcode\nuser interface.", "Then click Run in Xcode."))))
+
+    def test_prices(self):
+        self.assertEqual(steering.check_prices("a.md", 'The unlock costs USD 1.99. The archive says "$2.99" and "$1.99–$4.99 one-time purchase".'), [])
+        self.assertTrue(steering.check_prices("a.md", "Each game costs $2.99."))
+        self.assertTrue(steering.check_prices("a.md", "The unlock costs USD 2.49."))
+        self.assertTrue(steering.check_prices("a.json", '{"price": "$2.99"}'))
+        self.assertEqual(steering.check_prices("a.json", '{"price": "USD 1.99"}'), [])
+
+    def test_monetization(self):
+        good = ("No advertising of any kind, ever. No ad or tracking SDKs, ad identifiers, subscriptions,\n"
+                "consumables, external payment paths, dark patterns or required accounts.\n\n"
+                "One non-consumable product at USD 1.99.\n\n"
+                "| Advertising code in the binary | none |\n"
+                "- **Non-goals:** Social accounts; cloud sharing and subscription infrastructure.\n")
+        self.assertEqual(steering.check_monetization("a.md", good), [])
+        for bad in ("The free tier is supported by ads.", "Players can watch a rewarded video for hints.",
+                    "A monthly subscription unlocks the premium library.", "Hints are sold as consumables."):
+            self.assertTrue(steering.check_monetization("a.md", bad), bad)
+
+    def test_secrets(self):
+        self.assertEqual(steering.check_secrets("a.md", "commit 38d98ebb376088e18f053f3cc39d246a7e7dd3b3, product type iPhone15,4"), [])
+        for bad in ("device 00008120-001A2B3C4D5E6F78", "simulator 4E32B01D-7911-4A64-A944-877DDD445BC0", "DEVELOPMENT_TEAM = ABCDE12345",
+                    "write to someone@example.com", "-----BEGIN RSA PRIVATE KEY-----", "token ghp_abcdefghijklmnopqrstuvwxyz0123"):
+            self.assertTrue(steering.check_secrets("a.md", bad), bad)
+
+    def test_links_and_scripts(self):
+        with tempfile.TemporaryDirectory() as t:
+            d = Path(t)
+            (d / "scripts").mkdir()
+            (d / "scripts/real.py").write_text("")
+            (d / "other.md").write_text("x")
+            text = ("[ok](other.md) [web](https://example.com) [gone](missing.md)\n`scripts/real.py` `scripts/verify_experiences.py` "
+                    "`scripts/invented.py`\n```\n[in code](nowhere.md) scripts/also_invented.py\n```\n")
+            (d / "doc.md").write_text(text)
+            problems = steering.check_links(d, "doc.md", text)
+            self.assertEqual(len(problems), 2)
+            self.assertTrue(any("broken link missing.md" in p for p in problems))
+            self.assertTrue(any("scripts/invented.py does not exist" in p for p in problems))
+
+    def test_bootstrap(self):
+        text = (ROOT_DIR / "CLAUDE.md").read_text()
+        self.assertEqual(steering.check_bootstrap(text), [])
+        self.assertTrue(any("under 12,000" in p for p in steering.check_bootstrap(text + "x" * 12000)))
+        self.assertTrue(any("DO NOT UPDATE D3" in p for p in steering.check_bootstrap(text.replace("DO NOT UPDATE D3", "keep D3"))))
+
+    def test_renderer(self):
+        self.assertEqual(render.anchor("11. App architecture"), "11-app-architecture")
+        self.assertEqual(render.anchor("Part I — Orientation"), "part-i--orientation")
+        self.assertEqual(render.headings("# A\n```\n# not a heading\n```\n## B\n"), [(1, "A"), (2, "B")])
+        with tempfile.TemporaryDirectory() as t:
+            d = Path(t)
+            for rel in ("docs/catalog/experience-catalog.json", "docs/catalog/feature-index.json", "docs/catalog/unified-app-features.json",
+                        "docs/catalog/shared-feature-map.json", ".autonomy/migration/ledger.json", "docs/migration/source-to-canonical-matrix.csv"):
+                (d / rel).parent.mkdir(parents=True, exist_ok=True)
+                (d / rel).write_bytes((ROOT_DIR / rel).read_bytes())
+            stale = self.doc.replace("| 1 | [A01]", "| 1 | [A01-edited-by-hand]", 1) + ""
+            (d / "Auto-Creator.md").write_text(stale.replace("<!-- GENERATED:BEGIN backlog -->", "<!-- GENERATED:BEGIN mystery -->").replace("<!-- GENERATED:END backlog -->", "<!-- GENERATED:END mystery -->"))
+            current, rendered, problems = render.render(d)
+            self.assertNotEqual(current, rendered)
+            self.assertTrue(any("unknown generated block 'mystery'" in p for p in problems))
+            self.assertTrue(any("'backlog' is missing" in p for p in problems))
+
+    def test_traceability_matrix_helpers(self):
+        lines = ["# Title", "```", "# shell comment", "```", "## Real", "text", "~~~", "### also not", "~~~", "#### Deep"]
+        self.assertEqual(tracematrix.heading_lines(lines), {1: "# Title", 5: "## Real", 10: "#### Deep"})
+        self.assertEqual(tracematrix.canonical("AC-11.3"), ("Auto-Creator.md §11.3", "AC-11.3"))
+        self.assertEqual(tracematrix.canonical("archive")[1], "archive")
+        self.assertEqual(tracematrix.canonical("specs/004-resources-shaders"), ("specs/004-resources-shaders", ""))
+        self.assertIn("AC-11.3", tracematrix.sections_of(self.doc))
+        self.assertIn("AC-28", tracematrix.sections_of(self.doc))
+        with tempfile.TemporaryDirectory() as t:
+            d = Path(t)
+            (d / "docs/migration/heading-maps").mkdir(parents=True)
+            (d / "src.md").write_text("# One\n\n## Two\n\n## Three\n")
+            (d / "docs/migration/heading-maps/src.json").write_text(json.dumps({"schema": 1, "source": "src.md", "rows": [
+                {"line": 1, "heading": "# One", "target": "AC-1", "status": "planned", "note": ""},
+                {"line": 3, "heading": "## Wrong text", "target": "AC-2", "status": "planned", "note": ""},
+                {"line": 5, "heading": "## Three", "target": "AC-3", "status": "done", "note": ""}]}))
+            rows, problems = tracematrix.heading_rows(d, {"experiences": []}, {"features": []}, {})
+            self.assertEqual([r["source_id"] for r in rows], ["# One"])
+            self.assertTrue(any("line 3 is not the heading" in p for p in problems))
+            self.assertTrue(any("unknown status 'done'" in p for p in problems))
+            self.assertTrue(any("heading at line 3 is not mapped" in p for p in problems))
+
+    def test_repository_is_consistent(self):
+        """The real repository passes every steering check (this is the CI wiring of the validator)."""
+        results = steering.validate(ROOT_DIR)
+        self.assertEqual(list(results), list(steering.CHECKS))
+        self.assertEqual({name: problems for name, problems in results.items() if problems}, {})
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

@@ -309,7 +309,7 @@
    "disposition": "superseded",
    "existing": [],
    "home": "",
-   "note": "Reconciliation and evidence lock are LOCK-FREE-50 and UA-F12."
+   "note": "Reconciliation before devices is LOCK-FREE-50 and UA-F12; its device part is DEVICE-RECONCILE-100 (C-18)."
   }
  },
  "rounds-03-12": {

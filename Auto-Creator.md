@@ -14,7 +14,6 @@ change the data and run `python3 scripts/render_autocreator.py`.
 ## Contents
 
 <!-- GENERATED:BEGIN toc -->
-  - [Contents](#contents)
 - **[Part I — Orientation](#part-i--orientation)**
   - [1. Vision](#1-vision)
   - [2. How to use this document](#2-how-to-use-this-document)
@@ -113,7 +112,9 @@ separate owner authorization.
 **Precedence when sources disagree.** (1) Real Apple platform and toolchain behavior and observed test results.
 (2) Owner directives: ADR-0009, this document and `CLAUDE.md`. (3) The constitution and the other ADRs. (4) The
 planning archive. (5) Generated code. A requirement is never dropped because it is hard: it is implemented,
-planned, superseded with a reason, or blocked with the owner action it needs.
+planned, superseded with a reason, or blocked with the owner action it needs. An obsolete command, path or tool name
+in an archived document never cancels the requirement behind it: the requirement moves to the current mechanism.
+Inside the archive, an app's own manual outranks the brainstorm that preceded it.
 
 **Status words.** They are never merged into one green label.
 
@@ -125,6 +126,9 @@ planned, superseded with a reason, or blocked with the owner action it needs.
 | `DEVICE_VERIFIED` | real signed hardware tests passed with result bundles and reports |
 | `READY_FOR_OWNER_RELEASE_REVIEW` | every mandatory check passed; owner actions remain |
 | `BLOCKED_OWNER_ACTION` | work stops on this item until the owner acts; the exact steps are recorded |
+| `NOT_RUN` | a required check that has not been executed; never shown as pass or as fail |
+| `AUTOMATION_READY` | the automation for a device-only check exists and passes its dry run; the check itself has not run |
+| `NOT_REQUIRED` | waived by a dated owner ruling, written next to the still unticked task as "not required (owner ruling YYYY-MM-DD): reason" |
 
 **Identifiers.**
 
@@ -158,7 +162,7 @@ snapshot. For the live state run the commands at the end of the section.
 | Repository | `main` at commit `38d98eb`, identical to `origin/main`; consolidation work on branch `migration/unified-app-plan`, not pushed | baseline §1 |
 | Framework | `Packages/VisualCore` (pure Swift: Math, Simulation, Scenes, Parameters, Persistence, ShaderSource, EffectsGraph, Diagnostics, TestSupport, Baselines) and `Packages/VisualCoreRendering` (EGL and GL shims, Rendering, Effects, UI, Automation) | legacy gates F00–F09, `specs/001`–`010` |
 | Framework modules without functionality | `VisualCoreAudio` and `VisualCoreAudioDSP` hold only a version constant | ADR-0006 |
-| Showcase and harnesses | `Showcase`, `InteractiveDemo`, `SecondConsumer` (Lumen Garden), `ProjectMReference` | gates F06–F09 |
+| Showcase and harnesses | `Showcase`, `InteractiveDemo`, `SecondConsumer` (Lumen Garden), `ProjectMReference` | gates F05–F08 |
 | A01 Generative Art Studio | standalone app, all seven phases sealed | gates A01-P00 … A01-P06, `specs/011`–`017` |
 | A02 Fluid Art Playground | standalone app, all seven phases sealed | gates A02-P00 … A02-P06, `specs/018`–`024` |
 | A03 Fractal Explorer | standalone app, all seven phases sealed | gates A03-P00 … A03-P06, `specs/025`–`031` |
@@ -249,6 +253,9 @@ The reasoning, the alternatives and the resolved conflicts (C-01 … C-11) are i
 | D-12 | Two ledgers | 25 |
 | D-13 | Work stays on the migration branch | 24.4 |
 | D-14 | Archive instead of deletion | 26 |
+| D-15 | The app is fully offline: no network request of its own; purchases go through StoreKit | 15.2 |
+| D-16 | The launch set is never reduced: a failing concept is redesigned inside its concept, never dropped, merged or replaced | 6.5 |
+| D-17 | Human-judgement reviews are owner reviews and do not gate simulator gates or locks; their automated proxies do | 6.5, 23.3 |
 
 ### 4.3 Owner decisions that are open
 
@@ -263,7 +270,10 @@ campaign.
 | OD-04 | How and when the migration branch is merged to `main` | stay on `migration/unified-app-plan` |
 | OD-05 | Pushing the migration branch to `origin` | not pushed; a `git bundle` outside the repository at each milestone |
 | OD-06 | Signing team, certificates, profiles, sandbox tester, App Store Connect record and agreements | none; device work reports `BLOCKED_OWNER_ACTION` |
-| OD-07 | Minimum OS and device families | iOS and iPadOS 26.0, iPhone and iPad |
+| OD-07 | Minimum OS and device families. The roster covers iOS 27 on iPhone and iPadOS 26.5 and 27 on iPad; an iPhone on iOS 26 is not covered by any test device | iOS and iPadOS 26.0, iPhone and iPad; published claims name only the tested models and OS versions |
+| OD-08 | Length of the device stress sessions (about 150 device-hours over the campaign as the sources specify them) | as the sources say: 30 minutes per game on each device, ten minutes for a creative experience whose class warrants it |
+| OD-09 | Who performs the human reviews (distinctiveness, visual quality of hero scenes, five-second goal recognition, outside-player comprehension, VoiceOver) and when | the owner, before release; recorded, non-gating for gates and locks |
+| OD-10 | What happens to a launch experience that still fails after a redesign inside its concept | its gate stays blocked; nothing is dropped, merged or replaced |
 
 ### 4.4 Non-goals of the first release
 
@@ -282,7 +292,7 @@ category, family, score, design data and the exact file and line span of its sou
 <!-- GENERATED:BEGIN catalog-summary -->
 | Collection | Codes | Experiences | Kind | Tier | Release | Source document |
 |---|---|---:|---|---|---|---|
-| original | A01 … A25 | 25 | creative-app | free | launch | `docs/archive/planning/embedded/apps/ (25 manuals)` |
+| original | A01 … A25 | 25 | creative-app | free | launch | `docs/archive/planning/embedded/apps/` (25 manuals) |
 | round-02 | R02-G01 … R02-G25 | 25 | game | free | launch | `docs/archive/planning/rounds/round2.md` |
 | round-03 | R03-G01 … R03-G25 | 25 | game | premium | launch | `docs/archive/planning/rounds/round3.md` |
 | round-04 | R04-G01 … R04-G25 | 25 | game | premium | launch | `docs/archive/planning/rounds/round4.md` |
@@ -452,11 +462,11 @@ recorded. The contract is what "implemented" means in this project.
 |---|---|
 | E-01 Launch | Opening the experience from the launcher reaches a rendered, interactive first frame without a crash, a blank frame or a blocking prompt. Shaders are compiled during preparation, not on the first interactive frame. |
 | E-02 Real rendering | The picture comes from the experience's own scene through the session host and the real renderer. A frame passes a non-blank check and a semantic probe that depends on the experience's state (for example: the placed emitter is visible where it was placed). |
-| E-03 Input | Every documented control changes the domain state in the documented way. Input is normalized into domain actions. An invalid action is rejected with a typed reason and leaves the state digest unchanged. |
+| E-03 Input | Every documented control changes the domain state in the documented way. Input is normalized into domain actions. An invalid action is rejected with a typed reason and leaves the state digest unchanged. Touch is the primary input: a game can be completed with touch alone and never requires a keyboard, pointer, controller, network, motion sensor, microphone, camera or location. |
 | E-04 Determinism | `prepare(seed:)` with the same seed gives the same state digest. Domain updates run in fixed steps and do not depend on frame rate. Outcomes are decided by CPU state, never by reading back pixels. |
 | E-05 Save and restore | State is saved automatically at suspension and at safe points. After termination and relaunch the experience restores to the same digest. A snapshot from an older schema migrates; a corrupted or newer one produces a recoverable message with Reset and never a crash. |
 | E-06 Reset | Reset returns the experience to the state of a fresh preparation with the same seed and clears only its own storage. |
-| E-07 Outcome | The experience reaches a meaningful outcome and gives a reason to return: a creative experience produces and keeps a piece of work (preset, composition, export) as its manual requires; a game can be won and lost by its exact rules, records progress, and offers the next level. |
+| E-07 Outcome | The experience reaches a meaningful outcome and gives a reason to return: a creative experience produces and keeps a piece of work (preset, composition, export) as its manual requires; a game can be won and lost by its exact rules, records progress, and offers the next level. A UI test of every game reaches win, failure, undo, replay and persistence of the replay: full gameplay, not a looping demo. |
 | E-08 Suspend and resume | Backgrounding stops clocks and work; foregrounding resumes without catching up and without a visible jump. Interruptions (calls, audio session interruptions, split view resize) are handled. |
 | E-09 Teardown and re-entry | Leaving releases every GPU resource of the session (live and leaked counts are zero). Opening the experience again, or another one, works; 50 open and close cycles do not grow memory or GPU bytes. |
 | E-10 Cancellation | Leaving while the experience is still preparing cancels the work; nothing arrives after deactivation. |
@@ -471,14 +481,21 @@ recorded. The contract is what "implemented" means in this project.
 - **Creative experiences (A01–A25).** Every required feature of the card in section 7 is implemented, every
   regression fixture of the card is an automated test, and all seven phases of the app are sealed in the legacy
   ledger.
-- **Round 2 games.** 100 levels, each certified solvable by the game's solver with a stored witness; a tutorial
+- **Round 2 games.** The 100 levels of the game's level catalog (chapter section 18; it is canonical where the
+  chapter's earlier, shorter manifests differ), each generated from its seed and certified solvable by the game's
+  solver with a stored witness; the 80 acceptance scenarios of chapter section 19 as automated tests; a tutorial
   that teaches every rule the levels use; hints; undo where the rules allow it; progress and best results kept;
   the ten game features of section 8 sealed.
 - **Round 3 and 4 games.** The 100 levels of the game's archived level manifest, each with its seed, a machine
   checkable win witness and a rejection case; the 80 acceptance scenarios and the 50 fault-injection cases of its
   chapter as automated tests; the ten game features of section 9 sealed.
-- The level counts are requirements, not goals. A game with fewer certified levels than its source specifies does
-  not pass.
+- **Levels are generated, not written down.** Seeds are built before certification. A seed without a valid and
+  unambiguous solution is rejected, and the next salt is taken deterministically and logged. Levels fall into five
+  difficulty bands; level 001 teaches one control; levels 020, 040, 060, 080 and 100 close a chapter; every level
+  replays deterministically and gives the same digest on ten repeats.
+- The level counts are requirements, not goals. A level that exists only as a row in a document is not done. If
+  100 valid levels cannot be produced, that is a recorded design blocker, never a reason to fabricate levels. A
+  game with fewer certified levels than its source specifies does not pass.
 
 ### 6.3 What is not allowed
 
@@ -493,6 +510,8 @@ recorded. The contract is what "implemented" means in this project.
 5. Unbounded work: a loop, recursion, allocation or shader iteration count without a documented limit.
 6. A claim in any document, test name or metadata that an experience is implemented, verified or performant
    without the evidence defined in section 22.
+7. Anything fabricated: a scheme, a device identifier, a run, a benchmark, an entitlement, a dataset or a
+   screenshot. Blocked is never reported as skipped or as passed, and a failed required test never becomes optional.
 
 ### 6.4 Evidence for the integration gate
 
@@ -504,6 +523,39 @@ experience changed the framework, the API checks and the ProjectM reference regr
 Capabilities that only hardware can prove (microphone signal quality, thermal behavior, real frame pacing, haptics)
 are listed for the experience as *pending hardware verification* and become tasks of the device campaign. Core
 gameplay, rendering, persistence and purchase behavior can never be on that list.
+
+Three groups of free experiences have claims that only devices can prove, and for them the line is drawn
+explicitly. The audio experiences A06–A08 are complete on the simulator when their logic, interface, synthetic
+signal paths, permission handling and persistence pass; the claim that a particular audio source works is a
+device task. A24 Graphics Benchmark Lab is complete when its scenes, measurement pipeline and reports work; the
+measurements themselves are device results. For A09, A18 and A21, idle power and thermal behavior are device
+tasks.
+
+### 6.5 Rules for every game
+
+1. Each game has at least one real three-dimensional interaction, a win state and a fail state, pause and replay,
+   and progress that is kept offline.
+2. Each chapter states twelve invariants and each is a test: fixed step, input budget, goal, repeatability, undo, a
+   witness per level, honest failure, finite values, atomic save, renderer purity, nothing sold inside the game,
+   and novelty.
+3. Every gesture has a stepper alternative. No solution depends on timing precision or on flicker.
+4. Quality tiers trade samples, layers and resolution and never change what a scene means or what a level requires.
+5. Saves are atomic, carry a checksum and recover from corruption.
+6. The automation of each game has these run modes: launch, tutorial, win, fail, undo, restore, hero, stress,
+   accessibility, container scan, exit.
+7. A game's constants (tolerances, budgets, step size) change only through a recorded decision with a test that
+   proves the change.
+8. The hero scene is checked at a fixed camera and seed: a screenshot with a semantic description of the scene,
+   histogram, no black frame, no non-finite value, silhouette bounds, and a tolerant pixel comparison. A known-good
+   reference image is never overwritten.
+9. **Human reviews do not gate.** Whether a scene is beautiful, whether two games feel distinct, whether a
+   newcomer understands the goal within five seconds and the outside-player comprehension test are owner reviews
+   (OD-09). They are recorded before release. The automated checks of this section and of section 22 are what
+   gates.
+10. **The launch set is never reduced.** The sources allow a concept to be killed, pivoted or merged after a
+    prototype. For the 100 launch experiences that verdict is not available: a concept that fails its criteria is
+    redesigned inside its concept, with the failed evidence and the redesign recorded in an ADR. If it still
+    fails, its gate is blocked for the owner (OD-10). Nothing is dropped, merged or replaced.
 
 ## 7. Free library I: the 25 creative experiences (A01–A25)
 
@@ -530,6 +582,50 @@ Standard for every creative experience: a meaningful product with its own identi
 core interaction and persistence of its manual, deterministic sample data, stress and error scenarios, and
 documented supported and unsupported platform features. A module that compiles but lacks its core interaction
 fails.
+
+All 25 are mandatory and are built in the order 01 to 25. The "waves" of the source are hints about shared
+dependencies, not a different order.
+
+Minimum proof per phase:
+
+| Phase | Minimum proof before the gate |
+|---|---|
+| P00 | read-only audit of the framework surfaces the app will use; gaps recorded |
+| P01 | host unit tests of the domain core and basic simulator UI tests |
+| P02 | real GPU scene evidence on the simulator |
+| P03 | every mandatory workflow, including its negative cases |
+| P04 | content parsing and validation of snapshots and exports |
+| P05 | quotas and limits, accessibility, privacy, localization readiness, crash and fuzz tests |
+| P06 | independent full verification of the whole experience |
+
+Rules by class of experience:
+
+- **Simulations** (fluid, particles, rays, physics, fractals, orbits): fixed step, explicit units and camera
+  conventions, saved seed and configuration, bounded iteration counts, a stated policy for overflow and non-finite
+  values, and comparison with independent CPU reference formulas.
+- **Audio** (A06–A08): the source is chosen natively and labelled honestly, including "unavailable"; permission
+  denial, route changes and interruptions are handled; real-time callbacks neither allocate nor wait on a lock;
+  buffers and latency are bounded; captured audio is not retained.
+- **Science** (A14, A15, A17): sourced data with revision notes and uncertainty where it matters; accuracy is
+  reviewed separately from rendering; anatomy is education, never diagnosis or treatment.
+- **Authoring tools** (A22, A23, A25): untrusted shaders, graphs and imports are bounded; cycles and invalid paths
+  are rejected; passes, texture memory and compile time have caps; a failure is handled gracefully.
+- **Ambient** (A18–A21): export of images and video only through the public share and save APIs, checked before
+  the feature is designed; the app never claims to install an always-running animated wallpaper; battery,
+  brightness, Reduce Motion and Reduce Flashing are respected.
+- **Benchmark** (A24): repeatable measurements are kept apart from thermal and device-dependent ones; no GPU
+  timing precision is claimed unless a platform API provides it.
+- Every parser, shader compile and graph evaluation is bounded, recoverable and fuzz-tested; sizes, ranges and
+  durations have limits.
+
+The manuals are plans, not evidence, and the API, file and package names in them are provisional. Monetization
+ideas in the brainstorm (paid packs, premium themes, scene packs, collectible environments, subscriptions) are
+superseded: every creative experience is free and complete.
+
+**Code-only visuals apply here too.** Some manuals mention licensed or purchased meshes, textures, atlases or
+streamed asset packs (A12 Tiny Worlds, A17 Interactive Anatomy). Under P-06 the geometry and imagery of those
+experiences are generated by code. Bundled *data* (numbers, names, structures, measurements) is allowed with a
+license and a provenance record. The card text below is the source's wording; this paragraph prevails.
 
 <!-- GENERATED:BEGIN cards-creative -->
 ### A01 Generative Art Studio
@@ -1123,7 +1219,7 @@ Weave and phase-shift 3D luminous ribbons into target harmonies.
 - **Controls:** drag an anchor to displace a ribbon, rotate an orbital dial to change phase; two-finger pan camera.
 - **Model:** core abstraction spectral ribbon phase; state: A ribbon is a swept cubic spline with phase q(s,t)=k*s+omega*t+phi; controls quantize k and phi into sixteen stable ticks; fixed step 0.008333 s; solver: bounded phase-gradient coordinate descent with exact grid search fallback; truth metric: wrapped phase residual, no aesthetic-only success check.
 - **Look (code only):** camera-depth layered auroral silk with refractive-looking interference; geometry: parallel transport ribbon frame with bevel edge shading; signature shader: Layered ribbon meshes with wave displacement and fragment interference patterns; palette: polar teal, magenta, acid-gold.
-- **Content:** 100 solver-certified levels (the source's revised ship target; its first milestone is "80 solver-certified stages").
+- **Content:** 100 solver-certified levels: the catalog in lines 2884–2989 is canonical (`python3 scripts/planning_index.py levels --experience R02-G01`); 80 acceptance scenarios in lines 2990–3075. The chapter header's earlier figure ("80 solver-certified stages") and its shorter manifests are milestones only.
 - **Shared features used:** R02-F02, R02-F03, R02-F04, R02-F05, R02-F06, R02-F07, R02-F08, R02-F10, R02-F22, R02-F23, R02-F24, R02-F26; the remaining shared dependencies of the source are delivered by unified-app features (section 13).
 - **Source:** `docs/archive/planning/rounds/round2.md` lines 2061–3144 (23 sections); assertion outline lines 29449–29513. Prompts: `python3 scripts/planning_index.py prompt --feature R02-G01-01 --override`.
 
@@ -1137,7 +1233,7 @@ Tune two coupled frequencies so a moving point traces a safe path.
 - **Controls:** rotate the dual dials for frequency and phase; tap preview and trace scrubber.
 - **Model:** core abstraction three-axis harmonic path planning; state: x=A*sin(a*t+phi), y=B*sin(b*t), z=C*cos(c*t+psi); ratios from 1:1 to 9:8 with rational periods; fixed step 0.004167 s; solver: enumerate coprime frequency pairs and phase offsets with segment-swept collision tests; truth metric: minimum segment-obstacle clearance and checkpoint arc order.
 - **Look (code only):** luminous ink threads composing a slow-motion 3D mathematical flower; geometry: adaptive curve tessellation with tangent-space width; signature shader: elegant 3D luminous harmonic curves weave through obstacles; Analytic oscillators, Fourier curve meshes, interference heightfields and emissive color; palette: cobalt, violet and copper.
-- **Content:** 100 solver-certified levels (the source's revised ship target; its first milestone is "90 solver-certified stages").
+- **Content:** 100 solver-certified levels: the catalog in lines 3987–4092 is canonical (`python3 scripts/planning_index.py levels --experience R02-G02`); 80 acceptance scenarios in lines 4093–4178. The chapter header's earlier figure ("90 solver-certified stages") and its shorter manifests are milestones only.
 - **Shared features used:** R02-F02, R02-F03, R02-F04, R02-F05, R02-F06, R02-F07, R02-F08, R02-F22, R02-F23, R02-F24, R02-F26; the remaining shared dependencies of the source are delivered by unified-app features (section 13).
 - **Source:** `docs/archive/planning/rounds/round2.md` lines 3145–4247 (23 sections); assertion outline lines 29514–29578. Prompts: `python3 scripts/planning_index.py prompt --feature R02-G02-01 --override`.
 
@@ -1151,7 +1247,7 @@ Drag spectral control points to untie closed three-dimensional wave knots.
 - **Controls:** drag depth-aware handles with snapping; two-finger orbit for occlusion disambiguation.
 - **Model:** core abstraction topological strand manipulation; state: closed Catmull-Rom or cubic B-spline samples; handle motion must preserve minimum clearance unless explicit crossing gates permit changes; fixed step 0.008333 s; solver: constraint relaxation on control points with segment intersection and isotopy checks; truth metric: crossing graph parity and clearance margins.
 - **Look (code only):** glasslike light ropes braided through space with beat-driven caustic pulses; geometry: parallel-transport tube splines and additive glow shells; signature shader: luminous torus knots pulse in synchronized colors; Analytic oscillators, Fourier curve meshes, interference heightfields and emissive color; palette: pearl, sapphire and ember.
-- **Content:** 100 solver-certified levels (the source's revised ship target; its first milestone is "72 solver-certified stages").
+- **Content:** 100 solver-certified levels: the catalog in lines 5054–5159 is canonical (`python3 scripts/planning_index.py levels --experience R02-G03`); 80 acceptance scenarios in lines 5160–5245. The chapter header's earlier figure ("72 solver-certified stages") and its shorter manifests are milestones only.
 - **Shared features used:** R02-F02, R02-F03, R02-F04, R02-F05, R02-F06, R02-F07, R02-F08, R02-F22, R02-F23, R02-F24, R02-F26; the remaining shared dependencies of the source are delivered by unified-app features (section 13).
 - **Source:** `docs/archive/planning/rounds/round2.md` lines 4248–5314 (23 sections); assertion outline lines 29579–29643. Prompts: `python3 scripts/planning_index.py prompt --feature R02-G03-01 --override`.
 
@@ -1165,7 +1261,7 @@ Rotate a spectral compass to find a hidden target in a colored fog field.
 - **Controls:** swipe to rotate compass, press to sample a clue, separate high-contrast colorblind symbols.
 - **Model:** core abstraction chromatic inference in fog; state: hue hue=(atan2(y,x)+offset)/(2*pi); clues use hue differences and optical depth; luminance remains independently perceivable; fixed step 0.016667 s; solver: sample known target field with discretized compass bearings and uniqueness tests; truth metric: angular error with noncolor secondary state.
 - **Look (code only):** prismatic glass vectors floating within luminous spectral fog; geometry: instanced translucent prisms and analytic fog depth; signature shader: 3D color cones and moving luminous vector arrows; GLSL hue transforms, procedural glass polygons, spline light tubes and glow; palette: full-spectrum wheel with grayscale evidence glyphs.
-- **Content:** 100 solver-certified levels (the source's revised ship target; its first milestone is "76 solver-certified stages").
+- **Content:** 100 solver-certified levels: the catalog in lines 6130–6235 is canonical (`python3 scripts/planning_index.py levels --experience R02-G04`); 80 acceptance scenarios in lines 6236–6321. The chapter header's earlier figure ("76 solver-certified stages") and its shorter manifests are milestones only.
 - **Shared features used:** R02-F02, R02-F03, R02-F04, R02-F05, R02-F06, R02-F07, R02-F09, R02-F10, R02-F22, R02-F23, R02-F24, R02-F26; the remaining shared dependencies of the source are delivered by unified-app features (section 13).
 - **Source:** `docs/archive/planning/rounds/round2.md` lines 5315–6390 (23 sections); assertion outline lines 29644–29708. Prompts: `python3 scripts/planning_index.py prompt --feature R02-G04-01 --override`.
 
@@ -1179,7 +1275,7 @@ Carve sluices to direct colored light-fluid into target basins.
 - **Controls:** drag short sluice edits and tap valves; pause/step/undo.
 - **Model:** core abstraction conservative terrain-channel dye transport; state: cell volumes q_{t+1}=q_t+inflow-outflow; fixed dt and capacity; color mass is conserved separately; no unstable free-surface CFD; fixed step 0.016667 s; solver: coarse-grid deterministic water routing with graph reachability and conservation assertions; truth metric: total fluid and dye-mass drift per tick.
 - **Look (code only):** liquid neon waterfalls carving bright channels across miniature mesa terrain; geometry: heightfield mesh, generated surface normals, shader flow-map bands; signature shader: Heightfield canyons with spectral dye particles and flow-map water shaders; palette: electric cyan, coral, yellow.
-- **Content:** 100 solver-certified levels (the source's revised ship target; its first milestone is "100 solver-certified stages").
+- **Content:** 100 solver-certified levels: the catalog in lines 7256–7361 is canonical (`python3 scripts/planning_index.py levels --experience R02-G05`); 80 acceptance scenarios in lines 7362–7447. The chapter header's earlier figure ("100 solver-certified stages") and its shorter manifests are milestones only.
 - **Shared features used:** R02-F02, R02-F03, R02-F04, R02-F05, R02-F06, R02-F07, R02-F10, R02-F16, R02-F17, R02-F18, R02-F22, R02-F23, R02-F24, R02-F26; the remaining shared dependencies of the source are delivered by unified-app features (section 13).
 - **Source:** `docs/archive/planning/rounds/round2.md` lines 6391–7516 (23 sections); assertion outline lines 29709–29773. Prompts: `python3 scripts/planning_index.py prompt --feature R02-G05-01 --override`.
 
@@ -1193,7 +1289,7 @@ Record and replay a constellation's motion until all stars align.
 - **Controls:** scrub timeline; drag a star start marker; record and rewind without ambiguity.
 - **Model:** core abstraction time-based synchronized star routing; state: timeline is an event log of tick-indexed actions; replay uses fixed-step deterministic integration and signed snapshots; fixed step 0.008333 s; solver: integer-tick phase search for replay windows and time offsets; truth metric: tick-accurate replay hash and synchronized target-cell occupancy.
 - **Look (code only):** glowing temporal ribbons resembling a woven astronomical score; geometry: polyline history cache with predictable alpha decay; signature shader: 3D star traces accumulate into glowing history ribbons; Deterministic timeline buffers, ghost trails, reversible deformation shaders; palette: indigo, silver and rose.
-- **Content:** 100 solver-certified levels (the source's revised ship target; its first milestone is "78 solver-certified stages").
+- **Content:** 100 solver-certified levels: the catalog in lines 8336–8441 is canonical (`python3 scripts/planning_index.py levels --experience R02-G06`); 80 acceptance scenarios in lines 8442–8527. The chapter header's earlier figure ("78 solver-certified stages") and its shorter manifests are milestones only.
 - **Shared features used:** R02-F02, R02-F03, R02-F04, R02-F05, R02-F06, R02-F07, R02-F08, R02-F14, R02-F22, R02-F23, R02-F24, R02-F26; the remaining shared dependencies of the source are delivered by unified-app features (section 13).
 - **Source:** `docs/archive/planning/rounds/round2.md` lines 7517–8596 (23 sections); assertion outline lines 29774–29838. Prompts: `python3 scripts/planning_index.py prompt --feature R02-G06-01 --override`.
 
@@ -1207,7 +1303,7 @@ Rotate crystalline layers to open a route for a rolling pearl.
 - **Controls:** drag each shell bezel, tap advance pearl, double tap isolate layer.
 - **Model:** core abstraction nested faceted 3D maze; state: shell rings rotate in fixed increments; connectivity graph is recomputed at angle changes; pearl uses deterministic pocket transitions; fixed step 0.008333 s; solver: breadth-first search over discretized shell angles and pearl pocket indices; truth metric: graph route length and reachable exit proof.
 - **Look (code only):** layered amethyst gem cathedral with dancing internal facet highlights; geometry: procedurally beveled wedge polyhedra with analytic faceting; signature shader: translucent nested polygons with shifting specular highlights; Beveled polyhedra, faceted signed-distance fields, instanced lattices and faux dispersion; palette: amethyst purple and cool platinum.
-- **Content:** 100 solver-certified levels (the source's revised ship target; its first milestone is "80 solver-certified stages").
+- **Content:** 100 solver-certified levels: the catalog in lines 9420–9525 is canonical (`python3 scripts/planning_index.py levels --experience R02-G07`); 80 acceptance scenarios in lines 9526–9611. The chapter header's earlier figure ("80 solver-certified stages") and its shorter manifests are milestones only.
 - **Shared features used:** R02-F02, R02-F03, R02-F04, R02-F05, R02-F06, R02-F07, R02-F11, R02-F12, R02-F22, R02-F23, R02-F24, R02-F26; the remaining shared dependencies of the source are delivered by unified-app features (section 13).
 - **Source:** `docs/archive/planning/rounds/round2.md` lines 8597–9680 (23 sections); assertion outline lines 29839–29903. Prompts: `python3 scripts/planning_index.py prompt --feature R02-G07-01 --override`.
 
@@ -1221,7 +1317,7 @@ Place cleavage planes to split a glowing crystal into target solids.
 - **Controls:** drag cut-plane rim and depth slider; tap commit for cinematic split.
 - **Model:** core abstraction finite convex polyhedra partitioning; state: planes n·x=d split convex polyhedra; compute oriented intersections; reject degenerate tiny faces; volume from signed tetrahedra; fixed step 0.008333 s; solver: convex half-space polytope clipping and exact-oriented face classification with tolerances; truth metric: volume conservation and manifold/edge incidence.
 - **Look (code only):** incandescent mineral interiors opening like a geometric blossom; geometry: half-space clipping generates per-piece indexed meshes; signature shader: fast SDF cuts reveal incandescent geometric interiors; Beveled polyhedra, faceted signed-distance fields, instanced lattices and faux dispersion; palette: ice glass, ruby, inner amber.
-- **Content:** 100 solver-certified levels (the source's revised ship target; its first milestone is "84 solver-certified stages").
+- **Content:** 100 solver-certified levels: the catalog in lines 10512–10617 is canonical (`python3 scripts/planning_index.py levels --experience R02-G08`); 80 acceptance scenarios in lines 10618–10703. The chapter header's earlier figure ("84 solver-certified stages") and its shorter manifests are milestones only.
 - **Shared features used:** R02-F02, R02-F03, R02-F04, R02-F05, R02-F06, R02-F07, R02-F11, R02-F12, R02-F22, R02-F23, R02-F24, R02-F26; the remaining shared dependencies of the source are delivered by unified-app features (section 13).
 - **Source:** `docs/archive/planning/rounds/round2.md` lines 9681–10772 (23 sections); assertion outline lines 29904–29968. Prompts: `python3 scripts/planning_index.py prompt --feature R02-G08-01 --override`.
 
@@ -1235,7 +1331,7 @@ Arrange glowing blooms to create a target flower-shaped dark silhouette.
 - **Controls:** drag stems, pinch scale, slide sun elevation; silhouette preview as exact diagnostic.
 - **Model:** core abstraction silhouette composition; state: orthographic projected polygon union rasterized into a deterministic low-resolution mask; quality measured by IoU plus boundary deviation; fixed step 0.016667 s; solver: grid-snapped candidate placements with stencil overlap and shape-distance scoring; truth metric: mask intersection-over-union and contour Hausdorff proxy.
 - **Look (code only):** black botanical silhouettes climbing through luminous pearlescent mist; geometry: L-system stems, leaf polygons and projected shadow mesh; signature shader: deep black botanical shadows on colored mist planes; Procedural solids, CPU polygonal 3D shadow projections, soft shadow approximation; palette: midnight blue, lantern coral and parchment gold.
-- **Content:** 100 solver-certified levels (the source's revised ship target; its first milestone is "76 solver-certified stages").
+- **Content:** 100 solver-certified levels: the catalog in lines 11588–11693 is canonical (`python3 scripts/planning_index.py levels --experience R02-G09`); 80 acceptance scenarios in lines 11694–11779. The chapter header's earlier figure ("76 solver-certified stages") and its shorter manifests are milestones only.
 - **Shared features used:** R02-F02, R02-F03, R02-F04, R02-F05, R02-F06, R02-F07, R02-F13, R02-F19, R02-F22, R02-F23, R02-F24, R02-F26; the remaining shared dependencies of the source are delivered by unified-app features (section 13).
 - **Source:** `docs/archive/planning/rounds/round2.md` lines 10773–11848 (23 sections); assertion outline lines 29969–30033. Prompts: `python3 scripts/planning_index.py prompt --feature R02-G09-01 --override`.
 
@@ -1249,7 +1345,7 @@ Correct a hidden signal by reversing sections of an auroral wave.
 - **Controls:** tap segment ends, swipe the interval to reverse, timeline freeze preview.
 - **Model:** core abstraction piecewise reversible wave field; state: signal samples in signed fixed precision; interval reversal must preserve seam continuity and bounded curvature; fixed step 0.008333 s; solver: interval dynamic programming over reversible wave segments and endpoint continuity constraints; truth metric: normalized signal edit distance and continuity.
 - **Look (code only):** rivers of aurora folding backward through time in synchronized waves; geometry: tessellated temporal ribbon with direction-coded pulses; signature shader: auroral ribbons fold backward along procedural timelines; Deterministic timeline buffers, ghost trails, reversible deformation shaders; palette: deep ocean cyan, pale lilac, midnight.
-- **Content:** 100 solver-certified levels (the source's revised ship target; its first milestone is "76 solver-certified stages").
+- **Content:** 100 solver-certified levels: the catalog in lines 12665–12770 is canonical (`python3 scripts/planning_index.py levels --experience R02-G10`); 80 acceptance scenarios in lines 12771–12856. The chapter header's earlier figure ("76 solver-certified stages") and its shorter manifests are milestones only.
 - **Shared features used:** R02-F02, R02-F03, R02-F04, R02-F05, R02-F06, R02-F07, R02-F08, R02-F10, R02-F14, R02-F22, R02-F23, R02-F24, R02-F26; the remaining shared dependencies of the source are delivered by unified-app features (section 13).
 - **Source:** `docs/archive/planning/rounds/round2.md` lines 11849–12925 (23 sections); assertion outline lines 30034–30098. Prompts: `python3 scripts/planning_index.py prompt --feature R02-G10-01 --override`.
 
@@ -1263,7 +1359,7 @@ Touch to emit a pulse, mark reflected obstacles, locate hidden beacons; seeded r
 - **Controls:** tap to emit pulse; triangulate via dragging markers; rotate 3D camera.
 - **Model:** core abstraction reflective line-of-sight chamber mapping; state: raycast wave returns with path-length delay; echoes based on static convex segments; deterministic time-of-flight per beam; fixed step 0.008333 s; solver: grid chamber generator with connected-component and unique beacon inference proof; truth metric: ray travel distance agreement and beacon localization error.
 - **Look (code only):** dark temples briefly crystallizing into wireframe from expanding cyan light; geometry: SDF primitives plus instanced wireframe edge strips; signature shader: Signed-distance chamber topology, instanced wireframe surfaces, expanding normal-aware echo waves; palette: abyss black, sonar mint and opal.
-- **Content:** 100 solver-certified levels (the source's revised ship target; its first milestone is "90 solver-certified stages").
+- **Content:** 100 solver-certified levels: the catalog in lines 13770–13875 is canonical (`python3 scripts/planning_index.py levels --experience R02-G11`); 80 acceptance scenarios in lines 13876–13961. The chapter header's earlier figure ("90 solver-certified stages") and its shorter manifests are milestones only.
 - **Shared features used:** R02-F02, R02-F03, R02-F04, R02-F05, R02-F06, R02-F07, R02-F09, R02-F11, R02-F16, R02-F22, R02-F23, R02-F24, R02-F26; the remaining shared dependencies of the source are delivered by unified-app features (section 13).
 - **Source:** `docs/archive/planning/rounds/round2.md` lines 12926–14030 (23 sections); assertion outline lines 30099–30163. Prompts: `python3 scripts/planning_index.py prompt --feature R02-G11-01 --override`.
 
@@ -1277,7 +1373,7 @@ Tune suspended strings so their resonances solidify walkable bridges.
 - **Controls:** pluck to audition frequency, drag tuning peg, tap freeze to test walkway.
 - **Model:** core abstraction standing-wave bridge formation; state: y(x,t)=sum A_n sin(n*pi*x/L)*cos(omega_n*t+phi_n); solidity threshold from time-averaged envelope; fixed step 0.008333 s; solver: discrete rational string-mode search with graph edge existence and reachability; truth metric: mode amplitude envelope and bridge graph connectivity.
 - **Look (code only):** strings swelling into translucent glowing architecture as they find resonance; geometry: swept strings and radial wave-shell strip meshes; signature shader: oscillating wave membranes stretch between crystalline anchors; Instanced line meshes, transient wave shells, acoustically inspired distance-field reveals; palette: warm copper, cyan membranes and mist violet.
-- **Content:** 100 solver-certified levels (the source's revised ship target; its first milestone is "82 solver-certified stages").
+- **Content:** 100 solver-certified levels: the catalog in lines 14857–14962 is canonical (`python3 scripts/planning_index.py levels --experience R02-G12`); 80 acceptance scenarios in lines 14963–15048. The chapter header's earlier figure ("82 solver-certified stages") and its shorter manifests are milestones only.
 - **Shared features used:** R02-F02, R02-F03, R02-F04, R02-F05, R02-F06, R02-F07, R02-F08, R02-F22, R02-F23, R02-F24, R02-F26; the remaining shared dependencies of the source are delivered by unified-app features (section 13).
 - **Source:** `docs/archive/planning/rounds/round2.md` lines 14031–15117 (23 sections); assertion outline lines 30164–30228. Prompts: `python3 scripts/planning_index.py prompt --feature R02-G12-01 --override`.
 
@@ -1291,7 +1387,7 @@ Connect drifting musical nodes so their shared harmonics form celestial diagrams
 - **Controls:** drag links between 3D stars, tap a node to phase nudge, orbit to inspect.
 - **Model:** core abstraction graph resonance synchronization; state: phase_i += omega_i*dt + K sum sin(phase_j-phase_i)*dt; cap max degree; require spectral phase coherence; fixed step 0.008333 s; solver: graph spanning tree/cycle search plus bounded oscillator synchronization simulation; truth metric: Kuramoto order parameter and graph-isomorphism labeling.
 - **Look (code only):** celestial musical diagrams pulsing along silver filaments; geometry: instanced ellipsoids and shader-tinted spline links; signature shader: 3D oscillatory curves become glowing star networks; Instanced line meshes, transient wave shells, acoustically inspired distance-field reveals; palette: star white, teal resonance and plum.
-- **Content:** 100 solver-certified levels (the source's revised ship target; its first milestone is "85 solver-certified stages").
+- **Content:** 100 solver-certified levels: the catalog in lines 15952–16057 is canonical (`python3 scripts/planning_index.py levels --experience R02-G13`); 80 acceptance scenarios in lines 16058–16143. The chapter header's earlier figure ("85 solver-certified stages") and its shorter manifests are milestones only.
 - **Shared features used:** R02-F02, R02-F03, R02-F04, R02-F05, R02-F06, R02-F07, R02-F08, R02-F09, R02-F16, R02-F22, R02-F23, R02-F24, R02-F26; the remaining shared dependencies of the source are delivered by unified-app features (section 13).
 - **Source:** `docs/archive/planning/rounds/round2.md` lines 15118–16212 (23 sections); assertion outline lines 30229–30293. Prompts: `python3 scripts/planning_index.py prompt --feature R02-G13-01 --override`.
 
@@ -1305,7 +1401,7 @@ Rotate a clockwork machine until its combined moving shadows spell symbols.
 - **Controls:** turn a gear handle, adjust lamp height, scrub shadow sequence.
 - **Model:** core abstraction clockwork shadow composition; state: angular phases constrained by integer tooth count; projected polygons transformed by light matrix and tested across key frames; fixed step 0.008333 s; solver: discretized phase search with gear ratio constraints and silhouette union metric; truth metric: angular relation error and target-mask overlap per frame.
 - **Look (code only):** translucent clockwork casting moving ink shadows onto an illuminated paper wall; geometry: involute-inspired approximated gear outlines extruded procedurally; signature shader: interlocking shadow gears on a luminous paper wall; Procedural solids, CPU polygonal 3D shadow projections, soft shadow approximation; palette: aged gold, lunar blue and ink.
-- **Content:** 100 solver-certified levels (the source's revised ship target; its first milestone is "77 solver-certified stages").
+- **Content:** 100 solver-certified levels: the catalog in lines 17029–17134 is canonical (`python3 scripts/planning_index.py levels --experience R02-G14`); 80 acceptance scenarios in lines 17135–17220. The chapter header's earlier figure ("77 solver-certified stages") and its shorter manifests are milestones only.
 - **Shared features used:** R02-F02, R02-F03, R02-F04, R02-F05, R02-F06, R02-F07, R02-F13, R02-F22, R02-F23, R02-F24, R02-F26; the remaining shared dependencies of the source are delivered by unified-app features (section 13).
 - **Source:** `docs/archive/planning/rounds/round2.md` lines 16213–17289 (23 sections); assertion outline lines 30294–30358. Prompts: `python3 scripts/planning_index.py prompt --feature R02-G14-01 --override`.
 
@@ -1319,7 +1415,7 @@ Reconfigure hinged voxels into a target solid without collisions.
 - **Controls:** tap hinge, drag arc to discrete angle, rotate view with two fingers, undo.
 - **Model:** core abstraction grid-connected hinged polycube folding; state: each cube occupies integer local lattice coordinates; hinge angle one of {0,90,180,270} degrees; tree hierarchy; reject interpenetrations; fixed step 0.008333 s; solver: A-star over hinge-angle lattice states with swept AABB collision filter; truth metric: collision-free occupancy and canonical polycube hash.
 - **Look (code only):** chains of luminous cubes collapsing into radiant sculptural forms; geometry: instanced cubes with chamfered normals and hinge transform tree; signature shader: glowing cube nets morph into compact 3D sculptures; Reconfigurable polyhedral nets, articulated hinges, procedural faceted materials; palette: frosted ivory, laser turquoise and hot pink edge.
-- **Content:** 100 solver-certified levels (the source's revised ship target; its first milestone is "88 solver-certified stages").
+- **Content:** 100 solver-certified levels: the catalog in lines 18127–18232 is canonical (`python3 scripts/planning_index.py levels --experience R02-G15`); 80 acceptance scenarios in lines 18233–18318. The chapter header's earlier figure ("88 solver-certified stages") and its shorter manifests are milestones only.
 - **Shared features used:** R02-F02, R02-F03, R02-F04, R02-F05, R02-F06, R02-F07, R02-F22, R02-F23, R02-F24, R02-F26; the remaining shared dependencies of the source are delivered by unified-app features (section 13).
 - **Source:** `docs/archive/planning/rounds/round2.md` lines 17290–18387 (23 sections); assertion outline lines 30359–30423. Prompts: `python3 scripts/planning_index.py prompt --feature R02-G15-01 --override`.
 
@@ -1333,7 +1429,7 @@ Connect a moving starship route into a prescribed ancient symbol.
 - **Controls:** tap route nodes to queue legs, drag time slider, preview gliding 3D route.
 - **Model:** core abstraction symbolic route planning in moving starfields; state: ship transitions between node orbits on quantized launch ticks; completed trail projected into an authored glyph skeleton; fixed step 0.008333 s; solver: time-expanded graph search over navigable star corridors; truth metric: projected glyph skeleton mismatch and hazard clearance.
 - **Look (code only):** sapphire ship leaving comet-calligraphy across a rotating firmament; geometry: procedural star spheres and motion-blurred polyline trails; signature shader: luminous paths across three-dimensional star charts; Procedural planets and ring systems, layered star spheres and emission shaders; palette: deep ultramarine, meteor gold and pearl.
-- **Content:** 100 solver-certified levels (the source's revised ship target; its first milestone is "80 solver-certified stages").
+- **Content:** 100 solver-certified levels: the catalog in lines 19212–19317 is canonical (`python3 scripts/planning_index.py levels --experience R02-G16`); 80 acceptance scenarios in lines 19318–19403. The chapter header's earlier figure ("80 solver-certified stages") and its shorter manifests are milestones only.
 - **Shared features used:** R02-F02, R02-F03, R02-F04, R02-F05, R02-F06, R02-F07, R02-F08, R02-F14, R02-F15, R02-F22, R02-F23, R02-F24, R02-F26; the remaining shared dependencies of the source are delivered by unified-app features (section 13).
 - **Source:** `docs/archive/planning/rounds/round2.md` lines 18388–19472 (23 sections); assertion outline lines 30424–30488. Prompts: `python3 scripts/planning_index.py prompt --feature R02-G16-01 --override`.
 
@@ -1347,7 +1443,7 @@ Position miniature orbits so sequential eclipses form a target sequence.
 - **Controls:** drag orbital handles, rotate time dial, step through predicted eclipse timeline.
 - **Model:** core abstraction occultation sequence planning; state: discs projected from orbital positions; circle-circle overlap computed analytically, validate depth ordering to disambiguate occultations; fixed step 0.008333 s; solver: analytical circle/ellipse overlap interval enumeration and phase search; truth metric: ordered interval overlap timestamps and visibility classification.
 - **Look (code only):** glowing planetary crescents eclipsing into razor-edge corona halos; geometry: analytic orbital rings, signed circle masks and eclipse glow shaders; signature shader: precise shadow crescents over glowing planetary discs; Procedural planets and ring systems, layered star spheres and emission shaders; palette: corona gold, ink navy and muted ember.
-- **Content:** 100 solver-certified levels (the source's revised ship target; its first milestone is "74 solver-certified stages").
+- **Content:** 100 solver-certified levels: the catalog in lines 20284–20389 is canonical (`python3 scripts/planning_index.py levels --experience R02-G17`); 80 acceptance scenarios in lines 20390–20475. The chapter header's earlier figure ("74 solver-certified stages") and its shorter manifests are milestones only.
 - **Shared features used:** R02-F02, R02-F03, R02-F04, R02-F05, R02-F06, R02-F07, R02-F13, R02-F15, R02-F22, R02-F23, R02-F24, R02-F26; the remaining shared dependencies of the source are delivered by unified-app features (section 13).
 - **Source:** `docs/archive/planning/rounds/round2.md` lines 19473–20544 (23 sections); assertion outline lines 30489–30553. Prompts: `python3 scripts/planning_index.py prompt --feature R02-G17-01 --override`.
 
@@ -1361,7 +1457,7 @@ Tune orbital eccentricity to sweep precise regions of a miniature sky.
 - **Controls:** drag periapsis knob and semi-major axis, turn time crank, play orbit.
 - **Model:** core abstraction analytical conic orbital tuning; state: M=E-e*sin(E); solve bounded Newton with bisection fallback; r=a(1-e*cos E); area swept via quadrature; fixed step 0.008333 s; solver: bounded numeric search over eccentricity/orientation samples using Kepler anomaly inversion; truth metric: Kepler residual and swept-area deviation.
 - **Look (code only):** cosmic compass with loops of luminescent elliptical epicycles; geometry: adaptive analytic ellipse tessellation; signature shader: celestial paths trace luminous ellipses at varying depths; Numerical gravitation in fixed steps, analytic orbit curves, procedural planets and starfields; palette: glacial white, deep rose and midnight.
-- **Content:** 100 solver-certified levels (the source's revised ship target; its first milestone is "78 solver-certified stages").
+- **Content:** 100 solver-certified levels: the catalog in lines 21364–21469 is canonical (`python3 scripts/planning_index.py levels --experience R02-G18`); 80 acceptance scenarios in lines 21470–21555. The chapter header's earlier figure ("78 solver-certified stages") and its shorter manifests are milestones only.
 - **Shared features used:** R02-F02, R02-F03, R02-F04, R02-F05, R02-F06, R02-F07, R02-F08, R02-F15, R02-F22, R02-F23, R02-F24, R02-F26; the remaining shared dependencies of the source are delivered by unified-app features (section 13).
 - **Source:** `docs/archive/planning/rounds/round2.md` lines 20545–21624 (23 sections); assertion outline lines 30554–30618. Prompts: `python3 scripts/planning_index.py prompt --feature R02-G18-01 --override`.
 
@@ -1375,7 +1471,7 @@ Manipulate magnetic swimmers to build a glowing bacterial pattern.
 - **Controls:** drag up to three magnetic wells, scrub speed, tap freeze field.
 - **Model:** core abstraction deterministic magnetic boid swarms; state: boids use bounded separation/alignment/cohesion accelerations plus magnetic curl field; stable fixed-step integration; fixed step 0.008333 s; solver: low-dimensional field strength search with seeded boid simulator and shape-loss evaluation; truth metric: swarm density distribution and pattern connectivity.
 - **Look (code only):** bioluminescent protozoa making aurora-like ribbons under a microscope; geometry: instanced tapered capsules, deterministic ribbon trails; signature shader: slender luminous boids form wave-like living ribbons; L-system miniature flora, deterministic boids, bioluminescence and simple water planes; palette: sea glass green, heliotrope, white.
-- **Content:** 100 solver-certified levels (the source's revised ship target; its first milestone is "82 solver-certified stages").
+- **Content:** 100 solver-certified levels: the catalog in lines 22452–22557 is canonical (`python3 scripts/planning_index.py levels --experience R02-G19`); 80 acceptance scenarios in lines 22558–22643. The chapter header's earlier figure ("82 solver-certified stages") and its shorter manifests are milestones only.
 - **Shared features used:** R02-F02, R02-F03, R02-F04, R02-F05, R02-F06, R02-F07, R02-F09, R02-F20, R02-F22, R02-F23, R02-F24, R02-F26; the remaining shared dependencies of the source are delivered by unified-app features (section 13).
 - **Source:** `docs/archive/planning/rounds/round2.md` lines 21625–22712 (23 sections); assertion outline lines 30619–30683. Prompts: `python3 scripts/planning_index.py prompt --feature R02-G19-01 --override`.
 
@@ -1389,7 +1485,7 @@ Arrange fungi to create a stable forest humidity network.
 - **Controls:** drag spore pods, open or close canopy vents, shift moonlight intensity.
 - **Model:** core abstraction localized moisture diffusion and growth; state: humidity_{t+1}=humidity_t+D*laplacian*dt - evaporation + release; growth triggered by time-integrated thresholds; fixed step 0.016667 s; solver: grid diffusion with bounded evapotranspiration and reachability checks; truth metric: humidity conservation with source/sink ledger and colony survival intervals.
 - **Look (code only):** glowing umbrella caps breathing droplets into a midnight miniature forest; geometry: procedural lathed stalks and SDF mushroom caps; signature shader: translucent mushroom caps sparkle with moisture gradients; L-system miniature flora, deterministic boids, bioluminescence and simple water planes; palette: fern jade, amber spores and deep blue.
-- **Content:** 100 solver-certified levels (the source's revised ship target; its first milestone is "76 solver-certified stages").
+- **Content:** 100 solver-certified levels: the catalog in lines 23529–23634 is canonical (`python3 scripts/planning_index.py levels --experience R02-G20`); 80 acceptance scenarios in lines 23635–23720. The chapter header's earlier figure ("76 solver-certified stages") and its shorter manifests are milestones only.
 - **Shared features used:** R02-F02, R02-F03, R02-F04, R02-F05, R02-F06, R02-F07, R02-F19, R02-F20, R02-F21, R02-F22, R02-F23, R02-F24, R02-F26; the remaining shared dependencies of the source are delivered by unified-app features (section 13).
 - **Source:** `docs/archive/planning/rounds/round2.md` lines 22713–23789 (23 sections); assertion outline lines 30684–30748. Prompts: `python3 scripts/planning_index.py prompt --feature R02-G20-01 --override`.
 
@@ -1403,7 +1499,7 @@ Balance twin stars to keep orbiting flower worlds within a light zone.
 - **Controls:** drag star distance rings, tilt orbit plane, inspect each miniature world.
 - **Model:** core abstraction toy circumbinary habitability simulation; state: approximate flux=sum luminosity_i/max(r_i^2,r_min^2); orbit curves analytic; plants respond to integrated flux bands; fixed step 0.008333 s; solver: bounded coupled-orbit parameter sweep with sampling of received flux; truth metric: per-world integrated normalized flux and survival.
 - **Look (code only):** two suns painting crossing sunrise bands over tiny flowering spheres; geometry: cube-sphere planet mesh and shader-only seasonal banding; signature shader: twin light discs and procedural luminous planet ecologies; Numerical gravitation in fixed steps, analytic orbit curves, procedural planets and starfields; palette: warm vermilion, ice blue and mint world.
-- **Content:** 100 solver-certified levels (the source's revised ship target; its first milestone is "81 solver-certified stages").
+- **Content:** 100 solver-certified levels: the catalog in lines 24616–24721 is canonical (`python3 scripts/planning_index.py levels --experience R02-G21`); 80 acceptance scenarios in lines 24722–24807. The chapter header's earlier figure ("81 solver-certified stages") and its shorter manifests are milestones only.
 - **Shared features used:** R02-F02, R02-F03, R02-F04, R02-F05, R02-F06, R02-F07, R02-F15, R02-F19, R02-F21, R02-F22, R02-F23, R02-F24, R02-F26; the remaining shared dependencies of the source are delivered by unified-app features (section 13).
 - **Source:** `docs/archive/planning/rounds/round2.md` lines 23790–24876 (23 sections); assertion outline lines 30749–30813. Prompts: `python3 scripts/planning_index.py prompt --feature R02-G21-01 --override`.
 
@@ -1417,7 +1513,7 @@ Feed fungal networks so glowing veins form a target graph around rocks.
 - **Controls:** place nutrients and blockers, advance growth pulses, undo edits.
 - **Model:** core abstraction branching graph flow optimization; state: each tip chooses max nutrient-gradient direction minus curvature and obstacle penalties; graph cap 2048 nodes; fixed step 0.016667 s; solver: graph shortest path plus deterministic branching-growth heuristic and target topology check; truth metric: root-to-terminal connectivity, total branch cost and forbidden-zone hits.
 - **Look (code only):** organic veins pulsing like a starlit subterranean city; geometry: instanced tapered cylinder branch segments and procedural cap mushrooms; signature shader: recursive hyphae bloom under translucent luminous caps; Recursive L-systems, instanced leaves, flow network evolution and bioluminescent materials; palette: emerald, copper and violet roots.
-- **Content:** 100 solver-certified levels (the source's revised ship target; its first milestone is "84 solver-certified stages").
+- **Content:** 100 solver-certified levels: the catalog in lines 25709–25814 is canonical (`python3 scripts/planning_index.py levels --experience R02-G22`); 80 acceptance scenarios in lines 25815–25900. The chapter header's earlier figure ("84 solver-certified stages") and its shorter manifests are milestones only.
 - **Shared features used:** R02-F02, R02-F03, R02-F04, R02-F05, R02-F06, R02-F07, R02-F16, R02-F19, R02-F21, R02-F22, R02-F23, R02-F24, R02-F26; the remaining shared dependencies of the source are delivered by unified-app features (section 13).
 - **Source:** `docs/archive/planning/rounds/round2.md` lines 24877–25969 (23 sections); assertion outline lines 30814–30878. Prompts: `python3 scripts/planning_index.py prompt --feature R02-G22-01 --override`.
 
@@ -1431,7 +1527,7 @@ Raise and lower terrain to coax rain into carving a target canyon.
 - **Controls:** brush height with two-finger scale, tap cloud cells, run/pause epochs.
 - **Model:** core abstraction heightfield erosion with capped sediment flow; state: water flux obeys local downhill differences; erode min(k*flow, sediment capacity); deposition restores sediment; clamps conserve material ledger; fixed step 0.016667 s; solver: iterative heightfield transport with deterministic hydraulic approximations and seed replay; truth metric: mass ledger terrain+sediment and outlet graph.
 - **Look (code only):** mesas dissolving into shining rivulets under spectacular algorithmic weather; geometry: adaptive tessellated heightfield and flowing shader streaks; signature shader: procedural heightfields channel glowing water and sediment; Deterministic heightfields, erosion approximation, instanced scenery and raster-free sky; palette: sunset vermilion, turquoise rain and violet shadow.
-- **Content:** 100 solver-certified levels (the source's revised ship target; its first milestone is "76 solver-certified stages").
+- **Content:** 100 solver-certified levels: the catalog in lines 26785–26890 is canonical (`python3 scripts/planning_index.py levels --experience R02-G23`); 80 acceptance scenarios in lines 26891–26976. The chapter header's earlier figure ("76 solver-certified stages") and its shorter manifests are milestones only.
 - **Shared features used:** R02-F02, R02-F03, R02-F04, R02-F05, R02-F06, R02-F07, R02-F17, R02-F18, R02-F22, R02-F23, R02-F24, R02-F26; the remaining shared dependencies of the source are delivered by unified-app features (section 13).
 - **Source:** `docs/archive/planning/rounds/round2.md` lines 25970–27045 (23 sections); assertion outline lines 30879–30943. Prompts: `python3 scripts/planning_index.py prompt --feature R02-G23-01 --override`.
 
@@ -1445,7 +1541,7 @@ Choose fracture paths to reveal a target gem network in rock.
 - **Controls:** drag guided cleavage stroke, tap inspect mineral glow, rotate core.
 - **Model:** core abstraction terrain-contained voxel fracture network; state: rock consists of bounded convex chunks from deterministic Voronoi seeds; split along known planes, not dynamic brittle FEM; fixed step 0.008333 s; solver: seeded lattice graph with cut-set path planning and exposed target constraints; truth metric: reachable exposed seam count and stable chunk adjacency.
 - **Look (code only):** black slate parting to show incandescent crystalline constellations; geometry: deterministic Voronoi chunk meshes with internal seam shader; signature shader: glowing mineral seams emerge through geometric stone fractures; Deterministic heightfields, erosion approximation, instanced scenery and raster-free sky; palette: slate obsidian, emerald and molten rose.
-- **Content:** 100 solver-certified levels (the source's revised ship target; its first milestone is "86 solver-certified stages").
+- **Content:** 100 solver-certified levels: the catalog in lines 27883–27988 is canonical (`python3 scripts/planning_index.py levels --experience R02-G24`); 80 acceptance scenarios in lines 27989–28074. The chapter header's earlier figure ("86 solver-certified stages") and its shorter manifests are milestones only.
 - **Shared features used:** R02-F02, R02-F03, R02-F04, R02-F05, R02-F06, R02-F07, R02-F11, R02-F12, R02-F16, R02-F18, R02-F22, R02-F23, R02-F24, R02-F26; the remaining shared dependencies of the source are delivered by unified-app features (section 13).
 - **Source:** `docs/archive/planning/rounds/round2.md` lines 27046–28143 (23 sections); assertion outline lines 30944–31008. Prompts: `python3 scripts/planning_index.py prompt --feature R02-G24-01 --override`.
 
@@ -1459,15 +1555,17 @@ Rotate a 3D observatory until starlight aligns through viewports.
 - **Controls:** drag gimbals, pinch zoom lens, tap lock orientation.
 - **Model:** core abstraction perspective projection alignment; state: camera basis R=RzRyRx; project each star into a normalized pinhole viewport with stable near-plane constraints; fixed step 0.008333 s; solver: finite camera-angle/target quantization search and analytic projective ray intersection; truth metric: reprojection residual and aperture intersection errors.
 - **Look (code only):** geometric constellations crystallizing into a radiant planetary instrument; geometry: procedural star sprites as points, gimbal meshes and ray tubes; signature shader: Parametric star volumes, glowing triangulation rays and projection-matched constellations; palette: deep ink, pearl rays and gold gears.
-- **Content:** 100 solver-certified levels (the source's revised ship target; its first milestone is "82 solver-certified stages").
+- **Content:** 100 solver-certified levels: the catalog in lines 28970–29075 is canonical (`python3 scripts/planning_index.py levels --experience R02-G25`); 80 acceptance scenarios in lines 29076–29161. The chapter header's earlier figure ("82 solver-certified stages") and its shorter manifests are milestones only.
 - **Shared features used:** R02-F02, R02-F03, R02-F04, R02-F05, R02-F06, R02-F07, R02-F09, R02-F22, R02-F23, R02-F24, R02-F26; the remaining shared dependencies of the source are delivered by unified-app features (section 13).
 - **Source:** `docs/archive/planning/rounds/round2.md` lines 28144–29230 (23 sections); assertion outline lines 31009–31073. Prompts: `python3 scripts/planning_index.py prompt --feature R02-G25-01 --override`.
 <!-- GENERATED:END cards-round02 -->
 
 ## 9. Premium library: Rounds 3 and 4
 
-Rounds 3 and 4 hold the next 50 candidates in descending score order. They open with the single purchase. Their
-chapters share one structure: identity and non-goals, exact state and rules, first-session storyboard, renderer
+Rounds 3 and 4 hold the first 50 candidates of the rounds 3–12 selection
+(`docs/brainstorm/round3-to-round12-selection.csv`), in descending score order. That selection was scored in a
+second pass over the candidates Round 2 had not used, so its scores and ranks are not comparable one to one with
+Round 2's. The games open with the single purchase. Their chapters share one structure: identity and non-goals, exact state and rules, first-session storyboard, renderer
 recipe, content and progression, file inventory, prompts, a manifest of 100 levels, 80 acceptance scenarios, a
 fault-injection matrix, and a hardware plan.
 
@@ -1502,8 +1600,8 @@ Adjust phase offsets so three spirals touch fixed target rings.
 - **Controls:** Tune harmonics and phase to achieve a target three-dimensional pattern.
 - **Model:** core abstraction harmonic field; state: u(t)=Σ A_i sin(ω_i t+φ_i) and 3D path sampling; quantize ω_i ratios and phases; solver: bounded integer-frequency enumeration + adaptive swept-segment collision; numeric risks: phase wrapping, singular derivative, aliased camera under grazing views.
 - **Look (code only):** spinning luminous helices form a suspended braid; Analytic oscillators, Fourier curve meshes, interference heightfields and emissive color; geometry: parallel-transport ribbons, interference color and normal-based emission.
-- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases; golden seed `bae47f3d5665`. Score basis: Newly proposed 300; assessed from analog family prior.
-- **Source:** `docs/archive/planning/rounds/round3.md` lines 1103–2167 (11 sections); level manifest lines 1920–2023 (`python3 scripts/planning_index.py levels --experience R03-G01`); assertion outline lines 27730–27759. Prompts: `python3 scripts/planning_index.py prompt --feature R03-G01-01 --override`.
+- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases (levels in lines 1920–2023, scenarios in lines 2024–2107, fault injection in lines 2108–2160); golden seed `bae47f3d5665`. Score basis: Newly proposed 300; assessed from analog family prior.
+- **Source:** `docs/archive/planning/rounds/round3.md` lines 1103–2167 (11 sections); levels as JSON: `python3 scripts/planning_index.py levels --experience R03-G01`; assertion outline lines 27730–27759. Prompts: `python3 scripts/planning_index.py prompt --feature R03-G01-01 --override`.
 
 ### R03-G02 Ripple Clockwork
 
@@ -1515,8 +1613,8 @@ Synchronize circular waves so particles hit target nodes at exact times.
 - **Controls:** Tune harmonics and phase to achieve a target three-dimensional pattern.
 - **Model:** core abstraction harmonic field; state: u(t)=Σ A_i sin(ω_i t+φ_i) and 3D path sampling; quantize ω_i ratios and phases; solver: bounded integer-frequency enumeration + adaptive swept-segment collision; numeric risks: phase wrapping, singular derivative, aliased camera under grazing views.
 - **Look (code only):** nested spectral ripples cross floating gear rings; Analytic oscillators, Fourier curve meshes, interference heightfields and emissive color; geometry: parallel-transport ribbons, interference color and normal-based emission.
-- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases; golden seed `506c8d52fb34`. Score basis: Newly proposed 300; assessed from analog family prior.
-- **Source:** `docs/archive/planning/rounds/round3.md` lines 2168–3232 (11 sections); level manifest lines 2985–3088 (`python3 scripts/planning_index.py levels --experience R03-G02`); assertion outline lines 27760–27789. Prompts: `python3 scripts/planning_index.py prompt --feature R03-G02-01 --override`.
+- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases (levels in lines 2985–3088, scenarios in lines 3089–3172, fault injection in lines 3173–3225); golden seed `506c8d52fb34`. Score basis: Newly proposed 300; assessed from analog family prior.
+- **Source:** `docs/archive/planning/rounds/round3.md` lines 2168–3232 (11 sections); levels as JSON: `python3 scripts/planning_index.py levels --experience R03-G02`; assertion outline lines 27760–27789. Prompts: `python3 scripts/planning_index.py prompt --feature R03-G02-01 --override`.
 
 ### R03-G03 Prism Symphony
 
@@ -1528,8 +1626,8 @@ Combine three color waveforms into a target spatial chord.
 - **Controls:** Match spectral state in 3D without conflicting colors.
 - **Model:** core abstraction spectral constraint grid; state: discrete hue index h in Z_12; edge transfer h_next=(h+δ) mod 12; secondary glyph code; solver: constraint propagation + backtracking with uniqueness proof; numeric risks: accessibility, near-similar hues, fake additive mixing rules.
 - **Look (code only):** rotating spectral wave tubes and rhythmic animated glow; GLSL hue transforms, procedural glass polygons, spline light tubes and glow; geometry: GLSL color wheel, translucent solids and emissive edge tubes.
-- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases; golden seed `63a2b8d85734`. Score basis: Newly proposed 300; assessed from analog family prior.
-- **Source:** `docs/archive/planning/rounds/round3.md` lines 3233–4297 (11 sections); level manifest lines 4050–4153 (`python3 scripts/planning_index.py levels --experience R03-G03`); assertion outline lines 27790–27819. Prompts: `python3 scripts/planning_index.py prompt --feature R03-G03-01 --override`.
+- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases (levels in lines 4050–4153, scenarios in lines 4154–4237, fault injection in lines 4238–4290); golden seed `63a2b8d85734`. Score basis: Newly proposed 300; assessed from analog family prior.
+- **Source:** `docs/archive/planning/rounds/round3.md` lines 3233–4297 (11 sections); levels as JSON: `python3 scripts/planning_index.py levels --experience R03-G03`; assertion outline lines 27790–27819. Prompts: `python3 scripts/planning_index.py prompt --feature R03-G03-01 --override`.
 
 ### R03-G04 Harmonic Archipelago
 
@@ -1541,8 +1639,8 @@ Tune waves across floating islands to build temporary bridges.
 - **Controls:** Tune harmonics and phase to achieve a target three-dimensional pattern.
 - **Model:** core abstraction harmonic field; state: u(t)=Σ A_i sin(ω_i t+φ_i) and 3D path sampling; quantize ω_i ratios and phases; solver: bounded integer-frequency enumeration + adaptive swept-segment collision; numeric risks: phase wrapping, singular derivative, aliased camera under grazing views.
 - **Look (code only):** glowing wave membranes form ephemeral walkways; Analytic oscillators, Fourier curve meshes, interference heightfields and emissive color; geometry: parallel-transport ribbons, interference color and normal-based emission.
-- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases; golden seed `8d4a4d38325e`. Score basis: Newly proposed 300; assessed from analog family prior.
-- **Source:** `docs/archive/planning/rounds/round3.md` lines 4298–5362 (11 sections); level manifest lines 5115–5218 (`python3 scripts/planning_index.py levels --experience R03-G04`); assertion outline lines 27820–27849. Prompts: `python3 scripts/planning_index.py prompt --feature R03-G04-01 --override`.
+- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases (levels in lines 5115–5218, scenarios in lines 5219–5302, fault injection in lines 5303–5355); golden seed `8d4a4d38325e`. Score basis: Newly proposed 300; assessed from analog family prior.
+- **Source:** `docs/archive/planning/rounds/round3.md` lines 4298–5362 (11 sections); levels as JSON: `python3 scripts/planning_index.py levels --experience R03-G04`; assertion outline lines 27820–27849. Prompts: `python3 scripts/planning_index.py prompt --feature R03-G04-01 --override`.
 
 ### R03-G05 Color Alchemy Spires
 
@@ -1554,8 +1652,8 @@ Stack color-transforming towers to turn incoming beams into a target spectrum.
 - **Controls:** Match spectral state in 3D without conflicting colors.
 - **Model:** core abstraction spectral constraint grid; state: discrete hue index h in Z_12; edge transfer h_next=(h+δ) mod 12; secondary glyph code; solver: constraint propagation + backtracking with uniqueness proof; numeric risks: accessibility, near-similar hues, fake additive mixing rules.
 - **Look (code only):** luminous radial gradients and faceted glass spires; GLSL hue transforms, procedural glass polygons, spline light tubes and glow; geometry: GLSL color wheel, translucent solids and emissive edge tubes.
-- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases; golden seed `3a3459ae096a`. Score basis: Newly proposed 300; assessed from analog family prior.
-- **Source:** `docs/archive/planning/rounds/round3.md` lines 5363–6427 (11 sections); level manifest lines 6180–6283 (`python3 scripts/planning_index.py levels --experience R03-G05`); assertion outline lines 27850–27879. Prompts: `python3 scripts/planning_index.py prompt --feature R03-G05-01 --override`.
+- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases (levels in lines 6180–6283, scenarios in lines 6284–6367, fault injection in lines 6368–6420); golden seed `3a3459ae096a`. Score basis: Newly proposed 300; assessed from analog family prior.
+- **Source:** `docs/archive/planning/rounds/round3.md` lines 5363–6427 (11 sections); levels as JSON: `python3 scripts/planning_index.py levels --experience R03-G05`; assertion outline lines 27850–27879. Prompts: `python3 scripts/planning_index.py prompt --feature R03-G05-01 --override`.
 
 ### R03-G06 Gradient Locksmith
 
@@ -1567,8 +1665,8 @@ Rotate color wheels around a 3D lock until matching hues align.
 - **Controls:** Match spectral state in 3D without conflicting colors.
 - **Model:** core abstraction spectral constraint grid; state: discrete hue index h in Z_12; edge transfer h_next=(h+δ) mod 12; secondary glyph code; solver: constraint propagation + backtracking with uniqueness proof; numeric risks: accessibility, near-similar hues, fake additive mixing rules.
 - **Look (code only):** iridescent concentric tori and saturated light rings; GLSL hue transforms, procedural glass polygons, spline light tubes and glow; geometry: GLSL color wheel, translucent solids and emissive edge tubes.
-- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases; golden seed `e367736dd077`. Score basis: Newly proposed 300; assessed from analog family prior.
-- **Source:** `docs/archive/planning/rounds/round3.md` lines 6428–7492 (11 sections); level manifest lines 7245–7348 (`python3 scripts/planning_index.py levels --experience R03-G06`); assertion outline lines 27880–27909. Prompts: `python3 scripts/planning_index.py prompt --feature R03-G06-01 --override`.
+- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases (levels in lines 7245–7348, scenarios in lines 7349–7432, fault injection in lines 7433–7485); golden seed `e367736dd077`. Score basis: Newly proposed 300; assessed from analog family prior.
+- **Source:** `docs/archive/planning/rounds/round3.md` lines 6428–7492 (11 sections); levels as JSON: `python3 scripts/planning_index.py levels --experience R03-G06`; assertion outline lines 27880–27909. Prompts: `python3 scripts/planning_index.py prompt --feature R03-G06-01 --override`.
 
 ### R03-G07 Bessel Fountain
 
@@ -1580,8 +1678,8 @@ Choose radial wave modes that raise a fountain into a target sculpture.
 - **Controls:** Tune harmonics and phase to achieve a target three-dimensional pattern.
 - **Model:** core abstraction harmonic field; state: u(t)=Σ A_i sin(ω_i t+φ_i) and 3D path sampling; quantize ω_i ratios and phases; solver: bounded integer-frequency enumeration + adaptive swept-segment collision; numeric risks: phase wrapping, singular derivative, aliased camera under grazing views.
 - **Look (code only):** concentric liquid-looking waves form a glowing tower; Analytic oscillators, Fourier curve meshes, interference heightfields and emissive color; geometry: parallel-transport ribbons, interference color and normal-based emission.
-- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases; golden seed `0959d641f3bd`. Score basis: Newly proposed 300; assessed from analog family prior.
-- **Source:** `docs/archive/planning/rounds/round3.md` lines 7493–8557 (11 sections); level manifest lines 8310–8413 (`python3 scripts/planning_index.py levels --experience R03-G07`); assertion outline lines 27910–27939. Prompts: `python3 scripts/planning_index.py prompt --feature R03-G07-01 --override`.
+- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases (levels in lines 8310–8413, scenarios in lines 8414–8497, fault injection in lines 8498–8550); golden seed `0959d641f3bd`. Score basis: Newly proposed 300; assessed from analog family prior.
+- **Source:** `docs/archive/planning/rounds/round3.md` lines 7493–8557 (11 sections); levels as JSON: `python3 scripts/planning_index.py levels --experience R03-G07`; assertion outline lines 27910–27939. Prompts: `python3 scripts/planning_index.py prompt --feature R03-G07-01 --override`.
 
 ### R03-G08 Phase Prism
 
@@ -1593,8 +1691,8 @@ Route coherent light packets through wave-splitting chambers.
 - **Controls:** Tune harmonics and phase to achieve a target three-dimensional pattern.
 - **Model:** core abstraction harmonic field; state: u(t)=Σ A_i sin(ω_i t+φ_i) and 3D path sampling; quantize ω_i ratios and phases; solver: bounded integer-frequency enumeration + adaptive swept-segment collision; numeric risks: phase wrapping, singular derivative, aliased camera under grazing views.
 - **Look (code only):** interference beads light up along crystal facets; Analytic oscillators, Fourier curve meshes, interference heightfields and emissive color; geometry: parallel-transport ribbons, interference color and normal-based emission.
-- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases; golden seed `e70d5c960d47`. Score basis: Newly proposed 300; assessed from analog family prior.
-- **Source:** `docs/archive/planning/rounds/round3.md` lines 8558–9622 (11 sections); level manifest lines 9375–9478 (`python3 scripts/planning_index.py levels --experience R03-G08`); assertion outline lines 27940–27969. Prompts: `python3 scripts/planning_index.py prompt --feature R03-G08-01 --override`.
+- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases (levels in lines 9375–9478, scenarios in lines 9479–9562, fault injection in lines 9563–9615); golden seed `e70d5c960d47`. Score basis: Newly proposed 300; assessed from analog family prior.
+- **Source:** `docs/archive/planning/rounds/round3.md` lines 8558–9622 (11 sections); levels as JSON: `python3 scripts/planning_index.py levels --experience R03-G08`; assertion outline lines 27940–27969. Prompts: `python3 scripts/planning_index.py prompt --feature R03-G08-01 --override`.
 
 ### R03-G09 Polar Waveglass
 
@@ -1606,8 +1704,8 @@ Tune radial and angular wave modes to turn a disk into an iris pattern.
 - **Controls:** Tune harmonics and phase to achieve a target three-dimensional pattern.
 - **Model:** core abstraction harmonic field; state: u(t)=Σ A_i sin(ω_i t+φ_i) and 3D path sampling; quantize ω_i ratios and phases; solver: bounded integer-frequency enumeration + adaptive swept-segment collision; numeric risks: phase wrapping, singular derivative, aliased camera under grazing views.
 - **Look (code only):** brilliant glasslike polar waves bloom into petal geometry; Analytic oscillators, Fourier curve meshes, interference heightfields and emissive color; geometry: parallel-transport ribbons, interference color and normal-based emission.
-- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases; golden seed `d4ee0bf798a3`. Score basis: Newly proposed 300; assessed from analog family prior.
-- **Source:** `docs/archive/planning/rounds/round3.md` lines 9623–10687 (11 sections); level manifest lines 10440–10543 (`python3 scripts/planning_index.py levels --experience R03-G09`); assertion outline lines 27970–27999. Prompts: `python3 scripts/planning_index.py prompt --feature R03-G09-01 --override`.
+- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases (levels in lines 10440–10543, scenarios in lines 10544–10627, fault injection in lines 10628–10680); golden seed `d4ee0bf798a3`. Score basis: Newly proposed 300; assessed from analog family prior.
+- **Source:** `docs/archive/planning/rounds/round3.md` lines 9623–10687 (11 sections); levels as JSON: `python3 scripts/planning_index.py levels --experience R03-G09`; assertion outline lines 27970–27999. Prompts: `python3 scripts/planning_index.py prompt --feature R03-G09-01 --override`.
 
 ### R03-G10 Standing Wave Garden
 
@@ -1619,8 +1717,8 @@ Change boundary lengths so growing peaks lift tiny seeds into sockets.
 - **Controls:** Tune harmonics and phase to achieve a target three-dimensional pattern.
 - **Model:** core abstraction harmonic field; state: u(t)=Σ A_i sin(ω_i t+φ_i) and 3D path sampling; quantize ω_i ratios and phases; solver: bounded integer-frequency enumeration + adaptive swept-segment collision; numeric risks: phase wrapping, singular derivative, aliased camera under grazing views.
 - **Look (code only):** rippling 3D membrane meshes and glowing resonant crest lines; Analytic oscillators, Fourier curve meshes, interference heightfields and emissive color; geometry: parallel-transport ribbons, interference color and normal-based emission.
-- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases; golden seed `88a14c4016de`. Score basis: Newly proposed 300; assessed from analog family prior.
-- **Source:** `docs/archive/planning/rounds/round3.md` lines 10688–11752 (11 sections); level manifest lines 11505–11608 (`python3 scripts/planning_index.py levels --experience R03-G10`); assertion outline lines 28000–28029. Prompts: `python3 scripts/planning_index.py prompt --feature R03-G10-01 --override`.
+- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases (levels in lines 11505–11608, scenarios in lines 11609–11692, fault injection in lines 11693–11745); golden seed `88a14c4016de`. Score basis: Newly proposed 300; assessed from analog family prior.
+- **Source:** `docs/archive/planning/rounds/round3.md` lines 10688–11752 (11 sections); levels as JSON: `python3 scripts/planning_index.py levels --experience R03-G10`; assertion outline lines 28000–28029. Prompts: `python3 scripts/planning_index.py prompt --feature R03-G10-01 --override`.
 
 ### R03-G11 Sinewave Sculptor
 
@@ -1632,8 +1730,8 @@ Add harmonics to shape a luminous loop into a specified silhouette.
 - **Controls:** Tune harmonics and phase to achieve a target three-dimensional pattern.
 - **Model:** core abstraction harmonic field; state: u(t)=Σ A_i sin(ω_i t+φ_i) and 3D path sampling; quantize ω_i ratios and phases; solver: bounded integer-frequency enumeration + adaptive swept-segment collision; numeric risks: phase wrapping, singular derivative, aliased camera under grazing views.
 - **Look (code only):** smooth 3D Fourier curves evolve like molten jewelry; Analytic oscillators, Fourier curve meshes, interference heightfields and emissive color; geometry: parallel-transport ribbons, interference color and normal-based emission.
-- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases; golden seed `1c24ecd155b9`. Score basis: Newly proposed 300; assessed from analog family prior.
-- **Source:** `docs/archive/planning/rounds/round3.md` lines 11753–12817 (11 sections); level manifest lines 12570–12673 (`python3 scripts/planning_index.py levels --experience R03-G11`); assertion outline lines 28030–28059. Prompts: `python3 scripts/planning_index.py prompt --feature R03-G11-01 --override`.
+- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases (levels in lines 12570–12673, scenarios in lines 12674–12757, fault injection in lines 12758–12810); golden seed `1c24ecd155b9`. Score basis: Newly proposed 300; assessed from analog family prior.
+- **Source:** `docs/archive/planning/rounds/round3.md` lines 11753–12817 (11 sections); levels as JSON: `python3 scripts/planning_index.py levels --experience R03-G11`; assertion outline lines 28030–28059. Prompts: `python3 scripts/planning_index.py prompt --feature R03-G11-01 --override`.
 
 ### R03-G12 Neon Mosaic Route
 
@@ -1645,8 +1743,8 @@ Move translucent tiles so a color wave traverses every square once.
 - **Controls:** Match spectral state in 3D without conflicting colors.
 - **Model:** core abstraction spectral constraint grid; state: discrete hue index h in Z_12; edge transfer h_next=(h+δ) mod 12; secondary glyph code; solver: constraint propagation + backtracking with uniqueness proof; numeric risks: accessibility, near-similar hues, fake additive mixing rules.
 - **Look (code only):** glowing glass tiles light in a cascading chain; GLSL hue transforms, procedural glass polygons, spline light tubes and glow; geometry: GLSL color wheel, translucent solids and emissive edge tubes.
-- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases; golden seed `835a4d9dbe83`. Score basis: Newly proposed 300; assessed from analog family prior.
-- **Source:** `docs/archive/planning/rounds/round3.md` lines 12818–13882 (11 sections); level manifest lines 13635–13738 (`python3 scripts/planning_index.py levels --experience R03-G12`); assertion outline lines 28060–28089. Prompts: `python3 scripts/planning_index.py prompt --feature R03-G12-01 --override`.
+- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases (levels in lines 13635–13738, scenarios in lines 13739–13822, fault injection in lines 13823–13875); golden seed `835a4d9dbe83`. Score basis: Newly proposed 300; assessed from analog family prior.
+- **Source:** `docs/archive/planning/rounds/round3.md` lines 12818–13882 (11 sections); levels as JSON: `python3 scripts/planning_index.py levels --experience R03-G12`; assertion outline lines 28060–28089. Prompts: `python3 scripts/planning_index.py prompt --feature R03-G12-01 --override`.
 
 ### R03-G13 Spectrum Garden
 
@@ -1658,8 +1756,8 @@ Balance light wavelengths to make responsive flowers bloom in a pattern.
 - **Controls:** Match spectral state in 3D without conflicting colors.
 - **Model:** core abstraction spectral constraint grid; state: discrete hue index h in Z_12; edge transfer h_next=(h+δ) mod 12; secondary glyph code; solver: constraint propagation + backtracking with uniqueness proof; numeric risks: accessibility, near-similar hues, fake additive mixing rules.
 - **Look (code only):** colored petal geometry and lens-flare-like bloom; GLSL hue transforms, procedural glass polygons, spline light tubes and glow; geometry: GLSL color wheel, translucent solids and emissive edge tubes.
-- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases; golden seed `599996756323`. Score basis: Newly proposed 300; assessed from analog family prior.
-- **Source:** `docs/archive/planning/rounds/round3.md` lines 13883–14947 (11 sections); level manifest lines 14700–14803 (`python3 scripts/planning_index.py levels --experience R03-G13`); assertion outline lines 28090–28119. Prompts: `python3 scripts/planning_index.py prompt --feature R03-G13-01 --override`.
+- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases (levels in lines 14700–14803, scenarios in lines 14804–14887, fault injection in lines 14888–14940); golden seed `599996756323`. Score basis: Newly proposed 300; assessed from analog family prior.
+- **Source:** `docs/archive/planning/rounds/round3.md` lines 13883–14947 (11 sections); levels as JSON: `python3 scripts/planning_index.py levels --experience R03-G13`; assertion outline lines 28090–28119. Prompts: `python3 scripts/planning_index.py prompt --feature R03-G13-01 --override`.
 
 ### R03-G14 Surface Sonata
 
@@ -1671,8 +1769,8 @@ Tune vibrating heightfield patches to balance rolling beads.
 - **Controls:** Tune harmonics and phase to achieve a target three-dimensional pattern.
 - **Model:** core abstraction harmonic field; state: u(t)=Σ A_i sin(ω_i t+φ_i) and 3D path sampling; quantize ω_i ratios and phases; solver: bounded integer-frequency enumeration + adaptive swept-segment collision; numeric risks: phase wrapping, singular derivative, aliased camera under grazing views.
 - **Look (code only):** iridescent standing wave membranes move under a dark ceiling; Analytic oscillators, Fourier curve meshes, interference heightfields and emissive color; geometry: parallel-transport ribbons, interference color and normal-based emission.
-- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases; golden seed `39f215dcc95b`. Score basis: Newly proposed 300; assessed from analog family prior.
-- **Source:** `docs/archive/planning/rounds/round3.md` lines 14948–16012 (11 sections); level manifest lines 15765–15868 (`python3 scripts/planning_index.py levels --experience R03-G14`); assertion outline lines 28120–28149. Prompts: `python3 scripts/planning_index.py prompt --feature R03-G14-01 --override`.
+- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases (levels in lines 15765–15868, scenarios in lines 15869–15952, fault injection in lines 15953–16005); golden seed `39f215dcc95b`. Score basis: Newly proposed 300; assessed from analog family prior.
+- **Source:** `docs/archive/planning/rounds/round3.md` lines 14948–16012 (11 sections); levels as JSON: `python3 scripts/planning_index.py levels --experience R03-G14`; assertion outline lines 28120–28149. Prompts: `python3 scripts/planning_index.py prompt --feature R03-G14-01 --override`.
 
 ### R03-G15 Interference Orchard
 
@@ -1684,8 +1782,8 @@ Coordinate emitter phases so growth spots light up on distant trees.
 - **Controls:** Tune harmonics and phase to achieve a target three-dimensional pattern.
 - **Model:** core abstraction harmonic field; state: u(t)=Σ A_i sin(ω_i t+φ_i) and 3D path sampling; quantize ω_i ratios and phases; solver: bounded integer-frequency enumeration + adaptive swept-segment collision; numeric risks: phase wrapping, singular derivative, aliased camera under grazing views.
 - **Look (code only):** overlapping oscillatory beams paint trees with spectral cells; Analytic oscillators, Fourier curve meshes, interference heightfields and emissive color; geometry: parallel-transport ribbons, interference color and normal-based emission.
-- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases; golden seed `94f88079e3ed`. Score basis: Newly proposed 300; assessed from analog family prior.
-- **Source:** `docs/archive/planning/rounds/round3.md` lines 16013–17077 (11 sections); level manifest lines 16830–16933 (`python3 scripts/planning_index.py levels --experience R03-G15`); assertion outline lines 28150–28179. Prompts: `python3 scripts/planning_index.py prompt --feature R03-G15-01 --override`.
+- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases (levels in lines 16830–16933, scenarios in lines 16934–17017, fault injection in lines 17018–17070); golden seed `94f88079e3ed`. Score basis: Newly proposed 300; assessed from analog family prior.
+- **Source:** `docs/archive/planning/rounds/round3.md` lines 16013–17077 (11 sections); levels as JSON: `python3 scripts/planning_index.py levels --experience R03-G15`; assertion outline lines 28150–28179. Prompts: `python3 scripts/planning_index.py prompt --feature R03-G15-01 --override`.
 
 ### R03-G16 Color Vaults
 
@@ -1697,8 +1795,8 @@ Route light through nested chambers with subtractive filter gates.
 - **Controls:** Match spectral state in 3D without conflicting colors.
 - **Model:** core abstraction spectral constraint grid; state: discrete hue index h in Z_12; edge transfer h_next=(h+δ) mod 12; secondary glyph code; solver: constraint propagation + backtracking with uniqueness proof; numeric risks: accessibility, near-similar hues, fake additive mixing rules.
 - **Look (code only):** colorful refracted-looking pools inside faceted rooms; GLSL hue transforms, procedural glass polygons, spline light tubes and glow; geometry: GLSL color wheel, translucent solids and emissive edge tubes.
-- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases; golden seed `860f8fc32474`. Score basis: Newly proposed 300; assessed from analog family prior.
-- **Source:** `docs/archive/planning/rounds/round3.md` lines 17078–18142 (11 sections); level manifest lines 17895–17998 (`python3 scripts/planning_index.py levels --experience R03-G16`); assertion outline lines 28180–28209. Prompts: `python3 scripts/planning_index.py prompt --feature R03-G16-01 --override`.
+- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases (levels in lines 17895–17998, scenarios in lines 17999–18082, fault injection in lines 18083–18135); golden seed `860f8fc32474`. Score basis: Newly proposed 300; assessed from analog family prior.
+- **Source:** `docs/archive/planning/rounds/round3.md` lines 17078–18142 (11 sections); levels as JSON: `python3 scripts/planning_index.py levels --experience R03-G16`; assertion outline lines 28180–28209. Prompts: `python3 scripts/planning_index.py prompt --feature R03-G16-01 --override`.
 
 ### R03-G17 Photon Orchard
 
@@ -1710,8 +1808,8 @@ Route colored beams to activate fruit in a 3D glass orchard.
 - **Controls:** Match spectral state in 3D without conflicting colors.
 - **Model:** core abstraction spectral constraint grid; state: discrete hue index h in Z_12; edge transfer h_next=(h+δ) mod 12; secondary glyph code; solver: constraint propagation + backtracking with uniqueness proof; numeric risks: accessibility, near-similar hues, fake additive mixing rules.
 - **Look (code only):** floating crystalline fruits flare above dark foliage; GLSL hue transforms, procedural glass polygons, spline light tubes and glow; geometry: GLSL color wheel, translucent solids and emissive edge tubes.
-- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases; golden seed `0ca3decfbe2c`. Score basis: Newly proposed 300; assessed from analog family prior.
-- **Source:** `docs/archive/planning/rounds/round3.md` lines 18143–19207 (11 sections); level manifest lines 18960–19063 (`python3 scripts/planning_index.py levels --experience R03-G17`); assertion outline lines 28210–28239. Prompts: `python3 scripts/planning_index.py prompt --feature R03-G17-01 --override`.
+- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases (levels in lines 18960–19063, scenarios in lines 19064–19147, fault injection in lines 19148–19200); golden seed `0ca3decfbe2c`. Score basis: Newly proposed 300; assessed from analog family prior.
+- **Source:** `docs/archive/planning/rounds/round3.md` lines 18143–19207 (11 sections); levels as JSON: `python3 scripts/planning_index.py levels --experience R03-G17`; assertion outline lines 28210–28239. Prompts: `python3 scripts/planning_index.py prompt --feature R03-G17-01 --override`.
 
 ### R03-G18 Wavefront Weaver
 
@@ -1723,8 +1821,8 @@ Place wave sources so peak interference draws a target contour.
 - **Controls:** Tune harmonics and phase to achieve a target three-dimensional pattern.
 - **Model:** core abstraction harmonic field; state: u(t)=Σ A_i sin(ω_i t+φ_i) and 3D path sampling; quantize ω_i ratios and phases; solver: bounded integer-frequency enumeration + adaptive swept-segment collision; numeric risks: phase wrapping, singular derivative, aliased camera under grazing views.
 - **Look (code only):** expanding translucent wave shells converge into bright nodes; Analytic oscillators, Fourier curve meshes, interference heightfields and emissive color; geometry: parallel-transport ribbons, interference color and normal-based emission.
-- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases; golden seed `eafb77aa08af`. Score basis: Newly proposed 300; assessed from analog family prior.
-- **Source:** `docs/archive/planning/rounds/round3.md` lines 19208–20272 (11 sections); level manifest lines 20025–20128 (`python3 scripts/planning_index.py levels --experience R03-G18`); assertion outline lines 28240–28269. Prompts: `python3 scripts/planning_index.py prompt --feature R03-G18-01 --override`.
+- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases (levels in lines 20025–20128, scenarios in lines 20129–20212, fault injection in lines 20213–20265); golden seed `eafb77aa08af`. Score basis: Newly proposed 300; assessed from analog family prior.
+- **Source:** `docs/archive/planning/rounds/round3.md` lines 19208–20272 (11 sections); levels as JSON: `python3 scripts/planning_index.py levels --experience R03-G18`; assertion outline lines 28240–28269. Prompts: `python3 scripts/planning_index.py prompt --feature R03-G18-01 --override`.
 
 ### R03-G19 Pendulum Timeglass
 
@@ -1736,8 +1834,8 @@ Shift timelines to synchronize three moving pendulum shadows.
 - **Controls:** Edit events in a short loop to produce a future alignment.
 - **Model:** core abstraction fixed-step timeline; state: state[k+1]=F(state[k],actions[k]); snapshot every 120 ticks and hash canonical state; solver: bounded time-expanded search with cycle memoization; numeric risks: desynchronization, unbounded history, ambiguous rewind interface.
 - **Look (code only):** phase-offset ghosted machinery and stacked motion echoes; Deterministic timeline buffers, ghost trails, reversible deformation shaders; geometry: motion trails, reversible shader deformation and ghost snapshots.
-- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases; golden seed `887b3cb85fa4`. Score basis: Newly proposed 300; assessed from analog family prior.
-- **Source:** `docs/archive/planning/rounds/round3.md` lines 20273–21337 (11 sections); level manifest lines 21090–21193 (`python3 scripts/planning_index.py levels --experience R03-G19`); assertion outline lines 28270–28299. Prompts: `python3 scripts/planning_index.py prompt --feature R03-G19-01 --override`.
+- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases (levels in lines 21090–21193, scenarios in lines 21194–21277, fault injection in lines 21278–21330); golden seed `887b3cb85fa4`. Score basis: Newly proposed 300; assessed from analog family prior.
+- **Source:** `docs/archive/planning/rounds/round3.md` lines 20273–21337 (11 sections); levels as JSON: `python3 scripts/planning_index.py levels --experience R03-G19`; assertion outline lines 28270–28299. Prompts: `python3 scripts/planning_index.py prompt --feature R03-G19-01 --override`.
 
 ### R03-G20 Time-Lock Labyrinth
 
@@ -1749,8 +1847,8 @@ Synchronize repeating gates with a moving light traveler.
 - **Controls:** Edit events in a short loop to produce a future alignment.
 - **Model:** core abstraction fixed-step timeline; state: state[k+1]=F(state[k],actions[k]); snapshot every 120 ticks and hash canonical state; solver: bounded time-expanded search with cycle memoization; numeric risks: desynchronization, unbounded history, ambiguous rewind interface.
 - **Look (code only):** clockwork doors pulse in offset temporal loops; Deterministic timeline buffers, ghost trails, reversible deformation shaders; geometry: motion trails, reversible shader deformation and ghost snapshots.
-- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases; golden seed `3580540ea92d`. Score basis: Newly proposed 300; assessed from analog family prior.
-- **Source:** `docs/archive/planning/rounds/round3.md` lines 21338–22402 (11 sections); level manifest lines 22155–22258 (`python3 scripts/planning_index.py levels --experience R03-G20`); assertion outline lines 28300–28329. Prompts: `python3 scripts/planning_index.py prompt --feature R03-G20-01 --override`.
+- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases (levels in lines 22155–22258, scenarios in lines 22259–22342, fault injection in lines 22343–22395); golden seed `3580540ea92d`. Score basis: Newly proposed 300; assessed from analog family prior.
+- **Source:** `docs/archive/planning/rounds/round3.md` lines 21338–22402 (11 sections); levels as JSON: `python3 scripts/planning_index.py levels --experience R03-G20`; assertion outline lines 28300–28329. Prompts: `python3 scripts/planning_index.py prompt --feature R03-G20-01 --override`.
 
 ### R03-G21 Phase Garden
 
@@ -1762,8 +1860,8 @@ Bring three time-shifted flowers into bloom at the same instant.
 - **Controls:** Edit events in a short loop to produce a future alignment.
 - **Model:** core abstraction fixed-step timeline; state: state[k+1]=F(state[k],actions[k]); snapshot every 120 ticks and hash canonical state; solver: bounded time-expanded search with cycle memoization; numeric risks: desynchronization, unbounded history, ambiguous rewind interface.
 - **Look (code only):** overlapping spectral petal states form temporal mandalas; Deterministic timeline buffers, ghost trails, reversible deformation shaders; geometry: motion trails, reversible shader deformation and ghost snapshots.
-- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases; golden seed `a59ecfd09dcd`. Score basis: Newly proposed 300; assessed from analog family prior.
-- **Source:** `docs/archive/planning/rounds/round3.md` lines 22403–23467 (11 sections); level manifest lines 23220–23323 (`python3 scripts/planning_index.py levels --experience R03-G21`); assertion outline lines 28330–28359. Prompts: `python3 scripts/planning_index.py prompt --feature R03-G21-01 --override`.
+- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases (levels in lines 23220–23323, scenarios in lines 23324–23407, fault injection in lines 23408–23460); golden seed `a59ecfd09dcd`. Score basis: Newly proposed 300; assessed from analog family prior.
+- **Source:** `docs/archive/planning/rounds/round3.md` lines 22403–23467 (11 sections); levels as JSON: `python3 scripts/planning_index.py levels --experience R03-G21`; assertion outline lines 28330–28359. Prompts: `python3 scripts/planning_index.py prompt --feature R03-G21-01 --override`.
 
 ### R03-G22 Moire Observatory
 
@@ -1775,8 +1873,8 @@ Rotate layered lattices until interference reveals hidden constellation points.
 - **Controls:** Tune harmonics and phase to achieve a target three-dimensional pattern.
 - **Model:** core abstraction harmonic field; state: u(t)=Σ A_i sin(ω_i t+φ_i) and 3D path sampling; quantize ω_i ratios and phases; solver: bounded integer-frequency enumeration + adaptive swept-segment collision; numeric risks: phase wrapping, singular derivative, aliased camera under grazing views.
 - **Look (code only):** shimmering 3D grid volumes and projected moiré fringes; Analytic oscillators, Fourier curve meshes, interference heightfields and emissive color; geometry: parallel-transport ribbons, interference color and normal-based emission.
-- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases; golden seed `850b92ced8fb`. Score basis: Newly proposed 300; assessed from analog family prior.
-- **Source:** `docs/archive/planning/rounds/round3.md` lines 23468–24532 (11 sections); level manifest lines 24285–24388 (`python3 scripts/planning_index.py levels --experience R03-G22`); assertion outline lines 28360–28389. Prompts: `python3 scripts/planning_index.py prompt --feature R03-G22-01 --override`.
+- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases (levels in lines 24285–24388, scenarios in lines 24389–24472, fault injection in lines 24473–24525); golden seed `850b92ced8fb`. Score basis: Newly proposed 300; assessed from analog family prior.
+- **Source:** `docs/archive/planning/rounds/round3.md` lines 23468–24532 (11 sections); levels as JSON: `python3 scripts/planning_index.py levels --experience R03-G22`; assertion outline lines 28360–28389. Prompts: `python3 scripts/planning_index.py prompt --feature R03-G22-01 --override`.
 
 ### R03-G23 Aurora Geode
 
@@ -1788,8 +1886,8 @@ Tune internal light sources to project a matching aurora outside crystal.
 - **Controls:** Rotate/cut/exchange crystal solids to meet 3D geometry rules.
 - **Model:** core abstraction convex-solid graph; state: vertex planes n·x<=d; polytope clipping with epsilon-scaled robust predicates; solver: exact discrete state BFS + convex clipping check on candidate action; numeric risks: zero-area faces, z-order transparencies, unmanifold mesh.
 - **Look (code only):** refraction-style caustics across faceted shells; Beveled polyhedra, faceted signed-distance fields, instanced lattices and faux dispersion; geometry: generated bevel prisms, layered facet reflection and gradient interiors.
-- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases; golden seed `11a4807c47d0`. Score basis: Newly proposed 300; assessed from analog family prior.
-- **Source:** `docs/archive/planning/rounds/round3.md` lines 24533–25597 (11 sections); level manifest lines 25350–25453 (`python3 scripts/planning_index.py levels --experience R03-G23`); assertion outline lines 28390–28419. Prompts: `python3 scripts/planning_index.py prompt --feature R03-G23-01 --override`.
+- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases (levels in lines 25350–25453, scenarios in lines 25454–25537, fault injection in lines 25538–25590); golden seed `11a4807c47d0`. Score basis: Newly proposed 300; assessed from analog family prior.
+- **Source:** `docs/archive/planning/rounds/round3.md` lines 24533–25597 (11 sections); levels as JSON: `python3 scripts/planning_index.py levels --experience R03-G23`; assertion outline lines 28390–28419. Prompts: `python3 scripts/planning_index.py prompt --feature R03-G23-01 --override`.
 
 ### R03-G24 Snowflake Foundry
 
@@ -1801,8 +1899,8 @@ Configure six symmetric branching rules to make a target ice form.
 - **Controls:** Rotate/cut/exchange crystal solids to meet 3D geometry rules.
 - **Model:** core abstraction convex-solid graph; state: vertex planes n·x<=d; polytope clipping with epsilon-scaled robust predicates; solver: exact discrete state BFS + convex clipping check on candidate action; numeric risks: zero-area faces, z-order transparencies, unmanifold mesh.
 - **Look (code only):** animated fractal dendrites grow into fragile crystalline spires; Beveled polyhedra, faceted signed-distance fields, instanced lattices and faux dispersion; geometry: generated bevel prisms, layered facet reflection and gradient interiors.
-- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases; golden seed `6d98f43a3216`. Score basis: Newly proposed 300; assessed from analog family prior.
-- **Source:** `docs/archive/planning/rounds/round3.md` lines 25598–26662 (11 sections); level manifest lines 26415–26518 (`python3 scripts/planning_index.py levels --experience R03-G24`); assertion outline lines 28420–28449. Prompts: `python3 scripts/planning_index.py prompt --feature R03-G24-01 --override`.
+- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases (levels in lines 26415–26518, scenarios in lines 26519–26602, fault injection in lines 26603–26655); golden seed `6d98f43a3216`. Score basis: Newly proposed 300; assessed from analog family prior.
+- **Source:** `docs/archive/planning/rounds/round3.md` lines 25598–26662 (11 sections); levels as JSON: `python3 scripts/planning_index.py levels --experience R03-G24`; assertion outline lines 28420–28449. Prompts: `python3 scripts/planning_index.py prompt --feature R03-G24-01 --override`.
 
 ### R03-G25 Geode Locksmith
 
@@ -1814,8 +1912,8 @@ Cut and rotate nested geode rings to align hidden crystalline keys.
 - **Controls:** Rotate/cut/exchange crystal solids to meet 3D geometry rules.
 - **Model:** core abstraction convex-solid graph; state: vertex planes n·x<=d; polytope clipping with epsilon-scaled robust predicates; solver: exact discrete state BFS + convex clipping check on candidate action; numeric risks: zero-area faces, z-order transparencies, unmanifold mesh.
 - **Look (code only):** iridescent concentric shells and sparkling interior facets; Beveled polyhedra, faceted signed-distance fields, instanced lattices and faux dispersion; geometry: generated bevel prisms, layered facet reflection and gradient interiors.
-- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases; golden seed `2bbb37564d01`. Score basis: Newly proposed 300; assessed from analog family prior.
-- **Source:** `docs/archive/planning/rounds/round3.md` lines 26663–27727 (11 sections); level manifest lines 27480–27583 (`python3 scripts/planning_index.py levels --experience R03-G25`); assertion outline lines 28450–28480. Prompts: `python3 scripts/planning_index.py prompt --feature R03-G25-01 --override`.
+- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases (levels in lines 27480–27583, scenarios in lines 27584–27667, fault injection in lines 27668–27720); golden seed `2bbb37564d01`. Score basis: Newly proposed 300; assessed from analog family prior.
+- **Source:** `docs/archive/planning/rounds/round3.md` lines 26663–27727 (11 sections); levels as JSON: `python3 scripts/planning_index.py levels --experience R03-G25`; assertion outline lines 28450–28480. Prompts: `python3 scripts/planning_index.py prompt --feature R03-G25-01 --override`.
 <!-- GENERATED:END cards-round03 -->
 
 ### 9.2 Round 4
@@ -1831,8 +1929,8 @@ Reconfigure edges of frozen solids while preserving volume.
 - **Controls:** Rotate/cut/exchange crystal solids to meet 3D geometry rules.
 - **Model:** core abstraction convex-solid graph; state: vertex planes n·x<=d; polytope clipping with epsilon-scaled robust predicates; solver: exact discrete state BFS + convex clipping check on candidate action; numeric risks: zero-area faces, z-order transparencies, unmanifold mesh.
 - **Look (code only):** geometric frost geometry and glowing beveled edge networks; Beveled polyhedra, faceted signed-distance fields, instanced lattices and faux dispersion; geometry: generated bevel prisms, layered facet reflection and gradient interiors.
-- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases; golden seed `d8041a475a2d`. Score basis: Newly proposed 300; assessed from analog family prior.
-- **Source:** `docs/archive/planning/rounds/round4.md` lines 1104–2168 (11 sections); level manifest lines 1921–2024 (`python3 scripts/planning_index.py levels --experience R04-G01`); assertion outline lines 27731–27760. Prompts: `python3 scripts/planning_index.py prompt --feature R04-G01-01 --override`.
+- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases (levels in lines 1921–2024, scenarios in lines 2025–2108, fault injection in lines 2109–2161); golden seed `d8041a475a2d`. Score basis: Newly proposed 300; assessed from analog family prior.
+- **Source:** `docs/archive/planning/rounds/round4.md` lines 1104–2168 (11 sections); levels as JSON: `python3 scripts/planning_index.py levels --experience R04-G01`; assertion outline lines 27731–27760. Prompts: `python3 scripts/planning_index.py prompt --feature R04-G01-01 --override`.
 
 ### R04-G02 Crystal Phase Shift
 
@@ -1844,8 +1942,8 @@ Change a mineral lattice phase to unlock a three-dimensional channel.
 - **Controls:** Rotate/cut/exchange crystal solids to meet 3D geometry rules.
 - **Model:** core abstraction convex-solid graph; state: vertex planes n·x<=d; polytope clipping with epsilon-scaled robust predicates; solver: exact discrete state BFS + convex clipping check on candidate action; numeric risks: zero-area faces, z-order transparencies, unmanifold mesh.
 - **Look (code only):** tiny voxel cells snap into new reflective-looking structures; Beveled polyhedra, faceted signed-distance fields, instanced lattices and faux dispersion; geometry: generated bevel prisms, layered facet reflection and gradient interiors.
-- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases; golden seed `d9471f65f7b3`. Score basis: Newly proposed 300; assessed from analog family prior.
-- **Source:** `docs/archive/planning/rounds/round4.md` lines 2169–3233 (11 sections); level manifest lines 2986–3089 (`python3 scripts/planning_index.py levels --experience R04-G02`); assertion outline lines 27761–27790. Prompts: `python3 scripts/planning_index.py prompt --feature R04-G02-01 --override`.
+- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases (levels in lines 2986–3089, scenarios in lines 3090–3173, fault injection in lines 3174–3226); golden seed `d9471f65f7b3`. Score basis: Newly proposed 300; assessed from analog family prior.
+- **Source:** `docs/archive/planning/rounds/round4.md` lines 2169–3233 (11 sections); levels as JSON: `python3 scripts/planning_index.py levels --experience R04-G02`; assertion outline lines 27761–27790. Prompts: `python3 scripts/planning_index.py prompt --feature R04-G02-01 --override`.
 
 ### R04-G03 Diamond Pulse
 
@@ -1857,8 +1955,8 @@ Time crystal rotations so a traveling flash survives every split.
 - **Controls:** Rotate/cut/exchange crystal solids to meet 3D geometry rules.
 - **Model:** core abstraction convex-solid graph; state: vertex planes n·x<=d; polytope clipping with epsilon-scaled robust predicates; solver: exact discrete state BFS + convex clipping check on candidate action; numeric risks: zero-area faces, z-order transparencies, unmanifold mesh.
 - **Look (code only):** fast staccato light cascades over geometric gemstone machinery; Beveled polyhedra, faceted signed-distance fields, instanced lattices and faux dispersion; geometry: generated bevel prisms, layered facet reflection and gradient interiors.
-- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases; golden seed `7d7fde9d2c72`. Score basis: Newly proposed 300; assessed from analog family prior.
-- **Source:** `docs/archive/planning/rounds/round4.md` lines 3234–4298 (11 sections); level manifest lines 4051–4154 (`python3 scripts/planning_index.py levels --experience R04-G03`); assertion outline lines 27791–27820. Prompts: `python3 scripts/planning_index.py prompt --feature R04-G03-01 --override`.
+- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases (levels in lines 4051–4154, scenarios in lines 4155–4238, fault injection in lines 4239–4291); golden seed `7d7fde9d2c72`. Score basis: Newly proposed 300; assessed from analog family prior.
+- **Source:** `docs/archive/planning/rounds/round4.md` lines 3234–4298 (11 sections); levels as JSON: `python3 scripts/planning_index.py levels --experience R04-G03`; assertion outline lines 27791–27820. Prompts: `python3 scripts/planning_index.py prompt --feature R04-G03-01 --override`.
 
 ### R04-G04 Octahedral Orchard
 
@@ -1870,8 +1968,8 @@ Connect branching octahedron clusters into a stable luminous canopy.
 - **Controls:** Rotate/cut/exchange crystal solids to meet 3D geometry rules.
 - **Model:** core abstraction convex-solid graph; state: vertex planes n·x<=d; polytope clipping with epsilon-scaled robust predicates; solver: exact discrete state BFS + convex clipping check on candidate action; numeric risks: zero-area faces, z-order transparencies, unmanifold mesh.
 - **Look (code only):** glowing Platonic solid growth and spectral shadow play; Beveled polyhedra, faceted signed-distance fields, instanced lattices and faux dispersion; geometry: generated bevel prisms, layered facet reflection and gradient interiors.
-- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases; golden seed `be8b0dc787cf`. Score basis: Newly proposed 300; assessed from analog family prior.
-- **Source:** `docs/archive/planning/rounds/round4.md` lines 4299–5363 (11 sections); level manifest lines 5116–5219 (`python3 scripts/planning_index.py levels --experience R04-G04`); assertion outline lines 27821–27850. Prompts: `python3 scripts/planning_index.py prompt --feature R04-G04-01 --override`.
+- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases (levels in lines 5116–5219, scenarios in lines 5220–5303, fault injection in lines 5304–5356); golden seed `be8b0dc787cf`. Score basis: Newly proposed 300; assessed from analog family prior.
+- **Source:** `docs/archive/planning/rounds/round4.md` lines 4299–5363 (11 sections); levels as JSON: `python3 scripts/planning_index.py levels --experience R04-G04`; assertion outline lines 27821–27850. Prompts: `python3 scripts/planning_index.py prompt --feature R04-G04-01 --override`.
 
 ### R04-G05 Echo Harmonics
 
@@ -1883,8 +1981,8 @@ Adjust frequency bands to expose a hidden geometric object.
 - **Controls:** Tune harmonics and phase to achieve a target three-dimensional pattern.
 - **Model:** core abstraction harmonic field; state: u(t)=Σ A_i sin(ω_i t+φ_i) and 3D path sampling; quantize ω_i ratios and phases; solver: bounded integer-frequency enumeration + adaptive swept-segment collision; numeric risks: phase wrapping, singular derivative, aliased camera under grazing views.
 - **Look (code only):** translucent waves reveal resonant contours on solids; Analytic oscillators, Fourier curve meshes, interference heightfields and emissive color; geometry: parallel-transport ribbons, interference color and normal-based emission.
-- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases; golden seed `a696a0b7dd9e`. Score basis: Newly proposed 300; assessed from analog family prior.
-- **Source:** `docs/archive/planning/rounds/round4.md` lines 5364–6428 (11 sections); level manifest lines 6181–6284 (`python3 scripts/planning_index.py levels --experience R04-G05`); assertion outline lines 27851–27880. Prompts: `python3 scripts/planning_index.py prompt --feature R04-G05-01 --override`.
+- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases (levels in lines 6181–6284, scenarios in lines 6285–6368, fault injection in lines 6369–6421); golden seed `a696a0b7dd9e`. Score basis: Newly proposed 300; assessed from analog family prior.
+- **Source:** `docs/archive/planning/rounds/round4.md` lines 5364–6428 (11 sections); levels as JSON: `python3 scripts/planning_index.py levels --experience R04-G05`; assertion outline lines 27851–27880. Prompts: `python3 scripts/planning_index.py prompt --feature R04-G05-01 --override`.
 
 ### R04-G06 Memory Marble
 
@@ -1896,8 +1994,8 @@ Replay and edit a previous rolling trajectory to avoid a collision.
 - **Controls:** Edit events in a short loop to produce a future alignment.
 - **Model:** core abstraction fixed-step timeline; state: state[k+1]=F(state[k],actions[k]); snapshot every 120 ticks and hash canonical state; solver: bounded time-expanded search with cycle memoization; numeric risks: desynchronization, unbounded history, ambiguous rewind interface.
 - **Look (code only):** translucent ghost marbles retrace glowing splines; Deterministic timeline buffers, ghost trails, reversible deformation shaders; geometry: motion trails, reversible shader deformation and ghost snapshots.
-- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases; golden seed `c645c001a850`. Score basis: Newly proposed 300; assessed from analog family prior.
-- **Source:** `docs/archive/planning/rounds/round4.md` lines 6429–7493 (11 sections); level manifest lines 7246–7349 (`python3 scripts/planning_index.py levels --experience R04-G06`); assertion outline lines 27881–27910. Prompts: `python3 scripts/planning_index.py prompt --feature R04-G06-01 --override`.
+- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases (levels in lines 7246–7349, scenarios in lines 7350–7433, fault injection in lines 7434–7486); golden seed `c645c001a850`. Score basis: Newly proposed 300; assessed from analog family prior.
+- **Source:** `docs/archive/planning/rounds/round4.md` lines 6429–7493 (11 sections); levels as JSON: `python3 scripts/planning_index.py levels --experience R04-G06`; assertion outline lines 27881–27910. Prompts: `python3 scripts/planning_index.py prompt --feature R04-G06-01 --override`.
 
 ### R04-G07 Echoes of Stone
 
@@ -1909,8 +2007,8 @@ Carve a stone once per loop to reroute future light pulses.
 - **Controls:** Edit events in a short loop to produce a future alignment.
 - **Model:** core abstraction fixed-step timeline; state: state[k+1]=F(state[k],actions[k]); snapshot every 120 ticks and hash canonical state; solver: bounded time-expanded search with cycle memoization; numeric risks: desynchronization, unbounded history, ambiguous rewind interface.
 - **Look (code only):** new cuts cast successive glowing temporal shadow maps; Deterministic timeline buffers, ghost trails, reversible deformation shaders; geometry: motion trails, reversible shader deformation and ghost snapshots.
-- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases; golden seed `b2db91f634a4`. Score basis: Newly proposed 300; assessed from analog family prior.
-- **Source:** `docs/archive/planning/rounds/round4.md` lines 7494–8558 (11 sections); level manifest lines 8311–8414 (`python3 scripts/planning_index.py levels --experience R04-G07`); assertion outline lines 27911–27940. Prompts: `python3 scripts/planning_index.py prompt --feature R04-G07-01 --override`.
+- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases (levels in lines 8311–8414, scenarios in lines 8415–8498, fault injection in lines 8499–8551); golden seed `b2db91f634a4`. Score basis: Newly proposed 300; assessed from analog family prior.
+- **Source:** `docs/archive/planning/rounds/round4.md` lines 7494–8558 (11 sections); levels as JSON: `python3 scripts/planning_index.py levels --experience R04-G07`; assertion outline lines 27911–27940. Prompts: `python3 scripts/planning_index.py prompt --feature R04-G07-01 --override`.
 
 ### R04-G08 Hourglass Gravity
 
@@ -1922,8 +2020,8 @@ Reverse one local gravity field at a chosen time to route falling pearls.
 - **Controls:** Edit events in a short loop to produce a future alignment.
 - **Model:** core abstraction fixed-step timeline; state: state[k+1]=F(state[k],actions[k]); snapshot every 120 ticks and hash canonical state; solver: bounded time-expanded search with cycle memoization; numeric risks: desynchronization, unbounded history, ambiguous rewind interface.
 - **Look (code only):** trails split into past and future gravity arcs; Deterministic timeline buffers, ghost trails, reversible deformation shaders; geometry: motion trails, reversible shader deformation and ghost snapshots.
-- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases; golden seed `e19d6c1f3631`. Score basis: Newly proposed 300; assessed from analog family prior.
-- **Source:** `docs/archive/planning/rounds/round4.md` lines 8559–9623 (11 sections); level manifest lines 9376–9479 (`python3 scripts/planning_index.py levels --experience R04-G08`); assertion outline lines 27941–27970. Prompts: `python3 scripts/planning_index.py prompt --feature R04-G08-01 --override`.
+- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases (levels in lines 9376–9479, scenarios in lines 9480–9563, fault injection in lines 9564–9616); golden seed `e19d6c1f3631`. Score basis: Newly proposed 300; assessed from analog family prior.
+- **Source:** `docs/archive/planning/rounds/round4.md` lines 8559–9623 (11 sections); levels as JSON: `python3 scripts/planning_index.py levels --experience R04-G08`; assertion outline lines 27941–27970. Prompts: `python3 scripts/planning_index.py prompt --feature R04-G08-01 --override`.
 
 ### R04-G09 Color Vortex
 
@@ -1935,8 +2033,8 @@ Position angular emitters to bring rotating color streams into phase.
 - **Controls:** Match spectral state in 3D without conflicting colors.
 - **Model:** core abstraction spectral constraint grid; state: discrete hue index h in Z_12; edge transfer h_next=(h+δ) mod 12; secondary glyph code; solver: constraint propagation + backtracking with uniqueness proof; numeric risks: accessibility, near-similar hues, fake additive mixing rules.
 - **Look (code only):** spiraling spectral particles converge on a bright core; GLSL hue transforms, procedural glass polygons, spline light tubes and glow; geometry: GLSL color wheel, translucent solids and emissive edge tubes.
-- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases; golden seed `018bd67e4c30`. Score basis: Newly proposed 300; assessed from analog family prior.
-- **Source:** `docs/archive/planning/rounds/round4.md` lines 9624–10688 (11 sections); level manifest lines 10441–10544 (`python3 scripts/planning_index.py levels --experience R04-G09`); assertion outline lines 27971–28000. Prompts: `python3 scripts/planning_index.py prompt --feature R04-G09-01 --override`.
+- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases (levels in lines 10441–10544, scenarios in lines 10545–10628, fault injection in lines 10629–10681); golden seed `018bd67e4c30`. Score basis: Newly proposed 300; assessed from analog family prior.
+- **Source:** `docs/archive/planning/rounds/round4.md` lines 9624–10688 (11 sections); levels as JSON: `python3 scripts/planning_index.py levels --experience R04-G09`; assertion outline lines 27971–28000. Prompts: `python3 scripts/planning_index.py prompt --feature R04-G09-01 --override`.
 
 ### R04-G10 Candle Geometry
 
@@ -1948,8 +2046,8 @@ Move tiny light sources around solids to animate a shadow poem.
 - **Controls:** Construct 3D shapes whose target shadow matches an image or path.
 - **Model:** core abstraction projective shadow geometry; state: shadow mask=∪Π_light(occluder solids), compare raster IoU and Hausdorff boundary; solver: finite pose search and deterministic silhouette raster validator; numeric risks: shadow self-intersection, ambiguous depth, darkness hides interactions.
 - **Look (code only):** flickering low-poly forms generate flowing edge shadows; Procedural solids, CPU polygonal 3D shadow projections, soft shadow approximation; geometry: CPU-projected analytic soft shadow stencil with light shaft geometry.
-- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases; golden seed `f23c5b3ea989`. Score basis: Newly proposed 300; assessed from analog family prior.
-- **Source:** `docs/archive/planning/rounds/round4.md` lines 10689–11753 (11 sections); level manifest lines 11506–11609 (`python3 scripts/planning_index.py levels --experience R04-G10`); assertion outline lines 28001–28030. Prompts: `python3 scripts/planning_index.py prompt --feature R04-G10-01 --override`.
+- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases (levels in lines 11506–11609, scenarios in lines 11610–11693, fault injection in lines 11694–11746); golden seed `f23c5b3ea989`. Score basis: Newly proposed 300; assessed from analog family prior.
+- **Source:** `docs/archive/planning/rounds/round4.md` lines 10689–11753 (11 sections); levels as JSON: `python3 scripts/planning_index.py levels --experience R04-G10`; assertion outline lines 28001–28030. Prompts: `python3 scripts/planning_index.py prompt --feature R04-G10-01 --override`.
 
 ### R04-G11 Umbra Rings
 
@@ -1961,8 +2059,8 @@ Arrange orbital rings to form target overlapping dark discs.
 - **Controls:** Construct 3D shapes whose target shadow matches an image or path.
 - **Model:** core abstraction projective shadow geometry; state: shadow mask=∪Π_light(occluder solids), compare raster IoU and Hausdorff boundary; solver: finite pose search and deterministic silhouette raster validator; numeric risks: shadow self-intersection, ambiguous depth, darkness hides interactions.
 - **Look (code only):** moving eclipse zones and concentric iridescent edges; Procedural solids, CPU polygonal 3D shadow projections, soft shadow approximation; geometry: CPU-projected analytic soft shadow stencil with light shaft geometry.
-- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases; golden seed `e9351ec850bb`. Score basis: Newly proposed 300; assessed from analog family prior.
-- **Source:** `docs/archive/planning/rounds/round4.md` lines 11754–12818 (11 sections); level manifest lines 12571–12674 (`python3 scripts/planning_index.py levels --experience R04-G11`); assertion outline lines 28031–28060. Prompts: `python3 scripts/planning_index.py prompt --feature R04-G11-01 --override`.
+- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases (levels in lines 12571–12674, scenarios in lines 12675–12758, fault injection in lines 12759–12811); golden seed `e9351ec850bb`. Score basis: Newly proposed 300; assessed from analog family prior.
+- **Source:** `docs/archive/planning/rounds/round4.md` lines 11754–12818 (11 sections); levels as JSON: `python3 scripts/planning_index.py levels --experience R04-G11`; assertion outline lines 28031–28060. Prompts: `python3 scripts/planning_index.py prompt --feature R04-G11-01 --override`.
 
 ### R04-G12 Nightfall Sculptor
 
@@ -1974,8 +2072,8 @@ Transform a mesh through a sequence of target shadow silhouettes.
 - **Controls:** Construct 3D shapes whose target shadow matches an image or path.
 - **Model:** core abstraction projective shadow geometry; state: shadow mask=∪Π_light(occluder solids), compare raster IoU and Hausdorff boundary; solver: finite pose search and deterministic silhouette raster validator; numeric risks: shadow self-intersection, ambiguous depth, darkness hides interactions.
 - **Look (code only):** slowly morphing signed-distance solid and moving projection; Procedural solids, CPU polygonal 3D shadow projections, soft shadow approximation; geometry: CPU-projected analytic soft shadow stencil with light shaft geometry.
-- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases; golden seed `9af6deddabbf`. Score basis: Newly proposed 300; assessed from analog family prior.
-- **Source:** `docs/archive/planning/rounds/round4.md` lines 12819–13883 (11 sections); level manifest lines 13636–13739 (`python3 scripts/planning_index.py levels --experience R04-G12`); assertion outline lines 28061–28090. Prompts: `python3 scripts/planning_index.py prompt --feature R04-G12-01 --override`.
+- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases (levels in lines 13636–13739, scenarios in lines 13740–13823, fault injection in lines 13824–13876); golden seed `9af6deddabbf`. Score basis: Newly proposed 300; assessed from analog family prior.
+- **Source:** `docs/archive/planning/rounds/round4.md` lines 12819–13883 (11 sections); levels as JSON: `python3 scripts/planning_index.py levels --experience R04-G12`; assertion outline lines 28061–28090. Prompts: `python3 scripts/planning_index.py prompt --feature R04-G12-01 --override`.
 
 ### R04-G13 Lumen Sudoku
 
@@ -1987,8 +2085,8 @@ Solve a three-dimensional color placement puzzle across layered cubes.
 - **Controls:** Match spectral state in 3D without conflicting colors.
 - **Model:** core abstraction spectral constraint grid; state: discrete hue index h in Z_12; edge transfer h_next=(h+δ) mod 12; secondary glyph code; solver: constraint propagation + backtracking with uniqueness proof; numeric risks: accessibility, near-similar hues, fake additive mixing rules.
 - **Look (code only):** cubes form glowing volumetric patterns at solution; GLSL hue transforms, procedural glass polygons, spline light tubes and glow; geometry: GLSL color wheel, translucent solids and emissive edge tubes.
-- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases; golden seed `943b02787855`. Score basis: Newly proposed 300; assessed from analog family prior.
-- **Source:** `docs/archive/planning/rounds/round4.md` lines 13884–14948 (11 sections); level manifest lines 14701–14804 (`python3 scripts/planning_index.py levels --experience R04-G13`); assertion outline lines 28091–28120. Prompts: `python3 scripts/planning_index.py prompt --feature R04-G13-01 --override`.
+- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases (levels in lines 14701–14804, scenarios in lines 14805–14888, fault injection in lines 14889–14941); golden seed `943b02787855`. Score basis: Newly proposed 300; assessed from analog family prior.
+- **Source:** `docs/archive/planning/rounds/round4.md` lines 13884–14948 (11 sections); levels as JSON: `python3 scripts/planning_index.py levels --experience R04-G13`; assertion outline lines 28091–28120. Prompts: `python3 scripts/planning_index.py prompt --feature R04-G13-01 --override`.
 
 ### R04-G14 Eclipse Lantern
 
@@ -2000,8 +2098,8 @@ Reposition planets and lamps so a room's shadow sequence repeats.
 - **Controls:** Construct 3D shapes whose target shadow matches an image or path.
 - **Model:** core abstraction projective shadow geometry; state: shadow mask=∪Π_light(occluder solids), compare raster IoU and Hausdorff boundary; solver: finite pose search and deterministic silhouette raster validator; numeric risks: shadow self-intersection, ambiguous depth, darkness hides interactions.
 - **Look (code only):** orbital shadow choreography with golden rim lights; Procedural solids, CPU polygonal 3D shadow projections, soft shadow approximation; geometry: CPU-projected analytic soft shadow stencil with light shaft geometry.
-- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases; golden seed `65bfcb689cf6`. Score basis: Newly proposed 300; assessed from analog family prior.
-- **Source:** `docs/archive/planning/rounds/round4.md` lines 14949–16013 (11 sections); level manifest lines 15766–15869 (`python3 scripts/planning_index.py levels --experience R04-G14`); assertion outline lines 28121–28150. Prompts: `python3 scripts/planning_index.py prompt --feature R04-G14-01 --override`.
+- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases (levels in lines 15766–15869, scenarios in lines 15870–15953, fault injection in lines 15954–16006); golden seed `65bfcb689cf6`. Score basis: Newly proposed 300; assessed from analog family prior.
+- **Source:** `docs/archive/planning/rounds/round4.md` lines 14949–16013 (11 sections); levels as JSON: `python3 scripts/planning_index.py levels --experience R04-G14`; assertion outline lines 28121–28150. Prompts: `python3 scripts/planning_index.py prompt --feature R04-G14-01 --override`.
 
 ### R04-G15 Clockwave Harbor
 
@@ -2013,8 +2111,8 @@ Phase-shift small orbital vessels to dock in a single time window.
 - **Controls:** Edit events in a short loop to produce a future alignment.
 - **Model:** core abstraction fixed-step timeline; state: state[k+1]=F(state[k],actions[k]); snapshot every 120 ticks and hash canonical state; solver: bounded time-expanded search with cycle memoization; numeric risks: desynchronization, unbounded history, ambiguous rewind interface.
 - **Look (code only):** stacked orbit trails converge in synchronized flashes; Deterministic timeline buffers, ghost trails, reversible deformation shaders; geometry: motion trails, reversible shader deformation and ghost snapshots.
-- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases; golden seed `8d9166536a6a`. Score basis: Newly proposed 300; assessed from analog family prior.
-- **Source:** `docs/archive/planning/rounds/round4.md` lines 16014–17078 (11 sections); level manifest lines 16831–16934 (`python3 scripts/planning_index.py levels --experience R04-G15`); assertion outline lines 28151–28180. Prompts: `python3 scripts/planning_index.py prompt --feature R04-G15-01 --override`.
+- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases (levels in lines 16831–16934, scenarios in lines 16935–17018, fault injection in lines 17019–17071); golden seed `8d9166536a6a`. Score basis: Newly proposed 300; assessed from analog family prior.
+- **Source:** `docs/archive/planning/rounds/round4.md` lines 16014–17078 (11 sections); levels as JSON: `python3 scripts/planning_index.py levels --experience R04-G15`; assertion outline lines 28151–28180. Prompts: `python3 scripts/planning_index.py prompt --feature R04-G15-01 --override`.
 
 ### R04-G16 Prism Pathways
 
@@ -2026,8 +2124,8 @@ Rotate prisms to connect color-filtered light emitters to terminal crystals.
 - **Controls:** Existing concept input requires game-specific design verification.
 - **Model:** core abstraction finite polyhedral space; state: state=(position,orientation,configuration) on quantized 3D lattice; solver: BFS/A* through spatial transformation graph; numeric risks: occlusion, motion sickness, path uniqueness.
 - **Look (code only):** Parametric glass/prism meshes, wavelength-band beams, approximated Fresnel and bloom; geometry: SDF-style surfaces, translucent prisms and selected-edge glow.
-- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases; golden seed `a62461020363`. Score basis: Inherited original 200; previously scored.
-- **Source:** `docs/archive/planning/rounds/round4.md` lines 17079–18143 (11 sections); level manifest lines 17896–17999 (`python3 scripts/planning_index.py levels --experience R04-G16`); assertion outline lines 28181–28210. Prompts: `python3 scripts/planning_index.py prompt --feature R04-G16-01 --override`.
+- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases (levels in lines 17896–17999, scenarios in lines 18000–18083, fault injection in lines 18084–18136); golden seed `a62461020363`. Score basis: Inherited original 200; previously scored.
+- **Source:** `docs/archive/planning/rounds/round4.md` lines 17079–18143 (11 sections); levels as JSON: `python3 scripts/planning_index.py levels --experience R04-G16`; assertion outline lines 28181–28210. Prompts: `python3 scripts/planning_index.py prompt --feature R04-G16-01 --override`.
 
 ### R04-G17 Longlight Labyrinth
 
@@ -2039,8 +2137,8 @@ Shift time-of-day to reveal a hidden route drawn by cast shadows.
 - **Controls:** Construct 3D shapes whose target shadow matches an image or path.
 - **Model:** core abstraction projective shadow geometry; state: shadow mask=∪Π_light(occluder solids), compare raster IoU and Hausdorff boundary; solver: finite pose search and deterministic silhouette raster validator; numeric risks: shadow self-intersection, ambiguous depth, darkness hides interactions.
 - **Look (code only):** traveling sundial shadows across maze geometry; Procedural solids, CPU polygonal 3D shadow projections, soft shadow approximation; geometry: CPU-projected analytic soft shadow stencil with light shaft geometry.
-- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases; golden seed `6b408b8d3cc7`. Score basis: Newly proposed 300; assessed from analog family prior.
-- **Source:** `docs/archive/planning/rounds/round4.md` lines 18144–19208 (11 sections); level manifest lines 18961–19064 (`python3 scripts/planning_index.py levels --experience R04-G17`); assertion outline lines 28211–28240. Prompts: `python3 scripts/planning_index.py prompt --feature R04-G17-01 --override`.
+- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases (levels in lines 18961–19064, scenarios in lines 19065–19148, fault injection in lines 19149–19201); golden seed `6b408b8d3cc7`. Score basis: Newly proposed 300; assessed from analog family prior.
+- **Source:** `docs/archive/planning/rounds/round4.md` lines 18144–19208 (11 sections); levels as JSON: `python3 scripts/planning_index.py levels --experience R04-G17`; assertion outline lines 28211–28240. Prompts: `python3 scripts/planning_index.py prompt --feature R04-G17-01 --override`.
 
 ### R04-G18 Iridescent Channels
 
@@ -2052,8 +2150,8 @@ Reorder wavelength filters to route colors through branching tubes.
 - **Controls:** Match spectral state in 3D without conflicting colors.
 - **Model:** core abstraction spectral constraint grid; state: discrete hue index h in Z_12; edge transfer h_next=(h+δ) mod 12; secondary glyph code; solver: constraint propagation + backtracking with uniqueness proof; numeric risks: accessibility, near-similar hues, fake additive mixing rules.
 - **Look (code only):** transparent tube networks carry brilliant gradient pulses; GLSL hue transforms, procedural glass polygons, spline light tubes and glow; geometry: GLSL color wheel, translucent solids and emissive edge tubes.
-- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases; golden seed `44ca2683182b`. Score basis: Newly proposed 300; assessed from analog family prior.
-- **Source:** `docs/archive/planning/rounds/round4.md` lines 19209–20273 (11 sections); level manifest lines 20026–20129 (`python3 scripts/planning_index.py levels --experience R04-G18`); assertion outline lines 28241–28270. Prompts: `python3 scripts/planning_index.py prompt --feature R04-G18-01 --override`.
+- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases (levels in lines 20026–20129, scenarios in lines 20130–20213, fault injection in lines 20214–20266); golden seed `44ca2683182b`. Score basis: Newly proposed 300; assessed from analog family prior.
+- **Source:** `docs/archive/planning/rounds/round4.md` lines 19209–20273 (11 sections); levels as JSON: `python3 scripts/planning_index.py levels --experience R04-G18`; assertion outline lines 28241–28270. Prompts: `python3 scripts/planning_index.py prompt --feature R04-G18-01 --override`.
 
 ### R04-G19 Lattice Bloom
 
@@ -2065,8 +2163,8 @@ Rotate repeated crystal unit cells until a glowing lattice closes.
 - **Controls:** Rotate/cut/exchange crystal solids to meet 3D geometry rules.
 - **Model:** core abstraction convex-solid graph; state: vertex planes n·x<=d; polytope clipping with epsilon-scaled robust predicates; solver: exact discrete state BFS + convex clipping check on candidate action; numeric risks: zero-area faces, z-order transparencies, unmanifold mesh.
 - **Look (code only):** instanced translucent polyhedra form kaleidoscopic architecture; Beveled polyhedra, faceted signed-distance fields, instanced lattices and faux dispersion; geometry: generated bevel prisms, layered facet reflection and gradient interiors.
-- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases; golden seed `e31684a8ce1a`. Score basis: Newly proposed 300; assessed from analog family prior.
-- **Source:** `docs/archive/planning/rounds/round4.md` lines 20274–21338 (11 sections); level manifest lines 21091–21194 (`python3 scripts/planning_index.py levels --experience R04-G19`); assertion outline lines 28271–28300. Prompts: `python3 scripts/planning_index.py prompt --feature R04-G19-01 --override`.
+- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases (levels in lines 21091–21194, scenarios in lines 21195–21278, fault injection in lines 21279–21331); golden seed `e31684a8ce1a`. Score basis: Newly proposed 300; assessed from analog family prior.
+- **Source:** `docs/archive/planning/rounds/round4.md` lines 20274–21338 (11 sections); levels as JSON: `python3 scripts/planning_index.py levels --experience R04-G19`; assertion outline lines 28271–28300. Prompts: `python3 scripts/planning_index.py prompt --feature R04-G19-01 --override`.
 
 ### R04-G20 Glass Knot Studio
 
@@ -2078,8 +2176,8 @@ Thread transparent geometric ropes through interlocking crystal loops.
 - **Controls:** Rotate/cut/exchange crystal solids to meet 3D geometry rules.
 - **Model:** core abstraction convex-solid graph; state: vertex planes n·x<=d; polytope clipping with epsilon-scaled robust predicates; solver: exact discrete state BFS + convex clipping check on candidate action; numeric risks: zero-area faces, z-order transparencies, unmanifold mesh.
 - **Look (code only):** tubular spline geometry and shimmering facets; Beveled polyhedra, faceted signed-distance fields, instanced lattices and faux dispersion; geometry: generated bevel prisms, layered facet reflection and gradient interiors.
-- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases; golden seed `54741054cbda`. Score basis: Newly proposed 300; assessed from analog family prior.
-- **Source:** `docs/archive/planning/rounds/round4.md` lines 21339–22403 (11 sections); level manifest lines 22156–22259 (`python3 scripts/planning_index.py levels --experience R04-G20`); assertion outline lines 28301–28330. Prompts: `python3 scripts/planning_index.py prompt --feature R04-G20-01 --override`.
+- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases (levels in lines 22156–22259, scenarios in lines 22260–22343, fault injection in lines 22344–22396); golden seed `54741054cbda`. Score basis: Newly proposed 300; assessed from analog family prior.
+- **Source:** `docs/archive/planning/rounds/round4.md` lines 21339–22403 (11 sections); levels as JSON: `python3 scripts/planning_index.py levels --experience R04-G20`; assertion outline lines 28301–28330. Prompts: `python3 scripts/planning_index.py prompt --feature R04-G20-01 --override`.
 
 ### R04-G21 Time Ribbon Relay
 
@@ -2091,8 +2189,8 @@ Rewind a moving light ribbon while changing one obstacle per loop.
 - **Controls:** Edit events in a short loop to produce a future alignment.
 - **Model:** core abstraction fixed-step timeline; state: state[k+1]=F(state[k],actions[k]); snapshot every 120 ticks and hash canonical state; solver: bounded time-expanded search with cycle memoization; numeric risks: desynchronization, unbounded history, ambiguous rewind interface.
 - **Look (code only):** luminous ribbon retains branching past trajectories; Deterministic timeline buffers, ghost trails, reversible deformation shaders; geometry: motion trails, reversible shader deformation and ghost snapshots.
-- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases; golden seed `d0bc7a43b428`. Score basis: Newly proposed 300; assessed from analog family prior.
-- **Source:** `docs/archive/planning/rounds/round4.md` lines 22404–23468 (11 sections); level manifest lines 23221–23324 (`python3 scripts/planning_index.py levels --experience R04-G21`); assertion outline lines 28331–28360. Prompts: `python3 scripts/planning_index.py prompt --feature R04-G21-01 --override`.
+- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases (levels in lines 23221–23324, scenarios in lines 23325–23408, fault injection in lines 23409–23461); golden seed `d0bc7a43b428`. Score basis: Newly proposed 300; assessed from analog family prior.
+- **Source:** `docs/archive/planning/rounds/round4.md` lines 22404–23468 (11 sections); levels as JSON: `python3 scripts/planning_index.py levels --experience R04-G21`; assertion outline lines 28331–28360. Prompts: `python3 scripts/planning_index.py prompt --feature R04-G21-01 --override`.
 
 ### R04-G22 Gemstone Telegraph
 
@@ -2104,8 +2202,8 @@ Encode and decode light pulses across a network of faceted prism towers.
 - **Controls:** Tap and rotate optical elements; observe ray path; solve light-path constraint.
 - **Model:** core abstraction ray/wave optical graph; state: Snell n1 sinθ1=n2 sinθ2; Fresnel-inspired aesthetic only, numeric ray solver owns truth; solver: bounded ray graph traversal with plane intersections and reflection/refraction validation; numeric risks: false physical accuracy, firefly pixels, excessive transparency.
 - **Look (code only):** faceted gems flashing wavelength-coded trails; Analytic beam volumes, layered caustic projections, SDF optics and gradient materials; geometry: projected caustics, beam cylinders, chromatic dispersion approximations.
-- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases; golden seed `a0a33adfcbbe`. Score basis: Newly proposed 300; assessed from analog family prior.
-- **Source:** `docs/archive/planning/rounds/round4.md` lines 23469–24533 (11 sections); level manifest lines 24286–24389 (`python3 scripts/planning_index.py levels --experience R04-G22`); assertion outline lines 28361–28390. Prompts: `python3 scripts/planning_index.py prompt --feature R04-G22-01 --override`.
+- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases (levels in lines 24286–24389, scenarios in lines 24390–24473, fault injection in lines 24474–24526); golden seed `a0a33adfcbbe`. Score basis: Newly proposed 300; assessed from analog family prior.
+- **Source:** `docs/archive/planning/rounds/round4.md` lines 23469–24533 (11 sections); levels as JSON: `python3 scripts/planning_index.py levels --experience R04-G22`; assertion outline lines 28361–28390. Prompts: `python3 scripts/planning_index.py prompt --feature R04-G22-01 --override`.
 
 ### R04-G23 Soundglass Observatory
 
@@ -2117,8 +2215,8 @@ Tilt sound-sensitive glass to project wave shapes into geometric constellations.
 - **Controls:** Position/trigger resonators and infer hidden 3D structure.
 - **Model:** core abstraction pulse propagation graph; state: arrival_time(x)=||x-source||/c with bounded distance field and quantized pulse ticks; solver: discrete emitter search with exact arrival-order and occlusion checks; numeric risks: misleading sound analogy, ring overdraw and strobe risk.
 - **Look (code only):** iridescent sheet deformations and scanline nebulae; Instanced line meshes, transient wave shells, acoustically inspired distance-field reveals; geometry: expanding ring meshes, volumetric-look pulse shells and glowing distance bands.
-- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases; golden seed `752aef8eaa60`. Score basis: Newly proposed 300; assessed from analog family prior.
-- **Source:** `docs/archive/planning/rounds/round4.md` lines 24534–25598 (11 sections); level manifest lines 25351–25454 (`python3 scripts/planning_index.py levels --experience R04-G23`); assertion outline lines 28391–28420. Prompts: `python3 scripts/planning_index.py prompt --feature R04-G23-01 --override`.
+- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases (levels in lines 25351–25454, scenarios in lines 25455–25538, fault injection in lines 25539–25591); golden seed `752aef8eaa60`. Score basis: Newly proposed 300; assessed from analog family prior.
+- **Source:** `docs/archive/planning/rounds/round4.md` lines 24534–25598 (11 sections); levels as JSON: `python3 scripts/planning_index.py levels --experience R04-G23`; assertion outline lines 28391–28420. Prompts: `python3 scripts/planning_index.py prompt --feature R04-G23-01 --override`.
 
 ### R04-G24 Refraction Foundry
 
@@ -2130,8 +2228,8 @@ Shape virtual lenses to focus colored beams at targets inside a glass furnace.
 - **Controls:** Tap and rotate optical elements; observe ray path; solve light-path constraint.
 - **Model:** core abstraction ray/wave optical graph; state: Snell n1 sinθ1=n2 sinθ2; Fresnel-inspired aesthetic only, numeric ray solver owns truth; solver: bounded ray graph traversal with plane intersections and reflection/refraction validation; numeric risks: false physical accuracy, firefly pixels, excessive transparency.
 - **Look (code only):** curved Fresnel-like patterns around translucent procedural solids; Analytic beam volumes, layered caustic projections, SDF optics and gradient materials; geometry: projected caustics, beam cylinders, chromatic dispersion approximations.
-- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases; golden seed `0910bf9c5b24`. Score basis: Newly proposed 300; assessed from analog family prior.
-- **Source:** `docs/archive/planning/rounds/round4.md` lines 25599–26663 (11 sections); level manifest lines 26416–26519 (`python3 scripts/planning_index.py levels --experience R04-G24`); assertion outline lines 28421–28450. Prompts: `python3 scripts/planning_index.py prompt --feature R04-G24-01 --override`.
+- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases (levels in lines 26416–26519, scenarios in lines 26520–26603, fault injection in lines 26604–26656); golden seed `0910bf9c5b24`. Score basis: Newly proposed 300; assessed from analog family prior.
+- **Source:** `docs/archive/planning/rounds/round4.md` lines 25599–26663 (11 sections); levels as JSON: `python3 scripts/planning_index.py levels --experience R04-G24`; assertion outline lines 28421–28450. Prompts: `python3 scripts/planning_index.py prompt --feature R04-G24-01 --override`.
 
 ### R04-G25 Prism Terrace
 
@@ -2143,8 +2241,8 @@ Stack rotating faceted platforms to redirect beams toward a center.
 - **Controls:** Rotate/cut/exchange crystal solids to meet 3D geometry rules.
 - **Model:** core abstraction convex-solid graph; state: vertex planes n·x<=d; polytope clipping with epsilon-scaled robust predicates; solver: exact discrete state BFS + convex clipping check on candidate action; numeric risks: zero-area faces, z-order transparencies, unmanifold mesh.
 - **Look (code only):** sharp glints and colored refraction approximations; Beveled polyhedra, faceted signed-distance fields, instanced lattices and faux dispersion; geometry: generated bevel prisms, layered facet reflection and gradient interiors.
-- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases; golden seed `cdea0f8b4b64`. Score basis: Newly proposed 300; assessed from analog family prior.
-- **Source:** `docs/archive/planning/rounds/round4.md` lines 26664–27728 (11 sections); level manifest lines 27481–27584 (`python3 scripts/planning_index.py levels --experience R04-G25`); assertion outline lines 28451–28481. Prompts: `python3 scripts/planning_index.py prompt --feature R04-G25-01 --override`.
+- **Content:** 100 planned levels; 80 acceptance scenarios; 50 fault-injection cases (levels in lines 27481–27584, scenarios in lines 27585–27668, fault injection in lines 27669–27721); golden seed `cdea0f8b4b64`. Score basis: Newly proposed 300; assessed from analog family prior.
+- **Source:** `docs/archive/planning/rounds/round4.md` lines 26664–27728 (11 sections); levels as JSON: `python3 scripts/planning_index.py levels --experience R04-G25`; assertion outline lines 28451–28481. Prompts: `python3 scripts/planning_index.py prompt --feature R04-G25-01 --override`.
 <!-- GENERATED:END cards-round04 -->
 
 ## 10. Backlog: Rounds 5–12
@@ -2407,6 +2505,8 @@ Names without that mark exist in the source today.
   never waits for the store.
 - `Showcase`, the harnesses and, until they are retired, the four standalone apps remain non-shipping targets.
 - ProjectM engine and preset code is never linked into the app (checked on the built product).
+- The app target's Swift module is named `VisualCoreApp` (proposal) so that it cannot be confused with the
+  framework package `VisualCore`; the display name stays VisualCore.
 
 ### 11.2 Catalog and identity
 
@@ -2435,6 +2535,7 @@ need SwiftUI or a render host live in `VisualCoreExperienceHost` (new, in `Packa
 | draw | Through the existing `RenderScene` contract. Reads immutable state. No GPU result decides an outcome. |
 | input | Gestures are normalized into domain actions. Each action is accepted or rejected with a typed reason; a rejected action leaves the digest unchanged. |
 | snapshot / restore | A versioned envelope with migrations. `restore(snapshot())` reproduces the digest. |
+| state and GPU | A snapshot is a pure, versioned value. GPU objects are a cache that can be rebuilt from it; a GPU handle is never persisted. |
 | reset | Equals a fresh `prepare` with the same seed. |
 | suspend / resume | Clocks stop; rebuildable caches may be dropped; resume does not catch up. |
 | deactivate | Every GPU resource of the session is released. |
@@ -2503,6 +2604,9 @@ Sketch of the proposed shape (illustrative; UA-F02 fixes the real signatures):
 - Swift traps cannot be caught, so shipped code paths that read stored or user-influenced data use no
   `fatalError`, forced unwrap or unchecked index; inputs are bounded and validated.
 - Preparation has a time limit; exceeding it is a failure like any other.
+- Below the experience lifecycle sits the render host's own: uninitialized, surface ready, active, suspended,
+  surface invalid, reinitialized, destroyed. GPU handles belong to a context generation. Simulator tests cover
+  re-entrancy, resize, rapid scene change, background and foreground, and termination.
 
 ### 11.7 Navigation, settings and onboarding
 
@@ -2525,7 +2629,8 @@ Sketch of the proposed shape (illustrative; UA-F02 fixes the real signatures):
 OpenGL ES 3.0 calls go through EGL to the owner's ANGLE fork, which renders with Metal. `RenderHost` owns the
 context and the frame loop, `RenderScene` is what an experience draws through, `RenderSurface` is the SwiftUI view,
 `ResourceRegistry` and `ResourceLedger` account for every GPU object, and `FrameScheduler` paces frames. The design
-is described in `docs/architecture/visualcore-architecture.md` and `docs/architecture/current-rendering-pipeline.md`.
+is described in `docs/architecture/visualcore-architecture.md`; `docs/architecture/current-rendering-pipeline.md`
+traces the ProjectM-iOS reference pipeline that `RenderHost` re-implements.
 
 ### 12.2 Rules
 
@@ -2535,11 +2640,28 @@ is described in `docs/architecture/visualcore-architecture.md` and `docs/archite
 3. Shaders are GLSL ES 3.00, expanded and validated by the existing shader pipeline, compiled during preparation.
    Measure load separately from the first rendered frame.
 4. Gameplay truth is CPU state. Shaders portray it. No readback decides an outcome.
-5. Color handling follows `docs/rendering/color-space.md`. Bloom and emissive passes go through the flash limiter.
+5. Color handling follows `docs/rendering/color-space.md`. Color space, alpha convention and units are explicit in
+   every pipeline; the alpha convention (premultiplied or straight) is not yet written down there and is added by
+   the first feature that blends. Bloom and emissive passes go through the flash limiter.
 6. Experience and app sources contain no direct GL or EGL calls (`scripts/check_app_isolation.py`).
 7. Untrusted or user-authored input (shader text in Shader Studio, graphs in Visual Programming Lab and Effects
    Composer) is bounded: pass counts, texture memory, compile time and iteration counts have limits, cycles and
    invalid paths are rejected, and a failure never hangs the app.
+8. **Optical truth boundary.** Bloom, reflective-looking color, translucency and caustic-looking gradients are
+   presentation. The CPU model computes intersections, phases, conservation and projection. A lower tier may
+   trade samples, layers and resolution while the meaning of the scene stays identical.
+9. No compute shaders and no unbounded volumetric ray marching: neither fits GLSL ES 3.00 on this path.
+10. Shader compilation and `glGetError` are checked for real. The GL ES and extension fingerprint of each device
+    is recorded during the device campaign.
+11. Dependency trees are handled with care: never `git clean -fdx` inside them, never wipe, move or delete the
+    large `gclient` tree of ANGLE, build the reference binaries only with the reference project's own scripts
+    (they write only to `Build/ANGLEFrameworks`), and keep the forks pinned (`Coastrnaut/projectm` and
+    `Coastrnaut/angle`, branch `ios`). The submodule is never vendored, its pin never changes without a recorded
+    decision, `git submodule update --remote` is never run unattended, and the tested commit is recorded. The
+    reference's deployment target, ANGLE revision, compiler settings and build system are never changed to fit a
+    VisualCore convention.
+12. No new ANGLE adapter or backend is added for the sake of modularity. Native Metal is considered only for a
+    proven, concrete need, with an ADR.
 
 ### 12.3 Fidelity during the migration
 
@@ -2558,7 +2680,8 @@ override lets a person pin a tier.
 ### 12.5 Budgets
 
 Budgets are written as proposals in `docs/performance/` together with the device measurement that will confirm
-them. Simulator numbers are development signals and are never presented as performance results. The first values
+them. Simulator numbers are development signals and are never presented as performance results. No target becomes a
+requirement before a measured baseline exists, and comparisons are made on the same device and OS. The first values
 to confirm on devices:
 
 | Budget | Proposal | Confirmed by |
@@ -2566,6 +2689,9 @@ to confirm on devices:
 | Cold launch to an interactive launcher | no rendering context, no store wait | D1, D2, D3 measurements, at least 200 samples |
 | Open an experience to its first frame | preparation, shader compilation and first present recorded separately | same |
 | Frame pacing in an active experience | at least 95 % of refresh slots on time at the selected tier | same |
+| Frame rate | 60 frames per second with adaptive tiers; a documented 30 frames per second mode is acceptable on the lower tier | same |
+| Input to visible response | median under 80 ms and p95 under 150 ms, measured on one clock | same |
+| Start | cold and warm start recorded separately; bounded shader variants are prewarmed | same |
 | Memory and GPU bytes of a session | bounded by the declared `ResourceBudget`; flat over a 10-minute scenario | simulator trend, then devices |
 | Clean build, incremental build, app size | recorded at every milestone | UA-F10 |
 
@@ -2578,6 +2704,10 @@ to confirm on devices:
 - D1 is the primary reference, D2 the high-resolution tier, D3 the compatibility and lower-tier budget. Devices
   are not forced to the same quality; adaptive quality is reported.
 - Installed size is compared on thinned archives, not on debug simulator builds.
+- Launch time takes one sample per process launch. The first launch after installation belongs to onboarding and
+  is excluded.
+- A result that only just passes is repeated and reported with its variance.
+- Data the launcher sorts or indexes is sorted at build time, not at launch.
 
 ## 13. Shared features and reuse
 
@@ -2629,6 +2759,12 @@ of build time and size and an ADR.
 4. Every framework change gets `///` documentation, an API baseline update
    (`python3 scripts/check_public_api.py --update`), its own package tests, and the seven-step ProjectM reference
    regression run in two chunks.
+5. No API without a concrete consumer, and no general game-engine architecture unless a requirement demands it.
+   Before a new shared boundary is created, the six questions of the original framework plan are answered
+   (`docs/archive/planning/embedded/sources/README.md`, "boundary" questions); if the answers are unclear, the need
+   is documented and the boundary deferred.
+6. A framework capability is complete only with a consumer, a contract, tests, a sample, lifecycle and error
+   behavior, measurements and documentation.
 
 ### 13.4 Round 2 shared features
 
@@ -2671,7 +2807,7 @@ the other 24 are gates of the migration ledger. "Reuses today" lists types that 
 | R02-F31 | **Device automation harness and report schema** — devicectl wrappers; launch modes; xresult archive; per-run JSON; checksums | ALL | superseded | `AutomationRunner`, `AutomationReport` | — | no gate: superseded by UA-F09, UA-F13 | Simulator part in UA-F09, device part in UA-F13. |
 | R02-F32 | **Graphics frame pacing and D3 thermal adaptation** — adaptive quality; frame interval histograms; no false GPU statistics; 30 min sustained probe | ALL | superseded | `FramePacing`, `QualityPolicy`, `DeviceConditions` | — | no gate: superseded by UA-F06 | Quality profiles and pacing are UA-F06; D3 measurements happen after the lock. |
 | R02-F33 | **Game identity distinctiveness & release packaging** — originality matrices; independent UX/goal; static app icons from vector code; legal audit | ALL | superseded | — | — | no gate: superseded by UA-F11, UA-F14 | Distinctiveness audit is UA-F11; packaging is UA-F14 for the one app. |
-| R02-F34 | **Cross-game reconciliation and Round 2 evidence lock** — 25×3 device reports; no pending regression; full provenance and audit summary | ALL | superseded | — | — | no gate: superseded by UA-F12 | Reconciliation and evidence lock are LOCK-FREE-50 and UA-F12. |
+| R02-F34 | **Cross-game reconciliation and Round 2 evidence lock** — 25×3 device reports; no pending regression; full provenance and audit summary | ALL | superseded | — | — | no gate: superseded by UA-F12 | Reconciliation before devices is LOCK-FREE-50 and UA-F12; its device part is DEVICE-RECONCILE-100 (C-18). |
 <!-- GENERATED:END shared-round02 -->
 
 ### 13.5 Shared features of Rounds 3–12
@@ -2698,6 +2834,51 @@ adapter instead of duplicate code.
 | Rnn-F12 | **Suite originality, legal, no-ads and final reconciliation** — Audit all products, similarities, licenses, privacy and evidentiary gaps; converge only when valid results exist | superseded | — | — | no gate: superseded | Originality, legal and no-advertising audits are UA-F11; final reconciliation is UA-F12. |
 <!-- GENERATED:END shared-rounds03-12 -->
 
+### 13.6 Binding rules for every shared feature
+
+Round 2 attaches a binding supplement to all its shared-feature prompts (source section 4.3). It stands:
+
+1. Every feature begins with an audit for genuine reuse. An API that has not been found, compiled and tested in
+   the local checkout is only a proposal.
+2. The source's type sketches (`GameTick`, `GameActionEnvelope`, `LevelIdentity`, `RuleRejection`,
+   `DeterministicGameModel`) are proposals, not existing names. They map onto ExperienceKit and
+   `VisualCorePuzzle`; a wrapper is written only where the repository lacks an equivalent, as a thin adapter. A
+   sketch is compiled against the pinned Swift before it is adopted; where typed throws are unavailable, plain
+   throws with a typed validation layer are used.
+3. Gates of the supplement, each proven by a test:
+
+| Area | Gate |
+|---|---|
+| CPU puzzle models | action traces replay to identical canonical hashes on the host and on both simulator runtimes |
+| Solvers and certification | 100 levels per game with real solver witnesses and no placeholder |
+| Renderer adapters | real shader compilation and `glGetError` checks; device fingerprints recorded during the campaign |
+| Procedural assets | the same code and seed give identical logical artifact hashes |
+| Gameplay accessibility | an alternative to drag, tap precision, color, motion and audio in every game; semantic UI tests and an accessible replay |
+| Content provenance | every shipped level manifest parses and validates; no level exists only in a document |
+| Evidence | simulator and device results are never mixed; device evidence only after the lock |
+| Hygiene | no advertising, subscription, private API or misleading clone branding in the built app or its frameworks |
+
+4. No gameplay input and no graphics result depends on a network connection.
+5. A deficiency found while testing these rules becomes a new, uniquely numbered task that goes through the full
+   Spec Kit progression. It is never fixed by a quiet shortcut.
+
+### 13.7 Known gaps of the framework
+
+Found on 2026-11-11 by comparing the original framework plan with the source. Each gap is closed in the framework
+by the first feature that needs it, after that feature's own audit has confirmed it.
+
+| Gap today | Needed by | Note |
+|---|---|---|
+| Depth, stencil and multisampling: the window surface is color-only and `RenderTarget` has a color attachment only | the 3D creative experiences (A05, A07, A12, A14, A15, A17), the 3D games, R02-F13 | a depth attachment on off-screen targets is the smaller step; changing the window configuration departs from the audited sequence of ADR-0002 and needs a new ADR |
+| 3D mesh pipeline: three generators and one Lambert-lit `MeshRenderer`; no materials, textured meshes, mesh instancing, picking or level of detail | R02-F05, R02-F08, R02-F09, R02-F22 and every 3D experience | geometry goes to `VisualCoreGeometry`, drawing to `VisualCoreRendering` |
+| Audio: capture with spectrum, bands and onsets; audio output and procedural sound; haptics | A06–A08; A10, A21; the games (R02-F26) | `VisualCoreAudio` and `VisualCoreAudioDSP` are placeholders |
+| Text inside GL scenes | labels of A14, A15, A17, the clock face of A18, glyphs in puzzles | decided per experience: a native overlay first, procedural glyph geometry where the text is part of the scene; no font atlas from outside |
+| Image decoding into textures and a textured sprite batch | A25 (image import), 2D experiences | `Texture` takes raw RGBA and `PrimitiveRenderer` draws flat color today |
+| Physics and collision | A10, A11 | pure code in `VisualCoreSimulation` |
+| Scene transitions and video export | A19 and the ambient experiences | export through public APIs only |
+| GPU timing | A24 | no precision claim without a platform API |
+| Game-controller input, a fake clock and fixtures in test support, a shared diagnostics overlay, asset metrics, a shader preset format | several | deliberately not built so far (ADR-0006) |
+
 ## 14. Purchases and entitlement
 
 ### 14.1 The product
@@ -2719,6 +2900,9 @@ transfer and the app never suggests they do.
   Family-shared ownership and its loss are handled.
 - A previously verified entitlement works offline. A device that never purchased shows an honest locked state
   offline, never an error that looks like a bug.
+- Store lookups never block the launcher or the first interactive frame.
+- The archive's Round 2 rule that forbids a StoreKit configuration file and an entitlement fixture belongs to the
+  superseded "no in-app purchase" plan (C-02). Both exist here, for tests only.
 - Gating happens twice: the launcher refuses to navigate to a locked premium experience and the session refuses
   to activate it. Free experiences never query the store and work when StoreKit is unavailable.
 
@@ -2773,7 +2957,10 @@ Connect, the Paid Apps agreement, the price, the Family Sharing choice and a san
   (`scripts/check_privacy_manifest.py`). A checked-in manifest alone proves nothing.
 - Usage descriptions exist only for capabilities that registered experiences use. Captured audio is processed in
   memory and not retained by default. Real-time audio callbacks do not allocate or wait on locks.
-- Export-compliance declarations and privacy answers are drafted from the built product (UA-F14).
+- Export-compliance declarations, the privacy policy, the license agreement text and the privacy answers are
+  drafted from the built product (UA-F14). Usage descriptions are the union of what the registered experiences
+  need, for example the microphone for A06–A08. The privacy label of the app therefore reflects every
+  experience, including the few that ask for a permission. Exports carry no microphone data and no hidden metadata.
 
 ### 15.3 Accessibility and comfort
 
@@ -2790,9 +2977,13 @@ VoiceOver testing on devices is recorded and is non-gating.
 - ProjectM and its presets are reference material of the harness. They are not linked into or shipped with the
   app; a symbol and dependency scan of the built app proves it.
 - Every shader and generated asset in the bundle has provenance in the repository.
-- A distinctiveness matrix over the 100 launch experiences (core abstraction, player action, win rule) shows that
-  no two share a mechanic; near-duplicates are redesigned or merged before the lock. Names, trademarks and the
-  age rating are owner reviews.
+- License files are never removed, rewritten or merged without a legal review by the owner.
+- A distinctiveness matrix over all pairs of the 100 launch experiences (core abstraction, player action, win
+  rule) shows that no two share a mechanic. The six close pairs named by the Round 2 source are checked first. A
+  near-duplicate is redesigned before the lock; it is never merged or dropped (section 6.5). Names, trademarks
+  and the age rating are owner reviews.
+- Scans look for advertising SDKs, advertising identifiers, trackers, remote image pipelines, placeholder branding
+  and copied art or audio. A clean scan is evidence, not legal assurance.
 - Scientific content (astronomy, molecules, anatomy) carries sources and revision notes and is educational, not
   diagnostic.
 
@@ -2849,7 +3040,9 @@ VisualCore/
 
 Naming conventions for new code: experience directory and module prefix are the experience name in upper camel
 case (`InfiniteGeometry`); targets are `<Name>Core` (pure, host-testable) and `<Name>Experience` (SwiftUI and
-scene); test targets add `Tests`; UI tests live in `Apps/VisualCore/Tests/UI/<Name>/`. The complete old-to-new
+scene); test targets add `Tests`; UI tests live in `Apps/VisualCore/Tests/UI/<Name>/`. Xcode projects are
+generated with the pinned XcodeGen and are not committed. Shader caches, build output, derived data, preview
+videos and generated indexes never enter Git. The complete old-to-new
 path map is in [`docs/migration/migration-plan.md`](docs/migration/migration-plan.md) and
 `docs/migration/path-map.json`.
 
@@ -3027,6 +3220,11 @@ At most ten agents work at once and one writer owns each file. Research, reviews
 experiences are good parallel units; the integration session owns `project.yml`, the package manifests, the
 catalog, `tasks.md`, the ledgers and this document. Heavy builds, simulator test runs and all device jobs run one
 at a time on the one Mac. An agent's report is a claim: inspect the diff and rerun the tests before ticking a task.
+Two Spec Kit features are never in progress in the same working tree.
+
+Defaults when no one can be asked: inspect the real API before designing against it; measure before optimizing;
+fix and rerun instead of weakening a test; report blocked instead of inventing a result; choose the simplest
+defensible option and record why.
 
 ## 19. Spec Kit procedure and numbering
 
@@ -3058,7 +3256,7 @@ The constitution (1.5.0) still describes 25 separate apps. Before any new featur
 
 <!-- GENERATED:BEGIN constitution-prompt -->
 ```text
-/speckit-constitution Amend the VisualCore constitution from 1.5.0 to 2.0.0 (MAJOR: scope and Principle V are redefined) to adopt ADR-0009. Keep Principles I, II, II-a, III, IV, VI, VII, VIII, IX and X and every app-scoped rule for A01-A04 in force; change only what ADR-0009 changes, and record a dated rationale that cites ADR-0009. Required amendments: (1) Scope: one iPhone/iPad application, VisualCore, with one shippable app target and modular registered experiences; the Showcase and the harnesses stay non-shipping; the 25 original apps and all round games are experiences, not separate apps. (2) Add Principle XI, One App and Stable Experience Identity: exactly one shippable app target and bundle identifier; every experience has an immutable id '<code>.<slug>' from docs/catalog/experience-catalog.json; experiences never depend on each other; ProjectM types stay out of the app. (3) Add Principle XII, One Purchase and No Advertising (NON-NEGOTIABLE): free download; exactly one non-consumable StoreKit 2 product at USD 1.99 unlocking every premium experience including future ones; no ads, ad SDKs, ad identifiers, rewarded ads, subscriptions, consumables, external payment paths, dark patterns or required accounts; premium gating at routing and at experience activation; the test-only entitlement fixture must be absent from shipping Release binaries. (4) Add Principle XIII, Code-Driven Visuals: all worlds and signature effects are GLSL, procedural meshes, SDFs, particles and deterministic animation on the existing OpenGL ES to ANGLE to Metal path; no required human-made models, purchased art packs, prompt-generated images or external image services. (5) Redefine Principle V, Implementation Before Devices: all 100 launch experiences (50 free, 50 premium) are implemented and pass host and simulator acceptance, and ImplementationLock-100 is recorded by scripts/migration_ledger.py, before any physical-device install, launch or test of the unified app; then D1, D2, D3 in that order, 100 experiences each; D3 stays on iPadOS 26.5; historical device observations never certify the unified build. (6) Principle VIII: one PrivacyInfo.xcprivacy for the app, audited against the built product. (7) Development Workflow: feature numbering and ID namespaces of Auto-Creator.md section 19; the legacy ledger .autonomy/state.json keeps the A-phase gates; .autonomy/migration/ledger.json holds every new gate; commits stay on the migration branch and are never pushed to main until the owner merges. (8) App-Scoped Rules: keep the A01-A04 rules, reworded from 'app' to 'experience' only where the directory or target wording would otherwise be false. (9) Governance precedence: Apple and toolchain behavior and observed tests, then Auto-Creator.md and CLAUDE.md, then this constitution and ADRs, then the planning archive, then generated code. Do not delete or weaken any requirement that ADR-0009 does not supersede. After amending, update the Sync Impact Report, run python3 scripts/validate_docs.py, and write ADR-0010 recording the amendment.
+/speckit-constitution Amend the VisualCore constitution from 1.5.0 to 2.0.0 (MAJOR: scope and Principle V are redefined) to adopt ADR-0009. Keep Principles I, II, II-a, III, IV, VI, VII, VIII, IX and X and every app-scoped rule for A01-A04 in force; change only what ADR-0009 changes, and record a dated rationale that cites ADR-0009. Required amendments: (1) Scope: one iPhone/iPad application, VisualCore, with one shippable app target and modular registered experiences; the Showcase and the harnesses stay non-shipping; the 25 original apps and all round games are experiences, not separate apps. (2) Add Principle XI, One App and Stable Experience Identity: exactly one shippable app target and bundle identifier; every experience has an immutable id '<code>.<slug>' from docs/catalog/experience-catalog.json; experiences never depend on each other; ProjectM types stay out of the app; the launch set of 100 experiences is never reduced, merged or substituted (ADR-0009 D-16). (3) Add Principle XII, One Purchase and No Advertising (NON-NEGOTIABLE): free download; exactly one non-consumable StoreKit 2 product at USD 1.99 unlocking every premium experience including future ones; no ads, ad SDKs, ad identifiers, rewarded ads, subscriptions, consumables, external payment paths, dark patterns or required accounts; premium gating at routing and at experience activation; the test-only entitlement fixture must be absent from shipping Release binaries. (4) Add Principle XIII, Code-Driven Visuals: all worlds and signature effects are GLSL, procedural meshes, SDFs, particles and deterministic animation on the existing OpenGL ES to ANGLE to Metal path; no required human-made models, purchased art packs, prompt-generated images or external image services. (5) Redefine Principle V, Implementation Before Devices: all 100 launch experiences (50 free, 50 premium) are implemented and pass host and simulator acceptance, and ImplementationLock-100 is recorded by scripts/migration_ledger.py, before any physical-device install, launch or test of the unified app; then D1, D2, D3 in that order, 100 experiences each; D3 stays on iPadOS 26.5; historical device observations never certify the unified build. (6) Principle VIII: one PrivacyInfo.xcprivacy for the app, audited against the built product; the app makes no network request of its own (ADR-0009 D-15); human-judgement reviews are owner reviews and do not gate (D-17). (7) Development Workflow: feature numbering and ID namespaces of Auto-Creator.md section 19; the legacy ledger .autonomy/state.json keeps the A-phase gates; .autonomy/migration/ledger.json holds every new gate; commits stay on the migration branch and are never pushed to main until the owner merges. (8) App-Scoped Rules: keep the A01-A04 rules, reworded from 'app' to 'experience' only where the directory or target wording would otherwise be false. (9) Governance precedence: Apple and toolchain behavior and observed tests, then Auto-Creator.md and CLAUDE.md, then this constitution and ADRs, then the planning archive, then generated code. Do not delete or weaken any requirement that ADR-0009 does not supersede. After amending, update the Sync Impact Report, run python3 scripts/validate_docs.py, and write ADR-0010 recording the amendment.
 ```
 <!-- GENERATED:END constitution-prompt -->
 
@@ -3081,20 +3279,26 @@ One feature per gate. The same loop serves every feature; only the source of the
 **A. Feature in the migration ledger** (unified-app, shared round and game features):
 
 ```bash
-python3 scripts/migration_ledger.py next --limit 1                 # the gate
-python3 scripts/migration_ledger.py show --gate <GATE>             # spec_dir, dependencies
+python3 scripts/migration_ledger.py next --limit 1
+python3 scripts/migration_ledger.py show --gate <GATE>
 mkdir -p <spec_dir> && printf '{\n  "feature_directory": "%s"\n}\n' <spec_dir> > .specify/feature.json
-python3 scripts/planning_index.py prompt --feature <GATE> --override   # the eight prompts, with the override note
+python3 scripts/planning_index.py prompt --feature <GATE> --override
 ```
+
+The first command prints the gate, the second its spec directory and dependencies, the third points Spec Kit at
+the directory, the fourth prints the eight prompts with the override note.
 
 **B. Phase of an original app** (legacy ledger):
 
 ```bash
-python3 Tools/python/desktop_runbook.py status                     # the gate, for example A04-P04 = feature 036
+python3 Tools/python/desktop_runbook.py status
 mkdir -p specs/<NNN>-<slug> && printf '{\n  "feature_directory": "%s"\n}\n' specs/<NNN>-<slug> > .specify/feature.json
-python3 scripts/speckit_prompts.py --feature <NNN>                 # the prompts of the phase
-python3 scripts/planning_index.py prompt --feature A<nn>-P<p> --override   # the override note to append to each
+python3 scripts/speckit_prompts.py --feature <NNN>
+python3 scripts/planning_index.py prompt --feature A<nn>-P<p> --override
 ```
+
+The first command prints the gate (for example A04-P04, which is feature 036), the third the prompts of the phase,
+the fourth the override note to append to each prompt.
 
 Then, in the conversation, in this order and without skipping one:
 
@@ -3112,19 +3316,29 @@ Then, in the conversation, in this order and without skipping one:
 Each prompt is used verbatim. Additions are labelled `Canonical override:` and never replace prompt text. A skill
 is never replaced by hand-written artifacts.
 
-Record evidence and close the gate:
+- Before each skill, confirm that `.specify/feature.json` names the feature's directory.
+- Start a feature by reading its sources in full: the brief or the card and, for an original app, the one manual
+  of that app. Read archived material in bounded pieces, and never describe a part that was not read.
+- Every task names its file path, its test and its exact expected result.
+- A convergence run does not report "converged" when only a plan, empty source files, an agent's claim or mocked
+  tests exist.
+
+Record evidence and close the gate. In the migration ledger:
 
 ```bash
-# migration ledger
 python3 scripts/migration_ledger.py run-check --gate <GATE> --name <check> -- <command and arguments>
 python3 scripts/migration_ledger.py seal --gate <GATE>
 python3 scripts/migration_ledger.py record --gate <GATE>
+```
 
-# legacy ledger
-python3 Tools/python/desktop_runbook.py run-check --stage <GATE> --name <check> -- <command and arguments>
+In the legacy ledger (its `run-check` defaults to a timeout of 1800 seconds, so the limit is passed explicitly; the
+last command refreshes the catalog's implementation state):
+
+```bash
+python3 Tools/python/desktop_runbook.py run-check --stage <GATE> --name <check> --timeout 600 -- <command and arguments>
 python3 Tools/python/desktop_runbook.py seal --stage <GATE>
 python3 Tools/python/desktop_runbook.py record --stage <GATE> --evidence .autonomy/evidence/<GATE>.json
-python3 scripts/planning_index.py build        # refresh the catalog's implementation state
+python3 scripts/planning_index.py build
 ```
 
 Commit after every skill, every task and every recorded gate. Then take the next gate; sealing a gate is not a
@@ -3140,6 +3354,8 @@ stopping point.
   blocks a simulator gate, and neither is ever ticked from a simulator result.
 - Evidence is a real command run through `run-check`. Logs go to `.autonomy/logs/` (not tracked); attestations
   with the log's SHA-256 and sealed evidence files are tracked.
+- An evidence command is an argument list, never a shell string: no shell wrapper and no inline script. The
+  migration ledger refuses both.
 - Long commands run in the foreground with a timeout of ten minutes or less; larger suites are split with
   `--only` and `--skip`. A job is never left in the background at the end of a turn.
 
@@ -3159,6 +3375,9 @@ stopping point.
   the consumers. A noise-floor-relative reference criterion that fails once is rerun unchanged once, and the
   failed attempt stays in the record.
 - Percentage criteria need at least 200 samples; fewer is a development signal, not a result.
+- Commands that address a simulator or a device are filled in from live `xcrun` output, run with an explicit
+  timeout and write their complete output to a file. `|| true` is never appended to hide a failure.
+- One simulator per lane. Permissions are reset between scenarios with `xcrun simctl privacy`.
 
 ## 20. Unified-app features: briefs and prompts
 
@@ -4111,6 +4330,8 @@ Canonical override: feature directory specs/194-ua-f08-entitlement-store; requir
 6. Rendered frames pass non-blank and semantic probe checks; golden images are supporting evidence only.
 7. Each record names the simulator runtime build, device type, Xcode build, commit and app binary hash.
 8. The driver has self-tests with the sample experience, including a deliberately failing scenario.
+9. A result bundle counts only after xcrun xcresulttool, run independently, reports the tests as passed; the driver records test counts, failures, destination and attachments from the bundle.
+10. Games additionally run the 80 acceptance scenarios of their chapter, a hero scenario with automatic image checks (histogram, no black frame, no non-finite value, silhouette bounds) and, from Round 3 on, the 50 fault-injection cases.
 
 **Evidence commands.**
 
@@ -4132,7 +4353,7 @@ SCOPE: Build the single deterministic verification runner: a scenario manifest p
 DEPENDS ON: UA-F02, UA-F03, UA-F04 (each must be pass in the migration ledger before this feature is implemented).
 SOURCES TO READ FIRST: Auto-Creator.md sections 6 and 22; Packages/VisualCoreRendering/Sources/VisualCoreAutomation (AutomationRunner, AutomationReport); scripts/run_automation_sim.py; scripts/check_test_enumeration.py.
 ABSORBED SOURCE REQUIREMENTS: R02-F29 golden harness; R02-F31 device automation harness and report schema (simulator part); R03-F11 and R04-F11 evidence collection (simulator part). Read each archived feature with python3 scripts/planning_index.py prompt --feature <ID> --stage specify, and list every unique requirement in the specification as adopted, adapted or superseded with the reason.
-ACCEPTANCE (each item becomes at least one functional requirement and one measurable success criterion): (1) Every experience ships the scenarios launch-first-frame, input-response, completion, rejection, save-restore, reset, suspend-resume, teardown-reentry and cancel-prepare, expressed as domain actions. (2) The in-app runner runs one scenario by experience id and seed, writes evidence JSON and exits; it cannot be reached from a URL or any public input. (3) verify_experiences.py runs host tests and simulator scenarios per runtime, collects JSON, screenshots and result bundles, is resumable with --only and --skip, and exits non-zero on any failure. (4) Evidence records follow the schema of Auto-Creator.md section 22.3 and are checked by a validator with self-tests. (5) Audits fail on TODO or placeholder markers in shipped sources, on raster art other than the generated app icon, on scenarios that bypass the real reducer, and on content counts below the source specification. (6) Rendered frames pass non-blank and semantic probe checks; golden images are supporting evidence only. (7) Each record names the simulator runtime build, device type, Xcode build, commit and app binary hash. (8) The driver has self-tests with the sample experience, including a deliberately failing scenario.
+ACCEPTANCE (each item becomes at least one functional requirement and one measurable success criterion): (1) Every experience ships the scenarios launch-first-frame, input-response, completion, rejection, save-restore, reset, suspend-resume, teardown-reentry and cancel-prepare, expressed as domain actions. (2) The in-app runner runs one scenario by experience id and seed, writes evidence JSON and exits; it cannot be reached from a URL or any public input. (3) verify_experiences.py runs host tests and simulator scenarios per runtime, collects JSON, screenshots and result bundles, is resumable with --only and --skip, and exits non-zero on any failure. (4) Evidence records follow the schema of Auto-Creator.md section 22.3 and are checked by a validator with self-tests. (5) Audits fail on TODO or placeholder markers in shipped sources, on raster art other than the generated app icon, on scenarios that bypass the real reducer, and on content counts below the source specification. (6) Rendered frames pass non-blank and semantic probe checks; golden images are supporting evidence only. (7) Each record names the simulator runtime build, device type, Xcode build, commit and app binary hash. (8) The driver has self-tests with the sample experience, including a deliberately failing scenario. (9) A result bundle counts only after xcrun xcresulttool, run independently, reports the tests as passed; the driver records test counts, failures, destination and attachments from the bundle. (10) Games additionally run the 80 acceptance scenarios of their chapter, a hero scenario with automatic image checks (histogram, no black frame, no non-finite value, silhouette bounds) and, from Round 3 on, the 50 fault-injection cases.
 OUT OF SCOPE: (1) Physical devices (UA-F13).
 DEVICE-ONLY VERIFICATION (tasks tagged {device}, run only after ImplementationLock-100): none.
 OWNER-ONLY ITEMS (tasks tagged {owner}, never performed by the agent): none.
@@ -4313,7 +4534,7 @@ Canonical override: feature directory specs/196-ua-f10-build-ci; requirement ids
 3. A scan of the built app finds no advertising, analytics or tracking SDK, no AdSupport or AppTrackingTransparency use and no ad identifiers; any finding fails the gate.
 4. ANGLE notices and every third-party license are bundled and shown in the app; docs/legal/third-party.json is complete.
 5. A symbol and dependency scan proves no ProjectM engine or preset code is in the app.
-6. A distinctiveness matrix (core abstraction, player action, win rule) shows no two launch experiences share a mechanic; near-duplicates are redesigned or merged before lock.
+6. A distinctiveness matrix over all pairs of the launch experiences (core abstraction, player action, win rule) shows no two share a mechanic; a near-duplicate is redesigned before the lock and is never merged or dropped (ADR-0009 D-16); the human distinctiveness review is an owner review (D-17).
 7. Metadata inputs are generated only from experiences whose integration gate is pass.
 
 **Evidence commands.**
@@ -4337,7 +4558,7 @@ SCOPE: One privacy manifest audited against the built app, usage descriptions on
 DEPENDS ON: UA-F04, UA-F10 (each must be pass in the migration ledger before this feature is implemented).
 SOURCES TO READ FIRST: Auto-Creator.md section 15; scripts/check_privacy_manifest.py; scripts/check_licenses.py; scripts/bundle_licenses.py; docs/legal.
 ABSORBED SOURCE REQUIREMENTS: R02-F33 distinctiveness and release packaging; R03-F12 and R04-F12 originality, legal and no-ads audits (pre-device part). Read each archived feature with python3 scripts/planning_index.py prompt --feature <ID> --stage specify, and list every unique requirement in the specification as adopted, adapted or superseded with the reason.
-ACCEPTANCE (each item becomes at least one functional requirement and one measurable success criterion): (1) PrivacyInfo.xcprivacy matches the required-reason APIs found in the built app (scripts/check_privacy_manifest.py). (2) Info.plist usage descriptions exist only for capabilities declared by registered experiences. (3) A scan of the built app finds no advertising, analytics or tracking SDK, no AdSupport or AppTrackingTransparency use and no ad identifiers; any finding fails the gate. (4) ANGLE notices and every third-party license are bundled and shown in the app; docs/legal/third-party.json is complete. (5) A symbol and dependency scan proves no ProjectM engine or preset code is in the app. (6) A distinctiveness matrix (core abstraction, player action, win rule) shows no two launch experiences share a mechanic; near-duplicates are redesigned or merged before lock. (7) Metadata inputs are generated only from experiences whose integration gate is pass.
+ACCEPTANCE (each item becomes at least one functional requirement and one measurable success criterion): (1) PrivacyInfo.xcprivacy matches the required-reason APIs found in the built app (scripts/check_privacy_manifest.py). (2) Info.plist usage descriptions exist only for capabilities declared by registered experiences. (3) A scan of the built app finds no advertising, analytics or tracking SDK, no AdSupport or AppTrackingTransparency use and no ad identifiers; any finding fails the gate. (4) ANGLE notices and every third-party license are bundled and shown in the app; docs/legal/third-party.json is complete. (5) A symbol and dependency scan proves no ProjectM engine or preset code is in the app. (6) A distinctiveness matrix over all pairs of the launch experiences (core abstraction, player action, win rule) shows no two share a mechanic; a near-duplicate is redesigned before the lock and is never merged or dropped (ADR-0009 D-16); the human distinctiveness review is an owner review (D-17). (7) Metadata inputs are generated only from experiences whose integration gate is pass.
 OUT OF SCOPE: (1) Submitting anything to App Store Connect.
 DEVICE-ONLY VERIFICATION (tasks tagged {device}, run only after ImplementationLock-100): none.
 OWNER-ONLY ITEMS (tasks tagged {owner}, never performed by the agent): (1) Legal review of licenses and App Store answers. (2) Trademark and name clearance.
@@ -4515,7 +4736,7 @@ Canonical override: feature directory specs/198-ua-f12-implementation-lock; requ
 1. The script refuses to run when ImplementationLock-100 is not pass or the tree differs from the locked commit.
 2. Devices are matched by hardwareProperties.productType (iPhone15,4, iPad17,3, iPad15,7); the live OS and build are recorded; D3 is refused with a blocker if it is not on iPadOS 26.5; no UDID is written to a tracked file.
 3. One Release build with VISUALCORE_AUTOMATION is installed once per device; each experience runs by id and exports its evidence JSON, which is copied back with devicectl.
-4. Percentage criteria use at least 200 samples; launch, first frame, frame pacing, memory and thermal state are recorded per experience.
+4. Percentage criteria use at least 200 samples; launch, first frame, frame pacing, memory and thermal state are recorded per experience; every game runs its 30-minute stress session and a creative experience a ten-minute sustained scenario where its class warrants it (ADR-0009 OD-08).
 5. A renderer or test-integrity failure halts the campaign on that device; a localized failure is recorded and the campaign continues; reconciliation lists every non-pass row.
 6. Owner-needed states (locked device, trust, signing, permissions, purchase sheet) produce BLOCKED_OWNER_ACTION with exact steps and never wait for input; --dry-run prints the plan.
 7. The shipping Release binary has no automation symbols (nm check).
@@ -4540,7 +4761,7 @@ SCOPE: Write scripts/run_device_campaign.py (new): refuse before the lock, disco
 DEPENDS ON: UA-F12 (each must be pass in the migration ledger before this feature is implemented).
 SOURCES TO READ FIRST: Auto-Creator.md section 23; docs/archive/planning/playbook (devicectl lessons); scripts/inventory_devices.py; Packages/VisualCoreRendering/Sources/VisualCoreAutomation.
 ABSORBED SOURCE REQUIREMENTS: R02-F31 device automation harness (device part); R03-F11 and R04-F11 device fixtures; legacy gates D1-A01 to D3-A25 and DEVICE-RECONCILE. Read each archived feature with python3 scripts/planning_index.py prompt --feature <ID> --stage specify, and list every unique requirement in the specification as adopted, adapted or superseded with the reason.
-ACCEPTANCE (each item becomes at least one functional requirement and one measurable success criterion): (1) The script refuses to run when ImplementationLock-100 is not pass or the tree differs from the locked commit. (2) Devices are matched by hardwareProperties.productType (iPhone15,4, iPad17,3, iPad15,7); the live OS and build are recorded; D3 is refused with a blocker if it is not on iPadOS 26.5; no UDID is written to a tracked file. (3) One Release build with VISUALCORE_AUTOMATION is installed once per device; each experience runs by id and exports its evidence JSON, which is copied back with devicectl. (4) Percentage criteria use at least 200 samples; launch, first frame, frame pacing, memory and thermal state are recorded per experience. (5) A renderer or test-integrity failure halts the campaign on that device; a localized failure is recorded and the campaign continues; reconciliation lists every non-pass row. (6) Owner-needed states (locked device, trust, signing, permissions, purchase sheet) produce BLOCKED_OWNER_ACTION with exact steps and never wait for input; --dry-run prints the plan. (7) The shipping Release binary has no automation symbols (nm check).
+ACCEPTANCE (each item becomes at least one functional requirement and one measurable success criterion): (1) The script refuses to run when ImplementationLock-100 is not pass or the tree differs from the locked commit. (2) Devices are matched by hardwareProperties.productType (iPhone15,4, iPad17,3, iPad15,7); the live OS and build are recorded; D3 is refused with a blocker if it is not on iPadOS 26.5; no UDID is written to a tracked file. (3) One Release build with VISUALCORE_AUTOMATION is installed once per device; each experience runs by id and exports its evidence JSON, which is copied back with devicectl. (4) Percentage criteria use at least 200 samples; launch, first frame, frame pacing, memory and thermal state are recorded per experience; every game runs its 30-minute stress session and a creative experience a ten-minute sustained scenario where its class warrants it (ADR-0009 OD-08). (5) A renderer or test-integrity failure halts the campaign on that device; a localized failure is recorded and the campaign continues; reconciliation lists every non-pass row. (6) Owner-needed states (locked device, trust, signing, permissions, purchase sheet) produce BLOCKED_OWNER_ACTION with exact steps and never wait for input; --dry-run prints the plan. (7) The shipping Release binary has no automation symbols (nm check).
 OUT OF SCOPE: (1) Any device test before the lock. (2) Updating device operating systems.
 DEVICE-ONLY VERIFICATION (tasks tagged {device}, run only after ImplementationLock-100): (1) All 300 rows: 100 experiences on D1, then D2, then D3.
 OWNER-ONLY ITEMS (tasks tagged {owner}, never performed by the agent): (1) Provision signing (Configs/Signing.local.xcconfig), unlock and trust devices, keep D3 on iPadOS 26.5, grant microphone permission, operate purchase sheets.
@@ -4712,8 +4933,8 @@ checking that hash.
 <!-- GENERATED:BEGIN prompt-catalog -->
 | Features | Count | Archived stage prompts | Prompts are in | Print with |
 |---|---:|---:|---|---|
-| Foundation phases F00–F09 (sealed) | 10 | in the manifest | `docs/process/speckit-prompt-manifest.json` (extracted from the archived app manuals) | `python3 scripts/speckit_prompts.py --feature <NNN>` |
-| Original app phases A01-P00 … A25-P06 | 175 | in the manifest | `docs/process/speckit-prompt-manifest.json` (extracted from the archived app manuals) | `python3 scripts/speckit_prompts.py --feature <NNN>` plus `python3 scripts/planning_index.py prompt --feature A<nn>-P<p> --override` |
+| Foundation phases F00–F09 (sealed) | 10 | in the manifest | `docs/process/speckit-prompt-manifest.json` (extracted from the archive) | `python3 scripts/speckit_prompts.py --feature <NNN>` |
+| Original app phases A01-P00 … A25-P06 | 175 | in the manifest | `docs/process/speckit-prompt-manifest.json` (extracted from the archive) | `python3 scripts/speckit_prompts.py --feature <NNN>` plus `python3 scripts/planning_index.py prompt --feature A<nn>-P<p> --override` |
 | Round 2 shared features | 34 | 272 | `docs/archive/planning/rounds/` | `python3 scripts/planning_index.py prompt --feature <ID> --stage <stage> --override` |
 | Round 2 game features | 250 | 2,000 | `docs/archive/planning/rounds/` | `python3 scripts/planning_index.py prompt --feature <ID> --stage <stage> --override` |
 | Rounds 3–4 shared features | 24 | 192 | `docs/archive/planning/rounds/` | `python3 scripts/planning_index.py prompt --feature <ID> --stage <stage> --override` |
@@ -4752,7 +4973,7 @@ Canonical override (ADR-0009, Auto-Creator.md section 21): implement this shared
 For every phase of an original app (example: A05-P01, feature 040):
 
 ```text
-Canonical override (ADR-0009, Auto-Creator.md section 21): this app is experience A05 inside the single VisualCore app. Do not create or extend a standalone app target, bundle identifier or store listing. Until UA-F07 has moved an app, its sources stay where they are; afterwards and for every app not yet started the sources are the experience modules named in Auto-Creator.md section 16. Store-listing, pricing and per-app release-dossier parts of Phase 06 are inapplicable; its quality, privacy, accessibility and regression gates stand. Physical-device tasks are tagged {device} and run only after ImplementationLock-100. Feature directory and ids follow ADR-0004 (specs/040-*, FR-A05-1##, SC-A05-1##, T-A05-1##); evidence is recorded with Tools/python/desktop_runbook.py run-check --stage A05-P01. All other requirements of the prompt stand.
+Canonical override (ADR-0009, Auto-Creator.md section 21): this app is experience A05 inside the single VisualCore app. Do not create or extend a standalone app target, bundle identifier, in-app product or store listing. Visuals are code only: where the prompt or the manual mentions licensed or purchased models, textures, atlases or asset packs, generate the geometry and imagery in code; bundled data (numbers, names, structures) needs a license and provenance record. The app makes no network request. Until UA-F07 has moved an app, its sources stay where they are; afterwards and for every app not yet started the sources are the experience modules named in Auto-Creator.md section 16. Store-listing, pricing and per-app release-dossier parts of Phase 06 are inapplicable; its quality, privacy, accessibility and regression gates stand. Physical-device tasks are tagged {device} and run only after ImplementationLock-100. Feature directory and ids follow ADR-0004 (specs/040-*, FR-A05-1##, SC-A05-1##, T-A05-1##); evidence is recorded with Tools/python/desktop_runbook.py run-check --stage A05-P01. All other requirements of the prompt stand.
 ```
 <!-- GENERATED:END canonical-overrides -->
 
@@ -4769,13 +4990,32 @@ Canonical override (ADR-0009, Auto-Creator.md section 21): this app is experienc
 | "CLAUDE.md", "README.md" as scope | this document and `CLAUDE.md` |
 | "80 solver-certified stages" (Round 2) | 100 certified levels; 80 is the first milestone |
 | "96- or 100-level catalog" (rounds 3–12) | 100 levels, as in the game's level manifest |
+| "premium", "paid once", "one-time purchase" in a Round 2 game | the game is free: all its content without any purchase |
+| `ROUND2_AUTOMATION`, `ROUND2_AUTORUN` | `VISUALCORE_AUTOMATION`, `VISUALCORE_AUTORUN` |
+| `Apps/<Game>`, `Round2*` packages, `GameModules`, `docs/games/<slug>` | the experience module of section 16 |
+| `docs/test-reports/`, `docs/adr/` | `docs/verification/`, `docs/decisions/` |
+| `Application Support/<Game>/v1/progress.json` | the experience's storage namespace (section 15.1) |
+| `.autonomy/round2-state.json`, Round 2's own gate list, `specs/599-round2-suite-audit` | the migration ledger, `LOCK-FREE-50`, UA-F12 |
+| "GO, PIVOT, COMBINE, NO_GO", kill criteria | redesign inside the concept; never drop, merge or replace (section 6.5) |
+| a human review as a gate | an owner review, recorded and non-gating (section 6.5) |
+| a 30-minute stress session | kept: a device task of the game's row (section 23.3) |
+| licensed or purchased meshes, textures, atlases, asset packs | geometry and imagery generated by code; bundled data with license and provenance (section 7) |
+| a network allowlist, "audit each network requirement" | no network request at all (section 15.2) |
 
 ### 21.4 Level manifests and assertion outlines
 
-Every game of rounds 3–12 has a manifest of 100 levels in its chapter
-(`python3 scripts/planning_index.py levels --experience R03-G01` prints it as JSON), and every game of every round
-has an assertion outline; the catalog records the line span and hash of each. They are requirements of the game's
-features: the level manifest for the level compiler, the outline for the acceptance scenarios.
+Every game has, in its chapter, a manifest of 100 levels (Round 2: chapter section 18; rounds 3–12: section 8)
+and a table of 80 acceptance scenarios; games of rounds 3–12 add 50 fault-injection cases.
+`python3 scripts/planning_index.py levels --experience <CODE>` prints a level manifest as JSON, and the catalog
+records the line span and row count of every table. They are requirements of the game's features: the manifest
+for the level compiler, the scenario tables for the tests.
+
+Every game also has an assertion outline; the catalog records its line span and hash, and the Round 2 outlines
+are also kept as `docs/brainstorm/Round-2-Top25-Complete-AssertionOutlines.md`. An outline is a decision argument
+(claims, reasons, evidence, strongest objection, kill criteria), never proof. Its acceptance contracts are planned
+tests: the solver replay agrees at fixed seeds, no geometry is missing, and the goal is recognizable (the human
+five-second review is an owner review). Each claim of an outline is traced to an observation of the built
+experience in that experience's evidence.
 
 ## 22. The simulator gate and ImplementationLock-100
 
@@ -4796,10 +5036,12 @@ by the in-app scenario runner (compiled only under `DEBUG` or `VISUALCORE_AUTOMA
 | `teardown-reentry` | after leaving, live and leaked GPU resources are zero; re-entering works; repeated cycles do not grow memory |
 | `cancel-prepare` | leaving during preparation cancels it and nothing arrives afterwards |
 
-Games add `full-playthrough` over their certified levels (host-side, through the same reducer) and, for rounds
-3–12, the 80 acceptance scenarios and 50 fault-injection cases of their chapter. Creative experiences add one
-scenario per regression fixture of their card. An `endurance` scenario of ten minutes shows flat memory and GPU
-bytes. Scenarios are deterministic: fixed seeds, no wall-clock dependence.
+Games add `full-playthrough` over their certified levels (host-side, through the same reducer), the 80 acceptance
+scenarios of their chapter, a `hero` scenario (section 6.5) and, from Round 3 on, the 50 fault-injection cases.
+Creative experiences add one scenario per regression fixture of their card. An `endurance` scenario of ten minutes
+shows flat memory and GPU bytes. Scenarios are deterministic: fixed seeds, no wall-clock dependence. A scenario
+is started only through the launch environment (`VISUALCORE_AUTORUN`), writes its evidence JSON and exits; no
+URL, file or other outside input can start one.
 
 ### 22.2 Verifying one experience (the `X-<code>` gate)
 
@@ -4821,6 +5063,13 @@ call outside the framework; a premium experience that opens without entitlement;
 
 Rendered frames must pass the non-blank check and the semantic probes. Golden images are supporting evidence
 only: they catch regressions but a matching image never proves a rule.
+Image checks use tolerances and domain invariants, never exact pixels across devices, and paired comparisons run
+on the same hardware. An offline shader check or a successful compile never proves that rendering is correct or
+unchanged.
+
+A result bundle counts only after `xcrun xcresulttool` has been run on it independently and reports the tests as
+passed; the summary printed by the build is not proof. The runner records test counts, failures, destination and
+attachments from the bundle.
 
 ### 22.3 Evidence schema
 
@@ -4829,8 +5078,9 @@ One record per experience, scenario and environment. The validator of UA-F09 enf
 | Field | Content |
 |---|---|
 | `schema`, `experience`, `code`, `scenario`, `seed`, `result` | identity and outcome (`pass` or `fail`) |
-| `environment` | `kind` (`simulator` or `device`), OS version and build, device type or product type, Xcode build, host OS |
-| `source` | commit, dirty flag, tree hash, catalog hash, SHA-256 of the app binary |
+| `run` | run id, attempt number and, after the lock, the SHA-256 of the lock manifest |
+| `environment` | `kind` (`simulator` or `device`), OS version and build, device type or product type, Xcode, Swift and SDK builds, host OS, signing mode |
+| `source` | commit, dirty flag, tree hash, submodule pins, catalog hash, SHA-256 of the app binary |
 | `configuration` | build configuration, automation flag, quality tier, entitlement fixture |
 | `steps` | each action with accepted or rejected, reason, digest after |
 | `digests` | initial, final, after restore, after reset |
@@ -4843,7 +5093,8 @@ One record per experience, scenario and environment. The validator of UA-F09 enf
 | `failures` | list of failed expectations with messages |
 
 Device records add the device role and never contain a hardware identifier; identifiers stay in untracked private
-artifacts. Tracked summaries live under `docs/verification/`; raw logs, screenshots and result bundles stay in the
+artifacts, and a tracked record may carry only a salted hash of one. A record with result `pass` and no observed
+evidence is rejected. Tracked summaries live under `docs/verification/`; raw logs, screenshots and result bundles stay in the
 untracked `.autonomy/logs/` and `.autonomy/xcresults/` and are referenced by hash.
 
 ### 22.4 The three locks
@@ -4863,12 +5114,24 @@ hash, catalog hash, tool versions, simulator runtimes and, per experience, the e
 premium, all pass, purchase scenarios pass, audits pass. The lock also checks that the Release build has no
 automation symbols, no ProjectM symbols, no private API use and no signing material in Git.
 
+A single skipped mandatory test rejects the lock. The lock report lists the real commands with their exit codes,
+the Xcode and SDK builds, the commit, an audit of unimplemented features and the known platform limits.
+
+Before the lock, a build for `generic/platform=iOS` without installation is a compile check and is never reported
+as a device test; there is no early smoke test on D1. APIs newer than the deployment target are weak-linked and
+guarded by availability checks, and the run on the iOS 26.5 simulator, not compilation alone, proves that path. An
+instrumented Release build (with `VISUALCORE_AUTOMATION`) is a valid performance build; the shipping Release build
+has no automation code or symbols (`nm -U` and a symbol scan).
+
 ### 22.5 After the lock
 
 Any change of tracked app or framework source after the lock invalidates it. The repair path is: fix, rerun the
 affected experiences and the shared regressions on the simulators, rerun the lock (a new revision of its
 evidence, recorded with `--reverify`), then rerun the affected device rows. History is kept: every revision has
 its own evidence file.
+
+The same holds before the lock: after a change of a shared framework module, the experiences that depend on it are
+verified again before their next gate, and the new revision is recorded with `--reverify`.
 
 ### 22.6 Pending hardware verification
 
@@ -4916,9 +5179,10 @@ For one device, in catalog order (A01 … A25, R02-G01 … R04-G25):
    (`python3 scripts/migration_ledger.py record --gate DEV<n>-<code> --result pass|fail`).
 3. Minimum per row: launch, native UI flow, a real rendered scene, touch and accessibility checks, pause and
    resume (and resize where it applies), persisted state after relaunch, export where the experience has one, the
-   container inventory, a frame, memory and thermal trace, and a real result bundle. Experiences whose class
-   warrants it run a ten-minute sustained scenario with cool-down windows. Percentage criteria use at least 200
-   samples, with first-run and warm runs separated.
+   container inventory, a frame, memory and thermal trace, and a real result bundle. Every game runs its 30-minute
+   stress session on each device, and a creative experience runs a ten-minute sustained scenario where its class
+   warrants it, both with cool-down windows (OD-08). Percentage criteria use at least 200 samples, with first-run
+   and warm runs separated. Frame rate is never read from a screenshot.
 4. A specialized scenario may be `not_applicable` only when the experience genuinely lacks that capability on
    that OS or device; the row itself stays mandatory.
 
@@ -4929,8 +5193,16 @@ prompt, a signing problem or a purchase sheet is `BLOCKED_OWNER_ACTION`.
 
 **Order.** All 100 on D1, then all 100 on D2, then all 100 on D3. A device's campaign gate needs every row
 attempted. The purchase sheet, Ask to Buy and restore on a device with a sandbox account are owner-operated.
-Manual VoiceOver passes are recorded and non-gating. The six open legacy `{device}` tasks (section 17.4) are run
-in the same sessions.
+Manual VoiceOver passes are recorded and non-gating; the automated accessibility checks of a row do gate: the
+accessibility audit of the UI tests, a label and an identifier on every control, and layouts at the largest text
+size. The six open legacy `{device}` tasks (section 17.4) are run in the same sessions.
+
+Each campaign has a run id and records the commit and the Xcode and SDK fingerprint. D1 and D2 run different minor
+versions of iOS 27: before a difference is blamed on the form factor, compare OS, memory, refresh rate, GPU and
+configuration. A row that only just passes is repeated and reported with its variance. Published claims name only
+the tested models and OS versions. Every row records the exact OS version and build; after any OS
+change on D1 or D2 the inventory is recorded again. One destination per device, and a cool-down between
+performance runs. A performance baseline is labelled with model, OS, Xcode build, ANGLE commit and seed.
 
 ### 23.4 Device differentiators of the creative experiences
 
@@ -4973,6 +5245,7 @@ After the lock the code is frozen except for targeted repairs of genuine device 
 first. Make the smallest patch. Rerun the experience's host and simulator checks, rerun the lock (section 22.5),
 then rerun every device row the change can affect; a change in shared code makes all earlier rows that depend on
 it stale. Failed attempts are kept, never overwritten. No new feature is added during the campaign.
+A repaired case links its old run and its new run, with one result bundle per device, experience and attempt.
 
 ### 23.6 Reconciliation
 
@@ -4980,6 +5253,8 @@ it stale. Failed attempts are kept, never overwritten. No new feature is added d
 evidence was recorded at an older commit is rerun unless the change since then demonstrably cannot affect it. The
 final report states 100 of 100 simulator-verified and how many of 300 device rows are verified, or the precise
 incomplete or blocked state.
+A matrix that is complete but contains failures is collected evidence, not a passing suite. One script finds
+missing rows, duplicate run ids, model mismatches, OS changes between runs and gaps.
 
 ## 24. CI, release and owner-only actions
 
@@ -4992,6 +5267,12 @@ simulator build of the framework. Nothing in CI is signed. Planned: UA-F00 adds
 `scripts/migration_ledger.py validate`; UA-F10 adds the unified app's simulator build. Expensive simulator suites
 stay local, run through `scripts/release_check.py` in chunks of ten minutes or less.
 
+Rules for CI changes: every job has a timeout and a concurrency group; caches of the reference frameworks are
+keyed by the Xcode build, the fork commits and the build flags; `[skip ci]` is used only for documentation-only
+pushes; free CI minutes are never assumed. A CI change is confirmed by a real run (`gh run watch --exit-status`)
+once the owner allows the branch to be pushed (OD-05); until then it is proven by running the same commands
+locally, and that limit is stated in the evidence.
+
 ### 24.2 Release preparation (UA-F14)
 
 Version and build numbers in `project.yml`; an unsigned archive build; screenshots only from real simulator or
@@ -4999,6 +5280,16 @@ device runs, each listed with experience id, seed, commit and device in a proven
 description, keywords, privacy answers, the in-app purchase's name and description and the review notes drafted
 only from experiences whose integration gate is pass; future content described as planned; the final compliance,
 privacy, license and symbol checks on the release candidate. Nothing is uploaded or submitted.
+
+Signing: `Configs/Signing.xcconfig` holds only the optional include of the owner's local file; unsigned builds pass
+`CODE_SIGNING_ALLOWED=NO`; `-allowProvisioningUpdates` is used only with credentials the owner has already
+provisioned; prebuilt frameworks carry a valid `CFBundleShortVersionString` and `MinimumOSVersion`, or the archive
+is rejected. The hand-off list for the owner: icon, export-compliance key, privacy policy, license agreement,
+review notes, name check, version and build numbers, screenshots at the exact store sizes, and previews (a
+preview without audio is silent).
+
+Release provenance records the submodule revision, lock files, tool versions, schema versions, the license
+inventory, the build configuration and the test matrix.
 
 ### 24.3 Owner-only actions
 
@@ -5015,13 +5306,17 @@ The agent prepares everything up to the boundary, records the block and continue
 | Decide how the migration branch reaches `main` and whether it is pushed | repository |
 | Upload, submit for review, release | release |
 
-Format of a block: `BLOCKED_OWNER_ACTION: <what is needed> | gate <id> | steps: 1. … 2. … | verify with: <command>`.
+A block records the object, the observed error, the command, the time and the safe action for the owner:
+`BLOCKED_OWNER_ACTION: <what is needed> | gate <id> | observed: <error> | command: <command> | steps: 1. … 2. … |
+verify with: <command>`. An owner waiver leaves the task unticked and adds the line
+`not required (owner ruling YYYY-MM-DD): <reason>`.
 
 ### 24.4 Git
 
 - Work on `migration/unified-app-plan`. Never push or merge to `main`; never force-push; never rewrite history;
   never `git reset --hard`. The branch itself is pushed only if the owner says so (OD-05).
-- Small commits with a clear subject, no co-author or "Generated with" trailers, LF line endings.
+- Small commits whose subject names the feature and the task ids, made with the Git identity the owner
+  configured, with no co-author or "Generated with" trailers and LF line endings.
 - Before any push: scan for hardware identifiers, serial numbers, team ids and secrets.
 - Never committed: `Configs/Signing.local.xcconfig`, `.autonomy/private/`, logs, result bundles, container exports.
 - At each milestone exit, write a bundle outside the repository:
@@ -5043,6 +5338,13 @@ Format of a block: `BLOCKED_OWNER_ACTION: <what is needed> | gate <id> | steps: 
 Rules for both: a gate is recorded only from sealed evidence of real commands; the ledger files, the evidence
 files and the attestations are never edited by hand; a passed gate is never reset. A gate may be verified again
 after a source change (`--reverify`); each revision keeps its own evidence.
+
+One integration session records gates at a time. The legacy tool keeps its lease (`claim --owner`, `release`);
+another session's lease is never cleared without proof that the session is dead. The legacy tool is the tracked
+file `Tools/python/desktop_runbook.py`: it was re-pointed at the archived specification during the consolidation
+and is never re-extracted from the copy embedded in the archived README.
+
+A check has four results and they are never merged: pass, fail, blocked, not run.
 
 ### 25.2 What is tracked
 
@@ -5079,9 +5381,14 @@ changing a brief, the shared-feature map or the catalog, run `python3 scripts/re
 4. If the last evidence is in doubt, rerun the command through `run-check` under a new name. Never reuse or edit
    an attestation.
 5. Continue with the loop of section 19.3.
+6. Repair from the last passing commit and its logs, never by marking a gate. Retries are bounded; a failing
+   service is retried with a pause, not in a tight loop.
 
 A session that ends for any reason leaves the repository in a committed state whenever it can: commit after every
 task, never leave a build running in the background, never end between `seal` and `record`.
+
+The owner may set up a scheduled task of Claude Desktop that starts a session with the continuation prompt. Such a
+task runs only while the app is open and the Mac is awake. It is optional and not part of this procedure.
 
 ## 26. Source traceability
 
@@ -5104,7 +5411,18 @@ source, the canonical target (a section of this document or a path that holds th
 | `historical` | context of another repository or of the old process; nothing to implement |
 
 <!-- GENERATED:BEGIN traceability-summary -->
-_The matrix has not been generated yet: run `python3 scripts/build_traceability_matrix.py`._
+| Source kind | implemented-and-verified | implemented-but-unverified | planned | superseded | blocked | historical | Rows |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| assertion-outline | 0 | 0 | 275 | 0 | 0 | 0 | 275 |
+| constitution-prompt | 0 | 0 | 0 | 11 | 0 | 0 | 11 |
+| document | 0 | 0 | 39 | 5 | 0 | 15 | 59 |
+| experience | 3 | 0 | 297 | 0 | 0 | 0 | 300 |
+| experience-section | 0 | 0 | 3325 | 0 | 0 | 0 | 3325 |
+| feature | 35 | 0 | 2994 | 60 | 0 | 0 | 3089 |
+| heading | 126 | 6 | 375 | 145 | 1 | 530 | 1183 |
+| level-manifest | 0 | 0 | 275 | 0 | 0 | 0 | 275 |
+| scenario-table | 0 | 0 | 525 | 0 | 0 | 0 | 525 |
+| **Total** | **164** | **6** | **8105** | **221** | **1** | **545** | **9042** |
 <!-- GENERATED:END traceability-summary -->
 
 Known limits of the matrix, stated plainly:
@@ -5142,6 +5460,7 @@ Known limits of the matrix, stated plainly:
 | `BLOCKED_OWNER_ACTION` | a recorded stop that only the owner can clear |
 | Archive | `docs/archive/planning/`, the original planning documents, never edited |
 | Baseline | the recorded state of the repository before the consolidation |
+| Wave | a letter A to D in the sources that groups original apps by shared dependencies; it is a hint, not an order, and is unrelated to the code prefix `A` |
 
 ## 28. Continuation prompt
 
@@ -5208,8 +5527,9 @@ STEP 1 - THE LOOP (repeat until nothing is ready)
   4. Evidence, then the gate:
        python3 scripts/migration_ledger.py run-check --gate <GATE> --name <check> -- <command>
        python3 scripts/migration_ledger.py seal --gate <GATE> && python3 scripts/migration_ledger.py record --gate <GATE>
-     Legacy gates use Tools/python/desktop_runbook.py run-check --stage, seal --stage, record --stage --evidence,
-     followed by python3 scripts/planning_index.py build.
+     Legacy gates use Tools/python/desktop_runbook.py run-check --stage <GATE> --name <check> --timeout 600 -- <command>,
+     then seal --stage <GATE>, record --stage <GATE> --evidence .autonomy/evidence/<GATE>.json, followed by
+     python3 scripts/planning_index.py build.
   5. Commit (no trailers). Go to 1. Sealing a gate or finishing a milestone is not a stopping point.
 The very first gate is CONSTITUTION-2: run /speckit-constitution with the prompt printed by
 `python3 scripts/planning_index.py prompt --feature CONSTITUTION-2`, write ADR-0010, record the gate
@@ -5241,8 +5561,11 @@ rejects invalid actions without changing state; is deterministic for a seed; sav
 after relaunch and resets cleanly; reaches its real outcome through the real reducer (a game is won and lost by
 its exact rules; a creative tool produces and keeps work); suspends and resumes; releases every GPU resource on
 exit and re-enters; cancels preparation; isolates failures; passes its accessibility audit; and has all its
-content: every required feature and fixture of a creative experience, 100 solver-certified levels for a Round 2
-game, the 100-level manifest with the 80 acceptance scenarios and 50 fault-injection cases for a Round 3 or 4 game.
+content: every required feature and fixture of a creative experience; for a Round 2 game the 100-level catalog,
+every level generated from its seed and certified by the solver with a stored witness, and the 80 acceptance
+scenarios; for a Round 3 or 4 game the 100-level manifest, the 80 acceptance scenarios and the 50 fault-injection
+cases. No launch experience is ever dropped, merged or replaced: a failing concept is redesigned inside its
+concept, and if it still fails its gate is blocked for the owner.
 Forbidden: empty or repeated levels, "coming soon", TODO markers in shipped code, mock gameplay, scenarios that
 bypass the reducer or the renderer, a win state that is set instead of reached, raster or third-party art (the
 generated app icon excepted), outcomes decided by the GPU or the clock, any claim without evidence.
@@ -5258,6 +5581,8 @@ RULES THAT NEVER BEND
     purchases, agreements, App Store Connect, device operating systems, unlock, trust and permission prompts.
     Record `BLOCKED_OWNER_ACTION: <what> | gate <id> | steps: ... | verify with: <command>`
     (python3 scripts/migration_ledger.py block --gate <GATE> --reason "...") and continue with the next ready gate.
+  - Permissions: stay in the permission mode the owner chose. Never bypass a permission, trust, signing or system
+    dialog and never drive the screen to get past one.
   - Evidence is real: commands run through run-check, logs hashed, nothing fabricated. Simulator results are never
     device evidence. Earlier device observations never certify this app. Percentage criteria need 200 samples.
   - Git: commit after every skill, task and gate on migration/unified-app-plan; never push or merge to main; never

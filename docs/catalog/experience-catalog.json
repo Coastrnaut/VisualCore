@@ -5377,6 +5377,16 @@
      "line_end": 3144
     }
    ],
+   "level_manifest": {
+    "line_start": 2884,
+    "line_end": 2989,
+    "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 2990,
+    "line_end": 3075,
+    "rows": 80
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round2.md",
     "line_start": 29449,
@@ -5609,6 +5619,16 @@
      "line_end": 4247
     }
    ],
+   "level_manifest": {
+    "line_start": 3987,
+    "line_end": 4092,
+    "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 4093,
+    "line_end": 4178,
+    "rows": 80
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round2.md",
     "line_start": 29514,
@@ -5841,6 +5861,16 @@
      "line_end": 5314
     }
    ],
+   "level_manifest": {
+    "line_start": 5054,
+    "line_end": 5159,
+    "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 5160,
+    "line_end": 5245,
+    "rows": 80
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round2.md",
     "line_start": 29579,
@@ -6074,6 +6104,16 @@
      "line_end": 6390
     }
    ],
+   "level_manifest": {
+    "line_start": 6130,
+    "line_end": 6235,
+    "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 6236,
+    "line_end": 6321,
+    "rows": 80
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round2.md",
     "line_start": 29644,
@@ -6309,6 +6349,16 @@
      "line_end": 7516
     }
    ],
+   "level_manifest": {
+    "line_start": 7256,
+    "line_end": 7361,
+    "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 7362,
+    "line_end": 7447,
+    "rows": 80
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round2.md",
     "line_start": 29709,
@@ -6542,6 +6592,16 @@
      "line_end": 8596
     }
    ],
+   "level_manifest": {
+    "line_start": 8336,
+    "line_end": 8441,
+    "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 8442,
+    "line_end": 8527,
+    "rows": 80
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round2.md",
     "line_start": 29774,
@@ -6775,6 +6835,16 @@
      "line_end": 9680
     }
    ],
+   "level_manifest": {
+    "line_start": 9420,
+    "line_end": 9525,
+    "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 9526,
+    "line_end": 9611,
+    "rows": 80
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round2.md",
     "line_start": 29839,
@@ -7008,6 +7078,16 @@
      "line_end": 10772
     }
    ],
+   "level_manifest": {
+    "line_start": 10512,
+    "line_end": 10617,
+    "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 10618,
+    "line_end": 10703,
+    "rows": 80
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round2.md",
     "line_start": 29904,
@@ -7241,6 +7321,16 @@
      "line_end": 11848
     }
    ],
+   "level_manifest": {
+    "line_start": 11588,
+    "line_end": 11693,
+    "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 11694,
+    "line_end": 11779,
+    "rows": 80
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round2.md",
     "line_start": 29969,
@@ -7475,6 +7565,16 @@
      "line_end": 12925
     }
    ],
+   "level_manifest": {
+    "line_start": 12665,
+    "line_end": 12770,
+    "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 12771,
+    "line_end": 12856,
+    "rows": 80
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round2.md",
     "line_start": 30034,
@@ -7709,6 +7809,16 @@
      "line_end": 14030
     }
    ],
+   "level_manifest": {
+    "line_start": 13770,
+    "line_end": 13875,
+    "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 13876,
+    "line_end": 13961,
+    "rows": 80
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round2.md",
     "line_start": 30099,
@@ -7941,6 +8051,16 @@
      "line_end": 15117
     }
    ],
+   "level_manifest": {
+    "line_start": 14857,
+    "line_end": 14962,
+    "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 14963,
+    "line_end": 15048,
+    "rows": 80
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round2.md",
     "line_start": 30164,
@@ -8175,6 +8295,16 @@
      "line_end": 16212
     }
    ],
+   "level_manifest": {
+    "line_start": 15952,
+    "line_end": 16057,
+    "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 16058,
+    "line_end": 16143,
+    "rows": 80
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round2.md",
     "line_start": 30229,
@@ -8407,6 +8537,16 @@
      "line_end": 17289
     }
    ],
+   "level_manifest": {
+    "line_start": 17029,
+    "line_end": 17134,
+    "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 17135,
+    "line_end": 17220,
+    "rows": 80
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round2.md",
     "line_start": 30294,
@@ -8638,6 +8778,16 @@
      "line_end": 18387
     }
    ],
+   "level_manifest": {
+    "line_start": 18127,
+    "line_end": 18232,
+    "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 18233,
+    "line_end": 18318,
+    "rows": 80
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round2.md",
     "line_start": 30359,
@@ -8872,6 +9022,16 @@
      "line_end": 19472
     }
    ],
+   "level_manifest": {
+    "line_start": 19212,
+    "line_end": 19317,
+    "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 19318,
+    "line_end": 19403,
+    "rows": 80
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round2.md",
     "line_start": 30424,
@@ -9105,6 +9265,16 @@
      "line_end": 20544
     }
    ],
+   "level_manifest": {
+    "line_start": 20284,
+    "line_end": 20389,
+    "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 20390,
+    "line_end": 20475,
+    "rows": 80
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round2.md",
     "line_start": 30489,
@@ -9338,6 +9508,16 @@
      "line_end": 21624
     }
    ],
+   "level_manifest": {
+    "line_start": 21364,
+    "line_end": 21469,
+    "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 21470,
+    "line_end": 21555,
+    "rows": 80
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round2.md",
     "line_start": 30554,
@@ -9571,6 +9751,16 @@
      "line_end": 22712
     }
    ],
+   "level_manifest": {
+    "line_start": 22452,
+    "line_end": 22557,
+    "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 22558,
+    "line_end": 22643,
+    "rows": 80
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round2.md",
     "line_start": 30619,
@@ -9805,6 +9995,16 @@
      "line_end": 23789
     }
    ],
+   "level_manifest": {
+    "line_start": 23529,
+    "line_end": 23634,
+    "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 23635,
+    "line_end": 23720,
+    "rows": 80
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round2.md",
     "line_start": 30684,
@@ -10039,6 +10239,16 @@
      "line_end": 24876
     }
    ],
+   "level_manifest": {
+    "line_start": 24616,
+    "line_end": 24721,
+    "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 24722,
+    "line_end": 24807,
+    "rows": 80
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round2.md",
     "line_start": 30749,
@@ -10273,6 +10483,16 @@
      "line_end": 25969
     }
    ],
+   "level_manifest": {
+    "line_start": 25709,
+    "line_end": 25814,
+    "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 25815,
+    "line_end": 25900,
+    "rows": 80
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round2.md",
     "line_start": 30814,
@@ -10506,6 +10726,16 @@
      "line_end": 27045
     }
    ],
+   "level_manifest": {
+    "line_start": 26785,
+    "line_end": 26890,
+    "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 26891,
+    "line_end": 26976,
+    "rows": 80
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round2.md",
     "line_start": 30879,
@@ -10741,6 +10971,16 @@
      "line_end": 28143
     }
    ],
+   "level_manifest": {
+    "line_start": 27883,
+    "line_end": 27988,
+    "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 27989,
+    "line_end": 28074,
+    "rows": 80
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round2.md",
     "line_start": 30944,
@@ -10973,6 +11213,16 @@
      "line_end": 29230
     }
    ],
+   "level_manifest": {
+    "line_start": 28970,
+    "line_end": 29075,
+    "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 29076,
+    "line_end": 29161,
+    "rows": 80
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round2.md",
     "line_start": 31009,
@@ -11111,6 +11361,16 @@
     "line_start": 1920,
     "line_end": 2023,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 2024,
+    "line_end": 2107,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 2108,
+    "line_end": 2160,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round3.md",
@@ -11251,6 +11511,16 @@
     "line_end": 3088,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 3089,
+    "line_end": 3172,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 3173,
+    "line_end": 3225,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round3.md",
     "line_start": 27760,
@@ -11389,6 +11659,16 @@
     "line_start": 4050,
     "line_end": 4153,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 4154,
+    "line_end": 4237,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 4238,
+    "line_end": 4290,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round3.md",
@@ -11529,6 +11809,16 @@
     "line_end": 5218,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 5219,
+    "line_end": 5302,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 5303,
+    "line_end": 5355,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round3.md",
     "line_start": 27820,
@@ -11667,6 +11957,16 @@
     "line_start": 6180,
     "line_end": 6283,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 6284,
+    "line_end": 6367,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 6368,
+    "line_end": 6420,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round3.md",
@@ -11807,6 +12107,16 @@
     "line_end": 7348,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 7349,
+    "line_end": 7432,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 7433,
+    "line_end": 7485,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round3.md",
     "line_start": 27880,
@@ -11945,6 +12255,16 @@
     "line_start": 8310,
     "line_end": 8413,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 8414,
+    "line_end": 8497,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 8498,
+    "line_end": 8550,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round3.md",
@@ -12085,6 +12405,16 @@
     "line_end": 9478,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 9479,
+    "line_end": 9562,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 9563,
+    "line_end": 9615,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round3.md",
     "line_start": 27940,
@@ -12223,6 +12553,16 @@
     "line_start": 10440,
     "line_end": 10543,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 10544,
+    "line_end": 10627,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 10628,
+    "line_end": 10680,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round3.md",
@@ -12363,6 +12703,16 @@
     "line_end": 11608,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 11609,
+    "line_end": 11692,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 11693,
+    "line_end": 11745,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round3.md",
     "line_start": 28000,
@@ -12501,6 +12851,16 @@
     "line_start": 12570,
     "line_end": 12673,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 12674,
+    "line_end": 12757,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 12758,
+    "line_end": 12810,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round3.md",
@@ -12641,6 +13001,16 @@
     "line_end": 13738,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 13739,
+    "line_end": 13822,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 13823,
+    "line_end": 13875,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round3.md",
     "line_start": 28060,
@@ -12779,6 +13149,16 @@
     "line_start": 14700,
     "line_end": 14803,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 14804,
+    "line_end": 14887,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 14888,
+    "line_end": 14940,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round3.md",
@@ -12919,6 +13299,16 @@
     "line_end": 15868,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 15869,
+    "line_end": 15952,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 15953,
+    "line_end": 16005,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round3.md",
     "line_start": 28120,
@@ -13057,6 +13447,16 @@
     "line_start": 16830,
     "line_end": 16933,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 16934,
+    "line_end": 17017,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 17018,
+    "line_end": 17070,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round3.md",
@@ -13197,6 +13597,16 @@
     "line_end": 17998,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 17999,
+    "line_end": 18082,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 18083,
+    "line_end": 18135,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round3.md",
     "line_start": 28180,
@@ -13335,6 +13745,16 @@
     "line_start": 18960,
     "line_end": 19063,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 19064,
+    "line_end": 19147,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 19148,
+    "line_end": 19200,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round3.md",
@@ -13475,6 +13895,16 @@
     "line_end": 20128,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 20129,
+    "line_end": 20212,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 20213,
+    "line_end": 20265,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round3.md",
     "line_start": 28240,
@@ -13613,6 +14043,16 @@
     "line_start": 21090,
     "line_end": 21193,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 21194,
+    "line_end": 21277,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 21278,
+    "line_end": 21330,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round3.md",
@@ -13753,6 +14193,16 @@
     "line_end": 22258,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 22259,
+    "line_end": 22342,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 22343,
+    "line_end": 22395,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round3.md",
     "line_start": 28300,
@@ -13891,6 +14341,16 @@
     "line_start": 23220,
     "line_end": 23323,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 23324,
+    "line_end": 23407,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 23408,
+    "line_end": 23460,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round3.md",
@@ -14031,6 +14491,16 @@
     "line_end": 24388,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 24389,
+    "line_end": 24472,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 24473,
+    "line_end": 24525,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round3.md",
     "line_start": 28360,
@@ -14169,6 +14639,16 @@
     "line_start": 25350,
     "line_end": 25453,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 25454,
+    "line_end": 25537,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 25538,
+    "line_end": 25590,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round3.md",
@@ -14309,6 +14789,16 @@
     "line_end": 26518,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 26519,
+    "line_end": 26602,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 26603,
+    "line_end": 26655,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round3.md",
     "line_start": 28420,
@@ -14447,6 +14937,16 @@
     "line_start": 27480,
     "line_end": 27583,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 27584,
+    "line_end": 27667,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 27668,
+    "line_end": 27720,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round3.md",
@@ -14587,6 +15087,16 @@
     "line_end": 2024,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 2025,
+    "line_end": 2108,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 2109,
+    "line_end": 2161,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round4.md",
     "line_start": 27731,
@@ -14725,6 +15235,16 @@
     "line_start": 2986,
     "line_end": 3089,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 3090,
+    "line_end": 3173,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 3174,
+    "line_end": 3226,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round4.md",
@@ -14865,6 +15385,16 @@
     "line_end": 4154,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 4155,
+    "line_end": 4238,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 4239,
+    "line_end": 4291,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round4.md",
     "line_start": 27791,
@@ -15003,6 +15533,16 @@
     "line_start": 5116,
     "line_end": 5219,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 5220,
+    "line_end": 5303,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 5304,
+    "line_end": 5356,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round4.md",
@@ -15143,6 +15683,16 @@
     "line_end": 6284,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 6285,
+    "line_end": 6368,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 6369,
+    "line_end": 6421,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round4.md",
     "line_start": 27851,
@@ -15281,6 +15831,16 @@
     "line_start": 7246,
     "line_end": 7349,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 7350,
+    "line_end": 7433,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 7434,
+    "line_end": 7486,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round4.md",
@@ -15421,6 +15981,16 @@
     "line_end": 8414,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 8415,
+    "line_end": 8498,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 8499,
+    "line_end": 8551,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round4.md",
     "line_start": 27911,
@@ -15559,6 +16129,16 @@
     "line_start": 9376,
     "line_end": 9479,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 9480,
+    "line_end": 9563,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 9564,
+    "line_end": 9616,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round4.md",
@@ -15699,6 +16279,16 @@
     "line_end": 10544,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 10545,
+    "line_end": 10628,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 10629,
+    "line_end": 10681,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round4.md",
     "line_start": 27971,
@@ -15837,6 +16427,16 @@
     "line_start": 11506,
     "line_end": 11609,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 11610,
+    "line_end": 11693,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 11694,
+    "line_end": 11746,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round4.md",
@@ -15977,6 +16577,16 @@
     "line_end": 12674,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 12675,
+    "line_end": 12758,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 12759,
+    "line_end": 12811,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round4.md",
     "line_start": 28031,
@@ -16115,6 +16725,16 @@
     "line_start": 13636,
     "line_end": 13739,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 13740,
+    "line_end": 13823,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 13824,
+    "line_end": 13876,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round4.md",
@@ -16255,6 +16875,16 @@
     "line_end": 14804,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 14805,
+    "line_end": 14888,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 14889,
+    "line_end": 14941,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round4.md",
     "line_start": 28091,
@@ -16393,6 +17023,16 @@
     "line_start": 15766,
     "line_end": 15869,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 15870,
+    "line_end": 15953,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 15954,
+    "line_end": 16006,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round4.md",
@@ -16533,6 +17173,16 @@
     "line_end": 16934,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 16935,
+    "line_end": 17018,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 17019,
+    "line_end": 17071,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round4.md",
     "line_start": 28151,
@@ -16671,6 +17321,16 @@
     "line_start": 17896,
     "line_end": 17999,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 18000,
+    "line_end": 18083,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 18084,
+    "line_end": 18136,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round4.md",
@@ -16811,6 +17471,16 @@
     "line_end": 19064,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 19065,
+    "line_end": 19148,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 19149,
+    "line_end": 19201,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round4.md",
     "line_start": 28211,
@@ -16949,6 +17619,16 @@
     "line_start": 20026,
     "line_end": 20129,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 20130,
+    "line_end": 20213,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 20214,
+    "line_end": 20266,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round4.md",
@@ -17089,6 +17769,16 @@
     "line_end": 21194,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 21195,
+    "line_end": 21278,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 21279,
+    "line_end": 21331,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round4.md",
     "line_start": 28271,
@@ -17227,6 +17917,16 @@
     "line_start": 22156,
     "line_end": 22259,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 22260,
+    "line_end": 22343,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 22344,
+    "line_end": 22396,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round4.md",
@@ -17367,6 +18067,16 @@
     "line_end": 23324,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 23325,
+    "line_end": 23408,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 23409,
+    "line_end": 23461,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round4.md",
     "line_start": 28331,
@@ -17505,6 +18215,16 @@
     "line_start": 24286,
     "line_end": 24389,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 24390,
+    "line_end": 24473,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 24474,
+    "line_end": 24526,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round4.md",
@@ -17645,6 +18365,16 @@
     "line_end": 25454,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 25455,
+    "line_end": 25538,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 25539,
+    "line_end": 25591,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round4.md",
     "line_start": 28391,
@@ -17783,6 +18513,16 @@
     "line_start": 26416,
     "line_end": 26519,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 26520,
+    "line_end": 26603,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 26604,
+    "line_end": 26656,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round4.md",
@@ -17923,6 +18663,16 @@
     "line_end": 27584,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 27585,
+    "line_end": 27668,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 27669,
+    "line_end": 27721,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round4.md",
     "line_start": 28451,
@@ -18061,6 +18811,16 @@
     "line_start": 1922,
     "line_end": 2025,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 2026,
+    "line_end": 2109,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 2110,
+    "line_end": 2162,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round5.md",
@@ -18201,6 +18961,16 @@
     "line_end": 3090,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 3091,
+    "line_end": 3174,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 3175,
+    "line_end": 3227,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round5.md",
     "line_start": 27762,
@@ -18339,6 +19109,16 @@
     "line_start": 4052,
     "line_end": 4155,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 4156,
+    "line_end": 4239,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 4240,
+    "line_end": 4292,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round5.md",
@@ -18479,6 +19259,16 @@
     "line_end": 5220,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 5221,
+    "line_end": 5304,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 5305,
+    "line_end": 5357,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round5.md",
     "line_start": 27822,
@@ -18617,6 +19407,16 @@
     "line_start": 6182,
     "line_end": 6285,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 6286,
+    "line_end": 6369,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 6370,
+    "line_end": 6422,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round5.md",
@@ -18757,6 +19557,16 @@
     "line_end": 7350,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 7351,
+    "line_end": 7434,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 7435,
+    "line_end": 7487,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round5.md",
     "line_start": 27882,
@@ -18895,6 +19705,16 @@
     "line_start": 8312,
     "line_end": 8415,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 8416,
+    "line_end": 8499,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 8500,
+    "line_end": 8552,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round5.md",
@@ -19035,6 +19855,16 @@
     "line_end": 9480,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 9481,
+    "line_end": 9564,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 9565,
+    "line_end": 9617,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round5.md",
     "line_start": 27942,
@@ -19173,6 +20003,16 @@
     "line_start": 10442,
     "line_end": 10545,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 10546,
+    "line_end": 10629,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 10630,
+    "line_end": 10682,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round5.md",
@@ -19313,6 +20153,16 @@
     "line_end": 11610,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 11611,
+    "line_end": 11694,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 11695,
+    "line_end": 11747,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round5.md",
     "line_start": 28002,
@@ -19451,6 +20301,16 @@
     "line_start": 12572,
     "line_end": 12675,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 12676,
+    "line_end": 12759,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 12760,
+    "line_end": 12812,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round5.md",
@@ -19591,6 +20451,16 @@
     "line_end": 13740,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 13741,
+    "line_end": 13824,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 13825,
+    "line_end": 13877,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round5.md",
     "line_start": 28062,
@@ -19729,6 +20599,16 @@
     "line_start": 14702,
     "line_end": 14805,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 14806,
+    "line_end": 14889,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 14890,
+    "line_end": 14942,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round5.md",
@@ -19869,6 +20749,16 @@
     "line_end": 15870,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 15871,
+    "line_end": 15954,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 15955,
+    "line_end": 16007,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round5.md",
     "line_start": 28122,
@@ -20007,6 +20897,16 @@
     "line_start": 16832,
     "line_end": 16935,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 16936,
+    "line_end": 17019,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 17020,
+    "line_end": 17072,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round5.md",
@@ -20147,6 +21047,16 @@
     "line_end": 18000,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 18001,
+    "line_end": 18084,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 18085,
+    "line_end": 18137,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round5.md",
     "line_start": 28182,
@@ -20285,6 +21195,16 @@
     "line_start": 18962,
     "line_end": 19065,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 19066,
+    "line_end": 19149,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 19150,
+    "line_end": 19202,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round5.md",
@@ -20425,6 +21345,16 @@
     "line_end": 20130,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 20131,
+    "line_end": 20214,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 20215,
+    "line_end": 20267,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round5.md",
     "line_start": 28242,
@@ -20563,6 +21493,16 @@
     "line_start": 21092,
     "line_end": 21195,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 21196,
+    "line_end": 21279,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 21280,
+    "line_end": 21332,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round5.md",
@@ -20703,6 +21643,16 @@
     "line_end": 22260,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 22261,
+    "line_end": 22344,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 22345,
+    "line_end": 22397,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round5.md",
     "line_start": 28302,
@@ -20841,6 +21791,16 @@
     "line_start": 23222,
     "line_end": 23325,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 23326,
+    "line_end": 23409,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 23410,
+    "line_end": 23462,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round5.md",
@@ -20981,6 +21941,16 @@
     "line_end": 24390,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 24391,
+    "line_end": 24474,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 24475,
+    "line_end": 24527,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round5.md",
     "line_start": 28362,
@@ -21119,6 +22089,16 @@
     "line_start": 25352,
     "line_end": 25455,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 25456,
+    "line_end": 25539,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 25540,
+    "line_end": 25592,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round5.md",
@@ -21259,6 +22239,16 @@
     "line_end": 26520,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 26521,
+    "line_end": 26604,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 26605,
+    "line_end": 26657,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round5.md",
     "line_start": 28422,
@@ -21397,6 +22387,16 @@
     "line_start": 27482,
     "line_end": 27585,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 27586,
+    "line_end": 27669,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 27670,
+    "line_end": 27722,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round5.md",
@@ -21537,6 +22537,16 @@
     "line_end": 2026,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 2027,
+    "line_end": 2110,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 2111,
+    "line_end": 2163,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round6.md",
     "line_start": 27733,
@@ -21675,6 +22685,16 @@
     "line_start": 2988,
     "line_end": 3091,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 3092,
+    "line_end": 3175,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 3176,
+    "line_end": 3228,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round6.md",
@@ -21815,6 +22835,16 @@
     "line_end": 4156,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 4157,
+    "line_end": 4240,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 4241,
+    "line_end": 4293,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round6.md",
     "line_start": 27793,
@@ -21953,6 +22983,16 @@
     "line_start": 5118,
     "line_end": 5221,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 5222,
+    "line_end": 5305,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 5306,
+    "line_end": 5358,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round6.md",
@@ -22093,6 +23133,16 @@
     "line_end": 6286,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 6287,
+    "line_end": 6370,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 6371,
+    "line_end": 6423,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round6.md",
     "line_start": 27853,
@@ -22231,6 +23281,16 @@
     "line_start": 7248,
     "line_end": 7351,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 7352,
+    "line_end": 7435,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 7436,
+    "line_end": 7488,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round6.md",
@@ -22371,6 +23431,16 @@
     "line_end": 8416,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 8417,
+    "line_end": 8500,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 8501,
+    "line_end": 8553,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round6.md",
     "line_start": 27913,
@@ -22509,6 +23579,16 @@
     "line_start": 9378,
     "line_end": 9481,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 9482,
+    "line_end": 9565,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 9566,
+    "line_end": 9618,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round6.md",
@@ -22649,6 +23729,16 @@
     "line_end": 10546,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 10547,
+    "line_end": 10630,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 10631,
+    "line_end": 10683,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round6.md",
     "line_start": 27973,
@@ -22787,6 +23877,16 @@
     "line_start": 11508,
     "line_end": 11611,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 11612,
+    "line_end": 11695,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 11696,
+    "line_end": 11748,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round6.md",
@@ -22927,6 +24027,16 @@
     "line_end": 12676,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 12677,
+    "line_end": 12760,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 12761,
+    "line_end": 12813,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round6.md",
     "line_start": 28033,
@@ -23065,6 +24175,16 @@
     "line_start": 13638,
     "line_end": 13741,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 13742,
+    "line_end": 13825,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 13826,
+    "line_end": 13878,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round6.md",
@@ -23205,6 +24325,16 @@
     "line_end": 14806,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 14807,
+    "line_end": 14890,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 14891,
+    "line_end": 14943,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round6.md",
     "line_start": 28093,
@@ -23343,6 +24473,16 @@
     "line_start": 15768,
     "line_end": 15871,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 15872,
+    "line_end": 15955,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 15956,
+    "line_end": 16008,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round6.md",
@@ -23483,6 +24623,16 @@
     "line_end": 16936,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 16937,
+    "line_end": 17020,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 17021,
+    "line_end": 17073,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round6.md",
     "line_start": 28153,
@@ -23621,6 +24771,16 @@
     "line_start": 17898,
     "line_end": 18001,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 18002,
+    "line_end": 18085,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 18086,
+    "line_end": 18138,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round6.md",
@@ -23761,6 +24921,16 @@
     "line_end": 19066,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 19067,
+    "line_end": 19150,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 19151,
+    "line_end": 19203,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round6.md",
     "line_start": 28213,
@@ -23899,6 +25069,16 @@
     "line_start": 20028,
     "line_end": 20131,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 20132,
+    "line_end": 20215,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 20216,
+    "line_end": 20268,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round6.md",
@@ -24039,6 +25219,16 @@
     "line_end": 21196,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 21197,
+    "line_end": 21280,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 21281,
+    "line_end": 21333,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round6.md",
     "line_start": 28273,
@@ -24177,6 +25367,16 @@
     "line_start": 22158,
     "line_end": 22261,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 22262,
+    "line_end": 22345,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 22346,
+    "line_end": 22398,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round6.md",
@@ -24317,6 +25517,16 @@
     "line_end": 23326,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 23327,
+    "line_end": 23410,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 23411,
+    "line_end": 23463,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round6.md",
     "line_start": 28333,
@@ -24455,6 +25665,16 @@
     "line_start": 24288,
     "line_end": 24391,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 24392,
+    "line_end": 24475,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 24476,
+    "line_end": 24528,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round6.md",
@@ -24595,6 +25815,16 @@
     "line_end": 25456,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 25457,
+    "line_end": 25540,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 25541,
+    "line_end": 25593,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round6.md",
     "line_start": 28393,
@@ -24733,6 +25963,16 @@
     "line_start": 26418,
     "line_end": 26521,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 26522,
+    "line_end": 26605,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 26606,
+    "line_end": 26658,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round6.md",
@@ -24873,6 +26113,16 @@
     "line_end": 27586,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 27587,
+    "line_end": 27670,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 27671,
+    "line_end": 27723,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round6.md",
     "line_start": 28453,
@@ -25011,6 +26261,16 @@
     "line_start": 1924,
     "line_end": 2027,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 2028,
+    "line_end": 2111,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 2112,
+    "line_end": 2164,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round7.md",
@@ -25151,6 +26411,16 @@
     "line_end": 3092,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 3093,
+    "line_end": 3176,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 3177,
+    "line_end": 3229,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round7.md",
     "line_start": 27764,
@@ -25289,6 +26559,16 @@
     "line_start": 4054,
     "line_end": 4157,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 4158,
+    "line_end": 4241,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 4242,
+    "line_end": 4294,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round7.md",
@@ -25429,6 +26709,16 @@
     "line_end": 5222,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 5223,
+    "line_end": 5306,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 5307,
+    "line_end": 5359,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round7.md",
     "line_start": 27824,
@@ -25567,6 +26857,16 @@
     "line_start": 6184,
     "line_end": 6287,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 6288,
+    "line_end": 6371,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 6372,
+    "line_end": 6424,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round7.md",
@@ -25707,6 +27007,16 @@
     "line_end": 7352,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 7353,
+    "line_end": 7436,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 7437,
+    "line_end": 7489,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round7.md",
     "line_start": 27884,
@@ -25845,6 +27155,16 @@
     "line_start": 8314,
     "line_end": 8417,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 8418,
+    "line_end": 8501,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 8502,
+    "line_end": 8554,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round7.md",
@@ -25985,6 +27305,16 @@
     "line_end": 9482,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 9483,
+    "line_end": 9566,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 9567,
+    "line_end": 9619,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round7.md",
     "line_start": 27944,
@@ -26123,6 +27453,16 @@
     "line_start": 10444,
     "line_end": 10547,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 10548,
+    "line_end": 10631,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 10632,
+    "line_end": 10684,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round7.md",
@@ -26263,6 +27603,16 @@
     "line_end": 11612,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 11613,
+    "line_end": 11696,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 11697,
+    "line_end": 11749,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round7.md",
     "line_start": 28004,
@@ -26401,6 +27751,16 @@
     "line_start": 12574,
     "line_end": 12677,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 12678,
+    "line_end": 12761,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 12762,
+    "line_end": 12814,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round7.md",
@@ -26541,6 +27901,16 @@
     "line_end": 13742,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 13743,
+    "line_end": 13826,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 13827,
+    "line_end": 13879,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round7.md",
     "line_start": 28064,
@@ -26679,6 +28049,16 @@
     "line_start": 14704,
     "line_end": 14807,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 14808,
+    "line_end": 14891,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 14892,
+    "line_end": 14944,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round7.md",
@@ -26819,6 +28199,16 @@
     "line_end": 15872,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 15873,
+    "line_end": 15956,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 15957,
+    "line_end": 16009,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round7.md",
     "line_start": 28124,
@@ -26957,6 +28347,16 @@
     "line_start": 16834,
     "line_end": 16937,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 16938,
+    "line_end": 17021,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 17022,
+    "line_end": 17074,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round7.md",
@@ -27097,6 +28497,16 @@
     "line_end": 18002,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 18003,
+    "line_end": 18086,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 18087,
+    "line_end": 18139,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round7.md",
     "line_start": 28184,
@@ -27235,6 +28645,16 @@
     "line_start": 18964,
     "line_end": 19067,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 19068,
+    "line_end": 19151,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 19152,
+    "line_end": 19204,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round7.md",
@@ -27375,6 +28795,16 @@
     "line_end": 20132,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 20133,
+    "line_end": 20216,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 20217,
+    "line_end": 20269,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round7.md",
     "line_start": 28244,
@@ -27513,6 +28943,16 @@
     "line_start": 21094,
     "line_end": 21197,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 21198,
+    "line_end": 21281,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 21282,
+    "line_end": 21334,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round7.md",
@@ -27653,6 +29093,16 @@
     "line_end": 22262,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 22263,
+    "line_end": 22346,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 22347,
+    "line_end": 22399,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round7.md",
     "line_start": 28304,
@@ -27791,6 +29241,16 @@
     "line_start": 23224,
     "line_end": 23327,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 23328,
+    "line_end": 23411,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 23412,
+    "line_end": 23464,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round7.md",
@@ -27931,6 +29391,16 @@
     "line_end": 24392,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 24393,
+    "line_end": 24476,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 24477,
+    "line_end": 24529,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round7.md",
     "line_start": 28364,
@@ -28069,6 +29539,16 @@
     "line_start": 25354,
     "line_end": 25457,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 25458,
+    "line_end": 25541,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 25542,
+    "line_end": 25594,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round7.md",
@@ -28209,6 +29689,16 @@
     "line_end": 26522,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 26523,
+    "line_end": 26606,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 26607,
+    "line_end": 26659,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round7.md",
     "line_start": 28424,
@@ -28347,6 +29837,16 @@
     "line_start": 27484,
     "line_end": 27587,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 27588,
+    "line_end": 27671,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 27672,
+    "line_end": 27724,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round7.md",
@@ -28487,6 +29987,16 @@
     "line_end": 2028,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 2029,
+    "line_end": 2112,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 2113,
+    "line_end": 2165,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round8.md",
     "line_start": 27735,
@@ -28625,6 +30135,16 @@
     "line_start": 2990,
     "line_end": 3093,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 3094,
+    "line_end": 3177,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 3178,
+    "line_end": 3230,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round8.md",
@@ -28765,6 +30285,16 @@
     "line_end": 4158,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 4159,
+    "line_end": 4242,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 4243,
+    "line_end": 4295,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round8.md",
     "line_start": 27795,
@@ -28903,6 +30433,16 @@
     "line_start": 5120,
     "line_end": 5223,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 5224,
+    "line_end": 5307,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 5308,
+    "line_end": 5360,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round8.md",
@@ -29043,6 +30583,16 @@
     "line_end": 6288,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 6289,
+    "line_end": 6372,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 6373,
+    "line_end": 6425,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round8.md",
     "line_start": 27855,
@@ -29181,6 +30731,16 @@
     "line_start": 7250,
     "line_end": 7353,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 7354,
+    "line_end": 7437,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 7438,
+    "line_end": 7490,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round8.md",
@@ -29321,6 +30881,16 @@
     "line_end": 8418,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 8419,
+    "line_end": 8502,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 8503,
+    "line_end": 8555,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round8.md",
     "line_start": 27915,
@@ -29459,6 +31029,16 @@
     "line_start": 9380,
     "line_end": 9483,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 9484,
+    "line_end": 9567,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 9568,
+    "line_end": 9620,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round8.md",
@@ -29599,6 +31179,16 @@
     "line_end": 10548,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 10549,
+    "line_end": 10632,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 10633,
+    "line_end": 10685,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round8.md",
     "line_start": 27975,
@@ -29737,6 +31327,16 @@
     "line_start": 11510,
     "line_end": 11613,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 11614,
+    "line_end": 11697,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 11698,
+    "line_end": 11750,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round8.md",
@@ -29877,6 +31477,16 @@
     "line_end": 12678,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 12679,
+    "line_end": 12762,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 12763,
+    "line_end": 12815,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round8.md",
     "line_start": 28035,
@@ -30015,6 +31625,16 @@
     "line_start": 13640,
     "line_end": 13743,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 13744,
+    "line_end": 13827,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 13828,
+    "line_end": 13880,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round8.md",
@@ -30155,6 +31775,16 @@
     "line_end": 14808,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 14809,
+    "line_end": 14892,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 14893,
+    "line_end": 14945,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round8.md",
     "line_start": 28095,
@@ -30293,6 +31923,16 @@
     "line_start": 15770,
     "line_end": 15873,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 15874,
+    "line_end": 15957,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 15958,
+    "line_end": 16010,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round8.md",
@@ -30433,6 +32073,16 @@
     "line_end": 16938,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 16939,
+    "line_end": 17022,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 17023,
+    "line_end": 17075,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round8.md",
     "line_start": 28155,
@@ -30571,6 +32221,16 @@
     "line_start": 17900,
     "line_end": 18003,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 18004,
+    "line_end": 18087,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 18088,
+    "line_end": 18140,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round8.md",
@@ -30711,6 +32371,16 @@
     "line_end": 19068,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 19069,
+    "line_end": 19152,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 19153,
+    "line_end": 19205,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round8.md",
     "line_start": 28215,
@@ -30849,6 +32519,16 @@
     "line_start": 20030,
     "line_end": 20133,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 20134,
+    "line_end": 20217,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 20218,
+    "line_end": 20270,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round8.md",
@@ -30989,6 +32669,16 @@
     "line_end": 21198,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 21199,
+    "line_end": 21282,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 21283,
+    "line_end": 21335,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round8.md",
     "line_start": 28275,
@@ -31127,6 +32817,16 @@
     "line_start": 22160,
     "line_end": 22263,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 22264,
+    "line_end": 22347,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 22348,
+    "line_end": 22400,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round8.md",
@@ -31267,6 +32967,16 @@
     "line_end": 23328,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 23329,
+    "line_end": 23412,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 23413,
+    "line_end": 23465,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round8.md",
     "line_start": 28335,
@@ -31405,6 +33115,16 @@
     "line_start": 24290,
     "line_end": 24393,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 24394,
+    "line_end": 24477,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 24478,
+    "line_end": 24530,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round8.md",
@@ -31545,6 +33265,16 @@
     "line_end": 25458,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 25459,
+    "line_end": 25542,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 25543,
+    "line_end": 25595,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round8.md",
     "line_start": 28395,
@@ -31683,6 +33413,16 @@
     "line_start": 26420,
     "line_end": 26523,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 26524,
+    "line_end": 26607,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 26608,
+    "line_end": 26660,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round8.md",
@@ -31823,6 +33563,16 @@
     "line_end": 27588,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 27589,
+    "line_end": 27672,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 27673,
+    "line_end": 27725,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round8.md",
     "line_start": 28455,
@@ -31961,6 +33711,16 @@
     "line_start": 1926,
     "line_end": 2029,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 2030,
+    "line_end": 2113,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 2114,
+    "line_end": 2166,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round9.md",
@@ -32101,6 +33861,16 @@
     "line_end": 3094,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 3095,
+    "line_end": 3178,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 3179,
+    "line_end": 3231,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round9.md",
     "line_start": 27766,
@@ -32239,6 +34009,16 @@
     "line_start": 4056,
     "line_end": 4159,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 4160,
+    "line_end": 4243,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 4244,
+    "line_end": 4296,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round9.md",
@@ -32379,6 +34159,16 @@
     "line_end": 5224,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 5225,
+    "line_end": 5308,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 5309,
+    "line_end": 5361,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round9.md",
     "line_start": 27826,
@@ -32517,6 +34307,16 @@
     "line_start": 6186,
     "line_end": 6289,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 6290,
+    "line_end": 6373,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 6374,
+    "line_end": 6426,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round9.md",
@@ -32657,6 +34457,16 @@
     "line_end": 7354,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 7355,
+    "line_end": 7438,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 7439,
+    "line_end": 7491,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round9.md",
     "line_start": 27886,
@@ -32795,6 +34605,16 @@
     "line_start": 8316,
     "line_end": 8419,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 8420,
+    "line_end": 8503,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 8504,
+    "line_end": 8556,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round9.md",
@@ -32935,6 +34755,16 @@
     "line_end": 9484,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 9485,
+    "line_end": 9568,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 9569,
+    "line_end": 9621,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round9.md",
     "line_start": 27946,
@@ -33073,6 +34903,16 @@
     "line_start": 10446,
     "line_end": 10549,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 10550,
+    "line_end": 10633,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 10634,
+    "line_end": 10686,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round9.md",
@@ -33213,6 +35053,16 @@
     "line_end": 11614,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 11615,
+    "line_end": 11698,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 11699,
+    "line_end": 11751,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round9.md",
     "line_start": 28006,
@@ -33351,6 +35201,16 @@
     "line_start": 12576,
     "line_end": 12679,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 12680,
+    "line_end": 12763,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 12764,
+    "line_end": 12816,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round9.md",
@@ -33491,6 +35351,16 @@
     "line_end": 13744,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 13745,
+    "line_end": 13828,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 13829,
+    "line_end": 13881,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round9.md",
     "line_start": 28066,
@@ -33629,6 +35499,16 @@
     "line_start": 14706,
     "line_end": 14809,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 14810,
+    "line_end": 14893,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 14894,
+    "line_end": 14946,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round9.md",
@@ -33769,6 +35649,16 @@
     "line_end": 15874,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 15875,
+    "line_end": 15958,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 15959,
+    "line_end": 16011,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round9.md",
     "line_start": 28126,
@@ -33907,6 +35797,16 @@
     "line_start": 16836,
     "line_end": 16939,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 16940,
+    "line_end": 17023,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 17024,
+    "line_end": 17076,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round9.md",
@@ -34047,6 +35947,16 @@
     "line_end": 18004,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 18005,
+    "line_end": 18088,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 18089,
+    "line_end": 18141,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round9.md",
     "line_start": 28186,
@@ -34185,6 +36095,16 @@
     "line_start": 18966,
     "line_end": 19069,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 19070,
+    "line_end": 19153,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 19154,
+    "line_end": 19206,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round9.md",
@@ -34325,6 +36245,16 @@
     "line_end": 20134,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 20135,
+    "line_end": 20218,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 20219,
+    "line_end": 20271,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round9.md",
     "line_start": 28246,
@@ -34463,6 +36393,16 @@
     "line_start": 21096,
     "line_end": 21199,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 21200,
+    "line_end": 21283,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 21284,
+    "line_end": 21336,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round9.md",
@@ -34603,6 +36543,16 @@
     "line_end": 22264,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 22265,
+    "line_end": 22348,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 22349,
+    "line_end": 22401,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round9.md",
     "line_start": 28306,
@@ -34741,6 +36691,16 @@
     "line_start": 23226,
     "line_end": 23329,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 23330,
+    "line_end": 23413,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 23414,
+    "line_end": 23466,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round9.md",
@@ -34881,6 +36841,16 @@
     "line_end": 24394,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 24395,
+    "line_end": 24478,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 24479,
+    "line_end": 24531,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round9.md",
     "line_start": 28366,
@@ -35019,6 +36989,16 @@
     "line_start": 25356,
     "line_end": 25459,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 25460,
+    "line_end": 25543,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 25544,
+    "line_end": 25596,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round9.md",
@@ -35159,6 +37139,16 @@
     "line_end": 26524,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 26525,
+    "line_end": 26608,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 26609,
+    "line_end": 26661,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round9.md",
     "line_start": 28426,
@@ -35297,6 +37287,16 @@
     "line_start": 27486,
     "line_end": 27589,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 27590,
+    "line_end": 27673,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 27674,
+    "line_end": 27726,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round9.md",
@@ -35437,6 +37437,16 @@
     "line_end": 2030,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 2031,
+    "line_end": 2114,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 2115,
+    "line_end": 2167,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round10.md",
     "line_start": 27737,
@@ -35575,6 +37585,16 @@
     "line_start": 2992,
     "line_end": 3095,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 3096,
+    "line_end": 3179,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 3180,
+    "line_end": 3232,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round10.md",
@@ -35715,6 +37735,16 @@
     "line_end": 4160,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 4161,
+    "line_end": 4244,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 4245,
+    "line_end": 4297,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round10.md",
     "line_start": 27797,
@@ -35853,6 +37883,16 @@
     "line_start": 5122,
     "line_end": 5225,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 5226,
+    "line_end": 5309,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 5310,
+    "line_end": 5362,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round10.md",
@@ -35993,6 +38033,16 @@
     "line_end": 6290,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 6291,
+    "line_end": 6374,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 6375,
+    "line_end": 6427,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round10.md",
     "line_start": 27857,
@@ -36131,6 +38181,16 @@
     "line_start": 7252,
     "line_end": 7355,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 7356,
+    "line_end": 7439,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 7440,
+    "line_end": 7492,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round10.md",
@@ -36271,6 +38331,16 @@
     "line_end": 8420,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 8421,
+    "line_end": 8504,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 8505,
+    "line_end": 8557,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round10.md",
     "line_start": 27917,
@@ -36409,6 +38479,16 @@
     "line_start": 9382,
     "line_end": 9485,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 9486,
+    "line_end": 9569,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 9570,
+    "line_end": 9622,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round10.md",
@@ -36549,6 +38629,16 @@
     "line_end": 10550,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 10551,
+    "line_end": 10634,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 10635,
+    "line_end": 10687,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round10.md",
     "line_start": 27977,
@@ -36687,6 +38777,16 @@
     "line_start": 11512,
     "line_end": 11615,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 11616,
+    "line_end": 11699,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 11700,
+    "line_end": 11752,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round10.md",
@@ -36827,6 +38927,16 @@
     "line_end": 12680,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 12681,
+    "line_end": 12764,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 12765,
+    "line_end": 12817,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round10.md",
     "line_start": 28037,
@@ -36965,6 +39075,16 @@
     "line_start": 13642,
     "line_end": 13745,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 13746,
+    "line_end": 13829,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 13830,
+    "line_end": 13882,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round10.md",
@@ -37105,6 +39225,16 @@
     "line_end": 14810,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 14811,
+    "line_end": 14894,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 14895,
+    "line_end": 14947,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round10.md",
     "line_start": 28097,
@@ -37243,6 +39373,16 @@
     "line_start": 15772,
     "line_end": 15875,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 15876,
+    "line_end": 15959,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 15960,
+    "line_end": 16012,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round10.md",
@@ -37383,6 +39523,16 @@
     "line_end": 16940,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 16941,
+    "line_end": 17024,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 17025,
+    "line_end": 17077,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round10.md",
     "line_start": 28157,
@@ -37521,6 +39671,16 @@
     "line_start": 17902,
     "line_end": 18005,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 18006,
+    "line_end": 18089,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 18090,
+    "line_end": 18142,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round10.md",
@@ -37661,6 +39821,16 @@
     "line_end": 19070,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 19071,
+    "line_end": 19154,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 19155,
+    "line_end": 19207,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round10.md",
     "line_start": 28217,
@@ -37799,6 +39969,16 @@
     "line_start": 20032,
     "line_end": 20135,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 20136,
+    "line_end": 20219,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 20220,
+    "line_end": 20272,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round10.md",
@@ -37939,6 +40119,16 @@
     "line_end": 21200,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 21201,
+    "line_end": 21284,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 21285,
+    "line_end": 21337,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round10.md",
     "line_start": 28277,
@@ -38077,6 +40267,16 @@
     "line_start": 22162,
     "line_end": 22265,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 22266,
+    "line_end": 22349,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 22350,
+    "line_end": 22402,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round10.md",
@@ -38217,6 +40417,16 @@
     "line_end": 23330,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 23331,
+    "line_end": 23414,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 23415,
+    "line_end": 23467,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round10.md",
     "line_start": 28337,
@@ -38355,6 +40565,16 @@
     "line_start": 24292,
     "line_end": 24395,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 24396,
+    "line_end": 24479,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 24480,
+    "line_end": 24532,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round10.md",
@@ -38495,6 +40715,16 @@
     "line_end": 25460,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 25461,
+    "line_end": 25544,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 25545,
+    "line_end": 25597,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round10.md",
     "line_start": 28397,
@@ -38633,6 +40863,16 @@
     "line_start": 26422,
     "line_end": 26525,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 26526,
+    "line_end": 26609,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 26610,
+    "line_end": 26662,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round10.md",
@@ -38773,6 +41013,16 @@
     "line_end": 27590,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 27591,
+    "line_end": 27674,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 27675,
+    "line_end": 27727,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round10.md",
     "line_start": 28457,
@@ -38911,6 +41161,16 @@
     "line_start": 1928,
     "line_end": 2031,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 2032,
+    "line_end": 2115,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 2116,
+    "line_end": 2168,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round11.md",
@@ -39051,6 +41311,16 @@
     "line_end": 3096,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 3097,
+    "line_end": 3180,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 3181,
+    "line_end": 3233,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round11.md",
     "line_start": 27768,
@@ -39189,6 +41459,16 @@
     "line_start": 4058,
     "line_end": 4161,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 4162,
+    "line_end": 4245,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 4246,
+    "line_end": 4298,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round11.md",
@@ -39329,6 +41609,16 @@
     "line_end": 5226,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 5227,
+    "line_end": 5310,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 5311,
+    "line_end": 5363,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round11.md",
     "line_start": 27828,
@@ -39467,6 +41757,16 @@
     "line_start": 6188,
     "line_end": 6291,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 6292,
+    "line_end": 6375,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 6376,
+    "line_end": 6428,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round11.md",
@@ -39607,6 +41907,16 @@
     "line_end": 7356,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 7357,
+    "line_end": 7440,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 7441,
+    "line_end": 7493,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round11.md",
     "line_start": 27888,
@@ -39745,6 +42055,16 @@
     "line_start": 8318,
     "line_end": 8421,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 8422,
+    "line_end": 8505,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 8506,
+    "line_end": 8558,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round11.md",
@@ -39885,6 +42205,16 @@
     "line_end": 9486,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 9487,
+    "line_end": 9570,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 9571,
+    "line_end": 9623,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round11.md",
     "line_start": 27948,
@@ -40023,6 +42353,16 @@
     "line_start": 10448,
     "line_end": 10551,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 10552,
+    "line_end": 10635,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 10636,
+    "line_end": 10688,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round11.md",
@@ -40163,6 +42503,16 @@
     "line_end": 11616,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 11617,
+    "line_end": 11700,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 11701,
+    "line_end": 11753,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round11.md",
     "line_start": 28008,
@@ -40301,6 +42651,16 @@
     "line_start": 12578,
     "line_end": 12681,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 12682,
+    "line_end": 12765,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 12766,
+    "line_end": 12818,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round11.md",
@@ -40441,6 +42801,16 @@
     "line_end": 13746,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 13747,
+    "line_end": 13830,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 13831,
+    "line_end": 13883,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round11.md",
     "line_start": 28068,
@@ -40579,6 +42949,16 @@
     "line_start": 14708,
     "line_end": 14811,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 14812,
+    "line_end": 14895,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 14896,
+    "line_end": 14948,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round11.md",
@@ -40719,6 +43099,16 @@
     "line_end": 15876,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 15877,
+    "line_end": 15960,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 15961,
+    "line_end": 16013,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round11.md",
     "line_start": 28128,
@@ -40857,6 +43247,16 @@
     "line_start": 16838,
     "line_end": 16941,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 16942,
+    "line_end": 17025,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 17026,
+    "line_end": 17078,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round11.md",
@@ -40997,6 +43397,16 @@
     "line_end": 18006,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 18007,
+    "line_end": 18090,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 18091,
+    "line_end": 18143,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round11.md",
     "line_start": 28188,
@@ -41135,6 +43545,16 @@
     "line_start": 18968,
     "line_end": 19071,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 19072,
+    "line_end": 19155,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 19156,
+    "line_end": 19208,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round11.md",
@@ -41275,6 +43695,16 @@
     "line_end": 20136,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 20137,
+    "line_end": 20220,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 20221,
+    "line_end": 20273,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round11.md",
     "line_start": 28248,
@@ -41413,6 +43843,16 @@
     "line_start": 21098,
     "line_end": 21201,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 21202,
+    "line_end": 21285,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 21286,
+    "line_end": 21338,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round11.md",
@@ -41553,6 +43993,16 @@
     "line_end": 22266,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 22267,
+    "line_end": 22350,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 22351,
+    "line_end": 22403,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round11.md",
     "line_start": 28308,
@@ -41691,6 +44141,16 @@
     "line_start": 23228,
     "line_end": 23331,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 23332,
+    "line_end": 23415,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 23416,
+    "line_end": 23468,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round11.md",
@@ -41831,6 +44291,16 @@
     "line_end": 24396,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 24397,
+    "line_end": 24480,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 24481,
+    "line_end": 24533,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round11.md",
     "line_start": 28368,
@@ -41969,6 +44439,16 @@
     "line_start": 25358,
     "line_end": 25461,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 25462,
+    "line_end": 25545,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 25546,
+    "line_end": 25598,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round11.md",
@@ -42109,6 +44589,16 @@
     "line_end": 26526,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 26527,
+    "line_end": 26610,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 26611,
+    "line_end": 26663,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round11.md",
     "line_start": 28428,
@@ -42247,6 +44737,16 @@
     "line_start": 27488,
     "line_end": 27591,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 27592,
+    "line_end": 27675,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 27676,
+    "line_end": 27728,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round11.md",
@@ -42387,6 +44887,16 @@
     "line_end": 2032,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 2033,
+    "line_end": 2116,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 2117,
+    "line_end": 2169,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round12.md",
     "line_start": 27739,
@@ -42525,6 +45035,16 @@
     "line_start": 2994,
     "line_end": 3097,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 3098,
+    "line_end": 3181,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 3182,
+    "line_end": 3234,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round12.md",
@@ -42665,6 +45185,16 @@
     "line_end": 4162,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 4163,
+    "line_end": 4246,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 4247,
+    "line_end": 4299,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round12.md",
     "line_start": 27799,
@@ -42803,6 +45333,16 @@
     "line_start": 5124,
     "line_end": 5227,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 5228,
+    "line_end": 5311,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 5312,
+    "line_end": 5364,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round12.md",
@@ -42943,6 +45483,16 @@
     "line_end": 6292,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 6293,
+    "line_end": 6376,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 6377,
+    "line_end": 6429,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round12.md",
     "line_start": 27859,
@@ -43081,6 +45631,16 @@
     "line_start": 7254,
     "line_end": 7357,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 7358,
+    "line_end": 7441,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 7442,
+    "line_end": 7494,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round12.md",
@@ -43221,6 +45781,16 @@
     "line_end": 8422,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 8423,
+    "line_end": 8506,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 8507,
+    "line_end": 8559,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round12.md",
     "line_start": 27919,
@@ -43359,6 +45929,16 @@
     "line_start": 9384,
     "line_end": 9487,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 9488,
+    "line_end": 9571,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 9572,
+    "line_end": 9624,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round12.md",
@@ -43499,6 +46079,16 @@
     "line_end": 10552,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 10553,
+    "line_end": 10636,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 10637,
+    "line_end": 10689,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round12.md",
     "line_start": 27979,
@@ -43637,6 +46227,16 @@
     "line_start": 11514,
     "line_end": 11617,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 11618,
+    "line_end": 11701,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 11702,
+    "line_end": 11754,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round12.md",
@@ -43777,6 +46377,16 @@
     "line_end": 12682,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 12683,
+    "line_end": 12766,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 12767,
+    "line_end": 12819,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round12.md",
     "line_start": 28039,
@@ -43915,6 +46525,16 @@
     "line_start": 13644,
     "line_end": 13747,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 13748,
+    "line_end": 13831,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 13832,
+    "line_end": 13884,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round12.md",
@@ -44055,6 +46675,16 @@
     "line_end": 14812,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 14813,
+    "line_end": 14896,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 14897,
+    "line_end": 14949,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round12.md",
     "line_start": 28099,
@@ -44193,6 +46823,16 @@
     "line_start": 15774,
     "line_end": 15877,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 15878,
+    "line_end": 15961,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 15962,
+    "line_end": 16014,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round12.md",
@@ -44333,6 +46973,16 @@
     "line_end": 16942,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 16943,
+    "line_end": 17026,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 17027,
+    "line_end": 17079,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round12.md",
     "line_start": 28159,
@@ -44471,6 +47121,16 @@
     "line_start": 17904,
     "line_end": 18007,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 18008,
+    "line_end": 18091,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 18092,
+    "line_end": 18144,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round12.md",
@@ -44611,6 +47271,16 @@
     "line_end": 19072,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 19073,
+    "line_end": 19156,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 19157,
+    "line_end": 19209,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round12.md",
     "line_start": 28219,
@@ -44749,6 +47419,16 @@
     "line_start": 20034,
     "line_end": 20137,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 20138,
+    "line_end": 20221,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 20222,
+    "line_end": 20274,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round12.md",
@@ -44889,6 +47569,16 @@
     "line_end": 21202,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 21203,
+    "line_end": 21286,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 21287,
+    "line_end": 21339,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round12.md",
     "line_start": 28279,
@@ -45027,6 +47717,16 @@
     "line_start": 22164,
     "line_end": 22267,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 22268,
+    "line_end": 22351,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 22352,
+    "line_end": 22404,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round12.md",
@@ -45167,6 +47867,16 @@
     "line_end": 23332,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 23333,
+    "line_end": 23416,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 23417,
+    "line_end": 23469,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round12.md",
     "line_start": 28339,
@@ -45305,6 +48015,16 @@
     "line_start": 24294,
     "line_end": 24397,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 24398,
+    "line_end": 24481,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 24482,
+    "line_end": 24534,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round12.md",
@@ -45445,6 +48165,16 @@
     "line_end": 25462,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 25463,
+    "line_end": 25546,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 25547,
+    "line_end": 25599,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round12.md",
     "line_start": 28399,
@@ -45584,6 +48314,16 @@
     "line_end": 26527,
     "rows": 100
    },
+   "acceptance_scenarios": {
+    "line_start": 26528,
+    "line_end": 26611,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 26612,
+    "line_end": 26664,
+    "rows": 50
+   },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round12.md",
     "line_start": 28429,
@@ -45722,6 +48462,16 @@
     "line_start": 27489,
     "line_end": 27592,
     "rows": 100
+   },
+   "acceptance_scenarios": {
+    "line_start": 27593,
+    "line_end": 27676,
+    "rows": 80
+   },
+   "fault_injection": {
+    "line_start": 27677,
+    "line_end": 27729,
+    "rows": 50
    },
    "assertion_outline": {
     "file": "docs/archive/planning/rounds/round12.md",

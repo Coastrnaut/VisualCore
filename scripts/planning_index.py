@@ -320,6 +320,15 @@ def parse_round2(root: Path) -> tuple[list[dict], list[dict], dict]:
         ident = bold_fields(lines[i + 1])
         story = bold_fields(lines[i + 2])
         sections = headings(lines, i, j, r"^#### 6\.\d+\.(\d+)\. (.+)$")
+
+        def table_span(number: int, row: str, expected: int, sections=sections, j=j, pos=pos) -> dict:
+            """Line span and row count of the table in chapter section `number` (the 100-level catalog, the 80 scenarios)."""
+            at = next(n for n, (_, sm) in enumerate(sections) if int(sm.group(1)) == number)
+            lo, hi = sections[at][0], (sections[at + 1][0] if at + 1 < len(sections) else j)
+            rows = sum(1 for l in lines[lo:hi] if re.match(row, l))
+            need(rows == expected, f"round 2 game {pos}: section {number} has {rows} rows, expected {expected}")
+            return {"line_start": lo + 1, "line_end": hi, "rows": rows}
+
         fields: dict[str, str] = {}
         for l in lines[i + 1:sections[4][0] if len(sections) > 4 else j]:
             for key, value in bold_fields(l).items():
@@ -377,6 +386,8 @@ def parse_round2(root: Path) -> tuple[list[dict], list[dict], dict]:
             "sections": [{"number": int(sm.group(1)), "title": sm.group(2).strip(), "line_start": si + 1,
                           "line_end": (sections[n + 1][0] if n + 1 < len(sections) else j)}
                          for n, (si, sm) in enumerate(sections)],
+            "level_manifest": table_span(18, r"^\| \d{3} \|", 100),
+            "acceptance_scenarios": table_span(19, r"^\| `R2-G\d\d-QA-\d{3}`", 80),
             "assertion_outline": span(rel, lines, oi, oj),
             "superseded_source_terms": {"price": roster[pos]["price"], "packaging": "separate paid app"},
             "implementation": {"state": "not-started", "unified_integration": "pending"},
@@ -520,6 +531,8 @@ def parse_round(root: Path, n: int) -> tuple[list[dict], list[dict], dict]:
             "sections": [{"number": int(sm.group(1)), "title": sm.group(2).strip(), "line_start": si + 1,
                           "line_end": sec[int(sm.group(1))][1]} for si, sm in sections],
             "level_manifest": {"line_start": sec[8][0] + 1, "line_end": sec[8][1], "rows": len(level_rows)},
+            "acceptance_scenarios": {"line_start": sec[9][0] + 1, "line_end": sec[9][1], "rows": len(scenario_rows)},
+            "fault_injection": {"line_start": sec[10][0] + 1, "line_end": sec[10][1], "rows": len(fault_rows)},
             "assertion_outline": span(rel, lines, ai, aj),
             "superseded_source_terms": {"price": roster[pos]["price"], "packaging": "separate paid app"},
             "implementation": {"state": "not-started", "unified_integration": "pending"},
@@ -658,7 +671,10 @@ OVERRIDE_SHARED = (
 
 OVERRIDE_APP_PHASE = (
     "Canonical override (ADR-0009, Auto-Creator.md section 21): this app is experience {code} inside the single "
-    "VisualCore app. Do not create or extend a standalone app target, bundle identifier or store listing. Until "
+    "VisualCore app. Do not create or extend a standalone app target, bundle identifier, in-app product or store "
+    "listing. Visuals are code only: where the prompt or the manual mentions licensed or purchased models, textures, "
+    "atlases or asset packs, generate the geometry and imagery in code; bundled data (numbers, names, structures) "
+    "needs a license and provenance record. The app makes no network request. Until "
     "UA-F07 has moved an app, its sources stay where they are; afterwards and for every app not yet started the "
     "sources are the experience modules named in Auto-Creator.md section 16. Store-listing, pricing and per-app "
     "release-dossier parts of Phase 06 are inapplicable; its quality, privacy, accessibility and regression gates "
@@ -826,10 +842,11 @@ def cmd_levels(args: argparse.Namespace) -> int:
     catalog = json.loads((ROOT / CATALOG).read_text(encoding="utf-8"))
     exp = next((e for e in catalog["experiences"] if e["code"] == args.experience.upper()), None)
     if not exp or "level_manifest" not in exp:
-        raise SystemExit(f"ERROR: {args.experience} has no archived level manifest (rounds 3-12 only)")
+        raise SystemExit(f"ERROR: {args.experience} has no archived level manifest (games only)")
     lines = read_lines(ROOT, Path(exp["source"]["file"]))
     lm = exp["level_manifest"]
-    header = [c.strip() for c in lines[lm["line_start"]].strip("|").split("|")]
+    first = next(l for l in lines[lm["line_start"] - 1:lm["line_end"]] if l.startswith("|"))
+    header = [c.strip() for c in first.strip("|").split("|")]
     rows = []
     for l in lines[lm["line_start"] - 1:lm["line_end"]]:
         if re.match(r"^\| \d{3} \|", l):

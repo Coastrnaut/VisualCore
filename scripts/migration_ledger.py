@@ -25,7 +25,8 @@ so the first line printed by `next` is the canonical next action. A gate is *rea
 device row), every dependency is satisfied (pass, or superseded by gates that are all pass) and every legacy gate
 it requires is pass in the legacy ledger. Device gates are additionally guarded by ImplementationLock-100.
 
-Evidence model (same as the legacy tool): `run-check` executes a real command (argv, never a shell string), writes
+Evidence model (same as the legacy tool): `run-check` executes a real command (an argument list: never a shell
+string, a shell wrapper or an inline script), writes
 the full log and an attestation with the log's SHA-256; `seal` gathers the new attestations of a gate, re-hashes
 their logs and writes an evidence file; `record` marks the gate from that evidence file. A gate that already passed
 can be verified again after a later source change with `--reverify`: every revision keeps its own evidence file
@@ -58,6 +59,8 @@ BRIEFS = Path("docs/catalog/unified-app-features.json")
 BASELINE = Path("docs/migration/pre-fable-baseline.json")
 LOCK = "ImplementationLock-100"
 STATUSES = ("pending", "pass", "fail", "blocked", "superseded")
+SHELLS = {"sh", "bash", "zsh", "dash", "ksh", "csh", "tcsh", "fish"}
+INLINE_FLAGS = {"-c", "-e", "--eval"}
 DEVICES = {"DEV1": {"role": "D1", "product_type": "iPhone15,4", "name": "iPhone 15"},
            "DEV2": {"role": "D2", "product_type": "iPad17,3", "name": "iPad Pro 13-inch (M5)"},
            "DEV3": {"role": "D3", "product_type": "iPad15,7", "name": "iPad (A16), must stay on iPadOS 26.5"}}
@@ -399,8 +402,13 @@ def cmd_run_check(root: Path, args) -> int:
     argv = args.argv[1:] if args.argv and args.argv[0] == "--" else args.argv
     if not argv:
         fail("run-check requires a command after --")
-    if Path(argv[0]).name.lower() in {"claude", "claude-code"}:
+    program = Path(argv[0]).name.lower()
+    if program in {"claude", "claude-code"}:
         fail("the Claude CLI is prohibited: operate through Claude Desktop Code")
+    if program in SHELLS:
+        fail("an evidence command is an argument list: no shell wrapper")
+    if len(argv) > 1 and argv[1] in INLINE_FLAGS and re.match(r"(python|ruby|perl|node|osascript|swift)", program):
+        fail("no inline script as evidence: run a tracked script or tool instead")
     label = f"{args.gate}.{args.name}"
     att = root / CHECKS / f"{label}.json"
     log = root / LOGS / f"{label}.log"
@@ -431,6 +439,13 @@ def cmd_run_check(root: Path, args) -> int:
 
 def git(root: Path, *argv: str) -> str:
     return subprocess.run(["git", *argv], cwd=root, capture_output=True, text=True, check=False).stdout.strip()
+
+
+def changed_paths(root: Path) -> list[str]:
+    """Paths that differ from HEAD, without the ledger's own files (which a gate in progress always touches)."""
+    out = subprocess.run(["git", "status", "--porcelain"], cwd=root, capture_output=True, text=True, check=False).stdout
+    paths = [line[3:] for line in out.splitlines() if len(line) > 3]
+    return [p for p in paths if not p.startswith(".autonomy/migration/")]
 
 
 def evidence_files(root: Path, gid: str) -> list[Path]:
@@ -465,9 +480,10 @@ def cmd_seal(root: Path, args) -> int:
             fail(f"log missing or changed since the command ran: {a['log']}")
     if not checks and not args.allow_failures:
         fail("no passing attestation; fix and rerun, or seal a failed device row with --allow-failures")
+    changed = changed_paths(root)
     evidence = {"ledger": "migration", "gate": args.gate, "revision_number": len(prior) + 1, "sealed": clock(),
                 "revision": git(root, "rev-parse", "HEAD"), "branch": git(root, "branch", "--show-current"),
-                "dirty": bool(git(root, "status", "--porcelain")),
+                "dirty": bool(changed), "dirty_paths": changed[:50],
                 "passing_checks": [{k: a[k] for k in ("name", "command", "exit_code", "log", "log_sha256", "finished")} for a in checks],
                 "failed_attempts": [{k: a[k] for k in ("name", "command", "exit_code", "timed_out", "log", "log_sha256")} for a in failed]}
     name = f"{args.gate}.json" if not prior else f"{args.gate}.r{len(prior) + 1}.json"

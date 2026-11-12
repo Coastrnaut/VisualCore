@@ -96,7 +96,7 @@ def block_toc(ctx) -> str:
     for level, title in headings(ctx["doc"])[1:]:
         if level == 1:
             lines.append(f"- **[{title}](#{anchor(title)})**")
-        elif level == 2:
+        elif level == 2 and title != "Contents":
             lines.append(f"  - [{title}](#{anchor(title)})")
     return "\n".join(lines)
 
@@ -107,10 +107,9 @@ def block_catalog_summary(ctx) -> str:
     for e in ctx["catalog"]["experiences"]:
         groups.setdefault(e["collection"], []).append(e)
     for name, es in groups.items():
-        src = es[0]["source"]["file"]
-        src = "docs/archive/planning/embedded/apps/ (25 manuals)" if name == "original" else src
+        src = "`docs/archive/planning/embedded/apps/` (25 manuals)" if name == "original" else f"`{es[0]['source']['file']}`"
         rows.append(f"| {name} | {es[0]['code']} … {es[-1]['code']} | {len(es)} | {es[0]['kind']} | {es[0]['tier']} | "
-                    f"{es[0]['release']} | `{src}` |")
+                    f"{es[0]['release']} | {src} |")
     c = ctx["catalog"]["counts"]
     rows.append(f"| **Total** | | **{c['experiences']}** | | {c['free']} free, {c['premium']} premium, "
                 f"{c['premium-backlog']} premium backlog | {c['launch']} launch, {c['backlog']} backlog | |")
@@ -167,7 +166,7 @@ def ranking(e: dict) -> str:
 
 
 def round2_card(e: dict, live: set[str]) -> str:
-    d, src, out = e["design"], e["source"], e["assertion_outline"]
+    d, src, out, lm, qa = e["design"], e["source"], e["assertion_outline"], e["level_manifest"], e["acceptance_scenarios"]
     first = 301 + (e["collection_position"] - 1) * 10
     used = [s for s in e["shared_feature_dependencies"] if s in live]
     lines = [
@@ -181,8 +180,10 @@ def round2_card(e: dict, live: set[str]) -> str:
         f"solver: {d['solver']}; truth metric: {sentence(d['truth_metric'])}",
         f"- **Look (code only):** {d['hero_art']}; geometry: {d['geometry']}; signature shader: {d['signature_shader']}; "
         f"palette: {sentence(d['palette'])}",
-        f"- **Content:** 100 solver-certified levels (the source's revised ship target; its first milestone is "
-        f"\"{d['content_target']}\").",
+        f"- **Content:** {lm['rows']} solver-certified levels: the catalog in lines {lm['line_start']}–{lm['line_end']} is "
+        f"canonical (`python3 scripts/planning_index.py levels --experience {e['code']}`); {qa['rows']} acceptance scenarios in "
+        f"lines {qa['line_start']}–{qa['line_end']}. The chapter header's earlier figure (\"{d['content_target']}\") and its "
+        f"shorter manifests are milestones only.",
         f"- **Shared features used:** {', '.join(used)}; the remaining shared dependencies of the source are delivered by "
         f"unified-app features (section 13).",
         f"- **Source:** `{src['file']}` lines {src['line_start']}–{src['line_end']} ({len(e['sections'])} sections); assertion "
@@ -207,10 +208,12 @@ def later_card(e: dict) -> str:
         f"- **Model:** core abstraction {d['core_abstraction']}; state: {d['state_model']}; solver: {d['solver']}; numeric "
         f"risks: {sentence(d['numeric_risks'])}",
         f"- **Look (code only):** {d['hero_art']}; geometry: {sentence(d['geometry'])}",
-        f"- **Content:** {d['content_target']}; golden seed `{d['golden_seed']}`.{basis}",
-        f"- **Source:** `{src['file']}` lines {src['line_start']}–{src['line_end']} ({len(e['sections'])} sections); level "
-        f"manifest lines {lm['line_start']}–{lm['line_end']} (`python3 scripts/planning_index.py levels --experience "
-        f"{e['code']}`); assertion outline lines {out['line_start']}–{out['line_end']}. Prompts: "
+        f"- **Content:** {d['content_target']} (levels in lines {lm['line_start']}–{lm['line_end']}, scenarios in lines "
+        f"{e['acceptance_scenarios']['line_start']}–{e['acceptance_scenarios']['line_end']}, fault injection in lines "
+        f"{e['fault_injection']['line_start']}–{e['fault_injection']['line_end']}); golden seed `{d['golden_seed']}`.{basis}",
+        f"- **Source:** `{src['file']}` lines {src['line_start']}–{src['line_end']} ({len(e['sections'])} sections); levels as "
+        f"JSON: `python3 scripts/planning_index.py levels --experience {e['code']}`; assertion outline lines "
+        f"{out['line_start']}–{out['line_end']}. Prompts: "
         f"`python3 scripts/planning_index.py prompt --feature {e['features'][0]} --override`.",
     ]
     return "\n".join(lines)
@@ -365,7 +368,7 @@ def block_prompt_catalog(ctx) -> str:
             where = "`docs/archive/planning/rounds/`"
             how = "`python3 scripts/planning_index.py prompt --feature <ID> --stage <stage> --override`"
         else:
-            where = "`docs/process/speckit-prompt-manifest.json` (extracted from the archived app manuals)"
+            where = "`docs/process/speckit-prompt-manifest.json` (extracted from the archive)"
             how = "`python3 scripts/speckit_prompts.py --feature <NNN>`" + (
                 "" if "sealed" in key else " plus `python3 scripts/planning_index.py prompt --feature A<nn>-P<p> --override`")
         rows.append(f"| {key} | {len(fs):,} | {prompts:,} | {where} | {how} |" if prompts else

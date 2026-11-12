@@ -38,9 +38,9 @@ cycles); a "hub" app that links out to separate apps (still many apps, breaks th
 | Tier | Experiences | Source |
 |---|---|---|
 | Free forever (50) | A01–A25 | the 25 original creative apps |
-| | R02-G01 … R02-G25 | Round 2 games (candidates ranked 1–25 of the 500-candidate study) |
-| Premium (50) | R03-G01 … R03-G25 | Round 3 (ranked 26–50) |
-| | R04-G01 … R04-G25 | Round 4 (ranked 51–75) |
+| | R02-G01 … R02-G25 | Round 2 games (ranks 1–25 of the refined 500-candidate study) |
+| Premium (50) | R03-G01 … R03-G25 | Round 3: the first 25 of the rounds 3–12 selection, in descending score |
+| | R04-G01 … R04-G25 | Round 4: the next 25 of that selection |
 | Backlog (200) | R05 … R12 | later premium additions, kept in descending score order |
 
 The first release contains all 100, complete. The queues are not reordered and concepts are not substituted. The
@@ -105,12 +105,17 @@ on one locked commit. That state is recorded as the gate **`ImplementationLock-1
 verification*; missing core gameplay, rendering, persistence or purchase behavior may not. Every per-round and
 per-app device prerequisite in the planning corpus is superseded by this rule.
 
+After the lock, the source is frozen except for targeted repairs of genuine device defects. A repair is followed
+by a new lock revision and a rerun of every device row it can affect (Auto-Creator.md sections 22.5 and 23.5).
+
 ### D-08 Device sequence
 
 After the lock: D1 (iPhone 15, `iPhone15,4`), then D2 (iPad Pro 13-inch M5, `iPad17,3`), then D3 (iPad A16,
-`iPad15,7`), 100 experiences each, 300 rows in total. The live OS, build and identifier are detected before each
-campaign and recorded outside tracked files. **D3 stays on iPadOS 26.5 and is never updated.** Manual VoiceOver
-testing is non-gating. Device evidence recorded for other repositories or for the standalone apps is history and
+`iPad15,7`), 100 experiences each, 300 rows in total. The live OS version and build are detected before each
+campaign and recorded in the evidence; hardware identifiers stay outside tracked files. **D3 stays on iPadOS 26.5
+and is never updated.** Manual VoiceOver testing is non-gating; the automated accessibility checks of a row gate.
+The six open `{device}` tasks of the framework dossiers (T-F418, T-F523, T-F613, T-F714, T-F810, T-F915), which
+the old plan assigned to its second campaign, run in the same device sessions. Device evidence recorded for other repositories or for the standalone apps is history and
 does not certify the unified build.
 
 ### D-09 Code-driven visuals on the proven renderer
@@ -158,6 +163,10 @@ of rounds 2–4, one integration gate per experience (`X-<code>`), three locks, 
 preparation. An `X-A<nn>` gate requires its seven legacy phase gates to be pass. No completed gate, ticked task or
 sealed evidence file is reset by the migration.
 
+The legacy tool was re-pointed during the consolidation to read the archived specification. It is therefore no
+longer byte-identical to the copy embedded in the archived README (ADR-0001 required that) and is never
+re-extracted from it.
+
 ### D-13 Git discipline during the migration
 
 All consolidation and migration work is committed on `migration/unified-app-plan`. Nothing is pushed or merged to
@@ -171,21 +180,54 @@ records each original path and SHA-256, and `scripts/planning_archive.py verify`
 Requirements are carried forward through the catalog, the feature index and `Auto-Creator.md`, and each is labelled
 in the traceability matrix; none is dropped because it is difficult.
 
+### D-15 Offline
+
+The app makes no network request of its own. Purchases go through StoreKit, which the system mediates. The former
+specification allowed each separate app to justify networking of its own; none of the 100 launch experiences needs
+it, and one offline binary is the simplest privacy position. A future experience that needs the network needs a
+new ADR.
+
+### D-16 The launch set is never reduced
+
+The sources let a concept be killed, pivoted or merged after a prototype ("GO, PIVOT, COMBINE, NO_GO"). For the
+100 launch experiences that verdict is not available to the agent. A concept that fails its criteria, its
+distinctiveness check or a device is redesigned inside its concept, and the failed evidence and the redesign are
+recorded in an ADR. If it still fails, its gate is blocked for an owner decision (OD-10). Nothing is dropped,
+merged or replaced, and the queue order is unchanged.
+
+### D-17 Human reviews do not gate
+
+Several source gates need human judgement: the distinctiveness review, the review of whether a hero scene is
+beautiful, the five-second goal-recognition review, the outside-player comprehension test and manual VoiceOver.
+An agent cannot perform them truthfully. They are owner reviews (OD-09), recorded before release, and they do not
+gate integration gates or locks. Their automated proxies do gate: semantic probes, histograms, silhouette bounds,
+the pairwise distinctiveness matrix and the accessibility audits.
+
 ## Conflicts resolved (all dated 2026-11-11)
 
 | # | Source statement | Resolution | Reason |
 |---|---|---|---|
 | C-01 | 25 separately buildable apps, each with a target, bundle id and store record (former README §1, §11; constitution 1.5.0 scope) | superseded by D-01 | owner directive |
-| C-02 | Round games are separate paid apps at "$2.99" (supplemental candidates "$3.99") with "no in-app purchases" and "no StoreKit product queries" | superseded by D-03, D-04 | owner directive; the no-advertising and no-tracking parts are kept and strengthened |
+| C-02 | Round games are separate paid apps at "$2.99" or "$3.99" (prompts say "$1.99–$4.99 one-time purchase") with "no in-app purchases", "no StoreKit product queries" and no StoreKit test configuration; the former README allowed in-app products per app "where an app truly sells content" | superseded by D-03, D-04: one product for the whole app | owner directive; the no-advertising and no-tracking parts are kept and strengthened |
 | C-03 | Each round starts only after the previous round's 75-row device campaign | superseded by D-07 | owner directive: all 100 on the simulator first |
 | C-04 | Legacy lock after 25 apps, then 75 device gates | superseded by `ImplementationLock-100` and 300 rows (D-07, D-08, D-12) | scope grew from 25 to 100 |
 | C-05 | One XcodeGen target and bundle id per game; "25-target CI" (R02-F30, Rnn-F10) | one target; the build features are absorbed by UA-F10 | D-01 |
-| C-06 | Per-app Phase 06 store listings, screenshots and release dossiers | the quality gates of Phase 06 stay; store-listing parts are inapplicable and move to UA-F14 for the one app | D-01 |
+| C-06 | Per-app Phase 06 store listings, screenshots, release dossiers, privacy manifests, purpose strings, review notes, license agreements and icons | the quality gates of Phase 06 stay; there is one set of these artifacts for the one app (UA-F11, UA-F14), and its purpose strings are the union of what the registered experiences need | D-01 |
 | C-07 | Round 2 content target 80 levels versus "revised proposed ship target is 100 solver-certified levels" | 100 | the source's own later revision |
-| C-08 | Former CLAUDE.md §0 rule 4: push every commit to `origin main` | suspended on the migration branch (D-13) | high-risk restructuring, owner directive |
-| C-09 | Former CLAUDE.md said "README.md is the full specification" | `Auto-Creator.md` is the steering document; the former README is archived (D-10) | owner directive |
+| C-08 | Former CLAUDE.md §0 rule 4: push every commit to `origin main`; older sources prescribe a feature branch and a pull request per feature | all work is committed on the migration branch and nothing is pushed (D-13) | high-risk restructuring, owner directive |
+| C-09 | Former CLAUDE.md said "README.md is the full specification", and the former README ranked itself above the constitution and every ADR | `Auto-Creator.md` is the steering document; the former README is archived (D-10); precedence is the one in Auto-Creator.md section 2 | owner directive |
 | C-10 | Round 2 ids `R2-…` versus rounds 3–12 `Rnn-…` | canonical `R02-…`, alias kept (D-06) | one scheme for ledger and validators |
 | C-11 | `docs/verification/source-hashes.json` records an older README hash than the archived README | left as recorded evidence; the archive manifest holds the current hash | evidence is not rewritten |
+| C-12 | Sources allow a game to be killed, pivoted or merged after a prototype; distinctiveness rules suggest merging near-duplicates | D-16: redesign inside the concept; never drop, merge or replace | owner directive: exactly 100, no substitution |
+| C-13 | Human reviews as gates (distinctiveness, "stunning" hero scene, five-second recognition, outside-player comprehension) | D-17: owner reviews, non-gating; automated proxies gate | an agent cannot perform them truthfully; the owner made manual VoiceOver non-gating on the same ground |
+| C-14 | Round 2 requires a 30-minute stress session per game per device; the original apps a ten-minute sustained run where the class warrants it | both kept as written (about 150 device-hours); shortening is an owner decision (OD-08) | no test procedure is dropped |
+| C-15 | The former README refused a suite-wide network ban and asked for a per-app allowlist | D-15: the single app is offline | no launch experience needs the network; one privacy position |
+| C-16 | Some app manuals and the brainstorm plan licensed or purchased meshes, textures, atlases, media or streamed assets (A09, A12, A14, A17) and licensed datasets | D-09 prevails for geometry and imagery, which are generated by code; bundled data with license and provenance is allowed | owner directive on code-driven visuals |
+| C-17 | Round 2 names its own packages, paths, ledger, environment variables and a suite-audit feature (`Round2*`, `GameModules`, `.autonomy/round2-state.json`, `ROUND2_AUTORUN`, `specs/599-…`) | mapped to the layout, ledger and names of this ADR (Auto-Creator.md section 21.3) | D-06, D-11, D-12 |
+| C-18 | Round 2's last shared feature reconciles after the device batches | split: the simulator part is `LOCK-FREE-50` and UA-F12 before devices, the device part is `DEVICE-RECONCILE-100` | D-07 |
+| C-19 | The former README confirms CI changes by a real GitHub run | until the owner allows the branch to be pushed (OD-05), CI changes are proven by running the same commands locally, and the evidence says so | D-13 |
+| C-20 | The brainstorm lists monetization per app: paid packs, premium themes, scene packs, collectible environments, subscriptions | superseded by D-03; every creative experience is free and complete | owner directive |
+| C-21 | Some free experiences have claims only devices can prove (audio sources of A06–A08, the measurements of A24, idle power and thermal behavior of A09, A18, A21) | these are hardware capabilities listed as pending hardware verification; the experiences are complete on the simulator without them (Auto-Creator.md section 6.4) | D-07 |
 
 ## Owner decisions still open
 
@@ -197,7 +239,10 @@ in the traceability matrix; none is dropped because it is difficult.
 | OD-04 | How and when `migration/unified-app-plan` is merged to `main` | stay on the branch |
 | OD-05 | May the migration branch be pushed to `origin` as a branch? | not pushed; local commits plus an outside `git bundle` at each milestone |
 | OD-06 | Signing team, certificates, profiles, sandbox tester, App Store Connect record and agreements | none; device work reports `BLOCKED_OWNER_ACTION` |
-| OD-07 | Minimum OS and device families | iOS and iPadOS 26.0, iPhone and iPad (current project setting) |
+| OD-07 | Minimum OS and device families. No test device is an iPhone on iOS 26 (D3 is an iPad) | iOS and iPadOS 26.0, iPhone and iPad (current project setting); published claims name only the tested models and OS versions |
+| OD-08 | Length of the device stress sessions | as the sources say: 30 minutes per game on each device, ten minutes for a creative experience whose class warrants it |
+| OD-09 | Who performs the human reviews and when | the owner, before release; recorded and non-gating |
+| OD-10 | A launch experience that still fails after a redesign inside its concept | its gate stays blocked; nothing is dropped, merged or replaced |
 
 ## Consequences
 
