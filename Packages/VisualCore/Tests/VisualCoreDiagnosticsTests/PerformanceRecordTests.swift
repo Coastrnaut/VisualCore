@@ -300,3 +300,52 @@ private func writeRefusal(_ record: PerformanceRecord) -> PerformanceRecordError
     #expect(timing == LaunchTiming(milliseconds: 412.5, firstLaunch: true))
     #expect(timing != LaunchTiming(milliseconds: 412.5, firstLaunch: false))
 }
+
+// Found by the app's tests (feature 192): a measured time such as 0.0007909999999999998 ms must read back as
+// exactly the same value.
+@Test func performanceRecordNumbersReadBackExactly() throws {
+    let awkward: [Double] = [0.0007909999999999998, 0.1 + 0.2, 1e-7, 123_456.789012345, 16.75, 1.0 / 3.0,
+                             1e-100, 1e100, 0, 2.5e-5, 99.99999999999999, 4.9e-7, 600_000.123]
+    // 2,000 more values of the sizes a record holds, from a fixed generator: fractions of a millisecond up to
+    // minutes in milliseconds.
+    var state: UInt64 = 0x9E37_79B9_7F4A_7C15
+    var values = awkward
+    for index in 0..<2_000 {
+        state = state &* 6_364_136_223_846_793_005 &+ 1_442_695_040_888_963_407
+        let unit = Double(state >> 11) / Double(1 << 53)
+        values.append(unit * [1e-3, 1.0, 1e3, 6e5][index % 4])
+    }
+    #expect(values.count == awkward.count + 2_000)
+    for value in values {
+        var record = PerformanceRecord(
+            experience: "a99.contract-sample", presented: true, qualityLevel: 0, qualityPinned: false,
+            qualityLevels: 1, stepsDown: 0, stepsUp: 0, thermal: .nominal, lowPower: false, frameCapFPS: 60,
+            renderScale: 1, pacing: PacingSummary(samples: 1, onTime: 1, medianMs: value, p95Ms: value, p99Ms: value),
+            gpuBytes: 0, gpuPeakBytes: 0, lateCompilations: 0, rebuilds: 0, memoryEvents: 0)
+        record.launchMs = value
+        record.prepareMs = value
+        record.setupMs = value
+        record.firstPresentMs = value
+        let text = try record.encoded()
+        let back = try PerformanceRecord(data: text)
+        #expect(back == record, "value \(value) did not read back: \(String(decoding: text, as: UTF8.self))")
+    }
+}
+
+@Test func performanceRecordRefusesMagnitudesNoMeasurementHas() {
+    for value in [5e-324, 1e-101, 1.1e100, 1.7976931348623157e308] {
+        var record = PerformanceRecord(
+            experience: "a99.contract-sample", presented: false, qualityLevel: 0, qualityPinned: false,
+            qualityLevels: 1, stepsDown: 0, stepsUp: 0, thermal: .nominal, lowPower: false, frameCapFPS: 60,
+            renderScale: 1, pacing: PacingSummary(), gpuBytes: 0, gpuPeakBytes: 0, lateCompilations: 0, rebuilds: 0,
+            memoryEvents: 0)
+        record.prepareMs = value
+        var refusal: PerformanceRecordError?
+        do {
+            _ = try record.encoded()
+        } catch {
+            refusal = error
+        }
+        #expect(refusal == .invalidValue("prepare_ms"), "value \(value)")
+    }
+}

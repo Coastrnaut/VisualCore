@@ -151,4 +151,8 @@ the number of samples.
   no stored preferences (also after a reset of all data).
 - `ShellID.performance` and `SettingsView.performanceText` exist only in debug builds.
 - The sample core gained the fault `WrongProfileCount` for the conformance test.
+- Numbers of the record are written with the digits of Swift's shortest exact text (through a decimal number) and
+  read back through those digits, because the system serializer shortens some values (0.0007909999999999998 became
+  0.000791; found by the app's test over 600 frames). A magnitude below 1e-100 or above 1e100 is refused as
+  `performance.invalid-value`. A test reads back 2,000 generated values exactly.
 

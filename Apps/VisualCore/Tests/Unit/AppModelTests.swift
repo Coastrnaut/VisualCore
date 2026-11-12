@@ -381,6 +381,19 @@ final class AppModelTests: XCTestCase {
         XCTAssertEqual(DebugExperience.make(id: id).qualityProfile, profile, "the session sees the core's profile")
     }
 
+    /// SC-U06-001: the fixture experience keeps every obligation of the contract, the two of UA-F06 among them:
+    /// its profile matches its tiers, and no level changes its state digest.
+    func testTheFixtureExperiencePassesTheConformanceRun() async throws {
+        let id = try XCTUnwrap(DebugLaunch.fixtureFreeIDs.first)
+        let plan = ConformancePlan(seeds: [1, 2, 3], stepsPerSegment: 30,
+                                   actions: [ScriptedAction("tap", []), ScriptedAction("tap", [])], rejected: [])
+        let report = await ExperienceConformance.run(DebugExperienceCore.self, id: id, plan: plan)
+        XCTAssertTrue(report.passed, "\(report.entries.filter { !$0.passed })")
+        XCTAssertEqual(report.entries.count, ConformanceCheck.allCases.count)
+        XCTAssertTrue(report.entries.contains { $0.check == .profileMatchesTiers && $0.passed })
+        XCTAssertTrue(report.entries.contains { $0.check == .tierKeepsDigest && $0.passed })
+    }
+
     /// FR-U06-004: every registered experience of the real registry names its levels as the catalog does.
     /// Today nothing is registered; the loop binds every later integration.
     func testRegisteredExperiencesDeclareTheCatalogLevelNames() throws {
@@ -434,7 +447,8 @@ final class AppModelTests: XCTestCase {
         XCTAssertNil(model.session.lastPerformanceRecord)
         let opened = await model.open(id)
         XCTAssertTrue(opened)
-        for _ in 0..<30 { model.session.renderHost?.renderOneFrame(present: false) }
+        // SC-U06-005: 600 interactive frames compile no shader program.
+        for _ in 0..<600 { model.session.renderHost?.renderOneFrame(present: false) }
         model.closeExperience()
         XCTAssertNil(model.session.performanceRecord)
         let record = try XCTUnwrap(model.session.lastPerformanceRecord)

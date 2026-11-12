@@ -296,7 +296,15 @@ public struct PerformanceRecord: Sendable, Equatable {
     /// The JSON number as a finite `Double`, or `nil` for a boolean, another type or a non-finite number.
     private static func number(_ value: Any) -> Double? {
         guard !isBoolean(value), let number = value as? NSNumber else { return nil }
-        let double = number.doubleValue
+        // Where the parser keeps the digits of the text as a decimal number, its own conversion to a `Double` is
+        // not always the nearest value; Swift converts the digits exactly. A number the parser already holds as
+        // a `Double` is taken as it is.
+        let double: Double
+        if let decimal = number as? NSDecimalNumber {
+            double = Double(decimal.stringValue) ?? decimal.doubleValue
+        } else {
+            double = number.doubleValue
+        }
         return double.isFinite ? double : nil
     }
 
@@ -385,10 +393,18 @@ public struct PerformanceRecord: Sendable, Equatable {
 
     // MARK: - Writing helpers
 
-    /// The value when it is finite; otherwise `invalidValue` with the key.
-    private static func finite(_ value: Double, _ key: String) throws(PerformanceRecordError) -> Double {
+    /// The value as a JSON number that reads back to exactly the same `Double`, when it is finite; otherwise
+    /// `invalidValue` with the key (also for a magnitude below 1e-100 or above 1e100). The number is written with the digits of Swift's shortest exact text of the
+    /// value: the serializer's own formatting of a `Double` shortens some values (0.0007909999999999998 became
+    /// 0.000791), and the record must read back equal (FR-U06-041).
+    private static func finite(_ value: Double, _ key: String) throws(PerformanceRecordError) -> NSDecimalNumber {
         guard value.isFinite else { throw .invalidValue(key) }
-        return value
+        // No measurement of this record is that small or that large; the decimal form used below cannot hold it.
+        let size = abs(value)
+        guard size == 0 || (size >= 1e-100 && size <= 1e100) else { throw .invalidValue(key) }
+        let exact = NSDecimalNumber(string: "\(value)", locale: Locale(identifier: "en_US_POSIX"))
+        guard exact != NSDecimalNumber.notANumber else { throw .invalidValue(key) }
+        return exact
     }
 
     /// The case name written for a thermal state.
