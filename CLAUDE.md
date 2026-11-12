@@ -5,9 +5,9 @@ operating procedure live in [`Auto-Creator.md`](Auto-Creator.md). Progress lives
 
 ## 1. Read in this order
 
-1. [`.specify/memory/constitution.md`](.specify/memory/constitution.md) — the principles. It is version 1.5.0 and
-   still describes 25 separate apps; [ADR-0009](docs/decisions/ADR-0009-unified-app.md) supersedes that scope. Amending
-   it to 2.0.0 is the first gate after the consolidation (`CONSTITUTION-2`, Auto-Creator.md §19.2).
+1. [`.specify/memory/constitution.md`](.specify/memory/constitution.md) — the principles I–XIII. Since version 2.0.0
+   it governs the single app of [ADR-0009](docs/decisions/ADR-0009-unified-app.md); the amendment is recorded in
+   [ADR-0010](docs/decisions/ADR-0010-constitution-2-0-0.md) (gate `CONSTITUTION-2`, Auto-Creator.md §19.2).
 2. [`Auto-Creator.md`](Auto-Creator.md) — the single forward-looking design and steering document: §3 verified state,
    §4 decisions, §18 phases and gates, §19 Spec Kit procedure, §25 ledgers and recovery, §28 the continuation prompt.
 3. [`docs/migration/migration-plan.md`](docs/migration/migration-plan.md) — path map, milestones, rollback.

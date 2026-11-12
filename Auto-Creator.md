@@ -221,7 +221,7 @@ These come from the owner. A change needs a new owner directive and a new ADR.
 
 | Id | Constraint | Enforced by |
 |---|---|---|
-| P-01 | One App Store app named VisualCore, one app target, one bundle identifier, a unified launcher and common settings. Experiences are internal modules with stable identifiers. | constitution principle XI (after the amendment), UA-F04, UA-F10, `scripts/check_dependencies.py` |
+| P-01 | One App Store app named VisualCore, one app target, one bundle identifier, a unified launcher and common settings. Experiences are internal modules with stable identifiers. | constitution principle XI, UA-F04, UA-F10, `scripts/check_dependencies.py` |
 | P-02 | The first release contains exactly 100 complete experiences: 50 free forever (A01–A25, R02-G01 … R02-G25) and 50 premium (R03-G01 … R04-G25). Rounds 5–12 are backlog. Queues are not reordered, concepts are not substituted. | catalog validation (UA-F01), `scripts/validate_autocreator.py`, the three locks |
 | P-03 | Free download and one non-consumable in-app purchase at USD 1.99 that unlocks all premium experiences, present and future. StoreKit 2, verified transactions, restore, revocation and refund handling, offline entitlement, local `SKTestSession` tests. | UA-F08, section 14 |
 | P-04 | No advertising under any circumstances. No ad SDK, ad identifier, rewarded ad, subscription, consumable, dark pattern, external payment path or required account. | UA-F11 scans, constitution principle XII |
@@ -3336,7 +3336,7 @@ uniqueness of every id; a ticked task without "— Verified YYYY-MM-DD:" fails v
 
 ### 19.2 First gate after the consolidation: the constitution
 
-The constitution (1.5.0) still describes 25 separate apps. Before any new feature is specified it is amended to
+Constitution 1.5.0 described 25 separate apps. Before any new feature is specified it is amended to
 2.0.0 with `/speckit-constitution` and this prompt (also printed by
 `python3 scripts/planning_index.py prompt --feature CONSTITUTION-2`):
 
@@ -3356,7 +3356,8 @@ python3 scripts/migration_ledger.py seal --gate CONSTITUTION-2
 python3 scripts/migration_ledger.py record --gate CONSTITUTION-2
 ```
 
-The eleven per-round `/speckit-constitution` prompts of the archive are superseded by this single amendment.
+The eleven per-round `/speckit-constitution` prompts of the archive are superseded by this single amendment, which
+[ADR-0010](docs/decisions/ADR-0010-constitution-2-0-0.md) records.
 
 ### 19.3 The loop for one feature
 

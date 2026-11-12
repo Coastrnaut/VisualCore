@@ -9,6 +9,10 @@
   "retire": "removed once the replacement is verified",
   "new": "created by the named feature"
  },
+ "states": {
+  "pending": "not executed yet; the validator checks that the source exists and that a new target does not",
+  "done": "executed by the named gate"
+ },
  "entries": [
   {
    "from": "Apps/GenerativeArtStudio/Core/Sources/GenerativeArtStudioCore",
@@ -422,7 +426,7 @@
    "to": ".specify",
    "action": "modify",
    "by": "CONSTITUTION-2",
-   "state": "pending",
+   "state": "done",
    "note": "Constitution amended to 2.0.0; templates and scripts unchanged."
   },
   {
@@ -542,7 +546,7 @@
    "to": "docs/decisions/ADR-0010-constitution-2-0-0.md",
    "action": "new",
    "by": "CONSTITUTION-2",
-   "state": "pending",
+   "state": "done",
    "note": "Records the constitution amendment."
   }
  ]
