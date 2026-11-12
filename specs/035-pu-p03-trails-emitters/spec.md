@@ -24,6 +24,55 @@ Canonical overrides:
 - **Out of scope here:** saving and loading scenes and the scene editor's library (Phase 04), profiling numbers
   (Phase 05), and more than the emitter count the scene format already allows.
 
+## Clarifications
+
+### Session 2026-11-11
+
+Answered autonomously under the owner's standing approval (CLAUDE.md §0 rule 1), choosing the recommended option
+each time. Facts checked in code:
+- `PingPongTarget(registry:width:height:format:label:)` and `FieldPass.run(output:inputs:uniforms:)` exist; field
+  passes disable blending for their draw.
+- `ResourceRegistry.stats.liveCount` counts live resources per kind.
+- `ParticleRenderer` always blends premultiplied "over" (ONE, ONE_MINUS_SRC_ALPHA).
+- `Palette.builtIns` has six palettes with `sample(t)`.
+- `ParticleSystem.instances()` takes a particle's size and color from `emitters[source]`, so deleting an emitter
+  from the middle of the list would recolor other emitters' live particles.
+
+- Q: How is the trail layer built, and what exactly does "strength" mean? → A: `TrailLayer` in VisualCoreRendering:
+  - an RGBA8 `PingPongTarget` at the drawable size, with the longer edge capped at 2,048 pixels;
+  - each frame: (1) a decay pass writes `max(previous × f − 1/255, 0)` per channel into the write target, where
+    f = s^(Δt·60) and s is the strength 0…0.98 (the fraction kept per 1/60 s), so the fade is frame-rate independent
+    and always reaches background; (2) the particles are drawn into the write target; (3) a composite pass copies it
+    to the screen; (4) swap.
+  - Strength 0 means trails off: the layer is bypassed and the particles draw straight to the screen (no extra pass),
+    except when the brightness cap must apply (Q3).
+  - `clear()` zeroes both targets; a resize recreates them at the new size (cleared); teardown releases both.
+- Q: How does additive blending work? → A: `ParticleRenderer` gains `blend: ParticleBlend` (`.normal`, the existing
+  premultiplied over, default; `.additive`, ONE + ONE). Existing callers keep `.normal`, so A01's pixels are unchanged.
+- Q: What is the reduced-flash brightness cap? → A: `TrailLayer.brightnessCap` (0…1, default 1). The composite pass
+  writes `min(color, cap)` per channel. With Reduce Flashing on (VisualCore `AccessibilityPreferences` resolved with
+  the system flags), the sandbox sets the cap to 0.6 (153/255) and routes drawing through the layer even with trails
+  off, and shows "Brightness limited (Reduce Flashing)".
+- Q: How do several emitters behave, including removal? → A:
+  - The sandbox adds emitters up to `ParticleScene.maxEmitters` (8), placing emitter k at its family's position
+    shifted 150 world units sideways (alternating right and left, clamped to the world square). The family picker
+    changes the selected emitter's family; a picker selects "Emitter 1…N". The force placement from Phase 02 is
+    unchanged; moving emitters is Phase 04's editor.
+  - Removal retires the emitter's slot: it stops emitting and is hidden in the UI, but stays in the simulation until
+    its last particle dies, so no live particle changes color or size. A retired slot whose particles are gone is
+    reused by the next add. While all 8 slots are taken (retired ones still fading), Add stays disabled with the note
+    "Waiting for removed emitters to fade".
+  - `SceneSimulation` gains `addEmitter(_:)`, `removeEmitter(at:)`, `setEmitterOverrides(at:_:)` and the visible
+    emitter list; a family or seed change rebuilds the scene from the visible emitters (Phase 01 rule).
+- Q: What are the size, lifetime and gradient ranges, and how are they stored? → A: `SceneEmitter` gains optional
+  fields (absent in old files, so schema 1 and `replay-v1.json` stay valid):
+  - `size`: start diameter 1…48 world units; the end size keeps the family's end/start ratio;
+  - `lifetime`: 0.2…8 s; particles live 0.8…1.2 × the value;
+  - `gradient`: a built-in palette id (Sunset, Ocean, Forest, Neon, Monochrome, Ember) or nil for the family's colors;
+    start color = `sample(1)` at alpha 1, end color = `sample(0.5)` at alpha 0.
+
+  Invalid values are rejected on decode (`SceneError.invalidEmitter(i)`) and clamped when set from the UI.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Several emitters in one scene (Priority: P1) 🎯
@@ -115,6 +164,8 @@ the brightness cap.
 - Adding an emitter when the particle budget is full: it is added, but its particles are dropped and counted until
   there is room (Phase 02 live limit).
 - Removing the selected emitter selects the previous one.
+- Removing an emitter retires it until its last particle dies; while all 8 slots are taken, Add is disabled with a
+  note (clarification 4).
 - Changing the family of the selected emitter keeps its position and its size, lifetime and gradient overrides.
 - A trail strength outside its range is clamped; trails at strength 0 cost no extra pass.
 - Resizing to a zero-size view or to the largest allowed size keeps trails valid (or clears them) without error.
@@ -179,7 +230,8 @@ the brightness cap.
 - Reduce Flashing comes from the shared VisualCore accessibility preferences (system setting plus in-app choice).
 - The scene format already allows several emitters (Phase 01); per-emitter overrides are additive optional fields,
   so existing scenes and the replay fixture stay valid.
-- Exact ranges, gradient set and fade formula are fixed in clarification.
+- Exact ranges, gradient set and fade formula are fixed in clarification (decay `max(prev × s^(Δt·60) − 1/255, 0)`,
+  cap 0.6 under Reduce Flashing, size 1…48, lifetime 0.2…8 s, six built-in palettes).
 
 ## Traceability
 
