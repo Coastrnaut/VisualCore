@@ -78,6 +78,10 @@ evidence commands are found as described in Auto-Creator.md §19. Simulators are
 14. **Spec Kit.** Every installed skill, in order, with the supplied prompt verbatim plus labelled
     `Canonical override:` notes (specify, clarify, plan, checklist, tasks, analyze, implement, converge). Converge,
     implement what it appended, converge again until nothing is appended; only then seal and record the gate.
+    **Always use the Spec Kit skills for each step of the loop** (owner ruling of 2026-11-12): every step of every
+    gate is done by invoking its skill with the Skill tool first and doing the step's work inside that invocation.
+    No step is skipped, merged with another or replaced by hand-written work, and repeated runs (analyze after
+    fixes, implement and converge in rounds) invoke the skill again each time.
 15. **Documents.** `Auto-Creator.md` is edited in place as a book, never by appending amendments. The archive under
     `docs/archive/planning/` is never edited. Run `python3 scripts/validate_autocreator.py` before committing a
     change to a steering document.
