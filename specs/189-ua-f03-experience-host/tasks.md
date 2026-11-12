@@ -113,4 +113,4 @@ collected at the end on the final sources.
 
 ## Phase 7: Convergence
 
-- [ ] T-U03-026 Name `SessionStrings` (its `Key` cases and `text(_:)`) in `specs/189-ua-f03-experience-host/contracts/session-api.md`, with the seven keys of the string catalog; proof: a script finds every public name of the session's five source files in the contract or the data model, except the members SwiftUI requires (`body`, `makeBody`), per plan: Public API (partial)
+- [X] T-U03-026 Name `SessionStrings` (its `Key` cases and `text(_:)`) in `specs/189-ua-f03-experience-host/contracts/session-api.md`, with the seven keys of the string catalog; proof: a script finds every public name of the session's five source files in the contract or the data model, except the members SwiftUI requires (`body`, `makeBody`), per plan: Public API (partial) — Verified 2026-11-12: SessionStrings, its seven keys and text(_:) are named in contracts/session-api.md; a script over the five source files finds all 82 public names in the contract or the data model except body and makeBody, which SwiftUI requires

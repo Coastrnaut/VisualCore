@@ -108,6 +108,11 @@ As built (recorded after T-U03-007 and T-U03-009):
   `SessionPreparingView`, `SessionFailureView`, `SessionMessageView`, `SessionButtonStyle` (minimum 44 points) and
   the identifier constants `SessionViewID`. The controls below the canvas scroll within at most 280 points.
 
+Texts: `public enum SessionStrings` with `Key` (`preparing` = `session.preparing`, `cancel` = `session.cancel`,
+`failureTitle` = `session.failure.title`, `retry` = `session.retry`, `back` = `session.back`, `memoryMessage` =
+`session.message.memory`, `canvasHint` = `session.canvas.hint`) and `text(_ key: Key) -> String`, which reads the
+module's string catalog. `SessionButtonStyle.minimumSize` is 44.
+
 Identifiers of the host view's own controls: `session.cancel`, `session.retry`, `session.back`,
 `session.failure`, `session.message`, `session.preparing`, `session.canvas`.
 
