@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_app_isolation.py",
+    "--app",
+    "Apps/VisualCore"
+  ],
+  "command": "python3 scripts/check_app_isolation.py --app Apps/VisualCore",
+  "elapsed_seconds": 0.028,
+  "exit_code": 0,
+  "finished": "2026-11-12T12:13:01+00:00",
+  "gate": "UA-F03",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F03.app-isolation.log",
+  "log_sha256": "f9a06a93790ad7fac44c3adc3533e52f80e9ce59fe0ca07b14ffdc708a9cea63",
+  "name": "app-isolation",
+  "started": "2026-11-12T12:13:01+00:00",
+  "timed_out": false
+}
