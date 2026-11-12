@@ -26,7 +26,7 @@ Exactly these keys; any other key is an error.
 | `id` | string | valid id; unique |
 | `code` | string | valid code; equals the code inside the id; unique |
 | `title` | string | 1 to 80 characters |
-| `summary` | string | at most 300 characters |
+| `summary` | string | 1 to 300 characters |
 | `kind` | string | `creative` or `game` |
 | `tier` | string | `free` or `premium` |
 | `category` | string | `create`, `audio`, `play`, `learn`, `ambient`, `tools` or `puzzle`; a game is `puzzle`, a creative experience is not |

@@ -45,7 +45,7 @@ text handling.
   never be available; the tile seed of every entry is derived from its id. Rejected: reading these facts out of
   program source (fragile) and typing them into the manifest by hand (the manifest is generated).
 - Q: What are the size cap and the limits of the loader? → A: 1,048,576 bytes for each catalog file; at most 400
-  entries; a title of 1 to 80 characters, a summary of at most 300, a family of 1 to 60; at most 16 tags of at
+  entries; a title of 1 to 80 characters, a summary of 1 to 300, a family of 1 to 60; at most 16 tags of at
   most 60 characters each; at most 8 tile colors, 16 capabilities and 8 quality tiers; catalog order 1 to 9,999;
   tile seed 0 to 4,294,967,295; level count 0 to 10,000. The planning catalog today needs 23, 136 and 33
   characters for its longest title, summary and family.
@@ -256,9 +256,9 @@ duplicate registration, and compare the report.
 - **FR-U01-004**: A committed golden list MUST hold the id of every experience of the planning catalog. A test
   MUST fail, naming the id, when an id of the planning catalog or of the runtime manifest is not in the list or
   when a listed id is missing from the planning catalog. The list only grows.
-- **FR-U01-005**: Names derived from an experience (storage namespace, accessibility identifier prefix, evidence
-  file name, integration gate) MUST be functions of the id or the code alone, offered by the catalog module, so
-  that no feature builds them by hand.
+- **FR-U01-005**: Names derived from an experience MUST be functions of the id or the code alone, offered by the
+  catalog module, so that no feature builds them by hand: the integration gate is `X-<code>`, the storage
+  namespace and the evidence file name are the id, and the accessibility identifier prefix is `experience.<id>`.
 
 **Tier and launch allocation**
 
@@ -275,7 +275,8 @@ duplicate registration, and compare the report.
 
 - **FR-U01-020**: Every entry MUST have exactly one launcher category out of create, audio, play, learn, ambient,
   tools and puzzle; a creative experience MUST NOT be in puzzle and a game MUST be in puzzle.
-- **FR-U01-021**: Every entry MUST carry its family, and its tags MUST contain the family in tag form.
+- **FR-U01-021**: Every entry MUST carry its family, and its tags MUST contain the family in tag form: lower
+  case, groups of letters and digits joined by single hyphens ("Wave mathematics" becomes `wave-mathematics`).
 - **FR-U01-022**: The category list MUST hold the seven categories in launcher order with a title each; it MUST be
   loaded with the same bounds and typed errors as the manifest, and a manifest entry whose category is not in the
   list MUST fail validation.
@@ -297,8 +298,8 @@ duplicate registration, and compare the report.
 - **FR-U01-033**: The loader MUST refuse an entry with a missing field, a field of the wrong type, a key that the
   schema does not define, an unknown tier, kind or category, an empty title, a text longer than its limit or a
   list longer than its limit, naming the entry and the field. The limits are: title 1 to 80 characters, summary
-  at most 300, family 1 to 60, at most 16 tags of at most 60 characters, at most 8 tile colors, 16 capabilities
-  and 8 quality tiers.
+  1 to 300, family 1 to 60, at most 16 tags of at most 60 characters, at most 8 tile colors (each written `#RRGGBB`), 16
+  capabilities and 8 quality tiers.
 - **FR-U01-034**: The loader MUST refuse a number that is not finite, not whole where a whole number is required,
   or outside its range, naming the entry and the field. The ranges are: catalog order 1 to 9,999, tile seed 0 to
   4,294,967,295, level count 0 to 10,000.
@@ -318,8 +319,9 @@ duplicate registration, and compare the report.
 - **FR-U01-042**: The build tool MUST refuse to mark an experience available whose registration is missing, and
   MUST name it. It MUST refuse a registration for an id that the planning catalog does not define, and a
   registrations file of another schema version.
-- **FR-U01-043**: The build tool MUST have a check mode that compares the committed manifest files with what it
-  would write, fails naming the first difference, and writes nothing.
+- **FR-U01-043**: The build tool MUST have a check mode that compares the committed manifest, the golden list
+  and the copies of the catalog files that the package tests use with what it would write, fails naming the first
+  difference of each file, and writes nothing.
 - **FR-U01-044**: The build tool MUST write each file completely or not at all, MUST produce the same bytes for
   the same inputs, and MUST stop with a message naming the file when an input cannot be read or has an unexpected
   shape.
