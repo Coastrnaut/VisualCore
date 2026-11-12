@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/VisualCoreRendering",
+    "--scheme",
+    "VisualCoreRendering-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--only-testing",
+    "VisualCoreExperienceHostTests/EnduranceTests"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --only-testing VisualCoreExperienceHostTests/EnduranceTests",
+  "elapsed_seconds": 9.492,
+  "exit_code": 0,
+  "finished": "2026-11-12T19:00:47+00:00",
+  "gate": "UA-F06",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F06.endurance-ios27.log",
+  "log_sha256": "349bac17fd48fb594afd7068911f192aec83d4b3b9bf7a9c5d34705d14ea4791",
+  "name": "endurance-ios27",
+  "started": "2026-11-12T19:00:37+00:00",
+  "timed_out": false
+}

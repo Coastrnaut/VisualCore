@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_performance_docs.py"
+  ],
+  "command": "python3 scripts/check_performance_docs.py",
+  "elapsed_seconds": 0.027,
+  "exit_code": 0,
+  "finished": "2026-11-12T19:48:41+00:00",
+  "gate": "UA-F06",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F06.performance-docs.log",
+  "log_sha256": "91f3f6c94dd95e0624ba771fb5bf58dea7fc8c4fa30369799184c5d65ef15149",
+  "name": "performance-docs",
+  "started": "2026-11-12T19:48:41+00:00",
+  "timed_out": false
+}

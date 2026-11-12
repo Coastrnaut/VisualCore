@@ -1,8 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<!-- VisualCore privacy manifest (feature 190 T-U04-001; Principle VIII). The app tracks nothing and collects nothing.
-     It keeps its own preferences in UserDefaults (reason CA92.1: values the app itself wrote and reads). The manifest
-     is audited against the built product in the release preparation (UA-F14). -->
+<!-- VisualCore privacy manifest (feature 190 T-U04-001; feature 192 T-U06-040; Principle VIII). The app tracks
+     nothing and collects nothing. Categories come from scripts/check_privacy_manifest.py on the Release build:
+     - UserDefaults (CA92.1): the app's own preferences, which only the app writes and reads.
+     - SystemBootTime (35F9.1; CACurrentMediaTime, mach_absolute_time, systemUptime): elapsed time between events
+       inside the app only - frame timing of the render host, the stage times and frame intervals of the performance
+       record, touch timing. No value leaves the device.
+     - FileTimestamp (C617.1; stat): metadata of files inside the app's own container - the experience data folders
+       and the bundled resources. Nothing is shown to the person or sent anywhere.
+     The check runs for the gate evidence of feature 192 and again in the release preparation (UA-F14). -->
 <plist version="1.0">
 <dict>
 	<key>NSPrivacyTracking</key>
@@ -19,6 +25,22 @@
 			<key>NSPrivacyAccessedAPITypeReasons</key>
 			<array>
 				<string>CA92.1</string>
+			</array>
+		</dict>
+		<dict>
+			<key>NSPrivacyAccessedAPIType</key>
+			<string>NSPrivacyAccessedAPICategorySystemBootTime</string>
+			<key>NSPrivacyAccessedAPITypeReasons</key>
+			<array>
+				<string>35F9.1</string>
+			</array>
+		</dict>
+		<dict>
+			<key>NSPrivacyAccessedAPIType</key>
+			<string>NSPrivacyAccessedAPICategoryFileTimestamp</string>
+			<key>NSPrivacyAccessedAPITypeReasons</key>
+			<array>
+				<string>C617.1</string>
 			</array>
 		</dict>
 	</array>

@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/VisualCore",
+    "--filter",
+    "VisualCoreDiagnosticsTests"
+  ],
+  "command": "swift test --package-path Packages/VisualCore --filter VisualCoreDiagnosticsTests",
+  "elapsed_seconds": 2.247,
+  "exit_code": 0,
+  "finished": "2026-11-12T18:57:26+00:00",
+  "gate": "UA-F06",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F06.diagnostics-host.log",
+  "log_sha256": "0995c568645b4171c7ed383d568f07c71b095df2060afcc5ec1d15713f202576",
+  "name": "diagnostics-host",
+  "started": "2026-11-12T18:57:24+00:00",
+  "timed_out": false
+}

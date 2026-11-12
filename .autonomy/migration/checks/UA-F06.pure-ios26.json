@@ -1,0 +1,25 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/VisualCore",
+    "--scheme",
+    "VisualCore-Package",
+    "--destination",
+    "sim-26.5",
+    "--action",
+    "test"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCore --scheme VisualCore-Package --destination sim-26.5 --action test",
+  "elapsed_seconds": 36.123,
+  "exit_code": 0,
+  "finished": "2026-11-12T18:59:07+00:00",
+  "gate": "UA-F06",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F06.pure-ios26.log",
+  "log_sha256": "a0bed1fa7688ffb314faef536019c0109aa9a61944a93758060d62bc218d5cd0",
+  "name": "pure-ios26",
+  "started": "2026-11-12T18:58:31+00:00",
+  "timed_out": false
+}

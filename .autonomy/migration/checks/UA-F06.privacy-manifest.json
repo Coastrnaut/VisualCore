@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_privacy_manifest.py",
+    "--app",
+    "Build/DerivedData/ua-f06-release/Build/Products/Release-iphonesimulator/VisualCore.app"
+  ],
+  "command": "python3 scripts/check_privacy_manifest.py --app Build/DerivedData/ua-f06-release/Build/Products/Release-iphonesimulator/VisualCore.app",
+  "elapsed_seconds": 0.634,
+  "exit_code": 1,
+  "finished": "2026-11-12T19:48:41+00:00",
+  "gate": "UA-F06",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F06.privacy-manifest.log",
+  "log_sha256": "80e575a3c3c3cdac0d6cd9c908d86a7421c3a2048af0f45d74bd0eb3cb296242",
+  "name": "privacy-manifest",
+  "started": "2026-11-12T19:48:41+00:00",
+  "timed_out": false
+}

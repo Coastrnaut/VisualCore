@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_compliance.py"
+  ],
+  "command": "python3 scripts/check_compliance.py",
+  "elapsed_seconds": 0.579,
+  "exit_code": 0,
+  "finished": "2026-11-12T19:50:00+00:00",
+  "gate": "UA-F06",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F06.compliance-r2.log",
+  "log_sha256": "3a5342d6fa484f983cea9d575e979e1ac1eb68bd5ae1e49fc8faa7280cabc411",
+  "name": "compliance-r2",
+  "started": "2026-11-12T19:50:00+00:00",
+  "timed_out": false
+}

@@ -1,0 +1,26 @@
+{
+  "argv": [
+    "xcodebuild",
+    "build",
+    "-project",
+    "VisualCore.xcodeproj",
+    "-scheme",
+    "VisualCore",
+    "-destination",
+    "generic/platform=iOS Simulator",
+    "-derivedDataPath",
+    "Build/DerivedData/ua-f06-app-build",
+    "CODE_SIGNING_ALLOWED=NO"
+  ],
+  "command": "xcodebuild build -project VisualCore.xcodeproj -scheme VisualCore -destination 'generic/platform=iOS Simulator' -derivedDataPath Build/DerivedData/ua-f06-app-build CODE_SIGNING_ALLOWED=NO",
+  "elapsed_seconds": 11.827,
+  "exit_code": 0,
+  "finished": "2026-11-12T19:01:07+00:00",
+  "gate": "UA-F06",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F06.app-build.log",
+  "log_sha256": "ddf9a3684718fa240d7725c6107ea61780a78bdb605d205b2e77f2110140665d",
+  "name": "app-build",
+  "started": "2026-11-12T19:00:55+00:00",
+  "timed_out": false
+}
