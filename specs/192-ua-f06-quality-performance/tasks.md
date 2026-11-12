@@ -139,3 +139,17 @@ MVP is Phase 1 to Phase 3 (a declared, checked profile). Then US2 and US3 (the s
   -007, -011, -020, -026, -032, -040, -044.
 - `/speckit-analyze` run 2 (2026-11-12): 0 critical, 0 high, 0 medium, 1 low (the named base commit is followed by
   document-only commits; left). 36 of 36 requirements and 10 of 10 success criteria are referenced by tasks.
+
+## Phase 11: Convergence
+
+Appended by `/speckit-converge` run 1 (2026-11-12), taken before the evidence round: a read-only audit of the
+code against the specification, each finding checked against the source by the lead.
+
+- [ ] T-U06-045 Make the app's 600-frame test draw: lay the session's host out in `Apps/VisualCore/Tests/Unit/AppModelTests.swift`, assert that 600 frames were drawn by the debug experience and that the record has 0 late compilations per SC-U06-005 (partial)
+- [ ] T-U06-046 Give the session one time source for its quality decisions (replaceable, default its own clock) so that scripted and own decisions share a scale; take a decision when an experience resumes or is first activated after a deferred open and when a pin is removed; always set the experience's tier at an open, whatever tier the instance had; with tests, one of which lets the frame hook take the decisions while frames are drawn per FR-U06-010, FR-U06-011, FR-U06-013 (partial)
+- [ ] T-U06-047 Make the measurements honest at their edges: the frame-rate cap and the resolution factor are absent from a record without a render host; the interval chain of the pacing is cut at a context rebuild as at a suspension; the first-present time of an experience opened while the app was not active does not include the time it waited; with tests, one of which presents frames on both sides of a suspension per FR-U06-021, FR-U06-031, US4/AC4 (partial)
+- [ ] T-U06-048 Add a session test of a context loss the render host detects itself: one rebuild, no late compilation, the baseline taken again per FR-U06-022, US3/AC4 (partial)
+- [ ] T-U06-049 Apply the range checks of reading when a record is written, so that no record can be written that cannot be read, with tests per FR-U06-041 (partial)
+- [ ] T-U06-050 Replace the vacuous memory assertion of `PacingMeterTests` by one that sees the bins, and add session tests of the frozen record after a close under memory pressure (peak bytes, event count) and of steps down and up in a session's record per FR-U06-032, FR-U06-040, FR-U06-014 (partial)
+- [ ] T-U06-051 Tighten `scripts/check_performance_docs.py`: a line that gives a simulator number with a unit must itself say that it is a development signal, and a device row must name its scenario; tests in `scripts/test_scripts.py`; the real documents pass per FR-U06-061, SC-U06-009 (partial)
+- [ ] T-U06-052 Correct the texts to what is built: spec.md (FR-U06-014: the level's resolution share is applied by the experience, the frame pacing's factor by the host, both recorded; FR-U06-024 and US3/AC6: the first usable screen is the launcher or, on a first start, the welcome; FR-U06-061 and SC-U06-009: a budget no device measures names its tooling report; Edge Cases: a rebuild is counted apart and does not change the first set-up time; the failed stage is named by the session's diagnostics), plan.md (restore before the level; a cancelled open leaves no record), contracts/performance-api.md (the public symbols that exist beyond the listed ones; the changed record keys), data-model.md section 9, Auto-Creator.md section 12.4 per plan: documents (contradicts)
