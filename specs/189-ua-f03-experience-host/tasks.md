@@ -64,7 +64,7 @@ then the host view (US1), then the tool (US6).
 
 ## Phase 6: Evidence and convergence
 
-- [ ] T-U03-017 Evidence `host-visualcore`: `swift test --package-path Packages/VisualCore`.
+- [X] T-U03-017 Evidence `host-visualcore`: `swift test --package-path Packages/VisualCore`. — Verified 2026-11-12: run-check UA-F03/host-visualcore (swift test --package-path Packages/VisualCore): exit 0, the whole package passed (202 tests in the experience test target)
 - [ ] T-U03-018 Evidence `rendering-ios27`: `python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --result-name ua-f03-ios27` (TEST SUCCEEDED).
 - [ ] T-U03-019 Evidence `rendering-ios26`: `python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-26.5 --action test --result-name ua-f03-ios26` (TEST SUCCEEDED).
 - [ ] T-U03-020 Evidence `pure-ios27` and `pure-ios26`: `python3 scripts/xcodebuild_package.py --package Packages/VisualCore --scheme VisualCore-Package --destination sim-27.2 --action test` and `--destination sim-26.5`.
