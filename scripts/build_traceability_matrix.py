@@ -64,7 +64,7 @@ RETAINED_ROLES = {
     "docs/process/": ("AC-21", "planned", "Prompts of features 001-185; 036-185 are still to be run with the canonical override."),
 }
 SECTION_RULES = [  # (pattern in a game chapter's section title, canonical id, note)
-    (r"hardware", "AC-23", "Device work happens only after ImplementationLock-100; per-round campaigns are superseded (C-03)."),
+    (r"hardware", "AC-23", "Device work happens only after the lock: ImplementationLock-100 at launch, the round's own lock for a backlog round (D-07, D-18)."),
     (r"file inventory|source file checklist|module boundaries", "AC-16", "Layout adapted to the experience module; no app target (C-05)."),
     (r"spec kit|implementation backlog", "AC-21", "Prompts are used verbatim with the canonical override."),
     (r"shipping decision|commercial", "AC-15.4", "Originality rules stand; separate shipping is superseded (C-01)."),

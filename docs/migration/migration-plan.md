@@ -229,7 +229,7 @@ gate whose code was reverted is verified again and recorded as a new revision, o
 | 11 | The legacy tool and the new tool disagree about an original app | double or missing records | legacy ledger stays the only record of app phases; `X-A<nn>` requires its seven gates; `migration_ledger.py validate` checks the link | UA-F00 |
 | 12 | Owner-only prerequisites are missing when devices start | campaign cannot begin | recorded as `BLOCKED_OWNER_ACTION` with exact steps; simulator work never depends on them | section 24.3 |
 | 13 | Name or bundle identifier changes late | rework of identifiers | placeholders isolated in `project.yml` and the StoreKit configuration; experience ids do not contain the bundle identifier | OD-01, OD-02 |
-| 14 | The supplemental candidates of Rounds 11 and 12 have provisional scores | wrong order of late backlog | re-score before those rounds start | section 10 |
+| 14 | The supplemental candidates of Rounds 11 and 12 have provisional scores | weak late backlog | they stay at the end of the queue; the owner confirms them before those rounds start (OD-11) | section 10 of Auto-Creator.md |
 
 ## 7. What this plan does not do
 

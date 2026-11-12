@@ -150,7 +150,9 @@ def verify(root: Path = ROOT) -> list[str]:
         if not out.is_file() or out.read_bytes() != data:
             problems.append(f"embedded source {name}: extracted copy missing or different")
     listed = {d["path"] for d in manifest["derived"]}
-    on_disk = {p.relative_to(root).as_posix() for p in (root / ARCHIVE / "embedded").rglob("*") if p.is_file()}
+    # Finder metadata (.DS_Store) is ignored by Git and is not part of the archive.
+    on_disk = {p.relative_to(root).as_posix() for p in (root / ARCHIVE / "embedded").rglob("*")
+               if p.is_file() and p.name != ".DS_Store"}
     for extra in sorted(on_disk - listed):
         problems.append(f"unlisted file in the extracted sources: {extra}")
     if not (root / PLAYBOOK).is_file() or (root / PLAYBOOK).read_bytes() != playbook_bytes(root):

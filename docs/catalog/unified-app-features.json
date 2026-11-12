@@ -581,7 +581,7 @@
     "The script refuses to run when ImplementationLock-100 is not pass or the tree differs from the locked commit",
     "Devices are matched by hardwareProperties.productType (iPhone15,4, iPad17,3, iPad15,7); the live OS and build are recorded; D3 is refused with a blocker if it is not on iPadOS 26.5; no UDID is written to a tracked file",
     "One Release build with VISUALCORE_AUTOMATION is installed once per device; each experience runs by id and exports its evidence JSON, which is copied back with devicectl",
-    "Percentage criteria use at least 200 samples; launch, first frame, frame pacing, memory and thermal state are recorded per experience; every game runs its 30-minute stress session and a creative experience a ten-minute sustained scenario where its class warrants it (ADR-0009 OD-08)",
+    "Percentage criteria use at least 200 samples; launch, first frame, frame pacing, memory and thermal state are recorded per experience; a Round 2 game runs its 30-minute stress session on each device, a game of Rounds 3 and 4 on D3, and a creative experience a ten-minute sustained scenario where its class warrants it (ADR-0009 C-14, OD-08)",
     "A renderer or test-integrity failure halts the campaign on that device; a localized failure is recorded and the campaign continues; reconciliation lists every non-pass row",
     "Owner-needed states (locked device, trust, signing, permissions, purchase sheet) produce BLOCKED_OWNER_ACTION with exact steps and never wait for input; --dry-run prints the plan",
     "The shipping Release binary has no automation symbols (nm check)"

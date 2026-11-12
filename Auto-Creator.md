@@ -63,7 +63,7 @@ The first release contains exactly 100 complete experiences:
 
 - the 25 original VisualCore creative apps (A01–A25): generative art, fluids, fractals, particles, music
   visualization, simulations, explorers, ambient pieces and creative tools;
-- the 25 Round 2 puzzle games, the highest-ranked concepts of the 500-candidate study;
+- the 25 Round 2 puzzle games, the family-balanced selection from the 500-candidate study;
 - the 25 Round 3 and 25 Round 4 puzzle games, which form the premium library.
 
 Two hundred further games (Rounds 5–12) are specified and wait in score order as later premium additions.
@@ -114,7 +114,8 @@ separate owner authorization.
 planning archive. (5) Generated code. A requirement is never dropped because it is hard: it is implemented,
 planned, superseded with a reason, or blocked with the owner action it needs. An obsolete command, path or tool name
 in an archived document never cancels the requirement behind it: the requirement moves to the current mechanism.
-Inside the archive, an app's own manual outranks the brainstorm that preceded it.
+Inside the archive, an app's own manual outranks the brainstorm that preceded it. Between two owner rules, the later
+dated one wins.
 
 **Status words.** They are never merged into one green label.
 
@@ -235,7 +236,7 @@ These come from the owner. A change needs a new owner directive and a new ADR.
 
 ### 4.2 Decisions
 
-The reasoning, the alternatives and the resolved conflicts (C-01 … C-11) are in ADR-0009. In short:
+The reasoning, the alternatives and the resolved conflicts (C-01 … C-24) are in ADR-0009. In short:
 
 | Id | Decision | Design section |
 |---|---|---|
@@ -256,6 +257,7 @@ The reasoning, the alternatives and the resolved conflicts (C-01 … C-11) are i
 | D-15 | The app is fully offline: no network request of its own; purchases go through StoreKit | 15.2 |
 | D-16 | The launch set is never reduced: a failing concept is redesigned inside its concept, never dropped, merged or replaced | 6.5 |
 | D-17 | Human-judgement reviews are owner reviews and do not gate simulator gates or locks; their automated proxies do | 6.5, 23.3 |
+| D-18 | Backlog rounds are added one at a time after the release, each with its own lock and its own device rows | 18.4 |
 
 ### 4.3 Owner decisions that are open
 
@@ -271,9 +273,10 @@ campaign.
 | OD-05 | Pushing the migration branch to `origin` | not pushed; a `git bundle` outside the repository at each milestone |
 | OD-06 | Signing team, certificates, profiles, sandbox tester, App Store Connect record and agreements | none; device work reports `BLOCKED_OWNER_ACTION` |
 | OD-07 | Minimum OS and device families. The roster covers iOS 27 on iPhone and iPadOS 26.5 and 27 on iPad; an iPhone on iOS 26 is not covered by any test device | iOS and iPadOS 26.0, iPhone and iPad; published claims name only the tested models and OS versions |
-| OD-08 | Length of the device stress sessions (about 150 device-hours over the campaign as the sources specify them) | as the sources say: 30 minutes per game on each device, ten minutes for a creative experience whose class warrants it |
+| OD-08 | Length of the device stress sessions (about 60 device-hours for the launch games as the sources specify them) | as the sources say: 30 minutes on each device for a Round 2 game, 30 minutes on D3 for a game of Rounds 3 and 4, ten minutes for a creative experience whose class warrants it |
 | OD-09 | Who performs the human reviews (distinctiveness, visual quality of hero scenes, five-second goal recognition, outside-player comprehension, VoiceOver) and when | the owner, before release; recorded, non-gating for gates and locks |
 | OD-10 | What happens to a launch experience that still fails after a redesign inside its concept | its gate stays blocked; nothing is dropped, merged or replaced |
+| OD-11 | Confirmation of the 26 supplemental candidates, whose scores are provisional, before Rounds 11 and 12 | they keep their place at the end of the queue |
 
 ### 4.4 Non-goals of the first release
 
@@ -490,9 +493,10 @@ recorded. The contract is what "implemented" means in this project.
   checkable win witness and a rejection case; the 80 acceptance scenarios and the 50 fault-injection cases of its
   chapter as automated tests; the ten game features of section 9 sealed.
 - **Levels are generated, not written down.** Seeds are built before certification. A seed without a valid and
-  unambiguous solution is rejected, and the next salt is taken deterministically and logged. Levels fall into five
-  difficulty bands; level 001 teaches one control; levels 020, 040, 060, 080 and 100 close a chapter; every level
-  replays deterministically and gives the same digest on ten repeats.
+  unambiguous solution is rejected, and the next salt is taken deterministically and logged. Every level replays
+  deterministically and gives the same digest on ten repeats. Repeats are found by a canonical puzzle hash.
+  Round 2 levels fall into five difficulty bands; level 001 teaches one control; levels 020, 040, 060, 080 and 100
+  close a chapter. Levels of Rounds 3 and 4 form ten worlds of ten with rising limits (section 6.6).
 - The level counts are requirements, not goals. A level that exists only as a row in a document is not done. If
   100 valid levels cannot be produced, that is a recorded design blocker, never a reason to fabricate levels. A
   game with fewer certified levels than its source specifies does not pass.
@@ -512,6 +516,7 @@ recorded. The contract is what "implemented" means in this project.
    without the evidence defined in section 22.
 7. Anything fabricated: a scheme, a device identifier, a run, a benchmark, an entitlement, a dataset or a
    screenshot. Blocked is never reported as skipped or as passed, and a failed required test never becomes optional.
+8. A static scene without independent logic. Skipped is never success.
 
 ### 6.4 Evidence for the integration gate
 
@@ -556,6 +561,38 @@ tasks.
     prototype. For the 100 launch experiences that verdict is not available: a concept that fails its criteria is
     redesigned inside its concept, with the failed evidence and the redesign recorded in an ADR. If it still
     fails, its gate is blocked for the owner (OD-10). Nothing is dropped, merged or replaced.
+
+### 6.6 Additional rules for the games of Rounds 3 to 12
+
+These are the constants of the chapter template that all 250 later games share.
+
+- **Time and state.** A fixed tick of 1/120 s (1/240 s only where a collision proof needs it), integer ticks,
+  bounded controls and versioned `Codable` state. No GPU value and no frame delta decides an outcome.
+- **Actions.** Typed actions carry a control id, a tick and coordinates. An illegal action gets a typed rejection
+  and changes nothing. A win requires all conditions to hold together for a number of fixed ticks that the chapter
+  states (five to eight). Pause, undo and retry are always available. A failure never corrupts a save.
+- **Proof.** The solver gives, for every shipped level, a machine-readable witness (actions and digest) and a
+  contrasting invalid action. A level with no witness, with an unintended second solution or with unreachable
+  targets is rejected. A non-finite value or a zero step fails the test.
+- **First session.** Six beats in two minutes; the goal stated in fewer than twelve words; one finger manipulates,
+  two fingers orbit; controls of at least 44 by 44 points; state announced to VoiceOver; symbols besides color; a
+  camera reset; undo.
+- **Rendering.** Immutable render snapshots; no baked raster hero art; GL resources rebuilt from CPU scene data
+  after a context loss; every shader variant compiles on both runtimes; one golden seed and camera manifest per
+  game, produced by the real renderer.
+- **Levels.** Ten worlds of ten levels. From world to world the solver depth limit rises from 14 to 50 moves, the
+  gesture travel of the witness from 145 to 280 points, and the number of controls from one to four; each new
+  rule gets one tutorial level without penalty. Each level has an objective, a difficulty, a predicate, a move
+  budget, a certified replay, a rejected-action certificate, scene and camera, accessibility notes, quality tiers,
+  a checksum and a stable id, and six generated artifacts (witness, reject, render, input, access, sha256). A
+  missing or unsolved level is rejected.
+- **Scenarios.** The 80 acceptance scenarios (S001 to S080) rotate through twelve classes: load and reset, win,
+  failure, undo and redo, replay, gesture, accessibility, graphics, performance, privacy, backgrounding and OS
+  compatibility; each names its level, seed, negative path and proof file. All classes run as host tests; the
+  simulator runs may be a stratified sample. The table alone is not evidence.
+- **Fault injection.** The 50 cases (F001 to F050) apply 25 mutations twice, among them context recreation, pause
+  and resume, a zero tick, non-finite input, a corrupt save and a lost surface. The logic digest stays
+  deterministic; rendering recovers or fails with a typed error.
 
 ## 7. Free library I: the 25 creative experiences (A01–A25)
 
@@ -1181,7 +1218,8 @@ A visual effects-chain editor for building, previewing and exporting reusable sh
 
 ## 8. Free library II: the 25 Round 2 games
 
-Round 2 holds the candidates ranked 1 to 25 of the 500-candidate study (`docs/brainstorm/`). Every game is a
+Round 2 holds the 25 games selected from the 500-candidate study (`docs/brainstorm/`): the best-scoring
+candidates with at most two per mechanic family, numbered 1 to 25 in the study's "selected top 25" column. Every game is a
 deterministic puzzle whose world is drawn entirely by code. Each has 23 chapters in the archive (first play, exact
 rules and victory proof, invariants, visual identity, content design, persistence, accessibility, file inventory,
 shared dependencies, prompts, acceptance matrix, seed contracts, hardware plan, risks and more) and an assertion
@@ -1562,10 +1600,11 @@ Rotate a 3D observatory until starlight aligns through viewports.
 
 ## 9. Premium library: Rounds 3 and 4
 
-Rounds 3 and 4 hold the first 50 candidates of the rounds 3–12 selection
-(`docs/brainstorm/round3-to-round12-selection.csv`), in descending score order. That selection was scored in a
-second pass over the candidates Round 2 had not used, so its scores and ranks are not comparable one to one with
-Round 2's. The games open with the single purchase. Their chapters share one structure: identity and non-goals, exact state and rules, first-session storyboard, renderer
+Rounds 3 and 4 hold the first 50 of the remaining candidates in descending score order
+(`docs/brainstorm/round3-to-round12-selection.csv`). They come from the same scoring matrix as Round 2. Because
+Round 2 was limited to two games per family, some games of Rounds 3 and 4 score higher than some Round 2 games;
+the queue is the source's and is not rearranged. The games open with the single purchase. Their chapters share
+one structure: identity and non-goals, exact state and rules, first-session storyboard, renderer
 recipe, content and progression, file inventory, prompts, a manifest of 100 levels, 80 acceptance scenarios, a
 fault-injection matrix, and a hardware plan.
 
@@ -2251,8 +2290,10 @@ Two hundred further games are specified to the same depth as Rounds 3 and 4 and 
 order. They are not part of the first release and nothing about them is implemented. After the release they are
 added as premium experiences in bounded batches, one round at a time, never out of order
 (`python3 scripts/migration_ledger.py add-round --round N`, section 18.4). Buyers of the unlock receive them
-without a further purchase. Round 11 ends with one and Round 12 consists of 25 supplemental candidates whose
-scores are provisional; they keep their place in the queue and are re-scored before their round starts.
+without a further purchase. Round 11 ends with one and Round 12 consists of 25 supplemental candidates
+(`docs/brainstorm/supplemental-26-provisional-candidates.csv`). Their scores are provisional estimates and they
+rank beneath every original candidate; they keep their place at the end of the queue. The sources give no rule
+for confirming them, so that is the owner's call before those rounds start.
 
 <!-- GENERATED:BEGIN backlog -->
 | # | Code | Runtime id | Name | Family | Score | Source rank | Pitch | Source lines |
@@ -2507,6 +2548,11 @@ Names without that mark exist in the source today.
 - ProjectM engine and preset code is never linked into the app (checked on the built product).
 - The app target's Swift module is named `VisualCoreApp` (proposal) so that it cannot be confused with the
   framework package `VisualCore`; the display name stays VisualCore.
+- Placeholder identifiers approved by the owner stay as they are until OD-02 is decided: `dev.visualcore.<Name>`
+  (the Showcase is `dev.visualcore.Showcase`, the harnesses `dev.visualcore.harness.*`). The App Store name is
+  settled before the bundle identifier, because the identifier is permanent once a build is uploaded and the
+  in-app product hangs off it; a later rename changes only target, scheme and product name. The home-screen name
+  is `CFBundleDisplayName`.
 
 ### 11.2 Catalog and identity
 
@@ -2519,6 +2565,29 @@ Names without that mark exist in the source today.
   files with typed errors (constitution IX).
 - A registry check proves a one-to-one match between manifest entries marked available and registered
   factories. A committed golden list of shipped ids makes any change of an id a test failure.
+
+Proposed schema of the runtime manifest (`Catalog/experiences.json`, schema version 1; UA-F01 fixes it):
+
+| Field | Type | Meaning |
+|---|---|---|
+| `schema`, `catalog_sha256` | number, string | manifest version and the hash of the planning catalog it was built from |
+| `id`, `code` | string | immutable runtime id and catalog code |
+| `title`, `summary` | string | display text |
+| `kind` | `creative` or `game` | |
+| `tier` | `free` or `premium` | what the entitlement gate reads |
+| `category`, `family`, `tags` | string, string, list | launcher grouping and search |
+| `order` | number | catalog order |
+| `palette`, `tile_seed` | list of colors, number | what the launcher draws the tile from |
+| `capabilities` | list | for example `microphone`, `export-image`; drives usage descriptions and the privacy audit |
+| `quality_tiers` | list | declared tier names |
+| `content` | object | for a game: level count, the bundled level catalog with seeds and witness hashes, and its SHA-256 |
+| `available` | boolean | true only when `X-<code>` is pass |
+
+Data models that the features define (all versioned, all with bounded decoding): the experience descriptor above;
+the snapshot envelope (experience id, schema version, seed, step index, state payload, digest); the level catalog
+of a game (level id, seed, band or world, move budget, witness hash); the scenario manifest of an experience
+(scenario name, seed, actions, expected digests and probes); the entitlement state; the evidence record of
+section 22.3; the lock manifest of section 22.4.
 
 ### 11.3 ExperienceKit: the experience contract
 
@@ -2703,7 +2772,12 @@ to confirm on devices:
   timings and failure reason. First-run and cache-warm runs are separated.
 - D1 is the primary reference, D2 the high-resolution tier, D3 the compatibility and lower-tier budget. Devices
   are not forced to the same quality; adaptive quality is reported.
-- Installed size is compared on thinned archives, not on debug simulator builds.
+- Scrolling and animation smoothness are read from an in-app display-link frame meter (on-time frames, missed
+  refresh slots), shown with a launch flag and read by a UI test that interacts for ten seconds or more.
+- Installed size is compared on thinned archives (`thinning = <thin-for-all-variants>`, the "App Thinning Size
+  Report.txt" of each device model), not on debug simulator builds.
+- Reports name thermal state, sample ids, app hash, device model, OS, battery and charging state, brightness, the
+  frame-time distribution and memory.
 - Launch time takes one sample per process launch. The first launch after installation belongs to onboarding and
   is excluded.
 - A result that only just passes is repeated and reported with its variance.
@@ -2901,6 +2975,8 @@ transfer and the app never suggests they do.
 - A previously verified entitlement works offline. A device that never purchased shows an honest locked state
   offline, never an error that looks like a bug.
 - Store lookups never block the launcher or the first interactive frame.
+- The locked or unlocked state while offline is derived from StoreKit's own results, never from a reachability
+  API: the app uses no networking API at all, and the compliance scan rejects one (even `NWPathMonitor`).
 - The archive's Round 2 rule that forbids a StoreKit configuration file and an entitlement fixture belongs to the
   superseded "no in-app purchase" plan (C-02). Both exist here, for tests only.
 - Gating happens twice: the launcher refuses to navigate to a locked premium experience and the session refuses
@@ -2922,7 +2998,8 @@ no nagging and no pre-selected option.
   request runs before the test session exists and no Apple Account prompt appears.
 - UI tests that are not about buying use the launch argument `-uitestEntitlement free|premium|revoked`, compiled
   only under `DEBUG` or `VISUALCORE_AUTOMATION`.
-- The pending-transaction handler is pure code with its own tests.
+- The pending-transaction handler is pure code with its own tests; an approval is delivered in tests through the
+  test session (`buyProduct`), never through a real Ask to Buy flow.
 - No real purchase, Ask to Buy flow or account sign-in is ever automated.
 
 ### 14.5 Shipping checks
@@ -2945,13 +3022,16 @@ Connect, the Paid Apps agreement, the price, the Family Sharing choice and a san
 - Reset of one experience clears exactly its namespace. Reset of all data clears every namespace and the session
   state.
 - A container inventory test lists the only files and defaults keys that may exist. Files created by the system
-  (StoreKit's transaction bookkeeping, Metal caches) are allowed after their origin has been checked, not ignored
-  wholesale.
+  (StoreKit's `SKTransactionUpdatesLastChecked` key, Metal cache files ending in `.pcm`, which are not audio) are
+  allowed after their origin has been checked, not ignored wholesale. Unknown files are never suppressed.
 - No iCloud and no sync.
 
 ### 15.2 Privacy
 
 - The app makes no network request of its own. Purchases go through StoreKit.
+- Compliance is code: `scripts/check_compliance.py` allows public APIs only and rejects `dlopen`, `dlsym` and
+  networking APIs. It runs in CI and before every commit. Also excluded: private frameworks, capture workarounds
+  through ReplayKit, unsupported screen-recording entitlements and invented background modes.
 - No data leaves the device. No analytics, tracking, advertising identifier or third-party SDK.
 - One `PrivacyInfo.xcprivacy`, audited against the built app including dependencies
   (`scripts/check_privacy_manifest.py`). A checked-in manifest alone proves nothing.
@@ -2978,6 +3058,8 @@ VoiceOver testing on devices is recorded and is non-gating.
   app; a symbol and dependency scan of the built app proves it.
 - Every shader and generated asset in the bundle has provenance in the repository.
 - License files are never removed, rewritten or merged without a legal review by the owner.
+- The LGPL analysis of the actual linkage is `docs/legal/lgpl-analysis.md`; licenses of every component are
+  recorded before anything is distributed.
 - A distinctiveness matrix over all pairs of the 100 launch experiences (core abstraction, player action, win
   rule) shows that no two share a mechanic. The six close pairs named by the Round 2 source are checked first. A
   near-duplicate is redesigned before the lock; it is never merged or dropped (section 6.5). Names, trademarks
@@ -3042,7 +3124,8 @@ Naming conventions for new code: experience directory and module prefix are the 
 case (`InfiniteGeometry`); targets are `<Name>Core` (pure, host-testable) and `<Name>Experience` (SwiftUI and
 scene); test targets add `Tests`; UI tests live in `Apps/VisualCore/Tests/UI/<Name>/`. Xcode projects are
 generated with the pinned XcodeGen and are not committed. Shader caches, build output, derived data, preview
-videos and generated indexes never enter Git. The complete old-to-new
+videos and generated indexes never enter Git. Third-party content enters only as a pinned, shallow submodule
+(`git submodule update --init --depth 1 <path>`), never as a copy. The complete old-to-new
 path map is in [`docs/migration/migration-plan.md`](docs/migration/migration-plan.md) and
 `docs/migration/path-map.json`.
 
@@ -3212,7 +3295,8 @@ Execution order stored in the ledger (first to last):
 After `RELEASE-PREP`, `python3 scripts/migration_ledger.py add-round --round 5` appends the gates of Round 5
 (shared features, 250 game features, 25 integration gates, a round lock, 75 device rows, a reconciliation gate).
 Round N+1 is added only after Round N. Each round is one bounded batch and ends with its own lock and device rows
-before anything of it is released.
+before anything of it is released. A regression of an earlier round that is found during a round is fixed in
+that round.
 
 ### 18.5 Parallel work
 
@@ -3221,6 +3305,8 @@ experiences are good parallel units; the integration session owns `project.yml`,
 catalog, `tasks.md`, the ledgers and this document. Heavy builds, simulator test runs and all device jobs run one
 at a time on the one Mac. An agent's report is a claim: inspect the diff and rerun the tests before ticking a task.
 Two Spec Kit features are never in progress in the same working tree.
+One session writes; any other session only analyses, in its own Git worktree. No schedule that starts further
+schedules, no agent that starts copies of itself, and no automation of the Claude Desktop interface.
 
 Defaults when no one can be asked: inspect the real API before designing against it; measure before optimizing;
 fix and rerun instead of weakening a test; report blocked instead of inventing a result; choose the simplest
@@ -3322,6 +3408,14 @@ is never replaced by hand-written artifacts.
 - Every task names its file path, its test and its exact expected result.
 - A convergence run does not report "converged" when only a plan, empty source files, an agent's claim or mocked
   tests exist.
+- Phase 00 of an original app starts with the manual's own `/speckit-constitution` prompt (printed first by
+  `scripts/speckit_prompts.py` for that feature). It adds the experience's rules under App-Scoped Rules of the
+  constitution (ADR-0007, ADR-0008) and, with the override, never restates a standalone-app scope.
+- Use the skill names that are installed (`ls .claude/skills`); a missing skill is no reason to invent a command.
+- An owner waiver, an Apple entitlement decision or a legal approval is never invented. A waived task keeps its
+  box unticked and carries the owner's dated ruling.
+- Run `python3 scripts/verify_environment.py` at the start of a session. A pinned tool is never installed or
+  upgraded silently.
 
 Record evidence and close the gate. In the migration ledger:
 
@@ -3378,6 +3472,12 @@ stopping point.
 - Commands that address a simulator or a device are filled in from live `xcrun` output, run with an explicit
   timeout and write their complete output to a file. `|| true` is never appended to hide a failure.
 - One simulator per lane. Permissions are reset between scenarios with `xcrun simctl privacy`.
+- Never test on a simulator that another job is using. Erase a simulator whose state looks wrong, after saving
+  what is needed.
+- In UI tests, toolbar items exist only on the view that declares them, and values are read from
+  `XCUIElement.label`. A snapshot test inspects the scene's output, not merely that a screen opened.
+- A failure is repaired at its smallest cause; the exact tests are rerun; the new attempt is appended to the
+  record; an acceptance criterion is never weakened to pass.
 
 ## 20. Unified-app features: briefs and prompts
 
@@ -4736,7 +4836,7 @@ Canonical override: feature directory specs/198-ua-f12-implementation-lock; requ
 1. The script refuses to run when ImplementationLock-100 is not pass or the tree differs from the locked commit.
 2. Devices are matched by hardwareProperties.productType (iPhone15,4, iPad17,3, iPad15,7); the live OS and build are recorded; D3 is refused with a blocker if it is not on iPadOS 26.5; no UDID is written to a tracked file.
 3. One Release build with VISUALCORE_AUTOMATION is installed once per device; each experience runs by id and exports its evidence JSON, which is copied back with devicectl.
-4. Percentage criteria use at least 200 samples; launch, first frame, frame pacing, memory and thermal state are recorded per experience; every game runs its 30-minute stress session and a creative experience a ten-minute sustained scenario where its class warrants it (ADR-0009 OD-08).
+4. Percentage criteria use at least 200 samples; launch, first frame, frame pacing, memory and thermal state are recorded per experience; a Round 2 game runs its 30-minute stress session on each device, a game of Rounds 3 and 4 on D3, and a creative experience a ten-minute sustained scenario where its class warrants it (ADR-0009 C-14, OD-08).
 5. A renderer or test-integrity failure halts the campaign on that device; a localized failure is recorded and the campaign continues; reconciliation lists every non-pass row.
 6. Owner-needed states (locked device, trust, signing, permissions, purchase sheet) produce BLOCKED_OWNER_ACTION with exact steps and never wait for input; --dry-run prints the plan.
 7. The shipping Release binary has no automation symbols (nm check).
@@ -4761,7 +4861,7 @@ SCOPE: Write scripts/run_device_campaign.py (new): refuse before the lock, disco
 DEPENDS ON: UA-F12 (each must be pass in the migration ledger before this feature is implemented).
 SOURCES TO READ FIRST: Auto-Creator.md section 23; docs/archive/planning/playbook (devicectl lessons); scripts/inventory_devices.py; Packages/VisualCoreRendering/Sources/VisualCoreAutomation.
 ABSORBED SOURCE REQUIREMENTS: R02-F31 device automation harness (device part); R03-F11 and R04-F11 device fixtures; legacy gates D1-A01 to D3-A25 and DEVICE-RECONCILE. Read each archived feature with python3 scripts/planning_index.py prompt --feature <ID> --stage specify, and list every unique requirement in the specification as adopted, adapted or superseded with the reason.
-ACCEPTANCE (each item becomes at least one functional requirement and one measurable success criterion): (1) The script refuses to run when ImplementationLock-100 is not pass or the tree differs from the locked commit. (2) Devices are matched by hardwareProperties.productType (iPhone15,4, iPad17,3, iPad15,7); the live OS and build are recorded; D3 is refused with a blocker if it is not on iPadOS 26.5; no UDID is written to a tracked file. (3) One Release build with VISUALCORE_AUTOMATION is installed once per device; each experience runs by id and exports its evidence JSON, which is copied back with devicectl. (4) Percentage criteria use at least 200 samples; launch, first frame, frame pacing, memory and thermal state are recorded per experience; every game runs its 30-minute stress session and a creative experience a ten-minute sustained scenario where its class warrants it (ADR-0009 OD-08). (5) A renderer or test-integrity failure halts the campaign on that device; a localized failure is recorded and the campaign continues; reconciliation lists every non-pass row. (6) Owner-needed states (locked device, trust, signing, permissions, purchase sheet) produce BLOCKED_OWNER_ACTION with exact steps and never wait for input; --dry-run prints the plan. (7) The shipping Release binary has no automation symbols (nm check).
+ACCEPTANCE (each item becomes at least one functional requirement and one measurable success criterion): (1) The script refuses to run when ImplementationLock-100 is not pass or the tree differs from the locked commit. (2) Devices are matched by hardwareProperties.productType (iPhone15,4, iPad17,3, iPad15,7); the live OS and build are recorded; D3 is refused with a blocker if it is not on iPadOS 26.5; no UDID is written to a tracked file. (3) One Release build with VISUALCORE_AUTOMATION is installed once per device; each experience runs by id and exports its evidence JSON, which is copied back with devicectl. (4) Percentage criteria use at least 200 samples; launch, first frame, frame pacing, memory and thermal state are recorded per experience; a Round 2 game runs its 30-minute stress session on each device, a game of Rounds 3 and 4 on D3, and a creative experience a ten-minute sustained scenario where its class warrants it (ADR-0009 C-14, OD-08). (5) A renderer or test-integrity failure halts the campaign on that device; a localized failure is recorded and the campaign continues; reconciliation lists every non-pass row. (6) Owner-needed states (locked device, trust, signing, permissions, purchase sheet) produce BLOCKED_OWNER_ACTION with exact steps and never wait for input; --dry-run prints the plan. (7) The shipping Release binary has no automation symbols (nm check).
 OUT OF SCOPE: (1) Any device test before the lock. (2) Updating device operating systems.
 DEVICE-ONLY VERIFICATION (tasks tagged {device}, run only after ImplementationLock-100): (1) All 300 rows: 100 experiences on D1, then D2, then D3.
 OWNER-ONLY ITEMS (tasks tagged {owner}, never performed by the agent): (1) Provision signing (Configs/Signing.local.xcconfig), unlock and trust devices, keep D3 on iPadOS 26.5, grant microphone permission, operate purchase sheets.
@@ -4951,6 +5051,13 @@ Kit discipline, stage instruction); two of the six lines are constant across the
 single lines. The catalog is deduplicated by reference, not by rewriting: the index points at the one archived
 copy of each prompt.
 
+Each archived prompt of rounds 3–12 carries its own stage rules, which stand: a specification with five user
+stories, twelve requirements, eight success conditions and three counterexamples; tasks with unique ids and a seed
+per test; an implementation that records exit codes and never deletes an assertion. The archive also contains
+harmless template artifacts, which are read as intended: Round 12 mentions a following round that does not exist,
+Round 3's constitution prompt names an empty range of earlier rounds, and rounds 3–9 write some ids without
+zero padding (`R3-F03`).
+
 ### 21.2 Canonical overrides
 
 The archived prompts were written for separate apps. They are used verbatim, followed by one of these notes
@@ -4998,9 +5105,14 @@ Canonical override (ADR-0009, Auto-Creator.md section 21): this app is experienc
 | `.autonomy/round2-state.json`, Round 2's own gate list, `specs/599-round2-suite-audit` | the migration ledger, `LOCK-FREE-50`, UA-F12 |
 | "GO, PIVOT, COMBINE, NO_GO", kill criteria | redesign inside the concept; never drop, merge or replace (section 6.5) |
 | a human review as a gate | an owner review, recorded and non-gating (section 6.5) |
-| a 30-minute stress session | kept: a device task of the game's row (section 23.3) |
+| a 30-minute stress session | kept as written: on each device for a Round 2 game, on D3 for a game of rounds 3–12 (section 23.3) |
 | licensed or purchased meshes, textures, atlases, asset packs | geometry and imagery generated by code; bundled data with license and provenance (section 7) |
 | a network allowlist, "audit each network requirement" | no network request at all (section 15.2) |
+| `[device]`, `[owner]` task tags | `{device}`, `{owner}` |
+| `ROUND<N>_AUTOMATION`, `Packages/Round<N>*`, `.autonomy/round<N>-state.json`, `org.visualcore.round<N>.<game>`, `specs/r<nn>-shared-*`, `specs/r<nn>-game-*` | the names of this document: `VISUALCORE_AUTOMATION`, the experience packages, the migration ledger, the runtime id, the spec directory printed by the ledger |
+| `hardwareUDID` in an evidence record, `docs/test-reports/round<N>/` | identifiers only in untracked private files; tracked summaries under `docs/verification/` |
+| per-game `Info.plist`, privacy manifest, store metadata, bundle identifier | the one app's single set (C-05, C-06) |
+| each round's or each manual's "standalone app" scope in a `/speckit-constitution` prompt | constitution 2.0.0; an original app's prompt adds only its experience rules (section 19.3) |
 
 ### 21.4 Level manifests and assertion outlines
 
@@ -5088,7 +5200,7 @@ One record per experience, scenario and environment. The validator of UA-F09 enf
 | `timing` | launch, preparation, shader compilation, first present, in milliseconds, each measured separately |
 | `pacing` | samples, on-time count, median, p95 and p99 frame time (development signal on simulators) |
 | `resources` | memory footprint, GPU bytes, live and leaked GPU objects after teardown |
-| `thermal_state`, `low_power` | as reported by the system |
+| `thermal_state`, `low_power`, `battery` | as reported by the system; on devices also charging state and brightness |
 | `artifacts` | result bundle path, log path and SHA-256 |
 | `failures` | list of failed expectations with messages |
 
@@ -5120,8 +5232,10 @@ the Xcode and SDK builds, the commit, an audit of unimplemented features and the
 Before the lock, a build for `generic/platform=iOS` without installation is a compile check and is never reported
 as a device test; there is no early smoke test on D1. APIs newer than the deployment target are weak-linked and
 guarded by availability checks, and the run on the iOS 26.5 simulator, not compilation alone, proves that path. An
-instrumented Release build (with `VISUALCORE_AUTOMATION`) is a valid performance build; the shipping Release build
-has no automation code or symbols (`nm -U` and a symbol scan).
+instrumented Release build (`SWIFT_ACTIVE_COMPILATION_CONDITIONS` containing `VISUALCORE_AUTOMATION`) is a valid
+performance build; the shipping Release build has no automation code or symbols (`nm -U` and a symbol scan).
+Allowed before the lock: host tests, package tests, shader compilation, headless CPU fixtures, simulator
+screenshots and UI tests, and compile checks against the device SDK. A lock is never granted on file counts.
 
 ### 22.5 After the lock
 
@@ -5170,6 +5284,12 @@ The roster is final: no other device is requested.
 `scripts/run_device_campaign.py` (new, UA-F13) runs the campaign without interaction and has a dry-run mode. The
 exact `devicectl` and `xcodebuild` flags are checked against the pinned Xcode's `--help`, not copied from old
 notes; the test destination needs the hardware identifier, not the `devicectl` device id.
+It can rehearse on a simulator, serializes Xcode operations, has retry and time budgets, gives every run its own
+result bundle path and never assumes that a device name is unique. The command shapes to confirm are: `devicectl
+device install app`; `devicectl device process launch` with `--terminate-existing` and the scenario in
+`--environment-variables`; `devicectl device info files` for the app's data container; `devicectl device copy
+from` for the evidence file; `devicectl device info processes` and `devicectl device process terminate`.
+A row ends as pass, fail, unsupported on that device, or blocked for the owner; skipped is never success.
 
 For one device, in catalog order (A01 … A25, R02-G01 … R04-G25):
 
@@ -5179,9 +5299,10 @@ For one device, in catalog order (A01 … A25, R02-G01 … R04-G25):
    (`python3 scripts/migration_ledger.py record --gate DEV<n>-<code> --result pass|fail`).
 3. Minimum per row: launch, native UI flow, a real rendered scene, touch and accessibility checks, pause and
    resume (and resize where it applies), persisted state after relaunch, export where the experience has one, the
-   container inventory, a frame, memory and thermal trace, and a real result bundle. Every game runs its 30-minute
-   stress session on each device, and a creative experience runs a ten-minute sustained scenario where its class
-   warrants it, both with cool-down windows (OD-08). Percentage criteria use at least 200 samples, with first-run
+   container inventory, a frame, memory and thermal trace, and a real result bundle. A Round 2 game runs its 30-minute
+   stress session on each device; a game of Rounds 3 and 4 runs it on D3, at its maximum bounded complexity; a
+   creative experience runs a ten-minute sustained scenario where its class warrants it; all with cool-down
+   windows (OD-08). Percentage criteria use at least 200 samples, with first-run
    and warm runs separated. Frame rate is never read from a screenshot.
 4. A specialized scenario may be `not_applicable` only when the experience genuinely lacks that capability on
    that OS or device; the row itself stays mandatory.
@@ -5273,6 +5394,14 @@ pushes; free CI minutes are never assumed. A CI change is confirmed by a real ru
 once the owner allows the branch to be pushed (OD-05); until then it is proven by running the same commands
 locally, and that limit is stated in the evidence.
 
+The sources also plan a fast documentation and compliance gate and package tests on Linux, cached reference
+frameworks passed between jobs, a job on the newest Xcode image, XcodeGen installed from its release with a
+pinned SHA-256, the simulator chosen by runtime, each job fetching only what it needs, and restricted write
+permissions. UA-F10 decides which of these the one app's CI adopts; whether the pure package builds on Linux has
+not been verified here. Rendering and UI suites stay local for as long as they need the locally built ANGLE
+frameworks. `[skip ci]` is never used on the last commit of a push that changes code or CI. A dependent job that
+was skipped because an upstream job was cancelled is investigated before the code is blamed.
+
 ### 24.2 Release preparation (UA-F14)
 
 Version and build numbers in `project.yml`; an unsigned archive build; screenshots only from real simulator or
@@ -5311,12 +5440,19 @@ A block records the object, the observed error, the command, the time and the sa
 verify with: <command>`. An owner waiver leaves the task unticked and adds the line
 `not required (owner ruling YYYY-MM-DD): <reason>`.
 
+The playbook of the ProjectM-iOS project asked the owner questions up front, let a script wait for a key press and
+let the agent operate App Store Connect once authorized. None of that is carried over: the agent never asks,
+never waits for input and never operates an owner account. Purchase sheets, system pickers, Airplane Mode and the
+first microphone permission are owner-operated.
+
 ### 24.4 Git
 
 - Work on `migration/unified-app-plan`. Never push or merge to `main`; never force-push; never rewrite history;
   never `git reset --hard`. The branch itself is pushed only if the owner says so (OD-05).
-- Small commits whose subject names the feature and the task ids, made with the Git identity the owner
-  configured, with no co-author or "Generated with" trailers and LF line endings.
+- Small commits whose subject names the feature and the task ids (for a skill: `speckit-tasks: feature 189,
+  T-U03-001 to T-U03-040`), made with the Git identity the owner configured (not a no-reply address), with no
+  co-author or "Generated with" trailers and LF line endings. Verified work is never left uncommitted, and
+  uncommitted changes of the owner are never reset, cleaned or overwritten.
 - Before any push: scan for hardware identifiers, serial numbers, team ids and secrets.
 - Never committed: `Configs/Signing.local.xcconfig`, `.autonomy/private/`, logs, result bundles, container exports.
 - At each milestone exit, write a bundle outside the repository:
@@ -5494,7 +5630,9 @@ the brief (section 20) or card (sections 7-9) and the architecture sections of t
 load the whole of Auto-Creator.md or anything under docs/archive/ into the conversation; use
 `python3 scripts/planning_index.py prompt|levels` to read archived material.
 Print a CHECKPOINT REPORT with exactly these items:
-  1. branch and HEAD commit; clean or dirty (list the dirty files)
+  1. branch and HEAD commit; clean or dirty (list the dirty files); how HEAD relates to the source revision
+     of the last recorded gate ("LAST RECORDED" in the ledger status): the same, ahead by N commits (list their
+     subjects), or unrelated (stop condition c)
   2. legacy ledger: gates passed and the next legacy gate
   3. migration ledger: counts by status, blocked gates, the first line of `next`
   4. feature in progress: .specify/feature.json and its first unticked task, or "none"
@@ -5615,6 +5753,7 @@ Stop and report only when one of these is true:
      a submission, or anything else this prompt forbids.
 Otherwise continue. When the context runs low, commit, make sure nothing runs in the background, and end the turn
 with the report below; the next session starts again at STEP 0 with this same prompt.
+If the owner writes during the work, answer briefly and continue. Sealing a gate is never a reason to pause.
 
 REPORT AT THE END OF EVERY SESSION
 State exactly: gates recorded this session (ids); files changed; checks run and their results; what is unverified;

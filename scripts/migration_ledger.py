@@ -346,6 +346,12 @@ def cmd_status(root: Path, args) -> int:
     blocked = [g["id"] for g in ledger["gates"] if g["status"] == "blocked"]
     if blocked:
         print("BLOCKED: " + ", ".join(blocked))
+    recorded = [(a["at"], g["id"], a) for g in ledger["gates"] for a in g["attempts"] if "evidence" in a]
+    if recorded:
+        at, gid, attempt = max(recorded, key=lambda r: r[0])
+        print(f"LAST RECORDED: {gid} {attempt['result']} at {at}, source revision {attempt.get('revision', 'unknown')[:12]}")
+    else:
+        print("LAST RECORDED: nothing yet")
     actions = next_actions(ledger, legacy, limit=6)
     print("NEXT:" if actions else "NEXT: nothing is ready")
     for g, why in actions:

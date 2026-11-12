@@ -38,9 +38,9 @@ cycles); a "hub" app that links out to separate apps (still many apps, breaks th
 | Tier | Experiences | Source |
 |---|---|---|
 | Free forever (50) | A01–A25 | the 25 original creative apps |
-| | R02-G01 … R02-G25 | Round 2 games (ranks 1–25 of the refined 500-candidate study) |
-| Premium (50) | R03-G01 … R03-G25 | Round 3: the first 25 of the rounds 3–12 selection, in descending score |
-| | R04-G01 … R04-G25 | Round 4: the next 25 of that selection |
+| | R02-G01 … R02-G25 | Round 2 games: the selection of 25 from the 500-candidate study, best scores with at most two per mechanic family |
+| Premium (50) | R03-G01 … R03-G25 | Round 3: the first 25 of the remaining candidates, in descending score |
+| | R04-G01 … R04-G25 | Round 4: the next 25 |
 | Backlog (200) | R05 … R12 | later premium additions, kept in descending score order |
 
 The first release contains all 100, complete. The queues are not reordered and concepts are not substituted. The
@@ -195,6 +195,11 @@ distinctiveness check or a device is redesigned inside its concept, and the fail
 recorded in an ADR. If it still fails, its gate is blocked for an owner decision (OD-10). Nothing is dropped,
 merged or replaced, and the queue order is unchanged.
 
+All rounds come from one scoring matrix. Because Round 2 was limited to two games per family, some games of later
+rounds score higher than some Round 2 games. That is the source's order and it stays. The 26 supplemental
+candidates at the end of the queue (the last game of Round 11 and all of Round 12) have provisional scores; the
+sources give no rule for confirming them, so that is an owner decision before those rounds start.
+
 ### D-17 Human reviews do not gate
 
 Several source gates need human judgement: the distinctiveness review, the review of whether a hero scene is
@@ -202,6 +207,14 @@ beautiful, the five-second goal-recognition review, the outside-player comprehen
 An agent cannot perform them truthfully. They are owner reviews (OD-09), recorded before release, and they do not
 gate integration gates or locks. Their automated proxies do gate: semantic probes, histograms, silhouette bounds,
 the pairwise distinctiveness matrix and the accessibility audits.
+
+### D-18 Backlog rounds
+
+After the first release, Rounds 5 to 12 are added one at a time, in order
+(`python3 scripts/migration_ledger.py add-round`). Each round is implemented and verified on simulators, locked by
+its own gate, and then verified on D1, D2 and D3 before any of it is released. A round's device rows gate that
+round's release; they are not a prerequisite for starting the next round's implementation. Releases need owner
+authorization.
 
 ## Conflicts resolved (all dated 2026-11-11)
 
@@ -214,20 +227,23 @@ the pairwise distinctiveness matrix and the accessibility audits.
 | C-05 | One XcodeGen target and bundle id per game; "25-target CI" (R02-F30, Rnn-F10) | one target; the build features are absorbed by UA-F10 | D-01 |
 | C-06 | Per-app Phase 06 store listings, screenshots, release dossiers, privacy manifests, purpose strings, review notes, license agreements and icons | the quality gates of Phase 06 stay; there is one set of these artifacts for the one app (UA-F11, UA-F14), and its purpose strings are the union of what the registered experiences need | D-01 |
 | C-07 | Round 2 content target 80 levels versus "revised proposed ship target is 100 solver-certified levels" | 100 | the source's own later revision |
-| C-08 | Former CLAUDE.md §0 rule 4: push every commit to `origin main`; older sources prescribe a feature branch and a pull request per feature | all work is committed on the migration branch and nothing is pushed (D-13) | high-risk restructuring, owner directive |
+| C-08 | Former CLAUDE.md, the former setup guide and constitution 1.5.0: push every commit to `origin main`; older sources prescribe a feature branch and a pull request per feature | all work is committed on the migration branch and nothing is pushed (D-13) | high-risk restructuring, owner directive |
 | C-09 | Former CLAUDE.md said "README.md is the full specification", and the former README ranked itself above the constitution and every ADR | `Auto-Creator.md` is the steering document; the former README is archived (D-10); precedence is the one in Auto-Creator.md section 2 | owner directive |
 | C-10 | Round 2 ids `R2-…` versus rounds 3–12 `Rnn-…` | canonical `R02-…`, alias kept (D-06) | one scheme for ledger and validators |
 | C-11 | `docs/verification/source-hashes.json` records an older README hash than the archived README | left as recorded evidence; the archive manifest holds the current hash | evidence is not rewritten |
 | C-12 | Sources allow a game to be killed, pivoted or merged after a prototype; distinctiveness rules suggest merging near-duplicates | D-16: redesign inside the concept; never drop, merge or replace | owner directive: exactly 100, no substitution |
 | C-13 | Human reviews as gates (distinctiveness, "stunning" hero scene, five-second recognition, outside-player comprehension) | D-17: owner reviews, non-gating; automated proxies gate | an agent cannot perform them truthfully; the owner made manual VoiceOver non-gating on the same ground |
-| C-14 | Round 2 requires a 30-minute stress session per game per device; the original apps a ten-minute sustained run where the class warrants it | both kept as written (about 150 device-hours); shortening is an owner decision (OD-08) | no test procedure is dropped |
+| C-14 | Round 2 requires a 30-minute stress session per game on each device; rounds 3–12 require it on D3; the original apps require a ten-minute sustained run where the class warrants it | all kept as written (about 60 device-hours for the launch games); shortening is an owner decision (OD-08) | no test procedure is dropped |
 | C-15 | The former README refused a suite-wide network ban and asked for a per-app allowlist | D-15: the single app is offline | no launch experience needs the network; one privacy position |
 | C-16 | Some app manuals and the brainstorm plan licensed or purchased meshes, textures, atlases, media or streamed assets (A09, A12, A14, A17) and licensed datasets | D-09 prevails for geometry and imagery, which are generated by code; bundled data with license and provenance is allowed | owner directive on code-driven visuals |
-| C-17 | Round 2 names its own packages, paths, ledger, environment variables and a suite-audit feature (`Round2*`, `GameModules`, `.autonomy/round2-state.json`, `ROUND2_AUTORUN`, `specs/599-…`) | mapped to the layout, ledger and names of this ADR (Auto-Creator.md section 21.3) | D-06, D-11, D-12 |
-| C-18 | Round 2's last shared feature reconciles after the device batches | split: the simulator part is `LOCK-FREE-50` and UA-F12 before devices, the device part is `DEVICE-RECONCILE-100` | D-07 |
+| C-17 | Every round names its own packages, paths, ledger file, environment variables and bundle identifiers (`Round<N>*`, `GameModules`, `.autonomy/round<N>-state.json`, `ROUND<N>_AUTORUN`, `org.visualcore.round<N>.<game>`, `specs/599-…`); evidence records carry a hardware identifier | mapped to the layout, ledger and names of this ADR (Auto-Creator.md section 21.3); identifiers stay in untracked files | D-06, D-08, D-11, D-12 |
+| C-18 | The last shared feature of every round (R02-F34, R<nn>-F12) closes after the device batches | split: the simulator part is the lock and UA-F12 before devices, the device part is `DEVICE-RECONCILE-100`; the other round features delivered by unified features are listed in Auto-Creator.md section 13 | D-07 |
 | C-19 | The former README confirms CI changes by a real GitHub run | until the owner allows the branch to be pushed (OD-05), CI changes are proven by running the same commands locally, and the evidence says so | D-13 |
 | C-20 | The brainstorm lists monetization per app: paid packs, premium themes, scene packs, collectible environments, subscriptions | superseded by D-03; every creative experience is free and complete | owner directive |
 | C-21 | Some free experiences have claims only devices can prove (audio sources of A06–A08, the measurements of A24, idle power and thermal behavior of A09, A18, A21) | these are hardware capabilities listed as pending hardware verification; the experiences are complete on the simulator without them (Auto-Creator.md section 6.4) | D-07 |
+| C-22 | Feature 03 of every game of rounds 3–12 says "96- or 100-level complete catalog"; everything else in those rounds says 100 | 100 levels, as in each game's level manifest | the manifests have 100 rows |
+| C-23 | Each round has its own `/speckit-constitution` prompt, and each original app manual has one that begins "Build a standalone … app" | the eleven round prompts are replaced by the single amendment to 2.0.0; an original app's prompt still runs at its Phase 00 and adds only that experience's rules (ADR-0007, ADR-0008) | D-01 |
+| C-24 | After each round the sources start the next round only when the previous round's 75 device outcomes exist | launch rounds: D-07; backlog rounds: D-18 | owner directive |
 
 ## Owner decisions still open
 
@@ -240,9 +256,10 @@ the pairwise distinctiveness matrix and the accessibility audits.
 | OD-05 | May the migration branch be pushed to `origin` as a branch? | not pushed; local commits plus an outside `git bundle` at each milestone |
 | OD-06 | Signing team, certificates, profiles, sandbox tester, App Store Connect record and agreements | none; device work reports `BLOCKED_OWNER_ACTION` |
 | OD-07 | Minimum OS and device families. No test device is an iPhone on iOS 26 (D3 is an iPad) | iOS and iPadOS 26.0, iPhone and iPad (current project setting); published claims name only the tested models and OS versions |
-| OD-08 | Length of the device stress sessions | as the sources say: 30 minutes per game on each device, ten minutes for a creative experience whose class warrants it |
+| OD-08 | Length of the device stress sessions | as the sources say: 30 minutes on each device for a Round 2 game, 30 minutes on D3 for a game of Rounds 3 and 4, ten minutes for a creative experience whose class warrants it |
 | OD-09 | Who performs the human reviews and when | the owner, before release; recorded and non-gating |
 | OD-10 | A launch experience that still fails after a redesign inside its concept | its gate stays blocked; nothing is dropped, merged or replaced |
+| OD-11 | Confirmation of the 26 supplemental candidates (provisional scores) before Rounds 11 and 12 | they keep their place at the end of the queue |
 
 ## Consequences
 
