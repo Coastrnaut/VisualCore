@@ -14,4 +14,8 @@ Existing identifiers from Phase 01 stay (`pu.sandbox.family`, `.description`, `.
 | `pu.sandbox.effective` | text | "Effective limit: 4,000 of 4,000 (quality tier 1 of 4)"; the tier shown is `QualityPolicy.tier + 1` |
 | `pu.sandbox.renderer` | text | "Renderer: GPU" or "Renderer: CPU preview (<reason>)" |
 
-Launch arguments (DEBUG builds only): `-uitestThermal nominal|fair|serious|critical`, `-uitestLowPower YES`.
+Launch arguments (DEBUG builds only, read in `DeviceConditionsSource`):
+- `-uitestThermal nominal|fair|serious|critical` and `-uitestLowPower YES|NO`: replace heat and Low Power Mode;
+- `-uitestRendererFailure YES`: start in the CPU preview with the note "Renderer: CPU preview (test: GPU disabled)"
+  (US4 AC3);
+- `-uitestReduceMotion YES`: start paused as under Reduce Motion (T-A04-218; also used by the accessibility audits).

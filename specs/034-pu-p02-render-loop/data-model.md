@@ -76,6 +76,9 @@ New cases `repulsor(x:y:strength:radius:)`, `gravityWell(x:y:strength:softening:
 - `setPlacedForce(_ force: PlacedForce?)` — places, replaces or removes `system.forces[0]`; scene forces follow at
   index 1… when a placed force exists (`moveAttractor` indices are offset accordingly). `placedForce` getter.
 - `setLiveLimit(_:)`, `liveLimit`.
+- `activeForces`: the forces the particles feel now, in order (placed force, scene forces, family forces), for tests
+  and diagnostics.
+- `nonFiniteRemoved`: particles removed for NaN or infinite state (stays 0 for every placed force, T-A04-209).
 
 ### SceneQuality
 
