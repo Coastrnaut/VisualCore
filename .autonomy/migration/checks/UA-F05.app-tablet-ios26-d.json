@@ -1,0 +1,28 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_app.py",
+    "--scheme",
+    "VisualCore",
+    "--runtime",
+    "26.5",
+    "--kind",
+    "tablet",
+    "--only-testing",
+    "VisualCoreUITests/LauncherUITests",
+    "VisualCoreUITests/FirstRunUITests",
+    "--log-name",
+    "ua-f05-tablet-ios26-d"
+  ],
+  "command": "python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime 26.5 --kind tablet --only-testing VisualCoreUITests/LauncherUITests VisualCoreUITests/FirstRunUITests --log-name ua-f05-tablet-ios26-d",
+  "elapsed_seconds": 178.984,
+  "exit_code": 0,
+  "finished": "2026-11-12T23:18:12+00:00",
+  "gate": "UA-F05",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F05.app-tablet-ios26-d.log",
+  "log_sha256": "f6b92e13e78445bea5abe81b2b334ae57d3cfcd1970c969f26e5b747b93b0481",
+  "name": "app-tablet-ios26-d",
+  "started": "2026-11-12T23:15:13+00:00",
+  "timed_out": false
+}
