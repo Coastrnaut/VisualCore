@@ -3496,6 +3496,14 @@ stopping point.
   `XCUIElement.label`. A snapshot test inspects the scene's output, not merely that a screen opened.
 - A failure is repaired at its smallest cause; the exact tests are rerun; the new attempt is appended to the
   record; an acceptance criterion is never weakened to pass.
+- A stage prompt is copied from the output of `scripts/planning_index.py prompt` or `scripts/speckit_prompts.py`,
+  never retyped from memory: the evidence commands differ from feature to feature. A skill is invoked before any of
+  its work is done; an analysis written first is not a run of `/speckit-analyze`.
+- CI runs on every push, so `main` is kept green commit by commit: a test task is seen to fail locally and is then
+  committed together with the implementation it proves, and a commit that adds a public symbol also updates the
+  API baseline (`python3 scripts/check_public_api.py --update`); the final baseline review remains its own task.
+- In `zsh`, a command kept in a variable is not split into words; use a shell function for repeated `run-check`
+  calls.
 
 ## 20. Unified-app features: briefs and prompts
 
