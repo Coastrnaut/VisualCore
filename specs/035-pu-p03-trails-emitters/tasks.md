@@ -1,0 +1,67 @@
+---
+
+description: "Task list for feature 035 — Particle Universe Phase 03 trails and multiple emitters (ledger gate A04-P03)"
+---
+
+# Tasks: Particle Universe — Phase 03 Trails and multiple emitters
+
+**Input**: `/specs/035-pu-p03-trails-emitters/` (spec, plan, research, data-model, contracts/visualcore-api.md,
+contracts/app-ui.md, quickstart).
+
+**Tests** are required by the spec: host tests (C1, C2, slots, overrides), simulator pixel and leak tests (C3–C7),
+UI tests and accessibility audits on iOS 27.2 and 26.5 with the enumeration guard, and the reference regression.
+
+**Conventions**: IDs `T-A04-3##`, one commit and push per task (`scripts/tick_task.py`, evidence text only); every
+command through `desktop_runbook.py run-check --stage A04-P03`. Review checkpoint after each phase: `validate_docs.py`
+passes and the named tests are green.
+
+## Phase 1: Setup
+
+- [ ] T-A04-301 Add the `VisualCoreParameters` product to `Apps/ParticleUniverse/ParticleUniverseCore/Package.swift` (target and test target) and to the `ParticleUniverse` target in `project.yml`; `swift build` the package and build the app for the generic iOS Simulator (plan "Dependency direction").
+
+## Phase 2: Foundational — VisualCore (G-BLENDTRAIL; blocking)
+
+- [ ] T-A04-302 [P] Write `Packages/VisualCore/Tests/VisualCoreSimulationTests/TrailDecayTests.swift` first, then add `Packages/VisualCore/Sources/VisualCoreSimulation/TrailDecay.swift` and `ParticleSystem.liveCount(source:)` (C1, C2; research R1, R4): "`factor(strength:delta:)` = s^(delta·60); delta ≤ 0 or non-finite → 1; strength clamped 0…0.98, non-finite → 0"; "`step8` = max(0, round(v·f − 1))". Tests: factor composes (two half steps = one full step within 1e-12), 0 strength → 0 for any positive delta, every 8-bit value reaches 0 in ≤ 255 frames at s = 0.98 and delta 1/120, `liveCount(source:)` per emitter and 0 out of range, existing particle tests unchanged. `///` docs.
+- [ ] T-A04-303 [P] Write `Packages/VisualCoreRendering/Tests/VisualCoreRenderingTests/ParticleBlendTests.swift` first, then add `ParticleBlend` and `draw(_:camera:metrics:blend:)` (default `.normal`) in `Packages/VisualCoreRendering/Sources/VisualCoreRendering/ParticleRenderer.swift` (FR-A04-301, C3): `.additive` = ONE, ONE. Tests: two overlapping half-intensity red particles give ≈ 2× red with additive and the over-composite value with normal; the existing `ParticleRendererTests` pass unchanged (A01's path). Run the rendering package tests on sim-27.2 and sim-26.5 with the enumeration guard.
+- [ ] T-A04-304 Write `Packages/VisualCoreRendering/Tests/VisualCoreRenderingTests/TrailLayerTests.swift` first, then add `Packages/VisualCoreRendering/Sources/VisualCoreRendering/TrailLayer.swift` (FR-A04-302, FR-A04-303, C4–C6): "`maxEdge = 2048` — longer edge scaled down to it, keeping aspect"; RGBA8 `PingPongTarget`; decay `FieldPass` writing `max(prev·f − 1/255, 0)`; composite `FieldPass` writing `min(c, cap)` with alpha 1 to a `FieldPass.Output`; `strength` "0…0.98 (clamped)", `brightnessCap` "0…1 (clamped, default 1)"; `clear()`, `frame(delta:draw:output:)`, idempotent `release()`. Tests: SC-A04-303 (a lit pixel follows `TrailDecay.step8` within 1/255 every frame for 60 frames; 60 frames at 1/60 s vs 30 at 1/30 s agree within 2/255), SC-A04-304 (20 resizes via release+init, 20 clears, `recreateContext()` with a scene using the layer: `stats.liveCount[.texture]` equals the count after first setup and `leaked` unchanged), SC-A04-305 (cap 0.6 → every channel ≤ 153), edge clamp at 4,096 × 1,024 → 2,048 × 512. Run on both runtimes.
+- [ ] T-A04-305 Extend `Packages/VisualCoreRendering/Sources/VisualCoreRendering/ParticleLayerScene.swift` (C7): `blend`, `trailStrength` (clamped 0…0.98), `brightnessCap` (clamped 0…1), `clearTrails()`, `trailLayer`; the layer is created on the first frame that needs it at the drawable size, recreated on a size change, released when no longer needed and on teardown. Tests in `TrailLayerTests` / `ParticleLayerSceneTests`: without trails or cap the Phase 02 pixel tests pass unchanged; with trails a particle removed from the source leaves a fading streak; turning trails off releases the layer's textures. Run on both runtimes; update the API baseline (`check_public_api.py --update`) and the READMEs.
+- [ ] T-A04-306 Run `swift test --package-path Packages/VisualCore`, A01's core tests and the ParticleUniverseCore tests; `check_public_api.py` and the documented-API check.
+
+**Checkpoint**: G-BLENDTRAIL closed in VisualCore.
+
+## Phase 3: US1 — Several emitters (P1) 🎯 MVP
+
+- [ ] T-A04-307 [US1] Write `Apps/ParticleUniverse/ParticleUniverseCore/Tests/ParticleUniverseCoreTests/EmitterSlotTests.swift` first, then extend `Sources/ParticleUniverseCore/SceneSimulation.swift` (FR-A04-304, research R4, R5): `visibleEmitters`, `addEmitter(_:) -> Bool`, `canAddEmitter`, `removeEmitter(at:) -> Bool`, `setEmitter(at:_:)`, `retiredSlots`, `rebuildScene()`; placement "family position + (150·⌈k/2⌉·(−1)^(k+1), 0), clamped to ±450"; the last emitter cannot be removed; retired slots reused only when `liveCount(source:) == 0`. Tests: SC-A04-301 (1…8 emitters all emit; live ≤ effective limit; removing deletes 0 live particles and leaves every other particle's color unchanged), slot reuse after fade, add disabled with 8 busy slots, rebuild drops retired slots and keeps order; replay fixture unchanged.
+- [ ] T-A04-308 [US1] Extend `Apps/ParticleUniverse/App/SceneModel.swift` and `SandboxView.swift` with `EmitterControls` (contracts/app-ui.md): `pu.sandbox.emitter` picker "Emitter 1…N", `pu.sandbox.emitters` "Emitters: N of 8" (+ waiting note), `pu.sandbox.addEmitter`, `pu.sandbox.removeEmitter`; the family picker edits the selected emitter (position and overrides kept); New seed rebuilds from the visible emitters. Build for the generic simulator.
+
+## Phase 4: US2 — Size, lifetime, gradient (P1)
+
+- [ ] T-A04-309 [US2] Write `Tests/ParticleUniverseCoreTests/EmitterOverrideTests.swift` first, then extend `Sources/ParticleUniverseCore/ParticleScene.swift` (`SceneEmitter.size` "1…48 world units", `lifetime` "0.2…8 s; particles live 0.8…1.2 × it", `gradient` "a `Palette.builtIns` id; start = sample(1) α 1, end = sample(0.5) α 0"; `SceneError.invalidEmitter(i)`; clamped UI helpers) and `emitter()` (FR-A04-305). Tests: SC-A04-302 (after a change 100% of newly emitted particles have the new lifetime range and, at age 0, the new size and start color; earlier particles keep their lifetime; other emitters unaffected), decode rejects out-of-range and unknown ids, old files without the fields decode, round trip.
+- [ ] T-A04-310 [US2] Add the size slider `pu.sandbox.size` ("N points"), lifetime slider `pu.sandbox.lifetime` ("N.N seconds") and gradient menu `pu.sandbox.gradient` to `SandboxView.swift`/`SceneModel.swift` for the selected emitter. Build.
+- [ ] T-A04-311 [US1] [US2] Add `Apps/ParticleUniverse/Tests/UI/SandboxEmitterUITests.swift`: add to 3 emitters and read the count; select and remove; Remove disabled with one; family change keeps the count; size, lifetime and gradient controls change their values. Run on iOS 27.2 and 26.5 (SC-A04-306).
+
+## Phase 5: US3 + US4 — Trails, blend and the brightness cap (P1)
+
+- [ ] T-A04-312 [US3] [US4] Extend `SceneModel.swift`, `SandboxView.swift` (`TrailControls`: `pu.sandbox.trails`, `pu.sandbox.trailStrength` "N percent", `pu.sandbox.blend` Normal/Additive, `pu.sandbox.trailNote`) and `DeviceConditionsSource.swift` (DEBUG `-uitestReduceFlashing`): Reduce Flashing resolved from `AccessibilityPreferences` and `SystemAccessibilityObserver` sets the cap 0.6; the CPU preview disables the trail controls with "Trails need the GPU renderer"; trails clear on resize through the scene. Add `Apps/ParticleUniverse/Tests/UI/SandboxTrailUITests.swift` (toggle, strength value, blend choice, the cap note under `-uitestReduceFlashing YES`, controls disabled under `-uitestRendererFailure YES`). Run the whole scheme on both runtimes with the enumeration guard and the accessibility audits (SC-A04-306).
+
+## Phase 6: Polish & cross-cutting
+
+- [ ] T-A04-313 Update `docs/apps/particle-universe/visualcore-contract.json` (gate A04-P03; G-BLENDTRAIL closed with `ParticleBlend`, `TrailLayer`, `TrailDecay` and tests; M04 and M08 available; decision reason) and re-render the `.md`; `check_app_contract.py --app particle-universe` passes (FR-A04-307).
+- [ ] T-A04-314 Run the ProjectM reference regression in two chunks (3/3, 4/4; SC-F702 may be rerun unchanged once), rebuild A01 and A02 for testing from clean derived data, confirm the rendering package tests ran after the last VisualCore change, and record the rerun in `docs/apps/particle-universe/regression-baseline.md` (FR-A04-307).
+- [ ] T-A04-315 Run the release-check fast steps (docs, app-contracts, compliance, dependencies, public-api, licenses, script-tests, host-visualcore, documented-api-particle-universe, isolation-particle-universe, host-particle-universe-core).
+
+## Dependencies
+
+- 301 first. 302 and 303 in parallel; 304 after 302 and 303 (uses `TrailDecay`); 305 after 304; 306 after 305.
+- 307 after 302 (`liveCount(source:)`); 308 after 307; 309 after 301; 310 after 308 and 309; 311 after 310.
+- 312 after 305 and 310. 313 after 305; 314 after the last VisualCore change; 315 last.
+
+## Parallel examples
+
+- T-A04-302 (VisualCore host) and T-A04-303 (rendering package) touch disjoint files.
+- After 306: T-A04-307 (app core) and T-A04-309 touch different parts of the core; run 307 then 309 since both edit `SceneSimulation`/`ParticleScene` paths that `emitter()` shares.
+
+## Implementation strategy
+
+MVP = Phase 2 + US1. Then overrides, trails and the cap, the contract and the regression. Seal only after converge
+appends nothing.
