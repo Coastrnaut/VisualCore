@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "swift",
+    "build",
+    "--package-path",
+    "Apps/ParticleUniverse/ParticleUniverseCore"
+  ],
+  "command": "swift build --package-path Apps/ParticleUniverse/ParticleUniverseCore",
+  "elapsed_seconds": 2.216,
+  "exit_code": 0,
+  "finished": "2026-11-12T00:23:48+00:00",
+  "log": ".autonomy/logs/A04-P03.t301-package-build.log",
+  "log_sha256": "43e0ec71535104e6f2b402c6430c7cca6c1bcf3f23c80140cedfed3d2572248a",
+  "name": "t301-package-build",
+  "stage": "A04-P03",
+  "started": "2026-11-12T00:23:45+00:00",
+  "timed_out": false
+}

@@ -438,6 +438,9 @@ targets:
         product: VisualCoreRendering
       - package: VisualCore
         product: VisualCoreDiagnostics
+      # Feature 035 (A04-P03): built-in palettes for the color gradients.
+      - package: VisualCore
+        product: VisualCoreParameters
     postBuildScripts:
       # FR-A04-006: the build fails if the app depends on ProjectM engine/preset/bridge modules.
       - name: Dependency audit (FR-A04-006)
