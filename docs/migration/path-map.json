@@ -1,0 +1,585 @@
+{
+ "schema": 1,
+ "note": "Directory-level path map of the migration (ADR-0009). 'from' paths exist today; 'to' paths of new and move entries are proposals confirmed by the named feature. state is pending until the feature records the move in Catalog/path-map.json. File-level moves are recorded there when they happen.",
+ "actions": {
+  "keep": "stays as it is",
+  "modify": "stays and grows",
+  "move": "git mv after parity is proven",
+  "merge": "content is merged into one target file",
+  "retire": "removed once the replacement is verified",
+  "new": "created by the named feature"
+ },
+ "entries": [
+  {
+   "from": "Apps/GenerativeArtStudio/Core/Sources/GenerativeArtStudioCore",
+   "to": "Packages/ExperiencesCreative/GenerativeArtStudio/Core",
+   "action": "move",
+   "by": "UA-F07",
+   "state": "pending",
+   "note": "Pure domain target GenerativeArtStudioCore; tests must pass unchanged before and after the move.",
+   "experience": "A01"
+  },
+  {
+   "from": "Apps/GenerativeArtStudio/Core/Tests/GenerativeArtStudioCoreTests",
+   "to": "Packages/ExperiencesCreative/GenerativeArtStudio/CoreTests",
+   "action": "move",
+   "by": "UA-F07",
+   "state": "pending",
+   "note": "Host tests and fixtures of the Core target; fixtures stay bit-identical.",
+   "experience": "A01"
+  },
+  {
+   "from": "Apps/GenerativeArtStudio/Core/Package.swift",
+   "to": "Packages/ExperiencesCreative/Package.swift",
+   "action": "merge",
+   "by": "UA-F07",
+   "state": "pending",
+   "note": "The per-app package manifest is replaced by targets in the collection package.",
+   "experience": "A01"
+  },
+  {
+   "from": "Apps/GenerativeArtStudio/App",
+   "to": "Packages/ExperiencesCreative/GenerativeArtStudio/Experience",
+   "action": "move",
+   "by": "UA-F07",
+   "state": "pending",
+   "note": "SwiftUI and scene sources become target GenerativeArtStudioExperience; the @main type GenerativeArtStudioApp.swift is replaced by the experience factory and is retired.",
+   "experience": "A01"
+  },
+  {
+   "from": "Apps/GenerativeArtStudio/Shaders",
+   "to": "Packages/ExperiencesCreative/GenerativeArtStudio/Shaders",
+   "action": "move",
+   "by": "UA-F07",
+   "state": "pending",
+   "note": "GLSL sources become resources of the Experience target.",
+   "experience": "A01"
+  },
+  {
+   "from": "Apps/GenerativeArtStudio/Tests/Unit",
+   "to": "Packages/ExperiencesCreative/GenerativeArtStudio/ExperienceTests",
+   "action": "move",
+   "by": "UA-F07",
+   "state": "pending",
+   "note": "Unit tests that need UIKit or the render host.",
+   "experience": "A01"
+  },
+  {
+   "from": "Apps/GenerativeArtStudio/Tests/UI",
+   "to": "Apps/VisualCore/Tests/UI/GenerativeArtStudio",
+   "action": "move",
+   "by": "UA-F07",
+   "state": "pending",
+   "note": "UI tests are ported to the unified app; a mapping table and the enumeration guard prove none is lost.",
+   "experience": "A01"
+  },
+  {
+   "from": "Apps/GenerativeArtStudio/Resources/PrivacyInfo.xcprivacy",
+   "to": "Apps/VisualCore/Resources/PrivacyInfo.xcprivacy",
+   "action": "merge",
+   "by": "UA-F11",
+   "state": "pending",
+   "note": "One privacy manifest for the app, audited against the built product.",
+   "experience": "A01"
+  },
+  {
+   "from": "Apps/GenerativeArtStudio/Resources/Assets.xcassets",
+   "to": null,
+   "action": "retire",
+   "by": "UA-F07",
+   "state": "pending",
+   "note": "Icon and accent of the standalone app; the unified app has one generated icon.",
+   "experience": "A01"
+  },
+  {
+   "from": "Apps/GenerativeArtStudio/Generated",
+   "to": null,
+   "action": "retire",
+   "by": "UA-F07",
+   "state": "pending",
+   "note": "XcodeGen output of the standalone target.",
+   "experience": "A01"
+  },
+  {
+   "from": "Apps/FluidArtPlayground/FluidArtPlaygroundCore/Sources/FluidArtPlaygroundCore",
+   "to": "Packages/ExperiencesCreative/FluidArtPlayground/Core",
+   "action": "move",
+   "by": "UA-F07",
+   "state": "pending",
+   "note": "Pure domain target FluidArtPlaygroundCore; tests must pass unchanged before and after the move.",
+   "experience": "A02"
+  },
+  {
+   "from": "Apps/FluidArtPlayground/FluidArtPlaygroundCore/Tests/FluidArtPlaygroundCoreTests",
+   "to": "Packages/ExperiencesCreative/FluidArtPlayground/CoreTests",
+   "action": "move",
+   "by": "UA-F07",
+   "state": "pending",
+   "note": "Host tests and fixtures of the Core target; fixtures stay bit-identical.",
+   "experience": "A02"
+  },
+  {
+   "from": "Apps/FluidArtPlayground/FluidArtPlaygroundCore/Package.swift",
+   "to": "Packages/ExperiencesCreative/Package.swift",
+   "action": "merge",
+   "by": "UA-F07",
+   "state": "pending",
+   "note": "The per-app package manifest is replaced by targets in the collection package.",
+   "experience": "A02"
+  },
+  {
+   "from": "Apps/FluidArtPlayground/App",
+   "to": "Packages/ExperiencesCreative/FluidArtPlayground/Experience",
+   "action": "move",
+   "by": "UA-F07",
+   "state": "pending",
+   "note": "SwiftUI and scene sources become target FluidArtPlaygroundExperience; the @main type FluidArtPlaygroundApp.swift is replaced by the experience factory and is retired.",
+   "experience": "A02"
+  },
+  {
+   "from": "Apps/FluidArtPlayground/Tests/Unit",
+   "to": "Packages/ExperiencesCreative/FluidArtPlayground/ExperienceTests",
+   "action": "move",
+   "by": "UA-F07",
+   "state": "pending",
+   "note": "Unit tests that need UIKit or the render host.",
+   "experience": "A02"
+  },
+  {
+   "from": "Apps/FluidArtPlayground/Tests/UI",
+   "to": "Apps/VisualCore/Tests/UI/FluidArtPlayground",
+   "action": "move",
+   "by": "UA-F07",
+   "state": "pending",
+   "note": "UI tests are ported to the unified app; a mapping table and the enumeration guard prove none is lost.",
+   "experience": "A02"
+  },
+  {
+   "from": "Apps/FluidArtPlayground/Resources/PrivacyInfo.xcprivacy",
+   "to": "Apps/VisualCore/Resources/PrivacyInfo.xcprivacy",
+   "action": "merge",
+   "by": "UA-F11",
+   "state": "pending",
+   "note": "One privacy manifest for the app, audited against the built product.",
+   "experience": "A02"
+  },
+  {
+   "from": "Apps/FluidArtPlayground/Resources/Assets.xcassets",
+   "to": null,
+   "action": "retire",
+   "by": "UA-F07",
+   "state": "pending",
+   "note": "Icon and accent of the standalone app; the unified app has one generated icon.",
+   "experience": "A02"
+  },
+  {
+   "from": "Apps/FluidArtPlayground/Generated",
+   "to": null,
+   "action": "retire",
+   "by": "UA-F07",
+   "state": "pending",
+   "note": "XcodeGen output of the standalone target.",
+   "experience": "A02"
+  },
+  {
+   "from": "Apps/FractalExplorer/FractalExplorerCore/Sources/FractalExplorerCore",
+   "to": "Packages/ExperiencesCreative/FractalExplorer/Core",
+   "action": "move",
+   "by": "UA-F07",
+   "state": "pending",
+   "note": "Pure domain target FractalExplorerCore; tests must pass unchanged before and after the move.",
+   "experience": "A03"
+  },
+  {
+   "from": "Apps/FractalExplorer/FractalExplorerCore/Tests/FractalExplorerCoreTests",
+   "to": "Packages/ExperiencesCreative/FractalExplorer/CoreTests",
+   "action": "move",
+   "by": "UA-F07",
+   "state": "pending",
+   "note": "Host tests and fixtures of the Core target; fixtures stay bit-identical.",
+   "experience": "A03"
+  },
+  {
+   "from": "Apps/FractalExplorer/FractalExplorerCore/Package.swift",
+   "to": "Packages/ExperiencesCreative/Package.swift",
+   "action": "merge",
+   "by": "UA-F07",
+   "state": "pending",
+   "note": "The per-app package manifest is replaced by targets in the collection package.",
+   "experience": "A03"
+  },
+  {
+   "from": "Apps/FractalExplorer/App",
+   "to": "Packages/ExperiencesCreative/FractalExplorer/Experience",
+   "action": "move",
+   "by": "UA-F07",
+   "state": "pending",
+   "note": "SwiftUI and scene sources become target FractalExplorerExperience; the @main type FractalExplorerApp.swift is replaced by the experience factory and is retired.",
+   "experience": "A03"
+  },
+  {
+   "from": "Apps/FractalExplorer/Tests/Unit",
+   "to": "Packages/ExperiencesCreative/FractalExplorer/ExperienceTests",
+   "action": "move",
+   "by": "UA-F07",
+   "state": "pending",
+   "note": "Unit tests that need UIKit or the render host.",
+   "experience": "A03"
+  },
+  {
+   "from": "Apps/FractalExplorer/Tests/Fixtures",
+   "to": "Packages/ExperiencesCreative/FractalExplorer/ExperienceTests/Fixtures",
+   "action": "move",
+   "by": "UA-F07",
+   "state": "pending",
+   "note": "Test fixtures; stay bit-identical.",
+   "experience": "A03"
+  },
+  {
+   "from": "Apps/FractalExplorer/Tests/UI",
+   "to": "Apps/VisualCore/Tests/UI/FractalExplorer",
+   "action": "move",
+   "by": "UA-F07",
+   "state": "pending",
+   "note": "UI tests are ported to the unified app; a mapping table and the enumeration guard prove none is lost.",
+   "experience": "A03"
+  },
+  {
+   "from": "Apps/FractalExplorer/Resources/PrivacyInfo.xcprivacy",
+   "to": "Apps/VisualCore/Resources/PrivacyInfo.xcprivacy",
+   "action": "merge",
+   "by": "UA-F11",
+   "state": "pending",
+   "note": "One privacy manifest for the app, audited against the built product.",
+   "experience": "A03"
+  },
+  {
+   "from": "Apps/FractalExplorer/Resources/Assets.xcassets",
+   "to": null,
+   "action": "retire",
+   "by": "UA-F07",
+   "state": "pending",
+   "note": "Icon and accent of the standalone app; the unified app has one generated icon.",
+   "experience": "A03"
+  },
+  {
+   "from": "Apps/FractalExplorer/Generated",
+   "to": null,
+   "action": "retire",
+   "by": "UA-F07",
+   "state": "pending",
+   "note": "XcodeGen output of the standalone target.",
+   "experience": "A03"
+  },
+  {
+   "from": "Apps/ParticleUniverse/ParticleUniverseCore/Sources/ParticleUniverseCore",
+   "to": "Packages/ExperiencesCreative/ParticleUniverse/Core",
+   "action": "move",
+   "by": "UA-F07",
+   "state": "pending",
+   "note": "Pure domain target ParticleUniverseCore; tests must pass unchanged before and after the move.",
+   "experience": "A04"
+  },
+  {
+   "from": "Apps/ParticleUniverse/ParticleUniverseCore/Tests/ParticleUniverseCoreTests",
+   "to": "Packages/ExperiencesCreative/ParticleUniverse/CoreTests",
+   "action": "move",
+   "by": "UA-F07",
+   "state": "pending",
+   "note": "Host tests and fixtures of the Core target; fixtures stay bit-identical.",
+   "experience": "A04"
+  },
+  {
+   "from": "Apps/ParticleUniverse/ParticleUniverseCore/Package.swift",
+   "to": "Packages/ExperiencesCreative/Package.swift",
+   "action": "merge",
+   "by": "UA-F07",
+   "state": "pending",
+   "note": "The per-app package manifest is replaced by targets in the collection package.",
+   "experience": "A04"
+  },
+  {
+   "from": "Apps/ParticleUniverse/App",
+   "to": "Packages/ExperiencesCreative/ParticleUniverse/Experience",
+   "action": "move",
+   "by": "UA-F07",
+   "state": "pending",
+   "note": "SwiftUI and scene sources become target ParticleUniverseExperience; the @main type ParticleUniverseApp.swift is replaced by the experience factory and is retired.",
+   "experience": "A04"
+  },
+  {
+   "from": "Apps/ParticleUniverse/Tests/UI",
+   "to": "Apps/VisualCore/Tests/UI/ParticleUniverse",
+   "action": "move",
+   "by": "UA-F07",
+   "state": "pending",
+   "note": "UI tests are ported to the unified app; a mapping table and the enumeration guard prove none is lost.",
+   "experience": "A04"
+  },
+  {
+   "from": "Apps/ParticleUniverse/Generated",
+   "to": null,
+   "action": "retire",
+   "by": "UA-F07",
+   "state": "pending",
+   "note": "XcodeGen output of the standalone target.",
+   "experience": "A04"
+  },
+  {
+   "from": "Packages/VisualCore",
+   "to": "Packages/VisualCore",
+   "action": "modify",
+   "by": "UA-F01, UA-F02, R02-F05, R02-F23",
+   "state": "pending",
+   "note": "Adds the pure modules VisualCoreExperience, VisualCoreGeometry and VisualCorePuzzle; existing modules keep their names and API."
+  },
+  {
+   "from": "Packages/VisualCoreRendering",
+   "to": "Packages/VisualCoreRendering",
+   "action": "modify",
+   "by": "UA-F02, UA-F03, UA-F08",
+   "state": "pending",
+   "note": "Adds VisualCoreExperienceHost and VisualCoreStore; existing modules keep their names and API."
+  },
+  {
+   "from": "project.yml",
+   "to": "project.yml",
+   "action": "modify",
+   "by": "UA-F04, UA-F07, UA-F10",
+   "state": "pending",
+   "note": "Gains the application target VisualCore; loses each standalone app target after its experience is verified."
+  },
+  {
+   "from": "Showcase",
+   "to": "Showcase",
+   "action": "keep",
+   "by": "-",
+   "state": "pending",
+   "note": "Non-shipping framework showcase."
+  },
+  {
+   "from": "Harnesses/InteractiveDemo",
+   "to": "Harnesses/InteractiveDemo",
+   "action": "keep",
+   "by": "-",
+   "state": "pending",
+   "note": "Non-shipping harness."
+  },
+  {
+   "from": "Harnesses/SecondConsumer",
+   "to": "Harnesses/SecondConsumer",
+   "action": "keep",
+   "by": "-",
+   "state": "pending",
+   "note": "Non-shipping harness (Lumen Garden) with GardenKit."
+  },
+  {
+   "from": "Harnesses/ProjectMReference",
+   "to": "Harnesses/ProjectMReference",
+   "action": "keep",
+   "by": "-",
+   "state": "pending",
+   "note": "The only target that touches the ProjectM reference (rule R1)."
+  },
+  {
+   "from": "External/projectm-ios",
+   "to": "External/projectm-ios",
+   "action": "keep",
+   "by": "-",
+   "state": "pending",
+   "note": "Pinned read-only submodule (ADR-0005)."
+  },
+  {
+   "from": "Configs",
+   "to": "Configs",
+   "action": "keep",
+   "by": "-",
+   "state": "pending",
+   "note": "toolchain.json and Signing.xcconfig; Signing.local.xcconfig is owner-created and never committed."
+  },
+  {
+   "from": "Tools/python/desktop_runbook.py",
+   "to": "Tools/python/desktop_runbook.py",
+   "action": "keep",
+   "by": "-",
+   "state": "pending",
+   "note": "Legacy ledger tool; reads the archived specification."
+  },
+  {
+   "from": "scripts",
+   "to": "scripts",
+   "action": "modify",
+   "by": "UA-F00, UA-F01, UA-F09, UA-F13",
+   "state": "pending",
+   "note": "Adds build_catalog.py, verify_experiences.py, run_device_campaign.py; existing checks are extended, not replaced."
+  },
+  {
+   "from": "specs",
+   "to": "specs",
+   "action": "modify",
+   "by": "every feature",
+   "state": "pending",
+   "note": "001-035 are records and are never rewritten; new dossiers follow the numbering of ADR-0009 D-11."
+  },
+  {
+   "from": ".autonomy/state.json",
+   "to": ".autonomy/state.json",
+   "action": "keep",
+   "by": "-",
+   "state": "pending",
+   "note": "Legacy ledger; never reset."
+  },
+  {
+   "from": ".autonomy/evidence",
+   "to": ".autonomy/evidence",
+   "action": "keep",
+   "by": "-",
+   "state": "pending",
+   "note": "Sealed legacy evidence."
+  },
+  {
+   "from": ".autonomy/checks",
+   "to": ".autonomy/checks",
+   "action": "keep",
+   "by": "-",
+   "state": "pending",
+   "note": "Legacy attestations."
+  },
+  {
+   "from": ".autonomy/migration",
+   "to": ".autonomy/migration",
+   "action": "modify",
+   "by": "every gate",
+   "state": "pending",
+   "note": "Migration ledger, its evidence and attestations."
+  },
+  {
+   "from": ".specify",
+   "to": ".specify",
+   "action": "modify",
+   "by": "CONSTITUTION-2",
+   "state": "pending",
+   "note": "Constitution amended to 2.0.0; templates and scripts unchanged."
+  },
+  {
+   "from": ".github/workflows/ci.yml",
+   "to": ".github/workflows/ci.yml",
+   "action": "modify",
+   "by": "UA-F00, UA-F10",
+   "state": "pending",
+   "note": "Adds the steering validators and the unified app's simulator build."
+  },
+  {
+   "from": "docs/archive/planning",
+   "to": "docs/archive/planning",
+   "action": "keep",
+   "by": "-",
+   "state": "pending",
+   "note": "Byte-identical originals; never edited."
+  },
+  {
+   "from": "docs/apps",
+   "to": "docs/apps",
+   "action": "keep",
+   "by": "-",
+   "state": "pending",
+   "note": "Regression baselines and release dossiers of the standalone apps: history; store listings are superseded."
+  },
+  {
+   "from": "docs/release",
+   "to": "docs/release",
+   "action": "keep",
+   "by": "-",
+   "state": "pending",
+   "note": "Framework 1.0.0-rc.1 records; the unified app's release material is added by UA-F14."
+  },
+  {
+   "from": null,
+   "to": "Apps/VisualCore",
+   "action": "new",
+   "by": "UA-F04",
+   "state": "pending",
+   "note": "The only shippable target: App/, Resources/, Tests/Unit, Tests/UI."
+  },
+  {
+   "from": null,
+   "to": "Catalog",
+   "action": "new",
+   "by": "UA-F01",
+   "state": "pending",
+   "note": "Runtime manifest experiences.json, categories.json and path-map.json."
+  },
+  {
+   "from": null,
+   "to": "Packages/ExperiencesCreative",
+   "action": "new",
+   "by": "UA-F07",
+   "state": "pending",
+   "note": "A01-A25, one directory per experience with Core, Experience, Shaders and tests."
+  },
+  {
+   "from": null,
+   "to": "Packages/ExperiencesRound02",
+   "action": "new",
+   "by": "UA-F10",
+   "state": "pending",
+   "note": "R02-G01 … R02-G25."
+  },
+  {
+   "from": null,
+   "to": "Packages/ExperiencesRound03",
+   "action": "new",
+   "by": "UA-F10",
+   "state": "pending",
+   "note": "R03-G01 … R03-G25."
+  },
+  {
+   "from": null,
+   "to": "Packages/ExperiencesRound04",
+   "action": "new",
+   "by": "UA-F10",
+   "state": "pending",
+   "note": "R04-G01 … R04-G25."
+  },
+  {
+   "from": null,
+   "to": "scripts/build_catalog.py",
+   "action": "new",
+   "by": "UA-F01",
+   "state": "pending",
+   "note": "Derives the runtime manifest from the planning catalog."
+  },
+  {
+   "from": null,
+   "to": "scripts/verify_experiences.py",
+   "action": "new",
+   "by": "UA-F09",
+   "state": "pending",
+   "note": "Verification runner and lock driver."
+  },
+  {
+   "from": null,
+   "to": "scripts/run_device_campaign.py",
+   "action": "new",
+   "by": "UA-F13",
+   "state": "pending",
+   "note": "Noninteractive device campaign."
+  },
+  {
+   "from": null,
+   "to": "docs/verification/implementation-lock-100.json",
+   "action": "new",
+   "by": "UA-F12",
+   "state": "pending",
+   "note": "Lock manifest."
+  },
+  {
+   "from": null,
+   "to": "docs/decisions/ADR-0010-constitution-2-0-0.md",
+   "action": "new",
+   "by": "CONSTITUTION-2",
+   "state": "pending",
+   "note": "Records the constitution amendment."
+  }
+ ]
+}
