@@ -1110,7 +1110,7 @@ class SteeringDocumentTests(unittest.TestCase):
 
     def test_secrets(self):
         self.assertEqual(steering.check_secrets("a.md", "commit 38d98ebb376088e18f053f3cc39d246a7e7dd3b3, product type iPhone15,4"), [])
-        for bad in ("device 00008120-001A2B3C4D5E6F78", "simulator 4E32B01D-7911-4A64-A944-877DDD445BC0", "DEVELOPMENT_TEAM = ABCDE12345",
+        for bad in ("device 00008120-001A2B3C4D5E6F78", "simulator 1A2B3C4D-5E6F-4A7B-8C9D-0E1F2A3B4C5D", "DEVELOPMENT_TEAM = ABCDE12345",
                     "write to someone@example.com", "-----BEGIN RSA PRIVATE KEY-----", "token ghp_abcdefghijklmnopqrstuvwxyz0123"):
             self.assertTrue(steering.check_secrets("a.md", bad), bad)
 
@@ -1188,7 +1188,7 @@ class PrepushScanTests(unittest.TestCase):
 
     def test_patterns(self):
         hits = {"device 00008120-001A2B3C4D5E6F78": "hardware identifier",
-                "sim 4E32B01D-7911-4A64-A944-877DDD445BC0": "device or simulator UUID",
+                "sim 1A2B3C4D-5E6F-4A7B-8C9D-0E1F2A3B4C5D": "device or simulator UUID",
                 '"ecid": 0x1A2B3C4D5E6F': "ECID", "Serial Number: F2LXK1ABCD12": "serial number",
                 "DEVELOPMENT_TEAM = ABCDE12345": "development team id", "team id: ABCDE12345": "development team id",
                 "write to someone@example.com": "e-mail address", "open /Users/somebody/Documents/x": "absolute home path",
@@ -1199,6 +1199,12 @@ class PrepushScanTests(unittest.TestCase):
                       "brew install python@3.15", "git@github.com:owner/repo.git", "scan for UDIDs, ECIDs, serials and team ids",
                       "product type iPhone15,4 on iPadOS 26.5", "/Users/<name>/Documents", "/Users/Shared/tools"):
             self.assertEqual(prepush.scan_line(clean), [], clean)
+
+    def test_known_simulators_are_not_findings(self):
+        line = "xcodebuild test -destination id=1A2B3C4D-5E6F-4A7B-8C9D-0E1F2A3B4C5D"
+        self.assertEqual(prepush.scan_line(line), ["device or simulator UUID"])
+        self.assertEqual(prepush.scan_line(line, frozenset({"1A2B3C4D-5E6F-4A7B-8C9D-0E1F2A3B4C5D"})), [])
+        self.assertEqual(prepush.scan_line(line.lower(), frozenset({"1A2B3C4D-5E6F-4A7B-8C9D-0E1F2A3B4C5D"})), [])
 
     def test_only_added_lines_of_scanned_files_count(self):
         diff = ("--- a/docs/x.md\n+++ b/docs/x.md\n@@ -1 +1 @@\n-old 00008120-001A2B3C4D5E6F78\n+new text\n"

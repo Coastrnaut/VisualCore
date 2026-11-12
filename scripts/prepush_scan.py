@@ -8,10 +8,12 @@
 Owner rule: before any push, scan for device identifiers, ECIDs, serial numbers, team ids and secrets. The scan
 reads every ADDED line of the outgoing commits (a rename without changes adds nothing) and looks for:
 
-  hardware identifier   00008120-001A2B3C4D5E6F78
-  device or other UUID  4E32B01D-7911-4A64-A944-877DDD445BC0 (synthetic ids starting 00000000-0000-4000-8000- are allowed)
+  hardware identifier   eight hexadecimal digits, a hyphen, sixteen hexadecimal digits
+  device or other UUID  the 8-4-4-4-12 form; allowed are synthetic ids that start with 00000000-0000-4000-8000- and
+                        the identifiers of this Mac's own simulators (they appear in recorded test commands and
+                        identify nothing outside this machine)
   ECID, serial number   only when a value follows the word
-  team id               DEVELOPMENT_TEAM = ABCDE12345, "team id: ABCDE12345"
+  team id               a DEVELOPMENT_TEAM assignment or "team id" followed by ten characters
   e-mail address, absolute home path with a user name
   private key, access token
 
@@ -48,28 +50,39 @@ FORBIDDEN_PATHS = re.compile(r"^\.autonomy/(private|logs|xcresults|reports)/|^Co
 UNSCANNED = {"scripts/test_scripts.py"}
 
 
-def scan_line(line: str) -> list[str]:
-    """Labels of everything suspicious in one added line."""
+def scan_line(line: str, allowed: frozenset[str] = frozenset()) -> list[str]:
+    """Labels of everything suspicious in one added line. `allowed` holds upper-case UUIDs that are not findings."""
     found = []
     for label, pattern in PATTERNS:
         for m in pattern.finditer(line):
             if label == "e-mail address" and m.group(0) in ALLOWED_ADDRESSES:
+                continue
+            if label == "device or simulator UUID" and m.group(0).upper() in allowed:
                 continue
             found.append(label)
             break
     return found
 
 
-def scan_diff(diff: str) -> list[str]:
+def scan_diff(diff: str, allowed: frozenset[str] = frozenset()) -> list[str]:
     """Findings in a unified diff: 'file: label: text' for every suspicious added line."""
     findings, current = [], None
     for line in diff.split("\n"):
         if line.startswith("+++ "):
             current = line[6:] if line.startswith("+++ b/") else None
         elif line.startswith("+") and not line.startswith("+++") and current and current not in UNSCANNED:
-            for label in scan_line(line[1:]):
+            for label in scan_line(line[1:], allowed):
                 findings.append(f"{current}: {label}: {line[1:].strip()[:100]}")
     return findings
+
+
+def simulator_identifiers() -> frozenset[str]:
+    """Identifiers of the simulators installed on this Mac; empty where simctl is unavailable."""
+    try:
+        out = subprocess.run(["xcrun", "simctl", "list", "devices", "-j"], capture_output=True, text=True, timeout=60, check=False).stdout
+    except (OSError, subprocess.TimeoutExpired):
+        return frozenset()
+    return frozenset(u.upper() for u in re.findall(r'"udid"\s*:\s*"([0-9A-Fa-f-]{36})"', out))
 
 
 def forbidden(paths: list[str]) -> list[str]:
@@ -84,7 +97,7 @@ def scan(root: Path = ROOT, commits: str = "origin/main..HEAD") -> list[str]:
     diff = git(root, "diff", "--unified=0", "--no-color", "--find-renames", commits)
     if diff.returncode != 0:
         return [f"cannot read {commits}: {diff.stderr.strip()[:200]}"]
-    return scan_diff(diff.stdout) + forbidden(git(root, "ls-files").stdout.splitlines())
+    return scan_diff(diff.stdout, simulator_identifiers()) + forbidden(git(root, "ls-files").stdout.splitlines())
 
 
 def main(argv: list[str] | None = None, root: Path = ROOT) -> int:
