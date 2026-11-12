@@ -1,0 +1,29 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_release_symbols.py",
+    "--app",
+    "Build/DerivedData/ua-f04-app-build/Build/Products/Debug-iphonesimulator/VisualCore.app",
+    "--forbid",
+    "DebugLaunch",
+    "DebugExperience",
+    "openExperience",
+    "vcFixtureCatalog",
+    "vcDamagedCatalog",
+    "vcSeedData",
+    "vcFailingExperience",
+    "hideWelcomeForThisLaunch",
+    "--expect-present"
+  ],
+  "command": "python3 scripts/check_release_symbols.py --app Build/DerivedData/ua-f04-app-build/Build/Products/Debug-iphonesimulator/VisualCore.app --forbid DebugLaunch DebugExperience openExperience vcFixtureCatalog vcDamagedCatalog vcSeedData vcFailingExperience hideWelcomeForThisLaunch --expect-present",
+  "elapsed_seconds": 0.14,
+  "exit_code": 0,
+  "finished": "2026-11-12T16:48:41+00:00",
+  "gate": "UA-F04",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F04.debug-symbols-present-r2.log",
+  "log_sha256": "0847d989d0b2c75a5a5242fb73a73c467f741e4b4ebf60ee2dab995368ec1202",
+  "name": "debug-symbols-present-r2",
+  "started": "2026-11-12T16:48:41+00:00",
+  "timed_out": false
+}

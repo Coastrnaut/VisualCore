@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_release_symbols.py",
+    "--app",
+    "Build/DerivedData/ua-f04-release/Build/Products/Release-iphonesimulator/VisualCore.app"
+  ],
+  "command": "python3 scripts/check_release_symbols.py --app Build/DerivedData/ua-f04-release/Build/Products/Release-iphonesimulator/VisualCore.app",
+  "elapsed_seconds": 0.112,
+  "exit_code": 0,
+  "finished": "2026-11-12T16:48:41+00:00",
+  "gate": "UA-F04",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F04.release-automation-r2.log",
+  "log_sha256": "1164ca292bdb43a06089334672ba196d7f23d9808e5166293943dc6fefaa8a83",
+  "name": "release-automation-r2",
+  "started": "2026-11-12T16:48:41+00:00",
+  "timed_out": false
+}

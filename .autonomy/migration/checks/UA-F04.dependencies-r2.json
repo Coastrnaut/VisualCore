@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_dependencies.py"
+  ],
+  "command": "python3 scripts/check_dependencies.py",
+  "elapsed_seconds": 0.377,
+  "exit_code": 0,
+  "finished": "2026-11-12T16:48:42+00:00",
+  "gate": "UA-F04",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F04.dependencies-r2.log",
+  "log_sha256": "2e76fc1dfc80da350956dec58466acc6dbf15f1f957df7bf748288a82b279183",
+  "name": "dependencies-r2",
+  "started": "2026-11-12T16:48:42+00:00",
+  "timed_out": false
+}
