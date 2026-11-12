@@ -1,0 +1,505 @@
+{
+  "schema": 1,
+  "note": "Every entry is byte-identical to the file tracked at the baseline commit 38d98ebb376088e18f053f3cc39d246a7e7dd3b3; derived copies are verbatim extractions.",
+  "baseline": "docs/migration/pre-fable-baseline.json",
+  "entries": [
+    {
+      "original_path": "README.md",
+      "archive_path": "docs/archive/planning/root/README-2026-11-10-full-specification.md",
+      "method": "moved",
+      "role": "Former root README: canonical specification chapters 1-19 and the verbatim archive of 33 source documents",
+      "bytes": 1753038,
+      "sha256": "d07b49f0b9e871880acc8d74936dc3a891db35abb94ae86ef54b33ab858411d8",
+      "baseline_sha256": "d07b49f0b9e871880acc8d74936dc3a891db35abb94ae86ef54b33ab858411d8"
+    },
+    {
+      "original_path": "CLAUDE.md",
+      "archive_path": "docs/archive/planning/root/CLAUDE-2026-11-11-agent-contract.md",
+      "method": "moved",
+      "role": "Former root agent contract (sections 0-13) with the verbatim ProjectM-iOS playbook (section 14)",
+      "bytes": 49484,
+      "sha256": "9185e1b4802679d262908bfb2e7c5d7ee32d4fc1c5db4e76752a0d0dbf87db11",
+      "baseline_sha256": "9185e1b4802679d262908bfb2e7c5d7ee32d4fc1c5db4e76752a0d0dbf87db11"
+    },
+    {
+      "original_path": "setup.md",
+      "archive_path": "docs/archive/planning/root/setup-2026-11-11.md",
+      "method": "copied",
+      "role": "Machine setup guide as it stood at the baseline; the root setup.md continues and is revised",
+      "bytes": 21729,
+      "sha256": "5c19416d4982a9fbd3b2b2c3038c36e7bc48755ae510d99aaacbebfb5b564ee3",
+      "baseline_sha256": "5c19416d4982a9fbd3b2b2c3038c36e7bc48755ae510d99aaacbebfb5b564ee3"
+    },
+    {
+      "original_path": "START-HERE.md",
+      "archive_path": "docs/archive/planning/root/START-HERE.md",
+      "method": "moved",
+      "role": "Index of rounds 3-12",
+      "bytes": 5051,
+      "sha256": "eb33a768e6bf55d198c0fd03321a859e11d5358b63059f3469ccc8b60bef0984",
+      "baseline_sha256": "eb33a768e6bf55d198c0fd03321a859e11d5358b63059f3469ccc8b60bef0984"
+    },
+    {
+      "original_path": "DESKTOP-ONE-SHOT.md",
+      "archive_path": "docs/archive/planning/root/DESKTOP-ONE-SHOT.md",
+      "method": "moved",
+      "role": "Controller prompt for rounds 3-12 (superseded)",
+      "bytes": 6079,
+      "sha256": "85028a0f4fdd1c0d34d2e3af00cf1aa18dd5d1258822d9fe34f3b0aa24d36a44",
+      "baseline_sha256": "85028a0f4fdd1c0d34d2e3af00cf1aa18dd5d1258822d9fe34f3b0aa24d36a44"
+    },
+    {
+      "original_path": "manifest.json",
+      "archive_path": "docs/archive/planning/root/manifest.json",
+      "method": "moved",
+      "role": "Hash manifest and roster metadata for rounds 3-12",
+      "bytes": 4132,
+      "sha256": "eb464a37078d85b43ee3ffc698fb0cccd0ec9ab1cb873de561f8feaa4c27960d",
+      "baseline_sha256": "eb464a37078d85b43ee3ffc698fb0cccd0ec9ab1cb873de561f8feaa4c27960d"
+    },
+    {
+      "original_path": "Round2.md",
+      "archive_path": "docs/archive/planning/rounds/round2.md",
+      "method": "moved",
+      "role": "Round 2: 34 shared features, 25 games, embedded assertion outlines and 500-candidate study (tracked as Round2.md; the document names itself round2.md)",
+      "bytes": 11989899,
+      "sha256": "f45d83dcc873fec3b25ab6d52c8f89be1dcc40ccaf5162646a9b7af72829649d",
+      "baseline_sha256": "f45d83dcc873fec3b25ab6d52c8f89be1dcc40ccaf5162646a9b7af72829649d"
+    },
+    {
+      "original_path": "round3.md",
+      "archive_path": "docs/archive/planning/rounds/round3.md",
+      "method": "moved",
+      "role": "Round 3: 12 shared features and 25 games",
+      "bytes": 9647090,
+      "sha256": "b1168ebe539a452096251d91727b5eebefb3b6e1b7dfaf0fa9d3b3fd0f46f653",
+      "baseline_sha256": "b1168ebe539a452096251d91727b5eebefb3b6e1b7dfaf0fa9d3b3fd0f46f653"
+    },
+    {
+      "original_path": "round4.md",
+      "archive_path": "docs/archive/planning/rounds/round4.md",
+      "method": "moved",
+      "role": "Round 4: 12 shared features and 25 games",
+      "bytes": 9623350,
+      "sha256": "ad372fdcadf98489152a08632dd100fa3eec8d9b831b6c2846ae9afbc30a5e04",
+      "baseline_sha256": "ad372fdcadf98489152a08632dd100fa3eec8d9b831b6c2846ae9afbc30a5e04"
+    },
+    {
+      "original_path": "round5.md",
+      "archive_path": "docs/archive/planning/rounds/round5.md",
+      "method": "moved",
+      "role": "Round 5: 12 shared features and 25 games",
+      "bytes": 9652437,
+      "sha256": "1fd67d383fa380f09f470c2e2511b98c0164ee2d6d38f22081a8fa251f2b8b8e",
+      "baseline_sha256": "1fd67d383fa380f09f470c2e2511b98c0164ee2d6d38f22081a8fa251f2b8b8e"
+    },
+    {
+      "original_path": "round6.md",
+      "archive_path": "docs/archive/planning/rounds/round6.md",
+      "method": "moved",
+      "role": "Round 6: 12 shared features and 25 games",
+      "bytes": 9660361,
+      "sha256": "521f3b45c776284ee643c3ff358cbfd3dd7bebbd50d0ac3bd3036826db890171",
+      "baseline_sha256": "521f3b45c776284ee643c3ff358cbfd3dd7bebbd50d0ac3bd3036826db890171"
+    },
+    {
+      "original_path": "round7.md",
+      "archive_path": "docs/archive/planning/rounds/round7.md",
+      "method": "moved",
+      "role": "Round 7: 12 shared features and 25 games",
+      "bytes": 9626810,
+      "sha256": "d6b921633cd313fe1dc1ce459a6c83d986cb796d98ad41fd57b39a6738a31882",
+      "baseline_sha256": "d6b921633cd313fe1dc1ce459a6c83d986cb796d98ad41fd57b39a6738a31882"
+    },
+    {
+      "original_path": "round8.md",
+      "archive_path": "docs/archive/planning/rounds/round8.md",
+      "method": "moved",
+      "role": "Round 8: 12 shared features and 25 games",
+      "bytes": 9639293,
+      "sha256": "fa9ac8733fd2ed97283ff44a40dffdb5a6d6441dd965861b80d39bf8358494ff",
+      "baseline_sha256": "fa9ac8733fd2ed97283ff44a40dffdb5a6d6441dd965861b80d39bf8358494ff"
+    },
+    {
+      "original_path": "round9.md",
+      "archive_path": "docs/archive/planning/rounds/round9.md",
+      "method": "moved",
+      "role": "Round 9: 12 shared features and 25 games",
+      "bytes": 9575532,
+      "sha256": "f5bf53f52e2d7c8922aab7c04edb24358b1da62ae57f0386d1bf1137c092fba4",
+      "baseline_sha256": "f5bf53f52e2d7c8922aab7c04edb24358b1da62ae57f0386d1bf1137c092fba4"
+    },
+    {
+      "original_path": "round10.md",
+      "archive_path": "docs/archive/planning/rounds/round10.md",
+      "method": "moved",
+      "role": "Round 10: 12 shared features and 25 games",
+      "bytes": 9649785,
+      "sha256": "91dc69b3f203d921c26e70fae629382e4983b5bcf0660b4f6ffab86f67962a65",
+      "baseline_sha256": "91dc69b3f203d921c26e70fae629382e4983b5bcf0660b4f6ffab86f67962a65"
+    },
+    {
+      "original_path": "round11.md",
+      "archive_path": "docs/archive/planning/rounds/round11.md",
+      "method": "moved",
+      "role": "Round 11: 12 shared features and 25 games",
+      "bytes": 9645721,
+      "sha256": "0800ed35feb9ba5a6f0b0e2d4d06ad2fde81d931eb1fce5f78970faac8a81ed9",
+      "baseline_sha256": "0800ed35feb9ba5a6f0b0e2d4d06ad2fde81d931eb1fce5f78970faac8a81ed9"
+    },
+    {
+      "original_path": "round12.md",
+      "archive_path": "docs/archive/planning/rounds/round12.md",
+      "method": "moved",
+      "role": "Round 12: 12 shared features and 25 games",
+      "bytes": 9514217,
+      "sha256": "fa816aadcf19578ca9bec8eb5c159d8ce4a361e3c2805b4ad034a7cdf1f3d566",
+      "baseline_sha256": "fa816aadcf19578ca9bec8eb5c159d8ce4a361e3c2805b4ad034a7cdf1f3d566"
+    },
+    {
+      "original_path": "docs/brainstorm/Round-2-Refined-Premium-500x62-Scoring.csv",
+      "archive_path": null,
+      "method": "retained in place",
+      "role": "500 candidates scored on 62 criteria",
+      "bytes": 625464,
+      "sha256": "ec6e19c82624e2490a60befb671f83f4e01a7f30086ca36a67808548cbd6840e",
+      "baseline_sha256": "ec6e19c82624e2490a60befb671f83f4e01a7f30086ca36a67808548cbd6840e"
+    },
+    {
+      "original_path": "docs/brainstorm/Round-2-Refined-Premium-Games-Study-500.md",
+      "archive_path": null,
+      "method": "retained in place",
+      "role": "500-candidate study",
+      "bytes": 143274,
+      "sha256": "b9fc09a7a9e87b63a5dc613e679312b8ff584a24e15eed77cd7629c3c6a05dbb",
+      "baseline_sha256": "b9fc09a7a9e87b63a5dc613e679312b8ff584a24e15eed77cd7629c3c6a05dbb"
+    },
+    {
+      "original_path": "docs/brainstorm/Round-2-Refined-Top25-Selected.csv",
+      "archive_path": null,
+      "method": "retained in place",
+      "role": "Round 2 selection (top 25)",
+      "bytes": 10986,
+      "sha256": "dd8a0f35f2087df7a6bc4394e1a0b691e73a8e70607f6cb05eb0796528ff2c1d",
+      "baseline_sha256": "dd8a0f35f2087df7a6bc4394e1a0b691e73a8e70607f6cb05eb0796528ff2c1d"
+    },
+    {
+      "original_path": "docs/brainstorm/Round-2-Top25-Complete-AssertionOutlines.md",
+      "archive_path": null,
+      "method": "retained in place",
+      "role": "25 Round 2 assertion outlines",
+      "bytes": 183839,
+      "sha256": "56eccbb59a99a4386fb724de83a6b89226e29e93b5f1c5752c223fb4b916ffbf",
+      "baseline_sha256": "56eccbb59a99a4386fb724de83a6b89226e29e93b5f1c5752c223fb4b916ffbf"
+    },
+    {
+      "original_path": "docs/brainstorm/round3-to-round12-selection.csv",
+      "archive_path": null,
+      "method": "retained in place",
+      "role": "Rounds 3-12 selection in score order",
+      "bytes": 91324,
+      "sha256": "cffa03a7add8bdf9c5b8f544ebfdcd99ce4471f96e916a127a6c2b29997bf9b4",
+      "baseline_sha256": "cffa03a7add8bdf9c5b8f544ebfdcd99ce4471f96e916a127a6c2b29997bf9b4"
+    },
+    {
+      "original_path": "docs/brainstorm/supplemental-26-provisional-candidates.csv",
+      "archive_path": null,
+      "method": "retained in place",
+      "role": "26 supplemental provisional candidates",
+      "bytes": 33679,
+      "sha256": "b4db022471cd90013841abd174f77bed352cf0d4dca71764f84c1f796635dc1d",
+      "baseline_sha256": "b4db022471cd90013841abd174f77bed352cf0d4dca71764f84c1f796635dc1d"
+    },
+    {
+      "original_path": "docs/process/speckit-prompt-manifest.json",
+      "archive_path": null,
+      "method": "retained in place",
+      "role": "Spec Kit prompts for features 001-185 (generated)",
+      "bytes": 718491,
+      "sha256": "24873c2376fec4eb86a577946abdf6ccd0000098a53ac5b5f73a41a4a09afc92",
+      "baseline_sha256": "24873c2376fec4eb86a577946abdf6ccd0000098a53ac5b5f73a41a4a09afc92"
+    },
+    {
+      "original_path": "docs/process/speckit-prompt-manifest.md",
+      "archive_path": null,
+      "method": "retained in place",
+      "role": "Summary of the prompt manifest",
+      "bytes": 18490,
+      "sha256": "9082c27f07558263febe704af17fdd7d42429f5d02fc20ecf1eb5f2aebc3b042",
+      "baseline_sha256": "9082c27f07558263febe704af17fdd7d42429f5d02fc20ecf1eb5f2aebc3b042"
+    }
+  ],
+  "derived": [
+    {
+      "path": "docs/archive/planning/embedded/sources/README.md",
+      "derived_from": "docs/archive/planning/root/README-2026-11-10-full-specification.md",
+      "kind": "embedded source",
+      "embedded_name": "sources/README.md",
+      "bytes": 58016,
+      "sha256": "1ee7e5bdcc7696b0e964dcb8c00178fb479e8246294f5a9b065fa76aa1212c65"
+    },
+    {
+      "path": "docs/archive/planning/embedded/sources/AppsBrainstorm.md",
+      "derived_from": "docs/archive/planning/root/README-2026-11-10-full-specification.md",
+      "kind": "embedded source",
+      "embedded_name": "sources/AppsBrainstorm.md",
+      "bytes": 51518,
+      "sha256": "efdcf626fa1b2594dc3f15c3e97b33f4ca8f282c553b463d948f6ff44465ce7f"
+    },
+    {
+      "path": "docs/archive/planning/embedded/apps/01-generative-art-studio.md",
+      "derived_from": "docs/archive/planning/root/README-2026-11-10-full-specification.md",
+      "kind": "embedded source",
+      "embedded_name": "apps/01-generative-art-studio.md",
+      "bytes": 55738,
+      "sha256": "557c444d28cf08094ad214e091a0eba5aba344861b5464c767de9ec399b836d9"
+    },
+    {
+      "path": "docs/archive/planning/embedded/apps/02-fluid-art-playground.md",
+      "derived_from": "docs/archive/planning/root/README-2026-11-10-full-specification.md",
+      "kind": "embedded source",
+      "embedded_name": "apps/02-fluid-art-playground.md",
+      "bytes": 54695,
+      "sha256": "99984107b80f6595e34a3e68abca924a5a9525d3d352de0e7dfd672e978cc081"
+    },
+    {
+      "path": "docs/archive/planning/embedded/apps/03-fractal-explorer.md",
+      "derived_from": "docs/archive/planning/root/README-2026-11-10-full-specification.md",
+      "kind": "embedded source",
+      "embedded_name": "apps/03-fractal-explorer.md",
+      "bytes": 54149,
+      "sha256": "8d96a21550b0d5b955c3c8db7d62400323c237d72542fee5c1cfbde5ade4e9a8"
+    },
+    {
+      "path": "docs/archive/planning/embedded/apps/04-particle-universe.md",
+      "derived_from": "docs/archive/planning/root/README-2026-11-10-full-specification.md",
+      "kind": "embedded source",
+      "embedded_name": "apps/04-particle-universe.md",
+      "bytes": 53849,
+      "sha256": "118c17a296c184236da271ad0f539783664d6931fca7ceb389a5916295e5445f"
+    },
+    {
+      "path": "docs/archive/planning/embedded/apps/05-infinite-geometry.md",
+      "derived_from": "docs/archive/planning/root/README-2026-11-10-full-specification.md",
+      "kind": "embedded source",
+      "embedded_name": "apps/05-infinite-geometry.md",
+      "bytes": 53262,
+      "sha256": "329159552c0aeac3b72d859311ef2fad4c61ff14f8c1bdaa2115d188d6ea944e"
+    },
+    {
+      "path": "docs/archive/planning/embedded/apps/06-visualcore-music-lab.md",
+      "derived_from": "docs/archive/planning/root/README-2026-11-10-full-specification.md",
+      "kind": "embedded source",
+      "embedded_name": "apps/06-visualcore-music-lab.md",
+      "bytes": 54507,
+      "sha256": "428a8da52129a5976fd396c1367718552b281006eec522abf072843b5da30d28"
+    },
+    {
+      "path": "docs/archive/planning/embedded/apps/07-audio-odyssey.md",
+      "derived_from": "docs/archive/planning/root/README-2026-11-10-full-specification.md",
+      "kind": "embedded source",
+      "embedded_name": "apps/07-audio-odyssey.md",
+      "bytes": 53820,
+      "sha256": "2bec53c4b2e23f0536122c1b17cc9a54e1366243eb7ae3ebfa84caf4810266bc"
+    },
+    {
+      "path": "docs/archive/planning/embedded/apps/08-oscilloscope-studio.md",
+      "derived_from": "docs/archive/planning/root/README-2026-11-10-full-specification.md",
+      "kind": "embedded source",
+      "embedded_name": "apps/08-oscilloscope-studio.md",
+      "bytes": 53641,
+      "sha256": "4630f888041f2f44ddbd4dd071f857b4e56a87a37d3a5932b319df40d05b3456"
+    },
+    {
+      "path": "docs/archive/planning/embedded/apps/09-digital-aquarium.md",
+      "derived_from": "docs/archive/planning/root/README-2026-11-10-full-specification.md",
+      "kind": "embedded source",
+      "embedded_name": "apps/09-digital-aquarium.md",
+      "bytes": 53943,
+      "sha256": "1621d0893b92783555ede8bb72be5828eade9b4e2018bec4d1ca9e991c06868c"
+    },
+    {
+      "path": "docs/archive/planning/embedded/apps/10-neon-arcade.md",
+      "derived_from": "docs/archive/planning/root/README-2026-11-10-full-specification.md",
+      "kind": "embedded source",
+      "embedded_name": "apps/10-neon-arcade.md",
+      "bytes": 53518,
+      "sha256": "5dc63ea3cceee8b727f226491018b30392214f6cff171762137dcc28d3f1a2ec"
+    },
+    {
+      "path": "docs/archive/planning/embedded/apps/11-physics-playground.md",
+      "derived_from": "docs/archive/planning/root/README-2026-11-10-full-specification.md",
+      "kind": "embedded source",
+      "embedded_name": "apps/11-physics-playground.md",
+      "bytes": 53689,
+      "sha256": "8457f8ead485ee91843286ce6b31971c9b0656c6521325598f1481e8a7f0fcf4"
+    },
+    {
+      "path": "docs/archive/planning/embedded/apps/12-tiny-worlds.md",
+      "derived_from": "docs/archive/planning/root/README-2026-11-10-full-specification.md",
+      "kind": "embedded source",
+      "embedded_name": "apps/12-tiny-worlds.md",
+      "bytes": 52898,
+      "sha256": "f6ca998dfd914132e92717a5e3fb1b8426e7c37bb60d4cbc3d148be8d0fb0b1c"
+    },
+    {
+      "path": "docs/archive/planning/embedded/apps/13-light-maze.md",
+      "derived_from": "docs/archive/planning/root/README-2026-11-10-full-specification.md",
+      "kind": "embedded source",
+      "embedded_name": "apps/13-light-maze.md",
+      "bytes": 53224,
+      "sha256": "5c62ef567f5f855a2d322b0b15b1572cf86aaf4a08772d0505e7f1282bc1d3d8"
+    },
+    {
+      "path": "docs/archive/planning/embedded/apps/14-solar-system-explorer.md",
+      "derived_from": "docs/archive/planning/root/README-2026-11-10-full-specification.md",
+      "kind": "embedded source",
+      "embedded_name": "apps/14-solar-system-explorer.md",
+      "bytes": 54143,
+      "sha256": "03a27d229017a665e883120387e13b5f4b0d26b527db9a53bff4560f083d78a1"
+    },
+    {
+      "path": "docs/archive/planning/embedded/apps/15-molecular-explorer.md",
+      "derived_from": "docs/archive/planning/root/README-2026-11-10-full-specification.md",
+      "kind": "embedded source",
+      "embedded_name": "apps/15-molecular-explorer.md",
+      "bytes": 53661,
+      "sha256": "34563982f72f4bd01d137f12a93f57482f5794642a948b3c7d7ef4bccdd16a41"
+    },
+    {
+      "path": "docs/archive/planning/embedded/apps/16-simulation-lab.md",
+      "derived_from": "docs/archive/planning/root/README-2026-11-10-full-specification.md",
+      "kind": "embedded source",
+      "embedded_name": "apps/16-simulation-lab.md",
+      "bytes": 54097,
+      "sha256": "20c7b0bf1325b186860c9e4f142c71e48ddc08e0b207d64fd033f2503fa2271f"
+    },
+    {
+      "path": "docs/archive/planning/embedded/apps/17-interactive-anatomy.md",
+      "derived_from": "docs/archive/planning/root/README-2026-11-10-full-specification.md",
+      "kind": "embedded source",
+      "embedded_name": "apps/17-interactive-anatomy.md",
+      "bytes": 53794,
+      "sha256": "933ec4e1c78425bd902760855daaed7e6d96e78514153a4baef8fa4e483135eb"
+    },
+    {
+      "path": "docs/archive/planning/embedded/apps/18-ambient-clock.md",
+      "derived_from": "docs/archive/planning/root/README-2026-11-10-full-specification.md",
+      "kind": "embedded source",
+      "embedded_name": "apps/18-ambient-clock.md",
+      "bytes": 53833,
+      "sha256": "a719c2b74ccc6e83afc3fe612b9f909ea7c38d35e09b044a6422c671e99de57e"
+    },
+    {
+      "path": "docs/archive/planning/embedded/apps/19-living-wallpapers.md",
+      "derived_from": "docs/archive/planning/root/README-2026-11-10-full-specification.md",
+      "kind": "embedded source",
+      "embedded_name": "apps/19-living-wallpapers.md",
+      "bytes": 54065,
+      "sha256": "c28927351b3f61c3df108cc4f724478312090130536db31c2283c2f2d7f01e54"
+    },
+    {
+      "path": "docs/archive/planning/embedded/apps/20-digital-zen-garden.md",
+      "derived_from": "docs/archive/planning/root/README-2026-11-10-full-specification.md",
+      "kind": "embedded source",
+      "embedded_name": "apps/20-digital-zen-garden.md",
+      "bytes": 53494,
+      "sha256": "b5bfc3915dc33c2562fc4e508a1a1cf22632ceace842563b64ecd3936b63dfee"
+    },
+    {
+      "path": "docs/archive/planning/embedded/apps/21-aurora.md",
+      "derived_from": "docs/archive/planning/root/README-2026-11-10-full-specification.md",
+      "kind": "embedded source",
+      "embedded_name": "apps/21-aurora.md",
+      "bytes": 52674,
+      "sha256": "1daca5bd25e29d42ec1d0df35c1d7bbaa25eb97504bf8d37aad852fb5ef2cb19"
+    },
+    {
+      "path": "docs/archive/planning/embedded/apps/22-shader-studio.md",
+      "derived_from": "docs/archive/planning/root/README-2026-11-10-full-specification.md",
+      "kind": "embedded source",
+      "embedded_name": "apps/22-shader-studio.md",
+      "bytes": 54003,
+      "sha256": "989b136f8e154ffc5ebff722da7af61fb8245534a97edfcca76c8361c3e81c23"
+    },
+    {
+      "path": "docs/archive/planning/embedded/apps/23-visual-programming-lab.md",
+      "derived_from": "docs/archive/planning/root/README-2026-11-10-full-specification.md",
+      "kind": "embedded source",
+      "embedded_name": "apps/23-visual-programming-lab.md",
+      "bytes": 54149,
+      "sha256": "a7a4285d56c7a739efb28c22433ea4b5582fcc1013ee3a49adcf376de3e1571c"
+    },
+    {
+      "path": "docs/archive/planning/embedded/apps/24-graphics-benchmark-lab.md",
+      "derived_from": "docs/archive/planning/root/README-2026-11-10-full-specification.md",
+      "kind": "embedded source",
+      "embedded_name": "apps/24-graphics-benchmark-lab.md",
+      "bytes": 54575,
+      "sha256": "02488510c4d139cb9131c4ba6dff5f69beddfe8922d64cf5e1ad1413bc5d9f7d"
+    },
+    {
+      "path": "docs/archive/planning/embedded/apps/25-effects-composer.md",
+      "derived_from": "docs/archive/planning/root/README-2026-11-10-full-specification.md",
+      "kind": "embedded source",
+      "embedded_name": "apps/25-effects-composer.md",
+      "bytes": 54190,
+      "sha256": "8ce0dd99f2dbfb18dffb06f3de3b13786fd91203dbd19cb0d5136e494e205457"
+    },
+    {
+      "path": "docs/archive/planning/embedded/sources/VisualCore-25-App-Specs-Index.md",
+      "derived_from": "docs/archive/planning/root/README-2026-11-10-full-specification.md",
+      "kind": "embedded source",
+      "embedded_name": "sources/VisualCore-25-App-Specs-Index.md",
+      "bytes": 5592,
+      "sha256": "08dd90cd17e1aae43e2e27921f92b7bb5aca0982040c0a93c930fe32bd6cc837"
+    },
+    {
+      "path": "docs/archive/planning/embedded/sources/VisualCore-25-App-Specs/INDEX.md",
+      "derived_from": "docs/archive/planning/root/README-2026-11-10-full-specification.md",
+      "kind": "embedded source",
+      "embedded_name": "sources/VisualCore-25-App-Specs/INDEX.md",
+      "bytes": 5592,
+      "sha256": "08dd90cd17e1aae43e2e27921f92b7bb5aca0982040c0a93c930fe32bd6cc837"
+    },
+    {
+      "path": "docs/archive/planning/embedded/sources/VisualCore-25-App-Specs-manifest.json",
+      "derived_from": "docs/archive/planning/root/README-2026-11-10-full-specification.md",
+      "kind": "embedded source",
+      "embedded_name": "sources/VisualCore-25-App-Specs-manifest.json",
+      "bytes": 6597,
+      "sha256": "92f9c683553a83cd97678ffed2935ec494d49a40d185d03e98c34edfbdf98364"
+    },
+    {
+      "path": "docs/archive/planning/embedded/sources/ProjectM-iOS-CLAUDE.md",
+      "derived_from": "docs/archive/planning/root/README-2026-11-10-full-specification.md",
+      "kind": "embedded source",
+      "embedded_name": "sources/ProjectM-iOS-CLAUDE.md",
+      "bytes": 25405,
+      "sha256": "8f691031510a776b4cef8a6b15597b4176729ab76b66f1702886e1e65f4ae4c1"
+    },
+    {
+      "path": "docs/archive/planning/embedded/sources/devices.md",
+      "derived_from": "docs/archive/planning/root/README-2026-11-10-full-specification.md",
+      "kind": "embedded source",
+      "embedded_name": "sources/devices.md",
+      "bytes": 2871,
+      "sha256": "7ba8f719421a62ce1b67641f0146ca661e65e092226cc4bc9079351f50aaa96e"
+    },
+    {
+      "path": "docs/archive/planning/embedded/sources/Previous-autopilot-runbook.md",
+      "derived_from": "docs/archive/planning/root/README-2026-11-10-full-specification.md",
+      "kind": "embedded source",
+      "embedded_name": "sources/Previous-autopilot-runbook.md",
+      "bytes": 98820,
+      "sha256": "492ec9ac2c9b1b7743a66319c1fca6f929491645be61d848f511d52ad4133b09"
+    },
+    {
+      "path": "docs/archive/planning/playbook/Playbook-new-iOS-app-with-Claude-and-Spec-Kit-2026-11-10.md",
+      "derived_from": "docs/archive/planning/root/CLAUDE-2026-11-11-agent-contract.md",
+      "kind": "verbatim section (from the playbook heading to the end of the file)",
+      "bytes": 12778,
+      "sha256": "a00764a5f29a9c60c2c3919058f4ed2e13f5b624c469e630b35ccfd65a95a6ab"
+    }
+  ]
+}
