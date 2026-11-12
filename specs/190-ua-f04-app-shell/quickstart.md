@@ -16,6 +16,8 @@ Each is recorded with `python3 scripts/migration_ledger.py run-check --gate UA-F
 | `app-isolation` | `python3 scripts/check_app_isolation.py --app Apps/VisualCore --require-sources --built-app <built app>` | pass: no network, no shim import, no usage description |
 | `release-symbols` | a release build of the app for the generic simulator, searched for the debug support names | 0 found |
 | `host-visualcore` | `swift test --package-path Packages/VisualCore` | pass |
+| `rendering-ios27`, `rendering-ios26` | the rendering package tests on both simulator runtimes (the app links its products) | TEST SUCCEEDED |
+| `release-tool` | `python3 scripts/release_check.py --list` | the unsigned simulator build of the scheme VisualCore is a step |
 | `pure-ios27`, `pure-ios26` | the pure package tests on both simulator runtimes | TEST SUCCEEDED |
 | `public-api`, `dependencies`, `documented-api-*` | as in every framework gate | pass |
 | `reference-a`, `reference-b` | the two chunks of the ProjectM reference regression | 3 of 3 and 4 of 4 |

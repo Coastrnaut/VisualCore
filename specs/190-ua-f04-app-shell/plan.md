@@ -109,6 +109,8 @@ Apps/VisualCore/
 
 project.yml                            modify: targets VisualCore, VisualCoreTests, VisualCoreUITests; scheme VisualCore
 scripts/xcodebuild_app.py              new
+scripts/check_release_symbols.py       modify: option --forbid for the release-contents check
+scripts/release_check.py               modify: the unsigned simulator build of the app as a step
 scripts/test_scripts.py                modify
 docs/api/visualcore-public-api.txt     modify (generated)
 README.md, docs/getting-started.md, Auto-Creator.md (sections 11.1, 11.7, 16), docs/migration/path-map.json   modify in place
