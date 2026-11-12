@@ -1,0 +1,419 @@
+{
+ "schema": 1,
+ "note": "How each shared round feature maps onto the existing VisualCore framework and the unified-app features. 'existing' lists public types that exist today and are reused; 'home' names the module that receives new code ('(new)' marks a proposed module). Dispositions: reuse (audit and adapter only), extend (existing module grows), new (new capability), superseded (delivered by unified-app features; no separate gate). Rounds 3 to 12 share one list by feature number.",
+ "round-02": {
+  "F01": {
+   "disposition": "superseded",
+   "existing": [],
+   "home": "",
+   "note": "Replaced by the pre-migration baseline, the two ledgers and UA-F00; no Round 1 device exit gate exists any more (C-03)."
+  },
+  "F02": {
+   "disposition": "reuse",
+   "existing": [
+    "RenderCapabilities"
+   ],
+   "home": "VisualCoreRendering",
+   "note": "Audit only: the public API baseline (docs/api/visualcore-public-api.txt, scripts/check_public_api.py) and RenderCapabilities already exist; add capability probes only where a game needs one."
+  },
+  "F03": {
+   "disposition": "reuse",
+   "existing": [
+    "SeededRandom",
+    "SplitMix64",
+    "FixedStepClock",
+    "SceneClock",
+    "FixedStepRunner",
+    "TimeStepPolicy"
+   ],
+   "home": "VisualCoreMath, VisualCoreSimulation",
+   "note": "Deterministic time and randomness exist; add only missing numeric helpers with tests."
+  },
+  "F04": {
+   "disposition": "reuse",
+   "existing": [
+    "ResourceRegistry",
+    "ResourceLedger",
+    "ResourceBudget",
+    "RenderLifecycle"
+   ],
+   "home": "VisualCoreRendering, VisualCoreDiagnostics",
+   "note": "Ownership rules exist; the session-level rules are delivered by UA-F03."
+  },
+  "F05": {
+   "disposition": "new",
+   "existing": [
+    "Mesh",
+    "MeshRenderer",
+    "PrimitiveRenderer"
+   ],
+   "home": "(new) VisualCoreGeometry, VisualCoreRendering",
+   "note": "Indexed mesh compiler with bevels, tubes, manifold and bounds validation on top of the existing Mesh and MeshRenderer."
+  },
+  "F06": {
+   "disposition": "extend",
+   "existing": [
+    "ShaderLibrary",
+    "ShaderBundle",
+    "ShaderProgram",
+    "InfoLogParser",
+    "ShaderCacheKey"
+   ],
+   "home": "VisualCoreShaderSource, VisualCoreRendering",
+   "note": "Typed per-domain shader parameters and safe GLSL ES compilation on the existing shader pipeline."
+  },
+  "F07": {
+   "disposition": "extend",
+   "existing": [
+    "EffectRenderer",
+    "FloatRenderSupport",
+    "FlashLimiterModel",
+    "RenderTarget"
+   ],
+   "home": "VisualCoreEffects",
+   "note": "Linear-colour emissive pass and mobile-safe bloom; the bloom and flash limiter of VisualCoreEffects are the starting point."
+  },
+  "F08": {
+   "disposition": "new",
+   "existing": [
+    "Mesh",
+    "MeshRenderer"
+   ],
+   "home": "(new) VisualCoreGeometry, VisualCoreRendering",
+   "note": "Curve, ribbon and tube batches with parallel-transport frames."
+  },
+  "F09": {
+   "disposition": "extend",
+   "existing": [
+    "ParticleRenderer",
+    "ParticleBlend",
+    "ParticleLayerScene",
+    "ParticleSystem"
+   ],
+   "home": "VisualCoreRendering",
+   "note": "Instanced points exist; add beams and generic instancing."
+  },
+  "F10": {
+   "disposition": "extend",
+   "existing": [
+    "Palette",
+    "AccessibleColors",
+    "AccessibilityPreferences"
+   ],
+   "home": "VisualCoreParameters, VisualCoreUI",
+   "note": "Spectral palettes plus non-colour clues (shape, pattern, label) for every colour-coded rule."
+  },
+  "F11": {
+   "disposition": "new",
+   "existing": [],
+   "home": "(new) VisualCoreGeometry, VisualCoreShaderSource",
+   "note": "Signed-distance and constructive-geometry library with CPU proxies that decide outcomes."
+  },
+  "F12": {
+   "disposition": "new",
+   "existing": [],
+   "home": "(new) VisualCoreGeometry",
+   "note": "Robust convex clipping and polygon operations, pure and host-tested."
+  },
+  "F13": {
+   "disposition": "new",
+   "existing": [
+    "MeshRenderer"
+   ],
+   "home": "(new) VisualCoreGeometry, VisualCoreRendering",
+   "note": "Shadow volumes or stencils and silhouette analysis; CPU decides, GPU portrays."
+  },
+  "F14": {
+   "disposition": "extend",
+   "existing": [
+    "Timeline",
+    "TimelineEvent",
+    "FixedStepRunner",
+    "ControlStream",
+    "PlaybackState"
+   ],
+   "home": "VisualCoreSimulation",
+   "note": "Reversible history and scrubbing on the existing timeline and replay stream."
+  },
+  "F15": {
+   "disposition": "new",
+   "existing": [
+    "OrbitCamera"
+   ],
+   "home": "VisualCoreMath",
+   "note": "Conic orbits and eclipse geometry, pure and host-tested."
+  },
+  "F16": {
+   "disposition": "new",
+   "existing": [],
+   "home": "(new) VisualCorePuzzle",
+   "note": "Grid, graph and route solvers used by solvability certification."
+  },
+  "F17": {
+   "disposition": "extend",
+   "existing": [
+    "FieldGrid",
+    "FieldPass",
+    "PingPongTarget",
+    "FieldUniform"
+   ],
+   "home": "VisualCoreSimulation, VisualCoreRendering",
+   "note": "Height-field transport with conservation checks on the existing field passes."
+  },
+  "F18": {
+   "disposition": "new",
+   "existing": [
+    "Mesh",
+    "MeshRenderer"
+   ],
+   "home": "(new) VisualCoreGeometry, VisualCoreRendering",
+   "note": "Procedural terrain meshes and a sky dome."
+  },
+  "F19": {
+   "disposition": "new",
+   "existing": [
+    "SeededRandom"
+   ],
+   "home": "(new) VisualCoreGeometry",
+   "note": "Compact grammar-based vegetation generator."
+  },
+  "F20": {
+   "disposition": "new",
+   "existing": [
+    "ParticleSystem",
+    "FixedStepRunner"
+   ],
+   "home": "VisualCoreSimulation",
+   "note": "Bounded swarm and steering simulation."
+  },
+  "F21": {
+   "disposition": "new",
+   "existing": [
+    "FieldGrid"
+   ],
+   "home": "VisualCoreSimulation",
+   "note": "Diffusion, nutrient and viability field solver."
+  },
+  "F22": {
+   "disposition": "extend",
+   "existing": [
+    "TapRecognizer",
+    "DragRecognizer",
+    "PinchRecognizer",
+    "RotateRecognizer",
+    "LongPressRecognizer",
+    "DoubleTapRecognizer",
+    "PointerTracker",
+    "OrbitCamera",
+    "Camera2D"
+   ],
+   "home": "VisualCoreScenes, VisualCoreMath",
+   "note": "Gesture recognizers and cameras exist; add analytic picking and world-space controls."
+  },
+  "F23": {
+   "disposition": "new",
+   "existing": [
+    "FixedStepSimulation",
+    "ParameterHash"
+   ],
+   "home": "(new) VisualCorePuzzle",
+   "note": "Puzzle contract, seeded generation and solver certification; the lifecycle and digest parts are delivered by UA-F02."
+  },
+  "F24": {
+   "disposition": "new",
+   "existing": [
+    "Preset",
+    "NamedLibrary"
+   ],
+   "home": "(new) VisualCorePuzzle, scripts/",
+   "note": "Content authoring, balancing and level catalogs generated and validated by tools."
+  },
+  "F25": {
+   "disposition": "superseded",
+   "existing": [
+    "RenderSurface"
+   ],
+   "home": "",
+   "note": "The shared shell is the one app: UA-F03 (session) and UA-F04 (launcher, navigation, settings)."
+  },
+  "F26": {
+   "disposition": "extend",
+   "existing": [
+    "AccessibilitySettingsSection",
+    "SystemAccessibilityObserver",
+    "AccessibilityPreferences",
+    "EffectiveAccessibility"
+   ],
+   "home": "VisualCoreUI, VisualCoreSimulation",
+   "note": "Input, accessibility and haptics contract for games; shell-level parts are in UA-F04."
+  },
+  "F27": {
+   "disposition": "superseded",
+   "existing": [],
+   "home": "",
+   "note": "Entitlement is UA-F08 (one non-consumable); the zero-advertising audit is UA-F11. The source's 'no StoreKit' rule is superseded (C-02)."
+  },
+  "F28": {
+   "disposition": "superseded",
+   "existing": [
+    "DocumentStore",
+    "NamedLibrary",
+    "MigrationChain",
+    "DocumentEnvelope"
+   ],
+   "home": "",
+   "note": "Per-experience storage, migrations and atomic saves are UA-F05 on VisualCorePersistence."
+  },
+  "F29": {
+   "disposition": "superseded",
+   "existing": [
+    "StillCapture",
+    "ImageComparison",
+    "ImageStatistics"
+   ],
+   "home": "",
+   "note": "Golden, shader and mesh regression harness is part of the verification runner UA-F09."
+  },
+  "F30": {
+   "disposition": "superseded",
+   "existing": [],
+   "home": "",
+   "note": "One app target: build matrix and CI are UA-F10 (C-05)."
+  },
+  "F31": {
+   "disposition": "superseded",
+   "existing": [
+    "AutomationRunner",
+    "AutomationReport"
+   ],
+   "home": "",
+   "note": "Simulator part in UA-F09, device part in UA-F13."
+  },
+  "F32": {
+   "disposition": "superseded",
+   "existing": [
+    "FramePacing",
+    "QualityPolicy",
+    "DeviceConditions"
+   ],
+   "home": "",
+   "note": "Quality profiles and pacing are UA-F06; D3 measurements happen after the lock."
+  },
+  "F33": {
+   "disposition": "superseded",
+   "existing": [],
+   "home": "",
+   "note": "Distinctiveness audit is UA-F11; packaging is UA-F14 for the one app."
+  },
+  "F34": {
+   "disposition": "superseded",
+   "existing": [],
+   "home": "",
+   "note": "Reconciliation and evidence lock are LOCK-FREE-50 and UA-F12."
+  }
+ },
+ "rounds-03-12": {
+  "F01": {
+   "disposition": "superseded",
+   "existing": [],
+   "home": "",
+   "note": "Round boundary and prior-device exit are replaced by the ledgers and UA-F00 (C-03)."
+  },
+  "F02": {
+   "disposition": "reuse",
+   "existing": [
+    "RenderCapabilities",
+    "ShaderPrecision"
+   ],
+   "home": "VisualCoreRendering",
+   "note": "Re-audit of the renderer API and GLSL ES assumptions for the round's families; no new code unless the audit finds a gap."
+  },
+  "F03": {
+   "disposition": "extend",
+   "existing": [
+    "Vec3",
+    "Mat4",
+    "Quat",
+    "SeededRandom"
+   ],
+   "home": "VisualCoreMath",
+   "note": "Only the family-specific math that is genuinely missing, with error bounds and replay hashes."
+  },
+  "F04": {
+   "disposition": "extend",
+   "existing": [
+    "Mesh",
+    "MeshRenderer"
+   ],
+   "home": "(new) VisualCoreGeometry",
+   "note": "Extends the Round 2 mesh, ribbon and surface compilers (R02-F05, R02-F08)."
+  },
+  "F05": {
+   "disposition": "extend",
+   "existing": [
+    "ShaderLibrary",
+    "ShaderBundle",
+    "EffectRenderer"
+   ],
+   "home": "VisualCoreShaderSource, VisualCoreEffects",
+   "note": "Shader variants and the emissive pass on top of R02-F06 and R02-F07."
+  },
+  "F06": {
+   "disposition": "extend",
+   "existing": [
+    "ParticleRenderer",
+    "PointerTracker"
+   ],
+   "home": "VisualCoreRendering, VisualCoreScenes",
+   "note": "Family-specific batching and object picking on top of R02-F09 and R02-F22."
+  },
+  "F07": {
+   "disposition": "extend",
+   "existing": [
+    "SeededRandom",
+    "ParameterHash"
+   ],
+   "home": "(new) VisualCorePuzzle",
+   "note": "Seeded generation, uniqueness and progression proofs on top of R02-F23 and R02-F24."
+  },
+  "F08": {
+   "disposition": "extend",
+   "existing": [
+    "OrbitCamera",
+    "AccessibilityPreferences"
+   ],
+   "home": "VisualCoreScenes, VisualCoreUI",
+   "note": "Touch, camera and accessibility adapters on top of R02-F22 and R02-F26."
+  },
+  "F09": {
+   "disposition": "superseded",
+   "existing": [
+    "FramePacing",
+    "QualityPolicy",
+    "DeviceConditions"
+   ],
+   "home": "",
+   "note": "Benchmarks are prepared by UA-F06 and measured on devices after the lock."
+  },
+  "F10": {
+   "disposition": "superseded",
+   "existing": [],
+   "home": "",
+   "note": "One target instead of 25: UA-F10 (C-05)."
+  },
+  "F11": {
+   "disposition": "superseded",
+   "existing": [
+    "AutomationRunner"
+   ],
+   "home": "",
+   "note": "Simulator evidence in UA-F09, device fixtures in UA-F13."
+  },
+  "F12": {
+   "disposition": "superseded",
+   "existing": [],
+   "home": "",
+   "note": "Originality, legal and no-advertising audits are UA-F11; final reconciliation is UA-F12."
+  }
+ }
+}

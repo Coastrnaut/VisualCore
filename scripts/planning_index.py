@@ -35,6 +35,7 @@ ARCHIVE = Path("docs/archive/planning")
 OUT_DIR = Path("docs/catalog")
 CATALOG = OUT_DIR / "experience-catalog.json"
 FEATURES = OUT_DIR / "feature-index.json"
+BRIEFS = OUT_DIR / "unified-app-features.json"
 SPEC_DOC = ARCHIVE / "root/README-2026-11-10-full-specification.md"
 LEDGER = Path(".autonomy/state.json")
 STAGES = ["specify", "clarify", "plan", "checklist", "tasks", "analyze", "implement", "converge"]
@@ -655,10 +656,155 @@ OVERRIDE_SHARED = (
 )
 
 
+OVERRIDE_APP_PHASE = (
+    "Canonical override (ADR-0009, Auto-Creator.md section 21): this app is experience {code} inside the single "
+    "VisualCore app. Do not create or extend a standalone app target, bundle identifier or store listing. Until "
+    "UA-F07 has moved an app, its sources stay where they are; afterwards and for every app not yet started the "
+    "sources are the experience modules named in Auto-Creator.md section 16. Store-listing, pricing and per-app "
+    "release-dossier parts of Phase 06 are inapplicable; its quality, privacy, accessibility and regression gates "
+    "stand. Physical-device tasks are tagged {{device}} and run only after ImplementationLock-100. Feature directory "
+    "and ids follow ADR-0004 (specs/{number:03d}-*, FR-{code}-{phase}##, SC-{code}-{phase}##, T-{code}-{phase}##); "
+    "evidence is recorded with Tools/python/desktop_runbook.py run-check --stage {gate}. All other requirements of "
+    "the prompt stand."
+)
+UNIFIED_BOUNDARIES = (
+    "BOUNDARIES: one app target (VisualCore) and one bundle identifier; experiences never depend on each other; the "
+    "OpenGL ES to ANGLE to Metal path is the only renderer and is not forked; External/projectm-ios is read-only and "
+    "ProjectM types stay out of the VisualCore public API and out of the app; public Apple APIs only; no advertising, "
+    "analytics or tracking code and no network use; pure logic goes in Packages/VisualCore and GPU or UIKit code in "
+    "Packages/VisualCoreRendering; every public symbol gets /// documentation and the API baseline is updated; no "
+    "physical-device action before ImplementationLock-100; owner-only actions are recorded as BLOCKED_OWNER_ACTION and "
+    "never performed."
+)
+UNIFIED_DISCIPLINE = (
+    "DISCIPLINE: work in Claude Desktop Code on branch migration/unified-app-plan (never the Claude CLI, never a push to "
+    "main). Reference only APIs verified in the current source; every name marked (new) or proposed in the brief must "
+    "be confirmed or corrected against real code and the correction recorded. Never claim device performance from "
+    "simulator results. Tick a task only with reproduced evidence in the form '- [X] <id> ... \u2014 Verified YYYY-MM-DD: "
+    "<command and result>'. Commit after every task without trailers."
+)
+
+
+def load_briefs(root: Path) -> dict:
+    return json.loads((root / BRIEFS).read_text(encoding="utf-8"))
+
+
+def numbered(items: list[str]) -> str:
+    return " ".join(f"({i}) {text}{'' if text.endswith('.') else '.'}" for i, text in enumerate(items, 1)) if items else "none."
+
+
+def unified_prompts(brief: dict) -> dict[str, str]:
+    """The eight copy-ready stage prompts of one unified-app feature, rendered from its brief."""
+    fid, ns = brief["id"], brief["namespace"]
+    directory = f"specs/{brief['number']}-{brief['slug']}"
+    ids = f"requirement ids FR-{ns}-###, success criteria SC-{ns}-###, task ids T-{ns}-###"
+    override = f"Canonical override: feature directory {directory}; {ids}"
+    check = f"python3 scripts/migration_ledger.py run-check --gate {fid} --name <check-name> -- <command>"
+    depends = ", ".join(brief["depends_on"]) or "none"
+    absorbed = ("ABSORBED SOURCE REQUIREMENTS: " + "; ".join(brief["absorbs"]) + ". Read each archived feature with "
+                "python3 scripts/planning_index.py prompt --feature <ID> --stage specify, and list every unique requirement "
+                "in the specification as adopted, adapted or superseded with the reason.\n") if brief["absorbs"] else ""
+    return {
+        "specify": (
+            f"/speckit-specify Feature {fid}: {brief['title']}.\n"
+            f"SCOPE: {brief['scope']}\n"
+            f"DEPENDS ON: {depends} (each must be pass in the migration ledger before this feature is implemented).\n"
+            f"SOURCES TO READ FIRST: {'; '.join(brief['sources'])}.\n"
+            f"{absorbed}"
+            f"ACCEPTANCE (each item becomes at least one functional requirement and one measurable success criterion): "
+            f"{numbered(brief['acceptance'])}\n"
+            f"OUT OF SCOPE: {numbered(brief['out_of_scope'])}\n"
+            f"DEVICE-ONLY VERIFICATION (tasks tagged {{device}}, run only after ImplementationLock-100): {numbered(brief['device'])}\n"
+            f"OWNER-ONLY ITEMS (tasks tagged {{owner}}, never performed by the agent): {numbered(brief['owner'])}\n"
+            f"{UNIFIED_BOUNDARIES}\n"
+            "Write prioritized user stories that can each be tested alone, acceptance scenarios, and edge cases for failure, "
+            "cancellation, lifecycle interruption, memory pressure and corrupted or newer-version data where they apply. "
+            "State requirements as observable behavior; name existing modules only where the brief names them.\n"
+            f"{override}."
+        ),
+        "clarify": (
+            f"/speckit-clarify Review the {fid} specification for unverified VisualCore or Apple APIs, lifecycle and thread-"
+            "ownership assumptions, data-format and migration semantics, performance statements that need a device, and "
+            "anything that contradicts ADR-0009 or the Auto-Creator.md sections named in the sources. Ask only questions "
+            "whose answer changes the design, at most five.\n"
+            f"{override}. Answer every question yourself under the owner's standing delegation, recommended option first, "
+            "and record each answer in spec.md under Clarifications."
+        ),
+        "plan": (
+            f"/speckit-plan Create the technical plan for {fid}. Begin with a read-only audit of the existing sources named "
+            "in the brief and record it in research.md; reference only APIs the audit verified. Give exact source paths, "
+            "each marked existing, new, move or modify; module and dependency direction; public API; lifecycle and thread-"
+            "ownership contracts; data schemas with versions and migrations; the tests of each layer (host, package tests "
+            "on the iOS 27.x and iOS 26.5 simulators, app UI tests); build and test commands; rollback. Check the plan "
+            "against every constitution principle. quickstart.md must contain these evidence commands: "
+            f"{'; '.join(brief['evidence'])}. When VisualCore changes: python3 scripts/check_public_api.py --update, "
+            "python3 scripts/check_documented_api.py, and the seven-step ProjectM reference regression in two chunks.\n"
+            f"{UNIFIED_DISCIPLINE}\n"
+            f"{override}. The clarification decisions are binding."
+        ),
+        "checklist": (
+            f"/speckit-checklist Generate the requirements-quality checklist for {fid}: completeness, clarity, consistency, "
+            "measurability, lifecycle and failure coverage, privacy and no-advertising constraints, accessibility, the split "
+            "between simulator-verifiable and device-only requirements, and traceability to the sources.\n"
+            f"{override}. Evaluate every item yourself under the owner's standing delegation, record the evaluation in the "
+            "checklist, and correct the specification for every failed item before continuing."
+        ),
+        "tasks": (
+            f"/speckit-tasks Break {fid} into dependency-ordered tasks with exact files, tests written before the code they "
+            "prove, an integration acceptance task per user story, commit boundaries and review checkpoints. Include one task "
+            "for every evidence command of quickstart.md; the documentation, API-baseline and ProjectM-regression tasks when "
+            "VisualCore changes; one task tagged {device} for every device-only item and one tagged {owner} for every "
+            "owner-only item; and a final task that runs /speckit-converge until it appends nothing.\n"
+            f"{override}. Tasks start at T-{ns}-001. Evidence is recorded with {check}."
+        ),
+        "analyze": (
+            f"/speckit-analyze Validate the {fid} specification, plan and tasks: requirements without tasks, tasks without "
+            "requirements, speculative dependencies, missing tests, ambiguous terms, and conflicts with the constitution or "
+            "ADR-0009. Stop if a critical finding remains.\n"
+            f"{override}. Apply the fixes yourself under the owner's standing delegation, record them in the artifacts, and "
+            "run the analysis again until no critical or high finding remains."
+        ),
+        "implement": (
+            f"/speckit-implement Implement {fid} task by task in small verified groups. Run the real builds and tests (host "
+            "tests, package tests on the iOS 27.x and iOS 26.5 simulators, app tests where the feature has UI); a task is "
+            "never ticked from reading code. Tasks tagged {device} or {owner} stay open, are listed in the final report and "
+            "do not block the gate.\n"
+            f"{UNIFIED_DISCIPLINE}\n"
+            f"{override}. Record each passing command with {check}."
+        ),
+        "converge": (
+            f"/speckit-converge Assess the code against the {fid} specification, plan and tasks and append every remaining gap "
+            "as a task. Then run /speckit-implement for the appended tasks and /speckit-converge again; repeat until a run "
+            "appends nothing and reports what it checked. Only then seal and record the gate: "
+            f"python3 scripts/migration_ledger.py seal --gate {fid} && python3 scripts/migration_ledger.py record --gate {fid}.\n"
+            f"{override}. Appended tasks continue the T-{ns}-### sequence."
+        ),
+    }
+
+
 def cmd_prompt(args: argparse.Namespace) -> int:
+    wanted = args.feature.upper()
+    if wanted in ("CONSTITUTION-2", "CONSTITUTION"):
+        print("# CONSTITUTION-2 — amend the constitution to 2.0.0 — /speckit-constitution  (docs/catalog/unified-app-features.json)")
+        print(load_briefs(ROOT)["constitution_amendment"]["prompt"])
+        return 0
+    if wanted.startswith("UA-F"):
+        brief = next((b for b in load_briefs(ROOT)["features"] if b["id"] == wanted), None)
+        if not brief:
+            raise SystemExit(f"ERROR: unknown feature {args.feature}")
+        prompts = unified_prompts(brief)
+        for stage in ([args.stage] if args.stage else STAGES):
+            print(f"# {brief['id']} — {brief['title']} — /speckit-{stage}  (docs/catalog/unified-app-features.json)")
+            print(prompts[stage])
+            print()
+        return 0
     feature = load_feature(ROOT, args.feature)
     if "prompts" not in feature:
         print(f"{feature['id']}: prompts are in {feature['prompt_source']}")
+        if args.override and feature["kind"] == "original-app-phase":
+            code, phase = feature["id"].split("-P")
+            print()
+            print(OVERRIDE_APP_PHASE.format(code=code, phase=int(phase), number=int(feature["spec_number"]), gate=feature["id"]))
         return 0
     stages = [args.stage] if args.stage else STAGES
     for stage in stages:
