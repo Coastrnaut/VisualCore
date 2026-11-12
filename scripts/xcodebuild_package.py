@@ -45,10 +45,19 @@ def destination(name: str) -> str:
     raise SystemExit("refused destination (simulator/generic only): " + name)
 
 
-def test_options(language: str | None, region: str | None) -> list[str]:
-    """The xcodebuild options of a test run: explicit timeouts, and the language and region when they are given
-    (feature 187: the catalog search must give the same results under another language setting)."""
+ONLY_TESTING = re.compile(r"[A-Za-z_][A-Za-z0-9_]*(/[A-Za-z_][A-Za-z0-9_]*){0,2}$")
+
+
+def test_options(language: str | None, region: str | None, only: list[str] | None = None) -> list[str]:
+    """The xcodebuild options of a test run: explicit timeouts, the language and region when they are given
+    (feature 187: the catalog search must give the same results under another language setting), and one
+    `-only-testing:` per id of `only` (feature 192: a single test class, such as the endurance run, in one short
+    command). An id is `Target`, `Target/Class` or `Target/Class/method`."""
     options = ["-test-timeouts-enabled", "YES", "-default-test-execution-time-allowance", "180"]
+    for item in only or []:
+        if not ONLY_TESTING.match(item):
+            raise SystemExit("--only-testing takes ids such as Target/Class: " + item)
+        options.append("-only-testing:" + item)
     if language:
         if not (len(language) in (2, 3) and language.isalpha() and language.islower()):
             raise SystemExit("--test-language is an ISO 639 code such as tr")
@@ -69,6 +78,8 @@ def main() -> int:
     ap.add_argument("--result-name", help="xcresult bundle name (test only)")
     ap.add_argument("--test-language", help="ISO 639-1 language to run the tests in (test only; xcodebuild -testLanguage)")
     ap.add_argument("--test-region", help="ISO 3166-1 region to run the tests in (test only; xcodebuild -testRegion)")
+    ap.add_argument("--only-testing", nargs="+", default=[], metavar="ID",
+                    help="run only these tests (test only): Target, Target/Class or Target/Class/method")
     args = ap.parse_args()
     pkg = (ROOT / args.package).resolve()
     if not (pkg / "Package.swift").is_file() or not pkg.is_relative_to(ROOT):
@@ -80,9 +91,10 @@ def main() -> int:
         name = args.result_name or f"{tag}-{dt.datetime.now().strftime('%Y%m%dT%H%M%S')}"
         bundle = ROOT / ".autonomy" / "xcresults" / f"{name}.xcresult"
         bundle.parent.mkdir(parents=True, exist_ok=True)
-        cmd += ["-resultBundlePath", str(bundle)] + test_options(args.test_language, args.test_region)
-    elif args.test_language or args.test_region:
-        raise SystemExit("--test-language and --test-region need --action test")
+        cmd += ["-resultBundlePath", str(bundle)] + test_options(args.test_language, args.test_region,
+                                                                 args.only_testing)
+    elif args.test_language or args.test_region or args.only_testing:
+        raise SystemExit("--test-language, --test-region and --only-testing need --action test")
     print("$ (cd", args.package, ")", " ".join(cmd), flush=True)
     return subprocess.run(cmd, cwd=pkg, check=False).returncode
 

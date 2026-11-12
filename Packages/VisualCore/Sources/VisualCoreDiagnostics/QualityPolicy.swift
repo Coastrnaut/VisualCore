@@ -66,6 +66,14 @@ public struct QualityPolicy: Sendable, Equatable {
         return tier
     }
 
+    /// Forgets timing and keeps the tier: the calm period and the decision interval start again at the next
+    /// decision (feature 192: an experience that resumes after a suspension must not count the time it was away
+    /// as calm).
+    public mutating func forgetTiming() {
+        lastChange = nil
+        calmSince = nil
+    }
+
     /// Returns to the best tier and forgets timing (for example when a screen opens again).
     public mutating func reset() {
         tier = 0

@@ -52,33 +52,61 @@ VisualCoreAutomation | var | public var schema
 VisualCoreAutomation | var | public var startedAt: String
 VisualCoreAutomation | var | public var timeToFirstFrameMs: Double?
 VisualCoreDiagnostics | enum | public enum DiagnosticsInfo
+VisualCoreDiagnostics | enum | public enum GrowthRule
+VisualCoreDiagnostics | enum | public enum GrowthVerdict: Sendable, Equatable
 VisualCoreDiagnostics | enum | public enum Level: String, Sendable, CaseIterable
+VisualCoreDiagnostics | enum | public enum PerformanceRecordError: Error, Sendable, Equatable
+VisualCoreDiagnostics | enum | public enum QualityBudget: String, Sendable, CaseIterable
+VisualCoreDiagnostics | enum | public enum QualityDeclaration
+VisualCoreDiagnostics | enum | public enum QualityProfileError: Error, Sendable, Equatable
 VisualCoreDiagnostics | enum | public enum RenderLifecycleState: String, Sendable, Codable, CaseIterable
 VisualCoreDiagnostics | enum | public enum ResourceBudgetError: Error, Equatable, Sendable
 VisualCoreDiagnostics | enum | public enum ResourceKind: String, CaseIterable, Sendable, Codable
 VisualCoreDiagnostics | enum | public enum Thermal: Int, Sendable, Codable, CaseIterable
+VisualCoreDiagnostics | func | public func elements(requested: Int, level: Int, minimum: Int = 0) -> Int
+VisualCoreDiagnostics | func | public func encoded() throws(PerformanceRecordError) -> Data
+VisualCoreDiagnostics | func | public func iterations(requested: Int, level: Int, minimum: Int = 1) -> Int
+VisualCoreDiagnostics | func | public func level(_ index: Int) -> QualityLevel
 VisualCoreDiagnostics | func | public func limit(requested: Int, tier: Int) -> Int
 VisualCoreDiagnostics | func | public func relative(to reference: RenderCostEstimate) -> Double
 VisualCoreDiagnostics | func | public func share(tier: Int) -> Double
 VisualCoreDiagnostics | func | public mutating func abandonAll() -> Int
 VisualCoreDiagnostics | func | public mutating func allocate(_ kind: ResourceKind, bytes amount: Int) throws(ResourceBudgetError)
+VisualCoreDiagnostics | func | public mutating func decide(conditions: DeviceConditions, now: Double) -> Int
 VisualCoreDiagnostics | func | public mutating func decide(thermal: FramePacing.Thermal, lowPower: Bool, now: Double) -> Int
+VisualCoreDiagnostics | func | public mutating func forgetTiming()
 VisualCoreDiagnostics | func | public mutating func noteShaderFailure()
 VisualCoreDiagnostics | func | public mutating func noteStale()
+VisualCoreDiagnostics | func | public mutating func record(interval: Double, period: Double)
 VisualCoreDiagnostics | func | public mutating func release(_ kind: ResourceKind, bytes amount: Int)
 VisualCoreDiagnostics | func | public mutating func reset()
+VisualCoreDiagnostics | func | public mutating func resume()
+VisualCoreDiagnostics | func | public mutating func setPin(_ pin: Int?)
+VisualCoreDiagnostics | func | public mutating func skipNext()
 VisualCoreDiagnostics | func | public mutating func transition(to next: RenderLifecycleState) -> Bool
 VisualCoreDiagnostics | func | public mutating func warn(_ message: String) -> Bool
 VisualCoreDiagnostics | func | public static func clampedDelta(_ delta: Double) -> Double
 VisualCoreDiagnostics | func | public static func current() -> DeviceConditions
 VisualCoreDiagnostics | func | public static func isAllowed(from: RenderLifecycleState, to: RenderLifecycleState) -> Bool
+VisualCoreDiagnostics | func | public static func judge(_ samples: [ResourceSample]) -> GrowthVerdict
 VisualCoreDiagnostics | func | public static func level(ratio: Double, lightMax: Double = 2, moderateMax: Double = 10) -> Level
+VisualCoreDiagnostics | func | public static func problems(profile: QualityProfile, tierCount: Int, catalogNames: [String]?) -> [String]
 VisualCoreDiagnostics | func | public static func text(ratio: Double) -> String
+VisualCoreDiagnostics | func | public static func uniform(levels: Int) -> QualityProfile
+VisualCoreDiagnostics | init | public init()
 VisualCoreDiagnostics | init | public init(budget: ResourceBudget = ResourceBudget())
+VisualCoreDiagnostics | init | public init(data: Data) throws(PerformanceRecordError)
+VisualCoreDiagnostics | init | public init(experience: String, presented: Bool, qualityLevel: Int, qualityPinned: Bool, qualityLevels: Int,
+VisualCoreDiagnostics | init | public init(footprintBytes: Int?, gpuBytes: Int)
 VisualCoreDiagnostics | init | public init(from: RenderLifecycleState, to: RenderLifecycleState, generation: Int, accepted: Bool)
 VisualCoreDiagnostics | init | public init(historyLimit: Int = 256)
+VisualCoreDiagnostics | init | public init(levelCount: Int, pin: Int? = nil)
+VisualCoreDiagnostics | init | public init(levels: [QualityLevel]) throws(QualityProfileError)
+VisualCoreDiagnostics | init | public init(milliseconds: Double, firstLaunch: Bool)
 VisualCoreDiagnostics | init | public init(minimum: Int, maximum: Int, preferred: Int)
+VisualCoreDiagnostics | init | public init(name: String, resolutionShare: Double = 1, elementShare: Double = 1,
 VisualCoreDiagnostics | init | public init(pixels: Double, iterations: Double, samples: Double = 1)
+VisualCoreDiagnostics | init | public init(samples: Int = 0, onTime: Int = 0, missed: Int = 0, invalid: Int = 0,
 VisualCoreDiagnostics | init | public init(shares: [Double], minimum: Int)
 VisualCoreDiagnostics | init | public init(thermal: FramePacing.Thermal, lowPower: Bool)
 VisualCoreDiagnostics | init | public init(thermal: Thermal, lowPower: Bool, requestedMaxFPS: Int)
@@ -88,58 +116,127 @@ VisualCoreDiagnostics | let | public let accepted: Bool
 VisualCoreDiagnostics | let | public let budget: ResourceBudget
 VisualCoreDiagnostics | let | public let calmPeriod: Double
 VisualCoreDiagnostics | let | public let decisionInterval: Double
+VisualCoreDiagnostics | let | public let effectPasses: Int
+VisualCoreDiagnostics | let | public let elementShare: Double
 VisualCoreDiagnostics | let | public let from: RenderLifecycleState
 VisualCoreDiagnostics | let | public let generation: Int
 VisualCoreDiagnostics | let | public let historyLimit: Int
+VisualCoreDiagnostics | let | public let iterationShare: Double
 VisualCoreDiagnostics | let | public let iterations: Double
+VisualCoreDiagnostics | let | public let levelCount: Int
+VisualCoreDiagnostics | let | public let levels: [QualityLevel]
 VisualCoreDiagnostics | let | public let lowPowerCeiling: Int
 VisualCoreDiagnostics | let | public let maxFPS: Int
 VisualCoreDiagnostics | let | public let minimum: Int
+VisualCoreDiagnostics | let | public let name: String
 VisualCoreDiagnostics | let | public let pixels: Double
 VisualCoreDiagnostics | let | public let renderScale: Double
+VisualCoreDiagnostics | let | public let resolutionShare: Double
 VisualCoreDiagnostics | let | public let samples: Double
 VisualCoreDiagnostics | let | public let shares: [Double]
 VisualCoreDiagnostics | let | public let tierCount: Int
 VisualCoreDiagnostics | let | public let to: RenderLifecycleState
+VisualCoreDiagnostics | let | public static let binCount
+VisualCoreDiagnostics | let | public static let binWidth: Double
 VisualCoreDiagnostics | let | public static let defaultTotal
+VisualCoreDiagnostics | let | public static let footprintMarginBytes
+VisualCoreDiagnostics | let | public static let footprintMarginShare
+VisualCoreDiagnostics | let | public static let footprintQuantity
+VisualCoreDiagnostics | let | public static let gpuQuantity
+VisualCoreDiagnostics | let | public static let maxBytes
+VisualCoreDiagnostics | let | public static let maxEffectPasses
+VisualCoreDiagnostics | let | public static let maxLevels
+VisualCoreDiagnostics | let | public static let maxNameLength
 VisualCoreDiagnostics | let | public static let maximumDelta
 VisualCoreDiagnostics | let | public static let minimumFPS
+VisualCoreDiagnostics | let | public static let minimumInterval: Double
+VisualCoreDiagnostics | let | public static let minimumSamples
 VisualCoreDiagnostics | let | public static let nominal
+VisualCoreDiagnostics | let | public static let optionalKeys: [String]
+VisualCoreDiagnostics | let | public static let requiredKeys: [String]
+VisualCoreDiagnostics | let | public static let single: QualityProfile
 VisualCoreDiagnostics | let | public static let standard
 VisualCoreDiagnostics | let | public static let version
 VisualCoreDiagnostics | struct | public struct DeviceConditions: Sendable, Equatable
 VisualCoreDiagnostics | struct | public struct FramePacing: Sendable, Equatable
+VisualCoreDiagnostics | struct | public struct LaunchTiming: Sendable, Equatable
+VisualCoreDiagnostics | struct | public struct PacingMeter: Sendable, Equatable
+VisualCoreDiagnostics | struct | public struct PacingSummary: Sendable, Equatable, Codable
 VisualCoreDiagnostics | struct | public struct ParticleBudget: Sendable, Equatable
+VisualCoreDiagnostics | struct | public struct PerformanceRecord: Sendable, Equatable
+VisualCoreDiagnostics | struct | public struct QualityGovernor: Sendable, Equatable
+VisualCoreDiagnostics | struct | public struct QualityLevel: Sendable, Equatable
 VisualCoreDiagnostics | struct | public struct QualityPolicy: Sendable, Equatable
+VisualCoreDiagnostics | struct | public struct QualityProfile: Sendable, Equatable
 VisualCoreDiagnostics | struct | public struct Range: Sendable, Equatable
 VisualCoreDiagnostics | struct | public struct RenderCostEstimate: Sendable, Equatable
 VisualCoreDiagnostics | struct | public struct RenderLifecycle: Sendable
 VisualCoreDiagnostics | struct | public struct RenderLifecycleEvent: Sendable, Codable, Equatable
 VisualCoreDiagnostics | struct | public struct ResourceBudget: Sendable, Equatable
 VisualCoreDiagnostics | struct | public struct ResourceLedger: Sendable
+VisualCoreDiagnostics | struct | public struct ResourceSample: Sendable, Equatable
 VisualCoreDiagnostics | struct | public struct Snapshot: Sendable, Equatable, Codable
 VisualCoreDiagnostics | var | public private(set) var generation
 VisualCoreDiagnostics | var | public private(set) var history: [RenderLifecycleEvent]
+VisualCoreDiagnostics | var | public private(set) var pin: Int?
 VisualCoreDiagnostics | var | public private(set) var rejectedTransitions
 VisualCoreDiagnostics | var | public private(set) var state: RenderLifecycleState
 VisualCoreDiagnostics | var | public private(set) var stepsDown
 VisualCoreDiagnostics | var | public private(set) var stepsUp
 VisualCoreDiagnostics | var | public private(set) var tier
 VisualCoreDiagnostics | var | public var canRender: Bool
+VisualCoreDiagnostics | var | public var code: String
+VisualCoreDiagnostics | var | public var count: Int
+VisualCoreDiagnostics | var | public var experience: String
+VisualCoreDiagnostics | var | public var firstLaunch: Bool
+VisualCoreDiagnostics | var | public var firstLaunch: Bool?
+VisualCoreDiagnostics | var | public var firstPresentMs: Double?
+VisualCoreDiagnostics | var | public var footprintBytes: Int?
+VisualCoreDiagnostics | var | public var frameCapFPS: Int
+VisualCoreDiagnostics | var | public var gpuBytes: Int
+VisualCoreDiagnostics | var | public var gpuPeakBytes: Int
+VisualCoreDiagnostics | var | public var invalid: Int
+VisualCoreDiagnostics | var | public var lateCompilations: Int
+VisualCoreDiagnostics | var | public var launchMs: Double?
 VisualCoreDiagnostics | var | public var leaked: Int
+VisualCoreDiagnostics | var | public var levelInForce: Int
 VisualCoreDiagnostics | var | public var liveBytes: [ResourceKind: Int]
 VisualCoreDiagnostics | var | public var liveCount: [ResourceKind: Int]
 VisualCoreDiagnostics | var | public var liveTotal: Int
 VisualCoreDiagnostics | var | public var lowPower: Bool
 VisualCoreDiagnostics | var | public var maximum: Int
+VisualCoreDiagnostics | var | public var medianMs: Double?
+VisualCoreDiagnostics | var | public var memoryEvents: Int
+VisualCoreDiagnostics | var | public var memoryFootprintBytes: Int?
+VisualCoreDiagnostics | var | public var milliseconds: Double
 VisualCoreDiagnostics | var | public var minimum: Int
+VisualCoreDiagnostics | var | public var missed: Int
+VisualCoreDiagnostics | var | public var names: [String]
+VisualCoreDiagnostics | var | public var onTime: Int
+VisualCoreDiagnostics | var | public var p95Ms: Double?
+VisualCoreDiagnostics | var | public var p99Ms: Double?
+VisualCoreDiagnostics | var | public var pacing: PacingSummary
+VisualCoreDiagnostics | var | public var passes: Bool
 VisualCoreDiagnostics | var | public var peakBytes: Int
 VisualCoreDiagnostics | var | public var perKind: [ResourceKind: Int]
 VisualCoreDiagnostics | var | public var preferred: Int
+VisualCoreDiagnostics | var | public var prepareMs: Double?
+VisualCoreDiagnostics | var | public var presented: Bool
+VisualCoreDiagnostics | var | public var programsCompiled: Int?
+VisualCoreDiagnostics | var | public var qualityLevel: Int
+VisualCoreDiagnostics | var | public var qualityLevels: Int
+VisualCoreDiagnostics | var | public var qualityPinned: Bool
 VisualCoreDiagnostics | var | public var range: Range
+VisualCoreDiagnostics | var | public var rebuilds: Int
+VisualCoreDiagnostics | var | public var renderScale: Double
+VisualCoreDiagnostics | var | public var samples: Int
+VisualCoreDiagnostics | var | public var setupMs: Double?
 VisualCoreDiagnostics | var | public var shaderFailures: Int
 VisualCoreDiagnostics | var | public var snapshot: Snapshot
 VisualCoreDiagnostics | var | public var staleRejected: Int
+VisualCoreDiagnostics | var | public var stepsDown: Int
+VisualCoreDiagnostics | var | public var stepsUp: Int
+VisualCoreDiagnostics | var | public var summary: PacingSummary
 VisualCoreDiagnostics | var | public var thermal: FramePacing.Thermal
 VisualCoreDiagnostics | var | public var total: Int
 VisualCoreDiagnostics | var | public var totalBytes: Int

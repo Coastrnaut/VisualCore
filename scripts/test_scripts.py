@@ -2825,7 +2825,9 @@ class ExperienceModuleTests(unittest.TestCase):
                 self.assertNotIn(word, code, f"{path.name} names {word}")
             imports = set(re.findall(r"^import\s+(\w+)", text, re.M))
             # UA-F02 adds the pure modules the experience contract adapts; nothing else may be imported.
-            allowed = {"Foundation", "VisualCoreMath", "VisualCoreSimulation", "VisualCorePersistence"}
+            # UA-F06 adds the diagnostics module: an experience declares its quality profile with it.
+            allowed = {"Foundation", "VisualCoreMath", "VisualCoreSimulation", "VisualCorePersistence",
+                       "VisualCoreDiagnostics"}
             self.assertLessEqual(imports, allowed, f"{path.name} imports {sorted(imports)}")
 
     def test_package_test_tool_passes_language_and_region(self):
@@ -2837,6 +2839,20 @@ class ExperienceModuleTests(unittest.TestCase):
         for language, region in (("TR", None), ("turkish", None), (None, "tr"), (None, "TUR"), ("t r", None)):
             with self.assertRaises(SystemExit):
                 tool.test_options(language, region)
+
+    def test_package_test_tool_passes_only_testing(self):
+        """Feature UA-F06 T-U06-002: `--only-testing` ids become `-only-testing:` options; anything that is not
+        a target, class or method id is refused."""
+        tool = load("xcodebuild_package")
+        base = ["-test-timeouts-enabled", "YES", "-default-test-execution-time-allowance", "180"]
+        self.assertEqual(tool.test_options(None, None, ["VisualCoreExperienceHostTests/EnduranceTests"]),
+                         base + ["-only-testing:VisualCoreExperienceHostTests/EnduranceTests"])
+        self.assertEqual(tool.test_options("tr", None, ["A", "B/C/testD"]),
+                         base + ["-only-testing:A", "-only-testing:B/C/testD"] + ["-testLanguage", "tr"])
+        self.assertEqual(tool.test_options(None, None, []), base)
+        for bad in ("A/B/C/D", "A B", "-x", "A/", "A;rm"):
+            with self.assertRaises(SystemExit):
+                tool.test_options(None, None, [bad])
 
 
 class ExperienceSymbolsTests(unittest.TestCase):

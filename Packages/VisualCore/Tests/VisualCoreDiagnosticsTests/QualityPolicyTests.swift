@@ -78,3 +78,19 @@ import Testing
     #expect(p.tier == 0)
     #expect(p.decide(thermal: .critical, lowPower: false, now: 0.5) == 1, "a reset also clears the interval")
 }
+
+// Feature 192 (UA-F06): the timing can be forgotten without losing the tier.
+@Test func forgetTimingKeepsTheTierAndRestartsCalm() {
+    var p = QualityPolicy(tierCount: 3)
+    let down = p.decide(thermal: .serious, lowPower: false, now: 0)
+    #expect(down == 1)
+    let calm = p.decide(thermal: .nominal, lowPower: false, now: 1)
+    #expect(calm == 1)
+    p.forgetTiming()
+    #expect(p.tier == 1, "the tier is kept")
+    let early = p.decide(thermal: .nominal, lowPower: false, now: 11.5)
+    #expect(early == 1, "calm starts again at the first decision after the timing was forgotten")
+    let later = p.decide(thermal: .nominal, lowPower: false, now: 21.5)
+    #expect(later == 0)
+    #expect(p.stepsDown == 1 && p.stepsUp == 1)
+}
