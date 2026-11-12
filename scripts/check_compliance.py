@@ -90,8 +90,22 @@ def scan(root: Path = ROOT) -> list[str]:
     return problems
 
 
+def scanned(root: Path = ROOT) -> dict[str, int]:
+    """Number of scanned files per area: `Apps/<name>` for each app, the first folder otherwise."""
+    counts: dict[str, int] = {}
+    for path in files(root):
+        if path.suffix.lower() not in SOURCE_EXT | CONFIG_EXT:
+            continue
+        parts = path.relative_to(root).parts
+        area = "/".join(parts[:2]) if parts[0] == "Apps" and len(parts) > 2 else (parts[0] if len(parts) > 1 else ".")
+        counts[area] = counts.get(area, 0) + 1
+    return counts
+
+
 def main() -> int:
     problems = scan()
+    for area, count in sorted(scanned().items()):
+        print(f"scanned {area}: {count} files")
     for p in problems:
         print("VIOLATION:", p)
     print("PASS: no compliance violations" if not problems else f"FAIL: {len(problems)} violations")

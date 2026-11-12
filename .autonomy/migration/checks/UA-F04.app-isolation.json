@@ -1,0 +1,22 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_app_isolation.py",
+    "--app",
+    "Apps/VisualCore",
+    "--require-sources",
+    "--built-app",
+    "Build/DerivedData/ua-f04-app-build/Build/Products/Debug-iphonesimulator/VisualCore.app"
+  ],
+  "command": "python3 scripts/check_app_isolation.py --app Apps/VisualCore --require-sources --built-app Build/DerivedData/ua-f04-app-build/Build/Products/Debug-iphonesimulator/VisualCore.app",
+  "elapsed_seconds": 0.027,
+  "exit_code": 0,
+  "finished": "2026-11-12T14:51:50+00:00",
+  "gate": "UA-F04",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F04.app-isolation.log",
+  "log_sha256": "ab812bfcafbf76e97c3edf944287003c18746caf00a28c8aec69abf9bd9158da",
+  "name": "app-isolation",
+  "started": "2026-11-12T14:51:50+00:00",
+  "timed_out": false
+}

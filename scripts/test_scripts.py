@@ -911,6 +911,23 @@ class ReleaseCheckTests(unittest.TestCase):
         self.assertEqual(names.index("visualcore-app-build"), names.index("xcodegen") + 1)
 
 
+class ComplianceScanReportTests(unittest.TestCase):
+    """The compliance check says what it scanned, so a missing app folder cannot pass unseen (UA-F04)."""
+
+    def test_each_app_is_reported_as_its_own_area(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "Apps" / "One" / "App").mkdir(parents=True)
+            (root / "Apps" / "One" / "App" / "A.swift").write_text("let a = 1\n")
+            (root / "Apps" / "One" / "App" / "B.swift").write_text("let b = 1\n")
+            (root / "Packages" / "P").mkdir(parents=True)
+            (root / "Packages" / "P" / "C.swift").write_text("let c = 1\n")
+            self.assertEqual(compliance.scanned(root), {"Apps/One": 2, "Packages": 1})
+
+    def test_the_unified_app_is_scanned(self):
+        self.assertGreater(compliance.scanned().get("Apps/VisualCore", 0), 15)
+
+
 class AppTestRunnerTests(unittest.TestCase):
     """Feature UA-F04 T-U04-002 (FR-U04-080): scripts/xcodebuild_app.py."""
 
