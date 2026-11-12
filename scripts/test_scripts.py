@@ -938,11 +938,12 @@ class PerformanceDocsTests(unittest.TestCase):
             "| Launch | fast | proposal | |\n": "lacks its confirming measurement",
             "| Launch | fast | proposal | later |\n": "lacks its confirming measurement",
             "| Launch | fast | proposal | D1 only |\n": "lacks its confirming measurement",
+            "| Launch | fast | proposal | D1: 200 samples |\n": "lacks its confirming measurement",
             "| Launch | fast | proposal | 200 samples |\n": "lacks its confirming measurement",
             "| Launch | fast | proposal | tooling: |\n": "lacks its confirming measurement",
-            "| Launch | fast | measured | D1: 200 samples |\n": "neither proposal nor confirmed",
-            "| Launch | fast | confirmed | D1: 200 samples |\n": "confirmed without a link",
-            "| Launch |  | proposal | D1: 200 samples |\n": "needs a budget and a proposal",
+            "| Launch | fast | measured | D1: scenario launch, 200 samples |\n": "neither proposal nor confirmed",
+            "| Launch | fast | confirmed | D1: scenario launch, 200 samples |\n": "confirmed without a link",
+            "| Launch |  | proposal | D1: scenario launch, 200 samples |\n": "needs a budget and a proposal",
         }
         for row, expected in cases.items():
             problems, _, _ = self.run_on({"budgets.md": self.HEAD + row})
@@ -950,15 +951,25 @@ class PerformanceDocsTests(unittest.TestCase):
             self.assertTrue(problems[0].startswith("budgets.md:3: "), problems[0])
             self.assertIn(expected, problems[0])
         ok, _, _ = self.run_on({"budgets.md": self.HEAD
-                                + "| Launch | fast | confirmed | D1: 200 samples, [report](r.md) |\n"})
+                                + "| Launch | fast | confirmed | D1: scenario launch, 200 samples, [report](r.md) |\n"})
         self.assertEqual(ok, [])
 
     def test_a_simulator_number_without_the_notice_fails(self):
         text = "# Baselines\n\nMedian on the simulator: 12.4 ms.\n"
         problems, _, _ = self.run_on({"budgets.md": self.HEAD + self.GOOD, "notes.md": text})
-        self.assertEqual(len(problems), 1)
+        self.assertEqual(len(problems), 2)
         self.assertTrue(problems[0].startswith("notes.md:3: a simulator is mentioned without the notice"), problems[0])
+        self.assertTrue(problems[1].startswith("notes.md:3: a simulator number is given without calling it"), problems[1])
+        # The notice alone is not enough for a line that gives a number: the line itself says what the number is.
         problems, _, _ = self.run_on({"budgets.md": self.HEAD + self.GOOD, "notes.md": self.NOTICE + "\n" + text})
+        self.assertEqual(len(problems), 1)
+        self.assertTrue(problems[0].startswith("notes.md:4: a simulator number is given without calling it"), problems[0])
+        labelled = self.NOTICE + "\n\nDevelopment signal on the simulator: 12.4 ms.\n"
+        problems, _, _ = self.run_on({"budgets.md": self.HEAD + self.GOOD, "notes.md": labelled})
+        self.assertEqual(problems, [])
+        # A line about the simulator without a number needs no label.
+        plain = self.NOTICE + "\n\nThe simulator runs are repeated after framework changes.\n"
+        problems, _, _ = self.run_on({"budgets.md": self.HEAD + self.GOOD, "notes.md": plain})
         self.assertEqual(problems, [])
 
     def test_a_directory_without_a_budget_table_fails(self):

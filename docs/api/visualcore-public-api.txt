@@ -192,7 +192,7 @@ VisualCoreDiagnostics | var | public var firstLaunch: Bool
 VisualCoreDiagnostics | var | public var firstLaunch: Bool?
 VisualCoreDiagnostics | var | public var firstPresentMs: Double?
 VisualCoreDiagnostics | var | public var footprintBytes: Int?
-VisualCoreDiagnostics | var | public var frameCapFPS: Int
+VisualCoreDiagnostics | var | public var frameCapFPS: Int?
 VisualCoreDiagnostics | var | public var gpuBytes: Int
 VisualCoreDiagnostics | var | public var gpuPeakBytes: Int
 VisualCoreDiagnostics | var | public var invalid: Int
@@ -228,7 +228,7 @@ VisualCoreDiagnostics | var | public var qualityLevels: Int
 VisualCoreDiagnostics | var | public var qualityPinned: Bool
 VisualCoreDiagnostics | var | public var range: Range
 VisualCoreDiagnostics | var | public var rebuilds: Int
-VisualCoreDiagnostics | var | public var renderScale: Double
+VisualCoreDiagnostics | var | public var renderScale: Double?
 VisualCoreDiagnostics | var | public var samples: Int
 VisualCoreDiagnostics | var | public var setupMs: Double?
 VisualCoreDiagnostics | var | public var shaderFailures: Int
@@ -744,6 +744,7 @@ VisualCoreExperienceHost | var | @ObservationIgnored public private(set) var las
 VisualCoreExperienceHost | var | @ObservationIgnored public var conditions: @MainActor () -> DeviceConditions
 VisualCoreExperienceHost | var | @ObservationIgnored public var launch: LaunchTiming?
 VisualCoreExperienceHost | var | @ObservationIgnored public var qualityPin: Int?
+VisualCoreExperienceHost | var | @ObservationIgnored public var timeSource: (@MainActor () -> Double)?
 VisualCoreExperienceHost | var | public private(set) var engine: ExperienceEngine<Presenter.Core>
 VisualCoreExperienceHost | var | public private(set) var experience: (any Experience)?
 VisualCoreExperienceHost | var | public private(set) var failure: SessionFailure?

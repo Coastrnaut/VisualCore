@@ -159,21 +159,33 @@ private let pacingCases: [PacingCase] = [
     #expect(PacingMeter.binWidth == 0.00025 && PacingMeter.binCount == 1000)
 }
 
-@Test func pacingMeterSizeIsTheSameAfterAMillionRecords() {
+/// The number of counters the meter holds, read through reflection: its only growing storage would be the bins.
+private func storedCounters(of meter: PacingMeter) -> Int {
+    var total = 0
+    for child in Mirror(reflecting: meter).children {
+        if let list = child.value as? [Int] { total += list.count }
+    }
+    return total
+}
+
+// FR-U06-032: the meter keeps a bounded amount of data however many intervals it takes, also when the intervals
+// differ. (Convergence T-U06-050: the earlier assertion compared `MemoryLayout` sizes, which never change.)
+@Test func pacingMeterHoldsTheSameNumberOfCountersAfterAMillionRecords() {
     var meter = PacingMeter()
-    let sizeBefore = MemoryLayout.size(ofValue: meter)
-    for _ in 0..<1_000 {
-        meter.record(interval: onTime60, period: period60)
+    #expect(storedCounters(of: meter) == PacingMeter.binCount)
+    for index in 0..<1_000 {
+        meter.record(interval: Double(index % 400 + 1) * 0.0007, period: period60)
     }
-    #expect(MemoryLayout.size(ofValue: meter) == sizeBefore)
+    #expect(storedCounters(of: meter) == PacingMeter.binCount)
     #expect(meter.summary.samples == 1_000)
-    for _ in 0..<1_000_000 {
-        meter.record(interval: onTime60, period: period60)
+    for index in 0..<1_000_000 {
+        meter.record(interval: Double(index % 400 + 1) * 0.0007, period: period60)
     }
-    #expect(MemoryLayout.size(ofValue: meter) == sizeBefore)
+    #expect(storedCounters(of: meter) == PacingMeter.binCount, "no storage grew")
     let summary = meter.summary
-    #expect(summary.samples == 1_001_000 && summary.onTime == 1_001_000 && summary.missed == 0)
-    #expect(summary.medianMs == 16.75 && summary.p99Ms == 16.75)
+    #expect(summary.samples == 1_001_000)
+    #expect(summary.onTime + summary.missed >= summary.samples, "every late interval misses at least one refresh")
+    #expect(summary.invalid == 0)
 }
 
 @Test func pacingSummaryCodesAndDecodes() throws {

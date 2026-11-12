@@ -117,9 +117,17 @@ public final class ExperienceSession {
         didSet {
             guard qualityPin != oldValue else { return }
             governor?.setPin(qualityPin)
-            applyLevelInForce()
+            if qualityPin == nil, state == .running {
+                refreshQuality()   // automatic again: the level for the conditions of this moment
+            } else {
+                applyLevelInForce()
+            }
         }
     }
+    /// The time source of the quality decisions, in seconds on a steady scale; nil for the session's own clock.
+    /// A test that scripts the time sets it, so that every decision (at an open, from the frame hook, at a
+    /// resume, on `refreshQuality`) is on the same scale.
+    @ObservationIgnored public var timeSource: (@MainActor () -> Double)?
     /// Where the session reads the device conditions for its automatic level; the device itself by default.
     @ObservationIgnored public var conditions: @MainActor () -> DeviceConditions = { DeviceConditions.current() }
     /// The launch time of the process, given by the app once; it becomes part of every performance record.
@@ -135,6 +143,8 @@ public final class ExperienceSession {
     @ObservationIgnored private let created: ContinuousClock.Instant
     /// When the current open began; the first-present time counts from here.
     @ObservationIgnored private var openStart: ContinuousClock.Instant?
+    /// When an experience that was opened while the app was not active began to wait for its activation.
+    @ObservationIgnored private var waitingSince: ContinuousClock.Instant?
     @ObservationIgnored private var meter = PacingMeter()
     /// The host time of the last presented frame; nil after a suspension, so that no interval spans it.
     @ObservationIgnored private var lastPresentTime: Double?
@@ -259,7 +269,7 @@ public final class ExperienceSession {
         newGovernor.decide(conditions: conditions(), now: sessionSeconds)
         governor = newGovernor
         lastQualityCheck = sessionSeconds
-        applyLevelInForce()
+        applyLevelInForce(always: true)
 
         let hostStart = clock.now
         let scene = SessionScene(inner: experience.scene)
@@ -294,6 +304,7 @@ public final class ExperienceSession {
 
         guard phase == .active else {
             host.pause()
+            waitingSince = clock.now
             move(to: .suspended)
             opens += 1
             return .suspended
@@ -397,6 +408,7 @@ public final class ExperienceSession {
     public func recreateContext() {
         guard let host = renderHost else { return }
         closeCompileBaseline(of: host)
+        lastPresentTime = nil   // the rebuild is neither a sample nor a missed refresh
         host.recreateContext()
         contextRecreations += 1
         rebuilds += 1
@@ -415,8 +427,8 @@ public final class ExperienceSession {
     public var qualityLevel: Int { experience == nil ? 0 : appliedLevel }
 
     /// Takes a quality decision now, from the current conditions, and applies a changed level. `now` is a time
-    /// in seconds on any steady scale (tests script it); by default the session's own clock. Nothing happens
-    /// unless an experience runs.
+    /// in seconds on the scale of the session's decisions (`timeSource`, or the session's own clock); by default
+    /// the current time on that scale. Nothing happens unless an experience runs.
     public func refreshQuality(now: Double? = nil) {
         guard state == .running, governor != nil else { return }
         let time = now ?? sessionSeconds
@@ -432,16 +444,17 @@ public final class ExperienceSession {
         return makeRecord(of: experience)
     }
 
-    /// Seconds since the session was created, on its steady clock.
-    private var sessionSeconds: Double { Self.seconds(clock.now - created) }
+    /// The time of the quality decisions: `timeSource`, or seconds since the session was created on its clock.
+    private var sessionSeconds: Double { timeSource?() ?? Self.seconds(clock.now - created) }
 
-    /// Sets the experience to the governor's level in force when it differs from the level it has.
-    private func applyLevelInForce() {
+    /// Sets the experience to the governor's level in force when it differs from the level the session last
+    /// set, or `always`: at an open the experience is set whatever tier its instance had before.
+    private func applyLevelInForce(always: Bool = false) {
         guard let governor, let experience else { return }
         let state = experience.state
         guard state == .ready || state == .active || state == .suspended else { return }
         let level = governor.levelInForce
-        guard level != appliedLevel else { return }
+        guard always || level != appliedLevel else { return }
         do {
             try experience.setQualityTier(level)
             appliedLevel = level
@@ -456,6 +469,7 @@ public final class ExperienceSession {
         appliedLevel = 0
         lastQualityCheck = nil
         openStart = nil
+        waitingSince = nil
         meter = PacingMeter()
         lastPresentTime = nil
         presentedAny = false
@@ -488,7 +502,7 @@ public final class ExperienceSession {
             experience: experience.id.rawValue, presented: presentedAny, qualityLevel: appliedLevel,
             qualityPinned: qualityPin != nil, qualityLevels: experience.qualityProfile.count,
             stepsDown: governor?.stepsDown ?? 0, stepsUp: governor?.stepsUp ?? 0, thermal: device.thermal,
-            lowPower: device.lowPower, frameCapFPS: pacing?.maxFPS ?? 0, renderScale: pacing?.renderScale ?? 1,
+            lowPower: device.lowPower, frameCapFPS: pacing?.maxFPS, renderScale: pacing?.renderScale,
             pacing: meter.summary, gpuBytes: stats?.totalBytes ?? 0, gpuPeakBytes: stats?.peakBytes ?? 0,
             lateCompilations: lateCompilations, rebuilds: rebuilds, memoryEvents: memoryEvents)
         record.launchMs = launch?.milliseconds
@@ -628,6 +642,7 @@ public final class ExperienceSession {
         case .contextLost:
             contextRecreations += 1   // the host recreates its context itself after this report
             rebuilds += 1
+            lastPresentTime = nil
             if let host = renderHost { closeCompileBaseline(of: host) }
             rebaselinePending = compileBaseline != nil
         case .allocation, .scene:
@@ -703,9 +718,14 @@ public final class ExperienceSession {
         }
         move(to: .running)
         governor?.resume()
-        lastQualityCheck = nil
+        refreshQuality()   // from the conditions of this moment, before the next frame
         guard firstActivation else { return }
         timings.activate = Self.seconds(clock.now - start)
+        // The time the experience waited for the app to become active is not part of its first-present time.
+        if let waitingSince, let openStart {
+            self.openStart = openStart + (clock.now - waitingSince)
+        }
+        waitingSince = nil
         compileBaseline = host.resources.compileCount   // interactive from here
         firstFrameStart = clock.now
         host.renderOneFrame(present: false)

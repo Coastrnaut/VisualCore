@@ -13,7 +13,7 @@ samples are kept apart.
 
 | Budget | Proposal | Status | Confirmed by |
 |---|---|---|---|
-| Cold launch to the usable launcher | no rendering context and no store wait before the launcher is usable; time from the start of the app's own code to the usable launcher recorded once per process | proposal | D1, D2, D3: scenario `launch`, 200 samples per device, first launch after an install kept apart |
+| Cold launch to the first usable screen | no rendering context and no store wait before the first screen (the launcher, or the welcome on a first start) is usable; time from the start of the app's own code to that moment recorded once per process | proposal | D1, D2, D3: scenario `launch`, 200 samples per device, first launch after an install kept apart |
 | Open an experience to its first presented frame | preparation, shader set-up and first present recorded as separate stage times; no shader program compiled after the experience became interactive | proposal | D1, D2, D3: scenario `launch-first-frame`, 200 samples per device and experience tier |
 | Frame pacing | at least 95% of display refreshes on time at the level in force | proposal | D1, D2, D3: scenario `steady`, 200 samples of ten seconds or more per device |
 | Frame rate | 60 frames per second with automatic levels; a documented 30 frames per second mode is acceptable on the last level | proposal | D1, D2, D3: scenario `steady`, 200 samples per device |

@@ -88,8 +88,8 @@ JSON object with sorted keys; at most 65,536 bytes; numbers finite; an absent me
 | `steps_down`, `steps_up` | int | yes | of the session |
 | `thermal` | string | yes | `nominal, fair, serious, critical` |
 | `low_power` | bool | yes | |
-| `frame_cap_fps` | int | yes | the frame pacing's cap |
-| `render_scale` | number | yes | the frame pacing's factor |
+| `frame_cap_fps` | int | no | the frame pacing's cap; absent without a render host |
+| `render_scale` | number | no | the frame pacing's factor, above 0 and at most 1; absent without a render host |
 | `pacing` | object | yes | `samples, on_time, missed, invalid` (int), `median_ms, p95_ms, p99_ms` (number, absent without samples) |
 | `gpu_bytes`, `gpu_peak_bytes` | int | yes | from the resource ledger |
 | `late_compilations`, `rebuilds`, `memory_events` | int | yes | counters |
@@ -155,4 +155,15 @@ the number of samples.
   read back through those digits, because the system serializer shortens some values (0.0007909999999999998 became
   0.000791; found by the app's test over 600 frames). A magnitude below 1e-100 or above 1e100 is refused as
   `performance.invalid-value`. A test reads back 2,000 generated values exactly.
+- Convergence (T-U06-046 to T-U06-049): the session's quality decisions use one time source
+  (`ExperienceSession.timeSource`, or its own clock); a decision is also taken when an experience resumes, when
+  it is first activated after an open in the background, and when a pin is removed; the tier is set at every
+  open whatever tier the instance had. `frame_cap_fps` and `render_scale` are optional keys. The interval chain
+  of the pacing is cut at a context rebuild as at a suspension. The first-present time of an experience opened
+  while the app was not active excludes the time it waited. `encoded()` applies the range rules of reading.
+- A late compilation in the very first frame after a context loss that the host repairs itself is counted with
+  the rebuild, because the baseline is taken after that frame.
+- When the experience's logic refuses a level (`setQualityTier` throws), the session keeps the level it had; the
+  governor's counters still move. The conformance check keeps profile and tiers equal, so this cannot happen for
+  an experience that passed it.
 

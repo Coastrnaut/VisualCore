@@ -2814,7 +2814,8 @@ pinned level, or the tier of the existing `QualityPolicy` for the device conditi
 second. The session owns the governor: it applies the level after the preparation and before a render host exists,
 decides again while the experience runs, takes no decision while it is suspended, and applies a changed pin at
 once. The app only hands the stored override to the session. The frame scheduler's own reaction to heat (frame-rate
-cap and resolution factor) is unchanged and multiplies with the level's resolution share.
+cap and resolution factor on the display surface) is unchanged; an experience applies its level's resolution share
+to what it draws, and the record names both.
 
 ### 12.5 Budgets
 

@@ -447,8 +447,17 @@ final class AppModelTests: XCTestCase {
         XCTAssertNil(model.session.lastPerformanceRecord)
         let opened = await model.open(id)
         XCTAssertTrue(opened)
-        // SC-U06-005: 600 interactive frames compile no shader program.
-        for _ in 0..<600 { model.session.renderHost?.renderOneFrame(present: false) }
+        // SC-U06-005: 600 interactive frames compile no shader program. The host gets a surface first; without
+        // one no frame is drawn (convergence T-U06-045).
+        let host = try XCTUnwrap(model.session.renderHost)
+        host.view.frame = CGRect(x: 0, y: 0, width: 64, height: 64)
+        host.view.layoutIfNeeded()
+        var drawn = 0
+        for _ in 0..<600 where host.renderOneFrame(present: false) { drawn += 1 }
+        XCTAssertEqual(drawn, 600, "every frame was drawn")
+        XCTAssertEqual(model.session.experience?.diagnostics.stepIndex, 1_200, "600 frames of 1/60 s are 1,200 steps")
+        XCTAssertEqual(model.session.performanceRecord?.lateCompilations, 0)
+        XCTAssertEqual(host.resources.compileCount, model.session.diagnostics.timings.programsCompiled)
         model.closeExperience()
         XCTAssertNil(model.session.performanceRecord)
         let record = try XCTUnwrap(model.session.lastPerformanceRecord)

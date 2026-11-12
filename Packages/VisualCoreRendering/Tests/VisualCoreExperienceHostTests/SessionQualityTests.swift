@@ -1,15 +1,17 @@
 // SessionQualityTests — feature 192 T-U06-017 (UA-F06; US2; FR-U06-010 to FR-U06-014; SC-U06-003). The quality
 // level of the open experience as `ExperienceSession` decides it: a pinned level is applied before the first
 // frame and after a retry, a pin beyond the profile means the last level, the automatic level follows scripted
-// device conditions through `refreshQuality(now:)` (one step down per 2 s, one step up per 10 s of calm, Low
-// Power Mode holds level 1), no decision is taken while suspended and the calm period starts again after a
-// resume, a changed pin applies at once, and no level change touches the state digest.
+// device conditions (one step down per 2 s, one step up per 10 s of calm, Low Power Mode holds level 1), the
+// frame hook takes the decisions while frames are drawn (at most one per second), no decision is taken while
+// suspended, one is taken at the resume and the calm period starts again there, a changed or removed pin
+// applies at once, every open sets the tier of the experience instance, and no level change touches the state
+// digest.
 // The helpers (`sampleRequest`, `SampleProbe`, `layOut`, `drawFrame`, …) are in SessionOpenCloseTests.swift.
 //
-// Timing: at every open the session takes one decision with its own clock (seconds since the session was
-// created, far below 1 here). The scripted times of these tests therefore start at 10 and only increase. The
-// tests that script the automatic level never lay the host out: without a surface no frame is drawn, so the
-// session's frame hook takes no decision with the real clock between two scripted ones.
+// Timing: the tests of the automatic level give the session a scripted clock (`session.timeSource`) before the
+// open, so that every decision of the session (at the open, from the frame hook, at a resume, at the removal of
+// a pin, on `refreshQuality()`) is on one scale. A test sets the clock and then calls `refreshQuality()` or
+// draws a frame. The scripted time starts at 100 and only increases.
 import XCTest
 import VisualCoreDiagnostics
 import VisualCoreExperience
@@ -32,6 +34,13 @@ private final class ScriptedConditions {
     }
 }
 
+/// The time a test scripts, in seconds; the session's `timeSource` closure reads it at every decision.
+@MainActor
+private final class ScriptedClock {
+    var now: Double
+    init(_ now: Double = 100) { self.now = now }
+}
+
 /// A flag a test flips between two factory calls of one request (the cause of a failure is removed).
 @MainActor
 private final class Flag {
@@ -46,10 +55,14 @@ final class SessionQualityTests: XCTestCase {
     private static let serious = DeviceConditions(thermal: .serious, lowPower: false)
     private static let lowPower = DeviceConditions(thermal: .nominal, lowPower: true)
 
-    /// A session that reads its device conditions from `script`.
-    private func scriptedSession(_ script: ScriptedConditions) -> ExperienceSession {
+    /// A session that reads its device conditions from `script` and, with a `clock`, the time of its quality
+    /// decisions from that clock.
+    private func scriptedSession(_ script: ScriptedConditions, clock: ScriptedClock? = nil) -> ExperienceSession {
         let session = ExperienceSession()
         session.conditions = { script.read() }
+        if let clock {
+            session.timeSource = { clock.now }
+        }
         return session
     }
 
@@ -142,127 +155,244 @@ final class SessionQualityTests: XCTestCase {
 
     func testTheAutomaticLevelStepsDownWhileHotAndUpAfterCalm() async throws {
         let script = ScriptedConditions(Self.serious)
-        let session = scriptedSession(script)
+        let clock = ScriptedClock(100)
+        let session = scriptedSession(script, clock: clock)
         defer { session.close() }
         let (request, _) = sampleRequest()
         let result = await session.open(request)
         XCTAssertEqual(result, .running)
         XCTAssertGreaterThanOrEqual(script.reads, 1, "the open read the scripted conditions")
 
-        // Open decision at t0 (below 1 s): hot, no change yet, so one step down: 0 → 1; last change = t0.
+        // t = 100, open decision: hot, no change yet, so one step down: 0 → 1; last change = 100.
         assertLevel(session, 1, "one step down at the open decision")
 
-        // t = 10: hot; 10 − t0 ≥ 2 s (decision interval), so one more step: 1 → 2; last change = 10.
-        session.refreshQuality(now: 10)
+        // t = 101: hot; the governor asks the policy (1 s since its last decision), but 101 − 100 < 2 s
+        // (decision interval): no step.
+        clock.now = 101
+        session.refreshQuality()
+        assertLevel(session, 1, "no second step within the decision interval")
+
+        // t = 102: hot; 102 − 100 ≥ 2 s, so one more step: 1 → 2; last change = 102.
+        clock.now = 102
+        session.refreshQuality()
         assertLevel(session, 2, "second step down")
 
-        // t = 12: hot and the interval passed, but 2 is the last of three levels: it stays.
-        session.refreshQuality(now: 12)
+        // t = 104: hot and the interval passed, but 2 is the last of three levels: it stays.
+        clock.now = 104
+        session.refreshQuality()
         assertLevel(session, 2, "the last level is the floor")
 
-        // t = 14: first calm decision; the calm period starts at 14, no step.
+        // t = 106: first calm decision; the calm period starts at 106, no step.
         script.value = .nominal
-        session.refreshQuality(now: 14)
+        clock.now = 106
+        session.refreshQuality()
         assertLevel(session, 2, "calm begins, no step yet")
 
-        // t = 23: 9 s of calm < 10 s (calm period): no step.
-        session.refreshQuality(now: 23)
+        // t = 115: 9 s of calm < 10 s (calm period): no step.
+        clock.now = 115
+        session.refreshQuality()
         assertLevel(session, 2, "9 s of calm are not enough")
 
-        // t = 24: 10 s of calm and 24 − 10 ≥ 2 s since the last change: 2 → 1; calm starts again at 24.
-        session.refreshQuality(now: 24)
+        // t = 116: 10 s of calm and 116 − 102 ≥ 2 s since the last change: 2 → 1; calm starts again at 116.
+        clock.now = 116
+        session.refreshQuality()
         assertLevel(session, 1, "one step up after 10 s of calm")
 
-        // t = 33: 9 s since the step up: no step.
-        session.refreshQuality(now: 33)
+        // t = 125: 9 s since the step up: no step.
+        clock.now = 125
+        session.refreshQuality()
         assertLevel(session, 1, "the calm period started again at the step up")
 
-        // t = 34: 10 s since the step up: 1 → 0.
-        session.refreshQuality(now: 34)
+        // t = 126: 10 s since the step up: 1 → 0.
+        clock.now = 126
+        session.refreshQuality()
         assertLevel(session, 0, "another step up after 10 more seconds")
 
-        // t = 50: level 0 is the best: nothing left to step.
-        session.refreshQuality(now: 50)
+        // t = 140: level 0 is the best: nothing left to step.
+        clock.now = 140
+        session.refreshQuality()
         assertLevel(session, 0, "the best level stays")
         XCTAssertEqual(session.state, .running)
     }
 
     func testLowPowerModeHoldsLevelOneAndDoesNotRecoverWhileItIsOn() async throws {
         let script = ScriptedConditions(Self.lowPower)
-        let session = scriptedSession(script)
+        let clock = ScriptedClock(100)
+        let session = scriptedSession(script, clock: clock)
         defer { session.close() }
         let (request, _) = sampleRequest()
         let result = await session.open(request)
         XCTAssertEqual(result, .running)
 
-        // Open decision: Low Power Mode with level 0 better than the ceiling 1 (min(1, 3 − 1)): 0 → 1.
+        // t = 100, open decision: Low Power Mode with level 0 better than the ceiling 1 (min(1, 3 − 1)): 0 → 1.
         assertLevel(session, 1, "Low Power Mode steps to level 1 at the open decision")
 
-        // t = 10, 30, 60: Low Power Mode with the level at the ceiling: no step down (not hot, not better than
-        // the ceiling) and no calm (Low Power Mode is never calm), however long it lasts.
-        for time in [10.0, 30, 60] {
-            session.refreshQuality(now: time)
+        // t = 110, 130, 160: Low Power Mode with the level at the ceiling: no step down (not hot, not better
+        // than the ceiling) and no calm (Low Power Mode is never calm), however long it lasts.
+        for time in [110.0, 130, 160] {
+            clock.now = time
+            session.refreshQuality()
             assertLevel(session, 1, "Low Power Mode at t = \(time)")
         }
 
-        // Low Power Mode off. t = 70: the calm period starts. t = 79: 9 s, no step. t = 80: 10 s: 1 → 0.
+        // Low Power Mode off. t = 170: the calm period starts. t = 179: 9 s, no step. t = 180: 10 s of calm
+        // and 180 − 100 ≥ 2 s since the last change: 1 → 0.
         script.value = .nominal
-        session.refreshQuality(now: 70)
+        clock.now = 170
+        session.refreshQuality()
         assertLevel(session, 1, "calm begins when Low Power Mode ends")
-        session.refreshQuality(now: 79)
+        clock.now = 179
+        session.refreshQuality()
         assertLevel(session, 1, "9 s of calm are not enough")
-        session.refreshQuality(now: 80)
+        clock.now = 180
+        session.refreshQuality()
         assertLevel(session, 0, "recovery 10 s after Low Power Mode ended")
+    }
+
+    // MARK: Frame hook (FR-U06-010, FR-U06-011)
+
+    func testTheFrameHookTakesTheDecisionsWhileFramesAreDrawn() async throws {
+        let script = ScriptedConditions(Self.serious)
+        let clock = ScriptedClock(100)
+        let session = scriptedSession(script, clock: clock)
+        defer { session.close() }
+        let (request, probe) = sampleRequest()
+        let result = await session.open(request)
+        XCTAssertEqual(result, .running)
+        // t = 100, open decision: hot: 0 → 1; last change = 100; the session's last check = 100.
+        assertLevel(session, 1, "one step down at the open decision")
+        layOut(session)   // a frame drawn by the layout is at t = 100: 0 s since the last check, no decision
+        let readsAfterOpen = script.reads
+
+        // t = 100.5: a frame is drawn, but 0.5 s < 1 s since the session's last check: the governor is not
+        // asked and the conditions are not read.
+        clock.now = 100.5
+        let drawnEarly = drawFrame(session)
+        XCTAssertTrue(drawnEarly)
+        assertLevel(session, 1, "no decision less than one second after the last one")
+        XCTAssertEqual(script.reads, readsAfterOpen, "the frame hook did not read the conditions")
+
+        // t = 102: a frame is drawn 2 s after the last check (≥ 1 s): the hook asks the governor (2 s ≥ 1 s
+        // since its last decision), the policy steps (102 − 100 ≥ 2 s, hot): 1 → 2; last change = 102.
+        clock.now = 102
+        let readsBeforeFrame = script.reads
+        let drawnLater = drawFrame(session)
+        XCTAssertTrue(drawnLater)
+        let readsAfterFrame = script.reads
+        XCTAssertEqual(readsAfterFrame, readsBeforeFrame + 1, "the frame hook read the conditions once")
+        assertLevel(session, 2, "the frame hook took the decision: second step down")
+
+        // Nominal from here, one frame per second from t = 103 to t = 113. Every frame is 1 s after the last
+        // check, so every frame takes a decision. t = 103: the calm period starts. t = 104 … 112: 1 … 9 s of
+        // calm, no step. t = 113: 10 s of calm and 113 − 102 ≥ 2 s since the last change: 2 → 1.
+        script.value = .nominal
+        for second in 1...11 {
+            clock.now = 102 + Double(second)
+            let drawn = drawFrame(session)
+            XCTAssertTrue(drawn)
+            let expected = second < 11 ? 2 : 1
+            assertLevel(session, expected, "frame at t = \(clock.now), \(second - 1) s of calm")
+        }
+        XCTAssertEqual(script.reads, readsAfterFrame + 11, "one decision per frame, one second apart")
+
+        // The decision follows the drawing of its frame: the next frame (same time, so no decision) is the
+        // first one drawn with level 1.
+        let drawnAfterStep = drawFrame(session)
+        XCTAssertTrue(drawnAfterStep)
+        let drawnTier = probe.presenter?.lastTier
+        XCTAssertEqual(drawnTier, 1, "the frame after the step up was drawn with level 1")
+        assertLevel(session, 1, "one level up only")
+        XCTAssertEqual(session.state, .running)
     }
 
     // MARK: Suspension (FR-U06-012)
 
     func testNoDecisionIsTakenWhileSuspendedAndTheCalmPeriodStartsAgainAfterTheResume() async throws {
         let script = ScriptedConditions(Self.serious)
-        let session = scriptedSession(script)
+        let clock = ScriptedClock(100)
+        let session = scriptedSession(script, clock: clock)
         defer { session.close() }
         let (request, _) = sampleRequest()
         let result = await session.open(request)
         XCTAssertEqual(result, .running)
-        // Open decision: hot: 0 → 1 (as in the test of the automatic level).
+        // t = 100, open decision: hot: 0 → 1 (as in the test of the automatic level); last change = 100.
         assertLevel(session, 1, "one step down before the suspension")
 
         session.setScenePhase(.background)
         XCTAssertEqual(session.state, .suspended)
         let readsAtSuspension = script.reads
 
-        // Still hot at t = 10: a decision would step 1 → 2 (10 − t0 ≥ 2 s). None is taken while suspended.
-        session.refreshQuality(now: 10)
+        // Still hot at t = 110: a decision would step 1 → 2 (110 − 100 ≥ 2 s). None is taken while suspended.
+        clock.now = 110
+        session.refreshQuality()
         assertLevel(session, 1, "no step down while suspended")
-        // Calm at t = 40: a decision would start the calm period here. None is taken.
+        // Calm at t = 140: a decision would start the calm period here. None is taken.
         script.value = .nominal
-        session.refreshQuality(now: 40)
+        clock.now = 140
+        session.refreshQuality()
         assertLevel(session, 1, "no decision while suspended")
         XCTAssertEqual(script.reads, readsAtSuspension, "the conditions were not even read while suspended")
 
+        // t = 200: the resume forgets the timing and takes one decision from the conditions of that moment
+        // (calm): the calm period starts at 200; the time away (and the refused calls at 110 and 140) count
+        // for nothing, so no step.
+        clock.now = 200
         session.setScenePhase(.active)
         XCTAssertEqual(session.state, .running)
-        assertLevel(session, 1, "the resume keeps the level")
+        assertLevel(session, 1, "the resume keeps the level: the time away is not calm time")
+        XCTAssertEqual(script.reads, readsAtSuspension + 1, "the resume took one decision")
 
-        // The resume forgot the timing. t = 100: the first decision after the resume starts the calm period
-        // at 100; the time away (and the refused calls at 10 and 40) count for nothing, so no step.
-        session.refreshQuality(now: 100)
-        assertLevel(session, 1, "the time away is not calm time")
-
-        // t = 109: 9 s after the first decision following the resume: no step.
-        session.refreshQuality(now: 109)
+        // t = 209: 9 s after the decision of the resume: no step.
+        clock.now = 209
+        session.refreshQuality()
         assertLevel(session, 1, "9 s of calm after the resume are not enough")
 
-        // t = 110: 10 s of calm; the decision interval was forgotten too, so the step is allowed: 1 → 0.
-        session.refreshQuality(now: 110)
-        assertLevel(session, 0, "one step up 10 s after the first decision following the resume")
+        // t = 210: 10 s of calm; the last change was forgotten at the resume, so the step is allowed: 1 → 0;
+        // last change = 210.
+        clock.now = 210
+        session.refreshQuality()
+        assertLevel(session, 0, "one step up 10 s after the decision of the resume")
+
+        // A second suspension; the device is hot when the app comes back at t = 211. The resume forgets the
+        // timing (the change at 210 no longer blocks) and its decision steps at once: 0 → 1.
+        session.setScenePhase(.background)
+        XCTAssertEqual(session.state, .suspended)
+        script.value = Self.serious
+        clock.now = 211
+        session.setScenePhase(.active)
+        XCTAssertEqual(session.state, .running)
+        assertLevel(session, 1, "the decision of the resume uses the conditions of that moment")
+        XCTAssertEqual(session.diagnostics.rejectedTransitions, 0)
+    }
+
+    func testAnExperienceOpenedWhileNotActiveGetsTheLevelOfTheMomentItIsActivated() async throws {
+        let script = ScriptedConditions(.nominal)
+        let clock = ScriptedClock(100)
+        let session = scriptedSession(script, clock: clock)
+        defer { session.close() }
+        session.setScenePhase(.background)
+        let (request, _) = sampleRequest()
+        let result = await session.open(request)
+        XCTAssertEqual(result, .suspended)
+        XCTAssertEqual(session.state, .suspended)
+        // t = 100, open decision: calm, level 0; the experience waits in the state ready.
+        assertLevel(session, 0, "level 0 under nominal conditions while it waits")
+
+        // The device gets hot while the experience waits. t = 105: the app becomes active; the session
+        // activates the experience, forgets the timing and takes a decision: hot, no change yet: 0 → 1.
+        script.value = Self.serious
+        clock.now = 105
+        session.setScenePhase(.active)
+        XCTAssertEqual(session.state, .running)
+        assertLevel(session, 1, "the level of the moment of the activation")
         XCTAssertEqual(session.diagnostics.rejectedTransitions, 0)
     }
 
     // MARK: Changing the pin (FR-U06-013)
 
     func testChangingThePinWhileAnExperienceRunsAppliesAtOnce() async throws {
-        let session = scriptedSession(ScriptedConditions(.nominal))
+        let clock = ScriptedClock(100)
+        let session = scriptedSession(ScriptedConditions(.nominal), clock: clock)
         defer { session.close() }
         let (request, probe) = sampleRequest()
         let result = await session.open(request)
@@ -278,18 +408,81 @@ final class SessionQualityTests: XCTestCase {
 
         // The same pin again changes nothing; a decision with a pin changes nothing either.
         session.qualityPin = 2
-        session.refreshQuality(now: 10)
+        clock.now = 110
+        session.refreshQuality()
         assertLevel(session, 2, "the pin holds")
 
         // 2 → 1: at once.
         session.qualityPin = 1
         assertLevel(session, 1, "a changed pin applies at once")
 
-        // 1 → nil: back to automatic, which starts again from level 0 with its timing forgotten.
+        // 1 → nil: back to automatic, which starts again from level 0 with its timing forgotten and takes a
+        // decision at once (t = 110): calm, so level 0 stays.
         session.qualityPin = nil
         assertLevel(session, 0, "automatic starts again from level 0")
         XCTAssertEqual(session.state, .running)
         XCTAssertEqual(probe.makes, 1, "the same experience all along")
+    }
+
+    func testRemovingThePinUnderHeatAppliesTheAutomaticLevelAtOnce() async throws {
+        let script = ScriptedConditions(Self.serious)
+        let clock = ScriptedClock(100)
+        let session = scriptedSession(script, clock: clock)
+        defer { session.close() }
+        session.qualityPin = 0
+        let (request, _) = sampleRequest()
+        let result = await session.open(request)
+        XCTAssertEqual(result, .running)
+        // t = 100, open decision: pinned, so the policy is not asked: level 0 in spite of the heat.
+        assertLevel(session, 0, "the pin holds level 0 while the device is hot")
+
+        // t = 105: still pinned: a decision changes nothing.
+        clock.now = 105
+        session.refreshQuality()
+        assertLevel(session, 0, "the pin holds")
+
+        // The pin is removed at t = 105: the policy starts again from level 0 with its timing forgotten, and
+        // the session takes a decision at once: hot, no change yet: 0 → 1. No frame and no `refreshQuality`.
+        session.qualityPin = nil
+        let levelAtOnce = session.qualityLevel
+        let tierAtOnce = session.experience?.diagnostics.qualityTier
+        XCTAssertEqual(levelAtOnce, 1, "the automatic level for the heat applies at once")
+        XCTAssertEqual(tierAtOnce, 1, "the experience has the automatic level at once")
+        XCTAssertEqual(session.state, .running)
+    }
+
+    // MARK: Open (FR-U06-013)
+
+    func testAnOpenAlwaysSetsTheTierOfTheExperienceInstance() async throws {
+        let clock = ScriptedClock(100)
+        let session = scriptedSession(ScriptedConditions(.nominal), clock: clock)
+        defer { session.close() }
+        // One experience instance for every open of the request (`sampleRequest` builds a new one each time).
+        let shell = ExperienceShell(id: SampleExperience.id, presenter: SamplePresenter<NoFault>())
+        let request = ExperienceOpenRequest(id: SampleExperience.id, seed: 42) { shell }
+
+        session.qualityPin = 2
+        let first = await session.open(request)
+        XCTAssertEqual(first, .running)
+        XCTAssertTrue(session.experience === shell)
+        assertLevel(session, 2, "the pin at the first open")
+
+        session.close()
+        XCTAssertEqual(session.state, .idle)
+        let tierAfterClose = shell.diagnostics.qualityTier
+        XCTAssertEqual(tierAfterClose, 2, "the instance keeps its tier after the close")
+
+        // Automatic and nominal: the level in force at the second open is 0, which is also the level a new
+        // open of the session starts from. The session sets the tier all the same, so the instance leaves 2.
+        session.qualityPin = nil
+        clock.now = 110
+        let second = await session.open(request)
+        XCTAssertEqual(second, .running)
+        XCTAssertTrue(session.experience === shell, "the same instance was opened again")
+        let level = session.qualityLevel
+        let tier = shell.diagnostics.qualityTier
+        XCTAssertEqual(level, 0, "the session's level at the second open")
+        XCTAssertEqual(tier, 0, "the open set the tier of the instance")
     }
 
     // MARK: Retry (FR-U06-013)
@@ -337,13 +530,15 @@ final class SessionQualityTests: XCTestCase {
 
     func testWithoutAnExperienceTheLevelIsZeroAndRefreshDoesNothing() async throws {
         let script = ScriptedConditions(Self.serious)
-        let session = scriptedSession(script)
+        let clock = ScriptedClock(100)
+        let session = scriptedSession(script, clock: clock)
         defer { session.close() }
         let idleLevel = session.qualityLevel
         XCTAssertEqual(idleLevel, 0)
 
         session.refreshQuality()
-        session.refreshQuality(now: 10)
+        clock.now = 110
+        session.refreshQuality()
         let afterRefresh = session.qualityLevel
         XCTAssertEqual(afterRefresh, 0)
         XCTAssertEqual(script.reads, 0, "no decision without an experience: the conditions were not read")
@@ -364,7 +559,8 @@ final class SessionQualityTests: XCTestCase {
         session.close()
         let closedLevel = session.qualityLevel
         XCTAssertEqual(closedLevel, 0, "level 0 again after the close")
-        session.refreshQuality(now: 20)
+        clock.now = 120
+        session.refreshQuality()
         XCTAssertEqual(session.state, .idle)
         assertHoldsNothing(session)
     }

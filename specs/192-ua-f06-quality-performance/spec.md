@@ -138,7 +138,8 @@ experience that compiles a shader in its tenth frame and read the count of late 
    compilations are counted as a rebuild and not as late compilations.
 5. **Given** an open that fails or is cancelled before a stage ended, **When** its measurements are read,
    **Then** the stages that ended have their times and the others are absent — never zero, never an estimate.
-6. **Given** a start of the app, **When** the launcher has become usable, **Then** one launch time is recorded
+6. **Given** a start of the app, **When** its first screen (the launcher, or the welcome on a first start) has
+   become usable, **Then** one launch time is recorded
    for that start, it is not recorded again in the same process, and a first start after an installation is
    marked as such.
 
@@ -221,15 +222,15 @@ count, and no row or sentence presents a simulator number as a result.
 ### Edge Cases
 
 - **Failure while opening**: an experience that fails in its set-up has a preparation time and no first present
-  time; the record of the failed open exists and names the stage that failed.
+  time; the record of the failed open exists, and the session's diagnostics name the stage that failed.
 - **Cancellation**: leaving while an experience prepares leaves no shader or present time and no pacing sample;
   nothing is recorded as zero.
 - **Backgrounding and interruptions**: a suspended experience takes no pacing sample and no quality decision;
   the launch time is not affected by a later return to the foreground.
 - **Memory warning**: when the session sheds caches or closes the experience under memory pressure, the record
   keeps the peak graphics bytes and counts the event; the quality level is not changed by a memory warning.
-- **Replaced display context**: shaders compiled again after the context was replaced are a rebuild, timed and
-  counted apart from the first compilation and never a late compilation.
+- **Replaced display context**: shaders compiled again after the context was replaced are a rebuild, counted
+  apart from the first compilation and never a late compilation; the first set-up time is not changed by it.
 - **Clock anomalies**: a frame time that is not a finite number or runs backwards is counted as invalid and is
   not a sample; a non-finite time given to a quality decision keeps the level.
 - **Oscillating conditions**: conditions that change faster than the decision interval change the level at most
@@ -278,7 +279,9 @@ count, and no row or sentence presents a simulator number as a result.
   applied before the first frame of an experience is drawn, also after a retry.
 - **FR-U06-014**: The number of steps down and steps up of a session, the level in force, and the frame-rate cap
   and resolution factor that the existing frame pacing applies under heat MUST be readable for the performance
-  record; that frame pacing stays as it is and multiplies with the level's resolution share.
+  record. That frame pacing stays as it is: its resolution factor applies to the display surface, the level's
+  resolution share is applied by the experience to what it draws, and both are recorded. Without a render host
+  the cap and the factor are absent.
 - **FR-U06-015**: The settings MUST say what automatic and a pinned level mean, and MUST keep the choice across
   restarts as today. The text MUST be a string resource, MUST wrap at the largest accessibility text size and
   MUST leave the settings route passing its accessibility audit. This feature MUST NOT add a per-experience
@@ -295,8 +298,9 @@ count, and no row or sentence presents a simulator number as a result.
   of shader compilations after that moment MUST be counted as late compilations; compilations after a replaced display context MUST be counted as a rebuild instead.
 - **FR-U06-023**: The performance check of an experience MUST fail when it has one or more late compilations.
 - **FR-U06-024**: The app MUST record one launch time per process: from the earliest moment the app's own code
-  runs to the moment the launcher is usable, with a mark for the first start after an installation (a start that finds no stored preferences of the app).
-  Before the launcher is usable the app MUST create no rendering context. Time before the app's own code runs is
+  runs to the moment the first screen is usable (the launcher, or the welcome on a first start), with a mark for
+  the first start after an installation (a start that finds no stored preferences of the app). Before that
+  moment the app MUST create no rendering context. Time before the app's own code runs is
   not observable by the app and is not part of the value.
 
 **Running measurements**
@@ -344,8 +348,9 @@ count, and no row or sentence presents a simulator number as a result.
 
 - **FR-U06-060**: The budgets of Auto-Creator.md section 12.5 MUST be written in `docs/performance/` as
   proposals, each with the device measurement (devices, scenario, number of samples) that will confirm it.
-- **FR-U06-061**: A check MUST fail when a budget lacks its confirming measurement or when a simulator number is
-  presented without the label of a simulator development signal.
+- **FR-U06-061**: A check MUST fail when a budget lacks its confirming measurement (devices, scenario and number
+  of samples; for a budget no device measures, such as build time and app size, the tooling report that
+  measures it) or when a simulator number is presented without the label of a development signal.
 - **FR-U06-062**: No statement of this feature MUST present a simulator measurement as device performance.
 
 **Boundaries and verification**
@@ -396,7 +401,8 @@ of a device; those belong to the device task of FR-U06-073.
   newer texts is refused with its code.
 - **SC-U06-008**: The ten-minute endurance scenario passes the growth rule on both simulator runtimes, and a
   leaking test experience fails it in 1 of 1 runs.
-- **SC-U06-009**: 100% of the budget rows name their confirming device measurement, and the check finds 0
+- **SC-U06-009**: 100% of the budget rows name their confirming measurement (a device measurement with scenario
+  and samples, or the tooling report for a budget no device measures), and the check finds 0
   simulator numbers presented as results; a scratch document with one such number fails the check.
 - **SC-U06-010**: 100% of the new public framework symbols are documented, the API baseline check passes, the
   reference regression passes 7 of 7, and a release build of the app contains 0 symbols of the test access.

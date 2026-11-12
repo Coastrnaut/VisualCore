@@ -154,3 +154,17 @@ extension ExperienceSession {
 - `scripts/check_performance_docs.py [--dir docs/performance]` (new): exit 0 when every budget row is a proposal
   with its confirming device measurement and every file that mentions a simulator carries the notice; exit 1
   with file and line otherwise. Step `performance-docs` of `scripts/release_check.py`.
+
+## As built (convergence T-U06-052)
+
+Public symbols that exist beyond the ones listed above: `QualityPolicy.forgetTiming()`,
+`QualityGovernor.levelCount`, `QualityProfile.maxNameLength` (40) and `maxEffectPasses` (64),
+`PerformanceRecord.requiredKeys` and `optionalKeys`, `GrowthRule.gpuQuantity` and `footprintQuantity`,
+`ExperienceSession.timeSource` (the time source of the quality decisions; nil for the session's clock), and the
+sample fault `WrongProfileCount` in the test support. `PerformanceRecord.frameCapFPS` and `renderScale` are
+optional (`frame_cap_fps` and `render_scale` are absent without a render host), and `encoded()` applies the
+range rules of reading. `PacingMeter.skipNext()` exists and is tested; the session cuts the interval chain by
+forgetting the last presented time instead. `PresentedFrame.index` and `targetTime` are for later consumers
+(the frame meter of UA-F09). The document check accepts the status `confirmed` only with a link and the
+confirming measurement `tooling: …` for a budget no device measures.
+

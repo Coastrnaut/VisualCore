@@ -2,7 +2,10 @@
 // SC-U06-004, SC-U06-005). The stage times of an open (prepare, set-up, first presented frame, programs compiled
 // at the end of the set-up), the late shader compilations and rebuilds, and the performance record of a session:
 // its fields while an experience is open, the frozen record after a close and after a failed open, its text form,
-// and the proof that measuring changes nothing in the experience.
+// and the proof that measuring changes nothing in the experience. Also: a suspension between presented frames, a
+// context loss the render host detects itself (injected with the host's internal test hook, hence the testable
+// import of VisualCoreRendering), a close under memory pressure, the steps of the quality level and the
+// first-present time of an open that waited for its activation.
 // The helpers (`sampleRequest`, `SampleProbe`, `layOut`, `drawFrame`, `openInBackground`, …) are in
 // SessionOpenCloseTests.swift and SamplePresenter.swift. Test-only.
 import SwiftUI
@@ -11,7 +14,7 @@ import XCTest
 import VisualCoreDiagnostics
 import VisualCoreExperience
 @testable import VisualCoreExperienceHost
-import VisualCoreRendering
+@testable import VisualCoreRendering
 import VisualCoreTestSupport
 
 // MARK: - A presenter that compiles shader programs
@@ -123,6 +126,20 @@ private func compilingRequest(compilesInSetup: Bool, lateFrame: Int?,
     return (request, probe)
 }
 
+/// The time a test scripts; the session's `timeSource` reads it at every quality decision.
+@MainActor
+private final class ScriptedTime {
+    var now: Double
+    init(_ now: Double) { self.now = now }
+}
+
+/// The device conditions a test scripts; the session's `conditions` closure reads them.
+@MainActor
+private final class ScriptedDevice {
+    var value: DeviceConditions
+    init(_ value: DeviceConditions) { self.value = value }
+}
+
 // MARK: - Tests
 
 @MainActor
@@ -151,6 +168,35 @@ final class SessionPerformanceTests: XCTestCase {
         var drawn = 0
         for _ in 0..<count where drawFrame(session) { drawn += 1 }
         return drawn
+    }
+
+    /// Presents one frame on `host`: first the laid-out host as it is (off screen); when that does not present,
+    /// with the host's view in a window, which is returned so that the test can hide it at its end. `presented`
+    /// is false when no frame can reach a display here (the caller skips then).
+    private func presentFirstFrame(_ host: RenderHost) -> (presented: Bool, window: UIWindow?) {
+        let before = host.presentedFrameCount
+        if host.renderOneFrame(present: true), host.presentedFrameCount > before {
+            return (true, nil)
+        }
+        let frame = CGRect(x: 0, y: 0, width: 64, height: 64)
+        let shown = UIWindow(frame: frame)
+        let controller = UIViewController()
+        shown.rootViewController = controller
+        shown.isHidden = false
+        controller.view.frame = frame
+        controller.view.addSubview(host.view)
+        host.view.frame = frame
+        shown.layoutIfNeeded()
+        host.view.layoutIfNeeded()
+        let drawn = host.renderOneFrame(present: true)
+        return (drawn && host.presentedFrameCount > before, shown)
+    }
+
+    /// Presents `count` more frames on `host`; returns how many were presented.
+    private func presentFrames(_ host: RenderHost, _ count: Int) -> Int {
+        var presented = 0
+        for _ in 0..<count where host.renderOneFrame(present: true) { presented += 1 }
+        return presented
     }
 
     /// Checks that no stage of `timings` has a value.
@@ -432,8 +478,10 @@ final class SessionPerformanceTests: XCTestCase {
         XCTAssertEqual(record.prepareMs, timings.prepare.map { $0 * 1_000 }, "milliseconds")
         XCTAssertEqual(record.setupMs, timings.setup.map { $0 * 1_000 }, "milliseconds")
         XCTAssertEqual(record.programsCompiled, timings.programsCompiled)
-        XCTAssertEqual(record.frameCapFPS, host.framePacing.maxFPS)
-        XCTAssertEqual(record.renderScale, host.framePacing.renderScale)
+        let frameCap = try XCTUnwrap(record.frameCapFPS, "a render host exists, so the cap is in the record")
+        let renderScale = try XCTUnwrap(record.renderScale, "a render host exists, so the scale is in the record")
+        XCTAssertEqual(frameCap, host.framePacing.maxFPS)
+        XCTAssertEqual(renderScale, host.framePacing.renderScale)
         XCTAssertEqual(record.memoryEvents, 0)
         XCTAssertEqual(record.rebuilds, 0)
         XCTAssertNil(record.launchMs, "no launch time was given")
@@ -465,23 +513,53 @@ final class SessionPerformanceTests: XCTestCase {
         XCTAssertEqual(after.qualityLevel, before.qualityLevel)
     }
 
-    func testASuspensionAndAResumeAddNoMissedRefreshAndNoSample() async throws {
-        let (session, _) = await runningSession(frames: 3)
-        defer { session.close() }
-        let before = try XCTUnwrap(session.performanceRecord)
+    func testASuspensionBetweenPresentedFramesAddsNoSampleAndNoLongInterval() async throws {
+        let (session, _) = await runningSession()
+        var window: UIWindow?
+        defer {
+            window?.isHidden = true
+            session.close()
+        }
+        let host = try XCTUnwrap(session.renderHost)
+        let first = presentFirstFrame(host)
+        window = first.window
+        guard first.presented else {
+            throw XCTSkip("no frame could be presented here, neither off screen nor in a window")
+        }
 
+        // N = 4 presented frames before the suspension: N − 1 = 3 intervals.
+        let moreBefore = presentFrames(host, 3)
+        XCTAssertEqual(moreBefore, 3, "three more frames were presented")
+        let framesBefore = host.presentedFrameCount
+        XCTAssertEqual(framesBefore, 4)
+        let before = try XCTUnwrap(session.performanceRecord)
+        XCTAssertEqual(before.pacing.samples, framesBefore - 1, "one interval between two presented frames")
+
+        // Away for 0.3 s: an interval that spanned it would be far longer than 1.5 refresh periods and would
+        // fall in the last bin of the meter (250 ms and more).
         session.setScenePhase(.background)
         XCTAssertEqual(session.state, .suspended)
         let away = try XCTUnwrap(session.performanceRecord, "a suspended experience has a record")
         XCTAssertEqual(away.pacing, before.pacing)
+        try await Task.sleep(for: .milliseconds(300))
+        XCTAssertEqual(host.presentedFrameCount, framesBefore, "a paused host presents nothing")
 
         session.setScenePhase(.active)
         XCTAssertEqual(session.state, .running)
-        XCTAssertEqual(drawFrames(session, 3), 3)
+        let resumed = try XCTUnwrap(session.performanceRecord)
+        XCTAssertEqual(resumed.pacing, before.pacing, "the resume itself is no sample")
+
+        // M = 3 presented frames after the resume: the first one starts a new chain, so M − 1 = 2 intervals.
+        let moreAfter = presentFrames(host, 3)
+        XCTAssertEqual(moreAfter, 3, "three frames were presented after the resume")
+        let framesAfter = host.presentedFrameCount - framesBefore
+        XCTAssertEqual(framesAfter, 3)
         let after = try XCTUnwrap(session.performanceRecord)
-        XCTAssertEqual(after.pacing, before.pacing, "no frame was presented in between")
-        XCTAssertEqual(after.pacing.missed, before.pacing.missed)
-        XCTAssertEqual(after.pacing.samples, before.pacing.samples)
+        XCTAssertEqual(after.pacing.samples, (framesBefore - 1) + (framesAfter - 1),
+                       "the interval across the suspension is no sample")
+        XCTAssertEqual(after.pacing.invalid, before.pacing.invalid)
+        let slowest = try XCTUnwrap(after.pacing.p99Ms, "there are samples")
+        XCTAssertLessThan(slowest, 250, "no interval of the time away was recorded")
     }
 
     func testAfterACloseTheLastRecordIsTheFrozenOneAndTheLiveRecordIsNil() async throws {
@@ -545,5 +623,224 @@ final class SessionPerformanceTests: XCTestCase {
         XCTAssertEqual(measured.digest, unmeasured.digest, "reading the record does not change the state")
         XCTAssertEqual(measured.steps, unmeasured.steps)
         XCTAssertGreaterThan(unmeasured.steps, 0, "the run advanced the state")
+    }
+
+    // MARK: Record without a render host, lost context, memory pressure, steps, deferred open
+
+    func testAFailedOpenWithoutARenderHostRecordsNoFrameCapAndNoRenderScale() async throws {
+        let session = ExperienceSession()
+        defer { session.close() }
+        let (failing, _) = sampleRequest(FailingPreparation.self)
+        let result = await session.open(failing)
+        guard case .failed(let failure) = result else { return XCTFail("got \(result)") }
+        XCTAssertEqual(failure.stage, .prepare)
+        XCTAssertNil(session.renderHost, "a failed preparation never had a render host")
+        XCTAssertNil(session.performanceRecord)
+
+        // `fail` freezes a record whenever the session holds an experience, and it does from the factory call on.
+        let record = try XCTUnwrap(session.lastPerformanceRecord, "the failed preparation leaves a record")
+        XCTAssertEqual(record.experience, SampleExperience.id.rawValue)
+        XCTAssertNil(record.frameCapFPS, "no render host, no frame cap")
+        XCTAssertNil(record.renderScale, "no render host, no render scale")
+        XCTAssertNotNil(record.prepareMs, "the preparation that failed has a duration")
+        XCTAssertNil(record.setupMs)
+        XCTAssertNil(record.firstPresentMs)
+        XCTAssertNil(record.programsCompiled)
+        XCTAssertFalse(record.presented)
+        XCTAssertEqual(record.gpuBytes, 0)
+        XCTAssertEqual(record.gpuPeakBytes, 0)
+
+        let data = try record.encoded()
+        let text = String(decoding: data, as: UTF8.self)
+        XCTAssertFalse(text.contains("frame_cap_fps"), text)
+        XCTAssertFalse(text.contains("render_scale"), text)
+        XCTAssertTrue(text.contains("prepare_ms"), text)
+        let back = try PerformanceRecord(data: data)
+        XCTAssertEqual(back, record)
+
+        // A running experience has a render host, and its record has both values.
+        let (request, _) = sampleRequest()
+        let opened = await session.open(request)
+        XCTAssertEqual(opened, .running)
+        let host = try XCTUnwrap(session.renderHost)
+        let running = try XCTUnwrap(session.performanceRecord)
+        let frameCap = try XCTUnwrap(running.frameCapFPS)
+        let renderScale = try XCTUnwrap(running.renderScale)
+        XCTAssertEqual(frameCap, host.framePacing.maxFPS)
+        XCTAssertEqual(renderScale, host.framePacing.renderScale)
+        let runningData = try running.encoded()
+        let runningText = String(decoding: runningData, as: UTF8.self)
+        XCTAssertTrue(runningText.contains("frame_cap_fps"), runningText)
+        XCTAssertTrue(runningText.contains("render_scale"), runningText)
+    }
+
+    func testAContextLossTheHostDetectsItselfIsARebuildAndNoLateCompilation() async throws {
+        let session = ExperienceSession()
+        defer { session.close() }
+        let (request, probe) = compilingRequest(compilesInSetup: true, lateFrame: nil)
+        let result = await session.open(request)
+        XCTAssertEqual(result, .running)
+        layOut(session)
+        let drawnBefore = drawFrames(session, 3)
+        XCTAssertEqual(drawnBefore, 3)
+        let host = try XCTUnwrap(session.renderHost)
+        let compiledBefore = host.resources.compileCount
+        XCTAssertEqual(compiledBefore, 1, "the set-up compiled one program")
+        let timingsBefore = session.diagnostics.timings
+        XCTAssertEqual(timingsBefore.programsCompiled, 1)
+        let generationBefore = host.generation
+
+        // The host's test hook: the next frame ends as if the swap had failed with EGL_CONTEXT_LOST. The host
+        // reports the loss to its observers (the session counts the rebuild) and recreates its context in the
+        // same call, so nothing has to be awaited.
+        host.simulateContextLossOnNextFrame()
+        let lostFrame = host.renderOneFrame(present: false)
+        XCTAssertFalse(lostFrame, "the frame with the lost context is dropped")
+        XCTAssertGreaterThan(host.generation, generationBefore, "the host recreated its context")
+        XCTAssertEqual(host.state, .active)
+        XCTAssertEqual(session.state, .running, "a context the host rebuilt is no failure")
+        XCTAssertTrue(session.renderHost === host)
+        XCTAssertEqual(probe.presenter?.inner.setupCalls, 2, "the scene was set up again")
+        let compiledAfter = host.resources.compileCount
+        XCTAssertEqual(compiledAfter, compiledBefore + 1, "the program of the set-up was compiled again")
+        let atRebuild = try XCTUnwrap(session.performanceRecord)
+        XCTAssertEqual(atRebuild.rebuilds, 1)
+        XCTAssertEqual(atRebuild.lateCompilations, 0, "also before the next drawn frame")
+
+        let drawnAfter = drawFrames(session, 20)
+        XCTAssertEqual(drawnAfter, 20)
+        let record = try XCTUnwrap(session.performanceRecord)
+        XCTAssertEqual(record.rebuilds, 1)
+        XCTAssertEqual(record.lateCompilations, 0, "a rebuild after a lost context is not a late compilation")
+        XCTAssertTrue(record.passes)
+        XCTAssertEqual(host.resources.compileCount, compiledAfter, "nothing was compiled in the frames after")
+        let timingsAfter = session.diagnostics.timings
+        XCTAssertEqual(timingsAfter.programsCompiled, timingsBefore.programsCompiled,
+                       "the count of the open's set-up stays")
+        XCTAssertEqual(timingsAfter.setup, timingsBefore.setup, "the time of the first set-up stays")
+        XCTAssertEqual(record.programsCompiled, 1)
+        XCTAssertEqual(session.diagnostics.contextRecreations, 1)
+        XCTAssertEqual(session.diagnostics.failures, 0)
+    }
+
+    func testTheFrozenRecordOfACloseUnderMemoryPressureKeepsThePeakAndTheEvent() async throws {
+        let session = ExperienceSession()
+        defer { session.close() }
+        // A limit of 0 bytes is raised to the rule's minimum of 1 byte; the sample's 1 × 1 texture has 4.
+        let (request, _) = sampleRequest(memoryPressureLimit: 0)
+        let result = await session.open(request)
+        XCTAssertEqual(result, .running)
+        layOut(session)
+        let drawn = drawFrames(session, 3)
+        XCTAssertEqual(drawn, 3)
+        let host = try XCTUnwrap(session.renderHost)
+        let liveBefore = host.resources.stats.totalBytes
+        XCTAssertGreaterThan(liveBefore, 1, "the session is above its limit")
+        XCTAssertNil(session.lastPerformanceRecord, "nothing was closed yet")
+
+        session.handleMemoryWarning()
+        XCTAssertEqual(session.state, .message)
+        XCTAssertNil(session.performanceRecord, "no experience is open after the close")
+        let frozen = try XCTUnwrap(session.lastPerformanceRecord, "the close under memory pressure leaves a record")
+        XCTAssertEqual(frozen.experience, SampleExperience.id.rawValue)
+        XCTAssertEqual(frozen.memoryEvents, 1, "the warning that closed the experience is counted")
+        XCTAssertGreaterThanOrEqual(frozen.gpuPeakBytes, liveBefore, "the peak is read before the host is destroyed")
+        XCTAssertGreaterThanOrEqual(frozen.gpuBytes, liveBefore, "and so are the live bytes")
+        XCTAssertNotNil(frozen.frameCapFPS, "the render host still existed")
+        XCTAssertNotNil(frozen.renderScale)
+        XCTAssertEqual(session.diagnostics.memoryClosures, 1)
+    }
+
+    func testStepsDownAndUpOfTheSessionAreInItsRecord() async throws {
+        let time = ScriptedTime(100)
+        let device = ScriptedDevice(DeviceConditions(thermal: .serious, lowPower: false))
+        let session = ExperienceSession()
+        defer { session.close() }
+        session.timeSource = { time.now }
+        session.conditions = { device.value }
+        // The host is never laid out: without a surface no frame is drawn, so only the open and the calls of
+        // `refreshQuality()` below take decisions. The sample has three levels.
+        let (request, _) = sampleRequest()
+        let result = await session.open(request)
+        XCTAssertEqual(result, .running)
+
+        // t = 100 (open): hot, no change yet, so one step down: 0 → 1; last change = 100.
+        XCTAssertEqual(session.qualityLevel, 1)
+
+        // t = 102: hot; 102 − 100 ≥ 1 s (governor) and ≥ 2 s (decision interval): 1 → 2; last change = 102.
+        time.now = 102
+        session.refreshQuality()
+        XCTAssertEqual(session.qualityLevel, 2)
+
+        // t = 103: nominal; the calm period starts at 103; no step (and 103 − 102 < 2 s anyway).
+        device.value = .nominal
+        time.now = 103
+        session.refreshQuality()
+        XCTAssertEqual(session.qualityLevel, 2)
+
+        // t = 113: 10 s of calm (calm period) and 113 − 102 ≥ 2 s since the last change: one step up, 2 → 1.
+        time.now = 113
+        session.refreshQuality()
+        XCTAssertEqual(session.qualityLevel, 1)
+
+        let record = try XCTUnwrap(session.performanceRecord)
+        XCTAssertEqual(record.stepsDown, 2)
+        XCTAssertEqual(record.stepsUp, 1)
+        XCTAssertEqual(record.qualityLevel, 1)
+        XCTAssertEqual(record.qualityLevels, 3)
+        XCTAssertFalse(record.qualityPinned)
+        XCTAssertEqual(record.thermal, .nominal)
+        XCTAssertFalse(record.lowPower)
+
+        // The frozen record keeps the steps (the governor is dropped only after the record was taken).
+        session.close()
+        let frozen = try XCTUnwrap(session.lastPerformanceRecord)
+        XCTAssertEqual(frozen.stepsDown, 2)
+        XCTAssertEqual(frozen.stepsUp, 1)
+        XCTAssertEqual(frozen.qualityLevel, 1)
+    }
+
+    func testTheFirstPresentTimeOfADeferredOpenDoesNotIncludeTheWait() async throws {
+        let session = ExperienceSession()
+        var window: UIWindow?
+        defer {
+            window?.isHidden = true
+            session.close()
+        }
+        let clock = ContinuousClock()
+        session.setScenePhase(.background)
+        let openStart = clock.now
+        let (request, _) = sampleRequest()
+        let result = await session.open(request)
+        XCTAssertEqual(result, .suspended)
+        XCTAssertEqual(session.state, .suspended)
+        layOut(session)
+        let host = try XCTUnwrap(session.renderHost)
+
+        // The experience waits half a second for the app to become active.
+        try await Task.sleep(for: .milliseconds(500))
+        XCTAssertNil(session.diagnostics.timings.firstPresent)
+
+        session.setScenePhase(.active)
+        XCTAssertEqual(session.state, .running)
+        let first = presentFirstFrame(host)
+        window = first.window
+        let total = clock.now - openStart
+        guard first.presented else {
+            XCTAssertNil(session.diagnostics.timings.firstPresent)
+            throw XCTSkip("no frame could be presented here, neither off screen nor in a window")
+        }
+
+        let firstPresent = try XCTUnwrap(session.diagnostics.timings.firstPresent, "set by the presented frame")
+        let parts = total.components
+        let totalSeconds = Double(parts.seconds) + Double(parts.attoseconds) * 1e-18
+        XCTAssertGreaterThanOrEqual(totalSeconds, 0.5, "the test really waited")
+        XCTAssertGreaterThanOrEqual(firstPresent, 0)
+        // The wait (at least the 0.5 s slept) is taken out: what is left is at most the rest of the real time.
+        XCTAssertLessThanOrEqual(firstPresent, totalSeconds - 0.5 + 0.001, "the wait is not in the time")
+        XCTAssertLessThan(firstPresent, 0.4, "the 0.5 s of waiting are not part of the first-present time")
+        let record = try XCTUnwrap(session.performanceRecord)
+        XCTAssertTrue(record.presented)
+        XCTAssertEqual(record.firstPresentMs, firstPresent * 1_000)
     }
 }

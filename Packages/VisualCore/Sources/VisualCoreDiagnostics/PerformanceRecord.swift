@@ -63,14 +63,14 @@ public struct PerformanceRecord: Sendable, Equatable {
 
     /// The keys every record has, sorted (without `version`).
     public static let requiredKeys: [String] = [
-        "experience", "frame_cap_fps", "gpu_bytes", "gpu_peak_bytes", "late_compilations", "low_power",
+        "experience", "gpu_bytes", "gpu_peak_bytes", "late_compilations", "low_power",
         "memory_events", "pacing", "presented", "quality_level", "quality_levels", "quality_pinned", "rebuilds",
-        "render_scale", "steps_down", "steps_up", "thermal",
+        "steps_down", "steps_up", "thermal",
     ]
     /// The keys a record has only when the measurement exists, sorted.
     public static let optionalKeys: [String] = [
-        "first_launch", "first_present_ms", "launch_ms", "memory_footprint_bytes", "prepare_ms",
-        "programs_compiled", "setup_ms",
+        "first_launch", "first_present_ms", "frame_cap_fps", "launch_ms", "memory_footprint_bytes", "prepare_ms",
+        "programs_compiled", "render_scale", "setup_ms",
     ]
 
     /// The experience id (`experience`).
@@ -91,10 +91,10 @@ public struct PerformanceRecord: Sendable, Equatable {
     public var thermal: FramePacing.Thermal
     /// Whether Low Power Mode was on (`low_power`).
     public var lowPower: Bool
-    /// The frame pacing's cap in frames per second (`frame_cap_fps`).
-    public var frameCapFPS: Int
-    /// The frame pacing's render scale, above 0 and at most 1 (`render_scale`).
-    public var renderScale: Double
+    /// The frame pacing's cap in frames per second (`frame_cap_fps`); nil when no render host existed.
+    public var frameCapFPS: Int?
+    /// The frame pacing's render scale, above 0 and at most 1 (`render_scale`); nil when no render host existed.
+    public var renderScale: Double?
     /// The frame pacing summary (`pacing`).
     public var pacing: PacingSummary
     /// The graphics bytes of the resource ledger (`gpu_bytes`).
@@ -124,8 +124,8 @@ public struct PerformanceRecord: Sendable, Equatable {
 
     /// Creates a record; the optional measurements default to absent.
     public init(experience: String, presented: Bool, qualityLevel: Int, qualityPinned: Bool, qualityLevels: Int,
-                stepsDown: Int, stepsUp: Int, thermal: FramePacing.Thermal, lowPower: Bool, frameCapFPS: Int,
-                renderScale: Double, pacing: PacingSummary, gpuBytes: Int, gpuPeakBytes: Int,
+                stepsDown: Int, stepsUp: Int, thermal: FramePacing.Thermal, lowPower: Bool, frameCapFPS: Int?,
+                renderScale: Double?, pacing: PacingSummary, gpuBytes: Int, gpuPeakBytes: Int,
                 lateCompilations: Int, rebuilds: Int, memoryEvents: Int, launchMs: Double? = nil,
                 firstLaunch: Bool? = nil, prepareMs: Double? = nil, setupMs: Double? = nil,
                 firstPresentMs: Double? = nil, programsCompiled: Int? = nil, memoryFootprintBytes: Int? = nil) {
@@ -201,9 +201,9 @@ public struct PerformanceRecord: Sendable, Equatable {
         guard let thermal = Self.thermal(named: thermalName) else { throw .invalidValue("thermal") }
         self.thermal = thermal
         lowPower = try Self.bool(object, "low_power")
-        frameCapFPS = try Self.count(object, "frame_cap_fps")
-        renderScale = try Self.measure(object, "render_scale")
-        guard renderScale > 0, renderScale <= 1 else { throw .invalidValue("render_scale") }
+        frameCapFPS = try Self.optionalCount(object, "frame_cap_fps")
+        renderScale = try Self.optionalMeasure(object, "render_scale")
+        if let renderScale, !(renderScale > 0 && renderScale <= 1) { throw .invalidValue("render_scale") }
         pacing = try Self.readPacing(object["pacing"])
         gpuBytes = try Self.count(object, "gpu_bytes")
         gpuPeakBytes = try Self.count(object, "gpu_peak_bytes")
@@ -233,7 +233,7 @@ public struct PerformanceRecord: Sendable, Equatable {
         if let value = pacing.p95Ms { pacingObject["p95_ms"] = try Self.finite(value, "pacing.p95_ms") }
         if let value = pacing.p99Ms { pacingObject["p99_ms"] = try Self.finite(value, "pacing.p99_ms") }
 
-        let scale = try Self.finite(renderScale, "render_scale")
+        try checkRanges()
         var object: [String: Any] = [
             Self.versionKey: Self.version,
             "experience": experience,
@@ -245,8 +245,6 @@ public struct PerformanceRecord: Sendable, Equatable {
             "steps_up": stepsUp,
             "thermal": Self.name(of: thermal),
             "low_power": lowPower,
-            "frame_cap_fps": frameCapFPS,
-            "render_scale": scale,
             "pacing": pacingObject,
             "gpu_bytes": gpuBytes,
             "gpu_peak_bytes": gpuPeakBytes,
@@ -254,6 +252,8 @@ public struct PerformanceRecord: Sendable, Equatable {
             "rebuilds": rebuilds,
             "memory_events": memoryEvents,
         ]
+        if let value = frameCapFPS { object["frame_cap_fps"] = value }
+        if let value = renderScale { object["render_scale"] = try Self.finite(value, "render_scale") }
         if let value = launchMs { object["launch_ms"] = try Self.finite(value, "launch_ms") }
         if let value = firstLaunch { object["first_launch"] = value }
         if let value = prepareMs { object["prepare_ms"] = try Self.finite(value, "prepare_ms") }
@@ -392,6 +392,31 @@ public struct PerformanceRecord: Sendable, Equatable {
     }
 
     // MARK: - Writing helpers
+
+    /// The range rules of reading, applied before writing: a record that could not be read back is not written.
+    private func checkRanges() throws(PerformanceRecordError) {
+        guard (1...8).contains(qualityLevels) else { throw .invalidValue("quality_levels") }
+        guard qualityLevel >= 0, qualityLevel < qualityLevels else { throw .invalidValue("quality_level") }
+        let counts: [(String, Int?)] = [
+            ("steps_down", stepsDown), ("steps_up", stepsUp), ("gpu_bytes", gpuBytes),
+            ("gpu_peak_bytes", gpuPeakBytes), ("late_compilations", lateCompilations), ("rebuilds", rebuilds),
+            ("memory_events", memoryEvents), ("frame_cap_fps", frameCapFPS), ("programs_compiled", programsCompiled),
+            ("memory_footprint_bytes", memoryFootprintBytes), ("pacing.samples", pacing.samples),
+            ("pacing.on_time", pacing.onTime), ("pacing.missed", pacing.missed), ("pacing.invalid", pacing.invalid),
+        ]
+        for (key, value) in counts {
+            if let value, value < 0 { throw .invalidValue(key) }
+        }
+        let measures: [(String, Double?)] = [
+            ("launch_ms", launchMs), ("prepare_ms", prepareMs), ("setup_ms", setupMs),
+            ("first_present_ms", firstPresentMs), ("pacing.median_ms", pacing.medianMs),
+            ("pacing.p95_ms", pacing.p95Ms), ("pacing.p99_ms", pacing.p99Ms),
+        ]
+        for (key, value) in measures {
+            if let value, !(value >= 0) { throw .invalidValue(key) }
+        }
+        if let renderScale, !(renderScale > 0 && renderScale <= 1) { throw .invalidValue("render_scale") }
+    }
 
     /// The value as a JSON number that reads back to exactly the same `Double`, when it is finite; otherwise
     /// `invalidValue` with the key (also for a magnitude below 1e-100 or above 1e100). The number is written with the digits of Swift's shortest exact text of the

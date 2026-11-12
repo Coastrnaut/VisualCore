@@ -107,13 +107,14 @@ private func writeRefusal(_ record: PerformanceRecord) -> PerformanceRecordError
     #expect(PerformanceRecord.maxBytes == 65_536)
     // Data-model section 5, without `version`.
     #expect(PerformanceRecord.requiredKeys == [
-        "experience", "frame_cap_fps", "gpu_bytes", "gpu_peak_bytes", "late_compilations", "low_power",
+        "experience", "gpu_bytes", "gpu_peak_bytes", "late_compilations", "low_power",
         "memory_events", "pacing", "presented", "quality_level", "quality_levels", "quality_pinned", "rebuilds",
-        "render_scale", "steps_down", "steps_up", "thermal",
+        "steps_down", "steps_up", "thermal",
     ])
+    // The frame-rate cap and the render scale exist only with a render host (convergence, T-U06-047).
     #expect(PerformanceRecord.optionalKeys == [
-        "first_launch", "first_present_ms", "launch_ms", "memory_footprint_bytes", "prepare_ms",
-        "programs_compiled", "setup_ms",
+        "first_launch", "first_present_ms", "frame_cap_fps", "launch_ms", "memory_footprint_bytes", "prepare_ms",
+        "programs_compiled", "render_scale", "setup_ms",
     ])
     #expect(PerformanceRecord.requiredKeys == PerformanceRecord.requiredKeys.sorted())
     #expect(PerformanceRecord.optionalKeys == PerformanceRecord.optionalKeys.sorted())
@@ -168,7 +169,9 @@ private func writeRefusal(_ record: PerformanceRecord) -> PerformanceRecordError
 }
 
 @Test func performanceRecordWithoutMeasurementsHasNoOptionalKey() {
-    let record = requiredOnlyRecord()
+    var record = requiredOnlyRecord()
+    record.frameCapFPS = nil   // no render host existed
+    record.renderScale = nil
     let data = text(of: record)
     let dictionary = object(of: data)
     #expect(dictionary.keys.sorted() == (PerformanceRecord.requiredKeys + ["version"]).sorted())
@@ -349,3 +352,38 @@ private func writeRefusal(_ record: PerformanceRecord) -> PerformanceRecordError
         #expect(refusal == .invalidValue("prepare_ms"), "value \(value)")
     }
 }
+
+// Convergence T-U06-049: what cannot be read is not written.
+@Test func performanceRecordIsNotWrittenWithValuesReadingRefuses() {
+    let broken: [(String, (inout PerformanceRecord) -> Void)] = [
+        ("quality_levels", { $0.qualityLevels = 0 }),
+        ("quality_levels", { $0.qualityLevels = 9 }),
+        ("quality_level", { $0.qualityLevel = $0.qualityLevels }),
+        ("quality_level", { $0.qualityLevel = -1 }),
+        ("steps_down", { $0.stepsDown = -1 }),
+        ("gpu_bytes", { $0.gpuBytes = -1 }),
+        ("late_compilations", { $0.lateCompilations = -2 }),
+        ("frame_cap_fps", { $0.frameCapFPS = -30 }),
+        ("render_scale", { $0.renderScale = 0 }),
+        ("render_scale", { $0.renderScale = 1.5 }),
+        ("prepare_ms", { $0.prepareMs = -0.5 }),
+        ("pacing.samples", { $0.pacing.samples = -1 }),
+        ("pacing.median_ms", { $0.pacing.medianMs = -1 }),
+        ("memory_footprint_bytes", { $0.memoryFootprintBytes = -1 }),
+    ]
+    for (key, change) in broken {
+        var record = fullRecord()
+        change(&record)
+        var refusal: PerformanceRecordError?
+        do {
+            _ = try record.encoded()
+        } catch {
+            refusal = error
+        }
+        #expect(refusal == .invalidValue(key), "\(key)")
+    }
+    // The untouched record is still written and read.
+    let good = fullRecord()
+    #expect(read(text(of: good)) == good)
+}
+

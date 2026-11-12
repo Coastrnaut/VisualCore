@@ -139,14 +139,14 @@ changes its signature. Protocol requirements are added with defaults (`Experienc
 
 - The governor, the meter and the record are values owned by `ExperienceSession`, which is bound to the main
   actor; `RenderHost` calls present observers on the main thread after `eglSwapBuffers` succeeded.
-- Open: prepare → apply the level in force → (restore) → create host (set-up timed, programs counted) → activate →
+- Open: prepare → (restore) → apply the level in force → create host (set-up timed, programs counted) → activate →
   first frame. Interactive begins when the session becomes running; the compile baseline is taken then.
 - Running: each presented frame gives one interval to the meter; at most once per second the governor decides;
   a changed level is applied through `setQualityTier`.
 - Suspend: no decision, no sample; resume: `governor.resume()`, `meter.skipNext()`.
 - Context recreation: rebuild counted, compile baseline taken again.
 - Close: the record is frozen into `lastPerformanceRecord` before the host is destroyed (peak bytes are read
-  first); a failed or cancelled open leaves a record with the stages that ended.
+  first); a failed open leaves a record with the stages that ended; a cancelled preparation leaves none.
 - Memory warning: counted in `memory_events`; the level is not changed.
 
 ## Data schemas
