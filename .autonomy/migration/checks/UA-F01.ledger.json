@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "python3",
+    "scripts/migration_ledger.py",
+    "validate"
+  ],
+  "command": "python3 scripts/migration_ledger.py validate",
+  "elapsed_seconds": 0.032,
+  "exit_code": 0,
+  "finished": "2026-11-12T06:06:59+00:00",
+  "gate": "UA-F01",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F01.ledger.log",
+  "log_sha256": "51f6e99a19837cc8b7751a0c0a444d4e43f907efce357ffd7e8dcd14cfde9d49",
+  "name": "ledger",
+  "started": "2026-11-12T06:06:59+00:00",
+  "timed_out": false
+}
