@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Apps/ParticleUniverse/ParticleUniverseCore"
+  ],
+  "command": "swift test --package-path Apps/ParticleUniverse/ParticleUniverseCore",
+  "elapsed_seconds": 14.307,
+  "exit_code": 0,
+  "finished": "2026-11-12T00:34:19+00:00",
+  "log": ".autonomy/logs/A04-P03.t307-slots-2.log",
+  "log_sha256": "a4222cec768f02308798cb997dba157aec3fe564c6d34df6fab5487eed611eb7",
+  "name": "t307-slots-2",
+  "stage": "A04-P03",
+  "started": "2026-11-12T00:34:04+00:00",
+  "timed_out": false
+}

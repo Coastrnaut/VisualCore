@@ -55,6 +55,11 @@ remaining design decisions.
   `isEmitting = false` and retires the slot. The last visible emitter cannot be removed. `rebuildScene()` builds a
   fresh `ParticleScene` from the visible emitters (for the family and seed rebuild paths).
 - **Rationale:** no live particle ever changes source, so nothing recolors or vanishes (US1 AC2).
+- **Family forces (T-A04-307):** the forces a family brings (Fountain gravity, Firework drag) are global, so with
+  several emitters they are the deduplicated forces of the visible emitters' families, in order of first
+  appearance, rebuilt after each add, remove or family change; the placed force and scene forces stay in front. Two
+  Fountains therefore bring one gravity, not two. Initialization uses the same rule; the replay fixture's families
+  (Fountain, Firework) are distinct, so it is unchanged.
 - A new `ParticleSystem` query is needed to know whether a source still has live particles: add the generic
   `ParticleSystem.liveCount(source:)` (VisualCoreSimulation, documented and tested) rather than reading internals
   from the app.

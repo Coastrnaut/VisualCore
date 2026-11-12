@@ -1,6 +1,9 @@
 // SceneSimulation.swift — a validated scene running on VisualCore's ParticleSystem and FixedStepRunner (feature 033
 // A04-P01 T-A04-108; FR-A04-103–FR-A04-105; research R5, R6). Fixed step 1/120 s, at most 8 steps per frame; the time
 // scale multiplies frame time only, so replays stay deterministic.
+// Feature 035 (A04-P03 T-A04-307): emitter slots with retirement — removed emitters stop emitting and keep their slot
+// until their last particle dies, so no live particle changes look (research R4); family forces are the deduplicated
+// forces of the visible emitters' families.
 import VisualCoreMath
 import VisualCoreSimulation
 
@@ -28,6 +31,12 @@ public struct SceneState: FixedStepSimulation, Sendable {
         case (nil, true): system.forces.removeFirst(); hasPlacedForce = false
         case (nil, false): break
         }
+    }
+
+    /// Replaces the family forces (everything after the placed force and the scene forces).
+    mutating func replaceFamilyForces(_ forces: [ParticleForce]) {
+        let keep = sceneForceCount + (hasPlacedForce ? 1 : 0)
+        system.forces = Array(system.forces.prefix(keep)) + forces
     }
 
     /// Applies one command (ignoring and counting invalid ones).
@@ -66,10 +75,106 @@ public struct SceneSimulation: Sendable {
         self.scene = scene
         var system = ParticleSystem(capacity: scene.particleLimit, seed: scene.seed)
         system.emitters = scene.emitters.map { $0.emitter() }
-        system.forces = scene.forces.map(\.particleForce) + scene.emitters.flatMap { $0.family.forces() }
+        system.forces = scene.forces.map(\.particleForce) + Self.familyForces(scene.emitters)
         let state = SceneState(system: system, sceneForceCount: scene.forces.count)
+        slots = scene.emitters.map { Optional($0) }
         runner = FixedStepRunner(simulation: state, clock: FixedStepClock(step: Self.step, maxSteps: Self.maxStepsPerFrame),
                                  stream: ControlStream(controls)) { state, command in state.apply(command) }
+    }
+
+    /// The forces the families of `emitters` bring, each family once, in order of first appearance (feature 035; a
+    /// scene with two Fountains has one gravity, not two).
+    static func familyForces(_ emitters: [SceneEmitter]) -> [ParticleForce] {
+        var seen: [EmitterFamily] = []
+        for e in emitters where !seen.contains(e.family) { seen.append(e.family) }
+        return seen.flatMap { $0.forces() }
+    }
+
+    // MARK: Emitter slots (feature 035)
+
+    /// One entry per particle-system emitter: the visible emitter, or nil for a retired slot whose particles fade.
+    public private(set) var slots: [SceneEmitter?] = []
+    /// The emitters a person sees, in order.
+    public var visibleEmitters: [SceneEmitter] { slots.compactMap { $0 } }
+    /// Slots of removed emitters whose particles may still be alive.
+    public var retiredSlots: Int { slots.filter { $0 == nil }.count }
+
+    private func slotIndex(visible index: Int) -> Int? {
+        var n = -1
+        for (i, s) in slots.enumerated() where s != nil {
+            n += 1
+            if n == index { return i }
+        }
+        return nil
+    }
+
+    private func freeSlot() -> Int? {
+        slots.indices.first { slots[$0] == nil && runner.simulation.system.liveCount(source: $0) == 0 }
+    }
+
+    /// True when another emitter fits: fewer than `ParticleScene.maxEmitters` slots, or a retired slot whose
+    /// particles are gone.
+    public var canAddEmitter: Bool { slots.count < ParticleScene.maxEmitters || freeSlot() != nil }
+
+    /// Where the k-th added emitter (k ≥ 1) of `family` goes: the family's position shifted 150·⌈k/2⌉ sideways,
+    /// alternating right and left, clamped to ±450 (research R5).
+    public static func placement(of family: EmitterFamily, index k: Int) -> Vec2 {
+        let base = family.emitter().position
+        guard k > 0 else { return base }
+        let step = 150.0 * Double((k + 1) / 2) * (k % 2 == 1 ? 1 : -1)
+        return Vec2(min(max(base.x + step, -450), 450), base.y)
+    }
+
+    /// Adds `emitter` (reusing a free retired slot, else appending); false when no slot is available.
+    @discardableResult
+    public mutating func addEmitter(_ emitter: SceneEmitter) -> Bool {
+        let index: Int
+        if let free = freeSlot() {
+            index = free
+            slots[index] = emitter
+            runner.mutate { $0.system.emitters[index] = emitter.emitter() }
+        } else if slots.count < ParticleScene.maxEmitters {
+            slots.append(emitter)
+            runner.mutate { $0.system.emitters.append(emitter.emitter()) }
+        } else {
+            return false
+        }
+        syncFamilyForces()
+        return true
+    }
+
+    /// Removes the visible emitter at `index`: it stops emitting and its slot is retired until its particles are
+    /// gone. False for a bad index or the last visible emitter (a scene always has one).
+    @discardableResult
+    public mutating func removeEmitter(at index: Int) -> Bool {
+        guard visibleEmitters.count > 1, let slot = slotIndex(visible: index) else { return false }
+        slots[slot] = nil
+        runner.mutate { $0.system.emitters[slot].isEmitting = false; $0.system.emitters[slot].burst = nil }
+        syncFamilyForces()
+        return true
+    }
+
+    /// Replaces the visible emitter at `index` (family, position, overrides); false for a bad index.
+    @discardableResult
+    public mutating func setEmitter(at index: Int, _ emitter: SceneEmitter) -> Bool {
+        guard let slot = slotIndex(visible: index) else { return false }
+        slots[slot] = emitter
+        runner.mutate { $0.system.emitters[slot] = emitter.emitter() }
+        syncFamilyForces()
+        return true
+    }
+
+    private mutating func syncFamilyForces() {
+        let forces = Self.familyForces(visibleEmitters)
+        runner.mutate { $0.replaceFamilyForces(forces) }
+    }
+
+    /// A scene with the visible emitters (retired ones dropped) and this scene's other settings, for rebuilding.
+    public func rebuildScene(seed: UInt64? = nil) -> ParticleScene {
+        var s = scene
+        s.emitters = visibleEmitters
+        if let seed { s.seed = seed }
+        return s
     }
 
     /// Adds a frame's elapsed real time (scaled by the scene's time scale) and runs the resulting steps; returns them.
@@ -100,6 +205,9 @@ public struct SceneSimulation: Sendable {
     public var liveLimit: Int { runner.simulation.system.liveLimit }
     /// Sets the emission ceiling (clamped to 1…the scene's particle limit); live particles above it are not removed.
     public mutating func setLiveLimit(_ limit: Int) { runner.mutate { $0.system.liveLimit = limit } }
+
+    /// The steppable state, read-only (tests and diagnostics).
+    public var state: SceneState { runner.simulation }
 
     /// The forces the particles currently feel, in order (placed force, scene forces, family forces).
     public var activeForces: [ParticleForce] { runner.simulation.system.forces }
