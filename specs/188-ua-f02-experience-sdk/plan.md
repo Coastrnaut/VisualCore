@@ -100,7 +100,7 @@ Packages/VisualCore/
 ├── Sources/VisualCoreMath/StableHash.swift              move (from VisualCoreShaderSource/SHA256.swift), made public
 ├── Sources/VisualCoreShaderSource/SHA256.swift          modify: keeps ShaderCacheKey, which now calls StableHash
 ├── Sources/VisualCoreExperience/
-│   ├── Module.swift                                     modify: version 1.1.0-rc.1, header
+│   ├── Module.swift                                     modify: header only (one common module version, pinned by tests)
 │   ├── ExperienceError.swift                            new
 │   ├── ExperienceLifecycle.swift                        new
 │   ├── StateDigest.swift                                new

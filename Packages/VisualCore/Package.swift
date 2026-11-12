@@ -17,7 +17,7 @@ let package = Package(
         .target(name: "VisualCoreSimulation", dependencies: ["VisualCoreMath"]),
         // Scenes → Simulation (feature 023 T-A02-501; research R1): SyntheticGestureScript uses SeededRandom. Pure and acyclic (R2, R3).
         .target(name: "VisualCoreScenes", dependencies: ["VisualCoreMath", "VisualCoreSimulation"]),
-        .target(name: "VisualCoreShaderSource"),
+        .target(name: "VisualCoreShaderSource", dependencies: ["VisualCoreMath"]),
         .target(name: "VisualCoreEffectsGraph"),
         .target(name: "VisualCoreDiagnostics"),
         .target(name: "VisualCoreAudioDSP"),
@@ -26,12 +26,13 @@ let package = Package(
         .target(name: "VisualCoreParameters"),
         // Experience identity and the validated runtime catalog of the unified app (feature 187 UA-F01; Foundation
         // only, rule R2; a leaf: no other VisualCore module).
-        .target(name: "VisualCoreExperience"),
+        .target(name: "VisualCoreExperience", dependencies: ["VisualCoreMath", "VisualCoreSimulation", "VisualCorePersistence"]),
         // Host performance baselines (feature 010 T-F909); an executable, never a library dependency.
         .executableTarget(name: "VisualCoreBaselines",
                           dependencies: ["VisualCoreMath", "VisualCoreSimulation", "VisualCoreScenes", "VisualCoreShaderSource", "VisualCoreEffectsGraph"]),
         // Test-only (rule R5): never a dependency of a product target.
-        .target(name: "VisualCoreTestSupport", dependencies: ["VisualCoreMath", "VisualCoreSimulation"]),
+        .target(name: "VisualCoreTestSupport",
+                dependencies: ["VisualCoreMath", "VisualCoreSimulation", "VisualCoreExperience", "VisualCorePersistence"]),
         .testTarget(name: "VisualCoreMathTests", dependencies: ["VisualCoreMath"]),
         .testTarget(name: "VisualCoreSimulationTests", dependencies: ["VisualCoreSimulation", "VisualCoreMath"]),
         .testTarget(name: "VisualCoreScenesTests", dependencies: ["VisualCoreScenes", "VisualCoreMath"]),
@@ -39,7 +40,9 @@ let package = Package(
         .testTarget(name: "VisualCoreParametersTests", dependencies: ["VisualCoreParameters"]),
         .testTarget(name: "VisualCoreTestSupportTests", dependencies: ["VisualCoreTestSupport"]),
         .testTarget(name: "VisualCorePersistenceTests", dependencies: ["VisualCorePersistence"]),
-        .testTarget(name: "VisualCoreExperienceTests", dependencies: ["VisualCoreExperience"], resources: [.copy("Fixtures")]),
+        .testTarget(name: "VisualCoreExperienceTests",
+                    dependencies: ["VisualCoreExperience", "VisualCoreTestSupport", "VisualCorePersistence", "VisualCoreSimulation"],
+                    resources: [.copy("Fixtures")]),
         .testTarget(name: "VisualCoreShaderSourceTests", dependencies: ["VisualCoreShaderSource"]),
         .testTarget(name: "VisualCoreEffectsGraphTests", dependencies: ["VisualCoreEffectsGraph"], resources: [.copy("Fixtures")]),
         .testTarget(name: "VisualCoreScaffoldTests",

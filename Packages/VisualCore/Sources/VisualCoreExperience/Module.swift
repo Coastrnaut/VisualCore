@@ -1,5 +1,7 @@
 // VisualCoreExperience — VisualCore pure module (package map: specs/002-architecture-contracts/contracts/package-map.md).
-// Experience identity and the validated runtime catalog of the unified app (feature 187, UA-F01; ADR-0009 D-06).
+// Experience identity and the validated runtime catalog of the unified app (feature 187, UA-F01; ADR-0009 D-06), and
+// the pure part of ExperienceKit: lifecycle, digest, actions, snapshots, engine, diagnostics and conformance
+// (feature 188, UA-F02; ADR-0009 D-05).
 /// Module version (semantic versioning).
 public enum ExperienceInfo {
     /// Semantic version of the VisualCoreExperience module.

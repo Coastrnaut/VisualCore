@@ -304,6 +304,8 @@ VisualCoreExperience | var | public var integrationGate: String
 VisualCoreExperience | var | public var isMatch: Bool
 VisualCoreExperience | var | public var isOriginal: Bool
 VisualCoreExperience | var | public var storageNamespace: String
+VisualCoreExperienceHost | enum | public enum ExperienceHostInfo
+VisualCoreExperienceHost | let | public static let version
 VisualCoreMath | enum | public enum EasingCurve: String, CaseIterable, Sendable, Codable
 VisualCoreMath | enum | public enum EasingMode: String, CaseIterable, Sendable, Codable
 VisualCoreMath | enum | public enum Level: String, Sendable, Equatable
