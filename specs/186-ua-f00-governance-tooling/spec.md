@@ -276,8 +276,9 @@ locally against a range with a seeded finding and see it fail.
   feature directory that the migration ledger names MUST map to exactly one namespace, and no two of them to the
   same one.
 - **FR-U00-002**: The document validator MUST report a feature directory that the numbering map does not contain:
-  a number from 235 to 300 or above 550, a round directory whose round is not 03 to 12, and a game directory
-  without a feature number.
+  the number 000, a number from 235 to 300 or above 550, a round directory whose round is not 03 to 12, whose
+  shared-feature number is 00, whose game number is not 01 to 25 or whose game-feature number is not 01 to 10, a
+  game directory without a feature number, and every other directory directly under `specs/`.
 - **FR-U00-003**: The document validator MUST report every requirement id and success-criterion id defined in a
   specification that is not in the namespace of its directory, naming the id and the expected namespace. The id
   MUST have the exact shape of its directory form: the foundation namespace followed by two digits, the app-phase
@@ -397,7 +398,8 @@ locally against a range with a seeded finding and see it fail.
   ANGLE tree, the legacy ledger or the legacy ledger tool.
 - **FR-U00-061**: Every tool of this feature MUST use only the Python standard library and MUST NOT start the
   Claude CLI, call a model or use the network; pushing through Git is the single exception. The tools contain no
-  advertising, analytics or tracking code and need no account.
+  advertising, analytics or tracking code and need no account. A self-test MUST prove that the five tools import
+  only standard-library modules and each other.
 
 ### Absorbed source requirements
 

@@ -124,7 +124,7 @@ Configs/
 ├── ci.yml                      modify    four validator steps in the job `checks`
 └── push-scan.yml               new       scan of the pushed range, never cancelled
 
-Auto-Creator.md                 modify    sections 19.4, 21.3 and 24.1 describe the tools as built (edited in place)
+Auto-Creator.md                 modify    sections 19.4, 21.2, 24.1 and 25.3 describe the tools as built (edited in place)
 README.md                       modify    workflow list and CI paragraph
 setup.md                        modify    section 5.1: recording simulator identifiers before a push
 docs/migration/path-map.json    modify    state of the entries of this gate

@@ -50,6 +50,10 @@ Labels after this feature: hardware identifier; device or simulator UUID; ECID; 
 setting; development team id; e-mail address; absolute home path; private key; GitHub token; GitHub fine-grained
 token; Anthropic API key; AWS access key id.
 
+A UUID that is not accepted is one finding of the pattern "device or simulator UUID". On a machine whose own
+simulator list contains it, the finding's text is "simulator identifier not recorded" with the recording command;
+that is a message of the same pattern, not a pattern of its own.
+
 Allowed look-alikes: a UUID that starts with `00000000-0000-4000-8000-`; a UUID whose hash is in the hash list; the
 address `git@github.com`; a home path with a placeholder (`/Users/<name>/`) or `/Users/Shared/`.
 
