@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/VisualCore",
+    "--filter",
+    "TrailDecayTests"
+  ],
+  "command": "swift test --package-path Packages/VisualCore --filter TrailDecayTests",
+  "elapsed_seconds": 3.889,
+  "exit_code": 0,
+  "finished": "2026-11-12T00:26:58+00:00",
+  "log": ".autonomy/logs/A04-P03.t304-decay-model.log",
+  "log_sha256": "2011a60c20008ab7e6a26558f8fcb527ae097f04d914bf777e65358e1c47172c",
+  "name": "t304-decay-model",
+  "stage": "A04-P03",
+  "started": "2026-11-12T00:26:55+00:00",
+  "timed_out": false
+}

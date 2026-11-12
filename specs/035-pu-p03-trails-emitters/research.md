@@ -19,15 +19,16 @@ remaining design decisions.
 
 ## R1. Fade model and 8-bit prediction
 
-- **Decision:** `TrailDecay.factor(strength:delta:) = s^(max(delta,0)·60)`, with s clamped to 0…0.98 (non-finite
-  becomes 0); `delta` 0 gives factor 1. The shader writes `max(prev·f − 1/255, 0)`. The GPU stores
-  `round(255·out)`, so the predicted 8-bit step is `step8(k, f) = max(0, round(k·f − 1))`.
-- **Rationale:** the extra −1/255 guarantees the fade reaches 0 in 8 bits (without it, 1/255 × 0.95 rounds back to
-  1/255 forever). The exponent form makes the same elapsed time give the same fade at any frame rate (SC-A04-303);
-  the subtraction is per frame, so the tolerance of 1/255 is checked per frame against `step8` of the observed
-  previous value, and over time at 60 versus 30 Hz to within 2/255 per 30 frames.
-- **Alternatives:** RGBA16F targets (not guaranteed renderable on every device path, larger); a time-based
-  subtraction (fractional, rounds away).
+- **Decision:** `TrailDecay.factor(strength:delta:) = s^(max(delta,0)·60)` (s clamped to 0…0.98, non-finite → 0;
+  delta 0 → 1) and `subtraction(delta:) = max(1, delta·60)` levels. The shader writes `max(prev·f − d/255, 0)`; the
+  GPU stores `round(255·out)`, so the predicted step is `step8(k, f, d) = max(0, round(k·f − d))`.
+- **Revision during T-A04-304:** the first model subtracted a fixed 1/255 per frame. Simulating all 255 start values
+  showed that 60 and 30 Hz then differ by up to 20/255 after 1 s, because 60 Hz subtracts twice as often. Scaling the
+  subtraction with time reduces the worst difference to 5/255 (strength 0.98) and 0 for strength ≤ 0.5; the
+  minimum of one level per frame still guarantees every trail ends at high frame rates. SC-A04-303's cross-rate
+  tolerance is therefore 6/255 (8-bit rounding), and the per-frame GPU-versus-model tolerance stays 1/255.
+- **Alternatives:** RGBA16F targets (not guaranteed renderable on every device path, larger); no subtraction (8-bit
+  values stall above 0 forever).
 
 ## R2. Additive blend and the cap
 

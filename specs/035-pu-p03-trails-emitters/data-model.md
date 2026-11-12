@@ -8,7 +8,8 @@
 |---|---|
 | `strengthRange = 0...0.98` | fraction kept per 1/60 s |
 | `factor(strength:delta:) -> Double` | `s^(delta·60)`; delta ≤ 0 or non-finite → 1; strength clamped, non-finite → 0 |
-| `step8(_ value: UInt8, factor: Double) -> UInt8` | predicted 8-bit result `max(0, round(v·f − 1))` |
+| `subtraction(delta:) -> Double` | `max(1, delta·60)` levels per frame (non-finite or ≤ 0 → 1) |
+| `step8(_ value: UInt8, factor: Double, subtract: Double = 1) -> UInt8` | predicted 8-bit result `max(0, round(v·f − d))` |
 
 ### ParticleSystem.liveCount(source:) (VisualCoreSimulation)
 

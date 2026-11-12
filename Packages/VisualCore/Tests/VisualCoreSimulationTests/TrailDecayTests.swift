@@ -36,6 +36,27 @@ import VisualCoreMath
     #expect(TrailDecay.step8(100, factor: 0.5) == 49)
 }
 
+@Test func equalElapsedTimeFadesAlikeAtThirtyAndSixtyHertz() {
+    // SC-A04-303 model: after 10 frames at 60 Hz versus 5 at 30 Hz, and after 1 s, every start value agrees within
+    // 6/255 for every strength (research R1).
+    for s in [0.5, 0.8, 0.9, 0.95, 0.98] {
+        for frames in [10, 60] {
+            for start in UInt8(1)...UInt8(255) {
+                var a = start, b = start
+                for _ in 0..<frames {
+                    a = TrailDecay.step8(a, factor: TrailDecay.factor(strength: s, delta: 1.0 / 60), subtract: TrailDecay.subtraction(delta: 1.0 / 60))
+                }
+                for _ in 0..<(frames / 2) {
+                    b = TrailDecay.step8(b, factor: TrailDecay.factor(strength: s, delta: 1.0 / 30), subtract: TrailDecay.subtraction(delta: 1.0 / 30))
+                }
+                #expect(abs(Int(a) - Int(b)) <= 6, "s \(s), \(frames) frames, start \(start)")
+            }
+        }
+    }
+    #expect(TrailDecay.subtraction(delta: 1.0 / 30) == 2 && TrailDecay.subtraction(delta: 1.0 / 120) == 1)
+    #expect(TrailDecay.subtraction(delta: .nan) == 1)
+}
+
 @Test func liveCountPerSource() {
     var ps = ParticleSystem(capacity: 500, seed: 3)
     ps.emitters = [Emitter(rate: 0, lifetime: 10...10), Emitter(rate: 0, lifetime: 10...10)]

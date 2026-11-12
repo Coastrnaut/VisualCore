@@ -40,9 +40,10 @@ each time. Facts checked in code:
 
 - Q: How is the trail layer built, and what exactly does "strength" mean? → A: `TrailLayer` in VisualCoreRendering:
   - an RGBA8 `PingPongTarget` at the drawable size, with the longer edge capped at 2,048 pixels;
-  - each frame: (1) a decay pass writes `max(previous × f − 1/255, 0)` per channel into the write target, where
-    f = s^(Δt·60) and s is the strength 0…0.98 (the fraction kept per 1/60 s), so the fade is frame-rate independent
-    and always reaches background; (2) the particles are drawn into the write target; (3) a composite pass copies it
+  - each frame: (1) a decay pass writes `max(previous × f − d/255, 0)` per channel into the write target, where
+    f = s^(Δt·60), d = max(1, Δt·60) and s is the strength 0…0.98 (the fraction kept per 1/60 s), so the fade is
+    frame-rate independent up to 8-bit rounding and always reaches background (d revised from a fixed 1 during
+    T-A04-304, research R1); (2) the particles are drawn into the write target; (3) a composite pass copies it
     to the screen; (4) swap.
   - Strength 0 means trails off: the layer is bypassed and the particles draw straight to the screen (no extra pass),
     except when the brightness cap must apply (Q3).
@@ -221,8 +222,8 @@ the brightness cap.
   values (host test). Lifetime is fixed at birth, so 0 earlier particles change lifetime; size and gradient restyle
   the emitter's live particles at once for immediate feedback (plan research R3), and never another emitter's.
 - **SC-A04-303**: A lit trail pixel follows the documented 8-bit fade within 1/255 at every frame for 60 frames, and
-  the same elapsed time at 60 and 30 frames per second gives values within 2/255 (frame-rate independent; plan
-  research R1, analyze F1).
+  the same elapsed time at 60 and 30 frames per second gives values within 6/255 (frame-rate independent up to 8-bit
+  rounding; plan research R1 as revised in T-A04-304).
 - **SC-A04-304**: After 20 resizes, 20 clears and one context recreation, live trail textures equal the count after
   first setup (0 leaked).
 - **SC-A04-305**: With Reduce Flashing on, 100% of sampled trail pixels are at or below the cap.

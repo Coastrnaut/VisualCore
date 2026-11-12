@@ -1,6 +1,6 @@
 // TrailDecay.swift — the fade model for decaying trail images (feature 035 A04-P03 T-A04-302; gap G-BLENDTRAIL;
 // FR-A04-302; research R1). Pure math shared by the GPU trail layer (VisualCoreRendering's TrailLayer) and its tests:
-// the layer keeps `max(previous × factor − 1/255, 0)` of the last image each frame.
+// the layer keeps `max(previous × factor − subtraction/255, 0)` of the last image each frame.
 import Foundation
 
 /// Frame-rate-independent fading of trail images stored with 8 bits per channel.
@@ -21,10 +21,20 @@ public enum TrailDecay {
         return s == 0 ? 0 : pow(s, delta * 60)
     }
 
-    /// The 8-bit value after one frame: `max(0, round(value × factor − 1))`, the GPU's result for an 8-bit channel
-    /// (the −1 is the layer's −1/255 term, which guarantees every trail ends).
-    public static func step8(_ value: UInt8, factor: Double) -> UInt8 {
+    /// The extra fade per frame, in 8-bit levels: `max(1, delta × 60)` (one level per 1/60 s, at least one per frame).
+    /// Scaling it with time keeps equal elapsed time fading alike at 30 and 60 frames per second (a fixed level per
+    /// frame differed by up to 20/255 after 1 s; this differs by at most 5/255, research R1); the minimum of one level
+    /// guarantees every trail ends even at high frame rates.
+    public static func subtraction(delta: Double) -> Double {
+        guard delta.isFinite, delta > 0 else { return 1 }
+        return max(1, delta * 60)
+    }
+
+    /// The 8-bit value after one frame: `max(0, round(value × factor − subtract))`, the GPU's result for an 8-bit
+    /// channel of the trail layer.
+    public static func step8(_ value: UInt8, factor: Double, subtract: Double = 1) -> UInt8 {
         let f = factor.isFinite ? min(max(factor, 0), 1) : 0
-        return UInt8(max(0, (Double(value) * f - 1).rounded()))
+        let d = subtract.isFinite ? max(subtract, 1) : 1
+        return UInt8(max(0, (Double(value) * f - d).rounded()))
     }
 }
