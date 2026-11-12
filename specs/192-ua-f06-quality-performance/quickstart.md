@@ -15,6 +15,7 @@ Each is recorded with `python3 scripts/migration_ledger.py run-check --gate UA-F
 | `rendering-ios27`, `rendering-ios26` | `python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --result-name ua-f06-ios27` (and `sim-26.5`, `ua-f06-ios26`) | TEST SUCCEEDED |
 | `endurance-ios27`, `endurance-ios26` | `python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --only-testing VisualCoreExperienceHostTests/EnduranceTests` (and `sim-26.5`) | the ten-minute scenario passes the growth rule; the leaking experience fails it |
 | `app-…-a/-b/-c/-d` | `python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime 27.2 --kind phone --only-testing …` in the four chunks of UA-F04, for phone and tablet on 27.2 and 26.5 | tests and enumeration guard pass |
+| `privacy-manifest` | `python3 scripts/check_privacy_manifest.py --app <release app>` | pass |
 | `performance-docs` | `python3 scripts/check_performance_docs.py` | every budget is a proposal with its confirming measurement; no simulator number without the notice |
 | `release-symbols` | `python3 scripts/check_release_symbols.py --app <release app> --forbid DebugLaunch DebugExperience vc.performance` | 0 found |
 | `public-api`, `documented-api-*`, `dependencies` | `python3 scripts/check_public_api.py` (after `--update`), `python3 scripts/check_documented_api.py --sources …`, `python3 scripts/check_dependencies.py` | pass |
