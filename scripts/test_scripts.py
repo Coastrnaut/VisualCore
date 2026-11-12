@@ -149,6 +149,95 @@ class DocsTests(unittest.TestCase):
             (d / "specs/250-nowhere").mkdir()
             self.assertTrue(any("250-nowhere: feature directory outside the numbering map" in p for p in docs.validate(d)))
 
+    # ---- feature 186 (UA-F00): the whole numbering map, one exact id shape per directory form
+
+    OUTSIDE_THE_MAP = ("000-x", "235-x", "300-x", "551-x", "r02-f01-x", "r13-f01-x", "r03-f00-x", "r03-g00-01-x",
+                       "r03-g26-01-x", "r03-g01-00-x", "r03-g01-11-x", "r03-g01-x", "notes", "r3-g1-x")
+    NEW_NAMESPACES = {  # label: (directory, its namespace, a namespace of another feature of the same kind)
+        "U<kk>": ("190-ua-f04-x", "U04", "U05"),
+        "R02F<ff>": ("205-mesh", "R02F05", "R02F06"),
+        "R02G<gg><ff>": ("301-kernel", "R02G0101", "R02G0102"),
+        "RnnFff": ("r03-f03-kernels", "R03F03", "R04F03"),
+        "RnnGggff": ("r12-g25-10-final", "R12G2510", "R12G2509"),
+    }
+
+    def test_directories_outside_the_map_are_reported(self):
+        # FR-U00-002 (research G-01, G-02): nothing under specs/ is silently ignored.
+        for name in self.OUTSIDE_THE_MAP:
+            self.assertEqual(docs.namespace(Path("specs") / name), "", name)
+            self.assertIsNone(docs.id_shape(Path("specs") / name), name)
+        with tempfile.TemporaryDirectory() as t:
+            d = Path(t)
+            self.make(d, "- **FR-F001**: a\n")
+            for name in self.OUTSIDE_THE_MAP:
+                (d / "specs" / name).mkdir()
+            (d / "specs" / "a-file-is-not-a-dossier.md").write_text("x\n")
+            probs = docs.validate(d)
+            for name in self.OUTSIDE_THE_MAP:
+                self.assertIn(f"specs/{name}: feature directory outside the numbering map (ADR-0009 D-11)", probs, name)
+            self.assertEqual(len(probs), len(self.OUTSIDE_THE_MAP))
+
+    def test_ids_have_the_exact_shape_of_their_directory(self):
+        # FR-U00-003, FR-U00-004 (research G-03, G-04): a namespace that only begins like the expected one is rejected.
+        shapes = {"001-x": ("F001", "F0001"), "035-x": ("A04-301", "A04-3011"), "186-x": ("U00-001", "U000-001"),
+                  "205-x": ("R02F05-001", "R02F051-001"), "301-x": ("R02G0101-001", "R02G01011-001"),
+                  "r03-f01-x": ("R03F01-001", "R03F011-001"), "r03-g01-01-x": ("R03G0101-001", "R03G01011-001")}
+        for name, (good, bad) in shapes.items():
+            shape = docs.id_shape(Path("specs") / name)
+            self.assertTrue(shape.fullmatch(good), (name, good))
+            self.assertFalse(shape.fullmatch(bad), (name, bad))
+        with tempfile.TemporaryDirectory() as t:
+            d = Path(t)
+            self.make(d, "- **FR-F0001**: four digits after the foundation namespace\n", "- [ ] T-F101 a task of phase 1\n")
+            f = d / "specs/r03-f01-x"
+            f.mkdir()
+            (f / "spec.md").write_text("- **FR-R03F011-001**: one digit too many in the feature number\n")
+            (f / "tasks.md").write_text("- [ ] T-R03F02-001 a task of another shared feature\n")
+            probs = docs.validate(d)
+            for needle in ("specs/001-x/spec.md: FR-F0001 outside namespace F0", "specs/001-x/tasks.md: T-F101 outside namespace F0",
+                           "specs/r03-f01-x/spec.md: FR-R03F011-001 outside namespace R03F01",
+                           "specs/r03-f01-x/tasks.md: T-R03F02-001 outside namespace R03F01"):
+                self.assertIn(needle, probs)
+
+    def test_each_new_namespace_accepts_its_own_ids_and_rejects_others(self):
+        # FR-U00-008: one accepted and one rejected dossier per new namespace (ten sub-cases).
+        for label, (name, ns, other) in self.NEW_NAMESPACES.items():
+            with tempfile.TemporaryDirectory() as t:
+                d = Path(t)
+                self.make(d, "- **FR-F001**: a\n")
+                f = d / "specs" / name
+                f.mkdir()
+                (f / "spec.md").write_text(f"- **FR-{ns}-001**: a\n- **SC-{ns}-001**: b\n")
+                (f / "tasks.md").write_text(f"- [X] T-{ns}-001 does FR-{ns}-001 — Verified 2026-11-11: cmd\n- [ ] T-{ns}-002 open\n")
+                self.assertEqual(docs.validate(d), [], f"{label}: accepted dossier")
+                (f / "spec.md").write_text(f"- **FR-{ns}-001**: a\n- **SC-{other}-001**: of another feature\n")
+                (f / "tasks.md").write_text(f"- [ ] T-{other}-001 of another feature\n")
+                probs = docs.validate(d)
+                self.assertIn(f"specs/{name}/spec.md: SC-{other}-001 outside namespace {ns}", probs, f"{label}: rejected definition")
+                self.assertIn(f"specs/{name}/tasks.md: T-{other}-001 outside namespace {ns}", probs, f"{label}: rejected task")
+
+    def test_every_ledger_directory_is_in_the_map(self):
+        # FR-U00-001: every feature directory the migration ledger names has exactly one namespace of its own.
+        gates = json.loads((ROOT_DIR / ".autonomy/migration/ledger.json").read_text())["gates"]
+        seen = {}
+        for g in gates:
+            if "spec_dir" not in g:
+                continue
+            ns = docs.namespace(Path(g["spec_dir"]))
+            self.assertTrue(ns, g["id"])
+            self.assertNotIn(ns, seen, f"{g['id']} shares {ns} with {seen.get(ns)}")
+            seen[ns] = g["id"]
+        self.assertEqual(len(seen), 823)
+
+    def test_every_dossier_is_counted(self):
+        # research G-05: round directories are dossiers too.
+        with tempfile.TemporaryDirectory() as t:
+            d = Path(t)
+            self.make(d, "- **FR-F001**: a\n")
+            for name in ("186-ua-f00-x", "r03-f03-kernels", "notes"):
+                (d / "specs" / name).mkdir()
+            self.assertEqual([f.name for f in docs.feature_dirs(d)], ["001-x", "186-ua-f00-x", "r03-f03-kernels"])
+
     def test_archive_links_are_not_checked(self):
         # ADR-0009: docs/archive/ holds verbatim historical documents; their relative links point at old locations.
         with tempfile.TemporaryDirectory() as t:
