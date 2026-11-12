@@ -65,7 +65,7 @@ commits. Review checkpoint after each phase.
 - [X] T-U04-021 Evidence `app-tablet-ios27-a`, `-b`, `-c`: the same with `--kind tablet`, in the three chunks of T-U04-012. — Verified 2026-11-12: run-checks app-tablet-ios27-a (14 tests), -b (18), -c (25) exit 0, guard passed per chunk; 57 tests in total
 - [X] T-U04-022 Evidence `app-phone-ios26`: the same with `--runtime 26.5 --kind phone`. — Verified 2026-11-12: run-check app-phone-ios26 exit 0: 57 of 57 and guard passed
 - [X] T-U04-023 Evidence `app-tablet-ios26-a`, `-b`, `-c`: the same with `--runtime 26.5 --kind tablet`, in the three chunks of T-U04-012. — Verified 2026-11-12: run-checks app-tablet-ios26-a (14), -b (18), -c (25) exit 0, guard passed per chunk; the audit ignored and printed 4 contrast findings on a tile title cut by the bottom screen edge
-- [ ] T-U04-024 Evidence `compliance`, `app-isolation` and `release-symbols` on the final sources.
+- [X] T-U04-024 Evidence `compliance`, `app-isolation` and `release-symbols` on the final sources. — Verified 2026-11-12: run-checks compliance, app-isolation, release-symbols (plus release-automation and debug-symbols-present) exit 0; no app source changed after them
 - [ ] T-U04-025 Evidence `host-visualcore`, `pure-ios27` and `pure-ios26`: `swift test --package-path Packages/VisualCore` and the pure package tests on both simulator runtimes.
 - [ ] T-U04-026 Evidence `rendering-ios27` and `rendering-ios26`: the rendering package tests on both simulator runtimes (the app links its products).
 - [ ] T-U04-027 Evidence `reference-a` and `reference-b`: the two chunks of the ProjectM reference regression (3 of 3 and 4 of 4).
