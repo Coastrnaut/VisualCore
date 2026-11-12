@@ -335,6 +335,7 @@ VisualCoreMath | enum | public enum Level: String, Sendable, Equatable
 VisualCoreMath | enum | public enum MathInfo
 VisualCoreMath | enum | public enum Phase: String, Sendable, Equatable
 VisualCoreMath | enum | public enum PrecisionAdvisor
+VisualCoreMath | enum | public enum StableHash
 VisualCoreMath | func | public func apply(_ p: Vec2) -> Vec2
 VisualCoreMath | func | public func applyPoint(_ p: Vec3) -> Vec3
 VisualCoreMath | func | public func applyVector(_ v: Vec2) -> Vec2
@@ -401,6 +402,8 @@ VisualCoreMath | func | public static func rotation(_ q: Quat) -> Mat4
 VisualCoreMath | func | public static func route(from: PlaneFraming, to: PlaneFraming) -> [FramingFlight]
 VisualCoreMath | func | public static func scale(_ s: Vec2) -> Mat3
 VisualCoreMath | func | public static func scale(_ s: Vec3) -> Mat4
+VisualCoreMath | func | public static func sha256(_ message: [UInt8]) -> [UInt8]
+VisualCoreMath | func | public static func sha256Hex(_ message: [UInt8]) -> String
 VisualCoreMath | func | public static func translation(_ t: Vec2) -> Mat3
 VisualCoreMath | func | public static func translation(_ t: Vec3) -> Mat4
 VisualCoreMath | func | public static func trs(_ t: Vec2, _ r: Double, _ s: Vec2) -> Mat3
