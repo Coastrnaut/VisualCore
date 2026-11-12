@@ -2276,7 +2276,9 @@ class ExperienceModuleTests(unittest.TestCase):
             for word in self.FORBIDDEN:
                 self.assertNotIn(word, code, f"{path.name} names {word}")
             imports = set(re.findall(r"^import\s+(\w+)", text, re.M))
-            self.assertLessEqual(imports, {"Foundation"}, f"{path.name} imports {sorted(imports)}")
+            # UA-F02 adds the pure modules the experience contract adapts; nothing else may be imported.
+            allowed = {"Foundation", "VisualCoreMath", "VisualCoreSimulation", "VisualCorePersistence"}
+            self.assertLessEqual(imports, allowed, f"{path.name} imports {sorted(imports)}")
 
     def test_package_test_tool_passes_language_and_region(self):
         tool = load("xcodebuild_package")
@@ -2287,6 +2289,173 @@ class ExperienceModuleTests(unittest.TestCase):
         for language, region in (("TR", None), ("turkish", None), (None, "tr"), (None, "TUR"), ("t r", None)):
             with self.assertRaises(SystemExit):
                 tool.test_options(language, region)
+
+
+class ExperienceSymbolsTests(unittest.TestCase):
+    """Feature UA-F02 T-U02-031: the pure functions and the exit codes of check_experience_symbols.py. Nothing is
+    built: the builds and `nm` are replaced by an injected `run`."""
+
+    tool = load("check_experience_symbols")
+    CLEAN = "0000000000000000 T _$s20VisualCoreExperience0C6EngineC4stepyyF\n                 U _swift_release\n"
+    MANGLED = "_$s20VisualCoreExperience0C8ScenarioV5stepsSivg"
+    DEMANGLED = "VisualCoreExperience.ExperienceScenario.steps.getter : Swift.Int"
+    DIRTY = CLEAN + "0000000000000040 T " + MANGLED + "\n"
+
+    def fake_run(self, build_code=0, nm_output="", objects=(), nm_code=0, demangle_code=0):
+        """A stand-in for subprocess.run: the "build" creates the given object files below the build directory and
+        the "demangler" knows the one abbreviated symbol of the fixtures."""
+        calls = []
+
+        def run(cmd, cwd=None, capture_output=False, text=False, input=None, **_):
+            calls.append((list(cmd), cwd))
+            if cmd[:2] == ["xcrun", "swift-demangle"]:
+                return subprocess.CompletedProcess(cmd, demangle_code, input.replace(self.MANGLED, self.DEMANGLED), "")
+            if cmd[:2] == ["xcrun", "nm"]:
+                return subprocess.CompletedProcess(cmd, nm_code, nm_output, "nm error" if nm_code else "")
+            self.assertTrue(capture_output and text)
+            if build_code == 0:
+                where = cmd[cmd.index("--scratch-path") + 1] if "--scratch-path" in cmd else cmd[cmd.index("-derivedDataPath") + 1]
+                for rel in objects:
+                    path = Path(cwd) / where / rel
+                    path.parent.mkdir(parents=True, exist_ok=True)
+                    path.write_bytes(b"")
+            return subprocess.CompletedProcess(cmd, build_code, "\n".join(f"line {i}" for i in range(40)), "error: broken")
+
+        return run, calls
+
+    def run_main(self, argv, **fake):
+        run, calls = self.fake_run(**fake)
+        out, err = io.StringIO(), io.StringIO()
+        with tempfile.TemporaryDirectory() as d, contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+            code = self.tool.main(argv, root=Path(d).resolve(), run=run)
+        return code, out.getvalue(), err.getvalue(), calls
+
+    def test_count_symbols(self):
+        dirty = self.DIRTY.replace(self.MANGLED, self.DEMANGLED)
+        self.assertEqual(self.tool.count_symbols(self.CLEAN), 0)
+        self.assertEqual(self.tool.count_symbols(dirty), 1)
+        self.assertEqual(self.tool.count_symbols(dirty + "0000 S _$s3App18ExperienceScenarioVMn\n"), 2)
+        self.assertEqual(self.tool.count_symbols(self.DIRTY), 0, "the abbreviated mangling needs the demangler")
+        self.assertEqual(self.tool.count_symbols(""), 0)
+
+    def test_verdict_in_the_four_combinations(self):
+        self.assertTrue(self.tool.verdict(0, False))
+        self.assertFalse(self.tool.verdict(3, False))
+        self.assertFalse(self.tool.verdict(0, True))
+        self.assertTrue(self.tool.verdict(3, True))
+
+    def test_pure_build_commands(self):
+        root = Path("/repo")
+        cmd, cwd, build_dir = self.tool.build_command("pure", False, root)
+        self.assertEqual(cmd, ["swift", "build", "--package-path", "Packages/VisualCore", "-c", "release", "--target",
+                               "VisualCoreExperience", "--scratch-path", "Build/experience-symbols/pure"])
+        self.assertEqual((cwd, build_dir), (root, root / "Build/experience-symbols/pure"))
+        self.assertFalse(any("VISUALCORE_AUTOMATION" in part for part in cmd))
+        flagged, cwd, flag_dir = self.tool.build_command("pure", True, root)
+        self.assertEqual(flagged[-2:], ["-Xswiftc", "-DVISUALCORE_AUTOMATION"])
+        self.assertEqual(flagged[flagged.index("--scratch-path") + 1], "Build/experience-symbols/pure-flag")
+        self.assertEqual((cwd, flag_dir), (root, root / "Build/experience-symbols/pure-flag"))
+        self.assertNotEqual(build_dir, flag_dir)
+
+    def test_host_build_commands_never_name_a_device(self):
+        root = Path("/repo")
+        cmd, cwd, build_dir = self.tool.build_command("host", False, root)
+        self.assertEqual(cmd[:2], ["xcodebuild", "build"])
+        self.assertEqual(cmd[cmd.index("-scheme") + 1], "VisualCoreExperienceHost")
+        self.assertEqual(cmd[cmd.index("-configuration") + 1], "Release")
+        self.assertEqual(cmd[cmd.index("-destination") + 1], "generic/platform=iOS Simulator")
+        self.assertEqual(cmd.count("-destination"), 1)
+        self.assertEqual(cmd[cmd.index("-derivedDataPath") + 1], "/repo/Build/experience-symbols/host")
+        self.assertEqual((cwd, build_dir), (root / "Packages/VisualCoreRendering", root / "Build/experience-symbols/host"))
+        self.assertFalse(any("VISUALCORE_AUTOMATION" in part for part in cmd))
+        flagged, cwd, flag_dir = self.tool.build_command("host", True, root)
+        self.assertIn("SWIFT_ACTIVE_COMPILATION_CONDITIONS=$(inherited) VISUALCORE_AUTOMATION", flagged)
+        self.assertEqual(flagged[flagged.index("-derivedDataPath") + 1], "/repo/Build/experience-symbols/host-flag")
+        self.assertEqual(flag_dir, root / "Build/experience-symbols/host-flag")
+        self.assertNotEqual(build_dir, flag_dir)
+        for command in (cmd, flagged):
+            for part in command:
+                self.assertNotIn("id=", part)
+                self.assertNotIn("platform=iOS,", part)
+                self.assertNotEqual(part, "generic/platform=iOS")
+        with self.assertRaises(ValueError):
+            self.tool.build_command("device", False, root)
+
+    def test_tool_has_no_destination_option(self):
+        for option in ("--destination", "--device", "--udid"):
+            with self.assertRaises(SystemExit), contextlib.redirect_stderr(io.StringIO()):
+                self.tool.main(["--module", "host", option, "x"], run=None)
+
+    def test_object_files_only_below_the_module_build_directory(self):
+        with tempfile.TemporaryDirectory() as d:
+            base = Path(d)
+            self.assertEqual(self.tool.object_files(base / "missing", "pure"), [])
+            wanted = ["release/VisualCoreExperience.build/ExperienceEngine.swift.o",
+                      "release/VisualCoreExperience.build/nested/ExperienceCore.o"]
+            others = ["release/VisualCoreMath.build/StableHash.swift.o",
+                      "release/VisualCoreExperienceHost.build/ExperienceShell.o",
+                      "release/VisualCoreExperience.build/ExperienceEngine.swiftdeps",
+                      "release/VisualCoreExperience.build.o",
+                      "release/Other.o"]
+            for rel in wanted + others:
+                (base / rel).parent.mkdir(parents=True, exist_ok=True)
+                (base / rel).write_bytes(b"")
+            self.assertEqual(self.tool.object_files(base, "pure"), sorted(base / rel for rel in wanted))
+            self.assertEqual(self.tool.object_files(base, "host"), [base / others[1]])
+
+    def test_main_exit_2_when_the_build_fails(self):
+        code, out, err, calls = self.run_main(["--module", "pure"], build_code=1)
+        self.assertEqual((code, out), (2, ""))
+        self.assertEqual(len(calls), 1)
+        self.assertIn("error: broken", err)
+        self.assertIn("line 39", err)
+        self.assertNotIn("line 5\n", err)
+
+    def test_main_exit_2_when_no_object_file_is_found(self):
+        code, out, err, calls = self.run_main(["--module", "pure"], objects=["release/VisualCoreMath.build/a.o"])
+        self.assertEqual((code, out), (2, ""))
+        self.assertIn("no object file", err)
+        self.assertEqual(len(calls), 1)
+        code, _, _, _ = self.run_main(["--module", "host"])
+        self.assertEqual(code, 2)
+
+    def test_main_exit_2_when_nm_fails(self):
+        code, out, _, _ = self.run_main(["--module", "pure"], objects=["release/VisualCoreExperience.build/a.o"], nm_code=1)
+        self.assertEqual((code, out), (2, ""))
+
+    def test_main_exit_2_when_the_demangler_fails(self):
+        code, out, _, _ = self.run_main(["--module", "pure"], objects=["release/VisualCoreExperience.build/a.o"],
+                                        nm_output=self.DIRTY, demangle_code=1)
+        self.assertEqual((code, out), (2, ""))
+
+    def test_main_without_the_flag(self):
+        objects = ["release/VisualCoreExperience.build/a.o"]
+        code, out, _, calls = self.run_main(["--module", "pure"], objects=objects, nm_output=self.CLEAN)
+        self.assertEqual((code, out), (0, "PASS: pure, release, 0 automation symbols in 1 object files\n"))
+        self.assertEqual([c[0][:2] for c in calls], [["swift", "build"], ["xcrun", "nm"], ["xcrun", "swift-demangle"]])
+        code, out, _, _ = self.run_main(["--module", "pure"], objects=objects, nm_output=self.DIRTY)
+        self.assertEqual(code, 1)
+        lines = out.splitlines()
+        self.assertEqual(lines[0], "FAIL: pure, release, 1 automation symbols in 1 object files")
+        self.assertIn("ExperienceScenario", lines[1])
+        two = objects + ["release/VisualCoreExperience.build/b.o"]
+        code, out, _, _ = self.run_main(["--module", "pure"], objects=two, nm_output=self.DIRTY * 4)
+        self.assertEqual(out.splitlines()[0], "FAIL: pure, release, 8 automation symbols in 2 object files")
+        self.assertEqual(len(out.splitlines()), 6)
+
+    def test_main_with_the_flag_is_inverted(self):
+        objects = ["Build/Intermediates.noindex/X.build/Release-iphonesimulator/VisualCoreExperienceHost.build/Objects-normal/arm64/a.o"]
+        code, out, _, calls = self.run_main(["--module", "host", "--with-flag"], objects=objects, nm_output=self.DIRTY)
+        self.assertEqual((code, out),
+                         (0, "PASS: host, release with VISUALCORE_AUTOMATION, 1 automation symbols in 1 object files\n"))
+        self.assertEqual(calls[0][1].name, "VisualCoreRendering")
+        code, out, _, _ = self.run_main(["--module", "host", "--with-flag"], objects=objects, nm_output=self.CLEAN)
+        self.assertEqual((code, out),
+                         (1, "FAIL: host, release with VISUALCORE_AUTOMATION, 0 automation symbols in 1 object files\n"))
+        code, out, _, _ = self.run_main(["--module", "pure", "--with-flag"],
+                                        objects=["release/VisualCoreExperience.build/a.o"], nm_output=self.DIRTY)
+        self.assertEqual((code, out),
+                         (0, "PASS: pure, release with VISUALCORE_AUTOMATION, 1 automation symbols in 1 object files\n"))
 
 
 def ledger_tree_hash() -> str:

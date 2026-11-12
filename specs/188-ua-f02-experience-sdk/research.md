@@ -122,8 +122,8 @@ names the brief marked as proposals are confirmed or corrected in section 2.
 
 - **Decision**: `ExperienceScenario`, `ExperienceScenarioResult` and the `run` methods of the engine and the shell
   are inside `#if DEBUG || VISUALCORE_AUTOMATION`. A new tool, `scripts/check_experience_symbols.py`, builds each
-  module for release without and with the flag and counts the symbols that contain `ExperienceScenario` in the
-  object files: 0 without the flag, more than 0 with it.
+  module for release without and with the flag and counts the demangled symbols that contain `ExperienceScenario`
+  in the object files: 0 without the flag, more than 0 with it.
 - **Rationale**: no app links the new modules yet, so the existing app-binary check cannot see them. Object files
   of the modules themselves are the most direct evidence; the run with the flag proves that the check can see the
   symbols.

@@ -124,8 +124,9 @@ python3 scripts/check_experience_symbols.py --module host --with-flag
   with `swift build -c release --target VisualCoreExperience`, the host module with `xcodebuild build -scheme
   VisualCoreExperienceHost -configuration Release -destination 'generic/platform=iOS Simulator'`. With
   `--with-flag` the condition `VISUALCORE_AUTOMATION` is added.
-- Lists the symbols of the module's object files with `xcrun nm` and counts those that contain
-  `ExperienceScenario`.
+- Lists the symbols of the module's object files with `xcrun nm`, demangles them with `xcrun swift-demangle`
+  (Swift abbreviates repeated words inside a mangled name, so the plain text would hide the type name) and counts
+  those that contain `ExperienceScenario`.
 - Without the flag: prints `PASS: <module>, release, 0 automation symbols in <n> object files` and exits 0; any
   symbol is listed and the exit code is 1. With the flag the result is inverted: at least one symbol is required.
 - Exit 2 when the build fails or no object file is found. Standard library only; it never touches a device.

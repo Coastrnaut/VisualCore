@@ -153,11 +153,13 @@ Preparation derives every start value from the seed with `SplitMix64` and checks
 256 rounds.
 
 Faults (marker types): unseeded preparation (prepares from the seed mixed with the uptime clock and keeps that
-mixed value as its seed, so only the determinism of preparation is broken), lossy snapshot (omits
-`tone`), wrong reset (keeps `energy`), mutating rejection (adds to `energy` before it rejects), tier changes state (writes
-the tier into `energy`), shedding changes state (clears `tone`), clock in update (mixes the uptime clock into
-`phase`), slow preparation (sleeps in small slices for up to 60 s, checking cancellation), failing preparation
-(throws `ExperienceFailure(code: "sample.broken", …)`).
+mixed value as its seed, so only the determinism of preparation is broken), lossy snapshot (writes `tone` as 0),
+wrong reset (keeps `energy` and `tone`), mutating rejection (adds to `energy` before a rule rejection), tier
+changes state (writes the tier into `energy`), shedding changes state (adds 1 to `energy`), clock in update (mixes
+the uptime clock into `phase`), slow preparation (sleeps in slices of 10 ms for up to 60 s, checking
+cancellation), failing preparation (throws `ExperienceFailure(code: "sample.broken", …)`). The core also counts
+its `apply` and `update` calls in two fields outside the digest and outside the payload, so tests can prove that
+a refused operation did not reach it.
 
 The sample presenter (test target of the host module) creates one 1 × 1 texture through the registry in `setup`,
 releases it in `teardown`, and clears the framebuffer to the colour (x / 15, y / 15, tone); it counts its calls
