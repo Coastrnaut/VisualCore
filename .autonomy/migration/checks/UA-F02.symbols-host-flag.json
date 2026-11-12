@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_experience_symbols.py",
+    "--module",
+    "host",
+    "--with-flag"
+  ],
+  "command": "python3 scripts/check_experience_symbols.py --module host --with-flag",
+  "elapsed_seconds": 1.362,
+  "exit_code": 0,
+  "finished": "2026-11-12T11:38:48+00:00",
+  "gate": "UA-F02",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F02.symbols-host-flag.log",
+  "log_sha256": "d37316c3f93d43122dd5645dea9fb054e32941c3a76027cb0366b82300ed0041",
+  "name": "symbols-host-flag",
+  "started": "2026-11-12T11:38:47+00:00",
+  "timed_out": false
+}
