@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/VisualCore",
+    "--filter",
+    "ExperienceSnapshotTests|ExperienceEngineStateTests"
+  ],
+  "command": "swift test --package-path Packages/VisualCore --filter 'ExperienceSnapshotTests|ExperienceEngineStateTests'",
+  "elapsed_seconds": 2.581,
+  "exit_code": 0,
+  "finished": "2026-11-12T11:23:48+00:00",
+  "gate": "UA-F02",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F02.us3-snapshots.log",
+  "log_sha256": "7d9ffd1afea613fa2b75c27762b14ee677f57f4164bb82e726f15a4293edbda6",
+  "name": "us3-snapshots",
+  "started": "2026-11-12T11:23:45+00:00",
+  "timed_out": false
+}
