@@ -113,5 +113,8 @@ extension ExperienceSession {
 - `scripts/check_app_isolation.py --no-direct-storage <path> …` (new option): exit 1 with file and line when a
   source names `UserDefaults`, `FileManager`, `NSHomeDirectory`, `NSTemporaryDirectory`,
   `applicationSupportDirectory`, `documentDirectory` or `cachesDirectory`.
+- `scripts/check_app_isolation.py --no-crash-on-stored-data <path> …` (new option): exit 1 with file and line
+  for a forced `try`, `fatalError`, `preconditionFailure`, `precondition(`, `assertionFailure` or a forced unwrap in
+  a source that reads stored data (FR-U05-071).
 - `scripts/xcodebuild_app.py … --only-testing VisualCoreUITests/PersistenceUITests` issues the brief's
   `xcodebuild test -only-testing:VisualCoreUITests/PersistenceUITests` command.

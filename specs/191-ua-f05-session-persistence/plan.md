@@ -95,7 +95,6 @@ Apps/VisualCore/
 ├── App/AppModel.swift                             modify  sink, load at open, checkpoints, unreadable notice, resets
 ├── App/ExperienceRegistry.swift                   modify  ExperienceLaunch.storage; migrationProblems
 ├── App/PreferencesStore.swift                     modify  copy of an unreadable value
-├── App/ExperienceDataStore.swift                  modify  (the root is shared with the stores of the package)
 ├── App/UnreadableStateView.swift                  new
 ├── App/ExperienceRouteView.swift, RootView.swift, AppStrings.swift, SettingsView.swift      modify
 ├── App/DebugSupport/DebugLaunch.swift             modify  -vcDamageState, -vcStrayItems, -vcSeedData through the handle
@@ -105,7 +104,7 @@ Apps/VisualCore/
 ├── Tests/Unit/AppModelTests.swift, StoreTests.swift                    modify
 └── Tests/UI/PersistenceUITests.swift              new
 
-scripts/check_app_isolation.py                     modify  --no-direct-storage
+scripts/check_app_isolation.py                     modify  --no-direct-storage, --no-crash-on-stored-data
 scripts/test_scripts.py                            modify
 docs/api/visualcore-public-api.txt                 modify  baseline
 Auto-Creator.md (sections 11.4, 11.7, 15.1, 16)    modify  as built
@@ -148,7 +147,7 @@ schema. `ShellPreferences` stays schema 1 and gains the place where a later vers
 | Package tests, iOS 27.2 and 26.5 simulators | the same pure tests; `SessionRestoreTests` |
 | App unit tests | restore, checkpoints, unreadable notice, Reset and Back, resets, the registry's migration check, leftovers |
 | App interface tests | `PersistenceUITests`: restore after an end of the app, damaged states, Reset and Back, inventory, stray items |
-| Tool | `--no-direct-storage` |
+| Tool | `--no-direct-storage`, `--no-crash-on-stored-data` |
 
 ## Build and test commands
 
