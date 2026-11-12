@@ -43,6 +43,7 @@ licenses = load("check_licenses")
 autosim = load("run_automation_sim")
 relsym = load("check_release_symbols")
 relcheck = load("release_check")
+apprunner = load("xcodebuild_app")
 appcontract = load("check_app_contract")
 enumeration = load("check_test_enumeration")
 privacy = load("check_privacy_manifest")
@@ -895,6 +896,259 @@ class ReleaseCheckTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             with contextlib.redirect_stdout(io.StringIO()):
                 self.assertEqual(relcheck.main(["--log-dir", d], step_factory=fake), 0)
+
+    def test_list_contains_the_unified_app_build(self):
+        """Feature UA-F04 T-U04-029: the unsigned generic-simulator build of the scheme VisualCore is a release step."""
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            self.assertEqual(relcheck.main(["--list"]), 0)
+        lines = [l for l in out.getvalue().splitlines() if l.startswith("visualcore-app-build: ")]
+        self.assertEqual(lines, ["visualcore-app-build: xcodebuild build -project VisualCore.xcodeproj -scheme VisualCore "
+                                 "-destination generic/platform=iOS Simulator "
+                                 "-derivedDataPath Build/DerivedData/release-VisualCore-sim CODE_SIGNING_ALLOWED=NO"])
+        names = [s.name for s in relcheck.steps("X")]
+        self.assertLess(names.index("xcodegen"), names.index("visualcore-app-build"))
+        self.assertEqual(names.index("visualcore-app-build"), names.index("xcodegen") + 1)
+
+
+class AppTestRunnerTests(unittest.TestCase):
+    """Feature UA-F04 T-U04-002 (FR-U04-080): scripts/xcodebuild_app.py."""
+
+    PHONE_27, TABLET_27, PHONE_26, TABLET_26, GONE = ("AAAA1111-0000-0000-0000-000000000001",
+                                                      "AAAA1111-0000-0000-0000-000000000002",
+                                                      "BBBB2222-0000-0000-0000-000000000001",
+                                                      "BBBB2222-0000-0000-0000-000000000002",
+                                                      "CCCC3333-0000-0000-0000-000000000009")
+    DEVICES = {"devices": {
+        "com.apple.CoreSimulator.SimRuntime.iOS-27-2": [
+            {"name": "iPhone 18 Pro", "udid": GONE, "isAvailable": False},
+            {"name": "iPad Pro 13-inch (M5)", "udid": TABLET_27, "isAvailable": True},
+            {"name": "iPhone 18", "udid": PHONE_27, "isAvailable": True},
+            {"name": "iPhone 18 Plus", "udid": "AAAA1111-0000-0000-0000-000000000003", "isAvailable": True},
+        ],
+        "com.apple.CoreSimulator.SimRuntime.iOS-26-5": [
+            {"name": "iPhone 17", "udid": PHONE_26, "isAvailable": True},
+            {"name": "iPad Air 11-inch (M3)", "udid": TABLET_26, "isAvailable": True},
+        ],
+        "com.apple.CoreSimulator.SimRuntime.iOS-25-0": [
+            {"name": "iPhone 16", "udid": "DDDD4444-0000-0000-0000-000000000001", "isAvailable": True},
+        ],
+        "com.apple.CoreSimulator.SimRuntime.watchOS-27-2": [
+            {"name": "iPhone-like Watch", "udid": "EEEE5555-0000-0000-0000-000000000001", "isAvailable": True},
+        ],
+    }}
+
+    def test_picks_a_phone_and_a_tablet_by_runtime(self):
+        pick = apprunner.pick_simulator
+        self.assertEqual(pick(self.DEVICES, "27.2", "phone"), (self.PHONE_27, "iPhone 18"))   # the unavailable one is skipped
+        self.assertEqual(pick(self.DEVICES, "27.2", "tablet"), (self.TABLET_27, "iPad Pro 13-inch (M5)"))
+        self.assertEqual(pick(self.DEVICES, "26.5", "phone"), (self.PHONE_26, "iPhone 17"))
+        self.assertEqual(pick(self.DEVICES, "26.5", "tablet"), (self.TABLET_26, "iPad Air 11-inch (M3)"))
+
+    def test_none_when_the_runtime_or_kind_has_none(self):
+        pick = apprunner.pick_simulator
+        self.assertIsNone(pick(self.DEVICES, "28.0", "phone"))
+        self.assertIsNone(pick(self.DEVICES, "25.0", "tablet"))
+        self.assertIsNone(pick(self.DEVICES, "27.2", "watch"))
+        self.assertIsNone(pick({"devices": {}}, "27.2", "phone"))
+        self.assertIsNone(pick({}, "27.2", "phone"))
+
+    def test_exact_command(self):
+        self.assertEqual(apprunner.test_command("VisualCore.xcodeproj", "VisualCore", "UDID", "Build/DerivedData/x", []),
+                         ["xcodebuild", "test", "-project", "VisualCore.xcodeproj", "-scheme", "VisualCore",
+                          "-destination", "platform=iOS Simulator,id=UDID",
+                          "-test-timeouts-enabled", "YES", "-default-test-execution-time-allowance", "180",
+                          "-derivedDataPath", "Build/DerivedData/x", "CODE_SIGNING_ALLOWED=NO"])
+        cmd = apprunner.test_command("P.xcodeproj", "S", "U", "D", ["VisualCoreTests/A", "VisualCoreUITests/B/testC"])
+        self.assertEqual(cmd[-2:], ["-only-testing:VisualCoreTests/A", "-only-testing:VisualCoreUITests/B/testC"])
+        self.assertIn("CODE_SIGNING_ALLOWED=NO", cmd)
+
+    def run_main(self, args, xcode_exit=0, guard_exit=0, listing=None, sources=True):
+        """Runs the tool in a temporary root with a fake runner and guard; returns (code, output, calls, guards, root files)."""
+        calls, guards = [], []
+        devices = self.DEVICES if listing is None else listing
+
+        def fake_run(cmd, **kw):
+            calls.append((list(cmd), kw))
+            if cmd[:2] == ["xcrun", "simctl"]:
+                return subprocess.CompletedProcess(cmd, 0, stdout=json.dumps(devices), stderr="")
+            kw["stdout"].write("Test Case '-[T.A testOne]' passed (0.1 s).\n"
+                               f"destination id={cmd[cmd.index('-destination') + 1].split('id=')[1]}\n** TEST RESULT **\n")
+            return subprocess.CompletedProcess(cmd, xcode_exit)
+
+        def fake_guard(src, log):
+            guards.append((src, log, log.read_text()))
+            return guard_exit
+
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d).resolve()
+            if sources:
+                (root / "Apps" / "VisualCore" / "Tests").mkdir(parents=True)
+            out = io.StringIO()
+            with contextlib.redirect_stdout(out), contextlib.redirect_stderr(io.StringIO()):
+                code = apprunner.main(args, root=root, run=fake_run, guard=fake_guard)
+            files = sorted(str(p.relative_to(root)) for p in root.rglob("*.log"))
+            guards = [(str(s.relative_to(root)), str(l.relative_to(root)), text) for s, l, text in guards]
+            cwd_ok = all(kw.get("cwd") == root for c, kw in calls if c[0] == "xcodebuild")
+        return code, out.getvalue(), calls, guards, files, cwd_ok
+
+    BASE = ["--scheme", "VisualCore", "--runtime", "27.2", "--kind", "phone"]
+
+    def test_pass_runs_tests_then_guard_and_writes_the_log(self):
+        code, out, calls, guards, files, cwd_ok = self.run_main(self.BASE)
+        self.assertEqual(code, 0)
+        self.assertEqual(calls[0][0], ["xcrun", "simctl", "list", "-j", "devices", "available"])
+        self.assertEqual(calls[1][0], apprunner.test_command("VisualCore.xcodeproj", "VisualCore", self.PHONE_27,
+                                                             "Build/DerivedData/app-VisualCore-27.2-phone", []))
+        self.assertEqual(calls[1][1]["stderr"], subprocess.STDOUT)
+        self.assertTrue(cwd_ok)
+        self.assertEqual(files, [".autonomy/logs/app-tests/VisualCore-27.2-phone.log"])
+        self.assertEqual([(s, l) for s, l, _ in guards],
+                         [("Apps/VisualCore/Tests", ".autonomy/logs/app-tests/VisualCore-27.2-phone.log")])
+        self.assertIn("testOne]' passed", guards[0][2])   # the guard reads the finished log
+        self.assertEqual(out.splitlines()[-1], "PASS: VisualCore on iOS 27.2 phone — tests and enumeration guard passed "
+                                               "(.autonomy/logs/app-tests/VisualCore-27.2-phone.log)")
+        self.assertIn("** TEST RESULT **", out)            # the last lines of the log are repeated
+
+    def test_identifier_is_never_printed(self):
+        for kind, udid, name in [("phone", self.PHONE_27, "iPhone 18"), ("tablet", self.TABLET_27, "iPad Pro 13-inch (M5)")]:
+            code, out, calls, _, files, _ = self.run_main(["--scheme", "VisualCore", "--runtime", "27.2", "--kind", kind])
+            self.assertEqual(code, 0)
+            self.assertIn(f"id={udid}", " ".join(calls[1][0]))   # passed to xcodebuild only
+            self.assertNotIn(udid, out)                          # even though the fake log's tail contains it
+            self.assertNotIn(udid, " ".join(files))
+            self.assertIn(name, out)
+            self.assertIn("iOS 27.2", out)
+
+    def test_options_reach_the_command_and_the_log_name(self):
+        code, out, calls, guards, files, _ = self.run_main(
+            ["--scheme", "VisualCore", "--runtime", "26.5", "--kind", "tablet", "--project", "Other.xcodeproj",
+             "--only-testing", "VisualCoreTests/A", "VisualCoreTests/B", "--only-testing", "VisualCoreUITests",
+             "--log-name", "smoke", "--derived-data", "Build/DerivedData/custom"])
+        self.assertEqual(code, 0)
+        self.assertEqual(calls[1][0], apprunner.test_command("Other.xcodeproj", "VisualCore", self.TABLET_26, "Build/DerivedData/custom",
+                                                             ["VisualCoreTests/A", "VisualCoreTests/B", "VisualCoreUITests"]))
+        self.assertEqual(files, [".autonomy/logs/app-tests/smoke.log"])
+        self.assertTrue(out.splitlines()[-1].startswith("PASS: VisualCore on iOS 26.5 tablet — "))
+
+    def test_exit_1_when_the_tests_fail(self):
+        code, out, _, guards, files, _ = self.run_main(self.BASE, xcode_exit=65)
+        self.assertEqual(code, 1)
+        self.assertEqual(guards, [])                             # no guard on a failed run
+        self.assertTrue(out.splitlines()[-1].startswith("FAIL: VisualCore on iOS 27.2 phone — tests failed"))
+        self.assertIn(files[0], out.splitlines()[-1])
+
+    def test_exit_1_when_the_guard_fails(self):
+        code, out, _, guards, _, _ = self.run_main(self.BASE, guard_exit=1)
+        self.assertEqual(code, 1)
+        self.assertEqual(len(guards), 1)
+        self.assertTrue(out.splitlines()[-1].startswith("FAIL: VisualCore on iOS 27.2 phone — tests passed but the enumeration guard failed"))
+
+    def test_exit_2_without_a_simulator_or_with_bad_input(self):
+        code, out, calls, _, files, _ = self.run_main(["--scheme", "VisualCore", "--runtime", "28.0", "--kind", "phone"])
+        self.assertEqual((code, len(calls), files), (2, 1, []))  # xcodebuild is never started
+        self.assertEqual(out.splitlines()[-1], "FAIL: VisualCore on iOS 28.0 phone — no available iPhone simulator of iOS 28.0")
+        code, out, calls, _, _, _ = self.run_main(["--scheme", "VisualCore", "--runtime", "25.0", "--kind", "tablet"])
+        self.assertEqual((code, len(calls)), (2, 1))
+        self.assertIn("no available iPad simulator", out)
+        for bad in [["--scheme", "VisualCore", "--runtime", "27.2", "--kind", "watch"],
+                    ["--scheme", "VisualCore", "--runtime", "latest", "--kind", "phone"],
+                    ["--scheme", "VisualCore", "--runtime", "27.2"],
+                    self.BASE + ["--log-name", "../escape"],
+                    self.BASE + ["--destination", "platform=iOS,id=00008140-000000000000001E"],
+                    self.BASE + ["--only-testing", "platform=iOS,id=X"]]:
+            code, _, calls, _, files, _ = self.run_main(bad)
+            self.assertEqual((code, calls, files), (2, [], []), bad)
+        code, _, calls, _, _, _ = self.run_main(self.BASE, sources=False)
+        self.assertEqual((code, calls), (2, []))
+
+    def test_default_guard_is_the_enumeration_check(self):
+        with tempfile.TemporaryDirectory() as t:
+            d = Path(t)
+            (d / "src").mkdir()
+            (d / "src" / "A.swift").write_text("final class ATests: XCTestCase {\n    func testOne() {}\n}\n")
+            log = d / "log"
+            log.write_text("Test Case '-[T.ATests testOne]' passed (1 s).\n")
+            with contextlib.redirect_stdout(io.StringIO()):
+                self.assertEqual(apprunner.enumeration_guard(d / "src", log), 0)
+                log.write_text("nothing ran\n")
+                self.assertEqual(apprunner.enumeration_guard(d / "src", log), 1)
+
+
+class ForbiddenTextTests(unittest.TestCase):
+    """Feature UA-F04 T-U04-014 (FR-U04-004): `check_release_symbols.py --forbid`."""
+
+    def check(self, args, main_nm="0000 T _main\n", main_bytes=b"\x00plain\x00", fw_nm="0000 T _helper\n",
+              fw_bytes=b"\x00other\x00", nm_exit=0):
+        import plistlib
+        with tempfile.TemporaryDirectory() as d:
+            app = Path(d) / "VisualCore.app"
+            fw = app / "Frameworks" / "Kit.framework"
+            fw.mkdir(parents=True)
+            for folder, name, data in [(app, "VisualCore", main_bytes), (fw, "Kit", fw_bytes)]:
+                (folder / "Info.plist").write_bytes(plistlib.dumps({"CFBundleExecutable": name}))
+                (folder / name).write_bytes(data)
+
+            def fake_run(cmd, **kw):
+                self.assertEqual(cmd[:3], ["xcrun", "nm", "-U"])
+                text = fw_nm if cmd[3].endswith("Kit.framework/Kit") else main_nm
+                return subprocess.CompletedProcess(cmd, nm_exit, stdout=text, stderr="nm: broken")
+
+            out = io.StringIO()
+            with mock.patch.object(relsym.subprocess, "run", fake_run), contextlib.redirect_stdout(out), \
+                    contextlib.redirect_stderr(io.StringIO()):
+                code = relsym.main(["--app", str(app)] + args)
+        return code, out.getvalue()
+
+    def test_no_hit_passes(self):
+        code, out = self.check(["--forbid", "DebugLaunch", "vcFixtureCatalog"])
+        self.assertEqual(code, 0)
+        self.assertEqual(out.splitlines()[-1], "PASS: 0 of 2 forbidden texts found (expected 0)")
+
+    def test_hit_in_symbols_fails_naming_text_and_binary(self):
+        code, out = self.check(["--forbid", "DebugLaunch", "vcFixtureCatalog"],
+                               main_nm="0000 T _$s10VisualCore11DebugLaunchV\n")
+        self.assertEqual(code, 1)
+        self.assertIn("'DebugLaunch' found in VisualCore.app/VisualCore (symbols)", out)
+        self.assertEqual(out.splitlines()[-1],
+                         "FAIL: 1 of 2 forbidden texts found (expected 0): DebugLaunch in VisualCore.app/VisualCore")
+
+    def test_hit_in_the_bytes_of_an_embedded_framework_fails(self):
+        code, out = self.check(["--forbid", "DebugLaunch", "openExperience"], fw_bytes=b"\x00-openExperience\x00")
+        self.assertEqual(code, 1)
+        self.assertIn("'openExperience' found in VisualCore.app/Frameworks/Kit.framework/Kit (strings)", out)
+        self.assertNotIn("'DebugLaunch' found", out)
+
+    def test_expect_present_inverts(self):
+        args = ["--forbid", "DebugLaunch", "vcFixtureCatalog", "--expect-present"]
+        code, out = self.check(args, main_nm="0000 T _DebugLaunch\n", fw_bytes=b"vcFixtureCatalog")
+        self.assertEqual(code, 0)
+        self.assertEqual(out.splitlines()[-1], "PASS: 2 of 2 texts present (expected all)")
+        code, out = self.check(args, main_nm="0000 T _DebugLaunch\n")
+        self.assertEqual(code, 1)
+        self.assertIn("'vcFixtureCatalog' not found in any binary", out)
+        self.assertEqual(self.check(args)[0], 1)
+
+    def test_nm_failure_is_exit_2(self):
+        self.assertEqual(self.check(["--forbid", "DebugLaunch"], nm_exit=1)[0], 2)
+
+    def test_without_forbid_the_check_is_unchanged(self):
+        code, out = self.check([])
+        self.assertEqual(code, 0)
+        self.assertEqual(out.splitlines()[-1], "PASS: 0 automation symbols, 0 trigger strings (expected 0)")
+        # The texts that --forbid would look for are not part of the built-in check.
+        code, out = self.check([], main_nm="0000 T _DebugLaunch\n", main_bytes=b"vcFixtureCatalog")
+        self.assertEqual(code, 0)
+        code, out = self.check([], main_nm="0000 T _$s20VisualCoreAutomation6RunnerC\n")
+        self.assertEqual(code, 1)
+        self.assertIn("VisualCore.app/VisualCore: 1 automation symbols, 0 trigger strings", out)
+        self.assertEqual(out.splitlines()[-1], "FAIL: 1 automation symbols, 0 trigger strings (expected 0)")
+        code, out = self.check([], fw_bytes=b"\x00VISUALCORE_AUTORUN\x00")
+        self.assertEqual(code, 1)
+        code, out = self.check(["--expect-present"], main_nm="0000 T _AutomationRunner\n")
+        self.assertEqual((code, out.splitlines()[-1]),
+                         (0, "PASS: measurement build has 1 automation symbols (expected > 0)"))
+        self.assertEqual(self.check(["--expect-present"])[0], 1)
 
 
 class VersionTests(unittest.TestCase):

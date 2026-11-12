@@ -99,6 +99,11 @@ def steps(stamp: str) -> list[Step]:
         Step("xcodegen", [PY, "-c", "import subprocess,sys;[subprocess.run(['xcodegen','generate','--spec',p],check=True) "
                                     "for p in sys.argv[1:]]", "project.yml", "Harnesses/InteractiveDemo/InteractiveDemo.yml",
                           "Harnesses/SecondConsumer/SecondConsumer.yml", "Harnesses/ProjectMReference/ProjectMReference.yml"]),
+        # Feature UA-F04 T-U04-029 (FR-U04-002): the unified app builds unsigned for the generic simulator.
+        Step("visualcore-app-build", ["xcodebuild", "build", "-project", "VisualCore.xcodeproj", "-scheme", "VisualCore",
+                                      "-destination", "generic/platform=iOS Simulator",
+                                      "-derivedDataPath", "Build/DerivedData/release-VisualCore-sim",
+                                      "CODE_SIGNING_ALLOWED=NO"]),
     ]
     for rt in RUNTIMES:
         t = tag(rt)

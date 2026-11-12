@@ -1,14 +1,30 @@
-// VisualCoreApp — feature 190 T-U04-001 (UA-F04; ADR-0009 D-01). The app type of the unified app, the only shippable
-// target of the repository. The launcher, the routes and the settings arrive with T-U04-011.
+// VisualCoreApp — feature 190 T-U04-011 (UA-F04; ADR-0009 D-01; FR-U04-001, FR-U04-030, FR-U04-043). The app type
+// of the unified app, the only shippable target of the repository. It creates the one app model and shows the
+// root view. In builds made for testing the environment passes through the debug launch arguments; a release
+// build contains none of that handling.
 import SwiftUI
+import VisualCoreUI
 
 /// The VisualCore app.
 @main
 struct VisualCoreApp: App {
+    @State private var model: AppModel
+
+    /// Creates the app with its one model.
+    init() {
+        #if DEBUG
+        let environment = DebugLaunch.environment(base: AppEnvironment.live())
+        #else
+        let environment = AppEnvironment.live()
+        #endif
+        _model = State(initialValue: AppModel(environment: environment))
+    }
+
     var body: some Scene {
         WindowGroup {
-            Text(verbatim: "VisualCore")
-                .accessibilityIdentifier("vc.route.catalog")
+            RootView(model: model)
+                // The contrast-checked accent of the framework, not the system default (accessibility audit).
+                .tint(AccessibleColors.accent)
         }
     }
 }

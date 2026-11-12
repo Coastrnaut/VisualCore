@@ -502,6 +502,8 @@ targets:
         product: VisualCoreSimulation
       - package: VisualCore
         product: VisualCoreDiagnostics
+      - package: VisualCore
+        product: VisualCorePersistence
       - package: VisualCoreRendering
         product: VisualCoreRendering
       - package: VisualCoreRendering

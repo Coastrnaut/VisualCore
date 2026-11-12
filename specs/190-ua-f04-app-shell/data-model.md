@@ -50,7 +50,7 @@ arguments, last reset (what was removed). Readable in debug builds through the i
 
 ## 6. Identifiers
 
-`vc.tile.<id>`, `vc.route.catalog|experience|settings|about`, `vc.search`, `vc.empty`, `vc.nomatch`,
+`vc.tile.<id>`, `vc.route.catalog|experience|settings|about`, `vc.nav.settings`, `vc.nav.about`, `vc.search`, `vc.empty`, `vc.nomatch`,
 `vc.error`, `vc.welcome`, `vc.welcome.start`, `vc.settings.quality`, `vc.settings.reset.all`,
 `vc.settings.reset.<id>`, `vc.settings.privacy`, `vc.about.acknowledgements`, `vc.experience.back`,
 `vc.premium.notice`.
