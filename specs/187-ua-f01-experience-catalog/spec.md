@@ -246,9 +246,9 @@ duplicate registration, and compare the report.
 
 **Identity**
 
-- **FR-U01-001**: Every experience MUST have an immutable code of the form `A<nn>` or `R<rr>-G<gg>` and an immutable
-  runtime id `<code in lower case>.<slug>`, where the slug consists of lower-case letters and digits in groups
-  joined by single hyphens.
+- **FR-U01-001**: Every experience MUST have an immutable code of the form `A<nn>` (01 to 99) or `R<rr>-G<gg>`
+  (round 02 to 99, game 01 to 99) and an immutable runtime id `<code in lower case>.<slug>`, where the slug
+  consists of lower-case letters and digits in groups joined by single hyphens and has 1 to 60 characters.
 - **FR-U01-002**: The catalog module MUST parse an id text into code and slug, MUST give back exactly the same text
   for a valid id, and MUST reject a malformed id with a typed reason.
 - **FR-U01-003**: The id and code of every entry of the runtime manifest MUST equal those of the planning catalog
