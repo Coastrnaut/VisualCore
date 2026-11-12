@@ -220,7 +220,7 @@ final class AppModelTests: XCTestCase {
         let storage = try TestStorage(self)
         let received = LaunchBox()
         let registry = DebugLaunch.fixtureFreeIDs.map { free in
-            ExperienceRegistration(id: free) { launch in
+            ExperienceRegistration(id: free, core: DebugExperienceCore.self) { launch in
                 received.values.append(launch)
                 return DebugExperience.make(id: free, launch: launch)
             }
@@ -229,13 +229,16 @@ final class AppModelTests: XCTestCase {
         let id = try XCTUnwrap(freeIDs(model).first)
         let first = await model.open(id)
         XCTAssertTrue(first)
-        XCTAssertEqual(received.values, [ExperienceLaunch(reduceMotion: .system, reduceFlashing: .system)])
+        XCTAssertEqual(received.values.map(\.reduceMotion), [.system])
+        XCTAssertEqual(received.values.map(\.reduceFlashing), [.system])
+        XCTAssertEqual(received.values.map(\.storage.id), [id], "the factory receives the handle of its own id")
         model.closeExperience()
 
         model.setAccessibility(reduceMotion: .on, reduceFlashing: .off)
         let second = await model.open(id)
         XCTAssertTrue(second)
-        XCTAssertEqual(received.values.last, ExperienceLaunch(reduceMotion: .on, reduceFlashing: .off))
+        XCTAssertEqual(received.values.last?.reduceMotion, .on)
+        XCTAssertEqual(received.values.last?.reduceFlashing, .off)
         XCTAssertEqual(received.values.count, 2, "the factory is called once per open")
         model.closeExperience()
 
@@ -243,7 +246,8 @@ final class AppModelTests: XCTestCase {
         let later = self.model(storage, registry: registry)
         let third = await later.open(id)
         XCTAssertTrue(third)
-        XCTAssertEqual(received.values.last, ExperienceLaunch(reduceMotion: .on, reduceFlashing: .off))
+        XCTAssertEqual(received.values.last?.reduceMotion, .on)
+        XCTAssertEqual(received.values.last?.reduceFlashing, .off)
         later.closeExperience()
     }
 
@@ -347,7 +351,7 @@ final class AppModelTests: XCTestCase {
         let storage = try TestStorage(self)
         let id = try XCTUnwrap(DebugLaunch.fixtureFreeIDs.first)
         let calls = LaunchBox()
-        let registry = [ExperienceRegistration(id: id) { launch in
+        let registry = [ExperienceRegistration(id: id, core: DebugExperienceCore.self) { launch in
             calls.values.append(launch)
             return ExperienceShell(id: id, presenter: DebugPresenter(experienceID: id, launch: launch,
                                                                      failsSetup: calls.values.count == 1))
@@ -378,7 +382,7 @@ final class AppModelTests: XCTestCase {
         XCTAssertEqual(QualityDeclaration.problems(profile: profile, tierCount: DebugExperienceCore.qualityTiers,
                                                    catalogNames: nil), [])
         let id = try XCTUnwrap(DebugLaunch.fixtureFreeIDs.first)
-        XCTAssertEqual(DebugExperience.make(id: id).qualityProfile, profile, "the session sees the core's profile")
+        XCTAssertEqual(DebugExperience.make(id: id, launch: try TestStorage(self).launch(id)).qualityProfile, profile, "the session sees the core's profile")
     }
 
     /// SC-U06-001: the fixture experience keeps every obligation of the contract, the two of UA-F06 among them:
@@ -400,7 +404,7 @@ final class AppModelTests: XCTestCase {
         let categories = try CategoryList(data: bundled("categories"))
         let manifest = try CatalogManifest(data: bundled("experiences"), categories: categories)
         for registration in ExperienceRegistry.all {
-            let profile = registration.make(ExperienceLaunch()).qualityProfile
+            let profile = registration.make(try TestStorage(self).launch(registration.id)).qualityProfile
             let names = try XCTUnwrap(manifest.experience(registration.id), "\(registration.id)").qualityTiers
             XCTAssertEqual(QualityDeclaration.problems(profile: profile, tierCount: profile.count,
                                                        catalogNames: names), [], "\(registration.id)")
@@ -517,7 +521,9 @@ final class AppModelTests: XCTestCase {
     func testLeavingWhileAnExperiencePreparesCancelsAndReturnsToTheCatalog() async throws {
         let storage = try TestStorage(self)
         let id = try XCTUnwrap(DebugLaunch.fixtureFreeIDs.first)
-        let registry = [ExperienceRegistration(id: id) { _ in ExperienceShell(id: id, presenter: SlowPresenter()) }]
+        let registry = [ExperienceRegistration(id: id, core: SlowPresenter.Core.self) { _ in
+            ExperienceShell(id: id, presenter: SlowPresenter())
+        }]
             + DebugLaunch.fixtureFreeIDs.dropFirst().map(DebugExperience.registration(for:))
         let model = model(storage, registry: registry)
         let task = Task { await model.open(id) }
@@ -534,10 +540,456 @@ final class AppModelTests: XCTestCase {
         XCTAssertNil(model.session.experience)
         XCTAssertEqual(PreferencesStore(defaults: storage.defaults).load().preferences.lastRoute, .catalog)
     }
+
+    // MARK: Storage handles (feature 191, T-U05-012; FR-U05-002, FR-U05-006)
+
+    func testTwoExperiencesEachSeeOnlyTheirOwnStoredValue() async throws {
+        let storage = try TestStorage(self)
+        let model = fixtureModel(storage)
+        let ids = Array(freeIDs(model).prefix(2))
+        XCTAssertEqual(ids.count, 2)
+        for id in ids {
+            let opened = await model.open(id)
+            XCTAssertTrue(opened)
+        }
+        let again = await model.open(ids[0])
+        XCTAssertTrue(again)
+        model.closeExperience()
+        XCTAssertEqual(DebugExperience.opens(in: storage.handle(ids[0])), 2)
+        XCTAssertEqual(DebugExperience.opens(in: storage.handle(ids[1])), 1)
+        for id in ids {
+            XCTAssertEqual(storage.handle(id).valueKeys(), [DebugExperience.opensKey])
+            XCTAssertNotNil(storage.defaults.object(forKey: "exp.\(id.rawValue).opens"))
+        }
+        XCTAssertNil(storage.handle(ids[0]).value(for: "exp.\(ids[1].rawValue).opens"))
+    }
+
+    // MARK: Saved state (feature 191, T-U05-015; FR-U05-010 to FR-U05-015, FR-U05-020 to FR-U05-022)
+
+    private func persistenceModel(_ storage: TestStorage, sleep: ScriptedSleep,
+                                  registry: [ExperienceRegistration] = DebugLaunch.fixtureRegistry) -> AppModel {
+        var environment = storage.environment(catalog: DebugLaunch.fixtureCatalogData,
+                                              categories: DebugLaunch.fixtureCategoriesData, registry: registry)
+        environment.checkpointSleep = { duration in try await sleep.sleep(duration) }
+        addTeardownBlock { sleep.fire() }
+        return AppModel(environment: environment)
+    }
+
+    /// Sends `count` taps to the open debug experience.
+    private func tap(_ model: AppModel, _ count: Int = 1) {
+        for _ in 0..<count {
+            XCTAssertEqual(model.session.experience?.handle(control: "tap", values: []), .accepted)
+        }
+    }
+
+    /// Lets the main actor run what was scheduled, until `condition` holds or about two seconds passed.
+    private func settle(until condition: () -> Bool = { false }) async throws {
+        for _ in 0..<40 where !condition() {
+            try await Task.sleep(nanoseconds: 5_000_000)
+        }
+        for _ in 0..<10 { await Task.yield() }
+    }
+
+    /// The stored state of `id` on `storage`; fails the test when it is not a readable state.
+    private func storedState(_ storage: TestStorage, _ id: ExperienceID,
+                             file: StaticString = #filePath, line: UInt = #line) -> ExperienceSnapshot? {
+        guard case .state(let snapshot) = SavedStateStore(root: storage.root).load(id) else {
+            XCTFail("no readable stored state", file: file, line: line)
+            return nil
+        }
+        return snapshot
+    }
+
+    private func stateURL(_ storage: TestStorage, _ id: ExperienceID) -> URL {
+        SavedStateStore(root: storage.root).stateURL(for: id)
+    }
+
+    private func taps(of snapshot: ExperienceSnapshot?) -> Int? {
+        guard let snapshot, let object = try? JSONSerialization.jsonObject(with: Data(snapshot.payload.utf8)),
+              let fields = object as? [String: Any] else { return nil }
+        return fields["count"] as? Int
+    }
+
+    func testAStateChangedByActionsIsRestoredAfterACloseAndByANewModel() async throws {
+        let storage = try TestStorage(self)
+        let sleep = ScriptedSleep()
+        let model = persistenceModel(storage, sleep: sleep)
+        let id = try XCTUnwrap(freeIDs(model).first)
+        let opened = await model.open(id)
+        XCTAssertTrue(opened)
+        XCTAssertFalse(FileManager.default.fileExists(atPath: stateURL(storage, id).path), "nothing saved yet")
+        tap(model, 3)
+        model.closeExperience()
+        let first = try XCTUnwrap(storedState(storage, id))
+        XCTAssertEqual(taps(of: first), 3)
+        XCTAssertEqual(first.seed, AppModel.seed(for: id))
+
+        let reopened = await model.open(id)
+        XCTAssertTrue(reopened)
+        XCTAssertTrue(model.session.experience?.port.summary.contains("3 taps") ?? false,
+                      model.session.experience?.port.summary ?? "no experience")
+        model.closeExperience()
+        let second = try XCTUnwrap(storedState(storage, id))
+        XCTAssertEqual(second.digest, first.digest)
+        XCTAssertEqual(second.seed, first.seed)
+        XCTAssertEqual(second.stepIndex, first.stepIndex)
+
+        let later = persistenceModel(storage, sleep: sleep)
+        let third = await later.open(id)
+        XCTAssertTrue(third)
+        XCTAssertTrue(later.session.experience?.port.summary.contains("3 taps") ?? false)
+        later.closeExperience()
+        let last = try XCTUnwrap(storedState(storage, id))
+        XCTAssertEqual(last.digest, first.digest)
+        XCTAssertEqual(last.stepIndex, first.stepIndex)
+    }
+
+    func testAnAcceptedActionIsSavedOnceWhenTheDelayEndsAndNotBefore() async throws {
+        let storage = try TestStorage(self)
+        let sleep = ScriptedSleep()
+        let model = persistenceModel(storage, sleep: sleep)
+        let id = try XCTUnwrap(freeIDs(model).first)
+        let opened = await model.open(id)
+        XCTAssertTrue(opened)
+        let url = stateURL(storage, id)
+
+        // No action: no checkpoint is scheduled at all, however long the scripted time is.
+        try await settle()
+        XCTAssertEqual(sleep.calls, 0)
+        XCTAssertFalse(FileManager.default.fileExists(atPath: url.path))
+
+        // Several actions inside the delay: one delay, no save before it ends, one save after.
+        tap(model, 1)
+        try await settle { sleep.pending == 1 }
+        tap(model, 2)
+        try await settle()
+        XCTAssertEqual(sleep.calls, 1, "further actions inside the delay do not start another one")
+        XCTAssertEqual(sleep.durations, [AppModel.checkpointDelay])
+        XCTAssertFalse(FileManager.default.fileExists(atPath: url.path), "no save before the delay ends")
+        sleep.fire()
+        try await settle { FileManager.default.fileExists(atPath: url.path) }
+        XCTAssertEqual(taps(of: storedState(storage, id)), 3)
+        XCTAssertEqual(model.session.state, .running)
+
+        // A state equal to the stored one is not written again.
+        let past = Date(timeIntervalSince1970: 1_000_000)
+        try FileManager.default.setAttributes([.modificationDate: past], ofItemAtPath: url.path)
+        model.session.checkpoint()
+        let date = try FileManager.default.attributesOfItem(atPath: url.path)[.modificationDate] as? Date
+        XCTAssertEqual(date, past)
+
+        // The next action starts the next delay; its save holds the new state.
+        tap(model, 1)
+        try await settle { sleep.pending == 1 }
+        XCTAssertEqual(sleep.calls, 2)
+        sleep.fire()
+        try await settle { self.taps(of: self.storedState(storage, id)) == 4 }
+        XCTAssertEqual(taps(of: storedState(storage, id)), 4)
+        XCTAssertNil(model.diagnostics.lastSaveFailure)
+
+        // A pending checkpoint is dropped by the close, which saves itself.
+        tap(model, 1)
+        try await settle { sleep.pending == 1 }
+        model.closeExperience()
+        XCTAssertEqual(taps(of: storedState(storage, id)), 5)
+        try FileManager.default.setAttributes([.modificationDate: past], ofItemAtPath: url.path)
+        sleep.fire()
+        try await settle()
+        let after = try FileManager.default.attributesOfItem(atPath: url.path)[.modificationDate] as? Date
+        XCTAssertEqual(after, past, "the dropped checkpoint writes nothing")
+    }
+
+    func testASuspensionSavesOnceAndASecondModelReadsTheCompleteState() async throws {
+        let storage = try TestStorage(self)
+        let sleep = ScriptedSleep()
+        let model = persistenceModel(storage, sleep: sleep)
+        let id = try XCTUnwrap(freeIDs(model).first)
+        let opened = await model.open(id)
+        XCTAssertTrue(opened)
+        tap(model, 2)
+        // Two starts in quick succession: the second model exists before the first one saved.
+        let second = persistenceModel(storage, sleep: sleep)
+        model.session.setScenePhase(.background)
+        XCTAssertEqual(taps(of: storedState(storage, id)), 2)
+        let reopened = await second.open(id)
+        XCTAssertTrue(reopened)
+        XCTAssertTrue(second.session.experience?.port.summary.contains("2 taps") ?? false)
+        second.closeExperience()
+        model.closeExperience()
+    }
+
+    func testAFailedExperienceAndACancelledPreparationSaveNothing() async throws {
+        let storage = try TestStorage(self)
+        let sleep = ScriptedSleep()
+        let failing = try XCTUnwrap(DebugLaunch.fixtureFreeIDs.first)
+        let slow = try XCTUnwrap(DebugLaunch.fixtureFreeIDs.dropFirst().first)
+        let registry = [DebugExperience.failingRegistration(for: failing),
+                        ExperienceRegistration(id: slow, core: SlowPresenter.Core.self) { _ in
+                            ExperienceShell(id: slow, presenter: SlowPresenter())
+                        }]
+        let model = persistenceModel(storage, sleep: sleep, registry: registry)
+        let opened = await model.open(failing)
+        XCTAssertFalse(opened)
+        XCTAssertEqual(model.session.state, .failed)
+        XCTAssertNil(model.unreadable, "a failure of the set-up is not an unreadable state")
+        model.closeExperience()
+        XCTAssertFalse(FileManager.default.fileExists(atPath: stateURL(storage, failing).path))
+
+        let task = Task { await model.open(slow) }
+        for _ in 0..<500 where model.session.state != .preparing {
+            try await Task.sleep(nanoseconds: 10_000_000)
+        }
+        model.closeExperience()
+        let cancelled = await task.value
+        XCTAssertFalse(cancelled)
+        XCTAssertFalse(FileManager.default.fileExists(atPath: stateURL(storage, slow).path))
+        XCTAssertEqual(sleep.calls, 0)
+    }
+
+    func testASaveFailureIsRecordedAndTheExperienceKeepsRunning() async throws {
+        let storage = try TestStorage(self)
+        let sleep = ScriptedSleep()
+        let model = persistenceModel(storage, sleep: sleep)
+        let id = try XCTUnwrap(freeIDs(model).first)
+        // A file in the place of the experience's folder: nothing can be written below it.
+        try Data("in the way".utf8).write(to: storage.root.appendingPathComponent(id.storageNamespace))
+        let opened = await model.open(id)
+        XCTAssertTrue(opened)
+        tap(model, 1)
+        model.session.checkpoint()
+        XCTAssertEqual(model.diagnostics.lastSaveFailure, "storage.write-failed")
+        XCTAssertEqual(model.session.state, .running)
+        XCTAssertEqual(model.session.experience?.handle(control: "tap", values: []), .accepted)
+        model.closeExperience()
+        XCTAssertEqual(model.session.state, .idle)
+    }
+
+    func testLeftoverTemporaryFilesAreRemovedAtTheStart() throws {
+        let storage = try TestStorage(self)
+        let id = try XCTUnwrap(DebugLaunch.fixtureFreeIDs.first)
+        let folder = storage.root.appendingPathComponent(id.storageNamespace)
+        try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+        try Data("half".utf8).write(to: folder.appendingPathComponent(".state.json.tmp-interrupted"))
+        try Data("kept".utf8).write(to: folder.appendingPathComponent("kept.txt"))
+        let model = fixtureModel(storage)
+        XCTAssertEqual(model.diagnostics.leftoversRemoved, 1)
+        XCTAssertEqual(try FileManager.default.contentsOfDirectory(atPath: folder.path), ["kept.txt"])
+        XCTAssertTrue(model.diagnostics.text.contains("leftoversRemoved: 1"))
+    }
+
+    // MARK: Unreadable states (feature 191, T-U05-017; FR-U05-030 to FR-U05-034; SC-U05-004, SC-U05-009)
+
+    /// A stored state of `id` with `count` taps, written by a real open and close.
+    private func storeState(_ model: AppModel, _ id: ExperienceID, taps count: Int = 2) async throws -> Data {
+        let opened = await model.open(id)
+        XCTAssertTrue(opened)
+        tap(model, count)
+        model.closeExperience()
+        return try Data(contentsOf: SavedStateStore(root: model.dataRootForTests).stateURL(for: id))
+    }
+
+    /// `stored` with one field of its JSON object replaced.
+    private func edited(_ stored: Data, _ key: String, _ value: Any) throws -> Data {
+        var object = try XCTUnwrap(try JSONSerialization.jsonObject(with: stored) as? [String: Any])
+        XCTAssertNotNil(object[key], "the stored state has no field \(key)")
+        object[key] = value
+        return try JSONSerialization.data(withJSONObject: object, options: [.sortedKeys])
+    }
+
+    /// `stored` rebuilt as a valid snapshot with another schema version or another experience id.
+    private func rebuilt(_ stored: Data, schema: Int? = nil, experience: ExperienceID? = nil) throws -> Data {
+        let snapshot = try ExperienceSnapshot(data: stored)
+        return try ExperienceSnapshot(experience: experience ?? snapshot.experience,
+                                      schemaVersion: schema ?? snapshot.schemaVersion, seed: snapshot.seed,
+                                      stepIndex: snapshot.stepIndex, digest: snapshot.digest,
+                                      payload: Data(snapshot.payload.utf8)).encoded()
+    }
+
+    /// The eight unreadable states of SC-U05-004 made from a good one: six the file shows, two only the
+    /// experience finds.
+    private func unreadableStates(from good: Data) throws -> [(name: String, data: Data, code: String, newer: Bool)] {
+        let other = try XCTUnwrap(ExperienceID(rawValue: "a98.another-experience"))
+        return [
+            ("truncated", good.prefix(good.count / 2), "snapshot.corrupt", false),
+            ("garbage", Data("not a saved state".utf8), "snapshot.corrupt", false),
+            ("checksum", try edited(good, "checksum", String(repeating: "0f", count: 32)),
+             "snapshot.checksum-mismatch", false),
+            ("other experience", try rebuilt(good, experience: other), "snapshot.wrong-experience", false),
+            ("unknown format", try edited(good, "format", 99), "snapshot.unknown-format", false),
+            ("too large", Data(count: ExperienceSnapshot.maxBytes + 1), "snapshot.too-large", false),
+            ("newer schema", try rebuilt(good, schema: 99), "snapshot.newer-schema", true),
+            ("schema without migration", try rebuilt(good, schema: 0), "snapshot.missing-migration", false),
+        ]
+    }
+
+    func testEachUnreadableStateGivesTheNoticeAndBackChangesNothing() async throws {
+        let storage = try TestStorage(self)
+        let model = fixtureModel(storage)
+        await model.finishWelcome(openFirst: false)
+        let id = try XCTUnwrap(freeIDs(model).first)
+        let good = try await storeState(model, id)
+        let states = try unreadableStates(from: good)
+        XCTAssertEqual(states.count, 8)
+        let url = stateURL(storage, id)
+        let store = SavedStateStore(root: storage.root)
+        for state in states {
+            try state.data.write(to: url)
+            let opened = await model.open(id)
+            XCTAssertFalse(opened, state.name)
+            XCTAssertEqual(model.unreadable?.id, id, state.name)
+            XCTAssertEqual(model.unreadable?.problem.code, state.code, state.name)
+            XCTAssertEqual(model.unreadable?.problem.newer, state.newer, state.name)
+            XCTAssertNil(model.session.experience, "\(state.name): nothing runs")
+            XCTAssertEqual(model.session.state, .idle, state.name)
+            XCTAssertEqual(model.route, .experience(id), "\(state.name): the notice is on the experience route")
+            XCTAssertEqual(try Data(contentsOf: url), state.data, "\(state.name): the file is unchanged")
+
+            model.dismissUnreadable()
+            XCTAssertNil(model.unreadable, state.name)
+            XCTAssertEqual(model.route, .catalog, state.name)
+            XCTAssertEqual(try Data(contentsOf: url), state.data, "\(state.name): Back keeps the file")
+            XCTAssertEqual(store.quarantined(id), [], "\(state.name): Back makes no copy")
+
+            // Opening again without Reset shows the notice again; so does a new model (a new start).
+            let again = await model.open(id)
+            XCTAssertFalse(again, state.name)
+            XCTAssertEqual(model.unreadable?.problem.code, state.code, state.name)
+            let later = fixtureModel(storage)
+            XCTAssertEqual(later.route, .experience(id), state.name)
+            await later.restoreRoute()
+            XCTAssertEqual(later.unreadable?.problem.code, state.code, "\(state.name): after a new start")
+            XCTAssertEqual(later.route, .experience(id), state.name)
+            XCTAssertEqual(try Data(contentsOf: url), state.data, state.name)
+            model.dismissUnreadable()
+        }
+    }
+
+    func testResetOfTheNoticeKeepsACopyAndStartsAfresh() async throws {
+        let storage = try TestStorage(self)
+        let model = fixtureModel(storage)
+        let id = try XCTUnwrap(freeIDs(model).first)
+        let good = try await storeState(model, id, taps: 4)
+        let url = stateURL(storage, id)
+        let store = SavedStateStore(root: storage.root)
+        var expected: [String] = []
+        for (index, state) in try unreadableStates(from: good).prefix(5).enumerated() {
+            try state.data.write(to: url)
+            let opened = await model.open(id)
+            XCTAssertFalse(opened, state.name)
+            await model.resetUnreadable()
+            XCTAssertNil(model.unreadable, state.name)
+            XCTAssertEqual(model.session.state, .running, state.name)
+            XCTAssertEqual(model.route, .experience(id), state.name)
+            XCTAssertTrue(model.session.experience?.port.summary.contains(" 0 taps") ?? false,
+                          "\(state.name): \(model.session.experience?.port.summary ?? "no experience")")
+            let name = "quarantine-\(index + 1).json"
+            expected = Array((expected + [name]).suffix(SavedStateStore.maxQuarantined))
+            XCTAssertEqual(store.quarantined(id), expected, state.name)
+            let copy = store.folder(for: id).appendingPathComponent(name)
+            XCTAssertEqual(try Data(contentsOf: copy), state.data, "\(state.name): the copy holds the unreadable bytes")
+            model.closeExperience()
+            let fresh = try XCTUnwrap(storedState(storage, id))
+            XCTAssertEqual(taps(of: fresh), 0, state.name)
+            XCTAssertEqual(fresh.seed, AppModel.seed(for: id), "\(state.name): the same seed")
+        }
+        XCTAssertEqual(store.quarantined(id), ["quarantine-3.json", "quarantine-4.json", "quarantine-5.json"],
+                       "five unreadable states in a row leave three copies")
+    }
+
+    // MARK: Migration examples and inventory rules (feature 191, T-U05-020, T-U05-022)
+
+    func testEveryRegistrationHasAnExampleOfEveryEarlierSchemaVersion() async throws {
+        for registration in ExperienceRegistry.all + DebugLaunch.fixtureRegistry {
+            let problems = await registration.migrationProblems()
+            XCTAssertEqual(problems, [], "\(registration.id)")
+        }
+        XCTAssertEqual(DebugExperienceCore.migrations.currentVersion, 1, "the debug core needs no example")
+    }
+
+    func testTheInventoryRulesAreValidAndNameNoPurchaseOrTrackingValue() throws {
+        let inventory = try ContainerInventory(rules: DebugInventory.rules)
+        XCTAssertEqual(inventory.rules.count, DebugInventory.rules.count)
+        for rule in DebugInventory.rules {
+            if rule.system {
+                XCTAssertFalse((rule.origin ?? "").trimmingCharacters(in: .whitespaces).isEmpty, rule.pattern)
+            }
+            let text = (rule.pattern + " " + rule.writer).lowercased()
+            for word in ["unlock", "purchas", "premium", "advert", "track", "account", "analytic"] {
+                XCTAssertFalse(text.contains(word), "\(rule.pattern) names \(word)")
+            }
+        }
+        let id = "a01.generative-art-studio"
+        let listed = ["Library/Application Support/Experiences/\(id)/state.json",
+                      "Library/Application Support/Experiences/\(id)/quarantine-2.json",
+                      "Library/Application Support/Experiences/\(id)/seed.txt",
+                      "Library/Preferences/dev.visualcore.VisualCore.plist"]
+        let keys = ["vc.shell.preferences", "vc.shell.preferences.unreadable", "exp.\(id).opens"]
+        XCTAssertEqual(DebugInventory.text(files: listed, keys: keys), "inventory: 4 files, 3 keys; unlisted: none")
+        XCTAssertEqual(DebugInventory.text(files: listed + ["Library/Application Support/stray.txt"],
+                                           keys: keys + ["stray.key"]),
+                       "inventory: 5 files, 4 keys; unlisted: file:Library/Application Support/stray.txt, key:stray.key")
+        // A hidden temporary file of an interrupted write and a file outside an experience folder are not listed.
+        XCTAssertTrue(DebugInventory.text(files: ["Library/Application Support/Experiences/\(id)/.state.json.tmp-x"],
+                                          keys: []).hasSuffix(".state.json.tmp-x"))
+        XCTAssertTrue(DebugInventory.text(files: [], keys: ["unlocked"]).hasSuffix("unlisted: key:unlocked"))
+    }
+
+    func testTheInventoryReaderListsEveryFileBelowTheThreeFolders() throws {
+        let storage = try TestStorage(self)
+        let home = storage.root
+        for path in ["Documents/a.txt", "Library/Application Support/Experiences/a01.x/state.json", "tmp/b",
+                     "Library/.hidden", "other/outside.txt"] {
+            let url = home.appendingPathComponent(path)
+            try FileManager.default.createDirectory(at: url.deletingLastPathComponent(),
+                                                    withIntermediateDirectories: true)
+            try Data("x".utf8).write(to: url)
+        }
+        XCTAssertEqual(DebugInventory.files(home: home),
+                       ["Documents/a.txt", "Library/.hidden",
+                        "Library/Application Support/Experiences/a01.x/state.json", "tmp/b"])
+        storage.defaults.set(1, forKey: "one")
+        storage.defaults.set(2, forKey: "two")
+        XCTAssertEqual(DebugInventory.keys(defaults: storage.defaults, domain: storage.suite), ["one", "two"])
+    }
     #endif
 }
 
 #if DEBUG
+/// The delay between an accepted action and its checkpoint, scripted: a call waits until the test fires it.
+final class ScriptedSleep: @unchecked Sendable {
+    private let lock = NSLock()
+    private var waiting: [CheckedContinuation<Void, Never>] = []
+    private var asked: [Duration] = []
+
+    /// How many delays were started.
+    var calls: Int { lock.withLock { asked.count } }
+    /// The durations that were asked for.
+    var durations: [Duration] { lock.withLock { asked } }
+    /// How many delays wait to be fired.
+    var pending: Int { lock.withLock { waiting.count } }
+
+    /// Waits until `fire()`; throws when the task was cancelled meanwhile.
+    func sleep(_ duration: Duration) async throws {
+        await withCheckedContinuation { continuation in
+            lock.withLock {
+                asked.append(duration)
+                waiting.append(continuation)
+            }
+        }
+        try Task.checkCancellation()
+    }
+
+    /// Ends every waiting delay.
+    func fire() {
+        let ended = lock.withLock {
+            let all = waiting
+            waiting = []
+            return all
+        }
+        for continuation in ended { continuation.resume() }
+    }
+}
+
 /// Collects what the shell hands to a factory.
 @MainActor
 private final class LaunchBox {

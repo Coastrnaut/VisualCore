@@ -34,7 +34,14 @@ enum ShellID {
     static let settingsPrivacy = "vc.settings.privacy"
     static let aboutAcknowledgements = "vc.about.acknowledgements"
     static let diagnostics = "vc.diagnostics"
+    /// The notice of a stored state that cannot be read (feature 191): its text, its code and its two buttons.
+    static let unreadable = "vc.unreadable"
+    static let unreadableCode = "vc.unreadable.code"
+    static let unreadableReset = "vc.unreadable.reset"
+    static let unreadableBack = "vc.unreadable.back"
     #if DEBUG
+    /// The container inventory, in the debug diagnostics of the settings (feature 191).
+    static let inventory = "vc.inventory"
     /// The text of the last performance record, in the debug diagnostics of the settings (UA-F06).
     static let performance = "vc.performance"
     #endif

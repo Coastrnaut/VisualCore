@@ -13,6 +13,10 @@ struct SettingsView: View {
     @State private var system = SystemAccessibilityObserver()
     @State private var pending: PendingReset?
     @State private var confirmed: ResetPlan?
+    #if DEBUG
+    /// The container inventory, read when the settings appear and after a reset.
+    @State private var inventory = ""
+    #endif
 
     /// A reset that waits for its confirmation.
     struct PendingReset: Identifiable {
@@ -48,6 +52,9 @@ struct SettingsView: View {
                 Text(verbatim: Self.performanceText(model.session.lastPerformanceRecord))
                     .font(.footnote)
                     .accessibilityIdentifier(ShellID.performance)
+                Text(verbatim: inventory)
+                    .font(.footnote)
+                    .accessibilityIdentifier(ShellID.inventory)
             }
             #endif
         }
@@ -55,7 +62,12 @@ struct SettingsView: View {
         .routeRoot(ShellID.routeSettings)
         .navigationTitle(AppStrings.text(.settingsTitle))
         .navigationBarBackButtonHidden(true)
-        .onAppear { model.refreshDataNamespaces() }
+        .onAppear {
+            model.refreshDataNamespaces()
+            #if DEBUG
+            inventory = DebugInventory.current()
+            #endif
+        }
         .sheet(item: $pending, onDismiss: carryOut) { request in
             ResetConfirmationView(question: request.question) {
                 confirmed = request.plan
@@ -73,6 +85,9 @@ struct SettingsView: View {
         guard let plan = confirmed else { return }
         confirmed = nil
         model.reset(plan)
+        #if DEBUG
+        inventory = DebugInventory.current()
+        #endif
     }
 
     // MARK: Accessibility choices

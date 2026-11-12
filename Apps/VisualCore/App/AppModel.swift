@@ -3,6 +3,9 @@
 // The one observable model of the app shell. It loads the catalog, compares it with the registry, keeps the
 // preferences and owns the one experience session. Every decision is taken by the pure shell model of
 // VisualCoreExperience; this type only carries the decisions out and stores their result.
+// Feature 191 (UA-F05; FR-U05-010 to FR-U05-044; research R3 to R5): the model stores the snapshot the session
+// hands out (suspension, close, and a checkpoint five seconds after an accepted action), gives it back at the
+// next open, shows a notice for a stored state that cannot be read, and clears storage on a reset.
 import Foundation
 import Observation
 import VisualCoreDiagnostics
@@ -19,8 +22,13 @@ struct AppDiagnostics: Equatable {
     var preferencesNote: String?
     /// Test arguments the debug support did not understand.
     var unknownArguments: [String]
-    /// What the last reset removed: storage namespaces and, after a reset of all data, the preferences key.
+    /// What the last reset removed: storage namespaces, defaults keys of experiences and, after a reset of all
+    /// data, the preferences keys.
     var lastReset: [String]
+    /// The code of the last saved state that could not be written; nil when every save worked.
+    var lastSaveFailure: String? = nil
+    /// How many leftover temporary files of interrupted writes the start removed.
+    var leftoversRemoved = 0
 
     /// The diagnostics as lines of text.
     var text: String {
@@ -28,7 +36,9 @@ struct AppDiagnostics: Equatable {
          "registryMismatches: \(registryMismatches.joined(separator: ","))",
          "preferencesNote: \(preferencesNote ?? "")",
          "unknownArguments: \(unknownArguments.joined(separator: ","))",
-         "lastReset: \(lastReset.joined(separator: ","))"].joined(separator: "\n")
+         "lastReset: \(lastReset.joined(separator: ","))",
+         "lastSaveFailure: \(lastSaveFailure ?? "")",
+         "leftoversRemoved: \(leftoversRemoved)"].joined(separator: "\n")
     }
 }
 
@@ -48,6 +58,8 @@ struct AppEnvironment {
     var arguments: [String]
     /// The earliest instant the app's own code ran; nil where no launch is measured (tests).
     var launchStart: ContinuousClock.Instant? = nil
+    /// Waits for the delay between an accepted action and its checkpoint; tests script it.
+    var checkpointSleep: @Sendable (Duration) async throws -> Void = { try await Task.sleep(for: $0) }
 
     /// The environment of the shipped app: the bundled catalog, the explicit registry, the standard defaults,
     /// `Application Support/Experiences` and the arguments of the process.
@@ -62,6 +74,36 @@ struct AppEnvironment {
     static func bundled(_ name: String) -> Data? {
         guard let url = Bundle.main.url(forResource: name, withExtension: "json") else { return nil }
         return try? Data(contentsOf: url)
+    }
+}
+
+/// A stored state that cannot be read: the experience it belongs to and what is wrong with it.
+struct UnreadableState: Equatable {
+    /// The experience whose stored state cannot be read.
+    let id: ExperienceID
+    /// The stable code of the problem and whether a newer version wrote the state.
+    let problem: SavedStateProblem
+}
+
+/// What the session's snapshot sink does: it saves through the store and keeps the result for the model.
+@MainActor
+private final class StateSaver {
+    let store: SavedStateStore
+    /// Called after every save with the failure code, or nil when the save worked.
+    var onResult: ((String?) -> Void)?
+
+    init(store: SavedStateStore) {
+        self.store = store
+    }
+
+    func save(_ snapshot: ExperienceSnapshot) throws {
+        do {
+            try store.save(snapshot)
+            onResult?(nil)
+        } catch {
+            onResult?(error.code)
+            throw error
+        }
     }
 }
 
@@ -86,6 +128,8 @@ final class AppModel {
         guard preferences.qualityOverride != nil, session.experience != nil else { return nil }
         return session.qualityLevel
     }
+    /// The stored state that could not be read, while its notice is shown on the experience route; nil otherwise.
+    private(set) var unreadable: UnreadableState?
     /// The diagnostics of the start and of the last reset.
     private(set) var diagnostics: AppDiagnostics
     /// The storage namespaces that have a data folder, sorted.
@@ -99,6 +143,16 @@ final class AppModel {
     private let registrations: [ExperienceID: ExperienceRegistration]
     private let store: PreferencesStore
     private let dataStore: ExperienceDataStore
+    private let stateStore: SavedStateStore
+    private let defaults: UserDefaults
+    private let dataRoot: URL
+    /// The delay between an accepted action and the checkpoint that saves it.
+    static let checkpointDelay: Duration = .seconds(5)
+    private let checkpointSleep: @Sendable (Duration) async throws -> Void
+    /// The pending checkpoint; nil when no accepted action waits to be saved.
+    private var checkpointTask: Task<Void, Never>?
+    /// Grows with every open and every close, so that an observation of an earlier experience ends.
+    private var watchGeneration = 0
     /// The ids the launcher may show when they are available: see `showableIDs(_:_:)`.
     private let showable: Set<ExperienceID>
     private var restored = false
@@ -106,7 +160,14 @@ final class AppModel {
     /// Creates the model: loads the catalog, compares it with the registry, loads the preferences and decides
     /// the start. Nothing is opened here; `restoreRoute()` opens a restored experience.
     init(environment: AppEnvironment) {
-        session = ExperienceSession()
+        let states = SavedStateStore(root: environment.dataRoot)
+        let saver = StateSaver(store: states)
+        session = ExperienceSession(snapshotSink: { snapshot in try saver.save(snapshot) })
+        stateStore = states
+        defaults = environment.defaults
+        dataRoot = environment.dataRoot
+        checkpointSleep = environment.checkpointSleep
+        let leftovers = states.removeLeftovers()
         arguments = environment.arguments
         let loaded = Self.loadCatalog(catalog: environment.catalogData, categories: environment.categoriesData)
         manifest = loaded.manifest
@@ -142,11 +203,16 @@ final class AppModel {
         launcher = LauncherModel.state(manifest: loaded.manifest, categories: loaded.categories,
                                        registered: registered, searchText: stored.preferences.searchText)
         diagnostics = AppDiagnostics(catalog: catalogText, registryMismatches: mismatches,
-                                     preferencesNote: stored.note, unknownArguments: [], lastReset: [])
+                                     preferencesNote: stored.note, unknownArguments: [], lastReset: [],
+                                     leftoversRemoved: leftovers)
         dataNamespaces = folders.existing()
         launchStart = environment.launchStart
         firstStart = environment.defaults.object(forKey: ShellPreferences.storageKey) == nil
         session.qualityPin = stored.preferences.qualityOverride
+        saver.onResult = { [weak self] failure in
+            guard let self, self.diagnostics.lastSaveFailure != failure else { return }
+            self.diagnostics.lastSaveFailure = failure
+        }
     }
 
     // MARK: - Launch time (UA-F06)
@@ -226,6 +292,8 @@ final class AppModel {
     /// is not taken here: `open(_:)` opens an experience.
     func go(_ route: ShellRoute) {
         if case .experience = route { return }
+        endWatching()
+        unreadable = nil
         session.close()
         setRoute(route)
     }
@@ -246,15 +314,40 @@ final class AppModel {
         }
         guard let registration = registrations[id] else { return false }
         premiumNotice = false
+        endWatching()
+        unreadable = nil
+        // What is open is closed first, so that its state is stored before the stored state is read.
+        session.close()
         setRoute(.experience(id))
-        let launch = ExperienceLaunch(reduceMotion: preferences.reduceMotion,
+        var stored: ExperienceSnapshot?
+        switch stateStore.load(id) {
+        case .none:
+            break
+        case .state(let snapshot):
+            stored = snapshot
+        case .unreadable(let problem):
+            // Nothing is opened: a fresh state could be saved over the one that cannot be read.
+            unreadable = UnreadableState(id: id, problem: problem)
+            return false
+        }
+        let launch = ExperienceLaunch(storage: ExperienceStorage(id: id, root: dataRoot, defaults: defaults),
+                                      reduceMotion: preferences.reduceMotion,
                                       reduceFlashing: preferences.reduceFlashing)
-        let request = ExperienceOpenRequest(id: id, seed: Self.seed(for: id)) { registration.make(launch) }
+        let request = ExperienceOpenRequest(id: id, seed: Self.seed(for: id), snapshot: stored,
+                                            refusedSnapshotFails: true) { registration.make(launch) }
         switch await session.open(request) {
         case .running, .suspended:
             setRoute(.experience(id))
+            watchActions()
             return true
-        case .failed, .superseded:
+        case .failed(let failure):
+            if failure.stage == .restore, session.state == .failed, route == .experience(id) {
+                // The experience refused its stored state: the notice replaces the failure view.
+                unreadable = UnreadableState(id: id, problem: SavedStateProblem(failureCode: failure.failure.code))
+                session.close()
+            }
+            return false
+        case .superseded:
             return false
         case .cancelled:
             if route == .experience(id) { setRoute(.catalog) }
@@ -262,8 +355,72 @@ final class AppModel {
         }
     }
 
+    /// Reset of the unreadable-state notice: the stored state becomes a quarantined copy and the experience
+    /// opens in the state of a fresh preparation. When the copy cannot be made nothing is opened and the
+    /// notice stays, so that the stored state is never lost without a copy.
+    func resetUnreadable() async {
+        guard let notice = unreadable else { return }
+        do {
+            try stateStore.quarantine(notice.id)
+        } catch {
+            diagnostics.lastSaveFailure = error.code
+            return
+        }
+        unreadable = nil
+        refreshDataNamespaces()
+        await open(notice.id)
+    }
+
+    /// Back of the unreadable-state notice: the catalog is shown and nothing stored is changed.
+    func dismissUnreadable() {
+        guard unreadable != nil else { return }
+        unreadable = nil
+        setRoute(.catalog)
+    }
+
+    // MARK: - Checkpoints
+
+    /// Watches the action port of the open experience: every accepted action raises its revision, and a raised
+    /// revision schedules one checkpoint `checkpointDelay` later. Further actions inside that time do not move
+    /// it, so a burst of actions gives one save.
+    private func watchActions() {
+        guard let port = session.experience?.port else { return }
+        let generation = watchGeneration
+        withObservationTracking {
+            _ = port.revision
+        } onChange: { [weak self] in
+            Task { @MainActor [weak self] in
+                guard let self, self.watchGeneration == generation else { return }
+                self.scheduleCheckpoint()
+                self.watchActions()
+            }
+        }
+    }
+
+    private func scheduleCheckpoint() {
+        guard checkpointTask == nil else { return }
+        let generation = watchGeneration
+        let sleep = checkpointSleep
+        checkpointTask = Task { @MainActor [weak self] in
+            try? await sleep(Self.checkpointDelay)
+            guard let self, !Task.isCancelled, self.watchGeneration == generation else { return }
+            self.checkpointTask = nil
+            self.session.checkpoint()
+        }
+    }
+
+    /// Ends the observation of the open experience and drops a pending checkpoint. The close that follows
+    /// saves the state itself.
+    private func endWatching() {
+        watchGeneration += 1
+        checkpointTask?.cancel()
+        checkpointTask = nil
+    }
+
     /// Closes the open experience and returns to the catalog.
     func closeExperience() {
+        endWatching()
+        unreadable = nil
         session.close()
         setRoute(.catalog)
     }
@@ -274,7 +431,7 @@ final class AppModel {
         restored = true
         guard case .experience(let id) = route, session.state == .idle else { return }
         let opened = await open(id)
-        if !opened, session.state == .idle { setRoute(.catalog) }
+        if !opened, session.state == .idle, unreadable == nil { setRoute(.catalog) }
     }
 
     /// Hides the premium notice.
@@ -311,6 +468,9 @@ final class AppModel {
     }
 
     #if DEBUG
+    /// The folder below which the experiences have their data; for tests.
+    var dataRootForTests: URL { dataRoot }
+
     /// True once the debug launch arguments acted on this model. Kept on the model, not in a table by object
     /// identity: the identity of a released model can be given to the next one.
     var debugLaunchStarted = false
@@ -345,9 +505,13 @@ final class AppModel {
         if found != dataNamespaces { dataNamespaces = found }
     }
 
-    /// Carries out a reset. An open experience is closed first. `.experience` removes the folder of that
-    /// experience; `.all` removes every experience folder and the preferences, and shows the welcome again.
+    /// Carries out a reset. An open experience is closed first (its state is saved and then removed with the
+    /// rest). `.experience` removes the folder and the defaults values of that experience; `.all` removes every
+    /// experience folder, every experience's defaults values and the preferences with the copy of an unreadable
+    /// one, and shows the welcome again.
     func reset(_ plan: ResetPlan) {
+        endWatching()
+        unreadable = nil
         session.close()
         if case .experience = route { setRoute(.catalog) }
         let found = dataStore.existing()
@@ -357,14 +521,19 @@ final class AppModel {
         if plan.removesPreferences { names += found }
         var removed = dataStore.remove(namespaces: names)
         if plan.removesPreferences {
-            store.remove()
+            removed += ExperienceStorage.removeAllValues(in: defaults)
+            let keys = store.remove()
             removed.append(ShellPreferences.storageKey)
+            removed += keys.filter { $0 != ShellPreferences.storageKey }
             preferences = ShellPreferences()
             route = .catalog
             premiumNotice = false
             session.qualityPin = nil
             refreshLauncher()
             showWelcome = ShellStartup.decide(preferences: preferences, shown: shown).showWelcome
+        }
+        if case .experience(let id) = plan {
+            removed += ExperienceStorage.removeValues(of: id, in: defaults)
         }
         diagnostics.lastReset = removed
         refreshDataNamespaces()

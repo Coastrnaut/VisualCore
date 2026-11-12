@@ -95,6 +95,9 @@ final class DebugPresenter: ExperiencePresenter {
 
     func setup(_ context: RenderContext) throws {
         if failsSetup { throw DebugExperience.SetupFailure() }
+        // One value through the experience's own storage handle (feature 191): how often it was set up.
+        try? launch.storage.setValue(Data(String(DebugExperience.opens(in: launch.storage) + 1).utf8),
+                                     for: DebugExperience.opensKey)
         try scene.setup(context)
     }
 
@@ -154,15 +157,26 @@ enum DebugExperience {
         id.accessibilityPrefix + ".tap"
     }
 
+    /// The name of the value the debug experience keeps in its storage: the number of its set-ups.
+    static let opensKey = "opens"
+
+    /// How often the debug experience of `storage` was set up; 0 without the value.
+    static func opens(in storage: ExperienceStorage) -> Int {
+        guard let data = storage.value(for: opensKey), let text = String(data: data, encoding: .utf8) else {
+            return 0
+        }
+        return Int(text) ?? 0
+    }
+
     /// The debug experience registered as `id`, opened with `launch`.
     @MainActor
-    static func make(id: ExperienceID, launch: ExperienceLaunch = ExperienceLaunch()) -> any Experience {
+    static func make(id: ExperienceID, launch: ExperienceLaunch) -> any Experience {
         ExperienceShell(id: id, presenter: DebugPresenter(experienceID: id, launch: launch))
     }
 
     /// The registration of the debug experience for `id`.
     static func registration(for id: ExperienceID) -> ExperienceRegistration {
-        ExperienceRegistration(id: id) { launch in make(id: id, launch: launch) }
+        ExperienceRegistration(id: id, core: DebugExperienceCore.self) { launch in make(id: id, launch: launch) }
     }
 
     /// The error of a debug experience whose setup is made to fail.
@@ -171,7 +185,7 @@ enum DebugExperience {
     /// The registration of a debug experience for `id` whose setup always fails: the session ends the open in
     /// its failure view.
     static func failingRegistration(for id: ExperienceID) -> ExperienceRegistration {
-        ExperienceRegistration(id: id) { launch in
+        ExperienceRegistration(id: id, core: DebugExperienceCore.self) { launch in
             ExperienceShell(id: id, presenter: DebugPresenter(experienceID: id, launch: launch, failsSetup: true))
         }
     }

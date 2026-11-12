@@ -397,6 +397,72 @@
         }
       }
     },
+    "vc.unreadable.back": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Back"
+          }
+        }
+      }
+    },
+    "vc.unreadable.damaged": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The saved state of this experience is damaged and cannot be read."
+          }
+        }
+      }
+    },
+    "vc.unreadable.newer": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The saved state of this experience was written by a newer version of the app and cannot be read by this version."
+          }
+        }
+      }
+    },
+    "vc.unreadable.reset": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reset"
+          }
+        }
+      }
+    },
+    "vc.unreadable.reset.note": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reset starts the experience from the beginning. A copy of the saved state is kept on this device. Back changes nothing."
+          }
+        }
+      }
+    },
+    "vc.unreadable.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saved state cannot be opened"
+          }
+        }
+      }
+    },
     "vc.welcome.body": {
       "extractionState": "manual",
       "localizations": {
