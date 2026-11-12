@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Apps/ParticleUniverse/ParticleUniverseCore"
+  ],
+  "command": "swift test --package-path Apps/ParticleUniverse/ParticleUniverseCore",
+  "elapsed_seconds": 14.854,
+  "exit_code": 0,
+  "finished": "2026-11-12T00:35:41+00:00",
+  "log": ".autonomy/logs/A04-P03.t309-overrides-2.log",
+  "log_sha256": "976a7ecdeb651bcd25292a55dea8b076043b2d21a793209debaaca5b74c23e93",
+  "name": "t309-overrides-2",
+  "stage": "A04-P03",
+  "started": "2026-11-12T00:35:26+00:00",
+  "timed_out": false
+}

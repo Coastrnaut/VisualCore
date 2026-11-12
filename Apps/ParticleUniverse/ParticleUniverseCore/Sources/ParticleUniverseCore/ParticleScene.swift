@@ -1,6 +1,7 @@
 // ParticleScene.swift — the versioned, validated scene description (feature 033 A04-P01 T-A04-111; FR-A04-105; US4;
 // spec clarification 4; data model). Plain data: the simulation and any GPU state are rebuilt from it.
 import VisualCoreMath
+import VisualCoreParameters
 import VisualCoreSimulation
 
 /// Why a scene was rejected.
@@ -19,21 +20,71 @@ public enum SceneError: Error, Equatable, Sendable {
     case forceCount(Int)
     /// A force value is out of range (negative drag, non-positive attractor radius).
     case invalidForce(Int)
+    /// An emitter override is out of range or names an unknown gradient (feature 035).
+    case invalidEmitter(Int)
 }
 
-/// One emitter in a scene: a family, optionally moved.
+/// One emitter in a scene: a family, optionally moved, with optional size, lifetime and color-gradient overrides
+/// (feature 035; absent in older files, which stay valid).
 public struct SceneEmitter: Codable, Equatable, Sendable {
+    /// Allowed start diameters (world units).
+    public static let sizeRange: ClosedRange<Double> = 1...48
+    /// Allowed lifetimes (seconds); particles live 0.8…1.2 × the value.
+    public static let lifetimeRange: ClosedRange<Double> = 0.2...8
+
     /// The family preset.
     public var family: EmitterFamily
     /// A position replacing the family's (world units), or nil for the family's own.
     public var position: Vec2?
-    /// Creates an emitter of `family`, optionally at `position`.
-    public init(family: EmitterFamily, position: Vec2? = nil) { self.family = family; self.position = position }
+    /// Start diameter replacing the family's (1…48); the end size keeps the family's end/start ratio.
+    public var size: Double?
+    /// Lifetime replacing the family's (0.2…8 s).
+    public var lifetime: Double?
+    /// A built-in palette id (`Palette.builtIns`) replacing the family's colors: start `sample(1)`, end `sample(0.5)`
+    /// fading to transparent.
+    public var gradient: String?
 
-    /// The VisualCore emitter for this entry.
+    /// Creates an emitter of `family`, optionally at `position` and with overrides.
+    public init(family: EmitterFamily, position: Vec2? = nil, size: Double? = nil, lifetime: Double? = nil, gradient: String? = nil) {
+        self.family = family; self.position = position
+        self.size = size; self.lifetime = lifetime; self.gradient = gradient
+    }
+
+    /// `value` clamped to `sizeRange`; nil for nil or non-finite.
+    public static func clampedSize(_ value: Double?) -> Double? {
+        guard let value, value.isFinite else { return nil }
+        return min(max(value, sizeRange.lowerBound), sizeRange.upperBound)
+    }
+
+    /// `value` clamped to `lifetimeRange`; nil for nil or non-finite.
+    public static func clampedLifetime(_ value: Double?) -> Double? {
+        guard let value, value.isFinite else { return nil }
+        return min(max(value, lifetimeRange.lowerBound), lifetimeRange.upperBound)
+    }
+
+    /// True when every override is finite, in range and names a known palette.
+    var overridesAreValid: Bool {
+        if let size, !(size.isFinite && Self.sizeRange.contains(size)) { return false }
+        if let lifetime, !(lifetime.isFinite && Self.lifetimeRange.contains(lifetime)) { return false }
+        if let gradient, Palette.builtIn(gradient) == nil { return false }
+        return true
+    }
+
+    /// The VisualCore emitter for this entry, with the overrides applied.
     public func emitter() -> Emitter {
         var e = family.emitter()
         if let position { e.position = position }
+        if let size = Self.clampedSize(size) {
+            let ratio = e.startSize > 0 ? e.endSize / e.startSize : 0
+            e.startSize = size
+            e.endSize = size * ratio
+        }
+        if let lifetime = Self.clampedLifetime(lifetime) { e.lifetime = lifetime * 0.8...lifetime * 1.2 }
+        if let id = gradient, let palette = Palette.builtIn(id) {
+            let a = palette.sample(1), b = palette.sample(0.5)
+            e.startColor = Vec4(a.x, a.y, a.z, 1)
+            e.endColor = Vec4(b.x, b.y, b.z, 0)
+        }
         return e
     }
 }
@@ -143,6 +194,7 @@ public struct ParticleScene: Codable, Equatable, Sendable {
         guard (1...Self.maxEmitters).contains(emitters.count) else { throw .emitterCount(emitters.count) }
         for (i, e) in emitters.enumerated() {
             if let p = e.position, !(p.x.isFinite && p.y.isFinite) { throw .nonFinite("emitters[\(i)].position") }
+            guard e.overridesAreValid else { throw .invalidEmitter(i) }
         }
         guard forces.count <= Self.maxForces else { throw .forceCount(forces.count) }
         for (i, f) in forces.enumerated() {
