@@ -1721,7 +1721,8 @@ class GovernanceTests(unittest.TestCase):
 
     LEDGER_WRITER = "scripts/migration_ledger.py"
     # Reviewed readers of the migration ledger. Adding a reader is a change to this list (FR-U00-039).
-    LEDGER_READERS = {"scripts/validate_autocreator.py", "scripts/render_autocreator.py", "scripts/build_traceability_matrix.py"}
+    LEDGER_READERS = {"scripts/validate_autocreator.py", "scripts/render_autocreator.py", "scripts/build_traceability_matrix.py",
+                      "scripts/planning_index.py"}
     PUSHERS = {"scripts/tick_task.py", "scripts/prepush_scan.py"}
     TOOLS = ("validate_docs", "tick_task", "prepush_scan", "migration_ledger", "planning_index")
     NETWORK_MODULES = {"socket", "ssl", "urllib", "http", "ftplib", "smtplib", "poplib", "imaplib", "xmlrpc", "telnetlib",
@@ -1765,6 +1766,121 @@ class GovernanceTests(unittest.TestCase):
                     imported.add(node.module.split(".")[0])
             self.assertEqual(imported - allowed, set(), f"{tool}.py imports a module outside the standard library")
             self.assertEqual(imported & self.NETWORK_MODULES, set(), f"{tool}.py imports a network module")
+
+
+class PromptCoverageTests(unittest.TestCase):
+    """Every pending launch feature has a non-empty prompt for all eight stages, and the override note of an
+    archived round feature names its directory and ids (feature 186, FR-U00-040 to FR-U00-042)."""
+
+    FILES = (".autonomy/state.json", ".autonomy/migration/ledger.json", "docs/process/speckit-prompt-manifest.json",
+             "docs/catalog/feature-index.json", "docs/catalog/unified-app-features.json")
+    KINDS = ("unified-feature", "shared-round-feature", "game-feature")
+
+    def open_gates(self):
+        gates = json.loads((ROOT_DIR / ".autonomy/migration/ledger.json").read_text())["gates"]
+        return [g for g in gates if g["kind"] in self.KINDS and g["status"] not in ("pass", "superseded")]
+
+    def copy(self) -> Path:
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        root = Path(tmp.name)
+        for rel in self.FILES:
+            (root / rel).parent.mkdir(parents=True, exist_ok=True)
+            (root / rel).write_bytes((ROOT_DIR / rel).read_bytes())
+        (root / "docs/archive").symlink_to(ROOT_DIR / "docs/archive")
+        return root
+
+    def edit(self, root: Path, rel: str, change) -> None:
+        data = json.loads((root / rel).read_text())
+        change(data)
+        (root / rel).write_text(json.dumps(data))
+
+    def test_every_pending_launch_feature_has_eight_prompts(self):
+        legacy = json.loads((ROOT_DIR / ".autonomy/state.json").read_text())
+        phases = [g for g in legacy["order"] if re.fullmatch(r"A\d\d-P\d\d", g) and legacy["stages"][g]["status"] != "pass"]
+        expected = len(phases) + len(self.open_gates())
+        features, prompts, problems = planidx.prompt_coverage(ROOT_DIR)
+        self.assertEqual(problems, [])
+        self.assertEqual(features, expected)
+        self.assertEqual(prompts, 8 * expected)
+        self.assertGreater(features, 0)
+
+    def test_a_missing_or_empty_prompt_names_the_feature_and_the_stage(self):
+        root = self.copy()
+        self.assertEqual(planidx.prompt_coverage(root)[2], [])
+
+        def drop_round_stage(index):
+            next(f for f in index["features"] if f["id"] == "R03-G05-07")["prompts"].pop("plan")
+            next(f for f in index["features"] if f["id"] == "R02-F01")["prompts"].clear()  # superseded: never walked
+
+        def empty_phase_stage(manifest):
+            entry = next(f for f in manifest["features"] if f["gate"] == "A10-P03")
+            next(c for c in entry["commands"] if c["command"] == "speckit-tasks")["prompt"] = "  "
+            manifest["features"] = [f for f in manifest["features"] if f["gate"] != "A11-P00"]
+
+        self.edit(root, "docs/catalog/feature-index.json", drop_round_stage)
+        self.edit(root, "docs/process/speckit-prompt-manifest.json", empty_phase_stage)
+        self.edit(root, "docs/catalog/unified-app-features.json",
+                  lambda briefs: briefs.update(features=[b for b in briefs["features"] if b["id"] != "UA-F05"]))
+        features, prompts, problems = planidx.prompt_coverage(root)
+        self.assertEqual(prompts, 8 * features - len(problems))
+        self.assertEqual(len(problems), 1 + 1 + 8 + 8)
+        self.assertTrue(any(p.startswith("R03-G05-07 plan: ") for p in problems), problems[:4])
+        self.assertTrue(any(p.startswith("A10-P03 tasks: ") for p in problems))
+        for stage in planidx.STAGES:
+            self.assertTrue(any(p.startswith(f"A11-P00 {stage}: ") for p in problems), stage)
+            self.assertTrue(any(p.startswith(f"UA-F05 {stage}: ") for p in problems), stage)
+        self.assertFalse(any(p.startswith("R02-F01 ") for p in problems))
+
+    def test_coverage_command_reports_both_counts(self):
+        with contextlib.redirect_stdout(io.StringIO()) as out:
+            code = planidx.main(["coverage"])
+        self.assertEqual(code, 0)
+        self.assertRegex(out.getvalue(), r"PASS: \d+ pending launch features, \d+ stage prompts, 0 problems")
+
+    def test_manifest_is_what_the_phase_prompt_tool_builds(self):
+        if not (ROOT_DIR / ".autonomy/context/apps").is_dir():
+            self.skipTest("the extraction .autonomy/context is not on this machine (a CI runner): the tracked manifest is used as it is")
+        built = {f["gate"]: f for f in phaseprompts.foundation() + phaseprompts.apps()}
+        manifest = {f["gate"]: f for f in json.loads((ROOT_DIR / "docs/process/speckit-prompt-manifest.json").read_text())["features"]}
+        legacy = json.loads((ROOT_DIR / ".autonomy/state.json").read_text())
+        for gate in legacy["order"]:
+            if re.fullmatch(r"A\d\d-P\d\d", gate) and legacy["stages"][gate]["status"] != "pass":
+                self.assertEqual(manifest[gate], built[gate], gate)
+
+    def test_override_sentence_names_the_directory_and_the_ids(self):
+        index = {f["id"]: f for f in json.loads((ROOT_DIR / "docs/catalog/feature-index.json").read_text())["features"]}
+        checked = 0
+        for g in self.open_gates():
+            if g["kind"] == "unified-feature":
+                continue
+            ns = docs.namespace(Path(g["spec_dir"]))
+            self.assertEqual(planidx.override_ids(ROOT_DIR, index[g["id"]]),
+                             f"Canonical override: feature directory {g['spec_dir']}; requirement ids FR-{ns}-###, "
+                             f"success criteria SC-{ns}-###, task ids T-{ns}-###.", g["id"])
+            checked += 1
+        self.assertGreater(checked, 700)
+        backlog = next(f for f in index.values() if f["kind"] == "game-feature" and f["round"] == 5)
+        self.assertIn(f"feature directory {backlog['spec_dir_proposed']};", planidx.override_ids(ROOT_DIR, backlog))
+
+    def test_prompt_with_override_ends_with_the_sentence(self):
+        index = {f["id"]: f for f in json.loads((ROOT_DIR / "docs/catalog/feature-index.json").read_text())["features"]}
+        feature = index["R02-G01-01"]
+        archived = planidx.prompt_text(ROOT_DIR, feature, "specify")
+        with contextlib.redirect_stdout(io.StringIO()) as out:
+            self.assertEqual(planidx.main(["prompt", "--feature", "R02-G01-01", "--stage", "specify", "--override"]), 0)
+        text = out.getvalue()
+        sentence = ("Canonical override: feature directory specs/301-aurora-loom-playable-rule-kernel; requirement ids "
+                    "FR-R02G0101-###, success criteria SC-R02G0101-###, task ids T-R02G0101-###.")
+        self.assertTrue(text.rstrip().endswith(sentence), text[-300:])
+        self.assertIn(archived, text)
+        paragraph = planidx.OVERRIDE_GAME.format(code="R02-G01", tier="free")
+        self.assertLess(text.index(archived), text.index(paragraph))
+        self.assertLess(text.index(paragraph), text.index(sentence))
+        with contextlib.redirect_stdout(io.StringIO()) as plain:
+            planidx.main(["prompt", "--feature", "R02-G01-01", "--stage", "specify"])
+        self.assertNotIn("Canonical override", plain.getvalue())
+        self.assertIn(archived, plain.getvalue())
 
 
 def ledger_tree_hash() -> str:

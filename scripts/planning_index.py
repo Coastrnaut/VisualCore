@@ -5,6 +5,7 @@
     python3 scripts/planning_index.py verify                     # re-parse the archive and compare with docs/catalog
     python3 scripts/planning_index.py prompt --feature R03-G01-02 [--stage plan] [--override]
     python3 scripts/planning_index.py levels --experience R03-G01     # the planned level manifest of one game (JSON)
+    python3 scripts/planning_index.py coverage                   # every pending launch feature has its eight prompts
 
 The archive under docs/archive/planning/ is the lossless source. This tool never edits it. It extracts
 
@@ -16,7 +17,11 @@ The archive under docs/archive/planning/ is the lossless source. This tool never
                                            location of its section and of each of its stage prompts.
 
 `prompt` prints the archived prompt text verbatim, after checking it against the hash recorded in the index.
-`--override` appends the canonical override note of Auto-Creator.md section 21 for that feature class.
+`--override` appends the canonical override note of Auto-Creator.md section 21 for that feature class and, for a
+round feature, one sentence that names its feature directory and its three id forms.
+`coverage` walks every pending feature of the launch scope (original-app phases of the legacy ledger through the
+tracked prompt manifest; unified-app, shared and game features of the migration ledger) and fails when one of the
+eight stage prompts is missing or empty.
 
 Line numbers are 1-based. A section hash is the SHA-256 of its lines joined with LF (no trailing LF).
 Standard library only.
@@ -30,6 +35,9 @@ import re
 import sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import validate_docs  # noqa: E402
+
 ROOT = Path(__file__).resolve().parent.parent
 ARCHIVE = Path("docs/archive/planning")
 OUT_DIR = Path("docs/catalog")
@@ -38,6 +46,8 @@ FEATURES = OUT_DIR / "feature-index.json"
 BRIEFS = OUT_DIR / "unified-app-features.json"
 SPEC_DOC = ARCHIVE / "root/README-2026-11-10-full-specification.md"
 LEDGER = Path(".autonomy/state.json")
+MIGRATION_LEDGER = Path(".autonomy/migration/ledger.json")  # read only: scripts/migration_ledger.py is its writer
+PHASE_PROMPTS = Path("docs/process/speckit-prompt-manifest.json")  # tracked output of scripts/speckit_prompts.py
 STAGES = ["specify", "clarify", "plan", "checklist", "tasks", "analyze", "implement", "converge"]
 BOLD = re.compile(r"\*\*([^*:]+):\*\*\s*")
 
@@ -643,9 +653,15 @@ def load_feature(root: Path, fid: str) -> dict:
     raise SystemExit(f"ERROR: unknown feature {fid}")
 
 
-def prompt_text(root: Path, feature: dict, stage: str) -> str:
+def prompt_text(root: Path, feature: dict, stage: str, cache: dict | None = None) -> str:
+    """The archived prompt of one stage, verbatim. `cache` keeps the lines of an archive file between calls."""
     start, end = feature["prompts"][stage]
-    lines = read_lines(root, Path(feature["prompts_file"]))
+    if cache is None:
+        lines = read_lines(root, Path(feature["prompts_file"]))
+    else:
+        if feature["prompts_file"] not in cache:
+            cache[feature["prompts_file"]] = read_lines(root, Path(feature["prompts_file"]))
+        lines = cache[feature["prompts_file"]]
     src = feature["source"]
     if sha("\n".join(lines[src["line_start"] - 1:src["line_end"]])) != src["sha256"]:
         raise SystemExit(f"ERROR: the archived section of {feature['id']} does not match the index hash")
@@ -798,6 +814,86 @@ def unified_prompts(brief: dict) -> dict[str, str]:
     }
 
 
+def override_ids(root: Path, feature: dict) -> str:
+    """The sentence that names the feature directory and the three id forms of an archived round feature
+    (feature 186, FR-U00-042). The directory is the gate's `spec_dir` in the migration ledger, or the proposed
+    directory of the index for a round that is not in the ledger yet; the namespace is the validator's."""
+    directory = feature["spec_dir_proposed"]
+    ledger = root / MIGRATION_LEDGER
+    if ledger.is_file():
+        gate = next((g for g in json.loads(ledger.read_text(encoding="utf-8"))["gates"] if g["id"] == feature["id"]), None)
+        if gate and gate.get("spec_dir"):
+            directory = gate["spec_dir"]
+    ns = validate_docs.namespace(Path(directory))
+    if not ns:
+        raise SystemExit(f"ERROR: {feature['id']}: {directory} is outside the numbering map")
+    return (f"Canonical override: feature directory {directory}; requirement ids FR-{ns}-###, success criteria "
+            f"SC-{ns}-###, task ids T-{ns}-###.")
+
+
+def prompt_coverage(root: Path = ROOT) -> tuple[int, int, list[str]]:
+    """Walk every pending feature of the launch scope and count its stage prompts (feature 186, FR-U00-040, 041).
+
+    Pending means: a phase of an original app that is not pass in the legacy ledger, and a unified-app feature,
+    shared round feature or game feature that is neither pass nor superseded in the migration ledger. Returns the
+    number of features, the number of non-empty prompts and one problem per missing or empty prompt,
+    '<feature> <stage>: <reason>'."""
+    features, prompts, problems = 0, 0, []
+
+    def count(fid: str, texts: dict[str, str], where: str, reported: frozenset[str] = frozenset()) -> None:
+        nonlocal features, prompts
+        features += 1
+        for stage in STAGES:
+            if stage in reported:
+                continue
+            if stage not in texts:
+                problems.append(f"{fid} {stage}: no prompt in {where}")
+            elif not texts[stage].strip():
+                problems.append(f"{fid} {stage}: empty prompt in {where}")
+            else:
+                prompts += 1
+
+    legacy = json.loads((root / LEDGER).read_text(encoding="utf-8"))
+    manifest = {f["gate"]: f for f in json.loads((root / PHASE_PROMPTS).read_text(encoding="utf-8"))["features"]}
+    for gate in legacy["order"]:
+        if not re.fullmatch(r"A\d\d-P\d\d", gate) or legacy["stages"][gate]["status"] == "pass":
+            continue
+        texts: dict[str, str] = {}
+        for command in manifest.get(gate, {}).get("commands", []):
+            stage = command["command"].removeprefix("speckit-")
+            if not command["source"].startswith("supplement:converge"):
+                texts.setdefault(stage, command["prompt"])
+        count(gate, texts, PHASE_PROMPTS.as_posix())
+
+    index = {f["id"]: f for f in json.loads((root / FEATURES).read_text(encoding="utf-8"))["features"]}
+    briefs = {b["id"]: b for b in load_briefs(root)["features"]}
+    cache: dict = {}
+    for gate in json.loads((root / MIGRATION_LEDGER).read_text(encoding="utf-8"))["gates"]:
+        if gate["status"] in ("pass", "superseded") or gate["kind"] not in ("unified-feature", "shared-round-feature", "game-feature"):
+            continue
+        fid = gate["id"]
+        if gate["kind"] == "unified-feature":
+            count(fid, unified_prompts(briefs[fid]) if fid in briefs else {}, BRIEFS.as_posix())
+            continue
+        feature, texts, unreadable = index.get(fid), {}, set()
+        for stage in (feature or {}).get("prompts", {}):
+            try:
+                texts[stage] = prompt_text(root, feature, stage, cache)
+            except (OSError, SystemExit) as error:
+                unreadable.add(stage)
+                problems.append(f"{fid} {stage}: {error}")
+        count(fid, texts, FEATURES.as_posix(), frozenset(unreadable))
+    return features, prompts, problems
+
+
+def cmd_coverage(root: Path = ROOT) -> int:
+    features, prompts, problems = prompt_coverage(root)
+    for problem in problems:
+        print("PROBLEM:", problem)
+    print(f"{'PASS' if not problems else 'FAIL'}: {features} pending launch features, {prompts} stage prompts, {len(problems)} problems")
+    return 1 if problems else 0
+
+
 def cmd_prompt(args: argparse.Namespace) -> int:
     wanted = args.feature.upper()
     if wanted in ("CONSTITUTION-2", "CONSTITUTION"):
@@ -834,6 +930,8 @@ def cmd_prompt(args: argparse.Namespace) -> int:
             exp = next((e for e in catalog["experiences"] if e["code"] == feature.get("experience")), None)
             print()
             print(OVERRIDE_GAME.format(code=exp["code"], tier=exp["tier"]) if exp else OVERRIDE_SHARED)
+            print()
+            print(override_ids(ROOT, feature))
         print()
     return 0
 
@@ -868,7 +966,10 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--override", action="store_true")
     l = sub.add_parser("levels")
     l.add_argument("--experience", required=True)
+    sub.add_parser("coverage")
     args = ap.parse_args(argv)
+    if args.cmd == "coverage":
+        return cmd_coverage()
     if args.cmd == "build":
         try:
             build()
