@@ -514,7 +514,7 @@
    "to": "scripts/build_catalog.py",
    "action": "new",
    "by": "UA-F01",
-   "state": "pending",
+   "state": "done",
    "note": "Derives the runtime manifest from the planning catalog."
   },
   {

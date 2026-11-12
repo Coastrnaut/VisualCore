@@ -1841,7 +1841,7 @@ class GovernanceTests(unittest.TestCase):
     LEDGER_WRITER = "scripts/migration_ledger.py"
     # Reviewed readers of the migration ledger. Adding a reader is a change to this list (FR-U00-039).
     LEDGER_READERS = {"scripts/validate_autocreator.py", "scripts/render_autocreator.py", "scripts/build_traceability_matrix.py",
-                      "scripts/planning_index.py"}
+                      "scripts/planning_index.py", "scripts/build_catalog.py"}
     PUSHERS = {"scripts/tick_task.py", "scripts/prepush_scan.py"}
     SCRIPT_SUFFIXES = (".py", ".sh", ".bash", ".zsh", ".command", ".rb", ".yml", ".yaml")
     NOT_OURS = ("External/", "Vendor/", "docs/archive/")
@@ -2030,6 +2030,206 @@ class PromptCoverageTests(unittest.TestCase):
             planidx.main(["prompt", "--feature", "R02-G01-01", "--stage", "specify"])
         self.assertNotIn("Canonical override", plain.getvalue())
         self.assertIn(archived, plain.getvalue())
+
+
+class BuildCatalogTests(unittest.TestCase):
+    """scripts/build_catalog.py derives the runtime manifest from the planning catalog, the migration ledger and the
+    registrations, and proves with --check that the committed files are what it would write (feature 187, UA-F01:
+    FR-U01-040 to FR-U01-045, FR-U01-004)."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.tool = load("build_catalog")
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.root = Path(self.tmp.name)
+        for rel in ("docs/catalog/experience-catalog.json", ".autonomy/migration/ledger.json"):
+            (self.root / rel).parent.mkdir(parents=True, exist_ok=True)
+            (self.root / rel).write_bytes((ROOT_DIR / rel).read_bytes())
+        self.write("Catalog/categories.json", {"schema": 1, "categories": [{"id": i, "title": i.title()} for i in self.tool.CATEGORIES]})
+        self.write("Catalog/registrations.json", {"schema": 1, "registrations": {}})
+        self.write("Catalog/path-map.json", {"schema": 1, "moves": []})
+        self.assertEqual(self.run_tool("--add-golden")[0], 0)
+
+    def write(self, rel, value):
+        path = self.root / rel
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps(value, indent=2) + "\n")
+
+    def edit(self, rel, change):
+        data = json.loads((self.root / rel).read_text())
+        change(data)
+        (self.root / rel).write_text(json.dumps(data))
+
+    def run_tool(self, *argv):
+        with contextlib.redirect_stdout(io.StringIO()) as out:
+            try:
+                code = self.tool.main(list(argv), self.root)
+            except SystemExit as stop:
+                return 1, out.getvalue() + str(stop)
+        return code, out.getvalue()
+
+    def manifest(self):
+        return json.loads((self.root / "Catalog/experiences.json").read_text())
+
+    def gate(self, gate_id, status):
+        def change(ledger):
+            next(g for g in ledger["gates"] if g["id"] == gate_id)["status"] = status
+        self.edit(".autonomy/migration/ledger.json", change)
+
+    def tree(self):
+        return {p.relative_to(self.root).as_posix(): p.read_bytes() for p in sorted(self.root.rglob("*")) if p.is_file()}
+
+    def test_build_derives_every_field_from_the_planning_catalog(self):
+        ledger_before = (self.root / ".autonomy/migration/ledger.json").read_bytes()
+        code, out = self.run_tool()
+        self.assertEqual(code, 0)
+        self.assertIn("100 experiences, 50 free, 50 premium, 0 available", out)
+        planning_bytes = (self.root / "docs/catalog/experience-catalog.json").read_bytes()
+        planning = {e["id"]: e for e in json.loads(planning_bytes)["experiences"]}
+        built = self.manifest()
+        self.assertEqual(list(built), ["schema", "catalog_sha256", "experiences"])
+        self.assertEqual(built["schema"], 1)
+        self.assertEqual(built["catalog_sha256"], hashlib.sha256(planning_bytes).hexdigest())
+        entries = built["experiences"]
+        self.assertEqual(len(entries), 100)
+        self.assertEqual([e["order"] for e in entries], sorted(e["order"] for e in entries))
+        self.assertEqual(list(entries[0]), ["id", "code", "title", "summary", "kind", "tier", "category", "family", "tags", "order",
+                                            "palette", "tile_seed", "capabilities", "quality_tiers", "content", "available"])
+        for e in entries:
+            source = planning[e["id"]]
+            self.assertEqual((e["code"], e["title"], e["tier"], e["family"], e["order"], e["category"]),
+                             (source["code"], source["name"], source["tier"], source["family"], source["order"], source["launcher_category"]))
+            self.assertEqual(e["summary"], source["design"].get("summary") or source["design"]["pitch"])
+            self.assertEqual(e["kind"], "creative" if source["kind"] == "creative-app" else "game")
+            self.assertEqual(e["tags"], [re.sub(r"[^a-z0-9]+", "-", source["family"].lower()).strip("-")])
+            self.assertEqual(e["tile_seed"], int.from_bytes(hashlib.sha256(e["id"].encode()).digest()[:4], "big"))
+            self.assertEqual((e["palette"], e["capabilities"], e["quality_tiers"], e["content"], e["available"]), ([], [], [], None, False))
+        self.assertEqual(sum(e["tier"] == "free" for e in entries), 50)
+        self.assertEqual({e["code"] for e in entries if e["tier"] == "premium"},
+                         {f"R{r:02d}-G{g:02d}" for r in (3, 4) for g in range(1, 26)})
+        fixtures = self.root / self.tool.FIXTURES
+        for name in ("experiences.json", "categories.json", "registrations.json", "path-map.json", "experience-ids.golden.txt"):
+            self.assertEqual((fixtures / name).read_bytes(), (self.root / "Catalog" / name).read_bytes(), name)
+        self.assertEqual((self.root / ".autonomy/migration/ledger.json").read_bytes(), ledger_before)
+
+    def test_only_a_passed_integration_gate_makes_an_experience_available(self):
+        for status in ("pending", "blocked", "fail"):
+            self.gate("X-A02", status)
+            self.assertEqual(self.run_tool()[0], 0, status)
+            self.assertEqual(sum(e["available"] for e in self.manifest()["experiences"]), 0, status)
+        self.gate("X-A01", "pass")
+        before = self.tree()
+        code, out = self.run_tool()
+        self.assertEqual(code, 1)
+        self.assertIn("a01.generative-art-studio", out)
+        self.assertIn("registration", out)
+        self.assertEqual(self.tree(), before)
+        registration = {"capabilities": ["export-image"], "quality_tiers": ["low", "high"], "palette": ["#102030"], "content": None}
+        self.edit("Catalog/registrations.json", lambda r: r["registrations"].update({"a01.generative-art-studio": registration}))
+        code, out = self.run_tool()
+        self.assertEqual(code, 0)
+        self.assertIn("1 available", out)
+        available = [e for e in self.manifest()["experiences"] if e["available"]]
+        self.assertEqual([e["id"] for e in available], ["a01.generative-art-studio"])
+        self.assertEqual((available[0]["capabilities"], available[0]["quality_tiers"], available[0]["palette"]),
+                         (["export-image"], ["low", "high"], ["#102030"]))
+
+    def test_bad_registrations_are_errors_that_write_nothing(self):
+        self.assertEqual(self.run_tool()[0], 0)
+        before = self.tree()
+        cases = {"an id the planning catalog does not define": lambda r: r["registrations"].update({"a99.nothing": {
+                     "capabilities": [], "quality_tiers": [], "palette": [], "content": None}}),
+                 "another schema": lambda r: r.update(schema=2),
+                 "a missing key": lambda r: r["registrations"].update({"a01.generative-art-studio": {"capabilities": []}}),
+                 "an unknown key": lambda r: r["registrations"].update({"a01.generative-art-studio": {
+                     "capabilities": [], "quality_tiers": [], "palette": [], "content": None, "price": 1}})}
+        good = (self.root / "Catalog/registrations.json").read_bytes()
+        for label, change in cases.items():
+            self.edit("Catalog/registrations.json", change)
+            changed = (self.root / "Catalog/registrations.json").read_bytes()
+            code, out = self.run_tool()
+            self.assertEqual(code, 1, label)
+            self.assertIn("Catalog/registrations.json", out, label)
+            after = self.tree()
+            after["Catalog/registrations.json"] = before["Catalog/registrations.json"]
+            self.assertEqual(after, before, label)
+            self.assertEqual((self.root / "Catalog/registrations.json").read_bytes(), changed)
+            (self.root / "Catalog/registrations.json").write_bytes(good)
+
+    def test_check_mode_names_the_file_and_writes_nothing(self):
+        self.assertEqual(self.run_tool()[0], 0)
+        code, out = self.run_tool("--check")
+        self.assertEqual(code, 0)
+        self.assertIn("PASS: runtime catalog, 0 problems", out)
+        fixtures = self.tool.FIXTURES.as_posix()
+        for rel in ("Catalog/experiences.json", f"{fixtures}/experiences.json", f"{fixtures}/categories.json"):
+            path = self.root / rel
+            good = path.read_bytes()
+            path.write_bytes(good.replace(b"Generative Art Studio", b"Generative Art Studi0") if b"Generative Art Studio" in good
+                             else good + b" ")
+            before = self.tree()
+            code, out = self.run_tool("--check")
+            self.assertEqual(code, 1, rel)
+            self.assertIn(f"PROBLEM: {rel}", out, rel)
+            self.assertEqual(self.tree(), before, rel)
+            path.write_bytes(good)
+        golden = self.root / "Catalog/experience-ids.golden.txt"
+        good = golden.read_text()
+        golden.write_text(good.replace("a05.infinite-geometry", "a05.infinite-geometri"))
+        code, out = self.run_tool("--check")
+        self.assertEqual(code, 1)
+        self.assertIn("a05.infinite-geometry", out)
+        self.assertIn("a05.infinite-geometri", out)
+        golden.write_text(good)
+        self.assertEqual(self.run_tool("--check")[0], 0)
+
+    def test_two_builds_give_identical_bytes(self):
+        self.assertEqual(self.run_tool()[0], 0)
+        first = self.tree()
+        self.assertEqual(self.run_tool()[0], 0)
+        self.assertEqual(self.tree(), first)
+
+    def test_golden_list_only_grows(self):
+        golden = self.root / "Catalog/experience-ids.golden.txt"
+        lines = golden.read_text().splitlines()
+        self.assertEqual(len(lines), 300)
+        self.assertEqual(lines[0], "a01.generative-art-studio")
+        golden.write_text("\n".join(lines[:298]) + "\n")
+        code, out = self.run_tool()
+        self.assertEqual(code, 1)
+        self.assertIn("--add-golden", out)
+        code, out = self.run_tool("--add-golden")
+        self.assertEqual(code, 0)
+        self.assertIn("2 ids added", out)
+        self.assertEqual(golden.read_text().splitlines(), lines)
+        self.assertIn("0 ids added", self.run_tool("--add-golden")[1])
+        golden.write_text("\n".join(lines + ["a99.nothing"]) + "\n")
+        for argv in (["--add-golden"], [], ["--check"]):
+            code, out = self.run_tool(*argv)
+            self.assertEqual(code, 1, argv)
+            self.assertIn("a99.nothing", out, argv)
+
+    def test_unreadable_or_misallocated_planning_catalog_is_an_error(self):
+        planning = self.root / "docs/catalog/experience-catalog.json"
+        good = planning.read_bytes()
+        planning.write_text("{not json")
+        code, out = self.run_tool()
+        self.assertEqual(code, 1)
+        self.assertIn("docs/catalog/experience-catalog.json", out)
+        planning.write_bytes(good)
+        self.edit("docs/catalog/experience-catalog.json", lambda c: c["experiences"][0].update(tier="premium"))
+        code, out = self.run_tool()
+        self.assertEqual(code, 1)
+        self.assertIn("A01", out)
+        self.assertFalse((self.root / "Catalog/experiences.json").exists())
+        (self.root / ".autonomy/migration/ledger.json").unlink()
+        planning.write_bytes(good)
+        code, out = self.run_tool()
+        self.assertEqual(code, 1)
+        self.assertIn(".autonomy/migration/ledger.json", out)
 
 
 def ledger_tree_hash() -> str:
