@@ -46,6 +46,7 @@ enum AppStrings {
         case unreadableDamaged = "vc.unreadable.damaged"
         case unreadableNewer = "vc.unreadable.newer"
         case unreadableResetNote = "vc.unreadable.reset.note"
+        case unreadableCode = "vc.unreadable.code"
         case unreadableReset = "vc.unreadable.reset"
         case unreadableBack = "vc.unreadable.back"
         case aboutTitle = "vc.about.title"

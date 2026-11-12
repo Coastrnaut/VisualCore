@@ -408,6 +408,17 @@
         }
       }
     },
+    "vc.unreadable.code": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Problem code: %@"
+          }
+        }
+      }
+    },
     "vc.unreadable.damaged": {
       "extractionState": "manual",
       "localizations": {

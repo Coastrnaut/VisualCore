@@ -21,9 +21,8 @@ struct UnreadableStateView: View {
                     .accessibilityIdentifier(ShellID.unreadable)
                 Text(AppStrings.text(.unreadableResetNote))
                     .font(.body)
-                Text(verbatim: notice.problem.code)
+                Text(AppStrings.text(.unreadableCode, notice.problem.code))
                     .font(.footnote)
-                    .foregroundStyle(.secondary)
                     .accessibilityIdentifier(ShellID.unreadableCode)
                 Button {
                     Task { await model.resetUnreadable() }

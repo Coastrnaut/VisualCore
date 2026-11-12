@@ -33,7 +33,29 @@ enum DebugInventory {
         InventoryRule(kind: .file, pattern: "Library/Preferences/[A-Za-z0-9.-]+\\.plist",
                       writer: "the system: the property list of a defaults domain", system: true,
                       origin: "written by cfprefsd for UserDefaults; seen on the iOS 27.2 and 26.5 simulators"),
+        InventoryRule(kind: .file, pattern: "Library/Caches/" + bundle + "/com\\.apple\\.metal/.+",
+                      writer: "the system: the Metal library cache", system: true,
+                      origin: "written by Metal when the renderer (OpenGL ES through ANGLE on Metal) compiles "
+                          + "its shaders: libraries.data and libraries.list; seen after the first frame"),
+        InventoryRule(kind: .file, pattern: "Library/Caches/" + bundle + "/com\\.apple\\.metalfe/.+",
+                      writer: "the system: the Metal front-end module cache", system: true,
+                      origin: "written by the Metal shader compiler: modules.timestamp and one folder with "
+                          + "modules.idx and monolithic_metal.pcm; seen after the first frame"),
+        InventoryRule(kind: .file, pattern: "Library/SplashBoard/Snapshots/.+",
+                      writer: "the system: pictures of the launch screen", system: true,
+                      origin: "written by SplashBoard for the launch screen, one .ktx picture per size and "
+                          + "appearance; seen after the first start"),
+        InventoryRule(kind: .file, pattern: "Library/Saved Application State/" + bundle + "\\.savedState/.+",
+                      writer: "the system: the scene sessions of UIKit", system: true,
+                      origin: "written by UIKit when the app goes to the background: KnownSceneSessions and "
+                          + "one folder per scene; the app stores nothing there itself"),
+        InventoryRule(kind: .key, pattern: "com\\.apple\\.UIKit\\.UISplitViewController\\.[A-Za-z0-9._-]+",
+                      writer: "the system: the column state of the split view", system: true,
+                      origin: "written by UIKit for the NavigationSplitView of the root view; seen as "
+                          + "com.apple.UIKit.UISplitViewController.Root after the first start"),
     ]
+
+    private static let bundle = "[A-Za-z0-9.-]+"
 
     /// The files below `Documents`, `Library` and `tmp` of the container at `home`, as relative paths, sorted.
     /// Folders are not listed; a file the reader cannot classify is listed, never skipped.

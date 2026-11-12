@@ -4,7 +4,8 @@
 //
 //   -vcFixtureCatalog      use the fixture catalog and the fixture registry
 //   -vcEmptyRegistry       use the fixture catalog and register nothing
-//   -vcResetData           remove the stored preferences and every experience folder before the model starts
+//   -vcResetData           remove the stored preferences, every experience folder, every experience value and
+//                          the stray items of an earlier `-vcStrayItems` before the model starts
 //   -vcSkipWelcome         mark the welcome as seen before the model starts
 //   -vcDamagedCatalog      use catalog data that cannot be read, so that the launcher shows its error state
 //   -vcFailingExperience   with the fixture: every fixture experience fails when it is set up
@@ -54,6 +55,11 @@ enum DebugLaunch {
             preferences.remove()
             let folders = ExperienceDataStore(root: base.dataRoot)
             folders.remove(namespaces: folders.existing())
+            ExperienceStorage.removeAllValues(in: base.defaults)
+            // What `-vcStrayItems` wrote in an earlier start is test material, not data of the app.
+            try? FileManager.default.removeItem(at: base.dataRoot.deletingLastPathComponent()
+                .appendingPathComponent(strayFileName))
+            base.defaults.removeObject(forKey: strayKey)
         }
         if arguments.contains(skipWelcomeArgument) {
             var stored = preferences.load().preferences
