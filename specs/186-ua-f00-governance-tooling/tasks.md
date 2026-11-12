@@ -97,7 +97,7 @@ writer, two pushers.
 
 ### Implementation for User Story 4
 
-- [ ] T-U00-015 [US4] In `scripts/migration_ledger.py` make `read_json()` fail with the tool's own message `cannot read <file>: <reason>` for invalid JSON and for a file that cannot be read (research R10); no other behavior changes. Expected result: the tests of T-U00-014 pass, the suite ends with `OK` and prints `ledger tree unchanged`, and `python3 scripts/migration_ledger.py validate` prints `PASS: migration ledger, 0 problems`.
+- [X] T-U00-015 [US4] In `scripts/migration_ledger.py` make `read_json()` fail with the tool's own message `cannot read <file>: <reason>` for invalid JSON and for a file that cannot be read (research R10); no other behavior changes. Expected result: the tests of T-U00-014 pass, the suite ends with `OK` and prints `ledger tree unchanged`, and `python3 scripts/migration_ledger.py validate` prints `PASS: migration ledger, 0 problems`. — Verified 2026-11-12: python3 scripts/test_scripts.py: Ran 133 tests, OK, 'ledger tree unchanged: f605a7ad42c8b6b0'; python3 scripts/migration_ledger.py validate: PASS: migration ledger, 0 problems; validate_autocreator.py PASS 16 checks
 - [ ] T-U00-016 [US4] Acceptance of User Story 4 (SC-U00-006): run `python3 scripts/test_scripts.py`. Expected result: `OK`; each of the six refusals of the brief (dependency order FR-U00-030, duplicate attestation FR-U00-031, changed log FR-U00-032, device gate before the lock FR-U00-033, Claude CLI FR-U00-034, legacy gates of an original app FR-U00-035) has at least one passing test, named in the evidence; the suite reports the same ledger tree hash before and after.
 
 **Checkpoint**: the ledger refuses everything it must.
