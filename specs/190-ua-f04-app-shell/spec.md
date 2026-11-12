@@ -31,6 +31,27 @@ Canonical overrides:
   acknowledgements views in VisualCoreUI; a project file with the Showcase and four standalone apps, none of them
   the unified app.
 
+## Clarifications
+
+### Session 2026-11-12
+
+Questions asked and answered under the owner's standing delegation (recommended option first).
+
+- Q: Where does the experience used by the interface tests live, given that the sample of the framework may be
+  linked by test targets only? → A: In the app target's own sources, in one folder that compiles only in debug
+  builds, together with the test catalog and the handling of test launch arguments (recommended). A check on the
+  release build proves that none of it is shipped.
+- Q: Where are the shell's preferences kept? → A: As one versioned value in the app's own preferences storage
+  (recommended); experience data lies in one folder per storage namespace inside the app's Application Support
+  folder. A reset removes exactly these. Nothing is stored outside the app's container.
+- Q: Where does the shell's pure logic live? → A: In the existing pure experience module, next to the catalog it
+  works on (recommended): launcher sections, route restoration, first-run decision, preferences value and reset
+  plan. No new module.
+- Q: How does the catalog get into the app? → A: The app bundles the tracked files of the `Catalog` folder
+  directly (recommended); no copy is kept in the app folder, so the bundle and the validated catalog cannot drift.
+- Q: On which simulators do the interface tests run? → A: On one phone and one tablet of each runtime, chosen by
+  runtime and kind, never by a recorded identifier (recommended).
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - There is one app, and it builds (Priority: P1) 🎯
@@ -205,7 +226,8 @@ violation and see the check fail.
   identifier `dev.visualcore.VisualCore` and the display name VisualCore, and one unit test target and one
   interface test target for it. No other target MUST be described as shippable.
 - **FR-U04-002**: The app MUST build without signing for the generic simulator from a freshly generated project.
-- **FR-U04-003**: The app MUST bundle the runtime catalog files and MUST load them through the validated loader.
+- **FR-U04-003**: The app MUST bundle the tracked runtime catalog files of the `Catalog` folder directly, with no
+  copy elsewhere, and MUST load them through the validated loader.
 - **FR-U04-004**: A release build of the app MUST contain no test fixture, no sample experience, no test launch
   argument handling and no code of the reference engine.
 - **FR-U04-005**: The app's own module MUST have a name different from the framework package, so that the two
@@ -280,10 +302,12 @@ violation and see the check fail.
 **Preferences**
 
 - **FR-U04-060**: The shell's preferences (welcome seen, last route, last experience, catalog filter, quality
-  override, accessibility choices) MUST be one versioned value. An unreadable or newer value MUST be replaced by
+  override, accessibility choices) MUST be one versioned value in the app's own preferences storage; experience
+  data MUST lie in one folder per storage namespace inside the app's Application Support folder; nothing MUST be
+  stored outside the app's container. An unreadable or newer value MUST be replaced by
   defaults, with a recorded note, and MUST NOT stop the app.
 - **FR-U04-061**: Pure decisions of the shell (which tiles to show, route restoration, first-run decision, the
-  rules of a reset) MUST be host-testable logic in the pure package.
+  rules of a reset) MUST be host-testable logic in the pure experience module, next to the catalog.
 
 **Privacy and boundaries**
 
@@ -296,11 +320,12 @@ violation and see the check fail.
 
 **Verification**
 
-- **FR-U04-080**: Interface tests MUST run on the iOS 27.x and iOS 26.5 simulators, on a phone and on a tablet,
+- **FR-U04-080**: Interface tests MUST run on the iOS 27.x and iOS 26.5 simulators, on a phone and on a tablet
+  chosen by runtime and kind,
   with the enumeration guard (a run that enumerates no test is a failure), and MUST include the accessibility
   audit of every route.
-- **FR-U04-081**: The interface tests MUST use a test catalog and a test experience that exist only in builds
-  made for testing.
+- **FR-U04-081**: The interface tests MUST use a test catalog and a test experience that live in one folder of
+  the app's sources that compiles only in debug builds; a check on the release build MUST find none of it.
 - **FR-U04-082**: Every public symbol added to the framework MUST have documentation, the API baseline MUST be
   updated, package tests MUST pass on the host and on both simulator runtimes, and the reference regression MUST
   pass.

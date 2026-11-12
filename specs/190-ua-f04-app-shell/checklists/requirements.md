@@ -38,3 +38,5 @@
   script confirmed that every functional requirement appears in the traceability table.
 - The specification states plainly that no experience is available in the real catalog yet, and how the first-run
   criterion is proven until one is.
+- Re-validated 2026-11-12 after `/speckit-clarify` (five questions answered): 16 of 16 still pass; no item
+  changed state.
