@@ -14,7 +14,7 @@ final class SandboxEmitterUITests: XCTestCase {
         let app = launchSandbox()
         XCTAssertEqual(emitterCount(app), 1)
         let remove = app.buttons["pu.sandbox.removeEmitter"]
-        XCTAssertFalse(remove.isEnabled, "a scene always keeps one emitter")
+        XCTAssertFalse(remove.exists, "a scene always keeps one emitter, so Remove is not offered")
         let add = app.buttons["pu.sandbox.addEmitter"]
         add.tap(); add.tap()
         XCTAssertEqual(emitterCount(app), 3)
@@ -28,7 +28,7 @@ final class SandboxEmitterUITests: XCTestCase {
         XCTAssertEqual(emitterCount(app), 2)
         remove.tap()
         XCTAssertEqual(emitterCount(app), 1)
-        XCTAssertFalse(remove.isEnabled)
+        XCTAssertFalse(remove.exists)
     }
 
     func testSizeLifetimeAndGradientControls() {

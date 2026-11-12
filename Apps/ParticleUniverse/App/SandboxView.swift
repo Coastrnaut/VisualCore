@@ -184,12 +184,15 @@ private struct EmitterControls: View {
         .buttonStyle(.bordered)
         .disabled(!model.canAddEmitter)
         .accessibilityIdentifier("pu.sandbox.addEmitter")
-        Button { model.removeEmitter() } label: {
-            Label("Remove emitter", systemImage: "minus.circle").frame(minHeight: 44)
+        // Shown only when there is something to remove: a scene always keeps one emitter, and a disabled button's
+        // dimmed title failed the contrast audit (T-A04-312).
+        if model.canRemoveEmitter {
+            Button { model.removeEmitter() } label: {
+                Label("Remove emitter", systemImage: "minus.circle").frame(minHeight: 44)
+            }
+            .buttonStyle(.bordered)
+            .accessibilityIdentifier("pu.sandbox.removeEmitter")
         }
-        .buttonStyle(.bordered)
-        .disabled(!model.canRemoveEmitter)
-        .accessibilityIdentifier("pu.sandbox.removeEmitter")
     }
 }
 

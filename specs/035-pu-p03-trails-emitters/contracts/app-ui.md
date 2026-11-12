@@ -7,7 +7,7 @@ Phase 01–02 identifiers stay. New:
 | `pu.sandbox.emitter` | menu picker | "Emitter 1" … "Emitter N" (selects the emitter the family picker and overrides edit) |
 | `pu.sandbox.emitters` | text | "Emitters: N of 8" (+ " — waiting for removed emitters to fade" when slots are busy) |
 | `pu.sandbox.addEmitter` | button "Add emitter" | adds the selected family; disabled at 8 busy slots |
-| `pu.sandbox.removeEmitter` | button "Remove emitter" | removes the selected one; disabled with one emitter |
+| `pu.sandbox.removeEmitter` | button "Remove emitter" | removes the selected one; shown only with two or more emitters (a disabled button failed the contrast audit) |
 | `pu.sandbox.size` | slider 1…48 | value "N points" |
 | `pu.sandbox.lifetime` | slider 0.2…8 | value "N.N seconds" |
 | `pu.sandbox.gradient` | menu | "Family colors", Sunset, Ocean, Forest, Neon, Monochrome, Ember |
