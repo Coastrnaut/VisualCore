@@ -23,7 +23,16 @@ struct TestStorage {
         test.addTeardownBlock {
             UserDefaults.standard.removePersistentDomain(forName: suite)
             try? FileManager.default.removeItem(at: root)
+            // The property list of the private suite is a file in the app's container; the unit tests run
+            // inside the app, so it would stay there and the container inventory would rightly name it.
+            try? FileManager.default.removeItem(at: Self.propertyList(of: suite))
         }
+    }
+
+    /// The file the system keeps the defaults suite `suite` in.
+    static func propertyList(of suite: String) -> URL {
+        URL(fileURLWithPath: NSHomeDirectory(), isDirectory: true)
+            .appendingPathComponent("Library/Preferences/\(suite).plist")
     }
 
     /// An environment on this storage.

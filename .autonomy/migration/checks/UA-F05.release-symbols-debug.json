@@ -1,0 +1,26 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_release_symbols.py",
+    "--app",
+    "Build/DerivedData/release-VisualCore-sim/Build/Products/Debug-iphonesimulator/VisualCore.app",
+    "--forbid",
+    "DebugLaunch",
+    "DebugInventory",
+    "vcDamageState",
+    "vcStrayItems",
+    "vc.inventory",
+    "--expect-present"
+  ],
+  "command": "python3 scripts/check_release_symbols.py --app Build/DerivedData/release-VisualCore-sim/Build/Products/Debug-iphonesimulator/VisualCore.app --forbid DebugLaunch DebugInventory vcDamageState vcStrayItems vc.inventory --expect-present",
+  "elapsed_seconds": 0.172,
+  "exit_code": 0,
+  "finished": "2026-11-12T21:43:57+00:00",
+  "gate": "UA-F05",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F05.release-symbols-debug.log",
+  "log_sha256": "cc19ed75a60e60931366ad09ed6d265a4703a05177fcc3d739dd7ccb54da1e58",
+  "name": "release-symbols-debug",
+  "started": "2026-11-12T21:43:57+00:00",
+  "timed_out": false
+}

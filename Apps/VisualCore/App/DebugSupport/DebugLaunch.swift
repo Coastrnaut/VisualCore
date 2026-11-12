@@ -5,7 +5,8 @@
 //   -vcFixtureCatalog      use the fixture catalog and the fixture registry
 //   -vcEmptyRegistry       use the fixture catalog and register nothing
 //   -vcResetData           remove the stored preferences, every experience folder, every experience value and
-//                          the stray items of an earlier `-vcStrayItems` before the model starts
+//                          the stray items of an earlier `-vcStrayItems` and the defaults files of the unit
+//                          tests, before the model starts
 //   -vcSkipWelcome         mark the welcome as seen before the model starts
 //   -vcDamagedCatalog      use catalog data that cannot be read, so that the launcher shows its error state
 //   -vcFailingExperience   with the fixture: every fixture experience fails when it is set up
@@ -60,6 +61,7 @@ enum DebugLaunch {
             try? FileManager.default.removeItem(at: base.dataRoot.deletingLastPathComponent()
                 .appendingPathComponent(strayFileName))
             base.defaults.removeObject(forKey: strayKey)
+            removeTestSuiteLists()
         }
         if arguments.contains(skipWelcomeArgument) {
             var stored = preferences.load().preferences
@@ -118,6 +120,18 @@ enum DebugLaunch {
             if !damageKinds.contains(kind) { unknown.append((damageStateArgument + " " + kind)) }
         }
         return unknown
+    }
+
+    /// Removes the property lists the app's unit tests left in the container: each test uses a private defaults
+    /// suite `<bundle id>.tests.<uuid>`, and the unit tests run inside the app. They are test material.
+    static func removeTestSuiteLists() {
+        guard let bundle = Bundle.main.bundleIdentifier else { return }
+        let folder = URL(fileURLWithPath: NSHomeDirectory(), isDirectory: true)
+            .appendingPathComponent("Library/Preferences", isDirectory: true)
+        let names = (try? FileManager.default.contentsOfDirectory(atPath: folder.path)) ?? []
+        for name in names where name.hasPrefix(bundle + ".tests.") && name.hasSuffix(".plist") {
+            try? FileManager.default.removeItem(at: folder.appendingPathComponent(name))
+        }
     }
 
     /// Damages the stored state of every experience folder below `root` in the way `kind` names. A state that

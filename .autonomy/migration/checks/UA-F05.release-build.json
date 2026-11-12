@@ -1,0 +1,28 @@
+{
+  "argv": [
+    "xcodebuild",
+    "build",
+    "-project",
+    "VisualCore.xcodeproj",
+    "-scheme",
+    "VisualCore",
+    "-configuration",
+    "Release",
+    "-destination",
+    "generic/platform=iOS Simulator",
+    "-derivedDataPath",
+    "Build/DerivedData/ua-f05-release",
+    "CODE_SIGNING_ALLOWED=NO"
+  ],
+  "command": "xcodebuild build -project VisualCore.xcodeproj -scheme VisualCore -configuration Release -destination 'generic/platform=iOS Simulator' -derivedDataPath Build/DerivedData/ua-f05-release CODE_SIGNING_ALLOWED=NO",
+  "elapsed_seconds": 19.399,
+  "exit_code": 0,
+  "finished": "2026-11-12T21:43:41+00:00",
+  "gate": "UA-F05",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F05.release-build.log",
+  "log_sha256": "526092c87740554275aa1d4100f79a25e3d8a9fd3e2614983267e2d75df0ab81",
+  "name": "release-build",
+  "started": "2026-11-12T21:43:21+00:00",
+  "timed_out": false
+}
