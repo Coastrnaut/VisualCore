@@ -4,6 +4,8 @@
 // operation through the lifecycle first, and so answers every call in every state. A value type: a copy of an engine
 // is an independent run from the same state.
 import Foundation
+import VisualCoreMath
+import VisualCorePersistence
 import VisualCoreSimulation
 
 /// Names one started preparation, so that a result that arrives late can be told from the current one.
@@ -216,11 +218,53 @@ public struct ExperienceEngine<Core: ExperienceCore>: Sendable {
         core = current
     }
 
+    // MARK: Input
+
+    /// Carries out an action made now: it is stamped with the current step index.
+    @discardableResult
+    public mutating func handle(control: String, values: [Double] = []) -> ActionResult {
+        handle(ExperienceAction(control: control, values: values, step: stepIndex))
+    }
+
+    /// Carries out `action` or rejects it with a typed reason. The contract checks, in this order: the lifecycle
+    /// state, the step index, the control, the number of values, finiteness and ranges; only a well-formed action
+    /// reaches the core. When the core rejects, the state it had before the call is put back, so a rejected action
+    /// never changes the digest.
+    @discardableResult
+    public mutating func handle(_ action: ExperienceAction) -> ActionResult {
+        let result = carryOut(action)
+        if result.isAccepted { acceptedActions += 1 } else { rejectedActions += 1 }
+        return result
+    }
+
+    private mutating func carryOut(_ action: ExperienceAction) -> ActionResult {
+        do {
+            try lifecycle.permit(.action)
+        } catch {
+            return .rejected(.notActive(lifecycle.state))
+        }
+        guard let before = core else { return .rejected(.notActive(lifecycle.state)) }
+        guard action.step == stepIndex else {
+            return .rejected(.wrongStep(expected: stepIndex, found: action.step))
+        }
+        if let rejection = ExperienceInput.validate(control: action.control, values: action.values, controls: Core.controls) {
+            return .rejected(rejection)
+        }
+        var current = before
+        let result = current.apply(action)
+        core = result.isAccepted ? current : before
+        return result
+    }
+
     // MARK: State
 
     /// The digest of the current domain state, with the experience id as domain.
     public func digest() throws(ExperienceError) -> StateDigest {
         guard let core else { throw .notPrepared }
+        return try digest(of: core)
+    }
+
+    private func digest(of core: Core) throws(ExperienceError) -> StateDigest {
         var builder = DigestBuilder(domain: id.rawValue)
         do {
             try core.writeDigest(into: &builder)
@@ -228,5 +272,94 @@ public struct ExperienceEngine<Core: ExperienceCore>: Sendable {
             throw .digest(error)
         }
         return builder.finish()
+    }
+
+    /// Captures the state as a versioned envelope. Legal while ready, active or suspended.
+    public mutating func snapshot() throws(ExperienceError) -> ExperienceSnapshot {
+        try lifecycle.permit(.snapshot)
+        guard let core, let seed else { throw .notPrepared }
+        let payload: Data
+        do {
+            payload = try core.snapshotPayload()
+        } catch {
+            throw .snapshot(.corrupt(reason: "the payload could not be written: \(error)"))
+        }
+        let digest = try digest(of: core)
+        do {
+            return try ExperienceSnapshot(experience: id, schemaVersion: Self.schemaVersion, seed: seed,
+                                          stepIndex: stepIndex, digest: digest, payload: payload)
+        } catch {
+            throw .snapshot(error)
+        }
+    }
+
+    /// Replaces the state by the one in `snapshot`. Checks, in this order: experience id, schema version,
+    /// checksum, migration, decoding and, at the current schema version, the digest. A refused restore changes
+    /// nothing. Legal while ready, active or suspended.
+    public mutating func restore(_ snapshot: ExperienceSnapshot) throws(ExperienceError) {
+        try lifecycle.permit(.restore)
+        guard snapshot.experience == id else {
+            throw .snapshot(.wrongExperience(found: snapshot.experience.rawValue))
+        }
+        let current = Self.schemaVersion
+        guard snapshot.schemaVersion <= current else {
+            throw .snapshot(.newerSchema(found: snapshot.schemaVersion, current: current))
+        }
+        let bytes = Array(snapshot.payload.utf8)
+        guard StableHash.sha256Hex(bytes) == snapshot.checksum else { throw .snapshot(.checksumMismatch) }
+        var payload = Data(bytes)
+        if snapshot.schemaVersion < current {
+            payload = try Self.migrated(payload, from: snapshot.schemaVersion)
+        }
+        var candidate: Core
+        do {
+            candidate = try Core.restore(payload: payload, seed: snapshot.seed)
+        } catch {
+            throw .snapshot(.corrupt(reason: "the payload does not decode: \(error)"))
+        }
+        if snapshot.schemaVersion == current {
+            let found = try digest(of: candidate)
+            guard found == snapshot.digest else {
+                throw .snapshot(.stateMismatch(expected: snapshot.digest.hex, found: found.hex))
+            }
+        } else {
+            _ = try digest(of: candidate)
+        }
+        if qualityTier != 0 { candidate.setQualityTier(qualityTier) }
+        core = candidate
+        seed = snapshot.seed
+        stepIndex = snapshot.stepIndex
+        clock.resetAccumulator()
+    }
+
+    private static func migrated(_ payload: Data, from version: Int) throws(ExperienceError) -> Data {
+        guard let object = (try? JSONSerialization.jsonObject(with: payload)) as? [String: Any] else {
+            throw .snapshot(.corrupt(reason: "the payload is not a JSON object"))
+        }
+        do {
+            let upgraded = try Core.migrations.migrate(object, from: version)
+            guard JSONSerialization.isValidJSONObject(upgraded) else {
+                throw ExperienceError.snapshot(.corrupt(reason: "a migration step produced a value that is not JSON"))
+            }
+            return try JSONSerialization.data(withJSONObject: upgraded, options: [.sortedKeys])
+        } catch let error as ExperienceError {
+            throw error
+        } catch MigrationError.missingStep(let missing) {
+            throw .snapshot(.missingMigration(from: missing))
+        } catch {
+            throw .snapshot(.corrupt(reason: "the migration failed: \(error)"))
+        }
+    }
+
+    /// Returns to the state of a fresh preparation with the current seed; the step index is 0 again. Legal while
+    /// ready, active or suspended.
+    public mutating func reset() throws(ExperienceError) {
+        try lifecycle.permit(.reset)
+        guard var current = core else { throw .notPrepared }
+        core = nil
+        current.reset()
+        core = current
+        stepIndex = 0
+        clock.resetAccumulator()
     }
 }

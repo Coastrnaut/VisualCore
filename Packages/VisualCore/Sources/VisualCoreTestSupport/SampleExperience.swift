@@ -63,4 +63,23 @@ public enum SampleExperience {
     public static let digestAfter240Steps = "e1df502ae639bed10e7f3d7aead5c21c68a5c8e3fd0aa869818842b807805839"
 
     // MARK: - Version-1 snapshot (migration tests)
+
+    /// The payload a version-1 sample wrote: no `energy`, no tier and no cache.
+    public static func payloadV1(seed: UInt64) -> String {
+        #"{"phase":0.5,"seed":"\#(seed)","targetX":14,"targetY":14,"ticks":10,"tone":0.25,"x":5,"y":2}"#
+    }
+
+    /// An encoded snapshot of schema version 1 with step index 10, for the migration tests. The digest in a
+    /// version-1 envelope is not compared at restore, because the schema changed since; it is all zeros here.
+    public static func snapshotV1(seed: UInt64) -> Data {
+        guard let digest = StateDigest(hex: String(repeating: "0", count: 64)),
+              let snapshot = try? ExperienceSnapshot(experience: id, schemaVersion: 1, seed: seed, stepIndex: 10,
+                                                     digest: digest, payload: Data(payloadV1(seed: seed).utf8)),
+              let data = try? snapshot.encoded()
+        else { return Data() }
+        return data
+    }
+
+    /// The digest of the state that `snapshotV1(seed: 42)` restores to after its migration to version 2.
+    public static let snapshotV1Digest = "ad44d74c90060750ea427b5a1e7c57467460a8f7ba98fc73bbc0eb9dff3d7a50"
 }

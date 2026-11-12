@@ -258,12 +258,17 @@ VisualCoreExperience | func | public mutating func completePreparation(_ ticket:
 VisualCoreExperience | func | public mutating func fail(_ failure: ExperienceFailure)
 VisualCoreExperience | func | public mutating func fail(_ failure: ExperienceFailure) -> Bool
 VisualCoreExperience | func | public mutating func finishDeactivation(gpu: GPUResourceCounts? = nil) throws(ExperienceError)
+VisualCoreExperience | func | public mutating func handle(_ action: ExperienceAction) -> ActionResult
+VisualCoreExperience | func | public mutating func handle(control: String, values: [Double] = []) -> ActionResult
 VisualCoreExperience | func | public mutating func permit(_ operation: ExperienceOperation) throws(ExperienceError)
 VisualCoreExperience | func | public mutating func prepare(seed: UInt64, timeLimit: Duration? = nil) async throws(ExperienceError)
+VisualCoreExperience | func | public mutating func reset() throws(ExperienceError)
+VisualCoreExperience | func | public mutating func restore(_ snapshot: ExperienceSnapshot) throws(ExperienceError)
 VisualCoreExperience | func | public mutating func resume() throws(ExperienceError)
 VisualCoreExperience | func | public mutating func run(steps: Int) throws(ExperienceError)
 VisualCoreExperience | func | public mutating func setQualityTier(_ tier: Int)
 VisualCoreExperience | func | public mutating func shedCaches()
+VisualCoreExperience | func | public mutating func snapshot() throws(ExperienceError) -> ExperienceSnapshot
 VisualCoreExperience | func | public mutating func suspend() throws(ExperienceError)
 VisualCoreExperience | func | public mutating func transition(to next: ExperienceLifecycleState) -> Bool
 VisualCoreExperience | func | public static func < (lhs: ExperienceCode, rhs: ExperienceCode) -> Bool
@@ -1403,8 +1408,10 @@ VisualCoreTestSupport | func | public mutating func update(step: Int)
 VisualCoreTestSupport | func | public static func compare(_ a: [UInt8], _ b: [UInt8]) -> ImageDifference
 VisualCoreTestSupport | func | public static func distinctColors(_ rgba: [UInt8]) -> Int
 VisualCoreTestSupport | func | public static func meanLuminance(_ rgba: [UInt8]) -> Double
+VisualCoreTestSupport | func | public static func payloadV1(seed: UInt64) -> String
 VisualCoreTestSupport | func | public static func prepare(seed: UInt64) async throws -> Self
 VisualCoreTestSupport | func | public static func restore(payload: Data, seed: UInt64) throws -> Self
+VisualCoreTestSupport | func | public static func snapshotV1(seed: UInt64) -> Data
 VisualCoreTestSupport | init | public init(from decoder: any Decoder) throws
 VisualCoreTestSupport | let | public let maxAbsolute: Int
 VisualCoreTestSupport | let | public let meanAbsolute: Double
@@ -1414,6 +1421,7 @@ VisualCoreTestSupport | let | public static let goldenDigests: [(seed: UInt64, h
 VisualCoreTestSupport | let | public static let id: ExperienceID
 VisualCoreTestSupport | let | public static let rejectedActions: [ScriptedAction]
 VisualCoreTestSupport | let | public static let seeds: [UInt64]
+VisualCoreTestSupport | let | public static let snapshotV1Digest
 VisualCoreTestSupport | let | public static let stepsPerSegment
 VisualCoreTestSupport | let | public static let version
 VisualCoreTestSupport | protocol | public protocol SampleFault: Sendable

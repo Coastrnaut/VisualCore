@@ -79,8 +79,8 @@ Encoded form (UTF-8 JSON, keys in sorted order, no insignificant white space):
 |---|---|---|
 | `format` | integer | exactly 1; anything else is `unknownFormat` |
 | `experience` | text | a valid experience id; restore compares it with the engine's id (`wrongExperience`) |
-| `schema` | integer ≥ 1 | the schema version of the experience that wrote the payload |
-| `seed` | text | decimal digits of an unsigned 64-bit integer |
+| `schema` | integer ≥ 0 | the schema version of the experience that wrote the payload; experiences start at 1, and a version without a migration step is refused at restore |
+| `seed` | text | decimal digits of an unsigned 64-bit integer in canonical form (no sign, no leading zero) |
 | `step` | integer ≥ 0 | the step index at capture |
 | `digest` | text | 64 lower-case hexadecimal digits: the digest of the state at capture |
 | `payload` | text | the UTF-8 text of one JSON object |
