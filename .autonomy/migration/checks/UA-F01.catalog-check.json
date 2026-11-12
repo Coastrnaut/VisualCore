@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "python3",
+    "scripts/build_catalog.py",
+    "--check"
+  ],
+  "command": "python3 scripts/build_catalog.py --check",
+  "elapsed_seconds": 0.046,
+  "exit_code": 0,
+  "finished": "2026-11-12T06:06:38+00:00",
+  "gate": "UA-F01",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F01.catalog-check.log",
+  "log_sha256": "b035aef278a6dafb57919e4549a815b28b290d77030f71d06029262cb83775bc",
+  "name": "catalog-check",
+  "started": "2026-11-12T06:06:38+00:00",
+  "timed_out": false
+}
