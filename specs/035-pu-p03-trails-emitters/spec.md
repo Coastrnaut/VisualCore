@@ -167,7 +167,11 @@ the brightness cap.
 - Removing an emitter retires it until its last particle dies; while all 8 slots are taken, Add is disabled with a
   note (clarification 4).
 - Changing the family of the selected emitter keeps its position and its size, lifetime and gradient overrides.
-- A trail strength outside its range is clamped; trails at strength 0 cost no extra pass.
+- A trail strength outside its range is clamped; trails at strength 0 cost no extra pass unless the Reduce Flashing
+  cap applies, which routes drawing through the trail layer (CHK011, clarification 3).
+- The family picker changes only the selected emitter's family (position and overrides kept, no restart). "New
+  seed" restarts the scene with all visible emitters, their families and overrides; retired emitters are dropped
+  (CHK017).
 - Resizing to a zero-size view or to the largest allowed size keeps trails valid (or clears them) without error.
 - Backgrounding with trails on: trails are kept or cleared, never corrupted, when the app returns.
 - Reduce Motion: trails start paused with the scene (Phase 01/02 rule).
