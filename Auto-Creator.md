@@ -5289,7 +5289,8 @@ result bundle path and never assumes that a device name is unique. The command s
 device install app`; `devicectl device process launch` with `--terminate-existing` and the scenario in
 `--environment-variables`; `devicectl device info files` for the app's data container; `devicectl device copy
 from` for the evidence file; `devicectl device info processes` and `devicectl device process terminate`.
-A row ends as pass, fail, unsupported on that device, or blocked for the owner; skipped is never success.
+A row is recorded as pass or fail, or it is blocked for the owner; a single scenario inside a row may be not
+applicable (item 4 below); skipped is never success.
 
 For one device, in catalog order (A01 … A25, R02-G01 … R04-G25):
 
