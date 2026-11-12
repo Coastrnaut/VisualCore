@@ -307,7 +307,7 @@
    "action": "modify",
    "by": "UA-F02, UA-F03, UA-F08",
    "state": "pending",
-   "note": "Adds VisualCoreExperienceHost and VisualCoreStore; existing modules keep their names and API. Done so far: VisualCoreExperienceHost with presenter, port and shell (UA-F02); the entry stays pending for UA-F03 and UA-F08."
+   "note": "Adds VisualCoreExperienceHost and VisualCoreStore; existing modules keep their names and API. Done so far: VisualCoreExperienceHost with presenter, port and shell (UA-F02) and with session and host view (UA-F03); the entry stays pending for UA-F08."
   },
   {
    "from": "project.yml",

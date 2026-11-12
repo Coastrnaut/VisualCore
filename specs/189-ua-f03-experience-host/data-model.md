@@ -50,6 +50,7 @@ threw; recorded, not shown as a failure view). Codes of the experience contract 
 
 ## 7. Isolation tool output
 
-`PASS|FAIL: <path> — <n> Swift files, <m> isolation problems` (the existing line for `--app`, now also per
-`--experiences` folder), `  FAIL <file>:<line>: <match>` per problem, and
-`PASS: <path> — nothing checked (no Swift sources yet)` for a missing or empty folder.
+`PASS|FAIL: <app> — <n> app Swift files, <m> isolation problems` for `--app` (unchanged), and per `--experiences`
+folder `PASS|FAIL: <folder> — <n> Swift files, <m> isolation problems, <k> test files left out`; one line
+`  FAIL <file>:<line>: <match>` per problem; `PASS: <path> — nothing checked (no Swift sources yet)` for a missing
+or empty folder, which becomes `FAIL: <path> — no Swift sources found` with `--require-sources`.

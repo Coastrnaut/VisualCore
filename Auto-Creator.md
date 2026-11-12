@@ -2680,15 +2680,22 @@ builds of both modules.
 
 ### 11.4 Session host
 
-- `ExperienceSession` (new) owns exactly one experience, one `RenderHost` created with a `ResourceBudget` from the
-  experience's quality profile, and the clocks. `ExperienceHostView` (new) shows the existing `RenderSurface`
-  together with the experience's native controls.
-- One session is active at a time. Opening another experience deactivates the current one, proves that its
-  resource registry is empty, and only then prepares the next.
-- Activation order: resolve entitlement → create session → `prepare(seed:)` (shaders compiled here) → activate →
-  first frame → interactive. Each stage is timed separately for the evidence record.
-- Deactivation order: stop clocks → final snapshot → deactivate → destroy GPU objects → assert zero live and zero
-  leaked resources → release the host.
+- `ExperienceSession` (UA-F03, in `VisualCoreExperienceHost`) is the one object that opens and closes experiences
+  for the whole app. An open request carries a factory for the experience, the seed, an optional snapshot, the
+  `ResourceBudget`, a memory-pressure limit and a time limit for preparation. The session builds a new experience
+  for every open and every Retry, owns exactly one `RenderHost`, and hands snapshots to a sink the opener
+  supplies. `ExperienceHostView` shows the existing `RenderSurface` together with the experience's native
+  controls, and the session's own views for preparing, failure (Retry and Back) and messages.
+- One session is active at a time. Opening another experience closes the current one completely, proves that
+  its resource registry is empty, and only then prepares the next. Of two competing opens the newest wins; the
+  other ends as superseded.
+- Activation order: resolve entitlement (the caller, before it asks the session) → `prepare(seed:)` → restore the
+  given snapshot → create the render host with the budget → activate → first frame → interactive. Each stage is
+  timed separately for the evidence record. A render host exists only after a successful preparation.
+- Deactivation order: stop clocks → final snapshot → begin deactivation → destroy the render host → read the
+  counts → end deactivation (zero live and zero leaked resources, or a recorded leak failure) → idle.
+- The session's decisions (its seven states and their legal changes, the order of a close, the memory-pressure
+  rule) are pure values in `VisualCoreExperience` (`SessionLifecycle`), tested on the host.
 
 ### 11.5 Threads and GPU ownership
 
@@ -2708,8 +2715,8 @@ builds of both modules.
 - Errors are typed. A failure in preparation, setup or rendering is caught by the session, recorded in
   diagnostics and shown as a failure view with Retry and Back.
 - Leaving during preparation cancels it. No callback of an experience arrives after its deactivation.
-- Scene phases: background suspends, foreground resumes. A memory warning sheds caches; a session still over its
-  budget deactivates with a message. Termination is safe because state was saved at suspension.
+- Scene phases: background and inactive suspend, active resumes. A memory warning sheds caches; a session whose
+  live bytes are still above its memory-pressure limit (by default half of the budget) closes with a message. Termination is safe because state was saved at suspension.
 - Swift traps cannot be caught, so shipped code paths that read stored or user-influenced data use no
   `fatalError`, forced unwrap or unchecked index; inputs are bounded and validated.
 - Preparation has a time limit; exceeding it is a failure like any other.

@@ -13,7 +13,7 @@ renderer and no `dlsym`; GL entry points come from the generated `CVisualCoreGL`
 | VisualCoreUI | `RenderSurface` (SwiftUI host for a caller-owned `RenderHost`); diagnostics overlay and accessibility helpers planned |
 | VisualCoreAudio | AVAudioEngine microphone / in-app playback taps → DSP features |
 | VisualCoreAutomation | AutomationRunner (`DEBUG \|\| VISUALCORE_AUTOMATION` only) |
-| VisualCoreExperienceHost | the main-actor part of the experience contract: `ExperiencePresenter`, `ExperienceActionPort`, `ExperienceShell` and the type-erased `Experience` (UA-F02) |
+| VisualCoreExperienceHost | the main-actor part of the experience contract: `ExperiencePresenter`, `ExperienceActionPort`, `ExperienceShell` and the type-erased `Experience` (UA-F02); `ExperienceSession` and `ExperienceHostView`: one experience at a time on one render host (UA-F03) |
 
 Contracts: [render lifecycle](../../specs/002-architecture-contracts/contracts/render-lifecycle.md),
 [resources, shaders, errors](../../specs/002-architecture-contracts/contracts/resources-shaders-errors.md).
@@ -285,3 +285,26 @@ Controls built by the presenter send actions through `ExperienceActionPort` (`se
 the state description for assistive technology; identifiers start with the catalog's accessibility prefix). An
 error of preparation, setup or drawing moves the lifecycle to failed and stays readable in `shell.diagnostics`.
 Contract: [experience-host-api.md](../../specs/188-ua-f02-experience-sdk/contracts/experience-host-api.md).
+
+## Experience session (feature 189, UA-F03)
+
+`ExperienceSession` opens and closes experiences for the whole app. It builds the experience from a factory,
+prepares it, creates the one `RenderHost` with the experience's budget, activates it, and on every exit destroys
+the host and checks that no GPU object is live or leaked.
+
+```swift
+let session = ExperienceSession(snapshotSink: { snapshot in try store.save(snapshot) })
+let result = await session.open(ExperienceOpenRequest(id: id, seed: 42) {
+    ExperienceShell(id: id, presenter: MyPresenter())
+})                                         // .running, .suspended, .failed, .cancelled or .superseded
+session.setScenePhase(.background)         // suspends, pauses the host, hands a snapshot to the sink
+session.setScenePhase(.active)             // resumes without catching up
+session.close()                            // stop clock, snapshot, deactivate, destroy host, count objects, idle
+```
+
+`ExperienceHostView(session:)` shows the canvas with the experience's controls, a preparing view with Cancel, a
+failure view with Retry and Back, and a message view. A failure of preparation, setup or drawing never takes the
+app down: the session is failed, the failure is in `session.diagnostics`, and any experience can be opened next.
+A memory warning sheds caches; when the live bytes are still above the memory-pressure limit, the experience is
+closed with a message. Texts come from the module's string catalog (`SessionStrings`).
+Contract: [session-api.md](../../specs/189-ua-f03-experience-host/contracts/session-api.md).

@@ -682,6 +682,132 @@ class AppIsolationTests(unittest.TestCase):
             self.assertEqual(isolation.usage_problems(app, ["NSMicrophoneUsageDescription"]), [])
 
 
+class ExperienceIsolationTests(unittest.TestCase):
+    """Feature UA-F03 T-U03-011: `--experiences`, line numbers, folders without sources (FR-U03-090, FR-U03-091)."""
+
+    CLEAN = "import VisualCore\nlet x = 1\n"
+
+    def setUp(self):
+        self._tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self._tmp.cleanup)
+        self.root = Path(self._tmp.name)
+
+    def write(self, rel: str, text: str) -> Path:
+        p = self.root / rel
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_text(text)
+        return p
+
+    def run_main(self, *args) -> tuple[int, str]:
+        out, err = io.StringIO(), io.StringIO()
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+            try:
+                code = isolation.main([str(a) for a in args])
+            except SystemExit as e:
+                code = e.code
+        return code, out.getvalue()
+
+    def two_folders(self, second_text: str) -> tuple[Path, Path, Path]:
+        self.write("One/A.swift", self.CLEAN)
+        bad = self.write("Two/Sub/B.swift", second_text)
+        return self.root / "One", self.root / "Two", bad
+
+    def assert_reported(self, text: str, line: int, match: str):
+        one, two, bad = self.two_folders(text)
+        code, out = self.run_main("--experiences", one, two)
+        self.assertEqual(code, 1)
+        self.assertEqual(out, f"PASS: {one} — 1 Swift files, 0 isolation problems, 0 test files left out\n"
+                              f"  FAIL {bad}:{line}: {match}\n"
+                              f"FAIL: {two} — 1 Swift files, 1 isolation problems, 0 test files left out\n")
+
+    def test_two_clean_folders_pass(self):
+        one, two, _ = self.two_folders(self.CLEAN)
+        code, out = self.run_main("--experiences", one, two)
+        self.assertEqual(code, 0)
+        self.assertEqual(out, f"PASS: {one} — 1 Swift files, 0 isolation problems, 0 test files left out\n"
+                              f"PASS: {two} — 1 Swift files, 0 isolation problems, 0 test files left out\n")
+
+    def test_shim_import_is_reported_with_file_and_line(self):
+        self.assert_reported("import VisualCore\nimport CVisualCoreGL\n", 2, "import CVisualCoreGL")
+
+    def test_egl_call_is_reported_with_file_and_line(self):
+        self.assert_reported("let a = 1\n\nfunc f() {\n    eglMakeCurrent(d, s, s, c)\n}\n", 4, "eglMakeCurrent(")
+
+    def test_vcgl_call_is_reported_with_file_and_line(self):
+        self.assert_reported("/* two\n   lines */\nfunc f() { vcglClear(1) }\n", 3, "vcglClear(")
+
+    def test_gl_call_is_reported_with_file_and_line(self):
+        self.assert_reported("func f() {\n    glClear(1)\n}\n", 2, "glClear(")
+
+    def test_gl_calls_are_only_refused_for_experiences(self):
+        self.write("App/A.swift", "func f() { glClear(1); vcglClear(1) }\n")
+        self.assertEqual(self.run_main("--app", self.root / "App")[0], 0)
+        self.assertEqual(isolation.scan(self.root / "App"), [])
+        self.assertEqual(len(isolation.scan(self.root / "App", extra_patterns=isolation.GL)), 2)
+
+    def test_commented_out_calls_are_not_reported(self):
+        one, two, _ = self.two_folders("// glClear(1) and eglMakeCurrent(d)\n/* vcglClear(1)\nimport CVisualCoreGL */\n"
+                                       "let single = 1\n")
+        code, out = self.run_main("--experiences", one, two)
+        self.assertEqual(code, 0)
+        self.assertNotIn("  FAIL", out)
+
+    def test_test_files_are_left_out_and_counted(self):
+        self.write("One/A.swift", self.CLEAN)
+        self.write("One/Tests/T1.swift", "func t() { glClear(1) }\n")
+        self.write("One/Sub/Tests/T2.swift", "import CVisualCoreGL\n")
+        code, out = self.run_main("--experiences", self.root / "One")
+        self.assertEqual(code, 0)
+        self.assertEqual(out, f"PASS: {self.root / 'One'} — 1 Swift files, 0 isolation problems, 2 test files left out\n")
+
+    def test_missing_and_empty_folders_pass_as_nothing_checked(self):
+        missing, empty = self.root / "Missing", self.root / "Empty"
+        self.write("Empty/Tests/T.swift", "let s = 1\n")
+        self.write("Empty/Generated/G.swift", "let g = 1\n")
+        code, out = self.run_main("--experiences", missing, empty)
+        self.assertEqual(code, 0)
+        self.assertEqual(out, f"PASS: {missing} — nothing checked (no Swift sources yet)\n"
+                              f"PASS: {empty} — nothing checked (no Swift sources yet)\n")
+        code, out = self.run_main("--app", missing)
+        self.assertEqual((code, out), (0, f"PASS: {missing} — nothing checked (no Swift sources yet)\n"))
+
+    def test_require_sources_fails_missing_and_empty_folders(self):
+        missing, empty = self.root / "Missing", self.root / "Empty"
+        empty.mkdir()
+        code, out = self.run_main("--experiences", missing, empty, "--require-sources")
+        self.assertEqual(code, 1)
+        self.assertEqual(out, f"FAIL: {missing} — no Swift sources found\nFAIL: {empty} — no Swift sources found\n")
+        code, out = self.run_main("--app", missing, "--require-sources")
+        self.assertEqual((code, out), (1, f"FAIL: {missing} — no Swift sources found\n"))
+
+    def test_app_keeps_its_summary_line_and_adds_line_numbers(self):
+        self.write("App/A.swift", self.CLEAN)
+        self.write("App/Tests/T.swift", "let s = URLSession.shared\n")
+        app = self.root / "App"
+        self.assertEqual(self.run_main("--app", app), (0, f"PASS: {app} — 1 app Swift files, 0 isolation problems\n"))
+        bad = self.write("App/B.swift", "let a = 1\nlet s = URLSession.shared\n")
+        self.assertEqual(self.run_main("--app", app),
+                         (1, f"  FAIL {bad}:2: URLSession\nFAIL: {app} — 2 app Swift files, 1 isolation problems\n"))
+        self.assertEqual(self.run_main("--app", app, "--allow-network")[0], 0)
+        self.assertEqual(isolation.scan_lines(app), [(bad, 2, "URLSession")])
+
+    def test_app_and_experiences_together(self):
+        self.write("App/A.swift", self.CLEAN)
+        self.write("One/A.swift", "func f() { glClear(1) }\n")
+        code, out = self.run_main("--app", self.root / "App", "--experiences", self.root / "One")
+        self.assertEqual(code, 1)
+        self.assertIn(f"PASS: {self.root / 'App'} — 1 app Swift files, 0 isolation problems\n", out)
+        self.assertIn(f"FAIL: {self.root / 'One'} — 1 Swift files, 1 isolation problems, 0 test files left out\n", out)
+
+    def test_bad_input_exits_2(self):
+        self.assertEqual(self.run_main(), (2, ""))
+        self.assertEqual(self.run_main("--allow-network"), (2, ""))
+        self.assertEqual(self.run_main("--experiences"), (2, ""))
+        self.write("App/A.swift", self.CLEAN)
+        self.assertEqual(self.run_main("--app", self.root / "App", "--built-app", self.root / "No.app"), (2, ""))
+        self.assertEqual(self.run_main("--app", self.root / "App" / "A.swift"), (2, ""))
+
+
 class ReleaseCheckTests(unittest.TestCase):
     """Feature 010 T-F908: release-check runner logic (step list, selection, logs, summary, failure handling)."""
 
