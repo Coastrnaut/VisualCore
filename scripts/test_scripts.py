@@ -2259,9 +2259,18 @@ class PrepushScanTests(unittest.TestCase):
         self.assertGreater(len(clean), 5_000_000)
         box.write("docs/big.txt", clean + "device 00008120-001A2B3C4D5E6F78\n")
         box.commit_all("a large file")
+        # The time limit guards against a scan that hangs or grows faster than its input. It is set against the
+        # machine it runs on: a reference pass over the same text with one simple pattern is timed first, and the
+        # scan may take 30 seconds or 400 times that pass, whichever is longer. (A fixed 30 seconds failed on a
+        # shared CI runner that was several times slower than usual on 2026-11-12; the scan was correct.)
+        reference_started = time.monotonic()
+        self.assertEqual(len(re.findall(r"^row \d{7}: ", clean, re.M)), 110000)
+        reference = time.monotonic() - reference_started
+        limit = max(30.0, 400 * reference)
         started = time.monotonic()
         findings = prepush.scan(box.root)
-        self.assertLess(time.monotonic() - started, 30)
+        elapsed = time.monotonic() - started
+        self.assertLess(elapsed, limit, f"scan took {elapsed:.1f} s; reference pass {reference:.3f} s")
         self.assertEqual(findings, ["docs/big.txt: hardware identifier: device 00008120-001A2B3C4D5E6F78"])
 
     def test_output_is_bounded(self):
