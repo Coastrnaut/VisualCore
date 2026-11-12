@@ -1,10 +1,18 @@
 // ParticleRenderer.swift — draws ParticleInstances as instanced soft-edged quads (feature 006 T-F514;
 // FR-F507, FR-F508, FR-F512; research R7). Per instance: NDC center, NDC half size, premultiplied color;
-// the quad corners come from gl_VertexID, so there is no per-vertex buffer.
+// the quad corners come from gl_VertexID, so there is no per-vertex buffer. Feature 035 (G-BLENDTRAIL): ParticleBlend.
 import CVisualCoreGL
 import VisualCoreMath
 import VisualCoreScenes
 import VisualCoreSimulation
+
+/// How particles combine with what is already drawn (feature 035, gap G-BLENDTRAIL).
+public enum ParticleBlend: Sendable, Equatable, CaseIterable {
+    /// Premultiplied "over" (ONE, ONE_MINUS_SRC_ALPHA): the original look, the default.
+    case normal
+    /// Additive (ONE, ONE): overlapping particles add their light, saturating at white.
+    case additive
+}
 
 /// Draws particles as instanced soft-edged quads on the main thread; GPU objects are rebuilt after a context recreation.
 @MainActor
@@ -44,8 +52,9 @@ public final class ParticleRenderer {
         program = try registry.program(vertex: Self.vertexSource, fragment: Self.fragmentSource)
     }
 
-    /// Draws particles (size = diameter in world units) into the bound framebuffer covering `metrics`.
-    public func draw(_ particles: [ParticleInstance], camera: Camera2D, metrics: ViewMetrics) throws {
+    /// Draws particles (size = diameter in world units) into the bound framebuffer covering `metrics`, combined with
+    /// `blend` (default `.normal`, the pre-feature-035 behavior).
+    public func draw(_ particles: [ParticleInstance], camera: Camera2D, metrics: ViewMetrics, blend: ParticleBlend = .normal) throws {
         lastInstanceCount = 0
         guard let toNDC = metrics.worldToNDC(camera: camera), !particles.isEmpty else { return }
         if program == nil || program!.generation != registry.generation {
@@ -66,7 +75,10 @@ public final class ParticleRenderer {
         vcAttribute(0, components: 4, strideFloats: 8, offsetFloats: 0, divisor: 1)
         vcAttribute(1, components: 4, strideFloats: 8, offsetFloats: 4, divisor: 1)
         vcglEnable(GLenum(GL_BLEND))
-        vcglBlendFunc(GLenum(GL_ONE), GLenum(GL_ONE_MINUS_SRC_ALPHA))
+        switch blend {
+        case .normal: vcglBlendFunc(GLenum(GL_ONE), GLenum(GL_ONE_MINUS_SRC_ALPHA))
+        case .additive: vcglBlendFunc(GLenum(GL_ONE), GLenum(GL_ONE))
+        }
         vcglDrawArraysInstanced(GLenum(GL_TRIANGLES), 0, 6, GLsizei(count))
         vcglDisable(GLenum(GL_BLEND))
         vcglVertexAttribDivisor(0, 0); vcglVertexAttribDivisor(1, 0)
