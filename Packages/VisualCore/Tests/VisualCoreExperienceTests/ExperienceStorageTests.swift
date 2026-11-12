@@ -172,6 +172,26 @@ import Testing
         #expect(other.valueKeys() == ["x"])
     }
 
+    /// On a volume that ignores case `State.json` names the saved state: it is refused like `state.json`, and
+    /// the saved state placed in the folder stays as it is.
+    @Test func reservedNamesAreRefusedInAnyCase() throws {
+        let place = try makePlace()
+        defer { place.cleanUp() }
+        let storage = handle(try firstID(), place)
+        try FileManager.default.createDirectory(at: storage.folder, withIntermediateDirectories: true)
+        let state = storage.folder.appendingPathComponent("state.json")
+        try Data("the saved state".utf8).write(to: state)
+        for name in ["State.json", "STATE.JSON", "Quarantine-1.json", "QUARANTINE-22.JSON"] {
+            #expect(writeError(storage, Data("x".utf8), name) == .reservedName(name))
+            #expect(readError(storage, name) == .reservedName(name))
+            #expect(removeError(storage, name) == .reservedName(name))
+            #expect(!storage.exists(name))
+        }
+        let kept = try Data(contentsOf: state)
+        #expect(kept == Data("the saved state".utf8))
+        #expect(storage.list() == [])
+    }
+
     @Test func nameRulesAtTheirEdges() {
         #expect(ExperienceStorage.isValidName(String(repeating: "a", count: 128)))
         #expect(ExperienceStorage.isValidName("A-z_0.9"))
@@ -184,7 +204,10 @@ import Testing
         #expect(!ExperienceStorage.isReservedName("quarantine-.json"))
         #expect(!ExperienceStorage.isReservedName("quarantine-1a.json"))
         #expect(!ExperienceStorage.isReservedName("quarantine-1.txt"))
-        #expect(!ExperienceStorage.isReservedName("State.json"))
+        // Case does not matter: on a volume that ignores case these are the files of the saved state.
+        #expect(ExperienceStorage.isReservedName("State.json"))
+        #expect(ExperienceStorage.isReservedName("STATE.JSON"))
+        #expect(ExperienceStorage.isReservedName("Quarantine-2.JSON"))
         #expect(StorageQuota.maxNameLength == 128)
     }
 

@@ -93,6 +93,8 @@ public struct ExperienceStorage: @unchecked Sendable {
     /// Whether `name` is a file name of the saved state: `state.json`, or `quarantine-<n>.json` with decimal
     /// digits for n. Such files are written by the app only and are not offered to the experience.
     public static func isReservedName(_ name: String) -> Bool {
+        // Compared without regard to case: on a volume that ignores case `State.json` is the saved state.
+        let name = name.lowercased()
         if name == "state.json" { return true }
         let head = "quarantine-", tail = ".json"
         guard name.hasPrefix(head), name.hasSuffix(tail), name.utf8.count > head.utf8.count + tail.utf8.count else {

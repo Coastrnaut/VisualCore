@@ -131,3 +131,25 @@ recorded once, on the final sources.
 - `/speckit-analyze` run 2 (2026-11-12): no finding. 38 of 38 requirements and 10 of 10 success criteria are
   referenced by tasks.
 
+
+## Phase 11: Convergence
+
+Appended by `/speckit-converge` run 1 (2026-11-12, the audit of T-U05-026: 38 requirements, 10 success criteria,
+the acceptance scenarios and edge cases, the plan's touch-points and 15 constitution principles checked; 15
+findings: 0 critical, 1 high, 5 medium, 9 low, of which 8 are actionable and 7 are recorded as accepted in the
+note below the tasks).
+
+- [ ] T-U05-036 Route the failure view's Retry through the app: `ExperienceHostView` takes an optional retry action that replaces `session.retry()`, and `AppModel.retryExperience()` opens the experience again through `open(_:)`, so that the state on disk now is loaded and the action watch is armed again; app unit tests: open, taps, checkpoint, a failure while running, Retry gives the checkpointed state (not the one of the first open) and a later action is saved after the delay; a Retry after a failed set-up arms the watch per FR-U05-020, FR-U05-011 (contradicts)
+- [ ] T-U05-037 Add the two source rules as steps of `scripts/release_check.py` (`storage-rule`: `--no-direct-storage` on the debug experience and the sample core; `stored-data-rule`: `--no-crash-on-stored-data` on `SavedStateStore.swift`, `ExperienceStorage.swift`, `ExperienceSnapshot.swift`, `ShellModel.swift`, `SnapshotMigrationCheck.swift`, `ContainerInventory.swift`, `PreferencesStore.swift`, `AppModel.swift`, `ExperienceDataStore.swift`), with a script test that both steps exist, so that CI runs them per FR-U05-006, FR-U05-071 (partial)
+- [ ] T-U05-038 Extend `--no-direct-storage` to refuse `AppStorage`, `SceneStorage`, `FileHandle`, `documentsDirectory`, `libraryDirectory`, `homeDirectory`, `temporaryDirectory`, `Data(contentsOf`, `String(contentsOf` and `.write(to:`, with script tests for each and for `append(contentsOf:` not being a finding per FR-U05-006 (partial)
+- [ ] T-U05-039 Make `ExperienceStorage.folder` internal (an experience is never handed the URL of its folder) and update the API baseline per FR-U05-001, contracts/persistence-api.md (unrequested)
+- [ ] T-U05-040 Record an unreadable state in the app's diagnostics (`lastUnreadable: <id>: <code>`, kept after the notice is dismissed) with a unit test per FR-U05-031 (partial)
+- [ ] T-U05-041 Bind the system rules of the inventory that name a bundle identifier (the defaults property list, the caches, the saved application state) to the app's own identifier, with a unit test that the property list of another domain is unlisted per FR-U05-061 (partial)
+- [ ] T-U05-042 Small corrections: `SavedStateStore.save` compares sizes before it reads the stored file for equality; the settings offer the reset of one experience also for an experience that has stored values and no folder; the session test of a checkpoint while preparing calls it while the session's state is `preparing` and an experience exists; contracts/persistence-api.md and data-model.md section 6 name the API as built (`migratedVersions`, `InventoryError.emptyWriter`) per FR-U05-013, FR-U05-040, T-U05-013 (partial)
+
+Accepted without a task (run 1): the copy of unreadable preferences keeps the oldest value, as FR-U05-052
+says "one copy"; `migratedVersions` is checked against the schema by its test; the checkpoint delay is the
+5 seconds of clarification 3; "no save without an action" is proved by no delay being started at all, which
+holds for any length of time; ordinary names that differ only by case are one file on a volume that ignores
+case, inside the experience's own folder only; a non-Data object under the preferences key reads as no value.
+The reserved names are compared without regard to case (fixed during this audit, with a test).
