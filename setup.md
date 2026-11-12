@@ -170,6 +170,11 @@ print `22fb0cf…`; the `reference-clean` step (section 8.1) fails if a nested s
   and fast-forwarded into `main`. That branch is a local record and is not used any more.
 - Before any push, `python3 scripts/prepush_scan.py` must pass; `python3 scripts/prepush_scan.py --push` scans and
   pushes.
+- Recorded test commands contain the identifiers of this Mac's simulators. The scan accepts such an identifier only
+  when its SHA-256 hash is in `Configs/simulator-identifier-hashes.json`; the identifiers themselves are never
+  tracked. After creating a simulator, run `python3 scripts/prepush_scan.py --record-simulators` and commit the
+  list. The scan names this command when it meets a simulator that is not recorded. CI scans every pushed range
+  with the same list.
 
 ## 6. Build the reference engine binaries
 
