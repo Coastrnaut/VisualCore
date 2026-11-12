@@ -343,8 +343,9 @@ locale-independent.
 
 ### 5.5 Availability
 
-The app ships a runtime manifest (`Catalog/experiences.json`, new, built by UA-F01 from the planning catalog). An
-experience is listed as available only when its integration gate `X-<code>` is pass in the migration ledger.
+The app ships a runtime manifest, `Catalog/experiences.json`, which `scripts/build_catalog.py` builds from the
+planning catalog (UA-F01). An experience is listed as available only when its integration gate `X-<code>` is pass
+in the migration ledger, and only when it has a registration in `Catalog/registrations.json`; nobody types the flag.
 Planned experiences are never shown as available, and store metadata is generated only from available ones.
 
 ### 5.6 The 100 launch experiences
@@ -3115,7 +3116,7 @@ VisualCore/
 │   ├── ExperiencesRound02/       new        R02-G01 … G25
 │   ├── ExperiencesRound03/       new        R03-G01 … G25
 │   └── ExperiencesRound04/       new        R04-G01 … G25
-├── Catalog/                      new        experiences.json, categories.json, path-map.json (UA-F01)
+├── Catalog/                      existing   experiences.json (generated), categories.json, registrations.json, path-map.json, experience-ids.golden.txt (UA-F01)
 ├── Showcase/                     existing   non-shipping framework showcase
 ├── Harnesses/                    existing   InteractiveDemo, SecondConsumer, ProjectMReference
 ├── External/projectm-ios/        existing   pinned read-only submodule
