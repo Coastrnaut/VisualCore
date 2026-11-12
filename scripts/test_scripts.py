@@ -13,6 +13,7 @@ import re
 import subprocess
 import sys
 import tempfile
+import time
 import unittest
 from unittest import mock
 from pathlib import Path
@@ -234,6 +235,31 @@ class DocsTests(unittest.TestCase):
             self.assertNotIn(ns, seen, f"{g['id']} shares {ns} with {seen.get(ns)}")
             seen[ns] = g["id"]
         self.assertEqual(len(seen), 823)
+
+    def test_the_full_planned_set_of_dossiers_validates(self):
+        # Edge case "large input": every planned feature directory at once, each with ids of its own namespace.
+        index = json.loads((ROOT_DIR / "docs/catalog/feature-index.json").read_text())["features"]
+        briefs = json.loads((ROOT_DIR / "docs/catalog/unified-app-features.json").read_text())["features"]
+        names = ([f"{n:03d}-x" for n in range(1, 186)] + [f"{b['number']}-{b['slug']}" for b in briefs]
+                 + [Path(f["spec_dir_proposed"]).name for f in index if f["kind"] in ("shared-round-feature", "game-feature")])
+        gates = json.loads((ROOT_DIR / ".autonomy/migration/ledger.json").read_text())["gates"]
+        self.assertLessEqual({Path(g["spec_dir"]).name for g in gates if "spec_dir" in g}, set(names))
+        self.assertEqual(len(names), len(set(names)))
+        self.assertGreater(len(names), 1200)
+        with tempfile.TemporaryDirectory() as t:
+            d = Path(t)
+            self.make(d, "- **FR-F001**: a\n", "- [ ] T-F001 a task\n")
+            for name in names[1:]:
+                f = d / "specs" / name
+                f.mkdir()
+                ns = docs.namespace(f)
+                ident = ns + ("01" if ns[0] in "FA" else "-001")
+                (f / "spec.md").write_text(f"- **FR-{ident}**: a\n- **SC-{ident}**: b\n")
+                (f / "tasks.md").write_text(f"- [X] T-{ident} does FR-{ident} — Verified 2026-11-12: cmd\n")
+            started = time.monotonic()
+            self.assertEqual(docs.validate(d), [])
+            self.assertEqual(len(docs.feature_dirs(d)), len(names))
+            self.assertLess(time.monotonic() - started, 30)
 
     def test_duplicated_task_names_both_places(self):
         # FR-U00-005: a task id listed twice, in one task list or in two dossiers, is reported with both places.
@@ -1596,6 +1622,18 @@ class PrepushScanTests(unittest.TestCase):
                          ["docs/new.md: hardware identifier: device 00008120-001A2B3C4D5E6F78"])
         self.assertEqual(len(prepush.scan(box.root, "main..feature")), 2)
         self.assertEqual(self.run_main(box, "--range", "main...feature")[0], 1)
+
+    def test_large_diff_is_read_to_its_end(self):
+        # Edge case "large input": a commit of several megabytes; the one finding is on its last line.
+        box = self.sandbox()
+        clean = "".join(f"row {n:07d}: procedural mesh, signed-distance field, fixed step\n" for n in range(110000))
+        self.assertGreater(len(clean), 5_000_000)
+        box.write("docs/big.txt", clean + "device 00008120-001A2B3C4D5E6F78\n")
+        box.commit_all("a large file")
+        started = time.monotonic()
+        findings = prepush.scan(box.root)
+        self.assertLess(time.monotonic() - started, 30)
+        self.assertEqual(findings, ["docs/big.txt: hardware identifier: device 00008120-001A2B3C4D5E6F78"])
 
     def test_output_is_bounded(self):
         # Edge case "large input": at most 40 findings are printed, then the rest is counted.
