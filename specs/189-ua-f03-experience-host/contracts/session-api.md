@@ -94,6 +94,20 @@ Behavior:
 | `recreateContext` | `host.recreateContext()`, counted; when the host then reports an unrecoverable error: `fail` with `session.context-lost` |
 | deinit | removes the memory-warning observer; destroys a host that is still alive |
 
+As built (recorded after T-U03-007 and T-U03-009):
+
+- The render host receives a forwarding scene of the session, which passes setup, resize, render and teardown to
+  the experience's scene unchanged and tells the session after each frame drawn without error. That is how the
+  first-frame time is taken: at the first real frame while running, in seconds since activation.
+- `deinit` only removes the memory-warning observer; the owner calls `close()` before it releases the session.
+- Counters: an open that replaces a preparing open counts in `cancelledPreparations` and in `supersededOpens`; a
+  memory closure counts in `closes` and in `memoryClosures`; a context loss reported by the host counts in
+  `contextRecreations` like a forced recreation. `lastCloseCounts` is written only when a host was destroyed.
+- A snapshot is taken at close and at suspension only when a sink exists; the close step is recorded either way.
+- Further public members: `lastRestoreRefusal` and `lastSinkFailure` (both `ExperienceFailure?`), the view types
+  `SessionPreparingView`, `SessionFailureView`, `SessionMessageView`, `SessionButtonStyle` (minimum 44 points) and
+  the identifier constants `SessionViewID`. The controls below the canvas scroll within at most 280 points.
+
 Identifiers of the host view's own controls: `session.cancel`, `session.retry`, `session.back`,
 `session.failure`, `session.message`, `session.preparing`, `session.canvas`.
 
