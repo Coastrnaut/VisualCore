@@ -3,7 +3,7 @@
  "source": "docs/archive/planning/root/DESKTOP-ONE-SHOT.md",
  "rows": [
   {"line": 1, "heading": "# VisualCore Rounds 3–12 — Master one-shot Claude Code Desktop instructions", "target": "AC-5", "status": "planned", "note": "Carried: 250 games for rounds 3-12 in score order, 224 from the 500-candidate study and 26 provisional; plans, not software (50 launch premium, 200 backlog). Controller role: Auto-Creator.md (D-10). Separate sale: D-03."},
-  {"line": 5, "heading": "## Exact standalone Claude Desktop Code prompt", "target": "AC-28", "status": "superseded", "note": "Replaced by the AC-28 prompt. Superseded: per-round device gating (C-03, D-07), separate premium apps without IAP (C-02, D-03), a target per game (C-05), .autonomy/roundN-state.json (D-12). Kept: 100 certified levels."},
+  {"line": 5, "heading": "## Exact standalone Claude Desktop Code prompt", "target": "AC-28", "status": "superseded", "note": "Replaced by the AC-28 prompt. Superseded: per-round device gating (C-03, D-07), separate premium apps without IAP (C-02, D-03), a target per game (C-05), per-round state file (D-12). Kept: 100 levels, D3 stress (C-14)."},
   {"line": 27, "heading": "## Availability and limits", "target": "AC-24", "status": "planned", "note": "Still true: the owner prepares devices, signing and first-run permissions (OD-06); durable checkpoints are needed; scores are heuristics, 26 provisional; no commercial, performance or legal claim without real tests."}
  ]
 }

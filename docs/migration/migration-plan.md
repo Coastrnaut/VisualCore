@@ -25,8 +25,8 @@ packages and, inside the framework packages, the modules `VisualCoreExperience`,
 
 ## 2. Path map
 
-The machine-readable form is [`path-map.json`](path-map.json) (67 directory-level entries). Every
-"from" path exists today. "To" paths are proposals that the named feature confirms; a move happens with `git mv`
+The machine-readable form is [`path-map.json`](path-map.json) (63 directory-level entries). Every
+"from" path is tracked and exists today; generated, untracked output such as `Apps/<Name>/Generated` is not listed. "To" paths are proposals that the named feature confirms; a move happens with `git mv`
 only after parity is proven (section 4), and each executed move is recorded file by file in `Catalog/path-map.json`.
 
 ### 2.1 The four existing apps
@@ -44,7 +44,6 @@ only after parity is proven (section 4), and each executed move is recorded file
 | `Apps/GenerativeArtStudio/Tests/UI` | `Apps/VisualCore/Tests/UI/GenerativeArtStudio` | move | UA-F07 | UI tests are ported to the unified app; a mapping table and the enumeration guard prove none is lost. |
 | `Apps/GenerativeArtStudio/Resources/PrivacyInfo.xcprivacy` | `Apps/VisualCore/Resources/PrivacyInfo.xcprivacy` | merge | UA-F11 | One privacy manifest for the app, audited against the built product. |
 | `Apps/GenerativeArtStudio/Resources/Assets.xcassets` | — | retire | UA-F07 | Icon and accent of the standalone app; the unified app has one generated icon. |
-| `Apps/GenerativeArtStudio/Generated` | — | retire | UA-F07 | XcodeGen output of the standalone target. |
 
 **A02 Fluid Art Playground**
 
@@ -58,7 +57,6 @@ only after parity is proven (section 4), and each executed move is recorded file
 | `Apps/FluidArtPlayground/Tests/UI` | `Apps/VisualCore/Tests/UI/FluidArtPlayground` | move | UA-F07 | UI tests are ported to the unified app; a mapping table and the enumeration guard prove none is lost. |
 | `Apps/FluidArtPlayground/Resources/PrivacyInfo.xcprivacy` | `Apps/VisualCore/Resources/PrivacyInfo.xcprivacy` | merge | UA-F11 | One privacy manifest for the app, audited against the built product. |
 | `Apps/FluidArtPlayground/Resources/Assets.xcassets` | — | retire | UA-F07 | Icon and accent of the standalone app; the unified app has one generated icon. |
-| `Apps/FluidArtPlayground/Generated` | — | retire | UA-F07 | XcodeGen output of the standalone target. |
 
 **A03 Fractal Explorer**
 
@@ -73,7 +71,6 @@ only after parity is proven (section 4), and each executed move is recorded file
 | `Apps/FractalExplorer/Tests/UI` | `Apps/VisualCore/Tests/UI/FractalExplorer` | move | UA-F07 | UI tests are ported to the unified app; a mapping table and the enumeration guard prove none is lost. |
 | `Apps/FractalExplorer/Resources/PrivacyInfo.xcprivacy` | `Apps/VisualCore/Resources/PrivacyInfo.xcprivacy` | merge | UA-F11 | One privacy manifest for the app, audited against the built product. |
 | `Apps/FractalExplorer/Resources/Assets.xcassets` | — | retire | UA-F07 | Icon and accent of the standalone app; the unified app has one generated icon. |
-| `Apps/FractalExplorer/Generated` | — | retire | UA-F07 | XcodeGen output of the standalone target. |
 
 **A04 Particle Universe**
 
@@ -84,7 +81,6 @@ only after parity is proven (section 4), and each executed move is recorded file
 | `Apps/ParticleUniverse/ParticleUniverseCore/Package.swift` | `Packages/ExperiencesCreative/Package.swift` | merge | UA-F07 | The per-app package manifest is replaced by targets in the collection package. |
 | `Apps/ParticleUniverse/App` | `Packages/ExperiencesCreative/ParticleUniverse/Experience` | move | UA-F07 | SwiftUI and scene sources become target ParticleUniverseExperience; the @main type ParticleUniverseApp.swift is replaced by the experience factory and is retired. |
 | `Apps/ParticleUniverse/Tests/UI` | `Apps/VisualCore/Tests/UI/ParticleUniverse` | move | UA-F07 | UI tests are ported to the unified app; a mapping table and the enumeration guard prove none is lost. |
-| `Apps/ParticleUniverse/Generated` | — | retire | UA-F07 | XcodeGen output of the standalone target. |
 
 ### 2.2 Retained and modified
 

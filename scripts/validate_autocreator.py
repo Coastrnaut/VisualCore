@@ -33,6 +33,7 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import subprocess
 import sys
 from pathlib import Path
 
@@ -452,11 +453,15 @@ def run_references(root: Path) -> list[str]:
     for group in ("round-02", "rounds-03-12"):
         for key, entry in shared[group].items():
             problems += [f"shared-feature map {group} {key}: {s} is not a public type of the framework" for s in entry["existing"] if s not in declared]
+    listing = subprocess.run(["git", "ls-files"], cwd=root, capture_output=True, text=True, check=False)
+    tracked = listing.stdout.splitlines() if listing.returncode == 0 else None
     for e in load(root, PATHMAP)["entries"]:
         if e["state"] != "pending":
             continue
         if e["from"] and not (root / e["from"]).exists():
             problems.append(f"path map: source {e['from']} does not exist")
+        elif e["from"] and tracked is not None and not any(t == e["from"] or t.startswith(e["from"] + "/") for t in tracked):
+            problems.append(f"path map: source {e['from']} is not tracked (generated output does not belong in the path map)")
         if e["action"] == "new" and (root / e["to"]).exists():
             problems.append(f"path map: {e['to']} is marked new but exists")
     problems += [f"Spec Kit skill speckit-{s} is not installed" for s in SKILLS if not (root / f".claude/skills/speckit-{s}/SKILL.md").is_file()]

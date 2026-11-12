@@ -1,6 +1,6 @@
 {
  "schema": 1,
- "note": "Directory-level path map of the migration (ADR-0009). 'from' paths exist today; 'to' paths of new and move entries are proposals confirmed by the named feature. state is pending until the feature records the move in Catalog/path-map.json. File-level moves are recorded there when they happen.",
+ "note": "Directory-level path map of the migration (ADR-0009). 'from' paths are tracked files or directories that exist today (generated, untracked output such as Apps/<Name>/Generated is not listed); 'to' paths of new and move entries are proposals confirmed by the named feature. state is pending until the feature records the move in Catalog/path-map.json. File-level moves are recorded there when they happen.",
  "actions": {
   "keep": "stays as it is",
   "modify": "stays and grows",
@@ -92,15 +92,6 @@
    "experience": "A01"
   },
   {
-   "from": "Apps/GenerativeArtStudio/Generated",
-   "to": null,
-   "action": "retire",
-   "by": "UA-F07",
-   "state": "pending",
-   "note": "XcodeGen output of the standalone target.",
-   "experience": "A01"
-  },
-  {
    "from": "Apps/FluidArtPlayground/FluidArtPlaygroundCore/Sources/FluidArtPlaygroundCore",
    "to": "Packages/ExperiencesCreative/FluidArtPlayground/Core",
    "action": "move",
@@ -170,15 +161,6 @@
    "by": "UA-F07",
    "state": "pending",
    "note": "Icon and accent of the standalone app; the unified app has one generated icon.",
-   "experience": "A02"
-  },
-  {
-   "from": "Apps/FluidArtPlayground/Generated",
-   "to": null,
-   "action": "retire",
-   "by": "UA-F07",
-   "state": "pending",
-   "note": "XcodeGen output of the standalone target.",
    "experience": "A02"
   },
   {
@@ -263,15 +245,6 @@
    "experience": "A03"
   },
   {
-   "from": "Apps/FractalExplorer/Generated",
-   "to": null,
-   "action": "retire",
-   "by": "UA-F07",
-   "state": "pending",
-   "note": "XcodeGen output of the standalone target.",
-   "experience": "A03"
-  },
-  {
    "from": "Apps/ParticleUniverse/ParticleUniverseCore/Sources/ParticleUniverseCore",
    "to": "Packages/ExperiencesCreative/ParticleUniverse/Core",
    "action": "move",
@@ -314,15 +287,6 @@
    "by": "UA-F07",
    "state": "pending",
    "note": "UI tests are ported to the unified app; a mapping table and the enumeration guard prove none is lost.",
-   "experience": "A04"
-  },
-  {
-   "from": "Apps/ParticleUniverse/Generated",
-   "to": null,
-   "action": "retire",
-   "by": "UA-F07",
-   "state": "pending",
-   "note": "XcodeGen output of the standalone target.",
    "experience": "A04"
   },
   {
