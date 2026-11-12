@@ -127,7 +127,7 @@ the symbol checks of the pure module. The shell's hook and the symbol checks of 
 
 ## Phase 11: Evidence and convergence
 
-- [ ] T-U02-046 Evidence `host-experience`: `swift test --package-path Packages/VisualCore --filter VisualCoreExperienceTests` (all tests pass).
+- [X] T-U02-046 Evidence `host-experience`: `swift test --package-path Packages/VisualCore --filter VisualCoreExperienceTests` (all tests pass). — Verified 2026-11-12: run-check UA-F02/host-experience (swift test --package-path Packages/VisualCore --filter VisualCoreExperienceTests): exit 0; 180 tests in 21 suites passed
 - [ ] T-U02-047 Evidence `host-visualcore`: `swift test --package-path Packages/VisualCore` (the whole package passes, including the unchanged `SHA256Tests`).
 - [ ] T-U02-048 Evidence `rendering-ios27`: `python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --result-name ua-f02-ios27` (TEST SUCCEEDED).
 - [ ] T-U02-049 Evidence `rendering-ios26`: `python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-26.5 --action test --result-name ua-f02-ios26` (TEST SUCCEEDED).

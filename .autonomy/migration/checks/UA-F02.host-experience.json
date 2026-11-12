@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/VisualCore",
+    "--filter",
+    "VisualCoreExperienceTests"
+  ],
+  "command": "swift test --package-path Packages/VisualCore --filter VisualCoreExperienceTests",
+  "elapsed_seconds": 3.399,
+  "exit_code": 0,
+  "finished": "2026-11-12T11:37:26+00:00",
+  "gate": "UA-F02",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F02.host-experience.log",
+  "log_sha256": "5e72de4e473dc0a07c6fe5ee5dc26e57c881294e712211ad7dde71000178b396",
+  "name": "host-experience",
+  "started": "2026-11-12T11:37:23+00:00",
+  "timed_out": false
+}
