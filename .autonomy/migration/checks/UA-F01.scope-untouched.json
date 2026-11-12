@@ -1,0 +1,30 @@
+{
+  "argv": [
+    "git",
+    "diff",
+    "--quiet",
+    "5166d7d",
+    "--",
+    "Apps",
+    "Showcase",
+    "Harnesses",
+    "Packages/VisualCoreRendering",
+    "External",
+    "Vendor",
+    "Tools",
+    "project.yml",
+    ".autonomy/state.json",
+    "docs/catalog/experience-catalog.json"
+  ],
+  "command": "git diff --quiet 5166d7d -- Apps Showcase Harnesses Packages/VisualCoreRendering External Vendor Tools project.yml .autonomy/state.json docs/catalog/experience-catalog.json",
+  "elapsed_seconds": 0.079,
+  "exit_code": 0,
+  "finished": "2026-11-12T06:07:09+00:00",
+  "gate": "UA-F01",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F01.scope-untouched.log",
+  "log_sha256": "2a1ded2e149307fbe5b845e1b05e90b0bdb0d635a5ca31653df08897a3138b50",
+  "name": "scope-untouched",
+  "started": "2026-11-12T06:07:09+00:00",
+  "timed_out": false
+}
