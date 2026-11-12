@@ -115,6 +115,38 @@ class DocsTests(unittest.TestCase):
             self.make(d, "- **FR-F101**: phase 1 id inside the phase 0 feature\n")
             self.assertTrue(any("namespace" in p for p in docs.validate(d)))
 
+    def test_unified_numbering_map(self):
+        # ADR-0009 D-11: every block of the numbering map has its own id namespace.
+        cases = {"186-ua-f00-x": "U00", "200-ua-f14-x": "U14", "201-x": "R02F01", "234-x": "R02F34",
+                 "301-x": "R02G0101", "310-x": "R02G0110", "550-x": "R02G2510",
+                 "r03-f03-kernels": "R03F03", "r12-g25-10-final": "R12G2510"}
+        for name, ns in cases.items():
+            self.assertEqual(docs.namespace(Path("specs") / name), ns, name)
+        for name in ("250-x", "600-x", "r03-g01-missing-feature-number"):
+            self.assertEqual(docs.namespace(Path("specs") / name), "", name)
+
+    def test_unified_namespaces_are_enforced(self):
+        with tempfile.TemporaryDirectory() as t:
+            d = Path(t)
+            self.make(d, "- **FR-F001**: a\n")
+            good = {"186-ua-f00-x": "U00", "205-mesh": "R02F05", "301-kernel": "R02G0101", "r03-g01-01-rules": "R03G0101"}
+            for name, ns in good.items():
+                f = d / "specs" / name
+                f.mkdir(parents=True)
+                (f / "spec.md").write_text(f"- **FR-{ns}-001**: a\n- **SC-{ns}-001**: b\n")
+                (f / "tasks.md").write_text(f"- [X] T-{ns}-001 x per FR-{ns}-001 — Verified 2026-11-11: cmd\n- [ ] T-{ns}-002 y\n")
+            self.assertEqual(docs.validate(d), [])
+            (d / "specs/186-ua-f00-x/spec.md").write_text("- **FR-U01-001**: wrong namespace\n")
+            self.assertTrue(any("FR-U01-001 outside namespace U00" in p for p in docs.validate(d)))
+            (d / "specs/186-ua-f00-x/spec.md").write_text("- **FR-U00-001**: a\n")
+            (d / "specs/205-mesh/tasks.md").write_text("- [X] T-R02F05-001 ticked without evidence\n- [ ] T-R02F05-002 uses FR-R02F05-999\n")
+            probs = docs.validate(d)
+            self.assertTrue(any("T-R02F05-001 ticked without" in p for p in probs))
+            self.assertTrue(any("undefined FR-R02F05-999" in p for p in probs))
+            (d / "specs/205-mesh/tasks.md").write_text("")
+            (d / "specs/250-nowhere").mkdir()
+            self.assertTrue(any("250-nowhere: feature directory outside the numbering map" in p for p in docs.validate(d)))
+
     def test_archive_links_are_not_checked(self):
         # ADR-0009: docs/archive/ holds verbatim historical documents; their relative links point at old locations.
         with tempfile.TemporaryDirectory() as t:

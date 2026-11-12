@@ -4,7 +4,8 @@
 Checks:
   1. `.specify/memory/constitution.md` has no unresolved `[ALL_CAPS]` template tokens and a version line.
   2. Every `specs/*/spec.md` defines requirement/success IDs at most once across ALL features
-     (FR-*, SC-*), and every ID is in its feature's namespace (001 → F, 0NN app → ANN).
+     (FR-*, SC-*), and every ID is in its feature's namespace (numbering map of ADR-0009 D-11: 001-010 F,
+     011-185 ANN-P, 186-200 UKK, 201-234 R02FFF, 301-550 R02GGGFF, rNN-fFF-* RNNFFF, rNN-gGG-FF-* RNNGGGFF).
   3. Every task ID in `specs/*/tasks.md` is unique across features and every ticked task `[X]`
      carries a `— Verified YYYY-MM-DD:` annotation (Constitution VI).
   4. Every ADR in docs/decisions has a Date and Status line.
@@ -22,8 +23,11 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 DEF = re.compile(r"\*\*((?:FR|SC)-[A-Z0-9]+-?\d{3})\*\*")
-REF = re.compile(r"\b((?:FR|SC)-(?:F|A\d{2}-)\d{3})\b")
-TASK = re.compile(r"^- \[( |x|X)\] (T-(?:F|A\d{2}-)\d{3})\b(.*)$", re.M)
+NAMESPACE = r"(?:F|A\d{2}-|U\d{2}-|R\d{2}[FG]\d{2,4}-)"
+REF = re.compile(r"\b((?:FR|SC)-" + NAMESPACE + r"\d{3})\b")
+TASK = re.compile(r"^- \[( |x|X)\] (T-" + NAMESPACE + r"\d{3})\b(.*)$", re.M)
+FEATURE_DIRS = ("[0-9][0-9][0-9]-*", "r[0-9][0-9]-[fg][0-9][0-9]-*")
+ROUND_DIR = re.compile(r"^r(\d{2})-([fg])(\d{2})(?:-(\d{2}))?-")
 TOKEN = re.compile(r"\[[A-Z][A-Z0-9_]{2,}\]")
 LINK = re.compile(r"\]\(([^)\s]+)\)")
 FENCE = re.compile(r"```.*?```", re.S)
@@ -49,13 +53,33 @@ def broken_links(root: Path) -> list[str]:
 
 
 def namespace(feature_dir: Path) -> str:
-    """Feature numbering (ADR-0004): 001-010 = foundation phases F00-F09 (IDs F<phase>##);
-    011-185 = app NN phase P, number 10 + (NN-1)*7 + P + 1 (IDs ANN-<P>##)."""
+    """Feature numbering (ADR-0004, extended by ADR-0009 D-11).
+
+    001-010 = foundation phases F00-F09 (IDs F<phase>##); 011-185 = app NN phase P, number 10 + (NN-1)*7 + P + 1
+    (IDs ANN-<P>##); 186-200 = unified-app features UA-F00..F14 (IDs UKK-###); 201-234 = Round 2 shared features
+    (IDs R02FFF-###); 301-550 = Round 2 game features, number 301 + (GG-1)*10 + (FF-1) (IDs R02GGGFF-###);
+    rNN-fFF-* and rNN-gGG-FF-* = rounds 3-12 (IDs RNNFFF-### and RNNGGGFF-###). Returns "" for a directory
+    outside the map."""
+    later = ROUND_DIR.match(feature_dir.name)
+    if later:
+        rnd, kind, first, second = later.groups()
+        if kind == "g" and second is None:
+            return ""
+        return f"R{rnd}F{first}" if kind == "f" else f"R{rnd}G{first}{second}"
     num = int(feature_dir.name.split("-", 1)[0])
     if num <= 10:
         return f"F{num - 1}"
-    idx = num - 11
-    return f"A{idx // 7 + 1:02d}-{idx % 7}"
+    if num <= 185:
+        idx = num - 11
+        return f"A{idx // 7 + 1:02d}-{idx % 7}"
+    if num <= 200:
+        return f"U{num - 186:02d}"
+    if 201 <= num <= 234:
+        return f"R02F{num - 200:02d}"
+    if 301 <= num <= 550:
+        idx = num - 301
+        return f"R02G{idx // 10 + 1:02d}{idx % 10 + 1:02d}"
+    return ""
 
 
 def validate(root: Path = ROOT) -> list[str]:
@@ -73,8 +97,11 @@ def validate(root: Path = ROOT) -> list[str]:
     defined: dict[str, str] = {}
     tasks: dict[str, str] = {}
     referenced: list[tuple[str, str]] = []
-    for feature in sorted((root / "specs").glob("[0-9][0-9][0-9]-*")):
+    for feature in sorted(f for pattern in FEATURE_DIRS for f in (root / "specs").glob(pattern)):
         ns = namespace(feature)
+        if not ns:
+            problems.append(f"{feature.relative_to(root)}: feature directory outside the numbering map (ADR-0009 D-11)")
+            continue
         spec = feature / "spec.md"
         if spec.exists():
             for ident in DEF.findall(spec.read_text(encoding="utf-8")):

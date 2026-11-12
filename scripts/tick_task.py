@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
-"""Tick one verified Spec Kit task, then commit and push (owner cadence, CLAUDE.md §8).
+"""Tick one verified Spec Kit task, then commit (and push only when the checkout is on `main`).
 
   python3 scripts/tick_task.py specs/004-resources-shaders T-F302 "evidence text" "commit subject"
 
 Refuses if the task is missing or already ticked, if `validate_docs.py` fails, or if the evidence is
-empty. Appends `— Verified YYYY-MM-DD: <evidence>` (Constitution VI), stages all changes, commits
-without trailers and pushes `main` to `origin`. Pass `--no-push` to skip the push.
+empty. Appends `— Verified YYYY-MM-DD: <evidence>` (Constitution VI), stages all changes and commits
+without trailers. It pushes only when the current branch is `main` (the pre-migration cadence); on any other
+branch, such as `migration/unified-app-plan`, nothing is pushed (ADR-0009 D-13). `--no-push` skips the push on
+`main` too.
 """
 from __future__ import annotations
 
@@ -42,7 +44,10 @@ def main() -> int:
         raise SystemExit("validate_docs.py failed after ticking; fix before committing")
     subprocess.run(["git", "add", "-A"], cwd=ROOT, check=True)
     subprocess.run(["git", "commit", "-q", "-m", args.message], cwd=ROOT, check=True)
-    if not args.no_push:
+    branch = subprocess.run(["git", "branch", "--show-current"], cwd=ROOT, capture_output=True, text=True).stdout.strip()
+    if branch != "main":
+        print(f"not pushed: branch {branch or '(detached)'} is not main (ADR-0009 D-13)")
+    elif not args.no_push:
         subprocess.run(["git", "push", "-q", "origin", "main"], cwd=ROOT, check=True)
     print(subprocess.run(["git", "log", "--oneline", "-1"], cwd=ROOT, capture_output=True, text=True).stdout.strip())
     return 0
