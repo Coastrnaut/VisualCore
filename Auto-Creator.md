@@ -5065,7 +5065,11 @@ zero padding (`R3-F03`).
 
 The archived prompts were written for separate apps. They are used verbatim, followed by one of these notes
 (printed automatically with `--override`). The notes change the packaging and the order of device work; they never
-weaken a functional, quality or testing requirement.
+weaken a functional, quality or testing requirement. For a round feature, `--override` then prints one more
+sentence with the feature's directory from the ledger and its three id forms, for example
+"Canonical override: feature directory specs/301-aurora-loom-playable-rule-kernel; requirement ids
+FR-R02G0101-###, success criteria SC-R02G0101-###, task ids T-R02G0101-###." The namespace is the one the document
+validator derives from the directory, so the prompt and the validator cannot disagree.
 
 <!-- GENERATED:BEGIN canonical-overrides -->
 For every game feature (example: a feature of R02-G01):
@@ -5507,7 +5511,9 @@ the built reference frameworks.
 | `python3 scripts/migration_baseline.py verify` | planning documents, legacy evidence and passed gates are unchanged since the baseline |
 | `python3 scripts/planning_archive.py verify` | the archive is byte-identical to the originals |
 | `python3 scripts/planning_index.py verify` | catalog and index match the archive and the legacy ledger |
-| `python3 scripts/validate_docs.py` | dossier namespaces, unique ids, verified ticks, ADR headers, links |
+| `python3 scripts/planning_index.py coverage` | every pending feature of the launch scope has a non-empty prompt for all eight stages; prints the number of features and prompts |
+| `python3 scripts/validate_docs.py` | every directory under `specs/` is in the numbering map; every requirement, criterion and task id has the exact shape of its directory and is unique; verified ticks, ADR headers, links |
+| `python3 scripts/prepush_scan.py` | the outgoing commits add no identifier or secret and no forbidden path is tracked; simulator identifiers are accepted only through the tracked hash list |
 
 After a legacy gate is recorded, run `python3 scripts/planning_index.py build` so the catalog reflects it. After
 changing a brief, the shared-feature map or the catalog, run `python3 scripts/render_autocreator.py`.
