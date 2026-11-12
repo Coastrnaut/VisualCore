@@ -214,7 +214,8 @@ the brightness cap.
 - **SC-A04-301**: With 1…the maximum number of emitters, every emitter emits, the live count stays within the
   effective limit, and removing an emitter deletes 0 live particles.
 - **SC-A04-302**: After a size, lifetime or gradient change, 100% of particles emitted afterwards carry the new
-  values (host test), and 0 particles emitted before change.
+  values (host test). Lifetime is fixed at birth, so 0 earlier particles change lifetime; size and gradient restyle
+  the emitter's live particles at once for immediate feedback (plan research R3), and never another emitter's.
 - **SC-A04-303**: A lit trail pixel fades to within 1/255 of the predicted value after 1, 10 and 60 frames at two
   different frame rates for the same elapsed time.
 - **SC-A04-304**: After 20 resizes, 20 clears and one context recreation, live trail textures equal the count after
