@@ -1730,8 +1730,9 @@ class GovernanceTests(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        listing = subprocess.run(["git", "ls-files", "scripts", "Tools/python", ".github"], cwd=ROOT_DIR, capture_output=True,
-                                 text=True, check=True).stdout.splitlines()
+        # Tracked files and new files that are not ignored: a script written a moment ago is judged too.
+        listing = subprocess.run(["git", "ls-files", "--cached", "--others", "--exclude-standard", "scripts", "Tools/python", ".github"],
+                                 cwd=ROOT_DIR, capture_output=True, text=True, check=True).stdout.splitlines()
         cls.files = {rel: (ROOT_DIR / rel).read_text(encoding="utf-8", errors="replace") for rel in listing
                      if (ROOT_DIR / rel).is_file()}
 
@@ -1753,6 +1754,23 @@ class GovernanceTests(unittest.TestCase):
         for rel, text in self.files.items():
             if rel.startswith(".github/"):
                 self.assertNotRegex(text, r"git\s+push", f"{rel} pushes")
+
+    def test_ci_runs_the_governance_checks(self):
+        # FR-U00-050 to FR-U00-052: four validators as steps of ci.yml, the scan of the pushed range in its own workflow.
+        ci = self.files[".github/workflows/ci.yml"]
+        for command in ("python3 scripts/validate_autocreator.py", "python3 scripts/planning_archive.py verify",
+                        "python3 scripts/planning_index.py verify", "python3 scripts/migration_ledger.py validate"):
+            self.assertRegex(ci, r"run: " + re.escape(command) + r"\s*\n", command)
+        self.assertTrue(".github/workflows/push-scan.yml" in self.files, "the scan workflow does not exist")
+        scan = self.files[".github/workflows/push-scan.yml"]
+        for needle in ("fetch-depth: 0", "cancel-in-progress: false", "group: push-scan-${{ github.sha }}", "timeout-minutes: 10",
+                       "contents: read", "branches: [main]", "pull_request:", "runs-on: ubuntu-latest",
+                       'python3 scripts/prepush_scan.py --range "$RANGE"', "github.event.before", "github.event.pull_request.base.sha"):
+            self.assertIn(needle, scan, needle)
+        self.assertNotIn("cancel-in-progress: true", scan)
+        for name in (".github/workflows/ci.yml", ".github/workflows/push-scan.yml"):
+            self.assertNotIn("secrets.", self.files[name], f"{name} names a secret")
+        self.assertNotRegex(scan, r"run:.*\$\{\{", "event values reach the script through environment variables only")
 
     def test_tools_use_only_the_standard_library(self):
         allowed = set(sys.stdlib_module_names) | set(self.TOOLS)

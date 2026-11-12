@@ -1,0 +1,43 @@
+# Scan of every pushed range (feature 186, UA-F00, FR-U00-051). It repeats scripts/prepush_scan.py over exactly the
+# commits of a push or a pull request, so that a push that did not go through the tools is still read.
+# This is a workflow of its own because ci.yml cancels a running workflow when a newer push arrives: a cancelled
+# scan would leave its commits unread. Here every pushed commit gets its own run and none is cancelled.
+# The scan needs only Git and Python; simulator identifiers are accepted through the tracked list of hashes
+# (Configs/simulator-identifier-hashes.json), so the verdict is the one of the development Mac.
+name: push-scan
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: push-scan-${{ github.sha }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - name: Scan the pushed commits
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          PUSH_BEFORE: ${{ github.event.before }}
+          PUSH_AFTER: ${{ github.sha }}
+          PR_BASE: ${{ github.event.pull_request.base.sha }}
+          PR_HEAD: ${{ github.event.pull_request.head.sha }}
+        run: |
+          if [ "$EVENT_NAME" = "pull_request" ]; then
+            RANGE="$PR_BASE...$PR_HEAD"
+          else
+            RANGE="$PUSH_BEFORE..$PUSH_AFTER"
+          fi
+          echo "range: $RANGE"
+          python3 scripts/prepush_scan.py --range "$RANGE"

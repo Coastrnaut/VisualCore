@@ -1,4 +1,5 @@
-# VisualCore CI (feature 010 T-F912; FR-F910). Fast host-only gates: docs, compliance, dependency rules, script tests,
+# VisualCore CI (feature 010 T-F912; FR-F910; feature 186 FR-U00-050). Fast host-only gates: docs, the steering
+# validators of the unified app (steering documents, planning archive, planning index, migration ledger), compliance, dependency rules, script tests,
 # public API, documented API, licenses, host Swift tests and an iOS Simulator build of the pure package. Rendering,
 # reference and Release-symbol gates need the prebuilt ANGLE frameworks and run locally through scripts/release_check.py (see docs/index.md).
 # Only the reference submodule is fetched, shallow and non-recursive (its license texts are inventoried); its
@@ -29,6 +30,15 @@ jobs:
         run: python3 Tools/python/desktop_runbook.py validate
       - name: Docs
         run: python3 scripts/validate_docs.py
+      # Feature 186 (UA-F00, FR-U00-050): the steering validators of the unified app. They read tracked files only.
+      - name: Steering documents
+        run: python3 scripts/validate_autocreator.py
+      - name: Planning archive
+        run: python3 scripts/planning_archive.py verify
+      - name: Planning index
+        run: python3 scripts/planning_index.py verify
+      - name: Migration ledger
+        run: python3 scripts/migration_ledger.py validate
       - name: Compliance
         run: python3 scripts/check_compliance.py
       - name: Dependency rules
