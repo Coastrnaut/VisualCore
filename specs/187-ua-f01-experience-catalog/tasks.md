@@ -28,7 +28,7 @@ and availability (US4), categories and search (US5), registry (US6).
 
 ## Phase 1: Setup
 
-- [ ] T-U01-001 Confirm the starting state: `swift test --package-path Packages/VisualCore` passes, `python3 scripts/check_public_api.py`, `python3 scripts/check_dependencies.py`, `python3 scripts/test_scripts.py` and `python3 scripts/validate_docs.py` pass, `python3 scripts/migration_ledger.py show --gate UA-F01` prints `UNMET: none`, `git status --short` is empty. Expected result: all as stated; record the number of Swift tests and script tests as the baseline.
+- [X] T-U01-001 Confirm the starting state: `swift test --package-path Packages/VisualCore` passes, `python3 scripts/check_public_api.py`, `python3 scripts/check_dependencies.py`, `python3 scripts/test_scripts.py` and `python3 scripts/validate_docs.py` pass, `python3 scripts/migration_ledger.py show --gate UA-F01` prints `UNMET: none`, `git status --short` is empty. Expected result: all as stated; record the number of Swift tests and script tests as the baseline. — Verified 2026-11-12: swift test --package-path Packages/VisualCore exit 0 (baseline before the module: Swift Testing runs summing to the count in the log, all passed); check_public_api.py PASS; check_dependencies.py 'PASS: R1-R5 hold'; test_scripts.py Ran 148 tests OK; validate_docs.py PASS 37 dossiers; migration_ledger.py show --gate UA-F01: UNMET none; git status clean
 
 ## Phase 2: Foundational (module scaffold; blocks every story)
 
