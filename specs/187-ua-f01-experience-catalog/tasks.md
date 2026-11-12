@@ -1,0 +1,130 @@
+---
+
+description: "Task list for feature 187 — UA-F01 experience catalog and stable identity (migration ledger gate UA-F01)"
+---
+
+# Tasks: UA-F01 — Experience catalog and stable identity
+
+**Input**: `specs/187-ua-f01-experience-catalog/` (spec, plan, research, data-model,
+contracts/visualcore-experience-api.md, contracts/catalog-files.md, quickstart).
+
+**Tests** are required by the specification (acceptance items 1, 4 and 7): Swift Testing in
+`Packages/VisualCore/Tests/VisualCoreExperienceTests` and `BuildCatalogTests` in `scripts/test_scripts.py`, each
+written before the code it proves and seen to fail.
+
+**Conventions**: ids `T-U01-###`; one commit and push per task through `scripts/tick_task.py`; a test task and the
+implementation it proves are committed together so that `main` is never red; gate evidence through
+`python3 scripts/migration_ledger.py run-check --gate UA-F01 --name <check-name> -- <command>` (simulator and
+reference commands with `--timeout 600`). "The commit before the feature" is `5166d7d`. No task is marked `[P]`:
+the tasks share the package manifest, one test target and `tasks.md`. Every public symbol gets its `///`
+documentation in the task that adds it. Review checkpoint after each phase: the named tests and
+`python3 scripts/validate_docs.py` pass.
+
+**Order of stories**: by dependency, not by number: identity (US1), loading (US3), allocation (US2), build tool
+and availability (US4), categories and search (US5), registry (US6).
+
+**Not applicable**: the brief names no device-only and no owner-only item, so there is no `{device}` and no
+`{owner}` task.
+
+## Phase 1: Setup
+
+- [ ] T-U01-001 Confirm the starting state: `swift test --package-path Packages/VisualCore` passes, `python3 scripts/check_public_api.py`, `python3 scripts/check_dependencies.py`, `python3 scripts/test_scripts.py` and `python3 scripts/validate_docs.py` pass, `python3 scripts/migration_ledger.py show --gate UA-F01` prints `UNMET: none`, `git status --short` is empty. Expected result: all as stated; record the number of Swift tests and script tests as the baseline.
+
+## Phase 2: Foundational (module scaffold; blocks every story)
+
+- [ ] T-U01-002 Add the pure module to `Packages/VisualCore/Package.swift` (`VisualCoreExperience` in the list `pure`, target without dependencies, test target `VisualCoreExperienceTests` with `resources: [.copy("Fixtures")]`), create `Packages/VisualCore/Sources/VisualCoreExperience/Module.swift` (`ExperienceInfo.version = "1.0.0-rc.1"`, documented), `Packages/VisualCore/Tests/VisualCoreExperienceTests/ModuleTests.swift` (the version) with a `Fixtures/README.md`, add the version to `Packages/VisualCore/Tests/VisualCoreScaffoldTests/ScaffoldTests.swift` and a row to `Packages/VisualCore/README.md`. Expected result: `swift test --package-path Packages/VisualCore --filter "VisualCoreExperienceTests|VisualCoreScaffoldTests"` passes; `python3 scripts/check_dependencies.py` passes (FR-U01-062).
+
+**Checkpoint**: the module builds and is a leaf.
+
+## Phase 3: User Story 1 - Every experience has one identity that never changes (Priority: P1) 🎯 MVP
+
+**Goal**: parsed, immutable code and id with the derived names.
+
+**Independent Test**: `ExperienceIDTests`.
+
+- [ ] T-U01-003 [US1] Write `Packages/VisualCore/Tests/VisualCoreExperienceTests/ExperienceIDTests.swift` first: valid codes (`A01`, `A25`, `R02-G01`, `R12-G25`) and ids (`a05.infinite-geometry`, `r02-g01.aurora-loom`) parse and print identically; `code`, `slug`, `isOriginal`, `round`, `number`; derived names "`X-<code>`", "the id", "`experience.<id>`"; at least twelve malformed texts are rejected with `ExperienceIDError.malformed` and a reason (upper case in the id, missing dot, two dots, empty slug, slug with a leading, trailing or double hyphen, `A1`, `A00`, `R01-G01`, `R02-G00`, `r02-g01` as a code, a slug over 60 characters, surrounding spaces); `Hashable`, `Comparable` by text, `Codable` as a string. Expected result: the tests do not compile or fail before the implementation; name them in the evidence.
+- [ ] T-U01-004 [US1] Implement `Packages/VisualCore/Sources/VisualCoreExperience/ExperienceID.swift` (`ExperienceCode`, `ExperienceID`, `ExperienceIDError`; data-model.md section 1: code "`A<nn>` (nn 01–99) or `R<rr>-G<gg>` (rr 02–99, gg 01–99)", slug "`[a-z0-9]+(-[a-z0-9]+)*`, 1 to 60 characters") (FR-U01-001, FR-U01-002, FR-U01-005). Expected result: `swift test --package-path Packages/VisualCore --filter VisualCoreExperienceTests` passes.
+
+**Checkpoint**: identity types exist; the golden list follows in Phase 6, when the real files exist.
+
+## Phase 4: User Story 3 - A damaged or foreign manifest is refused safely (Priority: P1)
+
+**Goal**: descriptor types and the bounded loader with one typed error per defect.
+
+**Independent Test**: `CatalogLoadingTests` with generated and damaged manifests.
+
+- [ ] T-U01-005 [US3] Write `Packages/VisualCore/Tests/VisualCoreExperienceTests/CatalogLoadingTests.swift` and a test helper `ManifestBuilder.swift` first. The helper builds a valid 100-entry launch manifest as a dictionary and lets a test change one thing. Tests: the valid manifest loads with 100 entries and every field read back; one test per error of data-model.md section 8, at least: `tooLarge` (1,048,577 bytes, refused without parsing), `unreadable` (not JSON; an array; text), `unsupportedSchema` (0 and 2, with both numbers in the error), `tooManyEntries` (401), `missingField` (each of the 16 keys of an entry and each top-level key), `unknownField` (entry and top level), `wrongType` (a number for the title, a string for `available`, a Boolean for `order`), `invalidValue` (unknown tier, kind and category; malformed id; code and id that disagree; empty title; title of 81, summary of 0 and of 301, family of 61 characters; 17 tags; 9 colors; a color not `#RRGGBB`; 17 capabilities; 9 quality tiers; family missing among the tags; a game outside `puzzle`; a creative experience in `puzzle`), `invalidNumber` (order 0, 10,000 and 1.5; tile seed −1 and 4,294,967,296; a number written `1e400`; levels 10,001), `duplicate` (id, code, order), `outOfOrder`; a manifest with two defects reports the first by the order of data-model.md section 3; loading never returns a partial value. Expected result: the tests fail to compile before the implementation.
+- [ ] T-U01-006 [US3] Implement `ExperienceDescriptor.swift` (`ExperienceDescriptor`, `ExperienceTier`, `ExperienceKind`, `ExperienceCategory`, `ExperienceContent`), `CatalogError.swift` and `CatalogManifest.swift` (`init(data:categories:)` with the size cap 1,048,576 bytes and 400 entries, `JSONSerialization`, exact key sets, limits and ranges of data-model.md section 2, duplicates, ascending order; `experience(_:)`, `experience(code:)`, `experiences(in:)`, `available`, `families(in:)`) in `Packages/VisualCore/Sources/VisualCoreExperience/` (FR-U01-010, FR-U01-013, FR-U01-020, FR-U01-021, FR-U01-030 to FR-U01-036). Expected result: `CatalogLoadingTests` pass; at least ten error cases are asserted (SC-U01-005).
+
+**Checkpoint**: nothing unvalidated can become a catalog.
+
+## Phase 5: User Story 2 - The launch set is exactly 50 free and 50 premium (Priority: P1)
+
+- [ ] T-U01-007 [US2] Write `Packages/VisualCore/Tests/VisualCoreExperienceTests/LaunchAllocationTests.swift` first: the built manifest validates with 50 free (A01–A25, R02-G01–R02-G25) and 50 premium (R03-G01–R04-G25); refused with `CatalogError.allocation` naming the code: a free launch code made premium, a premium one made free, a launch code removed, an entry of round 5 that is free, an original code above A25, a round-2 game above G25; accepted: an added premium entry of round 5. Expected result: the allocation tests fail before the rule exists.
+- [ ] T-U01-008 [US2] Implement the allocation rule in `CatalogManifest.swift` (research R3; FR-U01-011, FR-U01-012). Expected result: `LaunchAllocationTests` pass; at least four wrong allocations are refused (SC-U01-002).
+
+## Phase 6: User Story 4 - Only integrated experiences are available (Priority: P1)
+
+**Goal**: the build tool, the real files under `Catalog/`, the golden list.
+
+- [ ] T-U01-009 [US4] Add `BuildCatalogTests` to `scripts/test_scripts.py` first, on a temporary root with copies of the planning catalog and the migration ledger: the build gives 100 entries, 50 free, 50 premium, 0 available, in catalog order, with the derivations of contracts/catalog-files.md (title, summary, kind, tier, category, family tag, tile seed, hash of the planning catalog); with the gate `X-A01` set to pass and a registration for `a01.generative-art-studio` exactly that entry is available; pending, blocked and failed gates are not available; an available experience without a registration, a registration for an unknown id and a registrations file of schema 2 are errors that write nothing; `--check` passes on fresh output, fails naming the file after one byte of the manifest, of a test copy or of the golden list is changed, and writes nothing; two builds give identical bytes; `--add-golden` appends missing ids and refuses when a listed id is not in the planning catalog; an unreadable planning catalog and one whose allocation is not 50 and 50 are errors; the ledger file is byte-identical after every run. Expected result: the tests fail because `scripts/build_catalog.py` does not exist.
+- [ ] T-U01-010 [US4] Implement `scripts/build_catalog.py` (contracts/catalog-files.md: build, `--check`, `--add-golden`; standard library only; atomic writes; reads the ledger, never writes it), remove it from `PLANNED_SCRIPTS` in `scripts/validate_autocreator.py`, and add it to the reviewed ledger readers of `GovernanceTests` (FR-U01-040 to FR-U01-045). Expected result: `BuildCatalogTests` pass and `python3 scripts/test_scripts.py` ends with `OK`.
+- [ ] T-U01-011 [US4] Create `Catalog/categories.json` (seven categories in launcher order with titles), `Catalog/registrations.json` (schema 1, empty) and `Catalog/path-map.json` (schema 1, no moves) by hand; run `python3 scripts/build_catalog.py --add-golden` and `python3 scripts/build_catalog.py`; set the two entries of this gate in `docs/migration/path-map.json` to `done`. Expected result: the tool prints `100 experiences, 50 free, 50 premium, 0 available`; `Catalog/experience-ids.golden.txt` has 300 lines; the copies exist under `Packages/VisualCore/Tests/VisualCoreExperienceTests/Fixtures/Catalog/`; `python3 scripts/build_catalog.py --check` prints `PASS: runtime catalog, 0 problems`; `python3 scripts/validate_autocreator.py` passes (FR-U01-003, FR-U01-004, FR-U01-046).
+- [ ] T-U01-012 [US1] [US2] [US4] Write `Packages/VisualCore/Tests/VisualCoreExperienceTests/RealCatalogTests.swift` against the copied files: the real manifest loads with the real category list; every id of the manifest is in the golden list and has the stated form; the golden list has 300 unique, well-formed ids; 100 entries, 50 free and 50 premium with the stated codes; 0 available; category counts 5, 4, 4, 4, 4, 4, 75; every entry carries its family tag; loading and validating takes under 50 ms (median of 20 runs); a copy of the manifest with one id changed fails the golden-list comparison naming the id. Expected result: the tests pass (SC-U01-001, SC-U01-002, SC-U01-003, SC-U01-006, SC-U01-010); this is the acceptance of User Stories 1, 2 and 4.
+
+**Checkpoint**: the generated catalog is real, checked and frozen.
+
+## Phase 7: User Story 5 - Categories, tags and search behave the same everywhere (Priority: P2)
+
+- [ ] T-U01-013 [US5] Write `CategoryListTests.swift` and `CatalogSearchTests.swift` in `Packages/VisualCore/Tests/VisualCoreExperienceTests/` first: the category list loads seven entries in launcher order with titles; a list with six entries, a wrong order, an unknown id, an empty title, an unknown key or schema 2 is refused with a typed error; a manifest entry of a category missing from a given list is refused; `CatalogSearch.fold` on a table (upper case, accents, `İstanbul`, `ISTANBUL`, `ıstanbul`, full-width letters, the ligature `ﬁ`, tabs and repeated spaces); a table of at least twelve searches on the real manifest with expected ids in order (title match before tag match before summary match, ties in catalog order, every word required, empty text returns all 100 in catalog order, no match returns none); the same search twice gives equal results. Expected result: the tests fail to compile before the implementation.
+- [ ] T-U01-014 [US5] Implement `CategoryList.swift` and `CatalogSearch.swift` and `CatalogManifest.search(_:)` (research R4: compatibility decomposition, removal of combining marks, `lowercased()`, `ı` as `i`, white space collapsed; folded fields computed once at load; no locale-dependent API) (FR-U01-022, FR-U01-023, FR-U01-024). Add to `scripts/xcodebuild_package.py` the optional pass-through options `--test-language` and `--test-region` (xcodebuild `-testLanguage`, `-testRegion`) with a test of the command line in `scripts/test_scripts.py`. Expected result: the Swift tests pass; `python3 scripts/test_scripts.py` ends with `OK`.
+
+## Phase 8: User Story 6 - The registry and the manifest agree one to one (Priority: P2)
+
+- [ ] T-U01-015 [US6] Write `RegistryReportTests.swift` and `SourceMoveMapTests.swift` first: the five cases of SC-U01-007 (match, missing registration, unexpected registration for an entry that is missing and for one that is not available, duplicate registration, today's catalog with no available entry and no registration); reports sorted by id; the real `path-map.json` loads with no moves; a move list with a missing key, an unknown key, a path of 301 characters, 5,001 moves or schema 2 is refused with a typed error. Expected result: the tests fail to compile before the implementation.
+- [ ] T-U01-016 [US6] Implement `RegistryReport.swift` (`CatalogManifest.registryReport(registered:)`) and `SourceMoveMap.swift` (FR-U01-046, FR-U01-050, FR-U01-051). Expected result: the tests pass; `swift test --package-path Packages/VisualCore --filter VisualCoreExperienceTests` passes as a whole.
+
+## Phase 9: Framework obligations and documents
+
+- [ ] T-U01-017 Update the public API baseline with `python3 scripts/check_public_api.py --update`, review that every new line belongs to `VisualCoreExperience` and that no existing line changed, and run `python3 scripts/check_public_api.py`, `python3 scripts/check_dependencies.py` and `python3 scripts/check_documented_api.py --sources Showcase/App` (and the two harness sources). Expected result: all pass; `git diff docs/api/visualcore-public-api.txt` only adds lines (FR-U01-060, SC-U01-009).
+- [ ] T-U01-018 Update the documents in place: `Auto-Creator.md` section 11.2 (the schema as built, the registrations file, the golden list, the two path maps), `docs/getting-started.md` and `docs/release/support-matrix.md` (the new module), and add the CI step "Runtime catalog" (`python3 scripts/build_catalog.py --check`) to `.github/workflows/ci.yml` with its assertion in `GovernanceTests.test_ci_runs_the_governance_checks`. Run `python3 scripts/render_autocreator.py`, `python3 scripts/validate_autocreator.py`, `python3 scripts/validate_docs.py`, `python3 scripts/test_scripts.py`. Expected result: all pass.
+- [ ] T-U01-019 Run the package tests on both simulator runtimes and once in another language: `python3 scripts/xcodebuild_package.py --package Packages/VisualCore --scheme VisualCore-Package --destination sim-27.2 --action test`, the same with `--destination sim-26.5`, and the 27.2 run again with `--test-language tr --test-region TR` (checks `sim-ios27`, `sim-ios26`, `sim-ios27-tr`). Expected result: `TEST SUCCEEDED` three times; the `VisualCoreExperienceTests` ran in each (named in the evidence with their count); the search table gives the same results under both language settings (FR-U01-024, FR-U01-060, SC-U01-004).
+- [ ] T-U01-020 Run the ProjectM reference regression, first chunk (check `reference-a`): `python3 scripts/release_check.py --only reference-engine-xcframework reference-build-projectm-ios-sim reference-clean`. Expected result: 3 of 3 pass; the reference is clean at its pin (FR-U01-061).
+- [ ] T-U01-021 Run the ProjectM reference regression, second chunk (check `reference-b`): `python3 scripts/release_check.py --only reference-test-anglerendering-ios27 reference-test-anglerendering-ios26 projectm-reference-ios27 projectm-reference-ios26`. Expected result: 4 of 4 pass, 7 of 7 in total; a noise-floor criterion that fails once is rerun unchanged once and the failed attempt stays in the record (FR-U01-061, SC-U01-009).
+- [ ] T-U01-022 Build the consumers of the package for testing from clean derived data: `xcodebuild build-for-testing -project VisualCore.xcodeproj -scheme <Scheme> -destination 'generic/platform=iOS Simulator' -derivedDataPath Build/DerivedData/<Scheme> CODE_SIGNING_ALLOWED=NO` for the schemes `Showcase`, `GenerativeArtStudio`, `FluidArtPlayground`, `FractalExplorer` and `ParticleUniverse`, after `xcodegen generate` (checks `build-<Scheme>`). Expected result: `TEST BUILD SUCCEEDED` five times.
+
+## Phase 10: Evidence and convergence
+
+- [ ] T-U01-023 Record `host-experience` and `host-visualcore`: `swift test --package-path Packages/VisualCore --filter VisualCoreExperienceTests` and `swift test --package-path Packages/VisualCore`. Expected result: both exit 0; the evidence gives the number of tests.
+- [ ] T-U01-024 Record `catalog-check`, `public-api` and `dependencies`: `python3 scripts/build_catalog.py --check`, `python3 scripts/check_public_api.py`, `python3 scripts/check_dependencies.py`. Expected result: three exits 0.
+- [ ] T-U01-025 Record `script-tests`, `docs`, `steering`, `ledger` and `prepush-scan`: `python3 scripts/test_scripts.py`, `python3 scripts/validate_docs.py`, `python3 scripts/validate_autocreator.py`, `python3 scripts/migration_ledger.py validate`, `python3 scripts/prepush_scan.py --range 5166d7d..HEAD`. Expected result: five exits 0.
+- [ ] T-U01-026 Record the boundary check `scope-untouched`: `git diff --quiet 5166d7d -- Apps Showcase Harnesses Packages/VisualCoreRendering External Vendor Tools project.yml .autonomy/state.json docs/catalog/experience-catalog.json`, and confirm the CI runs of the final commit with `gh run watch <id> --exit-status` for the workflows `ci` and `push-scan` (checks `ci-run`, `push-scan-run`). Expected result: three exits 0 (FR-U01-063).
+- [ ] T-U01-027 Run `/speckit-converge` with its supplied prompt and override; implement what it appends with `/speckit-implement`; repeat until a run appends nothing and reports what it checked. If a source file changed after the evidence tasks, rerun the affected checks under new names and watch new CI runs. Then `python3 scripts/migration_ledger.py seal --gate UA-F01 && python3 scripts/migration_ledger.py record --gate UA-F01`, commit and push. Expected result: the last convergence run appends no task; `python3 scripts/migration_ledger.py show --gate UA-F01` shows `"status": "pass"`; `python3 scripts/migration_ledger.py validate` passes.
+
+## Dependencies & Execution Order
+
+- Phase 1 → Phase 2 → Phases 3 to 8 in the order written → Phase 9 → Phase 10.
+- US3 needs US1 (ids inside descriptors). US2 needs US3 (it validates a loaded manifest). US4 needs US2 and US3
+  (the tool's output must load) and delivers the real files that the acceptance of US1, US2 and US4 uses. US5 and
+  US6 need the real manifest of US4.
+- Phase 9 needs all sources final: the API baseline, the simulator runs and the reference regression are run
+  after the last change of `Packages/VisualCore`.
+
+### Parallel Opportunities
+
+None is used: one package manifest, one test target, one test file for the scripts, and one heavy build at a time
+on this Mac.
+
+## Implementation Strategy
+
+MVP: Phases 1 to 3 (identity). Then loading, allocation, the build tool with the real catalog, search, registry;
+each step leaves the package tests green and is pushed. The framework obligations run once, at the end, on the
+final sources.
+
+## Notes
+
+- A task is ticked only with reproduced evidence, through `scripts/tick_task.py`.
+- Heavy commands (simulator tests, reference chunks, consumer builds) run one at a time in the foreground, each
+  within ten minutes, with their output written to a file by `run-check`.
+- No task changes `Apps/`, `Showcase/`, `Harnesses/`, `Packages/VisualCoreRendering`, `External/`, `Vendor/`,
+  `project.yml` or the planning catalog.
