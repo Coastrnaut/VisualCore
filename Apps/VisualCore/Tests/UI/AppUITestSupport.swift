@@ -1,8 +1,8 @@
 // AppUITestSupport — feature 190 T-U04-007 to T-U04-010 (UA-F04): helpers shared by the interface tests of the
 // unified app. Elements are found by the identifiers of data-model.md section 6, never by position. The audit
 // wrapper follows the pattern of the standalone apps (features 016 and 020): contrast of the artwork inside the
-// live canvas, navigation-bar chrome and findings without an element are ignored, and each ignored finding is
-// printed.
+// live canvas, navigation-bar chrome, text only partly on screen and findings without an element are ignored, and
+// each ignored finding is printed.
 import Foundation
 import UIKit
 import XCTest
@@ -160,6 +160,7 @@ func audit(_ app: XCUIApplication, _ screen: String, largeText: Bool) throws -> 
     let types: XCUIAccessibilityAuditType = largeText ? all : all.subtracting([.dynamicType, .textClipped])
     let ignored = FindingLog()
     let bars = app.navigationBars.allElementsBoundByIndex.map { $0.frame }
+    let screen = app.windows.firstMatch.frame
     let label = "\(screen) [\(largeText ? "largest" : "default")]"
     try app.performAccessibilityAudit(for: types) { issue in
         let e = issue.element
@@ -175,6 +176,13 @@ func audit(_ app: XCUIApplication, _ screen: String, largeText: Bool) throws -> 
            issue.auditType == .contrast || issue.auditType == .dynamicType || issue.auditType == .textClipped {
             ignored.append(description)
             print("A11Y-AUDIT ignored (navigation-bar chrome): \(description)")
+            return true
+        }
+        if let frame = e?.frame, issue.auditType == .contrast, !screen.isEmpty, !screen.contains(frame) {
+            // A text the scroll position cuts at the screen edge is measured on the cut glyphs; the same text is
+            // audited in full where a test scrolls to it.
+            ignored.append(description)
+            print("A11Y-AUDIT ignored (text only partly on screen): \(description)")
             return true
         }
         if e == nil {
