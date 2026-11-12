@@ -2,12 +2,14 @@
 """Unit tests for the deterministic VisualCore scripts (T-F006). Run: python3 scripts/test_scripts.py"""
 from __future__ import annotations
 
+import ast
 import contextlib
 import datetime
 import hashlib
 import importlib.util
 import io
 import json
+import re
 import subprocess
 import sys
 import tempfile
@@ -1104,6 +1106,67 @@ class MigrationLedgerTests(unittest.TestCase):
         self.assertEqual(self.ledger()["gates"][0]["status"], "pending")
         self.refuses("after RELEASE-PREP", "add-round", "--round", "5")
 
+    # ---- feature 186 (UA-F00): every refusal also for seal and record; damaged files stop the tool cleanly
+
+    def tree(self):
+        """Every file of the temporary ledger tree with its bytes: what a refusal must leave untouched."""
+        base = self.root / ".autonomy" / "migration"
+        return {f.relative_to(base).as_posix(): f.read_bytes() for f in sorted(base.rglob("*")) if f.is_file()}
+
+    def test_seal_and_record_are_refused_for_an_unmet_dependency(self):
+        before = self.tree()
+        for command in ("seal", "record"):
+            self.refuses("CONSTITUTION-2 is not ready; unmet: M0-CONSOLIDATION", command, "--gate", "CONSTITUTION-2")
+        self.assertEqual(self.tree(), before)
+
+    def test_device_gates_are_refused_for_every_command_before_the_lock(self):
+        self.force({g: "pass" for g in ("M0-CONSOLIDATION", "CONSTITUTION-2", "UA-F13")})
+        before = self.tree()
+        for gate in ("DEV1-A01", "DEV1-CAMPAIGN", "DEV3-R04-G25"):
+            self.refuses("ImplementationLock-100", "run-check", "--gate", gate, "--name", "x", "--", sys.executable, "ok.py")
+            self.refuses("ImplementationLock-100", "seal", "--gate", gate)
+            self.refuses("ImplementationLock-100", "record", "--gate", gate)
+        self.refuses("no physical-device install, launch or test before ImplementationLock-100", "guard-device")
+        self.assertEqual(self.tree(), before)
+
+    def test_removed_log_cannot_be_sealed(self):
+        self.assertEqual(self.run_tool("run-check", "--gate", "M0-CONSOLIDATION", "--name", "a", "--", sys.executable, "ok.py"), 0)
+        (self.root / ledgertool.LOGS / "M0-CONSOLIDATION.a.log").unlink()
+        self.refuses("log missing or changed since the command ran", "seal", "--gate", "M0-CONSOLIDATION")
+        self.assertFalse((self.root / ledgertool.EVIDENCE / "M0-CONSOLIDATION.json").exists())
+
+    def test_damaged_files_stop_the_tool_with_a_message(self):
+        ok = ["--", sys.executable, "ok.py"]
+        self.assertEqual(self.run_tool("run-check", "--gate", "M0-CONSOLIDATION", "--name", "a", *ok), 0)
+        attestation = self.root / ledgertool.CHECKS / "M0-CONSOLIDATION.a.json"
+        good = attestation.read_text()
+        attestation.write_text("{not json")
+        self.refuses("cannot read .autonomy/migration/checks/M0-CONSOLIDATION.a.json", "seal", "--gate", "M0-CONSOLIDATION")
+        self.assertFalse((self.root / ledgertool.EVIDENCE / "M0-CONSOLIDATION.json").exists())
+        attestation.write_text(good)
+        self.assertEqual(self.run_tool("seal", "--gate", "M0-CONSOLIDATION"), 0)
+        evidence = self.root / ledgertool.EVIDENCE / "M0-CONSOLIDATION.json"
+        evidence.write_text("{not json")
+        ledger_before = (self.root / ledgertool.LEDGER).read_bytes()
+        self.refuses("cannot read .autonomy/migration/evidence/M0-CONSOLIDATION.json", "record", "--gate", "M0-CONSOLIDATION")
+        self.assertEqual((self.root / ledgertool.LEDGER).read_bytes(), ledger_before)
+        ledger = self.root / ledgertool.LEDGER
+        ledger.write_text("{not json")
+        before = self.tree()
+        for argv in (["status"], ["next"], ["show", "--gate", "UA-F00"], ["validate"], ["guard-device"], ["seal", "--gate", "UA-F00"],
+                     ["record", "--gate", "UA-F00"], ["run-check", "--gate", "UA-F00", "--name", "x", *ok],
+                     ["block", "--gate", "UA-F00", "--reason", "r"]):
+            self.refuses("cannot read .autonomy/migration/ledger.json", *argv)
+        self.assertEqual(self.tree(), before)
+        ledger.write_text(json.dumps({"schema": 2, "gates": []}))
+        self.refuses("unexpected migration ledger schema", "status")
+        ledger.unlink()
+        self.refuses("migration ledger missing", "status")
+
+    def test_pass_without_evidence_is_reported(self):
+        self.force({"M0-CONSOLIDATION": "pass"})
+        self.assertIn("M0-CONSOLIDATION: pass without recorded evidence", ledgertool.validate(self.root))
+
     def test_only_device_rows_may_fail(self):
         self.assertNotEqual(self.run_tool("run-check", "--gate", "M0-CONSOLIDATION", "--name", "bad", "--", sys.executable, "bad.py"), 0)
         self.assertEqual(self.run_tool("seal", "--gate", "M0-CONSOLIDATION", "--allow-failures"), 0)
@@ -1650,6 +1713,58 @@ class TickTaskTests(unittest.TestCase):
         self.assertEqual(message.strip(), "subject only")
         for trailer in ("Co-Authored-By", "Generated with"):
             self.assertNotIn(trailer, message)
+
+
+class GovernanceTests(unittest.TestCase):
+    """Rules about the tools themselves (feature 186): one writer of the ledger, two tools that push, standard
+    library only."""
+
+    LEDGER_WRITER = "scripts/migration_ledger.py"
+    # Reviewed readers of the migration ledger. Adding a reader is a change to this list (FR-U00-039).
+    LEDGER_READERS = {"scripts/validate_autocreator.py", "scripts/render_autocreator.py", "scripts/build_traceability_matrix.py"}
+    PUSHERS = {"scripts/tick_task.py", "scripts/prepush_scan.py"}
+    TOOLS = ("validate_docs", "tick_task", "prepush_scan", "migration_ledger", "planning_index")
+    NETWORK_MODULES = {"socket", "ssl", "urllib", "http", "ftplib", "smtplib", "poplib", "imaplib", "xmlrpc", "telnetlib",
+                       "asyncio", "socketserver", "webbrowser"}
+
+    @classmethod
+    def setUpClass(cls):
+        listing = subprocess.run(["git", "ls-files", "scripts", "Tools/python", ".github"], cwd=ROOT_DIR, capture_output=True,
+                                 text=True, check=True).stdout.splitlines()
+        cls.files = {rel: (ROOT_DIR / rel).read_text(encoding="utf-8", errors="replace") for rel in listing
+                     if (ROOT_DIR / rel).is_file()}
+
+    def test_only_the_ledger_tool_writes_the_ledger(self):
+        names_ledger = re.compile(r"migration/ledger\.json|migration_ledger\.LEDGER")
+        naming = {rel for rel, text in self.files.items() if names_ledger.search(text)}
+        self.assertEqual(naming - self.LEDGER_READERS - {self.LEDGER_WRITER, "scripts/test_scripts.py"}, set(),
+                         "a tracked script or workflow names the migration ledger without being a reviewed reader")
+        writes = re.compile(r"write_text|write_bytes|atomic_write|os\.replace|\.unlink\(|\.rename\(|open\([^)]*[\"'][wax]")
+        for rel in sorted(naming & self.LEDGER_READERS):
+            for number, line in enumerate(self.files[rel].splitlines(), 1):
+                if re.search(r"\bLEDGER\b|ledger\.json", line):
+                    self.assertIsNone(writes.search(line), f"{rel}:{number} writes the migration ledger")
+
+    def test_only_two_tools_push(self):
+        pushes = re.compile(r"""["']git["'],\s*["']push["']""")
+        pushing = {rel for rel, text in self.files.items() if rel.endswith(".py") and rel != "scripts/test_scripts.py" and pushes.search(text)}
+        self.assertEqual(pushing, self.PUSHERS)
+        for rel, text in self.files.items():
+            if rel.startswith(".github/"):
+                self.assertNotRegex(text, r"git\s+push", f"{rel} pushes")
+
+    def test_tools_use_only_the_standard_library(self):
+        allowed = set(sys.stdlib_module_names) | set(self.TOOLS)
+        for tool in self.TOOLS:
+            tree = ast.parse(self.files[f"scripts/{tool}.py"])
+            imported = set()
+            for node in ast.walk(tree):
+                if isinstance(node, ast.Import):
+                    imported |= {alias.name.split(".")[0] for alias in node.names}
+                elif isinstance(node, ast.ImportFrom) and node.module and node.level == 0:
+                    imported.add(node.module.split(".")[0])
+            self.assertEqual(imported - allowed, set(), f"{tool}.py imports a module outside the standard library")
+            self.assertEqual(imported & self.NETWORK_MODULES, set(), f"{tool}.py imports a network module")
 
 
 def ledger_tree_hash() -> str:

@@ -99,8 +99,21 @@ def digest(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
 
+def shown(path: Path) -> str:
+    """The path as the repository names it (from `.autonomy/` or `docs/` on), for messages."""
+    for anchor in (".autonomy", "docs"):
+        if anchor in path.parts:
+            return Path(*path.parts[path.parts.index(anchor):]).as_posix()
+    return path.name
+
+
 def read_json(path: Path):
-    return json.loads(path.read_text(encoding="utf-8"))
+    """Parse a tracked JSON file. A file that cannot be read or is not valid JSON stops the tool with a message
+    that names it; nothing is written (feature 186, FR-U00-036)."""
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError) as error:
+        fail(f"cannot read {shown(path)}: {type(error).__name__}: {str(error)[:120]}")
 
 
 def dump_ledger(ledger: dict) -> str:
