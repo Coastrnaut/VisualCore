@@ -483,6 +483,8 @@ VisualCoreExperience | var | public var storageNamespace: String
 VisualCoreExperienceHost | class | public final class ExperienceActionPort
 VisualCoreExperienceHost | class | public final class ExperienceShell<Presenter: ExperiencePresenter>: Experience
 VisualCoreExperienceHost | enum | public enum ExperienceHostInfo
+VisualCoreExperienceHost | enum | public enum Key: String, CaseIterable, Sendable
+VisualCoreExperienceHost | enum | public enum SessionStrings
 VisualCoreExperienceHost | func | public func activate() throws(ExperienceError)
 VisualCoreExperienceHost | func | public func beginDeactivation() throws(ExperienceError)
 VisualCoreExperienceHost | func | public func cancelPreparation()
@@ -502,6 +504,7 @@ VisualCoreExperienceHost | func | public func shedCaches()
 VisualCoreExperienceHost | func | public func shedCaches() throws(ExperienceError)
 VisualCoreExperienceHost | func | public func snapshot() throws(ExperienceError) -> ExperienceSnapshot
 VisualCoreExperienceHost | func | public func suspend() throws(ExperienceError)
+VisualCoreExperienceHost | func | public static func text(_ key: Key) -> String
 VisualCoreExperienceHost | init | public init(id: ExperienceID, presenter: Presenter, maxStepsPerFrame: Int = 8)
 VisualCoreExperienceHost | let | public let accessibilityPrefix: String
 VisualCoreExperienceHost | let | public let id: ExperienceID

@@ -7,6 +7,7 @@ import PackageDescription
 
 let package = Package(
     name: "VisualCoreRendering",
+    defaultLocalization: "en",
     platforms: [.iOS("26.0")],
     products: [
         .library(name: "VisualCoreRendering", targets: ["VisualCoreRendering"]),
@@ -44,8 +45,9 @@ let package = Package(
                 linkerSettings: [.linkedFramework("AVFAudio")]),
         .target(name: "VisualCoreAutomation", dependencies: ["VisualCoreRendering", .product(name: "VisualCoreDiagnostics", package: "VisualCore")]),
         .target(name: "VisualCoreExperienceHost",
-                dependencies: ["VisualCoreRendering", .product(name: "VisualCoreExperience", package: "VisualCore"),
-                               .product(name: "VisualCoreDiagnostics", package: "VisualCore")]),
+                dependencies: ["VisualCoreRendering", "VisualCoreUI", .product(name: "VisualCoreExperience", package: "VisualCore"),
+                               .product(name: "VisualCoreDiagnostics", package: "VisualCore")],
+                resources: [.process("Resources")]),
         .testTarget(name: "VisualCoreExperienceHostTests",
                     dependencies: ["VisualCoreExperienceHost", "VisualCoreRendering", "CVisualCoreGL",
                                    .product(name: "VisualCoreExperience", package: "VisualCore"),
