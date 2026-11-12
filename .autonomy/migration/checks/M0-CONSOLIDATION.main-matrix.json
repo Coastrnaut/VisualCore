@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "python3",
+    "scripts/build_traceability_matrix.py",
+    "--check"
+  ],
+  "command": "python3 scripts/build_traceability_matrix.py --check",
+  "elapsed_seconds": 0.437,
+  "exit_code": 0,
+  "finished": "2026-11-12T04:13:37+00:00",
+  "gate": "M0-CONSOLIDATION",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/M0-CONSOLIDATION.main-matrix.log",
+  "log_sha256": "5a2af4b06e333f926375968521e44933de2b36602b718a5c3a4152960171cb52",
+  "name": "main-matrix",
+  "started": "2026-11-12T04:13:37+00:00",
+  "timed_out": false
+}

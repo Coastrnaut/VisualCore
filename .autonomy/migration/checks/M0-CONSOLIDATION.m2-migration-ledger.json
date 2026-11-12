@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "python3",
+    "scripts/migration_ledger.py",
+    "validate"
+  ],
+  "command": "python3 scripts/migration_ledger.py validate",
+  "elapsed_seconds": 0.038,
+  "exit_code": 0,
+  "finished": "2026-11-12T04:14:58+00:00",
+  "gate": "M0-CONSOLIDATION",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/M0-CONSOLIDATION.m2-migration-ledger.log",
+  "log_sha256": "287493d5f84e1724f862f7b795cbf46a8d88c906ddeebb0dc36bacd90855e540",
+  "name": "m2-migration-ledger",
+  "started": "2026-11-12T04:14:58+00:00",
+  "timed_out": false
+}

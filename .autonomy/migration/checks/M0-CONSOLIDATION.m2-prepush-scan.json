@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "python3",
+    "scripts/prepush_scan.py"
+  ],
+  "command": "python3 scripts/prepush_scan.py",
+  "elapsed_seconds": 1.055,
+  "exit_code": 0,
+  "finished": "2026-11-12T04:15:06+00:00",
+  "gate": "M0-CONSOLIDATION",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/M0-CONSOLIDATION.m2-prepush-scan.log",
+  "log_sha256": "dc541ea11330d513336c1f09dc219e7ed6b3d8464d8d352e33365790b6bcbada",
+  "name": "m2-prepush-scan",
+  "started": "2026-11-12T04:15:04+00:00",
+  "timed_out": false
+}

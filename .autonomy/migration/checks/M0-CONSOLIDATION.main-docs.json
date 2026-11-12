@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "python3",
+    "scripts/validate_docs.py"
+  ],
+  "command": "python3 scripts/validate_docs.py",
+  "elapsed_seconds": 0.045,
+  "exit_code": 0,
+  "finished": "2026-11-12T04:13:38+00:00",
+  "gate": "M0-CONSOLIDATION",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/M0-CONSOLIDATION.main-docs.log",
+  "log_sha256": "21203bdfd880a70f9de8d1401ec49ca55ce329b422bc2081bd466209b87806f4",
+  "name": "main-docs",
+  "started": "2026-11-12T04:13:38+00:00",
+  "timed_out": false
+}

@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "python3",
+    "scripts/render_autocreator.py",
+    "--check"
+  ],
+  "command": "python3 scripts/render_autocreator.py --check",
+  "elapsed_seconds": 0.131,
+  "exit_code": 0,
+  "finished": "2026-11-12T04:14:57+00:00",
+  "gate": "M0-CONSOLIDATION",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/M0-CONSOLIDATION.m2-generated-blocks.log",
+  "log_sha256": "b6b48baa84ef20390426b64a54ca2b9efaef225a7d57e5364e6225ee6a15085b",
+  "name": "m2-generated-blocks",
+  "started": "2026-11-12T04:14:57+00:00",
+  "timed_out": false
+}

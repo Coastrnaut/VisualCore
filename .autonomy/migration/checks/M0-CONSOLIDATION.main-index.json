@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "python3",
+    "scripts/planning_index.py",
+    "verify"
+  ],
+  "command": "python3 scripts/planning_index.py verify",
+  "elapsed_seconds": 0.454,
+  "exit_code": 0,
+  "finished": "2026-11-12T04:13:38+00:00",
+  "gate": "M0-CONSOLIDATION",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/M0-CONSOLIDATION.main-index.log",
+  "log_sha256": "142abe2ee521f61f5327c4c849b3f2b625de1302b3feb1c95baed2689d189413",
+  "name": "main-index",
+  "started": "2026-11-12T04:13:37+00:00",
+  "timed_out": false
+}

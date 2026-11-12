@@ -1,0 +1,190 @@
+{
+  "branch": "main",
+  "dirty": false,
+  "dirty_paths": [],
+  "failed_attempts": [
+    {
+      "command": "python3 scripts/prepush_scan.py",
+      "exit_code": 1,
+      "log": ".autonomy/logs/migration/M0-CONSOLIDATION.main-prepush-scan.log",
+      "log_sha256": "a7e5bb733de64d63eef141438aeb779b29fa08768c097477c9d5a37d2f633043",
+      "name": "main-prepush-scan",
+      "timed_out": false
+    }
+  ],
+  "gate": "M0-CONSOLIDATION",
+  "ledger": "migration",
+  "passing_checks": [
+    {
+      "command": "python3 scripts/planning_archive.py verify",
+      "exit_code": 0,
+      "finished": "2026-11-12T04:14:57+00:00",
+      "log": ".autonomy/logs/migration/M0-CONSOLIDATION.m2-archive.log",
+      "log_sha256": "14779f99e6041225f018b6a325c4da2f2fa788394862d48ac63879febb6f4dd1",
+      "name": "m2-archive"
+    },
+    {
+      "command": "python3 scripts/migration_baseline.py verify",
+      "exit_code": 0,
+      "finished": "2026-11-12T04:14:58+00:00",
+      "log": ".autonomy/logs/migration/M0-CONSOLIDATION.m2-baseline.log",
+      "log_sha256": "d3820b88d912bbbe30de5c331d139b8e48114a6399d95dfcbc6a9176e8ebf1b7",
+      "name": "m2-baseline"
+    },
+    {
+      "command": "python3 scripts/validate_docs.py",
+      "exit_code": 0,
+      "finished": "2026-11-12T04:14:58+00:00",
+      "log": ".autonomy/logs/migration/M0-CONSOLIDATION.m2-docs.log",
+      "log_sha256": "2be410624b22b04650920b4d72a9696b1b0fd3f33aa4a869571aaa616bc96879",
+      "name": "m2-docs"
+    },
+    {
+      "command": "python3 scripts/render_autocreator.py --check",
+      "exit_code": 0,
+      "finished": "2026-11-12T04:14:57+00:00",
+      "log": ".autonomy/logs/migration/M0-CONSOLIDATION.m2-generated-blocks.log",
+      "log_sha256": "b6b48baa84ef20390426b64a54ca2b9efaef225a7d57e5364e6225ee6a15085b",
+      "name": "m2-generated-blocks"
+    },
+    {
+      "command": "python3 scripts/planning_index.py verify",
+      "exit_code": 0,
+      "finished": "2026-11-12T04:14:58+00:00",
+      "log": ".autonomy/logs/migration/M0-CONSOLIDATION.m2-index.log",
+      "log_sha256": "4b13352d95d89d65d513fc96ffeb16903a403c2bb378d356173bf61e2bdb25d2",
+      "name": "m2-index"
+    },
+    {
+      "command": "python3 Tools/python/desktop_runbook.py validate",
+      "exit_code": 0,
+      "finished": "2026-11-12T04:14:58+00:00",
+      "log": ".autonomy/logs/migration/M0-CONSOLIDATION.m2-legacy-ledger.log",
+      "log_sha256": "42a355aac4f0b5c0434dc61bb5bb3d03bf04281258e4cf277aafb960d0ecfe4b",
+      "name": "m2-legacy-ledger"
+    },
+    {
+      "command": "python3 scripts/build_traceability_matrix.py --check",
+      "exit_code": 0,
+      "finished": "2026-11-12T04:14:57+00:00",
+      "log": ".autonomy/logs/migration/M0-CONSOLIDATION.m2-matrix.log",
+      "log_sha256": "790a7d94fa47a305ea04f226ba8032279a5d5238186edb4fabc76a9946f0e615",
+      "name": "m2-matrix"
+    },
+    {
+      "command": "python3 scripts/migration_ledger.py validate",
+      "exit_code": 0,
+      "finished": "2026-11-12T04:14:58+00:00",
+      "log": ".autonomy/logs/migration/M0-CONSOLIDATION.m2-migration-ledger.log",
+      "log_sha256": "287493d5f84e1724f862f7b795cbf46a8d88c906ddeebb0dc36bacd90855e540",
+      "name": "m2-migration-ledger"
+    },
+    {
+      "command": "python3 scripts/prepush_scan.py",
+      "exit_code": 0,
+      "finished": "2026-11-12T04:15:06+00:00",
+      "log": ".autonomy/logs/migration/M0-CONSOLIDATION.m2-prepush-scan.log",
+      "log_sha256": "dc541ea11330d513336c1f09dc219e7ed6b3d8464d8d352e33365790b6bcbada",
+      "name": "m2-prepush-scan"
+    },
+    {
+      "command": "python3 scripts/test_scripts.py",
+      "exit_code": 0,
+      "finished": "2026-11-12T04:15:04+00:00",
+      "log": ".autonomy/logs/migration/M0-CONSOLIDATION.m2-script-tests.log",
+      "log_sha256": "d011c9a26503b550d75cb925351d5056a80df8398f7bca099d5ef6c0d5ce6d05",
+      "name": "m2-script-tests"
+    },
+    {
+      "command": "python3 scripts/validate_autocreator.py",
+      "exit_code": 0,
+      "finished": "2026-11-12T04:14:57+00:00",
+      "log": ".autonomy/logs/migration/M0-CONSOLIDATION.m2-steering.log",
+      "log_sha256": "26039f6cd4fb64b07974226959ddea455171044439090231a3a7b848a2bab23f",
+      "name": "m2-steering"
+    },
+    {
+      "command": "python3 scripts/planning_archive.py verify",
+      "exit_code": 0,
+      "finished": "2026-11-12T04:13:37+00:00",
+      "log": ".autonomy/logs/migration/M0-CONSOLIDATION.main-archive.log",
+      "log_sha256": "2a5babc733ba697e840786e1c41d3a6678f2b5654c9f18a5584446c6c07c83ec",
+      "name": "main-archive"
+    },
+    {
+      "command": "python3 scripts/migration_baseline.py verify",
+      "exit_code": 0,
+      "finished": "2026-11-12T04:13:38+00:00",
+      "log": ".autonomy/logs/migration/M0-CONSOLIDATION.main-baseline.log",
+      "log_sha256": "338a13f4b921f4504b017413da3e738bce66befaac7c8d3a7095f96af721ac16",
+      "name": "main-baseline"
+    },
+    {
+      "command": "python3 scripts/validate_docs.py",
+      "exit_code": 0,
+      "finished": "2026-11-12T04:13:38+00:00",
+      "log": ".autonomy/logs/migration/M0-CONSOLIDATION.main-docs.log",
+      "log_sha256": "21203bdfd880a70f9de8d1401ec49ca55ce329b422bc2081bd466209b87806f4",
+      "name": "main-docs"
+    },
+    {
+      "command": "python3 scripts/render_autocreator.py --check",
+      "exit_code": 0,
+      "finished": "2026-11-12T04:13:37+00:00",
+      "log": ".autonomy/logs/migration/M0-CONSOLIDATION.main-generated-blocks.log",
+      "log_sha256": "bbbcb8b1c9390cdf9aab453b2e07f96422972969e1e994d8f46369e3e0a5fc0a",
+      "name": "main-generated-blocks"
+    },
+    {
+      "command": "python3 scripts/planning_index.py verify",
+      "exit_code": 0,
+      "finished": "2026-11-12T04:13:38+00:00",
+      "log": ".autonomy/logs/migration/M0-CONSOLIDATION.main-index.log",
+      "log_sha256": "142abe2ee521f61f5327c4c849b3f2b625de1302b3feb1c95baed2689d189413",
+      "name": "main-index"
+    },
+    {
+      "command": "python3 Tools/python/desktop_runbook.py validate",
+      "exit_code": 0,
+      "finished": "2026-11-12T04:13:38+00:00",
+      "log": ".autonomy/logs/migration/M0-CONSOLIDATION.main-legacy-ledger.log",
+      "log_sha256": "8d11faa4edffbe282c4650da3d5e5deba4462d6c043c4515fb7894240fd35369",
+      "name": "main-legacy-ledger"
+    },
+    {
+      "command": "python3 scripts/build_traceability_matrix.py --check",
+      "exit_code": 0,
+      "finished": "2026-11-12T04:13:37+00:00",
+      "log": ".autonomy/logs/migration/M0-CONSOLIDATION.main-matrix.log",
+      "log_sha256": "5a2af4b06e333f926375968521e44933de2b36602b718a5c3a4152960171cb52",
+      "name": "main-matrix"
+    },
+    {
+      "command": "python3 scripts/migration_ledger.py validate",
+      "exit_code": 0,
+      "finished": "2026-11-12T04:13:38+00:00",
+      "log": ".autonomy/logs/migration/M0-CONSOLIDATION.main-migration-ledger.log",
+      "log_sha256": "b44f1386fe9bb17e5dae25043067427ff92d454a0518aa9b67215d52b102dc89",
+      "name": "main-migration-ledger"
+    },
+    {
+      "command": "python3 scripts/test_scripts.py",
+      "exit_code": 0,
+      "finished": "2026-11-12T04:13:44+00:00",
+      "log": ".autonomy/logs/migration/M0-CONSOLIDATION.main-script-tests.log",
+      "log_sha256": "cf00da67076f6a05fde787f6f11e99d0f388264da0fb20e29f4220b5a492b455",
+      "name": "main-script-tests"
+    },
+    {
+      "command": "python3 scripts/validate_autocreator.py",
+      "exit_code": 0,
+      "finished": "2026-11-12T04:13:37+00:00",
+      "log": ".autonomy/logs/migration/M0-CONSOLIDATION.main-steering.log",
+      "log_sha256": "f0edc5c7285c58bafe224ce407c5dd51f81f6bbdc23d2abce419daeb0f00f417",
+      "name": "main-steering"
+    }
+  ],
+  "revision": "841b20be1951c60f06effba3e87943e65e9abea9",
+  "revision_number": 2,
+  "sealed": "2026-11-12T04:15:15+00:00"
+}

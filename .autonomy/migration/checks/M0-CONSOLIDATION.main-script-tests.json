@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "python3",
+    "scripts/test_scripts.py"
+  ],
+  "command": "python3 scripts/test_scripts.py",
+  "elapsed_seconds": 5.982,
+  "exit_code": 0,
+  "finished": "2026-11-12T04:13:44+00:00",
+  "gate": "M0-CONSOLIDATION",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/M0-CONSOLIDATION.main-script-tests.log",
+  "log_sha256": "cf00da67076f6a05fde787f6f11e99d0f388264da0fb20e29f4220b5a492b455",
+  "name": "main-script-tests",
+  "started": "2026-11-12T04:13:38+00:00",
+  "timed_out": false
+}

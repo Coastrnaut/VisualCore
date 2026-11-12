@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "python3",
+    "scripts/validate_docs.py"
+  ],
+  "command": "python3 scripts/validate_docs.py",
+  "elapsed_seconds": 0.045,
+  "exit_code": 0,
+  "finished": "2026-11-12T04:14:58+00:00",
+  "gate": "M0-CONSOLIDATION",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/M0-CONSOLIDATION.m2-docs.log",
+  "log_sha256": "2be410624b22b04650920b4d72a9696b1b0fd3f33aa4a869571aaa616bc96879",
+  "name": "m2-docs",
+  "started": "2026-11-12T04:14:58+00:00",
+  "timed_out": false
+}

@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "python3",
+    "scripts/planning_archive.py",
+    "verify"
+  ],
+  "command": "python3 scripts/planning_archive.py verify",
+  "elapsed_seconds": 0.114,
+  "exit_code": 0,
+  "finished": "2026-11-12T04:14:57+00:00",
+  "gate": "M0-CONSOLIDATION",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/M0-CONSOLIDATION.m2-archive.log",
+  "log_sha256": "14779f99e6041225f018b6a325c4da2f2fa788394862d48ac63879febb6f4dd1",
+  "name": "m2-archive",
+  "started": "2026-11-12T04:14:57+00:00",
+  "timed_out": false
+}
