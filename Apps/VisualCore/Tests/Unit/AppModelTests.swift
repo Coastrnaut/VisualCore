@@ -341,6 +341,34 @@ final class AppModelTests: XCTestCase {
         XCTAssertEqual(model.session.state, .idle)
     }
 
+    /// FR-U04-051: an experience that the failure view's Retry opens again runs with the stored quality override.
+    func testTheQualityOverrideIsAppliedAfterARetry() async throws {
+        let storage = try TestStorage(self)
+        let id = try XCTUnwrap(DebugLaunch.fixtureFreeIDs.first)
+        let calls = LaunchBox()
+        let registry = [ExperienceRegistration(id: id) { launch in
+            calls.values.append(launch)
+            return ExperienceShell(id: id, presenter: DebugPresenter(experienceID: id, launch: launch,
+                                                                     failsSetup: calls.values.count == 1))
+        }]
+        let model = model(storage, registry: registry)
+        model.setQualityOverride(7)
+        let opened = await model.open(id)
+        XCTAssertFalse(opened)
+        XCTAssertEqual(model.session.state, .failed)
+        XCTAssertNil(model.lastAppliedTier)
+
+        // What the Retry button of the failure view does.
+        _ = await model.session.retry()
+        XCTAssertEqual(model.session.state, .running)
+        for _ in 0..<200 where model.lastAppliedTier == nil {
+            try await Task.sleep(nanoseconds: 10_000_000)
+        }
+        XCTAssertEqual(model.lastAppliedTier, 1, "the debug experience declares two tiers; 7 becomes its last one")
+        XCTAssertEqual(calls.values.count, 2)
+        model.closeExperience()
+    }
+
     /// Edge case: leaving while an experience prepares cancels the open and returns to the catalog.
     func testLeavingWhileAnExperiencePreparesCancelsAndReturnsToTheCatalog() async throws {
         let storage = try TestStorage(self)

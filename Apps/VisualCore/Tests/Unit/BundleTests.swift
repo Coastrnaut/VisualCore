@@ -15,6 +15,15 @@ final class BundleTests: XCTestCase {
         XCTAssertNil(info["CFBundleDocumentTypes"])
     }
 
+    /// FR-U04-054: the version the about route shows is the short version and the build of the bundle.
+    func testTheAboutVersionIsTheBundleVersion() throws {
+        let short = try XCTUnwrap(Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String)
+        let build = try XCTUnwrap(Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String)
+        XCTAssertFalse(short.isEmpty)
+        XCTAssertFalse(build.isEmpty)
+        XCTAssertEqual(AboutView.version(), "\(short) (\(build))")
+    }
+
     func testTheCatalogFilesAreBundled() {
         XCTAssertNotNil(Bundle.main.url(forResource: "experiences", withExtension: "json"))
         XCTAssertNotNil(Bundle.main.url(forResource: "categories", withExtension: "json"))

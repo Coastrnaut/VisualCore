@@ -112,6 +112,20 @@ final class SettingsUITests: XCTestCase {
         XCTAssertGreaterThan(entries.count, 0)
     }
 
+    /// Data-model section 5: a debug build shows the diagnostics in the settings; a test argument that the debug
+    /// support does not know is noted there.
+    @MainActor
+    func testTheDiagnosticsNameAnUnknownTestArgument() {
+        let app = launchApp(arguments: Self.fresh + ["-vcBogus"])
+        waitFor(element(app, "vc.route.catalog"))
+        openSettings(app)
+        let diagnostics = element(app, "vc.diagnostics")
+        scrollRoute(app, "vc.route.settings", to: diagnostics)
+        let shown = text(app, of: "vc.diagnostics")
+        XCTAssertTrue(shown.contains("unknownArguments: -vcBogus"), shown)
+        XCTAssertTrue(shown.contains("catalog: loaded: "), shown)
+    }
+
     /// FR-U04-052: the reset of one experience asks first; Cancel removes nothing, Confirm removes only the
     /// data of that experience. `-vcSeedData` gives two fixture experiences a data folder.
     @MainActor

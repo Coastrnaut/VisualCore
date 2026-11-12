@@ -120,6 +120,14 @@ final class LauncherUITests: XCTestCase {
         search.typeText(" zzqqxxzz")
         waitFor(element(app, "vc.nomatch"), timeout: VC.wait)
         XCTAssertEqual(tile(app).count, 0)
+
+        // The clear control empties the field and brings every tile back.
+        let clear = element(app, "vc.search.clear")
+        waitFor(clear, timeout: VC.wait)
+        clear.tap()
+        XCTAssertTrue(waitUntilGone(element(app, "vc.nomatch")))
+        waitFor(element(app, firstIdentifier), timeout: VC.wait)
+        XCTAssertTrue(waitUntilGone(clear), "an empty field has no clear control")
     }
 
     @MainActor
@@ -142,6 +150,11 @@ final class LauncherUITests: XCTestCase {
         waitFor(element(app, "vc.premium.notice"), timeout: VC.wait)
         XCTAssertFalse(element(app, VC.canvas).exists, "a premium experience is not opened by this feature")
         XCTAssertFalse(element(app, "vc.route.experience").exists)
+        let dismiss = element(app, "vc.premium.dismiss")
+        waitFor(dismiss, timeout: VC.wait)
+        dismiss.tap()
+        XCTAssertTrue(waitUntilGone(element(app, "vc.premium.notice")))
+        XCTAssertTrue(element(app, "vc.route.catalog").exists)
     }
 
     @MainActor

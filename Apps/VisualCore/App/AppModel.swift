@@ -136,6 +136,28 @@ final class AppModel {
         diagnostics = AppDiagnostics(catalog: catalogText, registryMismatches: mismatches,
                                      preferencesNote: stored.note, unknownArguments: [], lastReset: [])
         dataNamespaces = folders.existing()
+        watchSession()
+    }
+
+    /// Follows the session's state for as long as the model lives. The session can reach the running state
+    /// without the model: the Retry of its failure view opens the experience again. The stored quality override is
+    /// applied each time the session runs, so that a retried experience gets it as an opened one does (FR-U04-051).
+    private func watchSession() {
+        withObservationTracking {
+            _ = session.state
+        } onChange: { [weak self] in
+            Task { @MainActor [weak self] in
+                guard let self else { return }
+                self.sessionStateChanged()
+                self.watchSession()
+            }
+        }
+    }
+
+    private func sessionStateChanged() {
+        guard session.state == .running else { return }
+        let tier = applyQualityOverride()
+        if tier != lastAppliedTier { lastAppliedTier = tier }
     }
 
     // MARK: - Catalog
