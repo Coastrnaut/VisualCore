@@ -73,3 +73,16 @@ Results after adding the force fields and `liveLimit` (VisualCoreSimulation), `P
 - VisualCoreRendering package tests pass on iOS 27.2 and 26.5 (`t212-rendering-ios27`, `t212-rendering-ios26`,
   enumeration 153/153 each). The VisualCore host suite passes (`t205-visualcore`), and A01's `ParticleReplay` and
   `replay-v1.json` are unchanged (`t205-a01-core`, `t205-pu-core`).
+
+## A04-P03 rerun after G-BLENDTRAIL (T-A04-314, 2026-11-11)
+
+Results after adding `TrailDecay` and `ParticleSystem.liveCount(source:)` (VisualCoreSimulation) and
+`ParticleBlend`, `TrailLayer` and the `ParticleLayerScene` trail options (VisualCoreRendering):
+- `A04-P03/t314-reference-a`: 3/3 (pin `d93edd1` unchanged, reference clean).
+- `t314-reference-b`: 4/4.
+- The ProjectM regression is **7/7 pass** on the first attempt.
+- A01 (`t314-build-GenerativeArtStudio`) and A02 (`t314-build-FluidArtPlayground`) build for testing from clean
+  derived data.
+- VisualCoreRendering package tests pass on iOS 27.2 and 26.5 after the last VisualCore change
+  (`t305-rendering-ios27-2`, `t305-rendering-ios26`, enumeration 166/166 each). The VisualCore host suite passes
+  (`t306-visualcore`); A01's `ParticleReplay` and `replay-v1.json` are unchanged (`t306-a01-core`, `t306-pu-core`).
