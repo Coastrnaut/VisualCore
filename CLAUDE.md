@@ -55,9 +55,13 @@ evidence commands are found as described in Auto-Creator.md §19. Simulators are
    of the first 100 experiences is reached. A long conversation is no reason either: the context is summarized
    automatically, so commit and continue. Do not stop to report progress; the ledgers and the commits carry it.
    The only stops are the four stop conditions of Auto-Creator.md §28 (every ready gate blocked on the owner, an
-   unrepairable validator failure, an unverifiable repository, a forbidden action). At most ten concurrent agents,
-   one writer per file, heavy builds one at a time in the foreground (10 minutes or less per command, split with
-   `--only`/`--skip`).
+   unrepairable validator failure, an unverifiable repository, a forbidden action).
+   **Use multiple agents wherever they make the work faster** (owner ruling of 2026-11-12): independent source and
+   test files of one feature, read-heavy audits, and experiences that touch different files run in parallel
+   agents; coupled design steps stay with the lead. At most ten concurrent agents and one writer per file. Agents
+   do not commit, push or run heavy builds; the lead invokes every Spec Kit skill, runs the builds one at a time
+   in the foreground (10 minutes or less per command, split with `--only`/`--skip`), retests every agent result
+   before a task is ticked (an agent's report is not evidence) and commits.
 8. **Tools.** Claude Desktop Code only. Never the Claude CLI (`claude`, `claude -p`), the Agent SDK or Python that
    calls a model.
 9. **Evidence.** Nothing is fabricated. Simulator results are never device evidence. Device observations from other
