@@ -474,7 +474,7 @@
    "to": "Catalog",
    "action": "new",
    "by": "UA-F01",
-   "state": "pending",
+   "state": "done",
    "note": "Runtime manifest experiences.json, categories.json and path-map.json."
   },
   {

@@ -1,0 +1,33 @@
+{
+  "schema": 1,
+  "categories": [
+    {
+      "id": "create",
+      "title": "Create"
+    },
+    {
+      "id": "audio",
+      "title": "Audio"
+    },
+    {
+      "id": "play",
+      "title": "Play"
+    },
+    {
+      "id": "learn",
+      "title": "Learn"
+    },
+    {
+      "id": "ambient",
+      "title": "Ambient"
+    },
+    {
+      "id": "tools",
+      "title": "Tools"
+    },
+    {
+      "id": "puzzle",
+      "title": "Puzzles"
+    }
+  ]
+}

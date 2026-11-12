@@ -1,0 +1,2006 @@
+{
+  "schema": 1,
+  "catalog_sha256": "8e2cad95fe4fe324dda66484d14c1568cb9ab31f718cc244c02a21ab422c9ce7",
+  "experiences": [
+    {
+      "id": "a01.generative-art-studio",
+      "code": "A01",
+      "title": "Generative Art Studio",
+      "summary": "A curated, touch-responsive procedural-art studio that converts parameterized GPU scenes into saveable compositions.",
+      "kind": "creative",
+      "tier": "free",
+      "category": "create",
+      "family": "Creative and visual",
+      "tags": [
+        "creative-and-visual"
+      ],
+      "order": 1,
+      "palette": [],
+      "tile_seed": 3483897892,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "a02.fluid-art-playground",
+      "code": "A02",
+      "title": "Fluid Art Playground",
+      "summary": "A tactile ink-and-fluid playground driven by a bounded GPU-feedback simulation with clear quality presets.",
+      "kind": "creative",
+      "tier": "free",
+      "category": "create",
+      "family": "Creative and visual",
+      "tags": [
+        "creative-and-visual"
+      ],
+      "order": 2,
+      "palette": [],
+      "tile_seed": 2235648963,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "a03.fractal-explorer",
+      "code": "A03",
+      "title": "Fractal Explorer",
+      "summary": "A navigable, explanatory Mandelbrot and Julia set explorer with reproducible camera bookmarks.",
+      "kind": "creative",
+      "tier": "free",
+      "category": "create",
+      "family": "Creative and visual",
+      "tags": [
+        "creative-and-visual"
+      ],
+      "order": 3,
+      "palette": [],
+      "tile_seed": 76489236,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "a04.particle-universe",
+      "code": "A04",
+      "title": "Particle Universe",
+      "summary": "An interactive particle-field sandbox featuring emitters, forces, trails and presets.",
+      "kind": "creative",
+      "tier": "free",
+      "category": "create",
+      "family": "Creative and visual",
+      "tags": [
+        "creative-and-visual"
+      ],
+      "order": 4,
+      "palette": [],
+      "tile_seed": 807550656,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "a05.infinite-geometry",
+      "code": "A05",
+      "title": "Infinite Geometry",
+      "summary": "An animated geometry laboratory for tilings, kaleidoscopes, procedural objects and camera-driven compositions.",
+      "kind": "creative",
+      "tier": "free",
+      "category": "create",
+      "family": "Creative and visual",
+      "tags": [
+        "creative-and-visual"
+      ],
+      "order": 5,
+      "palette": [],
+      "tile_seed": 393185064,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "a06.visualcore-music-lab",
+      "code": "A06",
+      "title": "VisualCore Music Lab",
+      "summary": "A modern audio-reactive visualizer with oscillograms, spectrum analysis and customizable graphics scenes that is not a ProjectM clone.",
+      "kind": "creative",
+      "tier": "free",
+      "category": "audio",
+      "family": "Music and audio",
+      "tags": [
+        "music-and-audio"
+      ],
+      "order": 6,
+      "palette": [],
+      "tile_seed": 1558176675,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "a07.audio-odyssey",
+      "code": "A07",
+      "title": "Audio Odyssey",
+      "summary": "An audio-reactive journey through procedural tunnels, particle corridors and moving landscapes.",
+      "kind": "creative",
+      "tier": "free",
+      "category": "audio",
+      "family": "Music and audio",
+      "tags": [
+        "music-and-audio"
+      ],
+      "order": 7,
+      "palette": [],
+      "tile_seed": 3017195737,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "a08.oscilloscope-studio",
+      "code": "A08",
+      "title": "Oscilloscope Studio",
+      "summary": "A responsive and technically legible waveform, Lissajous and spectrum display for permitted audio inputs.",
+      "kind": "creative",
+      "tier": "free",
+      "category": "audio",
+      "family": "Music and audio",
+      "tags": [
+        "music-and-audio"
+      ],
+      "order": 8,
+      "palette": [],
+      "tile_seed": 2544392494,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "a09.digital-aquarium",
+      "code": "A09",
+      "title": "Digital Aquarium",
+      "summary": "A calming, customizable underwater habitat with autonomous fish, plants, bubbles and soft lighting.",
+      "kind": "creative",
+      "tier": "free",
+      "category": "audio",
+      "family": "Music and audio",
+      "tags": [
+        "music-and-audio"
+      ],
+      "order": 9,
+      "palette": [],
+      "tile_seed": 2237006121,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "a10.neon-arcade",
+      "code": "A10",
+      "title": "Neon Arcade",
+      "summary": "A compact collection of highly legible arcade games with glow, particles and disciplined game logic.",
+      "kind": "creative",
+      "tier": "free",
+      "category": "play",
+      "family": "Games and interactive experiences",
+      "tags": [
+        "games-and-interactive-experiences"
+      ],
+      "order": 10,
+      "palette": [],
+      "tile_seed": 1936113027,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "a11.physics-playground",
+      "code": "A11",
+      "title": "Physics Playground",
+      "summary": "A deterministic sandbox for gravity, collisions, springs and forces with explanatory overlays.",
+      "kind": "creative",
+      "tier": "free",
+      "category": "play",
+      "family": "Games and interactive experiences",
+      "tags": [
+        "games-and-interactive-experiences"
+      ],
+      "order": 11,
+      "palette": [],
+      "tile_seed": 350328926,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "a12.tiny-worlds",
+      "code": "A12",
+      "title": "Tiny Worlds",
+      "summary": "A curated gallery of miniature procedural environments with orbit navigation and gentle customization.",
+      "kind": "creative",
+      "tier": "free",
+      "category": "play",
+      "family": "Games and interactive experiences",
+      "tags": [
+        "games-and-interactive-experiences"
+      ],
+      "order": 12,
+      "palette": [],
+      "tile_seed": 585748781,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "a13.light-maze",
+      "code": "A13",
+      "title": "Light Maze",
+      "summary": "A precise, tactile light-reflection puzzle game with visually rich beams and deterministic rules.",
+      "kind": "creative",
+      "tier": "free",
+      "category": "play",
+      "family": "Games and interactive experiences",
+      "tags": [
+        "games-and-interactive-experiences"
+      ],
+      "order": 13,
+      "palette": [],
+      "tile_seed": 3689267109,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "a14.solar-system-explorer",
+      "code": "A14",
+      "title": "Solar System Explorer",
+      "summary": "An educational solar system viewer that cleanly distinguishes astronomical scale, time simulation and artistically exaggerated displays.",
+      "kind": "creative",
+      "tier": "free",
+      "category": "learn",
+      "family": "Education and science",
+      "tags": [
+        "education-and-science"
+      ],
+      "order": 14,
+      "palette": [],
+      "tile_seed": 3067068499,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "a15.molecular-explorer",
+      "code": "A15",
+      "title": "Molecular Explorer",
+      "summary": "An approachable 3D molecule viewer with clear atom/bond styling and constrained structured-data import.",
+      "kind": "creative",
+      "tier": "free",
+      "category": "learn",
+      "family": "Education and science",
+      "tags": [
+        "education-and-science"
+      ],
+      "order": 15,
+      "palette": [],
+      "tile_seed": 4166749141,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "a16.simulation-lab",
+      "code": "A16",
+      "title": "Simulation Lab",
+      "summary": "A gallery of inspectable GPU simulations with parameter panels and explicit numerical/educational limitations.",
+      "kind": "creative",
+      "tier": "free",
+      "category": "learn",
+      "family": "Education and science",
+      "tags": [
+        "education-and-science"
+      ],
+      "order": 16,
+      "palette": [],
+      "tile_seed": 2061763513,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "a17.interactive-anatomy",
+      "code": "A17",
+      "title": "Interactive Anatomy",
+      "summary": "A labeled, layer-controlled 3D anatomy reference with trustworthy licensed models and plain-language descriptions.",
+      "kind": "creative",
+      "tier": "free",
+      "category": "learn",
+      "family": "Education and science",
+      "tags": [
+        "education-and-science"
+      ],
+      "order": 17,
+      "palette": [],
+      "tile_seed": 310464051,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "a18.ambient-clock",
+      "code": "A18",
+      "title": "Ambient Clock",
+      "summary": "An elegant, low-power clock that pairs accurate local timekeeping with responsive procedural backgrounds.",
+      "kind": "creative",
+      "tier": "free",
+      "category": "ambient",
+      "family": "Ambient and lifestyle",
+      "tags": [
+        "ambient-and-lifestyle"
+      ],
+      "order": 18,
+      "palette": [],
+      "tile_seed": 2940797539,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "a19.living-wallpapers",
+      "code": "A19",
+      "title": "Living Wallpapers",
+      "summary": "A creator that exports striking still or supported video background files while respecting iOS wallpaper restrictions.",
+      "kind": "creative",
+      "tier": "free",
+      "category": "ambient",
+      "family": "Ambient and lifestyle",
+      "tags": [
+        "ambient-and-lifestyle"
+      ],
+      "order": 19,
+      "palette": [],
+      "tile_seed": 3776902180,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "a20.digital-zen-garden",
+      "code": "A20",
+      "title": "Digital Zen Garden",
+      "summary": "A calm tactile sand-raking and stone-arrangement experience with persistent compositions.",
+      "kind": "creative",
+      "tier": "free",
+      "category": "ambient",
+      "family": "Ambient and lifestyle",
+      "tags": [
+        "ambient-and-lifestyle"
+      ],
+      "order": 20,
+      "palette": [],
+      "tile_seed": 1934530510,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "a21.aurora",
+      "code": "A21",
+      "title": "Aurora",
+      "summary": "A full-screen ambient aurora experience with procedural skies, gentle stars and optional soundscapes.",
+      "kind": "creative",
+      "tier": "free",
+      "category": "ambient",
+      "family": "Ambient and lifestyle",
+      "tags": [
+        "ambient-and-lifestyle"
+      ],
+      "order": 21,
+      "palette": [],
+      "tile_seed": 647181721,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "a22.shader-studio",
+      "code": "A22",
+      "title": "Shader Studio",
+      "summary": "A mobile GLSL ES editor that compiles local shaders, shows diagnostics and safely previews bounded work.",
+      "kind": "creative",
+      "tier": "free",
+      "category": "tools",
+      "family": "Developer and creator tools",
+      "tags": [
+        "developer-and-creator-tools"
+      ],
+      "order": 22,
+      "palette": [],
+      "tile_seed": 3608590787,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "a23.visual-programming-lab",
+      "code": "A23",
+      "title": "Visual Programming Lab",
+      "summary": "A constrained node-graph editor for composing parameterized visuals without writing shader code.",
+      "kind": "creative",
+      "tier": "free",
+      "category": "tools",
+      "family": "Developer and creator tools",
+      "tags": [
+        "developer-and-creator-tools"
+      ],
+      "order": 23,
+      "palette": [],
+      "tile_seed": 2235151530,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "a24.graphics-benchmark-lab",
+      "code": "A24",
+      "title": "Graphics Benchmark Lab",
+      "summary": "A transparent, repeatable suite of GPU graphics workloads and instrumentation with measured-device caveats.",
+      "kind": "creative",
+      "tier": "free",
+      "category": "tools",
+      "family": "Developer and creator tools",
+      "tags": [
+        "developer-and-creator-tools"
+      ],
+      "order": 24,
+      "palette": [],
+      "tile_seed": 1597107587,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "a25.effects-composer",
+      "code": "A25",
+      "title": "Effects Composer",
+      "summary": "A visual effects-chain editor for building, previewing and exporting reusable shader looks.",
+      "kind": "creative",
+      "tier": "free",
+      "category": "tools",
+      "family": "Developer and creator tools",
+      "tags": [
+        "developer-and-creator-tools"
+      ],
+      "order": 25,
+      "palette": [],
+      "tile_seed": 3017671393,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "r02-g01.aurora-loom",
+      "code": "R02-G01",
+      "title": "Aurora Loom",
+      "summary": "Weave and phase-shift 3D luminous ribbons into target harmonies",
+      "kind": "game",
+      "tier": "free",
+      "category": "puzzle",
+      "family": "Light and color",
+      "tags": [
+        "light-and-color"
+      ],
+      "order": 26,
+      "palette": [],
+      "tile_seed": 336522925,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "r02-g02.lissajous-labyrinth",
+      "code": "R02-G02",
+      "title": "Lissajous Labyrinth",
+      "summary": "Tune two coupled frequencies so a moving point traces a safe path",
+      "kind": "game",
+      "tier": "free",
+      "category": "puzzle",
+      "family": "Wave mathematics",
+      "tags": [
+        "wave-mathematics"
+      ],
+      "order": 27,
+      "palette": [],
+      "tile_seed": 2655514513,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "r02-g03.wave-knot-keeper",
+      "code": "R02-G03",
+      "title": "Wave Knot Keeper",
+      "summary": "Drag spectral control points to untie closed three-dimensional wave knots",
+      "kind": "game",
+      "tier": "free",
+      "category": "puzzle",
+      "family": "Wave mathematics",
+      "tags": [
+        "wave-mathematics"
+      ],
+      "order": 28,
+      "palette": [],
+      "tile_seed": 2914899599,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "r02-g04.hue-compass",
+      "code": "R02-G04",
+      "title": "Hue Compass",
+      "summary": "Rotate a spectral compass to find a hidden target in a colored fog field",
+      "kind": "game",
+      "tier": "free",
+      "category": "puzzle",
+      "family": "Chromatic logic",
+      "tags": [
+        "chromatic-logic"
+      ],
+      "order": 29,
+      "palette": [],
+      "tile_seed": 4011485366,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "r02-g05.colorfall-canyons",
+      "code": "R02-G05",
+      "title": "Colorfall Canyons",
+      "summary": "Carve sluices to direct colored light-fluid into target basins",
+      "kind": "game",
+      "tier": "free",
+      "category": "puzzle",
+      "family": "Light and color",
+      "tags": [
+        "light-and-color"
+      ],
+      "order": 30,
+      "palette": [],
+      "tile_seed": 1480865471,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "r02-g06.chrono-constellator",
+      "code": "R02-G06",
+      "title": "Chrono Constellator",
+      "summary": "Record and replay a constellation's motion until all stars align",
+      "kind": "game",
+      "tier": "free",
+      "category": "puzzle",
+      "family": "Temporal puzzles",
+      "tags": [
+        "temporal-puzzles"
+      ],
+      "order": 31,
+      "palette": [],
+      "tile_seed": 362353603,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "r02-g07.amethyst-escape",
+      "code": "R02-G07",
+      "title": "Amethyst Escape",
+      "summary": "Rotate crystalline layers to open a route for a rolling pearl",
+      "kind": "game",
+      "tier": "free",
+      "category": "puzzle",
+      "family": "Crystal solids",
+      "tags": [
+        "crystal-solids"
+      ],
+      "order": 32,
+      "palette": [],
+      "tile_seed": 3542326232,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "r02-g08.faceted-forge",
+      "code": "R02-G08",
+      "title": "Faceted Forge",
+      "summary": "Place cleavage planes to split a glowing crystal into target solids",
+      "kind": "game",
+      "tier": "free",
+      "category": "puzzle",
+      "family": "Crystal solids",
+      "tags": [
+        "crystal-solids"
+      ],
+      "order": 33,
+      "palette": [],
+      "tile_seed": 1607256697,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "r02-g09.nocturne-garden",
+      "code": "R02-G09",
+      "title": "Nocturne Garden",
+      "summary": "Arrange glowing blooms to create a target flower-shaped dark silhouette",
+      "kind": "game",
+      "tier": "free",
+      "category": "puzzle",
+      "family": "Shadow construction",
+      "tags": [
+        "shadow-construction"
+      ],
+      "order": 34,
+      "palette": [],
+      "tile_seed": 3713552974,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "r02-g10.backwards-aurora",
+      "code": "R02-G10",
+      "title": "Backwards Aurora",
+      "summary": "Correct a hidden signal by reversing sections of an auroral wave",
+      "kind": "game",
+      "tier": "free",
+      "category": "puzzle",
+      "family": "Temporal puzzles",
+      "tags": [
+        "temporal-puzzles"
+      ],
+      "order": 35,
+      "palette": [],
+      "tile_seed": 2668167125,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "r02-g11.echo-cartographer",
+      "code": "R02-G11",
+      "title": "Echo Cartographer",
+      "summary": "Touch to emit a pulse, mark reflected obstacles, locate hidden beacons; seeded room generator",
+      "kind": "game",
+      "tier": "free",
+      "category": "puzzle",
+      "family": "Logic and patterns",
+      "tags": [
+        "logic-and-patterns"
+      ],
+      "order": 36,
+      "palette": [],
+      "tile_seed": 622706770,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "r02-g12.harmonic-bridges",
+      "code": "R02-G12",
+      "title": "Harmonic Bridges",
+      "summary": "Tune suspended strings so their resonances solidify walkable bridges",
+      "kind": "game",
+      "tier": "free",
+      "category": "puzzle",
+      "family": "Acoustic geometry",
+      "tags": [
+        "acoustic-geometry"
+      ],
+      "order": 37,
+      "palette": [],
+      "tile_seed": 435727826,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "r02-g13.acoustic-constellator",
+      "code": "R02-G13",
+      "title": "Acoustic Constellator",
+      "summary": "Connect drifting musical nodes so their shared harmonics form celestial diagrams",
+      "kind": "game",
+      "tier": "free",
+      "category": "puzzle",
+      "family": "Acoustic geometry",
+      "tags": [
+        "acoustic-geometry"
+      ],
+      "order": 38,
+      "palette": [],
+      "tile_seed": 863229864,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "r02-g14.moonlit-mechanism",
+      "code": "R02-G14",
+      "title": "Moonlit Mechanism",
+      "summary": "Rotate a clockwork machine until its combined moving shadows spell symbols",
+      "kind": "game",
+      "tier": "free",
+      "category": "puzzle",
+      "family": "Shadow construction",
+      "tags": [
+        "shadow-construction"
+      ],
+      "order": 39,
+      "palette": [],
+      "tile_seed": 1973935519,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "r02-g15.voxel-origami",
+      "code": "R02-G15",
+      "title": "Voxel Origami",
+      "summary": "Reconfigure hinged voxels into a target solid without collisions",
+      "kind": "game",
+      "tier": "free",
+      "category": "puzzle",
+      "family": "Spatial origami",
+      "tags": [
+        "spatial-origami"
+      ],
+      "order": 40,
+      "palette": [],
+      "tile_seed": 2005980415,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "r02-g16.starlit-cartouche",
+      "code": "R02-G16",
+      "title": "Starlit Cartouche",
+      "summary": "Connect a moving starship route into a prescribed ancient symbol",
+      "kind": "game",
+      "tier": "free",
+      "category": "puzzle",
+      "family": "Celestial exploration",
+      "tags": [
+        "celestial-exploration"
+      ],
+      "order": 41,
+      "palette": [],
+      "tile_seed": 1927898377,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "r02-g17.celestial-eclipse-lab",
+      "code": "R02-G17",
+      "title": "Celestial Eclipse Lab",
+      "summary": "Position miniature orbits so sequential eclipses form a target sequence",
+      "kind": "game",
+      "tier": "free",
+      "category": "puzzle",
+      "family": "Celestial exploration",
+      "tags": [
+        "celestial-exploration"
+      ],
+      "order": 42,
+      "palette": [],
+      "tile_seed": 3041427992,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "r02-g18.apsides-workshop",
+      "code": "R02-G18",
+      "title": "Apsides Workshop",
+      "summary": "Tune orbital eccentricity to sweep precise regions of a miniature sky",
+      "kind": "game",
+      "tier": "free",
+      "category": "puzzle",
+      "family": "Orbital dynamics",
+      "tags": [
+        "orbital-dynamics"
+      ],
+      "order": 43,
+      "palette": [],
+      "tile_seed": 1927673211,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "r02-g19.microscopic-aurora",
+      "code": "R02-G19",
+      "title": "Microscopic Aurora",
+      "summary": "Manipulate magnetic swimmers to build a glowing bacterial pattern",
+      "kind": "game",
+      "tier": "free",
+      "category": "puzzle",
+      "family": "Micro ecosystems",
+      "tags": [
+        "micro-ecosystems"
+      ],
+      "order": 44,
+      "palette": [],
+      "tile_seed": 3511848477,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "r02-g20.mushroom-weather",
+      "code": "R02-G20",
+      "title": "Mushroom Weather",
+      "summary": "Arrange fungi to create a stable forest humidity network",
+      "kind": "game",
+      "tier": "free",
+      "category": "puzzle",
+      "family": "Micro ecosystems",
+      "tags": [
+        "micro-ecosystems"
+      ],
+      "order": 45,
+      "palette": [],
+      "tile_seed": 1604298359,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "r02-g21.binary-gardens",
+      "code": "R02-G21",
+      "title": "Binary Gardens",
+      "summary": "Balance twin stars to keep orbiting flower worlds within a light zone",
+      "kind": "game",
+      "tier": "free",
+      "category": "puzzle",
+      "family": "Orbital dynamics",
+      "tags": [
+        "orbital-dynamics"
+      ],
+      "order": 46,
+      "palette": [],
+      "tile_seed": 2293014854,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "r02-g22.mycelium-architect",
+      "code": "R02-G22",
+      "title": "Mycelium Architect",
+      "summary": "Feed fungal networks so glowing veins form a target graph around rocks",
+      "kind": "game",
+      "tier": "free",
+      "category": "puzzle",
+      "family": "Organic growth",
+      "tags": [
+        "organic-growth"
+      ],
+      "order": 47,
+      "palette": [],
+      "tile_seed": 2946499318,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "r02-g23.erosion-painter",
+      "code": "R02-G23",
+      "title": "Erosion Painter",
+      "summary": "Raise and lower terrain to coax rain into carving a target canyon",
+      "kind": "game",
+      "tier": "free",
+      "category": "puzzle",
+      "family": "Terrain alchemy",
+      "tags": [
+        "terrain-alchemy"
+      ],
+      "order": 48,
+      "palette": [],
+      "tile_seed": 2532055081,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "r02-g24.crystal-quarry",
+      "code": "R02-G24",
+      "title": "Crystal Quarry",
+      "summary": "Choose fracture paths to reveal a target gem network in rock",
+      "kind": "game",
+      "tier": "free",
+      "category": "puzzle",
+      "family": "Terrain alchemy",
+      "tags": [
+        "terrain-alchemy"
+      ],
+      "order": 49,
+      "palette": [],
+      "tile_seed": 2683086535,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "r02-g25.starlight-surveyors",
+      "code": "R02-G25",
+      "title": "Starlight Surveyors",
+      "summary": "Rotate a 3D observatory until starlight aligns through viewports",
+      "kind": "game",
+      "tier": "free",
+      "category": "puzzle",
+      "family": "Cosmic puzzles",
+      "tags": [
+        "cosmic-puzzles"
+      ],
+      "order": 50,
+      "palette": [],
+      "tile_seed": 1919287216,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "r03-g01.harmonic-helix",
+      "code": "R03-G01",
+      "title": "Harmonic Helix",
+      "summary": "Adjust phase offsets so three spirals touch fixed target rings",
+      "kind": "game",
+      "tier": "premium",
+      "category": "puzzle",
+      "family": "Wave mathematics",
+      "tags": [
+        "wave-mathematics"
+      ],
+      "order": 51,
+      "palette": [],
+      "tile_seed": 3721204587,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "r03-g02.ripple-clockwork",
+      "code": "R03-G02",
+      "title": "Ripple Clockwork",
+      "summary": "Synchronize circular waves so particles hit target nodes at exact times",
+      "kind": "game",
+      "tier": "premium",
+      "category": "puzzle",
+      "family": "Wave mathematics",
+      "tags": [
+        "wave-mathematics"
+      ],
+      "order": 52,
+      "palette": [],
+      "tile_seed": 463317765,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "r03-g03.prism-symphony",
+      "code": "R03-G03",
+      "title": "Prism Symphony",
+      "summary": "Combine three color waveforms into a target spatial chord",
+      "kind": "game",
+      "tier": "premium",
+      "category": "puzzle",
+      "family": "Chromatic logic",
+      "tags": [
+        "chromatic-logic"
+      ],
+      "order": 53,
+      "palette": [],
+      "tile_seed": 360492566,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "r03-g04.harmonic-archipelago",
+      "code": "R03-G04",
+      "title": "Harmonic Archipelago",
+      "summary": "Tune waves across floating islands to build temporary bridges",
+      "kind": "game",
+      "tier": "premium",
+      "category": "puzzle",
+      "family": "Wave mathematics",
+      "tags": [
+        "wave-mathematics"
+      ],
+      "order": 54,
+      "palette": [],
+      "tile_seed": 867634253,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "r03-g05.color-alchemy-spires",
+      "code": "R03-G05",
+      "title": "Color Alchemy Spires",
+      "summary": "Stack color-transforming towers to turn incoming beams into a target spectrum",
+      "kind": "game",
+      "tier": "premium",
+      "category": "puzzle",
+      "family": "Chromatic logic",
+      "tags": [
+        "chromatic-logic"
+      ],
+      "order": 55,
+      "palette": [],
+      "tile_seed": 328154109,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "r03-g06.gradient-locksmith",
+      "code": "R03-G06",
+      "title": "Gradient Locksmith",
+      "summary": "Rotate color wheels around a 3D lock until matching hues align",
+      "kind": "game",
+      "tier": "premium",
+      "category": "puzzle",
+      "family": "Chromatic logic",
+      "tags": [
+        "chromatic-logic"
+      ],
+      "order": 56,
+      "palette": [],
+      "tile_seed": 4005899807,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "r03-g07.bessel-fountain",
+      "code": "R03-G07",
+      "title": "Bessel Fountain",
+      "summary": "Choose radial wave modes that raise a fountain into a target sculpture",
+      "kind": "game",
+      "tier": "premium",
+      "category": "puzzle",
+      "family": "Wave mathematics",
+      "tags": [
+        "wave-mathematics"
+      ],
+      "order": 57,
+      "palette": [],
+      "tile_seed": 1183118468,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "r03-g08.phase-prism",
+      "code": "R03-G08",
+      "title": "Phase Prism",
+      "summary": "Route coherent light packets through wave-splitting chambers",
+      "kind": "game",
+      "tier": "premium",
+      "category": "puzzle",
+      "family": "Wave mathematics",
+      "tags": [
+        "wave-mathematics"
+      ],
+      "order": 58,
+      "palette": [],
+      "tile_seed": 1647908486,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "r03-g09.polar-waveglass",
+      "code": "R03-G09",
+      "title": "Polar Waveglass",
+      "summary": "Tune radial and angular wave modes to turn a disk into an iris pattern",
+      "kind": "game",
+      "tier": "premium",
+      "category": "puzzle",
+      "family": "Wave mathematics",
+      "tags": [
+        "wave-mathematics"
+      ],
+      "order": 59,
+      "palette": [],
+      "tile_seed": 3425274111,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "r03-g10.standing-wave-garden",
+      "code": "R03-G10",
+      "title": "Standing Wave Garden",
+      "summary": "Change boundary lengths so growing peaks lift tiny seeds into sockets",
+      "kind": "game",
+      "tier": "premium",
+      "category": "puzzle",
+      "family": "Wave mathematics",
+      "tags": [
+        "wave-mathematics"
+      ],
+      "order": 60,
+      "palette": [],
+      "tile_seed": 558275026,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "r03-g11.sinewave-sculptor",
+      "code": "R03-G11",
+      "title": "Sinewave Sculptor",
+      "summary": "Add harmonics to shape a luminous loop into a specified silhouette",
+      "kind": "game",
+      "tier": "premium",
+      "category": "puzzle",
+      "family": "Wave mathematics",
+      "tags": [
+        "wave-mathematics"
+      ],
+      "order": 61,
+      "palette": [],
+      "tile_seed": 2235181624,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "r03-g12.neon-mosaic-route",
+      "code": "R03-G12",
+      "title": "Neon Mosaic Route",
+      "summary": "Move translucent tiles so a color wave traverses every square once",
+      "kind": "game",
+      "tier": "premium",
+      "category": "puzzle",
+      "family": "Chromatic logic",
+      "tags": [
+        "chromatic-logic"
+      ],
+      "order": 62,
+      "palette": [],
+      "tile_seed": 3006825303,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "r03-g13.spectrum-garden",
+      "code": "R03-G13",
+      "title": "Spectrum Garden",
+      "summary": "Balance light wavelengths to make responsive flowers bloom in a pattern",
+      "kind": "game",
+      "tier": "premium",
+      "category": "puzzle",
+      "family": "Chromatic logic",
+      "tags": [
+        "chromatic-logic"
+      ],
+      "order": 63,
+      "palette": [],
+      "tile_seed": 5038753,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "r03-g14.surface-sonata",
+      "code": "R03-G14",
+      "title": "Surface Sonata",
+      "summary": "Tune vibrating heightfield patches to balance rolling beads",
+      "kind": "game",
+      "tier": "premium",
+      "category": "puzzle",
+      "family": "Wave mathematics",
+      "tags": [
+        "wave-mathematics"
+      ],
+      "order": 64,
+      "palette": [],
+      "tile_seed": 3543054739,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "r03-g15.interference-orchard",
+      "code": "R03-G15",
+      "title": "Interference Orchard",
+      "summary": "Coordinate emitter phases so growth spots light up on distant trees",
+      "kind": "game",
+      "tier": "premium",
+      "category": "puzzle",
+      "family": "Wave mathematics",
+      "tags": [
+        "wave-mathematics"
+      ],
+      "order": 65,
+      "palette": [],
+      "tile_seed": 2156363474,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "r03-g16.color-vaults",
+      "code": "R03-G16",
+      "title": "Color Vaults",
+      "summary": "Route light through nested chambers with subtractive filter gates",
+      "kind": "game",
+      "tier": "premium",
+      "category": "puzzle",
+      "family": "Chromatic logic",
+      "tags": [
+        "chromatic-logic"
+      ],
+      "order": 66,
+      "palette": [],
+      "tile_seed": 2896747257,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "r03-g17.photon-orchard",
+      "code": "R03-G17",
+      "title": "Photon Orchard",
+      "summary": "Route colored beams to activate fruit in a 3D glass orchard",
+      "kind": "game",
+      "tier": "premium",
+      "category": "puzzle",
+      "family": "Chromatic logic",
+      "tags": [
+        "chromatic-logic"
+      ],
+      "order": 67,
+      "palette": [],
+      "tile_seed": 3137441548,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "r03-g18.wavefront-weaver",
+      "code": "R03-G18",
+      "title": "Wavefront Weaver",
+      "summary": "Place wave sources so peak interference draws a target contour",
+      "kind": "game",
+      "tier": "premium",
+      "category": "puzzle",
+      "family": "Wave mathematics",
+      "tags": [
+        "wave-mathematics"
+      ],
+      "order": 68,
+      "palette": [],
+      "tile_seed": 2282625201,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "r03-g19.pendulum-timeglass",
+      "code": "R03-G19",
+      "title": "Pendulum Timeglass",
+      "summary": "Shift timelines to synchronize three moving pendulum shadows",
+      "kind": "game",
+      "tier": "premium",
+      "category": "puzzle",
+      "family": "Temporal puzzles",
+      "tags": [
+        "temporal-puzzles"
+      ],
+      "order": 69,
+      "palette": [],
+      "tile_seed": 555076303,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "r03-g20.time-lock-labyrinth",
+      "code": "R03-G20",
+      "title": "Time-Lock Labyrinth",
+      "summary": "Synchronize repeating gates with a moving light traveler",
+      "kind": "game",
+      "tier": "premium",
+      "category": "puzzle",
+      "family": "Temporal puzzles",
+      "tags": [
+        "temporal-puzzles"
+      ],
+      "order": 70,
+      "palette": [],
+      "tile_seed": 1090947670,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "r03-g21.phase-garden",
+      "code": "R03-G21",
+      "title": "Phase Garden",
+      "summary": "Bring three time-shifted flowers into bloom at the same instant",
+      "kind": "game",
+      "tier": "premium",
+      "category": "puzzle",
+      "family": "Temporal puzzles",
+      "tags": [
+        "temporal-puzzles"
+      ],
+      "order": 71,
+      "palette": [],
+      "tile_seed": 18313734,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "r03-g22.moire-observatory",
+      "code": "R03-G22",
+      "title": "Moire Observatory",
+      "summary": "Rotate layered lattices until interference reveals hidden constellation points",
+      "kind": "game",
+      "tier": "premium",
+      "category": "puzzle",
+      "family": "Wave mathematics",
+      "tags": [
+        "wave-mathematics"
+      ],
+      "order": 72,
+      "palette": [],
+      "tile_seed": 2338819356,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "r03-g23.aurora-geode",
+      "code": "R03-G23",
+      "title": "Aurora Geode",
+      "summary": "Tune internal light sources to project a matching aurora outside crystal",
+      "kind": "game",
+      "tier": "premium",
+      "category": "puzzle",
+      "family": "Crystal solids",
+      "tags": [
+        "crystal-solids"
+      ],
+      "order": 73,
+      "palette": [],
+      "tile_seed": 471833266,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "r03-g24.snowflake-foundry",
+      "code": "R03-G24",
+      "title": "Snowflake Foundry",
+      "summary": "Configure six symmetric branching rules to make a target ice form",
+      "kind": "game",
+      "tier": "premium",
+      "category": "puzzle",
+      "family": "Crystal solids",
+      "tags": [
+        "crystal-solids"
+      ],
+      "order": 74,
+      "palette": [],
+      "tile_seed": 781400785,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "r03-g25.geode-locksmith",
+      "code": "R03-G25",
+      "title": "Geode Locksmith",
+      "summary": "Cut and rotate nested geode rings to align hidden crystalline keys",
+      "kind": "game",
+      "tier": "premium",
+      "category": "puzzle",
+      "family": "Crystal solids",
+      "tags": [
+        "crystal-solids"
+      ],
+      "order": 75,
+      "palette": [],
+      "tile_seed": 3907398687,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "r04-g01.icy-polyhedron",
+      "code": "R04-G01",
+      "title": "Icy Polyhedron",
+      "summary": "Reconfigure edges of frozen solids while preserving volume",
+      "kind": "game",
+      "tier": "premium",
+      "category": "puzzle",
+      "family": "Crystal solids",
+      "tags": [
+        "crystal-solids"
+      ],
+      "order": 76,
+      "palette": [],
+      "tile_seed": 2835194433,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "r04-g02.crystal-phase-shift",
+      "code": "R04-G02",
+      "title": "Crystal Phase Shift",
+      "summary": "Change a mineral lattice phase to unlock a three-dimensional channel",
+      "kind": "game",
+      "tier": "premium",
+      "category": "puzzle",
+      "family": "Crystal solids",
+      "tags": [
+        "crystal-solids"
+      ],
+      "order": 77,
+      "palette": [],
+      "tile_seed": 3725412242,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "r04-g03.diamond-pulse",
+      "code": "R04-G03",
+      "title": "Diamond Pulse",
+      "summary": "Time crystal rotations so a traveling flash survives every split",
+      "kind": "game",
+      "tier": "premium",
+      "category": "puzzle",
+      "family": "Crystal solids",
+      "tags": [
+        "crystal-solids"
+      ],
+      "order": 78,
+      "palette": [],
+      "tile_seed": 1166541059,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "r04-g04.octahedral-orchard",
+      "code": "R04-G04",
+      "title": "Octahedral Orchard",
+      "summary": "Connect branching octahedron clusters into a stable luminous canopy",
+      "kind": "game",
+      "tier": "premium",
+      "category": "puzzle",
+      "family": "Crystal solids",
+      "tags": [
+        "crystal-solids"
+      ],
+      "order": 79,
+      "palette": [],
+      "tile_seed": 353443138,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "r04-g05.echo-harmonics",
+      "code": "R04-G05",
+      "title": "Echo Harmonics",
+      "summary": "Adjust frequency bands to expose a hidden geometric object",
+      "kind": "game",
+      "tier": "premium",
+      "category": "puzzle",
+      "family": "Wave mathematics",
+      "tags": [
+        "wave-mathematics"
+      ],
+      "order": 80,
+      "palette": [],
+      "tile_seed": 787524,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "r04-g06.memory-marble",
+      "code": "R04-G06",
+      "title": "Memory Marble",
+      "summary": "Replay and edit a previous rolling trajectory to avoid a collision",
+      "kind": "game",
+      "tier": "premium",
+      "category": "puzzle",
+      "family": "Temporal puzzles",
+      "tags": [
+        "temporal-puzzles"
+      ],
+      "order": 81,
+      "palette": [],
+      "tile_seed": 1672510140,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "r04-g07.echoes-of-stone",
+      "code": "R04-G07",
+      "title": "Echoes of Stone",
+      "summary": "Carve a stone once per loop to reroute future light pulses",
+      "kind": "game",
+      "tier": "premium",
+      "category": "puzzle",
+      "family": "Temporal puzzles",
+      "tags": [
+        "temporal-puzzles"
+      ],
+      "order": 82,
+      "palette": [],
+      "tile_seed": 4016674691,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "r04-g08.hourglass-gravity",
+      "code": "R04-G08",
+      "title": "Hourglass Gravity",
+      "summary": "Reverse one local gravity field at a chosen time to route falling pearls",
+      "kind": "game",
+      "tier": "premium",
+      "category": "puzzle",
+      "family": "Temporal puzzles",
+      "tags": [
+        "temporal-puzzles"
+      ],
+      "order": 83,
+      "palette": [],
+      "tile_seed": 3019912130,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "r04-g09.color-vortex",
+      "code": "R04-G09",
+      "title": "Color Vortex",
+      "summary": "Position angular emitters to bring rotating color streams into phase",
+      "kind": "game",
+      "tier": "premium",
+      "category": "puzzle",
+      "family": "Chromatic logic",
+      "tags": [
+        "chromatic-logic"
+      ],
+      "order": 84,
+      "palette": [],
+      "tile_seed": 3364378456,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "r04-g10.candle-geometry",
+      "code": "R04-G10",
+      "title": "Candle Geometry",
+      "summary": "Move tiny light sources around solids to animate a shadow poem",
+      "kind": "game",
+      "tier": "premium",
+      "category": "puzzle",
+      "family": "Shadow construction",
+      "tags": [
+        "shadow-construction"
+      ],
+      "order": 85,
+      "palette": [],
+      "tile_seed": 113607350,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "r04-g11.umbra-rings",
+      "code": "R04-G11",
+      "title": "Umbra Rings",
+      "summary": "Arrange orbital rings to form target overlapping dark discs",
+      "kind": "game",
+      "tier": "premium",
+      "category": "puzzle",
+      "family": "Shadow construction",
+      "tags": [
+        "shadow-construction"
+      ],
+      "order": 86,
+      "palette": [],
+      "tile_seed": 1972100524,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "r04-g12.nightfall-sculptor",
+      "code": "R04-G12",
+      "title": "Nightfall Sculptor",
+      "summary": "Transform a mesh through a sequence of target shadow silhouettes",
+      "kind": "game",
+      "tier": "premium",
+      "category": "puzzle",
+      "family": "Shadow construction",
+      "tags": [
+        "shadow-construction"
+      ],
+      "order": 87,
+      "palette": [],
+      "tile_seed": 390844587,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "r04-g13.lumen-sudoku",
+      "code": "R04-G13",
+      "title": "Lumen Sudoku",
+      "summary": "Solve a three-dimensional color placement puzzle across layered cubes",
+      "kind": "game",
+      "tier": "premium",
+      "category": "puzzle",
+      "family": "Chromatic logic",
+      "tags": [
+        "chromatic-logic"
+      ],
+      "order": 88,
+      "palette": [],
+      "tile_seed": 3377653410,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "r04-g14.eclipse-lantern",
+      "code": "R04-G14",
+      "title": "Eclipse Lantern",
+      "summary": "Reposition planets and lamps so a room's shadow sequence repeats",
+      "kind": "game",
+      "tier": "premium",
+      "category": "puzzle",
+      "family": "Shadow construction",
+      "tags": [
+        "shadow-construction"
+      ],
+      "order": 89,
+      "palette": [],
+      "tile_seed": 2216592318,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "r04-g15.clockwave-harbor",
+      "code": "R04-G15",
+      "title": "Clockwave Harbor",
+      "summary": "Phase-shift small orbital vessels to dock in a single time window",
+      "kind": "game",
+      "tier": "premium",
+      "category": "puzzle",
+      "family": "Temporal puzzles",
+      "tags": [
+        "temporal-puzzles"
+      ],
+      "order": 90,
+      "palette": [],
+      "tile_seed": 2467412310,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "r04-g16.prism-pathways",
+      "code": "R04-G16",
+      "title": "Prism Pathways",
+      "summary": "Rotate prisms to connect color-filtered light emitters to terminal crystals",
+      "kind": "game",
+      "tier": "premium",
+      "category": "puzzle",
+      "family": "Spatial puzzles",
+      "tags": [
+        "spatial-puzzles"
+      ],
+      "order": 91,
+      "palette": [],
+      "tile_seed": 1301519731,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "r04-g17.longlight-labyrinth",
+      "code": "R04-G17",
+      "title": "Longlight Labyrinth",
+      "summary": "Shift time-of-day to reveal a hidden route drawn by cast shadows",
+      "kind": "game",
+      "tier": "premium",
+      "category": "puzzle",
+      "family": "Shadow construction",
+      "tags": [
+        "shadow-construction"
+      ],
+      "order": 92,
+      "palette": [],
+      "tile_seed": 2654625664,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "r04-g18.iridescent-channels",
+      "code": "R04-G18",
+      "title": "Iridescent Channels",
+      "summary": "Reorder wavelength filters to route colors through branching tubes",
+      "kind": "game",
+      "tier": "premium",
+      "category": "puzzle",
+      "family": "Chromatic logic",
+      "tags": [
+        "chromatic-logic"
+      ],
+      "order": 93,
+      "palette": [],
+      "tile_seed": 3014121144,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "r04-g19.lattice-bloom",
+      "code": "R04-G19",
+      "title": "Lattice Bloom",
+      "summary": "Rotate repeated crystal unit cells until a glowing lattice closes",
+      "kind": "game",
+      "tier": "premium",
+      "category": "puzzle",
+      "family": "Crystal solids",
+      "tags": [
+        "crystal-solids"
+      ],
+      "order": 94,
+      "palette": [],
+      "tile_seed": 2828232967,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "r04-g20.glass-knot-studio",
+      "code": "R04-G20",
+      "title": "Glass Knot Studio",
+      "summary": "Thread transparent geometric ropes through interlocking crystal loops",
+      "kind": "game",
+      "tier": "premium",
+      "category": "puzzle",
+      "family": "Crystal solids",
+      "tags": [
+        "crystal-solids"
+      ],
+      "order": 95,
+      "palette": [],
+      "tile_seed": 749733140,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "r04-g21.time-ribbon-relay",
+      "code": "R04-G21",
+      "title": "Time Ribbon Relay",
+      "summary": "Rewind a moving light ribbon while changing one obstacle per loop",
+      "kind": "game",
+      "tier": "premium",
+      "category": "puzzle",
+      "family": "Temporal puzzles",
+      "tags": [
+        "temporal-puzzles"
+      ],
+      "order": 96,
+      "palette": [],
+      "tile_seed": 1610046360,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "r04-g22.gemstone-telegraph",
+      "code": "R04-G22",
+      "title": "Gemstone Telegraph",
+      "summary": "Encode and decode light pulses across a network of faceted prism towers",
+      "kind": "game",
+      "tier": "premium",
+      "category": "puzzle",
+      "family": "Wave optics",
+      "tags": [
+        "wave-optics"
+      ],
+      "order": 97,
+      "palette": [],
+      "tile_seed": 113955797,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "r04-g23.soundglass-observatory",
+      "code": "R04-G23",
+      "title": "Soundglass Observatory",
+      "summary": "Tilt sound-sensitive glass to project wave shapes into geometric constellations",
+      "kind": "game",
+      "tier": "premium",
+      "category": "puzzle",
+      "family": "Acoustic geometry",
+      "tags": [
+        "acoustic-geometry"
+      ],
+      "order": 98,
+      "palette": [],
+      "tile_seed": 373473922,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "r04-g24.refraction-foundry",
+      "code": "R04-G24",
+      "title": "Refraction Foundry",
+      "summary": "Shape virtual lenses to focus colored beams at targets inside a glass furnace",
+      "kind": "game",
+      "tier": "premium",
+      "category": "puzzle",
+      "family": "Wave optics",
+      "tags": [
+        "wave-optics"
+      ],
+      "order": 99,
+      "palette": [],
+      "tile_seed": 2471141050,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    },
+    {
+      "id": "r04-g25.prism-terrace",
+      "code": "R04-G25",
+      "title": "Prism Terrace",
+      "summary": "Stack rotating faceted platforms to redirect beams toward a center",
+      "kind": "game",
+      "tier": "premium",
+      "category": "puzzle",
+      "family": "Crystal solids",
+      "tags": [
+        "crystal-solids"
+      ],
+      "order": 100,
+      "palette": [],
+      "tile_seed": 506741280,
+      "capabilities": [],
+      "quality_tiers": [],
+      "content": null,
+      "available": false
+    }
+  ]
+}
