@@ -46,7 +46,32 @@ Canonical overrides:
 
 ## Clarifications
 
-(none yet)
+### Session 2026-11-12
+
+Answered by the lead under the owner's standing delegation; the recommended option was taken each time.
+
+- Q: In what form does an experience report that its outcome was reached, so that the completion scenario can
+  check it? → A: As an optional outcome that the core derives from its own state when asked (none by default),
+  surfaced through the engine and the diagnostics. It is never stored, so it adds nothing to snapshots or
+  digests. A manifest can only expect it, never set it.
+- Q: Do the three further audits of Auto-Creator.md section 22.2 belong to this feature? They cover direct GL
+  calls outside the framework, a premium experience opening without entitlement, and network symbols. → A: The
+  direct-GL and network-symbol audits run in `--audits` here, reusing the existing isolation and compliance
+  checks. The entitlement audit belongs to UA-F08, which builds the entitlement; `--audits` names it as "not yet
+  provided (UA-F08)" and does not report it as passed.
+- Q: Where does the app write its evidence record, and what removes it? → A: In
+  `Documents/visualcore-evidence/<run id>/<experience>.<scenario>.json` of its own container, written atomically.
+  The driver copies it out and then removes it. The container inventory of builds made for testing lists that
+  folder with the runner as its writer.
+- Q: How does the marker audit tell a real placeholder from the word used as a technical term in code? → A: TODO,
+  FIXME and XXX are markers wherever they appear in comments or strings. "lorem ipsum", "coming soon" and
+  "placeholder" are markers in text a person can see: the string catalog and string literals of views. A name or
+  comment in code that uses "placeholder" as a technical term is not a marker. No list of exceptions is kept.
+- Q: How are the sample experience (tests only) and the app's debug experience verified, since neither is a
+  catalog experience? → A: `--only a99.contract-sample` runs the scenarios through the package tests on each
+  runtime, whose result bundles the driver checks. The app path is proven with the debug experience under its
+  first fixture id, which the runner registers by itself in builds made for testing, with no launch argument.
+  Real experiences run in the app path.
 
 ## Absorbed source requirements
 
@@ -289,8 +314,9 @@ a Round 3 game without fault cases (fail); run the hero image checks on a drawn 
 - **FR-U09-003**: Expectations MUST cover, as the scenario needs: the result of each action (accepted, or
   rejected with a reason code), the digest after chosen steps, the initial and final digest, the probes of the
   rendered frame, and the outcome.
-- **FR-U09-004**: An experience MUST be able to report an outcome (for example a level solved, or work saved)
-  from its own state. The completion scenario passes only when the experience reports the expected outcome after
+- **FR-U09-004**: An experience MUST be able to report an outcome (for example a level solved, or work saved),
+  derived from its own state when asked and absent by default. The outcome is never stored, so it changes no
+  snapshot or digest. The completion scenario passes only when the experience reports the expected outcome after
   the scripted actions; a manifest cannot set it.
 - **FR-U09-005**: Creative experiences MUST add one scenario per regression fixture of their card. Games MUST
   add `full-playthrough`, `hero`, the acceptance scenarios of their chapter (80) and, from Round 3, the
@@ -342,6 +368,9 @@ a Round 3 game without fault cases (fail); run the hero image checks on a drawn 
   with failures, and a device record with a hardware identifier. It has self-tests.
 - **FR-U09-033**: Tracked summaries MUST go under `docs/verification/`; raw logs, frames and result bundles stay in
   untracked folders and are referenced by hash.
+- **FR-U09-034**: The app MUST write its record atomically to `Documents/visualcore-evidence/<run id>/` of its
+  own container. The driver removes the record after copying it. The container inventory of builds made for
+  testing lists that folder.
 
 **Frames (story 5)**
 - **FR-U09-040**: A drawing scenario MUST read its frame from the real renderer and check that it is not blank
@@ -352,8 +381,9 @@ a Round 3 game without fault cases (fail); run the hero image checks on a drawn 
   bounds.
 
 **Audits (story 7)**
-- **FR-U09-050**: An audit MUST fail on TODO, FIXME, XXX, "lorem ipsum" or "coming soon" in shipped sources, and on
-  "placeholder" text a person can see. A technical use in code is listed and accepted by a reviewed rule.
+- **FR-U09-050**: An audit MUST fail on TODO, FIXME or XXX in comments or strings of shipped sources. It MUST also
+  fail on "lorem ipsum", "coming soon" or "placeholder" in text a person can see: the string catalog and string
+  literals of views. "placeholder" as a technical term in code is not a marker. No list of exceptions is kept.
 - **FR-U09-051**: An audit MUST fail on any raster file in the shipped sources and resources other than an app
   icon produced by a generator in the repository.
 - **FR-U09-052**: An audit MUST fail on a scenario that bypasses the real reducer: a step without an action of a
@@ -362,6 +392,8 @@ a Round 3 game without fault cases (fail); run the hero image checks on a drawn 
 - **FR-U09-053**: An audit MUST fail on content counts below the source specification: the scenario counts of a
   manifest, and for a game its levels, acceptance scenarios and fault cases compared with the planning catalog.
 - **FR-U09-054**: The audits MUST read the tracked files only, so that build products are never audited.
+- **FR-U09-055**: `--audits` MUST also run the direct-GL check and the network-symbol check of section 22.2 with the
+  existing tools. It MUST name the entitlement audit as not yet provided (UA-F08) and never report it as passed.
 
 **Boundaries and carried obligations**
 - **FR-U09-060**: The driver MUST run `--only a99.contract-sample --scenario endurance --runtime 27`, which is the
@@ -413,14 +445,9 @@ a Round 3 game without fault cases (fail); run the hero image checks on a drawn 
 
 ## Assumptions
 
-- The sample experience exists only for tests and cannot be linked into the app. Its scenarios run on the
-  simulators through the package tests, whose result bundles the driver checks. The app path of the runner is
-  proven with the app's debug experience.
+- The sample experience exists only for tests and cannot be linked into the app (clarification 5).
 - A Round 2 game counts 80 acceptance scenarios and 100 levels, and a Round 3 or 4 game also 50 fault cases, as
   the planning catalog says. A creative experience counts its regression fixtures. Fixture manifests prove the
   rules, because no game exists yet.
-- The audits of section 22.2 beyond this feature's list are left to the features that own them: direct GL calls
-  are already checked by the app isolation tool, premium without entitlement belongs to UA-F08, and network
-  symbols to UA-F11. Clarification may move them here.
 - Pacing, thermal state and battery on simulators are development signals, recorded and never claimed for
   devices.
