@@ -27,6 +27,38 @@ Canonical overrides:
 - **What exists today:** the planning catalog `docs/catalog/experience-catalog.json` with 300 experiences, of which
   100 are the launch set. No experience is integrated in the unified app yet, so no experience is available.
 
+## Clarifications
+
+### Session 2026-11-12
+
+Answered by the engineer under the owner's standing delegation (ADR-0004 decision 3), recommended option first. No
+question concerned an Apple API, a thread-ownership rule or a device measurement: the module is pure data and
+text handling.
+
+- Q: Which ids does the golden list freeze while no experience has shipped yet? → A: All 300 ids of the planning
+  catalog, from now on. Storage names, evidence files and ledger gates are derived from ids long before the
+  release, so an id is treated as shipped the moment the catalog defines it. Rejected: freezing only the 100 launch
+  ids (a backlog id could then drift unnoticed until its round starts).
+- Q: Where does a built experience declare what the manifest needs from it (capabilities, quality tiers, tile
+  colors, content facts)? → A: In one tracked file of registrations keyed by id, with a schema version, read by the
+  build tool. It is empty today. An entry without a registration has empty lists and no content facts and can
+  never be available; the tile seed of every entry is derived from its id. Rejected: reading these facts out of
+  program source (fragile) and typing them into the manifest by hand (the manifest is generated).
+- Q: What are the size cap and the limits of the loader? → A: 1,048,576 bytes for each catalog file; at most 400
+  entries; a title of 1 to 80 characters, a summary of at most 300, a family of 1 to 60; at most 16 tags of at
+  most 60 characters each; at most 8 tile colors, 16 capabilities and 8 quality tiers; catalog order 1 to 9,999;
+  tile seed 0 to 4,294,967,295; level count 0 to 10,000. The planning catalog today needs 23, 136 and 33
+  characters for its longest title, summary and family.
+- Q: How exactly is text folded for search, and how are results ordered? → A: Folding is: compatibility
+  decomposition, removal of combining marks, lower case by the language-independent Unicode mapping, the dotless i
+  read as i, and every run of white space as one space. A word of the search text matches a field when the folded
+  field contains it. An entry's rank is the weakest field any of its words needed (title, then tags, then
+  summary); results are ordered by rank and then by catalog order.
+- Q: Is a manifest with an unknown key or a higher schema version read as far as it is understood? → A: No. Only
+  schema version 1 loads, and a key that version 1 does not define is refused like a missing one. The manifest is
+  generated from the same commit as the loader, so strictness costs nothing and catches drift. A change of shape
+  is a new schema version with a loader that reads both.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Every experience has one identity that never changes (Priority: P1) 🎯
@@ -199,8 +231,8 @@ duplicate registration, and compare the report.
 - **Memory pressure**: the loader refuses data over the cap before parsing, bounds every text and list, and keeps
   one catalog value; it needs no cache that could grow.
 - **Corrupted data**: any damage gives a typed error (User Story 3); the app can show a failure and stay usable.
-- **Newer-version data**: a manifest of a higher schema version is refused with the versions in the error; the
-  loader never guesses at unknown fields of a known version: they are ignored only when the schema says so.
+- **Newer-version data**: a manifest of a higher schema version is refused with the versions in the error, and a
+  key that the known version does not define is refused too; the loader never guesses.
 - **Unicode in text**: titles such as "Moire Observatory" or a future title with accents, a dotless or dotted
   capital I, or full-width letters are searched by the same folding on every device.
 - **Backlog rounds**: an experience of Rounds 5 to 12 enters the manifest only when its round is added to the
@@ -247,23 +279,29 @@ duplicate registration, and compare the report.
 - **FR-U01-022**: The category list MUST hold the seven categories in launcher order with a title each; it MUST be
   loaded with the same bounds and typed errors as the manifest, and a manifest entry whose category is not in the
   list MUST fail validation.
-- **FR-U01-023**: Search MUST cover title, summary and tags; MUST ignore letter case, accents and extra spaces;
-  MUST require every word of the search text to match; and MUST order results by a stated rule (a match in the
-  title before a match only in tags, before a match only in the summary; ties in catalog order).
+- **FR-U01-023**: Search MUST cover title, summary and tags. Text MUST be folded by compatibility decomposition,
+  removal of combining marks, lower case by the language-independent Unicode mapping, the dotless i read as i, and
+  every run of white space as one space. Every word of the search text MUST be contained in a folded field. An
+  entry's rank is the weakest field any of its words needed (title, then tags, then summary); results MUST be
+  ordered by rank and then by catalog order.
 - **FR-U01-024**: Search MUST give identical results and order regardless of the device's language and region
   settings, and for an empty text MUST return every entry in catalog order.
 
 **Bounded loading**
 
-- **FR-U01-030**: The loader MUST refuse data over a stated size cap before parsing it.
+- **FR-U01-030**: The loader MUST refuse data over 1,048,576 bytes before parsing it, for each catalog file, and
+  MUST refuse a manifest of more than 400 entries.
 - **FR-U01-031**: The loader MUST refuse a schema version other than the supported one and report both versions.
 - **FR-U01-032**: The loader MUST refuse duplicate ids, duplicate codes and duplicate order numbers and name the
   duplicate.
-- **FR-U01-033**: The loader MUST refuse an entry with a missing field, a field of the wrong type, an unknown
-  tier, kind or category, an empty title, a text longer than its limit or a list longer than its limit, naming
-  the entry and the field.
+- **FR-U01-033**: The loader MUST refuse an entry with a missing field, a field of the wrong type, a key that the
+  schema does not define, an unknown tier, kind or category, an empty title, a text longer than its limit or a
+  list longer than its limit, naming the entry and the field. The limits are: title 1 to 80 characters, summary
+  at most 300, family 1 to 60, at most 16 tags of at most 60 characters, at most 8 tile colors, 16 capabilities
+  and 8 quality tiers.
 - **FR-U01-034**: The loader MUST refuse a number that is not finite, not whole where a whole number is required,
-  or outside its stated range, naming the entry and the field.
+  or outside its range, naming the entry and the field. The ranges are: catalog order 1 to 9,999, tile seed 0 to
+  4,294,967,295, level count 0 to 10,000.
 - **FR-U01-035**: Every refusal MUST be one typed error value that a caller can compare; the loader MUST NOT crash
   and MUST NOT return a partly loaded catalog.
 - **FR-U01-036**: Loading MUST be deterministic and MUST NOT read the clock, the language settings, the network or
@@ -272,12 +310,14 @@ duplicate registration, and compare the report.
 **Availability and the build tool**
 
 - **FR-U01-040**: The build tool MUST derive the runtime manifest from the planning catalog, the migration ledger
-  and the registrations of experiences, and MUST record in the manifest the hash of the planning catalog it was
-  built from.
+  and one tracked file of registrations keyed by id, and MUST record in the manifest the hash of the planning
+  catalog it was built from. An entry without a registration MUST have empty lists of capabilities, quality tiers
+  and tile colors and no content facts; the tile seed of every entry MUST be derived from its id alone.
 - **FR-U01-041**: An entry MUST be marked available only when its integration gate `X-<code>` is pass in the
   migration ledger; for every other gate status it MUST be marked not available.
 - **FR-U01-042**: The build tool MUST refuse to mark an experience available whose registration is missing, and
-  MUST name it.
+  MUST name it. It MUST refuse a registration for an id that the planning catalog does not define, and a
+  registrations file of another schema version.
 - **FR-U01-043**: The build tool MUST have a check mode that compares the committed manifest files with what it
   would write, fails naming the first difference, and writes nothing.
 - **FR-U01-044**: The build tool MUST write each file completely or not at all, MUST produce the same bytes for
@@ -315,8 +355,8 @@ duplicate registration, and compare the report.
 - **Category**: one of seven launcher groups, with an order and a title.
 - **Catalog manifest**: the validated set of descriptors with its schema version and the hash of the planning
   catalog it came from.
-- **Registration**: what a built experience declares about itself (capabilities, quality tiers, tile data, content
-  facts). None exists yet.
+- **Registration**: what a built experience declares about itself (capabilities, quality tiers, tile colors,
+  content facts), kept in one tracked file keyed by id. The file exists and is empty today.
 - **Golden id list**: the committed list of every id ever defined; it only grows.
 - **Path map**: the record of source moves of the migration; empty until the first move.
 - **Registry report**: the result of comparing registered ids with available entries.
