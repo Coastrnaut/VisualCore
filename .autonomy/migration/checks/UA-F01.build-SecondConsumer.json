@@ -1,0 +1,26 @@
+{
+  "argv": [
+    "xcodebuild",
+    "build-for-testing",
+    "-project",
+    "Harnesses/SecondConsumer/SecondConsumer.xcodeproj",
+    "-scheme",
+    "SecondConsumer",
+    "-destination",
+    "generic/platform=iOS Simulator",
+    "-derivedDataPath",
+    "Build/DerivedData/ua-f01-SecondConsumer",
+    "CODE_SIGNING_ALLOWED=NO"
+  ],
+  "command": "xcodebuild build-for-testing -project Harnesses/SecondConsumer/SecondConsumer.xcodeproj -scheme SecondConsumer -destination 'generic/platform=iOS Simulator' -derivedDataPath Build/DerivedData/ua-f01-SecondConsumer CODE_SIGNING_ALLOWED=NO",
+  "elapsed_seconds": 11.632,
+  "exit_code": 0,
+  "finished": "2026-11-12T06:05:43+00:00",
+  "gate": "UA-F01",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F01.build-SecondConsumer.log",
+  "log_sha256": "471b3a3bcfe73f9594e85d9452100d59e4702c433b1be573f900dc41049c3b0b",
+  "name": "build-SecondConsumer",
+  "started": "2026-11-12T06:05:32+00:00",
+  "timed_out": false
+}

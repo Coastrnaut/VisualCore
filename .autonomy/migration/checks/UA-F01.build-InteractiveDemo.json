@@ -1,0 +1,26 @@
+{
+  "argv": [
+    "xcodebuild",
+    "build-for-testing",
+    "-project",
+    "Harnesses/InteractiveDemo/InteractiveDemo.xcodeproj",
+    "-scheme",
+    "InteractiveDemo",
+    "-destination",
+    "generic/platform=iOS Simulator",
+    "-derivedDataPath",
+    "Build/DerivedData/ua-f01-InteractiveDemo",
+    "CODE_SIGNING_ALLOWED=NO"
+  ],
+  "command": "xcodebuild build-for-testing -project Harnesses/InteractiveDemo/InteractiveDemo.xcodeproj -scheme InteractiveDemo -destination 'generic/platform=iOS Simulator' -derivedDataPath Build/DerivedData/ua-f01-InteractiveDemo CODE_SIGNING_ALLOWED=NO",
+  "elapsed_seconds": 8.788,
+  "exit_code": 0,
+  "finished": "2026-11-12T06:05:32+00:00",
+  "gate": "UA-F01",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F01.build-InteractiveDemo.log",
+  "log_sha256": "fd8d819a389d6ea786d5869c6900fdbdef6de755ce84994e8427b4fced346fd6",
+  "name": "build-InteractiveDemo",
+  "started": "2026-11-12T06:05:23+00:00",
+  "timed_out": false
+}
