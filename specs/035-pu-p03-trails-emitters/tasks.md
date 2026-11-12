@@ -46,7 +46,7 @@ passes and the named tests are green.
 
 ## Phase 6: Polish & cross-cutting
 
-- [ ] T-A04-313 Update `docs/apps/particle-universe/visualcore-contract.json` (gate A04-P03; G-BLENDTRAIL closed with `ParticleBlend`, `TrailLayer`, `TrailDecay` and tests; M04 and M08 available; decision reason) and re-render the `.md`; `check_app_contract.py --app particle-universe` passes (FR-A04-307).
+- [X] T-A04-313 Update `docs/apps/particle-universe/visualcore-contract.json` (gate A04-P03; G-BLENDTRAIL closed with `ParticleBlend`, `TrailLayer`, `TrailDecay` and tests; M04 and M08 available; decision reason) and re-render the `.md`; `check_app_contract.py --app particle-universe` passes (FR-A04-307). — Verified 2026-11-11: docs/apps/particle-universe/visualcore-contract.json gate A04-P03: G-BLENDTRAIL closed (A04-P03); M04 available with evidence ParticleBlend, TrailLayer, PingPongTarget, FieldPass, TrailDecay and example ParticleLayerScene; M08 notes and evidence for the per-emitter overrides and TrailLayer; A04-P03 decision reason; .md re-rendered. run-check A04-P03/t313-contract PASS (10 rows, 43 citations, 5 gaps, decision go)
 - [ ] T-A04-314 Run the ProjectM reference regression in two chunks (3/3, 4/4; SC-F702 may be rerun unchanged once), rebuild A01 and A02 for testing from clean derived data, confirm the rendering package tests ran after the last VisualCore change, and record the rerun in `docs/apps/particle-universe/regression-baseline.md` (FR-A04-307).
 - [ ] T-A04-315 Run the release-check fast steps (docs, app-contracts, compliance, dependencies, public-api, licenses, script-tests, host-visualcore, documented-api-particle-universe, isolation-particle-universe, host-particle-universe-core).
 

@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "app": "particle-universe",
-  "gate": "A04-P02",
+  "gate": "A04-P03",
   "date": "2026-11-11",
   "inventory": [
     {
@@ -318,8 +318,20 @@
       "id": "M04",
       "capability": "Blending and trails",
       "source": "brainstorm",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ParticleRenderer.swift",
+          "symbol": "ParticleBlend",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/TrailLayer.swift",
+          "symbol": "TrailLayer",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
         {
           "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/PingPongTarget.swift",
           "symbol": "PingPongTarget",
@@ -331,13 +343,19 @@
           "symbol": "FieldPass",
           "product": "VisualCoreRendering",
           "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/TrailDecay.swift",
+          "symbol": "TrailDecay",
+          "product": "VisualCoreSimulation",
+          "public": true
         }
       ],
       "example": {
-        "file": "Apps/FluidArtPlayground/App/FluidFieldsScene.swift",
-        "symbol": "FluidFieldsScene"
+        "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ParticleLayerScene.swift",
+        "symbol": "ParticleLayerScene"
       },
-      "notes": "Only premultiplied 'over' blending exists; additive blending and a trail-decay pass are gap G-BLENDTRAIL (research R4)."
+      "notes": "Closed in A04-P03 (G-BLENDTRAIL): ParticleBlend adds additive drawing (normal stays the default, A01 unchanged); TrailLayer fades an RGBA8 PingPongTarget with TrailDecay's frame-rate-independent model (per frame within 1/255 of the model, 30 vs 60 Hz within 6/255), composites over the background with a brightness cap (0.6 under Reduce Flashing), caps the longer edge at 2,048 px, and leaks no render targets across 20 resizes, 20 clears and a context recreation (fixture 3); ParticleLayerScene uses it only while trails or the cap are active."
     },
     {
       "id": "M05",
@@ -443,13 +461,19 @@
           "symbol": "Palette",
           "product": "VisualCoreParameters",
           "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/TrailLayer.swift",
+          "symbol": "TrailLayer",
+          "product": "VisualCoreRendering",
+          "public": true
         }
       ],
       "example": {
-        "file": "Apps/GenerativeArtStudio/Core/Sources/GenerativeArtStudioCore/ParticleReplay.swift",
-        "symbol": "ParticleReplay"
+        "file": "Apps/ParticleUniverse/ParticleUniverseCore/Sources/ParticleUniverseCore/ParticleScene.swift",
+        "symbol": "SceneEmitter"
       },
-      "notes": "Size and lifetime ranges and start/end colors exist; multi-stop gradients map through Palette; trail strength depends on G-BLENDTRAIL (research R8)."
+      "notes": "A04-P03: per-emitter size (1-48), lifetime (0.2-8 s) and color gradient (built-in Palette, start sample(1), end sample(0.5)) as optional SceneEmitter overrides (schema 1), and trail strength through TrailLayer."
     },
     {
       "id": "M09",
@@ -578,7 +602,8 @@
       "owner": "VisualCore:VisualCoreRendering",
       "phase": 3,
       "test": "Package tests on both runtimes: ParticleRenderer draws with an additive blend option; a trail-decay pass on PingPongTarget fades by a set factor per frame, and resizing or clearing the trail targets leaks no textures (fixture 3); reduced-flash mode caps brightness",
-      "justification": "Found in A04-P00 (research R4): additive glow and decaying trails are generic effects for many apps (A10 Neon Arcade, A21 Aurora)."
+      "justification": "Found in A04-P00 (research R4): additive glow and decaying trails are generic effects for many apps (A10 Neon Arcade, A21 Aurora).",
+      "closed": "A04-P03"
     }
   ],
   "traceability": [
@@ -725,7 +750,8 @@
       "Reference regression baseline recorded green 7/7 (T-A04-003) and the empty shell builds and passes its smoke test on both simulator runtimes (T-A04-005).",
       "Phase 01 starts with G-SIMSTEP and G-EMITTERS in VisualCoreSimulation and the app's seeded scene model.",
       "A04-P01: a seeded, GPU-free particle domain — four emitter families with bounded counts on VisualCore's new emitter shapes and bursts (G-EMITTERS), a versioned validated ParticleScene, and VisualCore's FixedStepRunner (G-SIMSTEP) with a committed replay fixture that is bit-exact on host and both simulators; the sandbox shows a CPU preview with live and dropped counts, play/pause/step and new seed; ProjectM regression 7/7 after the VisualCore change (one noise-floor retry recorded).",
-      "A04-P02: one placed force (attractor, repulsor, gravity well, wind or vortex) placed by tap, dragged, or moved by Center, nudges and a strength slider, on VisualCore's bounded force fields (G-FIELDS closed); the live particle limit follows QualityPolicy tiers through VisualCore's ParticleBudget and DeviceConditions (G-PQUALITY closed); the sandbox draws on the GPU through VisualCore's generic ParticleLayerScene in RenderHost, with the CPU preview as a fallback. No app GL or EGL."
+      "A04-P02: one placed force (attractor, repulsor, gravity well, wind or vortex) placed by tap, dragged, or moved by Center, nudges and a strength slider, on VisualCore's bounded force fields (G-FIELDS closed); the live particle limit follows QualityPolicy tiers through VisualCore's ParticleBudget and DeviceConditions (G-PQUALITY closed); the sandbox draws on the GPU through VisualCore's generic ParticleLayerScene in RenderHost, with the CPU preview as a fallback. No app GL or EGL.",
+      "A04-P03: several emitters (up to 8, removed ones fade out in retired slots so no live particle changes look), per-emitter size, lifetime and color gradient, and trails with strength, normal or additive blending and a Reduce Flashing brightness cap, on VisualCore's new ParticleBlend, TrailLayer and TrailDecay (G-BLENDTRAIL closed). No app GL."
     ],
     "blockers": []
   }
