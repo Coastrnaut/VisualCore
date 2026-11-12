@@ -58,7 +58,8 @@ final class SandboxTrailUITests: XCTestCase {
         XCTAssertEqual(app.staticTexts["pu.sandbox.renderer"].label, "Renderer: GPU")
         XCTAssertEqual(trails.value as? String, "1", "trails stay on")
         let live = app.staticTexts["pu.sandbox.live"].label
-        Thread.sleep(forTimeInterval: 1)
+        let start = Date()
+        while app.staticTexts["pu.sandbox.live"].label == live, Date().timeIntervalSince(start) < 5 { Thread.sleep(forTimeInterval: 0.25) }
         XCTAssertNotEqual(app.staticTexts["pu.sandbox.live"].label, live, "the GPU stage runs again")
     }
 }

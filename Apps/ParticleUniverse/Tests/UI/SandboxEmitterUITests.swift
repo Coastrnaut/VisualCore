@@ -49,3 +49,26 @@ final class SandboxEmitterUITests: XCTestCase {
         XCTAssertTrue(app.buttons["pu.sandbox.gradient"].label.contains("Family colors"))
     }
 }
+
+extension SandboxEmitterUITests {
+    /// Feature 035 T-A04-317 (spec §Edge Cases): a family change keeps the selected emitter's size override, and
+    /// removing the selected Emitter 3 selects Emitter 2.
+    func testFamilyChangeKeepsOverridesAndRemovalSelectsThePrevious() {
+        let app = launchSandbox()
+        let size = app.sliders["pu.sandbox.size"]
+        reveal(size, in: app)
+        size.adjust(toNormalizedSliderPosition: 1)
+        XCTAssertEqual(size.value as? String, "48 points")
+        let curtain = app.buttons["Curtain"]
+        reveal(curtain, in: app)
+        curtain.tap()
+        reveal(size, in: app)
+        XCTAssertEqual(size.value as? String, "48 points", "the family change keeps the size override")
+        let add = app.buttons["pu.sandbox.addEmitter"]
+        reveal(add, in: app)
+        add.tap(); add.tap()
+        XCTAssertTrue(app.buttons["pu.sandbox.emitter"].label.contains("Emitter 3"))
+        app.buttons["pu.sandbox.removeEmitter"].tap()
+        XCTAssertTrue(app.buttons["pu.sandbox.emitter"].label.contains("Emitter 2"), app.buttons["pu.sandbox.emitter"].label)
+    }
+}
