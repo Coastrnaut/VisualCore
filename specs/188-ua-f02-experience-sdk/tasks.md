@@ -196,3 +196,7 @@ at the end, on the final sources.
 - Golden digests are computed once on the host and then must be reproduced by both simulator runtimes; a
   mismatch there is a defect in the digest or in the sample, never a reason to change the committed value
   without finding the cause.
+
+## Phase 12: Convergence
+
+- [ ] T-U02-055 Name in `specs/188-ua-f02-experience-sdk/contracts/experience-core-api.md` the seven public members that the code and the API baseline have and the contract does not: `ExperienceFailure.unspecifiedCode`, `ExperienceFailure.maxCodeLength`, `ExperienceFailure.maxMessageLength`, `ExperienceFailure.isValidCode(_:)`, `ExperienceEngine.preparationFailedCode`, `ExperienceScenario.tooLargeCode` and `ExperienceScenario.isWithinLimits`, each with its value or rule; proof: a script finds every public member of VisualCoreExperience added by this feature in the contracts or the data model, per plan: Public API (partial)
