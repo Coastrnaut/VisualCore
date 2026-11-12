@@ -78,6 +78,21 @@ def xcode_test(project: str, scheme: str, runtime: str, derived: str, stamp: str
                        "CODE_SIGNING_ALLOWED=NO"], needs_simulator=runtime)
 
 
+# Feature 191 (UA-F05). Experience sources: the debug experience and the sample core today; every experience
+# module is added here when it is integrated.
+STORAGE_RULE_SOURCES = ["Apps/VisualCore/App/DebugSupport/DebugExperience.swift",
+                        "Packages/VisualCore/Sources/VisualCoreTestSupport/SampleExperienceCore.swift"]
+# The shipped sources that read stored data.
+STORED_DATA_SOURCES = ["Packages/VisualCore/Sources/VisualCoreExperience/SavedStateStore.swift",
+                       "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift",
+                       "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceSnapshot.swift",
+                       "Packages/VisualCore/Sources/VisualCoreExperience/ShellModel.swift",
+                       "Packages/VisualCore/Sources/VisualCoreExperience/SnapshotMigrationCheck.swift",
+                       "Packages/VisualCore/Sources/VisualCoreExperience/ContainerInventory.swift",
+                       "Apps/VisualCore/App/PreferencesStore.swift", "Apps/VisualCore/App/AppModel.swift",
+                       "Apps/VisualCore/App/ExperienceDataStore.swift"]
+
+
 def steps(stamp: str) -> list[Step]:
     s = [
         Step("docs", [PY, "scripts/validate_docs.py"]),
@@ -85,6 +100,11 @@ def steps(stamp: str) -> list[Step]:
         # Feature 192 (UA-F06): budgets are proposals with their confirming device measurement; simulator numbers
         # carry the notice.
         Step("performance-docs", [PY, "scripts/check_performance_docs.py"]),
+        # Feature 191 (UA-F05): experience sources reach storage only through their handle, and no shipped path
+        # that reads stored data uses a deliberate crash.
+        Step("storage-rule", [PY, "scripts/check_app_isolation.py", "--no-direct-storage", *STORAGE_RULE_SOURCES]),
+        Step("stored-data-rule", [PY, "scripts/check_app_isolation.py", "--no-crash-on-stored-data",
+                                  *STORED_DATA_SOURCES]),
         Step("dependencies", [PY, "scripts/check_dependencies.py"]),
         Step("public-api", [PY, "scripts/check_public_api.py"]),
         Step("documented-api-showcase", [PY, "scripts/check_documented_api.py", "--sources", "Showcase/App"]),

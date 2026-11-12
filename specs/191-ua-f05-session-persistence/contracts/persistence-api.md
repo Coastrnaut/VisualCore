@@ -70,11 +70,13 @@ public struct InventoryRule: Sendable, Equatable {                    // (new)
     public init(kind: Kind, pattern: String, writer: String, system: Bool = false, origin: String? = nil)
 }
 public enum InventoryError: Error, Sendable, Equatable {              // (new)
-    case invalidPattern(String), systemRuleWithoutOrigin(String)
+    case invalidPattern(String), systemRuleWithoutOrigin(String), emptyWriter(String)
 }
 public struct ContainerInventory: Sendable {                          // (new)
     public init(rules: [InventoryRule]) throws(InventoryError)
     public func unlisted(files: [String], keys: [String]) -> [String]
+    public func rule(forFile path: String) -> InventoryRule?
+    public func rule(forKey key: String) -> InventoryRule?
 }
 extension ShellPreferences {
     public static let unreadableCopyKey: String      // (new) "vc.shell.preferences.unreadable"
@@ -118,3 +120,12 @@ extension ExperienceSession {
   a source that reads stored data (FR-U05-071).
 - `scripts/xcodebuild_app.py … --only-testing VisualCoreUITests/PersistenceUITests` issues the brief's
   `xcodebuild test -only-testing:VisualCoreUITests/PersistenceUITests` command.
+
+## As built (2026-11-12)
+
+- `ExperienceHostView.init(session:onRetry:)`: an optional action that replaces what the failure view's Retry
+  does; the app passes one that opens the experience with the state stored now (convergence T-U05-036).
+- `ExperienceStorage.folder` is internal; `SavedStateProblem.newerSchemaCode` and `unreadableFileCode`,
+  `SavedStateStore.folder(for:)`, `stateURL(for:)`, `quarantinePrefix` are public.
+- `ShellPreferences.migratedVersions` (not `migrations`): the earlier schema versions that have a migration.
+- Reserved file names are compared without regard to case.

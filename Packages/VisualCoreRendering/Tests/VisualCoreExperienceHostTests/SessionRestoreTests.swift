@@ -91,15 +91,22 @@ final class SessionRestoreTests: XCTestCase {
         session.checkpoint()
         XCTAssertEqual(log.count, 0, "idle")
 
-        // Preparing: the factory runs inside `open`, before the preparation ends.
-        var duringPreparation = -1
-        let (request, _) = sampleRequest(onMake: { [weak session] in
-            session?.checkpoint()
-            duringPreparation = log.count
-        })
+        // Preparing: a slow preparation is under way; the session has its experience and is not yet running.
+        let (slow, _) = sampleRequest(SlowPreparation.self)
+        let pending = openInBackground(session, slow)
+        let preparing = await waitUntil { session.state == .preparing }
+        XCTAssertTrue(preparing)
+        XCTAssertNotNil(session.experience, "the experience exists while it prepares")
+        session.checkpoint()
+        XCTAssertEqual(log.count, 0, "preparing")
+        session.close()
+        let cancelled = await pending.value
+        XCTAssertEqual(cancelled, .cancelled)
+        XCTAssertEqual(log.count, 0, "a cancelled preparation hands out nothing")
+
+        let (request, _) = sampleRequest()
         let result = await session.open(request)
         XCTAssertEqual(result, .running)
-        XCTAssertEqual(duringPreparation, 0, "preparing")
         session.close()
         let afterClose = log.count
         XCTAssertEqual(afterClose, 1)

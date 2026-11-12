@@ -133,7 +133,10 @@ public struct SavedStateStore: Sendable {
         let target = stateURL(for: id)
         let manager = FileManager.default
         if manager.fileExists(atPath: target.path) {
-            if let stored = try? Data(contentsOf: target), stored == text { return false }
+            // The stored file is read for the comparison only when it has the size of the new text, so a
+            // file above the limit is never read here.
+            let size = (try? manager.attributesOfItem(atPath: target.path))?[.size] as? Int
+            if size == text.count, let stored = try? Data(contentsOf: target), stored == text { return false }
             if case .unreadable = load(id) { try quarantine(id) }
         }
         let temporary = directory.appendingPathComponent(".\(Self.stateFileName)\(Self.temporaryMarker)\(UUID().uuidString)",

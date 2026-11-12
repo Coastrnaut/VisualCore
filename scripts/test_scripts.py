@@ -836,6 +836,18 @@ class StorageRuleTests(unittest.TestCase):
                 code = e.code
         return code, out.getvalue()
 
+    def test_file_reads_and_writes_without_a_storage_name_are_reported(self):
+        """Converge task T-U05-038: reading or writing a file needs none of the storage names."""
+        uses = {"Data(contentsOf": "let d = try Data(contentsOf: url)",
+                "String(contentsOf": "let s = try String( contentsOf: url)",
+                ".write(to:": "try data.write(to: url)"}
+        self.assertEqual(sorted(uses), sorted(name for _, name in isolation.STORAGE_CALLS))
+        for name, code_line in uses.items():
+            with self.subTest(name):
+                self.assertEqual(isolation.storage_uses("let a = 1\n" + code_line + "\n"), [(2, name)])
+        clean = "items.append(contentsOf: more)\nprint(x, to: &stream)\nlet t = text.write\n"
+        self.assertEqual(isolation.storage_uses(clean), [])
+
     def test_each_storage_name_is_reported_with_file_and_line(self):
         uses = {"UserDefaults": "let d = UserDefaults.standard",
                 "FileManager": "let m = FileManager.default",
@@ -843,7 +855,14 @@ class StorageRuleTests(unittest.TestCase):
                 "NSTemporaryDirectory": "let t = NSTemporaryDirectory()",
                 "applicationSupportDirectory": "let a = URL.applicationSupportDirectory",
                 "documentDirectory": "let u = urls(for: .documentDirectory, in: .userDomainMask)",
-                "cachesDirectory": "let c = URL.cachesDirectory"}
+                "cachesDirectory": "let c = URL.cachesDirectory",
+                "AppStorage": '@AppStorage("k") var k = 0',
+                "SceneStorage": '@SceneStorage("k") var k = 0',
+                "FileHandle": "let f = FileHandle(forReadingAtPath: p)",
+                "documentsDirectory": "let u = URL.documentsDirectory",
+                "libraryDirectory": "let u = URL.libraryDirectory",
+                "homeDirectory": "let u = URL.homeDirectory",
+                "temporaryDirectory": "let u = URL.temporaryDirectory"}
         self.assertEqual(sorted(uses), sorted(isolation.STORAGE))
         for name, code_line in uses.items():
             with self.subTest(name):
@@ -1179,6 +1198,12 @@ class PerformanceDocsTests(unittest.TestCase):
         listing = subprocess.run([sys.executable, str(HERE / "release_check.py"), "--list"],
                                  capture_output=True, text=True, check=True).stdout
         self.assertIn("performance-docs: ", listing)
+        # Feature 191 (UA-F05): the two source rules run with every release check, on files that exist.
+        self.assertIn("storage-rule: ", listing)
+        self.assertIn("stored-data-rule: ", listing)
+        tool = load("release_check")
+        for source in tool.STORAGE_RULE_SOURCES + tool.STORED_DATA_SOURCES:
+            self.assertTrue((ROOT_DIR / source).is_file(), source)
 
 
 class UnifiedAppTargetTests(unittest.TestCase):

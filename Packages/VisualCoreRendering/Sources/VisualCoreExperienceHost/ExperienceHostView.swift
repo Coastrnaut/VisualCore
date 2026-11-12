@@ -208,11 +208,17 @@ public struct SessionMessageView: View {
 /// views while it prepares, after a failure and after a message. It forwards the scene phase to the session.
 public struct ExperienceHostView: View {
     private let session: ExperienceSession
+    private let onRetry: (@MainActor () async -> Void)?
     @Environment(\.scenePhase) private var scenePhase
 
     /// Creates the view of `session`. The session stays owned by the caller.
-    public init(session: ExperienceSession) {
+    ///
+    /// `onRetry` replaces what the failure view's Retry does. Without it the session opens its last request
+    /// again (`ExperienceSession.retry()`), with the snapshot that request carried. An opener that stores
+    /// snapshots passes an action that opens the experience with the state stored now (feature 191).
+    public init(session: ExperienceSession, onRetry: (@MainActor () async -> Void)? = nil) {
         self.session = session
+        self.onRetry = onRetry
     }
 
     /// The view of the session's current state.
@@ -232,7 +238,11 @@ public struct ExperienceHostView: View {
             SessionFailureView(title: SessionStrings.text(.failureTitle),
                                detail: session.failure?.failure.message ?? "",
                                code: session.failure?.failure.code ?? "",
-                               onRetry: { Task { await session.retry() } },
+                               onRetry: {
+                                   Task {
+                                       if let onRetry { await onRetry() } else { await session.retry() }
+                                   }
+                               },
                                onBack: { session.back() })
         case .message:
             SessionMessageView(text: session.message ?? SessionStrings.text(.memoryMessage)) { session.back() }

@@ -600,6 +600,12 @@ final class AppModelTests: XCTestCase {
         return snapshot
     }
 
+    /// The taps of the stored state of `id`, or nil without a readable state; never fails the test (for waits).
+    private func quietTaps(_ storage: TestStorage, _ id: ExperienceID) -> Int? {
+        guard case .state(let snapshot) = SavedStateStore(root: storage.root).load(id) else { return nil }
+        return taps(of: snapshot)
+    }
+
     private func stateURL(_ storage: TestStorage, _ id: ExperienceID) -> URL {
         SavedStateStore(root: storage.root).stateURL(for: id)
     }
@@ -683,7 +689,7 @@ final class AppModelTests: XCTestCase {
         try await settle { sleep.pending == 1 }
         XCTAssertEqual(sleep.calls, 2)
         sleep.fire()
-        try await settle { self.taps(of: self.storedState(storage, id)) == 4 }
+        try await settle { self.quietTaps(storage, id) == 4 }
         XCTAssertEqual(taps(of: storedState(storage, id)), 4)
         XCTAssertNil(model.diagnostics.lastSaveFailure)
 
@@ -775,6 +781,109 @@ final class AppModelTests: XCTestCase {
         XCTAssertEqual(model.diagnostics.leftoversRemoved, 1)
         XCTAssertEqual(try FileManager.default.contentsOfDirectory(atPath: folder.path), ["kept.txt"])
         XCTAssertTrue(model.diagnostics.text.contains("leftoversRemoved: 1"))
+    }
+
+    // MARK: Retry after a failure (feature 191, T-U05-036; FR-U05-020, FR-U05-011)
+
+    func testRetryAfterAFailureWhileRunningRestoresTheCheckpointedState() async throws {
+        let storage = try TestStorage(self)
+        let sleep = ScriptedSleep()
+        let id = try XCTUnwrap(DebugLaunch.fixtureFreeIDs.first)
+        let switches = FlakySwitch()
+        let registry = [ExperienceRegistration(id: id, core: DebugExperienceCore.self) { launch in
+            ExperienceShell(id: id, presenter: FlakyPresenter(inner: DebugPresenter(experienceID: id, launch: launch),
+                                                              switches: switches))
+        }]
+        let model = persistenceModel(storage, sleep: sleep, registry: registry)
+        let opened = await model.open(id)
+        XCTAssertTrue(opened)
+        tap(model, 3)
+        try await settle { sleep.pending == 1 }
+        sleep.fire()
+        try await settle { FileManager.default.fileExists(atPath: self.stateURL(storage, id).path) }
+        XCTAssertEqual(taps(of: storedState(storage, id)), 3, "the checkpoint stored three taps")
+
+        // The experience fails while it runs: its next frame throws.
+        let host = try XCTUnwrap(model.session.renderHost)
+        host.view.frame = CGRect(x: 0, y: 0, width: 64, height: 64)
+        host.view.layoutIfNeeded()
+        switches.failsDraw = true
+        _ = host.renderOneFrame(present: false)
+        XCTAssertEqual(model.session.state, .failed)
+        XCTAssertEqual(model.route, .experience(id))
+        switches.failsDraw = false
+
+        // Retry opens with the state stored now, not with what the first open began with (nothing).
+        await model.retryExperience()
+        XCTAssertEqual(model.session.state, .running)
+        XCTAssertTrue(model.session.experience?.port.summary.contains(" 3 taps") ?? false,
+                      model.session.experience?.port.summary ?? "no experience")
+        XCTAssertEqual(switches.made, 2)
+
+        // The retried experience is watched again: an action is saved when its delay ends.
+        tap(model, 1)
+        try await settle { sleep.pending == 1 }
+        XCTAssertEqual(sleep.pending, 1, "the action of the retried experience started a delay")
+        sleep.fire()
+        try await settle { self.quietTaps(storage, id) == 4 }
+        XCTAssertEqual(taps(of: storedState(storage, id)), 4)
+        model.closeExperience()
+    }
+
+    func testRetryAfterAFailedSetUpWatchesTheActions() async throws {
+        let storage = try TestStorage(self)
+        let sleep = ScriptedSleep()
+        let id = try XCTUnwrap(DebugLaunch.fixtureFreeIDs.first)
+        let calls = LaunchBox()
+        let registry = [ExperienceRegistration(id: id, core: DebugExperienceCore.self) { launch in
+            calls.values.append(launch)
+            return ExperienceShell(id: id, presenter: DebugPresenter(experienceID: id, launch: launch,
+                                                                     failsSetup: calls.values.count == 1))
+        }]
+        let model = persistenceModel(storage, sleep: sleep, registry: registry)
+        let opened = await model.open(id)
+        XCTAssertFalse(opened)
+        XCTAssertEqual(model.session.state, .failed)
+        await model.retryExperience()
+        XCTAssertEqual(model.session.state, .running)
+        tap(model, 2)
+        try await settle { sleep.pending == 1 }
+        sleep.fire()
+        try await settle { self.quietTaps(storage, id) == 2 }
+        XCTAssertEqual(taps(of: storedState(storage, id)), 2)
+        model.closeExperience()
+    }
+
+    // MARK: Diagnostics and reset rows (feature 191, T-U05-040, T-U05-042)
+
+    func testAnUnreadableStateIsRecordedInTheDiagnostics() async throws {
+        let storage = try TestStorage(self)
+        let model = fixtureModel(storage)
+        let id = try XCTUnwrap(freeIDs(model).first)
+        XCTAssertNil(model.diagnostics.lastUnreadable)
+        let url = stateURL(storage, id)
+        try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
+        try Data("garbage".utf8).write(to: url)
+        let opened = await model.open(id)
+        XCTAssertFalse(opened)
+        XCTAssertEqual(model.diagnostics.lastUnreadable, "\(id.rawValue): snapshot.corrupt")
+        model.dismissUnreadable()
+        XCTAssertEqual(model.diagnostics.lastUnreadable, "\(id.rawValue): snapshot.corrupt", "kept after Back")
+        XCTAssertTrue(model.diagnostics.text.contains("lastUnreadable: \(id.rawValue): snapshot.corrupt"))
+    }
+
+    func testAnExperienceWithValuesAndNoFolderIsOfferedForReset() async throws {
+        let storage = try TestStorage(self)
+        let model = fixtureModel(storage)
+        let id = try XCTUnwrap(freeIDs(model).first)
+        XCTAssertEqual(model.dataNamespaces, [])
+        try storage.handle(id).setValue(Data("v".utf8), for: "only-a-value")
+        storage.defaults.set("x", forKey: "exp.not an id.name")
+        model.refreshDataNamespaces()
+        XCTAssertEqual(model.dataNamespaces, [id.storageNamespace])
+        model.reset(.experience(id))
+        XCTAssertEqual(model.dataNamespaces, [])
+        XCTAssertEqual(storage.handle(id).valueKeys(), [])
     }
 
     // MARK: Unreadable states (feature 191, T-U05-017; FR-U05-030 to FR-U05-034; SC-U05-004, SC-U05-009)
@@ -928,6 +1037,11 @@ final class AppModelTests: XCTestCase {
         XCTAssertEqual(DebugInventory.text(files: listed + ["Library/Application Support/stray.txt"],
                                            keys: keys + ["stray.key"]),
                        "inventory: 5 files, 4 keys; unlisted: file:Library/Application Support/stray.txt, key:stray.key")
+        // The property list of another defaults domain is not the app's (T-U05-041).
+        XCTAssertEqual(DebugInventory.text(files: ["Library/Preferences/com.example.other.plist"], keys: []),
+                       "inventory: 1 files, 0 keys; unlisted: file:Library/Preferences/com.example.other.plist")
+        XCTAssertTrue(DebugInventory.text(files: ["Library/Caches/com.example.other/com.apple.metal/libraries.data"],
+                                          keys: []).contains("unlisted: file:"))
         // A hidden temporary file of an interrupted write and a file outside an experience folder are not listed.
         XCTAssertTrue(DebugInventory.text(files: ["Library/Application Support/Experiences/\(id)/.state.json.tmp-x"],
                                           keys: []).hasSuffix(".state.json.tmp-x"))
@@ -988,6 +1102,41 @@ final class ScriptedSleep: @unchecked Sendable {
         }
         for continuation in ended { continuation.resume() }
     }
+}
+
+/// What a test switches on a `FlakyPresenter`.
+@MainActor
+private final class FlakySwitch {
+    /// The next frame throws.
+    var failsDraw = false
+    /// How many presenters were built.
+    var made = 0
+}
+
+/// The debug presenter with a frame that can be made to throw, so that an experience fails while it runs.
+@MainActor
+private final class FlakyPresenter: ExperiencePresenter {
+    typealias Core = DebugExperienceCore
+    struct DrawFailure: Error {}
+
+    private let inner: DebugPresenter
+    private let switches: FlakySwitch
+
+    init(inner: DebugPresenter, switches: FlakySwitch) {
+        self.inner = inner
+        self.switches = switches
+        switches.made += 1
+    }
+
+    func setup(_ context: RenderContext) throws { try inner.setup(context) }
+    func resize(_ context: RenderContext) { inner.resize(context) }
+    func draw(_ core: DebugExperienceCore, tier: Int, context: RenderContext, frame: FrameInfo) throws {
+        if switches.failsDraw { throw DrawFailure() }
+        try inner.draw(core, tier: tier, context: context, frame: frame)
+    }
+    func teardown(_ context: RenderContext) { inner.teardown(context) }
+    func describe(_ core: DebugExperienceCore) -> String { inner.describe(core) }
+    func makeControls(_ port: ExperienceActionPort) -> AnyView { inner.makeControls(port) }
 }
 
 /// Collects what the shell hands to a factory.

@@ -2703,6 +2703,8 @@ builds of both modules.
   sink, so an experience never starts on a fresh state while a stored one exists that it could not read.
   `checkpoint()` hands the open experience's snapshot to the sink between a suspension and a close; the app
   calls it five seconds after an accepted action.
+  `ExperienceHostView` takes an optional retry action; the app's Retry opens the experience with the state
+  stored now, not with the snapshot the failed open began with.
 
 ### 11.5 Threads and GPU ownership
 

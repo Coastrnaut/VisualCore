@@ -107,7 +107,7 @@ recorded in the "As built" section.
 - `ExperienceRegistration.migrationProblems: @Sendable () async -> [String]`.
 - `AppModel`: `unreadable: UnreadableState?` (experience id and problem), `resetUnreadable()`,
   `dismissUnreadable()`, `diagnostics.lastSaveFailure`, `diagnostics.leftoversRemoved`.
-- `ShellPreferences.migrations` (empty today); key `vc.shell.preferences.unreadable`.
+- `ShellPreferences.migratedVersions` (empty today); key `vc.shell.preferences.unreadable`.
 
 ## 7. Identifiers and debug arguments
 
@@ -129,6 +129,10 @@ state before the model starts), `-vcStrayItems` (one stray file and one stray de
 - `-vcResetData` also removes every experience value and the stray items of an earlier `-vcStrayItems`.
 - The interface tests are two classes, each one chunk: `PersistenceUITests` (`-e`) and
   `PersistenceDamageUITests` (`-f`).
+- The failure view's Retry goes through the app (`AppModel.retryExperience()`), so that the state stored now
+  is restored and the actions are watched again; `AppDiagnostics.lastUnreadable` records `<id>: <code>`.
+- The system rules of the inventory that name a bundle identifier are bound to the app's own identifier.
+- `scripts/release_check.py` runs the two source rules as the steps `storage-rule` and `stored-data-rule`.
 - The source rule of feature 187 names `ExperienceStorage.swift` and `SavedStateStore.swift` as the only files
   of the pure module that reach files and defaults.
 

@@ -22,7 +22,7 @@ struct ExperienceRouteView: View {
                 // The stored state cannot be read: nothing runs until the person chooses (feature 191).
                 UnreadableStateView(model: model, notice: notice)
             } else {
-                ExperienceHostView(session: model.session)
+                ExperienceHostView(session: model.session) { await model.retryExperience() }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
         }

@@ -704,7 +704,6 @@ VisualCoreExperience | var | public var failure: ExperienceFailure
 VisualCoreExperience | var | public var failures: Int
 VisualCoreExperience | var | public var firstFrame: Double?
 VisualCoreExperience | var | public var firstPresent: Double?
-VisualCoreExperience | var | public var folder: URL
 VisualCoreExperience | var | public var integrationGate: String
 VisualCoreExperience | var | public var isAccepted: Bool
 VisualCoreExperience | var | public var isMatch: Bool
@@ -779,7 +778,7 @@ VisualCoreExperienceHost | init | public init()
 VisualCoreExperienceHost | init | public init(id: ExperienceID, presenter: Presenter, maxStepsPerFrame: Int = 8)
 VisualCoreExperienceHost | init | public init(id: ExperienceID, seed: UInt64, snapshot: ExperienceSnapshot? = nil,
 VisualCoreExperienceHost | init | public init(onCancel: @escaping @MainActor () -> Void)
-VisualCoreExperienceHost | init | public init(session: ExperienceSession)
+VisualCoreExperienceHost | init | public init(session: ExperienceSession, onRetry: (@MainActor () async -> Void)? = nil)
 VisualCoreExperienceHost | init | public init(snapshotSink: SnapshotSink? = nil)
 VisualCoreExperienceHost | init | public init(text: String, onBack: @escaping @MainActor () -> Void)
 VisualCoreExperienceHost | init | public init(title: String, detail: String, code: String,

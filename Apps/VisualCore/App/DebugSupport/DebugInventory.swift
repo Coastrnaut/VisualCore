@@ -30,9 +30,9 @@ enum DebugInventory {
     /// What the system writes on its own. Each rule was added after the item was seen in an inventory run on
     /// the simulators; `origin` says where and why it is the system's.
     static let systemRules: [InventoryRule] = [
-        InventoryRule(kind: .file, pattern: "Library/Preferences/[A-Za-z0-9.-]+\\.plist",
+        InventoryRule(kind: .file, pattern: "Library/Preferences/" + bundle + "\\.plist",
                       writer: "the system: the property list of a defaults domain", system: true,
-                      origin: "written by cfprefsd for UserDefaults; seen on the iOS 27.2 and 26.5 simulators"),
+                      origin: "written by cfprefsd for the app's own defaults domain; seen on the iOS 27.2 and 26.5 simulators"),
         InventoryRule(kind: .file, pattern: "Library/Caches/" + bundle + "/com\\.apple\\.metal/.+",
                       writer: "the system: the Metal library cache", system: true,
                       origin: "written by Metal when the renderer (OpenGL ES through ANGLE on Metal) compiles "
@@ -55,7 +55,9 @@ enum DebugInventory {
                           + "com.apple.UIKit.UISplitViewController.Root after the first start"),
     ]
 
-    private static let bundle = "[A-Za-z0-9.-]+"
+    /// The app's own bundle identifier as a pattern: the system rules allow the app's files, not those of
+    /// any identifier.
+    private static let bundle = NSRegularExpression.escapedPattern(for: Bundle.main.bundleIdentifier ?? "-")
 
     /// The files below `Documents`, `Library` and `tmp` of the container at `home`, as relative paths, sorted.
     /// Folders are not listed; a file the reader cannot classify is listed, never skipped.

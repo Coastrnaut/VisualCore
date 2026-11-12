@@ -56,7 +56,11 @@ def strip_comments(text: str) -> str:
 
 
 STORAGE = ["UserDefaults", "FileManager", "NSHomeDirectory", "NSTemporaryDirectory", "applicationSupportDirectory",
-           "documentDirectory", "cachesDirectory"]
+           "documentDirectory", "cachesDirectory", "AppStorage", "SceneStorage", "FileHandle", "documentsDirectory",
+           "libraryDirectory", "homeDirectory", "temporaryDirectory"]
+# Ways to read or write a file that need none of the names above: the pattern and the name a finding carries.
+STORAGE_CALLS = [(r"\bData\s*\(\s*contentsOf\b", "Data(contentsOf"), (r"\bString\s*\(\s*contentsOf\b", "String(contentsOf"),
+                 (r"\.write\s*\(\s*to\s*:", ".write(to:")]
 CRASH_CALLS = ["fatalError", "preconditionFailure", "precondition", "assertionFailure", "assert"]
 _STRING_OPEN = re.compile(r'(#*)("""|")')
 _BANG = re.compile(r"(?<=[\w)\]])!(?!=)")
@@ -154,6 +158,8 @@ def storage_uses(text: str) -> list[tuple[int, str]]:
     """Every direct use of storage in Swift source as (1-based line, name), ordered by line and column."""
     code = code_only(text)
     hits = [(m.start(), m.group(0)) for m in re.finditer(r"\b(?:" + "|".join(STORAGE) + r")\b", code)]
+    for pattern, name in STORAGE_CALLS:
+        hits += [(m.start(), name) for m in re.finditer(pattern, code)]
     return [(code.count("\n", 0, pos) + 1, name) for pos, name in sorted(hits)]
 
 

@@ -70,9 +70,9 @@ public struct ExperienceStorage: @unchecked Sendable {
         self.defaults = defaults
     }
 
-    /// The namespace folder of the experience, `<root>/<id>/`. An experience never needs it: it reaches its files
-    /// through the handle only. It is public so that tests and the app's debug support can inspect the folder.
-    public var folder: URL { root.appendingPathComponent(id.storageNamespace, isDirectory: true) }
+    /// The namespace folder of the experience, `<root>/<id>/`. Internal: an experience is never handed the
+    /// location of its folder; it reaches its files through the handle only.
+    var folder: URL { root.appendingPathComponent(id.storageNamespace, isDirectory: true) }
 
     // MARK: Names
 

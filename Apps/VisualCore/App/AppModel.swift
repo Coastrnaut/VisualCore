@@ -25,6 +25,8 @@ struct AppDiagnostics: Equatable {
     /// What the last reset removed: storage namespaces, defaults keys of experiences and, after a reset of all
     /// data, the preferences keys.
     var lastReset: [String]
+    /// The last stored state that could not be read, as `<id>: <code>`; kept after its notice is dismissed.
+    var lastUnreadable: String? = nil
     /// The code of the last saved state that could not be written; nil when every save worked.
     var lastSaveFailure: String? = nil
     /// How many leftover temporary files of interrupted writes the start removed.
@@ -37,6 +39,7 @@ struct AppDiagnostics: Equatable {
          "preferencesNote: \(preferencesNote ?? "")",
          "unknownArguments: \(unknownArguments.joined(separator: ","))",
          "lastReset: \(lastReset.joined(separator: ","))",
+         "lastUnreadable: \(lastUnreadable ?? "")",
          "lastSaveFailure: \(lastSaveFailure ?? "")",
          "leftoversRemoved: \(leftoversRemoved)"].joined(separator: "\n")
     }
@@ -209,6 +212,7 @@ final class AppModel {
         launchStart = environment.launchStart
         firstStart = environment.defaults.object(forKey: ShellPreferences.storageKey) == nil
         session.qualityPin = stored.preferences.qualityOverride
+        refreshDataNamespaces()
         saver.onResult = { [weak self] failure in
             guard let self, self.diagnostics.lastSaveFailure != failure else { return }
             self.diagnostics.lastSaveFailure = failure
@@ -327,7 +331,7 @@ final class AppModel {
             stored = snapshot
         case .unreadable(let problem):
             // Nothing is opened: a fresh state could be saved over the one that cannot be read.
-            unreadable = UnreadableState(id: id, problem: problem)
+            noteUnreadable(id, problem)
             return false
         }
         let launch = ExperienceLaunch(storage: ExperienceStorage(id: id, root: dataRoot, defaults: defaults),
@@ -343,7 +347,7 @@ final class AppModel {
         case .failed(let failure):
             if failure.stage == .restore, session.state == .failed, route == .experience(id) {
                 // The experience refused its stored state: the notice replaces the failure view.
-                unreadable = UnreadableState(id: id, problem: SavedStateProblem(failureCode: failure.failure.code))
+                noteUnreadable(id, SavedStateProblem(failureCode: failure.failure.code))
                 session.close()
             }
             return false
@@ -353,6 +357,20 @@ final class AppModel {
             if route == .experience(id) { setRoute(.catalog) }
             return false
         }
+    }
+
+    /// Retry of the session's failure view: the experience of the current route is opened again through
+    /// `open(_:)`, so that the state stored now is the one restored (a checkpoint may have stored a newer state
+    /// than the failed open began with) and the actions are watched again.
+    func retryExperience() async {
+        guard case .experience(let id) = route else { return }
+        await open(id)
+    }
+
+    /// Shows the notice for the stored state of `id` and records it in the diagnostics.
+    private func noteUnreadable(_ id: ExperienceID, _ problem: SavedStateProblem) {
+        unreadable = UnreadableState(id: id, problem: problem)
+        diagnostics.lastUnreadable = "\(id.rawValue): \(problem.code)"
     }
 
     /// Reset of the unreadable-state notice: the stored state becomes a quarantined copy and the experience
@@ -501,7 +519,15 @@ final class AppModel {
 
     /// Reads again which storage namespaces have a data folder.
     func refreshDataNamespaces() {
-        let found = dataStore.existing()
+        // An experience has data when it has a folder or a stored value (`exp.<id>.<name>`).
+        let prefix = "exp."
+        let withValues = defaults.dictionaryRepresentation().keys.compactMap { key -> String? in
+            guard key.hasPrefix(prefix) else { return nil }
+            let parts = key.dropFirst(prefix.count).split(separator: ".", omittingEmptySubsequences: false)
+            guard parts.count >= 3 else { return nil }
+            return ExperienceID(rawValue: parts[0] + "." + parts[1])?.storageNamespace
+        }
+        let found = Set(dataStore.existing()).union(withValues).sorted()
         if found != dataNamespaces { dataNamespaces = found }
     }
 
