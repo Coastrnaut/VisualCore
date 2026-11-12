@@ -229,7 +229,10 @@ forbidden call.
 **Session and its states**
 
 - **FR-U03-001**: A session MUST be in exactly one of these states: idle, preparing, running, suspended, failed,
-  message, closing. It MUST start idle.
+  message, closing. It MUST start idle. The legal changes MUST be exactly these 17: idle → preparing; preparing →
+  running, suspended, failed or closing; running → suspended, failed or closing; suspended → running, failed or
+  closing; failed → preparing or idle; message → idle or preparing; closing → idle or message. Any other change
+  MUST be refused and counted.
 - **FR-U03-002**: At most one experience MUST be open in a session, and the app MUST use one session. At no
   moment MUST two render hosts created by the session be alive.
 - **FR-U03-003**: An open request MUST carry a factory for the experience, the seed, an optional snapshot, the
@@ -326,7 +329,8 @@ forbidden call.
 
 - **FR-U03-070**: The session MUST hand snapshots to a sink that the opener supplies (the persistence feature
   later), at suspension, at close and before a memory closure. Without a sink the snapshots are dropped. A sink
-  that throws MUST be recorded and MUST NOT stop the close.
+  that throws, or a snapshot that the experience cannot produce, MUST be recorded with its code and MUST NOT stop
+  the suspension or the close.
 - **FR-U03-071**: The session MUST NOT write files and MUST NOT read stored data itself.
 
 **Diagnostics**
@@ -341,9 +345,10 @@ forbidden call.
 
 - **FR-U03-090**: `scripts/check_app_isolation.py` MUST accept experience module directories in addition to app
   directories, MUST fail with file and line for a low-level graphics import or a direct EGL or GL call in their
-  sources, and MUST say plainly when a given directory holds no source file.
-- **FR-U03-091**: The check MUST run for the test sources of this feature's sample presenter only where the plan
-  lists an explicit exception, and the exception MUST be visible in the tool's output.
+  sources, and MUST say plainly, with exit code 0, when a given directory holds no source file or does not exist
+  yet. An option MUST turn "no sources" into a failure for gates that must find sources.
+- **FR-U03-091**: Test sources MUST stay outside the check by one stated rule (they may use the low-level calls to
+  read pixels), and the tool's output MUST state how many test files it left out.
 
 **Framework obligations and boundaries**
 
@@ -395,9 +400,10 @@ forbidden call.
   line, and reports "no sources" for an empty directory.
 - **SC-U03-009**: 100% of the new public symbols are documented, the API baseline check passes with no removed
   line, package tests pass on the host and on both simulator runtimes, and the reference regression passes 7 of 7.
-- **SC-U03-010**: At the largest Dynamic Type size on the smallest simulated phone, all controls of the failure
-  view, the message view and the preparing view lie inside the screen and have a hit area of at least 44 by 44
-  points.
+- **SC-U03-010**: Laid out in a window of 320 by 568 points at the largest accessibility text size on both
+  simulator runtimes, the failure view, the message view and the preparing view are not wider than the window,
+  their content is reachable by scrolling, and their controls have a minimum size of 44 by 44 points. Taps on
+  these controls by an interface test belong to the app's tests of UA-F04.
 
 ## Assumptions
 
