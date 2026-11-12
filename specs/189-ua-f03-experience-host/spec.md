@@ -32,6 +32,28 @@ Canonical overrides:
   Nothing yet owns a render host on behalf of an experience, enforces one experience at a time, or shows what
   happened when an experience fails.
 
+## Clarifications
+
+### Session 2026-11-12
+
+Questions asked and answered under the owner's standing delegation (recommended option first).
+
+- Q: Does the opener hand the session a finished experience or a way to make one? → A: A way to make one
+  (recommended): the open request carries a factory. The session builds the experience for each open and for each
+  Retry, so a retry never reuses an object that failed, and a closed experience is released completely.
+- Q: What happens when a second open arrives while the first is still opening? → A: The newest request wins
+  (recommended). Opens are handled one after another; a request that is overtaken before it runs ends with the
+  result "superseded" and changes nothing; an opening in progress is cancelled and closed before the next starts.
+- Q: Who tells the session about scene phases and memory warnings? → A: The host view passes the scene phase on;
+  the session itself listens for the system's memory warning (recommended). The render host keeps its own
+  reactions (it pauses in the background and trims its pools); the session adds the experience-level reaction.
+  Tests call the same two entry points directly.
+- Q: What does "still over its budget" mean, given that the registry refuses any allocation beyond the budget?
+  → A: A separate memory-pressure limit in bytes, by default half of the budget's total (recommended). After
+  shedding, live bytes above that limit close the experience with the message.
+- Q: Where do the session's decisions live? → A: In a pure, host-testable value in the pure package: the state
+  table, the order of a close and the pressure rule (recommended). The main-actor session carries them out.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Opening an experience always ends in something usable (Priority: P1) 🎯
@@ -149,9 +171,10 @@ force a context recreation and compare digest and picture.
 
 **Acceptance Scenarios**:
 
-1. **Given** a running experience within its budget, **When** a memory warning arrives, **Then** caches are shed,
+1. **Given** a running experience below its memory-pressure limit, **When** a memory warning arrives, **Then** caches are shed,
    the digest is unchanged and the experience keeps running.
-2. **Given** a running experience that is over its budget after shedding, **When** a memory warning arrives,
+2. **Given** a running experience that is above its memory-pressure limit after shedding, **When** a memory
+   warning arrives,
    **Then** a snapshot is handed out, the experience is closed with zero live and leaked objects, and the host
    view shows a message with Back.
 3. **Given** a running experience, **When** the render context is recreated, **Then** the next frame shows the
@@ -209,11 +232,16 @@ forbidden call.
   message, closing. It MUST start idle.
 - **FR-U03-002**: At most one experience MUST be open in a session, and the app MUST use one session. At no
   moment MUST two render hosts created by the session be alive.
-- **FR-U03-003**: Opening MUST follow this order: prepare the experience (with the given seed and time limit),
+- **FR-U03-003**: An open request MUST carry a factory for the experience, the seed, an optional snapshot, the
+  resource budget, the memory-pressure limit and the preparation time limit. The session MUST build a new
+  experience from the factory for every open and every Retry. Opening MUST follow this order: prepare the
+  experience (with the given seed and time limit),
   restore the given snapshot when one is passed in, create the render host with the experience's resource budget,
   activate, draw the first frame. Each stage's duration MUST be recorded.
 - **FR-U03-004**: Opening while another experience is open or preparing MUST first close that experience
-  completely (FR-U03-010) and only then start the new preparation.
+  completely (FR-U03-010) and only then start the new preparation. Open requests MUST be handled one after
+  another and the newest MUST win: a request that is overtaken before it runs MUST end with the result
+  "superseded" and change nothing.
 - **FR-U03-005**: A stored snapshot that the experience refuses at open MUST NOT stop the opening: the experience
   opens fresh and the refusal is recorded with its code.
 - **FR-U03-006**: The session MUST publish its state, the open experience's id, the stage timings and its
@@ -263,14 +291,16 @@ forbidden call.
   suspension returns.
 - **FR-U03-043**: An experience MUST NOT be activated while the phase is not active: a preparation that finishes
   in the background leads to a suspended experience that runs when the app is active.
-- **FR-U03-044**: The session MUST NOT register its own observers for app notifications where the render host
-  already observes them; it MUST drive the host through the host's own pause and resume.
+- **FR-U03-044**: The session MUST receive the scene phase from its host view (or a test) and MUST listen itself
+  for the system's memory warning, with exactly one observer that is removed when the session is released. It MUST
+  NOT replace the render host's own reactions and MUST drive the host through the host's own pause and resume.
 
 **Memory pressure and context loss**
 
 - **FR-U03-050**: On a memory warning the session MUST ask the open experience to shed its caches. Shedding MUST
   NOT change the digest.
-- **FR-U03-051**: When, after shedding, the live bytes of the session's registry exceed the budget, the session
+- **FR-U03-051**: When, after shedding, the live bytes of the session's registry exceed the memory-pressure limit
+  of the open request (by default half of the budget's total), the session
   MUST hand out a snapshot, close the experience (FR-U03-010) and enter the message state with a text that says
   the experience was closed to free memory. The host view MUST show the message with Back.
 - **FR-U03-052**: After a context recreation the experience MUST draw again from its state, the digest MUST be
@@ -318,8 +348,8 @@ forbidden call.
 **Framework obligations and boundaries**
 
 - **FR-U03-100**: The session and the host view MUST live in VisualCoreExperienceHost and MUST run on the main
-  actor. Pure decisions (the session's state table, the order of a close, the budget rule) MUST be host-testable
-  logic in the pure package.
+  actor. Pure decisions (the session's state table, the order of a close, the memory-pressure rule) MUST be one
+  host-testable value in the pure package, and the session MUST carry out what that value decides.
 - **FR-U03-101**: The feature MUST NOT change the public API of the experience contract of UA-F02 except by
   additions, and MUST NOT change the render host's behavior.
 - **FR-U03-102**: Every public symbol MUST have documentation, the API baseline MUST be updated, both packages'
@@ -333,7 +363,8 @@ forbidden call.
 ### Key Entities
 
 - **Session**: state, open experience, render host, budget, phase, sink, counters.
-- **Open request**: experience, seed, optional snapshot, resource budget, time limit.
+- **Open request**: experience factory, seed, optional snapshot, resource budget, memory-pressure limit, time
+  limit. **Open result**: running, failed, cancelled or superseded.
 - **Stage timings**: prepare, host creation, activation, first frame.
 - **Session failure**: code, text, stage in which it happened.
 - **Session diagnostics**: the readable record of FR-U03-080.
@@ -356,8 +387,8 @@ forbidden call.
 - **SC-U03-005**: For the phase sequences background → active and inactive → active, each after 10 seconds away,
   the step count grows by 0 for the time away and the digest is equal before and after; a snapshot is handed out
   at every suspension.
-- **SC-U03-006**: A memory warning within the budget changes neither digest nor state; a memory warning over the
-  budget ends in the message state with 0 live objects and one snapshot handed out.
+- **SC-U03-006**: A memory warning below the memory-pressure limit changes neither digest nor state; a memory
+  warning above it ends in the message state with 0 live objects and one snapshot handed out.
 - **SC-U03-007**: After a forced context recreation the centre pixel shows the same colour as before within 2 of
   255 and the digest is equal, on both simulator runtimes.
 - **SC-U03-008**: The isolation check passes on the repository, fails on 2 of 2 scratch violations with file and

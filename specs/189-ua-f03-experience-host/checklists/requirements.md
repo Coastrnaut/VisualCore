@@ -39,3 +39,5 @@
   (Traceability table); a script confirmed that every functional requirement appears in that table.
 - The absorbed features R02-F04 and R02-F25 are listed requirement by requirement as adopted, adapted or
   superseded.
+- Re-validated 2026-11-12 after `/speckit-clarify` (five questions answered): 16 of 16 still pass; no item
+  changed state.
