@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "grep",
+    "-n",
+    "-F",
+    "**Date:** 2026-11-11",
+    "docs/decisions/ADR-0010-constitution-2-0-0.md"
+  ],
+  "command": "grep -n -F '**Date:** 2026-11-11' docs/decisions/ADR-0010-constitution-2-0-0.md",
+  "elapsed_seconds": 0.003,
+  "exit_code": 0,
+  "finished": "2026-11-12T04:37:37+00:00",
+  "gate": "CONSTITUTION-2",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/CONSTITUTION-2.adr-0010.log",
+  "log_sha256": "2eba958c190dc1196f74e3acd8358184a8fff3b38b7888d3f7a577034ed4459a",
+  "name": "adr-0010",
+  "started": "2026-11-12T04:37:37+00:00",
+  "timed_out": false
+}

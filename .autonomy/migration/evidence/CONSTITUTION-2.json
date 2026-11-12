@@ -1,0 +1,93 @@
+{
+  "branch": "main",
+  "dirty": false,
+  "dirty_paths": [],
+  "failed_attempts": [],
+  "gate": "CONSTITUTION-2",
+  "ledger": "migration",
+  "passing_checks": [
+    {
+      "command": "grep -n -F '**Date:** 2026-11-11' docs/decisions/ADR-0010-constitution-2-0-0.md",
+      "exit_code": 0,
+      "finished": "2026-11-12T04:37:37+00:00",
+      "log": ".autonomy/logs/migration/CONSTITUTION-2.adr-0010.log",
+      "log_sha256": "2eba958c190dc1196f74e3acd8358184a8fff3b38b7888d3f7a577034ed4459a",
+      "name": "adr-0010"
+    },
+    {
+      "command": "python3 scripts/validate_docs.py",
+      "exit_code": 0,
+      "finished": "2026-11-12T04:37:30+00:00",
+      "log": ".autonomy/logs/migration/CONSTITUTION-2.docs.log",
+      "log_sha256": "b63e579be0bd4facab6e824b2e004c62dc5cb3582b98533821b6435d57348a85",
+      "name": "docs"
+    },
+    {
+      "command": "grep -n -F ImplementationLock-100 .specify/memory/constitution.md",
+      "exit_code": 0,
+      "finished": "2026-11-12T04:37:37+00:00",
+      "log": ".autonomy/logs/migration/CONSTITUTION-2.principle-v-lock.log",
+      "log_sha256": "77fa27650b9d780f088044193eddb8b058fcf4d424d2f5cf1906a0069462bc04",
+      "name": "principle-v-lock"
+    },
+    {
+      "command": "grep -n -x -F '### XI. One App and Stable Experience Identity' .specify/memory/constitution.md",
+      "exit_code": 0,
+      "finished": "2026-11-12T04:37:37+00:00",
+      "log": ".autonomy/logs/migration/CONSTITUTION-2.principle-xi.log",
+      "log_sha256": "7ec32e8fe4702389e1033485809cdd0090507b5f738c428edb68759ff3e6f742",
+      "name": "principle-xi"
+    },
+    {
+      "command": "grep -n -x -F '### XII. One Purchase and No Advertising (NON-NEGOTIABLE)' .specify/memory/constitution.md",
+      "exit_code": 0,
+      "finished": "2026-11-12T04:37:37+00:00",
+      "log": ".autonomy/logs/migration/CONSTITUTION-2.principle-xii.log",
+      "log_sha256": "4536f24cb238ea43fc4b02fd10f9a203297bdfd852d2a32a032541da8bd3d0ed",
+      "name": "principle-xii"
+    },
+    {
+      "command": "grep -n -x -F '### XIII. Code-Driven Visuals' .specify/memory/constitution.md",
+      "exit_code": 0,
+      "finished": "2026-11-12T04:37:37+00:00",
+      "log": ".autonomy/logs/migration/CONSTITUTION-2.principle-xiii.log",
+      "log_sha256": "49383a16179c03b55f20429ee22be8c36c0fb3ceead66d0b3cbe7ff39f95319a",
+      "name": "principle-xiii"
+    },
+    {
+      "command": "python3 scripts/render_autocreator.py --check",
+      "exit_code": 0,
+      "finished": "2026-11-12T04:37:31+00:00",
+      "log": ".autonomy/logs/migration/CONSTITUTION-2.render.log",
+      "log_sha256": "3ff40d9bc512d1d31b17999eba985d9b350c02c05f8e6be93efb70538eb39606",
+      "name": "render"
+    },
+    {
+      "command": "python3 scripts/test_scripts.py",
+      "exit_code": 0,
+      "finished": "2026-11-12T04:37:37+00:00",
+      "log": ".autonomy/logs/migration/CONSTITUTION-2.script-tests.log",
+      "log_sha256": "88e8b6d8d737ebd1f843658ed1dbdb85a824eead1cb188f0872d8eebc50c5533",
+      "name": "script-tests"
+    },
+    {
+      "command": "python3 scripts/validate_autocreator.py",
+      "exit_code": 0,
+      "finished": "2026-11-12T04:37:31+00:00",
+      "log": ".autonomy/logs/migration/CONSTITUTION-2.steering.log",
+      "log_sha256": "296fed8874b706caf9c4ddcbdc3d5e817c099740070e78efde786d715f4f06a8",
+      "name": "steering"
+    },
+    {
+      "command": "grep -n -x -F '**Version**: 2.0.0 | **Ratified**: 2026-11-10 | **Last Amended**: 2026-11-11' .specify/memory/constitution.md",
+      "exit_code": 0,
+      "finished": "2026-11-12T04:37:37+00:00",
+      "log": ".autonomy/logs/migration/CONSTITUTION-2.version-2-0-0.log",
+      "log_sha256": "b4164ada8f78ba6fea64925a0c9167ad7ed6dbf8dcfa7cb3232ce1f38b6fdada",
+      "name": "version-2-0-0"
+    }
+  ],
+  "revision": "42cdb8ee6731c7817db2815cdd66c9ce0551bb32",
+  "revision_number": 1,
+  "sealed": "2026-11-12T04:37:45+00:00"
+}

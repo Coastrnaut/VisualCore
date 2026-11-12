@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "grep",
+    "-n",
+    "-x",
+    "-F",
+    "### XI. One App and Stable Experience Identity",
+    ".specify/memory/constitution.md"
+  ],
+  "command": "grep -n -x -F '### XI. One App and Stable Experience Identity' .specify/memory/constitution.md",
+  "elapsed_seconds": 0.003,
+  "exit_code": 0,
+  "finished": "2026-11-12T04:37:37+00:00",
+  "gate": "CONSTITUTION-2",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/CONSTITUTION-2.principle-xi.log",
+  "log_sha256": "7ec32e8fe4702389e1033485809cdd0090507b5f738c428edb68759ff3e6f742",
+  "name": "principle-xi",
+  "started": "2026-11-12T04:37:37+00:00",
+  "timed_out": false
+}

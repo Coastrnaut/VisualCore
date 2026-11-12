@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "python3",
+    "scripts/render_autocreator.py",
+    "--check"
+  ],
+  "command": "python3 scripts/render_autocreator.py --check",
+  "elapsed_seconds": 0.123,
+  "exit_code": 0,
+  "finished": "2026-11-12T04:37:31+00:00",
+  "gate": "CONSTITUTION-2",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/CONSTITUTION-2.render.log",
+  "log_sha256": "3ff40d9bc512d1d31b17999eba985d9b350c02c05f8e6be93efb70538eb39606",
+  "name": "render",
+  "started": "2026-11-12T04:37:31+00:00",
+  "timed_out": false
+}

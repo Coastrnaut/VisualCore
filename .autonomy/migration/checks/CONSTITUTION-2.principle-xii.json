@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "grep",
+    "-n",
+    "-x",
+    "-F",
+    "### XII. One Purchase and No Advertising (NON-NEGOTIABLE)",
+    ".specify/memory/constitution.md"
+  ],
+  "command": "grep -n -x -F '### XII. One Purchase and No Advertising (NON-NEGOTIABLE)' .specify/memory/constitution.md",
+  "elapsed_seconds": 0.003,
+  "exit_code": 0,
+  "finished": "2026-11-12T04:37:37+00:00",
+  "gate": "CONSTITUTION-2",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/CONSTITUTION-2.principle-xii.log",
+  "log_sha256": "4536f24cb238ea43fc4b02fd10f9a203297bdfd852d2a32a032541da8bd3d0ed",
+  "name": "principle-xii",
+  "started": "2026-11-12T04:37:37+00:00",
+  "timed_out": false
+}

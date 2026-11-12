@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "python3",
+    "scripts/validate_docs.py"
+  ],
+  "command": "python3 scripts/validate_docs.py",
+  "elapsed_seconds": 0.043,
+  "exit_code": 0,
+  "finished": "2026-11-12T04:37:30+00:00",
+  "gate": "CONSTITUTION-2",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/CONSTITUTION-2.docs.log",
+  "log_sha256": "b63e579be0bd4facab6e824b2e004c62dc5cb3582b98533821b6435d57348a85",
+  "name": "docs",
+  "started": "2026-11-12T04:37:30+00:00",
+  "timed_out": false
+}

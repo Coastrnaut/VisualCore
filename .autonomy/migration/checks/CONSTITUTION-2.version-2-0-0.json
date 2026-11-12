@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "grep",
+    "-n",
+    "-x",
+    "-F",
+    "**Version**: 2.0.0 | **Ratified**: 2026-11-10 | **Last Amended**: 2026-11-11",
+    ".specify/memory/constitution.md"
+  ],
+  "command": "grep -n -x -F '**Version**: 2.0.0 | **Ratified**: 2026-11-10 | **Last Amended**: 2026-11-11' .specify/memory/constitution.md",
+  "elapsed_seconds": 0.004,
+  "exit_code": 0,
+  "finished": "2026-11-12T04:37:37+00:00",
+  "gate": "CONSTITUTION-2",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/CONSTITUTION-2.version-2-0-0.log",
+  "log_sha256": "b4164ada8f78ba6fea64925a0c9167ad7ed6dbf8dcfa7cb3232ce1f38b6fdada",
+  "name": "version-2-0-0",
+  "started": "2026-11-12T04:37:37+00:00",
+  "timed_out": false
+}

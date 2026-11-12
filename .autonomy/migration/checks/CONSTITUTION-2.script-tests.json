@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "python3",
+    "scripts/test_scripts.py"
+  ],
+  "command": "python3 scripts/test_scripts.py",
+  "elapsed_seconds": 5.738,
+  "exit_code": 0,
+  "finished": "2026-11-12T04:37:37+00:00",
+  "gate": "CONSTITUTION-2",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/CONSTITUTION-2.script-tests.log",
+  "log_sha256": "88e8b6d8d737ebd1f843658ed1dbdb85a824eead1cb188f0872d8eebc50c5533",
+  "name": "script-tests",
+  "started": "2026-11-12T04:37:32+00:00",
+  "timed_out": false
+}
