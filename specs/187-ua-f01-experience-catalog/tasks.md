@@ -139,3 +139,9 @@ final sources.
   within ten minutes, with their output written to a file by `run-check`.
 - No task changes `Apps/`, `Showcase/`, `Harnesses/`, `Packages/VisualCoreRendering`, `External/`, `Vendor/`,
   `project.yml` or the planning catalog.
+
+## Phase 11: Convergence
+
+- [ ] T-U01-028 Add two cases to `BuildCatalogTests` in `scripts/test_scripts.py`: with a gate `X-R05-G01` added to the temporary ledger the manifest has 101 entries and the new one is premium and not available, while without the gate no backlog experience is in the manifest; a planning catalog in which two experiences share an id is an error that names the file and writes nothing, per spec Edge Cases, FR-U01-012 and FR-U01-044 (partial)
+- [ ] T-U01-029 Add to `CatalogLoadingTests.swift` the two untested limits: a tag of 61 characters and a quality tier name of 41 characters are refused with `invalidValue`, and 60 and 40 characters are accepted, per FR-U01-033 (partial)
+- [ ] T-U01-030 Record what was built where the documents differ: list `CatalogManifest.launchCodes`, `ExperienceDescriptor.tag(forFamily:)`, `ExperienceID.maxSlugLength`, `SourceMoveMap.maxMoves` and the public initializers of `RegistryReport`, `SourceMoveMap.Move` and `ExperienceContent` in `contracts/visualcore-experience-api.md` with the reason each is public; correct research.md R5 (the tool validates `Catalog/categories.json`, which is written by hand) and the plan's test folder line (damaged manifests are built in code by `ManifestBuilder`, there is no `Fixtures/Damaged`), per contracts/visualcore-experience-api.md and plan: project structure (unrequested)
