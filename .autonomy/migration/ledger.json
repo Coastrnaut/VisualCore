@@ -2,7 +2,7 @@
  "schema": 1,
  "name": "VisualCore unified-app migration ledger (ADR-0009)",
  "created": "2026-11-12T02:54:10+00:00",
- "updated": "2026-11-12T18:19:43+00:00",
+ "updated": "2026-11-12T20:12:59+00:00",
  "rules": [
   "Only scripts/migration_ledger.py writes this file.",
   "The legacy ledger .autonomy/state.json is never reset or rewritten by the migration; its passed gates stay passed.",
@@ -85,7 +85,7 @@
   {"id":"UA-F03","kind":"unified-feature","title":"Experience host and session lifecycle","depends":["CONSTITUTION-2","UA-F02"],"status":"pass","attempts":[{"at":"2026-11-12T12:24:07+00:00","result":"pass","evidence":".autonomy/migration/evidence/UA-F03.json","evidence_sha256":"3853dc8b6662a4cd64e59ae8b0fe9fd251fd30cee867489c95f7679a17148a4e","revision":"fff95900a3ed99147cf42bed8b8e47fc55b2dcda"}],"spec_dir":"specs/189-ua-f03-experience-host"},
   {"id":"UA-F04","kind":"unified-feature","title":"The VisualCore app shell: launcher, navigation, settings and onboarding","depends":["CONSTITUTION-2","UA-F01","UA-F03"],"status":"pass","attempts":[{"at":"2026-11-12T18:19:43+00:00","result":"pass","evidence":".autonomy/migration/evidence/UA-F04.json","evidence_sha256":"0469dad51455748b3ed9ba55ccb6eba87ff262fde071d0b1e74b5e7dd946c0cb","revision":"f0280f6769ffcfd02f91d02d4c761e52f1f77f1b"}],"spec_dir":"specs/190-ua-f04-app-shell"},
   {"id":"UA-F05","kind":"unified-feature","title":"Session state, per-experience persistence, reset and restore","depends":["CONSTITUTION-2","UA-F03","UA-F04"],"status":"pending","attempts":[],"spec_dir":"specs/191-ua-f05-session-persistence"},
-  {"id":"UA-F06","kind":"unified-feature","title":"Quality profiles and performance observability","depends":["CONSTITUTION-2","UA-F03"],"status":"pending","attempts":[],"spec_dir":"specs/192-ua-f06-quality-performance"},
+  {"id":"UA-F06","kind":"unified-feature","title":"Quality profiles and performance observability","depends":["CONSTITUTION-2","UA-F03"],"status":"pass","attempts":[{"at":"2026-11-12T20:12:59+00:00","result":"pass","evidence":".autonomy/migration/evidence/UA-F06.json","evidence_sha256":"d069a69aa02ef2931ae64b8cee33a09532905f91c8d336d2bb48e84a1fc7a86c","revision":"012d7296536cee6a860d84a4959ddcba8b774a38"}],"spec_dir":"specs/192-ua-f06-quality-performance"},
   {"id":"UA-F07","kind":"unified-feature","title":"Adoption of the existing apps A01 to A04 as experiences","depends":["CONSTITUTION-2","UA-F02","UA-F03","UA-F04","UA-F05"],"status":"pending","attempts":[],"spec_dir":"specs/193-ua-f07-legacy-adoption"},
   {"id":"UA-F09","kind":"unified-feature","title":"Experience verification runner and evidence schema","depends":["CONSTITUTION-2","UA-F02","UA-F03","UA-F04"],"status":"pending","attempts":[],"spec_dir":"specs/195-ua-f09-verification-runner"},
   {"id":"UA-F10","kind":"unified-feature","title":"Build, project and CI consolidation","depends":["CONSTITUTION-2","UA-F04"],"status":"pending","attempts":[],"spec_dir":"specs/196-ua-f10-build-ci"},
