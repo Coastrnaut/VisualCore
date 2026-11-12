@@ -2698,6 +2698,11 @@ builds of both modules.
   counts → end deactivation (zero live and zero leaked resources, or a recorded leak failure) → idle.
 - The session's decisions (its seven states and their legal changes, the order of a close, the memory-pressure
   rule) are pure values in `VisualCoreExperience` (`SessionLifecycle`), tested on the host.
+- As built by UA-F05: a request can say that a refused snapshot fails the open (`refusedSnapshotFails`). The
+  open then ends as a failure of the stage `restore`, before a render host exists and without a call of the
+  sink, so an experience never starts on a fresh state while a stored one exists that it could not read.
+  `checkpoint()` hands the open experience's snapshot to the sink between a suspension and a close; the app
+  calls it five seconds after an accepted action.
 
 ### 11.5 Threads and GPU ownership
 
@@ -2750,6 +2755,13 @@ builds of both modules.
   search is a text field in the first row; a registration's factory receives the stored reduce-motion and
   reduce-flashing choices; the shell's pure decisions (launcher sections,
   startup, preferences, reset plan) live in `VisualCoreExperience` (`ShellModel.swift`).
+- As built by UA-F05: a stored state that cannot be read shows a notice on the experience route in place of the
+  experience (`vc.unreadable`, with `vc.unreadable.reset` and `vc.unreadable.back`); nothing runs behind it.
+  Reset keeps a copy of the stored state and starts afresh; Back returns to the catalog and changes nothing.
+  The debug support gained `-vcDamageState <truncated|garbage|newer|other>` (damages every stored state before
+  the model starts), `-vcStrayItems` (one file and one defaults key that no inventory rule lists) and the
+  container inventory in the settings diagnostics (`vc.inventory`). The interface tests of persistence are two
+  further chunks: `VisualCoreUITests/PersistenceUITests` and `VisualCoreUITests/PersistenceDamageUITests`.
 
 ## 12. Rendering, quality and performance
 
@@ -3095,17 +3107,34 @@ Connect, the Paid Apps agreement, the price, the Family Sharing choice and a san
 ### 15.1 Persistence
 
 - Each experience has an isolated namespace: files under `Application Support/Experiences/<id>/` and defaults keys
-  with the prefix `exp.<id>.`. It reaches storage only through its context; a test proves that two experiences
-  cannot read each other's data.
-- Snapshots are versioned envelopes (`DocumentEnvelope`) with migrations (`MigrationChain`). Writes are atomic.
-  Each experience with stored data has a migration test from every earlier schema version.
-- Autosave happens at suspension and at safe points. A truncated, corrupted or newer-version file gives a
-  recoverable message with Reset, keeps a quarantined copy and never crashes or silently erases earlier work.
-- Reset of one experience clears exactly its namespace. Reset of all data clears every namespace and the session
-  state.
-- A container inventory test lists the only files and defaults keys that may exist. Files created by the system
-  (StoreKit's `SKTransactionUpdatesLastChecked` key, Metal cache files ending in `.pcm`, which are not audio) are
-  allowed after their origin has been checked, not ignored wholesale. Unknown files are never suppressed.
+  with the prefix `exp.<id>.`. It reaches storage only through the handle the shell hands over when it opens the
+  experience (`ExperienceStorage`, in the launch value): named files and named values, names of 1 to 128
+  characters of `A-Z a-z 0-9 . _ -` that do not start with a dot, at most 64 files of 16 MiB in total and 64
+  values of 4 KiB. A refused operation changes nothing. Tests prove that two experiences cannot read each
+  other's data and that no name leaves the folder; `scripts/check_app_isolation.py --no-direct-storage` proves
+  that an experience's sources name no file or defaults interface.
+- The saved state of an experience is the text of its `ExperienceSnapshot` (format 1, at most 1 MiB, with
+  checksum, schema version and migrations through `MigrationChain`) in `state.json` of its folder
+  (`SavedStateStore`). Writes are atomic: a hidden temporary file in the same folder, then a replace; leftover
+  temporary files are removed at the start. A state equal to the stored one is not written again.
+  Each registered experience carries one stored example of every earlier schema version with the digest it
+  restores to (`SnapshotMigrationCheck`); the app's unit test runs the check for every registration.
+- The state is saved at a suspension, at a close and five seconds after an accepted action (one save for a burst
+  of actions). A save that fails is recorded in the diagnostics and never stops the experience.
+- A truncated, damaged, foreign, too large or newer-version state never starts the experience: the app shows a
+  notice with Reset and Back. Reset moves the file to a quarantined copy (`quarantine-<n>.json`, at most three,
+  the oldest removed first) and starts afresh; Back changes nothing. No shipped path that reads stored data
+  uses a deliberate crash (`scripts/check_app_isolation.py --no-crash-on-stored-data`).
+- Reset of one experience clears exactly its namespace: its folder and its defaults values. Reset of all data
+  clears every namespace, the session state and the copy of an unreadable session state
+  (`vc.shell.preferences.unreadable`, kept once before such a value is overwritten).
+- A container inventory lists the only files and defaults keys that may exist (`ContainerInventory`; the rule
+  list is in the app's debug support). An interface test reads the inventory after a scripted use on both
+  simulator runtimes. Files and keys the system writes are allowed by a rule that states how the origin was
+  established, not ignored wholesale: the defaults property list, the Metal caches (`com.apple.metal`,
+  `com.apple.metalfe`, with files ending in `.pcm`, which are not audio), the launch-screen pictures of
+  SplashBoard, UIKit's saved application state and the split view's column key. StoreKit's
+  `SKTransactionUpdatesLastChecked` key is added with the purchase feature. Unknown files are never suppressed.
 - No iCloud and no sync.
 
 ### 15.2 Privacy
@@ -3179,7 +3208,7 @@ VisualCore/
 │   ├── FractalExplorer/          move       likewise
 │   └── ParticleUniverse/         move       likewise
 ├── Packages/
-│   ├── VisualCore/               modify     + VisualCoreExperience (catalog UA-F01, experience contract UA-F02), VisualCoreGeometry, VisualCorePuzzle
+│   ├── VisualCore/               modify     + VisualCoreExperience (catalog UA-F01, experience contract UA-F02, storage handle and saved state UA-F05), VisualCoreGeometry, VisualCorePuzzle
 │   ├── VisualCoreRendering/      modify     + VisualCoreExperienceHost (presenter, port, shell: UA-F02; session: UA-F03), VisualCoreStore
 │   ├── ExperiencesCreative/      new        A01–A25: <Name>/Core, <Name>/Experience, <Name>/Shaders, tests
 │   ├── ExperiencesRound02/       new        R02-G01 … G25
@@ -3191,7 +3220,7 @@ VisualCore/
 ├── External/projectm-ios/        existing   pinned read-only submodule
 ├── Configs/                      existing   toolchain.json, Signing.xcconfig (the local signing file is never committed), simulator-identifier-hashes.json
 ├── Tools/python/desktop_runbook.py   existing   legacy ledger tool
-├── scripts/                      modify     + build_catalog.py, check_experience_symbols.py, xcodebuild_app.py, check_performance_docs.py, verify_experiences.py, run_device_campaign.py
+├── scripts/                      modify     + build_catalog.py, check_experience_symbols.py, xcodebuild_app.py, check_performance_docs.py, storage rules in check_app_isolation.py (UA-F05), verify_experiences.py, run_device_campaign.py
 ├── specs/                        modify     001–035 existing; 036–550 and rNN-* as features are specified
 └── docs/
     ├── decisions/                modify     ADR-0001 … ADR-0009, then ADR-0010 (constitution 2.0.0)

@@ -117,3 +117,38 @@ builds, settings diagnostics).
 Debug arguments (debug builds only): `-vcDamageState <truncated|garbage|newer|other>` (damages every stored
 state before the model starts), `-vcStrayItems` (one stray file and one stray defaults key), and the existing
 `-vcSeedData`, which now writes through the storage handle.
+
+## 8. As built (2026-11-12)
+
+- `ExperienceLaunch.storage` is not optional; `ExperienceRegistration` is created with its core type and its
+  examples (`init(id:core:examples:make:)`), so that no registration exists without the migration check.
+- `quarantine(_:)` takes no reason; a file above the limit gives the code `snapshot.too-large`.
+- The notice also shows the problem code as text (`vc.unreadable.code`).
+- `PreferencesStore.load()` makes the copy of an unreadable value the first time it meets one;
+  `PreferencesStore.remove()` removes the value and the copy.
+- `-vcResetData` also removes every experience value and the stray items of an earlier `-vcStrayItems`.
+- The interface tests are two classes, each one chunk: `PersistenceUITests` (`-e`) and
+  `PersistenceDamageUITests` (`-f`).
+- The source rule of feature 187 names `ExperienceStorage.swift` and `SavedStateStore.swift` as the only files
+  of the pure module that reach files and defaults.
+
+The allow-list as built (`Apps/VisualCore/App/DebugSupport/DebugInventory.swift`). `<id>` is
+`[a-z0-9][a-z0-9.-]*`, `<name>` a storage name, `<bundle>` a bundle identifier.
+
+| Kind | Pattern | Writer | Origin of a system entry |
+|---|---|---|---|
+| file | `Library/Application Support/Experiences/<id>/state.json` | the app | |
+| file | `Library/Application Support/Experiences/<id>/quarantine-<n>.json` | the app | |
+| file | `Library/Application Support/Experiences/<id>/<name>` | an experience, through its handle | |
+| key | `vc.shell.preferences` | the app | |
+| key | `vc.shell.preferences.unreadable` | the app | |
+| key | `exp.<id>.<name>` | an experience, through its handle | |
+| file | `Library/Preferences/<bundle>.plist` | the system | the property list of the defaults domain; iOS 27.2 and 26.5 simulators |
+| file | `Library/Caches/<bundle>/com.apple.metal/…` | the system | Metal library cache (`libraries.data`, `libraries.list`), seen after the first frame |
+| file | `Library/Caches/<bundle>/com.apple.metalfe/…` | the system | Metal front-end module cache (`modules.timestamp`, `modules.idx`, `monolithic_metal.pcm`) |
+| file | `Library/SplashBoard/Snapshots/…` | the system | launch-screen pictures (`.ktx`), seen after the first start |
+| file | `Library/Saved Application State/<bundle>.savedState/…` | the system | UIKit scene sessions, written when the app goes to the background |
+| key | `com.apple.UIKit.UISplitViewController.<name>` | the system | the column state of the root view's split view (`…Root`) |
+
+Observed with `PersistenceUITests.testAfterAScriptedUseTheContainerHoldsOnlyListedItems` on the iOS 27.2 phone
+and tablet and the iOS 26.5 phone and tablet simulators: `unlisted: none` in every run.
