@@ -1,0 +1,26 @@
+{
+  "argv": [
+    "python3",
+    "scripts/release_check.py",
+    "--only",
+    "docs",
+    "app-contracts",
+    "compliance",
+    "dependencies",
+    "public-api",
+    "documented-api",
+    "licenses",
+    "script-tests"
+  ],
+  "command": "python3 scripts/release_check.py --only docs app-contracts compliance dependencies public-api documented-api licenses script-tests",
+  "elapsed_seconds": 0.032,
+  "exit_code": 1,
+  "finished": "2026-11-12T04:02:12+00:00",
+  "gate": "M0-CONSOLIDATION",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/M0-CONSOLIDATION.fast-release-checks.log",
+  "log_sha256": "673631c0d3d85dab34e2d94ac85e81e88b1c4de7fe7f9910701fdab47eb22039",
+  "name": "fast-release-checks",
+  "started": "2026-11-12T04:02:12+00:00",
+  "timed_out": false
+}

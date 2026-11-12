@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "python3",
+    "Tools/python/desktop_runbook.py",
+    "validate"
+  ],
+  "command": "python3 Tools/python/desktop_runbook.py validate",
+  "elapsed_seconds": 0.048,
+  "exit_code": 0,
+  "finished": "2026-11-12T04:01:58+00:00",
+  "gate": "M0-CONSOLIDATION",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/M0-CONSOLIDATION.legacy-ledger.log",
+  "log_sha256": "6ac16dcc1ee491f02dcbaf50190588614b2e66413c0fb04fc653dcc99b8e1471",
+  "name": "legacy-ledger",
+  "started": "2026-11-12T04:01:58+00:00",
+  "timed_out": false
+}

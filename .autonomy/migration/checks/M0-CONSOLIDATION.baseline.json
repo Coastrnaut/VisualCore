@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "python3",
+    "scripts/migration_baseline.py",
+    "verify"
+  ],
+  "command": "python3 scripts/migration_baseline.py verify",
+  "elapsed_seconds": 0.102,
+  "exit_code": 0,
+  "finished": "2026-11-12T04:01:58+00:00",
+  "gate": "M0-CONSOLIDATION",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/M0-CONSOLIDATION.baseline.log",
+  "log_sha256": "d33298c52ef89cdfb00e911e6a474165c8b3b46791f81fd8c4adca65518bf318",
+  "name": "baseline",
+  "started": "2026-11-12T04:01:58+00:00",
+  "timed_out": false
+}

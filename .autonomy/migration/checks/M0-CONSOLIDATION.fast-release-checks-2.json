@@ -1,0 +1,28 @@
+{
+  "argv": [
+    "python3",
+    "scripts/release_check.py",
+    "--only",
+    "docs",
+    "compliance",
+    "dependencies",
+    "public-api",
+    "documented-api-showcase",
+    "documented-api-interactive-demo",
+    "documented-api-second-consumer",
+    "licenses",
+    "app-contracts",
+    "script-tests"
+  ],
+  "command": "python3 scripts/release_check.py --only docs compliance dependencies public-api documented-api-showcase documented-api-interactive-demo documented-api-second-consumer licenses app-contracts script-tests",
+  "elapsed_seconds": 8.836,
+  "exit_code": 0,
+  "finished": "2026-11-12T04:02:34+00:00",
+  "gate": "M0-CONSOLIDATION",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/M0-CONSOLIDATION.fast-release-checks-2.log",
+  "log_sha256": "501519e68cfc25f0660cc44030354329be3a608ac93421234d61e53b1267673a",
+  "name": "fast-release-checks-2",
+  "started": "2026-11-12T04:02:25+00:00",
+  "timed_out": false
+}

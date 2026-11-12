@@ -1,0 +1,110 @@
+{
+  "branch": "migration/unified-app-plan",
+  "dirty": false,
+  "dirty_paths": [],
+  "failed_attempts": [
+    {
+      "command": "python3 scripts/release_check.py --only docs app-contracts compliance dependencies public-api documented-api licenses script-tests",
+      "exit_code": 1,
+      "log": ".autonomy/logs/migration/M0-CONSOLIDATION.fast-release-checks.log",
+      "log_sha256": "673631c0d3d85dab34e2d94ac85e81e88b1c4de7fe7f9910701fdab47eb22039",
+      "name": "fast-release-checks",
+      "timed_out": false
+    }
+  ],
+  "gate": "M0-CONSOLIDATION",
+  "ledger": "migration",
+  "passing_checks": [
+    {
+      "command": "python3 scripts/planning_archive.py verify",
+      "exit_code": 0,
+      "finished": "2026-11-12T04:01:58+00:00",
+      "log": ".autonomy/logs/migration/M0-CONSOLIDATION.archive.log",
+      "log_sha256": "245d6e0381ad7520b8250f40d60222721df16552cae625d6062bf4731c06a550",
+      "name": "archive"
+    },
+    {
+      "command": "python3 scripts/migration_baseline.py verify",
+      "exit_code": 0,
+      "finished": "2026-11-12T04:01:58+00:00",
+      "log": ".autonomy/logs/migration/M0-CONSOLIDATION.baseline.log",
+      "log_sha256": "d33298c52ef89cdfb00e911e6a474165c8b3b46791f81fd8c4adca65518bf318",
+      "name": "baseline"
+    },
+    {
+      "command": "python3 scripts/validate_docs.py",
+      "exit_code": 0,
+      "finished": "2026-11-12T04:01:58+00:00",
+      "log": ".autonomy/logs/migration/M0-CONSOLIDATION.docs.log",
+      "log_sha256": "beef148ecf88f0ffdb652e31484843e3fb90ac73b40fd133a1f562860acadb17",
+      "name": "docs"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only docs compliance dependencies public-api documented-api-showcase documented-api-interactive-demo documented-api-second-consumer licenses app-contracts script-tests",
+      "exit_code": 0,
+      "finished": "2026-11-12T04:02:34+00:00",
+      "log": ".autonomy/logs/migration/M0-CONSOLIDATION.fast-release-checks-2.log",
+      "log_sha256": "501519e68cfc25f0660cc44030354329be3a608ac93421234d61e53b1267673a",
+      "name": "fast-release-checks-2"
+    },
+    {
+      "command": "python3 scripts/render_autocreator.py --check",
+      "exit_code": 0,
+      "finished": "2026-11-12T04:01:57+00:00",
+      "log": ".autonomy/logs/migration/M0-CONSOLIDATION.generated-blocks.log",
+      "log_sha256": "b24e7e96293a3df7349d1eaa7e2da46a7cd5932d062c56b6de56f39c9222daae",
+      "name": "generated-blocks"
+    },
+    {
+      "command": "python3 scripts/planning_index.py verify",
+      "exit_code": 0,
+      "finished": "2026-11-12T04:01:58+00:00",
+      "log": ".autonomy/logs/migration/M0-CONSOLIDATION.index.log",
+      "log_sha256": "bd59e0d08adb7fd326aad8e080bc77325240aff8eec8b063dcab4b0b1721ed52",
+      "name": "index"
+    },
+    {
+      "command": "python3 Tools/python/desktop_runbook.py validate",
+      "exit_code": 0,
+      "finished": "2026-11-12T04:01:58+00:00",
+      "log": ".autonomy/logs/migration/M0-CONSOLIDATION.legacy-ledger.log",
+      "log_sha256": "6ac16dcc1ee491f02dcbaf50190588614b2e66413c0fb04fc653dcc99b8e1471",
+      "name": "legacy-ledger"
+    },
+    {
+      "command": "python3 scripts/build_traceability_matrix.py --check",
+      "exit_code": 0,
+      "finished": "2026-11-12T04:01:58+00:00",
+      "log": ".autonomy/logs/migration/M0-CONSOLIDATION.matrix.log",
+      "log_sha256": "3ba8ccae0c400c6fb6c7c6caa3241cb38688edbcebf86a5f3c783b56487cb808",
+      "name": "matrix"
+    },
+    {
+      "command": "python3 scripts/migration_ledger.py validate",
+      "exit_code": 0,
+      "finished": "2026-11-12T04:01:59+00:00",
+      "log": ".autonomy/logs/migration/M0-CONSOLIDATION.migration-ledger.log",
+      "log_sha256": "1bc5f963d7a9fec6aed7da64e2bf91a9c632e2c8808c0a1d2172bb925fedec69",
+      "name": "migration-ledger"
+    },
+    {
+      "command": "python3 scripts/test_scripts.py",
+      "exit_code": 0,
+      "finished": "2026-11-12T04:02:05+00:00",
+      "log": ".autonomy/logs/migration/M0-CONSOLIDATION.script-tests.log",
+      "log_sha256": "6893c8eadda98d4c8a2cd65d723fb534e43947fbeba9b30794fed249b696e48e",
+      "name": "script-tests"
+    },
+    {
+      "command": "python3 scripts/validate_autocreator.py",
+      "exit_code": 0,
+      "finished": "2026-11-12T04:01:57+00:00",
+      "log": ".autonomy/logs/migration/M0-CONSOLIDATION.steering.log",
+      "log_sha256": "24b60229325647c0e43bfd39a13f53ff15cfbe391dbb5219b32ea8445e79a106",
+      "name": "steering"
+    }
+  ],
+  "revision": "866b68172e19b08a25ca0cd05917d0a44e1df910",
+  "revision_number": 1,
+  "sealed": "2026-11-12T04:02:43+00:00"
+}

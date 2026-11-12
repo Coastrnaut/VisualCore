@@ -2,7 +2,7 @@
  "schema": 1,
  "name": "VisualCore unified-app migration ledger (ADR-0009)",
  "created": "2026-11-12T02:54:10+00:00",
- "updated": "2026-11-12T02:54:10+00:00",
+ "updated": "2026-11-12T04:02:43+00:00",
  "rules": [
   "Only scripts/migration_ledger.py writes this file.",
   "The legacy ledger .autonomy/state.json is never reset or rewritten by the migration; its passed gates stay passed.",
@@ -77,7 +77,7 @@
   }
  ],
  "gates": [
-  {"id":"M0-CONSOLIDATION","kind":"milestone","title":"Planning corpus consolidated: archive, catalog, Auto-Creator.md, validators","depends":[],"status":"pending","attempts":[]},
+  {"id":"M0-CONSOLIDATION","kind":"milestone","title":"Planning corpus consolidated: archive, catalog, Auto-Creator.md, validators","depends":[],"status":"pass","attempts":[{"at":"2026-11-12T04:02:43+00:00","result":"pass","evidence":".autonomy/migration/evidence/M0-CONSOLIDATION.json","evidence_sha256":"d02ec94c43bb288b1f9bfc6339e28da020cbd7569c58f2100ab9d64e6b8d4c13","revision":"866b68172e19b08a25ca0cd05917d0a44e1df910","note":"Consolidation of 2026-11-11: archive, catalog, Auto-Creator.md, ledgers, validators. Documentation and tooling only; no app or framework source changed."}]},
   {"id":"CONSTITUTION-2","kind":"governance","title":"Constitution amended to 2.0.0 for the single app (ADR-0009)","depends":["M0-CONSOLIDATION"],"status":"pending","attempts":[]},
   {"id":"UA-F00","kind":"unified-feature","title":"Governance tooling: feature numbering, validators and ledger operation","depends":["CONSTITUTION-2"],"status":"pending","attempts":[],"spec_dir":"specs/186-ua-f00-governance-tooling"},
   {"id":"UA-F01","kind":"unified-feature","title":"Experience catalog and stable identity","depends":["CONSTITUTION-2","UA-F00"],"status":"pending","attempts":[],"spec_dir":"specs/187-ua-f01-experience-catalog"},
