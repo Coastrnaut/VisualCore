@@ -25,7 +25,7 @@ public struct CatalogManifest: Sendable, Equatable {
     /// Loads and validates a manifest.
     ///
     /// The checks run in a fixed order, so a file with several defects reports the first: size, JSON object, schema
-    /// version, top-level keys, entry count, every entry in turn, duplicates, ascending order.
+    /// version, top-level keys, entry count, every entry in turn, duplicates, ascending order, launch allocation.
     public init(data: Data) throws(CatalogError) {
         guard data.count <= Self.maxBytes else { throw .tooLarge(bytes: data.count, limit: Self.maxBytes) }
         let top = try JSONFields.root(of: data, name: "manifest")
@@ -53,6 +53,7 @@ public struct CatalogManifest: Sendable, Equatable {
         for index in entries.indices.dropFirst() where entries[index].order < entries[index - 1].order {
             throw .outOfOrder(entry: entries[index].id.rawValue)
         }
+        try Self.checkAllocation(entries)
         schemaVersion = schema
         catalogSHA256 = hash
         experiences = entries
@@ -74,6 +75,45 @@ public struct CatalogManifest: Sendable, Equatable {
     public func families(in category: ExperienceCategory) -> [String] {
         var seen = Set<String>()
         return experiences(in: category).map(\.family).filter { seen.insert($0).inserted }
+    }
+
+    // MARK: - Launch allocation (ADR-0009 D-02; FR-U01-011, FR-U01-012)
+
+    /// Games per round and original experiences: 25 each.
+    static let collectionSize = 25
+    /// Rounds whose games are free (round 2) and premium at launch (rounds 3 and 4); later rounds are the backlog.
+    static let freeRounds = 2...2, premiumLaunchRounds = 3...4, backlogRounds = 5...12
+
+    /// The 100 launch codes in catalog order: A01–A25 and R02-G01–R02-G25 (free), R03-G01–R04-G25 (premium).
+    public static let launchCodes: [String] = (1...collectionSize).map { String(format: "A%02d", $0) }
+        + (freeRounds.lowerBound...premiumLaunchRounds.upperBound).flatMap { round in
+            (1...collectionSize).map { String(format: "R%02d-G%02d", round, $0) }
+        }
+
+    /// The rule is code, not data: a file cannot redefine which experiences are free.
+    private static func checkAllocation(_ entries: [ExperienceDescriptor]) throws(CatalogError) {
+        for entry in entries {
+            let code = entry.code
+            guard code.number <= collectionSize else {
+                throw .allocation(code: code.text, reason: "a collection has \(collectionSize) experiences")
+            }
+            let expected: ExperienceTier
+            if let round = code.round {
+                guard freeRounds.contains(round) || premiumLaunchRounds.contains(round) || backlogRounds.contains(round) else {
+                    throw .allocation(code: code.text, reason: "rounds are 02 to 12")
+                }
+                expected = freeRounds.contains(round) ? .free : .premium
+            } else {
+                expected = .free
+            }
+            guard entry.tier == expected else {
+                throw .allocation(code: code.text, reason: "this experience is \(expected.rawValue)")
+            }
+        }
+        let present = Set(entries.map(\.code.text))
+        if let missing = launchCodes.first(where: { !present.contains($0) }) {
+            throw .allocation(code: missing, reason: "a launch experience is missing")
+        }
     }
 
     // MARK: - One entry

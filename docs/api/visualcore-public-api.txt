@@ -260,6 +260,7 @@ VisualCoreExperience | let | public let text: String
 VisualCoreExperience | let | public let tier: ExperienceTier
 VisualCoreExperience | let | public let tileSeed: UInt32
 VisualCoreExperience | let | public let title: String
+VisualCoreExperience | let | public static let launchCodes: [String]
 VisualCoreExperience | let | public static let maxBytes
 VisualCoreExperience | let | public static let maxEntries
 VisualCoreExperience | let | public static let maxSlugLength
