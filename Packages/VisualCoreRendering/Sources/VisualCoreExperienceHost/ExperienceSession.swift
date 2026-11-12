@@ -22,13 +22,20 @@ private final class SessionScene: RenderScene {
     private let inner: any RenderScene
     /// Called after each frame the experience's scene drew without an error.
     var onFrame: (@MainActor () -> Void)?
+    /// How long the last set-up that ended without an error took, in seconds; nil before one ended. The set-up
+    /// is where an experience compiles its shaders (feature 192, UA-F06).
+    private(set) var setupSeconds: Double?
+    private let clock = ContinuousClock()
 
     init(inner: any RenderScene) {
         self.inner = inner
     }
 
     func setup(_ context: RenderContext) throws {
+        let start = clock.now
         try inner.setup(context)
+        let elapsed = (clock.now - start).components
+        setupSeconds = Double(elapsed.seconds) + Double(elapsed.attoseconds) / 1e18
     }
 
     func resize(_ context: RenderContext) {
@@ -101,6 +108,45 @@ public final class ExperienceSession {
     @ObservationIgnored private var firstFrameStart: ContinuousClock.Instant?
 
     @ObservationIgnored private var timings = SessionStageTimings()
+
+    // MARK: Quality and performance (feature 192, UA-F06)
+
+    /// The pinned quality level, or nil for automatic. A pin beyond an experience's levels means its last
+    /// level. Setting it applies to an open experience at once.
+    @ObservationIgnored public var qualityPin: Int? {
+        didSet {
+            guard qualityPin != oldValue else { return }
+            governor?.setPin(qualityPin)
+            applyLevelInForce()
+        }
+    }
+    /// Where the session reads the device conditions for its automatic level; the device itself by default.
+    @ObservationIgnored public var conditions: @MainActor () -> DeviceConditions = { DeviceConditions.current() }
+    /// The launch time of the process, given by the app once; it becomes part of every performance record.
+    @ObservationIgnored public var launch: LaunchTiming?
+    /// The performance record of the last experience that was closed or whose open failed; nil before that.
+    @ObservationIgnored public private(set) var lastPerformanceRecord: PerformanceRecord?
+
+    @ObservationIgnored private var governor: QualityGovernor?
+    /// The level the open experience was last set to.
+    @ObservationIgnored private var appliedLevel = 0
+    /// When the governor was last asked from the frame hook, in seconds of the session's clock.
+    @ObservationIgnored private var lastQualityCheck: Double?
+    @ObservationIgnored private let created: ContinuousClock.Instant
+    /// When the current open began; the first-present time counts from here.
+    @ObservationIgnored private var openStart: ContinuousClock.Instant?
+    @ObservationIgnored private var meter = PacingMeter()
+    /// The host time of the last presented frame; nil after a suspension, so that no interval spans it.
+    @ObservationIgnored private var lastPresentTime: Double?
+    @ObservationIgnored private var presentedAny = false
+    /// The registry's compile count when the experience became interactive or after the last context rebuild.
+    @ObservationIgnored private var compileBaseline: Int?
+    /// A context was lost and the host rebuilds it: the baseline is taken again at the next drawn frame.
+    @ObservationIgnored private var rebaselinePending = false
+    /// Late compilations counted before the last baseline.
+    @ObservationIgnored private var lateBefore = 0
+    @ObservationIgnored private var rebuilds = 0
+    @ObservationIgnored private var memoryEvents = 0
     @ObservationIgnored private var lastCloseCounts: GPUResourceCounts?
     @ObservationIgnored private var lastCloseSteps: [SessionCloseStep] = []
     @ObservationIgnored private var lastFailure: SessionFailure?
@@ -119,6 +165,7 @@ public final class ExperienceSession {
     /// the session itself stores nothing. The session listens for the system's memory warning.
     public init(snapshotSink: SnapshotSink? = nil) {
         self.snapshotSink = snapshotSink
+        created = clock.now
         memoryObserver = NotificationCenter.default.addObserver(
             forName: UIApplication.didReceiveMemoryWarningNotification, object: nil, queue: .main
         ) { [weak self] _ in
@@ -173,10 +220,12 @@ public final class ExperienceSession {
         lastRestoreRefusal = nil
         timings = SessionStageTimings()
         firstFrameStart = nil
+        resetMeasurements()
 
         let experience = request.make()
         self.experience = experience
         let prepareStart = clock.now
+        openStart = prepareStart
         var prepareError: ExperienceError?
         do {
             try await experience.prepare(seed: request.seed, timeLimit: request.timeLimit)
@@ -205,6 +254,13 @@ public final class ExperienceSession {
             }
         }
 
+        // The level in force is applied before a render host exists, so that the first frame is drawn with it.
+        var newGovernor = QualityGovernor(levelCount: experience.qualityProfile.count, pin: qualityPin)
+        newGovernor.decide(conditions: conditions(), now: sessionSeconds)
+        governor = newGovernor
+        lastQualityCheck = sessionSeconds
+        applyLevelInForce()
+
         let hostStart = clock.now
         let scene = SessionScene(inner: experience.scene)
         let host: RenderHost
@@ -224,7 +280,15 @@ public final class ExperienceSession {
             guard let self, let host, self.renderHost === host else { return }
             self.hostReported(error)
         }
+        host.addPresentObserver { [weak self, weak host] frame in
+            guard let self, let host, self.renderHost === host else { return }
+            self.notePresented(frame, by: host)
+        }
         timings.createHost = Self.seconds(clock.now - hostStart)
+        if let setup = scene.setupSeconds {
+            timings.setup = setup
+            timings.programsCompiled = host.resources.compileCount
+        }
         // A setup that threw inside the host's initializer was reported before the observer existed.
         if let failed = failIfExperienceFailed() { return .failed(failed) }
 
@@ -243,6 +307,7 @@ public final class ExperienceSession {
         timings.activate = Self.seconds(clock.now - activateStart)
         move(to: .running)
         opens += 1
+        compileBaseline = host.resources.compileCount   // interactive from here
         firstFrameStart = clock.now
         host.renderOneFrame(present: false)
         if let failed = failIfExperienceFailed() { return .failed(failed) }
@@ -296,6 +361,7 @@ public final class ExperienceSession {
                 handOutSnapshot(of: experience)
             }
             renderHost?.pause()
+            lastPresentTime = nil   // the time away is neither a sample nor a missed refresh
             move(to: .suspended)
         case (.active, .suspended):
             resumeFromSuspension()
@@ -314,6 +380,7 @@ public final class ExperienceSession {
         guard experienceState == .ready || experienceState == .active || experienceState == .suspended else {
             return
         }
+        memoryEvents += 1
         try? experience.shedCaches()
         let limit = MemoryPressureRule.limit(requested: request.memoryPressureLimit,
                                              budgetTotal: request.budget.total)
@@ -329,14 +396,109 @@ public final class ExperienceSession {
     /// context, the session fails with `session.context-lost`.
     public func recreateContext() {
         guard let host = renderHost else { return }
+        closeCompileBaseline(of: host)
         host.recreateContext()
         contextRecreations += 1
+        rebuilds += 1
         guard renderHost === host else { return }   // the error observer already failed the session
+        if compileBaseline != nil { compileBaseline = host.resources.compileCount }
         if case .unsupported(let text) = host.lastError {
             fail(Self.contextLost(text))
         } else if host.state == .destroyed {
             fail(Self.contextLost("the render host was destroyed"))
         }
+    }
+
+    // MARK: Quality and performance
+
+    /// The quality level the open experience is set to; 0 without one.
+    public var qualityLevel: Int { experience == nil ? 0 : appliedLevel }
+
+    /// Takes a quality decision now, from the current conditions, and applies a changed level. `now` is a time
+    /// in seconds on any steady scale (tests script it); by default the session's own clock. Nothing happens
+    /// unless an experience runs.
+    public func refreshQuality(now: Double? = nil) {
+        guard state == .running, governor != nil else { return }
+        let time = now ?? sessionSeconds
+        lastQualityCheck = time
+        governor?.decide(conditions: conditions(), now: time)
+        applyLevelInForce()
+    }
+
+    /// The performance record of the open experience at this moment; nil without one. Reading it changes
+    /// nothing in the experience.
+    public var performanceRecord: PerformanceRecord? {
+        guard let experience, state == .running || state == .suspended else { return nil }
+        return makeRecord(of: experience)
+    }
+
+    /// Seconds since the session was created, on its steady clock.
+    private var sessionSeconds: Double { Self.seconds(clock.now - created) }
+
+    /// Sets the experience to the governor's level in force when it differs from the level it has.
+    private func applyLevelInForce() {
+        guard let governor, let experience else { return }
+        let state = experience.state
+        guard state == .ready || state == .active || state == .suspended else { return }
+        let level = governor.levelInForce
+        guard level != appliedLevel else { return }
+        do {
+            try experience.setQualityTier(level)
+            appliedLevel = level
+        } catch {
+            // An experience whose logic declares fewer tiers than its profile keeps the level it has.
+        }
+    }
+
+    /// Forgets the measurements of the open before; called when a new open begins.
+    private func resetMeasurements() {
+        governor = nil
+        appliedLevel = 0
+        lastQualityCheck = nil
+        openStart = nil
+        meter = PacingMeter()
+        lastPresentTime = nil
+        presentedAny = false
+        compileBaseline = nil
+        rebaselinePending = false
+        lateBefore = 0
+        rebuilds = 0
+        memoryEvents = 0
+    }
+
+    /// Adds the compilations since the baseline to the late ones; called before a context is rebuilt.
+    private func closeCompileBaseline(of host: RenderHost) {
+        guard let baseline = compileBaseline else { return }
+        lateBefore += max(0, host.resources.compileCount - baseline)
+        compileBaseline = host.resources.compileCount
+    }
+
+    /// Shader programs compiled after the experience became interactive, rebuilds after a lost context excluded.
+    private var lateCompilations: Int {
+        guard let baseline = compileBaseline, let host = renderHost, !rebaselinePending else { return lateBefore }
+        return lateBefore + max(0, host.resources.compileCount - baseline)
+    }
+
+    /// Assembles the performance record of `experience` from what was measured so far.
+    private func makeRecord(of experience: any Experience) -> PerformanceRecord {
+        let device = conditions()
+        let stats: ResourceLedger.Snapshot? = renderHost?.resources.stats
+        let pacing = renderHost?.framePacing
+        var record = PerformanceRecord(
+            experience: experience.id.rawValue, presented: presentedAny, qualityLevel: appliedLevel,
+            qualityPinned: qualityPin != nil, qualityLevels: experience.qualityProfile.count,
+            stepsDown: governor?.stepsDown ?? 0, stepsUp: governor?.stepsUp ?? 0, thermal: device.thermal,
+            lowPower: device.lowPower, frameCapFPS: pacing?.maxFPS ?? 0, renderScale: pacing?.renderScale ?? 1,
+            pacing: meter.summary, gpuBytes: stats?.totalBytes ?? 0, gpuPeakBytes: stats?.peakBytes ?? 0,
+            lateCompilations: lateCompilations, rebuilds: rebuilds, memoryEvents: memoryEvents)
+        record.launchMs = launch?.milliseconds
+        record.firstLaunch = launch?.firstLaunch
+        record.prepareMs = timings.prepare.map { $0 * 1_000 }
+        record.setupMs = timings.setup.map { $0 * 1_000 }
+        record.firstPresentMs = timings.firstPresent.map { $0 * 1_000 }
+        record.programsCompiled = timings.programsCompiled
+        record.memoryFootprintBytes = ProcessMemory.footprint()
+        return record
     }
 
     // MARK: Internals: state
@@ -392,6 +554,7 @@ public final class ExperienceSession {
             case .stopClock:
                 renderHost?.pause()
                 if let experience, experience.state == .active { try? experience.suspend() }
+                if let experience { lastPerformanceRecord = makeRecord(of: experience) }
             case .handOutSnapshot:
                 if let experience { handOutSnapshot(of: experience) }
             case .beginDeactivation:
@@ -413,6 +576,7 @@ public final class ExperienceSession {
             case .becomeIdle:
                 self.experience = nil
                 firstFrameStart = nil
+                governor = nil
                 move(to: end)
             case .cancelPreparation:
                 break
@@ -437,6 +601,8 @@ public final class ExperienceSession {
         preparingGeneration = nil
         firstFrameStart = nil
         let experience = self.experience
+        if let experience { lastPerformanceRecord = makeRecord(of: experience) }
+        governor = nil
         readCounts(of: destroyHost())
         if let experience { release(experience) }
         self.experience = nil
@@ -461,6 +627,9 @@ public final class ExperienceSession {
             fail(Self.contextLost(text))
         case .contextLost:
             contextRecreations += 1   // the host recreates its context itself after this report
+            rebuilds += 1
+            if let host = renderHost { closeCompileBaseline(of: host) }
+            rebaselinePending = compileBaseline != nil
         case .allocation, .scene:
             break
         }
@@ -468,8 +637,31 @@ public final class ExperienceSession {
 
     /// A frame of the experience was drawn: the first one while running sets the first-frame time.
     private func noteFrameDrawn() {
-        guard state == .running, timings.firstFrame == nil, let firstFrameStart else { return }
-        timings.firstFrame = Self.seconds(clock.now - firstFrameStart)
+        guard state == .running else { return }
+        if timings.firstFrame == nil, let firstFrameStart {
+            timings.firstFrame = Self.seconds(clock.now - firstFrameStart)
+        }
+        if rebaselinePending, let host = renderHost {
+            rebaselinePending = false
+            compileBaseline = host.resources.compileCount
+        }
+        let now = sessionSeconds
+        if let last = lastQualityCheck, now - last < QualityGovernor.minimumInterval { return }
+        refreshQuality(now: now)
+    }
+
+    /// A frame reached the display: the first one ends the first-present time; every later one gives the
+    /// pacing meter the interval since the frame before it.
+    private func notePresented(_ frame: PresentedFrame, by host: RenderHost) {
+        guard state == .running else { return }
+        presentedAny = true
+        if timings.firstPresent == nil, let openStart {
+            timings.firstPresent = Self.seconds(clock.now - openStart)
+        }
+        if let last = lastPresentTime {
+            meter.record(interval: frame.time - last, period: 1.0 / Double(max(host.framePacing.maxFPS, 1)))
+        }
+        lastPresentTime = frame.time
     }
 
     /// Destroys the host, when there is one, and returns its registry for the counts.
@@ -510,8 +702,11 @@ public final class ExperienceSession {
             return
         }
         move(to: .running)
+        governor?.resume()
+        lastQualityCheck = nil
         guard firstActivation else { return }
         timings.activate = Self.seconds(clock.now - start)
+        compileBaseline = host.resources.compileCount   // interactive from here
         firstFrameStart = clock.now
         host.renderOneFrame(present: false)
         _ = failIfExperienceFailed()

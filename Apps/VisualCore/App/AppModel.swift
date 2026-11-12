@@ -5,6 +5,7 @@
 // VisualCoreExperience; this type only carries the decisions out and stores their result.
 import Foundation
 import Observation
+import VisualCoreDiagnostics
 import VisualCoreExperience
 import VisualCoreExperienceHost
 
@@ -45,13 +46,16 @@ struct AppEnvironment {
     var dataRoot: URL
     /// The launch arguments of the process.
     var arguments: [String]
+    /// The earliest instant the app's own code ran; nil where no launch is measured (tests).
+    var launchStart: ContinuousClock.Instant? = nil
 
     /// The environment of the shipped app: the bundled catalog, the explicit registry, the standard defaults,
     /// `Application Support/Experiences` and the arguments of the process.
     static func live() -> AppEnvironment {
         AppEnvironment(catalogData: bundled("experiences"), categoriesData: bundled("categories"),
                        registry: ExperienceRegistry.all, defaults: .standard,
-                       dataRoot: ExperienceDataStore.defaultRoot(), arguments: ProcessInfo.processInfo.arguments)
+                       dataRoot: ExperienceDataStore.defaultRoot(), arguments: ProcessInfo.processInfo.arguments,
+                       launchStart: AppLaunch.start)
     }
 
     /// The data of a JSON resource at the root of the main bundle.
@@ -76,8 +80,12 @@ final class AppModel {
     private(set) var preferences: ShellPreferences
     /// True after a premium tile was chosen, until the notice is dismissed.
     private(set) var premiumNotice = false
-    /// The quality tier applied to the last opened experience; nil for automatic.
-    private(set) var lastAppliedTier: Int? = nil
+    /// The quality level the open experience runs at when a level is pinned; nil for automatic and without an
+    /// open experience. The session applies the pin before the first frame and after a retry (UA-F06).
+    var lastAppliedTier: Int? {
+        guard preferences.qualityOverride != nil, session.experience != nil else { return nil }
+        return session.qualityLevel
+    }
     /// The diagnostics of the start and of the last reset.
     private(set) var diagnostics: AppDiagnostics
     /// The storage namespaces that have a data folder, sorted.
@@ -136,28 +144,25 @@ final class AppModel {
         diagnostics = AppDiagnostics(catalog: catalogText, registryMismatches: mismatches,
                                      preferencesNote: stored.note, unknownArguments: [], lastReset: [])
         dataNamespaces = folders.existing()
-        watchSession()
+        launchStart = environment.launchStart
+        firstStart = environment.defaults.object(forKey: ShellPreferences.storageKey) == nil
+        session.qualityPin = stored.preferences.qualityOverride
     }
 
-    /// Follows the session's state for as long as the model lives. The session can reach the running state
-    /// without the model: the Retry of its failure view opens the experience again. The stored quality override is
-    /// applied each time the session runs, so that a retried experience gets it as an opened one does (FR-U04-051).
-    private func watchSession() {
-        withObservationTracking {
-            _ = session.state
-        } onChange: { [weak self] in
-            Task { @MainActor [weak self] in
-                guard let self else { return }
-                self.sessionStateChanged()
-                self.watchSession()
-            }
-        }
-    }
+    // MARK: - Launch time (UA-F06)
 
-    private func sessionStateChanged() {
-        guard session.state == .running else { return }
-        let tier = applyQualityOverride()
-        if tier != lastAppliedTier { lastAppliedTier = tier }
+    private let launchStart: ContinuousClock.Instant?
+    /// True when the app started without stored preferences: the first start after an installation or a reset.
+    private let firstStart: Bool
+
+    /// Records the launch time once per process: from the start instant of the environment to this call, which
+    /// the root view makes when the launcher or the welcome first appears. Without a start instant (tests that
+    /// give none) nothing is recorded.
+    func noteLauncherUsable() {
+        guard session.launch == nil, let launchStart else { return }
+        let elapsed = (ContinuousClock.now - launchStart).components
+        let milliseconds = (Double(elapsed.seconds) + Double(elapsed.attoseconds) / 1e18) * 1_000
+        session.launch = LaunchTiming(milliseconds: max(0, milliseconds), firstLaunch: firstStart)
     }
 
     // MARK: - Catalog
@@ -229,8 +234,8 @@ final class AppModel {
     ///
     /// An id that is not shown (unknown, not available or not registered) changes nothing and returns false. A
     /// premium experience is not opened: `premiumNotice` becomes true and the result is false. Otherwise the
-    /// route becomes the experience and the session opens it; after a successful open the quality override is
-    /// applied (an undeclared tier is replaced by the last declared one) and the result is true. After a failed
+    /// route becomes the experience and the session opens it; the session applies the pinned quality level
+    /// before the first frame (an undeclared level is replaced by the last declared one) and the result is true. After a failed
     /// open the route stays on the experience, where the session shows its failure view, and the result is false.
     @discardableResult
     func open(_ id: ExperienceID) async -> Bool {
@@ -241,14 +246,12 @@ final class AppModel {
         }
         guard let registration = registrations[id] else { return false }
         premiumNotice = false
-        lastAppliedTier = nil
         setRoute(.experience(id))
         let launch = ExperienceLaunch(reduceMotion: preferences.reduceMotion,
                                       reduceFlashing: preferences.reduceFlashing)
         let request = ExperienceOpenRequest(id: id, seed: Self.seed(for: id)) { registration.make(launch) }
         switch await session.open(request) {
         case .running, .suspended:
-            lastAppliedTier = applyQualityOverride()
             setRoute(.experience(id))
             return true
         case .failed, .superseded:
@@ -291,24 +294,6 @@ final class AppModel {
         id.rawValue.utf8.prefix(8).reduce(UInt64(0)) { ($0 << 8) | UInt64($1) }
     }
 
-    /// Applies the stored quality override to the open experience and returns the tier that was applied: the
-    /// override, or the experience's last declared tier when it did not declare the override; nil for automatic.
-    private func applyQualityOverride() -> Int? {
-        guard let override = preferences.qualityOverride, let experience = session.experience else { return nil }
-        do {
-            try experience.setQualityTier(override)
-            return override
-        } catch {
-            guard case .invalidTier(_, let tiers) = error, tiers > 0 else { return nil }
-            do {
-                try experience.setQualityTier(tiers - 1)
-                return tiers - 1
-            } catch {
-                return nil
-            }
-        }
-    }
-
     // MARK: - Welcome
 
     /// Ends the welcome and remembers that it was seen. With `openFirst` it opens the first free experience
@@ -343,6 +328,7 @@ final class AppModel {
     func setQualityOverride(_ tier: Int?) {
         preferences.qualityOverride = tier
         store.save(preferences)
+        session.qualityPin = preferences.qualityOverride
     }
 
     /// Stores the reduce-motion and the reduce-flashing choice.
@@ -376,7 +362,7 @@ final class AppModel {
             preferences = ShellPreferences()
             route = .catalog
             premiumNotice = false
-            lastAppliedTier = nil
+            session.qualityPin = nil
             refreshLauncher()
             showWelcome = ShellStartup.decide(preferences: preferences, shown: shown).showWelcome
         }

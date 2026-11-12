@@ -76,6 +76,8 @@ public final class ExperienceShell<Presenter: ExperiencePresenter>: Experience {
     }
     /// The engine's diagnostics, with the registry's GPU counts once a graphics context was seen.
     public var diagnostics: ExperienceDiagnostics { engine.diagnostics(gpu: gpuCounts) }
+    /// The quality profile the core declares.
+    public var qualityProfile: QualityProfile { Presenter.Core.qualityProfile }
 
     // MARK: Preparation
 

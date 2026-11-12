@@ -501,6 +501,9 @@ targets:
         product: VisualCoreExperience
       - package: VisualCore
         product: VisualCoreSimulation
+      # VisualCoreDiagnostics: the launch timing and the performance record of UA-F06.
+      - package: VisualCore
+        product: VisualCoreDiagnostics
       # VisualCorePersistence is used only by the debug experience (its core declares a migration chain); a package
       # product cannot be linked for one configuration only.
       - package: VisualCore

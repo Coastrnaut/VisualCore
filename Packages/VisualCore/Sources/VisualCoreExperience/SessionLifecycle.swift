@@ -116,6 +116,13 @@ public struct SessionStageTimings: Sendable, Equatable, Codable {
     public var activate: Double?
     /// The first frame.
     public var firstFrame: Double?
+    /// The set-up of the experience's scene, where its shaders are compiled (feature 192, UA-F06).
+    public var setup: Double?
+    /// From the start of the open to the first frame that was presented on a display; nil while nothing was
+    /// presented.
+    public var firstPresent: Double?
+    /// The number of shader programs compiled when the set-up ended.
+    public var programsCompiled: Int?
 
     /// Creates timings without any duration.
     public init() {}

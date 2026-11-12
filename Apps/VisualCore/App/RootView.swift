@@ -34,6 +34,10 @@ enum ShellID {
     static let settingsPrivacy = "vc.settings.privacy"
     static let aboutAcknowledgements = "vc.about.acknowledgements"
     static let diagnostics = "vc.diagnostics"
+    #if DEBUG
+    /// The text of the last performance record, in the debug diagnostics of the settings (UA-F06).
+    static let performance = "vc.performance"
+    #endif
 }
 
 extension View {
@@ -83,6 +87,7 @@ struct RootView: View {
                 shell
             }
         }
+        .onAppear { model.noteLauncherUsable() }
         .task {
             #if DEBUG
             await DebugLaunch.start(model)

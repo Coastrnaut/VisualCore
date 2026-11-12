@@ -4,6 +4,7 @@
 // is inside `#if DEBUG`; a release build contains none of these types.
 #if DEBUG
 import SwiftUI
+import VisualCoreDiagnostics
 import VisualCoreExperience
 import VisualCoreExperienceHost
 import VisualCorePersistence
@@ -27,6 +28,12 @@ struct DebugExperienceCore: ExperienceCore, Codable, Equatable {
     static var migrations: MigrationChain { MigrationChain(currentVersion: 1) }
     static var controls: [ExperienceControl] { [ExperienceControl(id: "tap")] }
     static var qualityTiers: Int { 2 }
+    /// Two levels: `full` and `reduced` (the presenter draws them with a different blue).
+    static var qualityProfile: QualityProfile {
+        let levels = [QualityLevel(name: "full"),
+                      QualityLevel(name: "reduced", resolutionShare: 0.75, elementShare: 0.5, iterationShare: 0.5)]
+        return (try? QualityProfile(levels: levels)) ?? .uniform(levels: 2)
+    }
 
     /// The state of a fresh preparation with the start value `start`.
     private init(start: Int) {

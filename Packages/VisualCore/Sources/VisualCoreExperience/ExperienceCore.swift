@@ -3,6 +3,7 @@
 // and the rules that change it. A core is a value that can be handed between threads; it never draws and never
 // reads a clock. The engine drives it, the presenter of the experience draws it.
 import Foundation
+import VisualCoreDiagnostics
 import VisualCorePersistence
 
 /// The domain state of an experience and the rules that change it.
@@ -16,6 +17,10 @@ public protocol ExperienceCore: Sendable {
     static var controls: [ExperienceControl] { get }
     /// The number of quality tiers (at least 1; tier 0 is the best). Default 1.
     static var qualityTiers: Int { get }
+    /// What each quality tier means in numbers: one named level per tier with its budgets (feature 192, UA-F06).
+    /// The profile has as many levels as `qualityTiers`; `ExperienceConformance` checks it. Default: levels named
+    /// `level-0` … with every budget at its maximum, for an experience whose tiers change nothing measurable.
+    static var qualityProfile: QualityProfile { get }
     /// The length of one fixed step in seconds. Default 1/120; used clamped to 1/240…1/30.
     static var stepDuration: Double { get }
 
@@ -48,6 +53,8 @@ public protocol ExperienceCore: Sendable {
 extension ExperienceCore {
     /// One quality tier.
     public static var qualityTiers: Int { 1 }
+    /// `qualityTiers` uniform levels.
+    public static var qualityProfile: QualityProfile { .uniform(levels: qualityTiers) }
     /// 1/120 s.
     public static var stepDuration: Double { 1.0 / 120 }
     /// Nothing depends on the tier.

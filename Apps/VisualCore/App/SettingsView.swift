@@ -2,6 +2,7 @@
 // The settings route: the shared reduce-motion and reduce-flashing section, the quality override, the reset of
 // one experience's data and of all data (each asks first) and the privacy statement.
 import SwiftUI
+import VisualCoreDiagnostics
 import VisualCoreExperience
 import VisualCoreSimulation
 import VisualCoreUI
@@ -44,6 +45,9 @@ struct SettingsView: View {
                 Text(verbatim: model.diagnostics.text)
                     .font(.footnote)
                     .accessibilityIdentifier(ShellID.diagnostics)
+                Text(verbatim: Self.performanceText(model.session.lastPerformanceRecord))
+                    .font(.footnote)
+                    .accessibilityIdentifier(ShellID.performance)
             }
             #endif
         }
@@ -136,6 +140,16 @@ struct SettingsView: View {
                 .font(.footnote)
         }
     }
+
+    #if DEBUG
+    /// The performance record of the last experience as text; "none" before an experience ran.
+    static func performanceText(_ record: PerformanceRecord?) -> String {
+        guard let record, let data = try? record.encoded(), let text = String(data: data, encoding: .utf8) else {
+            return "none"
+        }
+        return text
+    }
+    #endif
 
     // MARK: Reset
 

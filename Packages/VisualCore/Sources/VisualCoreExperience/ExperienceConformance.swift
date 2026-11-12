@@ -1,8 +1,9 @@
 // ExperienceConformance — feature 188 T-U02-041 (FR-U02-070, FR-U02-071, FR-U02-073; data-model section 6; contract
 // specs/188-ua-f02-experience-sdk/contracts/experience-core-api.md, section "Conformance"). The reusable proof that
-// a core keeps the obligations of `ExperienceCore`: seven checks, run for every seed of a plan, reported as data.
+// a core keeps the obligations of `ExperienceCore`: eight checks, run for every seed of a plan, reported as data.
 // The helper imports no test framework, so a test target, a tool or the app's own diagnostics can call it.
 import Foundation
+import VisualCoreDiagnostics
 
 /// The obligations of an `ExperienceCore` that `ExperienceConformance` checks.
 public enum ConformanceCheck: String, Sendable, Codable, CaseIterable {
@@ -20,6 +21,8 @@ public enum ConformanceCheck: String, Sendable, Codable, CaseIterable {
     case sheddingKeepsDigest
     /// Running the same script twice from the same state gives the same digest.
     case replayReproducesDigest
+    /// The quality profile has as many levels as the core declares quality tiers (feature 192, UA-F06).
+    case profileMatchesTiers
 }
 
 /// What a conformance run does: the seeds, the length of a segment and the actions.
@@ -90,7 +93,7 @@ public struct ConformanceReport: Sendable, Equatable, Codable {
 
 /// Runs the conformance checks of the experience contract against a core type.
 public enum ExperienceConformance {
-    /// Runs the seven checks for every seed of `plan` (after its limits) and reports one entry per check.
+    /// Runs the eight checks for every seed of `plan` (after its limits) and reports one entry per check.
     ///
     /// The run never throws and never stops the process: a preparation that fails is reported by
     /// `seedDeterminism` with the error code, and the other checks are not run for that seed. An error inside a
@@ -302,6 +305,13 @@ public enum ExperienceConformance {
                     throw Mismatch("quality tier \(tier) changed the digest from \(firstDigest.hex) to \(found.hex)")
                 }
             }
+        }))
+
+        // profileMatchesTiers
+        outcomes.append((.profileMatchesTiers, failure {
+            let problems = QualityDeclaration.problems(profile: Core.qualityProfile, tierCount: Core.qualityTiers,
+                                                       catalogNames: nil)
+            guard problems.isEmpty else { throw Mismatch(problems.joined(separator: "; ")) }
         }))
 
         // sheddingKeepsDigest

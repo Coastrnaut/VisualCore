@@ -611,6 +611,7 @@ VisualCoreExperience | var | public private(set) var state: ExperienceLifecycleS
 VisualCoreExperience | var | public private(set) var state: SessionState
 VisualCoreExperience | var | public private(set) var stepIndex
 VisualCoreExperience | var | public static var preparationFailedCode: String
+VisualCoreExperience | var | public static var qualityProfile: QualityProfile
 VisualCoreExperience | var | public static var qualityTiers: Int
 VisualCoreExperience | var | public static var schemaVersion: Int
 VisualCoreExperience | var | public static var stepDuration: Double
@@ -635,6 +636,7 @@ VisualCoreExperience | var | public var failed: [ConformanceCheck]
 VisualCoreExperience | var | public var failure: ExperienceFailure
 VisualCoreExperience | var | public var failures: Int
 VisualCoreExperience | var | public var firstFrame: Double?
+VisualCoreExperience | var | public var firstPresent: Double?
 VisualCoreExperience | var | public var integrationGate: String
 VisualCoreExperience | var | public var isAccepted: Bool
 VisualCoreExperience | var | public var isMatch: Bool
@@ -649,6 +651,7 @@ VisualCoreExperience | var | public var message: String
 VisualCoreExperience | var | public var opens: Int
 VisualCoreExperience | var | public var passed: Bool
 VisualCoreExperience | var | public var prepare: Double?
+VisualCoreExperience | var | public var programsCompiled: Int?
 VisualCoreExperience | var | public var qualityOverride: Int?
 VisualCoreExperience | var | public var reduceFlashing: AccessibilityChoice
 VisualCoreExperience | var | public var reduceMotion: AccessibilityChoice
@@ -657,6 +660,7 @@ VisualCoreExperience | var | public var rejectedTransitions: Int
 VisualCoreExperience | var | public var removesPreferences: Bool
 VisualCoreExperience | var | public var searchText: String
 VisualCoreExperience | var | public var seeds: [UInt64]
+VisualCoreExperience | var | public var setup: Double?
 VisualCoreExperience | var | public var sinkFailures: Int
 VisualCoreExperience | var | public var state: SessionState
 VisualCoreExperience | var | public var stepsPerSegment: Int
@@ -686,6 +690,7 @@ VisualCoreExperienceHost | func | public func makeBody(configuration: Configurat
 VisualCoreExperienceHost | func | public func open(_ request: ExperienceOpenRequest) async -> SessionOpenResult
 VisualCoreExperienceHost | func | public func prepare(seed: UInt64, timeLimit: Duration? = nil) async throws(ExperienceError)
 VisualCoreExperienceHost | func | public func recreateContext()
+VisualCoreExperienceHost | func | public func refreshQuality(now: Double? = nil)
 VisualCoreExperienceHost | func | public func reset() throws(ExperienceError)
 VisualCoreExperienceHost | func | public func resize(_ context: RenderContext)
 VisualCoreExperienceHost | func | public func restore(_ snapshot: ExperienceSnapshot) throws(ExperienceError)
@@ -733,8 +738,12 @@ VisualCoreExperienceHost | struct | public struct SessionMessageView: View
 VisualCoreExperienceHost | struct | public struct SessionPreparingView: View
 VisualCoreExperienceHost | typealias | public typealias SnapshotSink = @MainActor (ExperienceSnapshot) throws -> Void
 VisualCoreExperienceHost | var | @ObservationIgnored public private(set) var hostsAlive
+VisualCoreExperienceHost | var | @ObservationIgnored public private(set) var lastPerformanceRecord: PerformanceRecord?
 VisualCoreExperienceHost | var | @ObservationIgnored public private(set) var lastRestoreRefusal: ExperienceFailure?
 VisualCoreExperienceHost | var | @ObservationIgnored public private(set) var lastSinkFailure: ExperienceFailure?
+VisualCoreExperienceHost | var | @ObservationIgnored public var conditions: @MainActor () -> DeviceConditions
+VisualCoreExperienceHost | var | @ObservationIgnored public var launch: LaunchTiming?
+VisualCoreExperienceHost | var | @ObservationIgnored public var qualityPin: Int?
 VisualCoreExperienceHost | var | public private(set) var engine: ExperienceEngine<Presenter.Core>
 VisualCoreExperienceHost | var | public private(set) var experience: (any Experience)?
 VisualCoreExperienceHost | var | public private(set) var failure: SessionFailure?
@@ -752,6 +761,9 @@ VisualCoreExperienceHost | var | public var controls: AnyView
 VisualCoreExperienceHost | var | public var diagnostics: ExperienceDiagnostics
 VisualCoreExperienceHost | var | public var diagnostics: SessionDiagnostics
 VisualCoreExperienceHost | var | public var memoryPressureLimit: Int?
+VisualCoreExperienceHost | var | public var performanceRecord: PerformanceRecord?
+VisualCoreExperienceHost | var | public var qualityLevel: Int
+VisualCoreExperienceHost | var | public var qualityProfile: QualityProfile
 VisualCoreExperienceHost | var | public var scene: any RenderScene
 VisualCoreExperienceHost | var | public var seed: UInt64
 VisualCoreExperienceHost | var | public var snapshot: ExperienceSnapshot?
@@ -1071,6 +1083,7 @@ VisualCoreRendering | enum | public enum GLState
 VisualCoreRendering | enum | public enum OffscreenRenderError: Error, Equatable, Sendable
 VisualCoreRendering | enum | public enum Output
 VisualCoreRendering | enum | public enum ParticleBlend: Sendable, Equatable, CaseIterable
+VisualCoreRendering | enum | public enum ProcessMemory
 VisualCoreRendering | enum | public enum RenderHostError: Error, Equatable, Sendable
 VisualCoreRendering | enum | public enum RenderingInfo
 VisualCoreRendering | enum | public enum ResourceError: Error, Equatable, Sendable
@@ -1081,6 +1094,7 @@ VisualCoreRendering | enum | public enum TextureFormat: Sendable, Equatable
 VisualCoreRendering | func | public func acquireTarget(width: Int, height: Int, format: TextureFormat = .rgba8) throws -> RenderTarget
 VisualCoreRendering | func | public func addErrorObserver(_ observer: @escaping @MainActor (RenderHostError) -> Void)
 VisualCoreRendering | func | public func addObserver(_ observer: @escaping @MainActor (RenderLifecycleEvent) -> Void)
+VisualCoreRendering | func | public func addPresentObserver(_ observer: @escaping @MainActor (PresentedFrame) -> Void)
 VisualCoreRendering | func | public func bind()
 VisualCoreRendering | func | public func bind(target: Int32 = GL_ARRAY_BUFFER)
 VisualCoreRendering | func | public func bind(unit: Int)
@@ -1142,6 +1156,7 @@ VisualCoreRendering | func | public nonisolated static func message(for error: O
 VisualCoreRendering | func | public static func detect(in registry: ResourceRegistry) -> FloatRenderSupport
 VisualCoreRendering | func | public static func fit(world: WorldRect, viewSize: Vec2) -> (camera: Camera2D, metrics: ViewMetrics)?
 VisualCoreRendering | func | public static func fittedSize(width: Int, height: Int) -> (width: Int, height: Int)?
+VisualCoreRendering | func | public static func footprint() -> Int?
 VisualCoreRendering | func | public static func pngData(_ image: StillImage) throws(OffscreenRenderError) -> Data
 VisualCoreRendering | func | public static func resetForVisualCore(framebuffer: UInt32, width: Int, height: Int)
 VisualCoreRendering | func | public static func square(halfExtent: Double) -> WorldRect
@@ -1155,6 +1170,7 @@ VisualCoreRendering | init | public init(extensionReported: Bool, probeComplete:
 VisualCoreRendering | init | public init(files: [String: String])
 VisualCoreRendering | init | public init(folder: TemporaryFolder)
 VisualCoreRendering | init | public init(fragment: String, fragmentName: String, bundle: ShaderBundle)
+VisualCoreRendering | init | public init(index: Int, time: Double, targetTime: Double)
 VisualCoreRendering | init | public init(mesh: Mesh, registry: ResourceRegistry) throws
 VisualCoreRendering | init | public init(rangeMin: Int, rangeMax: Int, precisionBits: Int)
 VisualCoreRendering | init | public init(red: Float = 0, green: Float = 0, blue: Float = 0)
@@ -1196,6 +1212,7 @@ VisualCoreRendering | let | public let program: ShaderProgram
 VisualCoreRendering | let | public let resources: ResourceRegistry
 VisualCoreRendering | let | public let rgba: [UInt8]
 VisualCoreRendering | let | public let size: GLint
+VisualCoreRendering | let | public let targetTime: Double
 VisualCoreRendering | let | public let targetTimestamp: Double
 VisualCoreRendering | let | public let time: Double
 VisualCoreRendering | let | public let type: GLenum
@@ -1218,6 +1235,7 @@ VisualCoreRendering | protocol | public protocol RenderScene: AnyObject
 VisualCoreRendering | struct | public struct FloatRenderSupport: Sendable, Equatable
 VisualCoreRendering | struct | public struct FrameInfo: Sendable, Equatable
 VisualCoreRendering | struct | public struct GPUHandle: Sendable, Equatable
+VisualCoreRendering | struct | public struct PresentedFrame: Sendable, Equatable
 VisualCoreRendering | struct | public struct RenderCapabilities: Sendable, Equatable, Codable
 VisualCoreRendering | struct | public struct RenderContext: Equatable
 VisualCoreRendering | struct | public struct Run: Sendable, Equatable
@@ -1725,6 +1743,7 @@ VisualCoreTestSupport | enum | public enum SlowPreparation: SampleFault
 VisualCoreTestSupport | enum | public enum TestSupportInfo
 VisualCoreTestSupport | enum | public enum TierChangesState: SampleFault
 VisualCoreTestSupport | enum | public enum UnseededPreparation: SampleFault
+VisualCoreTestSupport | enum | public enum WrongProfileCount: SampleFault
 VisualCoreTestSupport | enum | public enum WrongReset: SampleFault
 VisualCoreTestSupport | func | public func encode(to encoder: any Encoder) throws
 VisualCoreTestSupport | func | public func fractionWithin(_ tolerance: Int) -> Double
@@ -1777,6 +1796,7 @@ VisualCoreTestSupport | var | public static var controls: [ExperienceControl]
 VisualCoreTestSupport | var | public static var kind: SampleFaultKind
 VisualCoreTestSupport | var | public static var maxEnergy: Int
 VisualCoreTestSupport | var | public static var migrations: MigrationChain
+VisualCoreTestSupport | var | public static var qualityProfile: QualityProfile
 VisualCoreTestSupport | var | public static var qualityTiers: Int
 VisualCoreTestSupport | var | public static var stepDuration: Double
 VisualCoreUI | class | public final class SystemAccessibilityObserver

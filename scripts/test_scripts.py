@@ -952,7 +952,8 @@ class UnifiedAppTargetTests(unittest.TestCase):
 
     def test_the_app_links_no_unused_framework_product(self):
         products = [l.split("product:")[1].strip() for l in self.targets()["VisualCore"] if "product:" in l]
-        self.assertEqual(products, ["VisualCoreExperience", "VisualCoreSimulation", "VisualCorePersistence",
+        self.assertEqual(products, ["VisualCoreExperience", "VisualCoreSimulation", "VisualCoreDiagnostics",
+                                    "VisualCorePersistence",
                                     "VisualCoreRendering", "VisualCoreUI", "VisualCoreExperienceHost"])
 
     def test_the_standing_isolation_step_requires_sources(self):

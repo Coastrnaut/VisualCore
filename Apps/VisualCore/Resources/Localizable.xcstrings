@@ -293,7 +293,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Automatic lets each experience choose. Tier 0 is the best quality. An experience with fewer tiers uses its last one."
+            "value": "Automatic starts at the best quality and steps down while the device is hot or in Low Power Mode, then back up when it has cooled. A number keeps that level; 0 is the best. An experience with fewer levels uses its last one."
           }
         }
       }

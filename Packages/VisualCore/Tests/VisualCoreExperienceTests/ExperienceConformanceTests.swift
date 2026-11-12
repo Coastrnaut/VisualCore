@@ -24,11 +24,11 @@ import VisualCoreTestSupport
 
     // MARK: The sample that keeps the contract
 
-    @Test func sampleWithoutFaultPassesAllSevenChecks() async {
+    @Test func sampleWithoutFaultPassesAllEightChecks() async {
         let report = await conformance(of: NoFault.self)
         #expect(report.passed)
         #expect(report.failed.isEmpty)
-        #expect(report.entries.count == 7)
+        #expect(report.entries.count == 8)
         for entry in report.entries {
             #expect(entry.passed, "\(entry.check.rawValue): \(entry.detail)")
             #expect(entry.detail == "4 seeds")
@@ -66,6 +66,14 @@ import VisualCoreTestSupport
         #expect(detail.contains("quality tier 1"), "detail: \(detail)")
     }
 
+    // Feature 192 (UA-F06) T-U06-014: the profile and the tier count agree.
+    @Test func wrongProfileCountFailsProfileMatchesTiers() async {
+        let report = await conformance(of: WrongProfileCount.self)
+        expectOnly(.profileMatchesTiers, in: report)
+        let detail = report.entries.first { $0.check == .profileMatchesTiers }?.detail ?? ""
+        #expect(detail.contains("the profile has 2 levels and the experience declares 3 tiers"), "detail: \(detail)")
+    }
+
     @Test func sheddingChangesStateFailsSheddingKeepsDigest() async {
         expectOnly(.sheddingKeepsDigest, in: await conformance(of: SheddingChangesState.self))
     }
@@ -92,7 +100,7 @@ import VisualCoreTestSupport
     @Test func reportHasOneEntryPerCheckInTheOrderOfAllCases() async {
         let expected: [ConformanceCheck] = [.seedDeterminism, .snapshotRoundTrip, .resetEquivalence,
                                             .rejectionKeepsDigest, .tierKeepsDigest, .sheddingKeepsDigest,
-                                            .replayReproducesDigest]
+                                            .replayReproducesDigest, .profileMatchesTiers]
         #expect(ConformanceCheck.allCases == expected)
         let passing = await conformance(of: NoFault.self)
         #expect(passing.entries.map(\.check) == expected)

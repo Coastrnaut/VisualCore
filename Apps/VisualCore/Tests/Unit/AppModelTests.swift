@@ -4,6 +4,7 @@
 // is applied when an experience opens. The storage helper `TestStorage` is in StoreTests.swift.
 import Foundation
 import SwiftUI
+import VisualCoreDiagnostics
 import VisualCoreExperience
 import VisualCoreExperienceHost
 import VisualCorePersistence
@@ -358,15 +359,135 @@ final class AppModelTests: XCTestCase {
         XCTAssertEqual(model.session.state, .failed)
         XCTAssertNil(model.lastAppliedTier)
 
-        // What the Retry button of the failure view does.
+        // What the Retry button of the failure view does. The session itself applies the pin (UA-F06).
         _ = await model.session.retry()
         XCTAssertEqual(model.session.state, .running)
-        for _ in 0..<200 where model.lastAppliedTier == nil {
-            try await Task.sleep(nanoseconds: 10_000_000)
-        }
+        XCTAssertEqual(model.session.experience?.diagnostics.qualityTier, 1)
         XCTAssertEqual(model.lastAppliedTier, 1, "the debug experience declares two tiers; 7 becomes its last one")
         XCTAssertEqual(calls.values.count, 2)
         model.closeExperience()
+    }
+
+    // MARK: Quality and performance (UA-F06: T-U06-016, T-U06-020, T-U06-024, T-U06-028)
+
+    /// FR-U06-004: the fixture experience declares as many named levels as its logic declares tiers.
+    func testTheFixtureExperienceDeclaresTwoNamedLevels() throws {
+        let profile = DebugExperienceCore.qualityProfile
+        XCTAssertEqual(profile.names, ["full", "reduced"])
+        XCTAssertEqual(profile.count, DebugExperienceCore.qualityTiers)
+        XCTAssertEqual(QualityDeclaration.problems(profile: profile, tierCount: DebugExperienceCore.qualityTiers,
+                                                   catalogNames: nil), [])
+        let id = try XCTUnwrap(DebugLaunch.fixtureFreeIDs.first)
+        XCTAssertEqual(DebugExperience.make(id: id).qualityProfile, profile, "the session sees the core's profile")
+    }
+
+    /// FR-U06-004: every registered experience of the real registry names its levels as the catalog does.
+    /// Today nothing is registered; the loop binds every later integration.
+    func testRegisteredExperiencesDeclareTheCatalogLevelNames() throws {
+        let categories = try CategoryList(data: bundled("categories"))
+        let manifest = try CatalogManifest(data: bundled("experiences"), categories: categories)
+        for registration in ExperienceRegistry.all {
+            let profile = registration.make(ExperienceLaunch()).qualityProfile
+            let names = try XCTUnwrap(manifest.experience(registration.id), "\(registration.id)").qualityTiers
+            XCTAssertEqual(QualityDeclaration.problems(profile: profile, tierCount: profile.count,
+                                                       catalogNames: names), [], "\(registration.id)")
+        }
+        XCTAssertEqual(ExperienceRegistry.all.count, 0, "no experience is integrated yet")
+    }
+
+    /// FR-U06-013: a pinned level is in force when the first frame is drawn, and the record says so.
+    func testThePinnedLevelIsInForceFromTheFirstFrame() async throws {
+        let storage = try TestStorage(self)
+        let model = fixtureModel(storage)
+        let id = try XCTUnwrap(freeIDs(model).first)
+        model.setQualityOverride(1)
+        XCTAssertEqual(model.session.qualityPin, 1)
+        let opened = await model.open(id)
+        XCTAssertTrue(opened)
+        // Nothing but the open happened: the level was set before the first frame.
+        XCTAssertEqual(model.session.experience?.diagnostics.qualityTier, 1)
+        XCTAssertEqual(model.session.qualityLevel, 1)
+        XCTAssertEqual(model.lastAppliedTier, 1)
+        let running = try XCTUnwrap(model.session.performanceRecord)
+        XCTAssertEqual(running.qualityLevel, 1)
+        XCTAssertTrue(running.qualityPinned)
+        XCTAssertEqual(running.qualityLevels, 2)
+        model.closeExperience()
+
+        // A new model on the same storage pins the stored level; automatic clears the pin.
+        let later = fixtureModel(storage)
+        XCTAssertEqual(later.session.qualityPin, 1)
+        later.setQualityOverride(nil)
+        XCTAssertNil(later.session.qualityPin)
+        let again = await later.open(id)
+        XCTAssertTrue(again)
+        XCTAssertEqual(later.session.qualityLevel, 0)
+        XCTAssertNil(later.lastAppliedTier)
+        later.closeExperience()
+    }
+
+    /// FR-U06-040, FR-U06-043: after an open and a close the session keeps the performance record.
+    func testThePerformanceRecordOfAnOpenAndACloseIsKept() async throws {
+        let storage = try TestStorage(self)
+        let model = fixtureModel(storage)
+        let id = try XCTUnwrap(freeIDs(model).first)
+        XCTAssertNil(model.session.lastPerformanceRecord)
+        let opened = await model.open(id)
+        XCTAssertTrue(opened)
+        for _ in 0..<30 { model.session.renderHost?.renderOneFrame(present: false) }
+        model.closeExperience()
+        XCTAssertNil(model.session.performanceRecord)
+        let record = try XCTUnwrap(model.session.lastPerformanceRecord)
+        XCTAssertEqual(record.experience, id.rawValue)
+        XCTAssertGreaterThanOrEqual(try XCTUnwrap(record.prepareMs), 0)
+        XCTAssertGreaterThanOrEqual(try XCTUnwrap(record.setupMs), 0)
+        XCTAssertNotNil(record.programsCompiled)
+        XCTAssertEqual(record.lateCompilations, 0)
+        XCTAssertTrue(record.passes)
+        XCTAssertEqual(record.qualityLevels, 2)
+        XCTAssertFalse(record.qualityPinned)
+        let text = try record.encoded()
+        XCTAssertEqual(try PerformanceRecord(data: text), record)
+        XCTAssertNotEqual(SettingsView.performanceText(record), "none")
+        XCTAssertEqual(SettingsView.performanceText(nil), "none")
+    }
+
+    /// FR-U06-024: one launch time per process, marked as a first start when no preferences were stored, and
+    /// taken before any rendering context exists.
+    func testTheLaunchTimeIsRecordedOncePerProcess() async throws {
+        let storage = try TestStorage(self)
+        var environment = storage.environment(catalog: DebugLaunch.fixtureCatalogData,
+                                              categories: DebugLaunch.fixtureCategoriesData,
+                                              registry: DebugLaunch.fixtureRegistry)
+        environment.launchStart = ContinuousClock.now
+        let model = AppModel(environment: environment)
+        XCTAssertNil(model.session.launch)
+        model.noteLauncherUsable()
+        let launch = try XCTUnwrap(model.session.launch)
+        XCTAssertGreaterThanOrEqual(launch.milliseconds, 0)
+        XCTAssertLessThan(launch.milliseconds, 60_000)
+        XCTAssertTrue(launch.firstLaunch, "no preferences were stored")
+        XCTAssertEqual(model.session.hostsAlive, 0, "no rendering context before the launcher is usable")
+        model.noteLauncherUsable()
+        XCTAssertEqual(model.session.launch, launch, "recorded once")
+
+        // The launch time is part of the record of an experience.
+        let id = try XCTUnwrap(freeIDs(model).first)
+        let opened = await model.open(id)
+        XCTAssertTrue(opened)
+        XCTAssertEqual(model.session.performanceRecord?.launchMs, launch.milliseconds)
+        XCTAssertEqual(model.session.performanceRecord?.firstLaunch, true)
+        model.closeExperience()
+
+        // A later start finds stored preferences: not a first start. Without a start instant nothing is recorded.
+        var second = environment
+        second.launchStart = ContinuousClock.now
+        let later = AppModel(environment: second)
+        later.noteLauncherUsable()
+        XCTAssertEqual(later.session.launch?.firstLaunch, false)
+        let none = fixtureModel(storage)
+        none.noteLauncherUsable()
+        XCTAssertNil(none.session.launch)
     }
 
     /// Edge case: leaving while an experience prepares cancels the open and returns to the catalog.

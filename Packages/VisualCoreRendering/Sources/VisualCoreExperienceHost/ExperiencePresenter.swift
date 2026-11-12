@@ -3,6 +3,7 @@
 // author writes for an experience (GPU objects, drawing, controls, the state in words) and the face every
 // experience shows to the session host.
 import SwiftUI
+import VisualCoreDiagnostics
 import VisualCoreExperience
 import VisualCoreRendering
 
@@ -55,6 +56,8 @@ public protocol Experience: AnyObject {
     var accessibilitySummary: String { get }
     /// The diagnostics of the experience, with GPU counts once a graphics context was seen.
     var diagnostics: ExperienceDiagnostics { get }
+    /// What each quality tier of the experience means in numbers (feature 192, UA-F06). Default: one level.
+    var qualityProfile: QualityProfile { get }
 
     /// Prepares the state from `seed` off the main actor, under an optional time limit; ends in ready.
     func prepare(seed: UInt64, timeLimit: Duration?) async throws(ExperienceError)
@@ -83,4 +86,9 @@ public protocol Experience: AnyObject {
     /// Ends the leave after the render host was destroyed or its scene replaced; throws `.gpuLeak` when a GPU
     /// object is still live or was leaked.
     func finishDeactivation() throws(ExperienceError)
+}
+
+extension Experience {
+    /// One level: an experience that declares no profile has nothing to step through.
+    public var qualityProfile: QualityProfile { .single }
 }

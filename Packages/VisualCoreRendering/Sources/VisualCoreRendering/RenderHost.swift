@@ -15,6 +15,24 @@ import QuartzCore
 import UIKit
 import VisualCoreDiagnostics
 
+
+/// One frame that reached the display (feature 192, UA-F06).
+public struct PresentedFrame: Sendable, Equatable {
+    /// The index of the frame since the host was created.
+    public let index: Int
+    /// The host time, in seconds, right after the frame was presented.
+    public let time: Double
+    /// The host time, in seconds, the display link named as the frame's target.
+    public let targetTime: Double
+
+    /// Creates the description of a presented frame.
+    public init(index: Int, time: Double, targetTime: Double) {
+        self.index = index
+        self.time = time
+        self.targetTime = targetTime
+    }
+}
+
 /// App-neutral render host over ANGLE's Metal backend: owns the EGL context and surface, drives a RenderScene from CADisplayLink on the main thread, and tracks lifecycle states and context generations.
 @MainActor
 public final class RenderHost {
@@ -64,6 +82,7 @@ public final class RenderHost {
     private var lastTimestamp: CFTimeInterval?
     private var observers: [(RenderLifecycleEvent) -> Void] = []
     private var errorObservers: [(RenderHostError) -> Void] = []
+    private var presentObservers: [(PresentedFrame) -> Void] = []
     private var notificationTokens: [NSObjectProtocol] = []
     private lazy var scheduler = FrameScheduler(requestedMaxFPS: maxFramesPerSecond) { [weak self] link in
         self?.displayLinkFired(link)
@@ -129,6 +148,13 @@ public final class RenderHost {
     /// Called synchronously on the main thread for each reported error.
     public func addErrorObserver(_ observer: @escaping @MainActor (RenderHostError) -> Void) {
         errorObservers.append(observer)
+    }
+
+    /// Called synchronously on the main thread after each frame that was presented on the display (feature 192,
+    /// UA-F06): the time between two calls is the interval a person sees. A frame that is drawn without being
+    /// presented, or whose presentation failed, gives no call.
+    public func addPresentObserver(_ observer: @escaping @MainActor (PresentedFrame) -> Void) {
+        presentObservers.append(observer)
     }
 
     @discardableResult
@@ -404,6 +430,10 @@ public final class RenderHost {
                 return false
             }
             presentedFrameCount += 1
+            if !presentObservers.isEmpty {
+                let presented = PresentedFrame(index: frame.index, time: CACurrentMediaTime(), targetTime: target)
+                for observer in presentObservers { observer(presented) }
+            }
         }
         return true
     }

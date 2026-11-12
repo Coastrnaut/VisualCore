@@ -4,6 +4,7 @@
 // fault, so that the tests can prove that each conformance check finds the fault it is meant to find.
 // Test-only (rule R5): no app and no shipped module depends on this file.
 import Foundation
+import VisualCoreDiagnostics
 import VisualCoreExperience
 import VisualCorePersistence
 import VisualCoreSimulation
@@ -32,6 +33,8 @@ public enum SampleFaultKind: String, Sendable, CaseIterable {
     case slowPreparation
     /// The preparation throws the failure `sample.broken`.
     case failingPreparation
+    /// The quality profile has two levels while the core declares three tiers.
+    case wrongProfileCount
 }
 
 /// A marker type that chooses the fault of a `SampleExperienceCore`.
@@ -98,6 +101,12 @@ public enum SlowPreparation: SampleFault {
 public enum FailingPreparation: SampleFault {
     /// `.failingPreparation`.
     public static var kind: SampleFaultKind { .failingPreparation }
+}
+
+/// The sample whose quality profile has fewer levels than it declares tiers.
+public enum WrongProfileCount: SampleFault {
+    /// `.wrongProfileCount`.
+    public static var kind: SampleFaultKind { .wrongProfileCount }
 }
 
 // MARK: - Start state
@@ -192,6 +201,17 @@ public struct SampleExperienceCore<Fault: SampleFault>: ExperienceCore, Codable,
 
     /// Three quality tiers.
     public static var qualityTiers: Int { 3 }
+    /// The three levels `full`, `reduced` and `minimal` with falling budgets; the fault `wrongProfileCount` leaves
+    /// the last one out.
+    public static var qualityProfile: QualityProfile {
+        let levels = [QualityLevel(name: "full", resolutionShare: 1, elementShare: 1, iterationShare: 1, effectPasses: 2),
+                      QualityLevel(name: "reduced", resolutionShare: 0.75, elementShare: 0.6, iterationShare: 0.5,
+                                   effectPasses: 1),
+                      QualityLevel(name: "minimal", resolutionShare: 0.5, elementShare: 0.35, iterationShare: 0.25,
+                                   effectPasses: 0)]
+        let declared = Fault.kind == .wrongProfileCount ? Array(levels.dropLast()) : levels
+        return (try? QualityProfile(levels: declared)) ?? .uniform(levels: declared.count)
+    }
     /// 1/120 s.
     public static var stepDuration: Double { 1.0 / 120 }
 

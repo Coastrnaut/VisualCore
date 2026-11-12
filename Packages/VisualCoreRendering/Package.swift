@@ -51,6 +51,7 @@ let package = Package(
         .testTarget(name: "VisualCoreExperienceHostTests",
                     dependencies: ["VisualCoreExperienceHost", "VisualCoreRendering", "CVisualCoreGL",
                                    .product(name: "VisualCoreExperience", package: "VisualCore"),
+                                   .product(name: "VisualCoreDiagnostics", package: "VisualCore"),
                                    .product(name: "VisualCoreTestSupport", package: "VisualCore")]),
         .testTarget(name: "VisualCoreUITests", dependencies: ["VisualCoreUI", "VisualCoreRendering",
                                                              .product(name: "VisualCoreParameters", package: "VisualCore"),

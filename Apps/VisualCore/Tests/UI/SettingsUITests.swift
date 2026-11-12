@@ -126,6 +126,38 @@ final class SettingsUITests: XCTestCase {
         XCTAssertTrue(shown.contains("catalog: loaded: "), shown)
     }
 
+    /// UA-F06 (FR-U06-040, FR-U06-043): in a debug build the settings show the performance record of the last
+    /// experience: stage times, pacing samples, no late shader compilation, and the launch time.
+    @MainActor
+    func testThePerformanceRecordOfTheLastExperienceIsReadable() throws {
+        let app = launchApp(arguments: Self.fresh)
+        waitFor(element(app, "vc.route.catalog"))
+        revealAndTap(app, firstTile(app, tier: "Free"))
+        waitFor(element(app, VC.canvas), timeout: VC.firstWait)
+        usleep(2_000_000)   // let the display present some frames
+        let back = element(app, "vc.experience.back")
+        waitFor(back, timeout: VC.wait)
+        back.tap()
+        waitFor(element(app, "vc.route.catalog"), timeout: VC.wait)
+        openSettings(app)
+        let shown = element(app, "vc.performance")
+        scrollRoute(app, "vc.route.settings", to: shown)
+        let text = shown.label
+        let data = try XCTUnwrap(text.data(using: .utf8))
+        let record = try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any], text)
+        XCTAssertEqual(record["version"] as? Int, 1)
+        for key in ["prepare_ms", "setup_ms", "first_present_ms", "launch_ms"] {
+            let value = try XCTUnwrap(record[key] as? Double, "\(key) missing in \(text)")
+            XCTAssertGreaterThanOrEqual(value, 0, key)
+        }
+        XCTAssertEqual(record["presented"] as? Bool, true)
+        XCTAssertEqual(record["late_compilations"] as? Int, 0)
+        XCTAssertEqual(record["quality_levels"] as? Int, 2)
+        let pacing = try XCTUnwrap(record["pacing"] as? [String: Any])
+        XCTAssertGreaterThan(try XCTUnwrap(pacing["samples"] as? Int), 0, "frames were presented: \(text)")
+        XCTAssertNotNil(record["memory_footprint_bytes"] as? Int)
+    }
+
     /// FR-U04-052: the reset of one experience asks first; Cancel removes nothing, Confirm removes only the
     /// data of that experience. `-vcSeedData` gives two fixture experiences a data folder.
     @MainActor

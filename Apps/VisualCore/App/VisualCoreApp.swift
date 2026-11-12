@@ -5,6 +5,13 @@
 import SwiftUI
 import VisualCoreUI
 
+/// The start of the app's own code: the launch time counts from here (UA-F06, FR-U06-024). The value is taken
+/// when the app type is created, which is the first code of the app that runs.
+enum AppLaunch {
+    /// The instant the app type was created.
+    static let start = ContinuousClock.now
+}
+
 /// The VisualCore app.
 @main
 struct VisualCoreApp: App {
@@ -12,6 +19,7 @@ struct VisualCoreApp: App {
 
     /// Creates the app with its one model.
     init() {
+        _ = AppLaunch.start
         #if DEBUG
         let environment = DebugLaunch.environment(base: AppEnvironment.live())
         #else
