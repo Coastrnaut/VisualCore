@@ -216,8 +216,30 @@ VisualCoreEffectsGraph | var | public var passes: [EffectPassDescription]
 VisualCoreEffectsGraph | var | public var scale: Double
 VisualCoreEffectsGraph | var | public var type: String
 VisualCoreEffectsGraph | var | public var version: Int
+VisualCoreExperience | enum | public enum ExperienceIDError: Error, Equatable, Sendable
 VisualCoreExperience | enum | public enum ExperienceInfo
+VisualCoreExperience | func | public func encode(to encoder: any Encoder) throws
+VisualCoreExperience | func | public static func < (lhs: ExperienceCode, rhs: ExperienceCode) -> Bool
+VisualCoreExperience | func | public static func < (lhs: ExperienceID, rhs: ExperienceID) -> Bool
+VisualCoreExperience | init | public init(_ text: String) throws(ExperienceIDError)
+VisualCoreExperience | init | public init(from decoder: any Decoder) throws
+VisualCoreExperience | init | public init?(rawValue: String)
+VisualCoreExperience | let | public let code: ExperienceCode
+VisualCoreExperience | let | public let number: Int
+VisualCoreExperience | let | public let rawValue: String
+VisualCoreExperience | let | public let round: Int?
+VisualCoreExperience | let | public let slug: String
+VisualCoreExperience | let | public let text: String
+VisualCoreExperience | let | public static let maxSlugLength
 VisualCoreExperience | let | public static let version
+VisualCoreExperience | struct | public struct ExperienceCode: Hashable, Comparable, Sendable, CustomStringConvertible
+VisualCoreExperience | struct | public struct ExperienceID: Hashable, Comparable, Sendable, RawRepresentable, Codable, CustomStringConvertible
+VisualCoreExperience | var | public var accessibilityPrefix: String
+VisualCoreExperience | var | public var description: String
+VisualCoreExperience | var | public var evidenceName: String
+VisualCoreExperience | var | public var integrationGate: String
+VisualCoreExperience | var | public var isOriginal: Bool
+VisualCoreExperience | var | public var storageNamespace: String
 VisualCoreMath | enum | public enum EasingCurve: String, CaseIterable, Sendable, Codable
 VisualCoreMath | enum | public enum EasingMode: String, CaseIterable, Sendable, Codable
 VisualCoreMath | enum | public enum Level: String, Sendable, Equatable
