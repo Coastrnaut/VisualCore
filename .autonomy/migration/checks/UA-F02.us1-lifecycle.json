@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/VisualCore",
+    "--filter",
+    "LifecycleTests"
+  ],
+  "command": "swift test --package-path Packages/VisualCore --filter LifecycleTests",
+  "elapsed_seconds": 2.15,
+  "exit_code": 0,
+  "finished": "2026-11-12T11:20:06+00:00",
+  "gate": "UA-F02",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F02.us1-lifecycle.log",
+  "log_sha256": "27ffbada4a1f1b97e215d716befc005f0b17248efa4c6ca6511c2128c288d943",
+  "name": "us1-lifecycle",
+  "started": "2026-11-12T11:20:04+00:00",
+  "timed_out": false
+}
