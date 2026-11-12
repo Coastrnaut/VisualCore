@@ -46,5 +46,21 @@ public enum SampleExperience {
 
     // MARK: - Committed digests (T-U02-017)
 
+    /// The digest of the sample right after preparation, for eight seeds. Computed once on the Mac host; the
+    /// simulator runtimes must reproduce every value.
+    public static let goldenDigests: [(seed: UInt64, hex: String)] = [
+        (0, "ad928107cbbb09a93b8a22848e7965050a1c86db95c28934306a6f39cf227c6d"),
+        (1, "b3ab9d97dc84ac84b1b320d8fc82e21eaec91a0d209d21a1a178979204378033"),
+        (2, "30ed5ecc2e9888ea409e3437f485fe89f13e4e558e3aa415cf2a19a283d697fb"),
+        (42, "bd6c7d36efeb80cea40f3dff946c1af0edef97ab727accc3048bc7ece10600ef"),
+        (1_000, "be8ddca6770a9dac0412d23994dd1b434d34aa55929c227fcce7cbc4fe43b9a8"),
+        (65_535, "fe218b42efd7bcff12a51a9fad0278c595195c4380caa4a62bec1b60bfad8658"),
+        (4_294_967_296, "4a249d904c41200bc8fdfb1651bfb6e39380054b966b1710afdbef82413c738a"),
+        (.max, "fb3a8a2a7505aa51296621a97e7c3a6339af08761d5a22bca2731c66ab213312"),
+    ]
+
+    /// The digest of the sample prepared with seed 42 after 240 steps.
+    public static let digestAfter240Steps = "e1df502ae639bed10e7f3d7aead5c21c68a5c8e3fd0aa869818842b807805839"
+
     // MARK: - Version-1 snapshot (migration tests)
 }

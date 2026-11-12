@@ -1409,6 +1409,8 @@ VisualCoreTestSupport | init | public init(from decoder: any Decoder) throws
 VisualCoreTestSupport | let | public let maxAbsolute: Int
 VisualCoreTestSupport | let | public let meanAbsolute: Double
 VisualCoreTestSupport | let | public static let acceptedActions: [ScriptedAction]
+VisualCoreTestSupport | let | public static let digestAfter240Steps
+VisualCoreTestSupport | let | public static let goldenDigests: [(seed: UInt64, hex: String)]
 VisualCoreTestSupport | let | public static let id: ExperienceID
 VisualCoreTestSupport | let | public static let rejectedActions: [ScriptedAction]
 VisualCoreTestSupport | let | public static let seeds: [UInt64]
