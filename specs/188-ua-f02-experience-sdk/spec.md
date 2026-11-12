@@ -33,6 +33,37 @@ Canonical overrides:
   `DEBUG` or `VISUALCORE_AUTOMATION`. No common contract ties them together for an experience: each of the four
   existing apps wires them by hand.
 
+## Clarifications
+
+### Session 2026-11-12
+
+Questions asked and answered under the owner's standing delegation (recommended option first).
+
+- Q: Is an experience one object, or a pure core with a separate part that owns the picture? → A: Two parts
+  (recommended). A pure core holds the domain state, preparation, update, actions, snapshot and digest, has no
+  user-interface or graphics dependency and can be handed between threads. A main-actor shell owns the scene, the
+  controls and the GPU objects and reads the core. Reason: the conformance helper must run on the Mac host, where
+  no render host exists (section 11.3), and CPU-heavy preparation may run off the main actor (section 11.5). The
+  sketch of section 11.3 is illustrative; it showed one main-actor protocol.
+- Q: How large is the state digest and how is it computed? → A: 256 bits, SHA-256 over a canonical typed
+  encoding, printed as 64 lower-case hexadecimal digits (recommended). Reason: digests are compared across one
+  hundred experiences, ten thousand levels and three platforms, and the level artifacts of Rounds 3 and 4 already
+  name SHA-256; the existing 64-bit checksum of the fixed-step simulation stays as it is for its own purpose.
+- Q: In what form is the snapshot payload held, given that the existing migration chain works on JSON objects?
+  → A: A JSON object, encoded deterministically (sorted keys), carried in an envelope that also holds the digest
+  of the state at capture (recommended). 64-bit values (the seed) are written as text so that no JSON reader
+  rounds them. The checksum is SHA-256 of the encoded payload. The envelope has its own format number, separate
+  from the schema version of the experience.
+- Q: On which thread does preparation run and how does cancellation end it? → A: The core's preparation is a pure
+  asynchronous function that may run off the main actor; it checks for cancellation at bounded intervals; a
+  result that arrives after cancellation, after deactivation began or after a newer preparation started is
+  discarded (recommended). The caller sets a time limit; exceeding it is a failure with its own code. Everything
+  that touches the graphics context stays on the main actor.
+- Q: Where do the automation hooks live and how is their absence proven? → A: Inside the two modules of this
+  feature, in code that compiles only under `DEBUG` or `VISUALCORE_AUTOMATION`; absence is proven by listing the
+  symbols of a release build without the flag (recommended). The existing automation module is not changed; the
+  verification runner (UA-F09) connects the two later.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - An experience can only be driven in a legal order (Priority: P1) 🎯
@@ -240,7 +271,7 @@ hand-written copies of the same tests.
 - **Cancellation.** Leaving during preparation cancels it. A preparation that completes after it was cancelled is
   discarded. Nothing reaches the experience after deactivation.
 - **Preparation that does not end.** Preparation has a time limit that the caller sets; exceeding it is a failure
-  with its own code.
+  with its own code. A result that arrives late is discarded.
 - **Lifecycle interruption.** Suspension stops the clock; resume does not catch up. A suspension request in a
   state other than active is refused and counted; the caller decides what to do next.
 - **Memory pressure.** Shedding caches never changes the digest. What is shed is rebuilt on demand.
@@ -292,13 +323,20 @@ hand-written copies of the same tests.
 - **FR-U02-011**: Preparation MUST be asynchronous and cancellable. A cancelled preparation MUST end with a
   cancellation result, MUST leave no visible state and MUST lead to inactive.
 - **FR-U02-012**: A failed preparation MUST lead to failed with a typed error; no partial state MUST be visible.
-- **FR-U02-013**: Every prepared experience MUST offer a state digest of fixed size, computed from a canonical
-  encoding of its domain state. Equal states MUST give equal digests in every process, on the Mac host and on both
+- **FR-U02-013**: Every prepared experience MUST offer a state digest of 256 bits, the SHA-256 of a canonical
+  typed encoding of its domain state, printed as 64 lower-case hexadecimal digits. Equal states MUST give equal digests in every process, on the Mac host and on both
   simulator runtimes. The digest MUST NOT depend on wall-clock time, memory addresses, the iteration order of
   unordered collections, the quality tier, or anything read from the GPU.
 - **FR-U02-014**: The same seed MUST give the same digest after every preparation.
 - **FR-U02-015**: The contract MUST offer one shared way to build a digest from integers, booleans, text, byte
-  sequences and finite floating-point numbers, and that way MUST refuse a number that is not finite.
+  sequences and finite floating-point numbers, and that way MUST refuse a number that is not finite. The encoding
+  MUST mark the type and the length of every field, so that two different sequences of fields never give the same
+  bytes.
+- **FR-U02-016**: The core's preparation MAY run off the main actor. It MUST check for cancellation at bounded
+  intervals. A preparation result that arrives after cancellation, after deactivation began or after a newer
+  preparation started MUST be discarded.
+- **FR-U02-017**: The caller MUST be able to set a time limit for preparation. Exceeding it MUST be a failure with
+  its own stable code.
 
 **Fixed-step update**
 
@@ -333,22 +371,25 @@ hand-written copies of the same tests.
 
 **Snapshot, restore and reset**
 
-- **FR-U02-040**: A snapshot MUST be a pure, versioned envelope holding: the experience id, the schema version,
-  the seed, the step index, the payload and a checksum of the payload. It MUST NOT hold a GPU handle, a memory
-  address or a time of day.
+- **FR-U02-040**: A snapshot MUST be a pure, versioned envelope holding: the envelope format number, the
+  experience id, the schema version of the experience, the seed, the step index, the digest of the state at
+  capture, the payload and the SHA-256 checksum of the encoded payload. The payload MUST be a JSON object. It MUST
+  NOT hold a GPU handle, a memory address or a time of day.
 - **FR-U02-041**: Restoring a snapshot taken from the same experience at the same schema version MUST reproduce
   digest, seed and step index.
 - **FR-U02-042**: A snapshot of an older schema version MUST be migrated step by step with the existing
   MigrationChain. A missing migration step MUST be a typed refusal.
 - **FR-U02-043**: Restore MUST refuse, with a distinct typed reason each: a snapshot of another experience, a
-  newer schema version, a payload that does not decode, a checksum mismatch, and an encoded snapshot larger than
-  1,048,576 bytes.
+  newer schema version or an unknown envelope format, a payload that does not decode, a checksum mismatch, and an
+  encoded snapshot larger than 1,048,576 bytes. When a snapshot of the current schema version restores to a state
+  whose digest differs from the digest in the envelope, that MUST be a typed refusal too.
 - **FR-U02-044**: A refused restore MUST leave the running state exactly as it was (same digest, same step
   index).
 - **FR-U02-045**: Reset MUST give the state of a fresh preparation with the current seed: equal digest, step
   index 0. After a restore the current seed is the seed of the restored snapshot.
-- **FR-U02-046**: The encoded form of a snapshot MUST be deterministic: encoding the same snapshot twice gives
-  the same bytes, and a decoded snapshot encodes to the bytes it was decoded from.
+- **FR-U02-046**: The encoded form of a snapshot MUST be deterministic (keys in sorted order): encoding the same
+  snapshot twice gives the same bytes, and a decoded snapshot encodes to the bytes it was decoded from. 64-bit
+  values MUST be written as text so that they survive every JSON reader exactly.
 - **FR-U02-047**: The envelope MUST be storable by the existing DocumentStore without a second envelope format
   for the same purpose.
 
@@ -380,13 +421,13 @@ hand-written copies of the same tests.
   that can be written into an evidence file.
 - **FR-U02-062**: Scenario hooks for automation (run a script of seed, steps and actions; read the results) MUST
   compile only under `DEBUG` or `VISUALCORE_AUTOMATION`. A release build without the flag MUST contain none of
-  them.
+  them, proven by listing the symbols of that build. The existing automation module MUST stay unchanged.
 - **FR-U02-063**: Errors of the contract MUST be typed, each with a stable code that does not change between
   releases.
 
 **Conformance and the sample experience**
 
-- **FR-U02-070**: A reusable helper, ExperienceConformance, MUST run these checks for any experience on the host
+- **FR-U02-070**: A reusable helper, ExperienceConformance, MUST run these checks for the core of any experience on the host
   and report each as passed or failed with the reason: seed determinism, snapshot round trip, reset equivalence,
   rejection leaves the digest unchanged, tier change leaves the digest unchanged, cache shedding leaves the digest
   unchanged, replay of recorded actions reproduces the digest.
@@ -400,9 +441,12 @@ hand-written copies of the same tests.
 
 **Framework obligations and boundaries**
 
-- **FR-U02-080**: The pure parts (lifecycle, digest, snapshot envelope, action types, diagnostics, conformance)
-  MUST live in VisualCoreExperience and MUST stay free of user-interface and graphics dependencies. The parts that
-  need a render host or SwiftUI MUST live in VisualCoreExperienceHost in `Packages/VisualCoreRendering`.
+- **FR-U02-080**: An experience MUST consist of two parts. The core (domain state, preparation, update, actions,
+  snapshot, digest) and the other pure parts (lifecycle, digest builder, snapshot envelope, action types,
+  diagnostics, conformance) MUST live in VisualCoreExperience, MUST stay free of user-interface and graphics
+  dependencies and MUST be usable from any thread. The shell (scene, controls, GPU objects) and everything else
+  that needs a render host or SwiftUI MUST live in VisualCoreExperienceHost in `Packages/VisualCoreRendering` and
+  MUST run on the main actor.
 - **FR-U02-081**: The contract MUST adapt the existing surfaces named in the brief and MUST NOT duplicate them:
   the fixed-step clock and runner, the scene contract and render host, the document envelope and store, the
   migration chain and the render lifecycle keep their behavior and their public API.
@@ -423,7 +467,10 @@ hand-written copies of the same tests.
 - **State digest**: a fixed-size value of the domain state, printable as text, comparable across platforms.
 - **Experience action**: control id, values, step index. **Action result**: accepted or rejected with a reason.
 - **Control declaration**: id, number of values, ranges.
-- **Experience snapshot**: experience id, schema version, seed, step index, payload, checksum.
+- **Experience core and shell**: the pure part that holds the domain state, and the main-actor part that owns
+  scene, controls and GPU objects.
+- **Experience snapshot**: envelope format, experience id, schema version, seed, step index, digest at capture,
+  payload (a JSON object), checksum.
 - **Experience diagnostics**: the readable state of an experience at one moment.
 - **Scenario script and result** (automation builds only): seed, steps, actions; final digest and per-action
   results.
@@ -442,7 +489,7 @@ hand-written copies of the same tests.
   seeds the digest equals a committed value on the host and on both simulator runtimes.
 - **SC-U02-003**: At 100 different points of a run, snapshot and restore reproduce digest, seed and step index in
   100% of the cases; reset equals a fresh preparation in 100% of 32 tried seeds; a committed version-1 snapshot
-  restores to its committed digest; each of the five refusal reasons is produced by its fixture, and the running
+  restores to its committed digest; each of the six refusal reasons is produced by its fixture, and the running
   digest is unchanged in every refusal.
 - **SC-U02-004**: Every rejection reason is produced by at least one row of the action table, and the digest is
   unchanged after 100% of the rejected actions; a replay of 200 recorded actions reproduces the digest.
@@ -507,7 +554,7 @@ unique requirements and what happens to each:
 | Source | Requirement |
 |---|---|
 | Acceptance 1 (pure lifecycle reducer, exhaustive tests, illegal transitions rejected and counted) | FR-U02-001–007, US1, SC-U02-001 |
-| Acceptance 2 (deterministic preparation, conformance helper checks it) | FR-U02-010–015, FR-U02-070, US2, SC-U02-002, SC-U02-010 |
+| Acceptance 2 (deterministic preparation, conformance helper checks it) | FR-U02-010–017, FR-U02-070, US2, SC-U02-002, SC-U02-010 |
 | Acceptance 3 (restore reproduces the digest, reset equals fresh preparation, versioned envelopes with migrations) | FR-U02-040–047, US3, SC-U02-003 |
 | Acceptance 4 (normalized input, rejection leaves the digest unchanged, typed reason) | FR-U02-030–036, US4, SC-U02-004 |
 | Acceptance 5 (fixed steps independent of frame rate, drawing reads immutable state, no GPU result decides) | FR-U02-020–025, FR-U02-050–052, US2, US5, SC-U02-005 |
@@ -516,7 +563,7 @@ unique requirements and what happens to each:
 | Acceptance 8 (sample experience on host and both simulators; documented and baselined API) | FR-U02-072, FR-U02-073, FR-U02-082, US7, SC-U02-008, SC-U02-009 |
 | Scope: suspend, resume, deactivate, tier, cache shedding | FR-U02-006, FR-U02-024, FR-U02-052, FR-U02-054, FR-U02-055 |
 | Out of scope: session host, real experiences | FR-U02-084 |
-| Auto-Creator.md section 6.1 (E-03, E-04, E-05, E-06, E-08, E-09, E-10, E-11, E-13) | FR-U02-030–036, FR-U02-010–025, FR-U02-040–047, FR-U02-045, FR-U02-024, FR-U02-052, FR-U02-011, FR-U02-012, FR-U02-054 |
+| Auto-Creator.md section 6.1 (E-03, E-04, E-05, E-06, E-08, E-09, E-10, E-11, E-13) | FR-U02-030–036, FR-U02-010–025, FR-U02-040–047, FR-U02-045, FR-U02-024, FR-U02-052, FR-U02-011, FR-U02-016, FR-U02-012, FR-U02-054 |
 | Auto-Creator.md section 11.3 (operations, states, conformance helper), 11.5 (threads), 11.6 (failure, cancellation, no traps) | FR-U02-001–007, FR-U02-070, FR-U02-053, FR-U02-011, FR-U02-012, FR-U02-085 |
 | ADR-0009 D-05 (one contract that adapts the existing surfaces) | FR-U02-080, FR-U02-081 |
 | Constitution II (reuse obligations), III (lifecycle and context generation), IX (bounded untrusted input), XI (identity), XIII (code-driven visuals) | FR-U02-082, FR-U02-083, FR-U02-052, FR-U02-043, FR-U02-085, FR-U02-056, FR-U02-050 |

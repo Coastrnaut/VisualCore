@@ -42,3 +42,6 @@
   (Traceability table of the specification).
 - The absorbed feature R02-F23 is listed requirement by requirement as adopted, adapted, superseded or not
   absorbed.
+- Re-validated 2026-11-12 after `/speckit-clarify` (five questions answered): 16 of 16 still pass; no item
+  changed state. The clarifications fixed the two-part shape of an experience, the digest (SHA-256, 256 bits), the
+  payload form, the thread and cancellation rule of preparation and the place of the automation hooks.
