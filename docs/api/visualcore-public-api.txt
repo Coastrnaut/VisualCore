@@ -216,13 +216,20 @@ VisualCoreEffectsGraph | var | public var passes: [EffectPassDescription]
 VisualCoreEffectsGraph | var | public var scale: Double
 VisualCoreEffectsGraph | var | public var type: String
 VisualCoreEffectsGraph | var | public var version: Int
+VisualCoreExperience | enum | public enum ActionRejection: Error, Sendable, Equatable, Codable
+VisualCoreExperience | enum | public enum ActionResult: Sendable, Equatable, Codable
 VisualCoreExperience | enum | public enum CatalogError: Error, Equatable, Sendable
 VisualCoreExperience | enum | public enum CatalogSearch
+VisualCoreExperience | enum | public enum DigestError: Error, Sendable, Equatable
 VisualCoreExperience | enum | public enum ExperienceCategory: String, Sendable, Equatable, CaseIterable
+VisualCoreExperience | enum | public enum ExperienceError: Error, Sendable, Equatable
 VisualCoreExperience | enum | public enum ExperienceIDError: Error, Equatable, Sendable
 VisualCoreExperience | enum | public enum ExperienceInfo
 VisualCoreExperience | enum | public enum ExperienceKind: String, Sendable, Equatable, CaseIterable
+VisualCoreExperience | enum | public enum ExperienceLifecycleState: String, Sendable, Codable, CaseIterable
+VisualCoreExperience | enum | public enum ExperienceOperation: String, Sendable, Codable, CaseIterable
 VisualCoreExperience | enum | public enum ExperienceTier: String, Sendable, Equatable, CaseIterable
+VisualCoreExperience | enum | public enum SnapshotError: Error, Sendable, Equatable
 VisualCoreExperience | func | public func encode(to encoder: any Encoder) throws
 VisualCoreExperience | func | public func experience(_ id: ExperienceID) -> ExperienceDescriptor?
 VisualCoreExperience | func | public func experience(code: ExperienceCode) -> ExperienceDescriptor?
@@ -234,25 +241,31 @@ VisualCoreExperience | func | public func title(of category: ExperienceCategory)
 VisualCoreExperience | func | public static func < (lhs: ExperienceCode, rhs: ExperienceCode) -> Bool
 VisualCoreExperience | func | public static func < (lhs: ExperienceID, rhs: ExperienceID) -> Bool
 VisualCoreExperience | func | public static func fold(_ text: String) -> String
+VisualCoreExperience | func | public static func isValidCode(_ code: String) -> Bool
 VisualCoreExperience | func | public static func tag(forFamily family: String) -> String
 VisualCoreExperience | init | public init(_ text: String) throws(ExperienceIDError)
+VisualCoreExperience | init | public init(code: String, message: String)
 VisualCoreExperience | init | public init(data: Data) throws(CatalogError)
 VisualCoreExperience | init | public init(data: Data, categories: CategoryList? = nil) throws(CatalogError)
 VisualCoreExperience | init | public init(from decoder: any Decoder) throws
+VisualCoreExperience | init | public init(from: ExperienceLifecycleState, to: ExperienceLifecycleState, accepted: Bool)
 VisualCoreExperience | init | public init(from: String, to: String, gate: String, commit: String)
 VisualCoreExperience | init | public init(levels: Int, catalogSHA256: String)
 VisualCoreExperience | init | public init(missingRegistrations: [ExperienceID], unexpectedRegistrations: [ExperienceID], duplicates: [ExperienceID])
 VisualCoreExperience | init | public init?(rawValue: String)
+VisualCoreExperience | let | public let accepted: Bool
 VisualCoreExperience | let | public let capabilities: [String]
 VisualCoreExperience | let | public let catalogSHA256: String
 VisualCoreExperience | let | public let categories: [Entry]
 VisualCoreExperience | let | public let category: ExperienceCategory
 VisualCoreExperience | let | public let code: ExperienceCode
+VisualCoreExperience | let | public let code: String
 VisualCoreExperience | let | public let commit: String
 VisualCoreExperience | let | public let content: ExperienceContent?
 VisualCoreExperience | let | public let duplicates: [ExperienceID]
 VisualCoreExperience | let | public let experiences: [ExperienceDescriptor]
 VisualCoreExperience | let | public let family: String
+VisualCoreExperience | let | public let from: ExperienceLifecycleState
 VisualCoreExperience | let | public let from: String
 VisualCoreExperience | let | public let gate: String
 VisualCoreExperience | let | public let id: ExperienceCategory
@@ -260,6 +273,7 @@ VisualCoreExperience | let | public let id: ExperienceID
 VisualCoreExperience | let | public let isAvailable: Bool
 VisualCoreExperience | let | public let kind: ExperienceKind
 VisualCoreExperience | let | public let levels: Int
+VisualCoreExperience | let | public let message: String
 VisualCoreExperience | let | public let missingRegistrations: [ExperienceID]
 VisualCoreExperience | let | public let moves: [Move]
 VisualCoreExperience | let | public let number: Int
@@ -276,14 +290,18 @@ VisualCoreExperience | let | public let text: String
 VisualCoreExperience | let | public let tier: ExperienceTier
 VisualCoreExperience | let | public let tileSeed: UInt32
 VisualCoreExperience | let | public let title: String
+VisualCoreExperience | let | public let to: ExperienceLifecycleState
 VisualCoreExperience | let | public let to: String
 VisualCoreExperience | let | public let unexpectedRegistrations: [ExperienceID]
 VisualCoreExperience | let | public static let launchCodes: [String]
 VisualCoreExperience | let | public static let maxBytes
+VisualCoreExperience | let | public static let maxCodeLength
 VisualCoreExperience | let | public static let maxEntries
+VisualCoreExperience | let | public static let maxMessageLength
 VisualCoreExperience | let | public static let maxMoves
 VisualCoreExperience | let | public static let maxSlugLength
 VisualCoreExperience | let | public static let supportedSchema
+VisualCoreExperience | let | public static let unspecifiedCode
 VisualCoreExperience | let | public static let version
 VisualCoreExperience | struct | public struct CatalogManifest: Sendable, Equatable
 VisualCoreExperience | struct | public struct CategoryList: Sendable, Equatable
@@ -291,16 +309,21 @@ VisualCoreExperience | struct | public struct Entry: Sendable, Equatable
 VisualCoreExperience | struct | public struct ExperienceCode: Hashable, Comparable, Sendable, CustomStringConvertible
 VisualCoreExperience | struct | public struct ExperienceContent: Sendable, Equatable
 VisualCoreExperience | struct | public struct ExperienceDescriptor: Sendable, Equatable, Identifiable
+VisualCoreExperience | struct | public struct ExperienceFailure: Error, Sendable, Equatable, Codable
 VisualCoreExperience | struct | public struct ExperienceID: Hashable, Comparable, Sendable, RawRepresentable, Codable, CustomStringConvertible
+VisualCoreExperience | struct | public struct ExperienceLifecycleEvent: Sendable, Codable, Equatable
 VisualCoreExperience | struct | public struct Move: Sendable, Equatable
 VisualCoreExperience | struct | public struct RegistryReport: Sendable, Equatable
 VisualCoreExperience | struct | public struct SourceMoveMap: Sendable, Equatable
 VisualCoreExperience | var | public var accessibilityPrefix: String
 VisualCoreExperience | var | public var available: [ExperienceDescriptor]
 VisualCoreExperience | var | public var code: ExperienceCode
+VisualCoreExperience | var | public var code: String
 VisualCoreExperience | var | public var description: String
 VisualCoreExperience | var | public var evidenceName: String
+VisualCoreExperience | var | public var failure: ExperienceFailure
 VisualCoreExperience | var | public var integrationGate: String
+VisualCoreExperience | var | public var isAccepted: Bool
 VisualCoreExperience | var | public var isMatch: Bool
 VisualCoreExperience | var | public var isOriginal: Bool
 VisualCoreExperience | var | public var storageNamespace: String
