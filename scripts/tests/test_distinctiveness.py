@@ -210,6 +210,19 @@ class PlantedDefects(unittest.TestCase):
 
 
 class Generation(unittest.TestCase):
+    def test_interrupted_write_keeps_the_previous_files(self):
+        from unittest import mock
+        ws = Workspace(self)
+        ws.run("--write")
+        before = (ws.matrix.read_bytes(), ws.summary.read_bytes())
+        ws.catalog_data["experiences"][0]["name"] = ws.catalog_data["experiences"][0]["name"] + " Two"
+        ws.save_catalog()
+        with mock.patch.object(cd.os, "replace", side_effect=KeyboardInterrupt):
+            with self.assertRaises(KeyboardInterrupt):
+                ws.run("--write")
+        self.assertEqual((ws.matrix.read_bytes(), ws.summary.read_bytes()), before)
+        self.assertEqual(sorted(p.name for p in ws.matrix.parent.iterdir()), sorted([ws.matrix.name, ws.summary.name]))
+
     def test_close_pairs_first_and_rest_sorted(self):
         ws = Workspace(self)
         ws.run("--write")

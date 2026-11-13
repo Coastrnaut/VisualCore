@@ -32,7 +32,9 @@ import argparse
 import hashlib
 import itertools
 import json
+import os
 import re
+import tempfile
 import sys
 from pathlib import Path
 
@@ -299,8 +301,7 @@ def run(args) -> tuple:
     findings = []
     if args.write:
         for path, content in ((matrix_path, text), (summary_path, md)):
-            path.parent.mkdir(parents=True, exist_ok=True)
-            path.write_bytes(content.encode("utf-8"))
+            write_atomically(path, content)
             print(f"wrote {path}")
     else:
         if not matrix_path.is_file():
@@ -321,6 +322,20 @@ def run(args) -> tuple:
                              "text": "summary missing or differs from a fresh generation; run --write"})
     findings += rule_findings(raw, matrix, titles, catalog_path)
     return (1 if findings else 0), findings, matrix["summary"]
+
+
+def write_atomically(path: Path, content: str) -> None:
+    """Write `content` whole or not at all: a temporary file in the same folder, then a rename (spec edge case
+    "Cancellation and interruption"); an interruption keeps the previous file."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    fd, temp = tempfile.mkstemp(prefix=f".{path.name}.", dir=path.parent)
+    try:
+        with os.fdopen(fd, "wb") as handle:
+            handle.write(content.encode("utf-8"))
+        os.replace(temp, path)
+    except BaseException:
+        Path(temp).unlink(missing_ok=True)
+        raise
 
 
 def main(argv=None) -> int:
