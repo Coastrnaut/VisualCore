@@ -154,7 +154,7 @@ runtimes.
 
 ## Phase 8: User Story 3 — Fractal Explorer (P2), same steps for A03
 
-- [ ] T-U07-023 [US3] Tests first: `FractalCoreTests` covering:
+- [X] T-U07-023 [US3] Tests first: `FractalCoreTests` covering: — Verified 2026-11-13: Apps/FractalExplorer/FractalExplorerAdapter/Tests/FractalCoreTests.swift (10 tests) and the manifest tests (3): conformance over 4 seeds; size-independent framing equal to FractalState for 3 sizes; pan, pinch and zoom buttons equal the standalone PlaneViewport arithmetic for 2 sizes; cap, palette, animation, seed; go-to numbers from the app's GoToInput; palette animation and tours advance only with steps (a tour timeline matches at 5 s and finishes); precision limit; bookmark open; snapshot round trip. swift test: 13 passed (a03-core-host)
   - conformance;
   - the framing is size-independent;
   - pan, pinch and the zoom buttons as normalized actions;
