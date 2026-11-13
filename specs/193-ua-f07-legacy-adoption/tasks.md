@@ -212,7 +212,7 @@ runtimes.
   a02.fluid-art-playground a03.fractal-explorer --runtime 27 26 --fresh`) and `verify-a04`.
 - [X] T-U07-036 Evidence `test-map` (`check_test_map.py`: 56 of 56 old tests mapped, every new test exists and passed in — Verified 2026-11-13: check_test_map.py per app against the old UI tests of af887e3 (git archive) and the iOS 27.2 phone logs of the evidence pass: A01 14 to 14 (test-map-a01), A02 9 to 10 (test-map-a02), A03 10 to 12 (test-map-a03), A04 23 to 21 (test-map-a04); 56 of 56 mapped, every new test exists and passed (SC-U07-004 as corrected); the combined run (test-map) fails by design because class names repeat across apps
   the logs of the chunks; SC-U07-004).
-- [ ] T-U07-037 Evidence of the app: `xcodegen`, `app-build`, and the chunks a to f plus g to j on the phone and the tablet
+- [X] T-U07-037 Evidence of the app: `xcodegen`, `app-build`, and the chunks a to f plus g to j on the phone and the tablet — Verified 2026-11-13: xcodegen and visualcore-app-build PASS (a01-screens-app-build); build-for-testing on the iOS 27.2 phone (app-phone-ios27-build-for-testing); chunks on the iOS 27.2 phone all pass: a, b, c, d, e, f, g1, g2, g3, h1, h2 (app-phone-ios27-<x>-ev), i1a (-ev2), i1b, i2 (-ev5), j2 (-ev2), j3 (-ev); A04's audit j1 passed before the owner ruling (app-phone-ios27-j1). The tablet and iOS 26.5 passes moved to the run before ImplementationLock-100 and audits wait for devices (owner ruling 2026-11-13; spec SC-U07-004 and FR-U07-022 corrected)
   of both runtimes.
 - [ ] T-U07-038 Evidence: `release-build`, `release-symbols`, `privacy-manifest`, `compliance`, `app-isolation`,
   `public-api`, `dependencies`, the package tests (`pure-ios27`, `pure-ios26`, `rendering-ios27`,
