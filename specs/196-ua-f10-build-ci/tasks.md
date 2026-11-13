@@ -5,7 +5,7 @@
 
 Evidence: `python3 scripts/migration_ledger.py run-check --gate UA-F10 --name <check> -- <command>`. Commit after each
 task (`scripts/tick_task.py`), push through `prepush_scan.py --push`, check CI with `gh run list` between tasks, never
-wait. No VisualCore framework change is planned; if one happens, T-U10-031 applies. Device-only items: none.
+wait. No VisualCore framework change is planned; if one happens, T-U10-030 applies. Device-only items: none.
 Owner-only items: none.
 
 ## Phase 1: Setup
@@ -31,12 +31,14 @@ Independent test: a clean commit passes the CI job `app-build`; a scratch commit
 - [ ] T-U10-004 [US1] Write `scripts/make_ci_angle_standins.py --out DIR`: generate the C file, compile
   `arm64` and `x86_64` simulator slices with `xcrun clang -target <arch>-apple-ios26.0-simulator -dynamiclib`, set
   the install name `@rpath/libEGL.framework/libEGL`, build `libEGL.framework` and an empty `libGLESv2.framework`, and
-  wrap each with `xcodebuild -create-xcframework` (FR-U10-002; research R1). Prove locally in a scratch folder under
-  `Build/` that the app compiles against them with `-derivedDataPath Build/DerivedData/ua-f10-standin` by pointing a
-  temporary copy of the binary-target path (no edit of `Package.swift`); record check `standin-local-build`.
+  wrap each with `xcodebuild -create-xcframework` (FR-U10-002; research R1). Prove locally that the app compiles
+  against them: copy the tracked files (`git archive HEAD`) into `Build/standin-check/` (no submodule there),
+  generate the stand-ins into its `External/projectm-ios/Build/ANGLEFrameworks`, and build with
+  `-derivedDataPath Build/DerivedData/ua-f10-standin`; the real submodule is never touched (check
+  `standin-local-build`).
 - [ ] T-U10-005 [US1] Add the CI job `app-build` to `.github/workflows/ci.yml`: timeout 45 min, the `ci` concurrency
-  group, shallow non-recursive checkout of `External/projectm-ios` (for `Build/` to exist), generate the stand-ins
-  into `External/projectm-ios/Build/ANGLEFrameworks`, install XcodeGen 2.46.0, `xcodegen generate`, then
+  group, no submodule checkout (the read-only submodule stays uninitialized; its path is an empty folder), generate
+  the stand-ins into `External/projectm-ios/Build/ANGLEFrameworks` inside that empty folder, install XcodeGen 2.46.0, `xcodegen generate`, then
   `xcodebuild build-for-testing` (Debug, scheme `VisualCore`, `generic/platform=iOS Simulator`,
   `CODE_SIGNING_ALLOWED=NO`) and `xcodebuild build -configuration Release` (FR-U10-001, FR-U10-004).
 - [ ] T-U10-006 [US1] Acceptance: push; `gh run list --workflow ci` shows `app-build` success for a clean commit; push
@@ -118,7 +120,7 @@ Independent test: planted second shippable target, undeclared target and reused 
   then `migration_ledger.py seal --gate UA-F10` and `record --gate UA-F10`.
 
 Conditional:
-- [ ] T-U10-031 Only if a VisualCore framework source changes: `check_public_api.py --update`,
+- [ ] T-U10-030 Only if a VisualCore framework source changes: `check_public_api.py --update`,
   `check_documented_api.py --sources Apps/VisualCore`, and the reference regression after the change.
 
 ## Dependencies
@@ -136,3 +138,11 @@ independent and may be drafted by agents in parallel.
 
 MVP is US1 and US2: a push proves the app builds, and the project keeps one shippable app. The rest lands as
 separate commits.
+
+## Analysis
+
+- **Run 1 (2026-11-13)**: D1 CRITICAL, the CI job wrote into the read-only submodule; fixed: the submodule stays
+  uninitialized in the app-build job and the stand-ins go into its empty folder. C1 HIGH, the local stand-in proof
+  was unclear; fixed: a copy of the tracked files under `Build/standin-check/`. F1 MEDIUM, the numbering gap; fixed.
+  U1 LOW (FR-U10-051 is a review rule) accepted.
+- **Run 2 (2026-11-13)**: 21 of 21 requirements and 7 of 7 criteria covered; no critical or high finding.

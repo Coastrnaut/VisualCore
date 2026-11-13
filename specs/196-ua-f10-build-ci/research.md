@@ -32,7 +32,8 @@
   `CVisualCoreEGL.h`, writes a C file with each function calling `abort()`, plus `const char vc_ci_angle_standin[]`,
   compiles it for `arm64` and `x86_64` simulator slices, links a dynamic `libEGL.framework` and an empty
   `libGLESv2.framework`, and wraps each with `xcodebuild -create-xcframework` (simulator slice only; CI builds only
-  for the simulator). Alternatives: building ANGLE (hours, 12 GB), publishing frameworks (public repo), self-hosted
+  for the simulator). In CI the read-only submodule is never initialized; the stand-ins are written into its empty
+  folder (analysis D1). Alternatives: building ANGLE (hours, 12 GB), publishing frameworks (public repo), self-hosted
   runner (owner action). The tool refuses an output folder that already holds a framework without the marker.
 - **R2 Target list** (clarification 2). `Configs/app-targets.json` lists each application target. A reason may name
   a ledger gate (`until_gate`); when that gate is pass, the check fails until the target is removed.
