@@ -43,7 +43,7 @@ task. Owner-only items: none.
 - [X] T-R02F26-009 [US3] [US4] Write `Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPlans.swift` — Verified 2026-11-13: AccessibilityPlans.swift: Announcement, AnnouncementPlanner (0.5 s, merge to newest, off drops), StateSign, stateSignProblems, transitionDuration; texts are passed in by callers
   (`Announcement`, `AnnouncementPlanner`, `StateSign`, `stateSignProblems`, `transitionDuration`) — texts are passed in by the caller from a
   string catalog (FR-R02F26-021).
-- [ ] T-R02F26-010 [US3] Write `AnnouncementSink`, `SystemAnnouncementSink` (`UIAccessibility.post(notification:
+- [X] T-R02F26-010 [US3] Write `AnnouncementSink`, `SystemAnnouncementSink` (`UIAccessibility.post(notification: — Verified 2026-11-13: AccessibilityPlayers.swift: AnnouncementSink, SystemAnnouncementSink (UIAccessibility.post announcement), recording sinks; AccessibilityPlayersTests 4/4 on sim-27.2 and sim-26.5 (rendering-ios27/26)
   .announcement, argument:)`) in `Packages/VisualCoreRendering/Sources/VisualCoreUI/AccessibilityPlayers.swift`, with a
   fake-sink test in the rendering tests.
 - [ ] T-R02F26-011 [US3] [US4] Acceptance: host tests and rendering tests on both runtimes (checks `host-plans`,
