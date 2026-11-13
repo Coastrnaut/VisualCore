@@ -19,7 +19,7 @@ Independent test: a fresh host's report holds every value of FR-R02F02-001 and 0
   every new value present on a fresh host; `floorFindings()` empty on the simulator and listing a planted low value;
   a value whose query fails is nil (pure helper with an injected reader); a JSON report without the new keys decodes
   with them nil.
-- [ ] T-R02F02-003 [US1] Add to `RenderCapabilities.swift` (research R1): optional `maxSamples`, `maxDrawBuffers`,
+- [X] T-R02F02-003 [US1] Add to `RenderCapabilities.swift` (research R1): optional `maxSamples`, `maxDrawBuffers`, — Verified 2026-11-13: RenderCapabilities: 15 optional values (limits, vertex and integer precision, EGL version and extensions, missing entry points, generation), queries with an error check per limit, FloorFinding and floorFindings() with the ES 3.0 minima, /// on each; probe tests pass
   `maxColorAttachments`, `maxVertexAttribs`, `maxVertexUniformVectors`, `maxFragmentUniformVectors`,
   `maxTextureImageUnits`, `maxVaryingVectors`, `vertexHighp`, `vertexMediump`, `fragmentHighInt`, `eglVersion`,
   `eglExtensions`, `missingEntryPoints`, `generation`; the queries in `query(display:)` with `vcglGetError` after each
