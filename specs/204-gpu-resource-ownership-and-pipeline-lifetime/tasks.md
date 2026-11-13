@@ -79,7 +79,7 @@ API-baseline and reference-regression tasks apply.
   `render_autocreator.py`; document validators; CI of a commit with all changes finished with success.
 - [ ] T-R02F04-022 {device} In the device campaign: GPU memory used by depth targets and retired programs measured on
   D1, D2, D3 (simulator byte counts are accounting only).
-- [ ] T-R02F04-023 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record R02-F04.
+- [X] T-R02F04-023 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record R02-F04. — Verified 2026-11-13: converge round 1 appended T-R02F04-024 (implemented, both runtimes); round 2 appended nothing; T-R02F04-022 {device} stays open
 
 ## Dependencies
 
