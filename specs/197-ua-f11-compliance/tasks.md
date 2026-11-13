@@ -22,7 +22,7 @@ Device-only items: none, so no {device} task.
   executable (null without an app); `write_report(path, report)` leaves no file when interrupted before rename; `read_versioned` refuses schema 2, a
   missing schema and unparsable JSON. Every later tool test module also plants a schema-2 input and a missing app or
   input file (exit 2, path named) (FR-U11-081, spec edge cases).
-- [ ] T-U11-003 Write `scripts/report_meta.py` (`meta`, `write_report` atomic via temp file + `os.replace`,
+- [X] T-U11-003 Write `scripts/report_meta.py` (`meta`, `write_report` atomic via temp file + `os.replace`, — Verified 2026-11-13: scripts/report_meta.py meta, write_report (temp file + os.replace), read_versioned; its 7 tests pass; used by every UA-F11 tool
   `read_versioned(path, schema=1)` refusing a missing, non-integer or higher schema and unparsable JSON with the path).
 
 ## Phase 3: User Story 1 — The privacy manifest is true of the built app (P1)
