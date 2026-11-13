@@ -29,7 +29,7 @@ Canonical overrides:
   human distinctiveness review (D-17, non-gating).
 - **What exists today (read-only audit of 2026-11-13, `Build/agent-notes/UA-F11-audit.md`, names re-verified):**
   - `Apps/VisualCore/Resources/PrivacyInfo.xcprivacy` declares the required-reason categories UserDefaults (CA92.1),
-    FileTimestamp (C617.1) and DiskSpace (35F9.1), no tracking, no tracking domains and no collected data.
+    FileTimestamp (C617.1) and SystemBootTime (35F9.1), no tracking, no tracking domains and no collected data.
     `check_privacy_manifest.py --app` already compares a manifest with the reason APIs found in a built app and its
     embedded frameworks; it has not been run as evidence on the current Release app.
   - `project.yml` gives the app one usage description, `NSPhotoLibraryAddUsageDescription` (A01's Save Image).

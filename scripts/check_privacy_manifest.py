@@ -5,23 +5,30 @@ Scans the main executable and every embedded framework of a built `.app` for App
 (symbol references via `nm -u`/`nm -m`, plus Foundation key strings via `strings -a`) and compares the result with
 the bundle's `PrivacyInfo.xcprivacy`:
 
-  python3 scripts/check_privacy_manifest.py --app Build/.../GenerativeArtStudio.app [--json report.json]
+  python3 scripts/check_privacy_manifest.py --app Build/.../VisualCore.app [--json report.json]
 
 Exit 0 when the declared categories equal the detected ones and the manifest declares no tracking, no tracking
 domains and no collected data types; 1 when anything is undeclared, unused or violating; 2 on bad input. Detection is
 deliberately conservative (it may over-report); a category with no truthful reason is a release blocker, never a
 guessed declaration. Shared by every app (constitution II).
+
+`--json` writes the UA-F11 check report (specs/197-ua-f11-compliance data-model §7, FR-U11-003, FR-U11-080):
+{"schema": 1, "check": "privacy-manifest", "meta": {..., "executable_sha256"}, "findings": [...], "verdict"} plus the
+detail fields detected, declared, undeclared, unused, violations and binaries, written atomically.
 """
 from __future__ import annotations
 
 import argparse
-import json
 import plistlib
 import re
 import subprocess
 import sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from report_meta import ReportError, meta, write_report  # noqa: E402
+
+CHECK = "privacy-manifest"
 PREFIX = "NSPrivacyAccessedAPICategory"
 
 # Category → (symbol regexes matched against undefined/imported symbols, string regexes matched against binary strings).
@@ -74,6 +81,16 @@ def compare(detected: dict[str, list[str]], manifest: dict) -> dict:
     }
 
 
+def findings(report: dict) -> list[dict]:
+    """The failures of a `compare` result as data-model §7 findings ({file, kind, text})."""
+    out = [{"file": "PrivacyInfo.xcprivacy", "kind": "undeclared",
+            "text": f"{c} used ({', '.join(report['detected'][c][:3])}) but not declared"} for c in report["undeclared"]]
+    out += [{"file": "PrivacyInfo.xcprivacy", "kind": "unused", "text": f"{c} declared but not used"}
+            for c in report["unused"]]
+    out += [{"file": "PrivacyInfo.xcprivacy", "kind": "violation", "text": v} for v in report["violations"]]
+    return out
+
+
 def binaries(app: Path) -> list[Path]:
     with open(app / "Info.plist", "rb") as f:
         out = [app / plistlib.load(f)["CFBundleExecutable"]]
@@ -124,8 +141,14 @@ def main(argv: list[str] | None = None) -> int:
         print(f"  detected {c}: {', '.join(report['detected'][c][:3])}")
     ok = not (report["undeclared"] or report["unused"] or report["violations"])
     if a.json:
-        a.json.parent.mkdir(parents=True, exist_ok=True)
-        a.json.write_text(json.dumps(report, indent=2) + "\n")
+        try:
+            info = meta(a.app, None)
+        except ReportError as error:
+            print(f"ERROR: {error}", file=sys.stderr)
+            return 2
+        write_report(a.json, {**report, "schema": info["schema"], "check": CHECK,
+                              "meta": {k: v for k, v in info.items() if k != "schema"},
+                              "findings": findings(report), "verdict": "PASS" if ok else "FAIL"})
     print(f"{'PASS' if ok else 'FAIL'}: {len(report['detected'])} categories detected in {len(scanned)} binaries, "
           f"{len(report['declared'])} declared")
     return 0 if ok else 1
