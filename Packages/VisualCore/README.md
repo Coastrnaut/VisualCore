@@ -241,3 +241,18 @@ control sends. `AnnouncementPlanner` and `HapticPlanner` (VisualCoreSimulation) 
 and the person's switches; `stateSignProblems` checks that every state has a distinct non-colour sign;
 `transitionDuration(_:reduceMotion:)` makes animated transitions instant under Reduce Motion. `ShellPreferences.haptics`
 is the Settings switch (absent means on).
+
+## Numerical foundations (feature 203, R02-F03)
+
+Time and randomness reuse `FixedStepClock`, `SceneClock`, `SplitMix64` and `SeededRandom` unchanged; their output and
+every committed scenario digest stay the same. Added (all pure, value types or caseless enums):
+`SeedDerivation` (VisualCoreSimulation) derives independent sub-seeds from a seed and a label or an index (SplitMix64
+finalizer and FNV-1a-64); `SeededRandom(seed:label:)` and `SeededRandom(seed:index:)` start such a stream.
+`SeededRandom.index(below:)`, `shuffle(_:)`, `shuffled(_:)`, `pick(_:)` and `weightedIndex(_:)` are owned algorithms
+with a fixed draw count (one draw per random index), so results never change with the toolchain; they report bad input
+with `RandomChoiceError`. `SeededRandom.state` and `SeededRandom(restoring:)` save and resume a generator
+(`SeededRandom.State`, version 1, hexadecimal words; `RandomStateError` refuses other versions, malformed words and the
+all-zero state). `ShaderHash` (VisualCoreMath) computes on the CPU exactly what `vc/hash.glsl` computes (`vc_pcg`
+matches the GPU bit for bit; the float hashes lie in [0, 1]). `NumericHygiene` provides `finite(_:or:)`,
+`normalizedAngle(_:)` ([−π, π)), `wrapped(_:modulus:)` ([0, modulus)) and `quantized(_:step:)` (`NumericError`). The rules
+and conventions are in `docs/architecture/determinism.md`.
