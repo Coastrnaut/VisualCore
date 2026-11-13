@@ -61,7 +61,7 @@ Independent test: a fresh host's report holds every value of FR-R02F02-001 and 0
   and the record; `git diff --exit-code <base> -- Packages/VisualCoreRendering/Sources/VisualCoreRendering/EGLDisplayProvider.swift`
   proves the window configuration is unchanged (FR-R02F02-009, check `window-config-unchanged`); the review confirms
   only tracked constant declarations are used (FR-R02F02-010).
-- [ ] T-R02F02-013 [US4] Reference regression after the change: `reference-a` and `reference-b` (7 of 7) (SC-R02F02-005).
+- [X] T-R02F02-013 [US4] Reference regression after the change: `reference-a` and `reference-b` (7 of 7) (SC-R02F02-005). — Verified 2026-11-13: reference-a 3/3 (engine xcframework, projectM-iOS simulator build, reference clean) and reference-b 4/4 (ANGLE rendering and ProjectM reference on iOS 27 and 26) after the framework change (SC-R02F02-005)
 
 ## Phase 6: Polish
 
