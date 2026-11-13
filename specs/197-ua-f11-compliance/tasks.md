@@ -130,7 +130,7 @@ Device-only items: none, so no {device} task.
 - [ ] T-U11-031 Modify `.github/workflows/ci.yml` (research D8): checks job runs `check_usage_descriptions.py` and
   `check_distinctiveness.py --check`; app-build job runs `check_no_tracking.py --app` and `check_licenses.py --app` on
   its Release build.
-- [ ] T-U11-032 Script tests: `python3 scripts/test_scripts.py` passes with every new module (check `script-tests`);
+- [X] T-U11-032 Script tests: `python3 scripts/test_scripts.py` passes with every new module (check `script-tests`); — Verified 2026-11-13: test_scripts.py PASS with every new module, 503+ tests in 57 s (script-tests); each new check under 60 s: privacy 0.8 s, tracking 1.7 s, licenses-app 0.5 s, usage 0.1 s, ProjectM audit 2.6 s, distinctiveness 0.1 s, metadata inputs under 1 s
   each new check's elapsed time under 60 s recorded (SC-U11-008).
 - [ ] T-U11-033 Auto-Creator.md §15.2 and §15.4 as built (tools, files, where they run); `python3
   scripts/validate_autocreator.py`, `python3 scripts/validate_docs.py`, `python3 scripts/migration_baseline.py verify`
