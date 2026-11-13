@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "python3",
+    "scripts/validate_autocreator.py"
+  ],
+  "command": "python3 scripts/validate_autocreator.py",
+  "elapsed_seconds": 3.577,
+  "exit_code": 0,
+  "finished": "2026-11-13T20:49:31+00:00",
+  "gate": "UA-F11",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F11.docs-autocreator.log",
+  "log_sha256": "5559f09c04c07d8cadb0f01a3771e8817b49c9a8ea4005265a456e076faa94d6",
+  "name": "docs-autocreator",
+  "started": "2026-11-13T20:49:27+00:00",
+  "timed_out": false
+}
