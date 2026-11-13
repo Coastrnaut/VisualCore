@@ -41,7 +41,7 @@ Independent test: a clean commit passes the CI job `app-build`; a scratch commit
   the stand-ins into `External/projectm-ios/Build/ANGLEFrameworks` inside that empty folder, install XcodeGen 2.46.0, `xcodegen generate`, then
   `xcodebuild build-for-testing` (Debug, scheme `VisualCore`, `generic/platform=iOS Simulator`,
   `CODE_SIGNING_ALLOWED=NO`) and `xcodebuild build -configuration Release` (FR-U10-001, FR-U10-004).
-- [ ] T-U10-006 [US1] Acceptance: push; `gh run list --workflow ci` shows `app-build` success for a clean commit; push
+- [X] T-U10-006 [US1] Acceptance: push; `gh run list --workflow ci` shows `app-build` success for a clean commit; push — Verified 2026-11-13: planted Release-only break 30858f1 (CIPlantedBreak.swift uses debug-only FrameChecks): CI run 43497392798 app-build failed in the Release build step after the Debug build-for-testing passed; revert 7683cc9: CI run 43498985666 passed in checks, host-tests, simulator-build and app-build (SC-U10-001, 2 of 2). The runner used Xcode 26.6 (macos-latest), not the pinned 27.2; recorded in research
   a scratch commit that adds a debug-only call into a Release path of an experience file, observe `app-build` failing
   with the compile error, then `git revert` it and observe success (SC-U10-001). Record the two run ids in research.md
   section 4 (no `gh run watch` on a queued run).
