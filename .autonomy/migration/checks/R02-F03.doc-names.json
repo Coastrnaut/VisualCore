@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_doc_names.py",
+    "docs/architecture/determinism.md"
+  ],
+  "command": "python3 scripts/check_doc_names.py docs/architecture/determinism.md",
+  "elapsed_seconds": 0.061,
+  "exit_code": 0,
+  "finished": "2026-11-13T21:03:42+00:00",
+  "gate": "R02-F03",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-F03.doc-names.log",
+  "log_sha256": "2c47af0cfe003cbb14ca52593826bf77ae94714452692126a9966cb6494b4f7d",
+  "name": "doc-names",
+  "started": "2026-11-13T21:03:42+00:00",
+  "timed_out": false
+}
