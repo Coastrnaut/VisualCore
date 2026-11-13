@@ -127,7 +127,7 @@ Device-only items: none, so no {device} task.
   after `app-release-build`: `app-no-tracking`, `app-licenses`, `app-usage-descriptions`, `app-projectm-audit`, and
   `app-privacy-manifest`/`app-no-tracking` with `--json` into `.autonomy/logs/`; `scripts/tests/test_release_steps.py`
   covers the names; run the new steps (check `release-check-ua-f11`).
-- [ ] T-U11-031 Modify `.github/workflows/ci.yml` (research D8): checks job runs `check_usage_descriptions.py` and
+- [X] T-U11-031 Modify `.github/workflows/ci.yml` (research D8): checks job runs `check_usage_descriptions.py` and — Verified 2026-11-13: ci.yml checks job runs check_usage_descriptions (reads tracked project.yml; first run 43505639965 failed because the generated Info.plist is not in Git, fixed in 4d88133) and check_distinctiveness --check; app-build runs check_no_tracking and check_licenses --app on the stand-in Release build; CI run 43506898569 on 4d88133: all four jobs success
   `check_distinctiveness.py --check`; app-build job runs `check_no_tracking.py --app` and `check_licenses.py --app` on
   its Release build.
 - [X] T-U11-032 Script tests: `python3 scripts/test_scripts.py` passes with every new module (check `script-tests`); — Verified 2026-11-13: test_scripts.py PASS with every new module, 503+ tests in 57 s (script-tests); each new check under 60 s: privacy 0.8 s, tracking 1.7 s, licenses-app 0.5 s, usage 0.1 s, ProjectM audit 2.6 s, distinctiveness 0.1 s, metadata inputs under 1 s
