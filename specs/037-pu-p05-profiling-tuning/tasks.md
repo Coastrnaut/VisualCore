@@ -76,5 +76,5 @@ Appended by `/speckit-converge` (T-A04-515, round 1, 2026-11-13).
 
 Appended by `/speckit-converge` (T-A04-515, round 2, 2026-11-13).
 
-- [ ] T-A04-517 Bring `specs/037-pu-p05-profiling-tuning/contracts/monitor.md` and `data-model.md` up to date with `FrameBudgetMonitor(budget:maxTier:tier:)` and `FrameIntervalEstimate` (research D7) per plan: contracts (partial)
+- [X] T-A04-517 Bring `specs/037-pu-p05-profiling-tuning/contracts/monitor.md` and `data-model.md` up to date with `FrameBudgetMonitor(budget:maxTier:tier:)` and `FrameIntervalEstimate` (research D7) per plan: contracts (partial) — Verified 2026-11-13: 2026-11-13 contracts/monitor.md and data-model.md match the public declarations in ParticleUniverse/Core/FrameBudgetMonitor.swift (grep of init/observe/reset/record/restart)
 - [ ] T-A04-518 Re-run the ExperiencesCreative package on sim-26.5 after T-A04-516 through `desktop_runbook.py run-check --stage A04-P05` per T-A04-512 (partial)
