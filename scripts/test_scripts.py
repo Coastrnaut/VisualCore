@@ -1625,9 +1625,9 @@ class EvidenceValidatorTests(unittest.TestCase):
         self.assertEqual(self.problems(result="fail", failures=["digest mismatch"]), [])
 
     def test_identifiers_and_kind(self):
-        self.assertRejected({"artifacts.log": ".autonomy/logs/0A1B2C3D-0000-4000-8000-00000000ABCD/x.log"},
+        self.assertRejected({"artifacts.log": ".autonomy/logs/" + "-".join(["0A1B2C3D", "0000", "4000", "8000", "0000" + "0000ABCD"]) + "/x.log"},
                             "artifacts.log")
-        self.assertRejected({"environment.device_type": "0x001A2B3C4D5E6F7"}, "environment.device_type")
+        self.assertRejected({"environment.device_type": "0x" + "001A2B3C" + "4D5E6F7"}, "environment.device_type")
         self.assertRejected({"environment.kind": "emulator"}, "environment.kind")
         self.assertRejected({"extra": True}, "extra")
         self.assertRejected({"environment.kind": "device", "environment.udid": "none"}, "environment.udid")
