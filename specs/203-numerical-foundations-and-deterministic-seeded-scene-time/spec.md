@@ -259,8 +259,9 @@ check confirms every name it cites exists in the public interface.
 **Saved generator state (story 3)**
 - **FR-R02F03-030**: A generator's full state MUST be exportable and restorable so that the restored generator
   continues the identical sequence.
-- **FR-R02F03-031**: The saved state MUST carry a format version (1) and the four state words as 16-digit lower-case
-  hexadecimal strings, encodable as JSON; any other version MUST be refused.
+- **FR-R02F03-031**: The saved state MUST carry a format version (1), the original seed and the four state words as
+  16-digit lower-case hexadecimal strings, encodable as JSON; any other version MUST be refused. (Plan correction:
+  the generator also stores its seed, which takes part in equality, so the seed is saved too.)
 - **FR-R02F03-032**: An all-zero, short or otherwise invalid saved state MUST be refused with a reason.
 - **FR-R02F03-033**: Adding the saved state MUST NOT change existing equality or output of generators.
 
