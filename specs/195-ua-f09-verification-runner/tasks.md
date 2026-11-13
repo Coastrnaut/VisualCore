@@ -104,7 +104,7 @@ Commit after every task (`python3 scripts/tick_task.py`), and push with `python3
 
 ## Phase 6: User Story 1 - One command proves an experience on both runtimes (Priority: P1)
 
-- [ ] T-U09-020 [US1] Tests first in `scripts/test_scripts.py` (class `VerifyDriverTests`). Use fixtures and injected command runners, with no simulator. Cover:
+- [X] T-U09-020 [US1] Tests first in `scripts/test_scripts.py` (class `VerifyDriverTests`). Use fixtures and injected command runners, with no simulator. Cover: — Verified 2026-11-12: python3 scripts/test_scripts.py: Ran 286 tests, OK (VerifyDriverTests 28)
   - Planning per id: the sample takes the package path, `debug` and registered ids the app path.
   - `--only`, `--skip` and `--scenario` select correctly.
   - State and resume: passed items are skipped, and `--fresh` reruns them.
