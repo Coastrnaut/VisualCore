@@ -1,0 +1,72 @@
+{
+  "artifacts": {
+    "log": ".autonomy/logs/verify/verify-20261112T194914/verify-a99.contract-sample-27.2-verify-20261112T194914.log",
+    "log_sha256": "b20f68fd339dac2ef146928ef2d77d0d1511742ac9889610d26a9686135d0e53",
+    "record_sha256": "8e7e99b7923716f25f1ec00f85671a1baaa38588d37d8afe1d1919c84a7ba94c",
+    "result_bundle": ".autonomy/xcresults/verify-a99.contract-sample-27.2-verify-20261112T194914.xcresult"
+  },
+  "battery": null,
+  "code": "sample",
+  "configuration": {
+    "automation": true,
+    "build": "Debug",
+    "entitlement": "none",
+    "process": "single",
+    "quality_tier": null
+  },
+  "digests": {
+    "after_reset": null,
+    "after_restore": null,
+    "final": "547440612356faf59757e0dead9cbad7591b0f716bd583da3675da7f700238d9",
+    "initial": "bd6c7d36efeb80cea40f3dff946c1af0edef97ab727accc3048bc7ece10600ef"
+  },
+  "environment": {
+    "device_type": "com.apple.CoreSimulator.SimDeviceType.iPhone-18-Pro",
+    "host_os": "27.2.1",
+    "kind": "simulator",
+    "os_build": "24B91016s",
+    "os_version": "27.2",
+    "sdk": "24B8118",
+    "signing": "none",
+    "swift": "Apple Swift version 6.4.2 (swiftlang-6.4.2.1.9 clang-2100.4.1.1)",
+    "xcode": "27.2 (27B52)"
+  },
+  "experience": "a99.contract-sample",
+  "failures": [],
+  "frames": [],
+  "low_power": false,
+  "pacing": null,
+  "resources": {
+    "footprint_bytes": 12912872,
+    "gpu_bytes": 4,
+    "leaked": 0,
+    "live": 0
+  },
+  "result": "pass",
+  "run": {
+    "attempt": 1,
+    "id": "verify-20261112T194914",
+    "lock_sha256": null
+  },
+  "scenario": "suspend-resume",
+  "schema": 1,
+  "seed": "42",
+  "source": {
+    "app_sha256": "0196885778a23b72d15165c4d333bf53aef0f15381071b0a089333a5af13c57c",
+    "catalog_sha256": "dfc7fc87b4fe049a980d0ec25afdeb6c5f4dd53edfa161122be8b6544a66fb37",
+    "commit": "0876b9f2afb3e0f46aedd0fac8d93aa045b6d1ab",
+    "dirty": true,
+    "submodules": {
+      "External/projectm-ios": "d93edd178525444f86ed8b9f1e70aee7412871b2"
+    },
+    "tree": "78622fba56fcd3114c4f53cf65f883b79edea078"
+  },
+  "steps": [],
+  "thermal_state": "nominal",
+  "timing": {
+    "first_present_ms": 4.17675,
+    "launch_ms": null,
+    "preparation_ms": 0.211833,
+    "shader_compilation_ms": 0.188
+  }
+}

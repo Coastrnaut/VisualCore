@@ -1,0 +1,89 @@
+{
+  "artifacts": {
+    "log": ".autonomy/logs/verify/verify-20261112T194938/a98.debug-experience-27.2-rejection.log",
+    "log_sha256": "cfefaa9c7ac78eaeff1c81b6f99f0c2d0e78a7fc9701d4e1881ff52c231d10c9",
+    "record_sha256": "22b983138b3a837a6f59884a2e2d796f8a309025105fb1f5985b2cb38992854a",
+    "result_bundle": null
+  },
+  "battery": null,
+  "code": "debug",
+  "configuration": {
+    "automation": true,
+    "build": "Debug",
+    "entitlement": "none",
+    "process": "single",
+    "quality_tier": null
+  },
+  "digests": {
+    "after_reset": null,
+    "after_restore": null,
+    "final": "9a83ada71d210cef70879237bb8a69987c50df9eba91300acb019d75f4a71edd",
+    "initial": "9a83ada71d210cef70879237bb8a69987c50df9eba91300acb019d75f4a71edd"
+  },
+  "environment": {
+    "device_type": "com.apple.CoreSimulator.SimDeviceType.iPhone-18-Pro",
+    "host_os": "27.2.1",
+    "kind": "simulator",
+    "os_build": "24B91016s",
+    "os_version": "27.2",
+    "sdk": "24B8118",
+    "signing": "none",
+    "swift": "Apple Swift version 6.4.2 (swiftlang-6.4.2.1.9 clang-2100.4.1.1)",
+    "xcode": "27.2 (27B52)"
+  },
+  "experience": "a98.debug-experience",
+  "failures": [],
+  "frames": [],
+  "low_power": false,
+  "pacing": null,
+  "resources": {
+    "footprint_bytes": 18139392,
+    "gpu_bytes": 0,
+    "leaked": 0,
+    "live": 0
+  },
+  "result": "pass",
+  "run": {
+    "attempt": 1,
+    "id": "verify-20261112T194938",
+    "lock_sha256": null
+  },
+  "scenario": "rejection",
+  "schema": 1,
+  "seed": "7",
+  "source": {
+    "app_sha256": "5cccacddeaa6f0304e556236d50d66a331cde7520cd6fd3138bf35de5d6d7293",
+    "catalog_sha256": "dfc7fc87b4fe049a980d0ec25afdeb6c5f4dd53edfa161122be8b6544a66fb37",
+    "commit": "0876b9f2afb3e0f46aedd0fac8d93aa045b6d1ab",
+    "dirty": true,
+    "submodules": {
+      "External/projectm-ios": "d93edd178525444f86ed8b9f1e70aee7412871b2"
+    },
+    "tree": "78622fba56fcd3114c4f53cf65f883b79edea078"
+  },
+  "steps": [
+    {
+      "control": "tap",
+      "digest": "9a83ada71d210cef70879237bb8a69987c50df9eba91300acb019d75f4a71edd",
+      "reason": "action.wrong-value-count",
+      "result": "rejected",
+      "values": [
+        1
+      ]
+    },
+    {
+      "control": "jump",
+      "digest": "9a83ada71d210cef70879237bb8a69987c50df9eba91300acb019d75f4a71edd",
+      "reason": "action.unknown-control",
+      "result": "rejected",
+      "values": []
+    }
+  ],
+  "thermal_state": "nominal",
+  "timing": {
+    "first_present_ms": 2.4274590000000003,
+    "launch_ms": null,
+    "preparation_ms": 4.310917,
+    "shader_compilation_ms": 2.6448750000000003
+  }
+}

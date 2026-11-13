@@ -1,0 +1,137 @@
+[
+  {
+    "attachments" : [
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "62BA098B-4CBB-4DB6-91AD-51494936CF89",
+        "deviceName" : "iPhone 18 Pro",
+        "exportedFileName" : "72C51417-7449-4D34-80A0-582458EBC1FF.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "evidence-a99.contract-sample-cancel-prepare_0_B48AF8BF-9535-4D4A-8355-C923B1F1F734.json",
+        "timestamp" : 1794530969.452
+      }
+    ],
+    "testIdentifier" : "ScenarioRunnerTests/testCancelPrepare()",
+    "testIdentifierURL" : "test://com.apple.xcode/VisualCoreRendering/VisualCoreExperienceHostTests/ScenarioRunnerTests/testCancelPrepare"
+  },
+  {
+    "attachments" : [
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "62BA098B-4CBB-4DB6-91AD-51494936CF89",
+        "deviceName" : "iPhone 18 Pro",
+        "exportedFileName" : "10407AE4-CC63-4C46-B665-D1CA8CE2F113.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "evidence-a99.contract-sample-completion_0_1B056C31-142C-4784-9AA7-2698E78D31DB.json",
+        "timestamp" : 1794530971.103
+      }
+    ],
+    "testIdentifier" : "ScenarioRunnerTests/testCompletion()",
+    "testIdentifierURL" : "test://com.apple.xcode/VisualCoreRendering/VisualCoreExperienceHostTests/ScenarioRunnerTests/testCompletion"
+  },
+  {
+    "attachments" : [
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "62BA098B-4CBB-4DB6-91AD-51494936CF89",
+        "deviceName" : "iPhone 18 Pro",
+        "exportedFileName" : "1E881443-82F0-4CBF-BF6B-542E7E56A9CA.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "evidence-a99.contract-sample-input-response_0_97989E8A-2960-4156-992B-D40AE30AE74A.json",
+        "timestamp" : 1794530971.15
+      }
+    ],
+    "testIdentifier" : "ScenarioRunnerTests/testInputResponse()",
+    "testIdentifierURL" : "test://com.apple.xcode/VisualCoreRendering/VisualCoreExperienceHostTests/ScenarioRunnerTests/testInputResponse"
+  },
+  {
+    "attachments" : [
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "62BA098B-4CBB-4DB6-91AD-51494936CF89",
+        "deviceName" : "iPhone 18 Pro",
+        "exportedFileName" : "C9A64970-9C01-4D0E-90D8-C56ADF553C50.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "evidence-a99.contract-sample-launch-first-frame_0_B030F13B-FB62-4B5D-856C-3E2524D0F672.json",
+        "timestamp" : 1794530971.186
+      }
+    ],
+    "testIdentifier" : "ScenarioRunnerTests/testLaunchFirstFrame()",
+    "testIdentifierURL" : "test://com.apple.xcode/VisualCoreRendering/VisualCoreExperienceHostTests/ScenarioRunnerTests/testLaunchFirstFrame"
+  },
+  {
+    "attachments" : [
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "62BA098B-4CBB-4DB6-91AD-51494936CF89",
+        "deviceName" : "iPhone 18 Pro",
+        "exportedFileName" : "6F63BEC0-80AB-4ED6-A00A-A975D5979DDA.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "evidence-a99.contract-sample-rejection_0_83863382-19BF-459E-8C66-A8D14270001D.json",
+        "timestamp" : 1794530971.191
+      }
+    ],
+    "testIdentifier" : "ScenarioRunnerTests/testRejection()",
+    "testIdentifierURL" : "test://com.apple.xcode/VisualCoreRendering/VisualCoreExperienceHostTests/ScenarioRunnerTests/testRejection"
+  },
+  {
+    "attachments" : [
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "62BA098B-4CBB-4DB6-91AD-51494936CF89",
+        "deviceName" : "iPhone 18 Pro",
+        "exportedFileName" : "D7092E19-2261-4ECD-BCD2-05B15BE09BAD.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "evidence-a99.contract-sample-reset_0_5CA9A0A8-E980-4A3C-8491-18961D3A78D4.json",
+        "timestamp" : 1794530971.197
+      }
+    ],
+    "testIdentifier" : "ScenarioRunnerTests/testReset()",
+    "testIdentifierURL" : "test://com.apple.xcode/VisualCoreRendering/VisualCoreExperienceHostTests/ScenarioRunnerTests/testReset"
+  },
+  {
+    "attachments" : [
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "62BA098B-4CBB-4DB6-91AD-51494936CF89",
+        "deviceName" : "iPhone 18 Pro",
+        "exportedFileName" : "A407C1AF-95AE-4C35-9BA6-8FD915915FB6.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "evidence-a99.contract-sample-save-restore_0_AFA971BC-FCB8-4864-9664-9038D1F4D97D.json",
+        "timestamp" : 1794530971.28
+      }
+    ],
+    "testIdentifier" : "ScenarioRunnerTests/testSaveRestore()",
+    "testIdentifierURL" : "test://com.apple.xcode/VisualCoreRendering/VisualCoreExperienceHostTests/ScenarioRunnerTests/testSaveRestore"
+  },
+  {
+    "attachments" : [
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "62BA098B-4CBB-4DB6-91AD-51494936CF89",
+        "deviceName" : "iPhone 18 Pro",
+        "exportedFileName" : "D6B30D7D-EF84-4C8C-9F4B-AB8C8349D640.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "evidence-a99.contract-sample-suspend-resume_0_770BB481-0873-41B3-BED5-89F681359B3E.json",
+        "timestamp" : 1794530971.292
+      }
+    ],
+    "testIdentifier" : "ScenarioRunnerTests/testSuspendResume()",
+    "testIdentifierURL" : "test://com.apple.xcode/VisualCoreRendering/VisualCoreExperienceHostTests/ScenarioRunnerTests/testSuspendResume"
+  },
+  {
+    "attachments" : [
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "62BA098B-4CBB-4DB6-91AD-51494936CF89",
+        "deviceName" : "iPhone 18 Pro",
+        "exportedFileName" : "78BFF0A6-6E8F-4C6A-BC27-F5B1DF944529.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "evidence-a99.contract-sample-teardown-reentry_0_47C936FB-24AC-4A1F-8137-5FD757EA47BC.json",
+        "timestamp" : 1794530971.437
+      }
+    ],
+    "testIdentifier" : "ScenarioRunnerTests/testTeardownReentry()",
+    "testIdentifierURL" : "test://com.apple.xcode/VisualCoreRendering/VisualCoreExperienceHostTests/ScenarioRunnerTests/testTeardownReentry"
+  }
+]

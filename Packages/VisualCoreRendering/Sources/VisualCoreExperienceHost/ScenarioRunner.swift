@@ -186,6 +186,8 @@ public final class ScenarioRunner {
         restored.refusedSnapshotFails = true
         guard let experience = await openRestored(restored, into: &record) else { return }
         record.afterRestore = digest(of: experience)
+        // The restored state is where this launch starts and ends: no action runs in the second launch.
+        record.initial = record.afterRestore
         record.final = record.afterRestore
         if let expectedDigest, record.afterRestore != expectedDigest {
             record.failures.append("after-restore digest: expected \(expectedDigest), got \(record.afterRestore ?? "none")")

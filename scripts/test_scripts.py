@@ -3774,7 +3774,9 @@ class VerifyDriverTests(unittest.TestCase):
         sealed["artifacts"]["record_sha256"] = None
         digest = hashlib.sha256(verify.dump(sealed).encode()).hexdigest()
         self.assertEqual(record["artifacts"]["record_sha256"], digest)
-        self.assertEqual(summary["results"][5], {"scenario": "reset", "result": "pass", "record_sha256": digest})
+        reset = summary["results"][5]
+        self.assertEqual((reset["scenario"], reset["result"], reset["record_sha256"]), ("reset", "pass", digest))
+        self.assertIn("commit", reset, "each row names the commit it was made at")
         state = json.loads((self.root / ".autonomy" / "verify" / "state.json").read_text())
         self.assertEqual(state["runs"]["a99.contract-sample|reset|27.2"]["result"], "pass")
         self.assertFalse((self.root / ".autonomy" / "verify" / "lock").exists())
@@ -3821,7 +3823,11 @@ class VerifyDriverTests(unittest.TestCase):
         self.assertEqual(code, 0, lines)
         self.assertEqual(sim.package_scenarios,
                          [["VisualCoreExperienceHostTests/ScenarioRunnerTests/testEnduranceKeepsResourcesFlat"]])
-        row = self.summary("a99.contract-sample", "27.2")["results"][0]
+        rows = self.summary("a99.contract-sample", "27.2")["results"]
+        # Every standard scenario is listed (not run here), then the endurance row.
+        self.assertEqual([r["scenario"] for r in rows[:9]], verify.STANDARD)
+        self.assertTrue(all(r["result"] == "not-run" for r in rows[:9]))
+        row = rows[9]
         self.assertEqual((row["scenario"], row["result"], row["record_sha256"]), ("endurance", "pass", None))
         self.assertIn("result bundle only", row["evidence"])
         self.assertFalse(list((self.root / ".autonomy" / "verify" / self.RUN).rglob("*.endurance.json")))
@@ -4011,7 +4017,7 @@ class VerifyDriverTests(unittest.TestCase):
         code, lines, _ = self.main(["--only", "debug", "--runtime", "27", "--scenario", "reset"], sim)
         self.assertEqual(code, 1)
         self.assertTrue(any("after-reset digest differs" in line for line in lines))
-        row = self.summary("a98.debug-experience", "27.2")["results"][0]
+        row = next(r for r in self.summary("a98.debug-experience", "27.2")["results"] if r["scenario"] == "reset")
         self.assertEqual(row["result"], "fail")
 
     def test_a_wrong_code_fails(self):

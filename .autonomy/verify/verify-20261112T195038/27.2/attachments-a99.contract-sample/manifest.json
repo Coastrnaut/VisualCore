@@ -1,0 +1,32 @@
+[
+  {
+    "attachments" : [
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "62BA098B-4CBB-4DB6-91AD-51494936CF89",
+        "deviceName" : "iPhone 18 Pro",
+        "exportedFileName" : "351BEDBE-1B93-42ED-8BA9-3D5713CB7180.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "evidence-a99.contract-sample-save-restore-lossy_0_B3057DC7-B7C6-4638-A125-8D71CD5EB584.json",
+        "timestamp" : 1794531042.822
+      }
+    ],
+    "testIdentifier" : "ScenarioRunnerTests/testALossySnapshotFailsSaveRestoreByName()",
+    "testIdentifierURL" : "test://com.apple.xcode/VisualCoreRendering/VisualCoreExperienceHostTests/ScenarioRunnerTests/testALossySnapshotFailsSaveRestoreByName"
+  },
+  {
+    "attachments" : [
+      {
+        "configurationName" : "Test Scheme Action",
+        "deviceId" : "62BA098B-4CBB-4DB6-91AD-51494936CF89",
+        "deviceName" : "iPhone 18 Pro",
+        "exportedFileName" : "03C75476-073D-4E3C-A531-05B94F048880.json",
+        "isAssociatedWithFailure" : false,
+        "suggestedHumanReadableName" : "evidence-a99.contract-sample-save-restore_0_7084292D-B1F7-462D-BAE9-B4192D72D02B.json",
+        "timestamp" : 1794531042.828
+      }
+    ],
+    "testIdentifier" : "ScenarioRunnerTests/testSaveRestore()",
+    "testIdentifierURL" : "test://com.apple.xcode/VisualCoreRendering/VisualCoreExperienceHostTests/ScenarioRunnerTests/testSaveRestore"
+  }
+]

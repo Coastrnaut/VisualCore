@@ -475,6 +475,7 @@ class Driver:
         before = state["runs"].get(key, {})
         state["runs"][key] = {"result": result, "record_sha256": record_sha,
                               "finished": self.now().strftime("%Y-%m-%dT%H:%M:%S"),
+                              "commit": self.cached("commit", ["git", "rev-parse", "HEAD"]).strip(),
                               "attempt": int(before.get("attempt", 0)) + 1}
         self.save_state(state)
 
@@ -850,10 +851,21 @@ class Driver:
 
     # summaries
     def write_summary(self, item: dict, runtime: dict, device: dict, state: dict, bundle) -> Path | None:
-        rows = []
+        # Every standard scenario, then any other this run or an earlier one ran: a run of a few scenarios
+        # keeps the latest results of the others, each with the commit it was made at.
+        names = list(STANDARD)
         for s in item["scenarios"]:
+            if s not in names:
+                names.append(s)
+        for key in state["runs"]:
+            ident, scenario, version = key.split("|")
+            if ident == item["id"] and version == runtime["version"] and scenario not in names:
+                names.append(scenario)
+        rows = []
+        for s in names:
             entry = state["runs"].get(self.key(item["id"], s, runtime["version"]), {})
-            row = {"scenario": s, "result": entry.get("result", "not-run"), "record_sha256": entry.get("record_sha256")}
+            row = {"scenario": s, "result": entry.get("result", "not-run"), "record_sha256": entry.get("record_sha256"),
+                   "commit": entry.get("commit")}
             if s == ENDURANCE and item["path"] == "package":
                 row["evidence"] = "result bundle only; the endurance test attaches no record"
             rows.append(row)

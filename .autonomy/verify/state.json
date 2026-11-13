@@ -1,0 +1,130 @@
+{
+  "runs": {
+    "a98.debug-experience|cancel-prepare|27.2": {
+      "attempt": 2,
+      "commit": "0876b9f2afb3e0f46aedd0fac8d93aa045b6d1ab",
+      "finished": "2026-11-12T19:53:33",
+      "record_sha256": "fe1c146ab4acd23d5dd60f09aa91d4e06b5338243bd334cd3d8204f5afe5bba4",
+      "result": "pass"
+    },
+    "a98.debug-experience|completion|27.2": {
+      "attempt": 2,
+      "commit": "0876b9f2afb3e0f46aedd0fac8d93aa045b6d1ab",
+      "finished": "2026-11-12T19:53:25",
+      "record_sha256": "f08fb34e12c68a03b3c1d672385ad0af68ff9a83cc91aceaac4d300cc4f5362b",
+      "result": "pass"
+    },
+    "a98.debug-experience|input-response|27.2": {
+      "attempt": 2,
+      "commit": "0876b9f2afb3e0f46aedd0fac8d93aa045b6d1ab",
+      "finished": "2026-11-12T19:53:24",
+      "record_sha256": "fae1ce85b3cd7b9563a5e894de4bec855ba67e9c283ad5548e99572e7b35b221",
+      "result": "pass"
+    },
+    "a98.debug-experience|launch-first-frame|27.2": {
+      "attempt": 2,
+      "commit": "0876b9f2afb3e0f46aedd0fac8d93aa045b6d1ab",
+      "finished": "2026-11-12T19:53:23",
+      "record_sha256": "459a36e799ed1094890fee3cd633f4cd1cc96ca8e8c25917de78d3e87ca1401b",
+      "result": "pass"
+    },
+    "a98.debug-experience|rejection|27.2": {
+      "attempt": 2,
+      "commit": "0876b9f2afb3e0f46aedd0fac8d93aa045b6d1ab",
+      "finished": "2026-11-12T19:53:26",
+      "record_sha256": "74b8b818fbc104ca1fc5b905f8acfab0ec37f0df53cd6d8749ee12626205ef97",
+      "result": "pass"
+    },
+    "a98.debug-experience|reset|27.2": {
+      "attempt": 2,
+      "commit": "0876b9f2afb3e0f46aedd0fac8d93aa045b6d1ab",
+      "finished": "2026-11-12T19:53:30",
+      "record_sha256": "bb5b978e36c07c4d05f4b4c11e85bdf662cd01d6469a8fa5eca2b31aa066e8da",
+      "result": "pass"
+    },
+    "a98.debug-experience|save-restore|27.2": {
+      "attempt": 3,
+      "commit": "0876b9f2afb3e0f46aedd0fac8d93aa045b6d1ab",
+      "finished": "2026-11-12T19:53:29",
+      "record_sha256": "d48051e00ae8ebce35595b87a904e423760471c9cc3b1928eacea02c7ec6e10c",
+      "result": "pass"
+    },
+    "a98.debug-experience|suspend-resume|27.2": {
+      "attempt": 2,
+      "commit": "0876b9f2afb3e0f46aedd0fac8d93aa045b6d1ab",
+      "finished": "2026-11-12T19:53:31",
+      "record_sha256": "c7c72981561c8e055373d00dd3e67ad1d49805e1f483ea27807b0c48bc216e35",
+      "result": "pass"
+    },
+    "a98.debug-experience|teardown-reentry|27.2": {
+      "attempt": 2,
+      "commit": "0876b9f2afb3e0f46aedd0fac8d93aa045b6d1ab",
+      "finished": "2026-11-12T19:53:32",
+      "record_sha256": "407e030556bba60d866d03b077269c237fb98243a46ed2d19891a7d727ff05f2",
+      "result": "pass"
+    },
+    "a99.contract-sample|cancel-prepare|27.2": {
+      "attempt": 2,
+      "commit": "0876b9f2afb3e0f46aedd0fac8d93aa045b6d1ab",
+      "finished": "2026-11-12T19:53:18",
+      "record_sha256": "25d2522298c9f28c8306ea373dcafed343bd320b6cc125b69b9eb8901bf89fa8",
+      "result": "pass"
+    },
+    "a99.contract-sample|completion|27.2": {
+      "attempt": 2,
+      "commit": "0876b9f2afb3e0f46aedd0fac8d93aa045b6d1ab",
+      "finished": "2026-11-12T19:53:18",
+      "record_sha256": "1846155fc4f35c2fb763af2831ba7771e4af0cc019bf1de32a5be85a89bc6117",
+      "result": "pass"
+    },
+    "a99.contract-sample|input-response|27.2": {
+      "attempt": 2,
+      "commit": "0876b9f2afb3e0f46aedd0fac8d93aa045b6d1ab",
+      "finished": "2026-11-12T19:53:18",
+      "record_sha256": "9029d5c9dfc465171c8252eb3dc0ba751a4296ab5d6dae445ee5ea6634b7ac38",
+      "result": "pass"
+    },
+    "a99.contract-sample|launch-first-frame|27.2": {
+      "attempt": 2,
+      "commit": "0876b9f2afb3e0f46aedd0fac8d93aa045b6d1ab",
+      "finished": "2026-11-12T19:53:18",
+      "record_sha256": "6cbff700ca202cfcff4283db9c6d21c2ce5cd41fc841cec03feea6c63aa43453",
+      "result": "pass"
+    },
+    "a99.contract-sample|rejection|27.2": {
+      "attempt": 2,
+      "commit": "0876b9f2afb3e0f46aedd0fac8d93aa045b6d1ab",
+      "finished": "2026-11-12T19:53:18",
+      "record_sha256": "5f4979a7561b9e312a1306e97dbf1b077a1c9230620be30a5ee1afd1b4ad8415",
+      "result": "pass"
+    },
+    "a99.contract-sample|reset|27.2": {
+      "attempt": 2,
+      "commit": "0876b9f2afb3e0f46aedd0fac8d93aa045b6d1ab",
+      "finished": "2026-11-12T19:53:18",
+      "record_sha256": "c0d1be9346c6b3facde0162434b78589e038c33a3825bf34068dd5cbf765bd44",
+      "result": "pass"
+    },
+    "a99.contract-sample|save-restore|27.2": {
+      "attempt": 2,
+      "commit": "0876b9f2afb3e0f46aedd0fac8d93aa045b6d1ab",
+      "finished": "2026-11-12T19:53:18",
+      "record_sha256": "9f07c1aefe7772be16cc45a54722d9d86ce146ae150f1a0373defcbe68485c4c",
+      "result": "pass"
+    },
+    "a99.contract-sample|suspend-resume|27.2": {
+      "attempt": 2,
+      "commit": "0876b9f2afb3e0f46aedd0fac8d93aa045b6d1ab",
+      "finished": "2026-11-12T19:53:18",
+      "record_sha256": "d4dc6ed966d65e11a48afdf87c2797eeb10191596b45effd347c5da9a3c87574",
+      "result": "pass"
+    },
+    "a99.contract-sample|teardown-reentry|27.2": {
+      "attempt": 2,
+      "commit": "0876b9f2afb3e0f46aedd0fac8d93aa045b6d1ab",
+      "finished": "2026-11-12T19:53:18",
+      "record_sha256": "783d8b36e9af23cfe1b37120f123720a66dc3096b51016238cd80c8a7071c94c",
+      "result": "pass"
+    }
+  }
+}

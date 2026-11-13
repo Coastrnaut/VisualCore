@@ -1,0 +1,88 @@
+{
+  "artifacts" : {
+    "log" : null,
+    "log_sha256" : null,
+    "record_sha256" : null,
+    "result_bundle" : null
+  },
+  "battery" : null,
+  "code" : "sample",
+  "configuration" : {
+    "automation" : true,
+    "build" : "Debug",
+    "entitlement" : "none",
+    "process" : "single",
+    "quality_tier" : null
+  },
+  "digests" : {
+    "after_reset" : null,
+    "after_restore" : null,
+    "final" : "bd6c7d36efeb80cea40f3dff946c1af0edef97ab727accc3048bc7ece10600ef",
+    "initial" : "bd6c7d36efeb80cea40f3dff946c1af0edef97ab727accc3048bc7ece10600ef"
+  },
+  "environment" : {
+    "device_type" : null,
+    "host_os" : null,
+    "kind" : "simulator",
+    "os_build" : null,
+    "os_version" : null,
+    "sdk" : null,
+    "signing" : null,
+    "swift" : null,
+    "xcode" : null
+  },
+  "experience" : "a99.contract-sample",
+  "failures" : [
+
+  ],
+  "frames" : [
+    {
+      "non_blank" : true,
+      "path" : null,
+      "probes" : [
+        {
+          "expected" : "red",
+          "name" : "centre",
+          "observed" : "red",
+          "pass" : true
+        }
+      ],
+      "sha256" : "3056f6ee7a50855e4c904288eed2ac3eb11016a361571e4606ae05258cf93a57"
+    }
+  ],
+  "low_power" : false,
+  "pacing" : null,
+  "resources" : {
+    "footprint_bytes" : 13175016,
+    "gpu_bytes" : 4,
+    "leaked" : 0,
+    "live" : 0
+  },
+  "result" : "pass",
+  "run" : {
+    "attempt" : null,
+    "id" : "package-test",
+    "lock_sha256" : null
+  },
+  "scenario" : "launch-first-frame",
+  "schema" : 1,
+  "seed" : "42",
+  "source" : {
+    "app_sha256" : null,
+    "catalog_sha256" : null,
+    "commit" : null,
+    "dirty" : null,
+    "submodules" : null,
+    "tree" : null
+  },
+  "steps" : [
+
+  ],
+  "thermal_state" : "nominal",
+  "timing" : {
+    "first_present_ms" : 1.126333,
+    "launch_ms" : null,
+    "preparation_ms" : 0.186292,
+    "shader_compilation_ms" : 0.089167
+  }
+}

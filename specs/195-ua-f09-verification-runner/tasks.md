@@ -97,7 +97,7 @@ Commit after every task (`python3 scripts/tick_task.py`), and push with `python3
   - The rule `Documents/visualcore-evidence/…` in `DebugInventory.swift`.
   - Add `project.yml` sources if needed.
   - T-U09-017 passes. The app chunks a to f still pass on the iOS 27.2 phone (FR-U09-011, FR-U09-015, FR-U09-034).
-- [ ] T-U09-019 [US3] Release absence:
+- [X] T-U09-019 [US3] Release absence: — Verified 2026-11-12: Release build: check_release_symbols.py 0 automation symbols, 0 trigger strings; check_experience_symbols.py --module pure and host: 0 symbols in release, and with VISUALCORE_AUTOMATION --require-each 2853 and 556 symbols; script tests OK
   - Add `ScenarioRunner ScenarioLaunch ScenarioManifest VISUALCORE_AUTORUN_EXPERIENCE` to `scripts/check_release_symbols.py`'s lists.
   - Add the new type names to `scripts/check_experience_symbols.py` for `--module pure` and `--module host`, with script tests.
   - Proof: a Release build shows 0 found, and `check_experience_symbols.py --with-flag` shows them present (FR-U09-012; SC-U09-004).
