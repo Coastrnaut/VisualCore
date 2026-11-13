@@ -18,7 +18,10 @@ final class ParticleSessionTests: XCTestCase {
                          made: @escaping @MainActor (any Experience) -> Void = { _ in }) -> ExperienceOpenRequest {
         let id = self.id
         return ExperienceOpenRequest(id: id, seed: seed, snapshot: snapshot, refusedSnapshotFails: snapshot != nil) {
-            let experience = ParticleExperience.make(id: id, reduceMotion: false, reduceFlashing: false)
+            // A throwaway storage area (feature 036 A04-P04: the experience keeps its scene library there).
+            let root = FileManager.default.temporaryDirectory.appendingPathComponent("pu-session-\(UUID().uuidString)")
+            let storage = ExperienceStorage(id: id, root: root, defaults: UserDefaults(suiteName: "pu-session-tests")!)
+            let experience = ParticleExperience.make(id: id, storage: storage, reduceMotion: false, reduceFlashing: false)
             made(experience)
             return experience
         }

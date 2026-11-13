@@ -119,7 +119,7 @@ extension ExperienceRegistry {
         guard let id = ParticleExperience.id else { return nil }
         var registration = ExperienceRegistration(id: id, core: ParticleCore.self) { launch in
             let system = SystemAccessibilityObserver.systemValues()
-            return ParticleExperience.make(id: id,
+            return ParticleExperience.make(id: id, storage: launch.storage,
                                            reduceMotion: launch.reduceMotion.resolved(system: system.reduceMotion),
                                            reduceFlashing: launch.reduceFlashing.resolved(system: system.dimFlashingLights))
         }

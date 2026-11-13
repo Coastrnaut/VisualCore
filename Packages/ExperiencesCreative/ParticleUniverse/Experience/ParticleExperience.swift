@@ -12,9 +12,11 @@ public enum ParticleExperience {
     /// The experience registered as `id`, with the person's Reduce Motion and Reduce Flashing choices as they are in
     /// effect now. It keeps nothing in storage: the standalone app stored nothing either.
     @MainActor
-    public static func make(id: ExperienceID, reduceMotion: Bool, reduceFlashing: Bool) -> any Experience {
+    /// The experience over its own storage area, where the scene library lives (feature 036 A04-P04).
+    public static func make(id: ExperienceID, storage: ExperienceStorage, reduceMotion: Bool,
+                            reduceFlashing: Bool) -> any Experience {
         let scale = UITraitCollection.current.displayScale
-        return ExperienceShell(id: id, presenter: ParticlePresenter(experienceID: id, reduceMotion: reduceMotion,
+        return ExperienceShell(id: id, presenter: ParticlePresenter(experienceID: id, storage: storage, reduceMotion: reduceMotion,
                                                                     reduceFlashing: reduceFlashing,
                                                                     displayScale: scale > 0 ? scale : 2))
     }

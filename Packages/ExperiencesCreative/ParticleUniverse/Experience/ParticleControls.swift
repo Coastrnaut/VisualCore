@@ -14,7 +14,13 @@ import VisualCoreSimulation
 struct ParticleControls: View {
     let port: ExperienceActionPort
     let mirror: ParticleMirror
+    /// The saved scenes (feature 036 A04-P04).
+    let library: ParticleLibrary
     let reduceMotion: Bool
+
+    @State private var sceneName = ""
+    @State private var renaming: ParticleLibraryEntry?
+    @State private var renameText = ""
 
     @State private var motionApplied = false
 
@@ -128,6 +134,93 @@ struct ParticleControls: View {
                 .frame(minHeight: 44)
                 .accessibilityIdentifier(port.identifier("blend"))
             }
+            section("Move emitter") {
+                // Feature 036 A04-P04 (FR-A04-420, 421): the selected emitter moves by 50 points per press.
+                HStack {
+                    moveButton("Left", identifier: "move.left", core: core, dx: -50, dy: 0)
+                    moveButton("Right", identifier: "move.right", core: core, dx: 50, dy: 0)
+                    moveButton("Up", identifier: "move.up", core: core, dx: 0, dy: 50)
+                    moveButton("Down", identifier: "move.down", core: core, dx: 0, dy: -50)
+                }
+            }
+            librarySection(core)
+        }
+    }
+
+    // MARK: Scene library (feature 036 A04-P04, FR-A04-401 to 405)
+
+    @ViewBuilder private func librarySection(_ core: ParticleCore) -> some View {
+        section("Saved scenes") {
+            TextField(text: $sceneName) { Text(verbatim: "Scene name") }
+                .textFieldStyle(.roundedBorder)
+                .frame(minHeight: 44)
+                .accessibilityLabel(Text(verbatim: "Scene name"))
+                .accessibilityIdentifier(port.identifier("library.name"))
+            button("Save scene", identifier: "library.save", hint: "Saves the current scene under the name") {
+                save(core)
+            }
+            .disabled(ParticleLibrary.clean(sceneName) == nil)
+            if let message = library.errorMessage {
+                Text(verbatim: message).font(.footnote).foregroundStyle(.red)
+                    .accessibilityIdentifier(port.identifier("library.message"))
+            }
+            if library.unreadable > 0 {
+                Text(verbatim: "\(library.unreadable) saved scene\(library.unreadable == 1 ? "" : "s") could not be read")
+                    .font(.footnote).accessibilityIdentifier(port.identifier("library.problems"))
+            }
+            ForEach(Array(library.entries.enumerated()), id: \.element.id) { index, entry in
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(verbatim: entry.name).font(.body)
+                        .accessibilityIdentifier(port.identifier("library.entry.\(index)"))
+                    if renaming?.id == entry.id {
+                        TextField(text: $renameText) { Text(verbatim: "New name") }
+                            .textFieldStyle(.roundedBorder)
+                            .frame(minHeight: 44)
+                            .accessibilityIdentifier(port.identifier("library.renameText.\(index)"))
+                        button("Done", identifier: "library.renameDone.\(index)") {
+                            if library.rename(entry, to: renameText) { renaming = nil }
+                        }
+                    }
+                    HStack {
+                        button("Open", identifier: "library.open.\(index)", hint: "Replaces the scene with \(entry.name)") {
+                            open(entry)
+                        }
+                        button("Rename", identifier: "library.rename.\(index)") {
+                            renaming = entry
+                            renameText = entry.name
+                        }
+                        button("Delete", identifier: "library.delete.\(index)") { library.remove(entry) }
+                    }
+                }
+            }
+        }
+    }
+
+    private func save(_ core: ParticleCore) {
+        guard let name = ParticleLibrary.clean(sceneName) else { return }
+        do {
+            if library.save(try core.document(name: name)) != nil { sceneName = "" }
+        } catch {
+            library.errorMessage = "The scene could not be saved."
+        }
+    }
+
+    /// Sends the scene's open actions together (FR-A04-404): `scene.begin`, the emitters, the force and the look.
+    private func open(_ entry: ParticleLibraryEntry) {
+        guard let document = library.document(for: entry) else { return }
+        for action in document.openActions() {
+            guard port.send(action.id, action.values).isAccepted else {
+                library.errorMessage = "The scene could not be opened."
+                return
+            }
+        }
+        library.errorMessage = nil
+    }
+
+    private func moveButton(_ title: String, identifier: String, core: ParticleCore, dx: Double, dy: Double) -> some View {
+        button(title, identifier: identifier, hint: "Moves the selected emitter") {
+            let p = core.selectedEmitterPosition
+            port.send("emitter.move", [p.x + dx, p.y + dy])
         }
     }
 

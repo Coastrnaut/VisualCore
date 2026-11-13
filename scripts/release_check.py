@@ -246,7 +246,7 @@ UI_CHUNKS = {
     "h2": ["FAPPlaygroundUITests", "FAPControlsUITests", "FAPAdjustUITests", "FAPPaletteCaptureUITests"],
     "i2": ["FEExplorerUITests", "FEBookmarkUITests", "FECaptureTourUITests"],
     "j2": ["PUSandboxUITests"],
-    "j3": ["PUEmitterUITests", "PUForceUITests", "PUTrailUITests"],
+    "j3": ["PUEmitterUITests", "PUForceUITests", "PUTrailUITests", "PUSceneLibraryUITests"],
 }
 UNIFIED_LIMIT = 590       # seconds, below the ten-minute limit of one foreground command
 RELEASE_FORBIDDEN = ["DebugLaunch", "DebugExperience", "DebugInventory", "ScenarioLaunch", "ScenarioHostView",

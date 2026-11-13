@@ -45,8 +45,13 @@ final class ParticlePresenter: ExperiencePresenter {
         self?.particles ?? []
     }
 
-    init(experienceID: ExperienceID, reduceMotion: Bool, reduceFlashing: Bool, displayScale: Double) {
+    /// The saved scenes of this experience (feature 036 A04-P04).
+    let library: ParticleLibrary
+
+    init(experienceID: ExperienceID, storage: ExperienceStorage, reduceMotion: Bool, reduceFlashing: Bool,
+         displayScale: Double) {
         self.experienceID = experienceID
+        library = ParticleLibrary(storage: storage)
         self.reduceMotion = reduceMotion
         self.reduceFlashing = reduceFlashing
         pointsPerPixel = 1 / max(displayScale, 1)
@@ -99,7 +104,7 @@ final class ParticlePresenter: ExperiencePresenter {
     }
 
     func makeControls(_ port: ExperienceActionPort) -> AnyView {
-        AnyView(ParticleControls(port: port, mirror: mirror, reduceMotion: reduceMotion))
+        AnyView(ParticleControls(port: port, mirror: mirror, library: library, reduceMotion: reduceMotion))
     }
 
     /// A tap or a drag on the canvas places the force under the finger, as `SceneModel.touch(at:in:)` does.
