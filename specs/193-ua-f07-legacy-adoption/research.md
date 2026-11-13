@@ -266,3 +266,6 @@ The dossier files are not edited. The legacy ledger is untouched; its hash is co
     reaches them; the moved unit tests use `SceneModel`, `ExportRunner` and `LibraryModel`. The storage rules
     therefore cover the code the experience runs: the adapter and its presenter, controls, library and factory.
     Retiring the unreachable screens, with their tests mapped, is a convergence item.
+- **Photos add-only usage string (2026-11-13).** Saving an exported picture through the share sheet's "Save Image"
+  needs `NSPhotoLibraryAddUsageDescription`; without it the save fails. The one app declares only that string, with
+  A01's wording (FR-A01-407). `BundleTests` allows exactly that one usage description; the app never calls PhotoKit.

@@ -117,7 +117,7 @@ runtimes.
 
 ## Phase 6: User Story 7 — A01 moves and retires (P3)
 
-- [ ] T-U07-017 [US7] Move A01 with `git mv` along migration-plan.md section 2.1 into
+- [X] T-U07-017 [US7] Move A01 with `git mv` along migration-plan.md section 2.1 into — Verified 2026-11-13: git mv of A01 into Packages/ExperiencesCreative/GenerativeArtStudio/{Core,CoreTests,Experience,Shaders,ExperienceTests}, UI tests in Apps/VisualCore/Tests/UI/GenerativeArtStudio (commit 5fdc293); Package.swift with GenerativeArtStudioCore, GenerativeArtStudioExperience (shaders as resources) and their tests; the framework target replaced by the package product; #filePath and contract paths fixed (check_app_contract resolves through Catalog/path-map.json: PASS); 7 moves in Catalog/path-map.json, 9 docs/migration/path-map.json entries done. Re-runs: T-U07-014 check_renames.py 22 files without a changed line (a01-core-renames-only), package 95/95 on sim-27.2 and sim-26.5 incl. Core 31 (a01-package-ios272/265), migration_baseline verify (baseline-verify-a01-moved); T-U07-011 session tests in the package; T-U07-013 runner 9/9 on 27.2 and 26.5 (a01-verify-27-moved, a01-verify-26-moved)
   `Packages/ExperiencesCreative/GenerativeArtStudio/{Core,CoreTests,Experience,Shaders,ExperienceTests}` and
   `Apps/VisualCore/Tests/UI/GenerativeArtStudio`. Create `Packages/ExperiencesCreative/Package.swift` (merging A01's
   Core manifest; the Experience target with the shaders as resources). In the same commit:

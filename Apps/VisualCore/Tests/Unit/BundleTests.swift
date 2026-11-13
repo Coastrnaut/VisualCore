@@ -8,9 +8,14 @@ final class BundleTests: XCTestCase {
         XCTAssertEqual(Bundle.main.object(forInfoDictionaryKey: "CFBundleDisplayName") as? String, "VisualCore")
     }
 
+    /// Feature 193 (FR-U07-020, FR-A01-407): the only usage description is the Photos add-only one that the share
+    /// sheet's "Save Image" needs for an exported picture; the app itself never calls PhotoKit.
     func testNoUsageDescriptionNoURLTypeNoDocumentType() throws {
         let info = try XCTUnwrap(Bundle.main.infoDictionary)
-        XCTAssertTrue(info.keys.filter { $0.hasSuffix("UsageDescription") }.isEmpty, "\(info.keys.sorted())")
+        XCTAssertEqual(info.keys.filter { $0.hasSuffix("UsageDescription") }, ["NSPhotoLibraryAddUsageDescription"],
+                       "\(info.keys.sorted())")
+        XCTAssertEqual(info["NSPhotoLibraryAddUsageDescription"] as? String,
+                       "Saves exported artwork to your photo library when you choose Save Image.")
         XCTAssertNil(info["CFBundleURLTypes"])
         XCTAssertNil(info["CFBundleDocumentTypes"])
     }
