@@ -57,7 +57,7 @@ each task. Tests before code. Owner-only items: none. One {device} task. No Visu
   clamped to ±500 and keeps family and overrides; the move survives `document` → open.
 - [X] T-A04-413 [US3] Implement `emitter.move` in `ParticleCore.swift` and four direction buttons (step 50, — Verified 2026-11-13: emitter.move control in ParticleCore and four direction buttons (50 points, move.left/right/up/down) in the Move emitter section; the interface test presses move.right before saving (ui-scene-library-r4)
   identifiers `pu.move.left|right|up|down`, labels) in `ParticleControls.swift`; UI test presses one and saves.
-- [ ] T-A04-414 [US3] Acceptance: tests pass on sim-27.2 (check `experiences-ios27`) (SC-A04-404).
+- [X] T-A04-414 [US3] Acceptance: tests pass on sim-27.2 (check `experiences-ios27`) (SC-A04-404). — Verified 2026-11-13: move tests pass on sim-27.2 (experiences-ios27) and the saved scene with a moved emitter reopens (ui-scene-library-r4) (SC-A04-404)
 
 ## Phase 6: User Story 4 — Gates hold for opened scenes (P2)
 
