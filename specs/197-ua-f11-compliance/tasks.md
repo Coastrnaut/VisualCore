@@ -47,7 +47,7 @@ Device-only items: none, so no {device} task.
 - [X] T-U11-009 [US2] Modify `scripts/build_catalog.py`: optional `permissions` registration key validated against — Verified 2026-11-13: build_catalog.py accepts optional permissions (0-8 distinct vocabulary words, not in runtime catalog); a01 declares photo-library-add; build_catalog --check PASS (build-catalog); 390 VisualCoreExperienceTests pass
   the vocabulary, not copied into the runtime catalog; add `"permissions": ["photo-library-add"]` to
   `a01.generative-art-studio` in `Catalog/registrations.json`; `python3 scripts/build_catalog.py --check` passes.
-- [ ] T-U11-010 [US2] Write `scripts/check_usage_descriptions.py` (`--plist` default
+- [X] T-U11-010 [US2] Write `scripts/check_usage_descriptions.py` (`--plist` default — Verified 2026-11-13: scripts/check_usage_descriptions.py per contracts/cli.md; its tests pass (script-tests)
   `Apps/VisualCore/Generated/Info.plist`, `--app`, `--registrations`, `--vocabulary`, `--json`) per contracts/cli.md.
 - [ ] T-U11-011 [US2] Acceptance: `python3 scripts/check_usage_descriptions.py` and `--app "$APP"` pass with 1 key
   (checks `usage-descriptions`, `usage-descriptions-app`) (SC-U11-002).
