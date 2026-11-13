@@ -30,7 +30,7 @@ each task. Tests before code. Owner-only items: none. One {device} task. No Visu
   `ParticleDetailTests.swift`) showing the simulation digest is the same with and without detail changes, that the drawn
   tier is `max(host tier, monitor tier)` (host tier 2 with a monitor at 0 draws at 2; FR-A04-511), and that frames drawn
   while paused do not move the monitor (FR-A04-512).
-- [ ] T-A04-507 [US2] Acceptance on sim-27.2 (check `detail-ios27`) (SC-A04-502, 503).
+- [X] T-A04-507 [US2] Acceptance on sim-27.2 (check `detail-ios27`) (SC-A04-502, 503). — Verified 2026-11-13: monitor and detail tests pass on sim-27.2 and 26.5 (A04-P05/experiences-ios27, ios26) (SC-A04-502, 503)
 
 ## Phase 4: User Story 3 — Profile recorded (P2)
 
