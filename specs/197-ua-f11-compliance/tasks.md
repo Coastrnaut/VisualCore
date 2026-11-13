@@ -96,7 +96,7 @@ Device-only items: none, so no {device} task.
 
 ## Phase 8: User Story 6 — No two launch experiences share a mechanic (P2)
 
-- [ ] T-U11-023 [P] [US6] Tests first in `scripts/tests/test_distinctiveness.py`: normalization of each schema
+- [X] T-U11-023 [P] [US6] Tests first in `scripts/tests/test_distinctiveness.py`: normalization of each schema — Verified 2026-11-13: scripts/tests/test_distinctiveness.py 23 tests OK (schema normalization, words, equal-action and 0.5 pairs fail with redesign message, title, slug, stale, close pairs first, byte-identical)
   (clarification 2), Jaccard words (clarification 3), a planted equal-action pair and a planted pair at 0.5 fail with
   "redesign <later code> inside its concept"; a known title and a duplicate slug fail; a changed catalog makes the
   matrix stale; close pairs are rows 1–6; two generations are byte-identical; the message never says merge, drop or
