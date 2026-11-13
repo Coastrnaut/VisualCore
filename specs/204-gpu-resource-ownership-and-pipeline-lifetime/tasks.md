@@ -44,7 +44,7 @@ API-baseline and reference-regression tasks apply.
   (blend enable and factors, depth test, depth mask, cull enable and face, colour mask, current program); `Pipeline`
   equality by program identity; a released program and a program from before `recreateContext()` are refused
   (`apply` false, `staleRejected` +1).
-- [ ] T-R02F04-009 [US2] Write `Packages/VisualCoreRendering/Sources/VisualCoreRendering/Pipeline.swift` (`Pipeline`)
+- [X] T-R02F04-009 [US2] Write `Packages/VisualCoreRendering/Sources/VisualCoreRendering/Pipeline.swift` (`Pipeline`) — Verified 2026-11-13: Pipeline.swift (Hashable by program identity and state) and GLState.apply(_:resources:) setting every field; refusal counted via ResourceRegistry.noteStale(); tests pass (rendering-ios27/26)
   and `GLState.apply(_:resources:)` in `GLState.swift`.
 - [ ] T-R02F04-010 [US2] Acceptance: host RenderStateTests (check `host-visualcore`) and PipelineTests on sim-27.2
   (check `pipeline-ios27`) (SC-R02F04-002).
