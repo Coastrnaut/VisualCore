@@ -1,0 +1,36 @@
+{
+  "additive" : true,
+  "force" : {
+    "kind" : "attractor",
+    "strength" : 1.25,
+    "x" : 100,
+    "y" : 50
+  },
+  "name" : "Nebula",
+  "scene" : {
+    "emitters" : [
+      {
+        "family" : "fountain"
+      },
+      {
+        "family" : "halo",
+        "gradient" : "ocean",
+        "lifetime" : 3,
+        "position" : {
+          "x" : 150,
+          "y" : -20
+        },
+        "size" : 12
+      }
+    ],
+    "forces" : [],
+    "particleLimit" : 4000,
+    "seed" : 7,
+    "timeScale" : 1,
+    "version" : 1
+  },
+  "trailStrength" : 0.6,
+  "layers" : [],
+  "trailsOn" : true,
+  "version" : 3
+}

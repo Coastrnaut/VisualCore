@@ -32,3 +32,13 @@
 
 Round 1: 0 critical, 0 high, 1 medium (C1: storage-limit save failure test added to T-A04-406), 1 low (C2: no-VisualCore-
 change check added to T-A04-417). Round 2: clean; 22 of 22 requirements and 6 of 6 success criteria covered.
+
+## 3. Implementation notes (T-A04-403, 2026-11-13)
+
+- `SceneError.invalidDocument(String)` added (damaged JSON, name, force and look ranges); no exhaustive switches exist.
+- Opening reproduces the FR-A04-402 fields (emitters, placed force, trails, trail strength, blend). The scene's seed,
+  particle limit, time scale and scene-level forces are not editable in this slice and stay as they are when a scene is
+  opened; the saved document still records them.
+- An emitter saved with an explicit position equal to its family default reopens with no explicit position (same
+  behaviour); tests compare positions through `SceneSimulation.placement`.
+- Defaults: trails off, trail strength 0.85, blend not additive (`SceneDocument.default*`), shared with `ParticleCore`.

@@ -22,6 +22,8 @@ public enum SceneError: Error, Equatable, Sendable {
     case invalidForce(Int)
     /// An emitter override is out of range or names an unknown gradient (feature 035).
     case invalidEmitter(Int)
+    /// A saved scene document (feature 036) is damaged, truncated or has the named field out of range.
+    case invalidDocument(String)
 }
 
 /// One emitter in a scene: a family, optionally moved, with optional size, lifetime and color-gradient overrides
