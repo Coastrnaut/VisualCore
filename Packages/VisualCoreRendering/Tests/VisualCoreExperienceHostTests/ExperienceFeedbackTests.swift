@@ -57,4 +57,25 @@ final class ExperienceFeedbackTests: XCTestCase {
         XCTAssertEqual(handled, 0, "feedback never sends an action")
         XCTAssertEqual(port.revision, revision, "feedback never changes the state")
     }
+
+    /// T-R02F26-022: the session flushes a held announcement on a drawn frame once the interval passed.
+    func testTheSessionPostsAHeldAnnouncementOnAFrame() async throws {
+        let sink = RecordingAnnouncementSink()
+        let feedback = route(RecordingHapticSink(), sink)
+        let session = ExperienceSession()
+        session.feedback = feedback
+        defer { session.close() }
+        let (request, _) = sampleRequest()
+        let opened = await session.open(request)
+        XCTAssertEqual(opened, .running)
+        layOut(session)
+        let host = try XCTUnwrap(session.renderHost)
+        feedback.announce("First", kind: .state)
+        now = 0.1
+        feedback.announce("Held", kind: .state)       // inside 0.5 s: held
+        XCTAssertEqual(sink.announced, ["First"])
+        now = 0.7
+        _ = host.renderOneFrame(present: false)
+        XCTAssertEqual(sink.announced, ["First", "Held"], "the frame posted the held announcement")
+    }
 }

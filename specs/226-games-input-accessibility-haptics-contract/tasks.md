@@ -101,6 +101,6 @@ MVP: US1 and US2.
 
 Appended by `/speckit-converge` (T-R02F26-021, round 1, 2026-11-13).
 
-- [ ] T-R02F26-022 Call `ExperienceFeedback.flush()` once per frame from the session's frame path (`ExperienceSession.swift`)
+- [X] T-R02F26-022 Call `ExperienceFeedback.flush()` once per frame from the session's frame path (`ExperienceSession.swift`) — Verified 2026-11-13: ExperienceSession.feedback (default ExperienceFeedback.shared) is flushed in the scene's onFrame; ExperienceFeedbackTests.testTheSessionPostsAHeldAnnouncementOnAFrame: a held announcement reaches the sink on a frame after 0.5 s; 4/4 on sim-27.2 (session-flush-ios27); rendering package on sim-26.5 passes (rendering-ios26-r2); API baseline +1 line, 0 removed (public-api-r2); reference-a-r2 3/3, reference-b-r2 4/4
   so that a held, merged announcement is posted, with a test that a held announcement reaches the sink after the
   interval, per FR-R02F26-020 and FR-R02F26-021 (partial)

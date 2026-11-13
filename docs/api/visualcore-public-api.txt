@@ -1102,6 +1102,7 @@ VisualCoreExperienceHost | var | @ObservationIgnored public private(set) var las
 VisualCoreExperienceHost | var | @ObservationIgnored public private(set) var lastRestoreRefusal: ExperienceFailure?
 VisualCoreExperienceHost | var | @ObservationIgnored public private(set) var lastSinkFailure: ExperienceFailure?
 VisualCoreExperienceHost | var | @ObservationIgnored public var conditions: @MainActor () -> DeviceConditions
+VisualCoreExperienceHost | var | @ObservationIgnored public var feedback: ExperienceFeedback
 VisualCoreExperienceHost | var | @ObservationIgnored public var launch: LaunchTiming?
 VisualCoreExperienceHost | var | @ObservationIgnored public var qualityPin: Int?
 VisualCoreExperienceHost | var | @ObservationIgnored public var timeSource: (@MainActor () -> Double)?

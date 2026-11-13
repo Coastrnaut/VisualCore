@@ -172,6 +172,10 @@ public final class ExperienceSession {
 
     // MARK: Creation
 
+    /// The route of the experiences' haptics and announcements (feature 226); the session flushes held
+    /// announcements once per frame.
+    @ObservationIgnored public var feedback: ExperienceFeedback = .shared
+
     /// Creates an idle session. `snapshotSink` receives the experience's snapshot at every suspension and close;
     /// the session itself stores nothing. The session listens for the system's memory warning.
     public init(snapshotSink: SnapshotSink? = nil) {
@@ -290,6 +294,7 @@ public final class ExperienceSession {
         scene.onFrame = { [weak self, weak host] in
             guard let self, let host, self.renderHost === host else { return }
             self.noteFrameDrawn()
+            self.feedback.flush()   // a held, merged announcement is posted once its interval passed (feature 226)
         }
         host.addErrorObserver { [weak self, weak host] error in
             guard let self, let host, self.renderHost === host else { return }
