@@ -125,7 +125,7 @@ runtimes.
   - fix every `#filePath` and contract path (research R9);
   - record each move in `Catalog/path-map.json` and set the entries of `docs/migration/path-map.json` to `done` (SC-U07-006);
   - re-run T-U07-014, T-U07-011 and T-U07-013 for A01 (FR-U07-040 to FR-U07-042, FR-U07-044).
-- [ ] T-U07-018 [US7] Retire the `GenerativeArtStudio` app, unit-test and UI-test targets and scheme in `project.yml`.
+- [X] T-U07-018 [US7] Retire the `GenerativeArtStudio` app, unit-test and UI-test targets and scheme in `project.yml`. — Verified 2026-11-13: project.yml: GenerativeArtStudio, GenerativeArtStudioTests, GenerativeArtStudioUITests and their scheme retired with the move (commit 5fdc293), asset catalog retired; the 40 app unit tests run in GenerativeArtStudioExperienceTests (95 = 40 + 15 adapter + 9 session/parity + Core 31, same 40 as before; a01-package-ios272/265); the app builds and its unit chunk passes on iOS 27.2 (app-phone-ios27-c-moved-r2) and the A01 UI chunk g2 (app-phone-ios27-g2-moved); release_check.py --list has no generative-art-studio step and adds experiences-creative-sim-ios27/ios26 (script tests 318 OK); storage-rule, stored-data-rule, app-contracts and compliance PASS
   The app unit tests now run as `ExperienceTests`, with the same count (FR-U07-034). The project builds, and
   `release_check.py` drops the per-app steps of the retired scheme and adds the experience package's host tests
   (FR-U07-043; SC-U07-007).
