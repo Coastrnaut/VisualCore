@@ -96,15 +96,16 @@ def test_command(project: str, scheme: str, udid: str, derived: str, only: list[
 
 
 def guard_classes(only_testing: list[str]) -> list[str]:
-    """The test classes named by `--only-testing` ids of the form `Target/Class[/method]`; empty when an id names a
-    whole target or a single method, because the guard can then only be run for everything or not at all."""
+    """The guard filter named by `--only-testing` ids: `Class` for `Target/Class`, `Class/method` for
+    `Target/Class/method`; empty when an id names a whole target, because the guard then checks everything."""
     classes: list[str] = []
     for item in only_testing:
         parts = item.split("/")
-        if len(parts) != 2 or not parts[1]:
+        if len(parts) not in (2, 3) or not all(parts[1:]):
             return []
-        if parts[1] not in classes:
-            classes.append(parts[1])
+        key = "/".join(parts[1:])
+        if key not in classes:
+            classes.append(key)
     return classes
 
 

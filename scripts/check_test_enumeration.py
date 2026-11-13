@@ -21,7 +21,8 @@ PASSED = re.compile(r"Test Case '-\[[\w.]+\.(\w+) (test\w*)\]' passed")
 
 
 def declared(sources: Path, only: set[str] | None = None) -> set[tuple[str, str]]:
-    """(class, method) pairs for XCTest methods in Swift files under `sources`."""
+    """(class, method) pairs for XCTest methods in Swift files under `sources`. `only` holds class names or
+    `Class/method` ids (a chunk that runs one method of a long class, UA-F07)."""
     found: set[tuple[str, str]] = set()
     for path in sorted(sources.rglob("*.swift")):
         current = None
@@ -29,7 +30,7 @@ def declared(sources: Path, only: set[str] | None = None) -> set[tuple[str, str]
             if m := CLASS.match(line):
                 current = m.group(1)
             elif current and (m := METHOD.match(line)):
-                if not only or current in only:
+                if not only or current in only or f"{current}/{m.group(1)}" in only:
                     found.add((current, m.group(1)))
     return found
 
@@ -42,7 +43,7 @@ def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--sources", type=Path, required=True)
     ap.add_argument("--log", type=Path, required=True)
-    ap.add_argument("--only", nargs="*", help="limit to these test classes")
+    ap.add_argument("--only", nargs="*", help="limit to these test classes or Class/method ids")
     a = ap.parse_args(argv)
     if not a.sources.is_dir() or not a.log.is_file():
         print("ERROR: --sources must be a directory and --log a file", file=sys.stderr)

@@ -1338,12 +1338,12 @@ class AppTestRunnerTests(unittest.TestCase):
     }}
 
     def test_guard_is_limited_to_the_classes_of_a_chunk(self):
-        """A run in chunks names whole classes; the guard then checks only these. An id that names a target or a
-        single method gives no class list, so the guard runs for everything."""
+        """A run in chunks names whole classes or single methods; the guard then checks only these. An id that names
+        a target gives no list, so the guard runs for everything."""
         tool = load("xcodebuild_app")
         self.assertEqual(tool.guard_classes(["VisualCoreUITests/RoutesUITests", "VisualCoreTests/StoreTests"]),
                          ["RoutesUITests", "StoreTests"])
-        self.assertEqual(tool.guard_classes(["VisualCoreUITests/RoutesUITests/testOne"]), [])
+        self.assertEqual(tool.guard_classes(["VisualCoreUITests/RoutesUITests/testOne"]), ["RoutesUITests/testOne"])
         self.assertEqual(tool.guard_classes(["VisualCoreUITests"]), [])
         self.assertEqual(tool.guard_classes([]), [])
 
@@ -1883,6 +1883,17 @@ class AppContractTests(unittest.TestCase):
 
 
 class TestEnumerationTests(unittest.TestCase):
+    def test_a_method_id_limits_the_guard_to_that_method(self):
+        import contextlib, io
+        guard = load("check_test_enumeration")
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            (root / "T.swift").write_text("final class A: XCTestCase {\n    func testOne() {}\n    func testTwo() {}\n}\n")
+            (root / "log").write_text("Test Case '-[UI.A testOne]' passed (1.0 seconds).\n")
+            with contextlib.redirect_stdout(io.StringIO()):
+                self.assertEqual(guard.main(["--sources", d, "--log", str(root / "log"), "--only", "A/testOne"]), 0)
+                self.assertEqual(guard.main(["--sources", d, "--log", str(root / "log"), "--only", "A"]), 1)
+
     def test_missing_class_fails_and_full_run_passes(self):
         with tempfile.TemporaryDirectory() as t:
             d = Path(t)
