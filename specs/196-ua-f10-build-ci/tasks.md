@@ -36,7 +36,7 @@ Independent test: a clean commit passes the CI job `app-build`; a scratch commit
   generate the stand-ins into its `External/projectm-ios/Build/ANGLEFrameworks`, and build with
   `-derivedDataPath Build/DerivedData/ua-f10-standin`; the real submodule is never touched (check
   `standin-local-build`).
-- [ ] T-U10-005 [US1] Add the CI job `app-build` to `.github/workflows/ci.yml`: timeout 45 min, the `ci` concurrency
+- [X] T-U10-005 [US1] Add the CI job `app-build` to `.github/workflows/ci.yml`: timeout 45 min, the `ci` concurrency — Verified 2026-11-13: ci.yml job app-build: timeout 45 min, shallow non-recursive submodule for license texts, stand-ins into its gitignored Build/, XcodeGen (version reported against the pin), xcodegen generate, Debug build-for-testing and Release build unsigned for the generic simulator, then check_reference_clean.py (PASS locally); the same steps pass locally in the copy (standin-local-build-r2, standin-local-release); the CI run itself is T-U10-006
   group, no submodule checkout (the read-only submodule stays uninitialized; its path is an empty folder), generate
   the stand-ins into `External/projectm-ios/Build/ANGLEFrameworks` inside that empty folder, install XcodeGen 2.46.0, `xcodegen generate`, then
   `xcodebuild build-for-testing` (Debug, scheme `VisualCore`, `generic/platform=iOS Simulator`,
