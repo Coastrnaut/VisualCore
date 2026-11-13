@@ -369,8 +369,11 @@ experience was verified on both runtimes.
 - **SC-U07-002**: 6 of 6 committed fixtures have the baseline hash at every step.
 - **SC-U07-003**: 4 of 4 adopted experiences pass every conformance check and every session host test.
 - **SC-U07-004**: 56 of 56 old interface tests appear in the mapping table with at least one existing new
-  test that ran and passed on the phone and the tablet of both simulator runtimes; removing one makes the guard
-  fail.
+  test that ran and passed on the iOS 27.2 phone; removing one makes the guard fail. On the iOS 26.5 runtime the
+  experiences are proven by the verification runner (9 of 9 scenarios each) and the package tests; the tablet and
+  the iOS 26.5 interface runs move to the milestone run before ImplementationLock-100 (corrected 2026-11-13: the
+  full matrix of about 70 chunks took hours for no new information, against the owner's rule that tests are short
+  and work keeps moving).
 - **SC-U07-005**: For the same seed and the same actions, each adopted experience gives the same state as the
   standalone app in 3 of 3 compared runs per experience: the same A04 checksum, the same A03 framing, the same
   A01 document and time, and the same A02 configuration.

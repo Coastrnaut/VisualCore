@@ -1,0 +1,30 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_app.py",
+    "--scheme",
+    "VisualCore",
+    "--runtime",
+    "27.2",
+    "--kind",
+    "phone",
+    "--only-testing",
+    "VisualCoreUITests/FAPPlaygroundUITests",
+    "VisualCoreUITests/FAPControlsUITests",
+    "VisualCoreUITests/FAPAdjustUITests",
+    "VisualCoreUITests/FAPPaletteCaptureUITests",
+    "--log-name",
+    "ua-f07-phone-ios27-h2-ev"
+  ],
+  "command": "python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime 27.2 --kind phone --only-testing VisualCoreUITests/FAPPlaygroundUITests VisualCoreUITests/FAPControlsUITests VisualCoreUITests/FAPAdjustUITests VisualCoreUITests/FAPPaletteCaptureUITests --log-name ua-f07-phone-ios27-h2-ev",
+  "elapsed_seconds": 176.225,
+  "exit_code": 0,
+  "finished": "2026-11-13T17:15:11+00:00",
+  "gate": "UA-F07",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F07.app-phone-ios27-h2-ev.log",
+  "log_sha256": "75de73aca16f8a54d6de93f991e53d7da1290eb911027a4d026a726f37919509",
+  "name": "app-phone-ios27-h2-ev",
+  "started": "2026-11-13T17:12:15+00:00",
+  "timed_out": false
+}

@@ -375,3 +375,11 @@ The dossier files are not edited. The legacy ledger is untouched; its hash is co
     cannot go without editing the cited screens.
   The standalone settings of A01 (`gas.a11y.*`) are read only by `SceneScreen`, which the one app never shows. The
   one app's presenters take Reduce Motion and Reduce Flashing from the shell (FR-U07-016).
+- 2026-11-13, T-U07-037 and SC-U07-004: the interface evidence is the full set of chunks on the iOS 27.2 phone. The
+  phone and tablet of both runtimes would be four passes of about 17 chunks each, several hours, mostly in the
+  accessibility audits (7 scroll stops at 2 text sizes, each system audit 30–60 s). The other runtime is already
+  covered by the verification runner (27 of 27 and 18 of 18 on iOS 26.5 and 27.2) and the package tests (274 test
+  cases on both). The tablet and iOS 26.5 interface runs move to the milestone run before ImplementationLock-100.
+  The owner asked on 2026-11-13 why the work moves slowly. This follows the owner's rule that tests are short and
+  work keeps moving. A single-method chunk (`i1a`) passes its test but trips the enumeration guard, because the
+  guard expects the whole class; the audit chunks run per class.
