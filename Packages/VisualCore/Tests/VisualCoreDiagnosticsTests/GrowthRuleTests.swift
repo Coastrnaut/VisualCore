@@ -138,3 +138,18 @@ private func risingFootprintSamples(base: Int, rise: Int, gpu: Int = 4 * mib) ->
     #expect(!GrowthVerdict.grew(quantity: "gpu_bytes", by: 1).passes)
     #expect(!GrowthVerdict.tooFewSamples(0).passes)
 }
+
+/// Feature 193 (UA-F07): five cycles of twelve samples, each filling from empty to the same peak, are flat when the
+/// first cycle is the warm-up, and grew with the default tenth; a later cycle above the first one's peak grew.
+@Test func growthRuleWarmUpOfOneCycle() {
+    let cycle = (0..<12).map { ResourceSample(footprintBytes: 100 * mib, gpuBytes: 4 * mib + min($0, 8) * 320) }
+    var samples = Array([[ResourceSample]](repeating: cycle, count: 5).joined())
+    #expect(GrowthRule.judge(samples, warmUp: 12) == .flat(footprintChecked: true))
+    #expect(GrowthRule.judge(samples) == .grew(quantity: "gpu_bytes", by: 2_560 - 5 * 320))
+    #expect(GrowthRule.judge(samples, warmUp: nil) == GrowthRule.judge(samples))
+    samples[50].gpuBytes = 4 * mib + 2_561
+    #expect(GrowthRule.judge(samples, warmUp: 12) == .grew(quantity: "gpu_bytes", by: 1))
+    // Out-of-range warm-ups are clamped: 0 is one sample, and a warm-up of every sample still leaves one judged.
+    #expect(GrowthRule.judge(samples, warmUp: 0) == GrowthRule.judge(samples, warmUp: 1))
+    #expect(GrowthRule.judge(samples, warmUp: 1_000) == .flat(footprintChecked: true))
+}

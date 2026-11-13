@@ -1,4 +1,13 @@
 {
   "schema": 1,
-  "registrations": {}
+  "registrations": {
+    "a01.generative-art-studio": {
+      "capabilities": ["procedural shaders", "particles", "presets", "parameters", "saved compositions",
+                       "still export"],
+      "quality_tiers": ["level-0"],
+      "palette": ["#210D40", "#C22E5C", "#FA8F3D", "#FFE38C"],
+      "content": null,
+      "manifest": "Apps/GenerativeArtStudio/Adapter/scenario-manifest.json"
+    }
+  }
 }

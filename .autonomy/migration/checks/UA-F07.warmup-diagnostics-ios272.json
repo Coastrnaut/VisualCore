@@ -1,0 +1,29 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/VisualCore",
+    "--scheme",
+    "VisualCore-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--result-name",
+    "ua-f07-diag-272",
+    "--only-testing",
+    "VisualCoreDiagnosticsTests"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCore --scheme VisualCore-Package --destination sim-27.2 --action test --result-name ua-f07-diag-272 --only-testing VisualCoreDiagnosticsTests",
+  "elapsed_seconds": 6.128,
+  "exit_code": 0,
+  "finished": "2026-11-13T11:49:54+00:00",
+  "gate": "UA-F07",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F07.warmup-diagnostics-ios272.log",
+  "log_sha256": "ed5d1ddf203bf2c20010767c05dacbcf9bb0b7655918fff17d30a91a58c82225",
+  "name": "warmup-diagnostics-ios272",
+  "started": "2026-11-13T11:49:48+00:00",
+  "timed_out": false
+}

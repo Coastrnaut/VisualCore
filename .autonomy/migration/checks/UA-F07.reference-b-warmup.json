@@ -1,0 +1,22 @@
+{
+  "argv": [
+    "python3",
+    "scripts/release_check.py",
+    "--only",
+    "reference-test-anglerendering-ios27",
+    "reference-test-anglerendering-ios26",
+    "projectm-reference-ios27",
+    "projectm-reference-ios26"
+  ],
+  "command": "python3 scripts/release_check.py --only reference-test-anglerendering-ios27 reference-test-anglerendering-ios26 projectm-reference-ios27 projectm-reference-ios26",
+  "elapsed_seconds": 24.218,
+  "exit_code": 0,
+  "finished": "2026-11-13T11:50:50+00:00",
+  "gate": "UA-F07",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F07.reference-b-warmup.log",
+  "log_sha256": "2262547a405b0fd75d4021c1ea908df78def7ff6551d56f9d820fe1b6e309aee",
+  "name": "reference-b-warmup",
+  "started": "2026-11-13T11:50:26+00:00",
+  "timed_out": false
+}

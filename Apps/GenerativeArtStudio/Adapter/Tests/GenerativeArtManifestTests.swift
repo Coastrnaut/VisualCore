@@ -49,6 +49,24 @@ private func play(_ spec: ScenarioSpec) async throws -> (initial: String, result
         }
     }
 
+    /// The manifest in its JSON form with the control ids, as `Catalog/registrations.json` names it for the
+    /// verification runner's audits. `UPDATE_SCENARIO_MANIFEST=1 swift test` rewrites the file.
+    @Test func theCommittedManifestFileMatches() throws {
+        let file = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
+            .appendingPathComponent("scenario-manifest.json")
+        let manifest = GenerativeArtCore.manifest(for: id)
+        var object = try #require(try JSONSerialization.jsonObject(with: manifest.encoded()) as? [String: Any])
+        object["controls"] = GenerativeArtCore.controls.map(\.id)
+        let data = try JSONSerialization.data(withJSONObject: object, options: [.sortedKeys, .prettyPrinted])
+            + Data("\n".utf8)
+        if ProcessInfo.processInfo.environment["UPDATE_SCENARIO_MANIFEST"] == "1" {
+            try data.write(to: file)
+        }
+        let committed = try Data(contentsOf: file)
+        #expect(committed == data, "run UPDATE_SCENARIO_MANIFEST=1 swift test and commit the file")
+        #expect(try ScenarioManifest(data: manifest.encoded()) == manifest, "the JSON form round-trips")
+    }
+
     @Test func anotherSeedCommitsNoDigest() {
         for spec in GenerativeArtCore.manifest(for: id, seed: 8).scenarios {
             #expect(spec.expect.initialDigest == nil && spec.expect.finalDigest == nil, "\(spec.name)")

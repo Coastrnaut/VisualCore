@@ -96,7 +96,7 @@ runtimes.
   equal what the standalone `SceneModel` gives (a test in the framework bundle that drives both); the picture of the
   first frame matches the standalone scene's for the same document and time within the existing image tolerance
   (FR-U07-003; SC-U07-005).
-- [ ] T-U07-013 [US1] Acceptance: `python3 scripts/verify_experiences.py --only a01.generative-art-studio --runtime 27 26`
+- [X] T-U07-013 [US1] Acceptance: `python3 scripts/verify_experiences.py --only a01.generative-art-studio --runtime 27 26` — Verified 2026-11-13: python3 scripts/verify_experiences.py --only a01.generative-art-studio --runtime 27 --fresh: 9/9 scenarios pass on iOS 27.2 (a01-verify-27-fresh); --runtime 26: 9/9 on iOS 26.5 (a01-verify-26-r2); save-restore across two launches passed in 3 of 3 runs (a01-persist-run1..3). The first run failed teardown-reentry (a01-verify-27, kept), fixed by GrowthRule.judge(_:warmUp:) with the first cycle as warm-up (host 381+98+15, package tests on both runtimes, reference regression a and b exit 0). Summaries in docs/verification/a01.generative-art-studio/
   passes every scenario; a state changed by actions comes back after the app ends, in 3 of 3 runs (SC-U07-010).
 
 ## Phase 4: User Story 2 — Domain behaviour is unchanged (P1)

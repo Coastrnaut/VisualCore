@@ -204,3 +204,19 @@ The dossier files are not edited. The legacy ledger is untouched; its hash is co
     `ExperienceHostView` sets on the controls. This is a new public API: the baseline was updated, `StillRenderTests`
     was added, and the reference regression was run. The controls offer the PNG through `ShareLink` without
     writing a file (FR-U07-020).
+- **A01 verification (T-U07-013, 2026-11-13).**
+  - `Catalog/registrations.json` gains A01's entry (capabilities, `level-0`, the Sunset tile colours, no content) and
+    the key `manifest`, which `verify_experiences.py` already read and `build_catalog.py` now accepts. It names
+    `Apps/GenerativeArtStudio/Adapter/scenario-manifest.json`, the manifest's JSON form with the control ids, which
+    a host test keeps equal to the Swift manifest. A registration does not make an entry available; only X-A01 does.
+  - The runner's reducer-bypass audit rejects an action of an undeclared control in a manifest, so the
+    `rejection` scenario uses a wrong value count instead of an unknown control. JSON cannot hold infinity, so
+    fixture 2 uses an out-of-range value instead of a non-finite one.
+  - The first run failed teardown-reentry on iOS 27.2 with `grew(gpu_bytes, by: 2560)` (check `a01-verify-27`, kept).
+    Each cycle opens the Particles fountain from empty, and its instance buffer grows over the first frames to the
+    same peak in every cycle. The growth rule's warm-up was a fixed tenth (6 of 60 samples). `GrowthRule` gains
+    `judge(_:warmUp:)`, and teardown-reentry takes its first whole cycle (12 frames) as the warm-up. Growth now
+    means a later cycle holding more than the first reached. Covered by `growthRuleWarmUpOfOneCycle`, the host and
+    package tests on both runtimes, and the reference regression.
+  - The fixture scenarios are validated and played on the engine by the host tests; the runner plays the nine
+    standard scenarios (its `SCENARIOS`), as for every experience.

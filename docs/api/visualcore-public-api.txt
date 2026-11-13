@@ -89,6 +89,7 @@ VisualCoreDiagnostics | func | public static func clampedDelta(_ delta: Double) 
 VisualCoreDiagnostics | func | public static func current() -> DeviceConditions
 VisualCoreDiagnostics | func | public static func isAllowed(from: RenderLifecycleState, to: RenderLifecycleState) -> Bool
 VisualCoreDiagnostics | func | public static func judge(_ samples: [ResourceSample]) -> GrowthVerdict
+VisualCoreDiagnostics | func | public static func judge(_ samples: [ResourceSample], warmUp: Int?) -> GrowthVerdict
 VisualCoreDiagnostics | func | public static func level(ratio: Double, lightMax: Double = 2, moderateMax: Double = 10) -> Level
 VisualCoreDiagnostics | func | public static func problems(profile: QualityProfile, tierCount: Int, catalogNames: [String]?) -> [String]
 VisualCoreDiagnostics | func | public static func text(ratio: Double) -> String

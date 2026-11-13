@@ -1,0 +1,989 @@
+{
+  "controls" : [
+    "family",
+    "preset",
+    "palette",
+    "resetAll",
+    "seed.shuffle",
+    "seed.set",
+    "play",
+    "pause",
+    "scrub",
+    "rate",
+    "save",
+    "open",
+    "rebase",
+    "parameter.blend",
+    "value.blend",
+    "reset.blend",
+    "parameter.cells",
+    "value.cells",
+    "reset.cells",
+    "parameter.contrast",
+    "value.contrast",
+    "reset.contrast",
+    "parameter.count",
+    "value.count",
+    "reset.count",
+    "parameter.drag",
+    "value.drag",
+    "reset.drag",
+    "parameter.glow",
+    "value.glow",
+    "reset.glow",
+    "parameter.gravity",
+    "value.gravity",
+    "reset.gravity",
+    "parameter.lineWidth",
+    "value.lineWidth",
+    "reset.lineWidth",
+    "parameter.octaves",
+    "value.octaves",
+    "reset.octaves",
+    "parameter.rotation",
+    "value.rotation",
+    "reset.rotation",
+    "parameter.scale",
+    "value.scale",
+    "reset.scale",
+    "parameter.size",
+    "value.size",
+    "reset.size",
+    "parameter.speed",
+    "value.speed",
+    "reset.speed",
+    "parameter.spread",
+    "value.spread",
+    "reset.spread",
+    "parameter.symmetry",
+    "value.symmetry",
+    "reset.symmetry",
+    "parameter.twist",
+    "value.twist",
+    "reset.twist",
+    "parameter.warp",
+    "value.warp",
+    "reset.warp",
+    "parameter.zoom",
+    "value.zoom",
+    "reset.zoom"
+  ],
+  "experience" : "a01.generative-art-studio",
+  "kind" : "creative",
+  "scenarios" : [
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+        "initialDigest" : "9076cbcf0933978bd8a31f9dc8c99dcaa8c25534557a696191d2659198f60d9c"
+      },
+      "name" : "launch-first-frame",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "palette",
+            "values" : [
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 6
+        },
+        {
+          "action" : {
+            "control" : "parameter.size",
+            "values" : [
+              0.80000000000000004
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 6
+        },
+        {
+          "action" : {
+            "control" : "seed.shuffle",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 6
+        },
+        {
+          "action" : {
+            "control" : "pause",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 6
+        },
+        {
+          "action" : {
+            "control" : "scrub",
+            "values" : [
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 6
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "a3c37c2844586b07dc9473a74a10771787e7379ad9edb662b716a63a0076fe15",
+        "initialDigest" : "9076cbcf0933978bd8a31f9dc8c99dcaa8c25534557a696191d2659198f60d9c"
+      },
+      "name" : "input-response",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "parameter.gravity",
+            "values" : [
+              0.29999999999999999
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 6
+        },
+        {
+          "action" : {
+            "control" : "save",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 6
+        }
+      ],
+      "expect" : {
+        "outcome" : "work-saved"
+      },
+      "name" : "completion",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "family",
+            "values" : [
+              9
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "parameter.cells",
+            "values" : [
+              0.5
+            ]
+          },
+          "result" : "action.rule.a01.no-parameter",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "seed.set",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        }
+      ],
+      "expect" : {
+
+      },
+      "name" : "rejection",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "palette",
+            "values" : [
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 6
+        },
+        {
+          "action" : {
+            "control" : "parameter.size",
+            "values" : [
+              0.80000000000000004
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 6
+        },
+        {
+          "action" : {
+            "control" : "seed.shuffle",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 6
+        },
+        {
+          "action" : {
+            "control" : "pause",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 6
+        },
+        {
+          "action" : {
+            "control" : "scrub",
+            "values" : [
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 6
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "a3c37c2844586b07dc9473a74a10771787e7379ad9edb662b716a63a0076fe15",
+        "initialDigest" : "9076cbcf0933978bd8a31f9dc8c99dcaa8c25534557a696191d2659198f60d9c"
+      },
+      "name" : "save-restore",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "palette",
+            "values" : [
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 6
+        },
+        {
+          "action" : {
+            "control" : "parameter.size",
+            "values" : [
+              0.80000000000000004
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 6
+        },
+        {
+          "action" : {
+            "control" : "seed.shuffle",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 6
+        },
+        {
+          "action" : {
+            "control" : "pause",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 6
+        },
+        {
+          "action" : {
+            "control" : "scrub",
+            "values" : [
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 6
+        }
+      ],
+      "expect" : {
+        "initialDigest" : "9076cbcf0933978bd8a31f9dc8c99dcaa8c25534557a696191d2659198f60d9c",
+        "resetDigest" : true
+      },
+      "name" : "reset",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "suspend-resume",
+      "seed" : "7"
+    },
+    {
+      "cycles" : 5,
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "teardown-reentry",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "cancel-prepare",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "family",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 4
+        },
+        {
+          "action" : {
+            "control" : "seed.set",
+            "values" : [
+              0,
+              2024
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 4
+        },
+        {
+          "action" : {
+            "control" : "parameter.scale",
+            "values" : [
+              0.59999999999999998
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 4
+        },
+        {
+          "action" : {
+            "control" : "pause",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 4
+        },
+        {
+          "action" : {
+            "control" : "scrub",
+            "values" : [
+              42.5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 4
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "15696485a5179adae658f73a32f706a8dac4a4e5d1e1f406689d12ca8e1e3673",
+        "initialDigest" : "9076cbcf0933978bd8a31f9dc8c99dcaa8c25534557a696191d2659198f60d9c"
+      },
+      "name" : "fixture-1",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "open",
+            "values" : [
+              0,
+              99,
+              0,
+              1,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 2
+        },
+        {
+          "action" : {
+            "control" : "value.size",
+            "values" : [
+              99
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 2
+        },
+        {
+          "action" : {
+            "control" : "parameter.cells",
+            "values" : [
+              0.5
+            ]
+          },
+          "result" : "action.rule.a01.no-parameter",
+          "steps" : 2
+        },
+        {
+          "action" : {
+            "control" : "scrub",
+            "values" : [
+              -1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 2
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "c23152fa33ef55730e06ac2c5403e29cbe7f287d961cfce2333dfb2ff0b08cac",
+        "initialDigest" : "9076cbcf0933978bd8a31f9dc8c99dcaa8c25534557a696191d2659198f60d9c"
+      },
+      "name" : "fixture-2",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "palette",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "palette",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "palette",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "palette",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "palette",
+            "values" : [
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "palette",
+            "values" : [
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "palette",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "palette",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "palette",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "palette",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "palette",
+            "values" : [
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "palette",
+            "values" : [
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "palette",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "palette",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "palette",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "palette",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "palette",
+            "values" : [
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "palette",
+            "values" : [
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "palette",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "palette",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "palette",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "palette",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "palette",
+            "values" : [
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "palette",
+            "values" : [
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "palette",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "palette",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "palette",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "palette",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "palette",
+            "values" : [
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "palette",
+            "values" : [
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "palette",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "palette",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "palette",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "palette",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "palette",
+            "values" : [
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "palette",
+            "values" : [
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "palette",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "palette",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "palette",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "palette",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "initialDigest" : "9076cbcf0933978bd8a31f9dc8c99dcaa8c25534557a696191d2659198f60d9c"
+      },
+      "name" : "fixture-3",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "family",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 3
+        },
+        {
+          "action" : {
+            "control" : "pause",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 3
+        },
+        {
+          "action" : {
+            "control" : "scrub",
+            "values" : [
+              30
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 3
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "fef495ea264017480da2554d5e45f25e4799d9c51cbe4d3cfaa437f1052f864f",
+        "initialDigest" : "9076cbcf0933978bd8a31f9dc8c99dcaa8c25534557a696191d2659198f60d9c"
+      },
+      "name" : "fixture-4",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "family",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 30
+        },
+        {
+          "action" : {
+            "control" : "family",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 30
+        },
+        {
+          "action" : {
+            "control" : "family",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 30
+        },
+        {
+          "action" : {
+            "control" : "family",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 30
+        },
+        {
+          "action" : {
+            "control" : "family",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 30
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "9076cbcf0933978bd8a31f9dc8c99dcaa8c25534557a696191d2659198f60d9c",
+        "initialDigest" : "9076cbcf0933978bd8a31f9dc8c99dcaa8c25534557a696191d2659198f60d9c"
+      },
+      "name" : "fixture-5",
+      "seed" : "7"
+    }
+  ],
+  "schema" : 1
+}

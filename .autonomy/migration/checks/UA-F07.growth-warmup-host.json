@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/VisualCore"
+  ],
+  "command": "swift test --package-path Packages/VisualCore",
+  "elapsed_seconds": 17.231,
+  "exit_code": 1,
+  "finished": "2026-11-13T11:48:04+00:00",
+  "gate": "UA-F07",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F07.growth-warmup-host.log",
+  "log_sha256": "23c2e21112fa62db9e9c489e7137e6ea1af89d91ef4b6832bf1c0edbd276dec4",
+  "name": "growth-warmup-host",
+  "started": "2026-11-13T11:47:47+00:00",
+  "timed_out": false
+}

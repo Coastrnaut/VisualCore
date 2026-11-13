@@ -15,10 +15,24 @@
         "creative-and-visual"
       ],
       "order": 1,
-      "palette": [],
+      "palette": [
+        "#210D40",
+        "#C22E5C",
+        "#FA8F3D",
+        "#FFE38C"
+      ],
       "tile_seed": 3483897892,
-      "capabilities": [],
-      "quality_tiers": [],
+      "capabilities": [
+        "procedural shaders",
+        "particles",
+        "presets",
+        "parameters",
+        "saved compositions",
+        "still export"
+      ],
+      "quality_tiers": [
+        "level-0"
+      ],
       "content": null,
       "available": false
     },

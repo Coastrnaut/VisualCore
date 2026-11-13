@@ -89,8 +89,13 @@ def load_registrations(root: Path, known_ids: set[str]) -> dict:
          "expected exactly the keys schema and registrations")
     for experience_id, entry in data["registrations"].items():
         need(experience_id in known_ids, REGISTRATIONS, f"{experience_id} is not an id of the planning catalog")
-        need(isinstance(entry, dict) and sorted(entry) == sorted(REGISTRATION_KEYS), REGISTRATIONS,
-             f"{experience_id}: expected exactly the keys {', '.join(REGISTRATION_KEYS)}")
+        need(isinstance(entry, dict) and sorted(set(entry) - {"manifest"}) == sorted(REGISTRATION_KEYS), REGISTRATIONS,
+             f"{experience_id}: expected exactly the keys {', '.join(REGISTRATION_KEYS)} and optionally manifest")
+        # Feature 193 (UA-F07): the scenario manifest's JSON form that scripts/verify_experiences.py audits, a
+        # repository-relative file; it does not enter the runtime catalog.
+        need("manifest" not in entry or (isinstance(entry["manifest"], str)
+                                         and (root / entry["manifest"]).is_file()), REGISTRATIONS,
+             f"{experience_id}: manifest must name a file of the repository")
         strings(entry["capabilities"], REGISTRATIONS, f"{experience_id}: capabilities", 16, 40)
         strings(entry["quality_tiers"], REGISTRATIONS, f"{experience_id}: quality_tiers", 8, 40)
         need(isinstance(entry["palette"], list) and len(entry["palette"]) <= 8

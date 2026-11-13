@@ -18,7 +18,7 @@ public struct ResourceSample: Sendable, Equatable {
     }
 }
 
-/// The result of `GrowthRule.judge(_:)`.
+/// The result of `GrowthRule.judge(_:)` and `GrowthRule.judge(_:warmUp:)`.
 public enum GrowthVerdict: Sendable, Equatable {
     /// Nothing grew. `footprintChecked` is false when at least one sample had no footprint, so that only the
     /// graphics bytes were judged.
@@ -61,8 +61,16 @@ public enum GrowthRule {
     ///    of the two middle values.
     /// 5. Otherwise `.flat`.
     public static func judge(_ samples: [ResourceSample]) -> GrowthVerdict {
+        judge(samples, warmUp: nil)
+    }
+
+    /// Judges the samples as `judge(_:)` does, with the first `warmUp` samples as the warm-up instead of the first
+    /// tenth (feature 193, UA-F07): a series made of repeated cycles, each of which fills its content from empty,
+    /// takes its first whole cycle as the warm-up, so that growth means more than the first cycle reached. `nil`
+    /// gives the tenth; a value is clamped to 1 … count − 1.
+    public static func judge(_ samples: [ResourceSample], warmUp: Int?) -> GrowthVerdict {
         guard samples.count >= minimumSamples else { return .tooFewSamples(samples.count) }
-        let warmCount = max(1, samples.count / 10)
+        let warmCount = min(max(1, warmUp ?? samples.count / 10), samples.count - 1)
         let warm = samples[..<warmCount]
         let rest = samples[warmCount...]
 

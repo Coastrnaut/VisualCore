@@ -1,0 +1,24 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--only",
+    "a01.generative-art-studio",
+    "--runtime",
+    "27",
+    "--scenario",
+    "save-restore",
+    "--fresh"
+  ],
+  "command": "python3 scripts/verify_experiences.py --only a01.generative-art-studio --runtime 27 --scenario save-restore --fresh",
+  "elapsed_seconds": 6.468,
+  "exit_code": 0,
+  "finished": "2026-11-13T11:51:54+00:00",
+  "gate": "UA-F07",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F07.a01-persist-run1.log",
+  "log_sha256": "a6d08417580fd1b42c40eb65ec3946f030c2edaa40bcf478e3b5663f8d3f3911",
+  "name": "a01-persist-run1",
+  "started": "2026-11-13T11:51:48+00:00",
+  "timed_out": false
+}

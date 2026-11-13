@@ -243,7 +243,10 @@ public final class ScenarioRunner {
             record.live = counts?.objects ?? 0
             record.leaked = counts?.leaked ?? 0
         }
-        judge(samples, name: "teardown-reentry", into: &record)
+        // Each cycle opens afresh and fills its content from empty (A01's particle fountain grows its instance
+        // buffer over the first frames), so the first whole cycle is the warm-up: growth means a later cycle
+        // holding more than the first one reached (feature 193).
+        judge(samples, name: "teardown-reentry", warmUp: Self.framesPerCycle, into: &record)
     }
 
     /// Opens and leaves at once, while the experience prepares: the open ends cancelled and nothing arrives.
@@ -387,8 +390,8 @@ public final class ScenarioRunner {
         record.pixels = (pixels, size.width, size.height)
     }
 
-    private func judge(_ samples: [ResourceSample], name: String, into record: inout Record) {
-        let verdict = GrowthRule.judge(samples)
+    private func judge(_ samples: [ResourceSample], name: String, warmUp: Int? = nil, into record: inout Record) {
+        let verdict = GrowthRule.judge(samples, warmUp: warmUp)
         if !verdict.passes { record.failures.append("\(name): \(verdict)") }
     }
 

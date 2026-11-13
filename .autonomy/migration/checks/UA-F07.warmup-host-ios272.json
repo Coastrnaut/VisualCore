@@ -1,0 +1,29 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/VisualCoreRendering",
+    "--scheme",
+    "VisualCoreRendering-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--result-name",
+    "ua-f07-warmup-272",
+    "--only-testing",
+    "VisualCoreExperienceHostTests"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --result-name ua-f07-warmup-272 --only-testing VisualCoreExperienceHostTests",
+  "elapsed_seconds": 30.669,
+  "exit_code": 0,
+  "finished": "2026-11-13T11:49:13+00:00",
+  "gate": "UA-F07",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F07.warmup-host-ios272.log",
+  "log_sha256": "4401940850cd2d54dae3a0a2799fd49d39d311988ca3f8ce5d6eda2aa229278a",
+  "name": "warmup-host-ios272",
+  "started": "2026-11-13T11:48:43+00:00",
+  "timed_out": false
+}

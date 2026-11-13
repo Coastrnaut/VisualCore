@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--only",
+    "a01.generative-art-studio",
+    "--runtime",
+    "26"
+  ],
+  "command": "python3 scripts/verify_experiences.py --only a01.generative-art-studio --runtime 26",
+  "elapsed_seconds": 16.402,
+  "exit_code": 0,
+  "finished": "2026-11-13T11:51:21+00:00",
+  "gate": "UA-F07",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F07.a01-verify-26-r2.log",
+  "log_sha256": "5f4fa18c31f5a6ae0d4ead0b76cc24a4d8b1bcf1eb71c553f15ffe1e8553d6be",
+  "name": "a01-verify-26-r2",
+  "started": "2026-11-13T11:51:05+00:00",
+  "timed_out": false
+}

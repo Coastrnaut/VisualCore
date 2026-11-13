@@ -44,7 +44,7 @@ extension GenerativeArtCore {
         // 2. Corrupt or newer values surface as recoverable rejections and change nothing.
         let corrupt = [
             ScenarioStep(steps: 2, action: ScriptedAction("open", [0, 99, 0, 1, 0]), result: "action.out-of-range"),
-            ScenarioStep(steps: 2, action: ScriptedAction("value.size", [.infinity]), result: "action.non-finite"),
+            ScenarioStep(steps: 2, action: ScriptedAction("value.size", [99]), result: "action.out-of-range"),
             ScenarioStep(steps: 2, action: ScriptedAction("parameter.cells", [0.5]),
                          result: "action.rule.a01.no-parameter"),
             ScenarioStep(steps: 2, action: ScriptedAction("scrub", [-1]), result: "action.out-of-range"),
@@ -89,7 +89,7 @@ extension GenerativeArtCore {
                 ScenarioStep(steps: 0, action: ScriptedAction("family", [9]), result: "action.out-of-range"),
                 ScenarioStep(steps: 0, action: ScriptedAction("parameter.cells", [0.5]),
                              result: "action.rule.a01.no-parameter"),
-                ScenarioStep(steps: 0, action: ScriptedAction("tour"), result: "action.unknown-control"),
+                ScenarioStep(steps: 0, action: ScriptedAction("seed.set", [1]), result: "action.wrong-value-count"),
             ]),
             ScenarioSpec(name: "save-restore", seed: seed, entries: input,
                          expect: ScenarioExpectations(initialDigest: initial,

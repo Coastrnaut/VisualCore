@@ -62,11 +62,20 @@ enum CatalogFixture {
         for entry in manifest.experiences {
             #expect(entry.tags.contains(ExperienceDescriptor.tag(forFamily: entry.family)), "\(entry.id) lacks its family tag")
             #expect((entry.kind == .game) == (entry.category == .puzzle))
-            #expect(entry.palette.isEmpty && entry.capabilities.isEmpty && entry.qualityTiers.isEmpty && entry.content == nil)
+            // An entry without a registration declares nothing; a registered one (from feature 193: A01) declares
+            // its palette, capabilities and quality levels; only a game has content facts.
+            let declares = !entry.palette.isEmpty || !entry.capabilities.isEmpty || !entry.qualityTiers.isEmpty
+            if declares {
+                #expect(!entry.palette.isEmpty && !entry.capabilities.isEmpty && !entry.qualityTiers.isEmpty,
+                        "\(entry.id) declares only part of its registration")
+            }
+            #expect(entry.content == nil || entry.kind == .game)
         }
         #expect(manifest.experience(try ExperienceID("a05.infinite-geometry"))?.title == "Infinite Geometry")
         #expect(manifest.experience(code: try ExperienceCode("R03-G01"))?.id.rawValue == "r03-g01.harmonic-helix")
         #expect(manifest.families(in: .create) == ["Creative and visual"])
+        let registered = manifest.experiences.filter { !$0.palette.isEmpty }.map(\.id.rawValue)
+        #expect(registered == ["a01.generative-art-studio"], "the registrations of Catalog/registrations.json")
     }
 
     @Test func loadingTheCommittedManifestIsFast() throws {
