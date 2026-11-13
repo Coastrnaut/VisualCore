@@ -9,6 +9,7 @@ import hashlib
 import importlib.util
 import io
 import json
+import os
 import re
 import shutil
 import subprocess
@@ -3521,10 +3522,19 @@ class FakeSim:
         {"identifier": "com.apple.CoreSimulator.SimRuntime.iOS-26-2", "version": "26.2", "buildversion": "23C1",
          "isAvailable": True, "platform": "iOS"}]}
 
+    FRAME = bytes([0, 16, 32, 255]) * 4          # a 2x2 RGBA frame
+
     def __init__(self, root: Path, *, failed_tests=0, make_bundle=True, writes_record=True, exits=True, busy=0,
-                 lossy_result="fail", save_digest="d" * 64, records=True):
+                 lossy_result="fail", save_digest="d" * 64, records=True, commit="a" * 40, save_result="pass",
+                 frame=None, writes_frame=True, request_error=None):
         self.root = root
         self.calls: list[tuple[list[str], float, dict | None]] = []
+        self.kwargs: list[tuple[list[str], dict]] = []
+        self.commit = commit
+        self.save_result = save_result
+        self.frame = self.FRAME if frame is None else frame
+        self.writes_frame = writes_frame
+        self.request_error = request_error
         self.sleeps: list[float] = []
         self.time = 0.0
         self.failed_tests = failed_tests
@@ -3570,6 +3580,7 @@ class FakeSim:
         rec["artifacts"] = {"result_bundle": None, "log": None, "log_sha256": None, "record_sha256": None}
         if final:
             rec["digests"]["final"] = final
+        rec["frames"][0].update({"path": None, "sha256": hashlib.sha256(FakeSim.FRAME).hexdigest()})
         return rec
 
     def summary_json(self, total: int) -> str:
@@ -3579,14 +3590,15 @@ class FakeSim:
                                {"device": {"deviceId": self.udids["27.2"], "deviceName": "iPhone 18 Pro",
                                            "modelName": "iPhone 18 Pro", "osVersion": "27.2"}}]})
 
-    def __call__(self, argv, timeout, cwd=None, env=None):
+    def __call__(self, argv, timeout, cwd=None, env=None, **kw):
         argv = [str(a) for a in argv]
         self.calls.append((argv, timeout, env))
+        self.kwargs.append((argv, kw))
         if argv[:5] == ["xcrun", "simctl", "list", "-j", "runtimes"]:
             return 0, json.dumps(self.RUNTIMES), ""
         if argv[:5] == ["xcrun", "simctl", "list", "-j", "devices"]:
             return 0, json.dumps(self.devices()), ""
-        canned = {("git", "rev-parse", "HEAD"): "a" * 40 + "\n", ("git", "rev-parse", "HEAD^{tree}"): "b" * 40 + "\n",
+        canned = {("git", "rev-parse", "HEAD"): self.commit + "\n", ("git", "rev-parse", "HEAD^{tree}"): "b" * 40 + "\n",
                   ("git", "status", "--porcelain"): " M scripts/x.py\n",
                   ("git", "submodule", "status"): " " + "c" * 40 + " External/projectm-ios (heads/main)\n",
                   ("xcodebuild", "-version"): "Xcode 27.2\nBuild version 27C100\n",
@@ -3607,12 +3619,20 @@ class FakeSim:
         if argv[:5] == ["xcrun", "xcresulttool", "get", "test-results", "summary"]:
             tests = self.package_scenarios[-1]
             return 0, self.summary_json(len(tests)), ""
+        if argv[:5] == ["xcrun", "xcresulttool", "get", "test-results", "tests"]:
+            cases = [{"nodeType": "Test Case", "name": t.rsplit("/", 1)[-1] + "()",
+                      "result": "Failed" if i < self.failed_tests else "Passed"}
+                     for i, t in enumerate(self.package_scenarios[-1])]
+            return 0, json.dumps({"devices": [], "testNodes": [{"nodeType": "Test Plan", "name": "P", "children": [
+                {"nodeType": "Unit test bundle", "name": "VisualCoreExperienceHostTests", "children": [
+                    {"nodeType": "Test Suite", "name": "ScenarioRunnerTests", "children": cases}]}]}]}), ""
         if argv[:4] == ["xcrun", "xcresulttool", "export", "attachments"]:
             folder = Path(argv[argv.index("--output-path") + 1])
             entries = []
             for test in self.package_scenarios[-1]:
                 method = test.rsplit("/", 1)[-1]
-                scenario = next((s for s in verify.STANDARD if verify.test_method(s) == method), None)
+                scenario = next((s for s in verify.STANDARD if verify.test_method(s) == method),
+                                "endurance" if method == "testEnduranceKeepsResourcesFlat" else None)
                 lossy = method == "testALossySnapshotFailsSaveRestoreByName"
                 if lossy:
                     scenario = "save-restore"
@@ -3622,11 +3642,17 @@ class FakeSim:
                                   **({"result": self.lossy_result,
                                       "failures": ["after-restore digest differs from the saved digest"]
                                       if self.lossy_result == "fail" else []} if lossy else {}))
+                rec["configuration"]["process"] = "single"
                 exported = f"{fake_udid(len(entries) + 10)}.json"
                 (folder / exported).write_text(json.dumps(rec))
                 suggested = f"evidence-a99.contract-sample-{scenario}{'-lossy' if lossy else ''}_0_{fake_udid(99)}.json"
-                entries.append({"testIdentifier": f"ScenarioRunnerTests/{method}()", "attachments": [
-                    {"exportedFileName": exported, "suggestedHumanReadableName": suggested}]})
+                attachments = [{"exportedFileName": exported, "suggestedHumanReadableName": suggested}]
+                if not lossy and self.writes_frame:
+                    frame_file = f"{fake_udid(len(entries) + 50)}.rgba"
+                    (folder / frame_file).write_bytes(self.frame)
+                    attachments.append({"exportedFileName": frame_file, "suggestedHumanReadableName":
+                                        f"frame-a99.contract-sample-{scenario}_0_{fake_udid(98)}.rgba"})
+                entries.append({"testIdentifier": f"ScenarioRunnerTests/{method}()", "attachments": attachments})
             (folder / "manifest.json").write_text(json.dumps(entries))
             return 0, "", ""
         if argv[:3] == [verify.PY, "scripts/release_check.py", "--only"]:
@@ -3649,15 +3675,26 @@ class FakeSim:
                 self.busy -= 1
                 return 1, "", "An error was encountered processing the command: Busy"
             child = {k[len("SIMCTL_CHILD_"):]: v for k, v in (env or {}).items() if k.startswith("SIMCTL_CHILD_")}
-            if self.writes_record:
+            if self.request_error is not None:
+                target = self.container / verify.EVIDENCE_DIR / "invalid-request" / "request-error.json"
+                target.parent.mkdir(parents=True, exist_ok=True)
+                target.write_text(json.dumps({"result": "error", "failures": [self.request_error]}))
+            elif self.writes_record:
                 ident, scenario, run_id = (child["VISUALCORE_AUTORUN_EXPERIENCE"], child["VISUALCORE_AUTORUN_SCENARIO"],
                                            child["VISUALCORE_AUTORUN_RUN"])
                 phase = child.get("VISUALCORE_AUTORUN_PHASE")
                 rec = self.record(ident, "debug", scenario, run_id, final=self.save_digest if phase == "save" else None)
+                if phase == "save" and self.save_result != "pass":
+                    rec.update({"result": self.save_result,
+                                "failures": ["save phase: the snapshot could not be stored (storage.full)"]})
                 target = self.container / verify.EVIDENCE_DIR / run_id / f"{ident}.{scenario}.json"
                 target.parent.mkdir(parents=True, exist_ok=True)
                 target.write_text(json.dumps(rec))
+                if self.writes_frame:
+                    (target.parent / f"{ident}.{scenario}.frame.rgba").write_bytes(self.frame)
             return 0, "dev.visualcore.VisualCore: 4242\n", ""
+        if argv[:3] == ["xcrun", "simctl", "terminate"]:
+            return 0, "", ""
         if argv[:2] == ["test", "-f"]:
             return (0 if Path(argv[2]).is_file() else 1), "", ""
         if argv[:2] == ["ps", "-p"]:
@@ -3768,7 +3805,10 @@ class VerifyDriverTests(unittest.TestCase):
         self.assertEqual(len(sim.commands("xcrun", "xcresulttool", "get", "test-results", "summary")), 1)
         summary = self.summary("a99.contract-sample", "27.2")
         self.assertEqual([r["result"] for r in summary["results"]], ["pass"] * 9)
-        self.assertEqual(summary["bundle"], {"result": "Passed", "total": 9, "passed": 9, "failed": 0})
+        self.assertEqual(summary["bundle"], {"result": "Passed", "total": 9, "passed": 9, "failed": 0,
+                                             "destination": {"name": "iPhone 18 Pro", "os": "27.2"},
+                                             "failed_tests": []})
+        self.assertEqual(len(sim.commands("xcrun", "xcresulttool", "get", "test-results", "tests")), 1)
         self.assertEqual((summary["runtime"], summary["runtime_build"]), ("27.2", "24B8117"))
         self.assertEqual(summary["device_type"], "com.apple.CoreSimulator.SimDeviceType.iPhone-18-Pro")
         record_path = self.root / ".autonomy" / "verify" / self.RUN / "27.2" / "a99.contract-sample.reset.json"
@@ -3836,7 +3876,7 @@ class VerifyDriverTests(unittest.TestCase):
         self.assertEqual(code, 1)
         self.assertIn("FAIL: a99.contract-sample reset 27.2: no record in the result bundle", lines)
 
-    def test_endurance_counts_the_bundle_only(self):
+    def test_endurance_is_validated_and_counted_by_its_record(self):
         code, lines, sim = self.main(["--only", "a99.contract-sample", "--scenario", "endurance", "--runtime", "27"])
         self.assertEqual(code, 0, lines)
         self.assertEqual(sim.package_scenarios,
@@ -3846,17 +3886,44 @@ class VerifyDriverTests(unittest.TestCase):
         self.assertEqual([r["scenario"] for r in rows[:9]], verify.STANDARD)
         self.assertTrue(all(r["result"] == "not-run" for r in rows[:9]))
         row = rows[9]
-        self.assertEqual((row["scenario"], row["result"], row["record_sha256"]), ("endurance", "pass", None))
-        self.assertIn("result bundle only", row["evidence"])
-        self.assertFalse(list((self.root / ".autonomy" / "verify" / self.RUN).rglob("*.endurance.json")))
+        record_path = self.root / ".autonomy" / "verify" / self.RUN / "27.2" / "a99.contract-sample.endurance.json"
+        record = json.loads(record_path.read_text())
+        self.assertEqual(verify.load_check_evidence().validate(record), [])
+        self.assertEqual((row["scenario"], row["result"], row["record_sha256"]),
+                         ("endurance", "pass", record["artifacts"]["record_sha256"]))
+        self.assertNotIn("evidence", row)
+        self.assertFalse(any("result bundle only" in line for line in lines))
+        self.assertTrue(record["artifacts"]["result_bundle"].endswith("-endurance.xcresult"))
+
+    def test_endurance_without_its_record_fails_by_name(self):
+        code, lines, _ = self.main(["--only", "a99.contract-sample", "--scenario", "endurance", "--runtime", "27"],
+                                   FakeSim(self.root, records=False))
+        self.assertEqual(code, 1)
+        self.assertIn("FAIL: a99.contract-sample endurance 27.2: no record in the result bundle", lines)
+
+    def test_a_package_run_with_endurance_joins_both_bundles_in_the_block(self):
+        code, lines, sim = self.main(["--only", "a99.contract-sample", "--scenario", "reset", "endurance",
+                                      "--runtime", "27"])
+        self.assertEqual(code, 0, lines)
+        self.assertEqual(len(sim.package_scenarios), 2)
+        bundle = self.summary("a99.contract-sample", "27.2")["bundle"]
+        self.assertEqual((bundle["result"], bundle["total"], bundle["passed"]), ("Passed", 2, 2))
+
+    def make_test_binary(self, data=b"test binary"):
+        path = (self.root / "Build" / "DerivedData" / "VisualCoreRendering-sim-27.2" / "Build" / "Products"
+                / "Debug-iphonesimulator" / "VisualCoreExperienceHostTests.xctest" / "VisualCoreExperienceHostTests")
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(data)
+        return path
 
     def test_state_skips_what_passed_and_fresh_reruns(self):
+        self.make_test_binary()
         self.main(["--only", "a99.contract-sample", "--runtime", "27"])
         code, lines, sim = self.main(["--only", "a99.contract-sample", "--runtime", "27"],
                                      now=datetime.datetime(2026, 11, 12, 11, 0, 0))
         self.assertEqual(code, 0)
         self.assertEqual(sim.package_scenarios, [])
-        self.assertTrue(any("passed earlier, skipped" in line for line in lines))
+        self.assertTrue(any("passed earlier at this commit with this binary, skipped" in line for line in lines))
         code, lines, sim = self.main(["--only", "a99.contract-sample", "--runtime", "27", "--fresh"],
                                      now=datetime.datetime(2026, 11, 12, 12, 0, 0))
         self.assertEqual(code, 0)
@@ -3864,7 +3931,48 @@ class VerifyDriverTests(unittest.TestCase):
         state = json.loads((self.root / ".autonomy" / "verify" / "state.json").read_text())
         self.assertEqual(state["runs"]["a99.contract-sample|reset|27.2"]["attempt"], 2)
 
+    def test_a_pass_at_another_commit_or_with_another_binary_is_run_again(self):
+        self.make_test_binary()
+        self.main(["--only", "a99.contract-sample", "--runtime", "27", "--scenario", "reset"])
+        state = json.loads((self.root / ".autonomy" / "verify" / "state.json").read_text())
+        entry = state["runs"]["a99.contract-sample|reset|27.2"]
+        self.assertEqual((entry["result"], entry["commit"]), ("pass", "a" * 40))
+        self.assertEqual(entry["binary_sha256"], hashlib.sha256(b"test binary").hexdigest())
+        # Same commit, same binary: skipped.
+        code, lines, sim = self.main(["--only", "a99.contract-sample", "--runtime", "27", "--scenario", "reset"],
+                                     now=datetime.datetime(2026, 11, 12, 11, 0, 0))
+        self.assertEqual((code, sim.package_scenarios), (0, []))
+        # Another commit: run again.
+        code, lines, sim = self.main(["--only", "a99.contract-sample", "--runtime", "27", "--scenario", "reset"],
+                                     FakeSim(self.root, commit="e" * 40), now=datetime.datetime(2026, 11, 12, 12))
+        self.assertEqual(code, 0, lines)
+        self.assertEqual(sim.package_scenarios, [["VisualCoreExperienceHostTests/ScenarioRunnerTests/testReset"]])
+        # Same commit as that run, but another binary: run again.
+        self.make_test_binary(b"rebuilt test binary")
+        code, lines, sim = self.main(["--only", "a99.contract-sample", "--runtime", "27", "--scenario", "reset"],
+                                     FakeSim(self.root, commit="e" * 40), now=datetime.datetime(2026, 11, 12, 13))
+        self.assertEqual(len(sim.package_scenarios), 1)
+        # No binary on disk: nothing can be shown to be the same, so it runs.
+        self.make_test_binary().unlink()
+        code, lines, sim = self.main(["--only", "a99.contract-sample", "--runtime", "27", "--scenario", "reset"],
+                                     FakeSim(self.root, commit="e" * 40), now=datetime.datetime(2026, 11, 12, 14))
+        self.assertEqual(len(sim.package_scenarios), 1)
+
+    def test_the_app_path_resume_compares_the_app_binary(self):
+        self.main(["--only", "debug", "--runtime", "27", "--scenario", "reset"])
+        state = json.loads((self.root / ".autonomy" / "verify" / "state.json").read_text())
+        self.assertEqual(state["runs"]["a98.debug-experience|reset|27.2"]["binary_sha256"],
+                         hashlib.sha256(b"app binary").hexdigest())
+        code, lines, sim = self.main(["--only", "debug", "--runtime", "27", "--scenario", "reset"],
+                                     now=datetime.datetime(2026, 11, 12, 11))
+        self.assertEqual((code, sim.commands("xcrun", "simctl", "launch")), (0, []))
+        (self.root / verify.APP_PATH / "VisualCore").write_bytes(b"another app binary")
+        code, lines, sim = self.main(["--only", "debug", "--runtime", "27", "--scenario", "reset"],
+                                     now=datetime.datetime(2026, 11, 12, 12))
+        self.assertEqual(len(sim.commands("xcrun", "simctl", "launch")), 1)
+
     def test_resume_runs_only_what_did_not_pass(self):
+        self.make_test_binary()
         self.main(["--only", "a99.contract-sample", "--runtime", "27"], FakeSim(self.root, failed_tests=1))
         code, lines, sim = self.main(["--only", "a99.contract-sample", "--runtime", "27", "--scenario", "reset"],
                                      now=datetime.datetime(2026, 11, 12, 11, 0, 0))
@@ -3989,19 +4097,24 @@ class VerifyDriverTests(unittest.TestCase):
 
     def test_a_scenario_whose_record_never_appears_fails_by_name_after_the_limit(self):
         code, lines, sim = self.main(["--only", "debug", "--runtime", "27", "--scenario", "launch-first-frame"],
-                                     FakeSim(self.root, writes_record=False))
+                                     FakeSim(self.root, writes_record=False, exits=False))
         self.assertEqual(code, 1)
         self.assertIn("FAIL: a98.debug-experience launch-first-frame 27.2: no record within 120 s", lines)
+        terminate = [c for c in sim.calls if c[0][:3] == ["xcrun", "simctl", "terminate"]]
+        self.assertEqual([(c[0][3:], c[1]) for c in terminate],
+                         [([sim.udids["27.2"], "dev.visualcore.VisualCore"], 30)])
+        self.assertIn("a98.debug-experience launch-first-frame 27.2: the app was terminated (xcrun simctl terminate, "
+                      "exit 0)", lines)
         self.assertGreaterEqual(sim.time, 120)
         self.assertLess(sim.time, 122)
         self.assertEqual(set(sim.sleeps), {1})
         code, lines, sim = self.main(["--only", "debug", "--runtime", "27", "--scenario", "reset",
-                                      "--max-seconds", "15"], FakeSim(self.root, writes_record=False))
+                                      "--max-seconds", "15"], FakeSim(self.root, writes_record=False, exits=False))
         self.assertIn("FAIL: a98.debug-experience reset 27.2: no record within 15 s", lines)
 
     def test_endurance_waits_its_time_plus_120_seconds(self):
         code, lines, sim = self.main(["--only", "debug", "--runtime", "27", "--scenario", "endurance"],
-                                     FakeSim(self.root, writes_record=False))
+                                     FakeSim(self.root, writes_record=False, exits=False))
         self.assertIn("FAIL: a98.debug-experience endurance 27.2: no record within 720 s", lines)
 
     def test_a_process_that_does_not_exit_fails_by_name(self):
@@ -4010,6 +4123,56 @@ class VerifyDriverTests(unittest.TestCase):
         self.assertEqual(code, 1)
         self.assertIn("FAIL: a98.debug-experience reset 27.2: the process did not exit within 30 s", lines)
         self.assertTrue(sim.commands("ps", "-p", "4242"))
+        self.assertEqual(sim.commands("xcrun", "simctl", "terminate"),
+                         [["xcrun", "simctl", "terminate", sim.udids["27.2"], "dev.visualcore.VisualCore"]])
+
+    def test_a_crash_is_detected_at_once(self):
+        code, lines, sim = self.main(["--only", "debug", "--runtime", "27", "--scenario", "reset"],
+                                     FakeSim(self.root, writes_record=False, exits=True))
+        self.assertEqual(code, 1)
+        self.assertIn("FAIL: a98.debug-experience reset 27.2: the app exited without a record (crash)", lines)
+        self.assertLess(sim.time, 2, "the wait ends when the process is gone, not after the limit")
+        self.assertEqual(sim.commands("xcrun", "simctl", "terminate"), [])
+
+    def test_a_request_error_of_the_app_is_reported(self):
+        code, lines, sim = self.main(["--only", "debug", "--runtime", "27", "--scenario", "reset"],
+                                     FakeSim(self.root, request_error="request.invalid-run"))
+        self.assertEqual(code, 1)
+        self.assertIn("FAIL: a98.debug-experience reset 27.2: the request was refused: request.invalid-run", lines)
+        code, lines, sim = self.main(["--only", "debug", "--runtime", "27", "--scenario", "reset", "--fresh"],
+                                     FakeSim(self.root, request_error="request.invalid-seed", exits=False))
+        self.assertIn("FAIL: a98.debug-experience reset 27.2: no record within 120 s; the request was refused: "
+                      "request.invalid-seed", lines)
+
+    def test_a_package_test_run_is_its_own_process_group_killed_at_the_limit(self):
+        code, lines, sim = self.main(["--only", "a99.contract-sample", "--runtime", "27", "--scenario", "reset"])
+        self.assertEqual(code, 0, lines)
+        runs = [(argv, kw) for argv, kw in sim.kwargs if argv[1:2] == ["scripts/xcodebuild_package.py"]]
+        self.assertEqual([kw for _, kw in runs], [{"kill_group": True}])
+        timeouts = [c[1] for c in sim.calls if c[0][1:2] == ["scripts/xcodebuild_package.py"]]
+        self.assertEqual(timeouts, [540])
+        self.assertEqual(verify.TEST_RUN_LIMIT, 540)
+
+    def test_system_run_kills_the_whole_group_at_the_limit(self):
+        with tempfile.TemporaryDirectory() as d:
+            pidfile = Path(d) / "child.pid"
+            start = time.monotonic()
+            code, out, err = verify.system_run(["/bin/sh", "-c", f"sleep 30 & echo $! > {pidfile}; wait"], 1,
+                                               kill_group=True)
+            self.assertEqual(code, 124)
+            self.assertIn("process group killed", err)
+            self.assertLess(time.monotonic() - start, 15)
+            child = int(pidfile.read_text().strip())
+            deadline = time.monotonic() + 5
+            gone = False
+            while time.monotonic() < deadline and not gone:
+                try:
+                    os.kill(child, 0)
+                    time.sleep(0.05)
+                except ProcessLookupError:
+                    gone = True
+            self.assertTrue(gone, "the background child of the command was killed with its group")
+        self.assertEqual(verify.system_run(["/bin/sh", "-c", "echo ok"], 10, kill_group=True), (0, "ok\n", ""))
 
     def test_busy_is_retried_once_after_20_seconds(self):
         code, lines, sim = self.main(["--only", "debug", "--runtime", "27", "--scenario", "reset"],
@@ -4045,6 +4208,126 @@ class VerifyDriverTests(unittest.TestCase):
         code, lines, _ = self.main(["--only", "debug", "--runtime", "27", "--scenario", "reset"], sim)
         self.assertEqual(code, 1)
         self.assertTrue(any("code 'sample' is not 'debug'" in line for line in lines))
+
+    # the save phase (T-U09-041)
+    def test_a_failing_save_record_fails_save_restore_without_a_restore_launch(self):
+        code, lines, sim = self.main(["--only", "debug", "--runtime", "27", "--scenario", "save-restore"],
+                                     FakeSim(self.root, save_result="fail"))
+        self.assertEqual(code, 1)
+        self.assertTrue(any(line.startswith("FAIL: a98.debug-experience save-restore 27.2: save phase: ")
+                            and "the snapshot could not be stored" in line for line in lines), lines)
+        launches = [c[2] for c in sim.calls if c[0][:3] == ["xcrun", "simctl", "launch"]]
+        self.assertEqual([e["SIMCTL_CHILD_VISUALCORE_AUTORUN_PHASE"] for e in launches], ["save"])
+        saved = json.loads((self.root / ".autonomy" / "verify" / self.RUN / "27.2"
+                            / "a98.debug-experience.save-restore.save.json").read_text())
+        self.assertEqual(verify.load_check_evidence().validate(saved), [], "the save record is kept, completed")
+        self.assertEqual(saved["source"]["commit"], "a" * 40)
+        self.assertIsNotNone(saved["artifacts"]["record_sha256"])
+        row = next(r for r in self.summary("a98.debug-experience", "27.2")["results"] if r["scenario"] == "save-restore")
+        self.assertEqual(row["result"], "fail")
+
+    def test_an_invalid_save_record_fails_save_restore(self):
+        sim = FakeSim(self.root)
+        original = sim.record
+        sim.record = lambda *a, **kw: dict(original(*a, **kw), unexpected=1) if kw.get("final") else original(*a, **kw)
+        code, lines, _ = self.main(["--only", "debug", "--runtime", "27", "--scenario", "save-restore"], sim)
+        self.assertEqual(code, 1)
+        self.assertTrue(any("save phase: record: unexpected" in line for line in lines), lines)
+        self.assertEqual(len(sim.commands("xcrun", "simctl", "launch")), 1)
+
+    # frames (T-U09-049)
+    def test_the_app_frame_is_kept_hashed_and_named_in_the_record(self):
+        code, lines, sim = self.main(["--only", "debug", "--runtime", "27", "--scenario", "reset", "save-restore"])
+        self.assertEqual(code, 0, lines)
+        out_dir = self.root / ".autonomy" / "verify" / self.RUN / "27.2"
+        frame = out_dir / "a98.debug-experience.reset.frame.rgba"
+        self.assertEqual(frame.read_bytes(), FakeSim.FRAME)
+        record = json.loads((out_dir / "a98.debug-experience.reset.json").read_text())
+        self.assertEqual(record["frames"][0]["path"],
+                         f".autonomy/verify/{self.RUN}/27.2/a98.debug-experience.reset.frame.rgba")
+        sealed = json.loads(json.dumps(record))
+        sealed["artifacts"]["record_sha256"] = None
+        self.assertEqual(record["artifacts"]["record_sha256"], hashlib.sha256(verify.dump(sealed).encode()).hexdigest())
+        self.assertFalse((sim.container / verify.EVIDENCE_DIR / self.RUN / "a98.debug-experience.reset.frame.rgba")
+                         .exists(), "the frame is removed from the container")
+        self.assertTrue((out_dir / "a98.debug-experience.save-restore.save.frame.rgba").is_file())
+        self.assertTrue((out_dir / "a98.debug-experience.save-restore.frame.rgba").is_file())
+
+    def test_a_frame_with_another_hash_or_no_frame_fails(self):
+        code, lines, _ = self.main(["--only", "debug", "--runtime", "27", "--scenario", "reset"],
+                                   FakeSim(self.root, frame=b"\x00" * 16))
+        self.assertEqual(code, 1)
+        self.assertTrue(any(line.startswith("FAIL: a98.debug-experience reset 27.2: frame: SHA-256 of ")
+                            for line in lines), lines)
+        code, lines, _ = self.main(["--only", "debug", "--runtime", "27", "--scenario", "reset", "--fresh"],
+                                   FakeSim(self.root, writes_frame=False))
+        self.assertEqual(code, 1)
+        self.assertIn("FAIL: a98.debug-experience reset 27.2: frame: no frame file a98.debug-experience.reset.frame.rgba "
+                      "beside the record", lines)
+        code, lines, _ = self.main(["--only", "a99.contract-sample", "--runtime", "27", "--scenario", "reset"],
+                                   FakeSim(self.root, writes_frame=False))
+        self.assertIn("FAIL: a99.contract-sample reset 27.2: frame: no frame file a99.contract-sample.reset.frame.rgba "
+                      "beside the record", lines)
+
+    def test_the_package_frame_comes_from_the_attachments(self):
+        code, lines, _ = self.main(["--only", "a99.contract-sample", "--runtime", "27", "--scenario", "completion"])
+        self.assertEqual(code, 0, lines)
+        out_dir = self.root / ".autonomy" / "verify" / self.RUN / "27.2"
+        self.assertEqual((out_dir / "a99.contract-sample.completion.frame.rgba").read_bytes(), FakeSim.FRAME)
+        record = json.loads((out_dir / "a99.contract-sample.completion.json").read_text())
+        self.assertEqual(record["frames"][0]["path"],
+                         f".autonomy/verify/{self.RUN}/27.2/a99.contract-sample.completion.frame.rgba")
+        self.assertEqual(verify.attachment_scenario(f"frame-a99.contract-sample-reset_0_{fake_udid(7)}.rgba",
+                                                    "a99.contract-sample", "frame", ".rgba"), "reset")
+        self.assertIsNone(verify.attachment_scenario("frame-a99.contract-sample-reset.json", "a99.contract-sample",
+                                                     "frame", ".rgba"))
+
+    # the bundle block (T-U09-048)
+    def test_failed_test_names_and_the_destination_reach_the_summary(self):
+        code, lines, sim = self.main(["--only", "a99.contract-sample", "--runtime", "27", "--scenario", "reset",
+                                      "completion"], FakeSim(self.root, failed_tests=1))
+        self.assertEqual(code, 1)
+        bundle = self.summary("a99.contract-sample", "27.2")["bundle"]
+        self.assertEqual(bundle["failed_tests"], ["testReset()"])
+        self.assertEqual(bundle["destination"], {"name": "iPhone 18 Pro", "os": "27.2"})
+        self.assertTrue(any("result bundle Failed" in line and "(testReset())" in line for line in lines))
+        record = json.loads((self.root / ".autonomy" / "verify" / self.RUN / "27.2"
+                             / "a99.contract-sample.reset.json").read_text())
+        self.assertTrue(record["artifacts"]["result_bundle"].startswith(".autonomy/xcresults/verify-a99"))
+
+    def test_failed_tests_parsing(self):
+        passed = json.dumps({"testNodes": [{"nodeType": "Test Plan", "name": "P", "result": "Passed", "children": [
+            {"nodeType": "Test Case", "name": "testReset()", "result": "Passed"}]}]})
+        self.assertEqual(verify.parse_failed_tests(passed), [])
+        failed = json.dumps({"testNodes": [{"nodeType": "Test Plan", "name": "P", "result": "Failed", "children": [
+            {"nodeType": "Test Suite", "name": "ScenarioRunnerTests", "result": "Failed", "children": [
+                {"nodeType": "Test Case", "name": "testReset()", "result": "Passed"},
+                {"nodeType": "Test Case", "name": "testSaveRestore()", "result": "Failed", "children": [
+                    {"nodeType": "Failure Message", "name": "XCTAssertEqual failed", "result": "Failed"}]}]}]}]})
+        self.assertEqual(verify.parse_failed_tests(failed), ["testSaveRestore()"])
+        for broken in ("", "not json", "[]", json.dumps({"testNodes": "x"})):
+            self.assertEqual(verify.parse_failed_tests(broken), [])
+
+    # single-process save-restore (T-U09-052)
+    def test_a_single_process_save_restore_row_says_so(self):
+        self.main(["--only", "a99.contract-sample", "debug", "--runtime", "27", "--scenario", "save-restore"])
+        row = next(r for r in self.summary("a99.contract-sample", "27.2")["results"] if r["scenario"] == "save-restore")
+        self.assertEqual(row["process"], "single")
+        row = next(r for r in self.summary("a98.debug-experience", "27.2")["results"] if r["scenario"] == "save-restore")
+        self.assertNotIn("process", row)
+
+    # --audits with --only (T-U09-052)
+    def test_audits_with_only_audit_only(self):
+        code, lines, sim = self.main(["--only", "debug", "--audits"])
+        self.assertEqual(code, 0, lines)
+        self.assertFalse(any(c[0][:2] in (["xcrun", "simctl"], ["xcodebuild", "build"]) for c in sim.calls))
+        self.assertFalse(any("xcodebuild_package.py" in " ".join(c[0]) for c in sim.calls))
+        self.assertIn("SKIP: reducer-bypass (nothing to audit yet: 0 registered experiences)", lines)
+        self.assertFalse((self.root / "docs" / "verification").exists())
+        code, lines, sim = self.main(["--only", "debug", "--audits", "--dry-run"])
+        self.assertEqual((code, sim.calls), (0, []))
+        self.assertTrue(any("scoped to a98.debug-experience" in line for line in lines))
+        self.assertFalse(any("simctl launch" in line for line in lines))
 
     # self-test
     def test_self_test_with_a_runtime_detects_the_lossy_record(self):
@@ -4139,15 +4422,32 @@ class AuditTests(unittest.TestCase):
             'Apps/VisualCore/Resources/Localizable.xcstrings: "TODO" in the string catalog (work marker)']))
 
     def test_raster_files(self):
+        icons = verify.APP_ICON_SET
+        self.write("scripts/icon.py", "# generator\n")
         stray = self.write("Apps/VisualCore/Resources/x.png", b"png")
-        good = self.write("Apps/VisualCore/Resources/icon.png", b"generated")
-        bad = self.write("Apps/VisualCore/Resources/bad.jpg", b"generated too")
+        good = self.write(icons + "icon.png", b"generated")
+        bad = self.write(icons + "bad.jpg", b"generated too")
+        elsewhere = self.write("Apps/VisualCore/Resources/art.png", b"art")
+        no_gen = self.write(icons + "nogen.png", b"no generator")
+        missing_gen = self.write(icons + "gone.png", b"gone generator")
+        outside_gen = self.write(icons + "out.png", b"outside generator")
+        sha = lambda b: hashlib.sha256(b).hexdigest()
         self.write("Catalog/generated-art.json", json.dumps({"schema": 1, "files": [
-            {"path": good, "sha256": hashlib.sha256(b"generated").hexdigest(), "generator": "scripts/icon.py"},
-            {"path": bad, "sha256": "0" * 64, "generator": "scripts/icon.py"}]}))
-        self.assertEqual(verify.audit_raster(self.root, [stray, good, bad, "Apps/VisualCore/App/a.swift"]), [
+            {"path": good, "sha256": sha(b"generated"), "generator": "scripts/icon.py"},
+            {"path": bad, "sha256": "0" * 64, "generator": "scripts/icon.py"},
+            {"path": elsewhere, "sha256": sha(b"art"), "generator": "scripts/icon.py"},
+            {"path": no_gen, "sha256": sha(b"no generator")},
+            {"path": missing_gen, "sha256": sha(b"gone generator"), "generator": "scripts/gone.py"},
+            {"path": outside_gen, "sha256": sha(b"outside generator"), "generator": "../../etc/hosts"}]}))
+        found = verify.audit_raster(self.root, [stray, good, bad, elsewhere, no_gen, missing_gen, outside_gen,
+                                                "Apps/VisualCore/App/a.swift"])
+        self.assertEqual(found, [
             "Apps/VisualCore/Resources/x.png: raster file not listed in Catalog/generated-art.json",
-            "Apps/VisualCore/Resources/bad.jpg: SHA-256 differs from Catalog/generated-art.json"])
+            f"{bad}: SHA-256 differs from Catalog/generated-art.json",
+            f"{elsewhere}: a generated raster outside {icons}",
+            f"{no_gen}: generator None is not a file of the repository",
+            f"{missing_gen}: generator 'scripts/gone.py' is not a file of the repository",
+            f"{outside_gen}: generator '../../etc/hosts' is not a file of the repository"])
 
     def test_completion_expected_without_actions_and_an_undeclared_control(self):
         manifest = {"experience": "a01.x", "controls": ["tap"], "scenarios": [
@@ -4175,16 +4475,24 @@ class AuditTests(unittest.TestCase):
                                    {"id": "a01.creative", "design": {"fixtures": ["a", "b"]}}]}
         names = verify.STANDARD + ["full-playthrough", "hero"]
         def manifest(ident, extra, levels=0):
-            return {"experience": ident, "content": {"levels": levels},
+            # A `content` block in a manifest is not read: levels come from the runtime catalog.
+            return {"experience": ident, "content": {"levels": 1000},
                     "scenarios": [{"name": n} for n in names + extra]}
-        short = manifest(game, [f"acceptance-{i}" for i in range(79)], 100)
-        full = manifest(game, [f"acceptance-{i}" for i in range(80)], 100)
-        self.assertEqual(verify.audit_content([short], [game], catalog),
+        runtime = lambda levels: {"experiences": [{"id": game, "content": {"levels": levels}},
+                                                  {"id": "a01.creative", "content": None}]}
+        short = manifest(game, [f"acceptance-{i}" for i in range(79)])
+        full = manifest(game, [f"acceptance-{i}" for i in range(80)])
+        self.assertEqual(verify.audit_content([short], [game], catalog, runtime(100)),
                          [f"{game}: 79 acceptance below the planning catalog's 80"])
-        self.assertEqual(verify.audit_content([full], [game], catalog), [])
-        self.assertEqual(verify.audit_content([manifest(game, [f"acceptance-{i}" for i in range(80)], 99)], [game],
-                                              catalog), [f"{game}: 99 levels below the planning catalog's 100"])
-        self.assertEqual(verify.audit_content([manifest("a01.creative", ["fixture-a"])], ["a01.creative"], catalog),
+        self.assertEqual(verify.audit_content([full], [game], catalog, runtime(100)), [])
+        self.assertEqual(verify.audit_content([full], [game], catalog, runtime(99)),
+                         [f"{game}: 99 levels below the planning catalog's 100"])
+        self.assertEqual(verify.audit_content([full], [game], catalog, {"experiences": [{"id": game, "content": None}]}),
+                         [f"{game}: 0 levels below the planning catalog's 100"])
+        self.assertEqual(verify.runtime_levels(runtime(7), "a01.creative"), 0)
+        self.assertEqual(verify.runtime_levels(runtime(7), game), 7)
+        self.assertEqual(verify.audit_content([manifest("a01.creative", ["fixture-a"])], ["a01.creative"], catalog,
+                                              runtime(0)),
                          ["a01.creative: 1 fixtures below the planning catalog's 2"])
         self.assertEqual(verify.audit_content([], ["a01.creative"], catalog),
                          ["a01.creative: registered without a scenario manifest"])
@@ -4193,6 +4501,60 @@ class AuditTests(unittest.TestCase):
         self.assertEqual(verify.content_requirement(row)["acceptance"], 80)
         self.assertEqual(verify.content_requirement(row)["faults"], 50)
         self.assertEqual(verify.content_requirement(row)["levels"], 100)
+
+    def registered_game(self, levels, acceptance):
+        game = "r02-g01.aurora-loom"
+        names = verify.STANDARD + ["full-playthrough", "hero"] + [f"acceptance-{i}" for i in range(acceptance)]
+        self.write("Catalog/scenarios/game.json", json.dumps({
+            "schema": 1, "experience": game, "kind": "game", "controls": ["tap"],
+            "scenarios": [{"name": n, "entries": [{"steps": 1, "action": {"control": "tap"}}], "expect": {}}
+                          for n in names]}))
+        self.write("Catalog/registrations.json", json.dumps({"schema": 1, "registrations": {
+            game: {"manifest": "Catalog/scenarios/game.json"}, "a01.creative": {"manifest": "Catalog/none.json"},
+            "a02.without-manifest": {}}}))
+        self.write("Catalog/experiences.json", json.dumps({"schema": 1, "experiences": [
+            {"id": game, "content": {"levels": levels}}, {"id": "a01.creative", "content": None}]}))
+        self.write("docs/catalog/experience-catalog.json", json.dumps({"experiences": [
+            {"id": game, "acceptance_scenarios": {"rows": 80}, "level_manifest": {"rows": 100},
+             "design": {"fixtures": []}}]}))
+        return game
+
+    def audit(self, only=None):
+        lines: list[str] = []
+        sim = lambda argv, timeout, **kw: (0, "", "")
+        return verify.run_audits(self.root, sim, lines.append, only=only), lines
+
+    def test_registered_manifests_are_read_from_their_registration(self):
+        game = self.registered_game(levels=100, acceptance=79)
+        code, lines = self.audit()
+        self.assertEqual(code, 1)
+        self.assertIn("FAIL: content-counts: 3 findings", lines)
+        self.assertIn(f"    {game}: 79 acceptance below the planning catalog's 80", lines)
+        self.assertIn("    a02.without-manifest: registered without a scenario manifest", lines)
+        self.assertTrue(any(line.startswith("    a01.creative: standard scenarios missing") for line in lines))
+        self.assertTrue(any(line.startswith("    a01.creative: manifest Catalog/none.json cannot be read")
+                            for line in lines), lines)
+        code, lines = self.audit(only=[game])
+        self.assertEqual(code, 1)
+        self.assertIn("FAIL: content-counts: 1 findings", lines)
+        self.assertIn("PASS: reducer-bypass (1 manifests, 0 records)", lines)
+
+    def test_levels_come_from_the_runtime_catalog(self):
+        game = self.registered_game(levels=99, acceptance=80)
+        code, lines = self.audit(only=[game])
+        self.assertIn(f"    {game}: 99 levels below the planning catalog's 100", lines)
+        game = self.registered_game(levels=100, acceptance=80)
+        code, lines = self.audit(only=[game])
+        self.assertEqual(code, 0, lines)
+        self.assertIn("PASS: content-counts (1 registered experiences)", lines)
+
+    def test_nothing_registered_skips_the_bypass_and_content_audits(self):
+        self.write("Catalog/registrations.json", json.dumps({"schema": 1, "registrations": {}}))
+        code, lines = self.audit()
+        self.assertEqual(code, 0, lines)
+        self.assertIn("SKIP: reducer-bypass (nothing to audit yet: 0 registered experiences)", lines)
+        self.assertIn("SKIP: content-counts (nothing to audit yet: 0 registered experiences)", lines)
+        self.assertFalse(any(line.startswith(("PASS: reducer-bypass", "PASS: content-counts")) for line in lines))
 
     def test_the_audits_ignore_untracked_build_products_and_unshipped_paths(self):
         tracked = self.write("Apps/VisualCore/App/A.swift", "let a = 1\n")
@@ -4226,7 +4588,11 @@ class AuditTests(unittest.TestCase):
     def test_todays_repository_passes(self):
         lines: list[str] = []
         self.assertEqual(verify.run_audits(ROOT_DIR, verify.system_run, lines.append), 0, lines)
-        self.assertEqual(sum(line.startswith("PASS: ") for line in lines), 6)
+        registered = verify.registered_ids(ROOT_DIR)
+        self.assertEqual(sum(line.startswith("PASS: ") for line in lines), 6 if registered else 4)
+        if not registered:
+            self.assertIn("SKIP: reducer-bypass (nothing to audit yet: 0 registered experiences)", lines)
+            self.assertIn("SKIP: content-counts (nothing to audit yet: 0 registered experiences)", lines)
         art = json.loads((ROOT_DIR / "Catalog" / "generated-art.json").read_text())
         self.assertEqual(art, {"schema": 1, "files": []})
 

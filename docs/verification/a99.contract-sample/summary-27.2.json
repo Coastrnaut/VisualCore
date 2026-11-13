@@ -1,67 +1,79 @@
 {
   "bundle": {
+    "destination": {
+      "name": "iPhone 18 Pro",
+      "os": "27.2"
+    },
     "failed": 0,
-    "passed": 9,
+    "failed_tests": [],
+    "passed": 1,
     "result": "Passed",
-    "total": 9
+    "total": 1
   },
-  "commit": "0876b9f2afb3e0f46aedd0fac8d93aa045b6d1ab",
+  "commit": "deb74e8505f323e6fabe8e8edc5ea22eb25c12cd",
   "device_type": "com.apple.CoreSimulator.SimDeviceType.iPhone-18-Pro",
   "experience": "a99.contract-sample",
   "results": [
     {
-      "commit": "0876b9f2afb3e0f46aedd0fac8d93aa045b6d1ab",
-      "record_sha256": "6cbff700ca202cfcff4283db9c6d21c2ce5cd41fc841cec03feea6c63aa43453",
+      "commit": "deb74e8505f323e6fabe8e8edc5ea22eb25c12cd",
+      "record_sha256": "4595deb810fc432d84156abc32060f63ae5746e30d14f8b8569ca15ea40a258b",
       "result": "pass",
       "scenario": "launch-first-frame"
     },
     {
-      "commit": "0876b9f2afb3e0f46aedd0fac8d93aa045b6d1ab",
-      "record_sha256": "9029d5c9dfc465171c8252eb3dc0ba751a4296ab5d6dae445ee5ea6634b7ac38",
+      "commit": "deb74e8505f323e6fabe8e8edc5ea22eb25c12cd",
+      "record_sha256": "8c6f5629a4df31fbfc3c535f8f893b36cc0590668b33d67d376cf352fcf7f117",
       "result": "pass",
       "scenario": "input-response"
     },
     {
-      "commit": "0876b9f2afb3e0f46aedd0fac8d93aa045b6d1ab",
-      "record_sha256": "1846155fc4f35c2fb763af2831ba7771e4af0cc019bf1de32a5be85a89bc6117",
+      "commit": "deb74e8505f323e6fabe8e8edc5ea22eb25c12cd",
+      "record_sha256": "5b2fef320d3d81ce8524bf4ad1db43c7d241d83a0c639484028582802755b74b",
       "result": "pass",
       "scenario": "completion"
     },
     {
-      "commit": "0876b9f2afb3e0f46aedd0fac8d93aa045b6d1ab",
-      "record_sha256": "5f4979a7561b9e312a1306e97dbf1b077a1c9230620be30a5ee1afd1b4ad8415",
+      "commit": "deb74e8505f323e6fabe8e8edc5ea22eb25c12cd",
+      "record_sha256": "0e538f2a4c66aaa84f540ebe48bc8f0fbf655fe25a3716eb582dc35d75257350",
       "result": "pass",
       "scenario": "rejection"
     },
     {
-      "commit": "0876b9f2afb3e0f46aedd0fac8d93aa045b6d1ab",
-      "record_sha256": "9f07c1aefe7772be16cc45a54722d9d86ce146ae150f1a0373defcbe68485c4c",
+      "commit": "deb74e8505f323e6fabe8e8edc5ea22eb25c12cd",
+      "process": "single",
+      "record_sha256": "15e140f543a5b55b4e8d245b33fdffad92c4871d60e3eee750224acceec024d1",
       "result": "pass",
       "scenario": "save-restore"
     },
     {
-      "commit": "0876b9f2afb3e0f46aedd0fac8d93aa045b6d1ab",
-      "record_sha256": "c0d1be9346c6b3facde0162434b78589e038c33a3825bf34068dd5cbf765bd44",
+      "commit": "deb74e8505f323e6fabe8e8edc5ea22eb25c12cd",
+      "record_sha256": "ac853d655a024894b39a2e1382e579d83b5d04a1590b51506488475e3e27f6e6",
       "result": "pass",
       "scenario": "reset"
     },
     {
-      "commit": "0876b9f2afb3e0f46aedd0fac8d93aa045b6d1ab",
-      "record_sha256": "d4dc6ed966d65e11a48afdf87c2797eeb10191596b45effd347c5da9a3c87574",
+      "commit": "deb74e8505f323e6fabe8e8edc5ea22eb25c12cd",
+      "record_sha256": "de9e36d36d65d5742c3b8fb920a3a0423e64bb44230406ef80337308b4d76718",
       "result": "pass",
       "scenario": "suspend-resume"
     },
     {
-      "commit": "0876b9f2afb3e0f46aedd0fac8d93aa045b6d1ab",
-      "record_sha256": "783d8b36e9af23cfe1b37120f123720a66dc3096b51016238cd80c8a7071c94c",
+      "commit": "deb74e8505f323e6fabe8e8edc5ea22eb25c12cd",
+      "record_sha256": "286e596d5c8d0ee30e5ac342e7a6b754b1c512427f1c95e70f248344db6896fe",
       "result": "pass",
       "scenario": "teardown-reentry"
     },
     {
-      "commit": "0876b9f2afb3e0f46aedd0fac8d93aa045b6d1ab",
-      "record_sha256": "25d2522298c9f28c8306ea373dcafed343bd320b6cc125b69b9eb8901bf89fa8",
+      "commit": "deb74e8505f323e6fabe8e8edc5ea22eb25c12cd",
+      "record_sha256": "5bd05bb5f42998047c39c15eca490e0b8c6dca5cb5f8fce8a2c5ed735aec7ca6",
       "result": "pass",
       "scenario": "cancel-prepare"
+    },
+    {
+      "commit": "deb74e8505f323e6fabe8e8edc5ea22eb25c12cd",
+      "record_sha256": "3edce3f8cee0a0fd1c46048cf2a754fb296a361b6c0bbbfdefb5e666f0302394",
+      "result": "pass",
+      "scenario": "endurance"
     }
   ],
   "runtime": "27.2",

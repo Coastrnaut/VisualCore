@@ -73,3 +73,22 @@ plain values, and only the runner reads them.
 - `scripts/check_evidence.py <record.json…>` and `--self-test`. Exit 0 or 1.
 - `scripts/xcodebuild_app.py --result-name NAME` (new option): writes `.autonomy/xcresults/NAME.xcresult`.
 - `scripts/check_release_symbols.py` and `scripts/check_experience_symbols.py`: new names in their lists.
+
+## As built (2026-11-12)
+
+- `ScenarioRunner.init(session:)` and `run(_ spec:request:phase:savedSnapshot:expectedDigest:) async ->
+  ScenarioRunResult`. `ScenarioRunResult` carries the observation, the snapshot of a save phase, the frame's RGBA
+  bytes, the checked probes and `process` (`single` or `two-launch`). The request maker is
+  `(seed, snapshot) -> ExperienceOpenRequest`.
+- `ScenarioManifestError` also has `unknownSchema(Int)` (a schema of 0 or less).
+- The validator requires at least one action in `input-response`, `completion` and `rejection`, an expected
+  outcome in `completion`, and an expected result for every action in `rejection`. A rejection or fault scenario
+  may send unknown controls and wrong value counts when it expects them rejected.
+- `FrameColorClass` (release) and `FrameBounds` (automation builds) exist beside `FrameProbe` and `FrameChecks`.
+- `EvidenceRecord.observed(...)` builds the run's part of a record. `EvidenceRecord.environmentKind` and
+  `automationCompiled` follow the build.
+- `Experience.runScenario(_:)` (automation builds) and `Experience.frameProbes` serve the runner.
+  `ExperienceRegistration` carries `controls` and, in automation builds, `scenarioManifest`.
+- In the app, `ScenarioHostView` lives in `Automation/ScenarioLaunch.swift`. The debug experience runs under
+  `a98.debug-experience`. A manifest is validated before a run, and a damaged one gives
+  `request.invalid-manifest` with exit 2. The frame is written beside the record as `<id>.<scenario>.frame.rgba`.

@@ -70,7 +70,8 @@ Answered by the lead under the owner's standing delegation; the recommended opti
 - Q: How are the sample experience (tests only) and the app's debug experience verified, since neither is a
   catalog experience? → A: `--only a99.contract-sample` runs the scenarios through the package tests on each
   runtime, whose result bundles the driver checks. The app path is proven with the debug experience under its
-  first fixture id, which the runner registers by itself in builds made for testing, with no launch argument.
+  own id `a98.debug-experience` (not a catalog id; corrected at implementation from "its first fixture id"),
+  which the runner registers by itself in builds made for testing, with no launch argument.
   Real experiences run in the app path.
 
 ## Absorbed source requirements

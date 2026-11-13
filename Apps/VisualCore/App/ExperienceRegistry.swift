@@ -28,6 +28,13 @@ struct ExperienceRegistration: Sendable {
     /// Runs the migration check of the experience's core (feature 191, FR-U05-051): a text for every earlier
     /// schema version without a stored example and for every example that does not restore to its digest.
     let migrationProblems: @Sendable () async -> [String]
+    /// The controls of the experience's core, for checking its scenario manifest.
+    let controls: [ExperienceControl]
+    #if DEBUG || VISUALCORE_AUTOMATION
+    /// The scenarios the verification runner plays for this experience (feature 195); nil when it has none yet,
+    /// so that it cannot be verified.
+    var scenarioManifest: ScenarioManifest?
+    #endif
 
     /// Registers the experience `id` whose state is the core `core`. `examples` holds one stored snapshot of
     /// every schema version below the core's current one; a core with schema 1 needs none.
@@ -35,6 +42,7 @@ struct ExperienceRegistration: Sendable {
                                make: @escaping @MainActor (ExperienceLaunch) -> any Experience) {
         self.id = id
         self.make = make
+        controls = Core.controls
         migrationProblems = { await SnapshotMigrationCheck.problems(for: core, id: id, examples: examples) }
     }
 }

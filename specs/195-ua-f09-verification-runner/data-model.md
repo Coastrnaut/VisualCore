@@ -98,3 +98,14 @@ Validator rules (`scripts/check_evidence.py`):
 - Request keys (environment): `VISUALCORE_AUTORUN=scenario`, `VISUALCORE_AUTORUN_EXPERIENCE=<id>`,
   `VISUALCORE_AUTORUN_SCENARIO=<name>`, `VISUALCORE_AUTORUN_SEED=<decimal>`, `VISUALCORE_AUTORUN_RUN=<run id>`,
   `VISUALCORE_AUTORUN_PHASE=save|restore`, `VISUALCORE_AUTORUN_EXPECTED_DIGEST=<hex>` (the restore phase).
+
+## 6. As built (2026-11-12)
+
+- Request keys and the record location are as in section 5. A request error goes to the run's own folder when its
+  run id is usable, and to `invalid-request/request-error.json` otherwise.
+- The frame is kept beside the record as raw RGBA (rows bottom-up): `<id>.<scenario>.frame.rgba` in the app, and
+  the attachment `frame-<id>-<scenario>.rgba` in the package tests. The driver copies it to
+  `.autonomy/verify/<run>/<runtime>/`, checks its hash and sets `frames[0].path`.
+- Run state entries carry `commit` and `binary_sha256`. A pass is skipped only at the same commit and binary.
+- `ContentRequirement.levels` is not used by the Swift validator: a game's levels come from the runtime catalog's
+  `content.levels`, which the driver's audit reads.

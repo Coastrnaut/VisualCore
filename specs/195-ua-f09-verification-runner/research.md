@@ -215,7 +215,8 @@ scenario and the expectation for that case. **Rationale**: FR-U09-025, SC-U09-00
   each, after a warm-up of 120 frames. A wall-clock loop with yields between frames grew the footprint by hundreds of
   megabytes; the block pattern of UA-F06 does not.
 - Observation: a scissored clear on every frame grows the memory footprint on the iOS 26.5 simulator (9.3 MB over
-  36,000 frames in the UA-F06 endurance test; flat without it). The sample presenter therefore draws its contrasting
+  36,000 frames in the UA-F06 endurance test; flat without it; the same 9.3 MB appeared on the iOS 27.2 simulator over the 36,000 frames of the
+  driver's endurance run). The sample presenter therefore draws its contrasting
   corner mark only when a verification test asks for it. The renderer is not changed.
 - `MutatingRejection` cannot be observed through a session, because the engine discards a rejected action's
   changes; the deliberately failing state change of the runner tests is `WrongReset`.
@@ -229,3 +230,13 @@ scenario and the expectation for that case. **Rationale**: FR-U09-025, SC-U09-00
   range; the identifier is therefore in the history of `9ed2fd0` on `origin/main`. History is never rewritten.
   The scan now reads every outgoing commit on its own (a test plants an identifier that one commit adds and the
   next removes), and `.autonomy/verify/` is ignored. The identifier names a local simulator, not hardware.
+- The debug experience runs under its own id `a98.debug-experience`, not under a fixture id (correcting
+  clarification 5 and R4). The driver's alias `debug` therefore does not depend on the fixture catalog's order.
+- The scenario screen shows one line of text and keeps the session's host view out of the window. Without a
+  display link, every frame is drawn by the runner with the fixed delta of `renderOneFrame`, which makes runs
+  deterministic (correcting R4's "one window with the session's host view").
+- Result bundles on the package path come from `xcodebuild_package.py` (`--result-name`). The app path collects
+  records, not bundles; `xcodebuild_app.py --result-name` exists for the app's test runs.
+- Accepted at convergence run 1: suspend-resume cannot express time away through `renderOneFrame`'s fixed delta, so
+  the engine's catch-up limit rests on its own host tests. That a reset clears only its own storage rests on the
+  UA-F05 tests. `shader_compilation_ms` is the scene's set-up time, in which the shaders are compiled.

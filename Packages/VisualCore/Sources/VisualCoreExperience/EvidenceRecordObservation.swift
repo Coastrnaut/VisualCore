@@ -5,6 +5,15 @@
 import Foundation
 
 extension EvidenceRecord {
+    /// Whether this build was made with `VISUALCORE_AUTOMATION` (a plain debug build is not).
+    public static var automationCompiled: Bool {
+        #if VISUALCORE_AUTOMATION
+        true
+        #else
+        false
+        #endif
+    }
+
     /// `simulator` in a simulator build, `device` otherwise.
     public static var environmentKind: String {
         #if targetEnvironment(simulator)
@@ -47,7 +56,7 @@ extension EvidenceRecord {
         return EvidenceRecord(experience: experience.rawValue, code: code, scenario: observation.scenario,
                               seed: String(observation.seed), result: result, run: Run(id: run),
                               environment: Environment(kind: Self.environmentKind),
-                              configuration: Configuration(build: build, automation: true, qualityTier: qualityTier,
+                              configuration: Configuration(build: build, automation: automationCompiled, qualityTier: qualityTier,
                                                            entitlement: "none", process: process),
                               steps: steps, digests: digests, frames: frames, timing: timing, pacing: nil,
                               resources: resources, thermalState: thermalState, lowPower: lowPower, battery: nil,

@@ -194,20 +194,43 @@ enum DebugExperience {
     /// The scenarios of the debug experience (feature 195): the nine standard ones as taps. Expected digests are
     /// left to the runner's own checks (a rejection keeps the digest, a restore gives the final digest, a reset the
     /// initial one); the outcome comes from the core.
-    static func manifest(for id: ExperienceID, seed: UInt64 = 7) -> ScenarioManifest {
+    /// The seed of the manifest's scenarios.
+    static let manifestSeed: UInt64 = 7
+    /// The digest after a preparation with `manifestSeed`, committed (computed on a bare engine).
+    static let initialDigest = "9a83ada71d210cef70879237bb8a69987c50df9eba91300acb019d75f4a71edd"
+    /// The digests after each of four taps, each six steps after the last, committed.
+    static let tapDigests = [
+        "d6cea08220decbb31d8780d17e7fcb80f2e3c927c940b7b2eac7a1e3727b4e81",
+        "91f0f550379ed5412908d3567fa89a26a93f31a43c3edfe652f8cda149b12a06",
+        "e51e46b96c37dbbd0341e3293d8749826b2ed5fa6fac2d46c18d936bedb77125",
+        "fc7c2393a7a3b77a6af129631f97b35f088018c0c0d3f97987b098c50ca96b99",
+    ]
+
+    static func manifest(for id: ExperienceID, seed: UInt64 = manifestSeed) -> ScenarioManifest {
         let tap = ScriptedAction("tap")
-        let taps = (0..<4).map { _ in ScenarioStep(steps: 6, action: tap, result: "accepted") }
+        // The committed digests hold for the manifest seed only.
+        let committed = seed == manifestSeed
+        let taps = (0..<4).map { index in
+            ScenarioStep(steps: 6, action: tap, result: "accepted", digest: committed ? tapDigests[index] : nil)
+        }
+        let initial = committed ? initialDigest : nil
         let specs = [
-            ScenarioSpec(name: "launch-first-frame", seed: seed, entries: []),
-            ScenarioSpec(name: "input-response", seed: seed, entries: taps),
+            ScenarioSpec(name: "launch-first-frame", seed: seed, entries: [],
+                         expect: ScenarioExpectations(initialDigest: initial)),
+            ScenarioSpec(name: "input-response", seed: seed, entries: taps,
+                         expect: ScenarioExpectations(initialDigest: initial,
+                                                      finalDigest: committed ? tapDigests.last : nil)),
             ScenarioSpec(name: "completion", seed: seed, entries: Array(taps.prefix(tapsToComplete)),
                          expect: ScenarioExpectations(outcome: "taps-counted")),
             ScenarioSpec(name: "rejection", seed: seed, entries: [
                 ScenarioStep(steps: 0, action: ScriptedAction("tap", [1]), result: "action.wrong-value-count"),
                 ScenarioStep(steps: 0, action: ScriptedAction("jump"), result: "action.unknown-control"),
             ]),
-            ScenarioSpec(name: "save-restore", seed: seed, entries: taps),
-            ScenarioSpec(name: "reset", seed: seed, entries: taps, expect: ScenarioExpectations(resetDigest: true)),
+            ScenarioSpec(name: "save-restore", seed: seed, entries: taps,
+                         expect: ScenarioExpectations(initialDigest: initial,
+                                                      finalDigest: committed ? tapDigests.last : nil)),
+            ScenarioSpec(name: "reset", seed: seed, entries: taps,
+                         expect: ScenarioExpectations(initialDigest: initial, resetDigest: true)),
             ScenarioSpec(name: "suspend-resume", seed: seed, entries: []),
             ScenarioSpec(name: "teardown-reentry", seed: seed, entries: [], cycles: 5),
             ScenarioSpec(name: "cancel-prepare", seed: seed, entries: []),

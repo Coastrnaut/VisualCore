@@ -18,6 +18,9 @@ public enum ScenarioManifestValidator {
     public static let cycleRange = 1...50
     /// The legal number of seconds of an endurance scenario.
     public static let secondRange = 1...600
+    /// The scenarios that must send at least one action.
+    public static let scenariosWithActions: Set<String> = ["input-response", "completion", "rejection"]
+
     /// The scenarios in which an expectation needs no action before it.
     public static let scenariosWithoutActions: Set<String> = ["launch-first-frame", "reset"]
 
@@ -161,6 +164,19 @@ public enum ScenarioManifestValidator {
         }
         if spec.expect.outcome != nil, !actionSeen, !needsNoAction {
             problems.append("\(label): outcome expected without an action before it")
+        }
+        // What the three action scenarios must contain (convergence T-U09-044): a scenario of actions without an
+        // action, or a completion that expects no outcome, would pass without proving anything.
+        if Self.scenariosWithActions.contains(spec.name), !actionSeen {
+            problems.append("\(label): no action")
+        }
+        if spec.name == "completion", spec.expect.outcome == nil {
+            problems.append("\(label): no outcome expected")
+        }
+        if spec.name == "rejection" {
+            for (index, entry) in spec.entries.enumerated() where entry.action != nil && entry.result == nil {
+                problems.append("\(label): entry \(index + 1): no expected result")
+            }
         }
         return problems
     }

@@ -29,12 +29,17 @@ enum ScenarioLaunch {
     /// Where the records go, below the app's Documents folder.
     static let evidenceFolder = "visualcore-evidence"
 
-    /// The experiences a run can open: the real registry's experiences that carry a manifest and, in debug
-    /// builds, the debug experience.
-    static func targets() -> [ExperienceID: ScenarioTarget] {
+    /// The experiences a run can open: every experience of `registry` that carries a scenario manifest (its code
+    /// is its catalog code, for example `A01`) and, in debug builds, the debug experience.
+    static func targets(registry: [ExperienceRegistration] = ExperienceRegistry.all) -> [ExperienceID: ScenarioTarget] {
         var found: [ExperienceID: ScenarioTarget] = [:]
+        for registration in registry {
+            guard let manifest = registration.scenarioManifest else { continue }
+            found[registration.id] = ScenarioTarget(id: registration.id, code: registration.id.code.text,
+                                                    registration: registration, manifest: manifest)
+        }
         #if DEBUG
-        if let debugID {
+        if let debugID, found[debugID] == nil {
             found[debugID] = ScenarioTarget(id: debugID, code: "debug",
                                             registration: DebugExperience.registration(for: debugID),
                                             manifest: DebugExperience.manifest(for: debugID))
@@ -64,15 +69,26 @@ enum ScenarioLaunch {
         case .success(let value):
             request = value
         case .failure(let error):
+            // The record goes to the run's own folder when the run id is usable, so that the driver finds it.
+            let run = environment[ScenarioRequest.runKey].flatMap { isRunID($0) ? $0 : nil } ?? "invalid-request"
             return write(errorRecord(experience: nil, scenario: environment[ScenarioRequest.scenarioKey],
-                                     run: "invalid-request", message: error.code),
-                         run: "invalid-request", name: "request-error", documents: documents, code: 2)
+                                     run: run, message: error.code),
+                         run: run, name: "request-error", documents: documents, code: 2)
         }
         let name = "\(request.experience.rawValue).\(request.scenario)"
         guard let target = targets[request.experience] else {
             return write(errorRecord(experience: request.experience, scenario: request.scenario, run: request.run,
                                      message: "request.unknown-experience"),
                          run: request.run, name: name, documents: documents, code: 2)
+        }
+        // The manifest is checked before anything runs (FR-U09-002): a damaged manifest is an error, never a run.
+        let problems = ScenarioManifestValidator.problems(target.manifest, controls: target.registration.controls,
+                                                          content: ContentRequirement())
+        guard problems.isEmpty else {
+            var record = errorRecord(experience: request.experience, scenario: request.scenario, run: request.run,
+                                     message: "request.invalid-manifest")
+            record?.failures += problems
+            return write(record, run: request.run, name: name, documents: documents, code: 2)
         }
         guard var spec = target.manifest.scenarios.first(where: { $0.name == request.scenario }) else {
             return write(errorRecord(experience: request.experience, scenario: request.scenario, run: request.run,
@@ -116,7 +132,23 @@ enum ScenarioLaunch {
                                              run: request.run, build: buildConfiguration, process: result.process,
                                              qualityTier: nil, failures: failures, probes: result.probes,
                                              thermalState: thermalState, lowPower: ProcessInfo.processInfo.isLowPowerModeEnabled)
-        return write(record, run: request.run, name: name, documents: documents, code: failures.isEmpty ? 0 : 1)
+        let outcome = write(record, run: request.run, name: name, documents: documents, code: failures.isEmpty ? 0 : 1)
+        // The frame the record's hash names, beside the record (raw RGBA, rows bottom-up), for the driver to keep.
+        if let frame = result.frame, let file = outcome.record {
+            let frameFile = file.deletingLastPathComponent().appendingPathComponent(name + ".frame.rgba")
+            do {
+                try Data(frame.pixels).write(to: frameFile, options: .atomic)
+            } catch {
+                return Outcome(exitCode: 2, record: file)
+            }
+        }
+        return outcome
+    }
+
+    /// Whether `text` can name a run folder: 1 to 64 characters of `A-Z a-z 0-9 -`.
+    static func isRunID(_ text: String) -> Bool {
+        !text.isEmpty && text.count <= 64
+            && text.unicodeScalars.allSatisfy { $0.isASCII && (CharacterSet.alphanumerics.contains($0) || $0 == "-") }
     }
 
     // MARK: Records

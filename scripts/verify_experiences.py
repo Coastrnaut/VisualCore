@@ -15,19 +15,37 @@ then on each runtime `scripts/xcodebuild_package.py` runs the scenario tests of 
 `-only-testing` id per scenario, into `.autonomy/xcresults/verify-<id>-<runtime>-<run>.xcresult`. The driver then
 checks that bundle itself (`xcrun xcresulttool get test-results summary`: `result` Passed and no failed test) and
 exports its attachments (`xcrun xcresulttool export attachments`); each attachment named
-`evidence-a99.contract-sample-<scenario>.json` is a record. `endurance` is its own test run
-(`ScenarioRunnerTests/testEnduranceKeepsResourcesFlat`), which attaches no record: its result is the result bundle
-alone, and the summary says so; no record is made up for it. `debug` is the app's debug experience
+`evidence-a99.contract-sample-<scenario>.json` is a record, and each attachment named
+`frame-a99.contract-sample-<scenario>.rgba` is the frame that record hashes. `endurance` is its own test run
+(`ScenarioRunnerTests/testEnduranceKeepsResourcesFlat`, 600 simulated seconds) whose record
+`evidence-a99.contract-sample-endurance.json` is validated and counted like the others. The test command runs in
+its own process group, and the whole group is killed when its limit (540 s) passes. The summary's `bundle` block
+carries the bundle's result, counts, destination (name and OS from the summary's devicesAndConfigurations) and the
+names of its failed tests (`xcrun xcresulttool get test-results tests`: every node of type "Test Case" whose result
+is Failed). `debug` is the app's debug experience
 (`a98.debug-experience`, code `debug`); it and every id registered in `Catalog/registrations.json` take the app path:
 one unsigned Debug build per driver run into `Build/DerivedData/verify` (after `release_check.py --only xcodegen`),
 then per runtime the simulator is chosen by runtime and kind, booted (limit 300 s), the app installed, and each
 scenario launched with `simctl launch --terminate-running-process` and the `SIMCTL_CHILD_VISUALCORE_AUTORUN*`
 environment. The driver waits for `Documents/visualcore-evidence/<run>/<id>.<scenario>.json` in the app's data
 container (limit `--max-seconds`, default 120; endurance 600 + 120), then for the process to exit (limit 30 s),
-copies the record to `.autonomy/verify/<run>/<runtime>/` and removes it from the container. `save-restore` is two
-launches: phase `save` (its record is kept as `<id>.save-restore.save.json`, and its `digests.final` is passed on),
-then phase `restore` with `VISUALCORE_AUTORUN_EXPECTED_DIGEST`; the restore record is the scenario's record. A
-launch refused with "Busy" is retried once after 20 s.
+copies the record to `.autonomy/verify/<run>/<runtime>/` and removes it from the container. While it waits for the
+record it also watches the process: a process that is gone without a record fails at once ("the app exited without
+a record (crash)"). When no record came within the limit or the process did not exit, the app is stopped with
+`xcrun simctl terminate <udid> dev.visualcore.VisualCore` (limit 30 s) and that is reported. When no record came,
+the driver also reads `Documents/visualcore-evidence/invalid-request/request-error.json` (the app's error record
+for a request whose run id did not parse) and reports its failures. `save-restore` is two launches: phase `save`
+(its record is completed, kept as `<id>.save-restore.save.json`, validated and must be `pass`; otherwise the
+scenario fails with "save phase: …" and no restore launch is made; its `digests.final` is passed on), then phase
+`restore` with `VISUALCORE_AUTORUN_EXPECTED_DIGEST`; the restore record is the scenario's record. A launch refused
+with "Busy" is retried once after 20 s.
+
+Frames. The app writes the read frame's RGBA bytes (rows bottom-up) as `<id>.<scenario>.frame.rgba` beside its
+record; the package tests attach `frame-<id>-<scenario>.rgba`. When a record's `frames[0]` names a `sha256`, the
+driver copies that file (app path: from the container, then removes it there; package path: from the exported
+attachments) to `.autonomy/verify/<run>/<runtime>/<id>.<scenario>.frame.rgba`, requires its SHA-256 to equal
+`frames[0].sha256` (a missing file or another hash fails the scenario with "frame: …"), and sets `frames[0].path` to
+that repository-relative path before the record is validated and hashed.
 
 Process exit. `simctl launch` prints `<bundle id>: <pid>`. A simulator app is a process of the host, so the driver
 polls `ps -p <pid> -o pid=` (exit 1 once the process is gone). When the launch printed no pid, it polls
@@ -46,19 +64,34 @@ hash. Every record is checked with `scripts/check_evidence.py`. A scenario count
 path) passed, its record validates, its code is the experience's code and its result is `pass`.
 
 State and outputs. `.autonomy/verify/state.json` holds `{runs: {"<id>|<scenario>|<runtime>": {result,
-record_sha256, finished, attempt}}}`; what passed is skipped unless `--fresh`. `.autonomy/verify/lock` (with the
+record_sha256, finished, commit, binary_sha256, attempt[, process]}}}`. Unless `--fresh`, a scenario is skipped only
+when its last result is `pass`, its `commit` is the current `git rev-parse HEAD` and its `binary_sha256` (the app's
+executable on the app path, the test bundle's executable on the package path, the same hash as `source.app_sha256`)
+equals that of the binary on disk now; anything else is run again. A summary row of a save-restore whose record says
+`configuration.process` `single` (the package path) carries `"process": "single"`: it is not proof of a relaunch.
+`.autonomy/verify/lock` (with the
 pid) refuses a second concurrent run; a lock whose pid is not alive is removed. Tracked summaries go to
 `docs/verification/<id>/summary-<runtime>.json` (no simulator identifier, no device name); raw logs go to
 `.autonomy/logs/verify/<run>/`, records to `.autonomy/verify/<run>/`, bundles to `.autonomy/xcresults/`.
 
 Audits (`--audits`, over `git ls-files` restricted to shipped paths): markers, raster files, reducer bypass,
 content counts, direct GL (`check_app_isolation.py`), network (`check_compliance.py`), and the entitlement audit,
-which is named as not yet provided (UA-F08) and never counted. `--self-test` plants defects in a temporary tree and
+which is named as not yet provided (UA-F08) and never counted. A raster file passes only when
+`Catalog/generated-art.json` lists it with its SHA-256, its path is inside
+`Apps/VisualCore/Resources/Assets.xcassets/AppIcon.appiconset/` and its `generator` names a file of the repository.
+The reducer-bypass and content audits read the scenario manifests of the registered experiences: a registration in
+`Catalog/registrations.json` names its manifest as `registrations[<id>].manifest`, a repository-relative JSON file
+(the manifest's JSON form: experience, kind, controls, scenarios). A game's levels come from the runtime catalog
+(`Catalog/experiences.json`, the entry's `content.levels`; null counts 0), not from the manifest. While no
+experience is registered, both audits print `SKIP: … (nothing to audit yet: 0 registered experiences)` and do not
+fail; they act from the first registration (UA-F07). `--audits` together with `--only` runs the audits only (no
+simulator work), with the bypass and content audits scoped to those ids. `--self-test` plants defects in a temporary tree and
 requires each to be found and nothing else; with `--runtime` it also runs the sample's `LossySnapshot` variant,
 whose save-restore record must be judged a failure by name.
 
-Every external command goes through one runner (`run(argv, timeout, cwd=None, env=None) -> (code, stdout,
-stderr)`), and every wait uses an injected clock and sleep, so the script tests touch no simulator.
+Every external command goes through one runner (`run(argv, timeout, cwd=None, env=None, kill_group=False) -> (code,
+stdout, stderr)`; `kill_group` starts the command in its own session and kills its whole process group at the
+limit), and every wait uses an injected clock and sleep, so the script tests touch no simulator.
 Exit codes: 0 everything passed; 1 a failure (also a held lock); 2 bad input (unknown id or scenario, no runtime).
 """
 from __future__ import annotations
@@ -71,6 +104,7 @@ import os
 import plistlib
 import re
 import shutil
+import signal
 import subprocess
 import sys
 import tempfile
@@ -90,7 +124,8 @@ BUNDLE_ID = "dev.visualcore.VisualCore"
 BOOT_LIMIT = 300
 EXIT_LIMIT = 30
 BUSY_WAIT = 20
-TEST_RUN_LIMIT = 600
+TEST_RUN_LIMIT = 540            # the limit of the test runners (scripts/xcodebuild_app.py --max-seconds)
+TERMINATE_LIMIT = 30
 BUILD_LIMIT = 600
 COMMAND_LIMIT = 120
 
@@ -115,10 +150,8 @@ EVIDENCE_DIR = "Documents/visualcore-evidence"
 KINDS = {"phone": "iPhone", "tablet": "iPad"}
 UDID = re.compile(r"[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}")
 LOSSY = "save-restore-lossy"
-
-# Scenario manifests read by the reducer-bypass and content-count audits (repository paths). None exists yet: the
-# sample's manifest is built in its test file and no catalog experience is registered.
-MANIFESTS: list[str] = []
+REQUEST_ERROR = "invalid-request/request-error.json"
+APP_ICON_SET = "Apps/VisualCore/Resources/Assets.xcassets/AppIcon.appiconset/"
 
 
 class BadInput(Exception):
@@ -127,8 +160,29 @@ class BadInput(Exception):
 
 # --- the runner ----------------------------------------------------------------------------------------------------
 
-def system_run(argv: list[str], timeout: float, cwd=None, env=None) -> tuple[int, str, str]:
-    """Runs one command with a time limit; a command that does not finish in time returns code 124."""
+def system_run(argv: list[str], timeout: float, cwd=None, env=None, kill_group: bool = False) -> tuple[int, str, str]:
+    """Runs one command with a time limit; a command that does not finish in time returns code 124. With
+    `kill_group` the command starts in its own session (process group), and at the limit the whole group is killed,
+    so children such as xcodebuild under a wrapper script stop too."""
+    if kill_group:
+        try:
+            proc = subprocess.Popen(argv, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, cwd=cwd,
+                                    env=env, start_new_session=True)
+        except OSError as e:
+            return 127, "", f"cannot run {argv[0]}: {e}"
+        try:
+            out, err = proc.communicate(timeout=timeout)
+            return proc.returncode, out or "", err or ""
+        except subprocess.TimeoutExpired:
+            try:
+                os.killpg(proc.pid, signal.SIGKILL)
+            except (ProcessLookupError, PermissionError):
+                pass
+            try:
+                out, _ = proc.communicate(timeout=10)
+            except subprocess.TimeoutExpired:
+                out = ""
+            return 124, out or "", f"timeout after {timeout:.0f} s; process group killed"
     try:
         r = subprocess.run(argv, capture_output=True, text=True, timeout=timeout, cwd=cwd, env=env)
         return r.returncode, r.stdout or "", r.stderr or ""
@@ -164,13 +218,22 @@ def load_check_evidence():
 
 # --- planning ------------------------------------------------------------------------------------------------------
 
-def registered_ids(root: Path) -> list[str]:
+def registrations(root: Path) -> dict[str, dict]:
+    """`Catalog/registrations.json` as {id: registration}; a list of ids gives empty registrations."""
     try:
-        data = json.loads((root / "Catalog" / "registrations.json").read_text(encoding="utf-8"))
-        regs = data.get("registrations", {})
+        data = json.loads((Path(root) / "Catalog" / "registrations.json").read_text(encoding="utf-8"))
+        regs = data.get("registrations", {}) if isinstance(data, dict) else {}
     except (OSError, ValueError):
-        return []
-    return sorted(regs) if isinstance(regs, (dict, list)) else []
+        return {}
+    if isinstance(regs, dict):
+        return {str(k): (v if isinstance(v, dict) else {}) for k, v in regs.items()}
+    if isinstance(regs, list):
+        return {str(k): {} for k in regs}
+    return {}
+
+
+def registered_ids(root: Path) -> list[str]:
+    return sorted(registrations(root))
 
 
 def plan(only: list[str], skip: list[str], scenarios: list[str] | None, registrations: list[str]) -> list[dict]:
@@ -281,7 +344,7 @@ def parse_bundle_summary(text: str) -> dict:
 
 def parse_attachments(folder: Path) -> list[tuple[str, Path]]:
     """(suggested name, exported file) for every exported attachment. Read from `manifest.json` when it exists,
-    else every `evidence-*.json` file of the folder under its own name."""
+    else every `evidence-*.json` and `frame-*.rgba` file of the folder under its own name."""
     manifest = folder / "manifest.json"
     out: list[tuple[str, Path]] = []
     if manifest.is_file():
@@ -296,17 +359,39 @@ def parse_attachments(folder: Path) -> list[tuple[str, Path]]:
                 if name and exported:
                     out.append((str(name), folder / str(exported)))
         return out
-    return [(p.name, p) for p in sorted(folder.glob("evidence-*.json"))]
+    return [(p.name, p) for p in sorted(list(folder.glob("evidence-*.json")) + list(folder.glob("frame-*.rgba")))]
 
 
-def attachment_scenario(name: str, experience: str) -> str | None:
-    """The scenario of `evidence-<experience>-<scenario>[_<n>_<uuid>].json`, or None for another attachment."""
-    prefix = f"evidence-{experience}-"
-    if not name.startswith(prefix) or not name.endswith(".json"):
+def attachment_scenario(name: str, experience: str, kind: str = "evidence", ext: str = ".json") -> str | None:
+    """The scenario of `evidence-<experience>-<scenario>[_<n>_<uuid>].json` (or, with kind `frame` and ext `.rgba`,
+    of `frame-<experience>-<scenario>[_<n>_<uuid>].rgba`), or None for another attachment."""
+    prefix = f"{kind}-{experience}-"
+    if not name.startswith(prefix) or not name.endswith(ext):
         return None
-    rest = name[len(prefix):-len(".json")]
+    rest = name[len(prefix):-len(ext)]
     rest = re.sub(r"_\d+_[0-9A-Fa-f-]+$", "", rest)
     return rest if re.fullmatch(r"[a-z0-9-]{1,64}", rest) else None
+
+
+def parse_failed_tests(text: str) -> list[str]:
+    """The names of the failed tests of `xcresulttool get test-results tests --format json`: every node, at any
+    depth, whose nodeType is "Test Case" and whose result is Failed."""
+    try:
+        data = json.loads(text)
+    except ValueError:
+        return []
+    names: list[str] = []
+
+    def walk(node):
+        if isinstance(node, list):
+            for n in node:
+                walk(n)
+        elif isinstance(node, dict):
+            if node.get("nodeType") == "Test Case" and node.get("result") == "Failed":
+                names.append(str(node.get("name") or node.get("nodeIdentifier") or "unnamed test"))
+            walk(node.get("children") or [])
+    walk(data.get("testNodes") if isinstance(data, dict) else data)
+    return names
 
 
 # --- records -------------------------------------------------------------------------------------------------------
@@ -464,20 +549,41 @@ class Driver:
     def key(ident: str, scenario: str, runtime: str) -> str:
         return f"{ident}|{scenario}|{runtime}"
 
-    def pending(self, state: dict, ident: str, scenarios: list[str], runtime: str) -> list[str]:
+    def pending(self, state: dict, ident: str, scenarios: list[str], runtime: str,
+                binary: str | None = None) -> list[str]:
+        """The scenarios to run: all with `--fresh`; otherwise every one whose last result is not a pass made at
+        the current commit with the binary `binary` (None: no binary on disk, so nothing is skipped)."""
         if self.fresh:
             return list(scenarios)
-        return [s for s in scenarios if state["runs"].get(self.key(ident, s, runtime), {}).get("result") != "pass"]
+        commit = self.cached("commit", ["git", "rev-parse", "HEAD"]).strip()
+
+        def current(entry: dict) -> bool:
+            return (entry.get("result") == "pass" and bool(commit) and entry.get("commit") == commit
+                    and binary is not None and entry.get("binary_sha256") == binary)
+        return [s for s in scenarios if not current(state["runs"].get(self.key(ident, s, runtime), {}))]
 
     def record_state(self, state: dict, ident: str, scenario: str, runtime: str, result: str,
-                     record_sha: str | None) -> None:
+                     record_sha: str | None, binary: str | None = None, record: dict | None = None) -> None:
         key = self.key(ident, scenario, runtime)
         before = state["runs"].get(key, {})
-        state["runs"][key] = {"result": result, "record_sha256": record_sha,
-                              "finished": self.now().strftime("%Y-%m-%dT%H:%M:%S"),
-                              "commit": self.cached("commit", ["git", "rev-parse", "HEAD"]).strip(),
-                              "attempt": int(before.get("attempt", 0)) + 1}
+        entry = {"result": result, "record_sha256": record_sha,
+                 "finished": self.now().strftime("%Y-%m-%dT%H:%M:%S"),
+                 "commit": self.cached("commit", ["git", "rev-parse", "HEAD"]).strip(),
+                 "binary_sha256": binary, "attempt": int(before.get("attempt", 0)) + 1}
+        process = ((record or {}).get("configuration") or {}).get("process") if isinstance(record, dict) else None
+        if isinstance(process, str):
+            entry["process"] = process
+        state["runs"][key] = entry
         self.save_state(state)
+
+    def current_binary(self, item: dict, runtime: dict) -> str | None:
+        """The SHA-256 of the binary under test as it is on disk before this run (None when there is none): the
+        app's executable on the app path, the test bundle's executable on the package path."""
+        if item["path"] == "app":
+            sha = self.app_binary_sha()
+            return None if sha == "0" * 64 else sha
+        found = self.test_binary_path(item, runtime)
+        return sha256_file(found) if found else None
 
     def attempt(self, state: dict, ident: str, scenario: str, runtime: str) -> int:
         return int(state["runs"].get(self.key(ident, scenario, runtime), {}).get("attempt", 0)) + 1
@@ -485,6 +591,11 @@ class Driver:
     # commands
     def cmd(self, argv: list[str], timeout: float = COMMAND_LIMIT, **kw) -> tuple[int, str, str]:
         return self.run(argv, timeout, **kw)
+
+    def terminate(self, udid: str, label: str) -> None:
+        """Stops the app on the simulator (bounded) after a scenario gave no record or did not exit."""
+        code, _, err = self.cmd(["xcrun", "simctl", "terminate", udid, BUNDLE_ID], TERMINATE_LIMIT)
+        self.out(f"{label}: the app was terminated (xcrun simctl terminate, exit {code})")
 
     def cached(self, name: str, argv: list[str]) -> str:
         if name not in self._cache:
@@ -537,8 +648,10 @@ class Driver:
 
     def finish_record(self, raw: dict, *, ident: str, code: str | None, scenario: str, runtime: dict,
                       device: dict, attempt: int, binary_sha: str, log: tuple[str, str], bundle: str | None,
-                      bundle_ok: bool | None, dest_name: str) -> tuple[str, str, list[str]]:
-        """Completes, seals, writes and judges one record; returns (result, record hash, problems)."""
+                      bundle_ok: bool | None, dest_name: str, extra: list[str] | None = None
+                      ) -> tuple[str, str, list[str]]:
+        """Completes, seals, writes and judges one record; returns (result, record hash, problems). `extra` are
+        problems found before (the frame check), which fail the record too."""
         record = complete_record(raw, run_id=self.run_id, attempt=attempt,
                                  environment=self.environment(runtime, device), source=self.source(binary_sha),
                                  artifacts={"result_bundle": bundle, "log": log[0], "log_sha256": log[1]})
@@ -548,7 +661,26 @@ class Driver:
         self.records.append(record)
         self.written[f"{runtime['version']}/{dest_name}"] = record
         result, problems = judge(record, code, bundle_ok)
-        return result, digest, problems
+        problems = list(extra or []) + problems
+        return ("pass" if not problems else "fail"), digest, problems
+
+    def keep_frame(self, raw: dict, dest: Path, copy) -> list[str]:
+        """When the record's frames[0] names a sha256: `copy(dest)` brings the frame file to `dest`, its SHA-256
+        must equal that hash, and frames[0].path becomes the repository-relative path. Returns the problems."""
+        frames = raw.get("frames") if isinstance(raw, dict) else None
+        if not isinstance(frames, list) or not frames or not isinstance(frames[0], dict):
+            return []
+        expected = frames[0].get("sha256")
+        if not isinstance(expected, str) or not expected:
+            return []
+        dest.unlink(missing_ok=True)
+        if not copy(dest) or not dest.is_file():
+            return [f"frame: no frame file {dest.name} beside the record"]
+        frames[0]["path"] = self.rel(dest)
+        actual = sha256_file(dest)
+        if actual != expected:
+            return [f"frame: SHA-256 of {self.rel(dest)} is {actual}, the record names {expected}"]
+        return []
 
     # host tests
     def host_tests(self, item: dict) -> bool:
@@ -570,7 +702,7 @@ class Driver:
     # package path
     def package_test(self, item: dict, runtime: dict, methods: list[str], suffix: str) -> dict:
         """Runs one package test into its own result bundle and checks the bundle; returns {bundle, summary,
-        attachments, log}."""
+        attachments, log}. The test command runs in its own process group, killed as a whole at its limit."""
         entry = item["entry"]
         rt = runtime["version"]
         name = f"verify-{item['id']}-{rt}-{self.run_id}{suffix}"
@@ -579,9 +711,13 @@ class Driver:
                 "--destination", f"sim-{rt}", "--action", "test", "--result-name", name,
                 "--only-testing", *[f"{entry['only_testing']}/{m}" for m in methods]]
         self.out("$ " + " ".join(argv))
-        code, out, err = self.cmd(argv, TEST_RUN_LIMIT, cwd=str(self.root))
+        code, out, err = self.cmd(argv, TEST_RUN_LIMIT, cwd=str(self.root), kill_group=True)
+        if code == 124:
+            self.out(f"{item['id']} {rt}: the test run passed its limit of {TEST_RUN_LIMIT} s; its process group "
+                     "was killed")
         log = self.write_log(name, [out, err])
-        result = {"bundle": bundle, "log": log, "exit": code, "attachments": [], "summary": None}
+        result = {"bundle": bundle, "log": log, "exit": code, "attachments": [], "summary": None,
+                  "failed_tests": []}
         if not bundle.exists():
             result["summary"] = {"ok": False, "result": "missing", "total": 0, "passed": 0, "failed": 0,
                                  "skipped": 0, "destination": None}
@@ -592,6 +728,9 @@ class Driver:
         if code != 0 and summary["ok"]:
             summary = dict(summary, ok=False, result=f"Passed, but the test command exited {code}")
         result["summary"] = summary
+        tcode, tout, _ = self.cmd(["xcrun", "xcresulttool", "get", "test-results", "tests", "--path", str(bundle),
+                                   "--format", "json"])
+        result["failed_tests"] = parse_failed_tests(tout) if tcode == 0 else []
         folder = self.run_dir(rt) / f"attachments-{item['id']}{suffix}"
         shutil.rmtree(folder, ignore_errors=True)
         folder.mkdir(parents=True, exist_ok=True)
@@ -601,39 +740,70 @@ class Driver:
             result["attachments"] = parse_attachments(folder)
         return result
 
-    def test_binary_sha(self, item: dict, runtime: dict, bundle: Path) -> str:
+    def test_binary_path(self, item: dict, runtime: dict) -> Path | None:
         name = item["entry"]["test_binary"]
         base = self.root / "Build" / "DerivedData" / f"{Path(item['entry']['package']).name}-sim-{runtime['version']}"
         found = sorted((base / "Build" / "Products").glob(f"*/{name}.xctest/{name}")) if base.is_dir() else []
+        return found[0] if found else None
+
+    def test_binary_sha(self, item: dict, runtime: dict, bundle: Path) -> str:
+        found = self.test_binary_path(item, runtime)
         if found:
-            return sha256_file(found[0])
+            return sha256_file(found)
+        name = item["entry"]["test_binary"]
+        base = self.root / "Build" / "DerivedData" / f"{Path(item['entry']['package']).name}-sim-{runtime['version']}"
         info = bundle / "Info.plist"
         self.out(f"note: {name}.xctest not found under {self.rel(base)}; app_sha256 is the result bundle's Info.plist")
         return sha256_file(info) if info.is_file() else "0" * 64
 
+    @staticmethod
+    def bundle_block(summary: dict, failed_tests: list[str]) -> dict:
+        """The summary's `bundle` block of one result bundle."""
+        return {"result": summary["result"], "total": summary["total"], "passed": summary["passed"],
+                "failed": summary["failed"], "destination": summary.get("destination"),
+                "failed_tests": list(failed_tests)}
+
     def verify_package(self, item: dict, runtime: dict, state: dict, scenarios: list[str],
                        lossy: bool = False) -> dict:
-        """Returns {scenario: (result, record hash)} for the scenarios run, plus the bundle verdict."""
+        """Returns {scenario: (result, record hash)} for the scenarios run, plus the bundle block. The standard
+        scenarios share one test run; endurance is a test run of its own; both give records."""
         ident, rt = item["id"], runtime["version"]
         device = self.device(runtime)
         results: dict[str, tuple[str, str | None]] = {}
         bundle_info = None
         normal = [s for s in scenarios if s != ENDURANCE]
+        groups = []
         methods = [test_method(s) for s in normal] + ([item["entry"]["lossy_test"]] if lossy else [])
         if methods:
-            run = self.package_test(item, runtime, methods, "")
+            groups.append((methods, normal + ([LOSSY] if lossy else []), ""))
+        if ENDURANCE in scenarios:
+            groups.append(([item["entry"]["endurance_test"]], [ENDURANCE], "-endurance"))
+        for methods, wanted, suffix in groups:
+            run = self.package_test(item, runtime, methods, suffix)
             summary = run["summary"]
-            bundle_info = {"result": summary["result"], "total": summary["total"], "passed": summary["passed"],
-                           "failed": summary["failed"]}
-            self.out(f"{'PASS' if summary['ok'] else 'FAIL'}: {ident} {rt} result bundle {summary['result']}, "
-                     f"{summary['passed']} of {summary['total']} passed, {summary['failed']} failed")
+            block = self.bundle_block(summary, run["failed_tests"])
+            if bundle_info is None:
+                bundle_info = block
+            else:                      # the endurance run joins the block of the standard run
+                bundle_info = {"result": block["result"] if bundle_info["result"] == "Passed" else bundle_info["result"],
+                               "total": bundle_info["total"] + block["total"],
+                               "passed": bundle_info["passed"] + block["passed"],
+                               "failed": bundle_info["failed"] + block["failed"],
+                               "destination": bundle_info["destination"] or block["destination"],
+                               "failed_tests": bundle_info["failed_tests"] + block["failed_tests"]}
+            self.out(f"{'PASS' if summary['ok'] else 'FAIL'}: {ident} {rt} result bundle{suffix and ' (endurance)'} "
+                     f"{summary['result']}, {summary['passed']} of {summary['total']} passed, {summary['failed']} "
+                     "failed" + (f" ({', '.join(run['failed_tests'])})" if run["failed_tests"] else ""))
             binary = self.test_binary_sha(item, runtime, run["bundle"])
             found: dict[str, Path] = {}
+            frames: dict[str, Path] = {}
             for name, path in run["attachments"]:
                 scenario = attachment_scenario(name, ident)
                 if scenario:
                     found[scenario] = path
-            wanted = normal + ([LOSSY] if lossy else [])
+                scenario = attachment_scenario(name, ident, "frame", ".rgba")
+                if scenario:
+                    frames[scenario] = path
             for scenario in wanted:
                 attempt = self.attempt(state, ident, scenario, rt)
                 path = found.get(scenario)
@@ -641,17 +811,27 @@ class Driver:
                     if scenario != LOSSY:
                         self.fail(f"{ident} {scenario} {rt}: no record in the result bundle")
                         if not lossy:
-                            self.record_state(state, ident, scenario, rt, "fail", None)
+                            self.record_state(state, ident, scenario, rt, "fail", None, binary)
                     results[scenario] = ("missing", None)
                     continue
                 try:
                     raw = json.loads(path.read_text(encoding="utf-8"))
                 except ValueError:
                     raw = {}
+                extra: list[str] = []
+                if scenario != LOSSY:
+                    source = frames.get(scenario)
+
+                    def copy(dest: Path, source=source) -> bool:
+                        if source is None or not source.is_file():
+                            return False
+                        shutil.copyfile(source, dest)
+                        return True
+                    extra = self.keep_frame(raw, self.run_dir(rt) / f"{ident}.{scenario}.frame.rgba", copy)
                 result, digest, problems = self.finish_record(
                     raw, ident=ident, code=item["code"], scenario=scenario, runtime=runtime, device=device,
                     attempt=attempt, binary_sha=binary, log=run["log"], bundle=self.rel(run["bundle"]),
-                    bundle_ok=summary["ok"], dest_name=f"{ident}.{scenario}.json")
+                    bundle_ok=summary["ok"], dest_name=f"{ident}.{scenario}.json", extra=extra)
                 results[scenario] = (result, digest)
                 if scenario == LOSSY:
                     continue
@@ -660,21 +840,8 @@ class Driver:
                 else:
                     self.fail(f"{ident} {scenario} {rt}: " + "; ".join(problems))
                 if not lossy:
-                    self.record_state(state, ident, scenario, rt, result, digest)
-        if ENDURANCE in scenarios:
-            run = self.package_test(item, runtime, [item["entry"]["endurance_test"]], "-endurance")
-            summary = run["summary"]
-            result = "pass" if summary["ok"] else "fail"
-            if result == "pass":
-                self.out(f"PASS: {ident} endurance {rt} (result bundle only; the endurance test attaches no record)")
-            else:
-                self.fail(f"{ident} endurance {rt}: result bundle {summary['result']}, {summary['failed']} failed")
-            results[ENDURANCE] = (result, None)
-            if not lossy:
-                self.record_state(state, ident, ENDURANCE, rt, result, None)
-            if bundle_info is None:
-                bundle_info = {"result": summary["result"], "total": summary["total"], "passed": summary["passed"],
-                               "failed": summary["failed"]}
+                    self.record_state(state, ident, scenario, rt, result, digest, binary,
+                                      self.written.get(f"{rt}/{ident}.{scenario}.json"))
         return {"results": results, "bundle": bundle_info, "device": device}
 
     # app path
@@ -763,13 +930,29 @@ class Driver:
         code, out, _ = self.cmd(["xcrun", "simctl", "spawn", udid, "launchctl", "list"], 30)
         return code == 0 and f"UIKitApplication:{BUNDLE_ID}" not in out
 
+    def request_error(self, container: str, rt: str, label: str) -> str | None:
+        """The failures of the app's error record for a request whose run id did not parse
+        (`visualcore-evidence/invalid-request/request-error.json`), or None when there is none."""
+        path = f"{container}/{EVIDENCE_DIR}/{REQUEST_ERROR}"
+        if self.cmd(["test", "-f", path], 10)[0] != 0:
+            return None
+        target = self.run_dir(rt) / f"{label.split(' ')[0]}.request-error.json"
+        code, _, _ = self.cmd(["cp", path, str(target)], 30)
+        self.cmd(["rm", "-f", path], 30)
+        try:
+            failures = json.loads(target.read_text(encoding="utf-8")).get("failures") or []
+        except (OSError, ValueError, AttributeError):
+            failures = []
+        return "; ".join(map(str, failures)) or "an error record without failures"
+
     def app_launch(self, item: dict, scenario: str, runtime: dict, device: dict, container: str, log: list[str],
                    phase: str | None = None, expected: str | None = None, dest_name: str | None = None
-                   ) -> tuple[dict | None, str | None]:
-        """One launch of one scenario: (raw record, None) or (None, failure)."""
+                   ) -> tuple[dict | None, str | None, list[str]]:
+        """One launch of one scenario: (raw record, None, frame problems) or (None, failure, [])."""
         ident, rt, udid = item["id"], runtime["version"], device["udid"]
         evidence = f"{container}/{EVIDENCE_DIR}/{self.run_id}"
         self.cmd(["rm", "-rf", evidence], 30)
+        self.cmd(["rm", "-f", f"{container}/{EVIDENCE_DIR}/{REQUEST_ERROR}"], 30)
         if scenario == "save-restore" and phase != "restore":
             self.cmd(["rm", "-rf", f"{container}/Library/Application Support/Experiences/{ident}"], 30)
         env = {"SIMCTL_CHILD_VISUALCORE_AUTORUN": "scenario", "SIMCTL_CHILD_VISUALCORE_AUTORUN_EXPERIENCE": ident,
@@ -781,22 +964,55 @@ class Driver:
         ok, pid, why = self.launch(udid, env, log)
         label = f"{ident} {scenario}{' (' + phase + ')' if phase else ''} {rt}"
         if not ok:
-            return None, f"{label}: launch failed: {why}"
+            return None, f"{label}: launch failed: {why}", []
         limit = max(self.max_seconds, ENDURANCE_SECONDS + 120) if scenario == ENDURANCE else self.max_seconds
         record_path = f"{evidence}/{ident}.{scenario}.json"
-        if not self.wait_for(lambda: self.cmd(["test", "-f", record_path], 10)[0] == 0, limit):
-            return None, f"{label}: no record within {limit:.0f} s"
+        crashed = [False]
+
+        def record_or_gone() -> bool:
+            if self.cmd(["test", "-f", record_path], 10)[0] == 0:
+                return True
+            if self.process_gone(udid, pid):
+                # The record may have been written just before the exit.
+                if self.cmd(["test", "-f", record_path], 10)[0] != 0:
+                    crashed[0] = True
+                return True
+            return False
+
+        if not self.wait_for(record_or_gone, limit):
+            self.terminate(udid, label)
+            refused = self.request_error(container, rt, label)
+            return None, f"{label}: no record within {limit:.0f} s" + (
+                f"; the request was refused: {refused}" if refused else ""), []
+        if crashed[0]:
+            refused = self.request_error(container, rt, label)
+            if refused:
+                return None, f"{label}: the request was refused: {refused}", []
+            return None, f"{label}: the app exited without a record (crash)", []
         if not self.wait_for(lambda: self.process_gone(udid, pid), EXIT_LIMIT):
-            return None, f"{label}: the process did not exit within {EXIT_LIMIT} s"
-        target = self.run_dir(rt) / (dest_name or f"{ident}.{scenario}.json")
+            self.terminate(udid, label)
+            return None, f"{label}: the process did not exit within {EXIT_LIMIT} s", []
+        name = dest_name or f"{ident}.{scenario}.json"
+        target = self.run_dir(rt) / name
         code, _, err = self.cmd(["cp", record_path, str(target)], 30)
         if code != 0:
-            return None, f"{label}: record could not be copied: {err.strip()[:200]}"
+            return None, f"{label}: record could not be copied: {err.strip()[:200]}", []
         self.cmd(["rm", "-f", record_path], 30)
         try:
-            return json.loads(target.read_text(encoding="utf-8")), None
+            raw = json.loads(target.read_text(encoding="utf-8"))
         except (OSError, ValueError):
-            return None, f"{label}: the record is not valid JSON"
+            return None, f"{label}: the record is not valid JSON", []
+        frame_path = f"{evidence}/{ident}.{scenario}.frame.rgba"
+
+        def copy(dest: Path) -> bool:
+            if self.cmd(["test", "-f", frame_path], 10)[0] != 0:
+                return False
+            copied = self.cmd(["cp", frame_path, str(dest)], 30)[0] == 0
+            self.cmd(["rm", "-f", frame_path], 30)
+            return copied
+        extra = self.keep_frame(raw, self.run_dir(rt) / (name[:-len(".json")] + ".frame.rgba"), copy) \
+            if isinstance(raw, dict) else []
+        return raw, None, extra
 
     def verify_app(self, item: dict, runtime: dict, state: dict, scenarios: list[str]) -> dict:
         ident, rt = item["id"], runtime["version"]
@@ -819,33 +1035,46 @@ class Driver:
         for scenario in scenarios:
             log: list[str] = []
             attempt = self.attempt(state, ident, scenario, rt)
+            extra: list[str] = []
             if scenario == "save-restore":
-                saved, why = self.app_launch(item, scenario, runtime, device, container, log, phase="save",
-                                             dest_name=f"{ident}.save-restore.save.json")
-                digest = ((saved or {}).get("digests") or {}).get("final") if saved else None
-                if saved is not None and not digest:
-                    why = f"{ident} save-restore (save) {rt}: the save record has no digests.final"
+                saved, why, save_extra = self.app_launch(item, scenario, runtime, device, container, log,
+                                                         phase="save", dest_name=f"{ident}.save-restore.save.json")
+                digest = None
+                if saved is not None:
+                    # The save phase is judged like any record; a failed save phase fails the scenario and the
+                    # restore launch is not made.
+                    save_log = self.write_log(f"{ident}-{rt}-save-restore-save", log)
+                    save_result, _, save_problems = self.finish_record(
+                        saved, ident=ident, code=item["code"], scenario=scenario, runtime=runtime, device=device,
+                        attempt=attempt, binary_sha=binary, log=save_log, bundle=None, bundle_ok=None,
+                        dest_name=f"{ident}.save-restore.save.json", extra=save_extra)
+                    digest = (saved.get("digests") or {}).get("final") if isinstance(saved, dict) else None
+                    if save_result != "pass":
+                        why = f"{ident} save-restore {rt}: save phase: " + "; ".join(save_problems)
+                    elif not digest:
+                        why = f"{ident} save-restore (save) {rt}: the save record has no digests.final"
                 raw = None
                 if why is None:
-                    raw, why = self.app_launch(item, scenario, runtime, device, container, log, phase="restore",
-                                               expected=digest)
+                    raw, why, extra = self.app_launch(item, scenario, runtime, device, container, log,
+                                                      phase="restore", expected=digest)
             else:
-                raw, why = self.app_launch(item, scenario, runtime, device, container, log)
+                raw, why, extra = self.app_launch(item, scenario, runtime, device, container, log)
             logref = self.write_log(f"{ident}-{rt}-{scenario}", log)
             if raw is None:
                 self.fail(why)
-                self.record_state(state, ident, scenario, rt, "fail", None)
+                self.record_state(state, ident, scenario, rt, "fail", None, binary)
                 results[scenario] = ("fail", None)
                 continue
             result, digest, problems = self.finish_record(
                 raw, ident=ident, code=item["code"], scenario=scenario, runtime=runtime, device=device,
                 attempt=attempt, binary_sha=binary, log=logref, bundle=None, bundle_ok=None,
-                dest_name=f"{ident}.{scenario}.json")
+                dest_name=f"{ident}.{scenario}.json", extra=extra)
             if result == "pass":
                 self.out(f"PASS: {ident} {scenario} {rt}")
             else:
                 self.fail(f"{ident} {scenario} {rt}: " + "; ".join(problems))
-            self.record_state(state, ident, scenario, rt, result, digest)
+            self.record_state(state, ident, scenario, rt, result, digest, binary,
+                              self.written.get(f"{rt}/{ident}.{scenario}.json"))
             results[scenario] = (result, digest)
         return {"results": results, "bundle": None, "device": device}
 
@@ -866,8 +1095,8 @@ class Driver:
             entry = state["runs"].get(self.key(item["id"], s, runtime["version"]), {})
             row = {"scenario": s, "result": entry.get("result", "not-run"), "record_sha256": entry.get("record_sha256"),
                    "commit": entry.get("commit")}
-            if s == ENDURANCE and item["path"] == "package":
-                row["evidence"] = "result bundle only; the endurance test attaches no record"
+            if s == "save-restore" and entry.get("process") == "single":
+                row["process"] = "single"          # one process: not proof of a relaunch (FR-U09-013)
             rows.append(row)
         summary = {"schema": 1, "experience": item["id"], "runtime": runtime["version"],
                    "runtime_build": runtime["build"], "device_type": device["device_type"],
@@ -897,10 +1126,12 @@ class Driver:
                             self.record_state(state, item["id"], s, rt["version"], "fail", None)
                     continue
                 for runtime in runtimes:
-                    todo = self.pending(state, item["id"], item["scenarios"], runtime["version"])
+                    todo = self.pending(state, item["id"], item["scenarios"], runtime["version"],
+                                        None if self.fresh else self.current_binary(item, runtime))
                     done = [s for s in item["scenarios"] if s not in todo]
                     if done:
-                        self.out(f"{item['id']} {runtime['version']}: passed earlier, skipped: {', '.join(done)}")
+                        self.out(f"{item['id']} {runtime['version']}: passed earlier at this commit with this "
+                                 f"binary, skipped: {', '.join(done)}")
                     if not todo:
                         continue
                     if item["path"] == "package":
@@ -1163,12 +1394,13 @@ def audit_markers(root: Path, files: list[str]) -> list[str]:
 
 
 def audit_raster(root: Path, files: list[str]) -> list[str]:
-    """Every raster file is a finding unless Catalog/generated-art.json lists it with its SHA-256."""
-    listed: dict[str, str] = {}
+    """Every raster file is a finding unless Catalog/generated-art.json lists it with its SHA-256, the path is inside
+    the app icon set (the only generated raster allowed) and its `generator` is a file of the repository."""
+    listed: dict[str, dict] = {}
     try:
         art = json.loads((Path(root) / "Catalog" / "generated-art.json").read_text(encoding="utf-8"))
         for f in art.get("files", []):
-            listed[str(f.get("path"))] = str(f.get("sha256"))
+            listed[str(f.get("path"))] = f
     except (OSError, ValueError, AttributeError):
         pass
     findings = []
@@ -1178,10 +1410,18 @@ def audit_raster(root: Path, files: list[str]) -> list[str]:
         if rel not in listed:
             findings.append(f"{rel}: raster file not listed in Catalog/generated-art.json")
             continue
+        entry = listed[rel]
         path = Path(root) / rel
         actual = sha256_file(path) if path.is_file() else "missing"
-        if actual != listed[rel]:
+        if actual != str(entry.get("sha256")):
             findings.append(f"{rel}: SHA-256 differs from Catalog/generated-art.json")
+        if not rel.startswith(APP_ICON_SET):
+            findings.append(f"{rel}: a generated raster outside {APP_ICON_SET}")
+        generator = entry.get("generator")
+        gen_path = (Path(root) / generator).resolve() if isinstance(generator, str) and generator else None
+        inside = gen_path is not None and str(gen_path).startswith(str(Path(root).resolve()) + os.sep)
+        if not inside or not gen_path.is_file():
+            findings.append(f"{rel}: generator {generator!r} is not a file of the repository")
     return findings
 
 
@@ -1225,9 +1465,22 @@ def content_requirement(row: dict) -> dict:
             "levels": rows("level_manifest"), "fixtures": len(fixtures) if isinstance(fixtures, list) else 0}
 
 
-def audit_content(manifests: list[dict], registered: list[str], catalog: dict) -> list[str]:
+def runtime_levels(runtime_catalog: dict, ident: str) -> int:
+    """The levels of one experience in the runtime catalog (`Catalog/experiences.json`): `content.levels`, where a
+    null content or null levels count 0."""
+    for e in (runtime_catalog or {}).get("experiences", []) if isinstance(runtime_catalog, dict) else []:
+        if isinstance(e, dict) and e.get("id") == ident:
+            content = e.get("content")
+            levels = content.get("levels") if isinstance(content, dict) else None
+            return levels if isinstance(levels, int) and not isinstance(levels, bool) else 0
+    return 0
+
+
+def audit_content(manifests: list[dict], registered: list[str], catalog: dict,
+                  runtime_catalog: dict | None = None) -> list[str]:
     """For each registered experience: its manifest has the nine standard scenarios and at least the planning
-    catalog's acceptance, fault and fixture scenarios and levels."""
+    catalog's acceptance, fault and fixture scenarios; its levels in the runtime catalog (`content.levels`) are at
+    least the planning catalog's."""
     rows = {e.get("id"): e for e in catalog.get("experiences", [])} if isinstance(catalog, dict) else {}
     by_id = {m.get("experience"): m for m in manifests}
     findings = []
@@ -1244,7 +1497,7 @@ def audit_content(manifests: list[dict], registered: list[str], catalog: dict) -
         have = {"acceptance": sum(n.startswith("acceptance-") for n in names),
                 "faults": sum(n.startswith("fault-") for n in names),
                 "fixtures": sum(n.startswith("fixture-") for n in names),
-                "levels": int((m.get("content") or {}).get("levels", 0) or 0)}
+                "levels": runtime_levels(runtime_catalog or {}, ident)}
         for k in ("acceptance", "faults", "levels", "fixtures"):
             if have[k] < need[k]:
                 findings.append(f"{ident}: {have[k]} {k} below the planning catalog's {need[k]}")
@@ -1258,24 +1511,46 @@ def tracked_files(root: Path, run) -> list[str]:
     return [p for p in out.split("\0") if p]
 
 
-def load_manifests(root: Path, paths: list[str]) -> list[dict]:
-    out = []
-    for p in paths:
+def load_manifests(root: Path, regs: dict[str, dict]) -> tuple[list[dict], list[str]]:
+    """The scenario manifests the registrations name (`registrations[id].manifest`, a repository-relative JSON
+    file), with the problems of those that name a path that cannot be read. A registration without a manifest gives
+    none (the content audit reports it)."""
+    out, problems = [], []
+    for ident, reg in sorted(regs.items()):
+        rel = reg.get("manifest") if isinstance(reg, dict) else None
+        if not rel:
+            continue
         try:
-            out.append(json.loads((Path(root) / p).read_text(encoding="utf-8")))
-        except (OSError, ValueError):
-            out.append({"experience": p, "scenarios": [], "unreadable": True})
-    return out
+            data = json.loads((Path(root) / str(rel)).read_text(encoding="utf-8"))
+            if not isinstance(data, dict):
+                raise ValueError("not an object")
+            data.setdefault("experience", ident)
+            out.append(data)
+        except (OSError, ValueError) as e:
+            problems.append(f"{ident}: manifest {rel} cannot be read ({e})")
+            out.append({"experience": ident, "scenarios": [], "unreadable": True})
+    return out, problems
 
 
-def run_audits(root: Path, run, out, records: list[dict] | None = None, files: list[str] | None = None) -> int:
+def run_audits(root: Path, run, out, records: list[dict] | None = None, files: list[str] | None = None,
+               only: list[str] | None = None) -> int:
+    """Runs every audit; `only` scopes the reducer-bypass and content audits to those ids."""
     root = Path(root)
     files = [f for f in (files if files is not None else tracked_files(root, run)) if shipped(f)]
-    manifests = load_manifests(root, MANIFESTS)
+    regs = registrations(root)
+    if only is not None:
+        regs = {k: v for k, v in regs.items() if k in only}
+    manifests, unreadable = load_manifests(root, regs)
+    registered = sorted(regs)
+    scoped = [r for r in (records or []) if only is None or r.get("experience") in only]
     try:
         catalog = json.loads((root / "docs" / "catalog" / "experience-catalog.json").read_text(encoding="utf-8"))
     except (OSError, ValueError):
         catalog = {}
+    try:
+        runtime_catalog = json.loads((root / "Catalog" / "experiences.json").read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        runtime_catalog = {}
     failed = False
 
     def report(name: str, findings: list[str], detail: str) -> None:
@@ -1290,10 +1565,15 @@ def run_audits(root: Path, run, out, records: list[dict] | None = None, files: l
 
     report("markers", audit_markers(root, files), f"{len(files)} shipped files")
     report("raster", audit_raster(root, files), "no unlisted raster file")
-    report("reducer-bypass", audit_bypass(manifests, records or []),
-           f"{len(manifests)} manifests, {len(records or [])} records")
-    registered = registered_ids(root)
-    report("content-counts", audit_content(manifests, registered, catalog), f"{len(registered)} registered experiences")
+    if not registered:
+        # Nothing is registered yet: both audits act from the first registration (UA-F07).
+        out("SKIP: reducer-bypass (nothing to audit yet: 0 registered experiences)")
+        out("SKIP: content-counts (nothing to audit yet: 0 registered experiences)")
+    else:
+        report("reducer-bypass", unreadable + audit_bypass(manifests, scoped),
+               f"{len(manifests)} manifests, {len(scoped)} records")
+        report("content-counts", audit_content(manifests, registered, catalog, runtime_catalog),
+               f"{len(registered)} registered experiences")
     for name, argv in (("direct-gl", [PY, "scripts/check_app_isolation.py", "--app", "Apps/VisualCore",
                                       "--require-sources"]),
                        ("network", [PY, "scripts/check_compliance.py"])):
@@ -1306,9 +1586,9 @@ def run_audits(root: Path, run, out, records: list[dict] | None = None, files: l
 
 # --- self-test -----------------------------------------------------------------------------------------------------
 
-def plant(root: Path) -> tuple[list[str], list[str], list[dict], list[dict], list[str], dict]:
+def plant(root: Path) -> tuple[list[str], list[str], list[dict], list[dict], list[str], dict, dict]:
     """Writes planted defects into `root`. Returns (tracked files, expected finding substrings, manifests, records,
-    registered ids, catalog)."""
+    registered ids, planning catalog, runtime catalog)."""
     files = {
         "Apps/VisualCore/App/Planted.swift":
             "// TODO: finish this\n"
@@ -1327,27 +1607,33 @@ def plant(root: Path) -> tuple[list[str], list[str], list[dict], list[dict], lis
     for rel, text in files.items():
         (root / rel).parent.mkdir(parents=True, exist_ok=True)
         (root / rel).write_text(text)
-    for rel, data in (("Apps/VisualCore/Resources/x.png", b"\x89PNG stray"),
-                      ("Apps/VisualCore/Resources/wrong.png", b"\x89PNG generated"),
-                      ("Apps/VisualCore/Resources/right.png", b"\x89PNG generated ok")):
+    rasters = (("Apps/VisualCore/Resources/x.png", b"\x89PNG stray"),
+               (APP_ICON_SET + "wrong.png", b"\x89PNG generated"),
+               (APP_ICON_SET + "right.png", b"\x89PNG generated ok"),
+               ("Apps/VisualCore/Resources/outside.png", b"\x89PNG generated elsewhere"))
+    for rel, data in rasters:
+        (root / rel).parent.mkdir(parents=True, exist_ok=True)
         (root / rel).write_bytes(data)
+    (root / "scripts").mkdir(parents=True, exist_ok=True)
+    (root / "scripts" / "x.py").write_text("# the planted icon generator\n")
     (root / "Catalog").mkdir(parents=True, exist_ok=True)
     (root / "Catalog" / "generated-art.json").write_text(dump({"schema": 1, "files": [
-        {"path": "Apps/VisualCore/Resources/wrong.png", "sha256": "0" * 64, "generator": "scripts/x.py"},
-        {"path": "Apps/VisualCore/Resources/right.png", "sha256": sha256_bytes(b"\x89PNG generated ok"),
-         "generator": "scripts/x.py"}]}))
+        {"path": APP_ICON_SET + "wrong.png", "sha256": "0" * 64, "generator": "scripts/x.py"},
+        {"path": APP_ICON_SET + "right.png", "sha256": sha256_bytes(b"\x89PNG generated ok"),
+         "generator": "scripts/x.py"},
+        {"path": "Apps/VisualCore/Resources/outside.png", "sha256": sha256_bytes(b"\x89PNG generated elsewhere"),
+         "generator": "scripts/missing.py"}]}))
     untracked = root / "Apps/VisualCore/App/Build/Generated.swift"     # on disk, not tracked: never audited
     untracked.parent.mkdir(parents=True, exist_ok=True)
     untracked.write_text("// TODO: build product\n")
-    tracked = sorted(files) + ["Apps/VisualCore/Resources/x.png", "Apps/VisualCore/Resources/wrong.png",
-                               "Apps/VisualCore/Resources/right.png"]
+    tracked = sorted(files) + [rel for rel, _ in rasters]
     game = "r02-g01.aurora-loom"
     standard = [{"name": n, "seed": "1", "entries": [{"steps": 1, "action": {"control": "tap", "values": []}}],
                  "expect": {}} for n in STANDARD]
     manifests = [
         {"schema": 1, "experience": "a01.planted", "kind": "creative", "controls": ["tap"], "scenarios": [
             {"name": "completion", "seed": "1", "entries": [{"steps": 10}], "expect": {"outcome": "target-reached"}}]},
-        {"schema": 1, "experience": game, "kind": "game", "round": 2, "content": {"levels": 100},
+        {"schema": 1, "experience": game, "kind": "game", "round": 2,
          "scenarios": standard + [{"name": n, "seed": "1", "entries": [{"steps": 1, "action": {"control": "tap"}}],
                                    "expect": {}} for n in ["full-playthrough", "hero"]
                                   + [f"acceptance-{i:02d}" for i in range(1, 80)]]},
@@ -1355,13 +1641,16 @@ def plant(root: Path) -> tuple[list[str], list[str], list[dict], list[dict], lis
     records = [{"experience": "a01.planted", "scenario": "input-response", "failures": ["bypass: 3 handled of 4 sent"]}]
     catalog = {"experiences": [{"id": game, "acceptance_scenarios": {"rows": 80}, "level_manifest": {"rows": 100},
                                 "design": {"fixtures": []}}]}
+    runtime_catalog = {"experiences": [{"id": game, "content": {"levels": 100}}]}
     expected = ["Planted.swift:1: TODO in a comment", "Planted.swift:2: FIXME in a string",
                 "Planted.swift:3: \"Coming soon\" in visible text", "Planted.swift:4: \"placeholder\" in visible text",
                 "Localizable.xcstrings: \"Coming soon\" in the string catalog", "x.png: raster file not listed",
-                "wrong.png: SHA-256 differs", "a01.planted completion: an outcome or final digest is expected",
+                "wrong.png: SHA-256 differs", "outside.png: a generated raster outside",
+                "outside.png: generator 'scripts/missing.py' is not a file",
+                "a01.planted completion: an outcome or final digest is expected",
                 "a01.planted input-response: the engine handled fewer actions",
                 f"{game}: 79 acceptance below the planning catalog's 80"]
-    return tracked, expected, manifests, records, [game], catalog
+    return tracked, expected, manifests, records, [game], catalog, runtime_catalog
 
 
 def self_test_offline(out) -> int:
@@ -1372,10 +1661,10 @@ def self_test_offline(out) -> int:
         out(f"FAIL: self-test: check_evidence: {line}")
     with tempfile.TemporaryDirectory() as d:
         root = Path(d)
-        tracked, expected, manifests, records, registered, catalog = plant(root)
+        tracked, expected, manifests, records, registered, catalog, runtime_catalog = plant(root)
         files = [f for f in tracked if shipped(f)]
         findings = (audit_markers(root, files) + audit_raster(root, files) + audit_bypass(manifests, records)
-                    + audit_content(manifests, registered, catalog))
+                    + audit_content(manifests, registered, catalog, runtime_catalog))
     for e in expected:
         hits = [f for f in findings if e in f]
         if len(hits) != 1:
@@ -1438,7 +1727,8 @@ def print_plan(items: list[dict], runtimes: list[str], driver: Driver, out) -> N
                         f"each evidence-{item['id']}-<scenario>.json")
                 if ENDURANCE in item["scenarios"]:
                     out(f"  {r}: endurance: --only-testing {e['only_testing']}/{e['endurance_test']} into "
-                        f"verify-{item['id']}-{rt}-{driver.run_id}-endurance (the bundle is the evidence; no record)")
+                        f"verify-{item['id']}-{rt}-{driver.run_id}-endurance (600 simulated seconds; its record "
+                        f"evidence-{item['id']}-endurance.json is checked like the others)")
             else:
                 if not app_build_shown:
                     out("  app build, once: python3 scripts/release_check.py --only xcodegen; xcodebuild build -project "
@@ -1490,13 +1780,18 @@ def main(argv: list[str] | None = None, *, root: Path = ROOT, run=system_run, cl
     except BadInput as e:
         out(f"FAIL: {e}")
         return 2
-    runtimes = a.runtime or (["27", "26"] if a.only else [])
+    # `--audits` with `--only` audits only: no simulator work, the bypass and content audits scoped to the ids.
+    audit_scope = [i["id"] for i in items] if a.audits and items else None
+    if audit_scope is not None:
+        items = []
+    runtimes = a.runtime or (["27", "26"] if items else [])
     if a.dry_run:
         if items:
             print_plan(items, runtimes, driver, out)
         if a.audits:
-            out("audits: markers, raster, reducer-bypass, content-counts over `git ls-files` (shipped paths); "
-                "direct-gl: check_app_isolation.py --app Apps/VisualCore --require-sources; network: "
+            out("audits: markers, raster, reducer-bypass, content-counts over `git ls-files` (shipped paths)"
+                + (f", reducer-bypass and content-counts scoped to {', '.join(audit_scope)}" if audit_scope else "")
+                + "; direct-gl: check_app_isolation.py --app Apps/VisualCore --require-sources; network: "
                 "check_compliance.py; entitlement: not yet provided (UA-F08)")
         if a.self_test:
             out("self-test: check_evidence self-test, planted audit defects, planner"
@@ -1511,7 +1806,7 @@ def main(argv: list[str] | None = None, *, root: Path = ROOT, run=system_run, cl
         code = max(code, driver.verify(items, runtimes))
     if a.audits:
         try:
-            code = max(code, run_audits(Path(root), run, out, records=driver.records))
+            code = max(code, run_audits(Path(root), run, out, records=driver.records, only=audit_scope))
         except BadInput as e:
             out(f"FAIL: {e}")
             code = max(code, 2)

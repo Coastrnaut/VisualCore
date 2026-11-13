@@ -109,7 +109,6 @@ Packages/VisualCoreRendering/
 Apps/VisualCore/
 ├── App/VisualCoreApp.swift                  modify   scenario request before the model
 ├── App/Automation/ScenarioLaunch.swift      new      request → registry → runner → record → exit   (#if)
-├── App/Automation/ScenarioHostView.swift    new                                             (#if)
 ├── App/DebugSupport/DebugExperience.swift   modify   outcome, probes, manifest
 ├── App/DebugSupport/DebugInventory.swift    modify   the evidence folder rule
 └── Tests/Unit/ScenarioLaunchTests.swift     new
@@ -172,3 +171,9 @@ Experiences that implement `outcome` keep compiling against the default.
 ## Complexity Tracking
 
 No violation to justify.
+
+## As built
+
+`ScenarioHostView` is part of `App/Automation/ScenarioLaunch.swift`, and the sample's manifest is built in
+`ScenarioRunnerTests.swift`, not in a JSON fixture. The other differences from this plan are listed in
+contracts/verification-api.md ("As built") and research.md section 3.

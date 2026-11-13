@@ -36,7 +36,11 @@ import VisualCoreExperience
                      expect: expect)
     }
 
-    private func standard() -> [ScenarioSpec] { ScenarioManifest.standardNames.map { spec($0) } }
+    private func standard() -> [ScenarioSpec] {
+        ScenarioManifest.standardNames.map {
+            $0 == "completion" ? spec($0, expect: ScenarioExpectations(outcome: "done")) : spec($0)
+        }
+    }
 
     private func creative(_ scenarios: [ScenarioSpec]) throws -> ScenarioManifest {
         ScenarioManifest(experience: try id("a05.infinite-geometry"), kind: .creative, scenarios: scenarios)
@@ -197,6 +201,24 @@ import VisualCoreExperience
         #expect(found == ["scenario fixture-long: too many entries: 10001 (at most 10000)"])
     }
 
+    @Test func theActionScenariosMustProveSomething() throws {
+        // Convergence T-U09-044: no action in an action scenario, no outcome in completion, a rejection entry
+        // without an expected result.
+        for name in ["input-response", "completion", "rejection"] {
+            let empty = spec(name, entries: [], expect: name == "completion" ? ScenarioExpectations(outcome: "done")
+                                                                             : ScenarioExpectations())
+            let manifest = try creative(replacing(name, with: empty, in: completeCreative()))
+            let found = problems(manifest, content: Self.creativeContent)
+            #expect(found.contains("scenario \(name): no action"), "\(found)")
+        }
+        let noOutcome = spec("completion")
+        let withoutOutcome = try creative(replacing("completion", with: noOutcome, in: completeCreative()))
+        #expect(problems(withoutOutcome, content: Self.creativeContent) == ["scenario completion: no outcome expected"])
+        let silent = spec("rejection", entries: [ScenarioStep(steps: 0, action: ScriptedAction("tap"))])
+        let withoutResult = try creative(replacing("rejection", with: silent, in: completeCreative()))
+        #expect(problems(withoutResult, content: Self.creativeContent) == ["scenario rejection: entry 1: no expected result"])
+    }
+
     @Test func aRejectionScenarioMaySendInvalidActionsThatItExpectsRejected() throws {
         let rejection = spec("rejection", entries: [
             ScenarioStep(steps: 0, action: ScriptedAction("fly"), result: "action.unknown-control"),
@@ -213,7 +235,8 @@ import VisualCoreExperience
     @Test func anUnknownControlIsAProblem() throws {
         let rejection = spec("rejection", entries: [ScenarioStep(steps: 1, action: ScriptedAction("fly"))])
         let manifest = try creative(replacing("rejection", with: rejection, in: completeCreative()))
-        #expect(problems(manifest, content: Self.creativeContent) == ["scenario rejection: unknown control fly"])
+        #expect(problems(manifest, content: Self.creativeContent)
+                    == ["scenario rejection: unknown control fly", "scenario rejection: entry 1: no expected result"])
     }
 
     @Test func aWrongValueCountIsAProblem() throws {
@@ -235,7 +258,8 @@ import VisualCoreExperience
                               expect: ScenarioExpectations(outcome: "target-reached"))
         let manifest = try creative(replacing("completion", with: completion, in: completeCreative()))
         let found = problems(manifest, content: Self.creativeContent)
-        #expect(found == ["scenario completion: outcome expected without an action before it"])
+        #expect(found == ["scenario completion: outcome expected without an action before it",
+                          "scenario completion: no action"])
     }
 
     @Test func aFinalDigestWithoutAnActionIsAProblem() throws {
@@ -243,7 +267,8 @@ import VisualCoreExperience
                          expect: ScenarioExpectations(finalDigest: Self.digestA))
         let manifest = try creative(replacing("input-response", with: input, in: completeCreative()))
         let found = problems(manifest, content: Self.creativeContent)
-        #expect(found == ["scenario input-response: final digest expected without an action before it"])
+        #expect(found == ["scenario input-response: final digest expected without an action before it",
+                          "scenario input-response: no action"])
     }
 
     @Test func anEntryDigestBeforeTheFirstActionIsAProblem() throws {
@@ -269,9 +294,9 @@ import VisualCoreExperience
     }
 
     @Test func anInitialDigestNeedsNoAction() throws {
-        let input = spec("input-response", entries: [ScenarioStep(steps: 1)],
-                         expect: ScenarioExpectations(initialDigest: Self.digestA))
-        let manifest = try creative(replacing("input-response", with: input, in: completeCreative()))
+        let resume = spec("suspend-resume", entries: [ScenarioStep(steps: 1)],
+                          expect: ScenarioExpectations(initialDigest: Self.digestA))
+        let manifest = try creative(replacing("suspend-resume", with: resume, in: completeCreative()))
         #expect(problems(manifest, content: Self.creativeContent).isEmpty)
     }
 

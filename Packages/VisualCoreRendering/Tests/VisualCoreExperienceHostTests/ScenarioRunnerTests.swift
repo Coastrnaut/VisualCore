@@ -93,11 +93,11 @@ final class ScenarioRunnerTests: XCTestCase {
     // MARK: Running
 
     /// A request for the sample with fault `Fault`; `configure` sets the presenter's switches.
-    private func maker<Fault: SampleFault>(_ fault: Fault.Type,
+    private func maker<Fault: SampleFault>(_ fault: Fault.Type, marksCorner: Bool = true,
                                            configure: ((SamplePresenter<Fault>) -> Void)? = nil) -> ScenarioRunner.RequestMaker {
         { seed, snapshot in
             sampleRequest(Fault.self, seed: seed, snapshot: snapshot, configure: { presenter in
-                presenter.marksCorner = true
+                presenter.marksCorner = marksCorner
                 configure?(presenter)
             }).request
         }
@@ -125,6 +125,13 @@ final class ScenarioRunnerTests: XCTestCase {
             attachment.name = "evidence-\(SampleExperience.id.rawValue)-\(name)\(attachmentSuffix).json"
             attachment.lifetime = .keepAlways
             add(attachment)
+            // The frame the record's hash names (raw RGBA, rows bottom-up), for the driver to keep (T-U09-049).
+            if let frame = result.frame {
+                let picture = XCTAttachment(data: Data(frame.pixels), uniformTypeIdentifier: "public.data")
+                picture.name = "frame-\(SampleExperience.id.rawValue)-\(name)\(attachmentSuffix).rgba"
+                picture.lifetime = .keepAlways
+                add(picture)
+            }
         }
         return failures
     }
@@ -213,12 +220,25 @@ final class ScenarioRunnerTests: XCTestCase {
 
     // MARK: Endurance (FR-U09-060), outside the default nine
 
+    /// Ten simulated minutes (36,000 frames, the length of UA-F06's endurance test); its record is attached as
+    /// `evidence-a99.contract-sample-endurance.json` (T-U09-043).
     func testEnduranceKeepsResourcesFlat() async throws {
         let spec = ScenarioSpec(name: "endurance", seed: Self.seed, entries: [], expect: ScenarioExpectations(),
-                                seconds: 60)
+                                seconds: 600)
         let runner = ScenarioRunner(session: ExperienceSession())
-        let result = await runner.run(spec, request: maker(NoFault.self))
-        XCTAssertEqual(ScenarioEvaluator.failures(spec, result.observation), [])
+        // No corner mark: endurance reads no frame, and the scissored clear of the mark grows the footprint on the
+        // simulators (research section 3).
+        let result = await runner.run(spec, request: maker(NoFault.self, marksCorner: false))
+        let failures = ScenarioEvaluator.failures(spec, result.observation)
+        XCTAssertEqual(failures, [])
+        let record = EvidenceRecord.observed(result.observation, experience: SampleExperience.id, code: "sample",
+                                             run: "package-test", build: "Debug", process: result.process,
+                                             qualityTier: nil, failures: failures, probes: result.probes,
+                                             thermalState: "nominal", lowPower: false)
+        let attachment = XCTAttachment(data: try record.encoded(), uniformTypeIdentifier: "public.json")
+        attachment.name = "evidence-\(SampleExperience.id.rawValue)-endurance.json"
+        attachment.lifetime = .keepAlways
+        add(attachment)
     }
 }
 #endif

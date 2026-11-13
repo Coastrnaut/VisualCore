@@ -727,6 +727,7 @@ VisualCoreExperience | let | public static let qualityRange
 VisualCoreExperience | let | public static let quarantinePrefix
 VisualCoreExperience | let | public static let runKey
 VisualCoreExperience | let | public static let scenarioKey
+VisualCoreExperience | let | public static let scenariosWithActions: Set<String>
 VisualCoreExperience | let | public static let scenariosWithoutActions: Set<String>
 VisualCoreExperience | let | public static let schema
 VisualCoreExperience | let | public static let schemaVersion
@@ -831,6 +832,7 @@ VisualCoreExperience | var | public private(set) var seed: UInt64?
 VisualCoreExperience | var | public private(set) var state: ExperienceLifecycleState
 VisualCoreExperience | var | public private(set) var state: SessionState
 VisualCoreExperience | var | public private(set) var stepIndex
+VisualCoreExperience | var | public static var automationCompiled: Bool
 VisualCoreExperience | var | public static var environmentKind: String
 VisualCoreExperience | var | public static var migratedVersions: [Int]
 VisualCoreExperience | var | public static var preparationFailedCode: String
