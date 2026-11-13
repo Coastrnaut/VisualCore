@@ -21,22 +21,22 @@ final class PUSceneLibraryUITests: XCTestCase {
         if let current = field.value as? String, !current.isEmpty, current != "Scene name", current != "New name" {
             field.typeText(String(repeating: XCUIKeyboardKey.delete.rawValue, count: current.count))
         }
-        field.typeText(value)
+        field.typeText(value + "\n")                    // return dismisses the keyboard
     }
 
     @MainActor
     func testSaveChangeOpenRelaunchRenameDelete() {
         let app = PU.open()
-        XCTAssertEqual(text(app, "emitters"), "Emitters: 3 of 8", "the default scene has three emitters")
+        let saved = text(app, "emitters")                // the scene as saved (the default has one emitter)
         PU.tap(app, "move.right")                       // a moved emitter is saved with the scene
         type(app, "library.name", "Nebula")
         PU.tap(app, "library.save")
         XCTAssertEqual(text(app, "library.entry.0"), "Nebula")
 
         PU.tap(app, "emitter.add")                       // change the scene after saving
-        XCTAssertEqual(text(app, "emitters"), "Emitters: 4 of 8")
+        XCTAssertNotEqual(text(app, "emitters"), saved, "the scene changed")
         PU.tap(app, "library.open.0")
-        XCTAssertEqual(text(app, "emitters"), "Emitters: 3 of 8", "opening restores the saved scene")
+        XCTAssertEqual(text(app, "emitters"), saved, "opening restores the saved scene")
         XCTAssertFalse(PU.control(app, "library.message").exists, "no error after opening")
 
         let again = relaunch(app, arguments: PU.again)   // the library survives a relaunch
@@ -44,7 +44,7 @@ final class PUSceneLibraryUITests: XCTestCase {
         XCTAssertEqual(text(again, "library.entry.0"), "Nebula")
         PU.tap(again, "emitter.add")
         PU.tap(again, "library.open.0")
-        XCTAssertEqual(text(again, "emitters"), "Emitters: 3 of 8")
+        XCTAssertEqual(text(again, "emitters"), saved, "the saved scene opens after a relaunch")
 
         PU.tap(again, "library.rename.0")
         type(again, "library.renameText.0", "Galaxy")

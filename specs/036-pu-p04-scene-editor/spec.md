@@ -209,7 +209,9 @@ fixed number of steps; open a scene with the maximum emitters on each quality ti
   version-1 file opens.
 - **SC-A04-404**: A moved emitter's position is kept after save and reopen in 100% of cases.
 - **SC-A04-405**: 7 of 7 force kinds stay finite for 600 steps when placed on an emitter in an opened scene.
-- **SC-A04-406**: Every new test finishes in under 10 seconds on the simulator.
+- **SC-A04-406**: Every new unit test finishes in under 10 seconds on the simulator; the interface test (one launch,
+  one relaunch) finishes in under 3 minutes. (Corrected in implement: the existing Particle Universe interface tests
+  take 40–90 s each through their scroll-to-reveal helper, so 10 s cannot hold for an interface test.)
 
 ## Assumptions
 

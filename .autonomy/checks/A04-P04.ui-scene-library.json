@@ -1,0 +1,28 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_app.py",
+    "--scheme",
+    "VisualCore",
+    "--runtime",
+    "27.2",
+    "--kind",
+    "phone",
+    "--only-testing",
+    "VisualCoreUITests/PUSceneLibraryUITests",
+    "--sources",
+    "Apps/VisualCore/Tests/UI",
+    "--log-name",
+    "a04p04-scene-library"
+  ],
+  "command": "python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime 27.2 --kind phone --only-testing VisualCoreUITests/PUSceneLibraryUITests --sources Apps/VisualCore/Tests/UI --log-name a04p04-scene-library",
+  "elapsed_seconds": 60.945,
+  "exit_code": 1,
+  "finished": "2026-11-13T22:04:38+00:00",
+  "log": ".autonomy/logs/A04-P04.ui-scene-library.log",
+  "log_sha256": "78aeb33fab28fae71e39f36501323bd88d7fe7d807a1585667d02882285db174",
+  "name": "ui-scene-library",
+  "stage": "A04-P04",
+  "started": "2026-11-13T22:03:37+00:00",
+  "timed_out": false
+}

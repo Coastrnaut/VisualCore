@@ -42,3 +42,10 @@ change check added to T-A04-417). Round 2: clean; 22 of 22 requirements and 6 of
 - An emitter saved with an explicit position equal to its family default reopens with no explicit position (same
   behaviour); tests compare positions through `SceneSimulation.placement`.
 - Defaults: trails off, trail strength 0.85, blend not additive (`SceneDocument.default*`), shared with `ParticleCore`.
+- The default scene has one emitter; the interface test compares the emitter count against the saved one instead of a
+  fixed number. Typing ends with a return so the keyboard does not cover the save button.
+- SC-A04-406 corrected: unit tests stay under 10 s (the new ones run in under 1 s); the interface test bound is 3 minutes
+  (the first passing run took 169 s; existing PU interface tests take 40–90 s each).
+- Opening rejects an invalid define by leaving the open incomplete (the engine restores the core after a rejected
+  action), so the following `look.define` is refused for the wrong count and the scene stays unchanged; a new
+  `scene.begin` discards it.
