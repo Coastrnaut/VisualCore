@@ -75,7 +75,7 @@ each task. Tests before code. Owner-only items: none. One {device} task. No Visu
   `ui-pu`); test durations under 10 s each (SC-A04-406).
 - [X] T-A04-419 Update `docs/apps/particle-universe/README.md` with the editor and library. — Verified 2026-11-13: docs/apps/particle-universe/README.md section Scene editor and saved scenes (feature 036, A04-P04); validate_docs PASS
 - [ ] T-A04-420 {device} In the device campaign: save and open timings and GPU behaviour of opened scenes on D1, D2, D3.
-- [ ] T-A04-421 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then
+- [X] T-A04-421 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then — Verified 2026-11-13: converge round 1 appended T-A04-422 (implemented, library tests 9/9); round 2 appended nothing (22 FR, 6 SC, 12 scenarios, 9 edge cases checked); T-A04-420 {device} stays open
   seal and record the gate with `python3 Tools/python/desktop_runbook.py seal --stage A04-P04` and `record`.
 
 ## Dependencies
