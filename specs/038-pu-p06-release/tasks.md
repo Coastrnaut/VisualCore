@@ -18,13 +18,13 @@ A04-P06 --name <check> -- <command>`. Commit after every task (no trailers); pus
 **Independent test**: release declarations, scans and the privacy note.
 
 - [ ] T-A04-603 [P] [US1] Write `docs/apps/particle-universe/privacy-and-credits.md`: stored data (saved scenes `scene-<uuid>.json` in the experience's own folder, nothing else persisted), no collection or sharing, no permission, no network, no third-party code, no non-code assets, the app manifest's required reasons that cover the experience (UserDefaults CA92.1 via ExperienceStorage, FileTimestamp C617.1), per FR-A04-603–604
-- [ ] T-A04-604 [US1] Prove FR-A04-602 for the sources: `run-check --name pu-no-network -- python3 scripts/check_no_tracking.py` against the PU sources if it accepts a source path, else a `grep -rE 'URLSession|Network|CoreMotion|AVFoundation|CoreLocation|AdSupport|AppTrackingTransparency' PU` check that must find nothing; the release-build privacy, tracking and usage checks are T-A04-620
+- [ ] T-A04-604 [US1] Prove FR-A04-602 for the sources: `run-check --name pu-no-network -- /bin/sh -c "! grep -rnE 'URLSession|import Network|CoreMotion|AVFoundation|CoreLocation|AdSupport|AppTrackingTransparency|NSUserTrackingUsage' Packages/ExperiencesCreative/ParticleUniverse/Core Packages/ExperiencesCreative/ParticleUniverse/Experience"` (exit 0 only when nothing is found); the built-app tracking, privacy and usage checks are T-A04-620
 
 ## Phase 4: User Story 2 — A broken file or a failed draw never loses work (P1)
 
 **Independent test**: fixtures load as specified; failure → failed → retry → running.
 
-- [ ] T-A04-605 [P] [US2] Commit library fixtures in `PU/ExperienceTests/Fixtures/Library/`: `scene-no-format.json` (wrapper without `format`), `scene-format-1.json`, `scene-format-2.json` (`format: 2`), `scene-damaged.json` (truncated), each with an `id` equal to its renamed file name at test time
+- [ ] T-A04-605 [P] [US2] Commit library fixtures in `PU/ExperienceTests/Fixtures/Library/`: `scene-no-format.json` (wrapper without `format`), `scene-format-1.json`, `scene-format-2.json` (`format: 2`), `scene-damaged.json` (truncated), each with a fixed `id`; the test writes each as `scene-<its id lowercased>.json`
 - [ ] T-A04-606 [P] [US2] Write `PU/ExperienceTests/ParticleLibraryMigrationTests.swift` first (failing): the four fixtures copied into a temporary `ExperienceStorage` as `scene-<uuid>.json`; no-format and format-1 open with 100% of fields equal; format 2 counted in `newer`, kept, refused by `document(for:)`; damaged counted in `unreadable`, kept; save and rename write `"format":1`; a format-1 file decodes with the wrapper as it was before this phase (extra key ignored)
 - [ ] T-A04-607 [US2] Add `format` to the private `File` of `PU/Experience/ParticleLibrary.swift` ("absent = 1; written as 1"; `format > 1` counted in `newer`, never rewritten) with `///` documentation, until T-A04-606 passes
 - [ ] T-A04-608 [P] [US2] Add the internal seam `failNextDraw` (throws `ParticleDrawError.injected` from `draw`, then clears) and an internal `brightnessCap` read to `PU/Experience/ParticlePresenter.swift`

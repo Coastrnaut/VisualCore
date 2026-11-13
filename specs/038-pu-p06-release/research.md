@@ -32,3 +32,8 @@
 - **D6 Build and archive:** `docs/release/build-and-archive.md` lists `verify_environment.py`, `xcodegen generate`,
   `release_check.py --only app-release-build app-release-symbols app-privacy-manifest app-no-tracking app-licenses
   app-usage-descriptions`, and owner steps (team, signing, Product › Archive, upload, App Store Connect).
+
+## 2. Analysis record (`/speckit-analyze`, 2026-11-13)
+
+- U1 (HIGH) fixed: T-A04-604 scans the sources with a grep that must find nothing (`check_no_tracking.py` takes only
+  a built app). U2 (MEDIUM) fixed: fixture files are written under their own ids. Re-run: 0 critical, 0 high.
