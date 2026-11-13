@@ -99,3 +99,6 @@
   module up there. The per-tool test loaders and the collector of `test_scripts.py` now register each module first.
   The other jobs of that run passed: `app-build` (Debug and Release against the stand-ins), `host-tests` and
   `simulator-build`.
+- 2026-11-13, T-U10-006: the planted Release-only break (30858f1) failed `app-build` in its Release step (CI run
+  43497392798), and the revert (7683cc9) passed every job. GitHub's `macos-latest` runner built with Xcode 26.6, not
+  the pinned 27.2. The app builds with both, and the pin stays the local and evidence toolchain.

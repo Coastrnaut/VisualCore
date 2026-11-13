@@ -116,7 +116,7 @@ Independent test: planted second shippable target, undeclared target and reused 
 - [X] T-U10-027 Evidence `reference-a` and `reference-b`: the two chunks of the reference regression. — Verified 2026-11-13: reference-a 3/3 (engine xcframework, projectM-iOS simulator build, reference clean) and reference-b 4/4 (ANGLE rendering tests and ProjectM reference on iOS 27 and 26)
 - [X] T-U10-028 Evidence `docs`, `steering`, `script-tests`, `legacy-ledger` (`migration_baseline.py verify`), and a — Verified 2026-11-13: docs, steering, script-tests, legacy-ledger exit 0 (UA-F10 checks); CI run 43490248490 of 1fd4264 (contains every UA-F10 change: app-build with stand-ins and caches, checks on Linux, target and package validations) completed success in checks, host-tests, simulator-build and app-build
   finished `ci` run with success for a commit containing all UA-F10 changes.
-- [ ] T-U10-029 Run `/speckit-converge` and `/speckit-implement` for what it appends; repeat until it appends nothing;
+- [X] T-U10-029 Run `/speckit-converge` and `/speckit-implement` for what it appends; repeat until it appends nothing; — Verified 2026-11-13: /speckit-converge round 1 appended T-U10-031 (static proof of the audit deferral), implemented (audit-deferral); round 2 converged with 0 findings; the CI tasks T-U10-006 and T-U10-028 are now done
   then `migration_ledger.py seal --gate UA-F10` and `record --gate UA-F10`.
 
 Conditional:
