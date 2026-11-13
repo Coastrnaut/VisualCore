@@ -279,3 +279,12 @@ Appended by `/speckit-converge` (T-U07-033, 2026-11-13). Implemented before T-U0
   for the standalone target until X-A04 per FR-U07-016 and FR-U07-013 (unrequested)
 - [X] T-U07-044 Replace the retired app paths in the usage examples of `scripts/check_test_enumeration.py` and — Verified 2026-11-13: usage examples of check_test_enumeration.py and check_app_isolation.py name Apps/VisualCore paths; grep finds no retired app path in scripts outside test fixtures; both --help run; script tests 319 OK (script-tests-paths)
   `scripts/check_app_isolation.py` with paths that exist per FR-U07-044 (partial)
+
+## Phase 13: Convergence
+
+Appended by `/speckit-converge` (T-U07-041, round 1, 2026-11-13).
+
+- [ ] T-U07-045 Rerun the X readiness checks of A01 and A02 on their final sources (`verify_experiences.py --only
+  <id> --audits` and the runner with `--runtime 27 26 --fresh`), because the A01 screen retirement and the Release
+  fix of the probe helpers came after `a01-x-audits`, `a02-x-audits` and `verify-a01-a03-27/26` per FR-U07-051 and
+  SC-U07-008 (partial)
