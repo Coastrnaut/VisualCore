@@ -1,0 +1,115 @@
+# Tasks: R02-F03 — Numerical foundations and deterministic seeded scene time
+
+**Input**: [spec.md](spec.md), [plan.md](plan.md), [research.md](research.md), [data-model.md](data-model.md),
+[contracts/api.md](contracts/api.md), [quickstart.md](quickstart.md)
+
+Evidence: `python3 scripts/migration_ledger.py run-check --gate R02-F03 --name <check> -- <command>`. Commit after
+each task (`scripts/tick_task.py`). Tests before code. Device-only items: none (no {device} task). Owner-only items:
+none (no {owner} task). VisualCore changes, so the documentation, API-baseline and reference-regression tasks apply.
+
+## Phase 1: Setup
+
+- [ ] T-R02F03-001 Baseline: `swift test --package-path Packages/VisualCore` passes before the change (check
+  `baseline-host`); research.md §0 audit re-verified.
+
+## Phase 2: User Story 1 — Independent named random streams (P1)
+
+- [ ] T-R02F03-002 [P] [US1] Tests first in `Packages/VisualCore/Tests/VisualCoreSimulationTests/SeedDerivationTests.swift`:
+  `mix` equals the SplitMix64 first output for state 0 + golden increment; FNV-1a-64 of "" (`0xcbf29ce484222325`) and
+  of "a" (`0xaf63dc4c8601ec8c`); golden `derive(42, label: "layout")`, `derive(42, index: 0)` and `(42, 1)`;
+  labels "a"/"b" and indexes 0/1 pairwise different; chaining; `SeededRandom(seed:label:)` equals
+  `SeededRandom(seed: derive(seed, label:))`; drawing from one stream does not change another.
+- [ ] T-R02F03-003 [US1] Write `Packages/VisualCore/Sources/VisualCoreSimulation/SeedDerivation.swift` per data-model
+  "Sub-seed derivation" and contracts/api.md, with `///` on each public declaration.
+- [ ] T-R02F03-004 [US1] Acceptance: host tests pass (check `host-derivation`) (SC-R02F03-002).
+
+## Phase 3: User Story 2 — Owned random algorithms (P1)
+
+- [ ] T-R02F03-005 [P] [US2] Tests first in `Packages/VisualCore/Tests/VisualCoreSimulationTests/SeededRandomChoiceTests.swift`:
+  `index(below:)` uses exactly one draw (state after equals one `next()`); golden shuffle of 0…9 with seed 7, a
+  permutation, n − 1 draws; `pick` uniform golden and `.empty`; `weightedIndex([1, 0, 3])` 1,000 times from a fixed
+  seed never returns 1 and equals golden counts; `.empty`, `.negativeWeight(i)`, `.nonFiniteWeight(i)`, `.zeroTotal`.
+- [ ] T-R02F03-006 [US2] Write `Packages/VisualCore/Sources/VisualCoreSimulation/SeededRandom+Choice.swift` (`index(below:)`
+  via the high half of `multipliedFullWidth`, Fisher–Yates from the end, `RandomChoiceError`).
+- [ ] T-R02F03-007 [US2] Acceptance: host tests pass and the existing `SeededRandomTests` are unchanged and pass
+  (check `host-choice`) (SC-R02F03-003, SC-R02F03-001).
+
+## Phase 4: User Story 3 — Saved generator state (P2)
+
+- [ ] T-R02F03-008 [P] [US3] Tests first in `Packages/VisualCore/Tests/VisualCoreSimulationTests/SeededRandomStateTests.swift`:
+  after 100 draws, save, restore, next 100 identical and restored `==` original; JSON round trip; refused:
+  `version` ≠ 1, word count ≠ 4, a word not "16 lower-case hexadecimal digits", all-zero words; existing equality
+  unchanged.
+- [ ] T-R02F03-009 [US3] Write `Packages/VisualCore/Sources/VisualCoreSimulation/SeededRandom+State.swift`
+  (`State { version, seed, words }`, `state`, `init(restoring:) throws(RandomStateError)`); if the state words must be
+  read from the extension, change `private` to `fileprivate`/`internal` in `SeededRandom.swift` without changing
+  output.
+- [ ] T-R02F03-010 [US3] Acceptance: host tests pass (check `host-state`) (SC-R02F03-004).
+
+## Phase 5: User Story 4 — Shader hash twin (P2)
+
+- [ ] T-R02F03-011 [P] [US4] Tests first in `Packages/VisualCore/Tests/VisualCoreMathTests/ShaderHashTests.swift`:
+  `pcg` golden values for 0, 1, 12345, `UInt32.max` (computed from the `vc/hash.glsl` formula and committed);
+  `hash11`, `hash21`, `hash22` goldens on a few floats (bit patterns, divide by 4294967296).
+- [ ] T-R02F03-012 [US4] Write `Packages/VisualCore/Sources/VisualCoreMath/ShaderHash.swift`.
+- [ ] T-R02F03-013 [US4] Write `Packages/VisualCoreRendering/Tests/VisualCoreRenderingTests/ShaderHashParityTests.swift`:
+  a fragment shader including `vc/hash.glsl` writes the four bytes of `vc_pcg(index)` for 64 pixels into RGBA8; read
+  back with `readPixels()` and compare with `ShaderHash.pcg` exactly.
+- [ ] T-R02F03-014 [US4] Acceptance: host tests (check `host-shader-hash`); rendering package on sim-27.2 and sim-26.5
+  (checks `rendering-ios27`, `rendering-ios26`) with 64 of 64 matches (SC-R02F03-005).
+
+## Phase 6: User Story 5 — Numeric hygiene (P2)
+
+- [ ] T-R02F03-015 [P] [US5] Tests first in `Packages/VisualCore/Tests/VisualCoreMathTests/NumericHygieneTests.swift`:
+  `finite` with NaN, ±∞ and a finite value; `normalizedAngle` for 0, π (→ −π), −π, 3π, −7π/2, 1e9 in [−π, π) and
+  a whole number of turns away; `wrapped` for −0.5 mod 2, 2 mod 2 (→ 0), errors for modulus 0, −1, ∞, NaN input;
+  `quantized` 0.26 step 0.1 → 3, −0.0 → 0, `.nonFinite`, `.nonPositiveStep`, `.outOfRange` for 1e300.
+- [ ] T-R02F03-016 [US5] Write `Packages/VisualCore/Sources/VisualCoreMath/NumericHygiene.swift` (`NumericError`).
+- [ ] T-R02F03-017 [US5] Acceptance: host tests pass (check `host-hygiene`) (SC-R02F03-006).
+
+## Phase 7: User Story 6 — Determinism document (P3)
+
+- [ ] T-R02F03-018 [P] [US6] Tests first in `scripts/tests/test_check_doc_names.py`: a document citing an unknown
+  backticked public name fails; one citing only names of the API baseline passes; non-name code spans (paths, numbers)
+  are ignored.
+- [ ] T-R02F03-019 [US6] Write `scripts/check_doc_names.py` (backticked identifiers that look like public type or member
+  names are checked against `docs/api/visualcore-public-api.txt`).
+- [ ] T-R02F03-020 [US6] Write `docs/architecture/determinism.md` (FR-R02F03-060, 061: step policy, integer-only
+  rules, trust boundary of transcendental functions, stream derivation, replay format, transform conventions, UIKit
+  y-down conversion).
+- [ ] T-R02F03-021 [US6] Acceptance: `python3 scripts/check_doc_names.py docs/architecture/determinism.md` passes
+  after the API baseline update (check `doc-names`) (SC-R02F03-007).
+
+## Phase 8: Polish and cross-cutting
+
+- [ ] T-R02F03-022 API baseline: `python3 scripts/check_public_api.py --update` then `check_public_api.py` (check
+  `public-api`); `python3 scripts/check_documented_api.py --sources Apps/VisualCore` (check `documented-api`).
+- [ ] T-R02F03-023 `Packages/VisualCore/README.md` section "Numerical foundations (feature 203, R02-F03)".
+- [ ] T-R02F03-024 Full host suite `swift test --package-path Packages/VisualCore` (check `host-visualcore`).
+- [ ] T-R02F03-025 Committed digests unchanged: `python3 scripts/verify_experiences.py --only a01.generative-art-studio
+  a02.fluid-art-playground a03.fractal-explorer --runtime 27` (check `verify-a01-a03`) (FR-R02F03-002).
+- [ ] T-R02F03-026 Reference regression chunk 1: `python3 scripts/release_check.py --only reference-engine-xcframework
+  reference-build-projectm-ios-sim reference-clean` (check `reference-1`).
+- [ ] T-R02F03-027 Reference regression chunk 2: `python3 scripts/release_check.py --only
+  reference-test-anglerendering-ios27 reference-test-anglerendering-ios26 projectm-reference-ios27
+  projectm-reference-ios26` (check `reference-2`).
+- [ ] T-R02F03-028 Script tests `python3 scripts/test_scripts.py` (check `script-tests`).
+- [ ] T-R02F03-029 Auto-Creator.md section 13 row R02-F03 as built via `docs/catalog/shared-feature-map.json` and
+  `render_autocreator.py`; `validate_autocreator.py`, `validate_docs.py`, `migration_baseline.py verify`; CI of a
+  commit with all changes finished with success.
+- [ ] T-R02F03-030 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
+  R02-F03.
+
+## Dependencies
+
+001 → stories 1–6 (independent files; parallel) → 022 (baseline after all public additions) → 021 (document check
+needs the baseline) → 023–029 → 030.
+
+## Parallel execution (one writer per file)
+
+Agent A: 002–003. Agent B: 005–006. Agent C: 008–009 (sole writer of `SeededRandom.swift`). Agent D: 011–013.
+Agent E: 015–016. Agent F: 018–020. Lead: acceptances, 022–030.
+
+## Implementation strategy
+
+MVP: stories 1 and 2. Review checkpoint after each story's acceptance task.
