@@ -67,7 +67,7 @@ Device-only items: none, so no {device} task.
 - [X] T-U11-015 [P] [US3] Tests first in `scripts/tests/test_compliance_tracking.py`: a fixture source importing — Verified 2026-11-13: scripts/tests/test_compliance_tracking.py 4 tests OK (AdSupport/ATT imports and APIs, deny-listed library imports, comments ignored, repository passes)
   `AdSupport` or `AppTrackingTransparency`, or calling `ASIdentifierManager`/`ATTrackingManager`, fails
   `check_compliance.scan(root)`; the repository passes.
-- [ ] T-U11-016 [US3] Modify `scripts/check_compliance.py`: one `RULES` entry "advertising or tracking API
+- [X] T-U11-016 [US3] Modify `scripts/check_compliance.py`: one `RULES` entry "advertising or tracking API — Verified 2026-11-13: check_compliance.py RULES entry for advertising/tracking APIs plus deny-listed library imports read from Configs/tracking-denylist.json; repository PASS (compliance)
   (Constitution XII)".
 - [ ] T-U11-017 [US3] Acceptance: `python3 scripts/check_compliance.py` (check `compliance`) and
   `python3 scripts/check_no_tracking.py --app "$APP" --json .autonomy/logs/ua-f11/tracking.json` (check `no-tracking`)
