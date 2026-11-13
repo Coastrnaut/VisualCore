@@ -148,7 +148,7 @@ Device-only items: none, so no {device} task.
   (FR-U11-091).
 - [ ] T-U11-039 {owner} Human distinctiveness review of `docs/legal/distinctiveness-matrix.md`, non-gating (D-17,
   FR-U11-092).
-- [ ] T-U11-040 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
+- [X] T-U11-040 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record — Verified 2026-11-13: converge round 1 appended T-U11-041..042, round 2 appended T-U11-043, round 3 appended nothing; T-U11-037..039 {owner} stay open as BLOCKED_OWNER_ACTION (owner-review.md)
   UA-F11 (`python3 scripts/migration_ledger.py seal --gate UA-F11 && python3 scripts/migration_ledger.py record --gate
   UA-F11`).
 
