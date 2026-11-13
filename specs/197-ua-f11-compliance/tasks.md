@@ -111,7 +111,7 @@ Device-only items: none, so no {device} task.
 
 ## Phase 9: User Story 7 — Metadata inputs list only integrated experiences (P3)
 
-- [ ] T-U11-027 [P] [US7] Tests first in `scripts/tests/test_metadata_inputs.py`: a fixture ledger with X-A01 pass
+- [X] T-U11-027 [P] [US7] Tests first in `scripts/tests/test_metadata_inputs.py`: a fixture ledger with X-A01 pass — Verified 2026-11-13: scripts/tests/test_metadata_inputs.py 25 tests OK (only pass X gates, backlog excluded, unproven without, failing, other-check or mismatched reports, proven with two passing reports of one digest, stale check)
   and X-A02 pending lists only A01; privacy answers are `"unproven"` without reports, with a failing report, or with
   reports of different executable digests; proven with two passing reports of one digest; `--check` fails on a
   stale file.
