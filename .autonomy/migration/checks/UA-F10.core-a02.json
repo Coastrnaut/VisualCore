@@ -1,0 +1,29 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/ExperiencesCreative",
+    "--scheme",
+    "ExperiencesCreative-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--result-name",
+    "ua-f10-core-a02",
+    "--only-testing",
+    "FluidArtPlaygroundCoreTests"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --result-name ua-f10-core-a02 --only-testing FluidArtPlaygroundCoreTests",
+  "elapsed_seconds": 6.777,
+  "exit_code": 0,
+  "finished": "2026-11-13T18:55:17+00:00",
+  "gate": "UA-F10",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F10.core-a02.log",
+  "log_sha256": "9b604fb73124172300f4fc82d864160d6cacb14049aed761c81a4651d08451f7",
+  "name": "core-a02",
+  "started": "2026-11-13T18:55:10+00:00",
+  "timed_out": false
+}
