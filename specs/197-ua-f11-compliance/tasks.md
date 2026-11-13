@@ -90,7 +90,7 @@ Device-only items: none, so no {device} task.
 
 ## Phase 7: User Story 5 — ProjectM is not in the app (P2)
 
-- [ ] T-U11-022 [US5] Acceptance: `python3 scripts/audit_showcase_dependencies.py --target VisualCore --sources
+- [X] T-U11-022 [US5] Acceptance: `python3 scripts/audit_showcase_dependencies.py --target VisualCore --sources — Verified 2026-11-13: audit_showcase_dependencies --target VisualCore --app Release app PASS, no ProjectM (projectm-audit, release-check-app); check_release_symbols PASS (release-symbols); audit planted-defect tests pass (script-tests)
   Apps/VisualCore --app "$APP"` (check `projectm-audit`) and `python3 scripts/check_release_symbols.py --app "$APP"`
   (check `release-symbols`) pass; the audit's existing planted-defect tests pass in the script tests (SC-U11-005).
 
