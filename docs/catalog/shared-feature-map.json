@@ -241,13 +241,18 @@
   "F26": {
    "disposition": "extend",
    "existing": [
-    "AccessibilitySettingsSection",
-    "SystemAccessibilityObserver",
     "AccessibilityPreferences",
-    "EffectiveAccessibility"
+    "AccessibilitySettingsSection",
+    "AnnouncementPlanner",
+    "EffectiveAccessibility",
+    "ExperienceFeedback",
+    "GestureAlternatives",
+    "GestureArbiter",
+    "HapticPlanner",
+    "SystemAccessibilityObserver"
    ],
    "home": "VisualCoreUI, VisualCoreSimulation",
-   "note": "Input, accessibility and haptics contract for games; shell-level parts are in UA-F04."
+   "note": "As built (feature 226): GestureArbiter (one gesture owns the touch, deterministic), GestureAlternatives with presenter gesture and native action sets, AnnouncementPlanner and HapticPlanner with rate limits, stateSignProblems for colour independence, transitionDuration for Reduce Motion, system players behind sinks, ExperienceFeedback route, and a haptics switch in Settings (ShellPreferences.haptics, absent = on). Reduce Motion and Reduce Flashing reused from UA-F04. Haptic feel and the system audits are device items."
   },
   "F27": {
    "disposition": "superseded",

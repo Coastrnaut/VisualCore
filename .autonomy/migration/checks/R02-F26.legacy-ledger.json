@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "python3",
+    "scripts/migration_baseline.py",
+    "verify"
+  ],
+  "command": "python3 scripts/migration_baseline.py verify",
+  "elapsed_seconds": 0.097,
+  "exit_code": 0,
+  "finished": "2026-11-13T20:21:10+00:00",
+  "gate": "R02-F26",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-F26.legacy-ledger.log",
+  "log_sha256": "bb0fe46afca797e0fb9543fff753020224db19678a166cd8f35f6097d0b0c6d0",
+  "name": "legacy-ledger",
+  "started": "2026-11-13T20:21:10+00:00",
+  "timed_out": false
+}
