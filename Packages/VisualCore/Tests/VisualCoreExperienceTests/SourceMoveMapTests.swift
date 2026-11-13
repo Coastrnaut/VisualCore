@@ -13,8 +13,17 @@ import Testing
     private let move: [String: Any] = ["from": "Apps/GenerativeArtStudio/Core", "to": "Packages/ExperiencesCreative/GenerativeArtStudio/Core",
                                         "gate": "UA-F07", "commit": "abc1234"]
 
-    @Test func committedMapHasNoMovesYet() throws {
-        #expect(try SourceMoveMap(data: CatalogFixture.data("path-map.json")).moves.isEmpty)
+    /// Feature 193 (UA-F07) recorded the first moves: every committed move is that gate's, from `Apps/` into the
+    /// one app's tests or the experience packages, with a full commit id.
+    @Test func committedMovesAreTheAdoptionsOfUAF07() throws {
+        let moves = try SourceMoveMap(data: CatalogFixture.data("path-map.json")).moves
+        #expect(!moves.isEmpty)
+        for move in moves {
+            #expect(move.gate == "UA-F07", "\(move.from)")
+            #expect(move.from.hasPrefix("Apps/"), "\(move.from)")
+            #expect(move.to.hasPrefix("Packages/Experiences") || move.to.hasPrefix("Apps/VisualCore/Tests/UI/"), "\(move.to)")
+            #expect(move.commit.count == 40 && move.commit.allSatisfy(\.isHexDigit), "\(move.commit)")
+        }
     }
 
     @Test func movesAreRead() throws {

@@ -21,8 +21,11 @@ SKIP = {".build", "Build", "DerivedData", ".swiftpm", "Tests"}
 
 
 def sources(packages: Path) -> list[Path]:
+    """The framework's sources: every package except the experience collections (`Packages/Experiences*`, feature
+    193), whose public symbols serve only the one app's registry and are not VisualCore API."""
     return sorted(p for p in packages.rglob("*.swift")
-                  if p.name != "Package.swift" and not (SKIP & set(p.relative_to(packages).parts)))
+                  if p.name != "Package.swift" and not (SKIP & set(p.relative_to(packages).parts))
+                  and not p.relative_to(packages).parts[0].startswith("Experiences"))
 
 
 def module_of(path: Path, packages: Path) -> str:
