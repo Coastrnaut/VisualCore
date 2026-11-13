@@ -8,6 +8,9 @@
 //   1. The render callback only reads: the core steps the simulation (the standalone `gpuFrame` advanced it).
 //   2. The quality level comes from the session host and caps the drawn count; the simulation keeps its limit.
 //   3. There is no CPU preview renderer: a GPU failure fails the session's setup and shows its failure view.
+//   4. Feature 037 A04-P05 T-A04-506 (FR-A04-510 to FR-A04-512; research D2): a `FrameBudgetMonitor` fed with each
+//      drawn frame's time while the core plays lowers the drawn detail on slow frames; the presenter draws at the
+//      coarser of the host's tier and the monitor's. It is not a logged action and never changes the simulation.
 import Foundation
 import ParticleUniverseCore
 import SwiftUI
@@ -41,6 +44,13 @@ final class ParticlePresenter: ExperiencePresenter {
     private let reduceFlashing: Bool
     private let pointsPerPixel: Double
     private var particles: [ParticleInstance] = []
+    /// The drawn-detail controller: records frame times while the core plays and restarts while it is paused, on
+    /// setup and on teardown (feature 037 A04-P05).
+    var detail = FrameBudgetMonitor()
+    /// The tier of the last draw: the coarser of the host's tier and `detail.tier`.
+    private(set) var drawnTier = 0
+    /// The number of particles of the last draw.
+    var drawnCount: Int { particles.count }
     private lazy var scene = ParticleLayerScene(world: ParticleStage.world, background: Vec4(0, 0, 0, 1)) { [weak self] _ in
         self?.particles ?? []
     }
@@ -58,6 +68,7 @@ final class ParticlePresenter: ExperiencePresenter {
     }
 
     func setup(_ context: RenderContext) throws {
+        detail.restart()
         try scene.setup(context)
     }
 
@@ -68,7 +79,13 @@ final class ParticlePresenter: ExperiencePresenter {
     func draw(_ core: ParticleCore, tier: Int, context: RenderContext, frame: FrameInfo) throws {
         mirror.canvasSize = Vec2(Double(max(1, context.pixelWidth)) * pointsPerPixel,
                                  Double(max(1, context.pixelHeight)) * pointsPerPixel)
-        particles = core.instances(tier: tier)
+        if core.playing {
+            detail.record(frameTime: frame.delta)
+        } else {
+            detail.restart()
+        }
+        drawnTier = max(tier, detail.tier)
+        particles = core.instances(tier: drawnTier)
         scene.trailStrength = core.trailsOn ? core.trailStrength : 0
         scene.blend = core.additive ? .additive : .normal
         scene.brightnessCap = reduceFlashing ? 0.6 : 1
@@ -78,6 +95,7 @@ final class ParticlePresenter: ExperiencePresenter {
     func teardown(_ context: RenderContext) {
         scene.teardown(context)
         particles = []
+        detail.restart()
     }
 
     func describe(_ core: ParticleCore) -> String {
