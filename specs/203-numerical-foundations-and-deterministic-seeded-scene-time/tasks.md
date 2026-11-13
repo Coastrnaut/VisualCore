@@ -72,7 +72,7 @@ none (no {owner} task). VisualCore changes, so the documentation, API-baseline a
 - [X] T-R02F03-018 [P] [US6] Tests first in `scripts/tests/test_check_doc_names.py`: a document citing an unknown — Verified 2026-11-13: scripts/tests/test_check_doc_names.py 8 tests OK (unknown name fails, Type.member, non-name spans ignored, whole-word match, exit 2); script-tests PASS
   backticked public name fails; one citing only names of the API baseline passes; non-name code spans (paths, numbers)
   are ignored.
-- [ ] T-R02F03-019 [US6] Write `scripts/check_doc_names.py` (backticked identifiers that look like public type or member
+- [X] T-R02F03-019 [US6] Write `scripts/check_doc_names.py` (backticked identifiers that look like public type or member — Verified 2026-11-13: scripts/check_doc_names.py checks backticked public names against the API baseline; its tests pass (script-tests)
   names are checked against `docs/api/visualcore-public-api.txt`).
 - [ ] T-R02F03-020 [US6] Write `docs/architecture/determinism.md` (FR-R02F03-060, 061: step policy, integer-only
   rules, trust boundary of transcendental functions, stream derivation, replay format, transform conventions, UIKit
