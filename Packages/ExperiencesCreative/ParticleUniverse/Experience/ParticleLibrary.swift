@@ -4,9 +4,12 @@
 // last failure as a message). Writes go through `ExperienceStorage.write`, which replaces a file atomically and
 // enforces the storage quota, so a refused save leaves every existing file as it was.
 //
-// File content (format 1 of the wrapper): `{"document": <SceneDocument version 2>, "id": "<uuid>", "saved":
-// <seconds since 2001-01-01>}` with sorted keys. The scene itself is versioned by `SceneDocument` (`version` inside
-// `document`); a document of another version makes the file unreadable here. The `id` must match the file name.
+// File content (format 1 of the wrapper): `{"document": <SceneDocument version 2>, "format": 1, "id": "<uuid>",
+// "saved": <seconds since 2001-01-01>}` with sorted keys. Feature 038 (A04-P06) T-A04-607 (FR-A04-610): `format` is
+// written as 1 on every save and rename; a file without it (written before A04-P06) is read as format 1; a file of a
+// newer format is counted in `newer`, refused when opened and never rewritten (nothing is rewritten on load). The
+// scene itself is versioned by `SceneDocument` (`version` inside `document`); a document of another version makes
+// the file unreadable here. The `id` must match the file name.
 import Foundation
 import Observation
 import ParticleUniverseCore
@@ -31,11 +34,41 @@ final class ParticleLibrary {
     /// The file name extension of a saved scene.
     static let fileExtension = ".json"
 
+    /// The format of the file wrapper written by this version (T-A04-607, FR-A04-610). A file without a `format`
+    /// key is format 1; a file of a greater format is counted in `newer`, refused when opened and kept unchanged.
+    nonisolated static let format = 1
+
+    /// A library file whose wrapper `format` is newer than `ParticleLibrary.format`.
+    private enum LibraryFormatError: Error {
+        /// The file's format.
+        case newer(Int)
+    }
+
     /// The stored form of one file.
     private struct File: Codable {
+        /// The wrapper format (absent in older files = 1; written as `ParticleLibrary.format`).
+        var format: Int = ParticleLibrary.format
         var id: UUID
         var saved: Date
         var document: SceneDocument
+
+        init(id: UUID, saved: Date, document: SceneDocument) {
+            self.id = id
+            self.saved = saved
+            self.document = document
+        }
+
+        private enum CodingKeys: String, CodingKey { case format, id, saved, document }
+
+        /// Reads the format first, so a newer file is refused before its document is decoded.
+        init(from decoder: any Decoder) throws {
+            let c = try decoder.container(keyedBy: CodingKeys.self)
+            format = try c.decodeIfPresent(Int.self, forKey: .format) ?? 1
+            guard format <= ParticleLibrary.format else { throw LibraryFormatError.newer(format) }
+            id = try c.decode(UUID.self, forKey: .id)
+            saved = try c.decode(Date.self, forKey: .saved)
+            document = try c.decode(SceneDocument.self, forKey: .document)
+        }
     }
 
     /// The experience's storage.
@@ -71,6 +104,9 @@ final class ParticleLibrary {
             do {
                 file = try read(name)
             } catch SceneError.unsupportedVersion(let version) where version > SceneDocument.version {
+                newerFound += 1
+                continue
+            } catch LibraryFormatError.newer {
                 newerFound += 1
                 continue
             } catch {
@@ -113,6 +149,8 @@ final class ParticleLibrary {
             return document
         } catch SceneError.unsupportedVersion(let v) where v > SceneDocument.version {
             errorMessage = "The scene was made by a newer version."
+        } catch LibraryFormatError.newer {
+            errorMessage = "The scene was made by a newer version."
         } catch {
             errorMessage = "The scene could not be opened (\(Self.reason(error)))."
         }
@@ -140,6 +178,7 @@ final class ParticleLibrary {
             return false
         }
         var renamed = file
+        renamed.format = Self.format
         renamed.document.name = clean
         return write(renamed, failure: "The scene could not be renamed")
     }

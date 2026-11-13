@@ -197,7 +197,8 @@ let package = Package(
                                .product(name: "VisualCoreRendering", package: rendering),
                                .product(name: "VisualCoreUI", package: rendering),
                                .product(name: "VisualCoreExperienceHost", package: rendering)],
-                    path: "ParticleUniverse/ExperienceTests"),
+                    path: "ParticleUniverse/ExperienceTests",
+                    resources: [.copy("Fixtures")]),
     ],
     swiftLanguageModes: [.v6]
 )

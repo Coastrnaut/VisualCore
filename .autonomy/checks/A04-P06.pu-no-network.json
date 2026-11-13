@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "/bin/sh",
+    "-c",
+    "! grep -rnE 'URLSession|import Network|CoreMotion|AVFoundation|CoreLocation|AdSupport|AppTrackingTransparency|NSUserTrackingUsage' Packages/ExperiencesCreative/ParticleUniverse/Core Packages/ExperiencesCreative/ParticleUniverse/Experience"
+  ],
+  "command": "/bin/sh -c '! grep -rnE '\"'\"'URLSession|import Network|CoreMotion|AVFoundation|CoreLocation|AdSupport|AppTrackingTransparency|NSUserTrackingUsage'\"'\"' Packages/ExperiencesCreative/ParticleUniverse/Core Packages/ExperiencesCreative/ParticleUniverse/Experience'",
+  "elapsed_seconds": 0.02,
+  "exit_code": 0,
+  "finished": "2026-11-13T23:47:25+00:00",
+  "log": ".autonomy/logs/A04-P06.pu-no-network.log",
+  "log_sha256": "ff8ff9d61f70d1811b2379d1715d2b283c93047b7b325d4e381939af42a958a1",
+  "name": "pu-no-network",
+  "stage": "A04-P06",
+  "started": "2026-11-13T23:47:25+00:00",
+  "timed_out": false
+}

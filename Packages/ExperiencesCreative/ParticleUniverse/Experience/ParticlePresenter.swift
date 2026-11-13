@@ -30,6 +30,13 @@ final class ParticleMirror {
     var canvasSize = Vec2(390, 390)
 }
 
+/// The error of a draw failed on purpose through `ParticlePresenter.failNextDraw` (feature 038 A04-P06 T-A04-608,
+/// FR-A04-612; research D1): it lets a test prove the host-to-session failure path.
+enum ParticleDrawError: Error, Equatable {
+    /// The draw was failed by the test seam.
+    case injected
+}
+
 /// The presenter of Particle Universe.
 @MainActor
 final class ParticlePresenter: ExperiencePresenter {
@@ -53,6 +60,12 @@ final class ParticlePresenter: ExperiencePresenter {
     private(set) var drawnTier = 0
     /// The number of particles of the last draw.
     var drawnCount: Int { particles.count }
+    /// Set only by tests; the next draw throws `ParticleDrawError.injected` and clears the flag (feature 038
+    /// A04-P06 T-A04-608, research D1).
+    var failNextDraw = false
+    /// The brightness cap of the scene: 0.6 with Reduce Flashing and 1 without it, set by each draw (T-A04-608,
+    /// FR-A04-613).
+    var brightnessCap: Double { scene.brightnessCap }
     private lazy var scene = ParticleLayerScene(world: ParticleStage.world, background: Vec4(0, 0, 0, 1)) { [weak self] _ in
         self?.particles ?? []
     }
@@ -80,6 +93,10 @@ final class ParticlePresenter: ExperiencePresenter {
     }
 
     func draw(_ core: ParticleCore, tier: Int, context: RenderContext, frame: FrameInfo) throws {
+        if failNextDraw {
+            failNextDraw = false
+            throw ParticleDrawError.injected
+        }
         mirror.canvasSize = Vec2(Double(max(1, context.pixelWidth)) * pointsPerPixel,
                                  Double(max(1, context.pixelHeight)) * pointsPerPixel)
         noteFrameTarget(index: frame.index, target: frame.targetTimestamp)

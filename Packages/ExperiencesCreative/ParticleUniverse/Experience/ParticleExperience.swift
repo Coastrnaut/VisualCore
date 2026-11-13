@@ -10,9 +10,10 @@ public enum ParticleExperience {
     public static let id = ExperienceID(rawValue: ParticleCore.experienceID)
 
     /// The experience registered as `id`, with the person's Reduce Motion and Reduce Flashing choices as they are in
-    /// effect now. It keeps nothing in storage: the standalone app stored nothing either.
+    /// effect now, over its own storage area: the scene library lives there (feature 036 A04-P04), and the app's saved
+    /// session state (`state.json`) is written beside it by the host (feature 038 A04-P06,
+    /// docs/apps/particle-universe/privacy-and-credits.md).
     @MainActor
-    /// The experience over its own storage area, where the scene library lives (feature 036 A04-P04).
     public static func make(id: ExperienceID, storage: ExperienceStorage, reduceMotion: Bool,
                             reduceFlashing: Bool) -> any Experience {
         let scale = UITraitCollection.current.displayScale

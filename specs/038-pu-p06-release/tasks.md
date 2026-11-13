@@ -11,7 +11,7 @@ A04-P06 --name <check> -- <command>`. Commit after every task (no trailers); pus
 
 ## Phase 2: Foundational
 
-- [ ] T-A04-602 Add `resources: [.copy("Fixtures")]` to the `ParticleUniverseExperienceTests` target in `Packages/ExperiencesCreative/Package.swift` and create `PU/ExperienceTests/Fixtures/Library/` (lead)
+- [X] T-A04-602 Add `resources: [.copy("Fixtures")]` to the `ParticleUniverseExperienceTests` target in `Packages/ExperiencesCreative/Package.swift` and create `PU/ExperienceTests/Fixtures/Library/` (lead) — Verified 2026-11-13: 2026-11-13 .autonomy/checks/A04-P06.experiences-ios27.json and experiences-ios26.json (ExperiencesCreative on sim-27.2 and sim-26.5, TEST SUCCEEDED; the Fixtures resource bundle loads in ParticleLibraryMigrationTests)
 
 ## Phase 3: User Story 1 — Nothing about the person leaves the device (P1) 🎯
 
