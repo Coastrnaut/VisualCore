@@ -1,0 +1,600 @@
+{
+  "controls" : [
+    "stroke",
+    "pinch",
+    "brush",
+    "splash",
+    "pause",
+    "resume",
+    "step",
+    "reset",
+    "palette",
+    "edges",
+    "detail",
+    "viscosity",
+    "dyeFade",
+    "motionFade",
+    "quality",
+    "tuningReset"
+  ],
+  "experience" : "a02.fluid-art-playground",
+  "kind" : "creative",
+  "scenarios" : [
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+        "initialDigest" : "6035fe8d3405d03f48880b318ab10086e66ee6a5bd777c560f695342f1c68fdd"
+      },
+      "name" : "launch-first-frame",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "stroke",
+            "values" : [
+              0.20000000000000001,
+              0.5,
+              0,
+              0,
+              0,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 4
+        },
+        {
+          "action" : {
+            "control" : "stroke",
+            "values" : [
+              0.40000000000000002,
+              0.45000000000000001,
+              1.2,
+              -0.29999999999999999,
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 2
+        },
+        {
+          "action" : {
+            "control" : "stroke",
+            "values" : [
+              0.59999999999999998,
+              0.40000000000000002,
+              1.2,
+              -0.29999999999999999,
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 2
+        },
+        {
+          "action" : {
+            "control" : "splash",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 4
+        },
+        {
+          "action" : {
+            "control" : "palette",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 4
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "a039e29a4dedc96123bc6e4068e48085defd39d1e274b5e2b7ae9b487cfc748d",
+        "initialDigest" : "6035fe8d3405d03f48880b318ab10086e66ee6a5bd777c560f695342f1c68fdd"
+      },
+      "name" : "input-response",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "splash",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 2
+        },
+        {
+          "action" : {
+            "control" : "splash",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 2
+        }
+      ],
+      "expect" : {
+        "outcome" : "canvas-painted"
+      },
+      "name" : "completion",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "step",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.a02.not-paused",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "palette",
+            "values" : [
+              5
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "stroke",
+            "values" : [
+              0.5,
+              0.5
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        }
+      ],
+      "expect" : {
+
+      },
+      "name" : "rejection",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "stroke",
+            "values" : [
+              0.20000000000000001,
+              0.5,
+              0,
+              0,
+              0,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 4
+        },
+        {
+          "action" : {
+            "control" : "stroke",
+            "values" : [
+              0.40000000000000002,
+              0.45000000000000001,
+              1.2,
+              -0.29999999999999999,
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 2
+        },
+        {
+          "action" : {
+            "control" : "stroke",
+            "values" : [
+              0.59999999999999998,
+              0.40000000000000002,
+              1.2,
+              -0.29999999999999999,
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 2
+        },
+        {
+          "action" : {
+            "control" : "splash",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 4
+        },
+        {
+          "action" : {
+            "control" : "palette",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 4
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "a039e29a4dedc96123bc6e4068e48085defd39d1e274b5e2b7ae9b487cfc748d",
+        "initialDigest" : "6035fe8d3405d03f48880b318ab10086e66ee6a5bd777c560f695342f1c68fdd"
+      },
+      "name" : "save-restore",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "stroke",
+            "values" : [
+              0.20000000000000001,
+              0.5,
+              0,
+              0,
+              0,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 4
+        },
+        {
+          "action" : {
+            "control" : "stroke",
+            "values" : [
+              0.40000000000000002,
+              0.45000000000000001,
+              1.2,
+              -0.29999999999999999,
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 2
+        },
+        {
+          "action" : {
+            "control" : "stroke",
+            "values" : [
+              0.59999999999999998,
+              0.40000000000000002,
+              1.2,
+              -0.29999999999999999,
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 2
+        },
+        {
+          "action" : {
+            "control" : "splash",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 4
+        },
+        {
+          "action" : {
+            "control" : "palette",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 4
+        }
+      ],
+      "expect" : {
+        "initialDigest" : "6035fe8d3405d03f48880b318ab10086e66ee6a5bd777c560f695342f1c68fdd",
+        "resetDigest" : true
+      },
+      "name" : "reset",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "suspend-resume",
+      "seed" : "7"
+    },
+    {
+      "cycles" : 5,
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "teardown-reentry",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "cancel-prepare",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "dyeFade",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 2
+        },
+        {
+          "action" : {
+            "control" : "motionFade",
+            "values" : [
+              0.5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 120
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "77c5cd40173b9e8c7faa97faacd300c5c4c6d01ed6384a1f30396dc6ad73c6e7",
+        "initialDigest" : "6035fe8d3405d03f48880b318ab10086e66ee6a5bd777c560f695342f1c68fdd"
+      },
+      "name" : "fixture-1",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "pause",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 240
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "6ad5fdcd80201c97f823d2c95107ae6dbae78c0d2eb351b4cdcde42a9e582460",
+        "initialDigest" : "6035fe8d3405d03f48880b318ab10086e66ee6a5bd777c560f695342f1c68fdd"
+      },
+      "name" : "fixture-2",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "edges",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 2
+        },
+        {
+          "action" : {
+            "control" : "stroke",
+            "values" : [
+              0.02,
+              0.5,
+              -3,
+              0,
+              0,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 2
+        },
+        {
+          "action" : {
+            "control" : "stroke",
+            "values" : [
+              0.01,
+              0.5,
+              -3,
+              0,
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 2
+        },
+        {
+          "action" : {
+            "control" : "edges",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 20
+        },
+        {
+          "action" : {
+            "control" : "stroke",
+            "values" : [
+              0.97999999999999998,
+              0.5,
+              3,
+              0,
+              0,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 2
+        },
+        {
+          "action" : {
+            "control" : "stroke",
+            "values" : [
+              0.98999999999999999,
+              0.5,
+              3,
+              0,
+              2,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 2
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "e8506ab6c8dcddd26ea0e2747bd90bf16407bbce20475460c3c7011b3a8cf67b",
+        "initialDigest" : "6035fe8d3405d03f48880b318ab10086e66ee6a5bd777c560f695342f1c68fdd"
+      },
+      "name" : "fixture-3",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "detail",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 2
+        },
+        {
+          "action" : {
+            "control" : "splash",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 2
+        },
+        {
+          "action" : {
+            "control" : "detail",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "splash",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 2
+        },
+        {
+          "action" : {
+            "control" : "detail",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "23d913fa785a69e3dc72388cdc6d16b95d3baaf4e662b56b3e0f41a963332bc5",
+        "initialDigest" : "6035fe8d3405d03f48880b318ab10086e66ee6a5bd777c560f695342f1c68fdd"
+      },
+      "name" : "fixture-4",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "pause",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 2
+        },
+        {
+          "action" : {
+            "control" : "step",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 300
+        },
+        {
+          "action" : {
+            "control" : "resume",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 300
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "44397d97fccf53720579cd2493ac5d51e4d95ce81b19cfafb7d7a0741e732222",
+        "initialDigest" : "6035fe8d3405d03f48880b318ab10086e66ee6a5bd777c560f695342f1c68fdd"
+      },
+      "name" : "fixture-5",
+      "seed" : "7"
+    }
+  ],
+  "schema" : 1
+}

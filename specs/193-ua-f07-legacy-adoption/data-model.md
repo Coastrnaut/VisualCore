@@ -22,8 +22,9 @@ and VisualCoreExperienceHost. The unified app links the four.
 | A04 | `ParticleCore { scene: ParticleScene, commands, stepIndex, playing, … }` (replay) | `family[1]`, `emitter.add[0]`, `emitter.remove[0]`, `emitter.select[1]`, `size[1]`, `lifetime[1]`, `gradient[1]`, `trails[1]`, `trailStrength[1]`, `blend[1]`, `force.kind[1]`, `force.place[2]`, `force.nudge[2]`, `force.center[0]`, `strength[1]`, `play[0]`, `pause[0]`, `step[0]`, `reseed[0]` | `ParticleLayerScene` (source reads the core; no stepping in the callback) | 4 (draw cap) |
 
 Values are normalized: positions are 0…1 of the view, and indexes are whole numbers within the list's range. Every
-core has schema version 1, and its `outcome` is `work-saved` (A01: a composition saved), `nil` (A02, A03), or
-`nil` (A04 until its later phases).
+core has schema version 1, and its `outcome` is `work-saved` (A01: a composition saved), `canvas-painted` (A02: a
+splat reached the fields since the last reset), and for A03 and A04 an outcome the completion scenario can reach
+(corrected 2026-11-13: `ScenarioManifestValidator` requires the completion scenario to expect an outcome).
 
 ## 3. Candidates (research R6)
 

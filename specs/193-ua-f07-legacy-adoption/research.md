@@ -220,3 +220,11 @@ The dossier files are not edited. The legacy ledger is untouched; its hash is co
     package tests on both runtimes, and the reference regression.
   - The fixture scenarios are validated and played on the engine by the host tests; the runner plays the nine
     standard scenarios (its `SCENARIOS`), as for every experience.
+- **A02 core (T-U07-020, 2026-11-13).** The pure core and its manifest are a package like A01's
+  (`Apps/FluidArtPlayground/Adapter`, product `FluidArtPlaygroundAdapterCore`). `stroke` carries six values
+  (position and velocity normalized to the view, phase, pointer) instead of the four of data-model section 2: the
+  presenter keeps the app's `PointerVelocityTracker` and `PinchRecognizer`, so the core needs the tracker's velocity
+  to make the same splat as `SplatQueue.add` (a host test compares the two). `pinch` and the slider `brush` both carry
+  the brush radius. The completion scenario needs an outcome (`ScenarioManifestValidator`), so A02 reports
+  `canvas-painted` once a splat reached the fields since the last reset (data-model corrected). The core's six
+  differences from the standalone app are in its file header.

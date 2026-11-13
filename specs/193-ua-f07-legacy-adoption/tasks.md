@@ -137,7 +137,7 @@ runtimes.
 
 ## Phase 7: User Story 5 — Fluid Art Playground (P3), steps of Phases 3, 5 and 6 for A02
 
-- [ ] T-U07-020 [US5] Tests first: `FluidArtCoreTests` covering:
+- [X] T-U07-020 [US5] Tests first: `FluidArtCoreTests` covering: — Verified 2026-11-13: Apps/FluidArtPlayground/Adapter/Tests/FluidArtCoreTests.swift: conformance over 4 seeds; every control as an action; pause/step/resume; strokes equal SplatQueue's splats for the same tracker samples; pending bounded by SplatQueue.maxPending (1074 queued, 1024 kept, 50 dropped) and drained under the cap; digest of CPU state only, unchanged by tiers 0-2 and shedding; reset and detail; snapshot round trip; manifest valid with 5 fixtures and its committed digests. swift test --package-path Apps/FluidArtPlayground/Adapter: 12 passed (a02-core-host)
   - conformance;
   - strokes, pinch, splash, pause, step, reset, palette, edges, detail and sliders as actions;
   - pending splats bounded by `SplatQueue.maxPending`;

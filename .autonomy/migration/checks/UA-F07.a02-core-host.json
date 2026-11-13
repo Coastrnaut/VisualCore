@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Apps/FluidArtPlayground/Adapter"
+  ],
+  "command": "swift test --package-path Apps/FluidArtPlayground/Adapter",
+  "elapsed_seconds": 1.72,
+  "exit_code": 0,
+  "finished": "2026-11-13T11:58:59+00:00",
+  "gate": "UA-F07",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F07.a02-core-host.log",
+  "log_sha256": "9ac7169591ea1735998184c9601b6664fa7ea1034e5a35fc4bfa55d1c40ca760",
+  "name": "a02-core-host",
+  "started": "2026-11-13T11:58:58+00:00",
+  "timed_out": false
+}

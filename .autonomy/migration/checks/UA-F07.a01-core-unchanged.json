@@ -1,0 +1,22 @@
+{
+  "argv": [
+    "git",
+    "diff",
+    "--exit-code",
+    "--stat",
+    "af887e3",
+    "--",
+    "Apps/GenerativeArtStudio/Core"
+  ],
+  "command": "git diff --exit-code --stat af887e3 -- Apps/GenerativeArtStudio/Core",
+  "elapsed_seconds": 0.009,
+  "exit_code": 0,
+  "finished": "2026-11-13T11:53:22+00:00",
+  "gate": "UA-F07",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F07.a01-core-unchanged.log",
+  "log_sha256": "b8edd829ed1e40f0bc19584b93d7ce3b3957f831ce9b83739f4ab0c8d0617fa1",
+  "name": "a01-core-unchanged",
+  "started": "2026-11-13T11:53:22+00:00",
+  "timed_out": false
+}
