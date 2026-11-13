@@ -179,3 +179,9 @@ Appended by `/speckit-converge` (T-U11-040, round 1, 2026-11-13).
 
 - [X] T-U11-041 Add `configuration_of(app)` to `scripts/report_meta.py` (the build configuration from the products folder name, e.g. `Release-iphonesimulator` → `Release`, else null) with a test in `scripts/tests/test_report_meta.py`, and use it in `check_privacy_manifest.py`, `check_licenses.py --app`, `check_usage_descriptions.py --app` and `check_no_tracking.py` so every built-app report records its configuration per FR-U11-003, FR-U11-082 (partial) — Verified 2026-11-13: report_meta.configuration_of and meta() fallback; test_report_meta 9 tests OK; privacy, licenses --app, usage --app and tracking reports on the Release app all record configuration Release; script-tests-r2 PASS
 - [X] T-U11-042 Keep the reason-API detection of `scripts/check_privacy_manifest.py` per binary so an undeclared-category finding names the binary that uses it, with a test in `scripts/tests/test_privacy_report.py`, per US1/AC2, FR-U11-001 (partial) — Verified 2026-11-13: check_privacy_manifest detects per binary; report where{} and undeclared findings name the binary (test_privacy_report 16 tests OK); Release app PASS with UserDefaults in VisualCore, FileTimestamp in libEGL, SystemBootTime in VisualCore and libGLESv2; script-tests-r2 PASS
+
+## Phase 12: Convergence
+
+Appended by `/speckit-converge` (T-U11-040, round 2, 2026-11-13).
+
+- [ ] T-U11-043 Write `docs/legal/distinctiveness-matrix.json` and `.md` atomically in `scripts/check_distinctiveness.py --write` (temporary file in the same folder, then rename; an interrupted write leaves the previous files), with a test in `scripts/tests/test_distinctiveness.py`, per spec edge case "Cancellation and interruption" and plan: lifecycle (partial)
