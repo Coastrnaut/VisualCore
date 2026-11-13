@@ -1,0 +1,23 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_renames.py",
+    "--base",
+    "af887e3",
+    "Apps/FractalExplorer/FractalExplorerCore/Sources",
+    "Apps/FractalExplorer/FractalExplorerCore/Tests",
+    "Packages/ExperiencesCreative/FractalExplorer/Core",
+    "Packages/ExperiencesCreative/FractalExplorer/CoreTests"
+  ],
+  "command": "python3 scripts/check_renames.py --base af887e3 Apps/FractalExplorer/FractalExplorerCore/Sources Apps/FractalExplorer/FractalExplorerCore/Tests Packages/ExperiencesCreative/FractalExplorer/Core Packages/ExperiencesCreative/FractalExplorer/CoreTests",
+  "elapsed_seconds": 0.226,
+  "exit_code": 0,
+  "finished": "2026-11-13T15:05:54+00:00",
+  "gate": "UA-F07",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F07.a03-core-renames-only.log",
+  "log_sha256": "0d5de0fed849522627127e607d37b94e62c6dd7f67b81f7464575d860d4f0e34",
+  "name": "a03-core-renames-only",
+  "started": "2026-11-13T15:05:54+00:00",
+  "timed_out": false
+}
