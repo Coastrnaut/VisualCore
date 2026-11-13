@@ -54,7 +54,7 @@ Commit after every task (`python3 scripts/tick_task.py`), and push with `python3
   - Values over 256 characters are refused.
   - `EvidenceRecord` encodes the field names of data-model section 4 with sorted keys and decodes them.
 - [X] T-U09-011 Implement `ScenarioRequest.swift` and `EvidenceRecord.swift` (`#if`). T-U09-010 passes (FR-U09-011, FR-U09-030). — Verified 2026-11-12: swift test --package-path Packages/VisualCore --filter VisualCoreExperienceTests: 379 tests in 35 suites passed
-- [ ] T-U09-012 Record the API of Phase 2 with `python3 scripts/check_public_api.py --update`: 0 undocumented and no baseline line lost since `7bc756b`. Proof: `swift test --package-path Packages/VisualCore --filter VisualCoreExperienceTests` passes.
+- [X] T-U09-012 Record the API of Phase 2 with `python3 scripts/check_public_api.py --update`: 0 undocumented and no baseline line lost since `7bc756b`. Proof: `swift test --package-path Packages/VisualCore --filter VisualCoreExperienceTests` passes. — Verified 2026-11-12: check_public_api.py --update then check: PASS, 0 undocumented, 0 baseline lines removed since 7bc756b; swift test --package-path Packages/VisualCore --filter VisualCoreExperienceTests: 379 tests in 35 suites passed
 
 **Checkpoint**: the pure layer is complete and host-tested.
 
