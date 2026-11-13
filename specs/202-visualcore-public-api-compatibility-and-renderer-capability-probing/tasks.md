@@ -25,7 +25,7 @@ Independent test: a fresh host's report holds every value of FR-R02F02-001 and 0
   `eglExtensions`, `missingEntryPoints`, `generation`; the queries in `query(display:)` with `vcglGetError` after each
   limit (an error gives nil); `FloorFinding` and `floorFindings()` with the ES 3.0 minima of research R3; `///` on
   every new declaration.
-- [ ] T-R02F02-004 [US1] Acceptance: rendering package tests on sim-27.2 and sim-26.5 (checks `rendering-ios27`,
+- [X] T-R02F02-004 [US1] Acceptance: rendering package tests on sim-27.2 and sim-26.5 (checks `rendering-ios27`, — Verified 2026-11-13: VisualCoreRendering-Package tests pass on sim-27.2 (rendering-ios27) and sim-26.5 (rendering-ios26) (SC-R02F02-001, SC-R02F02-003)
   `rendering-ios26`) (SC-R02F02-001, SC-R02F02-003).
 
 ## Phase 3: User Story 2 — The report stays true after the context is rebuilt (P1)
