@@ -9,7 +9,7 @@ none (no {owner} task). VisualCore changes, so the documentation, API-baseline a
 
 ## Phase 1: Setup
 
-- [ ] T-R02F03-001 Baseline: `swift test --package-path Packages/VisualCore` passes before the change (check
+- [X] T-R02F03-001 Baseline: `swift test --package-path Packages/VisualCore` passes before the change (check — Verified 2026-11-13: swift test Packages/VisualCore passed before the change (baseline-host); research.md section 0 audit re-verified at ebc51a2
   `baseline-host`); research.md §0 audit re-verified.
 
 ## Phase 2: User Story 1 — Independent named random streams (P1)
