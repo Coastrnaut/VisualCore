@@ -20,7 +20,7 @@ task. Owner-only items: none.
 - [X] T-R02F26-003 [US1] Write `Packages/VisualCore/Sources/VisualCoreScenes/GestureArbiter.swift` (research R1; — Verified 2026-11-13: GestureArbiter.swift: GestureDeclaration, GestureKind, GestureOutcome, GestureArbiter (handle, tick, cancelAll) over the existing recognizers, one owner at a time, cancelled touch cancels, non-finite and extra pointers ignored; /// on each
   data-model `GestureDeclaration { id, kind, priority, pointers: 1...2 }`, `GestureOutcome { gesture, phase, values }`)
   over the existing recognizers; `///` on each public declaration.
-- [ ] T-R02F26-004 [US1] Acceptance: host tests (check `host-arbiter`) (SC-R02F26-001).
+- [X] T-R02F26-004 [US1] Acceptance: host tests (check `host-arbiter`) (SC-R02F26-001). — Verified 2026-11-13: swift test Packages/VisualCore: 390 + 98 + 55 + 15 tests pass, arbiter tests included (host-visualcore-r2) (SC-R02F26-001)
 
 ## Phase 3: User Story 2 — Every gesture has a button (P1)
 
