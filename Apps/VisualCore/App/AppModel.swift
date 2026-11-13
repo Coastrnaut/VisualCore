@@ -212,6 +212,7 @@ final class AppModel {
         launchStart = environment.launchStart
         firstStart = environment.defaults.object(forKey: ShellPreferences.storageKey) == nil
         session.qualityPin = stored.preferences.qualityOverride
+        ExperienceFeedback.shared.hapticsEnabled = stored.preferences.hapticsOn
         refreshDataNamespaces()
         saver.onResult = { [weak self] failure in
             guard let self, self.diagnostics.lastSaveFailure != failure else { return }
@@ -515,6 +516,13 @@ final class AppModel {
         preferences.reduceMotion = reduceMotion
         preferences.reduceFlashing = reduceFlashing
         store.save(preferences)
+    }
+
+    /// Stores the haptics switch and applies it to the feedback route of every experience (feature 226).
+    func setHaptics(_ on: Bool) {
+        preferences.haptics = on
+        store.save(preferences)
+        ExperienceFeedback.shared.hapticsEnabled = on
     }
 
     /// Reads again which storage namespaces have a data folder.

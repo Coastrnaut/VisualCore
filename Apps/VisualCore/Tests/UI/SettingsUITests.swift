@@ -23,6 +23,28 @@ final class SettingsUITests: XCTestCase {
     }
 
     @MainActor
+    /// Feature 226 (R02-F26, FR-R02F26-042; SC-R02F26-006): the haptics switch is on by default, labelled, at least
+    /// 44 points tall, and keeps its value across a relaunch.
+    func testTheHapticsSwitchIsOnByDefaultAndSurvivesARelaunch() {
+        let app = launchApp(arguments: Self.fresh)
+        waitFor(element(app, "vc.route.catalog"))
+        openSettings(app)
+        let haptics = app.switches["vc.settings.haptics"]
+        waitFor(haptics, timeout: VC.wait)
+        XCTAssertEqual(haptics.value as? String, "1", "on by default")
+        XCTAssertFalse(haptics.label.isEmpty)
+        XCTAssertGreaterThanOrEqual(haptics.frame.height, 44)
+        haptics.switches.firstMatch.exists ? haptics.switches.firstMatch.tap() : haptics.tap()
+        XCTAssertEqual(haptics.value as? String, "0")
+
+        let second = relaunch(app, arguments: [VC.fixture, VC.skipWelcome])
+        if !element(second, "vc.route.settings").waitForExistence(timeout: VC.firstWait) { openSettings(second) }
+        let again = second.switches["vc.settings.haptics"]
+        waitFor(again, timeout: VC.wait)
+        XCTAssertEqual(again.value as? String, "0", "the switch kept its value")
+    }
+
+    @MainActor
     func testTheThreeSettingsSurviveARelaunch() {
         let app = launchApp(arguments: Self.fresh)
         waitFor(element(app, "vc.route.catalog"))

@@ -41,6 +41,11 @@ public protocol ExperiencePresenter: AnyObject {
     /// domain actions with positions normalized to 0…1 of the view and sends them through `port`; it never
     /// changes the state itself. Default: nothing.
     func pointer(_ event: PointerEvent, viewSize: Vec2, port: ExperienceActionPort)
+    /// The action ids a canvas gesture of this experience can send (feature 226, FR-R02F26-010). Default: none.
+    var gestureActions: Set<String> { get }
+    /// The action ids its native controls can send; every gesture action must be among them
+    /// (`GestureAlternatives.missing`). Default: none.
+    var nativeActions: Set<String> { get }
 }
 
 extension ExperiencePresenter {
@@ -52,6 +57,10 @@ extension ExperiencePresenter {
     public func probes(_ core: Core) -> [FrameProbe] { [] }
     /// Ignores the event: an experience without canvas input needs no override.
     public func pointer(_ event: PointerEvent, viewSize: Vec2, port: ExperienceActionPort) {}
+    /// No gesture actions.
+    public var gestureActions: Set<String> { [] }
+    /// No declared native actions.
+    public var nativeActions: Set<String> { [] }
 }
 
 /// One experience as the session host sees it: lifecycle, scene, controls, state description and diagnostics.

@@ -32,6 +32,7 @@ enum ShellID {
     static let settingsResetConfirm = "vc.settings.reset.confirm"
     static let settingsResetCancel = "vc.settings.reset.cancel"
     static let settingsPrivacy = "vc.settings.privacy"
+    static let settingsHaptics = "vc.settings.haptics"
     static let aboutAcknowledgements = "vc.about.acknowledgements"
     static let diagnostics = "vc.diagnostics"
     /// The notice of a stored state that cannot be read (feature 191): its text, its code and its two buttons.

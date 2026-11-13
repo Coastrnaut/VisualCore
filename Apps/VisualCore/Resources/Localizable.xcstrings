@@ -232,6 +232,39 @@
         }
       }
     },
+    "vc.settings.haptics": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Haptic feedback"
+          }
+        }
+      }
+    },
+    "vc.settings.haptics.header": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Feedback"
+          }
+        }
+      }
+    },
+    "vc.settings.haptics.hint": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Short vibrations confirm moves in games. Turning them off changes nothing else."
+          }
+        }
+      }
+    },
     "vc.settings.privacy": {
       "extractionState": "manual",
       "localizations": {

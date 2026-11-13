@@ -146,6 +146,9 @@ final class DebugPresenter: ExperiencePresenter {
     func makeControls(_ port: ExperienceActionPort) -> AnyView {
         AnyView(DebugControls(port: port, identifier: DebugExperience.tapIdentifier(for: experienceID)))
     }
+
+    /// The canvas sends nothing; the native button sends `tap` (feature 226, FR-R02F26-010).
+    var nativeActions: Set<String> { ["tap"] }
 }
 
 /// The controls of the debug experience: the state in words and one button that sends `tap`.

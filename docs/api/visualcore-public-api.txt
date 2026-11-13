@@ -334,6 +334,7 @@ VisualCoreExperience | enum | public enum ExperienceOperation: String, Sendable,
 VisualCoreExperience | enum | public enum ExperienceTier: String, Sendable, Equatable, CaseIterable
 VisualCoreExperience | enum | public enum FrameChecks
 VisualCoreExperience | enum | public enum FrameColorClass: String, CaseIterable, Sendable, Codable
+VisualCoreExperience | enum | public enum GestureAlternatives
 VisualCoreExperience | enum | public enum InventoryError: Error, Sendable, Equatable
 VisualCoreExperience | enum | public enum Kind: String, Sendable
 VisualCoreExperience | enum | public enum Kind: String, Sendable, Equatable, Codable
@@ -447,6 +448,7 @@ VisualCoreExperience | func | public static func isValidCode(_ code: String) -> 
 VisualCoreExperience | func | public static func isValidName(_ name: String) -> Bool
 VisualCoreExperience | func | public static func limit(requested: Int?, budgetTotal: Int) -> Int
 VisualCoreExperience | func | public static func luma(r: UInt8, g: UInt8, b: UInt8) -> Double
+VisualCoreExperience | func | public static func missing(gesture: Set<String>, native: Set<String>) -> [String]
 VisualCoreExperience | func | public static func normalized(x: Double, y: Double, width: Double, height: Double) -> (x: Double, y: Double)?
 VisualCoreExperience | func | public static func observed(_ observation: ScenarioObservation, experience: ExperienceID, code: String,
 VisualCoreExperience | func | public static func parse(_ environment: [String: String]) -> Result<ScenarioRequest, ScenarioRequestError>?
@@ -896,6 +898,8 @@ VisualCoreExperience | var | public var generation: Int?
 VisualCoreExperience | var | public var glVersion: String?
 VisualCoreExperience | var | public var glslVersion: String?
 VisualCoreExperience | var | public var gpuBytes: Int
+VisualCoreExperience | var | public var haptics: Bool?
+VisualCoreExperience | var | public var hapticsOn: Bool
 VisualCoreExperience | var | public var hostOS: String?
 VisualCoreExperience | var | public var id: String
 VisualCoreExperience | var | public var initial: StateDigest?
@@ -991,6 +995,7 @@ VisualCoreExperience | var | public var welcomeRoute: ShellRoute
 VisualCoreExperience | var | public var welcomeSeen: Bool
 VisualCoreExperience | var | public var xcode: String?
 VisualCoreExperienceHost | class | public final class ExperienceActionPort
+VisualCoreExperienceHost | class | public final class ExperienceFeedback
 VisualCoreExperienceHost | class | public final class ExperienceSession
 VisualCoreExperienceHost | class | public final class ExperienceShell<Presenter: ExperiencePresenter>: Experience
 VisualCoreExperienceHost | class | public final class ScenarioRunner
@@ -1000,6 +1005,8 @@ VisualCoreExperienceHost | enum | public enum ScenarioPhase: String, Sendable, C
 VisualCoreExperienceHost | enum | public enum SessionStrings
 VisualCoreExperienceHost | enum | public enum SessionViewID
 VisualCoreExperienceHost | func | public func activate() throws(ExperienceError)
+VisualCoreExperienceHost | func | public func announce(_ text: String, kind: AnnouncementKind)
+VisualCoreExperienceHost | func | public func announce(_ text: String, kind: AnnouncementKind, route: ExperienceFeedback = .shared)
 VisualCoreExperienceHost | func | public func back()
 VisualCoreExperienceHost | func | public func beginDeactivation() throws(ExperienceError)
 VisualCoreExperienceHost | func | public func callAsFunction(width: Int, height: Int) throws(OffscreenRenderError) -> StillImage
@@ -1007,9 +1014,12 @@ VisualCoreExperienceHost | func | public func cancelPreparation()
 VisualCoreExperienceHost | func | public func checkpoint()
 VisualCoreExperienceHost | func | public func close()
 VisualCoreExperienceHost | func | public func finishDeactivation() throws(ExperienceError)
+VisualCoreExperienceHost | func | public func flush()
 VisualCoreExperienceHost | func | public func handle(control: String, values: [Double] = []) -> ActionResult
 VisualCoreExperienceHost | func | public func handleMemoryWarning()
 VisualCoreExperienceHost | func | public func handlePointer(_ event: PointerEvent, viewSize: Vec2)
+VisualCoreExperienceHost | func | public func haptic(_ kind: HapticKind)
+VisualCoreExperienceHost | func | public func haptic(_ kind: HapticKind, route: ExperienceFeedback = .shared)
 VisualCoreExperienceHost | func | public func identifier(_ name: String) -> String
 VisualCoreExperienceHost | func | public func makeBody(configuration: Configuration) -> some View
 VisualCoreExperienceHost | func | public func open(_ request: ExperienceOpenRequest) async -> SessionOpenResult
@@ -1039,6 +1049,7 @@ VisualCoreExperienceHost | func | public static func text(_ key: Key) -> String
 VisualCoreExperienceHost | init | public init()
 VisualCoreExperienceHost | init | public init(_ capabilities: RenderCapabilities)
 VisualCoreExperienceHost | init | public init(_ render: @escaping @MainActor @Sendable (Int, Int) throws(OffscreenRenderError) -> StillImage)
+VisualCoreExperienceHost | init | public init(hapticSink: (any HapticSink)? = nil, announcementSink: (any AnnouncementSink)? = nil,
 VisualCoreExperienceHost | init | public init(id: ExperienceID, presenter: Presenter, maxStepsPerFrame: Int = 8)
 VisualCoreExperienceHost | init | public init(id: ExperienceID, seed: UInt64, snapshot: ExperienceSnapshot? = nil,
 VisualCoreExperienceHost | init | public init(onCancel: @escaping @MainActor () -> Void)
@@ -1070,6 +1081,7 @@ VisualCoreExperienceHost | let | public static let message
 VisualCoreExperienceHost | let | public static let minimumSize: CGFloat
 VisualCoreExperienceHost | let | public static let preparing
 VisualCoreExperienceHost | let | public static let retry
+VisualCoreExperienceHost | let | public static let shared
 VisualCoreExperienceHost | let | public static let version
 VisualCoreExperienceHost | let | public static let warmUpFrames
 VisualCoreExperienceHost | protocol | public protocol Experience: AnyObject
@@ -1110,7 +1122,10 @@ VisualCoreExperienceHost | var | public var controls: AnyView
 VisualCoreExperienceHost | var | public var diagnostics: ExperienceDiagnostics
 VisualCoreExperienceHost | var | public var diagnostics: SessionDiagnostics
 VisualCoreExperienceHost | var | public var frameProbes: [FrameProbe]
+VisualCoreExperienceHost | var | public var gestureActions: Set<String>
+VisualCoreExperienceHost | var | public var hapticsEnabled: Bool
 VisualCoreExperienceHost | var | public var memoryPressureLimit: Int?
+VisualCoreExperienceHost | var | public var nativeActions: Set<String>
 VisualCoreExperienceHost | var | public var performanceRecord: PerformanceRecord?
 VisualCoreExperienceHost | var | public var qualityLevel: Int
 VisualCoreExperienceHost | var | public var qualityProfile: QualityProfile
@@ -1692,7 +1707,9 @@ VisualCoreRendering | var | public var view: UIView
 VisualCoreRendering | var | public var width: Int
 VisualCoreRendering | var | public var world: WorldRect
 VisualCoreScenes | class | public final class SceneNode
+VisualCoreScenes | enum | public enum GestureKind: String, Sendable, Equatable, Codable, CaseIterable
 VisualCoreScenes | enum | public enum GestureState: String, Sendable, Equatable
+VisualCoreScenes | enum | public enum Phase: String, Sendable, Equatable, Codable
 VisualCoreScenes | enum | public enum PointerPhase: String, Sendable, Codable
 VisualCoreScenes | enum | public enum Primitive: Sendable, Equatable
 VisualCoreScenes | enum | public enum ScenesInfo
@@ -1715,17 +1732,23 @@ VisualCoreScenes | func | public func toPixels(_ p: Vec2) -> Vec2?
 VisualCoreScenes | func | public func toWorld(_ p: Vec2, camera: Camera2D) -> Vec2?
 VisualCoreScenes | func | public func worldToNDC(camera: Camera2D) -> Mat3?
 VisualCoreScenes | func | public func worldTransform() -> Mat3
+VisualCoreScenes | func | public mutating func cancelAll() -> [GestureOutcome]
 VisualCoreScenes | func | public mutating func handle(_ e: PointerEvent) -> Bool
 VisualCoreScenes | func | public mutating func handle(_ e: PointerEvent) -> [Sample]
 VisualCoreScenes | func | public mutating func handle(_ e: PointerEvent, tracker: PointerTracker)
+VisualCoreScenes | func | public mutating func handle(_ event: PointerEvent) -> [GestureOutcome]
 VisualCoreScenes | func | public mutating func reset()
 VisualCoreScenes | func | public mutating func tick(now: Double)
+VisualCoreScenes | func | public mutating func tick(now: Double) -> [GestureOutcome]
 VisualCoreScenes | func | public static func cube() -> Mesh
 VisualCoreScenes | func | public static func plane(subdivisions: Int = 1) -> Mesh
 VisualCoreScenes | func | public static func uvSphere(segments: Int = 32, rings: Int = 16, radius: Double = 1) -> Mesh
 VisualCoreScenes | init | public init()
+VisualCoreScenes | init | public init(_ declarations: [GestureDeclaration])
+VisualCoreScenes | init | public init(gesture: String, phase: Phase, values: [Double])
 VisualCoreScenes | init | public init(id: Int, phase: PointerPhase, location: Vec2, timestamp: Double)
 VisualCoreScenes | init | public init(id: String = "", position: Vec2 = .zero, rotation: Double = 0, scale: Vec2 = Vec2(1, 1), z: Int = 0,
+VisualCoreScenes | init | public init(id: String, kind: GestureKind, priority: Int, pointers: Int)
 VisualCoreScenes | init | public init(maxDistance: Double = 10, maxDuration: Double = 0.3)
 VisualCoreScenes | init | public init(maxEdge: Int, maxPixels: Int = ExportGeometry.defaultMaxPixels)
 VisualCoreScenes | init | public init(maxInterval: Double = 0.3, maxSeparation: Double = 30)
@@ -1738,6 +1761,7 @@ VisualCoreScenes | init | public init(size: Vec2, scale: Double)
 VisualCoreScenes | init | public init(spacing: Double, maxSamplesPerUpdate: Int = 16, smoothing: Double = 0.5)
 VisualCoreScenes | init | public init(width: Int, height: Int)
 VisualCoreScenes | init | public init?(id: String, title: String, width: Int, height: Int)
+VisualCoreScenes | let | public let declarations: [GestureDeclaration]
 VisualCoreScenes | let | public let frameInterval: Double
 VisualCoreScenes | let | public let height: Int
 VisualCoreScenes | let | public let id: Int
@@ -1778,6 +1802,9 @@ VisualCoreScenes | struct | public struct DragRecognizer: GestureRecognizer
 VisualCoreScenes | struct | public struct ExportAspect: Sendable, Hashable, Identifiable
 VisualCoreScenes | struct | public struct ExportGeometry: Sendable, Equatable
 VisualCoreScenes | struct | public struct ExportSize: Sendable, Hashable
+VisualCoreScenes | struct | public struct GestureArbiter: Sendable
+VisualCoreScenes | struct | public struct GestureDeclaration: Sendable, Equatable, Codable
+VisualCoreScenes | struct | public struct GestureOutcome: Sendable, Equatable, Codable
 VisualCoreScenes | struct | public struct LongPressRecognizer: GestureRecognizer
 VisualCoreScenes | struct | public struct Mesh: Sendable, Equatable
 VisualCoreScenes | struct | public struct PinchRecognizer: GestureRecognizer
@@ -1813,14 +1840,17 @@ VisualCoreScenes | var | public var centroid: Vec2?
 VisualCoreScenes | var | public var color: Vec4
 VisualCoreScenes | var | public var count: Int
 VisualCoreScenes | var | public var effectiveMaxEdge: Int
+VisualCoreScenes | var | public var gesture: String
 VisualCoreScenes | var | public var id: Int
 VisualCoreScenes | var | public var id: String
 VisualCoreScenes | var | public var indices: [UInt32]
 VisualCoreScenes | var | public var isActive: Bool
+VisualCoreScenes | var | public var isContinuous: Bool
 VisualCoreScenes | var | public var isLandscape: Bool
 VisualCoreScenes | var | public var isTerminal: Bool
 VisualCoreScenes | var | public var isValid: Bool
 VisualCoreScenes | var | public var isVisible
+VisualCoreScenes | var | public var kind: GestureKind
 VisualCoreScenes | var | public var localTransform: Mat3
 VisualCoreScenes | var | public var location: Vec2
 VisualCoreScenes | var | public var longEdge: Int
@@ -1833,12 +1863,15 @@ VisualCoreScenes | var | public var minChange
 VisualCoreScenes | var | public var minDistance
 VisualCoreScenes | var | public var minDuration
 VisualCoreScenes | var | public var normals: [Vec3]
+VisualCoreScenes | var | public var phase: Phase
 VisualCoreScenes | var | public var phase: PointerPhase
 VisualCoreScenes | var | public var pixelCount: Int
 VisualCoreScenes | var | public var pixelSize: Vec2
+VisualCoreScenes | var | public var pointers: Int
 VisualCoreScenes | var | public var position: Vec2
 VisualCoreScenes | var | public var positions: [Vec3]
 VisualCoreScenes | var | public var primitive: Primitive?
+VisualCoreScenes | var | public var priority: Int
 VisualCoreScenes | var | public var rotation: Double
 VisualCoreScenes | var | public var scale: Double
 VisualCoreScenes | var | public var scale: Vec2
@@ -1846,6 +1879,7 @@ VisualCoreScenes | var | public var size: Vec2
 VisualCoreScenes | var | public var timestamp: Double
 VisualCoreScenes | var | public var triangleCount: Int
 VisualCoreScenes | var | public var uvs: [Vec2]
+VisualCoreScenes | var | public var values: [Double]
 VisualCoreScenes | var | public var z: Int
 VisualCoreShaderSource | enum | public enum InfoLogParser
 VisualCoreShaderSource | enum | public enum Severity: String, Sendable, Codable
@@ -1883,7 +1917,9 @@ VisualCoreShaderSource | struct | public struct ShaderLibrary: Sendable
 VisualCoreShaderSource | struct | public struct SourceOrigin: Sendable, Equatable, Hashable, Codable
 VisualCoreShaderSource | var | public var description: String
 VisualCoreSimulation | enum | public enum AccessibilityChoice: String, Sendable, Codable, CaseIterable, Identifiable
+VisualCoreSimulation | enum | public enum AnnouncementKind: String, Sendable, Equatable, CaseIterable
 VisualCoreSimulation | enum | public enum EmitterShape: Sendable, Equatable, Codable
+VisualCoreSimulation | enum | public enum HapticKind: String, Sendable, Equatable, CaseIterable
 VisualCoreSimulation | enum | public enum ParticleForce: Sendable, Equatable
 VisualCoreSimulation | enum | public enum SimulationInfo
 VisualCoreSimulation | enum | public enum StoragePrecision: String, Sendable, Codable, CaseIterable
@@ -1909,6 +1945,8 @@ VisualCoreSimulation | func | public func rounded(to precision: StoragePrecision
 VisualCoreSimulation | func | public func sampleBilinear(cellX: Float, cellY: Float) -> [Float]
 VisualCoreSimulation | func | public func sampleBilinear(cellX: Float, cellY: Float, channel: Int) -> Float
 VisualCoreSimulation | func | public func save(to defaults: UserDefaults, keyPrefix prefix: String)
+VisualCoreSimulation | func | public func stateSignProblems(_ signs: [StateSign]) -> [String]
+VisualCoreSimulation | func | public func transitionDuration(_ duration: Double, reduceMotion: Bool) -> Double
 VisualCoreSimulation | func | public func value(at t: Double) -> Double
 VisualCoreSimulation | func | public func value(of name: String) -> Double?
 VisualCoreSimulation | func | public mutating func add(_ tween: Tween, at offset: Double = 0, name: String)
@@ -1922,6 +1960,7 @@ VisualCoreSimulation | func | public mutating func double() -> Double
 VisualCoreSimulation | func | public mutating func enterBackground()
 VisualCoreSimulation | func | public mutating func enterForeground()
 VisualCoreSimulation | func | public mutating func float() -> Float
+VisualCoreSimulation | func | public mutating func flush(now: Double) -> Announcement?
 VisualCoreSimulation | func | public mutating func int(_ r: ClosedRange<Int>) -> Int
 VisualCoreSimulation | func | public mutating func mutate(_ body: (inout Simulation) -> Void)
 VisualCoreSimulation | func | public mutating func next() -> UInt64
@@ -1936,6 +1975,8 @@ VisualCoreSimulation | func | public mutating func scrub(to newTime: Double)
 VisualCoreSimulation | func | public mutating func seek(to t: Double)
 VisualCoreSimulation | func | public mutating func step(_ dt: Double)
 VisualCoreSimulation | func | public mutating func stepOnce()
+VisualCoreSimulation | func | public mutating func submit(_ announcement: Announcement) -> Announcement?
+VisualCoreSimulation | func | public mutating func submit(_ event: HapticEvent) -> HapticEvent?
 VisualCoreSimulation | func | public mutating func toggle()
 VisualCoreSimulation | func | public static func clampedStrength(_ strength: Double) -> Double
 VisualCoreSimulation | func | public static func factor(strength: Double, delta: Double) -> Double
@@ -1951,7 +1992,11 @@ VisualCoreSimulation | init | public init(count: Int, interval: Double)
 VisualCoreSimulation | init | public init(duration: Double = 120, speed: Double = 1, isPlaying: Bool = true)
 VisualCoreSimulation | init | public init(from decoder: Decoder) throws
 VisualCoreSimulation | init | public init(from: Double, to: Double, duration: Double, curve: EasingCurve = .linear, mode: EasingMode = .inOut,
+VisualCoreSimulation | init | public init(id: String, colorHex: String, sign: String)
+VisualCoreSimulation | init | public init(kind: HapticKind, time: Double)
 VisualCoreSimulation | init | public init(minStep: Double = 1.0 / 240, maxStep: Double = 1.0 / 30)
+VisualCoreSimulation | init | public init(minimumInterval: Double = 0.05)
+VisualCoreSimulation | init | public init(minimumInterval: Double = 0.5)
 VisualCoreSimulation | init | public init(position: Vec2 = .zero, rate: Double = 100, lifetime: ClosedRange<Double> = 1...1,
 VisualCoreSimulation | init | public init(position: Vec2, size: Double, color: Vec4)
 VisualCoreSimulation | init | public init(reduceMotion: AccessibilityChoice = .system, reduceFlashing: AccessibilityChoice = .system)
@@ -1963,6 +2008,7 @@ VisualCoreSimulation | init | public init(simulation: Simulation, clock: FixedSt
 VisualCoreSimulation | init | public init(step: Double = 1.0 / 120, maxSteps: Int = 8)
 VisualCoreSimulation | init | public init(step: Int, command: Command)
 VisualCoreSimulation | init | public init(storedValue: String?)
+VisualCoreSimulation | init | public init(text: String, kind: AnnouncementKind, time: Double)
 VisualCoreSimulation | init | public init(width: Int, height: Int, channels: Int, fill: Float = 0)
 VisualCoreSimulation | init | public init?(range: Float, center: Float = 0.5)
 VisualCoreSimulation | init | public init?(width: Int, height: Int, channels: Int, values: [Float])
@@ -1976,6 +2022,7 @@ VisualCoreSimulation | let | public let height: Int
 VisualCoreSimulation | let | public let maxStep: Double
 VisualCoreSimulation | let | public let maxSteps: Int
 VisualCoreSimulation | let | public let minStep: Double
+VisualCoreSimulation | let | public let minimumInterval: Double
 VisualCoreSimulation | let | public let range: Float
 VisualCoreSimulation | let | public let reduceFlashing: Bool
 VisualCoreSimulation | let | public let reduceMotion: Bool
@@ -2009,6 +2056,8 @@ VisualCoreSimulation | let | public static let strengthRange: ClosedRange<Double
 VisualCoreSimulation | let | public static let version
 VisualCoreSimulation | protocol | public protocol FixedStepSimulation
 VisualCoreSimulation | struct | public struct AccessibilityPreferences: Sendable, Equatable, Codable
+VisualCoreSimulation | struct | public struct Announcement: Sendable, Equatable
+VisualCoreSimulation | struct | public struct AnnouncementPlanner: Sendable, Equatable
 VisualCoreSimulation | struct | public struct ControlStream<Command>
 VisualCoreSimulation | struct | public struct EffectiveAccessibility: Sendable, Equatable
 VisualCoreSimulation | struct | public struct Emitter: Sendable, Equatable
@@ -2018,6 +2067,8 @@ VisualCoreSimulation | struct | public struct Entry: Sendable, Equatable
 VisualCoreSimulation | struct | public struct FieldGrid: Sendable, Equatable
 VisualCoreSimulation | struct | public struct FixedStepClock: Sendable, Equatable
 VisualCoreSimulation | struct | public struct FixedStepRunner<Simulation: FixedStepSimulation, Command>
+VisualCoreSimulation | struct | public struct HapticEvent: Sendable, Equatable
+VisualCoreSimulation | struct | public struct HapticPlanner: Sendable, Equatable
 VisualCoreSimulation | struct | public struct ParticleInstance: Sendable, Equatable
 VisualCoreSimulation | struct | public struct ParticleSystem: Sendable
 VisualCoreSimulation | struct | public struct PlaybackState: Sendable, Equatable
@@ -2025,6 +2076,7 @@ VisualCoreSimulation | struct | public struct SceneClock: Sendable, Equatable
 VisualCoreSimulation | struct | public struct SeededRandom: RandomNumberGenerator, Sendable, Equatable
 VisualCoreSimulation | struct | public struct SignedRangeEncoding: Sendable, Equatable
 VisualCoreSimulation | struct | public struct SplitMix64: RandomNumberGenerator, Sendable
+VisualCoreSimulation | struct | public struct StateSign: Sendable, Equatable
 VisualCoreSimulation | struct | public struct SystemAccessibility: Sendable, Equatable
 VisualCoreSimulation | struct | public struct TimeStepPolicy: Sendable, Equatable
 VisualCoreSimulation | struct | public struct Timeline: Sendable
@@ -2043,6 +2095,7 @@ VisualCoreSimulation | var | public private(set) var isInBackground
 VisualCoreSimulation | var | public private(set) var isPaused
 VisualCoreSimulation | var | public private(set) var isPlaying: Bool
 VisualCoreSimulation | var | public private(set) var nanRemoved
+VisualCoreSimulation | var | public private(set) var pending: Announcement?
 VisualCoreSimulation | var | public private(set) var random: SeededRandom
 VisualCoreSimulation | var | public private(set) var simulation: Simulation
 VisualCoreSimulation | var | public private(set) var state: UInt64
@@ -2055,12 +2108,14 @@ VisualCoreSimulation | var | public var alpha: Double
 VisualCoreSimulation | var | public var autoreverses: Bool
 VisualCoreSimulation | var | public var burst: EmitterBurst?
 VisualCoreSimulation | var | public var color: Vec4
+VisualCoreSimulation | var | public var colorHex: String
 VisualCoreSimulation | var | public var count: Int
 VisualCoreSimulation | var | public var curve: EasingCurve
 VisualCoreSimulation | var | public var dimFlashingLights: Bool
 VisualCoreSimulation | var | public var direction: Double
 VisualCoreSimulation | var | public var duration: Double
 VisualCoreSimulation | var | public var emitters: [Emitter]
+VisualCoreSimulation | var | public var enabled: Bool
 VisualCoreSimulation | var | public var finalValue: Double
 VisualCoreSimulation | var | public var forces: [ParticleForce]
 VisualCoreSimulation | var | public var from: Double
@@ -2071,6 +2126,8 @@ VisualCoreSimulation | var | public var isFinished: Bool
 VisualCoreSimulation | var | public var isFinite: Bool
 VisualCoreSimulation | var | public var isPaused
 VisualCoreSimulation | var | public var isRunning: Bool
+VisualCoreSimulation | var | public var kind: AnnouncementKind
+VisualCoreSimulation | var | public var kind: HapticKind
 VisualCoreSimulation | var | public var lifetime: ClosedRange<Double>
 VisualCoreSimulation | var | public var liveLimit: Int
 VisualCoreSimulation | var | public var minValue: Float
@@ -2089,6 +2146,7 @@ VisualCoreSimulation | var | public var reduceMotion: Bool
 VisualCoreSimulation | var | public var reducedMotion
 VisualCoreSimulation | var | public var repeatCount: Int?
 VisualCoreSimulation | var | public var shape: EmitterShape
+VisualCoreSimulation | var | public var sign: String
 VisualCoreSimulation | var | public var simulatedTime: Double
 VisualCoreSimulation | var | public var size: Double
 VisualCoreSimulation | var | public var speed: ClosedRange<Double>
@@ -2096,6 +2154,8 @@ VisualCoreSimulation | var | public var speed: Double
 VisualCoreSimulation | var | public var spread: Double
 VisualCoreSimulation | var | public var startColor: Vec4, endColor: Vec4
 VisualCoreSimulation | var | public var startSize: Double, endSize: Double
+VisualCoreSimulation | var | public var text: String
+VisualCoreSimulation | var | public var time: Double
 VisualCoreSimulation | var | public var title: String
 VisualCoreSimulation | var | public var to: Double
 VisualCoreSimulation | var | public var tolerance: Float
@@ -2173,13 +2233,21 @@ VisualCoreTestSupport | var | public static var qualityProfile: QualityProfile
 VisualCoreTestSupport | var | public static var qualityTiers: Int
 VisualCoreTestSupport | var | public static var stepDuration: Double
 VisualCoreTestSupport | var | public var outcome: ExperienceOutcome?
+VisualCoreUI | class | public final class RecordingAnnouncementSink: AnnouncementSink
+VisualCoreUI | class | public final class RecordingHapticSink: HapticSink
 VisualCoreUI | class | public final class SystemAccessibilityObserver
+VisualCoreUI | class | public final class SystemAnnouncementSink: AnnouncementSink
+VisualCoreUI | class | public final class SystemHapticSink: HapticSink
 VisualCoreUI | enum | public enum AccessibleColors
 VisualCoreUI | enum | public enum ParameterPanelModel
 VisualCoreUI | enum | public enum UIInfo
+VisualCoreUI | func | public func announce(_ text: String)
 VisualCoreUI | func | public func contentSwipeBackDisabled(_ disabled: Bool = true) -> some View
 VisualCoreUI | func | public func makeUIView(context: Context) -> UIView
+VisualCoreUI | func | public func play(_ kind: HapticKind)
+VisualCoreUI | func | public func prepare()
 VisualCoreUI | func | public func refresh()
+VisualCoreUI | func | public func reset()
 VisualCoreUI | func | public func text(for entry: Entry) -> String
 VisualCoreUI | func | public func updateUIView(_ uiView: UIView, context: Context)
 VisualCoreUI | func | public static func adjust(_ editor: inout ParameterEditor, _ name: String, up: Bool)
@@ -2187,6 +2255,7 @@ VisualCoreUI | func | public static func contrastRatio(_ a: UIColor, _ b: UIColo
 VisualCoreUI | func | public static func explanation(system: SystemAccessibility) -> String
 VisualCoreUI | func | public static func rows(_ editor: ParameterEditor) -> [ParameterRow]
 VisualCoreUI | func | public static func systemValues() -> SystemAccessibility
+VisualCoreUI | init | public init()
 VisualCoreUI | init | public init(editor: Binding<ParameterEditor>)
 VisualCoreUI | init | public init(host: RenderHost, accessibilityLabel: String, accessibilityHint: String? = nil)
 VisualCoreUI | init | public init(inventory: LicenseInventory? = LicenseInventory(), identifierPrefix: String = "vc.acknowledgements")
@@ -2212,6 +2281,8 @@ VisualCoreUI | let | public static let accentUIColor
 VisualCoreUI | let | public static let adjustStep
 VisualCoreUI | let | public static let changeNotifications: [Notification.Name]
 VisualCoreUI | let | public static let version
+VisualCoreUI | protocol | public protocol AnnouncementSink
+VisualCoreUI | protocol | public protocol HapticSink
 VisualCoreUI | struct | public struct AccessibilitySettingsSection: View
 VisualCoreUI | struct | public struct AcknowledgementsView: View
 VisualCoreUI | struct | public struct Entry: Codable, Sendable, Equatable, Identifiable
@@ -2219,5 +2290,7 @@ VisualCoreUI | struct | public struct LicenseInventory: Sendable, Equatable
 VisualCoreUI | struct | public struct ParameterPanel: View
 VisualCoreUI | struct | public struct ParameterRow: Sendable, Equatable, Identifiable
 VisualCoreUI | struct | public struct RenderSurface: UIViewRepresentable
+VisualCoreUI | var | public private(set) var announced: [String]
 VisualCoreUI | var | public private(set) var current: SystemAccessibility
+VisualCoreUI | var | public private(set) var played: [HapticKind]
 VisualCoreUI | var | public var body: some View

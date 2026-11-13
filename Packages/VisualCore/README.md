@@ -231,3 +231,13 @@ Contract: [verification-api.md](../../specs/195-ua-f09-verification-runner/contr
 A run's `EvidenceRecord.Environment` may carry a `RendererRecord` (feature 202): the renderer's versions, a few
 limits, the missing entry points, the context generation and the floor findings, every field optional, under the key
 `renderer`; a record without it stays valid.
+
+## Games input, accessibility and haptics (feature 226, R02-F26)
+
+`GestureArbiter` (VisualCoreScenes) takes pointer events and a game's `GestureDeclaration`s (kind, priority, pointer
+count) and lets one gesture at a time own the touch; a loser or a cancelled touch ends as `cancelled`. It is pure and
+deterministic. `GestureAlternatives.missing(gesture:native:)` (VisualCoreExperience) names every gesture action no native
+control sends. `AnnouncementPlanner` and `HapticPlanner` (VisualCoreSimulation) apply rate limits (0.5 s and 0.05 s)
+and the person's switches; `stateSignProblems` checks that every state has a distinct non-colour sign;
+`transitionDuration(_:reduceMotion:)` makes animated transitions instant under Reduce Motion. `ShellPreferences.haptics`
+is the Settings switch (absent means on).

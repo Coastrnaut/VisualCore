@@ -8,7 +8,7 @@ task. Owner-only items: none.
 
 ## Phase 1: Setup
 
-- [ ] T-R02F26-001 Record the audit and decisions (research.md sections 1–2); baseline: `swift test --package-path
+- [X] T-R02F26-001 Record the audit and decisions (research.md sections 1–2); baseline: `swift test --package-path — Verified 2026-11-13: research.md sections 1-2 (audit re-verified); baseline after X-A01..A03 availability: app unit and chunks a, b, d, e, f pass (baseline-app-r2, baseline-app-ui-d, baseline-app-ui-ef); pure host tests pass (host-visualcore-r2)
   Packages/VisualCore` passes before the change (check `baseline-host`).
 
 ## Phase 2: User Story 1 — Touches mean one thing at a time (P1)

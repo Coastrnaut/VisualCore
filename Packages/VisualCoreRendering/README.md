@@ -328,3 +328,10 @@ its OpenGL ES 3.0 minimum as a `FloorFinding`; findings are recorded, never rais
 enabled: the window surface stays single-sampled without depth (ADR-0002). `RendererRecord(_:)` (in
 VisualCoreExperienceHost) turns the report into the evidence's `environment.renderer`, which the verification runner
 fills from the frame it reads (`ScenarioRunResult.renderer`).
+
+## Haptics and announcements (feature 226, R02-F26)
+
+`ExperienceFeedback.shared` routes an experience's `port.haptic(_:)` and `port.announce(_:kind:)` to the system's
+feedback generators (`SystemHapticSink`) and accessibility announcements (`SystemAnnouncementSink`, only while
+VoiceOver runs), through the planners' rate limits and the haptics switch. It never touches an experience's state.
+`ExperiencePresenter.gestureActions` and `nativeActions` declare which actions gestures and native controls send.

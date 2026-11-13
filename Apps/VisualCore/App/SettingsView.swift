@@ -30,6 +30,22 @@ struct SettingsView: View {
         }
     }
 
+    /// The haptics switch (feature 226, FR-R02F26-042): on by default, stored at once, labelled for VoiceOver.
+    private var hapticsSection: some View {
+        Section {
+            Toggle(AppStrings.text(.settingsHaptics), isOn: Binding(
+                get: { model.preferences.hapticsOn },
+                set: { model.setHaptics($0) }))
+                .frame(minHeight: 44)
+                .accessibilityHint(AppStrings.text(.settingsHapticsHint))
+                .accessibilityIdentifier(ShellID.settingsHaptics)
+        } header: {
+            Text(AppStrings.text(.settingsHapticsHeader))
+        } footer: {
+            Text(AppStrings.text(.settingsHapticsHint))
+        }
+    }
+
     var body: some View {
         Form {
             Section {
@@ -37,6 +53,7 @@ struct SettingsView: View {
             }
             AccessibilitySettingsSection(preferences: accessibility, system: system.current,
                                          identifierPrefix: ShellID.settingsPrefix)
+            hapticsSection
             qualitySection
             dataSection
             Section(AppStrings.text(.settingsPrivacyHeader)) {

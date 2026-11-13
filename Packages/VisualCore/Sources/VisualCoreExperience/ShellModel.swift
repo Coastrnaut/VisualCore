@@ -112,6 +112,11 @@ public struct ShellPreferences: Sendable, Equatable, Codable {
     public var reduceMotion: AccessibilityChoice = .system
     /// The reduce-flashing choice. Default `system`.
     public var reduceFlashing: AccessibilityChoice = .system
+    /// The haptics switch (feature 226, R02-F26, FR-R02F26-042): nil or true is on, false is off. Optional so that
+    /// preferences written before it decode with haptics on; the schema stays 1.
+    public var haptics: Bool?
+    /// Whether haptic feedback is on (the stored switch, on when never set).
+    public var hapticsOn: Bool { haptics ?? true }
 
     /// The defaults: welcome not seen, the catalog, no search, automatic quality, both choices `system`.
     public init() {}
@@ -126,7 +131,7 @@ public struct ShellPreferences: Sendable, Equatable, Codable {
     }
 
     private enum CodingKeys: String, CodingKey {
-        case schema, welcomeSeen, lastRoute, searchText, qualityOverride, reduceMotion, reduceFlashing
+        case schema, welcomeSeen, lastRoute, searchText, qualityOverride, reduceMotion, reduceFlashing, haptics
     }
 
     private struct SchemaProbe: Decodable {
@@ -147,6 +152,7 @@ public struct ShellPreferences: Sendable, Equatable, Codable {
         qualityOverride = Self.accepted(try container.decodeIfPresent(Int.self, forKey: .qualityOverride))
         reduceMotion = try container.decodeIfPresent(AccessibilityChoice.self, forKey: .reduceMotion) ?? .system
         reduceFlashing = try container.decodeIfPresent(AccessibilityChoice.self, forKey: .reduceFlashing) ?? .system
+        haptics = try container.decodeIfPresent(Bool.self, forKey: .haptics)
     }
 
     /// Encodes schema 1 with the keys of data-model section 1; an automatic quality writes no key.
@@ -159,6 +165,7 @@ public struct ShellPreferences: Sendable, Equatable, Codable {
         try container.encodeIfPresent(qualityOverride, forKey: .qualityOverride)
         try container.encode(reduceMotion, forKey: .reduceMotion)
         try container.encode(reduceFlashing, forKey: .reduceFlashing)
+        try container.encodeIfPresent(haptics, forKey: .haptics)
     }
 
     /// Reads stored preferences. It never throws and never traps.
