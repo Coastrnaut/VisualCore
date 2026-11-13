@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/VisualCore",
+    "--filter",
+    "VisualCoreExperienceTests"
+  ],
+  "command": "swift test --package-path Packages/VisualCore --filter VisualCoreExperienceTests",
+  "elapsed_seconds": 4.327,
+  "exit_code": 0,
+  "finished": "2026-11-13T01:16:47+00:00",
+  "gate": "UA-F09",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F09.persistence-host.log",
+  "log_sha256": "485a5128664145b2bd13db97dca3eb51b564ba05efd620fa553ab11d68cb4bd6",
+  "name": "persistence-host",
+  "started": "2026-11-13T01:16:42+00:00",
+  "timed_out": false
+}

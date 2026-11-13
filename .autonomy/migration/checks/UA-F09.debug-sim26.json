@@ -1,0 +1,22 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--only",
+    "debug",
+    "--runtime",
+    "26",
+    "--fresh"
+  ],
+  "command": "python3 scripts/verify_experiences.py --only debug --runtime 26 --fresh",
+  "elapsed_seconds": 23.93,
+  "exit_code": 0,
+  "finished": "2026-11-13T01:18:31+00:00",
+  "gate": "UA-F09",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F09.debug-sim26.log",
+  "log_sha256": "8748eee1f5055f39351832f752a73cd5b7b5877a3b0811d75963ffc86c85479d",
+  "name": "debug-sim26",
+  "started": "2026-11-13T01:18:07+00:00",
+  "timed_out": false
+}

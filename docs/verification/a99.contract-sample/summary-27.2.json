@@ -10,68 +10,68 @@
     "result": "Passed",
     "total": 1
   },
-  "commit": "deb74e8505f323e6fabe8e8edc5ea22eb25c12cd",
+  "commit": "3ec1c0c7693256df0b2204673a35b5c4214055d8",
   "device_type": "com.apple.CoreSimulator.SimDeviceType.iPhone-18-Pro",
   "experience": "a99.contract-sample",
   "results": [
     {
-      "commit": "deb74e8505f323e6fabe8e8edc5ea22eb25c12cd",
-      "record_sha256": "4595deb810fc432d84156abc32060f63ae5746e30d14f8b8569ca15ea40a258b",
+      "commit": "3ec1c0c7693256df0b2204673a35b5c4214055d8",
+      "record_sha256": "7df56e6e97d82fe2fec829820cfee986b33ebcedb5454d3c5c0739b6351126ee",
       "result": "pass",
       "scenario": "launch-first-frame"
     },
     {
-      "commit": "deb74e8505f323e6fabe8e8edc5ea22eb25c12cd",
-      "record_sha256": "8c6f5629a4df31fbfc3c535f8f893b36cc0590668b33d67d376cf352fcf7f117",
+      "commit": "3ec1c0c7693256df0b2204673a35b5c4214055d8",
+      "record_sha256": "1f6a8867c2f6654a060edcd8b0e67a45362f3bbdf121017d98a8e1d91c7a38f5",
       "result": "pass",
       "scenario": "input-response"
     },
     {
-      "commit": "deb74e8505f323e6fabe8e8edc5ea22eb25c12cd",
-      "record_sha256": "5b2fef320d3d81ce8524bf4ad1db43c7d241d83a0c639484028582802755b74b",
+      "commit": "3ec1c0c7693256df0b2204673a35b5c4214055d8",
+      "record_sha256": "a0969f4212c2cf7692e9887dc6a563321cc80943d0792988e680c7cd7f54ce95",
       "result": "pass",
       "scenario": "completion"
     },
     {
-      "commit": "deb74e8505f323e6fabe8e8edc5ea22eb25c12cd",
-      "record_sha256": "0e538f2a4c66aaa84f540ebe48bc8f0fbf655fe25a3716eb582dc35d75257350",
+      "commit": "3ec1c0c7693256df0b2204673a35b5c4214055d8",
+      "record_sha256": "3afa47e55f8db54744a9a629d35f5aeb9050cb517851409f72431781cb2eb742",
       "result": "pass",
       "scenario": "rejection"
     },
     {
-      "commit": "deb74e8505f323e6fabe8e8edc5ea22eb25c12cd",
+      "commit": "3ec1c0c7693256df0b2204673a35b5c4214055d8",
       "process": "single",
-      "record_sha256": "15e140f543a5b55b4e8d245b33fdffad92c4871d60e3eee750224acceec024d1",
+      "record_sha256": "ad771855b0a606a3488d4c28c605ac3d7758dd56274058661e261071793011fc",
       "result": "pass",
       "scenario": "save-restore"
     },
     {
-      "commit": "deb74e8505f323e6fabe8e8edc5ea22eb25c12cd",
-      "record_sha256": "ac853d655a024894b39a2e1382e579d83b5d04a1590b51506488475e3e27f6e6",
+      "commit": "3ec1c0c7693256df0b2204673a35b5c4214055d8",
+      "record_sha256": "d4681099d306405b70a3881c4fc93c97ad09c1d4c46f049a90023135f75362cd",
       "result": "pass",
       "scenario": "reset"
     },
     {
-      "commit": "deb74e8505f323e6fabe8e8edc5ea22eb25c12cd",
-      "record_sha256": "de9e36d36d65d5742c3b8fb920a3a0423e64bb44230406ef80337308b4d76718",
+      "commit": "3ec1c0c7693256df0b2204673a35b5c4214055d8",
+      "record_sha256": "ed7261f153abbcad672a71a8414a8ba53ec3acc61335f46720d73424ddc6f399",
       "result": "pass",
       "scenario": "suspend-resume"
     },
     {
-      "commit": "deb74e8505f323e6fabe8e8edc5ea22eb25c12cd",
-      "record_sha256": "286e596d5c8d0ee30e5ac342e7a6b754b1c512427f1c95e70f248344db6896fe",
+      "commit": "3ec1c0c7693256df0b2204673a35b5c4214055d8",
+      "record_sha256": "a55415230af1917c98bc238ff4bc83f4fb2bb8eb1c1637bda5610501a0e2c3ba",
       "result": "pass",
       "scenario": "teardown-reentry"
     },
     {
-      "commit": "deb74e8505f323e6fabe8e8edc5ea22eb25c12cd",
-      "record_sha256": "5bd05bb5f42998047c39c15eca490e0b8c6dca5cb5f8fce8a2c5ed735aec7ca6",
+      "commit": "3ec1c0c7693256df0b2204673a35b5c4214055d8",
+      "record_sha256": "d95ea644a51ed6380997cb35905bc63b4cd83e64ccf8a39c0ff8326078a7b3a2",
       "result": "pass",
       "scenario": "cancel-prepare"
     },
     {
-      "commit": "deb74e8505f323e6fabe8e8edc5ea22eb25c12cd",
-      "record_sha256": "3edce3f8cee0a0fd1c46048cf2a754fb296a361b6c0bbbfdefb5e666f0302394",
+      "commit": "3ec1c0c7693256df0b2204673a35b5c4214055d8",
+      "record_sha256": "8c45c0c5505136d4ae73191f083aa0a57e103b1c42f8e08271c2c5f3ba7e5a5e",
       "result": "pass",
       "scenario": "endurance"
     }

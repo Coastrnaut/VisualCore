@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/VisualCoreRendering",
+    "--scheme",
+    "VisualCoreRendering-Package",
+    "--destination",
+    "sim-26.5",
+    "--action",
+    "test",
+    "--result-name",
+    "ua-f09-ios26"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-26.5 --action test --result-name ua-f09-ios26",
+  "elapsed_seconds": 33.364,
+  "exit_code": 0,
+  "finished": "2026-11-13T01:20:53+00:00",
+  "gate": "UA-F09",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F09.rendering-ios26.log",
+  "log_sha256": "9dce9fbfc50c6a39c6ff6da128817fcccc68528d0b52460dacb26e13ab4b37a0",
+  "name": "rendering-ios26",
+  "started": "2026-11-13T01:20:20+00:00",
+  "timed_out": false
+}

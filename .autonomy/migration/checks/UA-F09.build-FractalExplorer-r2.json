@@ -1,0 +1,26 @@
+{
+  "argv": [
+    "xcodebuild",
+    "build-for-testing",
+    "-project",
+    "VisualCore.xcodeproj",
+    "-scheme",
+    "FractalExplorer",
+    "-destination",
+    "generic/platform=iOS Simulator",
+    "-derivedDataPath",
+    "Build/DerivedData/ua-f09-FractalExplorer",
+    "CODE_SIGNING_ALLOWED=NO"
+  ],
+  "command": "xcodebuild build-for-testing -project VisualCore.xcodeproj -scheme FractalExplorer -destination 'generic/platform=iOS Simulator' -derivedDataPath Build/DerivedData/ua-f09-FractalExplorer CODE_SIGNING_ALLOWED=NO",
+  "elapsed_seconds": 5.183,
+  "exit_code": 0,
+  "finished": "2026-11-13T02:38:01+00:00",
+  "gate": "UA-F09",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F09.build-FractalExplorer-r2.log",
+  "log_sha256": "fd5f5de8d43a70fc8d1211373a7af187a670cc25482f637a8db18b2c8ce0aaf5",
+  "name": "build-FractalExplorer-r2",
+  "started": "2026-11-13T02:37:56+00:00",
+  "timed_out": false
+}

@@ -1,0 +1,31 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_release_symbols.py",
+    "--app",
+    "Build/DerivedData/ua-f09-release/Build/Products/Release-iphonesimulator/VisualCore.app",
+    "--forbid",
+    "DebugLaunch",
+    "DebugExperience",
+    "DebugInventory",
+    "ScenarioLaunch",
+    "ScenarioHostView",
+    "vcDamageState",
+    "vc.inventory",
+    "openExperience",
+    "vcFixtureCatalog",
+    "projectm",
+    "ProjectM"
+  ],
+  "command": "python3 scripts/check_release_symbols.py --app Build/DerivedData/ua-f09-release/Build/Products/Release-iphonesimulator/VisualCore.app --forbid DebugLaunch DebugExperience DebugInventory ScenarioLaunch ScenarioHostView vcDamageState vc.inventory openExperience vcFixtureCatalog projectm ProjectM",
+  "elapsed_seconds": 0.163,
+  "exit_code": 0,
+  "finished": "2026-11-13T02:37:05+00:00",
+  "gate": "UA-F09",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F09.release-symbols.log",
+  "log_sha256": "34217269fb89cad10809800f2f06a82c4aaa96a6515cea1eeb19cc351a92d12a",
+  "name": "release-symbols",
+  "started": "2026-11-13T02:37:05+00:00",
+  "timed_out": false
+}

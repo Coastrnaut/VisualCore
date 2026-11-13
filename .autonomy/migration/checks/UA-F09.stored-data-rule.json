@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "python3",
+    "scripts/release_check.py",
+    "--only",
+    "stored-data-rule"
+  ],
+  "command": "python3 scripts/release_check.py --only stored-data-rule",
+  "elapsed_seconds": 0.081,
+  "exit_code": 0,
+  "finished": "2026-11-13T01:17:14+00:00",
+  "gate": "UA-F09",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F09.stored-data-rule.log",
+  "log_sha256": "ae513abbdb41af65003d299182ee3ee32770183f7f54db783c560780044bae9c",
+  "name": "stored-data-rule",
+  "started": "2026-11-13T01:17:14+00:00",
+  "timed_out": false
+}

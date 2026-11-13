@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_experience_symbols.py",
+    "--module",
+    "pure",
+    "--with-flag",
+    "--require-each"
+  ],
+  "command": "python3 scripts/check_experience_symbols.py --module pure --with-flag --require-each",
+  "elapsed_seconds": 6.482,
+  "exit_code": 0,
+  "finished": "2026-11-13T02:37:27+00:00",
+  "gate": "UA-F09",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F09.automation-symbols-pure-flag.log",
+  "log_sha256": "1c090ee4b65d6e64766395eb241e9dca6599d50b2b772b6d65f9203463dc13d8",
+  "name": "automation-symbols-pure-flag",
+  "started": "2026-11-13T02:37:21+00:00",
+  "timed_out": false
+}

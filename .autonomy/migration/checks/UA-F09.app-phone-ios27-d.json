@@ -1,0 +1,28 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_app.py",
+    "--scheme",
+    "VisualCore",
+    "--runtime",
+    "27.2",
+    "--kind",
+    "phone",
+    "--only-testing",
+    "VisualCoreUITests/LauncherUITests",
+    "VisualCoreUITests/FirstRunUITests",
+    "--log-name",
+    "ua-f09-phone-ios27-d"
+  ],
+  "command": "python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime 27.2 --kind phone --only-testing VisualCoreUITests/LauncherUITests VisualCoreUITests/FirstRunUITests --log-name ua-f09-phone-ios27-d",
+  "elapsed_seconds": 202.067,
+  "exit_code": 0,
+  "finished": "2026-11-13T01:32:50+00:00",
+  "gate": "UA-F09",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F09.app-phone-ios27-d.log",
+  "log_sha256": "407162e5604768b1a951cf77dabab23da5141820e1c516c1531f1e6fe6af5d32",
+  "name": "app-phone-ios27-d",
+  "started": "2026-11-13T01:29:28+00:00",
+  "timed_out": false
+}

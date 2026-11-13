@@ -1,0 +1,24 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--only",
+    "a99.contract-sample",
+    "--scenario",
+    "endurance",
+    "--runtime",
+    "27",
+    "--fresh"
+  ],
+  "command": "python3 scripts/verify_experiences.py --only a99.contract-sample --scenario endurance --runtime 27 --fresh",
+  "elapsed_seconds": 6.777,
+  "exit_code": 0,
+  "finished": "2026-11-13T01:17:45+00:00",
+  "gate": "UA-F09",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F09.sample-endurance.log",
+  "log_sha256": "1b546cb9eb27381101504ce561cafa15421ecc665b01c13dbd5e625344eb0eaa",
+  "name": "sample-endurance",
+  "started": "2026-11-13T01:17:38+00:00",
+  "timed_out": false
+}

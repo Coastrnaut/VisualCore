@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--self-test"
+  ],
+  "command": "python3 scripts/verify_experiences.py --self-test",
+  "elapsed_seconds": 0.05,
+  "exit_code": 0,
+  "finished": "2026-11-13T01:16:41+00:00",
+  "gate": "UA-F09",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F09.self-test.log",
+  "log_sha256": "10c7318b3623a52c0ff6bfbf356b22a85bf8a6b45c8101934caf458a626f33cd",
+  "name": "self-test",
+  "started": "2026-11-13T01:16:41+00:00",
+  "timed_out": false
+}

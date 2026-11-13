@@ -1,0 +1,23 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--only",
+    "a99.contract-sample",
+    "--runtime",
+    "27",
+    "26",
+    "--fresh"
+  ],
+  "command": "python3 scripts/verify_experiences.py --only a99.contract-sample --runtime 27 26 --fresh",
+  "elapsed_seconds": 15.548,
+  "exit_code": 0,
+  "finished": "2026-11-13T01:17:35+00:00",
+  "gate": "UA-F09",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F09.sample-sim.log",
+  "log_sha256": "bf0c6802b8a181ad9decaa8cb259833d3245918ec7da9e8f7aa80e8a20e427e4",
+  "name": "sample-sim",
+  "started": "2026-11-13T01:17:19+00:00",
+  "timed_out": false
+}
