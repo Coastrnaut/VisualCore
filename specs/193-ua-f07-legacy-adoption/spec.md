@@ -47,7 +47,35 @@ Canonical overrides:
 
 ## Clarifications
 
-(none yet)
+### Session 2026-11-12
+
+Answered by the lead under the owner's standing delegation; the recommended option was taken each time.
+
+- Q: Fluid Art Playground keeps its fluid in GPU textures. What do its digest and saved state cover, so that rule E-04
+  (CPU decides) and E-05 (restore gives the same digest) hold? → A: The digest and the snapshot cover the CPU state:
+  the configuration, the control choices, the pending splats as actions, and the step. The fluid picture is how
+  that state is shown. After a restore the picture starts again from the seeded dye pattern with the restored
+  configuration. The decision is recorded in an ADR: the picture is not an outcome, and nothing is decided from
+  the GPU.
+- Q: Fluid Art Playground and Particle Universe lower simulated work under a lower quality level, which would
+  change the digest (against E-13). Where does the quality level act? → A: Only on how the state is shown. Particle
+  Universe keeps simulating its full requested particle count and draws at most the level's limit. Fluid Art
+  Playground's solver passes and splat cap belong to the picture (see the first answer). Each difference from the
+  standalone apps is listed as an adapter difference (FR-U07-003).
+- Q: How does Particle Universe keep its state within the 1 MiB snapshot limit, since 20,000 particles do not fit and
+  the particle system has no stored form? → A: As a replay: the scene, the commands with the step each was given at,
+  and the step count. A restore prepares the seed and replays them. Each replay is bounded by the session's
+  preparation time limit, and a test measures 30 simulated minutes on the simulator. Longer replays are measured on
+  devices later; no framework change is made.
+- Q: How can an adopted experience be opened and verified before its X gate makes it available to everyone? →
+  A: It is registered as a candidate (`ExperienceRegistry.candidates`) with its scenario manifest. The scenario
+  runner and a debug launch argument reach candidates, the launcher does not, and the registry agreement test keeps
+  comparing only `ExperienceRegistry.all` with the catalog. A candidate moves to `all` in the step that records its
+  X gate.
+- Q: How do touches on the canvas reach an adopted experience? → A: The session gives canvas pointer events to the
+  open experience's presenter, which turns them into domain actions (normalized positions and phases) and sends
+  them through its action port. Every touch is then an action that scenarios can script and records can replay.
+  The framework change gets documentation, an API baseline update and the two-chunk reference regression.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -157,7 +185,7 @@ digest and the picture with the standalone app.
 1. **Given** a running A02, **When** the person strokes on the canvas, **Then** dye follows the stroke as in the
    standalone app.
 2. **Given** A02 after the app ended, **When** it opens again, **Then** the configuration and the controls are
-   restored. The fluid picture follows the rule decided in clarification (see FR-U07-033).
+   restored. The fluid picture starts again from its seeded dye pattern (clarification 1).
 
 ---
 
@@ -244,27 +272,27 @@ experience was verified on both runtimes.
   its standalone app offers in phases that passed. A04 offers those of P00 to P03.
 - **FR-U07-013**: The experiences MUST NOT depend on each other. Code they share (for example a canvas input path
   or a still capture) lives in the framework or the app shell, not in one experience.
-- **FR-U07-014**: Each adopted experience MUST keep its state in a saved snapshot of at most 1 MiB, restored
-  to the same digest, with the schema version of its core. A04's 20,000 particles fit by the rule decided in
-  clarification.
+- **FR-U07-014**: Each adopted experience MUST keep its state in a saved snapshot of at most 1 MiB, restored to the
+  same digest, with the schema version of its core. Particle Universe keeps a replay (scene, commands with their
+  steps, step count) that a restore replays within the preparation time limit (clarification 3). Fluid Art
+  Playground keeps its CPU state; its picture starts again from the seed (clarification 1).
 - **FR-U07-015**: Each adopted experience MUST read and write its own files and values only through its storage
   handle (UA-F05). The A01 library and the A03 bookmarks live there; the experience sources pass the source
   storage rule.
 - **FR-U07-016**: Each adopted experience MUST take the person's Reduce Motion and Reduce Flashing choices from
   the shell and combine them with the system setting, replacing each app's own setting.
-- **FR-U07-017**: Each adopted experience MUST declare its quality levels with names the catalog shows, and a
-  quality change MUST follow rule E-13 or an exception recorded by clarification.
+- **FR-U07-017**: Each adopted experience MUST declare its quality levels with names the catalog shows. A quality
+  change MUST NOT change the digest (E-13): a level acts only on how the state is shown (clarification 2).
 - **FR-U07-018**: Time in an adopted experience MUST advance with the experience's fixed steps, not the device
   clock; this covers palette animation, tours and particle stepping.
-- **FR-U07-019**: Touches on the canvas MUST reach the open experience as actions, so that drags, pinches and taps
-  work as in the standalone apps and stay deterministic and recordable.
+- **FR-U07-019**: Touches on the canvas MUST reach the open experience's presenter, which turns them into domain
+  actions with normalized positions and sends them through its action port (clarification 5). Drags, pinches and
+  taps then work as in the standalone apps and stay deterministic and recordable.
 - **FR-U07-020**: A still capture or export that an app offers MUST work in the one app and write only where the
   person chooses through the system's share or save interface, or to the experience's own storage.
-- **FR-U07-021**: Before an adopted experience is available to everyone, it MUST be openable in builds made for
-  testing without changing the catalog's availability. Availability follows the X-A gate as the catalog rules
-  say.
-
-**Interface tests (story 6)**
+- **FR-U07-021**: Before its X gate, an adopted experience MUST be a candidate (`ExperienceRegistry.candidates`)
+  that the scenario runner and a debug launch argument can open, while the launcher and the catalog's availability
+  stay unchanged (clarification 4).
 - **FR-U07-030**: Every interface test of the four apps MUST have at least one counterpart in the one app's
   interface tests, checking the same behaviour.
 - **FR-U07-031**: A mapping table MUST list every old test (class and method) with its new test(s). A guard MUST

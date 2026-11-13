@@ -34,9 +34,8 @@
 - Names that appear are the ones the brief gives (Core packages, conformance helper, enumeration guard,
   `Catalog/path-map.json`, `project.yml`, the two ledgers, `docs/apps`); they are the objects the acceptance
   items are about, not an implementation choice.
-- Four decisions are left to `/speckit-clarify` by design and are referenced, not marked: the A02 digest and
-  restore rule (FR-U07-014, story 5), the quality rule of A02 and A04 against E-13 (FR-U07-017), the A04
-  snapshot form (FR-U07-014), and the state of an adopted experience before its X-A gate (FR-U07-021).
+- The four decisions named at specify, plus the canvas touch path, were settled by `/speckit-clarify` (five
+  answers, 2026-11-12).
 - 35 functional requirements (FR-U07-001 to 064), 10 success criteria, 7 user stories.
 - Ordering (recorded 2026-11-12): UA-F07's adoption can be specified now, but its verification, moves,
   retirement and X-A records need UA-F09's runner; the lead takes UA-F09 through its full loop next and
