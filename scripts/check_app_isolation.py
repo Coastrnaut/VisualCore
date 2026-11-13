@@ -3,7 +3,7 @@
 "consumer, not fork"; feature UA-F03 T-U03-012, FR-U03-090 and FR-U03-091; feature UA-F05 T-U05-001, FR-U05-006 and
 FR-U05-071).
 
-  python3 scripts/check_app_isolation.py --app Apps/FluidArtPlayground [--built-app path/To.app] [--allow-network]
+  python3 scripts/check_app_isolation.py --app Apps/VisualCore [--built-app path/To.app] [--allow-network]
                                          [--allow-usage KEY ...] [--require-sources]
   python3 scripts/check_app_isolation.py --experiences <folder> [<folder> ...] [--allow-network] [--require-sources]
   python3 scripts/check_app_isolation.py --no-direct-storage <path> [<path> ...]
@@ -245,7 +245,7 @@ def usage_problems(built: Path, allowed: list[str]) -> list[str]:
 
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--app", type=Path, help="app folder, e.g. Apps/FluidArtPlayground")
+    ap.add_argument("--app", type=Path, help="app folder, e.g. Apps/VisualCore")
     ap.add_argument("--experiences", type=Path, nargs="+", default=[], metavar="FOLDER",
                     help="experience source folders; also refuses direct gl…( and vcgl…( calls")
     ap.add_argument("--built-app", type=Path)

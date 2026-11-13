@@ -277,5 +277,5 @@ Appended by `/speckit-converge` (T-U07-033, 2026-11-13). Implemented before T-U0
   `SettingsView` (the app's own motion setting), A02 `PlaygroundView` and A03 `ExplorerView`, with every test that
   drives them moved to the experience's presenter or controls or mapped in research.md; A04's `SandboxView` stays
   for the standalone target until X-A04 per FR-U07-016 and FR-U07-013 (unrequested)
-- [ ] T-U07-044 Replace the retired app paths in the usage examples of `scripts/check_test_enumeration.py` and
+- [X] T-U07-044 Replace the retired app paths in the usage examples of `scripts/check_test_enumeration.py` and — Verified 2026-11-13: usage examples of check_test_enumeration.py and check_app_isolation.py name Apps/VisualCore paths; grep finds no retired app path in scripts outside test fixtures; both --help run; script tests 319 OK (script-tests-paths)
   `scripts/check_app_isolation.py` with paths that exist per FR-U07-044 (partial)

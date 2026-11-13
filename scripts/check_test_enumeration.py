@@ -6,7 +6,7 @@ test classes added since the previous 26.5 run, with no skip reported (A01-P04 t
 the XCTest methods declared in the sources (`func test…()` inside `XCTestCase` subclasses) with the test cases that
 passed in the log, so a short enumeration is never taken as evidence.
 
-  python3 scripts/check_test_enumeration.py --sources Apps/GenerativeArtStudio/Tests/UI --log <xcodebuild log> [--only Class]
+  python3 scripts/check_test_enumeration.py --sources Apps/VisualCore/Tests/UI/GenerativeArtStudio --log <xcodebuild log> [--only Class]
 """
 from __future__ import annotations
 
