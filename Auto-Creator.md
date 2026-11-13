@@ -3188,7 +3188,8 @@ VoiceOver testing on devices is recorded and is non-gating.
 
 Marks: **existing** stays as it is; **modify** stays and grows; **new** is created by the named feature; **move**
 is relocated with `git mv` after parity is proven; **retire** is removed once its replacement is verified;
-**archive** was moved to the archive by the consolidation. Nothing marked new exists today.
+**archive** was moved to the archive by the consolidation; **moved** was relocated by the named feature. Of the
+items marked new, only `Packages/ExperiencesCreative` exists today (UA-F07).
 
 ```
 VisualCore/
@@ -3207,14 +3208,14 @@ VisualCore/
 │   └── migration/ledger.json, evidence/, checks/   existing   migration ledger
 ├── Apps/
 │   ├── VisualCore/               existing   the app: App/, Resources/, Tests/Unit, Tests/UI (created by UA-F04)
-│   ├── GenerativeArtStudio/      move       → Packages/ExperiencesCreative/GenerativeArtStudio (UA-F07), then retire the target
-│   ├── FluidArtPlayground/       move       likewise
-│   ├── FractalExplorer/          move       likewise
-│   └── ParticleUniverse/         move       likewise
+│   ├── GenerativeArtStudio/      moved      → Packages/ExperiencesCreative/GenerativeArtStudio; target retired (UA-F07); only the historical privacy manifest stays
+│   ├── FluidArtPlayground/       moved      likewise
+│   ├── FractalExplorer/          moved      likewise
+│   └── ParticleUniverse/         moved      sources moved (UA-F07); the standalone target, its app file and UI tests stay until X-A04
 ├── Packages/
 │   ├── VisualCore/               modify     + VisualCoreExperience (catalog UA-F01, experience contract UA-F02, storage handle and saved state UA-F05), VisualCoreGeometry, VisualCorePuzzle
 │   ├── VisualCoreRendering/      modify     + VisualCoreExperienceHost (presenter, port, shell: UA-F02; session: UA-F03), VisualCoreStore
-│   ├── ExperiencesCreative/      new        A01–A25: <Name>/Core, <Name>/Experience, <Name>/Shaders, tests
+│   ├── ExperiencesCreative/      existing   A01–A04 today, A05–A25 later: <Name>/Core, CoreTests, Experience (with Adapter/), ExperienceTests, Shaders, scenario-manifest.json
 │   ├── ExperiencesRound02/       new        R02-G01 … G25
 │   ├── ExperiencesRound03/       new        R03-G01 … G25
 │   └── ExperiencesRound04/       new        R04-G01 … G25
@@ -3278,16 +3279,30 @@ that is already verified. The file-level plan, the path map and the risk registe
 
 ### 17.2 Adopting an existing app (UA-F07)
 
-For each of A01, A02, A03 and A04, in that order:
+UA-F07 first added what the four adapters needed to the framework, then adopted A01, A02, A03 and A04 in that order.
 
-1. Write the experience adapter over the existing scene and model types and register it.
+**Framework phase.** Pointer input reaches an experience through `ExperiencePresenter.pointer(_:viewSize:port:)` and
+`Experience.handlePointer`, which the session installs as the render host's pointer handler; a still picture for
+export comes from `ExperienceSession.renderStill(width:height:)` through the `experienceStillRenderer` environment
+value; `GrowthRule.judge(_:warmUp:)` lets the teardown and re-entry scenario ignore the first cycle's caches; the
+controls' scroll view hides its edge effect so the accessibility audit sees whole controls. Each addition is
+documented, in the API baseline, tested and covered by the seven-step reference regression.
+
+**Per experience:**
+
+1. Write the experience adapter (a Codable core, its scenario manifest, a presenter over the existing scene,
+   the controls) over the existing model and scene types, and register it as a candidate.
 2. Run the conformance helper and the session-host tests against it.
-3. Port the UI tests into the unified app; keep a table of old and new test names; prove with the enumeration
-   guard (`scripts/check_test_enumeration.py`) that none was lost.
+3. Port the UI tests into `Apps/VisualCore/Tests/UI/<Name>/`; keep the table of old and new test names
+   (`specs/193-ua-f07-legacy-adoption/test-map.csv`) and prove with `scripts/check_test_map.py` that every old test
+   is mapped and every new one exists and passed.
 4. Run the verification runner for the experience on both simulator runtimes.
-5. Move the sources along the path map, update `Catalog/path-map.json`, and run steps 2 to 4 again.
-6. Remove the standalone target from `project.yml` and regenerate the project.
-7. Record `X-A01`, `X-A02` and `X-A03`. `X-A04` waits for the legacy gates A04-P04 … A04-P06.
+5. Move the sources with `git mv` into `Packages/ExperiencesCreative/<Name>/`, update `Catalog/path-map.json`, prove
+   with `scripts/check_renames.py` that the Core files were renamed unchanged, and run steps 2 to 4 again.
+6. Remove the standalone target from `project.yml` and regenerate the project (A01–A03). A04's target stays,
+   compiling the moved sources, until its legacy phases are done.
+7. After UA-F07 is recorded, record `X-A01`, `X-A02` and `X-A03` and move their registrations from the candidates to
+   the available experiences. `X-A04` waits for the legacy gates A04-P04 … A04-P06.
 
 ### 17.3 Continuing the original apps
 
@@ -3312,7 +3327,7 @@ No ledger gate, ticked task or evidence file of the left column is changed by th
 
 | Retired | When | Record kept |
 |---|---|---|
-| The four standalone app targets and their bundle identifiers | after the experience's `X-` gate | `Catalog/path-map.json`, Git history |
+| The four standalone app targets and their bundle identifiers | after the experience passes the runner on both simulator runtimes in the one app (A01–A03 in UA-F07; A04 at `X-A04`) | `Catalog/path-map.json`, Git history |
 | Per-app `Info.plist`, asset catalogs and privacy manifests | with the target | merged into the app's single set |
 | Legacy gates `IMPLEMENTATION-LOCK`, `D1-A01` … `D3-A25`, `DEVICE-RECONCILE`, `SUITE-FINAL` | never run | superseded note in the migration ledger |
 | Per-round device campaigns and per-game store work in the archived prompts | never run | canonical overrides (section 21) |

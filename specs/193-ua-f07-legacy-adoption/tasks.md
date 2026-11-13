@@ -194,7 +194,7 @@ runtimes.
 
 - [X] T-U07-030 Add `docs/apps/<slug>/README.md` for the four dossiers, one paragraph saying that the store listing is — Verified 2026-11-13: the four dossier READMEs say the listing is superseded and the dossier is history; no other dossier file changed (git status shows only the four new README.md); python3 scripts/validate_docs.py PASS 44 dossiers, 0 problems (dossier-readmes)
   superseded by the one app and that the dossier is kept as history. No other dossier file changes (FR-U07-052).
-- [ ] T-U07-031 Documents as built: Auto-Creator.md section 17 (the as-built order and the framework phase) and section
+- [X] T-U07-031 Documents as built: Auto-Creator.md section 17 (the as-built order and the framework phase) and section — Verified 2026-11-13: Auto-Creator.md §16 (moved apps, ExperiencesCreative existing) and §17.2/17.5 (framework phase and as-built order) edited in place; data-model.md §6 As built; render_autocreator.py --check PASS; validate_autocreator.py PASS 16 checks, 0 problems (documents-as-built)
   16 (`Packages/ExperiencesCreative`), edited in place, with `render_autocreator.py` and `validate_autocreator.py`;
   data-model.md "As built" with the final adapter controls and levels.
 - [ ] T-U07-032 API baseline and boundaries: `check_public_api.py --update` leaves no difference and 0 undocumented
