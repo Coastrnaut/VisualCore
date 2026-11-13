@@ -89,7 +89,7 @@ runtimes.
   - `python3 scripts/release_check.py --only xcodegen`;
   - the app builds;
   - `check_app_isolation.py --app Apps/VisualCore` and the storage rule on the adapter pass.
-- [ ] T-U07-011 [US1] Session and conformance on the simulators: the A01 adapter's session tests (open, close,
+- [X] T-U07-011 [US1] Session and conformance on the simulators: the A01 adapter's session tests (open, close, — Verified 2026-11-13: GenerativeArtSessionTests 7 tests (open with first frame and probe, close without GPU objects across four families and six palettes, suspension, retry after refused restore, memory warning, context recreation, 20 cycles) pass 7/7 on iOS 27.2 and 26.5 phone (run-checks a01-session-ios27, a01-session-ios26)
   suspension, retry, memory warning, context loss) in the framework's test bundle on iOS 27.2 and 26.5 (FR-U07-011;
   SC-U07-003).
 - [ ] T-U07-012 [US1] Parity with the standalone app: for 3 seeds and the same actions, the adapter's document and time
