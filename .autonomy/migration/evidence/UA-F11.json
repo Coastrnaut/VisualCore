@@ -1,0 +1,189 @@
+{
+  "branch": "main",
+  "dirty": false,
+  "dirty_paths": [],
+  "failed_attempts": [],
+  "gate": "UA-F11",
+  "ledger": "migration",
+  "passing_checks": [
+    {
+      "command": "python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime 27.2 --kind phone --only-testing VisualCoreUITests/AcknowledgementsUITests --sources Apps/VisualCore/Tests/UI --log-name ua-f11-acknowledgements-r3",
+      "exit_code": 0,
+      "finished": "2026-11-13T20:48:21+00:00",
+      "log": ".autonomy/logs/migration/UA-F11.app-ui-acknowledgements.log",
+      "log_sha256": "a9511ee7e49e2aaf3da7d10bc8d0affc90c7470e5248132ac358f2dc819ccb29",
+      "name": "app-ui-acknowledgements"
+    },
+    {
+      "command": "python3 scripts/check_compliance.py",
+      "exit_code": 0,
+      "finished": "2026-11-13T20:37:57+00:00",
+      "log": ".autonomy/logs/migration/UA-F11.baseline-compliance.log",
+      "log_sha256": "bf7d4f532fb54ce95b597d61683ece322634168830dcb063c48ee06e06651651",
+      "name": "baseline-compliance"
+    },
+    {
+      "command": "python3 scripts/test_scripts.py",
+      "exit_code": 0,
+      "finished": "2026-11-13T20:39:12+00:00",
+      "log": ".autonomy/logs/migration/UA-F11.baseline-scripts.log",
+      "log_sha256": "88ef8b5db84d5b793246754676ccdf04625ccdc0c1bc3608f8ce8d084fa4d544",
+      "name": "baseline-scripts"
+    },
+    {
+      "command": "python3 scripts/build_catalog.py --check",
+      "exit_code": 0,
+      "finished": "2026-11-13T20:47:18+00:00",
+      "log": ".autonomy/logs/migration/UA-F11.build-catalog.log",
+      "log_sha256": "bb171d9ac9ca2e6fce45ffa0fffe88efa3bfae642fc8a930d85d660815b4e67b",
+      "name": "build-catalog"
+    },
+    {
+      "command": "python3 scripts/check_compliance.py",
+      "exit_code": 0,
+      "finished": "2026-11-13T20:47:13+00:00",
+      "log": ".autonomy/logs/migration/UA-F11.compliance.log",
+      "log_sha256": "db393a19970f5c154c399798994678fd946eeeaa8c8266c7b59c10e0eb5ab3e9",
+      "name": "compliance"
+    },
+    {
+      "command": "python3 scripts/check_distinctiveness.py --check",
+      "exit_code": 0,
+      "finished": "2026-11-13T20:52:55+00:00",
+      "log": ".autonomy/logs/migration/UA-F11.distinctiveness-r2.log",
+      "log_sha256": "2571f7053ee113375b0e57addef0adc9eae7a17412e0d3aaf5939f445ee6dbd6",
+      "name": "distinctiveness-r2"
+    },
+    {
+      "command": "python3 scripts/check_distinctiveness.py --check",
+      "exit_code": 0,
+      "finished": "2026-11-13T20:47:18+00:00",
+      "log": ".autonomy/logs/migration/UA-F11.distinctiveness.log",
+      "log_sha256": "1e80c4811b65d5c426f67e9ec56d1e6a8e7a666d2e87b5e2901a929514672657",
+      "name": "distinctiveness"
+    },
+    {
+      "command": "python3 scripts/validate_autocreator.py",
+      "exit_code": 0,
+      "finished": "2026-11-13T20:49:31+00:00",
+      "log": ".autonomy/logs/migration/UA-F11.docs-autocreator.log",
+      "log_sha256": "5559f09c04c07d8cadb0f01a3771e8817b49c9a8ea4005265a456e076faa94d6",
+      "name": "docs-autocreator"
+    },
+    {
+      "command": "python3 scripts/migration_baseline.py verify",
+      "exit_code": 0,
+      "finished": "2026-11-13T20:49:31+00:00",
+      "log": ".autonomy/logs/migration/UA-F11.docs-baseline.log",
+      "log_sha256": "43b67c0ab560e1da534586a245639ecd7e2dc0fbd01d2e76c9cdae085526e9b9",
+      "name": "docs-baseline"
+    },
+    {
+      "command": "python3 scripts/validate_docs.py",
+      "exit_code": 0,
+      "finished": "2026-11-13T20:49:31+00:00",
+      "log": ".autonomy/logs/migration/UA-F11.docs-dossiers.log",
+      "log_sha256": "1072cbe0cf2cf69a38f678074d4d8e4ee38db255d8ec66645c872b2b6b36b9b4",
+      "name": "docs-dossiers"
+    },
+    {
+      "command": "python3 scripts/check_licenses.py --app Build/DerivedData/release-VisualCore-Release-sim/Build/Products/Release-iphonesimulator/VisualCore.app",
+      "exit_code": 0,
+      "finished": "2026-11-13T20:47:16+00:00",
+      "log": ".autonomy/logs/migration/UA-F11.licenses-app.log",
+      "log_sha256": "5f04c0438dd7151b3cfd217a3c53f2b1593b0888a568e90c052edc3febd1f693",
+      "name": "licenses-app"
+    },
+    {
+      "command": "python3 scripts/check_licenses.py",
+      "exit_code": 0,
+      "finished": "2026-11-13T20:47:15+00:00",
+      "log": ".autonomy/logs/migration/UA-F11.licenses.log",
+      "log_sha256": "bbc58c4366e1012e30aee7bc7e5606c96b3c3a88ed825ab06d08d64f11b2b8fb",
+      "name": "licenses"
+    },
+    {
+      "command": "python3 scripts/metadata_inputs.py --check",
+      "exit_code": 0,
+      "finished": "2026-11-13T20:47:24+00:00",
+      "log": ".autonomy/logs/migration/UA-F11.metadata-inputs.log",
+      "log_sha256": "fd99d2ef8a48f57dbaf7c075399a1b0b00a3f1c8cc58f79ccd6e27ef62f81010",
+      "name": "metadata-inputs"
+    },
+    {
+      "command": "python3 scripts/check_no_tracking.py --app Build/DerivedData/release-VisualCore-Release-sim/Build/Products/Release-iphonesimulator/VisualCore.app --json .autonomy/logs/ua-f11/tracking.json",
+      "exit_code": 0,
+      "finished": "2026-11-13T20:47:15+00:00",
+      "log": ".autonomy/logs/migration/UA-F11.no-tracking.log",
+      "log_sha256": "49e96d03515c785581a81289c2a6e99eddcc0e5a9f5ada665e9d69cb667d89b0",
+      "name": "no-tracking"
+    },
+    {
+      "command": "python3 scripts/check_privacy_manifest.py --app Build/DerivedData/release-VisualCore-Release-sim/Build/Products/Release-iphonesimulator/VisualCore.app --json .autonomy/logs/ua-f11/privacy.json",
+      "exit_code": 0,
+      "finished": "2026-11-13T20:47:12+00:00",
+      "log": ".autonomy/logs/migration/UA-F11.privacy-manifest.log",
+      "log_sha256": "d053352a6e5f5f54818ef19dabe761cace7dcadc9170524d1a84c3856f1fd521",
+      "name": "privacy-manifest"
+    },
+    {
+      "command": "python3 scripts/audit_showcase_dependencies.py --target VisualCore --sources Apps/VisualCore --app Build/DerivedData/release-VisualCore-Release-sim/Build/Products/Release-iphonesimulator/VisualCore.app",
+      "exit_code": 0,
+      "finished": "2026-11-13T20:47:18+00:00",
+      "log": ".autonomy/logs/migration/UA-F11.projectm-audit.log",
+      "log_sha256": "ddf4918d50fbb1223a38c35529a985696c0d70c7c75fdcf2dab0442a45b80702",
+      "name": "projectm-audit"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only app-release-build app-release-symbols app-privacy-manifest app-no-tracking app-licenses app-usage-descriptions app-projectm-audit",
+      "exit_code": 0,
+      "finished": "2026-11-13T20:46:59+00:00",
+      "log": ".autonomy/logs/migration/UA-F11.release-check-app.log",
+      "log_sha256": "e287514a4e03756d4f51a5537779eeb9f272168662ef982a5df7e9dabe570a7a",
+      "name": "release-check-app"
+    },
+    {
+      "command": "python3 scripts/check_release_symbols.py --app Build/DerivedData/release-VisualCore-Release-sim/Build/Products/Release-iphonesimulator/VisualCore.app",
+      "exit_code": 0,
+      "finished": "2026-11-13T20:47:18+00:00",
+      "log": ".autonomy/logs/migration/UA-F11.release-symbols.log",
+      "log_sha256": "4f9808aa3fbfbb929d68056a48afb0d20d95661ee5237d696246c13c59668160",
+      "name": "release-symbols"
+    },
+    {
+      "command": "python3 scripts/test_scripts.py",
+      "exit_code": 0,
+      "finished": "2026-11-13T20:52:00+00:00",
+      "log": ".autonomy/logs/migration/UA-F11.script-tests-r2.log",
+      "log_sha256": "1279dfdf35c531dc497dee8c9e1c48a057538872f227cf43209ed22deff40704",
+      "name": "script-tests-r2"
+    },
+    {
+      "command": "python3 scripts/test_scripts.py",
+      "exit_code": 0,
+      "finished": "2026-11-13T20:46:19+00:00",
+      "log": ".autonomy/logs/migration/UA-F11.script-tests.log",
+      "log_sha256": "e4179d68d844e9d27bbd2271d263da0965c7e16cafd95304f15e2620d2023f17",
+      "name": "script-tests"
+    },
+    {
+      "command": "python3 scripts/check_usage_descriptions.py --app Build/DerivedData/release-VisualCore-Release-sim/Build/Products/Release-iphonesimulator/VisualCore.app",
+      "exit_code": 0,
+      "finished": "2026-11-13T20:47:13+00:00",
+      "log": ".autonomy/logs/migration/UA-F11.usage-descriptions-app.log",
+      "log_sha256": "59ee9c96603d1e838a27f2d6c3e1b92402c6af42f0b553a35f1c72c05c09829d",
+      "name": "usage-descriptions-app"
+    },
+    {
+      "command": "python3 scripts/check_usage_descriptions.py",
+      "exit_code": 0,
+      "finished": "2026-11-13T20:47:12+00:00",
+      "log": ".autonomy/logs/migration/UA-F11.usage-descriptions.log",
+      "log_sha256": "a13f66b6dfc6bd5baf3e3f692d55e5fc4b524c21601a7a0331edc252e33e9aaf",
+      "name": "usage-descriptions"
+    }
+  ],
+  "revision": "333dc2fffb041a0035f097771352923163840567",
+  "revision_number": 1,
+  "sealed": "2026-11-13T21:09:53+00:00"
+}
