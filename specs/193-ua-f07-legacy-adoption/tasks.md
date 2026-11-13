@@ -22,7 +22,7 @@ reverted alone.
   - `python3 scripts/migration_baseline.py verify` (the six fixture hashes);
   - the SHA-256 of `.autonomy/state.json`;
   - recorded in research.md section 3 "Baseline" (FR-U07-001, FR-U07-002, FR-U07-050; SC-U07-001, SC-U07-002, SC-U07-008).
-- [ ] T-U07-002 [P] Tests first in `scripts/test_scripts.py` (class `TestMapTests`), then `scripts/check_test_map.py`
+- [X] T-U07-002 [P] Tests first in `scripts/test_scripts.py` (class `TestMapTests`), then `scripts/check_test_map.py` — Verified 2026-11-13: python3 scripts/test_scripts.py: Ran 316 tests, OK; TestMapTests 9 tests pass (missing old method, nonexistent new method, failed in log all reported); run-check test-map-tool. The tool's first version entered commit 5218995 with the T-U07-001 tick
   (contracts/adoption-api.md, Tools). It must report three failures: a missing old method, a mapped new method
   that does not exist, and (with `--log`) a mapped method that did not pass. The test methods are read the way
   `check_test_enumeration.py` reads them (FR-U07-031).
