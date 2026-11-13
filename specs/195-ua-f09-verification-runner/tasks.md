@@ -166,7 +166,7 @@ Commit after every task (`python3 scripts/tick_task.py`), and push with `python3
 
 ## Phase 11: Framework obligations, documents and the audit before evidence
 
-- [ ] T-U09-028 API baseline, rules and boundaries:
+- [X] T-U09-028 API baseline, rules and boundaries: — Verified 2026-11-12: check_public_api.py: 2174 lines, 0 undocumented, 0 lines lost since 7bc756b; boundary diff since 7bc756b empty; dependencies, compliance, three documented-api checks, storage-rule, stored-data-rule and app isolation (18 files) pass
   - `check_public_api.py --update` leaves no difference: 0 undocumented and no line lost since `7bc756b`.
   - `git diff --stat 7bc756b -- External Vendor Showcase Harnesses Apps/GenerativeArtStudio Apps/FluidArtPlayground Apps/FractalExplorer Apps/ParticleUniverse` is empty.
   - `check_dependencies.py`, `check_compliance.py`, the three documented-API checks and the storage rules pass (FR-U09-063, FR-U09-064).
