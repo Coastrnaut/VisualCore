@@ -40,7 +40,7 @@ Independent test: a fresh host's report holds every value of FR-R02F02-001 and 0
 
 ## Phase 4: User Story 3 — Evidence records the renderer (P2)
 
-- [ ] T-R02F02-008 [P] [US3] Tests first: `Packages/VisualCore/Tests/VisualCoreExperienceTests/RendererRecordTests.swift`
+- [X] T-R02F02-008 [P] [US3] Tests first: `Packages/VisualCore/Tests/VisualCoreExperienceTests/RendererRecordTests.swift` — Verified 2026-11-13: RendererRecordTests.swift (5: round trip, snake_case keys, Environment without renderer decodes, with renderer round-trips, unknown key ignored) and scripts/tests/test_evidence_renderer.py (4: with and without renderer pass, non-object and UDID-shaped value fail); host-visualcore exit 0, script-tests exit 0
   (round trip with snake-case keys; an evidence JSON without `renderer` decodes); `scripts/tests/test_evidence_renderer.py`
   (`check_evidence.py` accepts a record with and without `environment.renderer`, rejects a non-object `renderer` and
   an identifier-shaped value inside it).
