@@ -2,7 +2,7 @@
  "schema": 1,
  "name": "VisualCore unified-app migration ledger (ADR-0009)",
  "created": "2026-11-12T02:54:10+00:00",
- "updated": "2026-11-13T21:18:15+00:00",
+ "updated": "2026-11-13T21:37:39+00:00",
  "rules": [
   "Only scripts/migration_ledger.py writes this file.",
   "The legacy ledger .autonomy/state.json is never reset or rewritten by the migration; its passed gates stay passed.",
@@ -119,7 +119,7 @@
   {"id":"R02-F01","kind":"shared-round-feature","title":"Round 1 evidence & reproducible baseline audit","depends":["UA-F02"],"status":"superseded","attempts":[],"spec_dir":"specs/201-round-1-evidence-reproducible-baseline-audit","superseded_by":["UA-F00"]},
   {"id":"R02-F02","kind":"shared-round-feature","title":"VisualCore public API compatibility and renderer capability probing","depends":["UA-F02","R02-F01"],"status":"pass","attempts":[{"at":"2026-11-13T19:59:34+00:00","result":"pass","evidence":".autonomy/migration/evidence/R02-F02.json","evidence_sha256":"cca4f494c8322dc166b8b7fb96a6893a696b66c0a6dcd8a31ebd915d0b9f60b3","revision":"5eb731403d8b8082c7f9f5f8c98dea37c53009df"}],"spec_dir":"specs/202-visualcore-public-api-compatibility-and-renderer-capability-probing"},
   {"id":"R02-F03","kind":"shared-round-feature","title":"Numerical foundations and deterministic seeded scene time","depends":["UA-F02","R02-F02"],"status":"pass","attempts":[{"at":"2026-11-13T21:18:15+00:00","result":"pass","evidence":".autonomy/migration/evidence/R02-F03.json","evidence_sha256":"750f6fcfe4cf6a1fe1b5f36e746df8a1988d74bb0d038accbae7f7bfe637debe","revision":"d57a7cbf11f810ce8fda6a500d94fc0bc68c2c3d"}],"spec_dir":"specs/203-numerical-foundations-and-deterministic-seeded-scene-time"},
-  {"id":"R02-F04","kind":"shared-round-feature","title":"GPU resource ownership and pipeline lifetime","depends":["UA-F02","R02-F02"],"status":"pending","attempts":[],"spec_dir":"specs/204-gpu-resource-ownership-and-pipeline-lifetime"},
+  {"id":"R02-F04","kind":"shared-round-feature","title":"GPU resource ownership and pipeline lifetime","depends":["UA-F02","R02-F02"],"status":"pass","attempts":[{"at":"2026-11-13T21:37:39+00:00","result":"pass","evidence":".autonomy/migration/evidence/R02-F04.json","evidence_sha256":"6fa4e07f6dfc33daf437540cf12a325d84b2b50faa730055c72ebe53091586f0","revision":"c743dee39e57e3e671464565ab49d55b0fc8c538"}],"spec_dir":"specs/204-gpu-resource-ownership-and-pipeline-lifetime"},
   {"id":"R02-F05","kind":"shared-round-feature","title":"Procedural mesh compiler and mesh validation","depends":["UA-F02","R02-F03","R02-F04"],"status":"pending","attempts":[],"spec_dir":"specs/205-procedural-mesh-compiler-and-mesh-validation"},
   {"id":"R02-F06","kind":"shared-round-feature","title":"Shader domain-specific parameters and GL ES safe compilation","depends":["UA-F02","R02-F04"],"status":"pending","attempts":[],"spec_dir":"specs/206-shader-domain-specific-parameters-and-gl-es-safe-compilation"},
   {"id":"R02-F07","kind":"shared-round-feature","title":"Linear-color/HDR-look emissive pass and mobile-safe bloom","depends":["UA-F02","R02-F06"],"status":"pending","attempts":[],"spec_dir":"specs/207-linear-color-hdr-look-emissive-pass-and-mobile-safe-bloom"},
