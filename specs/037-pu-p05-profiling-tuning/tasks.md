@@ -42,7 +42,7 @@ each task. Tests before code. Owner-only items: none. One {device} task. No Visu
 
 ## Phase 5: User Story 4 — MVP and host gates (P3)
 
-- [ ] T-A04-511 [US4] PU interface chunks on the iOS 27.2 phone: `app-build-for-testing-ios27 app-ui-ios27-j2`,
+- [X] T-A04-511 [US4] PU interface chunks on the iOS 27.2 phone: `app-build-for-testing-ios27 app-ui-ios27-j2`, — Verified 2026-11-13: PU chunks on the iOS 27.2 phone: j2 223 s, j3 342 s, j4 PASS (A04-P05/ui-pu-j2, ui-pu-j3, ui-pu-j4); audit_showcase_dependencies --target VisualCore PASS (A04-P05/projectm-audit) (SC-A04-505)
   `app-ui-ios27-j3`, `app-ui-ios27-j4` (checks `ui-pu-j2`, `ui-pu-j3`, `ui-pu-j4`); dependency audit
   `python3 scripts/audit_showcase_dependencies.py --target VisualCore --sources Apps/VisualCore` (check `projectm-audit`)
   (SC-A04-505).
