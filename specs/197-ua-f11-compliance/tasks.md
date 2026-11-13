@@ -62,7 +62,7 @@ Device-only items: none, so no {device} task.
   covering advertising, analytics, attribution and crash reporting with at least three each (FR-U11-020); texts
   "case-sensitive literals, 3–80 chars"; library names "distinctive module identifiers of at least 6 characters,
   matched as whole identifiers"; allowances need a reason.
-- [ ] T-U11-014 [US3] Write `scripts/check_no_tracking.py` (reuses `check_release_symbols.binaries`; `otool -L`,
+- [X] T-U11-014 [US3] Write `scripts/check_no_tracking.py` (reuses `check_release_symbols.binaries`; `otool -L`, — Verified 2026-11-13: scripts/check_no_tracking.py (otool -L, nm -m, 1 MiB chunked byte scan, allowances, --json via report_meta); its tests pass (script-tests)
   `nm -m`, 1 MiB chunked byte scan of every bundled file; `--json` via report_meta).
 - [ ] T-U11-015 [P] [US3] Tests first in `scripts/tests/test_compliance_tracking.py`: a fixture source importing
   `AdSupport` or `AppTrackingTransparency`, or calling `ASIdentifierManager`/`ATTrackingManager`, fails
