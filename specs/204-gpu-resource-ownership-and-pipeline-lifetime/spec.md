@@ -60,7 +60,20 @@ Canonical overrides:
 
 ### Session 2026-11-13
 
-(Filled by `/speckit-clarify`.)
+- Q: How does the registry know that an evicted program may still be in use? → A: It does not count holders.
+  Eviction only removes the program from the cache and moves it to a retired set; it is deleted when the holder
+  releases it or when the context ends (the registry releases the retired set with everything else). A later request
+  for the same variant compiles a new program. No reference counting and no deletion from a destructor.
+- Q: Where does the pipeline description live? → A: A pure value `RenderState` (blend, depth test, depth write,
+  cull, colour mask; Hashable, with presets) in the pure shader-source module, host-tested; the rendering package adds
+  `Pipeline` (a program plus a `RenderState`, equal when the program is the same object and the states are equal)
+  and `GLState.apply(_:)`, which sets every field and returns false for a stale or released program.
+- Q: Which depth storage do depth targets use? → A: A 24-bit depth renderbuffer of the target's size (no stencil),
+  requested by a `depth: Bool` option of the existing target factory (default false, so existing callers are
+  unchanged); counted as the existing `renderbuffer` resource kind; pooled targets are keyed by size, format and
+  depth.
+- Q: How is a refused draw counted? → A: With the ledger's existing stale counter (`noteStale`), so session-close
+  diagnostics and evidence report it without a new field; the registry's eviction count is a new statistic.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -172,7 +185,8 @@ runtimes and record them.
   context) and session close MUST report zero live resources.
 
 **Program cache (story 1)**
-- **FR-R02F04-010**: Evicting a program from the cache MUST NOT delete it while a holder may still use it.
+- **FR-R02F04-010**: Evicting a program from the cache MUST NOT delete it; it moves to a retired set until its holder
+  releases it or its context ends.
 - **FR-R02F04-011**: An evicted program MUST be deleted when its holder releases it or when its context ends,
   whichever comes first.
 - **FR-R02F04-012**: The cache MUST stay bounded at its current limit of 64 cached programs.
@@ -184,12 +198,14 @@ runtimes and record them.
   write, face culling and colour mask of a draw; equal descriptions MUST compare and hash equal.
 - **FR-R02F04-021**: Applying a description MUST set every one of those states, so the result does not depend on the
   previous state.
-- **FR-R02F04-022**: Applying a description whose program is stale or released MUST refuse the draw and count it.
+- **FR-R02F04-022**: Applying a description whose program is stale or released MUST refuse the draw and count it with
+  the ledger's stale counter.
 - **FR-R02F04-023**: The pure part of the description (everything except the program handle) MUST be host-testable.
 - **FR-R02F04-024**: Presets MUST exist for the common cases: opaque, alpha-blended, additive and opaque 3D with depth.
 
 **Depth targets (story 3)**
-- **FR-R02F04-030**: An offscreen render target MUST be creatable with depth storage of the same size.
+- **FR-R02F04-030**: An offscreen render target MUST be creatable with 24-bit depth storage of the same size through
+  an option that defaults to off.
 - **FR-R02F04-031**: The depth storage MUST be counted, released with its target and rejected after context loss.
 - **FR-R02F04-032**: Creation MUST fail without residue when the size is outside the limits, the budget is exceeded or
   the framebuffer is incomplete.
