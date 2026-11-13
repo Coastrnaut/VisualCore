@@ -85,7 +85,7 @@ none (no {owner} task). VisualCore changes, so the documentation, API-baseline a
 - [X] T-R02F03-022 API baseline: `python3 scripts/check_public_api.py --update` then `check_public_api.py` (check — Verified 2026-11-13: check_public_api.py --update: 2328 declarations, 0 undocumented, 32 additions equal to contracts/api.md; check_public_api PASS (public-api); check_documented_api --sources Apps/VisualCore PASS (documented-api)
   `public-api`); `python3 scripts/check_documented_api.py --sources Apps/VisualCore` (check `documented-api`).
 - [X] T-R02F03-023 `Packages/VisualCore/README.md` section "Numerical foundations (feature 203, R02-F03)". — Verified 2026-11-13: Packages/VisualCore/README.md section Numerical foundations (feature 203, R02-F03) added; its new names exist in the API baseline
-- [ ] T-R02F03-024 Full host suite `swift test --package-path Packages/VisualCore` (check `host-visualcore`); record
+- [X] T-R02F03-024 Full host suite `swift test --package-path Packages/VisualCore` (check `host-visualcore`); record — Verified 2026-11-13: swift test Packages/VisualCore PASS (host-visualcore); new suites: SeededRandomChoice 0.030 s, ShaderHash 0.001 s, NumericHygiene 0.001 s, derivation and state tests at most 0.012 s each, all under 1 s (SC-R02F03-008)
   the duration of each new suite from the output, each under 1 s (SC-R02F03-008).
 - [ ] T-R02F03-025 Committed digests unchanged: `python3 scripts/verify_experiences.py --only a01.generative-art-studio
   a02.fluid-art-playground a03.fractal-explorer --runtime 27` (check `verify-a01-a03`) and the ExperiencesCreative
