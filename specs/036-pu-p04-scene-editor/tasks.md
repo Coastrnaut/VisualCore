@@ -17,7 +17,7 @@ each task. Tests before code. Owner-only items: none. One {device} task. No Visu
   force" and default looks; newer refused (`unsupportedVersion`); NaN and truncated refused; name "1…64 characters after
   trimming"; force x, y "∈ [−500, 500]" and strength in `PlacedForce.strengthRange`; `openActions()` gives
   `scene.begin`, one `emitter.define` per emitter, `force.define`, `look.define` (at most 11, each ≤ 8 values).
-- [ ] T-A04-403 Write `PU/Core/SceneDocument.swift` (`SceneDocument`, `SavedForce`, decode with v1 migration,
+- [X] T-A04-403 Write `PU/Core/SceneDocument.swift` (`SceneDocument`, `SavedForce`, decode with v1 migration, — Verified 2026-11-13: PU/Core/SceneDocument.swift (SceneDocument v2, SavedForce, decode with v1 migration, encoded, openActions, index mappings, inverse defines) and SceneError.invalidDocument; tests pass (A04-P04/core-tests-ios27)
   `openActions()`), documented.
 
 ## Phase 3: User Story 1 — Save a scene and open it again (P1)
