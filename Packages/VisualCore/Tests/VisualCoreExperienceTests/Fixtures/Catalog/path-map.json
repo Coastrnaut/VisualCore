@@ -120,6 +120,30 @@
       "to": "Apps/VisualCore/Tests/UI/FractalExplorer",
       "gate": "UA-F07",
       "commit": "23bfdfe5ba77d83e0184feaf2c0cf966e959288d"
+    },
+    {
+      "from": "Apps/ParticleUniverse/ParticleUniverseCore/Sources/ParticleUniverseCore",
+      "to": "Packages/ExperiencesCreative/ParticleUniverse/Core",
+      "gate": "UA-F07",
+      "commit": "the commit of the A04 move"
+    },
+    {
+      "from": "Apps/ParticleUniverse/ParticleUniverseCore/Tests/ParticleUniverseCoreTests",
+      "to": "Packages/ExperiencesCreative/ParticleUniverse/CoreTests",
+      "gate": "UA-F07",
+      "commit": "the commit of the A04 move"
+    },
+    {
+      "from": "Apps/ParticleUniverse/ParticleUniverseCore/Package.swift",
+      "to": "Packages/ExperiencesCreative/Package.swift",
+      "gate": "UA-F07",
+      "commit": "the commit of the A04 move"
+    },
+    {
+      "from": "Apps/ParticleUniverse/App",
+      "to": "Packages/ExperiencesCreative/ParticleUniverse/Experience",
+      "gate": "UA-F07",
+      "commit": "the commit of the A04 move"
     }
   ]
 }

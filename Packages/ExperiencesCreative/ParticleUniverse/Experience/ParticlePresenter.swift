@@ -9,7 +9,6 @@
 //   2. The quality level comes from the session host and caps the drawn count; the simulation keeps its limit.
 //   3. There is no CPU preview renderer: a GPU failure fails the session's setup and shows its failure view.
 import Foundation
-import ParticleUniverseAdapterCore
 import ParticleUniverseCore
 import SwiftUI
 import UIKit

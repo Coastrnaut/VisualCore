@@ -253,7 +253,7 @@
    "to": "Packages/ExperiencesCreative/ParticleUniverse/Core",
    "action": "move",
    "by": "UA-F07",
-   "state": "pending",
+   "state": "done",
    "note": "Pure domain target ParticleUniverseCore; tests must pass unchanged before and after the move.",
    "experience": "A04"
   },
@@ -262,7 +262,7 @@
    "to": "Packages/ExperiencesCreative/ParticleUniverse/CoreTests",
    "action": "move",
    "by": "UA-F07",
-   "state": "pending",
+   "state": "done",
    "note": "Host tests and fixtures of the Core target; fixtures stay bit-identical.",
    "experience": "A04"
   },
@@ -271,7 +271,7 @@
    "to": "Packages/ExperiencesCreative/Package.swift",
    "action": "merge",
    "by": "UA-F07",
-   "state": "pending",
+   "state": "done",
    "note": "The per-app package manifest is replaced by targets in the collection package.",
    "experience": "A04"
   },

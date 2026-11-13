@@ -4,7 +4,6 @@
 import FluidArtPlaygroundExperience
 import FractalExplorerExperience
 import GenerativeArtStudioExperience
-import ParticleUniverseAdapterCore
 import ParticleUniverseExperience
 import VisualCoreExperience
 import VisualCoreExperienceHost

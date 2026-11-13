@@ -1,0 +1,26 @@
+{
+  "argv": [
+    "xcodebuild",
+    "build",
+    "-project",
+    "VisualCore.xcodeproj",
+    "-scheme",
+    "ParticleUniverse",
+    "-destination",
+    "generic/platform=iOS Simulator",
+    "-derivedDataPath",
+    "Build/DerivedData/pu-standalone",
+    "CODE_SIGNING_ALLOWED=NO"
+  ],
+  "command": "xcodebuild build -project VisualCore.xcodeproj -scheme ParticleUniverse -destination 'generic/platform=iOS Simulator' -derivedDataPath Build/DerivedData/pu-standalone CODE_SIGNING_ALLOWED=NO",
+  "elapsed_seconds": 8.305,
+  "exit_code": 0,
+  "finished": "2026-11-13T15:21:56+00:00",
+  "gate": "UA-F07",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F07.pu-standalone-build-moved.log",
+  "log_sha256": "cc65069ad199fea7a8a212ba7a424d33232da892c2804bcac424f06b39120487",
+  "name": "pu-standalone-build-moved",
+  "started": "2026-11-13T15:21:47+00:00",
+  "timed_out": false
+}

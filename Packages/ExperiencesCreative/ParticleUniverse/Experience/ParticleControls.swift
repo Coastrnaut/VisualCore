@@ -3,7 +3,6 @@
 // force with its kind, position and strength, trails and blend, and a new seed. Every change is an action through the
 // port; every control has a VoiceOver label, a hit area of at least 44 by 44 points and text that wraps at the
 // largest sizes.
-import ParticleUniverseAdapterCore
 import ParticleUniverseCore
 import SwiftUI
 import VisualCoreExperience

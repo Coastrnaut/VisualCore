@@ -94,8 +94,10 @@ STORAGE_RULE_SOURCES = ["Apps/VisualCore/App/DebugSupport/DebugExperience.swift"
                        "Packages/ExperiencesCreative/FractalExplorer/Experience/FractalControls.swift",
                        "Packages/ExperiencesCreative/FractalExplorer/Experience/FractalBookmarks.swift",
                        "Packages/ExperiencesCreative/FractalExplorer/Experience/FractalExperience.swift",
-                       "Apps/ParticleUniverse/ParticleUniverseAdapter/Core",
-                       "Apps/ParticleUniverse/ParticleUniverseAdapter/Experience"]
+                       "Packages/ExperiencesCreative/ParticleUniverse/Experience/Adapter",
+                       "Packages/ExperiencesCreative/ParticleUniverse/Experience/ParticlePresenter.swift",
+                       "Packages/ExperiencesCreative/ParticleUniverse/Experience/ParticleControls.swift",
+                       "Packages/ExperiencesCreative/ParticleUniverse/Experience/ParticleExperience.swift"]
 # The shipped sources that read stored data.
 STORED_DATA_SOURCES = ["Packages/VisualCore/Sources/VisualCoreExperience/SavedStateStore.swift",
                        "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift",
@@ -116,8 +118,10 @@ STORED_DATA_SOURCES = ["Packages/VisualCore/Sources/VisualCoreExperience/SavedSt
                        "Packages/ExperiencesCreative/FractalExplorer/Experience/FractalControls.swift",
                        "Packages/ExperiencesCreative/FractalExplorer/Experience/FractalBookmarks.swift",
                        "Packages/ExperiencesCreative/FractalExplorer/Experience/FractalExperience.swift",
-                       "Apps/ParticleUniverse/ParticleUniverseAdapter/Core",
-                       "Apps/ParticleUniverse/ParticleUniverseAdapter/Experience"]
+                       "Packages/ExperiencesCreative/ParticleUniverse/Experience/Adapter",
+                       "Packages/ExperiencesCreative/ParticleUniverse/Experience/ParticlePresenter.swift",
+                       "Packages/ExperiencesCreative/ParticleUniverse/Experience/ParticleControls.swift",
+                       "Packages/ExperiencesCreative/ParticleUniverse/Experience/ParticleExperience.swift"]
 
 
 def steps(stamp: str) -> list[Step]:

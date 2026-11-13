@@ -22,11 +22,6 @@ packages:
   # The creative experiences adopted from the standalone apps (feature 193, UA-F07; migration-plan.md section 2.1).
   ExperiencesCreative:
     path: Packages/ExperiencesCreative
-  ParticleUniverseCore:
-    path: Apps/ParticleUniverse/ParticleUniverseCore
-  # The pure adapter core of A04 (feature 193, UA-F07; research R1, R5).
-  ParticleUniverseAdapter:
-    path: Apps/ParticleUniverse/ParticleUniverseAdapter
 settings:
   base:
     SWIFT_VERSION: "6.0"
@@ -119,6 +114,10 @@ targets:
     platform: iOS
     sources:
       - path: Apps/ParticleUniverse/App
+      # Feature 193 (UA-F07): the app's other sources moved into Packages/ExperiencesCreative; this target compiles
+      # them from there until X-A04 retires it (FR-U07-043), without the adapter.
+      - path: Packages/ExperiencesCreative/ParticleUniverse/Experience
+        excludes: [Adapter, ParticlePresenter.swift, ParticleControls.swift, ParticleExperience.swift]
     info:
       path: Apps/ParticleUniverse/Generated/Info.plist
       properties:
@@ -142,7 +141,7 @@ targets:
       - package: VisualCoreRendering
         product: VisualCoreUI
       # Feature 033 (A04-P01): the GPU-free particle domain and the VisualCore simulation it builds on.
-      - package: ParticleUniverseCore
+      - package: ExperiencesCreative
         product: ParticleUniverseCore
       - package: VisualCore
         product: VisualCoreSimulation
@@ -238,9 +237,8 @@ targets:
         product: FluidArtPlaygroundExperience
       - package: ExperiencesCreative
         product: FractalExplorerExperience
-      - target: ParticleUniverseExperience
-      - package: ParticleUniverseAdapter
-        product: ParticleUniverseAdapterCore
+      - package: ExperiencesCreative
+        product: ParticleUniverseExperience
     postBuildScripts:
       - name: Bundle licenses (UA-F04)
         basedOnDependencyAnalysis: false
@@ -255,57 +253,6 @@ targets:
           env -i PATH=/usr/bin:/bin:/usr/sbin:/sbin HOME="$HOME" DEVELOPER_DIR="$DEVELOPER_DIR" \
             /usr/bin/python3 "$SRCROOT/scripts/audit_showcase_dependencies.py" --root "$SRCROOT" --spec project.yml \
             --target VisualCore --sources Apps/VisualCore --app "$TARGET_BUILD_DIR/$WRAPPER_NAME"
-  ParticleUniverseExperience:
-    # A04 adopted as an experience of the one app (feature 193, UA-F07; research R1, R5): the standalone app's
-    # sources without its @main file, plus the adapter's presenter, controls and factory. A static framework linked
-    # into the one app; the standalone target stays until X-A04 (FR-U07-043).
-    type: framework.static
-    platform: iOS
-    sources:
-      - path: Apps/ParticleUniverse/App
-        excludes: [ParticleUniverseApp.swift]
-      - path: Apps/ParticleUniverse/ParticleUniverseAdapter/Experience
-    settings:
-      base:
-        PRODUCT_BUNDLE_IDENTIFIER: dev.visualcore.VisualCore.ParticleUniverseExperience
-        PRODUCT_NAME: ParticleUniverseExperience
-        GENERATE_INFOPLIST_FILE: YES
-        SKIP_INSTALL: YES
-    dependencies:
-      - package: ParticleUniverseCore
-        product: ParticleUniverseCore
-      - package: ParticleUniverseAdapter
-        product: ParticleUniverseAdapterCore
-      - package: VisualCore
-        product: VisualCoreSimulation
-      - package: VisualCore
-        product: VisualCoreMath
-      - package: VisualCore
-        product: VisualCoreScenes
-      - package: VisualCore
-        product: VisualCoreDiagnostics
-      - package: VisualCore
-        product: VisualCoreParameters
-      - package: VisualCore
-        product: VisualCoreExperience
-      - package: VisualCoreRendering
-        product: VisualCoreRendering
-      - package: VisualCoreRendering
-        product: VisualCoreUI
-      - package: VisualCoreRendering
-        product: VisualCoreExperienceHost
-  ParticleUniverseExperienceTests:
-    # The A04 adapter's session tests (feature 193 T-U07-027), hosted by the one app. No package products of its
-    # own: linking a package the app also links makes Xcode build it as a dynamic framework.
-    type: bundle.unit-test
-    platform: iOS
-    sources: [Apps/ParticleUniverse/ParticleUniverseAdapter/ExperienceTests]
-    settings:
-      base:
-        PRODUCT_BUNDLE_IDENTIFIER: dev.visualcore.ParticleUniverseExperienceTests
-        GENERATE_INFOPLIST_FILE: YES
-    dependencies:
-      - target: VisualCore
   VisualCoreTests:
     type: bundle.unit-test
     platform: iOS
@@ -338,9 +285,8 @@ schemes:
         VisualCore: all
         VisualCoreTests: [test]
         VisualCoreUITests: [test]
-        ParticleUniverseExperienceTests: [test]
     test:
-      targets: [VisualCoreTests, VisualCoreUITests, ParticleUniverseExperienceTests]
+      targets: [VisualCoreTests, VisualCoreUITests]
   Showcase:
     build:
       targets:

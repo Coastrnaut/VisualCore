@@ -1,6 +1,5 @@
 // ParticleExperience — feature 193 (UA-F07) T-U07-027 (FR-U07-010, FR-U07-021; research R1, R6). The public face of the
 // framework `ParticleUniverseExperience`: the experience's id and the factory the one app's registry calls.
-import ParticleUniverseAdapterCore
 import UIKit
 import VisualCoreExperience
 import VisualCoreExperienceHost

@@ -4,7 +4,7 @@
 // replays are measured on devices (T-U07-029).
 import Foundation
 import Testing
-import ParticleUniverseAdapterCore
+@testable import ParticleUniverseExperience
 import VisualCoreExperience
 
 @Suite struct ParticleReplayTimingTests {

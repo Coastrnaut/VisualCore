@@ -85,7 +85,7 @@
         "#FFD966"
       ],
       "content": null,
-      "manifest": "Apps/ParticleUniverse/ParticleUniverseAdapter/scenario-manifest.json"
+      "manifest": "Packages/ExperiencesCreative/ParticleUniverse/scenario-manifest.json"
     }
   }
 }

@@ -4,7 +4,6 @@
 // keep the digest, repeated opens, a save and restore by replay, and a short replay's cost per step on this runtime.
 // Hosted by the VisualCore app.
 import XCTest
-import ParticleUniverseAdapterCore
 import ParticleUniverseCore
 @testable import ParticleUniverseExperience
 import VisualCoreExperience

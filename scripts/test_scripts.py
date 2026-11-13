@@ -1076,7 +1076,7 @@ class ReleaseCheckTests(unittest.TestCase):
             self.assertEqual(tests[0].needs_simulator, "27.2")
         self.assertEqual(relcheck.kebab("GenerativeArtStudio"), "generative-art-studio")
         names = [s.name for s in relcheck.steps("X")]
-        for required in ["documented-api-particle-universe", "host-particle-universe-core", "app-particle-universe-ios26",
+        for required in ["documented-api-particle-universe", "app-particle-universe-ios26",
                          # Feature 193: the adopted experiences' package on both runtimes.
                          "experiences-creative-sim-ios27", "experiences-creative-sim-ios26"]:
             self.assertIn(required, names)
@@ -1265,7 +1265,7 @@ class UnifiedAppTargetTests(unittest.TestCase):
                                     "VisualCorePersistence",
                                     "VisualCoreRendering", "VisualCoreUI", "VisualCoreExperienceHost",
                                     "GenerativeArtStudioExperience", "FluidArtPlaygroundExperience",
-                                    "FractalExplorerExperience", "ParticleUniverseAdapterCore"])
+                                    "FractalExplorerExperience", "ParticleUniverseExperience"])
 
     def test_the_standing_isolation_step_requires_sources(self):
         listing = subprocess.run([sys.executable, str(HERE / "release_check.py"), "--list"],

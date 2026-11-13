@@ -5,7 +5,7 @@
 // checksum equal to the standalone `SceneSimulation`'s for the same seed and commands. Host tests (`swift test`).
 import Foundation
 import Testing
-@testable import ParticleUniverseAdapterCore
+@testable import ParticleUniverseExperience
 import ParticleUniverseCore
 import VisualCoreExperience
 import VisualCoreMath

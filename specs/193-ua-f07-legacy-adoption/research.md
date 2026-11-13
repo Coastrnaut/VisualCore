@@ -338,3 +338,10 @@ The dossier files are not edited. The legacy ledger is untouched; its hash is co
     minutes there. That is below the 10-minute rebase interval in a debug simulator build; release builds hold far
     more (0.026 s on the Mac). Device bounds come from the device campaign (T-U07-029). The rebase interval stays at
     10 minutes, and a shorter interval for debug builds is left to that measurement.
+- **A04 move (T-U07-028, 2026-11-13).**
+  - A04's Core, its tests with `Fixtures/replay-v1.json` (as package resources), its app sources and the adapter
+    moved into `Packages/ExperiencesCreative/ParticleUniverse`.
+  - The standalone `ParticleUniverse` target stays until X-A04 (FR-U07-043). Its `@main` file stays in
+    `Apps/ParticleUniverse/App`; it compiles the moved sources from the package folder (without the adapter files)
+    and takes `ParticleUniverseCore` from the package's product. Its UI tests stay with it until the retirement.
+  - The path-map entries of the Core are done; the `App` and `Tests/UI` entries stay pending until X-A04.
