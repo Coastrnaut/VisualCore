@@ -26,7 +26,7 @@ Commit after every task (`python3 scripts/tick_task.py`), and push with `python3
   - Neither the sample's golden digests nor `scenarioDigest` change.
   - `ExperienceDiagnostics` encodes `outcome` only when present and decodes an older encoding without it.
 - [X] T-U09-003 Implement `Packages/VisualCore/Sources/VisualCoreExperience/ExperienceOutcome.swift` (release). Add `outcome` to `ExperienceCore` (default nil, computed, never stored), to `ExperienceEngine` and to `ExperienceDiagnostics`. In `Packages/VisualCore/Sources/VisualCoreTestSupport/SampleExperienceCore.swift`, the sample reports `target-reached` while marker equals target. T-U09-002 passes (FR-U09-004). — Verified 2026-11-12: swift test --package-path Packages/VisualCore --filter VisualCoreExperienceTests: 379 tests in 35 suites passed; the sample's golden digests unchanged
-- [ ] T-U09-004 [P] Tests first: `Packages/VisualCore/Tests/VisualCoreExperienceTests/ScenarioManifestTests.swift`. Cover:
+- [X] T-U09-004 [P] Tests first: `Packages/VisualCore/Tests/VisualCoreExperienceTests/ScenarioManifestTests.swift`. Cover: — Verified 2026-11-12: swift test --package-path Packages/VisualCore --filter VisualCoreExperienceTests: 379 tests in 35 suites passed (ScenarioManifestTests)
   - Loading of schema 1.
   - Refusal of schema 2 (`newerSchema`), of more than 4 MiB and of damaged JSON.
   - The validator finds each problem: a missing standard scenario (names it), a duplicate name, a name outside 1–64 `a-z 0-9 -`, more than 1,000 scenarios, more than 10,000 entries, an unknown control, a wrong value count, and an expected outcome or digest with no action before it.
