@@ -54,6 +54,17 @@ and `VisualCoreRendering` (iOS, GL). ADR-0003 and the package map record this. R
   noise floor (SC-F702 amended: noise floor − 1 pp, ≥ 95 %, mean ≤ 2), not bit-exactly.
 - Effect graphs are limited to 32 passes and a 256 MiB render-target quota by default.
 
+## Experiences
+
+### Particle Universe (A04; feature 038 T-A04-617)
+
+- Frame pacing, the drawn-detail steps under load, thermal behaviour and memory are unmeasured on devices; the only
+  profile is a simulator signal. They wait for the device campaign ([device-campaign.md](../apps/particle-universe/device-campaign.md)).
+- The system accessibility audits (default and largest text size) wait for the device campaign (owner ruling of
+  2026-11-13).
+- Drawn detail reacts to frame time, heat and Low Power Mode; the simulation itself is never thinned.
+- One placed force at a time; saved scenes stay on the device (no sync, no sharing, no export).
+
 ## Distribution
 
 - No App Store submission, signing or purchase setup is part of this release; those are owner actions.

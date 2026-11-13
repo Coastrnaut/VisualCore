@@ -4917,6 +4917,111 @@ class ScenarioReleaseSymbolTests(unittest.TestCase):
 
 
 
+class ExperienceReleaseAndCopyTests(unittest.TestCase):
+    """Feature 038 A04-P06 T-A04-614/615/617 (research D4, D5): experience release documents and copy claims."""
+
+    CHECKLIST = ("| Item | Area | Status | Evidence or steps |\n|---|---|---|---|\n"
+                 "| Privacy | app | verified | T-A04-604 grep |\n| Archive | app | owner-action | Product › Archive |\n")
+
+    def release(self, root: Path, checklist: str = CHECKLIST, docs=("docs/a.md",), write=("docs/a.md",)) -> tuple[int, str]:
+        tool = load("check_experience_release")
+        (root / "docs").mkdir(exist_ok=True)
+        for doc in write:
+            (root / doc).write_text("# doc\n")
+        (root / "docs/checklist.md").write_text(checklist)
+        config = root / "release.json"
+        config.write_text(json.dumps({"schema": 1, "experience": "a04.particle-universe",
+                                      "requiredDocs": list(docs), "checklist": "docs/checklist.md"}))
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            code = tool.main(["--config", str(config), "--root", str(root)])
+        return code, out.getvalue()
+
+    def test_release_config_passes(self):
+        with tempfile.TemporaryDirectory() as d:
+            code, out = self.release(Path(d))
+        self.assertEqual(code, 0, out)
+        self.assertIn("PASS: experience release a04.particle-universe, 1 documents, 2 checklist rows", out)
+
+    def test_missing_document_fails(self):
+        with tempfile.TemporaryDirectory() as d:
+            code, out = self.release(Path(d), docs=("docs/a.md", "docs/missing.md"))
+        self.assertEqual(code, 1)
+        self.assertIn("PROBLEM: missing document docs/missing.md", out)
+        self.assertIn("FAIL: experience release a04.particle-universe, 1 problems", out)
+
+    def test_unknown_status_fails(self):
+        bad = self.CHECKLIST.replace("| verified |", "| done |")
+        with tempfile.TemporaryDirectory() as d:
+            code, out = self.release(Path(d), checklist=bad)
+        self.assertEqual(code, 1)
+        self.assertIn("unknown status 'done'", out)
+
+    def test_empty_evidence_fails(self):
+        bad = self.CHECKLIST.replace("| T-A04-604 grep |", "|  |")
+        with tempfile.TemporaryDirectory() as d:
+            code, out = self.release(Path(d), checklist=bad)
+        self.assertEqual(code, 1)
+        self.assertIn("has no evidence or steps", out)
+
+    def test_the_particle_universe_release_documents_pass(self):
+        tool = load("check_experience_release")
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            code = tool.main(["--config", str(ROOT_DIR / "docs/apps/particle-universe/release.json")])
+        self.assertEqual(code, 0, out.getvalue())
+
+    def copy(self, text: str = "", swift: str = "") -> tuple[int, str]:
+        tool = load("check_copy_claims")
+        out = io.StringIO()
+        with tempfile.TemporaryDirectory() as d:
+            argv = ["--config", str(ROOT_DIR / "Configs/copy-claims-denylist.json")]
+            if text:
+                (Path(d) / "store.md").write_text(text)
+                argv += ["--text", str(Path(d) / "store.md")]
+            if swift:
+                (Path(d) / "Controls.swift").write_text(swift)
+                argv += ["--swift", str(Path(d) / "Controls.swift")]
+            with contextlib.redirect_stdout(out):
+                code = tool.main(argv)
+        return code, out.getvalue()
+
+    def test_copy_passes(self):
+        code, out = self.copy("Particle Universe lets you place emitters and forces.\nSave named scenes.\n")
+        self.assertEqual(code, 0, out)
+        self.assertIn("PASS: copy claims, 1 files", out)
+
+    def test_denylisted_word_fails(self):
+        code, out = self.copy("Buttery, lag-free particles.\nShare your scenes.\nA smoothie is not a claim.\n")
+        self.assertEqual(code, 1)
+        self.assertIn(":1: 'Buttery' (unmeasured quality word)", out)
+        self.assertIn(":1: 'lag-free'", out)
+        self.assertIn(":2: 'Share' (feature the experience does not have)", out)
+        self.assertNotIn(":3:", out, "whole words only")
+        self.assertIn("FAIL: copy claims, 3 problems", out)
+
+    def test_measured_number_fails(self):
+        code, out = self.copy("It runs at 60 fps on every iPhone.\n")
+        self.assertEqual(code, 1)
+        self.assertIn(":1: '60 fps' (measured performance or battery claim)", out)
+
+    def test_allow_marker_skips(self):
+        code, out = self.copy("The copy check refuses 'smooth' and '60 fps'. <!-- copy-claims: allow -->\n")
+        self.assertEqual(code, 0, out)
+
+    def test_swift_literals_ignore_identifiers(self):
+        swift = ('// Smooth playback at 120 Hz.\n'
+                 'button("Play", identifier: "share") { port.send("instant") }\n'
+                 '.accessibilityIdentifier(port.identifier("camera"))\n'
+                 'Text(verbatim: "\\(count) of \\(limit)") // battery\n')
+        code, out = self.copy(swift=swift)
+        self.assertEqual(code, 0, out)
+        code, out = self.copy(swift='Text(verbatim: "Instant \\(name ? "music" : "x")")\n')
+        self.assertEqual(code, 1)
+        self.assertIn(":1: 'Instant'", out)
+        self.assertIn(":1: 'music'", out)
+
+
 def ledger_tree_hash() -> str:
     """One hash over every file of the real migration ledger tree (FR-U00-038): the self-tests must not change it."""
     digest = hashlib.sha256()

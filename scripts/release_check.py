@@ -202,6 +202,7 @@ def steps(stamp: str) -> list[Step]:
     for rt in RUNTIMES:
         s += app_test_steps(rt, stamp)
     s += app_release_steps()
+    s += experience_release_steps()
     s += unified_app_steps(stamp)
     return s
 
@@ -261,6 +262,27 @@ def registered_ids(root: Path = ROOT) -> list[str]:
         return sorted(data.get("registrations", {}))
     except (OSError, ValueError, AttributeError):
         return []
+
+
+def experience_release_steps(root: Path = ROOT) -> list[Step]:
+    """Per experience with docs/apps/<slug>/release.json naming an `experience` (feature 038 T-A04-617): the release
+    document check and, when the config has `copyCheck` ({text, swift}), the copy-claim check. Step names use the
+    experience's code (`a04` of `a04.particle-universe`)."""
+    out: list[Step] = []
+    for config in sorted(root.glob("docs/apps/*/release.json")):
+        try:
+            data = json.loads(config.read_text())
+            code = data["experience"].split(".")[0]
+        except (ValueError, KeyError, AttributeError):
+            continue
+        rel = str(config.relative_to(root))
+        out.append(Step(f"experience-release-{code}", [PY, "scripts/check_experience_release.py", "--config", rel]))
+        copy = data.get("copyCheck")
+        if isinstance(copy, dict):
+            out.append(Step(f"copy-claims-{code}", [PY, "scripts/check_copy_claims.py", "--config",
+                                                    "Configs/copy-claims-denylist.json", "--text", *copy.get("text", []),
+                                                    "--swift", *copy.get("swift", [])]))
+    return out
 
 
 def unified_app_steps(stamp: str, root: Path = ROOT) -> list[Step]:

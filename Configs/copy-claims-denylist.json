@@ -1,0 +1,127 @@
+{
+  "schema": 1,
+  "description": "Copy claims refused in store text and interface strings (feature 038 A04-P06, research D5): measured claims, unmeasured quality words and features the experience does not have. Words match case-insensitively as whole words; patterns are case-insensitive regular expressions.",
+  "patterns": [
+    {
+      "id": "measured-number",
+      "regex": "\\b\\d+(\\.\\d+)?\\s*(fps|frames per second|frames/s|ms|milliseconds|%|percent|hours?|hrs?|hz|hertz)(?![A-Za-z])",
+      "reason": "measured performance or battery claim"
+    },
+    {
+      "id": "frame-rate-claim",
+      "regex": "\\b(frame rate|framerate|refresh rate)\\b",
+      "reason": "frame-rate claim"
+    },
+    {
+      "id": "battery-claim",
+      "regex": "\\bbattery\\b",
+      "reason": "battery claim"
+    }
+  ],
+  "words": [
+    {
+      "word": "smooth",
+      "reason": "unmeasured quality word"
+    },
+    {
+      "word": "smoothly",
+      "reason": "unmeasured quality word"
+    },
+    {
+      "word": "buttery",
+      "reason": "unmeasured quality word"
+    },
+    {
+      "word": "lag-free",
+      "reason": "unmeasured quality word"
+    },
+    {
+      "word": "lagless",
+      "reason": "unmeasured quality word"
+    },
+    {
+      "word": "no lag",
+      "reason": "unmeasured quality word"
+    },
+    {
+      "word": "zero latency",
+      "reason": "unmeasured quality word"
+    },
+    {
+      "word": "fastest",
+      "reason": "unmeasured quality word"
+    },
+    {
+      "word": "blazing",
+      "reason": "unmeasured quality word"
+    },
+    {
+      "word": "instant",
+      "reason": "unmeasured quality word"
+    },
+    {
+      "word": "instantly",
+      "reason": "unmeasured quality word"
+    },
+    {
+      "word": "audio",
+      "reason": "feature the experience does not have"
+    },
+    {
+      "word": "music",
+      "reason": "feature the experience does not have"
+    },
+    {
+      "word": "microphone",
+      "reason": "feature the experience does not have"
+    },
+    {
+      "word": "camera",
+      "reason": "feature the experience does not have"
+    },
+    {
+      "word": "share",
+      "reason": "feature the experience does not have"
+    },
+    {
+      "word": "sharing",
+      "reason": "feature the experience does not have"
+    },
+    {
+      "word": "video export",
+      "reason": "feature the experience does not have"
+    },
+    {
+      "word": "record video",
+      "reason": "feature the experience does not have"
+    },
+    {
+      "word": "AR",
+      "reason": "feature the experience does not have"
+    },
+    {
+      "word": "augmented reality",
+      "reason": "feature the experience does not have"
+    },
+    {
+      "word": "account",
+      "reason": "feature the experience does not have"
+    },
+    {
+      "word": "sign in",
+      "reason": "feature the experience does not have"
+    },
+    {
+      "word": "cloud sync",
+      "reason": "feature the experience does not have"
+    },
+    {
+      "word": "multiplayer",
+      "reason": "feature the experience does not have"
+    },
+    {
+      "word": "iCloud",
+      "reason": "feature the experience does not have"
+    }
+  ]
+}

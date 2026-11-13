@@ -12,3 +12,17 @@ kept). Saving under an existing name keeps both with a numbered suffix; renaming
 Opening a scene sends a short series of logged actions (`scene.begin`, `emitter.define`, `force.define`,
 `look.define`), so a replay reaches the same scene; the seed, particle limit, time scale and scene forces stay as they
 are. The selected emitter moves with four direction buttons (`emitter.move`, 50 points per press, within ±500).
+
+## Release documents (feature 038, A04-P06)
+
+These describe Particle Universe as an experience of the one app and replace the standalone history above for release:
+
+- [privacy-and-credits.md](privacy-and-credits.md): what is stored, the privacy manifest reasons, credits.
+- [release-checklist.md](release-checklist.md): artifact inventory with status and evidence; checked with
+  `python3 scripts/check_experience_release.py --config docs/apps/particle-universe/release.json`
+  ([release.json](release.json)).
+- [store-listing.md](store-listing.md): the store text input for the owner.
+- [device-campaign.md](device-campaign.md): the pending device measurements and audits (D1 → D2 → D3 after
+  ImplementationLock-100).
+- [build-and-archive.md](../../release/build-and-archive.md): build, test and release checks of the one app, and the
+  owner steps.
