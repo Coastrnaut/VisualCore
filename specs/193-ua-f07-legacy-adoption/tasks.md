@@ -71,7 +71,7 @@ runtimes.
   - `seed.shuffle` is a deterministic derivation of the current seed (a listed adapter difference);
   - the snapshot round trip returns the same digest;
   - the outcome is `work-saved` after a save action.
-- [ ] T-U07-008 [US1] Implement `Apps/GenerativeArtStudio/Adapter/GenerativeArtCore.swift`. It wraps `ArtDocument`,
+- [X] T-U07-008 [US1] Implement `Apps/GenerativeArtStudio/Adapter/GenerativeArtCore.swift`. It wraps `ArtDocument`, — Verified 2026-11-13: Apps/GenerativeArtStudio/Adapter/Core/GenerativeArtCore.swift with six listed adapter differences; edits go through CompositionEditor; T-U07-007 passes 11/11 (run-check a01-core-host)
   the family, the preset and the time; `CompositionEditor` and `SceneFamily` are rebuilt from the catalog. The file
   header lists each difference from the standalone app. T-U07-007 passes.
 - [ ] T-U07-009 [US1] `GenerativeArtPresenter.swift`, `GenerativeArtControls.swift` and `GenerativeArtManifest.swift` in
