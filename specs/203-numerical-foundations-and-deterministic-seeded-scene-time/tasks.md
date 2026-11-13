@@ -98,7 +98,7 @@ none (no {owner} task). VisualCore changes, so the documentation, API-baseline a
   reference-test-anglerendering-ios27 reference-test-anglerendering-ios26 projectm-reference-ios27
   projectm-reference-ios26` (check `reference-2`).
 - [X] T-R02F03-028 Script tests `python3 scripts/test_scripts.py` (check `script-tests`). — Verified 2026-11-13: python3 scripts/test_scripts.py PASS with test_check_doc_names (script-tests)
-- [ ] T-R02F03-029 Auto-Creator.md section 13 row R02-F03 as built via `docs/catalog/shared-feature-map.json` and
+- [X] T-R02F03-029 Auto-Creator.md section 13 row R02-F03 as built via `docs/catalog/shared-feature-map.json` and — Verified 2026-11-13: section 13 row R02-F03 rendered from shared-feature-map.json; validate_autocreator, validate_docs, migration_baseline verify PASS (docs-autocreator, docs-dossiers, docs-baseline); CI run 43508453967 on 22c0044 (all R02-F03 changes) completed success: checks, host-tests, simulator-build, app-build
   `render_autocreator.py`; `validate_autocreator.py`, `validate_docs.py`, `migration_baseline.py verify`; CI of a
   commit with all changes finished with success.
 - [ ] T-R02F03-030 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
