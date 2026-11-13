@@ -48,7 +48,7 @@ none (no {owner} task). VisualCore changes, so the documentation, API-baseline a
 
 ## Phase 5: User Story 4 — Shader hash twin (P2)
 
-- [ ] T-R02F03-011 [P] [US4] Tests first in `Packages/VisualCore/Tests/VisualCoreMathTests/ShaderHashTests.swift`:
+- [X] T-R02F03-011 [P] [US4] Tests first in `Packages/VisualCore/Tests/VisualCoreMathTests/ShaderHashTests.swift`: — Verified 2026-11-13: ShaderHashTests 5 tests (pcg goldens 129708002, 2831084092, 4099845390, 3861530882; float hash bit-pattern goldens from an independent Python model; -0 vs 0) pass
   `pcg` golden values for 0, 1, 12345, `UInt32.max` (computed from the `vc/hash.glsl` formula and committed);
   `hash11`, `hash21`, `hash22` goldens on a few floats (bit patterns, divide by 4294967296).
 - [ ] T-R02F03-012 [US4] Write `Packages/VisualCore/Sources/VisualCoreMath/ShaderHash.swift`.
