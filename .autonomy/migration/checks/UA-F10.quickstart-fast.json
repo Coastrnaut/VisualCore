@@ -1,0 +1,23 @@
+{
+  "argv": [
+    "python3",
+    "scripts/release_check.py",
+    "--only",
+    "app-targets",
+    "experience-packages",
+    "dependencies",
+    "measure-build-check",
+    "script-tests"
+  ],
+  "command": "python3 scripts/release_check.py --only app-targets experience-packages dependencies measure-build-check script-tests",
+  "elapsed_seconds": 68.059,
+  "exit_code": 0,
+  "finished": "2026-11-13T18:54:47+00:00",
+  "gate": "UA-F10",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F10.quickstart-fast.log",
+  "log_sha256": "0c3eb99230046402ab2177a91e6ea8a6d82dbacc6ea911dc1b8cd562fab6947b",
+  "name": "quickstart-fast",
+  "started": "2026-11-13T18:53:39+00:00",
+  "timed_out": false
+}
