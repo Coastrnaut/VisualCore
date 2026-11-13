@@ -40,7 +40,7 @@ task. Owner-only items: none.
   5 announcement sequences (rate limit 0.5 s, merge to newest, off → none), state-sign check (missing sign, duplicate
   sign, valid palette), and `transitionDuration(_:reduceMotion:)` (0 under Reduce Motion, unchanged otherwise;
   FR-R02F26-050).
-- [ ] T-R02F26-009 [US3] [US4] Write `Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPlans.swift`
+- [X] T-R02F26-009 [US3] [US4] Write `Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPlans.swift` — Verified 2026-11-13: AccessibilityPlans.swift: Announcement, AnnouncementPlanner (0.5 s, merge to newest, off drops), StateSign, stateSignProblems, transitionDuration; texts are passed in by callers
   (`Announcement`, `AnnouncementPlanner`, `StateSign`, `stateSignProblems`, `transitionDuration`) — texts are passed in by the caller from a
   string catalog (FR-R02F26-021).
 - [ ] T-R02F26-010 [US3] Write `AnnouncementSink`, `SystemAnnouncementSink` (`UIAccessibility.post(notification:
