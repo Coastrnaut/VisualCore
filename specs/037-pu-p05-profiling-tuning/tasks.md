@@ -51,7 +51,7 @@ each task. Tests before code. Owner-only items: none. One {device} task. No Visu
 
 - [X] T-A04-512 ExperiencesCreative on sim-26.5 (check `experiences-ios26`) and on sim-27.2 (check `experiences-ios27`); — Verified 2026-11-13: ExperiencesCreative PASS on sim-27.2 and sim-26.5 (A04-P05/experiences-ios27, ios26); new unit tests run in well under 10 s (SC-A04-506)
   new unit tests under 10 s (SC-A04-506).
-- [ ] T-A04-513 `python3 scripts/test_scripts.py` (check `script-tests`); `git diff --stat` over `Packages/VisualCore` and
+- [X] T-A04-513 `python3 scripts/test_scripts.py` (check `script-tests`); `git diff --stat` over `Packages/VisualCore` and — Verified 2026-11-13: test_scripts PASS after making two state-dependent assertions follow the ledger (A04-P05/script-tests-r3); git diff --stat 1a428487..HEAD over Packages/VisualCore and Packages/VisualCoreRendering is empty
   `Packages/VisualCoreRendering` for the phase's commits is empty (FR-A04-540).
 - [ ] T-A04-514 {device} In the device campaign: frame pacing, detail steps under load, thermal behaviour and memory of
   Particle Universe on D1, D2, D3; fill the budgets row.
