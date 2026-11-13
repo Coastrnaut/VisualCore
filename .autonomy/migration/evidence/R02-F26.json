@@ -1,0 +1,238 @@
+{
+  "branch": "main",
+  "dirty": false,
+  "dirty_paths": [],
+  "failed_attempts": [
+    {
+      "command": "python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27 app-ui-ios27-b",
+      "exit_code": 1,
+      "log": ".autonomy/logs/migration/R02-F26.app-settings.log",
+      "log_sha256": "41750717c4d2c33d81e4f596f236093c69adfd95e896538e28351d0d6cffa1ca",
+      "name": "app-settings",
+      "timed_out": false
+    },
+    {
+      "command": "python3 scripts/release_check.py --only app-ui-ios27-d app-ui-ios27-a",
+      "exit_code": 1,
+      "log": ".autonomy/logs/migration/R02-F26.baseline-app-ui.log",
+      "log_sha256": "ded35b494e5bf6d2729f5084bbc61da6ada224c2fae88072922d1ba80c7de48a",
+      "name": "baseline-app-ui",
+      "timed_out": false
+    },
+    {
+      "command": "python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27",
+      "exit_code": 1,
+      "log": ".autonomy/logs/migration/R02-F26.baseline-app-unit.log",
+      "log_sha256": "5f44546c86192b44ebd90f91d38acde9b947abd1d5218887dfe4fab951f87648",
+      "name": "baseline-app-unit",
+      "timed_out": false
+    },
+    {
+      "command": "swift test --package-path Packages/VisualCore",
+      "exit_code": 1,
+      "log": ".autonomy/logs/migration/R02-F26.host-visualcore.log",
+      "log_sha256": "21cf2855684a4b16f4bad4bd479627d00bfa95d4879caf2ba115c2b139e52aea",
+      "name": "host-visualcore",
+      "timed_out": false
+    }
+  ],
+  "gate": "R02-F26",
+  "ledger": "migration",
+  "passing_checks": [
+    {
+      "command": "python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27",
+      "exit_code": 0,
+      "finished": "2026-11-13T20:15:36+00:00",
+      "log": ".autonomy/logs/migration/R02-F26.app-settings-r2.log",
+      "log_sha256": "ade459252ac3a4fb449010b7b2f4a0ac248b4f092f9b251ea915c55b419f6a58",
+      "name": "app-settings-r2"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27 app-ui-ios27-a",
+      "exit_code": 0,
+      "finished": "2026-11-13T19:43:17+00:00",
+      "log": ".autonomy/logs/migration/R02-F26.baseline-app-r2.log",
+      "log_sha256": "ce0b35fbaa244314b41b53de77bf38240973b16facc7ffbb73a2a89c7b1be2f6",
+      "name": "baseline-app-r2"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only app-ui-ios27-d app-ui-ios27-b",
+      "exit_code": 0,
+      "finished": "2026-11-13T19:50:29+00:00",
+      "log": ".autonomy/logs/migration/R02-F26.baseline-app-ui-d.log",
+      "log_sha256": "4f846e521f2daaf9101a313c7be1eb155ca43a0a37c43a7b4890e709665546ee",
+      "name": "baseline-app-ui-d"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only app-ui-ios27-e app-ui-ios27-f",
+      "exit_code": 0,
+      "finished": "2026-11-13T19:59:06+00:00",
+      "log": ".autonomy/logs/migration/R02-F26.baseline-app-ui-ef.log",
+      "log_sha256": "6bc71ad95c52cd97c17368502ae090dca90a8908dbcbc93e7a0944c303a7f9f8",
+      "name": "baseline-app-ui-ef"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27",
+      "exit_code": 0,
+      "finished": "2026-11-13T19:27:50+00:00",
+      "log": ".autonomy/logs/migration/R02-F26.baseline-app-unit-r2.log",
+      "log_sha256": "378bd57bfae246793b7aded70fb1e17109dd08b339cde12b17c4592ab4c16225",
+      "name": "baseline-app-unit-r2"
+    },
+    {
+      "command": "python3 scripts/validate_docs.py",
+      "exit_code": 0,
+      "finished": "2026-11-13T20:21:10+00:00",
+      "log": ".autonomy/logs/migration/R02-F26.docs.log",
+      "log_sha256": "343dd0208e0c2ba53cc819eb9bcb19997233f648ae79e06b8cac83bfe89d8f42",
+      "name": "docs"
+    },
+    {
+      "command": "python3 scripts/check_documented_api.py --sources Apps/VisualCore",
+      "exit_code": 0,
+      "finished": "2026-11-13T20:18:19+00:00",
+      "log": ".autonomy/logs/migration/R02-F26.documented-api.log",
+      "log_sha256": "a5f29e5a4894b882bf3dfb16a7c65a200de6492e2dda8002662a0eeca34a9418",
+      "name": "documented-api"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --result-name r02f26-experiences-27",
+      "exit_code": 0,
+      "finished": "2026-11-13T20:18:04+00:00",
+      "log": ".autonomy/logs/migration/R02-F26.experiences-ios27.log",
+      "log_sha256": "24782e6c07c5cd766569d0958028bbe79efa93b687ae4457899951104cde8569",
+      "name": "experiences-ios27"
+    },
+    {
+      "command": "swift test --package-path Packages/VisualCore",
+      "exit_code": 0,
+      "finished": "2026-11-13T20:04:22+00:00",
+      "log": ".autonomy/logs/migration/R02-F26.host-visualcore-r2.log",
+      "log_sha256": "1891289be755ee78c14b6dee7303f32d8fd4b9ab7aa0defe675a2de6c95d0696",
+      "name": "host-visualcore-r2"
+    },
+    {
+      "command": "python3 scripts/migration_baseline.py verify",
+      "exit_code": 0,
+      "finished": "2026-11-13T20:21:10+00:00",
+      "log": ".autonomy/logs/migration/R02-F26.legacy-ledger.log",
+      "log_sha256": "bb0fe46afca797e0fb9543fff753020224db19678a166cd8f35f6097d0b0c6d0",
+      "name": "legacy-ledger"
+    },
+    {
+      "command": "python3 scripts/check_public_api.py",
+      "exit_code": 0,
+      "finished": "2026-11-13T20:23:50+00:00",
+      "log": ".autonomy/logs/migration/R02-F26.public-api-r2.log",
+      "log_sha256": "598bad6c1407b226add2f12971e08f88a1d179fb267aea93c40bc9ab46328fb5",
+      "name": "public-api-r2"
+    },
+    {
+      "command": "python3 scripts/check_public_api.py",
+      "exit_code": 0,
+      "finished": "2026-11-13T20:18:18+00:00",
+      "log": ".autonomy/logs/migration/R02-F26.public-api.log",
+      "log_sha256": "10f8554d24082a08a5827945222cc622f77c5c442828c03e8e5fb33d6ff03d23",
+      "name": "public-api"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only reference-engine-xcframework reference-build-projectm-ios-sim reference-clean",
+      "exit_code": 0,
+      "finished": "2026-11-13T20:24:26+00:00",
+      "log": ".autonomy/logs/migration/R02-F26.reference-a-r2.log",
+      "log_sha256": "3be95a0b52f22990741884560a5272731814150f3c2d9e7559b220427cd6b6a9",
+      "name": "reference-a-r2"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only reference-engine-xcframework reference-build-projectm-ios-sim reference-clean",
+      "exit_code": 0,
+      "finished": "2026-11-13T20:18:49+00:00",
+      "log": ".autonomy/logs/migration/R02-F26.reference-a.log",
+      "log_sha256": "c38fa8cee7b470343a745536552a3f7d8ce836f5e994b7a3cfe6d1c865d427d0",
+      "name": "reference-a"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only reference-test-anglerendering-ios27 reference-test-anglerendering-ios26 projectm-reference-ios27 projectm-reference-ios26",
+      "exit_code": 0,
+      "finished": "2026-11-13T20:24:51+00:00",
+      "log": ".autonomy/logs/migration/R02-F26.reference-b-r2.log",
+      "log_sha256": "c64e38f784b384722d22b6e3af70a0ba3889ea5ac0842d8152e66e044c8748b1",
+      "name": "reference-b-r2"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only reference-test-anglerendering-ios27 reference-test-anglerendering-ios26 projectm-reference-ios27 projectm-reference-ios26",
+      "exit_code": 0,
+      "finished": "2026-11-13T20:19:21+00:00",
+      "log": ".autonomy/logs/migration/R02-F26.reference-b.log",
+      "log_sha256": "f8011efec551f64b84a88c3c2018394a8fd16aa42dcb1b55a100440db7dcfcc3",
+      "name": "reference-b"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only app-release-build app-release-symbols app-privacy-manifest",
+      "exit_code": 0,
+      "finished": "2026-11-13T20:25:20+00:00",
+      "log": ".autonomy/logs/migration/R02-F26.release-app-r2.log",
+      "log_sha256": "3cc7a8ed18aca078e00d1cba6db733341466c21fadc57975207787c05f5cb6f7",
+      "name": "release-app-r2"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only app-release-build app-release-symbols app-privacy-manifest",
+      "exit_code": 0,
+      "finished": "2026-11-13T20:19:58+00:00",
+      "log": ".autonomy/logs/migration/R02-F26.release-app.log",
+      "log_sha256": "95958065696e8418498542907f4aa006b2303c473f179e54bc41f3ea25afd4f5",
+      "name": "release-app"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-26.5 --action test --result-name r02f26-rendering-26b",
+      "exit_code": 0,
+      "finished": "2026-11-13T20:23:49+00:00",
+      "log": ".autonomy/logs/migration/R02-F26.rendering-ios26-r2.log",
+      "log_sha256": "5c6d27a170ef7e9edbd5698e5a6d4f2ca25b32f234dd5d35586c83de7c7ae338",
+      "name": "rendering-ios26-r2"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-26.5 --action test --result-name r02f26-rendering-26",
+      "exit_code": 0,
+      "finished": "2026-11-13T20:09:21+00:00",
+      "log": ".autonomy/logs/migration/R02-F26.rendering-ios26.log",
+      "log_sha256": "2e348ec4b31d5727f5bd89bb202e7e902744cac55a2d0a4d34be76754179bec2",
+      "name": "rendering-ios26"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --result-name r02f26-rendering-27",
+      "exit_code": 0,
+      "finished": "2026-11-13T20:08:20+00:00",
+      "log": ".autonomy/logs/migration/R02-F26.rendering-ios27.log",
+      "log_sha256": "d8e9f1d1d86d79fe6cc8c84f51d58f3775c5a6c89ef49942a9f0134ae9022020",
+      "name": "rendering-ios27"
+    },
+    {
+      "command": "python3 scripts/test_scripts.py",
+      "exit_code": 0,
+      "finished": "2026-11-13T20:21:54+00:00",
+      "log": ".autonomy/logs/migration/R02-F26.script-tests.log",
+      "log_sha256": "2f607b2743bc62df7755d39269576138f8f3e9fb2f660c70d7fd97e193b94903",
+      "name": "script-tests"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --result-name r02f26-flush-27 --only-testing VisualCoreExperienceHostTests/ExperienceFeedbackTests",
+      "exit_code": 0,
+      "finished": "2026-11-13T20:23:05+00:00",
+      "log": ".autonomy/logs/migration/R02-F26.session-flush-ios27.log",
+      "log_sha256": "83b6edabbc578c1b11d15bacc64d7624c200c5b46abf5f09266170eed613bb13",
+      "name": "session-flush-ios27"
+    },
+    {
+      "command": "python3 scripts/validate_autocreator.py",
+      "exit_code": 0,
+      "finished": "2026-11-13T20:21:10+00:00",
+      "log": ".autonomy/logs/migration/R02-F26.steering.log",
+      "log_sha256": "ea5cdb655a6d87864daaabfdc1a3e09bea97efbce4cae796a23d1c3f0bc88c91",
+      "name": "steering"
+    }
+  ],
+  "revision": "915564783a48a034c7b49914031ae9ddbf5d6eab",
+  "revision_number": 1,
+  "sealed": "2026-11-13T20:31:40+00:00"
+}

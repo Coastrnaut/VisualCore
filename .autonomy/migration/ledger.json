@@ -2,7 +2,7 @@
  "schema": 1,
  "name": "VisualCore unified-app migration ledger (ADR-0009)",
  "created": "2026-11-12T02:54:10+00:00",
- "updated": "2026-11-13T20:20:40+00:00",
+ "updated": "2026-11-13T20:31:40+00:00",
  "rules": [
   "Only scripts/migration_ledger.py writes this file.",
   "The legacy ledger .autonomy/state.json is never reset or rewritten by the migration; its passed gates stay passed.",
@@ -141,7 +141,7 @@
   {"id":"R02-F23","kind":"shared-round-feature","title":"Puzzle contract, seed generation and solver certification","depends":["UA-F02","R02-F03","R02-F16"],"status":"pending","attempts":[],"spec_dir":"specs/223-puzzle-contract-seed-generation-and-solver-certification"},
   {"id":"R02-F24","kind":"shared-round-feature","title":"Procedural content authoring, balancing and catalogs","depends":["UA-F02","R02-F23"],"status":"pending","attempts":[],"spec_dir":"specs/224-procedural-content-authoring-balancing-and-catalogs"},
   {"id":"R02-F25","kind":"shared-round-feature","title":"Shared native iOS shell and evidence-friendly UI","depends":["UA-F02","R02-F22","R02-F24"],"status":"superseded","attempts":[],"spec_dir":"specs/225-shared-native-ios-shell-and-evidence-friendly-ui","superseded_by":["UA-F03","UA-F04"]},
-  {"id":"R02-F26","kind":"shared-round-feature","title":"Games input/accessibility/haptics contract","depends":["UA-F02","R02-F25"],"status":"pending","attempts":[],"spec_dir":"specs/226-games-input-accessibility-haptics-contract"},
+  {"id":"R02-F26","kind":"shared-round-feature","title":"Games input/accessibility/haptics contract","depends":["UA-F02","R02-F25"],"status":"pass","attempts":[{"at":"2026-11-13T20:31:40+00:00","result":"pass","evidence":".autonomy/migration/evidence/R02-F26.json","evidence_sha256":"effd6539fb22afda1fed742dd973cf6f660947a3be18f17856e7d03ed6bbf7e0","revision":"915564783a48a034c7b49914031ae9ddbf5d6eab"}],"spec_dir":"specs/226-games-input-accessibility-haptics-contract"},
   {"id":"R02-F27","kind":"shared-round-feature","title":"Offline premium entitlement and zero-ads compliance","depends":["UA-F02","R02-F25"],"status":"superseded","attempts":[],"spec_dir":"specs/227-offline-premium-entitlement-and-zero-ads-compliance","superseded_by":["UA-F08","UA-F11"]},
   {"id":"R02-F28","kind":"shared-round-feature","title":"Game profile migration and atomic save engine","depends":["UA-F02","R02-F23"],"status":"superseded","attempts":[],"spec_dir":"specs/228-game-profile-migration-and-atomic-save-engine","superseded_by":["UA-F05"]},
   {"id":"R02-F29","kind":"shared-round-feature","title":"Visual regression, shader, and mesh golden harness","depends":["UA-F02","R02-F06","R02-F25"],"status":"superseded","attempts":[],"spec_dir":"specs/229-visual-regression-shader-and-mesh-golden-harness","superseded_by":["UA-F09"]},
