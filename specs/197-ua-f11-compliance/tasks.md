@@ -30,7 +30,7 @@ Device-only items: none, so no {device} task.
 - [X] T-U11-004 [P] [US1] Tests first in `scripts/tests/test_privacy_report.py`: the `--json` report of — Verified 2026-11-13: scripts/tests/test_privacy_report.py 15 tests OK (undeclared, unused, tracking, tracking domains, collected data, report shape, exit 2)
   `check_privacy_manifest.py` contains `meta` and `verdict`; the three planted defects (undeclared category, unused
   category, tracking true) each fail (FR-U11-004).
-- [ ] T-U11-005 [US1] Modify `scripts/check_privacy_manifest.py`: `--json` writes data-model §7 with `meta` through
+- [X] T-U11-005 [US1] Modify `scripts/check_privacy_manifest.py`: `--json` writes data-model §7 with `meta` through — Verified 2026-11-13: check_privacy_manifest.py --json writes schema 1 report with meta via write_report; old fields kept; script-tests PASS (script-tests)
   `report_meta.write_report`; also fail on non-empty tracking domains or collected data types (FR-U11-002).
 - [ ] T-U11-006 [US1] Acceptance: `python3 scripts/check_privacy_manifest.py --app "$APP" --json
   .autonomy/logs/ua-f11/privacy.json` on the local Release app passes with 0 undeclared and 0 unused (check
