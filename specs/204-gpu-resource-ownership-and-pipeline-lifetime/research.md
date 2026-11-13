@@ -32,3 +32,12 @@
   `RenderTarget.depthRenderbuffer: GLuint` (0 when none); `GL_DEPTH_COMPONENT24` renderbuffer counted as
   `.renderbuffer` with width×height×4 bytes; incomplete framebuffer → delete everything allocated, throw.
 - **D5** `willEndContext` stays as is (internal, no consumer; not in scope).
+
+## 2. Plan validation (`/speckit-plan`, 2026-11-13)
+
+The plan artifacts drafted in 156576a8 were checked against the skill outline: technical context has no open
+unknowns; the constitution check covers all principles; data model, contract and quickstart exist. Corrections: the
+contract no longer shows a stored property inside an extension (it is added to the `RenderTarget` class); the
+quickstart states expected outcomes. Verified dependencies: VisualCoreRendering and VisualCoreRenderingTests already
+depend on VisualCoreShaderSource (`Packages/VisualCoreRendering/Package.swift`), and the host test target
+`VisualCoreShaderSourceTests` exists.

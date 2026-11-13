@@ -19,5 +19,5 @@ extension ResourceRegistry {
     public private(set) var evictionCount: Int
     public var retiredProgramCount: Int { get }
 }
-extension RenderTarget { public let depthRenderbuffer: GLuint }   // stored property; 0 when the target has no depth
+// RenderTarget (class in GPUObjects.swift) gains the stored property `public let depthRenderbuffer: GLuint` (0 without depth)
 ```

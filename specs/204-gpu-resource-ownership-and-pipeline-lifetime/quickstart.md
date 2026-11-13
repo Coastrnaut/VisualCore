@@ -12,3 +12,9 @@ python3 scripts/release_check.py --only reference-engine-xcframework reference-b
 python3 scripts/release_check.py --only reference-test-anglerendering-ios27 reference-test-anglerendering-ios26 projectm-reference-ios27 projectm-reference-ios26
 python3 scripts/test_scripts.py
 ```
+
+Expected: every command PASS. The whole VisualCoreRenderingTests target runs in the scheme runs (all five bundles),
+including ProgramCacheTests (held evicted program draws correctly; live programs 0 at close), PipelineTests (state
+read back after apply from 3 prior states; stale program refused and counted) and DepthTargetTests (nearer colour wins
+in both orders; colour and depth storage released). A01–A03 digests unchanged; reference regression 7 of 7.
+
