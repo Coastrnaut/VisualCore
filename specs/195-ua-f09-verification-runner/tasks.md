@@ -90,7 +90,7 @@ Commit after every task (`python3 scripts/tick_task.py`), and push with `python3
   - An unknown id writes a record with result `error` and code 2.
   - The debug core reports `taps-counted` after three taps.
   - The inventory rule lists the evidence folder.
-- [ ] T-U09-018 [US3] Implement the app side:
+- [X] T-U09-018 [US3] Implement the app side: — Verified 2026-11-12: xcodebuild_app.py 27.2 phone: chunk c + ScenarioLaunchTests 69/69 (all nine debug scenarios through the app's run path, two-launch save-restore, error records with exit 2); interface chunks a, b, d, e, f pass; the debug experience draws through a shader with a state-dependent corner mark (non-blank frames), reports taps-counted after three taps, declares a corner probe
   - `Apps/VisualCore/App/Automation/ScenarioLaunch.swift` and `ScenarioHostView.swift` (`#if DEBUG || VISUALCORE_AUTOMATION`).
   - The request check in `VisualCoreApp.swift` before the model.
   - In `DebugExperience.swift`: the outcome `taps-counted`, one probe, and its manifest of nine scenarios.
