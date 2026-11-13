@@ -75,7 +75,7 @@ API-baseline and reference-regression tasks apply.
 - [X] T-R02F04-019 Reference regression chunk 2 (check `reference-2`): `python3 scripts/release_check.py --only — Verified 2026-11-13: reference chunk 2: 4/4 PASS, regression 7 of 7 (reference-2)
   reference-test-anglerendering-ios27 reference-test-anglerendering-ios26 projectm-reference-ios27 projectm-reference-ios26`.
 - [X] T-R02F04-020 Script tests `python3 scripts/test_scripts.py` (check `script-tests`). — Verified 2026-11-13: python3 scripts/test_scripts.py PASS (script-tests)
-- [ ] T-R02F04-021 Auto-Creator.md section 13 row R02-F04 as built via `docs/catalog/shared-feature-map.json` and
+- [X] T-R02F04-021 Auto-Creator.md section 13 row R02-F04 as built via `docs/catalog/shared-feature-map.json` and — Verified 2026-11-13: section 13 row R02-F04 rendered; validate_autocreator, validate_docs, migration_baseline verify PASS (docs-autocreator, docs-dossiers, docs-baseline); CI run 43511396405 on the commit with every R02-F04 change completed success (checks, host-tests, simulator-build, app-build)
   `render_autocreator.py`; document validators; CI of a commit with all changes finished with success.
 - [ ] T-R02F04-022 {device} In the device campaign: GPU memory used by depth targets and retired programs measured on
   D1, D2, D3 (simulator byte counts are accounting only).
