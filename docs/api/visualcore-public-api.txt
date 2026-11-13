@@ -1141,8 +1141,11 @@ VisualCoreMath | enum | public enum EasingCurve: String, CaseIterable, Sendable,
 VisualCoreMath | enum | public enum EasingMode: String, CaseIterable, Sendable, Codable
 VisualCoreMath | enum | public enum Level: String, Sendable, Equatable
 VisualCoreMath | enum | public enum MathInfo
+VisualCoreMath | enum | public enum NumericError: Error, Equatable, Sendable
+VisualCoreMath | enum | public enum NumericHygiene
 VisualCoreMath | enum | public enum Phase: String, Sendable, Equatable
 VisualCoreMath | enum | public enum PrecisionAdvisor
+VisualCoreMath | enum | public enum ShaderHash
 VisualCoreMath | enum | public enum StableHash
 VisualCoreMath | func | public func apply(_ p: Vec2) -> Vec2
 VisualCoreMath | func | public func applyPoint(_ p: Vec3) -> Vec3
@@ -1201,10 +1204,17 @@ VisualCoreMath | func | public static func -= (a: inout Vec2, b: Vec2)
 VisualCoreMath | func | public static func / (a: Vec2, s: Double) -> Vec2
 VisualCoreMath | func | public static func / (a: Vec3, s: Double) -> Vec3
 VisualCoreMath | func | public static func assess(mantissaBits: Int, magnitude: Double, pixelStep: Double) -> Status
+VisualCoreMath | func | public static func finite(_ x: Double, or fallback: Double) -> Double
 VisualCoreMath | func | public static func framing(width: Double, center: Vec2, size: Vec2) -> PlaneViewport
+VisualCoreMath | func | public static func hash11(_ p: Float) -> Float
+VisualCoreMath | func | public static func hash21(_ x: Float, _ y: Float) -> Float
+VisualCoreMath | func | public static func hash22(_ x: Float, _ y: Float) -> (Float, Float)
 VisualCoreMath | func | public static func lookAt(eye: Vec3, target: Vec3, up: Vec3) -> Mat4
 VisualCoreMath | func | public static func minimumPixelStep(mantissaBits: Int, magnitude: Double) -> Double
+VisualCoreMath | func | public static func normalizedAngle(_ radians: Double) -> Double
+VisualCoreMath | func | public static func pcg(_ v: UInt32) -> UInt32
 VisualCoreMath | func | public static func perspective(fovY: Double, aspect: Double, near: Double, far: Double) -> Mat4
+VisualCoreMath | func | public static func quantized(_ x: Double, step: Double) throws(NumericError) -> Int64
 VisualCoreMath | func | public static func rotation(_ a: Double) -> Mat3
 VisualCoreMath | func | public static func rotation(_ q: Quat) -> Mat4
 VisualCoreMath | func | public static func route(from: PlaneFraming, to: PlaneFraming) -> [FramingFlight]
@@ -1215,6 +1225,7 @@ VisualCoreMath | func | public static func sha256Hex(_ message: [UInt8]) -> Stri
 VisualCoreMath | func | public static func translation(_ t: Vec2) -> Mat3
 VisualCoreMath | func | public static func translation(_ t: Vec3) -> Mat4
 VisualCoreMath | func | public static func trs(_ t: Vec2, _ r: Double, _ s: Vec2) -> Mat3
+VisualCoreMath | func | public static func wrapped(_ x: Double, modulus: Double) throws(NumericError) -> Double
 VisualCoreMath | init | public init(_ c0: Vec3, _ c1: Vec3, _ c2: Vec3)
 VisualCoreMath | init | public init(_ c0: Vec4, _ c1: Vec4, _ c2: Vec4, _ c3: Vec4)
 VisualCoreMath | init | public init(_ v: Vec3, _ w: Double)
@@ -1922,6 +1933,9 @@ VisualCoreSimulation | enum | public enum AnnouncementKind: String, Sendable, Eq
 VisualCoreSimulation | enum | public enum EmitterShape: Sendable, Equatable, Codable
 VisualCoreSimulation | enum | public enum HapticKind: String, Sendable, Equatable, CaseIterable
 VisualCoreSimulation | enum | public enum ParticleForce: Sendable, Equatable
+VisualCoreSimulation | enum | public enum RandomChoiceError: Error, Equatable, Sendable
+VisualCoreSimulation | enum | public enum RandomStateError: Error, Equatable, Sendable
+VisualCoreSimulation | enum | public enum SeedDerivation
 VisualCoreSimulation | enum | public enum SimulationInfo
 VisualCoreSimulation | enum | public enum StoragePrecision: String, Sendable, Codable, CaseIterable
 VisualCoreSimulation | enum | public enum TimelineEvent: Sendable, Equatable
@@ -1962,11 +1976,13 @@ VisualCoreSimulation | func | public mutating func enterBackground()
 VisualCoreSimulation | func | public mutating func enterForeground()
 VisualCoreSimulation | func | public mutating func float() -> Float
 VisualCoreSimulation | func | public mutating func flush(now: Double) -> Announcement?
+VisualCoreSimulation | func | public mutating func index(below n: Int) -> Int
 VisualCoreSimulation | func | public mutating func int(_ r: ClosedRange<Int>) -> Int
 VisualCoreSimulation | func | public mutating func mutate(_ body: (inout Simulation) -> Void)
 VisualCoreSimulation | func | public mutating func next() -> UInt64
 VisualCoreSimulation | func | public mutating func normal(mean: Double = 0, deviation: Double = 1) -> Double
 VisualCoreSimulation | func | public mutating func pause()
+VisualCoreSimulation | func | public mutating func pick<T>(_ items: [T]) throws(RandomChoiceError) -> T
 VisualCoreSimulation | func | public mutating func play()
 VisualCoreSimulation | func | public mutating func range(_ r: ClosedRange<Double>) -> Double
 VisualCoreSimulation | func | public mutating func resetAccumulator()
@@ -1974,15 +1990,22 @@ VisualCoreSimulation | func | public mutating func resume()
 VisualCoreSimulation | func | public mutating func run(steps: Int)
 VisualCoreSimulation | func | public mutating func scrub(to newTime: Double)
 VisualCoreSimulation | func | public mutating func seek(to t: Double)
+VisualCoreSimulation | func | public mutating func shuffle<T>(_ items: inout [T])
+VisualCoreSimulation | func | public mutating func shuffled<T>(_ items: [T]) -> [T]
 VisualCoreSimulation | func | public mutating func step(_ dt: Double)
 VisualCoreSimulation | func | public mutating func stepOnce()
 VisualCoreSimulation | func | public mutating func submit(_ announcement: Announcement) -> Announcement?
 VisualCoreSimulation | func | public mutating func submit(_ event: HapticEvent) -> HapticEvent?
 VisualCoreSimulation | func | public mutating func toggle()
+VisualCoreSimulation | func | public mutating func weightedIndex(_ weights: [Double]) throws(RandomChoiceError) -> Int
 VisualCoreSimulation | func | public static func clampedStrength(_ strength: Double) -> Double
+VisualCoreSimulation | func | public static func derive(_ seed: UInt64, index: UInt64) -> UInt64
+VisualCoreSimulation | func | public static func derive(_ seed: UInt64, label: String) -> UInt64
 VisualCoreSimulation | func | public static func factor(strength: Double, delta: Double) -> Double
+VisualCoreSimulation | func | public static func fnv1a64(_ label: String) -> UInt64
 VisualCoreSimulation | func | public static func keys(prefix: String) -> (reduceMotion: String, reduceFlashing: String)
 VisualCoreSimulation | func | public static func load(from defaults: UserDefaults, keyPrefix prefix: String) -> AccessibilityPreferences
+VisualCoreSimulation | func | public static func mix(_ z: UInt64) -> UInt64
 VisualCoreSimulation | func | public static func step8(_ value: UInt8, factor: Double, subtract: Double = 1) -> UInt8
 VisualCoreSimulation | func | public static func subtraction(delta: Double) -> Double
 VisualCoreSimulation | func | public static func unorm8(range: Float) -> SignedRangeEncoding?
@@ -2004,12 +2027,16 @@ VisualCoreSimulation | init | public init(reduceMotion: AccessibilityChoice = .s
 VisualCoreSimulation | init | public init(reduceMotion: Bool = false, dimFlashingLights: Bool = false)
 VisualCoreSimulation | init | public init(reduceMotion: Bool, autoplay: Bool = true)
 VisualCoreSimulation | init | public init(reduceMotion: Bool, reduceFlashing: Bool)
+VisualCoreSimulation | init | public init(restoring state: State) throws(RandomStateError)
 VisualCoreSimulation | init | public init(seed: UInt64)
+VisualCoreSimulation | init | public init(seed: UInt64, index: UInt64)
+VisualCoreSimulation | init | public init(seed: UInt64, label: String)
 VisualCoreSimulation | init | public init(simulation: Simulation, clock: FixedStepClock = FixedStepClock(), stream: ControlStream<Command> = ControlStream(),
 VisualCoreSimulation | init | public init(step: Double = 1.0 / 120, maxSteps: Int = 8)
 VisualCoreSimulation | init | public init(step: Int, command: Command)
 VisualCoreSimulation | init | public init(storedValue: String?)
 VisualCoreSimulation | init | public init(text: String, kind: AnnouncementKind, time: Double)
+VisualCoreSimulation | init | public init(version: Int, seed: String, words: [String])
 VisualCoreSimulation | init | public init(width: Int, height: Int, channels: Int, fill: Float = 0)
 VisualCoreSimulation | init | public init?(range: Float, center: Float = 0.5)
 VisualCoreSimulation | init | public init?(width: Int, height: Int, channels: Int, values: [Float])
@@ -2027,11 +2054,14 @@ VisualCoreSimulation | let | public let minimumInterval: Double
 VisualCoreSimulation | let | public let range: Float
 VisualCoreSimulation | let | public let reduceFlashing: Bool
 VisualCoreSimulation | let | public let reduceMotion: Bool
+VisualCoreSimulation | let | public let seed: String
 VisualCoreSimulation | let | public let seed: UInt64
 VisualCoreSimulation | let | public let step: Double
 VisualCoreSimulation | let | public let step: Int
 VisualCoreSimulation | let | public let stream: ControlStream<Command>
+VisualCoreSimulation | let | public let version: Int
 VisualCoreSimulation | let | public let width: Int
+VisualCoreSimulation | let | public let words: [String]
 VisualCoreSimulation | let | public static let boundaryTolerance
 VisualCoreSimulation | let | public static let countRange: ClosedRange<Int>
 VisualCoreSimulation | let | public static let defaultCapacity
@@ -2077,6 +2107,7 @@ VisualCoreSimulation | struct | public struct SceneClock: Sendable, Equatable
 VisualCoreSimulation | struct | public struct SeededRandom: RandomNumberGenerator, Sendable, Equatable
 VisualCoreSimulation | struct | public struct SignedRangeEncoding: Sendable, Equatable
 VisualCoreSimulation | struct | public struct SplitMix64: RandomNumberGenerator, Sendable
+VisualCoreSimulation | struct | public struct State: Codable, Sendable, Equatable
 VisualCoreSimulation | struct | public struct StateSign: Sendable, Equatable
 VisualCoreSimulation | struct | public struct SystemAccessibility: Sendable, Equatable
 VisualCoreSimulation | struct | public struct TimeStepPolicy: Sendable, Equatable
@@ -2155,6 +2186,7 @@ VisualCoreSimulation | var | public var speed: Double
 VisualCoreSimulation | var | public var spread: Double
 VisualCoreSimulation | var | public var startColor: Vec4, endColor: Vec4
 VisualCoreSimulation | var | public var startSize: Double, endSize: Double
+VisualCoreSimulation | var | public var state: State
 VisualCoreSimulation | var | public var text: String
 VisualCoreSimulation | var | public var time: Double
 VisualCoreSimulation | var | public var title: String
