@@ -36,7 +36,7 @@
   items are about, not an implementation choice.
 - The four decisions named at specify, plus the canvas touch path, were settled by `/speckit-clarify` (five
   answers, 2026-11-12).
-- 35 functional requirements (FR-U07-001 to 064), 10 success criteria, 7 user stories.
+- 36 functional requirements (FR-U07-001 to 064), 11 success criteria, 7 user stories (after the checklist corrections).
 - Ordering (recorded 2026-11-12): UA-F07's adoption can be specified now, but its verification, moves,
   retirement and X-A records need UA-F09's runner; the lead takes UA-F09 through its full loop next and
   continues UA-F07 with `/speckit-clarify` afterwards.

@@ -23,7 +23,8 @@ Canonical overrides:
   apps folded into the one app without losing a test, a fixture or a recorded result.
 - **Out of scope:** new features of the four apps; the legacy phases A04-P04 to A04-P06 (they run later from the
   archived prompts).
-- **Device-only items:** none. **Owner-only items:** none.
+- **Device-only items:** the replay time of Particle Universe beyond 30 simulated minutes is measured on devices in
+  the device campaign (clarification 3). **Owner-only items:** none.
 - **What exists today (read-only audit of 2026-11-12):**
   - A01 has 14 interface tests in 8 classes, 40 app unit tests and 31 Core tests. A02 has 9 interface tests in 7
     classes, 76 app unit tests and 56 Core tests. A03 has 10 interface tests in 6 classes, 64 app unit tests and
@@ -281,6 +282,10 @@ experience was verified on both runtimes.
   storage rule.
 - **FR-U07-016**: Each adopted experience MUST take the person's Reduce Motion and Reduce Flashing choices from
   the shell and combine them with the system setting, replacing each app's own setting.
+- **FR-U07-022**: The controls of each adopted experience MUST meet rule E-12. Every control has a VoiceOver label,
+  the controls fit at the largest accessibility text size without clipping, touch targets are at least 44 by 44
+  points, and information is never shown by colour alone. The ported accessibility audits run at the default and
+  the largest text size.
 - **FR-U07-017**: Each adopted experience MUST declare its quality levels with names the catalog shows. A quality
   change MUST NOT change the digest (E-13): a level acts only on how the state is shown (clarification 2).
 - **FR-U07-018**: Time in an adopted experience MUST advance with the experience's fixed steps, not the device
@@ -311,7 +316,8 @@ experience was verified on both runtimes.
 - **FR-U07-042**: After a move, the tests of stories 1 to 6 for that experience MUST pass again before the next
   step.
 - **FR-U07-043**: A standalone target MUST be removed from `project.yml` only after its experience is verified
-  in the one app on both simulator runtimes. The project MUST build after the removal.
+  in the one app on both simulator runtimes. The project MUST build after the removal. Particle Universe's target
+  stays until X-A04 can pass, after its legacy phases P04 to P06.
 - **FR-U07-044**: A repository check or test that names an old path MUST be updated in the step that moves the
   path. Records under `docs/apps` and the archived specifications stay as they are.
 - **FR-U07-045**: Each experience MUST be adopted, moved and retired as a separate step that can be reverted
@@ -373,6 +379,8 @@ experience was verified on both runtimes.
   (one target, no ProjectM, no direct GL, no advertising, tracking or network) pass.
 - **SC-U07-010**: Each adopted experience's saved state restores to the same digest after the app ends, in 3 of
   3 cases per experience.
+- **SC-U07-011**: A Particle Universe state of 30 simulated minutes restores within the preparation time limit of
+  10 seconds on both simulator runtimes; longer states are measured on devices (device-only item).
 
 ## Assumptions
 
