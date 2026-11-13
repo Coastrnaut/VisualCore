@@ -24,7 +24,7 @@ task. Owner-only items: none.
 
 ## Phase 3: User Story 2 — Every gesture has a button (P1)
 
-- [ ] T-R02F26-005 [P] [US2] Tests first: `GestureAlternatives.missing(gesture:native:)` returns the sorted gesture
+- [X] T-R02F26-005 [P] [US2] Tests first: `GestureAlternatives.missing(gesture:native:)` returns the sorted gesture — Verified 2026-11-13: GestureAlternativesTests.swift (covered sets leave nothing; missing actions named in order) pass (host-visualcore-r2)
   actions without a native action, empty when covered (`Packages/VisualCore/Tests/VisualCoreExperienceTests/GestureAlternativesTests.swift`).
 - [ ] T-R02F26-006 [US2] Write `Packages/VisualCore/Sources/VisualCoreExperience/GestureAlternatives.swift`; add
   `gestureActions` and `nativeActions` (default empty sets) to `ExperiencePresenter` in
