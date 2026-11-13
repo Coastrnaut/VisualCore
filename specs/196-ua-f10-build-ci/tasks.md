@@ -93,7 +93,7 @@ Independent test: planted second shippable target, undeclared target and reused 
 
 ## Phase 8: User Story 6 — Build time and size at milestones (P3)
 
-- [ ] T-U10-019 [P] [US6] Script tests first for `measure_build.py` with a fake runner: one record appended, a second
+- [X] T-U10-019 [P] [US6] Script tests first for `measure_build.py` with a fake runner: one record appended, a second — Verified 2026-11-13: scripts/tests/test_measure_build.py: 10 tests with fake runner and clock (one record appended, same commit skipped, damaged and newer-schema file refused without a write, failed and timed-out build exit 1 without a write, --check, --dry-run, touched file content unchanged), 368 OK (script-tests-tools-r2)
   run for the same commit skipped, a damaged or newer-schema file refused without a write.
 - [ ] T-U10-020 [US6] Write `scripts/measure_build.py` (research R6; data-model.md "Append only; one record per commit;
   damaged or newer schema → refusal and no write") and `docs/performance/build-measurements.json`; point the
