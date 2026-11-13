@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "frameworks": ["AdSupport", "AppTrackingTransparency", "iAd", "AdServices"],
+  "symbols": ["ASIdentifierManager", "advertisingIdentifier", "ATTrackingManager", "requestTrackingAuthorization",
+              "trackingAuthorizationStatus"],
+  "libraries": {
+    "advertising": ["GoogleMobileAds", "AppLovinSDK", "UnityAds", "FBAudienceNetwork", "IronSource"],
+    "analytics": ["FirebaseAnalytics", "GoogleAnalytics", "Mixpanel", "AmplitudeSwift", "FlurryAnalytics"],
+    "attribution": ["AppsFlyerLib", "AdjustSdk", "BranchSDK", "FBSDKCoreKit", "KochavaTracker"],
+    "crash-reporting": ["FirebaseCrashlytics", "Sentry", "Bugsnag", "Instabug", "NewRelicAgent"]
+  },
+  "allowances": []
+}

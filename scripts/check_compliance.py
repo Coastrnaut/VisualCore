@@ -33,6 +33,11 @@ RULES = [
     ("dynamic symbol lookup (dlopen/dlsym)", re.compile(r"\b(dlsym|dlopen)\s*\(")),
     ("Objective-C runtime string dispatch", re.compile(r"\b(NSClassFromString|NSSelectorFromString|performSelector)\b")),
     ("direct Metal renderer (Constitution I: ANGLE only)", re.compile(r"\bMTLCreateSystemDefaultDevice\b|\bMTKView\b|\bimport\s+MetalKit\b")),
+    # UA-F11 T-U11-016 (FR-U11-022): no advertising identifier or tracking authorization in any source.
+    ("advertising or tracking API (Constitution XII)",
+     re.compile(swift_import("AdSupport") + "|" + swift_import("AppTrackingTransparency")
+                + r"|<AdSupport/|<AppTrackingTransparency/|\bASIdentifierManager\b|\bATTrackingManager\b"
+                + r"|\badvertisingIdentifier\b")),
 ]
 PROJECTM = re.compile(swift_import(r"(?:ProjectMBridge|ANGLERendering|Rendering|PresetLibrary|CaptureKit)")
                       + r"|projectM-4|libprojectM|ProjectM\.xcframework")
@@ -62,7 +67,24 @@ def files(root: Path):
         yield p
 
 
+TRACKING_LIBRARY_LABEL = "advertising, analytics or tracking library (Constitution XII)"
+
+
+def tracking_libraries(root: Path) -> re.Pattern | None:
+    """Imports of the libraries named in Configs/tracking-denylist.json (FR-U11-022); the repository's list is used
+    when `root` (a fixture) has none."""
+    path = root / "Configs" / "tracking-denylist.json"
+    if not path.exists():
+        path = ROOT / "Configs" / "tracking-denylist.json"
+    if not path.exists():
+        return None
+    names = sorted({n for group in json.loads(path.read_text())["libraries"].values() for n in group})
+    alternatives = "|".join(re.escape(n) for n in names)
+    return re.compile(swift_import(f"(?:{alternatives})") + rf"|<(?:{alternatives})/")
+
+
 def scan(root: Path = ROOT) -> list[str]:
+    libraries = tracking_libraries(root)
     allow = root / "Configs" / "network-allowlist.json"
     network_ok = set(json.loads(allow.read_text())["paths"]) if allow.exists() else set()
     problems = []
@@ -76,6 +98,8 @@ def scan(root: Path = ROOT) -> list[str]:
             for label, rx in RULES:
                 if rx.search(text):
                     problems.append(f"{rel}: {label}")
+            if libraries is not None and libraries.search(text):
+                problems.append(f"{rel}: {TRACKING_LIBRARY_LABEL}")
             if not rel.startswith(REFERENCE_HARNESS) and PROJECTM.search(text):
                 problems.append(f"{rel}: ProjectM engine/reference module outside the reference harness (Constitution II)")
             if NETWORK.search(text) and not any(rel.startswith(p) for p in network_ok):

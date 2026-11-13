@@ -23,12 +23,16 @@ Readers refuse a missing, non-integer or higher schema and an unparsable file, n
 ```json
 {"schema": 1,
  "frameworks": ["AdSupport", "AppTrackingTransparency", "iAd", "AdServices"],
- "symbols": ["ASIdentifierManager", "advertisingIdentifier", "ATTrackingManager", "requestTrackingAuthorization"],
- "libraries": ["GoogleMobileAds", "FirebaseAnalytics", "FBSDKCoreKit", "AppsFlyerLib", "AdjustSdk", "BranchSDK", "..."],
+ "symbols": ["ASIdentifierManager", "advertisingIdentifier", "ATTrackingManager", "requestTrackingAuthorization",
+             "trackingAuthorizationStatus"],
+ "libraries": {"advertising": ["GoogleMobileAds", "..."], "analytics": ["FirebaseAnalytics", "..."],
+               "attribution": ["AppsFlyerLib", "AdjustSdk", "BranchSDK", "..."], "crash-reporting": ["Sentry", "..."]},
  "allowances": [{"text": "...", "file_pattern": "...", "reason": "..."}]}
 ```
 - Texts are case-sensitive literals, 3–80 chars; library names are distinctive module identifiers of at least 6
-  characters, matched as whole identifiers (not inside a longer word), so common words never match. An allowance needs a non-empty reason and matches one text in one
+  characters, matched as whole identifiers (not inside a longer word), so common words never match. All four kinds are present
+  with at least three names each. The same library names also fail as imports in sources (`check_compliance.py`).
+  Framework names are matched in linked-library lists only; symbol and library names are byte-scanned in every file. An allowance needs a non-empty reason and matches one text in one
   file pattern; an unused allowance fails (no stale exemptions).
 
 ## 4. Known game titles — `Configs/known-game-titles.json`
