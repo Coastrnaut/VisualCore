@@ -144,7 +144,7 @@ runtimes.
   - pending splats bounded by `SplatQueue.maxPending`;
   - the digest covers only CPU state;
   - a quality level never changes the digest (clarifications 1 and 2).
-- [ ] T-U07-021 [US5] `FluidArtCore`, `FluidArtPresenter` (it runs the passes for the steps since its last draw, restarts
+- [X] T-U07-021 [US5] `FluidArtCore`, `FluidArtPresenter` (it runs the passes for the steps since its last draw, restarts — Verified 2026-11-13: FluidArtCore and manifest (host 12/12, a02-core-host-renamed), FluidArtPresenter (one GPU step per frame for the core's steps, splats applied once and thinned by the level's cap, fields from DyeSeed.pattern at setup, reset and detail change, pointer events through the app's tracker and pinch recognizer into stroke and pinch actions, CPU-derived empty-dye probe), FluidArtControls (canvas, palette, brush, motion, quality, edges, detail, tuning reset, capture via the still renderer and ShareLink; labels and 44 pt), static framework FluidArtPlaygroundExperience and candidate registration; FluidArtSessionTests 6/6 incl. configuration parity with PlaygroundModel for 3 seeds on iOS 27.2 and 26.5 (a02-session-ios27/26); runner 9/9 on 27.2 and 26.5 (a02-verify-27, a02-verify-26). E-12 at the largest text size is checked by the ported audit (T-U07-022)
   the fields from `DyeSeed.pattern(seed:)` at setup, applies the level to iterations and the splat cap, and turns
   pointer events into `stroke` actions), `FluidArtControls`, `FluidArtManifest`; the framework target and candidate
   registration; session tests on both runtimes; parity of the configuration and the CPU state for 3 seeds; capture

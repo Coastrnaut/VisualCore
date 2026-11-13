@@ -1,0 +1,29 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_app.py",
+    "--scheme",
+    "VisualCore",
+    "--runtime",
+    "27.2",
+    "--kind",
+    "phone",
+    "--sources",
+    "Apps/FluidArtPlayground/FluidArtPlaygroundAdapter/ExperienceTests",
+    "--only-testing",
+    "FluidArtPlaygroundExperienceTests",
+    "--log-name",
+    "ua-f07-a02-session-ios27"
+  ],
+  "command": "python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime 27.2 --kind phone --sources Apps/FluidArtPlayground/FluidArtPlaygroundAdapter/ExperienceTests --only-testing FluidArtPlaygroundExperienceTests --log-name ua-f07-a02-session-ios27",
+  "elapsed_seconds": 9.707,
+  "exit_code": 0,
+  "finished": "2026-11-13T13:22:24+00:00",
+  "gate": "UA-F07",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F07.a02-session-ios27.log",
+  "log_sha256": "0dd825b11b5e7ed956d3380676af6b66ddd78d2ddcdb28829d16f840a8bcc322",
+  "name": "a02-session-ios27",
+  "started": "2026-11-13T13:22:15+00:00",
+  "timed_out": false
+}
