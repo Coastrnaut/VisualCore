@@ -87,7 +87,7 @@ Independent test: planted second shippable target, undeclared target and reused 
   `verify-<id>-ios27/26` from `Catalog/registrations.json`, `app-release-build`, `app-release-symbols`,
   `app-privacy-manifest`, `measure-build`; replace the whole-scheme `app-visual-core-ios27/26` steps (FR-U10-040 to
   FR-U10-042).
-- [ ] T-U10-018 [US5] Acceptance: `release_check.py --only app-release-build app-release-symbols app-privacy-manifest`
+- [X] T-U10-018 [US5] Acceptance: `release_check.py --only app-release-build app-release-symbols app-privacy-manifest` — Verified 2026-11-13: release_check.py --only app-release-build app-release-symbols app-privacy-manifest PASS 3/3 (release-app, 23.3 s build); --only app-build-for-testing-ios27 app-unit-ios27 PASS 2/2, 76 unit tests (release-unit-r2; the first run failed only in the guard scope, release-unit kept); --only app-ui-ios27-a PASS in 299 s (release-ui-a); every step below 600 s (SC-U10-005)
   (check `release-app`) and `--only app-build-for-testing-ios27 app-unit-ios27` (check `release-unit`), each step under
   600 s; one interface chunk through the new step (check `release-ui-a`) (SC-U10-005).
 
