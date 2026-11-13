@@ -60,7 +60,7 @@ API-baseline and reference-regression tasks apply.
 - [X] T-R02F04-012 [US3] Implement depth in `ResourceRegistry.swift` (`makeRenderTarget(..., depth:)`, — Verified 2026-11-13: makeRenderTarget/acquireTarget depth: Bool = false, GL_DEPTH_COMPONENT24 renderbuffer counted as .renderbuffer w*h*4 bytes, cleanup on incomplete framebuffer or budget failure, pool key with depth, RenderTarget.depthRenderbuffer; tests pass
   `acquireTarget(..., depth:)`, pool key with depth, `GL_DEPTH_COMPONENT24` renderbuffer counted as `.renderbuffer`
   width×height×4 bytes, cleanup on incomplete framebuffer) and `GPUObjects.swift` (`RenderTarget.depthRenderbuffer`).
-- [ ] T-R02F04-013 [US3] Acceptance: DepthTargetTests on sim-27.2 (check `depth-ios27`) (SC-R02F04-003).
+- [X] T-R02F04-013 [US3] Acceptance: DepthTargetTests on sim-27.2 (check `depth-ios27`) (SC-R02F04-003). — Verified 2026-11-13: DepthTargetTests 6/6 on sim-27.2 within the full scheme run (rendering-ios27) (SC-R02F04-003)
 
 ## Phase 6: Polish and cross-cutting
 
