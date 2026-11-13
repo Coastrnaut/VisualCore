@@ -12,7 +12,7 @@ each task. Tests before code. Owner-only items: none. One {device} task. No Visu
 
 ## Phase 2: Foundational — saved-scene format
 
-- [ ] T-A04-402 Tests first in `PU/CoreTests/SceneDocumentTests.swift` with fixtures `PU/CoreTests/Fixtures/scene-v1.json`,
+- [X] T-A04-402 Tests first in `PU/CoreTests/SceneDocumentTests.swift` with fixtures `PU/CoreTests/Fixtures/scene-v1.json`, — Verified 2026-11-13: SceneDocumentTests 9 tests with fixtures scene-v1/v2/newer/nan/truncated (round trip, v1 migration, newer refused, NaN and truncated refused, name 1-64, ranges, open actions within 11 and 8 values, inverse defines) pass in ParticleUniverseCoreTests 50/50 on sim-27.2 (A04-P04/core-tests-ios27)
   `scene-v2.json`, `scene-newer.json`, `scene-nan.json`, `scene-truncated.json`: v2 round trip; v1 migrates with "no
   force" and default looks; newer refused (`unsupportedVersion`); NaN and truncated refused; name "1…64 characters after
   trimming"; force x, y "∈ [−500, 500]" and strength in `PlacedForce.strengthRange`; `openActions()` gives
