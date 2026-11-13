@@ -67,6 +67,11 @@ evidence commands are found as described in Auto-Creator.md §19. Simulators are
    parallel simulator clones. **All system accessibility audits wait until device testing**: they are not run
    for gates or experiences before the device campaign. A gate's interface evidence is one pass on the iOS 27.x
    phone; iOS 26.5 is covered by the verification runner and package tests.
+   **Stopping a run** (lesson of 2026-11-13): stop the whole background command that runs a chunk loop (TaskStop),
+   not only its xcodebuild, or the loop starts its next chunk on the same simulator. Before a new run, confirm with
+   `pgrep -fl xcodebuild` that nothing else uses the simulator. A run that fails within seconds with "crashed with
+   signal kill before establishing connection" means a second run on that simulator. `xcodebuild_app.py` refuses
+   to start while another xcodebuild uses its simulator.
    **No open-ended waits** (owner ruling of 2026-11-12): nothing is waited for without a limit. App tests run
    through `scripts/xcodebuild_app.py`, which stops a run after `--max-seconds` (default 540) and names the test
    it was on; a run that would not fit is split into chunks of whole test classes with `--only-testing`. A CI run

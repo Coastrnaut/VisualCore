@@ -186,6 +186,18 @@ def main(argv: list[str] | None = None, root: Path = ROOT, run=subprocess.run, g
         print(f"FAIL: {what} — no available {KINDS[a.kind]} simulator of iOS {a.runtime}")
         return 2
     udid, name = chosen
+    # Lesson of 2026-11-13: a stopped chunk loop went on to its next chunk, and a second xcodebuild on the same
+    # simulator made every new run fail within seconds ("crashed with signal kill before establishing connection").
+    # A run therefore refuses to start while another xcodebuild uses this simulator.
+    try:
+        procs = run(["ps", "-Ao", "command"], capture_output=True, text=True)
+        busy = [line for line in (procs.stdout or "").splitlines()
+                if "xcodebuild" in line and f"id={udid}" in line]
+    except OSError:
+        busy = []
+    if busy:
+        print(f"FAIL: {what} — another xcodebuild is using {name}; stop it (and the loop that started it) first")
+        return 2
 
     derived = a.derived_data or f"Build/DerivedData/app-{tag}"
     bundle = None

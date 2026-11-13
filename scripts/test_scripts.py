@@ -1415,12 +1415,14 @@ class AppTestRunnerTests(unittest.TestCase):
         self.assertEqual(cmd[-2:], ["-only-testing:VisualCoreTests/A", "-only-testing:VisualCoreUITests/B/testC"])
         self.assertIn("CODE_SIGNING_ALLOWED=NO", cmd)
 
-    def run_main(self, args, xcode_exit=0, guard_exit=0, listing=None, sources=True):
+    def run_main(self, args, xcode_exit=0, guard_exit=0, listing=None, sources=True, processes=""):
         """Runs the tool in a temporary root with a fake runner and guard; returns (code, output, calls, guards, root files)."""
         calls, guards = [], []
         devices = self.DEVICES if listing is None else listing
 
         def fake_run(cmd, **kw):
+            if cmd[0] == "ps":
+                return subprocess.CompletedProcess(cmd, 0, stdout=processes, stderr="")
             calls.append((list(cmd), kw))
             if cmd[:2] == ["xcrun", "simctl"]:
                 return subprocess.CompletedProcess(cmd, 0, stdout=json.dumps(devices), stderr="")
@@ -1446,6 +1448,12 @@ class AppTestRunnerTests(unittest.TestCase):
 
     BASE = ["--scheme", "VisualCore", "--runtime", "27.2", "--kind", "phone"]
 
+    def test_a_run_refuses_while_another_xcodebuild_uses_the_simulator(self):
+        code, out, calls, *_ = self.run_main(self.BASE, processes=f"xcodebuild test -destination platform=iOS Simulator,id={self.PHONE_27}\n")
+        self.assertEqual(code, 2, out)
+        self.assertIn("another xcodebuild", out)
+        self.assertFalse(any(c[0] == "xcodebuild" for c, _ in calls))
+
     def test_pass_runs_tests_then_guard_and_writes_the_log(self):
         code, out, calls, guards, files, cwd_ok = self.run_main(self.BASE)
         self.assertEqual(code, 0)
@@ -1468,6 +1476,8 @@ class AppTestRunnerTests(unittest.TestCase):
         seen = {}
 
         def slow_run(cmd, **kw):
+            if cmd[0] == "ps":
+                return subprocess.CompletedProcess(cmd, 0, stdout="", stderr="")
             if cmd[:2] == ["xcrun", "simctl"]:
                 return subprocess.CompletedProcess(cmd, 0, stdout=json.dumps(self.DEVICES), stderr="")
             seen["timeout"] = kw.get("timeout")
@@ -1572,6 +1582,8 @@ class AppTestRunnerTests(unittest.TestCase):
         seen = {}
 
         def fake_run(cmd, **kw):
+            if cmd[0] == "ps":
+                return subprocess.CompletedProcess(cmd, 0, stdout="", stderr="")
             if cmd[:2] == ["xcrun", "simctl"]:
                 return subprocess.CompletedProcess(cmd, 0, stdout=json.dumps(self.DEVICES), stderr="")
             seen["cmd"] = list(cmd)
