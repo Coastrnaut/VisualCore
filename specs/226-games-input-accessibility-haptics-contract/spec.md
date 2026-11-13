@@ -143,7 +143,8 @@ the preference is off; a fake player records what would play.
 
 **VoiceOver (story 3)**
 - **FR-R02F26-020**: A planner MUST turn state changes into announcements (rejected move with its reason, outcome,
-  level change) with a rate limit, newest last, and none while announcements are off.
+  level change) with a rate limit of one announcement per 0.5 seconds (changes within it merge to the newest), and
+  none while VoiceOver is off. Announcement texts come from a string catalog, never built from raw identifiers.
 - **FR-R02F26-021**: The app MUST post the planned announcements through the system's public accessibility
   announcement, and the canvas label MUST keep mirroring the current state (existing description path).
 
@@ -153,7 +154,8 @@ the preference is off; a fake player records what would play.
 
 **Haptics (story 5)**
 - **FR-R02F26-040**: A planner MUST map game events to feedback kinds (selection, success, warning, error, impact
-  light/medium/heavy) with a rate limit, and return nothing when haptics are off.
+  light/medium/heavy) with a rate limit of one feedback per 0.05 seconds (extra events in that window are dropped), and
+  return nothing when haptics are off.
 - **FR-R02F26-041**: The app MUST play planned feedback through the system's public feedback generators, outside the
   game's state: haptics never change the state digest.
 - **FR-R02F26-042**: Settings MUST offer a haptics switch (default on), stored in the shell preferences as an optional
