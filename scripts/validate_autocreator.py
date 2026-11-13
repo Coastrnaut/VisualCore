@@ -60,7 +60,7 @@ LINKED = ["Auto-Creator.md", "README.md", "setup.md", "CLAUDE.md", "docs/migrati
           "docs/archive/planning/README.md"]
 SECTIONS = 28
 SKILLS = ["constitution", "specify", "clarify", "plan", "checklist", "tasks", "analyze", "implement", "converge"]
-PLANNED_SCRIPTS = {"scripts/verify_experiences.py", "scripts/run_device_campaign.py"}
+PLANNED_SCRIPTS = {"scripts/run_device_campaign.py"}
 PROMPT_MUST_CONTAIN = [
     "STEP 0", "CHECKPOINT REPORT", "STEP 1", "ORDER OF WORK", "DONE MEANS", "STOP CONDITIONS", "REPORT AT THE END",
     "on branch main", "python3 scripts/prepush_scan.py --push", "python3 scripts/migration_ledger.py status",

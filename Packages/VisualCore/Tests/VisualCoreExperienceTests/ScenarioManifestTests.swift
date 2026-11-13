@@ -197,6 +197,19 @@ import VisualCoreExperience
         #expect(found == ["scenario fixture-long: too many entries: 10001 (at most 10000)"])
     }
 
+    @Test func aRejectionScenarioMaySendInvalidActionsThatItExpectsRejected() throws {
+        let rejection = spec("rejection", entries: [
+            ScenarioStep(steps: 0, action: ScriptedAction("fly"), result: "action.unknown-control"),
+            ScenarioStep(steps: 0, action: ScriptedAction("tap", [1]), result: "action.wrong-value-count"),
+        ])
+        let manifest = try creative(replacing("rejection", with: rejection, in: completeCreative()))
+        #expect(problems(manifest, content: Self.creativeContent) == [])
+        // Without an expected rejection the same entry is a problem.
+        let careless = spec("rejection", entries: [ScenarioStep(steps: 0, action: ScriptedAction("fly"), result: "accepted")])
+        let other = try creative(replacing("rejection", with: careless, in: completeCreative()))
+        #expect(problems(other, content: Self.creativeContent) == ["scenario rejection: unknown control fly"])
+    }
+
     @Test func anUnknownControlIsAProblem() throws {
         let rejection = spec("rejection", entries: [ScenarioStep(steps: 1, action: ScriptedAction("fly"))])
         let manifest = try creative(replacing("rejection", with: rejection, in: completeCreative()))

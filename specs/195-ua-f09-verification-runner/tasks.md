@@ -83,7 +83,7 @@ Commit after every task (`python3 scripts/tick_task.py`), and push with `python3
 
 ## Phase 5: User Story 3 - The app runs one scenario and exits (Priority: P1)
 
-- [ ] T-U09-017 [US3] Tests first: `Apps/VisualCore/Tests/Unit/ScenarioLaunchTests.swift`. Cover:
+- [X] T-U09-017 [US3] Tests first: `Apps/VisualCore/Tests/Unit/ScenarioLaunchTests.swift`. Cover: — Verified 2026-11-12: xcodebuild_app.py 27.2 phone: chunk c + ScenarioLaunchTests 69/69 (all nine debug scenarios through the app's run path, two-launch save-restore, error records with exit 2); interface chunks a, b, d, e, f pass. Correction recorded: the debug experience runs under its own non-catalog id a98.debug-experience (not under a fixture id), so the driver alias does not depend on the fixture order
   - The request is read from an environment dictionary.
   - The registry for a run holds the real registry plus, in debug builds, the debug experience under its first fixture id with its manifest.
   - A run of `input-response` for the debug experience writes a valid record to a temporary `Documents/visualcore-evidence/<run>/` and reports exit code 0. The exit is injected, so the test process stays alive.

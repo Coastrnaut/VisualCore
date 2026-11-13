@@ -65,6 +65,17 @@ struct DebugExperienceCore: ExperienceCore, Codable, Equatable {
         self = DebugExperienceCore(start: start)
     }
 
+    /// `taps-counted` once the control was used three times (feature 195): the outcome the completion scenario
+    /// reaches. Derived from the count, never stored.
+    var outcome: ExperienceOutcome? {
+        count >= DebugExperience.tapsToComplete ? ExperienceOutcome(code: "taps-counted") : nil
+    }
+
+    /// The red, green and blue of the state, 0…1, as the presenter draws them.
+    func colour(tier: Int) -> (red: Double, green: Double, blue: Double) {
+        (phase, Double(count % 8) / 8, tier == 0 ? 0.6 : 0.3)
+    }
+
     func writeDigest(into builder: inout DigestBuilder) throws(DigestError) {
         builder.add(start)
         builder.add(count)
@@ -72,8 +83,9 @@ struct DebugExperienceCore: ExperienceCore, Codable, Equatable {
     }
 }
 
-/// Draws the debug experience: a clear colour made of the phase, the tap count and the quality tier, through a
-/// `ClearColorScene` it owns. Its one control is a native button.
+/// Draws the debug experience: a colour made of the phase, the tap count and the quality tier, with a corner mark in
+/// the contrasting grey (so that a frame is never one colour), through a `FullScreenShaderScene` it owns. Its one
+/// control is a native button.
 @MainActor
 final class DebugPresenter: ExperiencePresenter {
     typealias Core = DebugExperienceCore
@@ -84,7 +96,10 @@ final class DebugPresenter: ExperiencePresenter {
     let launch: ExperienceLaunch
     /// When true the setup throws, so that the session shows its failure view.
     let failsSetup: Bool
-    private let scene = ClearColorScene()
+    private let scene = FullScreenShaderScene(fragment: DebugExperience.fragment, fragmentName: "debug.frag",
+                                              bundle: ShaderBundle(files: [:]))
+    /// The quality tier of the last draw; the probes use it.
+    private var lastTier = 0
 
     /// Creates the presenter of the debug experience registered as `experienceID`, opened with `launch`.
     init(experienceID: ExperienceID, launch: ExperienceLaunch, failsSetup: Bool = false) {
@@ -106,9 +121,10 @@ final class DebugPresenter: ExperiencePresenter {
     }
 
     func draw(_ core: DebugExperienceCore, tier: Int, context: RenderContext, frame: FrameInfo) throws {
-        scene.red = Float(core.phase)
-        scene.green = Float(core.count % 8) / 8
-        scene.blue = tier == 0 ? 0.6 : 0.3
+        lastTier = tier
+        let colour = core.colour(tier: tier)
+        scene.parameters = ["red": colour.red, "green": colour.green, "blue": colour.blue,
+                            "mark": DebugExperience.markIsLight(colour) ? 1 : 0]
         try scene.render(context, frame: frame)
     }
 
@@ -119,6 +135,12 @@ final class DebugPresenter: ExperiencePresenter {
     func describe(_ core: DebugExperienceCore) -> String {
         "Debug experience, \(core.count) taps. Motion \(launch.reduceMotion.rawValue), "
             + "flashing \(launch.reduceFlashing.rawValue)."
+    }
+
+    /// The lower-left corner shows the mark: light on a dark state colour, dark on a light one (feature 195).
+    func probes(_ core: DebugExperienceCore) -> [FrameProbe] {
+        let light = DebugExperience.markIsLight(core.colour(tier: lastTier))
+        return [FrameProbe(name: "corner", x: 0.1, y: 0.9, expected: light ? "light" : "dark")].compactMap { $0 }
     }
 
     func makeControls(_ port: ExperienceActionPort) -> AnyView {
@@ -166,6 +188,56 @@ enum DebugExperience {
             return 0
         }
         return Int(text) ?? 0
+    }
+
+    #if DEBUG || VISUALCORE_AUTOMATION
+    /// The scenarios of the debug experience (feature 195): the nine standard ones as taps. Expected digests are
+    /// left to the runner's own checks (a rejection keeps the digest, a restore gives the final digest, a reset the
+    /// initial one); the outcome comes from the core.
+    static func manifest(for id: ExperienceID, seed: UInt64 = 7) -> ScenarioManifest {
+        let tap = ScriptedAction("tap")
+        let taps = (0..<4).map { _ in ScenarioStep(steps: 6, action: tap, result: "accepted") }
+        let specs = [
+            ScenarioSpec(name: "launch-first-frame", seed: seed, entries: []),
+            ScenarioSpec(name: "input-response", seed: seed, entries: taps),
+            ScenarioSpec(name: "completion", seed: seed, entries: Array(taps.prefix(tapsToComplete)),
+                         expect: ScenarioExpectations(outcome: "taps-counted")),
+            ScenarioSpec(name: "rejection", seed: seed, entries: [
+                ScenarioStep(steps: 0, action: ScriptedAction("tap", [1]), result: "action.wrong-value-count"),
+                ScenarioStep(steps: 0, action: ScriptedAction("jump"), result: "action.unknown-control"),
+            ]),
+            ScenarioSpec(name: "save-restore", seed: seed, entries: taps),
+            ScenarioSpec(name: "reset", seed: seed, entries: taps, expect: ScenarioExpectations(resetDigest: true)),
+            ScenarioSpec(name: "suspend-resume", seed: seed, entries: []),
+            ScenarioSpec(name: "teardown-reentry", seed: seed, entries: [], cycles: 5),
+            ScenarioSpec(name: "cancel-prepare", seed: seed, entries: []),
+        ]
+        return ScenarioManifest(experience: id, kind: .creative, scenarios: specs)
+    }
+    #endif
+
+    /// The taps after which the debug experience reports its outcome.
+    static let tapsToComplete = 3
+
+    /// The fragment shader: the state colour, and the mark in the lower-left quarter.
+    static let fragment = """
+    precision mediump float;
+    in vec2 v_uv;
+    uniform float u_red;
+    uniform float u_green;
+    uniform float u_blue;
+    uniform float u_mark;
+    out vec4 color;
+    void main() {
+        vec3 c = vec3(u_red, u_green, u_blue);
+        if (v_uv.x < 0.25 && v_uv.y < 0.25) { c = vec3(u_mark); }
+        color = vec4(c, 1.0);
+    }
+    """
+
+    /// Whether the mark is light: when the state colour is dark (Rec. 709 luma below one half).
+    static func markIsLight(_ colour: (red: Double, green: Double, blue: Double)) -> Bool {
+        0.2126 * colour.red + 0.7152 * colour.green + 0.0722 * colour.blue < 0.5
     }
 
     /// The debug experience registered as `id`, opened with `launch`.

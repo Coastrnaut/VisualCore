@@ -119,7 +119,13 @@ public enum ScenarioManifestValidator {
             totalSteps += max(entry.steps, 0)
             if let action = entry.action {
                 actionSeen = true
-                if let control = controls.first(where: { $0.id == action.control }) {
+                // A rejection scenario (and a fault case) sends invalid actions on purpose: an unknown control or a
+                // wrong value count is allowed there when the entry expects a rejection.
+                let invalidOnPurpose = (spec.name == "rejection" || spec.name.hasPrefix("fault-"))
+                    && (entry.result.map { $0 != "accepted" } ?? false)
+                if invalidOnPurpose {
+                    // nothing to check: the expected rejection code is compared when the scenario runs
+                } else if let control = controls.first(where: { $0.id == action.control }) {
                     if action.values.count != control.ranges.count {
                         problems.append("\(label): control \(control.id) takes \(control.ranges.count) values, "
                             + "entry \(index + 1) gives \(action.values.count)")

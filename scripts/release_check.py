@@ -117,6 +117,10 @@ def steps(stamp: str) -> list[Step]:
                                "sys.exit(max([subprocess.run([sys.executable,'scripts/check_app_contract.py','--app',a]).returncode "
                                "for a in apps] or [0]))"]),
         Step("script-tests", [PY, "scripts/test_scripts.py"]),
+        # Feature UA-F09 T-U09-026 (FR-U09-032, FR-U09-050 to FR-U09-055): the evidence validator's own cases, and the
+        # audits of the shipped sources (markers, raster files, reducer bypass, content counts, direct GL, network).
+        Step("evidence-self-test", [PY, "scripts/check_evidence.py", "--self-test"]),
+        Step("verify-audits", [PY, "scripts/verify_experiences.py", "--audits"]),
         Step("host-visualcore", ["swift", "test", "--package-path", "Packages/VisualCore"]),
         Step("host-gardenkit", ["swift", "test", "--package-path", "Harnesses/SecondConsumer/GardenKit"]),
         Step("xcodegen", [PY, "-c", "import subprocess,sys;[subprocess.run(['xcodegen','generate','--spec',p],check=True) "

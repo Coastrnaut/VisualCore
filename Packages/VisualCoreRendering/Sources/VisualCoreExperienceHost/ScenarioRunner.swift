@@ -107,9 +107,16 @@ public final class ScenarioRunner {
         record.final = digest(of: experience)
         record.outcome = experience.diagnostics.outcome?.code
         if drawsFrame(spec) { readFrame(of: experience, into: &record) }
+        if spec.name == "rejection", !record.steps.isEmpty, record.steps.allSatisfy({ $0.result != "accepted" }),
+           record.final != record.initial {
+            record.failures.append("rejection: the digest changed although every action was rejected")
+        }
         switch spec.name {
         case "save-restore":
             await saveRestore(experience, spec: spec, request: request, phase: phase, into: &record)
+            if phase == .single, let restored = record.afterRestore, restored != record.final {
+                record.failures.append("after-restore digest: expected \(record.final ?? "none"), got \(restored)")
+            }
         case "reset":
             do {
                 try experience.reset()

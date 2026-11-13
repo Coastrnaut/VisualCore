@@ -3,6 +3,7 @@
 // root view. In builds made for testing the environment passes through the debug launch arguments; a release
 // build contains none of that handling.
 import SwiftUI
+import VisualCoreExperience
 import VisualCoreUI
 
 /// The start of the app's own code: the launch time counts from here (UA-F06, FR-U06-024). The value is taken
@@ -15,11 +16,25 @@ enum AppLaunch {
 /// The VisualCore app.
 @main
 struct VisualCoreApp: App {
-    @State private var model: AppModel
+    @State private var model: AppModel?
+    #if DEBUG || VISUALCORE_AUTOMATION
+    /// The launch environment of a scenario run (feature 195); nil for a normal start.
+    private let scenarioEnvironment: [String: String]?
+    #endif
 
-    /// Creates the app with its one model.
+    /// Creates the app with its one model. A scenario run (only in builds made for testing or for automation)
+    /// creates no model, so it neither reads nor writes the person's preferences.
     init() {
         _ = AppLaunch.start
+        #if DEBUG || VISUALCORE_AUTOMATION
+        let processEnvironment = ProcessInfo.processInfo.environment
+        if ScenarioRequest.parse(processEnvironment) != nil {
+            scenarioEnvironment = processEnvironment
+            _model = State(initialValue: nil)
+            return
+        }
+        scenarioEnvironment = nil
+        #endif
         #if DEBUG
         let environment = DebugLaunch.environment(base: AppEnvironment.live())
         #else
@@ -30,9 +45,23 @@ struct VisualCoreApp: App {
 
     var body: some Scene {
         WindowGroup {
-            RootView(model: model)
+            content
                 // The contrast-checked accent of the framework, not the system default (accessibility audit).
                 .tint(AccessibleColors.accent)
         }
+    }
+
+    @ViewBuilder private var content: some View {
+        #if DEBUG || VISUALCORE_AUTOMATION
+        if let scenarioEnvironment {
+            ScenarioHostView(environment: scenarioEnvironment) { code in Darwin.exit(code) }
+        } else if let model {
+            RootView(model: model)
+        }
+        #else
+        if let model {
+            RootView(model: model)
+        }
+        #endif
     }
 }

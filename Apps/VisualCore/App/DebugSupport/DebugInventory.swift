@@ -20,6 +20,8 @@ enum DebugInventory {
                       writer: "the app: quarantined copies of a saved state that could not be read"),
         InventoryRule(kind: .file, pattern: experiences + name,
                       writer: "an experience, through its storage handle"),
+        InventoryRule(kind: .file, pattern: "Documents/visualcore-evidence/[A-Za-z0-9-]+/[a-z0-9.-]+\\.json",
+                      writer: "the scenario runner of builds made for testing: evidence records (feature 195)"),
         InventoryRule(kind: .key, pattern: "vc\\.shell\\.preferences", writer: "the app: the session state"),
         InventoryRule(kind: .key, pattern: "vc\\.shell\\.preferences\\.unreadable",
                       writer: "the app: the copy of an unreadable session state"),

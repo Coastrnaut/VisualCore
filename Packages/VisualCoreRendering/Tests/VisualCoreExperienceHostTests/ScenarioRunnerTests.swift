@@ -107,6 +107,7 @@ final class ScenarioRunnerTests: XCTestCase {
     /// runner and the evaluator found.
     @discardableResult
     private func run<Fault: SampleFault>(_ name: String, _ fault: Fault.Type, attach: Bool = true,
+                                         attachmentSuffix: String = "",
                                          configure: ((SamplePresenter<Fault>) -> Void)? = nil) async throws -> [String] {
         let manifest = try await sampleManifest()
         let spec = try XCTUnwrap(manifest.scenarios.first { $0.name == name })
@@ -121,7 +122,7 @@ final class ScenarioRunnerTests: XCTestCase {
                                              thermalState: "nominal", lowPower: false)
         if attach {
             let attachment = XCTAttachment(data: try record.encoded(), uniformTypeIdentifier: "public.json")
-            attachment.name = "evidence-\(SampleExperience.id.rawValue)-\(name).json"
+            attachment.name = "evidence-\(SampleExperience.id.rawValue)-\(name)\(attachmentSuffix).json"
             attachment.lifetime = .keepAlways
             add(attachment)
         }
@@ -187,7 +188,9 @@ final class ScenarioRunnerTests: XCTestCase {
     // MARK: Deliberate failures (SC-U09-002, SC-U09-007)
 
     func testALossySnapshotFailsSaveRestoreByName() async throws {
-        let failures = try await run("save-restore", LossySnapshot.self, attach: false)
+        // Its record is attached as `…-save-restore-lossy.json`: the driver's self-test reads it and must judge it a
+        // failure naming the scenario and the expectation (FR-U09-025).
+        let failures = try await run("save-restore", LossySnapshot.self, attachmentSuffix: "-lossy")
         XCTAssertTrue(failures.contains { $0.hasPrefix("after-restore digest") || $0.hasSuffix("at restore") }, "\(failures)")
     }
 

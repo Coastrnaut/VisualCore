@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Shipping-build automation check (feature 010 T-F904; FR-F914; CLAUDE.md §9): the Release binary of an app
-must contain zero automation symbols and no automation trigger strings. With --expect-present the check is
-inverted, proving on a measurement build (Release + VISUALCORE_AUTOMATION) that the check can see them.
+must contain zero automation symbols and no automation trigger strings (FORBIDDEN_SYMBOLS, FORBIDDEN_STRINGS;
+since UA-F09 also ScenarioRunner, ScenarioLaunch, ScenarioManifest and VISUALCORE_AUTORUN_EXPERIENCE). With
+--expect-present the check is inverted, proving on a measurement build (Release + VISUALCORE_AUTOMATION) that the check can see them.
 
   python3 scripts/check_release_symbols.py --app Build/.../Release-iphoneos/Showcase.app
 
@@ -20,8 +21,14 @@ import subprocess
 import sys
 from pathlib import Path
 
-SYMBOL = re.compile(r"VisualCoreAutomation|AutomationRunner|AutomationReport|ShowcaseAutomation|AutomationRootView")
-STRING = re.compile(rb"VISUALCORE_AUTORUN")
+# Symbols and trigger strings that no shipping Release binary may contain. Feature UA-F09 T-U09-019 (FR-U09-012;
+# SC-U09-004) adds the scenario runner, the app's scenario entry and the scenario manifest, and the experience key of a
+# scenario request (already covered by the VISUALCORE_AUTORUN prefix; named so the list states it).
+FORBIDDEN_SYMBOLS = ("VisualCoreAutomation", "AutomationRunner", "AutomationReport", "ShowcaseAutomation",
+                     "AutomationRootView", "ScenarioRunner", "ScenarioLaunch", "ScenarioManifest")
+FORBIDDEN_STRINGS = ("VISUALCORE_AUTORUN_EXPERIENCE", "VISUALCORE_AUTORUN")
+SYMBOL = re.compile("|".join(re.escape(s) for s in FORBIDDEN_SYMBOLS))
+STRING = re.compile(b"|".join(re.escape(s.encode()) for s in FORBIDDEN_STRINGS))
 
 
 def executable(app: Path) -> Path:

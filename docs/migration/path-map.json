@@ -522,8 +522,8 @@
    "to": "scripts/verify_experiences.py",
    "action": "new",
    "by": "UA-F09",
-   "state": "pending",
-   "note": "Verification runner and lock driver."
+   "state": "done",
+   "note": "Verification runner (UA-F09); the lock run (--lock) is added by UA-F12."
   },
   {
    "from": null,
