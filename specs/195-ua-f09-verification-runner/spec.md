@@ -331,11 +331,14 @@ a Round 3 game without fault cases (fail); run the hero image checks on a drawn 
 - **FR-U09-012**: The runner MUST exist only in builds with DEBUG or VISUALCORE_AUTOMATION. The shipping build
   MUST contain no runner symbol and no request key. No URL, file, argument or other outside input can start a
   scenario.
-- **FR-U09-013**: The save-restore scenario MUST span two launches: the first saves the snapshot and exits, the
-  second restores it and compares the digest.
+- **FR-U09-013**: In the app, the save-restore scenario MUST span two launches: the first saves the snapshot and
+  exits, the second restores it and compares the digest. On the package-test path of the sample, the two
+  sessions run in one test process. The record says so (`configuration.process` = `single`), and that run is not
+  counted as proof of a relaunch.
 - **FR-U09-014**: Suspend-resume MUST prove that no step runs for the time away and that the digest is unchanged
-  while suspended. Teardown-reentry MUST prove zero live and zero leaked GPU objects after each leave, and no
-  growth over its cycles. Cancel-prepare MUST prove that nothing arrives after the cancelled preparation.
+  while suspended. Teardown-reentry MUST prove zero live and zero leaked GPU objects after each leave over at
+  least 5 cycles, and no growth by the resource growth rule of UA-F06 (`GrowthRule`). Cancel-prepare MUST prove
+  that nothing arrives after the cancelled preparation.
 - **FR-U09-015**: The scenarios MUST run against an experience before it is available to everyone, without
   changing the catalog's availability.
 
@@ -351,8 +354,10 @@ a Round 3 game without fault cases (fail); run the hero image checks on a drawn 
 - **FR-U09-023**: A result bundle MUST count only after `xcrun xcresulttool`, run by the driver as its own
   command, reports the tests as passed. The record carries the test count, the failures, the destination and the
   attachments taken from the bundle.
-- **FR-U09-024**: Every wait of the driver MUST have a time limit. A scenario that ends without a record, or a
-  process that does not exit, is a failure that names the scenario.
+- **FR-U09-024**: Every wait of the driver MUST have a time limit: 120 seconds per scenario unless the manifest
+  names a longer one (`endurance`: its time plus 120 seconds), 300 seconds for a simulator to boot, and the 540
+  seconds of the test runners for a test run. A scenario that ends without a record, or a process that does not
+  exit, is a failure that names the scenario.
 - **FR-U09-025**: The driver MUST have self-tests that use the sample experience, including a deliberately
   failing scenario whose failure the driver must report by name and with a non-zero exit.
 
@@ -374,7 +379,8 @@ a Round 3 game without fault cases (fail); run the hero image checks on a drawn 
 
 **Frames (story 5)**
 - **FR-U09-040**: A drawing scenario MUST read its frame from the real renderer and check that it is not blank
-  and that each probe the experience declares matches its state. The record carries the frame's hash.
+  and that each probe the experience declares matches its state. Every experience MUST declare at least one
+  probe. The record carries the frame's hash.
 - **FR-U09-041**: A golden image MUST be supporting evidence only: never compared exactly across devices, never
   overwritten once accepted, and never what decides a pass.
 - **FR-U09-042**: The hero checks MUST cover the histogram, no black frame, no non-finite value and the silhouette
@@ -398,13 +404,16 @@ a Round 3 game without fault cases (fail); run the hero image checks on a drawn 
 **Boundaries and carried obligations**
 - **FR-U09-060**: The driver MUST run `--only a99.contract-sample --scenario endurance --runtime 27`, which is the
   obligation UA-F06 carries.
-- **FR-U09-061**: The driver MUST accept several experience ids in one run, as UA-F07 needs for A01 to A03.
+- **FR-U09-061**: The driver MUST accept several experience ids in one run, as UA-F07 needs for A01 to A03. The id
+  `debug` names the app's debug experience; its records carry the fixture id it runs under and the code
+  `debug`.
 - **FR-U09-062**: The record format, the request keys and the exit protocol MUST stay usable unchanged on devices
   (UA-F13), with `environment.kind = device`.
 - **FR-U09-063**: Every new public framework symbol MUST have `///` documentation and the API baseline MUST be
   updated. The ProjectM reference regression passes 7 of 7 in two chunks after any framework change.
 - **FR-U09-064**: One app target and one bundle identifier stay; no network, advertising or tracking code
-  enters; no physical device is touched.
+  enters; no physical device is touched. The runner shows no screen of its own beyond the session's views, and
+  the shipping app's accessibility is unchanged.
 
 ### Key Entities
 
