@@ -82,9 +82,12 @@ def compare(detected: dict[str, list[str]], manifest: dict) -> dict:
 
 
 def findings(report: dict) -> list[dict]:
-    """The failures of a `compare` result as data-model §7 findings ({file, kind, text})."""
-    out = [{"file": "PrivacyInfo.xcprivacy", "kind": "undeclared",
-            "text": f"{c} used ({', '.join(report['detected'][c][:3])}) but not declared"} for c in report["undeclared"]]
+    """The failures of a `compare` result as data-model §7 findings ({file, kind, text}); an undeclared category
+    names the binaries that use it (`report["where"]`, US1/AC2)."""
+    where = report.get("where", {})
+    out = [{"file": (where.get(c) or ["PrivacyInfo.xcprivacy"])[0], "kind": "undeclared",
+            "text": f"{c} used in {', '.join(where.get(c) or ['the app'])} ({', '.join(report['detected'][c][:3])})"
+                    " but not declared"} for c in report["undeclared"]]
     out += [{"file": "PrivacyInfo.xcprivacy", "kind": "unused", "text": f"{c} declared but not used"}
             for c in report["unused"]]
     out += [{"file": "PrivacyInfo.xcprivacy", "kind": "violation", "text": v} for v in report["violations"]]
@@ -122,17 +125,21 @@ def main(argv: list[str] | None = None) -> int:
         return 2
     symbols: list[str] = []
     strings: list[str] = []
+    where: dict[str, list[str]] = {}
     scanned = binaries(a.app)
     for b in scanned:
         s, t = collect(b)
         symbols += s
         strings += t
+        for category in scan(s, t):   # per binary, so a finding names where the API is used
+            where.setdefault(category, []).append(str(b.relative_to(a.app)))
     with open(manifest_path, "rb") as f:
         manifest = plistlib.load(f)
     report = compare(scan(symbols, strings), manifest)
     report["binaries"] = [str(b.relative_to(a.app)) for b in scanned]
+    report["where"] = where
     for c in report["undeclared"]:
-        print(f"  UNDECLARED {c} ({', '.join(report['detected'][c][:3])})")
+        print(f"  UNDECLARED {c} in {', '.join(where.get(c) or ['the app'])} ({', '.join(report['detected'][c][:3])})")
     for c in report["unused"]:
         print(f"  UNUSED {c}")
     for v in report["violations"]:

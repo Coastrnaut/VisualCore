@@ -117,6 +117,15 @@ class MainReportTests(unittest.TestCase):
     def test_undeclared_category_fails(self):
         self.assert_fails(dict(CLEAN, NSPrivacyAccessedAPITypes=[]), "undeclared")
 
+    def test_undeclared_category_names_the_binary(self):
+        code, report, text = self.run_main(dict(CLEAN, NSPrivacyAccessedAPITypes=[]))
+        self.assertEqual(code, 1)
+        undeclared = [f for f in report["findings"] if f["kind"] == "undeclared"]
+        self.assertEqual([f["file"] for f in undeclared], ["X"])
+        self.assertIn("in X", undeclared[0]["text"])
+        self.assertEqual(report["where"], {"NSPrivacyAccessedAPICategoryUserDefaults": ["X"]})
+        self.assertIn("in X", text)
+
     def test_unused_category_fails(self):
         extra = {"NSPrivacyAccessedAPIType": "NSPrivacyAccessedAPICategoryDiskSpace",
                  "NSPrivacyAccessedAPITypeReasons": ["E174.1"]}
