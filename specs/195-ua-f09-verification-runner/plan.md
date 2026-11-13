@@ -121,7 +121,7 @@ scripts/check_release_symbols.py, scripts/check_experience_symbols.py    modify 
 scripts/release_check.py                     modify   steps evidence-self-test, verify-audits
 scripts/test_scripts.py                      modify
 Catalog/generated-art.json                   new      empty list of permitted generated raster files
-docs/verification/README.md                  modify   record layout
+docs/verification/README.md                  new      record layout
 docs/api/visualcore-public-api.txt           modify
 Auto-Creator.md (sections 6, 11.4, 16, 22)   modify   as built
 ```
