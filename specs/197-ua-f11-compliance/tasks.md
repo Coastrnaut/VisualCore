@@ -118,7 +118,7 @@ Device-only items: none, so no {device} task.
 - [X] T-U11-028 [US7] Write `scripts/metadata_inputs.py` (`--write`, `--check`, `--privacy-report`, — Verified 2026-11-13: scripts/metadata_inputs.py added to LEDGER_READERS; docs/release/metadata-inputs.json generated from the release-check reports of d711921 (privacy answers proven, one digest)
   `--tracking-report`, `--json`) and generate `docs/release/metadata-inputs.json` from the T-U11-006 and T-U11-017 reports;
   add it to `LEDGER_READERS` in `scripts/test_scripts.py`.
-- [ ] T-U11-029 [US7] Acceptance: `python3 scripts/metadata_inputs.py --check` passes with 3 experiences (check
+- [X] T-U11-029 [US7] Acceptance: `python3 scripts/metadata_inputs.py --check` passes with 3 experiences (check — Verified 2026-11-13: metadata_inputs --check PASS: A01, A02, A03 (metadata-inputs)
   `metadata-inputs`) (SC-U11-007).
 
 ## Phase 10: Polish and cross-cutting
