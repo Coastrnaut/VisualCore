@@ -52,6 +52,8 @@ def main(argv: list[str] | None = None, root: Path = ROOT) -> int:
     ap.add_argument("evidence")
     ap.add_argument("message")
     ap.add_argument("--no-push", action="store_true")
+    ap.add_argument("--exclude", nargs="+", default=[], metavar="PATH",
+                    help="paths left out of the commit, such as files an agent is still writing (feature 193)")
     args = ap.parse_args(argv)
     if not args.evidence.strip():
         raise SystemExit("evidence is required (Constitution VI)")
@@ -75,6 +77,9 @@ def main(argv: list[str] | None = None, root: Path = ROOT) -> int:
         raise SystemExit("validate_docs.py failed after ticking; the task list was restored and nothing was committed:\n"
                          + "\n".join(problems[:5]))
     subprocess.run(["git", "add", "-A"], cwd=root, check=True)
+    if args.exclude:
+        # Files still being written by an agent stay out of this commit (feature 193: a tick once took them along).
+        subprocess.run(["git", "reset", "-q", "--", *args.exclude], cwd=root, check=True)
     subprocess.run(["git", "commit", "-q", "-m", args.message], cwd=root, check=True)
     branch = subprocess.run(["git", "branch", "--show-current"], cwd=root, capture_output=True, text=True).stdout.strip()
     if branch != "main":

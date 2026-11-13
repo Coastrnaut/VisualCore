@@ -2953,6 +2953,18 @@ class TickTaskTests(unittest.TestCase):
         self.assertIn("python3 scripts/prepush_scan.py --push", message)
         self.assertEqual(self.box.commits(), commits + 1)
 
+    def test_excluded_paths_stay_out_of_the_commit(self):
+        # Feature 193: files an agent is still writing are left uncommitted and untouched.
+        self.box.write("agent/draft.swift", "// not finished\n")
+        self.box.write("done/file.txt", "finished\n")
+        self.assertEqual(self.tick("specs/186-x", "T-U00-001", "e", "without the draft", "--no-push",
+                                   "--exclude", "agent"), 0)
+        committed = self.box.git("show", "--name-only", "--format=", "HEAD").split()
+        self.assertIn("done/file.txt", committed)
+        self.assertNotIn("agent/draft.swift", committed)
+        self.assertIn("?? agent/", self.box.git("status", "--short"))
+        self.assertTrue((self.box.root / "agent" / "draft.swift").is_file())
+
     def test_commit_has_no_trailer(self):
         self.assertEqual(self.tick("specs/186-x", "T-U00-001", "e", "subject only", "--no-push"), 0)
         message = self.box.last_message()
