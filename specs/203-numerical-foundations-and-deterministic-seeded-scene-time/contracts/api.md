@@ -16,7 +16,10 @@ extension SeededRandom {
     public mutating func shuffled<T>(_ items: [T]) -> [T]
     public mutating func pick<T>(_ items: [T]) throws(RandomChoiceError) -> T
     public mutating func weightedIndex(_ weights: [Double]) throws(RandomChoiceError) -> Int
-    public struct State: Codable, Sendable, Equatable { public let version: Int; public let seed: String; public let words: [String] }
+    public struct State: Codable, Sendable, Equatable {
+        public let version: Int; public let seed: String; public let words: [String]
+        public init(version: Int, seed: String, words: [String])   // added in implement: lets callers and tests build states
+    }
     public var state: State { get }
     public init(restoring state: State) throws(RandomStateError)
 }

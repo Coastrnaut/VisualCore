@@ -49,3 +49,13 @@ carries the seed too (spec FR-R02F03-031 updated).
 Round 1: 0 critical, 1 high, 1 medium. C1 (high): A04's committed digests are proven by the ExperiencesCreative
 package tests, now in T-R02F03-025 and quickstart. C2 (medium): T-R02F03-024 records new suite durations
 (SC-R02F03-008). Round 2: 0 critical, 0 high, 0 medium; 30 of 30 requirements and 8 of 8 success criteria covered.
+
+## 3. Implementation corrections (2026-11-13)
+
+- The float hashes (`vc_hash11`, `vc_hash21`, `vc_hash22` and their twins) return values in [0, 1], not [0, 1):
+  float conversion rounds the largest 32-bit words up, so `Float(0xFFFFFFFF) / 2^32 == 1.0` on the GPU and the CPU.
+  The `ShaderHash` documentation states [0, 1]; the GLSL comment "[0, 1)" is in the shader library and unchanged.
+- `SeededRandom.State` gained `public init(version:seed:words:)` (contracts/api.md updated); `SeededRandom`'s state
+  words became `internal private(set)` with an internal initializer, without any change of output or equality.
+- The parity test strides by the surface's pixel width (display scale makes the 8×8-point view at least 16×16 pixels),
+  so it compares 256 or more words, all exactly.
