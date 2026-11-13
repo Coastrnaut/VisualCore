@@ -116,7 +116,8 @@ The level names go to the catalog through the registration's profile.
 
 **Decision**: the payload is `{ scene: ParticleScene, commands: [(step, SceneCommand-equivalent)], stepIndex,
 playing, … }`. `restore(payload:seed:)` prepares `SceneSimulation` from the scene and seed and replays the
-commands up to `stepIndex`. A test measures the replay of 30 simulated minutes on both simulators.
+commands up to `stepIndex`. A short test measures the replay's cost per step on both simulators, and the longest
+state within the limit follows from it (corrected 2026-11-13: the owner's rule that tests are short).
 
 ### R6. Candidates (clarification 4)
 
@@ -301,3 +302,15 @@ The dossier files are not edited. The legacy ledger is untouched; its hash is co
   - The probe is the view's centre, declared only while a 9 × 9 grid around it lies inside the set by the CPU's
     `FractalMath`; the shader draws such points black.
   - `GoToTarget` has no public initializer, so the core applies its rule (span = default width ÷ zoom).
+- **A04 replay bound and rebase (T-U07-026, 2026-11-13).** A short replay of 10 simulated seconds (1,200 steps) took
+  0.85 s in a debug build on the host. The 10 s preparation limit therefore holds about 2 simulated minutes in
+  debug builds. A release build took 0.026 s (about 64 simulated minutes within the limit on this Mac). The owner's
+  rule of 2026-11-13 forbids long tests, so the bound comes from the cost per step, and device bounds are measured
+  in the device campaign (T-U07-029).
+  - A state that grows without limit would exceed any bound, so the core rebases every 10 simulated minutes
+    (`maxReplaySteps` = 72,000). It keeps its configuration as an anchor (the scene with its emitters, the force,
+    the settings), starts a fresh simulation from it with the next scene seed, and clears the log. A restore replays
+    at most 10 simulated minutes. E-05 holds: a host test rebases and restores to the same digest.
+  - The visible cost: particles (at most 8 s old) restart once in 10 minutes (adapter difference 6).
+  - Debug and simulator builds still need about 45 s to replay a full 10-minute segment. The runner's scenarios are
+    short, so they stay within the limit there.

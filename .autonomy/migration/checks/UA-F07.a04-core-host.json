@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Apps/ParticleUniverse/ParticleUniverseAdapter"
+  ],
+  "command": "swift test --package-path Apps/ParticleUniverse/ParticleUniverseAdapter",
+  "elapsed_seconds": 2.646,
+  "exit_code": 0,
+  "finished": "2026-11-13T14:12:12+00:00",
+  "gate": "UA-F07",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F07.a04-core-host.log",
+  "log_sha256": "2af0ea8d53a8b34a178c99a07f907014c79c2853021d1e8f07e2ffdce1b76cad",
+  "name": "a04-core-host",
+  "started": "2026-11-13T14:12:09+00:00",
+  "timed_out": false
+}

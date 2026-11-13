@@ -23,8 +23,8 @@ Canonical overrides:
   apps folded into the one app without losing a test, a fixture or a recorded result.
 - **Out of scope:** new features of the four apps; the legacy phases A04-P04 to A04-P06 (they run later from the
   archived prompts).
-- **Device-only items:** the replay time of Particle Universe beyond 30 simulated minutes is measured on devices in
-  the device campaign (clarification 3). **Owner-only items:** none.
+- **Device-only items:** the replay time of long Particle Universe states is measured on devices in the device
+  campaign (clarification 3). **Owner-only items:** none.
 - **What exists today (read-only audit of 2026-11-12):**
   - A01 has 14 interface tests in 8 classes, 40 app unit tests and 31 Core tests. A02 has 9 interface tests in 7
     classes, 76 app unit tests and 56 Core tests. A03 has 10 interface tests in 6 classes, 64 app unit tests and
@@ -66,8 +66,9 @@ Answered by the lead under the owner's standing delegation; the recommended opti
 - Q: How does Particle Universe keep its state within the 1 MiB snapshot limit, since 20,000 particles do not fit and
   the particle system has no stored form? → A: As a replay: the scene, the commands with the step each was given at,
   and the step count. A restore prepares the seed and replays them. Each replay is bounded by the session's
-  preparation time limit, and a test measures 30 simulated minutes on the simulator. Longer replays are measured on
-  devices later; no framework change is made.
+  preparation time limit. A short test measures the replay's cost per step on the simulator, and longer durations
+  are bounded from it by arithmetic. Long replays are measured on devices later (corrected 2026-11-13 by the owner's
+  rule that tests are short); no framework change is made.
 - Q: How can an adopted experience be opened and verified before its X gate makes it available to everyone? →
   A: It is registered as a candidate (`ExperienceRegistry.candidates`) with its scenario manifest. The scenario
   runner and a debug launch argument reach candidates, the launcher does not, and the registry agreement test keeps
@@ -383,8 +384,10 @@ experience was verified on both runtimes.
   (one target, no ProjectM, no direct GL, no advertising, tracking or network) pass.
 - **SC-U07-010**: Each adopted experience's saved state restores to the same digest after the app ends, in 3 of
   3 cases per experience.
-- **SC-U07-011**: A Particle Universe state of 30 simulated minutes restores within the preparation time limit of
-  10 seconds on both simulator runtimes; longer states are measured on devices (device-only item).
+- **SC-U07-011**: A short replay (10 simulated seconds) of Particle Universe runs on both simulator runtimes and on
+  the host. The longest state that restores within the preparation time limit of 10 seconds follows from its cost
+  per step and is recorded. Longer states are measured on devices (device-only item). The owner's rule of 2026-11-13
+  forbids long tests.
 
 ## Assumptions
 

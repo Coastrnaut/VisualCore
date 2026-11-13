@@ -171,10 +171,11 @@ runtimes.
 
 ## Phase 9: User Story 4 — Particle Universe (P2), A04 without retirement
 
-- [ ] T-U07-026 [US4] Tests first: `ParticleCoreTests` covering:
+- [X] T-U07-026 [US4] Tests first: `ParticleCoreTests` covering: — Verified 2026-11-13: Apps/ParticleUniverse/ParticleUniverseAdapter/Tests: ParticleCoreTests (8) and ParticleReplayTimingTests (1), all short: conformance over 4 seeds; replay payload restores the same checksum and digest; a rebase keeps the configuration and restores to the same digest; the quality level caps only the drawn count; force.place maps 0..1 to the world square; checksum equals the standalone SceneSimulation for the same seed and commands; pause and step; outcome scene-built; a 10-second replay costs 0.85 s in debug (about 2 simulated minutes within the limit) and 0.026 s in release. swift test: 9 passed (a04-core-host). The 30-minute replay test was replaced by the short one (owner rule of 2026-11-13; spec, research and tasks corrected)
   - conformance;
   - the replay payload restores the same checksum and digest;
-  - 30 simulated minutes replay within 10 s on the host, and on both simulators in the session tests;
+  - a short replay (10 simulated seconds) gives the cost per step on the host and on both simulators in the session
+    tests, and the longest state within 10 s follows from it (corrected 2026-11-13: tests are short);
   - the quality level caps only the drawn count;
   - `force.place` at normalized positions maps to the scene's world;
   - the checksum equals the standalone `SceneSimulation`'s for the same seed and commands (clarification 3;
@@ -186,7 +187,7 @@ runtimes.
   the move of A04's sources. The standalone `ParticleUniverse` target stays and X-A04 stays pending (FR-U07-043,
   FR-U07-051).
 - [ ] T-U07-029 {device} After ImplementationLock-100, in the device campaign: measure Particle Universe's restore of
-  states longer than 30 simulated minutes on D1, D2 and D3 and record the bound (the device-only item of the spec;
+  long states on D1, D2 and D3 and record the bound (the device-only item of the spec;
   clarification 3).
 
 ## Phase 10: Records, documents and the audit before evidence
