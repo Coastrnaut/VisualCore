@@ -3068,7 +3068,8 @@ class GovernanceTests(unittest.TestCase):
     # Reviewed readers of the migration ledger. Adding a reader is a change to this list (FR-U00-039).
     LEDGER_READERS = {"scripts/validate_autocreator.py", "scripts/render_autocreator.py", "scripts/build_traceability_matrix.py",
                       "scripts/planning_index.py", "scripts/build_catalog.py",
-                      "scripts/check_app_targets.py"}  # reads gate status only (UA-F10, FR-U10-011)
+                      "scripts/check_app_targets.py",   # reads gate status only (UA-F10, FR-U10-011)
+                      "scripts/metadata_inputs.py"}     # reads X- gate status only (UA-F11, FR-U11-070)
     PUSHERS = {"scripts/tick_task.py", "scripts/prepush_scan.py"}
     SCRIPT_SUFFIXES = (".py", ".sh", ".bash", ".zsh", ".command", ".rb", ".yml", ".yaml")
     NOT_OURS = ("External/", "Vendor/", "docs/archive/")

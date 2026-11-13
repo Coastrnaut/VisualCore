@@ -1,0 +1,33 @@
+{
+  "experiences": [
+    {
+      "category": "create",
+      "code": "A01",
+      "id": "a01.generative-art-studio",
+      "name": "Generative Art Studio",
+      "permissions": [
+        "photo-library-add"
+      ],
+      "tier": "free"
+    },
+    {
+      "category": "create",
+      "code": "A02",
+      "id": "a02.fluid-art-playground",
+      "name": "Fluid Art Playground",
+      "permissions": [],
+      "tier": "free"
+    },
+    {
+      "category": "create",
+      "code": "A03",
+      "id": "a03.fractal-explorer",
+      "name": "Fractal Explorer",
+      "permissions": [],
+      "tier": "free"
+    }
+  ],
+  "ledger_sha256": "2b76cd2b1c6163ab6b3dc6a6297c64407a2ec35da97a397cdc5eca18fe18fe04",
+  "privacy_answers": "unproven",
+  "schema": 1
+}
