@@ -127,7 +127,8 @@ the same values with the new fields absent.
   below its minimum.
 - **FR-R02F02-006**: The verification evidence of every run MUST contain, in the environment's optional `renderer`
   value (a pure type with optional fields, clarification 1), the report of the host it ran on; evidence files without
-  it MUST stay valid.
+  it MUST stay valid. The record holds renderer and version strings and numbers only, never a device identifier
+  (privacy: the evidence validator rejects identifier-shaped values as it does today).
 - **FR-R02F02-007**: Reports written before this feature MUST decode with the new values absent.
 - **FR-R02F02-008**: Every new public declaration MUST be documented and in the API baseline; the API check MUST show
   only added lines; the reference regression MUST pass after the change.
