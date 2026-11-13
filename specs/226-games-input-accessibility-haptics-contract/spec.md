@@ -181,7 +181,7 @@ the preference is off; a fake player records what would play.
 ## Success Criteria *(mandatory)*
 
 - **SC-R02F26-001**: 8 of 8 recorded touch sequences give their expected action lists, identical over 3 runs each.
-- **SC-R02F26-002**: The alternatives check passes for A01–A04's declarations and fails 1 of 1 planted gap.
+- **SC-R02F26-002**: The alternatives check passes for the app's debug experience and fails 1 of 1 planted gap.
 - **SC-R02F26-003**: The announcement planner yields the expected list for 5 of 5 sequences and 0 announcements when off.
 - **SC-R02F26-004**: The colour check fails 2 of 2 planted defects and passes a valid palette.
 - **SC-R02F26-005**: The haptic planner yields the expected kinds for 5 of 5 sequences and 0 when off; a fake player
@@ -192,6 +192,6 @@ the preference is off; a fake player records what would play.
 
 ## Assumptions
 
-- The 75 games adopt the contract in their own gates; A01–A04 are not changed beyond what their declarations need for
-  the alternatives check.
+- The 75 games adopt the contract in their own gates. A01–A04 are not changed by this feature, so the evidence of UA-F07
+  and their X gates stays current. They declare their action sets in their next gates (A04-P04 and later). (Analysis D1.)
 - Haptic feel and firing are device evidence ({device}); the simulator proves only the plans and the switch.

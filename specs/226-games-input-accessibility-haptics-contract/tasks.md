@@ -29,18 +29,19 @@ task. Owner-only items: none.
 - [ ] T-R02F26-006 [US2] Write `Packages/VisualCore/Sources/VisualCoreExperience/GestureAlternatives.swift`; add
   `gestureActions` and `nativeActions` (default empty sets) to `ExperiencePresenter` in
   `Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperiencePresenter.swift`.
-- [ ] T-R02F26-007 [US2] Declare the sets in the presenters of A01–A04
-  (`Packages/ExperiencesCreative/*/Experience/*Presenter.swift`) and add one package test per experience that the
-  check finds nothing missing; a planted gap fails (SC-R02F26-002). Package tests on sim-27.2 and sim-26.5 (checks
-  `experiences-ios27`, `experiences-ios26`).
+- [ ] T-R02F26-007 [US2] Declare the sets in the app's debug experience presenter
+  (`Apps/VisualCore/App/DebugSupport/DebugExperience.swift`) and add a unit test that the check finds nothing missing
+  for it and that a planted gap fails (SC-R02F26-002). A01–A04 stay unchanged (analysis D1); app unit tests (check
+  `app-unit-alternatives`).
 
 ## Phase 4: User Stories 3 and 4 — Announcements and colour (P2)
 
 - [ ] T-R02F26-008 [P] [US3] [US4] Tests first in `Packages/VisualCore/Tests/VisualCoreSimulationTests/AccessibilityPlansTests.swift`:
   5 announcement sequences (rate limit 0.5 s, merge to newest, off → none), state-sign check (missing sign, duplicate
-  sign, valid palette).
+  sign, valid palette), and `transitionDuration(_:reduceMotion:)` (0 under Reduce Motion, unchanged otherwise;
+  FR-R02F26-050).
 - [ ] T-R02F26-009 [US3] [US4] Write `Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPlans.swift`
-  (`Announcement`, `AnnouncementPlanner`, `StateSign`, `stateSignProblems`) — texts are passed in by the caller from a
+  (`Announcement`, `AnnouncementPlanner`, `StateSign`, `stateSignProblems`, `transitionDuration`) — texts are passed in by the caller from a
   string catalog (FR-R02F26-021).
 - [ ] T-R02F26-010 [US3] Write `AnnouncementSink`, `SystemAnnouncementSink` (`UIAccessibility.post(notification:
   .announcement, argument:)`) in `Packages/VisualCoreRendering/Sources/VisualCoreUI/AccessibilityPlayers.swift`, with a
@@ -84,5 +85,14 @@ task. Owner-only items: none.
 
 US1, US2 and US3/US4 are independent; US5 depends on the planners file of Phase 4 (same file) and on the session.
 Parallel agents: arbiter + tests (G1), planners + tests (G2), UI players + tests (G3); the lead owns
-`ExperiencePresenter.swift`, `ExperienceSession.swift`, `ShellModel.swift`, the A01–A04 presenters and the app.
+`ExperiencePresenter.swift`, `ExperienceSession.swift`, `ShellModel.swift` and the app.
 MVP: US1 and US2.
+
+## Analysis
+
+- **Run 1 (2026-11-13)**:
+  - D1 HIGH: changing the A01–A04 presenters would have made the evidence of UA-F07 stale. Fixed: the check is
+    proven on the debug experience, and A01–A04 adopt the sets later.
+  - E1 MEDIUM: Reduce Motion transitions had no task. Fixed in T-R02F26-008/009.
+  - E2 LOW: the canvas label already mirrors the state. Accepted.
+  - 15 of 15 requirements and 7 of 7 criteria are covered, with no critical or high finding left.

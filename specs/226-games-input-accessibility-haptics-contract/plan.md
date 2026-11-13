@@ -56,7 +56,6 @@ Packages/VisualCoreRendering/Sources/VisualCoreUI/AccessibilityPlayers.swift    
 Packages/VisualCoreRendering/Tests/VisualCoreUITests/AccessibilityPlayersTests.swift     new  (or the rendering tests target that holds UI tests)
 Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperiencePresenter.swift modify  gestureActions, nativeActions (default empty)
 Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceSession.swift   modify  owns players; hands a feedback handle to the experience
-Packages/ExperiencesCreative/*/Experience/*Presenter.swift                              modify  A01–A04 declare their sets
 Apps/VisualCore/App/ExperienceRegistry.swift, AppModel.swift, SettingsView.swift       modify  haptics in launch and Settings
 Apps/VisualCore/Tests/Unit/, Apps/VisualCore/Tests/UI/SettingsUITests.swift             modify  tests
 READMEs, docs/api/visualcore-public-api.txt                                              modify
