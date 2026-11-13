@@ -13,7 +13,7 @@ task. Owner-only items: none.
 
 ## Phase 2: User Story 1 — Touches mean one thing at a time (P1)
 
-- [ ] T-R02F26-002 [P] [US1] Tests first in `Packages/VisualCore/Tests/VisualCoreScenesTests/GestureArbiterTests.swift`:
+- [X] T-R02F26-002 [P] [US1] Tests first in `Packages/VisualCore/Tests/VisualCoreScenesTests/GestureArbiterTests.swift`: — Verified 2026-11-13: GestureArbiterTests.swift: 9 tests (8 sequences each identical over 3 runs, third finger ignored, priority tie by declaration order, cancelAll) pass in swift test Packages/VisualCore (host-visualcore-r2)
   8 recorded sequences (tap, tap that becomes a drag, drag then a second finger to pinch, pinch released to one finger,
   long press, rotate versus pinch by priority, cancelled touch, non-finite position) give fixed outcome lists,
   identical over 3 runs; more pointers than declared are rejected.
