@@ -68,7 +68,7 @@ task. Owner-only items: none.
 
 ## Phase 6: Polish
 
-- [ ] T-R02F26-016 `check_public_api.py --update` (only added lines, 0 undocumented; check `public-api`),
+- [X] T-R02F26-016 `check_public_api.py --update` (only added lines, 0 undocumented; check `public-api`), — Verified 2026-11-13: check_public_api.py --update: 2295 lines, 73 added, 0 removed, 0 undocumented (public-api); check_documented_api.py --sources Apps/VisualCore PASS after the READMEs name ExperienceFeedback (documented-api); README sections in VisualCore and VisualCoreRendering
   `check_documented_api.py --sources Apps/VisualCore` (check `documented-api`), README sections in VisualCore and
   VisualCoreRendering.
 - [ ] T-R02F26-017 Reference regression `reference-a` and `reference-b` after the change (SC-R02F26-007).
