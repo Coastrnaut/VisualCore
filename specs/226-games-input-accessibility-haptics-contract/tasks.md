@@ -29,7 +29,7 @@ task. Owner-only items: none.
 - [X] T-R02F26-006 [US2] Write `Packages/VisualCore/Sources/VisualCoreExperience/GestureAlternatives.swift`; add — Verified 2026-11-13: GestureAlternatives.missing(gesture:native:) in VisualCoreExperience; ExperiencePresenter.gestureActions and nativeActions with empty defaults; rendering package 15/15 per runtime still pass (rendering-ios27/26) and ExperiencesCreative 274 test cases pass (experiences-ios27)
   `gestureActions` and `nativeActions` (default empty sets) to `ExperiencePresenter` in
   `Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperiencePresenter.swift`.
-- [ ] T-R02F26-007 [US2] Declare the sets in the app's debug experience presenter
+- [X] T-R02F26-007 [US2] Declare the sets in the app's debug experience presenter — Verified 2026-11-13: DebugPresenter declares nativeActions [tap]; GestureAlternativesAppTests: the debug experience has nothing missing and a planted zoom gap is named; app unit 78/78 (app-settings-r2); A01-A04 unchanged (analysis D1) (SC-R02F26-002)
   (`Apps/VisualCore/App/DebugSupport/DebugExperience.swift`) and add a unit test that the check finds nothing missing
   for it and that a planted gap fails (SC-R02F26-002). A01–A04 stay unchanged (analysis D1); app unit tests (check
   `app-unit-alternatives`).
