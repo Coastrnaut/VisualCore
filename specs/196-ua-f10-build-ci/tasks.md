@@ -95,7 +95,7 @@ Independent test: planted second shippable target, undeclared target and reused 
 
 - [X] T-U10-019 [P] [US6] Script tests first for `measure_build.py` with a fake runner: one record appended, a second — Verified 2026-11-13: scripts/tests/test_measure_build.py: 10 tests with fake runner and clock (one record appended, same commit skipped, damaged and newer-schema file refused without a write, failed and timed-out build exit 1 without a write, --check, --dry-run, touched file content unchanged), 368 OK (script-tests-tools-r2)
   run for the same commit skipped, a damaged or newer-schema file refused without a write.
-- [ ] T-U10-020 [US6] Write `scripts/measure_build.py` (research R6; data-model.md "Append only; one record per commit;
+- [X] T-U10-020 [US6] Write `scripts/measure_build.py` (research R6; data-model.md "Append only; one record per commit; — Verified 2026-11-13: scripts/measure_build.py and docs/performance/build-measurements.json (schema 1); budgets.md row points to the tool with the ADR rule for module-granularity changes; check_performance_docs.py PASS
   damaged or newer schema → refusal and no write") and `docs/performance/build-measurements.json`; point the
   budgets.md row to it (FR-U10-050, FR-U10-051).
 - [ ] T-U10-021 [US6] Acceptance: `python3 scripts/measure_build.py --milestone UA-F10` appends one record (check
