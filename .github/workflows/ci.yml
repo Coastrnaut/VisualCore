@@ -93,12 +93,16 @@ jobs:
     # Feature 196 (UA-F10, FR-U10-001, FR-U10-002): compile the one app for the iOS Simulator in Debug (with its test
     # bundles) and in Release, unsigned. The ANGLE frameworks are built locally and never in Git, so this job links
     # against link-only stand-ins generated from the tracked EGL header (every function aborts; marker
-    # vc_ci_angle_standin). The read-only reference submodule is never initialized here: the stand-ins go into its
-    # empty folder. Nothing is run, signed or published.
+    # vc_ci_angle_standin). The read-only reference submodule is checked out shallow and non-recursive for its
+    # license texts; the stand-ins go into its gitignored Build/ folder, where the real frameworks are built locally,
+    # and the reference-clean check proves afterwards that no tracked file of it changed. Nothing is run, signed or
+    # published.
     runs-on: macos-latest
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@v5
+      - name: Reference submodule (shallow, non-recursive; license texts only)
+        run: git submodule update --init --depth 1 External/projectm-ios
       - name: Xcode
         run: xcodebuild -version
       - name: XcodeGen (pin 2.46.0 in Configs/toolchain.json)
@@ -121,3 +125,5 @@ jobs:
           xcodebuild build -project VisualCore.xcodeproj -scheme VisualCore -configuration Release
           -destination 'generic/platform=iOS Simulator' -derivedDataPath Build/DerivedData/ci-release
           CODE_SIGNING_ALLOWED=NO
+      - name: Reference submodule unchanged
+        run: python3 scripts/check_reference_clean.py

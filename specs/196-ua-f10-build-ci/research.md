@@ -77,3 +77,11 @@
   tool and `nm -gU` of the generated libEGL). Tool tests live in `scripts/tests/test_<tool>.py`, collected by
   `scripts/test_scripts.py`, so parallel agents never write the same file (owner ruling of 2026-11-13).
   `check_app_targets.py` joins the reviewed readers of the migration ledger in the governance test.
+- 2026-11-13, T-U10-004/005 (corrects analysis D1): the app's "Bundle licenses (UA-F04)" build phase copies the ANGLE
+  license texts, which are tracked files of the reference submodule. The first local proof without the submodule
+  compiled and linked every Swift and C target against the stand-ins and failed only in that phase. The CI job
+  therefore checks the submodule out shallow and non-recursive, as the `checks` job already does. It writes the
+  stand-ins into the submodule's gitignored `Build/` folder, where the real frameworks are built locally, and ends with
+  `check_reference_clean.py`, which proves that no tracked file of the submodule changed. Locally the proof uses a copy
+  of the tracked files under `Build/standin-check/` with the license texts taken by `git archive` from the
+  submodule. Debug build-for-testing passes (`standin-local-build-r2`), and so does Release (`standin-local-release`).

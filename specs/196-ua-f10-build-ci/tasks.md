@@ -24,7 +24,7 @@ Owner-only items: none.
 
 Independent test: a clean commit passes the CI job `app-build`; a scratch commit breaking only Release fails it.
 
-- [ ] T-U10-003 [US1] Script tests first for `make_ci_angle_standins.py` in `scripts/test_scripts.py`: the 15
+- [X] T-U10-003 [US1] Script tests first for `make_ci_angle_standins.py` in `scripts/test_scripts.py`: the 15 — Verified 2026-11-13: scripts/tests/test_standins.py: parsing the real header gives the 15 egl functions (corrected from 16), the generated C aborts in each and carries the marker, an output folder with a framework lacking the marker is refused with exit 2, --dry-run writes only the C file; in test_scripts.py 368 OK (script-tests-tools-r2)
   prototypes of `CVisualCoreEGL.h` (corrected from 16: line 71 `eglGetPlatformDisplay` … line 87 `eglGetProcAddress`) are parsed; the
   generated C defines each with `abort()` and `vc_ci_angle_standin`; an output folder holding a framework without the
   marker is refused (exit 2).

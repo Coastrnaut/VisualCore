@@ -1,0 +1,28 @@
+{
+  "argv": [
+    "xcodebuild",
+    "build-for-testing",
+    "-project",
+    "Build/standin-check/VisualCore.xcodeproj",
+    "-scheme",
+    "VisualCore",
+    "-configuration",
+    "Debug",
+    "-destination",
+    "generic/platform=iOS Simulator",
+    "-derivedDataPath",
+    "Build/DerivedData/ua-f10-standin",
+    "CODE_SIGNING_ALLOWED=NO"
+  ],
+  "command": "xcodebuild build-for-testing -project Build/standin-check/VisualCore.xcodeproj -scheme VisualCore -configuration Debug -destination 'generic/platform=iOS Simulator' -derivedDataPath Build/DerivedData/ua-f10-standin CODE_SIGNING_ALLOWED=NO",
+  "elapsed_seconds": 27.124,
+  "exit_code": 65,
+  "finished": "2026-11-13T18:38:45+00:00",
+  "gate": "UA-F10",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F10.standin-local-build.log",
+  "log_sha256": "4e8f38f32b7c09ff37f3b32fbad61389b241d3241224a57e03da3b49475f0ec9",
+  "name": "standin-local-build",
+  "started": "2026-11-13T18:38:18+00:00",
+  "timed_out": false
+}
