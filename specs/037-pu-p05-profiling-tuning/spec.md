@@ -142,6 +142,8 @@ Pause, reseed and save still work, and the experience still draws only through t
 - **Lowest and highest tier:** step-down at the lowest tier and step-up at the highest do nothing.
 - **Noisy frames:** isolated slow frames below the window's threshold share do not change detail.
 - **Memory pressure:** the existing session rule (closing on repeated warnings) is unchanged.
+- **New session or context recreation:** the detail controller is not saved; every new session (and every context
+  recreation) starts at full detail within the heat and Low Power ceiling.
 - **Cancellation, corrupted or newer data:** not applicable (no persisted state is added).
 
 ## Requirements *(mandatory)*
