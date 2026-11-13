@@ -1,8 +1,9 @@
 {
   "schema": 1,
-  "note": "SHA-256 of the upper-case identifiers of the development Mac's simulators. Written by scripts/prepush_scan.py --record-simulators. No identifier is stored.",
+  "note": "SHA-256 of the upper-case identifiers of the development Mac's simulators, written by scripts/prepush_scan.py --record-simulators, plus one Claude Desktop session identifier that appears in a scratchpad path of recorded UA-F07 test-map commands (2026-11-13; it identifies no hardware). No identifier is stored.",
   "sha256": [
     "0ffa169834b311f2e0e29c5feddb29ff64bad28a0f2b69b8eb876cd23745bb00",
+    "136d4b2b7de74f6d35acdafd0ca4c4353922afcc7f9690ffa3a72c3f76fd1405",
     "247fc47cf061a4ab588ee87da4d83d3d65ea7e4e2c16b5fd251230328bd99dc0",
     "2a096c833a237e15c7d0300cb4adafef214bcdceb9d2798e2d057ed022016dea",
     "2ca4a2804ec07583b64ee9fa1f537ade333095ab7e80ae01ebfa014d497e5cb0",
