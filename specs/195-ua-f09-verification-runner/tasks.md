@@ -79,7 +79,7 @@ Commit after every task (`python3 scripts/tick_task.py`), and push with `python3
   - A valid simulator record passes.
   - Each of these is rejected by name: each field group missing (14), a wrong type, schema 0 or 2, a bad hash, a `result` outside three values, a pass with failures, a pass without steps or digests, a drawing pass without a frame, a UDID-shaped value, an ECID-shaped value, and `environment.kind` other than simulator or device.
   - A device record without identifiers passes, so the format stays usable on devices (FR-U09-062).
-- [ ] T-U09-016 [US4] Implement `scripts/check_evidence.py` (validator; `--self-test`; exit 0 or 1). T-U09-015 passes (FR-U09-030 to FR-U09-032; SC-U09-003).
+- [X] T-U09-016 [US4] Implement `scripts/check_evidence.py` (validator; `--self-test`; exit 0 or 1). T-U09-015 passes (FR-U09-030 to FR-U09-032; SC-U09-003). — Verified 2026-11-12: python3 scripts/test_scripts.py: Ran 243 tests, OK; python3 scripts/check_evidence.py --self-test: PASS (43 cases)
 
 ## Phase 5: User Story 3 - The app runs one scenario and exits (Priority: P1)
 
