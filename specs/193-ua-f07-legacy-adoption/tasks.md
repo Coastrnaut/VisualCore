@@ -210,7 +210,7 @@ runtimes.
   (`migration_baseline.py verify`).
 - [X] T-U07-035 Evidence `verify-a01-a03` (`python3 scripts/verify_experiences.py --only a01.generative-art-studio — Verified 2026-11-13: verify_experiences.py --only a01 a02 a03 --fresh: 27/27 scenarios on iOS 27.2 (verify-a01-a03-27) and 27/27 on iOS 26.5 (verify-a01-a03-26); --only a04.particle-universe --runtime 27 26 --fresh: 18/18 (verify-a04); summaries in docs/verification/<id>/
   a02.fluid-art-playground a03.fractal-explorer --runtime 27 26 --fresh`) and `verify-a04`.
-- [ ] T-U07-036 Evidence `test-map` (`check_test_map.py`: 56 of 56 old tests mapped, every new test exists and passed in
+- [X] T-U07-036 Evidence `test-map` (`check_test_map.py`: 56 of 56 old tests mapped, every new test exists and passed in — Verified 2026-11-13: check_test_map.py per app against the old UI tests of af887e3 (git archive) and the iOS 27.2 phone logs of the evidence pass: A01 14 to 14 (test-map-a01), A02 9 to 10 (test-map-a02), A03 10 to 12 (test-map-a03), A04 23 to 21 (test-map-a04); 56 of 56 mapped, every new test exists and passed (SC-U07-004 as corrected); the combined run (test-map) fails by design because class names repeat across apps
   the logs of the chunks; SC-U07-004).
 - [ ] T-U07-037 Evidence of the app: `xcodegen`, `app-build`, and the chunks a to f plus g to j on the phone and the tablet
   of both runtimes.
