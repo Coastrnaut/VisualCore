@@ -64,7 +64,7 @@ Independent test: planted second shippable target, undeclared target and reused 
 - [ ] T-U10-010 [P] [US3] Script tests first for `check_experience_packages.py`: missing target, extra target,
   unknown id, a registered experience whose product the app does not link, a linked product without registration,
   damaged or newer-schema catalog.
-- [ ] T-U10-011 [US3] Write `scripts/check_experience_packages.py` (research R3: code prefix → package, catalog name in
+- [X] T-U10-011 [US3] Write `scripts/check_experience_packages.py` (research R3: code prefix → package, catalog name in — Verified 2026-11-13: scripts/check_experience_packages.py (code prefix to package, catalog name in upper camel case, four targets, product linked by VisualCore, registrations as the implemented set); in ci.yml job checks and release_check.py step experience-packages
   upper camel case, four targets, product linked by `VisualCore` in `project.yml`, registrations as the implemented
   set); add it to `ci.yml` `checks` and `release_check.py` as `experience-packages` (FR-U10-020 to FR-U10-022).
 - [ ] T-U10-012 [US3] Acceptance: passes on the tree with 4 of 4 experiences (check `experience-packages`); the planted
