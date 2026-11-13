@@ -113,7 +113,7 @@ runtimes.
   a01.generative-art-studio`, and locators `experience.a01.generative-art-studio.<control>`. Write the 14 rows of
   `test-map.csv`; settings, launch and acknowledgements tests map to the one app's equivalents with their note.
   Add the chunk `-g` (`GenerativeArtStudio` classes) to the app test runs. The ported accessibility audits run at the default and the largest text size (FR-U07-022, FR-U07-030 to FR-U07-033; SC-U07-004).
-- [ ] T-U07-016 [US6] Run the A01 chunk on the iOS 27.2 phone; `check_test_map.py` on its log passes for the 14 rows.
+- [X] T-U07-016 [US6] Run the A01 chunk on the iOS 27.2 phone; `check_test_map.py` on its log passes for the 14 rows. — Verified 2026-11-13: iOS 27.2 phone: chunks g1, g2, g3 pass (app-phone-ios27-g1..g3), Settings and Launch pass (app-phone-ios27-b-r2); check_test_map.py --app GenerativeArtStudio with those logs: PASS 14 old tests mapped to 14 new tests (a01-test-map-r3). Earlier attempts kept: app-phone-ios27-b (project not regenerated), a01-test-map and -r2 (covering logs missing)
 
 ## Phase 6: User Story 7 — A01 moves and retires (P3)
 
