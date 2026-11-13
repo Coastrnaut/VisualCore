@@ -262,7 +262,7 @@ note under the tasks.
   - `configuration.automation` follows the compilation condition;
   - a summary row of a single-process save-restore says `process: single`;
   per FR-U09-024, FR-U09-051, FR-U09-034, FR-U09-013 (partial)
-- [ ] T-U09-053 Bring the contract, data model, plan, research section 3 and clarification 5 to the code as built:
+- [X] T-U09-053 Bring the contract, data model, plan, research section 3 and clarification 5 to the code as built: — Verified 2026-11-12: contract, data model, plan, research section 3 and clarification 5 edited to the code as built; validate_docs.py PASS
   - the runner's signature, `ScenarioRunResult`, `FrameColorClass`, `FrameBounds`, `EvidenceRecord.observed`, `unknownSchema`;
   - `ScenarioHostView` inside ScenarioLaunch.swift;
   - the debug id `a98.debug-experience`;
