@@ -82,11 +82,15 @@ def pick_simulator(devices_json: dict, runtime: str, kind: str,
     return found[0]["udid"], found[0]["name"]
 
 
+ACTIONS = ("test", "build-for-testing", "test-without-building")
+
+
 def test_command(project: str, scheme: str, udid: str, derived: str, only: list[str] | None,
-                 result_bundle: str | None = None) -> list[str]:
-    """The exact `xcodebuild test` command: simulator destination, explicit timeouts, unsigned; with `result_bundle`
-    also `-resultBundlePath <result_bundle>`."""
-    cmd = ["xcodebuild", "test", "-project", project, "-scheme", scheme,
+                 result_bundle: str | None = None, action: str = "test") -> list[str]:
+    """The exact `xcodebuild <action>` command: simulator destination, explicit timeouts, unsigned; with
+    `result_bundle` also `-resultBundlePath <result_bundle>`. `build-for-testing` once and then
+    `test-without-building` per chunk, in the same DerivedData, saves the build and install of every chunk."""
+    cmd = ["xcodebuild", action, "-project", project, "-scheme", scheme,
            "-destination", f"platform=iOS Simulator,id={udid}",
            "-test-timeouts-enabled", "YES", "-default-test-execution-time-allowance", "180",
            "-derivedDataPath", derived, "CODE_SIGNING_ALLOWED=NO"]
@@ -137,6 +141,8 @@ def main(argv: list[str] | None = None, root: Path = ROOT, run=subprocess.run, g
     ap.add_argument("--max-seconds", type=int, default=540,
                     help="stop the run after this many seconds and name the test it was on (default 540, below the "
                          "ten-minute limit of one foreground command); 0 disables the limit")
+    ap.add_argument("--action", choices=ACTIONS, default="test",
+                    help="test (default); build-for-testing builds once for later test-without-building chunks")
     ap.add_argument("--result-name", metavar="NAME",
                     help="also write the result bundle to .autonomy/xcresults/NAME.xcresult (an older one is removed)")
     try:
@@ -190,7 +196,7 @@ def main(argv: list[str] | None = None, root: Path = ROOT, run=subprocess.run, g
         elif bundle.exists() or bundle.is_symlink():
             bundle.unlink()
         bundle.parent.mkdir(parents=True, exist_ok=True)
-    cmd = test_command(a.project, a.scheme, udid, derived, only, str(bundle) if bundle else None)
+    cmd = test_command(a.project, a.scheme, udid, derived, only, str(bundle) if bundle else None, a.action)
     log = root / ".autonomy" / "logs" / "app-tests" / f"{log_name}.log"
     log.parent.mkdir(parents=True, exist_ok=True)
     try:
@@ -220,6 +226,9 @@ def main(argv: list[str] | None = None, root: Path = ROOT, run=subprocess.run, g
     if code != 0:
         print(f"FAIL: {what} — tests failed, xcodebuild exit {code} ({shown})")
         return 1
+    if a.action == "build-for-testing":
+        print(f"PASS: {what} — built for testing ({shown})")
+        return 0
     classes = guard_classes(only)
     guard_code = guard(sources, log, classes) if classes else guard(sources, log)
     if guard_code != 0:

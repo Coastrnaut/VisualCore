@@ -1409,6 +1409,8 @@ class AppTestRunnerTests(unittest.TestCase):
                           "-destination", "platform=iOS Simulator,id=UDID",
                           "-test-timeouts-enabled", "YES", "-default-test-execution-time-allowance", "180",
                           "-derivedDataPath", "Build/DerivedData/x", "CODE_SIGNING_ALLOWED=NO"])
+        self.assertEqual(apprunner.test_command("P.xcodeproj", "S", "U", "D", [], action="test-without-building")[1],
+                         "test-without-building")
         cmd = apprunner.test_command("P.xcodeproj", "S", "U", "D", ["VisualCoreTests/A", "VisualCoreUITests/B/testC"])
         self.assertEqual(cmd[-2:], ["-only-testing:VisualCoreTests/A", "-only-testing:VisualCoreUITests/B/testC"])
         self.assertIn("CODE_SIGNING_ALLOWED=NO", cmd)
