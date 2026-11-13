@@ -231,3 +231,48 @@ audit of T-U09-030.
   network or a device, and the renderer is unchanged.
 - **Run 2 (2026-11-12)**: coverage 100% (46 of 46 requirement and criterion ids traced, ranges included); no
   critical or high finding; no further change.
+
+## Phase 13: Convergence
+
+Appended by `/speckit-converge` run 1 (2026-11-12, the audit of T-U09-030). It checked 36 requirements, 10 success
+criteria, the acceptance scenarios and edge cases, the plan's touch-points and 15 constitution principles, and
+found 22 gaps: 0 critical, 5 high, 7 medium, 10 low. The tasks below act on 18 of them; 4 are accepted in the
+note under the tasks.
+
+- [ ] T-U09-041 Judge the save-phase record of the app's save-restore: validate it, require `result: pass`, and fail the scenario with the save launch's failures. Add a VerifyDriverTests case with a failing save record per FR-U09-013, FR-U09-024 (partial)
+- [ ] T-U09-042 Resume skips a passed scenario only when it passed at the current commit with the same app or test binary hash. Rerun a pass of another commit, and add a test per FR-U09-021, Constitution VI (contradicts)
+- [ ] T-U09-043 Run the sample's endurance at 600 simulated seconds (36,000 frames, the UA-F06 length) and attach its record `evidence-a99.contract-sample-endurance.json`. The driver validates and counts it like the other records per FR-U09-005, FR-U09-060 (contradicts)
+- [ ] T-U09-044 The manifest validator requires:
+  - an expected outcome and at least one action in `completion`;
+  - at least one action in `input-response` and `rejection`;
+  - an expected result for every action in `rejection`.
+  Add tests for each per FR-U09-001, FR-U09-004 (partial)
+- [ ] T-U09-045 Validate the manifest at load in the app's scenario run. Problems give an error record (`request.invalid-manifest` with the problems) and exit 2. Add a unit test with a broken manifest per FR-U09-002, FR-U09-011 (missing)
+- [ ] T-U09-046 Build the run's targets from the real registry: a registration may carry a scenario manifest in builds for testing or automation. Add a test that a registered experience with a manifest is a target, and correct the doc comment per FR-U09-011, clarification 5 (partial)
+- [ ] T-U09-047 Terminate the app (`xcrun simctl terminate`, bounded) when a scenario gives no record or does not exit. End the record wait early, with "the app exited without a record (crash)", when the process is gone. Kill the whole process group of a test run at its limit. Add tests per FR-U09-024, SC-U09-009 (partial)
+- [ ] T-U09-048 The summary's bundle block carries the destination and the names of failed tests from `xcresulttool`, and each record's `artifacts.result_bundle` points to the bundle. Record honestly that SC-U09-008 (a bundle with a failed test fails its step) is proven with fixture outputs and with real passing bundles per FR-U09-023, SC-U09-008 (partial)
+- [ ] T-U09-049 Keep the frame: the app writes the RGBA bytes of the read frame beside its record (`<id>.<scenario>.frame.rgba`) and the package tests attach them. The driver copies the frame to `.autonomy/verify/<run>/`, checks its SHA-256 against the record and sets `frames[].path` per FR-U09-020, FR-U09-033 (missing)
+- [ ] T-U09-050 The content audit reads a game's levels from the runtime catalog's `content.levels`, not from a manifest. The bypass and content audits print "nothing to audit yet (0 registered experiences)" instead of PASS while nothing is registered. Record that both audits act from the first registration (UA-F07) per FR-U09-052, FR-U09-053 (partial)
+- [ ] T-U09-051 Give the debug experience's manifest expected digests (initial, after each tap, final), computed from its core on a bare engine and committed, with a test that they hold per FR-U09-003 (partial)
+- [ ] T-U09-052 Small corrections:
+  - test runs limited to 540 s;
+  - the raster allow-list requires a tracked generator and a path in the app icon set;
+  - `--audits` with `--only` audits only;
+  - a request error is written to the request's run folder when its run id parses;
+  - `configuration.automation` follows the compilation condition;
+  - a summary row of a single-process save-restore says `process: single`;
+  per FR-U09-024, FR-U09-051, FR-U09-034, FR-U09-013 (partial)
+- [ ] T-U09-053 Bring the contract, data model, plan, research section 3 and clarification 5 to the code as built:
+  - the runner's signature, `ScenarioRunResult`, `FrameColorClass`, `FrameBounds`, `EvidenceRecord.observed`, `unknownSchema`;
+  - `ScenarioHostView` inside ScenarioLaunch.swift;
+  - the debug id `a98.debug-experience`;
+  - the scenario screen that keeps the host view out of the window;
+  - result bundles of the package path;
+  - the accepted items below;
+  per the documents (contradicts)
+
+Accepted without a task (run 1):
+- G12: the runner's frames always carry the fixed delta of `renderOneFrame`, so suspend-resume cannot express time away in frames. The engine's catch-up limit is proven by its own host tests, and the runner proves that no step and no digest change happens while suspended.
+- G17: that a reset clears only the experience's own storage is proven by the UA-F05 tests of the app; the runner checks the digest.
+- G19: the scenario screen shows a line of text and keeps the session's host view out of the window. That is the decision that makes frames deterministic (no display link); it is recorded in research section 3.
+- G20 (shader timing): `shader_compilation_ms` is the scene's set-up time, in which the shaders are compiled. The setup compiles and links, so the name stands; the program count is in the session's timings.

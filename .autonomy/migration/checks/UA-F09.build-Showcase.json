@@ -1,0 +1,26 @@
+{
+  "argv": [
+    "xcodebuild",
+    "build-for-testing",
+    "-project",
+    "VisualCore.xcodeproj",
+    "-scheme",
+    "Showcase",
+    "-destination",
+    "generic/platform=iOS Simulator",
+    "-derivedDataPath",
+    "Build/DerivedData/ua-f09-Showcase",
+    "CODE_SIGNING_ALLOWED=NO"
+  ],
+  "command": "xcodebuild build-for-testing -project VisualCore.xcodeproj -scheme Showcase -destination 'generic/platform=iOS Simulator' -derivedDataPath Build/DerivedData/ua-f09-Showcase CODE_SIGNING_ALLOWED=NO",
+  "elapsed_seconds": 14.137,
+  "exit_code": 0,
+  "finished": "2026-11-13T00:57:10+00:00",
+  "gate": "UA-F09",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F09.build-Showcase.log",
+  "log_sha256": "04eee0cbbe553855608b5611cf4209def5c03fed1e8d52410c913bed2015e908",
+  "name": "build-Showcase",
+  "started": "2026-11-13T00:56:55+00:00",
+  "timed_out": false
+}
