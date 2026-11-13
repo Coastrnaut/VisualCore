@@ -306,7 +306,8 @@ the generator on a fixture ledger with a pending gate.
 **No advertising, analytics or tracking (story 3)**
 - **FR-U11-020**: A scan of the built app MUST fail on any linked advertising-support or tracking-transparency
   framework, any reference to the advertising identifier or tracking-authorization calls, and any name from a
-  maintained deny list of advertising, analytics, attribution and crash-reporting libraries.
+  maintained deny list of advertising, analytics, attribution and crash-reporting libraries. The deny list MUST cover
+  each of these four kinds with at least three widely used libraries.
 - **FR-U11-021**: The scan MUST cover the main executable, every embedded framework and library and every bundled
   file, and report each finding with its file.
 - **FR-U11-022**: The source compliance check MUST fail on an import of the advertising-support or
@@ -322,7 +323,9 @@ the generator on a fixture ledger with a pending gate.
   `docs/legal/third-party.json` with an allowed license and an existing text.
 - **FR-U11-031**: A built-app assertion MUST pass only when the bundled license set equals the inventory entries
   marked as shipped and every bundled text equals its repository text.
-- **FR-U11-032**: The app MUST show every shipped license by name with its full text in the acknowledgements.
+- **FR-U11-032**: The app MUST show every shipped license by name with its full text in the acknowledgements; each
+  row has a VoiceOver label (the component name), a stable identifier and a touch target of at least 44 points, and
+  the text reflows at every Dynamic Type size (system audits of this screen run in the device campaign).
 - **FR-U11-033**: License texts MUST never be removed, rewritten or merged by the agent.
 
 **ProjectM (story 5)**
@@ -413,3 +416,6 @@ the generator on a fixture ledger with a pending gate.
 - Permissions for A06–A08 (microphone) are declared when those experiences are integrated; this feature provides
   the vocabulary and the check, not their usage descriptions.
 - UA-F04 and UA-F10 are pass in the migration ledger.
+- Built-app checks run on the iOS Simulator Release build, which is compiled from the same sources and links the
+  same frameworks as the device build; scanning the signed device archive belongs to release packaging (UA-F14) and
+  the device campaign, not to this gate. No requirement of this feature needs a device.
