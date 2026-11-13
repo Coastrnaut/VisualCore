@@ -72,7 +72,7 @@ API-baseline and reference-regression tasks apply.
   (check `verify-a01-a03`).
 - [X] T-R02F04-018 Reference regression chunk 1 (check `reference-1`): `python3 scripts/release_check.py --only — Verified 2026-11-13: reference chunk 1: 3/3 PASS (reference-1)
   reference-engine-xcframework reference-build-projectm-ios-sim reference-clean`.
-- [ ] T-R02F04-019 Reference regression chunk 2 (check `reference-2`): `python3 scripts/release_check.py --only
+- [X] T-R02F04-019 Reference regression chunk 2 (check `reference-2`): `python3 scripts/release_check.py --only — Verified 2026-11-13: reference chunk 2: 4/4 PASS, regression 7 of 7 (reference-2)
   reference-test-anglerendering-ios27 reference-test-anglerendering-ios26 projectm-reference-ios27 projectm-reference-ios26`.
 - [ ] T-R02F04-020 Script tests `python3 scripts/test_scripts.py` (check `script-tests`).
 - [ ] T-R02F04-021 Auto-Creator.md section 13 row R02-F04 as built via `docs/catalog/shared-feature-map.json` and
