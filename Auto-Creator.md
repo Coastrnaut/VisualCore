@@ -3156,9 +3156,21 @@ Connect, the Paid Apps agreement, the price, the Family Sharing choice and a san
   through ReplayKit, unsupported screen-recording entitlements and invented background modes.
 - No data leaves the device. No analytics, tracking, advertising identifier or third-party SDK.
 - One `PrivacyInfo.xcprivacy`, audited against the built app including dependencies
-  (`scripts/check_privacy_manifest.py`). A checked-in manifest alone proves nothing.
+  (`scripts/check_privacy_manifest.py`). A checked-in manifest alone proves nothing. As built (UA-F11): the release
+  check runs the audit on the Release app and writes a report with the revision, a clean-tree flag and the scanned
+  executable's digest (`scripts/report_meta.py`); the manifest declares UserDefaults, SystemBootTime and
+  FileTimestamp, and the Release app uses exactly these.
 - Usage descriptions exist only for capabilities that registered experiences use. Captured audio is processed in
-  memory and not retained by default. Real-time audio callbacks do not allocate or wait on locks.
+  memory and not retained by default. Real-time audio callbacks do not allocate or wait on locks. As built (UA-F11):
+  an experience declares its permissions in `Catalog/registrations.json` (`permissions`, words of
+  `Configs/permission-vocabulary.json`, which also holds each usage text); `scripts/check_usage_descriptions.py`
+  requires the app's usage keys and texts to equal the union of the registered declarations (today one key, A01's
+  photo library add), in CI and on the Release app.
+- No advertising, analytics or tracking (UA-F11): `scripts/check_no_tracking.py` scans every binary, linked library
+  and bundled file of the Release app against `Configs/tracking-denylist.json` (frameworks, symbols and libraries of
+  four kinds; allowances only with a reason, an unused one fails); `scripts/check_compliance.py` rejects the same
+  frameworks, APIs and library imports in sources. Any finding fails the gate; CI runs the scan on its stand-in
+  Release build.
 - Export-compliance declarations, the privacy policy, the license agreement text and the privacy answers are
   drafted from the built product (UA-F14). Usage descriptions are the union of what the registered experiences
   need, for example the microphone for A06–A08. The privacy label of the app therefore reflects every
@@ -3177,7 +3189,9 @@ non-gating.
 ### 15.4 Licensing and originality
 
 - ANGLE notices and every third-party license are bundled and shown in the app; `docs/legal/third-party.json` is
-  complete; `scripts/check_licenses.py` passes.
+  complete; `scripts/check_licenses.py` passes, and with `--app` it requires the built app's `Licenses/` to equal
+  the shipped inventory byte for byte. An interface test opens About → Acknowledgements and finds every shipped
+  license (UA-F11).
 - ProjectM and its presets are reference material of the harness. They are not linked into or shipped with the
   app; a symbol and dependency scan of the built app proves it.
 - Every shader and generated asset in the bundle has provenance in the repository.
@@ -3187,7 +3201,14 @@ non-gating.
 - A distinctiveness matrix over all pairs of the 100 launch experiences (core abstraction, player action, win
   rule) shows that no two share a mechanic. The six close pairs named by the Round 2 source are checked first. A
   near-duplicate is redesigned before the lock; it is never merged or dropped (section 6.5). Names, trademarks
-  and the age rating are owner reviews.
+  and the age rating are owner reviews. As built (UA-F11): `scripts/check_distinctiveness.py` generates
+  `docs/legal/distinctiveness-matrix.json` and `.md` from the catalog (4,950 pairs; a shared mechanic is an equal
+  normalized triple, an equal player action, or a Jaccard similarity of player-action words of at least 0.5) and
+  fails on a shared mechanic, a stale matrix, a duplicate name or slug, or a name in `Configs/known-game-titles.json`.
+  The highest launch pair scores 0.375. The human review is recorded in `specs/197-ua-f11-compliance/owner-review.md`.
+- Store metadata inputs (UA-F11): `scripts/metadata_inputs.py` writes `docs/release/metadata-inputs.json` with only
+  the launch experiences whose integration gate is pass, and states "data not collected" and "no tracking" only
+  from passing privacy and tracking reports of one executable digest. UA-F14 drafts the store text from it.
 - Scans look for advertising SDKs, advertising identifiers, trackers, remote image pipelines, placeholder branding
   and copied art or audio. A clean scan is evidence, not legal assurance.
 - Scientific content (astronomy, molecules, anatomy) carries sources and revision notes and is educational, not
