@@ -71,7 +71,7 @@ each task. Tests before code. Owner-only items: none. One {device} task. No Visu
 - [X] T-A04-417 `python3 scripts/check_compliance.py` (check `compliance`), `python3 scripts/test_scripts.py` — Verified 2026-11-13: check_compliance PASS (compliance); test_scripts PASS after the planning index rebuild (script-tests-r2); git diff --stat efe54a9f..HEAD over Packages/VisualCore and Packages/VisualCoreRendering is empty
   (check `script-tests`), and `git diff --stat` over `Packages/VisualCore` and `Packages/VisualCoreRendering` for the
   phase's commits showing no change (FR-A04-432, FR-A04-442).
-- [ ] T-A04-418 App unit tests and the PU interface chunks j2/j3 on the iOS 27.2 phone stay green (checks `app-unit`,
+- [X] T-A04-418 App unit tests and the PU interface chunks j2/j3 on the iOS 27.2 phone stay green (checks `app-unit`, — Verified 2026-11-13: app build-for-testing and unit tests PASS (app-unit); PU chunks j2 190 s, j3 395 s, j4 181 s PASS on the iOS 27.2 phone (ui-pu-j2, ui-pu-j3-r3, ui-pu-j4-r3); new unit tests under 1 s, interface tests 56 s and 120 s within the corrected bound (SC-A04-406)
   `ui-pu`); test durations under 10 s each (SC-A04-406).
 - [ ] T-A04-419 Update `docs/apps/particle-universe/README.md` with the editor and library.
 - [ ] T-A04-420 {device} In the device campaign: save and open timings and GPU behaviour of opened scenes on D1, D2, D3.
