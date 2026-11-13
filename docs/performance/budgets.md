@@ -21,6 +21,7 @@ samples are kept apart.
 | Start | cold and warm start recorded apart; a bounded set of shader variants compiled in the set-up | proposal | D1, D2, D3: scenarios `launch` (cold) and `relaunch` (warm), 200 samples per device |
 | Memory and graphics bytes | bounded by the declared resource budget; flat over a ten-minute scenario (the growth rule of feature 192) | proposal | D1, D2, D3: scenario `endurance` on the wall clock, 200 samples per device; the simulator run of feature 192 is a development signal only |
 | Clean build, incremental build and app size | recorded at every milestone | proposal | tooling: `python3 scripts/measure_build.py --milestone <gate>` appends to `docs/performance/build-measurements.json` (UA-F10; simulator build, no device measurement); a module-granularity change needs an ADR with a measurement before and after |
+| Particle Universe frame-time detail (feature 037, A04-P05) | drawn detail steps down one tier when more than 25% of 120 frames exceed 1.2× the frame interval and up one tier when 95% of 600 frames stay under 0.8×, never above the heat and Low Power ceiling; resuming never runs more than 8 simulation steps in one frame | proposal | D1, D2, D3: scenario `steady` with Particle Universe at the default scene and at 8 emitters, 200 samples per device (pending the device campaign; the simulator profile of A04-P05 is a development signal only) |
 
 ## What the app measures (feature 192)
 

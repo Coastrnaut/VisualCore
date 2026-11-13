@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_performance_docs.py"
+  ],
+  "command": "python3 scripts/check_performance_docs.py",
+  "elapsed_seconds": 0.026,
+  "exit_code": 0,
+  "finished": "2026-11-13T22:58:27+00:00",
+  "log": ".autonomy/logs/A04-P05.performance-docs.log",
+  "log_sha256": "55f7b9453b4a7445b6150191e5e79afcfe009e012eeef2e8af8e74529d88d06d",
+  "name": "performance-docs",
+  "stage": "A04-P05",
+  "started": "2026-11-13T22:58:27+00:00",
+  "timed_out": false
+}
