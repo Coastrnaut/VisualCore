@@ -265,3 +265,17 @@ Each further experience is an increment that can be reverted alone. Evidence run
   resolved by the clarifications and ADR-0011.
 - **Run 2 (2026-11-13)**: coverage is 100% (47 of 47 requirement and criterion ids traced); no critical or high
   finding remains.
+
+## Phase 12: Convergence
+
+Appended by `/speckit-converge` (T-U07-033, 2026-11-13). Implemented before T-U07-034.
+
+- [ ] T-U07-042 Run the save-restore scenario across two launches 3 times each for A02, A03 and A04 on iOS 27.2
+  (`verify_experiences.py --only <id> --runtime 27 --scenario save-restore --fresh`, checks `a02-persist-run1..3`,
+  `a03-persist-run1..3`, `a04-persist-run1..3`); only A01 has the 3 of 3 record per SC-U07-010 (partial)
+- [ ] T-U07-043 Retire the standalone screens that the one app cannot reach: A01 `GalleryView`, `SceneScreen` and
+  `SettingsView` (the app's own motion setting), A02 `PlaygroundView` and A03 `ExplorerView`, with every test that
+  drives them moved to the experience's presenter or controls or mapped in research.md; A04's `SandboxView` stays
+  for the standalone target until X-A04 per FR-U07-016 and FR-U07-013 (unrequested)
+- [ ] T-U07-044 Replace the retired app paths in the usage examples of `scripts/check_test_enumeration.py` and
+  `scripts/check_app_isolation.py` with paths that exist per FR-U07-044 (partial)
