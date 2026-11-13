@@ -72,7 +72,7 @@ Independent test: planted second shippable target, undeclared target and reused 
 
 ## Phase 6: User Story 4 — Experiences stay independent (P2)
 
-- [ ] T-U10-013 [P] [US4] Script tests first for rules R6, R7, R8 of `check_dependencies.py` in a temporary tree.
+- [X] T-U10-013 [P] [US4] Script tests first for rules R6, R7, R8 of `check_dependencies.py` in a temporary tree. — Verified 2026-11-13: scripts/tests/test_dependency_rules.py: 5 tests (clean package, R6, R7, R8 without a duplicate R1, real repository) pass in test_scripts.py (script-tests-tools-r2, before the seal; the tick was missed by an argument error)
 - [X] T-U10-014 [US4] Add R6–R8 to `scripts/check_dependencies.py` (research R4) and its docstring (FR-U10-030). — Verified 2026-11-13: scripts/check_dependencies.py rules R6 (cross-experience import), R7 (cross-experience target dependency), R8 (ProjectM import in an experience; R1 skips experience sources so a line is reported once), docstring and --root; real tree PASS R1-R8 hold (dependencies)
 - [X] T-U10-015 [US4] Acceptance: `python3 scripts/check_dependencies.py` passes (check `dependencies`); 3 of 3 planted — Verified 2026-11-13: python3 scripts/check_dependencies.py PASS (dependencies); 3 of 3 planted defects (R6, R7, R8) fail in scripts/tests/test_dependency_rules.py (SC-U10-004)
   defects fail (SC-U10-004).
