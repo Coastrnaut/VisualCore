@@ -52,7 +52,7 @@ reverted alone.
   `-vcCandidates` in `DebugLaunch.swift`. `-vcCandidates` makes the candidates' fixture entries available and
   registers them. The registry agreement test keeps comparing only `all` with the catalog (FR-U07-021;
   clarification 4).
-- [ ] T-U07-006 ADR-0011 `docs/decisions/ADR-0011-fluid-picture-presentation.md`: the fluid picture of A02 is
+- [X] T-U07-006 ADR-0011 `docs/decisions/ADR-0011-fluid-picture-presentation.md`: the fluid picture of A02 is — Verified 2026-11-13: docs/decisions/ADR-0011-fluid-picture-presentation.md written (A02 state is CPU state, the fluid picture is presentation, quality levels act only on how a state is shown; E-04, E-05, E-13 of Auto-Creator.md section 6); validate_autocreator.py passes
   presentation; the digest and the snapshot cover the CPU state; quality levels act on how a state is shown
   (clarifications 1 and 2).
 

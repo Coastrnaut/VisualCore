@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "test",
+    "-s",
+    "docs/decisions/ADR-0011-fluid-picture-presentation.md"
+  ],
+  "command": "test -s docs/decisions/ADR-0011-fluid-picture-presentation.md",
+  "elapsed_seconds": 0.005,
+  "exit_code": 0,
+  "finished": "2026-11-13T11:19:56+00:00",
+  "gate": "UA-F07",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F07.adr-0011.log",
+  "log_sha256": "fae6829140bec422c657582a0dd98eecda2a08c88fac3939dcaf4b0c8d07067f",
+  "name": "adr-0011",
+  "started": "2026-11-13T11:19:56+00:00",
+  "timed_out": false
+}
