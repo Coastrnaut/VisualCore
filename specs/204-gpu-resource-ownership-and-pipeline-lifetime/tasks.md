@@ -39,7 +39,7 @@ API-baseline and reference-regression tasks apply.
   presets' fields (data-model: "opaque (none, no depth, no cull, all)", "alphaBlended (alpha)", "additive
   (additive, depthWrite false)", "opaque3D (none, depthTest true, depthWrite true, cull back)"); equality and hashing.
 - [X] T-R02F04-007 [US2] Write `Packages/VisualCore/Sources/VisualCoreShaderSource/RenderState.swift` per contracts/api.md. — Verified 2026-11-13: VisualCoreShaderSource/RenderState.swift per contracts/api.md with /// docs; tests pass (host-visualcore)
-- [ ] T-R02F04-008 [US2] Tests first in `Packages/VisualCoreRendering/Tests/VisualCoreRenderingTests/PipelineTests.swift`:
+- [X] T-R02F04-008 [US2] Tests first in `Packages/VisualCoreRendering/Tests/VisualCoreRenderingTests/PipelineTests.swift`: — Verified 2026-11-13: PipelineTests 5 tests: 4 presets plus a custom state after 3 prior states (15 read-backs of blend, depth, cull, mask, program), two pipelines in turn, identity equality, released and stale programs refused and counted; pass on 27.2 and 26.5
   apply each preset after 3 different prior states and read back via `glIsEnabled`/`glGetIntegerv`/`glGetBooleanv`
   (blend enable and factors, depth test, depth mask, cull enable and face, colour mask, current program); `Pipeline`
   equality by program identity; a released program and a program from before `recreateContext()` are refused
