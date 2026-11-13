@@ -65,3 +65,9 @@ each task. Tests before code. Owner-only items: none. One {device} task. No Visu
 ## Parallel execution
 
 Agent A: 504–506. Agent B: 502, 508. Lead: 501, 503, 507, 509–515.
+
+## Phase 7: Convergence
+
+Appended by `/speckit-converge` (T-A04-515, round 1, 2026-11-13).
+
+- [ ] T-A04-516 Take the monitor's budget from the frame interval the host reports in `Packages/ExperiencesCreative/ParticleUniverse/Experience/ParticlePresenter.swift` (`targetTimestamp − time` when finite and positive, else 1/60 s; rebuild the monitor at the same tier when the interval changes by more than 10%), with a test in `ParticleDetailTests.swift`, per FR-A04-510 and the clarification on the frame budget (partial)
