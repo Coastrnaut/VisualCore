@@ -58,7 +58,9 @@ Independent test: a fresh host's report holds every value of FR-R02F02-001 and 0
 
 - [ ] T-R02F02-012 [US4] `check_public_api.py --update`: only added lines, 0 undocumented (check `public-api`);
   `check_documented_api.py --sources Apps/VisualCore` (check `documented-api`); package READMEs list the new values
-  and the record.
+  and the record; `git diff --exit-code <base> -- Packages/VisualCoreRendering/Sources/VisualCoreRendering/EGLDisplayProvider.swift`
+  proves the window configuration is unchanged (FR-R02F02-009, check `window-config-unchanged`); the review confirms
+  only tracked constant declarations are used (FR-R02F02-010).
 - [ ] T-R02F02-013 [US4] Reference regression after the change: `reference-a` and `reference-b` (7 of 7) (SC-R02F02-005).
 
 ## Phase 6: Polish
@@ -73,3 +75,8 @@ Independent test: a fresh host's report holds every value of FR-R02F02-001 and 0
 US1 before US2 (same files). US3 (pure record, validator, mapping) runs in parallel with US1/US2: agents may write
 `RendererRecord.swift` with its tests and `test_evidence_renderer.py`; the lead owns `RenderCapabilities.swift`,
 `RenderHost.swift`, `EvidenceRecord.swift`, `check_evidence.py` and `ScenarioLaunch.swift`. MVP: US1 and US2.
+
+## Analysis
+
+- **Run 1 (2026-11-13)**: E1 MEDIUM (no task proved FR-R02F02-009) fixed in T-R02F02-012; E2 LOW (FR-R02F02-010 by
+  review) accepted. 10 of 10 requirements and 5 of 5 criteria covered; no critical or high finding.
