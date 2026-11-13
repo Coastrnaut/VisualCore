@@ -180,7 +180,7 @@ runtimes.
   - `force.place` at normalized positions maps to the scene's world;
   - the checksum equals the standalone `SceneSimulation`'s for the same seed and commands (clarification 3;
     SC-U07-011).
-- [ ] T-U07-027 [US4] `ParticleCore`, `ParticlePresenter` (the source reads the core, with no stepping in the render
+- [X] T-U07-027 [US4] `ParticleCore`, `ParticlePresenter` (the source reads the core, with no stepping in the render — Verified 2026-11-13: ParticleCore (replay snapshot with a rebase every 10 simulated minutes) and manifest (host 12/12, a04-core-host re-run), ParticlePresenter (ParticleLayerScene source reads the core, level caps the drawn count, taps and drags to force.place, background probe), ParticleControls (playback, emitters, family, size, lifetime, colours, force kind, centre, nudge, strength, trails, blend, new seed; labels and 44 pt), static framework ParticleUniverseExperience and candidate registration; ParticleSessionTests 5/5 incl. restore by replay and a short replay's cost on iOS 27.2 and 26.5 (a04-session-ios27/26); runner 9/9 on 27.2 and 26.5 (a04-verify-27, a04-verify-26). E-12 at the largest text size is checked by the ported audit (T-U07-028)
   callback; taps and drags become `force.place` actions), `ParticleControls`, `ParticleManifest`; the framework target
   and candidate; session tests on both runtimes; controls meeting E-12 (FR-U07-022).
 - [ ] T-U07-028 [US4] Port A04's 23 UI tests (`PU…`, chunk `-j`) with their map rows. Then the runner on both runtimes and

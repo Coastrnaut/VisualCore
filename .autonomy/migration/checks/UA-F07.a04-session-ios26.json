@@ -1,0 +1,29 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_app.py",
+    "--scheme",
+    "VisualCore",
+    "--runtime",
+    "26.5",
+    "--kind",
+    "phone",
+    "--sources",
+    "Apps/ParticleUniverse/ParticleUniverseAdapter/ExperienceTests",
+    "--only-testing",
+    "ParticleUniverseExperienceTests",
+    "--log-name",
+    "ua-f07-a04-session-ios26"
+  ],
+  "command": "python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime 26.5 --kind phone --sources Apps/ParticleUniverse/ParticleUniverseAdapter/ExperienceTests --only-testing ParticleUniverseExperienceTests --log-name ua-f07-a04-session-ios26",
+  "elapsed_seconds": 21.841,
+  "exit_code": 0,
+  "finished": "2026-11-13T15:18:02+00:00",
+  "gate": "UA-F07",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F07.a04-session-ios26.log",
+  "log_sha256": "0b851a663810bac27eee1c8a9e365b2a039c496ab64a84b7f1b3eec4a7d712fb",
+  "name": "a04-session-ios26",
+  "started": "2026-11-13T15:17:41+00:00",
+  "timed_out": false
+}

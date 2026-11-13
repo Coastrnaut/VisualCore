@@ -327,3 +327,14 @@ The dossier files are not edited. The legacy ledger is untouched; its hash is co
     - `bookmark-v1.json` moved bit-identical to `ExperienceTests/Fixtures`, and `MigrationTests` reads it there;
     - `CopyTests` and `PrivacyTests` are adapted as for A02; the privacy test also checks the one app's export
       compliance key.
+- **A04 adapter (T-U07-027, 2026-11-13).**
+  - The presenter draws the core's particles through VisualCore's `ParticleLayerScene` over the app's world square.
+    Its source only reads the core, and the drawn count is capped by the level's share. Taps and drags become
+    `force.place` at the world point under the finger, found with `ParticleLayerScene.worldPoint`.
+  - The probe is the top middle of the canvas while no particle (by the CPU's positions and sizes) covers it, and
+    trails are off; it expects the black background.
+  - Under Reduce Motion the controls pause the scene once, as the standalone app starts paused.
+  - On the iOS 27.2 simulator (debug), a 10-second replay took 0.25 s, so the 10 s limit holds about 6.8 simulated
+    minutes there. That is below the 10-minute rebase interval in a debug simulator build; release builds hold far
+    more (0.026 s on the Mac). Device bounds come from the device campaign (T-U07-029). The rebase interval stays at
+    10 minutes, and a shorter interval for debug builds is left to that measurement.
