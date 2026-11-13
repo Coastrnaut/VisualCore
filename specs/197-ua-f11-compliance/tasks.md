@@ -44,7 +44,7 @@ Device-only items: none, so no {device} task.
 - [X] T-U11-008 [P] [US2] Write `Configs/permission-vocabulary.json` (schema 1; word "lower-case kebab, 3–40 chars, — Verified 2026-11-13: Configs/permission-vocabulary.json schema 1: photo-library-add (project.yml text), microphone, camera; validated by build_catalog load_vocabulary
   unique" → `key` matching `^NS[A-Za-z]+UsageDescription$`, each key used once, and `text` of 20–200 characters):
   `photo-library-add` with the current `project.yml` text, `microphone`, `camera`.
-- [ ] T-U11-009 [US2] Modify `scripts/build_catalog.py`: optional `permissions` registration key validated against
+- [X] T-U11-009 [US2] Modify `scripts/build_catalog.py`: optional `permissions` registration key validated against — Verified 2026-11-13: build_catalog.py accepts optional permissions (0-8 distinct vocabulary words, not in runtime catalog); a01 declares photo-library-add; build_catalog --check PASS (build-catalog); 390 VisualCoreExperienceTests pass
   the vocabulary, not copied into the runtime catalog; add `"permissions": ["photo-library-add"]` to
   `a01.generative-art-studio` in `Catalog/registrations.json`; `python3 scripts/build_catalog.py --check` passes.
 - [ ] T-U11-010 [US2] Write `scripts/check_usage_descriptions.py` (`--plist` default
