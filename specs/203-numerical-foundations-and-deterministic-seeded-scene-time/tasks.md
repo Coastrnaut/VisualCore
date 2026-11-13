@@ -44,7 +44,7 @@ none (no {owner} task). VisualCore changes, so the documentation, API-baseline a
   (`State { version, seed, words }`, `state`, `init(restoring:) throws(RandomStateError)`); if the state words must be
   read from the extension, change `private` to `fileprivate`/`internal` in `SeededRandom.swift` without changing
   output.
-- [ ] T-R02F03-010 [US3] Acceptance: host tests pass (check `host-state`) (SC-R02F03-004).
+- [X] T-R02F03-010 [US3] Acceptance: host tests pass (check `host-state`) (SC-R02F03-004). — Verified 2026-11-13: host-visualcore PASS incl. state tests (SC-R02F03-004)
 
 ## Phase 5: User Story 4 — Shader hash twin (P2)
 
