@@ -99,4 +99,4 @@ MVP: US1 (the defect). Review checkpoint after each story's acceptance.
 
 Appended by `/speckit-converge` (T-R02F04-023, round 1, 2026-11-13).
 
-- [ ] T-R02F04-024 Add a test to `Packages/VisualCoreRendering/Tests/VisualCoreRenderingTests/DepthTargetTests.swift` that draws the far-then-near and near-then-far triangles into a depth target through `GLState.apply(Pipeline(program:state: .opaque3D), resources:)` and reads back the nearer colour both times, per T-R02F04-011 and US2/US3 integration (partial)
+- [X] T-R02F04-024 Add a test to `Packages/VisualCoreRendering/Tests/VisualCoreRenderingTests/DepthTargetTests.swift` that draws the far-then-near and near-then-far triangles into a depth target through `GLState.apply(Pipeline(program:state: .opaque3D), resources:)` and reads back the nearer colour both times, per T-R02F04-011 and US2/US3 integration (partial) — Verified 2026-11-13: DepthTargetTests.testOpaque3DPipelineResolvesOcclusionInADepthTarget: GLState.apply(Pipeline(program, .opaque3D)) returns true and the nearer colour wins in both orders; DepthTargetTests 7/7 and PipelineTests 5/5 on sim-27.2 and sim-26.5 (depth-pipeline-ios27, depth-pipeline-ios26)

@@ -1,0 +1,28 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/VisualCoreRendering",
+    "--scheme",
+    "VisualCoreRendering-Package",
+    "--destination",
+    "sim-26.5",
+    "--action",
+    "test",
+    "--only-testing",
+    "VisualCoreRenderingTests/DepthTargetTests",
+    "VisualCoreRenderingTests/PipelineTests"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-26.5 --action test --only-testing VisualCoreRenderingTests/DepthTargetTests VisualCoreRenderingTests/PipelineTests",
+  "elapsed_seconds": 3.619,
+  "exit_code": 0,
+  "finished": "2026-11-13T21:30:57+00:00",
+  "gate": "R02-F04",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-F04.depth-pipeline-ios26.log",
+  "log_sha256": "f84227ca852bd0d551d2c37a6b7ed404712f5fbe041651b10b55e814b4ad8c8c",
+  "name": "depth-pipeline-ios26",
+  "started": "2026-11-13T21:30:53+00:00",
+  "timed_out": false
+}
