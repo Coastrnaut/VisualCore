@@ -181,7 +181,7 @@ Commit after every task (`python3 scripts/tick_task.py`), and push with `python3
 ## Phase 12: Evidence and convergence
 
 - [X] T-U09-032 Evidence `script-tests` (`python3 scripts/test_scripts.py`), `self-test` (`python3 scripts/verify_experiences.py --self-test`), `audits` (`python3 scripts/verify_experiences.py --audits`). — Verified 2026-11-12: run-check script-tests (307 OK), self-test (43 validator cases, 12 planted audit defects), audits (PASS, SKIP for bypass and content with 0 registered, entitlement not yet provided): exit 0
-- [ ] T-U09-033 Evidence `sample-sim` (`python3 scripts/verify_experiences.py --only a99.contract-sample --runtime 27 26`), `sample-endurance` (`--only a99.contract-sample --scenario endurance --runtime 27`), `self-test-sim` (`--self-test --runtime 27`).
+- [X] T-U09-033 Evidence `sample-sim` (`python3 scripts/verify_experiences.py --only a99.contract-sample --runtime 27 26`), `sample-endurance` (`--only a99.contract-sample --scenario endurance --runtime 27`), `self-test-sim` (`--self-test --runtime 27`). — Verified 2026-11-12: run-check sample-sim (--only a99.contract-sample --runtime 27 26 --fresh: 18 of 18), sample-endurance (36,000 frames, record validated), self-test-sim (the LossySnapshot record judged a failure by name): exit 0
 - [ ] T-U09-034 Evidence `debug-sim27` and `debug-sim26` (`python3 scripts/verify_experiences.py --only debug --runtime 27`, and `26`).
 - [ ] T-U09-035 Evidence `persistence-host`, `host-visualcore`, `pure-ios27`, `pure-ios26`, `rendering-ios27`, `rendering-ios26` (host and package tests).
 - [ ] T-U09-036 Evidence of the app: `xcodegen`, `app-build`, and the 24 chunks `app-<phone|tablet>-ios<27|26>-<a…f>`.
