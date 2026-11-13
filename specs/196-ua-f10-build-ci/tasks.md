@@ -16,7 +16,7 @@ Owner-only items: none.
 
 ## Phase 2: Foundational
 
-- [ ] T-U10-002 Add `--parallel N` to `scripts/xcodebuild_app.py` (adds `-parallel-testing-enabled YES
+- [X] T-U10-002 Add `--parallel N` to `scripts/xcodebuild_app.py` (adds `-parallel-testing-enabled YES — Verified 2026-11-13: xcodebuild_app.py --parallel N adds -parallel-testing-enabled YES -parallel-testing-worker-count N (script tests 322 OK); the guard reads the clone log format (Test case 'C.m()' passed on 'Clone …'); real run of chunk d on the iOS 27.2 phone with --parallel 2 and test-without-building: 15/15 passed on clones (parallel-chunk-d-r2)
   -parallel-testing-worker-count N` for N > 1; N ≥ 1) with script tests first in `scripts/test_scripts.py`
   (FR-U10-040; owner ruling of 2026-11-13).
 
