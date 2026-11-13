@@ -80,7 +80,24 @@ round2.md:1894, R03-F12 at round3.md:997, R04-F12 at round4.md:998). Every uniqu
 
 ### Session 2026-11-13
 
-(Filled by `/speckit-clarify`.)
+- Q: Where does an experience declare the system permissions it needs? → A: In the app's registration data: a
+  `permissions` list of vocabulary words on each experience's registration, next to its free-text capabilities; the
+  vocabulary (word → usage-description key) is its own versioned file. No public Swift API changes; A01 declares
+  `photo-library-add`.
+- Q: Which catalog fields form the (core abstraction, player action, win rule) triple for each schema? → A: R03/R04:
+  core abstraction, player action, win predicate. R02: core abstraction, core action, victory. A01–A25: launcher
+  category as core abstraction, primary capability as player action, and the fixed win rule "open-ended".
+- Q: What similarity measure and threshold decide "shares a mechanic"? → A: Jaccard similarity of normalized
+  player-action word sets (lower case, words of three or more letters, stop words removed, a trailing plural "s"
+  dropped), compared across all pairs; threshold 0.5. On 2026-11-13 the highest launch pair is 0.375 (A23/A25).
+- Q: Which built-app checks run in CI, where the app links stand-in ANGLE frameworks? → A: The tracking scan, the
+  license assertion and the ProjectM audit run on both the CI Release build and the local Release build; the
+  privacy-manifest audit runs only on the local Release build with the real ANGLE frameworks, since the stand-ins
+  would hide ANGLE's reason APIs. Gate evidence comes from the local run.
+- Q: How does a report prove it scanned the current build? → A: Gate evidence comes only from release-check runs,
+  which build the app in the same run; each report records the source revision, whether the working tree was
+  clean, the configuration and the SHA-256 of the scanned main executable. A standalone run records the digest but
+  is never gate evidence.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -246,8 +263,8 @@ the generator on a fixture ledger with a pending gate.
   an unreadable input is never treated as clean.
 - **Missing build:** a check that needs the built app and finds none fails and says which build to run; it never
   falls back to the source tree.
-- **Stale build:** a built app older than the current source revision is refused for gate evidence (the report
-  records the revision it scanned).
+- **Stale build:** gate evidence comes only from release-check runs that build the app in the same run; each report
+  records the revision, a clean-tree flag, the configuration and the main executable's SHA-256.
 - **Cancellation and interruption:** an interrupted scan or generation leaves no partial report; reports are written
   whole or not at all, so a rerun starts clean.
 - **Memory pressure:** scans stream binaries and files instead of loading the whole app at once; a large app does not
@@ -278,8 +295,9 @@ the generator on a fixture ledger with a pending gate.
   flag).
 
 **Usage descriptions (story 2)**
-- **FR-U11-010**: Each permission an experience needs MUST be declared with a word from a controlled vocabulary;
-  each word maps to exactly one usage-description key.
+- **FR-U11-010**: Each permission an experience needs MUST be declared in its registration as a `permissions` list
+  of words from a controlled, versioned vocabulary; each word maps to exactly one usage-description key. A01
+  declares `photo-library-add`.
 - **FR-U11-011**: A check MUST pass only when the built app's usage-description keys equal the union of the keys of
   the permissions declared by registered experiences; an extra key, a missing key or an unknown word fails.
 - **FR-U11-012**: Every usage-description text MUST be non-empty and name the experience feature that asks.
@@ -314,10 +332,13 @@ the generator on a fixture ledger with a pending gate.
 
 **Distinctiveness (story 6)**
 - **FR-U11-060**: A generator MUST build a distinctiveness matrix over all unordered pairs of the 100 launch
-  experiences from the catalog, normalizing the three design schemas to (core abstraction, player action, win rule).
+  experiences from the catalog, normalizing the three design schemas to (core abstraction, player action, win rule):
+  R03/R04 core abstraction, player action, win predicate; R02 core abstraction, core action, victory; A01–A25
+  launcher category, primary capability, "open-ended".
 - **FR-U11-061**: Two experiences MUST be judged to share a mechanic when their normalized triples are equal, when
-  their player actions are equal, or when their player actions' similarity score is at or above a fixed, documented
-  threshold. A shared core abstraction or win-rule template alone MUST NOT count as a shared mechanic.
+  their player actions are equal, or when the Jaccard similarity of their normalized player-action word sets is at
+  or above 0.5 (normalization: lower case, words of three or more letters, stop words removed, trailing plural "s"
+  dropped). A shared core abstraction or win-rule template alone MUST NOT count as a shared mechanic.
 - **FR-U11-062**: The six close pairs named by the Round 2 source MUST be listed first in the matrix with their
   scores.
 - **FR-U11-063**: A check MUST fail when any pair shares a mechanic, when the matrix is older than the catalog, or
@@ -382,13 +403,12 @@ the generator on a fixture ledger with a pending gate.
 
 ## Assumptions
 
-- The Release app is built by the existing release check on the reference host; CI builds it with stand-in ANGLE
-  frameworks, so binary scans that need the real ANGLE frameworks run locally, and CI runs the source and
-  catalog checks.
+- The Release app is built by the existing release check on the reference host. CI builds it with stand-in ANGLE
+  frameworks and runs the tracking scan, license assertion and ProjectM audit on that build; the privacy-manifest
+  audit needs the real ANGLE frameworks and runs locally.
 - The advertising and analytics deny list is a maintained text list in the repository; a clean scan is evidence,
   not legal assurance.
-- The similarity score is a deterministic token-set measure over normalized catalog text; its threshold is fixed in
-  the plan and recorded in the matrix.
+- The similarity score is the Jaccard measure of FR-U11-061 with threshold 0.5, recorded in the matrix.
 - The list of well-known game titles is a maintained repository file with no web lookup.
 - Permissions for A06–A08 (microphone) are declared when those experiences are integrated; this feature provides
   the vocabulary and the check, not their usage descriptions.

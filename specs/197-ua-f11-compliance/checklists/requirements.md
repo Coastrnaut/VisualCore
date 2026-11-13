@@ -33,5 +33,5 @@
 
 - Validated 2026-11-13, one iteration. Names that the brief itself gives (the privacy manifest, the three scripts,
   `docs/legal/third-party.json`, Info.plist, the ledger, the catalog) appear as the brief requires; no other module
-  is named in requirements. The "shares a mechanic" rule (FR-U11-061) uses a fixed threshold to be set in the plan;
-  `/speckit-clarify` confirms its form.
+  is named in requirements. The "shares a mechanic" rule (FR-U11-061) was settled by `/speckit-clarify` on 2026-11-13
+  (Jaccard of normalized player-action words, threshold 0.5); all 16 items still pass after the five clarifications.
