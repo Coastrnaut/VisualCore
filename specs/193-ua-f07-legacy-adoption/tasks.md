@@ -149,7 +149,7 @@ runtimes.
   pointer events into `stroke` actions), `FluidArtControls`, `FluidArtManifest`; the framework target and candidate
   registration; session tests on both runtimes; parity of the configuration and the CPU state for 3 seeds; capture
   through the share interface; controls meeting E-12 (FR-U07-010 to FR-U07-022; SC-U07-003, SC-U07-005).
-- [ ] T-U07-022 [US5] Port A02's 9 UI tests (`FAP…`, chunk `-h`), with their map rows and guard. Then the runner on both
+- [X] T-U07-022 [US5] Port A02's 9 UI tests (`FAP…`, chunk `-h`), with their map rows and guard. Then the runner on both — Verified 2026-11-13: A02 interface tests ported (FAP classes, 9 map rows): h1 and h2 pass on iOS 27.2 (app-phone-ios27-h1, -h2), check_test_map --app FluidArtPlayground PASS 9 to 10 (a02-test-map); runner 9/9 on 27.2 and 26.5 before and after the move (a02-verify-27/26, a02-verify-*-moved); move into Packages/ExperiencesCreative/FluidArtPlayground with the standalone targets, scheme, UI tests and asset catalog retired; Core moved without a changed line (a02-core-renames-only, 26 files); package 245/245 on both runtimes incl. A02's 76 unit tests (a01-a02-package-ios272/265); app unit chunk and h2 pass after the move (app-phone-ios27-c-a02moved, -h2-moved); X-A02 readiness: host = package, sim27/sim26 = runner after the move, audits PASS (a02-x-audits); X-A02 is recorded after UA-F07 (FR-U07-051)
   runtimes, the move, the retirement and X-A02 as in T-U07-013 and T-U07-015 to T-U07-019.
 
 ## Phase 8: User Story 3 — Fractal Explorer (P2), same steps for A03

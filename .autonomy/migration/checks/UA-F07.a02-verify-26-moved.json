@@ -1,0 +1,22 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--only",
+    "a02.fluid-art-playground",
+    "--runtime",
+    "26",
+    "--fresh"
+  ],
+  "command": "python3 scripts/verify_experiences.py --only a02.fluid-art-playground --runtime 26 --fresh",
+  "elapsed_seconds": 16.491,
+  "exit_code": 0,
+  "finished": "2026-11-13T13:55:43+00:00",
+  "gate": "UA-F07",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F07.a02-verify-26-moved.log",
+  "log_sha256": "c3c46a22261d4ded7de4205e5e017f809395a557439217a7e86c2f6674dc8e10",
+  "name": "a02-verify-26-moved",
+  "started": "2026-11-13T13:55:26+00:00",
+  "timed_out": false
+}
