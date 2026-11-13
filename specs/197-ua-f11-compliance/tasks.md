@@ -49,7 +49,7 @@ Device-only items: none, so no {device} task.
   `a01.generative-art-studio` in `Catalog/registrations.json`; `python3 scripts/build_catalog.py --check` passes.
 - [X] T-U11-010 [US2] Write `scripts/check_usage_descriptions.py` (`--plist` default — Verified 2026-11-13: scripts/check_usage_descriptions.py per contracts/cli.md; its tests pass (script-tests)
   `Apps/VisualCore/Generated/Info.plist`, `--app`, `--registrations`, `--vocabulary`, `--json`) per contracts/cli.md.
-- [ ] T-U11-011 [US2] Acceptance: `python3 scripts/check_usage_descriptions.py` and `--app "$APP"` pass with 1 key
+- [X] T-U11-011 [US2] Acceptance: `python3 scripts/check_usage_descriptions.py` and `--app "$APP"` pass with 1 key — Verified 2026-11-13: check_usage_descriptions.py PASS with 1 key on the generated plist (usage-descriptions) and on the Release app (usage-descriptions-app)
   (checks `usage-descriptions`, `usage-descriptions-app`) (SC-U11-002).
 
 ## Phase 5: User Story 3 — No advertising, analytics or tracking (P1)
