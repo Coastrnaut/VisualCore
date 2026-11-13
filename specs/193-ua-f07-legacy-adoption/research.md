@@ -158,3 +158,16 @@ mapped (FR-U07-033).
 
 `docs/apps/<slug>/README.md` (new, one paragraph) states that the store listing is superseded by the unified app.
 The dossier files are not edited. The legacy ledger is untouched; its hash is compared before and after.
+
+## 3. Baseline (2026-11-13, before any adapter)
+
+| Core package | Tests that pass |
+|---|---|
+| `Apps/GenerativeArtStudio/Core` | 31 (Swift Testing) |
+| `Apps/FluidArtPlayground/FluidArtPlaygroundCore` | 56 (XCTest) |
+| `Apps/FractalExplorer/FractalExplorerCore` | 12 (XCTest) + 26 (Swift Testing) |
+| `Apps/ParticleUniverse/ParticleUniverseCore` | 40 (Swift Testing) + 1 (XCTest) |
+
+- `python3 scripts/migration_baseline.py verify`: 0 problems; this covers the six fixture hashes.
+- Legacy ledger: the SHA-256 of `.autonomy/state.json` is
+  `2604ffd8292cc8a877cdc0300e90cdea5c28ffdc4ef8e58b085e40526d44b7ca`.

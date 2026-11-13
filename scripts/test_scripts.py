@@ -48,6 +48,7 @@ relcheck = load("release_check")
 apprunner = load("xcodebuild_app")
 appcontract = load("check_app_contract")
 enumeration = load("check_test_enumeration")
+testmap = load("check_test_map")
 privacy = load("check_privacy_manifest")
 appreleasecheck = load("check_app_release")
 licensebundle = load("bundle_licenses")
@@ -1865,6 +1866,114 @@ class TestEnumerationTests(unittest.TestCase):
             log.write_text(log.read_text() + "Test Case '-[T.BUITests testTwo]' passed (1 s).\n")
             self.assertEqual(enumeration.main(["--sources", str(d / "src"), "--log", str(log)]), 0)
             self.assertEqual(enumeration.main(["--sources", str(d / "nope"), "--log", str(log)]), 2)
+
+
+class TestMapTests(unittest.TestCase):
+    """scripts/check_test_map.py: no interface test of a standalone app is lost in the unified app (T-U07-002)."""
+
+    HEADER = "app,old_class,old_method,new_class,new_method,note\n"
+
+    def setUp(self):
+        self._tmp = tempfile.TemporaryDirectory()
+        self.d = Path(self._tmp.name)
+        (self.d / "old").mkdir()
+        (self.d / "new").mkdir()
+        (self.d / "old" / "A.swift").write_text("final class AUITests: XCTestCase {\n    func testOne() {}\n"
+                                               "    @MainActor func testTwo() throws {}\n    func helper() {}\n}\n")
+        (self.d / "old" / "B.swift").write_text("class BUITests: XCTestCase {\n    func testThree() {}\n}\n")
+        (self.d / "new" / "N.swift").write_text("final class NewAUITests: XCTestCase {\n    func testOneA() {}\n"
+                                               "    func testOneB() {}\n    func testTwo() {}\n}\n"
+                                               "final class NewBUITests: XCTestCase {\n    func testThree() {}\n}\n")
+        self.rows = ["A,AUITests,testOne,NewAUITests,testOneA;testOneB,",
+                     "A,AUITests,testTwo,NewAUITests,testTwo,",
+                     "B,BUITests,testThree,NewBUITests,testThree,"]
+
+    def tearDown(self):
+        self._tmp.cleanup()
+
+    def run_map(self, rows, *extra, header=None):
+        m = self.d / "map.csv"
+        m.write_text((header if header is not None else self.HEADER) + "".join(r + "\n" for r in rows))
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(io.StringIO()):
+            code = testmap.main(["--map", str(m), "--old", str(self.d / "old"), "--new", str(self.d / "new"), *extra])
+        return code, out.getvalue()
+
+    def test_complete_map_passes_and_splits_method_lists(self):
+        code, out = self.run_map(self.rows)
+        self.assertEqual(code, 0, out)
+        self.assertEqual(out.strip().splitlines()[-1], "PASS: 3 old tests mapped to 4 new tests")
+
+    def test_missing_old_method_fails_naming_it(self):
+        code, out = self.run_map(self.rows[:1] + self.rows[2:])
+        self.assertEqual(code, 1)
+        self.assertIn("FAIL: missing from the map: AUITests.testTwo", out)
+        self.assertEqual(out.strip().splitlines()[-1], "FAIL: 1 problems")
+
+    def test_row_for_nonexistent_old_test_fails(self):
+        code, out = self.run_map(self.rows + ["A,AUITests,testGone,NewAUITests,testTwo,"])
+        self.assertEqual(code, 1)
+        self.assertIn("FAIL: not an old test: AUITests.testGone", out)
+
+    def test_duplicate_old_row_fails(self):
+        code, out = self.run_map(self.rows + [self.rows[1]])
+        self.assertEqual(code, 1)
+        self.assertIn("FAIL: mapped 2 times: AUITests.testTwo", out)
+
+    def test_nonexistent_new_method_fails(self):
+        rows = ["A,AUITests,testOne,NewAUITests,testOneA;testOneZ,"] + self.rows[1:]
+        code, out = self.run_map(rows)
+        self.assertEqual(code, 1)
+        self.assertIn("FAIL: no such new test: NewAUITests.testOneZ", out)
+        self.assertNotIn("testOneA", out)
+
+    def test_no_counterpart_row_needs_a_covering_test_in_the_note(self):
+        base = self.rows[:2]
+        code, out = self.run_map(base + ["B,BUITests,testThree,-,-,"])
+        self.assertEqual(code, 1)
+        self.assertIn("no covering Class.method in the note: BUITests.testThree", out)
+        code, out = self.run_map(base + ["B,BUITests,testThree,-,-,the gallery replaces it; covered by NewAUITests.testMissing"])
+        self.assertEqual(code, 1)
+        self.assertIn("FAIL: no such new test: NewAUITests.testMissing", out)
+        code, out = self.run_map(base + ['B,BUITests,testThree,-,-,"unified app equivalent, covered by NewBUITests.testThree"'])
+        self.assertEqual(code, 0, out)
+
+    def test_log_requires_every_mapped_and_covering_test_to_pass(self):
+        rows = self.rows[:2] + ["B,BUITests,testThree,-,-,covered by NewBUITests.testThree"]
+        lines = ["Test Case '-[VisualCoreUITests.NewAUITests testOneA]' passed (1.0 seconds).",
+                 "Test Case '-[VisualCoreUITests.NewAUITests testOneB]' passed (1.0 seconds).",
+                 "Test Case '-[VisualCoreUITests.NewAUITests testTwo]' failed (1.0 seconds).",
+                 "Test Case '-[VisualCoreUITests.NewBUITests testThree]' passed (1.0 seconds)."]
+        log1 = self.d / "one.log"
+        log1.write_text("\n".join(lines) + "\n")
+        code, out = self.run_map(rows, "--log", str(log1))
+        self.assertEqual(code, 1)
+        self.assertIn("FAIL: did not pass: NewAUITests.testTwo", out)
+        self.assertEqual(out.count("did not pass"), 1)
+        log2 = self.d / "two.log"
+        log2.write_text("Test Case '-[VisualCoreUITests.NewAUITests testTwo]' passed (2.0 seconds).\n")
+        code, out = self.run_map(rows, "--log", str(log1), str(log2))
+        self.assertEqual(code, 0, out)
+        self.assertIn("PASS: 3 old tests mapped to 4 new tests", out)
+
+    def test_app_limits_the_rows(self):
+        (self.d / "old" / "B.swift").unlink()
+        code, out = self.run_map(self.rows, "--app", "A")
+        self.assertEqual(code, 0, out)
+        self.assertIn("PASS: 2 old tests mapped to 3 new tests", out)
+        code, out = self.run_map(self.rows)
+        self.assertEqual(code, 1)
+        self.assertIn("FAIL: not an old test: BUITests.testThree", out)
+
+    def test_bad_input_exits_2(self):
+        code, _ = self.run_map(self.rows, header="app,old_class,old_method,new_class,new_method\n")
+        self.assertEqual(code, 2)
+        code, _ = self.run_map(self.rows, "--log", str(self.d / "absent.log"))
+        self.assertEqual(code, 2)
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(io.StringIO()):
+            code = testmap.main(["--map", str(self.d / "absent.csv"), "--old", str(self.d / "old"), "--new", str(self.d / "new")])
+        self.assertEqual(code, 2)
 
 
 class PrivacyManifestTests(unittest.TestCase):

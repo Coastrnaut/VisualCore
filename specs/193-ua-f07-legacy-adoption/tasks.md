@@ -17,7 +17,7 @@ reverted alone.
 
 ## Phase 1: Setup
 
-- [ ] T-U07-001 Record the parity baseline before any adapter:
+- [X] T-U07-001 Record the parity baseline before any adapter: — Verified 2026-11-13: swift test of the four Core packages: 31, 56, 12+26, 40+1 tests pass; migration_baseline.py verify: 0 problems; legacy ledger SHA-256 2604ffd8…b7ca; recorded in research.md section 3
   - `swift test` of the four Core packages (paths in quickstart.md), with the counts of tests run;
   - `python3 scripts/migration_baseline.py verify` (the six fixture hashes);
   - the SHA-256 of `.autonomy/state.json`;
