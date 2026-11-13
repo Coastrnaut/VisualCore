@@ -7,7 +7,7 @@ A04-P06 --name <check> -- <command>`. Commit after every task (no trailers); pus
 
 ## Phase 1: Setup
 
-- [ ] T-A04-601 Record the baseline: ExperiencesCreative package on sim-27.2 before changes (`run-check --name baseline-experiences -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test`)
+- [X] T-A04-601 Record the baseline: ExperiencesCreative package on sim-27.2 before changes (`run-check --name baseline-experiences -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test`) — Verified 2026-11-13: 2026-11-13 .autonomy/checks/A04-P06.baseline-experiences.json (sim-27.2, TEST SUCCEEDED)
 
 ## Phase 2: Foundational
 
