@@ -31,7 +31,7 @@ API-baseline and reference-regression tasks apply.
   retired set (`[ObjectIdentifier: ShaderProgram]`), eviction moves without GL delete and counts `evictionCount`,
   `release(_:)` deletes retired programs, `contextWillEnd()` releases retired programs before `abandonAll()`,
   `retiredProgramCount`; `///` docs.
-- [ ] T-R02F04-005 [US1] Acceptance: ProgramCacheTests pass on sim-27.2 (check `cache-ios27`) (SC-R02F04-001, 005).
+- [X] T-R02F04-005 [US1] Acceptance: ProgramCacheTests pass on sim-27.2 (check `cache-ios27`) (SC-R02F04-001, 005). — Verified 2026-11-13: ProgramCacheTests 6/6 on sim-27.2 within the full scheme run (rendering-ios27) (SC-R02F04-001, 005)
 
 ## Phase 4: User Story 2 — One immutable pipeline description (P1)
 
