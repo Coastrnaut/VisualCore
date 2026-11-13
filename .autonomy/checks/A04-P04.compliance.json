@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_compliance.py"
+  ],
+  "command": "python3 scripts/check_compliance.py",
+  "elapsed_seconds": 0.842,
+  "exit_code": 0,
+  "finished": "2026-11-13T22:10:34+00:00",
+  "log": ".autonomy/logs/A04-P04.compliance.log",
+  "log_sha256": "8706e879e2f560d99ca864aaa3fe6f1455abee0675dc7d54dd1d6d47f56d46e0",
+  "name": "compliance",
+  "stage": "A04-P04",
+  "started": "2026-11-13T22:10:33+00:00",
+  "timed_out": false
+}
