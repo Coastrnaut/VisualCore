@@ -75,6 +75,42 @@ final class DepthTargetTests: XCTestCase {
         XCTAssertGreaterThan(Int(withoutDepth.first ?? 0), 250, "control: without depth storage the last draw wins")
     }
 
+    /// T-R02F04-024 (US2 with US3): the opaque 3D pipeline applied by `GLState.apply` gives correct occlusion in a
+    /// depth target, in both draw orders.
+    func testOpaque3DPipelineResolvesOcclusionInADepthTarget() throws {
+        var pixels: [[UInt8]] = []
+        var applied: [Bool] = []
+        let scene = ProbeScene(setup: { ctx in
+            let program = try ctx.resources.program(vertex: Self.vertex, fragment: Self.fragment)
+            let pipeline = Pipeline(program: program, state: .opaque3D)
+            let target = try ctx.resources.makeRenderTarget(width: 8, height: 8, depth: true, label: "pipeline depth")
+            for order in [[(Self.far, Self.red), (Self.near, Self.green)], [(Self.near, Self.green), (Self.far, Self.red)]] {
+                target.bind()
+                vcglViewport(0, 0, GLsizei(target.width), GLsizei(target.height))
+                vcglDepthMask(GLboolean(GL_TRUE))          // clearing depth needs writes enabled
+                vcglClearColor(0, 0, 0, 1)
+                vcglClearDepthf(1)
+                vcglClear(GLbitfield(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT))
+                applied.append(GLState.apply(pipeline, resources: ctx.resources))
+                for pass in order {
+                    program.set("uZ", pass.0)
+                    program.set("uColor", pass.1)
+                    vcglDrawArrays(GLenum(GL_TRIANGLES), 0, 3)
+                }
+                pixels.append(Array(target.readPixels().prefix(4)))
+            }
+            ctx.resources.release(target)
+            ctx.resources.release(program)
+        })
+        _ = try host(scene)
+        XCTAssertEqual(applied, [true, true], "the opaque 3D pipeline applies")
+        XCTAssertEqual(pixels.count, 2)
+        for (pixel, order) in zip(pixels, ["far then near", "near then far"]) {
+            XCTAssertGreaterThan(Int(pixel.count == 4 ? pixel[1] : 0), 250, "nearer green wins (\(order))")
+            XCTAssertLessThan(Int(pixel.first ?? 255), 5, "farther red is hidden (\(order))")
+        }
+    }
+
     func testReleaseFreesColourAndDepth() throws {
         var during: ResourceLedger.Snapshot?
         let scene = ProbeScene(setup: { ctx in
