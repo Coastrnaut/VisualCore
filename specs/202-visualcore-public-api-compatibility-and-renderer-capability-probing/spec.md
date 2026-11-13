@@ -44,7 +44,16 @@ Canonical overrides:
 
 ### Session 2026-11-13
 
-(Filled by `/speckit-clarify`.)
+- Q: How does the evidence record, which lives in the pure package, carry the renderer's report without depending on
+  the rendering package? → A: The record's environment gains an optional `renderer` value of a new pure type in the
+  experience module (strings and whole numbers only, every field optional). The app's automation fills it from the
+  render host's report when it writes the evidence. JSON key `renderer`; an evidence file without it stays valid.
+  Rejected: a free-form string map, which would not be typed or checked, and a dependency from the pure package on the
+  rendering package, which rule R2 forbids.
+- Q: Where do the context generation and the ES 3.0 floor check live? → A: The report gains an optional `generation`,
+  set by the render host each time it takes the report. The floor check is a pure function of the report in the
+  rendering package that returns the list of findings; the verification runner does not fail on a finding, it
+  records it (simulator values are not device values).
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -116,8 +125,9 @@ the same values with the new fields absent.
   the same typed error as at creation.
 - **FR-R02F02-005**: A floor check MUST compare a report with the OpenGL ES 3.0 minimum values and list each value
   below its minimum.
-- **FR-R02F02-006**: The verification evidence of every run MUST contain the report of the host it ran on; evidence
-  files without it MUST stay valid.
+- **FR-R02F02-006**: The verification evidence of every run MUST contain, in the environment's optional `renderer`
+  value (a pure type with optional fields, clarification 1), the report of the host it ran on; evidence files without
+  it MUST stay valid.
 - **FR-R02F02-007**: Reports written before this feature MUST decode with the new values absent.
 - **FR-R02F02-008**: Every new public declaration MUST be documented and in the API baseline; the API check MUST show
   only added lines; the reference regression MUST pass after the change.
