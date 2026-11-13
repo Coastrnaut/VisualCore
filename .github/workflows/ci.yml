@@ -61,6 +61,10 @@ jobs:
           python3 scripts/check_documented_api.py --sources Harnesses/SecondConsumer
       - name: Licenses
         run: python3 scripts/check_licenses.py
+      - name: Usage descriptions (UA-F11)
+        run: python3 scripts/check_usage_descriptions.py
+      - name: Distinctiveness matrix (UA-F11)
+        run: python3 scripts/check_distinctiveness.py --check
       - name: Script tests
         run: python3 scripts/test_scripts.py
 
@@ -179,5 +183,9 @@ jobs:
           xcodebuild build -project VisualCore.xcodeproj -scheme VisualCore -configuration Release
           -destination 'generic/platform=iOS Simulator' -derivedDataPath Build/DerivedData/ci-release
           CODE_SIGNING_ALLOWED=NO
+      - name: No advertising, analytics or tracking in the Release app (UA-F11)
+        run: python3 scripts/check_no_tracking.py --app Build/DerivedData/ci-release/Build/Products/Release-iphonesimulator/VisualCore.app
+      - name: Bundled licenses of the Release app (UA-F11)
+        run: python3 scripts/check_licenses.py --app Build/DerivedData/ci-release/Build/Products/Release-iphonesimulator/VisualCore.app
       - name: Reference submodule unchanged
         run: python3 scripts/check_reference_clean.py

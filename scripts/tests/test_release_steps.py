@@ -27,7 +27,8 @@ class UnifiedAppStepTests(unittest.TestCase):
     def test_the_named_steps_exist(self):
         names = {s.name for s in self.steps()}
         for name in ("app-build-for-testing-ios27", "app-unit-ios27", "app-release-build", "app-release-symbols",
-                     "app-privacy-manifest", "measure-build-check"):
+                     "app-privacy-manifest", "measure-build-check", "app-no-tracking", "app-licenses",
+                     "app-usage-descriptions", "app-projectm-audit"):
             self.assertIn(name, names)
         self.assertTrue(any(n.startswith("app-ui-ios27-") for n in names))
 

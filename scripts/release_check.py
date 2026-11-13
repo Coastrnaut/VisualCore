@@ -145,6 +145,10 @@ def steps(stamp: str) -> list[Step]:
         Step("documented-api-interactive-demo", [PY, "scripts/check_documented_api.py", "--sources", "Harnesses/InteractiveDemo"]),
         Step("documented-api-second-consumer", [PY, "scripts/check_documented_api.py", "--sources", "Harnesses/SecondConsumer"]),
         Step("licenses", [PY, "scripts/check_licenses.py"]),
+        # Feature UA-F11 (FR-U11-013, FR-U11-063, FR-U11-070): permissions, distinctiveness and metadata inputs.
+        Step("usage-descriptions", [PY, "scripts/check_usage_descriptions.py"]),
+        Step("distinctiveness", [PY, "scripts/check_distinctiveness.py", "--check"]),
+        Step("metadata-inputs", [PY, "scripts/metadata_inputs.py", "--check"]),
         # Every app's Phase 00 VisualCore contract (feature 011): all citations resolve, gaps owned, decision recorded.
         Step("app-contracts", [PY, "-c", "import pathlib,subprocess,sys;apps=sorted(p.parent.name for p in "
                                "pathlib.Path('docs/apps').glob('*/visualcore-contract.json'));"
@@ -233,7 +237,7 @@ def app_domain_steps(root: Path = ROOT) -> list[Step]:
 # two simulator clones; the accessibility audit classes wait for the device campaign (owner ruling of 2026-11-13).
 UI_CHUNKS = {
     "a": ["RoutesUITests"],
-    "b": ["SettingsUITests", "LaunchUITests"],
+    "b": ["SettingsUITests", "LaunchUITests", "AcknowledgementsUITests"],
     "d": ["LauncherUITests", "FirstRunUITests"],
     "e": ["PersistenceUITests"],
     "f": ["PersistenceDamageUITests"],
@@ -283,7 +287,17 @@ def unified_app_steps(stamp: str, root: Path = ROOT) -> list[Step]:
                                        "-derivedDataPath", derived, "CODE_SIGNING_ALLOWED=NO"], timeout=UNIFIED_LIMIT),
             Step("app-release-symbols", [PY, "scripts/check_release_symbols.py", "--app", built, "--forbid",
                                          *RELEASE_FORBIDDEN], timeout=UNIFIED_LIMIT),
-            Step("app-privacy-manifest", [PY, "scripts/check_privacy_manifest.py", "--app", built], timeout=UNIFIED_LIMIT),
+            # Feature UA-F11 (FR-U11-003, 021, 025, 031, 041, 082): the compliance scans of the built Release app;
+            # their reports name the revision and the scanned executable's digest.
+            Step("app-privacy-manifest", [PY, "scripts/check_privacy_manifest.py", "--app", built, "--json",
+                                          f".autonomy/logs/ua-f11/privacy-{stamp}.json"], timeout=UNIFIED_LIMIT),
+            Step("app-no-tracking", [PY, "scripts/check_no_tracking.py", "--app", built, "--json",
+                                     f".autonomy/logs/ua-f11/tracking-{stamp}.json"], timeout=UNIFIED_LIMIT),
+            Step("app-licenses", [PY, "scripts/check_licenses.py", "--app", built], timeout=UNIFIED_LIMIT),
+            Step("app-usage-descriptions", [PY, "scripts/check_usage_descriptions.py", "--app", built],
+                 timeout=UNIFIED_LIMIT),
+            Step("app-projectm-audit", [PY, "scripts/audit_showcase_dependencies.py", "--target", "VisualCore",
+                                        "--sources", "Apps/VisualCore", "--app", built], timeout=UNIFIED_LIMIT),
             Step("measure-build-check", [PY, "scripts/measure_build.py", "--check"], timeout=UNIFIED_LIMIT)]
     return out
 
