@@ -24,28 +24,32 @@ final class PUSceneLibraryUITests: XCTestCase {
         field.typeText(value + "\n")                    // return dismisses the keyboard
     }
 
+    /// Saves "Nebula" after moving an emitter, changes the scene and opens the saved scene again (US1, US3).
     @MainActor
-    func testSaveChangeOpenRelaunchRenameDelete() {
+    func testSaveChangeAndOpen() {
         let app = PU.open()
         let saved = text(app, "emitters")                // the scene as saved (the default has one emitter)
         PU.tap(app, "move.right")                       // a moved emitter is saved with the scene
         type(app, "library.name", "Nebula")
         PU.tap(app, "library.save")
         XCTAssertEqual(text(app, "library.entry.0"), "Nebula")
-
         PU.tap(app, "emitter.add")                       // change the scene after saving
         XCTAssertNotEqual(text(app, "emitters"), saved, "the scene changed")
         PU.tap(app, "library.open.0")
         XCTAssertEqual(text(app, "emitters"), saved, "opening restores the saved scene")
         XCTAssertFalse(PU.control(app, "library.message").exists, "no error after opening")
+        XCTAssertFalse(element(app, "session.failure").exists, "no failure")
+    }
 
-        let again = relaunch(app, arguments: PU.again)   // the library survives a relaunch
+    /// The library survives a relaunch; a saved scene is renamed and deleted (US1 scenarios 2 and 4).
+    @MainActor
+    func testRelaunchRenameAndDelete() {
+        let app = PU.open()
+        type(app, "library.name", "Nebula")
+        PU.tap(app, "library.save")
+        let again = relaunch(app, arguments: PU.again)
         PU.waitUntilRunning(again)
-        XCTAssertEqual(text(again, "library.entry.0"), "Nebula")
-        PU.tap(again, "emitter.add")
-        PU.tap(again, "library.open.0")
-        XCTAssertEqual(text(again, "emitters"), saved, "the saved scene opens after a relaunch")
-
+        XCTAssertEqual(text(again, "library.entry.0"), "Nebula", "the library survives a relaunch")
         PU.tap(again, "library.rename.0")
         type(again, "library.renameText.0", "Galaxy")
         PU.tap(again, "library.renameDone.0")

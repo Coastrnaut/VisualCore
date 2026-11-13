@@ -61,6 +61,7 @@ struct ParticleControls: View {
                 Text(verbatim: "Live particles: \(core.simulation.liveCount) of \(core.simulation.scene.particleLimit)")
                     .font(.footnote).accessibilityIdentifier(port.identifier("live"))
             }
+            librarySection(core)              // near the top: saving and opening are frequent
             section("Emitters") {
                 Text(verbatim: "Emitters: \(core.simulation.visibleEmitters.count) of \(ParticleScene.maxEmitters)")
                     .font(.footnote).accessibilityIdentifier(port.identifier("emitters"))
@@ -98,6 +99,14 @@ struct ParticleControls: View {
                     }
                 }
             }
+            section("Move emitter") {
+                // Feature 036 A04-P04 (FR-A04-420, 421): the selected emitter moves by 50 points per press.
+                HStack {
+                    moveButton("Left", identifier: "move.left", core: core, dx: -50, dy: 0)
+                    moveButton("Right", identifier: "move.right", core: core, dx: 50, dy: 0)
+                    moveButton("Up", identifier: "move.up", core: core, dx: 0, dy: 50)
+                    moveButton("Down", identifier: "move.down", core: core, dx: 0, dy: -50)
+                }
             section("Force") {
                 choice("None", selected: core.selectedKind == nil, identifier: "force.none") { port.send("force.kind", [0]) }
                 ForEach(Array(PlacedForceKind.allCases.enumerated()), id: \.offset) { index, kind in
@@ -134,16 +143,7 @@ struct ParticleControls: View {
                 .frame(minHeight: 44)
                 .accessibilityIdentifier(port.identifier("blend"))
             }
-            section("Move emitter") {
-                // Feature 036 A04-P04 (FR-A04-420, 421): the selected emitter moves by 50 points per press.
-                HStack {
-                    moveButton("Left", identifier: "move.left", core: core, dx: -50, dy: 0)
-                    moveButton("Right", identifier: "move.right", core: core, dx: 50, dy: 0)
-                    moveButton("Up", identifier: "move.up", core: core, dx: 0, dy: 50)
-                    moveButton("Down", identifier: "move.down", core: core, dx: 0, dy: -50)
-                }
             }
-            librarySection(core)
         }
     }
 

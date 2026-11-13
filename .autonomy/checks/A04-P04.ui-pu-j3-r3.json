@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "python3",
+    "scripts/release_check.py",
+    "--only",
+    "app-ui-ios27-j3"
+  ],
+  "command": "python3 scripts/release_check.py --only app-ui-ios27-j3",
+  "elapsed_seconds": 394.487,
+  "exit_code": 0,
+  "finished": "2026-11-13T22:44:32+00:00",
+  "log": ".autonomy/logs/A04-P04.ui-pu-j3-r3.log",
+  "log_sha256": "f33f5a06db5261c49756d5197221f1c2d11036630341175dd849c1a33930d9d4",
+  "name": "ui-pu-j3-r3",
+  "stage": "A04-P04",
+  "started": "2026-11-13T22:37:57+00:00",
+  "timed_out": false
+}
