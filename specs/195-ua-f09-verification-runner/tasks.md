@@ -25,7 +25,7 @@ Commit after every task (`python3 scripts/tick_task.py`), and push with `python3
   - The sample reports `target-reached` only after moves bring the marker onto the target, and nil before.
   - Neither the sample's golden digests nor `scenarioDigest` change.
   - `ExperienceDiagnostics` encodes `outcome` only when present and decodes an older encoding without it.
-- [ ] T-U09-003 Implement `Packages/VisualCore/Sources/VisualCoreExperience/ExperienceOutcome.swift` (release). Add `outcome` to `ExperienceCore` (default nil, computed, never stored), to `ExperienceEngine` and to `ExperienceDiagnostics`. In `Packages/VisualCore/Sources/VisualCoreTestSupport/SampleExperienceCore.swift`, the sample reports `target-reached` while marker equals target. T-U09-002 passes (FR-U09-004).
+- [X] T-U09-003 Implement `Packages/VisualCore/Sources/VisualCoreExperience/ExperienceOutcome.swift` (release). Add `outcome` to `ExperienceCore` (default nil, computed, never stored), to `ExperienceEngine` and to `ExperienceDiagnostics`. In `Packages/VisualCore/Sources/VisualCoreTestSupport/SampleExperienceCore.swift`, the sample reports `target-reached` while marker equals target. T-U09-002 passes (FR-U09-004). — Verified 2026-11-12: swift test --package-path Packages/VisualCore --filter VisualCoreExperienceTests: 379 tests in 35 suites passed; the sample's golden digests unchanged
 - [ ] T-U09-004 [P] Tests first: `Packages/VisualCore/Tests/VisualCoreExperienceTests/ScenarioManifestTests.swift`. Cover:
   - Loading of schema 1.
   - Refusal of schema 2 (`newerSchema`), of more than 4 MiB and of damaged JSON.
