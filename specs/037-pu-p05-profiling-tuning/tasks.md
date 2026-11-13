@@ -55,7 +55,7 @@ each task. Tests before code. Owner-only items: none. One {device} task. No Visu
   `Packages/VisualCoreRendering` for the phase's commits is empty (FR-A04-540).
 - [ ] T-A04-514 {device} In the device campaign: frame pacing, detail steps under load, thermal behaviour and memory of
   Particle Universe on D1, D2, D3; fill the budgets row.
-- [ ] T-A04-515 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A04-P05
+- [X] T-A04-515 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A04-P05 — Verified 2026-11-13: 2026-11-13 converge rounds 1-3: round 1 appended T-A04-516, round 2 T-A04-517/518 (all ticked with checks t516-package-full-ios27, t518-package-ios26), round 3 appended nothing
   with `python3 Tools/python/desktop_runbook.py seal --stage A04-P05` and `record`.
 
 ## Dependencies
