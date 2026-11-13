@@ -30,7 +30,7 @@ Independent test: a fresh host's report holds every value of FR-R02F02-001 and 0
 
 ## Phase 3: User Story 2 — The report stays true after the context is rebuilt (P1)
 
-- [ ] T-R02F02-005 [US2] Tests first in `RenderCapabilitiesProbeTests.swift`: after 3 recreations the report's
+- [X] T-R02F02-005 [US2] Tests first in `RenderCapabilitiesProbeTests.swift`: after 3 recreations the report's — Verified 2026-11-13: testTheReportFollowsEveryContextRecreation: after 3 recreations the report's generation equals the host's and missingEntryPoints is 0 (probe-tests-ios27)
   `generation` equals the context's; the reload's missing count is in the report.
 - [ ] T-R02F02-006 [US2] In `RenderHost.swift`: set `generation` in init; in `recreateContext()` keep the reload
   count, fail with `RenderHostError.unsupported` and the surface-invalid path when it is above 0, otherwise re-query
