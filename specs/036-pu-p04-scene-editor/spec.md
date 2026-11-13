@@ -37,7 +37,25 @@ Canonical overrides:
 
 ### Session 2026-11-13
 
-(Filled by `/speckit-clarify`.)
+Answered autonomously under the owner's standing delegation, recommended option each time. Facts checked in code:
+`ExperienceStorage` (write, read, exists, list, remove; at most 64 files and 16 MiB, names up to 128 characters);
+`ParticleScene` allows 1…8 emitters and 0…8 scene forces and throws `SceneError` on bad values; emitter positions
+are scene coordinates (`SceneSimulation.placement(of:index:)` offsets them by 150 points).
+
+- Q: What happens when a scene is saved under a name that already exists? → A: Saving always creates a new entry; a
+  clashing name gets the next free suffix (" 2", " 3", …). Renaming to an existing name is refused with a message.
+  Nothing is ever overwritten silently.
+- Q: Which logged actions rebuild a scene when it is opened? → A: `scene.begin` (emitter count), then one
+  `emitter.define` per emitter (family, x, y, size, lifetime, gradient index — 6 values), then `force.define` (kind,
+  x, y, strength; kind 0 means none) and `look.define` (trails, trail strength, blend): at most 11 actions, each
+  within the 8-value limit. The core validates the whole set and rejects the open if any value is invalid, leaving
+  the scene unchanged.
+- Q: How is an emitter moved in this slice? → A: With an `emitter.move` action carrying an absolute scene point,
+  clamped to the scene bounds; the controls offer four direction buttons (fixed step) as the accessible way to
+  move. Dragging on the canvas is deferred (it conflicts with force placement).
+- Q: Where is the saved-scene format defined, and how is version 1 upgraded? → A: A `SceneDocument` (format version
+  2: scene, placed force, trails, trail strength, blend) in the experience's pure core; version 1 is the existing
+  `ParticleScene` document and upgrades through a migration step to version 2 with no force and default looks.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -88,7 +106,7 @@ library and open each.
 
 ### User Story 3 - Move an emitter (Priority: P2)
 
-A person drags (or uses a button alternative to move) the selected emitter to a new place in the scene, and the move
+A person moves the selected emitter with direction buttons to a new place in the scene, and the move
 is saved with the scene.
 
 **Why this priority**: the Phase 03 specification deferred moving emitters to this phase's editor.
@@ -97,8 +115,8 @@ is saved with the scene.
 
 **Acceptance Scenarios**:
 
-1. **Given** a selected emitter, **When** it is moved to a point, **Then** its position is that point clamped to the
-   scene bounds and particles start there.
+1. **Given** a selected emitter, **When** a direction button is pressed, **Then** its position moves by the fixed step,
+   clamped to the scene bounds, and particles start there.
 2. **Given** a moved emitter, **When** the scene is saved and reopened, **Then** the position is kept.
 3. **Given** VoiceOver, **When** the person uses the move control's button alternative, **Then** the emitter moves by
    a fixed step in the chosen direction.
@@ -123,8 +141,8 @@ fixed number of steps; open a scene with the maximum emitters on each quality ti
 
 ### Edge Cases
 
-- **Name clashes:** saving under an existing name asks to replace or keeps both with a numbered name; the decision is
-  explicit, never silent.
+- **Name clashes:** saving under an existing name keeps both: the new entry gets the next free numbered suffix;
+  renaming onto an existing name is refused.
 - **Empty or long names:** empty names are refused; names longer than 64 characters are trimmed.
 - **Storage full or write failure:** the save fails with a message; the previous file and the current scene stay.
 - **Library limits:** at most the experience storage limits (file count and size); reaching them is reported.
@@ -143,8 +161,9 @@ fixed number of steps; open a scene with the maximum emitters on each quality ti
 - **FR-A04-402**: A saved scene MUST hold the emitters (family, position, size, lifetime, gradient), the placed force
   (kind, position, strength), and the trail, trail-strength and blend settings.
 - **FR-A04-403**: Opening a saved scene MUST reproduce exactly those values.
-- **FR-A04-404**: Opening MUST be recorded in the session's action history as small actions, so a replay of the
-  history reaches the same scene and state digest.
+- **FR-A04-404**: Opening MUST be recorded in the session's action history as at most 11 small actions
+  (`scene.begin`, `emitter.define` per emitter, `force.define`, `look.define`), so a replay of the history reaches the
+  same scene and state digest; an invalid value rejects the whole open.
 - **FR-A04-405**: The library MUST list saved scenes by name and allow open, rename and delete; it MUST survive a relaunch.
 
 **Safe opening (story 2)**
@@ -155,7 +174,8 @@ fixed number of steps; open a scene with the maximum emitters on each quality ti
 - **FR-A04-414**: A save MUST be atomic: a failure leaves the previous file and the current scene unchanged.
 
 **Move an emitter (story 3)**
-- **FR-A04-420**: The selected emitter MUST be movable to a point, clamped to the scene bounds, as one logged action.
+- **FR-A04-420**: The selected emitter MUST be movable to a scene point, clamped to the scene bounds, as one logged
+  `emitter.move` action; dragging on the canvas is out of scope for this slice.
 - **FR-A04-421**: The move MUST have a button alternative with a VoiceOver label and a 44-point target.
 
 **Gates (story 4)**
