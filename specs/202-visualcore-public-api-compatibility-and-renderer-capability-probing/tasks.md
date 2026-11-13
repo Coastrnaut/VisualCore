@@ -47,7 +47,7 @@ Independent test: a fresh host's report holds every value of FR-R02F02-001 and 0
 - [X] T-R02F02-009 [US3] Add `Packages/VisualCore/Sources/VisualCoreExperience/RendererRecord.swift` (data-model.md: — Verified 2026-11-13: RendererRecord.swift (pure, optional fields, snake_case), EvidenceRecord.Environment.renderer (written only when present), check_evidence.py accepts and checks environment.renderer (self-test 48 cases PASS)
   strings and ints, all optional, unknown keys ignored) and `EvidenceRecord.Environment.renderer` (key `renderer`);
   update `scripts/check_evidence.py`.
-- [ ] T-R02F02-010 [US3] Add `Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/RendererRecord+Capabilities.swift`
+- [X] T-R02F02-010 [US3] Add `Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/RendererRecord+Capabilities.swift` — Verified 2026-11-13: RendererRecord+Capabilities.swift maps the report with floor findings; ScenarioRunner captures it in readFrame (ScenarioRunResult.renderer); EvidenceRecord.observed(renderer:); ScenarioLaunch passes it; the driver keeps the app's renderer (scripts/tests/test_verify_renderer.py, research section 3 correction)
   (`init(_ capabilities:)`, with `floor_findings` from `floorFindings()`), and fill `environment.renderer` in
   `Apps/VisualCore/App/Automation/ScenarioLaunch.swift` from the open session's `renderHost?.capabilities`.
 - [ ] T-R02F02-011 [US3] Acceptance: `swift test --package-path Packages/VisualCore` (check `host-visualcore`), script
