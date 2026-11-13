@@ -36,7 +36,7 @@ task. Owner-only items: none.
 
 ## Phase 4: User Stories 3 and 4 — Announcements and colour (P2)
 
-- [ ] T-R02F26-008 [P] [US3] [US4] Tests first in `Packages/VisualCore/Tests/VisualCoreSimulationTests/AccessibilityPlansTests.swift`:
+- [X] T-R02F26-008 [P] [US3] [US4] Tests first in `Packages/VisualCore/Tests/VisualCoreSimulationTests/AccessibilityPlansTests.swift`: — Verified 2026-11-13: AccessibilityPlansTests.swift: 14 tests (5 announcement sequences, 5 haptic sequences, 3 state-sign cases, transitionDuration incl. Reduce Motion, negative, NaN, infinity) pass (host-visualcore-r2)
   5 announcement sequences (rate limit 0.5 s, merge to newest, off → none), state-sign check (missing sign, duplicate
   sign, valid palette), and `transitionDuration(_:reduceMotion:)` (0 under Reduce Motion, unchanged otherwise;
   FR-R02F26-050).
