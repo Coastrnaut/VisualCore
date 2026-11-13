@@ -269,3 +269,9 @@ The dossier files are not edited. The legacy ledger is untouched; its hash is co
 - **Photos add-only usage string (2026-11-13).** Saving an exported picture through the share sheet's "Save Image"
   needs `NSPhotoLibraryAddUsageDescription`; without it the save fails. The one app declares only that string, with
   A01's wording (FR-A01-407). `BundleTests` allows exactly that one usage description; the app never calls PhotoKit.
+- **X gates after UA-F07 (T-U07-019, 2026-11-13).** In the migration ledger, X-A01, X-A02 and X-A03 depend on UA-F07,
+  so they cannot pass before it (`migration_ledger.py show --gate X-A01`: "UNMET: UA-F07"). This feature runs their
+  four checks with the commands of Auto-Creator.md 22.2 as UA-F07 checks before its seal. The X gates are recorded
+  right after UA-F07, and A01's registration then moves to `all`. FR-U07-051, SC-U07-008 and T-U07-019 are
+  corrected. The `host` check runs the package tests on a simulator, because the package's Experience targets need
+  UIKit and `swift test` cannot build them.

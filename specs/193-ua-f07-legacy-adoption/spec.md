@@ -326,7 +326,10 @@ experience was verified on both runtimes.
 **Records (story 7)**
 - **FR-U07-050**: The legacy ledger MUST be byte for byte unchanged by this feature.
 - **FR-U07-051**: X-A01, X-A02 and X-A03 MUST be recorded as pass in the migration ledger. X-A04 MUST stay
-  pending until A04-P04 to A04-P06 are sealed.
+  pending until A04-P04 to A04-P06 are sealed. The X gates depend on UA-F07 in the ledger. This feature therefore
+  runs their four checks with the same commands before its seal, to prove each experience is ready, and records
+  each X gate right after UA-F07 is recorded. The registration then moves from `candidates` to `all`
+  (corrected 2026-11-13).
 - **FR-U07-052**: Each `docs/apps` release dossier MUST stay as history and gain one note that its store listing
   is superseded by the one app. Nothing else in the dossier changes.
 - **FR-U07-053**: After any change to the framework, the ProjectM reference regression MUST pass 7 of 7 in two
@@ -374,7 +377,8 @@ experience was verified on both runtimes.
   A03 move is left pending at the end.
 - **SC-U07-007**: 3 standalone targets (A01, A02, A03) are removed after their experience was verified on 2 of 2
   runtimes, and the project builds after each removal.
-- **SC-U07-008**: The legacy ledger has 0 changed bytes; X-A01, X-A02 and X-A03 are pass; X-A04 is pending.
+- **SC-U07-008**: The legacy ledger has 0 changed bytes. Before the seal, the X checks of A01, A02 and A03 pass
+  as UA-F07 checks. Right after the record, X-A01, X-A02 and X-A03 are pass and X-A04 is pending.
 - **SC-U07-009**: The reference regression passes 7 of 7 after the last framework change; the boundary checks
   (one target, no ProjectM, no direct GL, no advertising, tracking or network) pass.
 - **SC-U07-010**: Each adopted experience's saved state restores to the same digest after the app ends, in 3 of

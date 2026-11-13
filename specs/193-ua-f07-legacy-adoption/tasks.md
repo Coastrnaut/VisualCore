@@ -129,11 +129,12 @@ runtimes.
   The app unit tests now run as `ExperienceTests`, with the same count (FR-U07-034). The project builds, and
   `release_check.py` drops the per-app steps of the retired scheme and adds the experience package's host tests
   (FR-U07-043; SC-U07-007).
-- [ ] T-U07-019 [US7] Record X-A01:
-  - move A01's registration from `candidates` to `all`;
-  - run `python3 scripts/build_catalog.py`, so that A01 becomes available once X-A01 is pass;
-  - run-check `host`, `sim27`, `sim26` and `audits` with the commands of Auto-Creator.md 22.2;
-  - seal and record X-A01 (FR-U07-051; SC-U07-008).
+- [X] T-U07-019 [US7] Prepare X-A01 (corrected 2026-11-13: X-A01 depends on UA-F07 in the ledger, so it is recorded — Verified 2026-11-13: Readiness of X-A01 as UA-F07 checks: host = package tests GenerativeArtStudioCoreTests and GenerativeArtStudioExperienceTests 95/95 on sim-27.2 (a01-x-host); sim27 and sim26 = verify_experiences.py --only a01.generative-art-studio 9/9 each after the move (a01-verify-27-moved, a01-verify-26-moved); audits PASS (a01-x-audits). Recording X-A01, moving the registration to all and rebuilding the catalog follow the UA-F07 record (ledger dependency; FR-U07-051 corrected)
+  right after UA-F07; FR-U07-051):
+  - run the four checks of Auto-Creator.md 22.2 as UA-F07 checks: the package tests of A01 on a simulator (the
+    package needs UIKit, so `swift test` cannot build it), and the runner on 27 and 26 and its audits for A01;
+  - after UA-F07 is recorded: run them again under X-A01, seal and record X-A01, move A01's registration from
+    `candidates` to `all`, and run `python3 scripts/build_catalog.py` so that A01 becomes available (SC-U07-008).
 
 ## Phase 7: User Story 5 — Fluid Art Playground (P3), steps of Phases 3, 5 and 6 for A02
 

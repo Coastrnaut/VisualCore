@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--only",
+    "a01.generative-art-studio",
+    "--audits"
+  ],
+  "command": "python3 scripts/verify_experiences.py --only a01.generative-art-studio --audits",
+  "elapsed_seconds": 1.027,
+  "exit_code": 0,
+  "finished": "2026-11-13T13:20:40+00:00",
+  "gate": "UA-F07",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F07.a01-x-audits.log",
+  "log_sha256": "753ee502e552737a0f137703fe4196958eca3a9f9716da000810f3b1d3d4bdce",
+  "name": "a01-x-audits",
+  "started": "2026-11-13T13:20:39+00:00",
+  "timed_out": false
+}
