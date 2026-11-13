@@ -87,7 +87,7 @@ none (no {owner} task). VisualCore changes, so the documentation, API-baseline a
 - [X] T-R02F03-023 `Packages/VisualCore/README.md` section "Numerical foundations (feature 203, R02-F03)". — Verified 2026-11-13: Packages/VisualCore/README.md section Numerical foundations (feature 203, R02-F03) added; its new names exist in the API baseline
 - [X] T-R02F03-024 Full host suite `swift test --package-path Packages/VisualCore` (check `host-visualcore`); record — Verified 2026-11-13: swift test Packages/VisualCore PASS (host-visualcore); new suites: SeededRandomChoice 0.030 s, ShaderHash 0.001 s, NumericHygiene 0.001 s, derivation and state tests at most 0.012 s each, all under 1 s (SC-R02F03-008)
   the duration of each new suite from the output, each under 1 s (SC-R02F03-008).
-- [ ] T-R02F03-025 Committed digests unchanged: `python3 scripts/verify_experiences.py --only a01.generative-art-studio
+- [X] T-R02F03-025 Committed digests unchanged: `python3 scripts/verify_experiences.py --only a01.generative-art-studio — Verified 2026-11-13: verify_experiences A01-A03 on iOS 27: 0 failures, digests unchanged (verify-a01-a03); ExperiencesCreative package on sim-27.2: 212 tests incl. A04 manifest digests pass (experiences-ios27) (FR-R02F03-002, 013)
   a02.fluid-art-playground a03.fractal-explorer --runtime 27` (check `verify-a01-a03`) and the ExperiencesCreative
   package tests with A04's committed digests and `seedStep`: `python3 scripts/xcodebuild_package.py --package
   Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test` (check
