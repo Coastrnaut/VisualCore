@@ -137,7 +137,7 @@ Device-only items: none, so no {device} task.
   pass (check `docs`).
 - [X] T-U11-034 Write `specs/197-ua-f11-compliance/owner-review.md` with the exact steps of T-U11-037..039 and record — Verified 2026-11-13: specs/197-ua-f11-compliance/owner-review.md lists the exact steps of the legal review, name clearance with age rating, and the non-gating distinctiveness review, each BLOCKED_OWNER_ACTION
   them as BLOCKED_OWNER_ACTION.
-- [ ] T-U11-035 CI of a commit with all UA-F11 changes finished with success (`gh run list --workflow ci --limit 1`).
+- [X] T-U11-035 CI of a commit with all UA-F11 changes finished with success (`gh run list --workflow ci --limit 1`). — Verified 2026-11-13: CI run 43506898569 on 4d88133 (every UA-F11 change) completed success: checks, host-tests, simulator-build, app-build
 - [X] T-U11-036 Only if a VisualCore package changed: `python3 scripts/check_public_api.py --update`, `python3 — Verified 2026-11-13: no VisualCore package source or public API changed: git diff --stat ecf2946..HEAD -- Packages/ shows only the regenerated test fixture Tests/VisualCoreExperienceTests/Fixtures/Catalog/registrations.json; API baseline, documented-API and ProjectM regression not triggered; 390 VisualCoreExperienceTests pass
   scripts/check_documented_api.py`, the seven-step ProjectM reference regression in two chunks; otherwise record
   "no package change" with `git diff --stat` of the feature's commits over `Packages/`.
