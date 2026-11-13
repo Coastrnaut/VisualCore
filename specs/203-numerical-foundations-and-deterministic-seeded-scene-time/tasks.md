@@ -36,7 +36,7 @@ none (no {owner} task). VisualCore changes, so the documentation, API-baseline a
 
 ## Phase 4: User Story 3 — Saved generator state (P2)
 
-- [ ] T-R02F03-008 [P] [US3] Tests first in `Packages/VisualCore/Tests/VisualCoreSimulationTests/SeededRandomStateTests.swift`:
+- [X] T-R02F03-008 [P] [US3] Tests first in `Packages/VisualCore/Tests/VisualCoreSimulationTests/SeededRandomStateTests.swift`: — Verified 2026-11-13: SeededRandomStateTests 8 tests (100-draw resume and equality, JSON round trip, version, word count, 9 malformed texts for words and seed, all-zero) pass
   after 100 draws, save, restore, next 100 identical and restored `==` original; JSON round trip; refused:
   `version` ≠ 1, word count ≠ 4, a word not "16 lower-case hexadecimal digits", all-zero words; existing equality
   unchanged.
