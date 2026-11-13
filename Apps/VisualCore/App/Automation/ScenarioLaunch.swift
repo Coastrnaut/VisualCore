@@ -30,8 +30,9 @@ enum ScenarioLaunch {
     static let evidenceFolder = "visualcore-evidence"
 
     /// The experiences a run can open: every experience of `registry` that carries a scenario manifest (its code
-    /// is its catalog code, for example `A01`) and, in debug builds, the debug experience.
-    static func targets(registry: [ExperienceRegistration] = ExperienceRegistry.all) -> [ExperienceID: ScenarioTarget] {
+    /// is its catalog code, for example `A01`) and, in debug builds, the debug experience. By default the
+    /// registered experiences and the candidates (feature 193).
+    static func targets(registry: [ExperienceRegistration] = ExperienceRegistry.all + ExperienceRegistry.candidates) -> [ExperienceID: ScenarioTarget] {
         var found: [ExperienceID: ScenarioTarget] = [:]
         for registration in registry {
             guard let manifest = registration.scenarioManifest else { continue }

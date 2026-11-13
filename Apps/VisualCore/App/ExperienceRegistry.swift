@@ -51,4 +51,10 @@ struct ExperienceRegistration: Sendable {
 enum ExperienceRegistry {
     /// Every registered experience, in catalog order. Empty until the first integration.
     static let all: [ExperienceRegistration] = []
+
+    /// The adopted experiences before their X gate (feature 193, FR-U07-021; clarification 4), in catalog order:
+    /// each carries its scenario manifest, so that the verification runner can open it, but it stays unavailable
+    /// in the catalog and outside `all`. Debug builds show them with `-vcCandidates`. Recording an experience's X
+    /// gate moves its registration from here to `all`.
+    static let candidates: [ExperienceRegistration] = []
 }

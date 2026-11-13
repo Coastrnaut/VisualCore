@@ -47,7 +47,7 @@ reverted alone.
   - the API baseline and `///` documentation.
 
   T-U07-003 passes on both runtimes (FR-U07-019, FR-U07-064).
-- [ ] T-U07-005 Tests first in `Apps/VisualCore/Tests/Unit/AppModelTests.swift`, then
+- [X] T-U07-005 Tests first in `Apps/VisualCore/Tests/Unit/AppModelTests.swift`, then — Verified 2026-11-13: AppModelTests gains 3 candidate tests (written first); ExperienceRegistry.candidates (empty until A01), ScenarioLaunch.targets reads all + candidates, DebugLaunch -vcCandidates with makeAvailable; app unit chunk AppModel/Store/Bundle/ScenarioLaunch passes on iOS 27.2 and 26.5 phone (run-checks candidates-app-ios27, candidates-app-ios26)
   `ExperienceRegistry.candidates`, the scenario targets reading `all + candidates`, and the debug argument
   `-vcCandidates` in `DebugLaunch.swift`. `-vcCandidates` makes the candidates' fixture entries available and
   registers them. The registry agreement test keeps comparing only `all` with the catalog (FR-U07-021;

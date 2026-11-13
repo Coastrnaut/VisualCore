@@ -43,6 +43,55 @@ final class AppModelTests: XCTestCase {
         XCTAssertEqual(manifest.available.map(\.id), [])
     }
 
+    // MARK: Candidates (feature 193, FR-U07-021; clarification 4)
+
+    /// Candidates are adopted experiences before their X gate: they are not in `all`, so the agreement test above
+    /// never sees them, and none is available in the bundled catalog.
+    func testCandidatesAreApartFromTheRegistryAndUnavailableInTheBundledCatalog() throws {
+        let categories = try CategoryList(data: bundled("categories"))
+        let manifest = try CatalogManifest(data: bundled("experiences"), categories: categories)
+        let candidates = ExperienceRegistry.candidates.map(\.id)
+        XCTAssertEqual(Set(candidates).count, candidates.count, "no candidate twice")
+        XCTAssertTrue(Set(candidates).isDisjoint(with: ExperienceRegistry.all.map(\.id)))
+        let ids = Set(manifest.experiences.map(\.id))
+        for id in candidates {
+            XCTAssertTrue(ids.contains(id), "\(id.rawValue) is a catalog id")
+            XCTAssertFalse(manifest.available.contains { $0.id == id }, "\(id.rawValue) stays unavailable")
+        }
+    }
+
+    /// `-vcCandidates` makes the candidates' entries available and registers them; nothing else changes.
+    func testTheCandidatesArgumentMakesTheCandidatesAvailableAndRegistersThem() throws {
+        let storage = try TestStorage(self)
+        let id = try XCTUnwrap(ExperienceID(rawValue: "a01.generative-art-studio"))
+        let candidate = DebugExperience.registration(for: id)
+        let base = try storage.environment(catalog: bundled("experiences"), categories: bundled("categories"),
+                                       registry: [], arguments: [DebugLaunch.candidatesArgument])
+        let environment = DebugLaunch.environment(base: base, candidates: [candidate])
+        XCTAssertEqual(environment.registry.map(\.id), [id])
+        let categories = try CategoryList(data: try XCTUnwrap(environment.categoriesData))
+        let manifest = try CatalogManifest(data: try XCTUnwrap(environment.catalogData), categories: categories)
+        XCTAssertEqual(manifest.available.map(\.id), [id], "only the candidate is available")
+        XCTAssertTrue(manifest.registryReport(registered: environment.registry.map(\.id)).isMatch)
+
+        let model = AppModel(environment: environment)
+        XCTAssertEqual(model.shown.map(\.id), [id], "the launcher shows the candidate")
+
+        // Without the argument nothing changes.
+        let plain = try storage.environment(catalog: bundled("experiences"), categories: bundled("categories"),
+                                        registry: [])
+        let unchanged = DebugLaunch.environment(base: plain, candidates: [candidate])
+        XCTAssertEqual(unchanged.catalogData, plain.catalogData)
+        XCTAssertTrue(unchanged.registry.isEmpty)
+        XCTAssertFalse(DebugLaunch.unknownArguments(in: [DebugLaunch.candidatesArgument]).contains("-vcCandidates"))
+    }
+
+    /// The verification runner's targets read the registered experiences and the candidates.
+    func testScenarioTargetsReadTheRegistryAndTheCandidates() {
+        let all = Set(ScenarioLaunch.targets(registry: ExperienceRegistry.all + ExperienceRegistry.candidates).keys)
+        XCTAssertEqual(Set(ScenarioLaunch.targets().keys), all)
+    }
+
     func testTheRealCatalogGivesTheEmptyLauncher() throws {
         let storage = try TestStorage(self)
         let model = AppModel(environment: storage.environment(catalog: try bundled("experiences"),

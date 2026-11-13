@@ -15,6 +15,8 @@
 //                          (not JSON), newer (a valid snapshot of schema 99), other (a valid snapshot of another
 //                          experience id)
 //   -vcStrayItems          write one file and one defaults key that no rule of the inventory lists
+//   -vcCandidates          make the candidates' catalog entries available and register them (feature 193): the
+//                          adopted experiences before their X gate, for the ported interface tests
 //   -openExperience <id>   open that experience directly after the start, without the welcome (which stays
 //                          unseen); an id that cannot be opened is recorded in the diagnostics and the catalog,
 //                          or on a first start the welcome, is shown
@@ -34,6 +36,7 @@ enum DebugLaunch {
     static let openExperienceArgument = "-openExperience"
     static let damageStateArgument = "-vcDamageState"
     static let strayItemsArgument = "-vcStrayItems"
+    static let candidatesArgument = "-vcCandidates"
     /// The kinds of damage `-vcDamageState` knows.
     static let damageKinds = ["truncated", "garbage", "newer", "other"]
     /// The stray file `-vcStrayItems` writes beside the experience folders, and its stray defaults key.
@@ -42,13 +45,16 @@ enum DebugLaunch {
 
     /// The debug arguments that take no value.
     static let flags = [fixtureCatalogArgument, emptyRegistryArgument, resetDataArgument, skipWelcomeArgument,
-                        damagedCatalogArgument, seedDataArgument, failingExperienceArgument, strayItemsArgument]
+                        damagedCatalogArgument, seedDataArgument, failingExperienceArgument, strayItemsArgument,
+                        candidatesArgument]
 
     // MARK: - Environment
 
     /// The environment the debug arguments of `base.arguments` ask for. A reset and a skipped welcome act on the
-    /// stores of `base` right here, before a model exists.
-    static func environment(base: AppEnvironment) -> AppEnvironment {
+    /// stores of `base` right here, before a model exists. `candidates` are the registrations `-vcCandidates`
+    /// adds (feature 193).
+    static func environment(base: AppEnvironment,
+                            candidates: [ExperienceRegistration] = ExperienceRegistry.candidates) -> AppEnvironment {
         var environment = base
         let arguments = base.arguments
         let preferences = PreferencesStore(defaults: base.defaults)
@@ -78,6 +84,14 @@ enum DebugLaunch {
             if !empty, arguments.contains(failingExperienceArgument) {
                 environment.registry = fixtureFreeIDs.map(DebugExperience.failingRegistration(for:))
             }
+        }
+        if arguments.contains(candidatesArgument), !candidates.isEmpty {
+            let ids = Set(candidates.map(\.id.rawValue))
+            if let data = environment.catalogData, let marked = makeAvailable(ids, in: data) {
+                environment.catalogData = marked
+            }
+            let known = Set(environment.registry.map(\.id))
+            environment.registry += candidates.filter { !known.contains($0.id) }
         }
         if arguments.contains(damagedCatalogArgument) {
             environment.catalogData = Data("{ damaged".utf8)
@@ -217,6 +231,18 @@ enum DebugLaunch {
     /// experience has no factory, because a premium experience is never opened by this feature.
     static var fixtureRegistry: [ExperienceRegistration] {
         fixture.freeIDs.map(DebugExperience.registration(for:))
+    }
+
+    /// The catalog `data` with `available` set to true for the entries whose id is in `ids`; nil when `data` is
+    /// not a catalog. The launch allocation stays as it is (feature 193, `-vcCandidates`).
+    static func makeAvailable(_ ids: Set<String>, in data: Data) -> Data? {
+        guard var root = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any],
+              var entries = root["experiences"] as? [[String: Any]] else { return nil }
+        for index in entries.indices where ids.contains(entries[index]["id"] as? String ?? "") {
+            entries[index]["available"] = true
+        }
+        root["experiences"] = entries
+        return try? JSONSerialization.data(withJSONObject: root, options: [.sortedKeys])
     }
 
     /// Builds the fixture from the data of a real catalog by switching `available` to true for six entries.
