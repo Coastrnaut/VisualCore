@@ -36,7 +36,7 @@ each task. Tests before code. Owner-only items: none. One {device} task. No Visu
   save beyond the storage limits (65th file) fails with a message and leaves the existing files unchanged (FR-A04-414).
 - [X] T-A04-407 [US1] Write `PU/Experience/ParticleLibrary.swift` (the `FractalBookmarks` pattern, files — Verified 2026-11-13: PU/Experience/ParticleLibrary.swift (scene-<uuid>.json over ExperienceStorage, FractalBookmarks pattern); tests pass (experiences-ios27/26)
   `scene-<uuid>.json`).
-- [ ] T-A04-408 [US1] Wire: `PU/Experience/ParticleExperience.swift` `make(id:storage:reduceMotion:reduceFlashing:)`;
+- [X] T-A04-408 [US1] Wire: `PU/Experience/ParticleExperience.swift` `make(id:storage:reduceMotion:reduceFlashing:)`; — Verified 2026-11-13: ParticleExperience.make(id:storage:reduceMotion:reduceFlashing:), presenter holds ParticleLibrary, controls Saved scenes and Move emitter sections with labels, identifiers and 44-point buttons, registry passes launch.storage; app builds and interface tests pass (ui-scene-library-r4, ui-pu-j4-r3)
   `PU/Experience/ParticlePresenter.swift` holds the library and sends the open actions; `PU/Experience/ParticleControls.swift`
   Library section (identifiers `pu.library.*` per contracts/actions.md, labels, 44-point targets);
   `Apps/VisualCore/App/ExperienceRegistry.swift` passes `launch.storage`.
