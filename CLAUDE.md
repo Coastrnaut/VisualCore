@@ -73,7 +73,8 @@ evidence commands are found as described in Auto-Creator.md §19. Simulators are
    traced to its cause and fixed, not retried.
    **Tests are short and concise** (owner ruling of 2026-11-13): a test exists to generate evidence quickly. No
    30-minute tests and no long soak, endurance or replay runs (wall-clock or simulated); measure a short run and
-   bound the rest by arithmetic, and leave long-duration measurements to the device campaign.
+   bound the rest by arithmetic, and leave long-duration measurements to the device campaign. This holds for all
+   future work and testing: nothing like a 30-minute test is ever run, and work keeps moving forward.
 8. **Tools.** Claude Desktop Code only. Never the Claude CLI (`claude`, `claude -p`), the Agent SDK or Python that
    calls a model.
 9. **Evidence.** Nothing is fabricated. Simulator results are never device evidence. Device observations from other
