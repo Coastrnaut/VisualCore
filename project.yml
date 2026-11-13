@@ -22,9 +22,12 @@ packages:
     path: Apps/GenerativeArtStudio/Core
   # The pure adapter core of A01 (feature 193, UA-F07; research R1 and section 4).
   GenerativeArtStudioAdapter:
-    path: Apps/GenerativeArtStudio/Adapter
+    path: Apps/GenerativeArtStudio/GenerativeArtStudioAdapter
   FluidArtPlaygroundCore:
     path: Apps/FluidArtPlayground/FluidArtPlaygroundCore
+  # The pure adapter core of A02 (feature 193, UA-F07; research R1, R3).
+  FluidArtPlaygroundAdapter:
+    path: Apps/FluidArtPlayground/FluidArtPlaygroundAdapter
   FractalExplorerCore:
     path: Apps/FractalExplorer/FractalExplorerCore
   ParticleUniverseCore:
@@ -525,6 +528,9 @@ targets:
       - target: GenerativeArtStudioExperience
       - package: GenerativeArtStudioAdapter
         product: GenerativeArtStudioAdapterCore
+      - target: FluidArtPlaygroundExperience
+      - package: FluidArtPlaygroundAdapter
+        product: FluidArtPlaygroundAdapterCore
     postBuildScripts:
       - name: Bundle licenses (UA-F04)
         basedOnDependencyAnalysis: false
@@ -549,7 +555,7 @@ targets:
     sources:
       - path: Apps/GenerativeArtStudio/App
         excludes: [GenerativeArtStudioApp.swift, LaunchCleanup.swift, AppAutomation.swift]
-      - path: Apps/GenerativeArtStudio/Adapter/Experience
+      - path: Apps/GenerativeArtStudio/GenerativeArtStudioAdapter/Experience
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: dev.visualcore.VisualCore.GenerativeArtStudioExperience
@@ -589,13 +595,70 @@ targets:
     # The A01 adapter's session tests (feature 193 T-U07-011, T-U07-012), hosted by the one app.
     type: bundle.unit-test
     platform: iOS
-    sources: [Apps/GenerativeArtStudio/Adapter/ExperienceTests]
+    sources: [Apps/GenerativeArtStudio/GenerativeArtStudioAdapter/ExperienceTests]
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: dev.visualcore.GenerativeArtStudioExperienceTests
         GENERATE_INFOPLIST_FILE: YES
     # No package products of its own: everything comes from the host app. Linking a package the app also links
     # makes Xcode build it as a dynamic framework, which breaks the link of VisualCoreTests (seen 2026-11-13).
+    dependencies:
+      - target: VisualCore
+  FluidArtPlaygroundExperience:
+    # A02 adopted as an experience of the one app (feature 193, UA-F07; research R1, R3; ADR-0011): the standalone
+    # app's sources without its @main, automation and test-mode files, plus the adapter's presenter, controls and
+    # factory. A static framework linked into the one app, as A01's.
+    type: framework.static
+    platform: iOS
+    sources:
+      - path: Apps/FluidArtPlayground/App
+        excludes: [FluidArtPlaygroundApp.swift, AppAutomation.swift, TestMode.swift]
+      - path: Apps/FluidArtPlayground/FluidArtPlaygroundAdapter/Experience
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: dev.visualcore.VisualCore.FluidArtPlaygroundExperience
+        PRODUCT_NAME: FluidArtPlaygroundExperience
+        GENERATE_INFOPLIST_FILE: YES
+        SKIP_INSTALL: YES
+    dependencies:
+      - package: FluidArtPlaygroundCore
+        product: FluidArtPlaygroundCore
+      - package: FluidArtPlaygroundAdapter
+        product: FluidArtPlaygroundAdapterCore
+      - package: VisualCore
+        product: VisualCorePersistence
+      - package: VisualCore
+        product: VisualCoreSimulation
+      - package: VisualCore
+        product: VisualCoreScenes
+      - package: VisualCore
+        product: VisualCoreMath
+      - package: VisualCore
+        product: VisualCoreDiagnostics
+      - package: VisualCore
+        product: VisualCoreEffectsGraph
+      - package: VisualCore
+        product: VisualCoreExperience
+      - package: VisualCoreRendering
+        product: VisualCoreRendering
+      - package: VisualCoreRendering
+        product: VisualCoreUI
+      - package: VisualCoreRendering
+        product: VisualCoreEffects
+      - package: VisualCoreRendering
+        product: VisualCoreExperienceHost
+      - package: VisualCoreRendering
+        product: VisualCoreAutomation
+  FluidArtPlaygroundExperienceTests:
+    # The A02 adapter's session and parity tests (feature 193 T-U07-021), hosted by the one app. No package
+    # products of its own (see GenerativeArtStudioExperienceTests).
+    type: bundle.unit-test
+    platform: iOS
+    sources: [Apps/FluidArtPlayground/FluidArtPlaygroundAdapter/ExperienceTests]
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: dev.visualcore.FluidArtPlaygroundExperienceTests
+        GENERATE_INFOPLIST_FILE: YES
     dependencies:
       - target: VisualCore
   VisualCoreTests:
@@ -631,8 +694,9 @@ schemes:
         VisualCoreTests: [test]
         VisualCoreUITests: [test]
         GenerativeArtStudioExperienceTests: [test]
+        FluidArtPlaygroundExperienceTests: [test]
     test:
-      targets: [VisualCoreTests, VisualCoreUITests, GenerativeArtStudioExperienceTests]
+      targets: [VisualCoreTests, VisualCoreUITests, GenerativeArtStudioExperienceTests, FluidArtPlaygroundExperienceTests]
   Showcase:
     build:
       targets:

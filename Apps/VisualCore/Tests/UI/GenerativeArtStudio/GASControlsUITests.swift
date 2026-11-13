@@ -26,6 +26,9 @@ final class GASControlsUITests: XCTestCase {
         let scrub = app.sliders[GAS.id("time.scrub")]
         waitFor(scrub, timeout: VC.wait)
         XCTAssertEqual(scrub.label, "Time")
+        // The slider is in its own row below the play button; it must be inside the controls' visible area, or the
+        // drag lands on the canvas above it.
+        GAS.reveal(app, scrub)
         scrub.adjust(toNormalizedSliderPosition: 0.5)
         let value = app.staticTexts[GAS.id("time.value")]
         waitFor(value, timeout: VC.wait)

@@ -72,8 +72,8 @@ exceptions to the constitution.
 Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/
   ExperiencePresenter.swift, ExperienceShell.swift, ExperienceSession.swift          modify   pointer path
 Packages/VisualCoreRendering/Package.swift                                            modify   ExperienceHost → VisualCoreScenes (if missing)
-Apps/GenerativeArtStudio/Adapter/{GenerativeArtCore,GenerativeArtPresenter,GenerativeArtControls,GenerativeArtManifest}.swift   new
-Apps/FluidArtPlayground/Adapter/{FluidArtCore,FluidArtPresenter,FluidArtControls,FluidArtManifest}.swift                       new
+Apps/GenerativeArtStudio/GenerativeArtStudioAdapter/{GenerativeArtCore,GenerativeArtPresenter,GenerativeArtControls,GenerativeArtManifest}.swift   new
+Apps/FluidArtPlayground/FluidArtPlaygroundAdapter/{FluidArtCore,FluidArtPresenter,FluidArtControls,FluidArtManifest}.swift                       new
 Apps/FractalExplorer/Adapter/{FractalCore,FractalPresenter,FractalControls,FractalManifest}.swift                               new
 Apps/ParticleUniverse/Adapter/{ParticleCore,ParticlePresenter,ParticleControls,ParticleManifest}.swift                         new
 Apps/*/Adapter/Tests/<Name>AdapterTests.swift (conformance, replay, digests)                                                   new

@@ -1,0 +1,28 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_test_map.py",
+    "--map",
+    "specs/193-ua-f07-legacy-adoption/test-map.csv",
+    "--old",
+    "Apps/GenerativeArtStudio/Tests/UI",
+    "--new",
+    "Apps/VisualCore/Tests/UI",
+    "--log",
+    ".autonomy/logs/app-tests/ua-f07-phone-ios27-g1.log",
+    ".autonomy/logs/app-tests/ua-f07-phone-ios27-g2.log",
+    ".autonomy/logs/app-tests/ua-f07-phone-ios27-g3.log",
+    ".autonomy/logs/app-tests/ua-f07-candidates-ios27.log"
+  ],
+  "command": "python3 scripts/check_test_map.py --map specs/193-ua-f07-legacy-adoption/test-map.csv --old Apps/GenerativeArtStudio/Tests/UI --new Apps/VisualCore/Tests/UI --log .autonomy/logs/app-tests/ua-f07-phone-ios27-g1.log .autonomy/logs/app-tests/ua-f07-phone-ios27-g2.log .autonomy/logs/app-tests/ua-f07-phone-ios27-g3.log .autonomy/logs/app-tests/ua-f07-candidates-ios27.log",
+  "elapsed_seconds": 0.032,
+  "exit_code": 1,
+  "finished": "2026-11-13T12:56:34+00:00",
+  "gate": "UA-F07",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F07.a01-test-map.log",
+  "log_sha256": "033ea5a8d3bbba7351e3d432175f2fc946c4939e30a1c13f98cde5f7576489ce",
+  "name": "a01-test-map",
+  "started": "2026-11-13T12:56:34+00:00",
+  "timed_out": false
+}

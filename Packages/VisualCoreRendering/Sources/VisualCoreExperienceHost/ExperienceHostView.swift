@@ -268,6 +268,9 @@ public struct ExperienceHostView: View {
                             try session.renderStill(width: width, height: height)
                         })
                 }
+                // Controls near the edges keep full contrast: no scroll-edge fade over them (rule E-12; feature 193,
+                // as A01's standalone controls did).
+                .scrollEdgeEffectHidden(true, for: .all)
                 .frame(maxHeight: SessionLayout.controlsMaxHeight)
             }
         }

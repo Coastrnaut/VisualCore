@@ -2,12 +2,47 @@
   "schema": 1,
   "registrations": {
     "a01.generative-art-studio": {
-      "capabilities": ["procedural shaders", "particles", "presets", "parameters", "saved compositions",
-                       "still export"],
-      "quality_tiers": ["level-0"],
-      "palette": ["#210D40", "#C22E5C", "#FA8F3D", "#FFE38C"],
+      "capabilities": [
+        "procedural shaders",
+        "particles",
+        "presets",
+        "parameters",
+        "saved compositions",
+        "still export"
+      ],
+      "quality_tiers": [
+        "level-0"
+      ],
+      "palette": [
+        "#210D40",
+        "#C22E5C",
+        "#FA8F3D",
+        "#FFE38C"
+      ],
       "content": null,
-      "manifest": "Apps/GenerativeArtStudio/Adapter/scenario-manifest.json"
+      "manifest": "Apps/GenerativeArtStudio/GenerativeArtStudioAdapter/scenario-manifest.json"
+    },
+    "a02.fluid-art-playground": {
+      "capabilities": [
+        "fluid simulation",
+        "touch painting",
+        "pinch brush",
+        "palettes",
+        "still capture"
+      ],
+      "quality_tiers": [
+        "full",
+        "reduced",
+        "minimal"
+      ],
+      "palette": [
+        "#F2598C",
+        "#40A6F2",
+        "#FAC74D",
+        "#73E699"
+      ],
+      "content": null,
+      "manifest": "Apps/FluidArtPlayground/FluidArtPlaygroundAdapter/scenario-manifest.json"
     }
   }
 }

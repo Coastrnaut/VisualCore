@@ -175,7 +175,7 @@ The dossier files are not edited. The legacy ledger is untouched; its hash is co
 ## 4. Corrections during implementation
 
 - **A01 adapter core location (T-U07-007, T-U07-008, 2026-11-13).** The pure core is a small SwiftPM package,
-  `Apps/GenerativeArtStudio/Adapter/Package.swift` (product `GenerativeArtStudioAdapterCore`), with the core at
+  `Apps/GenerativeArtStudio/GenerativeArtStudioAdapter/Package.swift` (product `GenerativeArtStudioAdapterCore`), with the core at
   `Adapter/Core/GenerativeArtCore.swift` and its host tests at `Adapter/Tests/GenerativeArtCoreTests.swift`, instead
   of a file compiled only into the framework target. The core then runs under `swift test` on the Mac like the Core
   packages; the presenter, controls and manifest stay in `Adapter/Experience/` and are compiled by the framework
@@ -207,7 +207,7 @@ The dossier files are not edited. The legacy ledger is untouched; its hash is co
 - **A01 verification (T-U07-013, 2026-11-13).**
   - `Catalog/registrations.json` gains A01's entry (capabilities, `level-0`, the Sunset tile colours, no content) and
     the key `manifest`, which `verify_experiences.py` already read and `build_catalog.py` now accepts. It names
-    `Apps/GenerativeArtStudio/Adapter/scenario-manifest.json`, the manifest's JSON form with the control ids, which
+    `Apps/GenerativeArtStudio/GenerativeArtStudioAdapter/scenario-manifest.json`, the manifest's JSON form with the control ids, which
     a host test keeps equal to the Swift manifest. A registration does not make an entry available; only X-A01 does.
   - The runner's reducer-bypass audit rejects an action of an undeclared control in a manifest, so the
     `rejection` scenario uses a wrong value count instead of an unknown control. JSON cannot hold infinity, so
@@ -221,10 +221,14 @@ The dossier files are not edited. The legacy ledger is untouched; its hash is co
   - The fixture scenarios are validated and played on the engine by the host tests; the runner plays the nine
     standard scenarios (its `SCENARIOS`), as for every experience.
 - **A02 core (T-U07-020, 2026-11-13).** The pure core and its manifest are a package like A01's
-  (`Apps/FluidArtPlayground/Adapter`, product `FluidArtPlaygroundAdapterCore`). `stroke` carries six values
+  (`Apps/FluidArtPlayground/FluidArtPlaygroundAdapter`, product `FluidArtPlaygroundAdapterCore`). `stroke` carries six values
   (position and velocity normalized to the view, phase, pointer) instead of the four of data-model section 2: the
   presenter keeps the app's `PointerVelocityTracker` and `PinchRecognizer`, so the core needs the tracker's velocity
   to make the same splat as `SplatQueue.add` (a host test compares the two). `pinch` and the slider `brush` both carry
   the brush radius. The completion scenario needs an outcome (`ScenarioManifestValidator`), so A02 reports
   `canvas-painted` once a splat reached the fields since the last reset (data-model corrected). The core's six
   differences from the standalone app are in its file header.
+- **Adapter folder names (2026-11-13).** SwiftPM takes a local package's identity from its folder name, so two
+  packages in folders named `Adapter` collided ("Missing package product 'FluidArtPlaygroundAdapterCore'"). The
+  adapters live in `Apps/<App>/<App>Adapter/`, like the Core packages (`FluidArtPlaygroundCore`); the folders
+  were renamed with `git mv` and every path in this feature's documents was updated.

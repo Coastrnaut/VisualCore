@@ -49,10 +49,25 @@
         "creative-and-visual"
       ],
       "order": 2,
-      "palette": [],
+      "palette": [
+        "#F2598C",
+        "#40A6F2",
+        "#FAC74D",
+        "#73E699"
+      ],
       "tile_seed": 2235648963,
-      "capabilities": [],
-      "quality_tiers": [],
+      "capabilities": [
+        "fluid simulation",
+        "touch painting",
+        "pinch brush",
+        "palettes",
+        "still capture"
+      ],
+      "quality_tiers": [
+        "full",
+        "reduced",
+        "minimal"
+      ],
       "content": null,
       "available": false
     },

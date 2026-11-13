@@ -47,8 +47,12 @@ final class GASLibraryUITests: XCTestCase {
         waitFor(field, timeout: VC.wait)
         field.tap()
         field.typeText(String(repeating: XCUIKeyboardKey.delete.rawValue, count: 40) + "Renamed")
-        alert.buttons.matching(NSPredicate(format: "identifier == %@ OR label == 'Rename'",
-                                           GAS.id("library.rename.confirm"))).firstMatch.tap()
+        let renameConfirm = alert.buttons.matching(NSPredicate(format: "identifier == %@ OR label == 'Rename'",
+                                                         GAS.id("library.rename.confirm"))).firstMatch
+        renameConfirm.tap()
+        // With the keyboard's suggestions showing, the first tap can be taken by the keyboard (seen 2026-11-13:
+        // the alert stayed open with the new name typed); tap once more while the alert is still there.
+        if !waitUntilGone(alert, timeout: 2), renameConfirm.exists { renameConfirm.tap() }
         waitFor(GAS.renameButton(app, "Renamed"), timeout: VC.wait, "the renamed entry")
         XCTAssertTrue(waitUntilGone(GAS.renameButton(app, "Clouds")), "the old name is gone")
 
@@ -63,8 +67,9 @@ final class GASLibraryUITests: XCTestCase {
         if cancel.exists {
             cancel.tap()
         } else {
-            // On a tablet the confirmation is a popover without a Cancel button: a tap outside it dismisses it.
-            app.windows.firstMatch.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.05)).tap()
+            // From iOS 26 the confirmation can be a popover without a Cancel button, on a phone too: a tap outside
+            // it dismisses it. The tap goes to the canvas (a third down the window), not the status bar.
+            app.windows.firstMatch.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.3)).tap()
         }
         XCTAssertTrue(waitUntilGone(confirm), "the confirmation closes")
         XCTAssertTrue(GAS.renameButton(app, "Renamed").exists, "cancel keeps it")

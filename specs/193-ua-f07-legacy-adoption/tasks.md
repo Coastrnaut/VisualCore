@@ -63,7 +63,7 @@ reverted alone.
 **Independent test**: with `-vcCandidates` the launcher opens A01; the runner passes its scenarios on both
 runtimes.
 
-- [X] T-U07-007 [US1] Tests first: `Apps/GenerativeArtStudio/Adapter/Tests/GenerativeArtCoreTests.swift` (host, Swift — Verified 2026-11-13: Apps/GenerativeArtStudio/Adapter/Tests/GenerativeArtCoreTests.swift, 11 Swift Testing tests (conformance over seeds 1, 7, 42, 2^64-1; every control; rejections; app editor parity; clock; deterministic shuffle; open/rebase; snapshot round trip; work-saved); swift test --package-path Apps/GenerativeArtStudio/Adapter: 11 passed (run-check a01-core-host). Location correction in research.md section 4
+- [X] T-U07-007 [US1] Tests first: `Apps/GenerativeArtStudio/GenerativeArtStudioAdapter/Tests/GenerativeArtCoreTests.swift` (host, Swift — Verified 2026-11-13: Apps/GenerativeArtStudio/GenerativeArtStudioAdapter/Tests/GenerativeArtCoreTests.swift, 11 Swift Testing tests (conformance over seeds 1, 7, 42, 2^64-1; every control; rejections; app editor parity; clock; deterministic shuffle; open/rebase; snapshot round trip; work-saved); swift test --package-path Apps/GenerativeArtStudio/GenerativeArtStudioAdapter: 11 passed (run-check a01-core-host). Location correction in research.md section 4
   Testing, in a package test target or the framework test bundle). Cover:
   - the conformance helper (`ExperienceConformance`) passes for `GenerativeArtCore` over 4 seeds;
   - each control of data-model section 2 changes the digest as specified, and invalid values are rejected;
@@ -71,11 +71,11 @@ runtimes.
   - `seed.shuffle` is a deterministic derivation of the current seed (a listed adapter difference);
   - the snapshot round trip returns the same digest;
   - the outcome is `work-saved` after a save action.
-- [X] T-U07-008 [US1] Implement `Apps/GenerativeArtStudio/Adapter/GenerativeArtCore.swift`. It wraps `ArtDocument`, — Verified 2026-11-13: Apps/GenerativeArtStudio/Adapter/Core/GenerativeArtCore.swift with six listed adapter differences; edits go through CompositionEditor; T-U07-007 passes 11/11 (run-check a01-core-host)
+- [X] T-U07-008 [US1] Implement `Apps/GenerativeArtStudio/GenerativeArtStudioAdapter/GenerativeArtCore.swift`. It wraps `ArtDocument`, — Verified 2026-11-13: Apps/GenerativeArtStudio/GenerativeArtStudioAdapter/Core/GenerativeArtCore.swift with six listed adapter differences; edits go through CompositionEditor; T-U07-007 passes 11/11 (run-check a01-core-host)
   the family, the preset and the time; `CompositionEditor` and `SceneFamily` are rebuilt from the catalog. The file
   header lists each difference from the standalone app. T-U07-007 passes.
 - [X] T-U07-009 [US1] `GenerativeArtPresenter.swift`, `GenerativeArtControls.swift` and `GenerativeArtManifest.swift` in — Verified 2026-11-13: Adapter/Experience: GenerativeArtPresenter (ArtCanvasScene over ArtSceneFactory with fixedTime, EffectScene limiter, CPU-derived particle-corner probe), GenerativeArtControls (families, time, presets, palettes, seed, parameters, library via ExperienceStorage, export via ShareLink and the new ExperienceStillRenderer; labels and 44 pt targets), GenerativeArtLibrary, GenerativeArtManifest (9 standard + 5 fixtures, committed digests); swift test 14/14 (a01-manifest-host); host tests 151/151 on sim-27.2 and sim-26.5 (still-host-ios272/265); public API 2183, 0 undocumented; reference regression a and b exit 0 (reference-a-still, reference-b-still). The largest-text-size check of E-12 is part of the ported accessibility audit (T-U07-015)
-  `Apps/GenerativeArtStudio/Adapter/`:
+  `Apps/GenerativeArtStudio/GenerativeArtStudioAdapter/`:
   - the presenter wraps `ArtSceneFactory` with `fixedTime` from the core and the framework's bundle for shaders,
     and declares a probe;
   - the controls cover the gallery families, presets, palettes, parameters, seed, play, pause and scrub, and the
@@ -137,7 +137,7 @@ runtimes.
 
 ## Phase 7: User Story 5 — Fluid Art Playground (P3), steps of Phases 3, 5 and 6 for A02
 
-- [X] T-U07-020 [US5] Tests first: `FluidArtCoreTests` covering: — Verified 2026-11-13: Apps/FluidArtPlayground/Adapter/Tests/FluidArtCoreTests.swift: conformance over 4 seeds; every control as an action; pause/step/resume; strokes equal SplatQueue's splats for the same tracker samples; pending bounded by SplatQueue.maxPending (1074 queued, 1024 kept, 50 dropped) and drained under the cap; digest of CPU state only, unchanged by tiers 0-2 and shedding; reset and detail; snapshot round trip; manifest valid with 5 fixtures and its committed digests. swift test --package-path Apps/FluidArtPlayground/Adapter: 12 passed (a02-core-host)
+- [X] T-U07-020 [US5] Tests first: `FluidArtCoreTests` covering: — Verified 2026-11-13: Apps/FluidArtPlayground/FluidArtPlaygroundAdapter/Tests/FluidArtCoreTests.swift: conformance over 4 seeds; every control as an action; pause/step/resume; strokes equal SplatQueue's splats for the same tracker samples; pending bounded by SplatQueue.maxPending (1074 queued, 1024 kept, 50 dropped) and drained under the cap; digest of CPU state only, unchanged by tiers 0-2 and shedding; reset and detail; snapshot round trip; manifest valid with 5 fixtures and its committed digests. swift test --package-path Apps/FluidArtPlayground/FluidArtPlaygroundAdapter: 12 passed (a02-core-host)
   - conformance;
   - strokes, pinch, splash, pause, step, reset, palette, edges, detail and sliders as actions;
   - pending splats bounded by `SplatQueue.maxPending`;

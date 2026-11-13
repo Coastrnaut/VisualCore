@@ -1260,7 +1260,7 @@ class UnifiedAppTargetTests(unittest.TestCase):
         self.assertEqual(products, ["VisualCoreExperience", "VisualCoreSimulation", "VisualCoreDiagnostics",
                                     "VisualCorePersistence",
                                     "VisualCoreRendering", "VisualCoreUI", "VisualCoreExperienceHost",
-                                    "GenerativeArtStudioAdapterCore"])
+                                    "GenerativeArtStudioAdapterCore", "FluidArtPlaygroundAdapterCore"])
 
     def test_the_standing_isolation_step_requires_sources(self):
         listing = subprocess.run([sys.executable, str(HERE / "release_check.py"), "--list"],

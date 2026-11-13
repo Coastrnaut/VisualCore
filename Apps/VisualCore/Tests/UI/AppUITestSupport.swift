@@ -171,10 +171,13 @@ func firstTile(_ app: XCUIApplication, tier: String) -> XCUIElement {
 @MainActor var isTablet: Bool { UIDevice.current.userInterfaceIdiom == .pad }
 
 /// Runs the system accessibility audit on what `app` shows. At the default text size the two text-size audits are
-/// left out, as in the standalone apps. Returns the ignored findings.
+/// left out, as in the standalone apps. `visible` is the frame of a scroll view that clips its content (an open
+/// experience's controls, feature 193): a contrast finding on an element not wholly inside it is measured on what is
+/// drawn over the clipped element, and the element is audited whole at the scroll stop that shows it. Returns the
+/// ignored findings.
 @MainActor
 @discardableResult
-func audit(_ app: XCUIApplication, _ screen: String, largeText: Bool) throws -> [String] {
+func audit(_ app: XCUIApplication, _ screen: String, largeText: Bool, visible: CGRect? = nil) throws -> [String] {
     let all = XCUIAccessibilityAuditType.all
     let types: XCUIAccessibilityAuditType = largeText ? all : all.subtracting([.dynamicType, .textClipped])
     let ignored = FindingLog()
@@ -202,6 +205,12 @@ func audit(_ app: XCUIApplication, _ screen: String, largeText: Bool) throws -> 
             // audited in full where a test scrolls to it.
             ignored.append(description)
             print("A11Y-AUDIT ignored (text only partly on screen): \(description)")
+            return true
+        }
+        if let frame = e?.frame, let visible, issue.auditType == .contrast,
+           !visible.insetBy(dx: -1, dy: -1).contains(frame) {
+            ignored.append(description)
+            print("A11Y-AUDIT ignored (clipped by its scroll view): \(description)")
             return true
         }
         if e == nil {

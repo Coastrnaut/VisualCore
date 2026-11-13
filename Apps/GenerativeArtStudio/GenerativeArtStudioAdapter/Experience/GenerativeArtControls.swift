@@ -73,21 +73,21 @@ struct GenerativeArtControls: View {
             librarySection(core)
             exportSection()
         }
-        .alert(Text(verbatim: "Rename"), isPresented: Binding(get: { renaming != nil }, set: { if !$0 { renaming = nil } })) {
+        // `presenting:` hands the entry to the actions: the binding is cleared when the alert closes, which can be
+        // before an action reads it.
+        .alert(Text(verbatim: "Rename"), isPresented: Binding(get: { renaming != nil }, set: { if !$0 { renaming = nil } }),
+               presenting: renaming) { entry in
             TextField(text: $newName) { Text(verbatim: "Name") }
                 .accessibilityIdentifier(port.identifier("library.rename.name"))
-            Button { if let entry = renaming { library.rename(entry.id, to: newName) }; renaming = nil } label: {
-                Text(verbatim: "Rename")
-            }
-            .accessibilityIdentifier(port.identifier("library.rename.confirm"))
-            Button(role: .cancel) { renaming = nil } label: { Text(verbatim: "Cancel") }
+            Button { library.rename(entry.id, to: newName) } label: { Text(verbatim: "Rename") }
+                .accessibilityIdentifier(port.identifier("library.rename.confirm"))
+            Button(role: .cancel) {} label: { Text(verbatim: "Cancel") }
         }
         .confirmationDialog(Text(verbatim: "Remove this composition?"),
-                            isPresented: Binding(get: { removing != nil }, set: { if !$0 { removing = nil } })) {
-            Button(role: .destructive) { if let entry = removing { library.remove(entry.id) }; removing = nil } label: {
-                Text(verbatim: "Remove")
-            }
-            .accessibilityIdentifier(port.identifier("library.remove.confirm"))
+                            isPresented: Binding(get: { removing != nil }, set: { if !$0 { removing = nil } }),
+                            presenting: removing) { entry in
+            Button(role: .destructive) { library.remove(entry.id) } label: { Text(verbatim: "Remove") }
+                .accessibilityIdentifier(port.identifier("library.remove.confirm"))
         }
     }
 
@@ -112,16 +112,18 @@ struct GenerativeArtControls: View {
                 }
                 .accessibilityLabel(Text(verbatim: core.playing ? "Pause" : "Play"))
                 .accessibilityIdentifier(port.identifier("time.playPause"))
-                Slider(value: Binding(get: { core.time }, set: { port.send("scrub", [$0]) }),
-                       in: 0...GenerativeArtCore.duration)
-                    .frame(minHeight: 44)
-                    .accessibilityLabel(Text(verbatim: "Time"))
-                    .accessibilityValue(Text(verbatim: String(format: "%.1f seconds", core.time)))
-                    .accessibilityIdentifier(port.identifier("time.scrub"))
+                Spacer()
                 Text(verbatim: String(format: "%.1f s", core.time))
                     .font(.subheadline.monospacedDigit())
                     .accessibilityIdentifier(port.identifier("time.value"))
             }
+            // The slider has its own full-width row, so that a drag never lands on its neighbours.
+            Slider(value: Binding(get: { core.time }, set: { port.send("scrub", [$0]) }),
+                   in: 0...GenerativeArtCore.duration)
+                .frame(minHeight: 44)
+                .accessibilityLabel(Text(verbatim: "Time"))
+                .accessibilityValue(Text(verbatim: String(format: "%.1f seconds", core.time)))
+                .accessibilityIdentifier(port.identifier("time.scrub"))
         }
     }
 

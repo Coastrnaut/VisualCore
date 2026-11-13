@@ -83,7 +83,9 @@ def xcode_test(project: str, scheme: str, runtime: str, derived: str, stamp: str
 STORAGE_RULE_SOURCES = ["Apps/VisualCore/App/DebugSupport/DebugExperience.swift",
                         "Packages/VisualCore/Sources/VisualCoreTestSupport/SampleExperienceCore.swift",
                         # The adapters of the adopted experiences (feature 193, UA-F07).
-                        "Apps/GenerativeArtStudio/Adapter/Core", "Apps/GenerativeArtStudio/Adapter/Experience"]
+                        "Apps/GenerativeArtStudio/GenerativeArtStudioAdapter/Core", "Apps/GenerativeArtStudio/GenerativeArtStudioAdapter/Experience",
+                       "Apps/FluidArtPlayground/FluidArtPlaygroundAdapter/Core",
+                       "Apps/FluidArtPlayground/FluidArtPlaygroundAdapter/Experience"]
 # The shipped sources that read stored data.
 STORED_DATA_SOURCES = ["Packages/VisualCore/Sources/VisualCoreExperience/SavedStateStore.swift",
                        "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift",
@@ -93,7 +95,9 @@ STORED_DATA_SOURCES = ["Packages/VisualCore/Sources/VisualCoreExperience/SavedSt
                        "Packages/VisualCore/Sources/VisualCoreExperience/ContainerInventory.swift",
                        "Apps/VisualCore/App/PreferencesStore.swift", "Apps/VisualCore/App/AppModel.swift",
                        "Apps/VisualCore/App/ExperienceDataStore.swift",
-                       "Apps/GenerativeArtStudio/Adapter/Core", "Apps/GenerativeArtStudio/Adapter/Experience"]
+                       "Apps/GenerativeArtStudio/GenerativeArtStudioAdapter/Core", "Apps/GenerativeArtStudio/GenerativeArtStudioAdapter/Experience",
+                       "Apps/FluidArtPlayground/FluidArtPlaygroundAdapter/Core",
+                       "Apps/FluidArtPlayground/FluidArtPlaygroundAdapter/Experience"]
 
 
 def steps(stamp: str) -> list[Step]:
