@@ -123,7 +123,7 @@ Device-only items: none, so no {device} task.
 
 ## Phase 10: Polish and cross-cutting
 
-- [ ] T-U11-030 Modify `scripts/release_check.py`: steps `usage-descriptions`, `distinctiveness`, `metadata-inputs`;
+- [X] T-U11-030 Modify `scripts/release_check.py`: steps `usage-descriptions`, `distinctiveness`, `metadata-inputs`; — Verified 2026-11-13: release_check.py steps usage-descriptions, distinctiveness, metadata-inputs and app-no-tracking, app-licenses, app-usage-descriptions, app-projectm-audit with JSON reports; AcknowledgementsUITests in chunk b; test_release_steps OK; release-check-app PASS (7 steps)
   after `app-release-build`: `app-no-tracking`, `app-licenses`, `app-usage-descriptions`, `app-projectm-audit`, and
   `app-privacy-manifest`/`app-no-tracking` with `--json` into `.autonomy/logs/`; `scripts/tests/test_release_steps.py`
   covers the names; run the new steps (check `release-check-ua-f11`).
