@@ -46,7 +46,7 @@ task. Owner-only items: none.
 - [X] T-R02F26-010 [US3] Write `AnnouncementSink`, `SystemAnnouncementSink` (`UIAccessibility.post(notification: — Verified 2026-11-13: AccessibilityPlayers.swift: AnnouncementSink, SystemAnnouncementSink (UIAccessibility.post announcement), recording sinks; AccessibilityPlayersTests 4/4 on sim-27.2 and sim-26.5 (rendering-ios27/26)
   .announcement, argument:)`) in `Packages/VisualCoreRendering/Sources/VisualCoreUI/AccessibilityPlayers.swift`, with a
   fake-sink test in the rendering tests.
-- [ ] T-R02F26-011 [US3] [US4] Acceptance: host tests and rendering tests on both runtimes (checks `host-plans`,
+- [X] T-R02F26-011 [US3] [US4] Acceptance: host tests and rendering tests on both runtimes (checks `host-plans`, — Verified 2026-11-13: host tests and rendering tests on both runtimes pass (host-visualcore-r2, rendering-ios27, rendering-ios26) (SC-R02F26-003, SC-R02F26-004)
   `rendering-ios27`, `rendering-ios26`) (SC-R02F26-003, SC-R02F26-004).
 
 ## Phase 5: User Story 5 — Haptics, when wanted (P3)
