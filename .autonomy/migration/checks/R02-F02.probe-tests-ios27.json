@@ -1,0 +1,29 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/VisualCoreRendering",
+    "--scheme",
+    "VisualCoreRendering-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--result-name",
+    "r02f02-probe-27",
+    "--only-testing",
+    "VisualCoreRenderingTests/RenderCapabilitiesProbeTests"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --result-name r02f02-probe-27 --only-testing VisualCoreRenderingTests/RenderCapabilitiesProbeTests",
+  "elapsed_seconds": 6.554,
+  "exit_code": 0,
+  "finished": "2026-11-13T19:07:09+00:00",
+  "gate": "R02-F02",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-F02.probe-tests-ios27.log",
+  "log_sha256": "2f8156c0442cd1929d23fc94acbb9af98d3842693602193a84801f2a216d58cb",
+  "name": "probe-tests-ios27",
+  "started": "2026-11-13T19:07:02+00:00",
+  "timed_out": false
+}

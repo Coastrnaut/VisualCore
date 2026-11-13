@@ -34,6 +34,9 @@ public struct ScenarioRunResult: Sendable {
     public let probes: [(name: String, expected: String, observed: String)]
     /// `single` when every part ran in this process, `two-launch` for a save or restore phase.
     public let process: String
+    /// What the render host's context reported when the frame was read (feature 202, FR-R02F02-006); nil when no
+    /// frame was read.
+    public let renderer: RendererRecord?
 }
 
 /// Runs scenarios of a manifest through one `ExperienceSession` on the main actor.
@@ -388,6 +391,7 @@ public final class ScenarioRunner {
         record.frame = FrameObservation(width: size.width, height: size.height, sha256: hash, nonBlank: nonBlank,
                                         probes: observed)
         record.pixels = (pixels, size.width, size.height)
+        record.renderer = RendererRecord(host.capabilities)
     }
 
     private func judge(_ samples: [ResourceSample], name: String, warmUp: Int? = nil, into record: inout Record) {
@@ -409,6 +413,7 @@ public final class ScenarioRunner {
         var frame: FrameObservation?
         var pixels: (pixels: [UInt8], width: Int, height: Int)?
         var probes: [(name: String, expected: String, observed: String)] = []
+        var renderer: RendererRecord?
         var timingValue = ScenarioTiming()
         var footprint = 0
         var gpuBytes = 0
@@ -447,7 +452,7 @@ public final class ScenarioRunner {
                 resources: ScenarioResources(footprint: footprint, gpuBytes: gpuBytes, live: live, leaked: leaked),
                 actionsSent: sent, actionsHandled: handled, failures: failures)
             return ScenarioRunResult(observation: observation, snapshot: snapshot, frame: pixels, probes: probes,
-                                     process: process)
+                                     process: process, renderer: renderer)
         }
     }
 }

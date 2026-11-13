@@ -132,7 +132,8 @@ enum ScenarioLaunch {
         let record = EvidenceRecord.observed(result.observation, experience: target.id, code: target.code,
                                              run: request.run, build: buildConfiguration, process: result.process,
                                              qualityTier: nil, failures: failures, probes: result.probes,
-                                             thermalState: thermalState, lowPower: ProcessInfo.processInfo.isLowPowerModeEnabled)
+                                             thermalState: thermalState, lowPower: ProcessInfo.processInfo.isLowPowerModeEnabled,
+                                             renderer: result.renderer)
         let outcome = write(record, run: request.run, name: name, documents: documents, code: failures.isEmpty ? 0 : 1)
         // The frame the record's hash names, beside the record (raw RGBA, rows bottom-up), for the driver to keep.
         if let frame = result.frame, let file = outcome.record {

@@ -1,0 +1,24 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--only",
+    "a01.generative-art-studio",
+    "--runtime",
+    "27",
+    "--scenario",
+    "launch-first-frame",
+    "--fresh"
+  ],
+  "command": "python3 scripts/verify_experiences.py --only a01.generative-art-studio --runtime 27 --scenario launch-first-frame --fresh",
+  "elapsed_seconds": 18.403,
+  "exit_code": 0,
+  "finished": "2026-11-13T19:09:55+00:00",
+  "gate": "R02-F02",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-F02.verify-renderer.log",
+  "log_sha256": "e31eb5bcd7855f582f5389e2e79a6c3c1250961a46d8a9d941439e8ac786e064",
+  "name": "verify-renderer",
+  "started": "2026-11-13T19:09:37+00:00",
+  "timed_out": false
+}

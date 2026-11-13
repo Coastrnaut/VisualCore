@@ -422,7 +422,11 @@ def complete_record(record: dict, *, run_id: str, attempt: int, environment: dic
     run.update({"id": run_id, "attempt": attempt})
     run.setdefault("lock_sha256", None)
     record["run"] = run
+    app_environment = record.get("environment") if isinstance(record.get("environment"), dict) else {}
     record["environment"] = dict(environment)
+    # Feature 202 (R02-F02, FR-R02F02-006): what the render host reported is the app's to say; the driver keeps it.
+    if "renderer" in app_environment:
+        record["environment"]["renderer"] = app_environment["renderer"]
     record["source"] = dict(source)
     art = record.get("artifacts") if isinstance(record.get("artifacts"), dict) else {}
     art.update(artifacts)

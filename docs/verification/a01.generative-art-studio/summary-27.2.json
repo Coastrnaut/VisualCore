@@ -1,12 +1,12 @@
 {
   "bundle": null,
-  "commit": "76602e2fc6d059f0ba803a477137dcfba61edd3e",
+  "commit": "9167267b6d3aba73c7dcaba27adcd3e74b7d66fa",
   "device_type": "com.apple.CoreSimulator.SimDeviceType.iPhone-18-Pro",
   "experience": "a01.generative-art-studio",
   "results": [
     {
-      "commit": "76602e2fc6d059f0ba803a477137dcfba61edd3e",
-      "record_sha256": "f2a94ee688cccd476a28c076278eb00383955d3bb6679791f02e481691d36c96",
+      "commit": "9167267b6d3aba73c7dcaba27adcd3e74b7d66fa",
+      "record_sha256": "2dd2c5e08ed40e022ef3b83a5310d0807b7f302a690d2f55ada828c4b243372c",
       "result": "pass",
       "scenario": "launch-first-frame"
     },

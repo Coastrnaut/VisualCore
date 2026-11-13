@@ -83,6 +83,8 @@ public struct EvidenceRecord: Sendable, Equatable, Codable {
         public var hostOS: String?
         /// The signing, `none` for a simulator build.
         public var signing: String?
+        /// What the renderer reported (R02-F02); the key is omitted, not `null`, when there is no report.
+        public var renderer: RendererRecord?
 
         enum CodingKeys: String, CodingKey {
             case kind
@@ -92,12 +94,13 @@ public struct EvidenceRecord: Sendable, Equatable, Codable {
             case xcode, swift, sdk
             case hostOS = "host_os"
             case signing
+            case renderer
         }
 
         /// Creates an environment.
         public init(kind: String, osVersion: String? = nil, osBuild: String? = nil, deviceType: String? = nil,
                     xcode: String? = nil, swift: String? = nil, sdk: String? = nil, hostOS: String? = nil,
-                    signing: String? = nil) {
+                    signing: String? = nil, renderer: RendererRecord? = nil) {
             self.kind = kind
             self.osVersion = osVersion
             self.osBuild = osBuild
@@ -107,9 +110,10 @@ public struct EvidenceRecord: Sendable, Equatable, Codable {
             self.sdk = sdk
             self.hostOS = hostOS
             self.signing = signing
+            self.renderer = renderer
         }
 
-        /// Encodes every key, absent values as `null`.
+        /// Encodes every key of schema 1, absent values as `null`; the optional `renderer` only when present.
         public func encode(to encoder: any Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
             try container.encode(kind, forKey: .kind)
@@ -121,6 +125,7 @@ public struct EvidenceRecord: Sendable, Equatable, Codable {
             try container.encodeOrNull(sdk, forKey: .sdk)
             try container.encodeOrNull(hostOS, forKey: .hostOS)
             try container.encodeOrNull(signing, forKey: .signing)
+            try container.encodeIfPresent(renderer, forKey: .renderer)
         }
     }
 

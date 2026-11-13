@@ -13,7 +13,9 @@ without observed evidence (no step and no initial and final digest, except for `
 `teardown-reentry`), a drawing pass (`launch-first-frame`, `hero`) without a non-blank frame with a hash,
 `environment.kind` other than simulator or device, any key or string value shaped like a UDID or an ECID, and in a
 device record any key named `udid`, `serial` or `ecid` (the format stays usable on devices without carrying a
-hardware identifier).
+hardware identifier). An optional `environment.renderer` (feature 202 R02-F02 T-R02F02-009) must be an object whose
+values are strings or integers, and whose `floor_findings`, when present, is a list of strings; its strings are
+scanned for identifiers like every other value.
 
 Output: one `PASS: <file>` line, or one `FAIL: <file>: <problem>` line per problem (each problem names its field
 path). Exit codes: 0 every file passed (or the self-test passed); 1 a file or a self-test case failed; 2 bad usage.
@@ -212,6 +214,24 @@ def _identifiers(path: str, value, device: bool, problems: list[str]) -> None:
         text(path, value, "value")
 
 
+def _check_renderer(environment, problems: list[str]) -> None:
+    """The optional `environment.renderer` (R02-F02 FR-R02F02-006): absent, or an object of string or integer
+    values, with `floor_findings` a list of strings. Unknown keys are allowed (readers ignore them)."""
+    if not isinstance(environment, dict) or "renderer" not in environment:
+        return
+    renderer = environment["renderer"]
+    if not isinstance(renderer, dict):
+        problems.append(f"environment.renderer: expected an object, got {_type_name(renderer)}")
+        return
+    for key, value in renderer.items():
+        where = f"environment.renderer.{key}"
+        if key == "floor_findings":
+            if not isinstance(value, list) or not all(isinstance(v, str) for v in value):
+                problems.append(f"{where}: expected a list of strings, got {_type_name(value)}")
+        elif not (isinstance(value, str) or _is_int(value)):
+            problems.append(f"{where}: expected a string or an integer, got {_type_name(value)}")
+
+
 def validate(record) -> list[str]:
     """Every problem of one evidence record; empty when it follows schema 1. Each problem names its field path."""
     if not isinstance(record, dict):
@@ -255,6 +275,7 @@ def validate(record) -> list[str]:
 
     environment = record.get("environment")
     device = isinstance(environment, dict) and environment.get("kind") == "device"
+    _check_renderer(environment, problems)
     _identifiers("", record, device, problems)
     return problems
 
@@ -357,6 +378,16 @@ SELF_TEST_CASES = [
     ("device record with a serial key",
      _edit(environment__kind="device", environment__serial="none"), "environment.serial: a device record"),
     ("run attempt 0", _edit(run__attempt=0), "run.attempt"),
+    ("valid record with a renderer",
+     _edit(environment__renderer={"gl_version": "OpenGL ES 3.0", "max_samples": 4, "floor_findings": []}), None),
+    ("renderer not an object", _edit(environment__renderer="ANGLE"), "environment.renderer: expected an object"),
+    ("renderer value a boolean", _edit(environment__renderer={"generation": True}),
+     "environment.renderer.generation: expected a string or an integer"),
+    ("renderer floor findings not strings", _edit(environment__renderer={"floor_findings": [1]}),
+     "environment.renderer.floor_findings: expected a list of strings"),
+    ("UDID in the renderer",
+     _edit(environment__renderer={"renderer": "-".join(["0A1B2C3D", "0000", "4000", "8000", "0000" + "0000ABCD"])}),
+     "environment.renderer.renderer: value looks like a UDID"),
     ("negative timing", _edit(timing__launch_ms=-1), "timing.launch_ms"),
 ]
 

@@ -36,3 +36,9 @@ The read-only audit (agent note `Build/agent-notes/R02-F02-audit.md`, verified a
 ## 3. Corrections during implementation
 
 (none yet)
+- 2026-11-13, T-R02F02-010: the first runner scenario passed but its evidence had no `renderer`. The verification
+  driver `scripts/verify_experiences.py` (`complete_record`) replaces the app's `environment` with the driver's host
+  fields, so the record was dropped there; the plan had not named that file. The driver now keeps the app's
+  `renderer` (scripts/tests/test_verify_renderer.py). The runner captures the report in `readFrame` while the host is
+  live, carries it as `ScenarioRunResult.renderer`, and `EvidenceRecord.observed(..., renderer:)` puts it in the
+  environment.

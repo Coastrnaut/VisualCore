@@ -110,8 +110,7 @@ public final class RenderHost {
         }
         lifecycle.transition(to: .surfaceReady)
         resources.contextDidStart(generation: lifecycle.generation)
-        capabilities = RenderCapabilities.query(display: display)
-        resources.maxTextureSize = capabilities.maxTextureSize
+        takeCapabilities(missingEntryPoints: 0)
         setupScene()
         renderView.onLayout = { [weak self] in self?.layoutSurface() }
         renderView.onWindowChange = { [weak self] inWindow in self?.windowChanged(inWindow) }
@@ -340,6 +339,15 @@ public final class RenderHost {
 
     // MARK: Recreation (FR-F208)
 
+    /// Takes the renderer's report for the current context generation (feature 202). Call with the context current.
+    private func takeCapabilities(missingEntryPoints: Int) {
+        var caps = RenderCapabilities.query(display: display)
+        caps.missingEntryPoints = missingEntryPoints
+        caps.generation = lifecycle.generation
+        capabilities = caps
+        resources.maxTextureSize = caps.maxTextureSize
+    }
+
     /// Destroys and recreates the context (API, tests, or after EGL_CONTEXT_LOST); the scene is set up again.
     public func recreateContext() {
         guard state != .destroyed, state != .uninitialized else { return }
@@ -364,8 +372,16 @@ public final class RenderHost {
         } catch {
             return
         }
-        _ = vcglLoadFromEGL()
+        // Feature 202 (R02-F02, FR-R02F02-003/004): a reload that misses entry points fails like a first load, and the
+        // report is taken again for the new context generation.
+        let missing = Int(vcglLoadFromEGL())
+        guard missing == 0 else {
+            report(.unsupported("\(missing) OpenGL ES 3.0 entry points missing from ANGLE after context recreation"))
+            enterSurfaceInvalid()
+            return
+        }
         resources.contextDidStart(generation: lifecycle.generation)
+        takeCapabilities(missingEntryPoints: missing)
         setupScene()
         layoutSurface()
         if state == .reinitialized { enterSurfaceInvalid() }   // no valid size yet

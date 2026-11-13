@@ -8,7 +8,7 @@ task. Owner-only items: none.
 
 ## Phase 1: Setup
 
-- [ ] T-R02F02-001 Record the audit and decisions (research.md sections 1–2, done in `/speckit-plan`); baseline:
+- [X] T-R02F02-001 Record the audit and decisions (research.md sections 1–2, done in `/speckit-plan`); baseline: — Verified 2026-11-13: research.md sections 1-2 (audit re-verified by the lead); the starting point is the passing baseline of UA-F07 (api-boundaries-r2: 2184 declarations, 0 undocumented; rendering-ios27/26)
   `check_public_api.py` PASS and the rendering package tests on sim-27.2 (checks `baseline-api`, `baseline-rendering`).
 
 ## Phase 2: User Story 1 — An experience can ask what the renderer offers (P1)

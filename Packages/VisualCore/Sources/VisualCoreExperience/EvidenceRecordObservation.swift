@@ -27,11 +27,12 @@ extension EvidenceRecord {
     ///
     /// `failures` are the evaluator's failures; the result is `pass` when there are none, `fail` otherwise, or
     /// `error` when `error` names one (for example an unknown experience). Fields only the host can know are null.
+    /// `renderer` is what the render host reported when the frame was read (feature 202); nil leaves it out.
     public static func observed(_ observation: ScenarioObservation, experience: ExperienceID, code: String,
                                 run: String, build: String, process: String, qualityTier: Int?,
                                 failures: [String], error: String? = nil,
                                 probes: [(name: String, expected: String, observed: String)] = [],
-                                thermalState: String, lowPower: Bool) -> EvidenceRecord {
+                                thermalState: String, lowPower: Bool, renderer: RendererRecord? = nil) -> EvidenceRecord {
         let result: EvidenceResult = error != nil ? .error : (failures.isEmpty ? .pass : .fail)
         let steps = observation.steps.map { step in
             Step(control: step.control, values: step.values, result: step.result == "accepted" ? "accepted" : "rejected",
@@ -55,7 +56,7 @@ extension EvidenceRecord {
                                   leaked: observation.resources.leaked)
         return EvidenceRecord(experience: experience.rawValue, code: code, scenario: observation.scenario,
                               seed: String(observation.seed), result: result, run: Run(id: run),
-                              environment: Environment(kind: Self.environmentKind),
+                              environment: Environment(kind: Self.environmentKind, renderer: renderer),
                               configuration: Configuration(build: build, automation: automationCompiled, qualityTier: qualityTier,
                                                            entitlement: "none", process: process),
                               steps: steps, digests: digests, frames: frames, timing: timing, pacing: nil,
