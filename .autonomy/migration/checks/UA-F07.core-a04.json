@@ -1,0 +1,29 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/ExperiencesCreative",
+    "--scheme",
+    "ExperiencesCreative-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--result-name",
+    "core-a04",
+    "--only-testing",
+    "ParticleUniverseCoreTests"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --result-name core-a04 --only-testing ParticleUniverseCoreTests",
+  "elapsed_seconds": 45.222,
+  "exit_code": 0,
+  "finished": "2026-11-13T16:26:35+00:00",
+  "gate": "UA-F07",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F07.core-a04.log",
+  "log_sha256": "163ba5f7b80ec2f0ae5cf17130c0579f696666aaed6756ac00da786695177f9a",
+  "name": "core-a04",
+  "started": "2026-11-13T16:25:50+00:00",
+  "timed_out": false
+}

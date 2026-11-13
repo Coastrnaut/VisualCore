@@ -1,0 +1,29 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/ExperiencesCreative",
+    "--scheme",
+    "ExperiencesCreative-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--result-name",
+    "core-a03",
+    "--only-testing",
+    "FractalExplorerCoreTests"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --result-name core-a03 --only-testing FractalExplorerCoreTests",
+  "elapsed_seconds": 4.3,
+  "exit_code": 0,
+  "finished": "2026-11-13T16:25:50+00:00",
+  "gate": "UA-F07",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F07.core-a03.log",
+  "log_sha256": "ba89f75c6bd2adaff731922c2eea7364b5e909385dc878cc4ee50d88e6fe4a3e",
+  "name": "core-a03",
+  "started": "2026-11-13T16:25:45+00:00",
+  "timed_out": false
+}

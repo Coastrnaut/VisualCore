@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "python3",
+    "scripts/migration_baseline.py",
+    "verify"
+  ],
+  "command": "python3 scripts/migration_baseline.py verify",
+  "elapsed_seconds": 0.184,
+  "exit_code": 0,
+  "finished": "2026-11-13T16:26:35+00:00",
+  "gate": "UA-F07",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F07.fixtures.log",
+  "log_sha256": "a9f56aa887d2beaab4da88d0d4372826dd4b58ae09456ee23a432910ceb43bf7",
+  "name": "fixtures",
+  "started": "2026-11-13T16:26:35+00:00",
+  "timed_out": false
+}

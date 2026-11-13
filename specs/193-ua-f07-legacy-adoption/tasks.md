@@ -206,7 +206,7 @@ runtimes.
 
 ## Phase 11: Evidence and convergence
 
-- [ ] T-U07-034 Evidence `core-a01` … `core-a04` (Core host tests at their final paths) and `fixtures`
+- [X] T-U07-034 Evidence `core-a01` … `core-a04` (Core host tests at their final paths) and `fixtures` — Verified 2026-11-13: xcodebuild_package.py ExperiencesCreative-Package sim-27.2 --only-testing <Name>CoreTests at the final paths: A01 31 (core-a01), A02 56 (core-a02), A03 26+12=38 (core-a03), A04 40+1=41 (core-a04), all passed and equal to the T-U07-001 counts; migration_baseline.py verify 0 problems (fixtures)
   (`migration_baseline.py verify`).
 - [ ] T-U07-035 Evidence `verify-a01-a03` (`python3 scripts/verify_experiences.py --only a01.generative-art-studio
   a02.fluid-art-playground a03.fractal-explorer --runtime 27 26 --fresh`) and `verify-a04`.

@@ -1,0 +1,29 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/ExperiencesCreative",
+    "--scheme",
+    "ExperiencesCreative-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--result-name",
+    "core-a01",
+    "--only-testing",
+    "GenerativeArtStudioCoreTests"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --result-name core-a01 --only-testing GenerativeArtStudioCoreTests",
+  "elapsed_seconds": 11.669,
+  "exit_code": 0,
+  "finished": "2026-11-13T16:25:37+00:00",
+  "gate": "UA-F07",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F07.core-a01.log",
+  "log_sha256": "2573d2d7dde1fd1aea29802fbab391183a9485a06368e62b8aff481de9a9f753",
+  "name": "core-a01",
+  "started": "2026-11-13T16:25:26+00:00",
+  "timed_out": false
+}
