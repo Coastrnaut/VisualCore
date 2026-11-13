@@ -32,7 +32,7 @@ Independent test: a fresh host's report holds every value of FR-R02F02-001 and 0
 
 - [X] T-R02F02-005 [US2] Tests first in `RenderCapabilitiesProbeTests.swift`: after 3 recreations the report's — Verified 2026-11-13: testTheReportFollowsEveryContextRecreation: after 3 recreations the report's generation equals the host's and missingEntryPoints is 0 (probe-tests-ios27)
   `generation` equals the context's; the reload's missing count is in the report.
-- [ ] T-R02F02-006 [US2] In `RenderHost.swift`: set `generation` in init; in `recreateContext()` keep the reload
+- [X] T-R02F02-006 [US2] In `RenderHost.swift`: set `generation` in init; in `recreateContext()` keep the reload — Verified 2026-11-13: RenderHost takes the report through takeCapabilities (missing count, generation, maxTextureSize) at creation and after every recreation; a reload with missing entry points reports RenderHostError.unsupported and enters the surface-invalid path
   count, fail with `RenderHostError.unsupported` and the surface-invalid path when it is above 0, otherwise re-query
   `capabilities` (with `generation`) and update `resources.maxTextureSize`.
 - [ ] T-R02F02-007 [US2] Acceptance: the rendering package tests on both runtimes again (checks `rendering-ios27-r2`,
