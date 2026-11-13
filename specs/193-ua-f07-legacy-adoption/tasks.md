@@ -201,7 +201,7 @@ runtimes.
   symbols; no baseline line is lost since `af887e3`; `External` and `Vendor` are unchanged; `check_dependencies.py`,
   `check_compliance.py`, the documented-API checks and the isolation rules pass (FR-U07-060 to FR-U07-064;
   SC-U07-009).
-- [ ] T-U07-033 Run a read-only audit of the implementation against the specification before the evidence round
+- [X] T-U07-033 Run a read-only audit of the implementation against the specification before the evidence round — Verified 2026-11-13: /speckit-converge round 1 appended Phase 12 (T-U07-042 save-restore 3 of 3 for A02-A04, T-U07-043 unreachable standalone screens, T-U07-044 retired paths in script usage), all implemented and ticked with evidence; round 2 converged with 0 findings (36 FR, 11 SC, 7 stories, constitution I-XIII), tasks.md unchanged by it
   (`/speckit-converge`); implement what it appends.
 
 ## Phase 11: Evidence and convergence
