@@ -64,7 +64,7 @@ API-baseline and reference-regression tasks apply.
 
 ## Phase 6: Polish and cross-cutting
 
-- [ ] T-R02F04-014 API baseline: `python3 scripts/check_public_api.py --update` then check (check `public-api`);
+- [X] T-R02F04-014 API baseline: `python3 scripts/check_public_api.py --update` then check (check `public-api`); — Verified 2026-11-13: check_public_api --update: 2357 declarations, 0 undocumented, 31 additions (two target factories gain a defaulted depth parameter); check_public_api PASS (public-api); check_documented_api PASS (documented-api)
   `python3 scripts/check_documented_api.py --sources Apps/VisualCore` (check `documented-api`).
 - [ ] T-R02F04-015 `Packages/VisualCoreRendering/README.md` section "Resource ownership and pipelines (feature 204, R02-F04)".
 - [ ] T-R02F04-016 Host suite `swift test --package-path Packages/VisualCore` (check `host-visualcore`).
