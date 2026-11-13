@@ -82,7 +82,7 @@ Device-only items: none, so no {device} task.
 - [X] T-U11-020 [US4] Write `Apps/VisualCore/Tests/UI/AcknowledgementsUITests.swift`: About → Acknowledgements shows — Verified 2026-11-13: Apps/VisualCore/Tests/UI/AcknowledgementsUITests.swift: one pass from the top records every row; asserts each shipped id from docs/legal/third-party.json has a label and a 44-point row, and a row opens non-empty text; in the project after xcodegen generate
   one row per shipped id of `docs/legal/third-party.json` (read through `#filePath`), each with a non-empty label
   and a 44-point target; one row opens non-empty text; `xcodegen generate` adds it to the project.
-- [ ] T-U11-021 [US4] Acceptance: `python3 scripts/check_licenses.py` (check `licenses`), `python3
+- [X] T-U11-021 [US4] Acceptance: `python3 scripts/check_licenses.py` (check `licenses`), `python3 — Verified 2026-11-13: check_licenses PASS (licenses); --app on the Release app PASS, bundled == shipped (licenses-app); AcknowledgementsUITests passed on the iOS 27.2 phone with the enumeration guard (app-ui-acknowledgements)
   scripts/check_licenses.py --app "$APP"` (check `licenses-app`) and the interface test once on the iOS 27.x phone:
   `python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime 27.2 --kind phone --only-testing
   VisualCoreUITests/AcknowledgementsUITests --sources Apps/VisualCore/Tests/UI` (check `app-ui-acknowledgements`)
