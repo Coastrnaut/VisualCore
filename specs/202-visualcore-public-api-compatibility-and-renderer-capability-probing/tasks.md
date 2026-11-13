@@ -65,7 +65,7 @@ Independent test: a fresh host's report holds every value of FR-R02F02-001 and 0
 
 ## Phase 6: Polish
 
-- [ ] T-R02F02-014 Auto-Creator.md section 13 row R02-F02 as built (in place); `validate_autocreator.py` (check `steering`).
+- [X] T-R02F02-014 Auto-Creator.md section 13 row R02-F02 as built (in place); `validate_autocreator.py` (check `steering`). — Verified 2026-11-13: docs/catalog/shared-feature-map.json round-02 F02 as built (values, refresh, floor check, renderer record, MSAA reported not enabled); render_autocreator.py rewrote the section 13 table; validate_autocreator.py PASS (steering)
 - [ ] T-R02F02-015 Evidence `docs`, `legacy-ledger`, `script-tests`; CI of a commit with all changes finished with success.
 - [ ] T-R02F02-016 {device} In the device campaign, record the report of D1, D2 and D3 (after ImplementationLock-100).
 - [ ] T-R02F02-017 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record R02-F02.

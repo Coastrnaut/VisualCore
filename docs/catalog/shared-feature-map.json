@@ -11,10 +11,12 @@
   "F02": {
    "disposition": "reuse",
    "existing": [
-    "RenderCapabilities"
+    "RenderCapabilities",
+    "FloorFinding",
+    "RendererRecord"
    ],
    "home": "VisualCoreRendering",
-   "note": "Audit only: the public API baseline (docs/api/visualcore-public-api.txt, scripts/check_public_api.py) and RenderCapabilities already exist; add capability probes only where a game needs one."
+   "note": "As built (feature 202): RenderCapabilities also reports samples, draw buffers, colour attachments, vertex limits, vertex and integer precision, EGL version and extensions, missing entry points and the context generation, taken again after every context recreation; floorFindings() checks the OpenGL ES 3.0 minima; the evidence carries environment.renderer (RendererRecord); API compatibility stays with scripts/check_public_api.py. MSAA is reported, not enabled (ADR-0002)."
   },
   "F03": {
    "disposition": "reuse",
