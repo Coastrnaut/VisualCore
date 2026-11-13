@@ -38,7 +38,7 @@ reverted alone.
   - the default presenter ignores events.
 
   Cover these with the sample presenter on both simulator runtimes (FR-U07-019; clarification 5).
-- [ ] T-U07-004 Implement the pointer path:
+- [X] T-U07-004 Implement the pointer path: — Verified 2026-11-13: ExperiencePresenter.pointer(_:viewSize:port:) with default, Experience.handlePointer, ExperienceShell forwarding only while active, ExperienceSession sets renderHost.pointerHandler and clears it in destroyHost; host target gains VisualCoreMath and VisualCoreScenes; check_public_api.py --update: 2178 declarations, 0 undocumented; host tests 149/149 on both runtimes; reference regression a and b exit 0 (reference-a-pointer, reference-b-pointer)
   - `ExperiencePresenter.pointer(_:viewSize:port:)` with its default;
   - `Experience.handlePointer(_:viewSize:)`;
   - `ExperienceShell` forwarding it;
