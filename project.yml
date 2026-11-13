@@ -24,6 +24,9 @@ packages:
     path: Packages/ExperiencesCreative
   FractalExplorerCore:
     path: Apps/FractalExplorer/FractalExplorerCore
+  # The pure adapter core of A03 (feature 193, UA-F07; research R1).
+  FractalExplorerAdapter:
+    path: Apps/FractalExplorer/FractalExplorerAdapter
   ParticleUniverseCore:
     path: Apps/ParticleUniverse/ParticleUniverseCore
 settings:
@@ -331,6 +334,9 @@ targets:
         product: GenerativeArtStudioExperience
       - package: ExperiencesCreative
         product: FluidArtPlaygroundExperience
+      - target: FractalExplorerExperience
+      - package: FractalExplorerAdapter
+        product: FractalExplorerAdapterCore
     postBuildScripts:
       - name: Bundle licenses (UA-F04)
         basedOnDependencyAnalysis: false
@@ -345,6 +351,59 @@ targets:
           env -i PATH=/usr/bin:/bin:/usr/sbin:/sbin HOME="$HOME" DEVELOPER_DIR="$DEVELOPER_DIR" \
             /usr/bin/python3 "$SRCROOT/scripts/audit_showcase_dependencies.py" --root "$SRCROOT" --spec project.yml \
             --target VisualCore --sources Apps/VisualCore --app "$TARGET_BUILD_DIR/$WRAPPER_NAME"
+  FractalExplorerExperience:
+    # A03 adopted as an experience of the one app (feature 193, UA-F07; research R1): the standalone app's sources
+    # without its @main and automation files, plus the adapter's presenter, controls, bookmarks and factory. A static
+    # framework linked into the one app until its move into Packages/ExperiencesCreative.
+    type: framework.static
+    platform: iOS
+    sources:
+      - path: Apps/FractalExplorer/App
+        excludes: [FractalExplorerApp.swift, AppAutomation.swift]
+      - path: Apps/FractalExplorer/FractalExplorerAdapter/Experience
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: dev.visualcore.VisualCore.FractalExplorerExperience
+        PRODUCT_NAME: FractalExplorerExperience
+        GENERATE_INFOPLIST_FILE: YES
+        SKIP_INSTALL: YES
+    dependencies:
+      - package: FractalExplorerCore
+        product: FractalExplorerCore
+      - package: FractalExplorerAdapter
+        product: FractalExplorerAdapterCore
+      - package: VisualCore
+        product: VisualCoreMath
+      - package: VisualCore
+        product: VisualCoreScenes
+      - package: VisualCore
+        product: VisualCoreSimulation
+      - package: VisualCore
+        product: VisualCoreParameters
+      - package: VisualCore
+        product: VisualCorePersistence
+      - package: VisualCore
+        product: VisualCoreDiagnostics
+      - package: VisualCore
+        product: VisualCoreExperience
+      - package: VisualCoreRendering
+        product: VisualCoreRendering
+      - package: VisualCoreRendering
+        product: VisualCoreUI
+      - package: VisualCoreRendering
+        product: VisualCoreExperienceHost
+  FractalExplorerExperienceTests:
+    # The A03 adapter's session and parity tests (feature 193 T-U07-024), hosted by the one app. No package products
+    # of its own: linking a package the app also links makes Xcode build it as a dynamic framework.
+    type: bundle.unit-test
+    platform: iOS
+    sources: [Apps/FractalExplorer/FractalExplorerAdapter/ExperienceTests]
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: dev.visualcore.FractalExplorerExperienceTests
+        GENERATE_INFOPLIST_FILE: YES
+    dependencies:
+      - target: VisualCore
   VisualCoreTests:
     type: bundle.unit-test
     platform: iOS
@@ -377,8 +436,9 @@ schemes:
         VisualCore: all
         VisualCoreTests: [test]
         VisualCoreUITests: [test]
+        FractalExplorerExperienceTests: [test]
     test:
-      targets: [VisualCoreTests, VisualCoreUITests]
+      targets: [VisualCoreTests, VisualCoreUITests, FractalExplorerExperienceTests]
   Showcase:
     build:
       targets:

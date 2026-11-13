@@ -2,6 +2,8 @@
 // experiences the app can open: for each an id and a factory. It is empty in this feature, because no experience
 // is integrated yet; an integration adds its line here and nowhere else.
 import FluidArtPlaygroundExperience
+import FractalExplorerAdapterCore
+import FractalExplorerExperience
 import GenerativeArtStudioExperience
 import VisualCoreExperience
 import VisualCoreExperienceHost
@@ -59,7 +61,7 @@ enum ExperienceRegistry {
     /// each carries its scenario manifest, so that the verification runner can open it, but it stays unavailable
     /// in the catalog and outside `all`. Debug builds show them with `-vcCandidates`. Recording an experience's X
     /// gate moves its registration from here to `all`.
-    static let candidates: [ExperienceRegistration] = [generativeArtStudio, fluidArtPlayground].compactMap { $0 }
+    static let candidates: [ExperienceRegistration] = [generativeArtStudio, fluidArtPlayground, fractalExplorer].compactMap { $0 }
 
     /// A01 Generative Art Studio (feature 193, US1).
     private static var generativeArtStudio: ExperienceRegistration? {
@@ -89,6 +91,22 @@ extension ExperienceRegistry {
         }
         #if DEBUG || VISUALCORE_AUTOMATION
         registration.scenarioManifest = FluidArtCore.manifest(for: id)
+        #endif
+        return registration
+    }
+}
+
+extension ExperienceRegistry {
+    /// A03 Fractal Explorer (feature 193, US3).
+    fileprivate static var fractalExplorer: ExperienceRegistration? {
+        guard let id = FractalExperience.id else { return nil }
+        var registration = ExperienceRegistration(id: id, core: FractalCore.self) { launch in
+            let system = SystemAccessibilityObserver.systemValues()
+            return FractalExperience.make(id: id, storage: launch.storage,
+                                          reduceMotion: launch.reduceMotion.resolved(system: system.reduceMotion))
+        }
+        #if DEBUG || VISUALCORE_AUTOMATION
+        registration.scenarioManifest = FractalCore.manifest(for: id)
         #endif
         return registration
     }

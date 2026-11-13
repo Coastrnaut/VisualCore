@@ -43,6 +43,26 @@
       ],
       "content": null,
       "manifest": "Packages/ExperiencesCreative/FluidArtPlayground/scenario-manifest.json"
+    },
+    "a03.fractal-explorer": {
+      "capabilities": [
+        "fractal rendering",
+        "pan and pinch",
+        "guided tours",
+        "bookmarks",
+        "still capture"
+      ],
+      "quality_tiers": [
+        "level-0"
+      ],
+      "palette": [
+        "#210D40",
+        "#C22E5C",
+        "#FA8F3D",
+        "#FFE38C"
+      ],
+      "content": null,
+      "manifest": "Apps/FractalExplorer/FractalExplorerAdapter/scenario-manifest.json"
     }
   }
 }

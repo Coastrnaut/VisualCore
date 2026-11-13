@@ -88,7 +88,8 @@ STORAGE_RULE_SOURCES = ["Apps/VisualCore/App/DebugSupport/DebugExperience.swift"
                        "Packages/ExperiencesCreative/FluidArtPlayground/Experience/Adapter",
                        "Packages/ExperiencesCreative/FluidArtPlayground/Experience/FluidArtPresenter.swift",
                        "Packages/ExperiencesCreative/FluidArtPlayground/Experience/FluidArtControls.swift",
-                       "Packages/ExperiencesCreative/FluidArtPlayground/Experience/FluidArtExperience.swift"]
+                       "Packages/ExperiencesCreative/FluidArtPlayground/Experience/FluidArtExperience.swift",
+                       "Apps/FractalExplorer/FractalExplorerAdapter/Core", "Apps/FractalExplorer/FractalExplorerAdapter/Experience"]
 # The shipped sources that read stored data.
 STORED_DATA_SOURCES = ["Packages/VisualCore/Sources/VisualCoreExperience/SavedStateStore.swift",
                        "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift",
@@ -103,7 +104,8 @@ STORED_DATA_SOURCES = ["Packages/VisualCore/Sources/VisualCoreExperience/SavedSt
                        "Packages/ExperiencesCreative/FluidArtPlayground/Experience/Adapter",
                        "Packages/ExperiencesCreative/FluidArtPlayground/Experience/FluidArtPresenter.swift",
                        "Packages/ExperiencesCreative/FluidArtPlayground/Experience/FluidArtControls.swift",
-                       "Packages/ExperiencesCreative/FluidArtPlayground/Experience/FluidArtExperience.swift"]
+                       "Packages/ExperiencesCreative/FluidArtPlayground/Experience/FluidArtExperience.swift",
+                       "Apps/FractalExplorer/FractalExplorerAdapter/Core", "Apps/FractalExplorer/FractalExplorerAdapter/Experience"]
 
 
 def steps(stamp: str) -> list[Step]:

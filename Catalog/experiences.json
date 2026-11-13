@@ -84,10 +84,23 @@
         "creative-and-visual"
       ],
       "order": 3,
-      "palette": [],
+      "palette": [
+        "#210D40",
+        "#C22E5C",
+        "#FA8F3D",
+        "#FFE38C"
+      ],
       "tile_seed": 76489236,
-      "capabilities": [],
-      "quality_tiers": [],
+      "capabilities": [
+        "fractal rendering",
+        "pan and pinch",
+        "guided tours",
+        "bookmarks",
+        "still capture"
+      ],
+      "quality_tiers": [
+        "level-0"
+      ],
       "content": null,
       "available": false
     },
