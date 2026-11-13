@@ -75,7 +75,7 @@ Device-only items: none, so no {device} task.
 
 ## Phase 6: User Story 4 — Every license is bundled, complete and shown (P2)
 
-- [ ] T-U11-018 [P] [US4] Tests first in `scripts/tests/test_licenses_app.py`: a fixture app whose `Licenses/` lacks a
+- [X] T-U11-018 [P] [US4] Tests first in `scripts/tests/test_licenses_app.py`: a fixture app whose `Licenses/` lacks a — Verified 2026-11-13: scripts/tests/test_licenses_app.py 14 tests OK (exact bundle passes; missing, extra, nested, changed text and changed index fail naming the file; missing Licenses; exit 2)
   shipped text, has an extra text, or has a differing text or index fails naming it; an exact bundle passes.
 - [ ] T-U11-019 [US4] Modify `scripts/check_licenses.py`: `--app APP` compares `APP/Licenses` with the files
   `bundle_licenses.bundle()` produces for shipped entries (generated into a temporary directory), byte for byte; `--json` report.
