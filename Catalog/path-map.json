@@ -42,6 +42,42 @@
       "to": "Apps/VisualCore/Tests/UI/GenerativeArtStudio",
       "gate": "UA-F07",
       "commit": "5fdc2936c29b77d27f4783982a8cab2e62d7bafa"
+    },
+    {
+      "from": "Apps/FluidArtPlayground/FluidArtPlaygroundCore/Sources/FluidArtPlaygroundCore",
+      "to": "Packages/ExperiencesCreative/FluidArtPlayground/Core",
+      "gate": "UA-F07",
+      "commit": "the commit of the A02 move"
+    },
+    {
+      "from": "Apps/FluidArtPlayground/FluidArtPlaygroundCore/Tests/FluidArtPlaygroundCoreTests",
+      "to": "Packages/ExperiencesCreative/FluidArtPlayground/CoreTests",
+      "gate": "UA-F07",
+      "commit": "the commit of the A02 move"
+    },
+    {
+      "from": "Apps/FluidArtPlayground/FluidArtPlaygroundCore/Package.swift",
+      "to": "Packages/ExperiencesCreative/Package.swift",
+      "gate": "UA-F07",
+      "commit": "the commit of the A02 move"
+    },
+    {
+      "from": "Apps/FluidArtPlayground/App",
+      "to": "Packages/ExperiencesCreative/FluidArtPlayground/Experience",
+      "gate": "UA-F07",
+      "commit": "the commit of the A02 move"
+    },
+    {
+      "from": "Apps/FluidArtPlayground/Tests/Unit",
+      "to": "Packages/ExperiencesCreative/FluidArtPlayground/ExperienceTests",
+      "gate": "UA-F07",
+      "commit": "the commit of the A02 move"
+    },
+    {
+      "from": "Apps/FluidArtPlayground/Tests/UI",
+      "to": "Apps/VisualCore/Tests/UI/FluidArtPlayground",
+      "gate": "UA-F07",
+      "commit": "the commit of the A02 move"
     }
   ]
 }

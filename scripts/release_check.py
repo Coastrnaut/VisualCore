@@ -85,8 +85,10 @@ STORAGE_RULE_SOURCES = ["Apps/VisualCore/App/DebugSupport/DebugExperience.swift"
                         # The adapters of the adopted experiences (feature 193, UA-F07).
                         "Packages/ExperiencesCreative/GenerativeArtStudio/Experience/Adapter", "Packages/ExperiencesCreative/GenerativeArtStudio/Experience/GenerativeArtPresenter.swift", "Packages/ExperiencesCreative/GenerativeArtStudio/Experience/GenerativeArtControls.swift",
                         "Packages/ExperiencesCreative/GenerativeArtStudio/Experience/GenerativeArtLibrary.swift", "Packages/ExperiencesCreative/GenerativeArtStudio/Experience/GenerativeArtExperience.swift",
-                       "Apps/FluidArtPlayground/FluidArtPlaygroundAdapter/Core",
-                       "Apps/FluidArtPlayground/FluidArtPlaygroundAdapter/Experience"]
+                       "Packages/ExperiencesCreative/FluidArtPlayground/Experience/Adapter",
+                       "Packages/ExperiencesCreative/FluidArtPlayground/Experience/FluidArtPresenter.swift",
+                       "Packages/ExperiencesCreative/FluidArtPlayground/Experience/FluidArtControls.swift",
+                       "Packages/ExperiencesCreative/FluidArtPlayground/Experience/FluidArtExperience.swift"]
 # The shipped sources that read stored data.
 STORED_DATA_SOURCES = ["Packages/VisualCore/Sources/VisualCoreExperience/SavedStateStore.swift",
                        "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift",
@@ -98,8 +100,10 @@ STORED_DATA_SOURCES = ["Packages/VisualCore/Sources/VisualCoreExperience/SavedSt
                        "Apps/VisualCore/App/ExperienceDataStore.swift",
                        "Packages/ExperiencesCreative/GenerativeArtStudio/Experience/Adapter", "Packages/ExperiencesCreative/GenerativeArtStudio/Experience/GenerativeArtPresenter.swift", "Packages/ExperiencesCreative/GenerativeArtStudio/Experience/GenerativeArtControls.swift",
                         "Packages/ExperiencesCreative/GenerativeArtStudio/Experience/GenerativeArtLibrary.swift", "Packages/ExperiencesCreative/GenerativeArtStudio/Experience/GenerativeArtExperience.swift",
-                       "Apps/FluidArtPlayground/FluidArtPlaygroundAdapter/Core",
-                       "Apps/FluidArtPlayground/FluidArtPlaygroundAdapter/Experience"]
+                       "Packages/ExperiencesCreative/FluidArtPlayground/Experience/Adapter",
+                       "Packages/ExperiencesCreative/FluidArtPlayground/Experience/FluidArtPresenter.swift",
+                       "Packages/ExperiencesCreative/FluidArtPlayground/Experience/FluidArtControls.swift",
+                       "Packages/ExperiencesCreative/FluidArtPlayground/Experience/FluidArtExperience.swift"]
 
 
 def steps(stamp: str) -> list[Step]:
@@ -148,7 +152,7 @@ def steps(stamp: str) -> list[Step]:
                                              "--action", "test", "--result-name", f"release-rendering-{t}-{stamp}"]))
         # Feature 193 (UA-F07): the adopted creative experiences' Core, adapter and experience tests.
         s.append(Step(f"experiences-creative-sim-{t}", [PY, "scripts/xcodebuild_package.py", "--package",
-                                                        "Packages/ExperiencesCreative", "--scheme", "ExperiencesCreative",
+                                                        "Packages/ExperiencesCreative", "--scheme", "ExperiencesCreative-Package",
                                                         "--destination", f"sim-{rt}", "--action", "test",
                                                         "--result-name", f"release-experiences-creative-{t}-{stamp}"]))
         s.append(xcode_test("VisualCore.xcodeproj", "Showcase", rt, "release-Showcase", stamp, f"showcase-{t}"))

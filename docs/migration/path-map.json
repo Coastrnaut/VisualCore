@@ -100,7 +100,7 @@
    "to": "Packages/ExperiencesCreative/FluidArtPlayground/Core",
    "action": "move",
    "by": "UA-F07",
-   "state": "pending",
+   "state": "done",
    "note": "Pure domain target FluidArtPlaygroundCore; tests must pass unchanged before and after the move.",
    "experience": "A02"
   },
@@ -109,7 +109,7 @@
    "to": "Packages/ExperiencesCreative/FluidArtPlayground/CoreTests",
    "action": "move",
    "by": "UA-F07",
-   "state": "pending",
+   "state": "done",
    "note": "Host tests and fixtures of the Core target; fixtures stay bit-identical.",
    "experience": "A02"
   },
@@ -118,7 +118,7 @@
    "to": "Packages/ExperiencesCreative/Package.swift",
    "action": "merge",
    "by": "UA-F07",
-   "state": "pending",
+   "state": "done",
    "note": "The per-app package manifest is replaced by targets in the collection package.",
    "experience": "A02"
   },
@@ -127,7 +127,7 @@
    "to": "Packages/ExperiencesCreative/FluidArtPlayground/Experience",
    "action": "move",
    "by": "UA-F07",
-   "state": "pending",
+   "state": "done",
    "note": "SwiftUI and scene sources become target FluidArtPlaygroundExperience; the @main type FluidArtPlaygroundApp.swift is replaced by the experience factory and is retired.",
    "experience": "A02"
   },
@@ -136,7 +136,7 @@
    "to": "Packages/ExperiencesCreative/FluidArtPlayground/ExperienceTests",
    "action": "move",
    "by": "UA-F07",
-   "state": "pending",
+   "state": "done",
    "note": "Unit tests that need UIKit or the render host.",
    "experience": "A02"
   },
@@ -145,7 +145,7 @@
    "to": "Apps/VisualCore/Tests/UI/FluidArtPlayground",
    "action": "move",
    "by": "UA-F07",
-   "state": "pending",
+   "state": "done",
    "note": "UI tests are ported to the unified app; a mapping table and the enumeration guard prove none is lost.",
    "experience": "A02"
   },
@@ -163,7 +163,7 @@
    "to": null,
    "action": "retire",
    "by": "UA-F07",
-   "state": "pending",
+   "state": "done",
    "note": "Icon and accent of the standalone app; the unified app has one generated icon.",
    "experience": "A02"
   },

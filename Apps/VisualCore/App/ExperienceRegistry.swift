@@ -1,7 +1,6 @@
 // ExperienceRegistry — feature 190 T-U04-011 (FR-U04-010, FR-U04-011; research R2). The one explicit list of the
 // experiences the app can open: for each an id and a factory. It is empty in this feature, because no experience
 // is integrated yet; an integration adds its line here and nowhere else.
-import FluidArtPlaygroundAdapterCore
 import FluidArtPlaygroundExperience
 import GenerativeArtStudioExperience
 import VisualCoreExperience

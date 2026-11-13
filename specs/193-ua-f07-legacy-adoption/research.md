@@ -275,3 +275,16 @@ The dossier files are not edited. The legacy ledger is untouched; its hash is co
   right after UA-F07, and A01's registration then moves to `all`. FR-U07-051, SC-U07-008 and T-U07-019 are
   corrected. The `host` check runs the package tests on a simulator, because the package's Experience targets need
   UIKit and `swift test` cannot build them.
+- **A02 move and retirement (T-U07-022, 2026-11-13).**
+  - A02 is in `Packages/ExperiencesCreative/FluidArtPlayground`, laid out like A01. A02 has no shader files (its
+    GLSL is inline).
+  - `TestMode.swift` and `AppAutomation.swift` moved with the sources. Both compile only under
+    `DEBUG || VISUALCORE_AUTOMATION`, and the moved unit tests use them.
+  - Four moved unit tests were adapted:
+    - `CrashRecoveryTests` calls the capture cleanup that the retired `@main` init ran;
+    - `CopyTests` checks A02's catalog summary in place of the retired home text, and resolves a store claim that
+      names a retired interface test through `test-map.csv`;
+    - `PrivacyTests` reads the one app's single Photos add-only string, and compares the defaults keys and the
+      Documents and Library listings before and after the session, because a package test has no app container;
+    - `IconRenderTests` reads the icon kept in `docs/apps/fluid-art-playground/history`.
+  - With two products, the package's scheme is `ExperiencesCreative-Package`.

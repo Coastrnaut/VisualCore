@@ -42,7 +42,7 @@
         "#73E699"
       ],
       "content": null,
-      "manifest": "Apps/FluidArtPlayground/FluidArtPlaygroundAdapter/scenario-manifest.json"
+      "manifest": "Packages/ExperiencesCreative/FluidArtPlayground/scenario-manifest.json"
     }
   }
 }

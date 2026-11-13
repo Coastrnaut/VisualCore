@@ -1,0 +1,29 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_test_map.py",
+    "--map",
+    "specs/193-ua-f07-legacy-adoption/test-map.csv",
+    "--old",
+    "Apps/FluidArtPlayground/Tests/UI",
+    "--new",
+    "Apps/VisualCore/Tests/UI",
+    "--app",
+    "FluidArtPlayground",
+    "--log",
+    ".autonomy/logs/app-tests/ua-f07-phone-ios27-h1.log",
+    ".autonomy/logs/app-tests/ua-f07-phone-ios27-h2.log",
+    ".autonomy/logs/app-tests/ua-f07-phone-ios27-b-r2.log"
+  ],
+  "command": "python3 scripts/check_test_map.py --map specs/193-ua-f07-legacy-adoption/test-map.csv --old Apps/FluidArtPlayground/Tests/UI --new Apps/VisualCore/Tests/UI --app FluidArtPlayground --log .autonomy/logs/app-tests/ua-f07-phone-ios27-h1.log .autonomy/logs/app-tests/ua-f07-phone-ios27-h2.log .autonomy/logs/app-tests/ua-f07-phone-ios27-b-r2.log",
+  "elapsed_seconds": 0.036,
+  "exit_code": 0,
+  "finished": "2026-11-13T13:47:08+00:00",
+  "gate": "UA-F07",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F07.a02-test-map.log",
+  "log_sha256": "bce0dd0f9db7ebc177a63954617c1ee2a42efa4a3d5fa55a08e43fc6cb893d9b",
+  "name": "a02-test-map",
+  "started": "2026-11-13T13:47:08+00:00",
+  "timed_out": false
+}
