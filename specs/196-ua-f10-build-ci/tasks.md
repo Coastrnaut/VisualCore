@@ -61,7 +61,7 @@ Independent test: planted second shippable target, undeclared target and reused 
 
 ## Phase 5: User Story 3 — Experience packages match the catalog (P2)
 
-- [ ] T-U10-010 [P] [US3] Script tests first for `check_experience_packages.py`: missing target, extra target,
+- [X] T-U10-010 [P] [US3] Script tests first for `check_experience_packages.py`: missing target, extra target, — Verified 2026-11-13: scripts/tests/test_experience_packages.py: 14 tests (missing and extra target, unknown id, not linked, linked not registered, empty package, damaged registrations, real repository) pass in test_scripts.py (script-tests-tools-r2, before the seal; the tick was missed by an argument error)
   unknown id, a registered experience whose product the app does not link, a linked product without registration,
   damaged or newer-schema catalog.
 - [X] T-U10-011 [US3] Write `scripts/check_experience_packages.py` (research R3: code prefix → package, catalog name in — Verified 2026-11-13: scripts/check_experience_packages.py (code prefix to package, catalog name in upper camel case, four targets, product linked by VisualCore, registrations as the implemented set); in ci.yml job checks and release_check.py step experience-packages
