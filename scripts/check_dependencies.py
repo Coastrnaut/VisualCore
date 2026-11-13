@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Enforce the VisualCore package rules R1-R5 (T-F103; contracts specs/002-architecture-contracts/contracts/package-map.md).
+"""Enforce the VisualCore package rules R1-R8 (T-F103; contracts specs/002-architecture-contracts/contracts/package-map.md;
+R6-R8 from UA-F10 FR-U10-030, specs/196-ua-f10-build-ci research R4).
 
 R1  Only Harnesses/ProjectMReference/ may import/depend on reference ProjectM modules
     (ProjectMBridge, ANGLERendering, Rendering, PresetLibrary, CaptureKit, CaptureUI, AudioCore,
@@ -8,6 +9,12 @@ R2  Pure Packages/VisualCore sources import only Foundation-level system modules
 R3  No cycles in the target dependency graph of Packages/*/Package.swift.
 R4  Packages/* never import app or harness modules.
 R5  VisualCoreTestSupport is a dependency of test targets only.
+R6  A source of experience X in a Packages/Experiences*/ package never imports a module of another experience Y
+    (`<Y>Core`, `<Y>Experience`). The owning experience is the folder `Packages/<Pkg>/<Name>/...` (any depth), mapped
+    through the `path:` of the targets `<Name>Core`, `<Name>CoreTests`, `<Name>Experience`, `<Name>ExperienceTests`.
+R7  In an Experiences* Package.swift, a target of experience X never depends on a target or product of experience Y.
+R8  No source (and no target) of an Experiences* package imports or depends on a reference ProjectM module; such
+    imports are reported as R8 instead of R1.
 
 Exit 1 with one line per violation: rule, path:line, detail. Standard library only.
 """
@@ -100,15 +107,61 @@ def app_modules(root: Path) -> set[str]:
     return {n.replace("-", "_") for n in names} | names
 
 
+EXPERIENCE_SUFFIXES = ("ExperienceTests", "CoreTests", "Experience", "Core")
+MODULE_SUFFIXES = ("Experience", "Core")
+
+
+def experience_of(target: str) -> str | None:
+    """Return the experience a target name `<Name>{Core,CoreTests,Experience,ExperienceTests}` belongs to."""
+    for suf in EXPERIENCE_SUFFIXES:
+        if target.endswith(suf) and len(target) > len(suf):
+            return target[:-len(suf)]
+    return None
+
+
+def experience_packages(root: Path) -> list[dict]:
+    """Describe each Packages/Experiences*/ package: owners of targets, products and folders."""
+    out = []
+    pk = root / "Packages"
+    if not pk.exists():
+        return out
+    for d in sorted(p for p in pk.glob("Experiences*") if p.is_dir()):
+        mf = d / "Package.swift"
+        text = mf.read_text(encoding="utf-8") if mf.exists() else ""
+        targets: dict[str, tuple[str, list[str]]] = {}
+        folders: dict[str, str] = {}
+        for kind, name, body in call_blocks(text, ("target", "testTarget", "executableTarget")):
+            exp = experience_of(name)
+            if exp is None:
+                continue
+            targets[name] = (exp, target_deps(body))
+            pm = re.search(r'path:\s*"([^"]+)"', body)
+            parts = Path(pm.group(1)).parts if pm else ("Sources", name)
+            folder = parts[0] if parts[0] != "Sources" or len(parts) == 1 else parts[1]
+            folders.setdefault(folder, exp)
+            folders.setdefault(exp, exp)
+        owners = {n: e for n, (e, _) in targets.items()}
+        for name, body in re.findall(r'\.library\(\s*name:\s*"([^"]+)"\s*,([^)]*)\)', text):
+            ts = re.findall(r'"([^"]+)"', body)
+            exps = {owners[t] for t in ts if t in owners}
+            if len(exps) == 1:
+                owners.setdefault(name, exps.pop())
+        out.append({"dir": d, "manifest": mf, "targets": targets, "folders": folders, "owners": owners})
+    return out
+
+
 def check(root: Path = ROOT) -> list[dict]:
     v: list[dict] = []
     rel = lambda p: p.relative_to(root).as_posix()
     pure_modules = {p.name for p in (root / "Packages" / "VisualCore" / "Sources").iterdir()} if (root / "Packages" / "VisualCore" / "Sources").exists() else set()
     apps = app_modules(root)
-    # R1 imports
+    exp_pkgs = experience_packages(root)
+    exp_dirs = {e["dir"].relative_to(root).as_posix() + "/" for e in exp_pkgs}
+    in_exp = lambda p: any(rel(p).startswith(d) for d in exp_dirs)
+    # R1 imports (experience packages are reported as R8 below)
     for base in ("Packages", "Apps", "Showcase", "Harnesses"):
         for p in sources(root, base):
-            if rel(p).startswith(HARNESS + "/"):
+            if rel(p).startswith(HARNESS + "/") or in_exp(p):
                 continue
             for line, mod in imports(p):
                 if mod in REFERENCE_MODULES:
@@ -137,6 +190,38 @@ def check(root: Path = ROOT) -> list[dict]:
         for line, mod in imports(p):
             if mod in apps:
                 v.append({"rule": "R4", "path": f"{rel(p)}:{line}", "detail": f"shared package imports app/harness module {mod}"})
+    # R6 cross-experience imports, R8 reference imports in experience sources
+    module_owner: dict[str, str] = {}
+    for e in exp_pkgs:
+        for n, (exp, _) in e["targets"].items():
+            if n.endswith(MODULE_SUFFIXES):
+                module_owner[n] = exp
+    for e in exp_pkgs:
+        base = e["dir"].relative_to(root).as_posix()
+        for p in sources(root, base):
+            parts = p.relative_to(e["dir"]).parts
+            folder = parts[1] if parts[0] == "Sources" and len(parts) > 2 else parts[0]
+            owner = e["folders"].get(folder)
+            for line, mod in imports(p):
+                if mod in REFERENCE_MODULES:
+                    v.append({"rule": "R8", "path": f"{rel(p)}:{line}",
+                              "detail": f"experience {owner or folder} imports reference ProjectM module {mod}"})
+                elif owner and mod in module_owner and module_owner[mod] != owner:
+                    v.append({"rule": "R6", "path": f"{rel(p)}:{line}",
+                              "detail": f"experience {owner} imports {mod} of experience {module_owner[mod]}"})
+    # R7 cross-experience target dependencies, R8 reference dependencies in experience manifests
+    all_owners: dict[str, str] = {}
+    for e in exp_pkgs:
+        all_owners.update(e["owners"])
+    for e in exp_pkgs:
+        for n, (exp, tdeps) in e["targets"].items():
+            for d in tdeps:
+                if d in REFERENCE_MODULES:
+                    v.append({"rule": "R8", "path": rel(e["manifest"]),
+                              "detail": f"target {n} of experience {exp} depends on reference ProjectM module {d}"})
+                elif d in all_owners and all_owners[d] != exp:
+                    v.append({"rule": "R7", "path": rel(e["manifest"]),
+                              "detail": f"target {n} of experience {exp} depends on {d} of experience {all_owners[d]}"})
     # R3 cycles + R5
     graph: dict[str, list[str]] = {}
     for m, text in manifests(root):
@@ -169,11 +254,14 @@ def check(root: Path = ROOT) -> list[dict]:
     return v
 
 
-def main() -> int:
-    v = check()
+def main(argv: list[str] | None = None) -> int:
+    import argparse
+    ap = argparse.ArgumentParser(description="Check the VisualCore package rules R1-R8.")
+    ap.add_argument("--root", type=Path, default=ROOT, help="repository root (default: this repository)")
+    v = check(ap.parse_args(argv).root.resolve())
     for x in v:
         print(f"{x['rule']} {x['path']}: {x['detail']}")
-    print("PASS: R1-R5 hold" if not v else f"FAIL: {len(v)} violations")
+    print("PASS: R1-R8 hold" if not v else f"FAIL: {len(v)} violations")
     return 1 if v else 0
 
 

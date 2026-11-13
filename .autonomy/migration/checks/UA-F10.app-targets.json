@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_app_targets.py"
+  ],
+  "command": "python3 scripts/check_app_targets.py",
+  "elapsed_seconds": 0.031,
+  "exit_code": 0,
+  "finished": "2026-11-13T18:36:57+00:00",
+  "gate": "UA-F10",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F10.app-targets.log",
+  "log_sha256": "20b483358d3b0a1b54ec58ef81b9d272227517cd00303457f47cc2aa9c774b74",
+  "name": "app-targets",
+  "started": "2026-11-13T18:36:57+00:00",
+  "timed_out": false
+}

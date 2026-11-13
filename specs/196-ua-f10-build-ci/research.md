@@ -8,7 +8,7 @@
   which includes the gitignored local file when it exists.
 - `Packages/VisualCoreRendering/Package.swift`: binary targets `libEGL` and `libGLESv2` at
   `../../External/projectm-ios/Build/ANGLEFrameworks/*.xcframework` (built locally, 18 MB, not in Git). The C target
-  `CVisualCoreEGL` declares 16 EGL functions in `include/CVisualCoreEGL.h` (lines 71–87, from `eglGetPlatformDisplay`
+  `CVisualCoreEGL` declares 15 EGL functions in `include/CVisualCoreEGL.h` (lines 71–87, two of them over two lines, from `eglGetPlatformDisplay`
   to `eglGetProcAddress`); GL is loaded at run time through `eglGetProcAddress` (`VCGLLoadFromEGL.c`), so only EGL
   symbols are linked. The local libEGL exports 115 symbols.
 - `.github/workflows/ci.yml`: jobs `checks`, `host-tests`, `simulator-build` on `macos-latest`, each 30 min, one
@@ -73,3 +73,7 @@
 ## 4. Corrections during implementation
 
 (none yet)
+- 2026-11-13: the EGL header declares 15 functions, not 16 (two prototypes span two lines; counted by the stand-in
+  tool and `nm -gU` of the generated libEGL). Tool tests live in `scripts/tests/test_<tool>.py`, collected by
+  `scripts/test_scripts.py`, so parallel agents never write the same file (owner ruling of 2026-11-13).
+  `check_app_targets.py` joins the reviewed readers of the migration ledger in the governance test.

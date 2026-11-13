@@ -3066,7 +3066,8 @@ class GovernanceTests(unittest.TestCase):
     LEDGER_WRITER = "scripts/migration_ledger.py"
     # Reviewed readers of the migration ledger. Adding a reader is a change to this list (FR-U00-039).
     LEDGER_READERS = {"scripts/validate_autocreator.py", "scripts/render_autocreator.py", "scripts/build_traceability_matrix.py",
-                      "scripts/planning_index.py", "scripts/build_catalog.py"}
+                      "scripts/planning_index.py", "scripts/build_catalog.py",
+                      "scripts/check_app_targets.py"}  # reads gate status only (UA-F10, FR-U10-011)
     PUSHERS = {"scripts/tick_task.py", "scripts/prepush_scan.py"}
     SCRIPT_SUFFIXES = (".py", ".sh", ".bash", ".zsh", ".command", ".rb", ".yml", ".yaml")
     NOT_OURS = ("External/", "Vendor/", "docs/archive/")
@@ -4907,6 +4908,21 @@ def ledger_tree_hash() -> str:
         if path.is_file():
             digest.update(path.relative_to(base).as_posix().encode() + b"\0" + path.read_bytes() + b"\0")
     return digest.hexdigest()
+
+
+def _collect_tool_tests() -> None:
+    """Feature 196 (UA-F10): tests written for one tool each live in scripts/tests/test_<tool>.py, so that parallel
+    agents never write the same file; their TestCase classes join this suite under the module's name."""
+    for path in sorted((HERE / "tests").glob("test_*.py")):
+        spec = importlib.util.spec_from_file_location(f"tool_tests_{path.stem}", path)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        for name, value in vars(module).items():
+            if isinstance(value, type) and issubclass(value, unittest.TestCase) and value.__module__ == module.__name__:
+                globals()[f"{path.stem}__{name}"] = value
+
+
+_collect_tool_tests()
 
 
 if __name__ == "__main__":

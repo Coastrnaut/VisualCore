@@ -24,8 +24,8 @@ Owner-only items: none.
 
 Independent test: a clean commit passes the CI job `app-build`; a scratch commit breaking only Release fails it.
 
-- [ ] T-U10-003 [US1] Script tests first for `make_ci_angle_standins.py` in `scripts/test_scripts.py`: the 16
-  prototypes of `CVisualCoreEGL.h` (line 71 `eglGetPlatformDisplay` … line 87 `eglGetProcAddress`) are parsed; the
+- [ ] T-U10-003 [US1] Script tests first for `make_ci_angle_standins.py` in `scripts/test_scripts.py`: the 15
+  prototypes of `CVisualCoreEGL.h` (corrected from 16: line 71 `eglGetPlatformDisplay` … line 87 `eglGetProcAddress`) are parsed; the
   generated C defines each with `abort()` and `vc_ci_angle_standin`; an output folder holding a framework without the
   marker is refused (exit 2).
 - [ ] T-U10-004 [US1] Write `scripts/make_ci_angle_standins.py --out DIR`: generate the C file, compile
@@ -50,7 +50,7 @@ Independent test: a clean commit passes the CI job `app-build`; a scratch commit
 
 Independent test: planted second shippable target, undeclared target and reused bundle id each fail.
 
-- [ ] T-U10-007 [P] [US2] Script tests first for `check_app_targets.py` (three planted defects, a gate in
+- [X] T-U10-007 [P] [US2] Script tests first for `check_app_targets.py` (three planted defects, a gate in — Verified 2026-11-13: scripts/tests/test_app_targets.py: 11 tests (second shippable target, undeclared target, reused bundle, missing reason, until_gate pass, unknown gate, damaged JSON, schema 2, real repository) pass in test_scripts.py, 368 OK (script-tests-tools-r2)
   `until_gate` that is pass, a damaged and a newer-schema list).
 - [ ] T-U10-008 [US2] Write `Configs/app-targets.json` (schema 1, data-model.md: "exactly one `ships: true`; names
   unique; bundles unique; every application target of `project.yml` listed and nothing else; `until_gate` pass in the

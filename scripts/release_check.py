@@ -137,6 +137,9 @@ def steps(stamp: str) -> list[Step]:
         Step("stored-data-rule", [PY, "scripts/check_app_isolation.py", "--no-crash-on-stored-data",
                                   *STORED_DATA_SOURCES]),
         Step("dependencies", [PY, "scripts/check_dependencies.py"]),
+        # Feature 196 (UA-F10, FR-U10-010/011, FR-U10-020 to 022): one shippable app; packages match the catalog.
+        Step("app-targets", [PY, "scripts/check_app_targets.py"]),
+        Step("experience-packages", [PY, "scripts/check_experience_packages.py"]),
         Step("public-api", [PY, "scripts/check_public_api.py"]),
         Step("documented-api-showcase", [PY, "scripts/check_documented_api.py", "--sources", "Showcase/App"]),
         Step("documented-api-interactive-demo", [PY, "scripts/check_documented_api.py", "--sources", "Harnesses/InteractiveDemo"]),

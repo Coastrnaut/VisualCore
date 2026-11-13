@@ -175,9 +175,17 @@ func firstTile(_ app: XCUIApplication, tier: String) -> XCUIElement {
 /// experience's controls, feature 193): a contrast finding on an element not wholly inside it is measured on what is
 /// drawn over the clipped element, and the element is audited whole at the scroll stop that shows it. Returns the
 /// ignored findings.
+///
+/// Owner ruling of 2026-11-13 (feature 196, FR-U10-042): system accessibility audits wait until device testing. The
+/// audit runs only when the test run sets `VC_RUN_AUDITS=1` (xcodebuild `TEST_RUNNER_VC_RUN_AUDITS=1`); otherwise it
+/// prints one line and returns, and the rest of the test runs as before.
 @MainActor
 @discardableResult
 func audit(_ app: XCUIApplication, _ screen: String, largeText: Bool, visible: CGRect? = nil) throws -> [String] {
+    guard ProcessInfo.processInfo.environment["VC_RUN_AUDITS"] == "1" else {
+        print("AUDIT DEFERRED (device campaign): \(screen) [\(largeText ? "largest" : "default")]")
+        return []
+    }
     let all = XCUIAccessibilityAuditType.all
     let types: XCUIAccessibilityAuditType = largeText ? all : all.subtracting([.dynamicType, .textClipped])
     let ignored = FindingLog()

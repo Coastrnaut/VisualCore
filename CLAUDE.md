@@ -62,22 +62,15 @@ evidence commands are found as described in Auto-Creator.md §19. Simulators are
    do not commit, push or run heavy builds; the lead invokes every Spec Kit skill, runs the builds in the
    foreground (10 minutes or less per command, split with `--only`/`--skip`), retests every agent result
    before a task is ticked (an agent's report is not evidence) and commits.
-   **More parallel agents, gates unchanged** (owner ruling of 2026-11-13): never consolidate the planned gates (the
-   phase gates of A05–A25 and the ten feature gates of each round game stay as they are). Speed comes from running
-   more work at once: every set of independent files of a task (tools, tests, sources, documents, read-only audits)
-   goes to parallel agents by default, up to ten, while the lead runs skills, builds and checks. Shared files (such
-   as `scripts/test_scripts.py`) stay with the lead; agents hand their part over as a separate file that the lead
-   merges.
-   **Faster tests** (owner ruling of 2026-11-13): an app test pass builds once (`xcodebuild_app.py --action
-   build-for-testing`) and runs its chunks with `--action test-without-building`; UI test classes may run in
-   parallel simulator clones. **All system accessibility audits wait until device testing**: they are not run
-   for gates or experiences before the device campaign. A gate's interface evidence is one pass on the iOS 27.x
-   phone; iOS 26.5 is covered by the verification runner and package tests.
-   **Stopping a run** (lesson of 2026-11-13): stop the whole background command that runs a chunk loop (TaskStop),
-   not only its xcodebuild, or the loop starts its next chunk on the same simulator. Before a new run, confirm with
-   `pgrep -fl xcodebuild` that nothing else uses the simulator. A run that fails within seconds with "crashed with
-   signal kill before establishing connection" means a second run on that simulator. `xcodebuild_app.py` refuses
-   to start while another xcodebuild uses its simulator.
+   **More parallel agents, gates unchanged** (owner ruling of 2026-11-13): never consolidate the planned gates;
+   by default fan independent files of a task (tools, tests, sources, docs, audits) out to up to ten agents. Shared
+   files stay with the lead; agents hand their part over as a separate file.
+   **Faster tests** (owner ruling of 2026-11-13): an app test pass builds once (`--action build-for-testing`, then
+   `test-without-building` chunks) and may use parallel simulator clones (`--parallel N`). **All system
+   accessibility audits wait until device testing** (`VC_RUN_AUDITS=1` only there). A gate's interface evidence is
+   one pass on the iOS 27.x phone. **Stopping a run** (lesson of 2026-11-13): TaskStop the whole background loop, not
+   only its xcodebuild, and check `pgrep -fl xcodebuild` before a new run; `xcodebuild_app.py` refuses a busy
+   simulator.
    **No open-ended waits** (owner ruling of 2026-11-12): nothing is waited for without a limit. App tests run
    through `scripts/xcodebuild_app.py`, which stops a run after `--max-seconds` (default 540) and names the test
    it was on; a run that would not fit is split into chunks of whole test classes with `--only-testing`. A CI run

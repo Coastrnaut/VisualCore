@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_experience_packages.py"
+  ],
+  "command": "python3 scripts/check_experience_packages.py",
+  "elapsed_seconds": 0.037,
+  "exit_code": 0,
+  "finished": "2026-11-13T18:36:58+00:00",
+  "gate": "UA-F10",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F10.experience-packages.log",
+  "log_sha256": "2a728435a0cb95dc5ab79eb266b3bd7f7c41f795644a003b3123687a9948b6de",
+  "name": "experience-packages",
+  "started": "2026-11-13T18:36:57+00:00",
+  "timed_out": false
+}
