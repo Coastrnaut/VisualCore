@@ -34,7 +34,7 @@ each task. Tests before code. Owner-only items: none. One {device} task. No Visu
 
 ## Phase 4: User Story 3 — Profile recorded (P2)
 
-- [ ] T-A04-508 [P] [US3] Write `PU/ExperienceTests/ParticleProfileTests.swift`: open, play about 120 frames, close; print
+- [X] T-A04-508 [P] [US3] Write `PU/ExperienceTests/ParticleProfileTests.swift`: open, play about 120 frames, close; print — Verified 2026-11-13: ParticleProfileTests prints one PROFILE line with source simulator and the session's PerformanceRecord fields, parsed back as JSON; pass
   one `PROFILE:` JSON line with `"source":"simulator"` and the session's `lastPerformanceRecord`.
 - [ ] T-A04-509 [US3] Add a "Particle Universe" row to `docs/performance/budgets.md` (device values pending the device
   campaign); `python3 scripts/check_performance_docs.py` passes (check `performance-docs`).
