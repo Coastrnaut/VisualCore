@@ -69,16 +69,16 @@ Commit after every task (`python3 scripts/tick_task.py`), and push with `python3
   - `LossySnapshot` fails save-restore and `MutatingRejection` fails rejection, each with the named expectation.
   - A presenter that draws black fails launch-first-frame with "blank", and a probe expecting `red` on a blue frame fails.
   - teardown-reentry runs 5 cycles with zero live and leaked objects. cancel-prepare uses `SlowPreparation` and the result is `.cancelled`. suspend-resume uses a scripted time source, with no step for the time away.
-  - Each test attaches its record as `evidence-a99.contract-sample-<scenario>.json`.
+  - An `endurance` scenario (the manifest names its seconds, 1 to 600) runs in the same class, outside the default run, and passes by the UA-F06 growth rule. A presenter that declares no probe fails launch-first-frame with "no probe declared". Each test attaches its record as `evidence-a99.contract-sample-<scenario>.json`.
   - The test-target manifest must be added to the package resources.
-- [ ] T-U09-014 [US2] Add `probes(_:)` (default empty) to `ExperiencePresenter` and `frameProbes` to `Experience`, forwarded by `ExperienceShell`. Implement `Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ScenarioRunner.swift` (`#if`), using the session calls of research R3. The sample presenter declares one probe. Update the API baseline. T-U09-013 passes on the iOS 27.2 and 26.5 simulators (FR-U09-010, FR-U09-013, FR-U09-014, FR-U09-040).
+- [ ] T-U09-014 [US2] Add `probes(_:)` (default empty) to `ExperiencePresenter` and `frameProbes` to `Experience`, forwarded by `ExperienceShell`. Implement `Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ScenarioRunner.swift` (`#if`), using the session calls of research R3. The sample presenter declares one probe. Update the API baseline. The runner fails launch-first-frame when the experience declares no probe. It runs `endurance` by the UA-F06 growth rule. T-U09-013 passes on the iOS 27.2 and 26.5 simulators (FR-U09-005, FR-U09-010, FR-U09-013, FR-U09-014, FR-U09-040, FR-U09-060; SC-U09-002).
 
 ## Phase 4: User Story 4 - Evidence records are complete, versioned and checked (Priority: P1)
 
 - [ ] T-U09-015 [P] [US4] Tests first in `scripts/test_scripts.py` (class `EvidenceValidatorTests`). Cover:
   - A valid simulator record passes.
   - Each of these is rejected by name: each field group missing (14), a wrong type, schema 0 or 2, a bad hash, a `result` outside three values, a pass with failures, a pass without steps or digests, a drawing pass without a frame, a UDID-shaped value, an ECID-shaped value, and `environment.kind` other than simulator or device.
-  - A device record without identifiers passes.
+  - A device record without identifiers passes, so the format stays usable on devices (FR-U09-062).
 - [ ] T-U09-016 [US4] Implement `scripts/check_evidence.py` (validator; `--self-test`; exit 0 or 1). T-U09-015 passes (FR-U09-030 to FR-U09-032; SC-U09-003).
 
 ## Phase 5: User Story 3 - The app runs one scenario and exits (Priority: P1)
@@ -115,7 +115,10 @@ Commit after every task (`python3 scripts/tick_task.py`), and push with `python3
   - Summaries carry no identifier.
   - The exit code is non-zero on any failure.
   - A lock file refuses a second concurrent run.
-- [ ] T-U09-021 [US1] Implement `scripts/verify_experiences.py` (research R6). T-U09-020 passes (FR-U09-020 to FR-U09-022, FR-U09-024).
+  - `--self-test` exits non-zero when a planted failure is not found.
+  - A summary is written under `docs/verification/<id>/`.
+  - `debug` and several ids are planned in one run.
+- [ ] T-U09-021 [US1] Implement `scripts/verify_experiences.py` (research R6). It has the options of FR-U09-021, takes several ids and the id `debug`, and writes the tracked summaries `docs/verification/<id>/summary-<runtime>.json`. Its `--self-test` runs the validator and audit self-tests without a simulator; with `--runtime`, it also runs the sample path with the `LossySnapshot` variant, which must fail save-restore by name while the self-test itself exits 0. T-U09-020 passes (FR-U09-020 to FR-U09-022, FR-U09-024, FR-U09-025, FR-U09-033, FR-U09-061; SC-U09-002, SC-U09-009, SC-U09-010).
 - [ ] T-U09-022 [US1] Acceptance:
   - `python3 scripts/verify_experiences.py --only a99.contract-sample --runtime 27` passes 9 of 9.
   - `--only debug --runtime 27` passes 9 of 9 in the app, with save-restore over two launches.
@@ -208,3 +211,23 @@ Commit after every task (`python3 scripts/tick_task.py`), and push with `python3
 The MVP is US2 plus US4: scenarios run through a real session, and records are checked. Then come the app path
 (US3), the driver (US1), bundles (US6), frames (US5), audits (US7) and games (US8). Evidence runs once, after the
 audit of T-U09-030.
+
+## Analysis record
+
+- **Run 1 (2026-11-12, `/speckit-analyze`)**: 36 requirements and 10 success criteria checked against 40 tasks.
+  It found 2 high, 3 medium and 1 low finding, and no critical one. Fixed in this file:
+  - H1: the `endurance` scenario (FR-U09-005, FR-U09-060) had no implementing task. It is now in T-U09-013 and
+    T-U09-014.
+  - H2: "every experience declares at least one probe" (FR-U09-040) was not enforced. The runner now fails
+    launch-first-frame without one (T-U09-013, T-U09-014).
+  - M1: the driver's `--self-test` with the failing variant (FR-U09-025) is now named in T-U09-021, with a test in
+    T-U09-020.
+  - M2: the tracked summaries (FR-U09-033) and the `debug` id and several ids (FR-U09-061) are now named in
+    T-U09-020 and T-U09-021.
+  - M3: device usability of the record format (FR-U09-062) is now traced to T-U09-015.
+  - L1: SC-U09-002, 009 and 010 are now traced to T-U09-014 and T-U09-021.
+
+  Constitution and ADR-0009: no conflict. The runner is absent from the shipping build, nothing touches the
+  network or a device, and the renderer is unchanged.
+- **Run 2 (2026-11-12)**: coverage 100% (46 of 46 requirement and criterion ids traced, ranges included); no
+  critical or high finding; no further change.
