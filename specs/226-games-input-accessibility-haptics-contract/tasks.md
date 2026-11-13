@@ -79,7 +79,7 @@ task. Owner-only items: none.
   verify`, script tests; CI of a commit with all changes finished with success.
 - [ ] T-R02F26-020 {device} In the device campaign: haptic feedback fires and feels distinct per kind on D1, D2, D3;
   manual VoiceOver pass over one game (recorded, non-gating); the system accessibility audits of the settings switch.
-- [ ] T-R02F26-021 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record R02-F26.
+- [X] T-R02F26-021 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record R02-F26. — Verified 2026-11-13: converge round 1 appended T-R02F26-022 (implemented in 640032e); round 2 appended nothing; T-R02F26-020 {device} stays open
 
 ## Dependencies and parallel work
 
