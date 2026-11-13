@@ -71,3 +71,10 @@ Agent A: 504–506. Agent B: 502, 508. Lead: 501, 503, 507, 509–515.
 Appended by `/speckit-converge` (T-A04-515, round 1, 2026-11-13).
 
 - [X] T-A04-516 Take the monitor's budget from the frame interval the host reports in `Packages/ExperiencesCreative/ParticleUniverse/Experience/ParticlePresenter.swift` (`targetTimestamp − time` when finite and positive, else 1/60 s; rebuild the monitor at the same tier when the interval changes by more than 10%), with a test in `ParticleDetailTests.swift`, per FR-A04-510 and the clarification on the frame budget (partial) — Verified 2026-11-13: 2026-11-13 .autonomy/checks/A04-P05.t516-package-full-ios27.json (ExperiencesCreative package on sim-27.2: all bundles pass, incl. aMonitorStartsAtAGivenTierWithinItsBounds, theIntervalIsTheSmallestStepBetweenConsecutiveTargets, stepsAcrossGapsOutOfRangeOrNotFiniteAreIgnored, testTheBudgetFollowsTheHostsFrameInterval); interval from consecutive target timestamps, research D7
+
+## Phase 8: Convergence
+
+Appended by `/speckit-converge` (T-A04-515, round 2, 2026-11-13).
+
+- [ ] T-A04-517 Bring `specs/037-pu-p05-profiling-tuning/contracts/monitor.md` and `data-model.md` up to date with `FrameBudgetMonitor(budget:maxTier:tier:)` and `FrameIntervalEstimate` (research D7) per plan: contracts (partial)
+- [ ] T-A04-518 Re-run the ExperiencesCreative package on sim-26.5 after T-A04-516 through `desktop_runbook.py run-check --stage A04-P05` per T-A04-512 (partial)
