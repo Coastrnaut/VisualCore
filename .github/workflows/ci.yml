@@ -69,7 +69,20 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - name: Toolchain
-        run: swift --version
+        id: toolchain
+        run: |
+          swift --version
+          echo "xcode=$(xcodebuild -version | tr '\n' ' ' | tr -cs 'A-Za-z0-9.' '-')" >> "$GITHUB_OUTPUT"
+      # Owner request of 2026-11-13 (UA-F10): cache build outputs. SwiftPM rebuilds only what changed; the key holds
+      # the Xcode build and the manifests, and an older cache of the same toolchain is restored as a starting point.
+      - name: SwiftPM build cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            Packages/VisualCore/.build
+            Harnesses/SecondConsumer/GardenKit/.build
+          key: spm-host-${{ steps.toolchain.outputs.xcode }}-${{ hashFiles('Packages/VisualCore/**/*.swift', 'Harnesses/SecondConsumer/GardenKit/**/*.swift') }}
+          restore-keys: spm-host-${{ steps.toolchain.outputs.xcode }}-
       - name: VisualCore host tests
         run: swift test --package-path Packages/VisualCore
       - name: GardenKit host tests
@@ -83,7 +96,16 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - name: Xcode
-        run: xcodebuild -version
+        id: toolchain
+        run: |
+          xcodebuild -version
+          echo "xcode=$(xcodebuild -version | tr '\n' ' ' | tr -cs 'A-Za-z0-9.' '-')" >> "$GITHUB_OUTPUT"
+      - name: DerivedData cache
+        uses: actions/cache@v4
+        with:
+          path: Build/DerivedData
+          key: dd-pure-${{ steps.toolchain.outputs.xcode }}-${{ hashFiles('Packages/VisualCore/**/*.swift') }}
+          restore-keys: dd-pure-${{ steps.toolchain.outputs.xcode }}-
       - name: Build VisualCore for the iOS Simulator
         run: >
           python3 scripts/xcodebuild_package.py --package Packages/VisualCore --scheme VisualCore-Package
@@ -105,14 +127,45 @@ jobs:
         run: git submodule update --init --depth 1 External/projectm-ios
       - name: Xcode
         run: xcodebuild -version
+      - name: Toolchain key
+        id: toolchain
+        run: echo "xcode=$(xcodebuild -version | tr '\n' ' ' | tr -cs 'A-Za-z0-9.' '-')" >> "$GITHUB_OUTPUT"
+      - name: XcodeGen cache
+        id: xcodegen-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.ci-tools/xcodegen
+          key: xcodegen-${{ runner.os }}-${{ runner.arch }}-brew-v1
       - name: XcodeGen (pin 2.46.0 in Configs/toolchain.json)
-        # Homebrew's current XcodeGen; a version other than the pin is reported, not hidden (setup.md section 3).
+        # Homebrew's current XcodeGen, kept in the cache; a version other than the pin is reported, not hidden.
         run: |
-          brew install xcodegen
+          if [ ! -x ~/.ci-tools/xcodegen/bin/xcodegen ]; then
+            brew install xcodegen
+            mkdir -p ~/.ci-tools/xcodegen
+            cp -R "$(brew --prefix xcodegen)/." ~/.ci-tools/xcodegen/
+          fi
+          echo "$HOME/.ci-tools/xcodegen/bin" >> "$GITHUB_PATH"
+          export PATH="$HOME/.ci-tools/xcodegen/bin:$PATH"
+
           v=$(xcodegen --version | awk '{print $NF}')
           echo "XcodeGen $v"; [ "$v" = "2.46.0" ] || echo "::warning::XcodeGen $v differs from the pin 2.46.0"
+      - name: ANGLE stand-in cache
+        id: standin-cache
+        uses: actions/cache@v4
+        with:
+          path: External/projectm-ios/Build/ANGLEFrameworks
+          key: angle-standins-${{ steps.toolchain.outputs.xcode }}-${{ hashFiles('Packages/VisualCoreRendering/Sources/CVisualCoreEGL/include/CVisualCoreEGL.h', 'scripts/make_ci_angle_standins.py') }}
       - name: ANGLE stand-ins (link only)
+        if: steps.standin-cache.outputs.cache-hit != 'true'
         run: python3 scripts/make_ci_angle_standins.py --out External/projectm-ios/Build/ANGLEFrameworks
+      - name: DerivedData cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            Build/DerivedData/ci-debug
+            Build/DerivedData/ci-release
+          key: dd-app-${{ steps.toolchain.outputs.xcode }}-${{ hashFiles('project.yml', 'Packages/**/Package.swift', 'Packages/**/*.swift', 'Packages/**/*.c', 'Packages/**/*.h', 'Apps/VisualCore/**/*.swift') }}
+          restore-keys: dd-app-${{ steps.toolchain.outputs.xcode }}-
       - name: Generate the project
         run: xcodegen generate --spec project.yml
       - name: Debug build with test bundles

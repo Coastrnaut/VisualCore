@@ -85,3 +85,9 @@
   `check_reference_clean.py`, which proves that no tracked file of the submodule changed. Locally the proof uses a copy
   of the tracked files under `Build/standin-check/` with the license texts taken by `git archive` from the
   submodule. Debug build-for-testing passes (`standin-local-build-r2`), and so does Release (`standin-local-release`).
+- 2026-11-13, owner request "use caching in ci to speed things up": `actions/cache@v4` for the SwiftPM `.build`
+  folders of the host tests, the DerivedData of the pure-package simulator build and of the app build (Debug and
+  Release), the XcodeGen install and the generated ANGLE stand-ins. Each key holds the Xcode build and a hash of the
+  sources it depends on, with a restore key of the same toolchain so a partial match gives an incremental build. The
+  real ANGLE and ProjectM builds are not cached in CI: they are never built there (a 12 GB tree and hours of build), and
+  publishing the locally built frameworks from a public repository is ruled out (clarification 1).
