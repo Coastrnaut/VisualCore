@@ -22,7 +22,7 @@ each task. Tests before code. Owner-only items: none. One {device} task. No Visu
 
 ## Phase 3: User Story 1 — Save a scene and open it again (P1)
 
-- [ ] T-A04-404 [P] [US1] Tests first in `PU/ExperienceTests/ParticleEditorTests.swift`: the open actions applied to a
+- [X] T-A04-404 [P] [US1] Tests first in `PU/ExperienceTests/ParticleEditorTests.swift`: the open actions applied to a — Verified 2026-11-13: ParticleEditorTests 9 tests (open reproduces emitters, force, looks and keeps seed/limit/time scale/scene forces; no-force open; document round trip; replay digest 3 of 3; invalid define and missing begin rejected; wrong counts; move clamps and survives; draw cap) pass on sim-27.2 and 26.5 (A04-P04/experiences-ios27, experiences-ios26)
   core reproduce the document's scene, force and looks; `ParticleCore.document` (current state as a `SceneDocument`)
   round-trips; replaying a log containing an open reaches the same digest 3 of 3 times; an invalid define rejects the
   whole open (`a04.invalid-open`) and leaves the scene unchanged; a define without `scene.begin` is rejected.
