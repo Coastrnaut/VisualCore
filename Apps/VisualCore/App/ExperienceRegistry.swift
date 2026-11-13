@@ -3,7 +3,6 @@
 // is integrated yet; an integration adds its line here and nowhere else.
 import FluidArtPlaygroundAdapterCore
 import FluidArtPlaygroundExperience
-import GenerativeArtStudioAdapterCore
 import GenerativeArtStudioExperience
 import VisualCoreExperience
 import VisualCoreExperienceHost

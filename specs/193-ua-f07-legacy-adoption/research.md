@@ -244,3 +244,25 @@ The dossier files are not edited. The legacy ledger is untouched; its hash is co
     test taps once more when the keyboard took the first tap. A confirmation dismissed by tapping outside it taps
     the canvas, because from iOS 26 a phone shows a popover without Cancel.
   - Chunks: `g1` (audit), `g2` (controls, export, gallery), `g3` (library, recovery).
+- **A01 move and retirement (T-U07-017, T-U07-018, 2026-11-13).**
+  - A01 is in `Packages/ExperiencesCreative`, with these targets:
+    - `GenerativeArtStudioCore` and its unchanged Core tests;
+    - `GenerativeArtStudioExperience`: the app's scene and screen sources, the adapter under `Experience/Adapter`,
+      and the shaders as resources from `Bundle.module`;
+    - `GenerativeArtStudioExperienceTests`: the app's 40 unit tests, the adapter's 15 host tests and the 9
+      session and parity tests.
+  - The package is iOS-only, because the Experience target needs UIKit, so it is tested on both simulators. The one
+    app links the product `GenerativeArtStudioExperience`.
+  - Three moved unit tests read repository paths, which were updated in the move:
+    - the Core fixture, now under `CoreTests/Fixtures`;
+    - the standalone icon, kept as history in `docs/apps/generative-art-studio/history`;
+    - the Photos add-only usage string, which the one app now declares for the share sheet's "Save Image"
+      (`project.yml`).
+  - The standalone targets and scheme are retired in the same change, because they compiled the moved files. The
+    standalone UI tests are retired; `test-map.csv` and the checks `a01-test-map-r3` and `app-phone-ios27-g1..g3`
+    prove each is ported. The asset catalog is retired. `PrivacyInfo.xcprivacy` stays for UA-F11 to merge.
+  - The standalone screens (`GalleryView`, the `SceneScreen` view, `SettingsView`, `LibraryView`, `LibraryModel`,
+    `ControlsSheet`, `ExportSheet`, `LaunchComposition`, `LaunchCleanup`) moved with the sources. The registry never
+    reaches them; the moved unit tests use `SceneModel`, `ExportRunner` and `LibraryModel`. The storage rules
+    therefore cover the code the experience runs: the adapter and its presenter, controls, library and factory.
+    Retiring the unreachable screens, with their tests mapped, is a convergence item.

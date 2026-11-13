@@ -19,7 +19,7 @@
    "to": "Packages/ExperiencesCreative/GenerativeArtStudio/Core",
    "action": "move",
    "by": "UA-F07",
-   "state": "pending",
+   "state": "done",
    "note": "Pure domain target GenerativeArtStudioCore; tests must pass unchanged before and after the move.",
    "experience": "A01"
   },
@@ -28,7 +28,7 @@
    "to": "Packages/ExperiencesCreative/GenerativeArtStudio/CoreTests",
    "action": "move",
    "by": "UA-F07",
-   "state": "pending",
+   "state": "done",
    "note": "Host tests and fixtures of the Core target; fixtures stay bit-identical.",
    "experience": "A01"
   },
@@ -37,7 +37,7 @@
    "to": "Packages/ExperiencesCreative/Package.swift",
    "action": "merge",
    "by": "UA-F07",
-   "state": "pending",
+   "state": "done",
    "note": "The per-app package manifest is replaced by targets in the collection package.",
    "experience": "A01"
   },
@@ -46,7 +46,7 @@
    "to": "Packages/ExperiencesCreative/GenerativeArtStudio/Experience",
    "action": "move",
    "by": "UA-F07",
-   "state": "pending",
+   "state": "done",
    "note": "SwiftUI and scene sources become target GenerativeArtStudioExperience; the @main type GenerativeArtStudioApp.swift is replaced by the experience factory and is retired.",
    "experience": "A01"
   },
@@ -55,7 +55,7 @@
    "to": "Packages/ExperiencesCreative/GenerativeArtStudio/Shaders",
    "action": "move",
    "by": "UA-F07",
-   "state": "pending",
+   "state": "done",
    "note": "GLSL sources become resources of the Experience target.",
    "experience": "A01"
   },
@@ -64,7 +64,7 @@
    "to": "Packages/ExperiencesCreative/GenerativeArtStudio/ExperienceTests",
    "action": "move",
    "by": "UA-F07",
-   "state": "pending",
+   "state": "done",
    "note": "Unit tests that need UIKit or the render host.",
    "experience": "A01"
   },
@@ -73,7 +73,7 @@
    "to": "Apps/VisualCore/Tests/UI/GenerativeArtStudio",
    "action": "move",
    "by": "UA-F07",
-   "state": "pending",
+   "state": "done",
    "note": "UI tests are ported to the unified app; a mapping table and the enumeration guard prove none is lost.",
    "experience": "A01"
   },
@@ -91,7 +91,7 @@
    "to": null,
    "action": "retire",
    "by": "UA-F07",
-   "state": "pending",
+   "state": "done",
    "note": "Icon and accent of the standalone app; the unified app has one generated icon.",
    "experience": "A01"
   },
@@ -482,7 +482,7 @@
    "to": "Packages/ExperiencesCreative",
    "action": "new",
    "by": "UA-F07",
-   "state": "pending",
+   "state": "done",
    "note": "A01-A25, one directory per experience with Core, Experience, Shaders and tests."
   },
   {

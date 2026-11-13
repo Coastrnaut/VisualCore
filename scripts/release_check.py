@@ -83,7 +83,8 @@ def xcode_test(project: str, scheme: str, runtime: str, derived: str, stamp: str
 STORAGE_RULE_SOURCES = ["Apps/VisualCore/App/DebugSupport/DebugExperience.swift",
                         "Packages/VisualCore/Sources/VisualCoreTestSupport/SampleExperienceCore.swift",
                         # The adapters of the adopted experiences (feature 193, UA-F07).
-                        "Apps/GenerativeArtStudio/GenerativeArtStudioAdapter/Core", "Apps/GenerativeArtStudio/GenerativeArtStudioAdapter/Experience",
+                        "Packages/ExperiencesCreative/GenerativeArtStudio/Experience/Adapter", "Packages/ExperiencesCreative/GenerativeArtStudio/Experience/GenerativeArtPresenter.swift", "Packages/ExperiencesCreative/GenerativeArtStudio/Experience/GenerativeArtControls.swift",
+                        "Packages/ExperiencesCreative/GenerativeArtStudio/Experience/GenerativeArtLibrary.swift", "Packages/ExperiencesCreative/GenerativeArtStudio/Experience/GenerativeArtExperience.swift",
                        "Apps/FluidArtPlayground/FluidArtPlaygroundAdapter/Core",
                        "Apps/FluidArtPlayground/FluidArtPlaygroundAdapter/Experience"]
 # The shipped sources that read stored data.
@@ -95,7 +96,8 @@ STORED_DATA_SOURCES = ["Packages/VisualCore/Sources/VisualCoreExperience/SavedSt
                        "Packages/VisualCore/Sources/VisualCoreExperience/ContainerInventory.swift",
                        "Apps/VisualCore/App/PreferencesStore.swift", "Apps/VisualCore/App/AppModel.swift",
                        "Apps/VisualCore/App/ExperienceDataStore.swift",
-                       "Apps/GenerativeArtStudio/GenerativeArtStudioAdapter/Core", "Apps/GenerativeArtStudio/GenerativeArtStudioAdapter/Experience",
+                       "Packages/ExperiencesCreative/GenerativeArtStudio/Experience/Adapter", "Packages/ExperiencesCreative/GenerativeArtStudio/Experience/GenerativeArtPresenter.swift", "Packages/ExperiencesCreative/GenerativeArtStudio/Experience/GenerativeArtControls.swift",
+                        "Packages/ExperiencesCreative/GenerativeArtStudio/Experience/GenerativeArtLibrary.swift", "Packages/ExperiencesCreative/GenerativeArtStudio/Experience/GenerativeArtExperience.swift",
                        "Apps/FluidArtPlayground/FluidArtPlaygroundAdapter/Core",
                        "Apps/FluidArtPlayground/FluidArtPlaygroundAdapter/Experience"]
 
@@ -144,6 +146,11 @@ def steps(stamp: str) -> list[Step]:
         s.append(Step(f"rendering-sim-{t}", [PY, "scripts/xcodebuild_package.py", "--package", "Packages/VisualCoreRendering",
                                              "--scheme", "VisualCoreRendering-Package", "--destination", f"sim-{rt}",
                                              "--action", "test", "--result-name", f"release-rendering-{t}-{stamp}"]))
+        # Feature 193 (UA-F07): the adopted creative experiences' Core, adapter and experience tests.
+        s.append(Step(f"experiences-creative-sim-{t}", [PY, "scripts/xcodebuild_package.py", "--package",
+                                                        "Packages/ExperiencesCreative", "--scheme", "ExperiencesCreative",
+                                                        "--destination", f"sim-{rt}", "--action", "test",
+                                                        "--result-name", f"release-experiences-creative-{t}-{stamp}"]))
         s.append(xcode_test("VisualCore.xcodeproj", "Showcase", rt, "release-Showcase", stamp, f"showcase-{t}"))
         s.append(xcode_test("Harnesses/InteractiveDemo/InteractiveDemo.xcodeproj", "InteractiveDemo", rt,
                             "release-InteractiveDemo", stamp, f"interactive-demo-{t}"))
@@ -208,6 +215,8 @@ def app_release_steps(root: Path = ROOT) -> list[Step]:
     """Per app with docs/apps/<slug>/release.json (feature 017 T-A01-602): an unsigned generic-iOS Release build, then
     the shipping-symbol, privacy-manifest and release-readiness checks on the built app."""
     out: list[Step] = []
+    spec = (root / "project.yml").read_text() if (root / "project.yml").is_file() else ""
+    schemes = set(re.findall(r"^  ([A-Za-z0-9]+):\n    build:", spec, flags=re.M))
     for config in sorted(root.glob("docs/apps/*/release.json")):
         slug = config.parent.name
         try:
@@ -215,6 +224,8 @@ def app_release_steps(root: Path = ROOT) -> list[Step]:
             scheme = data["scheme"]
         except (ValueError, KeyError):
             continue
+        if spec and scheme not in schemes:
+            continue   # a retired standalone app (feature 193, research R9): its scheme is gone with its targets
         derived = f"Build/DerivedData/release-{scheme}-Release"
         app = f"{derived}/Build/Products/Release-iphoneos/{scheme}.app"
         out.append(Step(f"app-release-{slug}", [PY, "-c",

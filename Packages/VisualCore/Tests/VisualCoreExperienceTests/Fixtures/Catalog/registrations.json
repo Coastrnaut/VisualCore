@@ -20,7 +20,7 @@
         "#FFE38C"
       ],
       "content": null,
-      "manifest": "Apps/GenerativeArtStudio/GenerativeArtStudioAdapter/scenario-manifest.json"
+      "manifest": "Packages/ExperiencesCreative/GenerativeArtStudio/scenario-manifest.json"
     },
     "a02.fluid-art-playground": {
       "capabilities": [

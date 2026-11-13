@@ -96,8 +96,24 @@ def declared(text: str, name: str, public: bool) -> bool:
     return False
 
 
+def moved(root: Path, file: str) -> str:
+    """`file` itself, or where an executed move of `Catalog/path-map.json` put it (feature 193, research R9): the
+    first move whose `from` is the file or one of its folders replaces that prefix by its `to`."""
+    if (root / file).exists():
+        return file
+    try:
+        moves = json.loads((root / "Catalog" / "path-map.json").read_text(encoding="utf-8")).get("moves", [])
+    except (OSError, ValueError):
+        return file
+    for move in moves:
+        source, target = str(move.get("from", "")), str(move.get("to", ""))
+        if source and target and (file == source or file.startswith(source.rstrip("/") + "/")):
+            return target + file[len(source):]
+    return file
+
+
 def symbol_problem(root: Path, file: str, symbol: str, public: bool) -> str | None:
-    path = root / file
+    path = root / moved(root, file)
     if not path.is_file():
         return "file not found"
     text = path.read_text(encoding="utf-8", errors="replace")
@@ -120,7 +136,7 @@ def validate(root: Path, data: dict) -> list[str]:
     rows = {r.get("id"): r for r in data.get("matrix", [])}
     for entry in data.get("inventory", []):
         for path in entry.get("paths", []):
-            if not (root / path).exists():
+            if not (root / moved(root, path)).exists():
                 problems.append(f"inventory {entry.get('area')}: path {path} not found")
     open_covered = {m for g in data.get("gaps", []) if not g.get("closed") for m in g.get("matrix", [])}
     for row in data.get("matrix", []):

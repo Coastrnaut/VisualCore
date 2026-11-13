@@ -1076,9 +1076,13 @@ class ReleaseCheckTests(unittest.TestCase):
             self.assertEqual(tests[0].needs_simulator, "27.2")
         self.assertEqual(relcheck.kebab("GenerativeArtStudio"), "generative-art-studio")
         names = [s.name for s in relcheck.steps("X")]
-        for required in ["documented-api-generative-art-studio", "documented-api-fluid-art-playground",
-                         "host-fluid-art-playground-core", "host-generative-art-studio-core", "app-generative-art-studio-ios27", "app-fluid-art-playground-ios26"]:
+        for required in ["documented-api-fluid-art-playground", "host-fluid-art-playground-core",
+                         "app-fluid-art-playground-ios26",
+                         # Feature 193: the adopted experiences' package on both runtimes.
+                         "experiences-creative-sim-ios27", "experiences-creative-sim-ios26"]:
             self.assertIn(required, names)
+        # Feature 193 (UA-F07): A01 Generative Art Studio is retired; no step of its standalone app remains.
+        self.assertFalse([n for n in names if "generative-art-studio" in n], names)
 
     def test_select_only_skip_and_unknown(self):
         all_steps = relcheck.steps("X")
@@ -1260,7 +1264,7 @@ class UnifiedAppTargetTests(unittest.TestCase):
         self.assertEqual(products, ["VisualCoreExperience", "VisualCoreSimulation", "VisualCoreDiagnostics",
                                     "VisualCorePersistence",
                                     "VisualCoreRendering", "VisualCoreUI", "VisualCoreExperienceHost",
-                                    "GenerativeArtStudioAdapterCore", "FluidArtPlaygroundAdapterCore"])
+                                    "GenerativeArtStudioExperience", "FluidArtPlaygroundAdapterCore"])
 
     def test_the_standing_isolation_step_requires_sources(self):
         listing = subprocess.run([sys.executable, str(HERE / "release_check.py"), "--list"],
