@@ -19,6 +19,9 @@
 //      and clears the log, so that a restore replays at most 10 simulated minutes (clarification 3; tests are short,
 //      so the bound comes from a short replay's cost per step). Particles live at most 8 s, so the picture restarts
 //      briefly once in 10 minutes.
+//   7. Feature 036 (A04-P04, T-A04-405, T-A04-413; contracts/actions.md; research D2, D3, D6): a saved scene opens through
+//      logged actions (`scene.begin`, `emitter.define` × n, `force.define`, `look.define`), so a replay reproduces it
+//      and the anchor gains no fields; `emitter.move` places the selected emitter; `document(name:)` saves the state.
 import Foundation
 import ParticleUniverseCore
 import VisualCoreDiagnostics
@@ -37,7 +40,7 @@ public struct ParticleCore: ExperienceCore, Equatable {
     /// The standalone app's seed step for "New seed".
     public static let seedStep: UInt64 = 0x9E37_79B9_7F4A_7C15
     /// The gradients offered: none (the family's colours) and the built-in palettes.
-    public static let gradientIDs: [String?] = [nil] + Palette.builtIns.map(\.id)
+    public static let gradientIDs: [String?] = SceneDocument.gradientIDs
     /// The outcome threshold.
     public static let builtEmitters = 3
 
@@ -85,6 +88,26 @@ public struct ParticleCore: ExperienceCore, Equatable {
     public private(set) var trailsOn: Bool
     public private(set) var trailStrength: Double
     public private(set) var additive: Bool
+    /// The open being defined between `scene.begin` and `look.define`; not part of the anchor or the snapshot (the
+    /// logged actions that built it are replayed).
+    private(set) var pendingOpen: PendingOpen?
+
+    /// An open in progress (contracts/actions.md): the emitter count begun, the emitters and the force defined so far.
+    struct PendingOpen: Equatable, Sendable {
+        /// The emitter count `scene.begin` announced, 1…8.
+        var count: Int
+        /// The emitters defined so far, in order.
+        var emitters: [SceneEmitter] = []
+        /// Whether `force.define` came.
+        var forceDefined = false
+        /// The defined force; nil for none.
+        var force: SavedForce?
+    }
+
+    /// The rule code of every rejected open action.
+    public static let invalidOpen = "a04.invalid-open"
+    /// The largest |x| or |y| `emitter.move` accepts before clamping to ±`PlacedForce.worldHalfExtent`.
+    public static let moveInputExtent = 1_000.0
 
     // MARK: Contract
 
@@ -103,6 +126,9 @@ public struct ParticleCore: ExperienceCore, Equatable {
     public static func drawShare(tier: Int) -> Double {
         1 - 0.25 * Double(min(max(tier, 0), SceneQuality.tierCount - 1))
     }
+
+    /// The scene's world square on one axis, ±`PlacedForce.worldHalfExtent`.
+    private static var world: ClosedRange<Double> { -PlacedForce.worldHalfExtent...PlacedForce.worldHalfExtent }
 
     public static var controls: [ExperienceControl] {
         [
@@ -125,6 +151,17 @@ public struct ParticleCore: ExperienceCore, Equatable {
             ExperienceControl(id: "pause"),
             ExperienceControl(id: "step"),
             ExperienceControl(id: "reseed"),
+            // Feature 036: the open sequence and the move (contracts/actions.md). Size and lifetime 0 mean the
+            // family's own; finer rules (whole indices, override ranges) are checked by `SceneDocument`.
+            ExperienceControl(id: "scene.begin", ranges: [1...Double(ParticleScene.maxEmitters)]),
+            ExperienceControl(id: "emitter.define", ranges: [
+                0...Double(EmitterFamily.allCases.count - 1), world, world, 0...SceneEmitter.sizeRange.upperBound,
+                0...SceneEmitter.lifetimeRange.upperBound, 0...Double(gradientIDs.count - 1)]),
+            ExperienceControl(id: "force.define", ranges: [0...Double(PlacedForceKind.allCases.count), world, world,
+                                                           PlacedForce.strengthRange]),
+            ExperienceControl(id: "look.define", ranges: [0...1, 0...1, 0...1]),
+            ExperienceControl(id: "emitter.move", ranges: [-moveInputExtent...moveInputExtent,
+                                                           -moveInputExtent...moveInputExtent]),
         ]
     }
 
@@ -136,8 +173,9 @@ public struct ParticleCore: ExperienceCore, Equatable {
     /// The standalone start: one Fountain emitter with the seed, Attractor chosen, strength 1, no trails, playing.
     private init(seed: UInt64) throws {
         let anchor = Anchor(scene: .single(.fountain, seed: seed), playing: true, selectedEmitter: 0,
-                            selectedKind: PlacedForceKind.attractor.rawValue, force: nil, strength: 1, trailsOn: false,
-                            trailStrength: 0.85, additive: false)
+                            selectedKind: PlacedForceKind.attractor.rawValue, force: nil, strength: 1,
+                            trailsOn: SceneDocument.defaultTrailsOn, trailStrength: SceneDocument.defaultTrailStrength,
+                            additive: SceneDocument.defaultAdditive)
         try self.init(seed: seed, anchor: anchor, rebases: 0)
     }
 
@@ -158,6 +196,7 @@ public struct ParticleCore: ExperienceCore, Equatable {
         trailStrength = anchor.trailStrength
         additive = anchor.additive
         placedForce = nil
+        pendingOpen = nil
         if let f = anchor.force, f.count == 4, PlacedForceKind.allCases.indices.contains(Int(f[0])) {
             setForce(PlacedForce(kind: PlacedForceKind.allCases[Int(f[0])], position: Vec2(f[1], f[2]), strength: f[3]))
         }
@@ -265,10 +304,72 @@ public struct ParticleCore: ExperienceCore, Equatable {
             simulation = rebuilt
             simulation.setPlacedForce(placedForce)
             selectedEmitter = min(selectedEmitter, simulation.visibleEmitters.count - 1)
+        case "scene.begin":
+            guard v[0].rounded() == v[0] else { return .rejected(.rule(code: Self.invalidOpen)) }
+            pendingOpen = PendingOpen(count: Int(v[0]))
+        case "emitter.define":
+            guard var open = pendingOpen, open.emitters.count < open.count, !open.forceDefined,
+                  let emitter = try? SceneDocument.emitter(fromDefine: v)
+            else { return .rejected(.rule(code: Self.invalidOpen)) }
+            open.emitters.append(emitter)
+            pendingOpen = open
+        case "force.define":
+            // `force(fromDefine:)` gives nil for kind 0 (none), so its success is checked apart from its value.
+            guard var open = pendingOpen, open.emitters.count == open.count, !open.forceDefined,
+                  let defined = Self.definedForce(v)
+            else { return .rejected(.rule(code: Self.invalidOpen)) }
+            open.forceDefined = true
+            open.force = defined
+            pendingOpen = open
+        case "look.define":
+            guard let open = pendingOpen, commit(open, trailsOn: v[0] >= 0.5, trailStrength: v[1], additive: v[2] >= 0.5)
+            else { return .rejected(.rule(code: Self.invalidOpen)) }
+        case "emitter.move":
+            let h = PlacedForce.worldHalfExtent
+            let p = Vec2(min(max(v[0], -h), h), min(max(v[1], -h), h))
+            edit { $0.position = p }
         default:
             return .rejected(.unknownControl(action.control))
         }
         return .accepted
+    }
+
+    /// The force a valid `force.define` value list describes, wrapped so that "none" (`.some(nil)`) differs from an
+    /// invalid list (nil).
+    private static func definedForce(_ v: [Double]) -> SavedForce?? {
+        do { return .some(try SceneDocument.force(fromDefine: v)) } catch { return nil }
+    }
+
+    /// Commits a complete pending open (research §3): a scene with the defined emitters and the current scene seed,
+    /// particle limit, time scale and scene forces, validated with the `ParticleScene` rules and built like `reseed`
+    /// builds (a fresh deterministic simulation); then the placed force and the looks. False, with nothing changed,
+    /// for a wrong emitter count or an invalid scene; the pending open is cleared on success.
+    private mutating func commit(_ open: PendingOpen, trailsOn: Bool, trailStrength: Double, additive: Bool) -> Bool {
+        guard open.emitters.count == open.count, (0...1).contains(trailStrength) else { return false }
+        var scene = simulation.rebuildScene(seed: sceneSeed)
+        scene.emitters = open.emitters
+        guard let rebuilt = try? SceneSimulation(scene: scene) else { return false }
+        simulation = rebuilt
+        selectedEmitter = 0
+        let force = open.force?.placedForce
+        if let force {
+            selectedKind = force.kind
+            strength = force.strength
+        }
+        setForce(force)
+        self.trailsOn = trailsOn
+        self.trailStrength = trailStrength
+        self.additive = additive
+        pendingOpen = nil
+        return true
+    }
+
+    /// The current state as a saved document named `name` (FR-A04-402): the visible emitters with the scene seed,
+    /// particle limit, time scale and scene forces, the placed force and the looks. Throws when the name is not 1…64
+    /// characters after trimming (or, never in practice, when the state is out of the document's ranges).
+    public func document(name: String) throws(SceneError) -> SceneDocument {
+        try SceneDocument(name: name, scene: simulation.rebuildScene(seed: sceneSeed), force: placedForce.map(SavedForce.init),
+                          trailsOn: trailsOn, trailStrength: trailStrength, additive: additive)
     }
 
     /// A fresh preparation with the same seed; a seed that could not prepare keeps the state (it prepared before).
@@ -375,6 +476,13 @@ public struct ParticleCore: ExperienceCore, Equatable {
         let all = simulation.instances()
         let cap = Int((Double(simulation.scene.particleLimit) * Self.drawShare(tier: tier)).rounded())
         return all.count > cap ? Array(all.prefix(cap)) : all
+    }
+
+    /// The selected emitter's scene position: its explicit position, or its family's own when it has none (the point
+    /// `emitter.move` steps from).
+    public var selectedEmitterPosition: Vec2 {
+        let e = selectedEntry
+        return e.position ?? e.family.emitter().position
     }
 
     private mutating func edit(_ change: (inout SceneEmitter) -> Void) {

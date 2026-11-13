@@ -18,7 +18,12 @@
     "play",
     "pause",
     "step",
-    "reseed"
+    "reseed",
+    "scene.begin",
+    "emitter.define",
+    "force.define",
+    "look.define",
+    "emitter.move"
   ],
   "experience" : "a04.particle-universe",
   "kind" : "creative",
@@ -283,6 +288,84 @@
 
       },
       "name" : "cancel-prepare",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "scene.begin",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 30
+        },
+        {
+          "action" : {
+            "control" : "emitter.define",
+            "values" : [
+              1,
+              -200,
+              450,
+              12,
+              3,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "emitter.define",
+            "values" : [
+              2,
+              150,
+              -100,
+              0,
+              0,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "force.define",
+            "values" : [
+              5,
+              100,
+              50,
+              1.5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "look.define",
+            "values" : [
+              1,
+              0.5,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "steps" : 60
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "140238815f0f160c7f0f83719e63993f176bc6bdb482d05f5bf1451b78ca704f",
+        "initialDigest" : "901c2f8be5b4ddafe8451c6f277b3f1c80e218df373823c99e6716a4859ea65f"
+      },
+      "name" : "save-and-open",
       "seed" : "7"
     },
     {

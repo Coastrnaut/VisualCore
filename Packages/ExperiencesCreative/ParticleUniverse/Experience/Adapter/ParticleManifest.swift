@@ -1,8 +1,10 @@
 // ParticleManifest — feature 193 (UA-F07) T-U07-027 (FR-U07-012; data-model section 3; feature 195). The scenarios the
 // verification runner plays for Particle Universe: the nine standard ones and one `fixture-<n>` per regression fixture
 // of the A04 card (docs/catalog/experience-catalog.json, `design.fixtures`). All short (owner rule of 2026-11-13).
-// Committed digests hold for the manifest seed and are checked against the engine by the host tests.
+// Committed digests hold for the manifest seed and are checked against the engine by the host tests. Feature 036
+// (A04-P04 T-A04-405) adds `save-and-open`: the open actions of a two-emitter document, then a short run.
 #if DEBUG || VISUALCORE_AUTOMATION
+import ParticleUniverseCore
 import VisualCoreExperience
 
 extension ParticleCore {
@@ -21,6 +23,24 @@ extension ParticleCore {
         "cc0245a37c87c57277c5310b03ddd7f34fb09ed6a51d0e1489ce93bccef37d4b",
         "be6863ad0cd7a945fdfc8fc4ab044a0a7697889afa05383c77566b3cb10c4b27",
     ]
+
+    /// The digest after the save-and-open entries.
+    public static let openDigest = "140238815f0f160c7f0f83719e63993f176bc6bdb482d05f5bf1451b78ca704f"
+
+    /// The entries of save-and-open: the open actions of a saved two-emitter document (a Curtain with size, lifetime
+    /// and the Ocean gradient, a Halo moved off its own position), a vortex and trails with additive blending, then
+    /// 60 steps of the opened scene.
+    public static var openEntries: [ScenarioStep] {
+        let ocean = Double(SceneDocument.gradientIndex("ocean"))
+        let vortex = Double(SceneDocument.forceKindIndex(PlacedForceKind.vortex.rawValue))
+        return [ScenarioStep(steps: 30, action: ScriptedAction("scene.begin", [2]), result: "accepted"),
+                ScenarioStep(steps: 0, action: ScriptedAction("emitter.define", [1, -200, 450, 12, 3, ocean]),
+                             result: "accepted"),
+                ScenarioStep(steps: 0, action: ScriptedAction("emitter.define", [2, 150, -100, 0, 0, 0]), result: "accepted"),
+                ScenarioStep(steps: 0, action: ScriptedAction("force.define", [vortex, 100, 50, 1.5]), result: "accepted"),
+                ScenarioStep(steps: 0, action: ScriptedAction("look.define", [1, 0.5, 1]), result: "accepted"),
+                ScenarioStep(steps: 60)]
+    }
 
     /// The actions of input-response, save-restore and reset: an emitter, a force, a family, a size.
     public static var inputEntries: [ScenarioStep] {
@@ -82,6 +102,8 @@ extension ParticleCore {
             ScenarioSpec(name: "suspend-resume", seed: seed, entries: []),
             ScenarioSpec(name: "teardown-reentry", seed: seed, entries: [], cycles: 5),
             ScenarioSpec(name: "cancel-prepare", seed: seed, entries: []),
+            ScenarioSpec(name: "save-and-open", seed: seed, entries: openEntries,
+                         expect: ScenarioExpectations(initialDigest: initial, finalDigest: committed ? openDigest : nil)),
         ]
         for (index, entries) in fixtureEntries.enumerated() {
             specs.append(ScenarioSpec(name: "fixture-\(index + 1)", seed: seed, entries: entries,
