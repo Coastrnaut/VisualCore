@@ -270,7 +270,7 @@ Each further experience is an increment that can be reverted alone. Evidence run
 
 Appended by `/speckit-converge` (T-U07-033, 2026-11-13). Implemented before T-U07-034.
 
-- [ ] T-U07-042 Run the save-restore scenario across two launches 3 times each for A02, A03 and A04 on iOS 27.2
+- [X] T-U07-042 Run the save-restore scenario across two launches 3 times each for A02, A03 and A04 on iOS 27.2 — Verified 2026-11-13: verify_experiences.py --only <id> --runtime 27 --scenario save-restore --fresh passed 3 of 3 for a02.fluid-art-playground (a02-persist-run1..3), a03.fractal-explorer (a03-persist-run1..3) and a04.particle-universe (a04-persist-run1..3) on iOS 27.2; with a01-persist-run1..3 all four experiences restore after the app ends in 3 of 3 (SC-U07-010)
   (`verify_experiences.py --only <id> --runtime 27 --scenario save-restore --fresh`, checks `a02-persist-run1..3`,
   `a03-persist-run1..3`, `a04-persist-run1..3`); only A01 has the 3 of 3 record per SC-U07-010 (partial)
 - [ ] T-U07-043 Retire the standalone screens that the one app cannot reach: A01 `GalleryView`, `SceneScreen` and

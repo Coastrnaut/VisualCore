@@ -1,6 +1,6 @@
 {
   "bundle": null,
-  "commit": "a6b9e0ba4b54df22afb79309aecf3849943101bd",
+  "commit": "8716d123178efb5fe833732cf63af95bd836c356",
   "device_type": "com.apple.CoreSimulator.SimDeviceType.iPhone-18-Pro",
   "experience": "a03.fractal-explorer",
   "results": [
@@ -29,8 +29,8 @@
       "scenario": "rejection"
     },
     {
-      "commit": "a6b9e0ba4b54df22afb79309aecf3849943101bd",
-      "record_sha256": "5d447cb50f9b312fe01afc90effef8cdbbdcd33371f092d8b0a30f8bc79e3d57",
+      "commit": "8716d123178efb5fe833732cf63af95bd836c356",
+      "record_sha256": "55bece970c54565483a5bf6c88c32a7965f59deeb21d5fa4f99640064f9adf20",
       "result": "pass",
       "scenario": "save-restore"
     },

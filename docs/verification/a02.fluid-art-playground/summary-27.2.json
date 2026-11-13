@@ -1,6 +1,6 @@
 {
   "bundle": null,
-  "commit": "7e963f9550e34f1a1ed01fd15d3fbce0505b5dc7",
+  "commit": "8716d123178efb5fe833732cf63af95bd836c356",
   "device_type": "com.apple.CoreSimulator.SimDeviceType.iPhone-18-Pro",
   "experience": "a02.fluid-art-playground",
   "results": [
@@ -29,8 +29,8 @@
       "scenario": "rejection"
     },
     {
-      "commit": "7e963f9550e34f1a1ed01fd15d3fbce0505b5dc7",
-      "record_sha256": "f13372ff49c0c924fc430150edc7357857ae3c5b482daa1e9f24f3fba7de70e0",
+      "commit": "8716d123178efb5fe833732cf63af95bd836c356",
+      "record_sha256": "41e62990a1eaba678d39a97a2d1dd25ae6be5e612ec8560ad8d5f5478e73a7cc",
       "result": "pass",
       "scenario": "save-restore"
     },

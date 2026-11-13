@@ -1,0 +1,24 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--only",
+    "a02.fluid-art-playground",
+    "--runtime",
+    "27",
+    "--scenario",
+    "save-restore",
+    "--fresh"
+  ],
+  "command": "python3 scripts/verify_experiences.py --only a02.fluid-art-playground --runtime 27 --scenario save-restore --fresh",
+  "elapsed_seconds": 10.416,
+  "exit_code": 0,
+  "finished": "2026-11-13T16:16:15+00:00",
+  "gate": "UA-F07",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F07.a02-persist-run2.log",
+  "log_sha256": "f9813cda42c129aca7de049683812fe898082c01cb046fe9cd29f4c4b2e2e967",
+  "name": "a02-persist-run2",
+  "started": "2026-11-13T16:16:04+00:00",
+  "timed_out": false
+}

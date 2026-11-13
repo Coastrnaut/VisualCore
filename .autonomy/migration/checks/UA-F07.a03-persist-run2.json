@@ -1,0 +1,24 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--only",
+    "a03.fractal-explorer",
+    "--runtime",
+    "27",
+    "--scenario",
+    "save-restore",
+    "--fresh"
+  ],
+  "command": "python3 scripts/verify_experiences.py --only a03.fractal-explorer --runtime 27 --scenario save-restore --fresh",
+  "elapsed_seconds": 8.237,
+  "exit_code": 0,
+  "finished": "2026-11-13T16:16:50+00:00",
+  "gate": "UA-F07",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F07.a03-persist-run2.log",
+  "log_sha256": "d9d7a6136c4f5cd1e7a4e9fc1d31f0387109c17b5b524b577b6ad89d3639d7e7",
+  "name": "a03-persist-run2",
+  "started": "2026-11-13T16:16:42+00:00",
+  "timed_out": false
+}
