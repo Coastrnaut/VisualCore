@@ -1470,7 +1470,7 @@ VisualCoreRendering | enum | public enum ShaderError: Error, Equatable, Sendable
 VisualCoreRendering | enum | public enum State: Equatable, Sendable
 VisualCoreRendering | enum | public enum StillImageEncoder
 VisualCoreRendering | enum | public enum TextureFormat: Sendable, Equatable
-VisualCoreRendering | func | public func acquireTarget(width: Int, height: Int, format: TextureFormat = .rgba8) throws -> RenderTarget
+VisualCoreRendering | func | public func acquireTarget(width: Int, height: Int, format: TextureFormat = .rgba8, depth: Bool = false) throws -> RenderTarget
 VisualCoreRendering | func | public func addErrorObserver(_ observer: @escaping @MainActor (RenderHostError) -> Void)
 VisualCoreRendering | func | public func addObserver(_ observer: @escaping @MainActor (RenderLifecycleEvent) -> Void)
 VisualCoreRendering | func | public func addPresentObserver(_ observer: @escaping @MainActor (PresentedFrame) -> Void)
@@ -1488,8 +1488,9 @@ VisualCoreRendering | func | public func draw(model: Mat4 = .identity, camera: O
 VisualCoreRendering | func | public func floorFindings() -> [FloorFinding]
 VisualCoreRendering | func | public func fragmentMantissaBits(fallback: Int = 10) -> Int
 VisualCoreRendering | func | public func frame(delta: Double, output: FieldPass.Output, draw: (RenderTarget) throws -> Void) throws
+VisualCoreRendering | func | public func hash(into hasher: inout Hasher)
 VisualCoreRendering | func | public func makeBuffer(bytes: Int, label: String) throws -> GPUBuffer
-VisualCoreRendering | func | public func makeRenderTarget(width: Int, height: Int, format: TextureFormat = .rgba8, label: String) throws -> RenderTarget
+VisualCoreRendering | func | public func makeRenderTarget(width: Int, height: Int, format: TextureFormat = .rgba8, depth: Bool = false,
 VisualCoreRendering | func | public func makeTexture(width: Int, height: Int, format: TextureFormat = .rgba8, label: String) throws -> Texture
 VisualCoreRendering | func | public func pause()
 VisualCoreRendering | func | public func pixel(x: Int, y: Int) -> SIMD4<UInt8>
@@ -1533,6 +1534,8 @@ VisualCoreRendering | func | public func warn(_ message: String) -> Bool
 VisualCoreRendering | func | public nonisolated static func == (a: RenderContext, b: RenderContext) -> Bool
 VisualCoreRendering | func | public nonisolated static func folder(named name: String) -> TemporaryFolder
 VisualCoreRendering | func | public nonisolated static func message(for error: OffscreenRenderError) -> String
+VisualCoreRendering | func | public static func == (lhs: Pipeline, rhs: Pipeline) -> Bool
+VisualCoreRendering | func | public static func apply(_ pipeline: Pipeline, resources: ResourceRegistry) -> Bool
 VisualCoreRendering | func | public static func detect(in registry: ResourceRegistry) -> FloatRenderSupport
 VisualCoreRendering | func | public static func fit(world: WorldRect, viewSize: Vec2) -> (camera: Camera2D, metrics: ViewMetrics)?
 VisualCoreRendering | func | public static func fittedSize(width: Int, height: Int) -> (width: Int, height: Int)?
@@ -1553,6 +1556,7 @@ VisualCoreRendering | init | public init(fragment: String, fragmentName: String,
 VisualCoreRendering | init | public init(index: Int, time: Double, targetTime: Double)
 VisualCoreRendering | init | public init(mesh: Mesh, registry: ResourceRegistry) throws
 VisualCoreRendering | init | public init(name: String, minimum: Int, reported: Int)
+VisualCoreRendering | init | public init(program: ShaderProgram, state: RenderState)
 VisualCoreRendering | init | public init(rangeMin: Int, rangeMax: Int, precisionBits: Int)
 VisualCoreRendering | init | public init(red: Float = 0, green: Float = 0, blue: Float = 0)
 VisualCoreRendering | init | public init(registry: ResourceRegistry) throws
@@ -1567,6 +1571,7 @@ VisualCoreRendering | let | public let bytes: Int
 VisualCoreRendering | let | public let cacheKey: String
 VisualCoreRendering | let | public let colorTexture: GLuint
 VisualCoreRendering | let | public let delta: Double
+VisualCoreRendering | let | public let depthRenderbuffer: GLuint
 VisualCoreRendering | let | public let extensionReported: Bool
 VisualCoreRendering | let | public let folder: TemporaryFolder
 VisualCoreRendering | let | public let format: TextureFormat
@@ -1593,6 +1598,7 @@ VisualCoreRendering | let | public let program: ShaderProgram
 VisualCoreRendering | let | public let resources: ResourceRegistry
 VisualCoreRendering | let | public let rgba: [UInt8]
 VisualCoreRendering | let | public let size: GLint
+VisualCoreRendering | let | public let state: RenderState
 VisualCoreRendering | let | public let targetTime: Double
 VisualCoreRendering | let | public let targetTimestamp: Double
 VisualCoreRendering | let | public let time: Double
@@ -1617,6 +1623,7 @@ VisualCoreRendering | struct | public struct FloatRenderSupport: Sendable, Equat
 VisualCoreRendering | struct | public struct FloorFinding: Sendable, Equatable, Codable
 VisualCoreRendering | struct | public struct FrameInfo: Sendable, Equatable
 VisualCoreRendering | struct | public struct GPUHandle: Sendable, Equatable
+VisualCoreRendering | struct | public struct Pipeline: Hashable
 VisualCoreRendering | struct | public struct PresentedFrame: Sendable, Equatable
 VisualCoreRendering | struct | public struct RenderCapabilities: Sendable, Equatable, Codable
 VisualCoreRendering | struct | public struct RenderContext: Equatable
@@ -1633,6 +1640,7 @@ VisualCoreRendering | var | public private(set) var cacheHits
 VisualCoreRendering | var | public private(set) var capabilities
 VisualCoreRendering | var | public private(set) var compileCount
 VisualCoreRendering | var | public private(set) var errorMessage: String?
+VisualCoreRendering | var | public private(set) var evictionCount
 VisualCoreRendering | var | public private(set) var generation: Int
 VisualCoreRendering | var | public private(set) var lastError: RenderHostError?
 VisualCoreRendering | var | public private(set) var lastError: String?
@@ -1703,6 +1711,7 @@ VisualCoreRendering | var | public var rejectedTransitions: Int
 VisualCoreRendering | var | public var renderer
 VisualCoreRendering | var | public var reported: Int
 VisualCoreRendering | var | public var reportsColorBufferHalfFloat: Bool
+VisualCoreRendering | var | public var retiredProgramCount: Int
 VisualCoreRendering | var | public var seedOffsets: SIMD4<Float>
 VisualCoreRendering | var | public var size: Vec2
 VisualCoreRendering | var | public var state: RenderLifecycleState
@@ -1893,6 +1902,8 @@ VisualCoreScenes | var | public var triangleCount: Int
 VisualCoreScenes | var | public var uvs: [Vec2]
 VisualCoreScenes | var | public var values: [Double]
 VisualCoreScenes | var | public var z: Int
+VisualCoreShaderSource | enum | public enum BlendMode: Hashable, Sendable
+VisualCoreShaderSource | enum | public enum CullMode: Hashable, Sendable
 VisualCoreShaderSource | enum | public enum InfoLogParser
 VisualCoreShaderSource | enum | public enum Severity: String, Sendable, Codable
 VisualCoreShaderSource | enum | public enum ShaderCacheKey
@@ -1908,8 +1919,10 @@ VisualCoreShaderSource | func | public static func make(vertex: ExpandedShader, 
 VisualCoreShaderSource | func | public static func parse(_ log: String, stage: ShaderStage, map: ExpandedShader?) -> [ShaderDiagnostic]
 VisualCoreShaderSource | func | public static func sha256Hex(_ text: String) -> String
 VisualCoreShaderSource | init | public init()
+VisualCoreShaderSource | init | public init(blend: BlendMode = .none, depthTest: Bool = false, depthWrite: Bool = false,
 VisualCoreShaderSource | init | public init(file: String, line: Int)
 VisualCoreShaderSource | init | public init(file: String, line: Int, stage: ShaderStage, severity: Severity, message: String)
+VisualCoreShaderSource | init | public init(red: Bool, green: Bool, blue: Bool, alpha: Bool)
 VisualCoreShaderSource | let | public let defines: [String]
 VisualCoreShaderSource | let | public let file: String
 VisualCoreShaderSource | let | public let line: Int
@@ -1918,16 +1931,32 @@ VisualCoreShaderSource | let | public let origins: [SourceOrigin]
 VisualCoreShaderSource | let | public let severity: Severity
 VisualCoreShaderSource | let | public let stage: ShaderStage
 VisualCoreShaderSource | let | public let text: String
+VisualCoreShaderSource | let | public static let additive
+VisualCoreShaderSource | let | public static let all
+VisualCoreShaderSource | let | public static let alphaBlended
 VisualCoreShaderSource | let | public static let generated
 VisualCoreShaderSource | let | public static let maxExpandedBytes
 VisualCoreShaderSource | let | public static let maxIncludeDepth
+VisualCoreShaderSource | let | public static let opaque
+VisualCoreShaderSource | let | public static let opaque3D
 VisualCoreShaderSource | let | public static let version
 VisualCoreShaderSource | let | public static let versionLine
+VisualCoreShaderSource | struct | public struct ColorMask: Hashable, Sendable
 VisualCoreShaderSource | struct | public struct ExpandedShader: Sendable, Equatable
+VisualCoreShaderSource | struct | public struct RenderState: Hashable, Sendable
 VisualCoreShaderSource | struct | public struct ShaderDiagnostic: Sendable, Equatable, Codable, CustomStringConvertible
 VisualCoreShaderSource | struct | public struct ShaderLibrary: Sendable
 VisualCoreShaderSource | struct | public struct SourceOrigin: Sendable, Equatable, Hashable, Codable
+VisualCoreShaderSource | var | public var alpha: Bool
+VisualCoreShaderSource | var | public var blend: BlendMode
+VisualCoreShaderSource | var | public var blue: Bool
+VisualCoreShaderSource | var | public var colorMask: ColorMask
+VisualCoreShaderSource | var | public var cull: CullMode
+VisualCoreShaderSource | var | public var depthTest: Bool
+VisualCoreShaderSource | var | public var depthWrite: Bool
 VisualCoreShaderSource | var | public var description: String
+VisualCoreShaderSource | var | public var green: Bool
+VisualCoreShaderSource | var | public var red: Bool
 VisualCoreSimulation | enum | public enum AccessibilityChoice: String, Sendable, Codable, CaseIterable, Identifiable
 VisualCoreSimulation | enum | public enum AnnouncementKind: String, Sendable, Equatable, CaseIterable
 VisualCoreSimulation | enum | public enum EmitterShape: Sendable, Equatable, Codable
