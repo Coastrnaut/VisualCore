@@ -359,3 +359,19 @@ The dossier files are not edited. The legacy ledger is untouched; its hash is co
   `@Environment`, matching `EvidenceRecord.Environment`), `ScenarioStep`, `ScenarioExpectations` and
   `ScenarioRunner.RequestMaker`, used by the app since UA-F09, were not named in a package README; the VisualCore
   and VisualCoreRendering READMEs now have a section each for the verification scenarios and the runner.
+- 2026-11-13, T-U07-043 (convergence): the standalone root screens were audited (read-only, every reference by whole
+  word). A01's gallery, library and settings screens (`GalleryView.swift`, `LibraryView.swift`, `SettingsView.swift`,
+  `LaunchComposition.swift`) had no test, no dossier citation and no use outside each other; they are removed.
+  `PaletteSwatch` moved to `ControlsSheet.swift` and `AppAccessibility` to `SceneScreen.swift`, their remaining
+  users. The package keeps its 274 test cases on iOS 27.2 and 26.5, the app builds, and A01's runner passes 9 of 9.
+  The other screens stay, unreachable from the one app (the factories build only the presenter and the controls):
+  - FR-U07-034 requires the app unit tests of A01 to A03 to keep running. They drive `SceneModel`, `ExportRunner`,
+    `LibraryModel`, `PlaygroundModel`, `TestMode`, `ExplorerModel`, `TourPlayer` and `BookmarksView`'s helpers,
+    and two presenters use constants declared beside the screens (`SceneModel.limiterGraph`,
+    `PlaygroundModel.glowGraph`).
+  - The dossier contracts that `check_app_contract.py` validates cite `SceneScreen`, `ExportSheet`,
+    `PlaygroundView` and `ExplorerView`, and FR-U07-052 forbids changing the dossiers.
+  - The sheets those screens present (`ControlsSheet`, `AdjustPanel`, `CaptureSheet`, `GoToView`, `ToursView`)
+    cannot go without editing the cited screens.
+  The standalone settings of A01 (`gas.a11y.*`) are read only by `SceneScreen`, which the one app never shows. The
+  one app's presenters take Reduce Motion and Reduce Flashing from the shell (FR-U07-016).

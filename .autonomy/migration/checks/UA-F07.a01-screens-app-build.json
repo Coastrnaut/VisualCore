@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "python3",
+    "scripts/release_check.py",
+    "--only",
+    "xcodegen",
+    "visualcore-app-build",
+    "app-contracts"
+  ],
+  "command": "python3 scripts/release_check.py --only xcodegen visualcore-app-build app-contracts",
+  "elapsed_seconds": 15.302,
+  "exit_code": 0,
+  "finished": "2026-11-13T16:24:02+00:00",
+  "gate": "UA-F07",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F07.a01-screens-app-build.log",
+  "log_sha256": "c3cf8f17aff0b7872e08c6ac0e668989bee7a79d0bb74704273f966b8b66c979",
+  "name": "a01-screens-app-build",
+  "started": "2026-11-13T16:23:47+00:00",
+  "timed_out": false
+}

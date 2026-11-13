@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/ExperiencesCreative",
+    "--scheme",
+    "ExperiencesCreative-Package",
+    "--destination",
+    "sim-26.5",
+    "--action",
+    "test",
+    "--result-name",
+    "a01-screens-pkg-265"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-26.5 --action test --result-name a01-screens-pkg-265",
+  "elapsed_seconds": 139.225,
+  "exit_code": 0,
+  "finished": "2026-11-13T16:23:37+00:00",
+  "gate": "UA-F07",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F07.a01-screens-package-ios265.log",
+  "log_sha256": "c349cf7e1cf080c534b5e404ffec4a77a112c9724864c5b30a9361476d65233f",
+  "name": "a01-screens-package-ios265",
+  "started": "2026-11-13T16:21:18+00:00",
+  "timed_out": false
+}

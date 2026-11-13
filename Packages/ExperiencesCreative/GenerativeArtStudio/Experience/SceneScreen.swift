@@ -268,3 +268,17 @@ struct SceneScreen: View {
         }
     }
 }
+
+// AppAccessibility moved here from the retired SettingsView.swift (feature 193 T-U07-043): the scene screen reads
+// the standalone app's stored choices; the one app passes the shell's choices to the presenter instead.
+/// The app's `UserDefaults` key prefix for accessibility choices (`gas.a11y.reduceMotion`, `gas.a11y.reduceFlashing`).
+enum AppAccessibility {
+    static let keyPrefix = "gas.a11y"
+    static let keys = AccessibilityPreferences.keys(prefix: keyPrefix)
+
+    /// Preferences from the two stored raw values.
+    static func preferences(motion: String, flashing: String) -> AccessibilityPreferences {
+        AccessibilityPreferences(reduceMotion: AccessibilityChoice(storedValue: motion),
+                                 reduceFlashing: AccessibilityChoice(storedValue: flashing))
+    }
+}

@@ -86,3 +86,15 @@ struct ControlsSheet: View {
         .accessibilityIdentifier("gas.controls.sheet")
     }
 }
+
+// PaletteSwatch moved here from the retired GalleryView.swift (feature 193 T-U07-043).
+/// A rounded gradient of a palette's sRGB stops (decorative; the family title carries the meaning).
+struct PaletteSwatch: View {
+    let palette: Palette
+    var body: some View {
+        RoundedRectangle(cornerRadius: 8)
+            .fill(LinearGradient(colors: palette.stops.map { Color(.sRGB, red: $0.x, green: $0.y, blue: $0.z) },
+                                 startPoint: .bottomLeading, endPoint: .topTrailing))
+            .overlay(RoundedRectangle(cornerRadius: 8).strokeBorder(.secondary.opacity(0.4)))
+    }
+}
