@@ -1,15 +1,17 @@
 {
   "schema": 1,
-  "note": "SHA-256 of the upper-case identifiers of the development Mac's simulators, written by scripts/prepush_scan.py --record-simulators, plus one Claude Desktop session identifier that appears in a scratchpad path of recorded UA-F07 test-map commands (2026-11-13; it identifies no hardware). No identifier is stored.",
+  "note": "SHA-256 of the upper-case identifiers of the development Mac's simulators, written by scripts/prepush_scan.py --record-simulators, plus one Claude Desktop session identifier that appears in a scratchpad path of recorded UA-F07 test-map commands (2026-11-13; it identifies no hardware). No identifier is stored. Also three synthetic scene ids of the A04-P06 library fixtures (feature 038, 0A0E0001-0000-4000-8000-00000000000N, N = 1\u20263; they identify no hardware).",
   "sha256": [
     "0ffa169834b311f2e0e29c5feddb29ff64bad28a0f2b69b8eb876cd23745bb00",
     "136d4b2b7de74f6d35acdafd0ca4c4353922afcc7f9690ffa3a72c3f76fd1405",
     "247fc47cf061a4ab588ee87da4d83d3d65ea7e4e2c16b5fd251230328bd99dc0",
     "2a096c833a237e15c7d0300cb4adafef214bcdceb9d2798e2d057ed022016dea",
     "2ca4a2804ec07583b64ee9fa1f537ade333095ab7e80ae01ebfa014d497e5cb0",
+    "31cff64f6a97935725018c60efb4b2935e926eab3dc35792b55c9aaa061bc723",
     "41ca453a57ba70f35ef3b21e4b5b391407c700b9f4f20056ab3ce8138c770818",
     "545a243a49d8e38b6c419998e86bfbe44a31e78e601be050a660c522743a5804",
     "5a52a3d28af6ca252cc3b37dd19ba173438ff1c918bbb7f72a1f7a1da80bc8ee",
+    "646446351ce0388de0c1b1527fbf2aee54b087e65c738c19a3bbfb08570b4a37",
     "65aedddd140735e3c3805a5aa8e44cc8b7ee45685f6d09cd308f142b15bf03bc",
     "7091e279117e6f2bfa3f7359ae67829129ef46389ab004996ebe6e9cd8a30e3d",
     "88871ec7ed916ddc36417620c3a7e6a7c01a26422093aed30df0e18c9556d516",
@@ -23,6 +25,7 @@
     "d9856a526dd7c8b6973de101f93468a2befa95fcb2b52238a4a50d07468b10a8",
     "e2f690506a899dd46d0e6de5deb3ce9368f17e6ea227bf11b5f62d42e21b937c",
     "e52fd03c02e8cc7c96a4604586263b8758bedcf49f879bc4e2ceaec3c7a074f5",
+    "e78821ab01bd67471067c080b44fc16842fb6ca5257e39909880b8bb12da0f71",
     "f6d3c1f48bcc81572a8b086f4ac0bed1c45ef1bf8daa96ff8218c5353f4dcafd",
     "f7743e07ecdfb0af8833d726f5d82a1b56a40f986757abdfdd6b751261b74df0",
     "f9ab904032af09c3b2af7f0667dfe9bc6111adb1a494c88d71e655826765a120"
