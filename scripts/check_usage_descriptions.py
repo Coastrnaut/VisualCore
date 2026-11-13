@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Check the app's permission usage descriptions against the declared permissions (feature 197, UA-F11, story 2).
 
-    python3 scripts/check_usage_descriptions.py                    # Apps/VisualCore/Generated/Info.plist
+    python3 scripts/check_usage_descriptions.py                    # project.yml, target VisualCore (tracked source)
     python3 scripts/check_usage_descriptions.py --app APP          # APP/Info.plist of a built app (XML or binary)
     python3 scripts/check_usage_descriptions.py --json report.json
 
@@ -26,7 +26,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from report_meta import ReportError, meta, read_versioned, write_report  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
-PLIST = ROOT / "Apps/VisualCore/Generated/Info.plist"
+PROJECT = ROOT / "project.yml"
+TARGET = "VisualCore"
 REGISTRATIONS = ROOT / "Catalog/registrations.json"
 VOCABULARY = ROOT / "Configs/permission-vocabulary.json"
 USAGE_KEY = re.compile(r"NS[A-Za-z]+UsageDescription")
@@ -43,6 +44,32 @@ def read_plist(path: Path) -> dict:
     if not isinstance(data, dict):
         raise ReportError(f"{path}: expected a dictionary")
     return data
+
+
+def read_project(path: Path, target: str = TARGET) -> dict:
+    """The usage-description entries of `target`'s Info.plist properties in an XcodeGen `project.yml`, the tracked
+    source of the generated Info.plist (which is not in Git, so CI checks this form). A line-based reader for the
+    one shape the file uses: `  <target>:` under `targets:`, then `NS…UsageDescription: text` lines."""
+    try:
+        lines = Path(path).read_text().splitlines()
+    except FileNotFoundError as error:
+        raise ReportError(f"{path}: missing") from error
+    try:
+        start = lines.index("targets:")
+        begin = lines.index(f"  {target}:", start)
+    except ValueError as error:
+        raise ReportError(f"{path}: no target {target} under targets:") from error
+    found: dict[str, str] = {}
+    for line in lines[begin + 1:]:
+        if line.strip() and not line.startswith("   ") and not line.lstrip().startswith("#"):
+            break                      # the next target (two-space indent) or a top-level key ends the block
+        match = re.match(r"^\s+(NS[A-Za-z]+UsageDescription):\s*(.*?)\s*$", line)
+        if match:
+            text = match.group(2)
+            if len(text) >= 2 and text[0] == text[-1] and text[0] in "\"'":
+                text = text[1:-1]
+            found[match.group(1)] = text
+    return found
 
 
 def vocabulary_words(path: Path) -> dict[str, dict]:
@@ -94,15 +121,16 @@ def findings(plist: dict, pairs: list[tuple[str, str]], words: dict[str, dict], 
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     source = ap.add_mutually_exclusive_group()
-    source.add_argument("--plist", type=Path, help="property list to check (default: %(default)s)")
+    source.add_argument("--plist", type=Path, help="property list to check")
+    source.add_argument("--project", type=Path, help="XcodeGen project file (default: project.yml, target VisualCore)")
     source.add_argument("--app", type=Path, help="built app bundle; its Info.plist is checked")
     ap.add_argument("--registrations", type=Path, default=REGISTRATIONS)
     ap.add_argument("--vocabulary", type=Path, default=VOCABULARY)
     ap.add_argument("--json", type=Path, help="write the machine-readable report here")
     args = ap.parse_args(argv)
-    plist_path = args.app / "Info.plist" if args.app else (args.plist or PLIST)
+    plist_path = args.app / "Info.plist" if args.app else (args.plist or args.project or PROJECT)
     try:
-        plist = read_plist(plist_path)
+        plist = read_plist(plist_path) if (args.app or args.plist) else read_project(plist_path)
         words = vocabulary_words(args.vocabulary)
         pairs = declared(args.registrations)
         found = findings(plist, pairs, words, str(plist_path))

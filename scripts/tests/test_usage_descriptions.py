@@ -127,6 +127,31 @@ class UsageDescriptionTests(unittest.TestCase):
         self.assertEqual(code, 2)
         self.assertIn("Info.plist", out)
 
+    def project(self, body):
+        path = self.dir / "project.yml"
+        path.write_text("name: X\npackages:\n  VisualCore:\n    path: P\ntargets:\n  Other:\n    type: framework\n"
+                        "    info:\n      properties:\n        NSCameraUsageDescription: not this target\n"
+                        "  VisualCore:\n    type: application\n    info:\n      properties:\n" + body +
+                        "  Next:\n    type: framework\n")
+        return path
+
+    def test_project_source_reads_only_the_app_target(self):
+        path = self.project(f"        # a comment\n        NSPhotoLibraryAddUsageDescription: {PHOTO}\n")
+        code, out = run(cud, ["--project", str(path), "--registrations", str(self.regs), "--vocabulary", str(self.vocab)])
+        self.assertEqual(code, 0, out)
+
+    def test_project_source_extra_key_fails(self):
+        path = self.project(f"        NSPhotoLibraryAddUsageDescription: \"{PHOTO}\"\n        NSMicrophoneUsageDescription: x y\n")
+        code, out = run(cud, ["--project", str(path), "--registrations", str(self.regs), "--vocabulary", str(self.vocab)])
+        self.assertEqual(code, 1, out)
+        self.assertIn("extra-key", out)
+
+    def test_project_without_the_target_is_unusable(self):
+        path = self.dir / "project.yml"
+        path.write_text("targets:\n  Other:\n    type: framework\n")
+        code, out = run(cud, ["--project", str(path), "--registrations", str(self.regs), "--vocabulary", str(self.vocab)])
+        self.assertEqual(code, 2, out)
+
     def test_real_repository_passes_with_one_key(self):
         code, out = run(cud, [])
         self.assertEqual(code, 0, out)
