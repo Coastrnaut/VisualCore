@@ -21,7 +21,7 @@ API-baseline and reference-regression tasks apply.
 
 ## Phase 3: User Story 1 — A program in use is never deleted by the cache (P1)
 
-- [ ] T-R02F04-003 [US1] Tests first in `Packages/VisualCoreRendering/Tests/VisualCoreRenderingTests/ProgramCacheTests.swift`:
+- [X] T-R02F04-003 [US1] Tests first in `Packages/VisualCoreRendering/Tests/VisualCoreRenderingTests/ProgramCacheTests.swift`: — Verified 2026-11-13: ProgramCacheTests: amended eviction test (FR-R02F04-014: 64 cached, 1 retired, 1 eviction, 65 live) plus held-evicted-program draws magenta, retired released at recreateContext with 0 leaked, re-request compiles new and both draw; 6 tests pass on 26.5 and 27.2
   amend `testCacheIsBoundedToSixtyFourWithLRUEviction` (comment the reason: FR-R02F04-014) to expect the evicted
   program still alive (`cachedProgramCount` 64, `retiredProgramCount` 1, `evictionCount` 1, live programs 65); new
   test: hold P, create 64 variants, draw a full-screen quad with P and read back the expected colour (not black);
