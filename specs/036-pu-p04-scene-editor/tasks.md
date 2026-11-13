@@ -40,7 +40,7 @@ each task. Tests before code. Owner-only items: none. One {device} task. No Visu
   `PU/Experience/ParticlePresenter.swift` holds the library and sends the open actions; `PU/Experience/ParticleControls.swift`
   Library section (identifiers `pu.library.*` per contracts/actions.md, labels, 44-point targets);
   `Apps/VisualCore/App/ExperienceRegistry.swift` passes `launch.storage`.
-- [ ] T-A04-409 [US1] Write `Apps/VisualCore/Tests/UI/ParticleUniverse/PUSceneLibraryUITests.swift`: save "Nebula",
+- [X] T-A04-409 [US1] Write `Apps/VisualCore/Tests/UI/ParticleUniverse/PUSceneLibraryUITests.swift`: save "Nebula", — Verified 2026-11-13: PUSceneLibraryUITests (save, change, open; relaunch, rename, delete) pass on the iOS 27.2 phone (55.7 s and 120.4 s; ui-scene-library-r4) and as release-check chunk j4 (ui-pu-j4-r3)
   change the scene, open "Nebula", relaunch and open again, rename, delete; add it to release-check chunk j3 in
   `scripts/release_check.py`; `xcodegen generate`.
 - [ ] T-A04-410 [US1] Acceptance: ExperiencesCreative on sim-27.2 (check `experiences-ios27`) and the UI test on the
