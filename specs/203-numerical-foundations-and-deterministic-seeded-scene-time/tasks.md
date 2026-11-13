@@ -82,7 +82,7 @@ none (no {owner} task). VisualCore changes, so the documentation, API-baseline a
 
 ## Phase 8: Polish and cross-cutting
 
-- [ ] T-R02F03-022 API baseline: `python3 scripts/check_public_api.py --update` then `check_public_api.py` (check
+- [X] T-R02F03-022 API baseline: `python3 scripts/check_public_api.py --update` then `check_public_api.py` (check — Verified 2026-11-13: check_public_api.py --update: 2328 declarations, 0 undocumented, 32 additions equal to contracts/api.md; check_public_api PASS (public-api); check_documented_api --sources Apps/VisualCore PASS (documented-api)
   `public-api`); `python3 scripts/check_documented_api.py --sources Apps/VisualCore` (check `documented-api`).
 - [ ] T-R02F03-023 `Packages/VisualCore/README.md` section "Numerical foundations (feature 203, R02-F03)".
 - [ ] T-R02F03-024 Full host suite `swift test --package-path Packages/VisualCore` (check `host-visualcore`); record
