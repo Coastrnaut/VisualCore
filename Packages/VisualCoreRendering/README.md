@@ -335,3 +335,15 @@ fills from the frame it reads (`ScenarioRunResult.renderer`).
 feedback generators (`SystemHapticSink`) and accessibility announcements (`SystemAnnouncementSink`, only while
 VoiceOver runs), through the planners' rate limits and the haptics switch. It never touches an experience's state.
 `ExperiencePresenter.gestureActions` and `nativeActions` declare which actions gestures and native controls send.
+
+## Resource ownership and pipelines (feature 204, R02-F04)
+
+The ownership rules are unchanged: every GPU handle carries its context generation, stale handles are refused and
+counted, everything is released in a fixed order and session close reports zero live resources. The program cache
+still holds at most 64 programs, but eviction no longer deletes a program a scene may still hold: the evicted program
+is retired and stays valid until its holder calls `release(_:)` or the context ends (`ResourceRegistry.evictionCount`,
+`retiredProgramCount`). `RenderState` (VisualCoreShaderSource) describes a draw's blend mode, depth test and write,
+face culling and colour mask, with the presets `opaque`, `alphaBlended`, `additive` and `opaque3D`; `Pipeline` pairs a
+program with a `RenderState`, and `GLState.apply(_:resources:)` sets all of it at once and refuses (and counts) a
+released or stale program. `makeRenderTarget(...depth: true...)` and `acquireTarget(...depth: true)` give offscreen
+targets a 24-bit depth renderbuffer (`RenderTarget.depthRenderbuffer`), counted, pooled and released with the target.
