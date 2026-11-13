@@ -21,7 +21,8 @@ public struct SplitMix64: RandomNumberGenerator, Sendable {
 
 /// Deterministic random numbers for simulations; conforms to `RandomNumberGenerator`.
 public struct SeededRandom: RandomNumberGenerator, Sendable, Equatable {
-    private var s0: UInt64, s1: UInt64, s2: UInt64, s3: UInt64
+    /// The four xoshiro256** state words; readable inside the module so `SeededRandom+State.swift` can save them.
+    internal private(set) var s0: UInt64, s1: UInt64, s2: UInt64, s3: UInt64
     /// The seed this generator was created with.
     public let seed: UInt64
 
@@ -30,6 +31,12 @@ public struct SeededRandom: RandomNumberGenerator, Sendable, Equatable {
         self.seed = seed
         var sm = SplitMix64(seed: seed)
         s0 = sm.next(); s1 = sm.next(); s2 = sm.next(); s3 = sm.next()
+    }
+
+    /// Rebuilds a generator from a saved seed and state words (used by `init(restoring:)`; no validation here).
+    internal init(seed: UInt64, s0: UInt64, s1: UInt64, s2: UInt64, s3: UInt64) {
+        self.seed = seed
+        self.s0 = s0; self.s1 = s1; self.s2 = s2; self.s3 = s3
     }
 
     @inline(__always) private static func rotl(_ x: UInt64, _ k: UInt64) -> UInt64 { (x << k) | (x >> (64 - k)) }
