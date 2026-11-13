@@ -101,8 +101,8 @@ session.
    not opened.
 3. **Given** a hosted session whose drawing fails, **When** the failure happens, **Then** the session shows its
    failure state, the saved scenes are untouched, and retry reopens a running session.
-4. **Given** Reduce Motion or Reduce Flashing, **When** the hosted experience opens, **Then** it starts paused or caps
-   brightness respectively.
+4. **Given** Reduce Motion or Reduce Flashing, **When** the experience opens in the one app, **Then** it starts paused
+   or caps brightness respectively.
 
 ---
 
@@ -145,6 +145,7 @@ only tested features, the known limitations, and a device campaign plan for what
 
 - **Library file without a format field** (all files written so far): treated as format 1.
 - **Library file of a newer format**: counted as newer, kept, never opened or rewritten.
+- **An older build reading a file written with `format`**: the extra key is ignored, so the scene still opens.
 - **Drawing failure during the first frame**: the failure view appears; no partial save happens.
 - **Failure while the library is open for renaming**: nothing is written; the library reloads on the next open.
 - **Reduce Motion turned on while playing**: unchanged behaviour of earlier phases (out of scope here).
@@ -170,7 +171,8 @@ only tested features, the known limitations, and a device campaign plan for what
   be loaded by tests.
 - **FR-A04-612**: A drawing failure in a hosted session (produced by a test-only presenter seam) MUST put the session
   in its failure state without changing any saved scene, and retry MUST reopen a running session.
-- **FR-A04-613**: Hosted tests MUST prove Reduce Motion starts paused and Reduce Flashing caps brightness.
+- **FR-A04-613**: In the one app, the interface test MUST prove Reduce Motion starts paused (the pause is issued by the
+  controls), and a session test MUST prove Reduce Flashing caps brightness.
 
 **Build and archive (story 3)**
 - **FR-A04-620**: Build-and-archive instructions for the one app (`docs/release/build-and-archive.md`) MUST list the exact unsigned build, test and release
