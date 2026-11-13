@@ -68,7 +68,7 @@ each task. Tests before code. Owner-only items: none. One {device} task. No Visu
 
 ## Phase 7: Polish
 
-- [ ] T-A04-417 `python3 scripts/check_compliance.py` (check `compliance`), `python3 scripts/test_scripts.py`
+- [X] T-A04-417 `python3 scripts/check_compliance.py` (check `compliance`), `python3 scripts/test_scripts.py` — Verified 2026-11-13: check_compliance PASS (compliance); test_scripts PASS after the planning index rebuild (script-tests-r2); git diff --stat efe54a9f..HEAD over Packages/VisualCore and Packages/VisualCoreRendering is empty
   (check `script-tests`), and `git diff --stat` over `Packages/VisualCore` and `Packages/VisualCoreRendering` for the
   phase's commits showing no change (FR-A04-432, FR-A04-442).
 - [ ] T-A04-418 App unit tests and the PU interface chunks j2/j3 on the iOS 27.2 phone stay green (checks `app-unit`,
