@@ -1,0 +1,25 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/VisualCore",
+    "--scheme",
+    "VisualCore-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCore --scheme VisualCore-Package --destination sim-27.2 --action test",
+  "elapsed_seconds": 30.648,
+  "exit_code": 0,
+  "finished": "2026-11-13T18:02:11+00:00",
+  "gate": "UA-F07",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F07.pure-ios27.log",
+  "log_sha256": "a0eb0859083b92e98d4c5572e9da0c804c8e2c1e3a53b679f3d658bda38ffd7b",
+  "name": "pure-ios27",
+  "started": "2026-11-13T18:01:40+00:00",
+  "timed_out": false
+}

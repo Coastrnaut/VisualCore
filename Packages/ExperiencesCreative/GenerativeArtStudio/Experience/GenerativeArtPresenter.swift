@@ -186,6 +186,7 @@ enum GenerativeArtProbe {
     /// in 0…1; the probe covers the pixel's rows and every noise value, and each channel is moved by ±4 levels to
     /// stay clear of a class boundary.
     static func particleCornerClass(palette: Palette) -> FrameColorClass? {
+        #if DEBUG || VISUALCORE_AUTOMATION
         let v = 1 - cornerY
         let base = 0.04 + 0.16 * (1 - v)
         var found: FrameColorClass?
@@ -208,6 +209,9 @@ enum GenerativeArtProbe {
             }
         }
         return found
+        #else
+        return nil  // FrameChecks exists only in debug and automation builds (probes are a test aid)
+        #endif
     }
 
     /// `vc_srgbEncode` of one channel.

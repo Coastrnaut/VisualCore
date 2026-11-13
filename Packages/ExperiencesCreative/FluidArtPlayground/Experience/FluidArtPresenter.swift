@@ -229,6 +229,7 @@ enum FluidArtProbe {
     /// The class of the palette's colour for every dye amount from none to `dye`, each channel moved by ±4 levels;
     /// nil when two of them differ.
     static func expectedClass(palette: FluidPalette, dye: SIMD3<Float>) -> FrameColorClass? {
+        #if DEBUG || VISUALCORE_AUTOMATION
         var found: FrameColorClass?
         for step in 0...8 {
             let amount = dye * (Float(step) / 8)
@@ -240,6 +241,9 @@ enum FluidArtProbe {
             }
         }
         return found
+        #else
+        return nil  // FrameChecks exists only in debug and automation builds (probes are a test aid)
+        #endif
     }
 
     private static func level(_ value: Float, _ offset: Int) -> UInt8 {

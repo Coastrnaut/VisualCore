@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "python3",
+    "scripts/release_check.py",
+    "--only",
+    "compliance",
+    "licenses",
+    "dependencies",
+    "public-api",
+    "app-contracts",
+    "isolation-visual-core",
+    "isolation-particle-universe",
+    "documented-api-visual-core",
+    "host-visualcore"
+  ],
+  "command": "python3 scripts/release_check.py --only compliance licenses dependencies public-api app-contracts isolation-visual-core isolation-particle-universe documented-api-visual-core host-visualcore",
+  "elapsed_seconds": 40.38,
+  "exit_code": 0,
+  "finished": "2026-11-13T18:00:08+00:00",
+  "gate": "UA-F07",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F07.release-static.log",
+  "log_sha256": "3081fa7911927d27dbf2c19fa9e03f4ea34576e906289ae3f3683125ecbda41b",
+  "name": "release-static",
+  "started": "2026-11-13T17:59:28+00:00",
+  "timed_out": false
+}

@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "python3",
+    "scripts/release_check.py",
+    "--only",
+    "showcase-release-build",
+    "release-symbols",
+    "projectm-independence"
+  ],
+  "command": "python3 scripts/release_check.py --only showcase-release-build release-symbols projectm-independence",
+  "elapsed_seconds": 15.178,
+  "exit_code": 0,
+  "finished": "2026-11-13T18:02:59+00:00",
+  "gate": "UA-F07",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F07.release-build-symbols.log",
+  "log_sha256": "51781af9ad5305788f0a0757006042f071994c26b5d5f8e0d999c08c57a89701",
+  "name": "release-build-symbols",
+  "started": "2026-11-13T18:02:44+00:00",
+  "timed_out": false
+}

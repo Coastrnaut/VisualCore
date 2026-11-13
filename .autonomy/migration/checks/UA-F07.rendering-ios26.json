@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "python3",
+    "scripts/release_check.py",
+    "--only",
+    "rendering-sim-ios26"
+  ],
+  "command": "python3 scripts/release_check.py --only rendering-sim-ios26",
+  "elapsed_seconds": 37.61,
+  "exit_code": 0,
+  "finished": "2026-11-13T18:01:32+00:00",
+  "gate": "UA-F07",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F07.rendering-ios26.log",
+  "log_sha256": "1f85f124d3d6c031cb28679bbbdf2f299db96ce0efe92c12f02ab62e65e441c0",
+  "name": "rendering-ios26",
+  "started": "2026-11-13T18:00:55+00:00",
+  "timed_out": false
+}

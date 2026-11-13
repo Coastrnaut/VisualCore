@@ -387,3 +387,8 @@ The dossier files are not edited. The legacy ledger is untouched; its hash is co
   and may run UI test classes in parallel simulator clones. The audit chunks of the iOS 27.2 phone that already
   passed (g1, h1, i1a, i1b) are kept; A04's audit chunk `j1` is not run for this gate. FR-U07-022 and SC-U07-004 are
   corrected; CLAUDE.md rule 7, Auto-Creator.md sections 6.4, 13 (app tests), 15.3 and 22.2 are edited in place.
+- 2026-11-13, T-U07-038: the Release build of the app failed. The frame-probe helpers of A01's and A02's presenters
+  call `FrameChecks.classify`, which exists only under `DEBUG || VISUALCORE_AUTOMATION`, and no earlier check built
+  the app in Release after the adapters. Both helpers now compute the class under that condition and return nil in
+  Release. Probes are a test aid, and in Release the presenters declare none. A Release build of the app belongs in
+  CI (UA-F10).
