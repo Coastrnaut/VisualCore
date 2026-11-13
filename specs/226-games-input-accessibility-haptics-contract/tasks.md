@@ -72,7 +72,7 @@ task. Owner-only items: none.
   `check_documented_api.py --sources Apps/VisualCore` (check `documented-api`), README sections in VisualCore and
   VisualCoreRendering.
 - [X] T-R02F26-017 Reference regression `reference-a` and `reference-b` after the change (SC-R02F26-007). — Verified 2026-11-13: reference-a 3/3 and reference-b 4/4 after the change (SC-R02F26-007)
-- [ ] T-R02F26-018 Release build, symbols and privacy (`release_check.py --only app-release-build app-release-symbols
+- [X] T-R02F26-018 Release build, symbols and privacy (`release_check.py --only app-release-build app-release-symbols — Verified 2026-11-13: release_check.py --only app-release-build app-release-symbols app-privacy-manifest PASS 3/3 (release-app)
   app-privacy-manifest`, check `release-app`).
 - [ ] T-R02F26-019 Auto-Creator.md section 13 row R02-F26 as built via `docs/catalog/shared-feature-map.json` and
   `render_autocreator.py`; `validate_autocreator.py` (check `steering`); `validate_docs.py`, `migration_baseline.py
