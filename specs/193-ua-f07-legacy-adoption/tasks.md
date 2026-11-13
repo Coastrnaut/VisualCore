@@ -80,7 +80,8 @@ runtimes.
     and declares a probe;
   - the controls cover the gallery families, presets, palettes, parameters, seed, play, pause and scrub, and the
     library (save, open, rename, remove) through `ExperienceStorage`;
-  - export goes to the system's share interface;
+  - export goes to the system's share interface or the experience's storage (FR-U07-020);
+  - every control has a VoiceOver label, fits at the largest text size, and is at least 44 by 44 points (FR-U07-022);
   - the manifest has the nine standard scenarios plus one `fixture-<n>` per regression fixture of the A01 card.
 - [ ] T-U07-010 [US1] `project.yml`: the framework target `GenerativeArtStudioExperience` (data-model section 1) and its
   test bundle; `Apps/VisualCore` links it; the registration of A01 is in `ExperienceRegistry.candidates` with its
@@ -111,7 +112,7 @@ runtimes.
   prefixed `GAS…`, launches through `-vcResetData -vcSkipWelcome -vcCandidates -openExperience
   a01.generative-art-studio`, and locators `experience.a01.generative-art-studio.<control>`. Write the 14 rows of
   `test-map.csv`; settings, launch and acknowledgements tests map to the one app's equivalents with their note.
-  Add the chunk `-g` (`GenerativeArtStudio` classes) to the app test runs (FR-U07-030 to FR-U07-033).
+  Add the chunk `-g` (`GenerativeArtStudio` classes) to the app test runs. The ported accessibility audits run at the default and the largest text size (FR-U07-022, FR-U07-030 to FR-U07-033; SC-U07-004).
 - [ ] T-U07-016 [US6] Run the A01 chunk on the iOS 27.2 phone; `check_test_map.py` on its log passes for the 14 rows.
 
 ## Phase 6: User Story 7 — A01 moves and retires (P3)
@@ -122,7 +123,7 @@ runtimes.
   Core manifest; the Experience target with the shaders as resources). In the same commit:
   - replace the framework target by the package products;
   - fix every `#filePath` and contract path (research R9);
-  - record each move in `Catalog/path-map.json` and set the entries of `docs/migration/path-map.json` to `done`;
+  - record each move in `Catalog/path-map.json` and set the entries of `docs/migration/path-map.json` to `done` (SC-U07-006);
   - re-run T-U07-014, T-U07-011 and T-U07-013 for A01 (FR-U07-040 to FR-U07-042, FR-U07-044).
 - [ ] T-U07-018 [US7] Retire the `GenerativeArtStudio` app, unit-test and UI-test targets and scheme in `project.yml`.
   The app unit tests now run as `ExperienceTests`, with the same count (FR-U07-034). The project builds, and
@@ -145,8 +146,8 @@ runtimes.
 - [ ] T-U07-021 [US5] `FluidArtCore`, `FluidArtPresenter` (it runs the passes for the steps since its last draw, restarts
   the fields from `DyeSeed.pattern(seed:)` at setup, applies the level to iterations and the splat cap, and turns
   pointer events into `stroke` actions), `FluidArtControls`, `FluidArtManifest`; the framework target and candidate
-  registration; session tests on both runtimes; parity of the configuration and the CPU state for 3 seeds
-  (FR-U07-010 to FR-U07-019; SC-U07-003, SC-U07-005).
+  registration; session tests on both runtimes; parity of the configuration and the CPU state for 3 seeds; capture
+  through the share interface; controls meeting E-12 (FR-U07-010 to FR-U07-022; SC-U07-003, SC-U07-005).
 - [ ] T-U07-022 [US5] Port A02's 9 UI tests (`FAP…`, chunk `-h`), with their map rows and guard. Then the runner on both
   runtimes, the move, the retirement and X-A02 as in T-U07-013 and T-U07-015 to T-U07-019.
 
@@ -161,7 +162,8 @@ runtimes.
   - tours and palette animation advance with steps, never with `systemUptime`.
 - [ ] T-U07-024 [US3] `FractalCore`, `FractalPresenter` (the viewport is derived from the drawable size, and pointer events
   become `pan` and `pinch`), `FractalControls` (with bookmarks through `ExperienceStorage` and go-to), and
-  `FractalManifest`; the framework target and candidate; session tests on both runtimes; framing parity for 3 seeds.
+  `FractalManifest`; the framework target and candidate; session tests on both runtimes; framing parity for 3 seeds;
+  capture through the share interface; controls meeting E-12 (FR-U07-020, FR-U07-022).
 - [ ] T-U07-025 [US3] Port A03's 10 UI tests (`FE…`, chunk `-i`), with their map rows. Then the runner, the move (including
   `Tests/Fixtures/bookmark-v1.json` → `ExperienceTests/Fixtures` with the `MigrationTests` path fixed), the retirement
   and X-A03.
@@ -178,7 +180,7 @@ runtimes.
     SC-U07-011).
 - [ ] T-U07-027 [US4] `ParticleCore`, `ParticlePresenter` (the source reads the core, with no stepping in the render
   callback; taps and drags become `force.place` actions), `ParticleControls`, `ParticleManifest`; the framework target
-  and candidate; session tests on both runtimes.
+  and candidate; session tests on both runtimes; controls meeting E-12 (FR-U07-022).
 - [ ] T-U07-028 [US4] Port A04's 23 UI tests (`PU…`, chunk `-j`) with their map rows. Then the runner on both runtimes and
   the move of A04's sources. The standalone `ParticleUniverse` target stays and X-A04 stays pending (FR-U07-043,
   FR-U07-051).
@@ -195,7 +197,8 @@ runtimes.
   data-model.md "As built" with the final adapter controls and levels.
 - [ ] T-U07-032 API baseline and boundaries: `check_public_api.py --update` leaves no difference and 0 undocumented
   symbols; no baseline line is lost since `af887e3`; `External` and `Vendor` are unchanged; `check_dependencies.py`,
-  `check_compliance.py`, the documented-API checks and the isolation rules pass (FR-U07-060 to FR-U07-064).
+  `check_compliance.py`, the documented-API checks and the isolation rules pass (FR-U07-060 to FR-U07-064;
+  SC-U07-009).
 - [ ] T-U07-033 Run a read-only audit of the implementation against the specification before the evidence round
   (`/speckit-converge`); implement what it appends.
 
@@ -206,7 +209,7 @@ runtimes.
 - [ ] T-U07-035 Evidence `verify-a01-a03` (`python3 scripts/verify_experiences.py --only a01.generative-art-studio
   a02.fluid-art-playground a03.fractal-explorer --runtime 27 26 --fresh`) and `verify-a04`.
 - [ ] T-U07-036 Evidence `test-map` (`check_test_map.py`: 56 of 56 old tests mapped, every new test exists and passed in
-  the logs of the chunks).
+  the logs of the chunks; SC-U07-004).
 - [ ] T-U07-037 Evidence of the app: `xcodegen`, `app-build`, and the chunks a to f plus g to j on the phone and the tablet
   of both runtimes.
 - [ ] T-U07-038 Evidence: `release-build`, `release-symbols`, `privacy-manifest`, `compliance`, `app-isolation`,
@@ -214,7 +217,7 @@ runtimes.
   `rendering-ios26`, `experiences-ios27`, `experiences-ios26`), and the consumer builds `build-<Scheme>` of the
   remaining schemes.
 - [ ] T-U07-039 Evidence `reference-a` and `reference-b`: the two chunks of the ProjectM reference regression (3 of 3
-  and 4 of 4).
+  and 4 of 4) after the last framework change (FR-U07-053; SC-U07-009).
 - [ ] T-U07-040 Evidence `legacy-ledger` (the SHA-256 of `.autonomy/state.json` begins `2604ffd8292cc8a8`), `docs`,
   `steering`, `script-tests`; then confirm with `gh run list` that `ci` and `push-scan` of the last pushed commit
   succeeded.
@@ -223,6 +226,9 @@ runtimes.
   record --gate UA-F07`.
 
 ## Dependencies & Execution Order
+
+- The order of FR-U07-045 (A01, A02, A03, A04, from the migration plan) is binding. The priorities of the user
+  stories (A03 and A04 P2, A02 P3) rank their importance; they do not reorder the work.
 
 - Phase 1 and Phase 2 come first. Then A01 completes, through Phases 3 to 6. A02, A03 and A04 follow in that order
   (FR-U07-045); each needs Phase 2 and repeats Phases 4 and 5 for itself.
@@ -240,3 +246,20 @@ runtimes.
 
 The MVP is the pointer path, the candidate registry and A01 complete (adopted, verified, moved, retired, X-A01).
 Each further experience is an increment that can be reverted alone. Evidence runs once after the audit of T-U07-033.
+
+## Analysis record
+
+- **Run 1 (2026-11-13, `/speckit-analyze`)**: 36 requirements and 11 success criteria checked against 41 tasks; 0
+  critical, 2 high, 3 medium and 1 low finding. All were fixed in this file:
+  - H1: the accessibility requirement FR-U07-022 had no task. It is now in T-U07-009, 015, 021, 024 and 027.
+  - H2: the story priorities (A03 and A04 P2, A02 P3) conflicted with the binding order of FR-U07-045
+    (A01–A04). The order is now stated as binding under "Dependencies".
+  - M1: FR-U07-020 (capture and export) was not traced; it now is, in T-U07-009, 021 and 024.
+  - M2: FR-U07-053 (reference regression) was not traced; it now is, in T-U07-039.
+  - M3: SC-U07-004, 006 and 009 were not traced; they now are, in T-U07-015, 036, 017 and 032.
+  - L1: a wording correction.
+
+  Constitution and ADR-0009: no conflict. One app target is kept, and the frameworks are not apps. E-04 and E-13 are
+  resolved by the clarifications and ADR-0011.
+- **Run 2 (2026-11-13)**: coverage is 100% (47 of 47 requirement and criterion ids traced); no critical or high
+  finding remains.
