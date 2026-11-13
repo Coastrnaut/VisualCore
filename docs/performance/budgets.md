@@ -20,7 +20,7 @@ samples are kept apart.
 | Input to visible response | median under 80 ms and 95th percentile under 150 ms, measured on one clock | proposal | D1, D2, D3: scenario `input-latency`, 200 samples per device |
 | Start | cold and warm start recorded apart; a bounded set of shader variants compiled in the set-up | proposal | D1, D2, D3: scenarios `launch` (cold) and `relaunch` (warm), 200 samples per device |
 | Memory and graphics bytes | bounded by the declared resource budget; flat over a ten-minute scenario (the growth rule of feature 192) | proposal | D1, D2, D3: scenario `endurance` on the wall clock, 200 samples per device; the simulator run of feature 192 is a development signal only |
-| Clean build, incremental build and app size | recorded at every milestone | proposal | tooling: release build and size report of UA-F10 at every milestone (no device measurement) |
+| Clean build, incremental build and app size | recorded at every milestone | proposal | tooling: `python3 scripts/measure_build.py --milestone <gate>` appends to `docs/performance/build-measurements.json` (UA-F10; simulator build, no device measurement); a module-granularity change needs an ADR with a measurement before and after |
 
 ## What the app measures (feature 192)
 

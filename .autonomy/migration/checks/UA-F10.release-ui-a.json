@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "python3",
+    "scripts/release_check.py",
+    "--only",
+    "app-ui-ios27-a"
+  ],
+  "command": "python3 scripts/release_check.py --only app-ui-ios27-a",
+  "elapsed_seconds": 299.368,
+  "exit_code": 0,
+  "finished": "2026-11-13T18:52:48+00:00",
+  "gate": "UA-F10",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F10.release-ui-a.log",
+  "log_sha256": "b0679f7f9ddc9d49ee18a616eb5cb91691cbed60de8f42665c1a669f52bd685c",
+  "name": "release-ui-a",
+  "started": "2026-11-13T18:47:48+00:00",
+  "timed_out": false
+}

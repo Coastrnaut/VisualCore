@@ -1097,9 +1097,10 @@ class ReleaseCheckTests(unittest.TestCase):
                          # Feature 193: the adopted experiences' package on both runtimes.
                          "experiences-creative-sim-ios27", "experiences-creative-sim-ios26"]:
             self.assertIn(required, names)
-        # Feature 193 (UA-F07): A01 and A02 are retired; no step of their standalone apps remains.
-        self.assertFalse([n for n in names if "generative-art-studio" in n or "fluid-art-playground" in n
-                          or "fractal-explorer" in n], names)
+        # Feature 193 (UA-F07): A01 to A03 are retired; no step of their standalone apps remains. Their experiences
+        # keep per-experience verification steps of the one app (UA-F10, `verify-<id>-iosNN`).
+        self.assertFalse([n for n in names if not n.startswith("verify-a0") and ("generative-art-studio" in n
+                          or "fluid-art-playground" in n or "fractal-explorer" in n)], names)
 
     def test_select_only_skip_and_unknown(self):
         all_steps = relcheck.steps("X")

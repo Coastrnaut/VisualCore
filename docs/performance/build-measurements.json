@@ -1,4 +1,14 @@
 {
   "schema": 1,
-  "records": []
+  "records": [
+    {
+      "commit": "d9770912746f2c137d599a27c7416c2d7073f840",
+      "date": "2026-11-13",
+      "xcode_build": "27B52",
+      "clean_build_s": 21.5,
+      "incremental_build_s": 4.1,
+      "release_app_bytes": 28351742,
+      "milestone": "UA-F10"
+    }
+  ]
 }

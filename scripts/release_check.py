@@ -198,6 +198,7 @@ def steps(stamp: str) -> list[Step]:
     for rt in RUNTIMES:
         s += app_test_steps(rt, stamp)
     s += app_release_steps()
+    s += unified_app_steps(stamp)
     return s
 
 
@@ -228,12 +229,72 @@ def app_domain_steps(root: Path = ROOT) -> list[Step]:
     return out
 
 
+# Feature 196 (UA-F10, FR-U10-040 to 042): interface chunks of the one app, built once and run without building, with
+# two simulator clones; the accessibility audit classes wait for the device campaign (owner ruling of 2026-11-13).
+UI_CHUNKS = {
+    "a": ["RoutesUITests"],
+    "b": ["SettingsUITests", "LaunchUITests"],
+    "d": ["LauncherUITests", "FirstRunUITests"],
+    "e": ["PersistenceUITests"],
+    "f": ["PersistenceDamageUITests"],
+    "g2": ["GASControlsUITests", "GASExportUITests", "GASGalleryUITests"],
+    "g3": ["GASLibraryUITests", "GASRecoveryUITests"],
+    "h2": ["FAPPlaygroundUITests", "FAPControlsUITests", "FAPAdjustUITests", "FAPPaletteCaptureUITests"],
+    "i2": ["FEExplorerUITests", "FEBookmarkUITests", "FECaptureTourUITests"],
+    "j2": ["PUSandboxUITests"],
+    "j3": ["PUEmitterUITests", "PUForceUITests", "PUTrailUITests"],
+}
+UNIFIED_LIMIT = 590       # seconds, below the ten-minute limit of one foreground command
+RELEASE_FORBIDDEN = ["DebugLaunch", "DebugExperience", "DebugInventory", "ScenarioLaunch", "ScenarioHostView",
+                     "vcDamageStat", "vcCandidates", "vc_ci_angle_standin"]
+
+
+def registered_ids(root: Path = ROOT) -> list[str]:
+    """The registered experience ids of `Catalog/registrations.json`; empty when the file is missing or damaged."""
+    try:
+        data = json.loads((root / "Catalog" / "registrations.json").read_text())
+        return sorted(data.get("registrations", {}))
+    except (OSError, ValueError, AttributeError):
+        return []
+
+
+def unified_app_steps(stamp: str, root: Path = ROOT) -> list[Step]:
+    """The one app's steps (feature UA-F10): build once for testing, unit tests, interface chunks, verification per
+    registered experience and runtime, Release build with its symbol and privacy checks, and the measurement file
+    check. Each step stops itself below ten minutes."""
+    app = [PY, "scripts/xcodebuild_app.py", "--scheme", "VisualCore", "--runtime", "27.2", "--kind", "phone"]
+    out = [Step("app-build-for-testing-ios27", app + ["--action", "build-for-testing", "--log-name",
+                                                      f"release-app-bft-ios27-{stamp}"], timeout=UNIFIED_LIMIT),
+           Step("app-unit-ios27", app + ["--action", "test-without-building", "--only-testing", "VisualCoreTests",
+                                         "--sources", "Apps/VisualCore/Tests/Unit", "--log-name", f"release-app-unit-ios27-{stamp}"], timeout=UNIFIED_LIMIT)]
+    for chunk, classes in UI_CHUNKS.items():
+        out.append(Step(f"app-ui-ios27-{chunk}", app + ["--action", "test-without-building", "--parallel", "2",
+                                                        "--only-testing", *[f"VisualCoreUITests/{c}" for c in classes],
+                                                        "--log-name", f"release-app-ui-ios27-{chunk}-{stamp}"],
+                        timeout=UNIFIED_LIMIT))
+    for exp in registered_ids(root):
+        for runtime in ("27", "26"):
+            out.append(Step(f"verify-{exp}-ios{runtime}", [PY, "scripts/verify_experiences.py", "--only", exp,
+                                                         "--runtime", runtime], timeout=UNIFIED_LIMIT))
+    derived = "Build/DerivedData/release-VisualCore-Release-sim"
+    built = f"{derived}/Build/Products/Release-iphonesimulator/VisualCore.app"
+    out += [Step("app-release-build", ["xcodebuild", "build", "-project", "VisualCore.xcodeproj", "-scheme", "VisualCore",
+                                       "-configuration", "Release", "-destination", "generic/platform=iOS Simulator",
+                                       "-derivedDataPath", derived, "CODE_SIGNING_ALLOWED=NO"], timeout=UNIFIED_LIMIT),
+            Step("app-release-symbols", [PY, "scripts/check_release_symbols.py", "--app", built, "--forbid",
+                                         *RELEASE_FORBIDDEN], timeout=UNIFIED_LIMIT),
+            Step("app-privacy-manifest", [PY, "scripts/check_privacy_manifest.py", "--app", built], timeout=UNIFIED_LIMIT),
+            Step("measure-build-check", [PY, "scripts/measure_build.py", "--check"], timeout=UNIFIED_LIMIT)]
+    return out
+
+
 def app_test_steps(runtime: str, stamp: str, root: Path = ROOT) -> list[Step]:
     """Per app with a same-named scheme in project.yml (feature 019 T-A02-115): unit and UI tests on `runtime`."""
     spec = (root / "project.yml").read_text() if (root / "project.yml").is_file() else ""
     schemes = set(re.findall(r"^  ([A-Za-z0-9]+):\n    build:", spec, flags=re.M))
+    # The one app runs in the chunked steps of unified_app_steps (UA-F10); the whole-scheme run could exceed ten minutes.
     return [xcode_test("VisualCore.xcodeproj", app.name, runtime, app.name, stamp, f"app-{kebab(app.name)}-{tag(runtime)}")
-            for app in app_dirs(root) if app.name in schemes]
+            for app in app_dirs(root) if app.name in schemes and app.name != "VisualCore"]
 
 
 def app_release_steps(root: Path = ROOT) -> list[Step]:

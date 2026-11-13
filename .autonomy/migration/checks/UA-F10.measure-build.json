@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "python3",
+    "scripts/measure_build.py",
+    "--milestone",
+    "UA-F10"
+  ],
+  "command": "python3 scripts/measure_build.py --milestone UA-F10",
+  "elapsed_seconds": 54.201,
+  "exit_code": 0,
+  "finished": "2026-11-13T18:43:40+00:00",
+  "gate": "UA-F10",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F10.measure-build.log",
+  "log_sha256": "d3026404c0b571b1632fcb69a2f7c1ec6b5f770b19ae0b3e6ad51ea551ae7aef",
+  "name": "measure-build",
+  "started": "2026-11-13T18:42:46+00:00",
+  "timed_out": false
+}
