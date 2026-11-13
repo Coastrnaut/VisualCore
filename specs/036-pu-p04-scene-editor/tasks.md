@@ -26,7 +26,7 @@ each task. Tests before code. Owner-only items: none. One {device} task. No Visu
   core reproduce the document's scene, force and looks; `ParticleCore.document` (current state as a `SceneDocument`)
   round-trips; replaying a log containing an open reaches the same digest 3 of 3 times; an invalid define rejects the
   whole open (`a04.invalid-open`) and leaves the scene unchanged; a define without `scene.begin` is rejected.
-- [ ] T-A04-405 [US1] Implement in `PU/Experience/Adapter/ParticleCore.swift`: controls `scene.begin`,
+- [X] T-A04-405 [US1] Implement in `PU/Experience/Adapter/ParticleCore.swift`: controls `scene.begin`, — Verified 2026-11-13: ParticleCore controls scene.begin, emitter.define, force.define, look.define with a pending open outside the anchor and atomic commit; document(name:); save-and-open scenario added, no existing digest changed, scenario-manifest.json regenerated; package passes on both runtimes
   `emitter.define`, `force.define`, `look.define` per contracts/actions.md; pending open not part of the anchor;
   `document` accessor. Update `PU/Experience/Adapter/ParticleManifest.swift` with a "save and open" scenario and
   regenerate digests and `PU/scenario-manifest.json` only where they change.
