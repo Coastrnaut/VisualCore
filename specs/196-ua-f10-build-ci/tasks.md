@@ -56,7 +56,7 @@ Independent test: planted second shippable target, undeclared target and reused 
   unique; bundles unique; every application target of `project.yml` listed and nothing else; `until_gate` pass in the
   migration ledger → failure") and `scripts/check_app_targets.py`; add it to the `checks` job of `ci.yml` and to
   `release_check.py` as step `app-targets` (FR-U10-010, FR-U10-011).
-- [ ] T-U10-009 [US2] Acceptance: `python3 scripts/check_app_targets.py` passes with 1 shippable app (check
+- [X] T-U10-009 [US2] Acceptance: `python3 scripts/check_app_targets.py` passes with 1 shippable app (check — Verified 2026-11-13: python3 scripts/check_app_targets.py: PASS 1 shippable app (VisualCore); 2 non-shipping: Showcase, ParticleUniverse (app-targets); planted second shippable target, undeclared target and reused bundle fail in scripts/tests/test_app_targets.py (SC-U10-002)
   `app-targets`); the three planted defects fail in the script tests (SC-U10-002).
 
 ## Phase 5: User Story 3 — Experience packages match the catalog (P2)
