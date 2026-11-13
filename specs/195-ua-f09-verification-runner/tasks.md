@@ -37,7 +37,7 @@ Commit after every task (`python3 scripts/tick_task.py`), and push with `python3
   - Each expectation kind passes and fails with a named message: a step result, a step digest, the initial, final, after-restore and after-reset digests, the outcome, and a probe.
   - `actionsHandled != actionsSent` fails as "bypass".
   - An observation with failures cannot pass.
-- [ ] T-U09-007 Implement `ScenarioObservation.swift` (observation and `ScenarioEvaluator`, `#if`). T-U09-006 passes (FR-U09-003, FR-U09-010, FR-U09-052).
+- [X] T-U09-007 Implement `ScenarioObservation.swift` (observation and `ScenarioEvaluator`, `#if`). T-U09-006 passes (FR-U09-003, FR-U09-010, FR-U09-052). — Verified 2026-11-12: swift test --package-path Packages/VisualCore --filter VisualCoreExperienceTests: 379 tests in 35 suites passed
 - [ ] T-U09-008 [P] Tests first: `FrameChecksTests.swift`. Cover:
   - `isNonBlank` is false for one colour or a spread below 8 of 255, and true for a gradient.
   - `isBlack` treats at most 4 of 255 as black.
