@@ -223,7 +223,7 @@ runtimes.
 - [X] T-U07-040 Evidence `legacy-ledger` (the SHA-256 of `.autonomy/state.json` begins `2604ffd8292cc8a8`), `docs`, — Verified 2026-11-13: legacy-ledger (state.json SHA-256 2604ffd8292cc8a8, migration_baseline verify 0 problems), docs, steering, script-tests all exit 0; CI run 43490248490 of 1fd4264 (contains every UA-F07 change) completed success: checks, host-tests, simulator-build and app-build
   `steering`, `script-tests`; then confirm with `gh run list` that `ci` and `push-scan` of the last pushed commit
   succeeded.
-- [ ] T-U07-041 Run `/speckit-converge` for UA-F07 and `/speckit-implement` for every task it appends; repeat until a run
+- [X] T-U07-041 Run `/speckit-converge` for UA-F07 and `/speckit-implement` for every task it appends; repeat until a run — Verified 2026-11-13: /speckit-converge round 1 appended T-U07-045 (X readiness of A01 and A02 on the final sources), implemented (a01/a02-x-audits-final, verify-a01-a02-final 36/36); round 2 converged with 0 findings
   appends nothing. Then `python3 scripts/migration_ledger.py seal --gate UA-F07 && python3 scripts/migration_ledger.py
   record --gate UA-F07`.
 
