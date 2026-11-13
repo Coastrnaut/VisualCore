@@ -36,3 +36,17 @@
 
 Round 1: 0 critical, 0 high, 2 medium (C1 ceiling wins, C2 paused frames not counted — both added to T-A04-506), 1 low
 (new session starts fresh by construction). Round 2: clean; 17 of 17 requirements and 6 of 6 success criteria covered.
+
+## D7 — The frame budget from the host's target timestamps (T-A04-516, converge round 1)
+
+- **Decision:** the monitor's budget is the display interval estimated by `FrameIntervalEstimate`
+  (`ParticleUniverse/Core/FrameBudgetMonitor.swift`): the smallest step between the target presentation times of
+  consecutive frames since setup, accepting steps of 1/240 s to 0.1 s. Until a step is seen the budget is 1/60 s.
+  When the estimate differs from the budget by more than 10%, the presenter rebuilds the monitor for the new budget at
+  the same tier (`FrameBudgetMonitor(budget:maxTier:tier:)`); the estimate resets on setup and teardown.
+- **Rationale:** the task text named `targetTimestamp − time`, but `FrameInfo.time` counts seconds since the host
+  started while `targetTimestamp` is a media-clock reading, so their difference is not an interval. Steps between
+  consecutive targets are whole multiples of the display interval (a late frame skips whole intervals), so their
+  minimum is the interval and slow frames cannot inflate the budget. No VisualCore change (FR-A04-540).
+- **Alternatives:** a median of recent steps (a run of late frames doubles it and hides the slowness); a new
+  `FrameInfo` field for the link duration (a VisualCore change, out of scope).

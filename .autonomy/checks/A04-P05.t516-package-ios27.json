@@ -1,0 +1,28 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/ExperiencesCreative",
+    "--scheme",
+    "ExperiencesCreative-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--only-testing",
+    "ParticleUniverseCoreTests",
+    "--only-testing",
+    "ParticleUniverseExperienceTests/ParticleDetailTests"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing ParticleUniverseCoreTests --only-testing ParticleUniverseExperienceTests/ParticleDetailTests",
+  "elapsed_seconds": 10.99,
+  "exit_code": 0,
+  "finished": "2026-11-13T23:30:58+00:00",
+  "log": ".autonomy/logs/A04-P05.t516-package-ios27.log",
+  "log_sha256": "e29e51c42c8f5661d3aed73159bb2c2d3890cf27738f03892be2848df5b4df02",
+  "name": "t516-package-ios27",
+  "stage": "A04-P05",
+  "started": "2026-11-13T23:30:47+00:00",
+  "timed_out": false
+}

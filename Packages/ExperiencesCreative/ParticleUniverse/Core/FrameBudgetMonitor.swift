@@ -33,11 +33,13 @@ public struct FrameBudgetMonitor: Equatable, Sendable {
     private var slowFlags: Ring
     private var fastFlags: Ring
 
-    /// Creates a monitor at tier 0 for frames of `budget` seconds (default 1/60 s) and tiers `0...maxTier`
-    /// (default 3); a non-positive or non-finite budget falls back to 1/60 s and a negative `maxTier` to 0.
-    public init(budget: Double = 1.0 / 60, maxTier: Int = 3) {
+    /// Creates a monitor at `tier` (default 0, clamped to `0...maxTier`) for frames of `budget` seconds (default
+    /// 1/60 s) and tiers `0...maxTier` (default 3); a non-positive or non-finite budget falls back to 1/60 s and a
+    /// negative `maxTier` to 0. A monitor rebuilt for a new budget passes the old tier (T-A04-516).
+    public init(budget: Double = 1.0 / 60, maxTier: Int = 3, tier: Int = 0) {
         self.budget = budget.isFinite && budget > 0 ? budget : 1.0 / 60
         self.maxTier = max(maxTier, 0)
+        self.tier = min(max(tier, 0), self.maxTier)
         slowFlags = Ring(capacity: Self.slowWindow)
         fastFlags = Ring(capacity: Self.fastWindow)
     }
@@ -64,6 +66,50 @@ public struct FrameBudgetMonitor: Equatable, Sendable {
     public mutating func restart() {
         slowFlags.clear()
         fastFlags.clear()
+    }
+}
+
+/// The display's frame interval, estimated from the target presentation times the host reports (T-A04-516,
+/// FR-A04-510).
+///
+/// The host's frame time is counted from its start while the target timestamp is a media-clock reading, so their
+/// difference is not an interval; the steps between the targets of consecutive frames are. A late frame skips whole
+/// display intervals, so its step is a multiple of the interval: the estimate is the smallest step seen since the
+/// last `reset()`. Steps outside 1/240 s … 1/10 s, steps across a gap in the frame index and non-finite targets are
+/// ignored; until a step is accepted the estimate is nil.
+public struct FrameIntervalEstimate: Equatable, Sendable {
+    /// The shortest accepted step in seconds (240 Hz).
+    public static let shortest = 1.0 / 240
+    /// The longest accepted step in seconds (10 Hz).
+    public static let longest = 0.1
+
+    /// The estimated interval in seconds, or nil before the first accepted step.
+    public private(set) var interval: Double?
+    private var last: (index: Int, target: Double)?
+
+    /// An estimate with no steps seen.
+    public init() {}
+
+    /// Notes the frame `index` with target presentation time `target` and returns the current estimate.
+    @discardableResult
+    public mutating func observe(index: Int, target: Double) -> Double? {
+        guard target.isFinite else { return interval }
+        defer { last = (index, target) }
+        guard let last, index == last.index + 1 else { return interval }
+        let step = target - last.target
+        guard step >= Self.shortest, step <= Self.longest else { return interval }
+        interval = min(interval ?? step, step)
+        return interval
+    }
+
+    /// Forgets every step (a new graphics context or session).
+    public mutating func reset() {
+        interval = nil
+        last = nil
+    }
+
+    public static func == (a: Self, b: Self) -> Bool {
+        a.interval == b.interval && a.last?.index == b.last?.index && a.last?.target == b.last?.target
     }
 }
 

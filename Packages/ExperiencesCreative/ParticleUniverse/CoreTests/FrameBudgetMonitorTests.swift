@@ -176,4 +176,38 @@ private struct SplitMix {
         z ^= z >> 31
         return Double(z >> 11) / Double(1 << 53)
     }
+
+}
+
+// MARK: T-A04-516 — the budget from the host's frame interval
+
+@Test func aMonitorStartsAtAGivenTierWithinItsBounds() {
+    #expect(FrameBudgetMonitor(budget: 1.0 / 120, tier: 2).tier == 2)
+    #expect(FrameBudgetMonitor(budget: 1.0 / 120, tier: 2).budget == 1.0 / 120)
+    #expect(FrameBudgetMonitor(maxTier: 3, tier: 9).tier == 3)
+    #expect(FrameBudgetMonitor(tier: -1).tier == 0)
+}
+
+private func near(_ a: Double?, _ b: Double) -> Bool { a.map { abs($0 - b) < 1e-9 } ?? false }
+
+@Test func theIntervalIsTheSmallestStepBetweenConsecutiveTargets() {
+    var estimate = FrameIntervalEstimate()
+    #expect(estimate.observe(index: 0, target: 100) == nil)
+    #expect(near(estimate.observe(index: 1, target: 100 + 2.0 / 60), 2.0 / 60))
+    #expect(near(estimate.observe(index: 2, target: 100 + 3.0 / 60), 1.0 / 60))
+    // A late frame skips whole intervals: its longer step leaves the estimate unchanged.
+    #expect(near(estimate.observe(index: 3, target: 100 + 6.0 / 60), 1.0 / 60))
+}
+
+@Test func stepsAcrossGapsOutOfRangeOrNotFiniteAreIgnored() {
+    var estimate = FrameIntervalEstimate()
+    estimate.observe(index: 0, target: 10)
+    #expect(estimate.observe(index: 2, target: 10 + 1.0 / 60) == nil, "a gap in the frame index")
+    #expect(estimate.observe(index: 3, target: 10 + 1.0 / 60 + 0.001) == nil, "shorter than 1/240 s")
+    #expect(estimate.observe(index: 4, target: 20) == nil, "longer than 0.1 s")
+    #expect(estimate.observe(index: 5, target: .nan) == nil)
+    #expect(near(estimate.observe(index: 5, target: 20 + 1.0 / 120), 1.0 / 120))
+    estimate.reset()
+    #expect(estimate.interval == nil)
+    #expect(estimate.observe(index: 6, target: 30) == nil, "the first frame after a reset has no step")
 }

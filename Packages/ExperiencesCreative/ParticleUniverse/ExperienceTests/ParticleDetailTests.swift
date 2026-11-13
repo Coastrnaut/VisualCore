@@ -104,4 +104,31 @@ final class ParticleDetailTests: XCTestCase {
         for _ in 0..<30 { shell.presenter.detail.record(frameTime: slowFrame) }
         XCTAssertEqual(shell.presenter.detail.tier, 0)
     }
+
+    /// T-A04-516 (FR-A04-510, clarification 1): the budget follows the interval of the host's target timestamps; a
+    /// change of more than 10% rebuilds the monitor at the same tier, a smaller one keeps it.
+    func testTheBudgetFollowsTheHostsFrameInterval() async throws {
+        let session = ExperienceSession()
+        defer { session.close() }
+        let shell = try await open(session)
+        let presenter = shell.presenter
+        XCTAssertEqual(presenter.detail.budget, 1.0 / 60, "1/60 s before any interval is seen")
+        for _ in 0..<(2 * FrameBudgetMonitor.slowWindow) { presenter.detail.record(frameTime: slowFrame) }
+        XCTAssertEqual(presenter.detail.tier, 2)
+
+        let start = 1_000.0
+        for i in 0..<4 { presenter.noteFrameTarget(index: 1_000 + i, target: start + Double(i) / 120) }
+        XCTAssertEqual(presenter.detail.budget, 1.0 / 120, accuracy: 1e-9, "a 120 Hz display")
+        XCTAssertEqual(presenter.detail.tier, 2, "rebuilt at the same tier")
+
+        // A step 5% shorter is within 10%: the monitor is kept, windows and all.
+        presenter.detail.record(frameTime: slowFrame)
+        let kept = presenter.detail
+        presenter.noteFrameTarget(index: 1_004, target: start + 3.0 / 120 + 0.95 / 120)
+        XCTAssertEqual(presenter.detail, kept)
+
+        // Slow frames against the new budget: 1/60 s is twice 1/120 s, so a window of them steps down.
+        for _ in 0..<FrameBudgetMonitor.slowWindow { presenter.detail.record(frameTime: 1.0 / 60) }
+        XCTAssertEqual(presenter.detail.tier, 3)
+    }
 }

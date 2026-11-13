@@ -47,6 +47,8 @@ final class ParticlePresenter: ExperiencePresenter {
     /// The drawn-detail controller: records frame times while the core plays and restarts while it is paused, on
     /// setup and on teardown (feature 037 A04-P05).
     var detail = FrameBudgetMonitor()
+    /// The display interval seen from the host's target timestamps; it sets `detail.budget` (T-A04-516).
+    private(set) var interval = FrameIntervalEstimate()
     /// The tier of the last draw: the coarser of the host's tier and `detail.tier`.
     private(set) var drawnTier = 0
     /// The number of particles of the last draw.
@@ -69,6 +71,7 @@ final class ParticlePresenter: ExperiencePresenter {
 
     func setup(_ context: RenderContext) throws {
         detail.restart()
+        interval.reset()
         try scene.setup(context)
     }
 
@@ -79,6 +82,7 @@ final class ParticlePresenter: ExperiencePresenter {
     func draw(_ core: ParticleCore, tier: Int, context: RenderContext, frame: FrameInfo) throws {
         mirror.canvasSize = Vec2(Double(max(1, context.pixelWidth)) * pointsPerPixel,
                                  Double(max(1, context.pixelHeight)) * pointsPerPixel)
+        noteFrameTarget(index: frame.index, target: frame.targetTimestamp)
         if core.playing {
             detail.record(frameTime: frame.delta)
         } else {
@@ -96,6 +100,16 @@ final class ParticlePresenter: ExperiencePresenter {
         scene.teardown(context)
         particles = []
         detail.restart()
+        interval.reset()
+    }
+
+    /// Feeds one frame's index and target presentation time to the interval estimate; when the estimate differs
+    /// from the monitor's budget by more than 10%, rebuilds the monitor for the new budget at the same tier (its
+    /// windows start empty). Before any estimate the budget stays 1/60 s (T-A04-516, FR-A04-510).
+    func noteFrameTarget(index: Int, target: Double) {
+        guard let seen = interval.observe(index: index, target: target),
+              abs(seen - detail.budget) > 0.1 * detail.budget else { return }
+        detail = FrameBudgetMonitor(budget: seen, maxTier: detail.maxTier, tier: detail.tier)
     }
 
     func describe(_ core: ParticleCore) -> String {
