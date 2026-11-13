@@ -19,7 +19,7 @@ Commit after every task (`python3 scripts/tick_task.py`), and push with `python3
 
 ## Phase 2: Foundational (pure types; blocking every story)
 
-- [ ] T-U09-002 [P] Tests first: `Packages/VisualCore/Tests/VisualCoreExperienceTests/OutcomeTests.swift`. Cover:
+- [X] T-U09-002 [P] Tests first: `Packages/VisualCore/Tests/VisualCoreExperienceTests/OutcomeTests.swift`. Cover: — Verified 2026-11-12: swift test --package-path Packages/VisualCore --filter VisualCoreExperienceTests: 379 tests in 35 suites passed (OutcomeTests)
   - `ExperienceOutcome(code:)` accepts 1 to 64 characters of `a-z 0-9 -` and refuses others.
   - A core without `outcome` gives nil.
   - The sample reports `target-reached` only after moves bring the marker onto the target, and nil before.
