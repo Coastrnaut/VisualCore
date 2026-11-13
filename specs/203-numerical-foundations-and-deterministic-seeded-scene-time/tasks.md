@@ -85,9 +85,13 @@ none (no {owner} task). VisualCore changes, so the documentation, API-baseline a
 - [ ] T-R02F03-022 API baseline: `python3 scripts/check_public_api.py --update` then `check_public_api.py` (check
   `public-api`); `python3 scripts/check_documented_api.py --sources Apps/VisualCore` (check `documented-api`).
 - [ ] T-R02F03-023 `Packages/VisualCore/README.md` section "Numerical foundations (feature 203, R02-F03)".
-- [ ] T-R02F03-024 Full host suite `swift test --package-path Packages/VisualCore` (check `host-visualcore`).
+- [ ] T-R02F03-024 Full host suite `swift test --package-path Packages/VisualCore` (check `host-visualcore`); record
+  the duration of each new suite from the output, each under 1 s (SC-R02F03-008).
 - [ ] T-R02F03-025 Committed digests unchanged: `python3 scripts/verify_experiences.py --only a01.generative-art-studio
-  a02.fluid-art-playground a03.fractal-explorer --runtime 27` (check `verify-a01-a03`) (FR-R02F03-002).
+  a02.fluid-art-playground a03.fractal-explorer --runtime 27` (check `verify-a01-a03`) and the ExperiencesCreative
+  package tests with A04's committed digests and `seedStep`: `python3 scripts/xcodebuild_package.py --package
+  Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test` (check
+  `experiences-ios27`) (FR-R02F03-002, FR-R02F03-013).
 - [ ] T-R02F03-026 Reference regression chunk 1: `python3 scripts/release_check.py --only reference-engine-xcframework
   reference-build-projectm-ios-sim reference-clean` (check `reference-1`).
 - [ ] T-R02F03-027 Reference regression chunk 2: `python3 scripts/release_check.py --only
