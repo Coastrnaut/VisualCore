@@ -48,7 +48,7 @@ each task. Tests before code. Owner-only items: none. One {device} task. No Visu
 
 ## Phase 4: User Story 2 — Saved scenes are safe to open (P1)
 
-- [ ] T-A04-411 [US2] Acceptance: SceneDocumentTests' bad-file cases and ParticleLibraryTests' unreadable-file case
+- [X] T-A04-411 [US2] Acceptance: SceneDocumentTests' bad-file cases and ParticleLibraryTests' unreadable-file case — Verified 2026-11-13: SceneDocumentTests bad files (newer, NaN, truncated) refused, v1 opens; ParticleLibraryTests unreadable files counted and kept; pass on sim-27.2 and sim-26.5 (experiences-ios27, experiences-ios26) (SC-A04-403)
   pass (4 of 4 refused, v1 opens) within the T-A04-410 runs and on sim-26.5 (check `experiences-ios26`) (SC-A04-403).
 
 ## Phase 5: User Story 3 — Move an emitter (P2)
