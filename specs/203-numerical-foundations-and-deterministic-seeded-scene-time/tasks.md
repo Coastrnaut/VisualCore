@@ -21,7 +21,7 @@ none (no {owner} task). VisualCore changes, so the documentation, API-baseline a
   `SeededRandom(seed: derive(seed, label:))`; drawing from one stream does not change another.
 - [X] T-R02F03-003 [US1] Write `Packages/VisualCore/Sources/VisualCoreSimulation/SeedDerivation.swift` per data-model — Verified 2026-11-13: SeedDerivation.swift (mix, fnv1a64, derive label/index; SeededRandom(seed:label:), (seed:index:)) with /// docs; its 7 tests pass (host-visualcore)
   "Sub-seed derivation" and contracts/api.md, with `///` on each public declaration.
-- [ ] T-R02F03-004 [US1] Acceptance: host tests pass (check `host-derivation`) (SC-R02F03-002).
+- [X] T-R02F03-004 [US1] Acceptance: host tests pass (check `host-derivation`) (SC-R02F03-002). — Verified 2026-11-13: swift test Packages/VisualCore PASS incl. SeedDerivation tests (host-visualcore) (SC-R02F03-002)
 
 ## Phase 3: User Story 2 — Owned random algorithms (P1)
 
