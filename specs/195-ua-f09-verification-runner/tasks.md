@@ -126,7 +126,7 @@ Commit after every task (`python3 scripts/tick_task.py`), and push with `python3
 
 ## Phase 7: User Story 6 - Result bundles count only when checked independently (Priority: P2)
 
-- [ ] T-U09-023 [US6] Tests first, then the code in `verify_experiences.py`:
+- [X] T-U09-023 [US6] Tests first, then the code in `verify_experiences.py`: — Verified 2026-11-12: verify_experiences.py --self-test --runtime 27: the bundle with the LossySnapshot test is checked with xcresulttool and the -lossy record is judged a failure naming save-restore (open failed: snapshot.state-mismatch at restore); bundle counts come from xcresulttool, never from the printed summary; VerifyDriverTests cover passed / one failed / missing bundle
   - Read `xcresulttool get test-results summary` and `tests` output from fixture JSON: passed, one failed, and missing.
   - Export the attachments.
   - Acceptance: the self-test path with the `LossySnapshot` variant produces a real bundle with one failed test. The driver fails that step, even though xcodebuild's printed summary is not trusted (FR-U09-023; SC-U09-008).
