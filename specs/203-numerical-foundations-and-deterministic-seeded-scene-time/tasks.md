@@ -74,7 +74,7 @@ none (no {owner} task). VisualCore changes, so the documentation, API-baseline a
   are ignored.
 - [X] T-R02F03-019 [US6] Write `scripts/check_doc_names.py` (backticked identifiers that look like public type or member — Verified 2026-11-13: scripts/check_doc_names.py checks backticked public names against the API baseline; its tests pass (script-tests)
   names are checked against `docs/api/visualcore-public-api.txt`).
-- [ ] T-R02F03-020 [US6] Write `docs/architecture/determinism.md` (FR-R02F03-060, 061: step policy, integer-only
+- [X] T-R02F03-020 [US6] Write `docs/architecture/determinism.md` (FR-R02F03-060, 061: step policy, integer-only — Verified 2026-11-13: docs/architecture/determinism.md: step policy, integer rules, float trust boundary, derivation, choice draw counts, saved state, shader twin, hygiene, replay, transform conventions, UIKit conversion
   rules, trust boundary of transcendental functions, stream derivation, replay format, transform conventions, UIKit
   y-down conversion).
 - [ ] T-R02F03-021 [US6] Acceptance: `python3 scripts/check_doc_names.py docs/architecture/determinism.md` passes
