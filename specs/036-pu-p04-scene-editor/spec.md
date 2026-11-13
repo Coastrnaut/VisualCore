@@ -150,6 +150,8 @@ fixed number of steps; open a scene with the maximum emitters on each quality ti
   session snapshot still restores the current scene.
 - **Memory pressure:** the library list is small text; scenes are loaded one at a time when opened.
 - **Opening while paused:** the scene opens paused; play resumes it.
+- **Interrupted open:** the open actions are sent together; a pending (begun but uncommitted) open is never part of
+  the saved session state, so a restore after termination shows the scene before the open.
 - **Reduce Motion and Reduce Flashing:** opened scenes respect the current settings, not the ones at saving time.
 
 ## Requirements *(mandatory)*
@@ -164,7 +166,9 @@ fixed number of steps; open a scene with the maximum emitters on each quality ti
 - **FR-A04-404**: Opening MUST be recorded in the session's action history as at most 11 small actions
   (`scene.begin`, `emitter.define` per emitter, `force.define`, `look.define`), so a replay of the history reaches the
   same scene and state digest; an invalid value rejects the whole open.
-- **FR-A04-405**: The library MUST list saved scenes by name and allow open, rename and delete; it MUST survive a relaunch.
+- **FR-A04-405**: The library MUST list saved scenes by name and allow open, rename and delete; it MUST survive a
+  relaunch. Every library control has a VoiceOver label, a stable identifier and a 44-point target (system audits run
+  in the device campaign).
 
 **Safe opening (story 2)**
 - **FR-A04-410**: Saved scenes MUST carry a format version; a newer version MUST be refused with a message.
