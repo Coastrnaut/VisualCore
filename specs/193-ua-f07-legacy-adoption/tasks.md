@@ -165,7 +165,7 @@ runtimes.
   become `pan` and `pinch`), `FractalControls` (with bookmarks through `ExperienceStorage` and go-to), and
   `FractalManifest`; the framework target and candidate; session tests on both runtimes; framing parity for 3 seeds;
   capture through the share interface; controls meeting E-12 (FR-U07-020, FR-U07-022).
-- [ ] T-U07-025 [US3] Port A03's 10 UI tests (`FE…`, chunk `-i`), with their map rows. Then the runner, the move (including
+- [X] T-U07-025 [US3] Port A03's 10 UI tests (`FE…`, chunk `-i`), with their map rows. Then the runner, the move (including — Verified 2026-11-13: A03 interface tests ported (FE classes, 10 map rows): i2 and both audits pass on iOS 27.2 (app-phone-ios27-i2, -i1a-r2, -i1b-r3; the audits found and the controls fixed two E-12 issues), check_test_map --app FractalExplorer PASS 10 to 12 (a03-test-map-r2); runner 9/9 on 27.2 and 26.5 before and after the move (a03-verify-27/26, -moved); move into Packages/ExperiencesCreative/FractalExplorer incl. Tests/Fixtures/bookmark-v1.json to ExperienceTests/Fixtures with MigrationTests fixed, Core and fixture moved without a changed line (a03-core-renames-only, 19 files); standalone targets, scheme, UI tests and asset catalog retired; package 365/365 on both runtimes (a01-a03-package-ios272/265); app unit chunk and i2 pass after the move (app-phone-ios27-c-a03moved, -i2-moved); X-A03 readiness: audits PASS (a03-x-audits); X-A03 is recorded after UA-F07
   `Tests/Fixtures/bookmark-v1.json` → `ExperienceTests/Fixtures` with the `MigrationTests` path fixed), the retirement
   and X-A03.
 
