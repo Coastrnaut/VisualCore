@@ -14,7 +14,7 @@ none (no {owner} task). VisualCore changes, so the documentation, API-baseline a
 
 ## Phase 2: User Story 1 — Independent named random streams (P1)
 
-- [ ] T-R02F03-002 [P] [US1] Tests first in `Packages/VisualCore/Tests/VisualCoreSimulationTests/SeedDerivationTests.swift`:
+- [X] T-R02F03-002 [P] [US1] Tests first in `Packages/VisualCore/Tests/VisualCoreSimulationTests/SeedDerivationTests.swift`: — Verified 2026-11-13: SeedDerivationTests.swift 7 tests (goldens from an independent Python model: mix, FNV-1a of empty/a/layout, derive label and index, chaining, stream independence) pass
   `mix` equals the SplitMix64 first output for state 0 + golden increment; FNV-1a-64 of "" (`0xcbf29ce484222325`) and
   of "a" (`0xaf63dc4c8601ec8c`); golden `derive(42, label: "layout")`, `derive(42, index: 0)` and `(42, 1)`;
   labels "a"/"b" and indexes 0/1 pairwise different; chaining; `SeededRandom(seed:label:)` equals
