@@ -66,7 +66,26 @@ Canonical overrides:
 
 ### Session 2026-11-13
 
-(Filled by `/speckit-clarify`.)
+- Q: How is a sub-seed derived from a seed and a label or an index? → A: With the SplitMix64 finalizer (the mix
+  step of the existing `SplitMix64`): label → finalizer(seed XOR FNV-1a-64 of the label's UTF-8 bytes); index →
+  finalizer(seed XOR finalizer(index + 1)). Pure 64-bit integer arithmetic, so identical everywhere; golden values
+  are committed. Existing hand-made offsets (A04's `seedStep`) stay unchanged because their digests are committed;
+  the new derivation is for new code.
+- Q: How many random draws does each owned algorithm consume? → A: Exactly one 64-bit draw per random index, mapped
+  to [0, n) by the high half of the 128-bit product (bias at most n/2^64, accepted for exact replay); a pick uses
+  1 draw, a shuffle of n elements n − 1 draws, a weighted choice 1 draw (scaled to the weight sum). The existing
+  rejection-sampled integer method stays as it is.
+- Q: What is the saved generator state's format? → A: A small value with `version` (1) and the four state words as
+  16-digit lower-case hexadecimal strings, encodable as JSON; restoring refuses another version, a wrong word count
+  or length, non-hex text and the all-zero state. It is an addition beside the generator; equality and output of
+  existing generators are unchanged.
+- Q: Which shader functions get a CPU twin? → A: The integer hash `vc_pcg` and the three value hashes `vc_hash11`,
+  `vc_hash21`, `vc_hash22` that build on it (float inputs taken by bit pattern exactly as the shader does);
+  goldens come from evaluating the shader source by hand-checked arithmetic, and a simulator test renders 64
+  inputs with `vc_pcg` into an integer target and compares exactly.
+- Q: Where does the determinism and conventions document live? → A: `docs/architecture/determinism.md`, cited from
+  the package README and Auto-Creator.md section 13; a script checks that every backticked public name in it exists
+  in the API baseline.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -220,12 +239,13 @@ check confirms every name it cites exists in the public interface.
 
 **Seed derivation (story 1)**
 - **FR-R02F03-010**: A sub-seed MUST be derivable from a seed and a text label, and from a seed and an unsigned
-  integer index, deterministically and with committed golden values.
+  integer index, deterministically and with committed golden values, by the SplitMix64-finalizer rule of the
+  clarifications (integer arithmetic only).
 - **FR-R02F03-011**: Derivations from different labels or indexes of one seed MUST give different sub-seeds for every
   golden case, and derivation MUST be chainable (a sub-seed can be derived again).
 - **FR-R02F03-012**: A generator MUST be creatable directly from a seed and a label or index.
-- **FR-R02F03-013**: At least one existing hand-made seed offset MUST be shown to be expressible with the new
-  derivation without changing that experience's committed digests, or recorded as kept unchanged with the reason.
+- **FR-R02F03-013**: Existing hand-made seed offsets (A04's `seedStep`) MUST stay unchanged, because their scenario
+  digests are committed; the determinism document points new code to the derivation.
 
 **Owned algorithms (story 2)**
 - **FR-R02F03-020**: Shuffle (in place and copying) MUST use an algorithm owned by the project, give a permutation,
@@ -233,18 +253,20 @@ check confirms every name it cites exists in the public interface.
 - **FR-R02F03-021**: Picking one element MUST be uniform over the elements and report an empty input.
 - **FR-R02F03-022**: Weighted choice MUST return an index with probability proportional to its weight, never choose a
   zero-weight index, and report empty, all-zero, negative or non-finite weights.
-- **FR-R02F03-023**: These algorithms MUST consume a documented number of draws per call so streams stay aligned.
+- **FR-R02F03-023**: These algorithms MUST consume exactly one draw per random index (pick 1, shuffle n − 1,
+  weighted choice 1), mapping a draw to [0, n) by the high half of the 128-bit product.
 
 **Saved generator state (story 3)**
 - **FR-R02F03-030**: A generator's full state MUST be exportable and restorable so that the restored generator
   continues the identical sequence.
-- **FR-R02F03-031**: The saved state MUST carry a format version; a newer version MUST be refused.
+- **FR-R02F03-031**: The saved state MUST carry a format version (1) and the four state words as 16-digit lower-case
+  hexadecimal strings, encodable as JSON; any other version MUST be refused.
 - **FR-R02F03-032**: An all-zero, short or otherwise invalid saved state MUST be refused with a reason.
 - **FR-R02F03-033**: Adding the saved state MUST NOT change existing equality or output of generators.
 
 **Shader hash twin (story 4)**
-- **FR-R02F03-040**: A CPU function MUST compute exactly what the shader integer hash computes for every 32-bit input,
-  with golden values derived from the shader source.
+- **FR-R02F03-040**: CPU functions MUST compute exactly what the shader's `vc_pcg`, `vc_hash11`, `vc_hash21` and
+  `vc_hash22` compute (float inputs by bit pattern), with golden values derived from the shader source.
 - **FR-R02F03-041**: A simulator test MUST render a grid of at least 64 inputs with the shader hash and match the CPU
   twin exactly.
 
@@ -258,7 +280,7 @@ check confirms every name it cites exists in the public interface.
 - **FR-R02F03-054**: Every helper MUST be pure (same input, same output) and documented.
 
 **Documentation (story 6)**
-- **FR-R02F03-060**: One determinism document MUST state the step policy, integer-only rules for game logic, the
+- **FR-R02F03-060**: One determinism document, `docs/architecture/determinism.md`, MUST state the step policy, integer-only rules for game logic, the
   trust boundary of transcendental and floating-point functions, the stream-derivation rules and the replay format.
 - **FR-R02F03-061**: The same document MUST state the transform conventions: column-major storage, counter-clockwise
   y-up 2D, right-handed 3D with −z forward, OpenGL depth range, units, and how UIKit's y-down coordinates convert.
