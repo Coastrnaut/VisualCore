@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "python3",
+    "scripts/release_check.py",
+    "--only",
+    "app-build-for-testing-ios27",
+    "app-ui-ios27-j2"
+  ],
+  "command": "python3 scripts/release_check.py --only app-build-for-testing-ios27 app-ui-ios27-j2",
+  "elapsed_seconds": 223.204,
+  "exit_code": 0,
+  "finished": "2026-11-13T23:12:53+00:00",
+  "log": ".autonomy/logs/A04-P05.ui-pu-j2.log",
+  "log_sha256": "cf0d54bdf51923cf26ebd77f473c59c3569fa6e96df3d030ceeb78fe69541986",
+  "name": "ui-pu-j2",
+  "stage": "A04-P05",
+  "started": "2026-11-13T23:09:10+00:00",
+  "timed_out": false
+}

@@ -1217,7 +1217,10 @@ class PerformanceDocsTests(unittest.TestCase):
         with contextlib.redirect_stdout(out):
             code = self.tool.main([])
         self.assertEqual(code, 0, out.getvalue())
-        self.assertIn("8 budget rows", out.getvalue().splitlines()[-1])
+        # The budgets table grows with experiences (feature 037 added Particle Universe); at least the 8 of feature 192.
+        rows = re.search(r"(\d+) budget rows", out.getvalue().splitlines()[-1])
+        self.assertIsNotNone(rows, out.getvalue())
+        self.assertGreaterEqual(int(rows.group(1)), 8)
         with contextlib.redirect_stdout(io.StringIO()):
             self.assertEqual(self.tool.main(["--dir", "docs/no-such-directory"]), 2)
         listing = subprocess.run([sys.executable, str(HERE / "release_check.py"), "--list"],
@@ -2269,15 +2272,19 @@ class MigrationLedgerTests(unittest.TestCase):
         data, legacy = self.ledger(), ledgertool.legacy_state(self.root)
         gates = ledgertool.index_of(data)
         self.assertEqual(ledgertool.unmet(gates["X-A01"], gates, legacy["stages"]), [])
-        self.assertIn("legacy:A04-P04", ledgertool.unmet(gates["X-A04"], gates, legacy["stages"]))
+        # The real legacy ledger advances phase by phase; any unmet A04 phase keeps X-A04 waiting (A04-P04 passed on
+        # 2026-11-13, feature 036; A04-P06 is the last phase).
+        unmet_a04 = ledgertool.unmet(gates["X-A04"], gates, legacy["stages"])
+        self.assertTrue(any(u.startswith("legacy:A04-P") for u in unmet_a04), unmet_a04)
+        self.assertIn("legacy:A04-P06", unmet_a04)
         actions = ledgertool.next_actions(data, legacy, limit=40)
         waiting = [why for g, why in actions if "legacy" in why]
         self.assertEqual(len(waiting), 1)
-        self.assertIn("A04-P04", waiting[0])
+        self.assertIn("next legacy gate A04-P0", waiting[0])
         legacy_before = (self.root / ledgertool.LEGACY).read_bytes()
-        self.refuses("legacy:A04-P04", "run-check", "--gate", "X-A04", "--name", "x", "--", sys.executable, "ok.py")
-        self.refuses("legacy:A04-P04", "seal", "--gate", "X-A04")
-        self.refuses("legacy:A04-P04", "record", "--gate", "X-A04")
+        self.refuses("legacy:A04-P06", "run-check", "--gate", "X-A04", "--name", "x", "--", sys.executable, "ok.py")
+        self.refuses("legacy:A04-P06", "seal", "--gate", "X-A04")
+        self.refuses("legacy:A04-P06", "record", "--gate", "X-A04")
         self.assertEqual((self.root / ledgertool.LEGACY).read_bytes(), legacy_before)  # FR-U00-035: the legacy ledger is never written
 
     def test_tampered_evidence_is_detected(self):
