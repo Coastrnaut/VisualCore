@@ -24,7 +24,7 @@ each task. Tests before code. Owner-only items: none. One {device} task. No Visu
   over 1.2× the budget" steps down one tier; "95% of the last 600 under 0.8× the budget" steps up one tier; at most one
   tier per window; never below 0 or above `maxTier`; a single slow frame changes nothing; `restart()` clears the windows;
   non-finite and non-positive times are ignored; deterministic for a given sequence.
-- [ ] T-A04-505 [US2] Write `PU/Core/FrameBudgetMonitor.swift` per contracts/monitor.md.
+- [X] T-A04-505 [US2] Write `PU/Core/FrameBudgetMonitor.swift` per contracts/monitor.md. — Verified 2026-11-13: PU/Core/FrameBudgetMonitor.swift per contracts/monitor.md (full windows, ring of flags, restart after a change); tests pass on both runtimes
 - [ ] T-A04-506 [US2] Wire `PU/Experience/ParticlePresenter.swift`: record `frame.delta` while the core plays, restart while
   paused; draw at `max(tier, monitor.tier)`; add a test in `PU/ExperienceTests/ParticleResumeBoundTests.swift` (or a new
   `ParticleDetailTests.swift`) showing the simulation digest is the same with and without detail changes, that the drawn
