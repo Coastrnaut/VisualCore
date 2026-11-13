@@ -2698,6 +2698,8 @@ builds of both modules.
   counts → end deactivation (zero live and zero leaked resources, or a recorded leak failure) → idle.
 - The session's decisions (its seven states and their legal changes, the order of a close, the memory-pressure
   rule) are pure values in `VisualCoreExperience` (`SessionLifecycle`), tested on the host.
+- As built by UA-F09: in builds for testing or automation, `ScenarioRunner` plays one scenario of a manifest
+  through the session (section 22.1); `Experience.runScenario` and `frameProbes` serve it.
 - As built by UA-F05: a request can say that a refused snapshot fails the open (`refusedSnapshotFails`). The
   open then ends as a failure of the stage `restore`, before a render host exists and without a call of the
   sink, so an experience never starts on a fresh state while a stored one exists that it could not read.
@@ -3222,7 +3224,7 @@ VisualCore/
 ├── External/projectm-ios/        existing   pinned read-only submodule
 ├── Configs/                      existing   toolchain.json, Signing.xcconfig (the local signing file is never committed), simulator-identifier-hashes.json
 ├── Tools/python/desktop_runbook.py   existing   legacy ledger tool
-├── scripts/                      modify     + build_catalog.py, check_experience_symbols.py, xcodebuild_app.py, check_performance_docs.py, storage rules in check_app_isolation.py (UA-F05), verify_experiences.py, run_device_campaign.py
+├── scripts/                      modify     + build_catalog.py, check_experience_symbols.py, xcodebuild_app.py, check_performance_docs.py, storage rules in check_app_isolation.py (UA-F05), verify_experiences.py and check_evidence.py (UA-F09), verify_experiences.py, run_device_campaign.py
 ├── specs/                        modify     001–035 existing; 036–550 and rNN-* as features are specified
 └── docs/
     ├── decisions/                modify     ADR-0001 … ADR-0009, then ADR-0010 (constitution 2.0.0)
@@ -5290,6 +5292,25 @@ shows flat memory and GPU bytes. Scenarios are deterministic: fixed seeds, no wa
 is started only through the launch environment (`VISUALCORE_AUTORUN`), writes its evidence JSON and exits; no
 URL, file or other outside input can start one.
 
+As built by UA-F09:
+- An experience reports an outcome derived from its state (`ExperienceCore.outcome`, nil by default; never
+  stored, so no digest changes). A completion scenario passes only when the core itself reports the expected
+  outcome.
+- The scenarios are a manifest of seeded domain actions with expectations (`ScenarioManifest`, schema 1),
+  checked by `ScenarioManifestValidator`. A rejection scenario may send unknown controls and wrong value counts
+  when it expects them rejected.
+- `ScenarioRunner` plays one scenario through a real `ExperienceSession`. It resets the experience after the
+  open's first frame, so a scenario starts from a fresh preparation. A restore opens in the background, so the
+  restored state is read before a frame advances it.
+- Frames are read from the render host and must be non-blank and match the experience's declared probes
+  (`ExperiencePresenter.probes`). Endurance counts simulated time: 60 frames per second in 60 sampled blocks.
+- In the app, the request keys are `VISUALCORE_AUTORUN=scenario` plus `_EXPERIENCE`, `_SCENARIO`, `_SEED`, `_RUN`,
+  `_PHASE` and `_EXPECTED_DIGEST`. The record goes to `Documents/visualcore-evidence/<run>/<id>.<scenario>.json`
+  and the process exits 0, 1 or 2. Save-restore spans two launches.
+- The sample experience (`a99.contract-sample`) runs through the package tests, whose records are result-bundle
+  attachments. The app's debug experience runs in the app under `a98.debug-experience`; the driver calls it
+  `debug`.
+
 ### 22.2 Verifying one experience (the `X-<code>` gate)
 
 `scripts/verify_experiences.py` (new, UA-F09) is the single driver. It runs the experience's host tests, builds
@@ -5317,6 +5338,19 @@ unchanged.
 A result bundle counts only after `xcrun xcresulttool` has been run on it independently and reports the tests as
 passed; the summary printed by the build is not proof. The runner records test counts, failures, destination and
 attachments from the bundle.
+
+As built by UA-F09:
+- Options: `--only`, `--skip`, `--scenario` (including `endurance`), `--runtime 27 26`, `--audits`,
+  `--self-test`, `--dry-run`, `--fresh` and `--max-seconds`.
+- The run state is kept in `.autonomy/verify/state.json`, so a later run skips what passed. Raw runs go to the
+  ignored `.autonomy/verify/<run>/`. Summaries go to `docs/verification/<id>/summary-<runtime>.json`, one row per
+  scenario with the commit it was made at.
+- Records are checked by `scripts/check_evidence.py`.
+- `--audits` runs these checks: markers, raster files (permitted only through `Catalog/generated-art.json`),
+  reducer bypass, content counts, direct GL and the network. It names the entitlement audit "not yet provided
+  (UA-F08)".
+- `--self-test` plants every audit defect, and with `--runtime` checks that the deliberately failing record of
+  the sample (`LossySnapshot`) is judged a failure by name.
 
 ### 22.3 Evidence schema
 

@@ -170,7 +170,7 @@ Commit after every task (`python3 scripts/tick_task.py`), and push with `python3
   - `check_public_api.py --update` leaves no difference: 0 undocumented and no line lost since `7bc756b`.
   - `git diff --stat 7bc756b -- External Vendor Showcase Harnesses Apps/GenerativeArtStudio Apps/FluidArtPlayground Apps/FractalExplorer Apps/ParticleUniverse` is empty.
   - `check_dependencies.py`, `check_compliance.py`, the three documented-API checks and the storage rules pass (FR-U09-063, FR-U09-064).
-- [ ] T-U09-029 Documents as built, edited in place:
+- [X] T-U09-029 Documents as built, edited in place: — Verified 2026-11-12: Auto-Creator.md 11.4, 16, 22.1 and 22.2 edited in place as built; docs/verification/README.md new; render_autocreator.py 18 blocks, validate_autocreator.py 16 checks 0 problems, validate_docs.py PASS
   - Auto-Creator.md sections 6 (outcome), 11.4 (runner), 16 (new files) and 22 (driver, options, record location, audits).
   - `docs/verification/README.md` (new: record layout).
   - `render_autocreator.py` and `validate_autocreator.py` pass.
