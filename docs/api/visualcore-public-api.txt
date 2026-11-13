@@ -496,6 +496,7 @@ VisualCoreExperience | init | public init(footprintBytes: Int, gpuBytes: Int, li
 VisualCoreExperience | init | public init(from decoder: any Decoder) throws
 VisualCoreExperience | init | public init(from: ExperienceLifecycleState, to: ExperienceLifecycleState, accepted: Bool)
 VisualCoreExperience | init | public init(from: String, to: String, gate: String, commit: String)
+VisualCoreExperience | init | public init(glVersion: String? = nil, glslVersion: String? = nil, renderer: String? = nil, vendor: String? = nil,
 VisualCoreExperience | init | public init(historyLimit: Int = 64)
 VisualCoreExperience | init | public init(id: ExperienceID, maxStepsPerFrame: Int = 8)
 VisualCoreExperience | init | public init(id: ExperienceID, root: URL, defaults: UserDefaults)
@@ -791,6 +792,7 @@ VisualCoreExperience | struct | public struct Pacing: Sendable, Equatable, Codab
 VisualCoreExperience | struct | public struct PreparationTicket: Sendable, Equatable
 VisualCoreExperience | struct | public struct ProbeResult: Sendable, Equatable, Codable
 VisualCoreExperience | struct | public struct RegistryReport: Sendable, Equatable
+VisualCoreExperience | struct | public struct RendererRecord: Sendable, Equatable, Codable
 VisualCoreExperience | struct | public struct Resources: Sendable, Equatable, Codable
 VisualCoreExperience | struct | public struct Run: Sendable, Equatable, Codable
 VisualCoreExperience | struct | public struct SavedStateProblem: Sendable, Equatable
@@ -872,6 +874,7 @@ VisualCoreExperience | var | public var dirty: Bool?
 VisualCoreExperience | var | public var effectiveActions: [ScriptedAction]
 VisualCoreExperience | var | public var effectiveSeeds: [UInt64]
 VisualCoreExperience | var | public var effectiveStepsPerSegment: Int
+VisualCoreExperience | var | public var eglVersion: String?
 VisualCoreExperience | var | public var entitlement: String
 VisualCoreExperience | var | public var environment: Environment
 VisualCoreExperience | var | public var evidenceName: String
@@ -886,8 +889,12 @@ VisualCoreExperience | var | public var failures: [String]
 VisualCoreExperience | var | public var firstFrame: Double?
 VisualCoreExperience | var | public var firstPresent: Double?
 VisualCoreExperience | var | public var firstPresentMS: Double
+VisualCoreExperience | var | public var floorFindings: [String]?
 VisualCoreExperience | var | public var footprintBytes: Int
 VisualCoreExperience | var | public var frames: [Frame]
+VisualCoreExperience | var | public var generation: Int?
+VisualCoreExperience | var | public var glVersion: String?
+VisualCoreExperience | var | public var glslVersion: String?
 VisualCoreExperience | var | public var gpuBytes: Int
 VisualCoreExperience | var | public var hostOS: String?
 VisualCoreExperience | var | public var id: String
@@ -909,9 +916,14 @@ VisualCoreExperience | var | public var lockSHA256: String?
 VisualCoreExperience | var | public var log: String?
 VisualCoreExperience | var | public var logSHA256: String?
 VisualCoreExperience | var | public var lowPower: Bool
+VisualCoreExperience | var | public var maxColorAttachments: Int?
+VisualCoreExperience | var | public var maxDrawBuffers: Int?
+VisualCoreExperience | var | public var maxSamples: Int?
+VisualCoreExperience | var | public var maxTextureSize: Int?
 VisualCoreExperience | var | public var medianMS: Double
 VisualCoreExperience | var | public var memoryClosures: Int
 VisualCoreExperience | var | public var message: String
+VisualCoreExperience | var | public var missingEntryPoints: Int?
 VisualCoreExperience | var | public var name: String
 VisualCoreExperience | var | public var nonBlank: Bool
 VisualCoreExperience | var | public var observed: String
@@ -940,6 +952,8 @@ VisualCoreExperience | var | public var reduceMotion: AccessibilityChoice
 VisualCoreExperience | var | public var rejected: [ScriptedAction]
 VisualCoreExperience | var | public var rejectedTransitions: Int
 VisualCoreExperience | var | public var removesPreferences: Bool
+VisualCoreExperience | var | public var renderer: RendererRecord?
+VisualCoreExperience | var | public var renderer: String?
 VisualCoreExperience | var | public var resources: Resources
 VisualCoreExperience | var | public var result: EvidenceResult
 VisualCoreExperience | var | public var result: String
@@ -972,6 +986,7 @@ VisualCoreExperience | var | public var timing: Timing
 VisualCoreExperience | var | public var timings: SessionStageTimings
 VisualCoreExperience | var | public var tree: String?
 VisualCoreExperience | var | public var values: [Double]
+VisualCoreExperience | var | public var vendor: String?
 VisualCoreExperience | var | public var welcomeRoute: ShellRoute
 VisualCoreExperience | var | public var welcomeSeen: Bool
 VisualCoreExperience | var | public var xcode: String?
@@ -1022,6 +1037,7 @@ VisualCoreExperienceHost | func | public func snapshot() throws(ExperienceError)
 VisualCoreExperienceHost | func | public func suspend() throws(ExperienceError)
 VisualCoreExperienceHost | func | public static func text(_ key: Key) -> String
 VisualCoreExperienceHost | init | public init()
+VisualCoreExperienceHost | init | public init(_ capabilities: RenderCapabilities)
 VisualCoreExperienceHost | init | public init(_ render: @escaping @MainActor @Sendable (Int, Int) throws(OffscreenRenderError) -> StillImage)
 VisualCoreExperienceHost | init | public init(id: ExperienceID, presenter: Presenter, maxStepsPerFrame: Int = 8)
 VisualCoreExperienceHost | init | public init(id: ExperienceID, seed: UInt64, snapshot: ExperienceSnapshot? = nil,
@@ -1040,6 +1056,7 @@ VisualCoreExperienceHost | let | public let port: ExperienceActionPort
 VisualCoreExperienceHost | let | public let presenter: Presenter
 VisualCoreExperienceHost | let | public let probes: [(name: String, expected: String, observed: String)]
 VisualCoreExperienceHost | let | public let process: String
+VisualCoreExperienceHost | let | public let renderer: RendererRecord?
 VisualCoreExperienceHost | let | public let session: ExperienceSession
 VisualCoreExperienceHost | let | public let snapshot: ExperienceSnapshot?
 VisualCoreExperienceHost | let | public static let back
@@ -1441,6 +1458,7 @@ VisualCoreRendering | func | public func destroy()
 VisualCoreRendering | func | public func draw(_ particles: [ParticleInstance], camera: Camera2D, metrics: ViewMetrics, blend: ParticleBlend = .normal) throws
 VisualCoreRendering | func | public func draw(_ root: SceneNode, camera: Camera2D, metrics: ViewMetrics) throws
 VisualCoreRendering | func | public func draw(model: Mat4 = .identity, camera: OrbitCamera, aspect: Double, color: Vec4) throws
+VisualCoreRendering | func | public func floorFindings() -> [FloorFinding]
 VisualCoreRendering | func | public func fragmentMantissaBits(fallback: Int = 10) -> Int
 VisualCoreRendering | func | public func frame(delta: Double, output: FieldPass.Output, draw: (RenderTarget) throws -> Void) throws
 VisualCoreRendering | func | public func makeBuffer(bytes: Int, label: String) throws -> GPUBuffer
@@ -1507,6 +1525,7 @@ VisualCoreRendering | init | public init(folder: TemporaryFolder)
 VisualCoreRendering | init | public init(fragment: String, fragmentName: String, bundle: ShaderBundle)
 VisualCoreRendering | init | public init(index: Int, time: Double, targetTime: Double)
 VisualCoreRendering | init | public init(mesh: Mesh, registry: ResourceRegistry) throws
+VisualCoreRendering | init | public init(name: String, minimum: Int, reported: Int)
 VisualCoreRendering | init | public init(rangeMin: Int, rangeMax: Int, precisionBits: Int)
 VisualCoreRendering | init | public init(red: Float = 0, green: Float = 0, blue: Float = 0)
 VisualCoreRendering | init | public init(registry: ResourceRegistry) throws
@@ -1568,6 +1587,7 @@ VisualCoreRendering | let | public static let visualCoreLibrary: [String: String
 VisualCoreRendering | protocol | public protocol GPUResource: AnyObject
 VisualCoreRendering | protocol | public protocol RenderScene: AnyObject
 VisualCoreRendering | struct | public struct FloatRenderSupport: Sendable, Equatable
+VisualCoreRendering | struct | public struct FloorFinding: Sendable, Equatable, Codable
 VisualCoreRendering | struct | public struct FrameInfo: Sendable, Equatable
 VisualCoreRendering | struct | public struct GPUHandle: Sendable, Equatable
 VisualCoreRendering | struct | public struct PresentedFrame: Sendable, Equatable
@@ -1610,13 +1630,17 @@ VisualCoreRendering | var | public var bytes: Int
 VisualCoreRendering | var | public var bytesPerPixel: Int
 VisualCoreRendering | var | public var cachedProgramCount: Int
 VisualCoreRendering | var | public var center: Vec2
+VisualCoreRendering | var | public var eglExtensions: [String]?
 VisualCoreRendering | var | public var eglVendor
+VisualCoreRendering | var | public var eglVersion: String?
 VisualCoreRendering | var | public var extensions: [String]
 VisualCoreRendering | var | public var fixedTime: Double?
+VisualCoreRendering | var | public var fragmentHighInt: ShaderPrecision?
 VisualCoreRendering | var | public var fragmentHighp: ShaderPrecision?
 VisualCoreRendering | var | public var fragmentMediump: ShaderPrecision?
 VisualCoreRendering | var | public var framePacing: FramePacing
 VisualCoreRendering | var | public var generation: Int
+VisualCoreRendering | var | public var generation: Int?
 VisualCoreRendering | var | public var glVersion
 VisualCoreRendering | var | public var glslVersion
 VisualCoreRendering | var | public var height: Int
@@ -1625,10 +1649,21 @@ VisualCoreRendering | var | public var isSupported: Bool
 VisualCoreRendering | var | public var isValid: Bool
 VisualCoreRendering | var | public var lifecycleHistory: [RenderLifecycleEvent]
 VisualCoreRendering | var | public var lightDirection
+VisualCoreRendering | var | public var maxColorAttachments: Int?
+VisualCoreRendering | var | public var maxDrawBuffers: Int?
+VisualCoreRendering | var | public var maxFragmentUniformVectors: Int?
 VisualCoreRendering | var | public var maxRenderSize: Int
 VisualCoreRendering | var | public var maxRenderbufferSize
+VisualCoreRendering | var | public var maxSamples: Int?
+VisualCoreRendering | var | public var maxTextureImageUnits: Int?
 VisualCoreRendering | var | public var maxTextureSize
+VisualCoreRendering | var | public var maxVaryingVectors: Int?
+VisualCoreRendering | var | public var maxVertexAttribs: Int?
+VisualCoreRendering | var | public var maxVertexUniformVectors: Int?
 VisualCoreRendering | var | public var maxViewport
+VisualCoreRendering | var | public var minimum: Int
+VisualCoreRendering | var | public var missingEntryPoints: Int?
+VisualCoreRendering | var | public var name: String
 VisualCoreRendering | var | public var names: [String]
 VisualCoreRendering | var | public var palette: [SIMD3<Float>]
 VisualCoreRendering | var | public var parameters: [String: Double]
@@ -1639,6 +1674,7 @@ VisualCoreRendering | var | public var rangeMin: Int
 VisualCoreRendering | var | public var red: Float, green: Float, blue: Float
 VisualCoreRendering | var | public var rejectedTransitions: Int
 VisualCoreRendering | var | public var renderer
+VisualCoreRendering | var | public var reported: Int
 VisualCoreRendering | var | public var reportsColorBufferHalfFloat: Bool
 VisualCoreRendering | var | public var seedOffsets: SIMD4<Float>
 VisualCoreRendering | var | public var size: Vec2
@@ -1650,6 +1686,8 @@ VisualCoreRendering | var | public var timeScale: Double
 VisualCoreRendering | var | public var trailStrength: Double
 VisualCoreRendering | var | public var usesTrailLayer: Bool
 VisualCoreRendering | var | public var vendor
+VisualCoreRendering | var | public var vertexHighp: ShaderPrecision?
+VisualCoreRendering | var | public var vertexMediump: ShaderPrecision?
 VisualCoreRendering | var | public var view: UIView
 VisualCoreRendering | var | public var width: Int
 VisualCoreRendering | var | public var world: WorldRect

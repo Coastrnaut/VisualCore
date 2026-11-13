@@ -56,7 +56,7 @@ Independent test: a fresh host's report holds every value of FR-R02F02-001 and 0
 
 ## Phase 5: User Story 4 — The public API stays compatible (P2)
 
-- [ ] T-R02F02-012 [US4] `check_public_api.py --update`: only added lines, 0 undocumented (check `public-api`);
+- [X] T-R02F02-012 [US4] `check_public_api.py --update`: only added lines, 0 undocumented (check `public-api`); — Verified 2026-11-13: check_public_api.py --update: 2222 declarations, 38 added, 0 removed, 0 undocumented; check passes after (public-api); check_documented_api.py --sources Apps/VisualCore PASS (documented-api); READMEs of VisualCore and VisualCoreRendering describe the values and the record; EGLDisplayProvider.swift unchanged since before the feature (window-config-unchanged, FR-R02F02-009); only tracked GL and EGL constants are used (FR-R02F02-010)
   `check_documented_api.py --sources Apps/VisualCore` (check `documented-api`); package READMEs list the new values
   and the record; `git diff --exit-code <base> -- Packages/VisualCoreRendering/Sources/VisualCoreRendering/EGLDisplayProvider.swift`
   proves the window configuration is unchanged (FR-R02F02-009, check `window-config-unchanged`); the review confirms

@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "git",
+    "diff",
+    "--exit-code",
+    "61ed96c^",
+    "--",
+    "Packages/VisualCoreRendering/Sources/VisualCoreRendering/EGLDisplayProvider.swift"
+  ],
+  "command": "git diff --exit-code '61ed96c^' -- Packages/VisualCoreRendering/Sources/VisualCoreRendering/EGLDisplayProvider.swift",
+  "elapsed_seconds": 0.008,
+  "exit_code": 0,
+  "finished": "2026-11-13T19:11:50+00:00",
+  "gate": "R02-F02",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-F02.window-config-unchanged.log",
+  "log_sha256": "4ca50b4de3fe5e23e1ae6176858bcf8296e8b261ea66c4900f128e6ef7bd864e",
+  "name": "window-config-unchanged",
+  "started": "2026-11-13T19:11:50+00:00",
+  "timed_out": false
+}

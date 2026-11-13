@@ -315,3 +315,16 @@ Contract: [session-api.md](../../specs/189-ua-f03-experience-host/contracts/sess
 through the experience's scripted run, exactly as a control would send it, and every wait has a limit. The caller
 passes a `ScenarioRunner.RequestMaker`, a closure that builds the `ExperienceOpenRequest` for a seed and an optional
 snapshot to restore, so the runner can open, close and reopen the experience.
+
+## Renderer capabilities (feature 202, R02-F02)
+
+`RenderHost.capabilities` describes the current context generation: GL and GLSL versions, renderer, vendor, EGL
+vendor, version and extensions, GL extensions, texture, viewport and renderbuffer limits, samples, draw buffers,
+colour attachments, vertex attributes, uniform and varying vectors, texture image units, vertex and fragment
+precision, the count of GL entry points the loader missed, and `generation`. It is taken again after every
+`recreateContext()`; a reload that misses entry points fails the host like the first load. Every new value is optional:
+nil when the query left a GL error, and absent in reports written before. `floorFindings()` lists each limit below
+its OpenGL ES 3.0 minimum as a `FloorFinding`; findings are recorded, never raised. Multisampling is reported, not
+enabled: the window surface stays single-sampled without depth (ADR-0002). `RendererRecord(_:)` (in
+VisualCoreExperienceHost) turns the report into the evidence's `environment.renderer`, which the verification runner
+fills from the frame it reads (`ScenarioRunResult.renderer`).

@@ -227,3 +227,7 @@ item is not checked). `ScenarioManifestValidator.problems(_:controls:)` rejects 
 control or lacks a standard scenario. A run's `EvidenceRecord` names the experience, the build, and in
 `EvidenceRecord.Environment` the kind of machine and its operating system.
 Contract: [verification-api.md](../../specs/195-ua-f09-verification-runner/contracts/verification-api.md).
+
+A run's `EvidenceRecord.Environment` may carry a `RendererRecord` (feature 202): the renderer's versions, a few
+limits, the missing entry points, the context generation and the floor findings, every field optional, under the key
+`renderer`; a record without it stays valid.
