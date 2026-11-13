@@ -40,7 +40,7 @@ none (no {owner} task). VisualCore changes, so the documentation, API-baseline a
   after 100 draws, save, restore, next 100 identical and restored `==` original; JSON round trip; refused:
   `version` ≠ 1, word count ≠ 4, a word not "16 lower-case hexadecimal digits", all-zero words; existing equality
   unchanged.
-- [ ] T-R02F03-009 [US3] Write `Packages/VisualCore/Sources/VisualCoreSimulation/SeededRandom+State.swift`
+- [X] T-R02F03-009 [US3] Write `Packages/VisualCore/Sources/VisualCoreSimulation/SeededRandom+State.swift` — Verified 2026-11-13: SeededRandom+State.swift (State version/seed/words, state, init(restoring:) throws(RandomStateError)); SeededRandom state words internal private(set) plus internal initializer, output unchanged; tests pass (host-visualcore)
   (`State { version, seed, words }`, `state`, `init(restoring:) throws(RandomStateError)`); if the state words must be
   read from the extension, change `private` to `fileprivate`/`internal` in `SeededRandom.swift` without changing
   output.
