@@ -34,7 +34,7 @@ each task. Tests before code. Owner-only items: none. One {device} task. No Visu
   `ExperienceStorage`): save, list, open data, rename (refused on clash), delete, numbered suffix on name clash,
   unreadable files counted and kept, relaunch (new library over the same storage) lists the same entries; a
   save beyond the storage limits (65th file) fails with a message and leaves the existing files unchanged (FR-A04-414).
-- [ ] T-A04-407 [US1] Write `PU/Experience/ParticleLibrary.swift` (the `FractalBookmarks` pattern, files
+- [X] T-A04-407 [US1] Write `PU/Experience/ParticleLibrary.swift` (the `FractalBookmarks` pattern, files — Verified 2026-11-13: PU/Experience/ParticleLibrary.swift (scene-<uuid>.json over ExperienceStorage, FractalBookmarks pattern); tests pass (experiences-ios27/26)
   `scene-<uuid>.json`).
 - [ ] T-A04-408 [US1] Wire: `PU/Experience/ParticleExperience.swift` `make(id:storage:reduceMotion:reduceFlashing:)`;
   `PU/Experience/ParticlePresenter.swift` holds the library and sends the open actions; `PU/Experience/ParticleControls.swift`
