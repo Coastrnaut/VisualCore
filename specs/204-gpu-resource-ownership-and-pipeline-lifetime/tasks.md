@@ -68,7 +68,7 @@ API-baseline and reference-regression tasks apply.
   `python3 scripts/check_documented_api.py --sources Apps/VisualCore` (check `documented-api`).
 - [X] T-R02F04-015 `Packages/VisualCoreRendering/README.md` section "Resource ownership and pipelines (feature 204, R02-F04)". — Verified 2026-11-13: Packages/VisualCoreRendering/README.md section Resource ownership and pipelines (feature 204, R02-F04)
 - [X] T-R02F04-016 Host suite `swift test --package-path Packages/VisualCore` (check `host-visualcore`). — Verified 2026-11-13: swift test Packages/VisualCore PASS (host-visualcore)
-- [ ] T-R02F04-017 ExperiencesCreative on sim-27.2 (check `experiences-ios27`) and A01–A03 verification on iOS 27
+- [X] T-R02F04-017 ExperiencesCreative on sim-27.2 (check `experiences-ios27`) and A01–A03 verification on iOS 27 — Verified 2026-11-13: ExperiencesCreative on sim-27.2 PASS (experiences-ios27); A01-A03 verification on iOS 27: 0 failures (verify-a01-a03)
   (check `verify-a01-a03`).
 - [ ] T-R02F04-018 Reference regression chunk 1 (check `reference-1`): `python3 scripts/release_check.py --only
   reference-engine-xcframework reference-build-projectm-ios-sim reference-clean`.
