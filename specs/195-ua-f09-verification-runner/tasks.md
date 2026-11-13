@@ -15,7 +15,7 @@ Commit after every task (`python3 scripts/tick_task.py`), and push with `python3
 
 ## Phase 1: Setup
 
-- [ ] T-U09-001 [P] Add `--result-name NAME` to `scripts/xcodebuild_app.py`, which writes `-resultBundlePath .autonomy/xcresults/NAME.xcresult` and removes an older bundle of that name first. Script tests in `scripts/test_scripts.py`: the command line carries the path; without the option, nothing changes (FR-U09-023).
+- [X] T-U09-001 [P] Add `--result-name NAME` to `scripts/xcodebuild_app.py`, which writes `-resultBundlePath .autonomy/xcresults/NAME.xcresult` and removes an older bundle of that name first. Script tests in `scripts/test_scripts.py`: the command line carries the path; without the option, nothing changes (FR-U09-023). — Verified 2026-11-12: python3 scripts/test_scripts.py: Ran 243 tests, OK (test_result_name_adds_the_result_bundle_path); one ledger-dependent prompt-coverage test now uses UA-F13, which stays open
 
 ## Phase 2: Foundational (pure types; blocking every story)
 

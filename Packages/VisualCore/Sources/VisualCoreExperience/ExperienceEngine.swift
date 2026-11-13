@@ -258,8 +258,12 @@ public struct ExperienceEngine<Core: ExperienceCore>: Sendable {
                               rejectedTransitions: lifecycle.rejectedTransitions,
                               rejectedOperations: lifecycle.rejectedOperations, acceptedActions: acceptedActions,
                               rejectedActions: rejectedActions, droppedTime: clock.droppedTime,
-                              invalidFrames: clock.invalidDeltas)
+                              invalidFrames: clock.invalidDeltas, outcome: outcome)
     }
+
+    /// The outcome the core reports for its current state (feature 195, UA-F09); nil without a prepared core or
+    /// when the core reports none. Reading it changes nothing.
+    public var outcome: ExperienceOutcome? { core?.outcome }
 
     // MARK: Input
 

@@ -50,11 +50,15 @@ public struct ExperienceDiagnostics: Sendable, Equatable, Codable {
     public let droppedTime: Double
     /// Frames whose time was negative or not finite.
     public let invalidFrames: Int
+    /// The outcome the core reports (feature 195, UA-F09); nil without a prepared core or without an outcome. Left
+    /// out of the encoded form when nil, and read as nil from an encoded value that has none.
+    public let outcome: ExperienceOutcome?
 
-    /// Creates a diagnostics value.
+    /// Creates a diagnostics value. `outcome` comes last and defaults to nil, so older call sites stay valid.
     public init(experience: ExperienceID, state: ExperienceLifecycleState, seed: UInt64?, stepIndex: Int, qualityTier: Int,
                 gpu: GPUResourceCounts?, lastError: ExperienceFailure?, digest: StateDigest?, rejectedTransitions: Int,
-                rejectedOperations: Int, acceptedActions: Int, rejectedActions: Int, droppedTime: Double, invalidFrames: Int) {
+                rejectedOperations: Int, acceptedActions: Int, rejectedActions: Int, droppedTime: Double, invalidFrames: Int,
+                outcome: ExperienceOutcome? = nil) {
         self.experience = experience
         self.state = state
         self.seed = seed
@@ -69,14 +73,15 @@ public struct ExperienceDiagnostics: Sendable, Equatable, Codable {
         self.rejectedActions = rejectedActions
         self.droppedTime = droppedTime
         self.invalidFrames = invalidFrames
+        self.outcome = outcome
     }
 
     private enum CodingKeys: String, CodingKey {
         case experience, state, seed, stepIndex, qualityTier, gpu, lastError, digest, rejectedTransitions, rejectedOperations
-        case acceptedActions, rejectedActions, droppedTime, invalidFrames
+        case acceptedActions, rejectedActions, droppedTime, invalidFrames, outcome
     }
 
-    /// Decodes a diagnostics value; the seed is read from decimal text.
+    /// Decodes a diagnostics value; the seed is read from decimal text and a missing outcome is nil.
     public init(from decoder: any Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
         experience = try c.decode(ExperienceID.self, forKey: .experience)
@@ -100,6 +105,7 @@ public struct ExperienceDiagnostics: Sendable, Equatable, Codable {
         rejectedActions = try c.decode(Int.self, forKey: .rejectedActions)
         droppedTime = try c.decode(Double.self, forKey: .droppedTime)
         invalidFrames = try c.decode(Int.self, forKey: .invalidFrames)
+        outcome = try c.decodeIfPresent(ExperienceOutcome.self, forKey: .outcome)
     }
 
     /// Encodes the value; the seed is written as decimal text and absent items are left out.
@@ -119,6 +125,7 @@ public struct ExperienceDiagnostics: Sendable, Equatable, Codable {
         try c.encode(rejectedActions, forKey: .rejectedActions)
         try c.encode(droppedTime, forKey: .droppedTime)
         try c.encode(invalidFrames, forKey: .invalidFrames)
+        try c.encodeIfPresent(outcome, forKey: .outcome)
     }
 
     /// The value as JSON with keys in sorted order, for evidence files.

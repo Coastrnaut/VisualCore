@@ -1525,6 +1525,139 @@ class AppTestRunnerTests(unittest.TestCase):
                 log.write_text("nothing ran\n")
                 self.assertEqual(apprunner.enumeration_guard(d / "src", log), 1)
 
+    def test_result_name_adds_the_result_bundle_path(self):
+        """UA-F09 T-U09-001 (FR-U09-023): `--result-name NAME` passes `-resultBundlePath
+        <root>/.autonomy/xcresults/NAME.xcresult`; without it the command is unchanged."""
+        self.assertNotIn("-resultBundlePath", apprunner.test_command("P.xcodeproj", "S", "U", "D", []))
+        cmd = apprunner.test_command("P.xcodeproj", "S", "U", "D", ["T/A"], "/r/.autonomy/xcresults/x.xcresult")
+        self.assertEqual(cmd[-3:], ["-resultBundlePath", "/r/.autonomy/xcresults/x.xcresult", "-only-testing:T/A"])
+        code, _, calls, _, _, _ = self.run_main(self.BASE)
+        self.assertEqual(code, 0)
+        self.assertNotIn("-resultBundlePath", calls[1][0])
+        seen = {}
+
+        def fake_run(cmd, **kw):
+            if cmd[:2] == ["xcrun", "simctl"]:
+                return subprocess.CompletedProcess(cmd, 0, stdout=json.dumps(self.DEVICES), stderr="")
+            seen["cmd"] = list(cmd)
+            bundle = Path(cmd[cmd.index("-resultBundlePath") + 1])
+            seen["old_gone"] = not bundle.exists()
+            seen["parent"] = bundle.parent.is_dir()
+            kw["stdout"].write("Test Case '-[T.A testOne]' passed (0.1 s).\n")
+            return subprocess.CompletedProcess(cmd, 0)
+
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d).resolve()
+            (root / "Apps" / "VisualCore" / "Tests").mkdir(parents=True)
+            old = root / ".autonomy" / "xcresults" / "smoke-27.2.xcresult"
+            (old / "Data").mkdir(parents=True)
+            (old / "Info.plist").write_text("old")
+            with contextlib.redirect_stdout(io.StringIO()):
+                code = apprunner.main(self.BASE + ["--result-name", "smoke-27.2"], root=root, run=fake_run,
+                                      guard=lambda src, log: 0, widths=lambda: {})
+        self.assertEqual(code, 0)
+        i = seen["cmd"].index("-resultBundlePath")
+        self.assertEqual(seen["cmd"][i + 1], str(root / ".autonomy" / "xcresults" / "smoke-27.2.xcresult"))
+        self.assertTrue(seen["old_gone"])     # the older bundle of that name was removed before the run
+        self.assertTrue(seen["parent"])
+        for bad in ["../escape", "a/b", ""]:
+            code, _, calls, _, _, _ = self.run_main(self.BASE + ["--result-name", bad])
+            self.assertEqual((code, calls), (2, []), bad)
+
+
+class EvidenceValidatorTests(unittest.TestCase):
+    """Feature UA-F09 T-U09-015 (FR-U09-030 to FR-U09-032, FR-U09-062): scripts/check_evidence.py."""
+
+    GROUPS = ["schema", "experience", "code", "scenario", "seed", "result", "run", "environment", "source",
+              "configuration", "steps", "digests", "frames", "failures"]
+
+    @classmethod
+    def setUpClass(cls):
+        cls.tool = load("check_evidence")
+
+    def record(self, **changes):
+        """The tool's valid sample record with dotted-path (`a.b`, `frames.0.x`) changes; `...` deletes a key."""
+        rec = self.tool.sample_record()
+        for dotted, value in changes.items():
+            *parents, last = dotted.split(".")
+            target = rec
+            for p in parents:
+                target = target[int(p)] if isinstance(target, list) else target[p]
+            if value is ...:
+                del target[last]
+            else:
+                target[last] = value
+        return rec
+
+    def problems(self, **changes):
+        return self.tool.validate(self.record(**changes))
+
+    def assertRejected(self, changes, needle):
+        problems = self.problems(**changes)
+        self.assertTrue(any(needle in p for p in problems), (needle, problems))
+
+    def test_a_valid_simulator_record_passes(self):
+        self.assertEqual(self.tool.validate(self.tool.sample_record()), [])
+        self.assertEqual(self.tool.sample_record()["environment"]["kind"], "simulator")
+
+    def test_each_field_group_missing_is_rejected_by_name(self):
+        for group in self.GROUPS:
+            with self.subTest(group=group):
+                problems = self.problems(**{group: ...})
+                self.assertIn(f"{group}: missing", problems)
+
+    def test_wrong_type_schema_hash_and_result(self):
+        self.assertRejected({"seed": 42}, "seed: expected a decimal string")
+        self.assertRejected({"schema": 0}, "unknown")
+        self.assertRejected({"schema": 2}, "newer")
+        self.assertRejected({"digests.initial": "a" * 63}, "digests.initial")
+        self.assertRejected({"steps.0.digest": "a" * 63}, "steps[0].digest")
+        self.assertRejected({"result": "ok"}, "result")
+
+    def test_pass_rules(self):
+        self.assertRejected({"failures": ["boom"]}, "failures")
+        self.assertRejected({"steps": [], "digests.initial": None, "digests.final": None}, "steps")
+        self.assertRejected({"scenario": "launch-first-frame", "frames": []}, "frames")
+        self.assertRejected({"scenario": "hero", "frames.0.non_blank": False}, "frames")
+        self.assertRejected({"result": "fail", "failures": []}, "failures")
+        self.assertEqual(self.problems(scenario="cancel-prepare", steps=[], **{"digests.initial": None,
+                                                                             "digests.final": None}), [])
+        self.assertEqual(self.problems(result="fail", failures=["digest mismatch"]), [])
+
+    def test_identifiers_and_kind(self):
+        self.assertRejected({"artifacts.log": ".autonomy/logs/0A1B2C3D-0000-4000-8000-00000000ABCD/x.log"},
+                            "artifacts.log")
+        self.assertRejected({"environment.device_type": "0x001A2B3C4D5E6F7"}, "environment.device_type")
+        self.assertRejected({"environment.kind": "emulator"}, "environment.kind")
+        self.assertRejected({"extra": True}, "extra")
+        self.assertRejected({"environment.kind": "device", "environment.udid": "none"}, "environment.udid")
+
+    def test_a_device_record_without_identifiers_passes(self):
+        self.assertEqual(self.problems(**{"environment.kind": "device"}), [])
+
+    def test_cli_exit_codes_and_self_test(self):
+        tool = self.tool
+        with tempfile.TemporaryDirectory() as d:
+            good, bad, broken = Path(d) / "good.json", Path(d) / "bad.json", Path(d) / "broken.json"
+            good.write_text(json.dumps(tool.sample_record()))
+            bad.write_text(json.dumps(self.record(result="ok")))
+            broken.write_text("{not json")
+            out = io.StringIO()
+            with contextlib.redirect_stdout(out):
+                self.assertEqual(tool.main([str(good)]), 0)
+                self.assertEqual(tool.main([str(good), str(bad)]), 1)
+                self.assertEqual(tool.main([str(broken)]), 1)
+                self.assertEqual(tool.main(["--self-test"]), 0)
+            lines = out.getvalue().splitlines()
+            self.assertIn(f"PASS: {good}", lines)
+            self.assertTrue(any(l.startswith(f"FAIL: {bad}: result") for l in lines), lines)
+            self.assertTrue(any(l.startswith(f"FAIL: {broken}: file: not valid JSON") for l in lines), lines)
+            self.assertTrue(lines[-1].startswith("PASS: self-test ("), lines[-1])
+            self.assertTrue(tool.validate_file(broken))
+        proc = subprocess.run([sys.executable, str(HERE / "check_evidence.py"), "--self-test"],
+                              capture_output=True, text=True)
+        self.assertEqual(proc.returncode, 0, proc.stdout + proc.stderr)
+
 
 class ForbiddenTextTests(unittest.TestCase):
     """Feature UA-F04 T-U04-014 (FR-U04-004): `check_release_symbols.py --forbid`."""
@@ -2823,8 +2956,9 @@ class PromptCoverageTests(unittest.TestCase):
 
         self.edit(root, "docs/catalog/feature-index.json", drop_round_stage)
         self.edit(root, "docs/process/speckit-prompt-manifest.json", empty_phase_stage)
+        # A brief of a gate that stays open until the device campaign (a passed gate's prompts are not walked).
         self.edit(root, "docs/catalog/unified-app-features.json",
-                  lambda briefs: briefs.update(features=[b for b in briefs["features"] if b["id"] != "UA-F05"]))
+                  lambda briefs: briefs.update(features=[b for b in briefs["features"] if b["id"] != "UA-F13"]))
         features, prompts, problems = planidx.prompt_coverage(root)
         self.assertEqual(prompts, 8 * features - len(problems))
         self.assertEqual(len(problems), 1 + 1 + 8 + 8)
@@ -2832,7 +2966,7 @@ class PromptCoverageTests(unittest.TestCase):
         self.assertTrue(any(p.startswith("A10-P03 tasks: ") for p in problems))
         for stage in planidx.STAGES:
             self.assertTrue(any(p.startswith(f"A11-P00 {stage}: ") for p in problems), stage)
-            self.assertTrue(any(p.startswith(f"UA-F05 {stage}: ") for p in problems), stage)
+            self.assertTrue(any(p.startswith(f"UA-F13 {stage}: ") for p in problems), stage)
         self.assertFalse(any(p.startswith("R02-F01 ") for p in problems))
 
     def test_coverage_command_reports_both_counts(self):

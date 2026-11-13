@@ -15,6 +15,10 @@ The complete xcodebuild output goes to `.autonomy/logs/app-tests/<log-name>.log`
 `<scheme>-<runtime>-<kind>`); its last lines are repeated on stdout. Afterwards
 `check_test_enumeration.py --sources <sources> --log <log>` proves that every declared test ran and passed.
 
+With `--result-name NAME` xcodebuild also writes its result bundle to `.autonomy/xcresults/NAME.xcresult`
+(feature UA-F09 T-U09-001, FR-U09-023); an older bundle of that name is removed first, because xcodebuild refuses to
+write into an existing one. Without the option no result bundle path is passed.
+
 Exit codes: 0 tests and guard passed; 1 tests or guard failed; 2 bad input or no simulator of that runtime and kind.
 """
 from __future__ import annotations
@@ -22,6 +26,7 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -77,12 +82,16 @@ def pick_simulator(devices_json: dict, runtime: str, kind: str,
     return found[0]["udid"], found[0]["name"]
 
 
-def test_command(project: str, scheme: str, udid: str, derived: str, only: list[str] | None) -> list[str]:
-    """The exact `xcodebuild test` command: simulator destination, explicit timeouts, unsigned."""
+def test_command(project: str, scheme: str, udid: str, derived: str, only: list[str] | None,
+                 result_bundle: str | None = None) -> list[str]:
+    """The exact `xcodebuild test` command: simulator destination, explicit timeouts, unsigned; with `result_bundle`
+    also `-resultBundlePath <result_bundle>`."""
     cmd = ["xcodebuild", "test", "-project", project, "-scheme", scheme,
            "-destination", f"platform=iOS Simulator,id={udid}",
            "-test-timeouts-enabled", "YES", "-default-test-execution-time-allowance", "180",
            "-derivedDataPath", derived, "CODE_SIGNING_ALLOWED=NO"]
+    if result_bundle:
+        cmd += ["-resultBundlePath", result_bundle]
     return cmd + [f"-only-testing:{t}" for t in (only or [])]
 
 
@@ -127,6 +136,8 @@ def main(argv: list[str] | None = None, root: Path = ROOT, run=subprocess.run, g
     ap.add_argument("--max-seconds", type=int, default=540,
                     help="stop the run after this many seconds and name the test it was on (default 540, below the "
                          "ten-minute limit of one foreground command); 0 disables the limit")
+    ap.add_argument("--result-name", metavar="NAME",
+                    help="also write the result bundle to .autonomy/xcresults/NAME.xcresult (an older one is removed)")
     try:
         a = ap.parse_args(argv)
     except SystemExit as e:
@@ -142,6 +153,8 @@ def main(argv: list[str] | None = None, root: Path = ROOT, run=subprocess.run, g
         problems.append("--scheme is a plain scheme name")
     if not SAFE_NAME.match(log_name):
         problems.append("--log-name is a plain file name without folders")
+    if a.result_name is not None and not SAFE_NAME.match(a.result_name):
+        problems.append("--result-name is a plain file name without folders")
     if not a.project.endswith(".xcodeproj"):
         problems.append("--project is an .xcodeproj")
     if any(not t or t.startswith("-") or "=" in t or "," in t for t in only):
@@ -168,7 +181,15 @@ def main(argv: list[str] | None = None, root: Path = ROOT, run=subprocess.run, g
     udid, name = chosen
 
     derived = a.derived_data or f"Build/DerivedData/app-{tag}"
-    cmd = test_command(a.project, a.scheme, udid, derived, only)
+    bundle = None
+    if a.result_name is not None:
+        bundle = root / ".autonomy" / "xcresults" / f"{a.result_name}.xcresult"
+        if bundle.is_dir() and not bundle.is_symlink():
+            shutil.rmtree(bundle)
+        elif bundle.exists() or bundle.is_symlink():
+            bundle.unlink()
+        bundle.parent.mkdir(parents=True, exist_ok=True)
+    cmd = test_command(a.project, a.scheme, udid, derived, only, str(bundle) if bundle else None)
     log = root / ".autonomy" / "logs" / "app-tests" / f"{log_name}.log"
     log.parent.mkdir(parents=True, exist_ok=True)
     try:

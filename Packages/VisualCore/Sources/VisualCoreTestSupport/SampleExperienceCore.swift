@@ -358,6 +358,15 @@ public struct SampleExperienceCore<Fault: SampleFault>: ExperienceCore, Codable,
         if Fault.kind == .sheddingChangesState { energy += 1 }
     }
 
+    // MARK: Outcome
+
+    /// `target-reached` while the marker stands on the target, otherwise nil (feature 195, UA-F09). Derived from
+    /// `x`, `y`, `targetX` and `targetY` when asked; nothing is stored, so the digest and the snapshot are unchanged.
+    public var outcome: ExperienceOutcome? {
+        guard x == targetX, y == targetY else { return nil }
+        return ExperienceOutcome(code: "target-reached")
+    }
+
     // MARK: Digest
 
     /// Adds seed, x, y, targetX, targetY, energy, tone, phase and ticks, in this order. The tier, the cache and

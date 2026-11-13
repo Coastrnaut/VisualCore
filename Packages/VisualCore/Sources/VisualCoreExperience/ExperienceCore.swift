@@ -48,6 +48,12 @@ public protocol ExperienceCore: Sendable {
     func snapshotPayload() throws -> Data
     /// Rebuilds a core from a payload of the current schema version. `Codable` cores get this for free.
     static func restore(payload: Data, seed: UInt64) throws -> Self
+
+    /// The outcome the state has reached, such as `level-solved` or `target-reached` (feature 195, UA-F09). Derived
+    /// from the domain state each time it is asked for and never stored, so it is not part of the digest or the
+    /// snapshot. Nil while there is no outcome; default nil. Only the core reports an outcome: a scenario manifest
+    /// can expect one but never set it.
+    var outcome: ExperienceOutcome? { get }
 }
 
 extension ExperienceCore {
@@ -61,6 +67,8 @@ extension ExperienceCore {
     public mutating func setQualityTier(_ tier: Int) {}
     /// There are no caches.
     public mutating func shedCaches() {}
+    /// No outcome.
+    public var outcome: ExperienceOutcome? { nil }
 }
 
 extension ExperienceCore where Self: Codable {
