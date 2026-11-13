@@ -70,7 +70,7 @@ API-baseline and reference-regression tasks apply.
 - [X] T-R02F04-016 Host suite `swift test --package-path Packages/VisualCore` (check `host-visualcore`). — Verified 2026-11-13: swift test Packages/VisualCore PASS (host-visualcore)
 - [X] T-R02F04-017 ExperiencesCreative on sim-27.2 (check `experiences-ios27`) and A01–A03 verification on iOS 27 — Verified 2026-11-13: ExperiencesCreative on sim-27.2 PASS (experiences-ios27); A01-A03 verification on iOS 27: 0 failures (verify-a01-a03)
   (check `verify-a01-a03`).
-- [ ] T-R02F04-018 Reference regression chunk 1 (check `reference-1`): `python3 scripts/release_check.py --only
+- [X] T-R02F04-018 Reference regression chunk 1 (check `reference-1`): `python3 scripts/release_check.py --only — Verified 2026-11-13: reference chunk 1: 3/3 PASS (reference-1)
   reference-engine-xcframework reference-build-projectm-ios-sim reference-clean`.
 - [ ] T-R02F04-019 Reference regression chunk 2 (check `reference-2`): `python3 scripts/release_check.py --only
   reference-test-anglerendering-ios27 reference-test-anglerendering-ios26 projectm-reference-ios27 projectm-reference-ios26`.
