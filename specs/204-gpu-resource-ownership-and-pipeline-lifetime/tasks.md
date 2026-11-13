@@ -9,7 +9,7 @@ API-baseline and reference-regression tasks apply.
 
 ## Phase 1: Setup
 
-- [ ] T-R02F04-001 Baseline: VisualCoreRendering scheme on sim-27.2 passes before the change (check `baseline-rendering`);
+- [X] T-R02F04-001 Baseline: VisualCoreRendering scheme on sim-27.2 passes before the change (check `baseline-rendering`); — Verified 2026-11-13: VisualCoreRendering scheme on sim-27.2 passed before the change (baseline-rendering); research.md section 0 re-verified
   research.md §0 re-verified.
 
 ## Phase 2: User Story 4 — The existing ownership rules are proven (P2, run first as the regression baseline)
