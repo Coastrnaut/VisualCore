@@ -817,10 +817,10 @@
      "A04-P01",
      "A04-P02",
      "A04-P03",
-     "A04-P04"
+     "A04-P04",
+     "A04-P05"
     ],
     "legacy_gates_pending": [
-     "A04-P05",
      "A04-P06"
     ],
     "unified_integration": "pending"

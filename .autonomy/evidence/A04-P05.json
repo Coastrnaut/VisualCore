@@ -1,0 +1,80 @@
+{
+  "checks": [
+    {
+      "attestation": ".autonomy/checks/A04-P05.baseline-experiences.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P05.baseline-experiences.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P05.experiences-ios26.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-26.5 --action test",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P05.experiences-ios26.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P05.experiences-ios27.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P05.experiences-ios27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P05.performance-docs.json",
+      "command": "python3 scripts/check_performance_docs.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P05.performance-docs.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P05.projectm-audit.json",
+      "command": "python3 scripts/audit_showcase_dependencies.py --target VisualCore --sources Apps/VisualCore",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P05.projectm-audit.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P05.script-tests-r3.json",
+      "command": "python3 scripts/test_scripts.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P05.script-tests-r3.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P05.t516-package-full-ios27.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P05.t516-package-full-ios27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P05.t516-package-ios27.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing ParticleUniverseCoreTests --only-testing ParticleUniverseExperienceTests/ParticleDetailTests",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P05.t516-package-ios27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P05.t518-package-ios26.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-26.5 --action test",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P05.t518-package-ios26.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P05.ui-pu-j2.json",
+      "command": "python3 scripts/release_check.py --only app-build-for-testing-ios27 app-ui-ios27-j2",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P05.ui-pu-j2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P05.ui-pu-j3.json",
+      "command": "python3 scripts/release_check.py --only app-ui-ios27-j3",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P05.ui-pu-j3.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P05.ui-pu-j4.json",
+      "command": "python3 scripts/release_check.py --only app-ui-ios27-j4",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P05.ui-pu-j4.log"
+    }
+  ],
+  "generated": "2026-11-13T23:37:32+00:00",
+  "method": "deterministic-run-check",
+  "stage": "A04-P05",
+  "status": "pass"
+}
