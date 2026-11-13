@@ -62,3 +62,6 @@ Configs/Signing.local.xcconfig
 Harnesses/*/Generated/
 Showcase/Generated/
 Apps/*/Generated/
+
+# UA-F09: raw verification runs (records, frames, logs, exported attachments, run state); summaries go to docs/verification
+.autonomy/verify/
