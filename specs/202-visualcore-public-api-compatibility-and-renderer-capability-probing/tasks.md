@@ -44,7 +44,7 @@ Independent test: a fresh host's report holds every value of FR-R02F02-001 and 0
   (round trip with snake-case keys; an evidence JSON without `renderer` decodes); `scripts/tests/test_evidence_renderer.py`
   (`check_evidence.py` accepts a record with and without `environment.renderer`, rejects a non-object `renderer` and
   an identifier-shaped value inside it).
-- [ ] T-R02F02-009 [US3] Add `Packages/VisualCore/Sources/VisualCoreExperience/RendererRecord.swift` (data-model.md:
+- [X] T-R02F02-009 [US3] Add `Packages/VisualCore/Sources/VisualCoreExperience/RendererRecord.swift` (data-model.md: — Verified 2026-11-13: RendererRecord.swift (pure, optional fields, snake_case), EvidenceRecord.Environment.renderer (written only when present), check_evidence.py accepts and checks environment.renderer (self-test 48 cases PASS)
   strings and ints, all optional, unknown keys ignored) and `EvidenceRecord.Environment.renderer` (key `renderer`);
   update `scripts/check_evidence.py`.
 - [ ] T-R02F02-010 [US3] Add `Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/RendererRecord+Capabilities.swift`
