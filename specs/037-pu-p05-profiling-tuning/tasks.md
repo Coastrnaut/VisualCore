@@ -25,7 +25,7 @@ each task. Tests before code. Owner-only items: none. One {device} task. No Visu
   tier per window; never below 0 or above `maxTier`; a single slow frame changes nothing; `restart()` clears the windows;
   non-finite and non-positive times are ignored; deterministic for a given sequence.
 - [X] T-A04-505 [US2] Write `PU/Core/FrameBudgetMonitor.swift` per contracts/monitor.md. — Verified 2026-11-13: PU/Core/FrameBudgetMonitor.swift per contracts/monitor.md (full windows, ring of flags, restart after a change); tests pass on both runtimes
-- [ ] T-A04-506 [US2] Wire `PU/Experience/ParticlePresenter.swift`: record `frame.delta` while the core plays, restart while
+- [X] T-A04-506 [US2] Wire `PU/Experience/ParticlePresenter.swift`: record `frame.delta` while the core plays, restart while — Verified 2026-11-13: ParticlePresenter records frame.delta while playing, restarts when paused and on setup/teardown, draws at max(host tier, monitor tier); ParticleDetailTests 3 tests (digest unchanged with detail changes, ceiling wins, paused frames do not count) pass
   paused; draw at `max(tier, monitor.tier)`; add a test in `PU/ExperienceTests/ParticleResumeBoundTests.swift` (or a new
   `ParticleDetailTests.swift`) showing the simulation digest is the same with and without detail changes, that the drawn
   tier is `max(host tier, monitor tier)` (host tier 2 with a monitor at 0 draws at 2; FR-A04-511), and that frames drawn
