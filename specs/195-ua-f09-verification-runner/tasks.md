@@ -158,7 +158,7 @@ Commit after every task (`python3 scripts/tick_task.py`), and push with `python3
 
 ## Phase 10: User Story 8 - Games run their extra scenarios (Priority: P3)
 
-- [ ] T-U09-027 [US8] Acceptance:
+- [X] T-U09-027 [US8] Acceptance: — Verified 2026-11-12: No game exists yet, so the requirement is enforced and proven by fixtures: ScenarioManifestTests (Round 2 complete passes, 79 acceptance -> 'too few acceptance scenarios: 79 of 80', Round 3 with 49 faults -> 'too few fault scenarios: 49 of 50', missing full-playthrough/hero, game without a round) in swift test 380 passed; FrameChecksTests (histogram, black frame, non-finite values, silhouette bounds); AuditTests.test_a_game_manifest_short_by_one_acceptance_scenario reads the catalog rows (100 levels, 80 acceptance) in test_scripts.py 287 OK
   - The validator tests of T-U09-004 with fixture game manifests (Round 2 complete, 79 acceptance, Round 3 without fault cases).
   - The frame-check tests of T-U09-008 for the hero checks.
   - The content counts in the audit read the planning catalog rows: 100 levels, 80 acceptance, 50 faults.
