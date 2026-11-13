@@ -46,7 +46,21 @@ Canonical overrides:
 
 ### Session 2026-11-13
 
-(Filled by `/speckit-clarify`.)
+- Q: What does CI link the app against in place of the locally built ANGLE frameworks? → A: Link-only stand-in
+  frameworks that a CI step generates from the C headers the rendering package already tracks: every exported
+  function exists and aborts if called, and each carries a marker symbol. They are created only in the CI workspace,
+  at the path the package expects, and never committed. Every local and Release build check fails if the marker is
+  present. Rejected: building ANGLE in CI (a 12 GB tree, hours); publishing the built frameworks as a release or
+  artifact (the repository is public, and that would publish binaries); a self-hosted runner on the owner's Mac (an
+  owner action).
+- Q: Where is it declared which application targets are non-shipping, and why? → A: In a tracked list,
+  `Configs/app-targets.json`, giving each target's name, bundle identifier, `ships` and a reason. Each reason names
+  the condition that ends it (for Particle Universe, the ledger gate X-A04). The project check compares
+  `project.yml` with this list. Comments in `project.yml` cannot be checked.
+- Q: Does CI run the app's tests, or only compile them? → A: It compiles the app and its test bundles
+  (build-for-testing in Debug, a plain build in Release) and runs no simulator tests. Running them needs the real
+  renderer, so app, interface and experience tests stay local in the release check, in chunks (Auto-Creator.md
+  section 24.1).
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -178,11 +192,13 @@ to a tracked file, and a record for a commit already measured is not duplicated.
 ### Functional Requirements
 
 **CI (story 1)**
-- **FR-U10-001**: CI MUST compile the one app for the iOS Simulator in the Debug and the Release configuration on
-  every push to `main` and every pull request, without signing and without a physical device.
+- **FR-U10-001**: CI MUST compile the one app for the iOS Simulator in the Debug configuration with its test bundles
+  (build-for-testing) and in the Release configuration, on every push to `main` and every pull request, without
+  signing and without a physical device. CI runs no simulator tests; those stay in the local release check.
 - **FR-U10-002**: The CI app build MUST NOT need the locally built ANGLE frameworks, MUST NOT build ANGLE, and MUST
-  NOT publish any binary. Whatever CI uses in their place MUST be unable to reach a shipped or locally built app
-  (decided in clarification).
+  NOT publish any binary. CI generates link-only stand-in frameworks from the tracked C headers. Each export
+  aborts if called, and each carries a marker symbol. They exist only in the CI workspace and are never committed.
+  The release check fails on a local or Release app that contains the marker.
 - **FR-U10-003**: CI MUST keep running the existing host gates, host tests and the pure-package simulator build, and
   MUST add the experience-package and project-structure validations of stories 2 to 4.
 - **FR-U10-004**: Every CI job MUST have a timeout and a concurrency group; nothing in CI is signed; a job MUST fetch
@@ -190,8 +206,9 @@ to a tracked file, and a record for a commit already measured is not duplicated.
 
 **Project (story 2)**
 - **FR-U10-010**: `project.yml` MUST have exactly one shippable application target, `VisualCore`, with the one
-  bundle identifier. Every other application target MUST be declared non-shipping with a reason, and none may use
-  the app's bundle identifier.
+  bundle identifier. Every application target MUST appear in `Configs/app-targets.json` with its bundle identifier,
+  whether it ships, and, for a non-shipping target, the reason and the condition that ends it. No other target may
+  use the app's bundle identifier.
 - **FR-U10-011**: A check MUST fail on an undeclared application target, a second shippable target, a reused
   bundle identifier, or a declared reason that no longer holds (the Particle Universe target once X-A04 is pass).
 
