@@ -51,7 +51,7 @@ task. Owner-only items: none.
 
 ## Phase 5: User Story 5 — Haptics, when wanted (P3)
 
-- [ ] T-R02F26-012 [P] [US5] Tests first: haptic planner (5 sequences, 0.05 s rate limit, off → none) in
+- [X] T-R02F26-012 [P] [US5] Tests first: haptic planner (5 sequences, 0.05 s rate limit, off → none) in — Verified 2026-11-13: haptic planner tests in AccessibilityPlansTests and ShellPreferencesHapticsTests (old preferences decode with haptics on; the switch round-trips; absent writes no key) pass (host-visualcore-r2)
   `AccessibilityPlansTests.swift`; `ShellPreferences` JSON without `haptics` decodes with haptics on, and round trips
   with false (`Packages/VisualCore/Tests/VisualCoreExperienceTests/ShellPreferencesHapticsTests.swift`).
 - [ ] T-R02F26-013 [US5] Write `HapticEvent`, `HapticPlanner` in `AccessibilityPlans.swift`; `ShellPreferences.haptics:
