@@ -2635,8 +2635,12 @@ class PrepushScanTests(unittest.TestCase):
         self.assertEqual(len(re.findall(r"^row \d{7}: ", clean, re.M)), 110000)
         reference = time.monotonic() - reference_started
         limit = max(30.0, 400 * reference)
+        # The scan alone is timed: the simulator list (`xcrun simctl`) is stubbed. On the CI runner that call waits
+        # for its 60-second limit, which is what both failures of this test measured (61.7 s and 61.8 s), not the
+        # scan.
         started = time.monotonic()
-        findings = prepush.scan(box.root)
+        with mock.patch.object(prepush, "simulator_identifiers", return_value=None):
+            findings = prepush.scan(box.root)
         elapsed = time.monotonic() - started
         self.assertLess(elapsed, limit, f"scan took {elapsed:.1f} s; reference pass {reference:.3f} s")
         self.assertEqual(findings, ["docs/big.txt: hardware identifier: device 00008120-001A2B3C4D5E6F78"])
