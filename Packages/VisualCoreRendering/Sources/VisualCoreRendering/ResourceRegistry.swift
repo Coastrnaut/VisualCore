@@ -32,6 +32,9 @@ public final class ResourceRegistry {
         return true
     }
 
+    /// Counts a refused use of a resource that is no longer valid (a released program in a pipeline, R02-F04).
+    func noteStale() { ledger.noteStale() }
+
     /// Called by the host after scene teardown and before the old context is destroyed: anything
     /// still live is counted as leaked and forgotten (no GL calls on a dead context).
     func contextWillEnd() {
@@ -40,6 +43,9 @@ public final class ResourceRegistry {
         for program in cache.values { release(program) }
         cache.removeAll()
         lru.removeAll()
+        // Evicted programs still held by scenes are registry-owned: released here, not counted as leaks (FR-R02F04-011).
+        for program in retired.values { release(program) }
+        retired.removeAll()
         willEndContext()
         ledger.abandonAll()   // anything still live belongs to a scene that leaked it
     }
@@ -89,26 +95,53 @@ public final class ResourceRegistry {
         return GPUBuffer(handle: GPUHandle(kind: .buffer, name: name, bytes: bytes, generation: generation, label: label), registry: self)
     }
 
-    /// Creates a framebuffer with one color texture (pixels), charged as a framebuffer entry; throws on invalid size, over budget or an incomplete framebuffer.
-    public func makeRenderTarget(width: Int, height: Int, format: TextureFormat = .rgba8, label: String) throws -> RenderTarget {
+    /// Creates a framebuffer with one color texture (pixels), charged as a framebuffer entry; throws on invalid size,
+    /// over budget or an incomplete framebuffer. With `depth` (feature 204, FR-R02F04-030…032) the target also gets a
+    /// `GL_DEPTH_COMPONENT24` renderbuffer of the same size, charged as one `.renderbuffer` entry of width×height×4
+    /// bytes and released with the target. Every failure leaves nothing allocated: budgets are checked before any GL
+    /// object exists, and an incomplete framebuffer deletes the texture, renderbuffer and framebuffer before throwing.
+    public func makeRenderTarget(width: Int, height: Int, format: TextureFormat = .rgba8, depth: Bool = false,
+                                 label: String) throws -> RenderTarget {
         try validate(width, height)
         let bytes = width * height * format.bytesPerPixel
+        let depthBytes = depth ? RenderTarget.depthBytes(width: width, height: height) : 0
         try ledger.allocate(.framebuffer, bytes: bytes)
+        if depth {
+            do { try ledger.allocate(.renderbuffer, bytes: depthBytes) } catch {
+                ledger.release(.framebuffer, bytes: bytes)
+                throw error
+            }
+        }
         let texture = Self.allocateTexture(width: width, height: height, format: format)
+        var renderbuffer: GLuint = 0
+        if depth {
+            vcglGenRenderbuffers(1, &renderbuffer)
+            vcglBindRenderbuffer(GLenum(GL_RENDERBUFFER), renderbuffer)
+            vcglRenderbufferStorage(GLenum(GL_RENDERBUFFER), GLenum(GL_DEPTH_COMPONENT24), GLsizei(width), GLsizei(height))
+            vcglBindRenderbuffer(GLenum(GL_RENDERBUFFER), 0)
+        }
         var framebuffer: GLuint = 0
         vcglGenFramebuffers(1, &framebuffer)
         vcglBindFramebuffer(GLenum(GL_FRAMEBUFFER), framebuffer)
         vcglFramebufferTexture2D(GLenum(GL_FRAMEBUFFER), GLenum(GL_COLOR_ATTACHMENT0), GLenum(GL_TEXTURE_2D), texture, 0)
+        if depth {
+            vcglFramebufferRenderbuffer(GLenum(GL_FRAMEBUFFER), GLenum(GL_DEPTH_ATTACHMENT), GLenum(GL_RENDERBUFFER), renderbuffer)
+        }
         let status = vcglCheckFramebufferStatus(GLenum(GL_FRAMEBUFFER))
         guard status == GLenum(GL_FRAMEBUFFER_COMPLETE) else {
             vcglDeleteFramebuffers(1, &framebuffer)
             var t = texture
             vcglDeleteTextures(1, &t)
             ledger.release(.framebuffer, bytes: bytes)
+            if depth {
+                vcglDeleteRenderbuffers(1, &renderbuffer)
+                ledger.release(.renderbuffer, bytes: depthBytes)
+            }
             throw ResourceError.incompleteFramebuffer(status)
         }
         return RenderTarget(handle: GPUHandle(kind: .framebuffer, name: framebuffer, bytes: bytes, generation: generation, label: label),
-                            colorTexture: texture, width: width, height: height, format: format, registry: self)
+                            colorTexture: texture, depthRenderbuffer: renderbuffer, width: width, height: height, format: format,
+                            registry: self)
     }
 
     private static func allocateTexture(width: Int, height: Int, format: TextureFormat) -> GLuint {
@@ -147,6 +180,11 @@ public final class ResourceRegistry {
             var fb = r.handle.name, tex = r.colorTexture
             vcglDeleteFramebuffers(1, &fb)
             vcglDeleteTextures(1, &tex)
+            if r.depthRenderbuffer != 0 {
+                var rb = r.depthRenderbuffer
+                vcglDeleteRenderbuffers(1, &rb)
+                ledger.release(.renderbuffer, bytes: RenderTarget.depthBytes(width: r.width, height: r.height))
+            }
         default:
             return
         }
@@ -155,23 +193,27 @@ public final class ResourceRegistry {
 
     // MARK: Render-target pool (FR-F312)
 
-    private struct PoolKey: Hashable { let width: Int, height: Int, format: String }
+    /// Pool key: size, format and whether the target has depth storage (FR-R02F04-033).
+    private struct PoolKey: Hashable { let width: Int, height: Int, format: String, depth: Bool }
     private var pool: [PoolKey: [RenderTarget]] = [:]
 
-    /// A pooled target of this size and format (reused when one is free).
-    public func acquireTarget(width: Int, height: Int, format: TextureFormat = .rgba8) throws -> RenderTarget {
-        let key = PoolKey(width: width, height: height, format: "\(format)")
+    /// A pooled target of this size, format and depth option (reused when one is free); targets with and without
+    /// depth storage are never interchanged (feature 204, FR-R02F04-033).
+    public func acquireTarget(width: Int, height: Int, format: TextureFormat = .rgba8, depth: Bool = false) throws -> RenderTarget {
+        let key = PoolKey(width: width, height: height, format: "\(format)", depth: depth)
         if var free = pool[key], let target = free.popLast() {
             pool[key] = free
             return target
         }
-        return try makeRenderTarget(width: width, height: height, format: format, label: "pool \(width)x\(height)")
+        return try makeRenderTarget(width: width, height: height, format: format, depth: depth,
+                                    label: depth ? "pool \(width)x\(height) depth" : "pool \(width)x\(height)")
     }
 
-    /// Returns a target to the pool for reuse.
+    /// Returns a target to the pool for reuse (under its size, format and depth option).
     public func recycle(_ target: RenderTarget) {
         guard !target.released, target.handle.generation == generation else { return }
-        pool[PoolKey(width: target.width, height: target.height, format: "\(target.format)"), default: []].append(target)
+        let key = PoolKey(width: target.width, height: target.height, format: "\(target.format)", depth: target.depthRenderbuffer != 0)
+        pool[key, default: []].append(target)
     }
 
     /// Frees every pooled (unused) target, e.g. on a memory warning.
@@ -233,17 +275,29 @@ public final class ResourceRegistry {
         cache[key] = program
         touch(key)
         if cache.count > Self.maxCachedPrograms, let oldest = lru.first {
-            if let evicted = cache[oldest] { release(evicted) }
+            // Eviction retires the program without deleting it: a holder may still draw with it (FR-R02F04-010).
+            lru.removeFirst()
+            if let evicted = cache.removeValue(forKey: oldest) {
+                retired[ObjectIdentifier(evicted)] = evicted
+                evictionCount += 1
+            }
         }
         return program
     }
 
     // MARK: Program cache (FR-F306)
 
-    /// Maximum cached programs; the least recently used is released beyond this.
+    /// Maximum cached programs; beyond this the least recently used leaves the cache and is retired (feature 204).
     public static let maxCachedPrograms = 64
     private var cache: [String: ShaderProgram] = [:]
     private var lru: [String] = []
+    /// Programs evicted from the cache but not yet released: alive until their holder releases them or the context
+    /// ends (feature 204, FR-R02F04-010/011). No reference counting; a later request for the variant compiles anew.
+    private var retired: [ObjectIdentifier: ShaderProgram] = [:]
+    /// Programs evicted from the cache since the registry was created (FR-R02F04-013).
+    public private(set) var evictionCount = 0
+    /// Evicted programs still alive because their holder has not released them yet (FR-R02F04-010).
+    public var retiredProgramCount: Int { retired.count }
     /// Programs actually compiled and linked, and requests served from the cache.
     public private(set) var compileCount = 0
     /// Program requests served from the cache instead of compiling.
@@ -256,7 +310,7 @@ public final class ResourceRegistry {
         lru.append(key)
     }
 
-    /// Deletes a program created by this registry (no-op if stale or already released).
+    /// Deletes a program created by this registry, cached or retired (no-op if stale or already released).
     public func release(_ program: ShaderProgram) {
         guard !program.released else { return }
         program.released = true
@@ -264,6 +318,7 @@ public final class ResourceRegistry {
             cache[program.cacheKey] = nil
             lru.removeAll { $0 == program.cacheKey }
         }
+        retired.removeValue(forKey: ObjectIdentifier(program))
         guard accept(generation: program.generation) else { return }
         vcglDeleteProgram(program.name)
         ledger.release(.program, bytes: 0)
