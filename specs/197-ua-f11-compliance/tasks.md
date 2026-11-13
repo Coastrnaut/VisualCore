@@ -77,7 +77,7 @@ Device-only items: none, so no {device} task.
 
 - [X] T-U11-018 [P] [US4] Tests first in `scripts/tests/test_licenses_app.py`: a fixture app whose `Licenses/` lacks a — Verified 2026-11-13: scripts/tests/test_licenses_app.py 14 tests OK (exact bundle passes; missing, extra, nested, changed text and changed index fail naming the file; missing Licenses; exit 2)
   shipped text, has an extra text, or has a differing text or index fails naming it; an exact bundle passes.
-- [ ] T-U11-019 [US4] Modify `scripts/check_licenses.py`: `--app APP` compares `APP/Licenses` with the files
+- [X] T-U11-019 [US4] Modify `scripts/check_licenses.py`: `--app APP` compares `APP/Licenses` with the files — Verified 2026-11-13: check_licenses.py --app compares APP/Licenses with bundle_licenses.bundle() output byte for byte, --json report; manifests() walk skips build folders; its tests pass (script-tests)
   `bundle_licenses.bundle()` produces for shipped entries (generated into a temporary directory), byte for byte; `--json` report.
 - [ ] T-U11-020 [US4] Write `Apps/VisualCore/Tests/UI/AcknowledgementsUITests.swift`: About → Acknowledgements shows
   one row per shipped id of `docs/legal/third-party.json` (read through `#filePath`), each with a non-empty label
