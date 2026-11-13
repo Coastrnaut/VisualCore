@@ -63,7 +63,7 @@ reverted alone.
 **Independent test**: with `-vcCandidates` the launcher opens A01; the runner passes its scenarios on both
 runtimes.
 
-- [ ] T-U07-007 [US1] Tests first: `Apps/GenerativeArtStudio/Adapter/Tests/GenerativeArtCoreTests.swift` (host, Swift
+- [X] T-U07-007 [US1] Tests first: `Apps/GenerativeArtStudio/Adapter/Tests/GenerativeArtCoreTests.swift` (host, Swift — Verified 2026-11-13: Apps/GenerativeArtStudio/Adapter/Tests/GenerativeArtCoreTests.swift, 11 Swift Testing tests (conformance over seeds 1, 7, 42, 2^64-1; every control; rejections; app editor parity; clock; deterministic shuffle; open/rebase; snapshot round trip; work-saved); swift test --package-path Apps/GenerativeArtStudio/Adapter: 11 passed (run-check a01-core-host). Location correction in research.md section 4
   Testing, in a package test target or the framework test bundle). Cover:
   - the conformance helper (`ExperienceConformance`) passes for `GenerativeArtCore` over 4 seeds;
   - each control of data-model section 2 changes the digest as specified, and invalid values are rejected;

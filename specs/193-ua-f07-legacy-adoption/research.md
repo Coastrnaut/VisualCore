@@ -171,3 +171,15 @@ The dossier files are not edited. The legacy ledger is untouched; its hash is co
 - `python3 scripts/migration_baseline.py verify`: 0 problems; this covers the six fixture hashes.
 - Legacy ledger: the SHA-256 of `.autonomy/state.json` is
   `2604ffd8292cc8a877cdc0300e90cdea5c28ffdc4ef8e58b085e40526d44b7ca`.
+
+## 4. Corrections during implementation
+
+- **A01 adapter core location (T-U07-007, T-U07-008, 2026-11-13).** The pure core is a small SwiftPM package,
+  `Apps/GenerativeArtStudio/Adapter/Package.swift` (product `GenerativeArtStudioAdapterCore`), with the core at
+  `Adapter/Core/GenerativeArtCore.swift` and its host tests at `Adapter/Tests/GenerativeArtCoreTests.swift`, instead
+  of a file compiled only into the framework target. The core then runs under `swift test` on the Mac like the Core
+  packages; the presenter, controls and manifest stay in `Adapter/Experience/` and are compiled by the framework
+  target. `MigrationChain` is in `VisualCorePersistence`, which the package lists. The core's six differences from
+  the standalone app are in its file header (FR-U07-003): fixed-step time, Reduce Motion as the control `rate`, a
+  deterministic `seed.shuffle`, `family` as one control, `open`/`value.<name>`/`rebase` for opening a saved
+  composition, and `save` counting saves for the outcome `work-saved`.
