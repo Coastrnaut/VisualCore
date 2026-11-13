@@ -35,7 +35,7 @@ Independent test: a fresh host's report holds every value of FR-R02F02-001 and 0
 - [X] T-R02F02-006 [US2] In `RenderHost.swift`: set `generation` in init; in `recreateContext()` keep the reload — Verified 2026-11-13: RenderHost takes the report through takeCapabilities (missing count, generation, maxTextureSize) at creation and after every recreation; a reload with missing entry points reports RenderHostError.unsupported and enters the surface-invalid path
   count, fail with `RenderHostError.unsupported` and the surface-invalid path when it is above 0, otherwise re-query
   `capabilities` (with `generation`) and update `resources.maxTextureSize`.
-- [ ] T-R02F02-007 [US2] Acceptance: the rendering package tests on both runtimes again (checks `rendering-ios27-r2`,
+- [X] T-R02F02-007 [US2] Acceptance: the rendering package tests on both runtimes again (checks `rendering-ios27-r2`, — Verified 2026-11-13: VisualCoreRendering-Package tests on sim-27.2 and sim-26.5 after the host change pass (rendering-ios27, rendering-ios26 were run after T-R02F02-006) (SC-R02F02-002)
   `rendering-ios26-r2`) (SC-R02F02-002).
 
 ## Phase 4: User Story 3 — Evidence records the renderer (P2)
