@@ -17,7 +17,7 @@ task. Owner-only items: none.
   8 recorded sequences (tap, tap that becomes a drag, drag then a second finger to pinch, pinch released to one finger,
   long press, rotate versus pinch by priority, cancelled touch, non-finite position) give fixed outcome lists,
   identical over 3 runs; more pointers than declared are rejected.
-- [ ] T-R02F26-003 [US1] Write `Packages/VisualCore/Sources/VisualCoreScenes/GestureArbiter.swift` (research R1;
+- [X] T-R02F26-003 [US1] Write `Packages/VisualCore/Sources/VisualCoreScenes/GestureArbiter.swift` (research R1; — Verified 2026-11-13: GestureArbiter.swift: GestureDeclaration, GestureKind, GestureOutcome, GestureArbiter (handle, tick, cancelAll) over the existing recognizers, one owner at a time, cancelled touch cancels, non-finite and extra pointers ignored; /// on each
   data-model `GestureDeclaration { id, kind, priority, pointers: 1...2 }`, `GestureOutcome { gesture, phase, values }`)
   over the existing recognizers; `///` on each public declaration.
 - [ ] T-R02F26-004 [US1] Acceptance: host tests (check `host-arbiter`) (SC-R02F26-001).
