@@ -12,7 +12,7 @@ each task. Tests before code. Owner-only items: none. One {device} task. No Visu
 
 ## Phase 2: User Story 1 — Coming back never fast-forwards (P1)
 
-- [ ] T-A04-502 [P] [US1] Write `PU/ExperienceTests/ParticleResumeBoundTests.swift`: through `ExperienceSession`
+- [X] T-A04-502 [P] [US1] Write `PU/ExperienceTests/ParticleResumeBoundTests.swift`: through `ExperienceSession` — Verified 2026-11-13: ParticleResumeBoundTests 4 tests through ExperienceSession: background then active, a 600 s engine frame took 8 steps, then 2 steps per 1/60 s frame; host clamp 600 s to 0.1 s; replay digest 3 of 3; paused gap 0 simulation steps; pass on sim-26.5 and 27.2 (A04-P05/experiences-ios26, ios27)
   (pattern of `ParticleSessionTests`): playing scene, background, active, one 600 s frame takes at most 8 steps
   (`maxStepsPerFrame`), then 1/60 s frames take the normal count; a replay of the same history gives the same digest
   3 of 3 times; a paused scene takes 0 steps for the gap.
