@@ -4,12 +4,14 @@ FR-R02F02-006, T-R02F02-010)."""
 from __future__ import annotations
 
 import importlib.util
+import sys
 import unittest
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[2]
 _spec = importlib.util.spec_from_file_location("verify_experiences_for_tests", REPO / "scripts" / "verify_experiences.py")
 driver = importlib.util.module_from_spec(_spec)
+sys.modules[_spec.name] = driver  # dataclasses (Python 3.14) look the module up
 _spec.loader.exec_module(driver)
 
 

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import contextlib
 import importlib.util
+import sys
 import io
 import json
 import tempfile
@@ -13,6 +14,7 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[2]
 _spec = importlib.util.spec_from_file_location("check_app_targets", REPO / "scripts" / "check_app_targets.py")
 tool = importlib.util.module_from_spec(_spec)
+sys.modules[_spec.name] = tool  # dataclasses (Python 3.14) look the module up
 _spec.loader.exec_module(tool)
 
 PROJECT = """\

@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import contextlib
 import importlib.util
+import sys
 import io
 import json
 import tempfile
@@ -13,6 +14,7 @@ REPO = Path(__file__).resolve().parents[2]
 _spec = importlib.util.spec_from_file_location("check_experience_packages",
                                                REPO / "scripts" / "check_experience_packages.py")
 tool = importlib.util.module_from_spec(_spec)
+sys.modules[_spec.name] = tool  # dataclasses (Python 3.14) look the module up
 _spec.loader.exec_module(tool)
 
 CATALOG = {"schema": 1, "experiences": [

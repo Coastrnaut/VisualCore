@@ -94,3 +94,8 @@
 - 2026-11-13: the `checks` job (Python validators only) stayed queued for over an hour while the macOS jobs of the
   same run finished; it now runs on `ubuntu-latest`. The one script test that calls Xcode tools (the real stand-in
   generation) already skips without `xcrun`.
+- 2026-11-13: the first CI run with `checks` on Linux (Python 3.14) failed in the script tests. A tool module that
+  defines a dataclass was loaded by `importlib` without an entry in `sys.modules`, and dataclasses in 3.14 look the
+  module up there. The per-tool test loaders and the collector of `test_scripts.py` now register each module first.
+  The other jobs of that run passed: `app-build` (Debug and Release against the stand-ins), `host-tests` and
+  `simulator-build`.

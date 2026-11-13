@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import importlib.util
+import sys
 import json
 import tempfile
 import unittest
@@ -11,6 +12,7 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[2]
 _spec = importlib.util.spec_from_file_location("release_check_for_tests", REPO / "scripts" / "release_check.py")
 rc = importlib.util.module_from_spec(_spec)
+sys.modules[_spec.name] = rc  # dataclasses (Python 3.14) look the module up
 _spec.loader.exec_module(rc)
 
 

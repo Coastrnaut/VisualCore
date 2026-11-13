@@ -4917,6 +4917,7 @@ def _collect_tool_tests() -> None:
     for path in sorted((HERE / "tests").glob("test_*.py")):
         spec = importlib.util.spec_from_file_location(f"tool_tests_{path.stem}", path)
         module = importlib.util.module_from_spec(spec)
+        sys.modules[spec.name] = module   # dataclasses (Python 3.14) look the module up
         spec.loader.exec_module(module)
         for name, value in vars(module).items():
             if isinstance(value, type) and issubclass(value, unittest.TestCase) and value.__module__ == module.__name__:

@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import contextlib
 import importlib.util
+import sys
 import io
 import re
 import shutil
@@ -20,6 +21,7 @@ EGL_COUNT = 15
 
 spec = importlib.util.spec_from_file_location("make_ci_angle_standins", TOOL)
 tool = importlib.util.module_from_spec(spec)
+sys.modules[spec.name] = tool  # dataclasses (Python 3.14) look the module up
 spec.loader.exec_module(tool)
 
 

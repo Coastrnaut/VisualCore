@@ -1,5 +1,6 @@
 """Tests for scripts/measure_build.py (UA-F10 T-U10-019): fake runner, fake clock, temporary roots."""
 import importlib.util
+import sys
 import json
 import subprocess
 import tempfile
@@ -10,6 +11,7 @@ from types import SimpleNamespace
 REPO = Path(__file__).resolve().parents[2]
 SPEC = importlib.util.spec_from_file_location("measure_build", REPO / "scripts" / "measure_build.py")
 mb = importlib.util.module_from_spec(SPEC)
+sys.modules[SPEC.name] = mb  # dataclasses (Python 3.14) look the module up
 SPEC.loader.exec_module(mb)
 
 COMMIT = "a" * 40

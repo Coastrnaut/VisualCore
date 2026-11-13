@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import contextlib
 import importlib.util
+import sys
 import io
 import tempfile
 import unittest
@@ -11,6 +12,7 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[2]
 _spec = importlib.util.spec_from_file_location("check_dependencies", REPO / "scripts" / "check_dependencies.py")
 deps = importlib.util.module_from_spec(_spec)
+sys.modules[_spec.name] = deps  # dataclasses (Python 3.14) look the module up
 _spec.loader.exec_module(deps)
 
 PKG = """// swift-tools-version: 6.0

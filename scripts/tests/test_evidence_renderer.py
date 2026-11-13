@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import copy
 import importlib.util
+import sys
 import unittest
 from pathlib import Path
 
@@ -11,6 +12,7 @@ TOOL = ROOT / "scripts" / "check_evidence.py"
 
 spec = importlib.util.spec_from_file_location("check_evidence", TOOL)
 check_evidence = importlib.util.module_from_spec(spec)
+sys.modules[spec.name] = check_evidence  # dataclasses (Python 3.14) look the module up
 spec.loader.exec_module(check_evidence)
 
 RENDERER = {
