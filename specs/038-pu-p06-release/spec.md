@@ -36,6 +36,32 @@ Canonical overrides:
   - No build-and-archive instructions exist for the one app; Particle Universe has no release checklist, privacy and
     credits note, store text input or device campaign plan; the known limitations do not mention it.
 
+## Clarifications
+
+### Session 2026-11-13
+
+Answered autonomously under the owner's standing delegation, recommended option each time. Facts checked in code:
+`ExperienceSession.hostReported(_:)` fails the session with the experience's error when its setup or drawing threw
+(`failIfExperienceFailed`), and `retry()` reopens it; `scripts/check_app_release.py` checks a standalone app's
+Info.plist plus `requiredDocs` and a checklist table whose Status is `verified`, `pending-campaign-ii` or
+`owner-action`; no copy-claim check exists in `scripts/`; `ParticleLibrary`'s file wrapper is `{document, id, saved}`
+without a version.
+
+- Q: How is a drawing failure produced in a hosted test? → A: An internal test seam on the experience's presenter
+  (a flag that makes the next draw throw), set only by tests; no launch argument, no Release-visible switch.
+- Q: Which tool checks the release documents of an experience that is not a standalone app? → A: A new experience-level
+  check reading `docs/apps/particle-universe/release.json` (required documents and checklist), reusing the checklist
+  rules and statuses of `check_app_release.py`; the app-level checks (manifest, tracking, licenses, usage strings)
+  stay in the release check of the one app.
+- Q: What does the copy check refuse? → A: A versioned denylist: measured claims (numbers with fps, ms, %, hours,
+  battery, frame rate), unmeasured quality words ("smooth", "lag-free", "fastest", "instant"), and features the
+  experience does not have (audio, music, camera, sharing, video export, AR, accounts); it scans the store text input
+  and the experience's interface strings.
+- Q: How is the library file format versioned? → A: A `format` field written as 1 on every save and rename; a file
+  without it is format 1; a larger number is counted as newer and kept; nothing is rewritten on load.
+- Q: Where do the one app's build-and-archive instructions live? → A: `docs/release/build-and-archive.md` (app-wide),
+  linked from Particle Universe's release checklist; experience documents never repeat app-wide commands.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Nothing about the person leaves the device (Priority: P1) 🎯
@@ -138,27 +164,29 @@ only tested features, the known limitations, and a device campaign plan for what
   collected or shared, and that it has no third-party code or non-code assets.
 
 **Migration and recovery (story 2)**
-- **FR-A04-610**: Library files MUST carry a format number; a file without one MUST be read as format 1; a newer
+- **FR-A04-610**: Library files MUST carry a `format` number (written as 1 on save and rename); a file without one MUST be read as format 1; a newer
   format MUST be counted as newer, kept and never opened.
 - **FR-A04-611**: Committed fixtures of each library file form (without format, format 1, newer format, damaged) MUST
   be loaded by tests.
-- **FR-A04-612**: A drawing failure in a hosted session MUST put the session in its failure state without changing any
-  saved scene, and retry MUST reopen a running session.
+- **FR-A04-612**: A drawing failure in a hosted session (produced by a test-only presenter seam) MUST put the session
+  in its failure state without changing any saved scene, and retry MUST reopen a running session.
 - **FR-A04-613**: Hosted tests MUST prove Reduce Motion starts paused and Reduce Flashing caps brightness.
 
 **Build and archive (story 3)**
-- **FR-A04-620**: Build-and-archive instructions for the one app MUST list the exact unsigned build, test and release
+- **FR-A04-620**: Build-and-archive instructions for the one app (`docs/release/build-and-archive.md`) MUST list the exact unsigned build, test and release
   check commands and mark signing, archive upload and App Store Connect as owner steps.
 
 **Release record (story 4)**
 - **FR-A04-630**: Particle Universe MUST have a release checklist with an artifact inventory, each item naming its
   evidence or "pending device campaign".
-- **FR-A04-631**: A store text input MUST describe only implemented, tested features; a copy check MUST refuse
-  measured claims and unimplemented features in it and in the experience's interface text.
+- **FR-A04-631**: A store text input MUST describe only implemented, tested features; a copy check with a versioned
+  denylist MUST refuse measured claims, unmeasured quality words and features the experience lacks, in the store text
+  input and in the experience's interface strings.
 - **FR-A04-632**: The known limitations MUST list Particle Universe's device-only items; a device campaign plan MUST
   name each pending device measurement (pacing, detail steps under load, thermal behaviour, memory, accessibility
   audits).
-- **FR-A04-633**: A release document check MUST fail when a required document or checklist evidence is missing.
+- **FR-A04-633**: An experience-level release document check (reading `docs/apps/particle-universe/release.json`) MUST
+  fail when a required document, a checklist status or checklist evidence is missing.
 
 **Common**
 - **FR-A04-640**: Every Particle Universe test suite MUST pass on both simulator runtimes; the release build MUST pass
