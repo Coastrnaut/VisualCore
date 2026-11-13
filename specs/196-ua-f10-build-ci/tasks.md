@@ -111,7 +111,7 @@ Independent test: planted second shippable target, undeclared target and reused 
   `check_dependencies.py`, `measure_build.py --check`, `test_scripts.py`.
 - [X] T-U10-025 Evidence `core-a01` … `core-a04`: the Core test targets on sim-27.2 with `xcodebuild_package.py — Verified 2026-11-13: xcodebuild_package.py ExperiencesCreative-Package sim-27.2 --only-testing <Name>CoreTests: core-a01, core-a02, core-a03, core-a04 all exit 0 (the quickstart equivalent of swift test --package-path <Core> for the iOS-only Core targets)
   --only-testing <Name>CoreTests` (the quickstart's equivalent of `swift test --package-path <Core>`).
-- [ ] T-U10-026 Evidence `verify-a01-a03`: `verify_experiences.py --only a01.generative-art-studio
+- [X] T-U10-026 Evidence `verify-a01-a03`: `verify_experiences.py --only a01.generative-art-studio — Verified 2026-11-13: verify_experiences.py --only a01 a02 a03 --runtime 27 26: 54/54 scenarios pass (verify-a01-a03)
   a02.fluid-art-playground a03.fractal-explorer --runtime 27 26`.
 - [ ] T-U10-027 Evidence `reference-a` and `reference-b`: the two chunks of the reference regression.
 - [ ] T-U10-028 Evidence `docs`, `steering`, `script-tests`, `legacy-ledger` (`migration_baseline.py verify`), and a
