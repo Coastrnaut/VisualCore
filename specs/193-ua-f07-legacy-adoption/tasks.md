@@ -29,7 +29,7 @@ reverted alone.
 
 ## Phase 2: Foundational (blocking every adoption)
 
-- [ ] T-U07-003 Tests first, in `Packages/VisualCoreRendering/Tests/VisualCoreExperienceHostTests/PointerPathTests.swift`:
+- [X] T-U07-003 Tests first, in `Packages/VisualCoreRendering/Tests/VisualCoreExperienceHostTests/PointerPathTests.swift`: — Verified 2026-11-13: PointerPathTests 5 tests written first (did not compile before the API existed); after T-U07-004 the full VisualCoreExperienceHostTests target passes 149/149 on sim-27.2 and sim-26.5 (run-checks pointer-path-host-ios272, pointer-path-host-ios265)
   - a pointer event on the open experience's host reaches the presenter's `pointer(_:viewSize:port:)` with the
     view size;
   - an action the presenter sends through the port changes the state;

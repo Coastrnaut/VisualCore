@@ -7,6 +7,8 @@ import CVisualCoreGL
 import VisualCoreRendering
 import VisualCoreExperience
 import VisualCoreExperienceHost
+import VisualCoreMath
+import VisualCoreScenes
 import VisualCoreTestSupport
 
 /// The error the sample presenter throws when a test asks it to fail.
@@ -33,6 +35,12 @@ final class SamplePresenter<Fault: SampleFault>: ExperiencePresenter {
     private(set) var lastTier: Int?
     /// The port the last `makeControls` received.
     private(set) var lastControlsPort: ExperienceActionPort?
+    /// Every pointer event that reached the presenter, oldest first (feature 193).
+    private(set) var pointerEvents: [PointerEvent] = []
+    /// The view size of the last pointer event; nil before the first one.
+    private(set) var lastViewSize: Vec2?
+    /// The result of the last action the pointer path sent; nil before the first one.
+    private(set) var lastPointerResult: ActionResult?
     /// The texture of the current context; kept after `teardown` only when `keepsTextureOnTeardown` is set.
     private(set) var texture: Texture?
 
@@ -110,6 +118,15 @@ final class SamplePresenter<Fault: SampleFault>: ExperiencePresenter {
 
     func describe(_ core: SampleExperienceCore<Fault>) -> String {
         "marker at \(core.x), \(core.y), tone \(String(format: "%.2f", core.tone))"
+    }
+
+    /// A lifted pointer moves the marker one cell right in the right half of the view and one cell left in the
+    /// left half, through the port (feature 193, FR-U07-019).
+    func pointer(_ event: PointerEvent, viewSize: Vec2, port: ExperienceActionPort) {
+        pointerEvents.append(event)
+        lastViewSize = viewSize
+        guard event.phase == .ended, viewSize.x > 0 else { return }
+        lastPointerResult = port.send("move", [event.location.x / viewSize.x >= 0.5 ? 1 : -1, 0])
     }
 
     func makeControls(_ port: ExperienceActionPort) -> AnyView {

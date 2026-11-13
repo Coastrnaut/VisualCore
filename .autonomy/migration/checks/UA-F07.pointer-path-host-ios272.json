@@ -1,0 +1,29 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/VisualCoreRendering",
+    "--scheme",
+    "VisualCoreRendering-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--result-name",
+    "ua-f07-pointer-272",
+    "--only-testing",
+    "VisualCoreExperienceHostTests"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --result-name ua-f07-pointer-272 --only-testing VisualCoreExperienceHostTests",
+  "elapsed_seconds": 51.482,
+  "exit_code": 0,
+  "finished": "2026-11-13T11:15:37+00:00",
+  "gate": "UA-F07",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F07.pointer-path-host-ios272.log",
+  "log_sha256": "9f46c7257c6dc3c16c78b55d34fbec100bf32b638c954b81c9d97b5f8856bc56",
+  "name": "pointer-path-host-ios272",
+  "started": "2026-11-13T11:14:45+00:00",
+  "timed_out": false
+}

@@ -6,7 +6,9 @@
 import SwiftUI
 import VisualCoreDiagnostics
 import VisualCoreExperience
+import VisualCoreMath
 import VisualCoreRendering
+import VisualCoreScenes
 
 /// The failure code of a presenter's `setup` that threw.
 private let setupFailedCode = "experience.setup-failed"
@@ -195,6 +197,13 @@ public final class ExperienceShell<Presenter: ExperiencePresenter>: Experience {
         run(scenario)
     }
     #endif
+
+    /// Hands a canvas touch to the presenter with this shell's port while the experience is active; in any other
+    /// state the event is dropped, so a closed or suspended experience never sees it (feature 193, FR-U07-019).
+    public func handlePointer(_ event: PointerEvent, viewSize: Vec2) {
+        guard state == .active else { return }
+        presenter.pointer(event, viewSize: viewSize, port: port)
+    }
 
     /// The probes the presenter declares for the current state; empty without a state (feature 195).
     public var frameProbes: [FrameProbe] {

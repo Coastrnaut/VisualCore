@@ -10,6 +10,7 @@ import Observation
 import UIKit
 import VisualCoreDiagnostics
 import VisualCoreExperience
+import VisualCoreMath
 import VisualCoreRendering
 
 /// The failure code of a presenter's `setup` that threw (set by the experience shell).
@@ -297,6 +298,14 @@ public final class ExperienceSession {
         host.addPresentObserver { [weak self, weak host] frame in
             guard let self, let host, self.renderHost === host else { return }
             self.notePresented(frame, by: host)
+        }
+        // Canvas touches go to the open experience while this host is the session's (feature 193, FR-U07-019);
+        // destroyHost clears the handler at every close.
+        host.pointerHandler = { [weak self, weak host, weak experience] event in
+            guard let self, let host, let experience, self.renderHost === host, self.experience === experience
+            else { return }
+            let bounds = host.view.bounds.size
+            experience.handlePointer(event, viewSize: Vec2(Double(bounds.width), Double(bounds.height)))
         }
         timings.createHost = Self.seconds(clock.now - hostStart)
         if let setup = scene.setupSeconds {
@@ -695,6 +704,7 @@ public final class ExperienceSession {
     private func destroyHost() -> ResourceRegistry? {
         guard let host = renderHost else { return nil }
         renderHost = nil   // first, so that the error observer ignores what the teardown reports
+        host.pointerHandler = nil   // no touch reaches a closed experience (feature 193)
         host.destroy()
         hostsAlive -= 1
         return host.resources

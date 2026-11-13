@@ -992,9 +992,11 @@ VisualCoreExperienceHost | func | public func close()
 VisualCoreExperienceHost | func | public func finishDeactivation() throws(ExperienceError)
 VisualCoreExperienceHost | func | public func handle(control: String, values: [Double] = []) -> ActionResult
 VisualCoreExperienceHost | func | public func handleMemoryWarning()
+VisualCoreExperienceHost | func | public func handlePointer(_ event: PointerEvent, viewSize: Vec2)
 VisualCoreExperienceHost | func | public func identifier(_ name: String) -> String
 VisualCoreExperienceHost | func | public func makeBody(configuration: Configuration) -> some View
 VisualCoreExperienceHost | func | public func open(_ request: ExperienceOpenRequest) async -> SessionOpenResult
+VisualCoreExperienceHost | func | public func pointer(_ event: PointerEvent, viewSize: Vec2, port: ExperienceActionPort)
 VisualCoreExperienceHost | func | public func prepare(seed: UInt64, timeLimit: Duration? = nil) async throws(ExperienceError)
 VisualCoreExperienceHost | func | public func probes(_ core: Core) -> [FrameProbe]
 VisualCoreExperienceHost | func | public func recreateContext()

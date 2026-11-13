@@ -5,7 +5,9 @@
 import SwiftUI
 import VisualCoreDiagnostics
 import VisualCoreExperience
+import VisualCoreMath
 import VisualCoreRendering
+import VisualCoreScenes
 
 /// The main-actor part of an experience: it owns the GPU objects, draws the core and builds the controls.
 ///
@@ -34,6 +36,11 @@ public protocol ExperiencePresenter: AnyObject {
     /// verification runner reads the drawn frame and checks each one. Default: none; every experience that is
     /// verified declares at least one.
     func probes(_ core: Core) -> [FrameProbe]
+    /// A touch on the canvas of the open, active experience (feature 193, FR-U07-019): `event.location` is in
+    /// view points (origin top-left) and `viewSize` is the view's size in points. The presenter turns events into
+    /// domain actions with positions normalized to 0…1 of the view and sends them through `port`; it never
+    /// changes the state itself. Default: nothing.
+    func pointer(_ event: PointerEvent, viewSize: Vec2, port: ExperienceActionPort)
 }
 
 extension ExperiencePresenter {
@@ -43,6 +50,8 @@ extension ExperiencePresenter {
     public func shedCaches() {}
     /// No probes.
     public func probes(_ core: Core) -> [FrameProbe] { [] }
+    /// Ignores the event: an experience without canvas input needs no override.
+    public func pointer(_ event: PointerEvent, viewSize: Vec2, port: ExperienceActionPort) {}
 }
 
 /// One experience as the session host sees it: lifecycle, scene, controls, state description and diagnostics.
@@ -77,6 +86,9 @@ public protocol Experience: AnyObject {
     func suspend() throws(ExperienceError)
     /// suspended → active, without catching up on the time spent suspended.
     func resume() throws(ExperienceError)
+    /// Hands a canvas touch to the presenter while the experience is active; otherwise it is dropped
+    /// (feature 193). `viewSize` is the canvas size in points.
+    func handlePointer(_ event: PointerEvent, viewSize: Vec2)
     /// Carries out an action made now with the control `control`, or rejects it with a typed reason.
     @discardableResult func handle(control: String, values: [Double]) -> ActionResult
     /// Captures the state as a versioned envelope.
