@@ -33,7 +33,7 @@ Commit after every task (`python3 scripts/tick_task.py`), and push with `python3
   - A creative experience needs `content.fixtures` scenarios named `fixture-…`.
   - A Round 2 game needs `full-playthrough`, `hero` and 80 `acceptance-…` scenarios. Rounds 3 and 4 also need 50 `fault-…` scenarios. Fixture manifests pass with 80 or 50 and fail with 79 or 49.
 - [X] T-U09-005 Implement `ScenarioManifest.swift` and `ScenarioManifestValidator.swift` in `Packages/VisualCore/Sources/VisualCoreExperience/` (inside `#if DEBUG || VISUALCORE_AUTOMATION`), as data-model section 2 gives them. Entries convert to the existing `ExperienceScenario`. T-U09-004 passes (FR-U09-001, FR-U09-002, FR-U09-003, FR-U09-005). — Verified 2026-11-12: swift test --package-path Packages/VisualCore --filter VisualCoreExperienceTests: 379 tests in 35 suites passed
-- [ ] T-U09-006 [P] Tests first: `ScenarioEvaluatorTests.swift`. Cover:
+- [X] T-U09-006 [P] Tests first: `ScenarioEvaluatorTests.swift`. Cover: — Verified 2026-11-12: swift test --package-path Packages/VisualCore --filter VisualCoreExperienceTests: 379 tests in 35 suites passed (ScenarioEvaluatorTests)
   - Each expectation kind passes and fails with a named message: a step result, a step digest, the initial, final, after-restore and after-reset digests, the outcome, and a probe.
   - `actionsHandled != actionsSent` fails as "bypass".
   - An observation with failures cannot pass.
