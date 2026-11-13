@@ -62,7 +62,7 @@
         "#FFE38C"
       ],
       "content": null,
-      "manifest": "Apps/FractalExplorer/FractalExplorerAdapter/scenario-manifest.json"
+      "manifest": "Packages/ExperiencesCreative/FractalExplorer/scenario-manifest.json"
     }
   }
 }

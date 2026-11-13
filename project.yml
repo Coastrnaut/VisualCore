@@ -1,7 +1,7 @@
 # project.yml — repository-root XcodeGen spec: the single source of truth for the unified app VisualCore (the only
 # shippable application target, ADR-0009), the Showcase and the earlier standalone apps not yet adopted, which stay
 # as consumers of the framework and are not shipped (feature 193 retires each after its move into
-# Packages/ExperiencesCreative; A01 Generative Art Studio and A02 Fluid Art Playground are retired). XcodeGen 2.46.0. Generated VisualCore.xcodeproj is gitignored.
+# Packages/ExperiencesCreative; A01, A02 and A03 are retired). XcodeGen 2.46.0. Generated VisualCore.xcodeproj is gitignored.
 # Simulator/CI builds are unsigned (CODE_SIGNING_ALLOWED=NO); device signing comes only from the owner's
 # gitignored Configs/Signing.local.xcconfig via Configs/Signing.xcconfig.
 # The Showcase must never depend on ProjectM engine/preset/bridge modules (FR-F610; scripts/audit_showcase_dependencies.py).
@@ -22,11 +22,6 @@ packages:
   # The creative experiences adopted from the standalone apps (feature 193, UA-F07; migration-plan.md section 2.1).
   ExperiencesCreative:
     path: Packages/ExperiencesCreative
-  FractalExplorerCore:
-    path: Apps/FractalExplorer/FractalExplorerCore
-  # The pure adapter core of A03 (feature 193, UA-F07; research R1).
-  FractalExplorerAdapter:
-    path: Apps/FractalExplorer/FractalExplorerAdapter
   ParticleUniverseCore:
     path: Apps/ParticleUniverse/ParticleUniverseCore
 settings:
@@ -115,102 +110,6 @@ targets:
         TEST_TARGET_NAME: Showcase
     dependencies:
       - target: Showcase
-  FractalExplorer:
-    # A03 Fractal Explorer (feature 025 A03-P00): app shell; complex-plane domain and rendering arrive in Phases 01–02.
-    type: application
-    platform: iOS
-    sources:
-      - path: Apps/FractalExplorer/App
-      # Feature 031 (A03-P06): privacy manifest and the app icon.
-      - path: Apps/FractalExplorer/Resources
-    info:
-      path: Apps/FractalExplorer/Generated/Info.plist
-      properties:
-        CFBundleDisplayName: Fractal Explorer
-        # Feature 029 (FR-A03-405): the share sheet's "Save Image" uses Photos add-only access; the app never calls PhotoKit.
-        NSPhotoLibraryAddUsageDescription: Fractal Explorer saves your captured picture to Photos only when you choose Save Image.
-        CFBundleShortVersionString: "1.0.0"
-        CFBundleVersion: "1"
-        ITSAppUsesNonExemptEncryption: false
-        UILaunchScreen: {}
-        UIApplicationSceneManifest:
-          UIApplicationSupportsMultipleScenes: false
-        UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait, UIInterfaceOrientationLandscapeLeft, UIInterfaceOrientationLandscapeRight]
-        UISupportedInterfaceOrientations~ipad: [UIInterfaceOrientationPortrait, UIInterfaceOrientationPortraitUpsideDown, UIInterfaceOrientationLandscapeLeft, UIInterfaceOrientationLandscapeRight]
-    settings:
-      base:
-        PRODUCT_BUNDLE_IDENTIFIER: dev.visualcore.FractalExplorer
-        PRODUCT_NAME: FractalExplorer
-        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
-        GENERATE_INFOPLIST_FILE: NO
-        ENABLE_USER_SCRIPT_SANDBOXING: NO
-    dependencies:
-      # Feature 026 (A03-P01): the GPU-free domain and the plane viewport; accessible colors.
-      - package: FractalExplorerCore
-        product: FractalExplorerCore
-      - package: VisualCore
-        product: VisualCoreMath
-      - package: VisualCoreRendering
-        product: VisualCoreUI
-      # Feature 027 (A03-P02): GPU render, gestures, palette clock and palettes.
-      - package: VisualCoreRendering
-        product: VisualCoreRendering
-      - package: VisualCore
-        product: VisualCoreScenes
-      - package: VisualCore
-        product: VisualCoreSimulation
-      - package: VisualCore
-        product: VisualCoreParameters
-      # Feature 028 (A03-P03): bookmarks on VisualCore NamedLibrary.
-      - package: VisualCore
-        product: VisualCorePersistence
-      # Feature 030 (A03-P05): empty unless DEBUG || VISUALCORE_AUTOMATION (Release has zero automation symbols).
-      - package: VisualCoreRendering
-        product: VisualCoreAutomation
-    postBuildScripts:
-      # T-A03-604: bundle the shipped components' license texts for the Acknowledgements screen (as A01 and A02).
-      - name: Bundle licenses (T-A03-604)
-        basedOnDependencyAnalysis: false
-        script: |
-          set -e
-          env -i PATH=/usr/bin:/bin:/usr/sbin:/sbin HOME="$HOME" \
-            /usr/bin/python3 "$SRCROOT/scripts/bundle_licenses.py" --out "$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/Licenses"
-      # FR-A03-006: the build fails if the app depends on ProjectM engine/preset/bridge modules.
-      - name: Dependency audit (FR-A03-006)
-        basedOnDependencyAnalysis: false
-        script: |
-          set -e
-          env -i PATH=/usr/bin:/bin:/usr/sbin:/sbin HOME="$HOME" DEVELOPER_DIR="$DEVELOPER_DIR" \
-            /usr/bin/python3 "$SRCROOT/scripts/audit_showcase_dependencies.py" --root "$SRCROOT" --spec project.yml \
-            --target FractalExplorer --sources Apps/FractalExplorer --app "$TARGET_BUILD_DIR/$WRAPPER_NAME"
-  FractalExplorerTests:
-    type: bundle.unit-test
-    platform: iOS
-    sources: [Apps/FractalExplorer/Tests/Unit]
-    info:
-      path: Apps/FractalExplorer/Generated/Tests-Info.plist
-    settings:
-      base:
-        PRODUCT_BUNDLE_IDENTIFIER: dev.visualcore.FractalExplorerTests
-        GENERATE_INFOPLIST_FILE: NO
-    dependencies:
-      - target: FractalExplorer
-      # Feature 031: image comparison for the icon provenance test.
-      - package: VisualCore
-        product: VisualCoreTestSupport
-  FractalExplorerUITests:
-    type: bundle.ui-testing
-    platform: iOS
-    sources: [Apps/FractalExplorer/Tests/UI]
-    info:
-      path: Apps/FractalExplorer/Generated/UITests-Info.plist
-    settings:
-      base:
-        PRODUCT_BUNDLE_IDENTIFIER: dev.visualcore.FractalExplorerUITests
-        GENERATE_INFOPLIST_FILE: NO
-        TEST_TARGET_NAME: FractalExplorer
-    dependencies:
-      - target: FractalExplorer
   ParticleUniverse:
     # A04 Particle Universe (feature 032 A04-P00): app shell; feature 033 (A04-P01) adds the seeded particle domain; the GPU loop arrives in Phase 02.
     type: application
@@ -334,9 +233,8 @@ targets:
         product: GenerativeArtStudioExperience
       - package: ExperiencesCreative
         product: FluidArtPlaygroundExperience
-      - target: FractalExplorerExperience
-      - package: FractalExplorerAdapter
-        product: FractalExplorerAdapterCore
+      - package: ExperiencesCreative
+        product: FractalExplorerExperience
     postBuildScripts:
       - name: Bundle licenses (UA-F04)
         basedOnDependencyAnalysis: false
@@ -351,59 +249,6 @@ targets:
           env -i PATH=/usr/bin:/bin:/usr/sbin:/sbin HOME="$HOME" DEVELOPER_DIR="$DEVELOPER_DIR" \
             /usr/bin/python3 "$SRCROOT/scripts/audit_showcase_dependencies.py" --root "$SRCROOT" --spec project.yml \
             --target VisualCore --sources Apps/VisualCore --app "$TARGET_BUILD_DIR/$WRAPPER_NAME"
-  FractalExplorerExperience:
-    # A03 adopted as an experience of the one app (feature 193, UA-F07; research R1): the standalone app's sources
-    # without its @main and automation files, plus the adapter's presenter, controls, bookmarks and factory. A static
-    # framework linked into the one app until its move into Packages/ExperiencesCreative.
-    type: framework.static
-    platform: iOS
-    sources:
-      - path: Apps/FractalExplorer/App
-        excludes: [FractalExplorerApp.swift, AppAutomation.swift]
-      - path: Apps/FractalExplorer/FractalExplorerAdapter/Experience
-    settings:
-      base:
-        PRODUCT_BUNDLE_IDENTIFIER: dev.visualcore.VisualCore.FractalExplorerExperience
-        PRODUCT_NAME: FractalExplorerExperience
-        GENERATE_INFOPLIST_FILE: YES
-        SKIP_INSTALL: YES
-    dependencies:
-      - package: FractalExplorerCore
-        product: FractalExplorerCore
-      - package: FractalExplorerAdapter
-        product: FractalExplorerAdapterCore
-      - package: VisualCore
-        product: VisualCoreMath
-      - package: VisualCore
-        product: VisualCoreScenes
-      - package: VisualCore
-        product: VisualCoreSimulation
-      - package: VisualCore
-        product: VisualCoreParameters
-      - package: VisualCore
-        product: VisualCorePersistence
-      - package: VisualCore
-        product: VisualCoreDiagnostics
-      - package: VisualCore
-        product: VisualCoreExperience
-      - package: VisualCoreRendering
-        product: VisualCoreRendering
-      - package: VisualCoreRendering
-        product: VisualCoreUI
-      - package: VisualCoreRendering
-        product: VisualCoreExperienceHost
-  FractalExplorerExperienceTests:
-    # The A03 adapter's session and parity tests (feature 193 T-U07-024), hosted by the one app. No package products
-    # of its own: linking a package the app also links makes Xcode build it as a dynamic framework.
-    type: bundle.unit-test
-    platform: iOS
-    sources: [Apps/FractalExplorer/FractalExplorerAdapter/ExperienceTests]
-    settings:
-      base:
-        PRODUCT_BUNDLE_IDENTIFIER: dev.visualcore.FractalExplorerExperienceTests
-        GENERATE_INFOPLIST_FILE: YES
-    dependencies:
-      - target: VisualCore
   VisualCoreTests:
     type: bundle.unit-test
     platform: iOS
@@ -436,9 +281,8 @@ schemes:
         VisualCore: all
         VisualCoreTests: [test]
         VisualCoreUITests: [test]
-        FractalExplorerExperienceTests: [test]
     test:
-      targets: [VisualCoreTests, VisualCoreUITests, FractalExplorerExperienceTests]
+      targets: [VisualCoreTests, VisualCoreUITests]
   Showcase:
     build:
       targets:
@@ -447,14 +291,6 @@ schemes:
         ShowcaseUITests: [test]
     test:
       targets: [ShowcaseTests, ShowcaseUITests]
-  FractalExplorer:
-    build:
-      targets:
-        FractalExplorer: all
-        FractalExplorerTests: [test]
-        FractalExplorerUITests: [test]
-    test:
-      targets: [FractalExplorerTests, FractalExplorerUITests]
   ParticleUniverse:
     build:
       targets:

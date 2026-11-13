@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/ExperiencesCreative",
+    "--scheme",
+    "ExperiencesCreative-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--result-name",
+    "ua-f07-a03-package-272"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --result-name ua-f07-a03-package-272",
+  "elapsed_seconds": 97.166,
+  "exit_code": 0,
+  "finished": "2026-11-13T15:03:30+00:00",
+  "gate": "UA-F07",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F07.a01-a03-package-ios272.log",
+  "log_sha256": "67d7f43c5d12499dcec322629fc9d67368f5dbddcbab77cf1ce49ab54db78b17",
+  "name": "a01-a03-package-ios272",
+  "started": "2026-11-13T15:01:53+00:00",
+  "timed_out": false
+}

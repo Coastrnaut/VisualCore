@@ -2,7 +2,6 @@
 // experiences the app can open: for each an id and a factory. It is empty in this feature, because no experience
 // is integrated yet; an integration adds its line here and nowhere else.
 import FluidArtPlaygroundExperience
-import FractalExplorerAdapterCore
 import FractalExplorerExperience
 import GenerativeArtStudioExperience
 import VisualCoreExperience

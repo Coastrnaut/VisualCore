@@ -78,6 +78,48 @@
       "to": "Apps/VisualCore/Tests/UI/FluidArtPlayground",
       "gate": "UA-F07",
       "commit": "790d3dde169a1f4ce61c8aabd9c9d5ce30c63a2c"
+    },
+    {
+      "from": "Apps/FractalExplorer/FractalExplorerCore/Sources/FractalExplorerCore",
+      "to": "Packages/ExperiencesCreative/FractalExplorer/Core",
+      "gate": "UA-F07",
+      "commit": "the commit of the A03 move"
+    },
+    {
+      "from": "Apps/FractalExplorer/FractalExplorerCore/Tests/FractalExplorerCoreTests",
+      "to": "Packages/ExperiencesCreative/FractalExplorer/CoreTests",
+      "gate": "UA-F07",
+      "commit": "the commit of the A03 move"
+    },
+    {
+      "from": "Apps/FractalExplorer/FractalExplorerCore/Package.swift",
+      "to": "Packages/ExperiencesCreative/Package.swift",
+      "gate": "UA-F07",
+      "commit": "the commit of the A03 move"
+    },
+    {
+      "from": "Apps/FractalExplorer/App",
+      "to": "Packages/ExperiencesCreative/FractalExplorer/Experience",
+      "gate": "UA-F07",
+      "commit": "the commit of the A03 move"
+    },
+    {
+      "from": "Apps/FractalExplorer/Tests/Unit",
+      "to": "Packages/ExperiencesCreative/FractalExplorer/ExperienceTests",
+      "gate": "UA-F07",
+      "commit": "the commit of the A03 move"
+    },
+    {
+      "from": "Apps/FractalExplorer/Tests/Fixtures",
+      "to": "Packages/ExperiencesCreative/FractalExplorer/ExperienceTests/Fixtures",
+      "gate": "UA-F07",
+      "commit": "the commit of the A03 move"
+    },
+    {
+      "from": "Apps/FractalExplorer/Tests/UI",
+      "to": "Apps/VisualCore/Tests/UI/FractalExplorer",
+      "gate": "UA-F07",
+      "commit": "the commit of the A03 move"
     }
   ]
 }

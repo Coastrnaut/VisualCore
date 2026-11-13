@@ -1076,12 +1076,13 @@ class ReleaseCheckTests(unittest.TestCase):
             self.assertEqual(tests[0].needs_simulator, "27.2")
         self.assertEqual(relcheck.kebab("GenerativeArtStudio"), "generative-art-studio")
         names = [s.name for s in relcheck.steps("X")]
-        for required in ["documented-api-fractal-explorer", "host-fractal-explorer-core", "app-fractal-explorer-ios26",
+        for required in ["documented-api-particle-universe", "host-particle-universe-core", "app-particle-universe-ios26",
                          # Feature 193: the adopted experiences' package on both runtimes.
                          "experiences-creative-sim-ios27", "experiences-creative-sim-ios26"]:
             self.assertIn(required, names)
         # Feature 193 (UA-F07): A01 and A02 are retired; no step of their standalone apps remains.
-        self.assertFalse([n for n in names if "generative-art-studio" in n or "fluid-art-playground" in n], names)
+        self.assertFalse([n for n in names if "generative-art-studio" in n or "fluid-art-playground" in n
+                          or "fractal-explorer" in n], names)
 
     def test_select_only_skip_and_unknown(self):
         all_steps = relcheck.steps("X")
@@ -1264,7 +1265,7 @@ class UnifiedAppTargetTests(unittest.TestCase):
                                     "VisualCorePersistence",
                                     "VisualCoreRendering", "VisualCoreUI", "VisualCoreExperienceHost",
                                     "GenerativeArtStudioExperience", "FluidArtPlaygroundExperience",
-                                    "FractalExplorerAdapterCore"])
+                                    "FractalExplorerExperience"])
 
     def test_the_standing_isolation_step_requires_sources(self):
         listing = subprocess.run([sys.executable, str(HERE / "release_check.py"), "--list"],

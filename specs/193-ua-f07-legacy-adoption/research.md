@@ -314,3 +314,16 @@ The dossier files are not edited. The legacy ledger is untouched; its hash is co
   - The visible cost: particles (at most 8 s old) restart once in 10 minutes (adapter difference 6).
   - Debug and simulator builds still need about 45 s to replay a full 10-minute segment. The runner's scenarios are
     short, so they stay within the limit there.
+- **A03 interface tests, move and retirement (T-U07-025, 2026-11-13).**
+  - The ported audit found two real E-12 issues, fixed in the controls:
+    - small red error text only nearly passed contrast; error lines in all three adapters now use the primary
+      colour;
+    - the go-to fields' placeholders clipped at the largest size; each field now has its name as a wrapping label
+      above it and a short placeholder. A vertical field was tried first, but its Return key inserts a newline.
+  - The audit was trimmed to seven stops, leaving out tours and the precision notice (same text styles), so that
+    each audit runs in its own chunk well under the limit (owner rule: tests are short).
+  - The move follows A02:
+    - `FractalExplorerApp.cleanUpCaptures()` became `CaptureCleanup.run()` with the retired `@main` type;
+    - `bookmark-v1.json` moved bit-identical to `ExperienceTests/Fixtures`, and `MigrationTests` reads it there;
+    - `CopyTests` and `PrivacyTests` are adapted as for A02; the privacy test also checks the one app's export
+      compliance key.

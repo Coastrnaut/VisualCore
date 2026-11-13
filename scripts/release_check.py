@@ -89,7 +89,11 @@ STORAGE_RULE_SOURCES = ["Apps/VisualCore/App/DebugSupport/DebugExperience.swift"
                        "Packages/ExperiencesCreative/FluidArtPlayground/Experience/FluidArtPresenter.swift",
                        "Packages/ExperiencesCreative/FluidArtPlayground/Experience/FluidArtControls.swift",
                        "Packages/ExperiencesCreative/FluidArtPlayground/Experience/FluidArtExperience.swift",
-                       "Apps/FractalExplorer/FractalExplorerAdapter/Core", "Apps/FractalExplorer/FractalExplorerAdapter/Experience"]
+                       "Packages/ExperiencesCreative/FractalExplorer/Experience/Adapter",
+                       "Packages/ExperiencesCreative/FractalExplorer/Experience/FractalPresenter.swift",
+                       "Packages/ExperiencesCreative/FractalExplorer/Experience/FractalControls.swift",
+                       "Packages/ExperiencesCreative/FractalExplorer/Experience/FractalBookmarks.swift",
+                       "Packages/ExperiencesCreative/FractalExplorer/Experience/FractalExperience.swift"]
 # The shipped sources that read stored data.
 STORED_DATA_SOURCES = ["Packages/VisualCore/Sources/VisualCoreExperience/SavedStateStore.swift",
                        "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift",
@@ -105,7 +109,11 @@ STORED_DATA_SOURCES = ["Packages/VisualCore/Sources/VisualCoreExperience/SavedSt
                        "Packages/ExperiencesCreative/FluidArtPlayground/Experience/FluidArtPresenter.swift",
                        "Packages/ExperiencesCreative/FluidArtPlayground/Experience/FluidArtControls.swift",
                        "Packages/ExperiencesCreative/FluidArtPlayground/Experience/FluidArtExperience.swift",
-                       "Apps/FractalExplorer/FractalExplorerAdapter/Core", "Apps/FractalExplorer/FractalExplorerAdapter/Experience"]
+                       "Packages/ExperiencesCreative/FractalExplorer/Experience/Adapter",
+                       "Packages/ExperiencesCreative/FractalExplorer/Experience/FractalPresenter.swift",
+                       "Packages/ExperiencesCreative/FractalExplorer/Experience/FractalControls.swift",
+                       "Packages/ExperiencesCreative/FractalExplorer/Experience/FractalBookmarks.swift",
+                       "Packages/ExperiencesCreative/FractalExplorer/Experience/FractalExperience.swift"]
 
 
 def steps(stamp: str) -> list[Step]:
