@@ -91,3 +91,6 @@
   sources it depends on, with a restore key of the same toolchain so a partial match gives an incremental build. The
   real ANGLE and ProjectM builds are not cached in CI: they are never built there (a 12 GB tree and hours of build), and
   publishing the locally built frameworks from a public repository is ruled out (clarification 1).
+- 2026-11-13: the `checks` job (Python validators only) stayed queued for over an hour while the macOS jobs of the
+  same run finished; it now runs on `ubuntu-latest`. The one script test that calls Xcode tools (the real stand-in
+  generation) already skips without `xcrun`.
