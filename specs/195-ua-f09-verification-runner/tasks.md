@@ -149,7 +149,7 @@ Commit after every task (`python3 scripts/tick_task.py`), and push with `python3
   - A record whose handled count is lower than the sent count.
   - A game manifest short by one acceptance scenario.
   - The audits ignore untracked build products.
-- [ ] T-U09-026 [US7] Implement `--audits` in `verify_experiences.py` (research R8):
+- [X] T-U09-026 [US7] Implement `--audits` in `verify_experiences.py` (research R8): — Verified 2026-11-12: verify_experiences.py --audits: 6 PASS lines on today's tree, entitlement named not yet provided (UA-F08); release_check steps evidence-self-test and verify-audits; Catalog/generated-art.json empty; python3 scripts/test_scripts.py: Ran 286 tests, OK
   - Create `Catalog/generated-art.json` (`{"schema": 1, "files": []}`).
   - Run the direct-GL check (`check_app_isolation.py`) and the network check (`check_compliance.py`).
   - Name the entitlement audit "not yet provided (UA-F08)".
