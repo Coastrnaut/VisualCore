@@ -16,7 +16,7 @@ each task. Tests before code. Owner-only items: none. One {device} task. No Visu
   (pattern of `ParticleSessionTests`): playing scene, background, active, one 600 s frame takes at most 8 steps
   (`maxStepsPerFrame`), then 1/60 s frames take the normal count; a replay of the same history gives the same digest
   3 of 3 times; a paused scene takes 0 steps for the gap.
-- [ ] T-A04-503 [US1] Acceptance on sim-27.2 (check `resume-ios27`) (SC-A04-501).
+- [X] T-A04-503 [US1] Acceptance on sim-27.2 (check `resume-ios27`) (SC-A04-501). — Verified 2026-11-13: ParticleResumeBoundTests pass on sim-27.2 within the package run (A04-P05/experiences-ios27) (SC-A04-501)
 
 ## Phase 3: User Story 2 — Slow frames lower drawn detail (P1)
 
