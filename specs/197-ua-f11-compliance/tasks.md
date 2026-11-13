@@ -184,4 +184,4 @@ Appended by `/speckit-converge` (T-U11-040, round 1, 2026-11-13).
 
 Appended by `/speckit-converge` (T-U11-040, round 2, 2026-11-13).
 
-- [ ] T-U11-043 Write `docs/legal/distinctiveness-matrix.json` and `.md` atomically in `scripts/check_distinctiveness.py --write` (temporary file in the same folder, then rename; an interrupted write leaves the previous files), with a test in `scripts/tests/test_distinctiveness.py`, per spec edge case "Cancellation and interruption" and plan: lifecycle (partial)
+- [X] T-U11-043 Write `docs/legal/distinctiveness-matrix.json` and `.md` atomically in `scripts/check_distinctiveness.py --write` (temporary file in the same folder, then rename; an interrupted write leaves the previous files), with a test in `scripts/tests/test_distinctiveness.py`, per spec edge case "Cancellation and interruption" and plan: lifecycle (partial) — Verified 2026-11-13: check_distinctiveness --write uses write_atomically (temp file + os.replace); test: an interrupted write keeps both previous files and leaves no temporary file (24 tests OK); regenerated matrix byte-identical; --check PASS (distinctiveness-r2)
