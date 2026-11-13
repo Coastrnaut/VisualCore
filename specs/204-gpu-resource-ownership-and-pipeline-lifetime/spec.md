@@ -167,7 +167,9 @@ runtimes and record them.
 - **Eviction while drawing:** a program evicted during a frame stays valid until its holder releases it.
 - **Budget exceeded:** creating a depth target over the session budget fails with the budget error and allocates
   nothing.
-- **Many variants:** the cache stays bounded at 64 cached programs; held evicted programs are bounded by what scenes hold.
+- **Many variants:** the cache stays bounded at 64 cached programs; retired programs are bounded by what scenes hold.
+  A scene that drops an evicted program without releasing it leaves it retired until the context ends, where it is
+  released by the registry (registry-owned, so not counted as a scene leak), the same as cached programs today.
 - **Memory pressure and backgrounding:** handled by the existing session lifecycle (UA-F03); this feature adds no new
   state that survives a context.
 - **Corrupted or newer-version data:** not applicable (nothing persisted).
