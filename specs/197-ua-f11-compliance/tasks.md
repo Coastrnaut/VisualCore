@@ -54,7 +54,7 @@ Device-only items: none, so no {device} task.
 
 ## Phase 5: User Story 3 — No advertising, analytics or tracking (P1)
 
-- [ ] T-U11-012 [P] [US3] Tests first in `scripts/tests/test_no_tracking.py`: fixture apps (directories with a
+- [X] T-U11-012 [P] [US3] Tests first in `scripts/tests/test_no_tracking.py`: fixture apps (directories with a — Verified 2026-11-13: scripts/tests/test_no_tracking.py 14 tests OK (framework link, symbol, library name, identifier bytes, unused allowance, whole identifiers, chunk boundary, schema 2, missing app)
   fake executable, `--symbols-file`, `--libraries-file`) planting a linked `AdSupport` framework, an
   `ASIdentifierManager` symbol, a deny-listed library name in a bundled file, and an unused allowance; each fails and
   names its file; a clean fixture passes; a schema-2 deny list is refused.
