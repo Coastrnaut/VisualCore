@@ -51,7 +51,7 @@ API-baseline and reference-regression tasks apply.
 
 ## Phase 5: User Story 3 — Offscreen targets with depth (P2)
 
-- [ ] T-R02F04-011 [US3] Tests first in `Packages/VisualCoreRendering/Tests/VisualCoreRenderingTests/DepthTargetTests.swift`:
+- [X] T-R02F04-011 [US3] Tests first in `Packages/VisualCoreRendering/Tests/VisualCoreRenderingTests/DepthTargetTests.swift`: — Verified 2026-11-13: DepthTargetTests 6 tests: nearer colour wins in both orders (control without depth shows last draw), release frees framebuffer and renderbuffer, stale after recreation, invalid sizes, budget smaller than one target leaves nothing allocated, pooled depth targets distinct; pass on 26.5 and 27.2
   a depth target draws two overlapping triangles far-then-near and near-then-far with `RenderState.opaque3D`; the
   nearer colour wins both times; release frees colour and depth (`liveCount[.renderbuffer]` back to 0); context
   recreation rejects the old target; zero or over-limit size throws with nothing allocated; a host with a budget
