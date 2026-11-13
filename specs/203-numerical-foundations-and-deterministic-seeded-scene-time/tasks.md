@@ -97,7 +97,7 @@ none (no {owner} task). VisualCore changes, so the documentation, API-baseline a
 - [X] T-R02F03-027 Reference regression chunk 2: `python3 scripts/release_check.py --only — Verified 2026-11-13: release_check reference-test-anglerendering-ios27/26 and projectm-reference-ios27/26: 4/4 PASS, regression 7 of 7 (reference-2)
   reference-test-anglerendering-ios27 reference-test-anglerendering-ios26 projectm-reference-ios27
   projectm-reference-ios26` (check `reference-2`).
-- [ ] T-R02F03-028 Script tests `python3 scripts/test_scripts.py` (check `script-tests`).
+- [X] T-R02F03-028 Script tests `python3 scripts/test_scripts.py` (check `script-tests`). — Verified 2026-11-13: python3 scripts/test_scripts.py PASS with test_check_doc_names (script-tests)
 - [ ] T-R02F03-029 Auto-Creator.md section 13 row R02-F03 as built via `docs/catalog/shared-feature-map.json` and
   `render_autocreator.py`; `validate_autocreator.py`, `validate_docs.py`, `migration_baseline.py verify`; CI of a
   commit with all changes finished with success.
