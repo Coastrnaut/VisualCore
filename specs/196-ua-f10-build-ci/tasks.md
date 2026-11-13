@@ -82,7 +82,7 @@ Independent test: planted second shippable target, undeclared target and reused 
 - [X] T-U10-016 [US5] Script tests first for the new `release_check.py` steps: names, limits below 600 s, one — Verified 2026-11-13: scripts/tests/test_release_steps.py: every unified-app step limited below 600 s, named steps present, no interface chunk names an accessibility audit class and each runs without building, app-release-symbols forbids vc_ci_angle_standin, verification steps follow the registrations, the whole-scheme VisualCore steps are gone; test_scripts.py 374 OK
   `verify-<id>-ios27/26` per registration, no audit class in any interface chunk, `app-release-symbols` forbids
   `vc_ci_angle_standin`.
-- [ ] T-U10-017 [US5] Add the unified-app steps to `scripts/release_check.py` (research R5): `app-build-for-testing-ios27`,
+- [X] T-U10-017 [US5] Add the unified-app steps to `scripts/release_check.py` (research R5): `app-build-for-testing-ios27`, — Verified 2026-11-13: release_check.py unified_app_steps: app-build-for-testing-ios27, app-unit-ios27 (guard on the unit sources), 11 interface chunks with --parallel 2 and test-without-building (audit classes left to the device campaign; the shared audit() runs only with VC_RUN_AUDITS=1), verify-<id>-ios27/26 from Catalog/registrations.json, app-release-build, app-release-symbols, app-privacy-manifest, measure-build-check; whole-scheme app-visual-core steps removed
   `app-unit-ios27`, `app-ui-ios27-<chunk>` (the UA-F07 chunk table without the four audit classes),
   `verify-<id>-ios27/26` from `Catalog/registrations.json`, `app-release-build`, `app-release-symbols`,
   `app-privacy-manifest`, `measure-build`; replace the whole-scheme `app-visual-core-ios27/26` steps (FR-U10-040 to
