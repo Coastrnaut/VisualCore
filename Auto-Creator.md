@@ -523,8 +523,10 @@ recorded. The contract is what "implemented" means in this project.
 
 `X-<code>` is recorded only from sealed evidence of these commands (details in section 22.2): the experience's
 host tests; the nine scenarios on the iOS 27.x and iOS 26.5 simulators through the verification runner; the UI
-tests and accessibility audit of the experience in the unified app; the no-placeholder audits; and, when the
-experience changed the framework, the API checks and the ProjectM reference regression.
+tests of the experience in the unified app; the no-placeholder audits; and, when the experience changed the
+framework, the API checks and the ProjectM reference regression. The system accessibility audits
+(`performAccessibilityAudit`, at the default and the largest text size) are not part of an X gate: they run in the
+device campaign (section 23; owner ruling of 2026-11-13).
 
 Capabilities that only hardware can prove (microphone signal quality, thermal behavior, real frame pacing, haptics)
 are listed for the experience as *pending hardware verification* and become tasks of the device campaign. Core
@@ -2752,8 +2754,13 @@ builds of both modules.
   experience and arguments that erase the app's data and skip the welcome; none of it is in a release build.
 - The app's tests run with `python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime <27.2|26.5> --kind
   <phone|tablet>`: the simulator is chosen by runtime and kind (for a phone the narrowest available one), and
-  the enumeration guard runs on the log. A run is made in chunks of whole test classes with `--only-testing`,
-  each under ten minutes; the guard then covers the classes of the chunk.
+  the enumeration guard runs on the log. A run is made in chunks of whole test classes or single methods with
+  `--only-testing`, each under ten minutes; the guard then covers exactly the classes and methods of the chunk.
+  A pass builds once (`--action build-for-testing`) and runs each chunk with `--action test-without-building`,
+  and the UI test classes may run in parallel simulator clones (owner ruling of 2026-11-13). The interface
+  evidence of a gate is one pass on the iOS 27.x phone; the iOS 26.5 runtime is covered by the verification
+  runner and the package tests, and the tablet and iOS 26.5 interface passes run once before
+  ImplementationLock-100. The system accessibility audits run only in the device campaign.
 - As built by UA-F04: settings and about are list rows above the tiles, and the way back from a route is a row
   of its content (a navigation bar clips text at the largest sizes and keeps its buttons below 44 points); the
   search is a text field in the first row; a registration's factory receives the stored reduce-motion and
@@ -3162,8 +3169,10 @@ Connect, the Paid Apps agreement, the price, the Family Sharing choice and a san
 Native controls with VoiceOver labels and stable identifiers; Dynamic Type through XXXL without clipped controls;
 iPhone and iPad layouts in the orientations each experience supports; Reduce Motion and Reduce Flashing honored by
 every experience; no rule or state conveyed by color alone; meaningful empty, permission-denied and error states;
-the flash limiter in every emissive pipeline. Accessibility audits run in the UI tests of each experience. Manual
-VoiceOver testing on devices is recorded and is non-gating.
+the flash limiter in every emissive pipeline. The labels, identifiers and 44-point targets are checked by each
+experience's tests; the system accessibility audits run in the device campaign, all of them together (owner ruling
+of 2026-11-13: audits wait until device testing). Manual VoiceOver testing on devices is recorded and is
+non-gating.
 
 ### 15.4 Licensing and originality
 
@@ -5898,7 +5907,7 @@ launches to a rendered interactive frame through the real renderer; responds to 
 rejects invalid actions without changing state; is deterministic for a seed; saves, restores to the same digest
 after relaunch and resets cleanly; reaches its real outcome through the real reducer (a game is won and lost by
 its exact rules; a creative tool produces and keeps work); suspends and resumes; releases every GPU resource on
-exit and re-enters; cancels preparation; isolates failures; passes its accessibility audit; and has all its
+exit and re-enters; cancels preparation; isolates failures; and has all its
 content: every required feature and fixture of a creative experience; for a Round 2 game the 100-level catalog,
 every level generated from its seed and certified by the solver with a stored witness, and the 80 acceptance
 scenarios; for a Round 3 or 4 game the 100-level manifest, the 80 acceptance scenarios and the 50 fault-injection

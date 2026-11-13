@@ -59,9 +59,14 @@ evidence commands are found as described in Auto-Creator.md §19. Simulators are
    **Use multiple agents wherever they make the work faster** (owner ruling of 2026-11-12): independent source and
    test files of one feature, read-heavy audits, and experiences that touch different files run in parallel
    agents; coupled design steps stay with the lead. At most ten concurrent agents and one writer per file. Agents
-   do not commit, push or run heavy builds; the lead invokes every Spec Kit skill, runs the builds one at a time
-   in the foreground (10 minutes or less per command, split with `--only`/`--skip`), retests every agent result
+   do not commit, push or run heavy builds; the lead invokes every Spec Kit skill, runs the builds in the
+   foreground (10 minutes or less per command, split with `--only`/`--skip`), retests every agent result
    before a task is ticked (an agent's report is not evidence) and commits.
+   **Faster tests** (owner ruling of 2026-11-13): an app test pass builds once (`xcodebuild_app.py --action
+   build-for-testing`) and runs its chunks with `--action test-without-building`; UI test classes may run in
+   parallel simulator clones. **All system accessibility audits wait until device testing**: they are not run
+   for gates or experiences before the device campaign. A gate's interface evidence is one pass on the iOS 27.x
+   phone; iOS 26.5 is covered by the verification runner and package tests.
    **No open-ended waits** (owner ruling of 2026-11-12): nothing is waited for without a limit. App tests run
    through `scripts/xcodebuild_app.py`, which stops a run after `--max-seconds` (default 540) and names the test
    it was on; a run that would not fit is split into chunks of whole test classes with `--only-testing`. A CI run

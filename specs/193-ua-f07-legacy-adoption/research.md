@@ -383,3 +383,7 @@ The dossier files are not edited. The legacy ledger is untouched; its hash is co
   The owner asked on 2026-11-13 why the work moves slowly. This follows the owner's rule that tests are short and
   work keeps moving. A single-method chunk (`i1a`) passes its test but trips the enumeration guard, because the
   guard expects the whole class; the audit chunks run per class.
+- 2026-11-13, owner ruling: all system accessibility audits wait until device testing, and app test passes build once
+  and may run UI test classes in parallel simulator clones. The audit chunks of the iOS 27.2 phone that already
+  passed (g1, h1, i1a, i1b) are kept; A04's audit chunk `j1` is not run for this gate. FR-U07-022 and SC-U07-004 are
+  corrected; CLAUDE.md rule 7, Auto-Creator.md sections 6.4, 13 (app tests), 15.3 and 22.2 are edited in place.

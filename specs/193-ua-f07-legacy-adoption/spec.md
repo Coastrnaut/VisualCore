@@ -286,7 +286,8 @@ experience was verified on both runtimes.
 - **FR-U07-022**: The controls of each adopted experience MUST meet rule E-12. Every control has a VoiceOver label,
   the controls fit at the largest accessibility text size without clipping, touch targets are at least 44 by 44
   points, and information is never shown by colour alone. The ported accessibility audits run at the default and
-  the largest text size.
+  the largest text size in the device campaign (corrected 2026-11-13, owner ruling: all accessibility audits wait
+  until device testing; the runs made before the ruling are kept as evidence).
 - **FR-U07-017**: Each adopted experience MUST declare its quality levels with names the catalog shows. A quality
   change MUST NOT change the digest (E-13): a level acts only on how the state is shown (clarification 2).
 - **FR-U07-018**: Time in an adopted experience MUST advance with the experience's fixed steps, not the device
