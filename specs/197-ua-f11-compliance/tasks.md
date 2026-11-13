@@ -103,7 +103,7 @@ Device-only items: none, so no {device} task.
   remove.
 - [X] T-U11-024 [P] [US6] Write `Configs/known-game-titles.json` (schema 1, at least 50 well-known commercial game — Verified 2026-11-13: Configs/known-game-titles.json schema 1 with 100 unique titles; no launch name matches
   titles, no web lookup).
-- [ ] T-U11-025 [US6] Write `scripts/check_distinctiveness.py` (`--write`, `--check`, `--catalog`, `--titles`)
+- [X] T-U11-025 [US6] Write `scripts/check_distinctiveness.py` (`--write`, `--check`, `--catalog`, `--titles`) — Verified 2026-11-13: scripts/check_distinctiveness.py generated docs/legal/distinctiveness-matrix.json and .md; its tests pass (script-tests)
   and `--json`, producing `docs/legal/distinctiveness-matrix.json` (data-model §5: score "rounded to 4 decimals", close pairs first)
   and `docs/legal/distinctiveness-matrix.md`; generate both.
 - [ ] T-U11-026 [US6] Acceptance: `python3 scripts/check_distinctiveness.py --check` passes with 4,950 pairs and 0
