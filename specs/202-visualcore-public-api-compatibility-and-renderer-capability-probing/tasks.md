@@ -15,7 +15,7 @@ task. Owner-only items: none.
 
 Independent test: a fresh host's report holds every value of FR-R02F02-001 and 0 floor findings on both runtimes.
 
-- [ ] T-R02F02-002 [P] [US1] Tests first in `Packages/VisualCoreRendering/Tests/VisualCoreRenderingTests/RenderCapabilitiesProbeTests.swift`:
+- [X] T-R02F02-002 [P] [US1] Tests first in `Packages/VisualCoreRendering/Tests/VisualCoreRenderingTests/RenderCapabilitiesProbeTests.swift`: — Verified 2026-11-13: RenderCapabilitiesProbeTests.swift: fresh host reports every new value at or above the ES 3.0 floors, floor check lists a planted low value and skips absent ones, a failed query gives nil, a pre-feature report decodes with the new values absent; 5/5 pass on sim-27.2 (probe-tests-ios27)
   every new value present on a fresh host; `floorFindings()` empty on the simulator and listing a planted low value;
   a value whose query fails is nil (pure helper with an injected reader); a JSON report without the new keys decodes
   with them nil.
