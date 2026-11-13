@@ -215,8 +215,10 @@ check confirms every name it cites exists in the public interface.
 
 - **Existing outputs:** the golden sequences of the existing generators and every committed scenario digest of A01–A04
   stay byte-identical; new helpers are additions only.
-- **Empty or degenerate input:** empty lists, a single element, all-zero weights, a zero or negative modulus or grid
-  step are reported, never answered with a value or a crash.
+- **Empty or degenerate input:** empty lists, all-zero weights, a zero or negative modulus or grid step are reported
+  by pick, weighted choice, wrapping and quantization, never answered with a value or a crash. The low-level
+  draw-to-index mapping requires a count of at least 1 as a documented precondition, like the standard library's
+  random-in-range; callers that cannot guarantee it use pick or weighted choice.
 - **Non-finite numbers:** NaN and infinities never reach a digest; helpers either replace them with a stated fallback
   or report them.
 - **Corrupted or newer-version data:** a saved generator state that is short, all zero, or of a newer version is
@@ -268,8 +270,9 @@ check confirms every name it cites exists in the public interface.
 **Shader hash twin (story 4)**
 - **FR-R02F03-040**: CPU functions MUST compute exactly what the shader's `vc_pcg`, `vc_hash11`, `vc_hash21` and
   `vc_hash22` compute (float inputs by bit pattern), with golden values derived from the shader source.
-- **FR-R02F03-041**: A simulator test MUST render a grid of at least 64 inputs with the shader hash and match the CPU
-  twin exactly.
+- **FR-R02F03-041**: A simulator test MUST render a grid of at least 64 inputs with the shader integer hash `vc_pcg`
+  and match the CPU twin exactly. The float hashes are compared with the shader formula on the CPU only, because
+  the GPU's integer-to-float rounding is not specified tightly enough for exact float parity.
 
 **Numeric hygiene (story 5)**
 - **FR-R02F03-050**: A helper MUST return a finite value or a stated fallback for any input.
