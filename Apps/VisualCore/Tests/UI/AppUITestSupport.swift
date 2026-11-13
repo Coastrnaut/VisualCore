@@ -12,6 +12,8 @@ enum VC {
     static let fixture = "-vcFixtureCatalog"
     static let reset = "-vcResetData"
     static let skipWelcome = "-vcSkipWelcome"
+    /// The real catalog with nothing available (the empty launcher), since A01–A03 are integrated.
+    static let nothingAvailable = "-vcNothingAvailable"
     static let openExperience = "-openExperience"
     static let damagedCatalog = "-vcDamagedCatalog"
     static let seedData = "-vcSeedData"

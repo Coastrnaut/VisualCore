@@ -132,7 +132,7 @@ final class LauncherUITests: XCTestCase {
 
     @MainActor
     func testTheRealCatalogShowsTheEmptyStatementAndNoTile() {
-        let app = launchApp(arguments: [VC.reset, VC.skipWelcome])
+        let app = launchApp(arguments: [VC.reset, VC.skipWelcome, VC.nothingAvailable])
         waitFor(element(app, "vc.route.catalog"))
         waitFor(element(app, "vc.empty"), timeout: VC.wait)
         XCTAssertEqual(tile(app).count, 0)
@@ -170,7 +170,7 @@ final class LauncherUITests: XCTestCase {
         waitFor(element(app, "vc.route.catalog"))
         waitFor(tile(app).firstMatch, timeout: VC.wait)
         try audit(app, "catalog", largeText: largeText)
-        let empty = relaunch(app, arguments: [VC.reset, VC.skipWelcome], largeText: largeText)
+        let empty = relaunch(app, arguments: [VC.reset, VC.skipWelcome, VC.nothingAvailable], largeText: largeText)
         waitFor(element(empty, "vc.empty"))
         try audit(empty, "catalog, empty", largeText: largeText)
     }

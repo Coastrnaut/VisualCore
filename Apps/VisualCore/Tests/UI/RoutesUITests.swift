@@ -115,8 +115,8 @@ final class RoutesUITests: XCTestCase {
     func testAnExperienceThatIsNoLongerAvailableLeadsToTheCatalog() {
         let app = launchApp(arguments: Self.fresh)
         openFirstFree(app)
-        // Without the fixture the real catalog has no available experience: the stored experience cannot open.
-        let second = relaunch(app, arguments: [VC.skipWelcome])
+        // With nothing available the stored experience cannot open.
+        let second = relaunch(app, arguments: [VC.skipWelcome, VC.nothingAvailable])
         waitFor(element(second, "vc.route.catalog"))
         waitFor(element(second, "vc.empty"), timeout: VC.wait)
         XCTAssertFalse(element(second, "vc.route.experience").exists)

@@ -37,10 +37,11 @@ final class AppModelTests: XCTestCase {
         let report = manifest.registryReport(registered: registered)
         XCTAssertTrue(report.isMatch, "missing \(report.missingRegistrations), unexpected "
             + "\(report.unexpectedRegistrations), duplicates \(report.duplicates)")
-        // Today no experience is integrated: none registered, none available.
+        // A01–A03 are integrated (X-A01 to X-A03 pass): registered and available, nothing else.
         XCTAssertEqual(registered.count, manifest.available.count)
-        XCTAssertEqual(registered, [])
-        XCTAssertEqual(manifest.available.map(\.id), [])
+        XCTAssertEqual(registered.map(\.rawValue), ["a01.generative-art-studio", "a02.fluid-art-playground",
+                                                     "a03.fractal-explorer"])
+        XCTAssertEqual(manifest.available.map(\.id), registered)
     }
 
     // MARK: Candidates (feature 193, FR-U07-021; clarification 4)
@@ -63,26 +64,27 @@ final class AppModelTests: XCTestCase {
     /// `-vcCandidates` makes the candidates' entries available and registers them; nothing else changes.
     func testTheCandidatesArgumentMakesTheCandidatesAvailableAndRegistersThem() throws {
         let storage = try TestStorage(self)
-        let id = try XCTUnwrap(ExperienceID(rawValue: "a01.generative-art-studio"))
+        let id = try XCTUnwrap(ExperienceID(rawValue: "a04.particle-universe"))
         let candidate = DebugExperience.registration(for: id)
+        let integrated = ExperienceRegistry.all.map(\.id)
         let base = try storage.environment(catalog: bundled("experiences"), categories: bundled("categories"),
-                                       registry: [], arguments: [DebugLaunch.candidatesArgument])
+                                       registry: ExperienceRegistry.all, arguments: [DebugLaunch.candidatesArgument])
         let environment = DebugLaunch.environment(base: base, candidates: [candidate])
-        XCTAssertEqual(environment.registry.map(\.id), [id])
+        XCTAssertEqual(environment.registry.map(\.id), integrated + [id])
         let categories = try CategoryList(data: try XCTUnwrap(environment.categoriesData))
         let manifest = try CatalogManifest(data: try XCTUnwrap(environment.catalogData), categories: categories)
-        XCTAssertEqual(manifest.available.map(\.id), [id], "only the candidate is available")
+        XCTAssertEqual(manifest.available.map(\.id), integrated + [id], "the integrated ones and the candidate")
         XCTAssertTrue(manifest.registryReport(registered: environment.registry.map(\.id)).isMatch)
 
         let model = AppModel(environment: environment)
-        XCTAssertEqual(model.shown.map(\.id), [id], "the launcher shows the candidate")
+        XCTAssertEqual(model.shown.map(\.id), integrated + [id], "the launcher shows the candidate too")
 
         // Without the argument nothing changes.
         let plain = try storage.environment(catalog: bundled("experiences"), categories: bundled("categories"),
-                                        registry: [])
+                                        registry: ExperienceRegistry.all)
         let unchanged = DebugLaunch.environment(base: plain, candidates: [candidate])
         XCTAssertEqual(unchanged.catalogData, plain.catalogData)
-        XCTAssertTrue(unchanged.registry.isEmpty)
+        XCTAssertEqual(unchanged.registry.map(\.id), integrated)
         XCTAssertFalse(DebugLaunch.unknownArguments(in: [DebugLaunch.candidatesArgument]).contains("-vcCandidates"))
     }
 
@@ -92,13 +94,14 @@ final class AppModelTests: XCTestCase {
         XCTAssertEqual(Set(ScenarioLaunch.targets().keys), all)
     }
 
-    func testTheRealCatalogGivesTheEmptyLauncher() throws {
+    /// The real catalog with the real registry shows the integrated experiences (A01–A03 since their X gates).
+    func testTheRealCatalogShowsTheIntegratedExperiences() throws {
         let storage = try TestStorage(self)
         let model = AppModel(environment: storage.environment(catalog: try bundled("experiences"),
                                                               categories: try bundled("categories"),
                                                               registry: ExperienceRegistry.all))
-        XCTAssertEqual(model.launcher, .empty)
-        XCTAssertEqual(model.shown.map(\.id), [])
+        XCTAssertNotEqual(model.launcher, .empty)
+        XCTAssertEqual(model.shown.map(\.id), ExperienceRegistry.all.map(\.id))
         XCTAssertEqual(model.diagnostics.registryMismatches, [])
         XCTAssertNil(model.diagnostics.preferencesNote)
         XCTAssertTrue(model.showWelcome, "a first start shows the welcome")
@@ -458,7 +461,7 @@ final class AppModelTests: XCTestCase {
             XCTAssertEqual(QualityDeclaration.problems(profile: profile, tierCount: profile.count,
                                                        catalogNames: names), [], "\(registration.id)")
         }
-        XCTAssertEqual(ExperienceRegistry.all.count, 0, "no experience is integrated yet")
+        XCTAssertEqual(ExperienceRegistry.all.count, 3, "A01–A03 are integrated")
     }
 
     /// FR-U06-013: a pinned level is in force when the first frame is drawn, and the record says so.

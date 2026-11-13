@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "python3",
+    "scripts/release_check.py",
+    "--only",
+    "app-ui-ios27-d",
+    "app-ui-ios27-b"
+  ],
+  "command": "python3 scripts/release_check.py --only app-ui-ios27-d app-ui-ios27-b",
+  "elapsed_seconds": 427.425,
+  "exit_code": 0,
+  "finished": "2026-11-13T19:50:29+00:00",
+  "gate": "R02-F26",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-F26.baseline-app-ui-d.log",
+  "log_sha256": "4f846e521f2daaf9101a313c7be1eb155ca43a0a37c43a7b4890e709665546ee",
+  "name": "baseline-app-ui-d",
+  "started": "2026-11-13T19:43:22+00:00",
+  "timed_out": false
+}

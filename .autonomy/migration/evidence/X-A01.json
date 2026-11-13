@@ -1,0 +1,77 @@
+{
+  "branch": "main",
+  "dirty": true,
+  "dirty_paths": [
+    "docs/verification/a01.generative-art-studio/summary-26.5.json",
+    "docs/verification/a01.generative-art-studio/summary-27.2.json",
+    "docs/verification/a02.fluid-art-playground/summary-26.5.json",
+    "docs/verification/a02.fluid-art-playground/summary-27.2.json",
+    "docs/verification/a03.fractal-explorer/summary-26.5.json",
+    "docs/verification/a03.fractal-explorer/summary-27.2.json"
+  ],
+  "failed_attempts": [
+    {
+      "command": "'python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test' --result-name xa01-core --only-testing GenerativeArtStudioCoreTests",
+      "exit_code": 127,
+      "log": ".autonomy/logs/migration/X-A01.host-core.log",
+      "log_sha256": "8c2dba6902485dfc0cea6eeeaa939476dd2963b2e133c7ac934d11029ca89b17",
+      "name": "host-core",
+      "timed_out": false
+    },
+    {
+      "command": "'python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test' --result-name xa01-exp --only-testing GenerativeArtStudioExperienceTests",
+      "exit_code": 127,
+      "log": ".autonomy/logs/migration/X-A01.host-experience.log",
+      "log_sha256": "7658487d4bf2ecbdfb4f64a2b8ef909bf97d7027f97e3bc5a5f2dd9bcd39587e",
+      "name": "host-experience",
+      "timed_out": false
+    }
+  ],
+  "gate": "X-A01",
+  "ledger": "migration",
+  "passing_checks": [
+    {
+      "command": "python3 scripts/verify_experiences.py --only a01.generative-art-studio --audits",
+      "exit_code": 0,
+      "finished": "2026-11-13T19:20:34+00:00",
+      "log": ".autonomy/logs/migration/X-A01.audits.log",
+      "log_sha256": "77e32efd667e3a390f942c9a713d58031b6963d48b209f090f378e933bbe86d7",
+      "name": "audits"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --result-name xa01-core --only-testing GenerativeArtStudioCoreTests",
+      "exit_code": 0,
+      "finished": "2026-11-13T19:20:55+00:00",
+      "log": ".autonomy/logs/migration/X-A01.host-core-r2.log",
+      "log_sha256": "3091122bcc6b521ce0290b2b6cc36847f76f7eb2d8730f50205c6c0a8b4bc1ec",
+      "name": "host-core-r2"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --result-name xa01-exp --only-testing GenerativeArtStudioExperienceTests",
+      "exit_code": 0,
+      "finished": "2026-11-13T19:21:47+00:00",
+      "log": ".autonomy/logs/migration/X-A01.host-experience-r2.log",
+      "log_sha256": "7acd168d1be56f2d5372b4cabd21bf162cbf1bf0bb61b6e8fda22e7f7e15c205",
+      "name": "host-experience-r2"
+    },
+    {
+      "command": "python3 scripts/verify_experiences.py --only a01.generative-art-studio --runtime 26",
+      "exit_code": 0,
+      "finished": "2026-11-13T19:20:33+00:00",
+      "log": ".autonomy/logs/migration/X-A01.sim26.log",
+      "log_sha256": "f558141f04d2402cff0f66a43c043f8f9455ce41a4a849cd62118c91dd0dc372",
+      "name": "sim26"
+    },
+    {
+      "command": "python3 scripts/verify_experiences.py --only a01.generative-art-studio --runtime 27",
+      "exit_code": 0,
+      "finished": "2026-11-13T19:20:17+00:00",
+      "log": ".autonomy/logs/migration/X-A01.sim27.log",
+      "log_sha256": "56c40ca0a8d8e17a62a324266c4ee925dfc4f2fa17174ad52485b1cd15d0eeb0",
+      "name": "sim27"
+    }
+  ],
+  "revision": "d883cb1e00c9023b2a66094948be4d1a98a90ce3",
+  "revision_number": 1,
+  "sealed": "2026-11-13T19:25:10+00:00"
+}

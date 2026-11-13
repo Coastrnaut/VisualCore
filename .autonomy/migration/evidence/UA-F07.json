@@ -1,0 +1,1662 @@
+{
+  "branch": "main",
+  "dirty": false,
+  "dirty_paths": [],
+  "failed_attempts": [
+    {
+      "command": "git diff -M --exit-code af887e3 HEAD -- Apps/GenerativeArtStudio/Core Packages/ExperiencesCreative/GenerativeArtStudio/Core Packages/ExperiencesCreative/GenerativeArtStudio/CoreTests",
+      "exit_code": 1,
+      "log": ".autonomy/logs/migration/UA-F07.a01-core-tests-unchanged-after-move.log",
+      "log_sha256": "9f8b89914cc26f7c82a142f9a64d3558bc15d49dd8ec5693cecf80b4d2532c82",
+      "name": "a01-core-tests-unchanged-after-move",
+      "timed_out": false
+    },
+    {
+      "command": "git diff -M --exit-code af887e3 HEAD -- Apps/GenerativeArtStudio/Core/Sources Apps/GenerativeArtStudio/Core/Tests Packages/ExperiencesCreative/GenerativeArtStudio/Core Packages/ExperiencesCreative/GenerativeArtStudio/CoreTests",
+      "exit_code": 1,
+      "log": ".autonomy/logs/migration/UA-F07.a01-core-unchanged-after-move-r2.log",
+      "log_sha256": "e51a12529870965e9b807194f57e0e2f5e110d81f023f9b4434ab93831489aa4",
+      "name": "a01-core-unchanged-after-move-r2",
+      "timed_out": false
+    },
+    {
+      "command": "python3 scripts/check_test_map.py --map specs/193-ua-f07-legacy-adoption/test-map.csv --old Apps/GenerativeArtStudio/Tests/UI --new Apps/VisualCore/Tests/UI --log .autonomy/logs/app-tests/ua-f07-phone-ios27-g1.log .autonomy/logs/app-tests/ua-f07-phone-ios27-g2.log .autonomy/logs/app-tests/ua-f07-phone-ios27-g3.log .autonomy/logs/app-tests/ua-f07-phone-ios27-b.log",
+      "exit_code": 1,
+      "log": ".autonomy/logs/migration/UA-F07.a01-test-map-r2.log",
+      "log_sha256": "41b57f6bd0ede8a7d1ca14df552e916d956742c433a0e408bc83a07dc4958916",
+      "name": "a01-test-map-r2",
+      "timed_out": false
+    },
+    {
+      "command": "python3 scripts/check_test_map.py --map specs/193-ua-f07-legacy-adoption/test-map.csv --old Apps/GenerativeArtStudio/Tests/UI --new Apps/VisualCore/Tests/UI --log .autonomy/logs/app-tests/ua-f07-phone-ios27-g1.log .autonomy/logs/app-tests/ua-f07-phone-ios27-g2.log .autonomy/logs/app-tests/ua-f07-phone-ios27-g3.log .autonomy/logs/app-tests/ua-f07-candidates-ios27.log",
+      "exit_code": 1,
+      "log": ".autonomy/logs/migration/UA-F07.a01-test-map.log",
+      "log_sha256": "033ea5a8d3bbba7351e3d432175f2fc946c4939e30a1c13f98cde5f7576489ce",
+      "name": "a01-test-map",
+      "timed_out": false
+    },
+    {
+      "command": "python3 scripts/verify_experiences.py --only a01.generative-art-studio --runtime 27",
+      "exit_code": 1,
+      "log": ".autonomy/logs/migration/UA-F07.a01-verify-27.log",
+      "log_sha256": "52ae786b22e836b4b50279c3971d454624517e8480de8728cb6b2ed562b2a77e",
+      "name": "a01-verify-27",
+      "timed_out": false
+    },
+    {
+      "command": "python3 scripts/check_test_map.py --map specs/193-ua-f07-legacy-adoption/test-map.csv --old Apps/FractalExplorer/Tests/UI --new Apps/VisualCore/Tests/UI --app FractalExplorer --log .autonomy/logs/app-tests/ua-f07-i1a-r2.log .autonomy/logs/app-tests/ua-f07-i1b-r3.log .autonomy/logs/app-tests/ua-f07-phone-ios27-i2.log .autonomy/logs/app-tests/ua-f07-phone-ios27-b-r2.log .autonomy/logs/app-tests/ua-f07-phone-ios27-d.log",
+      "exit_code": 2,
+      "log": ".autonomy/logs/migration/UA-F07.a03-test-map.log",
+      "log_sha256": "b9868bc78ebac31bd24541e965b2340bb873ee400c3aec11ec10f508b130e825",
+      "name": "a03-test-map",
+      "timed_out": false
+    },
+    {
+      "command": "python3 scripts/check_test_map.py --map specs/193-ua-f07-legacy-adoption/test-map.csv --old Apps/ParticleUniverse/Tests/UI --new Apps/VisualCore/Tests/UI --app ParticleUniverse --log .autonomy/logs/app-tests/ua-f07-phone-ios27-j1.log .autonomy/logs/app-tests/ua-f07-phone-ios27-j2.log .autonomy/logs/app-tests/ua-f07-phone-ios27-j3.log .autonomy/logs/app-tests/ua-f07-phone-ios27-b-r2.log",
+      "exit_code": 1,
+      "log": ".autonomy/logs/migration/UA-F07.a04-test-map.log",
+      "log_sha256": "703d7a3f31f76d9681694d0cfce877174279c6cf5f92ac05ae8c5bfd294b35b2",
+      "name": "a04-test-map",
+      "timed_out": false
+    },
+    {
+      "command": "python3 scripts/release_check.py --only compliance storage-rule stored-data-rule dependencies public-api documented-api-showcase documented-api-interactive-demo documented-api-second-consumer documented-api-particle-universe isolation-particle-universe documented-api-visual-core isolation-visual-core",
+      "exit_code": 1,
+      "log": ".autonomy/logs/migration/UA-F07.api-boundaries.log",
+      "log_sha256": "67f38b9985bdbf73c62fb09520c054ecae9d717e31dd0173cf60f72336fcdea8",
+      "name": "api-boundaries",
+      "timed_out": false
+    },
+    {
+      "command": "python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime 27.2 --kind phone --only-testing VisualCoreUITests/SettingsUITests VisualCoreUITests/LaunchUITests --log-name ua-f07-phone-ios27-b",
+      "exit_code": 1,
+      "log": ".autonomy/logs/migration/UA-F07.app-phone-ios27-b.log",
+      "log_sha256": "f8d7980efee4df01fdd9add128479144f1d89347654d5636dca734fba08cff14",
+      "name": "app-phone-ios27-b",
+      "timed_out": false
+    },
+    {
+      "command": "python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime 27.2 --kind phone --only-testing VisualCoreTests/AppModelTests VisualCoreTests/StoreTests VisualCoreTests/BundleTests VisualCoreTests/ScenarioLaunchTests --log-name ua-f07-c-moved",
+      "exit_code": 1,
+      "log": ".autonomy/logs/migration/UA-F07.app-phone-ios27-c-moved.log",
+      "log_sha256": "93f199837e5040cd4401633209c1ce409f442438a6f2ff65019f302a9deec22e",
+      "name": "app-phone-ios27-c-moved",
+      "timed_out": false
+    },
+    {
+      "command": "python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime 27.2 --kind phone --only-testing VisualCoreUITests/FEAccessibilityAuditUITests --log-name ua-f07-phone-ios27-i1",
+      "exit_code": 3,
+      "log": ".autonomy/logs/migration/UA-F07.app-phone-ios27-i1.log",
+      "log_sha256": "c690cea34e10cd492c811a6c0dcbd44faa0a43c5618020c17fad8d9aad0e6cc3",
+      "name": "app-phone-ios27-i1",
+      "timed_out": false
+    },
+    {
+      "command": "python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime 27.2 --kind phone --only-testing VisualCoreUITests/FEAccessibilityAuditUITests/testAuditDefaultTextSize --log-name ua-f07-phone-ios27-i1a-ev",
+      "exit_code": 1,
+      "log": ".autonomy/logs/migration/UA-F07.app-phone-ios27-i1a-ev.log",
+      "log_sha256": "d4321557585ce9438edf1e4fdad5aa6e02a16ab67b14a49a6f0ac80b128206eb",
+      "name": "app-phone-ios27-i1a-ev",
+      "timed_out": false
+    },
+    {
+      "command": "python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime 27.2 --kind phone --only-testing VisualCoreUITests/FEAccessibilityAuditUITests/testAuditDefaultTextSize --log-name ua-f07-i1a-r2",
+      "exit_code": 1,
+      "log": ".autonomy/logs/migration/UA-F07.app-phone-ios27-i1a-r2.log",
+      "log_sha256": "dd0f389ec947aee6248890991f27692694121442dc40e3940ad94a20f67de96f",
+      "name": "app-phone-ios27-i1a-r2",
+      "timed_out": false
+    },
+    {
+      "command": "python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime 27.2 --kind phone --only-testing VisualCoreUITests/FEAccessibilityAuditUITests/testAuditDefaultTextSize --log-name ua-f07-i1a",
+      "exit_code": 1,
+      "log": ".autonomy/logs/migration/UA-F07.app-phone-ios27-i1a.log",
+      "log_sha256": "560ab7075f92f907aa166d7f9c12f1cb231b4c8ccaa7df207ef71d75565e0def",
+      "name": "app-phone-ios27-i1a",
+      "timed_out": false
+    },
+    {
+      "command": "python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime 27.2 --kind phone --only-testing VisualCoreUITests/FEAccessibilityAuditUITests/testAuditLargestAccessibilityTextSize --log-name ua-f07-i1b-r2",
+      "exit_code": 1,
+      "log": ".autonomy/logs/migration/UA-F07.app-phone-ios27-i1b-r2.log",
+      "log_sha256": "36136f0597d70c959c449ac9d1dafca231f8cdd006ca54a140049b5d4c2dd0f8",
+      "name": "app-phone-ios27-i1b-r2",
+      "timed_out": false
+    },
+    {
+      "command": "python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime 27.2 --kind phone --only-testing VisualCoreUITests/FEAccessibilityAuditUITests/testAuditLargestAccessibilityTextSize --log-name ua-f07-i1b-r3",
+      "exit_code": 1,
+      "log": ".autonomy/logs/migration/UA-F07.app-phone-ios27-i1b-r3.log",
+      "log_sha256": "33a39560f4711219a1c7f94bb447c24ef8741d5cf21b0bcfda91f71da9a66039",
+      "name": "app-phone-ios27-i1b-r3",
+      "timed_out": false
+    },
+    {
+      "command": "python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime 27.2 --kind phone --only-testing VisualCoreUITests/FEAccessibilityAuditUITests/testAuditLargestAccessibilityTextSize --log-name ua-f07-i1b",
+      "exit_code": 1,
+      "log": ".autonomy/logs/migration/UA-F07.app-phone-ios27-i1b.log",
+      "log_sha256": "183596c98774af1048f54e804c120064dfc63ad437395d9839780e75008c2e8d",
+      "name": "app-phone-ios27-i1b",
+      "timed_out": false
+    },
+    {
+      "command": "python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime 27.2 --kind phone --only-testing VisualCoreUITests/FEExplorerUITests VisualCoreUITests/FEBookmarkUITests VisualCoreUITests/FECaptureTourUITests --log-name ua-f07-phone-ios27-i2-ev",
+      "exit_code": 1,
+      "log": ".autonomy/logs/migration/UA-F07.app-phone-ios27-i2-ev.log",
+      "log_sha256": "4bf954a2cdc3a268af97c46a73c66b67ba9bab14eb06b655fafd3e67f21dbf60",
+      "name": "app-phone-ios27-i2-ev",
+      "timed_out": false
+    },
+    {
+      "command": "python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime 27.2 --kind phone --action test-without-building --only-testing VisualCoreUITests/FEExplorerUITests VisualCoreUITests/FEBookmarkUITests VisualCoreUITests/FECaptureTourUITests --log-name ua-f07-phone-ios27-i2-ev2",
+      "exit_code": 1,
+      "log": ".autonomy/logs/migration/UA-F07.app-phone-ios27-i2-ev2.log",
+      "log_sha256": "fa62077e548697f7b3ae46c92f0eeb7f50cb5f5a3d3c42af47caf16f4ebb3f8b",
+      "name": "app-phone-ios27-i2-ev2",
+      "timed_out": false
+    },
+    {
+      "command": "python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime 27.2 --kind phone --action test-without-building --only-testing VisualCoreUITests/FEExplorerUITests VisualCoreUITests/FEBookmarkUITests VisualCoreUITests/FECaptureTourUITests --log-name ua-f07-phone-ios27-i2-ev3",
+      "exit_code": 1,
+      "log": ".autonomy/logs/migration/UA-F07.app-phone-ios27-i2-ev3.log",
+      "log_sha256": "3e114c665254dd9c4710716f913bd97b60a02b9ad88536e5a763f9258da68953",
+      "name": "app-phone-ios27-i2-ev3",
+      "timed_out": false
+    },
+    {
+      "command": "python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime 27.2 --kind phone --action test --only-testing VisualCoreUITests/FEExplorerUITests VisualCoreUITests/FEBookmarkUITests VisualCoreUITests/FECaptureTourUITests --log-name ua-f07-phone-ios27-i2-ev4",
+      "exit_code": 1,
+      "log": ".autonomy/logs/migration/UA-F07.app-phone-ios27-i2-ev4.log",
+      "log_sha256": "15ed833d0dacd772f6f6f03b7beb0efa9eab0070afdf9fc79f4f8b63ca6bc30e",
+      "name": "app-phone-ios27-i2-ev4",
+      "timed_out": false
+    },
+    {
+      "command": "python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime 27.2 --kind phone --only-testing VisualCoreUITests/PUSandboxUITests --log-name ua-f07-phone-ios27-j2-ev",
+      "exit_code": 1,
+      "log": ".autonomy/logs/migration/UA-F07.app-phone-ios27-j2-ev.log",
+      "log_sha256": "d77b09d5a942cdb13b25a1f8c1789d93702261e83acd0516e8e0f07b950ca8ed",
+      "name": "app-phone-ios27-j2-ev",
+      "timed_out": false
+    },
+    {
+      "command": "swift test --package-path Packages/VisualCore",
+      "exit_code": 1,
+      "log": ".autonomy/logs/migration/UA-F07.growth-warmup-host.log",
+      "log_sha256": "23c2e21112fa62db9e9c489e7137e6ea1af89d91ef4b6832bf1c0edbd276dec4",
+      "name": "growth-warmup-host",
+      "timed_out": false
+    },
+    {
+      "command": "python3 scripts/check_privacy_manifest.py --app Build/DerivedData/ua-f07-release/Build/Products/Release-iphonesimulator/VisualCore.app",
+      "exit_code": 2,
+      "log": ".autonomy/logs/migration/UA-F07.privacy-manifest.log",
+      "log_sha256": "3380906e19b581ac2fada8bb2a91c602f0ca291129354558922ad41bdcc88069",
+      "name": "privacy-manifest",
+      "timed_out": false
+    },
+    {
+      "command": "xcodebuild build -project VisualCore.xcodeproj -scheme VisualCore -configuration Release -destination 'generic/platform=iOS Simulator' -derivedDataPath Build/DerivedData/ua-f07-release CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 65,
+      "log": ".autonomy/logs/migration/UA-F07.release-build.log",
+      "log_sha256": "5d27905769845846b783000d3cd57bbee785d16a71fa4ef58b739cef4233d96c",
+      "name": "release-build",
+      "timed_out": false
+    },
+    {
+      "command": "python3 scripts/check_release_symbols.py --app Build/DerivedData/ua-f07-release/Build/Products/Release-iphonesimulator/VisualCore.app --forbid DebugLaunch DebugExperience DebugInventory ScenarioLaunch ScenarioHostView vcDamageStat vcCandidates ParticleManifest FractalManifest FluidArtManifest GenerativeArtManifest",
+      "exit_code": 1,
+      "log": ".autonomy/logs/migration/UA-F07.release-symbols.log",
+      "log_sha256": "f1f3b8d801769530713de4fbc5971ea50101f9a56f628af080c2bb3682f4430a",
+      "name": "release-symbols",
+      "timed_out": false
+    },
+    {
+      "command": "python3 scripts/check_test_map.py --map specs/193-ua-f07-legacy-adoption/test-map.csv --old /private/tmp/claude-501/-Users-coast-Documents-GIT-VisualCore/6ae79f68-9b3e-404c-8bcb-11c9e268df91/scratchpad/old-ui/Apps/GenerativeArtStudio/Tests/UI /private/tmp/claude-501/-Users-coast-Documents-GIT-VisualCore/6ae79f68-9b3e-404c-8bcb-11c9e268df91/scratchpad/old-ui/Apps/FluidArtPlayground/Tests/UI /private/tmp/claude-501/-Users-coast-Documents-GIT-VisualCore/6ae79f68-9b3e-404c-8bcb-11c9e268df91/scratchpad/old-ui/Apps/FractalExplorer/Tests/UI /private/tmp/claude-501/-Users-coast-Documents-GIT-VisualCore/6ae79f68-9b3e-404c-8bcb-11c9e268df91/scratchpad/old-ui/Apps/ParticleUniverse/Tests/UI --new Apps/VisualCore/Tests/UI --log .autonomy/logs/app-tests/ua-f07-phone-ios27-a-ev.log .autonomy/logs/app-tests/ua-f07-phone-ios27-b-ev.log .autonomy/logs/app-tests/ua-f07-phone-ios27-c-ev.log .autonomy/logs/app-tests/ua-f07-phone-ios27-d-ev.log .autonomy/logs/app-tests/ua-f07-phone-ios27-e-ev.log .autonomy/logs/app-tests/ua-f07-phone-ios27-f-ev.log .autonomy/logs/app-tests/ua-f07-phone-ios27-g1-ev.log .autonomy/logs/app-tests/ua-f07-phone-ios27-g2-ev.log .autonomy/logs/app-tests/ua-f07-phone-ios27-g3-ev.log .autonomy/logs/app-tests/ua-f07-phone-ios27-h1-ev.log .autonomy/logs/app-tests/ua-f07-phone-ios27-h2-ev.log .autonomy/logs/app-tests/ua-f07-phone-ios27-i1a-ev.log .autonomy/logs/app-tests/ua-f07-phone-ios27-i1a-ev2.log .autonomy/logs/app-tests/ua-f07-phone-ios27-i1b-ev.log .autonomy/logs/app-tests/ua-f07-phone-ios27-i2-ev.log .autonomy/logs/app-tests/ua-f07-phone-ios27-i2-ev2.log .autonomy/logs/app-tests/ua-f07-phone-ios27-i2-ev3.log .autonomy/logs/app-tests/ua-f07-phone-ios27-i2-ev4.log .autonomy/logs/app-tests/ua-f07-phone-ios27-i2-ev5.log .autonomy/logs/app-tests/ua-f07-phone-ios27-j2-ev.log .autonomy/logs/app-tests/ua-f07-phone-ios27-j2-ev2.log .autonomy/logs/app-tests/ua-f07-phone-ios27-j3-ev.log .autonomy/logs/app-tests/ua-f07-phone-ios27-j1.log",
+      "exit_code": 1,
+      "log": ".autonomy/logs/migration/UA-F07.test-map.log",
+      "log_sha256": "c560a8a4766b1bcd190ac49c88cea85c79c43305f7a60ffe9b3e764a2247bbe8",
+      "name": "test-map",
+      "timed_out": false
+    }
+  ],
+  "gate": "UA-F07",
+  "ledger": "migration",
+  "passing_checks": [
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-26.5 --action test --result-name ua-f07-a02-package-265",
+      "exit_code": 0,
+      "finished": "2026-11-13T13:53:24+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.a01-a02-package-ios265.log",
+      "log_sha256": "b236b74379eb2a038ae824b46d1393231085a408f85095cc9428730ee07c2f7c",
+      "name": "a01-a02-package-ios265"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --result-name ua-f07-a02-package-272",
+      "exit_code": 0,
+      "finished": "2026-11-13T13:52:11+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.a01-a02-package-ios272.log",
+      "log_sha256": "5ec1be59ab09f43f7c7be6bec8c2ce619984e3a6ead067f9c2f40262a5ac9ff7",
+      "name": "a01-a02-package-ios272"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-26.5 --action test --result-name ua-f07-a03-package-265",
+      "exit_code": 0,
+      "finished": "2026-11-13T15:05:19+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.a01-a03-package-ios265.log",
+      "log_sha256": "493b3c4528d2d400288b20623933788fabac0407a71ae151504d942326794cfb",
+      "name": "a01-a03-package-ios265"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --result-name ua-f07-a03-package-272",
+      "exit_code": 0,
+      "finished": "2026-11-13T15:03:30+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.a01-a03-package-ios272.log",
+      "log_sha256": "67d7f43c5d12499dcec322629fc9d67368f5dbddcbab77cf1ce49ab54db78b17",
+      "name": "a01-a03-package-ios272"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-26.5 --action test --result-name ua-f07-a04-package-265",
+      "exit_code": 0,
+      "finished": "2026-11-13T15:28:45+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.a01-a04-package-ios265.log",
+      "log_sha256": "12fd27cae1ebd9d4689865e17a9d456b8e0ffaccf2b3b1d6c7915a1c5ba4131e",
+      "name": "a01-a04-package-ios265"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --result-name ua-f07-a04-package-272",
+      "exit_code": 0,
+      "finished": "2026-11-13T15:26:15+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.a01-a04-package-ios272.log",
+      "log_sha256": "dd01eabd9c03224a5f2eb1516dff733c78d819b479b6263c49af658983a863f0",
+      "name": "a01-a04-package-ios272"
+    },
+    {
+      "command": "swift test --package-path Apps/GenerativeArtStudio/Adapter",
+      "exit_code": 0,
+      "finished": "2026-11-13T11:24:54+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.a01-core-host.log",
+      "log_sha256": "ae7b411791a2203a0afe18fbebfa6837f57d9ece78998d1a966edadda0a1421e",
+      "name": "a01-core-host"
+    },
+    {
+      "command": "swift test --package-path Apps/GenerativeArtStudio/Core",
+      "exit_code": 0,
+      "finished": "2026-11-13T11:53:30+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.a01-core-package-host.log",
+      "log_sha256": "0e4be34cf6c71b1b747232c955776c9ca09a174d98e858cedd45ba7a206a1b8d",
+      "name": "a01-core-package-host"
+    },
+    {
+      "command": "python3 scripts/check_renames.py --base af887e3 Apps/GenerativeArtStudio/Core/Sources Apps/GenerativeArtStudio/Core/Tests Packages/ExperiencesCreative/GenerativeArtStudio/Core Packages/ExperiencesCreative/GenerativeArtStudio/CoreTests",
+      "exit_code": 0,
+      "finished": "2026-11-13T13:14:25+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.a01-core-renames-only.log",
+      "log_sha256": "c722500bd44d59dc5c42931a61ac9269813cf85044299e9bf20624b9578adb91",
+      "name": "a01-core-renames-only"
+    },
+    {
+      "command": "git diff --exit-code --stat af887e3 -- Apps/GenerativeArtStudio/Core",
+      "exit_code": 0,
+      "finished": "2026-11-13T11:53:22+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.a01-core-unchanged.log",
+      "log_sha256": "b8edd829ed1e40f0bc19584b93d7ce3b3957f831ce9b83739f4ab0c8d0617fa1",
+      "name": "a01-core-unchanged"
+    },
+    {
+      "command": "python3 scripts/check_app_isolation.py --experiences Apps/GenerativeArtStudio/Adapter",
+      "exit_code": 0,
+      "finished": "2026-11-13T11:40:06+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.a01-isolation-adapter.log",
+      "log_sha256": "537fa0306e483966815c19f37c9a7b9f45c4bd7543c7cc41cc7f3aeec25f1bd3",
+      "name": "a01-isolation-adapter"
+    },
+    {
+      "command": "python3 scripts/check_app_isolation.py --app Apps/VisualCore",
+      "exit_code": 0,
+      "finished": "2026-11-13T11:40:06+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.a01-isolation-app.log",
+      "log_sha256": "c9a3ce17fd61408510c38d51019599240328d3c5f2e1042b630dbff29ecbdfd9",
+      "name": "a01-isolation-app"
+    },
+    {
+      "command": "swift test --package-path Apps/GenerativeArtStudio/Adapter",
+      "exit_code": 0,
+      "finished": "2026-11-13T11:40:09+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.a01-manifest-host.log",
+      "log_sha256": "b8b588d1c69328dc3d5372b872c00b67e57a1052fa12dc160f0a86cac371161d",
+      "name": "a01-manifest-host"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative --destination sim-26.5 --action test --result-name ua-f07-a01-package-265",
+      "exit_code": 0,
+      "finished": "2026-11-13T13:09:21+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.a01-package-ios265.log",
+      "log_sha256": "512d7062ac8b321dace56b2025673c30aef0b996f48acae2e5a0576ad2b8f22a",
+      "name": "a01-package-ios265"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative --destination sim-27.2 --action test --result-name ua-f07-a01-package-272",
+      "exit_code": 0,
+      "finished": "2026-11-13T13:08:26+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.a01-package-ios272.log",
+      "log_sha256": "459148a28b9612a1dde47c788330c2e1541655bf86f7fbe61f32b14e0125d3c1",
+      "name": "a01-package-ios272"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime 26.5 --kind phone --sources Apps/GenerativeArtStudio/Adapter/ExperienceTests --only-testing GenerativeArtStudioExperienceTests --log-name ua-f07-a01-parity-ios26",
+      "exit_code": 0,
+      "finished": "2026-11-13T11:43:27+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.a01-parity-ios26.log",
+      "log_sha256": "c7c614cb3fd1d0b09776f5cb4d2697e6dcf5d3403747da74ade4d6b06e2a7cab",
+      "name": "a01-parity-ios26"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime 27.2 --kind phone --sources Apps/GenerativeArtStudio/Adapter/ExperienceTests --only-testing GenerativeArtStudioExperienceTests --log-name ua-f07-a01-parity-ios27",
+      "exit_code": 0,
+      "finished": "2026-11-13T11:43:12+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.a01-parity-ios27.log",
+      "log_sha256": "f67c2be2237b811f0e3d175cc28d0a44c18b6746a90dd5f8a69a59a194abdfaf",
+      "name": "a01-parity-ios27"
+    },
+    {
+      "command": "python3 scripts/verify_experiences.py --only a01.generative-art-studio --runtime 27 --scenario save-restore --fresh",
+      "exit_code": 0,
+      "finished": "2026-11-13T11:51:54+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.a01-persist-run1.log",
+      "log_sha256": "a6d08417580fd1b42c40eb65ec3946f030c2edaa40bcf478e3b5663f8d3f3911",
+      "name": "a01-persist-run1"
+    },
+    {
+      "command": "python3 scripts/verify_experiences.py --only a01.generative-art-studio --runtime 27 --scenario save-restore --fresh",
+      "exit_code": 0,
+      "finished": "2026-11-13T11:52:01+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.a01-persist-run2.log",
+      "log_sha256": "99a7d9b750c80cbd7e4da03dcfefa9d11f7aeaf73918ae2e4340b33ea5ed1816",
+      "name": "a01-persist-run2"
+    },
+    {
+      "command": "python3 scripts/verify_experiences.py --only a01.generative-art-studio --runtime 27 --scenario save-restore --fresh",
+      "exit_code": 0,
+      "finished": "2026-11-13T11:52:08+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.a01-persist-run3.log",
+      "log_sha256": "6b382e93062895367b743f63fb8434a36a6d3acbe2306009f2dcc6db039689b4",
+      "name": "a01-persist-run3"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only xcodegen visualcore-app-build app-contracts",
+      "exit_code": 0,
+      "finished": "2026-11-13T16:24:02+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.a01-screens-app-build.log",
+      "log_sha256": "c3cf8f17aff0b7872e08c6ac0e668989bee7a79d0bb74704273f966b8b66c979",
+      "name": "a01-screens-app-build"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-26.5 --action test --result-name a01-screens-pkg-265",
+      "exit_code": 0,
+      "finished": "2026-11-13T16:23:37+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.a01-screens-package-ios265.log",
+      "log_sha256": "c349cf7e1cf080c534b5e404ffec4a77a112c9724864c5b30a9361476d65233f",
+      "name": "a01-screens-package-ios265"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --result-name a01-screens-pkg-272",
+      "exit_code": 0,
+      "finished": "2026-11-13T16:21:10+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.a01-screens-package-ios272.log",
+      "log_sha256": "50abb9cb0752aca692989b51225663ed3e65c21524805f9ef69abd9666259037",
+      "name": "a01-screens-package-ios272"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-26.5 --action test --result-name a01-screens-26 --only-testing GenerativeArtStudioExperienceTests --only-testing GenerativeArtStudioCoreTests",
+      "exit_code": 0,
+      "finished": "2026-11-13T16:18:53+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.a01-screens-retired-ios26.log",
+      "log_sha256": "fd4feb49d0a31a286ac99542ccc360c72e2299b8098873539ca0935bc574d7cd",
+      "name": "a01-screens-retired-ios26"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --result-name a01-screens-27 --only-testing GenerativeArtStudioExperienceTests --only-testing GenerativeArtStudioCoreTests",
+      "exit_code": 0,
+      "finished": "2026-11-13T16:18:31+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.a01-screens-retired-ios27.log",
+      "log_sha256": "4cf7fa4c41bcb32cd0797367f9298a0cd95ad5e9d86d7fe20174865f5da8e00e",
+      "name": "a01-screens-retired-ios27"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime 26.5 --kind phone --sources Apps/GenerativeArtStudio/Adapter/ExperienceTests --only-testing GenerativeArtStudioExperienceTests --log-name ua-f07-a01-session-ios26",
+      "exit_code": 0,
+      "finished": "2026-11-13T11:35:45+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.a01-session-ios26.log",
+      "log_sha256": "01299e4918ee2c9df5e2982f4a439e7c5f5d307ed0f40da246b77bdd548ed9dc",
+      "name": "a01-session-ios26"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime 27.2 --kind phone --sources Apps/GenerativeArtStudio/Adapter/ExperienceTests --only-testing GenerativeArtStudioExperienceTests --log-name ua-f07-a01-session-ios27",
+      "exit_code": 0,
+      "finished": "2026-11-13T11:35:27+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.a01-session-ios27.log",
+      "log_sha256": "7a99a7fac26b8c59265eab6bfa1e8efb88aa228b9f6fb2c7f6b6163846facd98",
+      "name": "a01-session-ios27"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only storage-rule stored-data-rule",
+      "exit_code": 0,
+      "finished": "2026-11-13T11:40:06+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.a01-storage-rules.log",
+      "log_sha256": "4dd4be1fd10162f2f5b936b994e448e479dcfd5ea995a51cad9437d306dbafd3",
+      "name": "a01-storage-rules"
+    },
+    {
+      "command": "python3 scripts/check_test_map.py --map specs/193-ua-f07-legacy-adoption/test-map.csv --old Apps/GenerativeArtStudio/Tests/UI --new Apps/VisualCore/Tests/UI --app GenerativeArtStudio --log .autonomy/logs/app-tests/ua-f07-phone-ios27-g1.log .autonomy/logs/app-tests/ua-f07-phone-ios27-g2.log .autonomy/logs/app-tests/ua-f07-phone-ios27-g3.log .autonomy/logs/app-tests/ua-f07-phone-ios27-b-r2.log",
+      "exit_code": 0,
+      "finished": "2026-11-13T13:03:03+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.a01-test-map-r3.log",
+      "log_sha256": "b545f2524c1446758222cf330a26129e260b9ff037584d5d05390be71f3cd9af",
+      "name": "a01-test-map-r3"
+    },
+    {
+      "command": "python3 scripts/verify_experiences.py --only a01.generative-art-studio --runtime 26 --fresh",
+      "exit_code": 0,
+      "finished": "2026-11-13T13:15:23+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.a01-verify-26-moved.log",
+      "log_sha256": "c494d1f8cba003b1a06d8a1ba0e66941434fed10c9b7a0eaf496f1319f7884c0",
+      "name": "a01-verify-26-moved"
+    },
+    {
+      "command": "python3 scripts/verify_experiences.py --only a01.generative-art-studio --runtime 26",
+      "exit_code": 0,
+      "finished": "2026-11-13T11:51:21+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.a01-verify-26-r2.log",
+      "log_sha256": "5f4fa18c31f5a6ae0d4ead0b76cc24a4d8b1bcf1eb71c553f15ffe1e8553d6be",
+      "name": "a01-verify-26-r2"
+    },
+    {
+      "command": "python3 scripts/verify_experiences.py --only a01.generative-art-studio --runtime 27 --fresh",
+      "exit_code": 0,
+      "finished": "2026-11-13T11:51:44+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.a01-verify-27-fresh.log",
+      "log_sha256": "d4035664c8f75c2cd35abea48a6429b1df459a62687482474381edb0c209cb47",
+      "name": "a01-verify-27-fresh"
+    },
+    {
+      "command": "python3 scripts/verify_experiences.py --only a01.generative-art-studio --runtime 27 --fresh",
+      "exit_code": 0,
+      "finished": "2026-11-13T13:15:03+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.a01-verify-27-moved.log",
+      "log_sha256": "f255d081b079af36fcf44e4881a70204a4c06ba9b447b19aea1b7d9851caa7f3",
+      "name": "a01-verify-27-moved"
+    },
+    {
+      "command": "python3 scripts/verify_experiences.py --only a01.generative-art-studio --runtime 27",
+      "exit_code": 0,
+      "finished": "2026-11-13T11:51:05+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.a01-verify-27-r2.log",
+      "log_sha256": "819884e97336cb483e3be012fd1a5a3ddd4183f8e7e66ea41e4ccf53284653ce",
+      "name": "a01-verify-27-r2"
+    },
+    {
+      "command": "python3 scripts/verify_experiences.py --only a01.generative-art-studio --runtime 27 --fresh",
+      "exit_code": 0,
+      "finished": "2026-11-13T16:24:24+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.a01-verify-27-screens.log",
+      "log_sha256": "5273b5e8f4f4760d9048c75cc047ab566a4b5008c5425aca3b2ee3a49b5c9e12",
+      "name": "a01-verify-27-screens"
+    },
+    {
+      "command": "python3 scripts/verify_experiences.py --only a01.generative-art-studio --audits",
+      "exit_code": 0,
+      "finished": "2026-11-13T18:13:05+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.a01-x-audits-final.log",
+      "log_sha256": "99522de094e00d791f4d653129353677cb338fc1c0b3ab372428d496f745ee81",
+      "name": "a01-x-audits-final"
+    },
+    {
+      "command": "python3 scripts/verify_experiences.py --only a01.generative-art-studio --audits",
+      "exit_code": 0,
+      "finished": "2026-11-13T13:20:40+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.a01-x-audits.log",
+      "log_sha256": "753ee502e552737a0f137703fe4196958eca3a9f9716da000810f3b1d3d4bdce",
+      "name": "a01-x-audits"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative --destination sim-27.2 --action test --result-name ua-f07-a01-x-host --only-testing GenerativeArtStudioCoreTests GenerativeArtStudioExperienceTests",
+      "exit_code": 0,
+      "finished": "2026-11-13T13:20:39+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.a01-x-host.log",
+      "log_sha256": "088da19fb7d7197b5fda12252bcb3365cfd9bf779e949e0f23d6c8f5f53a2ebc",
+      "name": "a01-x-host"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only xcodegen",
+      "exit_code": 0,
+      "finished": "2026-11-13T11:40:05+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.a01-xcodegen.log",
+      "log_sha256": "f4696d590e1b3843905c37f86e796aef171b62ba031af35737f221c685b649c8",
+      "name": "a01-xcodegen"
+    },
+    {
+      "command": "swift test --package-path Apps/FluidArtPlayground/FluidArtPlaygroundAdapter",
+      "exit_code": 0,
+      "finished": "2026-11-13T13:23:36+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.a02-core-host-renamed.log",
+      "log_sha256": "13d570df248f40447d17b4b9754f5f02b206cadebafad7063fdd1994d6328ccb",
+      "name": "a02-core-host-renamed"
+    },
+    {
+      "command": "swift test --package-path Apps/FluidArtPlayground/Adapter",
+      "exit_code": 0,
+      "finished": "2026-11-13T11:58:59+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.a02-core-host.log",
+      "log_sha256": "9ac7169591ea1735998184c9601b6664fa7ea1034e5a35fc4bfa55d1c40ca760",
+      "name": "a02-core-host"
+    },
+    {
+      "command": "python3 scripts/check_renames.py --base af887e3 Apps/FluidArtPlayground/FluidArtPlaygroundCore/Sources Apps/FluidArtPlayground/FluidArtPlaygroundCore/Tests Packages/ExperiencesCreative/FluidArtPlayground/Core Packages/ExperiencesCreative/FluidArtPlayground/CoreTests",
+      "exit_code": 0,
+      "finished": "2026-11-13T13:55:01+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.a02-core-renames-only.log",
+      "log_sha256": "99b028354dc3c8ca66145779ab58c8475a5e31e84b7acd2815705ccd86d6dc5f",
+      "name": "a02-core-renames-only"
+    },
+    {
+      "command": "python3 scripts/verify_experiences.py --only a02.fluid-art-playground --runtime 27 --scenario save-restore --fresh",
+      "exit_code": 0,
+      "finished": "2026-11-13T16:16:04+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.a02-persist-run1.log",
+      "log_sha256": "e4a144b3dae7414038d019567bb16199fd37a83c12409277be1349c94b4d460c",
+      "name": "a02-persist-run1"
+    },
+    {
+      "command": "python3 scripts/verify_experiences.py --only a02.fluid-art-playground --runtime 27 --scenario save-restore --fresh",
+      "exit_code": 0,
+      "finished": "2026-11-13T16:16:15+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.a02-persist-run2.log",
+      "log_sha256": "f9813cda42c129aca7de049683812fe898082c01cb046fe9cd29f4c4b2e2e967",
+      "name": "a02-persist-run2"
+    },
+    {
+      "command": "python3 scripts/verify_experiences.py --only a02.fluid-art-playground --runtime 27 --scenario save-restore --fresh",
+      "exit_code": 0,
+      "finished": "2026-11-13T16:16:28+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.a02-persist-run3.log",
+      "log_sha256": "63116807e9a9e88d008db73d1637896700214c13bc915617753d6a6fa7dcd37d",
+      "name": "a02-persist-run3"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime 26.5 --kind phone --sources Apps/FluidArtPlayground/FluidArtPlaygroundAdapter/ExperienceTests --only-testing FluidArtPlaygroundExperienceTests --log-name ua-f07-a02-session-ios26",
+      "exit_code": 0,
+      "finished": "2026-11-13T13:22:49+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.a02-session-ios26.log",
+      "log_sha256": "2376ab4b0e4b2d0a29b59a1e5ecd6b65d5b00f3a4638cb04b18357b35689cfdb",
+      "name": "a02-session-ios26"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime 27.2 --kind phone --sources Apps/FluidArtPlayground/FluidArtPlaygroundAdapter/ExperienceTests --only-testing FluidArtPlaygroundExperienceTests --log-name ua-f07-a02-session-ios27",
+      "exit_code": 0,
+      "finished": "2026-11-13T13:22:24+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.a02-session-ios27.log",
+      "log_sha256": "0dd825b11b5e7ed956d3380676af6b66ddd78d2ddcdb28829d16f840a8bcc322",
+      "name": "a02-session-ios27"
+    },
+    {
+      "command": "python3 scripts/check_test_map.py --map specs/193-ua-f07-legacy-adoption/test-map.csv --old Apps/FluidArtPlayground/Tests/UI --new Apps/VisualCore/Tests/UI --app FluidArtPlayground --log .autonomy/logs/app-tests/ua-f07-phone-ios27-h1.log .autonomy/logs/app-tests/ua-f07-phone-ios27-h2.log .autonomy/logs/app-tests/ua-f07-phone-ios27-b-r2.log",
+      "exit_code": 0,
+      "finished": "2026-11-13T13:47:08+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.a02-test-map.log",
+      "log_sha256": "bce0dd0f9db7ebc177a63954617c1ee2a42efa4a3d5fa55a08e43fc6cb893d9b",
+      "name": "a02-test-map"
+    },
+    {
+      "command": "python3 scripts/verify_experiences.py --only a02.fluid-art-playground --runtime 26 --fresh",
+      "exit_code": 0,
+      "finished": "2026-11-13T13:55:43+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.a02-verify-26-moved.log",
+      "log_sha256": "c3c46a22261d4ded7de4205e5e017f809395a557439217a7e86c2f6674dc8e10",
+      "name": "a02-verify-26-moved"
+    },
+    {
+      "command": "python3 scripts/verify_experiences.py --only a02.fluid-art-playground --runtime 26 --fresh",
+      "exit_code": 0,
+      "finished": "2026-11-13T13:23:26+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.a02-verify-26.log",
+      "log_sha256": "de9d62b64ab221fda847fe2c84b971772b5134b4e53d1c4cc05183f9df2de5fc",
+      "name": "a02-verify-26"
+    },
+    {
+      "command": "python3 scripts/verify_experiences.py --only a02.fluid-art-playground --runtime 27 --fresh",
+      "exit_code": 0,
+      "finished": "2026-11-13T13:55:26+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.a02-verify-27-moved.log",
+      "log_sha256": "63e37aceece527a955a57265c9afa185995f97c676f72e143af1096f81ad6290",
+      "name": "a02-verify-27-moved"
+    },
+    {
+      "command": "python3 scripts/verify_experiences.py --only a02.fluid-art-playground --runtime 27 --fresh",
+      "exit_code": 0,
+      "finished": "2026-11-13T13:23:09+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.a02-verify-27.log",
+      "log_sha256": "8842f5044faf04c907800fac8d5065fd4bddf14829136fb3d3cfbdb247a1580b",
+      "name": "a02-verify-27"
+    },
+    {
+      "command": "python3 scripts/verify_experiences.py --only a02.fluid-art-playground --audits",
+      "exit_code": 0,
+      "finished": "2026-11-13T18:13:05+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.a02-x-audits-final.log",
+      "log_sha256": "2c88c101350ce87f99c13781a5c24e0d5981da69721a4011642339a47388858a",
+      "name": "a02-x-audits-final"
+    },
+    {
+      "command": "python3 scripts/verify_experiences.py --only a02.fluid-art-playground --audits",
+      "exit_code": 0,
+      "finished": "2026-11-13T13:55:44+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.a02-x-audits.log",
+      "log_sha256": "1e102c5d2f3b27af16ae762bc84b392b88a2ca3678624bcfca137cf0a84fe4e8",
+      "name": "a02-x-audits"
+    },
+    {
+      "command": "swift test --package-path Apps/FractalExplorer/FractalExplorerAdapter",
+      "exit_code": 0,
+      "finished": "2026-11-13T13:28:16+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.a03-core-host.log",
+      "log_sha256": "afbf1427f3ac3ab1676816d3945506973c40d026cda735a22e4c4223032c501f",
+      "name": "a03-core-host"
+    },
+    {
+      "command": "python3 scripts/check_renames.py --base af887e3 Apps/FractalExplorer/FractalExplorerCore/Sources Apps/FractalExplorer/FractalExplorerCore/Tests Packages/ExperiencesCreative/FractalExplorer/Core Packages/ExperiencesCreative/FractalExplorer/CoreTests",
+      "exit_code": 0,
+      "finished": "2026-11-13T15:05:54+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.a03-core-renames-only.log",
+      "log_sha256": "0d5de0fed849522627127e607d37b94e62c6dd7f67b81f7464575d860d4f0e34",
+      "name": "a03-core-renames-only"
+    },
+    {
+      "command": "python3 scripts/verify_experiences.py --only a03.fractal-explorer --runtime 27 --scenario save-restore --fresh",
+      "exit_code": 0,
+      "finished": "2026-11-13T16:16:42+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.a03-persist-run1.log",
+      "log_sha256": "325cc82a7619d7eb1a5a465047a846c885e9868c9b7d717febc1aa155c56455c",
+      "name": "a03-persist-run1"
+    },
+    {
+      "command": "python3 scripts/verify_experiences.py --only a03.fractal-explorer --runtime 27 --scenario save-restore --fresh",
+      "exit_code": 0,
+      "finished": "2026-11-13T16:16:50+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.a03-persist-run2.log",
+      "log_sha256": "d9d7a6136c4f5cd1e7a4e9fc1d31f0387109c17b5b524b577b6ad89d3639d7e7",
+      "name": "a03-persist-run2"
+    },
+    {
+      "command": "python3 scripts/verify_experiences.py --only a03.fractal-explorer --runtime 27 --scenario save-restore --fresh",
+      "exit_code": 0,
+      "finished": "2026-11-13T16:16:58+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.a03-persist-run3.log",
+      "log_sha256": "554811501910dbf4a16992914145b6f37723682ffd15dc669985f0e90beadbd9",
+      "name": "a03-persist-run3"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime 26.5 --kind phone --sources Apps/FractalExplorer/FractalExplorerAdapter/ExperienceTests --only-testing FractalExplorerExperienceTests --log-name ua-f07-a03-session-ios26",
+      "exit_code": 0,
+      "finished": "2026-11-13T14:02:40+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.a03-session-ios26.log",
+      "log_sha256": "69ef62723260c16524853af9071409ff71c9d120e53c01e7a02ab3bba9b527ea",
+      "name": "a03-session-ios26"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime 27.2 --kind phone --sources Apps/FractalExplorer/FractalExplorerAdapter/ExperienceTests --only-testing FractalExplorerExperienceTests --log-name ua-f07-a03-session-ios27",
+      "exit_code": 0,
+      "finished": "2026-11-13T14:02:20+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.a03-session-ios27.log",
+      "log_sha256": "b3ff2e7e9f2c3df4cc5d56ac8a472bf7f061ffca9779f0d9cd1c8b3595e64fa5",
+      "name": "a03-session-ios27"
+    },
+    {
+      "command": "python3 scripts/check_test_map.py --map specs/193-ua-f07-legacy-adoption/test-map.csv --old Apps/FractalExplorer/Tests/UI --new Apps/VisualCore/Tests/UI --app FractalExplorer --log .autonomy/logs/app-tests/ua-f07-i1a-r2.log .autonomy/logs/app-tests/ua-f07-i1b-r3.log .autonomy/logs/app-tests/ua-f07-phone-ios27-i2.log .autonomy/logs/app-tests/ua-f07-phone-ios27-b-r2.log",
+      "exit_code": 0,
+      "finished": "2026-11-13T14:58:28+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.a03-test-map-r2.log",
+      "log_sha256": "b05b25b5c460ba9ff20967afb740f312d39f05990f833c3cb835ddba43cae327",
+      "name": "a03-test-map-r2"
+    },
+    {
+      "command": "python3 scripts/verify_experiences.py --only a03.fractal-explorer --runtime 26 --fresh",
+      "exit_code": 0,
+      "finished": "2026-11-13T15:06:46+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.a03-verify-26-moved.log",
+      "log_sha256": "e25d043e16133a1e4c55b5a2f66a251c3d498689c44db7c9ad53a604dcdaf553",
+      "name": "a03-verify-26-moved"
+    },
+    {
+      "command": "python3 scripts/verify_experiences.py --only a03.fractal-explorer --runtime 26 --fresh",
+      "exit_code": 0,
+      "finished": "2026-11-13T14:03:20+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.a03-verify-26.log",
+      "log_sha256": "2b7982e9ad21bc41a00bf00a1facdaab9e1131bfda6915e5233ea77dd45b1d06",
+      "name": "a03-verify-26"
+    },
+    {
+      "command": "python3 scripts/verify_experiences.py --only a03.fractal-explorer --runtime 27 --fresh",
+      "exit_code": 0,
+      "finished": "2026-11-13T15:06:29+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.a03-verify-27-moved.log",
+      "log_sha256": "1b3b4bb35ac62694defe54abf5e1191b7d6707f9ae277ec1b4e0c6b8f52ae112",
+      "name": "a03-verify-27-moved"
+    },
+    {
+      "command": "python3 scripts/verify_experiences.py --only a03.fractal-explorer --runtime 27 --fresh",
+      "exit_code": 0,
+      "finished": "2026-11-13T14:03:03+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.a03-verify-27.log",
+      "log_sha256": "e1b0ff898ad9e2cd81978ba633539d19f3ec8c6327ccfd89e3425b910bc8ece1",
+      "name": "a03-verify-27"
+    },
+    {
+      "command": "python3 scripts/verify_experiences.py --only a03.fractal-explorer --audits",
+      "exit_code": 0,
+      "finished": "2026-11-13T15:06:47+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.a03-x-audits.log",
+      "log_sha256": "ceba4a4b688658a03b4aca6cf0ec4a2e21e03a239691c94f03a9407fd191fa47",
+      "name": "a03-x-audits"
+    },
+    {
+      "command": "swift test --package-path Apps/ParticleUniverse/ParticleUniverseAdapter",
+      "exit_code": 0,
+      "finished": "2026-11-13T14:12:12+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.a04-core-host.log",
+      "log_sha256": "2af0ea8d53a8b34a178c99a07f907014c79c2853021d1e8f07e2ffdce1b76cad",
+      "name": "a04-core-host"
+    },
+    {
+      "command": "python3 scripts/check_renames.py --base af887e3 Apps/ParticleUniverse/ParticleUniverseCore/Sources Apps/ParticleUniverse/ParticleUniverseCore/Tests Packages/ExperiencesCreative/ParticleUniverse/Core Packages/ExperiencesCreative/ParticleUniverse/CoreTests",
+      "exit_code": 0,
+      "finished": "2026-11-13T15:23:04+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.a04-core-renames-only.log",
+      "log_sha256": "2a26f52f6a1ae92c8aa3901ba182c71c0489c0b1a6e2bf679f2c9a15dd3f1bb0",
+      "name": "a04-core-renames-only"
+    },
+    {
+      "command": "python3 scripts/verify_experiences.py --only a04.particle-universe --runtime 27 --scenario save-restore --fresh",
+      "exit_code": 0,
+      "finished": "2026-11-13T16:17:05+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.a04-persist-run1.log",
+      "log_sha256": "74d73d3ac29bf3028d186fcedb75d1eed9588f31650ba9400af54dab652389d2",
+      "name": "a04-persist-run1"
+    },
+    {
+      "command": "python3 scripts/verify_experiences.py --only a04.particle-universe --runtime 27 --scenario save-restore --fresh",
+      "exit_code": 0,
+      "finished": "2026-11-13T16:17:11+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.a04-persist-run2.log",
+      "log_sha256": "df840aecca40d11122b750deb87c9b7d5f04321b3ab3390f9ea6bc87705d491f",
+      "name": "a04-persist-run2"
+    },
+    {
+      "command": "python3 scripts/verify_experiences.py --only a04.particle-universe --runtime 27 --scenario save-restore --fresh",
+      "exit_code": 0,
+      "finished": "2026-11-13T16:17:18+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.a04-persist-run3.log",
+      "log_sha256": "45ce0e86392165d325cbf2a46f35ab362e1083f4b26b0cc633aec87a57df1cc4",
+      "name": "a04-persist-run3"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime 26.5 --kind phone --sources Apps/ParticleUniverse/ParticleUniverseAdapter/ExperienceTests --only-testing ParticleUniverseExperienceTests --log-name ua-f07-a04-session-ios26",
+      "exit_code": 0,
+      "finished": "2026-11-13T15:18:02+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.a04-session-ios26.log",
+      "log_sha256": "0b851a663810bac27eee1c8a9e365b2a039c496ab64a84b7f1b3eec4a7d712fb",
+      "name": "a04-session-ios26"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime 27.2 --kind phone --sources Apps/ParticleUniverse/ParticleUniverseAdapter/ExperienceTests --only-testing ParticleUniverseExperienceTests --log-name ua-f07-a04-session-ios27",
+      "exit_code": 0,
+      "finished": "2026-11-13T15:17:41+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.a04-session-ios27.log",
+      "log_sha256": "335840cd80b077b5ffb19a4aa05b359ef8a57fa8f34d11819f073b09bbbb6e2d",
+      "name": "a04-session-ios27"
+    },
+    {
+      "command": "python3 scripts/check_test_map.py --map specs/193-ua-f07-legacy-adoption/test-map.csv --old Apps/ParticleUniverse/Tests/UI --new Apps/VisualCore/Tests/UI --app ParticleUniverse --log .autonomy/logs/app-tests/ua-f07-phone-ios27-j1.log .autonomy/logs/app-tests/ua-f07-phone-ios27-j2.log .autonomy/logs/app-tests/ua-f07-phone-ios27-j3.log .autonomy/logs/app-tests/ua-f07-phone-ios27-b-r2.log .autonomy/logs/app-tests/ua-f07-phone-ios27-a.log",
+      "exit_code": 0,
+      "finished": "2026-11-13T16:06:46+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.a04-test-map-r2.log",
+      "log_sha256": "93ec09988e99ba55184358ad689a44cf9b0fcf5ac988d73b0fed3d33715be984",
+      "name": "a04-test-map-r2"
+    },
+    {
+      "command": "python3 scripts/verify_experiences.py --only a04.particle-universe --runtime 26 --fresh",
+      "exit_code": 0,
+      "finished": "2026-11-13T15:23:50+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.a04-verify-26-moved.log",
+      "log_sha256": "4a6141cf102a353636ceea10dea35e5e4925c73f80c6581a9afd5a42ea5157a9",
+      "name": "a04-verify-26-moved"
+    },
+    {
+      "command": "python3 scripts/verify_experiences.py --only a04.particle-universe --runtime 26 --fresh",
+      "exit_code": 0,
+      "finished": "2026-11-13T15:18:55+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.a04-verify-26.log",
+      "log_sha256": "3da45f2819bf904030bb5b24ed2d8c5b0ca930add41d6f5f874d1ca078a07081",
+      "name": "a04-verify-26"
+    },
+    {
+      "command": "python3 scripts/verify_experiences.py --only a04.particle-universe --runtime 27 --fresh",
+      "exit_code": 0,
+      "finished": "2026-11-13T15:23:32+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.a04-verify-27-moved.log",
+      "log_sha256": "d3a759f1491c91aba7ea3fcc421289079da3e8beabfecf696dbe6d9ba3ff7adf",
+      "name": "a04-verify-27-moved"
+    },
+    {
+      "command": "python3 scripts/verify_experiences.py --only a04.particle-universe --runtime 27 --fresh",
+      "exit_code": 0,
+      "finished": "2026-11-13T15:18:35+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.a04-verify-27.log",
+      "log_sha256": "36e1a0d0340dedff65c6205d308407f81caf97caa7e3029e82a4af63fd8c7d6e",
+      "name": "a04-verify-27"
+    },
+    {
+      "command": "test -s docs/decisions/ADR-0011-fluid-picture-presentation.md",
+      "exit_code": 0,
+      "finished": "2026-11-13T11:19:56+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.adr-0011.log",
+      "log_sha256": "fae6829140bec422c657582a0dd98eecda2a08c88fac3939dcaf4b0c8d07067f",
+      "name": "adr-0011"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only compliance storage-rule stored-data-rule dependencies public-api documented-api-showcase documented-api-interactive-demo documented-api-second-consumer documented-api-particle-universe isolation-particle-universe documented-api-visual-core isolation-visual-core",
+      "exit_code": 0,
+      "finished": "2026-11-13T16:12:06+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.api-boundaries-r2.log",
+      "log_sha256": "ae8ac20e8e213d898f1b05e75b66466ddd8fe28a570330a87a5a9595696581f1",
+      "name": "api-boundaries-r2"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime 27.2 --kind phone --only-testing VisualCoreUITests/RoutesUITests --log-name ua-f07-phone-ios27-a-ev",
+      "exit_code": 0,
+      "finished": "2026-11-13T16:34:18+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.app-phone-ios27-a-ev.log",
+      "log_sha256": "5e376b8c98040435d3110559bac6e25df5a116402b94272f671592cf04954385",
+      "name": "app-phone-ios27-a-ev"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime 27.2 --kind phone --only-testing VisualCoreUITests/RoutesUITests --log-name ua-f07-phone-ios27-a",
+      "exit_code": 0,
+      "finished": "2026-11-13T16:06:46+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.app-phone-ios27-a.log",
+      "log_sha256": "41501a799b84ef5e29a1ae2a21932574e3b540230d7dc29384f089a47d97f7fa",
+      "name": "app-phone-ios27-a"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime 27.2 --kind phone --only-testing VisualCoreUITests/SettingsUITests VisualCoreUITests/LaunchUITests --log-name ua-f07-phone-ios27-b-ev",
+      "exit_code": 0,
+      "finished": "2026-11-13T16:37:36+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.app-phone-ios27-b-ev.log",
+      "log_sha256": "fae91830aaace34e07c62addd5423cddee25c77afbbc3bb6ecdab9282b70349a",
+      "name": "app-phone-ios27-b-ev"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime 27.2 --kind phone --only-testing VisualCoreUITests/SettingsUITests VisualCoreUITests/LaunchUITests --log-name ua-f07-phone-ios27-b-r2",
+      "exit_code": 0,
+      "finished": "2026-11-13T13:03:03+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.app-phone-ios27-b-r2.log",
+      "log_sha256": "80fa743c3f182506452d79874fe58b58673255af8bcc853987af4c9c462cc6c4",
+      "name": "app-phone-ios27-b-r2"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime 27.2 --kind phone --action build-for-testing --log-name ua-f07-phone-ios27-bft",
+      "exit_code": 0,
+      "finished": "2026-11-13T17:35:02+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.app-phone-ios27-build-for-testing.log",
+      "log_sha256": "a99a487392d51bdd99b8c1c7fdb448f931649595b193b210eac65beec5028f05",
+      "name": "app-phone-ios27-build-for-testing"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime 27.2 --kind phone --only-testing VisualCoreTests/AppModelTests VisualCoreTests/StoreTests VisualCoreTests/BundleTests VisualCoreTests/ScenarioLaunchTests --log-name ua-f07-c-a02moved",
+      "exit_code": 0,
+      "finished": "2026-11-13T13:54:49+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.app-phone-ios27-c-a02moved.log",
+      "log_sha256": "911469e8fef7d439f60395dbbdbafe95290bdb5f4eb5006662510297c513bd0f",
+      "name": "app-phone-ios27-c-a02moved"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime 27.2 --kind phone --only-testing VisualCoreTests/AppModelTests VisualCoreTests/StoreTests VisualCoreTests/BundleTests VisualCoreTests/ScenarioLaunchTests --log-name ua-f07-c-a03moved",
+      "exit_code": 0,
+      "finished": "2026-11-13T15:05:36+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.app-phone-ios27-c-a03moved.log",
+      "log_sha256": "966a6df9122c5b8639a81df46660a07ac411483d85ae054f56055e81fb721450",
+      "name": "app-phone-ios27-c-a03moved"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime 27.2 --kind phone --only-testing VisualCoreTests/AppModelTests VisualCoreTests/StoreTests VisualCoreTests/BundleTests VisualCoreTests/ScenarioLaunchTests --log-name ua-f07-c-a04moved",
+      "exit_code": 0,
+      "finished": "2026-11-13T15:22:15+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.app-phone-ios27-c-a04moved.log",
+      "log_sha256": "fb3d1605dfc932534468db111a5ec4db4317fefa1dc64d3391075b077323c482",
+      "name": "app-phone-ios27-c-a04moved"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime 27.2 --kind phone --only-testing VisualCoreTests/AppModelTests VisualCoreTests/StoreTests VisualCoreTests/BundleTests VisualCoreTests/ScenarioLaunchTests --log-name ua-f07-phone-ios27-c-ev",
+      "exit_code": 0,
+      "finished": "2026-11-13T16:37:45+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.app-phone-ios27-c-ev.log",
+      "log_sha256": "ade0e4ccbdf0fcc7d17212bb650dd32e78d8cdec3ddf0f370df842a4de15a58d",
+      "name": "app-phone-ios27-c-ev"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime 27.2 --kind phone --only-testing VisualCoreTests/AppModelTests VisualCoreTests/StoreTests VisualCoreTests/BundleTests VisualCoreTests/ScenarioLaunchTests --log-name ua-f07-c-moved-r2",
+      "exit_code": 0,
+      "finished": "2026-11-13T13:18:46+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.app-phone-ios27-c-moved-r2.log",
+      "log_sha256": "c492e14ee023a4b0570e57055e0e616277ea9c7dff3b437f3ca5dfecf491e28c",
+      "name": "app-phone-ios27-c-moved-r2"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime 27.2 --kind phone --only-testing VisualCoreUITests/LauncherUITests VisualCoreUITests/FirstRunUITests --log-name ua-f07-phone-ios27-d-ev",
+      "exit_code": 0,
+      "finished": "2026-11-13T16:41:06+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.app-phone-ios27-d-ev.log",
+      "log_sha256": "60046a3ae8bdf58adaf749ee466299994931253dd8d8b0eec2bc4047929b7594",
+      "name": "app-phone-ios27-d-ev"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime 27.2 --kind phone --only-testing VisualCoreUITests/PersistenceUITests --log-name ua-f07-phone-ios27-e-ev",
+      "exit_code": 0,
+      "finished": "2026-11-13T16:44:27+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.app-phone-ios27-e-ev.log",
+      "log_sha256": "0a82c2a0dfb91ad6a94005ec700ab5eb4d9b2ff1683801d285c1a0af30d75b47",
+      "name": "app-phone-ios27-e-ev"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime 27.2 --kind phone --only-testing VisualCoreUITests/PersistenceDamageUITests --log-name ua-f07-phone-ios27-f-ev",
+      "exit_code": 0,
+      "finished": "2026-11-13T16:48:30+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.app-phone-ios27-f-ev.log",
+      "log_sha256": "48701230f1ef0d142b86ba1fb3377596f0a4389c87ec0e479ed1ac0a3352a788",
+      "name": "app-phone-ios27-f-ev"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime 27.2 --kind phone --only-testing VisualCoreUITests/GASAccessibilityAuditUITests --log-name ua-f07-phone-ios27-g1-ev",
+      "exit_code": 0,
+      "finished": "2026-11-13T16:55:15+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.app-phone-ios27-g1-ev.log",
+      "log_sha256": "7ddf1c250219d883e9334dde42bdb9c8b5d7aeb0ceb47e00c9022312a0d697aa",
+      "name": "app-phone-ios27-g1-ev"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime 27.2 --kind phone --only-testing VisualCoreUITests/GASAccessibilityAuditUITests --log-name ua-f07-phone-ios27-g1",
+      "exit_code": 0,
+      "finished": "2026-11-13T12:50:12+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.app-phone-ios27-g1.log",
+      "log_sha256": "9eaf2319d126516f3c130885bf2a07d69266db69175389c19b4e8d4fb1978f69",
+      "name": "app-phone-ios27-g1"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime 27.2 --kind phone --only-testing VisualCoreUITests/GASControlsUITests VisualCoreUITests/GASExportUITests VisualCoreUITests/GASGalleryUITests --log-name ua-f07-phone-ios27-g2-ev",
+      "exit_code": 0,
+      "finished": "2026-11-13T16:58:09+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.app-phone-ios27-g2-ev.log",
+      "log_sha256": "a41fccb6066c7bb083efaeb056ec14bf5c116df082f11f969cbdca9e69d02d96",
+      "name": "app-phone-ios27-g2-ev"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime 27.2 --kind phone --only-testing VisualCoreUITests/GASControlsUITests VisualCoreUITests/GASExportUITests VisualCoreUITests/GASGalleryUITests --log-name ua-f07-g2-moved",
+      "exit_code": 0,
+      "finished": "2026-11-13T13:18:05+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.app-phone-ios27-g2-moved.log",
+      "log_sha256": "757e17dbaa3b39e6b9ba6a852b11bb3d6348d1ad009e62d4119eaacee1a482c5",
+      "name": "app-phone-ios27-g2-moved"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime 27.2 --kind phone --only-testing VisualCoreUITests/GASControlsUITests VisualCoreUITests/GASExportUITests VisualCoreUITests/GASGalleryUITests --log-name ua-f07-phone-ios27-g2",
+      "exit_code": 0,
+      "finished": "2026-11-13T12:52:45+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.app-phone-ios27-g2.log",
+      "log_sha256": "880977a999f3d957300cb826eaad642b7d77765051b0c1e8a89d8cd857c31c77",
+      "name": "app-phone-ios27-g2"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime 27.2 --kind phone --only-testing VisualCoreUITests/GASLibraryUITests VisualCoreUITests/GASRecoveryUITests --log-name ua-f07-phone-ios27-g3-ev",
+      "exit_code": 0,
+      "finished": "2026-11-13T17:02:25+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.app-phone-ios27-g3-ev.log",
+      "log_sha256": "437434aa34cd7944b2e4312b92a196ab866392326c7917991c87a7a0c2a6c377",
+      "name": "app-phone-ios27-g3-ev"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime 27.2 --kind phone --only-testing VisualCoreUITests/GASLibraryUITests VisualCoreUITests/GASRecoveryUITests --log-name ua-f07-phone-ios27-g3",
+      "exit_code": 0,
+      "finished": "2026-11-13T12:56:21+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.app-phone-ios27-g3.log",
+      "log_sha256": "ab6ef38fa836ebaac98929529980300432473e2c8ebe6e637571e27953c5cc3a",
+      "name": "app-phone-ios27-g3"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime 27.2 --kind phone --only-testing VisualCoreUITests/FAPAccessibilityAuditUITests --log-name ua-f07-phone-ios27-h1-ev",
+      "exit_code": 0,
+      "finished": "2026-11-13T17:12:12+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.app-phone-ios27-h1-ev.log",
+      "log_sha256": "b6ec09cd6375bbfb3507593270a29db25baa08b735d7c75d3f08e219d5576a2e",
+      "name": "app-phone-ios27-h1-ev"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime 27.2 --kind phone --only-testing VisualCoreUITests/FAPAccessibilityAuditUITests --log-name ua-f07-phone-ios27-h1",
+      "exit_code": 0,
+      "finished": "2026-11-13T13:44:16+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.app-phone-ios27-h1.log",
+      "log_sha256": "6e381c48dac453907efe242091b22e3be1f9fbe71faea1f6db3e89bc4c38c3ae",
+      "name": "app-phone-ios27-h1"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime 27.2 --kind phone --only-testing VisualCoreUITests/FAPPlaygroundUITests VisualCoreUITests/FAPControlsUITests VisualCoreUITests/FAPAdjustUITests VisualCoreUITests/FAPPaletteCaptureUITests --log-name ua-f07-phone-ios27-h2-ev",
+      "exit_code": 0,
+      "finished": "2026-11-13T17:15:11+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.app-phone-ios27-h2-ev.log",
+      "log_sha256": "75de73aca16f8a54d6de93f991e53d7da1290eb911027a4d026a726f37919509",
+      "name": "app-phone-ios27-h2-ev"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime 27.2 --kind phone --only-testing VisualCoreUITests/FAPPlaygroundUITests VisualCoreUITests/FAPControlsUITests VisualCoreUITests/FAPAdjustUITests VisualCoreUITests/FAPPaletteCaptureUITests --log-name ua-f07-h2-moved",
+      "exit_code": 0,
+      "finished": "2026-11-13T13:58:45+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.app-phone-ios27-h2-moved.log",
+      "log_sha256": "2aae35cca902e1132c453da69f7c8a5e4946ee1e91e78ecb4834963b097995ab",
+      "name": "app-phone-ios27-h2-moved"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime 27.2 --kind phone --only-testing VisualCoreUITests/FAPPlaygroundUITests VisualCoreUITests/FAPControlsUITests VisualCoreUITests/FAPAdjustUITests VisualCoreUITests/FAPPaletteCaptureUITests --log-name ua-f07-phone-ios27-h2",
+      "exit_code": 0,
+      "finished": "2026-11-13T13:47:08+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.app-phone-ios27-h2.log",
+      "log_sha256": "6688eb5a0abd4bfbc748fe95d56822369b48dd9c7570a6bba3e8fcd0b578c501",
+      "name": "app-phone-ios27-h2"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime 27.2 --kind phone --only-testing VisualCoreUITests/FEAccessibilityAuditUITests/testAuditDefaultTextSize --log-name ua-f07-phone-ios27-i1a-ev2",
+      "exit_code": 0,
+      "finished": "2026-11-13T17:24:56+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.app-phone-ios27-i1a-ev2.log",
+      "log_sha256": "6fd9744088a5cedb761d4a7c3c04973088058a9cfee1e71bcec7e9fe52c076ff",
+      "name": "app-phone-ios27-i1a-ev2"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime 27.2 --kind phone --only-testing VisualCoreUITests/FEAccessibilityAuditUITests/testAuditLargestAccessibilityTextSize --log-name ua-f07-phone-ios27-i1b-ev",
+      "exit_code": 0,
+      "finished": "2026-11-13T17:31:11+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.app-phone-ios27-i1b-ev.log",
+      "log_sha256": "88acbdd198388f44324fd39d71e5f8c343e53d64ed7886e421063c06ec554f3a",
+      "name": "app-phone-ios27-i1b-ev"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime 27.2 --kind phone --action test-without-building --only-testing VisualCoreUITests/FEExplorerUITests VisualCoreUITests/FEBookmarkUITests VisualCoreUITests/FECaptureTourUITests --log-name ua-f07-phone-ios27-i2-ev5",
+      "exit_code": 0,
+      "finished": "2026-11-13T17:44:13+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.app-phone-ios27-i2-ev5.log",
+      "log_sha256": "6090aad59260f42b18fedf754155f2302bc6fd828baf74d6210c81ac0ea000ad",
+      "name": "app-phone-ios27-i2-ev5"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime 27.2 --kind phone --only-testing VisualCoreUITests/FEExplorerUITests VisualCoreUITests/FEBookmarkUITests VisualCoreUITests/FECaptureTourUITests --log-name ua-f07-i2-moved",
+      "exit_code": 0,
+      "finished": "2026-11-13T15:13:44+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.app-phone-ios27-i2-moved.log",
+      "log_sha256": "e1e0e4df5590636ac4a6900670c2ccb02085122ece815f9b049fce69bb0a9dbf",
+      "name": "app-phone-ios27-i2-moved"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime 27.2 --kind phone --only-testing VisualCoreUITests/FEExplorerUITests VisualCoreUITests/FEBookmarkUITests VisualCoreUITests/FECaptureTourUITests --log-name ua-f07-phone-ios27-i2",
+      "exit_code": 0,
+      "finished": "2026-11-13T14:58:22+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.app-phone-ios27-i2.log",
+      "log_sha256": "df80b7ee3bc139eb75d3e52c3d6930371c6cf634971b290e9a3cbe8dfd2a0326",
+      "name": "app-phone-ios27-i2"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime 27.2 --kind phone --only-testing VisualCoreUITests/PUAccessibilityAuditUITests --log-name ua-f07-phone-ios27-j1",
+      "exit_code": 0,
+      "finished": "2026-11-13T15:52:35+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.app-phone-ios27-j1.log",
+      "log_sha256": "8453667764e6482011ea211fa65195183699e35f8e068039510866c58ed08d11",
+      "name": "app-phone-ios27-j1"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime 27.2 --kind phone --action test-without-building --only-testing VisualCoreUITests/PUSandboxUITests --log-name ua-f07-phone-ios27-j2-ev2",
+      "exit_code": 0,
+      "finished": "2026-11-13T17:47:06+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.app-phone-ios27-j2-ev2.log",
+      "log_sha256": "183d8b976a52ba8735342d9c8cb36fa17a3347f6105d6967056ebba502e7ce23",
+      "name": "app-phone-ios27-j2-ev2"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime 27.2 --kind phone --only-testing VisualCoreUITests/PUSandboxUITests --log-name ua-f07-phone-ios27-j2",
+      "exit_code": 0,
+      "finished": "2026-11-13T15:55:10+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.app-phone-ios27-j2.log",
+      "log_sha256": "b61abde404a1666ea1f0718aa273739a9c12e8d6944427388d0552be92587c8e",
+      "name": "app-phone-ios27-j2"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime 27.2 --kind phone --action test-without-building --only-testing VisualCoreUITests/PUEmitterUITests VisualCoreUITests/PUForceUITests VisualCoreUITests/PUTrailUITests --log-name ua-f07-phone-ios27-j3-ev",
+      "exit_code": 0,
+      "finished": "2026-11-13T17:57:45+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.app-phone-ios27-j3-ev.log",
+      "log_sha256": "636e5a886ab4e5e7d5968e080c79bebaf05af410f06c3a69c28742adc24d5ee3",
+      "name": "app-phone-ios27-j3-ev"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime 27.2 --kind phone --only-testing VisualCoreUITests/PUEmitterUITests VisualCoreUITests/PUForceUITests VisualCoreUITests/PUTrailUITests --log-name ua-f07-phone-ios27-j3",
+      "exit_code": 0,
+      "finished": "2026-11-13T16:01:59+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.app-phone-ios27-j3.log",
+      "log_sha256": "05d4018a5176e679f44385b7b455458128c062d6fcac95968c9eacb0e4a27c14",
+      "name": "app-phone-ios27-j3"
+    },
+    {
+      "command": "python3 scripts/migration_baseline.py verify",
+      "exit_code": 0,
+      "finished": "2026-11-13T13:13:28+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.baseline-verify-a01-moved.log",
+      "log_sha256": "5b0fdb44cbfabe834b1968a4c9b5478d4be5aac19f464c2d923d2ca280e69dac",
+      "name": "baseline-verify-a01-moved"
+    },
+    {
+      "command": "python3 scripts/migration_baseline.py verify",
+      "exit_code": 0,
+      "finished": "2026-11-13T11:53:22+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.baseline-verify-a01.log",
+      "log_sha256": "0bba6b11233dffec91438c9cb3770ac22b89814a8f8599d98b805fc2802e62a0",
+      "name": "baseline-verify-a01"
+    },
+    {
+      "command": "python3 scripts/migration_baseline.py verify",
+      "exit_code": 0,
+      "finished": "2026-11-13T16:07:10+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.baseline-verify-all-moved.log",
+      "log_sha256": "60a8437e7d1a622ff10867c847ff285a12978a44dcbe0998ff3af9329dc998fb",
+      "name": "baseline-verify-all-moved"
+    },
+    {
+      "command": "xcodebuild build-for-testing -project Harnesses/InteractiveDemo/InteractiveDemo.xcodeproj -scheme InteractiveDemo -destination 'generic/platform=iOS Simulator' -derivedDataPath Build/DerivedData/ua-f07-InteractiveDemo CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "finished": "2026-11-13T18:10:01+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.build-InteractiveDemo.log",
+      "log_sha256": "0f240d8300496348e2593d83ce835554d00befad135f950d66aa982782185ffa",
+      "name": "build-InteractiveDemo"
+    },
+    {
+      "command": "xcodebuild build-for-testing -project VisualCore.xcodeproj -scheme ParticleUniverse -destination 'generic/platform=iOS Simulator' -derivedDataPath Build/DerivedData/ua-f07-ParticleUniverse CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "finished": "2026-11-13T18:09:52+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.build-ParticleUniverse.log",
+      "log_sha256": "2e0d862acb2ca93532bf4affc49e0b3a428c4d5b3cd3c806b0f94ce88c343e20",
+      "name": "build-ParticleUniverse"
+    },
+    {
+      "command": "xcodebuild build-for-testing -project Harnesses/SecondConsumer/SecondConsumer.xcodeproj -scheme SecondConsumer -destination 'generic/platform=iOS Simulator' -derivedDataPath Build/DerivedData/ua-f07-SecondConsumer CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "finished": "2026-11-13T18:10:13+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.build-SecondConsumer.log",
+      "log_sha256": "b0f4e1f3612bacd6fb3a74086fa56b16bfa1ab922246a41077f4e77ded871068",
+      "name": "build-SecondConsumer"
+    },
+    {
+      "command": "xcodebuild build-for-testing -project VisualCore.xcodeproj -scheme Showcase -destination 'generic/platform=iOS Simulator' -derivedDataPath Build/DerivedData/ua-f07-Showcase CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "finished": "2026-11-13T18:09:40+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.build-Showcase.log",
+      "log_sha256": "ee0fa3426b0509e356de22ffcb307414e9269959df919af71c089977d58671f7",
+      "name": "build-Showcase"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime 26.5 --kind phone --only-testing VisualCoreTests/AppModelTests VisualCoreTests/StoreTests VisualCoreTests/BundleTests VisualCoreTests/ScenarioLaunchTests --log-name ua-f07-candidates-ios26",
+      "exit_code": 0,
+      "finished": "2026-11-13T11:19:23+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.candidates-app-ios26.log",
+      "log_sha256": "ec8486a59d901afd3ced1bb26139f47b34abc254a1f05b80ca8e896ebd2f3cb3",
+      "name": "candidates-app-ios26"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime 27.2 --kind phone --only-testing VisualCoreTests/AppModelTests VisualCoreTests/StoreTests VisualCoreTests/BundleTests VisualCoreTests/ScenarioLaunchTests --log-name ua-f07-candidates-ios27",
+      "exit_code": 0,
+      "finished": "2026-11-13T11:19:04+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.candidates-app-ios27.log",
+      "log_sha256": "a30feab28c0f302f59d688718d8801e9cf62d3bb2fa248501a0ad5c03d788000",
+      "name": "candidates-app-ios27"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --result-name core-a01 --only-testing GenerativeArtStudioCoreTests",
+      "exit_code": 0,
+      "finished": "2026-11-13T16:25:37+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.core-a01.log",
+      "log_sha256": "2573d2d7dde1fd1aea29802fbab391183a9485a06368e62b8aff481de9a9f753",
+      "name": "core-a01"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --result-name core-a02 --only-testing FluidArtPlaygroundCoreTests",
+      "exit_code": 0,
+      "finished": "2026-11-13T16:25:45+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.core-a02.log",
+      "log_sha256": "3da9b41a39b8089bfc65042ef502426d2caff7291663c9bdcb2a1abb6a2645dc",
+      "name": "core-a02"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --result-name core-a03 --only-testing FractalExplorerCoreTests",
+      "exit_code": 0,
+      "finished": "2026-11-13T16:25:50+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.core-a03.log",
+      "log_sha256": "ba89f75c6bd2adaff731922c2eea7364b5e909385dc878cc4ee50d88e6fe4a3e",
+      "name": "core-a03"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --result-name core-a04 --only-testing ParticleUniverseCoreTests",
+      "exit_code": 0,
+      "finished": "2026-11-13T16:26:35+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.core-a04.log",
+      "log_sha256": "163ba5f7b80ec2f0ae5cf17130c0579f696666aaed6756ac00da786695177f9a",
+      "name": "core-a04"
+    },
+    {
+      "command": "python3 scripts/check_renames.py --base af887e3 Apps/GenerativeArtStudio/Core/Tests Apps/FluidArtPlayground/FluidArtPlaygroundCore/Tests Apps/FractalExplorer/FractalExplorerCore/Tests Apps/ParticleUniverse/ParticleUniverseCore/Tests Packages/ExperiencesCreative/GenerativeArtStudio/CoreTests Packages/ExperiencesCreative/FluidArtPlayground/CoreTests Packages/ExperiencesCreative/FractalExplorer/CoreTests Packages/ExperiencesCreative/ParticleUniverse/CoreTests",
+      "exit_code": 0,
+      "finished": "2026-11-13T16:07:11+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.core-tests-renames-only-all.log",
+      "log_sha256": "90b6ebfab4bcdc50b99589515875a6982ac65e9b8c8eb4a21d419e66a01cf69e",
+      "name": "core-tests-renames-only-all"
+    },
+    {
+      "command": "python3 scripts/validate_docs.py",
+      "exit_code": 0,
+      "finished": "2026-11-13T18:11:53+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.docs.log",
+      "log_sha256": "ac544a0430ac898cc6dd2aee39587d7d1cd6d27cfdf538622c5b40371c473270",
+      "name": "docs"
+    },
+    {
+      "command": "python3 scripts/validate_autocreator.py",
+      "exit_code": 0,
+      "finished": "2026-11-13T16:09:59+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.documents-as-built.log",
+      "log_sha256": "8929d5cfe5b9138859b139c9a149bfa60c41479f1098bf727e1e0d5e9ca40eaa",
+      "name": "documents-as-built"
+    },
+    {
+      "command": "python3 scripts/validate_docs.py",
+      "exit_code": 0,
+      "finished": "2026-11-13T16:08:47+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.dossier-readmes.log",
+      "log_sha256": "2e3df216dc861425ddaf12770e531ce1ae718b0d53f74b390434e33c541e1c3a",
+      "name": "dossier-readmes"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-26.5 --action test --result-name ua-f07-experiences-26",
+      "exit_code": 0,
+      "finished": "2026-11-13T18:09:22+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.experiences-ios26.log",
+      "log_sha256": "e152fb54c5343400dec73d5ff69841b6506d6746bd176d07b16468bff38f4dcf",
+      "name": "experiences-ios26"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --result-name ua-f07-experiences-27",
+      "exit_code": 0,
+      "finished": "2026-11-13T18:07:00+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.experiences-ios27.log",
+      "log_sha256": "0685b717fe69ba0c8fad912cc16fcebaeb470827cdfcf2eb2420586874f88d64",
+      "name": "experiences-ios27"
+    },
+    {
+      "command": "python3 scripts/migration_baseline.py verify",
+      "exit_code": 0,
+      "finished": "2026-11-13T16:26:35+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.fixtures.log",
+      "log_sha256": "a9f56aa887d2beaab4da88d0d4372826dd4b58ae09456ee23a432910ceb43bf7",
+      "name": "fixtures"
+    },
+    {
+      "command": "swift test --package-path Packages/VisualCore",
+      "exit_code": 0,
+      "finished": "2026-11-13T11:48:36+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.growth-warmup-host-r2.log",
+      "log_sha256": "41f2991dab7e7fc3c6e6eb5cc89be94ec56fb21e25f67366a6a071ed6c7362ac",
+      "name": "growth-warmup-host-r2"
+    },
+    {
+      "command": "python3 scripts/migration_baseline.py verify",
+      "exit_code": 0,
+      "finished": "2026-11-13T18:11:53+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.legacy-ledger.log",
+      "log_sha256": "eb3013bb7439f0bdc61a7193b2377bd068e2f52507156b3fdb4f0dae2fb7356f",
+      "name": "legacy-ledger"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-26.5 --action test --result-name ua-f07-pointer-265 --only-testing VisualCoreExperienceHostTests",
+      "exit_code": 0,
+      "finished": "2026-11-13T11:16:10+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.pointer-path-host-ios265.log",
+      "log_sha256": "5db6649a4658dffbae13a790a4e953d22821fbb272a599e3f2f1cf743bc8d962",
+      "name": "pointer-path-host-ios265"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --result-name ua-f07-pointer-272 --only-testing VisualCoreExperienceHostTests",
+      "exit_code": 0,
+      "finished": "2026-11-13T11:15:37+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.pointer-path-host-ios272.log",
+      "log_sha256": "9f46c7257c6dc3c16c78b55d34fbec100bf32b638c954b81c9d97b5f8856bc56",
+      "name": "pointer-path-host-ios272"
+    },
+    {
+      "command": "python3 scripts/check_privacy_manifest.py --app Build/DerivedData/ua-f07-release/Build/Products/Release-iphonesimulator/VisualCore.app",
+      "exit_code": 0,
+      "finished": "2026-11-13T18:04:17+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.privacy-manifest-r2.log",
+      "log_sha256": "66bf1e620c413d58ddf06a649efb4cc6b8647047a87b7fd9fb757ae38638a014",
+      "name": "privacy-manifest-r2"
+    },
+    {
+      "command": "xcodebuild build -project VisualCore.xcodeproj -scheme ParticleUniverse -destination 'generic/platform=iOS Simulator' -derivedDataPath Build/DerivedData/pu-standalone CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "finished": "2026-11-13T15:21:56+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.pu-standalone-build-moved.log",
+      "log_sha256": "cc65069ad199fea7a8a212ba7a424d33232da892c2804bcac424f06b39120487",
+      "name": "pu-standalone-build-moved"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCore --scheme VisualCore-Package --destination sim-26.5 --action test",
+      "exit_code": 0,
+      "finished": "2026-11-13T18:02:39+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.pure-ios26.log",
+      "log_sha256": "50ec3c8ad0172e8a414ea579b06c8ed8e58b1beeea04be0b2d6a84367c16eb6a",
+      "name": "pure-ios26"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCore --scheme VisualCore-Package --destination sim-27.2 --action test",
+      "exit_code": 0,
+      "finished": "2026-11-13T18:02:11+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.pure-ios27.log",
+      "log_sha256": "a0eb0859083b92e98d4c5572e9da0c804c8e2c1e3a53b679f3d658bda38ffd7b",
+      "name": "pure-ios27"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only reference-engine-xcframework reference-build-projectm-ios-sim reference-clean",
+      "exit_code": 0,
+      "finished": "2026-11-13T11:16:48+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.reference-a-pointer.log",
+      "log_sha256": "1772a64b126a8cc6dbd1f73cc487e71392077579efb492bb19acc8ba79a2304b",
+      "name": "reference-a-pointer"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only reference-engine-xcframework reference-build-projectm-ios-sim reference-clean",
+      "exit_code": 0,
+      "finished": "2026-11-13T11:39:14+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.reference-a-still.log",
+      "log_sha256": "de8a474c8163fc2ca394b52373dfcf87993bd50375cea7f91501b9620e194c6d",
+      "name": "reference-a-still"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only reference-engine-xcframework reference-build-projectm-ios-sim reference-clean",
+      "exit_code": 0,
+      "finished": "2026-11-13T11:50:26+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.reference-a-warmup.log",
+      "log_sha256": "2675c59512b1b1211e70a44d1acf5a0d124b3bd0f2d51eb881ff60127ad26338",
+      "name": "reference-a-warmup"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only reference-engine-xcframework reference-build-projectm-ios-sim reference-clean",
+      "exit_code": 0,
+      "finished": "2026-11-13T18:10:51+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.reference-a.log",
+      "log_sha256": "9d052b967d934e86d99c2b895db783f94178d7a7de6f94556337a3e0031bb749",
+      "name": "reference-a"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only reference-test-anglerendering-ios27 reference-test-anglerendering-ios26 projectm-reference-ios27 projectm-reference-ios26",
+      "exit_code": 0,
+      "finished": "2026-11-13T11:17:35+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.reference-b-pointer.log",
+      "log_sha256": "9dbf43f9b4397b76b178029b4c72041ebd283d5d46d08306d50af31e82927b90",
+      "name": "reference-b-pointer"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only reference-test-anglerendering-ios27 reference-test-anglerendering-ios26 projectm-reference-ios27 projectm-reference-ios26",
+      "exit_code": 0,
+      "finished": "2026-11-13T11:40:00+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.reference-b-still.log",
+      "log_sha256": "1cf293051341dafdec9c16bea2676f293e12759eb5ce0e4c94cff0bd40d3c4dc",
+      "name": "reference-b-still"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only reference-test-anglerendering-ios27 reference-test-anglerendering-ios26 projectm-reference-ios27 projectm-reference-ios26",
+      "exit_code": 0,
+      "finished": "2026-11-13T11:50:50+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.reference-b-warmup.log",
+      "log_sha256": "2262547a405b0fd75d4021c1ea908df78def7ff6551d56f9d820fe1b6e309aee",
+      "name": "reference-b-warmup"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only reference-test-anglerendering-ios27 reference-test-anglerendering-ios26 projectm-reference-ios27 projectm-reference-ios26",
+      "exit_code": 0,
+      "finished": "2026-11-13T18:11:35+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.reference-b.log",
+      "log_sha256": "a35396492d9803071a6b22d4c7df0a2375f6cef735defa6e890e66ec2f43ba2e",
+      "name": "reference-b"
+    },
+    {
+      "command": "xcodebuild build -project VisualCore.xcodeproj -scheme VisualCore -configuration Release -destination 'generic/platform=iOS Simulator' -derivedDataPath Build/DerivedData/ua-f07-release CODE_SIGNING_ALLOWED=NO",
+      "exit_code": 0,
+      "finished": "2026-11-13T18:04:12+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.release-build-r2.log",
+      "log_sha256": "5b99ac2a39f1c91f8d088c6b816b8b795663b89df8810577346a5497cac34b40",
+      "name": "release-build-r2"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only showcase-release-build release-symbols projectm-independence",
+      "exit_code": 0,
+      "finished": "2026-11-13T18:02:59+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.release-build-symbols.log",
+      "log_sha256": "51781af9ad5305788f0a0757006042f071994c26b5d5f8e0d999c08c57a89701",
+      "name": "release-build-symbols"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only compliance licenses dependencies public-api app-contracts isolation-visual-core isolation-particle-universe documented-api-visual-core host-visualcore",
+      "exit_code": 0,
+      "finished": "2026-11-13T18:00:08+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.release-static.log",
+      "log_sha256": "3081fa7911927d27dbf2c19fa9e03f4ea34576e906289ae3f3683125ecbda41b",
+      "name": "release-static"
+    },
+    {
+      "command": "python3 scripts/check_release_symbols.py --app Build/DerivedData/ua-f07-release/Build/Products/Release-iphonesimulator/VisualCore.app --forbid DebugLaunch DebugExperience DebugInventory ScenarioLaunch ScenarioHostView vcDamageStat vcCandidates ParticleManifest FractalManifest FluidArtManifest GenerativeArtManifest",
+      "exit_code": 0,
+      "finished": "2026-11-13T18:04:17+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.release-symbols-r2.log",
+      "log_sha256": "58701a3c55abc8acfac09bcbd9498ea9115eb6edb5e8f560344ac15d1668dcb7",
+      "name": "release-symbols-r2"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only rendering-sim-ios26",
+      "exit_code": 0,
+      "finished": "2026-11-13T18:01:32+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.rendering-ios26.log",
+      "log_sha256": "1f85f124d3d6c031cb28679bbbdf2f299db96ce0efe92c12f02ab62e65e441c0",
+      "name": "rendering-ios26"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only rendering-sim-ios27",
+      "exit_code": 0,
+      "finished": "2026-11-13T18:00:51+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.rendering-ios27.log",
+      "log_sha256": "fdf60a57b0f1945b4acbc3b6eaad53ec104dd72e923b6162ee12f7af77a0b988",
+      "name": "rendering-ios27"
+    },
+    {
+      "command": "python3 -m unittest scripts/test_scripts.py",
+      "exit_code": 0,
+      "finished": "2026-11-13T16:12:30+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.script-tests-docapi.log",
+      "log_sha256": "53a30c9c10d93e10b9a28b2c8e7a9c2d35e7f63552607c396ae63f87587ff0e9",
+      "name": "script-tests-docapi"
+    },
+    {
+      "command": "python3 -m unittest scripts/test_scripts.py",
+      "exit_code": 0,
+      "finished": "2026-11-13T17:20:52+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.script-tests-guard.log",
+      "log_sha256": "2af6ca260828b8d9f5cc5d5c08cad192f68d0b653e95bb71b457036bd048c0dc",
+      "name": "script-tests-guard"
+    },
+    {
+      "command": "python3 -m unittest scripts/test_scripts.py",
+      "exit_code": 0,
+      "finished": "2026-11-13T16:15:42+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.script-tests-paths.log",
+      "log_sha256": "bd6f456ccdb5505ed7103ea564f482d6b028ee40175fff515d84772636edc77f",
+      "name": "script-tests-paths"
+    },
+    {
+      "command": "python3 scripts/test_scripts.py",
+      "exit_code": 0,
+      "finished": "2026-11-13T18:12:22+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.script-tests.log",
+      "log_sha256": "1c567ff34538b6166f4c4ac8965dfb9f65c2320d00f899a6fec7292c49ec5026",
+      "name": "script-tests"
+    },
+    {
+      "command": "python3 scripts/test_scripts.py",
+      "exit_code": 0,
+      "finished": "2026-11-13T11:40:39+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.scripts-a01.log",
+      "log_sha256": "0ec5280bf8c078a9c83aef134eae34eed240d8583715eb7ca83dd5000cd6ac25",
+      "name": "scripts-a01"
+    },
+    {
+      "command": "python3 scripts/validate_autocreator.py",
+      "exit_code": 0,
+      "finished": "2026-11-13T18:11:54+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.steering.log",
+      "log_sha256": "179c8949bdf82dec58464b2c912607ff9b51db356c293ebfe7c3c70d2c205fe0",
+      "name": "steering"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-26.5 --action test --result-name ua-f07-still-265 --only-testing VisualCoreExperienceHostTests",
+      "exit_code": 0,
+      "finished": "2026-11-13T11:38:47+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.still-host-ios265.log",
+      "log_sha256": "d73f29493d64613aa4a5e01f8b6e6c34f97a29af3c0d9b7933b38c6d7e7b67ac",
+      "name": "still-host-ios265"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --result-name ua-f07-still-272 --only-testing VisualCoreExperienceHostTests",
+      "exit_code": 0,
+      "finished": "2026-11-13T11:38:17+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.still-host-ios272.log",
+      "log_sha256": "799536b1d842775cc11a8f0dc568d37bcea87b3c101a9b363353ec4b7e21bbfa",
+      "name": "still-host-ios272"
+    },
+    {
+      "command": "python3 scripts/check_test_map.py --map specs/193-ua-f07-legacy-adoption/test-map.csv --old /private/tmp/claude-501/-Users-coast-Documents-GIT-VisualCore/6ae79f68-9b3e-404c-8bcb-11c9e268df91/scratchpad/old-ui/Apps/GenerativeArtStudio/Tests/UI --new Apps/VisualCore/Tests/UI --app GenerativeArtStudio --log .autonomy/logs/app-tests/ua-f07-phone-ios27-a-ev.log .autonomy/logs/app-tests/ua-f07-phone-ios27-b-ev.log .autonomy/logs/app-tests/ua-f07-phone-ios27-c-ev.log .autonomy/logs/app-tests/ua-f07-phone-ios27-d-ev.log .autonomy/logs/app-tests/ua-f07-phone-ios27-e-ev.log .autonomy/logs/app-tests/ua-f07-phone-ios27-f-ev.log .autonomy/logs/app-tests/ua-f07-phone-ios27-g1-ev.log .autonomy/logs/app-tests/ua-f07-phone-ios27-g2-ev.log .autonomy/logs/app-tests/ua-f07-phone-ios27-g3-ev.log .autonomy/logs/app-tests/ua-f07-phone-ios27-h1-ev.log .autonomy/logs/app-tests/ua-f07-phone-ios27-h2-ev.log .autonomy/logs/app-tests/ua-f07-phone-ios27-i1a-ev.log .autonomy/logs/app-tests/ua-f07-phone-ios27-i1a-ev2.log .autonomy/logs/app-tests/ua-f07-phone-ios27-i1b-ev.log .autonomy/logs/app-tests/ua-f07-phone-ios27-i2-ev.log .autonomy/logs/app-tests/ua-f07-phone-ios27-i2-ev2.log .autonomy/logs/app-tests/ua-f07-phone-ios27-i2-ev3.log .autonomy/logs/app-tests/ua-f07-phone-ios27-i2-ev4.log .autonomy/logs/app-tests/ua-f07-phone-ios27-i2-ev5.log .autonomy/logs/app-tests/ua-f07-phone-ios27-j2-ev.log .autonomy/logs/app-tests/ua-f07-phone-ios27-j2-ev2.log .autonomy/logs/app-tests/ua-f07-phone-ios27-j3-ev.log .autonomy/logs/app-tests/ua-f07-phone-ios27-j1.log",
+      "exit_code": 0,
+      "finished": "2026-11-13T17:58:29+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.test-map-a01.log",
+      "log_sha256": "752716eb6a38de1c15dcfa0da52dd13c9b81c5ed44264e355e4b03f9c9fd835c",
+      "name": "test-map-a01"
+    },
+    {
+      "command": "python3 scripts/check_test_map.py --map specs/193-ua-f07-legacy-adoption/test-map.csv --old /private/tmp/claude-501/-Users-coast-Documents-GIT-VisualCore/6ae79f68-9b3e-404c-8bcb-11c9e268df91/scratchpad/old-ui/Apps/FluidArtPlayground/Tests/UI --new Apps/VisualCore/Tests/UI --app FluidArtPlayground --log .autonomy/logs/app-tests/ua-f07-phone-ios27-a-ev.log .autonomy/logs/app-tests/ua-f07-phone-ios27-b-ev.log .autonomy/logs/app-tests/ua-f07-phone-ios27-c-ev.log .autonomy/logs/app-tests/ua-f07-phone-ios27-d-ev.log .autonomy/logs/app-tests/ua-f07-phone-ios27-e-ev.log .autonomy/logs/app-tests/ua-f07-phone-ios27-f-ev.log .autonomy/logs/app-tests/ua-f07-phone-ios27-g1-ev.log .autonomy/logs/app-tests/ua-f07-phone-ios27-g2-ev.log .autonomy/logs/app-tests/ua-f07-phone-ios27-g3-ev.log .autonomy/logs/app-tests/ua-f07-phone-ios27-h1-ev.log .autonomy/logs/app-tests/ua-f07-phone-ios27-h2-ev.log .autonomy/logs/app-tests/ua-f07-phone-ios27-i1a-ev.log .autonomy/logs/app-tests/ua-f07-phone-ios27-i1a-ev2.log .autonomy/logs/app-tests/ua-f07-phone-ios27-i1b-ev.log .autonomy/logs/app-tests/ua-f07-phone-ios27-i2-ev.log .autonomy/logs/app-tests/ua-f07-phone-ios27-i2-ev2.log .autonomy/logs/app-tests/ua-f07-phone-ios27-i2-ev3.log .autonomy/logs/app-tests/ua-f07-phone-ios27-i2-ev4.log .autonomy/logs/app-tests/ua-f07-phone-ios27-i2-ev5.log .autonomy/logs/app-tests/ua-f07-phone-ios27-j2-ev.log .autonomy/logs/app-tests/ua-f07-phone-ios27-j2-ev2.log .autonomy/logs/app-tests/ua-f07-phone-ios27-j3-ev.log .autonomy/logs/app-tests/ua-f07-phone-ios27-j1.log",
+      "exit_code": 0,
+      "finished": "2026-11-13T17:58:29+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.test-map-a02.log",
+      "log_sha256": "8b703cb5f1ae7d35906b389111b51cfb4c880b7bef801c62057915544865332e",
+      "name": "test-map-a02"
+    },
+    {
+      "command": "python3 scripts/check_test_map.py --map specs/193-ua-f07-legacy-adoption/test-map.csv --old /private/tmp/claude-501/-Users-coast-Documents-GIT-VisualCore/6ae79f68-9b3e-404c-8bcb-11c9e268df91/scratchpad/old-ui/Apps/FractalExplorer/Tests/UI --new Apps/VisualCore/Tests/UI --app FractalExplorer --log .autonomy/logs/app-tests/ua-f07-phone-ios27-a-ev.log .autonomy/logs/app-tests/ua-f07-phone-ios27-b-ev.log .autonomy/logs/app-tests/ua-f07-phone-ios27-c-ev.log .autonomy/logs/app-tests/ua-f07-phone-ios27-d-ev.log .autonomy/logs/app-tests/ua-f07-phone-ios27-e-ev.log .autonomy/logs/app-tests/ua-f07-phone-ios27-f-ev.log .autonomy/logs/app-tests/ua-f07-phone-ios27-g1-ev.log .autonomy/logs/app-tests/ua-f07-phone-ios27-g2-ev.log .autonomy/logs/app-tests/ua-f07-phone-ios27-g3-ev.log .autonomy/logs/app-tests/ua-f07-phone-ios27-h1-ev.log .autonomy/logs/app-tests/ua-f07-phone-ios27-h2-ev.log .autonomy/logs/app-tests/ua-f07-phone-ios27-i1a-ev.log .autonomy/logs/app-tests/ua-f07-phone-ios27-i1a-ev2.log .autonomy/logs/app-tests/ua-f07-phone-ios27-i1b-ev.log .autonomy/logs/app-tests/ua-f07-phone-ios27-i2-ev.log .autonomy/logs/app-tests/ua-f07-phone-ios27-i2-ev2.log .autonomy/logs/app-tests/ua-f07-phone-ios27-i2-ev3.log .autonomy/logs/app-tests/ua-f07-phone-ios27-i2-ev4.log .autonomy/logs/app-tests/ua-f07-phone-ios27-i2-ev5.log .autonomy/logs/app-tests/ua-f07-phone-ios27-j2-ev.log .autonomy/logs/app-tests/ua-f07-phone-ios27-j2-ev2.log .autonomy/logs/app-tests/ua-f07-phone-ios27-j3-ev.log .autonomy/logs/app-tests/ua-f07-phone-ios27-j1.log",
+      "exit_code": 0,
+      "finished": "2026-11-13T17:58:29+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.test-map-a03.log",
+      "log_sha256": "dee3e3d388521fb4efd732fd7d921805662105a1af6077f3d70e4e9b19bb78ed",
+      "name": "test-map-a03"
+    },
+    {
+      "command": "python3 scripts/check_test_map.py --map specs/193-ua-f07-legacy-adoption/test-map.csv --old /private/tmp/claude-501/-Users-coast-Documents-GIT-VisualCore/6ae79f68-9b3e-404c-8bcb-11c9e268df91/scratchpad/old-ui/Apps/ParticleUniverse/Tests/UI --new Apps/VisualCore/Tests/UI --app ParticleUniverse --log .autonomy/logs/app-tests/ua-f07-phone-ios27-a-ev.log .autonomy/logs/app-tests/ua-f07-phone-ios27-b-ev.log .autonomy/logs/app-tests/ua-f07-phone-ios27-c-ev.log .autonomy/logs/app-tests/ua-f07-phone-ios27-d-ev.log .autonomy/logs/app-tests/ua-f07-phone-ios27-e-ev.log .autonomy/logs/app-tests/ua-f07-phone-ios27-f-ev.log .autonomy/logs/app-tests/ua-f07-phone-ios27-g1-ev.log .autonomy/logs/app-tests/ua-f07-phone-ios27-g2-ev.log .autonomy/logs/app-tests/ua-f07-phone-ios27-g3-ev.log .autonomy/logs/app-tests/ua-f07-phone-ios27-h1-ev.log .autonomy/logs/app-tests/ua-f07-phone-ios27-h2-ev.log .autonomy/logs/app-tests/ua-f07-phone-ios27-i1a-ev.log .autonomy/logs/app-tests/ua-f07-phone-ios27-i1a-ev2.log .autonomy/logs/app-tests/ua-f07-phone-ios27-i1b-ev.log .autonomy/logs/app-tests/ua-f07-phone-ios27-i2-ev.log .autonomy/logs/app-tests/ua-f07-phone-ios27-i2-ev2.log .autonomy/logs/app-tests/ua-f07-phone-ios27-i2-ev3.log .autonomy/logs/app-tests/ua-f07-phone-ios27-i2-ev4.log .autonomy/logs/app-tests/ua-f07-phone-ios27-i2-ev5.log .autonomy/logs/app-tests/ua-f07-phone-ios27-j2-ev.log .autonomy/logs/app-tests/ua-f07-phone-ios27-j2-ev2.log .autonomy/logs/app-tests/ua-f07-phone-ios27-j3-ev.log .autonomy/logs/app-tests/ua-f07-phone-ios27-j1.log",
+      "exit_code": 0,
+      "finished": "2026-11-13T17:58:29+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.test-map-a04.log",
+      "log_sha256": "f750584c762a94f07bb6d4ab44563f58098973559f0b7253bb8f09ae5c08828b",
+      "name": "test-map-a04"
+    },
+    {
+      "command": "python3 scripts/test_scripts.py TestMapTests",
+      "exit_code": 0,
+      "finished": "2026-11-13T11:12:41+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.test-map-tool.log",
+      "log_sha256": "ce376dff0ed6ae6411478937d98991709680aec5675debae42c8de591bff935d",
+      "name": "test-map-tool"
+    },
+    {
+      "command": "python3 scripts/verify_experiences.py --only a01.generative-art-studio a02.fluid-art-playground --runtime 27 26 --fresh",
+      "exit_code": 0,
+      "finished": "2026-11-13T18:14:01+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.verify-a01-a02-final.log",
+      "log_sha256": "eb84b693d95faed6e509f4f20ae849c0ab7a00f17e4abf68e366514dcd54df24",
+      "name": "verify-a01-a02-final"
+    },
+    {
+      "command": "python3 scripts/verify_experiences.py --only a01.generative-art-studio a02.fluid-art-playground a03.fractal-explorer --runtime 26 --fresh",
+      "exit_code": 0,
+      "finished": "2026-11-13T16:28:39+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.verify-a01-a03-26.log",
+      "log_sha256": "353c6d14ddec9488bf52c4091010b8407164e3fab59711963d3b5c02b8ba932f",
+      "name": "verify-a01-a03-26"
+    },
+    {
+      "command": "python3 scripts/verify_experiences.py --only a01.generative-art-studio a02.fluid-art-playground a03.fractal-explorer --runtime 27 --fresh",
+      "exit_code": 0,
+      "finished": "2026-11-13T16:27:39+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.verify-a01-a03-27.log",
+      "log_sha256": "6eb224b443edc69dcf3f03e9d63729f5517122f471bd2baca3b6e37352a3bf14",
+      "name": "verify-a01-a03-27"
+    },
+    {
+      "command": "python3 scripts/verify_experiences.py --only a04.particle-universe --runtime 27 26 --fresh",
+      "exit_code": 0,
+      "finished": "2026-11-13T16:29:08+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.verify-a04.log",
+      "log_sha256": "f2263eb704e0312a30236e9206fe037db4e78f35328d9c2d5fc35450038e9039",
+      "name": "verify-a04"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCore --scheme VisualCore-Package --destination sim-26.5 --action test --result-name ua-f07-diag-265 --only-testing VisualCoreDiagnosticsTests",
+      "exit_code": 0,
+      "finished": "2026-11-13T11:50:00+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.warmup-diagnostics-ios265.log",
+      "log_sha256": "2e61d334f4cb1ec4d7385388a82a325ec671437ab45baad1d4c6d84876078dd1",
+      "name": "warmup-diagnostics-ios265"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCore --scheme VisualCore-Package --destination sim-27.2 --action test --result-name ua-f07-diag-272 --only-testing VisualCoreDiagnosticsTests",
+      "exit_code": 0,
+      "finished": "2026-11-13T11:49:54+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.warmup-diagnostics-ios272.log",
+      "log_sha256": "ed5d1ddf203bf2c20010767c05dacbcf9bb0b7655918fff17d30a91a58c82225",
+      "name": "warmup-diagnostics-ios272"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-26.5 --action test --result-name ua-f07-warmup-265 --only-testing VisualCoreExperienceHostTests",
+      "exit_code": 0,
+      "finished": "2026-11-13T11:49:44+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.warmup-host-ios265.log",
+      "log_sha256": "35ac88f2329d03a8fab25fbf0b29228338021b006e9d185d9f62b38db8aea6a6",
+      "name": "warmup-host-ios265"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --result-name ua-f07-warmup-272 --only-testing VisualCoreExperienceHostTests",
+      "exit_code": 0,
+      "finished": "2026-11-13T11:49:13+00:00",
+      "log": ".autonomy/logs/migration/UA-F07.warmup-host-ios272.log",
+      "log_sha256": "4401940850cd2d54dae3a0a2799fd49d39d311988ca3f8ce5d6eda2aa229278a",
+      "name": "warmup-host-ios272"
+    }
+  ],
+  "revision": "d883cb1e00c9023b2a66094948be4d1a98a90ce3",
+  "revision_number": 1,
+  "sealed": "2026-11-13T19:19:45+00:00"
+}

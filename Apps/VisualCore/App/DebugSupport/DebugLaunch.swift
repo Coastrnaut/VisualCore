@@ -37,6 +37,9 @@ enum DebugLaunch {
     static let damageStateArgument = "-vcDamageState"
     static let strayItemsArgument = "-vcStrayItems"
     static let candidatesArgument = "-vcCandidates"
+    /// The real catalog with nothing available and no registration: the empty launcher (UA-F04), which the app no
+    /// longer shows by itself since A01–A03 are integrated.
+    static let nothingAvailableArgument = "-vcNothingAvailable"
     /// The kinds of damage `-vcDamageState` knows.
     static let damageKinds = ["truncated", "garbage", "newer", "other"]
     /// The stray file `-vcStrayItems` writes beside the experience folders, and its stray defaults key.
@@ -46,7 +49,7 @@ enum DebugLaunch {
     /// The debug arguments that take no value.
     static let flags = [fixtureCatalogArgument, emptyRegistryArgument, resetDataArgument, skipWelcomeArgument,
                         damagedCatalogArgument, seedDataArgument, failingExperienceArgument, strayItemsArgument,
-                        candidatesArgument]
+                        candidatesArgument, nothingAvailableArgument]
 
     // MARK: - Environment
 
@@ -84,6 +87,11 @@ enum DebugLaunch {
             if !empty, arguments.contains(failingExperienceArgument) {
                 environment.registry = fixtureFreeIDs.map(DebugExperience.failingRegistration(for:))
             }
+        }
+        if arguments.contains(nothingAvailableArgument), let data = environment.catalogData,
+           let none = makeUnavailable(in: data) {
+            environment.catalogData = none
+            environment.registry = []
         }
         if arguments.contains(candidatesArgument), !candidates.isEmpty {
             let ids = Set(candidates.map(\.id.rawValue))
@@ -245,6 +253,15 @@ enum DebugLaunch {
         return try? JSONSerialization.data(withJSONObject: root, options: [.sortedKeys])
     }
 
+    /// The catalog `data` with every entry unavailable; nil when `data` is not a catalog (`-vcNothingAvailable`).
+    static func makeUnavailable(in data: Data) -> Data? {
+        guard var root = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any],
+              var entries = root["experiences"] as? [[String: Any]] else { return nil }
+        for index in entries.indices { entries[index]["available"] = false }
+        root["experiences"] = entries
+        return try? JSONSerialization.data(withJSONObject: root, options: [.sortedKeys])
+    }
+
     /// Builds the fixture from the data of a real catalog by switching `available` to true for six entries.
     ///
     /// The entries are chosen by rule, not by name: the first premium entry; the first free entry of its
@@ -256,6 +273,9 @@ enum DebugLaunch {
             return Fixture()
         }
         func text(_ index: Int, _ key: String) -> String { entries[index][key] as? String ?? "" }
+        // Every other entry stays unavailable, also those the real catalog makes available (A01–A03 since their X
+        // gates), so that the fixture is exactly these six.
+        for index in entries.indices { entries[index]["available"] = false }
         guard let premium = entries.indices.first(where: { text($0, "tier") == "premium" }) else { return Fixture() }
         let premiumCategory = text(premium, "category")
         var chosen: [Int] = []

@@ -46,7 +46,7 @@ final class FirstRunUITests: XCTestCase {
 
     @MainActor
     func testTheWelcomeLeadsToTheLauncherWhenNothingIsAvailable() {
-        let app = launchApp(arguments: [VC.reset])
+        let app = launchApp(arguments: [VC.reset, VC.nothingAvailable])
         let start = element(app, "vc.welcome.start")
         waitFor(start)
         XCTAssertEqual(prompts(app), 0)

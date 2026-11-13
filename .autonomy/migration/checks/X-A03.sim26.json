@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--only",
+    "a03.fractal-explorer",
+    "--runtime",
+    "26"
+  ],
+  "command": "python3 scripts/verify_experiences.py --only a03.fractal-explorer --runtime 26",
+  "elapsed_seconds": 25.535,
+  "exit_code": 0,
+  "finished": "2026-11-13T19:25:04+00:00",
+  "gate": "X-A03",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/X-A03.sim26.log",
+  "log_sha256": "568e756b036512519601fc3e7d24af29535b643c800d27bf850cb0947c7c7c06",
+  "name": "sim26",
+  "started": "2026-11-13T19:24:38+00:00",
+  "timed_out": false
+}

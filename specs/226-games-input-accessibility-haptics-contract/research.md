@@ -31,3 +31,14 @@
 ## 3. Corrections during implementation
 
 (none yet)
+- 2026-11-13, baseline (T-R02F26-001): X-A01, X-A02 and X-A03 were recorded after UA-F07. As FR-U07-051 asks, their
+  registrations moved from `ExperienceRegistry.candidates` to `all`, and `build_catalog.py` made the three available.
+  Tests that assumed an empty catalog followed:
+  - the agreement and level-name unit tests now expect the three;
+  - the candidates test uses A04;
+  - the real-catalog launcher test checks the three tiles;
+  - the debug fixture marks every other entry unavailable;
+  - the empty-launcher interface tests use the new debug argument `-vcNothingAvailable` (real catalog, nothing
+    available).
+  On the iOS 27.2 phone, the app unit tests and the interface chunks a, b, d, e and f pass (`baseline-app-r2`,
+  `baseline-app-ui-d`, `baseline-app-ui-ef`).

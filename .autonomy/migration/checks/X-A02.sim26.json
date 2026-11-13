@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--only",
+    "a02.fluid-art-playground",
+    "--runtime",
+    "26"
+  ],
+  "command": "python3 scripts/verify_experiences.py --only a02.fluid-art-playground --runtime 26",
+  "elapsed_seconds": 24.906,
+  "exit_code": 0,
+  "finished": "2026-11-13T19:23:35+00:00",
+  "gate": "X-A02",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/X-A02.sim26.log",
+  "log_sha256": "fba6e74a3ca507bfb667baf23c814c12c5b3b2854cd9306a0399cc935a04ad24",
+  "name": "sim26",
+  "started": "2026-11-13T19:23:10+00:00",
+  "timed_out": false
+}

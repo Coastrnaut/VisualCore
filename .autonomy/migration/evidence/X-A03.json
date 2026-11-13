@@ -1,0 +1,60 @@
+{
+  "branch": "main",
+  "dirty": true,
+  "dirty_paths": [
+    "docs/verification/a01.generative-art-studio/summary-26.5.json",
+    "docs/verification/a01.generative-art-studio/summary-27.2.json",
+    "docs/verification/a02.fluid-art-playground/summary-26.5.json",
+    "docs/verification/a02.fluid-art-playground/summary-27.2.json",
+    "docs/verification/a03.fractal-explorer/summary-26.5.json",
+    "docs/verification/a03.fractal-explorer/summary-27.2.json"
+  ],
+  "failed_attempts": [],
+  "gate": "X-A03",
+  "ledger": "migration",
+  "passing_checks": [
+    {
+      "command": "python3 scripts/verify_experiences.py --only a03.fractal-explorer --audits",
+      "exit_code": 0,
+      "finished": "2026-11-13T19:25:04+00:00",
+      "log": ".autonomy/logs/migration/X-A03.audits.log",
+      "log_sha256": "1fed4479045ad6a5913b1f9365164aeaff19a449a3efeba2c40e5194e7d8657e",
+      "name": "audits"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --result-name xa03-core --only-testing FractalExplorerCoreTests",
+      "exit_code": 0,
+      "finished": "2026-11-13T19:23:41+00:00",
+      "log": ".autonomy/logs/migration/X-A03.host-core.log",
+      "log_sha256": "de8b94f48bec3fd2e65fae56523d22073921d807edb4a06fa5fba8ff258a0af3",
+      "name": "host-core"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --result-name xa03-exp --only-testing FractalExplorerExperienceTests",
+      "exit_code": 0,
+      "finished": "2026-11-13T19:24:16+00:00",
+      "log": ".autonomy/logs/migration/X-A03.host-experience.log",
+      "log_sha256": "47bfb4ca7a5e1d6a74eb2886210e6847202cb7fd8ffc5afaf20c84dd0ad582de",
+      "name": "host-experience"
+    },
+    {
+      "command": "python3 scripts/verify_experiences.py --only a03.fractal-explorer --runtime 26",
+      "exit_code": 0,
+      "finished": "2026-11-13T19:25:04+00:00",
+      "log": ".autonomy/logs/migration/X-A03.sim26.log",
+      "log_sha256": "568e756b036512519601fc3e7d24af29535b643c800d27bf850cb0947c7c7c06",
+      "name": "sim26"
+    },
+    {
+      "command": "python3 scripts/verify_experiences.py --only a03.fractal-explorer --runtime 27",
+      "exit_code": 0,
+      "finished": "2026-11-13T19:24:38+00:00",
+      "log": ".autonomy/logs/migration/X-A03.sim27.log",
+      "log_sha256": "2315e9e869c819ab9e0a7d643a9e241bb102347b4d5276eae812d88c9ea42c34",
+      "name": "sim27"
+    }
+  ],
+  "revision": "d883cb1e00c9023b2a66094948be4d1a98a90ce3",
+  "revision_number": 1,
+  "sealed": "2026-11-13T19:25:10+00:00"
+}

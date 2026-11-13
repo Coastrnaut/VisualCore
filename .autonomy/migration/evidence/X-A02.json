@@ -1,0 +1,60 @@
+{
+  "branch": "main",
+  "dirty": true,
+  "dirty_paths": [
+    "docs/verification/a01.generative-art-studio/summary-26.5.json",
+    "docs/verification/a01.generative-art-studio/summary-27.2.json",
+    "docs/verification/a02.fluid-art-playground/summary-26.5.json",
+    "docs/verification/a02.fluid-art-playground/summary-27.2.json",
+    "docs/verification/a03.fractal-explorer/summary-26.5.json",
+    "docs/verification/a03.fractal-explorer/summary-27.2.json"
+  ],
+  "failed_attempts": [],
+  "gate": "X-A02",
+  "ledger": "migration",
+  "passing_checks": [
+    {
+      "command": "python3 scripts/verify_experiences.py --only a02.fluid-art-playground --audits",
+      "exit_code": 0,
+      "finished": "2026-11-13T19:23:36+00:00",
+      "log": ".autonomy/logs/migration/X-A02.audits.log",
+      "log_sha256": "436aa1db3da52f9462435588d1febf29085e129f1f552eec0614f397c87b3a0b",
+      "name": "audits"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --result-name xa02-core --only-testing FluidArtPlaygroundCoreTests",
+      "exit_code": 0,
+      "finished": "2026-11-13T19:22:16+00:00",
+      "log": ".autonomy/logs/migration/X-A02.host-core.log",
+      "log_sha256": "355526c17f637e3178d9018ec21cb7c349dbaa464641b8c17ed227df0e6342bd",
+      "name": "host-core"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --result-name xa02-exp --only-testing FluidArtPlaygroundExperienceTests",
+      "exit_code": 0,
+      "finished": "2026-11-13T19:22:47+00:00",
+      "log": ".autonomy/logs/migration/X-A02.host-experience.log",
+      "log_sha256": "3f97d580f9f21aea25748d69fbcf717fccd1c99cbb35d0372f69ccde932476c2",
+      "name": "host-experience"
+    },
+    {
+      "command": "python3 scripts/verify_experiences.py --only a02.fluid-art-playground --runtime 26",
+      "exit_code": 0,
+      "finished": "2026-11-13T19:23:35+00:00",
+      "log": ".autonomy/logs/migration/X-A02.sim26.log",
+      "log_sha256": "fba6e74a3ca507bfb667baf23c814c12c5b3b2854cd9306a0399cc935a04ad24",
+      "name": "sim26"
+    },
+    {
+      "command": "python3 scripts/verify_experiences.py --only a02.fluid-art-playground --runtime 27",
+      "exit_code": 0,
+      "finished": "2026-11-13T19:23:10+00:00",
+      "log": ".autonomy/logs/migration/X-A02.sim27.log",
+      "log_sha256": "dfde7a66d89bb3eb9e915aa3ac69f19cb9c8358dfb70043c56b226149f5da032",
+      "name": "sim27"
+    }
+  ],
+  "revision": "d883cb1e00c9023b2a66094948be4d1a98a90ce3",
+  "revision_number": 1,
+  "sealed": "2026-11-13T19:25:10+00:00"
+}
