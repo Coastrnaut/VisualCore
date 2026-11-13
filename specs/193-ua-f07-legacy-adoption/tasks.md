@@ -208,7 +208,7 @@ runtimes.
 
 - [X] T-U07-034 Evidence `core-a01` … `core-a04` (Core host tests at their final paths) and `fixtures` — Verified 2026-11-13: xcodebuild_package.py ExperiencesCreative-Package sim-27.2 --only-testing <Name>CoreTests at the final paths: A01 31 (core-a01), A02 56 (core-a02), A03 26+12=38 (core-a03), A04 40+1=41 (core-a04), all passed and equal to the T-U07-001 counts; migration_baseline.py verify 0 problems (fixtures)
   (`migration_baseline.py verify`).
-- [ ] T-U07-035 Evidence `verify-a01-a03` (`python3 scripts/verify_experiences.py --only a01.generative-art-studio
+- [X] T-U07-035 Evidence `verify-a01-a03` (`python3 scripts/verify_experiences.py --only a01.generative-art-studio — Verified 2026-11-13: verify_experiences.py --only a01 a02 a03 --fresh: 27/27 scenarios on iOS 27.2 (verify-a01-a03-27) and 27/27 on iOS 26.5 (verify-a01-a03-26); --only a04.particle-universe --runtime 27 26 --fresh: 18/18 (verify-a04); summaries in docs/verification/<id>/
   a02.fluid-art-playground a03.fractal-explorer --runtime 27 26 --fresh`) and `verify-a04`.
 - [ ] T-U07-036 Evidence `test-map` (`check_test_map.py`: 56 of 56 old tests mapped, every new test exists and passed in
   the logs of the chunks; SC-U07-004).

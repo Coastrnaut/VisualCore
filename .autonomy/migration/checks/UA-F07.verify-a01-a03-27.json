@@ -1,0 +1,24 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--only",
+    "a01.generative-art-studio",
+    "a02.fluid-art-playground",
+    "a03.fractal-explorer",
+    "--runtime",
+    "27",
+    "--fresh"
+  ],
+  "command": "python3 scripts/verify_experiences.py --only a01.generative-art-studio a02.fluid-art-playground a03.fractal-explorer --runtime 27 --fresh",
+  "elapsed_seconds": 43.4,
+  "exit_code": 0,
+  "finished": "2026-11-13T16:27:39+00:00",
+  "gate": "UA-F07",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F07.verify-a01-a03-27.log",
+  "log_sha256": "6eb224b443edc69dcf3f03e9d63729f5517122f471bd2baca3b6e37352a3bf14",
+  "name": "verify-a01-a03-27",
+  "started": "2026-11-13T16:26:56+00:00",
+  "timed_out": false
+}
