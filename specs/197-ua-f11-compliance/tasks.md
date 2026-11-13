@@ -58,7 +58,7 @@ Device-only items: none, so no {device} task.
   fake executable, `--symbols-file`, `--libraries-file`) planting a linked `AdSupport` framework, an
   `ASIdentifierManager` symbol, a deny-listed library name in a bundled file, and an unused allowance; each fails and
   names its file; a clean fixture passes; a schema-2 deny list is refused.
-- [ ] T-U11-013 [P] [US3] Write `Configs/tracking-denylist.json` (data-model §3): frameworks, symbols, and libraries
+- [X] T-U11-013 [P] [US3] Write `Configs/tracking-denylist.json` (data-model §3): frameworks, symbols, and libraries — Verified 2026-11-13: Configs/tracking-denylist.json schema 1: 4 frameworks, 5 symbols, 5 libraries in each of advertising, analytics, attribution, crash-reporting (all identifiers of 6+ characters), no allowances
   covering advertising, analytics, attribution and crash reporting with at least three each (FR-U11-020); texts
   "case-sensitive literals, 3–80 chars"; library names "distinctive module identifiers of at least 6 characters,
   matched as whole identifiers"; allowances need a reason.
