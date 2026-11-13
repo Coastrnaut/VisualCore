@@ -14,7 +14,7 @@ API-baseline and reference-regression tasks apply.
 
 ## Phase 2: User Story 4 — The existing ownership rules are proven (P2, run first as the regression baseline)
 
-- [ ] T-R02F04-002 [US4] Acceptance: the whole VisualCoreRendering scheme (all five test bundles, incl.
+- [X] T-R02F04-002 [US4] Acceptance: the whole VisualCoreRendering scheme (all five test bundles, incl. — Verified 2026-11-13: full VisualCoreRendering scheme (5 bundles) passes on sim-27.2 and sim-26.5 after all changes (rendering-ios27, rendering-ios26); new classes: ProgramCacheTests 0.028/0.020 s, PipelineTests 0.016/0.300 s, DepthTargetTests 0.224/0.201 s, all under 5 s
   ResourceRegistryTests, RenderHostTests, CleanupSweepTests, ProgramCacheTests) passes on sim-27.2 and sim-26.5 after
   all changes (checks `rendering-ios27`, `rendering-ios26`); record the durations of ProgramCacheTests,
   PipelineTests and DepthTargetTests from the logs, each under 5 s (SC-R02F04-004, SC-R02F04-006).
