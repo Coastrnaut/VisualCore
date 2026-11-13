@@ -1,0 +1,23 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_renames.py",
+    "--base",
+    "af887e3",
+    "Apps/GenerativeArtStudio/Core/Sources",
+    "Apps/GenerativeArtStudio/Core/Tests",
+    "Packages/ExperiencesCreative/GenerativeArtStudio/Core",
+    "Packages/ExperiencesCreative/GenerativeArtStudio/CoreTests"
+  ],
+  "command": "python3 scripts/check_renames.py --base af887e3 Apps/GenerativeArtStudio/Core/Sources Apps/GenerativeArtStudio/Core/Tests Packages/ExperiencesCreative/GenerativeArtStudio/Core Packages/ExperiencesCreative/GenerativeArtStudio/CoreTests",
+  "elapsed_seconds": 0.04,
+  "exit_code": 0,
+  "finished": "2026-11-13T13:14:25+00:00",
+  "gate": "UA-F07",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F07.a01-core-renames-only.log",
+  "log_sha256": "c722500bd44d59dc5c42931a61ac9269813cf85044299e9bf20624b9578adb91",
+  "name": "a01-core-renames-only",
+  "started": "2026-11-13T13:14:25+00:00",
+  "timed_out": false
+}

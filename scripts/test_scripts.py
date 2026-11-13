@@ -2862,6 +2862,31 @@ class GitSandboxTests(unittest.TestCase):
         self.assertEqual(docs.validate(box.root), [])
 
 
+class CheckRenamesTests(unittest.TestCase):
+    """check_renames.py passes pure renames and fails a changed line or an empty listing (feature 193)."""
+
+    def test_renames_pass_and_edits_fail(self):
+        box = GitSandbox()
+        self.addCleanup(box.cleanup)
+        box.write("old/a.swift", "let a = 1\n")
+        box.commit_all("base")
+        base = box.head()
+        tool = load("check_renames")
+        (box.root / "new").mkdir()
+        box.git("mv", "old/a.swift", "new/a.swift")
+        box.commit_all("move")
+        with contextlib.redirect_stdout(io.StringIO()) as out:
+            self.assertEqual(tool.main(["--base", base, "old", "new"], box.root), 0)
+        self.assertIn("PASS: 1 files", out.getvalue())
+        box.write("new/a.swift", "let a = 2\n")
+        box.commit_all("edit")
+        with contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(tool.main(["--base", base, "old", "new"], box.root), 1)
+            self.assertEqual(tool.main(["--base", box.head(), "old", "new"], box.root), 1, "nothing listed")
+        with contextlib.redirect_stderr(io.StringIO()):
+            self.assertEqual(tool.main(["--base", "no-such-ref", "old"], box.root), 2)
+
+
 class TickTaskTests(unittest.TestCase):
     """tick_task.py ticks one verified task of any namespace, refuses without changing anything, and pushes only
     on main after a clean scan (feature 186, FR-U00-010 to FR-U00-014)."""

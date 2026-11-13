@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "python3",
+    "scripts/migration_baseline.py",
+    "verify"
+  ],
+  "command": "python3 scripts/migration_baseline.py verify",
+  "elapsed_seconds": 0.099,
+  "exit_code": 0,
+  "finished": "2026-11-13T13:13:28+00:00",
+  "gate": "UA-F07",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F07.baseline-verify-a01-moved.log",
+  "log_sha256": "5b0fdb44cbfabe834b1968a4c9b5478d4be5aac19f464c2d923d2ca280e69dac",
+  "name": "baseline-verify-a01-moved",
+  "started": "2026-11-13T13:13:28+00:00",
+  "timed_out": false
+}

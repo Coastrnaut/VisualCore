@@ -5,43 +5,43 @@
       "from": "Apps/GenerativeArtStudio/Core/Sources/GenerativeArtStudioCore",
       "to": "Packages/ExperiencesCreative/GenerativeArtStudio/Core",
       "gate": "UA-F07",
-      "commit": "the commit of T-U07-017"
+      "commit": "5fdc2936c29b77d27f4783982a8cab2e62d7bafa"
     },
     {
       "from": "Apps/GenerativeArtStudio/Core/Tests/GenerativeArtStudioCoreTests",
       "to": "Packages/ExperiencesCreative/GenerativeArtStudio/CoreTests",
       "gate": "UA-F07",
-      "commit": "the commit of T-U07-017"
+      "commit": "5fdc2936c29b77d27f4783982a8cab2e62d7bafa"
     },
     {
       "from": "Apps/GenerativeArtStudio/Core/Package.swift",
       "to": "Packages/ExperiencesCreative/Package.swift",
       "gate": "UA-F07",
-      "commit": "the commit of T-U07-017"
+      "commit": "5fdc2936c29b77d27f4783982a8cab2e62d7bafa"
     },
     {
       "from": "Apps/GenerativeArtStudio/App",
       "to": "Packages/ExperiencesCreative/GenerativeArtStudio/Experience",
       "gate": "UA-F07",
-      "commit": "the commit of T-U07-017"
+      "commit": "5fdc2936c29b77d27f4783982a8cab2e62d7bafa"
     },
     {
       "from": "Apps/GenerativeArtStudio/Shaders",
       "to": "Packages/ExperiencesCreative/GenerativeArtStudio/Shaders",
       "gate": "UA-F07",
-      "commit": "the commit of T-U07-017"
+      "commit": "5fdc2936c29b77d27f4783982a8cab2e62d7bafa"
     },
     {
       "from": "Apps/GenerativeArtStudio/Tests/Unit",
       "to": "Packages/ExperiencesCreative/GenerativeArtStudio/ExperienceTests",
       "gate": "UA-F07",
-      "commit": "the commit of T-U07-017"
+      "commit": "5fdc2936c29b77d27f4783982a8cab2e62d7bafa"
     },
     {
       "from": "Apps/GenerativeArtStudio/Tests/UI",
       "to": "Apps/VisualCore/Tests/UI/GenerativeArtStudio",
       "gate": "UA-F07",
-      "commit": "the commit of T-U07-017"
+      "commit": "5fdc2936c29b77d27f4783982a8cab2e62d7bafa"
     }
   ]
 }
