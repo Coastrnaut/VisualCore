@@ -1,0 +1,86 @@
+{
+  "checks": [
+    {
+      "attestation": ".autonomy/checks/A04-P04.app-unit.json",
+      "command": "python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P04.app-unit.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P04.baseline-experiences.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P04.baseline-experiences.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P04.compliance.json",
+      "command": "python3 scripts/check_compliance.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P04.compliance.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P04.core-tests-ios27.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing ParticleUniverseCoreTests",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P04.core-tests-ios27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P04.experiences-ios26.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-26.5 --action test",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P04.experiences-ios26.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P04.experiences-ios27.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P04.experiences-ios27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P04.library-newer-ios27.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing ParticleUniverseExperienceTests/ParticleLibraryTests",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P04.library-newer-ios27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P04.script-tests-r2.json",
+      "command": "python3 scripts/test_scripts.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P04.script-tests-r2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P04.ui-pu-j2.json",
+      "command": "python3 scripts/release_check.py --only app-ui-ios27-j2",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P04.ui-pu-j2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P04.ui-pu-j3-r3.json",
+      "command": "python3 scripts/release_check.py --only app-ui-ios27-j3",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P04.ui-pu-j3-r3.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P04.ui-pu-j4-r3.json",
+      "command": "python3 scripts/release_check.py --only app-ui-ios27-j4",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P04.ui-pu-j4-r3.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P04.ui-scene-library-r3.json",
+      "command": "python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime 27.2 --kind phone --only-testing VisualCoreUITests/PUSceneLibraryUITests --sources Apps/VisualCore/Tests/UI --log-name a04p04-scene-library-r3",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P04.ui-scene-library-r3.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P04.ui-scene-library-r4.json",
+      "command": "python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime 27.2 --kind phone --only-testing VisualCoreUITests/PUSceneLibraryUITests --sources Apps/VisualCore/Tests/UI --log-name a04p04-scene-library-r4",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P04.ui-scene-library-r4.log"
+    }
+  ],
+  "generated": "2026-11-13T22:49:26+00:00",
+  "method": "deterministic-run-check",
+  "stage": "A04-P04",
+  "status": "pass"
+}
