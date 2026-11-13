@@ -65,9 +65,9 @@ Packages/VisualCore/README.md                                                  m
 docs/catalog/shared-feature-map.json, Auto-Creator.md §13                      modify (as built)
 ```
 
-**Dependency direction**: VisualCoreSimulation → VisualCoreMath (existing, );
+**Dependency direction**: VisualCoreSimulation → VisualCoreMath (existing, `Packages/VisualCore/Package.swift:17`);
 the new files use only the standard library within their module. VisualCoreRenderingTests already depends on the
-VisualCoreMath product (), so no manifest change is needed.
+VisualCoreMath product (`Packages/VisualCoreRendering/Package.swift`), so no manifest change is needed.
 
 **Public API**: see [contracts/api.md](contracts/api.md). **Data**: [data-model.md](data-model.md).
 
