@@ -184,16 +184,32 @@ def git(root: Path, *argv: str) -> subprocess.CompletedProcess:
 
 
 def scan(root: Path = ROOT, commits: str = "origin/main..HEAD") -> list[str]:
-    diff = git(root, "diff", "--unified=0", "--no-color", "--find-renames", commits)
-    if diff.returncode != 0:
-        return [f"cannot read {commits}: {diff.stderr.strip()[:200]}"]
+    """Scans the change of every outgoing commit on its own, not only the net change of the range: a file that one
+    commit adds and a later one removes is still pushed in the first commit's history (feature 195 found this when a
+    raw run folder with a simulator identifier was added by one commit and untracked by the next)."""
+    # A three-dot range (a pull request, <base>...<head>) is the head's side only: what the base did after the
+    # fork is not part of it.
+    side = ["--right-only"] if "..." in commits else []
+    listed = git(root, "rev-list", "--reverse", *side, commits)
+    if listed.returncode != 0:
+        return [f"cannot read {commits}: {listed.stderr.strip()[:200]}"]
     findings, hashes = [], frozenset()
     try:
         hashes = load_hashes(root)
     except ValueError as error:
         findings.append(str(error))
     local = simulator_identifiers() or frozenset()
-    return findings + scan_diff(diff.stdout, hashes, local) + forbidden(git(root, "ls-files").stdout.splitlines())
+    seen: set[str] = set()
+    for commit in listed.stdout.split():
+        diff = git(root, "show", "--unified=0", "--no-color", "--find-renames", "--format=", commit)
+        if diff.returncode != 0:
+            findings.append(f"cannot read {commit[:12]}: {diff.stderr.strip()[:200]}")
+            continue
+        for finding in scan_diff(diff.stdout, hashes, local):
+            if finding not in seen:
+                seen.add(finding)
+                findings.append(finding)
+    return findings + forbidden(git(root, "ls-files").stdout.splitlines())
 
 
 def record_command(root: Path) -> int:

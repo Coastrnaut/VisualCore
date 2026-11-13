@@ -223,3 +223,9 @@ scenario and the expectation for that case. **Rationale**: FR-U09-025, SC-U09-00
   fixture is not needed; the manifest's JSON round trip is tested.
 - `Experience` gained `frameProbes` and, in builds for testing or automation, `runScenario(_:)`; the runner plays
   entries through it, which hands each action to the engine's reducer as `handle(control:values:)` does.
+- Incident (2026-11-12): a task commit staged the untracked raw run folder `.autonomy/verify/`. Its exported
+  attachment manifest names the local iOS 27.2 simulator's identifier. The next commit untracked the folder and
+  ignored it, and the push went through, because the pre-push scan read only the net change of the outgoing
+  range; the identifier is therefore in the history of `9ed2fd0` on `origin/main`. History is never rewritten.
+  The scan now reads every outgoing commit on its own (a test plants an identifier that one commit adds and the
+  next removes), and `.autonomy/verify/` is ignored. The identifier names a local simulator, not hardware.

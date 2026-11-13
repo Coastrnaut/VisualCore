@@ -2565,6 +2565,21 @@ class PrepushScanTests(unittest.TestCase):
         self.assertIn("1 findings", out)
         self.assertEqual(self.run_main(box, "--range", "HEAD~2..HEAD~1")[0], 0)
 
+    def test_a_finding_added_and_removed_inside_the_range_still_fails(self):
+        # Feature 195: the net change of the range is clean, but the first commit carries the identifier and is
+        # pushed with its history; every outgoing commit is scanned on its own.
+        box = self.sandbox()
+        box.write("docs/clean.md", "nothing private\n")
+        box.commit_all("clean")
+        box.write("raw/run.json", '{"deviceId": "' + self.SIM + '"}\n')
+        box.commit_all("a raw run")
+        (box.root / "raw/run.json").unlink()
+        box.commit_all("untracked again")
+        with mock.patch.object(prepush, "simulator_identifiers", return_value=None):
+            code, out = self.run_main(box, "--range", "HEAD~2..HEAD")
+        self.assertEqual(code, 1)
+        self.assertIn("FINDING: raw/run.json: device or simulator UUID", out)
+
     def test_push_only_when_clean_and_on_main(self):
         box = self.sandbox()
         box.write("docs/clean.md", "nothing private\n")
@@ -2598,7 +2613,10 @@ class PrepushScanTests(unittest.TestCase):
         box.commit_all("the base deletes the old line after the fork")
         self.assertEqual(prepush.scan(box.root, "main...feature"),
                          ["docs/new.md: hardware identifier: device 00008120-001A2B3C4D5E6F78"])
-        self.assertEqual(len(prepush.scan(box.root, "main..feature")), 2)
+        # Every commit of the range is scanned on its own (feature 195), so the two-dot range reads the feature's
+        # commit alone as well; the base's later deletion is no added line of it.
+        self.assertEqual(prepush.scan(box.root, "main..feature"),
+                         ["docs/new.md: hardware identifier: device 00008120-001A2B3C4D5E6F78"])
         self.assertEqual(self.run_main(box, "--range", "main...feature")[0], 1)
 
     def test_large_diff_is_read_to_its_end(self):
