@@ -8,7 +8,7 @@ each task. Tests before code. Owner-only items: none. One {device} task. No Visu
 
 ## Phase 1: Setup
 
-- [ ] T-A04-501 Baseline: ExperiencesCreative on sim-27.2 passes before the change (check `baseline-experiences`).
+- [X] T-A04-501 Baseline: ExperiencesCreative on sim-27.2 passes before the change (check `baseline-experiences`). — Verified 2026-11-13: ExperiencesCreative on sim-27.2 passed before the change (A04-P05/baseline-experiences)
 
 ## Phase 2: User Story 1 — Coming back never fast-forwards (P1)
 
