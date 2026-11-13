@@ -105,7 +105,7 @@ Independent test: planted second shippable target, undeclared target and reused 
 
 - [ ] T-U10-022 Auto-Creator.md sections 16 and 24.1 as built, edited in place; `render_autocreator.py --check` and
   `validate_autocreator.py` (check `steering`).
-- [ ] T-U10-023 Leak check: `check_release_symbols.py` on the local Release app forbids `vc_ci_angle_standin`
+- [X] T-U10-023 Leak check: `check_release_symbols.py` on the local Release app forbids `vc_ci_angle_standin` — Verified 2026-11-13: check_release_symbols.py on the local Release app with --forbid including vc_ci_angle_standin: 0 forbidden texts found in VisualCore and the embedded libEGL and libGLESv2 (app-release-symbols inside release-app, SC-U10-007)
   (check `standin-leak`, SC-U10-007).
 - [ ] T-U10-024 Evidence `quickstart-fast`: `check_app_targets.py`, `check_experience_packages.py`,
   `check_dependencies.py`, `measure_build.py --check`, `test_scripts.py`.
