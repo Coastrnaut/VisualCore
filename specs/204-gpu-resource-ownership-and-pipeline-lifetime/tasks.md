@@ -1,0 +1,94 @@
+# Tasks: R02-F04 — GPU resource ownership and pipeline lifetime
+
+**Input**: [spec.md](spec.md), [plan.md](plan.md), [research.md](research.md), [data-model.md](data-model.md),
+[contracts/api.md](contracts/api.md), [quickstart.md](quickstart.md)
+
+Evidence: `python3 scripts/migration_ledger.py run-check --gate R02-F04 --name <check> -- <command>`. Commit after
+each task. Tests before code. Owner-only items: none. One {device} task. VisualCore changes, so documentation,
+API-baseline and reference-regression tasks apply.
+
+## Phase 1: Setup
+
+- [ ] T-R02F04-001 Baseline: VisualCoreRendering scheme on sim-27.2 passes before the change (check `baseline-rendering`);
+  research.md §0 re-verified.
+
+## Phase 2: User Story 4 — The existing ownership rules are proven (P2, run first as the regression baseline)
+
+- [ ] T-R02F04-002 [US4] Acceptance: the whole VisualCoreRendering scheme (all five test bundles, incl.
+  ResourceRegistryTests, RenderHostTests, CleanupSweepTests, ProgramCacheTests) passes on sim-27.2 and sim-26.5 after
+  all changes (checks `rendering-ios27`, `rendering-ios26`) (SC-R02F04-004).
+
+## Phase 3: User Story 1 — A program in use is never deleted by the cache (P1)
+
+- [ ] T-R02F04-003 [US1] Tests first in `Packages/VisualCoreRendering/Tests/VisualCoreRenderingTests/ProgramCacheTests.swift`:
+  amend `testCacheIsBoundedToSixtyFourWithLRUEviction` (comment the reason: FR-R02F04-014) to expect the evicted
+  program still alive (`cachedProgramCount` 64, `retiredProgramCount` 1, `evictionCount` 1, live programs 65); new
+  test: hold P, create 64 variants, draw a full-screen quad with P and read back the expected colour (not black);
+  release P → live count drops by one; new test: retired programs are released at `recreateContext()` with 0
+  leaked; new test: requesting P's variant again after eviction compiles a new program and both work.
+- [ ] T-R02F04-004 [US1] Implement in `Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift`:
+  retired set (`[ObjectIdentifier: ShaderProgram]`), eviction moves without GL delete and counts `evictionCount`,
+  `release(_:)` deletes retired programs, `contextWillEnd()` releases retired programs before `abandonAll()`,
+  `retiredProgramCount`; `///` docs.
+- [ ] T-R02F04-005 [US1] Acceptance: ProgramCacheTests pass on sim-27.2 (check `cache-ios27`) (SC-R02F04-001, 005).
+
+## Phase 4: User Story 2 — One immutable pipeline description (P1)
+
+- [ ] T-R02F04-006 [P] [US2] Tests first in `Packages/VisualCore/Tests/VisualCoreShaderSourceTests/RenderStateTests.swift`:
+  presets' fields (data-model: "opaque (none, no depth, no cull, all)", "alphaBlended (alpha)", "additive
+  (additive, depthWrite false)", "opaque3D (none, depthTest true, depthWrite true, cull back)"); equality and hashing.
+- [ ] T-R02F04-007 [US2] Write `Packages/VisualCore/Sources/VisualCoreShaderSource/RenderState.swift` per contracts/api.md.
+- [ ] T-R02F04-008 [US2] Tests first in `Packages/VisualCoreRendering/Tests/VisualCoreRenderingTests/PipelineTests.swift`:
+  apply each preset after 3 different prior states and read back via `glIsEnabled`/`glGetIntegerv`/`glGetBooleanv`
+  (blend enable and factors, depth test, depth mask, cull enable and face, colour mask, current program); `Pipeline`
+  equality by program identity; a released program and a program from before `recreateContext()` are refused
+  (`apply` false, `staleRejected` +1).
+- [ ] T-R02F04-009 [US2] Write `Packages/VisualCoreRendering/Sources/VisualCoreRendering/Pipeline.swift` (`Pipeline`)
+  and `GLState.apply(_:resources:)` in `GLState.swift`.
+- [ ] T-R02F04-010 [US2] Acceptance: host RenderStateTests (check `host-visualcore`) and PipelineTests on sim-27.2
+  (check `pipeline-ios27`) (SC-R02F04-002).
+
+## Phase 5: User Story 3 — Offscreen targets with depth (P2)
+
+- [ ] T-R02F04-011 [US3] Tests first in `Packages/VisualCoreRendering/Tests/VisualCoreRenderingTests/DepthTargetTests.swift`:
+  a depth target draws two overlapping triangles far-then-near and near-then-far with `RenderState.opaque3D`; the
+  nearer colour wins both times; release frees colour and depth (`liveCount[.renderbuffer]` back to 0); context
+  recreation rejects the old target; zero or over-limit size throws with nothing allocated; pooled targets with and
+  without depth are distinct.
+- [ ] T-R02F04-012 [US3] Implement depth in `ResourceRegistry.swift` (`makeRenderTarget(..., depth:)`,
+  `acquireTarget(..., depth:)`, pool key with depth, `GL_DEPTH_COMPONENT24` renderbuffer counted as `.renderbuffer`
+  width×height×4 bytes, cleanup on incomplete framebuffer) and `GPUObjects.swift` (`RenderTarget.depthRenderbuffer`).
+- [ ] T-R02F04-013 [US3] Acceptance: DepthTargetTests on sim-27.2 (check `depth-ios27`) (SC-R02F04-003).
+
+## Phase 6: Polish and cross-cutting
+
+- [ ] T-R02F04-014 API baseline: `python3 scripts/check_public_api.py --update` then check (check `public-api`);
+  `python3 scripts/check_documented_api.py --sources Apps/VisualCore` (check `documented-api`).
+- [ ] T-R02F04-015 `Packages/VisualCoreRendering/README.md` section "Resource ownership and pipelines (feature 204, R02-F04)".
+- [ ] T-R02F04-016 Host suite `swift test --package-path Packages/VisualCore` (check `host-visualcore`).
+- [ ] T-R02F04-017 ExperiencesCreative on sim-27.2 (check `experiences-ios27`) and A01–A03 verification on iOS 27
+  (check `verify-a01-a03`).
+- [ ] T-R02F04-018 Reference regression chunk 1 (check `reference-1`): `python3 scripts/release_check.py --only
+  reference-engine-xcframework reference-build-projectm-ios-sim reference-clean`.
+- [ ] T-R02F04-019 Reference regression chunk 2 (check `reference-2`): `python3 scripts/release_check.py --only
+  reference-test-anglerendering-ios27 reference-test-anglerendering-ios26 projectm-reference-ios27 projectm-reference-ios26`.
+- [ ] T-R02F04-020 Script tests `python3 scripts/test_scripts.py` (check `script-tests`).
+- [ ] T-R02F04-021 Auto-Creator.md section 13 row R02-F04 as built via `docs/catalog/shared-feature-map.json` and
+  `render_autocreator.py`; document validators; CI of a commit with all changes finished with success.
+- [ ] T-R02F04-022 {device} In the device campaign: GPU memory used by depth targets and retired programs measured on
+  D1, D2, D3 (simulator byte counts are accounting only).
+- [ ] T-R02F04-023 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record R02-F04.
+
+## Dependencies
+
+001 → US1 (003–005) and US2 (006–010) and US3 (011–013); US1 and US3 both edit `ResourceRegistry.swift`, so one
+writer does them in order (US1 then US3); US2 is independent → 002 (all bundles on both runtimes) → 014–021 → 023.
+
+## Parallel execution
+
+Agent A: 006–009 (RenderState, Pipeline, GLState.apply, their tests). Agent B: 003–004 then 011–012 (registry,
+GPUObjects, ProgramCacheTests, DepthTargetTests). Lead: acceptances, 014–023.
+
+## Implementation strategy
+
+MVP: US1 (the defect). Review checkpoint after each story's acceptance.
