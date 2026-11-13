@@ -1,0 +1,22 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--only",
+    "a04.particle-universe",
+    "--runtime",
+    "26",
+    "--fresh"
+  ],
+  "command": "python3 scripts/verify_experiences.py --only a04.particle-universe --runtime 26 --fresh",
+  "elapsed_seconds": 18.415,
+  "exit_code": 0,
+  "finished": "2026-11-13T15:23:50+00:00",
+  "gate": "UA-F07",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F07.a04-verify-26-moved.log",
+  "log_sha256": "4a6141cf102a353636ceea10dea35e5e4925c73f80c6581a9afd5a42ea5157a9",
+  "name": "a04-verify-26-moved",
+  "started": "2026-11-13T15:23:32+00:00",
+  "timed_out": false
+}

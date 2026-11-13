@@ -345,3 +345,11 @@ The dossier files are not edited. The legacy ledger is untouched; its hash is co
     `Apps/ParticleUniverse/App`; it compiles the moved sources from the package folder (without the adapter files)
     and takes `ParticleUniverseCore` from the package's product. Its UI tests stay with it until the retirement.
   - The path-map entries of the Core are done; the `App` and `Tests/UI` entries stay pending until X-A04.
+- **A04 interface tests (T-U07-028, 2026-11-13).** Ported by an agent; the lead ran them.
+  - The first run found a real issue: the Reduce Motion action (A04 pause, A01 half rate) ran once when the
+    controls appeared, which can be before the experience is active, so it was refused and never retried. The
+    controls now retry it for at most 5 s.
+  - One test expected a step to raise the live count; at a steady state a step can lower it, so the test requires a
+    change.
+  - The standalone app's CPU preview, its quality controller hooks and its renderer texts have no counterpart; their
+    rows name the covering tests.

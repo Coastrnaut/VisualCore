@@ -26,11 +26,16 @@ struct ParticleControls: View {
                 ProgressView().accessibilityLabel(Text(verbatim: "Loading"))
             }
         }
-        .onChange(of: mirror.core == nil, initial: true) { _, missing in
-            // Under Reduce Motion the scene starts paused, as the standalone app does (adapter difference 4).
-            guard reduceMotion, !missing, !motionApplied, mirror.core?.playing == true else { return }
-            motionApplied = true
-            port.send("pause")
+        .task {
+            // Under Reduce Motion the scene starts paused, as the standalone app does (adapter difference 4). The
+            // controls can appear before the experience is active, when the action is refused, so it is retried for
+            // at most 5 s.
+            guard reduceMotion, !motionApplied else { return }
+            for _ in 0..<50 {
+                if mirror.core?.playing == false { motionApplied = true; return }
+                if mirror.core?.playing == true, port.send("pause").isAccepted { motionApplied = true; return }
+                try? await Task.sleep(for: .milliseconds(100))
+            }
         }
     }
 

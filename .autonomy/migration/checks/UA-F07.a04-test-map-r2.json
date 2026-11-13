@@ -1,0 +1,31 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_test_map.py",
+    "--map",
+    "specs/193-ua-f07-legacy-adoption/test-map.csv",
+    "--old",
+    "Apps/ParticleUniverse/Tests/UI",
+    "--new",
+    "Apps/VisualCore/Tests/UI",
+    "--app",
+    "ParticleUniverse",
+    "--log",
+    ".autonomy/logs/app-tests/ua-f07-phone-ios27-j1.log",
+    ".autonomy/logs/app-tests/ua-f07-phone-ios27-j2.log",
+    ".autonomy/logs/app-tests/ua-f07-phone-ios27-j3.log",
+    ".autonomy/logs/app-tests/ua-f07-phone-ios27-b-r2.log",
+    ".autonomy/logs/app-tests/ua-f07-phone-ios27-a.log"
+  ],
+  "command": "python3 scripts/check_test_map.py --map specs/193-ua-f07-legacy-adoption/test-map.csv --old Apps/ParticleUniverse/Tests/UI --new Apps/VisualCore/Tests/UI --app ParticleUniverse --log .autonomy/logs/app-tests/ua-f07-phone-ios27-j1.log .autonomy/logs/app-tests/ua-f07-phone-ios27-j2.log .autonomy/logs/app-tests/ua-f07-phone-ios27-j3.log .autonomy/logs/app-tests/ua-f07-phone-ios27-b-r2.log .autonomy/logs/app-tests/ua-f07-phone-ios27-a.log",
+  "elapsed_seconds": 0.084,
+  "exit_code": 0,
+  "finished": "2026-11-13T16:06:46+00:00",
+  "gate": "UA-F07",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F07.a04-test-map-r2.log",
+  "log_sha256": "93ec09988e99ba55184358ad689a44cf9b0fcf5ac988d73b0fed3d33715be984",
+  "name": "a04-test-map-r2",
+  "started": "2026-11-13T16:06:46+00:00",
+  "timed_out": false
+}

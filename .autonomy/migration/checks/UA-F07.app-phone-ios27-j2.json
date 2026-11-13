@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_app.py",
+    "--scheme",
+    "VisualCore",
+    "--runtime",
+    "27.2",
+    "--kind",
+    "phone",
+    "--only-testing",
+    "VisualCoreUITests/PUSandboxUITests",
+    "--log-name",
+    "ua-f07-phone-ios27-j2"
+  ],
+  "command": "python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime 27.2 --kind phone --only-testing VisualCoreUITests/PUSandboxUITests --log-name ua-f07-phone-ios27-j2",
+  "elapsed_seconds": 155.068,
+  "exit_code": 0,
+  "finished": "2026-11-13T15:55:10+00:00",
+  "gate": "UA-F07",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F07.app-phone-ios27-j2.log",
+  "log_sha256": "b61abde404a1666ea1f0718aa273739a9c12e8d6944427388d0552be92587c8e",
+  "name": "app-phone-ios27-j2",
+  "started": "2026-11-13T15:52:35+00:00",
+  "timed_out": false
+}

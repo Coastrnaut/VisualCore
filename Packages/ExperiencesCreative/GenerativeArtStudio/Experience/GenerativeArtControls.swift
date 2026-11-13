@@ -51,11 +51,19 @@ struct GenerativeArtControls: View {
                 ProgressView().accessibilityLabel(Text(verbatim: "Loading"))
             }
         }
-        .onChange(of: mirror.core?.rate, initial: true) { _, rate in
-            // Reduce Motion: half speed once per open, as the standalone app's clock (adapter difference 2).
-            guard reduceMotion, !motionApplied, rate == 1 else { return }
-            motionApplied = true
-            port.send("rate", [SceneClock.reducedMotionFactor])
+        .task {
+            // Reduce Motion: half speed once per open, as the standalone app's clock (adapter difference 2). The
+            // controls can appear before the experience is active, when the action is refused, so it is retried for at
+            // most 5 s.
+            guard reduceMotion, !motionApplied else { return }
+            for _ in 0..<50 {
+                if let rate = mirror.core?.rate, rate != 1 { motionApplied = true; return }
+                if mirror.core != nil, port.send("rate", [SceneClock.reducedMotionFactor]).isAccepted {
+                    motionApplied = true
+                    return
+                }
+                try? await Task.sleep(for: .milliseconds(100))
+            }
         }
     }
 
