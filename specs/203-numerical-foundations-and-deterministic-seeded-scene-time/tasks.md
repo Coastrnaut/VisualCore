@@ -19,7 +19,7 @@ none (no {owner} task). VisualCore changes, so the documentation, API-baseline a
   of "a" (`0xaf63dc4c8601ec8c`); golden `derive(42, label: "layout")`, `derive(42, index: 0)` and `(42, 1)`;
   labels "a"/"b" and indexes 0/1 pairwise different; chaining; `SeededRandom(seed:label:)` equals
   `SeededRandom(seed: derive(seed, label:))`; drawing from one stream does not change another.
-- [ ] T-R02F03-003 [US1] Write `Packages/VisualCore/Sources/VisualCoreSimulation/SeedDerivation.swift` per data-model
+- [X] T-R02F03-003 [US1] Write `Packages/VisualCore/Sources/VisualCoreSimulation/SeedDerivation.swift` per data-model — Verified 2026-11-13: SeedDerivation.swift (mix, fnv1a64, derive label/index; SeededRandom(seed:label:), (seed:index:)) with /// docs; its 7 tests pass (host-visualcore)
   "Sub-seed derivation" and contracts/api.md, with `///` on each public declaration.
 - [ ] T-R02F03-004 [US1] Acceptance: host tests pass (check `host-derivation`) (SC-R02F03-002).
 
