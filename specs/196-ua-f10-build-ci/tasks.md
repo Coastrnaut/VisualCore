@@ -120,7 +120,7 @@ Independent test: planted second shippable target, undeclared target and reused 
   then `migration_ledger.py seal --gate UA-F10` and `record --gate UA-F10`.
 
 Conditional:
-- [ ] T-U10-030 Only if a VisualCore framework source changes: `check_public_api.py --update`,
+- [X] T-U10-030 Only if a VisualCore framework source changes: `check_public_api.py --update`, — Verified 2026-11-13: not applicable: no UA-F10 commit changes a source of Packages/VisualCore or Packages/VisualCoreRendering (git log --grep ^UA-F10 with --stat: 0 framework source files); the API check still passes (public-api in release-static of UA-F07 and R02-F02 runs)
   `check_documented_api.py --sources Apps/VisualCore`, and the reference regression after the change.
 
 ## Dependencies
