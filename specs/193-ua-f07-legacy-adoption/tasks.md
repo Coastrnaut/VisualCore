@@ -220,7 +220,7 @@ runtimes.
   remaining schemes.
 - [X] T-U07-039 Evidence `reference-a` and `reference-b`: the two chunks of the ProjectM reference regression (3 of 3 — Verified 2026-11-13: reference-a 3 of 3 (engine xcframework, projectM-iOS simulator build, reference clean) and reference-b 4 of 4 (ANGLE rendering tests and ProjectM reference on iOS 27 and 26) after the last framework change; External/projectm-ios worktree clean (0 changes)
   and 4 of 4) after the last framework change (FR-U07-053; SC-U07-009).
-- [ ] T-U07-040 Evidence `legacy-ledger` (the SHA-256 of `.autonomy/state.json` begins `2604ffd8292cc8a8`), `docs`,
+- [X] T-U07-040 Evidence `legacy-ledger` (the SHA-256 of `.autonomy/state.json` begins `2604ffd8292cc8a8`), `docs`, — Verified 2026-11-13: legacy-ledger (state.json SHA-256 2604ffd8292cc8a8, migration_baseline verify 0 problems), docs, steering, script-tests all exit 0; CI run 43490248490 of 1fd4264 (contains every UA-F07 change) completed success: checks, host-tests, simulator-build and app-build
   `steering`, `script-tests`; then confirm with `gh run list` that `ci` and `push-scan` of the last pushed commit
   succeeded.
 - [ ] T-U07-041 Run `/speckit-converge` for UA-F07 and `/speckit-implement` for every task it appends; repeat until a run
