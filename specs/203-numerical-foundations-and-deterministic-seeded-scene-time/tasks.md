@@ -65,7 +65,7 @@ none (no {owner} task). VisualCore changes, so the documentation, API-baseline a
   a whole number of turns away; `wrapped` for −0.5 mod 2, 2 mod 2 (→ 0), errors for modulus 0, −1, ∞, NaN input;
   `quantized` 0.26 step 0.1 → 3, −0.0 → 0, `.nonFinite`, `.nonPositiveStep`, `.outOfRange` for 1e300.
 - [X] T-R02F03-016 [US5] Write `Packages/VisualCore/Sources/VisualCoreMath/NumericHygiene.swift` (`NumericError`). — Verified 2026-11-13: NumericHygiene.swift (finite, normalizedAngle, wrapped, quantized, NumericError) with /// docs; tests pass (host-visualcore)
-- [ ] T-R02F03-017 [US5] Acceptance: host tests pass (check `host-hygiene`) (SC-R02F03-006).
+- [X] T-R02F03-017 [US5] Acceptance: host tests pass (check `host-hygiene`) (SC-R02F03-006). — Verified 2026-11-13: host-visualcore PASS incl. hygiene tests (SC-R02F03-006)
 
 ## Phase 7: User Story 6 — Determinism document (P3)
 
