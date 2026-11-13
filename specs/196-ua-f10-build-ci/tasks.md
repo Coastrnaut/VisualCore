@@ -146,3 +146,11 @@ separate commits.
   was unclear; fixed: a copy of the tracked files under `Build/standin-check/`. F1 MEDIUM, the numbering gap; fixed.
   U1 LOW (FR-U10-051 is a review rule) accepted.
 - **Run 2 (2026-11-13)**: 21 of 21 requirements and 7 of 7 criteria covered; no critical or high finding.
+
+## Phase 10: Convergence
+
+Appended by `/speckit-converge` (T-U10-029, round 1, 2026-11-13).
+
+- [X] T-U10-031 Add a script test that the shared `audit(...)` of `Apps/VisualCore/Tests/UI/AppUITestSupport.swift` — Verified 2026-11-13: scripts/tests/test_audit_deferral.py: the repository passes (audit() returns before performAccessibilityAudit unless VC_RUN_AUDITS is 1; no other UI source calls it), a planted missing guard and a planted direct call are both found; test_scripts.py 377 OK (audit-deferral)
+  returns before `performAccessibilityAudit` unless `VC_RUN_AUDITS` is `1`, and that no other UI test source calls
+  `performAccessibilityAudit`, with a planted defect per FR-U10-042 (partial)
