@@ -172,3 +172,10 @@ Device-only items: none, so no {device} task.
 MVP: stories 1–3 (P1: privacy manifest, permissions, no tracking). Then licenses and ProjectM (evidence mostly from
 existing tools), distinctiveness, metadata inputs. Review checkpoint after each phase: rerun its acceptance command
 before ticking.
+
+## Phase 11: Convergence
+
+Appended by `/speckit-converge` (T-U11-040, round 1, 2026-11-13).
+
+- [ ] T-U11-041 Add `configuration_of(app)` to `scripts/report_meta.py` (the build configuration from the products folder name, e.g. `Release-iphonesimulator` → `Release`, else null) with a test in `scripts/tests/test_report_meta.py`, and use it in `check_privacy_manifest.py`, `check_licenses.py --app`, `check_usage_descriptions.py --app` and `check_no_tracking.py` so every built-app report records its configuration per FR-U11-003, FR-U11-082 (partial)
+- [ ] T-U11-042 Keep the reason-API detection of `scripts/check_privacy_manifest.py` per binary so an undeclared-category finding names the binary that uses it, with a test in `scripts/tests/test_privacy_report.py`, per US1/AC2, FR-U11-001 (partial)
