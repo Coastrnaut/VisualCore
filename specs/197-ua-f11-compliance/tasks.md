@@ -135,7 +135,7 @@ Device-only items: none, so no {device} task.
 - [X] T-U11-033 Auto-Creator.md §15.2 and §15.4 as built (tools, files, where they run); `python3 — Verified 2026-11-13: Auto-Creator.md sections 15.2 and 15.4 as built (manifest audit report, permissions vocabulary and check, tracking scan, built-app licenses, distinctiveness matrix, metadata inputs); validate_autocreator, validate_docs, migration_baseline verify PASS (docs)
   scripts/validate_autocreator.py`, `python3 scripts/validate_docs.py`, `python3 scripts/migration_baseline.py verify`
   pass (check `docs`).
-- [ ] T-U11-034 Write `specs/197-ua-f11-compliance/owner-review.md` with the exact steps of T-U11-037..039 and record
+- [X] T-U11-034 Write `specs/197-ua-f11-compliance/owner-review.md` with the exact steps of T-U11-037..039 and record — Verified 2026-11-13: specs/197-ua-f11-compliance/owner-review.md lists the exact steps of the legal review, name clearance with age rating, and the non-gating distinctiveness review, each BLOCKED_OWNER_ACTION
   them as BLOCKED_OWNER_ACTION.
 - [ ] T-U11-035 CI of a commit with all UA-F11 changes finished with success (`gh run list --workflow ci --limit 1`).
 - [X] T-U11-036 Only if a VisualCore package changed: `python3 scripts/check_public_api.py --update`, `python3 — Verified 2026-11-13: no VisualCore package source or public API changed: git diff --stat ecf2946..HEAD -- Packages/ shows only the regenerated test fixture Tests/VisualCoreExperienceTests/Fixtures/Catalog/registrations.json; API baseline, documented-API and ProjectM regression not triggered; 390 VisualCoreExperienceTests pass
