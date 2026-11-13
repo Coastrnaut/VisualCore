@@ -50,7 +50,7 @@ Independent test: a fresh host's report holds every value of FR-R02F02-001 and 0
 - [X] T-R02F02-010 [US3] Add `Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/RendererRecord+Capabilities.swift` — Verified 2026-11-13: RendererRecord+Capabilities.swift maps the report with floor findings; ScenarioRunner captures it in readFrame (ScenarioRunResult.renderer); EvidenceRecord.observed(renderer:); ScenarioLaunch passes it; the driver keeps the app's renderer (scripts/tests/test_verify_renderer.py, research section 3 correction)
   (`init(_ capabilities:)`, with `floor_findings` from `floorFindings()`), and fill `environment.renderer` in
   `Apps/VisualCore/App/Automation/ScenarioLaunch.swift` from the open session's `renderHost?.capabilities`.
-- [ ] T-R02F02-011 [US3] Acceptance: `swift test --package-path Packages/VisualCore` (check `host-visualcore`), script
+- [X] T-R02F02-011 [US3] Acceptance: `swift test --package-path Packages/VisualCore` (check `host-visualcore`), script — Verified 2026-11-13: swift test Packages/VisualCore exit 0 (host-visualcore); test_scripts.py exit 0 (script-tests); verify_experiences.py a01 launch-first-frame --fresh pass with environment.renderer: ES 3.0, 8 draw buffers, 4 samples, 0 floor findings, generation 1 (verify-renderer-r2; the first run lacked it, verify-renderer kept) (SC-R02F02-004)
   tests (check `script-tests`), and one runner scenario whose evidence holds `renderer` (check `verify-renderer`)
   (SC-R02F02-004).
 
