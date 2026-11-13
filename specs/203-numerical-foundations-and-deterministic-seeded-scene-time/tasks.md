@@ -77,7 +77,7 @@ none (no {owner} task). VisualCore changes, so the documentation, API-baseline a
 - [X] T-R02F03-020 [US6] Write `docs/architecture/determinism.md` (FR-R02F03-060, 061: step policy, integer-only — Verified 2026-11-13: docs/architecture/determinism.md: step policy, integer rules, float trust boundary, derivation, choice draw counts, saved state, shader twin, hygiene, replay, transform conventions, UIKit conversion
   rules, trust boundary of transcendental functions, stream derivation, replay format, transform conventions, UIKit
   y-down conversion).
-- [ ] T-R02F03-021 [US6] Acceptance: `python3 scripts/check_doc_names.py docs/architecture/determinism.md` passes
+- [X] T-R02F03-021 [US6] Acceptance: `python3 scripts/check_doc_names.py docs/architecture/determinism.md` passes — Verified 2026-11-13: check_doc_names.py docs/architecture/determinism.md PASS after the baseline update, 41 names (doc-names) (SC-R02F03-007)
   after the API baseline update (check `doc-names`) (SC-R02F03-007).
 
 ## Phase 8: Polish and cross-cutting
