@@ -52,7 +52,7 @@ Independent test: planted second shippable target, undeclared target and reused 
 
 - [X] T-U10-007 [P] [US2] Script tests first for `check_app_targets.py` (three planted defects, a gate in — Verified 2026-11-13: scripts/tests/test_app_targets.py: 11 tests (second shippable target, undeclared target, reused bundle, missing reason, until_gate pass, unknown gate, damaged JSON, schema 2, real repository) pass in test_scripts.py, 368 OK (script-tests-tools-r2)
   `until_gate` that is pass, a damaged and a newer-schema list).
-- [ ] T-U10-008 [US2] Write `Configs/app-targets.json` (schema 1, data-model.md: "exactly one `ships: true`; names
+- [X] T-U10-008 [US2] Write `Configs/app-targets.json` (schema 1, data-model.md: "exactly one `ships: true`; names — Verified 2026-11-13: Configs/app-targets.json (schema 1, 3 targets) and scripts/check_app_targets.py; in ci.yml job checks (step App targets) and release_check.py step app-targets (PASS 2/2 with experience-packages)
   unique; bundles unique; every application target of `project.yml` listed and nothing else; `until_gate` pass in the
   migration ledger → failure") and `scripts/check_app_targets.py`; add it to the `checks` job of `ci.yml` and to
   `release_check.py` as step `app-targets` (FR-U10-010, FR-U10-011).
