@@ -2,7 +2,7 @@
  "schema": 1,
  "name": "VisualCore unified-app migration ledger (ADR-0009)",
  "created": "2026-11-12T02:54:10+00:00",
- "updated": "2026-11-12T23:37:53+00:00",
+ "updated": "2026-11-13T11:02:44+00:00",
  "rules": [
   "Only scripts/migration_ledger.py writes this file.",
   "The legacy ledger .autonomy/state.json is never reset or rewritten by the migration; its passed gates stay passed.",
@@ -87,7 +87,7 @@
   {"id":"UA-F05","kind":"unified-feature","title":"Session state, per-experience persistence, reset and restore","depends":["CONSTITUTION-2","UA-F03","UA-F04"],"status":"pass","attempts":[{"at":"2026-11-12T23:37:53+00:00","result":"pass","evidence":".autonomy/migration/evidence/UA-F05.json","evidence_sha256":"198f97b980875c350a7754e39f3ca611e31039f040fd2cb7945f34f30431622e","revision":"a7ab1a821236e7fb56a201c73807a1de79f80e0c"}],"spec_dir":"specs/191-ua-f05-session-persistence"},
   {"id":"UA-F06","kind":"unified-feature","title":"Quality profiles and performance observability","depends":["CONSTITUTION-2","UA-F03"],"status":"pass","attempts":[{"at":"2026-11-12T20:12:59+00:00","result":"pass","evidence":".autonomy/migration/evidence/UA-F06.json","evidence_sha256":"d069a69aa02ef2931ae64b8cee33a09532905f91c8d336d2bb48e84a1fc7a86c","revision":"012d7296536cee6a860d84a4959ddcba8b774a38"}],"spec_dir":"specs/192-ua-f06-quality-performance"},
   {"id":"UA-F07","kind":"unified-feature","title":"Adoption of the existing apps A01 to A04 as experiences","depends":["CONSTITUTION-2","UA-F02","UA-F03","UA-F04","UA-F05"],"status":"pending","attempts":[],"spec_dir":"specs/193-ua-f07-legacy-adoption"},
-  {"id":"UA-F09","kind":"unified-feature","title":"Experience verification runner and evidence schema","depends":["CONSTITUTION-2","UA-F02","UA-F03","UA-F04"],"status":"pending","attempts":[],"spec_dir":"specs/195-ua-f09-verification-runner"},
+  {"id":"UA-F09","kind":"unified-feature","title":"Experience verification runner and evidence schema","depends":["CONSTITUTION-2","UA-F02","UA-F03","UA-F04"],"status":"pass","attempts":[{"at":"2026-11-13T11:02:44+00:00","result":"pass","evidence":".autonomy/migration/evidence/UA-F09.json","evidence_sha256":"58ae8614c39f94b777d503b1a0540b6fa73ed589ac23581d0c5befeb28eae992","revision":"3b3fadbf4849decd9aaa7481c4a4d761925eb729"}],"spec_dir":"specs/195-ua-f09-verification-runner"},
   {"id":"UA-F10","kind":"unified-feature","title":"Build, project and CI consolidation","depends":["CONSTITUTION-2","UA-F04"],"status":"pending","attempts":[],"spec_dir":"specs/196-ua-f10-build-ci"},
   {"id":"UA-F11","kind":"unified-feature","title":"Privacy, licensing, no-advertising audit and distinctiveness","depends":["CONSTITUTION-2","UA-F04","UA-F10"],"status":"pending","attempts":[],"spec_dir":"specs/197-ua-f11-compliance"},
   {"id":"UA-F12","kind":"unified-feature","title":"ImplementationLock-100: independent verification of all 100 experiences","depends":["CONSTITUTION-2","UA-F09","UA-F10","UA-F11"],"status":"pending","attempts":[],"spec_dir":"specs/198-ua-f12-implementation-lock"},
