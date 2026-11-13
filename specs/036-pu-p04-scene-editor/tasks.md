@@ -53,7 +53,7 @@ each task. Tests before code. Owner-only items: none. One {device} task. No Visu
 
 ## Phase 5: User Story 3 — Move an emitter (P2)
 
-- [ ] T-A04-412 [US3] Tests first in `ParticleEditorTests.swift`: `emitter.move` sets the selected emitter's position
+- [X] T-A04-412 [US3] Tests first in `ParticleEditorTests.swift`: `emitter.move` sets the selected emitter's position — Verified 2026-11-13: ParticleEditorTests move cases (clamp to +-500, family and overrides kept, survives document and open) pass (experiences-ios27)
   clamped to ±500 and keeps family and overrides; the move survives `document` → open.
 - [ ] T-A04-413 [US3] Implement `emitter.move` in `ParticleCore.swift` and four direction buttons (step 50,
   identifiers `pu.move.left|right|up|down`, labels) in `ParticleControls.swift`; UI test presses one and saves.
