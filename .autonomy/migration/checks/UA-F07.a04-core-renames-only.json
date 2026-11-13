@@ -1,0 +1,23 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_renames.py",
+    "--base",
+    "af887e3",
+    "Apps/ParticleUniverse/ParticleUniverseCore/Sources",
+    "Apps/ParticleUniverse/ParticleUniverseCore/Tests",
+    "Packages/ExperiencesCreative/ParticleUniverse/Core",
+    "Packages/ExperiencesCreative/ParticleUniverse/CoreTests"
+  ],
+  "command": "python3 scripts/check_renames.py --base af887e3 Apps/ParticleUniverse/ParticleUniverseCore/Sources Apps/ParticleUniverse/ParticleUniverseCore/Tests Packages/ExperiencesCreative/ParticleUniverse/Core Packages/ExperiencesCreative/ParticleUniverse/CoreTests",
+  "elapsed_seconds": 0.038,
+  "exit_code": 0,
+  "finished": "2026-11-13T15:23:04+00:00",
+  "gate": "UA-F07",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F07.a04-core-renames-only.log",
+  "log_sha256": "2a26f52f6a1ae92c8aa3901ba182c71c0489c0b1a6e2bf679f2c9a15dd3f1bb0",
+  "name": "a04-core-renames-only",
+  "started": "2026-11-13T15:23:04+00:00",
+  "timed_out": false
+}
