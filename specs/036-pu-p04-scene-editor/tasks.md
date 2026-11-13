@@ -30,7 +30,7 @@ each task. Tests before code. Owner-only items: none. One {device} task. No Visu
   `emitter.define`, `force.define`, `look.define` per contracts/actions.md; pending open not part of the anchor;
   `document` accessor. Update `PU/Experience/Adapter/ParticleManifest.swift` with a "save and open" scenario and
   regenerate digests and `PU/scenario-manifest.json` only where they change.
-- [ ] T-A04-406 [P] [US1] Tests first in `PU/ExperienceTests/ParticleLibraryTests.swift` (temporary
+- [X] T-A04-406 [P] [US1] Tests first in `PU/ExperienceTests/ParticleLibraryTests.swift` (temporary — Verified 2026-11-13: ParticleLibraryTests 8 tests (save, list, open, numbered suffix, 64-char suffix, rename refusals, remove, unreadable kept, relaunch, storage full leaves files unchanged) pass on sim-26.5 and in both package runs
   `ExperienceStorage`): save, list, open data, rename (refused on clash), delete, numbered suffix on name clash,
   unreadable files counted and kept, relaunch (new library over the same storage) lists the same entries; a
   save beyond the storage limits (65th file) fails with a message and leaves the existing files unchanged (FR-A04-414).
