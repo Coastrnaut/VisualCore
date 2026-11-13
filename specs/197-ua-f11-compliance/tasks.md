@@ -17,7 +17,7 @@ Device-only items: none, so no {device} task.
 
 ## Phase 2: Foundational
 
-- [ ] T-U11-002 [P] Tests first in `scripts/tests/test_report_meta.py`: `meta(app, configuration)` returns
+- [X] T-U11-002 [P] Tests first in `scripts/tests/test_report_meta.py`: `meta(app, configuration)` returns — Verified 2026-11-13: scripts/tests/test_report_meta.py 7 tests OK (meta fields, digest, interrupted write leaves no file, schema 2/missing/bool/unparsable refused)
   `schema` 1, 40-hex `revision`, boolean `clean`, `configuration`, 64-hex `executable_sha256` of the app's main
   executable (null without an app); `write_report(path, report)` leaves no file when interrupted before rename; `read_versioned` refuses schema 2, a
   missing schema and unparsable JSON. Every later tool test module also plants a schema-2 input and a missing app or
