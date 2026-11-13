@@ -26,7 +26,7 @@ task. Owner-only items: none.
 
 - [X] T-R02F26-005 [P] [US2] Tests first: `GestureAlternatives.missing(gesture:native:)` returns the sorted gesture — Verified 2026-11-13: GestureAlternativesTests.swift (covered sets leave nothing; missing actions named in order) pass (host-visualcore-r2)
   actions without a native action, empty when covered (`Packages/VisualCore/Tests/VisualCoreExperienceTests/GestureAlternativesTests.swift`).
-- [ ] T-R02F26-006 [US2] Write `Packages/VisualCore/Sources/VisualCoreExperience/GestureAlternatives.swift`; add
+- [X] T-R02F26-006 [US2] Write `Packages/VisualCore/Sources/VisualCoreExperience/GestureAlternatives.swift`; add — Verified 2026-11-13: GestureAlternatives.missing(gesture:native:) in VisualCoreExperience; ExperiencePresenter.gestureActions and nativeActions with empty defaults; rendering package 15/15 per runtime still pass (rendering-ios27/26) and ExperiencesCreative 274 test cases pass (experiences-ios27)
   `gestureActions` and `nativeActions` (default empty sets) to `ExperiencePresenter` in
   `Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperiencePresenter.swift`.
 - [ ] T-R02F26-007 [US2] Declare the sets in the app's debug experience presenter
