@@ -20,7 +20,7 @@ each task. Tests before code. Owner-only items: none. One {device} task. No Visu
 
 ## Phase 3: User Story 2 — Slow frames lower drawn detail (P1)
 
-- [ ] T-A04-504 [P] [US2] Tests first in `PU/CoreTests/FrameBudgetMonitorTests.swift`: "25% of the last 120 drawn frames
+- [X] T-A04-504 [P] [US2] Tests first in `PU/CoreTests/FrameBudgetMonitorTests.swift`: "25% of the last 120 drawn frames — Verified 2026-11-13: FrameBudgetMonitorTests 14 tests (31 of 120 slow steps down, 30 does not; 570 of 600 fast steps up, 569 does not; one tier per window; bounds; single slow frame; restart; invalid times ignored; deterministic 5,000-frame sequence) pass
   over 1.2× the budget" steps down one tier; "95% of the last 600 under 0.8× the budget" steps up one tier; at most one
   tier per window; never below 0 or above `maxTier`; a single slow frame changes nothing; `restart()` clears the windows;
   non-finite and non-positive times are ignored; deterministic for a given sequence.
