@@ -224,8 +224,7 @@ def main(argv: list[str] | None = None) -> int:
     try:
         deny = load_denylist(a.denylist)
         findings = scan(a.app, deny, a.denylist, a.symbols_file, a.libraries_file)
-        configuration = "Release" if any(part.startswith("Release") for part in a.app.resolve().parts) else None
-        report_meta = meta(a.app, configuration) if a.json else None
+        report_meta = meta(a.app, None) if a.json else None   # configuration from the products folder
     except (ReportError, subprocess.TimeoutExpired) as error:
         print(f"ERROR: {error}", file=sys.stderr)
         return 2

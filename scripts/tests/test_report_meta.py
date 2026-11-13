@@ -40,6 +40,22 @@ class MetaTests(unittest.TestCase):
                 rm.meta(app, "Release")
 
 
+class ConfigurationTests(unittest.TestCase):
+    def test_configuration_from_the_products_folder(self):
+        for folder, expected in [("Release-iphonesimulator", "Release"), ("Debug-iphoneos", "Debug"),
+                                 ("Release", "Release"), ("Apps", None), ("Releases-x", None)]:
+            with self.subTest(folder=folder):
+                self.assertEqual(rm.configuration_of(Path("/b") / folder / "Demo.app"), expected)
+
+    def test_meta_records_the_configuration_of_a_built_app(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            app = Path(tmp) / "Release-iphonesimulator" / "Demo.app"
+            app.mkdir(parents=True)
+            (app / "Demo").write_bytes(b"binary")
+            self.assertEqual(rm.meta(app, None)["configuration"], "Release")
+            self.assertEqual(rm.meta(app, "Debug")["configuration"], "Debug")
+
+
 class WriteReadTests(unittest.TestCase):
     def test_write_then_read(self):
         with tempfile.TemporaryDirectory() as tmp:

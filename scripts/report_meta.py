@@ -15,6 +15,7 @@ import hashlib
 import json
 import os
 import plistlib
+import re
 import subprocess
 import tempfile
 from pathlib import Path
@@ -55,8 +56,20 @@ def sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
+CONFIGURATION = re.compile(r"^(Debug|Release)(?:-[a-z]+)?$")
+
+
+def configuration_of(app: Path) -> str | None:
+    """The build configuration of a built app from its products folder (`Release-iphonesimulator` -> `Release`)."""
+    match = CONFIGURATION.match(Path(app).parent.name)
+    return match.group(1) if match else None
+
+
 def meta(app: Path | None, configuration: str | None) -> dict:
-    """Metadata recorded in every UA-F11 check report."""
+    """Metadata recorded in every UA-F11 check report; without an explicit configuration, a built app's is used
+    (FR-U11-003)."""
+    if configuration is None and app is not None:
+        configuration = configuration_of(app)
     return {"schema": SCHEMA, "revision": _git("rev-parse", "HEAD"),
             "clean": _git("status", "--porcelain") == "", "configuration": configuration,
             "executable_sha256": sha256(executable(app)) if app is not None else None}
