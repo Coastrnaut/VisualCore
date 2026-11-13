@@ -46,7 +46,7 @@ Commit after every task (`python3 scripts/tick_task.py`), and push with `python3
   - `silhouette` gives the bounding box and nil for an empty frame.
   - `classify` gives `dark`, `light`, `red`, `green`, `blue` or `other`.
   - `FrameProbe` x and y lie in 0…1.
-- [ ] T-U09-009 Implement `FrameChecks.swift`. `FrameProbe` is release; the checks are inside `#if`. T-U09-008 passes (FR-U09-040, FR-U09-042).
+- [X] T-U09-009 Implement `FrameChecks.swift`. `FrameProbe` is release; the checks are inside `#if`. T-U09-008 passes (FR-U09-040, FR-U09-042). — Verified 2026-11-12: swift test --package-path Packages/VisualCore --filter VisualCoreExperienceTests: 379 tests in 35 suites passed
 - [ ] T-U09-010 [P] Tests first: `ScenarioRequestTests.swift`. Cover:
   - No `VISUALCORE_AUTORUN`, or another value, is no request.
   - `scenario` with experience, scenario, seed, run, phase and expected digest parses.
