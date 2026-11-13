@@ -55,7 +55,7 @@ none (no {owner} task). VisualCore changes, so the documentation, API-baseline a
 - [X] T-R02F03-013 [US4] Write `Packages/VisualCoreRendering/Tests/VisualCoreRenderingTests/ShaderHashParityTests.swift`: — Verified 2026-11-13: ShaderHashParityTests.swift renders vc_pcg per pixel into RGBA8 and compares every word (at least 64, 256 at 2x) with ShaderHash.pcg exactly; passes on sim-27.2 and sim-26.5 (rendering-tests-ios27, rendering-tests-ios26)
   a fragment shader including `vc/hash.glsl` writes the four bytes of `vc_pcg(index)` for 64 pixels into RGBA8; read
   back with `readPixels()` and compare with `ShaderHash.pcg` exactly.
-- [ ] T-R02F03-014 [US4] Acceptance: host tests (check `host-shader-hash`); rendering package on sim-27.2 and sim-26.5
+- [X] T-R02F03-014 [US4] Acceptance: host tests (check `host-shader-hash`); rendering package on sim-27.2 and sim-26.5 — Verified 2026-11-13: host-visualcore PASS; VisualCoreRenderingTests 117 tests incl. ShaderHashParityTests pass on iOS 27.2 and 26.5 (rendering-tests-ios27, rendering-tests-ios26); default scheme runs (rendering-ios27/26, 15 UI tests) also pass (SC-R02F03-005)
   (checks `rendering-ios27`, `rendering-ios26`) with 64 of 64 matches (SC-R02F03-005).
 
 ## Phase 6: User Story 5 — Numeric hygiene (P2)
