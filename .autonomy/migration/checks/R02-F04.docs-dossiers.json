@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "python3",
+    "scripts/validate_docs.py"
+  ],
+  "command": "python3 scripts/validate_docs.py",
+  "elapsed_seconds": 0.092,
+  "exit_code": 0,
+  "finished": "2026-11-13T21:29:41+00:00",
+  "gate": "R02-F04",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-F04.docs-dossiers.log",
+  "log_sha256": "b27c781ca8d598cb1a3670e8382b215bfbb5b62b48ef8c2398629308a37c8b77",
+  "name": "docs-dossiers",
+  "started": "2026-11-13T21:29:41+00:00",
+  "timed_out": false
+}

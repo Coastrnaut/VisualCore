@@ -40,10 +40,12 @@
     "ResourceRegistry",
     "ResourceLedger",
     "ResourceBudget",
-    "RenderLifecycle"
+    "RenderLifecycle",
+    "RenderState",
+    "Pipeline"
    ],
    "home": "VisualCoreRendering, VisualCoreDiagnostics",
-   "note": "Ownership rules exist; the session-level rules are delivered by UA-F03."
+   "note": "As built (feature 204): ownership rules reused and proven on both runtimes; cache eviction now retires a program instead of deleting it (valid until released or the context ends; evictionCount, retiredProgramCount); RenderState (pure, presets opaque, alphaBlended, additive, opaque3D) and Pipeline applied by GLState.apply, which refuses and counts a released or stale program; offscreen targets with a 24-bit depth renderbuffer (depth: true), counted, pooled and released with the target. Session-level rules stay with UA-F03."
   },
   "F05": {
    "disposition": "new",
