@@ -108,7 +108,7 @@ runtimes.
 
 ## Phase 5: User Story 6 — No interface test is lost (P2), applied per experience
 
-- [ ] T-U07-015 [US6] Port A01's 14 UI tests to `Apps/VisualCore/Tests/UI/GenerativeArtStudio/` with class names
+- [X] T-U07-015 [US6] Port A01's 14 UI tests to `Apps/VisualCore/Tests/UI/GenerativeArtStudio/` with class names — Verified 2026-11-13: Apps/VisualCore/Tests/UI/GenerativeArtStudio/: GASAccessibilityAuditUITests, GASControlsUITests, GASExportUITests, GASGalleryUITests, GASLibraryUITests, GASRecoveryUITests and GASSupport; test-map.csv with 14 rows (3 mapped to the one app's Launch and Settings tests); the audits run at the default and the largest text size; chunks g1-g3 in the run script. Fixes from the first runs are listed in research.md section 4
   prefixed `GAS…`, launches through `-vcResetData -vcSkipWelcome -vcCandidates -openExperience
   a01.generative-art-studio`, and locators `experience.a01.generative-art-studio.<control>`. Write the 14 rows of
   `test-map.csv`; settings, launch and acknowledgements tests map to the one app's equivalents with their note.

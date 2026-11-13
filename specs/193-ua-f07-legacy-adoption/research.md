@@ -232,3 +232,15 @@ The dossier files are not edited. The legacy ledger is untouched; its hash is co
   packages in folders named `Adapter` collided ("Missing package product 'FluidArtPlaygroundAdapterCore'"). The
   adapters live in `Apps/<App>/<App>Adapter/`, like the Core packages (`FluidArtPlaygroundCore`); the folders
   were renamed with `git mv` and every path in this feature's documents was updated.
+- **A01 interface tests (T-U07-015, T-U07-016, 2026-11-13).** Ported by an agent; the lead ran and fixed them.
+  - The accessibility audit flagged controls the controls' scroll view clips (their frames lie under the canvas).
+    The shared `audit` takes a `visible` frame and ignores a contrast finding outside it; the ported audit passes
+    the list's frame above the home indicator.
+  - The session host's controls `ScrollView` hides the iOS 26 scroll-edge fade (`scrollEdgeEffectHidden`), as A01's
+    standalone controls did, so controls at its edges keep full contrast.
+  - The audit waits 0.8 s after each scroll, so that a decelerating list is not measured mid-move. Each audit test
+    has a 420 s allowance and runs in its own chunk.
+  - The time slider has its own full-width row. The rename alert and remove dialog use `presenting:`. The rename
+    test taps once more when the keyboard took the first tap. A confirmation dismissed by tapping outside it taps
+    the canvas, because from iOS 26 a phone shows a popover without Cancel.
+  - Chunks: `g1` (audit), `g2` (controls, export, gallery), `g3` (library, recovery).
