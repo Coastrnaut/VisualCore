@@ -26,10 +26,13 @@
     "FixedStepClock",
     "SceneClock",
     "FixedStepRunner",
-    "TimeStepPolicy"
+    "TimeStepPolicy",
+    "SeedDerivation",
+    "ShaderHash",
+    "NumericHygiene"
    ],
    "home": "VisualCoreMath, VisualCoreSimulation",
-   "note": "Deterministic time and randomness exist; add only missing numeric helpers with tests."
+   "note": "As built (feature 203): the clocks and generators are reused unchanged (golden sequences and committed digests identical); added SeedDerivation (named sub-seeds by label or index), owned SeededRandom.index(below:)/shuffle/pick/weightedIndex with one draw per index, a versioned SeededRandom.State, ShaderHash (CPU twin of vc/hash.glsl, vc_pcg bit-exact on the GPU) and NumericHygiene (finite, angle, wrap, quantize); rules and transform conventions in docs/architecture/determinism.md."
   },
   "F04": {
    "disposition": "reuse",

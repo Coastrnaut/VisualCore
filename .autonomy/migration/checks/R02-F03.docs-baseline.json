@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "python3",
+    "scripts/migration_baseline.py",
+    "verify"
+  ],
+  "command": "python3 scripts/migration_baseline.py verify",
+  "elapsed_seconds": 0.092,
+  "exit_code": 0,
+  "finished": "2026-11-13T21:11:28+00:00",
+  "gate": "R02-F03",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-F03.docs-baseline.log",
+  "log_sha256": "7fb224ee2a9d1ed0f20345540a8ce8df0a7c4c8aee8af4236d3cf7bbde47edde",
+  "name": "docs-baseline",
+  "started": "2026-11-13T21:11:28+00:00",
+  "timed_out": false
+}
