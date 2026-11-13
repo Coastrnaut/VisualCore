@@ -117,10 +117,26 @@
         "creative-and-visual"
       ],
       "order": 4,
-      "palette": [],
+      "palette": [
+        "#000000",
+        "#733D0A",
+        "#ED5410",
+        "#FFD966"
+      ],
       "tile_seed": 807550656,
-      "capabilities": [],
-      "quality_tiers": [],
+      "capabilities": [
+        "particle simulation",
+        "emitters",
+        "placed forces",
+        "trails",
+        "replay"
+      ],
+      "quality_tiers": [
+        "level-0",
+        "level-1",
+        "level-2",
+        "level-3"
+      ],
       "content": null,
       "available": false
     },

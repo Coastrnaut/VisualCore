@@ -1,0 +1,543 @@
+{
+  "controls" : [
+    "family",
+    "emitter.add",
+    "emitter.remove",
+    "emitter.select",
+    "size",
+    "lifetime",
+    "gradient",
+    "trails",
+    "trailStrength",
+    "blend",
+    "force.kind",
+    "force.place",
+    "force.nudge",
+    "force.center",
+    "strength",
+    "play",
+    "pause",
+    "step",
+    "reseed"
+  ],
+  "experience" : "a04.particle-universe",
+  "kind" : "creative",
+  "scenarios" : [
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+        "initialDigest" : "901c2f8be5b4ddafe8451c6f277b3f1c80e218df373823c99e6716a4859ea65f"
+      },
+      "name" : "launch-first-frame",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "emitter.add",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 30
+        },
+        {
+          "action" : {
+            "control" : "force.place",
+            "values" : [
+              0.75,
+              0.25
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 30
+        },
+        {
+          "action" : {
+            "control" : "family",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 30
+        },
+        {
+          "action" : {
+            "control" : "size",
+            "values" : [
+              16
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 30
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "0960cb630842b06242438442981217215185ed16b55ca0a8ec9de763ebefa29a",
+        "initialDigest" : "901c2f8be5b4ddafe8451c6f277b3f1c80e218df373823c99e6716a4859ea65f"
+      },
+      "name" : "input-response",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "emitter.add",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "emitter.add",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "outcome" : "scene-built"
+      },
+      "name" : "completion",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "play",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.a04.already-playing",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "emitter.remove",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.a04.last-emitter",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "family",
+            "values" : [
+              9
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        }
+      ],
+      "expect" : {
+
+      },
+      "name" : "rejection",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "emitter.add",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 30
+        },
+        {
+          "action" : {
+            "control" : "force.place",
+            "values" : [
+              0.75,
+              0.25
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 30
+        },
+        {
+          "action" : {
+            "control" : "family",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 30
+        },
+        {
+          "action" : {
+            "control" : "size",
+            "values" : [
+              16
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 30
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "0960cb630842b06242438442981217215185ed16b55ca0a8ec9de763ebefa29a",
+        "initialDigest" : "901c2f8be5b4ddafe8451c6f277b3f1c80e218df373823c99e6716a4859ea65f"
+      },
+      "name" : "save-restore",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "emitter.add",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 30
+        },
+        {
+          "action" : {
+            "control" : "force.place",
+            "values" : [
+              0.75,
+              0.25
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 30
+        },
+        {
+          "action" : {
+            "control" : "family",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 30
+        },
+        {
+          "action" : {
+            "control" : "size",
+            "values" : [
+              16
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 30
+        }
+      ],
+      "expect" : {
+        "initialDigest" : "901c2f8be5b4ddafe8451c6f277b3f1c80e218df373823c99e6716a4859ea65f",
+        "resetDigest" : true
+      },
+      "name" : "reset",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "suspend-resume",
+      "seed" : "7"
+    },
+    {
+      "cycles" : 5,
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "teardown-reentry",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "cancel-prepare",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "force.place",
+            "values" : [
+              0.25,
+              0.75
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 60
+        },
+        {
+          "action" : {
+            "control" : "strength",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 60
+        },
+        {
+          "action" : {
+            "control" : "force.nudge",
+            "values" : [
+              50,
+              -50
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 60
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "fdb8709fae72b31ff06917ce9e0773932a0351a684c7d811bc4635174882cc81",
+        "initialDigest" : "901c2f8be5b4ddafe8451c6f277b3f1c80e218df373823c99e6716a4859ea65f"
+      },
+      "name" : "fixture-1",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "family",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 2
+        },
+        {
+          "action" : {
+            "control" : "emitter.add",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "emitter.add",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "emitter.add",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "emitter.add",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "emitter.add",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "emitter.add",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "emitter.add",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "emitter.add",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.a04.emitters-full",
+          "steps" : 2
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "155e831ff3ec71668719285b624cb7b8fa9cbffd8aa6353a334ba298b58bdab5",
+        "initialDigest" : "901c2f8be5b4ddafe8451c6f277b3f1c80e218df373823c99e6716a4859ea65f"
+      },
+      "name" : "fixture-2",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "trails",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 20
+        },
+        {
+          "action" : {
+            "control" : "reseed",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 20
+        },
+        {
+          "action" : {
+            "control" : "trails",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 20
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "56a07300a8f81771098721325fc3441250832fb0eb607f4400917344e9286814",
+        "initialDigest" : "901c2f8be5b4ddafe8451c6f277b3f1c80e218df373823c99e6716a4859ea65f"
+      },
+      "name" : "fixture-3",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "force.kind",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 2
+        },
+        {
+          "action" : {
+            "control" : "force.place",
+            "values" : [
+              0.5,
+              0.5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 2
+        },
+        {
+          "action" : {
+            "control" : "strength",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 120
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "cc0245a37c87c57277c5310b03ddd7f34fb09ed6a51d0e1489ce93bccef37d4b",
+        "initialDigest" : "901c2f8be5b4ddafe8451c6f277b3f1c80e218df373823c99e6716a4859ea65f"
+      },
+      "name" : "fixture-4",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "pause",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "play",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 120
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "be6863ad0cd7a945fdfc8fc4ab044a0a7697889afa05383c77566b3cb10c4b27",
+        "initialDigest" : "901c2f8be5b4ddafe8451c6f277b3f1c80e218df373823c99e6716a4859ea65f"
+      },
+      "name" : "fixture-5",
+      "seed" : "7"
+    }
+  ],
+  "schema" : 1
+}

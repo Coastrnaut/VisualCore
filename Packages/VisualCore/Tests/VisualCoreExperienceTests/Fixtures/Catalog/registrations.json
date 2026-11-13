@@ -63,6 +63,29 @@
       ],
       "content": null,
       "manifest": "Packages/ExperiencesCreative/FractalExplorer/scenario-manifest.json"
+    },
+    "a04.particle-universe": {
+      "capabilities": [
+        "particle simulation",
+        "emitters",
+        "placed forces",
+        "trails",
+        "replay"
+      ],
+      "quality_tiers": [
+        "level-0",
+        "level-1",
+        "level-2",
+        "level-3"
+      ],
+      "palette": [
+        "#000000",
+        "#733D0A",
+        "#ED5410",
+        "#FFD966"
+      ],
+      "content": null,
+      "manifest": "Apps/ParticleUniverse/ParticleUniverseAdapter/scenario-manifest.json"
     }
   }
 }

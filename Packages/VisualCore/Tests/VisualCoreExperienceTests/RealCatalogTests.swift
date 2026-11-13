@@ -75,7 +75,8 @@ enum CatalogFixture {
         #expect(manifest.experience(code: try ExperienceCode("R03-G01"))?.id.rawValue == "r03-g01.harmonic-helix")
         #expect(manifest.families(in: .create) == ["Creative and visual"])
         let registered = manifest.experiences.filter { !$0.palette.isEmpty }.map(\.id.rawValue)
-        #expect(registered == ["a01.generative-art-studio", "a02.fluid-art-playground", "a03.fractal-explorer"],
+        #expect(registered == ["a01.generative-art-studio", "a02.fluid-art-playground", "a03.fractal-explorer",
+                               "a04.particle-universe"],
                 "the registrations of Catalog/registrations.json")
     }
 

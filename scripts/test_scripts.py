@@ -1265,7 +1265,7 @@ class UnifiedAppTargetTests(unittest.TestCase):
                                     "VisualCorePersistence",
                                     "VisualCoreRendering", "VisualCoreUI", "VisualCoreExperienceHost",
                                     "GenerativeArtStudioExperience", "FluidArtPlaygroundExperience",
-                                    "FractalExplorerExperience"])
+                                    "FractalExplorerExperience", "ParticleUniverseAdapterCore"])
 
     def test_the_standing_isolation_step_requires_sources(self):
         listing = subprocess.run([sys.executable, str(HERE / "release_check.py"), "--list"],

@@ -93,7 +93,9 @@ STORAGE_RULE_SOURCES = ["Apps/VisualCore/App/DebugSupport/DebugExperience.swift"
                        "Packages/ExperiencesCreative/FractalExplorer/Experience/FractalPresenter.swift",
                        "Packages/ExperiencesCreative/FractalExplorer/Experience/FractalControls.swift",
                        "Packages/ExperiencesCreative/FractalExplorer/Experience/FractalBookmarks.swift",
-                       "Packages/ExperiencesCreative/FractalExplorer/Experience/FractalExperience.swift"]
+                       "Packages/ExperiencesCreative/FractalExplorer/Experience/FractalExperience.swift",
+                       "Apps/ParticleUniverse/ParticleUniverseAdapter/Core",
+                       "Apps/ParticleUniverse/ParticleUniverseAdapter/Experience"]
 # The shipped sources that read stored data.
 STORED_DATA_SOURCES = ["Packages/VisualCore/Sources/VisualCoreExperience/SavedStateStore.swift",
                        "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift",
@@ -113,7 +115,9 @@ STORED_DATA_SOURCES = ["Packages/VisualCore/Sources/VisualCoreExperience/SavedSt
                        "Packages/ExperiencesCreative/FractalExplorer/Experience/FractalPresenter.swift",
                        "Packages/ExperiencesCreative/FractalExplorer/Experience/FractalControls.swift",
                        "Packages/ExperiencesCreative/FractalExplorer/Experience/FractalBookmarks.swift",
-                       "Packages/ExperiencesCreative/FractalExplorer/Experience/FractalExperience.swift"]
+                       "Packages/ExperiencesCreative/FractalExplorer/Experience/FractalExperience.swift",
+                       "Apps/ParticleUniverse/ParticleUniverseAdapter/Core",
+                       "Apps/ParticleUniverse/ParticleUniverseAdapter/Experience"]
 
 
 def steps(stamp: str) -> list[Step]:
