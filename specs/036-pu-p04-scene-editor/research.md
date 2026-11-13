@@ -27,3 +27,8 @@
 - **D5 Wiring**: `ParticleExperience.make(id:storage:reduceMotion:reduceFlashing:)`; registry passes `launch.storage`; `ParticleControls` gains a Library section (save field, list with open, rename, delete) and Move buttons.
 - **D6 Snapshot**: `Anchor` gains no fields (the opened scene is the anchor's scene after commit); new actions are logged, so `migrations` stay at v1 and `replay-v1.json` still decodes.
 - **D7** No VisualCore change.
+
+## 2. Analysis record (`/speckit-analyze`, 2026-11-13)
+
+Round 1: 0 critical, 0 high, 1 medium (C1: storage-limit save failure test added to T-A04-406), 1 low (C2: no-VisualCore-
+change check added to T-A04-417). Round 2: clean; 22 of 22 requirements and 6 of 6 success criteria covered.

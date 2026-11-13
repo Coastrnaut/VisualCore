@@ -32,7 +32,8 @@ each task. Tests before code. Owner-only items: none. One {device} task. No Visu
   regenerate digests and `PU/scenario-manifest.json` only where they change.
 - [ ] T-A04-406 [P] [US1] Tests first in `PU/ExperienceTests/ParticleLibraryTests.swift` (temporary
   `ExperienceStorage`): save, list, open data, rename (refused on clash), delete, numbered suffix on name clash,
-  unreadable files counted and kept, relaunch (new library over the same storage) lists the same entries.
+  unreadable files counted and kept, relaunch (new library over the same storage) lists the same entries; a
+  save beyond the storage limits (65th file) fails with a message and leaves the existing files unchanged (FR-A04-414).
 - [ ] T-A04-407 [US1] Write `PU/Experience/ParticleLibrary.swift` (the `FractalBookmarks` pattern, files
   `scene-<uuid>.json`).
 - [ ] T-A04-408 [US1] Wire: `PU/Experience/ParticleExperience.swift` `make(id:storage:reduceMotion:reduceFlashing:)`;
@@ -67,8 +68,9 @@ each task. Tests before code. Owner-only items: none. One {device} task. No Visu
 
 ## Phase 7: Polish
 
-- [ ] T-A04-417 `python3 scripts/check_compliance.py` (check `compliance`) and `python3 scripts/test_scripts.py`
-  (check `script-tests`).
+- [ ] T-A04-417 `python3 scripts/check_compliance.py` (check `compliance`), `python3 scripts/test_scripts.py`
+  (check `script-tests`), and `git diff --stat` over `Packages/VisualCore` and `Packages/VisualCoreRendering` for the
+  phase's commits showing no change (FR-A04-432, FR-A04-442).
 - [ ] T-A04-418 App unit tests and the PU interface chunks j2/j3 on the iOS 27.2 phone stay green (checks `app-unit`,
   `ui-pu`); test durations under 10 s each (SC-A04-406).
 - [ ] T-A04-419 Update `docs/apps/particle-universe/README.md` with the editor and library.
