@@ -28,9 +28,10 @@ enum CatalogFixture {
         #expect(manifest.catalogSHA256.count == 64)
     }
 
-    @Test func noExperienceIsAvailableBeforeItsIntegrationGate() throws {
-        // Today no gate X-<code> is pass in the migration ledger; the build tool is the only writer of this flag.
-        #expect(try CatalogFixture.manifest().available.isEmpty)
+    @Test func onlyExperiencesWithAPassingIntegrationGateAreAvailable() throws {
+        // X-A01, X-A02 and X-A03 are pass in the migration ledger (2026-11-13); the build tool is the only writer of
+        // this flag.
+        #expect(try CatalogFixture.manifest().available.map(\.id.rawValue) == ["a01.generative-art-studio", "a02.fluid-art-playground", "a03.fractal-explorer"])
     }
 
     @Test func everyIdIsInTheGoldenListAndWellFormed() throws {

@@ -251,17 +251,17 @@ import Testing
             == .error(code: "catalog.unsupportedSchema"))
     }
 
-    @Test func realCatalogIsEmptyBecauseNothingIsAvailable() throws {
+    @Test func realCatalogShowsOnlyTheIntegratedExperiences() throws {
         let manifest = try CatalogFixture.manifest()
         let categories = try Self.categories()
         let everything = Set(manifest.experiences.map(\.id))
-        #expect(LauncherModel.shown(manifest: manifest, registered: everything).isEmpty)
-        for registered in [[], everything] {
-            for search in ["", "aurora"] {
-                #expect(LauncherModel.state(manifest: .success(manifest), categories: categories, registered: registered,
-                                            searchText: search) == .empty)
-            }
+        #expect(LauncherModel.shown(manifest: manifest, registered: everything).map(\.id.rawValue) == ["a01.generative-art-studio", "a02.fluid-art-playground", "a03.fractal-explorer"])
+        for search in ["", "aurora"] {
+            #expect(LauncherModel.state(manifest: .success(manifest), categories: categories, registered: [],
+                                        searchText: search) == .empty, "nothing registered shows nothing")
         }
+        #expect(LauncherModel.state(manifest: .success(manifest), categories: categories, registered: everything,
+                                    searchText: "") != .empty)
     }
 
     @Test func sectionsFollowTheCategoryListAndTilesTheCatalogOrder() throws {
@@ -408,7 +408,7 @@ import Testing
             #expect(startup.welcomeRoute == .catalog)
         }
         let real = try CatalogFixture.manifest()
-        let none = LauncherModel.shown(manifest: real, registered: Set(real.experiences.map(\.id)))
+        let none = LauncherModel.shown(manifest: real, registered: [])
         #expect(ShellStartup.decide(preferences: ShellPreferences(), shown: none).firstFree == nil)
     }
 

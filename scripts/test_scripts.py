@@ -3280,6 +3280,14 @@ class BuildCatalogTests(unittest.TestCase):
         self.write("Catalog/categories.json", {"schema": 1, "categories": [{"id": i, "title": i.title()} for i in self.tool.CATEGORIES]})
         self.write("Catalog/registrations.json", {"schema": 1, "registrations": {}})
         self.write("Catalog/path-map.json", {"schema": 1, "moves": []})
+
+        # The fixture starts with no integration gate passed, whatever the real ledger says today (X-A01 to X-A03
+        # are pass since 2026-11-13); the tests set the gates they need.
+        def no_gate_passed(ledger):
+            for gate in ledger["gates"]:
+                if gate["id"].startswith("X-"):
+                    gate["status"] = "pending"
+        self.edit(".autonomy/migration/ledger.json", no_gate_passed)
         self.assertEqual(self.run_tool("--add-golden")[0], 0)
 
     def write(self, rel, value):

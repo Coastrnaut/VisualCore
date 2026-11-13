@@ -38,9 +38,10 @@ import Testing
         #expect(report.missingRegistrations.isEmpty && report.unexpectedRegistrations.isEmpty)
     }
 
-    @Test func todaysCatalogWithNothingRegisteredIsAMatch() throws {
-        let report = try CatalogFixture.manifest().registryReport(registered: [])
-        #expect(report.isMatch)
-        #expect(report == RegistryReport(missingRegistrations: [], unexpectedRegistrations: [], duplicates: []))
+    @Test func todaysCatalogWithTheIntegratedExperiencesRegisteredIsAMatch() throws {
+        let manifest = try CatalogFixture.manifest()
+        let integrated = ["a01.generative-art-studio", "a02.fluid-art-playground", "a03.fractal-explorer"].compactMap(ExperienceID.init(rawValue:))
+        #expect(manifest.registryReport(registered: integrated).isMatch)
+        #expect(manifest.registryReport(registered: []).missingRegistrations == integrated)
     }
 }

@@ -42,3 +42,10 @@
     available).
   On the iOS 27.2 phone, the app unit tests and the interface chunks a, b, d, e and f pass (`baseline-app-r2`,
   `baseline-app-ui-d`, `baseline-app-ui-ef`).
+- 2026-11-13, availability follow-up (found by the R02-F26 host run and the CI script tests): four pure tests read the
+  real catalog and still expected nothing available. `RealCatalogTests` now expects the three integrated
+  experiences, `ShellModelTests` checks that they are the ones shown and keeps the empty case with nothing
+  registered, the startup test uses no registration, and `RegistryReportTests` matches with the three registered.
+  The build-catalog script-test fixture copied the real ledger, where X-A01 to X-A03 are pass, with no
+  registrations; it now resets the X gates to pending in its copy. Host tests 390 + 98 + 55 + 15 pass
+  (`host-visualcore-r2`); script tests 383 OK.
