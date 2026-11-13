@@ -179,6 +179,9 @@ to a tracked file, and a record for a commit already measured is not duplicated.
   setup command; CI is unaffected (story 1 needs no locally built frameworks).
 - A CI run is cancelled by a newer push, or a dependent job is skipped: only the newest finished run is evidence; a
   skipped job is investigated before code is blamed.
+- A CI run stays queued because no hosted runner is free: it is not evidence and nobody waits for it; work goes on,
+  and the gate is recorded only after a run of a commit containing all of the gate's changes has finished with
+  success.
 - An interface chunk is interrupted, or another run already uses the simulator: the run refuses or stops and says
   so; nothing is retried blindly.
 - The simulator runtime named by the toolchain pins is not installed: the step fails naming the runtime.
@@ -230,8 +233,9 @@ to a tracked file, and a record for a commit already measured is not duplicated.
 
 **Release check (story 5)**
 - **FR-U10-040**: `release_check.py` MUST offer unified-app steps for the unit tests, the interface tests in chunks
-  (one build, then chunks without building; parallel simulator clones allowed), and verification subsets by
-  experience, each with a limit below ten minutes that stops the step and names where it was.
+  (one build, then chunks without building; parallel simulator clones allowed), and verification subsets with one
+  step per registered experience and runtime, derived from `Catalog/registrations.json` so that a new registration
+  gets its steps without an edit, each with a limit below ten minutes that stops the step and names where it was.
 - **FR-U10-041**: The release check MUST also build the one app in Release for the simulator and check its
   symbols and privacy manifest.
 - **FR-U10-042**: A unified-app step MUST NOT run a system accessibility audit before the device campaign (owner ruling
