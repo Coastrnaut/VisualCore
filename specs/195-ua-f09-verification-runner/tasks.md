@@ -140,7 +140,7 @@ Commit after every task (`python3 scripts/tick_task.py`), and push with `python3
 
 ## Phase 9: User Story 7 - Audits (Priority: P2)
 
-- [ ] T-U09-025 [US7] Tests first in `scripts/test_scripts.py` (class `AuditTests`), on temporary copies. Each of these is found:
+- [X] T-U09-025 [US7] Tests first in `scripts/test_scripts.py` (class `AuditTests`), on temporary copies. Each of these is found: — Verified 2026-11-12: python3 scripts/test_scripts.py: Ran 286 tests, OK (AuditTests 11)
   - A TODO in a comment, and a FIXME in a string.
   - "coming soon" in the string catalog, and "placeholder" in a `Text("…")`.
   - The word "placeholder" as a variable name is not a finding.
