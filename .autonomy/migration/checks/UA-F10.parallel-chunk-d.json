@@ -1,0 +1,32 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_app.py",
+    "--scheme",
+    "VisualCore",
+    "--runtime",
+    "27.2",
+    "--kind",
+    "phone",
+    "--action",
+    "test-without-building",
+    "--parallel",
+    "2",
+    "--only-testing",
+    "VisualCoreUITests/LauncherUITests",
+    "VisualCoreUITests/FirstRunUITests",
+    "--log-name",
+    "ua-f10-parallel-d"
+  ],
+  "command": "python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime 27.2 --kind phone --action test-without-building --parallel 2 --only-testing VisualCoreUITests/LauncherUITests VisualCoreUITests/FirstRunUITests --log-name ua-f10-parallel-d",
+  "elapsed_seconds": 167.286,
+  "exit_code": 1,
+  "finished": "2026-11-13T18:25:50+00:00",
+  "gate": "UA-F10",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F10.parallel-chunk-d.log",
+  "log_sha256": "b0bd8b660704baa5b40c56d33abcd83fcb61c475751ca14c1ca63c9d9eb5a117",
+  "name": "parallel-chunk-d",
+  "started": "2026-11-13T18:23:03+00:00",
+  "timed_out": false
+}

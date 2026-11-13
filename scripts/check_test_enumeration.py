@@ -18,6 +18,8 @@ from pathlib import Path
 CLASS = re.compile(r"^\s*(?:final\s+)?class\s+(\w+)\s*:\s*XCTestCase\b")
 METHOD = re.compile(r"^\s*(?:@MainActor\s+)?func\s+(test\w*)\s*\(\s*\)")
 PASSED = re.compile(r"Test Case '-\[[\w.]+\.(\w+) (test\w*)\]' passed")
+# Parallel testing in simulator clones (UA-F10) logs "Test case 'Class.testMethod()' passed on 'Clone 1 of …'".
+PASSED_PARALLEL = re.compile(r"Test case '(\w+)\.(test\w*)\(\)' passed on ")
 
 
 def declared(sources: Path, only: set[str] | None = None) -> set[tuple[str, str]]:
@@ -36,7 +38,9 @@ def declared(sources: Path, only: set[str] | None = None) -> set[tuple[str, str]
 
 
 def passed(log: Path) -> set[tuple[str, str]]:
-    return {(m.group(1), m.group(2)) for m in PASSED.finditer(log.read_text(errors="replace"))}
+    text = log.read_text(errors="replace")
+    return ({(m.group(1), m.group(2)) for m in PASSED.finditer(text)}
+            | {(m.group(1), m.group(2)) for m in PASSED_PARALLEL.finditer(text)})
 
 
 def main(argv: list[str] | None = None) -> int:

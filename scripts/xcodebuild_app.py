@@ -86,16 +86,19 @@ ACTIONS = ("test", "build-for-testing", "test-without-building")
 
 
 def test_command(project: str, scheme: str, udid: str, derived: str, only: list[str] | None,
-                 result_bundle: str | None = None, action: str = "test") -> list[str]:
+                 result_bundle: str | None = None, action: str = "test", parallel: int = 1) -> list[str]:
     """The exact `xcodebuild <action>` command: simulator destination, explicit timeouts, unsigned; with
     `result_bundle` also `-resultBundlePath <result_bundle>`. `build-for-testing` once and then
-    `test-without-building` per chunk, in the same DerivedData, saves the build and install of every chunk."""
+    `test-without-building` per chunk, in the same DerivedData, saves the build and install of every chunk. With
+    `parallel` above 1 the test classes run in that many simulator clones (owner ruling of 2026-11-13, UA-F10)."""
     cmd = ["xcodebuild", action, "-project", project, "-scheme", scheme,
            "-destination", f"platform=iOS Simulator,id={udid}",
            "-test-timeouts-enabled", "YES", "-default-test-execution-time-allowance", "180",
            "-derivedDataPath", derived, "CODE_SIGNING_ALLOWED=NO"]
     if result_bundle:
         cmd += ["-resultBundlePath", result_bundle]
+    if parallel > 1:
+        cmd += ["-parallel-testing-enabled", "YES", "-parallel-testing-worker-count", str(parallel)]
     return cmd + [f"-only-testing:{t}" for t in (only or [])]
 
 
@@ -143,6 +146,8 @@ def main(argv: list[str] | None = None, root: Path = ROOT, run=subprocess.run, g
                          "ten-minute limit of one foreground command); 0 disables the limit")
     ap.add_argument("--action", choices=ACTIONS, default="test",
                     help="test (default); build-for-testing builds once for later test-without-building chunks")
+    ap.add_argument("--parallel", type=int, default=1, metavar="N",
+                    help="run the test classes in N simulator clones (default 1)")
     ap.add_argument("--result-name", metavar="NAME",
                     help="also write the result bundle to .autonomy/xcresults/NAME.xcresult (an older one is removed)")
     try:
@@ -162,6 +167,8 @@ def main(argv: list[str] | None = None, root: Path = ROOT, run=subprocess.run, g
         problems.append("--log-name is a plain file name without folders")
     if a.result_name is not None and not SAFE_NAME.match(a.result_name):
         problems.append("--result-name is a plain file name without folders")
+    if a.parallel < 1:
+        problems.append("--parallel is 1 or more")
     if not a.project.endswith(".xcodeproj"):
         problems.append("--project is an .xcodeproj")
     if any(not t or t.startswith("-") or "=" in t or "," in t for t in only):
@@ -208,7 +215,8 @@ def main(argv: list[str] | None = None, root: Path = ROOT, run=subprocess.run, g
         elif bundle.exists() or bundle.is_symlink():
             bundle.unlink()
         bundle.parent.mkdir(parents=True, exist_ok=True)
-    cmd = test_command(a.project, a.scheme, udid, derived, only, str(bundle) if bundle else None, a.action)
+    cmd = test_command(a.project, a.scheme, udid, derived, only, str(bundle) if bundle else None, a.action,
+                       a.parallel)
     log = root / ".autonomy" / "logs" / "app-tests" / f"{log_name}.log"
     log.parent.mkdir(parents=True, exist_ok=True)
     try:

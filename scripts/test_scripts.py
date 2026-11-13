@@ -1411,6 +1411,10 @@ class AppTestRunnerTests(unittest.TestCase):
                           "-derivedDataPath", "Build/DerivedData/x", "CODE_SIGNING_ALLOWED=NO"])
         self.assertEqual(apprunner.test_command("P.xcodeproj", "S", "U", "D", [], action="test-without-building")[1],
                          "test-without-building")
+        par = apprunner.test_command("P.xcodeproj", "S", "U", "D", [], parallel=3)
+        self.assertEqual(par[par.index("-parallel-testing-worker-count") + 1], "3")
+        self.assertIn("-parallel-testing-enabled", par)
+        self.assertNotIn("-parallel-testing-enabled", apprunner.test_command("P.xcodeproj", "S", "U", "D", []))
         cmd = apprunner.test_command("P.xcodeproj", "S", "U", "D", ["VisualCoreTests/A", "VisualCoreUITests/B/testC"])
         self.assertEqual(cmd[-2:], ["-only-testing:VisualCoreTests/A", "-only-testing:VisualCoreUITests/B/testC"])
         self.assertIn("CODE_SIGNING_ALLOWED=NO", cmd)
@@ -1897,6 +1901,16 @@ class AppContractTests(unittest.TestCase):
 
 
 class TestEnumerationTests(unittest.TestCase):
+    def test_a_parallel_log_counts_its_passed_tests(self):
+        import contextlib, io
+        guard = load("check_test_enumeration")
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            (root / "T.swift").write_text("final class A: XCTestCase {\n    func testOne() {}\n}\n")
+            (root / "log").write_text("Test case 'A.testOne()' passed on 'Clone 1 of iPhone - Runner (1)' (1.0 seconds)\n")
+            with contextlib.redirect_stdout(io.StringIO()):
+                self.assertEqual(guard.main(["--sources", d, "--log", str(root / "log")]), 0)
+
     def test_a_method_id_limits_the_guard_to_that_method(self):
         import contextlib, io
         guard = load("check_test_enumeration")

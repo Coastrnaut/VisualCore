@@ -62,6 +62,12 @@ evidence commands are found as described in Auto-Creator.md §19. Simulators are
    do not commit, push or run heavy builds; the lead invokes every Spec Kit skill, runs the builds in the
    foreground (10 minutes or less per command, split with `--only`/`--skip`), retests every agent result
    before a task is ticked (an agent's report is not evidence) and commits.
+   **More parallel agents, gates unchanged** (owner ruling of 2026-11-13): never consolidate the planned gates (the
+   phase gates of A05–A25 and the ten feature gates of each round game stay as they are). Speed comes from running
+   more work at once: every set of independent files of a task (tools, tests, sources, documents, read-only audits)
+   goes to parallel agents by default, up to ten, while the lead runs skills, builds and checks. Shared files (such
+   as `scripts/test_scripts.py`) stay with the lead; agents hand their part over as a separate file that the lead
+   merges.
    **Faster tests** (owner ruling of 2026-11-13): an app test pass builds once (`xcodebuild_app.py --action
    build-for-testing`) and runs its chunks with `--action test-without-building`; UI test classes may run in
    parallel simulator clones. **All system accessibility audits wait until device testing**: they are not run
