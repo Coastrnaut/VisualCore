@@ -38,7 +38,27 @@ Canonical overrides:
 
 ### Session 2026-11-13
 
-(Filled by `/speckit-clarify`.)
+Answered autonomously under the owner's standing delegation, recommended option each time. Facts checked in code:
+`SceneSimulation.maxStepsPerFrame` = 8; `ExperienceEngine.resume()` resets the clock's accumulator; `ParticleCore`'s
+`drawShare(tier:)` gives 1, 3/4, 1/2, 1/4; the session builds a `PerformanceRecord` when it closes (private
+`makeRecord`); `docs/performance/budgets.md` has a table of proposals confirmed per device.
+
+- Q: What window and thresholds decide a detail change? → A: The frame budget is the display's frame interval (1/60 s
+  unless the host reports another). Step down one tier when more than 25% of the last 120 drawn frames took longer than
+  1.2× the budget; step up one tier when at least 95% of the last 600 drawn frames took less than 0.8× the budget. After a
+  change both windows restart, so detail moves at most one tier per window.
+- Q: Where does the detail controller live and how does it act? → A: A pure `FrameBudgetMonitor` in the experience's
+  core, fed by the presenter with each drawn frame's time; the presenter draws at the coarser of the host's tier and the
+  monitor's tier (the larger tier number), so heat and Low Power Mode always win. It is not a logged action and never
+  changes the simulation.
+- Q: How does the resume test inject a long gap? → A: Through the experience session: open, play, go to the background,
+  return, then advance one frame whose time step is 600 s (bypassing the host's 0.1 s clamp on purpose, to prove the
+  engine and core bound on their own) and then normal frames; the step counter and the digest are compared with a
+  replay. The host's clamp is noted as a fourth, separate bound.
+- Q: What is the profile record of story 3? → A: A short scripted session test that closes the session and prints the
+  session's performance record as one `PROFILE:` JSON line labelled `"source": "simulator"`; the recorded check log is
+  the evidence. `docs/performance/budgets.md` gains a Particle Universe row whose device values are "pending the device
+  campaign".
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -135,8 +155,9 @@ Pause, reseed and save still work, and the experience still draws only through t
 - **FR-A04-503**: A session-level test MUST prove FR-A04-501 with a gap of at least 10 minutes of clock time.
 
 **Frame-time detail control (story 2)**
-- **FR-A04-510**: The experience MUST step its drawn detail down one tier when the share of frames over the frame budget
-  in a window exceeds a set threshold, and up one tier after a longer window comfortably within budget.
+- **FR-A04-510**: The experience MUST step its drawn detail down one tier when more than 25% of the last 120 drawn frames
+  took longer than 1.2× the frame budget, and up one tier when at least 95% of the last 600 drawn frames took less than
+  0.8× the budget; both windows restart after a change.
 - **FR-A04-511**: Detail MUST never step above the tier allowed by heat and Low Power Mode, and at most one tier per window.
 - **FR-A04-512**: Frames while paused or in the background MUST NOT count; the windows restart on resume.
 - **FR-A04-513**: Detail changes MUST affect only the drawn count, never the simulation.
@@ -175,8 +196,8 @@ Pause, reseed and save still work, and the experience still draws only through t
 
 ## Assumptions
 
-- The frame budget is the display's frame interval (1/60 s by default); window sizes and thresholds are fixed in the
-  plan and recorded in the evidence.
+- The frame budget is the display's frame interval (1/60 s by default); window sizes and thresholds are those of
+  FR-A04-510.
 - Frame times on the simulator are not representative of devices; the controller is tested with injected sequences.
 - A04-P04 is pass; X-A04 follows Phase 06.
 
