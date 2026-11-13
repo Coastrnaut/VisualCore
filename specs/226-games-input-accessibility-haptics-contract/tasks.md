@@ -57,7 +57,7 @@ task. Owner-only items: none.
 - [X] T-R02F26-013 [US5] Write `HapticEvent`, `HapticPlanner` in `AccessibilityPlans.swift`; `ShellPreferences.haptics: — Verified 2026-11-13: HapticEvent and HapticPlanner (0.05 s, off plays nothing); ShellPreferences.haptics optional with hapticsOn; HapticSink and SystemHapticSink (UIKit generators prepared once) with recording sinks
   Bool?` (absent = on, key `haptics`, schema 1) in `ShellModel.swift`; `HapticSink`, `SystemHapticSink` (UIKit
   generators) in `AccessibilityPlayers.swift` with a fake-sink test.
-- [ ] T-R02F26-014 [US5] Wire: `ExperienceLaunch.haptics` from the preferences (`Apps/VisualCore/App/ExperienceRegistry.swift`,
+- [X] T-R02F26-014 [US5] Wire: `ExperienceLaunch.haptics` from the preferences (`Apps/VisualCore/App/ExperienceRegistry.swift`, — Verified 2026-11-13: ExperienceFeedback (shared route, planners, sinks, VoiceOver state) and port.haptic/announce; AppModel applies the stored switch at launch and setHaptics stores and applies it; SettingsView haptics switch vc.settings.haptics with label, hint, 44 pt; ExperienceFeedbackTests 3/3 (haptics rate limit and switch, announcements merge and need VoiceOver, the port never sends an action or changes revision) on both runtimes (rendering-ios27/26)
   `AppModel.swift`); a haptics switch with identifier `vc.settings.haptics` and a VoiceOver label in `SettingsView.swift`;
   the session owns one player and one announcer and offers them to the experience
   (`Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceSession.swift`); a session test that a
