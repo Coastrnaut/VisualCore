@@ -11,6 +11,8 @@ Inputs:
   Catalog/registrations.json             what a built experience declares: capabilities, quality tiers, tile colors,
                                          content facts; empty until the first experience is integrated
   Catalog/categories.json, Catalog/path-map.json   written by hand, validated here
+  Configs/permission-vocabulary.json     the permission words a registration may declare (feature 197, UA-F11); read
+                                         only when a registration has a permissions list
 
 Outputs:
   Catalog/experiences.json               the runtime manifest (schema 1; contracts of specs/187-ua-f01-experience-catalog)
@@ -48,6 +50,10 @@ ID = re.compile(r"(a\d\d|r\d\d-g\d\d)\.[a-z0-9]+(-[a-z0-9]+)*")
 FREE = [f"A{n:02d}" for n in range(1, 26)] + [f"R02-G{n:02d}" for n in range(1, 26)]
 PREMIUM = [f"R{r:02d}-G{n:02d}" for r in (3, 4) for n in range(1, 26)]
 REGISTRATION_KEYS = ["capabilities", "quality_tiers", "palette", "content"]
+OPTIONAL_KEYS = {"manifest", "permissions"}
+VOCABULARY = Path("Configs/permission-vocabulary.json")
+WORD = re.compile(r"[a-z][a-z0-9]*(-[a-z0-9]+)*")
+USAGE_KEY = re.compile(r"NS[A-Za-z]+UsageDescription")
 
 
 def fail(message: str) -> None:
@@ -82,20 +88,57 @@ def strings(value, rel: Path, what: str, max_count: int, max_length: int) -> lis
     return value
 
 
+def load_vocabulary(root: Path) -> dict[str, dict]:
+    """Configs/permission-vocabulary.json as {word: {key, text}} (feature 197, UA-F11, data model section 1).
+
+    Schema 1 only; a word is lower-case kebab of 3 to 40 characters, a key matches NS...UsageDescription and is used by
+    one word, a text has 20 to 200 characters."""
+    data = read_json(root, VOCABULARY)
+    need(isinstance(data, dict) and isinstance(data.get("schema"), int) and not isinstance(data.get("schema"), bool),
+         VOCABULARY, "missing or non-integer schema")
+    need(data["schema"] == 1, VOCABULARY, f"schema {data['schema']} is not supported (expected 1)")
+    words = data.get("words")
+    need(set(data) == {"schema", "words"} and isinstance(words, dict), VOCABULARY, "expected exactly the keys schema and words")
+    keys: set[str] = set()
+    for word, entry in words.items():
+        need(3 <= len(word) <= 40 and WORD.fullmatch(word) is not None, VOCABULARY, f"{word!r} is not a lower-case kebab word of 3 to 40 characters")
+        need(isinstance(entry, dict) and sorted(entry) == ["key", "text"], VOCABULARY, f"{word}: expected exactly the keys key and text")
+        need(isinstance(entry["key"], str) and USAGE_KEY.fullmatch(entry["key"]) is not None, VOCABULARY,
+             f"{word}: key must match NS<Name>UsageDescription")
+        need(entry["key"] not in keys, VOCABULARY, f"{word}: the key {entry['key']} is used by another word")
+        keys.add(entry["key"])
+        need(isinstance(entry["text"], str) and 20 <= len(entry["text"]) <= 200, VOCABULARY, f"{word}: text must have 20 to 200 characters")
+    return words
+
+
 def load_registrations(root: Path, known_ids: set[str]) -> dict:
     data = read_json(root, REGISTRATIONS)
     need(isinstance(data, dict) and data.get("schema") == 1, REGISTRATIONS, "expected schema 1")
     need(set(data) == {"schema", "registrations"} and isinstance(data["registrations"], dict), REGISTRATIONS,
          "expected exactly the keys schema and registrations")
+    vocabulary = None
     for experience_id, entry in data["registrations"].items():
         need(experience_id in known_ids, REGISTRATIONS, f"{experience_id} is not an id of the planning catalog")
-        need(isinstance(entry, dict) and sorted(set(entry) - {"manifest"}) == sorted(REGISTRATION_KEYS), REGISTRATIONS,
-             f"{experience_id}: expected exactly the keys {', '.join(REGISTRATION_KEYS)} and optionally manifest")
+        need(isinstance(entry, dict) and sorted(set(entry) - OPTIONAL_KEYS) == sorted(REGISTRATION_KEYS), REGISTRATIONS,
+             f"{experience_id}: expected exactly the keys {', '.join(REGISTRATION_KEYS)} and optionally manifest and permissions")
         # Feature 193 (UA-F07): the scenario manifest's JSON form that scripts/verify_experiences.py audits, a
         # repository-relative file; it does not enter the runtime catalog.
         need("manifest" not in entry or (isinstance(entry["manifest"], str)
                                          and (root / entry["manifest"]).is_file()), REGISTRATIONS,
              f"{experience_id}: manifest must name a file of the repository")
+        # Feature 197 (UA-F11, FR-U11-010): the system permissions the experience needs, as 0 to 8 distinct words of
+        # the permission vocabulary; scripts/check_usage_descriptions.py compares them with Info.plist. Not copied
+        # into the runtime catalog.
+        if "permissions" in entry:
+            permissions = entry["permissions"]
+            need(isinstance(permissions, list) and len(permissions) <= 8 and all(isinstance(w, str) for w in permissions)
+                 and len(set(permissions)) == len(permissions), REGISTRATIONS,
+                 f"{experience_id}: permissions must be a list of at most 8 distinct words")
+            if vocabulary is None:
+                vocabulary = load_vocabulary(root)
+            unknown = [w for w in permissions if w not in vocabulary]
+            need(not unknown, REGISTRATIONS,
+                 f"{experience_id}: permissions word {unknown[0] if unknown else ''} is not in {VOCABULARY.as_posix()}")
         strings(entry["capabilities"], REGISTRATIONS, f"{experience_id}: capabilities", 16, 40)
         strings(entry["quality_tiers"], REGISTRATIONS, f"{experience_id}: quality_tiers", 8, 40)
         need(isinstance(entry["palette"], list) and len(entry["palette"]) <= 8

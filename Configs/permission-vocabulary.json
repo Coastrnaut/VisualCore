@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "words": {
+    "photo-library-add": {
+      "key": "NSPhotoLibraryAddUsageDescription",
+      "text": "Saves exported artwork to your photo library when you choose Save Image."
+    },
+    "microphone": {
+      "key": "NSMicrophoneUsageDescription",
+      "text": "Listens to sound in the room to drive the visuals; audio stays on this device and is not recorded."
+    },
+    "camera": {
+      "key": "NSCameraUsageDescription",
+      "text": "Uses the camera image as a live source for the visuals; video stays on this device and is not recorded."
+    }
+  }
+}
