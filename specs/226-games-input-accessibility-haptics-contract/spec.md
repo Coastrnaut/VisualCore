@@ -43,7 +43,22 @@ Canonical overrides:
 
 ### Session 2026-11-13
 
-(Filled by `/speckit-clarify`.)
+- Q: In which modules do the arbiter, the planners and the system adapters live, given the existing dependency
+  directions? → A: The gesture arbiter goes in VisualCoreScenes next to the recognizers. The announcement and haptic
+  planners and the state-sign check are pure and go in VisualCoreSimulation, beside the accessibility preferences,
+  where VisualCoreUI can reach them. The players that call the system (feedback generators, accessibility
+  announcements) go in VisualCoreUI behind a sink protocol so tests use a fake. The wiring goes in
+  VisualCoreExperienceHost and the app. No new module, so no new package rule.
+- Q: How does an experience declare which actions its canvas gestures send and which its native controls send? → A:
+  Two sets on the presenter: the actions its gestures can send, and the actions its native controls can send. Both
+  default to empty, so existing presenters compile unchanged. A shared check reports every gesture action that is
+  missing from the native set. A01–A04 declare their sets. Rejected: inferring the sets from view code, which cannot
+  be checked statically.
+- Q: How do the haptics switch and the announcements reach a game, and where is the switch stored? → A: The shell
+  preferences gain an optional `haptics` value (absent means on), with no schema change, because missing fields
+  already decode as defaults. The launch hand-off gains `haptics: Bool`. The session's host owns one haptic player
+  and one announcer on the main thread, and gives the presenter a handle to plan through. A game never calls UIKit
+  directly.
 
 ## User Scenarios & Testing *(mandatory)*
 
