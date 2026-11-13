@@ -71,7 +71,7 @@ task. Owner-only items: none.
 - [X] T-R02F26-016 `check_public_api.py --update` (only added lines, 0 undocumented; check `public-api`), — Verified 2026-11-13: check_public_api.py --update: 2295 lines, 73 added, 0 removed, 0 undocumented (public-api); check_documented_api.py --sources Apps/VisualCore PASS after the READMEs name ExperienceFeedback (documented-api); README sections in VisualCore and VisualCoreRendering
   `check_documented_api.py --sources Apps/VisualCore` (check `documented-api`), README sections in VisualCore and
   VisualCoreRendering.
-- [ ] T-R02F26-017 Reference regression `reference-a` and `reference-b` after the change (SC-R02F26-007).
+- [X] T-R02F26-017 Reference regression `reference-a` and `reference-b` after the change (SC-R02F26-007). — Verified 2026-11-13: reference-a 3/3 and reference-b 4/4 after the change (SC-R02F26-007)
 - [ ] T-R02F26-018 Release build, symbols and privacy (`release_check.py --only app-release-build app-release-symbols
   app-privacy-manifest`, check `release-app`).
 - [ ] T-R02F26-019 Auto-Creator.md section 13 row R02-F26 as built via `docs/catalog/shared-feature-map.json` and
