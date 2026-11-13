@@ -79,7 +79,7 @@ Device-only items: none, so no {device} task.
   shipped text, has an extra text, or has a differing text or index fails naming it; an exact bundle passes.
 - [X] T-U11-019 [US4] Modify `scripts/check_licenses.py`: `--app APP` compares `APP/Licenses` with the files — Verified 2026-11-13: check_licenses.py --app compares APP/Licenses with bundle_licenses.bundle() output byte for byte, --json report; manifests() walk skips build folders; its tests pass (script-tests)
   `bundle_licenses.bundle()` produces for shipped entries (generated into a temporary directory), byte for byte; `--json` report.
-- [ ] T-U11-020 [US4] Write `Apps/VisualCore/Tests/UI/AcknowledgementsUITests.swift`: About → Acknowledgements shows
+- [X] T-U11-020 [US4] Write `Apps/VisualCore/Tests/UI/AcknowledgementsUITests.swift`: About → Acknowledgements shows — Verified 2026-11-13: Apps/VisualCore/Tests/UI/AcknowledgementsUITests.swift: one pass from the top records every row; asserts each shipped id from docs/legal/third-party.json has a label and a 44-point row, and a row opens non-empty text; in the project after xcodegen generate
   one row per shipped id of `docs/legal/third-party.json` (read through `#filePath`), each with a non-empty label
   and a 44-point target; one row opens non-empty text; `xcodegen generate` adds it to the project.
 - [ ] T-U11-021 [US4] Acceptance: `python3 scripts/check_licenses.py` (check `licenses`), `python3
