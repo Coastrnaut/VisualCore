@@ -92,7 +92,7 @@ runtimes.
 - [X] T-U07-011 [US1] Session and conformance on the simulators: the A01 adapter's session tests (open, close, — Verified 2026-11-13: GenerativeArtSessionTests 7 tests (open with first frame and probe, close without GPU objects across four families and six palettes, suspension, retry after refused restore, memory warning, context recreation, 20 cycles) pass 7/7 on iOS 27.2 and 26.5 phone (run-checks a01-session-ios27, a01-session-ios26)
   suspension, retry, memory warning, context loss) in the framework's test bundle on iOS 27.2 and 26.5 (FR-U07-011;
   SC-U07-003).
-- [ ] T-U07-012 [US1] Parity with the standalone app: for 3 seeds and the same actions, the adapter's document and time
+- [X] T-U07-012 [US1] Parity with the standalone app: for 3 seeds and the same actions, the adapter's document and time — Verified 2026-11-13: GenerativeArtParityTests: for seeds 5, 77 and 0xC0FFEE0012345678 the adapter's family, seed, palette, parameters, preset, baseline, time and playing equal the standalone SceneModel's after the same edits and 120 steps; the picture of every family at t = 5 s equals the app's own scene (within2 = 1.0, mean 0, max 0; tolerance 0.99 / 0.5). The adapter bundle passes on iOS 27.2 and 26.5 phone (run-checks a01-parity-ios27, a01-parity-ios26); VisualCoreTests still links (AppModelTests passed after the bundle's package link was removed)
   equal what the standalone `SceneModel` gives (a test in the framework bundle that drives both); the picture of the
   first frame matches the standalone scene's for the same document and time within the existing image tolerance
   (FR-U07-003; SC-U07-005).

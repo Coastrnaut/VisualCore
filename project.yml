@@ -594,6 +594,8 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: dev.visualcore.GenerativeArtStudioExperienceTests
         GENERATE_INFOPLIST_FILE: YES
+    # No package products of its own: everything comes from the host app. Linking a package the app also links
+    # makes Xcode build it as a dynamic framework, which breaks the link of VisualCoreTests (seen 2026-11-13).
     dependencies:
       - target: VisualCore
   VisualCoreTests:

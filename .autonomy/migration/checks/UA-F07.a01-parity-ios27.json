@@ -1,0 +1,29 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_app.py",
+    "--scheme",
+    "VisualCore",
+    "--runtime",
+    "27.2",
+    "--kind",
+    "phone",
+    "--sources",
+    "Apps/GenerativeArtStudio/Adapter/ExperienceTests",
+    "--only-testing",
+    "GenerativeArtStudioExperienceTests",
+    "--log-name",
+    "ua-f07-a01-parity-ios27"
+  ],
+  "command": "python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime 27.2 --kind phone --sources Apps/GenerativeArtStudio/Adapter/ExperienceTests --only-testing GenerativeArtStudioExperienceTests --log-name ua-f07-a01-parity-ios27",
+  "elapsed_seconds": 8.184,
+  "exit_code": 0,
+  "finished": "2026-11-13T11:43:12+00:00",
+  "gate": "UA-F07",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F07.a01-parity-ios27.log",
+  "log_sha256": "f67c2be2237b811f0e3d175cc28d0a44c18b6746a90dd5f8a69a59a194abdfaf",
+  "name": "a01-parity-ios27",
+  "started": "2026-11-13T11:43:03+00:00",
+  "timed_out": false
+}
