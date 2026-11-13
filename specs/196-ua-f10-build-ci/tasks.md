@@ -10,7 +10,7 @@ Owner-only items: none.
 
 ## Phase 1: Setup
 
-- [ ] T-U10-001 Record the read-only audit and decisions as research.md sections 1–3 (done in `/speckit-plan`); re-run
+- [X] T-U10-001 Record the read-only audit and decisions as research.md sections 1–3 (done in `/speckit-plan`); re-run — Verified 2026-11-13: research.md sections 1-3 written in /speckit-plan; release_check.py --only dependencies script-tests PASS (baseline-tools); release_check.py --list read
   `python3 scripts/check_dependencies.py`, `python3 scripts/test_scripts.py` and `python3 scripts/release_check.py --list`
   as the starting point (check `baseline-tools`).
 
