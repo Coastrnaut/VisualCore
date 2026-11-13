@@ -1,0 +1,24 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--only",
+    "a01.generative-art-studio",
+    "a02.fluid-art-playground",
+    "--runtime",
+    "27",
+    "26",
+    "--fresh"
+  ],
+  "command": "python3 scripts/verify_experiences.py --only a01.generative-art-studio a02.fluid-art-playground --runtime 27 26 --fresh",
+  "elapsed_seconds": 56.079,
+  "exit_code": 0,
+  "finished": "2026-11-13T18:14:01+00:00",
+  "gate": "UA-F07",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F07.verify-a01-a02-final.log",
+  "log_sha256": "eb84b693d95faed6e509f4f20ae849c0ab7a00f17e4abf68e366514dcd54df24",
+  "name": "verify-a01-a02-final",
+  "started": "2026-11-13T18:13:05+00:00",
+  "timed_out": false
+}

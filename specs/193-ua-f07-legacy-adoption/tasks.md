@@ -284,7 +284,7 @@ Appended by `/speckit-converge` (T-U07-033, 2026-11-13). Implemented before T-U0
 
 Appended by `/speckit-converge` (T-U07-041, round 1, 2026-11-13).
 
-- [ ] T-U07-045 Rerun the X readiness checks of A01 and A02 on their final sources (`verify_experiences.py --only
+- [X] T-U07-045 Rerun the X readiness checks of A01 and A02 on their final sources (`verify_experiences.py --only — Verified 2026-11-13: on the final sources: verify_experiences.py --audits PASS for a01 (a01-x-audits-final) and a02 (a02-x-audits-final); runner --only a01 a02 --runtime 27 26 --fresh 36/36 scenarios, 0 failures (verify-a01-a02-final); package tests 274 on both runtimes after the probe fix (experiences-ios27/26); A03 sources unchanged since a03-x-audits
   <id> --audits` and the runner with `--runtime 27 26 --fresh`), because the A01 screen retirement and the Release
   fix of the probe helpers came after `a01-x-audits`, `a02-x-audits` and `verify-a01-a03-27/26` per FR-U07-051 and
   SC-U07-008 (partial)
