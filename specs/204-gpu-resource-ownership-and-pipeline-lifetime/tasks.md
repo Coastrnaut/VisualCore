@@ -46,7 +46,7 @@ API-baseline and reference-regression tasks apply.
   (`apply` false, `staleRejected` +1).
 - [X] T-R02F04-009 [US2] Write `Packages/VisualCoreRendering/Sources/VisualCoreRendering/Pipeline.swift` (`Pipeline`) — Verified 2026-11-13: Pipeline.swift (Hashable by program identity and state) and GLState.apply(_:resources:) setting every field; refusal counted via ResourceRegistry.noteStale(); tests pass (rendering-ios27/26)
   and `GLState.apply(_:resources:)` in `GLState.swift`.
-- [ ] T-R02F04-010 [US2] Acceptance: host RenderStateTests (check `host-visualcore`) and PipelineTests on sim-27.2
+- [X] T-R02F04-010 [US2] Acceptance: host RenderStateTests (check `host-visualcore`) and PipelineTests on sim-27.2 — Verified 2026-11-13: host RenderStateTests pass (host-visualcore); PipelineTests pass on sim-27.2 (rendering-ios27) (SC-R02F04-002)
   (check `pipeline-ios27`) (SC-R02F04-002).
 
 ## Phase 5: User Story 3 — Offscreen targets with depth (P2)
