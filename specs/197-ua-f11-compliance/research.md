@@ -91,3 +91,14 @@ Corrections to the audit note `Build/agent-notes/UA-F11-audit.md`: none; every c
 ### D10 — No VisualCore package change
 - No public API changes, so the API baseline, documented-API and ProjectM regression steps are not triggered; the
   quickstart keeps them as conditional commands.
+
+## 2. Analysis record (`/speckit-analyze`, 2026-11-13)
+
+Round 1: 0 critical, 2 high, 2 medium, 2 low. Fixed under the owner's delegation:
+- A1 (high): FR-U11-012 now requires the property-list text to equal the vocabulary's text (data-model §1 gains `text`).
+- A2 (high): deny-list library names are distinctive module identifiers of at least 6 characters, matched whole
+  (data-model §3, T-U11-013), so common words such as "Adjust" or "Branch" never match.
+- C1 (medium): `--json` added to the distinctiveness, metadata-input and built-app license contracts and tasks (FR-U11-080).
+- C2 (medium): every new tool's tests refuse a schema-2 input and a missing input (T-U11-002, FR-U11-081).
+- C3, U1 (low): FR-U11-033 and FR-U11-072 are rule constraints without own tasks; the missing-build test is in T-U11-002.
+Round 2: 0 critical, 0 high, 0 medium; 39 of 39 buildable requirements and 8 of 8 success criteria have tasks.

@@ -6,10 +6,11 @@ Readers refuse a missing, non-integer or higher schema and an unparsable file, n
 ## 1. Permission vocabulary — `Configs/permission-vocabulary.json`
 
 ```json
-{"schema": 1, "words": {"photo-library-add": "NSPhotoLibraryAddUsageDescription",
-                        "microphone": "NSMicrophoneUsageDescription"}}
+{"schema": 1, "words": {"photo-library-add": {"key": "NSPhotoLibraryAddUsageDescription",
+                        "text": "Saves exported artwork to your photo library when you choose Save Image."}}}
 ```
-- Word: lower-case kebab, 3–40 chars, unique. Key: matches `^NS[A-Za-z]+UsageDescription$`; each key used by one word.
+- Word: lower-case kebab, 3–40 chars, unique. Key: matches `^NS[A-Za-z]+UsageDescription$`; each key used by one
+  word. Text: 20–200 characters; the property list's text for the key must equal it (FR-U11-012).
 
 ## 2. Permission declaration — `Catalog/registrations.json` (registration schema 1, unchanged version)
 
@@ -23,10 +24,11 @@ Readers refuse a missing, non-integer or higher schema and an unparsable file, n
 {"schema": 1,
  "frameworks": ["AdSupport", "AppTrackingTransparency", "iAd", "AdServices"],
  "symbols": ["ASIdentifierManager", "advertisingIdentifier", "ATTrackingManager", "requestTrackingAuthorization"],
- "libraries": ["GoogleMobileAds", "FirebaseAnalytics", "FBSDKCoreKit", "AppsFlyerLib", "Adjust", "Branch", "..."],
+ "libraries": ["GoogleMobileAds", "FirebaseAnalytics", "FBSDKCoreKit", "AppsFlyerLib", "AdjustSdk", "BranchSDK", "..."],
  "allowances": [{"text": "...", "file_pattern": "...", "reason": "..."}]}
 ```
-- Texts are case-sensitive literals, 3–80 chars. An allowance needs a non-empty reason and matches one text in one
+- Texts are case-sensitive literals, 3–80 chars; library names are distinctive module identifiers of at least 6
+  characters, matched as whole identifiers (not inside a longer word), so common words never match. An allowance needs a non-empty reason and matches one text in one
   file pattern; an unused allowance fails (no stale exemptions).
 
 ## 4. Known game titles — `Configs/known-game-titles.json`

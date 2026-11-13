@@ -19,7 +19,9 @@ Device-only items: none, so no {device} task.
 
 - [ ] T-U11-002 [P] Tests first in `scripts/tests/test_report_meta.py`: `meta(app, configuration)` returns
   `schema` 1, 40-hex `revision`, boolean `clean`, `configuration`, 64-hex `executable_sha256` of the app's main
-  executable (null without an app); `write_report(path, report)` leaves no file when interrupted before rename.
+  executable (null without an app); `write_report(path, report)` leaves no file when interrupted before rename; `read_versioned` refuses schema 2, a
+  missing schema and unparsable JSON. Every later tool test module also plants a schema-2 input and a missing app or
+  input file (exit 2, path named) (FR-U11-081, spec edge cases).
 - [ ] T-U11-003 Write `scripts/report_meta.py` (`meta`, `write_report` atomic via temp file + `os.replace`,
   `read_versioned(path, schema=1)` refusing a missing, non-integer or higher schema and unparsable JSON with the path).
 
@@ -37,11 +39,11 @@ Device-only items: none, so no {device} task.
 ## Phase 4: User Story 2 — Permission prompts only for what experiences use (P1)
 
 - [ ] T-U11-007 [P] [US2] Tests first in `scripts/tests/test_usage_descriptions.py`: extra key, missing key,
-  unknown word, empty text each fail; the real repository passes with 1 key; `build_catalog` rejects `permissions`
+  unknown word, a text different from the vocabulary's each fail; the real repository passes with 1 key; `build_catalog` rejects `permissions`
   that is not a list of 0–8 distinct vocabulary words and accepts its absence.
 - [ ] T-U11-008 [P] [US2] Write `Configs/permission-vocabulary.json` (schema 1; word "lower-case kebab, 3–40 chars,
-  unique" → key matching `^NS[A-Za-z]+UsageDescription$`, each key used once): `photo-library-add`, `microphone`,
-  `camera`.
+  unique" → `key` matching `^NS[A-Za-z]+UsageDescription$`, each key used once, and `text` of 20–200 characters):
+  `photo-library-add` with the current `project.yml` text, `microphone`, `camera`.
 - [ ] T-U11-009 [US2] Modify `scripts/build_catalog.py`: optional `permissions` registration key validated against
   the vocabulary, not copied into the runtime catalog; add `"permissions": ["photo-library-add"]` to
   `a01.generative-art-studio` in `Catalog/registrations.json`; `python3 scripts/build_catalog.py --check` passes.
@@ -58,7 +60,8 @@ Device-only items: none, so no {device} task.
   names its file; a clean fixture passes; a schema-2 deny list is refused.
 - [ ] T-U11-013 [P] [US3] Write `Configs/tracking-denylist.json` (data-model §3): frameworks, symbols, and libraries
   covering advertising, analytics, attribution and crash reporting with at least three each (FR-U11-020); texts
-  "case-sensitive literals, 3–80 chars"; allowances need a reason.
+  "case-sensitive literals, 3–80 chars"; library names "distinctive module identifiers of at least 6 characters,
+  matched as whole identifiers"; allowances need a reason.
 - [ ] T-U11-014 [US3] Write `scripts/check_no_tracking.py` (reuses `check_release_symbols.binaries`; `otool -L`,
   `nm -m`, 1 MiB chunked byte scan of every bundled file; `--json` via report_meta).
 - [ ] T-U11-015 [P] [US3] Tests first in `scripts/tests/test_compliance_tracking.py`: a fixture source importing
@@ -75,7 +78,7 @@ Device-only items: none, so no {device} task.
 - [ ] T-U11-018 [P] [US4] Tests first in `scripts/tests/test_licenses_app.py`: a fixture app whose `Licenses/` lacks a
   shipped text, has an extra text, or has a differing text or index fails naming it; an exact bundle passes.
 - [ ] T-U11-019 [US4] Modify `scripts/check_licenses.py`: `--app APP` compares `APP/Licenses` with the files
-  `bundle_licenses.bundle()` produces for shipped entries (generated into a temporary directory), byte for byte.
+  `bundle_licenses.bundle()` produces for shipped entries (generated into a temporary directory), byte for byte; `--json` report.
 - [ ] T-U11-020 [US4] Write `Apps/VisualCore/Tests/UI/AcknowledgementsUITests.swift`: About → Acknowledgements shows
   one row per shipped id of `docs/legal/third-party.json` (read through `#filePath`), each with a non-empty label
   and a 44-point target; one row opens non-empty text; `xcodegen generate` adds it to the project.
@@ -101,7 +104,7 @@ Device-only items: none, so no {device} task.
 - [ ] T-U11-024 [P] [US6] Write `Configs/known-game-titles.json` (schema 1, at least 50 well-known commercial game
   titles, no web lookup).
 - [ ] T-U11-025 [US6] Write `scripts/check_distinctiveness.py` (`--write`, `--check`, `--catalog`, `--titles`)
-  producing `docs/legal/distinctiveness-matrix.json` (data-model §5: score "rounded to 4 decimals", close pairs first)
+  and `--json`, producing `docs/legal/distinctiveness-matrix.json` (data-model §5: score "rounded to 4 decimals", close pairs first)
   and `docs/legal/distinctiveness-matrix.md`; generate both.
 - [ ] T-U11-026 [US6] Acceptance: `python3 scripts/check_distinctiveness.py --check` passes with 4,950 pairs and 0
   shared (check `distinctiveness`) (SC-U11-006).
@@ -113,7 +116,7 @@ Device-only items: none, so no {device} task.
   reports of different executable digests; proven with two passing reports of one digest; `--check` fails on a
   stale file.
 - [ ] T-U11-028 [US7] Write `scripts/metadata_inputs.py` (`--write`, `--check`, `--privacy-report`,
-  `--tracking-report`) and generate `docs/release/metadata-inputs.json` from the T-U11-006 and T-U11-017 reports;
+  `--tracking-report`, `--json`) and generate `docs/release/metadata-inputs.json` from the T-U11-006 and T-U11-017 reports;
   add it to `LEDGER_READERS` in `scripts/test_scripts.py`.
 - [ ] T-U11-029 [US7] Acceptance: `python3 scripts/metadata_inputs.py --check` passes with 3 experiences (check
   `metadata-inputs`) (SC-U11-007).

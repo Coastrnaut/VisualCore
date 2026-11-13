@@ -300,7 +300,8 @@ the generator on a fixture ledger with a pending gate.
   declares `photo-library-add`.
 - **FR-U11-011**: A check MUST pass only when the built app's usage-description keys equal the union of the keys of
   the permissions declared by registered experiences; an extra key, a missing key or an unknown word fails.
-- **FR-U11-012**: Every usage-description text MUST be non-empty and name the experience feature that asks.
+- **FR-U11-012**: Every usage-description text MUST equal the text the vocabulary gives for its word (a non-empty
+  sentence naming the action that asks, such as A01's Save Image), so a reviewed text cannot drift.
 - **FR-U11-013**: The check MUST be a step of the release check and run in CI on the project files.
 
 **No advertising, analytics or tracking (story 3)**
