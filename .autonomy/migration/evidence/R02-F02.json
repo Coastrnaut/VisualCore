@@ -1,0 +1,141 @@
+{
+  "branch": "main",
+  "dirty": false,
+  "dirty_paths": [],
+  "failed_attempts": [],
+  "gate": "R02-F02",
+  "ledger": "migration",
+  "passing_checks": [
+    {
+      "command": "python3 scripts/validate_docs.py",
+      "exit_code": 0,
+      "finished": "2026-11-13T19:14:27+00:00",
+      "log": ".autonomy/logs/migration/R02-F02.docs.log",
+      "log_sha256": "0168dc7ea8526435791d9d2c319b442ca0b7b7889f50e88d82dc629d3bd2fdf4",
+      "name": "docs"
+    },
+    {
+      "command": "python3 scripts/check_documented_api.py --sources Apps/VisualCore",
+      "exit_code": 0,
+      "finished": "2026-11-13T19:11:51+00:00",
+      "log": ".autonomy/logs/migration/R02-F02.documented-api.log",
+      "log_sha256": "dae92dcf8de615b2748b9e804cf3e2f8282a523ea50697c1d487d10ca8945af7",
+      "name": "documented-api"
+    },
+    {
+      "command": "swift test --package-path Packages/VisualCore",
+      "exit_code": 0,
+      "finished": "2026-11-13T19:08:13+00:00",
+      "log": ".autonomy/logs/migration/R02-F02.host-visualcore.log",
+      "log_sha256": "2f65a4f42c55fd196c47e946d13a885dd3f1125a8830a0d851f69a5e00399d1d",
+      "name": "host-visualcore"
+    },
+    {
+      "command": "python3 scripts/migration_baseline.py verify",
+      "exit_code": 0,
+      "finished": "2026-11-13T19:14:28+00:00",
+      "log": ".autonomy/logs/migration/R02-F02.legacy-ledger.log",
+      "log_sha256": "b2491ab788d60cab4251fc10bf8f658bee128dd7c3b366b166687718cc998e40",
+      "name": "legacy-ledger"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --result-name r02f02-probe-27 --only-testing VisualCoreRenderingTests/RenderCapabilitiesProbeTests",
+      "exit_code": 0,
+      "finished": "2026-11-13T19:07:09+00:00",
+      "log": ".autonomy/logs/migration/R02-F02.probe-tests-ios27.log",
+      "log_sha256": "2f8156c0442cd1929d23fc94acbb9af98d3842693602193a84801f2a216d58cb",
+      "name": "probe-tests-ios27"
+    },
+    {
+      "command": "python3 scripts/check_public_api.py",
+      "exit_code": 0,
+      "finished": "2026-11-13T19:11:50+00:00",
+      "log": ".autonomy/logs/migration/R02-F02.public-api.log",
+      "log_sha256": "fcfa48be4d70e18eb0614a847abab7f644e259cb042f71ac718eb955ab8b78c5",
+      "name": "public-api"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only reference-engine-xcframework reference-build-projectm-ios-sim reference-clean",
+      "exit_code": 0,
+      "finished": "2026-11-13T19:12:19+00:00",
+      "log": ".autonomy/logs/migration/R02-F02.reference-a.log",
+      "log_sha256": "9294f3b3307f9fc704e9a9245b276bcefbca4aae7ba1b266a6370e28a00b0abf",
+      "name": "reference-a"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only reference-test-anglerendering-ios27 reference-test-anglerendering-ios26 projectm-reference-ios27 projectm-reference-ios26",
+      "exit_code": 0,
+      "finished": "2026-11-13T19:12:44+00:00",
+      "log": ".autonomy/logs/migration/R02-F02.reference-b.log",
+      "log_sha256": "b1464819250b57c22672e14313c936e04bafeb7495a8e6e535d369c586c2e1b3",
+      "name": "reference-b"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only app-release-build app-release-symbols app-privacy-manifest",
+      "exit_code": 0,
+      "finished": "2026-11-13T19:15:32+00:00",
+      "log": ".autonomy/logs/migration/R02-F02.release-app.log",
+      "log_sha256": "972513652d6c09f65faae681a94aa10d08f30db7d45d7277ddc084d729ae1d55",
+      "name": "release-app"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-26.5 --action test --result-name r02f02-rendering-26",
+      "exit_code": 0,
+      "finished": "2026-11-13T19:09:31+00:00",
+      "log": ".autonomy/logs/migration/R02-F02.rendering-ios26.log",
+      "log_sha256": "7022ba1d934810d5d72b33b8c7bfb95d83f92f83a832e215f4b51a20ce2ebbe9",
+      "name": "rendering-ios26"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --result-name r02f02-rendering-27",
+      "exit_code": 0,
+      "finished": "2026-11-13T19:08:54+00:00",
+      "log": ".autonomy/logs/migration/R02-F02.rendering-ios27.log",
+      "log_sha256": "fe1504997c7d74ec5289ea4e261931761167718abac4c17271eb066e86c76961",
+      "name": "rendering-ios27"
+    },
+    {
+      "command": "python3 scripts/test_scripts.py",
+      "exit_code": 0,
+      "finished": "2026-11-13T19:11:16+00:00",
+      "log": ".autonomy/logs/migration/R02-F02.script-tests.log",
+      "log_sha256": "0048d40f6ab13cb37b9f932ff4852769d8598e5d5a36d8fb1f1e4ccf85deba36",
+      "name": "script-tests"
+    },
+    {
+      "command": "python3 scripts/validate_autocreator.py",
+      "exit_code": 0,
+      "finished": "2026-11-13T19:14:22+00:00",
+      "log": ".autonomy/logs/migration/R02-F02.steering.log",
+      "log_sha256": "9a10e2f4ce1dec099a433750241ce4498dcba6fd4625f36ea68eb1e859a96a43",
+      "name": "steering"
+    },
+    {
+      "command": "python3 scripts/verify_experiences.py --only a01.generative-art-studio --runtime 27 --scenario launch-first-frame --fresh",
+      "exit_code": 0,
+      "finished": "2026-11-13T19:10:38+00:00",
+      "log": ".autonomy/logs/migration/R02-F02.verify-renderer-r2.log",
+      "log_sha256": "6dd9465f2adadf06552c116ad445d1aa9999cb1916d8e70b672ca237d0889ad2",
+      "name": "verify-renderer-r2"
+    },
+    {
+      "command": "python3 scripts/verify_experiences.py --only a01.generative-art-studio --runtime 27 --scenario launch-first-frame --fresh",
+      "exit_code": 0,
+      "finished": "2026-11-13T19:09:55+00:00",
+      "log": ".autonomy/logs/migration/R02-F02.verify-renderer.log",
+      "log_sha256": "e31eb5bcd7855f582f5389e2e79a6c3c1250961a46d8a9d941439e8ac786e064",
+      "name": "verify-renderer"
+    },
+    {
+      "command": "git diff --exit-code '61ed96c^' -- Packages/VisualCoreRendering/Sources/VisualCoreRendering/EGLDisplayProvider.swift",
+      "exit_code": 0,
+      "finished": "2026-11-13T19:11:50+00:00",
+      "log": ".autonomy/logs/migration/R02-F02.window-config-unchanged.log",
+      "log_sha256": "4ca50b4de3fe5e23e1ae6176858bcf8296e8b261ea66c4900f128e6ef7bd864e",
+      "name": "window-config-unchanged"
+    }
+  ],
+  "revision": "5eb731403d8b8082c7f9f5f8c98dea37c53009df",
+  "revision_number": 1,
+  "sealed": "2026-11-13T19:59:34+00:00"
+}

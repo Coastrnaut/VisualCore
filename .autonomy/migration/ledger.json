@@ -2,7 +2,7 @@
  "schema": 1,
  "name": "VisualCore unified-app migration ledger (ADR-0009)",
  "created": "2026-11-12T02:54:10+00:00",
- "updated": "2026-11-13T19:25:10+00:00",
+ "updated": "2026-11-13T19:59:34+00:00",
  "rules": [
   "Only scripts/migration_ledger.py writes this file.",
   "The legacy ledger .autonomy/state.json is never reset or rewritten by the migration; its passed gates stay passed.",
@@ -117,7 +117,7 @@
   {"id":"X-A24","kind":"experience","title":"Graphics Benchmark Lab complete in the unified app (simulator-verified)","depends":["UA-F07","UA-F05","UA-F06","UA-F09"],"status":"pending","attempts":[],"experience":"a24.graphics-benchmark-lab","tier":"free","requires_legacy":["A24-P00","A24-P01","A24-P02","A24-P03","A24-P04","A24-P05","A24-P06"]},
   {"id":"X-A25","kind":"experience","title":"Effects Composer complete in the unified app (simulator-verified)","depends":["UA-F07","UA-F05","UA-F06","UA-F09"],"status":"pending","attempts":[],"experience":"a25.effects-composer","tier":"free","requires_legacy":["A25-P00","A25-P01","A25-P02","A25-P03","A25-P04","A25-P05","A25-P06"]},
   {"id":"R02-F01","kind":"shared-round-feature","title":"Round 1 evidence & reproducible baseline audit","depends":["UA-F02"],"status":"superseded","attempts":[],"spec_dir":"specs/201-round-1-evidence-reproducible-baseline-audit","superseded_by":["UA-F00"]},
-  {"id":"R02-F02","kind":"shared-round-feature","title":"VisualCore public API compatibility and renderer capability probing","depends":["UA-F02","R02-F01"],"status":"pending","attempts":[],"spec_dir":"specs/202-visualcore-public-api-compatibility-and-renderer-capability-probing"},
+  {"id":"R02-F02","kind":"shared-round-feature","title":"VisualCore public API compatibility and renderer capability probing","depends":["UA-F02","R02-F01"],"status":"pass","attempts":[{"at":"2026-11-13T19:59:34+00:00","result":"pass","evidence":".autonomy/migration/evidence/R02-F02.json","evidence_sha256":"cca4f494c8322dc166b8b7fb96a6893a696b66c0a6dcd8a31ebd915d0b9f60b3","revision":"5eb731403d8b8082c7f9f5f8c98dea37c53009df"}],"spec_dir":"specs/202-visualcore-public-api-compatibility-and-renderer-capability-probing"},
   {"id":"R02-F03","kind":"shared-round-feature","title":"Numerical foundations and deterministic seeded scene time","depends":["UA-F02","R02-F02"],"status":"pending","attempts":[],"spec_dir":"specs/203-numerical-foundations-and-deterministic-seeded-scene-time"},
   {"id":"R02-F04","kind":"shared-round-feature","title":"GPU resource ownership and pipeline lifetime","depends":["UA-F02","R02-F02"],"status":"pending","attempts":[],"spec_dir":"specs/204-gpu-resource-ownership-and-pipeline-lifetime"},
   {"id":"R02-F05","kind":"shared-round-feature","title":"Procedural mesh compiler and mesh validation","depends":["UA-F02","R02-F03","R02-F04"],"status":"pending","attempts":[],"spec_dir":"specs/205-procedural-mesh-compiler-and-mesh-validation"},
