@@ -35,7 +35,7 @@ API-baseline and reference-regression tasks apply.
 
 ## Phase 4: User Story 2 — One immutable pipeline description (P1)
 
-- [ ] T-R02F04-006 [P] [US2] Tests first in `Packages/VisualCore/Tests/VisualCoreShaderSourceTests/RenderStateTests.swift`:
+- [X] T-R02F04-006 [P] [US2] Tests first in `Packages/VisualCore/Tests/VisualCoreShaderSourceTests/RenderStateTests.swift`: — Verified 2026-11-13: RenderStateTests 8 tests (preset fields, ColorMask.all, default equals opaque, equality, hashing, set of presets) pass on host (host-visualcore)
   presets' fields (data-model: "opaque (none, no depth, no cull, all)", "alphaBlended (alpha)", "additive
   (additive, depthWrite false)", "opaque3D (none, depthTest true, depthWrite true, cull back)"); equality and hashing.
 - [ ] T-R02F04-007 [US2] Write `Packages/VisualCore/Sources/VisualCoreShaderSource/RenderState.swift` per contracts/api.md.
