@@ -138,7 +138,7 @@ Device-only items: none, so no {device} task.
 - [ ] T-U11-034 Write `specs/197-ua-f11-compliance/owner-review.md` with the exact steps of T-U11-037..039 and record
   them as BLOCKED_OWNER_ACTION.
 - [ ] T-U11-035 CI of a commit with all UA-F11 changes finished with success (`gh run list --workflow ci --limit 1`).
-- [ ] T-U11-036 Only if a VisualCore package changed: `python3 scripts/check_public_api.py --update`, `python3
+- [X] T-U11-036 Only if a VisualCore package changed: `python3 scripts/check_public_api.py --update`, `python3 — Verified 2026-11-13: no VisualCore package source or public API changed: git diff --stat ecf2946..HEAD -- Packages/ shows only the regenerated test fixture Tests/VisualCoreExperienceTests/Fixtures/Catalog/registrations.json; API baseline, documented-API and ProjectM regression not triggered; 390 VisualCoreExperienceTests pass
   scripts/check_documented_api.py`, the seven-step ProjectM reference regression in two chunks; otherwise record
   "no package change" with `git diff --stat` of the feature's commits over `Packages/`.
 - [ ] T-U11-037 {owner} Legal review: the owner reviews `docs/legal/third-party.json`, `THIRD_PARTY_NOTICES.md`,
