@@ -35,7 +35,9 @@ def strip(text: str) -> str:
 def public_names(packages: Path) -> set[str]:
     names: set[str] = set()
     for f in swift_files(packages):
-        if "Tests" in f.relative_to(packages).parts:
+        parts = f.relative_to(packages).parts
+        # Experience packages (`Packages/Experiences*`, ADR-0009) are app modules, not VisualCore API (UA-F07).
+        if "Tests" in parts or parts[0].startswith("Experiences"):
             continue
         text = f.read_text(errors="replace")
         names.update(TYPE_DECL.findall(text))

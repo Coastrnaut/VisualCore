@@ -544,6 +544,23 @@ class DocumentedApiTests(unittest.TestCase):
         with contextlib.redirect_stderr(io.StringIO()), contextlib.redirect_stdout(io.StringIO()):
             self.assertEqual(docapi.main(["--root", str(self.FIX), "--sources", "missing"]), 2)
 
+    def test_experience_packages_are_not_visualcore_api(self):
+        import contextlib, io
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            (root / "packages/ExperiencesCreative/A").mkdir(parents=True)
+            (root / "packages/ExperiencesCreative/A/A.swift").write_text("public struct ArtCore {}\n")
+            (root / "packages/VisualCore").mkdir(parents=True)
+            (root / "packages/VisualCore/V.swift").write_text("public struct Shown {}\n")
+            (root / "app").mkdir()
+            (root / "app/App.swift").write_text("let a = ArtCore()\nlet s = Shown()\n")
+            (root / "README.md").write_text("Shown\n")
+            out = io.StringIO()
+            with contextlib.redirect_stdout(out), contextlib.redirect_stderr(io.StringIO()):
+                code = docapi.main(["--root", d, "--sources", "app", "--packages", "packages", "--docs", "README.md"])
+            self.assertEqual(code, 0, out.getvalue())
+            self.assertNotIn("ArtCore", out.getvalue())
+
 
 class PublicApiTests(unittest.TestCase):
     """Feature 010 T-F901 (FR-F901, SC-F901)."""

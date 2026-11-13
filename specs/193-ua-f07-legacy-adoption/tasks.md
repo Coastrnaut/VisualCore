@@ -197,7 +197,7 @@ runtimes.
 - [X] T-U07-031 Documents as built: Auto-Creator.md section 17 (the as-built order and the framework phase) and section — Verified 2026-11-13: Auto-Creator.md §16 (moved apps, ExperiencesCreative existing) and §17.2/17.5 (framework phase and as-built order) edited in place; data-model.md §6 As built; render_autocreator.py --check PASS; validate_autocreator.py PASS 16 checks, 0 problems (documents-as-built)
   16 (`Packages/ExperiencesCreative`), edited in place, with `render_autocreator.py` and `validate_autocreator.py`;
   data-model.md "As built" with the final adapter controls and levels.
-- [ ] T-U07-032 API baseline and boundaries: `check_public_api.py --update` leaves no difference and 0 undocumented
+- [X] T-U07-032 API baseline and boundaries: `check_public_api.py --update` leaves no difference and 0 undocumented — Verified 2026-11-13: check_public_api.py --update: 2184 declarations, 0 undocumented, no diff; 0 baseline lines lost since af887e3; External and Vendor unchanged since af887e3 (git diff empty); release_check.py --only compliance storage-rule stored-data-rule dependencies public-api documented-api-* isolation-* PASS 12/12 (api-boundaries-r2) after the documented-API scope fix; script tests 319 OK (script-tests-docapi)
   symbols; no baseline line is lost since `af887e3`; `External` and `Vendor` are unchanged; `check_dependencies.py`,
   `check_compliance.py`, the documented-API checks and the isolation rules pass (FR-U07-060 to FR-U07-064;
   SC-U07-009).

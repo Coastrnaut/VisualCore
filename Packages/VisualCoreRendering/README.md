@@ -308,3 +308,10 @@ app down: the session is failed, the failure is in `session.diagnostics`, and an
 A memory warning sheds caches; when the live bytes are still above the memory-pressure limit, the experience is
 closed with a message. Texts come from the module's string catalog (`SessionStrings`).
 Contract: [session-api.md](../../specs/189-ua-f03-experience-host/contracts/session-api.md).
+
+## Scenario runner (feature 195, UA-F09)
+
+`ScenarioRunner(session:)` runs a scenario of an experience's manifest in the app's session: every action goes
+through the experience's scripted run, exactly as a control would send it, and every wait has a limit. The caller
+passes a `ScenarioRunner.RequestMaker`, a closure that builds the `ExperienceOpenRequest` for a seed and an optional
+snapshot to restore, so the runner can open, close and reopen the experience.

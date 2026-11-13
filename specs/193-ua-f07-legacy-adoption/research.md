@@ -353,3 +353,9 @@ The dossier files are not edited. The legacy ledger is untouched; its hash is co
     change.
   - The standalone app's CPU preview, its quality controller hooks and its renderer texts have no counterpart; their
     rows name the covering tests.
+- 2026-11-13, T-U07-032: `check_documented_api.py --sources Apps/VisualCore` failed on 12 names. Eight were the
+  public types of `Packages/ExperiencesCreative`, which the script counted as VisualCore API; it now skips
+  `Packages/Experiences*` as `check_public_api.py` does, with a script test. `Environment` (SwiftUI's
+  `@Environment`, matching `EvidenceRecord.Environment`), `ScenarioStep`, `ScenarioExpectations` and
+  `ScenarioRunner.RequestMaker`, used by the app since UA-F09, were not named in a package README; the VisualCore
+  and VisualCoreRendering READMEs now have a section each for the verification scenarios and the runner.

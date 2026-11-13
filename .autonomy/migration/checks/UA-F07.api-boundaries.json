@@ -1,0 +1,30 @@
+{
+  "argv": [
+    "python3",
+    "scripts/release_check.py",
+    "--only",
+    "compliance",
+    "storage-rule",
+    "stored-data-rule",
+    "dependencies",
+    "public-api",
+    "documented-api-showcase",
+    "documented-api-interactive-demo",
+    "documented-api-second-consumer",
+    "documented-api-particle-universe",
+    "isolation-particle-universe",
+    "documented-api-visual-core",
+    "isolation-visual-core"
+  ],
+  "command": "python3 scripts/release_check.py --only compliance storage-rule stored-data-rule dependencies public-api documented-api-showcase documented-api-interactive-demo documented-api-second-consumer documented-api-particle-universe isolation-particle-universe documented-api-visual-core isolation-visual-core",
+  "elapsed_seconds": 2.926,
+  "exit_code": 1,
+  "finished": "2026-11-13T16:10:17+00:00",
+  "gate": "UA-F07",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F07.api-boundaries.log",
+  "log_sha256": "67f38b9985bdbf73c62fb09520c054ecae9d717e31dd0173cf60f72336fcdea8",
+  "name": "api-boundaries",
+  "started": "2026-11-13T16:10:14+00:00",
+  "timed_out": false
+}

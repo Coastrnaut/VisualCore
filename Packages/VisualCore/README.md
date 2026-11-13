@@ -217,3 +217,13 @@ let report = await ExperienceConformance.run(MyCore.self, id: myID, plan: plan)
 error, digest, counters). `ExperienceScenario` and the engine's `run(_:)` exist only under `DEBUG` or
 `VISUALCORE_AUTOMATION`; `scripts/check_experience_symbols.py` proves that a release build has none of them.
 Contract: [experience-core-api.md](../../specs/188-ua-f02-experience-sdk/contracts/experience-core-api.md).
+
+## Verification scenarios (feature 195, UA-F09)
+
+An experience's `ScenarioManifest` lists its scenarios. Each `ScenarioSpec` has a name, a seed, a list of
+`ScenarioStep` entries (a number of fixed steps, then an optional `ScriptedAction` with its expected result and
+digest) and `ScenarioExpectations` (initial and final digest, outcome, frame-probe classes, reset digest; an absent
+item is not checked). `ScenarioManifestValidator.problems(_:controls:)` rejects a manifest that names an undeclared
+control or lacks a standard scenario. A run's `EvidenceRecord` names the experience, the build, and in
+`EvidenceRecord.Environment` the kind of machine and its operating system.
+Contract: [verification-api.md](../../specs/195-ua-f09-verification-runner/contracts/verification-api.md).

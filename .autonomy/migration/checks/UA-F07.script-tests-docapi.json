@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "python3",
+    "-m",
+    "unittest",
+    "scripts/test_scripts.py"
+  ],
+  "command": "python3 -m unittest scripts/test_scripts.py",
+  "elapsed_seconds": 23.739,
+  "exit_code": 0,
+  "finished": "2026-11-13T16:12:30+00:00",
+  "gate": "UA-F07",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F07.script-tests-docapi.log",
+  "log_sha256": "53a30c9c10d93e10b9a28b2c8e7a9c2d35e7f63552607c396ae63f87587ff0e9",
+  "name": "script-tests-docapi",
+  "started": "2026-11-13T16:12:06+00:00",
+  "timed_out": false
+}
