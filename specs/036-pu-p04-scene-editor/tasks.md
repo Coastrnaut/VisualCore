@@ -61,7 +61,7 @@ each task. Tests before code. Owner-only items: none. One {device} task. No Visu
 
 ## Phase 6: User Story 4 — Gates hold for opened scenes (P2)
 
-- [ ] T-A04-415 [US4] Tests first in `PU/CoreTests/PlacedForceStabilityTests.swift` (extend): for each of the 7 scene
+- [X] T-A04-415 [US4] Tests first in `PU/CoreTests/PlacedForceStabilityTests.swift` (extend): for each of the 7 scene — Verified 2026-11-13: PlacedForceStabilityTests forcesOnAnEmitterOfAnOpenedDocumentStayFinite: 7 scene force kinds plus placed forces on emitters of an encoded, decoded and opened document, 600 steps finite; 8-emitter draw cap per tier in ParticleEditorTests
   force kinds placed exactly on an emitter in a document that is opened, 600 steps stay finite; a document with 8
   emitters respects each tier's draw cap (adapter test in `ParticleEditorTests.swift`).
 - [ ] T-A04-416 [US4] Acceptance: tests pass (check `experiences-ios27`) (SC-A04-405).
