@@ -69,7 +69,7 @@ Device-only items: none, so no {device} task.
   `check_compliance.scan(root)`; the repository passes.
 - [X] T-U11-016 [US3] Modify `scripts/check_compliance.py`: one `RULES` entry "advertising or tracking API — Verified 2026-11-13: check_compliance.py RULES entry for advertising/tracking APIs plus deny-listed library imports read from Configs/tracking-denylist.json; repository PASS (compliance)
   (Constitution XII)".
-- [ ] T-U11-017 [US3] Acceptance: `python3 scripts/check_compliance.py` (check `compliance`) and
+- [X] T-U11-017 [US3] Acceptance: `python3 scripts/check_compliance.py` (check `compliance`) and — Verified 2026-11-13: check_compliance PASS (compliance); check_no_tracking on the Release app at d711921: PASS, 0 findings in 39 files, 1.7 s (no-tracking, release-check-app)
   `python3 scripts/check_no_tracking.py --app "$APP" --json .autonomy/logs/ua-f11/tracking.json` (check `no-tracking`)
   pass with 0 findings (SC-U11-003).
 
