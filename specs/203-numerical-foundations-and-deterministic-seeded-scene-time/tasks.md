@@ -60,7 +60,7 @@ none (no {owner} task). VisualCore changes, so the documentation, API-baseline a
 
 ## Phase 6: User Story 5 — Numeric hygiene (P2)
 
-- [ ] T-R02F03-015 [P] [US5] Tests first in `Packages/VisualCore/Tests/VisualCoreMathTests/NumericHygieneTests.swift`:
+- [X] T-R02F03-015 [P] [US5] Tests first in `Packages/VisualCore/Tests/VisualCoreMathTests/NumericHygieneTests.swift`: — Verified 2026-11-13: NumericHygieneTests 7 tests (finite fallback; angle edges pi, 3pi, -7pi/2, 1e9; wrapped -0.5 mod 2, 2 mod 2, -0; errors; quantized 0.26/0.1, ties to even, errors) pass
   `finite` with NaN, ±∞ and a finite value; `normalizedAngle` for 0, π (→ −π), −π, 3π, −7π/2, 1e9 in [−π, π) and
   a whole number of turns away; `wrapped` for −0.5 mod 2, 2 mod 2 (→ 0), errors for modulus 0, −1, ∞, NaN input;
   `quantized` 0.26 step 0.1 → 3, −0.0 → 0, `.nonFinite`, `.nonPositiveStep`, `.outOfRange` for 1e300.
