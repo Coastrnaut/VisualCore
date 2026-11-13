@@ -28,7 +28,7 @@ Independent test: a clean commit passes the CI job `app-build`; a scratch commit
   prototypes of `CVisualCoreEGL.h` (corrected from 16: line 71 `eglGetPlatformDisplay` … line 87 `eglGetProcAddress`) are parsed; the
   generated C defines each with `abort()` and `vc_ci_angle_standin`; an output folder holding a framework without the
   marker is refused (exit 2).
-- [ ] T-U10-004 [US1] Write `scripts/make_ci_angle_standins.py --out DIR`: generate the C file, compile
+- [X] T-U10-004 [US1] Write `scripts/make_ci_angle_standins.py --out DIR`: generate the C file, compile — Verified 2026-11-13: make_ci_angle_standins.py generates libEGL (15 aborting egl functions, arm64 and x86_64 simulator, marker vc_ci_angle_standin) and libGLESv2 xcframeworks; in a copy of the tracked files under Build/standin-check with the submodule's license texts, the app builds against them: Debug build-for-testing exit 0 (standin-local-build-r2) and Release exit 0 (standin-local-release); the first attempt without license texts failed only in the license phase (standin-local-build, kept)
   `arm64` and `x86_64` simulator slices with `xcrun clang -target <arch>-apple-ios26.0-simulator -dynamiclib`, set
   the install name `@rpath/libEGL.framework/libEGL`, build `libEGL.framework` and an empty `libGLESv2.framework`, and
   wrap each with `xcodebuild -create-xcframework` (FR-U10-002; research R1). Prove locally that the app compiles
