@@ -127,6 +127,26 @@ final class ParticleLibraryTests: XCTestCase {
         XCTAssertEqual(ParticleLibrary(storage: storage).unreadable, 2)
     }
 
+    /// T-A04-422 (US2/AC2, FR-A04-410): a scene saved by a newer version is counted as newer, not as unreadable, and
+    /// kept.
+    func testNewerVersionScenesAreCountedSeparatelyAndKept() throws {
+        let library = ParticleLibrary(storage: storage)
+        let good = try XCTUnwrap(library.save(try document("Good")))
+        let full = try XCTUnwrap(storage.read(ParticleLibrary.fileName(for: good.id)))
+        let text = try XCTUnwrap(String(data: full, encoding: .utf8))
+        XCTAssertTrue(text.contains("\"version\":2"), "the saved document carries version 2")
+        let newerID = UUID()
+        let newerText = text.replacingOccurrences(of: "\"version\":2", with: "\"version\":3")
+            .replacingOccurrences(of: good.id.uuidString, with: newerID.uuidString)
+        let newerName = ParticleLibrary.fileName(for: newerID)
+        try storage.write(Data(newerText.utf8), to: newerName)
+        library.reload()
+        XCTAssertEqual(library.entries.map(\.id), [good.id])
+        XCTAssertEqual(library.newer, 1)
+        XCTAssertEqual(library.unreadable, 0)
+        XCTAssertTrue(storage.exists(newerName))
+    }
+
     func testANewLibraryOverTheSameStorageListsTheSameEntries() throws {
         let first = ParticleLibrary(storage: storage)
         let a = try XCTUnwrap(first.save(try document("Aurora")))

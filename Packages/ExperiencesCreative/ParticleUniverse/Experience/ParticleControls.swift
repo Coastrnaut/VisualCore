@@ -168,6 +168,10 @@ struct ParticleControls: View {
                 Text(verbatim: "\(library.unreadable) saved scene\(library.unreadable == 1 ? "" : "s") could not be read")
                     .font(.footnote).accessibilityIdentifier(port.identifier("library.problems"))
             }
+            if library.newer > 0 {
+                Text(verbatim: "\(library.newer) saved scene\(library.newer == 1 ? " was" : "s were") made by a newer version")
+                    .font(.footnote).accessibilityIdentifier(port.identifier("library.newer"))
+            }
             ForEach(Array(library.entries.enumerated()), id: \.element.id) { index, entry in
                 VStack(alignment: .leading, spacing: 4) {
                     Text(verbatim: entry.name).font(.body)

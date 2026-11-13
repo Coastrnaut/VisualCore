@@ -44,6 +44,8 @@ final class ParticleLibrary {
     private(set) var entries: [ParticleLibraryEntry] = []
     /// Scene files that could not be read (shown as a count, never deleted).
     private(set) var unreadable = 0
+    /// Scene files made by a newer version of the app (shown as a count, never deleted; T-A04-422, FR-A04-410).
+    private(set) var newer = 0
     /// The last failure, for the person; nil after a success.
     var errorMessage: String?
     /// The clock for the saved time (a seam for tests).
@@ -63,14 +65,25 @@ final class ParticleLibrary {
     /// is counted in `unreadable` and left in place.
     func reload() {
         var found: [ParticleLibraryEntry] = []
-        var bad = 0
+        var bad = 0, newerFound = 0
         for name in storage.list() where name.hasPrefix(Self.filePrefix) && name.hasSuffix(Self.fileExtension) {
-            guard let file = try? read(name), Self.fileName(for: file.id) == name else {
+            let file: File
+            do {
+                file = try read(name)
+            } catch SceneError.unsupportedVersion(let version) where version > SceneDocument.version {
+                newerFound += 1
+                continue
+            } catch {
+                bad += 1
+                continue
+            }
+            guard Self.fileName(for: file.id) == name else {
                 bad += 1
                 continue
             }
             found.append(ParticleLibraryEntry(id: file.id, name: file.document.name, saved: file.saved))
         }
+        newer = newerFound
         entries = found.sorted {
             let order = $0.name.localizedStandardCompare($1.name)
             return order == .orderedSame ? $0.id.uuidString < $1.id.uuidString : order == .orderedAscending
