@@ -48,7 +48,7 @@ A04-P06 --name <check> -- <command>`. Commit after every task (no trailers); pus
 ## Phase 7: Polish & verification
 
 - [ ] T-A04-619 Run the PU interface chunks on the iOS 27.2 phone simulator, one command each (`run-check --name ui-pu-j2 -- python3 scripts/release_check.py --only app-build-for-testing-ios27 app-ui-ios27-j2`; `ui-pu-j3` `--only app-ui-ios27-j3`; `ui-pu-j4` `--only app-ui-ios27-j4`), including `testReduceMotionStartsPaused`
-- [ ] T-A04-620 Run the release build checks (`run-check --name release-checks -- python3 scripts/release_check.py --only app-release-build app-release-symbols app-privacy-manifest app-no-tracking app-licenses app-usage-descriptions`)
+- [X] T-A04-620 Run the release build checks (`run-check --name release-checks -- python3 scripts/release_check.py --only app-release-build app-release-symbols app-privacy-manifest app-no-tracking app-licenses app-usage-descriptions`) — Verified 2026-11-13: 2026-11-13 .autonomy/checks/A04-P06.release-checks.json (6/6 steps pass: Release build, symbols, privacy manifest, no tracking, licenses, usage strings)
 - [ ] T-A04-621 Run the script tests (`run-check --name script-tests -- python3 scripts/test_scripts.py`) and the dependency audit (`run-check --name dependency-audit -- python3 scripts/audit_showcase_dependencies.py --target VisualCore --sources Apps/VisualCore`)
 - [ ] T-A04-622 {device} In the device campaign (after ImplementationLock-100): the measurements and audits of `docs/apps/particle-universe/device-campaign.md` on D1 → D2 → D3
 - [ ] T-A04-623 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A04-P06
