@@ -69,7 +69,7 @@ none (no {owner} task). VisualCore changes, so the documentation, API-baseline a
 
 ## Phase 7: User Story 6 — Determinism document (P3)
 
-- [ ] T-R02F03-018 [P] [US6] Tests first in `scripts/tests/test_check_doc_names.py`: a document citing an unknown
+- [X] T-R02F03-018 [P] [US6] Tests first in `scripts/tests/test_check_doc_names.py`: a document citing an unknown — Verified 2026-11-13: scripts/tests/test_check_doc_names.py 8 tests OK (unknown name fails, Type.member, non-name spans ignored, whole-word match, exit 2); script-tests PASS
   backticked public name fails; one citing only names of the API baseline passes; non-name code spans (paths, numbers)
   are ignored.
 - [ ] T-R02F03-019 [US6] Write `scripts/check_doc_names.py` (backticked identifiers that look like public type or member
