@@ -98,7 +98,7 @@ Independent test: planted second shippable target, undeclared target and reused 
 - [X] T-U10-020 [US6] Write `scripts/measure_build.py` (research R6; data-model.md "Append only; one record per commit; — Verified 2026-11-13: scripts/measure_build.py and docs/performance/build-measurements.json (schema 1); budgets.md row points to the tool with the ADR rule for module-granularity changes; check_performance_docs.py PASS
   damaged or newer schema → refusal and no write") and `docs/performance/build-measurements.json`; point the
   budgets.md row to it (FR-U10-050, FR-U10-051).
-- [ ] T-U10-021 [US6] Acceptance: `python3 scripts/measure_build.py --milestone UA-F10` appends one record (check
+- [X] T-U10-021 [US6] Acceptance: `python3 scripts/measure_build.py --milestone UA-F10` appends one record (check — Verified 2026-11-13: python3 scripts/measure_build.py --milestone UA-F10 appended one record: clean build 21.5 s, incremental 4.1 s, Release app 28,351,742 bytes, Xcode 27B52, commit d977091 (measure-build; another project's build ran on the Mac at the same time); --check PASS 1 record
   `measure-build`); `--check` passes (SC-U10-006).
 
 ## Phase 9: Polish and cross-cutting
