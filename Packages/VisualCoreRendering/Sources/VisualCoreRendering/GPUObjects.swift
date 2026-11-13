@@ -122,13 +122,17 @@ public final class GPUBuffer: GPUResource {
     }
 }
 
-/// A framebuffer with one color texture; accounted as one `framebuffer` entry carrying the color bytes.
+/// A framebuffer with one color texture and optional depth storage; accounted as one `framebuffer` entry carrying the
+/// color bytes, plus one `renderbuffer` entry of width×height×4 bytes when it has depth (feature 204).
 @MainActor
 public final class RenderTarget: GPUResource {
     /// Registry bookkeeping: framebuffer name, accounted color bytes, generation and label.
     public let handle: GPUHandle
     /// GL name of the color attachment texture.
     public let colorTexture: GLuint
+    /// GL name of the `GL_DEPTH_COMPONENT24` depth renderbuffer, or 0 when the target was created without depth
+    /// (feature 204, FR-R02F04-030); released with the target and unusable after its context ends.
+    public let depthRenderbuffer: GLuint
     /// Size in pixels.
     public let width: Int, height: Int
     /// Pixel format of the color attachment.
@@ -136,10 +140,14 @@ public final class RenderTarget: GPUResource {
     weak var registry: ResourceRegistry?
     var released = false
 
-    init(handle: GPUHandle, colorTexture: GLuint, width: Int, height: Int, format: TextureFormat, registry: ResourceRegistry) {
-        self.handle = handle; self.colorTexture = colorTexture; self.width = width; self.height = height
-        self.format = format; self.registry = registry
+    init(handle: GPUHandle, colorTexture: GLuint, depthRenderbuffer: GLuint = 0, width: Int, height: Int,
+         format: TextureFormat, registry: ResourceRegistry) {
+        self.handle = handle; self.colorTexture = colorTexture; self.depthRenderbuffer = depthRenderbuffer
+        self.width = width; self.height = height; self.format = format; self.registry = registry
     }
+
+    /// Bytes accounted for a 24-bit depth renderbuffer of this size (stored as 4 bytes per pixel).
+    static func depthBytes(width: Int, height: Int) -> Int { width * height * 4 }
 
     /// Binds as the draw framebuffer (caller sets the viewport).
     public func bind() {
