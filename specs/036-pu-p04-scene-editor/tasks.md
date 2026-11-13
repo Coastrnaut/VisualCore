@@ -87,3 +87,9 @@ each task. Tests before code. Owner-only items: none. One {device} task. No Visu
 
 Agent A: 402–403. Then Agent B: 404–405, 412–413, 415 (ParticleCore, manifest, editor and stability tests); Agent C:
 406–407 (library). Lead: 408–409, acceptances, 417–421.
+
+## Phase 8: Convergence
+
+Appended by `/speckit-converge` (T-A04-421, round 1, 2026-11-13).
+
+- [ ] T-A04-422 Count saved scenes made by a newer version separately in `Packages/ExperiencesCreative/ParticleUniverse/Experience/ParticleLibrary.swift` (`newer`), show "N saved scene(s) made by a newer version" in the Saved scenes section of `ParticleControls.swift` (identifier `library.newer`), keep the files, and test it in `ParticleLibraryTests.swift` with a version-3 scene file per US2/AC2, FR-A04-410 (partial)
