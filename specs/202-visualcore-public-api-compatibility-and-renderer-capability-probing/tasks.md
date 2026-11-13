@@ -85,6 +85,6 @@ US1 before US2 (same files). US3 (pure record, validator, mapping) runs in paral
 
 Appended by `/speckit-converge` (T-R02F02-017, round 1, 2026-11-13).
 
-- [ ] T-R02F02-018 Build the app in Release for the simulator and run its symbol and privacy checks
+- [X] T-R02F02-018 Build the app in Release for the simulator and run its symbol and privacy checks — Verified 2026-11-13: release_check.py --only app-release-build app-release-symbols app-privacy-manifest PASS 3/3 (release-app): the Release app builds with the report, the record and the mapping; 0 debug or stand-in texts; privacy manifest declares what the binary uses
   (`release_check.py --only app-release-build app-release-symbols app-privacy-manifest`), because the report, the
   record and the mapping now compile into Release while the evidence and runner code does not, per FR-R02F02-008 (partial)
