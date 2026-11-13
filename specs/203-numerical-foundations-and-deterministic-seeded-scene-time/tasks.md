@@ -92,7 +92,7 @@ none (no {owner} task). VisualCore changes, so the documentation, API-baseline a
   package tests with A04's committed digests and `seedStep`: `python3 scripts/xcodebuild_package.py --package
   Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test` (check
   `experiences-ios27`) (FR-R02F03-002, FR-R02F03-013).
-- [ ] T-R02F03-026 Reference regression chunk 1: `python3 scripts/release_check.py --only reference-engine-xcframework
+- [X] T-R02F03-026 Reference regression chunk 1: `python3 scripts/release_check.py --only reference-engine-xcframework — Verified 2026-11-13: release_check reference-engine-xcframework, reference-build-projectm-ios-sim, reference-clean: 3/3 PASS (reference-1)
   reference-build-projectm-ios-sim reference-clean` (check `reference-1`).
 - [ ] T-R02F03-027 Reference regression chunk 2: `python3 scripts/release_check.py --only
   reference-test-anglerendering-ios27 reference-test-anglerendering-ios26 projectm-reference-ios27
