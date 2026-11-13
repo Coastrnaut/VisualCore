@@ -96,3 +96,11 @@ MVP: US1 and US2.
   - E1 MEDIUM: Reduce Motion transitions had no task. Fixed in T-R02F26-008/009.
   - E2 LOW: the canvas label already mirrors the state. Accepted.
   - 15 of 15 requirements and 7 of 7 criteria are covered, with no critical or high finding left.
+
+## Phase 7: Convergence
+
+Appended by `/speckit-converge` (T-R02F26-021, round 1, 2026-11-13).
+
+- [ ] T-R02F26-022 Call `ExperienceFeedback.flush()` once per frame from the session's frame path (`ExperienceSession.swift`)
+  so that a held, merged announcement is posted, with a test that a held announcement reaches the sink after the
+  interval, per FR-R02F26-020 and FR-R02F26-021 (partial)
