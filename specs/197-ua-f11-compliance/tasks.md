@@ -41,7 +41,7 @@ Device-only items: none, so no {device} task.
 - [X] T-U11-007 [P] [US2] Tests first in `scripts/tests/test_usage_descriptions.py`: extra key, missing key, — Verified 2026-11-13: scripts/tests/test_usage_descriptions.py 18 tests OK (extra key, missing key, unknown word, differing text, --app, schema 2, missing plist; build_catalog permissions rules)
   unknown word, a text different from the vocabulary's each fail; the real repository passes with 1 key; `build_catalog` rejects `permissions`
   that is not a list of 0–8 distinct vocabulary words and accepts its absence.
-- [ ] T-U11-008 [P] [US2] Write `Configs/permission-vocabulary.json` (schema 1; word "lower-case kebab, 3–40 chars,
+- [X] T-U11-008 [P] [US2] Write `Configs/permission-vocabulary.json` (schema 1; word "lower-case kebab, 3–40 chars, — Verified 2026-11-13: Configs/permission-vocabulary.json schema 1: photo-library-add (project.yml text), microphone, camera; validated by build_catalog load_vocabulary
   unique" → `key` matching `^NS[A-Za-z]+UsageDescription$`, each key used once, and `text` of 20–200 characters):
   `photo-library-add` with the current `project.yml` text, `microphone`, `camera`.
 - [ ] T-U11-009 [US2] Modify `scripts/build_catalog.py`: optional `permissions` registration key validated against
