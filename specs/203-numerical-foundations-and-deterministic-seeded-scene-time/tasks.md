@@ -51,7 +51,7 @@ none (no {owner} task). VisualCore changes, so the documentation, API-baseline a
 - [X] T-R02F03-011 [P] [US4] Tests first in `Packages/VisualCore/Tests/VisualCoreMathTests/ShaderHashTests.swift`: — Verified 2026-11-13: ShaderHashTests 5 tests (pcg goldens 129708002, 2831084092, 4099845390, 3861530882; float hash bit-pattern goldens from an independent Python model; -0 vs 0) pass
   `pcg` golden values for 0, 1, 12345, `UInt32.max` (computed from the `vc/hash.glsl` formula and committed);
   `hash11`, `hash21`, `hash22` goldens on a few floats (bit patterns, divide by 4294967296).
-- [ ] T-R02F03-012 [US4] Write `Packages/VisualCore/Sources/VisualCoreMath/ShaderHash.swift`.
+- [X] T-R02F03-012 [US4] Write `Packages/VisualCore/Sources/VisualCoreMath/ShaderHash.swift`. — Verified 2026-11-13: ShaderHash.swift (pcg, hash11, hash21, hash22) mirrors vc/hash.glsl; tests pass (host-visualcore)
 - [ ] T-R02F03-013 [US4] Write `Packages/VisualCoreRendering/Tests/VisualCoreRenderingTests/ShaderHashParityTests.swift`:
   a fragment shader including `vc/hash.glsl` writes the four bytes of `vc_pcg(index)` for 64 pixels into RGBA8; read
   back with `readPixels()` and compare with `ShaderHash.pcg` exactly.
