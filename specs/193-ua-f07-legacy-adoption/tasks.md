@@ -101,7 +101,7 @@ runtimes.
 
 ## Phase 4: User Story 2 — Domain behaviour is unchanged (P1)
 
-- [ ] T-U07-014 [US2] After each experience's adapter and after each move: the Core host tests run with the same counts as
+- [X] T-U07-014 [US2] After each experience's adapter and after each move: the Core host tests run with the same counts as — Verified 2026-11-13: After each adapter and each move: the Core tests keep the T-U07-001 counts in Packages/ExperiencesCreative on sim-27.2 and sim-26.5 (A01 31, A02 56, A03 38, A04 41; xcresult of a01-a04-package-ios272/265); no Core test file changed: check_renames.py from af887e3 over all four Core test folders PASS (core-tests-renames-only-all) and per experience (a01/a02/a03/a04-core-renames-only); migration_baseline.py verify 0 problems (baseline-verify-all-moved)
   the T-U07-001 baseline, with no test file of a Core package changed (`git diff --stat af887e3 -- <Core tests>`
   empty), and `migration_baseline.py verify` passes. This task is re-run and its evidence recorded per experience
   (FR-U07-001, FR-U07-002; SC-U07-001, SC-U07-002).

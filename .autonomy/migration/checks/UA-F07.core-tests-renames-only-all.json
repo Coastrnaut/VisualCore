@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_renames.py",
+    "--base",
+    "af887e3",
+    "Apps/GenerativeArtStudio/Core/Tests",
+    "Apps/FluidArtPlayground/FluidArtPlaygroundCore/Tests",
+    "Apps/FractalExplorer/FractalExplorerCore/Tests",
+    "Apps/ParticleUniverse/ParticleUniverseCore/Tests",
+    "Packages/ExperiencesCreative/GenerativeArtStudio/CoreTests",
+    "Packages/ExperiencesCreative/FluidArtPlayground/CoreTests",
+    "Packages/ExperiencesCreative/FractalExplorer/CoreTests",
+    "Packages/ExperiencesCreative/ParticleUniverse/CoreTests"
+  ],
+  "command": "python3 scripts/check_renames.py --base af887e3 Apps/GenerativeArtStudio/Core/Tests Apps/FluidArtPlayground/FluidArtPlaygroundCore/Tests Apps/FractalExplorer/FractalExplorerCore/Tests Apps/ParticleUniverse/ParticleUniverseCore/Tests Packages/ExperiencesCreative/GenerativeArtStudio/CoreTests Packages/ExperiencesCreative/FluidArtPlayground/CoreTests Packages/ExperiencesCreative/FractalExplorer/CoreTests Packages/ExperiencesCreative/ParticleUniverse/CoreTests",
+  "elapsed_seconds": 0.109,
+  "exit_code": 0,
+  "finished": "2026-11-13T16:07:11+00:00",
+  "gate": "UA-F07",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F07.core-tests-renames-only-all.log",
+  "log_sha256": "90b6ebfab4bcdc50b99589515875a6982ac65e9b8c8eb4a21d419e66a01cf69e",
+  "name": "core-tests-renames-only-all",
+  "started": "2026-11-13T16:07:11+00:00",
+  "timed_out": false
+}
