@@ -133,7 +133,7 @@ Commit after every task (`python3 scripts/tick_task.py`), and push with `python3
 
 ## Phase 8: User Story 5 - Rendered frames prove that something real was drawn (Priority: P2)
 
-- [ ] T-U09-024 [US5] Acceptance on both runtimes (package tests of T-U09-013):
+- [X] T-U09-024 [US5] Acceptance on both runtimes (package tests of T-U09-013): — Verified 2026-11-12: xcodebuild_package.py VisualCoreRendering --only-testing VisualCoreExperienceHostTests on sim-27.2 and sim-26.5: 144 tests, 0 failures each (ScenarioRunnerTests 15: nine standard scenarios pass; LossySnapshot fails save-restore, WrongReset fails reset, a blank frame and a wrong probe fail; endurance 3,600 frames flat) (testABlankFrameFailsLaunchFirstFrame, testAProbeThatDoesNotMatchFails; launch-first-frame records carry the frame hash and probe outcomes; no golden image decides a result)
   - The blank and wrong-probe cases fail.
   - The launch-first-frame records of the sample and the debug experience carry a frame hash and probe outcomes.
   - A golden image, when one exists, is recorded as `supporting` and changes no result (FR-U09-040, FR-U09-041; SC-U09-007).
