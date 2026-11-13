@@ -27,7 +27,7 @@ API-baseline and reference-regression tasks apply.
   test: hold P, create 64 variants, draw a full-screen quad with P and read back the expected colour (not black);
   release P → live count drops by one; new test: retired programs are released at `recreateContext()` with 0
   leaked; new test: requesting P's variant again after eviction compiles a new program and both work.
-- [ ] T-R02F04-004 [US1] Implement in `Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift`:
+- [X] T-R02F04-004 [US1] Implement in `Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift`: — Verified 2026-11-13: ResourceRegistry: retired set, evictionCount, retiredProgramCount, release handles retired, contextWillEnd releases retired before abandonAll; internal noteStale() for GLState.apply; tests pass (rendering-ios27/26)
   retired set (`[ObjectIdentifier: ShaderProgram]`), eviction moves without GL delete and counts `evictionCount`,
   `release(_:)` deletes retired programs, `contextWillEnd()` releases retired programs before `abandonAll()`,
   `retiredProgramCount`; `///` docs.
