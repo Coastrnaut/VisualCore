@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "python3",
+    "scripts/validate_docs.py"
+  ],
+  "command": "python3 scripts/validate_docs.py",
+  "elapsed_seconds": 0.056,
+  "exit_code": 0,
+  "finished": "2026-11-13T16:08:47+00:00",
+  "gate": "UA-F07",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F07.dossier-readmes.log",
+  "log_sha256": "2e3df216dc861425ddaf12770e531ce1ae718b0d53f74b390434e33c541e1c3a",
+  "name": "dossier-readmes",
+  "started": "2026-11-13T16:08:47+00:00",
+  "timed_out": false
+}
