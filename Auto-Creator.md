@@ -3232,7 +3232,7 @@ VisualCore/
 ├── Showcase/                     existing   non-shipping framework showcase
 ├── Harnesses/                    existing   InteractiveDemo, SecondConsumer, ProjectMReference
 ├── External/projectm-ios/        existing   pinned read-only submodule
-├── Configs/                      existing   toolchain.json, Signing.xcconfig (the local signing file is never committed), simulator-identifier-hashes.json
+├── Configs/                      existing   toolchain.json, Signing.xcconfig (the local signing file is never committed), simulator-identifier-hashes.json, app-targets.json (UA-F10)
 ├── Tools/python/desktop_runbook.py   existing   legacy ledger tool
 ├── scripts/                      modify     + build_catalog.py, check_experience_symbols.py, xcodebuild_app.py, check_performance_docs.py, storage rules in check_app_isolation.py (UA-F05), verify_experiences.py and check_evidence.py (UA-F09), verify_experiences.py, run_device_campaign.py
 ├── specs/                        modify     001–035 existing; 036–550 and rNN-* as features are specified
@@ -5578,9 +5578,21 @@ missing rows, duplicate run ids, model mismatches, OS changes between runs and g
 Today CI runs the host gates on every push and pull request (`.github/workflows/ci.yml`): legacy ledger and
 archive validation, document validation, the steering validators (`scripts/validate_autocreator.py`,
 `scripts/planning_archive.py verify`, `scripts/planning_index.py verify`, `scripts/migration_ledger.py validate`),
-compliance, dependency rules, public and documented API, licenses, script tests, host tests, and a simulator build
-of the framework. Nothing in CI is signed. Planned: UA-F10 adds the unified app's simulator build. Expensive
-simulator suites stay local, run through `scripts/release_check.py` in chunks of ten minutes or less.
+compliance, dependency rules (R1–R8, with the experience rules R6–R8 of UA-F10), the one-shippable-app check
+(`scripts/check_app_targets.py` against `Configs/app-targets.json`), the experience-package check
+(`scripts/check_experience_packages.py` against the catalog and the registrations), public and documented API,
+licenses, script tests, host tests, a simulator build of the framework, and, since UA-F10, the job `app-build`: the
+one app compiled for the simulator in Debug with its test bundles and in Release, unsigned. The ANGLE frameworks are
+built locally and never in Git, so `app-build` links against link-only stand-ins generated from the tracked EGL header
+(`scripts/make_ci_angle_standins.py`; every function aborts; marker `vc_ci_angle_standin`, which the release check
+forbids in every local app). The job checks the reference submodule out shallow for its license texts, writes the
+stand-ins into its gitignored `Build/` folder and proves with `check_reference_clean.py` that no tracked file changed.
+Caches (`actions/cache`) keep SwiftPM build folders, DerivedData, the XcodeGen install and the stand-ins, keyed by
+the Xcode build and the sources. Nothing in CI is signed, and CI runs no simulator tests: the app, interface and
+experience suites stay local in `scripts/release_check.py`, in steps of under ten minutes (`app-build-for-testing-ios27`,
+`app-unit-ios27`, `app-ui-ios27-<chunk>` built once and run in two simulator clones, `verify-<id>-ios27/26` per
+registered experience, `app-release-build`, `app-release-symbols`, `app-privacy-manifest`). Build times and the app
+size are recorded per milestone by `scripts/measure_build.py` in `docs/performance/build-measurements.json`.
 
 A second workflow, `.github/workflows/push-scan.yml`, runs `scripts/prepush_scan.py` over exactly the commits of
 each push (from the commit before the push to the pushed commit) and of each pull request (from the merge base to

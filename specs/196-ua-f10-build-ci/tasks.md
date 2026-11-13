@@ -103,7 +103,7 @@ Independent test: planted second shippable target, undeclared target and reused 
 
 ## Phase 9: Polish and cross-cutting
 
-- [ ] T-U10-022 Auto-Creator.md sections 16 and 24.1 as built, edited in place; `render_autocreator.py --check` and
+- [X] T-U10-022 Auto-Creator.md sections 16 and 24.1 as built, edited in place; `render_autocreator.py --check` and — Verified 2026-11-13: Auto-Creator.md section 24.1 (checks R1-R8, target list, package check, app-build job with stand-ins and caches, local unified-app steps, measurements) and section 16 (Configs/app-targets.json) edited in place; render_autocreator.py --check PASS; validate_autocreator.py PASS (steering)
   `validate_autocreator.py` (check `steering`).
 - [X] T-U10-023 Leak check: `check_release_symbols.py` on the local Release app forbids `vc_ci_angle_standin` — Verified 2026-11-13: check_release_symbols.py on the local Release app with --forbid including vc_ci_angle_standin: 0 forbidden texts found in VisualCore and the embedded libEGL and libGLESv2 (app-release-symbols inside release-app, SC-U10-007)
   (check `standin-leak`, SC-U10-007).

@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "python3",
+    "scripts/validate_autocreator.py"
+  ],
+  "command": "python3 scripts/validate_autocreator.py",
+  "elapsed_seconds": 2.205,
+  "exit_code": 0,
+  "finished": "2026-11-13T18:53:34+00:00",
+  "gate": "UA-F10",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F10.steering.log",
+  "log_sha256": "f35a90936d0e5e3d59c8f75193cfdcfe82cbadafe8441eef3b74b0ce9370b92a",
+  "name": "steering",
+  "started": "2026-11-13T18:53:31+00:00",
+  "timed_out": false
+}
