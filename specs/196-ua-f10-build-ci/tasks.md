@@ -113,7 +113,7 @@ Independent test: planted second shippable target, undeclared target and reused 
   --only-testing <Name>CoreTests` (the quickstart's equivalent of `swift test --package-path <Core>`).
 - [X] T-U10-026 Evidence `verify-a01-a03`: `verify_experiences.py --only a01.generative-art-studio — Verified 2026-11-13: verify_experiences.py --only a01 a02 a03 --runtime 27 26: 54/54 scenarios pass (verify-a01-a03)
   a02.fluid-art-playground a03.fractal-explorer --runtime 27 26`.
-- [ ] T-U10-027 Evidence `reference-a` and `reference-b`: the two chunks of the reference regression.
+- [X] T-U10-027 Evidence `reference-a` and `reference-b`: the two chunks of the reference regression. — Verified 2026-11-13: reference-a 3/3 (engine xcframework, projectM-iOS simulator build, reference clean) and reference-b 4/4 (ANGLE rendering tests and ProjectM reference on iOS 27 and 26)
 - [ ] T-U10-028 Evidence `docs`, `steering`, `script-tests`, `legacy-ledger` (`migration_baseline.py verify`), and a
   finished `ci` run with success for a commit containing all UA-F10 changes.
 - [ ] T-U10-029 Run `/speckit-converge` and `/speckit-implement` for what it appends; repeat until it appends nothing;
