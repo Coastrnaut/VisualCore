@@ -4,7 +4,7 @@
 
 | Framework target | Sources | Excluded (app only) | Resources |
 |---|---|---|---|
-| `GenerativeArtStudioExperience` | `Apps/GenerativeArtStudio/App`, `Apps/GenerativeArtStudio/Adapter` | `GenerativeArtStudioApp.swift`, `LaunchCleanup.swift`, `LaunchComposition.swift`, `AppAutomation.swift` | `Apps/GenerativeArtStudio/Shaders` (folder) |
+| `GenerativeArtStudioExperience` | `Apps/GenerativeArtStudio/App`, `Apps/GenerativeArtStudio/Adapter` | `GenerativeArtStudioApp.swift`, `LaunchCleanup.swift`, `AppAutomation.swift` (`LaunchComposition.swift` stays: `GalleryView` uses it; corrected 2026-11-13) | `Apps/GenerativeArtStudio/Shaders` (folder) |
 | `FluidArtPlaygroundExperience` | `Apps/FluidArtPlayground/App`, `…/Adapter` | `FluidArtPlaygroundApp.swift`, `AppAutomation.swift`, `TestMode.swift` | none |
 | `FractalExplorerExperience` | `Apps/FractalExplorer/App`, `…/Adapter` | `FractalExplorerApp.swift`, `AppAutomation.swift` | none |
 | `ParticleUniverseExperience` | `Apps/ParticleUniverse/App`, `…/Adapter` | `ParticleUniverseApp.swift`, `DeviceConditionsSource.swift` | none |

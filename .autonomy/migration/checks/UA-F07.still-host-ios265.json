@@ -1,0 +1,29 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/VisualCoreRendering",
+    "--scheme",
+    "VisualCoreRendering-Package",
+    "--destination",
+    "sim-26.5",
+    "--action",
+    "test",
+    "--result-name",
+    "ua-f07-still-265",
+    "--only-testing",
+    "VisualCoreExperienceHostTests"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-26.5 --action test --result-name ua-f07-still-265 --only-testing VisualCoreExperienceHostTests",
+  "elapsed_seconds": 29.865,
+  "exit_code": 0,
+  "finished": "2026-11-13T11:38:47+00:00",
+  "gate": "UA-F07",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F07.still-host-ios265.log",
+  "log_sha256": "d73f29493d64613aa4a5e01f8b6e6c34f97a29af3c0d9b7933b38c6d7e7b67ac",
+  "name": "still-host-ios265",
+  "started": "2026-11-13T11:38:17+00:00",
+  "timed_out": false
+}

@@ -264,6 +264,9 @@ public struct ExperienceHostView: View {
                     experience.controls
                         .frame(maxWidth: .infinity)
                         .padding()
+                        .environment(\.experienceStillRenderer, ExperienceStillRenderer { [session] (width: Int, height: Int) throws(OffscreenRenderError) -> StillImage in
+                            try session.renderStill(width: width, height: height)
+                        })
                 }
                 .frame(maxHeight: SessionLayout.controlsMaxHeight)
             }

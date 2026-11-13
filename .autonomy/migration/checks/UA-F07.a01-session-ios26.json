@@ -1,0 +1,29 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_app.py",
+    "--scheme",
+    "VisualCore",
+    "--runtime",
+    "26.5",
+    "--kind",
+    "phone",
+    "--sources",
+    "Apps/GenerativeArtStudio/Adapter/ExperienceTests",
+    "--only-testing",
+    "GenerativeArtStudioExperienceTests",
+    "--log-name",
+    "ua-f07-a01-session-ios26"
+  ],
+  "command": "python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime 26.5 --kind phone --sources Apps/GenerativeArtStudio/Adapter/ExperienceTests --only-testing GenerativeArtStudioExperienceTests --log-name ua-f07-a01-session-ios26",
+  "elapsed_seconds": 18.156,
+  "exit_code": 0,
+  "finished": "2026-11-13T11:35:45+00:00",
+  "gate": "UA-F07",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F07.a01-session-ios26.log",
+  "log_sha256": "01299e4918ee2c9df5e2982f4a439e7c5f5d307ed0f40da246b77bdd548ed9dc",
+  "name": "a01-session-ios26",
+  "started": "2026-11-13T11:35:27+00:00",
+  "timed_out": false
+}

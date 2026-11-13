@@ -27,7 +27,7 @@ private func core(_ engine: ExperienceEngine<GenerativeArtCore>) throws -> Gener
     @Test func conformancePassesOverFourSeeds() async {
         let plan = ConformancePlan(
             seeds: [1, 7, 42, 0xFFFF_FFFF_FFFF_FFFF], stepsPerSegment: 30,
-            actions: [ScriptedAction("palette", [3]), ScriptedAction("parameter.warp", [0.75]),
+            actions: [ScriptedAction("palette", [3]), ScriptedAction("parameter.gravity", [0.75]),
                       ScriptedAction("seed.shuffle"), ScriptedAction("family", [3]), ScriptedAction("parameter.count", [0.2]),
                       ScriptedAction("pause"), ScriptedAction("scrub", [12.5]), ScriptedAction("save")],
             rejected: [ScriptedAction("preset", [7]), ScriptedAction("parameter.cells", [0.5]),
@@ -36,9 +36,9 @@ private func core(_ engine: ExperienceEngine<GenerativeArtCore>) throws -> Gener
         for entry in report.entries { #expect(entry.passed, "\(entry.check): \(entry.detail)") }
     }
 
-    @Test func aFreshPreparationIsTheGallerysFirstFamilyAtItsDefaultPreset() async throws {
+    @Test func aFreshPreparationIsTheParticlesFamilyAtItsDefaultPreset() async throws {
         let state = try core(try await engine(seed: 42))
-        let family = FamilyCatalog.all[0]
+        let family = FamilyCatalog.family(.particles)
         #expect(state.family.id == family.id)
         #expect(state.presetID == family.defaultPreset.id)
         #expect(state.document.seed == family.defaultPreset.seed)
@@ -51,7 +51,7 @@ private func core(_ engine: ExperienceEngine<GenerativeArtCore>) throws -> Gener
         let base = try await engine()
         let start = try base.digest()
         let changing: [(String, [Double])] = [
-            ("family", [2]), ("preset", [1]), ("palette", [4]), ("parameter.scale", [0.9]), ("value.warp", [1.7]),
+            ("family", [2]), ("preset", [1]), ("palette", [4]), ("parameter.size", [0.9]), ("value.drag", [1.7]),
             ("seed.shuffle", []), ("seed.set", [1, 2]), ("pause", []), ("scrub", [30]), ("rate", [0.5]), ("save", []),
             ("open", [3, 2, 0, 99, 10]),
         ]
@@ -61,7 +61,7 @@ private func core(_ engine: ExperienceEngine<GenerativeArtCore>) throws -> Gener
             #expect(try engine.digest() != start, "\(control) changes the digest")
         }
         // Controls that change nothing on a fresh state: values already at the baseline, playing already.
-        for control in ["resetAll", "reset.scale", "play", "rebase"] {
+        for control in ["resetAll", "reset.size", "play", "rebase"] {
             var engine = base
             #expect(engine.handle(control: control) == .accepted, "\(control)")
             #expect(try engine.digest() == start, "\(control) keeps a fresh state")
@@ -75,7 +75,7 @@ private func core(_ engine: ExperienceEngine<GenerativeArtCore>) throws -> Gener
             ("family", [4], "action.out-of-range"), ("family", [], "action.wrong-value-count"),
             ("preset", [2], "action.out-of-range"), ("palette", [-1], "action.out-of-range"),
             ("parameter.scale", [1.5], "action.out-of-range"), ("parameter.scale", [.nan], "action.non-finite"),
-            ("parameter.cells", [0.5], "action.rule.a01.no-parameter"), ("reset.count", [], "action.rule.a01.no-parameter"),
+            ("parameter.cells", [0.5], "action.rule.a01.no-parameter"), ("reset.warp", [], "action.rule.a01.no-parameter"),
             ("scrub", [121], "action.out-of-range"), ("rate", [5], "action.out-of-range"),
             ("seed.set", [1], "action.wrong-value-count"), ("tour", [], "action.unknown-control"),
         ]
@@ -93,6 +93,7 @@ private func core(_ engine: ExperienceEngine<GenerativeArtCore>) throws -> Gener
 
     @Test func parameterEditsUseTheAppsEditor() async throws {
         var engine = try await engine()
+        #expect(engine.handle(control: "family", values: [0]) == .accepted)
         let family = FamilyCatalog.all[0]
         var reference = CompositionEditor(family: family)
         #expect(engine.handle(control: "parameter.scale", values: [0.25]) == .accepted)
@@ -145,7 +146,7 @@ private func core(_ engine: ExperienceEngine<GenerativeArtCore>) throws -> Gener
         #expect(shuffled != seed)
         #expect(try core(second).document.seed == shuffled)
         var random = SeededRandom(seed: seed)
-        var editor = CompositionEditor(family: FamilyCatalog.all[0])
+        var editor = CompositionEditor(family: FamilyCatalog.family(.particles))
         editor.shuffleSeed(using: &random)
         #expect(editor.composition.seed == shuffled, "the app's shuffle with SeededRandom(current seed)")
     }

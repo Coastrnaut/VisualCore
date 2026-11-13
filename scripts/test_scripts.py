@@ -1205,8 +1205,9 @@ class PerformanceDocsTests(unittest.TestCase):
         self.assertIn("storage-rule: ", listing)
         self.assertIn("stored-data-rule: ", listing)
         tool = load("release_check")
+        # A source is a file or, for the adapters of feature 193 (UA-F07), a folder of them.
         for source in tool.STORAGE_RULE_SOURCES + tool.STORED_DATA_SOURCES:
-            self.assertTrue((ROOT_DIR / source).is_file(), source)
+            self.assertTrue((ROOT_DIR / source).exists(), source)
 
 
 class UnifiedAppTargetTests(unittest.TestCase):
@@ -1244,15 +1245,22 @@ class UnifiedAppTargetTests(unittest.TestCase):
     def test_the_app_has_one_unit_test_and_one_interface_test_target(self):
         blocks = self.targets()
         testing = {n: b for n, b in blocks.items() if any(l.strip() == "- target: VisualCore" for l in b)}
-        self.assertEqual(sorted(testing), ["VisualCoreTests", "VisualCoreUITests"])
+        # Feature 193 (UA-F07): each adopted experience's framework has one unit-test bundle hosted by the app.
+        adopted = sorted(n for n in testing if n.endswith("ExperienceTests"))
+        self.assertEqual(sorted(set(testing) - set(adopted)), ["VisualCoreTests", "VisualCoreUITests"])
         self.assertIn("    type: bundle.unit-test", testing["VisualCoreTests"])
         self.assertIn("    type: bundle.ui-testing", testing["VisualCoreUITests"])
+        for name in adopted:
+            self.assertIn("    type: bundle.unit-test", testing[name])
+            self.assertIn(name.removesuffix("Tests"), blocks, "its framework target exists")
 
     def test_the_app_links_no_unused_framework_product(self):
         products = [l.split("product:")[1].strip() for l in self.targets()["VisualCore"] if "product:" in l]
+        # Feature 193 (UA-F07): the adapter cores of the adopted experiences, which the registry names.
         self.assertEqual(products, ["VisualCoreExperience", "VisualCoreSimulation", "VisualCoreDiagnostics",
                                     "VisualCorePersistence",
-                                    "VisualCoreRendering", "VisualCoreUI", "VisualCoreExperienceHost"])
+                                    "VisualCoreRendering", "VisualCoreUI", "VisualCoreExperienceHost",
+                                    "GenerativeArtStudioAdapterCore"])
 
     def test_the_standing_isolation_step_requires_sources(self):
         listing = subprocess.run([sys.executable, str(HERE / "release_check.py"), "--list"],

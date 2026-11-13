@@ -986,6 +986,7 @@ VisualCoreExperienceHost | enum | public enum SessionViewID
 VisualCoreExperienceHost | func | public func activate() throws(ExperienceError)
 VisualCoreExperienceHost | func | public func back()
 VisualCoreExperienceHost | func | public func beginDeactivation() throws(ExperienceError)
+VisualCoreExperienceHost | func | public func callAsFunction(width: Int, height: Int) throws(OffscreenRenderError) -> StillImage
 VisualCoreExperienceHost | func | public func cancelPreparation()
 VisualCoreExperienceHost | func | public func checkpoint()
 VisualCoreExperienceHost | func | public func close()
@@ -1001,6 +1002,7 @@ VisualCoreExperienceHost | func | public func prepare(seed: UInt64, timeLimit: D
 VisualCoreExperienceHost | func | public func probes(_ core: Core) -> [FrameProbe]
 VisualCoreExperienceHost | func | public func recreateContext()
 VisualCoreExperienceHost | func | public func refreshQuality(now: Double? = nil)
+VisualCoreExperienceHost | func | public func renderStill(width: Int, height: Int) throws(OffscreenRenderError) -> StillImage
 VisualCoreExperienceHost | func | public func reset() throws(ExperienceError)
 VisualCoreExperienceHost | func | public func resize(_ context: RenderContext)
 VisualCoreExperienceHost | func | public func restore(_ snapshot: ExperienceSnapshot) throws(ExperienceError)
@@ -1019,6 +1021,7 @@ VisualCoreExperienceHost | func | public func snapshot() throws(ExperienceError)
 VisualCoreExperienceHost | func | public func suspend() throws(ExperienceError)
 VisualCoreExperienceHost | func | public static func text(_ key: Key) -> String
 VisualCoreExperienceHost | init | public init()
+VisualCoreExperienceHost | init | public init(_ render: @escaping @MainActor @Sendable (Int, Int) throws(OffscreenRenderError) -> StillImage)
 VisualCoreExperienceHost | init | public init(id: ExperienceID, presenter: Presenter, maxStepsPerFrame: Int = 8)
 VisualCoreExperienceHost | init | public init(id: ExperienceID, seed: UInt64, snapshot: ExperienceSnapshot? = nil,
 VisualCoreExperienceHost | init | public init(onCancel: @escaping @MainActor () -> Void)
@@ -1055,6 +1058,7 @@ VisualCoreExperienceHost | protocol | public protocol Experience: AnyObject
 VisualCoreExperienceHost | protocol | public protocol ExperiencePresenter: AnyObject
 VisualCoreExperienceHost | struct | public struct ExperienceHostView: View
 VisualCoreExperienceHost | struct | public struct ExperienceOpenRequest
+VisualCoreExperienceHost | struct | public struct ExperienceStillRenderer: Sendable
 VisualCoreExperienceHost | struct | public struct ScenarioRunResult: Sendable
 VisualCoreExperienceHost | struct | public struct SessionButtonStyle: ButtonStyle
 VisualCoreExperienceHost | struct | public struct SessionFailureView: View
@@ -1062,6 +1066,7 @@ VisualCoreExperienceHost | struct | public struct SessionMessageView: View
 VisualCoreExperienceHost | struct | public struct SessionPreparingView: View
 VisualCoreExperienceHost | typealias | public typealias RequestMaker = @MainActor (_ seed: UInt64, _ snapshot: ExperienceSnapshot?) -> ExperienceOpenRequest
 VisualCoreExperienceHost | typealias | public typealias SnapshotSink = @MainActor (ExperienceSnapshot) throws -> Void
+VisualCoreExperienceHost | var | @Entry public var experienceStillRenderer: ExperienceStillRenderer?
 VisualCoreExperienceHost | var | @ObservationIgnored public private(set) var hostsAlive
 VisualCoreExperienceHost | var | @ObservationIgnored public private(set) var lastPerformanceRecord: PerformanceRecord?
 VisualCoreExperienceHost | var | @ObservationIgnored public private(set) var lastRestoreRefusal: ExperienceFailure?

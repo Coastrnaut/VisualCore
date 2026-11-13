@@ -81,7 +81,9 @@ def xcode_test(project: str, scheme: str, runtime: str, derived: str, stamp: str
 # Feature 191 (UA-F05). Experience sources: the debug experience and the sample core today; every experience
 # module is added here when it is integrated.
 STORAGE_RULE_SOURCES = ["Apps/VisualCore/App/DebugSupport/DebugExperience.swift",
-                        "Packages/VisualCore/Sources/VisualCoreTestSupport/SampleExperienceCore.swift"]
+                        "Packages/VisualCore/Sources/VisualCoreTestSupport/SampleExperienceCore.swift",
+                        # The adapters of the adopted experiences (feature 193, UA-F07).
+                        "Apps/GenerativeArtStudio/Adapter/Core", "Apps/GenerativeArtStudio/Adapter/Experience"]
 # The shipped sources that read stored data.
 STORED_DATA_SOURCES = ["Packages/VisualCore/Sources/VisualCoreExperience/SavedStateStore.swift",
                        "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift",
@@ -90,7 +92,8 @@ STORED_DATA_SOURCES = ["Packages/VisualCore/Sources/VisualCoreExperience/SavedSt
                        "Packages/VisualCore/Sources/VisualCoreExperience/SnapshotMigrationCheck.swift",
                        "Packages/VisualCore/Sources/VisualCoreExperience/ContainerInventory.swift",
                        "Apps/VisualCore/App/PreferencesStore.swift", "Apps/VisualCore/App/AppModel.swift",
-                       "Apps/VisualCore/App/ExperienceDataStore.swift"]
+                       "Apps/VisualCore/App/ExperienceDataStore.swift",
+                       "Apps/GenerativeArtStudio/Adapter/Core", "Apps/GenerativeArtStudio/Adapter/Experience"]
 
 
 def steps(stamp: str) -> list[Step]:

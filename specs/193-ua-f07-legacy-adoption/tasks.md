@@ -74,7 +74,7 @@ runtimes.
 - [X] T-U07-008 [US1] Implement `Apps/GenerativeArtStudio/Adapter/GenerativeArtCore.swift`. It wraps `ArtDocument`, — Verified 2026-11-13: Apps/GenerativeArtStudio/Adapter/Core/GenerativeArtCore.swift with six listed adapter differences; edits go through CompositionEditor; T-U07-007 passes 11/11 (run-check a01-core-host)
   the family, the preset and the time; `CompositionEditor` and `SceneFamily` are rebuilt from the catalog. The file
   header lists each difference from the standalone app. T-U07-007 passes.
-- [ ] T-U07-009 [US1] `GenerativeArtPresenter.swift`, `GenerativeArtControls.swift` and `GenerativeArtManifest.swift` in
+- [X] T-U07-009 [US1] `GenerativeArtPresenter.swift`, `GenerativeArtControls.swift` and `GenerativeArtManifest.swift` in — Verified 2026-11-13: Adapter/Experience: GenerativeArtPresenter (ArtCanvasScene over ArtSceneFactory with fixedTime, EffectScene limiter, CPU-derived particle-corner probe), GenerativeArtControls (families, time, presets, palettes, seed, parameters, library via ExperienceStorage, export via ShareLink and the new ExperienceStillRenderer; labels and 44 pt targets), GenerativeArtLibrary, GenerativeArtManifest (9 standard + 5 fixtures, committed digests); swift test 14/14 (a01-manifest-host); host tests 151/151 on sim-27.2 and sim-26.5 (still-host-ios272/265); public API 2183, 0 undocumented; reference regression a and b exit 0 (reference-a-still, reference-b-still). The largest-text-size check of E-12 is part of the ported accessibility audit (T-U07-014)
   `Apps/GenerativeArtStudio/Adapter/`:
   - the presenter wraps `ArtSceneFactory` with `fixedTime` from the core and the framework's bundle for shaders,
     and declares a probe;

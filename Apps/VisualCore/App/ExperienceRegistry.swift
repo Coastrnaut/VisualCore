@@ -1,8 +1,11 @@
 // ExperienceRegistry — feature 190 T-U04-011 (FR-U04-010, FR-U04-011; research R2). The one explicit list of the
 // experiences the app can open: for each an id and a factory. It is empty in this feature, because no experience
 // is integrated yet; an integration adds its line here and nowhere else.
+import GenerativeArtStudioAdapterCore
+import GenerativeArtStudioExperience
 import VisualCoreExperience
 import VisualCoreExperienceHost
+import VisualCoreUI
 
 /// What the shell hands to an experience when it opens it (US5, acceptance scenario 1): the person's stored
 /// accessibility choices and the experience's own storage. `.system` means "follow the device setting"; the
@@ -56,5 +59,33 @@ enum ExperienceRegistry {
     /// each carries its scenario manifest, so that the verification runner can open it, but it stays unavailable
     /// in the catalog and outside `all`. Debug builds show them with `-vcCandidates`. Recording an experience's X
     /// gate moves its registration from here to `all`.
-    static let candidates: [ExperienceRegistration] = []
+    static let candidates: [ExperienceRegistration] = [generativeArtStudio].compactMap { $0 }
+
+    /// A01 Generative Art Studio (feature 193, US1).
+    private static var generativeArtStudio: ExperienceRegistration? {
+        guard let id = GenerativeArtExperience.id else { return nil }
+        var registration = ExperienceRegistration(id: id, core: GenerativeArtCore.self) { launch in
+            let system = SystemAccessibilityObserver.systemValues()
+            return GenerativeArtExperience.make(
+                id: id, storage: launch.storage,
+                reduceMotion: launch.reduceMotion.resolved(system: system.reduceMotion),
+                reduceFlashing: launch.reduceFlashing.resolved(system: system.dimFlashingLights))
+        }
+        #if DEBUG || VISUALCORE_AUTOMATION
+        registration.scenarioManifest = GenerativeArtCore.manifest(for: id)
+        #endif
+        return registration
+    }
+}
+
+extension AccessibilityChoice {
+    /// The setting in effect: the system's value for `.system`, else the choice (as VisualCoreSimulation's
+    /// `AccessibilityPreferences.resolve` does for the standalone apps).
+    func resolved(system: Bool) -> Bool {
+        switch self {
+        case .system: system
+        case .on: true
+        case .off: false
+        }
+    }
 }

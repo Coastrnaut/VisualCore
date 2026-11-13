@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Apps/GenerativeArtStudio/Adapter"
+  ],
+  "command": "swift test --package-path Apps/GenerativeArtStudio/Adapter",
+  "elapsed_seconds": 3.026,
+  "exit_code": 0,
+  "finished": "2026-11-13T11:40:09+00:00",
+  "gate": "UA-F07",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F07.a01-manifest-host.log",
+  "log_sha256": "b8b588d1c69328dc3d5372b872c00b67e57a1052fa12dc160f0a86cac371161d",
+  "name": "a01-manifest-host",
+  "started": "2026-11-13T11:40:06+00:00",
+  "timed_out": false
+}

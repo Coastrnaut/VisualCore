@@ -183,3 +183,24 @@ The dossier files are not edited. The legacy ledger is untouched; its hash is co
   the standalone app are in its file header (FR-U07-003): fixed-step time, Reduce Motion as the control `rate`, a
   deterministic `seed.shuffle`, `family` as one control, `open`/`value.<name>`/`rebase` for opening a saved
   composition, and `save` counting saves for the outcome `work-saved`.
+- **A01 framework, manifest, probe and export (T-U07-009 to T-U07-011, 2026-11-13).**
+  - `GenerativeArtStudioExperience` is a *static* framework (`framework.static`). A dynamic framework and the app
+    would each link their own copy of the Swift packages they share, so types such as `ExperienceShell` would exist
+    twice. The static framework has no bundle of its own, so the app copies `Apps/GenerativeArtStudio/Shaders` as a
+    folder resource and the presenter loads it through `Bundle(for:)`, which is the app's bundle.
+  - `LaunchComposition.swift` stays in the framework, because `GalleryView` uses it (data-model section 1 corrected).
+  - The manifest is in the pure package (`Adapter/Core/GenerativeArtManifest.swift`), so that its committed digests
+    and result codes are checked against the engine by `swift test`. The five `fixture-<n>` scenarios follow the five
+    fixtures of the A01 card. Export dimensions and colour profile cannot be scripted as actions; fixture 4 checks
+    the state at an explicit time. The export itself is covered by the ported interface tests.
+  - The frame probe: the runner needs one probe whose colour class follows from the state. Gradient noise and tiling
+    span the whole palette, so no pixel of theirs has a known class. The Particles background corner is a palette
+    colour over a known range, scaled by a known factor. Its class is derived on the CPU (the GPU's `vc_palette`
+    equals `Palette.sample`) and declared only when it is the same class at every point of that range with ±4 levels
+    of margin, and only while no particle can reach the corner. A preparation therefore opens the Particles family
+    (core difference 4).
+  - Export needs the session's render host, which an experience never sees. VisualCoreExperienceHost gains
+    `ExperienceSession.renderStill(width:height:)` and the environment value `experienceStillRenderer`, which
+    `ExperienceHostView` sets on the controls. This is a new public API: the baseline was updated, `StillRenderTests`
+    was added, and the reference regression was run. The controls offer the PNG through `ShareLink` without
+    writing a file (FR-U07-020).

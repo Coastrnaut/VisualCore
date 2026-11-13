@@ -11,7 +11,10 @@
 //   3. `seed.shuffle` derives the next seed from the current one (a deterministic `SeededRandom`), instead of the
 //      system generator, so that a script replays it.
 //   4. The four families are one experience: `family` switches to a family's default preset, where the standalone
-//      app opens a new screen from the gallery. The time restarts at 0 and playback starts, as on a new screen.
+//      app opens a new screen from the gallery. The time restarts at 0 and playback starts, as on a new screen. A
+//      preparation opens the Particles family at its default preset (the standalone app opens on its gallery):
+//      the first frame then has a background whose colour follows from the palette alone, so the verification
+//      runner can check it (FR-U07-010).
 //   5. Opening a saved composition is the actions `open`, `value.<name>` and `rebase`, because an action carries at
 //      most eight numbers. The document id comes from the preparation seed, not from `UUID()`.
 //   6. `save` counts saved compositions; the controls write the file through the experience's storage. The
@@ -99,10 +102,13 @@ public struct GenerativeArtCore: ExperienceCore, Codable, Equatable {
                 ranges[definition.name] = definition.range
             }
         }
-        return ranges.keys.sorted().map { ($0, ranges[$0]!) }
+        return ranges.sorted { $0.key < $1.key }.map { ($0.key, $0.value) }
     }
 
-    /// The state of a fresh preparation: the first family of the gallery at its default preset, time 0, playing.
+    /// The family a preparation opens.
+    public static let startFamily = SceneFamilyID.particles
+
+    /// The state of a fresh preparation: the Particles family at its default preset, time 0, playing.
     public static func prepare(seed: UInt64) async throws -> GenerativeArtCore {
         try Task.checkCancellation()
         return GenerativeArtCore(seed: seed)
@@ -110,7 +116,7 @@ public struct GenerativeArtCore: ExperienceCore, Codable, Equatable {
 
     private init(seed: UInt64) {
         self.seed = seed
-        let editor = CompositionEditor(family: FamilyCatalog.all[0])
+        let editor = CompositionEditor(family: FamilyCatalog.family(Self.startFamily))
         var document = editor.composition
         document.id = Self.documentID(seed: seed)
         self.document = document

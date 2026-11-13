@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "python3",
+    "scripts/release_check.py",
+    "--only",
+    "xcodegen"
+  ],
+  "command": "python3 scripts/release_check.py --only xcodegen",
+  "elapsed_seconds": 0.173,
+  "exit_code": 0,
+  "finished": "2026-11-13T11:40:05+00:00",
+  "gate": "UA-F07",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F07.a01-xcodegen.log",
+  "log_sha256": "f4696d590e1b3843905c37f86e796aef171b62ba031af35737f221c685b649c8",
+  "name": "a01-xcodegen",
+  "started": "2026-11-13T11:40:05+00:00",
+  "timed_out": false
+}

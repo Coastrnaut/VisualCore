@@ -20,6 +20,9 @@ packages:
     path: Packages/VisualCoreRendering
   GenerativeArtStudioCore:
     path: Apps/GenerativeArtStudio/Core
+  # The pure adapter core of A01 (feature 193, UA-F07; research R1 and section 4).
+  GenerativeArtStudioAdapter:
+    path: Apps/GenerativeArtStudio/Adapter
   FluidArtPlaygroundCore:
     path: Apps/FluidArtPlayground/FluidArtPlaygroundCore
   FractalExplorerCore:
@@ -477,6 +480,10 @@ targets:
         buildPhase: resources
       - path: Catalog/categories.json
         buildPhase: resources
+      # The shaders of A01 Generative Art Studio (feature 193): its static framework has no bundle of its own.
+      - path: Apps/GenerativeArtStudio/Shaders
+        type: folder
+        buildPhase: resources
     info:
       path: Apps/VisualCore/Generated/Info.plist
       properties:
@@ -514,6 +521,10 @@ targets:
         product: VisualCoreUI
       - package: VisualCoreRendering
         product: VisualCoreExperienceHost
+      # The adopted experiences before their X gate (feature 193): candidates of the registry.
+      - target: GenerativeArtStudioExperience
+      - package: GenerativeArtStudioAdapter
+        product: GenerativeArtStudioAdapterCore
     postBuildScripts:
       - name: Bundle licenses (UA-F04)
         basedOnDependencyAnalysis: false
@@ -528,6 +539,63 @@ targets:
           env -i PATH=/usr/bin:/bin:/usr/sbin:/sbin HOME="$HOME" DEVELOPER_DIR="$DEVELOPER_DIR" \
             /usr/bin/python3 "$SRCROOT/scripts/audit_showcase_dependencies.py" --root "$SRCROOT" --spec project.yml \
             --target VisualCore --sources Apps/VisualCore --app "$TARGET_BUILD_DIR/$WRAPPER_NAME"
+  GenerativeArtStudioExperience:
+    # A01 adopted as an experience of the one app (feature 193, UA-F07; research R1, data-model section 1): the
+    # standalone app's sources without its @main and launch files, plus the adapter's presenter, controls and
+    # factory. A static framework linked into the one app, never an application (one app target, one bundle id);
+    # static, so that the Swift packages it shares with the app are linked once. Its shaders are copied by the app.
+    type: framework.static
+    platform: iOS
+    sources:
+      - path: Apps/GenerativeArtStudio/App
+        excludes: [GenerativeArtStudioApp.swift, LaunchCleanup.swift, AppAutomation.swift]
+      - path: Apps/GenerativeArtStudio/Adapter/Experience
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: dev.visualcore.VisualCore.GenerativeArtStudioExperience
+        PRODUCT_NAME: GenerativeArtStudioExperience
+        GENERATE_INFOPLIST_FILE: YES
+        SKIP_INSTALL: YES
+    dependencies:
+      - package: GenerativeArtStudioCore
+        product: GenerativeArtStudioCore
+      - package: GenerativeArtStudioAdapter
+        product: GenerativeArtStudioAdapterCore
+      - package: VisualCore
+        product: VisualCoreParameters
+      - package: VisualCore
+        product: VisualCoreSimulation
+      - package: VisualCore
+        product: VisualCoreMath
+      - package: VisualCore
+        product: VisualCoreScenes
+      - package: VisualCore
+        product: VisualCorePersistence
+      - package: VisualCore
+        product: VisualCoreEffectsGraph
+      - package: VisualCore
+        product: VisualCoreExperience
+      - package: VisualCoreRendering
+        product: VisualCoreRendering
+      - package: VisualCoreRendering
+        product: VisualCoreUI
+      - package: VisualCoreRendering
+        product: VisualCoreEffects
+      - package: VisualCoreRendering
+        product: VisualCoreExperienceHost
+      - package: VisualCoreRendering
+        product: VisualCoreAutomation
+  GenerativeArtStudioExperienceTests:
+    # The A01 adapter's session tests (feature 193 T-U07-011, T-U07-012), hosted by the one app.
+    type: bundle.unit-test
+    platform: iOS
+    sources: [Apps/GenerativeArtStudio/Adapter/ExperienceTests]
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: dev.visualcore.GenerativeArtStudioExperienceTests
+        GENERATE_INFOPLIST_FILE: YES
+    dependencies:
+      - target: VisualCore
   VisualCoreTests:
     type: bundle.unit-test
     platform: iOS
@@ -560,8 +628,9 @@ schemes:
         VisualCore: all
         VisualCoreTests: [test]
         VisualCoreUITests: [test]
+        GenerativeArtStudioExperienceTests: [test]
     test:
-      targets: [VisualCoreTests, VisualCoreUITests]
+      targets: [VisualCoreTests, VisualCoreUITests, GenerativeArtStudioExperienceTests]
   Showcase:
     build:
       targets:
