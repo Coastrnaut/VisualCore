@@ -57,7 +57,7 @@ API-baseline and reference-regression tasks apply.
   recreation rejects the old target; zero or over-limit size throws with nothing allocated; a host with a budget
   smaller than one depth target throws the budget error and leaves no colour, depth or framebuffer allocated; pooled targets with and
   without depth are distinct.
-- [ ] T-R02F04-012 [US3] Implement depth in `ResourceRegistry.swift` (`makeRenderTarget(..., depth:)`,
+- [X] T-R02F04-012 [US3] Implement depth in `ResourceRegistry.swift` (`makeRenderTarget(..., depth:)`, — Verified 2026-11-13: makeRenderTarget/acquireTarget depth: Bool = false, GL_DEPTH_COMPONENT24 renderbuffer counted as .renderbuffer w*h*4 bytes, cleanup on incomplete framebuffer or budget failure, pool key with depth, RenderTarget.depthRenderbuffer; tests pass
   `acquireTarget(..., depth:)`, pool key with depth, `GL_DEPTH_COMPONENT24` renderbuffer counted as `.renderbuffer`
   width×height×4 bytes, cleanup on incomplete framebuffer) and `GPUObjects.swift` (`RenderTarget.depthRenderbuffer`).
 - [ ] T-R02F04-013 [US3] Acceptance: DepthTargetTests on sim-27.2 (check `depth-ios27`) (SC-R02F04-003).
