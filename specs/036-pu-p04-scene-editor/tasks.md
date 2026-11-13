@@ -8,7 +8,7 @@ each task. Tests before code. Owner-only items: none. One {device} task. No Visu
 
 ## Phase 1: Setup
 
-- [ ] T-A04-401 Baseline: ExperiencesCreative on sim-27.2 passes before the change (check `baseline-experiences`).
+- [X] T-A04-401 Baseline: ExperiencesCreative on sim-27.2 passes before the change (check `baseline-experiences`). — Verified 2026-11-13: ExperiencesCreative on sim-27.2 passed before the change (desktop_runbook check A04-P04/baseline-experiences)
 
 ## Phase 2: Foundational — saved-scene format
 
