@@ -29,7 +29,7 @@ none (no {owner} task). VisualCore changes, so the documentation, API-baseline a
   `index(below:)` uses exactly one draw (state after equals one `next()`); golden shuffle of 0…9 with seed 7, a
   permutation, n − 1 draws; `pick` uniform golden and `.empty`; `weightedIndex([1, 0, 3])` 1,000 times from a fixed
   seed never returns 1 and equals golden counts; `.empty`, `.negativeWeight(i)`, `.nonFiniteWeight(i)`, `.zeroTotal`.
-- [ ] T-R02F03-006 [US2] Write `Packages/VisualCore/Sources/VisualCoreSimulation/SeededRandom+Choice.swift` (`index(below:)`
+- [X] T-R02F03-006 [US2] Write `Packages/VisualCore/Sources/VisualCoreSimulation/SeededRandom+Choice.swift` (`index(below:)` — Verified 2026-11-13: SeededRandom+Choice.swift (index(below:) via multipliedFullWidth high half, Fisher-Yates from the end, pick, weightedIndex, RandomChoiceError) with /// docs; tests pass (host-visualcore)
   via the high half of `multipliedFullWidth`, Fisher–Yates from the end, `RandomChoiceError`).
 - [ ] T-R02F03-007 [US2] Acceptance: host tests pass and the existing `SeededRandomTests` are unchanged and pass
   (check `host-choice`) (SC-R02F03-003, SC-R02F03-001).
