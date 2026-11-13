@@ -36,7 +36,7 @@ each task. Tests before code. Owner-only items: none. One {device} task. No Visu
 
 - [X] T-A04-508 [P] [US3] Write `PU/ExperienceTests/ParticleProfileTests.swift`: open, play about 120 frames, close; print — Verified 2026-11-13: ParticleProfileTests prints one PROFILE line with source simulator and the session's PerformanceRecord fields, parsed back as JSON; pass
   one `PROFILE:` JSON line with `"source":"simulator"` and the session's `lastPerformanceRecord`.
-- [ ] T-A04-509 [US3] Add a "Particle Universe" row to `docs/performance/budgets.md` (device values pending the device
+- [X] T-A04-509 [US3] Add a "Particle Universe" row to `docs/performance/budgets.md` (device values pending the device — Verified 2026-11-13: docs/performance/budgets.md row for Particle Universe frame-time detail (device values pending the campaign); check_performance_docs PASS (A04-P05/performance-docs)
   campaign); `python3 scripts/check_performance_docs.py` passes (check `performance-docs`).
 - [ ] T-A04-510 [US3] Acceptance: the profile line appears in the recorded log on sim-27.2 (check `profile-ios27`) (SC-A04-504).
 
