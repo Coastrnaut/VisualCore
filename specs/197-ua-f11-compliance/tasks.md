@@ -12,7 +12,7 @@ Device-only items: none, so no {device} task.
 
 ## Phase 1: Setup
 
-- [ ] T-U11-001 Baseline before changes: `python3 scripts/test_scripts.py` and `python3 scripts/check_compliance.py`
+- [X] T-U11-001 Baseline before changes: `python3 scripts/test_scripts.py` and `python3 scripts/check_compliance.py` — Verified 2026-11-13: check_compliance PASS (baseline-compliance) and test_scripts PASS (baseline-scripts) before changes; research.md section 0 audit re-verified at ecf2946
   pass (checks `baseline-scripts`, `baseline-compliance`); research.md §0 audit re-verified on the current revision.
 
 ## Phase 2: Foundational

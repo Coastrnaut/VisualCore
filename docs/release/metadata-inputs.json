@@ -28,6 +28,14 @@
     }
   ],
   "ledger_sha256": "2b76cd2b1c6163ab6b3dc6a6297c64407a2ec35da97a397cdc5eca18fe18fe04",
-  "privacy_answers": "unproven",
+  "privacy_answers": {
+    "data_collected": "none",
+    "proof": {
+      "executable_sha256": "0bd0b072319c7e24778859a37160ed14597eb22a0ed0825894ac4b7797eff31e",
+      "privacy_report": ".autonomy/logs/ua-f11/privacy-20261113T154648.json",
+      "tracking_report": ".autonomy/logs/ua-f11/tracking-20261113T154648.json"
+    },
+    "tracking": "no"
+  },
   "schema": 1
 }

@@ -1,0 +1,25 @@
+{
+  "argv": [
+    "python3",
+    "scripts/release_check.py",
+    "--only",
+    "app-release-build",
+    "app-release-symbols",
+    "app-privacy-manifest",
+    "app-no-tracking",
+    "app-licenses",
+    "app-usage-descriptions",
+    "app-projectm-audit"
+  ],
+  "command": "python3 scripts/release_check.py --only app-release-build app-release-symbols app-privacy-manifest app-no-tracking app-licenses app-usage-descriptions app-projectm-audit",
+  "elapsed_seconds": 11.465,
+  "exit_code": 0,
+  "finished": "2026-11-13T20:46:59+00:00",
+  "gate": "UA-F11",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F11.release-check-app.log",
+  "log_sha256": "e287514a4e03756d4f51a5537779eeb9f272168662ef982a5df7e9dabe570a7a",
+  "name": "release-check-app",
+  "started": "2026-11-13T20:46:48+00:00",
+  "timed_out": false
+}

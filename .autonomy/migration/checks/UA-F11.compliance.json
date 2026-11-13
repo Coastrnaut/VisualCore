@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_compliance.py"
+  ],
+  "command": "python3 scripts/check_compliance.py",
+  "elapsed_seconds": 0.814,
+  "exit_code": 0,
+  "finished": "2026-11-13T20:47:13+00:00",
+  "gate": "UA-F11",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F11.compliance.log",
+  "log_sha256": "db393a19970f5c154c399798994678fd946eeeaa8c8266c7b59c10e0eb5ab3e9",
+  "name": "compliance",
+  "started": "2026-11-13T20:47:13+00:00",
+  "timed_out": false
+}

@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_no_tracking.py",
+    "--app",
+    "Build/DerivedData/release-VisualCore-Release-sim/Build/Products/Release-iphonesimulator/VisualCore.app",
+    "--json",
+    ".autonomy/logs/ua-f11/tracking.json"
+  ],
+  "command": "python3 scripts/check_no_tracking.py --app Build/DerivedData/release-VisualCore-Release-sim/Build/Products/Release-iphonesimulator/VisualCore.app --json .autonomy/logs/ua-f11/tracking.json",
+  "elapsed_seconds": 1.157,
+  "exit_code": 0,
+  "finished": "2026-11-13T20:47:15+00:00",
+  "gate": "UA-F11",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F11.no-tracking.log",
+  "log_sha256": "49e96d03515c785581a81289c2a6e99eddcc0e5a9f5ada665e9d69cb667d89b0",
+  "name": "no-tracking",
+  "started": "2026-11-13T20:47:13+00:00",
+  "timed_out": false
+}
