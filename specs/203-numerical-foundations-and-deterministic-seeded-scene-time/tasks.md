@@ -25,7 +25,7 @@ none (no {owner} task). VisualCore changes, so the documentation, API-baseline a
 
 ## Phase 3: User Story 2 — Owned random algorithms (P1)
 
-- [ ] T-R02F03-005 [P] [US2] Tests first in `Packages/VisualCore/Tests/VisualCoreSimulationTests/SeededRandomChoiceTests.swift`:
+- [X] T-R02F03-005 [P] [US2] Tests first in `Packages/VisualCore/Tests/VisualCoreSimulationTests/SeededRandomChoiceTests.swift`: — Verified 2026-11-13: SeededRandomChoiceTests 7 tests (one-draw property, golden shuffle [1,8,3,0,4,5,9,6,2,7], picks, weighted counts [248,0,752], all four errors, no draw on error) pass
   `index(below:)` uses exactly one draw (state after equals one `next()`); golden shuffle of 0…9 with seed 7, a
   permutation, n − 1 draws; `pick` uniform golden and `.empty`; `weightedIndex([1, 0, 3])` 1,000 times from a fixed
   seed never returns 1 and equals golden counts; `.empty`, `.negativeWeight(i)`, `.nonFiniteWeight(i)`, `.zeroTotal`.
