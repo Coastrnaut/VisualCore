@@ -101,7 +101,7 @@ Device-only items: none, so no {device} task.
   "redesign <later code> inside its concept"; a known title and a duplicate slug fail; a changed catalog makes the
   matrix stale; close pairs are rows 1–6; two generations are byte-identical; the message never says merge, drop or
   remove.
-- [ ] T-U11-024 [P] [US6] Write `Configs/known-game-titles.json` (schema 1, at least 50 well-known commercial game
+- [X] T-U11-024 [P] [US6] Write `Configs/known-game-titles.json` (schema 1, at least 50 well-known commercial game — Verified 2026-11-13: Configs/known-game-titles.json schema 1 with 100 unique titles; no launch name matches
   titles, no web lookup).
 - [ ] T-U11-025 [US6] Write `scripts/check_distinctiveness.py` (`--write`, `--check`, `--catalog`, `--titles`)
   and `--json`, producing `docs/legal/distinctiveness-matrix.json` (data-model §5: score "rounded to 4 decimals", close pairs first)
