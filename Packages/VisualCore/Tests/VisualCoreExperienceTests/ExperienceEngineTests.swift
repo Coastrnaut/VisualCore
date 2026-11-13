@@ -159,7 +159,9 @@ private struct StepCore<Length: StepLength>: ExperienceCore, Codable {
         } catch {
             #expect(error == .preparationTimedOut)
         }
-        #expect(clock.now - started < .seconds(5))
+        // The slow sample takes about 60 s unless cancelled; ending within 20 s proves the limit cut it short. The
+        // bound was 5 s until a busy CI runner took 5.6 s (2026-11-13).
+        #expect(clock.now - started < .seconds(20))
         #expect(engine.lifecycle.state == .failed)
         #expect(engine.lifecycle.lastError?.code == "experience.preparation-timeout")
     }
