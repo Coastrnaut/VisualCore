@@ -218,7 +218,7 @@ runtimes.
   `public-api`, `dependencies`, the package tests (`pure-ios27`, `pure-ios26`, `rendering-ios27`,
   `rendering-ios26`, `experiences-ios27`, `experiences-ios26`), and the consumer builds `build-<Scheme>` of the
   remaining schemes.
-- [ ] T-U07-039 Evidence `reference-a` and `reference-b`: the two chunks of the ProjectM reference regression (3 of 3
+- [X] T-U07-039 Evidence `reference-a` and `reference-b`: the two chunks of the ProjectM reference regression (3 of 3 — Verified 2026-11-13: reference-a 3 of 3 (engine xcframework, projectM-iOS simulator build, reference clean) and reference-b 4 of 4 (ANGLE rendering tests and ProjectM reference on iOS 27 and 26) after the last framework change; External/projectm-ios worktree clean (0 changes)
   and 4 of 4) after the last framework change (FR-U07-053; SC-U07-009).
 - [ ] T-U07-040 Evidence `legacy-ledger` (the SHA-256 of `.autonomy/state.json` begins `2604ffd8292cc8a8`), `docs`,
   `steering`, `script-tests`; then confirm with `gh run list` that `ci` and `push-scan` of the last pushed commit
