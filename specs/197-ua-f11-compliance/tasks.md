@@ -32,7 +32,7 @@ Device-only items: none, so no {device} task.
   category, tracking true) each fail (FR-U11-004).
 - [X] T-U11-005 [US1] Modify `scripts/check_privacy_manifest.py`: `--json` writes data-model §7 with `meta` through — Verified 2026-11-13: check_privacy_manifest.py --json writes schema 1 report with meta via write_report; old fields kept; script-tests PASS (script-tests)
   `report_meta.write_report`; also fail on non-empty tracking domains or collected data types (FR-U11-002).
-- [ ] T-U11-006 [US1] Acceptance: `python3 scripts/check_privacy_manifest.py --app "$APP" --json
+- [X] T-U11-006 [US1] Acceptance: `python3 scripts/check_privacy_manifest.py --app "$APP" --json — Verified 2026-11-13: check_privacy_manifest.py --app on the Release app built in release-check-app at d711921 (clean): PASS, 3 categories detected and declared, 0 undeclared, 0 unused (privacy-manifest, release-check-app)
   .autonomy/logs/ua-f11/privacy.json` on the local Release app passes with 0 undeclared and 0 unused (check
   `privacy-manifest`) (SC-U11-001).
 
