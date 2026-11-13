@@ -62,7 +62,7 @@ task. Owner-only items: none.
   the session owns one player and one announcer and offers them to the experience
   (`Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceSession.swift`); a session test that a
   planned feedback reaches the fake sink and the state digest is unchanged.
-- [ ] T-R02F26-015 [US5] Acceptance: app unit tests and the settings interface chunk with a new test that the switch
+- [X] T-R02F26-015 [US5] Acceptance: app unit tests and the settings interface chunk with a new test that the switch — Verified 2026-11-13: app unit 78/78 (app-settings-r2); chunk b with SettingsUITests.testTheHapticsSwitchIsOnByDefaultAndSurvivesARelaunch passed (app-settings, chunk b PASS 266 s) (SC-R02F26-005, SC-R02F26-006)
   survives a relaunch (`Apps/VisualCore/Tests/UI/SettingsUITests.swift`; `release_check.py --only
   app-build-for-testing-ios27 app-unit-ios27 app-ui-ios27-b`, check `app-settings`) (SC-R02F26-005, SC-R02F26-006).
 
