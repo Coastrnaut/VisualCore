@@ -31,3 +31,8 @@
 - **D4 Profile** (`PU/ExperienceTests/ParticleProfileTests.swift`): scripted session (open, play 120 frames, close),
   print `PROFILE: {"source":"simulator", …record…}`; `docs/performance/budgets.md` gains a "Particle Universe" row.
 - **D5** No VisualCore change.
+
+## 2. Analysis record (`/speckit-analyze`, 2026-11-13)
+
+Round 1: 0 critical, 0 high, 2 medium (C1 ceiling wins, C2 paused frames not counted — both added to T-A04-506), 1 low
+(new session starts fresh by construction). Round 2: clean; 17 of 17 requirements and 6 of 6 success criteria covered.
