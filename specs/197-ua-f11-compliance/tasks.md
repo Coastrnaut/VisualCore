@@ -106,7 +106,7 @@ Device-only items: none, so no {device} task.
 - [X] T-U11-025 [US6] Write `scripts/check_distinctiveness.py` (`--write`, `--check`, `--catalog`, `--titles`) — Verified 2026-11-13: scripts/check_distinctiveness.py generated docs/legal/distinctiveness-matrix.json and .md; its tests pass (script-tests)
   and `--json`, producing `docs/legal/distinctiveness-matrix.json` (data-model §5: score "rounded to 4 decimals", close pairs first)
   and `docs/legal/distinctiveness-matrix.md`; generate both.
-- [ ] T-U11-026 [US6] Acceptance: `python3 scripts/check_distinctiveness.py --check` passes with 4,950 pairs and 0
+- [X] T-U11-026 [US6] Acceptance: `python3 scripts/check_distinctiveness.py --check` passes with 4,950 pairs and 0 — Verified 2026-11-13: check_distinctiveness --check PASS: 4950 pairs, 0 shared, max 0.375 (A23/A25), close pairs rows 1-6, 0.1 s (distinctiveness)
   shared (check `distinctiveness`) (SC-U11-006).
 
 ## Phase 9: User Story 7 — Metadata inputs list only integrated experiences (P3)
