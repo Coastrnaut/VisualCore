@@ -16,7 +16,8 @@ API-baseline and reference-regression tasks apply.
 
 - [ ] T-R02F04-002 [US4] Acceptance: the whole VisualCoreRendering scheme (all five test bundles, incl.
   ResourceRegistryTests, RenderHostTests, CleanupSweepTests, ProgramCacheTests) passes on sim-27.2 and sim-26.5 after
-  all changes (checks `rendering-ios27`, `rendering-ios26`) (SC-R02F04-004).
+  all changes (checks `rendering-ios27`, `rendering-ios26`); record the durations of ProgramCacheTests,
+  PipelineTests and DepthTargetTests from the logs, each under 5 s (SC-R02F04-004, SC-R02F04-006).
 
 ## Phase 3: User Story 1 — A program in use is never deleted by the cache (P1)
 
@@ -53,7 +54,8 @@ API-baseline and reference-regression tasks apply.
 - [ ] T-R02F04-011 [US3] Tests first in `Packages/VisualCoreRendering/Tests/VisualCoreRenderingTests/DepthTargetTests.swift`:
   a depth target draws two overlapping triangles far-then-near and near-then-far with `RenderState.opaque3D`; the
   nearer colour wins both times; release frees colour and depth (`liveCount[.renderbuffer]` back to 0); context
-  recreation rejects the old target; zero or over-limit size throws with nothing allocated; pooled targets with and
+  recreation rejects the old target; zero or over-limit size throws with nothing allocated; a host with a budget
+  smaller than one depth target throws the budget error and leaves no colour, depth or framebuffer allocated; pooled targets with and
   without depth are distinct.
 - [ ] T-R02F04-012 [US3] Implement depth in `ResourceRegistry.swift` (`makeRenderTarget(..., depth:)`,
   `acquireTarget(..., depth:)`, pool key with depth, `GL_DEPTH_COMPONENT24` renderbuffer counted as `.renderbuffer`

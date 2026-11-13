@@ -41,3 +41,9 @@ contract no longer shows a stored property inside an extension (it is added to t
 quickstart states expected outcomes. Verified dependencies: VisualCoreRendering and VisualCoreRenderingTests already
 depend on VisualCoreShaderSource (`Packages/VisualCoreRendering/Package.swift`), and the host test target
 `VisualCoreShaderSourceTests` exists.
+
+## 3. Analysis record (`/speckit-analyze`, 2026-11-13)
+
+Round 1: 0 critical, 0 high, 2 medium. C1: budget-exceeded depth target case added to T-R02F04-011 (FR-R02F04-032).
+C2: T-R02F04-002 records the new test classes' durations (SC-R02F04-006). Round 2: 0 findings above low; 21 of 21
+requirements and 6 of 6 success criteria covered.
