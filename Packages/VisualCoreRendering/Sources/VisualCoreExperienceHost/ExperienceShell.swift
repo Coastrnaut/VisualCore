@@ -189,7 +189,18 @@ public final class ExperienceShell<Presenter: ExperiencePresenter>: Experience {
         refreshPort()
         return result
     }
+
+    /// The `Experience` form of `run(_:)`.
+    public func runScenario(_ scenario: ExperienceScenario) -> ExperienceScenarioResult {
+        run(scenario)
+    }
     #endif
+
+    /// The probes the presenter declares for the current state; empty without a state (feature 195).
+    public var frameProbes: [FrameProbe] {
+        guard let core = engine.core else { return [] }
+        return presenter.probes(core)
+    }
 
     // MARK: Scene callbacks
 

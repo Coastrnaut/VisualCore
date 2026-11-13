@@ -30,6 +30,10 @@ public protocol ExperiencePresenter: AnyObject {
     func describe(_ core: Core) -> String
     /// The native controls of the experience; they call `port.send`.
     func makeControls(_ port: ExperienceActionPort) -> AnyView
+    /// Points of the rendered frame whose colour class follows from `core` (feature 195, FR-U09-040): the
+    /// verification runner reads the drawn frame and checks each one. Default: none; every experience that is
+    /// verified declares at least one.
+    func probes(_ core: Core) -> [FrameProbe]
 }
 
 extension ExperiencePresenter {
@@ -37,6 +41,8 @@ extension ExperiencePresenter {
     public func resize(_ context: RenderContext) {}
     /// Does nothing: a presenter without rebuildable caches needs no override.
     public func shedCaches() {}
+    /// No probes.
+    public func probes(_ core: Core) -> [FrameProbe] { [] }
 }
 
 /// One experience as the session host sees it: lifecycle, scene, controls, state description and diagnostics.
@@ -58,6 +64,8 @@ public protocol Experience: AnyObject {
     var diagnostics: ExperienceDiagnostics { get }
     /// What each quality tier of the experience means in numbers (feature 192, UA-F06). Default: one level.
     var qualityProfile: QualityProfile { get }
+    /// The frame probes of the current state (feature 195); empty without a state or without probes.
+    var frameProbes: [FrameProbe] { get }
 
     /// Prepares the state from `seed` off the main actor, under an optional time limit; ends in ready.
     func prepare(seed: UInt64, timeLimit: Duration?) async throws(ExperienceError)
@@ -86,9 +94,16 @@ public protocol Experience: AnyObject {
     /// Ends the leave after the render host was destroyed or its scene replaced; throws `.gpuLeak` when a GPU
     /// object is still live or was leaked.
     func finishDeactivation() throws(ExperienceError)
+    #if DEBUG || VISUALCORE_AUTOMATION
+    /// Runs scripted entries (steps, then an action each) on the active experience through its own reducer and
+    /// refreshes its controls. Only in builds made for testing or for automation.
+    func runScenario(_ scenario: ExperienceScenario) -> ExperienceScenarioResult
+    #endif
 }
 
 extension Experience {
     /// One level: an experience that declares no profile has nothing to step through.
     public var qualityProfile: QualityProfile { .single }
+    /// No probes.
+    public var frameProbes: [FrameProbe] { [] }
 }

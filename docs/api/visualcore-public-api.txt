@@ -447,6 +447,7 @@ VisualCoreExperience | func | public static func isValidName(_ name: String) -> 
 VisualCoreExperience | func | public static func limit(requested: Int?, budgetTotal: Int) -> Int
 VisualCoreExperience | func | public static func luma(r: UInt8, g: UInt8, b: UInt8) -> Double
 VisualCoreExperience | func | public static func normalized(x: Double, y: Double, width: Double, height: Double) -> (x: Double, y: Double)?
+VisualCoreExperience | func | public static func observed(_ observation: ScenarioObservation, experience: ExperienceID, code: String,
 VisualCoreExperience | func | public static func parse(_ environment: [String: String]) -> Result<ScenarioRequest, ScenarioRequestError>?
 VisualCoreExperience | func | public static func pixel(_ rgba: [UInt8], width: Int, height: Int,
 VisualCoreExperience | func | public static func prepare(seed: UInt64, timeLimit: Duration? = nil) async -> Result<Core, ExperienceError>
@@ -469,13 +470,13 @@ VisualCoreExperience | init | public init(_ control: String, _ values: [Double] 
 VisualCoreExperience | init | public init(_ descriptor: ExperienceDescriptor)
 VisualCoreExperience | init | public init(_ failure: ExperienceFailure, stage: SessionStage)
 VisualCoreExperience | init | public init(_ text: String) throws(ExperienceIDError)
-VisualCoreExperience | init | public init(build: String, automation: Bool, qualityTier: String, entitlement: String, process: String)
+VisualCoreExperience | init | public init(build: String, automation: Bool, qualityTier: Int?, entitlement: String, process: String)
 VisualCoreExperience | init | public init(code: String, message: String)
 VisualCoreExperience | init | public init(code: String, newer: Bool)
 VisualCoreExperience | init | public init(commit: String? = nil, dirty: Bool? = nil, tree: String? = nil, submodules: [String: String]? = nil,
 VisualCoreExperience | init | public init(control: String, values: [Double] = [], result: String, digest: String? = nil)
 VisualCoreExperience | init | public init(control: String, values: [Double] = [], step: Int)
-VisualCoreExperience | init | public init(control: String, values: [Double], result: String, reason: String? = nil, digest: StateDigest)
+VisualCoreExperience | init | public init(control: String, values: [Double], result: String, reason: String? = nil, digest: StateDigest?)
 VisualCoreExperience | init | public init(data: Data) throws(CatalogError)
 VisualCoreExperience | init | public init(data: Data) throws(ScenarioManifestError)
 VisualCoreExperience | init | public init(data: Data) throws(SnapshotError)
@@ -830,6 +831,7 @@ VisualCoreExperience | var | public private(set) var seed: UInt64?
 VisualCoreExperience | var | public private(set) var state: ExperienceLifecycleState
 VisualCoreExperience | var | public private(set) var state: SessionState
 VisualCoreExperience | var | public private(set) var stepIndex
+VisualCoreExperience | var | public static var environmentKind: String
 VisualCoreExperience | var | public static var migratedVersions: [Int]
 VisualCoreExperience | var | public static var preparationFailedCode: String
 VisualCoreExperience | var | public static var qualityProfile: QualityProfile
@@ -861,7 +863,7 @@ VisualCoreExperience | var | public var control: String
 VisualCoreExperience | var | public var createHost: Double?
 VisualCoreExperience | var | public var description: String
 VisualCoreExperience | var | public var deviceType: String?
-VisualCoreExperience | var | public var digest: StateDigest
+VisualCoreExperience | var | public var digest: StateDigest?
 VisualCoreExperience | var | public var digests: Digests
 VisualCoreExperience | var | public var dirty: Bool?
 VisualCoreExperience | var | public var effectiveActions: [ScriptedAction]
@@ -927,7 +929,7 @@ VisualCoreExperience | var | public var probes: [ProbeResult]
 VisualCoreExperience | var | public var process: String
 VisualCoreExperience | var | public var programsCompiled: Int?
 VisualCoreExperience | var | public var qualityOverride: Int?
-VisualCoreExperience | var | public var qualityTier: String
+VisualCoreExperience | var | public var qualityTier: Int?
 VisualCoreExperience | var | public var reason: String?
 VisualCoreExperience | var | public var recordSHA256: String?
 VisualCoreExperience | var | public var reduceFlashing: AccessibilityChoice
@@ -973,8 +975,10 @@ VisualCoreExperience | var | public var xcode: String?
 VisualCoreExperienceHost | class | public final class ExperienceActionPort
 VisualCoreExperienceHost | class | public final class ExperienceSession
 VisualCoreExperienceHost | class | public final class ExperienceShell<Presenter: ExperiencePresenter>: Experience
+VisualCoreExperienceHost | class | public final class ScenarioRunner
 VisualCoreExperienceHost | enum | public enum ExperienceHostInfo
 VisualCoreExperienceHost | enum | public enum Key: String, CaseIterable, Sendable
+VisualCoreExperienceHost | enum | public enum ScenarioPhase: String, Sendable, CaseIterable
 VisualCoreExperienceHost | enum | public enum SessionStrings
 VisualCoreExperienceHost | enum | public enum SessionViewID
 VisualCoreExperienceHost | func | public func activate() throws(ExperienceError)
@@ -990,6 +994,7 @@ VisualCoreExperienceHost | func | public func identifier(_ name: String) -> Stri
 VisualCoreExperienceHost | func | public func makeBody(configuration: Configuration) -> some View
 VisualCoreExperienceHost | func | public func open(_ request: ExperienceOpenRequest) async -> SessionOpenResult
 VisualCoreExperienceHost | func | public func prepare(seed: UInt64, timeLimit: Duration? = nil) async throws(ExperienceError)
+VisualCoreExperienceHost | func | public func probes(_ core: Core) -> [FrameProbe]
 VisualCoreExperienceHost | func | public func recreateContext()
 VisualCoreExperienceHost | func | public func refreshQuality(now: Double? = nil)
 VisualCoreExperienceHost | func | public func reset() throws(ExperienceError)
@@ -998,6 +1003,8 @@ VisualCoreExperienceHost | func | public func restore(_ snapshot: ExperienceSnap
 VisualCoreExperienceHost | func | public func resume() throws(ExperienceError)
 VisualCoreExperienceHost | func | public func retry() async -> SessionOpenResult
 VisualCoreExperienceHost | func | public func run(_ scenario: ExperienceScenario) -> ExperienceScenarioResult
+VisualCoreExperienceHost | func | public func run(_ spec: ScenarioSpec, request: RequestMaker, phase: ScenarioPhase = .single,
+VisualCoreExperienceHost | func | public func runScenario(_ scenario: ExperienceScenario) -> ExperienceScenarioResult
 VisualCoreExperienceHost | func | public func send(_ control: String, _ values: [Double] = []) -> ActionResult
 VisualCoreExperienceHost | func | public func send(_ control: String, at point: CGPoint, in size: CGSize) -> ActionResult
 VisualCoreExperienceHost | func | public func setQualityTier(_ tier: Int) throws(ExperienceError)
@@ -1011,32 +1018,45 @@ VisualCoreExperienceHost | init | public init()
 VisualCoreExperienceHost | init | public init(id: ExperienceID, presenter: Presenter, maxStepsPerFrame: Int = 8)
 VisualCoreExperienceHost | init | public init(id: ExperienceID, seed: UInt64, snapshot: ExperienceSnapshot? = nil,
 VisualCoreExperienceHost | init | public init(onCancel: @escaping @MainActor () -> Void)
+VisualCoreExperienceHost | init | public init(session: ExperienceSession)
 VisualCoreExperienceHost | init | public init(session: ExperienceSession, onRetry: (@MainActor () async -> Void)? = nil)
 VisualCoreExperienceHost | init | public init(snapshotSink: SnapshotSink? = nil)
 VisualCoreExperienceHost | init | public init(text: String, onBack: @escaping @MainActor () -> Void)
 VisualCoreExperienceHost | init | public init(title: String, detail: String, code: String,
 VisualCoreExperienceHost | let | public let accessibilityPrefix: String
+VisualCoreExperienceHost | let | public let frame: (pixels: [UInt8], width: Int, height: Int)?
 VisualCoreExperienceHost | let | public let id: ExperienceID
 VisualCoreExperienceHost | let | public let make: @MainActor () -> any Experience
+VisualCoreExperienceHost | let | public let observation: ScenarioObservation
 VisualCoreExperienceHost | let | public let port: ExperienceActionPort
 VisualCoreExperienceHost | let | public let presenter: Presenter
+VisualCoreExperienceHost | let | public let probes: [(name: String, expected: String, observed: String)]
+VisualCoreExperienceHost | let | public let process: String
+VisualCoreExperienceHost | let | public let session: ExperienceSession
+VisualCoreExperienceHost | let | public let snapshot: ExperienceSnapshot?
 VisualCoreExperienceHost | let | public static let back
 VisualCoreExperienceHost | let | public static let cancel
 VisualCoreExperienceHost | let | public static let canvas
+VisualCoreExperienceHost | let | public static let defaultCycles
 VisualCoreExperienceHost | let | public static let failure
+VisualCoreExperienceHost | let | public static let framesPerCycle
+VisualCoreExperienceHost | let | public static let maxFrameAttempts
 VisualCoreExperienceHost | let | public static let message
 VisualCoreExperienceHost | let | public static let minimumSize: CGFloat
 VisualCoreExperienceHost | let | public static let preparing
 VisualCoreExperienceHost | let | public static let retry
 VisualCoreExperienceHost | let | public static let version
+VisualCoreExperienceHost | let | public static let warmUpFrames
 VisualCoreExperienceHost | protocol | public protocol Experience: AnyObject
 VisualCoreExperienceHost | protocol | public protocol ExperiencePresenter: AnyObject
 VisualCoreExperienceHost | struct | public struct ExperienceHostView: View
 VisualCoreExperienceHost | struct | public struct ExperienceOpenRequest
+VisualCoreExperienceHost | struct | public struct ScenarioRunResult: Sendable
 VisualCoreExperienceHost | struct | public struct SessionButtonStyle: ButtonStyle
 VisualCoreExperienceHost | struct | public struct SessionFailureView: View
 VisualCoreExperienceHost | struct | public struct SessionMessageView: View
 VisualCoreExperienceHost | struct | public struct SessionPreparingView: View
+VisualCoreExperienceHost | typealias | public typealias RequestMaker = @MainActor (_ seed: UInt64, _ snapshot: ExperienceSnapshot?) -> ExperienceOpenRequest
 VisualCoreExperienceHost | typealias | public typealias SnapshotSink = @MainActor (ExperienceSnapshot) throws -> Void
 VisualCoreExperienceHost | var | @ObservationIgnored public private(set) var hostsAlive
 VisualCoreExperienceHost | var | @ObservationIgnored public private(set) var lastPerformanceRecord: PerformanceRecord?
@@ -1062,6 +1082,7 @@ VisualCoreExperienceHost | var | public var budget: ResourceBudget
 VisualCoreExperienceHost | var | public var controls: AnyView
 VisualCoreExperienceHost | var | public var diagnostics: ExperienceDiagnostics
 VisualCoreExperienceHost | var | public var diagnostics: SessionDiagnostics
+VisualCoreExperienceHost | var | public var frameProbes: [FrameProbe]
 VisualCoreExperienceHost | var | public var memoryPressureLimit: Int?
 VisualCoreExperienceHost | var | public var performanceRecord: PerformanceRecord?
 VisualCoreExperienceHost | var | public var qualityLevel: Int
@@ -1071,6 +1092,7 @@ VisualCoreExperienceHost | var | public var scene: any RenderScene
 VisualCoreExperienceHost | var | public var seed: UInt64
 VisualCoreExperienceHost | var | public var snapshot: ExperienceSnapshot?
 VisualCoreExperienceHost | var | public var state: ExperienceLifecycleState
+VisualCoreExperienceHost | var | public var surfaceSize
 VisualCoreExperienceHost | var | public var timeLimit: Duration
 VisualCoreMath | enum | public enum EasingCurve: String, CaseIterable, Sendable, Codable
 VisualCoreMath | enum | public enum EasingMode: String, CaseIterable, Sendable, Codable

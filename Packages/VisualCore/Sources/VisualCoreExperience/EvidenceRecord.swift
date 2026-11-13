@@ -174,8 +174,8 @@ public struct EvidenceRecord: Sendable, Equatable, Codable {
         public var build: String
         /// Whether the automation hooks were compiled in.
         public var automation: Bool
-        /// The quality tier the experience ran at.
-        public var qualityTier: String
+        /// The quality level the experience ran at (0 is the best); nil when none was set.
+        public var qualityTier: Int?
         /// The entitlement, `none` for a scenario run.
         public var entitlement: String
         /// `two-launch` or `single`.
@@ -188,12 +188,22 @@ public struct EvidenceRecord: Sendable, Equatable, Codable {
         }
 
         /// Creates a configuration.
-        public init(build: String, automation: Bool, qualityTier: String, entitlement: String, process: String) {
+        public init(build: String, automation: Bool, qualityTier: Int?, entitlement: String, process: String) {
             self.build = build
             self.automation = automation
             self.qualityTier = qualityTier
             self.entitlement = entitlement
             self.process = process
+        }
+
+        /// Encodes every key, a missing quality tier as `null`.
+        public func encode(to encoder: any Encoder) throws {
+            var c = encoder.container(keyedBy: CodingKeys.self)
+            try c.encode(build, forKey: .build)
+            try c.encode(automation, forKey: .automation)
+            try c.encode(qualityTier, forKey: .qualityTier)
+            try c.encode(entitlement, forKey: .entitlement)
+            try c.encode(process, forKey: .process)
         }
     }
 
@@ -207,15 +217,15 @@ public struct EvidenceRecord: Sendable, Equatable, Codable {
         public var result: String
         /// Why the step had its result; `null` when there is nothing to say.
         public var reason: String?
-        /// The state digest after the step.
-        public var digest: StateDigest
+        /// The state digest after the step; `null` when the step stopped before a digest existed.
+        public var digest: StateDigest?
 
         enum CodingKeys: String, CodingKey {
             case control, values, result, reason, digest
         }
 
         /// Creates a step.
-        public init(control: String, values: [Double], result: String, reason: String? = nil, digest: StateDigest) {
+        public init(control: String, values: [Double], result: String, reason: String? = nil, digest: StateDigest?) {
             self.control = control
             self.values = values
             self.result = result

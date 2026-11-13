@@ -44,6 +44,15 @@ final class SamplePresenter<Fault: SampleFault>: ExperiencePresenter {
     var failsInDraw = false
     /// `teardown` does not release the texture (a deliberate leak).
     var keepsTextureOnTeardown = false
+    /// `draw` clears to black and nothing else (a blank frame; feature 195).
+    var drawsBlank = false
+    /// The class the centre probe declares instead of the true one (a wrong probe; feature 195).
+    var wrongProbe: String?
+    /// `draw` adds a mark in the contrasting grey to the lower-left corner, so that the frame is never one colour
+    /// (feature 195, the non-blank check). Off by default: a scissored clear on every frame grows the memory
+    /// footprint on the iOS 26.5 simulator (observed 2026-11-12 with the UA-F06 endurance test: 9.3 MB over
+    /// 36,000 frames, flat without it), so only the verification tests turn it on.
+    var marksCorner = false
 
     init() {}
 
@@ -63,8 +72,22 @@ final class SamplePresenter<Fault: SampleFault>: ExperiencePresenter {
         drawCalls += 1
         lastTier = tier
         if failsInDraw { throw SamplePresenterError(stage: "draw") }
+        if drawsBlank {
+            vcglClearColor(0, 0, 0, 1)
+            vcglClear(GLbitfield(GL_COLOR_BUFFER_BIT))
+            return
+        }
         vcglClearColor(Float(core.x) / 15, Float(core.y) / 15, Float(core.tone), 1)
         vcglClear(GLbitfield(GL_COLOR_BUFFER_BIT))
+        guard marksCorner else { return }
+        // A corner mark in the contrasting grey, so that the frame is never one colour (feature 195, FR-U09-040).
+        let light = (0.2126 * Double(core.x) / 15 + 0.7152 * Double(core.y) / 15 + 0.0722 * core.tone) > 0.5
+        let mark: Float = light ? 0 : 1
+        vcglEnable(GLenum(GL_SCISSOR_TEST))
+        vcglScissor(0, 0, GLsizei(max(1, context.pixelWidth / 4)), GLsizei(max(1, context.pixelHeight / 4)))
+        vcglClearColor(mark, mark, mark, 1)
+        vcglClear(GLbitfield(GL_COLOR_BUFFER_BIT))
+        vcglDisable(GLenum(GL_SCISSOR_TEST))
     }
 
     func teardown(_ context: RenderContext) {
@@ -76,6 +99,13 @@ final class SamplePresenter<Fault: SampleFault>: ExperiencePresenter {
 
     func shedCaches() {
         shedCalls += 1
+    }
+
+    /// The centre of the frame shows the state's colour class (feature 195).
+    func probes(_ core: SampleExperienceCore<Fault>) -> [FrameProbe] {
+        let pixel = expectedPixel(for: core)
+        let expected = FrameChecks.classify(r: UInt8(pixel.0), g: UInt8(pixel.1), b: UInt8(pixel.2)).rawValue
+        return [FrameProbe(name: "centre", x: 0.5, y: 0.5, expected: wrongProbe ?? expected)].compactMap { $0 }
     }
 
     func describe(_ core: SampleExperienceCore<Fault>) -> String {

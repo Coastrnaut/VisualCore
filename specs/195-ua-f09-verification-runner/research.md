@@ -205,3 +205,21 @@ VISUALCORE_AUTORUN_EXPERIENCE` on the Release app (0 found). `check_experience_s
 planted defects in a temporary copy of the files. With `--runtime`, it also runs the sample path, including the
 `LossySnapshot` fault variant, whose save-restore must fail. The driver must exit non-zero and name the
 scenario and the expectation for that case. **Rationale**: FR-U09-025, SC-U09-002.
+
+## 3. As built (2026-11-12)
+
+- The runner resets the experience right after the open's first frame, so a scenario starts from the state of a
+  fresh preparation and its digests do not depend on how many frames the open drew. A restore opens with the scene
+  in the background, so the restored state is read before any frame advances it.
+- Endurance counts simulated time: 60 frames of 1/60 s per second, drawn in 60 blocks with one resource sample
+  each, after a warm-up of 120 frames. A wall-clock loop with yields between frames grew the footprint by hundreds of
+  megabytes; the block pattern of UA-F06 does not.
+- Observation: a scissored clear on every frame grows the memory footprint on the iOS 26.5 simulator (9.3 MB over
+  36,000 frames in the UA-F06 endurance test; flat without it). The sample presenter therefore draws its contrasting
+  corner mark only when a verification test asks for it. The renderer is not changed.
+- `MutatingRejection` cannot be observed through a session, because the engine discards a rejected action's
+  changes; the deliberately failing state change of the runner tests is `WrongReset`.
+- The sample's manifest is built in the test file from committed digests and a bare engine run. A JSON
+  fixture is not needed; the manifest's JSON round trip is tested.
+- `Experience` gained `frameProbes` and, in builds for testing or automation, `runScenario(_:)`; the runner plays
+  entries through it, which hands each action to the engine's reducer as `handle(control:values:)` does.

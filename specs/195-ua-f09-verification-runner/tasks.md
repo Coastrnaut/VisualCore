@@ -64,7 +64,7 @@ Commit after every task (`python3 scripts/tick_task.py`), and push with `python3
 
 **Independent test**: `ScenarioRunnerTests` on both simulator runtimes.
 
-- [ ] T-U09-013 [US2] Tests first: `Packages/VisualCoreRendering/Tests/VisualCoreExperienceHostTests/ScenarioRunnerTests.swift` with the fixture `Fixtures/sample-manifest.json` (nine scenarios; seeds and digests from the sample's committed goldens). Cover:
+- [X] T-U09-013 [US2] Tests first: `Packages/VisualCoreRendering/Tests/VisualCoreExperienceHostTests/ScenarioRunnerTests.swift` with the fixture `Fixtures/sample-manifest.json` (nine scenarios; seeds and digests from the sample's committed goldens). Cover: — Verified 2026-11-12: xcodebuild_package.py VisualCoreRendering --only-testing VisualCoreExperienceHostTests on sim-27.2 and sim-26.5: 144 tests, 0 failures each (ScenarioRunnerTests 15: nine standard scenarios pass; LossySnapshot fails save-restore, WrongReset fails reset, a blank frame and a wrong probe fail; endurance 3,600 frames flat)
   - Each of the nine passes with `SamplePresenter<NoFault>`.
   - `LossySnapshot` fails save-restore and `MutatingRejection` fails rejection, each with the named expectation.
   - A presenter that draws black fails launch-first-frame with "blank", and a probe expecting `red` on a blue frame fails.

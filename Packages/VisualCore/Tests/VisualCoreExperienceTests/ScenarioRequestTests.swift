@@ -136,7 +136,7 @@ import VisualCoreExperience
         EvidenceRecord(
             experience: "a05.infinite-geometry", code: "A05", scenario: "launch-first-frame", seed: "42", result: .pass,
             run: EvidenceRecord.Run(id: "run-1"), environment: EvidenceRecord.Environment(kind: "simulator"),
-            configuration: EvidenceRecord.Configuration(build: "Debug", automation: true, qualityTier: "high",
+            configuration: EvidenceRecord.Configuration(build: "Debug", automation: true, qualityTier: 1,
                                                         entitlement: "none", process: "single"),
             steps: [EvidenceRecord.Step(control: "tone", values: [0.5], result: "applied", digest: digest)],
             digests: EvidenceRecord.Digests(initial: digest, final: digest),
