@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "python3",
+    "scripts/release_check.py",
+    "--only",
+    "app-release-build",
+    "app-release-symbols",
+    "app-privacy-manifest"
+  ],
+  "command": "python3 scripts/release_check.py --only app-release-build app-release-symbols app-privacy-manifest",
+  "elapsed_seconds": 23.834,
+  "exit_code": 0,
+  "finished": "2026-11-13T20:25:20+00:00",
+  "gate": "R02-F26",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-F26.release-app-r2.log",
+  "log_sha256": "3cc7a8ed18aca078e00d1cba6db733341466c21fadc57975207787c05f5cb6f7",
+  "name": "release-app-r2",
+  "started": "2026-11-13T20:24:57+00:00",
+  "timed_out": false
+}
