@@ -49,7 +49,7 @@ each task. Tests before code. Owner-only items: none. One {device} task. No Visu
 
 ## Phase 6: Polish
 
-- [ ] T-A04-512 ExperiencesCreative on sim-26.5 (check `experiences-ios26`) and on sim-27.2 (check `experiences-ios27`);
+- [X] T-A04-512 ExperiencesCreative on sim-26.5 (check `experiences-ios26`) and on sim-27.2 (check `experiences-ios27`); — Verified 2026-11-13: ExperiencesCreative PASS on sim-27.2 and sim-26.5 (A04-P05/experiences-ios27, ios26); new unit tests run in well under 10 s (SC-A04-506)
   new unit tests under 10 s (SC-A04-506).
 - [ ] T-A04-513 `python3 scripts/test_scripts.py` (check `script-tests`); `git diff --stat` over `Packages/VisualCore` and
   `Packages/VisualCoreRendering` for the phase's commits is empty (FR-A04-540).
