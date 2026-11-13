@@ -80,7 +80,7 @@ struct FractalControls: View {
                 field("Zoom", text: $zoom, identifier: "goto.zoom")
                 button("Go", identifier: "goto.go") { goTo() }
                 if let goToError {
-                    Text(verbatim: goToError).font(.footnote).foregroundStyle(.red)
+                    Text(verbatim: goToError).font(.footnote).foregroundStyle(.primary)   // primary, not red: small red text fails contrast (E-12)
                         .accessibilityIdentifier(port.identifier("goto.error"))
                 }
             }
@@ -182,7 +182,7 @@ struct FractalControls: View {
                 }
             }
             if let message = library.errorMessage {
-                Text(verbatim: message).font(.footnote).foregroundStyle(.red)
+                Text(verbatim: message).font(.footnote).foregroundStyle(.primary)   // primary, not red: small red text fails contrast (E-12)
                     .accessibilityIdentifier(port.identifier("bookmark.error"))
             }
             if library.unreadable > 0 {
@@ -267,12 +267,17 @@ struct FractalControls: View {
     }
 
     private func field(_ title: String, text: Binding<String>, identifier: String) -> some View {
-        TextField(text: text) { Text(verbatim: title) }
-            .textFieldStyle(.roundedBorder)
-            .keyboardType(.numbersAndPunctuation)
-            .frame(minHeight: 44)
-            .accessibilityLabel(Text(verbatim: title))
-            .accessibilityIdentifier(port.identifier(identifier))
+        // The name is a label above the field, which wraps; the field's placeholder is short, so nothing clips at the
+        // largest text sizes (E-12).
+        VStack(alignment: .leading, spacing: 4) {
+            Text(verbatim: title).font(.subheadline).accessibilityHidden(true)
+            TextField(text: text) { Text(verbatim: "0") }
+                .textFieldStyle(.roundedBorder)
+                .keyboardType(.numbersAndPunctuation)
+                .frame(minHeight: 44)
+                .accessibilityLabel(Text(verbatim: title))
+                .accessibilityIdentifier(port.identifier(identifier))
+        }
     }
 
     private func seedSlider(_ title: String, identifier: String, value: Double,

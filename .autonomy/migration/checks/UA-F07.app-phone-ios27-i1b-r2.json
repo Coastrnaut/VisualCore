@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_app.py",
+    "--scheme",
+    "VisualCore",
+    "--runtime",
+    "27.2",
+    "--kind",
+    "phone",
+    "--only-testing",
+    "VisualCoreUITests/FEAccessibilityAuditUITests/testAuditLargestAccessibilityTextSize",
+    "--log-name",
+    "ua-f07-i1b-r2"
+  ],
+  "command": "python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime 27.2 --kind phone --only-testing VisualCoreUITests/FEAccessibilityAuditUITests/testAuditLargestAccessibilityTextSize --log-name ua-f07-i1b-r2",
+  "elapsed_seconds": 136.234,
+  "exit_code": 1,
+  "finished": "2026-11-13T14:41:21+00:00",
+  "gate": "UA-F07",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F07.app-phone-ios27-i1b-r2.log",
+  "log_sha256": "36136f0597d70c959c449ac9d1dafca231f8cdd006ca54a140049b5d4c2dd0f8",
+  "name": "app-phone-ios27-i1b-r2",
+  "started": "2026-11-13T14:39:05+00:00",
+  "timed_out": false
+}

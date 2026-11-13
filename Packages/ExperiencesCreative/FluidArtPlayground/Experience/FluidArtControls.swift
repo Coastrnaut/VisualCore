@@ -112,7 +112,7 @@ struct FluidArtControls: View {
                     }
                 }
                 if let captureError {
-                    Text(verbatim: captureError).font(.footnote).foregroundStyle(.red)
+                    Text(verbatim: captureError).font(.footnote).foregroundStyle(.primary)   // primary, not red: small red text fails contrast (E-12)
                         .accessibilityIdentifier(port.identifier("capture.message"))
                 }
             }

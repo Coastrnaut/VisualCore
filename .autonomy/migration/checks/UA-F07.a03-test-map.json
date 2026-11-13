@@ -1,0 +1,31 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_test_map.py",
+    "--map",
+    "specs/193-ua-f07-legacy-adoption/test-map.csv",
+    "--old",
+    "Apps/FractalExplorer/Tests/UI",
+    "--new",
+    "Apps/VisualCore/Tests/UI",
+    "--app",
+    "FractalExplorer",
+    "--log",
+    ".autonomy/logs/app-tests/ua-f07-i1a-r2.log",
+    ".autonomy/logs/app-tests/ua-f07-i1b-r3.log",
+    ".autonomy/logs/app-tests/ua-f07-phone-ios27-i2.log",
+    ".autonomy/logs/app-tests/ua-f07-phone-ios27-b-r2.log",
+    ".autonomy/logs/app-tests/ua-f07-phone-ios27-d.log"
+  ],
+  "command": "python3 scripts/check_test_map.py --map specs/193-ua-f07-legacy-adoption/test-map.csv --old Apps/FractalExplorer/Tests/UI --new Apps/VisualCore/Tests/UI --app FractalExplorer --log .autonomy/logs/app-tests/ua-f07-i1a-r2.log .autonomy/logs/app-tests/ua-f07-i1b-r3.log .autonomy/logs/app-tests/ua-f07-phone-ios27-i2.log .autonomy/logs/app-tests/ua-f07-phone-ios27-b-r2.log .autonomy/logs/app-tests/ua-f07-phone-ios27-d.log",
+  "elapsed_seconds": 0.042,
+  "exit_code": 2,
+  "finished": "2026-11-13T14:58:22+00:00",
+  "gate": "UA-F07",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F07.a03-test-map.log",
+  "log_sha256": "b9868bc78ebac31bd24541e965b2340bb873ee400c3aec11ec10f508b130e825",
+  "name": "a03-test-map",
+  "started": "2026-11-13T14:58:22+00:00",
+  "timed_out": false
+}

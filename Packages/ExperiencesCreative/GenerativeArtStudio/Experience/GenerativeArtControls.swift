@@ -207,7 +207,7 @@ struct GenerativeArtControls: View {
                 }
             }
             if let message = library.errorMessage {
-                Text(verbatim: message).font(.footnote).foregroundStyle(.red)
+                Text(verbatim: message).font(.footnote).foregroundStyle(.primary)   // primary, not red: small red text fails contrast (E-12)
                     .accessibilityIdentifier(port.identifier("library.error"))
             }
             if library.unreadable > 0 {
@@ -243,7 +243,7 @@ struct GenerativeArtControls: View {
                 }
             }
             if let exportError {
-                Text(verbatim: exportError).font(.footnote).foregroundStyle(.red)
+                Text(verbatim: exportError).font(.footnote).foregroundStyle(.primary)   // primary, not red: small red text fails contrast (E-12)
                     .accessibilityIdentifier(port.identifier("export.error"))
             }
         }
