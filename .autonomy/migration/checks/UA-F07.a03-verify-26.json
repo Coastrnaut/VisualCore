@@ -1,0 +1,22 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--only",
+    "a03.fractal-explorer",
+    "--runtime",
+    "26",
+    "--fresh"
+  ],
+  "command": "python3 scripts/verify_experiences.py --only a03.fractal-explorer --runtime 26 --fresh",
+  "elapsed_seconds": 17.139,
+  "exit_code": 0,
+  "finished": "2026-11-13T14:03:20+00:00",
+  "gate": "UA-F07",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/UA-F07.a03-verify-26.log",
+  "log_sha256": "2b7982e9ad21bc41a00bf00a1facdaab9e1131bfda6915e5233ea77dd45b1d06",
+  "name": "a03-verify-26",
+  "started": "2026-11-13T14:03:03+00:00",
+  "timed_out": false
+}

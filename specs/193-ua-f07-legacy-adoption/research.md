@@ -288,3 +288,16 @@ The dossier files are not edited. The legacy ledger is untouched; its hash is co
       Documents and Library listings before and after the session, because a package test has no app container;
     - `IconRenderTests` reads the icon kept in `docs/apps/fluid-art-playground/history`.
   - With two products, the package's scheme is `ExperiencesCreative-Package`.
+- **A03 adapter (T-U07-023, T-U07-024, 2026-11-13).**
+  - The core keeps a `PlaneFraming` (centre and span across the shorter side), so its state does not depend on the
+    view's size. `pan` and `pinch` carry distances in units of the view's shorter side. A host test and a session
+    test show they give the standalone `PlaneViewport` and `ExplorerModel` results for several sizes.
+  - The precision limit uses fixed constants (23 mantissa bits, 3 pixels per point, a 1,024-point side).
+  - Tours replay the app's `TourTimeline` at the core's elapsed step time, and the palette animates by the core's
+    time: neither uses `systemUptime`.
+  - The completion scenario's outcome is `deep-zoom` (1,000×).
+  - The presenter calls the app's `FractalScene.bind` and renders its inner scene with the core's palette time. There
+    is no CPU fallback picture: a shader failure fails the session's setup.
+  - The probe is the view's centre, declared only while a 9 × 9 grid around it lies inside the set by the CPU's
+    `FractalMath`; the shader draws such points black.
+  - `GoToTarget` has no public initializer, so the core applies its rule (span = default width ÷ zoom).

@@ -161,7 +161,7 @@ runtimes.
   - the cap, palette, animation and seed;
   - go-to parsing stays in the controls, and the core takes numbers;
   - tours and palette animation advance with steps, never with `systemUptime`.
-- [ ] T-U07-024 [US3] `FractalCore`, `FractalPresenter` (the viewport is derived from the drawable size, and pointer events
+- [X] T-U07-024 [US3] `FractalCore`, `FractalPresenter` (the viewport is derived from the drawable size, and pointer events — Verified 2026-11-13: FractalCore and manifest (host 13/13, a03-core-host), FractalPresenter (viewport from the drawable, palette time from the core, pan and pinch from touches as ExplorerModel moves them, centre-inside probe), FractalControls (family, view, go-to parsed by GoToInput, iterations with cost, palettes and animation, Julia seed, tours, bookmarks via ExperienceStorage, capture via the still renderer and ShareLink; labels and 44 pt), FractalBookmarks, static framework FractalExplorerExperience and candidate registration; FractalSessionTests 5/5 incl. framing parity with ExplorerModel for 3 seeds and sizes on iOS 27.2 and 26.5 (a03-session-ios27/26); runner 9/9 on 27.2 and 26.5 (a03-verify-27, a03-verify-26). E-12 at the largest text size is checked by the ported audit (T-U07-025)
   become `pan` and `pinch`), `FractalControls` (with bookmarks through `ExperienceStorage` and go-to), and
   `FractalManifest`; the framework target and candidate; session tests on both runtimes; framing parity for 3 seeds;
   capture through the share interface; controls meeting E-12 (FR-U07-020, FR-U07-022).
