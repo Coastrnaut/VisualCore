@@ -29,7 +29,7 @@
 - [X] T-A06-211 Runner iOS 27 (`python3 Tools/python/desktop_runbook.py run-check --stage A06-P02 --timeout 600 --name verify-27 -- python3 scripts/verify_experiences.py --only a06.visualcore-music-lab --runtime 27`; digests unchanged) — Verified 2026-11-14: — Verified 2026-11-14: .autonomy/checks/A06-P02.verify-27.json (0 failures; manifest digests unchanged)
 - [X] T-A06-212 Public API and docs: `check_public_api.py --update`, `python3 Tools/python/desktop_runbook.py run-check --stage A06-P02 --timeout 600 --name public-api -- python3 scripts/check_public_api.py`; `Packages/VisualCore/README.md` (VisualCoreAudioDSP section), `Auto-Creator.md` §13 row, `docs/apps/visualcore-music-lab/visualcore-contract.{json,md}` G-AUDIODSP marked built in A06-P02 (validate_autocreator) — Verified 2026-11-14: — Verified 2026-11-14: .autonomy/checks/A06-P02.public-api.json; README, Auto-Creator §13, contract rows M06–M14/M16 available, G-AUDIODSP closed (check_app_contract PASS)
 - [X] T-A06-213 Script tests (`python3 Tools/python/desktop_runbook.py run-check --stage A06-P02 --timeout 600 --name script-tests -- python3 scripts/test_scripts.py`) — Verified 2026-11-14: — Verified 2026-11-14: .autonomy/checks/A06-P02.script-tests.json
-- [ ] T-A06-214 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A06-P02
+- [X] T-A06-214 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A06-P02 — Verified 2026-11-14: — Verified 2026-11-14: converge round 1 appended T-A06-215..216 (done), round 2 converged with no findings
 
 ## Phase 5: Convergence
 
