@@ -26,7 +26,7 @@
 
 ## Phase 5: Polish & evidence
 
-- [ ] T-A05-509 Framework host tests (`python3 Tools/python/desktop_runbook.py run-check --stage A05-P05 --timeout 600 --name visualcore-host -- swift test --package-path Packages/VisualCore --filter "MeshCacheTests|TessellationChoiceTests"`)
+- [X] T-A05-509 Framework host tests (`python3 Tools/python/desktop_runbook.py run-check --stage A05-P05 --timeout 600 --name visualcore-host -- swift test --package-path Packages/VisualCore --filter "MeshCacheTests|TessellationChoiceTests"`) — Verified 2026-11-13: 2026-11-13 .autonomy/checks/A05-P05.visualcore-host.json (exit 0)
 - [ ] T-A05-510 Experiences package on sim-27.2 (`python3 Tools/python/desktop_runbook.py run-check --stage A05-P05 --timeout 600 --name experiences-ios27 -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test`)
 - [ ] T-A05-511 Experiences package on sim-26.5 (`python3 Tools/python/desktop_runbook.py run-check --stage A05-P05 --timeout 600 --name experiences-ios26 -- … --destination sim-26.5 --action test`)
 - [ ] T-A05-512 App build and unit (`xcodegen generate --spec project.yml` first, then `python3 Tools/python/desktop_runbook.py run-check --stage A05-P05 --timeout 600 --name app-unit -- python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27`)
