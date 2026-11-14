@@ -100,7 +100,11 @@ final class MusicLabAnalysisTests: XCTestCase {
             try await Task.sleep(for: .milliseconds(16))
             XCTAssertTrue(host.renderOneFrame(present: false))
             let isBeat = shell.presenter.lastDisplay.isBeat
-            if isBeat, !above { beats += 1 }
+            if isBeat, !above {
+                beats += 1
+                // Convergence T-A06-216 (US1/AC3, FR-A06-212): the spoken description names the beat.
+                XCTAssertTrue(shell.presenter.describe(try XCTUnwrap(shell.engine.core)).hasSuffix(", beat."))
+            }
             above = isBeat
         }
         XCTAssertGreaterThanOrEqual(beats, 3, "beats in the demo note sequence")

@@ -38,6 +38,7 @@ VisualCoreAudioDSP | enum | public enum AudioDSPInfo
 VisualCoreAudioDSP | enum | public enum LevelMeter
 VisualCoreAudioDSP | enum | public enum Mode: Int, Sendable, CaseIterable
 VisualCoreAudioDSP | func | public func analyze(_ samples: UnsafeBufferPointer<Float>, time: Double, elapsed: Double) -> AudioFeatures
+VisualCoreAudioDSP | func | public func analyze(_ samples: UnsafeBufferPointer<Float>, time: Double, elapsed: Double,
 VisualCoreAudioDSP | func | public func bandDB(_ index: Int) -> Float
 VisualCoreAudioDSP | func | public func latest(_ count: Int, into out: inout [Float]) -> Int
 VisualCoreAudioDSP | func | public func magnitudesDB(_ frame: [Float]) -> [Float]
@@ -100,10 +101,10 @@ VisualCoreAudioDSP | struct | public struct DemoSignal: Sendable
 VisualCoreAudioDSP | struct | public struct FeatureSmoother: Sendable, Equatable
 VisualCoreAudioDSP | struct | public struct OnsetDetector: Sendable
 VisualCoreAudioDSP | struct | public struct SpectrumAnalyzer: Sendable
-VisualCoreAudioDSP | var | public private(set) var features: AudioFeatures
 VisualCoreAudioDSP | var | public private(set) var value: Float
 VisualCoreAudioDSP | var | public var bandEnergies: [Float]
 VisualCoreAudioDSP | var | public var beatEnergy: Float
+VisualCoreAudioDSP | var | public var features: AudioFeatures
 VisualCoreAudioDSP | var | public var flux: Float
 VisualCoreAudioDSP | var | public var onset: Bool
 VisualCoreAudioDSP | var | public var peak: Float

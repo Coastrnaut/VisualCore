@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/VisualCore",
+    "--filter",
+    "VisualCoreAudioDSPTests"
+  ],
+  "command": "swift test --package-path Packages/VisualCore --filter VisualCoreAudioDSPTests",
+  "elapsed_seconds": 2.524,
+  "exit_code": 0,
+  "finished": "2026-11-14T07:54:15+00:00",
+  "log": ".autonomy/logs/A06-P02.dsp-host-2.log",
+  "log_sha256": "73267098151c11a285766cf784e33aa3029533299174bcd1d370a1113bcdfdeb",
+  "name": "dsp-host-2",
+  "stage": "A06-P02",
+  "started": "2026-11-14T07:54:12+00:00",
+  "timed_out": false
+}

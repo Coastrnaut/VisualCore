@@ -134,3 +134,22 @@ func aToneFillsItsOwnBand(frequency: Double) throws {
     #expect(FeatureExtractor(sampleRate: rate, bandCount: 0) == nil)
     #expect(FeatureExtractor(sampleRate: rate)?.layout.bandCount == 16)
 }
+
+@Test func analysisReusesTheCallersBandStorage() throws {
+    // Convergence T-A06-215 (FR-A06-205): writing into a caller-held feature set keeps its band storage, so no
+    // allocation happens per call; the base address stays the same over 100 analyses of a changing signal.
+    let extractor = try #require(FeatureExtractor(sampleRate: rate))
+    let signal = tone(440, seconds: 0.2)
+    var out = AudioFeatures.silent(bandCount: extractor.layout.bandCount)
+    let base = out.bandEnergies.withUnsafeBufferPointer { $0.baseAddress }
+    signal.withUnsafeBufferPointer { all in
+        for i in 0..<100 {
+            let end = extractor.size + (i * 64) % (all.count - extractor.size)
+            extractor.analyze(UnsafeBufferPointer(rebasing: all[(end - extractor.size)..<end]), time: Double(i) / 60,
+                              elapsed: 1.0 / 60, into: &out)
+        }
+    }
+    #expect(out.bandEnergies.withUnsafeBufferPointer { $0.baseAddress } == base)
+    #expect(out.rms > 0)
+    #expect(out == extractor.features)
+}

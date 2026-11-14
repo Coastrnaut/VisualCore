@@ -244,10 +244,11 @@ final class MusicLabPresenter: ExperiencePresenter {
             extractor = FeatureExtractor(size: Self.analysisSize, sampleRate: rate)
         }
         guard let extractor else { return }
-        let features = scratch.withUnsafeBufferPointer { all in
-            extractor.analyze(UnsafeBufferPointer(rebasing: all[0..<drawn]), time: frame.time, elapsed: frame.delta)
+        scratch.withUnsafeBufferPointer { all in
+            extractor.analyze(UnsafeBufferPointer(rebasing: all[0..<drawn]), time: frame.time, elapsed: frame.delta,
+                              into: &lastFeatures)
         }
-        lastFeatures = features
+        let features = lastFeatures
         let bandDB = (0..<features.bandEnergies.count).map { features.bandDB($0) }
         lastDisplay = AnalysisDisplay(bandDB: bandDB, rmsDB: features.rmsDB, peakDB: features.peakDB,
                                       beat: features.beatEnergy)

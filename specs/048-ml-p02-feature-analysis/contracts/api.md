@@ -37,8 +37,9 @@ public struct AudioFeatures: Sendable, Equatable {
 public final class FeatureExtractor {
   public static let beatAttack: Double; public static let beatRelease: Double   // 0.01, 0.25
   public init?(size: Int = 1_024, sampleRate: Double, bandCount: Int = 16)
-  public let layout: BandLayout; public private(set) var features: AudioFeatures
+  public let layout: BandLayout; public var features: AudioFeatures { get }       // a new value per read
   @discardableResult public func analyze(_ samples: UnsafeBufferPointer<Float>, time: Double, elapsed: Double) -> AudioFeatures
+  public func analyze(_ samples: UnsafeBufferPointer<Float>, time: Double, elapsed: Double, into out: inout AudioFeatures)  // T-A06-215: no allocation
   public func reset()
 }
 ```
