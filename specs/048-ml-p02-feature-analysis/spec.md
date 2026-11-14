@@ -66,7 +66,8 @@ primary capability ("authorized audio input, FFT and visual mapping").
 1. **Given** the demo 1 kHz tone, **When** a frame is drawn, **Then** the highest spectrum bar is the band containing
    1 kHz and the level meter reads the tone's level (RMS of a sine of amplitude 0.5 ≈ −9 dBFS) within 1 dB.
 2. **Given** the demo note sequence (one note every half second), **When** frames are drawn over two seconds, **Then**
-   the beat meter rises at each note start and decays between notes.
+   the beat meter shows at least three separate beats (rising above 0.5 and falling below it again); the exact
+   timing within one hop is proven by the analysis fixtures of story 3.
 3. **Given** any source, **When** the person uses VoiceOver, **Then** the canvas description states the source, the level
    in words and whether a beat is present.
 
@@ -119,6 +120,8 @@ The level, band, flux, onset and smoothing calculations are correct on known sig
 - Non-finite samples (corrupt decoder output): treated as 0 for analysis.
 - Switching source: smoothing restarts from zero so the previous source's beat does not linger.
 - A frame-rate drop: smoothing uses the actual frame interval, so decay time stays the same in seconds.
+- A source that delivers no new samples between two frames (paused file, stopped microphone): the same window is
+  analysed again; flux is 0, so no new onset is reported and the beat meter decays.
 
 ## Requirements *(mandatory)*
 
@@ -172,7 +175,7 @@ The level, band, flux, onset and smoothing calculations are correct on known sig
 - **SC-A06-202**: For tones at 100 Hz, 1 kHz and 5 kHz, the band holding the tone has the highest energy, and band
   energies sum to the covered bins' energy within 1e-4 relative.
 - **SC-A06-203**: On a 4-second click train with clicks every 0.5 s, 100% of clicks produce an onset within one hop and
-  no onset occurs between clicks; on silence and a steady tone, no onset occurs.
+  no onset occurs between clicks; on silence, and on a steady tone after its first window, no onset occurs.
 - **SC-A06-204**: A step reaches 63% ± one frame interval after the attack time and decays to 37% ± one frame interval
   after the release time, at both 30 and 120 updates per second.
 - **SC-A06-205**: In the experience, demo silence gives all meters at zero and two consecutive frames with identical
@@ -185,7 +188,9 @@ The level, band, flux, onset and smoothing calculations are correct on known sig
 - The demo source of A06-P01 (tone 440 Hz, tone 1 kHz, silence, note sequence) is the test signal for the experience;
   click trains and squares are generated in host tests; no audio files are bundled.
 - Analysis runs on the render side once per frame from the ring buffer (never in the audio callback), 1,024-point window.
-- Mapping features to visual parameters, gain calibration and scenes are Phase 03; analysis quality levels Phase 05.
+- Mapping features to visual parameters, gain calibration and scenes are Phase 03; analysis quality levels and a measured
+  per-window time bound are Phase 05 (G-AUDIOBUDGET); this phase bounds the work by construction (one 1,024-point
+  transform and 16 bands per frame).
 
 ## Out of Scope
 
