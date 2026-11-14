@@ -51,3 +51,7 @@ Agent A: T-A05-602, 607. Agent B: T-A05-604–606. Agent C: T-A05-610. Lead: che
 ## Implementation strategy
 
 Privacy and data first (US1, US2), then documents (US3) and the interface chunk (US4); evidence last.
+
+## Phase 7: Convergence
+
+- [ ] T-A05-619 Shorten `IGControlsUITests.testCameraButtonsAndReset` (110 s) and `IGLibraryExportUITests.testSaveChooseAnotherPresetAndOpen` (89 s) in `Apps/VisualCore/Tests/UI/InfiniteGeometry/` by removing timeout-bound fallbacks (target ≤ 30 s each); restate FR-A05-632/SC-A05-606 so the 10-second bound covers package tests and interface tests are bounded at 60 s each (an app launch alone takes ~8 s); rerun chunk k2 (`--name app-ui-2`) per FR-A05-632 (partial)
