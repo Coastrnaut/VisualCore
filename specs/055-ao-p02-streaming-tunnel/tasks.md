@@ -1,0 +1,50 @@
+# Tasks: Audio Odyssey — Phase 02 Streaming procedural tunnel
+
+**Input**: [spec.md](spec.md), [plan.md](plan.md), [research.md](research.md), [data-model.md](data-model.md),
+[contracts/api.md](contracts/api.md), [quickstart.md](quickstart.md). Gate A07-P02 (legacy). Evidence:
+`python3 Tools/python/desktop_runbook.py run-check --stage A07-P02 --timeout 600 --name <check> -- <command>`. Commit after every task (no trailers). iOS 27 only; reference regression at X-A07
+(owner, 2026-11-14).
+
+## Phase 1: Setup
+
+- [ ] T-A07-201 Baseline: cite the A07-P01 evidence on the unchanged tree (`.autonomy/checks/A07-P01.experience-ios27-2.json`, `.autonomy/checks/A07-P01.app-unit.json`) instead of a rerun (owner ruling of 2026-11-14)
+
+## Phase 2: Foundational (VisualCore)
+
+- [ ] T-A07-202 [P] [US2] Write `Packages/VisualCore/Tests/VisualCoreScenesTests/{SegmentWindowTests,SlotPoolTests}.swift` first, then `Packages/VisualCore/Sources/VisualCoreScenes/{SegmentWindow,SlotPool}.swift` per contracts/api.md ("nil if capacity < behind + ahead + 1"; `maxBuildsPerStep` 2, nearest first; retired indices returned before builds; pool never grows); tests: 200-piece flight never exceeds capacity, ≤ 2 builds per step, reuse after the first window, skipping far ahead builds only the window, backwards motion, NaN distance ignored (FR-A07-201; SC-A07-201)
+- [ ] T-A07-203 [P] [US2] Write `Packages/VisualCoreRendering/Sources/VisualCoreRendering/MeshFog.swift` and additive overloads in `MeshRenderer.swift` (`draw(model:view:projection:color:fog:)`) and `DepthMeshPass.swift` (`draw(_:view:projection:fog:context:)`), the orbit-camera methods forwarding with `fog: nil`; linear fog in eye depth in the fragment shader; tests `Packages/VisualCoreRendering/Tests/VisualCoreRenderingTests/MeshFogTests.swift`: far geometry within 2% of the fog colour, near geometry unfogged, orbit path pixels identical to the overload with the orbit camera's matrices and nil fog, `MeshFog(start:end:)` refuses end ≤ start; existing DepthMeshPassTests unchanged (FR-A07-202; SC-A07-202)
+
+## Phase 3: User Story 1 — the tunnel breathes with the music (P1) 🎯
+
+- [ ] T-A07-204 [P] [US1] Core: `Packages/ExperiencesCreative/AudioOdyssey/Core/{TunnelResponse,SourceKind}.swift` and `JourneyState` schema 2 (adds `source`, schema 1 reads as demo; digest includes the source) per data-model.md ("ripple ∈ [0, 0.35] (rest 0.08), ambient ∈ [0.30, 0.70] (rest 0.35); step limits 0.02 / 0.03"; reduce motion halves the ripple range, reduce flashing halves the ambient range and step); tests `CoreTests/{TunnelResponseTests,JourneyStateTests}.swift` (bounds, step limit on a step input, return to rest within 5% in 2 s of zero targets at 60 Hz, schema 1 → 2 decode) (FR-A07-210, 211; SC-A07-203)
+- [ ] T-A07-205 [US1] Experience: presenter owns the audio source (demo default), `SampleRingBuffer`, `FeatureExtractor`, two `AudioMapper`s (low → ripple, level → brightness per clarification 3) feeding `TunnelResponse`; draws the tunnel through `SegmentWindow` + `SlotPool` of `MeshRenderer`s and `DepthMeshPass.draw(_:view:projection:fog:context:)` with the rail view/projection and fog (start 40, end 110, the clear colour), applying the breathing scale per piece; adapter schema 2 + actions `source.demo`, `source.microphone` (rule `a07.permission-denied`), `source.file`, `permission.mirror`; controls (source buttons with identifiers `source.demo`, `source.microphone`, `source.file`, file importer, permission message); `Package.swift` deps `VisualCoreAudio`, `VisualCoreAudioDSP`; tests `ExperienceTests/{OdysseyStreamingTests,OdysseyAudioTests}.swift` (live renderers ≤ capacity over a long flight, fog visible at the far end; demo/tone/silence response within bounds and step limits; source switch keeps distance, speed and host; denied permission falls back to demo) (FR-A07-210, 220, 221, 230)
+
+## Phase 4: User Story 2/3 — steady flight and sound choice (P1/P2)
+
+- [ ] T-A07-206 [US3] Registry and catalog: `Apps/VisualCore/App/ExperienceRegistry.swift` passes `OdysseyCore.schemaOneExample()`; `Catalog/registrations.json` a07 gets `"permissions": ["microphone"]` and capabilities "audio-reactive tunnel", "demo signal", "live microphone input", "audio files" (FR-A07-220)
+- [ ] T-A07-207 [US2] Manifest: fixture-3 uses real source switches (`source.demo`/`source.file` are not scriptable without a file, so demo → microphone with the mirrored permission granted via `permission.mirror [1]` → demo), fixture-2 keeps the comfort run; regenerate `Packages/ExperiencesCreative/AudioOdyssey/scenario-manifest.json` (`TEST_RUNNER_UPDATE_SCENARIO_MANIFEST=1`) (FR-A07-231; SC-A07-204, 205)
+
+## Phase 5: Polish & evidence
+
+- [ ] T-A07-208 Scenes host tests (`python3 Tools/python/desktop_runbook.py run-check --stage A07-P02 --timeout 600 --name scenes-host -- swift test --package-path Packages/VisualCore --filter "SegmentWindowTests|SlotPoolTests"`)
+- [ ] T-A07-209 Rendering tests on sim-27.2 (`python3 Tools/python/desktop_runbook.py run-check --stage A07-P02 --timeout 600 --name rendering-ios27 -- python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --only-testing VisualCoreRenderingTests/MeshFogTests VisualCoreRenderingTests/DepthMeshPassTests`)
+- [ ] T-A07-210 Audio Odyssey tests on sim-27.2 (`python3 Tools/python/desktop_runbook.py run-check --stage A07-P02 --timeout 600 --name odyssey-ios27 -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing AudioOdysseyCoreTests AudioOdysseyExperienceTests`)
+- [ ] T-A07-211 App build and unit (`python3 Tools/python/desktop_runbook.py run-check --stage A07-P02 --timeout 600 --name app-unit -- python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27`)
+- [ ] T-A07-212 Runner iOS 27 (`python3 Tools/python/desktop_runbook.py run-check --stage A07-P02 --timeout 600 --name verify-27 -- python3 scripts/verify_experiences.py --only a07.audio-odyssey --runtime 27`)
+- [ ] T-A07-213 Experience package check (`python3 Tools/python/desktop_runbook.py run-check --stage A07-P02 --timeout 600 --name experience-packages -- python3 scripts/check_experience_packages.py`)
+- [ ] T-A07-214 Public API and docs: `check_public_api.py --update`, `python3 Tools/python/desktop_runbook.py run-check --stage A07-P02 --timeout 600 --name public-api -- python3 scripts/check_public_api.py`; READMEs of VisualCore (SegmentWindow, SlotPool) and VisualCoreRendering (MeshFog, overloads); contract G-SEGMENTSTREAM and G-RAILDRAW closed by "A07-P02" with rows updated, `check_app_contract.py --app audio-odyssey --render`
+- [ ] T-A07-215 Script tests (`python3 Tools/python/desktop_runbook.py run-check --stage A07-P02 --timeout 600 --name script-tests -- python3 scripts/test_scripts.py`)
+- [ ] T-A07-216 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A07-P02
+
+## Dependencies
+
+T-A07-201 → (202 ∥ 203 ∥ 204) → 205 → 206 → 207 → Polish.
+
+## Parallel examples
+
+Agent A: T-A07-202. Agent B: T-A07-203. Agent C: T-A07-204. Agent D: T-A07-205 once A–C pass. Lead: Package.swift,
+206, 207, docs, runs, commits.
+
+## Implementation strategy
+
+MVP: the audio-breathing tunnel (US1) on the streaming window and fog (US2 foundation); sources (US3); evidence last.
