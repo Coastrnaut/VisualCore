@@ -38,7 +38,7 @@
 
 ## Phase 5: Convergence
 
-- [ ] T-A06-320 Assert in `Packages/ExperiencesCreative/VisualCoreMusicLab/ExperienceTests/MusicLabSceneRenderTests.swift` that `presenter.mirror.parameterValues` equals `lastParameterValues` rounded to hundredths after a settled frame (the editor's live value); record `python3 Tools/python/desktop_runbook.py run-check --stage A06-P03 --timeout 600 --name experiences-ios27-2 -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing VisualCoreMusicLabExperienceTests VisualCoreMusicLabCoreTests` per US2 live value, FR-A06-312 (partial)
+- [X] T-A06-320 Assert in `Packages/ExperiencesCreative/VisualCoreMusicLab/ExperienceTests/MusicLabSceneRenderTests.swift` that `presenter.mirror.parameterValues` equals `lastParameterValues` rounded to hundredths after a settled frame (the editor's live value); record `python3 Tools/python/desktop_runbook.py run-check --stage A06-P03 --timeout 600 --name experiences-ios27-2 -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing VisualCoreMusicLabExperienceTests VisualCoreMusicLabCoreTests` per US2 live value, FR-A06-312 (partial) — Verified 2026-11-14: — Verified 2026-11-14: .autonomy/checks/A06-P03.experiences-ios27-2.json (MusicLab 15 XCTests + 40 tests, 0 failures)
 
 ## Dependencies
 
