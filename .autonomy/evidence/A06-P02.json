@@ -1,0 +1,56 @@
+{
+  "checks": [
+    {
+      "attestation": ".autonomy/checks/A06-P02.app-unit.json",
+      "command": "python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A06-P02.app-unit.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A06-P02.dsp-host-2.json",
+      "command": "swift test --package-path Packages/VisualCore --filter VisualCoreAudioDSPTests",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A06-P02.dsp-host-2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A06-P02.dsp-host.json",
+      "command": "swift test --package-path Packages/VisualCore --filter VisualCoreAudioDSPTests",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A06-P02.dsp-host.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A06-P02.experiences-ios27-2.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing VisualCoreMusicLabExperienceTests VisualCoreMusicLabCoreTests",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A06-P02.experiences-ios27-2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A06-P02.experiences-ios27.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A06-P02.experiences-ios27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A06-P02.public-api.json",
+      "command": "python3 scripts/check_public_api.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A06-P02.public-api.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A06-P02.script-tests.json",
+      "command": "python3 scripts/test_scripts.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A06-P02.script-tests.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A06-P02.verify-27.json",
+      "command": "python3 scripts/verify_experiences.py --only a06.visualcore-music-lab --runtime 27",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A06-P02.verify-27.log"
+    }
+  ],
+  "generated": "2026-11-14T07:54:50+00:00",
+  "method": "deterministic-run-check",
+  "stage": "A06-P02",
+  "status": "pass"
+}
