@@ -25,6 +25,35 @@ Canonical overrides:
 - **Owner rulings:** short tests; audits and device runs in the device campaign; iOS 27 at phase gates; every Spec Kit
   step runs.
 
+## Clarifications
+
+### Session 2026-11-14
+
+Answered autonomously under the owner's standing delegation, recommended option each time. Facts checked in code: the
+packages target iOS 26 (and macOS 15 for `VisualCore`), so the standard `Synchronization` module (`Atomic`) is
+available for a lock-free buffer; `scripts/check_dependencies.py` allows `Accelerate` in pure modules; `VisualCoreAudioDSP`
+is a target of the `VisualCore` package and `VisualCoreAudio` of `VisualCoreRendering` (depending on the DSP product);
+`NSMicrophoneUsageDescription` is absent from the app.
+
+- Q: How does the audio side hand samples to the render side without waiting or allocating? → A: A single-producer,
+  single-consumer ring buffer of `Float` with power-of-two capacity, preallocated, whose write and read positions are
+  `Atomic<Int>` (acquire/release ordering); the writer never blocks and overwrites the oldest samples on overflow; the
+  reader copies the latest N samples into a caller-provided array. Lives in `VisualCoreAudioDSP` (pure, host-testable).
+- Q: How is the spectrum computed? → A: Accelerate's vDSP real FFT on a Hann-windowed frame of N = 256…4,096 samples
+  (power of two), magnitudes in dB relative to full scale; in `VisualCoreAudioDSP`. Only the transform and peak-bin
+  lookup are built now (the fixture); bands, RMS and onsets are Phase 02.
+- Q: How are the microphone and permission handled testably? → A: `VisualCoreAudio` wraps the system record permission
+  behind a `MicrophonePermission` protocol (state: notDetermined/granted/denied/restricted; `request()`), with the
+  system implementation using `AVAudioApplication` and a test double; the microphone source uses `AVAudioEngine`'s input
+  node tap converting to mono `Float` into the ring buffer, started only when the state is granted. The simulator tests
+  use the double; real input is checked in the device campaign.
+- Q: Which file formats and how is a file chosen? → A: Any file `AVAudioFile` can read (WAV, AIFF, CAF, M4A/AAC, MP3),
+  chosen with the system file importer (security-scoped access, read only, not copied); decoded in chunks of 4,096
+  frames to mono `Float` and looped; tests generate original WAV, CAF and M4A tones at runtime.
+- Q: What does the demo source play? → A: A seeded, deterministic mix: a tone sequence (sine notes on a pentatonic scale,
+  one note per half second, seed chooses the order) at −12 dBFS plus quiet seeded noise, generated on the fly at 48 kHz;
+  no file, no permission.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Choose a sound source and see it (Priority: P1) 🎯
