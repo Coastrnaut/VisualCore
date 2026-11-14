@@ -11,7 +11,7 @@
 ## Phase 3: User Story 1 — Evidence-backed integration matrix (P1) 🎯
 
 - [X] T-A09-002 [US1] Write `docs/apps/digital-aquarium/visualcore-contract.json` (schema 1; app `digital-aquarium`; gate `A09-P00`): `inventory` of every FR-A09-001 area with paths, the release-check step count from `python3 scripts/release_check.py --list`; `matrix` rows covering the 6 brainstorm capabilities and 6 version 0.1 features plus cross-cutting rows (persistence, quality tiers and low power, accessibility and Reduce Motion, lifecycle, licenses) with status ∈ {available, requires adaptation, upstream gap} per clarification 2 and file/symbol/product evidence; `traceability`; `negative` rules of FR-A09-006 (FR-A09-001, 002) — Verified 2026-11-14: 2026-11-14: visualcore-contract.json, 20 rows (10 available, 9 adaptation, 1 upstream), 7 gaps, 98 release steps, decision go
-- [ ] T-A09-003 [US1] Run the contract checker and render the view (`python3 Tools/python/desktop_runbook.py run-check --stage A09-P00 --timeout 600 --name contract -- python3 scripts/check_app_contract.py --app digital-aquarium --render`); `docs/apps/digital-aquarium/visualcore-contract.md` is generated (FR-A09-007, SC-A09-001)
+- [X] T-A09-003 [US1] Run the contract checker and render the view (`python3 Tools/python/desktop_runbook.py run-check --stage A09-P00 --timeout 600 --name contract -- python3 scripts/check_app_contract.py --app digital-aquarium --render`); `docs/apps/digital-aquarium/visualcore-contract.md` is generated (FR-A09-007, SC-A09-001) — Verified 2026-11-14: 2026-11-14: .autonomy/checks/A09-P00.contract.json exit 0 (PASS 20 rows, 105 citations, 7 gaps); visualcore-contract.md rendered
 
 ## Phase 4: User Story 2 — The reference stays proven (P1)
 
