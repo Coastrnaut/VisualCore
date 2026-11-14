@@ -1154,6 +1154,8 @@ VisualCoreMath | func | public func applyPoint(_ p: Vec3) -> Vec3
 VisualCoreMath | func | public func applyVector(_ v: Vec2) -> Vec2
 VisualCoreMath | func | public func applyVector(_ v: Vec3) -> Vec3
 VisualCoreMath | func | public func cellCenters(rings: Int) -> [Vec2]
+VisualCoreMath | func | public func clamp(_ camera: Camera2D) -> Camera2D
+VisualCoreMath | func | public func clamp(_ camera: OrbitCamera) -> OrbitCamera
 VisualCoreMath | func | public func cross(_ b: Vec2) -> Double
 VisualCoreMath | func | public func cross(_ b: Vec3) -> Vec3
 VisualCoreMath | func | public func distance(to b: Vec2) -> Double
@@ -1167,7 +1169,9 @@ VisualCoreMath | func | public func framing(at t: Double, curve: EasingCurve = .
 VisualCoreMath | func | public func images(of p: Vec2) -> [Vec2]
 VisualCoreMath | func | public func images(of p: Vec2, rings: Int) -> [Vec2]
 VisualCoreMath | func | public func mix(_ b: Vec4, _ t: Double) -> Vec4
+VisualCoreMath | func | public func orbited(yaw: Double, pitch: Double, within bounds: OrbitBounds) -> OrbitCamera
 VisualCoreMath | func | public func panned(by delta: Vec2) -> PlaneViewport
+VisualCoreMath | func | public func panned(by delta: Vec2, within bounds: ViewBounds2D) -> Camera2D
 VisualCoreMath | func | public func pinched(by scale: Double, anchor: Vec2) -> PlaneViewport
 VisualCoreMath | func | public func plane(fromScreen p: Vec2) -> Vec2
 VisualCoreMath | func | public func project(_ p: Vec3, aspect: Double) -> Vec3
@@ -1184,6 +1188,8 @@ VisualCoreMath | func | public func state(at time: Double) -> State
 VisualCoreMath | func | public func view() -> Mat4
 VisualCoreMath | func | public func viewProjection(aspect: Double) -> Mat4
 VisualCoreMath | func | public func viewport(size: Vec2) -> PlaneViewport
+VisualCoreMath | func | public func zoomed(by factor: Double, within bounds: OrbitBounds) -> OrbitCamera
+VisualCoreMath | func | public func zoomed(by factor: Double, within bounds: ViewBounds2D) -> Camera2D
 VisualCoreMath | func | public mutating func orbit(dYaw: Double, dPitch: Double)
 VisualCoreMath | func | public mutating func pan(by delta: Vec2)
 VisualCoreMath | func | public mutating func zoom(by factor: Double)
@@ -1246,9 +1252,11 @@ VisualCoreMath | init | public init(center: Vec2, unitsPerPoint: Double, size: V
 VisualCoreMath | init | public init(framing: PlaneFraming, hold: Double)
 VisualCoreMath | init | public init(from decoder: any Decoder) throws
 VisualCoreMath | init | public init(from: PlaneFraming, to: PlaneFraming)
+VisualCoreMath | init | public init(pitchLimit: Double, distanceRange: ClosedRange<Double>)
 VisualCoreMath | init | public init(start: PlaneFraming, stops: [Stop], flightDuration: Double, reduceMotion: Bool)
 VisualCoreMath | init | public init(target: Vec3 = .zero, distance: Double = 5, yaw: Double = 0, pitch: Double = 0,
 VisualCoreMath | init | public init(x: Double, y: Double, z: Double, w: Double)
+VisualCoreMath | init | public init(zoomRange: ClosedRange<Double>, extent: Double)
 VisualCoreMath | let | public let center: Vec2
 VisualCoreMath | let | public let flightDuration: Double
 VisualCoreMath | let | public let framing: PlaneFraming
@@ -1278,6 +1286,7 @@ VisualCoreMath | struct | public struct Camera2D: Sendable, Equatable
 VisualCoreMath | struct | public struct FramingFlight: Sendable, Equatable
 VisualCoreMath | struct | public struct Mat3: Sendable, Equatable
 VisualCoreMath | struct | public struct Mat4: Sendable, Equatable
+VisualCoreMath | struct | public struct OrbitBounds: Sendable, Equatable, Codable
 VisualCoreMath | struct | public struct OrbitCamera: Sendable, Equatable
 VisualCoreMath | struct | public struct PlaneFraming: Sendable, Equatable, Hashable, Codable
 VisualCoreMath | struct | public struct PlaneViewport: Sendable, Equatable
@@ -1289,6 +1298,7 @@ VisualCoreMath | struct | public struct TourTimeline: Sendable, Equatable
 VisualCoreMath | struct | public struct Vec2: Sendable, Equatable, Hashable, Codable
 VisualCoreMath | struct | public struct Vec3: Sendable, Equatable, Hashable, Codable
 VisualCoreMath | struct | public struct Vec4: Sendable, Equatable, Hashable, Codable
+VisualCoreMath | struct | public struct ViewBounds2D: Sendable, Equatable, Codable
 VisualCoreMath | var | public private(set) var center: Vec2
 VisualCoreMath | var | public private(set) var size: Vec2
 VisualCoreMath | var | public private(set) var unitsPerPoint: Double
@@ -1300,7 +1310,9 @@ VisualCoreMath | var | public var center: Vec2
 VisualCoreMath | var | public var conjugate: Quat
 VisualCoreMath | var | public var determinant: Double
 VisualCoreMath | var | public var distance: Double
+VisualCoreMath | var | public var distanceRange: ClosedRange<Double>
 VisualCoreMath | var | public var duration: Double
+VisualCoreMath | var | public var extent: Double
 VisualCoreMath | var | public var eye: Vec3
 VisualCoreMath | var | public var far: Double
 VisualCoreMath | var | public var floats: [Float]
@@ -1320,6 +1332,7 @@ VisualCoreMath | var | public var normalized: Vec2
 VisualCoreMath | var | public var normalized: Vec3
 VisualCoreMath | var | public var order: Int
 VisualCoreMath | var | public var pitch: Double
+VisualCoreMath | var | public var pitchLimit: Double
 VisualCoreMath | var | public var pointGroup: PointGroup
 VisualCoreMath | var | public var pointGroupImages: Int
 VisualCoreMath | var | public var rotation: Double
@@ -1330,6 +1343,7 @@ VisualCoreMath | var | public var x: Double, y: Double, z: Double, w: Double
 VisualCoreMath | var | public var xyz: Vec3
 VisualCoreMath | var | public var yaw: Double
 VisualCoreMath | var | public var zoom: Double
+VisualCoreMath | var | public var zoomRange: ClosedRange<Double>
 VisualCoreParameters | enum | public enum ParameterError: Error, Equatable, Sendable
 VisualCoreParameters | enum | public enum ParameterHash
 VisualCoreParameters | enum | public enum ParameterTransform: String, Codable, Sendable, CaseIterable

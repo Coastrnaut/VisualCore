@@ -143,7 +143,8 @@ with:
 #include "vc/hash.glsl"     // vc_pcg, vc_hash11, vc_hash21, vc_hash22
 #include "vc/noise.glsl"    // vc_valueNoise, vc_gradientNoise, vc_fbm(p, octaves, lacunarity, gain)
 #include "vc/palette.glsl"  // uniform vec3 u_palette[8]; uniform int u_paletteCount; vc_palette(t) (linear light)
-#include "vc/sdf.glsl"      // vc_sdSphere, vc_sdBox, vc_sdTorus, vc_smoothUnion, vc_rotate
+#include "vc/sdf.glsl"      // vc_sdSphere, vc_sdBox, vc_sdTorus, vc_smoothUnion, vc_rotate;
+                            // 2D (feature 041): vc_sdCircle, vc_sdBox2, vc_sdSegment, vc_foldDihedral (= PointGroup.dihedral fold)
 #include "vc/color.glsl"    // vc_srgbEncode, vc_srgbDecode (exact transfer functions)
 ```
 

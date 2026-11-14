@@ -111,7 +111,10 @@ every position including the center; `liveLimit`; `liveCount(source:)` (feature 
 images, `factor`, `subtraction`, `step8`); NaN removal, `checksum()`; `instances()` →
 `ParticleInstance` for `ParticleRenderer`); 3D: `OrbitCamera` (pitch ±89°, `project`, `ray`), symmetry (feature 040, A05-P01: `PointGroup` cyclic and
 dihedral of order 1–24 and `WallpaperLattice` square p4m and hexagonal p6m, each with `images` in a fixed order and an
-idempotent `fold` into the fundamental region), `Mesh.plane/cube/uvSphere`
+idempotent `fold` into the fundamental region), camera bounds (feature 041, A05-P02: `ViewBounds2D` clamps a `Camera2D`'s
+zoom and centre, `Camera2D.panned(by:within:)` and `zoomed(by:within:)`; `OrbitBounds` clamps an `OrbitCamera`'s pitch and
+distance and wraps yaw, `OrbitCamera.orbited(yaw:pitch:within:)` and `zoomed(by:within:)`; non-finite or non-positive
+inputs leave the camera unchanged), `Mesh.plane/cube/uvSphere`
 (segments 3–256, rings 2–256, subdivisions ≤ 256). Feature 205 (R02-F05) adds the mesh compiler: `MeshBuilder` (welding of
 equal vertices, `MeshBudget` default 262,144 vertices and 1,572,864 indices, typed `MeshError`), the shapes
 `Mesh.surface`, `.revolution`, `.extrusion`, `.tube` (rotation-minimizing frames) and `.bevelledBox`,
