@@ -194,7 +194,8 @@ load preserves species, decor transforms and lighting" and "background/resume do
 
 ### Measurable Outcomes
 
-- **SC-A09-101**: The starter aquarium shows 2 species and at least 3 plants; the same seed gives an identical state.
+- **SC-A09-101**: Each starter aquarium shows 2 species (6 to 10 fish) and 4 to 6 plants; the same seed gives an
+  identical state.
 - **SC-A09-102**: Over 10,000 steps from at least 20 seeds, 0 fish positions lie outside the swim bounds and 0 speeds
   exceed the species maximum.
 - **SC-A09-103**: 100 % of bundled catalog items carry author and license; 100 % of malformed catalog fixtures are
