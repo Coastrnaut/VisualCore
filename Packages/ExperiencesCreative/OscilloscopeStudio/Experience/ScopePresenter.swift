@@ -1,0 +1,695 @@
+// ScopePresenter — feature 061 (A08-P01) T-A08-105 (FR-A08-110, FR-A08-121, FR-A08-122, FR-A08-130; clarifications
+// 2–4; edge cases). Draws Oscilloscope Studio through the host only (the host's context and registry, VisualCore's
+// `PrimitiveRenderer` with a `Camera2D`; no context of its own) and owns everything that is not state: the running
+// source, the buffer it writes into, the picked file, the microphone permission and the `ScopeAcquisition`.
+//
+//   - Sources: `sync(_:)` makes the running source match the core's selection on every draw and description (the shell
+//     describes the core after each accepted action, so a change takes effect at once). The test signal is a
+//     `TestSignalAudioSource` of `testSignal(for:)` (the state's waveform and frequency, amplitude 0.5, the sweep from
+//     100 Hz to 10 kHz over 2 s, two channels with the right at 1.5 × the left frequency) and a chosen file a
+//     `StereoFileAudioSource`; both write into a `StereoSampleBuffer` of 16,384 frames. The microphone is the shared
+//     mono `MicrophoneAudioSource` writing into a `SampleRingBuffer` of 16,384 samples and is read as one channel.
+//     Every start gets a fresh buffer and resets the acquisition, so no sample of the previous source (or of the time
+//     before a pause) is ever drawn; at most one source runs. A change of source, waveform or frequency restarts it
+//     (the sweep ignores the frequency, so a frequency change leaves a running sweep alone).
+//   - Microphone (`chooseMicrophone()`): granted sends `source.select 2`; not determined asks the system once and sends
+//     it only when allowed; denied or restricted sends nothing, keeps the previous source and shows a message with the
+//     way to Settings and the offer of the test signal. A restored microphone selection without access is answered
+//     with `source.select 0` after the current frame (never from inside it).
+//   - File (`chooseFile(url:)`): the file is opened first (`StereoFileAudioSource` holds its security-scoped access
+//     while it lives); an undecodable or moved file keeps the previous source and shows a message with the offer of
+//     the test signal. Only then is `source.select 1` sent. The file's name is display state, never core state.
+//   - Lifecycle: sources run only between `setup` and `teardown`, never in the background, and not while the
+//     experience is suspended: the shell's lifecycle (handed in by `OscilloscopeStudioExperience.make`) is checked on
+//     every draw and description and by a 0.1 s main-run-loop watch while the scene is set up, so a suspension stops
+//     the source and the return starts it again on a fresh buffer with the acquisition reset.
+//   - Drawing: per frame one `SignalWindow` from `ScopeAcquisition` (triggered on channel 0, at most 4,096 samples per
+//     channel), a 10 × 8 division grid inside a 6 % inset (the centre lines brighter) and the trace of channel 0 (and of
+//     channel 1 in a second colour when the source carries two) as `.line` scene nodes: at most one segment per
+//     displayed sample. The values are `displayValues(channel:gain:)` (× gain, clamped to full scale, so a clipped
+//     trace runs along the plot edge); a segment touching a clipped sample is drawn in the clip colour, and the window's
+//     `clipped` flag is reported in the description. The sample spacing is that of the full span, so a partial window
+//     is drawn from the left without stretching.
+//   - Description: "Oscilloscope Studio: test signal, sine 1 kHz, 2 channels, 1 ms per division, gain ×1, triggered
+//     rising at 0, not clipping." (source, signal, channels, timebase, gain, trigger state, clipping).
+//   - Privacy: nothing is recorded, stored or sent; the microphone is never played to the speaker.
+import Foundation
+import SwiftUI
+import UIKit
+import OscilloscopeStudioCore
+import VisualCoreAudio
+import VisualCoreAudioDSP
+import VisualCoreExperience
+import VisualCoreExperienceHost
+import VisualCoreMath
+import VisualCoreRendering
+import VisualCoreScenes
+import VisualCoreUI
+
+/// What the controls show: the display fields of the scope, updated only when one of them changes.
+@MainActor
+@Observable
+final class ScopeMirror {
+    /// Whether a state was seen (the controls show a progress indicator before).
+    var ready = false
+    /// The chosen source.
+    var source: ScopeSource = .testSignal
+    /// The source as the status line names it: "Test signal", "Microphone" or the picked file's name.
+    var sourceName = ScopeSource.testSignal.displayName
+    /// The index of the test waveform.
+    var waveformIndex = 0
+    /// The index of the test frequency.
+    var frequencyIndex = ScopeSettings.defaultFrequencyIndex
+    /// The index of the gain.
+    var gainIndex = ScopeSettings.defaultGainIndex
+    /// The index of the timebase.
+    var timebaseIndex = ScopeSettings.defaultTimebaseIndex
+    /// The trigger level.
+    var triggerLevel = 0.0
+    /// The index of the trigger slope.
+    var slopeIndex = 0
+    /// The index of the trigger mode.
+    var modeIndex = 0
+    /// The trace status in words (channels, trigger state, clipping).
+    var status = ""
+    /// A plain message (refused microphone access, an unplayable or moved file, a stopped source); nil when all is
+    /// well.
+    var message: String?
+    /// Whether the message concerns microphone access that only Settings can change.
+    var showsSettingsLink = false
+    /// Whether the message offers the test signal instead.
+    var offersTestSignal = false
+    /// Whether the system permission request is open.
+    var isRequestingPermission = false
+}
+
+/// How the presenter makes its sources; tests replace them with doubles.
+struct ScopeSourceFactory {
+    /// The test-signal source for a signal.
+    var testSignal: @MainActor (TestSignal) -> any StereoAudioSource
+    /// The file source for a picked URL; throws for a file the system cannot decode.
+    var file: @MainActor (URL) throws -> any StereoAudioSource
+    /// The microphone source behind a permission.
+    var microphone: @MainActor (any MicrophonePermission) -> any AudioSource
+
+    /// The VisualCoreAudio sources.
+    static var system: ScopeSourceFactory {
+        ScopeSourceFactory(testSignal: { TestSignalAudioSource(signal: $0) },
+                           file: { try StereoFileAudioSource(url: $0) },
+                           microphone: { MicrophoneAudioSource(permission: $0) })
+    }
+}
+
+/// The error of a draw failed on purpose through `ScopePresenter.failNextDraw`.
+enum ScopeDrawError: Error, Equatable {
+    /// The draw was failed by the test seam.
+    case injected
+}
+
+/// The presenter of Oscilloscope Studio.
+@MainActor
+final class ScopePresenter: ExperiencePresenter {
+    typealias Core = ScopeCore
+
+    /// The capacity of the two-channel buffer in frames (a window plus one window of lookback always fits).
+    nonisolated static let bufferFrames = 16_384
+    /// The capacity of the microphone's ring buffer in samples.
+    nonisolated static let ringCapacity = 16_384
+    /// The amplitude of the test signal (half of full scale).
+    nonisolated static let testAmplitude = 0.5
+    /// The right channel's frequency ratio of the test signal (so a later XY view has content).
+    nonisolated static let rightRatio = 1.5
+    /// The sweep's start and end frequency and its duration.
+    nonisolated static let sweepStart = 100.0, sweepEnd = 10_000.0, sweepDuration = 2.0
+    /// The index of the sweep in the waveform table (the frequency picker is hidden for it).
+    nonisolated static let sweepIndex = ScopeSettings.index(of: TestSignal.Waveform.sweep)
+    /// The number of horizontal and vertical divisions of the grid.
+    nonisolated static let horizontalDivisions = 10, verticalDivisions = 8
+    /// The inset of the plot from each edge of the view, as a share of the width and the height.
+    nonisolated static let inset = 0.06
+    /// The trace and grid line widths in pixels.
+    nonisolated static let traceWidth = 2.0, gridWidth = 1.0
+    /// The background colour (dark blue-black).
+    nonisolated static let background: (red: Float, green: Float, blue: Float) = (0.02, 0.03, 0.04)
+    /// The grid colour and the brighter centre-line colour.
+    nonisolated static let gridColor = Vec4(0.14, 0.18, 0.2, 1), axisColor = Vec4(0.26, 0.32, 0.36, 1)
+    /// The trace colours of channel 0 (green) and channel 1 (amber).
+    nonisolated static let traceColors = [Vec4(0.35, 1.0, 0.55, 1), Vec4(1.0, 0.75, 0.3, 1)]
+    /// The colour of a segment touching a clipped sample (red).
+    nonisolated static let clipColor = Vec4(1.0, 0.25, 0.25, 1)
+    /// The interval of the lifecycle watch in seconds.
+    nonisolated static let watchInterval = 0.1
+
+    /// The message when microphone access is off.
+    static let deniedMessage = "Microphone access is off. Allow it for VisualCore in Settings, or use the test signal."
+    /// The message when a picked file cannot be played.
+    static let undecodableMessage = "This file can't be played. Choose a WAV, AIFF, CAF, M4A or MP3 file, or use the test signal."
+    /// The message when a restored session's file is no longer reachable.
+    static let fileGoneMessage = "The audio file is no longer available. Choose it again, or use the test signal."
+
+    /// What runs (or should run): the test signal of a waveform and frequency, the picked file or the microphone.
+    enum SourceKey: Equatable {
+        /// The test signal (`frequency` −1 for the sweep, which ignores it).
+        case testSignal(waveform: Int, frequency: Int)
+        /// The picked file by pick number.
+        case file(pick: Int)
+        /// The microphone.
+        case microphone
+    }
+
+    /// A picked, opened file.
+    private struct PickedFile {
+        let name: String
+        let pick: Int
+        let source: any StereoAudioSource
+    }
+
+    let experienceID: ExperienceID
+    let mirror = ScopeMirror()
+    /// The microphone permission (the system's by default; a double in tests).
+    let permission: any MicrophonePermission
+    /// How the sources are made.
+    let factory: ScopeSourceFactory
+    /// The port of the shell, set by `OscilloscopeStudioExperience.make`; the presenter sends the source choices
+    /// through it.
+    weak var port: ExperienceActionPort?
+    /// The shell's lifecycle state, set by `OscilloscopeStudioExperience.make`; nil means active.
+    var lifecycle: (@MainActor () -> ExperienceLifecycleState?)?
+
+    /// The two-channel buffer of the running test-signal or file source (a fresh one per start).
+    private(set) var stereoBuffer = StereoSampleBuffer(capacityFrames: ScopePresenter.bufferFrames)
+    /// The ring buffer of the running microphone (a fresh one per start).
+    private(set) var ring = SampleRingBuffer(capacity: ScopePresenter.ringCapacity)
+    /// The running test-signal or file source, if any.
+    private(set) var activeStereo: (any StereoAudioSource)?
+    /// The running microphone source, if any.
+    private(set) var activeMono: (any AudioSource)?
+    /// What the running source was started for.
+    private(set) var activeKey: SourceKey?
+    /// A key whose start failed; not retried until the selection changes.
+    private var failedKey: SourceKey?
+    private var pickedFile: PickedFile?
+    private var pickCount = 0
+    /// The acquisition of the windows (reset with every source start).
+    let acquisition = ScopeAcquisition()
+
+    /// True between `setup` and `teardown`.
+    private(set) var isLive = false
+    /// True while the shell is suspended (the source is stopped).
+    private(set) var isSuspended = false
+    private var isBackgrounded = false
+    private var fallbackScheduled = false
+    private var observers: [NSObjectProtocol] = []
+    private var watch: Timer?
+    /// The core of the last draw or description.
+    private(set) var lastCore: ScopeCore?
+    /// The window drawn by the last frame; nil before the first frame.
+    private(set) var lastWindow: SignalWindow?
+    /// The trace segments drawn by the last frame per channel (at most one per displayed sample).
+    private(set) var lastSegmentCounts = [0, 0]
+    /// The number of starts of a source since the presenter was created (tests read it).
+    private(set) var startCount = 0
+    /// Set only by tests; the next draw throws `ScopeDrawError.injected` and clears the flag.
+    var failNextDraw = false
+
+    private let clear = ClearColorScene(red: ScopePresenter.background.red, green: ScopePresenter.background.green,
+                                        blue: ScopePresenter.background.blue)
+    private var primitives: PrimitiveRenderer?
+    private let root = SceneNode(id: "scope")
+    private var gridNodes: [SceneNode] = []
+    private var traceNodes: [[SceneNode]] = [[], []]
+
+    init(experienceID: ExperienceID, permission: any MicrophonePermission, factory: ScopeSourceFactory = .system) {
+        self.experienceID = experienceID
+        self.permission = permission
+        self.factory = factory
+        for index in 0..<(Self.horizontalDivisions + 1 + Self.verticalDivisions + 1) {
+            let node = SceneNode(id: "g\(index)", z: 0, color: Self.gridColor)
+            root.add(node)
+            gridNodes.append(node)
+        }
+    }
+
+    /// The running source's sample rate (48 kHz when none runs).
+    var activeSampleRate: Double { activeStereo?.sampleRate ?? activeMono?.sampleRate ?? TestSignal.defaultSampleRate }
+
+    /// The running source's channel count: the stereo source's (1 or 2), 1 for the microphone, 0 when none runs.
+    var activeChannelCount: Int {
+        if let activeStereo { return min(max(activeStereo.channelCount, 1), 2) }
+        return activeMono == nil ? 0 : 1
+    }
+
+    /// The test signal of `state`: its waveform and frequency (the sweep from 100 Hz to 10 kHz over 2 s), amplitude
+    /// 0.5 at 48 kHz, two channels with the right at 1.5 × the left frequency.
+    nonisolated static func testSignal(for state: ScopeState) -> TestSignal {
+        if state.waveform == .sweep {
+            return TestSignal(waveform: .sweep, frequency: sweepStart, amplitude: testAmplitude, channelCount: 2,
+                              rightRatio: rightRatio, sweepEnd: sweepEnd, sweepDuration: sweepDuration)
+        }
+        return TestSignal(waveform: state.waveform, frequency: state.frequency, amplitude: testAmplitude,
+                          channelCount: 2, rightRatio: rightRatio)
+    }
+
+    /// The key of the test signal of `state` (the sweep ignores the frequency).
+    nonisolated static func testKey(for state: ScopeState) -> SourceKey {
+        let waveform = ScopeSettings.index(of: state.waveform)
+        return .testSignal(waveform: waveform, frequency: state.waveform == .sweep ? -1 : state.frequencyIndex)
+    }
+
+    // MARK: Render scene
+
+    func setup(_ context: RenderContext) throws {
+        primitives = try PrimitiveRenderer(registry: context.resources)
+        isLive = true
+        let center = NotificationCenter.default
+        observers = [
+            center.addObserver(forName: UIApplication.didEnterBackgroundNotification, object: nil, queue: .main) { [weak self] _ in
+                MainActor.assumeIsolated { self?.enterBackground() }
+            },
+            center.addObserver(forName: UIApplication.willEnterForegroundNotification, object: nil, queue: .main) { [weak self] _ in
+                MainActor.assumeIsolated { self?.isBackgrounded = false }
+            },
+        ]
+        watch?.invalidate()
+        watch = Timer.scheduledTimer(withTimeInterval: Self.watchInterval, repeats: true) { [weak self] _ in
+            MainActor.assumeIsolated { self?.checkLifecycle() }
+        }
+        checkLifecycle()
+        if let lastCore { sync(lastCore) }
+    }
+
+    func draw(_ core: ScopeCore, tier: Int, context: RenderContext, frame: FrameInfo) throws {
+        if failNextDraw {
+            failNextDraw = false
+            throw ScopeDrawError.injected
+        }
+        checkLifecycle()
+        sync(core)
+        if mirror.message == nil {
+            if case .failed(let reason)? = activeStereo?.state ?? activeMono?.state {
+                setMessage("The signal stopped: \(reason)", settings: false, offer: core.state.source != .testSignal)
+            }
+        }
+        try clear.render(context, frame: frame)
+        let window = acquire(core.state)
+        lastWindow = window
+        updateStatus(core.state)
+        let width = Double(max(1, context.pixelWidth)), height = Double(max(1, context.pixelHeight))
+        layOut(width: width, height: height, window: window, gain: core.state.gain,
+               secondsPerDivision: core.state.secondsPerDivision)
+        if primitives == nil { primitives = try PrimitiveRenderer(registry: context.resources) }
+        try primitives?.draw(root, camera: Camera2D(), metrics: ViewMetrics(size: Vec2(width, height), scale: 1))
+    }
+
+    func teardown(_ context: RenderContext) {
+        stopActive()
+        isLive = false
+        watch?.invalidate()
+        watch = nil
+        for observer in observers { NotificationCenter.default.removeObserver(observer) }
+        observers = []
+        primitives?.release()
+        primitives = nil
+    }
+
+    // MARK: Acquisition and drawing
+
+    /// The window of the running source for `state` (an empty, partial window when nothing runs).
+    private func acquire(_ state: ScopeState) -> SignalWindow {
+        if let activeStereo {
+            return acquisition.window(from: stereoBuffer, channelCount: activeStereo.channelCount,
+                                      sampleRate: activeStereo.sampleRate, state: state)
+        }
+        if let activeMono {
+            return acquisition.window(from: ring, sampleRate: activeMono.sampleRate, state: state)
+        }
+        return .empty(sampleRate: TestSignal.defaultSampleRate, channelCount: 1,
+                      waiting: ScopeSettings.index(of: state.triggerMode) == 1, shortened: false)
+    }
+
+    /// Places the grid and the traces for a view of `width` × `height` pixels (world = pixels from the centre, y up).
+    private func layOut(width: Double, height: Double, window: SignalWindow, gain: Double, secondsPerDivision: Double) {
+        let plotWidth = width * (1 - 2 * Self.inset), plotHeight = height * (1 - 2 * Self.inset)
+        let left = -plotWidth / 2, bottom = -plotHeight / 2
+        var g = 0
+        for i in 0...Self.horizontalDivisions {
+            let x = left + Double(i) * plotWidth / Double(Self.horizontalDivisions)
+            gridNodes[g].primitive = .line(Vec2(x, bottom), Vec2(x, bottom + plotHeight), width: Self.gridWidth)
+            gridNodes[g].color = i == Self.horizontalDivisions / 2 ? Self.axisColor : Self.gridColor
+            g += 1
+        }
+        for j in 0...Self.verticalDivisions {
+            let y = bottom + Double(j) * plotHeight / Double(Self.verticalDivisions)
+            gridNodes[g].primitive = .line(Vec2(left, y), Vec2(left + plotWidth, y), width: Self.gridWidth)
+            gridNodes[g].color = j == Self.verticalDivisions / 2 ? Self.axisColor : Self.gridColor
+            g += 1
+        }
+        let span = window.sampleRate.isFinite && window.sampleRate > 0
+            ? TimebaseWindow(secondsPerDivision: secondsPerDivision).sampleCount(sampleRate: window.sampleRate)
+            : window.sampleCount
+        let dx = plotWidth / Double(max(span - 1, max(window.sampleCount - 1, 1)))
+        let halfHeight = plotHeight / 2
+        let g32 = Float(gain)
+        for channel in 0..<2 {
+            let raw = channel < window.channelCount ? window.samples(channel: channel) : []
+            let values = channel < window.channelCount ? window.displayValues(channel: channel, gain: gain) : []
+            let segments = max(values.count - 1, 0)
+            while traceNodes[channel].count < segments {
+                let node = SceneNode(id: "t\(channel).\(traceNodes[channel].count)", z: 1 + channel,
+                                     color: Self.traceColors[channel])
+                root.add(node)
+                traceNodes[channel].append(node)
+            }
+            func y(_ k: Int) -> Double {
+                let v = Double(values[k])
+                return v.isFinite ? v * halfHeight : 0
+            }
+            func clipped(_ k: Int) -> Bool { abs(raw[k] * g32) > 1 }
+            let nodes = traceNodes[channel]
+            for k in 0..<segments {
+                let a = Vec2(left + Double(k) * dx, y(k)), b = Vec2(left + Double(k + 1) * dx, y(k + 1))
+                nodes[k].primitive = .line(a, b, width: Self.traceWidth)
+                nodes[k].color = clipped(k) || clipped(k + 1) ? Self.clipColor : Self.traceColors[channel]
+            }
+            for k in segments..<nodes.count where nodes[k].primitive != nil { nodes[k].primitive = nil }
+            lastSegmentCounts[channel] = segments
+        }
+    }
+
+    // MARK: Lifecycle
+
+    /// Stops the source while the shell is suspended and starts it again (fresh buffer, acquisition reset) on return.
+    func checkLifecycle() {
+        let suspended = lifecycle?() == .suspended
+        if suspended, !isSuspended {
+            isSuspended = true
+            stopActive()
+        } else if !suspended, isSuspended {
+            isSuspended = false
+            if let lastCore { sync(lastCore) }
+        }
+    }
+
+    private func enterBackground() {
+        isBackgrounded = true
+        stopActive()
+    }
+
+    // MARK: Sources
+
+    /// Makes the running source match `core`'s selection (see the file header).
+    func sync(_ core: ScopeCore) {
+        lastCore = core
+        updateDisplay(core)
+        guard isLive, !isBackgrounded, !isSuspended else { return }
+        let desired: SourceKey?
+        switch core.state.source {
+        case .testSignal:
+            desired = Self.testKey(for: core.state)
+        case .file:
+            if let pickedFile {
+                desired = .file(pick: pickedFile.pick)
+            } else {
+                desired = nil
+                setMessage(Self.fileGoneMessage, settings: false, offer: true)
+            }
+        case .microphone:
+            switch permission.state {
+            case .granted:
+                desired = .microphone
+            case .notDetermined, .denied, .restricted:
+                desired = activeKey                       // the previous source keeps running
+                if permission.state != .notDetermined { showDenied() }
+                scheduleTestSignalFallback()
+            }
+        }
+        if desired != failedKey { failedKey = nil }
+        guard desired != activeKey else { return }
+        if let desired, desired == failedKey { return }     // a failed start is not retried every frame
+        stopActive()
+        if let desired { start(desired, state: core.state) }
+    }
+
+    /// Starts the source for `key` into a fresh buffer and resets the acquisition; a failure is shown and not retried
+    /// for the same key.
+    private func start(_ key: SourceKey, state: ScopeState) {
+        do {
+            switch key {
+            case .testSignal:
+                let source = factory.testSignal(Self.testSignal(for: state))
+                let buffer = StereoSampleBuffer(capacityFrames: Self.bufferFrames)
+                try source.start(into: buffer)
+                stereoBuffer = buffer
+                activeStereo = source
+            case .file:
+                guard let pickedFile else { return }
+                let buffer = StereoSampleBuffer(capacityFrames: Self.bufferFrames)
+                try pickedFile.source.start(into: buffer)
+                stereoBuffer = buffer
+                activeStereo = pickedFile.source
+            case .microphone:
+                let source = factory.microphone(permission)
+                let buffer = SampleRingBuffer(capacity: Self.ringCapacity)
+                try source.start(into: buffer)
+                ring = buffer
+                activeMono = source
+            }
+            activeKey = key
+            startCount += 1
+            acquisition.reset()
+            lastWindow = nil
+            if !mirror.showsSettingsLink { clearMessage() }    // a stale stop or file message goes
+        } catch {
+            failedKey = key
+            setMessage(Self.failureText(error), settings: (error as? AudioSourceError) == .permissionDenied,
+                       offer: key != Self.testKey(for: state))
+        }
+    }
+
+    /// Stops the running source, if any (the microphone is released).
+    private func stopActive() {
+        activeStereo?.stop()
+        activeMono?.stop()
+        activeStereo = nil
+        activeMono = nil
+        activeKey = nil
+    }
+
+    /// Opens the picked file at `url` and, when it decodes, selects the file source. An undecodable file changes
+    /// nothing (the previous source keeps running) and shows `undecodableMessage`. Returns whether the file was taken.
+    @discardableResult
+    func chooseFile(url: URL) -> Bool {
+        let source: any StereoAudioSource
+        do {
+            source = try factory.file(url)
+        } catch {
+            setMessage(Self.undecodableMessage, settings: false, offer: true)
+            return false
+        }
+        let previous = pickedFile
+        pickCount += 1
+        pickedFile = PickedFile(name: url.lastPathComponent, pick: pickCount, source: source)
+        guard let port, port.send("source.select", [Double(ScopeSource.file.rawValue)]).isAccepted else {
+            pickedFile = previous
+            return false
+        }
+        clearMessage()
+        if let lastCore { sync(lastCore) }
+        return true
+    }
+
+    /// Chooses the microphone: granted sends `source.select 2`; not determined asks once and sends it when allowed;
+    /// denied or restricted keeps the previous source, shows the message and offers the test signal. Returns the
+    /// answer (`a08.permission-denied` when access is off).
+    @discardableResult
+    func chooseMicrophone() async -> ActionResult {
+        guard let port else { return .rejected(.notActive(.inactive)) }
+        var access = permission.state
+        if access == .notDetermined {
+            mirror.isRequestingPermission = true
+            access = await permission.request()
+            mirror.isRequestingPermission = false
+        }
+        guard access == .granted else {
+            showDenied()
+            return .rejected(.rule(code: ScopeRule.permissionDenied))
+        }
+        let result = port.send("source.select", [Double(ScopeSource.microphone.rawValue)])
+        if result.isAccepted { clearMessage() }
+        return result
+    }
+
+    /// What the source picker does for `source`: the test signal sends `source.select 0`, the microphone goes through
+    /// `chooseMicrophone()`. Returns the answer, or nil for a file, which the controls pick first with the system file
+    /// importer (then `chooseFile(url:)`).
+    @discardableResult
+    func pickSource(_ source: ScopeSource) async -> ActionResult? {
+        switch source {
+        case .testSignal:
+            return useTestSignal()
+        case .microphone:
+            return await chooseMicrophone()
+        case .file:
+            return nil
+        }
+    }
+
+    /// Selects the test signal (the offer after a refused microphone or an unplayable file).
+    @discardableResult
+    func useTestSignal() -> ActionResult {
+        guard let port else { return .rejected(.notActive(.inactive)) }
+        let result = port.send("source.select", [Double(ScopeSource.testSignal.rawValue)])
+        if result.isAccepted { clearMessage() }
+        return result
+    }
+
+    /// A restored microphone selection without access: back to the test signal after the current frame or
+    /// description (never from inside it).
+    private func scheduleTestSignalFallback() {
+        guard !fallbackScheduled, port != nil else { return }
+        fallbackScheduled = true
+        Task { @MainActor [weak self] in
+            guard let self else { return }
+            fallbackScheduled = false
+            guard lastCore?.state.source == .microphone, permission.state != .granted else { return }
+            _ = port?.send("source.select", [Double(ScopeSource.testSignal.rawValue)])
+        }
+    }
+
+    private func showDenied() {
+        setMessage(Self.deniedMessage, settings: true, offer: true)
+    }
+
+    private func clearMessage() {
+        setMessage(nil, settings: false, offer: false)
+    }
+
+    /// Sets the message, the Settings link and the test-signal offer, each only when it changes (no redraw of the
+    /// controls every frame).
+    private func setMessage(_ message: String?, settings: Bool, offer: Bool) {
+        if mirror.message != message { mirror.message = message }
+        if mirror.showsSettingsLink != settings { mirror.showsSettingsLink = settings }
+        if mirror.offersTestSignal != offer { mirror.offersTestSignal = offer }
+    }
+
+    /// A plain message for a source that could not start.
+    static func failureText(_ error: any Error) -> String {
+        guard let error = error as? AudioSourceError else { return "The signal could not start." }
+        switch error {
+        case .engineFailed(let reason): return "The signal could not start: \(reason)"
+        case .undecodable: return undecodableMessage
+        case .permissionDenied, .notDetermined: return deniedMessage
+        }
+    }
+
+    // MARK: Description
+
+    /// Records the display fields when one of them changed.
+    private func updateDisplay(_ core: ScopeCore) {
+        let state = core.state
+        if !mirror.ready { mirror.ready = true }
+        if mirror.source != state.source { mirror.source = state.source }
+        let name = sourceName(state.source)
+        if mirror.sourceName != name { mirror.sourceName = name }
+        let waveform = ScopeSettings.index(of: state.waveform)
+        if mirror.waveformIndex != waveform { mirror.waveformIndex = waveform }
+        if mirror.frequencyIndex != state.frequencyIndex { mirror.frequencyIndex = state.frequencyIndex }
+        if mirror.gainIndex != state.gainIndex { mirror.gainIndex = state.gainIndex }
+        if mirror.timebaseIndex != state.timebaseIndex { mirror.timebaseIndex = state.timebaseIndex }
+        if mirror.triggerLevel != state.triggerLevel { mirror.triggerLevel = state.triggerLevel }
+        let slope = ScopeSettings.index(of: state.triggerSlope)
+        if mirror.slopeIndex != slope { mirror.slopeIndex = slope }
+        let mode = ScopeSettings.index(of: state.triggerMode)
+        if mirror.modeIndex != mode { mirror.modeIndex = mode }
+    }
+
+    /// Records the trace status of the last window when it changed.
+    private func updateStatus(_ state: ScopeState) {
+        let status = Self.channelWords(activeChannelCount) + ", " + Self.triggerWords(lastWindow, state: state) + ", "
+            + (lastWindow?.clipped == true ? "clipping" : "not clipping")
+        if mirror.status != status { mirror.status = status }
+    }
+
+    /// "Test signal", "Microphone" or the picked file's name ("File" when none is open).
+    private func sourceName(_ source: ScopeSource) -> String {
+        source == .file ? (pickedFile?.name ?? ScopeSource.file.displayName) : source.displayName
+    }
+
+    /// The spoken source and signal: "test signal, sine 1 kHz", "test signal, sweep 100 Hz to 10 kHz",
+    /// "file <name>", "microphone".
+    private func spokenSource(_ state: ScopeState) -> String {
+        switch state.source {
+        case .testSignal: "test signal, " + Self.signalWords(state)
+        case .file: "file " + (pickedFile?.name ?? "not available")
+        case .microphone: "microphone"
+        }
+    }
+
+    /// "sine 1 kHz", "square 440 Hz", "sweep 100 Hz to 10 kHz".
+    nonisolated static func signalWords(_ state: ScopeState) -> String {
+        let name = ScopeSettings.displayName(of: state.waveform).lowercased()
+        return state.waveform == .sweep ? "\(name) 100 Hz to 10 kHz"
+            : "\(name) \(ScopeSettings.frequencyName(state.frequencyIndex))"
+    }
+
+    /// "no signal", "1 channel", "2 channels".
+    nonisolated static func channelWords(_ count: Int) -> String {
+        switch count {
+        case 0: "no signal"
+        case 1: "1 channel"
+        default: "\(count) channels"
+        }
+    }
+
+    /// A trigger level in words: "0", "0.25", "-0.5" (two decimals at most).
+    nonisolated static func levelWords(_ level: Double) -> String {
+        guard level.isFinite else { return "0" }
+        let r = (level * 100).rounded() / 100
+        if r == 0 { return "0" }
+        return r == r.rounded() ? String(Int(r)) : String(r)
+    }
+
+    /// The trigger state of `window` in words: "triggered rising at 0", "waiting for a rising trigger at 0" (normal
+    /// mode), "no trigger" (auto mode, free-running), "filling" (fewer samples than the span) or "no samples yet";
+    /// ", shortened span" is added when the span was capped.
+    nonisolated static func triggerWords(_ window: SignalWindow?, state: ScopeState) -> String {
+        let slope = ScopeSettings.displayName(of: state.triggerSlope).lowercased()
+        let level = levelWords(state.triggerLevel)
+        guard let window, window.sampleCount > 0 else { return "no samples yet" }
+        let words: String
+        if window.waiting {
+            words = "waiting for a \(slope) trigger at \(level)"
+        } else if window.partial {
+            words = "filling"
+        } else if window.triggered {
+            words = "triggered \(slope) at \(level)"
+        } else {
+            words = "no trigger"
+        }
+        return window.shortened ? words + ", shortened span" : words
+    }
+
+    /// "Oscilloscope Studio: test signal, sine 1 kHz, 2 channels, 1 ms per division, gain ×1, triggered rising at 0,
+    /// not clipping." Also brings the running source in line with `core`.
+    func describe(_ core: ScopeCore) -> String {
+        checkLifecycle()
+        sync(core)
+        let state = core.state
+        return "Oscilloscope Studio: \(spokenSource(state)), \(Self.channelWords(activeChannelCount)), "
+            + "\(ScopeSettings.timebaseName(state.timebaseIndex)), gain \(ScopeSettings.gainName(state.gainIndex)), "
+            + "\(Self.triggerWords(lastWindow, state: state)), "
+            + (lastWindow?.clipped == true ? "clipping" : "not clipping") + "."
+    }
+
+    /// One background probe in the top-left corner, outside the plot's 6 % inset.
+    func probes(_ core: ScopeCore) -> [FrameProbe] {
+        [FrameProbe(name: "background", x: 0.02, y: 0.02, expected: "dark")].compactMap { $0 }
+    }
+
+    func makeControls(_ port: ExperienceActionPort) -> AnyView {
+        AnyView(ScopeControls(port: port, presenter: self, mirror: mirror))
+    }
+
+    /// Every action has a native control.
+    var nativeActions: Set<String> { Set(ScopeCore.actionIDs) }
+}
