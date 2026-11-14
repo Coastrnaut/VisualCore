@@ -233,7 +233,7 @@ final class ScopePresenter: ExperiencePresenter {
     /// The mark of a mono window in the XY view.
     static let xyNeedsStereo = "XY needs two channels"
     /// The words of the spectrum axes and marks (shown in the status text and spoken).
-    static let spectrumAxesWords = "frequency 20 Hz to half the sample rate on a logarithmic axis with marks at 100 Hz, "
+    static let spectrumAxesWords = "frequency 20 Hz to half the sample rate on a logarithmic axis with marks at 100 Hz, "  // copy-claims: allow (signal unit)
         + "1 kHz and 10 kHz, level 0 to \u{2212}100 dBFS with marks every 20 dB"
     /// The interval of the lifecycle watch in seconds.
     nonisolated static let watchInterval = 0.1
@@ -1286,7 +1286,7 @@ final class ScopePresenter: ExperiencePresenter {
 
     /// A sample rate in whole hertz with thousands grouped by a comma: "48,000 Hz".
     nonisolated static func hertzWords(_ rate: Double) -> String {
-        guard rate.isFinite, rate >= 0, rate < 1e12 else { return "0 Hz" }
+        guard rate.isFinite, rate >= 0, rate < 1e12 else { return "0 Hz" }  // copy-claims: allow (signal unit)
         let digits = String(Int(rate.rounded()))
         var out = ""
         for (i, ch) in digits.enumerated() {
@@ -1336,7 +1336,7 @@ final class ScopePresenter: ExperiencePresenter {
     /// A frequency in words: "440 Hz", "660 Hz", "1 kHz", "1.5 kHz", "7.5 kHz" (hertz below 1 kHz, otherwise kilohertz
     /// with at most two decimals).
     nonisolated static func frequencyWords(_ hertz: Double) -> String {
-        guard hertz.isFinite else { return "0 Hz" }
+        guard hertz.isFinite else { return "0 Hz" }  // copy-claims: allow (signal unit)
         if hertz < 1_000 {
             let r = hertz.rounded()
             return "\(Int(r)) Hz"
@@ -1363,7 +1363,7 @@ final class ScopePresenter: ExperiencePresenter {
     /// "sine 1 kHz", "square 440 Hz", "sweep 100 Hz to 10 kHz".
     nonisolated static func signalWords(_ state: ScopeState) -> String {
         let name = ScopeSettings.displayName(of: state.waveform).lowercased()
-        return state.waveform == .sweep ? "\(name) 100 Hz to 10 kHz"
+        return state.waveform == .sweep ? "\(name) 100 Hz to 10 kHz"  // copy-claims: allow (signal unit)
             : "\(name) \(ScopeSettings.frequencyName(state.frequencyIndex))"
     }
 
