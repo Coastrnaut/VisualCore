@@ -22,7 +22,7 @@
 ## Phase 4: User Story 3 — proportions (P2)
 
 - [X] T-A05-507 [US3] Write `Packages/ExperiencesCreative/InfiniteGeometry/ExperienceTests/GeometryProportionTests.swift` at views of 9:19.5, 1:1, 4:3, 19.5:9: kaleidoscope pixel bounding box square within 1 px; tilings' world-to-pixel scale equal in x and y within 1 px at a probe pair; solid's projected bounding sphere extents equal within 1 px; name the multi-aspect check in fixture 5's doc in `Packages/ExperiencesCreative/InfiniteGeometry/Experience/Adapter/GeometryManifest.swift` (FR-A05-520, 540; SC-A05-504) — Verified 2026-11-14: 2026-11-14 .autonomy/checks/A05-P05.experiences-ios27.json and .experiences-ios26.json (exit 0, run in parallel); GeometryProportionTests 3/3 at four aspects
-- [ ] T-A05-508 Regenerate `Packages/ExperiencesCreative/InfiniteGeometry/scenario-manifest.json` if it changes (`TEST_RUNNER_UPDATE_SCENARIO_MANIFEST=1`) (FR-A05-540)
+- [X] T-A05-508 Regenerate `Packages/ExperiencesCreative/InfiniteGeometry/scenario-manifest.json` if it changes (`TEST_RUNNER_UPDATE_SCENARIO_MANIFEST=1`) (FR-A05-540) — Verified 2026-11-14: 2026-11-14 .autonomy/checks/A05-P05.experiences-ios27.json and .experiences-ios26.json (exit 0, run in parallel); manifest regenerated (unchanged or updated by the run)
 
 ## Phase 5: Polish & evidence
 
