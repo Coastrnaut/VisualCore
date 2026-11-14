@@ -68,6 +68,18 @@
 // speedChoice) as JSON with sorted keys. The step 2 → 3 leaves the payload as it is: `JourneyState`'s decoder reads the
 // schema-1/2 shape (speedChoice → 2/4/7, standard easing, calm motion off, default mappings) and refuses a damaged one.
 // `schemaOneExample()` and `schemaTwoExample()` are the stored payloads the registry's migration check restores.
+//
+// Feature 057 (A07-P04) T-A07-403 (FR-A07-402; research D2; data-model "Action preset.apply"): one more action.
+//   preset.apply [16]            a whole journey in one step: [world, then for tunnel, landscape and star corridor:
+//                                primary channel, primary sensitivity, light channel, light sensitivity, then speed
+//                                target, easing, calm (0 or 1)] (`JourneyPreset.actionValues`). The engine checks the
+//                                declared ranges; `JourneyPreset.fromActionValues` then refuses any value that is not
+//                                a whole number naming a case (or a calm other than 0 or 1) with the rule
+//                                `a07.invalid-preset`, and a refusal changes nothing. Accepted, the world, the
+//                                mappings of all three worlds, the speed target, the easing and calm motion are set
+//                                together; distance, current speed, seed, source and pause are kept, so the flight
+//                                eases to the new target within the active limits and never jumps.
+// The snapshot schema stays 3 (the action changes only fields already in the state).
 import Foundation
 import AudioOdysseyCore
 import VisualCoreExperience
@@ -82,6 +94,9 @@ public enum OdysseyRule {
     public static let notPaused = "a07.not-paused"
     /// `source.microphone` while the mirrored microphone permission is denied or restricted (feature 055).
     public static let permissionDenied = "a07.permission-denied"
+    /// `preset.apply` with a value that names no world, channel, sensitivity or easing, or a calm value other than 0
+    /// or 1 (feature 057).
+    public static let invalidPreset = "a07.invalid-preset"
 }
 
 /// The microphone permission as Audio Odyssey mirrors it from the system (feature 055). The system stays the
@@ -198,9 +213,10 @@ public struct OdysseyCore: ExperienceCore, Equatable {
         return MigrationExample(version: version, snapshot: encoded, expectedDigest: builder.finish().hex)
     }
 
-    /// The fifteen controls: world, speed preset, pause, resume, a new journey, the Reduce Motion mirror, (feature 055)
-    /// the three sources and the microphone permission mirror, and (feature 056) the continuous speed, the easing,
-    /// calm motion, the mapping of the current world and the mapping reset.
+    /// The sixteen controls: world, speed preset, pause, resume, a new journey, the Reduce Motion mirror, (feature 055)
+    /// the three sources and the microphone permission mirror, (feature 056) the continuous speed, the easing, calm
+    /// motion, the mapping of the current world and the mapping reset, and (feature 057) the whole-journey
+    /// `preset.apply` with its sixteen values.
     public static var controls: [ExperienceControl] {
         let access = Double(OdysseyMicrophoneAccess.notDetermined.rawValue)...Double(OdysseyMicrophoneAccess.restricted.rawValue)
         let channels = Double(EnvelopeChannel.low.rawValue)...Double(EnvelopeChannel.overall.rawValue)
@@ -221,7 +237,20 @@ public struct OdysseyCore: ExperienceCore, Equatable {
             ExperienceControl(id: "comfort.calm", ranges: [0...1]),
             ExperienceControl(id: "mapping.set", ranges: [0...1, channels, sensitivities]),
             ExperienceControl(id: "mapping.reset"),
+            ExperienceControl(id: "preset.apply", ranges: presetRanges),
         ]
+    }
+
+    /// The declared ranges of the sixteen `preset.apply` values (the layout of `JourneyPreset.actionValues`).
+    static var presetRanges: [ClosedRange<Double>] {
+        let worlds = 0...Double(JourneyWorld.allCases.count - 1)
+        let channels = Double(EnvelopeChannel.low.rawValue)...Double(EnvelopeChannel.overall.rawValue)
+        let sensitivities = Double(Sensitivity.low.rawValue)...Double(Sensitivity.high.rawValue)
+        let easings = Double(Easing.gentle.rawValue)...Double(Easing.brisk.rawValue)
+        var ranges: [ClosedRange<Double>] = [worlds]
+        for _ in JourneyWorld.allCases { ranges += [channels, sensitivities, channels, sensitivities] }
+        ranges += [JourneyState.speedTargetRange, easings, 0...1]
+        return ranges
     }
 
     /// The first journey with `seed` as its seed.
@@ -307,9 +336,31 @@ public struct OdysseyCore: ExperienceCore, Equatable {
             state.setMapping(mapping, for: state.world)
         case "mapping.reset":
             state.resetMappings()
+        case "preset.apply":
+            return applyPreset(v)
         default:
             return .rejected(.unknownControl(action.control))
         }
+        return .accepted
+    }
+
+    /// `preset.apply` (feature 057): validates all sixteen values first, then sets the world, the three mappings, the
+    /// speed target, the easing and calm motion together. All-or-nothing: a refusal changes nothing. Distance, speed,
+    /// seed, source and pause are kept, so the flight eases to the new target.
+    private mutating func applyPreset(_ v: [Double]) -> ActionResult {
+        guard v.count == JourneyPreset.actionValueCount else {
+            return .rejected(.wrongValueCount(expected: JourneyPreset.actionValueCount, found: v.count))
+        }
+        guard let preset = JourneyPreset.fromActionValues(v) else {
+            return .rejected(.rule(code: OdysseyRule.invalidPreset))
+        }
+        var next = state
+        next.select(preset.world)
+        for world in JourneyWorld.allCases { next.setMapping(preset.mappings[world.rawValue], for: world) }
+        guard next.setSpeedTarget(preset.speedTarget) else { return .rejected(.rule(code: OdysseyRule.invalidPreset)) }
+        next.setEasing(preset.easing)
+        next.setCalmMotion(preset.calmMotion)
+        state = next
         return .accepted
     }
 

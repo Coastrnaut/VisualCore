@@ -73,6 +73,18 @@
 //   - Light: `WorldResponse.light` is the ambient of every renderer drawn in the frame, in every world.
 //   - Description: names the chosen speed ("2.5 units per second"), the easing and "calm motion" when calm motion is
 //     in effect (in-app or the system's Reduce Motion).
+//
+// Feature 057 (A07-P04) T-A07-403 (FR-A07-401–404, FR-A07-410, FR-A07-430; clarifications 1, 3 and 5):
+//   - Journeys: with the experience's storage (from the factory) the presenter owns a `JourneyPresetStore`, reloaded
+//     whenever the scene is set up (each time the experience is opened or its context returns); without storage (some
+//     tests) only `JourneyPreset.builtIns` are offered. A journey is applied by sending its `actionValues` as one
+//     `preset.apply` action, so the core validates and sets every field at once and the flight eases to the new
+//     speed. The selected journey's id is display state only (`OdysseyMirror.selectedPresetID`, never in the core);
+//     it marks the row and names what Rename and Delete act on. Saving captures the last core's journey state.
+//   - Sound picker: `pickSource(_:)` is what the segmented picker calls: the demo sends `source.demo`, the microphone
+//     goes through `chooseMicrophone()` (permission first), and File returns nil so the controls open the system file
+//     importer (`chooseFile(url:)` then opens the file before `source.file` is sent). The status line is
+//     `OdysseyMirror.sourceName` ("Demo signal", "Microphone" or the file's name).
 import Foundation
 import SwiftUI
 import UIKit
@@ -113,6 +125,8 @@ final class OdysseyMirror {
     var showsSettingsLink = false
     /// Whether the system permission request is open.
     var isRequestingPermission = false
+    /// The journey last applied or saved here (feature 057; display only, never state); nil when none is selected.
+    var selectedPresetID: UUID?
 }
 
 /// How the presenter makes its audio sources; tests replace them with doubles (feature 055).
@@ -257,6 +271,8 @@ final class OdysseyPresenter: ExperiencePresenter {
     weak var port: ExperienceActionPort?
     /// The demo signal's mode (the melody in the app; tests may choose a tone or silence before the source starts).
     var demoMode: DemoSignal.Mode = .sequence
+    /// The journeys in the experience's own storage (feature 057); nil without storage (some tests).
+    let presets: JourneyPresetStore?
 
     /// The rail of `railSeed`.
     private(set) var rail: CameraRail?
@@ -322,8 +338,9 @@ final class OdysseyPresenter: ExperiencePresenter {
     private(set) var response: WorldResponse
 
     init(experienceID: ExperienceID, permission: any MicrophonePermission, factory: OdysseySourceFactory = .system,
-         reduceMotion: Bool = false, reduceFlashing: Bool = false) {
+         reduceMotion: Bool = false, reduceFlashing: Bool = false, storage: ExperienceStorage? = nil) {
         self.experienceID = experienceID
+        presets = storage.map { JourneyPresetStore(storage: $0) }
         self.permission = permission
         self.factory = factory
         self.reduceMotion = reduceMotion
@@ -341,6 +358,7 @@ final class OdysseyPresenter: ExperiencePresenter {
         pass.clearColor = Self.background
         self.pass = pass
         isLive = true
+        presets?.reload()
         let center = NotificationCenter.default
         observers = [
             center.addObserver(forName: UIApplication.didEnterBackgroundNotification, object: nil, queue: .main) { [weak self] _ in
@@ -716,6 +734,80 @@ final class OdysseyPresenter: ExperiencePresenter {
         return deniedMessage
     }
 
+    // MARK: Journeys (feature 057)
+
+    /// The journeys offered: the store's entries (built-ins, then the user journeys), or the built-ins alone without
+    /// storage.
+    var presetEntries: [JourneyPreset] { presets?.entries ?? JourneyPreset.builtIns }
+
+    /// The id of the selected journey (display only); nil when none is selected.
+    var selectedPresetID: UUID? { mirror.selectedPresetID }
+
+    /// The selected journey when it is a user journey (Rename and Delete act on it); nil otherwise.
+    var selectedUserPreset: JourneyPreset? {
+        guard let id = mirror.selectedPresetID,
+              let preset = presetEntries.first(where: { $0.id == id }), !preset.isBuiltIn else { return nil }
+        return preset
+    }
+
+    /// Applies `preset` through the port as one `preset.apply` action with its sixteen values; an accepted journey
+    /// becomes the selected one. Returns the core's answer.
+    @discardableResult
+    func apply(_ preset: JourneyPreset) -> ActionResult {
+        guard let port else { return .rejected(.notActive(.inactive)) }
+        let result = port.send("preset.apply", preset.actionValues)
+        if result.isAccepted { mirror.selectedPresetID = preset.id }
+        return result
+    }
+
+    /// Saves the last core's journey (world, mappings, speed target, easing, calm motion) as a user journey named
+    /// `name` (cleaned and made unique); the new journey becomes the selected one. Nil without storage, before the
+    /// first frame, or when the store refuses (its `lastMessage` says why).
+    @discardableResult
+    func saveCurrentPreset(named name: String, now: Date = Date()) -> JourneyPreset? {
+        guard let presets, let state = lastCore?.state else { return nil }
+        guard let saved = presets.save(name: name, from: state, now: now) else { return nil }
+        mirror.selectedPresetID = saved.id
+        return saved
+    }
+
+    /// Renames the selected user journey to `name` (cleaned and made unique). False without storage, without a
+    /// selected user journey, or when the store refuses.
+    @discardableResult
+    func renameSelectedPreset(to name: String) -> Bool {
+        guard let presets, let id = mirror.selectedPresetID else { return false }
+        return presets.rename(id, to: name)
+    }
+
+    /// Deletes the selected user journey; the selection is cleared on success. False without storage, without a
+    /// selected journey, or when the store refuses (a built-in is refused with a plain message).
+    @discardableResult
+    func deleteSelectedPreset() -> Bool {
+        guard let presets, let id = mirror.selectedPresetID else { return false }
+        guard presets.delete(id) else { return false }
+        mirror.selectedPresetID = nil
+        return true
+    }
+
+    // MARK: Sound picker (feature 057)
+
+    /// What the segmented sound picker does for `source`: the demo sends `source.demo`, the microphone goes through
+    /// `chooseMicrophone()`. Returns the core's answer, or nil for a file, which the controls pick first with the
+    /// system file importer (then `chooseFile(url:)`).
+    @discardableResult
+    func pickSource(_ source: SourceKind) async -> ActionResult? {
+        switch source {
+        case .demo:
+            guard let port else { return .rejected(.notActive(.inactive)) }
+            let result = port.send("source.demo")
+            return result
+        case .microphone:
+            return await chooseMicrophone()
+        case .file:
+            return nil
+        }
+    }
+
     // MARK: Description
 
     /// Records the display fields when one of them changed.
@@ -798,6 +890,6 @@ final class OdysseyPresenter: ExperiencePresenter {
     var nativeActions: Set<String> {
         ["world.select", "speed.select", "flight.pause", "flight.resume", "journey.reseed", "comfort.reduce-motion",
          "source.demo", "source.microphone", "source.file", "permission.mirror", "speed.set", "easing.select",
-         "comfort.calm", "mapping.set", "mapping.reset"]
+         "comfort.calm", "mapping.set", "mapping.reset", "preset.apply"]
     }
 }

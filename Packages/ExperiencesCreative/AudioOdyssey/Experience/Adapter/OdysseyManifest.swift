@@ -11,6 +11,9 @@
 // (`speed.set [5.5]` and `easing.select [0]` with flight steps between); fixture 3 keeps the denied-microphone sequence
 // and adds two more `source.demo` switches (five source switches in all). The expected digests (now
 // `a07.journey.v3`) still derive by playing.
+// Feature 057 (A07-P04) T-A07-405 (FR-A07-402): fixture 4 starts by applying the built-in "Rolling hills"
+// (`preset.apply` with `JourneyPreset.builtIns[1].actionValues`: the landscape at 4 units/s, standard easing) and then
+// flies the steady medium flight as before; the expected digests still derive by playing.
 #if DEBUG || VISUALCORE_AUTOMATION
 import AudioOdysseyCore
 import VisualCoreExperience
@@ -85,9 +88,10 @@ extension OdysseyCore {
              step("source.demo", steps: 30), step("world.select", [2], steps: 30), step("source.demo", steps: 30),
              step("source.demo", steps: 30), step("source.demo", steps: 30),
              ScenarioStep(steps: 60)],
-            // Fixture 4 (catalog: "stable and measurable scene response"): a steady medium flight advances the same
-            // distance for the same steps; the audio-driven form follows in A07-P03.
-            [step("speed.select", [1], steps: 1), ScenarioStep(steps: 600)],
+            // Fixture 4 (catalog: "stable and measurable scene response"): the built-in "Rolling hills" is applied in
+            // one step (feature 057), then a steady medium flight advances the same distance for the same steps.
+            [step("preset.apply", JourneyPreset.builtIns[1].actionValues, steps: 1),
+             step("speed.select", [1], steps: 0), ScenarioStep(steps: 600)],
             // Fixture 5 (catalog: "long-duration travel avoids precision collapse"): a fast flight crosses many
             // pieces; the rebasing itself is proven by OriginRebaseTests at 10^7 units.
             [step("speed.select", [2], steps: 1), ScenarioStep(steps: 2_400)],

@@ -15,6 +15,15 @@
 // mapping editor of the world shown: what the music moves (`mapping.primary.channel`, `mapping.primary.sensitivity`,
 // `mapping.light.channel`, `mapping.light.sensitivity`, each a menu picker sending `mapping.set`) and "Reset all
 // mappings" (`mapping.reset`). Every control has an accessible label, value or hint.
+// Feature 057 (A07-P04) T-A07-403 (FR-A07-401, FR-A07-403, FR-A07-410, FR-A07-430): the controls are grouped in four
+// sections. Journey: the world picker, Pause or Resume, New journey. Sound: the segmented picker (`source.picker`, Demo /
+// Microphone / File, through the presenter's `pickSource(_:)` or the file importer), the status line (`source.status`:
+// "Demo signal", "Microphone" or the file's name), "Choose file…" (`source.file`), the permission message and Settings
+// link, then the mapping editor. Comfort: the speed slider and presets, the easing, calm motion. Journeys: one row per
+// journey (`preset.0…`, built-ins first; a tap applies it with `preset.apply`), and with storage the name field
+// (`preset.name`), Save (`preset.save`), Rename (`preset.rename`) and Delete (`preset.delete`, confirmed) for the
+// selected user journey, the store's message (`preset.message`) and the counts of unreadable (`preset.unreadable`) and
+// newer (`preset.newer`) files when above zero.
 import SwiftUI
 import UIKit
 import UniformTypeIdentifiers
@@ -28,6 +37,8 @@ struct OdysseyControls: View {
     let mirror: OdysseyMirror
 
     @State private var importing = false
+    @State private var presetName = ""
+    @State private var deleting = false
 
     var body: some View {
         Group {
@@ -44,47 +55,13 @@ struct OdysseyControls: View {
 
     @ViewBuilder private func content(world: JourneyWorld) -> some View {
         VStack(alignment: .leading, spacing: 16) {
-            section("World") {
+            section("Journey") {
                 ForEach(JourneyWorld.allCases, id: \.rawValue) { option in
                     choice(option.displayName, selected: world == option, identifier: "world.\(option.rawValue)",
                            hint: "Flies through the \(option.displayName.lowercased()) from the same place") {
                         if world != option { _ = port.send("world.select", [Double(option.rawValue)]) }
                     }
                 }
-            }
-            section("Speed") {
-                speedSlider
-                ForEach(SpeedChoice.allCases, id: \.rawValue) { option in
-                    let selected = mirror.speedTarget == option.unitsPerSecond
-                    choice("\(option.displayName) (\(OdysseyPresenter.speedWords(option.unitsPerSecond)))",
-                           selected: selected, identifier: "speed.\(option.rawValue)",
-                           hint: "Eases the flight to \(option.displayName.lowercased()) speed") {
-                        if !selected { _ = port.send("speed.select", [Double(option.rawValue)]) }
-                    }
-                }
-            }
-            section("Camera easing") {
-                ForEach(Easing.allCases, id: \.rawValue) { option in
-                    choice(option.displayName, selected: mirror.easing == option, identifier: "easing.\(option.rawValue)",
-                           hint: Self.easingHint(option)) {
-                        if mirror.easing != option { _ = port.send("easing.select", [Double(option.rawValue)]) }
-                    }
-                }
-            }
-            section("Comfort") {
-                Toggle(isOn: Binding(get: { mirror.calmMotion },
-                                     set: { on in if on != mirror.calmMotion { _ = port.send("comfort.calm", [on ? 1 : 0]) } })) {
-                    Text(verbatim: "Calm motion").font(.body).fixedSize(horizontal: false, vertical: true)
-                }
-                .frame(minHeight: 44)
-                .accessibilityLabel(Text(verbatim: "Calm motion"))
-                .accessibilityHint(Text(verbatim: "Flies at most 2.5 units per second, without sideways sway"))
-                .accessibilityIdentifier(port.identifier("comfort.calm"))
-            }
-            section("What the music moves") {
-                mappingEditor(world: world)
-            }
-            section("Flight") {
                 if mirror.paused {
                     button("Resume", identifier: "flight.resume", hint: "Continues the flight from where it stopped") {
                         _ = port.send("flight.resume")
@@ -98,24 +75,17 @@ struct OdysseyControls: View {
                     _ = port.send("journey.reseed")
                 }
             }
-            section("Sound source") {
-                choice("Demo signal", selected: mirror.source == .demo, identifier: "source.demo",
-                       hint: "The tunnel follows the built-in signal; no permission needed") {
-                    if mirror.source != .demo { _ = port.send("source.demo") }
-                }
-                choice("Microphone", selected: mirror.source == .microphone, identifier: "source.microphone",
-                       hint: "The tunnel follows the live input; nothing is recorded or sent") {
-                    Task { await presenter.chooseMicrophone() }
-                }
-                .disabled(mirror.isRequestingPermission)
-                choice("Choose file…", selected: mirror.source == .file, identifier: "source.file",
-                       hint: "The tunnel follows an audio file you pick; it is read in place, not copied") {
-                    importing = true
-                }
-                Text(verbatim: "Playing: \(mirror.sourceName)")
+            section("Sound") {
+                soundPicker
+                Text(verbatim: mirror.sourceName)
                     .font(.footnote)
                     .fixedSize(horizontal: false, vertical: true)
+                    .accessibilityLabel(Text(verbatim: "Playing: \(mirror.sourceName)"))
                     .accessibilityIdentifier(port.identifier("source.status"))
+                button(mirror.source == .file ? "Choose another file…" : "Choose file…", identifier: "source.file",
+                       hint: "The journey follows an audio file you pick; it is read in place, not copied") {
+                    importing = true
+                }
                 if let message = mirror.message {
                     Text(verbatim: message)
                         .font(.footnote).foregroundStyle(.primary)
@@ -130,7 +100,136 @@ struct OdysseyControls: View {
                         .accessibilityIdentifier(port.identifier("settings"))
                     }
                 }
+                Text(verbatim: "What the music moves").font(.subheadline).accessibilityAddTraits(.isHeader)
+                mappingEditor(world: world)
             }
+            section("Comfort") {
+                speedSlider
+                ForEach(SpeedChoice.allCases, id: \.rawValue) { option in
+                    let selected = mirror.speedTarget == option.unitsPerSecond
+                    choice("\(option.displayName) (\(OdysseyPresenter.speedWords(option.unitsPerSecond)))",
+                           selected: selected, identifier: "speed.\(option.rawValue)",
+                           hint: "Eases the flight to \(option.displayName.lowercased()) speed") {
+                        if !selected { _ = port.send("speed.select", [Double(option.rawValue)]) }
+                    }
+                }
+                Text(verbatim: "Camera easing").font(.subheadline).accessibilityAddTraits(.isHeader)
+                ForEach(Easing.allCases, id: \.rawValue) { option in
+                    choice(option.displayName, selected: mirror.easing == option, identifier: "easing.\(option.rawValue)",
+                           hint: Self.easingHint(option)) {
+                        if mirror.easing != option { _ = port.send("easing.select", [Double(option.rawValue)]) }
+                    }
+                }
+                Toggle(isOn: Binding(get: { mirror.calmMotion },
+                                     set: { on in if on != mirror.calmMotion { _ = port.send("comfort.calm", [on ? 1 : 0]) } })) {
+                    Text(verbatim: "Calm motion").font(.body).fixedSize(horizontal: false, vertical: true)
+                }
+                .frame(minHeight: 44)
+                .accessibilityLabel(Text(verbatim: "Calm motion"))
+                .accessibilityHint(Text(verbatim: "Flies at most 2.5 units per second, without sideways sway"))
+                .accessibilityIdentifier(port.identifier("comfort.calm"))
+            }
+            section("Journeys") {
+                journeys
+            }
+        }
+    }
+
+    /// The segmented sound picker (feature 057): Demo, Microphone, File. Demo and Microphone go through the
+    /// presenter's `pickSource(_:)`; File opens the system file importer first.
+    private var soundPicker: some View {
+        Picker(selection: Binding(get: { mirror.source },
+                                  set: { source in
+                                      guard source != mirror.source else { return }
+                                      if source == .file {
+                                          importing = true
+                                      } else {
+                                          Task { _ = await presenter.pickSource(source) }
+                                      }
+                                  })) {
+            ForEach(SourceKind.allCases, id: \.rawValue) { source in
+                Text(verbatim: Self.pickerName(source)).tag(source)
+            }
+        } label: {
+            Text(verbatim: "Sound source")
+        }
+        .pickerStyle(.segmented)
+        .frame(minHeight: 44)
+        .disabled(mirror.isRequestingPermission)
+        .accessibilityLabel(Text(verbatim: "Sound source"))
+        .accessibilityValue(Text(verbatim: mirror.sourceName))
+        .accessibilityHint(Text(verbatim: "Demo needs no permission; the microphone is never recorded or sent; a file is read in place"))
+        .accessibilityIdentifier(port.identifier("source.picker"))
+    }
+
+    /// The journeys (feature 057): one row per journey (`preset.0…`, a tap applies it), then, with storage, the name
+    /// field, Save, Rename and Delete for the selected user journey, the store's message and the counts of files that
+    /// could not be read or are newer.
+    @ViewBuilder private var journeys: some View {
+        let entries = presenter.presetEntries
+        ForEach(Array(entries.enumerated()), id: \.element.id) { index, preset in
+            choice(preset.isBuiltIn ? "\(preset.name) (built in)" : preset.name,
+                   selected: mirror.selectedPresetID == preset.id, identifier: "preset.\(index)",
+                   hint: "Changes to the \(preset.world.displayName.lowercased()) at "
+                       + "\(OdysseyPresenter.speedWords(preset.speedTarget)) with this journey's mapping; the flight eases there") {
+                _ = presenter.apply(preset)
+            }
+        }
+        if let store = presenter.presets {
+            TextField("Journey name", text: $presetName)
+                .textFieldStyle(.roundedBorder)
+                .frame(minHeight: 44)
+                .accessibilityLabel(Text(verbatim: "Journey name"))
+                .accessibilityIdentifier(port.identifier("preset.name"))
+            button("Save journey", identifier: "preset.save",
+                   hint: "Saves the world, mappings, speed, easing and calm motion under this name") {
+                if presenter.saveCurrentPreset(named: presetName) != nil { presetName = "" }
+            }
+            if let selected = presenter.selectedUserPreset {
+                button("Rename \(selected.name)", identifier: "preset.rename",
+                       hint: "Gives the selected journey the name in the field") {
+                    if presenter.renameSelectedPreset(to: presetName) { presetName = "" }
+                }
+                button("Delete \(selected.name)", identifier: "preset.delete", hint: "Deletes the selected journey") {
+                    deleting = true
+                }
+                .confirmationDialog("Delete journey?", isPresented: $deleting, titleVisibility: .visible) {
+                    Button("Delete", role: .destructive) { _ = presenter.deleteSelectedPreset() }
+                    Button("Cancel", role: .cancel) {}
+                }
+            }
+            if let message = store.lastMessage {
+                Text(verbatim: message)
+                    .font(.footnote).foregroundStyle(.primary)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .accessibilityIdentifier(port.identifier("preset.message"))
+            }
+            if store.unreadable > 0 {
+                Text(verbatim: Self.countText(store.unreadable, one: "journey file can't be read",
+                                              many: "journey files can't be read"))
+                    .font(.footnote).fixedSize(horizontal: false, vertical: true)
+                    .accessibilityIdentifier(port.identifier("preset.unreadable"))
+            }
+            if store.newer > 0 {
+                Text(verbatim: Self.countText(store.newer, one: "journey was saved by a newer version",
+                                              many: "journeys were saved by a newer version"))
+                    .font(.footnote).fixedSize(horizontal: false, vertical: true)
+                    .accessibilityIdentifier(port.identifier("preset.newer"))
+            }
+        }
+    }
+
+    /// "1 journey file can't be read", "3 journey files can't be read".
+    static func countText(_ count: Int, one: String, many: String) -> String {
+        "\(count) " + (count == 1 ? one : many)
+    }
+
+    /// The short name of a source in the segmented picker: Demo, Microphone, File.
+    static func pickerName(_ source: SourceKind) -> String {
+        switch source {
+        case .demo: "Demo"
+        case .microphone: "Microphone"
+        case .file: "File"
         }
     }
 

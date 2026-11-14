@@ -10,6 +10,7 @@
 // Feature 056 (A07-P03) T-A07-303 (FR-A07-301–303, FR-A07-312, FR-A07-330): schema 3 and the digest `a07.journey.v3`;
 // fifteen controls; the new actions change the digest; the flight accelerates at the easing's share of the limit
 // (standard 0.66 by default); the schema-1 and schema-2 examples migrate; damaged schema-3 payloads are refused.
+// Feature 057 (A07-P04) T-A07-403: sixteen controls (`preset.apply` added; its behaviour is in OdysseyPresetApplyTests).
 import Foundation
 import Testing
 @testable import AudioOdysseyExperience
@@ -37,7 +38,7 @@ private func core(_ engine: ExperienceEngine<OdysseyCore>) throws -> OdysseyCore
         #expect(OdysseyCore.controls.map(\.id)
                 == ["world.select", "speed.select", "flight.pause", "flight.resume", "journey.reseed",
                     "comfort.reduce-motion", "source.demo", "source.microphone", "source.file", "permission.mirror",
-                    "speed.set", "easing.select", "comfort.calm", "mapping.set", "mapping.reset"])
+                    "speed.set", "easing.select", "comfort.calm", "mapping.set", "mapping.reset", "preset.apply"])
         #expect(OdysseyCore.migrations.currentVersion == 3)
     }
 
