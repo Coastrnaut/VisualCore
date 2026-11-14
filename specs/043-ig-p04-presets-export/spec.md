@@ -20,6 +20,33 @@ Canonical overrides:
 - **Owner rulings of 2026-11-13:** short tests; audits wait for the device campaign; parallel agents; no wall-clock
   assertions on CI runners.
 
+## Clarifications
+
+### Session 2026-11-13
+
+Answered autonomously under the owner's standing delegation, recommended option each time. Facts checked in code:
+controls change the experience only through actions (`ExperienceActionPort.send`); Particle Universe opens a saved
+scene by sending its document's actions (`openActions()`) and names duplicates with a numeric suffix (`uniqueName`, "Name
+2"); `ExperienceStorage` allows 64 files (`StorageQuota.maxFiles`) and replaces files atomically; the host hands controls
+an `experienceStillRenderer` that calls `RenderHost.renderOffscreen` on the session's context; `StillImageEncoder.pngData`
+encodes through ImageIO (PNG file bytes are not documented to be stable across runs or OS versions).
+
+- Q: How is a saved composition restored when controls can only send actions? → A: By one atomic action
+  `composition.open` whose values carry the whole stored composition (preset index, kind, order, repeats, scale, palette,
+  motif seed, the 2D camera and the 3D camera); the core validates all values together and either applies all or refuses
+  all, so a partial open is impossible and the digest after opening equals the digest at save time.
+- Q: What is stored in a saved-composition file? → A: `composition-<uuid>.json` in the experience's storage:
+  `{"document": <GeometryDocument version 1>, "digest": "<hex at save time>", "format": 1, "id": "<uuid>", "saved":
+  <seconds>}` with sorted keys, following `ParticleLibrary` (unreadable files counted and never deleted; a newer
+  `format` or document version is listed and refused).
+- Q: What happens when a name is already taken? → A: As in Particle Universe, the saved composition gets the first free
+  numeric suffix ("Spiral 2"); renaming to a taken name does the same. Nothing is replaced silently.
+- Q: What does "byte-identical exports" mean when the PNG encoder may vary its bytes? → A: The decoded pixels of two
+  exports are identical byte for byte (RGBA), and the PNG files have the same size in pixels; file-byte equality is not
+  required.
+- Q: What does saving with an empty name do? → A: The name falls back to "Untitled" (then the numeric-suffix rule), as in
+  Particle Universe; names are trimmed and cut to 60 characters, so saving is never refused for its name.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Save a composition and get it back exactly (Priority: P1) 🎯
@@ -58,7 +85,7 @@ on-screen picture.
 
 1. **Given** any preset, **When** the person exports, **Then** a PNG picture with a long edge of 2048 pixels in the
    canvas's aspect is offered to the share sheet.
-2. **Given** an unchanged composition, **When** it is exported twice, **Then** the two pictures are byte-identical.
+2. **Given** an unchanged composition, **When** it is exported twice, **Then** the two pictures' pixels are identical.
 3. **Given** the 3D composition, **When** it is exported, **Then** the picture is depth-correct (as on screen).
 4. **Given** an export that cannot be made (for example the size exceeds the device's limit), **When** it fails,
    **Then** a plain message is shown, the live view keeps running and no file is left behind.
@@ -83,9 +110,8 @@ the cycles equal those after the first cycle and nothing is reported leaked.
 
 ### Edge Cases
 
-- Saving with an empty or whitespace name is refused with a message; names longer than 60 characters are refused.
-- Saving with a name that already exists (ignoring case) asks to replace or is refused — default: refused with a message
-  offering a different name.
+- Saving with an empty or whitespace name saves as "Untitled"; names are trimmed and cut to 60 characters.
+- Saving or renaming to a name that already exists (ignoring case) uses the first free numeric suffix ("Spiral 2").
 - The storage quota is reached: the save is refused, existing entries stay intact, a message is shown.
 - A saved file that cannot be read (damaged or from a newer version) is listed as unreadable, never deleted, and opening
   it is refused with a message.
@@ -98,10 +124,10 @@ the cycles equal those after the first cycle and nothing is reported leaked.
 ### Functional Requirements
 
 **Saved compositions (story 1)**
-- **FR-A05-401**: The person MUST be able to save the current composition under a name (1–60 characters after trimming,
-  unique ignoring case) and see the saved compositions listed by name.
-- **FR-A05-402**: Opening a saved composition MUST restore the complete experience state so that its digest equals the
-  digest recorded at save time.
+- **FR-A05-401**: The person MUST be able to save the current composition under a name (trimmed, at most 60 characters,
+  empty → "Untitled", made unique ignoring case with a numeric suffix) and see the saved compositions listed by name.
+- **FR-A05-402**: Opening a saved composition MUST restore the complete experience state in one all-or-nothing step so
+  that its digest equals the digest recorded at save time.
 - **FR-A05-403**: The person MUST be able to rename and delete saved compositions; other entries MUST stay untouched.
 - **FR-A05-404**: Saved compositions MUST persist in the experience's own storage across closing and reopening, within
   its quota; a refused save MUST leave existing entries unchanged.
@@ -113,7 +139,7 @@ the cycles equal those after the first cycle and nothing is reported leaked.
   by the device) in the canvas's aspect, offered through the system share sheet.
 - **FR-A05-411**: Export MUST be drawn by the host on its own graphics context (no second context or renderer) and MUST
   not change the composition's state.
-- **FR-A05-412**: Two exports of an unchanged composition MUST be byte-identical.
+- **FR-A05-412**: Two exports of an unchanged composition MUST have byte-identical decoded pixels.
 - **FR-A05-413**: A failed export MUST show a plain message, keep the live view running and leave no file.
 
 **Stability (story 3)**
@@ -129,8 +155,8 @@ the cycles equal those after the first cycle and nothing is reported leaked.
 
 ### Key Entities
 
-- **Saved composition**: an identifier, a name, the save time, the stored experience state (the same snapshot the engine
-  writes, with its schema version) and the digest at save time.
+- **Saved composition**: an identifier, a name, the save time, the composition document (preset index and fields, motif
+  seed, 2D and 3D cameras; version 1) and the digest at save time.
 - **Exported picture**: a PNG in a temporary folder, removed when the experience closes.
 
 ## Success Criteria *(mandatory)*
@@ -140,7 +166,7 @@ the cycles equal those after the first cycle and nothing is reported leaked.
 - **SC-A05-401**: For every preset kind, a saved composition reopened after changes restores its digest in 100% of cases.
 - **SC-A05-402**: Save, rename, delete and reopen keep the list and files consistent in 100% of the tested sequences,
   including a refused save at the quota.
-- **SC-A05-403**: Two exports of each preset kind are byte-identical, have the exact requested size and match the
+- **SC-A05-403**: Two exports of each preset kind have byte-identical decoded pixels, have the exact requested size and match the
   on-screen picture within 2/255 per channel at probe pixels after scaling.
 - **SC-A05-404**: After three full preset cycles, live GPU object counts equal those after the first cycle on both
   simulator runtimes; nothing leaked.
@@ -149,8 +175,7 @@ the cycles equal those after the first cycle and nothing is reported leaked.
 
 ## Assumptions
 
-- The saved state is the engine's own snapshot (schema 3), so the Phase 01–03 migration chain also applies to saved
-  compositions written by later phases.
+- The saved document is versioned on its own (version 1); a later phase that changes it adds a document migration.
 - The host exposes a still renderer to controls (as used by Fluid Art); exports are drawn at the requested size through
   it.
 - Pixel comparisons are done on the simulator; device colour fidelity is checked in the device campaign.
