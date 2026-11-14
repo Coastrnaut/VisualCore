@@ -2,6 +2,7 @@
 """Copy-claim check for store text and interface strings (feature 038 T-A04-615; A04-P06 research D5).
 
   python3 scripts/check_copy_claims.py [--config Configs/copy-claims-denylist.json] --text FILE... [--swift FILE...]
+      [--allow WORD...]
 
 The denylist (schema 1, data-model "Copy denylist") refuses measured claims (`patterns`: numbers with fps, ms, %,
 hours or Hz, frame-rate and battery claims; case-insensitive regular expressions), unmeasured quality words and
@@ -13,6 +14,10 @@ literals, which is the human-facing text: comment lines and trailing `//` commen
 literals that are identifiers or commands rather than copy are skipped: arguments of `identifier:` /
 `identifier(` / `accessibilityIdentifier(`, `send(` and `systemName:`. A line containing `copy-claims: allow` is
 skipped in both kinds of file (for quoted denylist examples in documents).
+
+`--allow` removes denylist `words` that name a feature the experience really has (feature 045 A05-P06: Infinite
+Geometry has a camera and shares pictures; the shared denylist was written for Particle Universe, which has neither).
+It never removes a measured-claim pattern. The experience's `release.json` lists them in `copyCheck.allow`.
 
 Prints `PROBLEM: <file>:<line>: '<match>' (<reason>)` per hit and `FAIL: copy claims, N problems`, exit 1; otherwise
 `PASS: copy claims, N files`, exit 0. Exit 2 on unreadable input.
@@ -33,12 +38,16 @@ ALLOW = "copy-claims: allow"
 SKIP_BEFORE = re.compile(r"(identifier\s*[:(]|Identifier\s*\(|send\s*\(|systemName\s*:)\s*$")
 
 
-def load_rules(config: dict) -> list[tuple[re.Pattern[str], str]]:
-    """Compiled (pattern, reason) pairs: the regex patterns first, then each word as a whole-word phrase."""
+def load_rules(config: dict, allow: list[str] | None = None) -> list[tuple[re.Pattern[str], str]]:
+    """Compiled (pattern, reason) pairs: the regex patterns first, then each word as a whole-word phrase, except the
+    words in `allow` (compared ignoring case)."""
     if config.get("schema") != SCHEMA:
         raise ValueError(f"schema is {config.get('schema')!r}, expected {SCHEMA}")
     rules = [(re.compile(p["regex"], re.IGNORECASE), p["reason"]) for p in config.get("patterns", [])]
+    allowed = {a.casefold() for a in (allow or [])}
     for w in config.get("words", []):
+        if w["word"].casefold() in allowed:
+            continue
         phrase = r"\s+".join(re.escape(part) for part in w["word"].split())
         rules.append((re.compile(rf"(?<![A-Za-z0-9]){phrase}(?![A-Za-z0-9])", re.IGNORECASE), w["reason"]))
     return rules
@@ -121,12 +130,14 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--config", type=Path, default=DEFAULT_CONFIG, help="denylist JSON (schema 1)")
     ap.add_argument("--text", type=Path, nargs="*", default=[], help="Markdown or plain-text files, every line")
     ap.add_argument("--swift", type=Path, nargs="*", default=[], help="Swift files, string literals only")
+    ap.add_argument("--allow", nargs="*", default=[], metavar="WORD",
+                    help="denylist words that are real features of this experience (never measured-claim patterns)")
     a = ap.parse_args(argv)
     if not a.text and not a.swift:
         print("ERROR: give at least one --text or --swift file", file=sys.stderr)
         return 2
     try:
-        rules = load_rules(json.loads(a.config.read_text(encoding="utf-8")))
+        rules = load_rules(json.loads(a.config.read_text(encoding="utf-8")), a.allow)
         problems: list[str] = []
         for path in a.text:
             problems += scan(path, False, rules)

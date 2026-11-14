@@ -43,6 +43,10 @@
 //     cached mesh without building it again. `shedCaches()` empties it.
 //   - `pixelPoint(world:size:view:)` is the one world-to-pixel mapping of the 2D presets (the fit of the shorter side
 //     times the zoom, equal on both axes); the root node's transform, the probe and the proportion test use it.
+//
+// Feature 045 (A05-P06) T-A05-606 (FR-A05-611; spec Clarifications): the internal test seam `failNextDraw` makes the
+// next draw throw `GeometryDrawError.injected` (and clears itself), as Particle Universe's `failNextDraw`, so a test
+// proves that a drawing failure fails the session and leaves the saved compositions as they were.
 import Foundation
 import InfiniteGeometryCore
 import SwiftUI
@@ -61,6 +65,13 @@ final class GeometryMirror {
     var core: GeometryCore?
     /// The drawable size in pixels of the last draw.
     var canvasSize = Vec2(390, 390)
+}
+
+/// The error of a draw failed on purpose through `GeometryPresenter.failNextDraw` (feature 045 A05-P06 T-A05-606,
+/// FR-A05-611; spec Clarifications): it lets a test prove the host-to-session failure path.
+enum GeometryDrawError: Error, Equatable {
+    /// The draw was failed by the test seam.
+    case injected
 }
 
 /// The presenter of Infinite Geometry.
@@ -147,6 +158,10 @@ final class GeometryPresenter: ExperiencePresenter {
     /// The number of elements of the last draw: polygons for a plane, triangles for a solid.
     private(set) var drawnCount = 0
 
+    /// Set only by tests; the next draw throws `GeometryDrawError.injected` and clears the flag (feature 045
+    /// A05-P06 T-A05-606, FR-A05-611). Release behaviour never sets it.
+    var failNextDraw = false
+
     /// The saved compositions shown by the controls (feature 043); nil in tests that need no library.
     let library: GeometryLibrary?
 
@@ -179,6 +194,10 @@ final class GeometryPresenter: ExperiencePresenter {
     }
 
     func draw(_ core: GeometryCore, tier: Int, context: RenderContext, frame: FrameInfo) throws {
+        if failNextDraw {
+            failNextDraw = false
+            throw GeometryDrawError.injected
+        }
         let width = Double(max(1, context.pixelWidth)), height = Double(max(1, context.pixelHeight))
         mirror.canvasSize = Vec2(width, height)
         try clear.render(context, frame: frame)

@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "experience": "a05.infinite-geometry",
+  "requiredDocs": [
+    "docs/apps/infinite-geometry/privacy-and-credits.md",
+    "docs/apps/infinite-geometry/store-listing.md",
+    "docs/apps/infinite-geometry/release-checklist.md",
+    "docs/apps/infinite-geometry/device-campaign.md",
+    "docs/release/build-and-archive.md"
+  ],
+  "checklist": "docs/apps/infinite-geometry/release-checklist.md",
+  "copyCheck": {
+    "text": [
+      "docs/apps/infinite-geometry/store-listing.md"
+    ],
+    "swift": [
+      "Packages/ExperiencesCreative/InfiniteGeometry/Experience/GeometryControls.swift",
+      "Packages/ExperiencesCreative/InfiniteGeometry/Experience/GeometryPresenter.swift"
+    ],
+    "allow": [
+      "camera",
+      "share"
+    ]
+  }
+}

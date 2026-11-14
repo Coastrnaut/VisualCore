@@ -249,6 +249,7 @@ UI_CHUNKS = {
     "j2": ["PUSandboxUITests"],
     "j3": ["PUEmitterUITests", "PUForceUITests", "PUTrailUITests"],
     "j4": ["PUSceneLibraryUITests"],   # feature 036 A04-P04: its own chunk keeps j3 under the time limit
+    "k2": ["IGControlsUITests", "IGLibraryExportUITests"],   # feature 045 A05-P06 (T-A05-610)
 }
 UNIFIED_LIMIT = 590       # seconds, below the ten-minute limit of one foreground command
 RELEASE_FORBIDDEN = ["DebugLaunch", "DebugExperience", "DebugInventory", "ScenarioLaunch", "ScenarioHostView",
@@ -266,7 +267,7 @@ def registered_ids(root: Path = ROOT) -> list[str]:
 
 def experience_release_steps(root: Path = ROOT) -> list[Step]:
     """Per experience with docs/apps/<slug>/release.json naming an `experience` (feature 038 T-A04-617): the release
-    document check and, when the config has `copyCheck` ({text, swift}), the copy-claim check. Step names use the
+    document check and, when the config has `copyCheck` ({text, swift, optional allow}), the copy-claim check. Step names use the
     experience's code (`a04` of `a04.particle-universe`)."""
     out: list[Step] = []
     for config in sorted(root.glob("docs/apps/*/release.json")):
@@ -281,7 +282,8 @@ def experience_release_steps(root: Path = ROOT) -> list[Step]:
         if isinstance(copy, dict):
             out.append(Step(f"copy-claims-{code}", [PY, "scripts/check_copy_claims.py", "--config",
                                                     "Configs/copy-claims-denylist.json", "--text", *copy.get("text", []),
-                                                    "--swift", *copy.get("swift", [])]))
+                                                    "--swift", *copy.get("swift", []),
+                                                    *(["--allow", *copy["allow"]] if copy.get("allow") else [])]))
     return out
 
 

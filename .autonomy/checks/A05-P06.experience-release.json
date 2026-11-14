@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_experience_release.py",
+    "--config",
+    "docs/apps/infinite-geometry/release.json"
+  ],
+  "command": "python3 scripts/check_experience_release.py --config docs/apps/infinite-geometry/release.json",
+  "elapsed_seconds": 0.043,
+  "exit_code": 0,
+  "finished": "2026-11-14T05:39:24+00:00",
+  "log": ".autonomy/logs/A05-P06.experience-release.log",
+  "log_sha256": "7a5073ce590b157689b96dcd3e61cb316e6e388bd03315803f3813216909b74d",
+  "name": "experience-release",
+  "stage": "A05-P06",
+  "started": "2026-11-14T05:39:24+00:00",
+  "timed_out": false
+}

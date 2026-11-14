@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--only",
+    "a05.infinite-geometry",
+    "--runtime",
+    "27"
+  ],
+  "command": "python3 scripts/verify_experiences.py --only a05.infinite-geometry --runtime 27",
+  "elapsed_seconds": 29.263,
+  "exit_code": 0,
+  "finished": "2026-11-14T05:44:29+00:00",
+  "log": ".autonomy/logs/A05-P06.verify-27.log",
+  "log_sha256": "0c3f49f50c368c6d1723069f5e6f7cccb99c954e3867719330ab8b16c11553d6",
+  "name": "verify-27",
+  "stage": "A05-P06",
+  "started": "2026-11-14T05:44:00+00:00",
+  "timed_out": false
+}

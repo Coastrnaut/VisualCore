@@ -5010,6 +5010,20 @@ class ExperienceReleaseAndCopyTests(unittest.TestCase):
         self.assertNotIn(":3:", out, "whole words only")
         self.assertIn("FAIL: copy claims, 3 problems", out)
 
+    def test_allow_removes_only_named_words(self):
+        tool = load("check_copy_claims")
+        out = io.StringIO()
+        with tempfile.TemporaryDirectory() as d:
+            (Path(d) / "store.md").write_text("Share a picture.\nMove the camera.\nButtery at 60 fps.\n")
+            with contextlib.redirect_stdout(out):
+                code = tool.main(["--config", str(ROOT_DIR / "Configs/copy-claims-denylist.json"),
+                                  "--text", str(Path(d) / "store.md"), "--allow", "share", "Camera"])
+        self.assertEqual(code, 1)
+        self.assertNotIn(":1:", out.getvalue(), "an allowed feature word passes")
+        self.assertNotIn(":2:", out.getvalue(), "allow ignores case")
+        self.assertIn(":3: 'Buttery'", out.getvalue(), "other words still fail")
+        self.assertIn("fps", out.getvalue(), "measured-claim patterns are never allowed")
+
     def test_measured_number_fails(self):
         code, out = self.copy("It runs at 60 fps on every iPhone.\n")
         self.assertEqual(code, 1)

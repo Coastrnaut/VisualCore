@@ -10,7 +10,7 @@
 
 ## Phase 2: User Story 1 — privacy (P1) 🎯
 
-- [ ] T-A05-602 [P] [US1] Write `docs/apps/infinite-geometry/privacy-and-credits.md` (stored data: `composition-<uuid>.json` in the experience's own folder; pictures leave only through the share sheet, held in memory, no metadata; nothing collected; no permission; credits: original code and shaders, no third-party art) (FR-A05-601, 604)
+- [X] T-A05-602 [P] [US1] Write `docs/apps/infinite-geometry/privacy-and-credits.md` (stored data: `composition-<uuid>.json` in the experience's own folder; pictures leave only through the share sheet, held in memory, no metadata; nothing collected; no permission; credits: original code and shaders, no third-party art) (FR-A05-601, 604) — Verified 2026-11-14: 2026-11-14 privacy-and-credits.md written; .autonomy/checks/A05-P06.experience-release.json (5 documents)
 - [X] T-A05-603 [US1] No-network scan (`python3 Tools/python/desktop_runbook.py run-check --stage A05-P06 --timeout 600 --name ig-no-network -- /bin/sh -c "! grep -rnE 'URLSession|import Network|CoreMotion|AVFoundation|CoreLocation|AdSupport|AppTrackingTransparency' Packages/ExperiencesCreative/InfiniteGeometry"`) (FR-A05-602) — Verified 2026-11-14: 2026-11-14 .autonomy/checks/A05-P06.ig-no-network.json (0 matches, exit 0)
 
 ## Phase 3: User Story 2 — data and recovery (P1)

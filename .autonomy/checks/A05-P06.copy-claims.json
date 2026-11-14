@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "python3",
+    "scripts/release_check.py",
+    "--only",
+    "copy-claims-a05"
+  ],
+  "command": "python3 scripts/release_check.py --only copy-claims-a05",
+  "elapsed_seconds": 0.108,
+  "exit_code": 0,
+  "finished": "2026-11-14T05:39:24+00:00",
+  "log": ".autonomy/logs/A05-P06.copy-claims.log",
+  "log_sha256": "36a39843322553baacc5c65c80d9ddcbb1c6bbd71f5a4fa64e66f5f851bdee3e",
+  "name": "copy-claims",
+  "stage": "A05-P06",
+  "started": "2026-11-14T05:39:24+00:00",
+  "timed_out": false
+}

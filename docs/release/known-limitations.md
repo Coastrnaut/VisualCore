@@ -65,6 +65,19 @@ and `VisualCoreRendering` (iOS, GL). ADR-0003 and the package map record this. R
 - Drawn detail reacts to frame time, heat and Low Power Mode; the simulation itself is never thinned.
 - One placed force at a time; saved scenes stay on the device (no sync, no sharing, no export).
 
+### Infinite Geometry (A05; feature 045 T-A05-607)
+
+- Frame time per quality tier for every preset kind, the tier the governor settles on, memory with the mesh cache
+  full, the thermal state over a short session and the export time are unmeasured on devices. They wait for the device
+  campaign ([device-campaign.md](../apps/infinite-geometry/device-campaign.md)).
+- The system accessibility audits (default and largest text size) and the VoiceOver journeys wait for the device
+  campaign (owner ruling of 2026-11-13).
+- Drawn detail of the 3D composition follows the host's quality level (thermal state and Low Power Mode); the 2D
+  presets draw the same at every level, and the composition and its digest never change.
+- Compositions are static: nothing moves with time, so Reduce Motion has nothing to reduce.
+- Saved compositions stay on the device (no sync); a picture leaves only through the share sheet, as a PNG without
+  metadata. At most 64 files fit in the experience's storage.
+
 ## Distribution
 
 - No App Store submission, signing or purchase setup is part of this release; those are owner actions.
