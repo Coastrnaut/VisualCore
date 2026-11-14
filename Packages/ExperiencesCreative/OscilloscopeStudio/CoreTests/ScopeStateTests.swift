@@ -6,6 +6,12 @@
 // Feature 063 (A08-P03) T-A08-302 (FR-A08-304; clarification 1): the spectrum display (2) is accepted, round trips and
 // is named in the digest; an A08-P02 payload (display 1) restores unchanged; 3 is refused. The P02 display tests below
 // were widened from {0, 1} to {0, 1, 2}.
+// Feature 064 (A08-P04) T-A08-402 (FR-A08-402, FR-A08-411; clarification 1; schema 3): the schema is 3 and the digest
+// text v3 appends the freeze flag, the cursors' visibility and the four cursor positions (the earlier expectations
+// below were updated: schema 2 → 3, digest v2 → v3 with the schema-3 suffix, `hasSuffix("|display=…")` →
+// `contains("|display=…|")`, nine keys → fifteen); schema 3 round trips, a schema-2 payload decodes with the defaults,
+// a non-finite or out-of-range cursor is refused, the setters clamp and refuse non-finite values, and moving any cursor
+// changes the digest.
 import Foundation
 import Testing
 import VisualCoreAudioDSP
@@ -19,6 +25,9 @@ import OscilloscopeStudioCore
         return try decoder.decode(ScopeState.self, from: Data(json.utf8))
     }
 
+    /// The digest suffix of the schema-3 fields at their first (and schema-2 migration) values.
+    private let defaultSuffix = "|frozen=0|cursors=0|cursorA=0.25|cursorB=0.75|frequencyCursor=0.5|levelCursor=0.5"
+
     private func payload(source: String = "0", waveform: String = "1", frequency: String = "1", gain: String = "2",
                          timebase: String = "5", level: String = "0.25", slope: String = "1",
                          mode: String = "1") -> String {
@@ -28,7 +37,7 @@ import OscilloscopeStudioCore
 
     @Test func theFirstStateIsAOneKilohertzSineAtOneMillisecondPerDivision() {
         let state = ScopeState.initial
-        #expect(ScopeState.currentSchema == 2)
+        #expect(ScopeState.currentSchema == 3)
         #expect(state.display == .waveform)
         #expect(state.source == .testSignal)
         #expect(state.waveform == .sine)
@@ -113,8 +122,8 @@ import OscilloscopeStudioCore
     @Test func theDigestIsStableAndCoversEveryField() throws {
         let base = ScopeState.initial
         #expect(base.digestText
-                    == "a08.scope.v2|source=0|waveform=0|frequency=2|gain=1|timebase=3|level=0.0|slope=0|mode=0"
-                    + "|display=0")
+                    == "a08.scope.v3|source=0|waveform=0|frequency=2|gain=1|timebase=3|level=0.0|slope=0|mode=0"
+                    + "|display=0" + defaultSuffix)
         #expect(ScopeState().digestText == base.digestText)
         var negativeZero = base
         let acceptedZero = negativeZero.setTriggerLevel(-0.0)
@@ -179,21 +188,21 @@ import OscilloscopeStudioCore
         #expect(state == .initial)
         #expect(state.selectDisplay(1) == true)
         #expect(state.display == .xy)
-        #expect(state.digestText.hasSuffix("|display=1"))
+        #expect(state.digestText.contains("|display=1|"))
         #expect(state.digestText != ScopeState.initial.digestText)
         state.select(ScopeDisplay.waveform)
         #expect(state == .initial)
         #expect(state.digestText == ScopeState.initial.digestText)
     }
 
-    // MARK: - Feature 063 (A08-P03) T-A08-302: spectrum display, still schema 2
+    // MARK: - Feature 063 (A08-P03) T-A08-302: spectrum display (schema 2 then; schema 3 since A08-P04)
 
     @Test func theSpectrumDisplayIsAcceptedAndNamedInTheDigest() {
         var state = ScopeState.initial
         #expect(state.selectDisplay(2) == true)
         #expect(state.display == .spectrum)
-        #expect(state.digestText.hasSuffix("|display=2"))
-        #expect(ScopeState.currentSchema == 2)
+        #expect(state.digestText.contains("|display=2|"))
+        #expect(ScopeState.currentSchema == 3)
         let refused = state.selectDisplay(3)
         #expect(refused == false && state.display == .spectrum)
         var digests: Set<String> = []
@@ -212,7 +221,7 @@ import OscilloscopeStudioCore
         let data = try JSONEncoder().encode(state)
         let object = try #require(try JSONSerialization.jsonObject(with: data) as? [String: Any])
         #expect(object["display"] as? Int == 2)
-        #expect(object.count == 9)
+        #expect(object.count == 15)
         let back = try JSONDecoder().decode(ScopeState.self, from: data)
         #expect(back == state && back.display == .spectrum)
         #expect(back.digestText == state.digestText)
@@ -228,8 +237,8 @@ import OscilloscopeStudioCore
         #expect(state.frequency == 5_000 && state.gain == 0.5 && state.timebaseMilliseconds == 2)
         #expect(state.triggerLevel == -0.5 && state.triggerSlope == .falling && state.triggerMode == .auto)
         #expect(state.digestText
-                    == "a08.scope.v2|source=1|waveform=2|frequency=3|gain=0|timebase=4|level=-0.5|slope=1|mode=0"
-                    + "|display=1")
+                    == "a08.scope.v3|source=1|waveform=2|frequency=3|gain=0|timebase=4|level=-0.5|slope=1|mode=0"
+                    + "|display=1" + defaultSuffix)
         let reencoded = try JSONDecoder().decode(ScopeState.self, from: JSONEncoder().encode(state))
         #expect(reencoded == state)
     }
@@ -237,5 +246,93 @@ import OscilloscopeStudioCore
     @Test func anOutOfRangeDisplayIsRefused() {
         let json = String(payload().dropLast()) + ",\"display\":3}"
         #expect(throws: DecodingError.self) { try decode(json) }
+    }
+
+    // MARK: - Feature 064 (A08-P04) T-A08-402: freeze and cursors, schema 3
+
+    @Test func theFirstStateIsNotFrozenWithTheCursorsHiddenAtTheirDefaults() {
+        let state = ScopeState.initial
+        #expect(!state.frozen && !state.cursorsShown)
+        #expect(state.cursorA == 0.25 && state.cursorB == 0.75)
+        #expect(state.frequencyCursor == 0.5 && state.levelCursor == 0.5)
+    }
+
+    @Test func schemaThreeRoundTripKeepsFreezeAndCursors() throws {
+        let state = try #require(ScopeState(source: .file, waveform: .square, frequencyIndex: 1, gainIndex: 2,
+                                            timebaseIndex: 4, triggerLevel: 0.125, triggerSlope: .falling,
+                                            triggerMode: .normal, display: .spectrum, frozen: true,
+                                            cursorsShown: true, cursorA: 0.9, cursorB: 0.1, frequencyCursor: 0.375,
+                                            levelCursor: -0.625))
+        let data = try JSONEncoder().encode(state)
+        let object = try #require(try JSONSerialization.jsonObject(with: data) as? [String: Any])
+        #expect(object["frozen"] as? Bool == true && object["cursorsShown"] as? Bool == true)
+        #expect(object["cursorA"] as? Double == 0.9 && object["levelCursor"] as? Double == -0.625)
+        let back = try JSONDecoder().decode(ScopeState.self, from: data)
+        #expect(back == state)
+        #expect(back.digestText == state.digestText)
+        #expect(back.digestText.hasSuffix("|frozen=1|cursors=1|cursorA=0.9|cursorB=0.1|frequencyCursor=0.375"
+                                          + "|levelCursor=-0.625"))
+    }
+
+    @Test func aSchemaTwoPayloadDecodesWithTheMigrationDefaults() throws {
+        // Exactly the shape the A08-P03 (schema 2) encoder wrote: nine keys, none of the schema-3 keys.
+        let state = try decode(String(payload().dropLast()) + ",\"display\":2}")
+        #expect(state.display == .spectrum && state.waveform == .square && state.frequency == 440)
+        #expect(!state.frozen && !state.cursorsShown)
+        #expect(state.cursorA == 0.25 && state.cursorB == 0.75)
+        #expect(state.frequencyCursor == 0.5 && state.levelCursor == 0.5)
+    }
+
+    @Test func aNonFiniteOrOutOfRangeCursorIsRefused() {
+        let base = String(payload().dropLast())
+        let bad = ["\"cursorA\":\"nan\"", "\"cursorB\":\"inf\"", "\"frequencyCursor\":\"-inf\"",
+                   "\"levelCursor\":\"nan\"", "\"cursorA\":1.5", "\"cursorB\":-0.01",
+                   "\"frequencyCursor\":2", "\"levelCursor\":-1.01"]
+        for entry in bad {
+            #expect(throws: DecodingError.self) { try decode(base + "," + entry + "}") }
+        }
+        #expect((try? decode(base + ",\"cursorA\":0,\"cursorB\":1,\"levelCursor\":-1}")) != nil)
+        #expect(ScopeState(source: .testSignal, waveform: .sine, frequencyIndex: 0, gainIndex: 0, timebaseIndex: 0,
+                           triggerLevel: 0, triggerSlope: .rising, triggerMode: .auto, cursorA: .nan) == nil)
+        #expect(ScopeState(source: .testSignal, waveform: .sine, frequencyIndex: 0, gainIndex: 0, timebaseIndex: 0,
+                           triggerLevel: 0, triggerSlope: .rising, triggerMode: .auto, levelCursor: 1.5) == nil)
+        #expect(ScopeState(source: .testSignal, waveform: .sine, frequencyIndex: 0, gainIndex: 0, timebaseIndex: 0,
+                           triggerLevel: 0, triggerSlope: .rising, triggerMode: .auto,
+                           frequencyCursor: .infinity) == nil)
+    }
+
+    @Test func theCursorSettersClampAndRefuseNonFiniteValues() {
+        var state = ScopeState.initial
+        let refused = [state.setCursorA(.nan), state.setCursorB(.infinity), state.setFrequencyCursor(-.infinity),
+                       state.setLevelCursor(.nan)]
+        #expect(refused == [false, false, false, false])
+        #expect(state == .initial)
+        let accepted = [state.setCursorA(-0.5), state.setCursorB(1.5), state.setFrequencyCursor(0.3),
+                        state.setLevelCursor(-2)]
+        #expect(accepted == [true, true, true, true])
+        #expect(state.cursorA == 0 && state.cursorB == 1 && state.frequencyCursor == 0.3 && state.levelCursor == -1)
+        #expect(state.cursorA.sign == .plus)   // a clamped −0.5 is stored as +0
+        state.setFrozen(true)
+        state.setCursorsShown(true)
+        #expect(state.frozen && state.cursorsShown)
+        state.setFrozen(false)
+        #expect(!state.frozen)
+    }
+
+    @Test func theDigestDiffersWhenFreezeOrAnyCursorChanges() {
+        let base = ScopeState.initial
+        var variants: [ScopeState] = []
+        var s = base; s.setFrozen(true); variants.append(s)
+        s = base; s.setCursorsShown(true); variants.append(s)
+        s = base; s.setCursorA(0.26); variants.append(s)
+        s = base; s.setCursorB(0.74); variants.append(s)
+        s = base; s.setFrequencyCursor(0.51); variants.append(s)
+        s = base; s.setLevelCursor(0.49); variants.append(s)
+        let texts = Set(variants.map(\.digestText) + [base.digestText])
+        #expect(texts.count == variants.count + 1)
+        var moved = base
+        moved.setCursorA(0.6)
+        moved.setCursorA(0.25)
+        #expect(moved.digestText == base.digestText)
     }
 }
