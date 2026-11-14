@@ -3,6 +3,9 @@
 // trip, refusal of unknown indices and of a non-finite or out-of-range trigger level, the setters and the digest text.
 // Feature 062 (A08-P02) T-A08-205 (FR-A08-211, FR-A08-212; schema 2): the display mode round trips, a schema-1 payload
 // decodes with the waveform display, an unknown display is refused and the digest names the display.
+// Feature 063 (A08-P03) T-A08-302 (FR-A08-304; clarification 1): the spectrum display (2) is accepted, round trips and
+// is named in the digest; an A08-P02 payload (display 1) restores unchanged; 3 is refused. The P02 display tests below
+// were widened from {0, 1} to {0, 1, 2}.
 import Foundation
 import Testing
 import VisualCoreAudioDSP
@@ -134,9 +137,9 @@ import OscilloscopeStudioCore
 
     // MARK: - Feature 062 (A08-P02) T-A08-205: display mode, schema 2
 
-    @Test func theDisplayChoicesAreWaveformAndXY() {
-        #expect(ScopeDisplay.allCases.map(\.rawValue) == [0, 1])
-        #expect(ScopeDisplay.allCases.map(\.displayName) == ["waveform", "XY"])
+    @Test func theDisplayChoicesAreWaveformXYAndSpectrum() {
+        #expect(ScopeDisplay.allCases.map(\.rawValue) == [0, 1, 2])
+        #expect(ScopeDisplay.allCases.map(\.displayName) == ["waveform", "XY", "spectrum"])
     }
 
     @Test func schemaTwoRoundTripKeepsTheXYDisplay() throws {
@@ -163,7 +166,7 @@ import OscilloscopeStudioCore
     }
 
     @Test func anUnknownDisplayIsRefused() {
-        for bad in ["2", "-1"] {
+        for bad in ["3", "-1"] {
             let json = String(payload().dropLast()) + ",\"display\":\(bad)}"
             #expect(throws: DecodingError.self) { try decode(json) }
         }
@@ -172,7 +175,7 @@ import OscilloscopeStudioCore
 
     @Test func theDisplaySettersAndDigest() {
         var state = ScopeState.initial
-        #expect(state.selectDisplay(2) == false)
+        #expect(state.selectDisplay(3) == false)
         #expect(state == .initial)
         #expect(state.selectDisplay(1) == true)
         #expect(state.display == .xy)
@@ -181,5 +184,58 @@ import OscilloscopeStudioCore
         state.select(ScopeDisplay.waveform)
         #expect(state == .initial)
         #expect(state.digestText == ScopeState.initial.digestText)
+    }
+
+    // MARK: - Feature 063 (A08-P03) T-A08-302: spectrum display, still schema 2
+
+    @Test func theSpectrumDisplayIsAcceptedAndNamedInTheDigest() {
+        var state = ScopeState.initial
+        #expect(state.selectDisplay(2) == true)
+        #expect(state.display == .spectrum)
+        #expect(state.digestText.hasSuffix("|display=2"))
+        #expect(ScopeState.currentSchema == 2)
+        let refused = state.selectDisplay(3)
+        #expect(refused == false && state.display == .spectrum)
+        var digests: Set<String> = []
+        for display in ScopeDisplay.allCases {
+            var s = ScopeState.initial
+            s.select(display)
+            digests.insert(s.digestText)
+        }
+        #expect(digests.count == 3)
+    }
+
+    @Test func theSpectrumDisplayRoundTrips() throws {
+        let state = try #require(ScopeState(source: .microphone, waveform: .sweep, frequencyIndex: 0, gainIndex: 4,
+                                            timebaseIndex: 1, triggerLevel: -0.25, triggerSlope: .falling,
+                                            triggerMode: .normal, display: .spectrum))
+        let data = try JSONEncoder().encode(state)
+        let object = try #require(try JSONSerialization.jsonObject(with: data) as? [String: Any])
+        #expect(object["display"] as? Int == 2)
+        #expect(object.count == 9)
+        let back = try JSONDecoder().decode(ScopeState.self, from: data)
+        #expect(back == state && back.display == .spectrum)
+        #expect(back.digestText == state.digestText)
+        #expect(try decode(String(payload().dropLast()) + ",\"display\":2}").display == .spectrum)
+    }
+
+    @Test func anA08P02PayloadRestoresUnchanged() throws {
+        // Exactly the shape the A08-P02 encoder wrote: nine keys with display 1 (XY).
+        let json = "{\"source\":1,\"waveform\":2,\"frequency\":3,\"gain\":0,\"timebase\":4,\"level\":-0.5,"
+            + "\"slope\":1,\"mode\":0,\"display\":1}"
+        let state = try decode(json)
+        #expect(state.display == .xy && state.source == .file && state.waveform == .sweep)
+        #expect(state.frequency == 5_000 && state.gain == 0.5 && state.timebaseMilliseconds == 2)
+        #expect(state.triggerLevel == -0.5 && state.triggerSlope == .falling && state.triggerMode == .auto)
+        #expect(state.digestText
+                    == "a08.scope.v2|source=1|waveform=2|frequency=3|gain=0|timebase=4|level=-0.5|slope=1|mode=0"
+                    + "|display=1")
+        let reencoded = try JSONDecoder().decode(ScopeState.self, from: JSONEncoder().encode(state))
+        #expect(reencoded == state)
+    }
+
+    @Test func anOutOfRangeDisplayIsRefused() {
+        let json = String(payload().dropLast()) + ",\"display\":3}"
+        #expect(throws: DecodingError.self) { try decode(json) }
     }
 }

@@ -11,6 +11,8 @@
 // Feature 062 (A08-P02) T-A08-205 (FR-A08-211, FR-A08-212; data-model "ScopeState", schema 2): the display mode
 // (waveform or XY) is a persisted field and part of the digest; a schema-1 payload (no `display` key) decodes with the
 // waveform display, so stored A08-P01 states migrate unchanged.
+// Feature 063 (A08-P03) T-A08-302 (FR-A08-304): `display` also accepts 2 (spectrum); the shape stays schema 2, so
+// A08-P02 states restore unchanged.
 import Foundation
 import VisualCoreAudioDSP
 
@@ -108,8 +110,8 @@ public struct ScopeState: Sendable, Equatable, Codable {
     /// presenter, not in the state).
     public mutating func select(_ display: ScopeDisplay) { self.display = display }
 
-    /// Selects the display mode with the raw value `rawValue` (the `display.select` action value: 0 waveform, 1 XY);
-    /// returns `false` and changes nothing when the value is unknown.
+    /// Selects the display mode with the raw value `rawValue` (the `display.select` action value: 0 waveform, 1 XY,
+    /// 2 spectrum); returns `false` and changes nothing when the value is unknown.
     @discardableResult
     public mutating func selectDisplay(_ rawValue: Int) -> Bool {
         guard let display = ScopeDisplay(rawValue: rawValue) else { return false }

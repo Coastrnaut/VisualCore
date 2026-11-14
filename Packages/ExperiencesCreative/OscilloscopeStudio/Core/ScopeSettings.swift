@@ -4,6 +4,8 @@
 // divisions), the trigger slopes and modes, and the names spoken in the canvas description. The positions in these
 // tables are the persisted indices of `ScopeState` and the values of the experience actions; they never change order.
 // Feature 062 (A08-P02) T-A08-205 (FR-A08-211, FR-A08-212) adds the display mode, waveform or XY.
+// Feature 063 (A08-P03) T-A08-302 (FR-A08-301, FR-A08-304; clarification 1) adds the spectrum display (raw value 2);
+// the saved shape stays schema 2.
 import Foundation
 import VisualCoreAudioDSP
 
@@ -27,18 +29,21 @@ public enum ScopeSource: Int, CaseIterable, Codable, Sendable {
 }
 
 /// The display mode of the scope. The raw values are persisted and are the values of the `display.select` action
-/// (feature 062, A08-P02, FR-A08-211, FR-A08-212).
+/// (feature 062, A08-P02, FR-A08-211, FR-A08-212; feature 063, A08-P03, FR-A08-304: spectrum).
 public enum ScopeDisplay: Int, Sendable, CaseIterable, Codable {
     /// The waveform view: each channel drawn against time (the first choice and the schema-1 migration value).
     case waveform = 0
     /// The XY view: the left channel plotted against the right channel (stereo windows only).
     case xy = 1
+    /// The spectrum view: the magnitude of the left (or only) channel against a logarithmic frequency axis.
+    case spectrum = 2
 
     /// The name shown on the display picker and spoken in the canvas description.
     public var displayName: String {
         switch self {
         case .waveform: "waveform"
         case .xy: "XY"
+        case .spectrum: "spectrum"
         }
     }
 }
