@@ -184,8 +184,8 @@ lattices) from VisualCore, documented and tested.
 
 ### Measurable Outcomes
 
-- **SC-A05-101**: For every order 1…24 and both lattices, the symmetry tests pass: order 1 gives 1 image; cyclic order n
-  gives n images; dihedral gives 2n; folding is idempotent in 100% of 1,000 sampled points per group.
+- **SC-A05-101**: For every order 1…24 and both lattices, the symmetry tests pass: cyclic order 1 gives 1 image (the
+  identity) and dihedral order 1 gives 2 (the point and its mirror); cyclic order n gives n images; dihedral gives 2n; folding is idempotent in 100% of 1,000 sampled points per group.
 - **SC-A05-102**: The four presets build compositions that are non-empty, within budget and identical across two builds
   (equal digests) in 4 of 4 cases; the 3D composition validates closed with 0 problems.
 - **SC-A05-103**: Each control's valid value changes the state and each invalid value is refused with the state digest

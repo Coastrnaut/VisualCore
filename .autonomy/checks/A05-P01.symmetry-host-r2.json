@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/VisualCore",
+    "--filter",
+    "SymmetryTests"
+  ],
+  "command": "swift test --package-path Packages/VisualCore --filter SymmetryTests",
+  "elapsed_seconds": 5.608,
+  "exit_code": 0,
+  "finished": "2026-11-14T02:04:18+00:00",
+  "log": ".autonomy/logs/A05-P01.symmetry-host-r2.log",
+  "log_sha256": "634cbb21bd7f14049d73291523c88455f22eb1329368bd1d1468230346beaf34",
+  "name": "symmetry-host-r2",
+  "stage": "A05-P01",
+  "started": "2026-11-14T02:04:13+00:00",
+  "timed_out": false
+}
