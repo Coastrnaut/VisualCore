@@ -29,7 +29,7 @@
 
 ## Phase 6: Polish & evidence
 
-- [ ] T-A08-108 VisualCoreAudioDSP host tests (`python3 Tools/python/desktop_runbook.py run-check --stage A08-P01 --timeout 600 --name dsp-host -- swift test --package-path Packages/VisualCore --filter "TestSignalTests|StereoSampleBufferTests|ScopeTriggerTests"`)
+- [X] T-A08-108 VisualCoreAudioDSP host tests (`python3 Tools/python/desktop_runbook.py run-check --stage A08-P01 --timeout 600 --name dsp-host -- swift test --package-path Packages/VisualCore --filter "TestSignalTests|StereoSampleBufferTests|ScopeTriggerTests"`) — Verified 2026-11-14: 2026-11-14: .autonomy/checks/A08-P01.dsp-host.json exit 0 (23 tests)
 - [ ] T-A08-109 VisualCoreAudio sources on sim-27.2 (`python3 Tools/python/desktop_runbook.py run-check --stage A08-P01 --timeout 600 --name audio-ios27 -- python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --only-testing VisualCoreAudioTests`)
 - [ ] T-A08-110 Core tests on sim-27.2 (`python3 Tools/python/desktop_runbook.py run-check --stage A08-P01 --timeout 600 --name core-ios27 -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing OscilloscopeStudioCoreTests`)
 - [ ] T-A08-111 Experience tests on sim-27.2 (`python3 Tools/python/desktop_runbook.py run-check --stage A08-P01 --timeout 600 --name experience-ios27 -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing OscilloscopeStudioExperienceTests`)

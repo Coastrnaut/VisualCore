@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/VisualCore",
+    "--filter",
+    "TestSignalTests|StereoSampleBufferTests|ScopeTriggerTests"
+  ],
+  "command": "swift test --package-path Packages/VisualCore --filter 'TestSignalTests|StereoSampleBufferTests|ScopeTriggerTests'",
+  "elapsed_seconds": 15.797,
+  "exit_code": 0,
+  "finished": "2026-11-14T16:13:53+00:00",
+  "log": ".autonomy/logs/A08-P01.dsp-host.log",
+  "log_sha256": "b0246d02e4e01a5674d00b93da03279f834477bad46d7f2cfeace3aa4b333b41",
+  "name": "dsp-host",
+  "stage": "A08-P01",
+  "started": "2026-11-14T16:13:37+00:00",
+  "timed_out": false
+}
