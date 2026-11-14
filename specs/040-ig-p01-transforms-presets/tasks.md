@@ -1,0 +1,55 @@
+# Tasks: Infinite Geometry — Phase 01 Geometry transforms and presets
+
+**Input**: [spec.md](spec.md), [plan.md](plan.md), [research.md](research.md), [data-model.md](data-model.md),
+[contracts/api.md](contracts/api.md), [quickstart.md](quickstart.md). Gate A05-P01 (legacy). Evidence:
+`python3 Tools/python/desktop_runbook.py run-check --stage A05-P01 --timeout 600 --name <check> -- <command>`. Commit after every task (no trailers). UUIDs in fixtures use the synthetic prefix
+00000000-0000-4000-8000-. No {device} task: nothing in this phase is device-only (compositions are static CPU geometry).
+
+## Phase 1: Setup
+
+- [ ] T-A05-101 Baseline: ExperiencesCreative package on sim-27.2 before changes (`python3 Tools/python/desktop_runbook.py run-check --stage A05-P01 --timeout 600 --name baseline -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test`)
+
+## Phase 2: Foundational — symmetry in VisualCore (US4)
+
+- [ ] T-A05-102 [US4] Write `Packages/VisualCore/Tests/VisualCoreMathTests/SymmetryTests.swift` first, then `Packages/VisualCore/Sources/VisualCoreMath/Symmetry.swift` per contracts/api.md and research D2: `PointGroup` (cyclic/dihedral, `orderRange` 1...24, `imageCount`, `images(of:)` identity first, `fold(_:)`), `WallpaperLattice` (square p4m, hexagonal p6m, `cellCenters(rings:)`, `images(of:rings:)`, `fold(_:)`); tests: order 1 identity, image counts n/2n/8/12 per cell, folding idempotent and equal for every image of a point on 1,000 seeded points per group, lattice periodicity, mirror-line and centre points (FR-A05-101–103, SC-A05-101); `///` on every public symbol
+
+## Phase 3: User Story 1–2 — presets, compositions and controls (P1) 🎯
+
+- [ ] T-A05-103 [P] [US1] Write `Packages/ExperiencesCreative/InfiniteGeometry/CoreTests/GeometryPresetTests.swift`, `MotifTests.swift`, `CompositionTests.swift` first, then `Packages/ExperiencesCreative/InfiniteGeometry/Core/Module.swift`, `GeometryPreset.swift` ("kind ∈ {squareTiling, hexTiling, kaleidoscope, solid}; order 1…24; repeats 1…12; scale 0.25…4 finite; palette 0…5; schemaVersion 1"; 4 curated presets; validation), `Motif.swift` (convex 3–7 points in the fundamental region from `SeededRandom`), `Composition.swift` (2D polygons ≤ 2,048 with colour index, refused beyond; solid = `order` revolved copies at radius 1.5 within `MeshBudget.default`, closed and valid); tests per FR-A05-110–113, SC-A05-102
+- [ ] T-A05-104 [US2] Write `Packages/ExperiencesCreative/InfiniteGeometry/ExperienceTests/GeometryCoreTests.swift` first, then `Packages/ExperiencesCreative/InfiniteGeometry/Experience/Adapter/GeometryCore.swift` (ExperienceCore, Codable, `experienceID` "a05.infinite-geometry", controls `preset.select`, `symmetry.order` (refused on tilings: `a05.order-fixed-by-lattice`), `repeats.set`, `scale.set`, `palette.set`, `reseed`; digest; outcome `composition-built`; `MigrationChain(currentVersion: 1)`); tests: each valid action changes state and digest, each invalid one is refused with the digest unchanged, snapshot round trip, reset (FR-A05-120, SC-A05-103)
+- [ ] T-A05-105 [US1] Write `Packages/ExperiencesCreative/InfiniteGeometry/Experience/GeometryPresenter.swift` (setup/teardown of `PrimitiveRenderer` and `MeshRenderer`, 2D via `SceneNode` polygons and `Camera2D`, 3D via `OrbitCamera`, composition cached by state digest, `describe` naming preset, kind and order, at least one `FrameProbe`), `GeometryControls.swift` (native controls with labels and identifiers), `InfiniteGeometryExperience.swift` (factory) (FR-A05-121, 132)
+- [ ] T-A05-106 [US1] Write `Packages/ExperiencesCreative/InfiniteGeometry/ExperienceTests/GeometrySessionTests.swift`: open through `ExperienceSession`, each of the 4 presets draws a non-blank frame whose probe matches its kind, context recreation and teardown leave 0 leaks (SC-A05-102)
+
+## Phase 4: User Story 3 — the experience in the one app (P2)
+
+- [ ] T-A05-107 [US3] Add the four targets and product `InfiniteGeometryExperience` to `Packages/ExperiencesCreative/Package.swift`; register `a05.infinite-geometry` in `Catalog/registrations.json` (capabilities, quality tiers, palette, manifest path) and as a candidate in `Apps/VisualCore/App/ExperienceRegistry.swift`; link the product in `project.yml`; rebuild the catalog (`scripts/build_catalog.py`)
+- [ ] T-A05-108 [US3] Write `Packages/ExperiencesCreative/InfiniteGeometry/Experience/Adapter/GeometryManifest.swift` (nine standard scenarios, DEBUG/automation only) and `Packages/ExperiencesCreative/InfiniteGeometry/ExperienceTests/GeometryManifestTests.swift` (the committed `Packages/ExperiencesCreative/InfiniteGeometry/scenario-manifest.json` equals the Swift manifest; regenerate with `UPDATE_SCENARIO_MANIFEST=1`)
+
+## Phase 5: Polish and evidence (one task per quickstart command)
+
+- [ ] T-A05-109 Symmetry host tests (`python3 Tools/python/desktop_runbook.py run-check --stage A05-P01 --timeout 600 --name symmetry-host -- swift test --package-path Packages/VisualCore --filter SymmetryTests`)
+- [ ] T-A05-110 Package on sim-27.2 (`python3 Tools/python/desktop_runbook.py run-check --stage A05-P01 --timeout 600 --name experiences-ios27 -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test`)
+- [ ] T-A05-111 Package on sim-26.5 (`python3 Tools/python/desktop_runbook.py run-check --stage A05-P01 --timeout 600 --name experiences-ios26 -- … --destination sim-26.5 --action test`)
+- [ ] T-A05-112 Experience package check (`python3 Tools/python/desktop_runbook.py run-check --stage A05-P01 --timeout 600 --name experience-packages -- python3 scripts/check_experience_packages.py`: 5 experiences)
+- [ ] T-A05-113 App build and unit tests (`python3 Tools/python/desktop_runbook.py run-check --stage A05-P01 --timeout 600 --name app-unit -- python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27`)
+- [ ] T-A05-114 Verification runner on iOS 27 (`python3 Tools/python/desktop_runbook.py run-check --stage A05-P01 --timeout 600 --name verify-27 -- python3 scripts/verify_experiences.py --only a05.infinite-geometry --runtime 27`) (SC-A05-104)
+- [ ] T-A05-115 Verification runner on iOS 26 (`python3 Tools/python/desktop_runbook.py run-check --stage A05-P01 --timeout 600 --name verify-26 -- python3 scripts/verify_experiences.py --only a05.infinite-geometry --runtime 26`) (SC-A05-104)
+- [ ] T-A05-116 Public API baseline and docs: `python3 scripts/check_public_api.py --update`, then `python3 Tools/python/desktop_runbook.py run-check --stage A05-P01 --timeout 600 --name public-api -- python3 scripts/check_public_api.py`; `Packages/VisualCore/README.md` symmetry entry; Auto-Creator.md §13 VisualCoreMath row (FR-A05-104)
+- [ ] T-A05-117 Reference chunk 1 (`python3 Tools/python/desktop_runbook.py run-check --stage A05-P01 --timeout 600 --name reference-1 -- python3 scripts/release_check.py --only reference-engine-xcframework reference-build-projectm-ios-sim reference-clean`)
+- [ ] T-A05-118 Reference chunk 2 (`python3 Tools/python/desktop_runbook.py run-check --stage A05-P01 --timeout 600 --name reference-2 -- python3 scripts/release_check.py --only reference-test-anglerendering-ios27 reference-test-anglerendering-ios26 projectm-reference-ios27 projectm-reference-ios26`) (SC-A05-105)
+- [ ] T-A05-119 Script tests (`python3 Tools/python/desktop_runbook.py run-check --stage A05-P01 --timeout 600 --name script-tests -- python3 scripts/test_scripts.py`)
+- [ ] T-A05-120 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A05-P01
+
+## Dependencies
+
+T-A05-101 → T-A05-102 → T-A05-103 → T-A05-104 → T-A05-105/106; T-A05-107/108 with 104–106 (the package must declare all
+four targets at once); Polish last.
+
+## Parallel examples
+
+Agent A: T-A05-102. Agent B: T-A05-103 (against contracts/api.md). Agent C: T-A05-104/105/106/108 (against B's types as
+listed in data-model.md). Lead: T-A05-107, docs, every run, tick and commit.
+
+## Implementation strategy
+
+MVP: symmetry + core + adapter + presenter (US1–US2); then wiring and the runner (US3); evidence last.
