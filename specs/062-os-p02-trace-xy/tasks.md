@@ -7,7 +7,7 @@
 
 ## Phase 1: Setup
 
-- [ ] T-A08-201 Baseline: cite the A08-P01 evidence on the unchanged tree (`.autonomy/checks/A08-P01.experience-ios27-2.json`, `.autonomy/checks/A08-P01.app-unit.json`, `.autonomy/checks/A08-P01.verify-27-2.json`) instead of a rerun (owner ruling of 2026-11-14)
+- [X] T-A08-201 Baseline: cite the A08-P01 evidence on the unchanged tree (`.autonomy/checks/A08-P01.experience-ios27-2.json`, `.autonomy/checks/A08-P01.app-unit.json`, `.autonomy/checks/A08-P01.verify-27-2.json`) instead of a rerun (owner ruling of 2026-11-14) — Verified 2026-11-14: 2026-11-14: tree unchanged since the A08-P01 record; cites .autonomy/checks/A08-P01.{experience-ios27-2,app-unit,verify-27-2}.json
 
 ## Phase 2: Foundational (VisualCore, stories 1 and 2)
 
