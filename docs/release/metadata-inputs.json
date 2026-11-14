@@ -51,17 +51,19 @@
         "microphone"
       ],
       "tier": "free"
+    },
+    {
+      "category": "audio",
+      "code": "A07",
+      "id": "a07.audio-odyssey",
+      "name": "Audio Odyssey",
+      "permissions": [
+        "microphone"
+      ],
+      "tier": "free"
     }
   ],
-  "ledger_sha256": "31683a95b58136c91ca240b6d7105841e5e9c17542fa35a9766518d98c75b9d8",
-  "privacy_answers": {
-    "data_collected": "none",
-    "proof": {
-      "executable_sha256": "8692b99c63bb9c8b575b91c58c6164186c9b3e3fc7d8b49e24ee41f7eb1d19c4",
-      "privacy_report": ".autonomy/logs/ua-f11/privacy-20261114T042711.json",
-      "tracking_report": ".autonomy/logs/ua-f11/tracking-20261114T042711.json"
-    },
-    "tracking": "no"
-  },
+  "ledger_sha256": "1a5ee6d73e238ee59d857f1dc568ae4ae550bb18af1844bc7165a2e979007864",
+  "privacy_answers": "unproven",
   "schema": 1
 }

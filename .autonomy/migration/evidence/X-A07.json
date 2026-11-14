@@ -1,0 +1,70 @@
+{
+  "branch": "main",
+  "dirty": false,
+  "dirty_paths": [],
+  "failed_attempts": [
+    {
+      "command": "python3 scripts/verify_experiences.py --only a07.audio-odyssey --runtime 27",
+      "exit_code": 1,
+      "log": ".autonomy/logs/migration/X-A07.sim27.log",
+      "log_sha256": "1d8ff803a8f73d35b0e00c1e5bbf819d61f44b444d44f04d21202c247e39be6e",
+      "name": "sim27",
+      "timed_out": false
+    }
+  ],
+  "gate": "X-A07",
+  "ledger": "migration",
+  "passing_checks": [
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --result-name xa07-host",
+      "exit_code": 0,
+      "finished": "2026-11-14T15:23:16+00:00",
+      "log": ".autonomy/logs/migration/X-A07.host.log",
+      "log_sha256": "30536ccb5036ec62aa02dceaf4f10083d265f0acfba53a1d582001a17b4cafb5",
+      "name": "host"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only reference-engine-xcframework reference-build-projectm-ios-sim reference-clean",
+      "exit_code": 0,
+      "finished": "2026-11-14T15:28:47+00:00",
+      "log": ".autonomy/logs/migration/X-A07.reference-1.log",
+      "log_sha256": "b986ce54dc942cdb1a0bc3b6186402c2f681b75f020f36d3ebad1a68d11a877c",
+      "name": "reference-1"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only reference-test-anglerendering-ios27 reference-test-anglerendering-ios26 projectm-reference-ios27 projectm-reference-ios26",
+      "exit_code": 0,
+      "finished": "2026-11-14T15:30:42+00:00",
+      "log": ".autonomy/logs/migration/X-A07.reference-2.log",
+      "log_sha256": "319ce853e2886d87e838a24a17f4a7d60693dd541d856575368a1812a2e9842a",
+      "name": "reference-2"
+    },
+    {
+      "command": "python3 scripts/verify_experiences.py --only a07.audio-odyssey --runtime 26",
+      "exit_code": 0,
+      "finished": "2026-11-14T15:23:52+00:00",
+      "log": ".autonomy/logs/migration/X-A07.sim26.log",
+      "log_sha256": "31dbf1aee6a7344a5c29b6d9982d7449262762c38220be2a247f6fa6548a7631",
+      "name": "sim26"
+    },
+    {
+      "command": "python3 scripts/verify_experiences.py --only a07.audio-odyssey --runtime 27",
+      "exit_code": 0,
+      "finished": "2026-11-14T15:24:22+00:00",
+      "log": ".autonomy/logs/migration/X-A07.sim27-2.log",
+      "log_sha256": "c6cb1f8d77c3077ba7d97fb67d4e927ef93e2f70c5f2c54b0a4755f30804447b",
+      "name": "sim27-2"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only app-build-for-testing-ios27 app-ui-ios27-o2",
+      "exit_code": 0,
+      "finished": "2026-11-14T15:27:20+00:00",
+      "log": ".autonomy/logs/migration/X-A07.ui-o2.log",
+      "log_sha256": "9183a74032e23ee5c1aa71dbfa7f2d256ac6e65875321a8a955188ababf34d07",
+      "name": "ui-o2"
+    }
+  ],
+  "revision": "f8c237717c136390ab9898c83f7056f71eda63dc",
+  "revision_number": 1,
+  "sealed": "2026-11-14T15:30:50+00:00"
+}
