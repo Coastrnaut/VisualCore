@@ -481,7 +481,7 @@
       "id": "M13",
       "capability": "Freeze and capture: hold the displayed window while input keeps running, and save a still image of the screen",
       "source": "v0.1 feature 04; manual render stage 4",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/StillCapture.swift",
@@ -497,16 +497,16 @@
         }
       ],
       "example": {
-        "file": "Packages/ExperiencesCreative/FractalExplorer/Experience/ExplorerView.swift",
-        "symbol": "ExplorerModel"
+        "file": "Packages/ExperiencesCreative/OscilloscopeStudio/Experience/ScopePresenter.swift",
+        "symbol": "ScopePresenter"
       },
-      "notes": "StillCapture (tested in VisualCoreRenderingTests/StillCaptureTests) saves the frame and latest() copies a window; the freeze state that keeps input running is experience domain. G-SCOPEINTERACT (app-local), A08-P04."
+      "notes": "StillCapture (tested in VisualCoreRenderingTests/StillCaptureTests) saves the frame and latest() copies a window; the freeze state that keeps input running is experience domain. G-SCOPEINTERACT (app-local), A08-P04. Built in A08-P04 (app-local): freeze holds the shown window with its sample rate, channel count, start and settings while input keeps running (ScopeSessionTests); \"capture\" is this frozen window with its metadata (catalog fixture); saving a still image of the screen is a later idea, so StillCapture is not used yet."
     },
     {
       "id": "M14",
       "capability": "Cursors: draggable time/voltage-style and frequency/level cursors with readouts in relative units",
       "source": "v0.1 feature 04",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCore/Sources/VisualCoreScenes/PointerTracker.swift",
@@ -528,10 +528,10 @@
         }
       ],
       "example": {
-        "file": "Packages/ExperiencesCreative/VisualCoreMusicLab/Experience/MusicLabPresenter.swift",
-        "symbol": "MusicLabPresenter"
+        "file": "Packages/ExperiencesCreative/OscilloscopeStudio/Experience/ScopePresenter.swift",
+        "symbol": "ScopePresenter"
       },
-      "notes": "Pointer events, a line primitive and screen/plane conversion exist; cursor state and readouts are experience domain. G-SCOPEINTERACT (app-local), A08-P04."
+      "notes": "Pointer events, a line primitive and screen/plane conversion exist; cursor state and readouts are experience domain. G-SCOPEINTERACT (app-local), A08-P04. Built in A08-P04 (app-local): time cursors A and B, a level cursor and a spectrum frequency cursor with ScopeReadout precision rules (never finer than a sample period or a bin; \"at or beyond full scale\"), dragged on the canvas or set by sliders; pinch zoom steps the timebase through PinchRecognizer (ScopeReadoutTests, ScopeZoomTests, ScopeSessionTests)."
     },
     {
       "id": "M15",
@@ -760,7 +760,7 @@
         "file": "Packages/ExperiencesCreative/VisualCoreMusicLab/Experience/MusicLabPresetStore.swift",
         "symbol": "MusicLabPresetStore"
       },
-      "notes": "Tested in VisualCoreParametersTests, VisualCorePersistenceTests and VisualCoreExperienceTests; the ScopeSettings schema is experience domain. Sample windows are never persisted."
+      "notes": "Tested in VisualCoreParametersTests, VisualCorePersistenceTests and VisualCoreExperienceTests; the ScopeSettings schema is experience domain. Sample windows are never persisted. Built in A08-P04: ScopePresetStore keeps scope-<uuid>.json presets (format 1, settings only) in the experience storage beside three built-ins; damaged and newer files are kept and counted (ScopePresetStoreTests)."
     },
     {
       "id": "M22",
@@ -1002,7 +1002,7 @@
       "justification": "Freeze, cursor and zoom state are the scope's own interaction model over shared StillCapture, PlaneViewport and pointer events.",
       "phase": 4,
       "test": "Host tests: freeze holds the shown window while the ring buffer keeps advancing, cursor readouts in time/frequency and relative dBFS, pinch zoom maps to timebase and frequency span within limits; capture through StillCapture",
-      "closed": null
+      "closed": "A08-P04"
     },
     {
       "id": "G-MEASUREA11Y",
