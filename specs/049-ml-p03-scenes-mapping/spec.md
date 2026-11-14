@@ -25,6 +25,37 @@ Canonical overrides:
 - **Owner rulings:** short tests; audits and device runs in the device campaign; iOS 27 at phase gates; every Spec Kit
   step runs.
 
+## Clarifications
+
+### Session 2026-11-14
+
+Answered autonomously under the owner's standing delegation, recommended option each time. Facts checked in code: the
+demo and file sources write their blocks from a main-run-loop timer (`DemoAudioSource.renderBlock`,
+`FileAudioSource.writeChunk`/`mixDown`), only the microphone runs on the real-time audio thread (the tap block of
+`MicrophoneAudioSource`, which already uses preallocated scratch); error branches build strings
+(`AudioSourceError.undecodable(name)`); `ProcessMemory.footprint()` reads the process footprint; experiences receive
+`reduceMotion` in their `make` factory from the registry; `ExperienceControl.maxValues` is 24; meshes are Lambert-lit with
+back-face culling (`MeshRenderer`) and several can be drawn with depth through `DepthMeshPass`.
+
+- Q: How is each feature normalised to 0…1? → A: Level and peak by dBFS over −60…0; each frequency region by the dB of
+  the summed energy of its four bands over −80…0; beat energy as is (already 0…1). Values below the window read 0,
+  above read 1.
+- Q: How does a mapping turn the normalised feature into a parameter value, and what is the rest value? → A: x =
+  clamp(gain · n, clampLow, clampHigh); s = smoother(attack, release) over x with the elapsed time; value = minimum + s ·
+  (maximum − minimum). The rest value is the value for silence (s = 0), i.e. the range minimum.
+- Q: What does the mapping editor change, and through which actions? → A: Per parameter only the feature and the gain
+  (attack/release and clamp stay at the scene's defaults in this phase). Actions: `scene.select [0…2]`, `mapping.set
+  [scene 0…2, slot 0…2, feature 0…6, gain 0…4]`, `mapping.reset [scene 0…2]`; features are indexed level, peak, beat,
+  low, low-mid, high-mid, high.
+- Q: How is the hot path marked and checked? → A: Each audio-side block handler is enclosed in `// vc:hot-path begin` /
+  `// vc:hot-path end`; a repository script refuses allocating constructs inside (array/dictionary/string creation or
+  literals, `append`, `map`/`filter`/`reduce`, string interpolation, class instantiation, closures, `print`); a line that
+  only runs on failure carries `// vc:cold` and is exempt. The microphone tap is the real-time handler; the demo and
+  file handlers are marked too because they feed the same buffer.
+- Q: How is "no growth" measured in-process? → A: The process footprint before and after 1,000 blocks through the
+  demo source's block handler and the microphone tap block (fed one preallocated buffer), after one warm-up block;
+  growth ≤ 64 KiB.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Choose one of three scenes (Priority: P1) 🎯
@@ -137,7 +168,7 @@ memory-allocating construct inside the marked code; the handlers are exercised w
 
 - **Audio mapping**: feature, gain, attack, release, clamp low/high, schema version.
 - **Mapper**: one mapping plus its smoothing state; produces a value in a parameter range.
-- **Scene**: identity (bars, rings, geometry), parameters (name, range, rest value), default mappings.
+- **Scene**: identity (bars, rings, geometry), parameters (name, range; rest value = range minimum), default mappings.
 - **Music Lab state (schema 2)**: source, demo seed, demo mode, scene, mappings per scene.
 
 ## Success Criteria *(mandatory)*
