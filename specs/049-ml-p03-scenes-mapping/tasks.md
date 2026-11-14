@@ -1,0 +1,51 @@
+# Tasks: VisualCore Music Lab — Phase 03 Three visual scenes and mapping editor
+
+**Input**: [spec.md](spec.md), [plan.md](plan.md), [research.md](research.md), [data-model.md](data-model.md),
+[contracts/api.md](contracts/api.md), [quickstart.md](quickstart.md). Gate A06-P03 (legacy). Evidence:
+`python3 Tools/python/desktop_runbook.py run-check --stage A06-P03 --timeout 600 --name <check> -- <command>`. Commit after every task (no trailers). iOS 27 only; reference regression at X-A06
+(owner, 2026-11-14).
+
+## Phase 1: Setup
+
+- [ ] T-A06-301 Baseline: cite the A06-P02 evidence on the unchanged tree (`.autonomy/checks/A06-P02.dsp-host-2.json`, `.autonomy/checks/A06-P02.experiences-ios27.json`, `.autonomy/checks/A06-P02.app-unit.json`, `.autonomy/checks/A06-P02.verify-27.json`) instead of a rerun (owner ruling 4 of 2026-11-14)
+
+## Phase 2: Foundational (VisualCore mapping, story 2; hot path, story 3)
+
+- [ ] T-A06-302 [P] [US2] Write `Packages/VisualCore/Tests/VisualCoreAudioDSPTests/{AudioMappingTests,AudioMapperTests}.swift` first, then `Packages/VisualCore/Sources/VisualCoreAudioDSP/{AudioFeatureKind,AudioMapping,AudioMapper}.swift` per contracts/api.md and data-model.md ("gain (0…4)", "attack, release (0.001…5 s)", "0 ≤ low < high ≤ 1", "schemaVersion 1", regions = bands 0–3/4–7/8–11/12–15, level/peak window −60…0 dBFS, region window −80…0 dB); tests: normalisation of each kind at window ends and midpoint; settled gain-1 mapping linear to the range within 1e-6; gain 2 doubles before the clamp; 1,000 seeded random feature sets stay in range; attack/release step timing via the smoother; reset; decode refuses unknown feature, NaN/inf, gain 5, attack 0, clampLow ≥ clampHigh, version 2; valid round trip exact (FR-A06-301–303; SC-A06-301, 302)
+- [ ] T-A06-303 [P] [US3] Write `scripts/check_audio_hot_path.py` (scan `Packages/VisualCoreRendering/Sources/VisualCoreAudio/{DemoAudioSource,FileAudioSource,MicrophoneAudioSource}.swift` for balanced `// vc:hot-path begin`/`// vc:hot-path end` regions, ≥ 1 per file; refuse inside them array/dictionary literals or initialisers (`[`…`](`, `Array(`, `[Float](`), `String(`, string interpolation `\\(`, `.append(`, `.map`/`.filter`/`.reduce`/`.compactMap`, `print(`, closure literals `{ [` or `{ _ in`, class instantiation of known reference types, except lines carrying `// vc:cold`; exit 1 with file:line), `scripts/tests/test_audio_hot_path.py` (repository passes; five planted constructs each fail; unbalanced markers fail; a file with no region fails), add the script tests to `scripts/test_scripts.py`, add a CI step in `.github/workflows/ci.yml` (checks job), and add the markers (and `// vc:cold` on failure-only lines) around `DemoAudioSource.renderBlock`, `FileAudioSource.writeChunk`/`mixDown` and the microphone tap processing in the three source files without changing behaviour (FR-A06-320; SC-A06-305)
+- [ ] T-A06-304 [P] [US1] Write `Packages/ExperiencesCreative/VisualCoreMusicLab/CoreTests/MusicLabSceneTests.swift` first, then `Packages/ExperiencesCreative/VisualCoreMusicLab/Core/{MusicLabScene,SceneParameter}.swift` per research D4 and data-model.md ("bars 0, rings 1, geometry 2"; parameters with ranges: bars height 0.3…1.0, glow 0.4…1.0; rings radius 0.2…0.45, wobble 0.02…0.15; geometry pulse 0.6…1.2, spin 0.1…2.0, lift 0.2…1.5; default choices bars height←level(0), glow←beat(2); rings radius←level, wobble←high-mid(5); geometry pulse←beat, spin←level, lift←low(3); gain 1; attack/release 0.02/0.25, beat-driven 0.01/0.2; `MappingChoice` feature 0…6, gain 0…4 finite); tests: three scenes with 2/2/3 parameters, ranges non-empty, defaults valid, names unique, display names (FR-A06-310, 311)
+
+## Phase 3: User Story 1 + 2 — scenes and mapping editor (P1) 🎯
+
+- [ ] T-A06-305 [US1] Extend `Packages/ExperiencesCreative/VisualCoreMusicLab/Core/MusicLabState.swift` (depends on T-A06-304) with `scene` (0…2) and `mappings` ([[MappingChoice]], "3 lists, each exactly its scene's parameter count"), `select(scene:)`, `setMapping(scene:slot:choice:)` (returns a rule refusal for a slot beyond the scene's count), `resetMappings(scene:)`; Codable persists them; decoding validates; update `CoreTests/MusicLabStateTests.swift` (persisted keys now source, demoSeed, demoMode, scene, mappings; damaged payloads refused) (FR-A06-310, 313)
+- [ ] T-A06-306 [US1] Modify `Packages/ExperiencesCreative/VisualCoreMusicLab/Experience/Adapter/MusicLabCore.swift` (depends on T-A06-305): controls `scene.select [0…2]`, `mapping.set [0…2, 0…2, 0…6, 0…4]`, `mapping.reset [0…2]`; digest adds scene and every choice; snapshot schema 2; `migrations` 1→2 inserting `scene: 0` and the default mappings; tests in `ExperienceTests/MusicLabCoreTests.swift`: each new action changes the digest, slot beyond count refused as rule `a06.no-such-parameter`, schema-1 payload restores with Bars and defaults, schema-2 round trip, damaged mapping payload refused (FR-A06-310, 312, 313; SC-A06-302, 304)
+- [ ] T-A06-307 [US1] Write `Packages/ExperiencesCreative/VisualCoreMusicLab/Experience/MusicLabScenes.swift` and modify `MusicLabPresenter.swift` (depends on T-A06-302, 306): one `AudioMapper` per active parameter built from the state's choices and the scene defaults; mappers reset on scene/source change; Bars (16 full-width bars scaled by height, brightness by glow, meters kept), Rings (5 concentric rings of the newest samples, radius and wobble mapped), Geometry (`DepthMeshPass` + sphere `MeshRenderer(Mesh.uvSphere(segments: 24, rings: 12))` scaled by pulse + one cube renderer drawn 16 times on a ring, heights by lift × band i, ring rotation by spin; Reduce Motion → spin at range minimum); renderers built in setup and released in teardown; `VisualCoreMusicLabExperience.make` passes `reduceMotion`; description "Music Lab: <scene> scene, <source>, level <word>[, beat]."; expose `lastParameterValues` for tests (FR-A06-311, 314, 315)
+- [ ] T-A06-308 [US2] Modify `Packages/ExperiencesCreative/VisualCoreMusicLab/Experience/MusicLabControls.swift`: scene picker, per-parameter feature picker (7 features) and gain slider (0…4, step 0.1), live value text, "Reset mapping" button, all with accessibility labels and identifiers `a06.scene`, `a06.mapping.<scene>.<slot>.feature`, `…gain`, `a06.mapping.reset`; actions sent through the port (FR-A06-312)
+- [ ] T-A06-309 [US1] Write `Packages/ExperiencesCreative/VisualCoreMusicLab/ExperienceTests/MusicLabSceneRenderTests.swift`: with the 1 kHz demo tone each scene draws non-blank and the three pictures differ pairwise in ≥ 10 % of a 16 × 16 sampling grid (channel diff > 16/255); each scene differs between silence and the tone; mapping `pulse`←level gain 2 doubles the settled normalised value and stays in range; Reduce Motion keeps spin at its minimum; scene restored after snapshot round trip; description names the scene (SC-A06-303, 304; FR-A06-314, 315)
+- [ ] T-A06-310 [US3] Write `Packages/ExperiencesCreative/VisualCoreMusicLab/ExperienceTests/MusicLabHotPathTests.swift`: after one warm-up block, 1,000 blocks through the demo source's block path (started into a ring buffer and driven by its tick) and 1,000 calls of the microphone tap block fed one preallocated `AVAudioPCMBuffer` change `ProcessMemory.footprint()` by ≤ 64 KiB (SC-A06-305)
+- [ ] T-A06-311 Regenerate `Packages/ExperiencesCreative/VisualCoreMusicLab/scenario-manifest.json` (`TEST_RUNNER_UPDATE_SCENARIO_MANIFEST=1`) and update `MusicLabManifest.swift` if a scenario needs the new actions (FR-A06-313; SC-A06-304)
+
+## Phase 4: Polish & evidence
+
+- [ ] T-A06-312 DSP host tests (`python3 Tools/python/desktop_runbook.py run-check --stage A06-P03 --timeout 600 --name dsp-host -- swift test --package-path Packages/VisualCore --filter VisualCoreAudioDSPTests`)
+- [ ] T-A06-313 Hot-path check (`python3 Tools/python/desktop_runbook.py run-check --stage A06-P03 --timeout 600 --name hot-path -- python3 scripts/check_audio_hot_path.py`)
+- [ ] T-A06-314 Experiences package on sim-27.2 (`python3 Tools/python/desktop_runbook.py run-check --stage A06-P03 --timeout 600 --name experiences-ios27 -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test`)
+- [ ] T-A06-315 App build and unit (`python3 Tools/python/desktop_runbook.py run-check --stage A06-P03 --timeout 600 --name app-unit -- python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27`)
+- [ ] T-A06-316 Runner iOS 27 (`python3 Tools/python/desktop_runbook.py run-check --stage A06-P03 --timeout 600 --name verify-27 -- python3 scripts/verify_experiences.py --only a06.visualcore-music-lab --runtime 27`)
+- [ ] T-A06-317 Public API and docs: `check_public_api.py --update`, `python3 Tools/python/desktop_runbook.py run-check --stage A06-P03 --timeout 600 --name public-api -- python3 scripts/check_public_api.py`; `Packages/VisualCore/README.md`, `Packages/VisualCoreRendering/README.md` (hot-path markers), `Auto-Creator.md` §13 row, `docs/apps/visualcore-music-lab/visualcore-contract.{json,md}` (G-AUDIOMAP closed in A06-P03, rows M01/M17 available with evidence, G-SIGNALTEXTURE phase 5; `check_app_contract.py --app visualcore-music-lab --render`)
+- [ ] T-A06-318 Script tests (`python3 Tools/python/desktop_runbook.py run-check --stage A06-P03 --timeout 600 --name script-tests -- python3 scripts/test_scripts.py`)
+- [ ] T-A06-319 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A06-P03
+
+## Dependencies
+
+T-A06-301 → (T-A06-302 ∥ T-A06-303 ∥ T-A06-304) → T-A06-305 → T-A06-306 → T-A06-307 → (T-A06-308, T-A06-309, T-A06-310) →
+T-A06-311 → T-A06-312…318 → T-A06-319. Review checkpoints: after T-A06-306 (state schema frozen), after T-A06-311 (manifest).
+
+## Parallel execution
+
+Agents: A = T-A06-302, B = T-A06-303, C = T-A06-304 (disjoint files). Lead: T-A06-305…311, docs, runs, commits.
+
+## Implementation strategy
+
+MVP: the mapping (US2) and scenes (US1) through state schema 2, then the editor; the hot-path fixture (US3) in
+parallel; evidence last.
