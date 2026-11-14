@@ -522,6 +522,82 @@
       },
       "name" : "fixture-7",
       "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "signal.waveform",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 5
+        },
+        {
+          "action" : {
+            "control" : "signal.frequency",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 5
+        },
+        {
+          "action" : {
+            "control" : "display.select",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 5
+        },
+        {
+          "steps" : 30
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "d853dc183eede71da5c1da3aa68a8d0154022a831e24c09eb54adcc29443ed8f",
+        "initialDigest" : "08e66bb5b8e1ff7ff09b212a861009ae5ab5d8f109985151868117aafda3ae17"
+      },
+      "name" : "fixture-8",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "source.select",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 5
+        },
+        {
+          "action" : {
+            "control" : "display.select",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 5
+        },
+        {
+          "steps" : 30
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "f92f31f5caef1aacd8c06c76915bc7d1d5bfa46ee62c87695c573d98d1934d8a",
+        "initialDigest" : "08e66bb5b8e1ff7ff09b212a861009ae5ab5d8f109985151868117aafda3ae17"
+      },
+      "name" : "fixture-9",
+      "seed" : "7"
     }
   ],
   "schema" : 1

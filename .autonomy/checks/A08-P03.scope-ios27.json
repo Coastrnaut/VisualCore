@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/ExperiencesCreative",
+    "--scheme",
+    "ExperiencesCreative-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--only-testing",
+    "OscilloscopeStudioCoreTests",
+    "OscilloscopeStudioExperienceTests"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing OscilloscopeStudioCoreTests OscilloscopeStudioExperienceTests",
+  "elapsed_seconds": 12.153,
+  "exit_code": 0,
+  "finished": "2026-11-14T17:15:10+00:00",
+  "log": ".autonomy/logs/A08-P03.scope-ios27.log",
+  "log_sha256": "60943cc487d8b7ee84e54fe1945d2397e47c1f901798a32a8f9c2cacbe285e42",
+  "name": "scope-ios27",
+  "stage": "A08-P03",
+  "started": "2026-11-14T17:14:58+00:00",
+  "timed_out": false
+}

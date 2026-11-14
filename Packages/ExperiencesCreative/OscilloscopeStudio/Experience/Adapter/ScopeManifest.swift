@@ -61,7 +61,10 @@ extension ScopeCore {
     /// 4. clipping shown: gain ×10 on the 0.5 sine drives the trace beyond full scale (the window marks it clipped);
     /// 5. sweep on a falling trigger: the logarithmic sweep with the falling slope at 2 ms per division;
     /// 6. missing crossing in auto mode (feature 062): the level at 0.9 with the auto mode, the newest span shown;
-    /// 7. the XY view (feature 062): the stereo test signal plotted left against right.
+    /// 7. the XY view (feature 062): the stereo test signal plotted left against right;
+    /// 8. the spectrum view (feature 063): the 1 kHz sine analysed, its peak read at the 1 kHz bin;
+    /// 9. the microphone (mono) in XY (feature 063, the manual's Phase 03 fixture): the XY view chosen, the waveform kept
+    ///    and marked "XY needs two channels".
     /// The flat line (silence) needs a silent source, which no action selects; `ScopeSessionTests` proves it in both
     /// modes with an injected silent source.
     public static var fixtureEntries: [[ScenarioStep]] {
@@ -79,6 +82,9 @@ extension ScopeCore {
              ScenarioStep(steps: 30)],
             [step("trigger.mode", [0]), step("trigger.level", [0.9]), ScenarioStep(steps: 30)],
             [step("source.select", [0]), step("display.select", [1]), ScenarioStep(steps: 30)],
+            [step("signal.waveform", [0]), step("signal.frequency", [2]), step("display.select", [2]),
+             ScenarioStep(steps: 30)],
+            [step("source.select", [2]), step("display.select", [1]), ScenarioStep(steps: 30)],
         ]
     }
 

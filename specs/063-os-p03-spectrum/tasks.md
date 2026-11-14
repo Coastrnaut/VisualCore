@@ -16,7 +16,7 @@
 
 ## Phase 3: User Story 3 — the mono XY fixture (P2)
 
-- [ ] T-A08-304 [US3] Extend `Experience/Adapter/ScopeManifest.swift` with fixtures for the spectrum view (`display.select [2]` on the 1 kHz sine) and for the microphone (mono) in XY (`source.select [2]`, `display.select [1]`), regenerate `scenario-manifest.json` (`UPDATE_SCENARIO_MANIFEST=1 TEST_RUNNER_UPDATE_SCENARIO_MANIFEST=1`), update `ExperienceTests/ScopeManifestTests.swift`; the session test for the mono-XY mark (A08-P02) stays green (FR-A08-310; SC-A08-304)
+- [X] T-A08-304 [US3] Extend `Experience/Adapter/ScopeManifest.swift` with fixtures for the spectrum view (`display.select [2]` on the 1 kHz sine) and for the microphone (mono) in XY (`source.select [2]`, `display.select [1]`), regenerate `scenario-manifest.json` (`UPDATE_SCENARIO_MANIFEST=1 TEST_RUNNER_UPDATE_SCENARIO_MANIFEST=1`), update `ExperienceTests/ScopeManifestTests.swift`; the session test for the mono-XY mark (A08-P02) stays green (FR-A08-310; SC-A08-304) — Verified 2026-11-14: 2026-11-14: manifest fixtures 8 (spectrum) and 9 (microphone mono in XY), manifest regenerated (9 fixtures); ScopeManifestTests pass
 
 ## Phase 4: Polish & evidence
 

@@ -29,13 +29,13 @@ private func play(_ spec: ScenarioSpec) async throws -> (initial: String, result
 }
 
 @Suite struct ScopeManifestTests {
-    @Test func theManifestIsValidWithTheNineStandardScenariosAndSevenFixtures() {
+    @Test func theManifestIsValidWithTheNineStandardScenariosAndNineFixtures() {
         let manifest = ScopeCore.manifest(for: id)
         let problems = ScenarioManifestValidator.problems(manifest, controls: ScopeCore.controls,
-                                                          content: ContentRequirement(fixtures: 7))
+                                                          content: ContentRequirement(fixtures: 9))
         #expect(problems.isEmpty, "\(problems)")
         #expect(Set(manifest.scenarios.map(\.name))
-                == Set(ScenarioManifest.standardNames).union((1...7).map { "fixture-\($0)" }))
+                == Set(ScenarioManifest.standardNames).union((1...9).map { "fixture-\($0)" }))
     }
 
     @Test func derivedDigestsAndResultsAreWhatTheEngineGives() async throws {
@@ -73,6 +73,10 @@ private func play(_ spec: ScenarioSpec) async throws -> (initial: String, result
         #expect(missing.triggerMode == .auto && missing.triggerLevel == 0.9)
         let xy = ScopeCore.played(seed: seed, entries: ScopeCore.fixtureEntries[6]).state
         #expect(xy.display == .xy && xy.source == .testSignal)
+        let spectrum = ScopeCore.played(seed: seed, entries: ScopeCore.fixtureEntries[7]).state
+        #expect(spectrum.display == .spectrum && spectrum.frequency == 1_000)
+        let monoXY = ScopeCore.played(seed: seed, entries: ScopeCore.fixtureEntries[8]).state
+        #expect(monoXY.display == .xy && monoXY.source == .microphone)
     }
 
     /// The JSON form with the control ids, named by `Catalog/registrations.json`. `UPDATE_SCENARIO_MANIFEST=1`
