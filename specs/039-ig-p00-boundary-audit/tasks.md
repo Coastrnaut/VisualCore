@@ -6,7 +6,7 @@
 
 ## Phase 1: Setup
 
-- [ ] T-A05-001 Create `docs/apps/infinite-geometry/README.md` (what the experience is per the manual §1–§2, that it is an experience of the one app, its documents) and `docs/apps/infinite-geometry/regression-baseline.md` with the phase start `427eea32` and the reference pin `d93edd1`
+- [X] T-A05-001 Create `docs/apps/infinite-geometry/README.md` (what the experience is per the manual §1–§2, that it is an experience of the one app, its documents) and `docs/apps/infinite-geometry/regression-baseline.md` with the phase start `427eea32` and the reference pin `d93edd1` — Verified 2026-11-13: 2026-11-13 docs/apps/infinite-geometry/README.md and regression-baseline.md (phase start 427eea32, pin d93edd1); validate_docs PASS
 
 ## Phase 3: User Story 1 — Evidence-backed integration matrix (P1) 🎯
 

@@ -1,0 +1,1167 @@
+{
+  "schema": 1,
+  "app": "infinite-geometry",
+  "gate": "A05-P00",
+  "date": "2026-11-13",
+  "inventory": [
+    {
+      "area": "Package products",
+      "description": "Pure, host-testable products of Packages/VisualCore: VisualCoreMath, VisualCoreSimulation, VisualCoreScenes, VisualCoreShaderSource, VisualCoreEffectsGraph, VisualCoreDiagnostics, VisualCoreAudioDSP, VisualCorePersistence, VisualCoreParameters, VisualCoreExperience (+ VisualCoreTestSupport for test targets). iOS products of Packages/VisualCoreRendering: VisualCoreRendering, VisualCoreEffects, VisualCoreUI, VisualCoreAudio, VisualCoreAutomation, VisualCoreExperienceHost. Experience targets live in Packages/ExperiencesCreative (A01-A04 today); A05 will add InfiniteGeometry/{Core,CoreTests,Experience,ExperienceTests} in A05-P01. Dependency rules enforced by scripts/check_dependencies.py; public surface recorded in docs/api/visualcore-public-api.txt.",
+      "paths": [
+        "Packages/VisualCore/Package.swift",
+        "Packages/VisualCoreRendering/Package.swift",
+        "Packages/ExperiencesCreative/Package.swift",
+        "scripts/check_dependencies.py",
+        "docs/api/visualcore-public-api.txt"
+      ],
+      "owner": "VisualCore packages (ADR-0003, ADR-0009)"
+    },
+    {
+      "area": "EGL render host and thread",
+      "description": "RenderHost (@MainActor) owns the EGL display, context and surfaces over ANGLE's Metal backend (EGLDisplayProvider chooses an RGBA8 ES3 config with no guaranteed depth buffer), the CAMetalLayer RenderView, the FrameScheduler and context generations; pause/resume, recreateContext and destroy; scenes implement RenderScene setup/resize/render/teardown. All GL work runs on the main thread. Infinite Geometry adds no EGL or GL context of its own.",
+      "paths": [
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderScene.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderView.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FrameScheduler.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/EGLDisplayProvider.swift"
+      ],
+      "owner": "VisualCoreRendering (ADR-0002 seam)"
+    },
+    {
+      "area": "Shaders and resources",
+      "description": "ResourceRegistry creates buffers, textures, programs and render targets under a ResourceBudget and rejects stale handles after a generation change; makeRenderTarget(depth: true) adds a GL_DEPTH_COMPONENT24 renderbuffer (R02-F04, feature 204). ShaderProgram, ShaderBundle and ShaderLibrary (#include expansion with line maps) compile bundled GLSL; the vc/ library holds color, field, hash, noise, palette and sdf helpers. Pipeline = ShaderProgram + RenderState, applied as one unit by GLState.apply (RenderState.opaque3D: depth test and write, back-face culling).",
+      "paths": [
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GPUObjects.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ShaderProgram.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ShaderBundle.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/Pipeline.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GLState.swift",
+        "Packages/VisualCore/Sources/VisualCoreShaderSource/RenderState.swift",
+        "Packages/VisualCore/Sources/VisualCoreShaderSource/ShaderLibrary.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GLSL/vc/sdf.glsl",
+        "specs/204-gpu-resource-ownership-and-pipeline-lifetime"
+      ],
+      "owner": "VisualCoreRendering + VisualCoreShaderSource"
+    },
+    {
+      "area": "Geometry and mesh compiler",
+      "description": "Mesh (positions, normals, uvs, UInt32 indices; plane, cube, uvSphere), the R02-F05 compiler MeshBuilder under a MeshBudget with welding, shapes surface, revolution, extrusion, tube and bevelledBox, validate() -> MeshReport (winding, degenerate, boundary edges, closedness, budget), smooth/flat normals, bounds and a stable digest; MeshRenderer draws a Mesh with Lambert lighting through an OrbitCamera.",
+      "paths": [
+        "Packages/VisualCore/Sources/VisualCoreScenes/MeshGenerators.swift",
+        "Packages/VisualCore/Sources/VisualCoreScenes/MeshBuilder.swift",
+        "Packages/VisualCore/Sources/VisualCoreScenes/MeshShapes.swift",
+        "Packages/VisualCore/Sources/VisualCoreScenes/MeshValidation.swift",
+        "Packages/VisualCore/Sources/VisualCoreScenes/MeshNormals.swift",
+        "Packages/VisualCore/Sources/VisualCoreScenes/MeshDigest.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/MeshRenderer.swift",
+        "specs/205-procedural-mesh-compiler-and-mesh-validation"
+      ],
+      "owner": "VisualCoreScenes + VisualCoreRendering"
+    },
+    {
+      "area": "Experience host",
+      "description": "ExperienceSession opens, checkpoints, closes and recovers an Experience on one RenderHost, applies the quality level (QualityPolicy) and memory/scene-phase events; ExperienceShell adapts an ExperiencePresenter (scene, controls) to Experience; ExperienceCore is the GPU-free state; the one app registers experiences in ExperienceRegistry (A05 joins in A05-P01; scripts/check_experience_packages.py forbids unregistered targets).",
+      "paths": [
+        "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceSession.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceShell.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperiencePresenter.swift",
+        "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceCore.swift",
+        "Apps/VisualCore/App/ExperienceRegistry.swift",
+        "scripts/check_experience_packages.py"
+      ],
+      "owner": "VisualCoreExperience + VisualCoreExperienceHost + the one app"
+    },
+    {
+      "area": "Build and release steps",
+      "description": "XcodeGen spec project.yml for the one app (target VisualCore), package schemes via scripts/xcodebuild_package.py, app tests via scripts/xcodebuild_app.py, and scripts/release_check.py: 78 named steps listed by --list on 2026-11-13 (shared checks, package and app builds/tests, release audits of the one app, reference regression steps).",
+      "paths": [
+        "project.yml",
+        "scripts/release_check.py",
+        "scripts/xcodebuild_package.py",
+        "scripts/xcodebuild_app.py",
+        ".github/workflows/ci.yml"
+      ],
+      "owner": "repository tooling"
+    },
+    {
+      "area": "Source ownership",
+      "description": "Infinite Geometry owns its domain (GeometryPreset, symmetry/tiling rules, ParametricShape recipes, CameraPose and MeshBudget choices), copy, curated presets and UI under Packages/ExperiencesCreative/InfiniteGeometry/ (Core GPU-free, Experience UIKit/GPU); VisualCore owns reusable math, mesh, shader, camera, quality and persistence machinery (constitution Principle II, Auto-Creator.md section 13); ProjectM stays in the harness.",
+      "paths": [
+        ".specify/memory/constitution.md",
+        "Auto-Creator.md",
+        "docs/decisions/ADR-0009-unified-app.md"
+      ],
+      "owner": "constitution + ADR-0009"
+    },
+    {
+      "area": "ProjectM reference regression",
+      "description": "Reference pinned at d93edd1, read-only; scripts/run_reference_baseline.py --list prints 9 ordered steps (engine xcframework, XcodeGen main and RendererLab, simulator builds of projectM-iOS, CaptureLab and RendererLab, generic build, ANGLERendering tests on iOS 27 and 26); scripts/check_reference_clean.py checks the submodule; run in two chunks via release_check.py --only.",
+      "paths": [
+        "scripts/run_reference_baseline.py",
+        "scripts/check_reference_clean.py",
+        "Harnesses/ProjectMReference/ProjectMReference.yml"
+      ],
+      "owner": "reference adapter (harness only)"
+    }
+  ],
+  "matrix": [
+    {
+      "id": "M01",
+      "capability": "Geometry rendering: lit mesh drawn in the experience's scene, depth-correct on screen and in exports",
+      "source": "brainstorm; v0.1 feature 01",
+      "status": "requires adaptation",
+      "evidence": [
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/MeshRenderer.swift",
+          "symbol": "MeshRenderer",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/MeshRenderer.swift",
+          "symbol": "MeshRenderer.draw",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/MeshGenerators.swift",
+          "symbol": "Mesh",
+          "product": "VisualCoreScenes",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/MeshGenerators.swift",
+          "symbol": "Mesh.cube",
+          "product": "VisualCoreScenes",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Showcase/App/Scenes/AnimatedGeometryScene.swift",
+        "symbol": "AnimatedGeometryScene"
+      },
+      "notes": "MeshRenderer draws a Mesh with one hard-coded Lambert program and enables culling itself, but does not apply a Pipeline/RenderState and leaves depth to the caller; the EGL window config has no guaranteed depth buffer and renderOffscreen uses a colour-only target. G-MESHSCENE: a reusable mesh scene that draws through a Pipeline (opaque3D) into a pooled depth RenderTarget and composites into the bound framebuffer, with per-mesh colour/palette, so on-screen and exported frames match."
+    },
+    {
+      "id": "M02",
+      "capability": "Shader effects: bundled full-screen fragment programs with uniforms, palette and time",
+      "source": "brainstorm",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FullScreenShaderScene.swift",
+          "symbol": "FullScreenShaderScene",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ShaderBundle.swift",
+          "symbol": "ShaderBundle",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreShaderSource/ShaderLibrary.swift",
+          "symbol": "ShaderLibrary",
+          "product": "VisualCoreShaderSource",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ShaderProgram.swift",
+          "symbol": "ShaderProgram",
+          "product": "VisualCoreRendering",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/GenerativeArtStudio/Experience/ArtSceneFactory.swift",
+        "symbol": "ArtSceneFactory"
+      },
+      "notes": "Used by A01, A02 and A03; vc/color, vc/noise, vc/palette, vc/hash, vc/field and vc/sdf include files ship in the VisualCoreRendering bundle."
+    },
+    {
+      "id": "M03",
+      "capability": "Transformations: 2D/3D affine and projective transforms, quaternions, scene nodes",
+      "source": "brainstorm",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/Matrix.swift",
+          "symbol": "Mat3.trs",
+          "product": "VisualCoreMath",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/Matrix.swift",
+          "symbol": "Mat4.perspective",
+          "product": "VisualCoreMath",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/Matrix.swift",
+          "symbol": "Mat4.lookAt",
+          "product": "VisualCoreMath",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/Quaternion.swift",
+          "symbol": "Quat",
+          "product": "VisualCoreMath",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/SceneGraph.swift",
+          "symbol": "SceneNode",
+          "product": "VisualCoreScenes",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/PrimitiveRenderer.swift",
+        "symbol": "PrimitiveRenderer"
+      },
+      "notes": "Double-precision, host-tested (VisualCoreMathTests)."
+    },
+    {
+      "id": "M04",
+      "capability": "Wallpaper-group and kaleidoscope symmetry mappings (fold into the fundamental domain, enumerate images)",
+      "source": "manual section 6 algorithm 1; v0.1 features 01, 03",
+      "status": "upstream gap",
+      "evidence": [],
+      "example": {
+        "file": "Packages/ExperiencesCreative/GenerativeArtStudio/Core/FamilyCatalog.swift",
+        "symbol": "FamilyCatalog"
+      },
+      "notes": "No VisualCore type maps a point into a dihedral (kaleidoscope) or wallpaper-group fundamental domain; A01's Geometric Tiling folds inline in its own fragment shader. G-SYMMETRY: a stable, host-tested SymmetryGroup mapping (dihedral Dn, rotation Cn and a set of wallpaper groups such as p4m, p6m, p3m1, pmm) in VisualCoreMath, with a CPU reference that the GLSL fold of G-SDF2D must match."
+    },
+    {
+      "id": "M05",
+      "capability": "2D signed-distance fragments and a GLSL symmetry fold for repeated patterns",
+      "source": "manual section 6 algorithm 2; v0.1 feature 01",
+      "status": "requires adaptation",
+      "evidence": [
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ShaderBundle.swift",
+          "symbol": "ShaderBundle",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreShaderSource/ShaderLibrary.swift",
+          "symbol": "ShaderLibrary",
+          "product": "VisualCoreShaderSource",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/GenerativeArtStudio/Core/FamilyCatalog.swift",
+        "symbol": "FamilyCatalog"
+      },
+      "notes": "vc/sdf.glsl holds only 3D vc_sdSphere, vc_sdBox, vc_sdTorus, vc_smoothUnion and vc_rotate. G-SDF2D: 2D primitives (circle, segment, box, regular polygon, star) and a vc/symmetry.glsl fold matching G-SYMMETRY's CPU mapping within a stated tolerance, compiled through ShaderLibrary."
+    },
+    {
+      "id": "M06",
+      "capability": "2D camera for tiling views: pan, pinch zoom about an anchor, rotation, zoom clamp",
+      "source": "v0.1 feature 02",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/Camera2D.swift",
+          "symbol": "Camera2D",
+          "product": "VisualCoreMath",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/Camera2D.swift",
+          "symbol": "Camera2D.zoomRange",
+          "product": "VisualCoreMath",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/PlaneViewport.swift",
+          "symbol": "PlaneViewport",
+          "product": "VisualCoreMath",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/GenerativeArtStudio/Experience/ParticlesArtScene.swift",
+        "symbol": "ParticlesArtScene"
+      },
+      "notes": "Tilings repeat without end, so unbounded pan is correct for 2D; zoom is clamped by Camera2D.zoomRange."
+    },
+    {
+      "id": "M07",
+      "capability": "3D orbit camera: orbit, zoom, projection, picking ray",
+      "source": "brainstorm; v0.1 feature 02",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/OrbitCamera.swift",
+          "symbol": "OrbitCamera",
+          "product": "VisualCoreMath",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/OrbitCamera.swift",
+          "symbol": "OrbitCamera.orbit",
+          "product": "VisualCoreMath",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/OrbitCamera.swift",
+          "symbol": "OrbitCamera.zoom",
+          "product": "VisualCoreMath",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/OrbitCamera.swift",
+          "symbol": "OrbitCamera.viewProjection",
+          "product": "VisualCoreMath",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/OrbitCamera.swift",
+          "symbol": "OrbitCamera.ray",
+          "product": "VisualCoreMath",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Showcase/App/Scenes/AnimatedGeometryScene.swift",
+        "symbol": "AnimatedGeometryScene"
+      },
+      "notes": "Host-tested (OrbitCameraTests); pitch clamped to 89 degrees, distance to OrbitCamera.distanceRange, non-finite input ignored."
+    },
+    {
+      "id": "M08",
+      "capability": "Camera bounds, pan and reset for the 3D composition",
+      "source": "v0.1 feature 02",
+      "status": "requires adaptation",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/OrbitCamera.swift",
+          "symbol": "OrbitCamera.pitchLimit",
+          "product": "VisualCoreMath",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/OrbitCamera.swift",
+          "symbol": "OrbitCamera.distanceRange",
+          "product": "VisualCoreMath",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Showcase/App/Scenes/AnimatedGeometryScene.swift",
+        "symbol": "AnimatedGeometryScene"
+      },
+      "notes": "OrbitCamera has no pan of the target, no per-scene distance or target bounds and no home pose. G-ORBITBOUNDS: pan(by:) in view space, a bounds value (distance range, target box) applied after every change, and reset to a stored home pose; host tests with NaN/Inf and extreme inputs."
+    },
+    {
+      "id": "M09",
+      "capability": "Touch orbit/pan/zoom gestures with deterministic arbitration",
+      "source": "v0.1 feature 02; manual section 3 interaction rules",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/GestureRecognizers.swift",
+          "symbol": "DragRecognizer",
+          "product": "VisualCoreScenes",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/GestureRecognizers.swift",
+          "symbol": "PinchRecognizer",
+          "product": "VisualCoreScenes",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/GestureRecognizers.swift",
+          "symbol": "RotateRecognizer",
+          "product": "VisualCoreScenes",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/GestureArbiter.swift",
+          "symbol": "GestureArbiter",
+          "product": "VisualCoreScenes",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/PointerTracker.swift",
+          "symbol": "PointerTracker",
+          "product": "VisualCoreScenes",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/FractalExplorer/Experience/FractalPresenter.swift",
+        "symbol": "FractalPresenter"
+      },
+      "notes": "Pure recognizers fed by RenderView's pointer events; A02 and A03 use them."
+    },
+    {
+      "id": "M10",
+      "capability": "Procedural mesh generation under a budget (R02-F05 compiler)",
+      "source": "brainstorm; v0.1 feature 01",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/MeshBuilder.swift",
+          "symbol": "MeshBuilder",
+          "product": "VisualCoreScenes",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/MeshBuilder.swift",
+          "symbol": "MeshBudget",
+          "product": "VisualCoreScenes",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/MeshShapes.swift",
+          "symbol": "Mesh.surface",
+          "product": "VisualCoreScenes",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/MeshShapes.swift",
+          "symbol": "Mesh.revolution",
+          "product": "VisualCoreScenes",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/MeshShapes.swift",
+          "symbol": "Mesh.extrusion",
+          "product": "VisualCoreScenes",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/MeshShapes.swift",
+          "symbol": "Mesh.tube",
+          "product": "VisualCoreScenes",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/MeshShapes.swift",
+          "symbol": "Mesh.bevelledBox",
+          "product": "VisualCoreScenes",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/VisualCoreRendering/Tests/VisualCoreRenderingTests/MeshCompilerRuntimeTests.swift",
+        "symbol": "MeshCompilerRuntimeTests"
+      },
+      "notes": "Recorded gate R02-F05 (feature 205); host tests MeshBuilderTests and MeshShapeTests, runtime digest equality and a compiled tube drawn by MeshRenderer on the simulators."
+    },
+    {
+      "id": "M11",
+      "capability": "Consistent normals and winding, capped subdivision, mesh validation",
+      "source": "manual section 6 algorithm 4",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/MeshValidation.swift",
+          "symbol": "Mesh.validate",
+          "product": "VisualCoreScenes",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/MeshValidation.swift",
+          "symbol": "MeshReport",
+          "product": "VisualCoreScenes",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/MeshNormals.swift",
+          "symbol": "Mesh.withSmoothNormals",
+          "product": "VisualCoreScenes",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/MeshNormals.swift",
+          "symbol": "Mesh.withFlatNormals",
+          "product": "VisualCoreScenes",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/MeshBounds.swift",
+          "symbol": "MeshBounds",
+          "product": "VisualCoreScenes",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/VisualCoreRendering/Tests/VisualCoreRenderingTests/MeshCompilerRuntimeTests.swift",
+        "symbol": "MeshCompilerRuntimeTests"
+      },
+      "notes": "validate(requireClosed:budget:) reports winding, degenerate and boundary problems; Mesh.subdivisionRange/segmentRange cap resolution."
+    },
+    {
+      "id": "M12",
+      "capability": "Depth-tested mesh pipeline: pipeline state and depth render targets",
+      "source": "manual section 6 render stage 3",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/Pipeline.swift",
+          "symbol": "Pipeline",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreShaderSource/RenderState.swift",
+          "symbol": "RenderState.opaque3D",
+          "product": "VisualCoreShaderSource",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GLState.swift",
+          "symbol": "GLState.apply",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
+          "symbol": "ResourceRegistry.makeRenderTarget",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GPUObjects.swift",
+          "symbol": "RenderTarget.depthRenderbuffer",
+          "product": "VisualCoreRendering",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/VisualCoreRendering/Tests/VisualCoreRenderingTests/DepthTargetTests.swift",
+        "symbol": "DepthTargetTests"
+      },
+      "notes": "Recorded gate R02-F04 (feature 204): occlusion resolves in both draw orders, stale depth targets are rejected after context recreation. Using it from a mesh scene is G-MESHSCENE (M01)."
+    },
+    {
+      "id": "M13",
+      "capability": "Mesh cache keyed by parameter signature, rebuilt outside the render callback",
+      "source": "manual section 6 algorithm 3; render stage 2",
+      "status": "requires adaptation",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/MeshDigest.swift",
+          "symbol": "Mesh.digest",
+          "product": "VisualCoreScenes",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreParameters/ParameterHash.swift",
+          "symbol": "ParameterHash.of",
+          "product": "VisualCoreParameters",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/StableHash.swift",
+          "symbol": "StableHash",
+          "product": "VisualCoreMath",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/VisualCoreRendering/Tests/VisualCoreRenderingTests/MeshCompilerRuntimeTests.swift",
+        "symbol": "MeshCompilerRuntimeTests"
+      },
+      "notes": "Signatures and mesh digests exist, but no bounded cache. G-MESHCACHE: a byte- and entry-bounded MeshCache keyed by a stable signature, built off the render callback and handed to the scene as an immutable Mesh; eviction and hit/miss counts host-tested."
+    },
+    {
+      "id": "M14",
+      "capability": "Adaptive mesh tessellation by device tier within a mesh budget",
+      "source": "v0.1 feature 05",
+      "status": "requires adaptation",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/MeshBuilder.swift",
+          "symbol": "MeshBudget",
+          "product": "VisualCoreScenes",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/QualityPolicy.swift",
+          "symbol": "QualityPolicy",
+          "product": "VisualCoreDiagnostics",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/ParticleBudget.swift",
+          "symbol": "ParticleBudget",
+          "product": "VisualCoreDiagnostics",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/ParticleUniverse/Core/SceneQuality.swift",
+        "symbol": "SceneQuality"
+      },
+      "notes": "ParticleBudget maps quality tiers to particle counts; nothing maps a tier to mesh resolution. G-MESHLOD: a MeshDetailBudget that turns a QualityPolicy tier and a MeshBudget (vertices, indices, draw calls) into a resolution per shape, monotonic in tier and never above the budget; the domain (shape, symmetry, preset) does not change with the tier."
+    },
+    {
+      "id": "M15",
+      "capability": "Render-quality settings and automatic tiers",
+      "source": "v0.1 feature 05",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/QualityPolicy.swift",
+          "symbol": "QualityPolicy.decide",
+          "product": "VisualCoreDiagnostics",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/DeviceConditions.swift",
+          "symbol": "DeviceConditions",
+          "product": "VisualCoreDiagnostics",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceSession.swift",
+          "symbol": "ExperienceSession.qualityLevel",
+          "product": "VisualCoreExperienceHost",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceSession.swift",
+          "symbol": "ExperienceSession.qualityPin",
+          "product": "VisualCoreExperienceHost",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/FluidArtPlayground/Core/FluidQuality.swift",
+        "symbol": "FluidQuality"
+      },
+      "notes": "Thermal state and Low Power Mode drive the tier with hysteresis; qualityPin fixes a user-chosen level."
+    },
+    {
+      "id": "M16",
+      "capability": "Symmetry group, repetition count, scale and palette controls",
+      "source": "v0.1 feature 03; journey 2",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreParameters/ParameterSchema.swift",
+          "symbol": "ParameterSchema",
+          "product": "VisualCoreParameters",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreParameters/ParameterSchema.swift",
+          "symbol": "ParameterDefinition",
+          "product": "VisualCoreParameters",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreParameters/ParameterEditor.swift",
+          "symbol": "ParameterEditor",
+          "product": "VisualCoreParameters",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreParameters/Palette.swift",
+          "symbol": "Palette",
+          "product": "VisualCoreParameters",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/ParameterPanel.swift",
+          "symbol": "ParameterPanel",
+          "product": "VisualCoreUI",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/GenerativeArtStudio/Core/FamilyCatalog.swift",
+        "symbol": "FamilyCatalog"
+      },
+      "notes": "Validated ranges, defaults and palettes; the meaning of a symmetry group comes from G-SYMMETRY (M04)."
+    },
+    {
+      "id": "M17",
+      "capability": "Deterministic named presets and persistence",
+      "source": "v0.1 feature 04; journey 3",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreParameters/Preset.swift",
+          "symbol": "Preset",
+          "product": "VisualCoreParameters",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCorePersistence/NamedLibrary.swift",
+          "symbol": "NamedLibrary",
+          "product": "VisualCorePersistence",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCorePersistence/DocumentStore.swift",
+          "symbol": "DocumentStore",
+          "product": "VisualCorePersistence",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift",
+          "symbol": "ExperienceStorage",
+          "product": "VisualCoreExperience",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/SeededRandom.swift",
+          "symbol": "SeededRandom",
+          "product": "VisualCoreSimulation",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/FractalExplorer/Experience/FractalBookmarks.swift",
+        "symbol": "FractalBookmarks"
+      },
+      "notes": "GeometryPreset (kind, symmetryOrder, repeats, paletteID, seed, camera, schemaVersion) is app domain stored through NamedLibrary/DocumentStore with versioned envelopes; no GPU handles are persisted."
+    },
+    {
+      "id": "M18",
+      "capability": "Still export of the current composition",
+      "source": "v0.1 feature 04",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+          "symbol": "RenderHost.renderOffscreen",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/StillCapture.swift",
+          "symbol": "StillCapture",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/ExportGeometry.swift",
+          "symbol": "ExportGeometry",
+          "product": "VisualCoreScenes",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/ExportGeometry.swift",
+          "symbol": "ExportSize",
+          "product": "VisualCoreScenes",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceStill.swift",
+          "symbol": "ExperienceStillRenderer",
+          "product": "VisualCoreExperienceHost",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/FractalExplorer/Experience/CaptureCleanup.swift",
+        "symbol": "CaptureCleanup"
+      },
+      "notes": "Opaque sRGB PNG; a mesh scene exports depth-correctly once G-MESHSCENE (M01) composites its own depth target."
+    },
+    {
+      "id": "M19",
+      "capability": "On-screen parameter explanations",
+      "source": "v0.1 feature 06",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreParameters/ParameterSchema.swift",
+          "symbol": "ParameterDefinition",
+          "product": "VisualCoreParameters",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/ParameterPanel.swift",
+          "symbol": "ParameterPanel",
+          "product": "VisualCoreUI",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/FractalExplorer/Core/FractalExplanations.swift",
+        "symbol": "FractalExplanations"
+      },
+      "notes": "Titles, units and valid ranges come from ParameterDefinition; the explanation copy is app content, as in A03's FractalExplanations."
+    },
+    {
+      "id": "M20",
+      "capability": "Accessibility: Reduce Motion, Reduce Flashing, legible native controls",
+      "source": "manual section 3; constitution",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPreferences.swift",
+          "symbol": "AccessibilityPreferences",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/SceneClock.swift",
+          "symbol": "SceneClock",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/AccessibilitySettingsSection.swift",
+          "symbol": "AccessibilitySettingsSection",
+          "product": "VisualCoreUI",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/AccessibilitySettingsSection.swift",
+          "symbol": "AccessibleColors",
+          "product": "VisualCoreUI",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/GenerativeArtStudio/Experience/SceneScreen.swift",
+        "symbol": "AppAccessibility"
+      },
+      "notes": "Reduce Motion slows animation through SceneClock's reduced-motion factor; system accessibility audits wait for device testing."
+    },
+    {
+      "id": "M21",
+      "capability": "Render host lifecycle: context loss, resize, background, memory warning",
+      "source": "manual section 6 rendering lifecycle; state transitions",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+          "symbol": "RenderHost",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+          "symbol": "RenderHost.recreateContext",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderScene.swift",
+          "symbol": "RenderScene",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
+          "symbol": "ResourceRegistry",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/RenderLifecycle.swift",
+          "symbol": "RenderLifecycleState",
+          "product": "VisualCoreDiagnostics",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/FractalExplorer/Experience/FractalScene.swift",
+        "symbol": "FractalScene"
+      },
+      "notes": "GPU resources are rebuilt from CPU state after a generation change; MeshRenderer already rebuilds its buffers."
+    },
+    {
+      "id": "M22",
+      "capability": "Hosting as an experience of the one app",
+      "source": "ADR-0009; manual section 4 architecture",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceShell.swift",
+          "symbol": "ExperienceShell",
+          "product": "VisualCoreExperienceHost",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceSession.swift",
+          "symbol": "ExperienceSession",
+          "product": "VisualCoreExperienceHost",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperiencePresenter.swift",
+          "symbol": "ExperiencePresenter",
+          "product": "VisualCoreExperienceHost",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceCore.swift",
+          "symbol": "ExperienceCore",
+          "product": "VisualCoreExperience",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/FractalExplorer/Experience/FractalExperience.swift",
+        "symbol": "FractalExperience"
+      },
+      "notes": "No standalone app target; a05.infinite-geometry is registered in Apps/VisualCore/App/ExperienceRegistry.swift in A05-P01 with its first real domain rules."
+    }
+  ],
+  "gaps": [
+    {
+      "id": "G-SYMMETRY",
+      "matrix": [
+        "M04"
+      ],
+      "kind": "upstream",
+      "owner": "VisualCore:VisualCoreMath",
+      "phase": 1,
+      "test": "Host tests: for Cn, Dn and each supported wallpaper group, folding any finite point lands in the fundamental domain, is idempotent, and the image of the fold under the group's generators reproduces the point within 1e-9; NaN/Inf and invalid orders are rejected",
+      "justification": "Found in A05-P00: symmetry mappings are generic (A01 Geometric Tiling folds inline; later pattern and puzzle experiences need the same math)."
+    },
+    {
+      "id": "G-SDF2D",
+      "matrix": [
+        "M05"
+      ],
+      "kind": "adaptation",
+      "owner": "VisualCore:VisualCoreRendering",
+      "phase": 2,
+      "test": "Shader tests: vc/sdf.glsl 2D primitives and the vc/symmetry.glsl fold compile through ShaderLibrary on both simulator runtimes, and offscreen pixels of a fold test pattern match the CPU G-SYMMETRY reference within a stated tolerance",
+      "justification": "Found in A05-P00: vc/sdf.glsl has only 3D primitives; 2D SDFs and a GLSL fold serve every 2D pattern experience."
+    },
+    {
+      "id": "G-MESHSCENE",
+      "matrix": [
+        "M01"
+      ],
+      "kind": "adaptation",
+      "owner": "VisualCore:VisualCoreRendering",
+      "phase": 3,
+      "test": "Simulator tests: two overlapping meshes drawn through the mesh scene resolve occlusion in both draw orders on screen and through renderOffscreen; a context recreation rebuilds buffers, pipeline and depth target with no stale handle",
+      "justification": "Found in A05-P00: MeshRenderer leaves depth and pipeline state to the caller and the window surface has no guaranteed depth buffer; every 3D experience needs the same depth-correct mesh scene."
+    },
+    {
+      "id": "G-ORBITBOUNDS",
+      "matrix": [
+        "M08"
+      ],
+      "kind": "adaptation",
+      "owner": "VisualCore:VisualCoreMath",
+      "phase": 3,
+      "test": "Host tests: pan moves the target in view space; after any orbit, zoom or pan the camera stays inside its bounds; reset returns exactly the home pose; non-finite input leaves the pose unchanged",
+      "justification": "Found in A05-P00: OrbitCamera has orbit and zoom only; bounds, pan and reset are generic camera behaviour."
+    },
+    {
+      "id": "G-MESHCACHE",
+      "matrix": [
+        "M13"
+      ],
+      "kind": "adaptation",
+      "owner": "VisualCore:VisualCoreScenes",
+      "phase": 5,
+      "test": "Host tests: a repeated signature hits, a changed signature misses and rebuilds once, the cache never exceeds its byte and entry limits, and eviction is least-recently-used and deterministic",
+      "justification": "Found in A05-P00: digests and parameter hashes exist but no bounded mesh cache; procedural-mesh experiences share it."
+    },
+    {
+      "id": "G-MESHLOD",
+      "matrix": [
+        "M14"
+      ],
+      "kind": "adaptation",
+      "owner": "VisualCore:VisualCoreDiagnostics",
+      "phase": 5,
+      "test": "Host tests: the chosen resolution is monotonic in the quality tier, every generated mesh validates within the MeshBudget at every tier, and the domain state is identical across tiers",
+      "justification": "Found in A05-P00: ParticleBudget covers particles only; tier-driven tessellation is generic to mesh experiences."
+    }
+  ],
+  "traceability": [
+    {
+      "item": "brainstorm: geometry rendering",
+      "matrix": [
+        "M01",
+        "M12"
+      ],
+      "phases": [
+        3
+      ]
+    },
+    {
+      "item": "brainstorm: shader effects",
+      "matrix": [
+        "M02",
+        "M05"
+      ],
+      "phases": [
+        2
+      ]
+    },
+    {
+      "item": "brainstorm: transformations",
+      "matrix": [
+        "M03",
+        "M04"
+      ],
+      "phases": [
+        1,
+        2
+      ]
+    },
+    {
+      "item": "brainstorm: camera controls",
+      "matrix": [
+        "M06",
+        "M07",
+        "M08",
+        "M09"
+      ],
+      "phases": [
+        2,
+        3
+      ]
+    },
+    {
+      "item": "brainstorm: procedural mesh generation",
+      "matrix": [
+        "M10",
+        "M11",
+        "M13"
+      ],
+      "phases": [
+        3,
+        5
+      ]
+    },
+    {
+      "item": "v0.1 feature 01 - two 2D tiling modes and one 3D procedural composition",
+      "matrix": [
+        "M04",
+        "M05",
+        "M01",
+        "M10",
+        "M11",
+        "M12"
+      ],
+      "phases": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "item": "v0.1 feature 02 - touch orbit/pan/zoom with reset and camera bounds",
+      "matrix": [
+        "M06",
+        "M07",
+        "M08",
+        "M09"
+      ],
+      "phases": [
+        2,
+        3
+      ]
+    },
+    {
+      "item": "v0.1 feature 03 - symmetry group, repetition count, scale and palette controls",
+      "matrix": [
+        "M04",
+        "M16"
+      ],
+      "phases": [
+        1,
+        4
+      ]
+    },
+    {
+      "item": "v0.1 feature 04 - deterministic presets and still export",
+      "matrix": [
+        "M17",
+        "M18"
+      ],
+      "phases": [
+        1,
+        4
+      ]
+    },
+    {
+      "item": "v0.1 feature 05 - adaptive mesh tessellation and render-quality settings",
+      "matrix": [
+        "M13",
+        "M14",
+        "M15"
+      ],
+      "phases": [
+        5
+      ]
+    },
+    {
+      "item": "v0.1 feature 06 - on-screen parameter explanations",
+      "matrix": [
+        "M19"
+      ],
+      "phases": [
+        4
+      ]
+    },
+    {
+      "item": "cross-cutting: accessibility, lifecycle, one-app hosting",
+      "matrix": [
+        "M20",
+        "M21",
+        "M22"
+      ],
+      "phases": [
+        1,
+        6
+      ]
+    }
+  ],
+  "negative": [
+    {
+      "rule": "No EGL display, context, surface or GL path of its own and no second renderer; all drawing goes through VisualCore's RenderHost on OpenGL ES -> ANGLE -> Metal",
+      "source": "manual rendering invariant; constitution; CLAUDE.md rule 4"
+    },
+    {
+      "rule": "No ProjectM types, engine or presets in the experience",
+      "source": "manual section 4 ownership policy; CLAUDE.md rule 12"
+    },
+    {
+      "rule": "No networking, accounts, analytics, tracking or advertising; scene state never leaves the device",
+      "source": "manual section 3; CLAUDE.md rule 3"
+    },
+    {
+      "rule": "No import or export of arbitrary mesh formats and no imported textures or models; all geometry is procedural",
+      "source": "manual section 2 explicit non-goals; CLAUDE.md rule 4"
+    },
+    {
+      "rule": "No CAD, exact-geometry or solver claims; the experience is an artistic geometry laboratory",
+      "source": "manual section 2 explicit non-goals"
+    },
+    {
+      "rule": "No unlimited recursion or subdivision depth; every mesh stays within a MeshBudget",
+      "source": "manual section 2 explicit non-goals; section 6 algorithm 4"
+    },
+    {
+      "rule": "No fork or copy of VisualCore, ANGLE or projectm-ios and no standalone app target; generic needs become VisualCore gaps",
+      "source": "ADR-0009; manual section 5; CLAUDE.md rule 1"
+    }
+  ],
+  "decision": {
+    "result": "go",
+    "reasons": [
+      "The render host, shader path, depth targets and pipelines (R02-F04) and the procedural mesh compiler with validation (R02-F05) exist with tests: 16 of 22 rows are available.",
+      "All six gaps are additive and reusable and need no second renderer, fork, private API or networking: G-SYMMETRY (VisualCoreMath, P01), G-SDF2D (VisualCoreRendering, P02), G-MESHSCENE and G-ORBITBOUNDS (P03), G-MESHCACHE and G-MESHLOD (P05).",
+      "Infinite Geometry stays unregistered until A05-P01 creates its four targets with real domain rules, so the experience package check and the one app are unchanged.",
+      "A05-P01 starts with G-SYMMETRY and the GPU-free GeometryPreset domain."
+    ],
+    "blockers": []
+  }
+}

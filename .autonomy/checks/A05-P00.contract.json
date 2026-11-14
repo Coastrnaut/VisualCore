@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_app_contract.py",
+    "--app",
+    "infinite-geometry",
+    "--render"
+  ],
+  "command": "python3 scripts/check_app_contract.py --app infinite-geometry --render",
+  "elapsed_seconds": 0.053,
+  "exit_code": 0,
+  "finished": "2026-11-14T01:40:34+00:00",
+  "log": ".autonomy/logs/A05-P00.contract.log",
+  "log_sha256": "c7f0c14e132f0d6cefc0dfb1ae822c72b786f4831712a2128ef9eadac801b158",
+  "name": "contract",
+  "stage": "A05-P00",
+  "started": "2026-11-14T01:40:34+00:00",
+  "timed_out": false
+}
