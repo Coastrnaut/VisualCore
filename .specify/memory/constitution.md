@@ -378,6 +378,45 @@ Ratified from the app manual's constitution prompt (2026-11-11).
 - **One phase at a time:** implement only one Spec Kit phase at a time (one ledger gate, ADR-0004), in order
   A04-P00 → A04-P06.
 
+### A05 Infinite Geometry (`a05.infinite-geometry`)
+
+Ratified from the app manual's constitution prompt (2026-11-13). Unlike A01–A04, this experience never had a
+standalone target: it is built directly as an experience in `Packages/ExperiencesCreative`.
+
+- **Consumer, not fork:** an experience of the VisualCore app and a VisualCore consumer, never a fork of
+  projectm-ios. It uses only audited VisualCore public APIs over the OpenGL ES → ANGLE → Metal
+  integration. It MUST NOT create its own EGL/ANGLE initialization path, a second renderer, or link
+  ProjectM engine code.
+- **Reuse first (Principle II):** generic machinery goes into VisualCore with tests, docs, the API baseline
+  and the reference regression. This covers:
+  - 2D symmetry and tiling transforms (wallpaper and kaleidoscope mappings);
+  - procedural meshes, normals, bounds and mesh validation (VisualCore's `Mesh` and the R02-F05 compiler);
+  - orbit, pan and zoom cameras with bounds;
+  - signed-distance-field shader helpers and depth-tested mesh drawing;
+  - presets, still export and quality tiers.
+
+  Only the curated scenes, copy, explanations and UI stay in the experience.
+- **GPU-free domain:** geometry transforms, symmetry rules, preset and camera schemas, mesh budgets and persisted
+  presets MUST be testable without GPU access, through host `swift test`.
+- **Truthful claims:** this is a visual and educational toy, not a CAD tool or an exact geometry solver; a
+  stylized (shader-illusion) mode is labelled as such and never presented as exact geometry; performance numbers
+  are claimed only from device measurements.
+- **Offline-first:** no networking, accounts or online galleries. Any permission (such as saving to Photos) is
+  disclosed before use and requested only through public APIs.
+- **Bounded GPU:** vertex, index and draw-call budgets, subdivision and recursion depth, symmetry order, camera
+  range and capture sizes are capped; quality tiers lower the load under heat or Low Power Mode; parameters are
+  validated and clamped before upload; context loss rebuilds everything from versioned CPU state.
+- **Accessibility:** native SwiftUI controls with VoiceOver labels, Dynamic Type, Reduce Motion (no automatic
+  camera motion or rapid pattern animation) and Reduce Flashing. The canvas has a spoken description of the
+  scene, and every gesture (orbit, pan, zoom) has a control alternative.
+- **Licenses:** every bundled preset, palette and shader records its license and author; no imported meshes or
+  textures.
+- **Regression when VisualCore changes:** any VisualCore change made for this experience MUST be followed by the
+  ProjectM reference regression (`scripts/run_reference_baseline.py` steps and `check_reference_clean.py`).
+- **Python only:** repository automation uses Python 3; there is no PowerShell dependency.
+- **One phase at a time:** implement only one Spec Kit phase at a time (one ledger gate, ADR-0004), in order
+  A05-P00 → A05-P06.
+
 ## Governance
 
 - Precedence: real Apple platform and toolchain behavior and observed test results → owner
@@ -394,5 +433,7 @@ Ratified from the app manual's constitution prompt (2026-11-11).
 - Amendment 2.0.0 (2026-11-11, MAJOR): the scope and Principle V are redefined and Principles XI–XIII are
   added to adopt ADR-0009 (owner directive of 2026-11-11). The dated rationale is
   `docs/decisions/ADR-0010-constitution-2-0-0.md`.
+- Amendment 2.1.0 (2026-11-13, MINOR): App-Scoped Rules gain the A05 Infinite Geometry subsection, ratified from
+  its manual's constitution prompt at gate A05-P00 (feature 039; ADR-0007, ADR-0008); no principle changes.
 
-**Version**: 2.0.0 | **Ratified**: 2026-11-10 | **Last Amended**: 2026-11-11
+**Version**: 2.1.0 | **Ratified**: 2026-11-10 | **Last Amended**: 2026-11-13
