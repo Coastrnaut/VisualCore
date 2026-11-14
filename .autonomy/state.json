@@ -739,8 +739,14 @@
       "status": "pass"
     },
     "A07-P05": {
-      "attempts": [],
-      "status": "pending"
+      "attempts": [
+        {
+          "at": "2026-11-14T14:57:22+00:00",
+          "evidence": ".autonomy/evidence/A07-P05.json",
+          "result": "pass"
+        }
+      ],
+      "status": "pass"
     },
     "A07-P06": {
       "attempts": [],
@@ -1663,5 +1669,5 @@
       "status": "pending"
     }
   },
-  "updated": "2026-11-14T14:33:16+00:00"
+  "updated": "2026-11-14T14:57:22+00:00"
 }
