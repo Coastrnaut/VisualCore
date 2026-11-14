@@ -1019,10 +1019,10 @@
     "state": "standalone-partial",
     "legacy_gates_passed": [
      "A05-P00",
-     "A05-P01"
+     "A05-P01",
+     "A05-P02"
     ],
     "legacy_gates_pending": [
-     "A05-P02",
      "A05-P03",
      "A05-P04",
      "A05-P05",
