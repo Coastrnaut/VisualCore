@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/VisualCore",
+    "--filter",
+    "SegmentWindowTests|SlotPoolTests"
+  ],
+  "command": "swift test --package-path Packages/VisualCore --filter 'SegmentWindowTests|SlotPoolTests'",
+  "elapsed_seconds": 3.082,
+  "exit_code": 0,
+  "finished": "2026-11-14T10:53:34+00:00",
+  "log": ".autonomy/logs/A07-P02.scenes-host.log",
+  "log_sha256": "78c4841604897ba1a679c7e430ab7ae29dea464e654b8c6bc0eea75e089b4b75",
+  "name": "scenes-host",
+  "stage": "A07-P02",
+  "started": "2026-11-14T10:53:31+00:00",
+  "timed_out": false
+}
