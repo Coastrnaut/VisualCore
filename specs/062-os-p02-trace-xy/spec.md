@@ -25,6 +25,37 @@ Canonical overrides:
 - **Owner rulings:** short tests; audits and device runs in the device campaign; iOS 27 at phase gates; every Spec Kit
   step runs.
 
+## Clarifications
+
+### Session 2026-11-14
+
+Answered autonomously under the owner's standing delegation, recommended option each time. Facts checked in code:
+`Primitive` (VisualCoreScenes) has `rect`, `circle`, `line(Vec2, Vec2, width:)` and `polygon` (≤ 256 points); only
+`SceneGraph.swift` (`bounded`, `contains`) and `PrimitiveRenderer.triangles` switch over it; `PrimitiveRenderer` draws a
+node tree as one triangle batch (`lastTriangleCount`), tested in `PrimitiveRendererTests` on the simulator; the scope
+presenter draws in pixel units (`ViewMetrics(size: pixel width × height, scale: 1)` from `context.pixelWidth`); the
+A08-P01 presenter draws one `.line` node per segment; `ScopeState` is schema 1.
+
+- Q: How is the multi-point line shape added without changing the existing shapes? → A: A new case
+  `Primitive.polyline([Vec2], width: Double)` with `maxPolylinePoints = 8,192` (two points per column for 4,096
+  columns); `bounded` keeps the first 8,192 finite points and a non-negative finite width; `contains` is the distance to
+  the nearest segment; `PrimitiveRenderer` draws it as one quad per non-zero segment (the same six vertices a two-point
+  `.line` gives), so its pixels equal the segments drawn one by one; the four existing cases are untouched.
+- Q: What does the reduction return and how is it drawn? → A: `MinMaxDecimator` in `VisualCoreAudioDSP` returns, for
+  N columns, the per-column (min, max) of the samples whose index falls in that column (column = ⌊i × N / count⌋);
+  when count ≤ N it returns one column per sample with min = max = the sample. The presenter draws it as a zig-zag
+  polyline (min then max per column, at the column's x), so every peak is on screen with at most 2 N points.
+- Q: How many columns does the waveform use? → A: The canvas's pixel width inside the grid inset (at most 4,096 per the
+  window cap); one polyline per channel per frame.
+- Q: How does the XY view scale, and what counts as stereo? → A: x = left × gain, y = right × gain, each clamped to
+  ±1 and mapped to the square grid area centred on the canvas; one polyline through the window's frames in order
+  (at most 4,096 points). A window is stereo when its channel count is 2; the test signal and stereo files are stereo,
+  the microphone and mono files are not.
+- Q: How does the saved state change? → A: `ScopeState` schema 2 adds `display` ∈ {waveform, xy}; the migration from
+  schema 1 adds `waveform`; a new action `display.select [0…1]` changes it (refused with `a08.needs-stereo` only by
+  the presenter's live check, never by the core, so snapshots stay deterministic); the canvas description names the
+  view.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - A Lissajous figure from stereo input (Priority: P1) 🎯
