@@ -1,0 +1,406 @@
+{
+  "controls" : [
+    "habitat.select",
+    "lighting.level",
+    "motion.pause"
+  ],
+  "experience" : "a09.digital-aquarium",
+  "kind" : "creative",
+  "scenarios" : [
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+        "initialDigest" : "ec1934651cc969ec011c2889f26b30a2daa3288abcb622881cc2e6e149f687c9"
+      },
+      "name" : "launch-first-frame",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "habitat.select",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "lighting.level",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "motion.pause",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "2173d14fab648ec582d878bfb3d394cbbe7a431cc93a8fa2c90fbc09fbe37294",
+        "initialDigest" : "ec1934651cc969ec011c2889f26b30a2daa3288abcb622881cc2e6e149f687c9"
+      },
+      "name" : "input-response",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "lighting.level",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "outcome" : "aquarium-configured"
+      },
+      "name" : "completion",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "habitat.select",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "lighting.level",
+            "values" : [
+              -1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "motion.pause",
+            "values" : [
+              0.5
+            ]
+          },
+          "result" : "action.rule.a09.invalid-choice",
+          "steps" : 0
+        }
+      ],
+      "expect" : {
+
+      },
+      "name" : "rejection",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "habitat.select",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "lighting.level",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "motion.pause",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "2173d14fab648ec582d878bfb3d394cbbe7a431cc93a8fa2c90fbc09fbe37294",
+        "initialDigest" : "ec1934651cc969ec011c2889f26b30a2daa3288abcb622881cc2e6e149f687c9"
+      },
+      "name" : "save-restore",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "habitat.select",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "lighting.level",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "motion.pause",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "initialDigest" : "ec1934651cc969ec011c2889f26b30a2daa3288abcb622881cc2e6e149f687c9",
+        "resetDigest" : true
+      },
+      "name" : "reset",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "suspend-resume",
+      "seed" : "7"
+    },
+    {
+      "cycles" : 5,
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "teardown-reentry",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "cancel-prepare",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "habitat.select",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 5
+        },
+        {
+          "steps" : 600
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "8e7b12e3993fd92b7ced02fcf8f75185aac695814ab395dd4f988129a8d80e62",
+        "initialDigest" : "ec1934651cc969ec011c2889f26b30a2daa3288abcb622881cc2e6e149f687c9"
+      },
+      "name" : "fixture-1",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "habitat.select",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 5
+        },
+        {
+          "action" : {
+            "control" : "lighting.level",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 5
+        },
+        {
+          "steps" : 120
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "53aacf0621b07740c6c0d1f91b39fca465a14c79157f80a1299cd06c910d1243",
+        "initialDigest" : "ec1934651cc969ec011c2889f26b30a2daa3288abcb622881cc2e6e149f687c9"
+      },
+      "name" : "fixture-2",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "motion.pause",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 5
+        },
+        {
+          "steps" : 300
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "c68ddb99aaeea5a9f530493ab48216f742a1489605e52f473f914e8911e1ee78",
+        "initialDigest" : "ec1934651cc969ec011c2889f26b30a2daa3288abcb622881cc2e6e149f687c9"
+      },
+      "name" : "fixture-3",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "habitat.select",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 30
+        },
+        {
+          "action" : {
+            "control" : "habitat.select",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 30
+        },
+        {
+          "steps" : 30
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "6840409c05fe253913d3aff99c37c7c06aa1e4162ccc393a1591bedab3112768",
+        "initialDigest" : "ec1934651cc969ec011c2889f26b30a2daa3288abcb622881cc2e6e149f687c9"
+      },
+      "name" : "fixture-4",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "habitat.select",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 5
+        },
+        {
+          "action" : {
+            "control" : "habitat.select",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 5
+        },
+        {
+          "action" : {
+            "control" : "habitat.select",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 5
+        },
+        {
+          "action" : {
+            "control" : "habitat.select",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 5
+        },
+        {
+          "action" : {
+            "control" : "habitat.select",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 5
+        },
+        {
+          "steps" : 60
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "485b9d3f551a2c295ed118f61263bacddef873ab8b7e664c021701ecd11722c1",
+        "initialDigest" : "ec1934651cc969ec011c2889f26b30a2daa3288abcb622881cc2e6e149f687c9"
+      },
+      "name" : "fixture-5",
+      "seed" : "7"
+    }
+  ],
+  "schema" : 1
+}
