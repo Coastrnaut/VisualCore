@@ -38,7 +38,7 @@
 - [X] T-A05-218 Reference chunk 1 (`python3 Tools/python/desktop_runbook.py run-check --stage A05-P02 --timeout 600 --name reference-1 -- python3 scripts/release_check.py --only reference-engine-xcframework reference-build-projectm-ios-sim reference-clean`) — Verified 2026-11-13: 2026-11-13 .autonomy/checks/A05-P02.reference-1.json (exit 0)
 - [X] T-A05-219 Reference chunk 2 (`python3 Tools/python/desktop_runbook.py run-check --stage A05-P02 --timeout 600 --name reference-2 -- python3 scripts/release_check.py --only reference-test-anglerendering-ios27 reference-test-anglerendering-ios26 projectm-reference-ios27 projectm-reference-ios26`) — Verified 2026-11-13: 2026-11-13 .autonomy/checks/A05-P02.reference-2.json (exit 0)
 - [X] T-A05-220 Script tests (`python3 Tools/python/desktop_runbook.py run-check --stage A05-P02 --timeout 600 --name script-tests -- python3 scripts/test_scripts.py`) — Verified 2026-11-13: 2026-11-13 .autonomy/checks/A05-P02.script-tests.json (exit 0)
-- [ ] T-A05-221 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A05-P02
+- [X] T-A05-221 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A05-P02 — Verified 2026-11-13: 2026-11-13 converge round 1: converged, nothing appended
 
 ## Dependencies
 
