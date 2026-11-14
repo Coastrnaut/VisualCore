@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "python3",
+    "scripts/test_scripts.py"
+  ],
+  "command": "python3 scripts/test_scripts.py",
+  "elapsed_seconds": 91.622,
+  "exit_code": 0,
+  "finished": "2026-11-14T18:41:05+00:00",
+  "log": ".autonomy/logs/A08-P04.script-tests.log",
+  "log_sha256": "e2a7e8d8cf46ea46393887aefc890d3c71e01c374dd53a1f6e74854805d1cefe",
+  "name": "script-tests",
+  "stage": "A08-P04",
+  "started": "2026-11-14T18:39:34+00:00",
+  "timed_out": false
+}
