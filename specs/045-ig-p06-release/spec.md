@@ -160,7 +160,10 @@ saves and reopens a composition, and exports a picture.
   device-campaign plan and the privacy note MUST exist; a release-document check MUST verify them.
 - **FR-A05-621**: The copy-claim check MUST find no measured or unimplemented claim in the store text and the
   experience's interface strings.
-- **FR-A05-622**: The known limitations MUST list Infinite Geometry's device-only items.
+- **FR-A05-622**: The known limitations MUST list Infinite Geometry's device-only items, and the device-campaign plan
+  MUST name each measurement without a value: frame time per quality tier for every preset kind on D1–D3, the tier the
+  governor settles on, memory with the mesh cache full, thermal state over a short session, export time, the
+  accessibility audits and VoiceOver journeys.
 
 **Interface and builds (story 4)**
 - **FR-A05-630**: An interface test chunk for Infinite Geometry MUST pass on the iOS 27 phone simulator.
