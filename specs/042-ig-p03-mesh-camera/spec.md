@@ -25,6 +25,38 @@ Canonical overrides:
 - **Owner rulings of 2026-11-13:** short tests; audits wait for the device campaign; parallel agents; no wall-clock
   assertions on CI runners.
 
+## Clarifications
+
+### Session 2026-11-13
+
+Answered autonomously under the owner's standing delegation, recommended option each time. Facts checked in code: the
+window surface is created without a depth buffer (no `EGL_DEPTH_SIZE` in the config) and `RenderHost.renderOffscreen`
+uses a render target without depth; `ResourceRegistry.makeRenderTarget(… depth: true)` (feature 204) gives a target with
+a 24-bit depth renderbuffer; `vcglBlitFramebuffer` is exported by CVisualCoreGL; `MeshRenderer` culls back faces and
+leaves depth to the caller; `MeshBounds` gives a mesh's centre and radius; `RenderContext` carries the target
+framebuffer and a generation that changes on context recreation; `OrbitBounds` (A05-P02) clamps pitch and distance only.
+
+- Q: Where does the depth buffer come from when neither the window nor the export target has one? → A: The mesh scene
+  owns a render target with depth at the context's pixel size, draws its meshes there with depth test and write on,
+  then copies the colour to the context's framebuffer with a framebuffer blit (colour only, nearest). The target is
+  recreated on resize and on a new context generation, and released on teardown. The export path therefore gets the
+  depth-correct result unchanged.
+- Q: What exactly is the "outside the bounding sphere" rule? → A: With R the composition's bounding radius about the
+  origin (|bounds centre| + bounds radius) and t the target, the clamp raises the minimum distance to
+  max(lower distance bound, |t| + R + 2 · near); the framework offers this as a clamp that takes the radius, the
+  experience supplies R from the built mesh.
+- Q: How does a pan move the 3D target? → A: `camera.pan [dx, dy]` in world units moves the target along the camera's
+  right and up vectors; the result is clamped to |t| ≤ 1 (scaled back toward the origin). On the 3D composition a
+  two-finger drag sends the negated centroid movement converted by 2 · distance · tan(fov / 2) / view height per point
+  (the composition follows the fingers); the existing pan buttons send fixed steps.
+- Q: How is the field of view set? → A: `camera.fov [degrees]`, an absolute vertical angle in 30…75 (default 60);
+  out-of-range or non-finite values are refused; native buttons "Wider" and "Narrower" step by 5°. No gesture changes
+  the field of view.
+- Q: How are occlusion probes judged when the mesh shader is lit? → A: The two test meshes are pure red and pure green;
+  a probe pixel counts for the nearer mesh when that mesh's channel is the larger one and above 0.25, so shading cannot
+  flip the verdict. Offscreen equality compares `renderOffscreen` at the view's pixel size with the screen pixels within
+  2/255 per channel.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - A solid composition that looks solid (Priority: P1) 🎯
@@ -116,16 +148,18 @@ and pan and field-of-view bounds for the orbit camera without the experience.
 - **FR-A05-303**: The 2D presets MUST keep their Phase 02 renderers.
 
 **Camera (story 2)**
-- **FR-A05-310**: The experience MUST accept a pan of the 3D target in the view plane (the existing pan action applied
-  to the 3D composition), limited to a disc of radius 1 around the origin.
-- **FR-A05-311**: The experience MUST accept a field-of-view action, limited to 30°…75° (default 60°).
+- **FR-A05-310**: The experience MUST accept a pan of the 3D target in the view plane (the existing `camera.pan` action
+  applied to the 3D composition: dx, dy in world units along the camera's right and up vectors), limited to |target| ≤ 1.
+- **FR-A05-311**: The experience MUST accept a field-of-view action `camera.fov [degrees]` (absolute), limited to 30°…75°
+  (default 60°); values outside or non-finite are refused.
 - **FR-A05-312**: After any action, the eye MUST stay outside the composition's bounding sphere by at least the near-plane
-  distance; the effective minimum distance grows with the target's offset.
+  distance: minimum distance = max(lower distance bound, |target| + R + 2 · near), R the composition's bounding radius.
 - **FR-A05-313**: Reset MUST restore target, distance, yaw, pitch and field of view of the default exactly.
 - **FR-A05-314**: Target and field of view MUST be part of the experience state (snapshot, digest, restore); a state saved
   by Phase 02 or Phase 01 MUST restore with the default target and field of view through the shared migration chain.
 - **FR-A05-315**: Two-finger drag MUST pan the 3D composition while the pinch zooms; field of view MUST have native
-  controls (wider/narrower); pan on the 3D composition MUST be reachable with the existing pan buttons.
+  controls ("Wider"/"Narrower", 5° steps) and no gesture; pan on the 3D composition MUST be reachable with the existing
+  pan buttons.
 
 **Framework (story 3)**
 - **FR-A05-320**: VisualCore MUST provide a depth-correct mesh scene that draws a list of meshes (each with a model
@@ -166,8 +200,8 @@ and pan and field-of-view bounds for the orbit camera without the experience.
 
 ## Assumptions
 
-- The window surface may lack a depth buffer, so the scene renders to an offscreen target with depth and shows it; the
-  existing render targets with depth (feature 204) are reused.
+- The window surface has no depth buffer, so the scene renders to its own target with depth and copies the colour to
+  the context's framebuffer (Clarifications); the existing render targets with depth (feature 204) are reused.
 - The composition's bounding sphere is computed from the built mesh (its bounds), not hard-coded.
 - The field of view is the vertical angle of the perspective projection.
 - Two-finger pan and pinch share one gesture: the centroid's movement pans and the distance ratio zooms.
