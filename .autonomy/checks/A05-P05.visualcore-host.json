@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/VisualCore",
+    "--filter",
+    "MeshCacheTests|TessellationChoiceTests"
+  ],
+  "command": "swift test --package-path Packages/VisualCore --filter 'MeshCacheTests|TessellationChoiceTests'",
+  "elapsed_seconds": 8.272,
+  "exit_code": 0,
+  "finished": "2026-11-14T04:58:47+00:00",
+  "log": ".autonomy/logs/A05-P05.visualcore-host.log",
+  "log_sha256": "6f3e97c3ad9e7bb63495bb2f51df96f150e635fc8e573e52a1b4a25613039f9c",
+  "name": "visualcore-host",
+  "stage": "A05-P05",
+  "started": "2026-11-14T04:58:39+00:00",
+  "timed_out": false
+}

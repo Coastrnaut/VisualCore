@@ -2896,12 +2896,12 @@ to confirm on devices:
 |---|---|---|
 | VisualCoreMath | VisualCore | `Vec2`, `Vec3`, `Vec4`, `Mat3`, `Mat4`, `Quat`, `OrbitCamera`, `Camera2D`, `EasingCurve`, `TourTimeline`, `PrecisionAdvisor`, `PointGroup` and `WallpaperLattice` (symmetry, A05-P01), `ViewBounds2D` and `OrbitBounds` (camera bounds, A05-P02), `OrbitViewBounds` (orbit pan and field of view, A05-P03) |
 | VisualCoreSimulation | VisualCore | `FixedStepRunner`, `FixedStepClock`, `SceneClock`, `SeededRandom`, `Timeline`, `ControlStream`, `PlaybackState`, `ParticleSystem`, `ParticleForce`, `FieldGrid`, `TrailDecay`, `AccessibilityPreferences` |
-| VisualCoreScenes | VisualCore | gesture recognizers (`TapRecognizer`, `DragRecognizer`, `PinchRecognizer`, `RotateRecognizer`, `LongPressRecognizer`, `DoubleTapRecognizer`), `PointerTracker`, `Mesh` with `MeshBuilder`, `MeshBudget`, `MeshBounds`, `MeshReport` and the shapes `surface`, `revolution`, `extrusion`, `tube`, `bevelledBox` (R02-F05), `SceneNode`, `ExportGeometry` |
+| VisualCoreScenes | VisualCore | gesture recognizers (`TapRecognizer`, `DragRecognizer`, `PinchRecognizer`, `RotateRecognizer`, `LongPressRecognizer`, `DoubleTapRecognizer`), `PointerTracker`, `Mesh` with `MeshBuilder`, `MeshBudget`, `MeshCache` (A05-P05), `MeshBounds`, `MeshReport` and the shapes `surface`, `revolution`, `extrusion`, `tube`, `bevelledBox` (R02-F05), `SceneNode`, `ExportGeometry` |
 | VisualCoreParameters | VisualCore | `ParameterSchema`, `Preset`, `Palette`, `ParameterHash`, `ParameterEditor` |
 | VisualCorePersistence | VisualCore | `DocumentStore`, `NamedLibrary`, `DocumentEnvelope`, `MigrationChain` |
 | VisualCoreShaderSource | VisualCore | `ShaderLibrary`, `ExpandedShader`, `InfoLogParser`, `ShaderCacheKey` |
 | VisualCoreEffectsGraph | VisualCore | `EffectGraphDescription`, `EffectGraphValidator`, `FlashLimiterModel` |
-| VisualCoreDiagnostics | VisualCore | `QualityPolicy`, `DeviceConditions`, `FramePacing`, `ParticleBudget`, `RenderCostEstimate`, `ResourceLedger`, `ResourceBudget`, `RenderLifecycle` |
+| VisualCoreDiagnostics | VisualCore | `QualityPolicy`, `DeviceConditions`, `FramePacing`, `ParticleBudget`, `RenderCostEstimate`, `ResourceLedger`, `ResourceBudget`, `RenderLifecycle`, `TessellationChoice` (A05-P05) |
 | VisualCoreTestSupport | VisualCore | `ImageComparison`, `ImageStatistics` (test targets only) |
 | VisualCoreRendering | VisualCoreRendering | `RenderHost`, `RenderScene`, `RenderContext`, `ResourceRegistry`, `ShaderProgram`, `ShaderBundle`, `RenderTarget`, `PingPongTarget`, `FieldPass`, `MeshRenderer`, `PrimitiveRenderer`, `ParticleRenderer`, `ParticleLayerScene`, `TrailLayer`, `StillCapture`, `RenderCapabilities`, `FloatRenderSupport`; GLSL library `vc/sdf.glsl` with 2D helpers and `vc_foldDihedral` (A05-P02); `DepthMeshPass` (depth-correct meshes on screen and offscreen, A05-P03) |
 | VisualCoreEffects | VisualCoreRendering | `EffectRenderer`, `EffectScene` |

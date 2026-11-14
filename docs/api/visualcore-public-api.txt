@@ -62,6 +62,7 @@ VisualCoreDiagnostics | enum | public enum QualityProfileError: Error, Sendable,
 VisualCoreDiagnostics | enum | public enum RenderLifecycleState: String, Sendable, Codable, CaseIterable
 VisualCoreDiagnostics | enum | public enum ResourceBudgetError: Error, Equatable, Sendable
 VisualCoreDiagnostics | enum | public enum ResourceKind: String, CaseIterable, Sendable, Codable
+VisualCoreDiagnostics | enum | public enum TessellationChoice
 VisualCoreDiagnostics | enum | public enum Thermal: Int, Sendable, Codable, CaseIterable
 VisualCoreDiagnostics | func | public func elements(requested: Int, level: Int, minimum: Int = 0) -> Int
 VisualCoreDiagnostics | func | public func encoded() throws(PerformanceRecordError) -> Data
@@ -92,6 +93,9 @@ VisualCoreDiagnostics | func | public static func judge(_ samples: [ResourceSamp
 VisualCoreDiagnostics | func | public static func judge(_ samples: [ResourceSample], warmUp: Int?) -> GrowthVerdict
 VisualCoreDiagnostics | func | public static func level(ratio: Double, lightMax: Double = 2, moderateMax: Double = 10) -> Level
 VisualCoreDiagnostics | func | public static func problems(profile: QualityProfile, tierCount: Int, catalogNames: [String]?) -> [String]
+VisualCoreDiagnostics | func | public static func segments(full: Int, minimum: Int, level: QualityLevel) -> Int
+VisualCoreDiagnostics | func | public static func segments(full: Int, minimum: Int, share: Double) -> Int
+VisualCoreDiagnostics | func | public static func segments(full: Int, minimum: Int, share: Double,
 VisualCoreDiagnostics | func | public static func text(ratio: Double) -> String
 VisualCoreDiagnostics | func | public static func uniform(levels: Int) -> QualityProfile
 VisualCoreDiagnostics | init | public init()
@@ -1777,6 +1781,7 @@ VisualCoreRendering | var | public var vertexMediump: ShaderPrecision?
 VisualCoreRendering | var | public var view: UIView
 VisualCoreRendering | var | public var width: Int
 VisualCoreRendering | var | public var world: WorldRect
+VisualCoreScenes | class | public final class MeshCache
 VisualCoreScenes | class | public final class SceneNode
 VisualCoreScenes | enum | public enum GestureKind: String, Sendable, Equatable, Codable, CaseIterable
 VisualCoreScenes | enum | public enum GestureState: String, Sendable, Equatable
@@ -1790,6 +1795,7 @@ VisualCoreScenes | enum | public enum ScenesInfo
 VisualCoreScenes | func | public func add(_ child: SceneNode)
 VisualCoreScenes | func | public func build() -> Mesh
 VisualCoreScenes | func | public func clampedLongEdge(_ longEdge: Int) -> Int
+VisualCoreScenes | func | public func contains(_ key: UInt64) -> Bool
 VisualCoreScenes | func | public func contains(_ p: Vec2) -> Bool
 VisualCoreScenes | func | public func contains(_ p: Vec3, tolerance: Double = 1e-9) -> Bool
 VisualCoreScenes | func | public func drawList(parentTransform: Mat3 = .identity) -> [(node: SceneNode, world: Mat3)]
@@ -1800,6 +1806,8 @@ VisualCoreScenes | func | public func fromPixels(_ p: Vec2) -> Vec2?
 VisualCoreScenes | func | public func fromWorld(_ w: Vec2, camera: Camera2D) -> Vec2?
 VisualCoreScenes | func | public func hitTest(_ world: Vec2) -> SceneNode?
 VisualCoreScenes | func | public func interleavedPositionNormal() -> [Float]
+VisualCoreScenes | func | public func mesh(for key: UInt64, build: () throws -> Mesh) rethrows -> Mesh
+VisualCoreScenes | func | public func removeAll()
 VisualCoreScenes | func | public func removeFromParent()
 VisualCoreScenes | func | public func size(longEdge: Int, aspect: ExportAspect) -> ExportSize
 VisualCoreScenes | func | public func toCamera(_ p: Vec2) -> Vec2?
@@ -1839,6 +1847,7 @@ VisualCoreScenes | init | public init(id: String, kind: GestureKind, priority: I
 VisualCoreScenes | init | public init(kind: Kind, triangle: Int? = nil, vertex: Int? = nil, edge: [UInt32]? = nil)
 VisualCoreScenes | init | public init(maxDistance: Double = 10, maxDuration: Double = 0.3)
 VisualCoreScenes | init | public init(maxEdge: Int, maxPixels: Int = ExportGeometry.defaultMaxPixels)
+VisualCoreScenes | init | public init(maxEntries: Int = defaultMaxEntries, maxBytes: Int = defaultMaxBytes)
 VisualCoreScenes | init | public init(maxInterval: Double = 0.3, maxSeparation: Double = 30)
 VisualCoreScenes | init | public init(maxVertices: Int, maxIndices: Int)
 VisualCoreScenes | init | public init(minAngle: Double = 0)
@@ -1858,7 +1867,9 @@ VisualCoreScenes | let | public let frameInterval: Double
 VisualCoreScenes | let | public let height: Int
 VisualCoreScenes | let | public let id: Int
 VisualCoreScenes | let | public let id: String
+VisualCoreScenes | let | public let maxBytes: Int
 VisualCoreScenes | let | public let maxEdge: Int
+VisualCoreScenes | let | public let maxEntries: Int
 VisualCoreScenes | let | public let maxPixels: Int
 VisualCoreScenes | let | public let maxSamplesPerUpdate: Int
 VisualCoreScenes | let | public let phase: PointerPhase
@@ -1878,6 +1889,8 @@ VisualCoreScenes | let | public let weldTolerance: Double
 VisualCoreScenes | let | public let width: Int
 VisualCoreScenes | let | public static let `default`
 VisualCoreScenes | let | public static let builtIns: [ExportAspect]
+VisualCoreScenes | let | public static let defaultMaxBytes
+VisualCoreScenes | let | public static let defaultMaxEntries
 VisualCoreScenes | let | public static let defaultMaxPixels
 VisualCoreScenes | let | public static let hardMaxEdge
 VisualCoreScenes | let | public static let landscape
@@ -1923,9 +1936,12 @@ VisualCoreScenes | var | public private(set) var cappedUpdates
 VisualCoreScenes | var | public private(set) var center: Vec2?
 VisualCoreScenes | var | public private(set) var children: [SceneNode]
 VisualCoreScenes | var | public private(set) var endTime: Double?
+VisualCoreScenes | var | public private(set) var evictions
+VisualCoreScenes | var | public private(set) var hits
 VisualCoreScenes | var | public private(set) var ignored
 VisualCoreScenes | var | public private(set) var ignoredPointers
 VisualCoreScenes | var | public private(set) var location: Vec2?
+VisualCoreScenes | var | public private(set) var misses
 VisualCoreScenes | var | public private(set) var order: [Int]
 VisualCoreScenes | var | public private(set) var rejectedSamples
 VisualCoreScenes | var | public private(set) var scale
@@ -1941,6 +1957,8 @@ VisualCoreScenes | var | public var bounded: Primitive
 VisualCoreScenes | var | public var bounds: MeshBounds
 VisualCoreScenes | var | public var boundsMax: Vec3?
 VisualCoreScenes | var | public var boundsMin: Vec3?
+VisualCoreScenes | var | public var byteSize: Int
+VisualCoreScenes | var | public var bytes: Int
 VisualCoreScenes | var | public var center: Vec3?
 VisualCoreScenes | var | public var centroid: Vec2?
 VisualCoreScenes | var | public var color: Vec4

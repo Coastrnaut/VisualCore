@@ -11,7 +11,7 @@ iOS 26+ inside apps. The package map and dependency rules R1–R5 are in
 | VisualCoreScenes | input mapping, pointer tracking and velocity, seeded synthetic gesture scripts, mesh generators, export geometry |
 | VisualCoreShaderSource | shader library, includes, line maps, diagnostics parsing |
 | VisualCoreEffectsGraph | effect DAG model, validation, quotas, flash-limiter model |
-| VisualCoreDiagnostics | render lifecycle state machine, frame statistics, reports, relative render-cost estimates (RenderCostEstimate) |
+| VisualCoreDiagnostics | render lifecycle state machine, frame statistics, reports, relative render-cost estimates (RenderCostEstimate); `TessellationChoice` — segments from a quality tier's share, monotonic, optionally fitted to a mesh budget (feature 044, A05-P05) |
 | VisualCoreAudioDSP | **placeholder, not built yet** — planned: lock-free ring, FFT, bands, RMS, onsets ([ADR-0006](../../docs/decisions/ADR-0006-unbuilt-readme-modules.md)) |
 | VisualCorePersistence | `DocumentStore` (versioned envelopes, atomic writes, migrations, per-file problem reports), A01-P03; app-owned temporary folders (TemporaryFolder); named, favoritable document libraries (NamedLibrary), A03-P03 |
 | VisualCoreParameters | parameter schemas (units, ranges, linear/log sliders), resolution, palettes (sRGB, linear-light sampling), presets, stable `ParameterHash` |
@@ -114,7 +114,8 @@ dihedral of order 1–24 and `WallpaperLattice` square p4m and hexagonal p6m, ea
 idempotent `fold` into the fundamental region), camera bounds (feature 041, A05-P02: `ViewBounds2D` clamps a `Camera2D`'s
 zoom and centre, `Camera2D.panned(by:within:)` and `zoomed(by:within:)`; `OrbitBounds` clamps an `OrbitCamera`'s pitch and
 distance and wraps yaw, `OrbitCamera.orbited(yaw:pitch:within:)` and `zoomed(by:within:)`; non-finite or non-positive
-inputs leave the camera unchanged), orbit view bounds (feature 042, A05-P03: `OrbitViewBounds` adds a target radius, a
+inputs leave the camera unchanged), mesh cache (feature 044, A05-P05: `MeshCache`, least-recently-used by a use counter,
+limits of 16 entries and 32 MiB by default, hit/miss/eviction counts; `Mesh.byteSize`), orbit view bounds (feature 042, A05-P03: `OrbitViewBounds` adds a target radius, a
 field-of-view range and the bounding-sphere rule — minimum distance = max(lower bound, |target| + clearance + 2 · near);
 `OrbitCamera.forward/right/up`, `panned(by:within:)` in view space, `withFieldOfView(_:within:)`), `Mesh.plane/cube/uvSphere`
 (segments 3–256, rings 2–256, subdivisions ≤ 256). Feature 205 (R02-F05) adds the mesh compiler: `MeshBuilder` (welding of
