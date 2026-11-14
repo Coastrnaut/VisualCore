@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "/bin/sh",
+    "-c",
+    "! grep -rnE 'URLSession|import Network|AVAudioRecorder|AVAssetWriter' Packages/ExperiencesCreative/OscilloscopeStudio"
+  ],
+  "command": "/bin/sh -c '! grep -rnE '\"'\"'URLSession|import Network|AVAudioRecorder|AVAssetWriter'\"'\"' Packages/ExperiencesCreative/OscilloscopeStudio'",
+  "elapsed_seconds": 0.398,
+  "exit_code": 0,
+  "finished": "2026-11-14T16:58:17+00:00",
+  "log": ".autonomy/logs/A08-P02.os-no-network.log",
+  "log_sha256": "35e895a1d1c40f4390fd6252c55318afa3f6c57973874802f9cb98f6ce7c08ee",
+  "name": "os-no-network",
+  "stage": "A08-P02",
+  "started": "2026-11-14T16:58:17+00:00",
+  "timed_out": false
+}
