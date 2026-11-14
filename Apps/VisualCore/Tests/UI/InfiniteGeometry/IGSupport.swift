@@ -84,9 +84,11 @@ enum IG {
     static func drag(_ app: XCUIApplication, forward: Bool) {
         let list = controlsList(app)
         let area = list.exists ? list : app.windows.firstMatch
-        let start = area.coordinate(withNormalizedOffset: CGVector(dx: 0, dy: forward ? 0.8 : 0.2))
+        // Most of the list's height per drag, so a control far down is reached in about half the drags (each drag
+        // costs about 2 s on the simulator).
+        let start = area.coordinate(withNormalizedOffset: CGVector(dx: 0, dy: forward ? 0.9 : 0.1))
             .withOffset(CGVector(dx: 8, dy: 0))
-        let end = area.coordinate(withNormalizedOffset: CGVector(dx: 0, dy: forward ? 0.3 : 0.7))
+        let end = area.coordinate(withNormalizedOffset: CGVector(dx: 0, dy: forward ? 0.12 : 0.88))
             .withOffset(CGVector(dx: 8, dy: 0))
         start.press(forDuration: 0.05, thenDragTo: end)
     }
@@ -95,11 +97,20 @@ enum IG {
     /// test at the caller's line when it never can.
     @MainActor
     @discardableResult
-    static func reveal(_ app: XCUIApplication, _ target: XCUIElement,
+    static func reveal(_ app: XCUIApplication, _ target: XCUIElement, upFirst: Bool = false,
                        file: StaticString = #filePath, line: UInt = #line) -> Bool {
-        _ = target.waitForExistence(timeout: VC.wait)
-        for forward in [true, false] {
-            for _ in 0..<14 where !(target.exists && target.isHittable) { drag(app, forward: forward) }
+        // A list row that is off screen is not in the tree until it is scrolled to, so waiting for it first only
+        // spends time (it cost 10 s per control in the first k2 run): look briefly, then scroll and look again.
+        _ = target.waitForExistence(timeout: 1)
+        // Stop as soon as the target is reachable: a `for … where` loop would keep querying the accessibility tree
+        // 28 times after the target was found (about 5 s per call in the first Infinite Geometry k2 run).
+        // `upFirst` for controls near the top (the presets): searching down first from the library section at the
+        // bottom would spend every drag at the end of the list.
+        search: for forward in (upFirst ? [false, true] : [true, false]) {
+            for _ in 0..<14 {
+                if target.exists && target.isHittable { break search }
+                drag(app, forward: forward)
+            }
         }
         let found = target.exists && target.isHittable
         XCTAssertTrue(found, "not reached by scrolling the controls: \(target)", file: file, line: line)
@@ -108,9 +119,10 @@ enum IG {
 
     /// Scrolls the control `name` into view and taps it.
     @MainActor
-    static func tap(_ app: XCUIApplication, _ name: String, file: StaticString = #filePath, line: UInt = #line) {
+    static func tap(_ app: XCUIApplication, _ name: String, upFirst: Bool = false,
+                    file: StaticString = #filePath, line: UInt = #line) {
         let target = control(app, name)
-        guard reveal(app, target, file: file, line: line) else { return }
+        guard reveal(app, target, upFirst: upFirst, file: file, line: line) else { return }
         target.tap()
     }
 
@@ -188,7 +200,7 @@ enum IG {
     @MainActor
     static func choosePreset(_ app: XCUIApplication, _ index: Int, kind: String,
                              file: StaticString = #filePath, line: UInt = #line) {
-        tap(app, "preset.\(index)", file: file, line: line)
+        tap(app, "preset.\(index)", upFirst: true, file: file, line: line)
         XCTAssertTrue(waitForDescription(app) { $0.hasPrefix(describedPrefix + kind + ",") },
                       "the canvas names \(kind): \(description(app))", file: file, line: line)
     }

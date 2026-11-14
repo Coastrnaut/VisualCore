@@ -168,7 +168,8 @@ saves and reopens a composition, and exports a picture.
 **Interface and builds (story 4)**
 - **FR-A05-630**: An interface test chunk for Infinite Geometry MUST pass on the iOS 27 phone simulator.
 - **FR-A05-631**: The release build checks (release build, symbols, privacy manifest) MUST pass.
-- **FR-A05-632**: Every Infinite Geometry suite MUST pass on iOS 27; every new test MUST finish in under 10 seconds.
+- **FR-A05-632**: Every Infinite Geometry suite MUST pass on iOS 27; every new package test MUST finish in under 10
+  seconds and every new interface test in under 60 seconds (an app launch alone takes about 8 s; converge round 1).
 
 **Common**
 - **FR-A05-640**: No new permission, no network, no VisualCore change unless proven needed; owner-only steps are
@@ -188,8 +189,8 @@ saves and reopens a composition, and exports a picture.
 - **SC-A05-603**: The forced drawing failure reaches the failure state in 1 of 1 run with saved files byte-identical.
 - **SC-A05-604**: The release-document check passes; removing a required document makes it fail.
 - **SC-A05-605**: The copy check finds 0 problems.
-- **SC-A05-606**: The interface chunk passes; the release build checks pass; all suites pass on iOS 27; every new test
-  is under 10 seconds.
+- **SC-A05-606**: The interface chunk passes; the release build checks pass; all suites pass on iOS 27; every new
+  package test is under 10 seconds and every new interface test under 60 seconds.
 
 ## Assumptions
 
