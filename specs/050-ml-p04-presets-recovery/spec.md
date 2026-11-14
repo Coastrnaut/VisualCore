@@ -136,6 +136,7 @@ editor change and a preset; every action is accepted and every scene draws.
   engines.
 - Saving with an empty name: "Untitled"; long names cut to 60 characters.
 - Storage full or write refused: the save is refused with a message; existing presets are untouched.
+- Number of presets: bounded only by the experience's storage quota (a save beyond it is refused as above).
 - Applying a preset made for more parameters than the scene has: refused (cannot happen with valid files; validated).
 
 ## Requirements *(mandatory)*
@@ -183,7 +184,9 @@ editor change and a preset; every action is accepted and every scene draws.
 - **SC-A06-401**: Each of the four notification kinds (and their resume flag) maps to the right event in 100% of cases;
   unknown or malformed notifications map to no event.
 - **SC-A06-402**: Across 50 seeded random event sequences, the microphone source (with an injected engine) never runs two
-  engines, ends each sequence in a state consistent with the last event, and resumes only when allowed.
+  engines, ends each sequence in the state the last effective event demands (began → interrupted; ended with resume,
+  route lost or media reset while running or resumable → running, or failed if the restart fails; ended without resume →
+  interrupted until `resume`), and resumes only when allowed.
 - **SC-A06-403**: Save → change → apply restores the scene and mappings exactly; rename makes names unique; delete removes
   the file; unreadable and newer files are counted and left byte-identical.
 - **SC-A06-404**: With permission denied, every scene draws a non-blank picture and every editor and preset action is
