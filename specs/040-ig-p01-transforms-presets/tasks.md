@@ -27,7 +27,7 @@
 
 ## Phase 5: Polish and evidence (one task per quickstart command)
 
-- [ ] T-A05-109 Symmetry host tests (`python3 Tools/python/desktop_runbook.py run-check --stage A05-P01 --timeout 600 --name symmetry-host -- swift test --package-path Packages/VisualCore --filter SymmetryTests`)
+- [X] T-A05-109 Symmetry host tests (`python3 Tools/python/desktop_runbook.py run-check --stage A05-P01 --timeout 600 --name symmetry-host -- swift test --package-path Packages/VisualCore --filter SymmetryTests`) — Verified 2026-11-13: 2026-11-13 .autonomy/checks/A05-P01.symmetry-host-r2.json (swift test --filter SymmetryTests: 11 pass)
 - [X] T-A05-110 Package on sim-27.2 (`python3 Tools/python/desktop_runbook.py run-check --stage A05-P01 --timeout 600 --name experiences-ios27 -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test`) — Verified 2026-11-13: 2026-11-13 .autonomy/checks/A05-P01.experiences-ios27.json (TEST SUCCEEDED)
 - [X] T-A05-111 Package on sim-26.5 (`python3 Tools/python/desktop_runbook.py run-check --stage A05-P01 --timeout 600 --name experiences-ios26 -- … --destination sim-26.5 --action test`) — Verified 2026-11-13: 2026-11-13 .autonomy/checks/A05-P01.experiences-ios26.json (TEST SUCCEEDED)
 - [X] T-A05-112 Experience package check (`python3 Tools/python/desktop_runbook.py run-check --stage A05-P01 --timeout 600 --name experience-packages -- python3 scripts/check_experience_packages.py`: 5 experiences) — Verified 2026-11-13: 2026-11-13 .autonomy/checks/A05-P01.experience-packages.json (PASS: 5 experiences in 1 packages)
