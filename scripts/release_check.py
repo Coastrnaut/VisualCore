@@ -252,7 +252,12 @@ UI_CHUNKS = {
     "k2": ["IGControlsUITests", "IGLibraryExportUITests"],   # feature 045 A05-P06 (T-A05-610)
     "m2": ["MLScenesUITests", "MLPresetsUITests"],   # feature 052 A06-P06 (T-A06-609)
     "o2": ["AOJourneyUITests", "AOPresetsUITests"],   # feature 059 A07-P06 (T-A07-609)
+    "p2": ["OSScopeUITests", "OSPresetsUITests"],   # feature 066 A08-P06 (T-A08-609)
 }
+# Chunks that run on one simulator (feature 066 A08-P06): the oscilloscope draws every frame on the main thread, and
+# two parallel clones competing for the host's CPU kept XCTest's idle wait from settling (single tests took 60–89 s in
+# parallel, 23–41 s serially, with the same total time).
+SERIAL_CHUNKS = {"p2"}
 UNIFIED_LIMIT = 590       # seconds, below the ten-minute limit of one foreground command
 RELEASE_FORBIDDEN = ["DebugLaunch", "DebugExperience", "DebugInventory", "ScenarioLaunch", "ScenarioHostView",
                      "vcDamageStat", "vcCandidates", "vc_ci_angle_standin"]
@@ -299,7 +304,8 @@ def unified_app_steps(stamp: str, root: Path = ROOT) -> list[Step]:
            Step("app-unit-ios27", app + ["--action", "test-without-building", "--only-testing", "VisualCoreTests",
                                          "--sources", "Apps/VisualCore/Tests/Unit", "--log-name", f"release-app-unit-ios27-{stamp}"], timeout=UNIFIED_LIMIT)]
     for chunk, classes in UI_CHUNKS.items():
-        out.append(Step(f"app-ui-ios27-{chunk}", app + ["--action", "test-without-building", "--parallel", "2",
+        parallel = [] if chunk in SERIAL_CHUNKS else ["--parallel", "2"]
+        out.append(Step(f"app-ui-ios27-{chunk}", app + ["--action", "test-without-building", *parallel,
                                                         "--only-testing", *[f"VisualCoreUITests/{c}" for c in classes],
                                                         "--log-name", f"release-app-ui-ios27-{chunk}-{stamp}"],
                         timeout=UNIFIED_LIMIT))
