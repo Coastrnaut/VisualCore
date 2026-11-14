@@ -26,7 +26,7 @@
 ## Phase 5: Polish & evidence
 
 - [X] T-A05-308 Orbit view bounds host tests (`python3 Tools/python/desktop_runbook.py run-check --stage A05-P03 --timeout 600 --name camera-host -- swift test --package-path Packages/VisualCore --filter OrbitViewBoundsTests`) — Verified 2026-11-13: 2026-11-13 .autonomy/checks/A05-P03.camera-host-2.json (exit 0)
-- [ ] T-A05-309 Rendering package on sim-27.2 (`python3 Tools/python/desktop_runbook.py run-check --stage A05-P03 --timeout 600 --name rendering-ios27 -- python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test`)
+- [X] T-A05-309 Rendering package on sim-27.2 (`python3 Tools/python/desktop_runbook.py run-check --stage A05-P03 --timeout 600 --name rendering-ios27 -- python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test`) — Verified 2026-11-13: 2026-11-13 .autonomy/checks/A05-P03.rendering-ios27.json (exit 0)
 - [ ] T-A05-310 Rendering package on sim-26.5 (`python3 Tools/python/desktop_runbook.py run-check --stage A05-P03 --timeout 600 --name rendering-ios26 -- … --destination sim-26.5 --action test`)
 - [ ] T-A05-311 Experiences package on sim-27.2 (`python3 Tools/python/desktop_runbook.py run-check --stage A05-P03 --timeout 600 --name experiences-ios27 -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test`)
 - [ ] T-A05-312 Experiences package on sim-26.5 (`python3 Tools/python/desktop_runbook.py run-check --stage A05-P03 --timeout 600 --name experiences-ios26 -- … --destination sim-26.5 --action test`)
