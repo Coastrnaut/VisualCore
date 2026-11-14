@@ -29,7 +29,7 @@
 
 ## Phase 7: Polish and evidence
 
-- [ ] T-A06-009 No-change proof (`python3 Tools/python/desktop_runbook.py run-check --stage A06-P00 --timeout 600 --name no-change -- git diff --exit-code --stat 4c27bfaf..HEAD -- Packages External`) (FR-A06-008, SC-A06-005)
+- [X] T-A06-009 No-change proof (`python3 Tools/python/desktop_runbook.py run-check --stage A06-P00 --timeout 600 --name no-change -- git diff --exit-code --stat 4c27bfaf..HEAD -- Packages External`) (FR-A06-008, SC-A06-005) — Verified 2026-11-14: 2026-11-14 .autonomy/checks/A06-P00.no-change.json (empty diff of Packages and External since the specify commit)
 - [ ] T-A06-010 Script tests (`python3 Tools/python/desktop_runbook.py run-check --stage A06-P00 --timeout 600 --name script-tests -- python3 scripts/test_scripts.py`) and the release-check document steps (`python3 Tools/python/desktop_runbook.py run-check --stage A06-P00 --timeout 600 --name fast-checks -- python3 scripts/release_check.py --only docs app-contracts compliance dependencies`)
 - [ ] T-A06-011 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A06-P00
 
