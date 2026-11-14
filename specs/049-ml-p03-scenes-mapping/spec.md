@@ -74,7 +74,7 @@ changes when the sound changes.
 **Acceptance Scenarios**:
 
 1. **Given** the demo 1 kHz tone, **When** each scene is selected in turn, **Then** each draws a non-blank picture and
-   every pair of scenes differs in at least 10% of the probe pixels.
+   every pair of scenes differs in at least 10% of the points of a 16 × 16 sampling grid.
 2. **Given** a scene, **When** the source goes from silence to the tone, **Then** the picture changes (the mapped values
    rise above their rest values).
 3. **Given** a chosen scene, **When** the session is saved and restored, **Then** the same scene is shown.
@@ -175,13 +175,13 @@ memory-allocating construct inside the marked code; the handlers are exercised w
 
 ### Measurable Outcomes
 
-- **SC-A06-301**: For each feature, a mapping with gain 1 maps the feature's minimum and maximum to the range ends and
-  midpoints linearly (within 1e-6); gain 2 doubles before the clamp; the value never leaves the range in 1,000 random
+- **SC-A06-301**: For each feature, a mapping with gain 1, once its smoothing has settled, maps the feature's minimum and
+  maximum to the range ends and midpoints linearly (within 1e-6); gain 2 doubles before the clamp; the value never leaves the range in 1,000 random
   feature sets.
 - **SC-A06-302**: Decoding refuses 100% of payloads with an unknown feature, a non-finite number, a gain outside 0…4 or
   an unsupported version; valid payloads round-trip exactly.
-- **SC-A06-303**: In the experience, the three scenes' probe pictures differ pairwise in ≥ 10% of probe pixels for the
-  1 kHz demo tone; each scene's picture differs between silence and the tone.
+- **SC-A06-303**: In the experience, the three scenes' pictures, sampled on a 16 × 16 grid of points over the view,
+  differ pairwise in ≥ 10% of the grid points (any channel differing by more than 16 of 255) for the 1 kHz demo tone; each scene's picture differs between silence and the tone.
 - **SC-A06-304**: Schema-1 payloads restore with the Bars scene and default mappings; schema-2 payloads round-trip; the
   nine scenarios and the fixture scenarios pass on iOS 27 with the regenerated manifest.
 - **SC-A06-305**: The hot-path check passes on the repository and fails on each of at least five planted allocating
