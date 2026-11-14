@@ -52,4 +52,4 @@ MVP: the accuracy audit (US1); then routes, speech and levels; evidence and devi
 
 ## Phase 7: Convergence
 
-- [ ] T-A08-515 Remove the unused `sentAnnouncements` record from `ScopePresenter` (tests read the injected `ScopeRecordingSink`) per plan: presenter owns the announcer (unrequested)
+- [X] T-A08-515 Remove the unused `sentAnnouncements` record from `ScopePresenter` (tests read the injected `ScopeRecordingSink`) per plan: presenter owns the announcer (unrequested) — Verified 2026-11-14: 2026-11-14: .autonomy/checks/A08-P05.scope-ios27-2.json exit 0 (Oscilloscope Studio suites on sim-27.2)

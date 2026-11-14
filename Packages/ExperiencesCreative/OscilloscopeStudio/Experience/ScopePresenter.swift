@@ -403,8 +403,6 @@ final class ScopePresenter: ExperiencePresenter {
     private(set) var announcementClock = 0.0
     /// The view, freeze, trigger, clipping and channel state last seen by the announcements; nil until the first frame.
     private var announcedState: AnnouncedState?
-    /// Every text sent to the sink (tests read it; bounded to the newest 32).
-    private(set) var sentAnnouncements: [String] = []
     /// A tier that overrides the host's in tests (feature 065); nil in the app.
     var forceTierForTesting: Int?
     /// The quality level of the last frame (0…2).
@@ -571,8 +569,6 @@ final class ScopePresenter: ExperiencePresenter {
     private func send(_ text: String) {
         guard voiceOverRunning() else { return }
         announcementSink.announce(text)
-        sentAnnouncements.append(text)
-        if sentAnnouncements.count > 32 { sentAnnouncements.removeFirst(sentAnnouncements.count - 32) }
     }
 
     func teardown(_ context: RenderContext) {
