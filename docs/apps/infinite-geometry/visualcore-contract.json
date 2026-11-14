@@ -727,7 +727,7 @@
         "file": "Packages/ExperiencesCreative/FractalExplorer/Experience/FractalBookmarks.swift",
         "symbol": "FractalBookmarks"
       },
-      "notes": "GeometryPreset (kind, symmetryOrder, repeats, paletteID, seed, camera, schemaVersion) is app domain stored through NamedLibrary/DocumentStore with versioned envelopes; no GPU handles are persisted."
+      "notes": "GeometryPreset (kind, symmetryOrder, repeats, paletteID, seed, camera, schemaVersion) is app domain stored through NamedLibrary/DocumentStore with versioned envelopes; no GPU handles are persisted. Consumed in A05-P04 (feature 043): GeometryDocument (version 1) and GeometryLibrary store saved compositions as composition-<uuid>.json in ExperienceStorage (ParticleLibrary pattern); the atomic composition.open action restores one."
     },
     {
       "id": "M18",
@@ -770,7 +770,7 @@
         "file": "Packages/ExperiencesCreative/FractalExplorer/Experience/CaptureCleanup.swift",
         "symbol": "CaptureCleanup"
       },
-      "notes": "Opaque sRGB PNG; a mesh scene exports depth-correctly once G-MESHSCENE (M01) composites its own depth target."
+      "notes": "Opaque sRGB PNG; a mesh scene exports depth-correctly since G-MESHSCENE (A05-P03, DepthMeshPass) composites its own depth target. Consumed in A05-P04 (feature 043): GeometryExport renders through ExperienceStillRenderer at a long edge of 2048 px and shares the PNG from memory (no file)."
     },
     {
       "id": "M19",
