@@ -1840,10 +1840,11 @@
     ]
    },
    "implementation": {
-    "state": "not-started",
-    "legacy_gates_passed": [],
+    "state": "standalone-partial",
+    "legacy_gates_passed": [
+     "A09-P00"
+    ],
     "legacy_gates_pending": [
-     "A09-P00",
      "A09-P01",
      "A09-P02",
      "A09-P03",

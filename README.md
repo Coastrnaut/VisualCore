@@ -56,14 +56,15 @@ evidence**: no physical-device test of the unified app has been run.
 | A06 VisualCore Music Lab | experience in the app; X-A06 pass | `.autonomy/migration/checks/X-A06.*.json` |
 | A07 Audio Odyssey | experience in the app; X-A07 pass | `.autonomy/migration/checks/X-A07.*.json` |
 | A08 Oscilloscope Studio | experience in the app; X-A08 pass | `.autonomy/migration/checks/X-A08.*.json` |
-| A09–A25 | not started | next legacy gate A09-P00 |
+| A09 Digital Aquarium | in progress: A09-P00 boundary audit pass (contract: 20 rows, 7 gaps, decision go) | [docs/apps/digital-aquarium](docs/apps/digital-aquarium/README.md) |
+| A10–A25 | not started | `python3 Tools/python/desktop_runbook.py next` |
 | Shared round features (R02-F02 … F05, F26) | pass | `python3 scripts/migration_ledger.py status` |
 | Games of Rounds 2–12 | planned; none exists in source | [catalog](docs/catalog/experience-catalog.json) |
 | Physical-device testing | none run; waits for `ImplementationLock-100` | [support matrix](docs/release/support-matrix.md) |
 | App Store | no submission and nothing for sale; signing, App Store Connect and agreements are owner actions | [build and archive](docs/release/build-and-archive.md) |
 
-Ledger totals today: the legacy ledger records **66 of 263** gates as passed (F00–F09 and the app phases
-A01-P00 … A08-P06); the unified-app ledger has 1,233 gates, with 8 experience gates (X-A01 … X-A08), 11 unified-app features,
+Ledger totals today: the legacy ledger records **67 of 263** gates as passed (F00–F09 and the app phases
+A01-P00 … A09-P00); the unified-app ledger has 1,233 gates, with 8 experience gates (X-A01 … X-A08), 11 unified-app features,
 5 shared round features and both governance milestones passed.
 
 ```bash
