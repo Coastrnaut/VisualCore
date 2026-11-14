@@ -42,7 +42,7 @@ its fixtures (`resources: [.copy("Fixtures")]`) are the precedent; the app alrea
 - Q: Which preset fixtures are committed? → A: Five files `journey-<uuid>.json` in `ExperienceTests/Fixtures/`: format 1
   tunnel (loads), format 1 star corridor with calm motion (loads), format 2 (newer, kept), damaged JSON (unreadable,
   kept), and a file whose name claims a built-in id (unreadable, kept); ids from the synthetic range
-  `00000000-0000-4000-8000-0000000007c1…c5`; plus the snapshot schema 1 and 2 examples already in the registry.
+  `00000000-0000-4000-8000-0000000007c1…c4`, the built-in claim named with the Deep tunnel id `…7b1`; plus the snapshot schema 1 and 2 examples already in the registry.
 - Q: How is the drawing failure forced? → A: The internal `failNextDraw` that `OdysseyPresenter` already has (added in
   A07-P02, re-checked 2026-11-14: the next draw throws `OdysseyDrawError.injected` once); the release phase adds the
   recovery test with preset files, not the seam.
