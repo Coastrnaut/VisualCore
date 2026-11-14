@@ -22,7 +22,7 @@
 
 ## Phase 4: Polish & evidence
 
-- [ ] T-A06-107 DSP host tests (`python3 Tools/python/desktop_runbook.py run-check --stage A06-P01 --timeout 600 --name dsp-host -- swift test --package-path Packages/VisualCore --filter "SampleRingBufferTests|DemoSignalTests|SpectrumAnalyzerTests"`)
+- [X] T-A06-107 DSP host tests (`python3 Tools/python/desktop_runbook.py run-check --stage A06-P01 --timeout 600 --name dsp-host -- swift test --package-path Packages/VisualCore --filter "SampleRingBufferTests|DemoSignalTests|SpectrumAnalyzerTests"`) — Verified 2026-11-14: 2026-11-14 .autonomy/checks/A06-P01.dsp-host.json (exit 0)
 - [ ] T-A06-108 Rendering package on sim-27.2 (`python3 Tools/python/desktop_runbook.py run-check --stage A06-P01 --timeout 600 --name rendering-ios27 -- python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test`)
 - [ ] T-A06-109 Experiences package on sim-27.2 (`python3 Tools/python/desktop_runbook.py run-check --stage A06-P01 --timeout 600 --name experiences-ios27 -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test`)
 - [ ] T-A06-110 App build and unit (`python3 Tools/python/desktop_runbook.py run-check --stage A06-P01 --timeout 600 --name app-unit -- python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27`)
