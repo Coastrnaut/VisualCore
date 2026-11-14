@@ -22,6 +22,38 @@ Canonical overrides:
   attached results and every device test is planned with its result pending the campaign; no unsupported promised
   feature in the interface or the store text; no fabricated measured performance or calibrated-accuracy claim.
 
+## Clarifications
+
+### Session 2026-11-14
+
+Answered autonomously under the owner's standing delegation, recommended option each time. Facts checked in code: the
+copy denylist (`Configs/copy-claims-denylist.json`) refuses "audio", "music" and "microphone" as words and any number
+followed by Hz or ms as a measured claim; `check_copy_claims.py` keeps every pattern but skips a line marked
+`copy-claims: allow`, and on the current sources it reports 5 hits, all signal units in `ScopePresenter.swift` (the
+spectrum axis words "20 Hz", "100 Hz" and the "0 Hz" of number formatting); `ScopePresetStore.reload()` counts
+`unreadable` and `newer` files and leaves them in place (files `scope-<uuid>.json`, format 1, built-ins
+`…08A1…A3`); `ScopePresenter.failNextDraw` exists since A08-P01 (`ScopeDrawError.injected`); `ScopeControls` gives every
+control an identifier from the port (`signal.waveform`, `display.select`, `gain.select`, `timebase.select`,
+`freeze.toggle`, `cursors.show`, …); the Audio Odyssey chunk "o2" and `AOSupport` are the interface precedent; the app
+already declares `NSMicrophoneUsageDescription` ("Listens to sound in the room to drive the visuals; audio stays on this
+device and is not recorded.").
+
+- Q: Which denylist words may Oscilloscope Studio's copy use? → A: `copyCheck.allow` = ["audio", "microphone"] (real
+  inputs); "music" and every other word stay refused; every measured-claim pattern stays active.
+- Q: How are the signal units (Hz, ms per division) in the interface copy kept from reading as performance claims? →
+  A: Each source line whose literal names a unit of the displayed signal carries the marker comment
+  `// copy-claims: allow (signal unit)`; the store text names no number with a unit at all.
+- Q: Which preset fixtures are committed? → A: Five files `scope-<uuid>.json` in `ExperienceTests/Fixtures/`: format 1
+  waveform settings (loads), format 1 spectrum settings (loads), format 2 (newer, kept), damaged JSON (unreadable,
+  kept) and a file whose name claims the built-in id `…08A1` (unreadable, kept); ids from the synthetic range
+  `00000000-0000-4000-8000-0000000008c1…c4`; the snapshot schema 1–3 examples already in the registry cover the state.
+- Q: Which interface chunk proves the journeys? → A: Chunk "p2" with `OSScopeUITests` (waveform, timebase, gain, XY and
+  spectrum views) and `OSPresetsUITests` (freeze, cursors, built-in preset, save) in
+  `Apps/VisualCore/Tests/UI/OscilloscopeStudio/` with an `OSSupport` helper following `AOSupport` (candidate launch);
+  the test signal is the source, the microphone is never chosen (no permission prompt automation).
+- Q: How is the drawing failure forced? → A: The internal `failNextDraw` that `ScopePresenter` already has; the release
+  phase adds the recovery test with preset files, not the seam.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Sound stays on my device and access is explained (Priority: P1) 🎯
@@ -80,8 +112,8 @@ every required document.
 **Acceptance Scenarios**:
 
 1. **Given** the store text and the experience's interface copy, **When** the copy check runs, **Then** it finds 0
-   problems; units that label the displayed signal (Hz, ms per division) are marked as signal units, never as
-   performance claims.
+   problems; source lines whose literals name units of the displayed signal (Hz, ms per division) carry the
+   `copy-claims: allow (signal unit)` marker, and the allowed words are exactly "audio" and "microphone".
 2. **Given** the release configuration, **When** a required document is missing, **Then** the release-document check
    fails.
 3. **Given** the store text, **When** read, **Then** it names relative-to-full-scale readouts and contains none of the
