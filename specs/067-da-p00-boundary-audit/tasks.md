@@ -6,7 +6,7 @@
 
 ## Phase 1: Setup
 
-- [ ] T-A09-001 Create `docs/apps/digital-aquarium/README.md` (what the experience is per the manual §1–§2, that it is an experience of the one app, its documents) and `docs/apps/digital-aquarium/regression-baseline.md` with the phase start `951802c1` (the specify commit; constitution `af97f2b0`) and the reference pin `d93edd1`
+- [X] T-A09-001 Create `docs/apps/digital-aquarium/README.md` (what the experience is per the manual §1–§2, that it is an experience of the one app, its documents) and `docs/apps/digital-aquarium/regression-baseline.md` with the phase start `951802c1` (the specify commit; constitution `af97f2b0`) and the reference pin `d93edd1` — Verified 2026-11-14: 2026-11-14: docs/apps/digital-aquarium/README.md and regression-baseline.md (phase start 951802c1, constitution af97f2b0, pin d93edd1; reference 7/7 recorded)
 
 ## Phase 3: User Story 1 — Evidence-backed integration matrix (P1) 🎯
 
