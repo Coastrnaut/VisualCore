@@ -27,6 +27,44 @@ Canonical overrides:
 - **Owner rulings:** short tests; audits and device runs in the device campaign; iOS 27 at phase gates; every Spec Kit
   step runs.
 
+## Clarifications
+
+### Session 2026-11-14
+
+Answered autonomously under the owner's standing delegation, recommended option each time. Facts checked in code:
+`SampleRingBuffer` (VisualCoreAudioDSP) is a lock-free single-writer buffer whose only read is
+`latest(_:into:)` (the most recent samples) with `totalWritten`; `DemoSignal.Mode` has `sequence`, `tone440`,
+`tone1k`, `silence` and A06 and A07 digests and fixtures depend on it; `DemoAudioSource` renders 1,024-frame blocks at
+real-time pace from a main-run-loop timer; `FileAudioSource.init(url:)` decodes in 4,096-frame chunks and mixes to
+mono; `MicrophoneAudioSource.start(into:)` writes mono; `SpectrumAnalyzer.expectedBin(frequency:sampleRate:size:)`
+gives the nearest bin.
+
+- Q: Do the new signals and the two-channel buffer change the existing demo and ring buffer? → A: No. New types live
+  beside them in `VisualCoreAudioDSP`: `TestSignal` (sine, square, logarithmic sweep; amplitude, frequency, optional
+  second channel with frequency ratio and phase) and `StereoSampleBuffer` (interleaved frames in a lock-free buffer
+  with a frame counter and a read by absolute frame position). `DemoSignal`, `SampleRingBuffer` and every A06/A07
+  digest stay byte-identical.
+- Q: How do two-channel sources plug into the existing source family? → A: A new protocol `StereoAudioSource` in
+  `VisualCoreAudio` (sample rate, state, channel count 1 or 2, start into a `StereoSampleBuffer`, stop) with
+  `TestSignalAudioSource` (real-time pace like `DemoAudioSource`) and `StereoFileAudioSource` (keeps a stereo file's two
+  channels, a mono file stays one channel). The microphone keeps the existing mono `MicrophoneAudioSource` and its
+  permission flow; the experience reads it as a one-channel window.
+- Q: Exactly how does the trigger find its position? → A: On the chosen channel, a rising crossing is the first sample
+  at or above the level after a sample at or below level − hysteresis (falling: mirror image); the hysteresis is 2 % of
+  full scale by default. The search looks for the most recent crossing whose full window (the timebase span) is
+  already written, so the window ends at or before the newest frame. Auto mode shows the newest span untriggered when
+  no crossing exists in the searched range (one window length of lookback); normal mode keeps the last triggered
+  window and reports "waiting". Positions are whole samples.
+- Q: Which timebases and gains are offered, and how is the window bounded? → A: Ten divisions; timebases 0.1, 0.2, 0.5,
+  1, 2 and 5 ms per division; gains ×0.5, ×1, ×2, ×5 and ×10. The window holds round(timebase × 10 × sample rate)
+  samples, capped at 4,096 per channel; a capped window (above 81.9 kHz at 5 ms/div) is marked as a shortened span.
+  The buffer keeps 16,384 frames, so a window plus one window of lookback is always inside it.
+- Q: What does the experience register and save in this phase? → A: A candidate registration with one quality level
+  (`level-0`; levels arrive with the performance phase and must then be declared by the core), snapshot schema 1 with
+  the scope state, actions `source.select`, `signal.waveform`, `signal.frequency`, `gain.select`, `timebase.select`,
+  `trigger.level`, `trigger.slope`, `trigger.mode`; the nine standard scenarios plus fixtures for the 1 kHz period
+  count, the spectrum bin and the flat-line no-trigger case.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - A steady, triggered waveform (Priority: P1) 🎯
