@@ -37,7 +37,7 @@
 
 ## Phase 7: Polish and evidence (one task per quickstart command)
 
-- [ ] T-R02F05-013 Host tests (`run-check --name host -- swift test --package-path Packages/VisualCore`); a mesh at the budget builds and validates in < 5 s in the debug build (printed timing) (SC-R02F05-006, restated in research §3)
+- [X] T-R02F05-013 Host tests (`run-check --name host -- swift test --package-path Packages/VisualCore`); a mesh at the budget builds and validates in < 5 s in the debug build (printed timing) (SC-R02F05-006, restated in research §3) — Verified 2026-11-13: 2026-11-13 .autonomy/migration/checks/R02-F05.host.json (swift test Packages/VisualCore, all pass); BUDGET-MESH 262,144 vertices build+validate 4.08 s debug (SC-R02F05-006 restated, research section 3)
 - [ ] T-R02F05-014 Rendering package on sim-27.2 (`run-check --name rendering-ios27 -- python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test`)
 - [ ] T-R02F05-015 Rendering package on sim-26.5 (`run-check --name rendering-ios26 -- … --destination sim-26.5 --action test`)
 - [ ] T-R02F05-016 Experiences package on sim-27.2 (`run-check --name experiences-ios27 -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test`)
