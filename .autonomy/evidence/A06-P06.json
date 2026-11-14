@@ -1,0 +1,62 @@
+{
+  "checks": [
+    {
+      "attestation": ".autonomy/checks/A06-P06.app-ui-2.json",
+      "command": "python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27 app-ui-ios27-m2",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A06-P06.app-ui-2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A06-P06.app-ui-5.json",
+      "command": "python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27 app-ui-ios27-m2",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A06-P06.app-ui-5.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A06-P06.experiences-ios27.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A06-P06.experiences-ios27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A06-P06.experiences-ml.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing VisualCoreMusicLabExperienceTests VisualCoreMusicLabCoreTests",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A06-P06.experiences-ml.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A06-P06.ml-no-network.json",
+      "command": "/bin/sh -c '! grep -rnE '\"'\"'URLSession|import Network|CoreMotion|CoreLocation|AVAudioRecorder|AVAssetWriter'\"'\"' Packages/ExperiencesCreative/VisualCoreMusicLab Packages/VisualCoreRendering/Sources/VisualCoreAudio'",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A06-P06.ml-no-network.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A06-P06.release-checks.json",
+      "command": "python3 scripts/release_check.py --only app-release-build app-release-symbols app-privacy-manifest app-no-tracking app-licenses app-usage-descriptions",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A06-P06.release-checks.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A06-P06.release-docs.json",
+      "command": "python3 scripts/release_check.py --only experience-release-a06 copy-claims-a06",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A06-P06.release-docs.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A06-P06.script-tests.json",
+      "command": "python3 scripts/test_scripts.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A06-P06.script-tests.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A06-P06.verify-27.json",
+      "command": "python3 scripts/verify_experiences.py --only a06.visualcore-music-lab --runtime 27",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A06-P06.verify-27.log"
+    }
+  ],
+  "generated": "2026-11-14T09:29:09+00:00",
+  "method": "deterministic-run-check",
+  "stage": "A06-P06",
+  "status": "pass"
+}

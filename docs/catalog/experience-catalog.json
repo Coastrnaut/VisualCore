@@ -1221,18 +1221,17 @@
     ]
    },
    "implementation": {
-    "state": "standalone-partial",
+    "state": "standalone-complete",
     "legacy_gates_passed": [
      "A06-P00",
      "A06-P01",
      "A06-P02",
      "A06-P03",
      "A06-P04",
-     "A06-P05"
-    ],
-    "legacy_gates_pending": [
+     "A06-P05",
      "A06-P06"
     ],
+    "legacy_gates_pending": [],
     "unified_integration": "pending"
    },
    "source": {
