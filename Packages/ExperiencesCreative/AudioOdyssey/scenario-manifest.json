@@ -5,7 +5,11 @@
     "flight.pause",
     "flight.resume",
     "journey.reseed",
-    "comfort.reduce-motion"
+    "comfort.reduce-motion",
+    "source.demo",
+    "source.microphone",
+    "source.file",
+    "permission.mirror"
   ],
   "experience" : "a07.audio-odyssey",
   "kind" : "creative",
@@ -15,7 +19,7 @@
 
       ],
       "expect" : {
-        "initialDigest" : "c6d5b3cf0048c9c546d70860f5e5e3373b2146996e609adf1d108c2963187523"
+        "initialDigest" : "155fc1a076f3e6a8be4add1ee67f8a03c389115db543492debb6a483eb38d583"
       },
       "name" : "launch-first-frame",
       "seed" : "7"
@@ -54,8 +58,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "caf726078abc391a048dfe76fbaf66ffbc28ff39c35883111adc9d6b6b7aefd3",
-        "initialDigest" : "c6d5b3cf0048c9c546d70860f5e5e3373b2146996e609adf1d108c2963187523"
+        "finalDigest" : "65a96d9afde349da43d8f29e5de39a56bdcbc61bafc0336497df89a4530a9567",
+        "initialDigest" : "155fc1a076f3e6a8be4add1ee67f8a03c389115db543492debb6a483eb38d583"
       },
       "name" : "input-response",
       "seed" : "7"
@@ -152,8 +156,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "caf726078abc391a048dfe76fbaf66ffbc28ff39c35883111adc9d6b6b7aefd3",
-        "initialDigest" : "c6d5b3cf0048c9c546d70860f5e5e3373b2146996e609adf1d108c2963187523"
+        "finalDigest" : "65a96d9afde349da43d8f29e5de39a56bdcbc61bafc0336497df89a4530a9567",
+        "initialDigest" : "155fc1a076f3e6a8be4add1ee67f8a03c389115db543492debb6a483eb38d583"
       },
       "name" : "save-restore",
       "seed" : "7"
@@ -192,7 +196,7 @@
         }
       ],
       "expect" : {
-        "initialDigest" : "c6d5b3cf0048c9c546d70860f5e5e3373b2146996e609adf1d108c2963187523",
+        "initialDigest" : "155fc1a076f3e6a8be4add1ee67f8a03c389115db543492debb6a483eb38d583",
         "resetDigest" : true
       },
       "name" : "reset",
@@ -276,8 +280,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "2a38a90db09a2356f3c0b8642a1686306a0f55b7a229767b1f077cb47232f685",
-        "initialDigest" : "c6d5b3cf0048c9c546d70860f5e5e3373b2146996e609adf1d108c2963187523"
+        "finalDigest" : "8415cdc74e72a8f7c0aa0a57867aae15302a5f8ae1775b2d01f0c30e91d88b92",
+        "initialDigest" : "155fc1a076f3e6a8be4add1ee67f8a03c389115db543492debb6a483eb38d583"
       },
       "name" : "fixture-1",
       "seed" : "7"
@@ -329,8 +333,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "eabd653ec4d9f0563ec07f4a083ca0151edd238d2176897f40d7f2228e14c36e",
-        "initialDigest" : "c6d5b3cf0048c9c546d70860f5e5e3373b2146996e609adf1d108c2963187523"
+        "finalDigest" : "a0fedc61d270f34a5c724dea8a58e1cb4bb1f6dc364fd70e992ebfedd2fe7fb6",
+        "initialDigest" : "155fc1a076f3e6a8be4add1ee67f8a03c389115db543492debb6a483eb38d583"
       },
       "name" : "fixture-2",
       "seed" : "7"
@@ -339,51 +343,61 @@
       "entries" : [
         {
           "action" : {
+            "control" : "permission.mirror",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 30
+        },
+        {
+          "action" : {
+            "control" : "source.microphone",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.a07.permission-denied",
+          "steps" : 30
+        },
+        {
+          "action" : {
+            "control" : "source.demo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 30
+        },
+        {
+          "action" : {
             "control" : "world.select",
             "values" : [
               2
             ]
           },
           "result" : "accepted",
-          "steps" : 5
+          "steps" : 30
         },
         {
           "action" : {
-            "control" : "world.select",
+            "control" : "source.demo",
             "values" : [
-              1
+
             ]
           },
           "result" : "accepted",
-          "steps" : 5
-        },
-        {
-          "action" : {
-            "control" : "world.select",
-            "values" : [
-              0
-            ]
-          },
-          "result" : "accepted",
-          "steps" : 5
-        },
-        {
-          "action" : {
-            "control" : "world.select",
-            "values" : [
-              2
-            ]
-          },
-          "result" : "accepted",
-          "steps" : 5
+          "steps" : 30
         },
         {
           "steps" : 60
         }
       ],
       "expect" : {
-        "finalDigest" : "34297dbac792830afeb0a699832c2272548a856f57908ef2f28fa5e0f92b24c9",
-        "initialDigest" : "c6d5b3cf0048c9c546d70860f5e5e3373b2146996e609adf1d108c2963187523"
+        "finalDigest" : "0b2e4b2a0c3edc07cf52a5765192a12308f14f0030415e7d23613ea900f30cce",
+        "initialDigest" : "155fc1a076f3e6a8be4add1ee67f8a03c389115db543492debb6a483eb38d583"
       },
       "name" : "fixture-3",
       "seed" : "7"
@@ -405,8 +419,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "baa3d213e16183c615ed9c2695f53af15dd4b374844b8aee19b84bfafc4898a9",
-        "initialDigest" : "c6d5b3cf0048c9c546d70860f5e5e3373b2146996e609adf1d108c2963187523"
+        "finalDigest" : "d52d9cb0d31b401c3c310cbc88061c7bcefcb52d52ca03c91264879498138a55",
+        "initialDigest" : "155fc1a076f3e6a8be4add1ee67f8a03c389115db543492debb6a483eb38d583"
       },
       "name" : "fixture-4",
       "seed" : "7"
@@ -428,8 +442,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "d6b53e38d6e6956795986f318c342b7453a56e6614521fe37f5454aabc837d7a",
-        "initialDigest" : "c6d5b3cf0048c9c546d70860f5e5e3373b2146996e609adf1d108c2963187523"
+        "finalDigest" : "1db47a3111fbca787c66e0864e5173e1d32a960911e0e99142f19b8e976b236e",
+        "initialDigest" : "155fc1a076f3e6a8be4add1ee67f8a03c389115db543492debb6a483eb38d583"
       },
       "name" : "fixture-5",
       "seed" : "7"
