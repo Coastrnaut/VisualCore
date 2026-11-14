@@ -41,7 +41,8 @@ Packages/ExperiencesCreative/AudioOdyssey/scenario-manifest.json                
 ```
 
 **Dependency direction**: unchanged. **Lifecycle**: the store is created by the factory with the experience's storage
-and reloaded on activate. **Migration**: none (snapshot schema 3 unchanged; preset format 1 new). **Rollback**: revert.
+and reloaded in the presenter's `setup()`, which runs on every open and on context recovery (the presenter protocol
+has no activate hook; convergence T-A07-413). **Migration**: none (snapshot schema 3 unchanged; preset format 1 new). **Rollback**: revert.
 
 ## Parallel work
 

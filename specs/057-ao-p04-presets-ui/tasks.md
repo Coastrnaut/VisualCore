@@ -42,4 +42,4 @@ MVP: journey presets (US1) and the clear source picker (US2); the demo fixture (
 
 ## Phase 5: Convergence
 
-- [ ] T-A07-413 Record in `specs/057-ao-p04-presets-ui/plan.md` (Lifecycle) that the preset store reloads in the presenter's `setup()` (every open and context recovery; the presenter protocol has no activate hook), as `Packages/ExperiencesCreative/AudioOdyssey/Experience/OdysseyPresenter.swift` does per plan: Lifecycle (contradicts)
+- [X] T-A07-413 Record in `specs/057-ao-p04-presets-ui/plan.md` (Lifecycle) that the preset store reloads in the presenter's `setup()` (every open and context recovery; the presenter protocol has no activate hook), as `Packages/ExperiencesCreative/AudioOdyssey/Experience/OdysseyPresenter.swift` does per plan: Lifecycle (contradicts) — Verified 2026-11-14: Verified 2026-11-14: plan.md Lifecycle now states the reload in setup() (every open and context recovery), matching OdysseyPresenter.swift line 361; validate_docs passed in the tick
