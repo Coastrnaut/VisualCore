@@ -99,6 +99,21 @@ import OscilloscopeStudioCore
         #expect(SpectrumAnalyzer.peakBin(analyzer.magnitudesDB(window.left)) == expected)
     }
 
+    /// Convergence T-A08-118 (SC-A08-102): every offered frequency peaks at its expected bin when the newest 4,096
+    /// frames (the analyser's full frame, as a spectrum view reads them) are analysed; the timebase window itself is
+    /// only zero-padded into it (above, for 1 kHz), which smears a 100 Hz window of five periods by a bin.
+    @Test(arguments: [100.0, 440.0, 1_000.0, 5_000.0])
+    func everyOfferedSinePeaksAtItsExpectedBin(frequency: Double) throws {
+        let buffer = try makeBuffer()
+        write(sine(frequency), frames: 0, count: 8_192, into: buffer)
+        var left: [Float] = [], right: [Float] = []
+        #expect(buffer.latestFrames(4_096, left: &left, right: &right) == 4_096)
+        let analyzer = try #require(SpectrumAnalyzer(size: 4_096))
+        #expect(SpectrumAnalyzer.peakBin(analyzer.magnitudesDB(left))
+                == SpectrumAnalyzer.expectedBin(frequency: frequency, sampleRate: rate, size: 4_096), "\(frequency) Hz")
+        #expect(ScopeSettings.frequencies.contains(frequency))
+    }
+
     @Test func consecutiveWindowsStartOnTheSamePhase() throws {
         let signal = sine(1_000)
         let buffer = try makeBuffer()
