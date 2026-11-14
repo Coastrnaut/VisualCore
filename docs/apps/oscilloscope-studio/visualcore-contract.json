@@ -456,32 +456,26 @@
       "id": "M12",
       "capability": "Spectrum annotation: frequency axis labels from bin frequencies and a relative dBFS axis (never SPL or volts), marking where the floor or clipping makes a value invalid",
       "source": "v0.1 feature 03 ('calibrated dB-style annotation where valid'); manual algorithm decision 4",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCore/Sources/VisualCoreAudioDSP/SpectrumAnalyzer.swift",
-          "symbol": "SpectrumAnalyzer.expectedBin",
+          "symbol": "SpectrumAnalyzer",
           "product": "VisualCoreAudioDSP",
           "public": true
         },
         {
-          "file": "Packages/VisualCore/Sources/VisualCoreAudioDSP/LevelMeter.swift",
-          "symbol": "LevelMeter.dBFS",
-          "product": "VisualCoreAudioDSP",
-          "public": true
-        },
-        {
-          "file": "Packages/VisualCore/Sources/VisualCoreAudioDSP/SpectrumAnalyzer.swift",
-          "symbol": "SpectrumAnalyzer.magnitudesDB",
+          "file": "Packages/VisualCore/Sources/VisualCoreAudioDSP/MinMaxDecimator.swift",
+          "symbol": "MinMaxDecimator",
           "product": "VisualCoreAudioDSP",
           "public": true
         }
       ],
       "example": {
-        "file": "Packages/ExperiencesCreative/VisualCoreMusicLab/Core/MetricText.swift",
-        "symbol": "MetricText"
+        "file": "Packages/ExperiencesCreative/OscilloscopeStudio/Core/SpectrumReadout.swift",
+        "symbol": "SpectrumReadout"
       },
-      "notes": "The numbers exist (expectedBin, LevelMeter.dBFS, magnitudesDB with its -200 dB floor); the axis labels, valid-range rules and wording are experience domain, as Music Lab's MetricText is. G-SPECTRUMLABELS (app-local), A08-P03."
+      "notes": "The numbers exist (expectedBin, LevelMeter.dBFS, magnitudesDB with its -200 dB floor); the axis labels, valid-range rules and wording are experience domain, as Music Lab's MetricText is. G-SPECTRUMLABELS (app-local), A08-P03. Built in A08-P03 (app-local): SpectrumReadout (peak to the nearest bin, level in dBFS relative to full scale, absent with \"no signal\", \"clipping, level not valid\" or \"filling\") and SpectrumView (log frequency columns, decade and 20 dB marks) over the VisualCore SpectrumAnalyzer (SpectrumReadoutTests, SpectrumViewTests, ScopeSessionTests)."
     },
     {
       "id": "M13",
@@ -983,7 +977,7 @@
       "justification": "The numbers come from VisualCoreAudioDSP; the axis wording and validity rules are Oscilloscope Studio's domain.",
       "phase": 3,
       "test": "Host tests: axis labels at the right bin frequencies for 48 and 44.1 kHz, levels shown as relative dBFS, values at the -200 dB floor or above clipping marked invalid, no SPL or volt wording",
-      "closed": null
+      "closed": "A08-P03"
     },
     {
       "id": "G-XYMODE",
