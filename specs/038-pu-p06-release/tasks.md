@@ -51,7 +51,7 @@ A04-P06 --name <check> -- <command>`. Commit after every task (no trailers); pus
 - [X] T-A04-620 Run the release build checks (`run-check --name release-checks -- python3 scripts/release_check.py --only app-release-build app-release-symbols app-privacy-manifest app-no-tracking app-licenses app-usage-descriptions`) — Verified 2026-11-13: 2026-11-13 .autonomy/checks/A04-P06.release-checks.json (6/6 steps pass: Release build, symbols, privacy manifest, no tracking, licenses, usage strings)
 - [X] T-A04-621 Run the script tests (`run-check --name script-tests -- python3 scripts/test_scripts.py`) and the dependency audit (`run-check --name dependency-audit -- python3 scripts/audit_showcase_dependencies.py --target VisualCore --sources Apps/VisualCore`) — Verified 2026-11-13: 2026-11-13 .autonomy/checks/A04-P06.script-tests.json (528 tests OK) and A04-P06.dependency-audit.json (exit 0)
 - [ ] T-A04-622 {device} In the device campaign (after ImplementationLock-100): the measurements and audits of `docs/apps/particle-universe/device-campaign.md` on D1 → D2 → D3
-- [ ] T-A04-623 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A04-P06
+- [X] T-A04-623 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A04-P06 — Verified 2026-11-13: 2026-11-13 converge round 1 appended T-A04-624 (ticked), round 2 appended nothing; T-A04-613 owner and T-A04-622 device stay open
 
 ## Dependencies
 
