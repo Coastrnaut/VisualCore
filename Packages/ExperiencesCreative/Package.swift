@@ -234,6 +234,18 @@ let package = Package(
                                    .product(name: "VisualCoreExperienceHost", package: rendering)],
                     path: "VisualCoreMusicLab/ExperienceTests",
                     resources: [.copy("Fixtures")]),
+        // Feature 054 (A07-P01) T-A07-103: Audio Odyssey — the device-free domain (journey state, seeded rail, world
+        // pieces); the experience target follows in T-A07-104.
+        .target(name: "AudioOdysseyCore",
+                dependencies: [.product(name: "VisualCoreMath", package: visualCore),
+                               .product(name: "VisualCoreSimulation", package: visualCore),
+                               .product(name: "VisualCoreScenes", package: visualCore)],
+                path: "AudioOdyssey/Core"),
+        .testTarget(name: "AudioOdysseyCoreTests",
+                    dependencies: ["AudioOdysseyCore",
+                                   .product(name: "VisualCoreMath", package: visualCore),
+                                   .product(name: "VisualCoreScenes", package: visualCore)],
+                    path: "AudioOdyssey/CoreTests"),
         .target(name: "ParticleUniverseCore",
                 dependencies: [
                                .product(name: "VisualCoreSimulation", package: visualCore),

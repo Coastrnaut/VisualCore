@@ -7,7 +7,7 @@
 
 ## Phase 1: Setup
 
-- [ ] T-A07-101 Baseline: cite the last package evidence on an unchanged `Packages/ExperiencesCreative` and VisualCore source tree (`.autonomy/migration/checks/X-A06.host-2.json`, `.autonomy/checks/A07-P00.app-build.json`) instead of a rerun (owner ruling of 2026-11-14)
+- [X] T-A07-101 Baseline: cite the last package evidence on an unchanged `Packages/ExperiencesCreative` and VisualCore source tree (`.autonomy/migration/checks/X-A06.host-2.json`, `.autonomy/checks/A07-P00.app-build.json`) instead of a rerun (owner ruling of 2026-11-14) — Verified 2026-11-14: Verified 2026-11-14: cited .autonomy/migration/checks/X-A06.host-2.json and .autonomy/checks/A07-P00.app-build.json (unchanged ExperiencesCreative and VisualCore sources since); no rerun (owner ruling 2026-11-14)
 
 ## Phase 2: Foundational (VisualCore, stories 1 and 2)
 
