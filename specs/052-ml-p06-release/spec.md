@@ -155,6 +155,9 @@ An interface test chunk walks Music Lab's main journeys in the real app on the i
   copy.
 - **FR-A06-622**: Known limitations MUST list Music Lab's device-only items; the device-campaign plan names each
   measurement with its device and pass criterion, results pending.
+- **FR-A06-623**: The device-campaign plan MUST include the accessibility audits (VoiceOver labels and values, Dynamic
+  Type, Reduce Motion, contrast of each palette) and the frame-time and thermal measurements, each with device and pass
+  criterion; the release checklist marks them `device` until results are attached.
 
 **Interface and builds (story 4)**
 - **FR-A06-630**: An interface test chunk for Music Lab MUST pass on the iOS 27 phone simulator, each test < 60 s.
