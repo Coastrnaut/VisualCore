@@ -22,6 +22,44 @@ Canonical overrides:
 - **Constitution:** 2.4.0 adds the A08 experience rules (committed at the start of this gate).
 - **Evidence:** host and simulator only.
 
+## Clarifications
+
+### Session 2026-11-14
+
+Answered autonomously under the owner's standing delegation, recommended option each time. Facts checked in code:
+`scripts/check_experience_packages.py` reports `EXTRA_TARGET` for any experience target of an `Experiences*` package
+that belongs to no registered experience; `LauncherModel.shown` lists only available experiences; the A08 constitution
+commit is `0cdd2ca0` and the A08-P00 specify commit `6fdb5ca9` (the phase start: the no-change diff of `Packages` and
+`External` is taken from it); the reference submodule is pinned at `d93edd1`. Every shared source writes mono samples
+(`AudioSource.swift:35` "A producer of mono `Float` audio samples"; the microphone and file sources mix down);
+`DemoSignal.Mode` offers `sequence`, `tone440`, `tone1k` and `silence` only; `SpectrumAnalyzer` gives magnitudes in dB
+with a −200 dB floor and `expectedBin(frequency:sampleRate:size:)`; the scene graph's only line is a two-point
+`.line(Vec2, Vec2, width:)` drawn by `PrimitiveRenderer`. The contract is
+`docs/apps/oscilloscope-studio/visualcore-contract.json` with the generated `visualcore-contract.md`, checked by
+`scripts/check_app_contract.py --app oscilloscope-studio`; the baseline is
+`docs/apps/oscilloscope-studio/regression-baseline.md`; the build steps are the named steps of
+`python3 scripts/release_check.py --list` at the time of the check, with the count.
+
+- Q: How is the manual's "compile an empty shell" gate met in the one app? → A: The one app is the shell: this phase
+  proves the VisualCore app still builds for testing with Oscilloscope Studio absent (not registered, not linked,
+  catalog unavailable). The experience's targets are created in A08-P01 with its first real domain rules, because an
+  empty target would be an `EXTRA_TARGET` finding and registering an empty experience would be a placeholder.
+- Q: What makes a capability "available"? → A: A public declaration in a VisualCore framework product with at least one
+  test that exercises it; an implementation that exists only inside another experience (A06, A07) or a harness is
+  "requires adaptation" at best.
+- Q: Which package holds Oscilloscope Studio? → A: `Packages/ExperiencesCreative/OscilloscopeStudio` (Auto-Creator.md
+  §16), as A06 and A07 did in `ExperiencesCreative`; no new package is created.
+- Q: Does Oscilloscope Studio need a new permission or privacy answer? → A: No. `VisualCoreAudio` and
+  `VisualCoreAudioDSP` are real products since A06 and the app's `NSMicrophoneUsageDescription` exists (`project.yml`,
+  checked by `BundleTests`); Oscilloscope Studio reuses the shared permission and string, so audio rows cite those
+  products and the app's privacy answers do not change.
+- Q: Which scope pieces exist, and who owns the missing ones? → A: Mono sources, the ring buffer, the spectrum in dB
+  and the demo tones exist. Gaps and owners: trigger detection with a timebase window, min/max display decimation and
+  a demo generator with square and sweep signals → `VisualCoreAudioDSP` (A08-P01); two-channel (stereo) capture for
+  the XY view → `VisualCoreAudio` (A08-P02); bounded multi-point trace strips → built in `VisualCoreScenes` and drawn
+  through `VisualCoreRendering` (A08-P02); spectrum frequency and dBFS annotation and the spoken measurement
+  description stay app-local (A08-P03 and A08-P05). The audit confirms or corrects each from the code.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - An evidence-backed integration matrix (Priority: P1) 🎯
@@ -114,8 +152,8 @@ VisualCore module will own each missing piece and in which phase.
   products as evidence; the shared audio products MUST appear as the evidence for audio input and analysis.
 - **FR-A08-003**: Every non-available row MUST have a gap entry naming the owning VisualCore module and the phase that
   will build it; at least trigger detection with a timebase window, display decimation (no more points than pixels),
-  bounded trace strips, stereo (two-channel) input for the XY view and the spectrum's frequency and level annotation
-  MUST be assessed.
+  bounded trace strips, square and sweep demo signals, stereo (two-channel) input for the XY view and the spectrum's
+  frequency and level annotation MUST be assessed.
 - **FR-A08-004**: The ProjectM reference regression MUST run in two chunks and pass; a baseline document MUST record
   the phase-start commit, the reference pin and the results.
 - **FR-A08-005**: The one app MUST build for testing with Oscilloscope Studio absent; the experience package check
@@ -152,8 +190,9 @@ VisualCore module will own each missing piece and in which phase.
 
 - `VisualCoreAudio` and `VisualCoreAudioDSP` are real products since A06 (sources, permission, session recovery,
   ring buffer, spectrum analysis, demo signals, level meter); Oscilloscope Studio reuses them.
-- Trigger and timebase, display decimation, thick trace strips and two-channel input are expected upstream gaps; the
-  audit confirms or corrects each from the code and names the owners.
+- Trigger and timebase, display decimation, square and sweep demo signals, multi-point trace strips and two-channel
+  input are expected upstream gaps (see Clarifications for the owners); the audit confirms or corrects this from the
+  code.
 - Later phases (A08-P01 to A08-P06) build the gaps; this phase builds none.
 
 ## Traceability
