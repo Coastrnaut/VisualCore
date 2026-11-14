@@ -9,7 +9,12 @@
     "source.demo",
     "source.microphone",
     "source.file",
-    "permission.mirror"
+    "permission.mirror",
+    "speed.set",
+    "easing.select",
+    "comfort.calm",
+    "mapping.set",
+    "mapping.reset"
   ],
   "experience" : "a07.audio-odyssey",
   "kind" : "creative",
@@ -19,7 +24,7 @@
 
       ],
       "expect" : {
-        "initialDigest" : "155fc1a076f3e6a8be4add1ee67f8a03c389115db543492debb6a483eb38d583"
+        "initialDigest" : "d54b2b11e499801746a9e6b6ac2c0f51ffde1969e3d09c190858ac4921828353"
       },
       "name" : "launch-first-frame",
       "seed" : "7"
@@ -58,8 +63,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "65a96d9afde349da43d8f29e5de39a56bdcbc61bafc0336497df89a4530a9567",
-        "initialDigest" : "155fc1a076f3e6a8be4add1ee67f8a03c389115db543492debb6a483eb38d583"
+        "finalDigest" : "1b6ac77651204cdd9666336c1b9831856c4466dd6d5443420abe0e2b4dfc35ac",
+        "initialDigest" : "d54b2b11e499801746a9e6b6ac2c0f51ffde1969e3d09c190858ac4921828353"
       },
       "name" : "input-response",
       "seed" : "7"
@@ -156,8 +161,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "65a96d9afde349da43d8f29e5de39a56bdcbc61bafc0336497df89a4530a9567",
-        "initialDigest" : "155fc1a076f3e6a8be4add1ee67f8a03c389115db543492debb6a483eb38d583"
+        "finalDigest" : "1b6ac77651204cdd9666336c1b9831856c4466dd6d5443420abe0e2b4dfc35ac",
+        "initialDigest" : "d54b2b11e499801746a9e6b6ac2c0f51ffde1969e3d09c190858ac4921828353"
       },
       "name" : "save-restore",
       "seed" : "7"
@@ -196,7 +201,7 @@
         }
       ],
       "expect" : {
-        "initialDigest" : "155fc1a076f3e6a8be4add1ee67f8a03c389115db543492debb6a483eb38d583",
+        "initialDigest" : "d54b2b11e499801746a9e6b6ac2c0f51ffde1969e3d09c190858ac4921828353",
         "resetDigest" : true
       },
       "name" : "reset",
@@ -280,8 +285,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "8415cdc74e72a8f7c0aa0a57867aae15302a5f8ae1775b2d01f0c30e91d88b92",
-        "initialDigest" : "155fc1a076f3e6a8be4add1ee67f8a03c389115db543492debb6a483eb38d583"
+        "finalDigest" : "db7443457666ad0750b596fc56fd6ce8660a38e43fa2f640ec310635ea8dad51",
+        "initialDigest" : "d54b2b11e499801746a9e6b6ac2c0f51ffde1969e3d09c190858ac4921828353"
       },
       "name" : "fixture-1",
       "seed" : "7"
@@ -310,6 +315,26 @@
         },
         {
           "action" : {
+            "control" : "speed.set",
+            "values" : [
+              5.5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 240
+        },
+        {
+          "action" : {
+            "control" : "easing.select",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 240
+        },
+        {
+          "action" : {
             "control" : "flight.pause",
             "values" : [
 
@@ -333,8 +358,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "a0fedc61d270f34a5c724dea8a58e1cb4bb1f6dc364fd70e992ebfedd2fe7fb6",
-        "initialDigest" : "155fc1a076f3e6a8be4add1ee67f8a03c389115db543492debb6a483eb38d583"
+        "finalDigest" : "a3f07c829636d34c9225a7cb8e64d309073192e4d35d4244ff63c593e232f30e",
+        "initialDigest" : "d54b2b11e499801746a9e6b6ac2c0f51ffde1969e3d09c190858ac4921828353"
       },
       "name" : "fixture-2",
       "seed" : "7"
@@ -392,12 +417,32 @@
           "steps" : 30
         },
         {
+          "action" : {
+            "control" : "source.demo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 30
+        },
+        {
+          "action" : {
+            "control" : "source.demo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 30
+        },
+        {
           "steps" : 60
         }
       ],
       "expect" : {
-        "finalDigest" : "0b2e4b2a0c3edc07cf52a5765192a12308f14f0030415e7d23613ea900f30cce",
-        "initialDigest" : "155fc1a076f3e6a8be4add1ee67f8a03c389115db543492debb6a483eb38d583"
+        "finalDigest" : "369c1e6258cd88c65c30ad90e3af41ceec45c9540951a4a890cb34ac546addd4",
+        "initialDigest" : "d54b2b11e499801746a9e6b6ac2c0f51ffde1969e3d09c190858ac4921828353"
       },
       "name" : "fixture-3",
       "seed" : "7"
@@ -419,8 +464,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "d52d9cb0d31b401c3c310cbc88061c7bcefcb52d52ca03c91264879498138a55",
-        "initialDigest" : "155fc1a076f3e6a8be4add1ee67f8a03c389115db543492debb6a483eb38d583"
+        "finalDigest" : "f574d709854e37f766e2c57fff8aba9f4b90487f140b338705e21a4ce1b3cdfb",
+        "initialDigest" : "d54b2b11e499801746a9e6b6ac2c0f51ffde1969e3d09c190858ac4921828353"
       },
       "name" : "fixture-4",
       "seed" : "7"
@@ -442,8 +487,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "1db47a3111fbca787c66e0864e5173e1d32a960911e0e99142f19b8e976b236e",
-        "initialDigest" : "155fc1a076f3e6a8be4add1ee67f8a03c389115db543492debb6a483eb38d583"
+        "finalDigest" : "5e9aa8214b34d84fb32a638169f406aa1a2878bab24779f13921e22f0013c709",
+        "initialDigest" : "d54b2b11e499801746a9e6b6ac2c0f51ffde1969e3d09c190858ac4921828353"
       },
       "name" : "fixture-5",
       "seed" : "7"
