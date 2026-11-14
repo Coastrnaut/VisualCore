@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/VisualCore",
+    "--filter",
+    "SampleRingBufferTests|DemoSignalTests|SpectrumAnalyzerTests"
+  ],
+  "command": "swift test --package-path Packages/VisualCore --filter 'SampleRingBufferTests|DemoSignalTests|SpectrumAnalyzerTests'",
+  "elapsed_seconds": 6.778,
+  "exit_code": 0,
+  "finished": "2026-11-14T06:57:37+00:00",
+  "log": ".autonomy/logs/A06-P01.dsp-host.log",
+  "log_sha256": "40c73c3f50a98c77795a93cd4bd127c8b6e96ac8d4bd7a15a62e57a5a66cca2d",
+  "name": "dsp-host",
+  "stage": "A06-P01",
+  "started": "2026-11-14T06:57:30+00:00",
+  "timed_out": false
+}

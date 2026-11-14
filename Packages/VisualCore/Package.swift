@@ -40,6 +40,8 @@ let package = Package(
         .testTarget(name: "VisualCoreSimulationTests", dependencies: ["VisualCoreSimulation", "VisualCoreMath"]),
         .testTarget(name: "VisualCoreScenesTests", dependencies: ["VisualCoreScenes", "VisualCoreMath"]),
         .testTarget(name: "VisualCoreDiagnosticsTests", dependencies: ["VisualCoreDiagnostics"]),
+        // Feature 047 (A06-P01) T-A06-102: ring buffer, demo signal and spectrum analyser.
+        .testTarget(name: "VisualCoreAudioDSPTests", dependencies: ["VisualCoreAudioDSP"]),
         .testTarget(name: "VisualCoreParametersTests", dependencies: ["VisualCoreParameters"]),
         .testTarget(name: "VisualCoreTestSupportTests", dependencies: ["VisualCoreTestSupport"]),
         .testTarget(name: "VisualCorePersistenceTests", dependencies: ["VisualCorePersistence"]),
