@@ -62,6 +62,8 @@ let package = Package(
         .testTarget(name: "VisualCoreUITests", dependencies: ["VisualCoreUI", "VisualCoreRendering",
                                                              .product(name: "VisualCoreParameters", package: "VisualCore"),
                                                              .product(name: "VisualCoreSimulation", package: "VisualCore")]),
+        .testTarget(name: "VisualCoreAudioTests",
+                    dependencies: ["VisualCoreAudio", .product(name: "VisualCoreAudioDSP", package: "VisualCore")]),
         .testTarget(name: "VisualCoreAutomationTests", dependencies: ["VisualCoreAutomation", "VisualCoreRendering"]),
         .testTarget(name: "VisualCoreEffectsTests",
                     dependencies: ["VisualCoreEffects", "VisualCoreRendering", "CVisualCoreGL",
