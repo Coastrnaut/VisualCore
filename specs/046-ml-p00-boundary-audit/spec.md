@@ -29,22 +29,15 @@ Answered autonomously under the owner's standing delegation, recommended option 
 `scripts/check_experience_packages.py` reports `EXTRA_TARGET` for any experience target of an `Experiences*` package
 that belongs to no registered experience and requires registered experiences to have all four targets and to be linked
 by the app; `LauncherModel.shown` lists only available experiences; the A06 constitution commit is `c37f95fe`; the
-reference submodule is pinned at `d93edd1`.
+reference submodule is pinned at `d93edd1`. Settled facts carried over from the A05 audit and re-checked: The A06 constitution commit `c37f95fe`; the no-change diff of `Packages` and `External` is taken from it. `docs/apps/visualcore-music-lab/visualcore-contract.json` and the generated `visualcore-contract.md`, checked by `scripts/check_app_contract.py --app visualcore-music-lab`; the baseline in `docs/apps/visualcore-music-lab/regression-baseline.md`. The named steps of `python3 scripts/release_check.py --list` at the time of the check, recorded with the count.
 
 - Q: How is the manual's "compile an empty shell" gate met in the one app? → A: The one app is the shell: this phase
   proves the VisualCore app still builds for testing with VisualCore Music Lab absent (not registered, not linked, catalog
   unavailable). The experience's targets are created in A06-P01 together with its first real domain rules, because an
   empty target would be an `EXTRA_TARGET` finding and registering an empty experience would be a placeholder (both
   forbidden).
-- Q: Which commit is the phase start? → A: The A06 constitution commit `c37f95fe`; the no-change diff of
-  `Packages` and `External` is taken from it.
-- Q: Where are the contract and its readable view? → A: `docs/apps/visualcore-music-lab/visualcore-contract.json` and the
-  generated `visualcore-contract.md`, checked by `scripts/check_app_contract.py --app visualcore-music-lab`; the baseline
-  in `docs/apps/visualcore-music-lab/regression-baseline.md`.
 - Q: What makes a capability "available"? → A: A public declaration in a VisualCore framework product with at least one
   test that exercises it; a harness-only or Showcase-only implementation is "requires adaptation" at best.
-- Q: Which build steps does the inventory count? → A: The named steps of `python3 scripts/release_check.py --list` at the
-  time of the check, recorded with the count.
 - Q: Which package holds the audio experience, given only `ExperiencesCreative` exists? → A: The audit records the choice
   for A06-P01: a new `Packages/ExperiencesAudio` package for the three audio experiences (A06–A08), mirroring
   `ExperiencesCreative` (Core / Experience / CoreTests / ExperienceTests per experience); creating it is A06-P01 work,
