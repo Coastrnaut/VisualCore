@@ -9,7 +9,7 @@ Catmull–Rom, arc-length table, level frame, `orbitCamera(at:)`), `ComfortLimit
 `RailFlight` (eased speed under the limits, capped time step, sway) and `OriginRebase` (1,024-unit snapping). Create
 the experience `a07.audio-odyssey` in `Packages/ExperiencesCreative/AudioOdyssey`: Core (`JourneyWorld`,
 `JourneyState` schema 1, `JourneyRail` seeded control points, `WorldPieces` for tunnel, landscape and star corridor),
-Experience (adapter `AudioOdysseyCore`, manifest, presenter drawing the 10-piece window through `DepthMeshPass` with
+Experience (adapter `OdysseyCore`, manifest, presenter drawing the 10-piece window through `DepthMeshPass` with
 the rail's `OrbitCamera`, controls), registered as a candidate with nine standard scenarios and two fixture
 scenarios. Research: [research.md](research.md).
 
@@ -39,17 +39,17 @@ Packages/VisualCore/Sources/VisualCoreMath/{CameraRail,ComfortLimits,RailFlight,
 Packages/VisualCore/Tests/VisualCoreMathTests/{CameraRailTests,RailFlightTests,OriginRebaseTests}.swift         new
 Packages/ExperiencesCreative/AudioOdyssey/Core/{JourneyWorld,JourneyState,JourneyRail,WorldPieces}.swift       new  domain
 Packages/ExperiencesCreative/AudioOdyssey/CoreTests/{JourneyStateTests,JourneyRailTests,WorldPiecesTests}.swift new
-Packages/ExperiencesCreative/AudioOdyssey/Experience/{Adapter/AudioOdysseyCore.swift,Adapter/AudioOdysseyManifest.swift,
-  AudioOdysseyPresenter.swift,AudioOdysseyControls.swift,AudioOdysseyExperience.swift}                         new
-Packages/ExperiencesCreative/AudioOdyssey/ExperienceTests/{AudioOdysseyCoreTests,AudioOdysseyManifestTests,
-  AudioOdysseySessionTests,AudioOdysseyRenderTests}.swift, Packages/ExperiencesCreative/AudioOdyssey/scenario-manifest.json  new
+Packages/ExperiencesCreative/AudioOdyssey/Experience/{Adapter/OdysseyCore.swift,Adapter/OdysseyManifest.swift,
+  OdysseyPresenter.swift,OdysseyControls.swift,AudioOdysseyExperience.swift}                         new
+Packages/ExperiencesCreative/AudioOdyssey/ExperienceTests/{OdysseyCoreTests,OdysseyManifestTests,
+  OdysseySessionTests,OdysseyRenderTests}.swift, Packages/ExperiencesCreative/AudioOdyssey/scenario-manifest.json  new
 Packages/ExperiencesCreative/Package.swift, Catalog/registrations.json, Apps/VisualCore/App/ExperienceRegistry.swift
   (candidate), project.yml (dependency)                                                                         modify
 docs/api/visualcore-public-api.txt, Packages/VisualCore/README.md, docs/apps/audio-odyssey/visualcore-contract.json
   (G-CAMERARAIL, G-ORIGINREBASE closed)                                                                         modify
 ```
 
-**Dependency direction**: AudioOdysseyExperience → AudioOdysseyCore → VisualCoreMath/Simulation/Scenes; experience →
+**Dependency direction** (targets `AudioOdysseyCore`, `AudioOdysseyExperience`, their test targets and the product `AudioOdysseyExperience`, as `scripts/check_experience_packages.py` requires; the adapter type is `OdysseyCore` so it does not shadow the `AudioOdysseyCore` module): AudioOdysseyExperience → AudioOdysseyCore → VisualCoreMath/Simulation/Scenes; experience →
 VisualCore host and rendering; nothing in VisualCore depends on the experience.
 
 **Lifecycle**: the presenter owns one `RailFlight`, the `JourneyRail`, a piece cache keyed by (world, index) for the

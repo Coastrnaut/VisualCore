@@ -26,7 +26,7 @@ public struct OriginRebase: Sendable, Equatable {
   public mutating func update(camera: Vec3)
   public func local(_ p: Vec3) -> SIMD3<Float>
 }
-// AudioOdysseyCore (experience domain)
+// module AudioOdysseyCore (experience domain; the experience adapter type is OdysseyCore)
 public enum JourneyWorld: Int, CaseIterable, Codable, Sendable { case tunnel, landscape, starCorridor }
 public struct JourneyState: Codable, Equatable, Sendable { /* data-model.md */ }
 public enum JourneyRail { public static func make(seed: UInt64) -> CameraRail }
