@@ -7,7 +7,7 @@
 
 ## Phase 1: Setup
 
-- [ ] T-A08-501 Baseline: cite the A08-P04 evidence on the unchanged tree (`.autonomy/checks/A08-P04.scope-ios27.json`, `.autonomy/checks/A08-P04.app-unit.json`, `.autonomy/checks/A08-P04.verify-27.json`) instead of a rerun (owner ruling of 2026-11-14)
+- [X] T-A08-501 Baseline: cite the A08-P04 evidence on the unchanged tree (`.autonomy/checks/A08-P04.scope-ios27.json`, `.autonomy/checks/A08-P04.app-unit.json`, `.autonomy/checks/A08-P04.verify-27.json`) instead of a rerun (owner ruling of 2026-11-14) — Verified 2026-11-14: 2026-11-14: A08-P04 evidence on the unchanged tree (.autonomy/checks/A08-P04.scope-ios27.json, A08-P04.app-unit.json, A08-P04.verify-27.json) cited per owner ruling of 2026-11-14
 
 ## Phase 2: Foundational (VisualCore and core)
 
