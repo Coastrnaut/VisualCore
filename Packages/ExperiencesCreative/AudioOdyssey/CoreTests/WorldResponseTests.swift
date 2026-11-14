@@ -114,4 +114,27 @@ import AudioOdysseyCore
             #expect(defaults.light > defaults.lightRest)
         }
     }
+
+    // Convergence T-A07-313: switching world or flags continues from the current values, never jumping.
+    @Test func continuingAcrossWorldsAndFlagsNeverJumps() {
+        var response = WorldResponse(world: .tunnel, reduceMotion: false, reduceFlashing: false)
+        for _ in 0..<60 { response.update(primaryTarget: 1, lightTarget: 1) }
+        #expect(response.light == 0.70)
+        let switches: [(JourneyWorld, Bool, Bool)] = [(.landscape, false, false), (.landscape, true, true),
+                                                      (.starCorridor, true, true), (.tunnel, false, false)]
+        for (world, motion, flashing) in switches {
+            var next = response.continued(world: world, reduceMotion: motion, reduceFlashing: flashing)
+            #expect(next.light == response.light)
+            var previous = next
+            for _ in 0..<80 {
+                next.update(primaryTarget: 0.2, lightTarget: 0.2)
+                #expect(abs(next.light - previous.light) <= next.lightStepLimit + 1e-12)
+                #expect(abs(next.primary - previous.primary) <= next.primaryStepLimit + 1e-12)
+                previous = next
+            }
+            #expect(next.lightRange.contains(next.light))
+            #expect(next.primaryRange.contains(next.primary))
+            response = next
+        }
+    }
 }

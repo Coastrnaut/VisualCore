@@ -260,7 +260,7 @@ final class OdysseyMappingSessionTests: XCTestCase {
             XCTAssertTrue(host.renderOneFrame(present: false), file: file, line: line)
             let state = try core(shell).state
             if shadow.world != state.world {
-                shadow = WorldResponse(world: state.world, reduceMotion: false, reduceFlashing: false)
+                shadow = shadow.continued(world: state.world, reduceMotion: false, reduceFlashing: false)
             }
             let targets = state.mapping(for: state.world).target(from: presenter.envelope)
             shadow.update(primaryTarget: targets.primary, lightTarget: targets.light)

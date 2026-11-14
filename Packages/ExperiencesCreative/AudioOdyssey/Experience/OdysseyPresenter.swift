@@ -516,7 +516,8 @@ final class OdysseyPresenter: ExperiencePresenter {
         let world = core.state.world
         let calm = reduceMotion || core.state.calmMotion
         if response.world != world || response.reduceMotion != calm || response.reduceFlashing != reduceFlashing {
-            response = WorldResponse(world: world, reduceMotion: calm, reduceFlashing: reduceFlashing)
+            // Continue from the current values (convergence T-A07-313): no frame jumps on a world or flag change.
+            response = response.continued(world: world, reduceMotion: calm, reduceFlashing: reduceFlashing)
         }
         let targets = core.state.mapping(for: world).target(from: envelope)
         response.update(primaryTarget: targets.primary, lightTarget: targets.light)

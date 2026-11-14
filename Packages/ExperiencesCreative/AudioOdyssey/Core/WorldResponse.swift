@@ -85,6 +85,22 @@ public struct WorldResponse: Sendable, Equatable {
         }
     }
 
+    /// The response for `world` and the given flags that continues from this one instead of starting at rest
+    /// (convergence T-A07-313, FR-A07-311): the light keeps its value and the primary keeps its fraction of its range's
+    /// maximum; values outside the new ranges walk in by at most one step per update, so a world switch or a calm,
+    /// Reduce Motion or Reduce Flashing toggle never makes a frame jump larger than the step limits.
+    /// - Parameters:
+    ///   - world: The new world.
+    ///   - reduceMotion: Whether calm motion or the system Reduce Motion is on.
+    ///   - reduceFlashing: Whether the system Reduce Flashing is on.
+    public func continued(world: JourneyWorld, reduceMotion: Bool, reduceFlashing: Bool) -> WorldResponse {
+        var next = WorldResponse(world: world, reduceMotion: reduceMotion, reduceFlashing: reduceFlashing)
+        let fraction = primaryRange.upperBound > 0 ? primary / primaryRange.upperBound : 0
+        if fraction.isFinite { next.primary = fraction * next.primaryRange.upperBound }
+        if light.isFinite { next.light = light }
+        return next
+    }
+
     /// Moves toward the targets: each target in 0…1 (clamped; NaN counts as 0) maps to `rest + t × (upper − rest)`,
     /// and each value moves toward its mapped target by at most its step limit.
     public mutating func update(primaryTarget: Double, lightTarget: Double) {
@@ -94,9 +110,12 @@ public struct WorldResponse: Sendable, Equatable {
                               step: lightStepLimit, range: lightRange)
     }
 
+    /// One step toward `goal`. A value that is already inside `range` stays inside it; a value carried in from another
+    /// world or flag setting (convergence T-A07-313) may start outside and walks in by at most `step` per call, so no
+    /// frame jumps.
     private static func approach(_ value: Double, _ goal: Double, step: Double, range: ClosedRange<Double>) -> Double {
         let delta = min(max(goal - value, -step), step)
-        return clamp(value + delta, to: range)
+        return range.contains(value) ? clamp(value + delta, to: range) : value + delta
     }
 
     private static func clamp(_ value: Double, to range: ClosedRange<Double>) -> Double {
