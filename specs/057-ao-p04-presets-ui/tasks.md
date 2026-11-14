@@ -26,7 +26,7 @@
 - [X] T-A07-409 Experience package check (`python3 Tools/python/desktop_runbook.py run-check --stage A07-P04 --timeout 600 --name experience-packages -- python3 scripts/check_experience_packages.py`) — Verified 2026-11-14: Verified 2026-11-14: .autonomy/checks/A07-P04.experience-packages.json exit 0
 - [X] T-A07-410 Public API unchanged (`python3 Tools/python/desktop_runbook.py run-check --stage A07-P04 --timeout 600 --name public-api -- python3 scripts/check_public_api.py`) — Verified 2026-11-14: Verified 2026-11-14: .autonomy/checks/A07-P04.public-api.json exit 0 (no VisualCore change)
 - [X] T-A07-411 Script tests (`python3 Tools/python/desktop_runbook.py run-check --stage A07-P04 --timeout 600 --name script-tests -- python3 scripts/test_scripts.py`) — Verified 2026-11-14: Verified 2026-11-14: .autonomy/checks/A07-P04.script-tests.json exit 0; VisualCore host suite in CI mode .autonomy/checks/A07-P04.visualcore-host-ci.json exit 0 (the CI catalog fix); the local-mode run visualcore-host-2 failed only on two pre-existing local wall-clock bounds (mesh budget 5.97 s vs 5 s, analysis timing) under an external machine load average near 800 from other repositories' builds
-- [ ] T-A07-412 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A07-P04
+- [X] T-A07-412 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A07-P04 — Verified 2026-11-14: Verified 2026-11-14: converge round 1 appended T-A07-413 (plan lifecycle), implemented; round 2 found 0 findings (tasks.md unchanged)
 
 ## Dependencies
 
