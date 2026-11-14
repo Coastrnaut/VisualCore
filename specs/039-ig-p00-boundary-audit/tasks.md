@@ -11,7 +11,7 @@
 ## Phase 3: User Story 1 — Evidence-backed integration matrix (P1) 🎯
 
 - [X] T-A05-002 [US1] Write `docs/apps/infinite-geometry/visualcore-contract.json` (schema 1; app `infinite-geometry`; gate `A05-P00`): `inventory` of every FR-A05-001 area with paths, the release-check step count from `python3 scripts/release_check.py --list`; `matrix` rows covering the 5 brainstorm capabilities and 6 version 0.1 features with status ∈ {available, requires adaptation, upstream gap} per clarification 4 and file/symbol/product evidence; `traceability`; `negative` rules of FR-A05-006 — Verified 2026-11-13: 2026-11-13 .autonomy/checks/A05-P00.contract.json (PASS: 22 rows, 109 citations, 6 gaps, decision go); 8 inventory areas, release_check --list 78 steps; 16 available, 5 requires adaptation, 1 upstream gap; OrbitCamera and vc/sdf.glsl gap claims re-checked by grep
-- [ ] T-A05-003 [US1] Run the contract checker and render the view (`python3 Tools/python/desktop_runbook.py run-check --stage A05-P00 --timeout 600 --name contract -- python3 scripts/check_app_contract.py --app infinite-geometry --render`); `docs/apps/infinite-geometry/visualcore-contract.md` is generated (FR-A05-007, SC-A05-001)
+- [X] T-A05-003 [US1] Run the contract checker and render the view (`python3 Tools/python/desktop_runbook.py run-check --stage A05-P00 --timeout 600 --name contract -- python3 scripts/check_app_contract.py --app infinite-geometry --render`); `docs/apps/infinite-geometry/visualcore-contract.md` is generated (FR-A05-007, SC-A05-001) — Verified 2026-11-13: 2026-11-13 .autonomy/checks/A05-P00.contract.json (PASS: 22 rows, 109 citations, 6 gaps, decision go); visualcore-contract.md rendered
 
 ## Phase 4: User Story 2 — The reference stays proven (P1)
 
