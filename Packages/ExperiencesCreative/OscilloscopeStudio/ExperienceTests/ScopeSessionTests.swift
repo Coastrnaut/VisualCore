@@ -793,4 +793,52 @@ final class ScopeSessionTests: XCTestCase {
         XCTAssertNotNil(restored.presenter.lastCursorReadout)
         next.close()
     }
+
+    // MARK: Feature 065 — frozen capture metadata
+
+    /// T-A08-506 (FR-A08-531; story 4; edge cases "route changes while running", "quality level change while
+    /// frozen"): a frozen window keeps its sample rate, channel count, start, count and samples over frames, a gain
+    /// change, a quality level change and a microphone route change from two channels to one. (A change of source
+    /// releases the freeze by design since A08-P04.)
+    func testAFrozenWindowKeepsItsMetadataOverGainLevelAndRouteChanges() async throws {
+        let microphone = ScopeRouteMicrophone()
+        let factory = ScopeSourceFactory(testSignal: { TestSignalAudioSource(signal: $0) },
+                                         file: { _ in throw AudioSourceError.undecodable("test double") },
+                                         microphone: { _ in microphone })
+        let session = ExperienceSession()
+        let shell = try await ScopeTest.open(session, permission: .granted, factory: factory)
+        let presenter = shell.presenter
+        let picked = await presenter.pickSource(.microphone)
+        XCTAssertEqual(picked, .accepted)
+        let filled = try await ScopeTest.frames(session, until: { (presenter.lastLiveWindow?.sampleCount ?? 0) > 0 })
+        XCTAssertTrue(filled)
+        XCTAssertTrue(presenter.setFrozen(true).isAccepted)
+        try ScopeTest.frames(session, 1)
+        let held = try XCTUnwrap(presenter.heldWindow)
+        XCTAssertEqual(held.channelCount, 2)
+        XCTAssertGreaterThan(held.sampleCount, 0)
+        func check(_ step: String) throws {
+            let window = try XCTUnwrap(presenter.heldWindow, step)
+            XCTAssertEqual(window.sampleRate, held.sampleRate, step)
+            XCTAssertEqual(window.channelCount, held.channelCount, step)
+            XCTAssertEqual(window.startFrame, held.startFrame, step)
+            XCTAssertEqual(window.sampleCount, held.sampleCount, step)
+            XCTAssertEqual(window.left, held.left, step)
+            XCTAssertEqual(window.right, held.right, step)
+        }
+        try ScopeTest.frames(session, 10)
+        try check("frames")
+        XCTAssertTrue(shell.handle(control: "gain.select", values: [3]).isAccepted)
+        try ScopeTest.frames(session, 2)
+        try check("gain")
+        presenter.forceTierForTesting = 2
+        try ScopeTest.frames(session, 2)
+        try check("level")
+        microphone.channelCount = 1                                   // headset out: one channel
+        try ScopeTest.frames(session, 2)
+        XCTAssertEqual(presenter.activeChannelCount, 1, "the live route has one channel now")
+        XCTAssertTrue(try XCTUnwrap(presenter.lastCore).state.frozen)
+        try check("route")
+        session.close()
+    }
 }

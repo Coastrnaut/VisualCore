@@ -68,6 +68,9 @@ extension ScopeCore {
     /// 10. freeze with cursors (feature 064): frozen, cursors shown one tenth of the window apart, level at half scale;
     /// 11. zoom steps (feature 064): the timebase stepped down twice and up once, as two pinch-outs and a pinch-in send;
     /// 12. a preset applied (feature 064): the built-in "Bass detail" (index 1).
+    /// 13. frozen capture metadata (feature 065, the manual's Phase 05 fixture): the test signal frozen, then the gain
+    ///    raised and the timebase changed; the frozen window's sample rate, channel count, start, count and samples stay
+    ///    as frozen (`ScopeSessionTests` checks the held window; the state keeps `frozen`).
     /// The flat line (silence) needs a silent source, which no action selects; `ScopeSessionTests` proves it in both
     /// modes with an injected silent source.
     public static var fixtureEntries: [[ScenarioStep]] {
@@ -93,6 +96,8 @@ extension ScopeCore {
             [step("timebase.select", [3]), step("timebase.select", [2]), step("timebase.select", [1]),
              step("timebase.select", [2]), ScenarioStep(steps: 30)],
             [step("preset.apply", [1]), ScenarioStep(steps: 30)],
+            [step("source.select", [0]), step("freeze.set", [1]), step("gain.select", [2]),
+             step("timebase.select", [4]), ScenarioStep(steps: 30)],
         ]
     }
 

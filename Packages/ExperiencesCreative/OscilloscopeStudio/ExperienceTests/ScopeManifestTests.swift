@@ -29,13 +29,13 @@ private func play(_ spec: ScenarioSpec) async throws -> (initial: String, result
 }
 
 @Suite struct ScopeManifestTests {
-    @Test func theManifestIsValidWithTheNineStandardScenariosAndTwelveFixtures() {
+    @Test func theManifestIsValidWithTheNineStandardScenariosAndThirteenFixtures() {
         let manifest = ScopeCore.manifest(for: id)
         let problems = ScenarioManifestValidator.problems(manifest, controls: ScopeCore.controls,
-                                                          content: ContentRequirement(fixtures: 12))
+                                                          content: ContentRequirement(fixtures: 13))
         #expect(problems.isEmpty, "\(problems)")
         #expect(Set(manifest.scenarios.map(\.name))
-                == Set(ScenarioManifest.standardNames).union((1...12).map { "fixture-\($0)" }))
+                == Set(ScenarioManifest.standardNames).union((1...13).map { "fixture-\($0)" }))
     }
 
     @Test func derivedDigestsAndResultsAreWhatTheEngineGives() async throws {
@@ -84,6 +84,8 @@ private func play(_ spec: ScenarioSpec) async throws -> (initial: String, result
         #expect(zoomed.timebaseIndex == 2)
         let preset = ScopeCore.played(seed: seed, entries: ScopeCore.fixtureEntries[11]).state
         #expect(preset.frequency == 100 && preset.gain == 2 && preset.timebaseMilliseconds == 5)
+        let metadata = ScopeCore.played(seed: seed, entries: ScopeCore.fixtureEntries[12]).state
+        #expect(metadata.frozen && metadata.source == .testSignal && metadata.gainIndex == 2 && metadata.timebaseIndex == 4)
     }
 
     /// The JSON form with the control ids, named by `Catalog/registrations.json`. `UPDATE_SCENARIO_MANIFEST=1`

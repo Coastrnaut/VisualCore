@@ -754,6 +754,59 @@
       },
       "name" : "fixture-12",
       "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "source.select",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 5
+        },
+        {
+          "action" : {
+            "control" : "freeze.set",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 5
+        },
+        {
+          "action" : {
+            "control" : "gain.select",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 5
+        },
+        {
+          "action" : {
+            "control" : "timebase.select",
+            "values" : [
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 5
+        },
+        {
+          "steps" : 30
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "b378d8cfccf595c9cf8e806d194f29a2a36e8d6a8b8ee1019eca5b4b0997ae8e",
+        "initialDigest" : "cffaa23aa0f9d894a63f7bca30aaa498b478130a6a9bbdfcbaa5f9bfec6db3fe"
+      },
+      "name" : "fixture-13",
+      "seed" : "7"
     }
   ],
   "schema" : 1

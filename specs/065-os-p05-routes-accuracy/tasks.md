@@ -24,7 +24,7 @@
 
 ## Phase 5: User Story 4 — the freeze metadata fixture (P2)
 
-- [ ] T-A08-506 [US4] Manifest fixture "frozen capture metadata" in `Experience/Adapter/ScopeManifest.swift`, regenerate `scenario-manifest.json` (`UPDATE_SCENARIO_MANIFEST=1 TEST_RUNNER_UPDATE_SCENARIO_MANIFEST=1`), update `ExperienceTests/ScopeManifestTests.swift`; session test: a frozen window's sample rate, channel count, start, count and samples stay identical over frames, a gain change, a level change and a source change from stereo to mono (the frozen window keeps two channels) (FR-A08-531; SC-A08-505)
+- [X] T-A08-506 [US4] Manifest fixture "frozen capture metadata" in `Experience/Adapter/ScopeManifest.swift`, regenerate `scenario-manifest.json` (`UPDATE_SCENARIO_MANIFEST=1 TEST_RUNNER_UPDATE_SCENARIO_MANIFEST=1`), update `ExperienceTests/ScopeManifestTests.swift`; session test: a frozen window's sample rate, channel count, start, count and samples stay identical over frames, a gain change, a level change and a microphone route change from two channels to one (the frozen window keeps two channels; a change of source releases the freeze by design since A08-P04) (FR-A08-531; SC-A08-505) — Verified 2026-11-14: 2026-11-14: fixture-13 (frozen capture metadata) in scenario-manifest.json; ScopeManifestTests 13 fixtures; ScopeSessionTests.testAFrozenWindowKeepsItsMetadataOverGainLevelAndRouteChanges; scope-ios27 160 tests 0 failures (.autonomy/checks/A08-P05.scope-ios27.json)
 
 ## Phase 6: Polish & evidence
 

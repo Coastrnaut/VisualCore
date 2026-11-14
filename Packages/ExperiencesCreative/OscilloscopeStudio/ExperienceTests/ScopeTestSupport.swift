@@ -70,6 +70,21 @@ final class ScopeQuietMicrophone: StereoAudioSource {
     func stop() { state = .idle }
 }
 
+/// A microphone double with samples: the stereo test signal (1 kHz and 1.5 kHz) behind a route channel count set by
+/// a test, as a route change would set it (feature 065).
+@MainActor
+final class ScopeRouteMicrophone: StereoAudioSource {
+    private let inner = TestSignalAudioSource(signal: TestSignal(waveform: .sine, frequency: 1_000, amplitude: 0.5,
+                                                                  channelCount: 2, rightRatio: 1.5))
+    /// The channel count of the simulated route (1 or 2).
+    var channelCount = 2
+    var sampleRate: Double { inner.sampleRate }
+    var state: AudioSourceState { inner.state }
+
+    func start(into buffer: StereoSampleBuffer) throws { try inner.start(into: buffer) }
+    func stop() { inner.stop() }
+}
+
 /// A deterministic two-channel source double: renders its `TestSignal` synchronously, `initialFrames` frames in
 /// `start(into:)` and `advance(_:)` frames on request; no timer, so source time moves only when a test says so.
 @MainActor
