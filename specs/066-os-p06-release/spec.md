@@ -169,7 +169,8 @@ An interface test chunk walks Oscilloscope Studio's main journeys in the real ap
 - **FR-A08-620**: A release checklist with an artifact inventory, a store text input with a traceability table, the
   device-campaign plan and a release configuration MUST exist and pass the release-document check.
 - **FR-A08-621**: The copy-claim check MUST find no measured or unimplemented claim in the store text and the interface
-  copy; signal units shown to the person are marked as such line by line.
+  copy; signal units shown to the person are marked as such line by line; the store text and the interface copy MUST
+  NOT contain the words calibrated, certified, laboratory or medical (the store text says "relative to full scale").
 - **FR-A08-622**: Known limitations MUST list Oscilloscope Studio's device-only items; the device-campaign plan names
   each measurement with its device and pass criterion, results pending.
 - **FR-A08-623**: The device-campaign plan MUST include the accessibility audits (VoiceOver labels and values, Dynamic
