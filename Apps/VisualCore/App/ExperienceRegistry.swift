@@ -1,6 +1,7 @@
 // ExperienceRegistry — feature 190 T-U04-011 (FR-U04-010, FR-U04-011; research R2). The one explicit list of the
 // experiences the app can open: for each an id and a factory. It is empty in this feature, because no experience
 // is integrated yet; an integration adds its line here and nowhere else.
+import AudioOdysseyExperience
 import FluidArtPlaygroundExperience
 import FractalExplorerExperience
 import GenerativeArtStudioExperience
@@ -66,7 +67,7 @@ enum ExperienceRegistry {
     /// each carries its scenario manifest, so that the verification runner can open it, but it stays unavailable
     /// in the catalog and outside `all`. Debug builds show them with `-vcCandidates`. Recording an experience's X
     /// gate moves its registration from here to `all`.
-    static let candidates: [ExperienceRegistration] = []
+    static let candidates: [ExperienceRegistration] = [audioOdyssey].compactMap { $0 }
 
     /// A01 Generative Art Studio (feature 193, US1).
     private static var generativeArtStudio: ExperienceRegistration? {
@@ -163,6 +164,20 @@ extension ExperienceRegistry {
         }
         #if DEBUG || VISUALCORE_AUTOMATION
         registration.scenarioManifest = MusicLabCore.manifest(for: id)
+        #endif
+        return registration
+    }
+    /// A07 Audio Odyssey (feature 054, A07-P01): a candidate until X-A07.
+    fileprivate static var audioOdyssey: ExperienceRegistration? {
+        guard let id = AudioOdysseyExperience.id else { return nil }
+        var registration = ExperienceRegistration(id: id, core: OdysseyCore.self) { launch in
+            let system = SystemAccessibilityObserver.systemValues()
+            return AudioOdysseyExperience.make(id: id, storage: launch.storage,
+                                               reduceMotion: launch.reduceMotion.resolved(system: system.reduceMotion),
+                                               reduceFlashing: launch.reduceFlashing.resolved(system: system.dimFlashingLights))
+        }
+        #if DEBUG || VISUALCORE_AUTOMATION
+        registration.scenarioManifest = OdysseyCore.manifest(for: id)
         #endif
         return registration
     }

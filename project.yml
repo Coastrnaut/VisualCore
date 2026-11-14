@@ -175,6 +175,8 @@ targets:
         product: InfiniteGeometryExperience
       - package: ExperiencesCreative
         product: VisualCoreMusicLabExperience
+      - package: ExperiencesCreative
+        product: AudioOdysseyExperience
     postBuildScripts:
       - name: Bundle licenses (UA-F04)
         basedOnDependencyAnalysis: false
