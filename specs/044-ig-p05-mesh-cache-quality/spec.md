@@ -22,6 +22,39 @@ Canonical overrides:
 - **Owner rulings of 2026-11-13:** short tests; device timing and audits wait for the device campaign; parallel agents;
   no wall-clock assertions on CI runners.
 
+## Clarifications
+
+### Session 2026-11-13
+
+Answered autonomously under the owner's standing delegation, recommended option each time. Facts checked in code:
+`ExperienceCore.setQualityTier(_:)` exists ("must not change the digest"; default does nothing) and the session calls it
+through `ExperienceShell.setQualityTier` with the level in force from `QualityGovernor` (pin from the app's
+`qualityOverride` preference, so the "render-quality setting" already exists in the app); a core declares
+`qualityTiers` and `qualityProfile` (`QualityLevel` with `elementShare`); the solid is built by
+`Composition.solid` with a fixed `petalSegments = 24` revolution and the mesh triangle count is proportional to the
+segments; `StableHash` exists in VisualCoreMath.
+
+- Q: Where is the tessellation chosen and the drawn mesh built, given the tier must not change the digest? → A: The
+  core keeps building its reference composition at full tessellation (24 segments) for its digest and bounds, and stores
+  the tier outside the digest and snapshot; the presenter builds the drawn solid through the mesh cache at the tier's
+  segment count. The reference mesh's bounding sphere contains every lower-tier mesh (their vertices lie on the same
+  surface of revolution), so the Phase 03 camera rule stays valid.
+- Q: Which quality levels? → A: Four, from best: "Full" (24 segments, element share 1), "High" (16, ⅔), "Medium" (12, ½),
+  "Low" (8, ⅓); resolution share 1 and no effect passes at every level. The cheapest draws a third of the best's
+  triangles (≤ 50% required).
+- Q: What does the framework tessellation choice compute? → A: From a full segment count, a minimum and a tier's element
+  share: segments = max(minimum, round(full × share)), lowered further while a supplied vertex estimate exceeds the mesh
+  budget; monotonic in the share by construction (VisualCoreDiagnostics, G-MESHLOD).
+- Q: What are the cache limits and the size of a mesh? → A: 16 entries and 32 MiB by default (settable); a mesh's size is
+  its vertex data (positions, normals and texture coordinates as 4-byte floats) plus 4 bytes per index; keys are a
+  64-bit `StableHash` of the signature; least-recently-used eviction ordered by a monotonically increasing use counter, so
+  ties cannot occur (VisualCoreScenes, G-MESHCACHE).
+- Q: How are proportions measured when tilings fill the whole view? → A: Three checks at four view shapes (portrait
+  9:19.5, square, 4:3, landscape 19.5:9): the bounded kaleidoscope is drawn and the bounding box of its non-background
+  pixels is square within 1 pixel; for the tilings, the presenter's world-to-pixel mapping maps a unit in x and in y to
+  the same number of pixels within 1 pixel (checked on a drawn probe point pair); for the 3D composition, the projected
+  bounding sphere's horizontal and vertical extents in pixels agree within 1 pixel.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - The 3D composition adapts to the device (Priority: P1) 🎯
@@ -79,8 +112,8 @@ their ratio matches the expected ratio within one pixel.
 
 **Acceptance Scenarios**:
 
-1. **Given** views of aspect 9:19.5, 1:1, 4:3 and 19.5:9, **When** each 2D preset is drawn, **Then** the measured extent
-   of the composition is equal horizontally and vertically within 1 pixel.
+1. **Given** views of aspect 9:19.5, 1:1, 4:3 and 19.5:9, **When** each 2D preset is drawn, **Then** the kaleidoscope's
+   drawn extent is square and the tilings' world-to-pixel scale is equal in x and y, within 1 pixel.
 2. **Given** the same views, **When** the 3D composition is drawn, **Then** the projected extent of its bounding sphere
    is circular within 1 pixel.
 
@@ -97,8 +130,8 @@ their ratio matches the expected ratio within one pixel.
 ### Functional Requirements
 
 **Adaptive tessellation (story 1)**
-- **FR-A05-501**: The experience MUST declare a quality profile of at least three levels and draw the 3D composition with
-  a tessellation chosen from the current tier.
+- **FR-A05-501**: The experience MUST declare a quality profile of four levels (Full, High, Medium, Low) and draw the 3D
+  composition with a tessellation chosen from the current tier (24, 16, 12, 8 segments).
 - **FR-A05-502**: The tessellation MUST be monotonic: a cheaper tier never draws more triangles than a better one; the
   cheapest draws at most half the triangles of the best.
 - **FR-A05-503**: Every drawn mesh at every tier MUST be closed, valid and within the mesh budget.
@@ -141,8 +174,8 @@ their ratio matches the expected ratio within one pixel.
 - **SC-A05-502**: The digest is identical at every tier for every preset kind (100%).
 - **SC-A05-503**: A → B → A at one tier gives exactly one hit and two builds; 200 seeded random access sequences never
   exceed the cache limits and evict in least-recently-used order (100%).
-- **SC-A05-504**: On four view aspects, measured horizontal and vertical extents agree within 1 pixel for every preset on
-  both simulator runtimes.
+- **SC-A05-504**: On four view aspects, the three proportion checks of the Clarifications agree within 1 pixel for every
+  preset on both simulator runtimes.
 - **SC-A05-505**: The runner passes the nine scenarios and five fixtures on both runtimes; the reference regression passes
   7 of 7; the public-API baseline lists the new types, all documented.
 - **SC-A05-506**: Every new test finishes in under 10 seconds.
