@@ -119,7 +119,7 @@ and `VisualCoreRendering` (iOS, GL). ADR-0003 and the package map record this. R
 - Journeys stay on the device (no sync); at most 64 files fit in the experience's storage, and a save beyond the quota
   is refused with a message.
 
-### Oscilloscope Studio (A08; feature 065 T-A08-512)
+### Oscilloscope Studio (A08; features 065–066)
 
 - Real two-channel routes, route changes, input latency, 44.1 kHz routes, frame time per view and quality level and the
   thermal state over ten minutes are unmeasured on devices; they wait for the device campaign
@@ -130,6 +130,13 @@ and `VisualCoreRendering` (iOS, GL). ADR-0003 and the package map record this. R
 - VoiceOver on hardware, the announcements and the system accessibility audits wait for the device campaign.
 - Drawn columns and the spectrum analysis rate follow the host's quality level; the scope state and its digest never
   change with it. Sound is analysed in memory only and never recorded.
+- Saved presets stay on the device (no sync, no sharing, no export). The experience's folder holds at most 64 files
+  and 16 MiB together (`StorageQuota`); a save beyond that is refused with a message saying the storage is full and
+  changes nothing (`ScopePresetStore`; `ScopePresetStoreTests.testASaveBeyondTheStorageLimitIsRefusedAndChangesNothing`).
+- A picked file is read in place and not remembered by its contents or address; after a restore the person chooses it
+  again ("The audio file is no longer available. Choose it again, or use the test signal.").
+- Persistence, the container's contents, memory, CPU and GPU frame time per view, Dynamic Type, Reduce Motion and
+  Reduce Flashing and trace contrast are unchecked on devices; they wait for the device campaign.
 
 ## Distribution
 
