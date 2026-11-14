@@ -31,7 +31,7 @@
 - [X] T-A09-110 Experience package check (`python3 Tools/python/desktop_runbook.py run-check --stage A09-P01 --timeout 600 --name experience-packages -- python3 scripts/check_experience_packages.py`) — Verified 2026-11-14: 2026-11-14: .autonomy/checks/A09-P01.experience-packages.json exit 0 (9 experiences)
 - [X] T-A09-111 Contract: G-HABITAT closed by "A09-P01" with rows M09 and M20 available and their evidence; `python3 Tools/python/desktop_runbook.py run-check --stage A09-P01 --timeout 600 --name contract -- python3 scripts/check_app_contract.py --app digital-aquarium --render` — Verified 2026-11-14: 2026-11-14: G-HABITAT closed A09-P01; M09 and M20 available; .autonomy/checks/A09-P01.contract.json exit 0
 - [X] T-A09-112 Script tests (`python3 Tools/python/desktop_runbook.py run-check --stage A09-P01 --timeout 600 --name script-tests -- python3 scripts/test_scripts.py`) — Verified 2026-11-14: 2026-11-14: .autonomy/checks/A09-P01.script-tests.json exit 0
-- [ ] T-A09-113 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A09-P01
+- [X] T-A09-113 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A09-P01 — Verified 2026-11-14: 2026-11-14: /speckit-converge appended nothing (12 FR, 5 SC, 4 stories, 12 tasks with evidence; FR-A09-123 resolved to drawn motion)
 
 ## Dependencies
 
