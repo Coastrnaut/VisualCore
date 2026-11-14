@@ -38,7 +38,7 @@
 - [X] T-A05-416 VisualCore: raise `ExperienceControl.maxValues` from 8 to 24 in `Packages/VisualCore/Sources/VisualCoreExperience/ExperienceAction.swift` (doc comment), update `Packages/VisualCore/Tests/VisualCoreExperienceTests/ExperienceActionTests.swift`, the VisualCore README and Auto-Creator §13 where the limit is stated; evidence `python3 Tools/python/desktop_runbook.py run-check --stage A05-P04 --timeout 600 --name visualcore-host -- swift test --package-path Packages/VisualCore` (approved in Clarifications; FR-A05-402) — Verified 2026-11-13: 2026-11-13 .autonomy/checks/A05-P04.visualcore-host.json (VisualCore full suite, exit 0)
 - [X] T-A05-417 Reference chunk 1 (`python3 Tools/python/desktop_runbook.py run-check --stage A05-P04 --timeout 600 --name reference-1 -- python3 scripts/release_check.py --only reference-engine-xcframework reference-build-projectm-ios-sim reference-clean`) — Verified 2026-11-13: 2026-11-13 .autonomy/checks/A05-P04.reference-1.json (exit 0)
 - [X] T-A05-418 Reference chunk 2 (`python3 Tools/python/desktop_runbook.py run-check --stage A05-P04 --timeout 600 --name reference-2 -- python3 scripts/release_check.py --only reference-test-anglerendering-ios27 reference-test-anglerendering-ios26 projectm-reference-ios27 projectm-reference-ios26`) — Verified 2026-11-13: 2026-11-13 .autonomy/checks/A05-P04.reference-2.json (exit 0)
-- [ ] T-A05-415 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A05-P04
+- [X] T-A05-415 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A05-P04 — Verified 2026-11-13: 2026-11-13 converge round 1: converged, nothing appended
 
 ## Dependencies
 
