@@ -1,0 +1,68 @@
+{
+  "checks": [
+    {
+      "attestation": ".autonomy/checks/A07-P02.app-unit.json",
+      "command": "python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A07-P02.app-unit.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A07-P02.contract.json",
+      "command": "python3 scripts/check_app_contract.py --app audio-odyssey --render",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A07-P02.contract.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A07-P02.core-ios27.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing AudioOdysseyCoreTests",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A07-P02.core-ios27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A07-P02.experience-packages.json",
+      "command": "python3 scripts/check_experience_packages.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A07-P02.experience-packages.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A07-P02.odyssey-ios27.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing AudioOdysseyCoreTests AudioOdysseyExperienceTests",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A07-P02.odyssey-ios27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A07-P02.public-api.json",
+      "command": "python3 scripts/check_public_api.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A07-P02.public-api.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A07-P02.rendering-ios27.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --only-testing VisualCoreRenderingTests/MeshFogTests VisualCoreRenderingTests/DepthMeshPassTests VisualCoreRenderingTests/MeshRendererTests VisualCoreRenderingTests/ShaderValidationTests",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A07-P02.rendering-ios27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A07-P02.scenes-host.json",
+      "command": "swift test --package-path Packages/VisualCore --filter 'SegmentWindowTests|SlotPoolTests'",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A07-P02.scenes-host.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A07-P02.script-tests.json",
+      "command": "python3 scripts/test_scripts.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A07-P02.script-tests.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A07-P02.verify-27.json",
+      "command": "python3 scripts/verify_experiences.py --only a07.audio-odyssey --runtime 27",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A07-P02.verify-27.log"
+    }
+  ],
+  "generated": "2026-11-14T11:14:24+00:00",
+  "method": "deterministic-run-check",
+  "stage": "A07-P02",
+  "status": "pass"
+}

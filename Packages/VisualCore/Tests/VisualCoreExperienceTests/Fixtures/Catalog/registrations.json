@@ -140,10 +140,13 @@
     "a07.audio-odyssey": {
       "capabilities": [
         "camera rail",
-        "procedural tunnel",
+        "audio-reactive tunnel",
         "procedural landscape",
         "star corridor",
-        "comfort limits"
+        "comfort limits",
+        "demo signal",
+        "live microphone input",
+        "audio files"
       ],
       "quality_tiers": [
         "level-0"
@@ -155,7 +158,10 @@
         "#DCE6FF"
       ],
       "content": null,
-      "manifest": "Packages/ExperiencesCreative/AudioOdyssey/scenario-manifest.json"
+      "manifest": "Packages/ExperiencesCreative/AudioOdyssey/scenario-manifest.json",
+      "permissions": [
+        "microphone"
+      ]
     }
   }
 }

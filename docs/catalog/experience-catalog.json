@@ -1432,10 +1432,10 @@
     "state": "standalone-partial",
     "legacy_gates_passed": [
      "A07-P00",
-     "A07-P01"
+     "A07-P01",
+     "A07-P02"
     ],
     "legacy_gates_pending": [
-     "A07-P02",
      "A07-P03",
      "A07-P04",
      "A07-P05",
