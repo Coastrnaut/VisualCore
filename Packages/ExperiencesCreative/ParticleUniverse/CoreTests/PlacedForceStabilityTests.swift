@@ -6,12 +6,15 @@ import VisualCoreMath
 
 @Test(arguments: PlacedForceKind.allCases)
 func emittersOnAForceCenterStayFinite(kind: PlacedForceKind) throws {
-    // Every family's emitter sits exactly on the force at strength 2; 10,000 fixed steps.
+    // Every family's emitter sits exactly on the force at strength 2; 2,000 fixed steps (16.7 s of simulation at 1/120 s,
+    // over four times the longest family lifetime of 4 s, so every particle alive at the end was born and lived its whole
+    // life on the force). Shortened from 10,000 steps under the owner's short-test rule of 2026-11-13: the population is
+    // in its steady state after one lifetime, so further steps repeat the same states.
     let center = Vec2(120, -80)
     for family in EmitterFamily.allCases {
         var sim = try SceneSimulation(scene: ParticleScene(seed: 4, emitters: [SceneEmitter(family: family, position: center)]))
         sim.setPlacedForce(PlacedForce(kind: kind, position: center, strength: 2))
-        sim.run(steps: 10_000)
+        sim.run(steps: 2_000)
         #expect(sim.nonFiniteRemoved == 0, "\(kind) on \(family)")
         #expect(sim.instances().allSatisfy { $0.position.isFinite && $0.size.isFinite })
         #expect(sim.liveCount > 0)
