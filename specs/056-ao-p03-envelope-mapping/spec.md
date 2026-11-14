@@ -130,7 +130,8 @@ Switching between the demo, a file and the microphone never restarts the drawing
 
 **Envelope and mapping (story 2)**
 - **FR-A07-310**: The experience MUST build an audio envelope (low, mid, high, transient, each 0…1, with its timestamp)
-  from the analysed sound each frame.
+  from the analysed sound each frame, plus a derived overall channel (the mean of low, mid and high) that mappings can
+  choose.
 - **FR-A07-311**: Each world MUST have two responses (tunnel: width, light; landscape: height, light; star corridor:
   sparkle, light), each mapped to one envelope channel with a sensitivity; responses stay within bounds and change at
   most a step per frame.
@@ -150,7 +151,7 @@ Switching between the demo, a file and the microphone never restarts the drawing
 
 ### Key Entities
 
-- **Audio envelope**: low, mid, high, transient (0…1), timestamp.
+- **Audio envelope**: low, mid, high, transient (0…1), derived overall, timestamp.
 - **World mapping**: per world, two responses each with a channel and a sensitivity.
 - **Comfort settings**: speed (continuous), easing (gentle, standard, brisk), calm motion (on/off).
 
