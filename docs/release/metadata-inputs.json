@@ -41,15 +41,25 @@
       "name": "Infinite Geometry",
       "permissions": [],
       "tier": "free"
+    },
+    {
+      "category": "audio",
+      "code": "A06",
+      "id": "a06.visualcore-music-lab",
+      "name": "VisualCore Music Lab",
+      "permissions": [
+        "microphone"
+      ],
+      "tier": "free"
     }
   ],
-  "ledger_sha256": "d1a70fb701e0e011f9fb58361d2836f35b2a1d15a47961aeec5b79485ba79167",
+  "ledger_sha256": "31683a95b58136c91ca240b6d7105841e5e9c17542fa35a9766518d98c75b9d8",
   "privacy_answers": {
     "data_collected": "none",
     "proof": {
-      "executable_sha256": "faa40643ef172bb42e09b8afadae1d177a8d5bde657c8c3161b0e9e5944a0422",
-      "privacy_report": ".autonomy/logs/ua-f11/privacy-20261114T004439.json",
-      "tracking_report": ".autonomy/logs/ua-f11/tracking-20261114T004439.json"
+      "executable_sha256": "8692b99c63bb9c8b575b91c58c6164186c9b3e3fc7d8b49e24ee41f7eb1d19c4",
+      "privacy_report": ".autonomy/logs/ua-f11/privacy-20261114T042711.json",
+      "tracking_report": ".autonomy/logs/ua-f11/tracking-20261114T042711.json"
     },
     "tracking": "no"
   },
