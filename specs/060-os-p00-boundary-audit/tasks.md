@@ -25,7 +25,7 @@
 
 ## Phase 6: User Story 4 — Stop/go decision (P2)
 
-- [ ] T-A08-008 [US4] Complete the contract's `gaps` (every non-available row: owning VisualCore module and phase A08-P01..P06) and `decision` (verdict and reasons; "stop" if no working host or buildable audio path; trigger and timebase window, min/max decimation, square and sweep demo, two-channel capture, multi-point trace strips and spectrum annotation assessed per FR-A08-003 with the owners of clarification 5); re-run the checker (`python3 Tools/python/desktop_runbook.py run-check --stage A08-P00 --timeout 600 --name contract-final -- python3 scripts/check_app_contract.py --app oscilloscope-studio --render`) (FR-A08-003, 006; SC-A08-002)
+- [X] T-A08-008 [US4] Complete the contract's `gaps` (every non-available row: owning VisualCore module and phase A08-P01..P06) and `decision` (verdict and reasons; "stop" if no working host or buildable audio path; trigger and timebase window, min/max decimation, square and sweep demo, two-channel capture, multi-point trace strips and spectrum annotation assessed per FR-A08-003 with the owners of clarification 5); re-run the checker (`python3 Tools/python/desktop_runbook.py run-check --stage A08-P00 --timeout 600 --name contract-final -- python3 scripts/check_app_contract.py --app oscilloscope-studio --render`) (FR-A08-003, 006; SC-A08-002) — Verified 2026-11-14: 2026-11-14: .autonomy/checks/A08-P00.contract-final.json exit 0; 10 gaps with owners and phases (G-DEMOWAVES, G-STEREO P01; G-TRIGGER, G-DECIMATION, G-TRACESTRIP P02; app-local P03-P05); decision go
 
 ## Phase 7: Polish and evidence
 
