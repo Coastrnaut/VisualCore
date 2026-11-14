@@ -141,8 +141,13 @@ enum PU {
     static func reveal(_ app: XCUIApplication, _ target: XCUIElement,
                        file: StaticString = #filePath, line: UInt = #line) -> Bool {
         _ = target.waitForExistence(timeout: VC.wait)
-        for forward in [true, false] {
-            for _ in 0..<14 where !(target.exists && target.isHittable) { drag(app, forward: forward) }
+        // Stop as soon as the target is reachable: a `for … where` loop would keep querying the accessibility tree
+        // 28 times after the target was found (about 5 s per call in the first Infinite Geometry k2 run).
+        search: for forward in [true, false] {
+            for _ in 0..<14 {
+                if target.exists && target.isHittable { break search }
+                drag(app, forward: forward)
+            }
         }
         let found = target.exists && target.isHittable
         XCTAssertTrue(found, "not reached by scrolling the controls: \(target)", file: file, line: line)
