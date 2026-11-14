@@ -70,3 +70,35 @@ private func near(_ a: Vec2, _ b: Vec2) -> Bool { abs(a.x - b.x) < 1e-12 && abs(
     n.removeFromParent()
     #expect(b.children.isEmpty && n.parent == nil)
 }
+
+// feature 062 (A08-P02) T-A08-203 (FR-A08-202; gap G-TRACESTRIP): polyline bounding and hit testing.
+@Test func polylineBoundedTruncatesAndDropsNonFinitePoints() {
+    let many = (0..<9_000).map { Vec2(Double($0), 0) }
+    guard case .polyline(let kept, let w) = Primitive.polyline(many, width: 2).bounded else {
+        Issue.record("polyline kept"); return
+    }
+    #expect(kept.count == Primitive.maxPolylinePoints && kept.last == Vec2(8_191, 0) && w == 2)
+    let dirty = [Vec2(0, 0), Vec2(.nan, 1), Vec2(1, .infinity), Vec2(2, 2), Vec2(-.infinity, 0), Vec2(3, 3)]
+    #expect(Primitive.polyline(dirty, width: 1).bounded == .polyline([Vec2(0, 0), Vec2(2, 2), Vec2(3, 3)], width: 1))
+    // Non-finite points do not count towards the 8,192 cap.
+    let mixed = [Vec2(.nan, .nan)] + many
+    if case .polyline(let k, _) = Primitive.polyline(mixed, width: 1).bounded { #expect(k.first == Vec2(0, 0) && k.count == 8_192) }
+    #expect(Primitive.polyline([Vec2(0, 0)], width: -3).bounded == .polyline([Vec2(0, 0)], width: 3))
+    #expect(Primitive.polyline([Vec2(0, 0)], width: .nan).bounded == .polyline([Vec2(0, 0)], width: 0))
+    let node = SceneNode(primitive: .polyline(dirty, width: -1))
+    #expect(node.primitive == .polyline([Vec2(0, 0), Vec2(2, 2), Vec2(3, 3)], width: 1))
+}
+
+@Test func polylineContainsOnAndOffZigZag() {
+    let zig = Primitive.polyline([Vec2(0, 0), Vec2(1, 1), Vec2(2, 0), Vec2(3, 1)], width: 0.2)
+    #expect(zig.contains(Vec2(0.5, 0.5)))      // on the first segment
+    #expect(zig.contains(Vec2(1.5, 0.5)))      // on the second
+    #expect(zig.contains(Vec2(2.5, 0.55)))     // within half-width of the third
+    #expect(zig.contains(Vec2(3, 1.09)))       // near the end point
+    #expect(!zig.contains(Vec2(1, 0)))         // in the valley, far from every segment
+    #expect(!zig.contains(Vec2(3.2, 1)))       // past the end
+    #expect(!zig.contains(Vec2(1.5, 0.8)))
+    #expect(!Primitive.polyline([], width: 10).contains(.zero))
+    let dot = Primitive.polyline([Vec2(1, 1)], width: 1)
+    #expect(dot.contains(Vec2(1.4, 1)) && !dot.contains(Vec2(1.6, 1)))
+}

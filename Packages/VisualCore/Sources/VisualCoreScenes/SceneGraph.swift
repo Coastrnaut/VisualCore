@@ -1,5 +1,6 @@
 // SceneGraph.swift — 2D scene nodes, primitives, world transforms, draw order and hit testing
 // (feature 006 T-F511; FR-F506, FR-F512). World space is y-up (Camera2D).
+// feature 062 (A08-P02) T-A08-203: polyline (G-TRACESTRIP)
 import VisualCoreMath
 
 /// Filled 2D shape drawn at a scene node's local origin.
@@ -10,11 +11,17 @@ public enum Primitive: Sendable, Equatable {
     case line(Vec2, Vec2, width: Double)
     /// Simple polygon (≤ 256 points, even-odd fill).
     case polygon([Vec2])
+    /// Open stroked path through `points` in order (≤ 8,192 finite points), `width` wide; each non-zero segment draws
+    /// exactly like a two-point `.line` of the same width (feature 062, FR-A08-202).
+    case polyline([Vec2], width: Double)
 
     /// Maximum polygon vertex count kept by `bounded`; extra points are dropped.
     public static let maxPolygonPoints = 256
+    /// Maximum polyline point count kept by `bounded` (two points per column for 4,096 columns); extra points are dropped.
+    public static let maxPolylinePoints = 8_192
 
-    /// The primitive with sizes made non-negative and finite and the polygon truncated to 256 points (FR-F512).
+    /// The primitive with sizes made non-negative and finite, the polygon truncated to 256 points (FR-F512) and the
+    /// polyline reduced to its first 8,192 finite points.
     public var bounded: Primitive {
         func f(_ v: Double) -> Double { v.isFinite ? abs(v) : 0 }
         switch self {
@@ -22,18 +29,37 @@ public enum Primitive: Sendable, Equatable {
         case .circle(let r): return .circle(f(r))
         case .line(let a, let b, let w): return .line(a, b, width: f(w))
         case .polygon(let p): return .polygon(Array(p.prefix(Self.maxPolygonPoints)))
+        case .polyline(let p, let w):
+            var kept: [Vec2] = []
+            kept.reserveCapacity(Swift.min(p.count, Self.maxPolylinePoints))
+            for v in p where v.x.isFinite && v.y.isFinite {
+                kept.append(v)
+                if kept.count == Self.maxPolylinePoints { break }
+            }
+            return .polyline(kept, width: f(w))
         }
     }
 
-    /// Whether a local-space point lies inside the shape.
+    /// Distance from `p` to the segment `a`–`b` (to `a` when the segment is a point).
+    private static func distance(_ p: Vec2, _ a: Vec2, _ b: Vec2) -> Double {
+        let ab = b - a, len2 = ab.dot(ab)
+        let t = len2 > 0 ? min(max((p - a).dot(ab) / len2, 0), 1) : 0
+        return p.distance(to: a + ab * t)
+    }
+
+    /// Whether a local-space point lies inside the shape (for a polyline: within `width / 2` of any segment, or of
+    /// its single point; an empty polyline contains nothing).
     public func contains(_ p: Vec2) -> Bool {
         switch self {
         case .rect(let s): return abs(p.x) <= s.x / 2 && abs(p.y) <= s.y / 2
         case .circle(let r): return p.length <= r
         case .line(let a, let b, let w):
-            let ab = b - a, len2 = ab.dot(ab)
-            let t = len2 > 0 ? min(max((p - a).dot(ab) / len2, 0), 1) : 0
-            return p.distance(to: a + ab * t) <= w / 2
+            return Self.distance(p, a, b) <= w / 2
+        case .polyline(let pts, let w):
+            guard let first = pts.first else { return false }
+            if pts.count == 1 { return p.distance(to: first) <= w / 2 }
+            for i in 1..<pts.count where Self.distance(p, pts[i - 1], pts[i]) <= w / 2 { return true }
+            return false
         case .polygon(let pts):
             guard pts.count >= 3 else { return false }
             var inside = false
