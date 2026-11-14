@@ -295,20 +295,32 @@
       "id": "M07",
       "capability": "Time-domain waveform with adjustable gain, timebase and selectable trigger: rising/falling level-crossing detection with hysteresis and holdoff, a timebase window (samples per division from the sample rate) placed at the trigger point, auto/normal/single modes",
       "source": "v0.1 feature 01; manual algorithm decision 1; primary capability waveform/timebase/trigger",
-      "status": "upstream gap",
+      "status": "available",
       "evidence": [
         {
-          "file": "Packages/VisualCore/Sources/VisualCoreAudioDSP/SampleRingBuffer.swift",
-          "symbol": "SampleRingBuffer.latest",
+          "file": "Packages/VisualCore/Sources/VisualCoreAudioDSP/ScopeTrigger.swift",
+          "symbol": "TriggerSettings",
+          "product": "VisualCoreAudioDSP",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreAudioDSP/ScopeTrigger.swift",
+          "symbol": "ScopeTrigger",
+          "product": "VisualCoreAudioDSP",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreAudioDSP/ScopeTrigger.swift",
+          "symbol": "TimebaseWindow",
           "product": "VisualCoreAudioDSP",
           "public": true
         }
       ],
       "example": {
-        "file": "Packages/ExperiencesCreative/VisualCoreMusicLab/Experience/MusicLabPresenter.swift",
-        "symbol": "MusicLabPresenter"
+        "file": "Packages/ExperiencesCreative/OscilloscopeStudio/Experience/ScopePresenter.swift",
+        "symbol": "ScopePresenter"
       },
-      "notes": "SampleRingBuffer.latest returns the newest N samples with no trigger alignment; no trigger, crossing or timebase type exists in any product (grep 2026-11-14), and Music Lab's waveform free-runs. G-TRIGGER: TriggerDetector and TimebaseWindow in VisualCoreAudioDSP, A08-P02. Gain is a plain multiply in the experience."
+      "notes": "SampleRingBuffer.latest returns the newest N samples with no trigger alignment; no trigger, crossing or timebase type exists in any product (grep 2026-11-14), and Music Lab's waveform free-runs. G-TRIGGER: TriggerDetector and TimebaseWindow in VisualCoreAudioDSP, A08-P02. Gain is a plain multiply in the experience. Built in A08-P01 (G-TRIGGER moved from A08-P02 because the manual's Phase 01 gate asks for a selectable trigger): level, rising/falling slope, hysteresis, auto and normal modes, TimebaseWindow (10 divisions, cap 4,096), tested in ScopeTriggerTests and OscilloscopeStudio ScopeAcquisitionTests. Single-shot capture arrives with freeze (G-SCOPEINTERACT, A08-P04)."
     },
     {
       "id": "M08",
@@ -339,26 +351,32 @@
       "id": "M09",
       "capability": "Two-channel (stereo) capture for the XY view: left and right sample streams kept separate from the source to the analysis buffers",
       "source": "v0.1 feature 02; manual validity risk routing",
-      "status": "upstream gap",
+      "status": "available",
       "evidence": [
         {
-          "file": "Packages/VisualCoreRendering/Sources/VisualCoreAudio/AudioSource.swift",
-          "symbol": "AudioSource",
+          "file": "Packages/VisualCore/Sources/VisualCoreAudioDSP/StereoSampleBuffer.swift",
+          "symbol": "StereoSampleBuffer",
+          "product": "VisualCoreAudioDSP",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreAudio/StereoAudioSource.swift",
+          "symbol": "StereoAudioSource",
           "product": "VisualCoreAudio",
           "public": true
         },
         {
-          "file": "Packages/VisualCoreRendering/Sources/VisualCoreAudio/MicrophoneAudioSource.swift",
-          "symbol": "MicrophoneAudioSource",
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreAudio/StereoFileAudioSource.swift",
+          "symbol": "StereoFileAudioSource",
           "product": "VisualCoreAudio",
           "public": true
         }
       ],
       "example": {
-        "file": "Packages/ExperiencesCreative/VisualCoreMusicLab/Experience/MusicLabPresenter.swift",
-        "symbol": "MusicLabPresenter"
+        "file": "Packages/ExperiencesCreative/OscilloscopeStudio/Experience/ScopePresenter.swift",
+        "symbol": "ScopePresenter"
       },
-      "notes": "Every shared source writes mono: AudioSource is 'a producer of mono Float audio samples' and MicrophoneAudioSource and FileAudioSource mix down to one channel. G-STEREO: two-channel capture (channel count reported, mono fallback labelled) in VisualCoreAudio, A08-P01."
+      "notes": "Every shared source writes mono: AudioSource is 'a producer of mono Float audio samples' and MicrophoneAudioSource and FileAudioSource mix down to one channel. G-STEREO: two-channel capture (channel count reported, mono fallback labelled) in VisualCoreAudio, A08-P01. Built in A08-P01 for the test-signal and file paths (StereoSampleBuffer, StereoAudioSource, TestSignalAudioSource, StereoFileAudioSource; tested in StereoSampleBufferTests and StereoFileAudioSourceTests). The microphone stays mono through MicrophoneAudioSource; route-dependent stereo microphone capture is M26 (G-STEREOMIC, A08-P05)."
     },
     {
       "id": "M10",
@@ -556,26 +574,26 @@
       "id": "M16",
       "capability": "Demo synthetic generator: sine, square and sweep (chirp) signals with known frequency and amplitude for tests and the no-permission path, never played to the speaker",
       "source": "v0.1 feature 05",
-      "status": "upstream gap",
+      "status": "available",
       "evidence": [
         {
-          "file": "Packages/VisualCore/Sources/VisualCoreAudioDSP/DemoSignal.swift",
-          "symbol": "DemoSignal.Mode",
+          "file": "Packages/VisualCore/Sources/VisualCoreAudioDSP/TestSignal.swift",
+          "symbol": "TestSignal",
           "product": "VisualCoreAudioDSP",
           "public": true
         },
         {
-          "file": "Packages/VisualCoreRendering/Sources/VisualCoreAudio/DemoAudioSource.swift",
-          "symbol": "DemoAudioSource",
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreAudio/TestSignalAudioSource.swift",
+          "symbol": "TestSignalAudioSource",
           "product": "VisualCoreAudio",
           "public": true
         }
       ],
       "example": {
-        "file": "Packages/ExperiencesCreative/VisualCoreMusicLab/Experience/MusicLabPresenter.swift",
-        "symbol": "MusicLabPresenter"
+        "file": "Packages/ExperiencesCreative/OscilloscopeStudio/Experience/ScopePresenter.swift",
+        "symbol": "ScopePresenter"
       },
-      "notes": "DemoSignal.Mode offers sequence, tone440, tone1k and silence only (tested in DemoSignalTests); no square or sweep exists. G-DEMOWAVES: square and sweep modes in VisualCoreAudioDSP (DemoAudioSource follows), A08-P01."
+      "notes": "DemoSignal.Mode offers sequence, tone440, tone1k and silence only (tested in DemoSignalTests); no square or sweep exists. G-DEMOWAVES: square and sweep modes in VisualCoreAudioDSP (DemoAudioSource follows), A08-P01. Built in A08-P01 as a new TestSignal beside DemoSignal (sine, naive square, logarithmic sweep, optional second channel), so A06/A07 digests stay unchanged; tested in TestSignalTests and TestSignalAudioSourceTests."
     },
     {
       "id": "M17",
@@ -867,6 +885,25 @@
         "symbol": "MetricText"
       },
       "notes": "dBFS and peak are tested (LevelMeterTests) and route changes are observed (AudioSessionEventTests); the accuracy statement, clipping threshold and the route/latency audit are experience domain. G-ACCURACY (app-local), A08-P05."
+    },
+    {
+      "id": "M26",
+      "capability": "Route-dependent two-channel microphone capture (external stereo inputs) with the channel count shown",
+      "source": "v0.1 feature 02; manual validity risk routing",
+      "status": "upstream gap",
+      "evidence": [
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreAudio/MicrophoneAudioSource.swift",
+          "symbol": "MicrophoneAudioSource",
+          "product": "VisualCoreAudio",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/OscilloscopeStudio/Experience/ScopePresenter.swift",
+        "symbol": "ScopePresenter"
+      },
+      "notes": "Split from G-STEREO in A08-P01: the shared microphone source mixes to mono, which the scope shows as one channel; stereo routes need the device-route audit. G-STEREOMIC, VisualCoreAudio, A08-P05."
     }
   ],
   "gaps": [
@@ -880,7 +917,7 @@
       "justification": "Found in A08-P00: DemoSignal.Mode has sequence, tone440, tone1k and silence only; test fixtures for any scope or tuner need square and sweep signals.",
       "phase": 1,
       "test": "Host tests: square and sweep modes are deterministic per seed, the square's fundamental lands on expectedBin and its odd harmonics fall by 1/n, the sweep covers its start-end range in the stated time, amplitudes stay within the declared peak, existing modes unchanged (API baseline additive)",
-      "closed": null
+      "closed": "A08-P01"
     },
     {
       "id": "G-STEREO",
@@ -892,7 +929,7 @@
       "justification": "Found in A08-P00: AudioSource is mono by contract and MicrophoneAudioSource/FileAudioSource mix down.",
       "phase": 1,
       "test": "Simulator/host tests: a two-channel source reports its channel count, keeps left and right separate into two ring buffers, falls back to mono with a labelled state when the route has one channel, mono callers unchanged",
-      "closed": null
+      "closed": "A08-P01"
     },
     {
       "id": "G-TRIGGER",
@@ -902,9 +939,9 @@
       "kind": "upstream",
       "owner": "VisualCore:VisualCoreAudioDSP",
       "justification": "Found in A08-P00: no trigger, crossing or timebase type exists in any product.",
-      "phase": 2,
+      "phase": 1,
       "test": "Host tests: rising and falling crossings found at the exact sample with hysteresis rejecting noise, holdoff respected, auto mode free-runs after the timeout, the timebase window spans samples-per-division x divisions from the sample rate, NaN/Inf rejected, no allocation in the steady state",
-      "closed": null
+      "closed": "A08-P01"
     },
     {
       "id": "G-DECIMATION",
@@ -989,6 +1026,18 @@
       "justification": "Accuracy statements and the route/latency audit are the experience's claims (manual P05); the shared numbers are tested in VisualCoreAudioDSP.",
       "phase": 5,
       "test": "Host tests: demo-signal frequency and dBFS readouts within stated tolerance, clipping flagged at full scale, copy contains no calibrated, certified, laboratory or medical claim; route and latency limitations recorded for the device campaign",
+      "closed": null
+    },
+    {
+      "id": "G-STEREOMIC",
+      "matrix": [
+        "M26"
+      ],
+      "kind": "upstream",
+      "owner": "VisualCore:VisualCoreAudio",
+      "justification": "Split from G-STEREO in A08-P01: the test-signal and file paths keep two channels; the microphone stays mono until the device-route audit shows which routes deliver two channels.",
+      "phase": 5,
+      "test": "Simulator tests with a two-channel input double: the channel count is reported, left and right stay separate, a one-channel route falls back to mono with a labelled state; device measurements in the campaign",
       "closed": null
     }
   ],
