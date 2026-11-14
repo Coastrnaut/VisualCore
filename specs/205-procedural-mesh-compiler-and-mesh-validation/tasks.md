@@ -60,3 +60,9 @@ Agent C (after A's builder lands): T-R02F05-008, 009 (shapes). Lead: 011, 012, 0
 ## Implementation strategy
 
 MVP is the builder plus validation (US2) and the shapes (US1); bounds, compatibility and evidence follow.
+
+## Phase 8: Convergence
+
+Appended by `/speckit-converge` (T-R02F05-021, round 1, 2026-11-13).
+
+- [ ] T-R02F05-022 Align `data-model.md` and `contracts/api.md` with the implemented `MeshSummary` (`boundsMin`/`boundsMax: Vec3?` instead of `bounds`, so the summary stays Codable) and the additive builder properties (`budget`, `weldTolerance`, `weldPositionsOnly`, `vertexCount`, `indexCount`) per plan: data model and contracts (partial)
