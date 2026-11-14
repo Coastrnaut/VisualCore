@@ -45,7 +45,7 @@
 - [X] T-R02F05-018 Reference regression chunk 1 (`run-check --name reference-1 -- python3 scripts/release_check.py --only reference-engine-xcframework reference-build-projectm-ios-sim reference-clean`) — Verified 2026-11-13: 2026-11-13 .autonomy/migration/checks/R02-F05.reference-1.json (3/3: engine xcframework, projectm-ios sim build, reference clean)
 - [X] T-R02F05-019 Reference regression chunk 2 (`run-check --name reference-2 -- python3 scripts/release_check.py --only reference-test-anglerendering-ios27 reference-test-anglerendering-ios26 projectm-reference-ios27 projectm-reference-ios26`) — Verified 2026-11-13: 2026-11-13 .autonomy/migration/checks/R02-F05.reference-2.json (4/4: ANGLE rendering tests and ProjectM reference on iOS 27.2 and 26.5)
 - [X] T-R02F05-020 Script tests (`run-check --name script-tests -- python3 scripts/test_scripts.py`) — Verified 2026-11-13: 2026-11-13 .autonomy/migration/checks/R02-F05.script-tests.json (test_scripts.py exit 0)
-- [ ] T-R02F05-021 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record R02-F05
+- [X] T-R02F05-021 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record R02-F05 — Verified 2026-11-13: 2026-11-13 converge round 1 appended T-R02F05-022 (ticked); round 2 appended nothing
 
 ## Dependencies
 
