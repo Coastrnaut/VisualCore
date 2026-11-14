@@ -21,6 +21,43 @@ Canonical overrides:
 - **Constitution:** 2.2.0 adds the A06 experience rules (commit of this gate).
 - **Evidence:** host and simulator only.
 
+## Clarifications
+
+### Session 2026-11-14
+
+Answered autonomously under the owner's standing delegation, recommended option each time. Facts checked in code:
+`scripts/check_experience_packages.py` reports `EXTRA_TARGET` for any experience target of an `Experiences*` package
+that belongs to no registered experience and requires registered experiences to have all four targets and to be linked
+by the app; `LauncherModel.shown` lists only available experiences; the A06 constitution commit is `c37f95fe`; the
+reference submodule is pinned at `d93edd1`.
+
+- Q: How is the manual's "compile an empty shell" gate met in the one app? → A: The one app is the shell: this phase
+  proves the VisualCore app still builds for testing with VisualCore Music Lab absent (not registered, not linked, catalog
+  unavailable). The experience's targets are created in A06-P01 together with its first real domain rules, because an
+  empty target would be an `EXTRA_TARGET` finding and registering an empty experience would be a placeholder (both
+  forbidden).
+- Q: Which commit is the phase start? → A: The A06 constitution commit `c37f95fe`; the no-change diff of
+  `Packages` and `External` is taken from it.
+- Q: Where are the contract and its readable view? → A: `docs/apps/visualcore-music-lab/visualcore-contract.json` and the
+  generated `visualcore-contract.md`, checked by `scripts/check_app_contract.py --app visualcore-music-lab`; the baseline
+  in `docs/apps/visualcore-music-lab/regression-baseline.md`.
+- Q: What makes a capability "available"? → A: A public declaration in a VisualCore framework product with at least one
+  test that exercises it; a harness-only or Showcase-only implementation is "requires adaptation" at best.
+- Q: Which build steps does the inventory count? → A: The named steps of `python3 scripts/release_check.py --list` at the
+  time of the check, recorded with the count.
+- Q: Which package holds the audio experience, given only `ExperiencesCreative` exists? → A: The audit records the choice
+  for A06-P01: a new `Packages/ExperiencesAudio` package for the three audio experiences (A06–A08), mirroring
+  `ExperiencesCreative` (Core / Experience / CoreTests / ExperienceTests per experience); creating it is A06-P01 work,
+  not this phase.
+- Q: Where does audio analysis live, given VisualCore's audio products are placeholders? → A: `VisualCoreAudioDSP`
+  (pure Swift, in the `VisualCore` package: ring buffer, windowed FFT, bands, RMS, peak, onset/beat energy) and
+  `VisualCoreAudio` (iOS, in `VisualCoreRendering`: microphone and file sources behind one interface, session
+  interruption handling); both contain only `AudioDSPInfo`/`AudioInfo` version constants today (checked), so every
+  audio row of the matrix is an upstream gap owned by them.
+- Q: Is a microphone usage string present today? → A: No (`NSMicrophoneUsageDescription` is absent from the app's
+  generated Info.plist and `project.yml`; checked); adding it with an honest text belongs to A06-P01's permission
+  shell, and the app's privacy answers change then.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - An evidence-backed integration matrix (Priority: P1) 🎯
