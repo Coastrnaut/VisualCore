@@ -29,6 +29,37 @@ Canonical overrides:
 - **Owner rulings of 2026-11-13:** tests are short; system accessibility audits wait for the device campaign;
   independent files go to parallel agents.
 
+## Clarifications
+
+### Session 2026-11-13
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time (archived clarify
+prompt: data types, precision, lifecycle, error states, ownership, cross-game API, fallbacks, acceptance). Facts checked
+in code: `Mesh` (VisualCoreScenes) holds `[Vec3]` positions and normals and `[Vec2]` texture coordinates in `Double`,
+`[UInt32]` indices; `StableHash.sha256` (VisualCoreMath) is a pure, platform-independent SHA-256.
+
+- Q: What are the default size budgets? → A: 262,144 vertices and 1,572,864 indices (524,288 triangles) per mesh,
+  overridable per call downward or upward up to the 32-bit index range. Rationale: well above any board or prop of the
+  75 games, small enough that build and validation stay under 1 second on the host (SC-R02F05-006). Impact: refusals
+  are budget problems, never partial meshes.
+- Q: What tolerances decide equality and validity? → A: Welding merges vertices whose positions differ by at most
+  1e-9 × (1 + largest coordinate magnitude) per component and whose normals and texture coordinates differ by at most
+  1e-9; a normal is unit when |length − 1| ≤ 1e-6; a texture coordinate is in range within 1e-9; a triangle is degenerate
+  when its area is at most 1e-12 × (squared bounding-box diagonal). Rationale: values are `Double`; relative tolerances
+  keep large and small meshes alike. Impact: tests use these constants by name.
+- Q: How is a mesh digest made? → A: SHA-256 (`StableHash`) over a little-endian byte stream: the counts, then every
+  position, normal and texture coordinate component as its IEEE-754 binary64 bit pattern (−0 written as +0), then every
+  index; shown as 64 lower-case hex digits. Rationale: exact, platform-independent, no Foundation needed. Impact: the
+  committed digests in SC-R02F05-003 are stable across runtimes.
+- Q: How does a tube orient its cross-sections? → A: A rotation-minimizing frame by the double-reflection method, started
+  from a fixed reference axis (the world axis least parallel to the first tangent); for a closed loop the remaining twist
+  is spread evenly over the loop so the seam meets. Rationale: no flips at inflection points, deterministic. Impact: tests
+  check that consecutive frames rotate by less than the path's bend.
+- Q: What does validation do when a mesh has many problems? → A: It reports the first 100 problems in order of
+  discovery (indices, then triangles, then edges, then vertices) and counts the rest; inward faces are judged by the
+  signed enclosed volume of a closed, consistently wound mesh (negative = inward). Validation never changes the mesh.
+  Rationale: bounded output, deterministic order. Impact: FR-R02F05-031 and SC-R02F05-002 test exact reports.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Build a correct mesh from code (Priority: P1) 🎯
@@ -134,7 +165,7 @@ Scenes that already use the plane, cube and sphere and the renderer that draws t
   touches the axis.
 - **FR-R02F05-012**: The framework MUST build an extrusion of a closed 2D outline with optional caps.
 - **FR-R02F05-013**: The framework MUST build a tube of a given radius along a 3D path, with a twist-free frame along
-  the path, optional caps, and an option for a closed loop.
+  the path (rotation-minimizing; a closed loop spreads its twist evenly), optional caps, and an option for a closed loop.
 - **FR-R02F05-014**: The framework MUST build a box with bevelled edges of a given radius and segment count.
 - **FR-R02F05-015**: Every shape MUST wind its triangles counter-clockwise seen from outside and give unit normals and
   texture coordinates in 0…1.
@@ -151,7 +182,7 @@ Scenes that already use the plane, cube and sphere and the renderer that draws t
   inconsistent winding across an edge; boundary edges (a hole) when the mesh is required to be closed; and, for a
   closed mesh, faces pointing inward (negative enclosed volume).
 - **FR-R02F05-031**: Each problem MUST name its kind and the triangle, edge or vertex it concerns; the report MUST list
-  every problem up to a limit and count the rest.
+  the first 100 problems in a fixed order and count the rest.
 - **FR-R02F05-032**: The validator MUST return a summary: vertex, triangle and boundary-edge counts, closed or open,
   bounds and enclosed volume (closed meshes).
 
@@ -161,9 +192,9 @@ Scenes that already use the plane, cube and sphere and the renderer that draws t
 
 **Budgets and determinism**
 - **FR-R02F05-050**: Building and validation MUST refuse inputs whose result would exceed a vertex or index budget
-  (defaults stated in the plan), with a budget problem and no partial mesh.
+  (defaults 262,144 vertices and 1,572,864 indices, overridable per call), with a budget problem and no partial mesh.
 - **FR-R02F05-051**: The same description MUST give the same mesh, byte for byte, on every run and runtime; a mesh MUST
-  have a stable content digest.
+  have a stable content digest (SHA-256 of its binary64 components and indices, see Clarifications).
 - **FR-R02F05-052**: Building and validation MUST be pure CPU work with no GPU or clock dependence.
 
 **Compatibility (story 4)**
