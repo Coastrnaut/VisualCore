@@ -140,7 +140,8 @@ Scenes that already use the plane, cube and sphere and the renderer that draws t
   points is refused.
 - **Profile touching the axis of revolution:** the touching ring collapses to one pole vertex (no degenerate
   triangles).
-- **Bevel larger than half the smallest box side:** clamped to half the side.
+- **Bevel larger than half the smallest box side:** clamped to half the side. **Bevel radius 0:** a plain box
+  (segments ignored).
 - **Resolution outside the allowed range:** clamped to the range, as the existing generators do.
 - **Welding tolerance:** vertices within the tolerance merge only when their normals and texture coordinates also
   match (or when welding positions only is requested).
@@ -224,8 +225,11 @@ Scenes that already use the plane, cube and sphere and the renderer that draws t
 ### Measurable Outcomes
 
 - **SC-R02F05-001**: Every shape at 3 resolutions passes the validator with 0 problems; closed shapes report 0 boundary
-  edges and a positive volume within 1% of the analytic volume (sphere, box, cylinder).
-- **SC-R02F05-002**: Each of the 12 planted defect kinds is reported with the right kind and location in 12 of 12 cases.
+  edges and a positive volume equal to the exact volume of the faceted solid within 1e-6 relative at every resolution,
+  and within 1% of the smooth solid (sphere by revolution, plain and bevelled box, capped straight tube) at the highest
+  resolution.
+- **SC-R02F05-002**: Each of the 14 problem kinds (13 planted defects and the budget) is reported with the right kind
+  and location in 14 of 14 cases.
 - **SC-R02F05-003**: The same description built twice gives equal digests in 100% of checks; the digests of a fixed set
   of descriptions equal committed values on both simulator runtimes.
 - **SC-R02F05-004**: Bounds contain 100% of vertices and each box face touches a vertex.
