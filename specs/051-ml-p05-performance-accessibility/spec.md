@@ -25,6 +25,34 @@ Canonical overrides:
 - **Owner rulings:** short tests (measure a short run, bound the rest by arithmetic; wall-clock bounds asserted locally
   only); audits and device runs in the device campaign; iOS 27 at phase gates; every Spec Kit step runs.
 
+## Clarifications
+
+### Session 2026-11-14
+
+Answered autonomously under the owner's standing delegation, recommended option each time. Facts checked in code: the
+host calls `draw(_:tier:context:frame:)` with the quality tier each frame; the a06 registration in
+`Catalog/registrations.json` declares `quality_tiers` (validated by `scripts/build_catalog.py`, up to 8 names); the host's
+`ExperienceFeedback` already pairs an `AnnouncementSink` (`SystemAnnouncementSink` posts `UIAccessibility` announcements)
+with a `voiceOverRunning` closure; `preset.apply` carries 7 values today and `ExperienceControl` allows 24.
+
+- Q: How does the host's tier reach the analysis? → A: Tier 0, 1, 2 (clamped) selects the analysis level of FR-A06-501;
+  the registration's `quality_tiers` become ["level-0", "level-1", "level-2"]; a tier change rebuilds the extractor for the
+  new size and band count on the next frame.
+- Q: What exactly does the metric text say? → A: "Level −9 dB" (RMS dBFS rounded to the nearest integer, minus sign
+  "−") or "Level silent" when RMS ≤ −90 dBFS; "strongest low | low-mid | high-mid | high" (the region with the largest
+  summed energy) or "strongest none" when silent; "beat" while the beat meter is above 0.5, else "no beat"; joined with
+  ", ". Non-finite values read as silent.
+- Q: How are announcements made testable and rate-limited? → A: The presenter takes an injectable announcement sink and
+  a VoiceOver-running check (defaults: the system's); on a frame where the text differs from the last announced text and
+  ≥ 2 s (frame time) have passed since the last announcement, it announces once.
+- Q: How do palettes enter state, presets and actions? → A: Palettes 0 Aurora (today's colours), 1 Ember (warm), 2 Mono
+  (greys), each with colours for bars, waves, level, beat and geometry; state schema 3 adds `palette` (migration from 2
+  → 0); `palette.select [0…2]`; preset format 2 adds `"palette"` (format 1 → 0); `preset.apply` grows to 8 values with the
+  palette last.
+- Q: How is the per-window cost measured without wall-clock asserts on CI? → A: A host test times 500 calls of
+  `analyze(_:time:elapsed:into:)` at level 0 after a warm-up and records the mean; it asserts < 0.5 ms only when the
+  environment variable `CI` is not set, and always prints the value.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Hear the numbers (Priority: P1) 🎯
