@@ -126,7 +126,8 @@ lattices) from VisualCore, documented and tested.
 - **Scale 0, negative, infinite or NaN:** refused.
 - **Unknown palette or preset index:** refused.
 - **Point on a mirror line or at the centre:** folding is defined and stays on the line; the centre maps to itself.
-- **Reduce Motion:** nothing animates in this phase (compositions are static); a static picture is drawn.
+- **Reduce Motion and Reduce Flashing:** nothing animates or flashes in this phase (compositions are static); later
+  phases that animate must honour both.
 - **Graphics context recreated:** the composition is rebuilt from the state; nothing is lost.
 - **Restored state of a newer version:** refused by the shared migration chain; the session reports it.
 
@@ -157,7 +158,9 @@ lattices) from VisualCore, documented and tested.
 
 **Controls and state (story 2)**
 - **FR-A05-120**: The experience MUST accept: select preset, set symmetry order, set repetitions, set scale, set
-  palette, reseed; each validated; invalid actions refused with a reason and no state change.
+  palette, reseed; each validated; invalid actions refused with a reason and no state change. The symmetry order applies
+  to the kaleidoscope and the 3D composition; the tilings have their lattice's fixed symmetry, so setting an order on a
+  tiling is refused (`a05.order-fixed-by-lattice`).
 - **FR-A05-121**: Every control MUST have an accessible label and a native control; the canvas MUST have a spoken
   description naming the preset, kind and symmetry order.
 
