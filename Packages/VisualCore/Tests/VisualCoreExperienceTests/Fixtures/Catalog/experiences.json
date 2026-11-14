@@ -297,10 +297,23 @@
         "music-and-audio"
       ],
       "order": 9,
-      "palette": [],
+      "palette": [
+        "#06243A",
+        "#1C7FA6",
+        "#F28C28",
+        "#7FBF6A"
+      ],
       "tile_seed": 2237006121,
-      "capabilities": [],
-      "quality_tiers": [],
+      "capabilities": [
+        "two fish species",
+        "aquatic plants",
+        "starter habitats",
+        "bounded swimming",
+        "lighting levels"
+      ],
+      "quality_tiers": [
+        "level-0"
+      ],
       "content": null,
       "available": false
     },

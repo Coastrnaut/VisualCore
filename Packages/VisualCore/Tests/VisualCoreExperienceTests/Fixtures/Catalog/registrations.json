@@ -190,6 +190,27 @@
       "permissions": [
         "microphone"
       ]
+    },
+    "a09.digital-aquarium": {
+      "capabilities": [
+        "two fish species",
+        "aquatic plants",
+        "starter habitats",
+        "bounded swimming",
+        "lighting levels"
+      ],
+      "quality_tiers": [
+        "level-0"
+      ],
+      "palette": [
+        "#06243A",
+        "#1C7FA6",
+        "#F28C28",
+        "#7FBF6A"
+      ],
+      "content": null,
+      "manifest": "Packages/ExperiencesCreative/DigitalAquarium/scenario-manifest.json",
+      "permissions": []
     }
   }
 }

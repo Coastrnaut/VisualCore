@@ -67,9 +67,9 @@ final class AppModelTests: XCTestCase {
     func testTheCandidatesArgumentMakesTheCandidatesAvailableAndRegistersThem() throws {
         let storage = try TestStorage(self)
         let integrated = ExperienceRegistry.all.map(\.id)
-        // Any catalog experience before its X gate works as a candidate; A09 is one (unavailable, not in `all`). The
-        // registry has no real candidate after X-A08, so the synthetic debug registration stands in for one.
-        let id = try XCTUnwrap(ExperienceID(rawValue: "a09.digital-aquarium"))
+        // Any catalog experience before its X gate works as a candidate; A10 is one (unavailable, not in `all`). The
+        // synthetic debug registration stands in for one (A09 is a real candidate since A09-P01).
+        let id = try XCTUnwrap(ExperienceID(rawValue: "a10.neon-arcade"))
         XCTAssertFalse(integrated.contains(id), "the synthetic candidate is not integrated")
         let candidate = DebugExperience.registration(for: id)
         let base = try storage.environment(catalog: bundled("experiences"), categories: bundled("categories"),
