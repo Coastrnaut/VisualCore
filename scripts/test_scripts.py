@@ -1287,7 +1287,9 @@ class UnifiedAppTargetTests(unittest.TestCase):
                                     "VisualCorePersistence",
                                     "VisualCoreRendering", "VisualCoreUI", "VisualCoreExperienceHost",
                                     "GenerativeArtStudioExperience", "FluidArtPlaygroundExperience",
-                                    "FractalExplorerExperience", "ParticleUniverseExperience"])
+                                    "FractalExplorerExperience", "ParticleUniverseExperience",
+                                    # Feature 040 (A05-P01): Infinite Geometry, a candidate until X-A05.
+                                    "InfiniteGeometryExperience"])
 
     def test_the_standing_isolation_step_requires_sources(self):
         listing = subprocess.run([sys.executable, str(HERE / "release_check.py"), "--list"],

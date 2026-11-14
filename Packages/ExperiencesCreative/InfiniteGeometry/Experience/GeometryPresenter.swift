@@ -33,6 +33,13 @@ final class GeometryMirror {
 /// The presenter of Infinite Geometry.
 @MainActor
 final class GeometryPresenter: ExperiencePresenter {
+    /// The scale that fits the square −1…1 into a `width` × `height` view: the same factor on both axes, half the
+    /// shorter side, so a non-square view keeps geometric proportions (regression fixture 5; A05-P01).
+    static func fitScale(width: Double, height: Double) -> Vec2 {
+        let fit = min(width, height) / 2
+        return Vec2(fit, fit)
+    }
+
     typealias Core = GeometryCore
 
     /// The camera of the 3D composition.
@@ -79,8 +86,8 @@ final class GeometryPresenter: ExperiencePresenter {
         switch composition {
         case .plane(let polygons):
             guard let root else { drawnCount = 0; return }
-            let fit = min(width, height) / 2
-            root.scale = Vec2(fit, fit)
+            let fit = Self.fitScale(width: width, height: height)
+            root.scale = fit
             if primitives == nil { primitives = try PrimitiveRenderer(registry: context.resources) }
             try primitives?.draw(root, camera: Camera2D(), metrics: ViewMetrics(size: Vec2(width, height), scale: 1))
             drawnCount = polygons.count
@@ -160,7 +167,7 @@ final class GeometryPresenter: ExperiencePresenter {
         let width = max(size.x, 1), height = max(size.y, 1)
         switch composition {
         case .plane(let polygons):
-            let fit = min(width, height) / 2
+            let fit = Self.fitScale(width: width, height: height).x
             let margin = probeMarginPixels / fit
             return probeCandidates.first { candidate in
                 let world = Vec2((candidate.x - 0.5) * width / fit, (0.5 - candidate.y) * height / fit)

@@ -1,5 +1,6 @@
 // GeometryManifest — feature 040 (A05-P01) T-A05-108 (FR-A05-130). The scenarios the verification runner plays for
-// Infinite Geometry: the nine standard ones, all short (owner rule of 2026-11-13). Unlike Particle Universe, whose
+// Infinite Geometry: the nine standard ones and one `fixture-<n>` per regression fixture of the planning catalog
+// (the content-count audit requires the five), all short (owner rule of 2026-11-13). Unlike Particle Universe, whose
 // committed digests are constants checked by the host tests, the expected digests here are derived when the manifest
 // is built: a composition is static (`update(step:)` does nothing), so the state after the entries is the prepared
 // core with the accepted actions applied, and its digest is computed exactly as the engine computes it (a
@@ -57,12 +58,45 @@ extension GeometryCore {
         return builder.finish().hex
     }
 
+    /// The index of the first curated preset of `kind`.
+    static func curatedIndex(_ kind: GeometryPreset.Kind) -> Int {
+        GeometryPreset.curated.firstIndex { $0.kind == kind } ?? 0
+    }
+
+    /// The entries of the five regression fixtures of the planning catalog, in its order:
+    /// 1. symmetry order one is the identity and higher orders repeat: the kaleidoscope at order 1, then 6;
+    /// 2. mesh generation has index bounds and valid normals: the 3D composition rebuilt at orders 3 and 8 (every
+    ///    accepted build is a closed, validated mesh — `Composition.build` refuses anything else);
+    /// 3. zoom clamps avoid singular states: the scale at both bounds is accepted and beyond them refused (the
+    ///    camera's field of view arrives in Phase 03 and extends this fixture there);
+    /// 4. repeated preset transitions leave the state stable: two full cycles through the four presets end where they
+    ///    began (final digest = initial digest; the records' GPU counts show no leak);
+    /// 5. non-square displays keep proportions: the hexagonal tiling at scale 0.5 drawn on the phone's non-square
+    ///    view (the presenter fits the shorter side; `GeometrySessionTests` checks the fit on a 160 × 240 view).
+    public static var fixtureEntries: [[ScenarioStep]] {
+        let kaleidoscope = Double(curatedIndex(.kaleidoscope)), solid = Double(curatedIndex(.solid))
+        let hex = Double(curatedIndex(.hexTiling))
+        func step(_ control: String, _ values: [Double] = [], _ result: String = "accepted") -> ScenarioStep {
+            ScenarioStep(steps: 1, action: ScriptedAction(control, values), result: result)
+        }
+        let cycle = (1..<GeometryPreset.curated.count).map { step("preset.select", [Double($0)]) } + [step("preset.select", [0])]
+        return [
+            [step("preset.select", [kaleidoscope]), step("symmetry.order", [1]), step("symmetry.order", [6])],
+            [step("preset.select", [solid]), step("symmetry.order", [3]), step("symmetry.order", [8])],
+            [step("scale.set", [GeometryPreset.scaleRange.lowerBound]), step("scale.set", [GeometryPreset.scaleRange.upperBound]),
+             step("scale.set", [GeometryPreset.scaleRange.upperBound + 1], "action.out-of-range"),
+             step("scale.set", [GeometryPreset.scaleRange.lowerBound / 2], "action.out-of-range")],
+            cycle + cycle,
+            [step("preset.select", [hex]), step("scale.set", [0.5])],
+        ]
+    }
+
     /// The manifest of the experience `id`.
     public static func manifest(for id: ExperienceID, seed: UInt64 = manifestSeed) -> ScenarioManifest {
         let input = inputEntries
         let initial = expectedDigest(for: id, seed: seed, entries: [])
         let final = expectedDigest(for: id, seed: seed, entries: input)
-        let specs = [
+        var specs = [
             ScenarioSpec(name: "launch-first-frame", seed: seed, entries: [],
                          expect: ScenarioExpectations(initialDigest: initial)),
             ScenarioSpec(name: "input-response", seed: seed, entries: input,
@@ -79,6 +113,12 @@ extension GeometryCore {
             ScenarioSpec(name: "teardown-reentry", seed: seed, entries: [], cycles: 5),
             ScenarioSpec(name: "cancel-prepare", seed: seed, entries: []),
         ]
+        for (index, entries) in fixtureEntries.enumerated() {
+            specs.append(ScenarioSpec(name: "fixture-\(index + 1)", seed: seed, entries: entries,
+                                      expect: ScenarioExpectations(initialDigest: initial,
+                                                                   finalDigest: expectedDigest(for: id, seed: seed,
+                                                                                               entries: entries))))
+        }
         return ScenarioManifest(experience: id, kind: .creative, scenarios: specs)
     }
 }

@@ -27,12 +27,14 @@ private func play(_ spec: ScenarioSpec) async throws -> (initial: String, result
 }
 
 @Suite struct GeometryManifestTests {
-    @Test func theManifestIsValidWithTheNineStandardScenarios() {
+    @Test func theManifestIsValidWithTheNineStandardScenariosAndFiveFixtures() {
         let manifest = GeometryCore.manifest(for: id)
         let problems = ScenarioManifestValidator.problems(manifest, controls: GeometryCore.controls,
                                                           content: ContentRequirement())
         #expect(problems.isEmpty, "\(problems)")
-        #expect(Set(manifest.scenarios.map(\.name)) == Set(ScenarioManifest.standardNames))
+        // The nine standard scenarios and the five regression fixtures of the planning catalog.
+        #expect(Set(manifest.scenarios.map(\.name))
+                == Set(ScenarioManifest.standardNames).union((1...5).map { "fixture-\($0)" }))
     }
 
     @Test func derivedDigestsAndResultsAreWhatTheEngineGives() async throws {

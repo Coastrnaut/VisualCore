@@ -99,4 +99,15 @@ final class GeometrySessionTests: XCTestCase {
         XCTAssertEqual(counts.leaked, 0)
         XCTAssertEqual(session.hostsAlive, 0)
     }
+
+    /// Regression fixture 5 (A05-P01): a non-square view scales both axes by the same factor, half the shorter side,
+    /// so a square stays square and the whole −1…1 square is visible.
+    func testANonSquareViewKeepsGeometricProportions() {
+        for (w, h) in [(160.0, 240.0), (240.0, 160.0), (390.0, 844.0), (100.0, 100.0)] {
+            let fit = GeometryPresenter.fitScale(width: w, height: h)
+            XCTAssertEqual(fit.x, fit.y, "same factor on both axes")
+            XCTAssertEqual(fit.x, min(w, h) / 2)
+            XCTAssertLessThanOrEqual(2 * fit.x, w + 1e-9); XCTAssertLessThanOrEqual(2 * fit.y, h + 1e-9)
+        }
+    }
 }
