@@ -1,9 +1,11 @@
 // JourneyState — feature 054 (A07-P01) T-A07-103 (FR-A07-111, FR-A07-121; data-model "JourneyState", schema 1). The
 // domain state of Audio Odyssey: the world, the unwrapped travelled distance, the speed choice, the current speed, the
 // seed of the rail and the worlds, and whether the flight is paused. All fields are persisted and part of the digest.
+// Feature 055 (A07-P02) T-A07-204 (FR-A07-220; data-model "JourneyState" schema 2): adds the audio `source`; a schema-1
+// payload without it decodes as the demo signal, and the digest text ends with `|source=<raw value>`.
 //
 // Rules: `distance` and `speed` are finite and ≥ 0. A decoded payload that breaks a rule (NaN, infinity, a negative
-// value, an unknown world or speed choice) is refused with `DecodingError.dataCorrupted`; the mutating methods ignore
+// value, an unknown world, speed choice or source) is refused with `DecodingError.dataCorrupted`; the mutating methods ignore
 // such values and report it.
 import Foundation
 
@@ -36,10 +38,10 @@ public enum SpeedChoice: Int, CaseIterable, Codable, Sendable {
     }
 }
 
-/// The state of Audio Odyssey. Schema version 1.
+/// The state of Audio Odyssey. Schema version 2 (schema 1 plus `source`).
 public struct JourneyState: Sendable, Equatable, Codable {
     /// The schema version of the persisted fields.
-    public static let schemaVersion = 1
+    public static let schemaVersion = 2
     /// The step `reseed()` adds to the seed (the golden-ratio increment).
     public static let seedStep: UInt64 = 0x9E37_79B9_7F4A_7C15
 
@@ -55,16 +57,19 @@ public struct JourneyState: Sendable, Equatable, Codable {
     public private(set) var seed: UInt64
     /// Whether the flight is paused.
     public private(set) var paused: Bool
+    /// The chosen audio source (feature 055); the demo signal by default.
+    public private(set) var source: SourceKind
 
     /// A state; a distance or speed that is not finite and ≥ 0 becomes 0.
     public init(seed: UInt64, world: JourneyWorld = .tunnel, distance: Double = 0, speedChoice: SpeedChoice = .medium,
-                speed: Double = 0, paused: Bool = false) {
+                speed: Double = 0, paused: Bool = false, source: SourceKind = .demo) {
         self.seed = seed
         self.world = world
         self.distance = Self.isUsable(distance) ? distance : 0
         self.speedChoice = speedChoice
         self.speed = Self.isUsable(speed) ? speed : 0
         self.paused = paused
+        self.source = source
     }
 
     /// Whether `value` is allowed as a distance or speed: finite and ≥ 0.
@@ -75,6 +80,9 @@ public struct JourneyState: Sendable, Equatable, Codable {
 
     /// Selects the speed choice; the current speed eases toward it in the flight.
     public mutating func select(_ speedChoice: SpeedChoice) { self.speedChoice = speedChoice }
+
+    /// Selects the audio source; distance, speed and world are kept.
+    public mutating func select(_ source: SourceKind) { self.source = source }
 
     /// Pauses (`true`) or resumes (`false`) the flight; distance and speed are kept.
     public mutating func setPaused(_ paused: Bool) { self.paused = paused }
@@ -97,13 +105,15 @@ public struct JourneyState: Sendable, Equatable, Codable {
         let micro = Int64((speed * 1e6).rounded())
         return "a07.journey.v\(Self.schemaVersion)|world=\(world.rawValue)|distance=\(distance)"
             + "|speedChoice=\(speedChoice.rawValue)|speedMicro=\(micro)|seed=\(seed)|paused=\(paused ? 1 : 0)"
+            + "|source=\(source.rawValue)"
     }
 
     // MARK: - Codable
 
-    private enum CodingKeys: String, CodingKey { case world, distance, speedChoice, speed, seed, paused }
+    private enum CodingKeys: String, CodingKey { case world, distance, speedChoice, speed, seed, paused, source }
 
-    /// Decodes and validates a state; refuses non-finite or negative distance and speed and unknown enum values.
+    /// Decodes and validates a state; refuses non-finite or negative distance and speed and unknown enum values. A
+    /// schema-1 payload (no `source`) decodes with the demo signal.
     public init(from decoder: any Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
         let world = try c.decode(JourneyWorld.self, forKey: .world)
@@ -112,6 +122,7 @@ public struct JourneyState: Sendable, Equatable, Codable {
         let speed = try c.decode(Double.self, forKey: .speed)
         let seed = try c.decode(UInt64.self, forKey: .seed)
         let paused = try c.decode(Bool.self, forKey: .paused)
+        let source = try c.decodeIfPresent(SourceKind.self, forKey: .source) ?? .demo
         guard Self.isUsable(distance) else {
             throw DecodingError.dataCorruptedError(forKey: .distance, in: c,
                                                    debugDescription: "distance \(distance) is not finite and ≥ 0")
@@ -120,7 +131,8 @@ public struct JourneyState: Sendable, Equatable, Codable {
             throw DecodingError.dataCorruptedError(forKey: .speed, in: c,
                                                    debugDescription: "speed \(speed) is not finite and ≥ 0")
         }
-        self.init(seed: seed, world: world, distance: distance, speedChoice: speedChoice, speed: speed, paused: paused)
+        self.init(seed: seed, world: world, distance: distance, speedChoice: speedChoice, speed: speed, paused: paused,
+                  source: source)
     }
 
     /// Encodes every field under its own name.
@@ -132,5 +144,6 @@ public struct JourneyState: Sendable, Equatable, Codable {
         try c.encode(speed, forKey: .speed)
         try c.encode(seed, forKey: .seed)
         try c.encode(paused, forKey: .paused)
+        try c.encode(source, forKey: .source)
     }
 }

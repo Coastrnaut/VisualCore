@@ -1,6 +1,7 @@
 // JourneyStateTests — feature 054 (A07-P01) T-A07-103 (FR-A07-121; data-model "JourneyState", schema 1). The state
 // rules of Audio Odyssey, host-free and short: the first state, the JSON round trip, refusal of invalid payloads, the
-// mutating rules and the digest text.
+// mutating rules and the digest text. Feature 055 (A07-P02) T-A07-204 (FR-A07-220; schema 2): the source field, the
+// schema-1 → 2 decode (demo), the microphone round trip, refusal of an unknown source and `|source=` in the digest.
 import Foundation
 import Testing
 import AudioOdysseyCore
@@ -14,20 +15,21 @@ import AudioOdysseyCore
     }
 
     private func payload(world: String = "0", distance: String = "12.5", speedChoice: String = "1",
-                         speed: String = "3.25") -> String {
+                         speed: String = "3.25", source: String? = nil) -> String {
         "{\"world\":\(world),\"distance\":\(distance),\"speedChoice\":\(speedChoice),\"speed\":\(speed),"
-            + "\"seed\":7,\"paused\":false}"
+            + "\"seed\":7,\"paused\":false" + (source.map { ",\"source\":\($0)" } ?? "") + "}"
     }
 
     @Test func theFirstStateIsTheTunnelAtMediumSpeed() {
         let state = JourneyState(seed: 3)
-        #expect(JourneyState.schemaVersion == 1)
+        #expect(JourneyState.schemaVersion == 2)
         #expect(state.world == .tunnel)
         #expect(state.distance == 0)
         #expect(state.speedChoice == .medium)
         #expect(state.speed == 0)
         #expect(state.seed == 3)
         #expect(!state.paused)
+        #expect(state.source == .demo)
     }
 
     @Test func speedChoicesAndWorldNamesMatchTheClarification() {
@@ -88,14 +90,51 @@ import AudioOdysseyCore
         let b = JourneyState(seed: 9, world: .landscape, distance: 2.5, speedChoice: .slow, speed: 1.000_000_1)
         #expect(a.digestText == b.digestText)
         #expect(a.digestText
-            == "a07.journey.v1|world=1|distance=2.5|speedChoice=0|speedMicro=1000000|seed=9|paused=0")
+            == "a07.journey.v2|world=1|distance=2.5|speedChoice=0|speedMicro=1000000|seed=9|paused=0|source=0")
         var c = a
         c.setPaused(true)
         #expect(c.digestText != a.digestText)
         var d = a
         d.select(.tunnel)
         #expect(d.digestText != a.digestText)
+        var e = a
+        e.select(SourceKind.microphone)
+        #expect(e.digestText.hasSuffix("|source=1"))
+        #expect(e.digestText != a.digestText)
         #expect(JourneyState(seed: 10, world: .landscape, distance: 2.5, speedChoice: .slow, speed: 1).digestText
             != a.digestText)
+    }
+
+    @Test func sourceNamesMatchTheClarification() {
+        #expect(SourceKind.allCases.map(\.displayName) == ["Demo signal", "Microphone", "File"])
+        #expect(SourceKind.allCases.map(\.rawValue) == [0, 1, 2])
+    }
+
+    @Test func aSchemaOnePayloadWithoutSourceDecodesAsDemo() throws {
+        let state = try decode(payload())
+        #expect(state.source == .demo)
+        #expect(state.distance == 12.5 && state.speedChoice == .medium)
+    }
+
+    @Test func jsonRoundTripKeepsTheMicrophoneSource() throws {
+        var state = JourneyState(seed: 4, world: .landscape, distance: 30, speedChoice: .slow, speed: 1.5)
+        state.select(SourceKind.microphone)
+        let back = try JSONDecoder().decode(JourneyState.self, from: JSONEncoder().encode(state))
+        #expect(back == state)
+        #expect(back.source == .microphone)
+        #expect(try decode(payload(source: "2")).source == .file)
+    }
+
+    @Test func anUnknownSourceIsRefused() {
+        #expect(throws: (any Error).self) { try decode(payload(source: "3")) }
+        #expect(throws: (any Error).self) { try decode(payload(source: "-1")) }
+        #expect(throws: (any Error).self) { try decode(payload(source: "\"mic\"")) }
+    }
+
+    @Test func selectingASourceKeepsTheFlight() {
+        var state = JourneyState(seed: 2, world: .starCorridor, distance: 88, speedChoice: .fast, speed: 6)
+        state.select(SourceKind.file)
+        #expect(state.source == .file)
+        #expect(state.distance == 88 && state.speed == 6 && state.world == .starCorridor && state.speedChoice == .fast)
     }
 }
