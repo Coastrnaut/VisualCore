@@ -8,6 +8,8 @@
 // refuses the microphone with no request, keeps the demo playing and shows the Settings message; a not-determined
 // permission is asked once and a refusal falls back to the demo; closing stops the source; and a schema-1 snapshot
 // opens as the same journey with the demo signal.
+// Feature 056 (A07-P03) T-A07-303: the presenter's response is the drawn world's `WorldResponse` (primary, light)
+// driven through the `AudioEnvelope` and the world's mapping.
 import Foundation
 import XCTest
 @testable import AudioOdysseyExperience
@@ -127,19 +129,22 @@ final class OdysseyAudioTests: XCTestCase {
     @discardableResult
     private func frames(_ session: ExperienceSession, _ shell: ExperienceShell<OdysseyPresenter>, _ count: Int,
                         pump: (() -> Void)? = nil, file: StaticString = #filePath,
-                        line: UInt = #line) throws -> [TunnelResponse] {
+                        line: UInt = #line) throws -> [WorldResponse] {
         let host = try XCTUnwrap(session.renderHost)
         var previous = shell.presenter.response
-        var out: [TunnelResponse] = []
+        var out: [WorldResponse] = []
         for _ in 0..<count {
             pump?()
             XCTAssertTrue(host.renderOneFrame(present: false), file: file, line: line)
             let r = shell.presenter.response
-            XCTAssertTrue(r.rippleRange.contains(r.ripple), "ripple \(r.ripple)", file: file, line: line)
-            XCTAssertTrue(r.ambientRange.contains(r.ambient), "ambient \(r.ambient)", file: file, line: line)
-            XCTAssertLessThanOrEqual(abs(r.ripple - previous.ripple), r.rippleStepLimit + 1e-12, file: file, line: line)
-            XCTAssertLessThanOrEqual(abs(r.ambient - previous.ambient), r.ambientStepLimit + 1e-12, file: file,
-                                     line: line)
+            XCTAssertTrue(r.primaryRange.contains(r.primary), "primary \(r.primary)", file: file, line: line)
+            XCTAssertTrue(r.lightRange.contains(r.light), "light \(r.light)", file: file, line: line)
+            if r.world == previous.world, r.reduceMotion == previous.reduceMotion {
+                XCTAssertLessThanOrEqual(abs(r.primary - previous.primary), r.primaryStepLimit + 1e-12, file: file,
+                                         line: line)
+                XCTAssertLessThanOrEqual(abs(r.light - previous.light), r.lightStepLimit + 1e-12, file: file,
+                                         line: line)
+            }
             out.append(r)
             previous = r
         }
@@ -152,11 +157,11 @@ final class OdysseyAudioTests: XCTestCase {
         let presenter = shell.presenter
         XCTAssertTrue(presenter.activeSource is DemoAudioSource, "the demo signal plays first, with no prompt")
         XCTAssertEqual(try core(shell).state.source, .demo)
-        let rest = TunnelResponse(reduceMotion: false, reduceFlashing: false)
+        let rest = WorldResponse(world: .tunnel, reduceMotion: false, reduceFlashing: false)
         var lifted = false
         for _ in 0..<60 {
             let r = try frames(session, shell, 1)[0]
-            if r.ripple > rest.rippleRest || r.ambient > rest.ambientRest { lifted = true; break }
+            if r.primary > rest.primaryRest || r.light > rest.lightRest { lifted = true; break }
             try await Task.sleep(for: .milliseconds(5))     // lets the demo source's timer write
         }
         XCTAssertTrue(lifted, "the response left rest within 60 frames")
@@ -174,15 +179,16 @@ final class OdysseyAudioTests: XCTestCase {
         let source = try XCTUnwrap(log.made.last)
         XCTAssertEqual(source.label, "demo")
         let rest = shell.presenter.response
-        XCTAssertEqual(rest.ripple, rest.rippleRest)
+        XCTAssertEqual(rest.primary, rest.primaryRest)
         // A sudden loud onset: both rise, by at most the step limit per frame, and reach well above rest.
         let cameraBefore = try XCTUnwrap(shell.presenter.lastCamera)
         let loud = try frames(session, shell, 60) { source.pump(amplitude: 0.7) }
         let top = try XCTUnwrap(loud.last)
-        XCTAssertGreaterThan(top.ripple, rest.rippleRest + 0.1, "ripple rose: \(top.ripple)")
-        XCTAssertGreaterThan(top.ambient, rest.ambientRest + 0.1, "brightness rose: \(top.ambient)")
-        XCTAssertGreaterThan(loud.prefix { $0.ripple < top.ripple - 1e-9 }.count, 3, "over several frames")
-        XCTAssertGreaterThan(top.breathingScale, 1 + rest.rippleRest * TunnelResponse.breathingGain)
+        XCTAssertGreaterThan(top.primary, rest.primaryRest + 0.1, "breathing rose: \(top.primary)")
+        // Light ← overall (the mean of low, mid and high): a pure low tone lifts at least its low third.
+        XCTAssertGreaterThan(top.light, rest.lightRest + 0.05, "brightness rose: \(top.light)")
+        XCTAssertGreaterThan(loud.prefix { $0.primary < top.primary - 1e-9 }.count, 3, "over several frames")
+        XCTAssertGreaterThan(top.primaryScale, 1 + rest.primaryRest * TunnelResponse.breathingGain)
         // Audio never moves the camera: the rail camera depends on the flight alone.
         let core = try core(shell)
         let rail = try XCTUnwrap(shell.presenter.rail)
@@ -194,8 +200,8 @@ final class OdysseyAudioTests: XCTestCase {
         // Two seconds of silence: back within 5 % of rest.
         let quiet = try frames(session, shell, 120) { source.pump(amplitude: 0) }
         let end = try XCTUnwrap(quiet.last)
-        XCTAssertLessThanOrEqual(abs(end.ripple - end.rippleRest), 0.05 * end.rippleRest, "ripple \(end.ripple)")
-        XCTAssertLessThanOrEqual(abs(end.ambient - end.ambientRest), 0.05 * end.ambientRest, "ambient \(end.ambient)")
+        XCTAssertLessThanOrEqual(abs(end.primary - end.primaryRest), 0.05 * end.primaryRest, "primary \(end.primary)")
+        XCTAssertLessThanOrEqual(abs(end.light - end.lightRest), 0.05 * end.lightRest, "light \(end.light)")
         XCTAssertTrue(shell.accessibilitySummary.hasSuffix("sound response at rest."), shell.accessibilitySummary)
         session.close()
     }
@@ -207,9 +213,9 @@ final class OdysseyAudioTests: XCTestCase {
         let source = try XCTUnwrap(log.made.last)
         let loud = try frames(session, shell, 90) { source.pump(amplitude: 1) }
         let top = try XCTUnwrap(loud.last)
-        XCTAssertLessThanOrEqual(top.ripple, TunnelResponse.reducedRippleBounds.upperBound)
-        XCTAssertLessThanOrEqual(top.ambient, TunnelResponse.reducedAmbientBounds.upperBound)
-        XCTAssertEqual(top.ambientStepLimit, TunnelResponse.reducedAmbientStep)
+        XCTAssertLessThanOrEqual(top.primary, TunnelResponse.reducedRippleBounds.upperBound)
+        XCTAssertLessThanOrEqual(top.light, TunnelResponse.reducedAmbientBounds.upperBound)
+        XCTAssertEqual(top.lightStepLimit, TunnelResponse.reducedAmbientStep)
         session.close()
     }
 

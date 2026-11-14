@@ -50,6 +50,29 @@
 //     before `source.file` is sent; an undecodable file keeps the previous source. Sources run only between `setup`
 //     and `teardown` and not in the background; teardown stops the source and releases the microphone. Nothing is
 //     recorded and nothing leaves the device.
+//
+// Feature 056 (A07-P03) T-A07-303 (FR-A07-301–303, FR-A07-310–312, FR-A07-320, FR-A07-330; clarifications 1–5):
+//   - Envelope: the two `AudioMapper`s and the tunnel-only `TunnelResponse` are replaced by one `AudioEnvelope` (Core),
+//     updated once per frame from the `FeatureExtractor`'s `AudioFeatures` (band energies, flux, onset) with the
+//     frame's time and elapsed time, and one `WorldResponse` for the world drawn. The response is rebuilt (at rest)
+//     when the world changes and when its reduce flags change: Reduce Motion = the factory's system setting OR the
+//     journey's in-app calm motion (so calm motion halves the primary range as Reduce Motion does), Reduce Flashing =
+//     the factory's. The targets are `state.mapping(for: world).target(from: envelope)`. A source start resets the
+//     envelope, so nothing of the previous source lingers. Audio never moves the camera.
+//   - Primary (`WorldResponse.primaryScale`), always ONE model matrix for every piece of the world in a frame, so the
+//     joins stay watertight and no mesh is rebuilt:
+//       tunnel: the radial breathing of A07-P02 (`breathingModel`, about the camera's rail point, across the rail);
+//       landscape: a vertical scaling along the rail's local up at the camera's rail point (`swellModel`), about the
+//         strip's base below that point (`WorldPieces.landscapeDrop` under the rail), so the relief above the base
+//         swells by up to 1.6× while the base under the camera stays put. Decision: a single matrix is exact at the
+//         camera; far ahead, where the rail's height differs from the camera's, the strip shifts by that difference
+//         × (scale − 1) (at most a few units, inside the fog), which is accepted to keep the joins closed;
+//       star corridor: the stars are not separate draws (48 per piece mesh, with the guide rings), so the star field
+//         is scaled like the tunnel, radially across the rail about the camera's rail point (`breathingModel` with
+//         the primary scale 1…1.6): the stars and rings spread out from the rail as the sparkle rises.
+//   - Light: `WorldResponse.light` is the ambient of every renderer drawn in the frame, in every world.
+//   - Description: names the chosen speed ("2.5 units per second"), the easing and "calm motion" when calm motion is
+//     in effect (in-app or the system's Reduce Motion).
 import Foundation
 import SwiftUI
 import UIKit
@@ -68,8 +91,16 @@ import VisualCoreScenes
 final class OdysseyMirror {
     /// The world shown; nil before the first description.
     var world: JourneyWorld?
-    /// The chosen speed.
+    /// The speed preset nearest to the speed target.
     var speedChoice: SpeedChoice = .medium
+    /// The chosen speed target in units per second (feature 056).
+    var speedTarget = JourneyState.defaultSpeedTarget
+    /// The camera easing (feature 056).
+    var easing: Easing = .standard
+    /// The in-app calm-motion setting (feature 056).
+    var calmMotion = false
+    /// The mapping of the world shown (feature 056).
+    var mapping = WorldMapping.defaults(for: .tunnel)
     /// Whether the flight is paused.
     var paused = false
     /// The chosen audio source (feature 055).
@@ -119,8 +150,6 @@ final class OdysseyPresenter: ExperiencePresenter {
     nonisolated static let near = 0.1, far = 120.0
     /// The clear colour (dark blue-black).
     nonisolated static let background = Vec4(0.02, 0.02, 0.05, 1)
-    /// The ambient share of the lighting of the landscape and the star corridor (the tunnel's follows the response).
-    nonisolated static let ambient = 0.35
     /// The linear depth fog of every world: from 40 to 110 units toward the clear colour (feature 055).
     nonisolated static let fog = MeshFog(start: 40, end: 110, color: background)
     /// The ring buffer's capacity in samples (a third of a second at 48 kHz).
@@ -173,19 +202,29 @@ final class OdysseyPresenter: ExperiencePresenter {
         return Mat4.translation(centre - origin) * radial * Mat4.translation(-centre)
     }
 
-    /// The mapper of one response target (the constants of clarification 3 are valid by construction).
-    nonisolated static func mapper(_ feature: AudioFeatureKind, gain: Double, attack: Double,
-                                   release: Double) -> AudioMapper {
-        guard let mapping = AudioMapping(feature: feature, gain: gain, attack: attack, release: release) else {
-            preconditionFailure("the tunnel's mapping constants are valid")
-        }
-        return AudioMapper(mapping: mapping)
+    /// The model matrix of every landscape piece in a frame (feature 056): the scaling by `scale` along the unit `up`
+    /// about the world point `centre` (1 across `up`), then the shift by `-origin` into drawing coordinates:
+    /// `T(centre − origin) · (I + (scale − 1) u uᵀ) · T(−centre)`.
+    nonisolated static func swellModel(scale: Double, centre: Vec3, up: Vec3, origin: Vec3) -> Mat4 {
+        let k = scale.isFinite ? scale - 1 : 0
+        let u = up.length > 0 ? up.normalized : Vec3(0, 1, 0)
+        func column(_ axis: Vec3, _ component: Double) -> Vec4 { Vec4(axis + u * (k * component), 0) }
+        let swell = Mat4(column(Vec3(1, 0, 0), u.x), column(Vec3(0, 1, 0), u.y), column(Vec3(0, 0, 1), u.z),
+                         Vec4(0, 0, 0, 1))
+        return Mat4.translation(centre - origin) * swell * Mat4.translation(-centre)
     }
 
-    /// The ripple mapper: low band, gain 1.5, attack 0.05 s, release 0.4 s.
-    nonisolated static func makeRippleMapper() -> AudioMapper { mapper(.low, gain: 1.5, attack: 0.05, release: 0.4) }
-    /// The brightness mapper: level, gain 1.2, attack 0.03 s, release 0.5 s.
-    nonisolated static func makeBrightnessMapper() -> AudioMapper { mapper(.level, gain: 1.2, attack: 0.03, release: 0.5) }
+    /// The model matrix of every piece of `world` in a frame for the primary `scale` at the camera's rail `pose`:
+    /// tunnel and star corridor the radial `breathingModel`, landscape the `swellModel` about the strip's base.
+    nonisolated static func pieceModel(world: JourneyWorld, scale: Double, pose: RailPose, origin: Vec3) -> Mat4 {
+        switch world {
+        case .tunnel, .starCorridor:
+            breathingModel(scale: scale, centre: pose.position, direction: pose.direction, origin: origin)
+        case .landscape:
+            swellModel(scale: scale, centre: pose.position - pose.up * WorldPieces.landscapeDrop, up: pose.up,
+                       origin: origin)
+        }
+    }
 
     /// What runs (or should run): the demo with its seed and mode, the picked file (by pick number) or the microphone.
     enum SourceKey: Equatable {
@@ -247,6 +286,8 @@ final class OdysseyPresenter: ExperiencePresenter {
     private(set) var lastDrawnPieces: [Int] = []
     /// The model matrix of the tunnel pieces in the last frame (nil outside the tunnel).
     private(set) var lastTunnelModel: Mat4?
+    /// The model matrix shared by every piece drawn in the last frame, in any world (feature 056).
+    private(set) var lastModel: Mat4?
     /// The number of piece renderers made since the presenter was created (tests read it).
     private(set) var piecesMade = 0
     /// The number of tunnel pieces built by the last frame (at most `SegmentWindow.maxBuildsPerStep`).
@@ -275,10 +316,10 @@ final class OdysseyPresenter: ExperiencePresenter {
     /// The features of the last frame (silence before the first).
     private(set) var lastFeatures = AudioFeatures.silent(bandCount: OdysseyPresenter.bandCount)
     private var scratch = [Float](repeating: 0, count: OdysseyPresenter.analysisSize)
-    private var rippleMapper = OdysseyPresenter.makeRippleMapper()
-    private var brightnessMapper = OdysseyPresenter.makeBrightnessMapper()
-    /// The tunnel's audio response, updated once per frame.
-    private(set) var response: TunnelResponse
+    /// The audio envelope, updated once per frame from the features (feature 056).
+    private(set) var envelope = AudioEnvelope()
+    /// The audio response of the world drawn, updated once per frame (feature 056: per world).
+    private(set) var response: WorldResponse
 
     init(experienceID: ExperienceID, permission: any MicrophonePermission, factory: OdysseySourceFactory = .system,
          reduceMotion: Bool = false, reduceFlashing: Bool = false) {
@@ -287,7 +328,7 @@ final class OdysseyPresenter: ExperiencePresenter {
         self.factory = factory
         self.reduceMotion = reduceMotion
         self.reduceFlashing = reduceFlashing
-        response = TunnelResponse(reduceMotion: reduceMotion, reduceFlashing: reduceFlashing)
+        response = WorldResponse(world: .tunnel, reduceMotion: reduceMotion, reduceFlashing: reduceFlashing)
     }
 
     /// The number of live piece renderers: the fixed window's and the streamed tunnel's.
@@ -322,7 +363,7 @@ final class OdysseyPresenter: ExperiencePresenter {
             mirror.message = "The sound stopped: \(reason)"
         }
         scheduleMirrorIfNeeded(core)
-        updateResponse(frame: frame)
+        updateResponse(core, frame: frame)
         let state = core.state
         let path = makeRail(for: state.seed)
         if cacheWorld != state.world || cacheSeed != state.seed {
@@ -355,16 +396,16 @@ final class OdysseyPresenter: ExperiencePresenter {
                 return renderer
             }, retire: { $0.release() })
             tunnelBuiltLastFrame = step.toBuild.count
-            let model = Self.breathingModel(scale: response.breathingScale, centre: pose.position,
-                                            direction: pose.direction, origin: origin)
+            let model = Self.pieceModel(world: .tunnel, scale: response.primaryScale, pose: pose, origin: origin)
             for index in tunnel.live {
                 guard let renderer = tunnel.element(for: index) else { continue }
                 renderer.lightDirection = light
-                renderer.ambient = response.ambient
+                renderer.ambient = response.light
                 items.append(DepthMeshPass.Item(renderer: renderer, model: model, color: color))
                 drawn.append(index)
             }
             lastTunnelModel = model
+            lastModel = model
         } else {
             if tunnel.liveCount > 0 || tunnelSeed != nil {
                 tunnel.reset { $0.release() }
@@ -375,7 +416,7 @@ final class OdysseyPresenter: ExperiencePresenter {
                 pieces[index]?.release()
                 pieces[index] = nil
             }
-            let model = Mat4.translation(-origin)
+            let model = Self.pieceModel(world: state.world, scale: response.primaryScale, pose: pose, origin: origin)
             for index in window {
                 let renderer: MeshRenderer
                 if let cached = pieces[index] {
@@ -384,15 +425,16 @@ final class OdysseyPresenter: ExperiencePresenter {
                     renderer = try MeshRenderer(mesh: WorldPieces.piece(state.world, index: index, rail: path,
                                                                         seed: state.seed),
                                                 registry: context.resources)
-                    renderer.ambient = Self.ambient
                     pieces[index] = renderer
                     piecesMade += 1
                 }
                 renderer.lightDirection = light
+                renderer.ambient = response.light
                 items.append(DepthMeshPass.Item(renderer: renderer, model: model, color: color))
                 drawn.append(index)
             }
             lastTunnelModel = nil
+            lastModel = model
         }
         if pass == nil {
             let made = DepthMeshPass(registry: context.resources)
@@ -452,14 +494,14 @@ final class OdysseyPresenter: ExperiencePresenter {
 
     // MARK: Audio response
 
-    /// Analyses the newest samples once for this frame and moves the response toward the mapped targets.
-    private func updateResponse(frame: FrameInfo) {
+    /// Analyses the newest samples once for this frame, updates the envelope and moves the world's response toward
+    /// the targets of the world's mapping (the response is rebuilt first when the world or a reduce flag changed).
+    private func updateResponse(_ core: OdysseyCore, frame: FrameInfo) {
         let rate = activeSource?.sampleRate ?? 48_000
         if extractor == nil || extractor?.sampleRate != rate {
             extractor = FeatureExtractor(size: Self.analysisSize, sampleRate: rate, bandCount: Self.bandCount)
             lastFeatures = AudioFeatures.silent(bandCount: Self.bandCount)
-            rippleMapper.reset()
-            brightnessMapper.reset()
+            envelope = AudioEnvelope()
         }
         let count = ring.latest(Self.analysisSize, into: &scratch)
         let used = max(0, min(count, scratch.count))
@@ -469,9 +511,15 @@ final class OdysseyPresenter: ExperiencePresenter {
                                   elapsed: frame.delta, into: &lastFeatures)
             }
         }
-        let rippleTarget = rippleMapper.value(for: lastFeatures, range: 0...1, elapsed: frame.delta)
-        let ambientTarget = brightnessMapper.value(for: lastFeatures, range: 0...1, elapsed: frame.delta)
-        response.update(rippleTarget: rippleTarget, ambientTarget: ambientTarget)
+        envelope.update(bandEnergies: lastFeatures.bandEnergies, flux: lastFeatures.flux, onset: lastFeatures.onset,
+                        time: frame.time, elapsed: frame.delta)
+        let world = core.state.world
+        let calm = reduceMotion || core.state.calmMotion
+        if response.world != world || response.reduceMotion != calm || response.reduceFlashing != reduceFlashing {
+            response = WorldResponse(world: world, reduceMotion: calm, reduceFlashing: reduceFlashing)
+        }
+        let targets = core.state.mapping(for: world).target(from: envelope)
+        response.update(primaryTarget: targets.primary, lightTarget: targets.light)
     }
 
     // MARK: Sources
@@ -534,8 +582,7 @@ final class OdysseyPresenter: ExperiencePresenter {
             activeSource = source
             activeKey = key
             extractor?.reset()                                  // no onset of the previous source lingers
-            rippleMapper.reset()
-            brightnessMapper.reset()
+            envelope = AudioEnvelope()
             if !mirror.showsSettingsLink { mirror.message = nil }   // a stale file or stop message goes
         } catch {
             failedKey = key
@@ -675,6 +722,11 @@ final class OdysseyPresenter: ExperiencePresenter {
         let state = core.state
         if mirror.world != state.world { mirror.world = state.world }
         if mirror.speedChoice != state.speedChoice { mirror.speedChoice = state.speedChoice }
+        if mirror.speedTarget != state.speedTarget { mirror.speedTarget = state.speedTarget }
+        if mirror.easing != state.easing { mirror.easing = state.easing }
+        if mirror.calmMotion != state.calmMotion { mirror.calmMotion = state.calmMotion }
+        let mapping = state.mapping(for: state.world)
+        if mirror.mapping != mapping { mirror.mapping = mapping }
         if mirror.paused != state.paused { mirror.paused = state.paused }
         if mirror.source != state.source { mirror.source = state.source }
         let name = sourceName(state.source)
@@ -692,29 +744,37 @@ final class OdysseyPresenter: ExperiencePresenter {
     }
 
     /// The response in words: "at rest" (within a tenth of the way from rest to the upper bound), "gentle" (below
-    /// half) or "strong", by the larger of the ripple's and the brightness's share.
-    nonisolated static func responseWord(_ response: TunnelResponse) -> String {
+    /// half) or "strong", by the larger of the primary's and the light's share.
+    nonisolated static func responseWord(_ response: WorldResponse) -> String {
         func share(_ value: Double, rest: Double, upper: Double) -> Double {
             upper > rest ? max(0, (value - rest) / (upper - rest)) : 0
         }
-        let level = max(share(response.ripple, rest: response.rippleRest, upper: response.rippleRange.upperBound),
-                        share(response.ambient, rest: response.ambientRest, upper: response.ambientRange.upperBound))
+        let level = max(share(response.primary, rest: response.primaryRest, upper: response.primaryRange.upperBound),
+                        share(response.light, rest: response.lightRest, upper: response.lightRange.upperBound))
         return level < 0.1 ? "at rest" : (level < 0.5 ? "gentle" : "strong")
     }
 
-    /// "Tunnel, medium speed, flying, demo signal, sound response at rest." (world, speed choice, pause, source and the
-    /// mapped response in words).
-    static func description(of state: JourneyState, source: String, response: String) -> String {
-        "\(state.world.displayName), \(state.speedChoice.displayName.lowercased()) speed, "
-            + (state.paused ? "paused" : "flying") + ", \(source), sound response \(response)."
+    /// A speed in words: "4 units per second", "2.5 units per second" (the target lies on the 0.5 grid).
+    nonisolated static func speedWords(_ speed: Double) -> String {
+        let text = speed == speed.rounded() && abs(speed) < 1e6 ? String(Int(speed)) : String(speed)
+        return "\(text) units per second"
     }
 
-    /// "Audio Odyssey: Tunnel, medium speed, flying, demo signal, sound response at rest." Also brings the running
-    /// source in line with `core` and mirrors Reduce Motion when needed.
+    /// "Tunnel, 4 units per second, standard easing, flying, demo signal, sound response at rest." (world, speed target,
+    /// easing, "calm motion" when `calm`, pause, source and the mapped response in words).
+    static func description(of state: JourneyState, calm: Bool, source: String, response: String) -> String {
+        "\(state.world.displayName), \(speedWords(state.speedTarget)), \(state.easing.displayName.lowercased()) easing, "
+            + (calm ? "calm motion, " : "") + (state.paused ? "paused" : "flying")
+            + ", \(source), sound response \(response)."
+    }
+
+    /// "Audio Odyssey: Tunnel, 4 units per second, standard easing, flying, demo signal, sound response at rest."
+    /// Also brings the running source in line with `core` and mirrors Reduce Motion when needed.
     func describe(_ core: OdysseyCore) -> String {
         sync(core)
         scheduleMirrorIfNeeded(core)
-        return "Audio Odyssey: " + Self.description(of: core.state, source: spokenSourceName(core.state.source),
+        return "Audio Odyssey: " + Self.description(of: core.state, calm: core.state.calmMotion || reduceMotion,
+                                                    source: spokenSourceName(core.state.source),
                                                     response: Self.responseWord(response))
     }
 
@@ -736,6 +796,7 @@ final class OdysseyPresenter: ExperiencePresenter {
     /// and the permission mirror by the Microphone button's flow.
     var nativeActions: Set<String> {
         ["world.select", "speed.select", "flight.pause", "flight.resume", "journey.reseed", "comfort.reduce-motion",
-         "source.demo", "source.microphone", "source.file", "permission.mirror"]
+         "source.demo", "source.microphone", "source.file", "permission.mirror", "speed.set", "easing.select",
+         "comfort.calm", "mapping.set", "mapping.reset"]
     }
 }

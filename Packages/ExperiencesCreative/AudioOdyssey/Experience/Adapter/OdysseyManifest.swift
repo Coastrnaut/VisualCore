@@ -7,6 +7,10 @@
 // flight keeps going, without starting real capture (as A06's fixture does): the permission is mirrored as denied, the
 // microphone is refused by the rule `a07.permission-denied`, the demo is selected again; the steps between the switches
 // keep the flight moving and the switches change neither distance nor speed. Fixture 2 keeps the comfort run.
+// Feature 056 (A07-P03) T-A07-305 (FR-A07-331; SC-A07-305): fixture 2 also covers the continuous speed and the easing
+// (`speed.set [5.5]` and `easing.select [0]` with flight steps between); fixture 3 keeps the denied-microphone sequence
+// and adds two more `source.demo` switches (five source switches in all). The expected digests (now
+// `a07.journey.v3`) still derive by playing.
 #if DEBUG || VISUALCORE_AUTOMATION
 import AudioOdysseyCore
 import VisualCoreExperience
@@ -59,8 +63,9 @@ extension OdysseyCore {
     ///    turn and a new journey is started, so the presenter builds and joins fresh pieces of all three worlds (the
     ///    joins themselves are proved within 1e-9 by `WorldPiecesTests`); the final digest proves the switches kept
     ///    distance and speed;
-    /// 2. comfort limits: fast is chosen and held, then slow, then a pause and a resume; the speed eases within the
-    ///    standard limits throughout (proved step by step by `OdysseyCoreTests` and `RailFlightTests`).
+    /// 2. comfort limits: fast is chosen and held, then slow, then (feature 056) the continuous target 5.5 and the gentle
+    ///    easing, then a pause and a resume; the speed eases within the active limits throughout (proved step by step
+    ///    by `OdysseyCoreTests`, `OdysseyComfortTests` and `RailFlightTests`).
     public static var fixtureEntries: [[ScenarioStep]] {
         func step(_ control: String, _ values: [Double] = [], _ result: String = "accepted", steps: Int) -> ScenarioStep {
             ScenarioStep(steps: steps, action: ScriptedAction(control, values), result: result)
@@ -69,13 +74,16 @@ extension OdysseyCore {
             [step("world.select", [1], steps: 240), step("world.select", [2], steps: 240),
              step("journey.reseed", steps: 240), step("world.select", [0], steps: 240), ScenarioStep(steps: 240)],
             [step("speed.select", [2], steps: 10), step("speed.select", [0], steps: 600),
+             step("speed.set", [5.5], steps: 240), step("easing.select", [0], steps: 240),
              step("flight.pause", steps: 240), step("flight.resume", steps: 240), ScenarioStep(steps: 120)],
             // Fixture 3 (catalog: "source switching does not reset the context"): the permission mirrored as denied, the
             // microphone refused by the rule (no request, no capture), the demo selected again, a world switch between,
-            // all while flying; the host context stays and distance and speed are untouched by the switches.
+            // all while flying; the host context stays and distance and speed are untouched by the switches. Feature 056
+            // adds two more demo switches: five source switches in all.
             [step("permission.mirror", [2], steps: 30),
              step("source.microphone", [], "action.rule." + OdysseyRule.permissionDenied, steps: 30),
              step("source.demo", steps: 30), step("world.select", [2], steps: 30), step("source.demo", steps: 30),
+             step("source.demo", steps: 30), step("source.demo", steps: 30),
              ScenarioStep(steps: 60)],
             // Fixture 4 (catalog: "stable and measurable scene response"): a steady medium flight advances the same
             // distance for the same steps; the audio-driven form follows in A07-P03.

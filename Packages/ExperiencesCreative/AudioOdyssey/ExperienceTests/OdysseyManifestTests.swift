@@ -5,11 +5,14 @@
 // `TEST_RUNNER_UPDATE_SCENARIO_MANIFEST=1`, rewrites it, as for Music Lab).
 // Feature 055 (A07-P02) T-A07-207: fixture 3 switches sources (permission mirrored as denied, microphone refused by
 // the rule, demo again) while flying; the switches change neither distance nor speed.
+// Feature 056 (A07-P03) T-A07-305: fixture 2 adds `speed.set [5.5]` and `easing.select [0]`; fixture 3 has five source
+// switches.
 import Foundation
 import Testing
 @testable import AudioOdysseyExperience
 import AudioOdysseyCore
 import VisualCoreExperience
+import VisualCoreMath
 
 private let id = ExperienceID(rawValue: OdysseyCore.experienceID)!
 
@@ -63,11 +66,14 @@ private func play(_ spec: ScenarioSpec) async throws -> (initial: String, result
         #expect(joins.state.seed == OdysseyCore.manifestSeed &+ JourneyState.seedStep)
         #expect(joins.state.distance > 3 * 8, "the flight crossed several piece boundaries: \(joins.state.distance)")
         #expect(abs(joins.state.speed - 4) < 1e-9)
-        // Fixture 2: after slow, a pause and a resume, the speed is back on its way to slow and within the limits.
+        // Fixture 2: after slow, the continuous target 5.5, the gentle easing, a pause and a resume, the speed is back on
+        // its way to 5.5 within the limits.
         let comfort = OdysseyCore.played(seed: OdysseyCore.manifestSeed, entries: OdysseyCore.fixtureEntries[1])
-        #expect(comfort.state.speedChoice == .slow)
+        #expect(comfort.state.speedTarget == 5.5)
+        #expect(comfort.state.easing == .gentle)
         #expect(!comfort.state.paused)
-        #expect(comfort.state.speed > 0 && comfort.state.speed <= 2)
+        #expect(comfort.state.speed > 0 && comfort.state.speed <= 5.5)
+        #expect(comfort.limits.maxAcceleration == ComfortLimits.standard.maxAcceleration * Easing.gentle.accelerationFactor)
         // Fixture 3: the microphone was refused, the demo plays, the last world switch wins; the flight never stopped.
         let switches = OdysseyCore.played(seed: OdysseyCore.manifestSeed, entries: OdysseyCore.fixtureEntries[2])
         #expect(switches.state.world == .starCorridor)
@@ -75,6 +81,7 @@ private func play(_ spec: ScenarioSpec) async throws -> (initial: String, result
         #expect(switches.permission == .denied)
         #expect(switches.state.distance > 0)
         let fixture3 = OdysseyCore.fixtureEntries[2]
+        #expect(fixture3.filter { $0.action?.control.hasPrefix("source.") == true }.count == 5, "five source switches")
         #expect(fixture3.contains { $0.action?.control == "source.microphone"
                                     && $0.result == "action.rule." + OdysseyRule.permissionDenied })
         // The switches change neither distance nor speed: the same steps without any action give the same flight.

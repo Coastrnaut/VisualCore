@@ -8,6 +8,7 @@
 // the experience's sources never create a graphics context of their own (only the host's context is used).
 // Feature 055 (A07-P02) T-A07-205: the tunnel streams (at most 2 pieces built per frame until the window of 2 + 1 + 8
 // is complete) and the description names the source and the response.
+// Feature 056 (A07-P03) T-A07-303: the description names the speed target in units per second and the easing.
 import Foundation
 import XCTest
 @testable import AudioOdysseyExperience
@@ -69,7 +70,7 @@ final class OdysseySessionTests: XCTestCase {
         XCTAssertEqual(live, Array(0..<live.count), "nearest first, from piece 0")
         XCTAssertLessThanOrEqual(presenter.tunnelBuiltLastFrame, 2)
         XCTAssertGreaterThan(shell.diagnostics.gpu?.objects ?? 0, 0, "the pieces live in the host's registry")
-        XCTAssertTrue(shell.accessibilitySummary.hasPrefix("Audio Odyssey: Tunnel, medium speed, flying, demo signal, "),
+        XCTAssertTrue(shell.accessibilitySummary.hasPrefix("Audio Odyssey: Tunnel, 4 units per second, standard easing, flying, demo signal, "),
                       shell.accessibilitySummary)
         XCTAssertEqual(presenter.mirror.world, .tunnel)
         XCTAssertEqual(presenter.mirror.speedChoice, .medium)
@@ -81,7 +82,7 @@ final class OdysseySessionTests: XCTestCase {
         XCTAssertEqual(presenter.tunnel.live, Array(streamed), "the whole window is streamed in")
         XCTAssertEqual(presenter.lastDrawnPieces, Array(streamed))
         XCTAssertTrue(shell.handle(control: "flight.pause").isAccepted)
-        XCTAssertTrue(shell.accessibilitySummary.hasPrefix("Audio Odyssey: Tunnel, medium speed, paused, demo signal, "),
+        XCTAssertTrue(shell.accessibilitySummary.hasPrefix("Audio Odyssey: Tunnel, 4 units per second, standard easing, paused, demo signal, "),
                       shell.accessibilitySummary)
         XCTAssertTrue(presenter.mirror.paused)
 
@@ -108,7 +109,7 @@ final class OdysseySessionTests: XCTestCase {
         XCTAssertEqual(presenter.piecesMade - made, window.count, "the landscape window was built")
         XCTAssertEqual(Set(presenter.pieces.keys), Set(window))
         XCTAssertGreaterThanOrEqual(try core(shell).state.distance, before.distance, "the same rail position, onward")
-        XCTAssertTrue(shell.accessibilitySummary.hasPrefix("Audio Odyssey: Landscape, medium speed, flying, demo signal, "),
+        XCTAssertTrue(shell.accessibilitySummary.hasPrefix("Audio Odyssey: Landscape, 4 units per second, standard easing, flying, demo signal, "),
                       shell.accessibilitySummary)
         XCTAssertEqual(presenter.tunnel.liveCount, 0, "leaving the tunnel empties the stream")
 

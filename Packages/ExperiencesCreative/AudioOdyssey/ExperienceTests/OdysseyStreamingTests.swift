@@ -145,7 +145,7 @@ final class OdysseyStreamingTests: XCTestCase {
         let state = try XCTUnwrap(shell.engine.core).state
         let rail = try XCTUnwrap(shell.presenter.rail)
         let pose = rail.pose(at: state.distance)
-        let expected = OdysseyPresenter.breathingModel(scale: shell.presenter.response.breathingScale,
+        let expected = OdysseyPresenter.breathingModel(scale: shell.presenter.response.primaryScale,
                                                        centre: pose.position, direction: pose.direction,
                                                        origin: shell.presenter.rebase.origin)
         XCTAssertEqual(tunnelModel, expected)

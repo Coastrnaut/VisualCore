@@ -117,8 +117,8 @@ final class OdysseyRenderTests: XCTestCase {
         for _ in 0..<30 where !shell.presenter.tunnel.window.isComplete { try await frames(session, 1) }
         XCTAssertTrue(shell.presenter.tunnel.window.isComplete)
         let response = shell.presenter.response
-        XCTAssertEqual(response.ripple, response.rippleRest, "silence keeps the response at rest")
-        XCTAssertEqual(response.ambient, response.ambientRest)
+        XCTAssertEqual(response.primary, response.primaryRest, "silence keeps the response at rest")
+        XCTAssertEqual(response.light, response.lightRest)
         let first = try picture(session)
         try await frames(session, 3)
         let second = try picture(session)

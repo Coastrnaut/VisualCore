@@ -7,6 +7,9 @@
 // Feature 055 (A07-P02) T-A07-205 (FR-A07-220; SC-A07-205): schema 2 with the source; the source actions, the
 // microphone refused by the rule while the mirrored permission is denied or restricted, source switches keeping the
 // flight, the permission mirror out of the digest and kept by a reset, and the schema-1 example migrating.
+// Feature 056 (A07-P03) T-A07-303 (FR-A07-301–303, FR-A07-312, FR-A07-330): schema 3 and the digest `a07.journey.v3`;
+// fifteen controls; the new actions change the digest; the flight accelerates at the easing's share of the limit
+// (standard 0.66 by default); the schema-1 and schema-2 examples migrate; damaged schema-3 payloads are refused.
 import Foundation
 import Testing
 @testable import AudioOdysseyExperience
@@ -33,8 +36,9 @@ private func core(_ engine: ExperienceEngine<OdysseyCore>) throws -> OdysseyCore
         #expect(AudioOdysseyExperience.id?.rawValue == "a07.audio-odyssey")
         #expect(OdysseyCore.controls.map(\.id)
                 == ["world.select", "speed.select", "flight.pause", "flight.resume", "journey.reseed",
-                    "comfort.reduce-motion", "source.demo", "source.microphone", "source.file", "permission.mirror"])
-        #expect(OdysseyCore.migrations.currentVersion == 2)
+                    "comfort.reduce-motion", "source.demo", "source.microphone", "source.file", "permission.mirror",
+                    "speed.set", "easing.select", "comfort.calm", "mapping.set", "mapping.reset"])
+        #expect(OdysseyCore.migrations.currentVersion == 3)
     }
 
     @Test func conformancePassesOverFourSeeds() async {
@@ -45,12 +49,19 @@ private func core(_ engine: ExperienceEngine<OdysseyCore>) throws -> OdysseyCore
                       ScriptedAction("flight.resume"), ScriptedAction("world.select", [2]),
                       ScriptedAction("comfort.reduce-motion", [1]), ScriptedAction("speed.select", [0]),
                       ScriptedAction("source.file"), ScriptedAction("permission.mirror", [1]),
-                      ScriptedAction("source.microphone"), ScriptedAction("source.demo")],
+                      ScriptedAction("source.microphone"), ScriptedAction("source.demo"),
+                      ScriptedAction("speed.set", [5.5]), ScriptedAction("easing.select", [0]),
+                      ScriptedAction("comfort.calm", [1]), ScriptedAction("mapping.set", [0, 2, 2]),
+                      ScriptedAction("mapping.reset")],
             rejected: [ScriptedAction("world.select", [3]), ScriptedAction("world.select", [.nan]),
                        ScriptedAction("speed.select", [-1]), ScriptedAction("flight.pause", [1]),
                        ScriptedAction("flight.resume"), ScriptedAction("comfort.reduce-motion", [2]),
                        ScriptedAction("source.demo", [1]), ScriptedAction("permission.mirror", [4]),
-                       ScriptedAction("bogus")])
+                       ScriptedAction("speed.set", [0.4]), ScriptedAction("speed.set", [7.5]),
+                       ScriptedAction("easing.select", [3]), ScriptedAction("comfort.calm", [2]),
+                       ScriptedAction("mapping.set", [2, 0, 0]), ScriptedAction("mapping.set", [0, 5, 0]),
+                       ScriptedAction("mapping.set", [0, 0, 3]), ScriptedAction("mapping.set", [0, 0]),
+                       ScriptedAction("mapping.reset", [1]), ScriptedAction("bogus")])
         let report = await ExperienceConformance.run(OdysseyCore.self, id: id, plan: plan)
         for entry in report.entries { #expect(entry.passed, "\(entry.check): \(entry.detail)") }
     }
@@ -69,7 +80,7 @@ private func core(_ engine: ExperienceEngine<OdysseyCore>) throws -> OdysseyCore
         var engine = try await engine()
         try engine.run(steps: 120)   // 1 s
         let state = try core(engine).state
-        #expect(abs(state.speed - 1.5) < 1e-9, "1 s at 1.5 units/s² from rest: \(state.speed)")
+        #expect(abs(state.speed - 1.5 * 0.66) < 1e-9, "1 s at 1.5 × 0.66 units/s² (standard easing): \(state.speed)")
         #expect(state.distance > 0)
         #expect(try core(engine).outcome?.code == OdysseyCore.outcomeCode)
     }
@@ -79,7 +90,9 @@ private func core(_ engine: ExperienceEngine<OdysseyCore>) throws -> OdysseyCore
         var last = try engine.digest()
         for (control, values) in [("world.select", [1.0]), ("world.select", [2.0]), ("speed.select", [2.0]),
                                   ("flight.pause", []), ("flight.resume", []), ("journey.reseed", []),
-                                  ("source.file", []), ("source.demo", [])] {
+                                  ("source.file", []), ("source.demo", []), ("speed.set", [5.5]),
+                                  ("easing.select", [2]), ("comfort.calm", [1]), ("mapping.set", [1, 3, 2]),
+                                  ("mapping.reset", [])] {
             #expect(engine.handle(control: control, values: values).isAccepted, "\(control) \(values)")
             let now = try engine.digest()
             #expect(now != last, "\(control) \(values) changes the digest")
@@ -125,8 +138,9 @@ private func core(_ engine: ExperienceEngine<OdysseyCore>) throws -> OdysseyCore
 
     @Test func theSchemaOneExampleMigratesToTheDemoSignal() async throws {
         let example = try #require(OdysseyCore.schemaOneExample())
-        #expect(example.version == 1)
-        let problems = await SnapshotMigrationCheck.problems(for: OdysseyCore.self, id: id, examples: [example])
+        let two = try #require(OdysseyCore.schemaTwoExample())
+        #expect(example.version == 1 && two.version == 2)
+        let problems = await SnapshotMigrationCheck.problems(for: OdysseyCore.self, id: id, examples: [example, two])
         #expect(problems.isEmpty, "\(problems)")
         // The same payload restored by an engine: the journey with the demo signal.
         var engine = try await engine(seed: 3)
@@ -134,6 +148,8 @@ private func core(_ engine: ExperienceEngine<OdysseyCore>) throws -> OdysseyCore
         let state = try core(engine).state
         #expect(state.source == .demo)
         #expect(state.world == .landscape && state.distance == 12.5 && state.speedChoice == .fast && state.speed == 3)
+        #expect(state.speedTarget == 7 && state.easing == .standard && !state.calmMotion)
+        #expect(state.mappings == WorldMapping.allDefaults)
         #expect(try engine.digest().hex == example.expectedDigest)
     }
 
@@ -153,6 +169,8 @@ private func core(_ engine: ExperienceEngine<OdysseyCore>) throws -> OdysseyCore
 
     @Test func speedEasesWithinTheStandardLimits() async throws {
         var engine = try await engine()
+        #expect(engine.handle(control: "easing.select", values: [2]).isAccepted, "brisk: the full standard limit")
+        #expect(try core(engine).limits == .standard)
         #expect(engine.handle(control: "speed.select", values: [0]).isAccepted)
         try engine.run(steps: 240)
         #expect(abs(try core(engine).state.speed - 2) < 1e-9, "slow reached")
@@ -174,7 +192,9 @@ private func core(_ engine: ExperienceEngine<OdysseyCore>) throws -> OdysseyCore
     @Test func reduceMotionCapsTheSpeedAndRemovesTheSway() async throws {
         var engine = try await engine()
         #expect(engine.handle(control: "comfort.reduce-motion", values: [1]).isAccepted)
-        #expect(try core(engine).limits == .reducedMotion)
+        let limits = try core(engine).limits
+        #expect(limits.maxSpeed == ComfortLimits.reducedMotion.maxSpeed && limits.swayAmplitude == 0)
+        #expect(abs(limits.maxAcceleration - ComfortLimits.reducedMotion.maxAcceleration * 0.66) < 1e-12)
         #expect(engine.handle(control: "speed.select", values: [2]).isAccepted)
         var top = 0.0
         for _ in 0..<12 {   // 6 s in half-second segments
@@ -193,7 +213,7 @@ private func core(_ engine: ExperienceEngine<OdysseyCore>) throws -> OdysseyCore
 
     @Test func pauseEasesToRestAndKeepsTheJourneyAndResumeContinues() async throws {
         var engine = try await engine()
-        try engine.run(steps: 360)   // 3 s: speed 4 reached after 2.67 s
+        try engine.run(steps: 360)   // 3 s at 0.99 units/s² (standard easing): about 3 units/s
         #expect(engine.handle(control: "flight.pause").isAccepted)
         let paused = try core(engine).state
         try engine.run(steps: 60)
@@ -233,7 +253,7 @@ private func core(_ engine: ExperienceEngine<OdysseyCore>) throws -> OdysseyCore
         try first.run(steps: 50)
         #expect(first.handle(control: "flight.pause").isAccepted)
         let snapshot = try first.snapshot()
-        #expect(snapshot.schemaVersion == 2)
+        #expect(snapshot.schemaVersion == 3)
         let decoded = try ExperienceSnapshot(data: snapshot.encoded())
         var second = try await engine(seed: 3)
         try second.restore(decoded)
@@ -263,6 +283,16 @@ private func core(_ engine: ExperienceEngine<OdysseyCore>) throws -> OdysseyCore
                                               payload: Data(unknown.utf8))
         #expect(throws: ExperienceError.self) { try engine.restore(snapshot) }
         #expect(try engine.digest() == before)
+        // Schema 3 with a speed target outside 0.5…7, and with two mappings only.
+        let map = #"{"light":{"channel":4,"sensitivity":1},"primary":{"channel":0,"sensitivity":1}}"#
+        for damaged in [#"{"calmMotion":false,"distance":0,"easing":1,"mappings":[%,%,%],"paused":false,"seed":7,"source":0,"speed":0,"speedTarget":9,"world":0}"#,
+                        #"{"calmMotion":false,"distance":0,"easing":1,"mappings":[%,%],"paused":false,"seed":7,"source":0,"speed":0,"speedTarget":4,"world":0}"#] {
+            let payload = damaged.replacingOccurrences(of: "%", with: map)
+            let snapshot = try ExperienceSnapshot(experience: id, schemaVersion: 3, seed: 7, stepIndex: 0, digest: before,
+                                                  payload: Data(payload.utf8))
+            #expect(throws: ExperienceError.self) { try engine.restore(snapshot) }
+            #expect(try engine.digest() == before)
+        }
     }
 
     @Test func resetReturnsToTheFirstJourneyAndKeepsTheMirror() async throws {
