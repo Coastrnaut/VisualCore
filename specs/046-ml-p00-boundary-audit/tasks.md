@@ -15,13 +15,13 @@
 
 ## Phase 4: User Story 2 — The reference stays proven (P1)
 
-- [ ] T-A06-004 [US2] Reference chunk 1 (`python3 Tools/python/desktop_runbook.py run-check --stage A06-P00 --timeout 600 --name reference-1 -- python3 scripts/release_check.py --only reference-engine-xcframework reference-build-projectm-ios-sim reference-clean`)
+- [X] T-A06-004 [US2] Reference chunk 1 (`python3 Tools/python/desktop_runbook.py run-check --stage A06-P00 --timeout 600 --name reference-1 -- python3 scripts/release_check.py --only reference-engine-xcframework reference-build-projectm-ios-sim reference-clean`) — Verified 2026-11-14: 2026-11-14 .autonomy/checks/A06-P00.reference-1.json (exit 0)
 - [ ] T-A06-005 [US2] Reference chunk 2 (`python3 Tools/python/desktop_runbook.py run-check --stage A06-P00 --timeout 600 --name reference-2 -- python3 scripts/release_check.py --only reference-test-anglerendering-ios27 reference-test-anglerendering-ios26 projectm-reference-ios27 projectm-reference-ios26`); record the 7 steps, commands and results in `docs/apps/visualcore-music-lab/regression-baseline.md` (FR-A06-004, SC-A06-003)
 
 ## Phase 5: User Story 3 — The shell builds with the experience absent (P2)
 
 - [ ] T-A06-006 [US3] Build the one app for testing (`python3 Tools/python/desktop_runbook.py run-check --stage A06-P00 --timeout 600 --name app-build -- python3 scripts/release_check.py --only app-build-for-testing-ios27`)
-- [ ] T-A06-007 [US3] Experience package check (`python3 Tools/python/desktop_runbook.py run-check --stage A06-P00 --timeout 600 --name experience-packages -- python3 scripts/check_experience_packages.py`: 4 experiences, none A05); `grep -c a05 Catalog/registrations.json Apps/VisualCore/App/ExperienceRegistry.swift` gives 0 (FR-A06-005, SC-A06-004)
+- [ ] T-A06-007 [US3] Experience package check (`python3 Tools/python/desktop_runbook.py run-check --stage A06-P00 --timeout 600 --name experience-packages -- python3 scripts/check_experience_packages.py`: 5 experiences, none A06); `grep -c a06 Catalog/registrations.json Apps/VisualCore/App/ExperienceRegistry.swift` gives 0 (FR-A06-005, SC-A06-004)
 
 ## Phase 6: User Story 4 — Stop/go decision (P2)
 

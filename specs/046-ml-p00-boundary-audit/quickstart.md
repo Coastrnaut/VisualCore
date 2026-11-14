@@ -10,4 +10,4 @@ git diff --stat 4c27bfaf..HEAD -- Packages External
 python3 scripts/test_scripts.py
 ```
 
-Expected: contract PASS; 7 of 7 reference steps; the app builds; 4 experiences, none A05; empty diff; script tests OK.
+Expected: contract PASS; 7 of 7 reference steps; the app builds; 5 experiences, none A06; empty diff; script tests OK.
