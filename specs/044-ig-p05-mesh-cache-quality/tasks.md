@@ -35,7 +35,7 @@
 - [X] T-A05-515 Public API and docs: `check_public_api.py --update`, `python3 Tools/python/desktop_runbook.py run-check --stage A05-P05 --timeout 600 --name public-api -- python3 scripts/check_public_api.py`; VisualCore README (MeshCache, TessellationChoice); Auto-Creator.md §13 rows (FR-A05-532) — Verified 2026-11-14: 2026-11-14 .autonomy/checks/A05-P05.public-api.json (2478 declarations, 0 undocumented); README and Auto-Creator §13
 - [X] T-A05-516 Reference chunk 1 (`python3 Tools/python/desktop_runbook.py run-check --stage A05-P05 --timeout 600 --name reference-1 -- python3 scripts/release_check.py --only reference-engine-xcframework reference-build-projectm-ios-sim reference-clean`) — Verified 2026-11-14: 2026-11-14 .autonomy/checks/A05-P05.reference-1.json (exit 0)
 - [X] T-A05-517 Reference chunk 2 (`python3 Tools/python/desktop_runbook.py run-check --stage A05-P05 --timeout 600 --name reference-2 -- python3 scripts/release_check.py --only reference-test-anglerendering-ios27 reference-test-anglerendering-ios26 projectm-reference-ios27 projectm-reference-ios26`) — Verified 2026-11-14: 2026-11-14 .autonomy/checks/A05-P05.reference-2.json (exit 0)
-- [ ] T-A05-518 Script tests (`python3 Tools/python/desktop_runbook.py run-check --stage A05-P05 --timeout 600 --name script-tests -- python3 scripts/test_scripts.py`)
+- [X] T-A05-518 Script tests (`python3 Tools/python/desktop_runbook.py run-check --stage A05-P05 --timeout 600 --name script-tests -- python3 scripts/test_scripts.py`) — Verified 2026-11-14: 2026-11-14 .autonomy/checks/A05-P05.script-tests.json (exit 0)
 - [ ] T-A05-519 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A05-P05
 
 ## Dependencies
