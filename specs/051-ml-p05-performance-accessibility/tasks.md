@@ -7,7 +7,7 @@
 
 ## Phase 1: Setup
 
-- [ ] T-A06-501 Baseline: cite the A06-P04 evidence on the unchanged tree (`.autonomy/checks/A06-P04.rendering-ios27.json`, `.autonomy/checks/A06-P04.experiences-ios27-2.json`, `.autonomy/checks/A06-P04.app-unit-2.json`, `.autonomy/checks/A06-P04.verify-27.json`) instead of a rerun (owner ruling 4 of 2026-11-14)
+- [X] T-A06-501 Baseline: cite the A06-P04 evidence on the unchanged tree (`.autonomy/checks/A06-P04.rendering-ios27.json`, `.autonomy/checks/A06-P04.experiences-ios27-2.json`, `.autonomy/checks/A06-P04.app-unit-2.json`, `.autonomy/checks/A06-P04.verify-27.json`) instead of a rerun (owner ruling 4 of 2026-11-14) — Verified 2026-11-14: — Verified 2026-11-14: cited .autonomy/checks/A06-P04.rendering-ios27.json, A06-P04.experiences-ios27-2.json, A06-P04.app-unit-2.json, A06-P04.verify-27.json on the unchanged tree (owner ruling 2026-11-14)
 
 ## Phase 2: Foundational
 
