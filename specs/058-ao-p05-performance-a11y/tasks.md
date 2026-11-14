@@ -27,7 +27,7 @@
 - [X] T-A07-510 Experience package check (`python3 Tools/python/desktop_runbook.py run-check --stage A07-P05 --timeout 600 --name experience-packages -- python3 scripts/check_experience_packages.py`) — Verified 2026-11-14: Verified 2026-11-14: .autonomy/checks/A07-P05.experience-packages.json exit 0
 - [X] T-A07-511 Public API and docs: `check_public_api.py --update`, `python3 Tools/python/desktop_runbook.py run-check --stage A07-P05 --timeout 600 --name public-api -- python3 scripts/check_public_api.py`; `Packages/VisualCore/README.md` (StreamingBudget); contract G-JOURNEYBUDGET and G-JOURNEYA11Y closed by "A07-P05", `check_app_contract.py --app audio-odyssey --render` — Verified 2026-11-14: Verified 2026-11-14: .autonomy/checks/A07-P05.public-api.json exit 0 (baseline 2,707 declarations); README (StreamingBudget); contract G-JOURNEYBUDGET and G-JOURNEYA11Y closed A07-P05, rows M20/M22 available, .autonomy/checks/A07-P05.contract.json exit 0
 - [X] T-A07-512 Script tests (`python3 Tools/python/desktop_runbook.py run-check --stage A07-P05 --timeout 600 --name script-tests -- python3 scripts/test_scripts.py`) — Verified 2026-11-14: Verified 2026-11-14: .autonomy/checks/A07-P05.script-tests.json exit 0
-- [ ] T-A07-513 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A07-P05
+- [X] T-A07-513 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A07-P05 — Verified 2026-11-14: Verified 2026-11-14: converge round 1 appended T-A07-514 (data model), implemented; round 2 found 0 findings (tasks.md unchanged)
 
 ## Dependencies
 
