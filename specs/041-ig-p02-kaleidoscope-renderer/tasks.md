@@ -11,7 +11,7 @@
 ## Phase 2: Foundational — framework (US3)
 
 - [X] T-A05-202 [P] [US3] Write `Packages/VisualCore/Tests/VisualCoreMathTests/CameraBoundsTests.swift` first, then `Packages/VisualCore/Sources/VisualCoreMath/CameraBounds.swift` per contracts/api.md (`ViewBounds2D` clamp, `Camera2D.panned(by:within:)`, `zoomed(by:within:)`, `OrbitBounds` clamp, `OrbitCamera.orbited(yaw:pitch:within:)`, `zoomed(by:within:)`); tests: 200 seeded random action sequences stay within bounds, non-finite inputs leave the camera unchanged, reset equality, pitch never beyond the limit (FR-A05-221, SC-A05-203) — Verified 2026-11-13: 2026-11-13 .autonomy/checks/A05-P02.camera-host.json (CameraBoundsTests 7/7, exit 0)
-- [ ] T-A05-203 [P] [US3] Add `vc_sdCircle`, `vc_sdBox2`, `vc_sdSegment`, `vc_foldDihedral` to `Packages/VisualCoreRendering/Sources/VisualCoreRendering/GLSL/vc/sdf.glsl` and write `Packages/VisualCoreRendering/Tests/VisualCoreRenderingTests/SymmetryParityTests.swift`: GPU fold of a 16 × 16 grid encoded as colours equals `PointGroup.fold` within 1/255 for orders 1, 3, 6, 12; SDF signs inside/outside for each helper (FR-A05-220, SC-A05-202)
+- [X] T-A05-203 [P] [US3] Add `vc_sdCircle`, `vc_sdBox2`, `vc_sdSegment`, `vc_foldDihedral` to `Packages/VisualCoreRendering/Sources/VisualCoreRendering/GLSL/vc/sdf.glsl` and write `Packages/VisualCoreRendering/Tests/VisualCoreRenderingTests/SymmetryParityTests.swift`: GPU fold of a 16 × 16 grid encoded as colours equals `PointGroup.fold` within 1/255 for orders 1, 3, 6, 12; SDF signs inside/outside for each helper (FR-A05-220, SC-A05-202) — Verified 2026-11-13: 2026-11-13 .autonomy/checks/A05-P02.rendering-ios27.json (SymmetryParityTests 2/2 on sim-27.2, exit 0)
 
 ## Phase 3: User Story 1 — the shader kaleidoscope (P1) 🎯
 
