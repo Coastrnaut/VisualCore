@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_public_api.py"
+  ],
+  "command": "python3 scripts/check_public_api.py",
+  "elapsed_seconds": 0.157,
+  "exit_code": 0,
+  "finished": "2026-11-14T04:46:34+00:00",
+  "log": ".autonomy/logs/A05-P04.public-api.log",
+  "log_sha256": "4dcf02232c06d8e99825ebb1aa76a305f464bf00fd1b93b81491354fcf0e0fc6",
+  "name": "public-api",
+  "stage": "A05-P04",
+  "started": "2026-11-14T04:46:34+00:00",
+  "timed_out": false
+}

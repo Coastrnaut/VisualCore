@@ -13,14 +13,15 @@ import VisualCoreExperience
         ExperienceControl(id: "move", ranges: [0...1]),
     ]
 
-    @Test func controlDropsRangesBeyondEight() {
-        #expect(ExperienceControl.maxValues == 8)
-        let ten = (0..<10).map { Double($0)...Double($0 + 1) }
-        let control = ExperienceControl(id: "wide", ranges: ten)
+    @Test func controlDropsRangesBeyondTwentyFour() {
+        // 24 since feature 043 (A05-P04 T-A05-416): one action restores a whole saved document.
+        #expect(ExperienceControl.maxValues == 24)
+        let thirty = (0..<30).map { Double($0)...Double($0 + 1) }
+        let control = ExperienceControl(id: "wide", ranges: thirty)
         #expect(control.id == "wide")
-        #expect(control.ranges.count == 8)
-        #expect(control.ranges == Array(ten.prefix(8)))
-        #expect(ExperienceControl(id: "exact", ranges: Array(ten.prefix(8))).ranges.count == 8)
+        #expect(control.ranges.count == 24)
+        #expect(control.ranges == Array(thirty.prefix(24)))
+        #expect(ExperienceControl(id: "exact", ranges: Array(thirty.prefix(24))).ranges.count == 24)
         #expect(ExperienceControl(id: "none").ranges.isEmpty)
         #expect(ExperienceControl(id: "a", ranges: [0...1]) == ExperienceControl(id: "a", ranges: [0...1]))
         #expect(ExperienceControl(id: "a", ranges: [0...1]) != ExperienceControl(id: "a", ranges: [0...2]))
@@ -77,11 +78,11 @@ import VisualCoreExperience
     }
 
     @Test func validationCountsAgainstTheKeptRanges() {
-        let wide = ExperienceControl(id: "wide", ranges: Array(repeating: 0...1, count: 10))
-        let eight = Array(repeating: 0.5, count: 8)
-        #expect(ExperienceInput.validate(control: "wide", values: eight, controls: [wide]) == nil)
-        #expect(ExperienceInput.validate(control: "wide", values: eight + [0.5, 0.5], controls: [wide])
-            == .wrongValueCount(expected: 8, found: 10))
+        let wide = ExperienceControl(id: "wide", ranges: Array(repeating: 0...1, count: 26))
+        let kept = Array(repeating: 0.5, count: ExperienceControl.maxValues)
+        #expect(ExperienceInput.validate(control: "wide", values: kept, controls: [wide]) == nil)
+        #expect(ExperienceInput.validate(control: "wide", values: kept + [0.5, 0.5], controls: [wide])
+            == .wrongValueCount(expected: 24, found: 26))
     }
 
     @Test func normalizedMapsCornersAndCentre() {

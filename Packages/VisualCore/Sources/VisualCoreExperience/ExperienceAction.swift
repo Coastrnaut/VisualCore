@@ -6,8 +6,9 @@ import Foundation
 
 /// A control an experience declares: an id and the legal range of each value an action for it carries.
 public struct ExperienceControl: Sendable, Equatable {
-    /// The largest number of values one action can carry.
-    public static let maxValues = 8
+    /// The largest number of values one action can carry: 24 since feature 043 (A05-P04 T-A05-416), so that one atomic
+    /// action can restore a whole saved document (Infinite Geometry's `composition.open` carries 18); 8 before.
+    public static let maxValues = 24
 
     /// The id actions name the control by.
     public let id: String

@@ -2,7 +2,7 @@
 
 **Input**: [spec.md](spec.md), [plan.md](plan.md), [research.md](research.md), [data-model.md](data-model.md),
 [contracts/api.md](contracts/api.md), [quickstart.md](quickstart.md). Gate A05-P04 (legacy). Evidence:
-`python3 Tools/python/desktop_runbook.py run-check --stage A05-P04 --timeout 600 --name <check> -- <command>`. Commit after every task (no trailers). No device task. No VisualCore change.
+`python3 Tools/python/desktop_runbook.py run-check --stage A05-P04 --timeout 600 --name <check> -- <command>`. Commit after every task (no trailers). No device task. One VisualCore change (T-A05-416, added in implement).
 
 ## Phase 1: Setup
 
@@ -10,7 +10,7 @@
 
 ## Phase 2: Foundational
 
-- [ ] T-A05-402 [P] [US1] Write `Packages/ExperiencesCreative/InfiniteGeometry/ExperienceTests/GeometryDocumentTests.swift` first, then `Packages/ExperiencesCreative/InfiniteGeometry/Experience/Adapter/GeometryDocument.swift` per contracts/api.md (version 1; name "trimmed, ≤ 60, empty → \"Untitled\""; 18-value `openValues` layout with the seed split into two 32-bit halves; `init?(openValues:name:)`) and the atomic `composition.open` action in `Packages/ExperiencesCreative/InfiniteGeometry/Experience/Adapter/GeometryCore.swift` (all values validated together; out-of-range or non-finite → out of range; camera outside the built composition's bounds → rule; otherwise the whole state replaced; added to the controls list); tests: document from core → open on a changed engine → digest equal, for every preset kind; partial or invalid values refused with the digest unchanged; Codable round trip (FR-A05-401, 402)
+- [X] T-A05-402 [P] [US1] Write `Packages/ExperiencesCreative/InfiniteGeometry/ExperienceTests/GeometryDocumentTests.swift` first, then `Packages/ExperiencesCreative/InfiniteGeometry/Experience/Adapter/GeometryDocument.swift` per contracts/api.md (version 1; name "trimmed, ≤ 60, empty → \"Untitled\""; 18-value `openValues` layout with the seed split into two 32-bit halves; `init?(openValues:name:)`) and the atomic `composition.open` action in `Packages/ExperiencesCreative/InfiniteGeometry/Experience/Adapter/GeometryCore.swift` (all values validated together; out-of-range or non-finite → out of range; camera outside the built composition's bounds → rule; otherwise the whole state replaced; added to the controls list); tests: document from core → open on a changed engine → digest equal, for every preset kind; partial or invalid values refused with the digest unchanged; Codable round trip (FR-A05-401, 402) — Verified 2026-11-13: 2026-11-13 .autonomy/checks/A05-P04.experiences-ios27.json and .experiences-ios26.json (exit 0); GeometryDocumentTests 6/6
 
 ## Phase 3: User Story 1 — save and reopen exactly (P1) 🎯
 
@@ -35,6 +35,9 @@
 - [ ] T-A05-412 Runner iOS 26 (`python3 Tools/python/desktop_runbook.py run-check --stage A05-P04 --timeout 600 --name verify-26 -- python3 scripts/verify_experiences.py --only a05.infinite-geometry --runtime 26`) (SC-A05-405)
 - [ ] T-A05-413 Public API unchanged (`python3 Tools/python/desktop_runbook.py run-check --stage A05-P04 --timeout 600 --name public-api -- python3 scripts/check_public_api.py`)
 - [ ] T-A05-414 Script tests (`python3 Tools/python/desktop_runbook.py run-check --stage A05-P04 --timeout 600 --name script-tests -- python3 scripts/test_scripts.py`)
+- [ ] T-A05-416 VisualCore: raise `ExperienceControl.maxValues` from 8 to 24 in `Packages/VisualCore/Sources/VisualCoreExperience/ExperienceAction.swift` (doc comment), update `Packages/VisualCore/Tests/VisualCoreExperienceTests/ExperienceActionTests.swift`, the VisualCore README and Auto-Creator §13 where the limit is stated; evidence `python3 Tools/python/desktop_runbook.py run-check --stage A05-P04 --timeout 600 --name visualcore-host -- swift test --package-path Packages/VisualCore` (approved in Clarifications; FR-A05-402)
+- [ ] T-A05-417 Reference chunk 1 (`python3 Tools/python/desktop_runbook.py run-check --stage A05-P04 --timeout 600 --name reference-1 -- python3 scripts/release_check.py --only reference-engine-xcframework reference-build-projectm-ios-sim reference-clean`)
+- [ ] T-A05-418 Reference chunk 2 (`python3 Tools/python/desktop_runbook.py run-check --stage A05-P04 --timeout 600 --name reference-2 -- python3 scripts/release_check.py --only reference-test-anglerendering-ios27 reference-test-anglerendering-ios26 projectm-reference-ios27 projectm-reference-ios26`)
 - [ ] T-A05-415 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A05-P04
 
 ## Dependencies

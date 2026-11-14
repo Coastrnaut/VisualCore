@@ -15,8 +15,9 @@ Canonical overrides:
 - **Phase gates (manual §9 Phase 04):** MVP — deterministic presets and still export; regression fixture — repeated preset
   transitions leave GPU objects stable; graphics-context ownership stays solely in the VisualCore host.
 - **VisualCore contract** (`docs/apps/infinite-geometry/visualcore-contract.md`): M17 named presets and persistence and
-  M18 still export are **available** — no framework change is planned; the experience follows the Particle Universe
-  saved-scene library and the Fluid Art still-capture patterns. The contract document gains these consumers.
+  M18 still export are **available**; the only framework change is raising the per-action value limit from 8 to 24
+  (Clarifications, T-A05-416). The experience follows the Particle Universe saved-scene library and the Fluid Art
+  still-capture patterns. The contract document gains these consumers.
 - **Owner rulings of 2026-11-13:** short tests; audits wait for the device campaign; parallel agents; no wall-clock
   assertions on CI runners.
 
@@ -44,6 +45,11 @@ encodes through ImageIO (PNG file bytes are not documented to be stable across r
 - Q: What does "byte-identical exports" mean when the PNG encoder may vary its bytes? → A: The decoded pixels of two
   exports are identical byte for byte (RGBA), and the PNG files have the same size in pixels; file-byte equality is not
   required.
+- Q: An action carries at most 8 values in VisualCore (`ExperienceControl.maxValues`, found in implement), but the
+  atomic open needs 18 — split the open or raise the limit? → A: Raise the limit to 24 (VisualCore task T-A05-416,
+  approved here): splitting the open into several actions would reintroduce the partial-open risk this clarification
+  removed, and the limit is generic (any experience restoring a document needs it); the change is one constant, its
+  tests, documentation and the ProjectM reference regression, as Principle XIII requires.
 - Q: What does saving with an empty name do? → A: The name falls back to "Untitled" (then the numeric-suffix rule), as in
   Particle Universe; names are trimmed and cut to 60 characters, so saving is never refused for its name.
 

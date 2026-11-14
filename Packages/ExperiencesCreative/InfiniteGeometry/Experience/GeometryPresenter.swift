@@ -108,8 +108,12 @@ final class GeometryPresenter: ExperiencePresenter {
     /// The number of elements of the last draw: polygons for a plane, triangles for a solid.
     private(set) var drawnCount = 0
 
-    init(experienceID: ExperienceID) {
+    /// The saved compositions shown by the controls (feature 043); nil in tests that need no library.
+    let library: GeometryLibrary?
+
+    init(experienceID: ExperienceID, library: GeometryLibrary? = nil) {
         self.experienceID = experienceID
+        self.library = library
     }
 
     func setup(_ context: RenderContext) throws {
@@ -304,14 +308,14 @@ final class GeometryPresenter: ExperiencePresenter {
     }
 
     func makeControls(_ port: ExperienceActionPort) -> AnyView {
-        AnyView(GeometryControls(port: port, mirror: mirror))
+        AnyView(GeometryControls(port: port, mirror: mirror, library: library))
     }
 
-    /// The six preset actions, the four camera actions and the field of view of the native controls (every gesture
+    /// The six preset actions, the four camera actions and the field of view and the open action of the native controls (every gesture
     /// action has a button; the field of view has buttons and no gesture).
     var nativeActions: Set<String> {
         let presetActions: Set<String> = ["preset.select", "symmetry.order", "repeats.set", "scale.set", "palette.set", "reseed"]
-        return presetActions.union(Self.cameraActions).union(["camera.fov"])
+        return presetActions.union(Self.cameraActions).union(["camera.fov", "composition.open"])
     }
 
     /// The camera actions a canvas gesture sends (FR-A05-212).

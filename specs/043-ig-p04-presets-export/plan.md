@@ -4,8 +4,8 @@
 
 ## Summary
 
-Add a saved-composition library and still export to Infinite Geometry with no framework change (contract rows M17 and
-M18 are available). A `GeometryDocument` (version 1) captures the composition; the core gains one all-or-nothing action
+Add a saved-composition library and still export to Infinite Geometry; contract rows M17 and M18 are available, and the
+only framework change is `ExperienceControl.maxValues` 8 → 24 (T-A05-416) so one action can carry a whole document. A `GeometryDocument` (version 1) captures the composition; the core gains one all-or-nothing action
 `composition.open` that applies a document; `GeometryLibrary` stores documents in the experience's storage following
 `ParticleLibrary`; the controls export a PNG through the host's `experienceStillRenderer` and share it as in-memory data
 (as Fluid Art does), so no file is left behind. A GPU-stability test cycles presets and saved compositions and compares
@@ -43,7 +43,7 @@ docs/apps/infinite-geometry/visualcore-contract.md                              
 ```
 
 **Dependency direction**: InfiniteGeometryExperience → VisualCoreExperience / VisualCoreExperienceHost /
-VisualCoreRendering; nothing new in VisualCore.
+VisualCoreRendering; in VisualCore only the per-action value limit changes (documented, tested, reference regression).
 
 **Lifecycle**: the library is created with the experience (`make`) from its storage and loads its entries once; writes
 are atomic. Export renders synchronously on the main thread through the still renderer (the session's context), keeps

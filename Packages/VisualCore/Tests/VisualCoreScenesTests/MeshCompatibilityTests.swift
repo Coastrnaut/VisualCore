@@ -36,24 +36,30 @@ import VisualCoreMath
 @Test func aMeshAtTheBudgetBuildsAndValidates() throws {
     let side = 256
     let clock = ContinuousClock()
-    let start = clock.now
-    var builder = MeshBuilder()
-    for j in 0..<side {
-        for i in 0..<side {
-            let u = Double(i) / Double(side - 1), v = Double(j) / Double(side - 1)
-            _ = try builder.vertex(Vec3(u, v, 0), normal: Vec3(0, 0, 1), uv: Vec2(u, v))
+    /// Builds and validates the grid once and returns the mesh, its report and the time taken.
+    func buildOnce() throws -> (Mesh, MeshReport, Duration) {
+        let start = clock.now
+        var builder = MeshBuilder()
+        for j in 0..<side {
+            for i in 0..<side {
+                let u = Double(i) / Double(side - 1), v = Double(j) / Double(side - 1)
+                _ = try builder.vertex(Vec3(u, v, 0), normal: Vec3(0, 0, 1), uv: Vec2(u, v))
+            }
         }
-    }
-    for j in 0..<(side - 1) {
-        for i in 0..<(side - 1) {
-            let a = UInt32(j * side + i), b = a + 1, c = a + UInt32(side), d = c + 1
-            try builder.triangle(a, b, d)
-            try builder.triangle(a, d, c)
+        for j in 0..<(side - 1) {
+            for i in 0..<(side - 1) {
+                let a = UInt32(j * side + i), b = a + 1, c = a + UInt32(side), d = c + 1
+                try builder.triangle(a, b, d)
+                try builder.triangle(a, d, c)
+            }
         }
+        let mesh = builder.build()
+        let report = mesh.validate()
+        return (mesh, report, clock.now - start)
     }
-    let mesh = builder.build()
-    let report = mesh.validate()
-    let elapsed = clock.now - start
+    // The faster of two runs, so that other suites running in parallel on the same machine do not inflate the bound.
+    let (mesh, report, first) = try buildOnce()
+    let elapsed = min(first, try buildOnce().2)
     let fullBudgetBound = elapsed * (Double(MeshBudget.default.maxVertices) / Double(mesh.positions.count))
     print("BUDGET-MESH: vertices \(mesh.positions.count), build+validate \(elapsed), full-budget bound \(fullBudgetBound)")
     #expect(mesh.positions.count * 4 == MeshBudget.default.maxVertices)

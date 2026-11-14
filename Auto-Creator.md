@@ -2915,7 +2915,7 @@ The authoritative list is the API baseline `docs/api/visualcore-public-api.txt`.
 
 | Module (new) | Package | Purpose | Introduced by |
 |---|---|---|---|
-| VisualCoreExperience | VisualCore | ids, catalog, lifecycle reducer, snapshots, entitlement policy, conformance helpers | UA-F01, UA-F02 |
+| VisualCoreExperience | VisualCore | ids, catalog, lifecycle reducer, snapshots, entitlement policy, conformance helpers; actions of at most 24 values (A05-P04) | UA-F01, UA-F02 |
 | VisualCoreExperienceHost | VisualCoreRendering | session, host view, failure view, scenario runner | UA-F02, UA-F03, UA-F09 |
 | VisualCoreStore | VisualCoreRendering | StoreKit 2 purchase controller behind a protocol | UA-F08 |
 | VisualCoreGeometry | VisualCore | mesh compiler, curves, ribbons, tubes, SDF and CSG proxies, convex clipping, terrain, vegetation | R02-F05 and later |

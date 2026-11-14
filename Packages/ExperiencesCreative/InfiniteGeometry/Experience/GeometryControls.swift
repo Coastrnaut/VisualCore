@@ -10,16 +10,60 @@
 // Feature 042 (A05-P03) T-A05-306 (FR-A05-315): the pan arrows are shown on the 3D composition too (they move the
 // orbit target by a fixed step in world units), and "Wider"/"Narrower" step the field of view by 5°, clamped into
 // 30…75° before the action is sent; both have labels, hints and identifiers like the other camera buttons.
+//
+// Feature 043 (A05-P04) T-A05-404 (FR-A05-410–413, 430, 431): the "Saved compositions" section (a name field, "Save
+// composition", and Open / Rename / Delete for every saved composition, with notes for unreadable files and files of
+// a newer version) and the "Export" section ("Export picture" renders the composition through the host's still
+// renderer at the canvas's aspect, long edge 2048 pixels, and offers it through "Share picture"). Opening sends the one
+// atomic `composition.open` action with the document's 18 values; a refusal changes nothing and shows a message.
 import InfiniteGeometryCore
 import SwiftUI
 import VisualCoreExperience
 import VisualCoreExperienceHost
 import VisualCoreParameters
+import VisualCoreRendering
 
 /// The controls of Infinite Geometry.
 struct GeometryControls: View {
     let port: ExperienceActionPort
     let mirror: GeometryMirror
+    /// The saved compositions (feature 043 A05-P04); nil hides the section.
+    let library: GeometryLibrary?
+
+    /// The message shown when the experience refuses a saved composition.
+    static let openFailure = "The composition could not be opened."
+    /// The message shown when an export fails.
+    static let exportFailure = "The picture could not be exported. Please try again."
+    /// The message shown when the canvas has no size yet.
+    static let exportNoCanvas = "The canvas has no size yet. Please try again in a moment."
+    /// The message shown when no still renderer is available.
+    static let exportUnavailable = "The picture cannot be made now."
+
+    @Environment(\.experienceStillRenderer) private var still
+    @State private var compositionName = ""
+    @State private var renaming: GeometryLibraryEntry?
+    @State private var renameText = ""
+    @State private var exported: GeometryCapture?
+    @State private var exportMessage: String?
+
+    /// Controls over `port` and `mirror`, with the saved compositions of `library` when there is one.
+    init(port: ExperienceActionPort, mirror: GeometryMirror, library: GeometryLibrary? = nil) {
+        self.port = port
+        self.mirror = mirror
+        self.library = library
+    }
+
+    /// The state digest of `core` in hex, as the engine computes it (domain: the experience id); nil when the core
+    /// cannot be digested.
+    static func digest(of core: GeometryCore) -> String? {
+        var builder = DigestBuilder(domain: GeometryCore.experienceID)
+        do {
+            try core.writeDigest(into: &builder)
+        } catch {
+            return nil
+        }
+        return builder.finish().hex
+    }
 
     /// One pan button's step: a quarter of the visible half-side, in world units at zoom 1.
     static let panStep = 0.25
@@ -88,6 +132,134 @@ struct GeometryControls: View {
                     _ = port.send("reseed")
                 }
             }
+            if let library { librarySection(core, library: library) }
+            exportSection()
+        }
+    }
+
+    // MARK: Saved compositions (FR-A05-401–403, 430)
+
+    @ViewBuilder private func librarySection(_ core: GeometryCore, library: GeometryLibrary) -> some View {
+        section("Saved compositions") {
+            TextField(text: $compositionName) { Text(verbatim: "Composition name") }
+                .textFieldStyle(.roundedBorder)
+                .frame(minHeight: 44)
+                .accessibilityLabel(Text(verbatim: "Composition name"))
+                .accessibilityIdentifier(port.identifier("library.name"))
+            button("Save composition", identifier: "library.save",
+                   hint: "Saves the current composition under the name") {
+                save(core, library: library)
+            }
+            if let message = library.errorMessage {
+                Text(verbatim: message).font(.footnote).foregroundStyle(.primary)   // primary, not red: contrast (E-12)
+                    .accessibilityIdentifier(port.identifier("library.message"))
+            }
+            if library.unreadable > 0 {
+                Text(verbatim: "\(library.unreadable) saved composition\(library.unreadable == 1 ? "" : "s") could not be read")
+                    .font(.footnote).accessibilityIdentifier(port.identifier("library.problems"))
+            }
+            if library.newer > 0 {
+                Text(verbatim: "\(library.newer) saved composition\(library.newer == 1 ? " was" : "s were") made by a newer version")
+                    .font(.footnote).accessibilityIdentifier(port.identifier("library.newer"))
+            }
+            ForEach(Array(library.entries.enumerated()), id: \.element.id) { index, entry in
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(verbatim: entry.name).font(.body)
+                        .accessibilityIdentifier(port.identifier("library.entry.\(index)"))
+                    if renaming?.id == entry.id {
+                        TextField(text: $renameText) { Text(verbatim: "New name") }
+                            .textFieldStyle(.roundedBorder)
+                            .frame(minHeight: 44)
+                            .accessibilityLabel(Text(verbatim: "New name for \(entry.name)"))
+                            .accessibilityIdentifier(port.identifier("library.renameText.\(index)"))
+                        HStack(spacing: 8) {
+                            button("Done", identifier: "library.renameDone.\(index)", hint: "Renames the composition") {
+                                if library.rename(entry, to: renameText) { renaming = nil }
+                            }
+                            button("Cancel", identifier: "library.renameCancel.\(index)", hint: "Keeps the name") {
+                                renaming = nil
+                            }
+                        }
+                    }
+                    HStack(spacing: 8) {
+                        button("Open", identifier: "library.open.\(index)",
+                               hint: "Replaces the composition with \(entry.name)") {
+                            open(entry, library: library)
+                        }
+                        button("Rename", identifier: "library.rename.\(index)", hint: "Gives \(entry.name) a new name") {
+                            renaming = entry
+                            renameText = entry.name
+                        }
+                        button("Delete", identifier: "library.delete.\(index)", hint: "Deletes \(entry.name)") {
+                            if renaming?.id == entry.id { renaming = nil }
+                            library.delete(entry)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /// Saves the current composition under the field's name (empty → "Untitled") with the digest at save time.
+    private func save(_ core: GeometryCore, library: GeometryLibrary) {
+        guard let digest = Self.digest(of: core) else {
+            library.errorMessage = "The composition could not be saved."
+            return
+        }
+        if library.save(GeometryDocument(core: core, name: compositionName), digest: digest) != nil {
+            compositionName = ""
+        }
+    }
+
+    /// Sends the saved composition as one atomic `composition.open` action (all values applied, or none).
+    private func open(_ entry: GeometryLibraryEntry, library: GeometryLibrary) {
+        guard let document = library.document(for: entry) else { return }
+        if port.send("composition.open", document.openValues).isAccepted {
+            library.errorMessage = nil
+        } else {
+            library.errorMessage = Self.openFailure
+        }
+    }
+
+    // MARK: Export (FR-A05-410–413, 431)
+
+    @ViewBuilder private func exportSection() -> some View {
+        section("Export") {
+            HStack(spacing: 8) {
+                button("Export picture", identifier: "export",
+                       hint: "Makes a picture of the composition, 2048 pixels on the long edge") { export() }
+                if let exported {
+                    ShareLink(item: exported, preview: SharePreview(Text(verbatim: "Infinite Geometry")))
+                        .frame(minWidth: 44, minHeight: 44)
+                        .accessibilityLabel(Text(verbatim: "Share picture"))
+                        .accessibilityHint(Text(verbatim: "\(exported.width) by \(exported.height) pixels"))
+                        .accessibilityIdentifier(port.identifier("export.share"))
+                }
+            }
+            if let exportMessage {
+                Text(verbatim: exportMessage).font(.footnote).foregroundStyle(.primary)   // primary, not red (E-12)
+                    .accessibilityIdentifier(port.identifier("export.message"))
+            }
+        }
+    }
+
+    /// Renders the current composition at the export size and keeps the PNG in memory for the share interface.
+    private func export() {
+        exported = nil
+        guard let still else {
+            exportMessage = Self.exportUnavailable
+            return
+        }
+        let canvas = CGSize(width: mirror.canvasSize.x, height: mirror.canvasSize.y)
+        guard GeometryExport.size(canvas: canvas, maxEdge: GeometryExport.longEdge) != nil else {
+            exportMessage = Self.exportNoCanvas
+            return
+        }
+        do {
+            exported = try GeometryExport.png(still: still, canvas: canvas, maxEdge: GeometryExport.longEdge)
+            exportMessage = nil
+        } catch {
+            exportMessage = Self.exportFailure
         }
     }
 

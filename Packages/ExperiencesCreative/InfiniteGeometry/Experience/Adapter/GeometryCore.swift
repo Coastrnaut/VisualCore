@@ -25,6 +25,13 @@
 // rule keeps the eye outside the composition's bounding sphere: minimum distance = max(3, |target| + R + 2 · near),
 // R = |bounds centre| + bounds radius of the built solid (derived, never stored; 0 for a 2D preset). Snapshot schema 3
 // adds target and field of view; the chain 1 → 2 → 3 fills the defaults.
+//
+// Feature 043 (A05-P04) T-A05-402 (FR-A05-401, FR-A05-402; contracts/api.md): `composition.open` replaces the whole
+// composition at once with the 18 values of a `GeometryDocument` (`openValues`). Every value is checked before anything
+// changes: a wrong count, a non-finite value or a value outside its range (or not whole where it must be) is refused
+// with its index, a preset that does not build with its rule code, a camera outside the bounds of the built composition
+// with `a05.open-out-of-bounds` (the same clamp-equality rule as a restore), the current state as unchanged; otherwise
+// preset index, preset, composition and both cameras are replaced together.
 import Foundation
 import InfiniteGeometryCore
 import VisualCoreExperience
@@ -136,6 +143,9 @@ public struct GeometryCore: ExperienceCore, Equatable, Codable {
     /// The rule code `camera.pan` on the 3D composition had in Phase 02; since Phase 03 (FR-A05-310) a pan on the
     /// solid moves the orbit target and this code is no longer returned. Kept so recorded results stay readable.
     public static let panPlaneOnlyCode = "a05.pan-plane-only"
+    /// The rule code of `composition.open` whose camera lies outside the bounds of the composition it builds, or whose
+    /// kind is not the kind of the curated preset it names (FR-A05-402).
+    public static let openOutOfBoundsCode = "a05.open-out-of-bounds"
     /// The rule code of `camera.fov` on a 2D preset (the field of view belongs to the 3D composition).
     public static let fovSolidOnlyCode = "a05.fov-solid-only"
     /// The rule code of `camera.orbit` on a 2D preset (it pans instead).
@@ -242,6 +252,7 @@ public struct GeometryCore: ExperienceCore, Equatable, Codable {
             ExperienceControl(id: "camera.orbit", ranges: [orbitRange, orbitRange]),
             ExperienceControl(id: "camera.reset"),
             ExperienceControl(id: "camera.fov", ranges: [fovRange]),
+            ExperienceControl(id: "composition.open", ranges: GeometryDocument.openRanges),
         ]
     }
 
@@ -282,15 +293,23 @@ public struct GeometryCore: ExperienceCore, Equatable, Codable {
         case .failure(let rejection):
             throw ExperienceFailure(code: Self.invalidStateCode, message: rejection.code)
         }
-        let finite = ([view.centerX, view.centerY, view.zoom] + orbit.values).allSatisfy(\.isFinite)
-        guard finite, View2D(Self.viewBounds(scale: self.preset.scale).clamp(view.camera)) == view,
-              Self.fovRange.contains(orbit.fovDegrees),
-              Orbit3D(orbitViewBounds.clamp(orbit.camera), fovDegrees: orbit.fovDegrees)
-                .isNearlyEqual(to: orbit, tolerance: 1e-9) else {
+        guard Self.camerasFit(view: view, orbit: orbit, scale: self.preset.scale, clearance: boundingRadius) else {
             throw ExperienceFailure(code: Self.invalidStateCode, message: "camera out of bounds")
         }
         view2D = view
         orbit3D = orbit
+    }
+
+    /// Whether `view` and `orbit` are finite and already within their bounds for a preset of `scale` and a composition
+    /// of bounding radius `clearance`: the 2D camera equals its clamp by `viewBounds(scale:)`, the field of view lies
+    /// in `fovRange` and the orbit camera equals its clamp by `orbitViewBounds(clearance:)` within 1e-9 (the rule of
+    /// a restore and of `composition.open`).
+    static func camerasFit(view: View2D, orbit: Orbit3D, scale: Double, clearance: Double) -> Bool {
+        let finite = ([view.centerX, view.centerY, view.zoom] + orbit.values).allSatisfy(\.isFinite)
+        return finite && View2D(viewBounds(scale: scale).clamp(view.camera)) == view
+            && fovRange.contains(orbit.fovDegrees)
+            && Orbit3D(orbitViewBounds(clearance: clearance).clamp(orbit.camera), fovDegrees: orbit.fovDegrees)
+                .isNearlyEqual(to: orbit, tolerance: 1e-9)
     }
 
     /// Nothing: a composition is static, so a step changes nothing (the digest depends only on the actions).
@@ -300,6 +319,7 @@ public struct GeometryCore: ExperienceCore, Equatable, Codable {
     /// otherwise the action is refused and the state is unchanged.
     public mutating func apply(_ action: ExperienceAction) -> ActionResult {
         if action.control.hasPrefix("camera.") { return applyCamera(action) }
+        if action.control == "composition.open" { return applyOpen(action.values) }
         let v = action.values
         var next = preset
         var nextIndex = presetIndex
@@ -410,6 +430,45 @@ public struct GeometryCore: ExperienceCore, Equatable, Codable {
         }
         view2D = view
         orbit3D = orbit
+        return .accepted
+    }
+
+    /// Carries out `composition.open` (FR-A05-402): the 18 values of `GeometryDocument.openValues` are checked together
+    /// and either replace the preset index, the preset, the composition and both cameras at once or change nothing.
+    /// Refusals, in this order: a count other than 18 (`wrongValueCount`), the first non-finite value (`nonFinite`),
+    /// the first value outside `GeometryDocument.openRanges` or not whole where it must be (`outOfRange`), a kind that
+    /// is not the named curated preset's or a camera outside the bounds of the built composition
+    /// (`openOutOfBoundsCode`), a preset that does not build (its rule code), the current state (`unchangedCode`).
+    private mutating func applyOpen(_ v: [Double]) -> ActionResult {
+        guard v.count == GeometryDocument.openValueCount else {
+            return .rejected(.wrongValueCount(expected: GeometryDocument.openValueCount, found: v.count))
+        }
+        if let index = v.firstIndex(where: { !$0.isFinite }) { return .rejected(.nonFinite(index: index)) }
+        if let index = GeometryDocument.firstInvalidIndex(in: v) { return .rejected(.outOfRange(index: index)) }
+        guard let document = GeometryDocument(openValues: v, name: "") else { return .rejected(.outOfRange(index: 0)) }
+        guard GeometryPreset.curated[document.presetIndex].kind == document.preset.kind else {
+            return .rejected(.rule(code: Self.openOutOfBoundsCode))
+        }
+        let built: Built
+        switch Self.build(document.preset) {
+        case .success(let value): built = value
+        case .failure(let rejection): return .rejected(rejection)
+        }
+        guard Self.camerasFit(view: document.view2D, orbit: document.orbit3D, scale: built.preset.scale,
+                              clearance: built.boundingRadius) else {
+            return .rejected(.rule(code: Self.openOutOfBoundsCode))
+        }
+        guard built.preset != preset || document.presetIndex != presetIndex || document.view2D != view2D
+                || document.orbit3D != orbit3D else {
+            return .rejected(.rule(code: Self.unchangedCode))
+        }
+        preset = built.preset
+        presetIndex = document.presetIndex
+        compositionDigest = built.composition.digest
+        elementCount = built.composition.elementCount
+        boundingRadius = built.boundingRadius
+        view2D = document.view2D
+        orbit3D = document.orbit3D
         return .accepted
     }
 

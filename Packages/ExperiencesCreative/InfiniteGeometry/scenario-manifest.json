@@ -10,7 +10,8 @@
     "camera.zoom",
     "camera.orbit",
     "camera.reset",
-    "camera.fov"
+    "camera.fov",
+    "composition.open"
   ],
   "experience" : "a05.infinite-geometry",
   "kind" : "creative",
