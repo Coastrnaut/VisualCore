@@ -1429,18 +1429,17 @@
     ]
    },
    "implementation": {
-    "state": "standalone-partial",
+    "state": "standalone-complete",
     "legacy_gates_passed": [
      "A07-P00",
      "A07-P01",
      "A07-P02",
      "A07-P03",
      "A07-P04",
-     "A07-P05"
-    ],
-    "legacy_gates_pending": [
+     "A07-P05",
      "A07-P06"
     ],
+    "legacy_gates_pending": [],
     "unified_integration": "pending"
    },
    "source": {
