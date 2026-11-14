@@ -131,8 +131,8 @@ full scale".
 
 **Acceptance Scenarios**:
 
-1. **Given** cursors one sample apart at 48 kHz, **When** read, **Then** Δt reads 0.0208 ms rounded to the sample
-   period (shown as "1 sample, 0.021 ms") and the frequency is marked as limited by the sample period.
+1. **Given** cursors one sample apart at 48 kHz, **When** read, **Then** Δt reads one sample period, shown as
+   "1 sample, 20.8 µs" (µs below 0.1 ms, three significant digits), and the frequency is marked as limited by the sample period.
 2. **Given** a cursor on a clipped sample, **When** read, **Then** it says "at or beyond full scale", not a number above
    1.
 
