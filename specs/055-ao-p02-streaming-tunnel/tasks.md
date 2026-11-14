@@ -48,3 +48,7 @@ Agent A: T-A07-202. Agent B: T-A07-203. Agent C: T-A07-204. Agent D: T-A07-205 o
 ## Implementation strategy
 
 MVP: the audio-breathing tunnel (US1) on the streaming window and fog (US2 foundation); sources (US3); evidence last.
+
+## Phase 6: Convergence
+
+- [ ] T-A07-217 Record in `specs/055-ao-p02-streaming-tunnel/research.md` D4 the implemented breathing: one radial scaling per frame about the camera's rail point in the plane perpendicular to the rail direction, the same matrix for every tunnel piece (joins stay watertight; a uniform 3-D scale about a point at the eye would be invisible), as documented in `Packages/ExperiencesCreative/AudioOdyssey/Experience/OdysseyPresenter.swift` per plan: research D4 (contradicts)
