@@ -64,7 +64,10 @@ extension ScopeCore {
     /// 7. the XY view (feature 062): the stereo test signal plotted left against right;
     /// 8. the spectrum view (feature 063): the 1 kHz sine analysed, its peak read at the 1 kHz bin;
     /// 9. the microphone (mono) in XY (feature 063, the manual's Phase 03 fixture): the XY view chosen, the waveform kept
-    ///    and marked "XY needs two channels".
+    ///    and marked "XY needs two channels";
+    /// 10. freeze with cursors (feature 064): frozen, cursors shown one tenth of the window apart, level at half scale;
+    /// 11. zoom steps (feature 064): the timebase stepped down twice and up once, as two pinch-outs and a pinch-in send;
+    /// 12. a preset applied (feature 064): the built-in "Bass detail" (index 1).
     /// The flat line (silence) needs a silent source, which no action selects; `ScopeSessionTests` proves it in both
     /// modes with an injected silent source.
     public static var fixtureEntries: [[ScenarioStep]] {
@@ -85,6 +88,11 @@ extension ScopeCore {
             [step("signal.waveform", [0]), step("signal.frequency", [2]), step("display.select", [2]),
              ScenarioStep(steps: 30)],
             [step("source.select", [2]), step("display.select", [1]), ScenarioStep(steps: 30)],
+            [step("source.select", [0]), step("freeze.set", [1]), step("cursors.show", [1]), step("cursor.a", [0.1]),
+             step("cursor.b", [0.2]), step("cursor.level", [0.5]), ScenarioStep(steps: 30)],
+            [step("timebase.select", [3]), step("timebase.select", [2]), step("timebase.select", [1]),
+             step("timebase.select", [2]), ScenarioStep(steps: 30)],
+            [step("preset.apply", [1]), ScenarioStep(steps: 30)],
         ]
     }
 

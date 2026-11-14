@@ -29,13 +29,13 @@ private func play(_ spec: ScenarioSpec) async throws -> (initial: String, result
 }
 
 @Suite struct ScopeManifestTests {
-    @Test func theManifestIsValidWithTheNineStandardScenariosAndNineFixtures() {
+    @Test func theManifestIsValidWithTheNineStandardScenariosAndTwelveFixtures() {
         let manifest = ScopeCore.manifest(for: id)
         let problems = ScenarioManifestValidator.problems(manifest, controls: ScopeCore.controls,
-                                                          content: ContentRequirement(fixtures: 9))
+                                                          content: ContentRequirement(fixtures: 12))
         #expect(problems.isEmpty, "\(problems)")
         #expect(Set(manifest.scenarios.map(\.name))
-                == Set(ScenarioManifest.standardNames).union((1...9).map { "fixture-\($0)" }))
+                == Set(ScenarioManifest.standardNames).union((1...12).map { "fixture-\($0)" }))
     }
 
     @Test func derivedDigestsAndResultsAreWhatTheEngineGives() async throws {
@@ -77,6 +77,13 @@ private func play(_ spec: ScenarioSpec) async throws -> (initial: String, result
         #expect(spectrum.display == .spectrum && spectrum.frequency == 1_000)
         let monoXY = ScopeCore.played(seed: seed, entries: ScopeCore.fixtureEntries[8]).state
         #expect(monoXY.display == .xy && monoXY.source == .microphone)
+        let frozen = ScopeCore.played(seed: seed, entries: ScopeCore.fixtureEntries[9]).state
+        #expect(frozen.frozen && frozen.cursorsShown && frozen.cursorA == 0.1 && frozen.cursorB == 0.2)
+        #expect(frozen.levelCursor == 0.5)
+        let zoomed = ScopeCore.played(seed: seed, entries: ScopeCore.fixtureEntries[10]).state
+        #expect(zoomed.timebaseIndex == 2)
+        let preset = ScopeCore.played(seed: seed, entries: ScopeCore.fixtureEntries[11]).state
+        #expect(preset.frequency == 100 && preset.gain == 2 && preset.timebaseMilliseconds == 5)
     }
 
     /// The JSON form with the control ids, named by `Catalog/registrations.json`. `UPDATE_SCENARIO_MANIFEST=1`

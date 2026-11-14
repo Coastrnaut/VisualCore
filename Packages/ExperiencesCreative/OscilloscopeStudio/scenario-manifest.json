@@ -8,7 +8,14 @@
     "trigger.level",
     "trigger.slope",
     "trigger.mode",
-    "display.select"
+    "display.select",
+    "freeze.set",
+    "cursors.show",
+    "cursor.a",
+    "cursor.b",
+    "cursor.frequency",
+    "cursor.level",
+    "preset.apply"
   ],
   "experience" : "a08.oscilloscope-studio",
   "kind" : "creative",
@@ -18,7 +25,7 @@
 
       ],
       "expect" : {
-        "initialDigest" : "08e66bb5b8e1ff7ff09b212a861009ae5ab5d8f109985151868117aafda3ae17"
+        "initialDigest" : "cffaa23aa0f9d894a63f7bca30aaa498b478130a6a9bbdfcbaa5f9bfec6db3fe"
       },
       "name" : "launch-first-frame",
       "seed" : "7"
@@ -57,8 +64,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "0036fc229359220d4677991053211a188cdeee8f2b4262dd6ba87eb2f6f6f87a",
-        "initialDigest" : "08e66bb5b8e1ff7ff09b212a861009ae5ab5d8f109985151868117aafda3ae17"
+        "finalDigest" : "57d8d439291731e001645a3644f83a23975a8d2546e9d54d0cc27a29374c298d",
+        "initialDigest" : "cffaa23aa0f9d894a63f7bca30aaa498b478130a6a9bbdfcbaa5f9bfec6db3fe"
       },
       "name" : "input-response",
       "seed" : "7"
@@ -155,8 +162,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "0036fc229359220d4677991053211a188cdeee8f2b4262dd6ba87eb2f6f6f87a",
-        "initialDigest" : "08e66bb5b8e1ff7ff09b212a861009ae5ab5d8f109985151868117aafda3ae17"
+        "finalDigest" : "57d8d439291731e001645a3644f83a23975a8d2546e9d54d0cc27a29374c298d",
+        "initialDigest" : "cffaa23aa0f9d894a63f7bca30aaa498b478130a6a9bbdfcbaa5f9bfec6db3fe"
       },
       "name" : "save-restore",
       "seed" : "7"
@@ -195,7 +202,7 @@
         }
       ],
       "expect" : {
-        "initialDigest" : "08e66bb5b8e1ff7ff09b212a861009ae5ab5d8f109985151868117aafda3ae17",
+        "initialDigest" : "cffaa23aa0f9d894a63f7bca30aaa498b478130a6a9bbdfcbaa5f9bfec6db3fe",
         "resetDigest" : true
       },
       "name" : "reset",
@@ -299,8 +306,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "08e66bb5b8e1ff7ff09b212a861009ae5ab5d8f109985151868117aafda3ae17",
-        "initialDigest" : "08e66bb5b8e1ff7ff09b212a861009ae5ab5d8f109985151868117aafda3ae17"
+        "finalDigest" : "cffaa23aa0f9d894a63f7bca30aaa498b478130a6a9bbdfcbaa5f9bfec6db3fe",
+        "initialDigest" : "cffaa23aa0f9d894a63f7bca30aaa498b478130a6a9bbdfcbaa5f9bfec6db3fe"
       },
       "name" : "fixture-1",
       "seed" : "7"
@@ -342,8 +349,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "83c9738522b04b505e7dd03aa6484f27ceda799efa43009a2ee4730f78b069a4",
-        "initialDigest" : "08e66bb5b8e1ff7ff09b212a861009ae5ab5d8f109985151868117aafda3ae17"
+        "finalDigest" : "72315908c130b5358abf0132e3363e98c5b416f2071e95232dce26984e35d83b",
+        "initialDigest" : "cffaa23aa0f9d894a63f7bca30aaa498b478130a6a9bbdfcbaa5f9bfec6db3fe"
       },
       "name" : "fixture-2",
       "seed" : "7"
@@ -375,8 +382,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "6565323814686a61641cb2bd0cfcd1b08dba1ef4725db28fd203e06faabfa065",
-        "initialDigest" : "08e66bb5b8e1ff7ff09b212a861009ae5ab5d8f109985151868117aafda3ae17"
+        "finalDigest" : "cbab378c863da01619940bcb64978e862ff887aa4ddfd6dd74585aa734ba456f",
+        "initialDigest" : "cffaa23aa0f9d894a63f7bca30aaa498b478130a6a9bbdfcbaa5f9bfec6db3fe"
       },
       "name" : "fixture-3",
       "seed" : "7"
@@ -408,8 +415,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "316c62e5e6c5b8d21a47ff185781745f4cf71209570b8dbf4dd2acc573c67ed6",
-        "initialDigest" : "08e66bb5b8e1ff7ff09b212a861009ae5ab5d8f109985151868117aafda3ae17"
+        "finalDigest" : "7f4bcf7c2ce4b3bfced0dd4a7d0738c1d66c590be5a30b214871743cfffa8b8e",
+        "initialDigest" : "cffaa23aa0f9d894a63f7bca30aaa498b478130a6a9bbdfcbaa5f9bfec6db3fe"
       },
       "name" : "fixture-4",
       "seed" : "7"
@@ -451,8 +458,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "02b5cede146d24f39f05798afa7cf76475b643f6f6982f91461fa12dea8d0c0c",
-        "initialDigest" : "08e66bb5b8e1ff7ff09b212a861009ae5ab5d8f109985151868117aafda3ae17"
+        "finalDigest" : "8b142144d1aec4a6cc29cdb74758c4cc3fd46e4699513709f2c65ab2c96e99f0",
+        "initialDigest" : "cffaa23aa0f9d894a63f7bca30aaa498b478130a6a9bbdfcbaa5f9bfec6db3fe"
       },
       "name" : "fixture-5",
       "seed" : "7"
@@ -484,8 +491,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "8047f05825f17be7dfb1472c6d43fcb9d234ea0802e8a242dc816f18f5118276",
-        "initialDigest" : "08e66bb5b8e1ff7ff09b212a861009ae5ab5d8f109985151868117aafda3ae17"
+        "finalDigest" : "5968e65f0900b74b1ff7c3486d47ff507ea896a0b775984cc140625df4b7101f",
+        "initialDigest" : "cffaa23aa0f9d894a63f7bca30aaa498b478130a6a9bbdfcbaa5f9bfec6db3fe"
       },
       "name" : "fixture-6",
       "seed" : "7"
@@ -517,8 +524,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "218d9a2534f88bc94335ade1cdc4e07423f82222c6baff2ed849c80dad02ed20",
-        "initialDigest" : "08e66bb5b8e1ff7ff09b212a861009ae5ab5d8f109985151868117aafda3ae17"
+        "finalDigest" : "4c3436a3ee11206b23aba5ea64fb7e2db8d76146ec99a1793d08bdc1a6b21274",
+        "initialDigest" : "cffaa23aa0f9d894a63f7bca30aaa498b478130a6a9bbdfcbaa5f9bfec6db3fe"
       },
       "name" : "fixture-7",
       "seed" : "7"
@@ -560,8 +567,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "d853dc183eede71da5c1da3aa68a8d0154022a831e24c09eb54adcc29443ed8f",
-        "initialDigest" : "08e66bb5b8e1ff7ff09b212a861009ae5ab5d8f109985151868117aafda3ae17"
+        "finalDigest" : "4daeca5606692b26dd59597f8ee483530a0a3b6da662858125de7af98e5609d1",
+        "initialDigest" : "cffaa23aa0f9d894a63f7bca30aaa498b478130a6a9bbdfcbaa5f9bfec6db3fe"
       },
       "name" : "fixture-8",
       "seed" : "7"
@@ -593,10 +600,159 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "f92f31f5caef1aacd8c06c76915bc7d1d5bfa46ee62c87695c573d98d1934d8a",
-        "initialDigest" : "08e66bb5b8e1ff7ff09b212a861009ae5ab5d8f109985151868117aafda3ae17"
+        "finalDigest" : "8819b9338a83f10c83c6ca2aef9ddb8a6d5f342a341d292180883448eb6f3877",
+        "initialDigest" : "cffaa23aa0f9d894a63f7bca30aaa498b478130a6a9bbdfcbaa5f9bfec6db3fe"
       },
       "name" : "fixture-9",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "source.select",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 5
+        },
+        {
+          "action" : {
+            "control" : "freeze.set",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 5
+        },
+        {
+          "action" : {
+            "control" : "cursors.show",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 5
+        },
+        {
+          "action" : {
+            "control" : "cursor.a",
+            "values" : [
+              0.10000000000000001
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 5
+        },
+        {
+          "action" : {
+            "control" : "cursor.b",
+            "values" : [
+              0.20000000000000001
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 5
+        },
+        {
+          "action" : {
+            "control" : "cursor.level",
+            "values" : [
+              0.5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 5
+        },
+        {
+          "steps" : 30
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "56f5caaf8e1004676759a6fa214f0d7cf0255084818246930241da778a18dac3",
+        "initialDigest" : "cffaa23aa0f9d894a63f7bca30aaa498b478130a6a9bbdfcbaa5f9bfec6db3fe"
+      },
+      "name" : "fixture-10",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "timebase.select",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 5
+        },
+        {
+          "action" : {
+            "control" : "timebase.select",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 5
+        },
+        {
+          "action" : {
+            "control" : "timebase.select",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 5
+        },
+        {
+          "action" : {
+            "control" : "timebase.select",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 5
+        },
+        {
+          "steps" : 30
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "0625cb0d2debbddd383eda9b5d5fdfbff32325f5159ec033eb41dab5c4218db7",
+        "initialDigest" : "cffaa23aa0f9d894a63f7bca30aaa498b478130a6a9bbdfcbaa5f9bfec6db3fe"
+      },
+      "name" : "fixture-11",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "preset.apply",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 5
+        },
+        {
+          "steps" : 30
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "c03a1b66c95fec13e62823f057a1e3c77c426361895b3dcb76a47471611a1c71",
+        "initialDigest" : "cffaa23aa0f9d894a63f7bca30aaa498b478130a6a9bbdfcbaa5f9bfec6db3fe"
+      },
+      "name" : "fixture-12",
       "seed" : "7"
     }
   ],

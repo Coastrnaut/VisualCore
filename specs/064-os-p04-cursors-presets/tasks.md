@@ -23,7 +23,7 @@
 
 ## Phase 5: User Story 4 — the precision fixture (P2)
 
-- [ ] T-A08-405 [US4] Extend `Experience/Adapter/ScopeManifest.swift` with fixtures for freeze with cursors, zoom steps (`timebase.select` as pinch would) and a built-in preset applied; regenerate `scenario-manifest.json` (`UPDATE_SCENARIO_MANIFEST=1 TEST_RUNNER_UPDATE_SCENARIO_MANIFEST=1`); update `ExperienceTests/ScopeManifestTests.swift` (FR-A08-420)
+- [X] T-A08-405 [US4] Extend `Experience/Adapter/ScopeManifest.swift` with fixtures for freeze with cursors, zoom steps (`timebase.select` as pinch would) and a built-in preset applied; regenerate `scenario-manifest.json` (`UPDATE_SCENARIO_MANIFEST=1 TEST_RUNNER_UPDATE_SCENARIO_MANIFEST=1`); update `ExperienceTests/ScopeManifestTests.swift` (FR-A08-420) — Verified 2026-11-14: 2026-11-14: manifest fixtures 10 (freeze with cursors), 11 (zoom steps), 12 (preset applied); manifest regenerated (12 fixtures); ScopeManifestTests pass
 
 ## Phase 6: Polish & evidence
 
