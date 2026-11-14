@@ -21,6 +21,8 @@
   lastMessage; unique names ignoring case with " 2", " 3"…).
 - **D6 Apply action.** `preset.apply [0…2, 0…6, 0…4, 0…6, 0…4, 0…6, 0…4]`; for a 2-parameter scene slot 3 values must be 0
   (else refused as rule `a06.no-such-parameter`).
+- **D6b Resume seam (analyze U1).** `ResumableAudioSource` protocol so the presenter resumes any resumable source and
+  tests use doubles.
 - **D7 Status.** Presenter maps (source kind, state) → status text and recovery button per clarification 5.
 - **D8 Contract.** G-INTERRUPTION closed in A06-P04; row M15 available with evidence (`AudioSessionEvent`,
   `AudioSessionEventMonitor`, `MicrophoneAudioSource`).

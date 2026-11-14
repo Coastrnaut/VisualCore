@@ -10,7 +10,10 @@ public enum AudioSessionEvent: Equatable, Sendable {
   public init(center: NotificationCenter = .default, handler: @escaping @MainActor (AudioSessionEvent) -> Void)
   public func stop()
 }
-extension MicrophoneAudioSource {
+public protocol ResumableAudioSource: AudioSource {   // analyze U1: the presenter resumes through this protocol
+  func resume()
+}
+extension MicrophoneAudioSource: ResumableAudioSource {
   public func handle(_ event: AudioSessionEvent)      // reactions per research D4
   public func resume()                                 // restart after an interruption ended without resume permission
 }
