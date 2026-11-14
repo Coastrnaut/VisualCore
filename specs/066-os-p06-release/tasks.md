@@ -38,7 +38,7 @@ Evidence: `python3 Tools/python/desktop_runbook.py run-check --stage A08-P06 --t
 - [X] T-A08-614 Script tests, including the release-document check failing on a missing document (`scripts/tests` for `check_experience_release.py`; SC-A08-604) (`python3 Tools/python/desktop_runbook.py run-check --stage A08-P06 --timeout 600 --name script-tests -- python3 scripts/test_scripts.py`) — Verified 2026-11-14: 2026-11-14: .autonomy/checks/A08-P06.script-tests.json exit 0 (includes the release-document check's missing-document failure tests)
 - [ ] T-A08-615 BLOCKED_OWNER_ACTION: signing, archive upload and App Store Connect entry of Oscilloscope Studio's store text, per `docs/release/build-and-archive.md` owner steps (FR-A08-640)
 - [ ] T-A08-616 {device} In the device campaign (after ImplementationLock-100): the measurements and audits of `docs/apps/oscilloscope-studio/device-campaign.md` on D1–D3
-- [ ] T-A08-617 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A08-P06 (owner and device items stay open, as for A07-P06)
+- [X] T-A08-617 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A08-P06 (owner and device items stay open, as for A07-P06) — Verified 2026-11-14: 2026-11-14: /speckit-converge appended nothing (14 FR/SC, 4 stories, 14 tasks with evidence); owner T-A08-615 and device T-A08-616 open by rule
 
 ## Dependencies
 
