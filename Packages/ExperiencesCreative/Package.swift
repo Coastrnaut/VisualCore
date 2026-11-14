@@ -232,7 +232,8 @@ let package = Package(
                                    .product(name: "VisualCoreAudio", package: rendering),
                                    .product(name: "VisualCoreRendering", package: rendering),
                                    .product(name: "VisualCoreExperienceHost", package: rendering)],
-                    path: "VisualCoreMusicLab/ExperienceTests"),
+                    path: "VisualCoreMusicLab/ExperienceTests",
+                    resources: [.copy("Fixtures")]),
         .target(name: "ParticleUniverseCore",
                 dependencies: [
                                .product(name: "VisualCoreSimulation", package: visualCore),

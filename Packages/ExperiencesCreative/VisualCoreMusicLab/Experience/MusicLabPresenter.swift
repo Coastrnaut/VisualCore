@@ -106,6 +106,13 @@ struct MusicLabSourceFactory {
     }
 }
 
+/// The error of a draw failed on purpose through `MusicLabPresenter.failNextDraw` (feature 052 A06-P06 T-A06-606,
+/// FR-A06-611): it lets a test prove the host-to-session failure path.
+enum MusicLabDrawError: Error, Equatable {
+    /// The draw was failed by the test seam.
+    case injected
+}
+
 /// The presenter of VisualCore Music Lab.
 @MainActor
 final class MusicLabPresenter: ExperiencePresenter {
@@ -223,6 +230,9 @@ final class MusicLabPresenter: ExperiencePresenter {
     private(set) var lastMetricText = ""
     /// The analysis level of the current extractor (feature 051, from the host's tier).
     private(set) var analysisLevel = 0
+    /// Set only by tests; the next draw throws `MusicLabDrawError.injected` and clears the flag (feature 052 A06-P06
+    /// T-A06-606, FR-A06-611). Release behaviour never sets it.
+    var failNextDraw = false
     /// A tier that overrides the host's in tests (feature 051); nil in the app.
     var forceTierForTesting: Int?
     /// The palette drawn by the last frame (feature 051).
@@ -292,6 +302,10 @@ final class MusicLabPresenter: ExperiencePresenter {
     }
 
     func draw(_ core: MusicLabCore, tier: Int, context: RenderContext, frame: FrameInfo) throws {
+        if failNextDraw {
+            failNextDraw = false
+            throw MusicLabDrawError.injected
+        }
         sync(core)
         if case .failed(let reason)? = activeSource?.state, mirror.message == nil {
             mirror.message = "The sound stopped: \(reason)"

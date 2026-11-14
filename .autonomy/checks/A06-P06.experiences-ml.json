@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/ExperiencesCreative",
+    "--scheme",
+    "ExperiencesCreative-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--only-testing",
+    "VisualCoreMusicLabExperienceTests",
+    "VisualCoreMusicLabCoreTests"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing VisualCoreMusicLabExperienceTests VisualCoreMusicLabCoreTests",
+  "elapsed_seconds": 26.284,
+  "exit_code": 0,
+  "finished": "2026-11-14T09:05:30+00:00",
+  "log": ".autonomy/logs/A06-P06.experiences-ml.log",
+  "log_sha256": "92a0cb0d6a65a83d849e64e77b33e9990ff4b228dcaa266de429850a22c509c3",
+  "name": "experiences-ml",
+  "stage": "A06-P06",
+  "started": "2026-11-14T09:05:04+00:00",
+  "timed_out": false
+}

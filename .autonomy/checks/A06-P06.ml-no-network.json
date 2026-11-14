@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "/bin/sh",
+    "-c",
+    "! grep -rnE 'URLSession|import Network|CoreMotion|CoreLocation|AVAudioRecorder|AVAssetWriter' Packages/ExperiencesCreative/VisualCoreMusicLab Packages/VisualCoreRendering/Sources/VisualCoreAudio"
+  ],
+  "command": "/bin/sh -c '! grep -rnE '\"'\"'URLSession|import Network|CoreMotion|CoreLocation|AVAudioRecorder|AVAssetWriter'\"'\"' Packages/ExperiencesCreative/VisualCoreMusicLab Packages/VisualCoreRendering/Sources/VisualCoreAudio'",
+  "elapsed_seconds": 0.058,
+  "exit_code": 0,
+  "finished": "2026-11-14T09:03:03+00:00",
+  "log": ".autonomy/logs/A06-P06.ml-no-network.log",
+  "log_sha256": "cfa3e1115707b8f8e3fd5576316d0bd1b51dcc9933d5be1165ba13bcefd17bf7",
+  "name": "ml-no-network",
+  "stage": "A06-P06",
+  "started": "2026-11-14T09:03:03+00:00",
+  "timed_out": false
+}
