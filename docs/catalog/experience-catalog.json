@@ -1636,10 +1636,10 @@
    "implementation": {
     "state": "standalone-partial",
     "legacy_gates_passed": [
-     "A08-P00"
+     "A08-P00",
+     "A08-P01"
     ],
     "legacy_gates_pending": [
-     "A08-P01",
      "A08-P02",
      "A08-P03",
      "A08-P04",
