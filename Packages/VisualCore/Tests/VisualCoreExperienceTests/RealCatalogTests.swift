@@ -80,7 +80,9 @@ enum CatalogFixture {
         #expect(registered == ["a01.generative-art-studio", "a02.fluid-art-playground", "a03.fractal-explorer",
                                "a04.particle-universe", "a05.infinite-geometry",
                                // Feature 047 (A06-P01); integrated at X-A06.
-                               "a06.visualcore-music-lab"],
+                               "a06.visualcore-music-lab",
+                               // Feature 054 (A07-P01): a candidate until X-A07.
+                               "a07.audio-odyssey"],
                 "the registrations of Catalog/registrations.json")
     }
 
