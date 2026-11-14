@@ -148,11 +148,15 @@ private func withinBounds(_ core: GeometryCore) -> Bool {
     /// SC-A05-203: 200 seeded random sequences of camera and preset actions; after every action both cameras are
     /// within their bounds, and a final reset restores the defaults exactly.
     @Test func twoHundredRandomSequencesStayWithinTheBounds() async throws {
+        // One engine for all sequences (`reset()` returns it to the preparation between them), and the camera actions
+        // weighted three to one over the actions that rebuild the composition (preset and scale), the expensive step:
+        // short-test rule (owner, 2026-11-13; T-A05-321).
         var rng = SeededRandom(seed: 0xA05_0203)
-        let controls = ["camera.pan", "camera.zoom", "camera.orbit", "camera.reset", "preset.select", "scale.set"]
-        let initial = try core(try await engine())
+        let camera = ["camera.pan", "camera.zoom", "camera.orbit"]
+        let controls = camera + camera + camera + ["camera.reset", "preset.select", "scale.set"]
+        var engine = try await engine()
+        let initial = try core(engine)
         for sequence in 0..<200 {
-            var engine = try await engine()
             for _ in 0..<12 {
                 let control = controls[rng.int(0...(controls.count - 1))]
                 let values: [Double]

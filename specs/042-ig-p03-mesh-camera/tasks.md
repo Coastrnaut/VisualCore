@@ -53,4 +53,4 @@ MVP: depth-correct solid (US1) on the mesh pass (US3); then camera pan and field
 
 ## Phase 6: Convergence
 
-- [ ] T-A05-321 Bring `GeometryCameraTests.twoHundredRandomSequencesStayWithinTheBounds` in `Packages/ExperiencesCreative/InfiniteGeometry/ExperienceTests/GeometryCameraTests.swift` under 10 s (10.6 s on sim-26.5) by reusing one engine and rebuilding the solid less often, then rerun the experiences package on both runtimes (`--name experiences-ios27-2`, `experiences-ios26-2`) per SC-A05-307 (partial)
+- [X] T-A05-321 Bring `GeometryCameraTests.twoHundredRandomSequencesStayWithinTheBounds` in `Packages/ExperiencesCreative/InfiniteGeometry/ExperienceTests/GeometryCameraTests.swift` under 10 s (10.6 s on sim-26.5) by reusing one engine and rebuilding the solid less often, then rerun the experiences package on both runtimes (`--name experiences-ios27-2`, `experiences-ios26-2`) per SC-A05-307 (partial) — Verified 2026-11-13: 2026-11-13 .autonomy/checks/A05-P03.experiences-ios27-2.json and .experiences-ios26-2.json (exit 0; test 6.5 s / 6.9 s)
