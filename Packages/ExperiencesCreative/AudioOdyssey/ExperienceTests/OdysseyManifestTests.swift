@@ -3,6 +3,8 @@
 // digests and expected results equal to what the engine gives when the runner plays them, and the committed
 // `scenario-manifest.json` equal to the Swift manifest (`UPDATE_SCENARIO_MANIFEST=1`, on the simulator
 // `TEST_RUNNER_UPDATE_SCENARIO_MANIFEST=1`, rewrites it, as for Music Lab).
+// Feature 055 (A07-P02) T-A07-207: fixture 3 switches sources (permission mirrored as denied, microphone refused by
+// the rule, demo again) while flying; the switches change neither distance nor speed.
 import Foundation
 import Testing
 @testable import AudioOdysseyExperience
@@ -66,10 +68,20 @@ private func play(_ spec: ScenarioSpec) async throws -> (initial: String, result
         #expect(comfort.state.speedChoice == .slow)
         #expect(!comfort.state.paused)
         #expect(comfort.state.speed > 0 && comfort.state.speed <= 2)
-        // Fixture 3: the last world switch wins; the flight never stopped.
+        // Fixture 3: the microphone was refused, the demo plays, the last world switch wins; the flight never stopped.
         let switches = OdysseyCore.played(seed: OdysseyCore.manifestSeed, entries: OdysseyCore.fixtureEntries[2])
         #expect(switches.state.world == .starCorridor)
+        #expect(switches.state.source == .demo)
+        #expect(switches.permission == .denied)
         #expect(switches.state.distance > 0)
+        let fixture3 = OdysseyCore.fixtureEntries[2]
+        #expect(fixture3.contains { $0.action?.control == "source.microphone"
+                                    && $0.result == "action.rule." + OdysseyRule.permissionDenied })
+        // The switches change neither distance nor speed: the same steps without any action give the same flight.
+        let stepsOnly = fixture3.map { ScenarioStep(steps: $0.steps) }
+        let unswitched = OdysseyCore.played(seed: OdysseyCore.manifestSeed, entries: stepsOnly)
+        #expect(unswitched.state.distance == switches.state.distance)
+        #expect(unswitched.state.speed == switches.state.speed)
         // Fixture 4: the same steady flight played twice gives the same distance (a stable, measurable response).
         let steady = OdysseyCore.played(seed: OdysseyCore.manifestSeed, entries: OdysseyCore.fixtureEntries[3])
         let again = OdysseyCore.played(seed: OdysseyCore.manifestSeed, entries: OdysseyCore.fixtureEntries[3])

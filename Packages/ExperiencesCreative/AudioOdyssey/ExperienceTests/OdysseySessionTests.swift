@@ -6,6 +6,8 @@
 // under Reduce Motion (mirrored into the core after the first frame); leaving for the background suspends the
 // experience so the journey holds still and returning continues it; closing releases every piece with no leak; and
 // the experience's sources never create a graphics context of their own (only the host's context is used).
+// Feature 055 (A07-P02) T-A07-205: the tunnel streams (at most 2 pieces built per frame until the window of 2 + 1 + 8
+// is complete) and the description names the source and the response.
 import Foundation
 import XCTest
 @testable import AudioOdysseyExperience
@@ -62,22 +64,32 @@ final class OdysseySessionTests: XCTestCase {
         let window = WorldPieces.indices(around: state.distance)
         XCTAssertEqual(presenter.lastIndices, window)
         XCTAssertEqual(window.count, 1 + WorldPieces.windowAhead, "at the start nothing lies behind piece 0")
-        XCTAssertEqual(Set(presenter.pieces.keys), Set(window))
+        let live = presenter.tunnel.live
+        XCTAssertGreaterThanOrEqual(live.count, 2, "the nearest pieces are built first")
+        XCTAssertEqual(live, Array(0..<live.count), "nearest first, from piece 0")
+        XCTAssertLessThanOrEqual(presenter.tunnelBuiltLastFrame, 2)
         XCTAssertGreaterThan(shell.diagnostics.gpu?.objects ?? 0, 0, "the pieces live in the host's registry")
-        XCTAssertEqual(shell.accessibilitySummary, "Audio Odyssey: Tunnel, medium speed, flying.")
+        XCTAssertTrue(shell.accessibilitySummary.hasPrefix("Audio Odyssey: Tunnel, medium speed, flying, demo signal, "),
+                      shell.accessibilitySummary)
         XCTAssertEqual(presenter.mirror.world, .tunnel)
         XCTAssertEqual(presenter.mirror.speedChoice, .medium)
         XCTAssertFalse(presenter.mirror.paused)
 
         try await frames(session, 20)
         XCTAssertGreaterThan(try core(shell).state.distance, 0, "the camera advances with no prompt")
+        let streamed = WorldPieces.indices(around: try core(shell).state.distance)
+        XCTAssertEqual(presenter.tunnel.live, Array(streamed), "the whole window is streamed in")
+        XCTAssertEqual(presenter.lastDrawnPieces, Array(streamed))
         XCTAssertTrue(shell.handle(control: "flight.pause").isAccepted)
-        XCTAssertEqual(shell.accessibilitySummary, "Audio Odyssey: Tunnel, medium speed, paused.")
+        XCTAssertTrue(shell.accessibilitySummary.hasPrefix("Audio Odyssey: Tunnel, medium speed, paused, demo signal, "),
+                      shell.accessibilitySummary)
         XCTAssertTrue(presenter.mirror.paused)
 
         session.close()
         XCTAssertEqual(session.hostsAlive, 0)
         XCTAssertTrue(presenter.pieces.isEmpty, "every piece released")
+        XCTAssertEqual(presenter.liveRendererCount, 0, "every tunnel piece released")
+        XCTAssertEqual(presenter.tunnel.available, TunnelStream<MeshRenderer>.capacity, "every slot free")
         XCTAssertFalse(presenter.isLive)
         XCTAssertEqual(shell.state, .inactive, "closed without a GPU leak")
     }
@@ -96,7 +108,9 @@ final class OdysseySessionTests: XCTestCase {
         XCTAssertEqual(presenter.piecesMade - made, window.count, "the landscape window was built")
         XCTAssertEqual(Set(presenter.pieces.keys), Set(window))
         XCTAssertGreaterThanOrEqual(try core(shell).state.distance, before.distance, "the same rail position, onward")
-        XCTAssertEqual(shell.accessibilitySummary, "Audio Odyssey: Landscape, medium speed, flying.")
+        XCTAssertTrue(shell.accessibilitySummary.hasPrefix("Audio Odyssey: Landscape, medium speed, flying, demo signal, "),
+                      shell.accessibilitySummary)
+        XCTAssertEqual(presenter.tunnel.liveCount, 0, "leaving the tunnel empties the stream")
 
         // Rapid switches with no frame between: exactly the last world is drawn.
         for world in [2.0, 0, 1, 2] {

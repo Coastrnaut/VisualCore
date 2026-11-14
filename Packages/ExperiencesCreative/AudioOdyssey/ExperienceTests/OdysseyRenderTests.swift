@@ -3,6 +3,8 @@
 // assertion): every world draws a non-blank picture on the dark clear colour, the three pictures differ pairwise (by
 // their pixel hash and in at least a tenth of a 16 × 16 sampling grid), the declared frame probes hold, a paused
 // journey draws the same picture frame after frame, and a failed draw reaches the session as a failure.
+// Feature 055 (A07-P02) T-A07-205: the paused-picture test plays the demo signal's silence, so the tunnel's audio
+// response stays at rest and the picture can be identical.
 import Foundation
 import XCTest
 @testable import AudioOdysseyExperience
@@ -16,11 +18,13 @@ import VisualCoreRendering
 final class OdysseyRenderTests: XCTestCase {
     private var id: ExperienceID { AudioOdysseyExperience.id ?? ExperienceID(rawValue: "a07.unknown")! }
 
-    private func open(_ session: ExperienceSession) async throws -> ExperienceShell<OdysseyPresenter> {
+    private func open(_ session: ExperienceSession, silent: Bool = false) async throws
+        -> ExperienceShell<OdysseyPresenter> {
         let id = self.id
         var made: ExperienceShell<OdysseyPresenter>?
         let request = ExperienceOpenRequest(id: id, seed: 7, snapshot: nil, refusedSnapshotFails: false) {
             let shell = AudioOdysseyExperience.make(id: id)
+            if silent { shell.presenter.demoMode = .silence }
             made = shell
             return shell
         }
@@ -101,7 +105,7 @@ final class OdysseyRenderTests: XCTestCase {
 
     func testAPausedJourneyDrawsTheSamePictureOnceAtRest() async throws {
         let session = ExperienceSession()
-        let shell = try await open(session)
+        let shell = try await open(session, silent: true)
         XCTAssertTrue(shell.handle(control: "flight.pause").isAccepted)
         // From near rest the speed reaches 0 within a few frames (1.5 units/s² at most); wait for it, bounded.
         for _ in 0..<120 {
@@ -109,6 +113,12 @@ final class OdysseyRenderTests: XCTestCase {
             try await frames(session, 1)
         }
         XCTAssertEqual(try XCTUnwrap(shell.engine.core).state.speed, 0)
+        // The streamed tunnel window fills at 2 pieces per frame; wait for it (bounded).
+        for _ in 0..<30 where !shell.presenter.tunnel.window.isComplete { try await frames(session, 1) }
+        XCTAssertTrue(shell.presenter.tunnel.window.isComplete)
+        let response = shell.presenter.response
+        XCTAssertEqual(response.ripple, response.rippleRest, "silence keeps the response at rest")
+        XCTAssertEqual(response.ambient, response.ambientRest)
         let first = try picture(session)
         try await frames(session, 3)
         let second = try picture(session)

@@ -4,6 +4,9 @@
 // was; a world switch keeping distance and speed; the speed easing within the standard limits; Reduce Motion capping
 // the speed at 2.5 with no sway; pause easing to rest with the journey kept and resume continuing; refusals; the
 // snapshot round trip, a damaged payload refused, and reset.
+// Feature 055 (A07-P02) T-A07-205 (FR-A07-220; SC-A07-205): schema 2 with the source; the source actions, the
+// microphone refused by the rule while the mirrored permission is denied or restricted, source switches keeping the
+// flight, the permission mirror out of the digest and kept by a reset, and the schema-1 example migrating.
 import Foundation
 import Testing
 @testable import AudioOdysseyExperience
@@ -30,8 +33,8 @@ private func core(_ engine: ExperienceEngine<OdysseyCore>) throws -> OdysseyCore
         #expect(AudioOdysseyExperience.id?.rawValue == "a07.audio-odyssey")
         #expect(OdysseyCore.controls.map(\.id)
                 == ["world.select", "speed.select", "flight.pause", "flight.resume", "journey.reseed",
-                    "comfort.reduce-motion"])
-        #expect(OdysseyCore.migrations.currentVersion == 1)
+                    "comfort.reduce-motion", "source.demo", "source.microphone", "source.file", "permission.mirror"])
+        #expect(OdysseyCore.migrations.currentVersion == 2)
     }
 
     @Test func conformancePassesOverFourSeeds() async {
@@ -40,10 +43,13 @@ private func core(_ engine: ExperienceEngine<OdysseyCore>) throws -> OdysseyCore
             actions: [ScriptedAction("speed.select", [2]), ScriptedAction("world.select", [1]),
                       ScriptedAction("flight.pause"), ScriptedAction("journey.reseed"),
                       ScriptedAction("flight.resume"), ScriptedAction("world.select", [2]),
-                      ScriptedAction("comfort.reduce-motion", [1]), ScriptedAction("speed.select", [0])],
+                      ScriptedAction("comfort.reduce-motion", [1]), ScriptedAction("speed.select", [0]),
+                      ScriptedAction("source.file"), ScriptedAction("permission.mirror", [1]),
+                      ScriptedAction("source.microphone"), ScriptedAction("source.demo")],
             rejected: [ScriptedAction("world.select", [3]), ScriptedAction("world.select", [.nan]),
                        ScriptedAction("speed.select", [-1]), ScriptedAction("flight.pause", [1]),
                        ScriptedAction("flight.resume"), ScriptedAction("comfort.reduce-motion", [2]),
+                       ScriptedAction("source.demo", [1]), ScriptedAction("permission.mirror", [4]),
                        ScriptedAction("bogus")])
         let report = await ExperienceConformance.run(OdysseyCore.self, id: id, plan: plan)
         for entry in report.entries { #expect(entry.passed, "\(entry.check): \(entry.detail)") }
@@ -72,7 +78,8 @@ private func core(_ engine: ExperienceEngine<OdysseyCore>) throws -> OdysseyCore
         var engine = try await engine()
         var last = try engine.digest()
         for (control, values) in [("world.select", [1.0]), ("world.select", [2.0]), ("speed.select", [2.0]),
-                                  ("flight.pause", []), ("flight.resume", []), ("journey.reseed", [])] {
+                                  ("flight.pause", []), ("flight.resume", []), ("journey.reseed", []),
+                                  ("source.file", []), ("source.demo", [])] {
             #expect(engine.handle(control: control, values: values).isAccepted, "\(control) \(values)")
             let now = try engine.digest()
             #expect(now != last, "\(control) \(values) changes the digest")
@@ -81,6 +88,53 @@ private func core(_ engine: ExperienceEngine<OdysseyCore>) throws -> OdysseyCore
         #expect(engine.handle(control: "comfort.reduce-motion", values: [1]).isAccepted)
         #expect(try core(engine).reduceMotion)
         #expect(try engine.digest() == last, "the Reduce Motion mirror is not in the digest")
+        #expect(engine.handle(control: "permission.mirror", values: [2]).isAccepted)
+        #expect(try core(engine).permission == .denied)
+        #expect(try engine.digest() == last, "the permission mirror is not in the digest")
+    }
+
+    @Test func theMicrophoneIsRefusedByTheRuleOnlyWhileAccessIsOff() async throws {
+        for access in OdysseyMicrophoneAccess.allCases {
+            var engine = try await engine()
+            #expect(engine.handle(control: "permission.mirror", values: [Double(access.rawValue)]).isAccepted)
+            let before = try engine.digest()
+            let result = engine.handle(control: "source.microphone")
+            if access.refusesMicrophone {
+                #expect(result == .rejected(.rule(code: OdysseyRule.permissionDenied)), "\(access)")
+                #expect(try core(engine).state.source == .demo, "\(access): the demo is kept")
+                #expect(try engine.digest() == before)
+            } else {
+                #expect(result.isAccepted, "\(access)")
+                #expect(try core(engine).state.source == .microphone)
+            }
+        }
+    }
+
+    @Test func sourceSwitchesKeepTheFlight() async throws {
+        var engine = try await engine()
+        try engine.run(steps: 240)
+        let before = try core(engine).state
+        for control in ["source.file", "source.microphone", "source.demo", "source.file", "source.demo"] {
+            #expect(engine.handle(control: control).isAccepted, "\(control)")
+            let state = try core(engine).state
+            #expect(state.distance == before.distance && state.speed == before.speed, "\(control)")
+            #expect(state.world == before.world && state.seed == before.seed && state.speedChoice == before.speedChoice)
+        }
+        #expect(try core(engine).state.source == .demo)
+    }
+
+    @Test func theSchemaOneExampleMigratesToTheDemoSignal() async throws {
+        let example = try #require(OdysseyCore.schemaOneExample())
+        #expect(example.version == 1)
+        let problems = await SnapshotMigrationCheck.problems(for: OdysseyCore.self, id: id, examples: [example])
+        #expect(problems.isEmpty, "\(problems)")
+        // The same payload restored by an engine: the journey with the demo signal.
+        var engine = try await engine(seed: 3)
+        try engine.restore(ExperienceSnapshot(data: example.snapshot))
+        let state = try core(engine).state
+        #expect(state.source == .demo)
+        #expect(state.world == .landscape && state.distance == 12.5 && state.speedChoice == .fast && state.speed == 3)
+        #expect(try engine.digest().hex == example.expectedDigest)
     }
 
     @Test func aWorldSwitchKeepsDistanceAndSpeed() async throws {
@@ -179,7 +233,7 @@ private func core(_ engine: ExperienceEngine<OdysseyCore>) throws -> OdysseyCore
         try first.run(steps: 50)
         #expect(first.handle(control: "flight.pause").isAccepted)
         let snapshot = try first.snapshot()
-        #expect(snapshot.schemaVersion == 1)
+        #expect(snapshot.schemaVersion == 2)
         let decoded = try ExperienceSnapshot(data: snapshot.encoded())
         var second = try await engine(seed: 3)
         try second.restore(decoded)
@@ -203,19 +257,28 @@ private func core(_ engine: ExperienceEngine<OdysseyCore>) throws -> OdysseyCore
             #expect(throws: ExperienceError.self) { try engine.restore(snapshot) }
             #expect(try engine.digest() == before)
         }
+        // Schema 2 with an unknown source.
+        let unknown = #"{"distance":0,"paused":false,"seed":7,"source":7,"speed":0,"speedChoice":1,"world":0}"#
+        let snapshot = try ExperienceSnapshot(experience: id, schemaVersion: 2, seed: 7, stepIndex: 0, digest: before,
+                                              payload: Data(unknown.utf8))
+        #expect(throws: ExperienceError.self) { try engine.restore(snapshot) }
+        #expect(try engine.digest() == before)
     }
 
     @Test func resetReturnsToTheFirstJourneyAndKeepsTheMirror() async throws {
         var engine = try await engine(seed: 11)
         let prepared = try engine.digest()
         #expect(engine.handle(control: "comfort.reduce-motion", values: [1]).isAccepted)
+        #expect(engine.handle(control: "permission.mirror", values: [3]).isAccepted)
         try engine.run(steps: 100)
         #expect(engine.handle(control: "world.select", values: [1]).isAccepted)
+        #expect(engine.handle(control: "source.file").isAccepted)
         #expect(engine.handle(control: "journey.reseed").isAccepted)
         try engine.reset()
         #expect(try engine.digest() == prepared)
         #expect(try core(engine).state == JourneyState(seed: 11))
         #expect(try core(engine).reduceMotion)
+        #expect(try core(engine).permission == .restricted, "the permission mirror is kept")
     }
 
     @Test func theSameStepsGiveTheSameJourney() async throws {

@@ -3,6 +3,10 @@
 // joins; comfort limits; world switches without a context reset; steady response; long travel), all short (owner rule of 2026-11-13). The flight advances with every step, so the expected
 // digests are derived by playing the entries on a core exactly as the engine plays them (the steps of an entry, then
 // its action) and digesting it with the experience id as domain, like Music Lab's manifest.
+// Feature 055 (A07-P02) T-A07-207 (FR-A07-231; SC-A07-204, SC-A07-205): fixture 3 switches audio sources while the
+// flight keeps going, without starting real capture (as A06's fixture does): the permission is mirrored as denied, the
+// microphone is refused by the rule `a07.permission-denied`, the demo is selected again; the steps between the switches
+// keep the flight moving and the switches change neither distance nor speed. Fixture 2 keeps the comfort run.
 #if DEBUG || VISUALCORE_AUTOMATION
 import AudioOdysseyCore
 import VisualCoreExperience
@@ -50,7 +54,7 @@ extension OdysseyCore {
         return builder.finish().hex
     }
 
-    /// The entries of the two regression fixtures of this phase:
+    /// The entries of the five regression fixtures (fixture 3 since feature 055: source switching):
     /// 1. watertight joins: the flight crosses several piece boundaries (8 units each) while every world is selected in
     ///    turn and a new journey is started, so the presenter builds and joins fresh pieces of all three worlds (the
     ///    joins themselves are proved within 1e-9 by `WorldPiecesTests`); the final digest proves the switches kept
@@ -66,10 +70,13 @@ extension OdysseyCore {
              step("journey.reseed", steps: 240), step("world.select", [0], steps: 240), ScenarioStep(steps: 240)],
             [step("speed.select", [2], steps: 10), step("speed.select", [0], steps: 600),
              step("flight.pause", steps: 240), step("flight.resume", steps: 240), ScenarioStep(steps: 120)],
-            // Fixture 3 (catalog: "source switching does not reset the context"): until audio sources arrive in
-            // A07-P03, rapid world switches while flying stand in for source switches; the host context stays.
-            [step("world.select", [2], steps: 5), step("world.select", [1], steps: 5), step("world.select", [0], steps: 5),
-             step("world.select", [2], steps: 5), ScenarioStep(steps: 60)],
+            // Fixture 3 (catalog: "source switching does not reset the context"): the permission mirrored as denied, the
+            // microphone refused by the rule (no request, no capture), the demo selected again, a world switch between,
+            // all while flying; the host context stays and distance and speed are untouched by the switches.
+            [step("permission.mirror", [2], steps: 30),
+             step("source.microphone", [], "action.rule." + OdysseyRule.permissionDenied, steps: 30),
+             step("source.demo", steps: 30), step("world.select", [2], steps: 30), step("source.demo", steps: 30),
+             ScenarioStep(steps: 60)],
             // Fixture 4 (catalog: "stable and measurable scene response"): a steady medium flight advances the same
             // distance for the same steps; the audio-driven form follows in A07-P03.
             [step("speed.select", [1], steps: 1), ScenarioStep(steps: 600)],
