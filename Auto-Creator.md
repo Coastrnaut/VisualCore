@@ -2896,7 +2896,7 @@ to confirm on devices:
 |---|---|---|
 | VisualCoreMath | VisualCore | `Vec2`, `Vec3`, `Vec4`, `Mat3`, `Mat4`, `Quat`, `OrbitCamera`, `Camera2D`, `EasingCurve`, `TourTimeline`, `PrecisionAdvisor` |
 | VisualCoreSimulation | VisualCore | `FixedStepRunner`, `FixedStepClock`, `SceneClock`, `SeededRandom`, `Timeline`, `ControlStream`, `PlaybackState`, `ParticleSystem`, `ParticleForce`, `FieldGrid`, `TrailDecay`, `AccessibilityPreferences` |
-| VisualCoreScenes | VisualCore | gesture recognizers (`TapRecognizer`, `DragRecognizer`, `PinchRecognizer`, `RotateRecognizer`, `LongPressRecognizer`, `DoubleTapRecognizer`), `PointerTracker`, `Mesh`, `SceneNode`, `ExportGeometry` |
+| VisualCoreScenes | VisualCore | gesture recognizers (`TapRecognizer`, `DragRecognizer`, `PinchRecognizer`, `RotateRecognizer`, `LongPressRecognizer`, `DoubleTapRecognizer`), `PointerTracker`, `Mesh` with `MeshBuilder`, `MeshBudget`, `MeshBounds`, `MeshReport` and the shapes `surface`, `revolution`, `extrusion`, `tube`, `bevelledBox` (R02-F05), `SceneNode`, `ExportGeometry` |
 | VisualCoreParameters | VisualCore | `ParameterSchema`, `Preset`, `Palette`, `ParameterHash`, `ParameterEditor` |
 | VisualCorePersistence | VisualCore | `DocumentStore`, `NamedLibrary`, `DocumentEnvelope`, `MigrationChain` |
 | VisualCoreShaderSource | VisualCore | `ShaderLibrary`, `ExpandedShader`, `InfoLogParser`, `ShaderCacheKey` |

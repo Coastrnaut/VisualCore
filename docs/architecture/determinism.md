@@ -113,3 +113,11 @@ division and are trusted only within section 3.
 - **UIKit conversion**: UIKit has its origin at the top left with y down; GL framebuffer coordinates have their
   origin at the bottom left with y up. A touch converts as x_gl = x_uikit × scale and
   y_gl = (height − y_uikit) × scale, with `height` the view height in points and `scale` the view's content scale.
+
+## 9. Mesh digests
+
+`Mesh.digest` (feature 205, R02-F05) is the SHA-256 (`StableHash`) of a little-endian stream: the four array counts,
+every position, normal and texture-coordinate component as its IEEE-754 binary64 bit pattern (−0 written as +0), then
+every index. Mesh builders and shapes use only arithmetic and the trusted functions of section 3, so the same
+description gives the same digest on the host and on both simulator runtimes; committed digests are checked on all
+three. A change in a digest is a change in geometry.

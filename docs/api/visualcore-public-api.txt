@@ -1730,13 +1730,18 @@ VisualCoreRendering | var | public var world: WorldRect
 VisualCoreScenes | class | public final class SceneNode
 VisualCoreScenes | enum | public enum GestureKind: String, Sendable, Equatable, Codable, CaseIterable
 VisualCoreScenes | enum | public enum GestureState: String, Sendable, Equatable
+VisualCoreScenes | enum | public enum Kind: String, Sendable, Codable, CaseIterable
+VisualCoreScenes | enum | public enum MeshBounds: Sendable, Equatable
+VisualCoreScenes | enum | public enum MeshError: Error, Sendable, Equatable
 VisualCoreScenes | enum | public enum Phase: String, Sendable, Equatable, Codable
 VisualCoreScenes | enum | public enum PointerPhase: String, Sendable, Codable
 VisualCoreScenes | enum | public enum Primitive: Sendable, Equatable
 VisualCoreScenes | enum | public enum ScenesInfo
 VisualCoreScenes | func | public func add(_ child: SceneNode)
+VisualCoreScenes | func | public func build() -> Mesh
 VisualCoreScenes | func | public func clampedLongEdge(_ longEdge: Int) -> Int
 VisualCoreScenes | func | public func contains(_ p: Vec2) -> Bool
+VisualCoreScenes | func | public func contains(_ p: Vec3, tolerance: Double = 1e-9) -> Bool
 VisualCoreScenes | func | public func drawList(parentTransform: Mat3 = .identity) -> [(node: SceneNode, world: Mat3)]
 VisualCoreScenes | func | public func events(forFrame frame: Int) -> [PointerEvent]
 VisualCoreScenes | func | public func fromCamera(_ c: Vec2) -> Vec2?
@@ -1751,6 +1756,9 @@ VisualCoreScenes | func | public func toCamera(_ p: Vec2) -> Vec2?
 VisualCoreScenes | func | public func toNDC(_ p: Vec2) -> Vec2?
 VisualCoreScenes | func | public func toPixels(_ p: Vec2) -> Vec2?
 VisualCoreScenes | func | public func toWorld(_ p: Vec2, camera: Camera2D) -> Vec2?
+VisualCoreScenes | func | public func validate(requireClosed: Bool = false, budget: MeshBudget = .default) -> MeshReport
+VisualCoreScenes | func | public func withFlatNormals() -> Mesh
+VisualCoreScenes | func | public func withSmoothNormals(creaseAngle: Double) -> Mesh
 VisualCoreScenes | func | public func worldToNDC(camera: Camera2D) -> Mat3?
 VisualCoreScenes | func | public func worldTransform() -> Mat3
 VisualCoreScenes | func | public mutating func cancelAll() -> [GestureOutcome]
@@ -1761,27 +1769,40 @@ VisualCoreScenes | func | public mutating func handle(_ event: PointerEvent) -> 
 VisualCoreScenes | func | public mutating func reset()
 VisualCoreScenes | func | public mutating func tick(now: Double)
 VisualCoreScenes | func | public mutating func tick(now: Double) -> [GestureOutcome]
+VisualCoreScenes | func | public mutating func triangle(_ a: UInt32, _ b: UInt32, _ c: UInt32) throws(MeshError)
+VisualCoreScenes | func | public mutating func vertex(_ position: Vec3, normal: Vec3, uv: Vec2) throws(MeshError) -> UInt32
+VisualCoreScenes | func | public static func bevelledBox(size: Vec3, radius: Double, segments: Int,
 VisualCoreScenes | func | public static func cube() -> Mesh
+VisualCoreScenes | func | public static func extrusion(outline: [Vec2], depth: Double, caps: Bool,
 VisualCoreScenes | func | public static func plane(subdivisions: Int = 1) -> Mesh
+VisualCoreScenes | func | public static func revolution(profile: [Vec2], segments: Int,
+VisualCoreScenes | func | public static func surface(columns: Int, rows: Int, closedU: Bool, closedV: Bool, budget: MeshBudget = .default,
+VisualCoreScenes | func | public static func tube(path: [Vec3], radius: Double, sides: Int, caps: Bool, closed: Bool,
 VisualCoreScenes | func | public static func uvSphere(segments: Int = 32, rings: Int = 16, radius: Double = 1) -> Mesh
 VisualCoreScenes | init | public init()
 VisualCoreScenes | init | public init(_ declarations: [GestureDeclaration])
+VisualCoreScenes | init | public init(budget: MeshBudget = .default, weldTolerance: Double = 1e-9, weldPositionsOnly: Bool = false)
 VisualCoreScenes | init | public init(gesture: String, phase: Phase, values: [Double])
 VisualCoreScenes | init | public init(id: Int, phase: PointerPhase, location: Vec2, timestamp: Double)
 VisualCoreScenes | init | public init(id: String = "", position: Vec2 = .zero, rotation: Double = 0, scale: Vec2 = Vec2(1, 1), z: Int = 0,
 VisualCoreScenes | init | public init(id: String, kind: GestureKind, priority: Int, pointers: Int)
+VisualCoreScenes | init | public init(kind: Kind, triangle: Int? = nil, vertex: Int? = nil, edge: [UInt32]? = nil)
 VisualCoreScenes | init | public init(maxDistance: Double = 10, maxDuration: Double = 0.3)
 VisualCoreScenes | init | public init(maxEdge: Int, maxPixels: Int = ExportGeometry.defaultMaxPixels)
 VisualCoreScenes | init | public init(maxInterval: Double = 0.3, maxSeparation: Double = 30)
+VisualCoreScenes | init | public init(maxVertices: Int, maxIndices: Int)
 VisualCoreScenes | init | public init(minAngle: Double = 0)
 VisualCoreScenes | init | public init(minChange: Double = 0)
 VisualCoreScenes | init | public init(minDistance: Double = 10)
 VisualCoreScenes | init | public init(minDuration: Double = 0.5, maxDistance: Double = 10)
+VisualCoreScenes | init | public init(problems: [MeshProblem], moreProblems: Int, summary: MeshSummary)
 VisualCoreScenes | init | public init(seed: UInt64, pointerCount: Int = 1, strokeSamples: Int = 30, speed: Double = 600,
 VisualCoreScenes | init | public init(size: Vec2, scale: Double)
 VisualCoreScenes | init | public init(spacing: Double, maxSamplesPerUpdate: Int = 16, smoothing: Double = 0.5)
+VisualCoreScenes | init | public init(vertices: Int, triangles: Int, boundaryEdges: Int, isClosed: Bool,
 VisualCoreScenes | init | public init(width: Int, height: Int)
 VisualCoreScenes | init | public init?(id: String, title: String, width: Int, height: Int)
+VisualCoreScenes | let | public let budget: MeshBudget
 VisualCoreScenes | let | public let declarations: [GestureDeclaration]
 VisualCoreScenes | let | public let frameInterval: Double
 VisualCoreScenes | let | public let height: Int
@@ -1802,7 +1823,10 @@ VisualCoreScenes | let | public let timestamp: Double
 VisualCoreScenes | let | public let title: String
 VisualCoreScenes | let | public let velocity: Vec2
 VisualCoreScenes | let | public let viewSize: Vec2
+VisualCoreScenes | let | public let weldPositionsOnly: Bool
+VisualCoreScenes | let | public let weldTolerance: Double
 VisualCoreScenes | let | public let width: Int
+VisualCoreScenes | let | public static let `default`
 VisualCoreScenes | let | public static let builtIns: [ExportAspect]
 VisualCoreScenes | let | public static let defaultMaxPixels
 VisualCoreScenes | let | public static let hardMaxEdge
@@ -1811,6 +1835,7 @@ VisualCoreScenes | let | public static let maxPointers
 VisualCoreScenes | let | public static let maxPolygonPoints
 VisualCoreScenes | let | public static let minimumInterval
 VisualCoreScenes | let | public static let portrait
+VisualCoreScenes | let | public static let problemLimit
 VisualCoreScenes | let | public static let ringRange
 VisualCoreScenes | let | public static let segmentRange
 VisualCoreScenes | let | public static let square
@@ -1828,6 +1853,11 @@ VisualCoreScenes | struct | public struct GestureDeclaration: Sendable, Equatabl
 VisualCoreScenes | struct | public struct GestureOutcome: Sendable, Equatable, Codable
 VisualCoreScenes | struct | public struct LongPressRecognizer: GestureRecognizer
 VisualCoreScenes | struct | public struct Mesh: Sendable, Equatable
+VisualCoreScenes | struct | public struct MeshBudget: Sendable, Equatable
+VisualCoreScenes | struct | public struct MeshBuilder: Sendable
+VisualCoreScenes | struct | public struct MeshProblem: Sendable, Equatable, Codable
+VisualCoreScenes | struct | public struct MeshReport: Sendable, Equatable, Codable, CustomStringConvertible
+VisualCoreScenes | struct | public struct MeshSummary: Sendable, Equatable, Codable
 VisualCoreScenes | struct | public struct PinchRecognizer: GestureRecognizer
 VisualCoreScenes | struct | public struct PointerEvent: Sendable, Equatable
 VisualCoreScenes | struct | public struct PointerTracker: Sendable
@@ -1856,33 +1886,47 @@ VisualCoreScenes | var | public private(set) var velocity: Vec2
 VisualCoreScenes | var | public private(set) weak var parent: SceneNode?
 VisualCoreScenes | var | public var activeCount: Int
 VisualCoreScenes | var | public var aspect: Double?
+VisualCoreScenes | var | public var boundaryEdges: Int
 VisualCoreScenes | var | public var bounded: Primitive
+VisualCoreScenes | var | public var bounds: MeshBounds
+VisualCoreScenes | var | public var boundsMax: Vec3?
+VisualCoreScenes | var | public var boundsMin: Vec3?
+VisualCoreScenes | var | public var center: Vec3?
 VisualCoreScenes | var | public var centroid: Vec2?
 VisualCoreScenes | var | public var color: Vec4
 VisualCoreScenes | var | public var count: Int
+VisualCoreScenes | var | public var description: String
+VisualCoreScenes | var | public var digest: String
+VisualCoreScenes | var | public var edge: [UInt32]?
 VisualCoreScenes | var | public var effectiveMaxEdge: Int
 VisualCoreScenes | var | public var gesture: String
 VisualCoreScenes | var | public var id: Int
 VisualCoreScenes | var | public var id: String
+VisualCoreScenes | var | public var indexCount: Int
 VisualCoreScenes | var | public var indices: [UInt32]
 VisualCoreScenes | var | public var isActive: Bool
+VisualCoreScenes | var | public var isClosed: Bool
 VisualCoreScenes | var | public var isContinuous: Bool
 VisualCoreScenes | var | public var isLandscape: Bool
 VisualCoreScenes | var | public var isTerminal: Bool
 VisualCoreScenes | var | public var isValid: Bool
 VisualCoreScenes | var | public var isVisible
 VisualCoreScenes | var | public var kind: GestureKind
+VisualCoreScenes | var | public var kind: Kind
 VisualCoreScenes | var | public var localTransform: Mat3
 VisualCoreScenes | var | public var location: Vec2
 VisualCoreScenes | var | public var longEdge: Int
 VisualCoreScenes | var | public var maxDistance
 VisualCoreScenes | var | public var maxDuration
+VisualCoreScenes | var | public var maxIndices: Int
 VisualCoreScenes | var | public var maxInterval
 VisualCoreScenes | var | public var maxSeparation
+VisualCoreScenes | var | public var maxVertices: Int
 VisualCoreScenes | var | public var minAngle
 VisualCoreScenes | var | public var minChange
 VisualCoreScenes | var | public var minDistance
 VisualCoreScenes | var | public var minDuration
+VisualCoreScenes | var | public var moreProblems: Int
 VisualCoreScenes | var | public var normals: [Vec3]
 VisualCoreScenes | var | public var phase: Phase
 VisualCoreScenes | var | public var phase: PointerPhase
@@ -1893,14 +1937,23 @@ VisualCoreScenes | var | public var position: Vec2
 VisualCoreScenes | var | public var positions: [Vec3]
 VisualCoreScenes | var | public var primitive: Primitive?
 VisualCoreScenes | var | public var priority: Int
+VisualCoreScenes | var | public var problems: [MeshProblem]
+VisualCoreScenes | var | public var radius: Double?
 VisualCoreScenes | var | public var rotation: Double
 VisualCoreScenes | var | public var scale: Double
 VisualCoreScenes | var | public var scale: Vec2
 VisualCoreScenes | var | public var size: Vec2
+VisualCoreScenes | var | public var summary: MeshSummary
 VisualCoreScenes | var | public var timestamp: Double
+VisualCoreScenes | var | public var triangle: Int?
 VisualCoreScenes | var | public var triangleCount: Int
+VisualCoreScenes | var | public var triangles: Int
 VisualCoreScenes | var | public var uvs: [Vec2]
 VisualCoreScenes | var | public var values: [Double]
+VisualCoreScenes | var | public var vertex: Int?
+VisualCoreScenes | var | public var vertexCount: Int
+VisualCoreScenes | var | public var vertices: Int
+VisualCoreScenes | var | public var volume: Double?
 VisualCoreScenes | var | public var z: Int
 VisualCoreShaderSource | enum | public enum BlendMode: Hashable, Sendable
 VisualCoreShaderSource | enum | public enum CullMode: Hashable, Sendable

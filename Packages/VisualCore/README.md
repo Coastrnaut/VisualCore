@@ -110,7 +110,12 @@ size and color over life; `ParticleForce` gravity/drag/attractor and (feature 03
 every position including the center; `liveLimit`; `liveCount(source:)` (feature 035); `TrailDecay` (feature 035: frame-rate-independent fade of 8-bit trail
 images, `factor`, `subtraction`, `step8`); NaN removal, `checksum()`; `instances()` →
 `ParticleInstance` for `ParticleRenderer`); 3D: `OrbitCamera` (pitch ±89°, `project`, `ray`), `Mesh.plane/cube/uvSphere`
-(segments 3–256, rings 2–256, subdivisions ≤ 256).
+(segments 3–256, rings 2–256, subdivisions ≤ 256). Feature 205 (R02-F05) adds the mesh compiler: `MeshBuilder` (welding of
+equal vertices, `MeshBudget` default 262,144 vertices and 1,572,864 indices, typed `MeshError`), the shapes
+`Mesh.surface`, `.revolution`, `.extrusion`, `.tube` (rotation-minimizing frames) and `.bevelledBox`,
+`withSmoothNormals(creaseAngle:)` and `withFlatNormals()`, `bounds` (`MeshBounds`), a SHA-256 `digest`, and
+`validate(requireClosed:budget:)` returning a `MeshReport` of up to 100 `MeshProblem`s (14 kinds) with a
+`MeshSummary`; topology is judged by welded position.
 
 ## Parameters (feature 012, A01-P01)
 
