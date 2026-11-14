@@ -43,7 +43,7 @@ Agent A: T-A06-102. Agent B: T-A06-103. Agent C: T-A06-104 (against contracts/ap
 ## Phase 5: Convergence
 
 - [X] T-A06-116 Add `testAnUndecodableFileKeepsThePreviousSourceAndShowsAMessage` to `Packages/ExperiencesCreative/VisualCoreMusicLab/ExperienceTests/MusicLabSessionTests.swift` (factory `file` closure throws `AudioSourceError.undecodable`; the demo keeps running, the message is `MusicLabPresenter.undecodableMessage`, the digest is unchanged) and record `python3 Tools/python/desktop_runbook.py run-check --stage A06-P01 --timeout 600 --name experiences-ios27-3 -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing VisualCoreMusicLabExperienceTests` per SC-A06-104, FR-A06-103 (partial) — Verified 2026-11-14: — Verified 2026-11-14: .autonomy/checks/A06-P01.experiences-ios27-3.json (6 XCTests + 13 tests, 0 failures)
-- [ ] T-A06-117 Amend `specs/047-ml-p01-audio-source/data-model.md` "MusicLabState": digest = source, demoSeed, demoMode; fileName is display-only (not in digest or snapshot), as recorded in `MusicLabCore.swift` per data-model digest (contradicts)
+- [X] T-A06-117 Amend `specs/047-ml-p01-audio-source/data-model.md` "MusicLabState": digest = source, demoSeed, demoMode; fileName is display-only (not in digest or snapshot), as recorded in `MusicLabCore.swift` per data-model digest (contradicts) — Verified 2026-11-14: — Verified 2026-11-14: data-model.md digest matches MusicLabCore.swift
 
 ## Implementation strategy
 
