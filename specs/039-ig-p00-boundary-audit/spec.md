@@ -14,13 +14,37 @@
 Canonical overrides:
 - **One app (ADR-0009):** Infinite Geometry (`a05.infinite-geometry`) is an experience of the VisualCore app, built in
   `Packages/ExperiencesCreative/InfiniteGeometry`; it never gets a standalone target. The manual's gate "the app can
-  compile an empty SwiftUI shell" becomes: the experience's GPU-free domain target and its experience target compile
-  with one module test each, and nothing is registered in the app yet (no placeholder is visible to a person).
+  compile an empty SwiftUI shell" is met by the one app itself (see Clarifications); nothing is registered yet.
 - **Audit only:** this phase modifies neither VisualCore nor ProjectM.
 - **Reuse:** the app-neutral contract checker of A01-P00 (`scripts/check_app_contract.py`) verifies the contract, as for
   A01–A04; the contract lives in `docs/apps/infinite-geometry/`.
 - **Constitution:** 2.1.0 adds the A05 experience rules (commit of this gate).
 - **Evidence:** host and simulator only.
+
+## Clarifications
+
+### Session 2026-11-13
+
+Answered autonomously under the owner's standing delegation, recommended option each time. Facts checked in code:
+`scripts/check_experience_packages.py` reports `EXTRA_TARGET` for any experience target of an `Experiences*` package
+that belongs to no registered experience and requires registered experiences to have all four targets and to be linked
+by the app; `LauncherModel.shown` lists only available experiences; the A05 constitution commit is `427eea32`; the
+reference submodule is pinned at `d93edd1`.
+
+- Q: How is the manual's "compile an empty shell" gate met in the one app? → A: The one app is the shell: this phase
+  proves the VisualCore app still builds for testing with Infinite Geometry absent (not registered, not linked, catalog
+  unavailable). The experience's targets are created in A05-P01 together with its first real domain rules, because an
+  empty target would be an `EXTRA_TARGET` finding and registering an empty experience would be a placeholder (both
+  forbidden).
+- Q: Which commit is the phase start? → A: The A05 constitution commit `427eea32`; the no-change diff of
+  `Packages` and `External` is taken from it.
+- Q: Where are the contract and its readable view? → A: `docs/apps/infinite-geometry/visualcore-contract.json` and the
+  generated `visualcore-contract.md`, checked by `scripts/check_app_contract.py --app infinite-geometry`; the baseline
+  in `docs/apps/infinite-geometry/regression-baseline.md`.
+- Q: What makes a capability "available"? → A: A public declaration in a VisualCore framework product with at least one
+  test that exercises it; a harness-only or Showcase-only implementation is "requires adaptation" at best.
+- Q: Which build steps does the inventory count? → A: The named steps of `python3 scripts/release_check.py --list` at the
+  time of the check, recorded with the count.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -59,18 +83,18 @@ commit is recorded, so later phases can prove they changed nothing upstream.
 
 ---
 
-### User Story 3 - The experience's targets exist and compile (Priority: P2)
+### User Story 3 - The shell builds with the experience absent (Priority: P2)
 
-The engineer has a GPU-free domain target and an experience target that compile and test, so Phase 01 starts by
-adding rules, not plumbing — and a person using the app sees nothing new yet.
+The engineer knows the one app builds for testing and its experience checks pass with Infinite Geometry absent, so
+Phase 01 starts by adding the experience's targets with real rules — and a person using the app sees nothing new.
 
-**Independent Test**: build and test the experience package; check the app's registry and catalog are unchanged.
+**Independent Test**: build the app for testing; run the experience package check; read the registry and catalog.
 
 **Acceptance Scenarios**:
 
-1. **Given** the experiences package, **When** it is tested, **Then** the two new module tests pass with the rest.
-2. **Given** the app, **When** its experience registry and catalog are read, **Then** Infinite Geometry is not
-   registered and stays unavailable.
+1. **Given** the one app, **When** it is built for testing on the iOS 27.2 phone simulator, **Then** the build passes.
+2. **Given** the experience package check and the app's registry, **When** they run and are read, **Then** they pass
+   and Infinite Geometry is neither registered nor available.
 
 ---
 
@@ -110,8 +134,8 @@ VisualCore module will own each missing piece and in which phase.
   will build it.
 - **FR-A05-004**: The ProjectM reference regression MUST run in two chunks and pass; a baseline document MUST record
   the phase-start commit, the reference pin and the results.
-- **FR-A05-005**: The experience package MUST gain a GPU-free domain target and an experience target with one module
-  test each; nothing is registered in the app and the catalog entry stays unavailable.
+- **FR-A05-005**: The one app MUST build for testing with Infinite Geometry absent; the experience package check MUST
+  pass; Infinite Geometry MUST stay unregistered and unavailable (its targets come with A05-P01's first rules).
 - **FR-A05-006**: The contract MUST record negative rules (no EGL path of its own, no second renderer, no ProjectM, no
   networking, no imported meshes or textures, no CAD or exactness claims) and a stop/go decision with reasons.
 - **FR-A05-007**: The contract MUST pass the app-neutral contract checker, and its readable view MUST be generated from
@@ -122,7 +146,6 @@ VisualCore module will own each missing piece and in which phase.
 
 - **Contract**: inventory, matrix rows, gaps, traceability, negative rules, decision (schema 1 of the checker).
 - **Regression baseline**: phase-start commit, reference pin, steps and results.
-- **Experience targets**: domain target and experience target, each with a module test.
 
 ## Success Criteria *(mandatory)*
 
@@ -132,7 +155,8 @@ VisualCore module will own each missing piece and in which phase.
   features (6) trace to matrix rows.
 - **SC-A05-002**: 100% of non-available rows have a gap with an owning module and a phase.
 - **SC-A05-003**: The reference regression passes 7 of 7 steps in two chunks.
-- **SC-A05-004**: The experiences package tests pass on both simulator runtimes, including the 2 new module tests.
+- **SC-A05-004**: The app builds for testing on the iOS 27.2 phone simulator and the experience package check passes
+  (4 registered experiences, none of them A05).
 - **SC-A05-005**: The diff of VisualCore and ProjectM since the phase start is empty; the app's registry and catalog
   availability are unchanged.
 - **SC-A05-006**: Every new test finishes in under 10 seconds.
@@ -148,7 +172,7 @@ VisualCore module will own each missing piece and in which phase.
 |---|---|
 | Phase 00 deliverable: inventory, products, host, thread, shaders, build steps, ownership, regression | FR-A05-001, 004 |
 | Review gate: evidence-backed integration matrix | FR-A05-002, 007, US1 |
-| Review gate: compile an empty shell (one-app form) | FR-A05-005, US3 |
+| Review gate: compile an empty shell (one-app form: the app itself) | FR-A05-005, US3 |
 | Review gate: written stop/go decision | FR-A05-003, 006, US4 |
 | "Do not modify VisualCore or ProjectM" | FR-A05-008 |
 | Brainstorm capabilities (geometry, shaders, transformations, camera, procedural meshes) | FR-A05-002 |
