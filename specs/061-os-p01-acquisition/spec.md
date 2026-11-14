@@ -139,6 +139,8 @@ the computed values.
   left the band on the other side.
 - **Too few samples buffered** (just started, or a short file): the window is shorter and marked partial; nothing
   outside the buffer is invented.
+- **A file cannot be decoded or was moved:** the scope says so, keeps the previous source and offers the test signal;
+  a file is chosen with the system file picker ("Choose file…", as Audio Odyssey does) and read only while chosen.
 - **Mono sources:** the microphone and mono files deliver one channel; the window says so; nothing duplicates a channel
   silently.
 - **Sample-rate changes** between sources: windows carry their own sample rate; the timebase stays in time units.
