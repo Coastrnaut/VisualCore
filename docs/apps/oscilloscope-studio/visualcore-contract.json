@@ -140,13 +140,19 @@
       "id": "M02",
       "capability": "Bounded multi-point trace strip: one polyline of up to N points (no more points than pixels) built from a sample window and drawn as one bounded vertex buffer, with no per-frame node allocation",
       "source": "brainstorm: line rendering, waveform buffers; manual render stage 3; v0.1 features 01-03",
-      "status": "upstream gap",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCore/Sources/VisualCoreScenes/SceneGraph.swift",
-          "symbol": "Primitive.line",
+          "symbol": "Primitive.polyline",
           "product": "VisualCoreScenes",
           "public": false
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/SceneGraph.swift",
+          "symbol": "maxPolylinePoints",
+          "product": "VisualCoreScenes",
+          "public": true
         },
         {
           "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/PrimitiveRenderer.swift",
@@ -156,10 +162,10 @@
         }
       ],
       "example": {
-        "file": "Packages/ExperiencesCreative/VisualCoreMusicLab/Experience/MusicLabPresenter.swift",
-        "symbol": "MusicLabPresenter"
+        "file": "Packages/ExperiencesCreative/OscilloscopeStudio/Experience/ScopePresenter.swift",
+        "symbol": "ScopePresenter"
       },
-      "notes": "No polyline or strip primitive exists: Primitive has rect, circle, two-point line and a filled polygon (<= 256 points). Music Lab draws its waveform as one SceneNode per two-point .line segment (MusicLabPresenter, drawnSampleCount nodes), which is experience code and does not scale to a pixel-width trace. G-TRACESTRIP: bounded trace strip in VisualCoreScenes, drawn through VisualCoreRendering, A08-P02."
+      "notes": "No polyline or strip primitive exists: Primitive has rect, circle, two-point line and a filled polygon (<= 256 points). Music Lab draws its waveform as one SceneNode per two-point .line segment (MusicLabPresenter, drawnSampleCount nodes), which is experience code and does not scale to a pixel-width trace. G-TRACESTRIP: bounded trace strip in VisualCoreScenes, drawn through VisualCoreRendering, A08-P02. Built in A08-P02: Primitive.polyline (≤ 8,192 finite points) drawn by PrimitiveRenderer as one quad per non-zero segment in the same batch, pixels equal to the segments (PrimitiveRendererTests.testPolylineIsOneBatchAndMatchesItsSegments, SceneGraphTests)."
     },
     {
       "id": "M03",
@@ -326,26 +332,26 @@
       "id": "M08",
       "capability": "Display decimation: min/max reduction of a sample window to at most one column pair per pixel so the trace keeps peaks without drawing more geometry than pixels",
       "source": "manual algorithm decision 3; v0.1 features 01 and 04",
-      "status": "upstream gap",
+      "status": "available",
       "evidence": [
         {
-          "file": "Packages/VisualCore/Sources/VisualCoreAudioDSP/SampleRingBuffer.swift",
-          "symbol": "SampleRingBuffer.latest",
+          "file": "Packages/VisualCore/Sources/VisualCoreAudioDSP/MinMaxDecimator.swift",
+          "symbol": "MinMaxDecimator",
           "product": "VisualCoreAudioDSP",
           "public": true
         },
         {
-          "file": "Packages/VisualCore/Sources/VisualCoreAudioDSP/LevelMeter.swift",
-          "symbol": "LevelMeter.peak",
+          "file": "Packages/VisualCore/Sources/VisualCoreAudioDSP/MinMaxDecimator.swift",
+          "symbol": "ColumnRange",
           "product": "VisualCoreAudioDSP",
           "public": true
         }
       ],
       "example": {
-        "file": "Packages/ExperiencesCreative/VisualCoreMusicLab/Experience/MusicLabPresenter.swift",
-        "symbol": "MusicLabPresenter"
+        "file": "Packages/ExperiencesCreative/OscilloscopeStudio/Experience/ScopePresenter.swift",
+        "symbol": "ScopePresenter"
       },
-      "notes": "No decimation or min/max reducer exists (grep 2026-11-14); Music Lab draws a fixed drawnSampleCount. G-DECIMATION in VisualCoreAudioDSP, A08-P02."
+      "notes": "No decimation or min/max reducer exists (grep 2026-11-14); Music Lab draws a fixed drawnSampleCount. G-DECIMATION in VisualCoreAudioDSP, A08-P02. Built in A08-P02: MinMaxDecimator keeps each column's minimum and maximum, at most 8,192 columns, identity when the window fits (MinMaxDecimatorTests); the scope reduces to the grid's pixel columns."
     },
     {
       "id": "M09",
@@ -382,32 +388,32 @@
       "id": "M10",
       "capability": "XY (Lissajous) plot mode: left/right sample pairs plotted as points in a square plane with persistence, mono input shown as a labelled diagonal",
       "source": "v0.1 feature 02; brainstorm: multiple visualization modes",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
-          "file": "Packages/VisualCore/Sources/VisualCoreMath/Camera2D.swift",
-          "symbol": "Camera2D",
-          "product": "VisualCoreMath",
-          "public": true
-        },
-        {
-          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/TrailLayer.swift",
-          "symbol": "TrailLayer",
-          "product": "VisualCoreRendering",
+          "file": "Packages/VisualCore/Sources/VisualCoreAudioDSP/StereoSampleBuffer.swift",
+          "symbol": "StereoSampleBuffer",
+          "product": "VisualCoreAudioDSP",
           "public": true
         },
         {
           "file": "Packages/VisualCore/Sources/VisualCoreScenes/SceneGraph.swift",
-          "symbol": "Primitive.line",
+          "symbol": "maxPolylinePoints",
           "product": "VisualCoreScenes",
-          "public": false
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/PrimitiveRenderer.swift",
+          "symbol": "PrimitiveRenderer",
+          "product": "VisualCoreRendering",
+          "public": true
         }
       ],
       "example": {
-        "file": "Packages/ExperiencesCreative/VisualCoreMusicLab/Experience/MusicLabPresenter.swift",
-        "symbol": "MusicLabPresenter"
+        "file": "Packages/ExperiencesCreative/OscilloscopeStudio/Experience/ScopePresenter.swift",
+        "symbol": "ScopePresenter"
       },
-      "notes": "Camera2D, TrailLayer and the line primitive exist; pairing channels into points and the mono-input label are experience domain once G-STEREO and G-TRACESTRIP exist. G-XYMODE (app-local), A08-P03."
+      "notes": "Camera2D, TrailLayer and the line primitive exist; pairing channels into points and the mono-input label are experience domain once G-STEREO and G-TRACESTRIP exist. G-XYMODE (app-local), A08-P03. Built in A08-P02 (moved from A08-P03 because the manual's Phase 02 gate asks for the XY view): ScopeTrace.xyPoints in the experience, one polyline of the window's scaled (left, right) pairs; a mono source keeps the waveform with \"XY needs two channels\" (ScopeSessionTests)."
     },
     {
       "id": "M11",
@@ -953,7 +959,7 @@
       "justification": "Found in A08-P00: no display decimation exists; the manual requires no more points than pixels.",
       "phase": 2,
       "test": "Host tests: min/max reduction to N columns keeps every peak of a square and an impulse, output never exceeds the column count, identity when samples <= columns, bounded work per frame",
-      "closed": null
+      "closed": "A08-P02"
     },
     {
       "id": "G-TRACESTRIP",
@@ -965,7 +971,7 @@
       "justification": "Found in A08-P00: the scene graph's only line is a two-point segment; per-segment nodes do not scale to a pixel-width trace.",
       "phase": 2,
       "test": "Host tests of the strip builder (bounded point count, finite-value guard, width and joins) and simulator tests that PrimitiveRenderer (VisualCoreRendering) draws a strip of N points in one batch with pixels equal to the equivalent segments and no per-frame allocation",
-      "closed": null
+      "closed": "A08-P02"
     },
     {
       "id": "G-SPECTRUMLABELS",
@@ -987,9 +993,9 @@
       "kind": "adaptation",
       "owner": "app-local",
       "justification": "Plotting channel pairs is experience domain on top of G-STEREO and G-TRACESTRIP.",
-      "phase": 3,
+      "phase": 2,
       "test": "Host tests: equal-phase sines give a diagonal, 90-degree phase gives a circle, a 1:2 ratio gives the expected figure, mono input is labelled",
-      "closed": null
+      "closed": "A08-P02"
     },
     {
       "id": "G-SCOPEINTERACT",

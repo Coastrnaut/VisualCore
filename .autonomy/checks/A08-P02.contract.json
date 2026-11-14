@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_app_contract.py",
+    "--app",
+    "oscilloscope-studio",
+    "--render"
+  ],
+  "command": "python3 scripts/check_app_contract.py --app oscilloscope-studio --render",
+  "elapsed_seconds": 0.137,
+  "exit_code": 0,
+  "finished": "2026-11-14T16:58:47+00:00",
+  "log": ".autonomy/logs/A08-P02.contract.log",
+  "log_sha256": "c37f315326c5d32f108aa2f8c9aefd77bcad7677feb9fa4f661f39162b333de0",
+  "name": "contract",
+  "stage": "A08-P02",
+  "started": "2026-11-14T16:58:47+00:00",
+  "timed_out": false
+}

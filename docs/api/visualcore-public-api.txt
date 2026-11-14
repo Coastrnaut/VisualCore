@@ -53,6 +53,7 @@ VisualCoreAudioDSP | enum | public enum AnalysisQuality
 VisualCoreAudioDSP | enum | public enum AudioDSPInfo
 VisualCoreAudioDSP | enum | public enum AudioFeatureKind: String, Codable, Sendable, CaseIterable
 VisualCoreAudioDSP | enum | public enum LevelMeter
+VisualCoreAudioDSP | enum | public enum MinMaxDecimator
 VisualCoreAudioDSP | enum | public enum Mode: Int, Sendable, CaseIterable
 VisualCoreAudioDSP | enum | public enum ScopeTrigger
 VisualCoreAudioDSP | enum | public enum TriggerMode: Int, Sendable, CaseIterable
@@ -91,6 +92,7 @@ VisualCoreAudioDSP | func | public static func makeExtractor(level: Int, sampleR
 VisualCoreAudioDSP | func | public static func peak(_ samples: UnsafeBufferPointer<Float>) -> Float
 VisualCoreAudioDSP | func | public static func peakBin(_ magnitudesDB: [Float]) -> Int?
 VisualCoreAudioDSP | func | public static func periods(frequency: Double, sampleCount: Int, sampleRate: Double) -> Double
+VisualCoreAudioDSP | func | public static func reduce(_ samples: [Float], columns: Int) -> [ColumnRange]
 VisualCoreAudioDSP | func | public static func rms(_ samples: UnsafeBufferPointer<Float>) -> Float
 VisualCoreAudioDSP | func | public static func silent(bandCount: Int) -> AudioFeatures
 VisualCoreAudioDSP | init | public init(attack: Double, release: Double)
@@ -99,6 +101,7 @@ VisualCoreAudioDSP | init | public init(capacityFrames: Int)
 VisualCoreAudioDSP | init | public init(from decoder: Decoder) throws
 VisualCoreAudioDSP | init | public init(historyCount: Int = 43, multiple: Float = 1.5, minimum: Float = 1e-4, minimumInterval: Double = 0.1)
 VisualCoreAudioDSP | init | public init(mapping: AudioMapping)
+VisualCoreAudioDSP | init | public init(min: Float, max: Float)
 VisualCoreAudioDSP | init | public init(secondsPerDivision: Double)
 VisualCoreAudioDSP | init | public init(seed: UInt64, mode: Mode, sampleRate: Double = 48_000)
 VisualCoreAudioDSP | init | public init(timestamp: Double, rms: Float, peak: Float, bandEnergies: [Float], flux: Float, onset: Bool,
@@ -124,6 +127,8 @@ VisualCoreAudioDSP | let | public let hysteresis: Double
 VisualCoreAudioDSP | let | public let layout: BandLayout
 VisualCoreAudioDSP | let | public let level: Double
 VisualCoreAudioDSP | let | public let lowestFrequency: Double
+VisualCoreAudioDSP | let | public let max: Float
+VisualCoreAudioDSP | let | public let min: Float
 VisualCoreAudioDSP | let | public let minimum: Float
 VisualCoreAudioDSP | let | public let minimumInterval: Double
 VisualCoreAudioDSP | let | public let mode: Mode
@@ -155,6 +160,7 @@ VisualCoreAudioDSP | let | public static let gainRange: ClosedRange<Double>
 VisualCoreAudioDSP | let | public static let hysteresisRange
 VisualCoreAudioDSP | let | public static let levelWindowDB: ClosedRange<Float>
 VisualCoreAudioDSP | let | public static let levels: ClosedRange<Int>
+VisualCoreAudioDSP | let | public static let maxColumns
 VisualCoreAudioDSP | let | public static let maxSamples
 VisualCoreAudioDSP | let | public static let maximumBandCount
 VisualCoreAudioDSP | let | public static let maximumCapacity
@@ -181,6 +187,7 @@ VisualCoreAudioDSP | struct | public struct AudioFeatures: Sendable, Equatable
 VisualCoreAudioDSP | struct | public struct AudioMapper: Sendable
 VisualCoreAudioDSP | struct | public struct AudioMapping: Codable, Sendable, Equatable
 VisualCoreAudioDSP | struct | public struct BandLayout: Sendable, Equatable
+VisualCoreAudioDSP | struct | public struct ColumnRange: Sendable, Equatable
 VisualCoreAudioDSP | struct | public struct DemoSignal: Sendable
 VisualCoreAudioDSP | struct | public struct FeatureSmoother: Sendable, Equatable
 VisualCoreAudioDSP | struct | public struct OnsetDetector: Sendable
@@ -2173,6 +2180,7 @@ VisualCoreScenes | let | public static let maxBuildsPerStep
 VisualCoreScenes | let | public static let maxLevels
 VisualCoreScenes | let | public static let maxPointers
 VisualCoreScenes | let | public static let maxPolygonPoints
+VisualCoreScenes | let | public static let maxPolylinePoints
 VisualCoreScenes | let | public static let minimumInterval
 VisualCoreScenes | let | public static let portrait
 VisualCoreScenes | let | public static let problemLimit
