@@ -6,3 +6,10 @@
 - Accessibility identifiers: `freeze.toggle`, `cursors.show`, `cursor.a`, `cursor.b`, `cursor.level`,
   `cursor.frequency`, `cursor.readout`, `preset.<index>`, `preset.name`, `preset.save`, `preset.rename`, `preset.delete`.
 - No VisualCore API change.
+
+## Additions found at convergence (T-A08-413)
+
+- Presenter-only rule `a08.nothing-to-freeze`: the Freeze control refuses an empty window with "Nothing to freeze yet"
+  (like `a08.permission-denied`, never returned by the core).
+- Identifiers `display.hint` (pinch hint in the spectrum view), `preset.message` (save/rename/delete messages) and
+  `preset.skipped` (count of damaged and newer preset files kept).

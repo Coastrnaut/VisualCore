@@ -50,4 +50,4 @@ MVP: freeze and cursors with precise readouts (US1, US4 rules); then zoom and pr
 
 ## Phase 7: Convergence
 
-- [ ] T-A08-413 Record in `specs/064-os-p04-cursors-presets/contracts/api.md` the presenter-only rule `a08.nothing-to-freeze` (an empty window cannot be frozen) and the identifiers `display.hint`, `preset.message` and `preset.skipped` that the controls use, per contracts/api.md (unrequested)
+- [X] T-A08-413 Record in `specs/064-os-p04-cursors-presets/contracts/api.md` the presenter-only rule `a08.nothing-to-freeze` (an empty window cannot be frozen) and the identifiers `display.hint`, `preset.message` and `preset.skipped` that the controls use, per contracts/api.md (unrequested) — Verified 2026-11-14: 2026-11-14: contracts/api.md lists a08.nothing-to-freeze, display.hint, preset.message, preset.skipped (all present in the Experience sources)
