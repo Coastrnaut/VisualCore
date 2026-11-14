@@ -7,7 +7,7 @@ Evidence: `python3 Tools/python/desktop_runbook.py run-check --stage A06-P06 --t
 
 ## Phase 1: Setup
 
-- [ ] T-A06-601 Baseline: cite the A06-P05 evidence on the unchanged tree (`.autonomy/checks/A06-P05.experiences-ios27.json`, `.autonomy/checks/A06-P05.app-unit.json`, `.autonomy/checks/A06-P05.verify-27.json`) instead of a rerun (owner ruling 4 of 2026-11-14)
+- [X] T-A06-601 Baseline: cite the A06-P05 evidence on the unchanged tree (`.autonomy/checks/A06-P05.experiences-ios27.json`, `.autonomy/checks/A06-P05.app-unit.json`, `.autonomy/checks/A06-P05.verify-27.json`) instead of a rerun (owner ruling 4 of 2026-11-14) — Verified 2026-11-14: — Verified 2026-11-14: cited .autonomy/checks/A06-P05.experiences-ios27.json, A06-P05.app-unit.json, A06-P05.verify-27.json on the unchanged tree (owner ruling 2026-11-14)
 
 ## Phase 2: User Story 1 — sound stays on the device (P1) 🎯
 
