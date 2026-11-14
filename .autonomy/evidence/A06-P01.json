@@ -1,0 +1,68 @@
+{
+  "checks": [
+    {
+      "attestation": ".autonomy/checks/A06-P01.app-unit-3.json",
+      "command": "python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A06-P01.app-unit-3.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A06-P01.dsp-host.json",
+      "command": "swift test --package-path Packages/VisualCore --filter 'SampleRingBufferTests|DemoSignalTests|SpectrumAnalyzerTests'",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A06-P01.dsp-host.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A06-P01.experience-packages.json",
+      "command": "python3 scripts/check_experience_packages.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A06-P01.experience-packages.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A06-P01.experiences-ios27-2.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A06-P01.experiences-ios27-2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A06-P01.experiences-ios27-3.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing VisualCoreMusicLabExperienceTests",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A06-P01.experiences-ios27-3.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A06-P01.experiences-ios27.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A06-P01.experiences-ios27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A06-P01.public-api.json",
+      "command": "python3 scripts/check_public_api.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A06-P01.public-api.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A06-P01.rendering-ios27.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A06-P01.rendering-ios27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A06-P01.script-tests-2.json",
+      "command": "python3 scripts/test_scripts.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A06-P01.script-tests-2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A06-P01.verify-27-2.json",
+      "command": "python3 scripts/verify_experiences.py --only a06.visualcore-music-lab --runtime 27",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A06-P01.verify-27-2.log"
+    }
+  ],
+  "generated": "2026-11-14T07:30:01+00:00",
+  "method": "deterministic-run-check",
+  "stage": "A06-P01",
+  "status": "pass"
+}
