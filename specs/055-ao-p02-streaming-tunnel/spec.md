@@ -62,8 +62,8 @@ are level, peak, beat, low, lowMid, highMid, high.
 
 ### User Story 1 - The tunnel breathes with the music (Priority: P1) 🎯
 
-A person flies through the tunnel while sound plays (the built-in demo first, with no permission asked). The tunnel's
-ripples swell and its light brightens with the sound, smoothly, never with jumps or flashes; when the sound stops the
+A person flies through the tunnel while sound plays (the built-in demo first, with no permission asked). The tunnel
+widens (breathes outward around the rail) and its light brightens with the sound, smoothly, never with jumps or flashes; when the sound stops the
 tunnel settles back.
 
 **Why this priority**: the phase MVP and the brainstorm's core promise ("environments that respond to sound").
