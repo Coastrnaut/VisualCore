@@ -6,7 +6,7 @@
 
 ## Phase 1: Setup
 
-- [ ] T-A07-501 Baseline: cite `.autonomy/checks/A07-P04.odyssey-ios27.json`, `.autonomy/checks/A07-P04.app-unit.json` and `.autonomy/checks/A07-P04.visualcore-host-ci.json` (tree unchanged since apart from documents) instead of a rerun (owner ruling of 2026-11-14)
+- [X] T-A07-501 Baseline: cite `.autonomy/checks/A07-P04.odyssey-ios27.json`, `.autonomy/checks/A07-P04.app-unit.json` and `.autonomy/checks/A07-P04.visualcore-host-ci.json` (tree unchanged since apart from documents) instead of a rerun (owner ruling of 2026-11-14) — Verified 2026-11-14: Verified 2026-11-14: cited .autonomy/checks/A07-P04.odyssey-ios27.json, A07-P04.app-unit.json and A07-P04.visualcore-host-ci.json (tree unchanged since apart from documents); no rerun (owner ruling 2026-11-14)
 
 ## Phase 2: Foundational
 
