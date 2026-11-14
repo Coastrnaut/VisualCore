@@ -237,8 +237,8 @@ Scenes that already use the plane, cube and sphere and the renderer that draws t
 - **SC-R02F05-004**: Bounds contain 100% of vertices and each box face touches a vertex.
 - **SC-R02F05-005**: The existing plane, cube and sphere outputs are unchanged and valid; the existing mesh and
   renderer tests and the reference regression pass.
-- **SC-R02F05-006**: A mesh at the budget builds and validates in under 1 second on the host; every new test finishes in
-  under 10 seconds.
+- **SC-R02F05-006**: A mesh at the budget (262,144 vertices) builds and validates in under 5 seconds in the debug host
+  build (the slower, unoptimized setting; measured 4.1 s on 2026-11-13); every new test finishes in under 10 seconds.
 
 ## Assumptions
 

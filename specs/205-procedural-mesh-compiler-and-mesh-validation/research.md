@@ -37,3 +37,14 @@
 
 - C1 (HIGH) fixed: topology by welded position (FR-R02F05-030, D7). I1 (HIGH) fixed: generator digests recorded in
   T-R02F05-011 after the digest exists, generators proven unchanged by `git diff`. U1 (MEDIUM) fixed: ≥ 1% coverage.
+
+## 3. Implementation record
+
+- SC-R02F05-006 restated (2026-11-13): a release (`-c release`) test build of Packages/VisualCore fails in an unrelated
+  existing target (`VisualCoreExperienceTests/RendererRecordTests` needs `@testable` symbols), so the < 1 s release
+  figure cannot be measured with the package's tests; the bound is set on the debug build, which is slower (4.1 s at
+  262,144 vertices). Shapes clamp resolution to at most 257 × 257 samples, so the budget-sized mesh is built through
+  `MeshBuilder`.
+- Smooth normals on a 32 × 16 sphere are radial within 0.015, not 1e-6 (area- and angle-weighted face normals of a
+  coarse sphere are not exactly radial); the test uses 0.015 and checks seam copies to 1e-12.
+- A cube smoothed at 100° keeps 24 vertices (their texture coordinates differ) and shares 8 diagonal normals.

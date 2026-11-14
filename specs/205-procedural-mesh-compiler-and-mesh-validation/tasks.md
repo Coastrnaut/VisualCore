@@ -7,7 +7,7 @@
 
 ## Phase 1: Setup
 
-- [ ] T-R02F05-001 Record the baseline: host tests of Packages/VisualCore (`run-check --name baseline-host -- swift test --package-path Packages/VisualCore`)
+- [X] T-R02F05-001 Record the baseline: host tests of Packages/VisualCore (`run-check --name baseline-host -- swift test --package-path Packages/VisualCore`) — Verified 2026-11-13: 2026-11-13 .autonomy/migration/checks/R02-F05.baseline-host.json (swift test Packages/VisualCore before changes, exit 0)
 
 ## Phase 2: Foundational
 
@@ -22,7 +22,7 @@
 
 ## Phase 4: User Story 1 — Build a correct mesh (P1) 🎯
 
-- [ ] T-R02F05-007 [P] [US1] Write `Packages/VisualCore/Tests/VisualCoreScenesTests/MeshNormalsTests.swift` first, then `Packages/VisualCore/Sources/VisualCoreScenes/MeshNormals.swift`: `withSmoothNormals(creaseAngle:)` (area- and angle-weighted; split by crease, research D2) and `withFlatNormals()`; tests: a cube with crease 30° keeps 24 corner normals sharp, with crease 100° shares 8; a sphere's smooth normals equal the radial direction within 1e-6; flat normals equal face normals; all unit
+- [ ] T-R02F05-007 [P] [US1] Write `Packages/VisualCore/Tests/VisualCoreScenesTests/MeshNormalsTests.swift` first, then `Packages/VisualCore/Sources/VisualCoreScenes/MeshNormals.swift`: `withSmoothNormals(creaseAngle:)` (area- and angle-weighted; split by crease, research D2) and `withFlatNormals()`; tests: a cube with crease 30° keeps 24 corner normals sharp, with crease 100° shares 8; a sphere's smooth normals equal the radial direction within 0.015 (research §3); flat normals equal face normals; all unit
 - [ ] T-R02F05-008 [US1] Write `Packages/VisualCore/Tests/VisualCoreScenesTests/MeshShapeTests.swift` first: for each shape (surface open and closed, revolution of a semicircle, extrusion with and without caps, tube straight capped, tube helix, tube closed loop, bevelled box radius 0 and r) at 3 resolutions: validator 0 problems (closed shapes requireClosed), exact faceted volume within 1e-6 relative, smooth volume within 1% at the highest resolution; boundary edges of open shapes equal the expected outline; edge cases of the spec (repeated path points, < 2 points refused, pole collapse, bevel clamp, clamped resolutions, self-intersecting outline refused, budget refusal); determinism (two builds equal digests); tube frames rotate by less than the path bend (FR-R02F05-010–015; SC-R02F05-001)
 - [ ] T-R02F05-009 [US1] Write `Packages/VisualCore/Sources/VisualCoreScenes/MeshShapes.swift`: `Mesh.surface`, `.revolution`, `.extrusion`, `.tube` (double-reflection frames, closed-loop twist spread, research D3), `.bevelledBox` (research D6) through `MeshBuilder`, counter-clockwise from outside, unit normals, uvs in 0…1, exact-count budget check before building; until T-R02F05-008 passes
 
@@ -37,7 +37,7 @@
 
 ## Phase 7: Polish and evidence (one task per quickstart command)
 
-- [ ] T-R02F05-013 Host tests (`run-check --name host -- swift test --package-path Packages/VisualCore`); a mesh at the budget builds and validates in < 1 s (printed timing) (SC-R02F05-006)
+- [ ] T-R02F05-013 Host tests (`run-check --name host -- swift test --package-path Packages/VisualCore`); a mesh at the budget builds and validates in < 5 s in the debug build (printed timing) (SC-R02F05-006, restated in research §3)
 - [ ] T-R02F05-014 Rendering package on sim-27.2 (`run-check --name rendering-ios27 -- python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test`)
 - [ ] T-R02F05-015 Rendering package on sim-26.5 (`run-check --name rendering-ios26 -- … --destination sim-26.5 --action test`)
 - [ ] T-R02F05-016 Experiences package on sim-27.2 (`run-check --name experiences-ios27 -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test`)

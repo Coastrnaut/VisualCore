@@ -1,0 +1,23 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "-c",
+    "release",
+    "--package-path",
+    "Packages/VisualCore",
+    "--filter",
+    "aMeshAtTheBudgetBuildsAndValidates"
+  ],
+  "command": "swift test -c release --package-path Packages/VisualCore --filter aMeshAtTheBudgetBuildsAndValidates",
+  "elapsed_seconds": 21.562,
+  "exit_code": 1,
+  "finished": "2026-11-14T01:23:02+00:00",
+  "gate": "R02-F05",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-F05.host-release-timing.log",
+  "log_sha256": "34003a86e52203749e6aff223646e4f02249b624d9950a6bf00659e566ba26ad",
+  "name": "host-release-timing",
+  "started": "2026-11-14T01:22:41+00:00",
+  "timed_out": false
+}
