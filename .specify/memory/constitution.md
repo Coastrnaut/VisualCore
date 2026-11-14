@@ -545,6 +545,43 @@ XY (Lissajous) and spectrum display for permitted audio inputs; it is not a cert
 - **One phase at a time:** implement only one Spec Kit phase at a time (one ledger gate, ADR-0004), in order
   A08-P00 → A08-P06.
 
+### A09 Digital Aquarium (`a09.digital-aquarium`)
+
+Ratified from the app manual's constitution prompt (2026-11-14). Like A05–A08, it never had a standalone target: it
+is built directly as an experience of the one app. Its product goal is a calming, customizable underwater habitat
+with autonomous fish, plants, bubbles and soft lighting; it is an ambient display, not a realistic ecosystem or
+animal-care simulator.
+
+- **Consumer, not fork:** an experience of the VisualCore app and a VisualCore consumer, never a fork of
+  projectm-ios. It uses only audited VisualCore public APIs over the OpenGL ES → ANGLE → Metal integration. It MUST
+  NOT create its own EGL/ANGLE initialization path, a second renderer, or link ProjectM engine code.
+- **Reuse first (Principle II):** scenes, primitives, particles, the seeded simulation clock, persistence and quality
+  tiers already in VisualCore are reused, not copied. New generic machinery (bounded steering and neighbour search,
+  depth-layered sprite batching, caustic and bubble effects) goes into VisualCore with tests, docs, the API baseline
+  and the reference regression when it is reusable; species, habitat content, copy and UI stay in the experience.
+- **Visuals are code:** fish, plants, decor, bubbles, caustics and lighting are procedural (shapes, SDFs, shaders and
+  particles); no purchased, generated or hand-made artwork, sprites or textures.
+- **GPU-free and device-free domain:** the habitat document, species catalog, fish behaviour (fixed-step, seeded),
+  feeding and decoration placement and persisted habitats MUST be testable without GPU access through `swift test`;
+  the same seed, inputs and steps give the same habitat state.
+- **Offline-first and private:** no networking, accounts, online aquariums or purchasable creature economy; no
+  permission beyond what a feature actually needs, each disclosed with a demo path when refused.
+- **Truthful claims:** an illustrative, calming display; no claims of realistic animal behaviour, animal-care
+  guidance, health, relaxation or sleep benefits, and performance or battery numbers only from device measurements.
+- **Bounded resources:** fish, plant, bubble and particle counts, neighbour searches, draw batches and frame work are
+  capped; quality tiers lower the load under heat, Low Power Mode and the ambient low-motion mode; context loss
+  rebuilds everything from versioned CPU state.
+- **Accessibility:** native SwiftUI controls with VoiceOver labels and Dynamic Type; the canvas has a spoken
+  description of the habitat; every gesture (feed, place, move) has a control alternative; Reduce Motion and Reduce
+  Flashing calm motion, shimmer and caustics.
+- **Licenses:** every bundled species definition, palette, preset habitat and shader records its author and license;
+  only original or license-cleared content is bundled.
+- **Regression when VisualCore changes:** any VisualCore change made for this experience MUST be followed by the
+  ProjectM reference regression (at the experience's X gate per the owner ruling of 2026-11-14).
+- **Python only:** repository automation uses Python 3; there is no PowerShell dependency.
+- **One phase at a time:** implement only one Spec Kit phase at a time (one ledger gate, ADR-0004), in order
+  A09-P00 → A09-P06.
+
 ## Governance
 
 - Precedence: real Apple platform and toolchain behavior and observed test results → owner
@@ -569,5 +606,7 @@ XY (Lissajous) and spectrum display for permitted audio inputs; it is not a cert
   manual's constitution prompt at gate A07-P00 (feature 053); no principle changes.
 - Amendment 2.4.0 (2026-11-14, MINOR): App-Scoped Rules gain the A08 Oscilloscope Studio subsection, ratified from
   its manual's constitution prompt at gate A08-P00 (feature 060); no principle changes.
+- Amendment 2.5.0 (2026-11-14, MINOR): App-Scoped Rules gain the A09 Digital Aquarium subsection, ratified from its
+  manual's constitution prompt at gate A09-P00 (feature 067); no principle changes.
 
-**Version**: 2.4.0 | **Ratified**: 2026-11-10 | **Last Amended**: 2026-11-14
+**Version**: 2.5.0 | **Ratified**: 2026-11-10 | **Last Amended**: 2026-11-14
