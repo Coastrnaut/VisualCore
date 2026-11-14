@@ -68,8 +68,8 @@ exposed as an accessibility value in the controls with no animation.
 
 **Acceptance Scenarios**:
 
-1. **Given** the demo 1 kHz tone, **When** the metrics are read, **Then** they say "Level −9 dB, strongest low-mid, no
-   beat" (values from the actual analysis).
+1. **Given** the demo 1 kHz tone, **When** the metrics are read, **Then** they say "Level −9 dB, strongest high-mid, no
+   beat" (1 kHz lies in band 8 of the 16-band layout, i.e. the high-mid region; values from the actual analysis).
 2. **Given** a beat every half second, **When** metrics change quickly, **Then** at most one announcement is made per two
    seconds and none when the text is unchanged.
 3. **Given** silence, **When** read, **Then** "Level silent, strongest none, no beat".
@@ -144,11 +144,12 @@ the final state is consistent, closing leaves no live host and no running captur
 
 **VisualCore (story 3)**
 - **FR-A06-501**: VisualCore MUST map an analysis quality level to a configuration (window size, band count) — level 0:
-  1,024/16, level 1: 512/16, level 2: 256/8 — and refuse levels outside 0…2 by clamping to the nearest.
+  1,024/16, level 1: 512/16, level 2: 256/8 — and clamp levels outside 0…2 to the nearest level.
 
 **Experience (stories 1, 2, 4)**
 - **FR-A06-510**: Music Lab MUST produce metric text "Level <n> dB | silent, strongest <region> | none, <beat | no beat>"
-  from the latest features and expose it as an accessibility value in the controls and in the canvas description.
+  from the latest features and expose it as an accessibility value in a controls section titled "Sound metrics (approximate)" and in the
+  canvas description.
 - **FR-A06-511**: Announcements of the metric text MUST be rate-limited to at most one per 2 s and only when the text
   changed, and only while VoiceOver is running.
 - **FR-A06-512**: Three palettes (Aurora, Ember, Mono) MUST colour every scene; the palette is part of the state (schema 3,
