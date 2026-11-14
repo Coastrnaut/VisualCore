@@ -21,3 +21,8 @@
 - **D4 Schema 2 (clarification 5):** `display` field; migration adds `waveform`; `display.select` is accepted by the
   core in any state, the presenter shows the waveform with the "XY needs two channels" mark for mono windows (keeps
   snapshots deterministic and independent of the live source).
+- **D5 Flat-line fixture (convergence T-A08-218):** no action selects silence, so the flat line is proved by
+  `ScopeSessionTests.testAFlatLineNeverTriggersAndNormalModeWaits` with an injected silent source (auto "no trigger",
+  normal "waiting"); the manifest carries the missing crossing (fixture 3 normal, fixture 6 auto) and XY (fixture 7),
+  and `testAMissingCrossingNeverTriggersAndNormalModeKeepsTheLastTrace` proves the missing crossing in both modes.
+  **Hairlines (T-A08-217):** a polyline is never drawn thinner than one pixel on screen.
