@@ -24,6 +24,40 @@ Canonical overrides:
 - **Owner rulings:** short tests; audits and device runs in the device campaign; iOS 27 at phase gates; every Spec Kit
   step runs.
 
+## Clarifications
+
+### Session 2026-11-14
+
+Answered autonomously under the owner's standing delegation, recommended option each time. Facts checked in code:
+`MeshRenderer.draw(model:camera:aspect:color:)` and `DepthMeshPass.draw(_:camera:context:)` take an `OrbitCamera`; the
+mesh shader has `u_mvp`, `u_model`, `u_color`, `u_light`, `u_ambient` and no fog; `MeshCache` (VisualCoreScenes) is an
+LRU of whole meshes, not a window; `FeatureExtractor.analyze(_:time:elapsed:)` returns `AudioFeatures` (rms, peak,
+band energies, flux, onset); `AudioMapper.value(for:range:elapsed:)` smooths with attack and release; the feature kinds
+are level, peak, beat, low, lowMid, highMid, high.
+
+- Q: What shape does the streaming window take in VisualCore? → A: `SegmentWindow` in `VisualCoreScenes`, generic over
+  nothing (indices only): `init(behind:ahead:capacity:)`, `advance(to distance:, pieceLength:) -> SegmentWindowStep`
+  (`toBuild: [Int]`, `toRetire: [Int]`, at most `maxBuildsPerStep` = 2 built per call, the nearest first), `live:
+  [Int]`; and a `SlotPool<Element>` with `capacity` that hands out and takes back slots, never growing. The experience
+  keeps one `MeshRenderer` per slot and refills its mesh on reuse.
+- Q: How do the drawing passes take a free camera and fog? → A: Additive overloads `MeshRenderer.draw(model:view:
+  projection:color:fog:)` and `DepthMeshPass.draw(_:view:projection:fog:context:)` with `MeshFog(start:end:color:)`
+  (VisualCoreRendering; fog `nil` keeps today's output); the orbit-camera methods forward to them with `fog: nil`, so
+  existing pixels are unchanged. Fog is linear in eye-space depth, mixed in the fragment shader.
+- Q: Which audio features drive the tunnel, and with what bounds? → A: Ripple ← `low` band (gain 1.5, attack 0.05 s,
+  release 0.4 s) mapped to an amplitude 0…0.35 of the tube radius (rest 0.08 as in A07-P01); brightness ← `level`
+  (gain 1.2, attack 0.03 s, release 0.5 s) mapped to ambient 0.30…0.70 (rest 0.35). Step limit per frame: ripple 0.02,
+  ambient 0.03; Reduce Flashing halves the ambient range and step; Reduce Motion halves the ripple range. Uses
+  `AudioMapper` with `AudioMapping` from VisualCoreAudioDSP.
+- Q: How does the ripple change the tunnel when pieces are built once? → A: The piece mesh keeps the rest shape; the
+  audio ripple is a radial displacement applied at draw time through the model matrix per piece as a uniform radial
+  scale breathing with the ripple amount (scale 1 + amount × 0.5 around the rail), so joins stay watertight (neighbour
+  pieces get the same scale at the same frame) and no mesh is rebuilt per frame.
+- Q: Which sources and how is permission handled? → A: As A06: `DemoAudioSource` (default), `MicrophoneAudioSource`
+  with `SystemMicrophonePermission` (requested only when not determined; denied or restricted keeps the demo and shows
+  how to allow access), `FileAudioSource` from the system file importer; one `SampleRingBuffer`; the presenter owns the
+  source and stops it on teardown. The shared `NSMicrophoneUsageDescription` already exists.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - The tunnel breathes with the music (Priority: P1) 🎯
