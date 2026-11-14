@@ -30,7 +30,7 @@
 ## Phase 7: Polish and evidence
 
 - [X] T-A08-009 No-change proof (`python3 Tools/python/desktop_runbook.py run-check --stage A08-P00 --timeout 600 --name no-change -- git diff --exit-code --stat 6fdb5ca9..HEAD -- Packages External`) (FR-A08-008, SC-A08-005) — Verified 2026-11-14: 2026-11-14: .autonomy/checks/A08-P00.no-change.json exit 0 (empty diff 6fdb5ca9..HEAD of Packages External)
-- [ ] T-A08-010 Script tests (`python3 Tools/python/desktop_runbook.py run-check --stage A08-P00 --timeout 600 --name script-tests -- python3 scripts/test_scripts.py`) and the release-check document steps (`python3 Tools/python/desktop_runbook.py run-check --stage A08-P00 --timeout 600 --name fast-checks -- python3 scripts/release_check.py --only docs app-contracts compliance dependencies`); every run-check of this gate stays within its 600 s limit and the contract check under 10 s (SC-A08-006)
+- [X] T-A08-010 Script tests (`python3 Tools/python/desktop_runbook.py run-check --stage A08-P00 --timeout 600 --name script-tests -- python3 scripts/test_scripts.py`) and the release-check document steps (`python3 Tools/python/desktop_runbook.py run-check --stage A08-P00 --timeout 600 --name fast-checks -- python3 scripts/release_check.py --only docs app-contracts compliance dependencies`); every run-check of this gate stays within its 600 s limit and the contract check under 10 s (SC-A08-006) — Verified 2026-11-14: 2026-11-14: .autonomy/checks/A08-P00.{script-tests,fast-checks}.json exit 0; every run under 600 s, contract check under 10 s
 - [ ] T-A08-011 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A08-P00
 
 ## Dependencies
