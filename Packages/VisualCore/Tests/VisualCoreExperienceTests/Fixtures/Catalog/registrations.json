@@ -164,6 +164,30 @@
       "permissions": [
         "microphone"
       ]
+    },
+    "a08.oscilloscope-studio": {
+      "capabilities": [
+        "triggered waveform",
+        "adjustable gain and timebase",
+        "test signal generator",
+        "two-channel input",
+        "audio files",
+        "live microphone input"
+      ],
+      "quality_tiers": [
+        "level-0"
+      ],
+      "palette": [
+        "#050807",
+        "#2FD46A",
+        "#E8A33C",
+        "#D9F2E2"
+      ],
+      "content": null,
+      "manifest": "Packages/ExperiencesCreative/OscilloscopeStudio/scenario-manifest.json",
+      "permissions": [
+        "microphone"
+      ]
     }
   }
 }

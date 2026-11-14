@@ -261,10 +261,24 @@
         "music-and-audio"
       ],
       "order": 8,
-      "palette": [],
+      "palette": [
+        "#050807",
+        "#2FD46A",
+        "#E8A33C",
+        "#D9F2E2"
+      ],
       "tile_seed": 2544392494,
-      "capabilities": [],
-      "quality_tiers": [],
+      "capabilities": [
+        "triggered waveform",
+        "adjustable gain and timebase",
+        "test signal generator",
+        "two-channel input",
+        "audio files",
+        "live microphone input"
+      ],
+      "quality_tiers": [
+        "level-0"
+      ],
       "content": null,
       "available": false
     },

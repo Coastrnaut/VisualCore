@@ -21,7 +21,7 @@
 
 ## Phase 4: User Story 2 — known test signals and sources (P1)
 
-- [ ] T-A08-106 [US2] Register: `Catalog/registrations.json` entry for a08 (capabilities, quality_tiers ["level-0"], palette, content), candidate in `Apps/VisualCore/App/ExperienceRegistry.swift`, `project.yml` dependency on the product, `scripts/test_scripts.py` products list and `Packages/VisualCore/Tests/VisualCoreExperienceTests/RealCatalogTests.swift` registrations, `xcodegen generate --spec project.yml` (FR-A08-120)
+- [X] T-A08-106 [US2] Register: `Catalog/registrations.json` entry for a08 (capabilities, quality_tiers ["level-0"], palette, content), candidate in `Apps/VisualCore/App/ExperienceRegistry.swift`, `project.yml` dependency on the product, `scripts/test_scripts.py` products list and `Packages/VisualCore/Tests/VisualCoreExperienceTests/RealCatalogTests.swift` registrations, `xcodegen generate --spec project.yml` (FR-A08-120) — Verified 2026-11-14: 2026-11-14: registrations.json a08 entry (level-0, microphone), candidate in ExperienceRegistry, project.yml product, products list, RealCatalogTests; catalog rebuilt (7 available); app build and unit pass (.autonomy/checks/A08-P01.app-unit.json)
 
 ## Phase 5: User Story 3 — the regression fixture (P2)
 

@@ -83,7 +83,9 @@ enum CatalogFixture {
                                // Feature 047 (A06-P01); integrated at X-A06.
                                "a06.visualcore-music-lab",
                                // Feature 054 (A07-P01); integrated at X-A07.
-                               "a07.audio-odyssey"],
+                               "a07.audio-odyssey",
+                               // Feature 061 (A08-P01): registered as a candidate, not yet available.
+                               "a08.oscilloscope-studio"],
                 "the registrations of Catalog/registrations.json")
     }
 

@@ -1293,7 +1293,9 @@ class UnifiedAppTargetTests(unittest.TestCase):
                                     # Feature 047 (A06-P01): VisualCore Music Lab, integrated at X-A06.
                                     "VisualCoreMusicLabExperience",
                                     # Feature 054 (A07-P01): Audio Odyssey, integrated at X-A07.
-                                    "AudioOdysseyExperience"])
+                                    "AudioOdysseyExperience",
+                                    # Feature 061 (A08-P01): Oscilloscope Studio, a candidate until X-A08.
+                                    "OscilloscopeStudioExperience"])
 
     def test_the_standing_isolation_step_requires_sources(self):
         listing = subprocess.run([sys.executable, str(HERE / "release_check.py"), "--list"],

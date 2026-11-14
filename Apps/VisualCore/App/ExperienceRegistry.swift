@@ -8,6 +8,7 @@ import GenerativeArtStudioExperience
 import InfiniteGeometryExperience
 import ParticleUniverseExperience
 import VisualCoreMusicLabExperience
+import OscilloscopeStudioExperience
 import VisualCoreExperience
 import VisualCoreExperienceHost
 import VisualCoreUI
@@ -67,7 +68,7 @@ enum ExperienceRegistry {
     /// each carries its scenario manifest, so that the verification runner can open it, but it stays unavailable
     /// in the catalog and outside `all`. Debug builds show them with `-vcCandidates`. Recording an experience's X
     /// gate moves its registration from here to `all`.
-    static let candidates: [ExperienceRegistration] = []
+    static let candidates: [ExperienceRegistration] = [oscilloscopeStudio].compactMap { $0 }
 
     /// A01 Generative Art Studio (feature 193, US1).
     private static var generativeArtStudio: ExperienceRegistration? {
@@ -181,6 +182,20 @@ extension ExperienceRegistry {
         }
         #if DEBUG || VISUALCORE_AUTOMATION
         registration.scenarioManifest = OdysseyCore.manifest(for: id)
+        #endif
+        return registration
+    }
+    /// A08 Oscilloscope Studio (feature 061, A08-P01): a candidate until X-A08.
+    fileprivate static var oscilloscopeStudio: ExperienceRegistration? {
+        guard let id = OscilloscopeStudioExperience.id else { return nil }
+        var registration = ExperienceRegistration(id: id, core: ScopeCore.self) { launch in
+            let system = SystemAccessibilityObserver.systemValues()
+            return OscilloscopeStudioExperience.make(id: id, storage: launch.storage,
+                                                     reduceMotion: launch.reduceMotion.resolved(system: system.reduceMotion),
+                                                     reduceFlashing: launch.reduceFlashing.resolved(system: system.dimFlashingLights))
+        }
+        #if DEBUG || VISUALCORE_AUTOMATION
+        registration.scenarioManifest = ScopeCore.manifest(for: id)
         #endif
         return registration
     }
