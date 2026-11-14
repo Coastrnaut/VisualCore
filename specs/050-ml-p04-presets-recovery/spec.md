@@ -26,6 +26,40 @@ Canonical overrides:
 - **Owner rulings:** short tests; audits and device runs in the device campaign; iOS 27 at phase gates; every Spec Kit
   step runs.
 
+## Clarifications
+
+### Session 2026-11-14
+
+Answered autonomously under the owner's standing delegation, recommended option each time. Facts checked in code:
+`MicrophoneAudioSource` creates its `AVAudioEngine` and configures the shared `AVAudioSession` inside `start(into:)`
+with no seam for tests, has `engineStartCount` as an internal test hook, and stops by removing the tap and deactivating
+the session; `AudioSourceState` has `idle`, `running`, `failed(String)`; no experience code switches exhaustively over
+it; `ExperienceStorage` writes atomically with a quota (used by `GeometryLibrary`, one file per item); the registry's
+`make(id:storage:reduceMotion:reduceFlashing:)` already hands the experience its storage; actions carry ≤ 24 numbers.
+
+- Q: How are system events and the engine made testable? → A: A public `AudioSessionEvent` enum (interruptionBegan,
+  interruptionEnded(shouldResume:), routeLost, mediaServicesReset) with a pure `init?(notification name, userInfo)`; a
+  public `AudioSessionEventMonitor` that observes an injectable `NotificationCenter` (default `.default`) for the
+  session's interruption, route-change and media-services-reset notifications and calls a handler on the main actor;
+  inside VisualCoreAudio an internal `MicrophoneCapture` protocol (start into a buffer → sample rate; stop) with the
+  system implementation holding today's session and engine code, and an internal initialiser of `MicrophoneAudioSource`
+  taking a capture factory for tests.
+- Q: What changes in the source's public surface? → A: `AudioSourceState.interrupted` (new case); `MicrophoneAudioSource
+  .handle(_ event:)` and `.resume()`; the source owns a monitor while running when created with the public initialiser.
+  Route loss counts only for the reason "old device unavailable"; other route changes are ignored.
+- Q: How is a preset applied as one action? → A: `preset.apply [scene 0…2, feature₀, gain₀, feature₁, gain₁, feature₂,
+  gain₂]` (7 values); values for slots beyond the scene's parameter count must be 0 and are ignored; it sets the scene
+  and that scene's choices; invalid values are refused like `mapping.set`.
+- Q: What is the preset file format? → A: One file `preset-<uuid>.json` per user preset in the experience's storage:
+  `{"choices": [{"feature": n, "gain": g}…], "format": 1, "id": "<uuid>", "name": "…", "saved": <seconds since 2001>,
+  "scene": n}` with sorted keys; the `id` must match the file name; greater `format` → counted as newer, refused, never
+  rewritten; any other undecodable file → counted as unreadable. Built-ins live in code with fixed names ("Spectrum",
+  "Waveform rings", "Pulse geometry").
+- Q: What does the status show and when is "Use demo signal" offered? → A: Status text "<source> — live" while running,
+  "— paused by the system" while interrupted, "— stopped" when failed (with the reason as the message); the demo and
+  file sources show "<source> — live". "Resume" appears while interrupted after an end without permission to resume;
+  "Use demo signal" appears when the microphone failed (rebuild failure or start failure).
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Always know what is playing and why it stopped (Priority: P1) 🎯
