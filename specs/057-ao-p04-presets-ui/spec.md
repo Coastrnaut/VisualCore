@@ -20,6 +20,38 @@ Canonical overrides:
 - **Owner rulings:** short tests; audits and device runs in the device campaign; iOS 27 at phase gates; every Spec Kit
   step runs.
 
+## Clarifications
+
+### Session 2026-11-14
+
+Answered autonomously under the owner's standing delegation, recommended option each time. Facts checked in code:
+`ExperienceStorage` (VisualCoreExperience) offers `write(_:to:)` (atomic, quota-checked), `read(_:)`, `list()`,
+`remove(_:)` with `StorageError` codes; the A07 factory receives a storage it does not use yet; A06's
+`MusicPreset`/`MusicLabPresetStore` implement the same rules (clean, unique name, built-ins first, unreadable and newer
+counted, atomic writes) for another experience.
+
+- Q: Where do the preset type and the store live? → A: `JourneyPreset` (pure: fields, file coding format 1, name
+  cleaning and uniqueness, three built-ins) in `AudioOdysseyCore`; `JourneyPresetStore` (list, save, rename, delete over
+  `ExperienceStorage`) in the experience target, as A06 splits `MusicPreset` and `MusicLabPresetStore`. Copying the
+  rules rather than sharing code is correct because they live in two experiences (Principle II covers generic
+  machinery; a preset file format per experience is experience domain).
+- Q: What are the built-ins? → A: "Deep tunnel" (tunnel, speed 3.5, gentle, mappings tunnel low/high-sensitivity and
+  overall), "Rolling hills" (landscape, speed 4, standard, mid/medium), "Night stars" (star corridor, speed 2.5, gentle,
+  calm on, transient/high); fixed ids `00000000-0000-4000-8000-0000000007B1…B3`, saved time 0.
+- Q: How does applying a preset reach the core, given actions carry numbers? → A: The presenter applies a preset
+  through existing actions in a fixed order (`world.select`, `mapping.set` × 2 per world, `speed.set`,
+  `easing.select`, `comfort.calm`), plus a new action `preset.apply` carrying the same eleven-plus values so scenarios
+  can apply a built-in in one step; the core validates every value. The preset id is display-only state in the
+  presenter.
+- Q: How is the demo response fixture made deterministic and measurable? → A: A core-level and presenter-level trace:
+  the demo source with a fixed seed is fed for N frames at a fixed 1/60 s step through the envelope and the world's
+  response; the trace (primary, light per frame) is compared with a second run (≤ 1e-6) and its maximum primary must be
+  ≥ rest + 25% of the range within 120 frames. A test renders frames through the host as well; timing uses fixed steps,
+  never wall clock.
+- Q: Is the source picker a new control or the existing buttons? → A: A segmented picker (`source.picker`, Demo /
+  Microphone / File) with a status line (`source.status`: "Demo signal", "Microphone", or the file's name) and the
+  existing permission message and Settings link; it sends the existing `source.*` actions.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Journeys I can come back to (Priority: P1) 🎯
