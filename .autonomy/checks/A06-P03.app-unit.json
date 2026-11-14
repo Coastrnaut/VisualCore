@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "python3",
+    "scripts/release_check.py",
+    "--only",
+    "app-build-for-testing-ios27",
+    "app-unit-ios27"
+  ],
+  "command": "python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27",
+  "elapsed_seconds": 24.563,
+  "exit_code": 0,
+  "finished": "2026-11-14T08:12:52+00:00",
+  "log": ".autonomy/logs/A06-P03.app-unit.log",
+  "log_sha256": "860320758127d5e2f068d7e385f3cdb698abf9d46a261332669f8f05276c58cd",
+  "name": "app-unit",
+  "stage": "A06-P03",
+  "started": "2026-11-14T08:12:28+00:00",
+  "timed_out": false
+}

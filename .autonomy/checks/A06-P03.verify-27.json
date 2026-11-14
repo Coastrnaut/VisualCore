@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--only",
+    "a06.visualcore-music-lab",
+    "--runtime",
+    "27"
+  ],
+  "command": "python3 scripts/verify_experiences.py --only a06.visualcore-music-lab --runtime 27",
+  "elapsed_seconds": 20.558,
+  "exit_code": 0,
+  "finished": "2026-11-14T08:13:13+00:00",
+  "log": ".autonomy/logs/A06-P03.verify-27.log",
+  "log_sha256": "cfe448039838c2b9d7044e30bff7de44fd6037556649f0640b6996b3b76e9e69",
+  "name": "verify-27",
+  "stage": "A06-P03",
+  "started": "2026-11-14T08:12:52+00:00",
+  "timed_out": false
+}

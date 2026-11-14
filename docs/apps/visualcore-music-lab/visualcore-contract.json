@@ -102,32 +102,32 @@
       "id": "M01",
       "capability": "Audio-reactive parameters: per-frame scalar uniforms driven by audio features within declared ranges",
       "source": "brainstorm; v0.1 feature 02",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
-          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FullScreenShaderScene.swift",
-          "symbol": "FullScreenShaderScene.parameters",
-          "product": "VisualCoreRendering",
+          "file": "Packages/VisualCore/Sources/VisualCoreAudioDSP/AudioMapping.swift",
+          "symbol": "AudioMapping",
+          "product": "VisualCoreAudioDSP",
           "public": true
         },
         {
-          "file": "Packages/VisualCore/Sources/VisualCoreParameters/ParameterSchema.swift",
-          "symbol": "ParameterDefinition.clamped",
-          "product": "VisualCoreParameters",
+          "file": "Packages/VisualCore/Sources/VisualCoreAudioDSP/AudioMapper.swift",
+          "symbol": "AudioMapper",
+          "product": "VisualCoreAudioDSP",
           "public": true
         },
         {
-          "file": "Packages/VisualCore/Sources/VisualCoreParameters/ParameterSchema.swift",
-          "symbol": "ParameterSchema",
-          "product": "VisualCoreParameters",
+          "file": "Packages/VisualCore/Sources/VisualCoreAudioDSP/AudioFeatureKind.swift",
+          "symbol": "AudioFeatureKind",
+          "product": "VisualCoreAudioDSP",
           "public": true
         }
       ],
       "example": {
-        "file": "Packages/ExperiencesCreative/GenerativeArtStudio/Experience/ArtSceneFactory.swift",
-        "symbol": "ArtSceneFactory"
+        "file": "Packages/ExperiencesCreative/VisualCoreMusicLab/Experience/MusicLabPresenter.swift",
+        "symbol": "MusicLabPresenter"
       },
-      "notes": "Named scalar uniforms and ranged parameter definitions exist and are tested (FullScreenShaderSceneTests, VisualCoreParametersTests), but nothing turns an audio feature into a parameter value. G-AUDIOMAP: ReactiveMapping (feature, gain, attack, release, clamp, target parameter) applied at the frame boundary."
+      "notes": "Named scalar uniforms and ranged parameter definitions exist and are tested (FullScreenShaderSceneTests, VisualCoreParametersTests), but nothing turns an audio feature into a parameter value. G-AUDIOMAP: ReactiveMapping (feature, gain, attack, release, clamp, target parameter) applied at the frame boundary. Built in A06-P03."
     },
     {
       "id": "M02",
@@ -543,20 +543,32 @@
       "id": "M17",
       "capability": "Audio-to-parameter mapping: feature, gain, attack, release, clamp and target uniform, editable and persisted",
       "source": "manual section 6 ReactiveMapping; AudioReactiveMapping; journey 3 calibrate gain",
-      "status": "upstream gap",
+      "status": "available",
       "evidence": [
         {
-          "file": "Packages/VisualCore/Sources/VisualCoreParameters/ParameterSchema.swift",
-          "symbol": "ParameterDefinition",
-          "product": "VisualCoreParameters",
+          "file": "Packages/VisualCore/Sources/VisualCoreAudioDSP/AudioMapping.swift",
+          "symbol": "AudioMapping",
+          "product": "VisualCoreAudioDSP",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreAudioDSP/AudioMapper.swift",
+          "symbol": "AudioMapper",
+          "product": "VisualCoreAudioDSP",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreAudioDSP/AudioFeatureKind.swift",
+          "symbol": "AudioFeatureKind",
+          "product": "VisualCoreAudioDSP",
           "public": true
         }
       ],
       "example": {
-        "file": "Packages/ExperiencesCreative/GenerativeArtStudio/Core/FamilyCatalog.swift",
-        "symbol": "FamilyCatalog"
+        "file": "Packages/ExperiencesCreative/VisualCoreMusicLab/Experience/MusicLabPresenter.swift",
+        "symbol": "MusicLabPresenter"
       },
-      "notes": "G-AUDIOMAP: a Codable, validated ReactiveMapping in VisualCoreAudioDSP that maps a time-stamped feature to a ParameterDefinition's range at the frame boundary; reused by the other audio experiences (A07, A08)."
+      "notes": "G-AUDIOMAP: a Codable, validated ReactiveMapping in VisualCoreAudioDSP that maps a time-stamped feature to a ParameterDefinition's range at the frame boundary; reused by the other audio experiences (A07, A08). Built in A06-P03."
     },
     {
       "id": "M18",
@@ -1078,7 +1090,8 @@
       "owner": "VisualCore:VisualCoreAudioDSP",
       "phase": 3,
       "test": "Host tests: mapping applies gain, attack, release and clamp into a ParameterDefinition range, rejects unknown features and non-finite values, Codable round trip with schema version, deterministic output for a recorded feature sequence",
-      "justification": "Found in A06-P00: no feature-to-parameter binding exists; the mapping is reusable by A07 and A08."
+      "justification": "Found in A06-P00: no feature-to-parameter binding exists; the mapping is reusable by A07 and A08.",
+      "closed": "A06-P03"
     },
     {
       "id": "G-SIGNALTEXTURE",
@@ -1087,9 +1100,9 @@
       ],
       "kind": "adaptation",
       "owner": "VisualCore:VisualCoreRendering",
-      "phase": 3,
+      "phase": 5,
       "test": "Simulator tests: a full-screen program samples an uploaded ramp signal and offscreen pixels match within a stated tolerance; per-frame upload reuses one texture; context recreation rebuilds it with no stale handle",
-      "justification": "Found in A06-P00: FullScreenShaderScene binds no texture; signal-driven shaders are generic for audio and data experiences."
+      "justification": "Found in A06-P00: FullScreenShaderScene binds no texture; signal-driven shaders are generic for audio and data experiences. Re-phased to 5 in A06-P03: the three scenes draw with the host primitive and mesh renderers and need no signal texture."
     },
     {
       "id": "G-INTERRUPTION",

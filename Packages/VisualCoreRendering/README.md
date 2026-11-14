@@ -11,7 +11,7 @@ renderer and no `dlsym`; GL entry points come from the generated `CVisualCoreGL`
 | VisualCoreRendering | `RenderHost`, `RenderView`, lifecycle, capabilities, resources, programs |
 | VisualCoreEffects | GPU passes, render-target pool, effect-graph executor |
 | VisualCoreUI | `RenderSurface` (SwiftUI host for a caller-owned `RenderHost`); diagnostics overlay and accessibility helpers planned |
-| VisualCoreAudio | feature 047 (A06-P01): `AudioSource` with `DemoAudioSource`, `FileAudioSource` (any AVAudioFile format, chunked, looped) and `MicrophoneAudioSource` (AVAudioEngine input tap, mono, no allocation in the tap, session mixes with other audio), `MicrophonePermission` (`SystemMicrophonePermission`, four states); samples go into a `SampleRingBuffer` |
+| VisualCoreAudio | feature 047 (A06-P01): `AudioSource` with `DemoAudioSource`, `FileAudioSource` (any AVAudioFile format, chunked, looped) and `MicrophoneAudioSource` (AVAudioEngine input tap, mono, no allocation in the tap, session mixes with other audio), `MicrophonePermission` (`SystemMicrophonePermission`, four states); samples go into a `SampleRingBuffer`; feature 049 (A06-P03): every audio-side block handler is enclosed in `// vc:hot-path begin/end` and checked for allocating constructs by `scripts/check_audio_hot_path.py` |
 | VisualCoreAutomation | AutomationRunner (`DEBUG \|\| VISUALCORE_AUTOMATION` only) |
 | VisualCoreExperienceHost | the main-actor part of the experience contract: `ExperiencePresenter`, `ExperienceActionPort`, `ExperienceShell` and the type-erased `Experience` (UA-F02); `ExperienceSession` and `ExperienceHostView`: one experience at a time on one render host (UA-F03) |
 

@@ -2907,7 +2907,7 @@ to confirm on devices:
 | VisualCoreEffects | VisualCoreRendering | `EffectRenderer`, `EffectScene` |
 | VisualCoreUI | VisualCoreRendering | `RenderSurface`, `ParameterPanel`, `AccessibilitySettingsSection`, `AccessibleColors`, `AcknowledgementsView`, `LicenseInventory` |
 | VisualCoreAutomation | VisualCoreRendering | `AutomationRunner`, `AutomationReport`, `AutomationView` |
-| VisualCoreAudio, VisualCoreAudioDSP | both | `AudioSource` (demo, file, microphone), `MicrophonePermission`; `SampleRingBuffer`, `DemoSignal`, `SpectrumAnalyzer` (A06-P01); `LevelMeter`, `BandLayout`, `FeatureSmoother`, `OnsetDetector`, `AudioFeatures`, `FeatureExtractor` (A06-P02); mapping follows in A06-P03 |
+| VisualCoreAudio, VisualCoreAudioDSP | both | `AudioSource` (demo, file, microphone), `MicrophonePermission`; `SampleRingBuffer`, `DemoSignal`, `SpectrumAnalyzer` (A06-P01); `LevelMeter`, `BandLayout`, `FeatureSmoother`, `OnsetDetector`, `AudioFeatures`, `FeatureExtractor` (A06-P02); `AudioFeatureKind`, `AudioMapping`, `AudioMapper` (A06-P03); audio hot path marked and checked by `scripts/check_audio_hot_path.py` |
 
 The authoritative list is the API baseline `docs/api/visualcore-public-api.txt`.
 
