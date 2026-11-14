@@ -52,5 +52,5 @@ Catalog/registrations.json (a08 quality_tiers), docs/api/visualcore-public-api.t
 ## Parallel work
 
 Agent A: VisualCoreAudio stereo microphone source + tests. Agent B: core `ScopeQuality`, `ScopeAnnouncer` + tests.
-Agent C: experience (audit, presenter wiring, description tests, microphone switch) after A and B. Lead: registrations,
+Agent C: accuracy audit + tests (needs neither A nor B). Agent D: presenter wiring, description tests, microphone switch after A and B. Lead: registrations,
 manifest fixture, device-campaign document, contract, API baseline, runs, commits.
