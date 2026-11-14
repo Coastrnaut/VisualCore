@@ -19,7 +19,7 @@
 
 ## Phase 4: User Story 3 — save and reuse scope settings (P2)
 
-- [ ] T-A08-404 [US3] `Experience/ScopePresetStore.swift` mirroring `Packages/ExperiencesCreative/AudioOdyssey/Experience/JourneyPresetStore.swift` (built-ins first and read-only, save, rename, delete, reload; damaged and newer files kept unchanged and counted; failed writes leave nothing half-written); presenter and controls: preset list (`preset.<index>`), name field, save, rename, delete; tests `ExperienceTests/ScopePresetStoreTests.swift` (5 of 5 save/rename/apply/delete/reload cases; damaged and newer files byte-identical; a new session lists saved presets) (FR-A08-410; SC-A08-404)
+- [X] T-A08-404 [US3] `Experience/ScopePresetStore.swift` mirroring `Packages/ExperiencesCreative/AudioOdyssey/Experience/JourneyPresetStore.swift` (built-ins first and read-only, save, rename, delete, reload; damaged and newer files kept unchanged and counted; failed writes leave nothing half-written); presenter and controls: preset list (`preset.<index>`), name field, save, rename, delete; tests `ExperienceTests/ScopePresetStoreTests.swift` (5 of 5 save/rename/apply/delete/reload cases; damaged and newer files byte-identical; a new session lists saved presets) (FR-A08-410; SC-A08-404) — Verified 2026-11-14: 2026-11-14: ScopePresetStore (built-ins first, save/rename/delete/reload, damaged/newer kept and counted) + presenter/controls list; ScopePresetStoreTests pass on sim-27.2
 
 ## Phase 5: User Story 4 — the precision fixture (P2)
 
