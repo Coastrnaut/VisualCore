@@ -1,0 +1,340 @@
+{
+  "controls" : [
+    "world.select",
+    "speed.select",
+    "flight.pause",
+    "flight.resume",
+    "journey.reseed",
+    "comfort.reduce-motion"
+  ],
+  "experience" : "a07.audio-odyssey",
+  "kind" : "creative",
+  "scenarios" : [
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+        "initialDigest" : "c6d5b3cf0048c9c546d70860f5e5e3373b2146996e609adf1d108c2963187523"
+      },
+      "name" : "launch-first-frame",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "speed.select",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 30
+        },
+        {
+          "action" : {
+            "control" : "world.select",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 30
+        },
+        {
+          "action" : {
+            "control" : "flight.pause",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 30
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "caf726078abc391a048dfe76fbaf66ffbc28ff39c35883111adc9d6b6b7aefd3",
+        "initialDigest" : "c6d5b3cf0048c9c546d70860f5e5e3373b2146996e609adf1d108c2963187523"
+      },
+      "name" : "input-response",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "speed.select",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 30
+        }
+      ],
+      "expect" : {
+        "outcome" : "journey-under-way"
+      },
+      "name" : "completion",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "world.select",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "speed.select",
+            "values" : [
+              -1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "flight.resume",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.a07.not-paused",
+          "steps" : 0
+        }
+      ],
+      "expect" : {
+
+      },
+      "name" : "rejection",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "speed.select",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 30
+        },
+        {
+          "action" : {
+            "control" : "world.select",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 30
+        },
+        {
+          "action" : {
+            "control" : "flight.pause",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 30
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "caf726078abc391a048dfe76fbaf66ffbc28ff39c35883111adc9d6b6b7aefd3",
+        "initialDigest" : "c6d5b3cf0048c9c546d70860f5e5e3373b2146996e609adf1d108c2963187523"
+      },
+      "name" : "save-restore",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "speed.select",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 30
+        },
+        {
+          "action" : {
+            "control" : "world.select",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 30
+        },
+        {
+          "action" : {
+            "control" : "flight.pause",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 30
+        }
+      ],
+      "expect" : {
+        "initialDigest" : "c6d5b3cf0048c9c546d70860f5e5e3373b2146996e609adf1d108c2963187523",
+        "resetDigest" : true
+      },
+      "name" : "reset",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "suspend-resume",
+      "seed" : "7"
+    },
+    {
+      "cycles" : 5,
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "teardown-reentry",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "cancel-prepare",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "world.select",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 240
+        },
+        {
+          "action" : {
+            "control" : "world.select",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 240
+        },
+        {
+          "action" : {
+            "control" : "journey.reseed",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 240
+        },
+        {
+          "action" : {
+            "control" : "world.select",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 240
+        },
+        {
+          "steps" : 240
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "2a38a90db09a2356f3c0b8642a1686306a0f55b7a229767b1f077cb47232f685",
+        "initialDigest" : "c6d5b3cf0048c9c546d70860f5e5e3373b2146996e609adf1d108c2963187523"
+      },
+      "name" : "fixture-1",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "speed.select",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "speed.select",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 600
+        },
+        {
+          "action" : {
+            "control" : "flight.pause",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 240
+        },
+        {
+          "action" : {
+            "control" : "flight.resume",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 240
+        },
+        {
+          "steps" : 120
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "eabd653ec4d9f0563ec07f4a083ca0151edd238d2176897f40d7f2228e14c36e",
+        "initialDigest" : "c6d5b3cf0048c9c546d70860f5e5e3373b2146996e609adf1d108c2963187523"
+      },
+      "name" : "fixture-2",
+      "seed" : "7"
+    }
+  ],
+  "schema" : 1
+}

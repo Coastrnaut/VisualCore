@@ -21,7 +21,7 @@
 ## Phase 4: User Story 2 — comfortable motion (P1)
 
 - [X] T-A07-105 [US2] Register: `Catalog/registrations.json` entry for a07 (capabilities, quality_tiers ["level-0"], palette, content), candidate in `Apps/VisualCore/App/ExperienceRegistry.swift`, `project.yml` dependency on the product, `xcodegen generate --spec project.yml` (FR-A07-120) — Verified 2026-11-14: Verified 2026-11-14: .autonomy/checks/A07-P01.app-unit.json exit 0 (app builds with a07 as a candidate; 78 unit tests); Catalog/registrations.json a07 entry; project.yml dependency; xcodegen generated
-- [ ] T-A07-106 [US2] Write `Experience/Adapter/OdysseyManifest.swift` (nine standard scenarios + fixture-1 watertight joins, fixture-2 comfort limits) and generate `Packages/ExperiencesCreative/AudioOdyssey/scenario-manifest.json` (`TEST_RUNNER_UPDATE_SCENARIO_MANIFEST=1`), with `ExperienceTests/OdysseyManifestTests.swift` (FR-A07-120)
+- [X] T-A07-106 [US2] Write `Experience/Adapter/OdysseyManifest.swift` (nine standard scenarios + fixture-1 watertight joins, fixture-2 comfort limits) and generate `Packages/ExperiencesCreative/AudioOdyssey/scenario-manifest.json` (`TEST_RUNNER_UPDATE_SCENARIO_MANIFEST=1`), with `ExperienceTests/OdysseyManifestTests.swift` (FR-A07-120) — Verified 2026-11-14: Verified 2026-11-14: scenario-manifest.json generated (TEST_RUNNER_UPDATE_SCENARIO_MANIFEST=1; 9 standard + fixture-1 joins + fixture-2 comfort, 6 controls); OdysseyManifestTests pass in .autonomy/checks/A07-P01.experience-ios27.json; runner .autonomy/checks/A07-P01.verify-27.json 0 failures
 
 ## Phase 5: Polish & evidence
 
