@@ -113,7 +113,7 @@ struct OdysseyControls: View {
                         if !selected { _ = port.send("speed.select", [Double(option.rawValue)]) }
                     }
                 }
-                Text(verbatim: "Camera easing").font(.subheadline).accessibilityAddTraits(.isHeader)
+                Text(verbatim: "Flight easing").font(.subheadline).accessibilityAddTraits(.isHeader)
                 ForEach(Easing.allCases, id: \.rawValue) { option in
                     choice(option.displayName, selected: mirror.easing == option, identifier: "easing.\(option.rawValue)",
                            hint: Self.easingHint(option)) {
@@ -264,7 +264,7 @@ struct OdysseyControls: View {
     /// The mapping editor of `world`: channel and sensitivity of the primary response and of the light, and the reset.
     @ViewBuilder private func mappingEditor(world: JourneyWorld) -> some View {
         let mapping = mirror.mapping
-        Text(verbatim: "In the \(world.displayName.lowercased()), changes apply at once and smoothly.")
+        Text(verbatim: "In the \(world.displayName.lowercased()), changes apply at once.")
             .font(.footnote).fixedSize(horizontal: false, vertical: true)
         mappingRow(Self.primaryName(world), target: 0, key: "primary", source: mapping.primary)
         mappingRow("Light", target: 1, key: "light", source: mapping.light)
