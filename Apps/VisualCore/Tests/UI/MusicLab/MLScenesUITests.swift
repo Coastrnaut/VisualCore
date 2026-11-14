@@ -29,8 +29,7 @@ final class MLScenesUITests: XCTestCase {
     @MainActor
     func testPaletteAndMetrics() {
         let app = ML.open()
-        ML.choose(app, "demo.mode.2")                   // 1 kHz tone
-        ML.choose(app, "palette.1")
+        ML.choose(app, "palette.1")                     // the demo melody gives metrics too
         XCTAssertTrue(ML.waitForSelection(ML.control(app, "palette.0"), false), "only one palette is selected")
 
         let metrics = ML.control(app, "metrics")

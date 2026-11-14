@@ -57,15 +57,16 @@ struct ExperienceRegistration: Sendable {
 /// The explicit list of registered experiences.
 enum ExperienceRegistry {
     /// Every registered experience, in catalog order: those whose X gate is pass (X-A01, X-A02 and X-A03, recorded
-    /// 2026-11-13 after UA-F07; X-A04 recorded 2026-11-13 after A04-P06; X-A05 recorded 2026-11-14 after A05-P06).
+    /// 2026-11-13 after UA-F07; X-A04 recorded 2026-11-13 after A04-P06; X-A05 recorded 2026-11-14 after A05-P06; X-A06 recorded 2026-11-14 after A06-P06).
     static let all: [ExperienceRegistration] = [generativeArtStudio, fluidArtPlayground, fractalExplorer,
-                                                particleUniverse, infiniteGeometry].compactMap { $0 }
+                                                particleUniverse, infiniteGeometry,
+                                                visualCoreMusicLab].compactMap { $0 }
 
     /// The adopted experiences before their X gate (feature 193, FR-U07-021; clarification 4), in catalog order:
     /// each carries its scenario manifest, so that the verification runner can open it, but it stays unavailable
     /// in the catalog and outside `all`. Debug builds show them with `-vcCandidates`. Recording an experience's X
     /// gate moves its registration from here to `all`.
-    static let candidates: [ExperienceRegistration] = [visualCoreMusicLab].compactMap { $0 }
+    static let candidates: [ExperienceRegistration] = []
 
     /// A01 Generative Art Studio (feature 193, US1).
     private static var generativeArtStudio: ExperienceRegistration? {
@@ -148,10 +149,13 @@ extension ExperienceRegistry {
         #endif
         return registration
     }
-    /// A06 VisualCore Music Lab (feature 047, A06-P01): a candidate until X-A06.
+    /// A06 VisualCore Music Lab (features 047–052, A06-P01…P06): integrated at X-A06 (2026-11-14).
     fileprivate static var visualCoreMusicLab: ExperienceRegistration? {
         guard let id = VisualCoreMusicLabExperience.id else { return nil }
-        var registration = ExperienceRegistration(id: id, core: MusicLabCore.self) { launch in
+        // Schema 2 (feature 049) adds the scene and mappings and schema 3 (feature 051) the palette; the stored
+        // schema-1 and schema-2 examples prove the migrations.
+        let examples = [MusicLabCore.schemaOneExample(), MusicLabCore.schemaTwoExample()].compactMap { $0 }
+        var registration = ExperienceRegistration(id: id, core: MusicLabCore.self, examples: examples) { launch in
             let system = SystemAccessibilityObserver.systemValues()
             return VisualCoreMusicLabExperience.make(id: id, storage: launch.storage,
                                                      reduceMotion: launch.reduceMotion.resolved(system: system.reduceMotion),

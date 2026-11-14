@@ -69,7 +69,48 @@ public struct MusicLabCore: ExperienceCore, Equatable {
         ])
     }
 
-    /// The ten controls: three sources, the demo mode, a new melody, the permission mirror, (feature 049) the scene, a
+    /// Three quality tiers since feature 051 (A06-P05): the host's tier selects the analysis level (window and band
+    /// count, `AnalysisQuality`); the tier never reaches the state, so every tier keeps the digest.
+    public static var qualityTiers: Int { 3 }
+
+    /// The stored example of schema 1 for the registry's migration check (feature 052, X-A06 follow-through): the
+    /// Phase 01 payload (source, demo seed, demo mode) of the state prepared with `seed`, with the digest its restore
+    /// must give — the same state with the Bars scene, the default mappings and the Aurora palette. Nil only if the
+    /// encoding failed.
+    public static func schemaOneExample(seed: UInt64 = 7) -> MigrationExample? {
+        let core = MusicLabCore(seed: seed)
+        let payload: [String: Any] = ["source": core.state.source.rawValue, "demoSeed": seed,
+                                      "demoMode": core.state.demoMode]
+        return example(version: 1, payload: payload, expected: core, seed: seed)
+    }
+
+    /// The stored example of schema 2 (feature 049 state: scene and mappings, no palette): the Geometry scene with
+    /// default mappings, with the digest its restore must give — that state with the Aurora palette.
+    public static func schemaTwoExample(seed: UInt64 = 7) -> MigrationExample? {
+        var core = MusicLabCore(seed: seed)
+        core.state.select(scene: .geometry)
+        let mappings = MusicLabScene.defaultMappings().map { list in
+            list.map { ["feature": $0.feature, "gain": $0.gain] as [String: Any] }
+        }
+        let payload: [String: Any] = ["source": core.state.source.rawValue, "demoSeed": seed,
+                                      "demoMode": core.state.demoMode, "scene": MusicLabScene.geometry.rawValue,
+                                      "mappings": mappings]
+        return example(version: 2, payload: payload, expected: core, seed: seed)
+    }
+
+    private static func example(version: Int, payload: [String: Any], expected: MusicLabCore,
+                                seed: UInt64) -> MigrationExample? {
+        guard let id = ExperienceID(rawValue: experienceID) else { return nil }
+        var builder = DigestBuilder(domain: id.rawValue)
+        guard (try? expected.writeDigest(into: &builder)) != nil,
+              let data = try? JSONSerialization.data(withJSONObject: payload, options: [.sortedKeys]),
+              let snapshot = try? ExperienceSnapshot(experience: id, schemaVersion: version, seed: seed, stepIndex: 0,
+                                                     digest: builder.finish(), payload: data),
+              let encoded = try? snapshot.encoded() else { return nil }
+        return MigrationExample(version: version, snapshot: encoded, expectedDigest: builder.finish().hex)
+    }
+
+    /// The eleven controls (palette.select since feature 051): three sources, the demo mode, a new melody, the permission mirror, (feature 049) the scene, a
     /// mapping choice and a scene's mapping reset, and (feature 050) applying a preset: the scene and up to three
     /// choices in one action.
     public static var controls: [ExperienceControl] {

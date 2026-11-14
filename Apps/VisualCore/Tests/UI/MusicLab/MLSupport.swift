@@ -131,6 +131,15 @@ enum ML {
                        file: StaticString = #filePath, line: UInt = #line) {
         let target = slider(app, name)
         guard reveal(app, target, file: file, line: line) else { return }
+        // A slider revealed at the edge of the controls can take the drag as a scroll: bring it toward the middle first
+        // (one short drag of about a quarter of the panel).
+        let list = controlsList(app)
+        let area = list.exists ? list : app.windows.firstMatch
+        if target.frame.midY > area.frame.minY + area.frame.height * 0.65 {
+            let from = area.coordinate(withNormalizedOffset: CGVector(dx: 0, dy: 0.6)).withOffset(CGVector(dx: 8, dy: 0))
+            let to = area.coordinate(withNormalizedOffset: CGVector(dx: 0, dy: 0.35)).withOffset(CGVector(dx: 8, dy: 0))
+            from.press(forDuration: 0.05, thenDragTo: to)
+        }
         usleep(500_000)
         target.adjust(toNormalizedSliderPosition: position)
     }

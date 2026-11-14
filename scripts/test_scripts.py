@@ -1290,7 +1290,7 @@ class UnifiedAppTargetTests(unittest.TestCase):
                                     "FractalExplorerExperience", "ParticleUniverseExperience",
                                     # Feature 040 (A05-P01): Infinite Geometry, integrated at X-A05.
                                     "InfiniteGeometryExperience",
-                                    # Feature 047 (A06-P01): VisualCore Music Lab, a candidate until X-A06.
+                                    # Feature 047 (A06-P01): VisualCore Music Lab, integrated at X-A06.
                                     "VisualCoreMusicLabExperience"])
 
     def test_the_standing_isolation_step_requires_sources(self):
