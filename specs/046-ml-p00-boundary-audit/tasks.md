@@ -6,7 +6,7 @@
 
 ## Phase 1: Setup
 
-- [ ] T-A06-001 Create `docs/apps/visualcore-music-lab/README.md` (what the experience is per the manual §1–§2, that it is an experience of the one app, its documents) and `docs/apps/visualcore-music-lab/regression-baseline.md` with the phase start `4c27bfaf` (specify commit; constitution commit `c37f95fe`) and the reference pin `d93edd1`
+- [X] T-A06-001 Create `docs/apps/visualcore-music-lab/README.md` (what the experience is per the manual §1–§2, that it is an experience of the one app, its documents) and `docs/apps/visualcore-music-lab/regression-baseline.md` with the phase start `4c27bfaf` (specify commit; constitution commit `c37f95fe`) and the reference pin `d93edd1` — Verified 2026-11-14: 2026-11-14 README.md and regression-baseline.md written (phase start 4c27bfaf, pin d93edd1, 7/7 pass)
 
 ## Phase 3: User Story 1 — Evidence-backed integration matrix (P1) 🎯
 

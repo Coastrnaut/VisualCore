@@ -1,0 +1,1220 @@
+{
+  "schema": 1,
+  "app": "visualcore-music-lab",
+  "gate": "A06-P00",
+  "date": "2026-11-14",
+  "inventory": [
+    {
+      "area": "Package products",
+      "description": "Pure, host-testable products of Packages/VisualCore: VisualCoreMath, VisualCoreSimulation, VisualCoreScenes, VisualCoreShaderSource, VisualCoreEffectsGraph, VisualCoreDiagnostics, VisualCoreAudioDSP, VisualCorePersistence, VisualCoreParameters, VisualCoreExperience (+ VisualCoreTestSupport for test targets). iOS products of Packages/VisualCoreRendering: VisualCoreRendering, VisualCoreEffects, VisualCoreUI, VisualCoreAudio (links AVFAudio), VisualCoreAutomation, VisualCoreExperienceHost. VisualCoreAudioDSP holds only AudioDSPInfo.version and VisualCoreAudio only AudioInfo.version (checked 2026-11-14): no capture, decoding, ring buffer, FFT, bands, RMS or onset code exists in any product. Experience targets live in Packages/ExperiencesCreative (A01-A05 today); A06 targets go to a new Packages/ExperiencesAudio package created in A06-P01. Dependency rules enforced by scripts/check_dependencies.py; public surface recorded in docs/api/visualcore-public-api.txt.",
+      "paths": [
+        "Packages/VisualCore/Package.swift",
+        "Packages/VisualCoreRendering/Package.swift",
+        "Packages/ExperiencesCreative/Package.swift",
+        "Packages/VisualCore/Sources/VisualCoreAudioDSP/Module.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreAudio/Module.swift",
+        "scripts/check_dependencies.py",
+        "docs/api/visualcore-public-api.txt"
+      ],
+      "owner": "VisualCore packages (ADR-0003, ADR-0009)"
+    },
+    {
+      "area": "EGL render host and thread",
+      "description": "RenderHost (@MainActor) owns the EGL display, context and surfaces over ANGLE's Metal backend (EGLDisplayProvider), the CAMetalLayer RenderView, the FrameScheduler and context generations; pause/resume, recreateContext, renderOffscreen and destroy; scenes implement RenderScene setup/resize/render/teardown. All GL work runs on the main thread. Audio capture and analysis must never touch GL: audio callbacks write a bounded buffer, analysis runs off the realtime thread, and only finished feature values cross to the main thread at the frame boundary. VisualCore Music Lab adds no EGL or GL context of its own.",
+      "paths": [
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderScene.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderView.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FrameScheduler.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/EGLDisplayProvider.swift"
+      ],
+      "owner": "VisualCoreRendering (ADR-0002 seam)"
+    },
+    {
+      "area": "Shaders and resources",
+      "description": "ResourceRegistry creates buffers, textures, programs and render targets under a ResourceBudget and rejects stale handles after a generation change; Texture.upload(rgba:) and RenderTarget.upload(rgbaFloats:) replace texel data. ShaderProgram (scalar, vector, vec3-array and matrix uniforms), ShaderBundle and ShaderLibrary (#include expansion with line maps) compile bundled GLSL; the vc/ library holds color, field, hash, noise, palette and sdf helpers. FullScreenShaderScene feeds u_time, u_resolution, u_seed, u_palette and named scalar parameters; it binds no texture. The effects graph (VisualCoreEffectsGraph + VisualCoreEffects) chains copy, colorMatrix, blur, bloom, distort, composite, feedback and flashLimit passes.",
+      "paths": [
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GPUObjects.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ShaderProgram.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ShaderBundle.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FullScreenShaderScene.swift",
+        "Packages/VisualCore/Sources/VisualCoreShaderSource/ShaderLibrary.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GLSL/vc/palette.glsl",
+        "Packages/VisualCore/Sources/VisualCoreEffectsGraph/PassSchemas.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreEffects/EffectScene.swift"
+      ],
+      "owner": "VisualCoreRendering + VisualCoreShaderSource + VisualCoreEffects"
+    },
+    {
+      "area": "Experience host",
+      "description": "ExperienceSession opens, checkpoints, closes and recovers an Experience on one RenderHost, applies the quality level (QualityGovernor over the experience's QualityProfile) and memory/scene-phase events; ExperienceShell adapts an ExperiencePresenter (scene, controls) to Experience; ExperienceCore is the GPU-free state; ExperienceStorage is the per-experience sandbox; the one app registers experiences in ExperienceRegistry (A06 joins in A06-P01; scripts/check_experience_packages.py forbids unregistered targets). The app's project.yml has no NSMicrophoneUsageDescription today.",
+      "paths": [
+        "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceSession.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceShell.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperiencePresenter.swift",
+        "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceCore.swift",
+        "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift",
+        "Apps/VisualCore/App/ExperienceRegistry.swift",
+        "Catalog/registrations.json",
+        "scripts/check_experience_packages.py",
+        "project.yml"
+      ],
+      "owner": "VisualCoreExperience + VisualCoreExperienceHost + the one app"
+    },
+    {
+      "area": "Build and release steps",
+      "description": "XcodeGen spec project.yml for the one app (target VisualCore), package schemes via scripts/xcodebuild_package.py, app tests via scripts/xcodebuild_app.py, and scripts/release_check.py: 83 named steps listed by --list on 2026-11-14 (shared checks, package and app builds/tests, per-experience verification of A01-A05, release audits of the one app incl. app-usage-descriptions, reference regression steps).",
+      "paths": [
+        "project.yml",
+        "scripts/release_check.py",
+        "scripts/xcodebuild_package.py",
+        "scripts/xcodebuild_app.py",
+        "scripts/check_usage_descriptions.py",
+        ".github/workflows/ci.yml"
+      ],
+      "owner": "repository tooling"
+    },
+    {
+      "area": "Source ownership",
+      "description": "VisualCore Music Lab owns its domain (MusicPreset, scene choice, ReactiveMapping choices and defaults, copy, accessibility metric phrasing), curated presets and UI under Packages/ExperiencesAudio/MusicLab/ (Core GPU-free, Experience UIKit/GPU; package created in A06-P01). VisualCore owns reusable audio machinery: sources, permission, interruption handling (VisualCoreAudio), ring buffer, FFT, bands, RMS, peak, onset, smoothing, demo signal and feature-to-parameter mapping (VisualCoreAudioDSP), plus shaders, effects, quality and persistence (constitution Principle II, Auto-Creator.md section 13). ProjectM stays in the harness.",
+      "paths": [
+        ".specify/memory/constitution.md",
+        "Auto-Creator.md",
+        "docs/decisions/ADR-0009-unified-app.md"
+      ],
+      "owner": "constitution + ADR-0009"
+    },
+    {
+      "area": "ProjectM reference regression",
+      "description": "Reference pinned at d93edd1, read-only; scripts/run_reference_baseline.py lists the ordered reference steps; scripts/check_reference_clean.py checks the submodule; the 7 release-check steps run in two chunks via release_check.py --only (docs/apps/visualcore-music-lab/regression-baseline.md).",
+      "paths": [
+        "scripts/run_reference_baseline.py",
+        "scripts/check_reference_clean.py",
+        "Harnesses/ProjectMReference/ProjectMReference.yml",
+        "docs/apps/visualcore-music-lab/regression-baseline.md"
+      ],
+      "owner": "reference adapter (harness only)"
+    }
+  ],
+  "matrix": [
+    {
+      "id": "M01",
+      "capability": "Audio-reactive parameters: per-frame scalar uniforms driven by audio features within declared ranges",
+      "source": "brainstorm; v0.1 feature 02",
+      "status": "requires adaptation",
+      "evidence": [
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FullScreenShaderScene.swift",
+          "symbol": "FullScreenShaderScene.parameters",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreParameters/ParameterSchema.swift",
+          "symbol": "ParameterDefinition.clamped",
+          "product": "VisualCoreParameters",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreParameters/ParameterSchema.swift",
+          "symbol": "ParameterSchema",
+          "product": "VisualCoreParameters",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/GenerativeArtStudio/Experience/ArtSceneFactory.swift",
+        "symbol": "ArtSceneFactory"
+      },
+      "notes": "Named scalar uniforms and ranged parameter definitions exist and are tested (FullScreenShaderSceneTests, VisualCoreParametersTests), but nothing turns an audio feature into a parameter value. G-AUDIOMAP: ReactiveMapping (feature, gain, attack, release, clamp, target parameter) applied at the frame boundary."
+    },
+    {
+      "id": "M02",
+      "capability": "Shader effects: bundled full-screen fragment programs with uniforms, palette and time",
+      "source": "brainstorm",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FullScreenShaderScene.swift",
+          "symbol": "FullScreenShaderScene",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ShaderBundle.swift",
+          "symbol": "ShaderBundle",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreShaderSource/ShaderLibrary.swift",
+          "symbol": "ShaderLibrary",
+          "product": "VisualCoreShaderSource",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ShaderProgram.swift",
+          "symbol": "ShaderProgram",
+          "product": "VisualCoreRendering",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/GenerativeArtStudio/Experience/ArtSceneFactory.swift",
+        "symbol": "ArtSceneFactory"
+      },
+      "notes": "Used by A01-A05; vc/color, vc/noise, vc/palette, vc/hash, vc/field and vc/sdf include files ship in the VisualCoreRendering bundle."
+    },
+    {
+      "id": "M03",
+      "capability": "Post-processing: validated effect graph (bloom, blur, colour matrix, distort, feedback, composite) with a flash limiter",
+      "source": "brainstorm",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreEffects/EffectScene.swift",
+          "symbol": "EffectScene",
+          "product": "VisualCoreEffects",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreEffects/EffectRenderer.swift",
+          "symbol": "EffectRenderer",
+          "product": "VisualCoreEffects",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreEffectsGraph/EffectGraph.swift",
+          "symbol": "EffectGraphDescription",
+          "product": "VisualCoreEffectsGraph",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreEffectsGraph/PassSchemas.swift",
+          "symbol": "PassSchemas",
+          "product": "VisualCoreEffectsGraph",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreEffectsGraph/FlashLimiterModel.swift",
+          "symbol": "FlashLimiterModel",
+          "product": "VisualCoreEffectsGraph",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/GenerativeArtStudio/Experience/GenerativeArtPresenter.swift",
+        "symbol": "GenerativeArtPresenter"
+      },
+      "notes": "EffectScene wraps any RenderScene; tested by VisualCoreEffectsTests (PassPixelTests, EffectRendererTests). Beat-driven bloom/feedback parameters come through G-AUDIOMAP; Reduce Flashing inserts the flashLimit pass."
+    },
+    {
+      "id": "M04",
+      "capability": "Animation: tweens, timelines, easing and a scene clock with Reduce Motion",
+      "source": "brainstorm",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/Timeline.swift",
+          "symbol": "Timeline",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/Timeline.swift",
+          "symbol": "Tween",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/Easing.swift",
+          "symbol": "EasingCurve",
+          "product": "VisualCoreMath",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/Easing.swift",
+          "symbol": "ease",
+          "product": "VisualCoreMath",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/SceneClock.swift",
+          "symbol": "SceneClock",
+          "product": "VisualCoreSimulation",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Showcase/App/Scenes/AnimatedGeometryScene.swift",
+        "symbol": "AnimatedGeometryScene"
+      },
+      "notes": "Host-tested (VisualCoreSimulationTests, VisualCoreMathTests). Audio-time smoothing is not animation and belongs to G-AUDIODSP."
+    },
+    {
+      "id": "M05",
+      "capability": "Scene and preset management: parameter schemas, seeded presets, named library, scene switching",
+      "source": "brainstorm; journey 2, 3",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreParameters/Preset.swift",
+          "symbol": "Preset",
+          "product": "VisualCoreParameters",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreParameters/ParameterSchema.swift",
+          "symbol": "ParameterSchema",
+          "product": "VisualCoreParameters",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCorePersistence/NamedLibrary.swift",
+          "symbol": "NamedLibrary",
+          "product": "VisualCorePersistence",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+          "symbol": "RenderHost.replaceScene",
+          "product": "VisualCoreRendering",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/InfiniteGeometry/Experience/GeometryLibrary.swift",
+        "symbol": "GeometryLibrary"
+      },
+      "notes": "Preset values and palette are generic; a MusicPreset (scene, palette, mappings, schema version) is experience domain on top of these (A06-P04)."
+    },
+    {
+      "id": "M06",
+      "capability": "Microphone live input: AVAudioEngine input tap delivering PCM frames to a bounded buffer",
+      "source": "v0.1 feature 01; journey 1; manual section 6 algorithm 1",
+      "status": "upstream gap",
+      "evidence": [],
+      "example": {
+        "file": "Packages/VisualCoreRendering/Sources/VisualCoreAudio/Module.swift",
+        "symbol": "AudioInfo"
+      },
+      "notes": "VisualCoreAudio holds only AudioInfo.version; no audio capture exists in any VisualCore product (the closest consumer is the placeholder module itself). G-AUDIOSOURCE: a microphone source on public AVFAudio APIs behind the one source interface."
+    },
+    {
+      "id": "M07",
+      "capability": "Microphone permission gate: record-permission state, request, denied/restricted handling and an honest usage string",
+      "source": "v0.1 feature 01; journey 1",
+      "status": "upstream gap",
+      "evidence": [],
+      "example": {
+        "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/SystemAccessibilityObserver.swift",
+        "symbol": "SystemAccessibilityObserver"
+      },
+      "notes": "No permission model exists and NSMicrophoneUsageDescription is absent from project.yml (checked 2026-11-14). G-MICPERMISSION: a testable permission state machine in VisualCoreAudio (AVAudioApplication record permission); the usage string is added by A06-P01 and checked by app-usage-descriptions. The demo signal works without permission."
+    },
+    {
+      "id": "M08",
+      "capability": "Local file audio the app can legally decode: a user-chosen file decoded on device to PCM",
+      "source": "v0.1 feature 01; journey 1",
+      "status": "upstream gap",
+      "evidence": [],
+      "example": {
+        "file": "Packages/VisualCoreRendering/Sources/VisualCoreAudio/Module.swift",
+        "symbol": "AudioInfo"
+      },
+      "notes": "No decoding exists. G-FILESOURCE: an AVAudioFile-based file source (user-picked through the system document picker, security-scoped, read only, never copied off device) with bounded length, truncated/unsupported-format rejection, behind the same source interface. No bundled third-party music."
+    },
+    {
+      "id": "M09",
+      "capability": "Audio source interface: one protocol for microphone, file and demo with a common mono float format and sample rate",
+      "source": "manual section 4 AudioSourceController; section 6 AudioSource schema",
+      "status": "upstream gap",
+      "evidence": [],
+      "example": {
+        "file": "Packages/VisualCore/Sources/VisualCoreAudioDSP/Module.swift",
+        "symbol": "AudioDSPInfo"
+      },
+      "notes": "G-AUDIOSOURCE: AudioSource kind (microphone, localFile, demo), format negotiation, downmix to mono, start/stop, published status; pure parts (format, downmix) in VisualCoreAudioDSP, AVFAudio parts in VisualCoreAudio."
+    },
+    {
+      "id": "M10",
+      "capability": "Bounded PCM ring buffer: single-producer/single-consumer, no allocation or locks in the realtime callback",
+      "source": "manual section 6 algorithm 2; PCMBufferRing",
+      "status": "upstream gap",
+      "evidence": [],
+      "example": {
+        "file": "Packages/ExperiencesCreative/FluidArtPlayground/Core/SplatQueue.swift",
+        "symbol": "SplatQueue"
+      },
+      "notes": "No ring buffer exists (the closest consumer is A02's capped SplatQueue). G-RINGBUFFER: a fixed-capacity SPSC float ring in VisualCoreAudioDSP with overrun counting and a read-latest window, host-tested."
+    },
+    {
+      "id": "M11",
+      "capability": "RMS and peak levels per analysis window (linear and dBFS)",
+      "source": "v0.1 feature 02",
+      "status": "upstream gap",
+      "evidence": [],
+      "example": {
+        "file": "Packages/VisualCore/Sources/VisualCoreAudioDSP/Module.swift",
+        "symbol": "AudioDSPInfo"
+      },
+      "notes": "G-AUDIODSP: RMS, peak and dBFS with silence floor and NaN/Inf rejection."
+    },
+    {
+      "id": "M12",
+      "capability": "Windowed FFT spectrum and logarithmic band energies",
+      "source": "v0.1 feature 02; manual section 6 algorithm 2",
+      "status": "upstream gap",
+      "evidence": [],
+      "example": {
+        "file": "Packages/VisualCore/Sources/VisualCoreAudioDSP/Module.swift",
+        "symbol": "AudioDSPInfo"
+      },
+      "notes": "G-AUDIODSP: Hann-windowed real FFT (Accelerate vDSP, public API) of power-of-two size, magnitude spectrum and a configurable log-spaced band set, computed outside the realtime callback."
+    },
+    {
+      "id": "M13",
+      "capability": "Spectral flux, onset and smoothed beat-energy signals with attack/release smoothing",
+      "source": "v0.1 feature 02; manual section 6 algorithm 3; FeatureSmoother",
+      "status": "upstream gap",
+      "evidence": [],
+      "example": {
+        "file": "Packages/VisualCore/Sources/VisualCoreAudioDSP/Module.swift",
+        "symbol": "AudioDSPInfo"
+      },
+      "notes": "G-AUDIODSP: spectral flux, adaptive-threshold onset and beat energy, and a time-stamped attack/release smoother that is frame-rate independent."
+    },
+    {
+      "id": "M14",
+      "capability": "Silent demo signal: deterministic synthetic PCM for offline testing, clearly labelled, no audio output",
+      "source": "v0.1 feature 06; domain rule (label demo vs real input)",
+      "status": "upstream gap",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/SeededRandom.swift",
+          "symbol": "SeededRandom",
+          "product": "VisualCoreSimulation",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/VisualCore/Sources/VisualCoreAudioDSP/Module.swift",
+        "symbol": "AudioDSPInfo"
+      },
+      "notes": "SeededRandom gives determinism but no signal generator exists. G-DEMOSIGNAL: a seeded generator (tones, noise bursts, beat pattern) producing PCM through the source interface, never played to the speaker, identical frames for a seed."
+    },
+    {
+      "id": "M15",
+      "capability": "Audio interruption, route change and media-services reset recovery",
+      "source": "v0.1 feature 04; manual section 6 algorithm 1",
+      "status": "upstream gap",
+      "evidence": [],
+      "example": {
+        "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceSession.swift",
+        "symbol": "ExperienceSession"
+      },
+      "notes": "ExperienceSession handles scene phase and memory, not audio session events. G-INTERRUPTION: an interruption/route/reset state machine in VisualCoreAudio driven by AVAudioSession notifications, resuming only when allowed, falling back to the demo signal or a paused state with a message."
+    },
+    {
+      "id": "M16",
+      "capability": "Source/status indicator: active source, permission, live/demo/paused/interrupted label and level, announced to VoiceOver",
+      "source": "v0.1 feature 04",
+      "status": "requires adaptation",
+      "evidence": [
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/AccessibilityPlayers.swift",
+          "symbol": "AnnouncementSink",
+          "product": "VisualCoreUI",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/AccessibilityPlayers.swift",
+          "symbol": "SystemAnnouncementSink",
+          "product": "VisualCoreUI",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceHostView.swift",
+          "symbol": "SessionMessageView",
+          "product": "VisualCoreExperienceHost",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/VisualCoreRendering/Tests/VisualCoreUITests/AccessibilityPlayersTests.swift",
+        "symbol": "AccessibilityPlayersTests"
+      },
+      "notes": "Announcement and message views exist; the observable source status they would show does not. G-AUDIOSOURCE provides the status model; the indicator view and copy are experience-owned."
+    },
+    {
+      "id": "M17",
+      "capability": "Audio-to-parameter mapping: feature, gain, attack, release, clamp and target uniform, editable and persisted",
+      "source": "manual section 6 ReactiveMapping; AudioReactiveMapping; journey 3 calibrate gain",
+      "status": "upstream gap",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreParameters/ParameterSchema.swift",
+          "symbol": "ParameterDefinition",
+          "product": "VisualCoreParameters",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/GenerativeArtStudio/Core/FamilyCatalog.swift",
+        "symbol": "FamilyCatalog"
+      },
+      "notes": "G-AUDIOMAP: a Codable, validated ReactiveMapping in VisualCoreAudioDSP that maps a time-stamped feature to a ParameterDefinition's range at the frame boundary; reused by the other audio experiences (A07, A08)."
+    },
+    {
+      "id": "M18",
+      "capability": "Signal data in shaders: per-frame spectrum/waveform upload to a small texture sampled by a full-screen fragment program",
+      "source": "v0.1 feature 03; manual section 6 render stage 3, 4",
+      "status": "requires adaptation",
+      "evidence": [
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GPUObjects.swift",
+          "symbol": "Texture.upload",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
+          "symbol": "ResourceRegistry.makeTexture",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FullScreenShaderScene.swift",
+          "symbol": "FullScreenShaderScene",
+          "product": "VisualCoreRendering",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Showcase/App/Scenes/GradientTextureScene.swift",
+        "symbol": "GradientTextureScene"
+      },
+      "notes": "Textures can be created and uploaded, but FullScreenShaderScene binds no texture and ShaderProgram has no float-array setter. G-SIGNALTEXTURE: a full-screen scene input that uploads up to N float samples per frame (one row, linear filtering) and binds it as u_signal, rebuilt after context loss."
+    },
+    {
+      "id": "M19",
+      "capability": "Bars scene: spectrum bars drawn as batched 2D primitives",
+      "source": "v0.1 feature 03; journey 2",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/PrimitiveRenderer.swift",
+          "symbol": "PrimitiveRenderer",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/PrimitiveRenderer.swift",
+          "symbol": "PrimitiveRenderer.draw",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/SceneGraph.swift",
+          "symbol": "SceneNode",
+          "product": "VisualCoreScenes",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/SceneGraph.swift",
+          "symbol": "Primitive",
+          "product": "VisualCoreScenes",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/Camera2D.swift",
+          "symbol": "Camera2D",
+          "product": "VisualCoreMath",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/InfiniteGeometry/Experience/GeometryPresenter.swift",
+        "symbol": "GeometryPresenter"
+      },
+      "notes": "Rects in one batched draw (PrimitiveRendererTests); band values come from G-AUDIODSP."
+    },
+    {
+      "id": "M20",
+      "capability": "Waveform rings scene: closed waveform outlines around a centre",
+      "source": "v0.1 feature 03; journey 2",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/PrimitiveRenderer.swift",
+          "symbol": "PrimitiveRenderer",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/SceneGraph.swift",
+          "symbol": "Primitive",
+          "product": "VisualCoreScenes",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/SceneGraph.swift",
+          "symbol": "SceneNode",
+          "product": "VisualCoreScenes",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Showcase/App/Scenes/ParticleShowcaseScene.swift",
+        "symbol": "ParticleShowcaseScene"
+      },
+      "notes": "Line primitives (up to 256-point polygons) draw rings of waveform segments; a smoother shader variant uses G-SIGNALTEXTURE (M18)."
+    },
+    {
+      "id": "M21",
+      "capability": "3D-ish responsive geometry: depth-correct lit meshes transformed by mapped features",
+      "source": "v0.1 feature 03; journey 2",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/DepthMeshPass.swift",
+          "symbol": "DepthMeshPass",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/MeshRenderer.swift",
+          "symbol": "MeshRenderer",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/MeshGenerators.swift",
+          "symbol": "Mesh.uvSphere",
+          "product": "VisualCoreScenes",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/OrbitCamera.swift",
+          "symbol": "OrbitCamera",
+          "product": "VisualCoreMath",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/InfiniteGeometry/Experience/GeometryPresenter.swift",
+        "symbol": "GeometryPresenter"
+      },
+      "notes": "Closed by A05 (DepthMeshPassTests); per-item model matrix and colour carry the audio response; no per-frame mesh rebuild is needed."
+    },
+    {
+      "id": "M22",
+      "capability": "Presets and local persistence: versioned documents, named library, per-experience storage",
+      "source": "v0.1 feature 05; journey 3",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreParameters/Preset.swift",
+          "symbol": "Preset",
+          "product": "VisualCoreParameters",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCorePersistence/NamedLibrary.swift",
+          "symbol": "NamedLibrary",
+          "product": "VisualCorePersistence",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCorePersistence/DocumentStore.swift",
+          "symbol": "DocumentStore",
+          "product": "VisualCorePersistence",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift",
+          "symbol": "ExperienceStorage",
+          "product": "VisualCoreExperience",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreExperience/SavedStateStore.swift",
+          "symbol": "SavedStateStore",
+          "product": "VisualCoreExperience",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/FractalExplorer/Experience/FractalBookmarks.swift",
+        "symbol": "FractalBookmarks"
+      },
+      "notes": "Migrations, size caps and quarantine exist and are tested; no audio is ever persisted, only settings and mappings."
+    },
+    {
+      "id": "M23",
+      "capability": "Accessibility text metrics: level, band and beat values as text for VoiceOver and without animation or colour",
+      "source": "v0.1 feature 05; manual section 3 legibility rule",
+      "status": "requires adaptation",
+      "evidence": [
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/ParameterPanel.swift",
+          "symbol": "ParameterPanel",
+          "product": "VisualCoreUI",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/AccessibilityPlayers.swift",
+          "symbol": "AnnouncementSink",
+          "product": "VisualCoreUI",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/FractalExplorer/Core/FractalExplanations.swift",
+        "symbol": "FractalExplanations"
+      },
+      "notes": "Native labelled controls and announcements exist; the metric phrasing (rounded dBFS, band names, rate-limited announcements) is experience copy. G-A11YMETRICS (app-local)."
+    },
+    {
+      "id": "M24",
+      "capability": "Accessibility: Reduce Motion, Reduce Flashing (beat flashes limited), legible native controls",
+      "source": "manual section 3; constitution",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPreferences.swift",
+          "symbol": "AccessibilityPreferences",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/SystemAccessibilityObserver.swift",
+          "symbol": "SystemAccessibilityObserver",
+          "product": "VisualCoreUI",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/AccessibilitySettingsSection.swift",
+          "symbol": "AccessibilitySettingsSection",
+          "product": "VisualCoreUI",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreEffects/EffectScene.swift",
+          "symbol": "EffectScene.reduceFlashing",
+          "product": "VisualCoreEffects",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/GenerativeArtStudio/Experience/SceneScreen.swift",
+        "symbol": "AppAccessibility"
+      },
+      "notes": "Beat-driven brightness must pass through the flashLimit pass when Reduce Flashing is in force."
+    },
+    {
+      "id": "M25",
+      "capability": "Still export of the current scene",
+      "source": "cross-cutting (manual section 3 exporting state)",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+          "symbol": "RenderHost.renderOffscreen",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/StillCapture.swift",
+          "symbol": "StillCapture",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/ExportGeometry.swift",
+          "symbol": "ExportSize",
+          "product": "VisualCoreScenes",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceStill.swift",
+          "symbol": "ExperienceStillRenderer",
+          "product": "VisualCoreExperienceHost",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/InfiniteGeometry/Experience/GeometryExport.swift",
+        "symbol": "GeometryExport"
+      },
+      "notes": "Stills render the frozen feature values of the moment; no audio or video recording (later-stage idea, not MVP)."
+    },
+    {
+      "id": "M26",
+      "capability": "Render-quality tiers and automatic quality governor",
+      "source": "cross-cutting; manual section 6 frame budget",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/QualityProfile.swift",
+          "symbol": "QualityProfile",
+          "product": "VisualCoreDiagnostics",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/QualityGovernor.swift",
+          "symbol": "QualityGovernor",
+          "product": "VisualCoreDiagnostics",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/DeviceConditions.swift",
+          "symbol": "DeviceConditions",
+          "product": "VisualCoreDiagnostics",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceSession.swift",
+          "symbol": "ExperienceSession.qualityLevel",
+          "product": "VisualCoreExperienceHost",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/ParticleUniverse/Core/SceneQuality.swift",
+        "symbol": "SceneQuality"
+      },
+      "notes": "Tested in SessionQualityTests; render resolution and effect passes follow the level."
+    },
+    {
+      "id": "M27",
+      "capability": "Audio and render performance budget: analysis cost per frame, FFT size and band count by quality level, frame pacing",
+      "source": "manual section 6 frame budget; phase 05",
+      "status": "requires adaptation",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/PacingMeter.swift",
+          "symbol": "PacingMeter",
+          "product": "VisualCoreDiagnostics",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/QualityProfile.swift",
+          "symbol": "QualityLevel",
+          "product": "VisualCoreDiagnostics",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/FramePacing.swift",
+          "symbol": "FramePacing",
+          "product": "VisualCoreDiagnostics",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/ParticleUniverse/Core/FrameBudgetMonitor.swift",
+        "symbol": "FrameBudgetMonitor"
+      },
+      "notes": "Frame pacing and quality levels exist; nothing bounds analysis work or maps it to a level. G-AUDIOBUDGET: an analysis configuration (FFT size, hop, band count) per quality level with a measured per-window cost bound."
+    },
+    {
+      "id": "M28",
+      "capability": "Render host lifecycle: context loss, resize, background, memory warning",
+      "source": "manual section 6 rendering lifecycle; state transitions",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+          "symbol": "RenderHost",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+          "symbol": "RenderHost.recreateContext",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderScene.swift",
+          "symbol": "RenderScene",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
+          "symbol": "ResourceRegistry",
+          "product": "VisualCoreRendering",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/FractalExplorer/Experience/FractalScene.swift",
+        "symbol": "FractalScene"
+      },
+      "notes": "RenderHostTests and CleanupSweepTests; audio sources stop on background independently of GL (G-INTERRUPTION)."
+    },
+    {
+      "id": "M29",
+      "capability": "Hosting as an experience of the one app (session open/suspend/resume/close, scene phase, memory)",
+      "source": "ADR-0009; manual section 4 architecture",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceShell.swift",
+          "symbol": "ExperienceShell",
+          "product": "VisualCoreExperienceHost",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceSession.swift",
+          "symbol": "ExperienceSession",
+          "product": "VisualCoreExperienceHost",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceSession.swift",
+          "symbol": "ExperienceSession.handleMemoryWarning",
+          "product": "VisualCoreExperienceHost",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperiencePresenter.swift",
+          "symbol": "ExperiencePresenter",
+          "product": "VisualCoreExperienceHost",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceCore.swift",
+          "symbol": "ExperienceCore",
+          "product": "VisualCoreExperience",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/FractalExplorer/Experience/FractalExperience.swift",
+        "symbol": "FractalExperience"
+      },
+      "notes": "A06 registers in A06-P01 with its four targets in Packages/ExperiencesAudio."
+    }
+  ],
+  "gaps": [
+    {
+      "id": "G-AUDIOSOURCE",
+      "matrix": [
+        "M06",
+        "M09",
+        "M16"
+      ],
+      "kind": "upstream",
+      "owner": "VisualCore:VisualCoreAudio",
+      "phase": 1,
+      "test": "Host tests of the pure format/downmix part (VisualCoreAudioDSP) and simulator tests of the source state machine with an injected engine: start/stop/restart, status transitions idle -> running -> stopped/failed, mono downmix of stereo frames, demo and microphone behind the same interface; no allocation in the tap closure (measured with an allocation counter in tests)",
+      "justification": "Found in A06-P00: VisualCoreAudio holds only AudioInfo.version; every audio experience (A06-A08) needs the same source interface and status."
+    },
+    {
+      "id": "G-MICPERMISSION",
+      "matrix": [
+        "M07"
+      ],
+      "kind": "upstream",
+      "owner": "VisualCore:VisualCoreAudio",
+      "phase": 1,
+      "test": "Unit tests with an injected permission provider: undetermined -> granted/denied, denied never starts capture and offers the demo signal, a revoked permission stops a running source; app-usage-descriptions passes with NSMicrophoneUsageDescription present",
+      "justification": "Found in A06-P00: no permission model and no usage string exist; the gate is generic for microphone-using experiences."
+    },
+    {
+      "id": "G-FILESOURCE",
+      "matrix": [
+        "M08"
+      ],
+      "kind": "upstream",
+      "owner": "VisualCore:VisualCoreAudio",
+      "phase": 1,
+      "test": "Simulator tests with generated fixture files written at test time: decodes PCM of the expected length and rate, rejects truncated, empty, oversize and unsupported files with a typed error, stops at end of file and loops on request",
+      "justification": "Found in A06-P00: no decoding exists; file input is shared with the other audio experiences."
+    },
+    {
+      "id": "G-RINGBUFFER",
+      "matrix": [
+        "M10"
+      ],
+      "kind": "upstream",
+      "owner": "VisualCore:VisualCoreAudioDSP",
+      "phase": 1,
+      "test": "Host tests: FIFO order across wrap-around, overrun drops oldest and counts it, read-latest window of N samples, concurrent producer/consumer stress of a bounded number of iterations without loss beyond counted overruns, capacity validation",
+      "justification": "Found in A06-P00: no realtime-safe buffer exists; any audio analysis needs one."
+    },
+    {
+      "id": "G-DEMOSIGNAL",
+      "matrix": [
+        "M14"
+      ],
+      "kind": "upstream",
+      "owner": "VisualCore:VisualCoreAudioDSP",
+      "phase": 1,
+      "test": "Host tests: identical samples for one seed, different for another, bounded amplitude, known RMS of the tone part and beat positions detectable by G-AUDIODSP; never routed to audio output (no output node in the graph)",
+      "justification": "Found in A06-P00: offline/permission-free use and deterministic fixtures need a generator in the DSP product."
+    },
+    {
+      "id": "G-AUDIODSP",
+      "matrix": [
+        "M11",
+        "M12",
+        "M13"
+      ],
+      "kind": "upstream",
+      "owner": "VisualCore:VisualCoreAudioDSP",
+      "phase": 2,
+      "test": "Host fixture tests: RMS/peak of sine, square and silence within 1e-6; FFT of a pure tone peaks in the expected bin with Hann leakage bounds; band energies sum consistently; onset detected on synthetic clicks within one hop; smoother attack/release time constants independent of frame rate; NaN/Inf input rejected",
+      "justification": "Found in A06-P00: VisualCoreAudioDSP holds only AudioDSPInfo.version; analysis is generic for all audio experiences (Accelerate vDSP is a public API)."
+    },
+    {
+      "id": "G-AUDIOMAP",
+      "matrix": [
+        "M01",
+        "M17"
+      ],
+      "kind": "upstream",
+      "owner": "VisualCore:VisualCoreAudioDSP",
+      "phase": 3,
+      "test": "Host tests: mapping applies gain, attack, release and clamp into a ParameterDefinition range, rejects unknown features and non-finite values, Codable round trip with schema version, deterministic output for a recorded feature sequence",
+      "justification": "Found in A06-P00: no feature-to-parameter binding exists; the mapping is reusable by A07 and A08."
+    },
+    {
+      "id": "G-SIGNALTEXTURE",
+      "matrix": [
+        "M18"
+      ],
+      "kind": "adaptation",
+      "owner": "VisualCore:VisualCoreRendering",
+      "phase": 3,
+      "test": "Simulator tests: a full-screen program samples an uploaded ramp signal and offscreen pixels match within a stated tolerance; per-frame upload reuses one texture; context recreation rebuilds it with no stale handle",
+      "justification": "Found in A06-P00: FullScreenShaderScene binds no texture; signal-driven shaders are generic for audio and data experiences."
+    },
+    {
+      "id": "G-INTERRUPTION",
+      "matrix": [
+        "M15"
+      ],
+      "kind": "upstream",
+      "owner": "VisualCore:VisualCoreAudio",
+      "phase": 4,
+      "test": "Unit tests with injected session notifications: interruption began pauses the source and marks status interrupted, ended with shouldResume resumes, route change (headphones removed) and media-services reset rebuild the engine, background stops capture; no crash or stuck state across a scripted sequence",
+      "justification": "Found in A06-P00: ExperienceSession knows scene phase but not audio session events; every audio experience needs the same recovery."
+    },
+    {
+      "id": "G-A11YMETRICS",
+      "matrix": [
+        "M23"
+      ],
+      "kind": "adaptation",
+      "owner": "app-local",
+      "phase": 5,
+      "test": "Core tests: metric text for given features (rounded dBFS, dominant band name, beat yes/no) and rate-limited announcements; UI test that the metrics are exposed as accessibility values without animation",
+      "justification": "Phrasing of level, band and beat text is experience copy over VisualCore's AnnouncementSink and native controls; nothing generic is missing."
+    },
+    {
+      "id": "G-AUDIOBUDGET",
+      "matrix": [
+        "M27"
+      ],
+      "kind": "adaptation",
+      "owner": "VisualCore:VisualCoreAudioDSP",
+      "phase": 5,
+      "test": "Host tests: each quality level maps to a valid analysis configuration; a short measured run of the analysis per window stays within the stated per-window bound (asserted locally, extrapolated on CI)",
+      "justification": "Found in A06-P00: quality levels and pacing exist but analysis cost is unbounded and not tied to a level."
+    }
+  ],
+  "traceability": [
+    {
+      "item": "brainstorm: audio-reactive parameters",
+      "matrix": [
+        "M01",
+        "M17",
+        "M11",
+        "M12",
+        "M13"
+      ],
+      "phases": [
+        2,
+        3
+      ]
+    },
+    {
+      "item": "brainstorm: shader effects",
+      "matrix": [
+        "M02",
+        "M18"
+      ],
+      "phases": [
+        3
+      ]
+    },
+    {
+      "item": "brainstorm: post-processing",
+      "matrix": [
+        "M03",
+        "M24"
+      ],
+      "phases": [
+        3,
+        5
+      ]
+    },
+    {
+      "item": "brainstorm: animation",
+      "matrix": [
+        "M04",
+        "M13"
+      ],
+      "phases": [
+        2,
+        3
+      ]
+    },
+    {
+      "item": "brainstorm: scene and preset management",
+      "matrix": [
+        "M05",
+        "M22"
+      ],
+      "phases": [
+        3,
+        4
+      ]
+    },
+    {
+      "item": "v0.1 feature 01 - microphone permission-gated live input and local file audio",
+      "matrix": [
+        "M06",
+        "M07",
+        "M08",
+        "M09",
+        "M10"
+      ],
+      "phases": [
+        1
+      ]
+    },
+    {
+      "item": "v0.1 feature 02 - RMS, peak, FFT spectrum and smoothed beat energy",
+      "matrix": [
+        "M11",
+        "M12",
+        "M13",
+        "M01"
+      ],
+      "phases": [
+        2
+      ]
+    },
+    {
+      "item": "v0.1 feature 03 - three scenes: bars, waveform rings, 3D-ish responsive geometry",
+      "matrix": [
+        "M19",
+        "M20",
+        "M21",
+        "M18",
+        "M17"
+      ],
+      "phases": [
+        3
+      ]
+    },
+    {
+      "item": "v0.1 feature 04 - source/status indicator and audio-interruption recovery",
+      "matrix": [
+        "M16",
+        "M15"
+      ],
+      "phases": [
+        1,
+        4
+      ]
+    },
+    {
+      "item": "v0.1 feature 05 - parameter presets, local persistence and accessibility text metrics",
+      "matrix": [
+        "M05",
+        "M22",
+        "M23",
+        "M24"
+      ],
+      "phases": [
+        4,
+        5
+      ]
+    },
+    {
+      "item": "v0.1 feature 06 - silent demo signal for offline testing",
+      "matrix": [
+        "M14"
+      ],
+      "phases": [
+        1
+      ]
+    },
+    {
+      "item": "cross-cutting: still export, quality tiers, performance budget, lifecycle, one-app hosting",
+      "matrix": [
+        "M25",
+        "M26",
+        "M27",
+        "M28",
+        "M29"
+      ],
+      "phases": [
+        1,
+        5,
+        6
+      ]
+    }
+  ],
+  "negative": [
+    {
+      "rule": "No EGL display, context, surface or GL path of its own and no second renderer; all drawing goes through VisualCore's RenderHost on OpenGL ES -> ANGLE -> Metal",
+      "source": "manual rendering invariant; constitution; CLAUDE.md rule 4"
+    },
+    {
+      "rule": "No ProjectM types, engine or presets and no MilkDrop/ProjectM engine code reused as the implementation; the experience is not a ProjectM clone",
+      "source": "manual section 2 explicit non-goals; section 4 ownership policy; CLAUDE.md rule 12"
+    },
+    {
+      "rule": "No networking, accounts, analytics, tracking or advertising; microphone and file audio are processed in memory on the device and never recorded, uploaded or persisted",
+      "source": "manual section 2 explicit non-goals; section 3; CLAUDE.md rule 3"
+    },
+    {
+      "rule": "No capture of other apps' or system audio (for example streaming services); only the microphone, user-chosen local files and the demo signal through public Apple APIs",
+      "source": "manual section 2 explicit non-goals; domain-specific engineering rule; CLAUDE.md rule 12"
+    },
+    {
+      "rule": "No measurement, calibration, hearing or health claims: levels and spectra are artistic visualisations, not a sound level meter",
+      "source": "manual section 1 product hypothesis; spec FR-A06-006"
+    },
+    {
+      "rule": "The demo signal is always labelled as demo and never presented as live input; it is never played to the speaker",
+      "source": "manual domain-specific engineering rule; v0.1 feature 06"
+    },
+    {
+      "rule": "No bundled third-party music or purchased/generated media; visuals are code",
+      "source": "CLAUDE.md rule 4; manual section 5 file creation policy"
+    },
+    {
+      "rule": "No fork or copy of VisualCore, ANGLE or projectm-ios and no standalone app target; generic audio needs become VisualCore gaps",
+      "source": "ADR-0009; manual section 5; CLAUDE.md rule 1"
+    }
+  ],
+  "decision": {
+    "result": "go",
+    "reasons": [
+      "The render host, shader path, effects graph, animation, presets, persistence, export, quality and accessibility exist with tests: 13 of 29 rows are available, and the three scenes can be drawn with PrimitiveRenderer and DepthMeshPass today.",
+      "Audio is buildable inside VisualCore's planned products on public APIs (AVFAudio/AVFoundation for sources, permission and session events; Accelerate vDSP for the FFT): VisualCoreAudio already links AVFAudio and VisualCoreAudioDSP is a pure, host-testable target, so no second backend, fork, private API or networking is needed.",
+      "All eleven gaps are additive and owned: G-AUDIOSOURCE, G-MICPERMISSION, G-FILESOURCE (VisualCoreAudio, P01), G-RINGBUFFER and G-DEMOSIGNAL (VisualCoreAudioDSP, P01), G-AUDIODSP (P02), G-AUDIOMAP and G-SIGNALTEXTURE (P03), G-INTERRUPTION (P04), G-AUDIOBUDGET and the app-local G-A11YMETRICS (P05).",
+      "VisualCore Music Lab stays unregistered until A06-P01 creates Packages/ExperiencesAudio with its four targets and real domain rules, so the experience package check and the one app are unchanged.",
+      "A06-P01 starts with G-RINGBUFFER, G-DEMOSIGNAL and the source interface, so the permission-free demo path works before the microphone path."
+    ],
+    "blockers": []
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_app_contract.py",
+    "--app",
+    "visualcore-music-lab"
+  ],
+  "command": "python3 scripts/check_app_contract.py --app visualcore-music-lab",
+  "elapsed_seconds": 0.04,
+  "exit_code": 0,
+  "finished": "2026-11-14T06:46:39+00:00",
+  "log": ".autonomy/logs/A06-P00.contract.log",
+  "log_sha256": "2f897ded49d4df6f63e07ec2b063ed6fbe162b6aa688088f118e2ced0471ce8a",
+  "name": "contract",
+  "stage": "A06-P00",
+  "started": "2026-11-14T06:46:39+00:00",
+  "timed_out": false
+}
