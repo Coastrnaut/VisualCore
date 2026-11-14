@@ -23,6 +23,30 @@ Canonical overrides:
 - **Owner rulings of 2026-11-13:** short tests; audits wait for the device campaign; parallel agents; no wall-clock
   assertions on CI runners.
 
+## Clarifications
+
+### Session 2026-11-13
+
+Answered autonomously under the owner's standing delegation, recommended option each time. Facts checked in code:
+`FullScreenShaderScene` binds `u_resolution`, `u_palette[8]`/`u_paletteCount`, `u_seed` and one float `u_<name>` per
+entry of `parameters` (no arrays or vectors otherwise); `ShaderHashParityTests` is the existing pattern for a GPU/CPU
+parity test; `Camera2D` zoom is clamped to 0.1…100 and `OrbitCamera` pitch to ±89° with no pan or reset.
+
+- Q: How does the motif reach the shader? → A: As named floats — `u_order`, `u_repeats`, `u_scale`, `u_count` (3–7) and
+  `u_p0x`…`u_p6y` for the motif points — plus the camera's `u_centerX`, `u_centerY`, `u_zoom`; colours through the
+  palette binding. No new uniform kinds are needed in the framework.
+- Q: How is the shader fold compared with the CPU fold? → A: A simulator test renders, for a 16 × 16 grid of points, the
+  GPU-folded point encoded in the colour channels (coordinates mapped from −1…1 to 0…255) and compares with
+  `PointGroup.fold` within one step (1/255 of the range), as `ShaderHashParityTests` does for the hash.
+- Q: What exactly bounds the 2D view? → A: Zoom 0.5…8 relative to the preset's fit; the view centre stays within the
+  composition's extent (the square ±1/scale); clamping happens in the domain action, so the state never holds an
+  out-of-bounds camera.
+- Q: How do gestures map to actions? → A: One-finger drag → `camera.pan` (screen points converted to world units by the
+  fit); pinch → `camera.zoom` (the pinch factor); on the 3D composition a one-finger drag → `camera.orbit` (0.01 rad per
+  point) and pinch → distance; double tap → `camera.reset`. Buttons: pan arrows, zoom in/out, orbit arrows, reset.
+- Q: How tolerant are the symmetry probes? → A: Points within 1 pixel of a mirror line are excluded; colours match
+  within 2/255 per channel; at least 95% of 64 pairs per order must match (SC-A05-201).
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - A crisp kaleidoscope drawn by the GPU (Priority: P1) 🎯
