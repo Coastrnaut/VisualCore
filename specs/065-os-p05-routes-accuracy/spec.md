@@ -22,6 +22,38 @@ Canonical overrides:
 - **Owner rulings:** short tests; system accessibility audits and all device measurements wait for the device
   campaign; iOS 27 at phase gates; reference regression at X-A08; every Spec Kit step runs.
 
+## Clarifications
+
+### Session 2026-11-14
+
+Answered autonomously under the owner's standing delegation, recommended option each time. Facts checked in code:
+`MicrophoneAudioSource` (VisualCoreAudio) mixes to mono and builds its capture through the internal `MicrophoneCapture`
+seam (`SystemMicrophoneCapture` holds session, engine and tap; tests inject a double), listens to session events through
+`AudioSessionEventMonitor` and uses `MicrophonePermission`; `AnnouncementSink` lives in VisualCoreUI; Audio Odyssey's
+`JourneyAnnouncer` paces announcements at 1.5 s; the host passes a quality tier to `draw(_:tier:context:frame:)` and a
+core declares its levels with `qualityTiers` (default 1, which X-A07 showed hides the levels).
+
+- Q: How is the two-channel microphone built without disturbing the mono one? → A: A new
+  `StereoMicrophoneAudioSource: StereoAudioSource` in VisualCoreAudio with its own internal seam
+  `StereoMicrophoneCapture` (start into a `StereoSampleBuffer`, returning sample rate and channel count; stop);
+  `SystemStereoMicrophoneCapture` uses the mono source's session category, mode and options and taps the input node,
+  keeping channels 0 and 1 (or duplicating channel 0 with channel count 1); permission, interruption and route-change
+  handling follow `MicrophoneAudioSource` (same states, `ResumableAudioSource`-style resume); `MicrophoneAudioSource`
+  is unchanged.
+- Q: Which cases does the accuracy audit cover? → A: Sine at 100 Hz, 440 Hz, 1 kHz, 5 kHz; square at 440 Hz and
+  1 kHz; the sweep at 0.5 s, 1 s and 1.5 s — each through acquisition (stereo buffer from the demo generator), trigger,
+  window, cursors (period within one sample), spectrum readout (one bin, 1.5 dB; square: fundamental and ±0.50 of full
+  scale) and readout wording; results written as an `AccuracyReport` (case, expected, measured, tolerance, pass).
+- Q: What do the quality levels change? → A: `ScopeQuality` levels 0/1/2: column share 1, ½, ¼ of the pixel columns and
+  spectrum analysis every 1, 2, 4 frames (the last readout is kept in between); `ScopeCore.qualityTiers = 3`; the
+  registration's `quality_tiers` become `level-0`, `level-1`, `level-2`; a forced level for tests; digests unchanged.
+- Q: What is announced and when? → A: `ScopeAnnouncer` (as `JourneyAnnouncer`, 1.5 s minimum interval, only while
+  VoiceOver runs): announces view changes, freeze and unfreeze, trigger lost or regained, clipping start and end, and
+  the channel count after a route change; the description builder covers each view and state.
+- Q: Where are route and latency limits recorded? → A: In a new `docs/apps/oscilloscope-studio/device-campaign.md`
+  section list started here (stereo routes, input latency, sample rates, thermal) with result "pending", completed and
+  extended in A08-P06; known limitations gain the device-only items.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Readouts that match the known signal (Priority: P1) 🎯
