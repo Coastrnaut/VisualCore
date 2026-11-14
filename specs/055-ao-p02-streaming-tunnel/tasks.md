@@ -26,7 +26,7 @@
 
 ## Phase 5: Polish & evidence
 
-- [ ] T-A07-208 Scenes host tests (`python3 Tools/python/desktop_runbook.py run-check --stage A07-P02 --timeout 600 --name scenes-host -- swift test --package-path Packages/VisualCore --filter "SegmentWindowTests|SlotPoolTests"`)
+- [X] T-A07-208 Scenes host tests (`python3 Tools/python/desktop_runbook.py run-check --stage A07-P02 --timeout 600 --name scenes-host -- swift test --package-path Packages/VisualCore --filter "SegmentWindowTests|SlotPoolTests"`) — Verified 2026-11-14: Verified 2026-11-14: .autonomy/checks/A07-P02.scenes-host.json exit 0 (12 tests; sources unchanged since)
 - [ ] T-A07-209 Rendering tests on sim-27.2 (`python3 Tools/python/desktop_runbook.py run-check --stage A07-P02 --timeout 600 --name rendering-ios27 -- python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --only-testing VisualCoreRenderingTests/MeshFogTests VisualCoreRenderingTests/DepthMeshPassTests`)
 - [ ] T-A07-210 Audio Odyssey tests on sim-27.2 (`python3 Tools/python/desktop_runbook.py run-check --stage A07-P02 --timeout 600 --name odyssey-ios27 -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing AudioOdysseyCoreTests AudioOdysseyExperienceTests`)
 - [ ] T-A07-211 App build and unit (`python3 Tools/python/desktop_runbook.py run-check --stage A07-P02 --timeout 600 --name app-unit -- python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27`)

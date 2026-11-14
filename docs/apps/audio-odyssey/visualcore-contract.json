@@ -106,7 +106,7 @@
       "id": "M01",
       "capability": "3D scene rendering: depth-correct, lit procedural meshes drawn through the journey's camera",
       "source": "brainstorm: 3D scene rendering; v0.1 feature 01",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/DepthMeshPass.swift",
@@ -115,8 +115,8 @@
           "public": true
         },
         {
-          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/DepthMeshPass.swift",
-          "symbol": "DepthMeshPass.draw",
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/MeshFog.swift",
+          "symbol": "MeshFog",
           "product": "VisualCoreRendering",
           "public": true
         },
@@ -125,19 +125,13 @@
           "symbol": "MeshRenderer",
           "product": "VisualCoreRendering",
           "public": true
-        },
-        {
-          "file": "Packages/VisualCore/Sources/VisualCoreMath/Matrix.swift",
-          "symbol": "Mat4.lookAt",
-          "product": "VisualCoreMath",
-          "public": true
         }
       ],
       "example": {
-        "file": "Packages/ExperiencesCreative/InfiniteGeometry/Experience/GeometryPresenter.swift",
-        "symbol": "GeometryPresenter"
+        "file": "Packages/ExperiencesCreative/AudioOdyssey/Experience/OdysseyPresenter.swift",
+        "symbol": "OdysseyPresenter"
       },
-      "notes": "DepthMeshPass and MeshRenderer are public and tested (depth occlusion, Lambert lighting, resize and context generation), but draw(...) takes only an OrbitCamera; a rail camera needs a draw through an arbitrary view and projection matrix (Mat4.lookAt/perspective exist). G-RAILDRAW, A07-P02."
+      "notes": "DepthMeshPass and MeshRenderer are public and tested (depth occlusion, Lambert lighting, resize and context generation), but draw(...) takes only an OrbitCamera; a rail camera needs a draw through an arbitrary view and projection matrix (Mat4.lookAt/perspective exist). G-RAILDRAW, A07-P02. Built in A07-P02."
     },
     {
       "id": "M02",
@@ -285,51 +279,51 @@
       "id": "M06",
       "capability": "Streaming tunnel/terrain segments: generate segments ahead of the camera, retire them behind it, bounded segment pool with no per-frame allocation, deterministic per seed and segment index",
       "source": "brainstorm: procedural environments; v0.1 feature 01; manual section 6 algorithm 1",
-      "status": "upstream gap",
+      "status": "available",
       "evidence": [
         {
-          "file": "Packages/VisualCore/Sources/VisualCoreScenes/MeshCache.swift",
-          "symbol": "MeshCache",
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/SegmentWindow.swift",
+          "symbol": "SegmentWindow",
           "product": "VisualCoreScenes",
           "public": true
         },
         {
-          "file": "Packages/VisualCore/Sources/VisualCoreScenes/MeshShapes.swift",
-          "symbol": "Mesh.tube",
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/SlotPool.swift",
+          "symbol": "SlotPool",
           "product": "VisualCoreScenes",
           "public": true
         }
       ],
       "example": {
-        "file": "Packages/ExperiencesCreative/InfiniteGeometry/Core/Composition.swift",
-        "symbol": "Composition"
+        "file": "Packages/ExperiencesCreative/AudioOdyssey/Experience/OdysseyPresenter.swift",
+        "symbol": "OdysseyPresenter"
       },
-      "notes": "MeshCache is a bounded LRU cache of whole meshes, not a streaming window keyed by distance. G-SEGMENTSTREAM: SegmentStream (window, pool, seed per index) in VisualCoreScenes, drawn through VisualCoreRendering, A07-P02."
+      "notes": "MeshCache is a bounded LRU cache of whole meshes, not a streaming window keyed by distance. G-SEGMENTSTREAM: SegmentStream (window, pool, seed per index) in VisualCoreScenes, drawn through VisualCoreRendering, A07-P02. Built in A07-P02."
     },
     {
       "id": "M07",
       "capability": "Depth fog and horizon: distance fog blended to the clear colour so streamed segments appear without popping",
       "source": "manual section 6 render stage 4; v0.1 feature 01",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
-          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/MeshRenderer.swift",
-          "symbol": "MeshRenderer",
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/MeshFog.swift",
+          "symbol": "MeshFog",
           "product": "VisualCoreRendering",
           "public": true
         },
         {
           "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/DepthMeshPass.swift",
-          "symbol": "DepthMeshPass.clearColor",
+          "symbol": "DepthMeshPass",
           "product": "VisualCoreRendering",
           "public": true
         }
       ],
       "example": {
-        "file": "Packages/ExperiencesCreative/InfiniteGeometry/Experience/GeometryPresenter.swift",
-        "symbol": "GeometryPresenter"
+        "file": "Packages/ExperiencesCreative/AudioOdyssey/Experience/OdysseyPresenter.swift",
+        "symbol": "OdysseyPresenter"
       },
-      "notes": "MeshRenderer's fragment program has no fog term; DepthMeshPass has a clear colour. G-RAILDRAW adds linear depth fog (near, far, colour) with the view-matrix draw, A07-P02."
+      "notes": "MeshRenderer's fragment program has no fog term; DepthMeshPass has a clear colour. G-RAILDRAW adds linear depth fog (near, far, colour) with the view-matrix draw, A07-P02. Built in A07-P02."
     },
     {
       "id": "M08",
@@ -907,7 +901,7 @@
       "phase": 2,
       "test": "Simulator tests: DepthMeshPass and MeshRenderer draw through a view and projection matrix with pixels equal to the OrbitCamera path for the same matrices, linear depth fog reaches the fog colour at the far distance, existing OrbitCamera callers unchanged (API baseline additive)",
       "justification": "Found in A07-P00: DepthMeshPass.draw and MeshRenderer.draw accept only an OrbitCamera and have no fog term.",
-      "closed": null
+      "closed": "A07-P02"
     },
     {
       "id": "G-SEGMENTSTREAM",
@@ -919,7 +913,7 @@
       "phase": 2,
       "test": "Host tests: the window holds segments from distance d - behind to d + ahead, segments retire behind the camera and return to a bounded pool, the pool never grows past its capacity, segment index plus seed gives an identical mesh digest, no allocation in the steady-state advance (counted in tests); drawing through VisualCoreRendering covered by G-RAILDRAW",
       "justification": "Found in A07-P00: MeshCache is an LRU of whole meshes; no streaming window exists.",
-      "closed": null
+      "closed": "A07-P02"
     },
     {
       "id": "G-JOURNEYA11Y",

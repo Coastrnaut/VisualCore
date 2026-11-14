@@ -8,7 +8,7 @@ iOS 26+ inside apps. The package map and dependency rules R1–R5 are in
 |---|---|
 | VisualCoreMath | vectors, matrices, quaternions, cameras, double-precision plane viewports (PlaneViewport) and size-independent framings (PlaneFraming), log-scale framing flights and tour timelines (FramingFlight, TourTimeline), precision advice (PrecisionAdvisor), easing, camera rails with comfort limits (CameraRail, RailPose, ComfortLimits, RailFlight) and origin rebasing for long journeys (OriginRebase) |
 | VisualCoreSimulation | fixed-step clock, seeded RNG, timelines, particle pool, NaN guard, CPU field grids, storage precision, time-step policy |
-| VisualCoreScenes | input mapping, pointer tracking and velocity, seeded synthetic gesture scripts, mesh generators, export geometry |
+| VisualCoreScenes | input mapping, pointer tracking and velocity, seeded synthetic gesture scripts, mesh generators, export geometry, streaming piece windows (SegmentWindow) and fixed-size slot pools (SlotPool) |
 | VisualCoreShaderSource | shader library, includes, line maps, diagnostics parsing |
 | VisualCoreEffectsGraph | effect DAG model, validation, quotas, flash-limiter model |
 | VisualCoreDiagnostics | render lifecycle state machine, frame statistics, reports, relative render-cost estimates (RenderCostEstimate); `TessellationChoice` — segments from a quality tier's share, monotonic, optionally fitted to a mesh budget (feature 044, A05-P05) |
