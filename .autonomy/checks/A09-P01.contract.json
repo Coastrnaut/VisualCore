@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_app_contract.py",
+    "--app",
+    "digital-aquarium",
+    "--render"
+  ],
+  "command": "python3 scripts/check_app_contract.py --app digital-aquarium --render",
+  "elapsed_seconds": 0.231,
+  "exit_code": 0,
+  "finished": "2026-11-14T20:31:35+00:00",
+  "log": ".autonomy/logs/A09-P01.contract.log",
+  "log_sha256": "108e3fdb4b23f3a123e64bad19823af09325b4e3785f3319ecfb606329026f2c",
+  "name": "contract",
+  "stage": "A09-P01",
+  "started": "2026-11-14T20:31:35+00:00",
+  "timed_out": false
+}

@@ -450,7 +450,7 @@
       "id": "M09",
       "capability": "One complete aquarium with two fish species and plants: a habitat document (tank bounds, seed, species catalog of two procedural species with counts, plant and decor placements, lighting) built deterministically from its seed",
       "source": "v0.1 feature 01; manual P01 habitat model",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCore/Sources/VisualCoreScenes/SceneGraph.swift",
@@ -472,10 +472,10 @@
         }
       ],
       "example": {
-        "file": "Packages/ExperiencesCreative/ParticleUniverse/Core/SceneDocument.swift",
-        "symbol": "SceneDocument"
+        "file": "Packages/ExperiencesCreative/DigitalAquarium/Core/HabitatDocument.swift",
+        "symbol": "HabitatDocument"
       },
-      "notes": "Shapes, seeds and palettes exist; the habitat schema, the two species and their limits are Digital Aquarium's domain, as Particle Universe's SceneDocument is A04's. G-HABITAT (app-local), A09-P01."
+      "notes": "Shapes, seeds and palettes exist; the habitat schema, the two species and their limits are Digital Aquarium's domain, as Particle Universe's SceneDocument is A04's. G-HABITAT (app-local), A09-P01. Built in A09-P01 (app-local): HabitatDocument schema 1 (tank 16 × 9, swim bounds, fish, plants, decor, lighting) built by HabitatDocument.starter from SpeciesCatalog.bundled (four species, four plant kinds, two starter habitats Reef and Kelp with two species each) and a SeededRandom; AquariumSimulation keeps every fish inside the bounds (HabitatDocumentTests, SpeciesCatalogTests, AquariumSimulationTests: 10,000 steps × 20 seeds)."
     },
     {
       "id": "M10",
@@ -869,7 +869,7 @@
       "id": "M20",
       "capability": "Licenses and provenance: every species definition, palette, preset habitat and shader bundled later records its author and license (original content only), and third-party notices appear in the app's acknowledgements",
       "source": "cross-cutting: licenses/provenance; manual risk asset licensing; manual P01 content license audit; spec FR-A09-006",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/AcknowledgementsView.swift",
@@ -885,10 +885,10 @@
         }
       ],
       "example": {
-        "file": "Apps/VisualCore/App/AboutView.swift",
-        "symbol": "AboutView"
+        "file": "Packages/ExperiencesCreative/DigitalAquarium/Core/LicenseAudit.swift",
+        "symbol": "LicenseAudit"
       },
-      "notes": "LicenseInventory and AcknowledgementsView cover third-party notices (scripts/check_licenses.py audits the built app); per-content author and license fields for species, palettes, preset habitats and shaders do not exist and belong to the habitat document. G-HABITAT (app-local), A09-P01."
+      "notes": "LicenseInventory and AcknowledgementsView cover third-party notices (scripts/check_licenses.py audits the built app); per-content author and license fields for species, palettes, preset habitats and shaders do not exist and belong to the habitat document. G-HABITAT (app-local), A09-P01. Built in A09-P01 (app-local): every species, plant and starter habitat carries author and license (allowed: MIT, VisualCore project); CatalogDecoder refuses missing or unsupported licenses; LicenseAudit generates docs/apps/digital-aquarium/content-licenses.md, which a test keeps equal to the catalog (LicenseAuditTests)."
     }
   ],
   "gaps": [
@@ -903,7 +903,7 @@
       "justification": "The habitat document, the two-species catalog and each content item's author and license are Digital Aquarium's domain (manual P01 habitat model and content license audit); shapes, seeds, palettes and persistence come from VisualCore.",
       "phase": 1,
       "test": "Host tests: the habitat document round-trips (format 1) and rejects out-of-range counts, bounds and non-finite values; the same seed builds the same habitat digest; the catalog holds exactly two species with plants; every species, palette and preset habitat records an author and a license and the license audit fails on a missing one",
-      "closed": null
+      "closed": "A09-P01"
     },
     {
       "id": "G-STEERING",
