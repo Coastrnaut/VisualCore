@@ -32,7 +32,7 @@
 - [X] T-A06-514 Runner iOS 27 (`python3 Tools/python/desktop_runbook.py run-check --stage A06-P05 --timeout 600 --name verify-27 -- python3 scripts/verify_experiences.py --only a06.visualcore-music-lab --runtime 27`) — Verified 2026-11-14: — Verified 2026-11-14: .autonomy/checks/A06-P05.verify-27.json (0 failures)
 - [X] T-A06-515 Public API and docs: `check_public_api.py --update`, `python3 Tools/python/desktop_runbook.py run-check --stage A06-P05 --timeout 600 --name public-api -- python3 scripts/check_public_api.py`; `Packages/VisualCore/README.md`, `Auto-Creator.md` §13 row, `docs/apps/visualcore-music-lab/visualcore-contract.{json,md}` (G-AUDIOBUDGET, G-A11YMETRICS closed in A06-P05; G-SIGNALTEXTURE closed as adapted; rows M18, M23, M27 available with evidence; `check_app_contract.py --render`) — Verified 2026-11-14: — Verified 2026-11-14: .autonomy/checks/A06-P05.public-api.json; README, Auto-Creator §13, contract (check_app_contract PASS; all 11 gaps closed)
 - [X] T-A06-516 Script tests (`python3 Tools/python/desktop_runbook.py run-check --stage A06-P05 --timeout 600 --name script-tests -- python3 scripts/test_scripts.py`) — Verified 2026-11-14: — Verified 2026-11-14: .autonomy/checks/A06-P05.script-tests.json
-- [ ] T-A06-517 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A06-P05
+- [X] T-A06-517 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A06-P05 — Verified 2026-11-14: — Verified 2026-11-14: converge round 1 found no gaps (tasks.md unchanged)
 
 ## Dependencies
 
