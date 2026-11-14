@@ -18,8 +18,8 @@ scenarios. Research: [research.md](research.md).
 **Language**: Swift 6. **Dependencies**: `VisualCoreMath`, `VisualCoreSimulation` (`SeededRandom`), `VisualCoreScenes`
 (`Mesh`, `MeshBudget`), `VisualCoreRendering` (`DepthMeshPass`, `MeshRenderer`), `VisualCoreExperience`,
 `VisualCoreExperienceHost`, `VisualCoreUI`. **Storage**: experience snapshot (`JourneyState` schema 1); no files.
-**Testing**: host `swift test` (VisualCoreMath rail/comfort/rebase; AudioOdyssey core: rail generator, pieces,
-journey); ExperiencesCreative on sim-27.2 (adapter, manifest, session, render); app build and unit; runner iOS 27;
+**Testing**: host `swift test` (VisualCoreMath rail/comfort/rebase); ExperiencesCreative on sim-27.2 (AudioOdyssey core:
+rail generator, pieces, journey; adapter, manifest, session, render); app build and unit; runner iOS 27;
 public API; script tests. **Performance**: piece median < 2 ms on host (measured; no wall-clock assert on CI).
 **Constraints**: tests < 10 s; iOS 27 only; reference regression at X-A07; no NEEDS CLARIFICATION remains.
 
