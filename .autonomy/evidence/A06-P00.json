@@ -1,0 +1,50 @@
+{
+  "checks": [
+    {
+      "attestation": ".autonomy/checks/A06-P00.app-build.json",
+      "command": "python3 scripts/release_check.py --only app-build-for-testing-ios27",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A06-P00.app-build.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A06-P00.contract.json",
+      "command": "python3 scripts/check_app_contract.py --app visualcore-music-lab",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A06-P00.contract.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A06-P00.experience-packages.json",
+      "command": "python3 scripts/check_experience_packages.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A06-P00.experience-packages.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A06-P00.no-change.json",
+      "command": "git diff --exit-code --stat 4c27bfaf..HEAD -- Packages External",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A06-P00.no-change.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A06-P00.reference-1.json",
+      "command": "python3 scripts/release_check.py --only reference-engine-xcframework reference-build-projectm-ios-sim reference-clean",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A06-P00.reference-1.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A06-P00.reference-2.json",
+      "command": "python3 scripts/release_check.py --only reference-test-anglerendering-ios27 reference-test-anglerendering-ios26 projectm-reference-ios27 projectm-reference-ios26",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A06-P00.reference-2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A06-P00.script-tests.json",
+      "command": "python3 scripts/test_scripts.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A06-P00.script-tests.log"
+    }
+  ],
+  "generated": "2026-11-14T06:47:55+00:00",
+  "method": "deterministic-run-check",
+  "stage": "A06-P00",
+  "status": "pass"
+}
