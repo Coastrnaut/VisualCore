@@ -135,6 +135,9 @@ final class MusicLabSceneRenderTests: XCTestCase {
         try await settle(shell, session, frames: 40)
         let value = shell.presenter.lastParameterValues[0]
         XCTAssertTrue(pulse.contains(value))
+        // Convergence T-A06-320 (US2, FR-A06-312): the editor's live values are the frame's values in hundredths.
+        XCTAssertEqual(shell.presenter.mirror.parameterValues,
+                       shell.presenter.lastParameterValues.map { ($0 * 100).rounded() / 100 })
         let two = (value - pulse.lowerBound) / (pulse.upperBound - pulse.lowerBound)
         XCTAssertEqual(two, min(1, 2 * one), accuracy: 0.05)
         session.close()
