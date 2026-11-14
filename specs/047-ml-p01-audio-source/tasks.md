@@ -1,0 +1,45 @@
+# Tasks: VisualCore Music Lab — Phase 01 Audio source and permission shell
+
+**Input**: [spec.md](spec.md), [plan.md](plan.md), [research.md](research.md), [data-model.md](data-model.md),
+[contracts/api.md](contracts/api.md), [quickstart.md](quickstart.md). Gate A06-P01 (legacy). Evidence:
+`python3 Tools/python/desktop_runbook.py run-check --stage A06-P01 --timeout 600 --name <check> -- <command>`. Commit after every task (no trailers). iOS 27 only; reference regression at X-A06
+(owner, 2026-11-14).
+
+## Phase 1: Setup
+
+- [ ] T-A06-101 Baseline: cite the last package evidence on an unchanged `Packages/ExperiencesCreative` and VisualCore source tree (`.autonomy/migration/checks/X-A05.host.json`, `.autonomy/checks/A06-P00.app-build.json`) instead of a rerun (owner ruling 4 of 2026-11-14)
+
+## Phase 2: Foundational (VisualCore, story 3)
+
+- [ ] T-A06-102 [P] [US3] Add `VisualCoreAudioDSPTests` testTarget to `Packages/VisualCore/Package.swift`; write `Packages/VisualCore/Tests/VisualCoreAudioDSPTests/{SampleRingBufferTests,DemoSignalTests,SpectrumAnalyzerTests}.swift` first, then `Packages/VisualCore/Sources/VisualCoreAudioDSP/{SampleRingBuffer,DemoSignal,SpectrumAnalyzer}.swift` per contracts/api.md ("capacity rounded up to a power of two, 1,024…262,144"; "N power of two 256…4,096"); tests: sine 440/1k/5k at 48 kHz N=1,024 peak bin ±1 and ≥ 20 dB over bins > 2 away; silence → no peak; 200 seeded write/read sequences vs a reference model; overflow drops oldest; writer allocation-free over 10,000 writes (malloc zone counter, local only); demo determinism per seed and modes (FR-A06-102, 110, 111; SC-A06-101–103)
+- [ ] T-A06-103 [P] [US2] Add `VisualCoreAudioTests` testTarget to `Packages/VisualCoreRendering/Package.swift`; write `Packages/VisualCoreRendering/Sources/VisualCoreAudio/{AudioSource,DemoAudioSource,FileAudioSource,MicrophoneAudioSource,MicrophonePermission}.swift` per contracts/api.md and `Packages/VisualCoreRendering/Tests/VisualCoreAudioTests/{DemoAudioSourceTests,FileAudioSourceTests,MicrophoneSourceTests}.swift`: demo source fills the buffer at its rate; files generated at runtime (WAV, CAF, M4A tones) decode to the expected rate and sample count and loop; a garbage file throws; microphone with permission double: denied/restricted → start throws without engine use, notDetermined → request called once; session category mixes with others (FR-A06-101, 103–105, 107; SC-A06-104, 105)
+
+## Phase 3: User Story 1 — choose a source and see it (P1) 🎯
+
+- [ ] T-A06-104 [US1] Create the experience in `Packages/ExperiencesCreative/VisualCoreMusicLab` (four targets + product in `Packages/ExperiencesCreative/Package.swift`: Core, Experience, CoreTests, ExperienceTests, as for InfiniteGeometry): `Core/{SourceKind,MusicLabState}.swift` (state per data-model.md "fileName ≤ 120 chars"), `Experience/Adapter/MusicLabCore.swift` (ExperienceCore: actions source.demo/source.microphone/source.file/demo.mode/demo.reseed, digest, snapshot schema 1), `Experience/MusicLabPresenter.swift` (owns the active AudioSource and a SampleRingBuffer; draws the latest 1,024 samples as a waveform with PrimitiveRenderer; status text; source lifecycle with the session; spoken description), `Experience/MusicLabControls.swift` (Demo, Microphone, Choose file… (fileImporter), demo mode picker, reseed; labels/identifiers; permission message with Settings link), `Experience/VisualCoreMusicLabExperience.swift` (make), tests `CoreTests/MusicLabStateTests.swift` and `ExperienceTests/{MusicLabCoreTests,MusicLabSessionTests}.swift` (session draws a waveform that matches the demo signal's samples at probe columns; permission-denied falls back to demo; leaving stops the source) (FR-A06-120–122)
+- [ ] T-A06-105 [US1] Register: `Catalog/registrations.json` entry for a06 (capabilities, quality_tiers ["level-0"], palette, content), candidate in `Apps/VisualCore/App/ExperienceRegistry.swift`, `project.yml` dependency on the product and `NSMicrophoneUsageDescription` ("VisualCore Music Lab uses the microphone only while you choose live input, to draw the sound on your device. Nothing is recorded or sent."), `xcodegen generate --spec project.yml` (FR-A06-106)
+- [ ] T-A06-106 [US1] Write `Packages/ExperiencesCreative/VisualCoreMusicLab/Experience/Adapter/MusicLabManifest.swift` (nine standard scenarios + fixture-1…5 per research D6) and generate `Packages/ExperiencesCreative/VisualCoreMusicLab/scenario-manifest.json` (`TEST_RUNNER_UPDATE_SCENARIO_MANIFEST=1`) (FR-A06-120)
+
+## Phase 4: Polish & evidence
+
+- [ ] T-A06-107 DSP host tests (`python3 Tools/python/desktop_runbook.py run-check --stage A06-P01 --timeout 600 --name dsp-host -- swift test --package-path Packages/VisualCore --filter "SampleRingBufferTests|DemoSignalTests|SpectrumAnalyzerTests"`)
+- [ ] T-A06-108 Rendering package on sim-27.2 (`python3 Tools/python/desktop_runbook.py run-check --stage A06-P01 --timeout 600 --name rendering-ios27 -- python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test`)
+- [ ] T-A06-109 Experiences package on sim-27.2 (`python3 Tools/python/desktop_runbook.py run-check --stage A06-P01 --timeout 600 --name experiences-ios27 -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test`)
+- [ ] T-A06-110 App build and unit (`python3 Tools/python/desktop_runbook.py run-check --stage A06-P01 --timeout 600 --name app-unit -- python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27`)
+- [ ] T-A06-111 Runner iOS 27 (`python3 Tools/python/desktop_runbook.py run-check --stage A06-P01 --timeout 600 --name verify-27 -- python3 scripts/verify_experiences.py --only a06.visualcore-music-lab --runtime 27`)
+- [ ] T-A06-112 Experience package check (`python3 Tools/python/desktop_runbook.py run-check --stage A06-P01 --timeout 600 --name experience-packages -- python3 scripts/check_experience_packages.py`)
+- [ ] T-A06-113 Public API and docs: `check_public_api.py --update`, `python3 Tools/python/desktop_runbook.py run-check --stage A06-P01 --timeout 600 --name public-api -- python3 scripts/check_public_api.py`; READMEs of VisualCore (VisualCoreAudioDSP) and VisualCoreRendering (VisualCoreAudio); Auto-Creator.md §13 rows (audio products no longer placeholders)
+- [ ] T-A06-114 Script tests (`python3 Tools/python/desktop_runbook.py run-check --stage A06-P01 --timeout 600 --name script-tests -- python3 scripts/test_scripts.py`)
+- [ ] T-A06-115 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A06-P01
+
+## Dependencies
+
+T-A06-101 → (102 ∥ 103) → 104 → 105 → 106 → Polish.
+
+## Parallel examples
+
+Agent A: T-A06-102. Agent B: T-A06-103. Agent C: T-A06-104 (against contracts/api.md). Lead: 105, 106, docs, runs, commits.
+
+## Implementation strategy
+
+MVP: demo/file/microphone sources with the waveform (US1, US2) on the DSP/audio layer (US3); evidence last.
