@@ -25,7 +25,7 @@ steps:)`, `ExperienceControl(id:ranges:)` (≤ 24 values), `PrimitiveRenderer` w
 `Mesh.uvSphere(segments:rings:radius:)`, `Mesh.cube()`, `OrbitCamera`, `ProcessMemory.footprint()`, the registry's
 `make(id:storage:reduceMotion:reduceFlashing:)` factory. **Storage**: snapshot schema 2 (JSON). **Testing**: host `swift
 test` (mapping); ExperiencesCreative on sim-27.2 (state/migration, core, scenes, editor, hot-path footprint);
-VisualCoreRendering on sim-27.2 not needed (no rendering-package change); app build/unit; runner iOS 27 with the
+VisualCoreRendering VisualCoreAudioTests on sim-27.2 (hot-path footprint); app build/unit; runner iOS 27 with the
 regenerated manifest; public API; script tests (hot-path check). **Constraints**: tests < 10 s; no wall-clock asserts;
 iOS 27 only at this gate; reference regression at X-A06.
 
@@ -50,7 +50,8 @@ Packages/ExperiencesCreative/VisualCoreMusicLab/CoreTests/{MusicLabSceneTests,Mu
 Packages/ExperiencesCreative/VisualCoreMusicLab/Experience/Adapter/MusicLabCore.swift                     modify (actions, migration 1→2, digest)
 Packages/ExperiencesCreative/VisualCoreMusicLab/Experience/{MusicLabScenes.swift}                         new (scene drawers)
 Packages/ExperiencesCreative/VisualCoreMusicLab/Experience/{MusicLabPresenter,MusicLabControls,VisualCoreMusicLabExperience}.swift  modify
-Packages/ExperiencesCreative/VisualCoreMusicLab/ExperienceTests/{MusicLabSceneRenderTests,MusicLabHotPathTests}.swift  new; MusicLabCoreTests modify
+Packages/ExperiencesCreative/VisualCoreMusicLab/ExperienceTests/MusicLabSceneRenderTests.swift  new; MusicLabCoreTests modify
+Packages/VisualCoreRendering/Tests/VisualCoreAudioTests/HotPathFootprintTests.swift                      new (footprint over 1,000 blocks)
 Packages/ExperiencesCreative/VisualCoreMusicLab/scenario-manifest.json                                    regenerate
 Packages/VisualCoreRendering/Sources/VisualCoreAudio/{DemoAudioSource,FileAudioSource,MicrophoneAudioSource}.swift  modify (markers only; cold tags)
 scripts/check_audio_hot_path.py, scripts/tests/test_audio_hot_path.py, scripts/test_scripts.py, .github/workflows/ci.yml  new / modify
