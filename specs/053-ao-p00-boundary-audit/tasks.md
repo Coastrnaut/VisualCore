@@ -6,7 +6,7 @@
 
 ## Phase 1: Setup
 
-- [ ] T-A07-001 Create `docs/apps/audio-odyssey/README.md` (what the experience is per the manual §1–§2, that it is an experience of the one app, its documents) and `docs/apps/audio-odyssey/regression-baseline.md` with the phase start `b5c919b4` (the specify commit; constitution `fcf6ad46`) and the reference pin `d93edd1`
+- [X] T-A07-001 Create `docs/apps/audio-odyssey/README.md` (what the experience is per the manual §1–§2, that it is an experience of the one app, its documents) and `docs/apps/audio-odyssey/regression-baseline.md` with the phase start `b5c919b4` (the specify commit; constitution `fcf6ad46`) and the reference pin `d93edd1` — Verified 2026-11-14: Verified 2026-11-14: docs/apps/audio-odyssey/README.md and regression-baseline.md (phase start b5c919b4, constitution fcf6ad46, pin d93edd1)
 
 ## Phase 3: User Story 1 — Evidence-backed integration matrix (P1) 🎯
 

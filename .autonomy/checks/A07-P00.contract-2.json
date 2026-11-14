@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_app_contract.py",
+    "--app",
+    "audio-odyssey",
+    "--render"
+  ],
+  "command": "python3 scripts/check_app_contract.py --app audio-odyssey --render",
+  "elapsed_seconds": 0.043,
+  "exit_code": 0,
+  "finished": "2026-11-14T10:10:06+00:00",
+  "log": ".autonomy/logs/A07-P00.contract-2.log",
+  "log_sha256": "64785dc45f870fb8b51756ca7ccddb1dd324ab68e2ddb0afb950e1f63e0598d1",
+  "name": "contract-2",
+  "stage": "A07-P00",
+  "started": "2026-11-14T10:10:06+00:00",
+  "timed_out": false
+}

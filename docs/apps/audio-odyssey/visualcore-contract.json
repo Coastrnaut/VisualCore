@@ -1,0 +1,1143 @@
+{
+  "schema": 1,
+  "app": "audio-odyssey",
+  "gate": "A07-P00",
+  "date": "2026-11-14",
+  "inventory": [
+    {
+      "area": "Package products",
+      "description": "Pure, host-testable products of Packages/VisualCore: VisualCoreMath, VisualCoreSimulation, VisualCoreScenes, VisualCoreShaderSource, VisualCoreEffectsGraph, VisualCoreDiagnostics, VisualCoreAudioDSP, VisualCorePersistence, VisualCoreParameters, VisualCoreExperience (+ VisualCoreTestSupport for test targets). iOS products of Packages/VisualCoreRendering: VisualCoreRendering, VisualCoreEffects, VisualCoreUI, VisualCoreAudio (links AVFAudio), VisualCoreAutomation, VisualCoreExperienceHost. Since A06 (checked 2026-11-14) VisualCoreAudio holds AudioSource/ResumableAudioSource, MicrophoneAudioSource, FileAudioSource, DemoAudioSource, MicrophonePermission and AudioSessionEventMonitor, and VisualCoreAudioDSP holds SampleRingBuffer, SpectrumAnalyzer, BandLayout, LevelMeter, OnsetDetector, FeatureSmoother, FeatureExtractor, AudioMapping/AudioMapper and AnalysisQuality; Audio Odyssey reuses them. VisualCoreMath has OrbitCamera, Camera2D, Mat4.lookAt/perspective, Quat and FramingFlight (2D plane framing only); VisualCoreScenes has Mesh.tube/surface/revolution, MeshBuilder with MeshBudget and the LRU MeshCache; no camera rail, segment streaming or origin rebasing exists in any product. Dependency rules enforced by scripts/check_dependencies.py; public surface recorded in docs/api/visualcore-public-api.txt.",
+      "paths": [
+        "Packages/VisualCore/Package.swift",
+        "Packages/VisualCoreRendering/Package.swift",
+        "Packages/ExperiencesCreative/Package.swift",
+        "Packages/VisualCore/Sources/VisualCoreAudioDSP/FeatureExtractor.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreAudio/AudioSource.swift",
+        "Packages/VisualCore/Sources/VisualCoreMath/OrbitCamera.swift",
+        "Packages/VisualCore/Sources/VisualCoreScenes/MeshShapes.swift",
+        "scripts/check_dependencies.py",
+        "docs/api/visualcore-public-api.txt"
+      ],
+      "owner": "VisualCore packages (ADR-0003, ADR-0009)"
+    },
+    {
+      "area": "EGL render host and thread",
+      "description": "RenderHost (@MainActor) owns the EGL display, context and surfaces over ANGLE's Metal backend (EGLDisplayProvider), the CAMetalLayer RenderView, the FrameScheduler and context generations; pause/resume, replaceScene, recreateContext, renderOffscreen and destroy; scenes implement RenderScene setup/resize/render/teardown. All EGL and GL work runs on the main thread. Audio capture and analysis never touch GL: the audio callback writes the bounded SampleRingBuffer, analysis runs off the realtime thread and only finished feature values cross to the main thread at the frame boundary; segment generation is CPU work whose finished meshes are uploaded on the main thread. Audio Odyssey adds no EGL or GL context of its own.",
+      "paths": [
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderScene.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderView.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FrameScheduler.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/EGLDisplayProvider.swift"
+      ],
+      "owner": "VisualCoreRendering (ADR-0002 seam)"
+    },
+    {
+      "area": "Shaders and resources",
+      "description": "ResourceRegistry creates buffers, textures, programs and render targets under a ResourceBudget and rejects stale handles after a generation change. ShaderProgram, ShaderBundle and ShaderLibrary (#include expansion with line maps) compile bundled GLSL; the vc/ library holds color, field, hash, noise, palette and sdf helpers. MeshRenderer draws a Mesh with Lambert lighting (lightDirection, ambient, colour) and DepthMeshPass draws mesh items with depth testing into an owned depth target; both take an OrbitCamera, and no fog term exists. FullScreenShaderScene, ParticleRenderer and the effects graph (VisualCoreEffectsGraph + VisualCoreEffects: copy, colorMatrix, blur, bloom, distort, composite, feedback, flashLimit) complete the drawing set.",
+      "paths": [
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GPUObjects.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ShaderProgram.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ShaderBundle.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/MeshRenderer.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/DepthMeshPass.swift",
+        "Packages/VisualCore/Sources/VisualCoreShaderSource/ShaderLibrary.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GLSL/vc/palette.glsl",
+        "Packages/VisualCore/Sources/VisualCoreEffectsGraph/PassSchemas.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreEffects/EffectScene.swift"
+      ],
+      "owner": "VisualCoreRendering + VisualCoreShaderSource + VisualCoreEffects"
+    },
+    {
+      "area": "Experience host",
+      "description": "ExperienceSession opens, checkpoints, closes and recovers an Experience on one RenderHost, applies the quality level (QualityGovernor over the experience's QualityProfile, fed by DeviceConditions thermal state and Low Power Mode) and memory/scene-phase events; ExperienceShell adapts an ExperiencePresenter (scene, controls) to Experience; ExperienceCore is the GPU-free state; ExperienceStorage is the per-experience sandbox; the one app registers experiences in ExperienceRegistry and Catalog/registrations.json (Audio Odyssey joins in A07-P01; scripts/check_experience_packages.py forbids unregistered targets). project.yml already carries the shared NSMicrophoneUsageDescription added for A06, so no new privacy answer is needed.",
+      "paths": [
+        "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceSession.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceShell.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperiencePresenter.swift",
+        "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceCore.swift",
+        "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift",
+        "Apps/VisualCore/App/ExperienceRegistry.swift",
+        "Catalog/registrations.json",
+        "scripts/check_experience_packages.py",
+        "project.yml"
+      ],
+      "owner": "VisualCoreExperience + VisualCoreExperienceHost + the one app"
+    },
+    {
+      "area": "Build and release steps",
+      "description": "XcodeGen spec project.yml for the one app (target VisualCore), package schemes via scripts/xcodebuild_package.py, app tests via scripts/xcodebuild_app.py, and scripts/release_check.py: 88 named steps listed by --list on 2026-11-14 (shared checks, package and app builds/tests, per-experience release, copy-claims and verification steps of A01-A06, release audits of the one app, the seven reference regression steps).",
+      "paths": [
+        "project.yml",
+        "scripts/release_check.py",
+        "scripts/xcodebuild_package.py",
+        "scripts/xcodebuild_app.py",
+        "scripts/check_usage_descriptions.py",
+        ".github/workflows/ci.yml"
+      ],
+      "owner": "repository tooling"
+    },
+    {
+      "area": "Source ownership",
+      "description": "Audio Odyssey owns its domain (JourneyState, WorldDescriptor, curated environments, journey presets, mapping choices and defaults, ComfortSettings defaults, copy and spoken journey description) and UI under Packages/ExperiencesCreative/AudioOdyssey/ (Core GPU-free, CoreTests, Experience with Adapter/, ExperienceTests, Shaders, scenario-manifest.json; created in A07-P01, not present today). VisualCore owns reusable machinery: audio sources, permission and session recovery (VisualCoreAudio), analysis, smoothing, mapping and analysis tiers (VisualCoreAudioDSP, reused from A06), camera rail, comfort caps and origin rebasing (VisualCoreMath), streaming tunnel/terrain segments and the bounded pool (VisualCoreScenes), mesh drawing and fog (VisualCoreRendering), quality and persistence (constitution Principle II, A07 section). ProjectM stays in the harness.",
+      "paths": [
+        ".specify/memory/constitution.md",
+        "Auto-Creator.md",
+        "docs/decisions/ADR-0009-unified-app.md",
+        "Packages/ExperiencesCreative/Package.swift"
+      ],
+      "owner": "constitution + ADR-0009"
+    },
+    {
+      "area": "ProjectM reference regression",
+      "description": "Reference pinned at d93edd1, read-only; scripts/run_reference_baseline.py lists the ordered reference steps; scripts/check_reference_clean.py checks the submodule; the 7 release-check steps run in two chunks via release_check.py --only (reference-engine-xcframework, reference-build-projectm-ios-sim, reference-clean; reference-test-anglerendering-ios27, reference-test-anglerendering-ios26, projectm-reference-ios27, projectm-reference-ios26), recorded in docs/apps/audio-odyssey/regression-baseline.md.",
+      "paths": [
+        "scripts/run_reference_baseline.py",
+        "scripts/check_reference_clean.py",
+        "Harnesses/ProjectMReference/ProjectMReference.yml",
+        "docs/apps/audio-odyssey/regression-baseline.md"
+      ],
+      "owner": "reference adapter (harness only)"
+    }
+  ],
+  "matrix": [
+    {
+      "id": "M01",
+      "capability": "3D scene rendering: depth-correct, lit procedural meshes drawn through the journey's camera",
+      "source": "brainstorm: 3D scene rendering; v0.1 feature 01",
+      "status": "requires adaptation",
+      "evidence": [
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/DepthMeshPass.swift",
+          "symbol": "DepthMeshPass",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/DepthMeshPass.swift",
+          "symbol": "DepthMeshPass.draw",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/MeshRenderer.swift",
+          "symbol": "MeshRenderer",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/Matrix.swift",
+          "symbol": "Mat4.lookAt",
+          "product": "VisualCoreMath",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/InfiniteGeometry/Experience/GeometryPresenter.swift",
+        "symbol": "GeometryPresenter"
+      },
+      "notes": "DepthMeshPass and MeshRenderer are public and tested (depth occlusion, Lambert lighting, resize and context generation), but draw(...) takes only an OrbitCamera; a rail camera needs a draw through an arbitrary view and projection matrix (Mat4.lookAt/perspective exist). G-RAILDRAW, A07-P02."
+    },
+    {
+      "id": "M02",
+      "capability": "Camera systems: perspective camera maths (orbit camera, look-at and perspective matrices, quaternion slerp, 2D camera)",
+      "source": "brainstorm: camera systems",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/OrbitCamera.swift",
+          "symbol": "OrbitCamera",
+          "product": "VisualCoreMath",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/Camera2D.swift",
+          "symbol": "Camera2D",
+          "product": "VisualCoreMath",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/Matrix.swift",
+          "symbol": "Mat4.perspective",
+          "product": "VisualCoreMath",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/Quaternion.swift",
+          "symbol": "Quat.slerp",
+          "product": "VisualCoreMath",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/InfiniteGeometry/Experience/GeometryPresenter.swift",
+        "symbol": "GeometryPresenter"
+      },
+      "notes": "Tested in VisualCoreMath tests (OrbitCamera, Camera2D, matrices, quaternions). These are building blocks; the rail itself is M03."
+    },
+    {
+      "id": "M03",
+      "capability": "Controlled camera rail: deterministic, distance-parameterised path with pose (position, forward, up) and eased speed changes; the same seed and distance give the same pose",
+      "source": "brainstorm: camera systems; v0.1 features 01 and 03",
+      "status": "upstream gap",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/FramingFlight.swift",
+          "symbol": "FramingFlight",
+          "product": "VisualCoreMath",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/Easing.swift",
+          "symbol": "EasingCurve",
+          "product": "VisualCoreMath",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/OrbitCamera.swift",
+          "symbol": "OrbitCamera",
+          "product": "VisualCoreMath",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/InfiniteGeometry/Experience/GeometryPresenter.swift",
+        "symbol": "GeometryPresenter"
+      },
+      "notes": "FramingFlight/TourTimeline ease between 2D plane framings and OrbitCamera orbits a target; nothing follows a 3D path by arc length or eases flight speed. G-CAMERARAIL: CameraRail (path, arc-length parameterisation, rotation-minimising frames, speed easing) in VisualCoreMath, A07-P01."
+    },
+    {
+      "id": "M04",
+      "capability": "Audio feature integration: on-device analysis (levels, FFT bands, onsets, smoothing) reused from A06",
+      "source": "brainstorm: audio feature integration; v0.1 feature 02",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreAudioDSP/FeatureExtractor.swift",
+          "symbol": "FeatureExtractor",
+          "product": "VisualCoreAudioDSP",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreAudioDSP/OnsetDetector.swift",
+          "symbol": "OnsetDetector",
+          "product": "VisualCoreAudioDSP",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreAudioDSP/FeatureSmoother.swift",
+          "symbol": "FeatureSmoother",
+          "product": "VisualCoreAudioDSP",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreAudioDSP/SpectrumAnalyzer.swift",
+          "symbol": "SpectrumAnalyzer",
+          "product": "VisualCoreAudioDSP",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreAudioDSP/SampleRingBuffer.swift",
+          "symbol": "SampleRingBuffer",
+          "product": "VisualCoreAudioDSP",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/VisualCoreMusicLab/Experience/MusicLabPresenter.swift",
+        "symbol": "MusicLabPresenter"
+      },
+      "notes": "Built in A06-P01..P03 and tested in VisualCoreAudioDSP tests; reused unchanged, not copied."
+    },
+    {
+      "id": "M05",
+      "capability": "Procedural environment geometry: tunnel (tube along a path), terrain (parametric surface) and corridor meshes from seeded, budgeted builders",
+      "source": "brainstorm: procedural environments; v0.1 feature 01",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/MeshShapes.swift",
+          "symbol": "Mesh.tube",
+          "product": "VisualCoreScenes",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/MeshShapes.swift",
+          "symbol": "Mesh.surface",
+          "product": "VisualCoreScenes",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/MeshBuilder.swift",
+          "symbol": "MeshBudget",
+          "product": "VisualCoreScenes",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/SeededRandom.swift",
+          "symbol": "SeededRandom",
+          "product": "VisualCoreSimulation",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/InfiniteGeometry/Core/Composition.swift",
+        "symbol": "Composition"
+      },
+      "notes": "Mesh.tube, Mesh.surface and MeshBudget are tested in VisualCoreScenes tests (exact counts, budgets, determinism); the closest consumer builds solids of revolution with the same builder."
+    },
+    {
+      "id": "M06",
+      "capability": "Streaming tunnel/terrain segments: generate segments ahead of the camera, retire them behind it, bounded segment pool with no per-frame allocation, deterministic per seed and segment index",
+      "source": "brainstorm: procedural environments; v0.1 feature 01; manual section 6 algorithm 1",
+      "status": "upstream gap",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/MeshCache.swift",
+          "symbol": "MeshCache",
+          "product": "VisualCoreScenes",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/MeshShapes.swift",
+          "symbol": "Mesh.tube",
+          "product": "VisualCoreScenes",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/InfiniteGeometry/Core/Composition.swift",
+        "symbol": "Composition"
+      },
+      "notes": "MeshCache is a bounded LRU cache of whole meshes, not a streaming window keyed by distance. G-SEGMENTSTREAM: SegmentStream (window, pool, seed per index) in VisualCoreScenes, drawn through VisualCoreRendering, A07-P02."
+    },
+    {
+      "id": "M07",
+      "capability": "Depth fog and horizon: distance fog blended to the clear colour so streamed segments appear without popping",
+      "source": "manual section 6 render stage 4; v0.1 feature 01",
+      "status": "requires adaptation",
+      "evidence": [
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/MeshRenderer.swift",
+          "symbol": "MeshRenderer",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/DepthMeshPass.swift",
+          "symbol": "DepthMeshPass.clearColor",
+          "product": "VisualCoreRendering",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/InfiniteGeometry/Experience/GeometryPresenter.swift",
+        "symbol": "GeometryPresenter"
+      },
+      "notes": "MeshRenderer's fragment program has no fog term; DepthMeshPass has a clear colour. G-RAILDRAW adds linear depth fog (near, far, colour) with the view-matrix draw, A07-P02."
+    },
+    {
+      "id": "M08",
+      "capability": "Animation and transitions: tweens, timelines, easing curves and a scene clock for environment changes and eased transitions without hard cuts",
+      "source": "brainstorm: animation and transitions",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/Timeline.swift",
+          "symbol": "Timeline",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/Timeline.swift",
+          "symbol": "Tween",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/Easing.swift",
+          "symbol": "ease",
+          "product": "VisualCoreMath",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/SceneClock.swift",
+          "symbol": "SceneClock",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+          "symbol": "RenderHost.replaceScene",
+          "product": "VisualCoreRendering",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Showcase/App/Scenes/AnimatedGeometryScene.swift",
+        "symbol": "AnimatedGeometryScene"
+      },
+      "notes": "Tested in VisualCoreSimulation and VisualCoreMath tests."
+    },
+    {
+      "id": "M09",
+      "capability": "Audio mapped to scene geometry and lighting: smoothed, clamped envelopes (low, mid, high, beat) drive scale, colour, ambient light and fog within declared bounds rather than hard cuts",
+      "source": "v0.1 feature 02; manual section 6 algorithm 2",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreAudioDSP/AudioMapping.swift",
+          "symbol": "AudioMapping",
+          "product": "VisualCoreAudioDSP",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreAudioDSP/AudioMapper.swift",
+          "symbol": "AudioMapper",
+          "product": "VisualCoreAudioDSP",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreAudioDSP/AudioFeatureKind.swift",
+          "symbol": "AudioFeatureKind",
+          "product": "VisualCoreAudioDSP",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/MeshRenderer.swift",
+          "symbol": "MeshRenderer.ambient",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/DepthMeshPass.swift",
+          "symbol": "DepthMeshPass.Item",
+          "product": "VisualCoreRendering",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/VisualCoreMusicLab/Experience/MusicLabScenes.swift",
+        "symbol": "GeometryMeshes"
+      },
+      "notes": "AudioMapping (feature, gain, attack, release, clamp) and AudioMapper are tested in VisualCoreAudioDSP tests and already drive A06's 3D mesh scene; corrected from the expected gap: no new envelope machinery is needed. The curated journey mapping table is experience domain (A07-P03)."
+    },
+    {
+      "id": "M10",
+      "capability": "Manual flight speed and camera easing: a speed control whose changes are eased, never stepped",
+      "source": "v0.1 feature 03",
+      "status": "upstream gap",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/Easing.swift",
+          "symbol": "EasingCurve",
+          "product": "VisualCoreMath",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/Timeline.swift",
+          "symbol": "Tween",
+          "product": "VisualCoreSimulation",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/InfiniteGeometry/Experience/GeometryPresenter.swift",
+        "symbol": "GeometryPresenter"
+      },
+      "notes": "Easing curves exist; speed easing along a rail does not. Part of G-CAMERARAIL, A07-P01."
+    },
+    {
+      "id": "M11",
+      "capability": "Microphone live input and permission: shared usage string, permission state and request, denied and restricted handling, works without permission",
+      "source": "v0.1 feature 04; cross-cutting: audio sources and permission",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreAudio/MicrophoneAudioSource.swift",
+          "symbol": "MicrophoneAudioSource",
+          "product": "VisualCoreAudio",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreAudio/MicrophonePermission.swift",
+          "symbol": "MicrophonePermission",
+          "product": "VisualCoreAudio",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreAudio/MicrophonePermission.swift",
+          "symbol": "SystemMicrophonePermission",
+          "product": "VisualCoreAudio",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/VisualCoreMusicLab/Experience/MusicLabPresenter.swift",
+        "symbol": "MusicLabPresenter"
+      },
+      "notes": "Built in A06-P01 and tested in VisualCoreAudio tests; NSMicrophoneUsageDescription is already in project.yml."
+    },
+    {
+      "id": "M12",
+      "capability": "App-owned file and demo input behind one source interface with a status (idle, running, interrupted, failed)",
+      "source": "v0.1 feature 04; cross-cutting: audio sources",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreAudio/FileAudioSource.swift",
+          "symbol": "FileAudioSource",
+          "product": "VisualCoreAudio",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreAudio/DemoAudioSource.swift",
+          "symbol": "DemoAudioSource",
+          "product": "VisualCoreAudio",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreAudio/AudioSource.swift",
+          "symbol": "AudioSource",
+          "product": "VisualCoreAudio",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreAudio/AudioSource.swift",
+          "symbol": "AudioSourceState",
+          "product": "VisualCoreAudio",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreAudioDSP/DemoSignal.swift",
+          "symbol": "DemoSignal",
+          "product": "VisualCoreAudioDSP",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/VisualCoreMusicLab/Experience/MusicLabPresenter.swift",
+        "symbol": "MusicLabPresenter"
+      },
+      "notes": "Built in A06-P01 and tested; the demo signal is labelled demo and never played to the speaker."
+    },
+    {
+      "id": "M13",
+      "capability": "Save environment and mapping presets: versioned documents, named library, per-experience storage",
+      "source": "v0.1 feature 05; cross-cutting: persistence",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreParameters/Preset.swift",
+          "symbol": "Preset",
+          "product": "VisualCoreParameters",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCorePersistence/NamedLibrary.swift",
+          "symbol": "NamedLibrary",
+          "product": "VisualCorePersistence",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCorePersistence/DocumentStore.swift",
+          "symbol": "DocumentStore",
+          "product": "VisualCorePersistence",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift",
+          "symbol": "ExperienceStorage",
+          "product": "VisualCoreExperience",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreAudioDSP/AudioMapping.swift",
+          "symbol": "AudioMapping",
+          "product": "VisualCoreAudioDSP",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/VisualCoreMusicLab/Experience/MusicLabPresetStore.swift",
+        "symbol": "MusicLabPresetStore"
+      },
+      "notes": "Tested in VisualCorePersistence, VisualCoreParameters and VisualCoreExperience tests; AudioMapping is Codable with a schema version. The journey preset schema is experience domain (A07-P04)."
+    },
+    {
+      "id": "M14",
+      "capability": "Stable pause and resume: session suspend/resume, render host pause/resume and deterministic journey state on resume",
+      "source": "v0.1 feature 06",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceSession.swift",
+          "symbol": "ExperienceSession",
+          "product": "VisualCoreExperienceHost",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceShell.swift",
+          "symbol": "ExperienceShell",
+          "product": "VisualCoreExperienceHost",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+          "symbol": "RenderHost.pause",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+          "symbol": "RenderHost.resume",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceCore.swift",
+          "symbol": "ExperienceCore",
+          "product": "VisualCoreExperience",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/FractalExplorer/Experience/FractalExperience.swift",
+        "symbol": "FractalExperience"
+      },
+      "notes": "Tested in VisualCoreExperienceHost and VisualCoreRendering tests; the journey distance itself is a pure value of the rail (M03)."
+    },
+    {
+      "id": "M15",
+      "capability": "Thermal quality downgrade: quality tiers and governor driven by thermal state and Low Power Mode, analysis cost tiers",
+      "source": "v0.1 feature 06; cross-cutting: quality tiers",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/QualityProfile.swift",
+          "symbol": "QualityLevel",
+          "product": "VisualCoreDiagnostics",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/QualityGovernor.swift",
+          "symbol": "QualityGovernor",
+          "product": "VisualCoreDiagnostics",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/DeviceConditions.swift",
+          "symbol": "DeviceConditions",
+          "product": "VisualCoreDiagnostics",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceSession.swift",
+          "symbol": "ExperienceSession.qualityLevel",
+          "product": "VisualCoreExperienceHost",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreAudioDSP/AnalysisQuality.swift",
+          "symbol": "AnalysisQuality",
+          "product": "VisualCoreAudioDSP",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/ParticleUniverse/Core/SceneQuality.swift",
+        "symbol": "SceneQuality"
+      },
+      "notes": "Tested in VisualCoreDiagnostics, VisualCoreAudioDSP and VisualCoreExperienceHost tests."
+    },
+    {
+      "id": "M16",
+      "capability": "Render host lifecycle: context loss, resize, background and memory warning rebuild everything from CPU state",
+      "source": "cross-cutting: interruption recovery (renderer); manual state transitions",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+          "symbol": "RenderHost.recreateContext",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderScene.swift",
+          "symbol": "RenderScene",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
+          "symbol": "ResourceRegistry",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceSession.swift",
+          "symbol": "ExperienceSession.handleMemoryWarning",
+          "product": "VisualCoreExperienceHost",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/FractalExplorer/Experience/FractalScene.swift",
+        "symbol": "FractalScene"
+      },
+      "notes": "Tested in VisualCoreRendering and VisualCoreExperienceHost tests."
+    },
+    {
+      "id": "M17",
+      "capability": "Audio interruption, route change and media-services reset recovery",
+      "source": "cross-cutting: interruption recovery (audio)",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreAudio/AudioSessionEvent.swift",
+          "symbol": "AudioSessionEvent",
+          "product": "VisualCoreAudio",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreAudio/AudioSessionEvent.swift",
+          "symbol": "AudioSessionEventMonitor",
+          "product": "VisualCoreAudio",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreAudio/AudioSource.swift",
+          "symbol": "ResumableAudioSource",
+          "product": "VisualCoreAudio",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/VisualCoreMusicLab/Experience/MusicLabPresenter.swift",
+        "symbol": "MusicLabPresenter"
+      },
+      "notes": "Built in A06-P04 and tested through AudioSessionEventMonitor and MicrophoneAudioSource tests."
+    },
+    {
+      "id": "M18",
+      "capability": "Comfort limits: caps on speed, acceleration, sway and roll that the person can lower; Reduce Motion lowers speed and removes sway and roll; audio never moves the camera",
+      "source": "cross-cutting: comfort limits; constitution A07 comfort; manual section 6 algorithm 4",
+      "status": "upstream gap",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPreferences.swift",
+          "symbol": "EffectiveAccessibility",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/FramingFlight.swift",
+          "symbol": "TourTimeline",
+          "product": "VisualCoreMath",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/InfiniteGeometry/Experience/GeometryPresenter.swift",
+        "symbol": "GeometryPresenter"
+      },
+      "notes": "TourTimeline honours Reduce Motion for 2D tours only; no capped acceleration, sway or roll exists. Part of G-CAMERARAIL (ComfortLimits applied by the rail), A07-P01."
+    },
+    {
+      "id": "M19",
+      "capability": "Reduce Motion and Reduce Flashing: system preferences observed, beat flashes limited",
+      "source": "v0.1 feature 03; cross-cutting: accessibility",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPreferences.swift",
+          "symbol": "SystemAccessibility",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/SystemAccessibilityObserver.swift",
+          "symbol": "SystemAccessibilityObserver",
+          "product": "VisualCoreUI",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreEffectsGraph/FlashLimiterModel.swift",
+          "symbol": "FlashLimiterModel",
+          "product": "VisualCoreEffectsGraph",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreEffects/EffectScene.swift",
+          "symbol": "EffectScene.reduceFlashing",
+          "product": "VisualCoreEffects",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/GenerativeArtStudio/Experience/SceneScreen.swift",
+        "symbol": "AppAccessibility"
+      },
+      "notes": "Tested in VisualCoreSimulation, VisualCoreEffectsGraph and VisualCoreUI tests."
+    },
+    {
+      "id": "M20",
+      "capability": "Spoken description of the journey and its state (environment, speed, input source, paused) and control alternatives for gestures",
+      "source": "cross-cutting: accessibility; constitution A07 accessibility",
+      "status": "requires adaptation",
+      "evidence": [
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/AccessibilityPlayers.swift",
+          "symbol": "AnnouncementSink",
+          "product": "VisualCoreUI",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/AccessibilityPlayers.swift",
+          "symbol": "SystemAnnouncementSink",
+          "product": "VisualCoreUI",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/AccessibilitySettingsSection.swift",
+          "symbol": "AccessibilitySettingsSection",
+          "product": "VisualCoreUI",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreExperience/GestureAlternatives.swift",
+          "symbol": "GestureAlternatives",
+          "product": "VisualCoreExperience",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/VisualCoreMusicLab/Experience/MusicLabPresenter.swift",
+        "symbol": "MusicLabPresenter"
+      },
+      "notes": "The announcement plumbing is available and tested; the journey description phrasing is experience domain. G-JOURNEYA11Y (app-local), A07-P05."
+    },
+    {
+      "id": "M21",
+      "capability": "Long-distance precision: world-origin rebasing so positions stay small in Float on the GPU however far the journey goes, without a visible jump",
+      "source": "cross-cutting: long-distance precision; manual section 6 algorithm 3",
+      "status": "upstream gap",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/PrecisionAdvisor.swift",
+          "symbol": "PrecisionAdvisor",
+          "product": "VisualCoreMath",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/Vectors.swift",
+          "symbol": "Vec3",
+          "product": "VisualCoreMath",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/FractalExplorer/Experience/Adapter/FractalCore.swift",
+        "symbol": "FractalCore"
+      },
+      "notes": "PrecisionAdvisor assesses 2D plane precision only; nothing rebases a 3D world origin. G-ORIGINREBASE in VisualCoreMath with the rail, A07-P01."
+    },
+    {
+      "id": "M22",
+      "capability": "Long-session resource budget: segment count, draw distance and vertex totals bounded per quality level with steady memory over the session",
+      "source": "cross-cutting: quality tiers; constitution A07 bounded resources",
+      "status": "requires adaptation",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/MeshBuilder.swift",
+          "symbol": "MeshBudget",
+          "product": "VisualCoreScenes",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/QualityProfile.swift",
+          "symbol": "QualityLevel",
+          "product": "VisualCoreDiagnostics",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/ResourceLedger.swift",
+          "symbol": "ResourceLedger",
+          "product": "VisualCoreDiagnostics",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/ResourceLedger.swift",
+          "symbol": "ResourceBudget",
+          "product": "VisualCoreDiagnostics",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/ParticleUniverse/Core/SceneQuality.swift",
+        "symbol": "SceneQuality"
+      },
+      "notes": "Budgets and the quality element share exist and are tested; nothing ties a segment window and draw distance to QualityLevel. G-JOURNEYBUDGET, A07-P05 (measured over a short run, bounded by arithmetic)."
+    }
+  ],
+  "gaps": [
+    {
+      "id": "G-CAMERARAIL",
+      "matrix": [
+        "M03",
+        "M10",
+        "M18"
+      ],
+      "kind": "upstream",
+      "owner": "VisualCore:VisualCoreMath",
+      "phase": 1,
+      "test": "Host tests: arc-length parameterisation within tolerance on closed and open paths, rotation-minimising frames without flips, the same seed and distance give the same pose, speed changes reach the target only through the easing curve, speed, acceleration, sway and roll never exceed ComfortLimits, Reduce Motion lowers speed and zeroes sway and roll, NaN/Inf inputs rejected",
+      "justification": "Found in A07-P00: VisualCoreMath has OrbitCamera, Camera2D and 2D FramingFlight only; any journey or fly-through experience needs the same rail and comfort caps.",
+      "closed": null
+    },
+    {
+      "id": "G-ORIGINREBASE",
+      "matrix": [
+        "M21"
+      ],
+      "kind": "upstream",
+      "owner": "VisualCore:VisualCoreMath",
+      "phase": 1,
+      "test": "Host tests: after a rebase every rail pose and segment transform differs from the unrebased one by less than one Float ulp at the camera, rebasing triggers at the documented distance, Double positions far along the rail map to Float-safe local positions, the rebase offset is part of the deterministic state",
+      "justification": "Found in A07-P00: PrecisionAdvisor covers 2D planes only; Float GPU positions lose precision on long journeys.",
+      "closed": null
+    },
+    {
+      "id": "G-RAILDRAW",
+      "matrix": [
+        "M01",
+        "M07"
+      ],
+      "kind": "adaptation",
+      "owner": "VisualCore:VisualCoreRendering",
+      "phase": 2,
+      "test": "Simulator tests: DepthMeshPass and MeshRenderer draw through a view and projection matrix with pixels equal to the OrbitCamera path for the same matrices, linear depth fog reaches the fog colour at the far distance, existing OrbitCamera callers unchanged (API baseline additive)",
+      "justification": "Found in A07-P00: DepthMeshPass.draw and MeshRenderer.draw accept only an OrbitCamera and have no fog term.",
+      "closed": null
+    },
+    {
+      "id": "G-SEGMENTSTREAM",
+      "matrix": [
+        "M06"
+      ],
+      "kind": "upstream",
+      "owner": "VisualCore:VisualCoreScenes",
+      "phase": 2,
+      "test": "Host tests: the window holds segments from distance d - behind to d + ahead, segments retire behind the camera and return to a bounded pool, the pool never grows past its capacity, segment index plus seed gives an identical mesh digest, no allocation in the steady-state advance (counted in tests); drawing through VisualCoreRendering covered by G-RAILDRAW",
+      "justification": "Found in A07-P00: MeshCache is an LRU of whole meshes; no streaming window exists.",
+      "closed": null
+    },
+    {
+      "id": "G-JOURNEYA11Y",
+      "matrix": [
+        "M20"
+      ],
+      "kind": "adaptation",
+      "owner": "app-local",
+      "phase": 5,
+      "test": "Host tests of the journey description for each state (environment, speed band, input source, paused, interrupted) and VoiceOver announcement through a RecordingAnnouncementSink",
+      "justification": "The wording of the journey description is experience domain; the generic AnnouncementSink plumbing already exists in VisualCoreUI.",
+      "closed": null
+    },
+    {
+      "id": "G-JOURNEYBUDGET",
+      "matrix": [
+        "M22"
+      ],
+      "kind": "adaptation",
+      "owner": "VisualCore:VisualCoreScenes",
+      "phase": 5,
+      "test": "Host tests: segment window size, draw distance and vertex total derived from QualityLevel stay within MeshBudget at every level; a short simulated run shows constant pool size and resource ledger totals, extrapolated by arithmetic to a long session",
+      "justification": "Found in A07-P00: budgets and quality levels exist but nothing maps them to a segment window.",
+      "closed": null
+    }
+  ],
+  "traceability": [
+    {
+      "item": "brainstorm: 3D scene rendering",
+      "matrix": [
+        "M01",
+        "M07"
+      ],
+      "phases": [
+        2
+      ]
+    },
+    {
+      "item": "brainstorm: camera systems",
+      "matrix": [
+        "M02",
+        "M03",
+        "M18",
+        "M21"
+      ],
+      "phases": [
+        1
+      ]
+    },
+    {
+      "item": "brainstorm: audio feature integration",
+      "matrix": [
+        "M04",
+        "M09",
+        "M11",
+        "M12",
+        "M17"
+      ],
+      "phases": [
+        3
+      ]
+    },
+    {
+      "item": "brainstorm: procedural environments",
+      "matrix": [
+        "M05",
+        "M06",
+        "M07",
+        "M22"
+      ],
+      "phases": [
+        2,
+        5
+      ]
+    },
+    {
+      "item": "brainstorm: animation and transitions",
+      "matrix": [
+        "M08",
+        "M10"
+      ],
+      "phases": [
+        1,
+        3
+      ]
+    },
+    {
+      "item": "v0.1 feature 01: three procedural environments with controlled camera rail",
+      "matrix": [
+        "M01",
+        "M03",
+        "M05",
+        "M06",
+        "M07"
+      ],
+      "phases": [
+        1,
+        2
+      ]
+    },
+    {
+      "item": "v0.1 feature 02: audio mapped to geometry and lighting rather than hard cuts",
+      "matrix": [
+        "M04",
+        "M09"
+      ],
+      "phases": [
+        3
+      ]
+    },
+    {
+      "item": "v0.1 feature 03: manual flight speed, camera easing and reduced-motion setting",
+      "matrix": [
+        "M10",
+        "M18",
+        "M19"
+      ],
+      "phases": [
+        1,
+        4
+      ]
+    },
+    {
+      "item": "v0.1 feature 04: microphone, app-owned audio file and demo input modes",
+      "matrix": [
+        "M11",
+        "M12",
+        "M17"
+      ],
+      "phases": [
+        3
+      ]
+    },
+    {
+      "item": "v0.1 feature 05: save environment and mapping presets",
+      "matrix": [
+        "M13"
+      ],
+      "phases": [
+        4
+      ]
+    },
+    {
+      "item": "v0.1 feature 06: stable pause/resume and thermal quality downgrade",
+      "matrix": [
+        "M14",
+        "M15",
+        "M16",
+        "M22"
+      ],
+      "phases": [
+        4,
+        5
+      ]
+    }
+  ],
+  "negative": [
+    {
+      "rule": "No EGL display, context, surface or GL path of its own and no second renderer; all drawing goes through VisualCore's RenderHost on OpenGL ES -> ANGLE -> Metal",
+      "source": "manual rendering invariant; constitution A07; CLAUDE.md rule 4"
+    },
+    {
+      "rule": "No ProjectM types, engine or presets and no ProjectM engine code reused as the implementation; the experience is not a ProjectM clone and imitates no ProjectM visuals",
+      "source": "manual header; constitution A07 consumer, not fork; CLAUDE.md rule 12"
+    },
+    {
+      "rule": "No networking, streaming services, accounts, analytics, tracking or advertising",
+      "source": "constitution A07 offline-first; CLAUDE.md rule 3"
+    },
+    {
+      "rule": "Audio never leaves the device: microphone and file audio are analysed in memory on the device and never recorded, uploaded or persisted; microphone only after the system permission and only while live input is chosen",
+      "source": "constitution A07 audio privacy"
+    },
+    {
+      "rule": "No system-wide capture of other apps' or protected third-party audio; only the microphone, files the person opens and the bundled demo signal through public Apple APIs",
+      "source": "manual section 2 explicit non-goals; section 6 domain-specific engineering rule"
+    },
+    {
+      "rule": "No VR or headset mode",
+      "source": "manual section 2 explicit non-goals"
+    },
+    {
+      "rule": "No open-world exploration or free navigation; the camera follows a controlled rail",
+      "source": "manual section 2 explicit non-goals; constitution A07 product goal"
+    },
+    {
+      "rule": "No claims about relaxation, health, hearing, meditation or motion-sickness prevention, and no calibrated level or pitch claims; an entertainment visualizer",
+      "source": "constitution A07 truthful claims; spec FR-A07-006"
+    },
+    {
+      "rule": "No hard camera cuts, sudden accelerations or camera jolts driven by audio; audio drives geometry and lighting, the camera stays continuous and eased",
+      "source": "v0.1 feature 02; constitution A07 comfort"
+    },
+    {
+      "rule": "No fork or copy of VisualCore, ANGLE or projectm-ios, no standalone app target and no copy of A06's audio code; generic needs become VisualCore gaps",
+      "source": "ADR-0009; constitution A07 reuse first; CLAUDE.md rule 1"
+    }
+  ],
+  "decision": {
+    "result": "go",
+    "reasons": [
+      "The render host, depth-tested mesh drawing, procedural mesh builders, animation, presets, persistence, quality tiers, session lifecycle and accessibility exist with tests: 13 of 22 rows are available.",
+      "The audio path exists: VisualCoreAudio (microphone with permission, app-owned files, demo, interruption recovery) and VisualCoreAudioDSP (ring buffer, FFT, bands, onsets, smoothing, AudioMapper, AnalysisQuality) were built for A06 and are reused unchanged; the shared NSMicrophoneUsageDescription is already in project.yml.",
+      "All six gaps are additive and owned: G-CAMERARAIL and G-ORIGINREBASE (VisualCoreMath, A07-P01), G-RAILDRAW (VisualCoreRendering) and G-SEGMENTSTREAM (VisualCoreScenes, A07-P02), G-JOURNEYBUDGET (VisualCoreScenes) and the app-local G-JOURNEYA11Y (A07-P05); audio mapping (A07-P03) and presets (A07-P04) need no new VisualCore machinery.",
+      "Audio Odyssey stays unregistered until A07-P01 creates Packages/ExperiencesCreative/AudioOdyssey with its targets and first real domain rules (rail and journey state), so the experience package check and the one app are unchanged."
+    ],
+    "blockers": []
+  }
+}
