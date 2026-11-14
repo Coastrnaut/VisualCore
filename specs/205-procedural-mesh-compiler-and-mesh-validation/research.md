@@ -26,8 +26,14 @@
   is reversed; a self-intersecting outline is refused as invalid input).
 - **D6 Bevelled box:** a rounded box made from a subdivided cube whose points are pushed to the inner box plus a
   sphere of the bevel radius (radius clamped to half the smallest side; 1…16 segments).
-- **D7 Validation order:** arrays and counts → indices → triangles (finite, degenerate) → edges (manifold, winding,
+- **D7 Validation order:** topology uses a position-welded vertex map (clarified tolerance) so crease and seam splits
+  do not count as holes; arrays and counts → indices → triangles (finite, degenerate) → edges (manifold, winding,
   boundary) → vertices (normals, uvs) → volume (closed only); first 100 problems, rest counted.
 - **D8 Digest:** see the clarification; −0 normalized to +0 so equal meshes hash equally.
 - **D9 Budget:** `MeshBudget(maxVertices: 262_144, maxIndices: 1_572_864)` default; checked before allocation from the
   shape's exact counts.
+
+## 2. Analysis record (`/speckit-analyze`, 2026-11-13)
+
+- C1 (HIGH) fixed: topology by welded position (FR-R02F05-030, D7). I1 (HIGH) fixed: generator digests recorded in
+  T-R02F05-011 after the digest exists, generators proven unchanged by `git diff`. U1 (MEDIUM) fixed: ≥ 1% coverage.

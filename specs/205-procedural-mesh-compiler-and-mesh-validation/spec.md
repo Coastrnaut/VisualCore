@@ -181,7 +181,9 @@ Scenes that already use the plane, cube and sphere and the renderer that draws t
   triangle (zero area); non-finite position, normal or texture coordinate; normal not of unit length; texture
   coordinate outside 0…1; array lengths that differ; non-manifold edge (shared by more than two triangles);
   inconsistent winding across an edge; boundary edges (a hole) when the mesh is required to be closed; and, for a
-  closed mesh, faces pointing inward (negative enclosed volume).
+  closed mesh, faces pointing inward (negative enclosed volume). Topology (edges, manifoldness, winding, boundary,
+  closedness) identifies vertices by position within the weld tolerance, so meshes split at creases or seams for
+  normals and texture coordinates are judged by their shape.
 - **FR-R02F05-031**: Each problem MUST name its kind and the triangle, edge or vertex it concerns; the report MUST list
   the first 100 problems in a fixed order and count the rest.
 - **FR-R02F05-032**: The validator MUST return a summary: vertex, triangle and boundary-edge counts, closed or open,

@@ -7,7 +7,7 @@
 
 ## Phase 1: Setup
 
-- [ ] T-R02F05-001 Record the baseline: host tests of Packages/VisualCore (`run-check --name baseline-host -- swift test --package-path Packages/VisualCore`) and the existing mesh outputs' digests computed in T-R02F05-012 against the unchanged generators
+- [ ] T-R02F05-001 Record the baseline: host tests of Packages/VisualCore (`run-check --name baseline-host -- swift test --package-path Packages/VisualCore`)
 
 ## Phase 2: Foundational
 
@@ -32,8 +32,8 @@
 
 ## Phase 6: User Story 4 — Existing meshes keep working (P3)
 
-- [ ] T-R02F05-011 [US4] Write `Packages/VisualCore/Tests/VisualCoreScenesTests/MeshCompatibilityTests.swift`: plane, cube and sphere outputs equal committed digests recorded from the unchanged generators (T-R02F05-001) and pass the validator (sphere and cube requireClosed after welding positions only where the generators duplicate seams; record which)
-- [ ] T-R02F05-012 [US4] Write `Packages/VisualCoreRendering/Tests/VisualCoreRenderingTests/MeshCompilerRuntimeTests.swift`: the committed digests of a fixed set of descriptions (one per shape) equal on the simulator; a capped tube drawn by `MeshRenderer` into an offscreen target covers non-background pixels and the context ends with 0 leaked objects
+- [ ] T-R02F05-011 [US4] Write `Packages/VisualCore/Tests/VisualCoreScenesTests/MeshCompatibilityTests.swift`: plane, cube and sphere outputs equal digests committed in this task from the generators as they are (`git diff --exit-code Packages/VisualCore/Sources/VisualCoreScenes/MeshGenerators.swift` proves them unchanged), and pass the validator (cube and sphere with requireClosed: topology by welded position)
+- [ ] T-R02F05-012 [US4] Write `Packages/VisualCoreRendering/Tests/VisualCoreRenderingTests/MeshCompilerRuntimeTests.swift`: the committed digests of a fixed set of descriptions (one per shape) equal on the simulator; a capped tube drawn by `MeshRenderer` into an offscreen target covers at least 1% of the target's pixels with non-background colour and the context ends with 0 leaked objects
 
 ## Phase 7: Polish and evidence (one task per quickstart command)
 
