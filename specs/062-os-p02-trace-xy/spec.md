@@ -76,7 +76,7 @@ window's (left, right) sample pairs scaled by the gain, and the figure closes on
 2. **Given** a mono source (the microphone or a mono file), **When** XY mode is chosen, **Then** the scope keeps the
    waveform view, marks XY as unavailable ("XY needs two channels") and says so.
 3. **Given** XY mode, **When** the source changes from stereo to mono, **Then** the view falls back to the waveform
-   with the same mark, and returns to XY only when the person chooses it again with a stereo source.
+   with the same mark; the chosen view stays XY, so a stereo source shows XY again without a new choice.
 
 ---
 
