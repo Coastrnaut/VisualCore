@@ -1,0 +1,56 @@
+{
+  "checks": [
+    {
+      "attestation": ".autonomy/checks/A07-P04.app-unit.json",
+      "command": "python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A07-P04.app-unit.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A07-P04.core-ios27.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing AudioOdysseyCoreTests",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A07-P04.core-ios27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A07-P04.experience-packages.json",
+      "command": "python3 scripts/check_experience_packages.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A07-P04.experience-packages.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A07-P04.odyssey-ios27.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing AudioOdysseyCoreTests AudioOdysseyExperienceTests",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A07-P04.odyssey-ios27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A07-P04.public-api.json",
+      "command": "python3 scripts/check_public_api.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A07-P04.public-api.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A07-P04.script-tests.json",
+      "command": "python3 scripts/test_scripts.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A07-P04.script-tests.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A07-P04.verify-27.json",
+      "command": "python3 scripts/verify_experiences.py --only a07.audio-odyssey --runtime 27",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A07-P04.verify-27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A07-P04.visualcore-host-ci.json",
+      "command": "swift test --package-path Packages/VisualCore",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A07-P04.visualcore-host-ci.log"
+    }
+  ],
+  "generated": "2026-11-14T14:33:16+00:00",
+  "method": "deterministic-run-check",
+  "stage": "A07-P04",
+  "status": "pass"
+}
