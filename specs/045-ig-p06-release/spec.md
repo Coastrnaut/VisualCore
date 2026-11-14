@@ -23,6 +23,33 @@ Canonical overrides:
   changes; every Spec Kit step still runs. Owner-only actions (signing, archive upload, App Store Connect) are
   `BLOCKED_OWNER_ACTION`; device rows are `{device}` tasks after ImplementationLock-100.
 
+## Clarifications
+
+### Session 2026-11-14
+
+Answered autonomously under the owner's standing delegation, recommended option each time. Facts checked in code:
+Particle Universe proves recovery with an internal presenter seam `failNextDraw` (throws once from `draw`);
+interface tests open a candidate experience with the debug arguments `-vcCandidates` and `VC.openExperience <id>`
+(`PUSupport.swift`) and run in chunks of `release_check.py` `UI_CHUNKS`; the release build steps are
+`app-release-build`, `app-release-symbols`, `app-privacy-manifest`, `app-no-tracking`, `app-licenses`,
+`app-usage-descriptions`; the A05 library treats a file without `format` as unreadable (Phase 04 decision, no older
+files exist).
+
+- Q: How is a drawing failure produced without touching release behaviour? → A: An internal `failNextDraw` flag on
+  `GeometryPresenter`, as in Particle Universe: the next draw throws `GeometryDrawError.injected` and clears the flag;
+  only tests set it (internal, reached through `@testable`).
+- Q: What does the missing-format fixture expect? → A: Counted as unreadable and kept (the Phase 04 rule); the other
+  four fixtures: format 1 listed and opens with its digest; newer format and newer document version counted as newer,
+  refused on open, never rewritten; damaged counted as unreadable.
+- Q: Which interface chunk and classes? → A: Chunk `k2` with `IGControlsUITests` (open, preset, symmetry order, camera
+  buttons, description) and `IGLibraryExportUITests` (save, choose another preset, reopen, export shows the share
+  control), using the candidate launch arguments; added to `UI_CHUNKS`.
+- Q: Which release build checks count for this phase? → A: The six release steps listed above in one run; they cover
+  the whole app (the experience adds no usage string, tracking domain or license).
+- Q: What is the copy check's input? → A: `docs/apps/infinite-geometry/store-listing.md` and the experience's
+  `GeometryControls.swift` and `GeometryPresenter.swift` strings, through `release.json`'s `copyCheck`, with the
+  shared denylist `Configs/copy-claims-denylist.json`.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Nothing about me leaves the device (Priority: P1) 🎯
