@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--only",
+    "a05.infinite-geometry",
+    "--runtime",
+    "27"
+  ],
+  "command": "python3 scripts/verify_experiences.py --only a05.infinite-geometry --runtime 27",
+  "elapsed_seconds": 19.353,
+  "exit_code": 0,
+  "finished": "2026-11-14T06:19:11+00:00",
+  "gate": "X-A05",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/X-A05.sim27.log",
+  "log_sha256": "a2d511536675fac510ebd53663969a174c7c677c87663916680a1a5b9a9316e6",
+  "name": "sim27",
+  "started": "2026-11-14T06:18:52+00:00",
+  "timed_out": false
+}

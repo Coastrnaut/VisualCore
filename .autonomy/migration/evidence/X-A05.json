@@ -1,0 +1,61 @@
+{
+  "branch": "main",
+  "dirty": false,
+  "dirty_paths": [],
+  "failed_attempts": [],
+  "gate": "X-A05",
+  "ledger": "migration",
+  "passing_checks": [
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --result-name xa05-host",
+      "exit_code": 0,
+      "finished": "2026-11-14T06:11:31+00:00",
+      "log": ".autonomy/logs/migration/X-A05.host.log",
+      "log_sha256": "f35e143a478b98b5c6742adb1234821d5658ebbd8421f78d49c6f50b2b0eaf9d",
+      "name": "host"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only reference-engine-xcframework reference-build-projectm-ios-sim reference-clean",
+      "exit_code": 0,
+      "finished": "2026-11-14T06:09:44+00:00",
+      "log": ".autonomy/logs/migration/X-A05.reference-1.log",
+      "log_sha256": "ecabb13feac04c8a73bd5cb78cd9eb18090f7540f707a300808d0f0eac27c139",
+      "name": "reference-1"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only reference-test-anglerendering-ios27 reference-test-anglerendering-ios26 projectm-reference-ios27 projectm-reference-ios26",
+      "exit_code": 0,
+      "finished": "2026-11-14T06:10:46+00:00",
+      "log": ".autonomy/logs/migration/X-A05.reference-2.log",
+      "log_sha256": "9d166596b19413d141edbae650271d28790ebdd48c355c1fe7f311143d16cba5",
+      "name": "reference-2"
+    },
+    {
+      "command": "python3 scripts/verify_experiences.py --only a05.infinite-geometry --runtime 26",
+      "exit_code": 0,
+      "finished": "2026-11-14T06:19:29+00:00",
+      "log": ".autonomy/logs/migration/X-A05.sim26.log",
+      "log_sha256": "696278046d6ca0a000eb5567597030fec5b1f1ad3c33d06d3610d29d017bb052",
+      "name": "sim26"
+    },
+    {
+      "command": "python3 scripts/verify_experiences.py --only a05.infinite-geometry --runtime 27",
+      "exit_code": 0,
+      "finished": "2026-11-14T06:19:11+00:00",
+      "log": ".autonomy/logs/migration/X-A05.sim27.log",
+      "log_sha256": "a2d511536675fac510ebd53663969a174c7c677c87663916680a1a5b9a9316e6",
+      "name": "sim27"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only app-build-for-testing-ios27 app-ui-ios27-k2",
+      "exit_code": 0,
+      "finished": "2026-11-14T06:21:55+00:00",
+      "log": ".autonomy/logs/migration/X-A05.ui-k2.log",
+      "log_sha256": "5e5cecdfa47b789b83b588cca09f47aaafe85ea68e12d333343fe3ca23cf0b64",
+      "name": "ui-k2"
+    }
+  ],
+  "revision": "eddf1967eb38c5383b9576b496bf6e85e2b15229",
+  "revision_number": 1,
+  "sealed": "2026-11-14T06:22:03+00:00"
+}

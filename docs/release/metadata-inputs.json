@@ -33,15 +33,23 @@
       "name": "Particle Universe",
       "permissions": [],
       "tier": "free"
+    },
+    {
+      "category": "create",
+      "code": "A05",
+      "id": "a05.infinite-geometry",
+      "name": "Infinite Geometry",
+      "permissions": [],
+      "tier": "free"
     }
   ],
-  "ledger_sha256": "809a13f0ff6bdc3b66b4a5cf3a4a1c0d3e517202738b627182c8a03312749006",
+  "ledger_sha256": "d1a70fb701e0e011f9fb58361d2836f35b2a1d15a47961aeec5b79485ba79167",
   "privacy_answers": {
     "data_collected": "none",
     "proof": {
-      "executable_sha256": "1147e51e499064fcd72f3291c2e560423ba44925ee41be0c55b82934c2d5df38",
-      "privacy_report": ".autonomy/logs/ua-f11/privacy-20261113T185519.json",
-      "tracking_report": ".autonomy/logs/ua-f11/tracking-20261113T185519.json"
+      "executable_sha256": "faa40643ef172bb42e09b8afadae1d177a8d5bde657c8c3161b0e9e5944a0422",
+      "privacy_report": ".autonomy/logs/ua-f11/privacy-20261114T004439.json",
+      "tracking_report": ".autonomy/logs/ua-f11/tracking-20261114T004439.json"
     },
     "tracking": "no"
   },
