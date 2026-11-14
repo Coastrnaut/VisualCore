@@ -21,6 +21,35 @@ Canonical overrides:
 - **Owner rulings:** short tests; audits and device runs in the device campaign; iOS 27 at phase gates; every Spec Kit
   step runs.
 
+## Clarifications
+
+### Session 2026-11-14
+
+Answered autonomously under the owner's standing delegation, recommended option each time. Facts checked in code:
+`AudioFeatures` has `bandEnergies` (16 bands from `FeatureExtractor`), `flux` and `onset`; `AudioMapper` smooths one
+`AudioMapping` (feature, gain, attack, release) into a range; `JourneyState` (schema 2) holds `speedChoice`
+(slow/medium/fast = 2/4/7 units/s) and the presenter's `TunnelResponse` drives tunnel breathing and ambient.
+
+- Q: How is the envelope built from the analysis? → A: `AudioEnvelope` (Core, pure): low = mean of bands 0–3, mid =
+  mean of bands 4–9, high = mean of bands 10–15, each normalised by a running peak with slow decay (0.5 s) into 0…1;
+  transient = flux normalised the same way, raised to at least 0.8 on an onset frame; all smoothed per channel with
+  attack 0.03 s / release 0.3 s; timestamp = the analysis time. Built in Core from plain arrays (no audio import), so
+  it is host-testable.
+- Q: How does continuous speed relate to the three speed choices? → A: `speedChoice` is replaced by a continuous
+  `speed target` 0.5…7 units/s (slider in 0.5 steps); schema 3; schema 1/2 states map slow/medium/fast to 2/4/7. The
+  action `speed.select [0…2]` stays (presets the slider) and `speed.set [0.5…7]` is added.
+- Q: What does easing change? → A: `easing` gentle/standard/brisk multiplies the active acceleration limit by
+  0.33/0.66/1.0 (never above the comfort maximum); gentle therefore settles in ≥ 3× the brisk time (≥ 2× required).
+- Q: What are the per-world responses and their bounds? → A: Generalise `TunnelResponse` to `WorldResponse` with two
+  outputs per world — primary (tunnel: breathing amount; landscape: height swell 0…0.6 of the base relief, applied as a
+  vertical scale of the strip; star corridor: sparkle 0…1 applied as star scale 1…1.6) and light (ambient as in
+  A07-P02) — same rest/bound/step-limit pattern, Reduce Motion halves the primary range, Reduce Flashing halves the
+  light range and step. Mapping per world: primary ← channel (default tunnel low, landscape mid, star transient),
+  light ← channel (default level-like = mean of low/mid/high), sensitivity low/medium/high = gain 0.6/1.0/1.6.
+- Q: Where does calm motion live and is it persisted? → A: `calmMotion` (Bool) in the journey state (schema 3,
+  persisted, in the digest); effective calm = calmMotion || system Reduce Motion (mirrored, not persisted); action
+  `comfort.calm [0…1]`.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Fly at my own pace, gently (Priority: P1) 🎯
