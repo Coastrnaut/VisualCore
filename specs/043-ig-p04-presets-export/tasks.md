@@ -23,7 +23,7 @@
 
 ## Phase 5: User Story 3 — no leaks over transitions (P2)
 
-- [ ] T-A05-406 [US3] Write `Packages/ExperiencesCreative/InfiniteGeometry/ExperienceTests/GeometryGPUStabilityTests.swift`: through a session, cycle all curated presets three times drawing a frame after each change; `renderHost` resource ledger live counts after cycles 2 and 3 equal cycle 1, nothing leaked; open saved documents of every kind twice in turn with the same equality (FR-A05-420, SC-A05-404)
+- [X] T-A05-406 [US3] Write `Packages/ExperiencesCreative/InfiniteGeometry/ExperienceTests/GeometryGPUStabilityTests.swift`: through a session, cycle all curated presets three times drawing a frame after each change; `renderHost` resource ledger live counts after cycles 2 and 3 equal cycle 1, nothing leaked; open saved documents of every kind twice in turn with the same equality (FR-A05-420, SC-A05-404) — Verified 2026-11-13: 2026-11-13 .autonomy/checks/A05-P04.experiences-ios27.json and .experiences-ios26.json (exit 0); GeometryGPUStabilityTests 2/2
 - [ ] T-A05-407 [US1] Regenerate `Packages/ExperiencesCreative/InfiniteGeometry/scenario-manifest.json` (`TEST_RUNNER_UPDATE_SCENARIO_MANIFEST=1`; controls list grew) and record the M17/M18 consumers in `docs/apps/infinite-geometry/visualcore-contract.md` (FR-A05-432)
 
 ## Phase 6: Polish & evidence
