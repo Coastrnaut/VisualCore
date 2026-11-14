@@ -5,7 +5,11 @@
     "repeats.set",
     "scale.set",
     "palette.set",
-    "reseed"
+    "reseed",
+    "camera.pan",
+    "camera.zoom",
+    "camera.orbit",
+    "camera.reset"
   ],
   "experience" : "a05.infinite-geometry",
   "kind" : "creative",
@@ -15,7 +19,7 @@
 
       ],
       "expect" : {
-        "initialDigest" : "f2f8906949bca1ec2a6394e4dcf52a772fb4162861721997edc9a382ee08ec5d"
+        "initialDigest" : "7ac53aa255769d7ca24b52a18da49ba6b261918e9e656c38f490890b85835f77"
       },
       "name" : "launch-first-frame",
       "seed" : "7"
@@ -84,8 +88,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "389597ff3d869d868bf4b8cb94a36390ab4d12f72da25f9f292118abf5f7c021",
-        "initialDigest" : "f2f8906949bca1ec2a6394e4dcf52a772fb4162861721997edc9a382ee08ec5d"
+        "finalDigest" : "280e1e2e6d48afd933dad572f4c7620219d7567599d8c40f96e822c25f0af0fc",
+        "initialDigest" : "7ac53aa255769d7ca24b52a18da49ba6b261918e9e656c38f490890b85835f77"
       },
       "name" : "input-response",
       "seed" : "7"
@@ -212,8 +216,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "389597ff3d869d868bf4b8cb94a36390ab4d12f72da25f9f292118abf5f7c021",
-        "initialDigest" : "f2f8906949bca1ec2a6394e4dcf52a772fb4162861721997edc9a382ee08ec5d"
+        "finalDigest" : "280e1e2e6d48afd933dad572f4c7620219d7567599d8c40f96e822c25f0af0fc",
+        "initialDigest" : "7ac53aa255769d7ca24b52a18da49ba6b261918e9e656c38f490890b85835f77"
       },
       "name" : "save-restore",
       "seed" : "7"
@@ -282,7 +286,7 @@
         }
       ],
       "expect" : {
-        "initialDigest" : "f2f8906949bca1ec2a6394e4dcf52a772fb4162861721997edc9a382ee08ec5d",
+        "initialDigest" : "7ac53aa255769d7ca24b52a18da49ba6b261918e9e656c38f490890b85835f77",
         "resetDigest" : true
       },
       "name" : "reset",
@@ -353,8 +357,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "ca128a4fa0c03553265a174c2543ee9ddbdadc66a91934a62a60a6b7aa890c72",
-        "initialDigest" : "f2f8906949bca1ec2a6394e4dcf52a772fb4162861721997edc9a382ee08ec5d"
+        "finalDigest" : "17a1645d059deb85e4bf9713c133c8e26cb579261b977ed611f8df9d4a7b7cd4",
+        "initialDigest" : "7ac53aa255769d7ca24b52a18da49ba6b261918e9e656c38f490890b85835f77"
       },
       "name" : "fixture-1",
       "seed" : "7"
@@ -393,8 +397,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "d0d1b9a87016e598aa34f563a2b3923eea850f195fd57e849bd7a807abf667e1",
-        "initialDigest" : "f2f8906949bca1ec2a6394e4dcf52a772fb4162861721997edc9a382ee08ec5d"
+        "finalDigest" : "a114f5992e0d867e95fdeb46700e71082a4ee6ca570ff2c3542c8810f202abfe",
+        "initialDigest" : "7ac53aa255769d7ca24b52a18da49ba6b261918e9e656c38f490890b85835f77"
       },
       "name" : "fixture-2",
       "seed" : "7"
@@ -440,11 +444,41 @@
           },
           "result" : "action.out-of-range",
           "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "camera.zoom",
+            "values" : [
+              100
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "camera.zoom",
+            "values" : [
+              100
+            ]
+          },
+          "result" : "action.rule.a05.unchanged",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "camera.zoom",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
         }
       ],
       "expect" : {
-        "finalDigest" : "d8a60513571435f4839f00c5982399dfc0663f96061b69e345cd87572c3f2627",
-        "initialDigest" : "f2f8906949bca1ec2a6394e4dcf52a772fb4162861721997edc9a382ee08ec5d"
+        "finalDigest" : "c0cf9edc726ace8cf42e6e841cc716cefaf4e03f054c4c6ec71873dfef15d98d",
+        "initialDigest" : "7ac53aa255769d7ca24b52a18da49ba6b261918e9e656c38f490890b85835f77"
       },
       "name" : "fixture-3",
       "seed" : "7"
@@ -533,8 +567,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "f2f8906949bca1ec2a6394e4dcf52a772fb4162861721997edc9a382ee08ec5d",
-        "initialDigest" : "f2f8906949bca1ec2a6394e4dcf52a772fb4162861721997edc9a382ee08ec5d"
+        "finalDigest" : "7ac53aa255769d7ca24b52a18da49ba6b261918e9e656c38f490890b85835f77",
+        "initialDigest" : "7ac53aa255769d7ca24b52a18da49ba6b261918e9e656c38f490890b85835f77"
       },
       "name" : "fixture-4",
       "seed" : "7"
@@ -563,8 +597,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "aee96139a9695376eb8cdb1d3f7050aa6f08fd987f473b79ac6c66f1c04aa2c7",
-        "initialDigest" : "f2f8906949bca1ec2a6394e4dcf52a772fb4162861721997edc9a382ee08ec5d"
+        "finalDigest" : "21f821c3d2ae592cb874c3d1346a69492b2d04b0ef301b1a4f244afd0b863fa1",
+        "initialDigest" : "7ac53aa255769d7ca24b52a18da49ba6b261918e9e656c38f490890b85835f77"
       },
       "name" : "fixture-5",
       "seed" : "7"

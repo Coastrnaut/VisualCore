@@ -2,6 +2,10 @@
 // Geometry: the four curated presets, the symmetry order (disabled for the tilings, whose lattice fixes it), the
 // repetitions, the scale, the palette and a new motif seed. Every change is an action through the port; every control
 // has a VoiceOver label, an identifier from the port, a hit area of at least 44 by 44 points and text that wraps.
+//
+// Feature 041 (A05-P02) T-A05-207 (FR-A05-212): the "View" section gives every camera gesture a button — pan
+// arrows (2D presets), zoom in and out (the 2D zoom, or the distance on the 3D composition), orbit arrows (3D
+// composition) and reset — sending the same actions as the gestures.
 import InfiniteGeometryCore
 import SwiftUI
 import VisualCoreExperience
@@ -12,6 +16,13 @@ import VisualCoreParameters
 struct GeometryControls: View {
     let port: ExperienceActionPort
     let mirror: GeometryMirror
+
+    /// One pan button's step: a quarter of the visible half-side, in world units at zoom 1.
+    static let panStep = 0.25
+    /// One zoom button's factor (its inverse zooms out).
+    static let zoomStep = 1.25
+    /// One orbit button's angle in radians.
+    static let orbitStep = 0.2
 
     var body: some View {
         Group {
@@ -58,12 +69,74 @@ struct GeometryControls: View {
                     }
                 }
             }
+            cameraSection(core)
             section("Motif") {
                 button("New motif", identifier: "reseed", hint: "Draws a new motif with the next seed") {
                     _ = port.send("reseed")
                 }
             }
         }
+    }
+
+    // MARK: View
+
+    /// The camera buttons: pan arrows on a 2D preset, orbit arrows on the 3D composition, zoom and reset on both.
+    @ViewBuilder private func cameraSection(_ core: GeometryCore) -> some View {
+        let solid = core.preset.kind == .solid
+        let pan = Self.panStep / max(core.view2D.zoom, 1e-6)
+        section("View") {
+            if solid {
+                HStack(spacing: 8) {
+                    arrow("Orbit left", symbol: "arrow.left", identifier: "camera.orbit.left",
+                          hint: "Turns the composition to the left") { _ = port.send("camera.orbit", [Self.orbitStep, 0]) }
+                    arrow("Orbit right", symbol: "arrow.right", identifier: "camera.orbit.right",
+                          hint: "Turns the composition to the right") { _ = port.send("camera.orbit", [-Self.orbitStep, 0]) }
+                    arrow("Orbit up", symbol: "arrow.up", identifier: "camera.orbit.up",
+                          hint: "Looks at the composition from higher up") { _ = port.send("camera.orbit", [0, Self.orbitStep]) }
+                    arrow("Orbit down", symbol: "arrow.down", identifier: "camera.orbit.down",
+                          hint: "Looks at the composition from lower down") { _ = port.send("camera.orbit", [0, -Self.orbitStep]) }
+                }
+            } else {
+                HStack(spacing: 8) {
+                    arrow("Pan left", symbol: "arrow.left", identifier: "camera.pan.left",
+                          hint: "Moves the view to the left") { _ = port.send("camera.pan", [-pan, 0]) }
+                    arrow("Pan right", symbol: "arrow.right", identifier: "camera.pan.right",
+                          hint: "Moves the view to the right") { _ = port.send("camera.pan", [pan, 0]) }
+                    arrow("Pan up", symbol: "arrow.up", identifier: "camera.pan.up",
+                          hint: "Moves the view up") { _ = port.send("camera.pan", [0, pan]) }
+                    arrow("Pan down", symbol: "arrow.down", identifier: "camera.pan.down",
+                          hint: "Moves the view down") { _ = port.send("camera.pan", [0, -pan]) }
+                }
+            }
+            HStack(spacing: 8) {
+                arrow("Zoom in", symbol: "plus.magnifyingglass", identifier: "camera.zoom.in",
+                      hint: solid ? "Moves the camera closer" : "Magnifies the view") {
+                    _ = port.send("camera.zoom", [Self.zoomStep])
+                }
+                arrow("Zoom out", symbol: "minus.magnifyingglass", identifier: "camera.zoom.out",
+                      hint: solid ? "Moves the camera away" : "Shows more of the composition") {
+                    _ = port.send("camera.zoom", [1 / Self.zoomStep])
+                }
+                button("Reset view", identifier: "camera.reset", hint: "Returns the camera to the preset's view") {
+                    _ = port.send("camera.reset")
+                }
+            }
+            Text(verbatim: solid
+                 ? String(format: "Pitch %.0f°, distance %.1f", core.orbit3D.pitch * 180 / Double.pi, core.orbit3D.distance)
+                 : String(format: "Zoom ×%.2f, centre %.2f, %.2f", core.view2D.zoom, core.view2D.centerX, core.view2D.centerY))
+                .font(.footnote).accessibilityIdentifier(port.identifier("camera.summary"))
+        }
+    }
+
+    private func arrow(_ title: String, symbol: String, identifier: String, hint: String,
+                       action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Image(systemName: symbol).font(.body).frame(minWidth: 44, minHeight: 44)
+        }
+        .buttonStyle(.bordered)
+        .accessibilityLabel(Text(verbatim: title))
+        .accessibilityHint(Text(verbatim: hint))
+        .accessibilityIdentifier(port.identifier(identifier))
     }
 
     // MARK: Building blocks

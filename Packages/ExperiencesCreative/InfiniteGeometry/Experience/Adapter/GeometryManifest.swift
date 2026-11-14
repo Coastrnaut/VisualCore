@@ -67,8 +67,9 @@ extension GeometryCore {
     /// 1. symmetry order one is the identity and higher orders repeat: the kaleidoscope at order 1, then 6;
     /// 2. mesh generation has index bounds and valid normals: the 3D composition rebuilt at orders 3 and 8 (every
     ///    accepted build is a closed, validated mesh — `Composition.build` refuses anything else);
-    /// 3. zoom clamps avoid singular states: the scale at both bounds is accepted and beyond them refused (the
-    ///    camera's field of view arrives in Phase 03 and extends this fixture there);
+    /// 3. zoom clamps avoid singular states: the scale at both bounds is accepted and beyond them refused; the 2D
+    ///    camera zoomed far beyond its upper bound stops at 8, a further zoom is refused as unchanged and a zero
+    ///    factor is out of range (A05-P02; the field of view arrives in Phase 03 and extends this fixture there);
     /// 4. repeated preset transitions leave the state stable: two full cycles through the four presets end where they
     ///    began (final digest = initial digest; the records' GPU counts show no leak);
     /// 5. non-square displays keep proportions: the hexagonal tiling at scale 0.5 drawn on the phone's non-square
@@ -85,7 +86,10 @@ extension GeometryCore {
             [step("preset.select", [solid]), step("symmetry.order", [3]), step("symmetry.order", [8])],
             [step("scale.set", [GeometryPreset.scaleRange.lowerBound]), step("scale.set", [GeometryPreset.scaleRange.upperBound]),
              step("scale.set", [GeometryPreset.scaleRange.upperBound + 1], "action.out-of-range"),
-             step("scale.set", [GeometryPreset.scaleRange.lowerBound / 2], "action.out-of-range")],
+             step("scale.set", [GeometryPreset.scaleRange.lowerBound / 2], "action.out-of-range"),
+             step("camera.zoom", [GeometryCore.zoomFactorRange.upperBound]),
+             step("camera.zoom", [GeometryCore.zoomFactorRange.upperBound], "action.rule." + unchangedCode),
+             step("camera.zoom", [0], "action.out-of-range")],
             cycle + cycle,
             [step("preset.select", [hex]), step("scale.set", [0.5])],
         ]

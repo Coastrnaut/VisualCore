@@ -10,6 +10,17 @@
 //     through `OrbitCamera(distance: 6, pitch: 0.5)`. Depth testing is left off (the renderer culls back faces).
 //   - The probe is a background point the CPU proves uncovered: a point of a fixed grid that lies outside every
 //     polygon by a margin (2D), or outside the projected bounds of the mesh (3D); it must read `dark`.
+//
+// Feature 041 (A05-P02) T-A05-204, T-A05-207 (FR-A05-201, FR-A05-203, FR-A05-212):
+//   - The kaleidoscope is drawn by `KaleidoscopeShader` on a `FullScreenShaderScene` the presenter owns: made and
+//     compiled in `setup` (so it is remade after a context loss), released in `teardown`; a compile or link error
+//     throws `KaleidoscopeShaderError`, which fails the session's setup with its message. The tilings keep the
+//     primitive renderer and the 3D composition the mesh renderer.
+//   - The core's 2D camera moves the tilings' root node (scale fit · zoom, position −centre · fit · zoom) and the
+//     shader's world point; the core's orbit camera is the mesh renderer's camera.
+//   - Canvas gestures become camera actions: one finger drags `camera.pan` (2D; screen points converted to world
+//     units by the fit and zoom) or `camera.orbit` (3D; 0.01 rad per point), two fingers pinch `camera.zoom` (the
+//     distance ratio), a double tap sends `camera.reset`. Each has a button in `GeometryControls`.
 import Foundation
 import InfiniteGeometryCore
 import SwiftUI
@@ -42,8 +53,10 @@ final class GeometryPresenter: ExperiencePresenter {
 
     typealias Core = GeometryCore
 
-    /// The camera of the 3D composition.
-    static let orbit = OrbitCamera(distance: 6, pitch: 0.5)
+    /// The camera of the 3D composition at the preset's default.
+    static let orbit = GeometryCore.Orbit3D.default.camera
+    /// The orbit angle of one point of one-finger drag on the 3D composition, in radians.
+    static let orbitPerPoint = 0.01
     /// The probe candidates, measured from the top left: the corners first, then the edge midpoints, then a grid.
     static let probeCandidates: [(x: Double, y: Double)] = {
         var points: [(x: Double, y: Double)] = [(0.04, 0.04), (0.96, 0.04), (0.04, 0.96), (0.96, 0.96),
@@ -58,6 +71,17 @@ final class GeometryPresenter: ExperiencePresenter {
     let mirror = GeometryMirror()
     private let clear = ClearColorScene()
     private var primitives: PrimitiveRenderer?
+    /// The kaleidoscope's full-screen shader; made in `setup`, released in `teardown`.
+    private var kaleidoscope: FullScreenShaderScene?
+    /// The 2D camera of the last draw, for converting drag distances into world units.
+    private var lastView = GeometryCore.View2D.default
+    /// The kind of the last draw: drags orbit on the 3D composition and pan otherwise.
+    private var lastKind = GeometryPreset.curated[0].kind
+
+    // Touch translation (presentation state, never domain state).
+    private var pointers = PointerTracker()
+    private var doubleTap = DoubleTapRecognizer()
+    private var lastPoint: [Int: Vec2] = [:]
     private var meshRenderer: MeshRenderer?
     /// The composition digest `meshRenderer` was made for.
     private var meshDigest: String?
@@ -76,6 +100,17 @@ final class GeometryPresenter: ExperiencePresenter {
 
     func setup(_ context: RenderContext) throws {
         primitives = try PrimitiveRenderer(registry: context.resources)
+        let scene = KaleidoscopeShader.makeScene()
+        try scene.setup(context)
+        if let message = scene.errorMessage {
+            scene.teardown(context)
+            throw KaleidoscopeShaderError(message: message)
+        }
+        kaleidoscope = scene
+    }
+
+    func resize(_ context: RenderContext) {
+        kaleidoscope?.resize(context)
     }
 
     func draw(_ core: GeometryCore, tier: Int, context: RenderContext, frame: FrameInfo) throws {
@@ -83,11 +118,22 @@ final class GeometryPresenter: ExperiencePresenter {
         mirror.canvasSize = Vec2(width, height)
         try clear.render(context, frame: frame)
         refresh(core)
+        lastView = core.view2D
+        lastKind = core.preset.kind
         switch composition {
+        case .plane(let polygons) where core.preset.kind == .kaleidoscope:
+            guard let kaleidoscope else { drawnCount = 0; return }
+            kaleidoscope.resize(context)
+            kaleidoscope.parameters = KaleidoscopeShader.parameters(for: core)
+            kaleidoscope.palette = KaleidoscopeShader.palette(core.preset.palette)
+            try kaleidoscope.render(context, frame: frame)
+            drawnCount = polygons.count
         case .plane(let polygons):
             guard let root else { drawnCount = 0; return }
             let fit = Self.fitScale(width: width, height: height)
-            root.scale = fit
+            let zoom = core.view2D.zoom
+            root.scale = fit * zoom
+            root.position = Vec2(-core.view2D.centerX * fit.x * zoom, -core.view2D.centerY * fit.y * zoom)
             if primitives == nil { primitives = try PrimitiveRenderer(registry: context.resources) }
             try primitives?.draw(root, camera: Camera2D(), metrics: ViewMetrics(size: Vec2(width, height), scale: 1))
             drawnCount = polygons.count
@@ -98,7 +144,7 @@ final class GeometryPresenter: ExperiencePresenter {
                 meshRenderer = try MeshRenderer(mesh: mesh, registry: context.resources)
                 meshDigest = compositionKey
             }
-            try meshRenderer?.draw(camera: Self.orbit, aspect: width / height,
+            try meshRenderer?.draw(camera: core.orbit3D.camera, aspect: width / height,
                                    color: Self.color(palette: core.preset.palette, index: 4))
             drawnCount = mesh.triangleCount
         case nil:
@@ -109,6 +155,8 @@ final class GeometryPresenter: ExperiencePresenter {
     func teardown(_ context: RenderContext) {
         primitives?.release()
         primitives = nil
+        kaleidoscope?.teardown(context)
+        kaleidoscope = nil
         meshRenderer?.release()
         meshRenderer = nil
         meshDigest = nil
@@ -158,19 +206,23 @@ final class GeometryPresenter: ExperiencePresenter {
     func probes(_ core: GeometryCore) -> [FrameProbe] {
         guard let built = core.composition() else { return [] }
         let size = mirror.canvasSize
-        guard let point = Self.backgroundPoint(built, size: size) else { return [] }
+        guard let point = Self.backgroundPoint(built, size: size, view: core.view2D, orbit: core.orbit3D.camera)
+        else { return [] }
         return [FrameProbe(name: "background", x: point.x, y: point.y, expected: "dark")].compactMap { $0 }
     }
 
-    /// The first probe candidate that no element of `composition` covers in a view of `size` pixels, or nil.
-    static func backgroundPoint(_ composition: Composition, size: Vec2) -> (x: Double, y: Double)? {
+    /// The first probe candidate that no element of `composition` covers in a view of `size` pixels seen through
+    /// the 2D camera `view` (planes) or the orbit camera `orbit` (solids), or nil.
+    static func backgroundPoint(_ composition: Composition, size: Vec2, view: GeometryCore.View2D = .default,
+                                orbit: OrbitCamera = GeometryPresenter.orbit) -> (x: Double, y: Double)? {
         let width = max(size.x, 1), height = max(size.y, 1)
         switch composition {
         case .plane(let polygons):
-            let fit = Self.fitScale(width: width, height: height).x
+            let fit = Self.fitScale(width: width, height: height).x * view.zoom
             let margin = probeMarginPixels / fit
             return probeCandidates.first { candidate in
-                let world = Vec2((candidate.x - 0.5) * width / fit, (0.5 - candidate.y) * height / fit)
+                let world = Vec2((candidate.x - 0.5) * width / fit + view.centerX,
+                                 (0.5 - candidate.y) * height / fit + view.centerY)
                 return !polygons.contains { covers($0.points, world, margin: margin) }
             }
         case .solid(let mesh):
@@ -220,8 +272,71 @@ final class GeometryPresenter: ExperiencePresenter {
         AnyView(GeometryControls(port: port, mirror: mirror))
     }
 
-    /// The six actions of the native controls.
+    /// The six preset actions and the four camera actions of the native controls (every gesture action has a button).
     var nativeActions: Set<String> {
-        ["preset.select", "symmetry.order", "repeats.set", "scale.set", "palette.set", "reseed"]
+        let presetActions: Set<String> = ["preset.select", "symmetry.order", "repeats.set", "scale.set", "palette.set", "reseed"]
+        return presetActions.union(Self.cameraActions)
+    }
+
+    /// The camera actions a canvas gesture sends (FR-A05-212).
+    var gestureActions: Set<String> { Self.cameraActions }
+
+    /// The four camera action ids.
+    static let cameraActions: Set<String> = ["camera.pan", "camera.zoom", "camera.orbit", "camera.reset"]
+
+    /// Canvas touches as camera actions (FR-A05-212; spec Clarifications): one finger moving pans the 2D view by its
+    /// movement converted to world units (the content follows the finger) or orbits the 3D composition by 0.01 rad
+    /// per point; two fingers zoom by the ratio of their distances; a double tap resets the camera. Values are
+    /// clamped into the controls' ranges so a fast gesture is never refused as out of range.
+    func pointer(_ event: PointerEvent, viewSize: Vec2, port: ExperienceActionPort) {
+        let side = min(viewSize.x, viewSize.y)
+        guard side > 0 else { return }
+        let previous = lastPoint
+        pointers.handle(event)
+        doubleTap.handle(event, tracker: pointers)
+        if event.phase == .began, doubleTap.state == .failed {
+            // A tap that came too late for the previous one starts a new double tap.
+            doubleTap.reset()
+            doubleTap.handle(event, tracker: pointers)
+        }
+        if doubleTap.state == .recognized {
+            port.send("camera.reset")
+            doubleTap.reset()
+        }
+        if event.phase == .moved, pointers.count >= 2 {
+            let ids = Array(pointers.order.prefix(2))
+            if let a0 = previous[ids[0]], let b0 = previous[ids[1]],
+               let a1 = pointers.active[ids[0]], let b1 = pointers.active[ids[1]] {
+                let d0 = a0.distance(to: b0), d1 = a1.distance(to: b1)
+                if d0 > 0, d1 > 0, d1 != d0 {
+                    port.send("camera.zoom", [Self.clamp(d1 / d0, GeometryCore.zoomFactorRange)])
+                }
+            }
+        } else if event.phase == .moved, pointers.count == 1, let last = previous[event.id] {
+            let move = event.location - last
+            if move.x == 0, move.y == 0 {
+                // No movement, no action.
+            } else if lastKind == .solid {
+                let range = GeometryCore.orbitRange
+                port.send("camera.orbit", [Self.clamp(-move.x * Self.orbitPerPoint, range),
+                                           Self.clamp(move.y * Self.orbitPerPoint, range)])
+            } else {
+                // Points per world unit: half the shorter side times the zoom (the fit in points).
+                let perWorld = side / 2 * max(lastView.zoom, 1e-6)
+                let range = GeometryCore.panRange
+                port.send("camera.pan", [Self.clamp(-move.x / perWorld, range), Self.clamp(move.y / perWorld, range)])
+            }
+        }
+        switch event.phase {
+        case .began, .moved: lastPoint[event.id] = event.location
+        case .ended, .cancelled: lastPoint[event.id] = nil
+        }
+        if pointers.count == 0 { lastPoint.removeAll() }
+    }
+
+    /// `value` clamped into `range`; a non-finite value counts as 0.
+    private static func clamp(_ value: Double, _ range: ClosedRange<Double>) -> Double {
+        let v = value.isFinite ? value : 0
+        return min(max(v, range.lowerBound), range.upperBound)
     }
 }
