@@ -22,9 +22,8 @@ python3 Tools/python/desktop_runbook.py status
 python3 scripts/validate_autocreator.py
 ```
 
-The second command shows the unified-app gates and the next action; the third the legacy gates F00 … A25-P06 (run
-`python3 Tools/python/desktop_runbook.py bootstrap` first if `.autonomy/context/` is missing); the fourth proves
-that the steering documents, the catalog, the archive and the ledgers agree.
+These show the unified-app gates and next action, the legacy gates F00 … A25-P06 (run `desktop_runbook.py
+bootstrap` first if `.autonomy/context/` is missing), and that steering documents, catalog, archive and ledgers agree.
 
 The gate printed first by `migration_ledger.py next` is the next thing to do. Its feature directory, prompts and
 evidence commands are found as described in Auto-Creator.md §19. Simulators are chosen by runtime (`sim-27.2`,
@@ -114,6 +113,8 @@ evidence commands are found as described in Auto-Creator.md §19. Simulators are
 15. **Documents.** `Auto-Creator.md` is edited in place as a book, never by appending amendments. The archive under
     `docs/archive/planning/` is never edited. Run `python3 scripts/validate_autocreator.py` before committing a
     change to a steering document.
+16. **README current** (owner, 2026-11-14): GitHub-style, all details, only true facts; update it and its date
+    with every gate record or structural change.
 
 ## 4. Where things are
 
@@ -131,6 +132,5 @@ evidence commands are found as described in Auto-Creator.md §19. Simulators are
 | Which source text became which rule | `docs/migration/source-to-canonical-matrix.csv` |
 | Machine setup | [`setup.md`](setup.md), `python3 scripts/verify_environment.py` |
 
-The former `CLAUDE.md` (agent contract of 2026-11-11 with the ProjectM-iOS playbook) is preserved verbatim at
-`docs/archive/planning/root/CLAUDE-2026-11-11-agent-contract.md`; its working lessons are integrated in
-Auto-Creator.md §19 and §24.
+Former CLAUDE.md (2026-11-11): `docs/archive/planning/root/CLAUDE-2026-11-11-agent-contract.md`; lessons in
+Auto-Creator.md §19, §24.
