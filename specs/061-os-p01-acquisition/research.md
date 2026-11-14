@@ -30,3 +30,8 @@
   buffer 16,384 frames.
 - **D6 Microphone stays mono (assumption):** a one-channel window; route-dependent stereo capture is assessed in
   A08-P05 (G-STEREO's microphone part re-owned there in the contract).
+- **D7 Five fixtures (convergence T-A08-119):** the scenario manifest carries five fixtures — display periods, spectrum
+  bin, no trigger, clipping beyond full scale, the sweep on a falling trigger — because the planning catalog asks five
+  for A08 (the audit's content-count check); `ScopeManifestTests` asserts the five. **Spectrum frames:** the spectrum bin
+  of every offered frequency is proved on the newest 4,096 frames (the analyser's full frame), not on the timebase
+  window, which a 100 Hz window of five periods would smear by a bin (convergence T-A08-118).
