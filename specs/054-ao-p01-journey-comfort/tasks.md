@@ -48,3 +48,7 @@ Agent A: T-A07-102. Agent B: T-A07-103 (against contracts/api.md; builds after A
 
 MVP: rail, comfort and rebasing (US2 foundation) with three worlds on the rail (US1) and seamless pieces (US3, inside
 T-A07-103); evidence last.
+
+## Phase 6: Convergence
+
+- [ ] T-A07-116 Record in `specs/054-ao-p01-journey-comfort/data-model.md` the sixth action `comfort.reduce-motion [0…1]` (the presenter mirrors the system setting; not in the digest or snapshot, as A06's `permission.mirror`) and the refusal rules `a07.already-paused` and `a07.not-paused`, matching `Packages/ExperiencesCreative/AudioOdyssey/Experience/Adapter/OdysseyCore.swift` per plan: data-model "Actions" (contradicts)
