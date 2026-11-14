@@ -51,4 +51,4 @@ T-A07-103); evidence last.
 
 ## Phase 6: Convergence
 
-- [ ] T-A07-116 Record in `specs/054-ao-p01-journey-comfort/data-model.md` the sixth action `comfort.reduce-motion [0…1]` (the presenter mirrors the system setting; not in the digest or snapshot, as A06's `permission.mirror`) and the refusal rules `a07.already-paused` and `a07.not-paused`, matching `Packages/ExperiencesCreative/AudioOdyssey/Experience/Adapter/OdysseyCore.swift` per plan: data-model "Actions" (contradicts)
+- [X] T-A07-116 Record in `specs/054-ao-p01-journey-comfort/data-model.md` the sixth action `comfort.reduce-motion [0…1]` (the presenter mirrors the system setting; not in the digest or snapshot, as A06's `permission.mirror`) and the refusal rules `a07.already-paused` and `a07.not-paused`, matching `Packages/ExperiencesCreative/AudioOdyssey/Experience/Adapter/OdysseyCore.swift` per plan: data-model "Actions" (contradicts) — Verified 2026-11-14: Verified 2026-11-14: data-model.md Actions now list comfort.reduce-motion and the rules a07.already-paused / a07.not-paused, matching OdysseyCore.swift lines 15-20 and the manifest controls; validate_docs passed in the tick
