@@ -1292,7 +1292,7 @@ class UnifiedAppTargetTests(unittest.TestCase):
                                     "InfiniteGeometryExperience",
                                     # Feature 047 (A06-P01): VisualCore Music Lab, integrated at X-A06.
                                     "VisualCoreMusicLabExperience",
-                                    # Feature 054 (A07-P01): Audio Odyssey, a candidate until X-A07.
+                                    # Feature 054 (A07-P01): Audio Odyssey, integrated at X-A07.
                                     "AudioOdysseyExperience"])
 
     def test_the_standing_isolation_step_requires_sources(self):

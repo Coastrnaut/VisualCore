@@ -58,16 +58,16 @@ struct ExperienceRegistration: Sendable {
 /// The explicit list of registered experiences.
 enum ExperienceRegistry {
     /// Every registered experience, in catalog order: those whose X gate is pass (X-A01, X-A02 and X-A03, recorded
-    /// 2026-11-13 after UA-F07; X-A04 recorded 2026-11-13 after A04-P06; X-A05 recorded 2026-11-14 after A05-P06; X-A06 recorded 2026-11-14 after A06-P06).
+    /// 2026-11-13 after UA-F07; X-A04 recorded 2026-11-13 after A04-P06; X-A05 recorded 2026-11-14 after A05-P06; X-A06 recorded 2026-11-14 after A06-P06; X-A07 recorded 2026-11-14 after A07-P06).
     static let all: [ExperienceRegistration] = [generativeArtStudio, fluidArtPlayground, fractalExplorer,
                                                 particleUniverse, infiniteGeometry,
-                                                visualCoreMusicLab].compactMap { $0 }
+                                                visualCoreMusicLab, audioOdyssey].compactMap { $0 }
 
     /// The adopted experiences before their X gate (feature 193, FR-U07-021; clarification 4), in catalog order:
     /// each carries its scenario manifest, so that the verification runner can open it, but it stays unavailable
     /// in the catalog and outside `all`. Debug builds show them with `-vcCandidates`. Recording an experience's X
     /// gate moves its registration from here to `all`.
-    static let candidates: [ExperienceRegistration] = [audioOdyssey].compactMap { $0 }
+    static let candidates: [ExperienceRegistration] = []
 
     /// A01 Generative Art Studio (feature 193, US1).
     private static var generativeArtStudio: ExperienceRegistration? {
@@ -167,7 +167,7 @@ extension ExperienceRegistry {
         #endif
         return registration
     }
-    /// A07 Audio Odyssey (features 054–056, A07-P01…P03): a candidate until X-A07.
+    /// A07 Audio Odyssey (features 053–059, A07-P00…P06): integrated at X-A07 (2026-11-14).
     fileprivate static var audioOdyssey: ExperienceRegistration? {
         guard let id = AudioOdysseyExperience.id else { return nil }
         // Schema 2 (feature 055) adds the sound source and schema 3 (feature 056) speed, easing, calm motion and mappings;

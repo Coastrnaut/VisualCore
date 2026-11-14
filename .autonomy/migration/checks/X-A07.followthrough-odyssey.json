@@ -1,0 +1,28 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/ExperiencesCreative",
+    "--scheme",
+    "ExperiencesCreative-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--only-testing",
+    "AudioOdysseyCoreTests",
+    "AudioOdysseyExperienceTests"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing AudioOdysseyCoreTests AudioOdysseyExperienceTests",
+  "elapsed_seconds": 20.088,
+  "exit_code": 0,
+  "finished": "2026-11-14T15:44:50+00:00",
+  "gate": "X-A07",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/X-A07.followthrough-odyssey.log",
+  "log_sha256": "08dc3b019bd4bc05e501a24aacf1b255a66d39bad09af8862efcc129fbde51d2",
+  "name": "followthrough-odyssey",
+  "started": "2026-11-14T15:44:30+00:00",
+  "timed_out": false
+}

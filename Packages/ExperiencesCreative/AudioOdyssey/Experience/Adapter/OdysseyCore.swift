@@ -157,6 +157,11 @@ public struct OdysseyCore: ExperienceCore, Equatable {
 
     // MARK: Contract
 
+    /// Three quality tiers since feature 058 (A07-P05; declared at the X-A07 follow-through, where the app's
+    /// level-name check found the default of one): the host's tier selects the streaming level (`OdysseyQuality`:
+    /// window, draw distance, star share); the tier never reaches the state, so every tier keeps the digest.
+    public static var qualityTiers: Int { 3 }
+
     /// Schema 3 since feature 056 (A07-P03): the step from schema 1 adds the audio source (the demo signal); the step
     /// from schema 2 leaves the payload as it is, because `JourneyState`'s decoder reads the schema-1/2 shape (speed
     /// choice → 2/4/7 units/s, standard easing, calm motion off, the default mappings).

@@ -40,6 +40,15 @@ final class OdysseyQualityTests: XCTestCase {
         XCTAssertTrue(presenter.tunnel.isComplete, "level \(level) filled within \(limit) frames")
     }
 
+    /// X-A07 follow-through: the core declares the three levels, so the host's governor and the catalog's level names
+    /// (level-0, level-1, level-2) reach every level the presenter draws.
+    func testTheCoreDeclaresOneTierPerQualityLevel() {
+        XCTAssertEqual(OdysseyCore.qualityTiers, OdysseyQuality.levels.count)
+        XCTAssertEqual(OdysseyCore.qualityProfile.count, 3)
+        let shell = AudioOdysseyExperience.make(id: P05.id)
+        XCTAssertEqual(shell.qualityProfile.count, 3, "the shell offers the host three levels")
+    }
+
     func testEachLevelShrinksTheTunnelWindowAndTheFog() async throws {
         let session = ExperienceSession()
         let shell = try await P05.open(session, snapshot: try pausedSnapshot())

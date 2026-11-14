@@ -1,5 +1,5 @@
 // AOSupport — feature 059 (A07-P06) T-A07-609 (FR-A07-630): helpers of the interface tests of Audio Odyssey (A07)
-// inside the one app, modelled on `MLSupport`. A07 is a candidate until X-A07 (`ExperienceRegistry.candidates`), so
+// inside the one app, modelled on `MLSupport`. A07 was a candidate until X-A07 (integrated 2026-11-14); as in `MLSupport`,
 // every launch carries `-vcCandidates`; the tests open it directly with `-openExperience`. The controls are found by
 // the identifiers of `OdysseyControls` (`port.identifier(name)`, that is `experience.a07.audio-odyssey.<name>`). They
 // sit below the canvas in a scroll view of limited height, so a control is scrolled into view before it is used, and a
