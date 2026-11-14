@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/VisualCore"
+  ],
+  "command": "swift test --package-path Packages/VisualCore",
+  "elapsed_seconds": 39.629,
+  "exit_code": 0,
+  "finished": "2026-11-14T14:31:48+00:00",
+  "log": ".autonomy/logs/A07-P04.visualcore-host-ci.log",
+  "log_sha256": "1554eac1840d4f4d919e90faee99627aedcb2c6a1f829a714af6b3a8fb39e6ab",
+  "name": "visualcore-host-ci",
+  "stage": "A07-P04",
+  "started": "2026-11-14T14:31:08+00:00",
+  "timed_out": false
+}
