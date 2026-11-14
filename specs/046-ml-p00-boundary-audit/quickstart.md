@@ -6,7 +6,7 @@ python3 scripts/release_check.py --only reference-engine-xcframework reference-b
 python3 scripts/release_check.py --only reference-test-anglerendering-ios27 reference-test-anglerendering-ios26 projectm-reference-ios27 projectm-reference-ios26
 python3 scripts/release_check.py --only app-build-for-testing-ios27
 python3 scripts/check_experience_packages.py
-git diff --stat c37f95fe..HEAD -- Packages External
+git diff --stat 4c27bfaf..HEAD -- Packages External
 python3 scripts/test_scripts.py
 ```
 
