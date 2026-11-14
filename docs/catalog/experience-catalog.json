@@ -1016,18 +1016,17 @@
     ]
    },
    "implementation": {
-    "state": "standalone-partial",
+    "state": "standalone-complete",
     "legacy_gates_passed": [
      "A05-P00",
      "A05-P01",
      "A05-P02",
      "A05-P03",
      "A05-P04",
-     "A05-P05"
-    ],
-    "legacy_gates_pending": [
+     "A05-P05",
      "A05-P06"
     ],
+    "legacy_gates_pending": [],
     "unified_integration": "pending"
    },
    "source": {
