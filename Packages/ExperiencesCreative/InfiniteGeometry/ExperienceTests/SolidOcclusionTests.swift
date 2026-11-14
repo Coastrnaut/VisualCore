@@ -77,6 +77,8 @@ final class SolidOcclusionTests: XCTestCase {
 
     private func render(yaw: Double) async throws -> Frame {
         let session = ExperienceSession()
+        // The CPU ray cast uses the full 24-segment mesh, so the drawn mesh must be the best tier (feature 044).
+        session.qualityPin = 0
         var made: (any Experience)?
         let opened = await session.open(request { made = $0 })
         XCTAssertEqual(opened, .running)

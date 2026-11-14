@@ -32,8 +32,16 @@
 // with its index, a preset that does not build with its rule code, a camera outside the bounds of the built composition
 // with `a05.open-out-of-bounds` (the same clamp-equality rule as a restore), the current state as unchanged; otherwise
 // preset index, preset, composition and both cameras are replaced together.
+//
+// Feature 044 (A05-P05) T-A05-504 (FR-A05-501–505; spec Clarifications; data-model "GeometryCore.qualityTier"):
+// four quality levels, Full, High, Medium and Low (element shares 1, ⅔, ½, ⅓), give the 3D composition's drawn
+// tessellation 24, 16, 12 and 8 segments (`segments(forTier:)` through VisualCoreDiagnostics' `TessellationChoice`).
+// The tier the host sets is stored clamped in `qualityTier`, which is presentation only: it is not written to the
+// digest, not encoded in the snapshot, not compared by `==` and kept across `reset()`. The reference composition
+// (digest, element count, bounding radius) is always built at the full 24 segments.
 import Foundation
 import InfiniteGeometryCore
+import VisualCoreDiagnostics
 import VisualCoreExperience
 import VisualCoreMath
 import VisualCorePersistence
@@ -203,6 +211,51 @@ public struct GeometryCore: ExperienceCore, Equatable, Codable {
     public private(set) var orbit3D: Orbit3D = .default
     /// The bounding radius of the current composition (derived from the built mesh; 0 for a 2D preset).
     public private(set) var boundingRadius: Double = 0
+    /// The quality tier the host set (0 = Full … 3 = Low, clamped); presentation only — not in the digest, the
+    /// snapshot or `==` (FR-A05-504).
+    public private(set) var qualityTier = 0
+
+    // MARK: Quality (FR-A05-501)
+
+    /// The full revolution segments of a 3D petal (the reference composition's tessellation).
+    public static let fullSegments = Composition.petalSegments
+    /// The fewest revolution segments any quality level draws.
+    public static let minimumSegments = 8
+
+    /// Four quality tiers (FR-A05-501).
+    public static var qualityTiers: Int { 4 }
+
+    /// Full, High, Medium and Low: element shares 1, ⅔, ½ and ⅓ (the 3D composition's tessellation), the full
+    /// resolution and iteration shares and no effect pass at every level, so no budget rises.
+    public static var qualityProfile: QualityProfile {
+        let levels = [QualityLevel(name: "Full", elementShare: 1),
+                      QualityLevel(name: "High", elementShare: 2.0 / 3.0),
+                      QualityLevel(name: "Medium", elementShare: 0.5),
+                      QualityLevel(name: "Low", elementShare: 1.0 / 3.0)]
+        return (try? QualityProfile(levels: levels)) ?? .uniform(levels: levels.count)
+    }
+
+    /// The revolution segments the 3D composition is drawn with at `tier` (clamped to the profile):
+    /// `TessellationChoice.segments(full: 24, minimum: 8, share:)` of the level's element share — 24, 16, 12, 8.
+    public static func segments(forTier tier: Int) -> Int {
+        TessellationChoice.segments(full: fullSegments, minimum: minimumSegments,
+                                    share: qualityProfile.level(tier).elementShare)
+    }
+
+    /// The revolution segments of the drawn 3D composition at the current `qualityTier`.
+    public var drawSegments: Int { Self.segments(forTier: qualityTier) }
+
+    /// Stores `tier` clamped to 0 ..< `qualityTiers`; the state and its digest do not change (FR-A05-504).
+    public mutating func setQualityTier(_ tier: Int) {
+        qualityTier = min(max(tier, 0), Self.qualityTiers - 1)
+    }
+
+    /// Equal states: every stored value except the presentation-only `qualityTier`.
+    public static func == (lhs: GeometryCore, rhs: GeometryCore) -> Bool {
+        lhs.seed == rhs.seed && lhs.presetIndex == rhs.presetIndex && lhs.preset == rhs.preset
+            && lhs.compositionDigest == rhs.compositionDigest && lhs.elementCount == rhs.elementCount
+            && lhs.view2D == rhs.view2D && lhs.orbit3D == rhs.orbit3D && lhs.boundingRadius == rhs.boundingRadius
+    }
 
     /// The bounds of the orbit camera on the current composition.
     public var orbitViewBounds: OrbitViewBounds { Self.orbitViewBounds(clearance: boundingRadius) }
@@ -472,9 +525,12 @@ public struct GeometryCore: ExperienceCore, Equatable, Codable {
         return .accepted
     }
 
-    /// Back to the preparation: curated preset 0 with the preparation seed (it built when it was prepared).
+    /// Back to the preparation: curated preset 0 with the preparation seed (it built when it was prepared); the
+    /// quality tier, which is not state, is kept.
     public mutating func reset() {
-        if let fresh = try? GeometryCore(seed: seed) { self = fresh }
+        guard var fresh = try? GeometryCore(seed: seed) else { return }
+        fresh.qualityTier = qualityTier
+        self = fresh
     }
 
     /// `composition-built`: every state this core holds was built from a validated preset (clarification 5).
@@ -581,7 +637,7 @@ public struct GeometryCore: ExperienceCore, Equatable, Codable {
     }
 
     /// Encodes the seed, the preset index, the preset and the two cameras; the composition is derived and rebuilt
-    /// on decoding.
+    /// on decoding, and the quality tier is not encoded (the host applies it again after a restore).
     public func encode(to encoder: any Encoder) throws {
         var c = encoder.container(keyedBy: CodingKeys.self)
         try c.encode(seed, forKey: .seed)

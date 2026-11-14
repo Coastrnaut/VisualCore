@@ -1,4 +1,7 @@
 // Composition.swift — feature 040 (A05-P01) T-A05-103 (FR-A05-112, FR-A05-113; spec Clarifications: bounds, 3D).
+// Feature 044 (A05-P05) T-A05-504 (FR-A05-501, FR-A05-510): the solid's revolution segments are a parameter (default
+// 24, the reference tessellation of `build`), `solidMesh(_:segments:)` builds a drawing-only mesh at a quality tier's
+// segment count and `meshSignature(_:segments:)` is the mesh cache key of that mesh.
 import Foundation
 import VisualCoreMath
 import VisualCoreScenes
@@ -34,8 +37,9 @@ public struct Polygon2D: Sendable, Equatable {
 /// polygons is counted from the centroid's images before any polygon is built; more than `maxPolygons` is refused,
 /// never truncated.
 ///
-/// 3D rule: `order` copies of the revolved motif profile (24 segments), each translated to radius 1.5 on the z axis and
-/// rotated about the vertical axis by 2πk/order, concatenated into one mesh. For order ≥ 2 the profile's radii are
+/// 3D rule: `order` copies of the revolved motif profile (24 segments in `build`; `solidMesh(_:segments:)` takes any
+/// count for drawing at a lower quality tier, its vertices on the same surfaces of revolution), each translated to
+/// radius 1.5 on the z axis and rotated about the vertical axis by 2πk/order, concatenated into one mesh. For order ≥ 2 the profile's radii are
 /// scaled (never enlarged) so a petal's radius is at most 0.9 · 1.5 · sin(π/order) and neighbouring petals stay apart
 /// (research D3). Each petal is closed, so the whole mesh validates closed; it must fit `MeshBudget.default`.
 public enum Composition: Sendable, Equatable {
@@ -50,8 +54,8 @@ public enum Composition: Sendable, Equatable {
     static let tilingCellSize = 0.4
     /// Distance of each 3D petal from the vertical axis.
     static let petalRadius = 1.5
-    /// Revolution segments of each 3D petal.
-    static let petalSegments = 24
+    /// Revolution segments of each 3D petal in the reference composition (`build`, digest and bounds).
+    public static let petalSegments = 24
 
     /// Builds the composition of `preset` (validated first); deterministic, GPU- and clock-free (FR-A05-113).
     ///
@@ -61,10 +65,53 @@ public enum Composition: Sendable, Equatable {
     public static func build(_ preset: GeometryPreset) throws(CompositionError) -> Composition {
         let preset = try validate(preset)
         let motif = Motif.make(seed: preset.seed, kind: preset.kind, order: preset.order)
-        if preset.kind == .solid { return .solid(try solid(motif, order: preset.order)) }
+        if preset.kind == .solid { return .solid(try solid(motif, order: preset.order, segments: petalSegments)) }
         let plan = try planePlan(preset, motif: motif)
         guard plan.kept.count <= maxPolygons else { throw .budget(plan.kept.count) }
         return .plane(try planePolygons(plan, motif: motif))
+    }
+
+    /// The closed mesh of the 3D composition of `preset` (validated first) with `segments` revolution segments per
+    /// petal (FR-A05-501): the drawing-only mesh of a quality tier. At `petalSegments` it equals the mesh of `build`;
+    /// at fewer segments its vertices lie on the same petal surfaces, so its bounding sphere lies inside the
+    /// reference one. Deterministic and GPU-free.
+    ///
+    /// - Throws: `.invalid(code)` for a refused preset or a preset that is not `.solid`, or an unusable mesh input;
+    ///   `.budget(vertices)` when the mesh would exceed the default mesh budget.
+    public static func solidMesh(_ preset: GeometryPreset,
+                                 segments: Int = petalSegments) throws(CompositionError) -> Mesh {
+        let preset = try validate(preset)
+        guard preset.kind == .solid else { throw .invalid("solidMesh needs a solid preset") }
+        let motif = Motif.make(seed: preset.seed, kind: preset.kind, order: preset.order)
+        return try solid(motif, order: preset.order, segments: segments)
+    }
+
+    /// The mesh cache key of `solidMesh(preset, segments:)` (FR-A05-510; data-model "Mesh signature"): the first 8
+    /// bytes (little-endian) of the SHA-256 (`StableHash`) of a little-endian byte stream of the tag
+    /// `a05.solid-mesh.1`, the kind's raw value (UTF-8, length-prefixed), the order, the repetitions (`Int64`), the
+    /// scale's IEEE-754 binary64 bit pattern (−0 written as +0), the motif seed (`UInt64`) and `segments` (`Int64`).
+    /// Every value that changes the mesh is part of it; the palette is not (it only colours the mesh).
+    public static func meshSignature(_ preset: GeometryPreset, segments: Int) -> UInt64 {
+        var bytes: [UInt8] = []
+        func put64(_ v: UInt64) {
+            for s in stride(from: 0, to: 64, by: 8) { bytes.append(UInt8(truncatingIfNeeded: v >> UInt64(s))) }
+        }
+        func putText(_ text: String) {
+            let utf8 = Array(text.utf8)
+            put64(UInt64(utf8.count))
+            bytes += utf8
+        }
+        putText("a05.solid-mesh.1")
+        putText(preset.kind.rawValue)
+        put64(UInt64(bitPattern: Int64(preset.order)))
+        put64(UInt64(bitPattern: Int64(preset.repeats)))
+        put64((preset.scale == 0 ? 0.0 : preset.scale).bitPattern)
+        put64(preset.seed)
+        put64(UInt64(bitPattern: Int64(segments)))
+        let digest = StableHash.sha256(bytes)
+        var key: UInt64 = 0
+        for (index, byte) in digest.prefix(8).enumerated() { key |= UInt64(byte) << UInt64(8 * index) }
+        return key
     }
 
     /// The number of polygons a 2D preset would produce, counted without building any polygon (0 for `solid`).
@@ -181,7 +228,7 @@ public enum Composition: Sendable, Equatable {
 
     // MARK: - 3D
 
-    private static func solid(_ motif: Motif, order: Int) throws(CompositionError) -> Mesh {
+    private static func solid(_ motif: Motif, order: Int, segments: Int) throws(CompositionError) -> Mesh {
         var profile = motif.points
         if order >= 2, let widest = profile.map(\.x).max(), widest > 0 {
             let limit = 0.9 * petalRadius * sin(Double.pi / Double(order))
@@ -190,7 +237,7 @@ public enum Composition: Sendable, Equatable {
         }
         let petal: Mesh
         do throws(MeshError) {
-            petal = try Mesh.revolution(profile: profile, segments: petalSegments)
+            petal = try Mesh.revolution(profile: profile, segments: segments)
         } catch {
             switch error {
             case .budget(let vertices, _, _): throw .budget(vertices)

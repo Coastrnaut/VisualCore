@@ -75,7 +75,10 @@ extension GeometryCore {
     /// 4. repeated preset transitions leave the state stable: two full cycles through the four presets end where they
     ///    began (final digest = initial digest; the records' GPU counts show no leak);
     /// 5. non-square displays keep proportions: the hexagonal tiling at scale 0.5 drawn on the phone's non-square
-    ///    view (the presenter fits the shorter side; `GeometrySessionTests` checks the fit on a 160 × 240 view).
+    ///    view (the presenter fits the shorter side; `GeometrySessionTests` checks the fit on a 160 × 240 view). The
+    ///    multi-aspect check of A05-P05 (FR-A05-520, `GeometryProportionTests`) draws every preset on views of
+    ///    9:19.5, 1:1, 4:3 and 19.5:9: the kaleidoscope's drawn extent is square, the tilings' world-to-pixel scale
+    ///    is equal in x and y and the 3D composition's projected bounding sphere is round, each within 1 pixel.
     public static var fixtureEntries: [[ScenarioStep]] {
         let kaleidoscope = Double(curatedIndex(.kaleidoscope)), solid = Double(curatedIndex(.solid))
         let hex = Double(curatedIndex(.hexTiling))

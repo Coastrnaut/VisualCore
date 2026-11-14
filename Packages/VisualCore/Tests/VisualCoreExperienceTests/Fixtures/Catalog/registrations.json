@@ -99,7 +99,10 @@
         "presets"
       ],
       "quality_tiers": [
-        "level-0"
+        "Full",
+        "High",
+        "Medium",
+        "Low"
       ],
       "palette": [
         "#0B1026",

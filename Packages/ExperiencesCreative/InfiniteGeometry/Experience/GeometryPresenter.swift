@@ -31,6 +31,18 @@
 //   - Two fingers on the 3D composition pan the target with the centroid's movement (the composition follows the
 //     fingers: world delta = −movement · 2 · distance · tan(fov / 2) / view height, y down on screen) alongside the
 //     pinch zoom; the field of view has buttons only (`camera.fov`), and the canvas description states it.
+//
+// Feature 044 (A05-P05) T-A05-505 (FR-A05-506, FR-A05-510; spec Clarifications):
+//   - The 3D composition is drawn at the quality tier's tessellation (`GeometryCore.drawSegments`: 24, 16, 12 or 8
+//     segments), taken from a presenter-owned `MeshCache` keyed by `Composition.meshSignature(_:segments:)`; a
+//     repeated signature (a preset drawn again, a tier set back) is not rebuilt. The core's reference composition
+//     (digest, bounds, probe) stays at 24 segments; every lower tier's vertices lie inside its bounding sphere.
+//   - The drawn mesh is chosen once at the start of a render, so a tier change switches the mesh between frames,
+//     never during one; the `MeshRenderer` is recreated whenever the drawn signature changes.
+//   - The cache holds CPU meshes only: a context recreation (teardown, setup) rebuilds the GPU renderer from the
+//     cached mesh without building it again. `shedCaches()` empties it.
+//   - `pixelPoint(world:size:view:)` is the one world-to-pixel mapping of the 2D presets (the fit of the shorter side
+//     times the zoom, equal on both axes); the root node's transform, the probe and the proportion test use it.
 import Foundation
 import InfiniteGeometryCore
 import SwiftUI
@@ -59,6 +71,26 @@ final class GeometryPresenter: ExperiencePresenter {
     static func fitScale(width: Double, height: Double) -> Vec2 {
         let fit = min(width, height) / 2
         return Vec2(fit, fit)
+    }
+
+    /// The pixel position (x from the left, y up from the bottom) of world point `world` in a view of `size` pixels
+    /// seen through the 2D camera `view`: `size / 2 + (world − centre) · fit · zoom`, with the same `fitScale` on
+    /// both axes, so a world unit in x and in y spans the same number of pixels on every view shape (FR-A05-520).
+    static func pixelPoint(world: Vec2, size: Vec2, view: GeometryCore.View2D) -> Vec2 {
+        let fit = pixelsPerWorld(size: size, view: view)
+        return Vec2(size.x / 2 + (world.x - view.centerX) * fit.x, size.y / 2 + (world.y - view.centerY) * fit.y)
+    }
+
+    /// Pixels per world unit on each axis in a view of `size` pixels through `view`: `fitScale` times the zoom (the
+    /// same on both axes).
+    static func pixelsPerWorld(size: Vec2, view: GeometryCore.View2D) -> Vec2 {
+        fitScale(width: max(size.x, 1), height: max(size.y, 1)) * view.zoom
+    }
+
+    /// The world point at pixel `pixel` (x from the left, y up from the bottom): the inverse of `pixelPoint`.
+    static func worldPoint(pixel: Vec2, size: Vec2, view: GeometryCore.View2D) -> Vec2 {
+        let fit = pixelsPerWorld(size: size, view: view)
+        return Vec2((pixel.x - size.x / 2) / fit.x + view.centerX, (pixel.y - size.y / 2) / fit.y + view.centerY)
     }
 
     typealias Core = GeometryCore
@@ -97,8 +129,15 @@ final class GeometryPresenter: ExperiencePresenter {
     private var doubleTap = DoubleTapRecognizer()
     private var lastPoint: [Int: Vec2] = [:]
     private var meshRenderer: MeshRenderer?
-    /// The composition digest `meshRenderer` was made for.
-    private var meshDigest: String?
+    /// The mesh signature `meshRenderer` was made for (`Composition.meshSignature(_:segments:)`).
+    private var meshSignature: UInt64?
+    /// The CPU meshes of the drawn 3D composition by signature (preset shape and tier); kept across context
+    /// recreations, emptied by `shedCaches()` (FR-A05-510).
+    let meshCache = MeshCache()
+    /// The number of triangles of the 3D mesh drawn by the last render (0 when no solid was drawn).
+    private(set) var drawnTriangleCount = 0
+    /// The revolution segments of the 3D mesh drawn by the last render (0 when no solid was drawn).
+    private(set) var drawnSegments = 0
     /// The composition digest of `composition`.
     private var compositionKey: String?
     /// The current composition, rebuilt only when the core's composition digest changes.
@@ -147,6 +186,8 @@ final class GeometryPresenter: ExperiencePresenter {
         lastView = core.view2D
         lastKind = core.preset.kind
         lastOrbit = core.orbit3D
+        drawnTriangleCount = 0       // set again below when a solid is drawn
+        drawnSegments = 0
         switch composition {
         case .plane(let polygons) where core.preset.kind == .kaleidoscope:
             guard let kaleidoscope else { drawnCount = 0; return }
@@ -157,25 +198,36 @@ final class GeometryPresenter: ExperiencePresenter {
             drawnCount = polygons.count
         case .plane(let polygons):
             guard let root else { drawnCount = 0; return }
-            let fit = Self.fitScale(width: width, height: height)
-            let zoom = core.view2D.zoom
-            root.scale = fit * zoom
-            root.position = Vec2(-core.view2D.centerX * fit.x * zoom, -core.view2D.centerY * fit.y * zoom)
+            // The node transform is `pixelPoint(world:size:view:)` about the view's centre.
+            let perWorld = Self.pixelsPerWorld(size: Vec2(width, height), view: core.view2D)
+            root.scale = perWorld
+            root.position = Vec2(-core.view2D.centerX * perWorld.x, -core.view2D.centerY * perWorld.y)
             if primitives == nil { primitives = try PrimitiveRenderer(registry: context.resources) }
             try primitives?.draw(root, camera: Camera2D(), metrics: ViewMetrics(size: Vec2(width, height), scale: 1))
             drawnCount = polygons.count
-        case .solid(let mesh):
-            if meshRenderer == nil || meshDigest != compositionKey {
+        case .solid(let reference):
+            // The tier is read once, here at the start of the render: the drawn mesh switches between frames only.
+            let segments = core.drawSegments
+            let signature = Composition.meshSignature(core.preset, segments: segments)
+            let preset = core.preset
+            let mesh = try meshCache.mesh(for: signature) {
+                // At full tessellation the reference composition's mesh is the drawn mesh (no second build).
+                if segments == Composition.petalSegments { return reference }
+                return try Composition.solidMesh(preset, segments: segments)
+            }
+            if meshRenderer == nil || meshSignature != signature {
                 meshRenderer?.release()
                 meshRenderer = nil
                 meshRenderer = try MeshRenderer(mesh: mesh, registry: context.resources)
-                meshDigest = compositionKey
+                meshSignature = signature
             }
             guard let meshRenderer else { drawnCount = 0; return }
             if depthPass == nil { depthPass = Self.makeDepthPass(context) }
             let item = DepthMeshPass.Item(renderer: meshRenderer, color: Self.color(palette: core.preset.palette, index: 4))
             try depthPass?.draw([item], camera: core.orbit3D.camera, context: context)
             drawnCount = mesh.triangleCount
+            drawnTriangleCount = mesh.triangleCount
+            drawnSegments = segments
         case nil:
             drawnCount = 0
         }
@@ -188,17 +240,18 @@ final class GeometryPresenter: ExperiencePresenter {
         kaleidoscope = nil
         meshRenderer?.release()
         meshRenderer = nil
-        meshDigest = nil
+        meshSignature = nil          // the CPU meshes in `meshCache` stay valid; only the GPU renderer is rebuilt
         depthPass?.release()
         depthPass = nil
         drawnCount = 0
     }
 
-    /// Drops the composition and its scene tree; the next draw rebuilds them from the core.
+    /// Drops the composition, its scene tree and the cached CPU meshes; the next draw rebuilds them from the core.
     func shedCaches() {
         composition = nil
         compositionKey = nil
         root = nil
+        meshCache.removeAll()
     }
 
     /// Rebuilds the composition and the 2D tree when the core's composition digest differs from the cached one.
@@ -259,9 +312,11 @@ final class GeometryPresenter: ExperiencePresenter {
         case .plane(let polygons):
             let fit = Self.fitScale(width: width, height: height).x * view.zoom
             let margin = probeMarginPixels / fit
+            let size = Vec2(width, height)
             return probeCandidates.first { candidate in
-                let world = Vec2((candidate.x - 0.5) * width / fit + view.centerX,
-                                 (0.5 - candidate.y) * height / fit + view.centerY)
+                // Candidates are measured from the top left; `worldPoint` takes y up from the bottom.
+                let world = worldPoint(pixel: Vec2(candidate.x * width, (1 - candidate.y) * height), size: size,
+                                       view: view)
                 return !polygons.contains { covers($0.points, world, margin: margin) }
             }
         case .solid(let mesh):
