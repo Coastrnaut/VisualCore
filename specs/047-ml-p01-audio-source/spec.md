@@ -139,6 +139,9 @@ The spectrum transform used later by the scenes is correct: a pure tone shows it
   granted, denied, restricted) MUST be readable, and the request MUST be made only when not determined.
 - **FR-A06-105**: No audio is written to disk and nothing leaves the device; the microphone is released when the
   experience leaves or the source changes.
+- **FR-A06-107**: Choosing the microphone MUST NOT stop audio the person is already playing in other apps (the audio
+  session mixes with others); the demo and file sources play silently (they drive the visuals only, no speaker output)
+  in this phase.
 - **FR-A06-106**: The app MUST declare a microphone usage description stating that the input drives the visuals on the
   device and is not recorded or sent.
 
