@@ -31,6 +31,11 @@
 - [X] T-A06-213 Script tests (`python3 Tools/python/desktop_runbook.py run-check --stage A06-P02 --timeout 600 --name script-tests -- python3 scripts/test_scripts.py`) — Verified 2026-11-14: — Verified 2026-11-14: .autonomy/checks/A06-P02.script-tests.json
 - [ ] T-A06-214 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A06-P02
 
+## Phase 5: Convergence
+
+- [ ] T-A06-215 Add `FeatureExtractor.analyze(_:time:elapsed:into:)` writing into a caller-held `AudioFeatures` (band array reused when its count matches), correct the file comment, use it from `Packages/ExperiencesCreative/VisualCoreMusicLab/Experience/MusicLabPresenter.swift` (`lastFeatures` passed inout), and add `FeatureExtractorTests.analysisReusesTheCallersBandStorage` (band storage base address unchanged over 100 calls); record `python3 Tools/python/desktop_runbook.py run-check --stage A06-P02 --timeout 600 --name dsp-host-2 -- swift test --package-path Packages/VisualCore --filter VisualCoreAudioDSPTests` and update the API baseline per FR-A06-205 (partial)
+- [ ] T-A06-216 Assert the spoken ", beat" in `Packages/ExperiencesCreative/VisualCoreMusicLab/ExperienceTests/MusicLabAnalysisTests.swift` (`testTheNoteSequenceShowsSeparateBeats`, while `isBeat`); record `python3 Tools/python/desktop_runbook.py run-check --stage A06-P02 --timeout 600 --name experiences-ios27-2 -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing VisualCoreMusicLabExperienceTests VisualCoreMusicLabCoreTests` per US1/AC3, FR-A06-212 (partial)
+
 ## Dependencies
 
 T-A06-201 → (T-A06-202 ∥ T-A06-203 ∥ T-A06-205) → T-A06-204 → T-A06-206 → T-A06-207 → T-A06-208…213 → T-A06-214.
