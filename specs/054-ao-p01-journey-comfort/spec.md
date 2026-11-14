@@ -24,6 +24,41 @@ Canonical overrides:
 - **Owner rulings:** short tests; audits and device runs in the device campaign; iOS 27 at phase gates; every Spec Kit
   step runs.
 
+## Clarifications
+
+### Session 2026-11-14
+
+Answered autonomously under the owner's standing delegation, recommended option each time. Facts checked in code:
+`VisualCoreMath` (no dependencies) holds `Vec3`, `Mat4`, `Quat`, `Easing`, `OrbitCamera` (`lookAt` with world up,
+yaw/pitch, no roll) and `PrecisionAdvisor` (2D only); `SeededRandom` is in `VisualCoreSimulation`, so seeded control
+points are made by the caller; `DepthMeshPass.draw(_:camera:context:)` takes an `OrbitCamera`; `Mesh.tube` and
+`Mesh.surface` are in `VisualCoreScenes`.
+
+- Q: Which curve and orientation does the rail use? → A: A closed centripetal Catmull–Rom spline through the control
+  points (no cusps or self-loops for well-spaced points), sampled into an arc-length table so a travelled distance maps
+  to a curve position; the orientation is a level frame (right = direction × world up, normalised; up = right ×
+  direction), which is identical at the loop's wrap point (no twist seam) and keeps the horizon level. Rails reject
+  control points whose direction comes within 30° of vertical. Lives in `VisualCoreMath` as `CameraRail`.
+- Q: What are the comfort numbers? → A: `ComfortLimits.standard`: maximum speed 8 units/s, acceleration 1.5 units/s²,
+  turn rate 45°/s, sway amplitude 0.25 units, roll 0 (horizon lock); `reducedMotion`: maximum speed 2.5 units/s,
+  acceleration 0.75 units/s², sway 0, roll 0. Speed choices are slow 2, medium 4, fast 7 units/s (clamped by the active
+  limits). A time step is capped at 0.1 s. The rail generator keeps the radius of curvature at least
+  speed ÷ turn rate for the fastest speed, so turning never exceeds the limit.
+- Q: How is origin rebasing done? → A: Distance and world positions stay in double precision in the state; an origin
+  snaps to the nearest multiple of 1,024 units of the camera's world position when the camera moves more than 1,024
+  units from it; everything drawn is expressed relative to that origin and converted to single precision only then.
+  The origin is derived from the state (deterministic), not stored separately.
+- Q: What are the three worlds and their pieces? → A: Pieces cover 8 units of rail each; the window shows 2 pieces
+  behind and 8 ahead. Tunnel: a 24-sided tube of radius 3 with seeded radius ripples that depend only on rail distance
+  and angle, 9 rings per piece. Landscape: a 33-column strip 24 units wide under the rail, heights from seeded value
+  noise of (distance, lateral) so neighbours share edges, 9 rows per piece. Star corridor: 48 small octahedra per piece
+  placed by a hash of (seed, piece index, star index) inside a cylinder of radius 6, plus 4 thin guide rings; its "join"
+  rule is that every star belongs to exactly one piece by its distance. Vertex budget 4,096 per piece.
+- Q: How is the slice drawn without free view matrices (G-RAILDRAW is A07-P02)? → A: With roll held at zero, a rail
+  pose is exactly an `OrbitCamera` (target = eye + direction, distance 1, yaw and pitch from the direction), so
+  `CameraRail` offers that conversion and the experience draws through the existing `DepthMeshPass`; fog and free
+  matrices come with G-RAILDRAW.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Fly through a world on a calm rail (Priority: P1) 🎯
@@ -156,8 +191,6 @@ the start edge of the next; generation of a piece stays within its vertex budget
 
 - The rail is a closed loop so a flight never ends; distance wraps modulo the rail length (rebasing still applies to
   the unwrapped distance for the "long flight" edge case).
-- With roll held at zero the camera keeps the horizon level, so this slice can draw through the existing orbit-camera
-  drawing path; free view matrices and fog come with G-RAILDRAW in A07-P02.
 - A fixed short window of pieces around the camera is enough for this slice; the bounded streaming pool is A07-P02.
 
 ## Out of Scope
