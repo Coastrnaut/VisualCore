@@ -1,0 +1,26 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/ExperiencesCreative",
+    "--scheme",
+    "ExperiencesCreative-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--only-testing",
+    "VisualCoreMusicLabExperienceTests"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing VisualCoreMusicLabExperienceTests",
+  "elapsed_seconds": 5.726,
+  "exit_code": 0,
+  "finished": "2026-11-14T07:29:19+00:00",
+  "log": ".autonomy/logs/A06-P01.experiences-ios27-3.log",
+  "log_sha256": "e3c02cd7e57b8b0830c8b91eefe03d8c8cb26bfca06f73efcd368918fc167891",
+  "name": "experiences-ios27-3",
+  "stage": "A06-P01",
+  "started": "2026-11-14T07:29:13+00:00",
+  "timed_out": false
+}

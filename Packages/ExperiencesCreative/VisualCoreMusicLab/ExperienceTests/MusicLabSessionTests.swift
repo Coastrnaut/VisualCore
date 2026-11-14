@@ -3,7 +3,8 @@
 // source's 440 Hz tone is drawn as exactly the ring buffer's newest samples, which are the demo signal's own samples;
 // a permission double that is denied or restricted makes the core refuse the microphone with no request and the demo
 // kept, one that is not determined is asked once and a refusal falls back to the demo; closing stops the source; and
-// five rapid source switches end with only the last source running. The microphone itself is never started (doubles).
+// five rapid source switches end with only the last source running; an undecodable file keeps the previous source
+// (convergence T-A06-115/116, SC-A06-104). The microphone itself is never started (doubles).
 import XCTest
 import VisualCoreAudio
 import VisualCoreAudioDSP
@@ -215,5 +216,28 @@ final class MusicLabSessionTests: XCTestCase {
         XCTAssertEqual(last.state, .running)
         session.close()
         XCTAssertTrue(log.made.allSatisfy { $0.state == .idle })
+    }
+
+    func testAnUndecodableFileKeepsThePreviousSourceAndShowsAMessage() async throws {
+        let session = ExperienceSession()
+        let log = SourceLog()
+        let refusing = MusicLabSourceFactory(demo: log.factory.demo,
+                                             file: { _ in throw AudioSourceError.undecodable("not audio") },
+                                             microphone: log.factory.microphone)
+        let shell = try await open(session, permission: PermissionDouble(.granted), factory: refusing)
+        let presenter = shell.presenter
+        let demo = try XCTUnwrap(presenter.activeSource)
+        let before = try XCTUnwrap(shell.engine.core)
+        let file = FileManager.default.temporaryDirectory.appendingPathComponent("music-lab-not-audio.wav")
+        XCTAssertFalse(presenter.chooseFile(url: file))
+        XCTAssertTrue(session.renderHost?.renderOneFrame(present: false) ?? false)
+        XCTAssertEqual(try XCTUnwrap(shell.engine.core), before, "the state and digest are unchanged")
+        XCTAssertEqual(try XCTUnwrap(shell.engine.core).state.source, .demo)
+        XCTAssertTrue(presenter.activeSource === demo, "the demo keeps playing")
+        XCTAssertEqual(demo.state, .running)
+        XCTAssertEqual(presenter.mirror.message, MusicLabPresenter.undecodableMessage)
+        XCTAssertFalse(presenter.mirror.showsSettingsLink)
+        XCTAssertEqual(log.made.map(\.label), ["demo"], "no other source was made")
+        session.close()
     }
 }
