@@ -8,7 +8,7 @@
 - Constitution 2.5.0 commit `af97f2b0`; specify commit `951802c1`; reference pin `d93edd1`.
 - Framework products with tests: `VisualCoreSimulation` (`SeededRandom`, `FixedStepClock`, `FixedStepRunner`,
   `ParticleSystem`, `Emitter`), `VisualCoreRendering` (`ParticleRenderer`, `ParticleBlend`, `PrimitiveRenderer`),
-  `VisualCoreScenes` (`SceneGraph`, `Primitive` rect/circle/line/polygon/polyline, tap/double-tap/long-press/drag/pinch
+  `VisualCoreScenes` (`SceneNode` in `SceneGraph.swift`, `Primitive` rect/circle/line/polygon/polyline, tap/double-tap/long-press/drag/pinch
   recognizers, `GestureArbiter`, `PointerTracker`), `VisualCoreMath` (`Camera2D`, `PlaneViewport`),
   `VisualCoreEffectsGraph` + `VisualCoreEffects` (passes copy, blur, bloom, distort, composite, feedback),
   `VisualCoreExperience` (`ExperienceStorage`, quality tiers), `VisualCoreDiagnostics` (`QualityGovernor`).

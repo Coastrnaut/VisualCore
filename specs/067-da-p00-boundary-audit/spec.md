@@ -32,7 +32,7 @@ diff of `Packages` and `External` is taken from it); the reference submodule is 
 `scripts/check_experience_packages.py` reports `EXTRA_TARGET` for an experience target that belongs to no registered
 experience; VisualCore offers `VisualCoreSimulation` (`SeededRandom`, `FixedStepClock`, `FixedStepRunner`,
 `ParticleSystem` with `Emitter`, tested in `ParticleSystemTests`), `VisualCoreRendering` (`ParticleRenderer` with
-`ParticleBlend`, `PrimitiveRenderer`), `VisualCoreScenes` (`SceneGraph` with `Primitive` rect, circle, line, polygon
+`ParticleBlend`, `PrimitiveRenderer`), `VisualCoreScenes` (`SceneNode` in `SceneGraph.swift` with `Primitive` rect, circle, line, polygon
 and polyline drawn in one batch; tap, double-tap, long-press, drag and pinch recognizers; `GestureArbiter`),
 `VisualCoreMath` (`Camera2D`, `PlaneViewport`), `VisualCoreEffects` with the effect-graph passes copy, blur, bloom,
 distort, composite and feedback, and `VisualCoreExperience` (`ExperienceStorage`, quality tiers); no neighbour search
