@@ -27,7 +27,7 @@
 
 ## Phase 4: Polish & evidence
 
-- [ ] T-A06-312 DSP host tests (`python3 Tools/python/desktop_runbook.py run-check --stage A06-P03 --timeout 600 --name dsp-host -- swift test --package-path Packages/VisualCore --filter VisualCoreAudioDSPTests`)
+- [X] T-A06-312 DSP host tests (`python3 Tools/python/desktop_runbook.py run-check --stage A06-P03 --timeout 600 --name dsp-host -- swift test --package-path Packages/VisualCore --filter VisualCoreAudioDSPTests`) — Verified 2026-11-14: — Verified 2026-11-14: .autonomy/checks/A06-P03.dsp-host.json
 - [ ] T-A06-313 Hot-path check (`python3 Tools/python/desktop_runbook.py run-check --stage A06-P03 --timeout 600 --name hot-path -- python3 scripts/check_audio_hot_path.py`)
 - [ ] T-A06-314 Experiences package on sim-27.2 (`python3 Tools/python/desktop_runbook.py run-check --stage A06-P03 --timeout 600 --name experiences-ios27 -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test`)
 - [ ] T-A06-315 App build and unit (`python3 Tools/python/desktop_runbook.py run-check --stage A06-P03 --timeout 600 --name app-unit -- python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27`)
