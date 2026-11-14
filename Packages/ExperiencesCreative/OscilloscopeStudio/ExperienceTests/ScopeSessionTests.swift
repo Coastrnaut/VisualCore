@@ -12,6 +12,12 @@
 // are exactly `ScopeTrace.xyPoints` of the window's pairs scaled by the gain, one per frame; a mono source in XY keeps
 // the waveform with the mark "XY needs two channels" and says so, and a stereo source shows XY again without a new
 // choice; the description names the view and the test signal's 2 : 3 ratio.
+// Feature 063 (A08-P03) T-A08-303 (FR-A08-301–305; story 1 scenarios 1, 2, 4 and 5; SC-A08-301, SC-A08-302): with the
+// synchronous `ScopeBlockSource` (8,192 frames written at start, source time advanced explicitly, no wall clock) the
+// spectrum of the 1 kHz test sine reads 1,000 Hz within one bin at −6.02 dBFS within 1.5 dB, of the left channel, as
+// one polyline of at most one point per pixel column, and the description and the status carry the readout text; gain
+// ×10 leaves the readout unchanged; the flat line says "no signal"; 1,024 written frames say "filling"; the sweep's
+// readout rises over 0.3 s of source time.
 import Foundation
 import XCTest
 @testable import OscilloscopeStudioExperience
@@ -368,6 +374,113 @@ final class ScopeSessionTests: XCTestCase {
         XCTAssertLessThanOrEqual(presenter.lastTraceNodeCount, 2)
         XCTAssertNil(presenter.mirror.displayNote)
         XCTAssertTrue(shell.accessibilitySummary.contains("2 channels, XY view, "), shell.accessibilitySummary)
+        session.close()
+    }
+
+    func testTheSpectrumReadsTheOneKilohertzTestSineAndIgnoresTheGain() async throws {
+        let sources = ScopeBlockSources()
+        let session = ExperienceSession()
+        let shell = try await ScopeTest.open(session, factory: sources.factory)
+        let presenter = shell.presenter
+        XCTAssertTrue(shell.handle(control: "display.select", values: [2]).isAccepted)
+        XCTAssertEqual(try core(shell).state.display, .spectrum)
+        try ScopeTest.frames(session, 1)
+        XCTAssertEqual(presenter.stereoBuffer.totalFrames, 8_192, "the double wrote its frames at start only")
+        let readout = try XCTUnwrap(presenter.lastReadout)
+        XCTAssertEqual(readout.validity, .valid)
+        let frequency = try XCTUnwrap(readout.frequency)
+        XCTAssertLessThanOrEqual(abs(frequency - 1_000), 48_000.0 / 4_096, "within one bin")
+        let level = try XCTUnwrap(readout.levelDB)
+        XCTAssertLessThanOrEqual(abs(level - 20 * log10(0.5)), 1.5, "about −6 dBFS")
+        XCTAssertTrue(readout.text.hasPrefix("peak "), readout.text)
+        XCTAssertTrue(readout.text.hasSuffix(" dBFS, relative to full scale"), readout.text)
+
+        // One polyline, at most one point per pixel column; no waveform or XY trace.
+        XCTAssertGreaterThan(presenter.lastSpectrumColumns, 0)
+        XCTAssertGreaterThan(presenter.lastSpectrumPointCount, 1)
+        XCTAssertLessThanOrEqual(presenter.lastSpectrumPointCount, presenter.lastSpectrumColumns)
+        XCTAssertEqual(presenter.lastTraceNodeCount, 1)
+        XCTAssertFalse(presenter.lastShowsXY)
+        XCTAssertEqual(presenter.lastPointCounts, [0, 0])
+
+        // The status and the description carry the readout verbatim.
+        XCTAssertTrue(presenter.mirror.status.hasPrefix("spectrum view, left channel, " + readout.text),
+                      presenter.mirror.status)
+        let summary = shell.accessibilitySummary
+        XCTAssertTrue(summary.contains("2 channels, spectrum view, left channel, "), summary)
+        XCTAssertTrue(summary.contains(readout.text), summary)
+        XCTAssertEqual(presenter.lastReadout, readout, "the description analyses the same frames")
+
+        // The spectrum is not scaled by the display gain.
+        XCTAssertTrue(shell.handle(control: "gain.select", values: [4]).isAccepted)
+        XCTAssertEqual(try core(shell).state.gain, 10)
+        try ScopeTest.frames(session, 1)
+        XCTAssertEqual(presenter.lastReadout, readout, "gain ×10 leaves the readout unchanged")
+        XCTAssertTrue(shell.accessibilitySummary.contains(readout.text))
+        session.close()
+    }
+
+    func testTheSpectrumSaysFillingBeforeFourThousandNinetySixFrames() async throws {
+        let sources = ScopeBlockSources(initialFrames: 1_024)
+        let session = ExperienceSession()
+        let shell = try await ScopeTest.open(session, factory: sources.factory)
+        let presenter = shell.presenter
+        XCTAssertTrue(shell.handle(control: "display.select", values: [2]).isAccepted)
+        try ScopeTest.frames(session, 1)
+        XCTAssertEqual(presenter.stereoBuffer.totalFrames, 1_024)
+        let readout = try XCTUnwrap(presenter.lastReadout)
+        XCTAssertEqual(readout.validity, .filling)
+        XCTAssertNil(readout.frequency)
+        XCTAssertNil(readout.levelDB)
+        XCTAssertEqual(readout.text, "filling")
+        XCTAssertTrue(shell.accessibilitySummary.contains("spectrum view, left channel, "), shell.accessibilitySummary)
+        XCTAssertTrue(shell.accessibilitySummary.hasSuffix(", filling."), shell.accessibilitySummary)
+
+        // Once 4,096 frames are written the readout carries a value.
+        try XCTUnwrap(sources.last).advance(3_072)
+        try ScopeTest.frames(session, 1)
+        XCTAssertEqual(presenter.lastReadout?.validity, .valid)
+        session.close()
+    }
+
+    func testTheSpectrumOfAFlatLineSaysNoSignal() async throws {
+        let session = ExperienceSession()
+        let shell = try await ScopeTest.open(session, factory: ScopeTest.flatSources)
+        let presenter = shell.presenter
+        XCTAssertTrue(shell.handle(control: "display.select", values: [2]).isAccepted)
+        // The real-time flat source writes 1,024 frames at start and the rest at real-time pace (about 64 ms more).
+        let reached = try await ScopeTest.frames(session, until: { presenter.lastReadout?.validity == .noSignal },
+                                                 limit: 60)
+        XCTAssertTrue(reached, "readout: \(String(describing: presenter.lastReadout))")
+        XCTAssertNil(presenter.lastReadout?.frequency)
+        XCTAssertNil(presenter.lastReadout?.levelDB)
+        XCTAssertTrue(presenter.mirror.status.hasPrefix("spectrum view, left channel, no signal"),
+                      presenter.mirror.status)
+        XCTAssertTrue(shell.accessibilitySummary.hasSuffix(", no signal."), shell.accessibilitySummary)
+        session.close()
+    }
+
+    func testTheSpectrumReadoutFollowsTheSweep() async throws {
+        let sources = ScopeBlockSources()
+        let session = ExperienceSession()
+        let shell = try await ScopeTest.open(session, factory: sources.factory)
+        let presenter = shell.presenter
+        XCTAssertTrue(shell.handle(control: "signal.waveform", values: [2]).isAccepted)
+        XCTAssertTrue(shell.handle(control: "display.select", values: [2]).isAccepted)
+        try ScopeTest.frames(session, 1)
+        let sweep = try XCTUnwrap(sources.last)
+        XCTAssertEqual(sweep.framesWritten, 8_192)
+        let early = try XCTUnwrap(presenter.lastReadout)
+        XCTAssertEqual(early.validity, .valid)
+        let first = try XCTUnwrap(early.frequency)
+
+        // 0.3 s of source time later (14,400 frames at 48 kHz) the peak sits higher.
+        sweep.advance(14_400)
+        try ScopeTest.frames(session, 1)
+        let late = try XCTUnwrap(presenter.lastReadout)
+        XCTAssertEqual(late.validity, .valid)
+        let second = try XCTUnwrap(late.frequency)
+        XCTAssertGreaterThan(second, first + early.binWidth, "the readout rises with the sweep (\(first) → \(second))")
         session.close()
     }
 }

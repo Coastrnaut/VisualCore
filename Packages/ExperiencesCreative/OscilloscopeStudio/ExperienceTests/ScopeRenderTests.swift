@@ -5,6 +5,9 @@
 // a failure; and the experience's sources never create a graphics context of their own.
 // Feature 062 (A08-P02) T-A08-206 (FR-A08-210, FR-A08-211): the XY view of the stereo test signal draws a non-blank
 // frame that differs from the waveform frame (pixel hash and a visible number of pixels).
+// Feature 063 (A08-P03) T-A08-303 (FR-A08-301, FR-A08-303): the spectrum view of the 1 kHz test sine (the synchronous
+// `ScopeBlockSource`, so the analysis is full on the first frame) draws a non-blank frame with its probe holding that
+// differs from both the waveform and the XY frame (pixel hash and at least 1 % of the pixels).
 import Foundation
 import XCTest
 @testable import OscilloscopeStudioExperience
@@ -68,6 +71,41 @@ final class ScopeRenderTests: XCTestCase {
         XCTAssertNotEqual(StableHash.sha256Hex(waveform.rgba), StableHash.sha256Hex(xy.rgba))
         let differing = ScopeTest.differingPixels(waveform.rgba, xy.rgba)
         XCTAssertGreaterThan(differing, xy.width * xy.height / 100, "the views differ visibly")
+        session.close()
+        XCTAssertEqual(session.hostsAlive, 0)
+    }
+
+    func testTheSpectrumFrameIsNonBlankAndDiffersFromTheWaveformAndXYFrames() async throws {
+        let sources = ScopeBlockSources()
+        let session = ExperienceSession()
+        let shell = try await ScopeTest.open(session, factory: sources.factory, size: size)
+        try ScopeTest.frames(session, 2)
+        let waveform = try ScopeTest.picture(session)
+        XCTAssertTrue(shell.handle(control: "display.select", values: [1]).isAccepted)
+        try ScopeTest.frames(session, 2)
+        let xy = try ScopeTest.picture(session)
+        XCTAssertTrue(shell.presenter.lastShowsXY)
+
+        XCTAssertTrue(shell.handle(control: "display.select", values: [2]).isAccepted)
+        try ScopeTest.frames(session, 2)
+        let spectrum = try ScopeTest.picture(session)
+        XCTAssertEqual(shell.presenter.lastReadout?.validity, .valid)
+        XCTAssertGreaterThan(shell.presenter.lastSpectrumPointCount, 1)
+        XCTAssertTrue(FrameChecks.isNonBlank(spectrum.rgba, width: spectrum.width, height: spectrum.height),
+                      "the spectrum is not blank")
+        XCTAssertFalse(FrameChecks.isBlack(spectrum.rgba, width: spectrum.width, height: spectrum.height),
+                       "the spectrum is not black")
+        for probe in shell.frameProbes {
+            XCTAssertEqual(FrameChecks.probe(probe, rgba: spectrum.rgba, width: spectrum.width,
+                                             height: spectrum.height)?.rawValue,
+                           probe.expected, "spectrum \(probe.name)")
+        }
+        for (name, other) in [("waveform", waveform), ("XY", xy)] {
+            XCTAssertNotEqual(StableHash.sha256Hex(other.rgba), StableHash.sha256Hex(spectrum.rgba), name)
+            let differing = ScopeTest.differingPixels(other.rgba, spectrum.rgba)
+            XCTAssertGreaterThan(differing, spectrum.width * spectrum.height / 100,
+                                 "the spectrum differs visibly from the \(name) view")
+        }
         session.close()
         XCTAssertEqual(session.hostsAlive, 0)
     }

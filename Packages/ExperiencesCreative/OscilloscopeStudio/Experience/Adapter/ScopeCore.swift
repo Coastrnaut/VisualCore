@@ -36,6 +36,11 @@
 // 1 → 2 adds `display` 0 (waveform), so a stored A08-P01 state restores unchanged with the waveform view.
 // `schemaOneExample()` is the stored schema-1 payload the registry's migration check restores. The digest is
 // `ScopeState.digestText` (`a08.scope.v2|…|display=…`).
+//
+// Feature 063 (A08-P03) T-A08-303 (FR-A08-304): `display.select [0…2]` — waveform, XY, spectrum. The range is derived
+// from `ScopeDisplay.allCases`, so the spectrum view (raw value 2) is accepted without a schema change: the saved shape
+// stays schema 2 and A08-P02 snapshots restore unchanged. The spectrum is drawn by the presenter (not triggered, not
+// scaled by the gain); the core only keeps the choice.
 import Foundation
 import OscilloscopeStudioCore
 import VisualCoreAudioDSP

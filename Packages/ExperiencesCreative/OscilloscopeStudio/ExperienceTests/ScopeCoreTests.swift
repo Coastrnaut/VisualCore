@@ -8,6 +8,9 @@
 // Feature 062 (A08-P02) T-A08-206 (FR-A08-211, FR-A08-212): the ninth control `display.select [0…1]` accepted and
 // changing the digest, refused out of range and fractional; schema 2 with the stored schema-1 snapshot restored through
 // the engine with the waveform view, and `schemaOneExample()` passing the migration check.
+// Feature 063 (A08-P03) T-A08-303 (FR-A08-304): `display.select [0…2]` (the spectrum view, raw value 2) accepted and
+// changing the digest; 3 refused out of range, fractional values (1.5) refused as invalid choices; a payload with
+// `display` 2 restores the spectrum view in the same schema 2, and `display` 3 is refused.
 import Foundation
 import XCTest
 @testable import OscilloscopeStudioExperience
@@ -37,7 +40,7 @@ final class ScopeCoreTests: XCTestCase {
                         "trigger.level", "trigger.slope", "trigger.mode", "display.select"])
         XCTAssertEqual(ScopeCore.controls.map(\.id), ScopeCore.actionIDs)
         XCTAssertEqual(ScopeCore.controls.map { $0.ranges }, [[0...2], [0...2], [0...3], [0...4], [0...5], [-1...1],
-                                                             [0...1], [0...1], [0...1]])
+                                                             [0...1], [0...1], [0...2]])
         XCTAssertEqual(ScopeCore.migrations.currentVersion, 2)
         XCTAssertEqual(ScopeCore.qualityTiers, 1)
     }
@@ -50,14 +53,15 @@ final class ScopeCoreTests: XCTestCase {
                       ScriptedAction("trigger.level", [-0.25]), ScriptedAction("trigger.slope", [1]),
                       ScriptedAction("trigger.mode", [1]), ScriptedAction("source.select", [2]),
                       ScriptedAction("source.select", [1]), ScriptedAction("signal.waveform", [2]),
-                      ScriptedAction("display.select", [1])],
+                      ScriptedAction("display.select", [1]), ScriptedAction("display.select", [2])],
             rejected: [ScriptedAction("source.select", [3]), ScriptedAction("source.select", [0.5]),
                        ScriptedAction("signal.waveform", [.nan]), ScriptedAction("signal.frequency", [4]),
                        ScriptedAction("gain.select", [-1]), ScriptedAction("timebase.select", [6]),
                        ScriptedAction("timebase.select", [2.5]), ScriptedAction("trigger.level", [1.5]),
                        ScriptedAction("trigger.slope", [2]), ScriptedAction("trigger.mode", [0.4]),
-                       ScriptedAction("gain.select", []), ScriptedAction("display.select", [2]),
-                       ScriptedAction("display.select", [0.5]), ScriptedAction("bogus")])
+                       ScriptedAction("gain.select", []), ScriptedAction("display.select", [3]),
+                       ScriptedAction("display.select", [0.5]), ScriptedAction("display.select", [1.5]),
+                       ScriptedAction("bogus")])
         let report = await ExperienceConformance.run(ScopeCore.self, id: scopeID, plan: plan)
         for entry in report.entries { XCTAssertTrue(entry.passed, "\(entry.check): \(entry.detail)") }
     }
@@ -89,7 +93,7 @@ final class ScopeCoreTests: XCTestCase {
             ("timebase.select", 5),
             ("trigger.level", -1), ("trigger.level", 0.5), ("trigger.level", 1),
             ("trigger.slope", 1), ("trigger.slope", 0), ("trigger.mode", 1), ("trigger.mode", 0),
-            ("display.select", 1), ("display.select", 0), ("display.select", 1),
+            ("display.select", 1), ("display.select", 0), ("display.select", 2), ("display.select", 1),
         ]
         for (control, value) in script {
             let before = try engine.digest()
@@ -113,7 +117,9 @@ final class ScopeCoreTests: XCTestCase {
         var engine = try await makeEngine()
         let before = try engine.digest()
         XCTAssertEqual(engine.handle(control: "source.select", values: [3]), .rejected(.outOfRange(index: 0)))
-        XCTAssertEqual(engine.handle(control: "display.select", values: [2]), .rejected(.outOfRange(index: 0)))
+        XCTAssertEqual(engine.handle(control: "display.select", values: [3]), .rejected(.outOfRange(index: 0)))
+        XCTAssertEqual(engine.handle(control: "display.select", values: [1.5]),
+                       .rejected(.rule(code: ScopeRule.invalidChoice)))
         XCTAssertEqual(engine.handle(control: "display.select", values: [-1]), .rejected(.outOfRange(index: 0)))
         XCTAssertEqual(engine.handle(control: "timebase.select", values: [-1]), .rejected(.outOfRange(index: 0)))
         XCTAssertEqual(engine.handle(control: "trigger.level", values: [1.01]), .rejected(.outOfRange(index: 0)))
@@ -137,7 +143,8 @@ final class ScopeCoreTests: XCTestCase {
         XCTAssertEqual(core.apply(action("timebase.select", [6])), .rejected(.rule(code: ScopeRule.invalidChoice)))
         XCTAssertEqual(core.apply(action("trigger.slope", [-1])), .rejected(.rule(code: ScopeRule.invalidChoice)))
         XCTAssertEqual(core.apply(action("trigger.mode", [.nan])), .rejected(.rule(code: ScopeRule.invalidChoice)))
-        XCTAssertEqual(core.apply(action("display.select", [2])), .rejected(.rule(code: ScopeRule.invalidChoice)))
+        XCTAssertEqual(core.apply(action("display.select", [3])), .rejected(.rule(code: ScopeRule.invalidChoice)))
+        XCTAssertEqual(core.apply(action("display.select", [1.5])), .rejected(.rule(code: ScopeRule.invalidChoice)))
         XCTAssertEqual(core.apply(action("display.select", [0.25])), .rejected(.rule(code: ScopeRule.invalidChoice)))
         XCTAssertEqual(core.apply(action("trigger.level", [1.5])), .rejected(.rule(code: ScopeRule.invalidLevel)))
         XCTAssertEqual(core.apply(action("trigger.level", [.nan])), .rejected(.rule(code: ScopeRule.invalidLevel)))
@@ -190,7 +197,7 @@ final class ScopeCoreTests: XCTestCase {
             #"{"frequency":2,"gain":1,"level":0,"mode":0,"slope":0,"source":0,"timebase":6,"waveform":0}"#,
             #"{"frequency":2,"gain":1,"level":0,"mode":0,"slope":0,"source":0,"timebase":3,"waveform":3}"#,
             #"{"frequency":2,"gain":1,"level":0,"mode":0,"source":0,"timebase":3,"waveform":0}"#,
-            #"{"display":2,"frequency":2,"gain":1,"level":0,"mode":0,"slope":0,"source":0,"timebase":3,"waveform":0}"#,
+            #"{"display":3,"frequency":2,"gain":1,"level":0,"mode":0,"slope":0,"source":0,"timebase":3,"waveform":0}"#,
             #"{"display":-1,"frequency":2,"gain":1,"level":0,"mode":0,"slope":0,"source":0,"timebase":3,"waveform":0}"#,
         ]
         for text in damaged {
@@ -200,6 +207,8 @@ final class ScopeCoreTests: XCTestCase {
         XCTAssertEqual(try ScopeCore.restore(payload: Data(good.utf8), seed: 7).state, ScopeState.initial)
         let xy = #"{"display":1,"frequency":2,"gain":1,"level":0,"mode":0,"slope":0,"source":0,"timebase":3,"waveform":0}"#
         XCTAssertEqual(try ScopeCore.restore(payload: Data(xy.utf8), seed: 7).state.display, .xy)
+        let spectrum = #"{"display":2,"frequency":2,"gain":1,"level":0,"mode":0,"slope":0,"source":0,"timebase":3,"waveform":0}"#
+        XCTAssertEqual(try ScopeCore.restore(payload: Data(spectrum.utf8), seed: 7).state.display, .spectrum)
     }
 
     func testAStoredSchemaOneSnapshotRestoresWithTheWaveformView() async throws {

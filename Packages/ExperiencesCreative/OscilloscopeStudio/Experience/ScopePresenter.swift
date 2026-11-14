@@ -47,6 +47,23 @@
 //     without a new choice.
 //   - Description: the view is named after the channels ("waveform view", "XY view" and, with the stereo test
 //     signal, "left 1 kHz against right 1.5 kHz (2 : 3)"; "XY needs two channels" for a mono window in XY).
+//
+// Feature 063 (A08-P03) T-A08-303 (FR-A08-301–305, FR-A08-320; story 1; clarifications 2–5; edge cases):
+//   - Spectrum view (`state.display == .spectrum`): every drawn frame (and every description) reads the newest 4,096
+//     frames of the left (or only) channel from the running source's buffer (`StereoSampleBuffer.latestFrames` or the
+//     microphone ring's `latest`), with the buffer's total as the written-frame count; fewer frames are zero-padded by
+//     the analyser and the readout says "filling". ONE `SpectrumAnalyzer(size: 4096)` is created on first use and kept.
+//     The spectrum is not triggered and not scaled by the display gain. `SpectrumReadout.make` gives the peak readout
+//     ("peak 1,000 Hz at −6.0 dBFS, relative to full scale") or the reason none is shown ("no signal", "clipping,
+//     level not valid", "filling").
+//   - Drawing: the grid nodes carry the spectrum grid instead of the 10 × 8 divisions: vertical lines at the decade
+//     marks (100 Hz, 1 kHz, 10 kHz below Nyquist) and at the plot's left and right edges, horizontal lines at the level
+//     marks (0 to −100 dBFS every 20 dB); the unused grid nodes are empty. The curve is one `.polyline` of
+//     `SpectrumView.points` of the strongest bin per pixel column of the plot (y-up, like the waveform), in the clip
+//     colour while the window clips; the second trace node is empty.
+//   - Status text and description: "Spectrum view, left channel, <readout>, …" in `trace.status` and "…, 2 channels,
+//     spectrum view, left channel, <axes>, <readout>." spoken ("1 channel, spectrum view, …" for a mono source). Levels
+//     are always relative to full scale; nothing claims a calibrated measurement.
 import Foundation
 import SwiftUI
 import UIKit
@@ -159,6 +176,9 @@ final class ScopePresenter: ExperiencePresenter {
     nonisolated static let maxColumns = 4_096
     /// The mark of a mono window in the XY view.
     static let xyNeedsStereo = "XY needs two channels"
+    /// The words of the spectrum axes and marks (shown in the status text and spoken).
+    static let spectrumAxesWords = "frequency 20 Hz to half the sample rate on a logarithmic axis with marks at 100 Hz, "
+        + "1 kHz and 10 kHz, level 0 to \u{2212}100 dBFS with marks every 20 dB"
     /// The interval of the lifecycle watch in seconds.
     nonisolated static let watchInterval = 0.1
 
@@ -240,6 +260,13 @@ final class ScopePresenter: ExperiencePresenter {
     private(set) var lastTraceNodeCount = 0
     /// Whether the last frame drew the XY view (XY chosen and a two-channel window).
     private(set) var lastShowsXY = false
+    /// The peak readout of the last spectrum analysis (a drawn spectrum frame or a description in the spectrum view);
+    /// nil before the first one and while no source runs.
+    private(set) var lastReadout: SpectrumReadout?
+    /// The points of the spectrum polyline drawn by the last spectrum frame (at most one per pixel column).
+    private(set) var lastSpectrumPointCount = 0
+    /// The pixel columns of the spectrum plot of the last spectrum frame.
+    private(set) var lastSpectrumColumns = 0
     /// The number of starts of a source since the presenter was created (tests read it).
     private(set) var startCount = 0
     /// Set only by tests; the next draw throws `ScopeDrawError.injected` and clears the flag.
@@ -252,6 +279,14 @@ final class ScopePresenter: ExperiencePresenter {
     private var gridNodes: [SceneNode] = []
     /// The two trace nodes (channel 0 or the XY trace, channel 1), reused every frame.
     private var traceNodes: [SceneNode] = []
+    /// The spectrum analyser, created on first use and kept (one FFT setup for the presenter's life).
+    private var analyzer: SpectrumAnalyzer?
+    /// The read buffers of the spectrum (4,096 frames each, reused).
+    private var spectrumLeft = [Float](repeating: 0, count: SpectrumReadout.frameSize)
+    private var spectrumRight = [Float](repeating: 0, count: SpectrumReadout.frameSize)
+    /// The magnitudes and sample rate of the last spectrum analysis (empty when none ran).
+    private var lastMagnitudes: [Float] = []
+    private var lastSpectrumRate = TestSignal.defaultSampleRate
 
     init(experienceID: ExperienceID, permission: any MicrophonePermission, factory: ScopeSourceFactory = .system) {
         self.experienceID = experienceID
@@ -332,6 +367,7 @@ final class ScopePresenter: ExperiencePresenter {
         try clear.render(context, frame: frame)
         let window = acquire(core.state)
         lastWindow = window
+        if core.state.display == .spectrum { analyseSpectrum() }
         updateStatus(core.state)
         let width = Double(max(1, context.pixelWidth)), height = Double(max(1, context.pixelHeight))
         layOut(width: width, height: height, window: window, state: core.state)
@@ -383,6 +419,12 @@ final class ScopePresenter: ExperiencePresenter {
             g += 1
         }
         let gain = state.gain
+        for node in gridNodes { node.primitive = nil }
+        if state.display == .spectrum {
+            layOutSpectrum(rect: (x: left, y: bottom, width: plotWidth, height: plotHeight))
+            lastTraceNodeCount = traceNodes.filter { $0.primitive != nil }.count
+            return
+        }
         if state.display == .xy, window.channelCount == 2 {
             let side = min(plotWidth, plotHeight)
             let square = (x: -side / 2, y: -side / 2, side: side)
@@ -425,6 +467,73 @@ final class ScopePresenter: ExperiencePresenter {
             lastShowsXY = false
         }
         lastTraceNodeCount = traceNodes.filter { $0.primitive != nil }.count
+    }
+
+    /// Analyses the newest 4,096 frames of the left (or only) channel of the running source with the one kept
+    /// `SpectrumAnalyzer` and records the magnitudes and the readout (nil, with no magnitudes, while no source runs).
+    private func analyseSpectrum() {
+        let samples: [Float]
+        let written: Int
+        if activeStereo != nil {
+            let n = stereoBuffer.latestFrames(SpectrumReadout.frameSize, left: &spectrumLeft, right: &spectrumRight)
+            samples = Array(spectrumLeft[0..<n])
+            written = stereoBuffer.totalFrames
+        } else if activeMono != nil {
+            let n = ring.latest(SpectrumReadout.frameSize, into: &spectrumLeft)
+            samples = Array(spectrumLeft[0..<n])
+            written = ring.totalWritten
+        } else {
+            lastMagnitudes = []
+            lastReadout = nil
+            return
+        }
+        if analyzer == nil { analyzer = SpectrumAnalyzer(size: SpectrumReadout.frameSize) }
+        guard let analyzer else {
+            lastMagnitudes = []
+            lastReadout = nil
+            return
+        }
+        let rate = activeSampleRate
+        let magnitudes = analyzer.magnitudesDB(samples)
+        lastMagnitudes = magnitudes
+        lastSpectrumRate = rate
+        lastReadout = SpectrumReadout.make(magnitudesDB: magnitudes, samples: samples, sampleRate: rate,
+                                           writtenFrames: written)
+    }
+
+    /// Places the spectrum grid (decade and plot-edge verticals, level-mark horizontals) and the spectrum curve
+    /// (one polyline, the strongest bin per pixel column) inside `rect` (world pixels, y up).
+    private func layOutSpectrum(rect: (x: Double, y: Double, width: Double, height: Double)) {
+        let columns = min(max(Int(rect.width.rounded(.down)), 1), SpectrumView.maximumWidth)
+        var lines: [(Vec2, Vec2, Vec4)] = []
+        lines.append((Vec2(rect.x, rect.y), Vec2(rect.x, rect.y + rect.height), Self.axisColor))
+        lines.append((Vec2(rect.x + rect.width, rect.y), Vec2(rect.x + rect.width, rect.y + rect.height),
+                      Self.axisColor))
+        for mark in SpectrumView.decadeMarks(sampleRate: lastSpectrumRate, width: rect.width) {
+            let x = rect.x + mark.x
+            lines.append((Vec2(x, rect.y), Vec2(x, rect.y + rect.height), Self.gridColor))
+        }
+        for level in SpectrumView.levelMarks {
+            let y = rect.y + (level - SpectrumView.floorDB) / -SpectrumView.floorDB * rect.height
+            let edge = level == 0 || level == SpectrumView.floorDB
+            lines.append((Vec2(rect.x, y), Vec2(rect.x + rect.width, y), edge ? Self.axisColor : Self.gridColor))
+        }
+        for (index, line) in lines.prefix(gridNodes.count).enumerated() {
+            gridNodes[index].primitive = .line(line.0, line.1, width: Self.gridWidth)
+            gridNodes[index].color = line.2
+        }
+        let reduced = SpectrumView.columns(magnitudesDB: lastMagnitudes, sampleRate: lastSpectrumRate,
+                                           size: SpectrumReadout.frameSize, width: columns)
+        let points = SpectrumView.points(reduced, in: rect, columnCount: columns)
+        traceNodes[0].primitive = points.count < 2
+            ? nil : Primitive.polyline(points.map(Self.vec), width: Self.traceWidth)
+        traceNodes[0].color = lastReadout?.validity == .clipping ? Self.clipColor : Self.traceColors[0]
+        traceNodes[1].primitive = nil
+        lastSpectrumPointCount = traceNodes[0].primitive == nil ? 0 : points.count
+        lastSpectrumColumns = columns
+        lastPointCounts = [0, 0]
+        lastXYPoints = []
+        lastShowsXY = false
     }
 
     /// The world position of a trace point (the same pixel units, y up).
@@ -665,8 +774,20 @@ final class ScopePresenter: ExperiencePresenter {
         var status = Self.channelWords(activeChannelCount) + ", " + Self.triggerWords(lastWindow, state: state) + ", "
             + (lastWindow?.clipped == true ? "clipping" : "not clipping")
         if state.display == .xy { status = (note ?? "XY view") + ", " + status }
+        if state.display == .spectrum {
+            status = "spectrum view, " + spectrumChannelWords + ", " + readoutWords + ", " + Self.spectrumAxesWords
+        }
         if mirror.status != status { mirror.status = status }
     }
+
+    /// The analysed channel in words: "left channel" for a two-channel source, "1 channel" for a mono one, "no
+    /// signal" while none runs.
+    private var spectrumChannelWords: String {
+        activeChannelCount == 2 ? "left channel" : Self.channelWords(activeChannelCount)
+    }
+
+    /// The peak readout in words (`SpectrumReadout.text`), "no signal" while no source runs.
+    private var readoutWords: String { lastReadout?.text ?? "no signal" }
 
     /// The channel count the view is decided by: the last window's, or the running source's before the first window.
     private var viewChannelCount: Int { lastWindow?.channelCount ?? activeChannelCount }
@@ -769,12 +890,20 @@ final class ScopePresenter: ExperiencePresenter {
 
     /// "Oscilloscope Studio: test signal, sine 1 kHz, 2 channels, waveform view, 1 ms per division, gain ×1, triggered
     /// rising at 0, not clipping." (in XY: "…, 2 channels, XY view, left 1 kHz against right 1.5 kHz (2 : 3), …"; a
-    /// mono window in XY: "…, 1 channel, XY needs two channels, waveform view, …"). Also brings the running source in
-    /// line with `core`.
+    /// mono window in XY: "…, 1 channel, XY needs two channels, waveform view, …"; in the spectrum view: "…, 2
+    /// channels, spectrum view, left channel, <axes>, peak 1,000 Hz at −6.0 dBFS, relative to full scale." with a
+    /// fresh analysis, or the reason no peak is shown). Also brings the running source in line with `core`.
     func describe(_ core: ScopeCore) -> String {
         checkLifecycle()
         sync(core)
         let state = core.state
+        if state.display == .spectrum {
+            analyseSpectrum()
+            let channels = Self.channelWords(activeChannelCount)
+            let analysed = activeChannelCount == 2 ? ", left channel" : ""
+            return "Oscilloscope Studio: \(spokenSource(state)), \(channels), spectrum view\(analysed), "
+                + "\(Self.spectrumAxesWords), \(readoutWords)."
+        }
         return "Oscilloscope Studio: \(spokenSource(state)), \(Self.channelWords(activeChannelCount)), "
             + "\(viewWords(state)), "
             + "\(ScopeSettings.timebaseName(state.timebaseIndex)), gain \(ScopeSettings.gainName(state.gainIndex)), "

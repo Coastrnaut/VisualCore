@@ -5,6 +5,9 @@
 // frame without waiting), opening the experience in the one app's session host, drawing frames, measuring the periods
 // in a window from its interpolated rising zero crossings, and reading the pixels of a frame.
 // Feature 062 (A08-P02) T-A08-206: a factory whose "file" is a mono 1 kHz test signal (one channel, so XY falls back).
+// Feature 063 (A08-P03) T-A08-303: `ScopeBlockSource`, a synchronous test-signal double that writes a fixed number of
+// frames in `start` (8,192 by default, so a 4,096-frame spectrum is full at once) and more only through `advance(_:)`
+// (source time moves without the wall clock), and `ScopeBlockSources`, the factory that hands them out and keeps them.
 import Foundation
 import XCTest
 @testable import OscilloscopeStudioExperience
@@ -40,6 +43,83 @@ final class ScopeQuietMicrophone: AudioSource {
 
     func start(into buffer: SampleRingBuffer) throws { state = .running }
     func stop() { state = .idle }
+}
+
+/// A deterministic two-channel source double: renders its `TestSignal` synchronously, `initialFrames` frames in
+/// `start(into:)` and `advance(_:)` frames on request; no timer, so source time moves only when a test says so.
+@MainActor
+final class ScopeBlockSource: StereoAudioSource {
+    let sampleRate: Double
+    let channelCount: Int
+    private(set) var state: AudioSourceState = .idle
+    /// The frames written since the last start.
+    private(set) var framesWritten = 0
+
+    private let initialSignal: TestSignal
+    private var signal: TestSignal
+    private let initialFrames: Int
+    private var buffer: StereoSampleBuffer?
+    private var left: [Float] = []
+    private var right: [Float] = []
+
+    init(signal: TestSignal, initialFrames: Int = 8_192) {
+        initialSignal = signal
+        self.signal = signal
+        self.initialFrames = initialFrames
+        sampleRate = signal.sampleRate
+        channelCount = signal.channelCount
+    }
+
+    func start(into buffer: StereoSampleBuffer) throws {
+        self.buffer = buffer
+        signal = initialSignal
+        framesWritten = 0
+        state = .running
+        advance(initialFrames)
+    }
+
+    func stop() {
+        buffer = nil
+        state = .idle
+    }
+
+    /// Renders and writes the next `frames` frames in blocks of 1,024 (nothing while stopped).
+    func advance(_ frames: Int) {
+        guard let buffer else { return }
+        var remaining = frames
+        while remaining > 0 {
+            let n = min(remaining, 1_024)
+            signal.render(frames: n, left: &left, right: &right)
+            buffer.write(left: left, right: channelCount == 2 ? right : left)
+            remaining -= n
+            framesWritten += n
+        }
+    }
+}
+
+/// A source factory whose test signals are `ScopeBlockSource`s writing `initialFrames` at start; keeps every source it
+/// made so a test can advance the running one.
+@MainActor
+final class ScopeBlockSources {
+    let initialFrames: Int
+    /// Every test-signal source made, oldest first.
+    private(set) var made: [ScopeBlockSource] = []
+
+    init(initialFrames: Int = 8_192) { self.initialFrames = initialFrames }
+
+    /// The newest source made.
+    var last: ScopeBlockSource? { made.last }
+
+    /// The factory: block test signals, files refused as undecodable, a silent microphone.
+    var factory: ScopeSourceFactory {
+        ScopeSourceFactory(testSignal: { [self] signal in
+                               let source = ScopeBlockSource(signal: signal, initialFrames: initialFrames)
+                               made.append(source)
+                               return source
+                           },
+                           file: { _ in throw AudioSourceError.undecodable("test double") },
+                           microphone: { _ in ScopeQuietMicrophone() })
+    }
 }
 
 @MainActor

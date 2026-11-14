@@ -13,6 +13,9 @@
 // Feature 062 (A08-P02) T-A08-206 (FR-A08-211): the Display section starts with the view picker (`display.select`,
 //   label "View": Waveform, XY) and, while XY is chosen for a one-channel source, the mark "XY needs two channels"
 //   (`display.status`); the chosen view stays XY, so a stereo source shows XY again without a new choice.
+// Feature 063 (A08-P03) T-A08-303 (FR-A08-304, FR-A08-305): the view picker lists every `ScopeDisplay` case —
+//   Waveform, XY, Spectrum; in the spectrum view the trace status reads the analysed channel, the peak readout (or the
+//   reason none is shown) and the axes' marks. Levels are dBFS, relative to full scale.
 // Every control has an accessible label and value and an identifier from the port; hit areas are at least 44 points
 // high and text wraps. Levels are relative to full scale only; nothing claims a calibrated measurement.
 import SwiftUI
@@ -95,7 +98,8 @@ struct ScopeControls: View {
             section("Display") {
                 choicePicker("View", identifier: "display.select", selection: mirror.display.rawValue,
                              options: ScopeDisplay.allCases.map { Self.viewName($0) },
-                             hint: "Waveform draws each channel against time; XY plots the left channel against the right") { index in
+                             hint: "Waveform draws each channel against time; XY plots the left channel against the right; "
+                                + "Spectrum shows the left channel's levels against frequency, relative to full scale") { index in
                     _ = port.send("display.select", [Double(index)])
                 }
                 if let note = mirror.displayNote {
@@ -191,7 +195,7 @@ struct ScopeControls: View {
         }
     }
 
-    /// The picker name of a view: "Waveform" or "XY".
+    /// The picker name of a view: "Waveform", "XY" or "Spectrum".
     static func viewName(_ display: ScopeDisplay) -> String {
         Self.sentence(display.displayName)
     }
