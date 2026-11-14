@@ -22,6 +22,49 @@ Canonical overrides:
 - **Constitution:** 2.5.0 adds the A09 experience rules (committed at the start of this gate).
 - **Evidence:** host and simulator only.
 
+## Clarifications
+
+### Session 2026-11-14
+
+Answered autonomously under the owner's standing delegation, recommended option each time. Facts checked in code:
+the A09 constitution commit is `af97f2b0` and the A09-P00 specify commit `951802c1` (the phase start: the no-change
+diff of `Packages` and `External` is taken from it); the reference submodule is pinned at `d93edd1`;
+`scripts/check_experience_packages.py` reports `EXTRA_TARGET` for an experience target that belongs to no registered
+experience; VisualCore offers `VisualCoreSimulation` (`SeededRandom`, `FixedStepClock`, `FixedStepRunner`,
+`ParticleSystem` with `Emitter`, tested in `ParticleSystemTests`), `VisualCoreRendering` (`ParticleRenderer` with
+`ParticleBlend`, `PrimitiveRenderer`), `VisualCoreScenes` (`SceneGraph` with `Primitive` rect, circle, line, polygon
+and polyline drawn in one batch; tap, double-tap, long-press, drag and pinch recognizers; `GestureArbiter`),
+`VisualCoreMath` (`Camera2D`, `PlaneViewport`), `VisualCoreEffects` with the effect-graph passes copy, blur, bloom,
+distort, composite and feedback, and `VisualCoreExperience` (`ExperienceStorage`, quality tiers); no neighbour search
+(spatial hash or grid) and no steering or flocking exists in any framework product. The contract is
+`docs/apps/digital-aquarium/visualcore-contract.json` with the generated `visualcore-contract.md`, checked by
+`scripts/check_app_contract.py --app digital-aquarium`; the baseline is `docs/apps/digital-aquarium/
+regression-baseline.md`; the build steps are the named steps of `python3 scripts/release_check.py --list` at the time
+of the check, with the count.
+
+- Q: How is the manual's "compile an empty shell" gate met in the one app? → A: The one app is the shell: this phase
+  proves the VisualCore app still builds for testing with Digital Aquarium absent (not registered, not linked, catalog
+  unavailable). The experience's targets are created in A09-P01 with its first real domain rules, because an empty
+  target would be an `EXTRA_TARGET` finding and registering an empty experience would be a placeholder.
+- Q: What makes a capability "available"? → A: A public declaration in a VisualCore framework product with at least one
+  test that exercises it; an implementation that exists only inside another experience (A04's particle editor, A07's
+  tunnel pieces) or a harness is "requires adaptation" at best.
+- Q: Which package holds Digital Aquarium? → A: `Packages/ExperiencesCreative/DigitalAquarium` (Auto-Creator.md §16),
+  as A05–A08 did; no new package is created.
+- Q: Does Digital Aquarium need a permission or a new privacy answer? → A: No. The version 0.1 features need no
+  microphone, camera, photos or location (audio-reactive lighting is a later idea, not MVP); habitats are stored in
+  the experience's own storage, so the app's privacy answers do not change.
+- Q: Which aquarium pieces exist, and who owns the missing ones? → A: The seeded fixed-step clock, particles with an
+  emitter and renderer, batched 2D shapes, gestures, effect passes, storage and quality tiers exist. Gaps and owners,
+  following the manual's phases (P01 habitat model and license audit, P02 fish movement and visual prototype, P03
+  editing, feeding and save, P04 lighting, particles and accessibility, P05 ambient device testing): the habitat
+  document and species catalog → app-local (A09-P01); bounded steering forces with a bounded neighbour search →
+  `VisualCoreSimulation` and procedural fish shapes with swim animation → app-local (A09-P02); feed and decoration
+  placement → app-local over the shared gestures (A09-P03); depth layers, bubbles and caustics → app-local over the
+  particle system and effect passes, with a caustics pattern in `VisualCoreEffects` only if it proves reusable
+  (A09-P04); the ambient low-motion mode with dimming → app-local over quality tiers (A09-P05). The audit confirms or
+  corrects each from the code.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - An evidence-backed integration matrix (Priority: P1) 🎯
