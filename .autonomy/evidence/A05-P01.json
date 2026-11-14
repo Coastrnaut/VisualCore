@@ -1,0 +1,116 @@
+{
+  "checks": [
+    {
+      "attestation": ".autonomy/checks/A05-P01.app-unit-r2.json",
+      "command": "python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A05-P01.app-unit-r2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A05-P01.app-unit-r3.json",
+      "command": "python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A05-P01.app-unit-r3.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A05-P01.baseline.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A05-P01.baseline.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A05-P01.documented-api.json",
+      "command": "python3 scripts/check_documented_api.py --sources Apps/VisualCore",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A05-P01.documented-api.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A05-P01.experience-packages.json",
+      "command": "python3 scripts/check_experience_packages.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A05-P01.experience-packages.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A05-P01.experiences-ios26-r2.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-26.5 --action test",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A05-P01.experiences-ios26-r2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A05-P01.experiences-ios26.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-26.5 --action test",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A05-P01.experiences-ios26.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A05-P01.experiences-ios27-r2.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A05-P01.experiences-ios27-r2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A05-P01.experiences-ios27.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A05-P01.experiences-ios27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A05-P01.public-api.json",
+      "command": "python3 scripts/check_public_api.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A05-P01.public-api.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A05-P01.reference-1.json",
+      "command": "python3 scripts/release_check.py --only reference-engine-xcframework reference-build-projectm-ios-sim reference-clean",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A05-P01.reference-1.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A05-P01.reference-2.json",
+      "command": "python3 scripts/release_check.py --only reference-test-anglerendering-ios27 reference-test-anglerendering-ios26 projectm-reference-ios27 projectm-reference-ios26",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A05-P01.reference-2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A05-P01.script-tests-r2.json",
+      "command": "python3 scripts/test_scripts.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A05-P01.script-tests-r2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A05-P01.symmetry-host-r2.json",
+      "command": "swift test --package-path Packages/VisualCore --filter SymmetryTests",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A05-P01.symmetry-host-r2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A05-P01.verify-26-r2.json",
+      "command": "python3 scripts/verify_experiences.py --only a05.infinite-geometry --runtime 26",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A05-P01.verify-26-r2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A05-P01.verify-26.json",
+      "command": "python3 scripts/verify_experiences.py --only a05.infinite-geometry --runtime 26",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A05-P01.verify-26.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A05-P01.verify-27-r2.json",
+      "command": "python3 scripts/verify_experiences.py --only a05.infinite-geometry --runtime 27",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A05-P01.verify-27-r2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A05-P01.verify-27.json",
+      "command": "python3 scripts/verify_experiences.py --only a05.infinite-geometry --runtime 27",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A05-P01.verify-27.log"
+    }
+  ],
+  "generated": "2026-11-14T02:43:06+00:00",
+  "method": "deterministic-run-check",
+  "stage": "A05-P01",
+  "status": "pass"
+}
