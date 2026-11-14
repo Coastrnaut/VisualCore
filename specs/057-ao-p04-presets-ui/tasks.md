@@ -6,7 +6,7 @@
 
 ## Phase 1: Setup
 
-- [ ] T-A07-401 Baseline: cite `.autonomy/checks/A07-P03.odyssey-ios27-3.json` and `.autonomy/checks/A07-P03.app-unit.json` (tree unchanged since apart from documents) instead of a rerun (owner ruling of 2026-11-14)
+- [X] T-A07-401 Baseline: cite `.autonomy/checks/A07-P03.odyssey-ios27-3.json` and `.autonomy/checks/A07-P03.app-unit.json` (tree unchanged since apart from documents) instead of a rerun (owner ruling of 2026-11-14) — Verified 2026-11-14: Verified 2026-11-14: cited .autonomy/checks/A07-P03.odyssey-ios27-3.json and A07-P03.app-unit.json (tree unchanged since apart from documents); no rerun (owner ruling 2026-11-14)
 
 ## Phase 2: Foundational (Core)
 
