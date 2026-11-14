@@ -25,7 +25,7 @@
 
 ## Phase 5: User Story 3 — the regression fixture (P2)
 
-- [ ] T-A08-107 [US3] Write `Experience/Adapter/ScopeManifest.swift` (nine standard scenarios + fixture-1 1 kHz periods at 1 ms/div, fixture-2 spectrum bin, fixture-3 flat line no trigger) and generate `Packages/ExperiencesCreative/OscilloscopeStudio/scenario-manifest.json` (`TEST_RUNNER_UPDATE_SCENARIO_MANIFEST=1`), with `ExperienceTests/ScopeManifestTests.swift` (FR-A08-120; SC-A08-105)
+- [X] T-A08-107 [US3] Write `Experience/Adapter/ScopeManifest.swift` (nine standard scenarios + fixture-1 1 kHz periods at 1 ms/div, fixture-2 spectrum bin, fixture-3 flat line no trigger) and generate `Packages/ExperiencesCreative/OscilloscopeStudio/scenario-manifest.json` (`TEST_RUNNER_UPDATE_SCENARIO_MANIFEST=1`), with `ExperienceTests/ScopeManifestTests.swift` (FR-A08-120; SC-A08-105) — Verified 2026-11-14: 2026-11-14: ScopeManifest (9 standard + 3 fixtures) and scenario-manifest.json; ScopeManifestTests 4 tests pass on sim-27.2
 
 ## Phase 6: Polish & evidence
 
