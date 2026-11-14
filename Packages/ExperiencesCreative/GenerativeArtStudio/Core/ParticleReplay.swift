@@ -12,10 +12,17 @@ public enum ParticleReplay {
     /// Largest number of live particles.
     public static let capacity = 10_000
 
+    /// The number of fixed steps a replay to `time` runs: `time` clamped to 0…`ArtDocument.maxPreviewTime` (120 s; a
+    /// non-finite time counts as 0) divided by `step`, rounded. Both the one-shot replay and the cursor use it, so the
+    /// cap is one rule (tests check it here by arithmetic instead of replaying two minutes).
+    public static func stepCount(at time: Double) -> Int {
+        Int((min(max(time.isFinite ? time : 0, 0), ArtDocument.maxPreviewTime) / step).rounded())
+    }
+
     /// Particles of `document` (validated, particles family) at `time`, for a view `worldHeight` points tall.
     public static func instances(for document: ArtDocument, at time: Double, worldHeight: Double = 600) -> [ParticleInstance] {
         var system = makeSystem(document, worldHeight: worldHeight)
-        let steps = Int((min(max(time.isFinite ? time : 0, 0), ArtDocument.maxPreviewTime) / step).rounded())
+        let steps = stepCount(at: time)
         for _ in 0..<steps { system.step(step) }
         return system.instances()
     }
@@ -60,7 +67,7 @@ public struct ParticleReplayCursor: Sendable {
 
     /// Moves to `time` (clamped to 0…120 s) and returns the particles there.
     public mutating func instances(at time: Double) -> [ParticleInstance] {
-        let target = Int((min(max(time.isFinite ? time : 0, 0), ArtDocument.maxPreviewTime) / ParticleReplay.step).rounded())
+        let target = ParticleReplay.stepCount(at: time)
         if target < steps {
             system = ParticleReplay.makeSystem(document, worldHeight: worldHeight)
             steps = 0

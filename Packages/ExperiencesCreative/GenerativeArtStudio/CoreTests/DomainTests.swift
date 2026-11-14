@@ -118,16 +118,20 @@ private func generatedDocuments(count: Int = 60) -> [ArtDocument] {
     var other = doc; other.seed = 6
     #expect(ParticleReplay.instances(for: other, at: 2) != a)
     #expect(ParticleReplay.instances(for: doc, at: 0).isEmpty)
-    let capped = ParticleReplay.instances(for: doc, at: 10_000), atMax = ParticleReplay.instances(for: doc, at: 120)
-    #expect(capped == atMax, "replay time is capped at 120 s")
-    #expect(atMax.count <= ParticleReplay.capacity)
+    // The 120 s cap, by arithmetic on the shared step count (owner short-test rule of 2026-11-13: a two-minute replay
+    // twice took 12 s under parallel load); the replay itself is exercised at short times.
+    #expect(ParticleReplay.stepCount(at: 10_000) == ParticleReplay.stepCount(at: 120), "replay time is capped at 120 s")
+    #expect(ParticleReplay.stepCount(at: 120) == 7_200)
+    #expect(ParticleReplay.stepCount(at: -5) == 0 && ParticleReplay.stepCount(at: .nan) == 0)
+    #expect(ParticleReplay.instances(for: doc, at: 4).count <= ParticleReplay.capacity)
     #expect(a.allSatisfy { $0.position.x.isFinite && $0.position.y.isFinite })
 }
 
 @Test func replayCursorMatchesFullReplay() throws {
     let doc = try ArtDocument.from(FamilyCatalog.family(.particles).presets[1], family: .particles).validated().document
     var cursor = ParticleReplayCursor(document: doc)
-    for t in [0.5, 1.0, 3.25, 2.0, 200] {   // forward, forward, forward, backward (rebuild), beyond the cap
+    for t in [0.5, 1.0, 3.25, 2.0, 4.0] {   // forward, forward, forward, backward (rebuild), forward again (the cap is
+                                            // the shared `stepCount`, checked by arithmetic above)
         #expect(cursor.instances(at: t) == ParticleReplay.instances(for: doc, at: t), "t = \(t)")
     }
 }
