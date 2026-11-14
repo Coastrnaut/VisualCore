@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/VisualCore",
+    "--filter",
+    "OrbitViewBoundsTests"
+  ],
+  "command": "swift test --package-path Packages/VisualCore --filter OrbitViewBoundsTests",
+  "elapsed_seconds": 8.752,
+  "exit_code": 1,
+  "finished": "2026-11-14T03:32:11+00:00",
+  "log": ".autonomy/logs/A05-P03.camera-host.log",
+  "log_sha256": "1c88a2c34af61724ef525d89977f068a4b810e8904a75bed3e15e1b3a96e510d",
+  "name": "camera-host",
+  "stage": "A05-P03",
+  "started": "2026-11-14T03:32:02+00:00",
+  "timed_out": false
+}
