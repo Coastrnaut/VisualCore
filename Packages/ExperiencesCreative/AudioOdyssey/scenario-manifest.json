@@ -14,7 +14,8 @@
     "easing.select",
     "comfort.calm",
     "mapping.set",
-    "mapping.reset"
+    "mapping.reset",
+    "preset.apply"
   ],
   "experience" : "a07.audio-odyssey",
   "kind" : "creative",
@@ -451,20 +452,45 @@
       "entries" : [
         {
           "action" : {
-            "control" : "speed.select",
+            "control" : "preset.apply",
             "values" : [
-              1
+              1,
+              0,
+              1,
+              4,
+              1,
+              1,
+              1,
+              4,
+              1,
+              3,
+              1,
+              4,
+              1,
+              4,
+              1,
+              0
             ]
           },
           "result" : "accepted",
           "steps" : 1
         },
         {
+          "action" : {
+            "control" : "speed.select",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
           "steps" : 600
         }
       ],
       "expect" : {
-        "finalDigest" : "f574d709854e37f766e2c57fff8aba9f4b90487f140b338705e21a4ce1b3cdfb",
+        "finalDigest" : "a658187a4334586d42fffe9bb4cb3fbbe1ead7a29df0379f3962f2d8dbfae09b",
         "initialDigest" : "d54b2b11e499801746a9e6b6ac2c0f51ffde1969e3d09c190858ac4921828353"
       },
       "name" : "fixture-4",
