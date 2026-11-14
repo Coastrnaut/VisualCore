@@ -7,7 +7,7 @@
 
 ## Phase 1: Setup
 
-- [ ] T-A08-101 Baseline: cite the last package evidence on an unchanged `Packages` tree (`.autonomy/checks/A08-P00.app-build.json`, `.autonomy/migration/checks/X-A07.followthrough-odyssey.json`) instead of a rerun (owner ruling of 2026-11-14)
+- [X] T-A08-101 Baseline: cite the last package evidence on an unchanged `Packages` tree (`.autonomy/checks/A08-P00.app-build.json`, `.autonomy/migration/checks/X-A07.followthrough-odyssey.json`) instead of a rerun (owner ruling of 2026-11-14) — Verified 2026-11-14: 2026-11-14: Packages unchanged since the X-A07 follow-through; cites .autonomy/checks/A08-P00.app-build.json and .autonomy/migration/checks/X-A07.followthrough-odyssey.json
 
 ## Phase 2: Foundational (VisualCore, stories 1 and 2)
 
