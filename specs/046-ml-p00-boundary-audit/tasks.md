@@ -25,7 +25,7 @@
 
 ## Phase 6: User Story 4 — Stop/go decision (P2)
 
-- [ ] T-A06-008 [US4] Complete the contract's `gaps` (every non-available row: owning VisualCore module and phase A06-P01..P06) and `decision` (verdict and reasons; "stop" if no working host or buildable audio path); re-run the checker (`python3 Tools/python/desktop_runbook.py run-check --stage A06-P00 --timeout 600 --name contract-final -- python3 scripts/check_app_contract.py --app visualcore-music-lab --render`) (FR-A06-003, 006; SC-A06-002)
+- [X] T-A06-008 [US4] Complete the contract's `gaps` (every non-available row: owning VisualCore module and phase A06-P01..P06) and `decision` (verdict and reasons; "stop" if no working host or buildable audio path); re-run the checker (`python3 Tools/python/desktop_runbook.py run-check --stage A06-P00 --timeout 600 --name contract-final -- python3 scripts/check_app_contract.py --app visualcore-music-lab --render`) (FR-A06-003, 006; SC-A06-002) — Verified 2026-11-14: 2026-11-14 11 gaps (VisualCoreAudio, VisualCoreAudioDSP, VisualCoreRendering, app-local), decision go
 
 ## Phase 7: Polish and evidence
 
