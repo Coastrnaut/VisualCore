@@ -7,7 +7,7 @@
 
 ## Phase 1: Setup
 
-- [ ] T-A08-301 Baseline: cite the A08-P02 evidence on the unchanged tree (`.autonomy/checks/A08-P02.scope-ios27.json`, `.autonomy/checks/A08-P02.app-unit.json`, `.autonomy/checks/A08-P02.verify-27.json`) instead of a rerun (owner ruling of 2026-11-14)
+- [X] T-A08-301 Baseline: cite the A08-P02 evidence on the unchanged tree (`.autonomy/checks/A08-P02.scope-ios27.json`, `.autonomy/checks/A08-P02.app-unit.json`, `.autonomy/checks/A08-P02.verify-27.json`) instead of a rerun (owner ruling of 2026-11-14) — Verified 2026-11-14: 2026-11-14: tree unchanged since the A08-P02 record; cites .autonomy/checks/A08-P02.{scope-ios27,app-unit,verify-27}.json
 
 ## Phase 2: User Story 1 — a spectrum with honest annotation (P1) 🎯
 
