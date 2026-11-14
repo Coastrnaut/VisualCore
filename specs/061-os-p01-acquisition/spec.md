@@ -63,7 +63,8 @@ gives the nearest bin.
   (`level-0`; levels arrive with the performance phase and must then be declared by the core), snapshot schema 1 with
   the scope state, actions `source.select`, `signal.waveform`, `signal.frequency`, `gain.select`, `timebase.select`,
   `trigger.level`, `trigger.slope`, `trigger.mode`; the nine standard scenarios plus fixtures for the 1 kHz period
-  count, the spectrum bin and the flat-line no-trigger case.
+  count, the spectrum bin and the flat-line no-trigger case, and (found at implementation: the planning catalog asks
+  five fixtures) clipping beyond full scale and the sweep on a falling trigger.
 
 ## User Scenarios & Testing *(mandatory)*
 

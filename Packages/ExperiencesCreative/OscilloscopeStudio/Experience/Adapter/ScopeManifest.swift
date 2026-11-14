@@ -1,7 +1,8 @@
 // ScopeManifest — feature 061 (A08-P01) T-A08-107 (FR-A08-120; SC-A08-105). The scenarios the verification runner plays
 // for Oscilloscope Studio: the nine standard ones and one `fixture-<n>` per regression fixture this phase proves (the
 // known 1 kHz sine at 1 ms/div gives 10 display periods; the 1 kHz sine gives the expected spectrum bin; a level beyond
-// the signal gives no trigger), all short (owner rule of 2026-11-13). Host steps change nothing in the scope state, so
+// the signal gives no trigger; gain beyond full scale is marked clipped; the sweep triggers on a falling slope — five,
+// the planning catalog's fixture count), all short (owner rule of 2026-11-13). Host steps change nothing in the scope state, so
 // the expected digests are derived by playing the entries on a core exactly as the engine plays them (the steps of an
 // entry, then its action) and digesting it with the experience id as domain, like Audio Odyssey's manifest. The
 // measurements themselves are proved by `ScopeAcquisitionTests` and `ScopeSessionTests`.
@@ -56,7 +57,9 @@ extension ScopeCore {
     /// The entries of the three regression fixtures of this phase:
     /// 1. display periods: the test signal's sine at 1 kHz, 1 ms per division, rising trigger at 0 (10 periods);
     /// 2. spectrum bin: the 1 kHz sine at 5 ms per division (the window whose spectrum peaks at the 1 kHz bin);
-    /// 3. no trigger: normal mode with the level at 0.9, beyond the test signal's amplitude of 0.5.
+    /// 3. no trigger: normal mode with the level at 0.9, beyond the test signal's amplitude of 0.5;
+    /// 4. clipping shown: gain ×10 on the 0.5 sine drives the trace beyond full scale (the window marks it clipped);
+    /// 5. sweep on a falling trigger: the logarithmic sweep with the falling slope at 2 ms per division.
     public static var fixtureEntries: [[ScenarioStep]] {
         func step(_ control: String, _ values: [Double], steps: Int = 5) -> ScenarioStep {
             ScenarioStep(steps: steps, action: ScriptedAction(control, values), result: "accepted")
@@ -67,6 +70,9 @@ extension ScopeCore {
             [step("signal.waveform", [0]), step("signal.frequency", [2]), step("timebase.select", [5]),
              ScenarioStep(steps: 30)],
             [step("trigger.mode", [1]), step("trigger.level", [0.9]), ScenarioStep(steps: 30)],
+            [step("signal.waveform", [0]), step("gain.select", [4]), ScenarioStep(steps: 30)],
+            [step("signal.waveform", [2]), step("trigger.slope", [1]), step("timebase.select", [4]),
+             ScenarioStep(steps: 30)],
         ]
     }
 

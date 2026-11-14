@@ -65,7 +65,7 @@ class AudioHotPathTests(unittest.TestCase):
         code, out = run(["--root", str(REPO)])
         self.assertEqual(code, 0, out)
         self.assertIn("PASS: audio hot path", out)
-        self.assertIn("in 3 files, 0 problems", out)
+        self.assertIn("in 5 files, 0 problems", out)
 
     def test_clean_file_passes(self):
         code, out = self.check(CLEAN)

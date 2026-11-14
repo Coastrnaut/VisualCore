@@ -13,5 +13,5 @@ python3 scripts/check_app_contract.py --app oscilloscope-studio --render
 python3 scripts/test_scripts.py
 ```
 
-Expected: all pass; nine standard and three fixture scenarios pass; the API baseline lists the new types; the contract
+Expected: all pass; nine standard and five fixture scenarios pass; the API baseline lists the new types; the contract
 records G-DEMOWAVES, G-TRIGGER and G-STEREO (test-signal and file paths) closed by A08-P01.

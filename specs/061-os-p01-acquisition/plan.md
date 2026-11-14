@@ -12,7 +12,7 @@ span). Close G-STEREO for the test-signal and file paths in `VisualCoreAudio`: `
 `Packages/ExperiencesCreative/OscilloscopeStudio`: Core (`ScopeState` schema 1, `ScopeSettings` choices,
 `SignalWindow`, `ScopeAcquisition` building triggered windows from a buffer), Experience (adapter `ScopeCore`, manifest,
 presenter drawing grid and trace through `PrimitiveRenderer` as Music Lab does, controls), registered as a candidate
-with nine standard scenarios and three fixture scenarios. Research: [research.md](research.md).
+with nine standard scenarios and five fixture scenarios. Research: [research.md](research.md).
 
 ## Technical Context
 

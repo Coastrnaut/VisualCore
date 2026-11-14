@@ -1,6 +1,6 @@
 // ScopeManifestTests — feature 061 (A08-P01) T-A08-107 (FR-A08-120; SC-A08-105). The scenario manifest of Oscilloscope
-// Studio: valid with the nine standard scenarios and the three fixtures of this phase (display periods, spectrum bin,
-// no trigger), its derived digests and expected results equal to what the engine gives when the runner plays them, the
+// Studio: valid with the nine standard scenarios and the five fixtures of this phase (display periods, spectrum bin,
+// no trigger, clipping, falling-slope sweep), its derived digests and expected results equal to what the engine gives when the runner plays them, the
 // fixtures ending in the states they name, and the committed `scenario-manifest.json` equal to the Swift manifest
 // (`UPDATE_SCENARIO_MANIFEST=1`, on the simulator `TEST_RUNNER_UPDATE_SCENARIO_MANIFEST=1`, rewrites it).
 import Foundation
@@ -29,13 +29,13 @@ private func play(_ spec: ScenarioSpec) async throws -> (initial: String, result
 }
 
 @Suite struct ScopeManifestTests {
-    @Test func theManifestIsValidWithTheNineStandardScenariosAndThreeFixtures() {
+    @Test func theManifestIsValidWithTheNineStandardScenariosAndFiveFixtures() {
         let manifest = ScopeCore.manifest(for: id)
         let problems = ScenarioManifestValidator.problems(manifest, controls: ScopeCore.controls,
-                                                          content: ContentRequirement(fixtures: 3))
+                                                          content: ContentRequirement(fixtures: 5))
         #expect(problems.isEmpty, "\(problems)")
         #expect(Set(manifest.scenarios.map(\.name))
-                == Set(ScenarioManifest.standardNames).union((1...3).map { "fixture-\($0)" }))
+                == Set(ScenarioManifest.standardNames).union((1...5).map { "fixture-\($0)" }))
     }
 
     @Test func derivedDigestsAndResultsAreWhatTheEngineGives() async throws {
@@ -65,6 +65,10 @@ private func play(_ spec: ScenarioSpec) async throws -> (initial: String, result
         #expect(SpectrumAnalyzer.expectedBin(frequency: 1_000, sampleRate: 48_000, size: 4_096) == 85)
         let none = ScopeCore.played(seed: seed, entries: ScopeCore.fixtureEntries[2]).state
         #expect(none.triggerMode == .normal && none.triggerLevel == 0.9)
+        let clipping = ScopeCore.played(seed: seed, entries: ScopeCore.fixtureEntries[3]).state
+        #expect(clipping.gain == 10 && clipping.waveform == .sine)
+        let sweep = ScopeCore.played(seed: seed, entries: ScopeCore.fixtureEntries[4]).state
+        #expect(sweep.waveform == .sweep && sweep.triggerSlope == .falling && sweep.timebaseMilliseconds == 2)
     }
 
     /// The JSON form with the control ids, named by `Catalog/registrations.json`. `UPDATE_SCENARIO_MANIFEST=1`

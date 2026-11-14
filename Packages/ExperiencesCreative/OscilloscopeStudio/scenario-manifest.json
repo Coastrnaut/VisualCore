@@ -379,6 +379,82 @@
       },
       "name" : "fixture-3",
       "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "signal.waveform",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 5
+        },
+        {
+          "action" : {
+            "control" : "gain.select",
+            "values" : [
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 5
+        },
+        {
+          "steps" : 30
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "3fc0f3cbf0c1627899cc8e0aa81f519da2d8944a304726b85742f7386372dd9c",
+        "initialDigest" : "316c70b8eeeff2cf2364bfc069dbce7adca6bc404abf4983579e9926514a237c"
+      },
+      "name" : "fixture-4",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "signal.waveform",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 5
+        },
+        {
+          "action" : {
+            "control" : "trigger.slope",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 5
+        },
+        {
+          "action" : {
+            "control" : "timebase.select",
+            "values" : [
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 5
+        },
+        {
+          "steps" : 30
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "1e1586efbdc5a159b1f5bd599e14d0fd7cbfc2800c3c6b2a501865ea874b372e",
+        "initialDigest" : "316c70b8eeeff2cf2364bfc069dbce7adca6bc404abf4983579e9926514a237c"
+      },
+      "name" : "fixture-5",
+      "seed" : "7"
     }
   ],
   "schema" : 1
