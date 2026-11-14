@@ -161,7 +161,7 @@ VisualCore module will own each missing piece and in which phase.
 - **SC-A06-002**: 100% of non-available rows have a gap with an owning module and a phase.
 - **SC-A06-003**: The reference regression passes 7 of 7 steps in two chunks.
 - **SC-A06-004**: The app builds for testing on the iOS 27.2 phone simulator and the experience package check passes
-  (4 registered experiences, none of them A05).
+  (5 registered experiences, none of them A06).
 - **SC-A06-005**: The diff of VisualCore and ProjectM since the phase start is empty; the app's registry and catalog
   availability are unchanged.
 - **SC-A06-006**: The contract checker finishes in under 10 seconds; each reference regression chunk and the app build
@@ -171,7 +171,7 @@ VisualCore module will own each missing piece and in which phase.
 
 - `VisualCoreAudio` and `VisualCoreAudioDSP` exist only as version constants (Auto-Creator §13); audio capture, decoding,
   ring buffers, FFT, bands, RMS and onsets are therefore upstream gaps owned by those products.
-- Later phases (A06-P01 to A05-P06) build the gaps; this phase builds none.
+- Later phases (A06-P01 to A06-P06) build the gaps; this phase builds none.
 
 ## Traceability
 
