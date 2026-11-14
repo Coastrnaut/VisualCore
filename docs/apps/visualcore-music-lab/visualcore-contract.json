@@ -293,116 +293,202 @@
       "id": "M06",
       "capability": "Microphone live input: AVAudioEngine input tap delivering PCM frames to a bounded buffer",
       "source": "v0.1 feature 01; journey 1; manual section 6 algorithm 1",
-      "status": "upstream gap",
-      "evidence": [],
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreAudio/MicrophoneAudioSource.swift",
+          "symbol": "MicrophoneAudioSource",
+          "product": "VisualCoreAudio",
+          "public": true
+        }
+      ],
       "example": {
-        "file": "Packages/VisualCoreRendering/Sources/VisualCoreAudio/Module.swift",
-        "symbol": "AudioInfo"
+        "file": "Packages/ExperiencesCreative/VisualCoreMusicLab/Experience/MusicLabPresenter.swift",
+        "symbol": "MusicLabPresenter"
       },
-      "notes": "VisualCoreAudio holds only AudioInfo.version; no audio capture exists in any VisualCore product (the closest consumer is the placeholder module itself). G-AUDIOSOURCE: a microphone source on public AVFAudio APIs behind the one source interface."
+      "notes": "VisualCoreAudio holds only AudioInfo.version; no audio capture exists in any VisualCore product (the closest consumer is the placeholder module itself). G-AUDIOSOURCE: a microphone source on public AVFAudio APIs behind the one source interface. Built in A06-P01."
     },
     {
       "id": "M07",
       "capability": "Microphone permission gate: record-permission state, request, denied/restricted handling and an honest usage string",
       "source": "v0.1 feature 01; journey 1",
-      "status": "upstream gap",
-      "evidence": [],
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreAudio/MicrophonePermission.swift",
+          "symbol": "MicrophonePermission",
+          "product": "VisualCoreAudio",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreAudio/MicrophonePermission.swift",
+          "symbol": "SystemMicrophonePermission",
+          "product": "VisualCoreAudio",
+          "public": true
+        }
+      ],
       "example": {
-        "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/SystemAccessibilityObserver.swift",
-        "symbol": "SystemAccessibilityObserver"
+        "file": "Packages/ExperiencesCreative/VisualCoreMusicLab/Experience/MusicLabPresenter.swift",
+        "symbol": "MusicLabPresenter"
       },
-      "notes": "No permission model exists and NSMicrophoneUsageDescription is absent from project.yml (checked 2026-11-14). G-MICPERMISSION: a testable permission state machine in VisualCoreAudio (AVAudioApplication record permission); the usage string is added by A06-P01 and checked by app-usage-descriptions. The demo signal works without permission."
+      "notes": "No permission model exists and NSMicrophoneUsageDescription is absent from project.yml (checked 2026-11-14). G-MICPERMISSION: a testable permission state machine in VisualCoreAudio (AVAudioApplication record permission); the usage string is added by A06-P01 and checked by app-usage-descriptions. The demo signal works without permission. Built in A06-P01."
     },
     {
       "id": "M08",
       "capability": "Local file audio the app can legally decode: a user-chosen file decoded on device to PCM",
       "source": "v0.1 feature 01; journey 1",
-      "status": "upstream gap",
-      "evidence": [],
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreAudio/FileAudioSource.swift",
+          "symbol": "FileAudioSource",
+          "product": "VisualCoreAudio",
+          "public": true
+        }
+      ],
       "example": {
-        "file": "Packages/VisualCoreRendering/Sources/VisualCoreAudio/Module.swift",
-        "symbol": "AudioInfo"
+        "file": "Packages/ExperiencesCreative/VisualCoreMusicLab/Experience/MusicLabPresenter.swift",
+        "symbol": "MusicLabPresenter"
       },
-      "notes": "No decoding exists. G-FILESOURCE: an AVAudioFile-based file source (user-picked through the system document picker, security-scoped, read only, never copied off device) with bounded length, truncated/unsupported-format rejection, behind the same source interface. No bundled third-party music."
+      "notes": "No decoding exists. G-FILESOURCE: an AVAudioFile-based file source (user-picked through the system document picker, security-scoped, read only, never copied off device) with bounded length, truncated/unsupported-format rejection, behind the same source interface. No bundled third-party music. Built in A06-P01."
     },
     {
       "id": "M09",
       "capability": "Audio source interface: one protocol for microphone, file and demo with a common mono float format and sample rate",
       "source": "manual section 4 AudioSourceController; section 6 AudioSource schema",
-      "status": "upstream gap",
-      "evidence": [],
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreAudio/AudioSource.swift",
+          "symbol": "AudioSource",
+          "product": "VisualCoreAudio",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreAudio/DemoAudioSource.swift",
+          "symbol": "DemoAudioSource",
+          "product": "VisualCoreAudio",
+          "public": true
+        }
+      ],
       "example": {
-        "file": "Packages/VisualCore/Sources/VisualCoreAudioDSP/Module.swift",
-        "symbol": "AudioDSPInfo"
+        "file": "Packages/ExperiencesCreative/VisualCoreMusicLab/Experience/MusicLabPresenter.swift",
+        "symbol": "MusicLabPresenter"
       },
-      "notes": "G-AUDIOSOURCE: AudioSource kind (microphone, localFile, demo), format negotiation, downmix to mono, start/stop, published status; pure parts (format, downmix) in VisualCoreAudioDSP, AVFAudio parts in VisualCoreAudio."
+      "notes": "G-AUDIOSOURCE: AudioSource kind (microphone, localFile, demo), format negotiation, downmix to mono, start/stop, published status; pure parts (format, downmix) in VisualCoreAudioDSP, AVFAudio parts in VisualCoreAudio. Built in A06-P01."
     },
     {
       "id": "M10",
       "capability": "Bounded PCM ring buffer: single-producer/single-consumer, no allocation or locks in the realtime callback",
       "source": "manual section 6 algorithm 2; PCMBufferRing",
-      "status": "upstream gap",
-      "evidence": [],
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreAudioDSP/SampleRingBuffer.swift",
+          "symbol": "SampleRingBuffer",
+          "product": "VisualCoreAudioDSP",
+          "public": true
+        }
+      ],
       "example": {
-        "file": "Packages/ExperiencesCreative/FluidArtPlayground/Core/SplatQueue.swift",
-        "symbol": "SplatQueue"
+        "file": "Packages/ExperiencesCreative/VisualCoreMusicLab/Experience/MusicLabPresenter.swift",
+        "symbol": "MusicLabPresenter"
       },
-      "notes": "No ring buffer exists (the closest consumer is A02's capped SplatQueue). G-RINGBUFFER: a fixed-capacity SPSC float ring in VisualCoreAudioDSP with overrun counting and a read-latest window, host-tested."
+      "notes": "No ring buffer exists (the closest consumer is A02's capped SplatQueue). G-RINGBUFFER: a fixed-capacity SPSC float ring in VisualCoreAudioDSP with overrun counting and a read-latest window, host-tested. Built in A06-P01."
     },
     {
       "id": "M11",
       "capability": "RMS and peak levels per analysis window (linear and dBFS)",
       "source": "v0.1 feature 02",
-      "status": "upstream gap",
-      "evidence": [],
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreAudioDSP/LevelMeter.swift",
+          "symbol": "LevelMeter",
+          "product": "VisualCoreAudioDSP",
+          "public": true
+        }
+      ],
       "example": {
-        "file": "Packages/VisualCore/Sources/VisualCoreAudioDSP/Module.swift",
-        "symbol": "AudioDSPInfo"
+        "file": "Packages/ExperiencesCreative/VisualCoreMusicLab/Experience/MusicLabPresenter.swift",
+        "symbol": "MusicLabPresenter"
       },
-      "notes": "G-AUDIODSP: RMS, peak and dBFS with silence floor and NaN/Inf rejection."
+      "notes": "G-AUDIODSP: RMS, peak and dBFS with silence floor and NaN/Inf rejection. Built in A06-P02."
     },
     {
       "id": "M12",
       "capability": "Windowed FFT spectrum and logarithmic band energies",
       "source": "v0.1 feature 02; manual section 6 algorithm 2",
-      "status": "upstream gap",
-      "evidence": [],
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreAudioDSP/SpectrumAnalyzer.swift",
+          "symbol": "SpectrumAnalyzer",
+          "product": "VisualCoreAudioDSP",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreAudioDSP/BandLayout.swift",
+          "symbol": "BandLayout",
+          "product": "VisualCoreAudioDSP",
+          "public": true
+        }
+      ],
       "example": {
-        "file": "Packages/VisualCore/Sources/VisualCoreAudioDSP/Module.swift",
-        "symbol": "AudioDSPInfo"
+        "file": "Packages/ExperiencesCreative/VisualCoreMusicLab/Experience/MusicLabPresenter.swift",
+        "symbol": "MusicLabPresenter"
       },
-      "notes": "G-AUDIODSP: Hann-windowed real FFT (Accelerate vDSP, public API) of power-of-two size, magnitude spectrum and a configurable log-spaced band set, computed outside the realtime callback."
+      "notes": "G-AUDIODSP: Hann-windowed real FFT (Accelerate vDSP, public API) of power-of-two size, magnitude spectrum and a configurable log-spaced band set, computed outside the realtime callback. Built in A06-P02."
     },
     {
       "id": "M13",
       "capability": "Spectral flux, onset and smoothed beat-energy signals with attack/release smoothing",
       "source": "v0.1 feature 02; manual section 6 algorithm 3; FeatureSmoother",
-      "status": "upstream gap",
-      "evidence": [],
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreAudioDSP/FeatureSmoother.swift",
+          "symbol": "FeatureSmoother",
+          "product": "VisualCoreAudioDSP",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreAudioDSP/OnsetDetector.swift",
+          "symbol": "OnsetDetector",
+          "product": "VisualCoreAudioDSP",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreAudioDSP/FeatureExtractor.swift",
+          "symbol": "FeatureExtractor",
+          "product": "VisualCoreAudioDSP",
+          "public": true
+        }
+      ],
       "example": {
-        "file": "Packages/VisualCore/Sources/VisualCoreAudioDSP/Module.swift",
-        "symbol": "AudioDSPInfo"
+        "file": "Packages/ExperiencesCreative/VisualCoreMusicLab/Experience/MusicLabPresenter.swift",
+        "symbol": "MusicLabPresenter"
       },
-      "notes": "G-AUDIODSP: spectral flux, adaptive-threshold onset and beat energy, and a time-stamped attack/release smoother that is frame-rate independent."
+      "notes": "G-AUDIODSP: spectral flux, adaptive-threshold onset and beat energy, and a time-stamped attack/release smoother that is frame-rate independent. Built in A06-P02."
     },
     {
       "id": "M14",
       "capability": "Silent demo signal: deterministic synthetic PCM for offline testing, clearly labelled, no audio output",
       "source": "v0.1 feature 06; domain rule (label demo vs real input)",
-      "status": "upstream gap",
+      "status": "available",
       "evidence": [
         {
-          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/SeededRandom.swift",
-          "symbol": "SeededRandom",
-          "product": "VisualCoreSimulation",
+          "file": "Packages/VisualCore/Sources/VisualCoreAudioDSP/DemoSignal.swift",
+          "symbol": "DemoSignal",
+          "product": "VisualCoreAudioDSP",
           "public": true
         }
       ],
       "example": {
-        "file": "Packages/VisualCore/Sources/VisualCoreAudioDSP/Module.swift",
-        "symbol": "AudioDSPInfo"
+        "file": "Packages/ExperiencesCreative/VisualCoreMusicLab/Experience/MusicLabPresenter.swift",
+        "symbol": "MusicLabPresenter"
       },
-      "notes": "SeededRandom gives determinism but no signal generator exists. G-DEMOSIGNAL: a seeded generator (tones, noise bursts, beat pattern) producing PCM through the source interface, never played to the speaker, identical frames for a seed."
+      "notes": "SeededRandom gives determinism but no signal generator exists. G-DEMOSIGNAL: a seeded generator (tones, noise bursts, beat pattern) producing PCM through the source interface, never played to the speaker, identical frames for a seed. Built in A06-P01."
     },
     {
       "id": "M15",
@@ -420,8 +506,14 @@
       "id": "M16",
       "capability": "Source/status indicator: active source, permission, live/demo/paused/interrupted label and level, announced to VoiceOver",
       "source": "v0.1 feature 04",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreAudio/AudioSource.swift",
+          "symbol": "AudioSourceState",
+          "product": "VisualCoreAudio",
+          "public": true
+        },
         {
           "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/AccessibilityPlayers.swift",
           "symbol": "AnnouncementSink",
@@ -442,10 +534,10 @@
         }
       ],
       "example": {
-        "file": "Packages/VisualCoreRendering/Tests/VisualCoreUITests/AccessibilityPlayersTests.swift",
-        "symbol": "AccessibilityPlayersTests"
+        "file": "Packages/ExperiencesCreative/VisualCoreMusicLab/Experience/MusicLabPresenter.swift",
+        "symbol": "MusicLabPresenter"
       },
-      "notes": "Announcement and message views exist; the observable source status they would show does not. G-AUDIOSOURCE provides the status model; the indicator view and copy are experience-owned."
+      "notes": "Announcement and message views exist; the observable source status they would show does not. G-AUDIOSOURCE provides the status model; the indicator view and copy are experience-owned. Built in A06-P01."
     },
     {
       "id": "M17",
@@ -911,7 +1003,8 @@
       "owner": "VisualCore:VisualCoreAudio",
       "phase": 1,
       "test": "Host tests of the pure format/downmix part (VisualCoreAudioDSP) and simulator tests of the source state machine with an injected engine: start/stop/restart, status transitions idle -> running -> stopped/failed, mono downmix of stereo frames, demo and microphone behind the same interface; no allocation in the tap closure (measured with an allocation counter in tests)",
-      "justification": "Found in A06-P00: VisualCoreAudio holds only AudioInfo.version; every audio experience (A06-A08) needs the same source interface and status."
+      "justification": "Found in A06-P00: VisualCoreAudio holds only AudioInfo.version; every audio experience (A06-A08) needs the same source interface and status.",
+      "closed": "A06-P01"
     },
     {
       "id": "G-MICPERMISSION",
@@ -922,7 +1015,8 @@
       "owner": "VisualCore:VisualCoreAudio",
       "phase": 1,
       "test": "Unit tests with an injected permission provider: undetermined -> granted/denied, denied never starts capture and offers the demo signal, a revoked permission stops a running source; app-usage-descriptions passes with NSMicrophoneUsageDescription present",
-      "justification": "Found in A06-P00: no permission model and no usage string exist; the gate is generic for microphone-using experiences."
+      "justification": "Found in A06-P00: no permission model and no usage string exist; the gate is generic for microphone-using experiences.",
+      "closed": "A06-P01"
     },
     {
       "id": "G-FILESOURCE",
@@ -933,7 +1027,8 @@
       "owner": "VisualCore:VisualCoreAudio",
       "phase": 1,
       "test": "Simulator tests with generated fixture files written at test time: decodes PCM of the expected length and rate, rejects truncated, empty, oversize and unsupported files with a typed error, stops at end of file and loops on request",
-      "justification": "Found in A06-P00: no decoding exists; file input is shared with the other audio experiences."
+      "justification": "Found in A06-P00: no decoding exists; file input is shared with the other audio experiences.",
+      "closed": "A06-P01"
     },
     {
       "id": "G-RINGBUFFER",
@@ -944,7 +1039,8 @@
       "owner": "VisualCore:VisualCoreAudioDSP",
       "phase": 1,
       "test": "Host tests: FIFO order across wrap-around, overrun drops oldest and counts it, read-latest window of N samples, concurrent producer/consumer stress of a bounded number of iterations without loss beyond counted overruns, capacity validation",
-      "justification": "Found in A06-P00: no realtime-safe buffer exists; any audio analysis needs one."
+      "justification": "Found in A06-P00: no realtime-safe buffer exists; any audio analysis needs one.",
+      "closed": "A06-P01"
     },
     {
       "id": "G-DEMOSIGNAL",
@@ -955,7 +1051,8 @@
       "owner": "VisualCore:VisualCoreAudioDSP",
       "phase": 1,
       "test": "Host tests: identical samples for one seed, different for another, bounded amplitude, known RMS of the tone part and beat positions detectable by G-AUDIODSP; never routed to audio output (no output node in the graph)",
-      "justification": "Found in A06-P00: offline/permission-free use and deterministic fixtures need a generator in the DSP product."
+      "justification": "Found in A06-P00: offline/permission-free use and deterministic fixtures need a generator in the DSP product.",
+      "closed": "A06-P01"
     },
     {
       "id": "G-AUDIODSP",
@@ -968,7 +1065,8 @@
       "owner": "VisualCore:VisualCoreAudioDSP",
       "phase": 2,
       "test": "Host fixture tests: RMS/peak of sine, square and silence within 1e-6; FFT of a pure tone peaks in the expected bin with Hann leakage bounds; band energies sum consistently; onset detected on synthetic clicks within one hop; smoother attack/release time constants independent of frame rate; NaN/Inf input rejected",
-      "justification": "Found in A06-P00: VisualCoreAudioDSP holds only AudioDSPInfo.version; analysis is generic for all audio experiences (Accelerate vDSP is a public API)."
+      "justification": "Found in A06-P00: VisualCoreAudioDSP holds only AudioDSPInfo.version; analysis is generic for all audio experiences (Accelerate vDSP is a public API).",
+      "closed": "A06-P02"
     },
     {
       "id": "G-AUDIOMAP",
