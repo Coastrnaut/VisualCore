@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "python3",
+    "scripts/release_check.py",
+    "--only",
+    "app-build-for-testing-ios27",
+    "app-ui-ios27-p2"
+  ],
+  "command": "python3 scripts/release_check.py --only app-build-for-testing-ios27 app-ui-ios27-p2",
+  "elapsed_seconds": 180.52,
+  "exit_code": 0,
+  "finished": "2026-11-14T19:51:11+00:00",
+  "gate": "X-A08",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/X-A08.ui-p2.log",
+  "log_sha256": "5acc725f8db47ce18c0e9f0d8df523374317b2a78a6f325ea3ed000319866618",
+  "name": "ui-p2",
+  "started": "2026-11-14T19:48:11+00:00",
+  "timed_out": false
+}

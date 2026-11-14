@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--only",
+    "a08.oscilloscope-studio",
+    "--runtime",
+    "27"
+  ],
+  "command": "python3 scripts/verify_experiences.py --only a08.oscilloscope-studio --runtime 27",
+  "elapsed_seconds": 20.665,
+  "exit_code": 0,
+  "finished": "2026-11-14T19:47:33+00:00",
+  "gate": "X-A08",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/X-A08.sim27.log",
+  "log_sha256": "193ef03a43a8ea7690c9f27b5cde5582af84477a1b64aab15070e00962f3ef99",
+  "name": "sim27",
+  "started": "2026-11-14T19:47:12+00:00",
+  "timed_out": false
+}
