@@ -250,6 +250,7 @@ UI_CHUNKS = {
     "j3": ["PUEmitterUITests", "PUForceUITests", "PUTrailUITests"],
     "j4": ["PUSceneLibraryUITests"],   # feature 036 A04-P04: its own chunk keeps j3 under the time limit
     "k2": ["IGControlsUITests", "IGLibraryExportUITests"],   # feature 045 A05-P06 (T-A05-610)
+    "m2": ["MLScenesUITests", "MLPresetsUITests"],   # feature 052 A06-P06 (T-A06-609)
 }
 UNIFIED_LIMIT = 590       # seconds, below the ten-minute limit of one foreground command
 RELEASE_FORBIDDEN = ["DebugLaunch", "DebugExperience", "DebugInventory", "ScenarioLaunch", "ScenarioHostView",

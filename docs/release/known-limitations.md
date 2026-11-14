@@ -78,6 +78,25 @@ and `VisualCoreRendering` (iOS, GL). ADR-0003 and the package map record this. R
 - Saved compositions stay on the device (no sync); a picture leaves only through the share sheet, as a PNG without
   metadata. At most 64 files fit in the experience's storage.
 
+### VisualCore Music Lab (A06; feature 052 T-A06-607)
+
+- Frame time per scene and analysis level, the tier the governor settles on, memory and the thermal state over ten
+  minutes are unmeasured on devices. They wait for the device campaign
+  ([device-campaign.md](../apps/visualcore-music-lab/device-campaign.md)).
+- Interruptions (call, alarm, Siri), route changes (headphones out) and media resets are tested only as simulated
+  audio-session events; their behaviour on hardware, and that other apps' music keeps playing, wait for the device
+  campaign.
+- The microphone permission flows (first request, refusal, grant, revoke in Settings while running) are tested with an
+  injected permission state only; the system prompt itself is answered by the owner on the devices.
+- The system accessibility audits (default and largest text size), VoiceOver labels and values on hardware (including
+  the sound metrics text), Dynamic Type at the largest size, Reduce Motion and the contrast of each palette wait for
+  the device campaign (owner ruling of 2026-11-13).
+- The sound metrics text is an approximate visual aid, not a measurement; no hearing, health or accuracy claim is made.
+- Sound is analysed in memory only and never recorded; the sound of other apps cannot be captured. A picked file is
+  read in place; a file that cannot be decoded keeps the previous source and shows a message.
+- Presets stay on the device (no sync); at most 64 files fit in the experience's storage, and a save beyond the quota
+  is refused with a message.
+
 ## Distribution
 
 - No App Store submission, signing or purchase setup is part of this release; those are owner actions.
