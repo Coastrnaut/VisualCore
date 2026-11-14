@@ -34,7 +34,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 SOURCES = "Packages/VisualCoreRendering/Sources/VisualCoreAudio"
 DEFAULT_FILES = tuple(f"{SOURCES}/{name}.swift"
-                      for name in ("DemoAudioSource", "FileAudioSource", "MicrophoneAudioSource"))
+                      for name in ("DemoAudioSource", "FileAudioSource", "MicrophoneAudioSource",
+                                   "TestSignalAudioSource", "StereoFileAudioSource"))  # + feature 061 (A08-P01)
 
 BEGIN = "// vc:hot-path begin"
 END = "// vc:hot-path end"
