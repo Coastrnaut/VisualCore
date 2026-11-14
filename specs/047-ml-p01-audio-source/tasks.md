@@ -30,7 +30,7 @@
 - [X] T-A06-112 Experience package check (`python3 Tools/python/desktop_runbook.py run-check --stage A06-P01 --timeout 600 --name experience-packages -- python3 scripts/check_experience_packages.py`) — Verified 2026-11-14: 2026-11-14: .autonomy/checks/A06-P01.experience-packages.json
 - [X] T-A06-113 Public API and docs: `check_public_api.py --update`, `python3 Tools/python/desktop_runbook.py run-check --stage A06-P01 --timeout 600 --name public-api -- python3 scripts/check_public_api.py`; READMEs of VisualCore (VisualCoreAudioDSP) and VisualCoreRendering (VisualCoreAudio); Auto-Creator.md §13 rows (audio products no longer placeholders) — Verified 2026-11-14: 2026-11-14: .autonomy/checks/A06-P01.public-api.json; READMEs and Auto-Creator §13 updated
 - [X] T-A06-114 Script tests (`python3 Tools/python/desktop_runbook.py run-check --stage A06-P01 --timeout 600 --name script-tests -- python3 scripts/test_scripts.py`) — Verified 2026-11-14: 2026-11-14: .autonomy/checks/A06-P01.script-tests-2.json
-- [ ] T-A06-115 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A06-P01
+- [X] T-A06-115 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A06-P01 — Verified 2026-11-14: — Verified 2026-11-14: converge round 1 appended T-A06-116..117 (done), round 2 converged with no findings
 
 ## Dependencies
 
