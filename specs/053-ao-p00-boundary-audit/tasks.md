@@ -20,7 +20,7 @@
 
 ## Phase 5: User Story 3 — The shell builds with the experience absent (P2)
 
-- [ ] T-A07-006 [US3] Build the one app for testing (`python3 Tools/python/desktop_runbook.py run-check --stage A07-P00 --timeout 600 --name app-build -- python3 scripts/release_check.py --only app-build-for-testing-ios27`)
+- [X] T-A07-006 [US3] Build the one app for testing (`python3 Tools/python/desktop_runbook.py run-check --stage A07-P00 --timeout 600 --name app-build -- python3 scripts/release_check.py --only app-build-for-testing-ios27`) — Verified 2026-11-14: Verified 2026-11-14: .autonomy/checks/A07-P00.app-build.json exit 0 (build-for-testing, iOS 27.2 phone)
 - [ ] T-A07-007 [US3] Experience package check (`python3 Tools/python/desktop_runbook.py run-check --stage A07-P00 --timeout 600 --name experience-packages -- python3 scripts/check_experience_packages.py`: 6 experiences, none A07); `grep -c a07 Catalog/registrations.json Apps/VisualCore/App/ExperienceRegistry.swift` gives 0 (FR-A07-005, SC-A07-004)
 
 ## Phase 6: User Story 4 — Stop/go decision (P2)
