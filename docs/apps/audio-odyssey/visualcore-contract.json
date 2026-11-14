@@ -180,32 +180,26 @@
       "id": "M03",
       "capability": "Controlled camera rail: deterministic, distance-parameterised path with pose (position, forward, up) and eased speed changes; the same seed and distance give the same pose",
       "source": "brainstorm: camera systems; v0.1 features 01 and 03",
-      "status": "upstream gap",
+      "status": "available",
       "evidence": [
         {
-          "file": "Packages/VisualCore/Sources/VisualCoreMath/FramingFlight.swift",
-          "symbol": "FramingFlight",
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/CameraRail.swift",
+          "symbol": "CameraRail",
           "product": "VisualCoreMath",
           "public": true
         },
         {
-          "file": "Packages/VisualCore/Sources/VisualCoreMath/Easing.swift",
-          "symbol": "EasingCurve",
-          "product": "VisualCoreMath",
-          "public": true
-        },
-        {
-          "file": "Packages/VisualCore/Sources/VisualCoreMath/OrbitCamera.swift",
-          "symbol": "OrbitCamera",
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/CameraRail.swift",
+          "symbol": "RailPose",
           "product": "VisualCoreMath",
           "public": true
         }
       ],
       "example": {
-        "file": "Packages/ExperiencesCreative/InfiniteGeometry/Experience/GeometryPresenter.swift",
-        "symbol": "GeometryPresenter"
+        "file": "Packages/ExperiencesCreative/AudioOdyssey/Experience/OdysseyPresenter.swift",
+        "symbol": "OdysseyPresenter"
       },
-      "notes": "FramingFlight/TourTimeline ease between 2D plane framings and OrbitCamera orbits a target; nothing follows a 3D path by arc length or eases flight speed. G-CAMERARAIL: CameraRail (path, arc-length parameterisation, rotation-minimising frames, speed easing) in VisualCoreMath, A07-P01."
+      "notes": "FramingFlight/TourTimeline ease between 2D plane framings and OrbitCamera orbits a target; nothing follows a 3D path by arc length or eases flight speed. G-CAMERARAIL: CameraRail (path, arc-length parameterisation, speed easing) in VisualCoreMath. Built in A07-P01 with a level frame instead of rotation-minimising frames (no twist seam at the loop and a level horizon; spec 054 clarification 1)."
     },
     {
       "id": "M04",
@@ -427,26 +421,26 @@
       "id": "M10",
       "capability": "Manual flight speed and camera easing: a speed control whose changes are eased, never stepped",
       "source": "v0.1 feature 03",
-      "status": "upstream gap",
+      "status": "available",
       "evidence": [
         {
-          "file": "Packages/VisualCore/Sources/VisualCoreMath/Easing.swift",
-          "symbol": "EasingCurve",
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/RailFlight.swift",
+          "symbol": "RailFlight",
           "product": "VisualCoreMath",
           "public": true
         },
         {
-          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/Timeline.swift",
-          "symbol": "Tween",
-          "product": "VisualCoreSimulation",
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/ComfortLimits.swift",
+          "symbol": "ComfortLimits",
+          "product": "VisualCoreMath",
           "public": true
         }
       ],
       "example": {
-        "file": "Packages/ExperiencesCreative/InfiniteGeometry/Experience/GeometryPresenter.swift",
-        "symbol": "GeometryPresenter"
+        "file": "Packages/ExperiencesCreative/AudioOdyssey/Experience/OdysseyPresenter.swift",
+        "symbol": "OdysseyPresenter"
       },
-      "notes": "Easing curves exist; speed easing along a rail does not. Part of G-CAMERARAIL, A07-P01."
+      "notes": "Easing curves exist; speed easing along a rail does not. Part of G-CAMERARAIL, A07-P01. Built in A07-P01."
     },
     {
       "id": "M11",
@@ -723,26 +717,26 @@
       "id": "M18",
       "capability": "Comfort limits: caps on speed, acceleration, sway and roll that the person can lower; Reduce Motion lowers speed and removes sway and roll; audio never moves the camera",
       "source": "cross-cutting: comfort limits; constitution A07 comfort; manual section 6 algorithm 4",
-      "status": "upstream gap",
+      "status": "available",
       "evidence": [
         {
-          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPreferences.swift",
-          "symbol": "EffectiveAccessibility",
-          "product": "VisualCoreSimulation",
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/ComfortLimits.swift",
+          "symbol": "ComfortLimits",
+          "product": "VisualCoreMath",
           "public": true
         },
         {
-          "file": "Packages/VisualCore/Sources/VisualCoreMath/FramingFlight.swift",
-          "symbol": "TourTimeline",
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/RailFlight.swift",
+          "symbol": "RailFlight",
           "product": "VisualCoreMath",
           "public": true
         }
       ],
       "example": {
-        "file": "Packages/ExperiencesCreative/InfiniteGeometry/Experience/GeometryPresenter.swift",
-        "symbol": "GeometryPresenter"
+        "file": "Packages/ExperiencesCreative/AudioOdyssey/Experience/OdysseyPresenter.swift",
+        "symbol": "OdysseyPresenter"
       },
-      "notes": "TourTimeline honours Reduce Motion for 2D tours only; no capped acceleration, sway or roll exists. Part of G-CAMERARAIL (ComfortLimits applied by the rail), A07-P01."
+      "notes": "TourTimeline honours Reduce Motion for 2D tours only; no capped acceleration, sway or roll exists. Part of G-CAMERARAIL (ComfortLimits applied by the rail), A07-P01. Built in A07-P01."
     },
     {
       "id": "M19",
@@ -822,26 +816,20 @@
       "id": "M21",
       "capability": "Long-distance precision: world-origin rebasing so positions stay small in Float on the GPU however far the journey goes, without a visible jump",
       "source": "cross-cutting: long-distance precision; manual section 6 algorithm 3",
-      "status": "upstream gap",
+      "status": "available",
       "evidence": [
         {
-          "file": "Packages/VisualCore/Sources/VisualCoreMath/PrecisionAdvisor.swift",
-          "symbol": "PrecisionAdvisor",
-          "product": "VisualCoreMath",
-          "public": true
-        },
-        {
-          "file": "Packages/VisualCore/Sources/VisualCoreMath/Vectors.swift",
-          "symbol": "Vec3",
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/OriginRebase.swift",
+          "symbol": "OriginRebase",
           "product": "VisualCoreMath",
           "public": true
         }
       ],
       "example": {
-        "file": "Packages/ExperiencesCreative/FractalExplorer/Experience/Adapter/FractalCore.swift",
-        "symbol": "FractalCore"
+        "file": "Packages/ExperiencesCreative/AudioOdyssey/Experience/OdysseyPresenter.swift",
+        "symbol": "OdysseyPresenter"
       },
-      "notes": "PrecisionAdvisor assesses 2D plane precision only; nothing rebases a 3D world origin. G-ORIGINREBASE in VisualCoreMath with the rail, A07-P01."
+      "notes": "PrecisionAdvisor assesses 2D plane precision only; nothing rebases a 3D world origin. G-ORIGINREBASE in VisualCoreMath with the rail, A07-P01. Built in A07-P01."
     },
     {
       "id": "M22",
@@ -894,7 +882,7 @@
       "phase": 1,
       "test": "Host tests: arc-length parameterisation within tolerance on closed and open paths, rotation-minimising frames without flips, the same seed and distance give the same pose, speed changes reach the target only through the easing curve, speed, acceleration, sway and roll never exceed ComfortLimits, Reduce Motion lowers speed and zeroes sway and roll, NaN/Inf inputs rejected",
       "justification": "Found in A07-P00: VisualCoreMath has OrbitCamera, Camera2D and 2D FramingFlight only; any journey or fly-through experience needs the same rail and comfort caps.",
-      "closed": null
+      "closed": "A07-P01"
     },
     {
       "id": "G-ORIGINREBASE",
@@ -906,7 +894,7 @@
       "phase": 1,
       "test": "Host tests: after a rebase every rail pose and segment transform differs from the unrebased one by less than one Float ulp at the camera, rebasing triggers at the documented distance, Double positions far along the rail map to Float-safe local positions, the rebase offset is part of the deterministic state",
       "justification": "Found in A07-P00: PrecisionAdvisor covers 2D planes only; Float GPU positions lose precision on long journeys.",
-      "closed": null
+      "closed": "A07-P01"
     },
     {
       "id": "G-RAILDRAW",

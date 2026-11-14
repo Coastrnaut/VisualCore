@@ -25,7 +25,7 @@
 
 ## Phase 5: Polish & evidence
 
-- [ ] T-A07-107 VisualCoreMath host tests (`python3 Tools/python/desktop_runbook.py run-check --stage A07-P01 --timeout 600 --name math-host -- swift test --package-path Packages/VisualCore --filter "CameraRailTests|RailFlightTests|OriginRebaseTests"`)
+- [X] T-A07-107 VisualCoreMath host tests (`python3 Tools/python/desktop_runbook.py run-check --stage A07-P01 --timeout 600 --name math-host -- swift test --package-path Packages/VisualCore --filter "CameraRailTests|RailFlightTests|OriginRebaseTests"`) — Verified 2026-11-14: Verified 2026-11-14: .autonomy/checks/A07-P01.math-host.json exit 0 (21 tests; VisualCoreMath sources unchanged since)
 - [ ] T-A07-108 Core tests on sim-27.2 (`python3 Tools/python/desktop_runbook.py run-check --stage A07-P01 --timeout 600 --name core-ios27 -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing AudioOdysseyCoreTests`; the package is iOS-only, so its Core tests run on the simulator as for A06)
 - [ ] T-A07-109 Experience tests on sim-27.2 (`python3 Tools/python/desktop_runbook.py run-check --stage A07-P01 --timeout 600 --name experience-ios27 -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing AudioOdysseyExperienceTests`)
 - [ ] T-A07-110 App build and unit (`python3 Tools/python/desktop_runbook.py run-check --stage A07-P01 --timeout 600 --name app-unit -- python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27`)

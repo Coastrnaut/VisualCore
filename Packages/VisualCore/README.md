@@ -6,7 +6,7 @@ iOS 26+ inside apps. The package map and dependency rules R1–R5 are in
 
 | Product | Purpose |
 |---|---|
-| VisualCoreMath | vectors, matrices, quaternions, cameras, double-precision plane viewports (PlaneViewport) and size-independent framings (PlaneFraming), log-scale framing flights and tour timelines (FramingFlight, TourTimeline), precision advice (PrecisionAdvisor), easing |
+| VisualCoreMath | vectors, matrices, quaternions, cameras, double-precision plane viewports (PlaneViewport) and size-independent framings (PlaneFraming), log-scale framing flights and tour timelines (FramingFlight, TourTimeline), precision advice (PrecisionAdvisor), easing, camera rails with comfort limits (CameraRail, RailPose, ComfortLimits, RailFlight) and origin rebasing for long journeys (OriginRebase) |
 | VisualCoreSimulation | fixed-step clock, seeded RNG, timelines, particle pool, NaN guard, CPU field grids, storage precision, time-step policy |
 | VisualCoreScenes | input mapping, pointer tracking and velocity, seeded synthetic gesture scripts, mesh generators, export geometry |
 | VisualCoreShaderSource | shader library, includes, line maps, diagnostics parsing |
@@ -269,3 +269,14 @@ all-zero state). `ShaderHash` (VisualCoreMath) computes on the CPU exactly what 
 matches the GPU bit for bit; the float hashes lie in [0, 1]). `NumericHygiene` provides `finite(_:or:)`,
 `normalizedAngle(_:)` ([−π, π)), `wrapped(_:modulus:)` ([0, modulus)) and `quantized(_:step:)` (`NumericError`). The rules
 and conventions are in `docs/architecture/determinism.md`.
+
+## Camera rails and comfort (feature 054, A07-P01)
+
+`CameraRail` (VisualCoreMath) is a closed centripetal Catmull–Rom loop through at least four control points, sampled
+into an arc-length table so equal travelled distances are equal lengths; `pose(at:)` wraps the distance and returns a
+level frame (right = direction × world up), so the horizon never tilts and the frame is identical at the wrap point.
+Rails whose direction comes within 30° of vertical are refused. `orbitCamera(at:fovY:near:far:)` expresses a pose as an
+`OrbitCamera`, so existing drawing passes can fly a rail. `ComfortLimits` caps speed, acceleration, turn rate, sway and
+roll (`.standard`, `.reducedMotion`); `RailFlight` eases speed toward a target within the limits, caps a time step at
+0.1 s and ignores invalid ones. `OriginRebase` snaps an origin to a 1,024-unit grid near the camera, so positions far
+along a journey are drawn relative to it in single precision without losing accuracy.
