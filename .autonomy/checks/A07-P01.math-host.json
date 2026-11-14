@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/VisualCore",
+    "--filter",
+    "CameraRailTests|RailFlightTests|OriginRebaseTests"
+  ],
+  "command": "swift test --package-path Packages/VisualCore --filter 'CameraRailTests|RailFlightTests|OriginRebaseTests'",
+  "elapsed_seconds": 3.862,
+  "exit_code": 0,
+  "finished": "2026-11-14T10:22:32+00:00",
+  "log": ".autonomy/logs/A07-P01.math-host.log",
+  "log_sha256": "ef9f8012e8d13aa57e02d6684c745d5b7c1675fc2cffdabf5b045dbc4eb3c47c",
+  "name": "math-host",
+  "stage": "A07-P01",
+  "started": "2026-11-14T10:22:28+00:00",
+  "timed_out": false
+}
