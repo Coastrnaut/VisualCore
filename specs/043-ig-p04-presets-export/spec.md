@@ -158,7 +158,8 @@ the cycles equal those after the first cycle and nothing is reported leaked.
 
 - **Saved composition**: an identifier, a name, the save time, the composition document (preset index and fields, motif
   seed, 2D and 3D cameras; version 1) and the digest at save time.
-- **Exported picture**: a PNG in a temporary folder, removed when the experience closes.
+- **Exported picture**: PNG data held in memory for the share sheet only (nothing is written to a file), released when
+  the share sheet closes or the next export replaces it.
 
 ## Success Criteria *(mandatory)*
 
