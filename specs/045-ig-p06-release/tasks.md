@@ -22,7 +22,7 @@
 ## Phase 4: User Story 3 — copy and release documents (P2)
 
 - [X] T-A05-607 [P] [US3] Write `docs/apps/infinite-geometry/{store-listing.md (text + traceability table to tests), release-checklist.md (Item | Area | Status | Evidence; statuses verified/pending/blocked-owner/device), device-campaign.md (measurements named without values per FR-A05-622), release.json (schema 1, experience a05.infinite-geometry, requiredDocs, checklist, copyCheck text+swift)}` and add the device-only items to `docs/release/known-limitations.md` (FR-A05-620–622) — Verified 2026-11-14: 2026-11-14 .autonomy/checks/A05-P06.experience-release.json (23 checklist rows); copyCheck.allow [camera, share] added with --allow support in check_copy_claims.py (test added)
-- [ ] T-A05-608 [US3] Release-document check (`python3 Tools/python/desktop_runbook.py run-check --stage A05-P06 --timeout 600 --name experience-release -- python3 scripts/check_experience_release.py --config docs/apps/infinite-geometry/release.json`) (SC-A05-604)
+- [X] T-A05-608 [US3] Release-document check (`python3 Tools/python/desktop_runbook.py run-check --stage A05-P06 --timeout 600 --name experience-release -- python3 scripts/check_experience_release.py --config docs/apps/infinite-geometry/release.json`) (SC-A05-604) — Verified 2026-11-14: 2026-11-14 .autonomy/checks/A05-P06.experience-release.json (exit 0)
 - [ ] T-A05-609 [US3] Copy-claim check (`python3 Tools/python/desktop_runbook.py run-check --stage A05-P06 --timeout 600 --name copy-claims -- python3 scripts/release_check.py --only copy-claims-a05`) (SC-A05-605)
 
 ## Phase 5: User Story 4 — interface and builds (P2)
