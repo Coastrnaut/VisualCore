@@ -4,6 +4,7 @@ VisualCoreAudio | class | public final class DemoAudioSource: AudioSource
 VisualCoreAudio | class | public final class FileAudioSource: AudioSource
 VisualCoreAudio | class | public final class MicrophoneAudioSource: ResumableAudioSource
 VisualCoreAudio | class | public final class StereoFileAudioSource: StereoAudioSource
+VisualCoreAudio | class | public final class StereoMicrophoneAudioSource: StereoAudioSource
 VisualCoreAudio | class | public final class SystemMicrophonePermission: MicrophonePermission
 VisualCoreAudio | class | public final class TestSignalAudioSource: StereoAudioSource
 VisualCoreAudio | enum | public enum AudioInfo
@@ -12,6 +13,7 @@ VisualCoreAudio | enum | public enum AudioSourceError: Error, Equatable, Sendabl
 VisualCoreAudio | enum | public enum AudioSourceState: Equatable, Sendable
 VisualCoreAudio | enum | public enum MicrophonePermissionState: Equatable, Sendable
 VisualCoreAudio | func | public func handle(_ event: AudioSessionEvent)
+VisualCoreAudio | func | public func handleNewRoute()
 VisualCoreAudio | func | public func request() async -> MicrophonePermissionState
 VisualCoreAudio | func | public func resume()
 VisualCoreAudio | func | public func start(into buffer: SampleRingBuffer) throws
@@ -42,6 +44,7 @@ VisualCoreAudio | protocol | public protocol MicrophonePermission: AnyObject
 VisualCoreAudio | protocol | public protocol ResumableAudioSource: AudioSource
 VisualCoreAudio | protocol | public protocol StereoAudioSource: AnyObject
 VisualCoreAudio | var | public private(set) var awaitsResume
+VisualCoreAudio | var | public private(set) var channelCount: Int
 VisualCoreAudio | var | public private(set) var sampleRate: Double
 VisualCoreAudio | var | public private(set) var state: AudioSourceState
 VisualCoreAudio | var | public var state: MicrophonePermissionState

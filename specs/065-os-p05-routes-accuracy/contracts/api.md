@@ -5,6 +5,9 @@
 - `@MainActor public final class StereoMicrophoneAudioSource: StereoAudioSource` — `init(permission: any MicrophonePermission)`;
   `sampleRate`, `channelCount`, `state`, `start(into: StereoSampleBuffer) throws`, `stop()`, `awaitsResume`, `resume()`;
   internal test init with a capture factory and an optional notification center.
+- Also public, as on the mono source: `handle(_ event: AudioSessionEvent)`; and `handleNewRoute()`, which rebuilds a
+  running capture when a new input device appears (the shared `AudioSessionEvent` maps only a lost route), so the
+  channel count follows a plugged-in headset or interface.
 
 ## Experience
 

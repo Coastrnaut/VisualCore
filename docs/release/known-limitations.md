@@ -119,6 +119,18 @@ and `VisualCoreRendering` (iOS, GL). ADR-0003 and the package map record this. R
 - Journeys stay on the device (no sync); at most 64 files fit in the experience's storage, and a save beyond the quota
   is refused with a message.
 
+### Oscilloscope Studio (A08; feature 065 T-A08-512)
+
+- Real two-channel routes, route changes, input latency, 44.1 kHz routes, frame time per view and quality level and the
+  thermal state over ten minutes are unmeasured on devices; they wait for the device campaign
+  ([device-campaign.md](../apps/oscilloscope-studio/device-campaign.md)). The two-channel microphone is tested only
+  with a capture double.
+- No latency figure is stated. Readouts are relative to full scale; no calibrated, certified, laboratory or medical
+  accuracy is claimed. The accuracy audit checks the readouts against the built-in test signal only.
+- VoiceOver on hardware, the announcements and the system accessibility audits wait for the device campaign.
+- Drawn columns and the spectrum analysis rate follow the host's quality level; the scope state and its digest never
+  change with it. Sound is analysed in memory only and never recorded.
+
 ## Distribution
 
 - No App Store submission, signing or purchase setup is part of this release; those are owner actions.

@@ -840,7 +840,7 @@
       "id": "M24",
       "capability": "Spoken measurement description: VoiceOver text for the current mode, trigger state, timebase, peak level in relative dBFS and dominant frequency, rate-limited",
       "source": "cross-cutting: accessibility; constitution A08 accessibility",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/AccessibilityPlayers.swift",
@@ -850,16 +850,16 @@
         }
       ],
       "example": {
-        "file": "Packages/ExperiencesCreative/VisualCoreMusicLab/Core/MetricText.swift",
-        "symbol": "MetricText"
+        "file": "Packages/ExperiencesCreative/OscilloscopeStudio/Core/ScopeAnnouncer.swift",
+        "symbol": "ScopeAnnouncer"
       },
-      "notes": "AnnouncementSink is public and tested (VisualCoreUITests/AccessibilityPlayersTests); the measurement wording is experience domain, as Music Lab's MetricText is. G-MEASUREA11Y (app-local), A08-P05."
+      "notes": "AnnouncementSink is public and tested (VisualCoreUITests/AccessibilityPlayersTests); the measurement wording is experience domain, as Music Lab's MetricText is. G-MEASUREA11Y (app-local), A08-P05. Built in A08-P05 (app-local): ScopeAnnouncer paces announcements at 1.5 s and only while VoiceOver runs; the presenter announces view, freeze, trigger, clipping and channel-count changes through the injected AnnouncementSink; the description names view, source, channels, timebase or readout, frozen and clipping (ScopeDescriptionTests, ScopeAnnouncerTests)."
     },
     {
       "id": "M25",
       "capability": "Units, calibration and accuracy: relative dBFS only, sample-rate and latency accounting, clipping indication, route (built-in, wired, Bluetooth) limitations stated; no calibrated SPL or volts",
       "source": "cross-cutting: units and calibration; manual validity risk (units, clipping, latency, routing, calibration); manual P05",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCore/Sources/VisualCoreAudioDSP/LevelMeter.swift",
@@ -881,20 +881,26 @@
         }
       ],
       "example": {
-        "file": "Packages/ExperiencesCreative/VisualCoreMusicLab/Core/MetricText.swift",
-        "symbol": "MetricText"
+        "file": "Packages/ExperiencesCreative/OscilloscopeStudio/Experience/ScopeAccuracyAudit.swift",
+        "symbol": "ScopeAccuracyAudit"
       },
-      "notes": "dBFS and peak are tested (LevelMeterTests) and route changes are observed (AudioSessionEventTests); the accuracy statement, clipping threshold and the route/latency audit are experience domain. G-ACCURACY (app-local), A08-P05."
+      "notes": "dBFS and peak are tested (LevelMeterTests) and route changes are observed (AudioSessionEventTests); the accuracy statement, clipping threshold and the route/latency audit are experience domain. G-ACCURACY (app-local), A08-P05. Built in A08-P05 (app-local): ScopeAccuracyAudit runs the demo sines (48 and 44.1 kHz), squares and sweep through acquisition, trigger, cursors and spectrum readout; every case passes within one bin, 1.5 dB and one sample (ScopeAccuracyAuditTests); readouts say relative to full scale and never calibrated, certified, laboratory or medical. Route, latency, sample-rate and thermal limits are recorded for the device campaign (docs/apps/oscilloscope-studio/device-campaign.md)."
     },
     {
       "id": "M26",
       "capability": "Route-dependent two-channel microphone capture (external stereo inputs) with the channel count shown",
       "source": "v0.1 feature 02; manual validity risk routing",
-      "status": "upstream gap",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCoreRendering/Sources/VisualCoreAudio/MicrophoneAudioSource.swift",
           "symbol": "MicrophoneAudioSource",
+          "product": "VisualCoreAudio",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreAudio/StereoMicrophoneAudioSource.swift",
+          "symbol": "StereoMicrophoneAudioSource",
           "product": "VisualCoreAudio",
           "public": true
         }
@@ -903,7 +909,7 @@
         "file": "Packages/ExperiencesCreative/OscilloscopeStudio/Experience/ScopePresenter.swift",
         "symbol": "ScopePresenter"
       },
-      "notes": "Split from G-STEREO in A08-P01: the shared microphone source mixes to mono, which the scope shows as one channel; stereo routes need the device-route audit. G-STEREOMIC, VisualCoreAudio, A08-P05."
+      "notes": "Split from G-STEREO in A08-P01: the shared microphone source mixes to mono, which the scope shows as one channel; stereo routes need the device-route audit. G-STEREOMIC, VisualCoreAudio, A08-P05. Built in A08-P05 (upstream): StereoMicrophoneAudioSource reports the route's channel count (1 or 2), keeps channels 0 and 1 apart, duplicates channel 0 on one-channel routes and rebuilds on route changes, with the mono source's permission, session and interruption behaviour; tested with a capture double (VisualCoreAudioTests/StereoMicrophoneAudioSourceTests). Real routes are measured in the device campaign."
     }
   ],
   "gaps": [
@@ -1014,7 +1020,7 @@
       "justification": "The measurement wording is experience domain; AnnouncementSink already exists in VisualCoreUI.",
       "phase": 5,
       "test": "Host tests of the measurement description for each mode and state (no signal, clipping, frozen, demo, mono) and rate-limited announcement through a RecordingAnnouncementSink",
-      "closed": null
+      "closed": "A08-P05"
     },
     {
       "id": "G-ACCURACY",
@@ -1026,7 +1032,7 @@
       "justification": "Accuracy statements and the route/latency audit are the experience's claims (manual P05); the shared numbers are tested in VisualCoreAudioDSP.",
       "phase": 5,
       "test": "Host tests: demo-signal frequency and dBFS readouts within stated tolerance, clipping flagged at full scale, copy contains no calibrated, certified, laboratory or medical claim; route and latency limitations recorded for the device campaign",
-      "closed": null
+      "closed": "A08-P05"
     },
     {
       "id": "G-STEREOMIC",
@@ -1038,7 +1044,7 @@
       "justification": "Split from G-STEREO in A08-P01: the test-signal and file paths keep two channels; the microphone stays mono until the device-route audit shows which routes deliver two channels.",
       "phase": 5,
       "test": "Simulator tests with a two-channel input double: the channel count is reported, left and right stay separate, a one-channel route falls back to mono with a labelled state; device measurements in the campaign",
-      "closed": null
+      "closed": "A08-P05"
     }
   ],
   "traceability": [
