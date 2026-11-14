@@ -3,6 +3,7 @@
 // 5,000 Hz), the gains (×0.5, ×1, ×2, ×5, ×10), the timebases (0.1, 0.2, 0.5, 1, 2 and 5 ms per division over ten
 // divisions), the trigger slopes and modes, and the names spoken in the canvas description. The positions in these
 // tables are the persisted indices of `ScopeState` and the values of the experience actions; they never change order.
+// Feature 062 (A08-P02) T-A08-205 (FR-A08-211, FR-A08-212) adds the display mode, waveform or XY.
 import Foundation
 import VisualCoreAudioDSP
 
@@ -21,6 +22,23 @@ public enum ScopeSource: Int, CaseIterable, Codable, Sendable {
         case .testSignal: "Test signal"
         case .file: "File"
         case .microphone: "Microphone"
+        }
+    }
+}
+
+/// The display mode of the scope. The raw values are persisted and are the values of the `display.select` action
+/// (feature 062, A08-P02, FR-A08-211, FR-A08-212).
+public enum ScopeDisplay: Int, Sendable, CaseIterable, Codable {
+    /// The waveform view: each channel drawn against time (the first choice and the schema-1 migration value).
+    case waveform = 0
+    /// The XY view: the left channel plotted against the right channel (stereo windows only).
+    case xy = 1
+
+    /// The name shown on the display picker and spoken in the canvas description.
+    public var displayName: String {
+        switch self {
+        case .waveform: "waveform"
+        case .xy: "XY"
         }
     }
 }

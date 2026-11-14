@@ -7,13 +7,17 @@
 // and in −1…1. The validating initialiser returns nil for a state that breaks a rule; a decoded payload that breaks one
 // (an unknown source, waveform, index, slope or mode, a non-finite or out-of-range level) is refused with
 // `DecodingError.dataCorrupted`; the mutating setters refuse such values, change nothing and return `false`.
+//
+// Feature 062 (A08-P02) T-A08-205 (FR-A08-211, FR-A08-212; data-model "ScopeState", schema 2): the display mode
+// (waveform or XY) is a persisted field and part of the digest; a schema-1 payload (no `display` key) decodes with the
+// waveform display, so stored A08-P01 states migrate unchanged.
 import Foundation
 import VisualCoreAudioDSP
 
-/// The state of Oscilloscope Studio. Schema version 1.
+/// The state of Oscilloscope Studio. Schema version 2.
 public struct ScopeState: Sendable, Equatable, Codable {
     /// The schema version of the persisted fields.
-    public static let currentSchema = 1
+    public static let currentSchema = 2
 
     /// The chosen signal source.
     public private(set) var source: ScopeSource
@@ -31,8 +35,11 @@ public struct ScopeState: Sendable, Equatable, Codable {
     public private(set) var triggerSlope: TriggerSlope
     /// The trigger mode.
     public private(set) var triggerMode: TriggerMode
+    /// The display mode: waveform (the first choice) or XY.
+    public private(set) var display: ScopeDisplay
 
-    /// The first state: the 1 kHz sine test signal, gain ×1, 1 ms/div, a rising auto trigger at level 0.
+    /// The first state: the 1 kHz sine test signal, gain ×1, 1 ms/div, a rising auto trigger at level 0, the waveform
+    /// display.
     public static let initial = ScopeState()
 
     /// The first state (see ``initial``).
@@ -45,11 +52,13 @@ public struct ScopeState: Sendable, Equatable, Codable {
         triggerLevel = 0
         triggerSlope = .rising
         triggerMode = .auto
+        display = .waveform
     }
 
     /// A validated state; `nil` when an index is outside its table or the trigger level is not finite and in −1…1.
     public init?(source: ScopeSource, waveform: TestSignal.Waveform, frequencyIndex: Int, gainIndex: Int,
-                 timebaseIndex: Int, triggerLevel: Double, triggerSlope: TriggerSlope, triggerMode: TriggerMode) {
+                 timebaseIndex: Int, triggerLevel: Double, triggerSlope: TriggerSlope, triggerMode: TriggerMode,
+                 display: ScopeDisplay = .waveform) {
         guard ScopeSettings.frequencies.indices.contains(frequencyIndex),
               ScopeSettings.gains.indices.contains(gainIndex),
               ScopeSettings.timebasesMilliseconds.indices.contains(timebaseIndex),
@@ -62,6 +71,7 @@ public struct ScopeState: Sendable, Equatable, Codable {
         self.triggerLevel = triggerLevel == 0 ? 0 : triggerLevel   // −0 is stored as 0 (one digest text)
         self.triggerSlope = triggerSlope
         self.triggerMode = triggerMode
+        self.display = display
     }
 
     /// Whether `level` is allowed as a trigger level: finite and in −1…1.
@@ -93,6 +103,19 @@ public struct ScopeState: Sendable, Equatable, Codable {
 
     /// Selects the trigger mode.
     public mutating func select(_ mode: TriggerMode) { triggerMode = mode }
+
+    /// Selects the display mode (both modes are valid in every state; a mono window in XY falls back in the
+    /// presenter, not in the state).
+    public mutating func select(_ display: ScopeDisplay) { self.display = display }
+
+    /// Selects the display mode with the raw value `rawValue` (the `display.select` action value: 0 waveform, 1 XY);
+    /// returns `false` and changes nothing when the value is unknown.
+    @discardableResult
+    public mutating func selectDisplay(_ rawValue: Int) -> Bool {
+        guard let display = ScopeDisplay(rawValue: rawValue) else { return false }
+        self.display = display
+        return true
+    }
 
     /// Selects the test frequency at `index`; returns `false` and changes nothing when the index is unknown.
     @discardableResult
@@ -129,21 +152,23 @@ public struct ScopeState: Sendable, Equatable, Codable {
     // MARK: - Digest
 
     /// The canonical text of every field for the experience digest: the indices of the source, waveform, frequency,
-    /// gain, timebase, slope and mode, and the trigger level in Swift's shortest round-trip form.
+    /// gain, timebase, slope, mode and display, and the trigger level in Swift's shortest round-trip form.
     public var digestText: String {
         "a08.scope.v\(Self.currentSchema)|source=\(source.rawValue)|waveform=\(ScopeSettings.index(of: waveform))"
             + "|frequency=\(frequencyIndex)|gain=\(gainIndex)|timebase=\(timebaseIndex)|level=\(triggerLevel)"
             + "|slope=\(ScopeSettings.index(of: triggerSlope))|mode=\(ScopeSettings.index(of: triggerMode))"
+            + "|display=\(display.rawValue)"
     }
 
     // MARK: - Codable
 
     private enum CodingKeys: String, CodingKey {
-        case source, waveform, frequency, gain, timebase, level, slope, mode
+        case source, waveform, frequency, gain, timebase, level, slope, mode, display
     }
 
-    /// Decodes and validates a schema-1 state; refuses an unknown source, waveform, frequency, gain, timebase, slope or
-    /// mode index and a trigger level that is not finite and in −1…1.
+    /// Decodes and validates a schema-2 state (or a schema-1 state, which has no `display` key and decodes with the
+    /// waveform display); refuses an unknown source, waveform, frequency, gain, timebase, slope, mode or display value
+    /// and a trigger level that is not finite and in −1…1.
     public init(from decoder: any Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
         let source = try c.decode(ScopeSource.self, forKey: .source)
@@ -154,13 +179,23 @@ public struct ScopeState: Sendable, Equatable, Codable {
         let gain = try c.decode(Int.self, forKey: .gain)
         let timebase = try c.decode(Int.self, forKey: .timebase)
         let level = try c.decode(Double.self, forKey: .level)
+        let display: ScopeDisplay
+        if let raw = try c.decodeIfPresent(Int.self, forKey: .display) {
+            guard let known = ScopeDisplay(rawValue: raw) else {
+                throw DecodingError.dataCorruptedError(forKey: .display, in: c,
+                                                       debugDescription: "unknown display \(raw)")
+            }
+            display = known
+        } else {
+            display = .waveform   // schema 1 (A08-P01) has no display field: migrate to the waveform view
+        }
         guard Self.isUsableLevel(level) else {
             throw DecodingError.dataCorruptedError(forKey: .level, in: c,
                                                    debugDescription: "trigger level \(level) is not finite in −1…1")
         }
         guard let state = ScopeState(source: source, waveform: waveform, frequencyIndex: frequency, gainIndex: gain,
                                      timebaseIndex: timebase, triggerLevel: level, triggerSlope: slope,
-                                     triggerMode: mode) else {
+                                     triggerMode: mode, display: display) else {
             throw DecodingError.dataCorrupted(.init(codingPath: c.codingPath,
                                                     debugDescription: "unknown frequency \(frequency), gain \(gain) "
                                                         + "or timebase \(timebase) index"))
@@ -168,7 +203,8 @@ public struct ScopeState: Sendable, Equatable, Codable {
         self = state
     }
 
-    /// Encodes every schema-1 field: the source raw value, the table indices and the trigger level.
+    /// Encodes every schema-2 field: the source raw value, the table indices, the trigger level and the display raw
+    /// value.
     public func encode(to encoder: any Encoder) throws {
         var c = encoder.container(keyedBy: CodingKeys.self)
         try c.encode(source, forKey: .source)
@@ -179,6 +215,7 @@ public struct ScopeState: Sendable, Equatable, Codable {
         try c.encode(triggerLevel, forKey: .level)
         try c.encode(ScopeSettings.index(of: triggerSlope), forKey: .slope)
         try c.encode(ScopeSettings.index(of: triggerMode), forKey: .mode)
+        try c.encode(display.rawValue, forKey: .display)
     }
 
     /// The element of `table` at the index stored under `key`; refuses an index outside the table.
