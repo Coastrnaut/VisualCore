@@ -1,0 +1,394 @@
+{
+  "controls" : [
+    "source.demo",
+    "source.microphone",
+    "source.file",
+    "demo.mode",
+    "demo.reseed",
+    "permission.mirror"
+  ],
+  "experience" : "a06.visualcore-music-lab",
+  "kind" : "creative",
+  "scenarios" : [
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+        "initialDigest" : "a056a87c758cac6ef44cc25e1c7e6a3be3d09da496534717ba7019926de318b6"
+      },
+      "name" : "launch-first-frame",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "demo.mode",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 2
+        },
+        {
+          "action" : {
+            "control" : "demo.reseed",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 2
+        },
+        {
+          "action" : {
+            "control" : "demo.mode",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 2
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "a6e29641889271626b63915276c9ea03fce87d3bc07b8118cbc9115bb35d5a4a",
+        "initialDigest" : "a056a87c758cac6ef44cc25e1c7e6a3be3d09da496534717ba7019926de318b6"
+      },
+      "name" : "input-response",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "demo.mode",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 2
+        }
+      ],
+      "expect" : {
+        "outcome" : "source-selected"
+      },
+      "name" : "completion",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "demo.mode",
+            "values" : [
+              9
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "permission.mirror",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "source.microphone",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.a06.permission-denied",
+          "steps" : 0
+        }
+      ],
+      "expect" : {
+
+      },
+      "name" : "rejection",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "demo.mode",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 2
+        },
+        {
+          "action" : {
+            "control" : "demo.reseed",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 2
+        },
+        {
+          "action" : {
+            "control" : "demo.mode",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 2
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "a6e29641889271626b63915276c9ea03fce87d3bc07b8118cbc9115bb35d5a4a",
+        "initialDigest" : "a056a87c758cac6ef44cc25e1c7e6a3be3d09da496534717ba7019926de318b6"
+      },
+      "name" : "save-restore",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "demo.mode",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 2
+        },
+        {
+          "action" : {
+            "control" : "demo.reseed",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 2
+        },
+        {
+          "action" : {
+            "control" : "demo.mode",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 2
+        }
+      ],
+      "expect" : {
+        "initialDigest" : "a056a87c758cac6ef44cc25e1c7e6a3be3d09da496534717ba7019926de318b6",
+        "resetDigest" : true
+      },
+      "name" : "reset",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "suspend-resume",
+      "seed" : "7"
+    },
+    {
+      "cycles" : 5,
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "teardown-reentry",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "cancel-prepare",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "demo.mode",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "demo.mode",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "6526bfe8ace4d45b4ae1022746096d2125f92f9cceb72c061722a6634f3a77dd",
+        "initialDigest" : "a056a87c758cac6ef44cc25e1c7e6a3be3d09da496534717ba7019926de318b6"
+      },
+      "name" : "fixture-1",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "demo.mode",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "920fe00180a970c432d4b83a5e361969959d8b01bb6edf996bdeb3700dea1271",
+        "initialDigest" : "a056a87c758cac6ef44cc25e1c7e6a3be3d09da496534717ba7019926de318b6"
+      },
+      "name" : "fixture-2",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "demo.reseed",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 30
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "a6e29641889271626b63915276c9ea03fce87d3bc07b8118cbc9115bb35d5a4a",
+        "initialDigest" : "a056a87c758cac6ef44cc25e1c7e6a3be3d09da496534717ba7019926de318b6"
+      },
+      "name" : "fixture-3",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "permission.mirror",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "source.microphone",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.a06.permission-denied",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "demo.mode",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "07b3ae43e66085edf8f00d720999627a97b76e3fff2935e4704c817d4b8d3c70",
+        "initialDigest" : "a056a87c758cac6ef44cc25e1c7e6a3be3d09da496534717ba7019926de318b6"
+      },
+      "name" : "fixture-4",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "source.file",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "source.demo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "source.file",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "source.demo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "a056a87c758cac6ef44cc25e1c7e6a3be3d09da496534717ba7019926de318b6",
+        "initialDigest" : "a056a87c758cac6ef44cc25e1c7e6a3be3d09da496534717ba7019926de318b6"
+      },
+      "name" : "fixture-5",
+      "seed" : "7"
+    }
+  ],
+  "schema" : 1
+}

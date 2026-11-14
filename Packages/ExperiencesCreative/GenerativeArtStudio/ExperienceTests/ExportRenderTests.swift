@@ -134,8 +134,12 @@ final class ExportRenderTests: XCTestCase {
             ?? lines.endIndex
         let usage = lines[start..<end].map { $0.trimmingCharacters(in: .whitespaces) }
             .filter { $0.hasPrefix("NS") && $0.contains("UsageDescription:") }
+        // Since feature 047 (A06-P01) the app also declares the microphone string of VisualCore Music Lab (live input
+        // drives its visuals on the device); this experience still asks for nothing but Photos add.
         XCTAssertEqual(usage, ["NSPhotoLibraryAddUsageDescription: Saves exported artwork to your photo library when "
-                               + "you choose Save Image."])
+                               + "you choose Save Image.",
+                               "NSMicrophoneUsageDescription: Listens to sound in the room to drive the visuals; audio stays on "
+                               + "this device and is not recorded."])
     }
 
     // SC-A01-404: a failed export shows a readable message, the live scene keeps rendering and nothing leaks.

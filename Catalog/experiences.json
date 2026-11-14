@@ -189,10 +189,22 @@
         "music-and-audio"
       ],
       "order": 6,
-      "palette": [],
+      "palette": [
+        "#05070D",
+        "#1F3B73",
+        "#36C2B4",
+        "#F5F1E6"
+      ],
       "tile_seed": 1558176675,
-      "capabilities": [],
-      "quality_tiers": [],
+      "capabilities": [
+        "live microphone input",
+        "audio files",
+        "demo signal",
+        "waveform"
+      ],
+      "quality_tiers": [
+        "level-0"
+      ],
       "content": null,
       "available": false
     },

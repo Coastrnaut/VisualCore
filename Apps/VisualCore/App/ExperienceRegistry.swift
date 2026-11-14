@@ -6,6 +6,7 @@ import FractalExplorerExperience
 import GenerativeArtStudioExperience
 import InfiniteGeometryExperience
 import ParticleUniverseExperience
+import VisualCoreMusicLabExperience
 import VisualCoreExperience
 import VisualCoreExperienceHost
 import VisualCoreUI
@@ -64,7 +65,7 @@ enum ExperienceRegistry {
     /// each carries its scenario manifest, so that the verification runner can open it, but it stays unavailable
     /// in the catalog and outside `all`. Debug builds show them with `-vcCandidates`. Recording an experience's X
     /// gate moves its registration from here to `all`.
-    static let candidates: [ExperienceRegistration] = []
+    static let candidates: [ExperienceRegistration] = [visualCoreMusicLab].compactMap { $0 }
 
     /// A01 Generative Art Studio (feature 193, US1).
     private static var generativeArtStudio: ExperienceRegistration? {
@@ -144,6 +145,20 @@ extension ExperienceRegistry {
         }
         #if DEBUG || VISUALCORE_AUTOMATION
         registration.scenarioManifest = GeometryCore.manifest(for: id)
+        #endif
+        return registration
+    }
+    /// A06 VisualCore Music Lab (feature 047, A06-P01): a candidate until X-A06.
+    fileprivate static var visualCoreMusicLab: ExperienceRegistration? {
+        guard let id = VisualCoreMusicLabExperience.id else { return nil }
+        var registration = ExperienceRegistration(id: id, core: MusicLabCore.self) { launch in
+            let system = SystemAccessibilityObserver.systemValues()
+            return VisualCoreMusicLabExperience.make(id: id, storage: launch.storage,
+                                                     reduceMotion: launch.reduceMotion.resolved(system: system.reduceMotion),
+                                                     reduceFlashing: launch.reduceFlashing.resolved(system: system.dimFlashingLights))
+        }
+        #if DEBUG || VISUALCORE_AUTOMATION
+        registration.scenarioManifest = MusicLabCore.manifest(for: id)
         #endif
         return registration
     }

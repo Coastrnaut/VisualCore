@@ -112,6 +112,28 @@
       ],
       "content": null,
       "manifest": "Packages/ExperiencesCreative/InfiniteGeometry/scenario-manifest.json"
+    },
+    "a06.visualcore-music-lab": {
+      "capabilities": [
+        "live microphone input",
+        "audio files",
+        "demo signal",
+        "waveform"
+      ],
+      "quality_tiers": [
+        "level-0"
+      ],
+      "palette": [
+        "#05070D",
+        "#1F3B73",
+        "#36C2B4",
+        "#F5F1E6"
+      ],
+      "content": null,
+      "manifest": "Packages/ExperiencesCreative/VisualCoreMusicLab/scenario-manifest.json",
+      "permissions": [
+        "microphone"
+      ]
     }
   }
 }

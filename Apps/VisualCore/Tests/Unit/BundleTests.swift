@@ -8,12 +8,16 @@ final class BundleTests: XCTestCase {
         XCTAssertEqual(Bundle.main.object(forInfoDictionaryKey: "CFBundleDisplayName") as? String, "VisualCore")
     }
 
-    /// Feature 193 (FR-U07-020, FR-A01-407): the only usage description is the Photos add-only one that the share
-    /// sheet's "Save Image" needs for an exported picture; the app itself never calls PhotoKit.
+    /// Feature 193 (FR-U07-020, FR-A01-407): the Photos add-only usage description that the share sheet's "Save Image"
+    /// needs for an exported picture (the app itself never calls PhotoKit), and since feature 047 (A06-P01,
+    /// FR-A06-106) the microphone description of VisualCore Music Lab's live input, worded from
+    /// `Configs/permission-vocabulary.json`; nothing else.
     func testNoUsageDescriptionNoURLTypeNoDocumentType() throws {
         let info = try XCTUnwrap(Bundle.main.infoDictionary)
-        XCTAssertEqual(info.keys.filter { $0.hasSuffix("UsageDescription") }, ["NSPhotoLibraryAddUsageDescription"],
-                       "\(info.keys.sorted())")
+        XCTAssertEqual(info.keys.filter { $0.hasSuffix("UsageDescription") }.sorted(),
+                       ["NSMicrophoneUsageDescription", "NSPhotoLibraryAddUsageDescription"], "\(info.keys.sorted())")
+        XCTAssertEqual(info["NSMicrophoneUsageDescription"] as? String,
+                       "Listens to sound in the room to drive the visuals; audio stays on this device and is not recorded.")
         XCTAssertEqual(info["NSPhotoLibraryAddUsageDescription"] as? String,
                        "Saves exported artwork to your photo library when you choose Save Image.")
         XCTAssertNil(info["CFBundleURLTypes"])

@@ -2907,7 +2907,7 @@ to confirm on devices:
 | VisualCoreEffects | VisualCoreRendering | `EffectRenderer`, `EffectScene` |
 | VisualCoreUI | VisualCoreRendering | `RenderSurface`, `ParameterPanel`, `AccessibilitySettingsSection`, `AccessibleColors`, `AcknowledgementsView`, `LicenseInventory` |
 | VisualCoreAutomation | VisualCoreRendering | `AutomationRunner`, `AutomationReport`, `AutomationView` |
-| VisualCoreAudio, VisualCoreAudioDSP | both | version constants only; audio acquisition and DSP are still to be built by the audio experiences (A06–A08) |
+| VisualCoreAudio, VisualCoreAudioDSP | both | `AudioSource` (demo, file, microphone), `MicrophonePermission`; `SampleRingBuffer`, `DemoSignal`, `SpectrumAnalyzer` (A06-P01); bands, RMS, onsets and mapping follow in A06-P02/P03 |
 
 The authoritative list is the API baseline `docs/api/visualcore-public-api.txt`.
 

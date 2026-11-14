@@ -152,12 +152,13 @@ class UsageDescriptionTests(unittest.TestCase):
         code, out = run(cud, ["--project", str(path), "--registrations", str(self.regs), "--vocabulary", str(self.vocab)])
         self.assertEqual(code, 2, out)
 
-    def test_real_repository_passes_with_one_key(self):
+    def test_real_repository_passes_with_two_keys(self):
+        # Feature 047 (A06-P01): VisualCore Music Lab declares the microphone permission (live input).
         code, out = run(cud, [])
         self.assertEqual(code, 0, out)
         last = out.strip().splitlines()[-1]
         self.assertTrue(last.startswith("PASS:"), last)
-        self.assertIn("1 key (NSPhotoLibraryAddUsageDescription)", last)
+        self.assertIn("2 keys (NSMicrophoneUsageDescription, NSPhotoLibraryAddUsageDescription)", last)
 
     def test_real_vocabulary_is_well_formed(self):
         with contextlib.redirect_stdout(io.StringIO()):

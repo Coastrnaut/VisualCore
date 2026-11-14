@@ -29,8 +29,11 @@ final class PrivacyTests: XCTestCase {
             ?? lines.endIndex
         let usage = lines[start..<end].map { $0.trimmingCharacters(in: .whitespaces) }
             .filter { $0.hasPrefix("NS") && $0.contains("UsageDescription:") }
-        XCTAssertEqual(usage.count, 1)
-        XCTAssertTrue(usage.first?.hasPrefix("NSPhotoLibraryAddUsageDescription:") ?? false, "\(usage)")
+        // Since feature 047 (A06-P01) the app also declares the microphone string of VisualCore Music Lab (live input
+        // drives its visuals on the device); this experience still asks for nothing but Photos add.
+        XCTAssertEqual(usage.count, 2, "\(usage)")
+        XCTAssertTrue(usage.contains { $0.hasPrefix("NSPhotoLibraryAddUsageDescription:") }, "\(usage)")
+        XCTAssertTrue(usage.contains { $0.hasPrefix("NSMicrophoneUsageDescription:") }, "\(usage)")
     }
 
     /// FR-A02-606: after painting, capturing and closing, the app has written no defaults keys and no files.
