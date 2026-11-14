@@ -159,7 +159,8 @@ VisualCore module will own each missing piece and in which phase.
   (4 registered experiences, none of them A05).
 - **SC-A05-005**: The diff of VisualCore and ProjectM since the phase start is empty; the app's registry and catalog
   availability are unchanged.
-- **SC-A05-006**: Every new test finishes in under 10 seconds.
+- **SC-A05-006**: The contract checker finishes in under 10 seconds; each reference regression chunk and the app build
+  finish in under 10 minutes (one foreground command each).
 
 ## Assumptions
 
