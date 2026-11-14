@@ -16,8 +16,7 @@
   whole when any value is invalid).
 - **D3 File:** `journey-<uuid>.json`, `{"calm":…,"easing":…,"format":1,"id":…,"mappings":[…],"name":…,"saved":…,
   "speedTarget":…,"world":…}` sorted keys; greater format → newer (counted); anything else undecodable → unreadable.
-- **D4 Trace:** `DemoResponseTrace.run(seed:world:mapping:frames:step:)` feeds `DemoSignal`-like synthetic band
-  energies? No — Core cannot import audio; the trace takes a closure or precomputed `[ [Float] ]` band frames. The
-  experience test produces the band frames with the real `DemoSignal` + `FeatureExtractor`; Core tests use synthetic
-  frames. Determinism and the 25% rise are asserted in both.
+- **D4 Trace:** `DemoResponseTrace.run(bandFrames:flux:onsets:world:mapping:step:)` in Core takes precomputed analysis
+  frames (Core cannot import audio): Core tests feed synthetic frames; the experience test produces the frames with the
+  real demo source and `FeatureExtractor`. Both assert determinism (≤ 1e-6 between two runs) and the 25% rise.
 - **D5 Picker:** segmented control sending the existing source actions; status from the presenter.
