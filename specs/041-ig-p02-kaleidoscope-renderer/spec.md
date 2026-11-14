@@ -131,7 +131,8 @@ Other experiences can fold points into a kaleidoscope wedge on the GPU and get e
 - **FR-A05-211**: Reset MUST restore the preset's default camera exactly.
 - **FR-A05-212**: Drag, pinch and (on the 3D composition) orbit gestures MUST map to the same actions, and each MUST
   have a native control alternative.
-- **FR-A05-213**: Camera state MUST be part of the experience state (snapshot, digest, restore).
+- **FR-A05-213**: Camera state MUST be part of the experience state (snapshot, digest, restore); a state saved by Phase 01
+  (schema 1, no camera) MUST restore with the preset's default camera through the shared migration chain.
 
 **Framework (story 3)**
 - **FR-A05-220**: VisualCore MUST provide 2D distance helpers (circle, box, segment, convex polygon) and a dihedral fold
