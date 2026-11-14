@@ -30,7 +30,8 @@ final class MusicLabAnalysisTests: XCTestCase {
             made = shell
             return shell
         }
-        XCTAssertEqual(await session.open(request), .running)
+        let opened = await session.open(request)
+        XCTAssertEqual(opened, .running)
         if let view = session.renderHost?.view {
             view.frame = CGRect(x: 0, y: 0, width: 160, height: 240)
             view.layoutIfNeeded()
@@ -60,7 +61,7 @@ final class MusicLabAnalysisTests: XCTestCase {
         let band = try XCTUnwrap(extractor.layout.bins.firstIndex { $0.contains(centre) })
         let loudest = try XCTUnwrap(features.bandEnergies.indices.max { features.bandEnergies[$0] < features.bandEnergies[$1] })
         XCTAssertEqual(loudest, band)
-        XCTAssertEqual(Double(features.rmsDB), Double(LevelMeter.dBFS(0.5 / 2.squareRoot())), accuracy: 1)
+        XCTAssertEqual(Double(features.rmsDB), Double(LevelMeter.dBFS(Float(0.5 / 2.0.squareRoot()))), accuracy: 1)
         XCTAssertEqual(presenter.lastDisplay.bars.count, 16)
         XCTAssertEqual(presenter.lastDisplay.bars.indices.max { presenter.lastDisplay.bars[$0] < presenter.lastDisplay.bars[$1] }, band)
         let summary = shell.accessibilitySummary
