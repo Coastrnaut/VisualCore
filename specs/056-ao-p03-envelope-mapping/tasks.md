@@ -25,7 +25,7 @@
 - [X] T-A07-308 Runner iOS 27 (`python3 Tools/python/desktop_runbook.py run-check --stage A07-P03 --timeout 600 --name verify-27 -- python3 scripts/verify_experiences.py --only a07.audio-odyssey --runtime 27`) — Verified 2026-11-14: Verified 2026-11-14: .autonomy/checks/A07-P03.verify-27.json exit 0 (nine standard scenarios)
 - [X] T-A07-309 Experience package check (`python3 Tools/python/desktop_runbook.py run-check --stage A07-P03 --timeout 600 --name experience-packages -- python3 scripts/check_experience_packages.py`) — Verified 2026-11-14: Verified 2026-11-14: .autonomy/checks/A07-P03.experience-packages.json exit 0
 - [X] T-A07-310 Public API unchanged (`python3 Tools/python/desktop_runbook.py run-check --stage A07-P03 --timeout 600 --name public-api -- python3 scripts/check_public_api.py`) — Verified 2026-11-14: Verified 2026-11-14: .autonomy/checks/A07-P03.public-api.json exit 0 (no VisualCore change)
-- [ ] T-A07-311 Script tests (`python3 Tools/python/desktop_runbook.py run-check --stage A07-P03 --timeout 600 --name script-tests -- python3 scripts/test_scripts.py`)
+- [X] T-A07-311 Script tests (`python3 Tools/python/desktop_runbook.py run-check --stage A07-P03 --timeout 600 --name script-tests -- python3 scripts/test_scripts.py`) — Verified 2026-11-14: Verified 2026-11-14: .autonomy/checks/A07-P03.script-tests.json exit 0
 - [ ] T-A07-312 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A07-P03
 
 ## Dependencies
