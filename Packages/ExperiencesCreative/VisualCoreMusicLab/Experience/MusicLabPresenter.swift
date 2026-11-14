@@ -74,8 +74,20 @@ final class MusicLabPresenter: ExperiencePresenter {
     nonisolated static let ringCapacity = 16_384
     /// The number of newest samples drawn per frame.
     nonisolated static let drawnSampleCount = 1_024
-    /// The drawn amplitude of a full-scale sample, as a share of the view height.
-    static let amplitudeShare = 0.4
+    /// The drawn amplitude of a full-scale sample, as a share of the view height (feature 048: the waveform keeps the
+    /// band 10 %…50 % of the height from the top, so its centre sits 30 % from the top).
+    static let amplitudeShare = 0.2
+    /// The waveform centre's offset above the view centre, as a share of the height.
+    static let waveCentreShare = 0.2
+    /// The spectrum bars' band, as shares of the height from the top (58 %…90 %).
+    static let barsTopShare = 0.58, barsBottomShare = 0.90
+    /// The width share left at the right edge for the level and beat meters.
+    static let metersShare = 0.12
+    /// The bar, level and beat colours.
+    nonisolated static let barColor = Vec4(0.45, 0.6, 1.0, 1), levelColor = Vec4(0.4, 0.95, 0.55, 1),
+                           peakColor = Vec4(1.0, 0.9, 0.4, 1), beatColor = Vec4(1.0, 0.45, 0.6, 1)
+    /// The analysis window in samples (the drawn window).
+    nonisolated static let analysisSize = 1_024
     /// The waveform's line width in pixels.
     static let lineWidth = 2.0
     /// The background colour (dark blue-black).
@@ -149,6 +161,17 @@ final class MusicLabPresenter: ExperiencePresenter {
     private let root = SceneNode(id: "waveform")
     private let centre = SceneNode(id: "centre", z: 0, color: MusicLabPresenter.centreColor)
     private var segments: [SceneNode] = []
+    private var bars: [SceneNode] = []
+    private let levelNode = SceneNode(id: "level", z: 1, color: MusicLabPresenter.levelColor)
+    private let peakNode = SceneNode(id: "peak", z: 2, color: MusicLabPresenter.peakColor)
+    private let beatNode = SceneNode(id: "beat", z: 1, color: MusicLabPresenter.beatColor)
+
+    /// The analysis of the running source (feature 048): made for its sample rate, reset on every source change.
+    private(set) var extractor: FeatureExtractor?
+    /// The features of the last frame (silence before the first).
+    private(set) var lastFeatures = AudioFeatures.silent(bandCount: 16)
+    /// The display heights of the last frame.
+    private(set) var lastDisplay = AnalysisDisplay.silent(bandCount: 16)
 
     init(experienceID: ExperienceID, permission: any MicrophonePermission, factory: MusicLabSourceFactory = .system) {
         self.experienceID = experienceID
@@ -160,6 +183,14 @@ final class MusicLabPresenter: ExperiencePresenter {
             root.add(node)
             segments.append(node)
         }
+        for index in 0..<16 {
+            let node = SceneNode(id: "b\(index)", z: 1, color: Self.barColor)
+            root.add(node)
+            bars.append(node)
+        }
+        root.add(levelNode)
+        root.add(peakNode)
+        root.add(beatNode)
     }
 
     // MARK: Render scene
@@ -188,7 +219,9 @@ final class MusicLabPresenter: ExperiencePresenter {
         let width = Double(max(1, context.pixelWidth)), height = Double(max(1, context.pixelHeight))
         let count = ring.latest(Self.drawnSampleCount, into: &scratch)
         lastDrawnTotalWritten = ring.totalWritten
-        lastDrawnSamples = Array(scratch.prefix(max(0, min(count, scratch.count))))
+        let drawn = max(0, min(count, scratch.count))
+        lastDrawnSamples = Array(scratch.prefix(drawn))
+        analyze(drawn: drawn, frame: frame)
         layOut(width: width, height: height)
         if primitives == nil { primitives = try PrimitiveRenderer(registry: context.resources) }
         try primitives?.draw(root, camera: Camera2D(), metrics: ViewMetrics(size: Vec2(width, height), scale: 1))
@@ -201,12 +234,30 @@ final class MusicLabPresenter: ExperiencePresenter {
         observers = []
         primitives?.release()
         primitives = nil
+        extractor = nil
+    }
+
+    /// Analyses the newest `drawn` samples of `scratch` once for this frame (feature 048, FR-A06-210, 211).
+    private func analyze(drawn: Int, frame: FrameInfo) {
+        let rate = activeSource?.sampleRate ?? 48_000
+        if extractor == nil || extractor?.sampleRate != rate {
+            extractor = FeatureExtractor(size: Self.analysisSize, sampleRate: rate)
+        }
+        guard let extractor else { return }
+        let features = scratch.withUnsafeBufferPointer { all in
+            extractor.analyze(UnsafeBufferPointer(rebasing: all[0..<drawn]), time: frame.time, elapsed: frame.delta)
+        }
+        lastFeatures = features
+        let bandDB = (0..<features.bandEnergies.count).map { features.bandDB($0) }
+        lastDisplay = AnalysisDisplay(bandDB: bandDB, rmsDB: features.rmsDB, peakDB: features.peakDB,
+                                      beat: features.beatEnergy)
     }
 
     /// Places the centre line and the 1,023 segments for a view of `width` × `height` pixels (world = pixels from
     /// the centre, y up): sample i of the newest 1,024 sits at x = −w/2 + i · w/1,023, y = clamp(s) · h · 0.4.
     private func layOut(width: Double, height: Double) {
-        centre.primitive = .line(Vec2(-width / 2, 0), Vec2(width / 2, 0), width: 1)
+        let waveY = height * Self.waveCentreShare
+        centre.primitive = .line(Vec2(-width / 2, waveY), Vec2(width / 2, waveY), width: 1)
         let n = Self.drawnSampleCount
         let samples = lastDrawnSamples
         let offset = n - samples.count            // fewer samples: right-aligned over silence
@@ -216,7 +267,7 @@ final class MusicLabPresenter: ExperiencePresenter {
             let k = i - offset
             guard k >= 0, k < samples.count else { return 0 }
             let s = Double(samples[k])
-            return (s.isFinite ? min(max(s, -1), 1) : 0) * amplitude
+            return waveY + (s.isFinite ? min(max(s, -1), 1) : 0) * amplitude
         }
         var previous = Vec2(-width / 2, y(0))
         for i in 1..<n {
@@ -224,6 +275,30 @@ final class MusicLabPresenter: ExperiencePresenter {
             segments[i - 1].primitive = .line(previous, point, width: Self.lineWidth)
             previous = point
         }
+        layOutAnalysis(width: width, height: height)
+    }
+
+    /// Places the 16 spectrum bars (58 %…90 % of the height from the top, left of the meters) and the level (with its
+    /// peak mark) and beat meters (two right-edge columns over the same band) from `lastDisplay`. A zero height draws
+    /// nothing (a line of zero length has no triangles).
+    private func layOutAnalysis(width: Double, height: Double) {
+        let bottom = height / 2 - height * Self.barsBottomShare
+        let span = height * (Self.barsBottomShare - Self.barsTopShare)
+        let barsWidth = width * (1 - Self.metersShare)
+        let slot = barsWidth / Double(bars.count)
+        let display = lastDisplay
+        for (index, node) in bars.enumerated() {
+            let x = -width / 2 + slot * (Double(index) + 0.5)
+            let h = index < display.bars.count ? display.bars[index] * span : 0
+            node.primitive = .line(Vec2(x, bottom), Vec2(x, bottom + h), width: slot * 0.7)
+        }
+        let column = width * Self.metersShare / 2
+        let levelX = width / 2 - column * 1.5, beatX = width / 2 - column * 0.5
+        levelNode.primitive = .line(Vec2(levelX, bottom), Vec2(levelX, bottom + display.level * span), width: column * 0.6)
+        let peakY = bottom + display.peakMark * span
+        peakNode.primitive = display.peakMark > 0
+            ? .line(Vec2(levelX - column * 0.35, peakY), Vec2(levelX + column * 0.35, peakY), width: 2) : nil
+        beatNode.primitive = .line(Vec2(beatX, bottom), Vec2(beatX, bottom + display.beat * span), width: column * 0.6)
     }
 
     // MARK: Sources
@@ -286,6 +361,7 @@ final class MusicLabPresenter: ExperiencePresenter {
             ring = buffer
             activeSource = source
             activeKey = key
+            extractor?.reset()                                  // no beat of the previous source lingers
             if !mirror.showsSettingsLink { mirror.message = nil }   // a stale file or stop message goes
         } catch {
             failedKey = key
@@ -434,7 +510,7 @@ final class MusicLabPresenter: ExperiencePresenter {
         state.source == .file ? (state.fileName ?? SourceKind.file.displayName) : state.source.displayName
     }
 
-    /// "quiet", "medium" or "loud" from the RMS of `samples` (−40 and −20 dBFS thresholds).
+    /// "quiet", "medium" or "loud" from the RMS of `samples` (−40 and −20 dBFS thresholds, as ``LevelWord``).
     static func levelText(_ samples: [Float]) -> String {
         guard !samples.isEmpty else { return "quiet" }
         var sum: Float = 0
@@ -443,13 +519,15 @@ final class MusicLabPresenter: ExperiencePresenter {
         return rms < quietRMS ? "quiet" : (rms < mediumRMS ? "medium" : "loud")
     }
 
-    /// "Music Lab: <source>, level <quiet/medium/loud>." Also brings the running source in line with `core`.
+    /// "Music Lab: <source>, level <quiet/medium/loud>[, beat]." from the last frame's features (feature 048,
+    /// FR-A06-212). Also brings the running source in line with `core`.
     func describe(_ core: MusicLabCore) -> String {
         sync(core)
-        return "Music Lab: \(mirror.status), level \(Self.levelText(lastDrawnSamples))."
+        let word = LevelWord.from(rmsDB: lastFeatures.rmsDB).rawValue
+        return "Music Lab: \(mirror.status), level \(word)\(lastDisplay.isBeat ? ", beat" : "")."
     }
 
-    /// One background probe in the top-left corner, outside the waveform's band (it spans 10 %…90 % of the height).
+    /// One background probe in the top-left corner, outside the waveform's band (10 %…50 % of the height) and the bars.
     func probes(_ core: MusicLabCore) -> [FrameProbe] {
         [FrameProbe(name: "background", x: 0.04, y: 0.04, expected: "dark")].compactMap { $0 }
     }
