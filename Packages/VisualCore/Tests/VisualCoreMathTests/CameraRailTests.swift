@@ -132,4 +132,20 @@ func angleBetween(_ a: Vec3, _ b: Vec3) -> Double { acos(min(1, max(-1, a.normal
         for k in 0..<20 { #expect(a.pose(at: Double(k) * 13.7) == b.pose(at: Double(k) * 13.7)) }
         #expect(a.pose(at: .nan) == a.pose(at: 0))
     }
+
+    /// Feature 058 (A07-P05) T-A07-502 (FR-A07-510; SC-A07-502): long-distance precision.
+    @Test func poseAtAThousandMillionUnitsMatchesTheWrappedPose() throws {
+        let rail = try #require(CameraRail(controlPoints: seededRailPoints(seed: 6)))
+        for x in [0.0, 0.25, 3.5, 17.125, 123.75, 999.5] {
+            let d = 1e9 + x
+            var wrapped = d.truncatingRemainder(dividingBy: rail.length)
+            if wrapped < 0 { wrapped += rail.length }
+            #expect(wrapped >= 0 && wrapped < rail.length)
+            let far = rail.pose(at: d), near = rail.pose(at: wrapped)
+            #expect((far.position - near.position).length < 1e-6, "x \(x)")
+            #expect((far.direction - near.direction).length < 1e-6, "x \(x)")
+            #expect((far.right - near.right).length < 1e-6, "x \(x)")
+            #expect((far.up - near.up).length < 1e-6, "x \(x)")
+        }
+    }
 }

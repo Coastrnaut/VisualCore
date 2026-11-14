@@ -11,7 +11,7 @@
 
 - **D1 StreamingBudget:** levels with behind/ahead/drawDistance/elementShare, validated non-increasing; vertex check per
   level against a `MeshBudget`. Alternative: reuse `QualityLevel` shares only (no window semantics).
-- **D2 Levels for A07:** ahead 8/6/4, behind 2/2/1, draw distance 110/80/50, element share 1/0.6/0.35.
+- **D2 Levels for A07:** ahead 8/6/4, behind 2/2/1, draw distance 64/48/32, element share 1/0.6/0.35.
 - **D3 Precision fixture:** rail wrap + Double distance + rebased Float drawing; tests at 10^9.
 - **D4 Long session:** 3,600 frames offscreen at 64 × 64 points; ledger snapshot equality after the first window;
   extrapolation by arithmetic (constant per-frame work).

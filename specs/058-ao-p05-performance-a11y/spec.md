@@ -36,7 +36,7 @@ level index to the presenter (`draw(_:tier:context:frame:)`, as A06 uses it with
   with `behind`, `ahead`, `drawDistance` and `elementShare`; `init?(levels:pieceLength:)` refuses an empty list,
   rising values or a draw distance beyond `ahead × pieceLength`; `vertexTotal(level:perPieceVertices:)` and
   `fits(level:perPieceVertices:budget: MeshBudget)`. Audio Odyssey's three levels: ahead 8/6/4, behind 2/2/1,
-  draw distance 110/80/50 units (fog end), element share 1.0/0.6/0.35 (star count per piece).
+  draw distance 64/48/32 units (= ahead × piece length 8; fog end, fog start at 40% of it; corrected during implementation because longer distances exceed the window), element share 1.0/0.6/0.35 (star count per piece).
 - Q: How is the precision fixture measured at 10^9? → A: In Core and VisualCoreMath tests: `CameraRail.pose(at:)` at
   10^9 + x equals `pose(at: (10^9 + x) mod length)` within 1e-6; pieces with index ≈ 1.25 × 10^8 join within 1e-6; the
   presenter, restored at distance 10^9 through a snapshot, draws its first frame with the rebased camera within 1e-3 of
