@@ -105,4 +105,17 @@ import AudioOdysseyCore
         print("WorldPieces median ms: \(median)")
         #expect(median.isFinite)
     }
+
+    // Feature 058 (A07-P05): the quality level's star share builds the first stars only; guide rings stay.
+    @Test func starCountBuildsTheFirstStarsOnly() {
+        let rail = JourneyRail.make(seed: 7)
+        let full = WorldPieces.piece(.starCorridor, index: 3, rail: rail, seed: 7)
+        let fewer = WorldPieces.piece(.starCorridor, index: 3, rail: rail, seed: 7, starCount: 17)
+        let none = WorldPieces.piece(.starCorridor, index: 3, rail: rail, seed: 7, starCount: -5)
+        #expect(fewer.positions.count < full.positions.count)
+        #expect(none.positions.count < fewer.positions.count)
+        #expect(Array(full.positions.prefix(17 * 24)) == Array(fewer.positions.prefix(17 * 24)))
+        let tunnel = WorldPieces.piece(.tunnel, index: 3, rail: rail, seed: 7, starCount: 1)
+        #expect(tunnel == WorldPieces.piece(.tunnel, index: 3, rail: rail, seed: 7))
+    }
 }

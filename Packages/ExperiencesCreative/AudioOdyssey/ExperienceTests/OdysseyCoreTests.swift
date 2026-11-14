@@ -15,6 +15,7 @@ import Foundation
 import Testing
 @testable import AudioOdysseyExperience
 import AudioOdysseyCore
+import VisualCoreAudioDSP
 import VisualCoreExperience
 import VisualCoreMath
 

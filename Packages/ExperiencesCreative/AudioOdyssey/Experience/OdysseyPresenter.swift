@@ -85,6 +85,25 @@
 //     goes through `chooseMicrophone()` (permission first), and File returns nil so the controls open the system file
 //     importer (`chooseFile(url:)` then opens the file before `source.file` is sent). The status line is
 //     `OdysseyMirror.sourceName` ("Demo signal", "Microphone" or the file's name).
+//
+// Feature 058 (A07-P05) T-A07-504 (FR-A07-502, FR-A07-510, FR-A07-511, FR-A07-520; clarifications 1–4; plan
+// "Lifecycle"):
+//   - Quality: each frame the level is `forceTierForTesting ?? tier` (the host's tier) clamped to 0…2, and
+//     `OdysseyQuality` gives its window, draw distance and element share. On a level change the tunnel's
+//     `SegmentWindow` is replaced by one of the level's behind/ahead (capacity 12): pieces outside it are retired (their
+//     renderers released) in the same frame and missing ones are built at most two per frame. The landscape and the
+//     star corridor draw the fixed window of the level's behind/ahead. The fog runs from `OdysseyQuality.fogStart` to
+//     the level's draw distance toward the clear colour; the far plane (120) lies beyond every draw distance. The star
+//     corridor's pieces carry `OdysseyQuality.starCount(level:)` stars each (48/29/17) and are rebuilt when the count
+//     changes. The level never touches the journey state (nothing is sent to the core), so the digest is unchanged.
+//   - Announcements: a `JourneyAnnouncer` (reset in `setup`) receives the world ("Tunnel", "Landscape", "Star
+//     corridor"), the source ("Demo signal", "Microphone" or the file's name), an applied journey ("Journey: <name>",
+//     which then stands for the world and source changes it brought) and pause or resume ("Paused", "Flying") when they
+//     change between frames (several changes of one frame are joined with ". "), and `tick` runs every frame. The time
+//     is the frame clock: the sum of the host's frame deltas since `setup` (deterministic in tests, real time in the
+//     app while frames are drawn). What the announcer releases goes to the injected `AnnouncementSink` only while
+//     `voiceOverRunning()` is true (the system's sink and VoiceOver state by default, as Music Lab). The first frame
+//     after `setup` sets the reference state and announces nothing.
 import Foundation
 import SwiftUI
 import UIKit
@@ -96,6 +115,7 @@ import VisualCoreExperienceHost
 import VisualCoreMath
 import VisualCoreRendering
 import VisualCoreScenes
+import VisualCoreUI
 
 /// What the controls show: the display fields of the journey, updated only when one of them changes (not every frame).
 @MainActor
@@ -160,12 +180,33 @@ final class OdysseyPresenter: ExperiencePresenter {
 
     /// The vertical field of view (60°).
     nonisolated static let fovY = 60.0 * Double.pi / 180
-    /// The near and far clipping distances.
+    /// The near and far clipping distances; the far plane lies beyond every quality level's draw distance (feature 058).
     nonisolated static let near = 0.1, far = 120.0
     /// The clear colour (dark blue-black).
     nonisolated static let background = Vec4(0.02, 0.02, 0.05, 1)
-    /// The linear depth fog of every world: from 40 to 110 units toward the clear colour (feature 055).
-    nonisolated static let fog = MeshFog(start: 40, end: 110, color: background)
+    /// The linear depth fog of quality level 0 (feature 058: from 25.6 to 64 units toward the clear colour).
+    nonisolated static let fog = OdysseyPresenter.levelFog(0)
+
+    /// The linear depth fog of quality level `level` (clamped): from `OdysseyQuality.fogStart(level:)` to the level's
+    /// draw distance toward the clear colour (feature 058).
+    nonisolated static func levelFog(_ level: Int) -> MeshFog? {
+        MeshFog(start: OdysseyQuality.fogStart(level: level), end: OdysseyQuality.level(level).drawDistance,
+                color: background)
+    }
+
+    /// The quality level drawn for the host's `tier` and an optional forced tier: `forced ?? tier` clamped to the
+    /// levels of `OdysseyQuality` (0…2).
+    nonisolated static func qualityLevel(tier: Int, forced: Int?) -> Int {
+        min(max(forced ?? tier, 0), OdysseyQuality.levels.count - 1)
+    }
+
+    /// The piece indices of the fixed window of quality level `level` around the unwrapped `distance`: the level's
+    /// behind and ahead around the distance's piece, never below 0 (level 0 equals `WorldPieces.indices(around:)`).
+    nonisolated static func indices(around distance: Double, level: Int) -> ClosedRange<Int> {
+        let streaming = OdysseyQuality.level(level)
+        let current = WorldPieces.pieceIndex(of: distance)
+        return max(0, current - streaming.behind)...(current + streaming.ahead)
+    }
     /// The ring buffer's capacity in samples (a third of a second at 48 kHz).
     nonisolated static let ringCapacity = 16_384
     /// The analysis window in samples.
@@ -311,6 +352,28 @@ final class OdysseyPresenter: ExperiencePresenter {
     /// Set only by tests; the next draw throws `OdysseyDrawError.injected` and clears the flag.
     var failNextDraw = false
 
+    /// A tier that overrides the host's in tests (feature 058); nil in the app.
+    var forceTierForTesting: Int?
+    /// The quality level drawn by the last frame (feature 058); nil before the first frame.
+    private(set) var lastLevel: Int?
+    /// The fog of the last frame (feature 058).
+    private(set) var lastFog: MeshFog?
+    /// The stars per piece of the star corridor pieces cached now (feature 058); nil while no star corridor piece is
+    /// cached.
+    private(set) var cacheStarCount: Int?
+    /// Where announcements go (feature 058; the system's VoiceOver announcements by default).
+    let announcementSink: any AnnouncementSink
+    /// Whether VoiceOver is running (feature 058; the system's answer by default).
+    let voiceOverRunning: @MainActor () -> Bool
+    /// The rate limit of the announcements (feature 058), reset in `setup`.
+    private(set) var announcer = JourneyAnnouncer()
+    /// The frame clock of the announcements: the sum of the frame deltas since `setup`, in seconds.
+    private(set) var announcementClock = 0.0
+    /// The world, source name and pause state last seen by the announcements; nil until the first frame after `setup`.
+    private var announcedState: (world: JourneyWorld, source: String, paused: Bool)?
+    /// The name of the journey applied since the last frame, announced by the next frame.
+    private var appliedPresetName: String?
+
     /// The buffer of the running source (a fresh one per start).
     private(set) var ring = SampleRingBuffer(capacity: OdysseyPresenter.ringCapacity)
     /// The running source, if any.
@@ -338,8 +401,11 @@ final class OdysseyPresenter: ExperiencePresenter {
     private(set) var response: WorldResponse
 
     init(experienceID: ExperienceID, permission: any MicrophonePermission, factory: OdysseySourceFactory = .system,
-         reduceMotion: Bool = false, reduceFlashing: Bool = false, storage: ExperienceStorage? = nil) {
+         reduceMotion: Bool = false, reduceFlashing: Bool = false, storage: ExperienceStorage? = nil,
+         announcementSink: (any AnnouncementSink)? = nil, voiceOverRunning: (@MainActor () -> Bool)? = nil) {
         self.experienceID = experienceID
+        self.announcementSink = announcementSink ?? SystemAnnouncementSink()
+        self.voiceOverRunning = voiceOverRunning ?? { UIAccessibility.isVoiceOverRunning }
         presets = storage.map { JourneyPresetStore(storage: $0) }
         self.permission = permission
         self.factory = factory
@@ -359,6 +425,10 @@ final class OdysseyPresenter: ExperiencePresenter {
         self.pass = pass
         isLive = true
         presets?.reload()
+        announcer.reset()
+        announcementClock = 0
+        announcedState = nil
+        appliedPresetName = nil
         let center = NotificationCenter.default
         observers = [
             center.addObserver(forName: UIApplication.didEnterBackgroundNotification, object: nil, queue: .main) { [weak self] _ in
@@ -382,14 +452,20 @@ final class OdysseyPresenter: ExperiencePresenter {
         }
         scheduleMirrorIfNeeded(core)
         updateResponse(core, frame: frame)
+        updateAnnouncements(core, frame: frame)
         let state = core.state
+        let level = Self.qualityLevel(tier: tier, forced: forceTierForTesting)
+        let streaming = OdysseyQuality.level(level)
+        let starCount = OdysseyQuality.starCount(level: level)
         let path = makeRail(for: state.seed)
-        if cacheWorld != state.world || cacheSeed != state.seed {
+        if cacheWorld != state.world || cacheSeed != state.seed
+            || (state.world == .starCorridor && cacheStarCount != nil && cacheStarCount != starCount) {
             releasePieces()
             cacheWorld = state.world
             cacheSeed = state.seed
         }
-        let window = WorldPieces.indices(around: state.distance)
+        tunnel.resize(behind: streaming.behind, ahead: streaming.ahead)
+        let window = Self.indices(around: state.distance, level: level)
         let sway = core.flight.sway(limits: core.limits)
         rebase.update(camera: Self.eye(rail: path, distance: state.distance, sway: sway))
         let origin = rebase.origin
@@ -407,13 +483,13 @@ final class OdysseyPresenter: ExperiencePresenter {
             }
             let seed = state.seed
             let registry = context.resources
-            let step = try tunnel.advance(to: state.distance, pieceLength: WorldPieces.pieceLength, build: { index in
+            try tunnel.advance(to: state.distance, pieceLength: WorldPieces.pieceLength, build: { index in
                 let renderer = try MeshRenderer(mesh: WorldPieces.piece(.tunnel, index: index, rail: path, seed: seed),
                                                 registry: registry)
                 piecesMade += 1
                 return renderer
             }, retire: { $0.release() })
-            tunnelBuiltLastFrame = step.toBuild.count
+            tunnelBuiltLastFrame = tunnel.builtLastStep
             let model = Self.pieceModel(world: .tunnel, scale: response.primaryScale, pose: pose, origin: origin)
             for index in tunnel.live {
                 guard let renderer = tunnel.element(for: index) else { continue }
@@ -440,9 +516,11 @@ final class OdysseyPresenter: ExperiencePresenter {
                 if let cached = pieces[index] {
                     renderer = cached
                 } else {
-                    renderer = try MeshRenderer(mesh: WorldPieces.piece(state.world, index: index, rail: path,
-                                                                        seed: state.seed),
-                                                registry: context.resources)
+                    let mesh = state.world == .starCorridor
+                        ? WorldPieces.piece(.starCorridor, index: index, rail: path, seed: state.seed,
+                                            starCount: starCount)
+                        : WorldPieces.piece(state.world, index: index, rail: path, seed: state.seed)
+                    renderer = try MeshRenderer(mesh: mesh, registry: context.resources)
                     pieces[index] = renderer
                     piecesMade += 1
                 }
@@ -454,14 +532,18 @@ final class OdysseyPresenter: ExperiencePresenter {
             lastTunnelModel = nil
             lastModel = model
         }
+        cacheStarCount = state.world == .starCorridor && !pieces.isEmpty ? starCount : nil
         if pass == nil {
             let made = DepthMeshPass(registry: context.resources)
             made.clearColor = Self.background
             pass = made
         }
         let aspect = Double(max(1, context.pixelWidth)) / Double(max(1, context.pixelHeight))
-        try pass?.draw(items, view: camera.view(), projection: camera.projection(aspect: aspect), fog: Self.fog,
+        let fog = Self.levelFog(level)
+        try pass?.draw(items, view: camera.view(), projection: camera.projection(aspect: aspect), fog: fog,
                        context: context)
+        lastLevel = level
+        lastFog = fog
         lastCamera = camera
         lastWorld = state.world
         lastIndices = window
@@ -478,6 +560,7 @@ final class OdysseyPresenter: ExperiencePresenter {
         tunnelSeed = nil
         cacheWorld = nil
         cacheSeed = nil
+        cacheStarCount = nil
         pass?.release()
         pass = nil
         extractor = nil
@@ -496,6 +579,39 @@ final class OdysseyPresenter: ExperiencePresenter {
     private func releasePieces() {
         for renderer in pieces.values { renderer.release() }
         pieces = [:]
+        cacheStarCount = nil
+    }
+
+    // MARK: Announcements (feature 058)
+
+    /// Advances the frame clock, offers what changed since the last frame to the announcer, flushes its pending text
+    /// when due, and sends what it releases to the sink while VoiceOver runs (see the file header).
+    private func updateAnnouncements(_ core: OdysseyCore, frame: FrameInfo) {
+        if frame.delta.isFinite, frame.delta > 0 { announcementClock += frame.delta }
+        let state = core.state
+        let current = (world: state.world, source: sourceName(state.source), paused: state.paused)
+        var texts: [String] = []
+        if let previous = announcedState {
+            if let name = appliedPresetName {
+                texts.append("Journey: \(name)")
+            } else {
+                if previous.world != current.world { texts.append(current.world.displayName) }
+                if previous.source != current.source { texts.append(current.source) }
+            }
+            if previous.paused != current.paused { texts.append(current.paused ? "Paused" : "Flying") }
+        }
+        announcedState = current
+        appliedPresetName = nil
+        if !texts.isEmpty, let text = announcer.offer(texts.joined(separator: ". "), at: announcementClock) {
+            send(text)
+        }
+        if let text = announcer.tick(at: announcementClock) { send(text) }
+    }
+
+    /// Sends `text` to the announcement sink while VoiceOver runs.
+    private func send(_ text: String) {
+        guard voiceOverRunning() else { return }
+        announcementSink.announce(text)
     }
 
     /// Mirrors the factory's Reduce Motion into the core after the current frame when they differ (once per change).
@@ -756,7 +872,10 @@ final class OdysseyPresenter: ExperiencePresenter {
     func apply(_ preset: JourneyPreset) -> ActionResult {
         guard let port else { return .rejected(.notActive(.inactive)) }
         let result = port.send("preset.apply", preset.actionValues)
-        if result.isAccepted { mirror.selectedPresetID = preset.id }
+        if result.isAccepted {
+            mirror.selectedPresetID = preset.id
+            if announcedState != nil { appliedPresetName = preset.name }
+        }
         return result
     }
 

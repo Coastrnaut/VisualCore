@@ -83,13 +83,18 @@ public enum WorldPieces {
     }
 
     /// The piece `index` (negative counts as 0) of `world` along `rail` for `seed`, at most `vertexBudget` vertices.
-    public static func piece(_ world: JourneyWorld, index: Int, rail: CameraRail, seed: UInt64) -> Mesh {
+    /// - Parameter starCount: For the star corridor, how many of the piece's `starsPerPiece` stars to build (feature
+    ///   058, A07-P05: the quality level's element share); the first `starCount` stars in star order, clamped to
+    ///   0…`starsPerPiece`. Other worlds ignore it.
+    public static func piece(_ world: JourneyWorld, index: Int, rail: CameraRail, seed: UInt64,
+                             starCount: Int = starsPerPiece) -> Mesh {
         let index = max(0, index)
         var draft = PieceDraft()
         switch world {
         case .tunnel: buildTunnel(&draft, index: index, rail: rail, seed: seed)
         case .landscape: buildLandscape(&draft, index: index, rail: rail, seed: seed)
-        case .starCorridor: buildStars(&draft, index: index, rail: rail, seed: seed)
+        case .starCorridor: buildStars(&draft, index: index, rail: rail, seed: seed,
+                                       count: min(max(starCount, 0), starsPerPiece))
         }
         return draft.build()
     }
@@ -186,8 +191,8 @@ public enum WorldPieces {
         return (d, radius, angle)
     }
 
-    private static func buildStars(_ draft: inout PieceDraft, index: Int, rail: CameraRail, seed: UInt64) {
-        for k in 0..<starsPerPiece {
+    private static func buildStars(_ draft: inout PieceDraft, index: Int, rail: CameraRail, seed: UInt64, count: Int) {
+        for k in 0..<count {
             let place = starPlacement(seed: seed, index: index, star: k)
             let pose = rail.pose(at: place.distance)
             let centre = pose.position + (pose.right * cos(place.angle) + pose.up * sin(place.angle)) * place.radius
