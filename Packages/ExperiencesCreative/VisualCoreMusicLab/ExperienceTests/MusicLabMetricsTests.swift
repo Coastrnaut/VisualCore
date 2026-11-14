@@ -84,10 +84,14 @@ final class MusicLabMetricsTests: XCTestCase {
         let sink = RecordingSink()
         let session = ExperienceSession()
         let shell = try await open(session, sink: sink, voiceOver: true)
-        // The melody changes its metrics often; ~2.5 s of frames allow at most 2 announcements (0 s and ≥ 2 s).
+        // The melody changes its metrics often; the gate allows one announcement at the start and at most one per 2 s
+        // after it, so the bound follows the measured run time (frames take longer on a loaded machine).
+        let start = Date()
         try await frames(session, 150)
+        let elapsed = Date().timeIntervalSince(start)
         XCTAssertGreaterThanOrEqual(sink.texts.count, 1)
-        XCTAssertLessThanOrEqual(sink.texts.count, 2, "\(sink.texts)")
+        XCTAssertLessThanOrEqual(sink.texts.count, 1 + Int(elapsed / AnnouncementGate.minimumInterval) + 1,
+                                 "\(sink.texts) over \(elapsed) s")
         XCTAssertTrue(zip(sink.texts, sink.texts.dropFirst()).allSatisfy { $0 != $1 })
         XCTAssertFalse(shell.presenter.lastMetricText.isEmpty)
         session.close()

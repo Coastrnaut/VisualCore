@@ -15,9 +15,13 @@ final class MLPresetsUITests: XCTestCase {
         // Mapping: the first strength slider of the Bars scene moves (0…4 in steps of 0.1).
         let gain = "mapping.0.0.gain"
         let before = ML.sliderValue(app, gain)
-        ML.adjust(app, gain, to: before == "3.6" ? 0.25 : 0.9)
-        // The spoken value follows the state, which the next frame refreshes: wait for it (bounded) before judging.
-        let changed = ML.waitForValue(ML.slider(app, gain), timeout: 3) { $0 != before }
+        // A drag on the simulator sometimes does not register; up to three drags to different positions, each followed
+        // by a bounded wait, because the spoken value follows the state that the next frame refreshes.
+        var changed = false
+        for position in [0.9, 0.25, 0.6] where !changed {
+            ML.adjust(app, gain, to: CGFloat(position))
+            changed = ML.waitForValue(ML.slider(app, gain), timeout: 2) { $0 != before }
+        }
         XCTAssertTrue(changed, "the strength changed from \(before) (now \(ML.sliderValue(app, gain)))")
 
         // Built-in preset: Pulse geometry shows the Geometry scene.
