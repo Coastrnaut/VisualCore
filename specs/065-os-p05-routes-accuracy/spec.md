@@ -72,8 +72,9 @@ spectrum, readouts) and compares each readout with the generator's defining valu
    one bin of the frequency and 1.5 dB of the level, and cursors one period apart read the period within one sample.
 2. **Given** the demo square, **When** audited, **Then** the waveform's extremes read ±0.50 of full scale and its
    spectrum peak is the fundamental.
-3. **Given** the sweep, **When** audited over two seconds, **Then** the spectrum peak rises monotonically within one bin of
-   the generator's instantaneous frequency.
+3. **Given** the sweep, **When** audited at 0.5 s, 1 s and 1.5 s, **Then** the spectrum peak rises from one point to the
+   next and lies within the frequency range the analysed 4,096-sample frame spans (the generator's frequencies at the
+   frame's first and last sample), widened by one bin on each side.
 4. **Given** any readout, **When** its words are examined, **Then** they say "relative to full scale" and never claim
    calibrated, certified, laboratory or medical accuracy.
 
