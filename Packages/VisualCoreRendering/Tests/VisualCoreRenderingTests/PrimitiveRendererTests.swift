@@ -103,6 +103,42 @@ final class PrimitiveRendererTests: XCTestCase {
         XCTAssertTrue(PrimitiveRenderer.triangles(.line(.zero, .zero, width: 3), pointsPerUnit: 1).isEmpty)
     }
 
+    /// Feature 062 (A08-P02) T-A08-204 (FR-A08-202, 203; SC-A08-202): a polyline of N points is one batch of
+    /// 2 (N − 1) triangles for its non-zero segments, and its pixels equal the same segments drawn as `.line` nodes.
+    func testPolylineIsOneBatchAndMatchesItsSegments() throws {
+        let points = [Vec2(-14, -8), Vec2(-6, 9), Vec2(0, -11), Vec2(0, -11), Vec2(7, 6), Vec2(14, -3)]
+        XCTAssertEqual(PrimitiveRenderer.triangles(.polyline(points, width: 2), pointsPerUnit: 1).count / 3, 2 * 4,
+                       "five segments, one of zero length skipped")
+        XCTAssertTrue(PrimitiveRenderer.triangles(.polyline([Vec2(1, 1)], width: 2), pointsPerUnit: 1).isEmpty)
+        XCTAssertTrue(PrimitiveRenderer.triangles(.polyline([], width: 2), pointsPerUnit: 1).isEmpty)
+
+        let strip = SceneNode(primitive: .polyline(points, width: 2), color: Vec4(0, 1, 0, 1))
+        var stripTriangles = 0
+        let a = try DrawHarness.pixels(keep: &host) { ctx in
+            let renderer = try PrimitiveRenderer(registry: ctx.resources)
+            try renderer.draw(strip, camera: Camera2D(), metrics: self.metrics)
+            stripTriangles = renderer.lastTriangleCount
+        }
+        XCTAssertEqual(stripTriangles, 8, "one batch: the strip's triangles only")
+        let segments = SceneNode()
+        for (p, q) in zip(points, points.dropFirst()) where p != q {
+            segments.add(SceneNode(primitive: .line(p, q, width: 2), color: Vec4(0, 1, 0, 1)))
+        }
+        let b = try DrawHarness.pixels(keep: &host) { ctx in
+            try PrimitiveRenderer(registry: ctx.resources).draw(segments, camera: Camera2D(), metrics: self.metrics)
+        }
+        var covered = 0, differing = 0
+        for y in 0..<32 {
+            for x in 0..<32 {
+                let pa = DrawHarness.px(a, 32, x, y), pb = DrawHarness.px(b, 32, x, y)
+                if pa.y > 0 || pb.y > 0 { covered += 1 }
+                if pa != pb { differing += 1 }
+            }
+        }
+        XCTAssertGreaterThan(covered, 60, "the strip covers pixels")
+        XCTAssertLessThanOrEqual(Double(differing), Double(covered) * 0.01, "\(differing) of \(covered) pixels differ")
+    }
+
     func testRecreationRebuildsAndTeardownLeaksNothing() throws {
         let scene = PrimitiveScene(root: SceneNode(primitive: .circle(6), color: Vec4(1, 0, 0, 1)))
         let host = try RenderHost(scene: scene)

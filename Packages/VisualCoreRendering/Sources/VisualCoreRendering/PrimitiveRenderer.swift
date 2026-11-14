@@ -1,7 +1,9 @@
-// PrimitiveRenderer.swift — draws a 2D SceneNode tree (rect, circle, line, polygon) as one batched
+// PrimitiveRenderer.swift — draws a 2D SceneNode tree (rect, circle, line, polygon, polyline) as one batched
 // triangle list (feature 006 T-F513; FR-F506, FR-F508, FR-F512; research R7). Vertices are transformed
 // to NDC on the CPU (Double precision), colors premultiplied, blended with ONE / ONE_MINUS_SRC_ALPHA.
 // GPU objects come from the registry; after a context recreation they are rebuilt on the next draw.
+// Feature 062 (A08-P02) T-A08-204 (FR-A08-202; gap G-TRACESTRIP): `.polyline` draws one quad per non-zero segment,
+// exactly the vertices `.line` gives, in the same batch.
 import CVisualCoreGL
 import Foundation
 import VisualCoreMath
@@ -104,13 +106,27 @@ public final class PrimitiveRenderer {
             }
             return out
         case .line(let a, let b, let w):
-            let d = (b - a).normalized
-            guard d != .zero else { return [] }
-            let n = Vec2(-d.y, d.x) * (w / 2)
-            return [a + n, a - n, b - n, a + n, b - n, b + n]
+            var out: [Vec2] = []
+            appendSegment(a, b, width: w, to: &out)
+            return out
         case .polygon(let pts):
             return earClip(pts)
+        case .polyline(let pts, let w):
+            // feature 062 (A08-P02): one quad per non-zero segment, identical to a two-point `.line`.
+            var out: [Vec2] = []
+            guard pts.count >= 2 else { return out }
+            out.reserveCapacity((pts.count - 1) * 6)
+            for i in 1..<pts.count { appendSegment(pts[i - 1], pts[i], width: w, to: &out) }
+            return out
         }
+    }
+
+    /// Appends the six vertices (two triangles) of a `width`-wide segment `a`–`b`; nothing for a zero-length segment.
+    private static func appendSegment(_ a: Vec2, _ b: Vec2, width w: Double, to out: inout [Vec2]) {
+        let d = (b - a).normalized
+        guard d != .zero else { return }
+        let n = Vec2(-d.y, d.x) * (w / 2)
+        out += [a + n, a - n, b - n, a + n, b - n, b + n]
     }
 
     /// Ear-clipping triangulation of a simple polygon (either winding); O(n²) for ≤ 256 points.
