@@ -1,0 +1,86 @@
+{
+  "checks": [
+    {
+      "attestation": ".autonomy/checks/A04-P06.baseline-experiences.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P06.baseline-experiences.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P06.copy-claims.json",
+      "command": "python3 scripts/release_check.py --only copy-claims-a04",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P06.copy-claims.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P06.dependency-audit.json",
+      "command": "python3 scripts/audit_showcase_dependencies.py --target VisualCore --sources Apps/VisualCore",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P06.dependency-audit.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P06.experience-release-r2.json",
+      "command": "python3 scripts/release_check.py --only experience-release-a04",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P06.experience-release-r2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P06.experience-release.json",
+      "command": "python3 scripts/release_check.py --only experience-release-a04",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P06.experience-release.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P06.experiences-ios26.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-26.5 --action test",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P06.experiences-ios26.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P06.experiences-ios27.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P06.experiences-ios27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P06.pu-no-network.json",
+      "command": "/bin/sh -c '! grep -rnE '\"'\"'URLSession|import Network|CoreMotion|AVFoundation|CoreLocation|AdSupport|AppTrackingTransparency|NSUserTrackingUsage'\"'\"' Packages/ExperiencesCreative/ParticleUniverse/Core Packages/ExperiencesCreative/ParticleUniverse/Experience'",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P06.pu-no-network.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P06.release-checks.json",
+      "command": "python3 scripts/release_check.py --only app-release-build app-release-symbols app-privacy-manifest app-no-tracking app-licenses app-usage-descriptions",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P06.release-checks.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P06.script-tests.json",
+      "command": "python3 scripts/test_scripts.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P06.script-tests.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P06.ui-pu-j2-r2.json",
+      "command": "python3 scripts/release_check.py --only app-build-for-testing-ios27 app-ui-ios27-j2",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P06.ui-pu-j2-r2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P06.ui-pu-j3.json",
+      "command": "python3 scripts/release_check.py --only app-ui-ios27-j3",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P06.ui-pu-j3.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A04-P06.ui-pu-j4.json",
+      "command": "python3 scripts/release_check.py --only app-ui-ios27-j4",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A04-P06.ui-pu-j4.log"
+    }
+  ],
+  "generated": "2026-11-14T00:22:58+00:00",
+  "method": "deterministic-run-check",
+  "stage": "A04-P06",
+  "status": "pass"
+}

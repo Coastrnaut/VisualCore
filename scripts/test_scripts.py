@@ -2272,8 +2272,15 @@ class MigrationLedgerTests(unittest.TestCase):
         data, legacy = self.ledger(), ledgertool.legacy_state(self.root)
         gates = ledgertool.index_of(data)
         self.assertEqual(ledgertool.unmet(gates["X-A01"], gates, legacy["stages"]), [])
-        # The real legacy ledger advances phase by phase; any unmet A04 phase keeps X-A04 waiting (A04-P04 passed on
-        # 2026-11-13, feature 036; A04-P06 is the last phase).
+        # The real legacy ledger advances phase by phase (A04-P06, the last A04 phase, passed on 2026-11-13, feature
+        # 038). The guard is proved on this test's copy of the legacy ledger with A04-P06 set back to pending: any
+        # unmet A04 phase keeps X-A04 waiting.
+        if legacy["stages"].get("A04-P06", {}).get("status") == "pass":
+            self.assertFalse(any(u.startswith("legacy:A04-P") for u in
+                                 ledgertool.unmet(gates["X-A04"], gates, legacy["stages"])))
+        legacy["stages"]["A04-P06"] = {"status": "pending", "attempts": []}
+        (self.root / ledgertool.LEGACY).write_text(json.dumps(legacy, indent=2) + "\n")
+        legacy = ledgertool.legacy_state(self.root)
         unmet_a04 = ledgertool.unmet(gates["X-A04"], gates, legacy["stages"])
         self.assertTrue(any(u.startswith("legacy:A04-P") for u in unmet_a04), unmet_a04)
         self.assertIn("legacy:A04-P06", unmet_a04)
