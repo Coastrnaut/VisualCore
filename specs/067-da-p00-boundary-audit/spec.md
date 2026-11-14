@@ -165,7 +165,9 @@ VisualCore module will own each missing piece and in which phase.
   pass; Digital Aquarium MUST stay unregistered and unavailable (its targets come with A09-P01's first rules).
 - **FR-A09-006**: The contract MUST record negative rules (no EGL path of its own, no second renderer, no ProjectM, no
   networking, no purchased, generated or hand-made artwork, no creature economy, no claims of realistic animal
-  behaviour, animal-care guidance, health, relaxation or sleep benefits) and a stop/go decision with reasons.
+  behaviour, animal-care guidance, health, relaxation or sleep benefits), the license rule (every species definition,
+  palette, preset habitat and shader bundled later records its author and license; only original content) and a
+  stop/go decision with reasons.
 - **FR-A09-007**: The contract MUST pass the app-neutral contract checker, and its readable view MUST be generated from
   it.
 - **FR-A09-008**: This phase MUST NOT change VisualCore or ProjectM (empty diff since the phase start).
