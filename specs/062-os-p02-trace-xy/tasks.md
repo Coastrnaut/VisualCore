@@ -48,3 +48,8 @@ Lead: 207, docs, contract, runs, commits.
 ## Implementation strategy
 
 MVP: decimated trace strips and the XY view; then the trigger fixtures; evidence last.
+
+## Phase 6: Convergence
+
+- [ ] T-A08-217 Draw `.polyline` at least one pixel wide on screen in `Packages/VisualCoreRendering/Sources/VisualCoreRendering/PrimitiveRenderer.swift` (width = max(width, 1 / pointsPerUnit); `.line` unchanged) with a test in `PrimitiveRendererTests.swift` that a 0.3-unit-wide polyline still covers pixels per spec Edge Cases "Width below one pixel" (partial)
+- [ ] T-A08-218 Record in `specs/062-os-p02-trace-xy/research.md` (D5) that the flat-line fixture is proved by `ScopeSessionTests.testAFlatLineNeverTriggersAndNormalModeWaits` with an injected silent source because no action selects silence, while the manifest carries the missing crossing (fixtures 3 normal, 6 auto) and XY (fixture 7) per FR-A08-220 (contradicts)
