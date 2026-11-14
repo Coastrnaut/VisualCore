@@ -7,7 +7,7 @@
 
 ## Phase 1: Setup
 
-- [ ] T-A06-401 Baseline: cite the A06-P03 evidence on the unchanged tree (`.autonomy/checks/A06-P03.rendering-ios27.json`, `.autonomy/checks/A06-P03.experiences-ios27-2.json`, `.autonomy/checks/A06-P03.app-unit.json`, `.autonomy/checks/A06-P03.verify-27.json`) instead of a rerun (owner ruling 4 of 2026-11-14)
+- [X] T-A06-401 Baseline: cite the A06-P03 evidence on the unchanged tree (`.autonomy/checks/A06-P03.rendering-ios27.json`, `.autonomy/checks/A06-P03.experiences-ios27-2.json`, `.autonomy/checks/A06-P03.app-unit.json`, `.autonomy/checks/A06-P03.verify-27.json`) instead of a rerun (owner ruling 4 of 2026-11-14) — Verified 2026-11-14: — Verified 2026-11-14: cited .autonomy/checks/A06-P03.rendering-ios27.json, A06-P03.experiences-ios27-2.json, A06-P03.app-unit.json, A06-P03.verify-27.json on the unchanged tree (owner ruling 2026-11-14)
 
 ## Phase 2: Foundational (VisualCore recovery, story 1; preset value, story 2)
 
