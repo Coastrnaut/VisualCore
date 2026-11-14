@@ -22,7 +22,7 @@
 
 ## Phase 4: User Story 3 — the trigger fixture (P2)
 
-- [ ] T-A08-207 [US3] Extend `Experience/Adapter/ScopeManifest.swift` with fixtures for the flat line (silence-level trigger in auto and normal) and the missing crossing in both modes and for XY (`display.select [1]`), regenerate `scenario-manifest.json` (`TEST_RUNNER_UPDATE_SCENARIO_MANIFEST=1`), update `ExperienceTests/ScopeManifestTests.swift`; session tests prove "no trigger" (auto) and "waiting" (normal) for silence and for a level above the amplitude (FR-A08-213, 220; SC-A08-204)
+- [X] T-A08-207 [US3] Extend `Experience/Adapter/ScopeManifest.swift` with fixtures for the flat line (silence-level trigger in auto and normal) and the missing crossing in both modes and for XY (`display.select [1]`), regenerate `scenario-manifest.json` (`TEST_RUNNER_UPDATE_SCENARIO_MANIFEST=1`), update `ExperienceTests/ScopeManifestTests.swift`; session tests prove "no trigger" (auto) and "waiting" (normal) for silence and for a level above the amplitude (FR-A08-213, 220; SC-A08-204) — Verified 2026-11-14: 2026-11-14: manifest fixtures 6 (missing crossing, auto) and 7 (XY), manifest regenerated (7 fixtures); flat line and missing crossing session tests in both modes pass
 
 ## Phase 5: Polish & evidence
 

@@ -29,13 +29,13 @@ private func play(_ spec: ScenarioSpec) async throws -> (initial: String, result
 }
 
 @Suite struct ScopeManifestTests {
-    @Test func theManifestIsValidWithTheNineStandardScenariosAndFiveFixtures() {
+    @Test func theManifestIsValidWithTheNineStandardScenariosAndSevenFixtures() {
         let manifest = ScopeCore.manifest(for: id)
         let problems = ScenarioManifestValidator.problems(manifest, controls: ScopeCore.controls,
-                                                          content: ContentRequirement(fixtures: 5))
+                                                          content: ContentRequirement(fixtures: 7))
         #expect(problems.isEmpty, "\(problems)")
         #expect(Set(manifest.scenarios.map(\.name))
-                == Set(ScenarioManifest.standardNames).union((1...5).map { "fixture-\($0)" }))
+                == Set(ScenarioManifest.standardNames).union((1...7).map { "fixture-\($0)" }))
     }
 
     @Test func derivedDigestsAndResultsAreWhatTheEngineGives() async throws {
@@ -69,6 +69,10 @@ private func play(_ spec: ScenarioSpec) async throws -> (initial: String, result
         #expect(clipping.gain == 10 && clipping.waveform == .sine)
         let sweep = ScopeCore.played(seed: seed, entries: ScopeCore.fixtureEntries[4]).state
         #expect(sweep.waveform == .sweep && sweep.triggerSlope == .falling && sweep.timebaseMilliseconds == 2)
+        let missing = ScopeCore.played(seed: seed, entries: ScopeCore.fixtureEntries[5]).state
+        #expect(missing.triggerMode == .auto && missing.triggerLevel == 0.9)
+        let xy = ScopeCore.played(seed: seed, entries: ScopeCore.fixtureEntries[6]).state
+        #expect(xy.display == .xy && xy.source == .testSignal)
     }
 
     /// The JSON form with the control ids, named by `Catalog/registrations.json`. `UPDATE_SCENARIO_MANIFEST=1`

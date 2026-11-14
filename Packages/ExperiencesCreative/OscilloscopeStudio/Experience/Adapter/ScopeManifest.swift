@@ -59,7 +59,11 @@ extension ScopeCore {
     /// 2. spectrum bin: the 1 kHz sine at 5 ms per division (the window whose spectrum peaks at the 1 kHz bin);
     /// 3. no trigger: normal mode with the level at 0.9, beyond the test signal's amplitude of 0.5;
     /// 4. clipping shown: gain ×10 on the 0.5 sine drives the trace beyond full scale (the window marks it clipped);
-    /// 5. sweep on a falling trigger: the logarithmic sweep with the falling slope at 2 ms per division.
+    /// 5. sweep on a falling trigger: the logarithmic sweep with the falling slope at 2 ms per division;
+    /// 6. missing crossing in auto mode (feature 062): the level at 0.9 with the auto mode, the newest span shown;
+    /// 7. the XY view (feature 062): the stereo test signal plotted left against right.
+    /// The flat line (silence) needs a silent source, which no action selects; `ScopeSessionTests` proves it in both
+    /// modes with an injected silent source.
     public static var fixtureEntries: [[ScenarioStep]] {
         func step(_ control: String, _ values: [Double], steps: Int = 5) -> ScenarioStep {
             ScenarioStep(steps: steps, action: ScriptedAction(control, values), result: "accepted")
@@ -73,6 +77,8 @@ extension ScopeCore {
             [step("signal.waveform", [0]), step("gain.select", [4]), ScenarioStep(steps: 30)],
             [step("signal.waveform", [2]), step("trigger.slope", [1]), step("timebase.select", [4]),
              ScenarioStep(steps: 30)],
+            [step("trigger.mode", [0]), step("trigger.level", [0.9]), ScenarioStep(steps: 30)],
+            [step("source.select", [0]), step("display.select", [1]), ScenarioStep(steps: 30)],
         ]
     }
 

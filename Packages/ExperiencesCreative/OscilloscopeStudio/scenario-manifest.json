@@ -7,7 +7,8 @@
     "timebase.select",
     "trigger.level",
     "trigger.slope",
-    "trigger.mode"
+    "trigger.mode",
+    "display.select"
   ],
   "experience" : "a08.oscilloscope-studio",
   "kind" : "creative",
@@ -17,7 +18,7 @@
 
       ],
       "expect" : {
-        "initialDigest" : "316c70b8eeeff2cf2364bfc069dbce7adca6bc404abf4983579e9926514a237c"
+        "initialDigest" : "08e66bb5b8e1ff7ff09b212a861009ae5ab5d8f109985151868117aafda3ae17"
       },
       "name" : "launch-first-frame",
       "seed" : "7"
@@ -56,8 +57,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "fe46ff0fb28381e8895be15d4e77fed04517c57ff314f3de9a4d4501d7720648",
-        "initialDigest" : "316c70b8eeeff2cf2364bfc069dbce7adca6bc404abf4983579e9926514a237c"
+        "finalDigest" : "0036fc229359220d4677991053211a188cdeee8f2b4262dd6ba87eb2f6f6f87a",
+        "initialDigest" : "08e66bb5b8e1ff7ff09b212a861009ae5ab5d8f109985151868117aafda3ae17"
       },
       "name" : "input-response",
       "seed" : "7"
@@ -154,8 +155,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "fe46ff0fb28381e8895be15d4e77fed04517c57ff314f3de9a4d4501d7720648",
-        "initialDigest" : "316c70b8eeeff2cf2364bfc069dbce7adca6bc404abf4983579e9926514a237c"
+        "finalDigest" : "0036fc229359220d4677991053211a188cdeee8f2b4262dd6ba87eb2f6f6f87a",
+        "initialDigest" : "08e66bb5b8e1ff7ff09b212a861009ae5ab5d8f109985151868117aafda3ae17"
       },
       "name" : "save-restore",
       "seed" : "7"
@@ -194,7 +195,7 @@
         }
       ],
       "expect" : {
-        "initialDigest" : "316c70b8eeeff2cf2364bfc069dbce7adca6bc404abf4983579e9926514a237c",
+        "initialDigest" : "08e66bb5b8e1ff7ff09b212a861009ae5ab5d8f109985151868117aafda3ae17",
         "resetDigest" : true
       },
       "name" : "reset",
@@ -298,8 +299,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "316c70b8eeeff2cf2364bfc069dbce7adca6bc404abf4983579e9926514a237c",
-        "initialDigest" : "316c70b8eeeff2cf2364bfc069dbce7adca6bc404abf4983579e9926514a237c"
+        "finalDigest" : "08e66bb5b8e1ff7ff09b212a861009ae5ab5d8f109985151868117aafda3ae17",
+        "initialDigest" : "08e66bb5b8e1ff7ff09b212a861009ae5ab5d8f109985151868117aafda3ae17"
       },
       "name" : "fixture-1",
       "seed" : "7"
@@ -341,8 +342,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "56cb48667e55c31bbfd893cbdd5999d70a6c2a86f1fca23e7c2be680822a4d2b",
-        "initialDigest" : "316c70b8eeeff2cf2364bfc069dbce7adca6bc404abf4983579e9926514a237c"
+        "finalDigest" : "83c9738522b04b505e7dd03aa6484f27ceda799efa43009a2ee4730f78b069a4",
+        "initialDigest" : "08e66bb5b8e1ff7ff09b212a861009ae5ab5d8f109985151868117aafda3ae17"
       },
       "name" : "fixture-2",
       "seed" : "7"
@@ -374,8 +375,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "663d66c530a76a40730b88e6c3f1e0c100d644d86fc6e4caa245bf0c29ae27aa",
-        "initialDigest" : "316c70b8eeeff2cf2364bfc069dbce7adca6bc404abf4983579e9926514a237c"
+        "finalDigest" : "6565323814686a61641cb2bd0cfcd1b08dba1ef4725db28fd203e06faabfa065",
+        "initialDigest" : "08e66bb5b8e1ff7ff09b212a861009ae5ab5d8f109985151868117aafda3ae17"
       },
       "name" : "fixture-3",
       "seed" : "7"
@@ -407,8 +408,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "3fc0f3cbf0c1627899cc8e0aa81f519da2d8944a304726b85742f7386372dd9c",
-        "initialDigest" : "316c70b8eeeff2cf2364bfc069dbce7adca6bc404abf4983579e9926514a237c"
+        "finalDigest" : "316c62e5e6c5b8d21a47ff185781745f4cf71209570b8dbf4dd2acc573c67ed6",
+        "initialDigest" : "08e66bb5b8e1ff7ff09b212a861009ae5ab5d8f109985151868117aafda3ae17"
       },
       "name" : "fixture-4",
       "seed" : "7"
@@ -450,10 +451,76 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "1e1586efbdc5a159b1f5bd599e14d0fd7cbfc2800c3c6b2a501865ea874b372e",
-        "initialDigest" : "316c70b8eeeff2cf2364bfc069dbce7adca6bc404abf4983579e9926514a237c"
+        "finalDigest" : "02b5cede146d24f39f05798afa7cf76475b643f6f6982f91461fa12dea8d0c0c",
+        "initialDigest" : "08e66bb5b8e1ff7ff09b212a861009ae5ab5d8f109985151868117aafda3ae17"
       },
       "name" : "fixture-5",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "trigger.mode",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 5
+        },
+        {
+          "action" : {
+            "control" : "trigger.level",
+            "values" : [
+              0.90000000000000002
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 5
+        },
+        {
+          "steps" : 30
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "8047f05825f17be7dfb1472c6d43fcb9d234ea0802e8a242dc816f18f5118276",
+        "initialDigest" : "08e66bb5b8e1ff7ff09b212a861009ae5ab5d8f109985151868117aafda3ae17"
+      },
+      "name" : "fixture-6",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "source.select",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 5
+        },
+        {
+          "action" : {
+            "control" : "display.select",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 5
+        },
+        {
+          "steps" : 30
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "218d9a2534f88bc94335ade1cdc4e07423f82222c6baff2ed849c80dad02ed20",
+        "initialDigest" : "08e66bb5b8e1ff7ff09b212a861009ae5ab5d8f109985151868117aafda3ae17"
+      },
+      "name" : "fixture-7",
       "seed" : "7"
     }
   ],
