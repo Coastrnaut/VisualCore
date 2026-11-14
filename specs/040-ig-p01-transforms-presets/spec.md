@@ -25,6 +25,31 @@ Canonical overrides:
 - **Owner rulings of 2026-11-13:** short tests; system accessibility audits wait for the device campaign; independent
   files go to parallel agents.
 
+## Clarifications
+
+### Session 2026-11-13
+
+Answered autonomously under the owner's standing delegation, recommended option each time. Facts checked in code:
+`SeededRandom` (VisualCoreSimulation) is the seeded generator; `Palette.builtIns` (VisualCoreParameters) has six
+palettes; `ExperienceOutcome(code:)` is how A04 gives the completion scenario its outcome (`scene-built`); the 2D
+primitive tree supports polygons (at most `Primitive.maxPolygonPoints` points) and the R02-F05 compiler builds closed
+revolved meshes with a default budget.
+
+- Q: What is the motif and how is it seeded? → A: A convex polygon of 3–7 points inside the group's fundamental region,
+  drawn from `SeededRandom(seed)`; reseed advances the seed by a fixed step. The motif is the only seeded element, so the
+  same preset and seed always give the same composition.
+- Q: What bounds a 2D composition? → A: The view is the square −1…1 in both axes divided by the scale; repetitions
+  (1…12) are the lattice rings around the centre for tilings and the concentric motif rings for the kaleidoscope; a
+  composition holds at most 2,048 polygons — a build that would exceed it is refused as a budget error (never truncated).
+- Q: What is the 3D composition? → A: `order` copies (1…24) of a seeded revolved "petal" (a profile of 5–9 points revolved
+  with 24 segments) placed by rotation about the vertical axis at radius 1.5 and concatenated into one mesh; each copy is
+  closed, so the whole mesh validates closed; it must fit the R02-F05 default budget.
+- Q: How are palettes chosen? → A: By index into `Palette.builtIns` (0…5); polygon colours sample the palette by image
+  index, so colour never depends on the GPU.
+- Q: What outcome does the completion scenario reach? → A: `composition-built`, reported once the current composition has
+  been built from a validated preset (true after preparation and after every accepted change); a refused action keeps
+  the previous outcome.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Explore a symmetric composition from a preset (Priority: P1) 🎯
@@ -126,8 +151,8 @@ lattices) from VisualCore, documented and tested.
 - **FR-A05-111**: A preset MUST hold its kind, symmetry order, repetitions, scale, palette, seed and schema version, and
   MUST be validated on entry (out-of-range and non-finite values refused).
 - **FR-A05-112**: A 2D composition MUST be the motif's images under the preset's symmetry within a bounded view, at most
-  a fixed number of elements; a 3D composition MUST be a closed, valid mesh built from the motif and the symmetry order
-  within the mesh budget.
+  2,048 polygons (more is refused, never truncated); a 3D composition MUST be a closed, valid mesh of `order` revolved
+  copies within the R02-F05 default budget.
 - **FR-A05-113**: Compositions MUST be deterministic for the preset and seed and MUST NOT depend on the GPU or the clock.
 
 **Controls and state (story 2)**
@@ -139,7 +164,7 @@ lattices) from VisualCore, documented and tested.
 **Experience behaviour (story 3)**
 - **FR-A05-130**: The experience MUST pass the nine standard scenarios on both simulator runtimes through the shared
   host (save/restore to the same digest, reset, suspend/resume, teardown/re-entry, cancel preparation, rejection,
-  completion — the composition built).
+  completion — outcome `composition-built`).
 - **FR-A05-131**: It MUST be registered as a candidate (hidden from people until X-A05) and linked by the one app, with
   all four targets and its product.
 - **FR-A05-132**: It MUST draw only through the host (no context, no second renderer, no ProjectM, no network, no
