@@ -22,6 +22,34 @@ Canonical overrides:
 - **Owner rulings:** short tests; audits and device runs in the device campaign; iOS 27 at phase gates; every Spec Kit
   step runs.
 
+## Clarifications
+
+### Session 2026-11-14
+
+Answered autonomously under the owner's standing delegation, recommended option each time. Facts checked in code:
+`SpectrumAnalyzer(size: 4096)` returns 2,048 magnitudes in dB relative to full scale (a full-scale sine centred on a
+bin reads about 0 dB; floor −200 dB) and `peakBin` ignores bin 0 and returns nil below −100 dB; `StereoSampleBuffer`
+has `latestFrames(_:left:right:)` and `SampleRingBuffer` `latest(_:into:)`; `ScopeDisplay` is {waveform, xy} with
+`selectDisplay(_:)` validating against `allCases`; the VisualCore 2D renderer draws shapes only (no text), so canvas
+labels are grid lines and the numbers are spoken and shown in the controls' status text.
+
+- Q: How is the spectrum view added to the saved state? → A: `ScopeDisplay` gains `spectrum` (raw value 2); the saved
+  shape stays schema 2 (the same `display` field with a wider value range), so A08-P02 snapshots restore unchanged and
+  `display.select` accepts 0…2.
+- Q: Which samples are analysed? → A: The newest 4,096 frames of the left (or only) channel, read from the acquisition
+  buffer each drawn frame; when fewer than 4,096 frames have been written the available frames are zero-padded by the
+  analyser and the readout says "filling". The spectrum is not triggered and not scaled by the display gain.
+- Q: How does the peak readout decide validity and value? → A: Peak = `SpectrumAnalyzer.peakBin` (bins 1…2,047);
+  frequency = bin × sample rate ÷ 4,096 rounded to 1 Hz; level = that bin's dBFS rounded to 0.1 dB with the words
+  "dBFS, relative to full scale". No value when `peakBin` is nil ("no signal"), when any analysed sample has
+  |x| ≥ 1 ("clipping, level not valid") or while filling ("filling").
+- Q: How are bins placed on screen? → A: x = log10(f ÷ 20) ÷ log10(nyquist ÷ 20) × width for bins at or above 20 Hz;
+  each pixel column takes the strongest bin that falls in it (columns with no bin are skipped); y maps 0 dBFS to the
+  top and −100 dBFS (and below) to the bottom; one point per non-empty column, drawn as one polyline.
+- Q: Where do the labels appear? → A: Decade frequency marks (100 Hz, 1 kHz, 10 kHz below Nyquist) and level marks
+  every 20 dB are drawn as grid lines on the canvas; their values, the axes' meaning and the peak readout are shown in
+  the status text under the canvas (`trace.status`) and in the spoken description.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - A spectrum with honest annotation (Priority: P1) 🎯
@@ -60,7 +88,7 @@ bin's level.
 **Acceptance Scenarios**:
 
 1. **Given** a 4,096-point analysis (2,048 bins), **When** it is drawn into N pixel columns, **Then** each column shows
-   the strongest bin of its frequency range and the curve has at most 2 N points.
+   the strongest bin of its frequency range and the curve has at most N points (at most two per column, per FR-A08-302).
 2. **Given** levels below −100 dBFS, **When** drawn, **Then** they sit on the bottom of the level axis.
 
 ---
