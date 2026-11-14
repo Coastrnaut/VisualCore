@@ -38,7 +38,7 @@ Evidence: `python3 Tools/python/desktop_runbook.py run-check --stage A06-P06 --t
 - [X] T-A06-614 Script tests (`python3 Tools/python/desktop_runbook.py run-check --stage A06-P06 --timeout 600 --name script-tests -- python3 scripts/test_scripts.py`) — Verified 2026-11-14: — Verified 2026-11-14: .autonomy/checks/A06-P06.script-tests.json
 - [ ] T-A06-615 BLOCKED_OWNER_ACTION: signing, archive upload and App Store Connect entry of Music Lab's store text, per `docs/release/build-and-archive.md` owner steps
 - [ ] T-A06-616 {device} In the device campaign (after ImplementationLock-100): the measurements and audits of `docs/apps/visualcore-music-lab/device-campaign.md` on D1–D3
-- [ ] T-A06-617 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A06-P06 (owner and device items stay open, as for A05-P06)
+- [X] T-A06-617 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A06-P06 (owner and device items stay open, as for A05-P06) — Verified 2026-11-14: — Verified 2026-11-14: converge round 1 found no gaps (tasks.md unchanged); owner T-A06-615 and device T-A06-616 open by design
 
 ## Dependencies
 
