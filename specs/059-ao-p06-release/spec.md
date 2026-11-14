@@ -56,7 +56,7 @@ its fixtures (`resources: [.copy("Fixtures")]`) are the precedent; the app alrea
 The person's microphone input is used only while chosen, never recorded or sent; the one permission is explained in
 plain words; nothing else about them leaves the device.
 
-**Why this priority**: privacy is a release gate of the one app and the A07 constitution rules.
+**Why this priority**: privacy is a release gate of the one app and the A07 constitution rules (audio privacy, comfort, truthful claims).
 
 **Independent Test**: scan the experience's sources (no network, tracking, advertising or recording); check the one usage
 string and the privacy manifest; read the privacy note.
@@ -65,8 +65,8 @@ string and the privacy manifest; read the privacy note.
 
 1. **Given** the experience's sources, **When** scanned, **Then** there is no network, tracking, advertising, file-writing
    of audio or sensor use beyond the microphone.
-2. **Given** the app, **When** its usage strings are checked, **Then** exactly the existing microphone string covers Music
-   Lab and says the sound drives the visuals on the device and is not recorded.
+2. **Given** the app, **When** its usage strings are checked, **Then** exactly the existing microphone string covers Audio
+   Odyssey and says the sound drives the visuals on the device and is not recorded.
 3. **Given** the privacy note, **When** read, **Then** it states what is stored (presets only, in the experience's own
    folder), that no audio is stored or sent, and the credits (no third-party assets; synthetic test audio).
 
