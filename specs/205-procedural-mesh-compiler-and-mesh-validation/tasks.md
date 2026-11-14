@@ -28,7 +28,7 @@
 
 ## Phase 5: User Story 3 — Bounds (P2)
 
-- [ ] T-R02F05-010 [US3] Extend `Packages/VisualCore/Tests/VisualCoreScenesTests/MeshBoundsTests.swift` with every shape of T-R02F05-008: bounds contain 100% of vertices and each box face touches a vertex (SC-R02F05-004)
+- [X] T-R02F05-010 [US3] Extend `Packages/VisualCore/Tests/VisualCoreScenesTests/MeshBoundsTests.swift` with every shape of T-R02F05-008: bounds contain 100% of vertices and each box face touches a vertex (SC-R02F05-004) — Verified 2026-11-13: 2026-11-13 .autonomy/migration/checks/R02-F05.host.json (swift test Packages/VisualCore, all pass): bounds of every shape contain all vertices with each box face touched (MeshShapeTests and MeshBoundsTests)
 
 ## Phase 6: User Story 4 — Existing meshes keep working (P3)
 
