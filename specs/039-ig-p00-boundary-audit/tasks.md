@@ -30,7 +30,7 @@
 ## Phase 7: Polish and evidence
 
 - [X] T-A05-009 No-change proof (`python3 Tools/python/desktop_runbook.py run-check --stage A05-P00 --timeout 600 --name no-change -- git diff --exit-code --stat 427eea32..HEAD -- Packages External`) (FR-A05-008, SC-A05-005) — Verified 2026-11-13: 2026-11-13 .autonomy/checks/A05-P00.no-change.json (git diff --exit-code 427eea32..HEAD -- Packages External: empty, exit 0)
-- [ ] T-A05-010 Script tests (`python3 Tools/python/desktop_runbook.py run-check --stage A05-P00 --timeout 600 --name script-tests -- python3 scripts/test_scripts.py`) and the release-check document steps (`python3 Tools/python/desktop_runbook.py run-check --stage A05-P00 --timeout 600 --name fast-checks -- python3 scripts/release_check.py --only docs app-contracts compliance dependencies`)
+- [X] T-A05-010 Script tests (`python3 Tools/python/desktop_runbook.py run-check --stage A05-P00 --timeout 600 --name script-tests -- python3 scripts/test_scripts.py`) and the release-check document steps (`python3 Tools/python/desktop_runbook.py run-check --stage A05-P00 --timeout 600 --name fast-checks -- python3 scripts/release_check.py --only docs app-contracts compliance dependencies`) — Verified 2026-11-13: 2026-11-13 .autonomy/checks/A05-P00.script-tests.json (exit 0) and A05-P00.fast-checks.json (docs, app-contracts, compliance, dependencies 4/4)
 - [ ] T-A05-011 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A05-P00
 
 ## Dependencies
