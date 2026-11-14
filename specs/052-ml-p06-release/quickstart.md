@@ -6,7 +6,7 @@ python3 scripts/release_check.py --only experience-release-a06 copy-claims-a06
 python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test
 python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27 app-ui-ios27-m2
 python3 scripts/verify_experiences.py --only a06.visualcore-music-lab --runtime 27
-python3 scripts/release_check.py --only app-release-build app-release-symbols app-release-privacy-manifest
+python3 scripts/release_check.py --only app-release-build app-release-symbols app-privacy-manifest app-no-tracking app-licenses app-usage-descriptions
 python3 scripts/test_scripts.py
 ```
 
