@@ -21,7 +21,7 @@
 
 ## Phase 4: User Story 2/3 — steady flight and sound choice (P1/P2)
 
-- [ ] T-A07-206 [US3] Registry and catalog: `Apps/VisualCore/App/ExperienceRegistry.swift` passes `OdysseyCore.schemaOneExample()`; `Catalog/registrations.json` a07 gets `"permissions": ["microphone"]` and capabilities "audio-reactive tunnel", "demo signal", "live microphone input", "audio files" (FR-A07-220)
+- [X] T-A07-206 [US3] Registry and catalog: `Apps/VisualCore/App/ExperienceRegistry.swift` passes `OdysseyCore.schemaOneExample()`; `Catalog/registrations.json` a07 gets `"permissions": ["microphone"]` and capabilities "audio-reactive tunnel", "demo signal", "live microphone input", "audio files" (FR-A07-220) — Verified 2026-11-14: Verified 2026-11-14: .autonomy/checks/A07-P02.app-unit.json exit 0 (registry passes OdysseyCore.schemaOneExample(); registrations a07 permissions [microphone] and audio capabilities)
 - [ ] T-A07-207 [US2] Manifest: fixture-3 exercises source switching without starting real capture, as A06 does: `permission.mirror [2]` (denied), `source.microphone` refused with `action.rule.a07.permission-denied`, `source.demo` accepted, while the flight keeps going (distance and speed unchanged by the switches), fixture-2 keeps the comfort run; regenerate `Packages/ExperiencesCreative/AudioOdyssey/scenario-manifest.json` (`TEST_RUNNER_UPDATE_SCENARIO_MANIFEST=1`) (FR-A07-231; SC-A07-204, 205)
 
 ## Phase 5: Polish & evidence

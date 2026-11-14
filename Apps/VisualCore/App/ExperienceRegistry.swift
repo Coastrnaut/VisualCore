@@ -167,10 +167,12 @@ extension ExperienceRegistry {
         #endif
         return registration
     }
-    /// A07 Audio Odyssey (feature 054, A07-P01): a candidate until X-A07.
+    /// A07 Audio Odyssey (features 054–055, A07-P01…P02): a candidate until X-A07.
     fileprivate static var audioOdyssey: ExperienceRegistration? {
         guard let id = AudioOdysseyExperience.id else { return nil }
-        var registration = ExperienceRegistration(id: id, core: OdysseyCore.self) { launch in
+        // Schema 2 (feature 055, A07-P02) adds the sound source; the stored schema-1 example proves the migration.
+        let examples = [OdysseyCore.schemaOneExample()].compactMap { $0 }
+        var registration = ExperienceRegistration(id: id, core: OdysseyCore.self, examples: examples) { launch in
             let system = SystemAccessibilityObserver.systemValues()
             return AudioOdysseyExperience.make(id: id, storage: launch.storage,
                                                reduceMotion: launch.reduceMotion.resolved(system: system.reduceMotion),
