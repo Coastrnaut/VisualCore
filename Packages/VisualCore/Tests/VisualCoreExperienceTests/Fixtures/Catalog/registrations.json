@@ -136,6 +136,26 @@
       "permissions": [
         "microphone"
       ]
+    },
+    "a07.audio-odyssey": {
+      "capabilities": [
+        "camera rail",
+        "procedural tunnel",
+        "procedural landscape",
+        "star corridor",
+        "comfort limits"
+      ],
+      "quality_tiers": [
+        "level-0"
+      ],
+      "palette": [
+        "#04060C",
+        "#1E8C8C",
+        "#7A8A4A",
+        "#DCE6FF"
+      ],
+      "content": null,
+      "manifest": "Packages/ExperiencesCreative/AudioOdyssey/scenario-manifest.json"
     }
   }
 }
