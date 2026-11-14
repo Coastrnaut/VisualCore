@@ -126,6 +126,7 @@ final class MicrophoneTapSink: @unchecked Sendable {
 
     /// Mixes `pcm` to mono and writes it to the ring buffer. Called on the audio render thread.
     func consume(_ pcm: AVAudioPCMBuffer) {
+        // vc:hot-path begin
         guard let channels = pcm.floatChannelData else { return }
         let frames = Int(pcm.frameLength)
         let count = Int(pcm.format.channelCount)
@@ -148,5 +149,6 @@ final class MicrophoneTapSink: @unchecked Sendable {
             buffer.write(UnsafeBufferPointer(start: scratch, count: slice))
             done += slice
         }
+        // vc:hot-path end
     }
 }

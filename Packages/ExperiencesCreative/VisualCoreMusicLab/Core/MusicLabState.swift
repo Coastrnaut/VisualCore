@@ -1,8 +1,9 @@
 // MusicLabState — feature 047 (A06-P01) T-A06-104 (FR-A06-102, FR-A06-104, FR-A06-121; data-model "MusicLabState",
 // schema 1). The domain state of VisualCore Music Lab: which source is selected, the demo signal's seed and mode, the
 // picked file's display name and the mirrored microphone permission. Samples are never state.
+// Feature 049 (A06-P03) T-A06-305 (FR-A06-310, 313): schema 2 adds the scene and the mapping choices per scene.
 //
-// Persisted (snapshot, digest): `source`, `demoSeed`, `demoMode`. Not persisted:
+// Persisted (snapshot, digest): `source`, `demoSeed`, `demoMode`, `scene`, `mappings`. Not persisted:
 //   - `fileName` is display only (≤ 120 characters). A picked file is reachable only through the security-scoped URL
 //     the system file importer hands out in this run, so neither the URL nor the name can be restored, and an
 //     experience action carries numbers only; the presenter records the name in its display copy of the state.
@@ -16,12 +17,14 @@ public enum MusicLabRule {
     public static let permissionDenied = "a06.permission-denied"
     /// A payload or preparation whose values lie outside the state's rules.
     public static let invalidState = "a06.invalid-state"
+    /// A mapping slot beyond the scene's parameter count (feature 049).
+    public static let noSuchParameter = "a06.no-such-parameter"
 }
 
-/// The state of Music Lab. Schema version 1.
+/// The state of Music Lab. Schema version 2.
 public struct MusicLabState: Sendable, Equatable, Codable {
-    /// The schema version of the persisted fields.
-    public static let schemaVersion = 1
+    /// The schema version of the persisted fields (2 since feature 049: scene and mappings).
+    public static let schemaVersion = 2
     /// The longest display name of a picked file, in characters.
     public static let fileNameLimit = 120
     /// The demo modes by index: melody (seeded tone sequence), 440 Hz tone, 1 kHz tone, silence.
@@ -41,6 +44,10 @@ public struct MusicLabState: Sendable, Equatable, Codable {
     public private(set) var fileName: String?
     /// The mirrored microphone permission. Not persisted.
     public var permission: MicrophoneAccess = .notDetermined
+    /// The selected scene (feature 049).
+    public private(set) var scene: MusicLabScene = .bars
+    /// The mapping choices per scene, in scene order; each list holds exactly its scene's parameter count.
+    public private(set) var mappings: [[MappingChoice]] = MusicLabScene.defaultMappings()
 
     /// The first state: the demo signal's melody with `seed`, no file, permission not determined.
     public init(seed: UInt64) {
@@ -96,13 +103,43 @@ public struct MusicLabState: Sendable, Equatable, Codable {
         return String(trimmed.prefix(fileNameLimit))
     }
 
+    /// Selects `scene` (FR-A06-310).
+    public mutating func select(scene: MusicLabScene) {
+        self.scene = scene
+    }
+
+    /// Sets the choice of `slot` in `scene`; returns `MusicLabRule.noSuchParameter` (and changes nothing) for a slot
+    /// beyond the scene's parameter count, nil otherwise.
+    @discardableResult
+    public mutating func setMapping(scene: MusicLabScene, slot: Int, choice: MappingChoice) -> String? {
+        guard mappings[scene.rawValue].indices.contains(slot) else { return MusicLabRule.noSuchParameter }
+        mappings[scene.rawValue][slot] = choice
+        return nil
+    }
+
+    /// Restores the default choices of `scene`.
+    public mutating func resetMappings(scene: MusicLabScene) {
+        mappings[scene.rawValue] = scene.defaultChoices
+    }
+
+    /// The choices of the selected scene.
+    public var currentChoices: [MappingChoice] { mappings[scene.rawValue] }
+
+    /// Whether `mappings` has one list per scene, each with its scene's parameter count, all choices valid.
+    public static func isValid(_ mappings: [[MappingChoice]]) -> Bool {
+        guard mappings.count == MusicLabScene.allCases.count else { return false }
+        return MusicLabScene.allCases.allSatisfy { scene in
+            mappings[scene.rawValue].count == scene.parameters.count && mappings[scene.rawValue].allSatisfy(\.isValid)
+        }
+    }
+
     /// The name of the current demo mode.
     public var demoModeName: String { Self.demoModeNames[demoMode] }
 
     // MARK: Coding (persisted fields only)
 
     private enum CodingKeys: String, CodingKey {
-        case source, demoSeed, demoMode
+        case source, demoSeed, demoMode, scene, mappings
     }
 
     /// Decodes the persisted fields; a demo mode outside `demoModeRange` is refused as corrupt data.
@@ -116,13 +153,27 @@ public struct MusicLabState: Sendable, Equatable, Codable {
         source = try c.decode(SourceKind.self, forKey: .source)
         demoSeed = try c.decode(UInt64.self, forKey: .demoSeed)
         demoMode = mode
+        let sceneIndex = try c.decode(Int.self, forKey: .scene)
+        guard let scene = MusicLabScene(rawValue: sceneIndex) else {
+            throw DecodingError.dataCorruptedError(forKey: .scene, in: c,
+                                                   debugDescription: "\(MusicLabRule.invalidState): scene \(sceneIndex)")
+        }
+        let mappings = try c.decode([[MappingChoice]].self, forKey: .mappings)
+        guard Self.isValid(mappings) else {
+            throw DecodingError.dataCorruptedError(forKey: .mappings, in: c,
+                                                   debugDescription: "\(MusicLabRule.invalidState): mappings")
+        }
+        self.scene = scene
+        self.mappings = mappings
     }
 
-    /// Encodes the persisted fields: source, demo seed, demo mode.
+    /// Encodes the persisted fields: source, demo seed, demo mode, scene index and mapping choices.
     public func encode(to encoder: any Encoder) throws {
         var c = encoder.container(keyedBy: CodingKeys.self)
         try c.encode(source, forKey: .source)
         try c.encode(demoSeed, forKey: .demoSeed)
         try c.encode(demoMode, forKey: .demoMode)
+        try c.encode(scene.rawValue, forKey: .scene)
+        try c.encode(mappings, forKey: .mappings)
     }
 }

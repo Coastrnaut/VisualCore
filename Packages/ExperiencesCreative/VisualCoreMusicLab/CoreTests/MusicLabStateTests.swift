@@ -79,7 +79,7 @@ import VisualCoreMusicLabCore
         state.setDemoMode(2)
         let data = try JSONEncoder().encode(state)
         let object = try #require(try JSONSerialization.jsonObject(with: data) as? [String: Any])
-        #expect(Set(object.keys) == ["source", "demoSeed", "demoMode"])
+        #expect(Set(object.keys) == ["source", "demoSeed", "demoMode", "scene", "mappings"])
         let decoded = try JSONDecoder().decode(MusicLabState.self, from: data)
         #expect(decoded.source == .file)
         #expect(decoded.demoSeed == 0xFFFF_FFFF_FFFF_FFFF)
@@ -89,9 +89,47 @@ import VisualCoreMusicLabCore
     }
 
     @Test func aDamagedPayloadIsRefused() {
-        let badMode = Data(#"{"demoMode":9,"demoSeed":1,"source":"demo"}"#.utf8)
+        let badMode = Data(#"{"demoMode":9,"demoSeed":1,"source":"demo","scene":0,"mappings":[]}"#.utf8)
         #expect(throws: (any Error).self) { try JSONDecoder().decode(MusicLabState.self, from: badMode) }
-        let badSource = Data(#"{"demoMode":0,"demoSeed":1,"source":"radio"}"#.utf8)
+        let badSource = Data(#"{"demoMode":0,"demoSeed":1,"source":"radio","scene":0,"mappings":[]}"#.utf8)
         #expect(throws: (any Error).self) { try JSONDecoder().decode(MusicLabState.self, from: badSource) }
+    }
+
+    // Feature 049 (A06-P03) T-A06-305: the scene and the mapping choices.
+    @Test func theSceneAndMappingsStartAtTheDefaultsAndPersist() throws {
+        var state = MusicLabState(seed: 3)
+        #expect(state.scene == .bars)
+        #expect(state.mappings == MusicLabScene.defaultMappings())
+        state.select(scene: .geometry)
+        let choice = try #require(MappingChoice(feature: 0, gain: 2))
+        #expect(state.setMapping(scene: .geometry, slot: 0, choice: choice) == nil)
+        #expect(state.currentChoices[0] == choice)
+        let decoded = try JSONDecoder().decode(MusicLabState.self, from: JSONEncoder().encode(state))
+        #expect(decoded.scene == .geometry)
+        #expect(decoded.mappings == state.mappings)
+    }
+
+    @Test func aSlotBeyondTheScenesParametersIsRefused() throws {
+        var state = MusicLabState(seed: 3)
+        let choice = try #require(MappingChoice(feature: 1, gain: 1))
+        #expect(state.setMapping(scene: .bars, slot: 2, choice: choice) == MusicLabRule.noSuchParameter)
+        #expect(state.mappings == MusicLabScene.defaultMappings())
+        #expect(state.setMapping(scene: .geometry, slot: 2, choice: choice) == nil)
+        state.resetMappings(scene: .geometry)
+        #expect(state.mappings == MusicLabScene.defaultMappings())
+    }
+
+    @Test func damagedScenesOrMappingsAreRefused() throws {
+        let good = try JSONEncoder().encode(MusicLabState(seed: 1))
+        var object = try #require(try JSONSerialization.jsonObject(with: good) as? [String: Any])
+        object["scene"] = 3
+        #expect(throws: (any Error).self) {
+            try JSONDecoder().decode(MusicLabState.self, from: JSONSerialization.data(withJSONObject: object))
+        }
+        object["scene"] = 0
+        object["mappings"] = [[["feature": 0, "gain": 1]]]
+        #expect(throws: (any Error).self) {
+            try JSONDecoder().decode(MusicLabState.self, from: JSONSerialization.data(withJSONObject: object))
+        }
     }
 }

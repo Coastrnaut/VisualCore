@@ -72,11 +72,13 @@ public final class DemoAudioSource: AudioSource {
     }
 
     private func renderBlock() {
+        // vc:hot-path begin
         guard let buffer else { return }
         scratch.withUnsafeMutableBufferPointer { out in
             signal.render(into: out)
             buffer.write(UnsafeBufferPointer(out))
         }
         framesWritten += Self.blockFrames
+        // vc:hot-path end
     }
 }

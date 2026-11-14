@@ -10,21 +10,23 @@ public enum VisualCoreMusicLabExperience {
     public static let id = ExperienceID(rawValue: MusicLabCore.experienceID)
 
     /// The experience registered as `id`, with the system microphone permission and the VisualCoreAudio sources.
-    /// It stores nothing (no audio is written; the source choice travels in the host's saved session state), and it
-    /// draws a waveform without flashes or automatic motion of its own, so Reduce Motion and Reduce Flashing change
-    /// nothing; the parameters keep the registry's one factory signature.
+    /// It stores nothing (no audio is written; the source and scene choices travel in the host's saved session state).
+    /// Reduce Motion keeps the Geometry scene's sound-driven spin at rest (feature 049, FR-A06-314); nothing flashes,
+    /// so Reduce Flashing changes nothing.
     @MainActor
     public static func make(id: ExperienceID, storage: ExperienceStorage, reduceMotion: Bool,
                             reduceFlashing: Bool) -> any Experience {
-        make(id: id, permission: SystemMicrophonePermission(), factory: .system)
+        make(id: id, permission: SystemMicrophonePermission(), factory: .system, reduceMotion: reduceMotion)
     }
 
     /// The experience with an injected permission and source factory (tests use doubles for both); the presenter
     /// gets the shell's port for the file and microphone choices.
     @MainActor
     static func make(id: ExperienceID, permission: any MicrophonePermission,
-                     factory: MusicLabSourceFactory = .system) -> ExperienceShell<MusicLabPresenter> {
-        let presenter = MusicLabPresenter(experienceID: id, permission: permission, factory: factory)
+                     factory: MusicLabSourceFactory = .system,
+                     reduceMotion: Bool = false) -> ExperienceShell<MusicLabPresenter> {
+        let presenter = MusicLabPresenter(experienceID: id, permission: permission, factory: factory,
+                                          reduceMotion: reduceMotion)
         let shell = ExperienceShell(id: id, presenter: presenter)
         presenter.port = shell.port
         return shell

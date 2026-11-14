@@ -46,6 +46,9 @@ final class MusicLabMirror {
     var showsSettingsLink = false
     /// Whether the system permission request is open.
     var isRequestingPermission = false
+    /// The active scene's parameter values, rounded to hundredths so the controls update only when a shown digit
+    /// changes (feature 049, FR-A06-312).
+    var parameterValues: [Double] = []
 }
 
 /// How the presenter makes its sources; tests replace the file and microphone sources with doubles.
@@ -173,8 +176,24 @@ final class MusicLabPresenter: ExperiencePresenter {
     /// The display heights of the last frame.
     private(set) var lastDisplay = AnalysisDisplay.silent(bandCount: 16)
 
-    init(experienceID: ExperienceID, permission: any MicrophonePermission, factory: MusicLabSourceFactory = .system) {
+    /// Whether Reduce Motion is on: the Geometry scene's spin then stays at its range minimum (FR-A06-314).
+    let reduceMotion: Bool
+    /// The mappers of the active scene's parameters (feature 049), rebuilt when the scene or a choice changes.
+    private var mappers: [AudioMapper] = []
+    private var mapperScene: MusicLabScene?
+    private var mapperChoices: [MappingChoice] = []
+    /// The active scene's parameter values of the last frame, in parameter order.
+    private(set) var lastParameterValues: [Double] = []
+    /// The scene drawn by the last frame.
+    private(set) var lastScene: MusicLabScene = .bars
+    private var spinAngle = 0.0
+    private var ringNodes: [SceneNode] = []
+    private var meshes: GeometryMeshes?
+
+    init(experienceID: ExperienceID, permission: any MicrophonePermission, factory: MusicLabSourceFactory = .system,
+         reduceMotion: Bool = false) {
         self.experienceID = experienceID
+        self.reduceMotion = reduceMotion
         self.permission = permission
         self.factory = factory
         root.add(centre)
@@ -191,6 +210,11 @@ final class MusicLabPresenter: ExperiencePresenter {
         root.add(levelNode)
         root.add(peakNode)
         root.add(beatNode)
+        for index in 0..<(RingLayout.ringCount * RingLayout.segments) {
+            let node = SceneNode(id: "r\(index)", z: 1, color: Self.waveColor)
+            root.add(node)
+            ringNodes.append(node)
+        }
     }
 
     // MARK: Render scene
@@ -222,6 +246,17 @@ final class MusicLabPresenter: ExperiencePresenter {
         let drawn = max(0, min(count, scratch.count))
         lastDrawnSamples = Array(scratch.prefix(drawn))
         analyze(drawn: drawn, frame: frame)
+        updateParameters(core, frame: frame)
+        lastScene = core.state.scene
+        if lastScene == .geometry {
+            if meshes == nil { meshes = try GeometryMeshes(registry: context.resources) }
+            let values = lastParameterValues
+            spinAngle = (spinAngle + values[1] * frame.delta).truncatingRemainder(dividingBy: 2 * Double.pi)
+            if let meshes {
+                try meshes.draw(meshes.items(pulse: values[0], lift: values[2], angle: spinAngle, bars: lastDisplay.bars),
+                                context: context)
+            }
+        }
         layOut(width: width, height: height)
         if primitives == nil { primitives = try PrimitiveRenderer(registry: context.resources) }
         try primitives?.draw(root, camera: Camera2D(), metrics: ViewMetrics(size: Vec2(width, height), scale: 1))
@@ -234,7 +269,47 @@ final class MusicLabPresenter: ExperiencePresenter {
         observers = []
         primitives?.release()
         primitives = nil
+        meshes?.release()
+        meshes = nil
         extractor = nil
+    }
+
+    /// Brings the mappers in line with the active scene and its choices, then maps this frame's features into the
+    /// scene's parameter ranges (feature 049, FR-A06-311, 314). A scene change rebuilds the mappers from rest; a changed
+    /// choice keeps the smoothing state of its slot.
+    private func updateParameters(_ core: MusicLabCore, frame: FrameInfo) {
+        let scene = core.state.scene
+        let choices = core.state.currentChoices
+        if scene != mapperScene || mappers.count != choices.count {
+            mappers = zip(scene.parameters, choices).map { AudioMapper(mapping: Self.mapping($1, for: $0)) }
+            mapperScene = scene
+        } else if choices != mapperChoices {
+            for (index, (parameter, choice)) in zip(scene.parameters, choices).enumerated() {
+                mappers[index].setMapping(Self.mapping(choice, for: parameter))
+            }
+        }
+        mapperChoices = choices
+        var values: [Double] = []
+        for (index, parameter) in scene.parameters.enumerated() {
+            var value = mappers[index].value(for: lastFeatures, range: parameter.range, elapsed: frame.delta)
+            if reduceMotion, scene.spinParameterIndex == index { value = parameter.range.lowerBound }
+            values.append(value)
+        }
+        lastParameterValues = values
+        let shown = values.map { ($0 * 100).rounded() / 100 }
+        if mirror.parameterValues != shown { mirror.parameterValues = shown }
+    }
+
+    /// The VisualCore mapping of `choice` with `parameter`'s smoothing (gain and feature come from the choice).
+    static func mapping(_ choice: MappingChoice, for parameter: SceneParameter) -> AudioMapping {
+        let feature = AudioFeatureKind.from(index: choice.feature) ?? .level
+        return AudioMapping(feature: feature, gain: choice.gain, attack: parameter.attack, release: parameter.release)
+            ?? AudioMapping(feature: .level, gain: 1)!
+    }
+
+    /// Restarts every mapper from rest (a source change).
+    private func resetMappers() {
+        for index in mappers.indices { mappers[index].reset() }
     }
 
     /// Analyses the newest `drawn` samples of `scratch` once for this frame (feature 048, FR-A06-210, 211).
@@ -257,6 +332,12 @@ final class MusicLabPresenter: ExperiencePresenter {
     /// Places the centre line and the 1,023 segments for a view of `width` × `height` pixels (world = pixels from
     /// the centre, y up): sample i of the newest 1,024 sits at x = −w/2 + i · w/1,023, y = clamp(s) · h · 0.4.
     private func layOut(width: Double, height: Double) {
+        guard lastScene == .bars else {
+            hideBars()
+            if lastScene == .rings { layOutRings(width: width, height: height) } else { hideRings() }
+            return
+        }
+        hideRings()
         let waveY = height * Self.waveCentreShare
         centre.primitive = .line(Vec2(-width / 2, waveY), Vec2(width / 2, waveY), width: 1)
         let n = Self.drawnSampleCount
@@ -282,6 +363,35 @@ final class MusicLabPresenter: ExperiencePresenter {
     /// Places the 16 spectrum bars (58 %…90 % of the height from the top, left of the meters) and the level (with its
     /// peak mark) and beat meters (two right-edge columns over the same band) from `lastDisplay`. A zero height draws
     /// nothing (a line of zero length has no triangles).
+    /// Hides the waveform, bars and meters (Rings and Geometry scenes).
+    private func hideBars() {
+        centre.primitive = nil
+        for node in segments { node.primitive = nil }
+        for node in bars { node.primitive = nil }
+        levelNode.primitive = nil
+        peakNode.primitive = nil
+        beatNode.primitive = nil
+    }
+
+    /// Hides the rings (Bars and Geometry scenes).
+    private func hideRings() {
+        for node in ringNodes where node.primitive != nil { node.primitive = nil }
+    }
+
+    /// Places the five rings of the newest samples (radius and wobble from the scene's parameters).
+    private func layOutRings(width: Double, height: Double) {
+        let values = lastParameterValues
+        let short = min(width, height)
+        for ring in 0..<RingLayout.ringCount {
+            let points = RingLayout.points(ring: ring, samples: lastDrawnSamples, radius: values[0], wobble: values[1],
+                                           short: short)
+            for j in 0..<RingLayout.segments {
+                ringNodes[ring * RingLayout.segments + j].primitive =
+                    .line(points[j], points[(j + 1) % RingLayout.segments], width: Self.lineWidth)
+            }
+        }
+    }
+
     private func layOutAnalysis(width: Double, height: Double) {
         let bottom = height / 2 - height * Self.barsBottomShare
         let span = height * (Self.barsBottomShare - Self.barsTopShare)
@@ -290,8 +400,11 @@ final class MusicLabPresenter: ExperiencePresenter {
         let display = lastDisplay
         for (index, node) in bars.enumerated() {
             let x = -width / 2 + slot * (Double(index) + 0.5)
-            let h = index < display.bars.count ? display.bars[index] * span : 0
+            let scale = lastParameterValues.first ?? 1
+            let h = index < display.bars.count ? display.bars[index] * span * scale : 0
             node.primitive = .line(Vec2(x, bottom), Vec2(x, bottom + h), width: slot * 0.7)
+            let glow = lastParameterValues.count > 1 ? lastParameterValues[1] : 1
+            node.color = Vec4(Self.barColor.x * glow, Self.barColor.y * glow, Self.barColor.z * glow, 1)
         }
         let column = width * Self.metersShare / 2
         let levelX = width / 2 - column * 1.5, beatX = width / 2 - column * 0.5
@@ -363,6 +476,7 @@ final class MusicLabPresenter: ExperiencePresenter {
             activeSource = source
             activeKey = key
             extractor?.reset()                                  // no beat of the previous source lingers
+            resetMappers()
             if !mirror.showsSettingsLink { mirror.message = nil }   // a stale file or stop message goes
         } catch {
             failedKey = key
@@ -520,12 +634,14 @@ final class MusicLabPresenter: ExperiencePresenter {
         return rms < quietRMS ? "quiet" : (rms < mediumRMS ? "medium" : "loud")
     }
 
-    /// "Music Lab: <source>, level <quiet/medium/loud>[, beat]." from the last frame's features (feature 048,
-    /// FR-A06-212). Also brings the running source in line with `core`.
+    /// "Music Lab: <scene> scene, <source>, level <quiet/medium/loud>[, beat]." from the last frame's features
+    /// (feature 048, FR-A06-212; the scene since feature 049, FR-A06-315). Also brings the running source in line
+    /// with `core`.
     func describe(_ core: MusicLabCore) -> String {
         sync(core)
         let word = LevelWord.from(rmsDB: lastFeatures.rmsDB).rawValue
-        return "Music Lab: \(mirror.status), level \(word)\(lastDisplay.isBeat ? ", beat" : "")."
+        return "Music Lab: \(core.state.scene.displayName) scene, \(mirror.status), level \(word)"
+            + "\(lastDisplay.isBeat ? ", beat" : "")."
     }
 
     /// One background probe in the top-left corner, outside the waveform's band (10 %…50 % of the height) and the bars.
@@ -539,6 +655,7 @@ final class MusicLabPresenter: ExperiencePresenter {
 
     /// Every action has a native control; the permission mirror is sent by the Microphone button's flow.
     var nativeActions: Set<String> {
-        ["source.demo", "source.microphone", "source.file", "demo.mode", "demo.reseed", "permission.mirror"]
+        ["source.demo", "source.microphone", "source.file", "demo.mode", "demo.reseed", "permission.mirror",
+         "scene.select", "mapping.set", "mapping.reset"]
     }
 }

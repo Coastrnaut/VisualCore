@@ -27,8 +27,9 @@ private func core(_ engine: ExperienceEngine<MusicLabCore>) throws -> MusicLabCo
         #expect(MusicLabCore.experienceID == "a06.visualcore-music-lab")
         #expect(VisualCoreMusicLabExperience.id?.rawValue == "a06.visualcore-music-lab")
         #expect(MusicLabCore.controls.map(\.id)
-                == ["source.demo", "source.microphone", "source.file", "demo.mode", "demo.reseed", "permission.mirror"])
-        #expect(MusicLabCore.migrations.currentVersion == 1)
+                == ["source.demo", "source.microphone", "source.file", "demo.mode", "demo.reseed", "permission.mirror",
+                    "scene.select", "mapping.set", "mapping.reset"])
+        #expect(MusicLabCore.migrations.currentVersion == 2)
     }
 
     @Test func conformancePassesOverFourSeeds() async {
@@ -37,10 +38,12 @@ private func core(_ engine: ExperienceEngine<MusicLabCore>) throws -> MusicLabCo
             actions: [ScriptedAction("demo.mode", [1]), ScriptedAction("demo.reseed"),
                       ScriptedAction("source.microphone"), ScriptedAction("source.file"),
                       ScriptedAction("source.demo"), ScriptedAction("demo.mode", [3]),
-                      ScriptedAction("permission.mirror", [2])],
+                      ScriptedAction("permission.mirror", [2]), ScriptedAction("scene.select", [2]),
+                      ScriptedAction("mapping.set", [2, 1, 4, 1.5]), ScriptedAction("mapping.reset", [2])],
             rejected: [ScriptedAction("demo.mode", [4]), ScriptedAction("demo.mode", [.nan]),
                        ScriptedAction("source.demo", [1]), ScriptedAction("permission.mirror", [9]),
-                       ScriptedAction("bogus")])
+                       ScriptedAction("scene.select", [3]), ScriptedAction("mapping.set", [0, 0, 7, 1]),
+                       ScriptedAction("mapping.set", [0, 0, 1, 4.5]), ScriptedAction("bogus")])
         let report = await ExperienceConformance.run(MusicLabCore.self, id: id, plan: plan)
         for entry in report.entries { #expect(entry.passed, "\(entry.check): \(entry.detail)") }
     }
@@ -112,7 +115,7 @@ private func core(_ engine: ExperienceEngine<MusicLabCore>) throws -> MusicLabCo
         #expect(first.handle(control: "demo.mode", values: [1]).isAccepted)
         #expect(first.handle(control: "demo.reseed").isAccepted)
         let snapshot = try first.snapshot()
-        #expect(snapshot.schemaVersion == 1)
+        #expect(snapshot.schemaVersion == 2)
         let decoded = try ExperienceSnapshot(data: snapshot.encoded())
         var second = try await engine(seed: 3)
         try second.restore(decoded)
@@ -141,5 +144,51 @@ private func core(_ engine: ExperienceEngine<MusicLabCore>) throws -> MusicLabCo
         #expect(try engine.digest() == prepared)
         #expect(try core(engine).state.source == .demo)
         #expect(try core(engine).state.permission == .denied)
+    }
+
+    // Feature 049 (A06-P03) T-A06-306: scenes and mappings.
+    @Test func sceneAndMappingActionsChangeTheDigest() async throws {
+        var engine = try await engine()
+        var last = try engine.digest()
+        for (control, values) in [("scene.select", [1.0]), ("scene.select", [2.0]), ("mapping.set", [2.0, 1, 4, 1.5]),
+                                  ("mapping.set", [0.0, 0, 6, 0.5]), ("mapping.reset", [2.0])] {
+            #expect(engine.handle(control: control, values: values).isAccepted, "\(control) \(values)")
+            let now = try engine.digest()
+            #expect(now != last, "\(control) \(values)")
+            last = now
+        }
+        #expect(try core(engine).state.scene == .geometry)
+        #expect(try core(engine).state.mappings[2] == MusicLabScene.geometry.defaultChoices)
+    }
+
+    @Test func aSlotBeyondTheScenesParametersIsRefusedAsARule() async throws {
+        var engine = try await engine()
+        let before = try engine.digest()
+        #expect(engine.handle(control: "mapping.set", values: [0, 2, 1, 1])
+                == .rejected(.rule(code: MusicLabRule.noSuchParameter)))
+        #expect(try engine.digest() == before)
+    }
+
+    @Test func aSchemaOnePayloadRestoresWithBarsAndDefaults() async throws {
+        var engine = try await engine(seed: 5)
+        let payload = Data(#"{"demoMode":2,"demoSeed":5,"source":"file"}"#.utf8)
+        let snapshot = try ExperienceSnapshot(experience: id, schemaVersion: 1, seed: 5, stepIndex: 0,
+                                              digest: try engine.digest(), payload: payload)
+        try engine.restore(snapshot)
+        let state = try core(engine).state
+        #expect(state.scene == .bars)
+        #expect(state.mappings == MusicLabScene.defaultMappings())
+        #expect(state.demoMode == 2)
+        #expect(state.source == .file)
+    }
+
+    @Test func aDamagedMappingPayloadIsRefused() async throws {
+        var engine = try await engine()
+        let before = try engine.digest()
+        let payload = Data(#"{"demoMode":0,"demoSeed":7,"mappings":[[{"feature":9,"gain":1}]],"scene":0,"source":"demo"}"#.utf8)
+        let snapshot = try ExperienceSnapshot(experience: id, schemaVersion: 2, seed: 7, stepIndex: 0, digest: before,
+                                              payload: payload)
+        #expect(throws: ExperienceError.self) { try engine.restore(snapshot) }
+        #expect(try engine.digest() == before)
     }
 }

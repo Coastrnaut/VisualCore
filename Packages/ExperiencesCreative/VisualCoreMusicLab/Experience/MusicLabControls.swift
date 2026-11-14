@@ -5,6 +5,8 @@
 // buttons send actions through the port; the file and microphone choices go through the presenter, which opens the
 // file or checks the permission first. Every control has a VoiceOver label, an identifier from the port, a hit area of
 // at least 44 by 44 points and text that wraps.
+// Feature 049 (A06-P03) T-A06-308 (FR-A06-312): the scene picker and the mapping editor — per parameter of the shown
+// scene a feature picker (seven features), a gain slider (0…4, steps of 0.1) and the live value, and Reset mapping.
 import SwiftUI
 import UIKit
 import UniformTypeIdentifiers
@@ -77,7 +79,68 @@ struct MusicLabControls: View {
                     _ = port.send("demo.reseed")
                 }
             }
+            section("Scene") {
+                ForEach(MusicLabScene.allCases, id: \.rawValue) { scene in
+                    choice(scene.displayName, selected: state.scene == scene, identifier: "scene.\(scene.rawValue)",
+                           hint: "Shows the \(scene.displayName) scene") {
+                        if state.scene != scene { _ = port.send("scene.select", [Double(scene.rawValue)]) }
+                    }
+                }
+            }
+            mappingEditor(state)
         }
+    }
+
+    /// The mapping editor of the shown scene: one row per parameter and Reset mapping.
+    @ViewBuilder private func mappingEditor(_ state: MusicLabState) -> some View {
+        let scene = state.scene
+        section("Mapping") {
+            ForEach(Array(scene.parameters.enumerated()), id: \.offset) { slot, parameter in
+                let choice = state.currentChoices[slot]
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack {
+                        Text(verbatim: parameter.title).font(.body)
+                        Spacer()
+                        Text(verbatim: valueText(slot))
+                            .font(.footnote.monospacedDigit())
+                            .accessibilityIdentifier(port.identifier("mapping.\(scene.rawValue).\(slot).value"))
+                    }
+                    Picker(selection: Binding(get: { choice.feature }, set: { feature in
+                        _ = port.send("mapping.set", [Double(scene.rawValue), Double(slot), Double(feature), choice.gain])
+                    })) {
+                        ForEach(Array(MappingChoice.featureNames.enumerated()), id: \.offset) { index, name in
+                            Text(verbatim: name).tag(index)
+                        }
+                    } label: {
+                        Text(verbatim: "\(parameter.title) follows")
+                    }
+                    .frame(minHeight: 44)
+                    .accessibilityLabel(Text(verbatim: "\(parameter.title) follows"))
+                    .accessibilityIdentifier(port.identifier("mapping.\(scene.rawValue).\(slot).feature"))
+                    Slider(value: Binding(get: { choice.gain }, set: { gain in
+                        let stepped = (gain * 10).rounded() / 10
+                        if stepped != choice.gain {
+                            _ = port.send("mapping.set", [Double(scene.rawValue), Double(slot), Double(choice.feature),
+                                                          stepped])
+                        }
+                    }), in: MappingChoice.gainRange, step: 0.1) {
+                        Text(verbatim: "\(parameter.title) strength")
+                    }
+                    .frame(minHeight: 44)
+                    .accessibilityLabel(Text(verbatim: "\(parameter.title) strength"))
+                    .accessibilityValue(Text(verbatim: String(format: "%.1f", choice.gain)))
+                    .accessibilityIdentifier(port.identifier("mapping.\(scene.rawValue).\(slot).gain"))
+                }
+            }
+            button("Reset mapping", identifier: "mapping.reset", hint: "Restores this scene's default mapping") {
+                _ = port.send("mapping.reset", [Double(scene.rawValue)])
+            }
+        }
+    }
+
+    /// The live value of parameter `slot`, two decimals; a dash before the first frame.
+    private func valueText(_ slot: Int) -> String {
+        slot < mirror.parameterValues.count ? String(format: "%.2f", mirror.parameterValues[slot]) : "–"
     }
 
     // MARK: Building blocks

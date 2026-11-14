@@ -48,10 +48,23 @@ public struct MusicLabCore: ExperienceCore, Equatable {
 
     // MARK: Contract
 
-    /// Schema 1, no migrations yet.
-    public static var migrations: MigrationChain { MigrationChain(currentVersion: 1) }
+    /// Schema 2 since feature 049 (A06-P03, FR-A06-313): the step from schema 1 adds the Bars scene and the default
+    /// mapping choices of every scene.
+    public static var migrations: MigrationChain {
+        MigrationChain(currentVersion: 2, steps: [
+            1: { payload in
+                var upgraded = payload
+                upgraded["scene"] = MusicLabScene.bars.rawValue
+                upgraded["mappings"] = MusicLabScene.defaultMappings().map { list in
+                    list.map { ["feature": $0.feature, "gain": $0.gain] as [String: Any] }
+                }
+                return upgraded
+            },
+        ])
+    }
 
-    /// The six controls: three sources, the demo mode, a new melody and the permission mirror.
+    /// The nine controls: three sources, the demo mode, a new melody, the permission mirror, and (feature 049) the
+    /// scene, a mapping choice and a scene's mapping reset.
     public static var controls: [ExperienceControl] {
         let modes = Double(MusicLabState.demoModeRange.lowerBound)...Double(MusicLabState.demoModeRange.upperBound)
         let access = Double(MicrophoneAccess.notDetermined.rawValue)...Double(MicrophoneAccess.restricted.rawValue)
@@ -62,6 +75,9 @@ public struct MusicLabCore: ExperienceCore, Equatable {
             ExperienceControl(id: "demo.mode", ranges: [modes]),
             ExperienceControl(id: "demo.reseed"),
             ExperienceControl(id: "permission.mirror", ranges: [access]),
+            ExperienceControl(id: "scene.select", ranges: [0...2]),
+            ExperienceControl(id: "mapping.set", ranges: [0...2, 0...2, 0...6, MappingChoice.gainRange]),
+            ExperienceControl(id: "mapping.reset", ranges: [0...2]),
         ]
     }
 
@@ -95,6 +111,25 @@ public struct MusicLabCore: ExperienceCore, Equatable {
                 return .rejected(.outOfRange(index: 0))
             }
             state.permission = access
+        case "scene.select":
+            guard let x = v.first, let scene = MusicLabScene(rawValue: Int(x.rounded())) else {
+                return .rejected(.outOfRange(index: 0))
+            }
+            state.select(scene: scene)
+        case "mapping.set":
+            guard v.count == 4 else { return .rejected(.wrongValueCount(expected: 4, found: v.count)) }
+            guard let scene = MusicLabScene(rawValue: Int(v[0].rounded())) else { return .rejected(.outOfRange(index: 0)) }
+            guard let choice = MappingChoice(feature: Int(v[2].rounded()), gain: v[3]) else {
+                return .rejected(.outOfRange(index: 2))
+            }
+            if let code = state.setMapping(scene: scene, slot: Int(v[1].rounded()), choice: choice) {
+                return .rejected(.rule(code: code))
+            }
+        case "mapping.reset":
+            guard let x = v.first, let scene = MusicLabScene(rawValue: Int(x.rounded())) else {
+                return .rejected(.outOfRange(index: 0))
+            }
+            state.resetMappings(scene: scene)
         default:
             return .rejected(.unknownControl(action.control))
         }
@@ -116,11 +151,19 @@ public struct MusicLabCore: ExperienceCore, Equatable {
         state.permission = permission
     }
 
-    /// The source, the demo seed and the demo mode, in this order. The file name and the permission mirror stay out.
+    /// The source, the demo seed, the demo mode, the scene and every mapping choice (feature and gain), in this order.
+    /// The file name and the permission mirror stay out.
     public func writeDigest(into builder: inout DigestBuilder) throws(DigestError) {
         builder.add(state.source.rawValue)
         builder.add(state.demoSeed)
         builder.add(state.demoMode)
+        builder.add(state.scene.rawValue)
+        for list in state.mappings {
+            for choice in list {
+                builder.add(choice.feature)
+                try builder.add(choice.gain)
+            }
+        }
     }
 
     /// The persisted fields of the state as JSON with sorted keys.
@@ -130,8 +173,8 @@ public struct MusicLabCore: ExperienceCore, Equatable {
         return try encoder.encode(state)
     }
 
-    /// The core of a schema-1 payload with the envelope's `seed` as preparation seed; a demo mode outside 0…3 or an
-    /// unknown source is refused (the decoding throws).
+    /// The core of a schema-2 payload (schema 1 arrives migrated) with the envelope's `seed` as preparation seed; a
+    /// demo mode outside 0…3, an unknown source or scene, or invalid mappings are refused (the decoding throws).
     public static func restore(payload: Data, seed: UInt64) throws -> MusicLabCore {
         var core = MusicLabCore(seed: seed)
         core.state = try JSONDecoder().decode(MusicLabState.self, from: payload)

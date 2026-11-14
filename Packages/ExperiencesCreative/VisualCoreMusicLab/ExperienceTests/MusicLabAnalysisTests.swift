@@ -65,7 +65,7 @@ final class MusicLabAnalysisTests: XCTestCase {
         XCTAssertEqual(presenter.lastDisplay.bars.count, 16)
         XCTAssertEqual(presenter.lastDisplay.bars.indices.max { presenter.lastDisplay.bars[$0] < presenter.lastDisplay.bars[$1] }, band)
         let summary = shell.accessibilitySummary
-        XCTAssertTrue(summary.hasPrefix("Music Lab: Demo signal, level loud"), summary)
+        XCTAssertTrue(summary.hasPrefix("Music Lab: Bars scene, Demo signal, level loud"), summary)
         session.close()
     }
 

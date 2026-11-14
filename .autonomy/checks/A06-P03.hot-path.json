@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_audio_hot_path.py"
+  ],
+  "command": "python3 scripts/check_audio_hot_path.py",
+  "elapsed_seconds": 0.022,
+  "exit_code": 0,
+  "finished": "2026-11-14T08:12:04+00:00",
+  "log": ".autonomy/logs/A06-P03.hot-path.log",
+  "log_sha256": "f070b1e79105d06184c460ff3c88a69ef0753b529c78ce90f41d8b566b3b5e72",
+  "name": "hot-path",
+  "stage": "A06-P03",
+  "started": "2026-11-14T08:12:04+00:00",
+  "timed_out": false
+}

@@ -136,7 +136,7 @@ final class MusicLabSessionTests: XCTestCase {
                            probe.expected, probe.name)
         }
         let summary = shell.accessibilitySummary
-        XCTAssertTrue(summary.hasPrefix("Music Lab: Demo signal, level "), summary)
+        XCTAssertTrue(summary.hasPrefix("Music Lab: Bars scene, Demo signal, level "), summary)
         XCTAssertFalse(summary.contains("level quiet"), summary)
         XCTAssertEqual(presenter.mirror.status, "Demo signal")
         session.close()

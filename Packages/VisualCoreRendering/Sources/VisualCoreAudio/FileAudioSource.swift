@@ -110,6 +110,7 @@ public final class FileAudioSource: AudioSource {
 
     /// Decodes one full chunk (wrapping to frame 0 at the end), mixes it to mono and writes it.
     private func writeChunk() throws {
+        // vc:hot-path begin
         guard let buffer else { return }
         var filled = 0
         let target = Int(Self.chunkFrames)
@@ -117,12 +118,12 @@ public final class FileAudioSource: AudioSource {
         while filled < target {
             let want = AVAudioFrameCount(target - filled)
             do { try file.read(into: pcm, frameCount: want) } catch {
-                throw AudioSourceError.undecodable(url.lastPathComponent)
+                throw AudioSourceError.undecodable(url.lastPathComponent) // vc:cold
             }
             let got = Int(pcm.frameLength)
             if got == 0 {
                 emptyReads += 1
-                if emptyReads > 1 { throw AudioSourceError.undecodable(url.lastPathComponent) }
+                if emptyReads > 1 { throw AudioSourceError.undecodable(url.lastPathComponent) } // vc:cold
                 file.framePosition = 0
                 continue
             }
@@ -133,9 +134,11 @@ public final class FileAudioSource: AudioSource {
         }
         mono.withUnsafeBufferPointer { buffer.write(UnsafeBufferPointer(rebasing: $0[0..<filled])) }
         framesWritten += filled
+        // vc:hot-path end
     }
 
     private func mixDown(frames: Int, at offset: Int) {
+        // vc:hot-path begin
         guard let channels = pcm.floatChannelData else { return }
         let count = channelCount
         let scale = 1 / Float(count)
@@ -146,5 +149,6 @@ public final class FileAudioSource: AudioSource {
                 out[offset + frame] = sum * scale
             }
         }
+        // vc:hot-path end
     }
 }

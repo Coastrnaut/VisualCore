@@ -65,6 +65,8 @@ jobs:
         run: python3 scripts/check_licenses.py
       - name: Usage descriptions (UA-F11)
         run: python3 scripts/check_usage_descriptions.py
+      - name: Audio hot path (A06-P03)
+        run: python3 scripts/check_audio_hot_path.py
       - name: Distinctiveness matrix (UA-F11)
         run: python3 scripts/check_distinctiveness.py --check
       - name: Script tests

@@ -5,7 +5,10 @@
     "source.file",
     "demo.mode",
     "demo.reseed",
-    "permission.mirror"
+    "permission.mirror",
+    "scene.select",
+    "mapping.set",
+    "mapping.reset"
   ],
   "experience" : "a06.visualcore-music-lab",
   "kind" : "creative",
@@ -15,7 +18,7 @@
 
       ],
       "expect" : {
-        "initialDigest" : "a056a87c758cac6ef44cc25e1c7e6a3be3d09da496534717ba7019926de318b6"
+        "initialDigest" : "9671c3cf1f281d7ba2b0967ce752b2baed9796ae36e22f733df7d2ffdefa69d1"
       },
       "name" : "launch-first-frame",
       "seed" : "7"
@@ -54,8 +57,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "a6e29641889271626b63915276c9ea03fce87d3bc07b8118cbc9115bb35d5a4a",
-        "initialDigest" : "a056a87c758cac6ef44cc25e1c7e6a3be3d09da496534717ba7019926de318b6"
+        "finalDigest" : "ed86fe59712ca5ab088924b2bb51be01f5dcb7b173eb3174f68e48a90b7c0f1d",
+        "initialDigest" : "9671c3cf1f281d7ba2b0967ce752b2baed9796ae36e22f733df7d2ffdefa69d1"
       },
       "name" : "input-response",
       "seed" : "7"
@@ -152,8 +155,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "a6e29641889271626b63915276c9ea03fce87d3bc07b8118cbc9115bb35d5a4a",
-        "initialDigest" : "a056a87c758cac6ef44cc25e1c7e6a3be3d09da496534717ba7019926de318b6"
+        "finalDigest" : "ed86fe59712ca5ab088924b2bb51be01f5dcb7b173eb3174f68e48a90b7c0f1d",
+        "initialDigest" : "9671c3cf1f281d7ba2b0967ce752b2baed9796ae36e22f733df7d2ffdefa69d1"
       },
       "name" : "save-restore",
       "seed" : "7"
@@ -192,7 +195,7 @@
         }
       ],
       "expect" : {
-        "initialDigest" : "a056a87c758cac6ef44cc25e1c7e6a3be3d09da496534717ba7019926de318b6",
+        "initialDigest" : "9671c3cf1f281d7ba2b0967ce752b2baed9796ae36e22f733df7d2ffdefa69d1",
         "resetDigest" : true
       },
       "name" : "reset",
@@ -253,8 +256,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "6526bfe8ace4d45b4ae1022746096d2125f92f9cceb72c061722a6634f3a77dd",
-        "initialDigest" : "a056a87c758cac6ef44cc25e1c7e6a3be3d09da496534717ba7019926de318b6"
+        "finalDigest" : "d6e47d914f352f21a5c11f323ff0e56a402b87b4ac9f0e8cb6282d9a024617cb",
+        "initialDigest" : "9671c3cf1f281d7ba2b0967ce752b2baed9796ae36e22f733df7d2ffdefa69d1"
       },
       "name" : "fixture-1",
       "seed" : "7"
@@ -273,8 +276,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "920fe00180a970c432d4b83a5e361969959d8b01bb6edf996bdeb3700dea1271",
-        "initialDigest" : "a056a87c758cac6ef44cc25e1c7e6a3be3d09da496534717ba7019926de318b6"
+        "finalDigest" : "ed18e44026a03ea38180e7520ad92b8bb14a626bff91332d79c34cb533426dcc",
+        "initialDigest" : "9671c3cf1f281d7ba2b0967ce752b2baed9796ae36e22f733df7d2ffdefa69d1"
       },
       "name" : "fixture-2",
       "seed" : "7"
@@ -293,8 +296,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "a6e29641889271626b63915276c9ea03fce87d3bc07b8118cbc9115bb35d5a4a",
-        "initialDigest" : "a056a87c758cac6ef44cc25e1c7e6a3be3d09da496534717ba7019926de318b6"
+        "finalDigest" : "ed86fe59712ca5ab088924b2bb51be01f5dcb7b173eb3174f68e48a90b7c0f1d",
+        "initialDigest" : "9671c3cf1f281d7ba2b0967ce752b2baed9796ae36e22f733df7d2ffdefa69d1"
       },
       "name" : "fixture-3",
       "seed" : "7"
@@ -333,8 +336,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "07b3ae43e66085edf8f00d720999627a97b76e3fff2935e4704c817d4b8d3c70",
-        "initialDigest" : "a056a87c758cac6ef44cc25e1c7e6a3be3d09da496534717ba7019926de318b6"
+        "finalDigest" : "370aa527e5ece768eac760c64b42f5bb1819cbd1689d7f24cd45b2502b202809",
+        "initialDigest" : "9671c3cf1f281d7ba2b0967ce752b2baed9796ae36e22f733df7d2ffdefa69d1"
       },
       "name" : "fixture-4",
       "seed" : "7"
@@ -383,8 +386,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "a056a87c758cac6ef44cc25e1c7e6a3be3d09da496534717ba7019926de318b6",
-        "initialDigest" : "a056a87c758cac6ef44cc25e1c7e6a3be3d09da496534717ba7019926de318b6"
+        "finalDigest" : "9671c3cf1f281d7ba2b0967ce752b2baed9796ae36e22f733df7d2ffdefa69d1",
+        "initialDigest" : "9671c3cf1f281d7ba2b0967ce752b2baed9796ae36e22f733df7d2ffdefa69d1"
       },
       "name" : "fixture-5",
       "seed" : "7"
