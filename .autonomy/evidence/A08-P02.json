@@ -1,0 +1,74 @@
+{
+  "checks": [
+    {
+      "attestation": ".autonomy/checks/A08-P02.app-unit.json",
+      "command": "python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A08-P02.app-unit.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A08-P02.contract.json",
+      "command": "python3 scripts/check_app_contract.py --app oscilloscope-studio --render",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A08-P02.contract.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A08-P02.experience-packages.json",
+      "command": "python3 scripts/check_experience_packages.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A08-P02.experience-packages.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A08-P02.os-no-network.json",
+      "command": "/bin/sh -c '! grep -rnE '\"'\"'URLSession|import Network|AVAudioRecorder|AVAssetWriter'\"'\"' Packages/ExperiencesCreative/OscilloscopeStudio'",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A08-P02.os-no-network.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A08-P02.public-api.json",
+      "command": "python3 scripts/check_public_api.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A08-P02.public-api.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A08-P02.renderer-ios27-2.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --only-testing VisualCoreRenderingTests/PrimitiveRendererTests",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A08-P02.renderer-ios27-2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A08-P02.renderer-ios27.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --only-testing VisualCoreRenderingTests/PrimitiveRendererTests",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A08-P02.renderer-ios27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A08-P02.scope-ios27.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing OscilloscopeStudioCoreTests OscilloscopeStudioExperienceTests",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A08-P02.scope-ios27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A08-P02.script-tests.json",
+      "command": "python3 scripts/test_scripts.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A08-P02.script-tests.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A08-P02.verify-27.json",
+      "command": "python3 scripts/verify_experiences.py --only a08.oscilloscope-studio --runtime 27",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A08-P02.verify-27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A08-P02.visualcore-host.json",
+      "command": "swift test --package-path Packages/VisualCore --filter 'MinMaxDecimatorTests|SceneGraphTests'",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A08-P02.visualcore-host.log"
+    }
+  ],
+  "generated": "2026-11-14T17:01:49+00:00",
+  "method": "deterministic-run-check",
+  "stage": "A08-P02",
+  "status": "pass"
+}
