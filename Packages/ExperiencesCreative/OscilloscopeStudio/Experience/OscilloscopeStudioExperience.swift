@@ -2,9 +2,10 @@
 // of the framework `OscilloscopeStudioExperience`: the experience's id and the factory the one app's registry calls.
 // The factory hands the presenter the system microphone permission and the VisualCoreAudio sources (tests inject a
 // permission and a source factory), the shell's port for the source choices and the shell's lifecycle state, so the
-// presenter stops its source while the experience is suspended. Oscilloscope Studio stores nothing of its own in this
-// phase (the scope state travels in the host's saved session state; no audio is ever stored), and its static trace has
-// nothing that Reduce Motion or Reduce Flashing would change.
+// presenter stops its source while the experience is suspended. The scope state travels in the host's saved session
+// state; no audio is ever stored, and the static trace has nothing that Reduce Motion or Reduce Flashing would change.
+// Feature 064 (A08-P04) T-A08-404 (FR-A08-410): the factory hands the presenter the experience's storage, where its
+// `ScopePresetStore` keeps the user presets (one small settings file each, `scope-<uuid>.json`; never audio).
 import VisualCoreAudio
 import VisualCoreExperience
 import VisualCoreExperienceHost
@@ -16,8 +17,8 @@ public enum OscilloscopeStudioExperience {
     public static let id = ExperienceID(rawValue: ScopeCore.experienceID)
 
     /// The experience registered as `id`, with the system microphone permission and the VisualCoreAudio sources.
-    /// `storage` is unused in this phase (nothing is stored); `reduceMotion` and `reduceFlashing` change nothing in the
-    /// static trace.
+    /// `storage` holds the user presets (feature 064); `reduceMotion` and `reduceFlashing` change nothing in the static
+    /// trace.
     @MainActor
     public static func make(id: ExperienceID, storage: ExperienceStorage, reduceMotion: Bool,
                             reduceFlashing: Bool) -> any Experience {
@@ -26,13 +27,14 @@ public enum OscilloscopeStudioExperience {
     }
 
     /// The experience with its presenter exposed (tests) and an injected permission and source factory (nil
-    /// permission: the system's); the presenter gets the shell's port and lifecycle state.
+    /// permission: the system's); the presenter gets the shell's port and lifecycle state. With `storage` the presenter
+    /// keeps the user presets there; without it (nil, some tests) only the built-in presets are listed.
     @MainActor
     static func make(id: ExperienceID, permission: (any MicrophonePermission)? = nil,
                      factory: ScopeSourceFactory = .system, storage: ExperienceStorage? = nil,
                      reduceMotion: Bool = false, reduceFlashing: Bool = false) -> ExperienceShell<ScopePresenter> {
         let presenter = ScopePresenter(experienceID: id, permission: permission ?? SystemMicrophonePermission(),
-                                       factory: factory)
+                                       factory: factory, storage: storage)
         let shell = ExperienceShell(id: id, presenter: presenter)
         presenter.port = shell.port
         presenter.lifecycle = { [weak shell] in shell?.state }

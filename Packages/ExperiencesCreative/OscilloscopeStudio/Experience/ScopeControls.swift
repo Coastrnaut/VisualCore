@@ -16,6 +16,15 @@
 // Feature 063 (A08-P03) T-A08-303 (FR-A08-304, FR-A08-305): the view picker lists every `ScopeDisplay` case —
 //   Waveform, XY, Spectrum; in the spectrum view the trace status reads the analysed channel, the peak readout (or the
 //   reason none is shown) and the axes' marks. Levels are dBFS, relative to full scale.
+// Feature 064 (A08-P04) T-A08-403 / T-A08-404 (FR-A08-401, FR-A08-402, FR-A08-410, FR-A08-412; contract api.md):
+//   Measure: the Freeze toggle (`freeze.toggle`, through the presenter's `setFrozen(_:)`, which refuses an empty window
+//     with "Nothing to freeze yet"), the Cursors toggle (`cursors.show`), and while the cursors are shown the sliders
+//     `cursor.a`, `cursor.b` and `cursor.level` (waveform and the mono XY fallback) or `cursor.frequency` (spectrum)
+//     with the readout (`cursor.readout`); the hint about pinching in the spectrum view (`display.hint`).
+//   Presets: one row per preset (`preset.<index>`, built-ins first; a tap applies it through the presenter's
+//     `apply(_:)` and selects it), the name field (`preset.name`), Save (`preset.save`), Rename (`preset.rename`) and
+//     Delete (`preset.delete`) for the selected user preset, the store's message and the counts of unreadable and newer
+//     files. Without storage only the built-ins are listed and the editing controls are hidden.
 // Every control has an accessible label and value and an identifier from the port; hit areas are at least 44 points
 // high and text wraps. Levels are relative to full scale only; nothing claims a calibrated measurement.
 import SwiftUI
@@ -30,11 +39,17 @@ struct ScopeControls: View {
     let port: ExperienceActionPort
     let presenter: ScopePresenter
     let mirror: ScopeMirror
+    /// The preset store (nil without storage: only the built-ins are listed).
+    let presets: ScopePresetStore?
 
     @State private var importing = false
+    @State private var presetName = ""
+    @State private var selectedPreset: UUID?
 
     /// The step of the trigger level slider.
     static let levelStep = 0.05
+    /// The step of the cursor sliders.
+    static let cursorStep = 0.005
 
     var body: some View {
         Group {
@@ -124,6 +139,50 @@ struct ScopeControls: View {
                     .fixedSize(horizontal: false, vertical: true)
                     .accessibilityIdentifier(port.identifier("trace.status"))
             }
+            section("Measure") {
+                toggle("Freeze", identifier: "freeze.toggle", isOn: mirror.frozen,
+                       hint: "Holds the shown trace with its sample rate and channels while the input keeps running") { on in
+                    presenter.setFrozen(on)
+                }
+                toggle("Cursors", identifier: "cursors.show", isOn: mirror.cursorsShown,
+                       hint: "Shows cursors to read time, frequency and level; drag them on the trace or use the sliders") { on in
+                    _ = port.send("cursors.show", [on ? 1 : 0])
+                }
+                if mirror.cursorsShown {
+                    if mirror.display == .spectrum {
+                        cursorSlider("Frequency cursor", identifier: "cursor.frequency", value: mirror.frequencyCursor,
+                                     range: ScopeState.positionRange, valueText: Self.percent(mirror.frequencyCursor),
+                                     hint: "Moves the frequency cursor across the spectrum")
+                    } else {
+                        cursorSlider("Cursor A", identifier: "cursor.a", value: mirror.cursorA,
+                                     range: ScopeState.positionRange, valueText: Self.percent(mirror.cursorA),
+                                     hint: "Moves time cursor A across the window")
+                        cursorSlider("Cursor B", identifier: "cursor.b", value: mirror.cursorB,
+                                     range: ScopeState.positionRange, valueText: Self.percent(mirror.cursorB),
+                                     hint: "Moves time cursor B across the window")
+                        cursorSlider("Level cursor", identifier: "cursor.level", value: mirror.levelCursor,
+                                     range: ScopeState.levelCursorRange,
+                                     valueText: "\(ScopePresenter.levelWords(mirror.levelCursor)) of full scale",
+                                     hint: "Moves the level line up and down, relative to full scale")
+                    }
+                    if let readout = mirror.cursorReadout {
+                        Text(verbatim: readout)
+                            .font(.footnote)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .accessibilityLabel(Text(verbatim: "Cursor readout: \(readout)"))
+                            .accessibilityIdentifier(port.identifier("cursor.readout"))
+                    }
+                }
+                if let hint = mirror.hint {
+                    Text(verbatim: hint)
+                        .font(.footnote)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .accessibilityIdentifier(port.identifier("display.hint"))
+                }
+            }
+            section("Presets") {
+                presetSection
+            }
             section("Trigger") {
                 levelSlider
                 choicePicker("Slope", identifier: "trigger.slope", selection: mirror.slopeIndex,
@@ -193,6 +252,113 @@ struct ScopeControls: View {
             .accessibilityHint(Text(verbatim: "The level the signal crosses where the trace starts"))
             .accessibilityIdentifier(port.identifier("trigger.level"))
         }
+    }
+
+    /// The preset rows (built-ins first) and, with storage, the name field, Save, Rename, Delete, the store's message
+    /// and the counts of files that could not be read.
+    @ViewBuilder private var presetSection: some View {
+        let entries = presets?.entries ?? ScopePreset.builtIns
+        ForEach(Array(entries.enumerated()), id: \.element.id) { index, preset in
+            let selected = selectedPreset == preset.id
+            Button {
+                selectedPreset = preset.id
+                presetName = preset.isBuiltIn ? presetName : preset.name
+                presenter.apply(preset)
+            } label: {
+                HStack {
+                    Text(verbatim: preset.name).font(.body).fixedSize(horizontal: false, vertical: true)
+                    Spacer()
+                    Text(verbatim: preset.isBuiltIn ? "Built-in" : "Apply").font(.footnote)
+                }
+                .frame(minHeight: 44)
+            }
+            .buttonStyle(.bordered)
+            .accessibilityLabel(Text(verbatim: "Apply preset \(preset.name)"))
+            .accessibilityValue(Text(verbatim: (preset.isBuiltIn ? "built-in" : "saved") + (selected ? ", selected" : "")))
+            .accessibilityHint(Text(verbatim: "Applies the preset's settings; the source, freeze and cursors stay"))
+            .accessibilityIdentifier(port.identifier("preset.\(index)"))
+        }
+        if let presets {
+            TextField(text: $presetName) { Text(verbatim: "Preset name") }
+                .textFieldStyle(.roundedBorder)
+                .frame(minHeight: 44)
+                .accessibilityLabel(Text(verbatim: "Preset name"))
+                .accessibilityHint(Text(verbatim: "1 to \(ScopePreset.nameLimit) characters"))
+                .accessibilityIdentifier(port.identifier("preset.name"))
+            button("Save preset", identifier: "preset.save",
+                   hint: "Saves the current settings under this name; the source, freeze and cursors are not saved") {
+                if let saved = presenter.savePreset(named: presetName) { selectedPreset = saved.id }
+            }
+            let user = selectedPreset.flatMap { id in presets.preset(id) }.flatMap { $0.isBuiltIn ? nil : $0 }
+            button("Rename preset", identifier: "preset.rename", hint: "Gives the selected saved preset this name") {
+                if let user { presenter.renamePreset(user.id, to: presetName) }
+            }
+            .disabled(user == nil)
+            button("Delete preset", identifier: "preset.delete", hint: "Deletes the selected saved preset") {
+                if let user, presenter.deletePreset(user.id) { selectedPreset = nil }
+            }
+            .disabled(user == nil)
+            if let message = presets.lastMessage {
+                Text(verbatim: message)
+                    .font(.footnote).fixedSize(horizontal: false, vertical: true)
+                    .accessibilityIdentifier(port.identifier("preset.message"))
+            }
+            if presets.unreadable > 0 || presets.newer > 0 {
+                Text(verbatim: Self.skippedWords(unreadable: presets.unreadable, newer: presets.newer))
+                    .font(.footnote).fixedSize(horizontal: false, vertical: true)
+                    .accessibilityIdentifier(port.identifier("preset.skipped"))
+            }
+        }
+    }
+
+    /// The files left out of the list in words: "2 preset files can't be read; 1 was made by a newer version".
+    static func skippedWords(unreadable: Int, newer: Int) -> String {
+        var parts: [String] = []
+        if unreadable > 0 { parts.append("\(unreadable) preset \(unreadable == 1 ? "file" : "files") can't be read") }
+        if newer > 0 { parts.append("\(newer) \(newer == 1 ? "was" : "were") made by a newer version") }
+        return parts.joined(separator: "; ")
+    }
+
+    /// A position as a whole percentage: "25 %".
+    static func percent(_ value: Double) -> String {
+        "\(Int((min(max(value, 0), 1) * 100).rounded())) %"
+    }
+
+    /// A cursor slider over `range` in steps of 0.005; each new value sends the action `identifier`.
+    private func cursorSlider(_ title: String, identifier: String, value: Double, range: ClosedRange<Double>,
+                              valueText: String, hint: String) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(verbatim: "\(title): \(valueText)")
+                .font(.body).fixedSize(horizontal: false, vertical: true)
+                .accessibilityHidden(true)
+            Slider(value: Binding(get: { value },
+                                  set: { new in
+                                      let snapped = min(max((new / Self.cursorStep).rounded() * Self.cursorStep,
+                                                            range.lowerBound), range.upperBound)
+                                      guard snapped.isFinite, snapped != value else { return }
+                                      _ = port.send(identifier, [snapped])
+                                  }),
+                   in: range, step: Self.cursorStep) {
+                Text(verbatim: title)
+            }
+            .frame(minHeight: 44)
+            .accessibilityLabel(Text(verbatim: title))
+            .accessibilityValue(Text(verbatim: valueText))
+            .accessibilityHint(Text(verbatim: hint))
+            .accessibilityIdentifier(port.identifier(identifier))
+        }
+    }
+
+    /// A labelled toggle; a new value calls `send`.
+    private func toggle(_ title: String, identifier: String, isOn: Bool, hint: String,
+                        send: @escaping (Bool) -> Void) -> some View {
+        Toggle(isOn: Binding(get: { isOn }, set: { on in if on != isOn { send(on) } })) {
+            Text(verbatim: title).font(.body)
+        }
+        .frame(minHeight: 44)
+        .accessibilityLabel(Text(verbatim: title))
+        .accessibilityHint(Text(verbatim: hint))
+        .accessibilityIdentifier(port.identifier(identifier))
     }
 
     /// The picker name of a view: "Waveform", "XY" or "Spectrum".

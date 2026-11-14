@@ -41,6 +41,27 @@
 // from `ScopeDisplay.allCases`, so the spectrum view (raw value 2) is accepted without a schema change: the saved shape
 // stays schema 2 and A08-P02 snapshots restore unchanged. The spectrum is drawn by the presenter (not triggered, not
 // scaled by the gain); the core only keeps the choice.
+//
+// Feature 064 (A08-P04) T-A08-403 (FR-A08-401–404, FR-A08-410, FR-A08-411; contract api.md): seven more actions.
+//   freeze.set [0…1]         not frozen, frozen (a whole number). The held window itself is presenter state: a frozen
+//                            state holds the next acquired window (and a restored frozen state the first one after it).
+//   cursors.show [0…1]       cursors hidden, shown (a whole number).
+//   cursor.a [0…1]           time cursor A as a fraction of the window (any finite value; clamped by the state).
+//   cursor.b [0…1]           time cursor B, the same.
+//   cursor.frequency [0…1]   the frequency cursor as a fraction of the spectrum width.
+//   cursor.level [−1…1]      the level cursor in full scale.
+//   preset.apply [0…2]       applies the built-in preset at that index of `ScopePreset.builtIns` (its settings; the
+//                            source, the freeze and the cursors stay). The core cannot see the experience's storage, so
+//                            it applies only the built-ins, deterministically by index; the presenter applies a user
+//                            preset by sending its settings as the individual actions (`signal.waveform`,
+//                            `signal.frequency`, `gain.select`, `timebase.select`, `trigger.level`, `trigger.slope`,
+//                            `trigger.mode`, `display.select`), so every applied setting is an ordinary action.
+// A freeze or visibility value that is not a whole number 0 or 1 is refused with `a08.invalid-choice`; a cursor
+// position that is not finite with `a08.invalid-level`; a preset index that is not a whole number naming a built-in
+// with `a08.invalid-preset`. Snapshot schema 3: `ScopeState` schema 3 (the nine schema-2 keys plus `frozen`,
+// `cursorsShown`, `cursorA`, `cursorB`, `frequencyCursor`, `levelCursor`) as JSON with sorted keys. The step 2 → 3 adds
+// not frozen and the cursors hidden at 0.25, 0.75, 0.5 and 0.5; `schemaTwoExample()` is the stored schema-2 payload the
+// registry's migration check restores. The digest is `ScopeState.digestText` (`a08.scope.v3|…|levelCursor=…`).
 import Foundation
 import OscilloscopeStudioCore
 import VisualCoreAudioDSP
@@ -56,9 +77,14 @@ public enum ScopeRule {
     /// The microphone chosen while access is off: the presenter's answer (no action is sent, the previous source keeps
     /// running and the test signal is offered).
     public static let permissionDenied = "a08.permission-denied"
+    /// A preset index that is not a whole number naming a built-in preset (`preset.apply`).
+    public static let invalidPreset = "a08.invalid-preset"
+    /// A freeze asked for while the shown window holds no sample: the presenter's answer (the freeze is refused with
+    /// the message "Nothing to freeze yet").
+    public static let nothingToFreeze = "a08.nothing-to-freeze"
 }
 
-/// The state of Oscilloscope Studio. Schema version 2.
+/// The state of Oscilloscope Studio. Schema version 3.
 public struct ScopeCore: ExperienceCore, Equatable {
     /// The experience's id in the catalog.
     public static let experienceID = "a08.oscilloscope-studio"
@@ -70,11 +96,12 @@ public struct ScopeCore: ExperienceCore, Equatable {
     /// The action ids in declaration order.
     public static let actionIDs = ["source.select", "signal.waveform", "signal.frequency", "gain.select",
                                    "timebase.select", "trigger.level", "trigger.slope", "trigger.mode",
-                                   "display.select"]
+                                   "display.select", "freeze.set", "cursors.show", "cursor.a", "cursor.b",
+                                   "cursor.frequency", "cursor.level", "preset.apply"]
 
     /// The preparation seed; `reset()` returns to the first state (the seed does not change the scope's settings).
     public private(set) var preparationSeed: UInt64
-    /// The domain state: source, waveform, frequency, gain, timebase, trigger and display mode.
+    /// The domain state: source, waveform, frequency, gain, timebase, trigger, display mode, freeze and cursors.
     public internal(set) var state: ScopeState
 
     /// The first state (`ScopeState.initial`) prepared with `seed`.
@@ -85,12 +112,23 @@ public struct ScopeCore: ExperienceCore, Equatable {
 
     // MARK: Contract
 
-    /// Schema 2; the step from schema 1 adds `"display": 0` (the waveform view).
+    /// Schema 3; the step from schema 1 adds `"display": 0` (the waveform view); the step from schema 2 adds not
+    /// frozen and the cursors hidden at A 0.25, B 0.75, frequency 0.5 and level 0.5.
     public static var migrations: MigrationChain {
-        MigrationChain(currentVersion: 2, steps: [
+        MigrationChain(currentVersion: 3, steps: [
             1: { payload in
                 var upgraded = payload
                 upgraded["display"] = ScopeDisplay.waveform.rawValue
+                return upgraded
+            },
+            2: { payload in
+                var upgraded = payload
+                upgraded["frozen"] = false
+                upgraded["cursorsShown"] = false
+                upgraded["cursorA"] = ScopeState.defaultCursorA
+                upgraded["cursorB"] = ScopeState.defaultCursorB
+                upgraded["frequencyCursor"] = ScopeState.defaultFrequencyCursor
+                upgraded["levelCursor"] = ScopeState.defaultLevelCursor
                 return upgraded
             },
         ])
@@ -113,6 +151,24 @@ public struct ScopeCore: ExperienceCore, Equatable {
         return example(version: 1, seed: seed, payload: payload, expected: expected)
     }
 
+    /// The stored example of schema 2 for the registry's migration check (feature 064, T-A08-403): an A08-P03 payload
+    /// (the nine schema-2 keys, none of the freeze or cursor keys) of a scope on the sine test signal at 100 Hz, gain ×5,
+    /// 5 ms per division, a rising auto trigger at 0.4, in the spectrum view, with the digest its restore must give —
+    /// the same scope, not frozen, cursors hidden at 0.25, 0.75, 0.5 and 0.5. Nil only if the encoding failed.
+    public static func schemaTwoExample(seed: UInt64 = 7) -> MigrationExample? {
+        guard let expected = ScopeState(source: .testSignal, waveform: .sine, frequencyIndex: 0, gainIndex: 3,
+                                        timebaseIndex: 5, triggerLevel: 0.4, triggerSlope: .rising,
+                                        triggerMode: .auto, display: .spectrum) else { return nil }
+        let payload: [String: Any] = ["source": expected.source.rawValue,
+                                      "waveform": ScopeSettings.index(of: expected.waveform),
+                                      "frequency": expected.frequencyIndex, "gain": expected.gainIndex,
+                                      "timebase": expected.timebaseIndex, "level": expected.triggerLevel,
+                                      "slope": ScopeSettings.index(of: expected.triggerSlope),
+                                      "mode": ScopeSettings.index(of: expected.triggerMode),
+                                      "display": expected.display.rawValue]
+        return example(version: 2, seed: seed, payload: payload, expected: expected)
+    }
+
     /// A stored example of `version` with `payload` and the digest of a core prepared with `seed` holding `expected`.
     private static func example(version: Int, seed: UInt64, payload: [String: Any],
                                 expected state: ScopeState) -> MigrationExample? {
@@ -127,8 +183,8 @@ public struct ScopeCore: ExperienceCore, Equatable {
         return MigrationExample(version: version, snapshot: encoded, expectedDigest: builder.finish().hex)
     }
 
-    /// The nine controls with their declared ranges (the positions of the `ScopeSettings` tables and of
-    /// `ScopeDisplay`).
+    /// The sixteen controls with their declared ranges (the positions of the `ScopeSettings` tables, of `ScopeDisplay`
+    /// and of `ScopePreset.builtIns`, the two flags, the cursor ranges of `ScopeState`).
     public static var controls: [ExperienceControl] {
         func last<T>(_ table: [T]) -> Double { Double(table.count - 1) }
         return [
@@ -141,6 +197,13 @@ public struct ScopeCore: ExperienceCore, Equatable {
             ExperienceControl(id: "trigger.slope", ranges: [0...last(ScopeSettings.slopes)]),
             ExperienceControl(id: "trigger.mode", ranges: [0...last(ScopeSettings.modes)]),
             ExperienceControl(id: "display.select", ranges: [0...Double(ScopeDisplay.allCases.count - 1)]),
+            ExperienceControl(id: "freeze.set", ranges: [0...1]),
+            ExperienceControl(id: "cursors.show", ranges: [0...1]),
+            ExperienceControl(id: "cursor.a", ranges: [ScopeState.positionRange]),
+            ExperienceControl(id: "cursor.b", ranges: [ScopeState.positionRange]),
+            ExperienceControl(id: "cursor.frequency", ranges: [ScopeState.positionRange]),
+            ExperienceControl(id: "cursor.level", ranges: [ScopeState.levelCursorRange]),
+            ExperienceControl(id: "preset.apply", ranges: [0...last(ScopePreset.builtIns)]),
         ]
     }
 
@@ -197,6 +260,25 @@ public struct ScopeCore: ExperienceCore, Equatable {
             guard let i = Self.choice(x, count: ScopeDisplay.allCases.count), state.selectDisplay(i) else {
                 return .rejected(.rule(code: ScopeRule.invalidChoice))
             }
+        case "freeze.set":
+            guard let i = Self.choice(x, count: 2) else { return .rejected(.rule(code: ScopeRule.invalidChoice)) }
+            state.setFrozen(i == 1)
+        case "cursors.show":
+            guard let i = Self.choice(x, count: 2) else { return .rejected(.rule(code: ScopeRule.invalidChoice)) }
+            state.setCursorsShown(i == 1)
+        case "cursor.a":
+            guard state.setCursorA(x) else { return .rejected(.rule(code: ScopeRule.invalidLevel)) }
+        case "cursor.b":
+            guard state.setCursorB(x) else { return .rejected(.rule(code: ScopeRule.invalidLevel)) }
+        case "cursor.frequency":
+            guard state.setFrequencyCursor(x) else { return .rejected(.rule(code: ScopeRule.invalidLevel)) }
+        case "cursor.level":
+            guard state.setLevelCursor(x) else { return .rejected(.rule(code: ScopeRule.invalidLevel)) }
+        case "preset.apply":
+            guard let i = Self.choice(x, count: ScopePreset.builtIns.count) else {
+                return .rejected(.rule(code: ScopeRule.invalidPreset))
+            }
+            state = ScopePreset.builtIns[i].applied(to: state)
         default:
             return .rejected(.unknownControl(action.control))
         }
@@ -217,21 +299,22 @@ public struct ScopeCore: ExperienceCore, Equatable {
         state = .initial
     }
 
-    /// The canonical text of every field (`ScopeState.digestText`, `a08.scope.v2|…|display=…`).
+    /// The canonical text of every field (`ScopeState.digestText`, `a08.scope.v3|…|levelCursor=…`).
     public func writeDigest(into builder: inout DigestBuilder) throws(DigestError) {
         builder.add(state.digestText)
     }
 
-    /// The scope state (schema 2) as JSON with sorted keys.
+    /// The scope state (schema 3) as JSON with sorted keys.
     public func snapshotPayload() throws -> Data {
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.sortedKeys, .withoutEscapingSlashes]
         return try encoder.encode(state)
     }
 
-    /// The core of a schema-2 payload (a schema-1 payload arrives migrated with `display` 0) with the envelope's `seed`
-    /// as preparation seed; an unknown source, waveform, index, slope, mode or display, or a trigger level that is not
-    /// finite in −1…1, is refused (the decoding throws).
+    /// The core of a schema-3 payload (a schema-1 or schema-2 payload arrives migrated with `display` 0 and the freeze
+    /// and cursor defaults) with the envelope's `seed` as preparation seed; an unknown source, waveform, index, slope,
+    /// mode or display, a trigger level or level cursor that is not finite in −1…1, or a time or frequency cursor that
+    /// is not finite in 0…1, is refused (the decoding throws).
     public static func restore(payload: Data, seed: UInt64) throws -> ScopeCore {
         ScopeCore(seed: seed, state: try JSONDecoder().decode(ScopeState.self, from: payload))
     }

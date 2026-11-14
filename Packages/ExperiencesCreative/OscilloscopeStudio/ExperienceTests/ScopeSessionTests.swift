@@ -18,6 +18,16 @@
 // one polyline of at most one point per pixel column, and the description and the status carry the readout text; gain
 // ×10 leaves the readout unchanged; the flat line says "no signal"; 1,024 written frames say "filling"; the sweep's
 // readout rises over 0.3 s of source time.
+// Feature 064 (A08-P04) T-A08-403 (FR-A08-401–404, FR-A08-411, FR-A08-412; SC-A08-401–403, SC-A08-405; story 1
+// AC1–AC5, story 2; edge cases): with `ScopeBlockSource` (source time advanced explicitly) a frozen window stays
+// identical over 60 frames while 61,440 new frames arrive, and unfreezing resumes the newest window; freezing an empty
+// window is refused with "Nothing to freeze yet"; a change of source releases the freeze (a waveform change keeps it);
+// cursors one period apart on 100 Hz (5 ms/div), 440 Hz (2 ms/div) and 1 kHz (1 ms/div) read `ScopeReadout.time`
+// and the expected period and frequency text, and the level cursor reads "0.50 of full scale (−6.0 dBFS)"; the level
+// cursor at a clipped value reads "at or beyond full scale"; the spectrum frequency cursor reads "± 11.7 Hz" with a
+// level in dBFS; two synthetic pointers pinching ×2 and ×4 step the timebase down one and two values (and pinching in
+// steps it up, clamped at the ends), pinch in the spectrum view changes nothing and shows the hint; one finger drags
+// the nearest cursor; a restored frozen snapshot freezes the next window, also in a new session.
 import Foundation
 import XCTest
 @testable import OscilloscopeStudioExperience
@@ -26,6 +36,7 @@ import VisualCoreAudio
 import VisualCoreAudioDSP
 import VisualCoreExperience
 import VisualCoreExperienceHost
+import VisualCoreMath
 
 @MainActor
 final class ScopeSessionTests: XCTestCase {
@@ -482,5 +493,271 @@ final class ScopeSessionTests: XCTestCase {
         let second = try XCTUnwrap(late.frequency)
         XCTAssertGreaterThan(second, first + early.binWidth, "the readout rises with the sweep (\(first) → \(second))")
         session.close()
+    }
+
+    // MARK: Feature 064 — freeze, cursors, pinch
+
+    func testAFrozenWindowStaysIdenticalWhileFramesArriveAndUnfreezingResumesTheNewest() async throws {
+        let sources = ScopeBlockSources()
+        let session = ExperienceSession()
+        let shell = try await ScopeTest.open(session, factory: sources.factory)
+        let presenter = shell.presenter
+        XCTAssertTrue(shell.handle(control: "signal.waveform", values: [2]).isAccepted, "the sweep changes every window")
+        try ScopeTest.frames(session, 1)
+        XCTAssertNil(presenter.heldWindow)
+        XCTAssertTrue(presenter.setFrozen(true).isAccepted)
+        XCTAssertTrue(try core(shell).state.frozen)
+        try ScopeTest.frames(session, 1)
+        let held = try XCTUnwrap(presenter.heldWindow)
+        XCTAssertGreaterThan(held.sampleCount, 0)
+        let source = try XCTUnwrap(sources.last)
+        let writtenBefore = source.framesWritten
+        for frame in 0..<60 {
+            source.advance(1_024)
+            try ScopeTest.frames(session, 1)
+            XCTAssertEqual(presenter.heldWindow, held, "frame \(frame)")
+            let shown = try XCTUnwrap(presenter.lastWindow)
+            XCTAssertEqual(shown.left, held.left, "frame \(frame)")
+            XCTAssertEqual(shown.right, held.right, "frame \(frame)")
+            XCTAssertEqual(shown.startFrame, held.startFrame)
+            XCTAssertEqual(shown.sampleRate, held.sampleRate)
+            XCTAssertEqual(shown.channelCount, held.channelCount)
+        }
+        XCTAssertGreaterThanOrEqual(source.framesWritten - writtenBefore, 1_024, "the input kept running")
+        let live = try XCTUnwrap(presenter.lastLiveWindow)
+        XCTAssertGreaterThan(live.startFrame, held.startFrame, "acquisition continued behind the freeze")
+        XCTAssertTrue(presenter.mirror.status.hasPrefix("frozen at 48,000 Hz, 2 channels, "), presenter.mirror.status)
+        XCTAssertTrue(shell.accessibilitySummary.contains(", frozen at 48,000 Hz, 2 channels."),
+                      shell.accessibilitySummary)
+
+        // Unfreezing resumes live drawing from the newest samples.
+        XCTAssertTrue(presenter.setFrozen(false).isAccepted)
+        source.advance(1_024)
+        try ScopeTest.frames(session, 1)
+        XCTAssertNil(presenter.heldWindow)
+        let resumed = try XCTUnwrap(presenter.lastWindow)
+        XCTAssertEqual(resumed, presenter.lastLiveWindow)
+        XCTAssertGreaterThan(resumed.startFrame, live.startFrame)
+        XCTAssertFalse(shell.accessibilitySummary.contains("frozen"))
+        session.close()
+    }
+
+    func testFreezingAnEmptyWindowIsRefusedWithAMessage() async throws {
+        let sources = ScopeBlockSources(initialFrames: 0)
+        let session = ExperienceSession()
+        let shell = try await ScopeTest.open(session, factory: sources.factory)
+        let presenter = shell.presenter
+        try ScopeTest.frames(session, 1)
+        XCTAssertEqual(presenter.lastLiveWindow?.sampleCount, 0)
+        XCTAssertEqual(presenter.setFrozen(true), .rejected(.rule(code: ScopeRule.nothingToFreeze)))
+        XCTAssertEqual(presenter.mirror.message, "Nothing to freeze yet")
+        XCTAssertFalse(try core(shell).state.frozen)
+        // Once samples exist the freeze is taken and the message goes.
+        try XCTUnwrap(sources.last).advance(1_024)
+        try ScopeTest.frames(session, 1)
+        XCTAssertTrue(presenter.setFrozen(true).isAccepted)
+        XCTAssertNil(presenter.mirror.message)
+        try ScopeTest.frames(session, 1)
+        XCTAssertNotNil(presenter.heldWindow)
+        session.close()
+    }
+
+    func testAChangeOfSourceReleasesTheFreezeAndAWaveformChangeKeepsIt() async throws {
+        let sources = ScopeBlockSources()
+        let session = ExperienceSession()
+        let shell = try await ScopeTest.open(session, factory: sources.factory)
+        let presenter = shell.presenter
+        XCTAssertTrue(shell.handle(control: "freeze.set", values: [1]).isAccepted)
+        try ScopeTest.frames(session, 1)
+        XCTAssertNotNil(presenter.heldWindow)
+        XCTAssertTrue(shell.handle(control: "signal.waveform", values: [1]).isAccepted)
+        await ScopeTest.settle()
+        try ScopeTest.frames(session, 1)
+        XCTAssertTrue(try core(shell).state.frozen, "a waveform change keeps the freeze")
+        XCTAssertNotNil(presenter.heldWindow)
+
+        XCTAssertTrue(shell.handle(control: "source.select", values: [2]).isAccepted)
+        XCTAssertNil(presenter.heldWindow, "the held window goes at once")
+        await ScopeTest.settle()
+        XCTAssertFalse(try core(shell).state.frozen, "the presenter sent freeze.set 0")
+        try ScopeTest.frames(session, 1)
+        XCTAssertEqual(presenter.activeKey, .microphone)
+        XCTAssertNil(presenter.heldWindow)
+        XCTAssertEqual(presenter.lastWindow, presenter.lastLiveWindow, "the new source shows live")
+        session.close()
+    }
+
+    func testCursorsOnePeriodApartReadThePeriodAndTheFrequency() async throws {
+        let session = ExperienceSession()
+        let shell = try await ScopeTest.open(session)
+        let presenter = shell.presenter
+        XCTAssertTrue(shell.handle(control: "cursors.show", values: [1]).isAccepted)
+        let cases: [(frequency: Int, timebase: Int, hertz: Double, time: String, text: String)] = [
+            (0, 5, 100, "10.0 ms", "100 Hz"), (1, 4, 440, "2.27 ms", "440 Hz"), (2, 3, 1_000, "1.00 ms", "1,000 Hz"),
+        ]
+        for entry in cases {
+            XCTAssertTrue(shell.handle(control: "signal.frequency", values: [Double(entry.frequency)]).isAccepted)
+            XCTAssertTrue(shell.handle(control: "timebase.select", values: [Double(entry.timebase)]).isAccepted)
+            let state = try core(shell).state
+            let span = 10 * state.secondsPerDivision
+            let a = 0.2, b = 0.2 + 1 / entry.hertz / span
+            XCTAssertTrue(shell.handle(control: "cursor.a", values: [a]).isAccepted)
+            XCTAssertTrue(shell.handle(control: "cursor.b", values: [b]).isAccepted)
+            try ScopeTest.frames(session, 1)
+            let window = try XCTUnwrap(presenter.lastWindow)
+            XCTAssertEqual(window.sampleRate, 48_000)
+            let spanSamples = Int((span * 48_000).rounded())
+            let expected = ScopeReadout.time(a: a, b: b, spanSeconds: Double(spanSamples) / 48_000,
+                                             sampleRate: 48_000)
+            XCTAssertEqual(expected.time, entry.time)
+            XCTAssertEqual(expected.frequency, entry.text)
+            let readout = try XCTUnwrap(presenter.lastCursorReadout)
+            XCTAssertEqual(readout, "A–B \(entry.time), \(entry.text); level 0.50 of full scale (−6.0 dBFS)")
+            XCTAssertEqual(presenter.mirror.cursorReadout, readout)
+            XCTAssertEqual(presenter.lastCursorLineCount, 3, "A, B and the level line")
+            XCTAssertTrue(shell.accessibilitySummary.hasSuffix(", cursors " + readout + "."), shell.accessibilitySummary)
+        }
+        // Hidden cursors: no readout and no lines.
+        XCTAssertTrue(shell.handle(control: "cursors.show", values: [0]).isAccepted)
+        try ScopeTest.frames(session, 1)
+        XCTAssertNil(presenter.lastCursorReadout)
+        XCTAssertNil(presenter.mirror.cursorReadout)
+        XCTAssertEqual(presenter.lastCursorLineCount, 0)
+        session.close()
+    }
+
+    func testTheLevelCursorOnAClippedValueReadsAtOrBeyondFullScale() async throws {
+        let session = ExperienceSession()
+        let shell = try await ScopeTest.open(session)
+        let presenter = shell.presenter
+        XCTAssertTrue(shell.handle(control: "gain.select", values: [4]).isAccepted)
+        XCTAssertTrue(shell.handle(control: "cursors.show", values: [1]).isAccepted)
+        XCTAssertTrue(shell.handle(control: "cursor.level", values: [1]).isAccepted)
+        try ScopeTest.frames(session, 2)
+        XCTAssertEqual(presenter.lastWindow?.clipped, true, "×10 clips the 0.5 sine")
+        let readout = try XCTUnwrap(presenter.lastCursorReadout)
+        XCTAssertTrue(readout.hasSuffix("; level at or beyond full scale"), readout)
+        XCTAssertTrue(shell.handle(control: "cursor.level", values: [-1]).isAccepted)
+        try ScopeTest.frames(session, 1)
+        XCTAssertTrue(try XCTUnwrap(presenter.lastCursorReadout).hasSuffix("; level at or beyond full scale"))
+        session.close()
+    }
+
+    func testTheSpectrumFrequencyCursorReadsItsColumnWithTheBinWidthAndLevel() async throws {
+        let sources = ScopeBlockSources()
+        let session = ExperienceSession()
+        let shell = try await ScopeTest.open(session, factory: sources.factory)
+        let presenter = shell.presenter
+        XCTAssertTrue(shell.handle(control: "display.select", values: [2]).isAccepted)
+        XCTAssertTrue(shell.handle(control: "cursors.show", values: [1]).isAccepted)
+        // The 1 kHz test sine's place on the log axis from 20 Hz to 24 kHz.
+        let position = log10(1_000.0 / 20) / log10(24_000.0 / 20)
+        XCTAssertTrue(shell.handle(control: "cursor.frequency", values: [position]).isAccepted)
+        try ScopeTest.frames(session, 1)
+        let readout = try XCTUnwrap(presenter.lastCursorReadout)
+        XCTAssertTrue(readout.hasPrefix("frequency "), readout)
+        XCTAssertTrue(readout.contains(" Hz ± 11.7 Hz at "), readout)
+        XCTAssertTrue(readout.hasSuffix(" dBFS"), readout)
+        XCTAssertEqual(presenter.lastCursorLineCount, 1)
+        XCTAssertEqual(presenter.mirror.cursorReadout, readout)
+        XCTAssertTrue(shell.accessibilitySummary.contains(", cursor " + readout), shell.accessibilitySummary)
+        session.close()
+    }
+
+    func testThePinchStepsTheTimebaseOncePerDoublingClampedAtTheEnds() async throws {
+        let session = ExperienceSession()
+        let shell = try await ScopeTest.open(session)
+        let view = Vec2(160, 120)
+        func pinch(from start: Double, to distances: [Double]) {
+            shell.handlePointer(ScopeTest.touch(1, .began, 0, 60), viewSize: view)
+            shell.handlePointer(ScopeTest.touch(2, .began, start, 60), viewSize: view)
+            for distance in distances {
+                shell.handlePointer(ScopeTest.touch(2, .moved, distance, 60), viewSize: view)
+            }
+            shell.handlePointer(ScopeTest.touch(2, .ended, distances.last ?? start, 60), viewSize: view)
+            shell.handlePointer(ScopeTest.touch(1, .ended, 0, 60), viewSize: view)
+        }
+        XCTAssertEqual(try core(shell).state.timebaseIndex, 3, "1 ms/div")
+        pinch(from: 100, to: [200])
+        XCTAssertEqual(try core(shell).state.timebaseIndex, 2, "×2: 0.5 ms/div")
+        pinch(from: 100, to: [200, 400])
+        XCTAssertEqual(try core(shell).state.timebaseIndex, 0, "×4: two more steps, 0.1 ms/div")
+        pinch(from: 100, to: [200, 400])
+        XCTAssertEqual(try core(shell).state.timebaseIndex, 0, "clamped at 0.1 ms/div")
+        pinch(from: 400, to: [200])
+        XCTAssertEqual(try core(shell).state.timebaseIndex, 1, "×0.5: one step up")
+        pinch(from: 400, to: [200, 100])
+        XCTAssertEqual(try core(shell).state.timebaseIndex, 3, "×0.25: two steps up")
+        pinch(from: 400, to: [300])
+        XCTAssertEqual(try core(shell).state.timebaseIndex, 3, "×0.75 is no step")
+        XCTAssertTrue(shell.handle(control: "timebase.select", values: [5]).isAccepted)
+        pinch(from: 400, to: [200, 100])
+        XCTAssertEqual(try core(shell).state.timebaseIndex, 5, "clamped at 5 ms/div")
+
+        // In the spectrum view pinch does nothing and says why.
+        XCTAssertTrue(shell.handle(control: "timebase.select", values: [3]).isAccepted)
+        XCTAssertTrue(shell.handle(control: "display.select", values: [2]).isAccepted)
+        let digest = try shell.engine.digest()
+        pinch(from: 100, to: [200, 400])
+        XCTAssertEqual(try shell.engine.digest(), digest)
+        XCTAssertEqual(shell.presenter.mirror.hint, ScopePresenter.spectrumPinchHint)
+        session.close()
+    }
+
+    func testOneFingerDragsTheNearestCursor() async throws {
+        let session = ExperienceSession()
+        let shell = try await ScopeTest.open(session)
+        let view = Vec2(160, 120)
+        func x(_ fraction: Double) -> Double { view.x * ScopePresenter.inset + fraction * view.x * 0.88 }
+        func y(_ level: Double) -> Double { view.y * ScopePresenter.inset + (1 - level) / 2 * view.y * 0.88 }
+        // Hidden cursors: a drag changes nothing.
+        let digest = try shell.engine.digest()
+        shell.handlePointer(ScopeTest.touch(1, .began, x(0.6), y(0)), viewSize: view)
+        shell.handlePointer(ScopeTest.touch(1, .ended, x(0.6), y(0)), viewSize: view)
+        XCTAssertEqual(try shell.engine.digest(), digest)
+
+        XCTAssertTrue(shell.handle(control: "cursors.show", values: [1]).isAccepted)
+        shell.handlePointer(ScopeTest.touch(1, .began, x(0.7), y(0)), viewSize: view)
+        XCTAssertEqual(shell.presenter.dragTarget, .b, "B (0.75) is nearest")
+        shell.handlePointer(ScopeTest.touch(1, .moved, x(0.9), y(-0.5)), viewSize: view)
+        shell.handlePointer(ScopeTest.touch(1, .ended, x(0.9), y(-0.5)), viewSize: view)
+        var state = try core(shell).state
+        XCTAssertEqual(state.cursorB, 0.9, accuracy: 1e-9)
+        XCTAssertEqual(state.cursorA, 0.25, "the target stays the one chosen at touch-down")
+        shell.handlePointer(ScopeTest.touch(1, .began, x(0.5), y(0.45)), viewSize: view)
+        XCTAssertEqual(shell.presenter.dragTarget, .level, "the level line (0.5) is nearest")
+        shell.handlePointer(ScopeTest.touch(1, .moved, x(0.5), y(-0.25)), viewSize: view)
+        shell.handlePointer(ScopeTest.touch(1, .ended, x(0.5), y(-0.25)), viewSize: view)
+        state = try core(shell).state
+        XCTAssertEqual(state.levelCursor, -0.25, accuracy: 1e-9)
+        session.close()
+    }
+
+    func testARestoredFrozenSnapshotFreezesTheNextWindow() async throws {
+        let sources = ScopeBlockSources()
+        let session = ExperienceSession()
+        let shell = try await ScopeTest.open(session, factory: sources.factory)
+        XCTAssertTrue(shell.handle(control: "freeze.set", values: [1]).isAccepted)
+        XCTAssertTrue(shell.handle(control: "cursors.show", values: [1]).isAccepted)
+        let snapshot = try shell.snapshot()
+        XCTAssertEqual(snapshot.schemaVersion, 3)
+        XCTAssertTrue(shell.handle(control: "freeze.set", values: [0]).isAccepted)
+        try ScopeTest.frames(session, 1)
+        XCTAssertNil(shell.presenter.heldWindow)
+        try shell.restore(snapshot)
+        try ScopeTest.frames(session, 1)
+        XCTAssertNotNil(shell.presenter.heldWindow, "the restored freeze holds the next window")
+        session.close()
+
+        // In a new session too.
+        let next = ExperienceSession()
+        let restored = try await ScopeTest.open(next, factory: ScopeBlockSources().factory)
+        try restored.restore(ExperienceSnapshot(data: snapshot.encoded()))
+        XCTAssertTrue(try core(restored).state.frozen)
+        try ScopeTest.frames(next, 1)
+        let held = try XCTUnwrap(restored.presenter.heldWindow)
+        XCTAssertGreaterThan(held.sampleCount, 0)
+        XCTAssertNotNil(restored.presenter.lastCursorReadout)
+        next.close()
     }
 }

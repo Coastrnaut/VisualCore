@@ -8,6 +8,8 @@
 // Feature 063 (A08-P03) T-A08-303 (FR-A08-301, FR-A08-303): the spectrum view of the 1 kHz test sine (the synchronous
 // `ScopeBlockSource`, so the analysis is full on the first frame) draws a non-blank frame with its probe holding that
 // differs from both the waveform and the XY frame (pixel hash and at least 1 % of the pixels).
+// Feature 064 (A08-P04) T-A08-403 (FR-A08-401, FR-A08-402; SC-A08-405): a frozen frame with the cursors shown is
+// non-blank with its probe holding and differs from the live frame without cursors (pixel hash and visible pixels).
 import Foundation
 import XCTest
 @testable import OscilloscopeStudioExperience
@@ -106,6 +108,37 @@ final class ScopeRenderTests: XCTestCase {
             XCTAssertGreaterThan(differing, spectrum.width * spectrum.height / 100,
                                  "the spectrum differs visibly from the \(name) view")
         }
+        session.close()
+        XCTAssertEqual(session.hostsAlive, 0)
+    }
+
+    func testAFrozenFrameWithCursorsIsNonBlankAndDiffersFromTheLiveFrame() async throws {
+        let sources = ScopeBlockSources()
+        let session = ExperienceSession()
+        let shell = try await ScopeTest.open(session, factory: sources.factory, size: size)
+        try ScopeTest.frames(session, 2)
+        let live = try ScopeTest.picture(session)
+        XCTAssertEqual(shell.presenter.lastCursorLineCount, 0)
+
+        XCTAssertTrue(shell.presenter.setFrozen(true).isAccepted)
+        XCTAssertTrue(shell.handle(control: "cursors.show", values: [1]).isAccepted)
+        XCTAssertTrue(shell.handle(control: "cursor.level", values: [-0.75]).isAccepted)
+        try XCTUnwrap(sources.last).advance(2_048)
+        try ScopeTest.frames(session, 2)
+        let frozen = try ScopeTest.picture(session)
+        XCTAssertNotNil(shell.presenter.heldWindow)
+        XCTAssertEqual(shell.presenter.lastCursorLineCount, 3)
+        XCTAssertTrue(FrameChecks.isNonBlank(frozen.rgba, width: frozen.width, height: frozen.height),
+                      "the frozen frame is not blank")
+        XCTAssertFalse(FrameChecks.isBlack(frozen.rgba, width: frozen.width, height: frozen.height))
+        for probe in shell.frameProbes {
+            XCTAssertEqual(FrameChecks.probe(probe, rgba: frozen.rgba, width: frozen.width,
+                                             height: frozen.height)?.rawValue,
+                           probe.expected, "frozen \(probe.name)")
+        }
+        XCTAssertNotEqual(StableHash.sha256Hex(live.rgba), StableHash.sha256Hex(frozen.rgba))
+        let differing = ScopeTest.differingPixels(live.rgba, frozen.rgba)
+        XCTAssertGreaterThan(differing, frozen.width * frozen.height / 200, "the cursor lines show")
         session.close()
         XCTAssertEqual(session.hostsAlive, 0)
     }

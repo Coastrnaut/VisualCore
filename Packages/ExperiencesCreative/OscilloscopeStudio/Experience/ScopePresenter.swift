@@ -64,6 +64,36 @@
 //   - Status text and description: "Spectrum view, left channel, <readout>, …" in `trace.status` and "…, 2 channels,
 //     spectrum view, left channel, <axes>, <readout>." spoken ("1 channel, spectrum view, …" for a mono source). Levels
 //     are always relative to full scale; nothing claims a calibrated measurement.
+//
+// Feature 064 (A08-P04) T-A08-403 / T-A08-404 (FR-A08-401–404, FR-A08-410–412; stories 1–3; clarifications 1–5; edge
+// cases):
+//   - Freeze: while `state.frozen` the presenter holds the next acquired window that has samples (`heldWindow`, with
+//     its sample rate, channel count, start frame and flags) and draws it instead of the live window; acquisition keeps
+//     running behind it (`lastLiveWindow`). The gain rescales the held samples (clipping is recomputed); a shorter
+//     timebase shows the held window cut to the new span; a longer one draws the held samples from the left and says
+//     "frozen window shorter than the span". In the spectrum view the last analysis is kept while frozen. A frozen
+//     state with no samples yet (a restored session, a source just started) waits for the first window with samples,
+//     so a restored frozen state freezes the next acquired window. The Freeze control goes through `setFrozen(_:)`,
+//     which refuses to freeze an empty window with "Nothing to freeze yet" (`a08.nothing-to-freeze`, nothing sent).
+//     A change of source (or a new file) releases the held window at once and sends `freeze.set 0` after the current
+//     frame or description (never from inside it, like the microphone fallback); unfreezing resumes the newest window.
+//   - Cursors (`state.cursorsShown`): in the waveform view two vertical lines at cursors A and B across the plot and a
+//     horizontal line at the level cursor; in the spectrum view one vertical line at the centre of the frequency
+//     cursor's pixel column. The readout (`ScopeReadout`, never more precise than the data) goes to the controls'
+//     `cursor.readout` and the description: "A–B 1.00 ms, 1,000 Hz; level 0.50 of full scale (−6.0 dBFS)" with the
+//     span of the plot (the timebase's samples at the window's rate); "frequency 996 Hz ± 11.7 Hz at −6.0 dBFS" with
+//     the level of the analysed bin under the cursor (`spectrumLevel`). The level cursor reads the plot's full scale.
+//   - Touch (`pointer(_:viewSize:port:)`, fed by the shell's `handlePointer`): pointers go to a `PointerTracker` and a
+//     `PinchRecognizer`; each time the pinch scale crosses a doubling (or halving) of the scale at the last step,
+//     `ScopeZoom` gives one timebase step, sent as `timebase.select` like the timebase control, and the anchor moves to
+//     the current scale (clamped at 0.1 and 5 ms per division). In the spectrum view pinch does nothing and the hint
+//     says why. One finger with the cursors shown moves the nearest cursor (A, B or the level line, chosen when the
+//     finger lands; the frequency cursor in the spectrum view) to the finger, sent as `cursor.a`, `cursor.b`,
+//     `cursor.level` or `cursor.frequency` with positions inside the plot.
+//   - Presets: with the experience's storage the presenter owns a `ScopePresetStore`; `apply(_:)` sends
+//     `preset.apply <index>` for a built-in and, for a user preset (which the core cannot see), its settings as the
+//     individual actions `signal.waveform`, `signal.frequency`, `gain.select`, `timebase.select`, `trigger.level`,
+//     `trigger.slope`, `trigger.mode` and `display.select`.
 import Foundation
 import SwiftUI
 import UIKit
@@ -116,6 +146,22 @@ final class ScopeMirror {
     var offersTestSignal = false
     /// Whether the system permission request is open.
     var isRequestingPermission = false
+    /// Whether the shown window is frozen (`freeze.set`).
+    var frozen = false
+    /// Whether the cursors are shown (`cursors.show`).
+    var cursorsShown = false
+    /// Cursor A as a fraction of the window.
+    var cursorA = ScopeState.defaultCursorA
+    /// Cursor B as a fraction of the window.
+    var cursorB = ScopeState.defaultCursorB
+    /// The frequency cursor as a fraction of the spectrum width.
+    var frequencyCursor = ScopeState.defaultFrequencyCursor
+    /// The level cursor in full scale.
+    var levelCursor = ScopeState.defaultLevelCursor
+    /// The cursor readout (`cursor.readout`); nil while the cursors are hidden or the XY view is drawn.
+    var cursorReadout: String?
+    /// A hint about touch on the canvas (pinch in the spectrum view); nil otherwise.
+    var hint: String?
 }
 
 /// How the presenter makes its sources; tests replace them with doubles.
@@ -188,6 +234,29 @@ final class ScopePresenter: ExperiencePresenter {
     static let undecodableMessage = "This file can't be played. Choose a WAV, AIFF, CAF, M4A or MP3 file, or use the test signal."
     /// The message when a restored session's file is no longer reachable.
     static let fileGoneMessage = "The audio file is no longer available. Choose it again, or use the test signal."
+    /// The message when a freeze is asked for while the window holds no sample.
+    static let nothingToFreezeMessage = "Nothing to freeze yet"
+    /// The mark of a frozen window that covers less than the timebase's span.
+    static let frozenShorterWords = "frozen window shorter than the span"
+    /// The hint after a pinch in the spectrum view.
+    static let spectrumPinchHint = "Pinch zoom changes the timebase in the waveform view; the spectrum's frequency span "
+        + "is fixed."
+    /// The colour of the cursor lines (cyan).
+    nonisolated static let cursorColor = Vec4(0.35, 0.85, 1.0, 1)
+    /// The width of the cursor lines in pixels.
+    nonisolated static let cursorWidth = 1.5
+
+    /// The cursor a one-finger drag moves.
+    enum CursorTarget: Equatable {
+        /// Time cursor A.
+        case a
+        /// Time cursor B.
+        case b
+        /// The level cursor.
+        case level
+        /// The frequency cursor (spectrum view).
+        case frequency
+    }
 
     /// What runs (or should run): the test signal of a waveform and frequency, the picked file or the microphone.
     enum SourceKey: Equatable {
@@ -271,6 +340,34 @@ final class ScopePresenter: ExperiencePresenter {
     private(set) var startCount = 0
     /// Set only by tests; the next draw throws `ScopeDrawError.injected` and clears the flag.
     var failNextDraw = false
+    /// The held (frozen) window; nil while not frozen, before the first window with samples, and after a release.
+    private(set) var heldWindow: SignalWindow?
+    /// The source the held window came from (a change of source releases it).
+    private var heldOrigin: SourceKey?
+    /// The freeze was released by the presenter and `freeze.set 0` is on its way; no window is held meanwhile.
+    private var releasePending = false
+    private var unfreezeScheduled = false
+    /// Whether the last frame's frozen window covered less than the timebase's span.
+    private(set) var frozenShorter = false
+    /// The live window acquired by the last frame (the same as `lastWindow` unless frozen).
+    private(set) var lastLiveWindow: SignalWindow?
+    /// The cursor readout of the last frame or description; nil while the cursors are hidden.
+    private(set) var lastCursorReadout: String?
+    /// The cursor lines drawn by the last frame (0 to 3).
+    private(set) var lastCursorLineCount = 0
+    /// The user presets in the experience's storage; nil without storage (only the built-ins are listed).
+    let presets: ScopePresetStore?
+
+    private var pointers = PointerTracker()
+    private var pinch = PinchRecognizer()
+    /// The pinch scale at the last timebase step.
+    private var pinchAnchor = 1.0
+    /// The timebase index after the last pinch step (nil before the first step of a gesture).
+    private var pinchTimebase: Int?
+    /// Whether two fingers were down in the current touch sequence (one finger left over does not drag).
+    private var pinchSeen = false
+    /// The cursor the current one-finger drag moves.
+    private(set) var dragTarget: CursorTarget?
 
     private let clear = ClearColorScene(red: ScopePresenter.background.red, green: ScopePresenter.background.green,
                                         blue: ScopePresenter.background.blue)
@@ -279,6 +376,8 @@ final class ScopePresenter: ExperiencePresenter {
     private var gridNodes: [SceneNode] = []
     /// The two trace nodes (channel 0 or the XY trace, channel 1), reused every frame.
     private var traceNodes: [SceneNode] = []
+    /// The three cursor nodes (A, B, level; or the frequency cursor), reused every frame.
+    private var cursorNodes: [SceneNode] = []
     /// The spectrum analyser, created on first use and kept (one FFT setup for the presenter's life).
     private var analyzer: SpectrumAnalyzer?
     /// The read buffers of the spectrum (4,096 frames each, reused).
@@ -288,10 +387,12 @@ final class ScopePresenter: ExperiencePresenter {
     private var lastMagnitudes: [Float] = []
     private var lastSpectrumRate = TestSignal.defaultSampleRate
 
-    init(experienceID: ExperienceID, permission: any MicrophonePermission, factory: ScopeSourceFactory = .system) {
+    init(experienceID: ExperienceID, permission: any MicrophonePermission, factory: ScopeSourceFactory = .system,
+         storage: ExperienceStorage? = nil) {
         self.experienceID = experienceID
         self.permission = permission
         self.factory = factory
+        presets = storage.map { ScopePresetStore(storage: $0) }
         for index in 0..<(Self.horizontalDivisions + 1 + Self.verticalDivisions + 1) {
             let node = SceneNode(id: "g\(index)", z: 0, color: Self.gridColor)
             root.add(node)
@@ -301,6 +402,11 @@ final class ScopePresenter: ExperiencePresenter {
             let node = SceneNode(id: "t\(channel)", z: 1 + channel, color: Self.traceColors[channel])
             root.add(node)
             traceNodes.append(node)
+        }
+        for index in 0..<3 {
+            let node = SceneNode(id: "c\(index)", z: 3, color: Self.cursorColor)
+            root.add(node)
+            cursorNodes.append(node)
         }
     }
 
@@ -365,12 +471,15 @@ final class ScopePresenter: ExperiencePresenter {
             }
         }
         try clear.render(context, frame: frame)
-        let window = acquire(core.state)
+        let live = acquire(core.state)
+        lastLiveWindow = live
+        let window = shownWindow(live: live, state: core.state)
         lastWindow = window
-        if core.state.display == .spectrum { analyseSpectrum() }
+        if core.state.display == .spectrum, !spectrumHeld(core.state) { analyseSpectrum() }
         updateStatus(core.state)
         let width = Double(max(1, context.pixelWidth)), height = Double(max(1, context.pixelHeight))
         layOut(width: width, height: height, window: window, state: core.state)
+        updateCursorReadout(core.state)
         if primitives == nil { primitives = try PrimitiveRenderer(registry: context.resources) }
         try primitives?.draw(root, camera: Camera2D(), metrics: ViewMetrics(size: Vec2(width, height), scale: 1))
     }
@@ -420,9 +529,11 @@ final class ScopePresenter: ExperiencePresenter {
         }
         let gain = state.gain
         for node in gridNodes { node.primitive = nil }
+        let plot = (x: left, y: bottom, width: plotWidth, height: plotHeight)
         if state.display == .spectrum {
-            layOutSpectrum(rect: (x: left, y: bottom, width: plotWidth, height: plotHeight))
+            layOutSpectrum(rect: plot)
             lastTraceNodeCount = traceNodes.filter { $0.primitive != nil }.count
+            layOutCursors(rect: plot, state: state)
             return
         }
         if state.display == .xy, window.channelCount == 2 {
@@ -467,6 +578,292 @@ final class ScopePresenter: ExperiencePresenter {
             lastShowsXY = false
         }
         lastTraceNodeCount = traceNodes.filter { $0.primitive != nil }.count
+        layOutCursors(rect: plot, state: state)
+    }
+
+    /// Places the cursor lines inside the plot `rect` (world pixels, y up): with the cursors shown, A and B as vertical
+    /// lines and the level cursor as a horizontal line in the waveform view, the frequency cursor as a vertical line at
+    /// its pixel column's centre in the spectrum view; nothing in the XY view or while the cursors are hidden.
+    private func layOutCursors(rect: (x: Double, y: Double, width: Double, height: Double), state: ScopeState) {
+        for node in cursorNodes { node.primitive = nil }
+        defer { lastCursorLineCount = cursorNodes.filter { $0.primitive != nil }.count }
+        guard state.cursorsShown, !lastShowsXY else { return }
+        let top = rect.y + rect.height
+        if state.display == .spectrum {
+            let columns = Double(max(lastSpectrumColumns, 1))
+            let column = min((state.frequencyCursor * columns).rounded(.down), columns - 1)
+            let x = rect.x + (column + 0.5) / columns * rect.width
+            cursorNodes[0].primitive = .line(Vec2(x, rect.y), Vec2(x, top), width: Self.cursorWidth)
+            return
+        }
+        for (index, position) in [state.cursorA, state.cursorB].enumerated() {
+            let x = rect.x + position * rect.width
+            cursorNodes[index].primitive = .line(Vec2(x, rect.y), Vec2(x, top), width: Self.cursorWidth)
+        }
+        let y = rect.y + (state.levelCursor + 1) / 2 * rect.height
+        cursorNodes[2].primitive = .line(Vec2(rect.x, y), Vec2(rect.x + rect.width, y), width: Self.cursorWidth)
+    }
+
+    // MARK: Freeze
+
+    /// The window to show for `live`: `live` unless frozen; while frozen, the held window (holding `live` first when
+    /// none is held and `live` has samples), cut to the timebase's span or marked shorter than it, with the clipping
+    /// recomputed for the current gain.
+    private func shownWindow(live: SignalWindow, state: ScopeState) -> SignalWindow {
+        frozenShorter = false
+        guard state.frozen, !releasePending else {
+            if !state.frozen { releaseHeld() }
+            return live
+        }
+        if heldWindow == nil, live.sampleCount > 0 {
+            heldWindow = live
+            heldOrigin = activeKey
+        }
+        guard let held = heldWindow else { return live }
+        let span = held.sampleRate.isFinite && held.sampleRate > 0
+            ? TimebaseWindow(secondsPerDivision: state.secondsPerDivision).sampleCount(sampleRate: held.sampleRate)
+            : held.sampleCount
+        var left = held.left, right = held.right
+        if span > 0, span < held.sampleCount {
+            left = Array(left.prefix(span))
+            right = Array(right.prefix(span))
+        } else if span > held.sampleCount {
+            frozenShorter = true
+        }
+        return SignalWindow(sampleRate: held.sampleRate, channelCount: held.channelCount, startFrame: held.startFrame,
+                            left: left, right: right, triggered: held.triggered, waiting: held.waiting,
+                            partial: held.partial, shortened: held.shortened,
+                            clipped: SignalWindow.isClipped(left: left, right: right, gain: state.gain))
+    }
+
+    /// Whether the spectrum analysis is kept (frozen with a held window).
+    private func spectrumHeld(_ state: ScopeState) -> Bool {
+        state.frozen && heldWindow != nil && !releasePending
+    }
+
+    /// Forgets the held window (the core is not frozen any more).
+    private func releaseHeld() {
+        heldWindow = nil
+        heldOrigin = nil
+        releasePending = false
+    }
+
+    /// Releases the freeze from the presenter's side (a change of source): the held window goes at once and
+    /// `freeze.set 0` is sent after the current frame or description.
+    private func releaseFreeze() {
+        heldWindow = nil
+        heldOrigin = nil
+        releasePending = true
+        guard !unfreezeScheduled, port != nil else { return }
+        unfreezeScheduled = true
+        Task { @MainActor [weak self] in
+            guard let self else { return }
+            unfreezeScheduled = false
+            guard lastCore?.state.frozen == true else { return }
+            _ = port?.send("freeze.set", [0])
+        }
+    }
+
+    /// Whether `a` and `b` are the same source: any two test signals (a waveform or frequency change restarts the
+    /// source but keeps the freeze), the same file pick, or the microphone.
+    nonisolated static func sameOrigin(_ a: SourceKey, _ b: SourceKey) -> Bool {
+        switch (a, b) {
+        case (.testSignal, .testSignal), (.microphone, .microphone): return true
+        case (.file(let p), .file(let q)): return p == q
+        default: return false
+        }
+    }
+
+    /// What the Freeze control does: freezing sends `freeze.set 1` unless the last window holds no sample, which is
+    /// refused with "Nothing to freeze yet" (`a08.nothing-to-freeze`) and nothing sent; unfreezing sends `freeze.set 0`.
+    @discardableResult
+    func setFrozen(_ frozen: Bool) -> ActionResult {
+        guard let port else { return .rejected(.notActive(.inactive)) }
+        if frozen, (lastLiveWindow?.sampleCount ?? 0) == 0 {
+            setMessage(Self.nothingToFreezeMessage, settings: false, offer: false)
+            return .rejected(.rule(code: ScopeRule.nothingToFreeze))
+        }
+        let result = port.send("freeze.set", [frozen ? 1 : 0])
+        if result.isAccepted, mirror.message == Self.nothingToFreezeMessage { clearMessage() }
+        return result
+    }
+
+    // MARK: Cursors
+
+    /// Records the cursor readout of `state` in `lastCursorReadout` and the mirror.
+    private func updateCursorReadout(_ state: ScopeState) {
+        let readout = cursorReadout(state)
+        lastCursorReadout = readout
+        if mirror.cursorReadout != readout { mirror.cursorReadout = readout }
+    }
+
+    /// The cursor readout of `state`: nil while the cursors are hidden or the XY view is drawn; in the spectrum view
+    /// "frequency <ScopeReadout.spectrumFrequency>" of the last analysis; otherwise "A–B <time>, <frequency>; level
+    /// <level>" over the plot's span (the timebase's samples at the shown window's rate).
+    func cursorReadout(_ state: ScopeState) -> String? {
+        guard state.cursorsShown else { return nil }
+        if state.display == .spectrum {
+            let rate = lastSpectrumRate
+            let width = Double(lastSpectrumColumns)
+            let level = Self.spectrumLevel(magnitudes: lastMagnitudes, position: state.frequencyCursor,
+                                           sampleRate: rate, width: width)
+            return "frequency " + ScopeReadout.spectrumFrequency(position: state.frequencyCursor, sampleRate: rate,
+                                                                 width: width,
+                                                                 binWidth: rate / Double(SpectrumReadout.frameSize),
+                                                                 levelDB: level)
+        }
+        if state.display == .xy, !xyFallsBack(state) { return nil }
+        let rate = lastWindow?.sampleRate ?? activeSampleRate
+        let span = TimebaseWindow(secondsPerDivision: state.secondsPerDivision).sampleCount(sampleRate: rate)
+        let time = ScopeReadout.time(a: state.cursorA, b: state.cursorB, spanSeconds: Double(span) / rate,
+                                     sampleRate: rate)
+        return "A–B \(time.time), \(time.frequency); level \(ScopeReadout.level(state.levelCursor))"
+    }
+
+    /// The level in dB relative to full scale of the analysis bin under a spectrum cursor at `position` (0…1 of a
+    /// spectrum `width` pixel columns wide; the centre of its column, as `ScopeReadout.spectrumFrequency` reads it):
+    /// the bin nearest the column's frequency on the log axis (at least bin 1); nil when the magnitudes are empty, the
+    /// bin lies beyond them, or an input is not usable.
+    nonisolated static func spectrumLevel(magnitudes: [Float], position: Double, sampleRate: Double,
+                                          width: Double) -> Double? {
+        let nyquist = sampleRate / 2
+        guard !magnitudes.isEmpty, position.isFinite, nyquist.isFinite,
+              nyquist > SpectrumView.minimumFrequency else { return nil }
+        var p = min(max(position, 0), 1)
+        if width.isFinite, width >= 1 {
+            let columns = width.rounded(.down)
+            let column = min((p * columns).rounded(.down), columns - 1)
+            p = (column + 0.5) / columns
+        }
+        let frequency = SpectrumView.minimumFrequency * pow(nyquist / SpectrumView.minimumFrequency, p)
+        let binWidth = sampleRate / Double(SpectrumReadout.frameSize)
+        let bin = max(Int((frequency / binWidth).rounded()), 1)
+        guard bin < magnitudes.count else { return nil }
+        let level = Double(magnitudes[bin])
+        return level.isFinite ? level : nil
+    }
+
+    // MARK: Touch
+
+    /// Canvas touches: two fingers pinch the timebase (one `timebase.select` step per doubling or halving of the pinch
+    /// scale since the last step; nothing but the hint in the spectrum view); one finger with the cursors shown drags
+    /// the nearest cursor. Positions are taken inside the plot (the view less the 6 % inset), clamped to it.
+    func pointer(_ event: PointerEvent, viewSize: Vec2, port: ExperienceActionPort) {
+        guard viewSize.x > 0, viewSize.y > 0, viewSize.x.isFinite, viewSize.y.isFinite else { return }
+        pointers.handle(event)
+        pinch.handle(event, tracker: pointers)
+        if pointers.count >= 2 { pinchSeen = true }
+        if pinchSeen {
+            dragTarget = nil
+            if event.phase == .moved { pinchStep(port: port) }
+        } else if pointers.count == 1, event.phase == .began || event.phase == .moved {
+            drag(event, viewSize: viewSize, port: port)
+        }
+        if pointers.count == 0 {
+            pinch.reset()
+            pinchAnchor = 1
+            pinchTimebase = nil
+            pinchSeen = false
+            dragTarget = nil
+        }
+    }
+
+    /// One timebase step when the pinch scale crossed a doubling or halving of the anchor (see `ScopeZoom`).
+    private func pinchStep(port: ExperienceActionPort) {
+        guard let state = lastCore?.state else { return }
+        if state.display == .spectrum {
+            if mirror.hint != Self.spectrumPinchHint { mirror.hint = Self.spectrumPinchHint }
+            return
+        }
+        if mirror.hint != nil { mirror.hint = nil }
+        guard pinch.state.isActive else { return }
+        let step = ScopeZoom.step(scale: pinch.scale, anchorScale: pinchAnchor)
+        guard step != 0 else { return }
+        pinchAnchor = pinch.scale
+        let current = pinchTimebase ?? state.timebaseIndex
+        let next = ScopeZoom.index(after: current, step: step, count: ScopeSettings.timebasesMilliseconds.count)
+        pinchTimebase = next
+        if next != current { _ = port.send("timebase.select", [Double(next)]) }
+    }
+
+    /// Moves the nearest cursor (chosen when the finger lands) to the finger while the cursors are shown.
+    private func drag(_ event: PointerEvent, viewSize: Vec2, port: ExperienceActionPort) {
+        guard let state = lastCore?.state, state.cursorsShown else { return }
+        let plotWidth = viewSize.x * (1 - 2 * Self.inset), plotHeight = viewSize.y * (1 - 2 * Self.inset)
+        let fx = min(max((event.location.x - viewSize.x * Self.inset) / plotWidth, 0), 1)
+        if state.display == .spectrum {
+            dragTarget = .frequency
+            _ = port.send("cursor.frequency", [fx])
+            return
+        }
+        if state.display == .xy, !xyFallsBack(state) { return }
+        let fromTop = (event.location.y - viewSize.y * Self.inset) / plotHeight
+        let level = min(max(1 - 2 * fromTop, -1), 1)
+        if event.phase == .began || dragTarget == nil || dragTarget == .frequency {
+            let distances: [(CursorTarget, Double)] = [(.a, abs(fx - state.cursorA) * plotWidth),
+                                                       (.b, abs(fx - state.cursorB) * plotWidth),
+                                                       (.level, abs(level - state.levelCursor) / 2 * plotHeight)]
+            dragTarget = distances.min { $0.1 < $1.1 }?.0
+        }
+        switch dragTarget {
+        case .a: _ = port.send("cursor.a", [fx])
+        case .b: _ = port.send("cursor.b", [fx])
+        case .level: _ = port.send("cursor.level", [level])
+        case .frequency, nil: break
+        }
+    }
+
+    // MARK: Presets
+
+    /// The presets to list: the built-ins, then the user presets (only the built-ins without storage).
+    var presetEntries: [ScopePreset] { presets?.entries ?? ScopePreset.builtIns }
+
+    /// Saves the current settings as a user preset named `name`; nil without storage or state, or when the store
+    /// refuses (its `lastMessage` says why).
+    @discardableResult
+    func savePreset(named name: String, now: Date = Date()) -> ScopePreset? {
+        guard let presets, let state = lastCore?.state else { return nil }
+        return presets.save(name: name, from: state, now: now)
+    }
+
+    /// Renames the user preset `id`; false without storage or when the store refuses.
+    @discardableResult
+    func renamePreset(_ id: UUID, to name: String) -> Bool {
+        presets?.rename(id, to: name) ?? false
+    }
+
+    /// Deletes the user preset `id`; false without storage or when the store refuses.
+    @discardableResult
+    func deletePreset(_ id: UUID) -> Bool {
+        presets?.delete(id) ?? false
+    }
+
+    /// Applies `preset`: a built-in as `preset.apply <index>`; a user preset as its settings sent one by one
+    /// (`presetActions`), stopping at the first refusal. Returns the answer.
+    @discardableResult
+    func apply(_ preset: ScopePreset) -> ActionResult {
+        guard let port else { return .rejected(.notActive(.inactive)) }
+        if let index = ScopePresetStore.builtInIndex(of: preset) {
+            return port.send("preset.apply", [Double(index)])
+        }
+        for (control, value) in Self.presetActions(preset.settings) {
+            let result = port.send(control, [value])
+            guard result.isAccepted else { return result }
+        }
+        return .accepted
+    }
+
+    /// The actions that apply `settings`: `signal.waveform`, `signal.frequency`, `gain.select`, `timebase.select`,
+    /// `trigger.level`, `trigger.slope`, `trigger.mode` and `display.select` with their values.
+    nonisolated static func presetActions(_ settings: ScopePreset.Settings) -> [(String, Double)] {
+        [("signal.waveform", Double(ScopeSettings.index(of: settings.waveform))),
+         ("signal.frequency", Double(settings.frequencyIndex)),
+         ("gain.select", Double(settings.gainIndex)),
+         ("timebase.select", Double(settings.timebaseIndex)),
+         ("trigger.level", settings.triggerLevel),
+         ("trigger.slope", Double(ScopeSettings.index(of: settings.triggerSlope))),
+         ("trigger.mode", Double(ScopeSettings.index(of: settings.triggerMode))),
+         ("display.select", Double(settings.display.rawValue))]
     }
 
     /// Analyses the newest 4,096 frames of the left (or only) channel of the running source with the one kept
@@ -562,8 +959,20 @@ final class ScopePresenter: ExperiencePresenter {
 
     /// Makes the running source match `core`'s selection (see the file header).
     func sync(_ core: ScopeCore) {
+        let previous = lastCore?.state
         lastCore = core
         updateDisplay(core)
+        if !core.state.frozen {
+            releaseHeld()
+        } else if !releasePending, let previous, previous.frozen, previous.source != core.state.source {
+            releaseFreeze()                                   // a change of source while frozen unfreezes
+        }
+        defer {
+            if core.state.frozen, !releasePending, let heldOrigin, let activeKey,
+               !Self.sameOrigin(heldOrigin, activeKey) {
+                releaseFreeze()                               // a new file unfreezes too
+            }
+        }
         guard isLive, !isBackgrounded, !isSuspended else { return }
         let desired: SourceKey?
         switch core.state.source {
@@ -765,6 +1174,12 @@ final class ScopePresenter: ExperiencePresenter {
         let mode = ScopeSettings.index(of: state.triggerMode)
         if mirror.modeIndex != mode { mirror.modeIndex = mode }
         if mirror.display != state.display { mirror.display = state.display }
+        if mirror.frozen != state.frozen { mirror.frozen = state.frozen }
+        if mirror.cursorsShown != state.cursorsShown { mirror.cursorsShown = state.cursorsShown }
+        if mirror.cursorA != state.cursorA { mirror.cursorA = state.cursorA }
+        if mirror.cursorB != state.cursorB { mirror.cursorB = state.cursorB }
+        if mirror.frequencyCursor != state.frequencyCursor { mirror.frequencyCursor = state.frequencyCursor }
+        if mirror.levelCursor != state.levelCursor { mirror.levelCursor = state.levelCursor }
     }
 
     /// Records the trace status of the last window when it changed.
@@ -777,7 +1192,30 @@ final class ScopePresenter: ExperiencePresenter {
         if state.display == .spectrum {
             status = "spectrum view, " + spectrumChannelWords + ", " + readoutWords + ", " + Self.spectrumAxesWords
         }
+        if let frozen = frozenWords(state) { status = frozen + ", " + status }
         if mirror.status != status { mirror.status = status }
+    }
+
+    /// The freeze in words while frozen: "frozen at 48,000 Hz, 2 channels" (the held window's rate and channels; with
+    /// ", frozen window shorter than the span" when it covers less than the timebase's span) or "frozen, waiting for
+    /// the first window" before a window with samples; nil while not frozen or after a release.
+    private func frozenWords(_ state: ScopeState) -> String? {
+        guard state.frozen, !releasePending else { return nil }
+        guard let held = heldWindow else { return "frozen, waiting for the first window" }
+        let words = "frozen at \(Self.hertzWords(held.sampleRate)), \(Self.channelWords(held.channelCount))"
+        return frozenShorter ? words + ", " + Self.frozenShorterWords : words
+    }
+
+    /// A sample rate in whole hertz with thousands grouped by a comma: "48,000 Hz".
+    nonisolated static func hertzWords(_ rate: Double) -> String {
+        guard rate.isFinite, rate >= 0, rate < 1e12 else { return "0 Hz" }
+        let digits = String(Int(rate.rounded()))
+        var out = ""
+        for (i, ch) in digits.enumerated() {
+            if i > 0, (digits.count - i) % 3 == 0 { out.append(",") }
+            out.append(ch)
+        }
+        return out + " Hz"
     }
 
     /// The analysed channel in words: "left channel" for a two-channel source, "1 channel" for a mono one, "no
@@ -897,18 +1335,24 @@ final class ScopePresenter: ExperiencePresenter {
         checkLifecycle()
         sync(core)
         let state = core.state
+        var extras = ""
+        if let frozen = frozenWords(state) { extras += ", " + frozen }
         if state.display == .spectrum {
-            analyseSpectrum()
+            if !spectrumHeld(state) { analyseSpectrum() }
+            updateCursorReadout(state)
+            if let readout = lastCursorReadout { extras += ", cursor " + readout }
             let channels = Self.channelWords(activeChannelCount)
             let analysed = activeChannelCount == 2 ? ", left channel" : ""
             return "Oscilloscope Studio: \(spokenSource(state)), \(channels), spectrum view\(analysed), "
-                + "\(Self.spectrumAxesWords), \(readoutWords)."
+                + "\(Self.spectrumAxesWords), \(readoutWords)\(extras)."
         }
+        updateCursorReadout(state)
+        if let readout = lastCursorReadout { extras += ", cursors " + readout }
         return "Oscilloscope Studio: \(spokenSource(state)), \(Self.channelWords(activeChannelCount)), "
             + "\(viewWords(state)), "
             + "\(ScopeSettings.timebaseName(state.timebaseIndex)), gain \(ScopeSettings.gainName(state.gainIndex)), "
             + "\(Self.triggerWords(lastWindow, state: state)), "
-            + (lastWindow?.clipped == true ? "clipping" : "not clipping") + "."
+            + (lastWindow?.clipped == true ? "clipping" : "not clipping") + extras + "."
     }
 
     /// One background probe in the top-left corner, outside the plot's 6 % inset.
@@ -917,7 +1361,7 @@ final class ScopePresenter: ExperiencePresenter {
     }
 
     func makeControls(_ port: ExperienceActionPort) -> AnyView {
-        AnyView(ScopeControls(port: port, presenter: self, mirror: mirror))
+        AnyView(ScopeControls(port: port, presenter: self, mirror: mirror, presets: presets))
     }
 
     /// Every action has a native control.

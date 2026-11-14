@@ -8,6 +8,9 @@
 // Feature 063 (A08-P03) T-A08-303: `ScopeBlockSource`, a synchronous test-signal double that writes a fixed number of
 // frames in `start` (8,192 by default, so a 4,096-frame spectrum is full at once) and more only through `advance(_:)`
 // (source time moves without the wall clock), and `ScopeBlockSources`, the factory that hands them out and keeps them.
+// Feature 064 (A08-P04) T-A08-403 / T-A08-404: `open` takes an optional experience storage (the preset store), a
+// temporary storage maker, synthetic pointer events and `settle()`, which lets the presenter's deferred actions (the
+// `freeze.set 0` after a source change) run.
 import Foundation
 import XCTest
 @testable import OscilloscopeStudioExperience
@@ -16,7 +19,9 @@ import VisualCoreAudio
 import VisualCoreAudioDSP
 import VisualCoreExperience
 import VisualCoreExperienceHost
+import VisualCoreMath
 import VisualCoreRendering
+import VisualCoreScenes
 
 /// A microphone permission with a fixed answer that never asks the system.
 @MainActor
@@ -157,14 +162,15 @@ enum ScopeTest {
     /// Opens Oscilloscope Studio in `session` (seed 7) with `permission` and `factory`, lays the view out at `size`
     /// points and draws one frame.
     static func open(_ session: ExperienceSession, permission: MicrophonePermissionState = .granted,
-                     factory: ScopeSourceFactory? = nil,
+                     factory: ScopeSourceFactory? = nil, storage: ExperienceStorage? = nil,
                      size: CGSize = CGSize(width: 160, height: 120)) async throws -> ExperienceShell<ScopePresenter> {
         let id = self.id
         let sources = factory ?? self.sources
         let access = ScopeFixedPermission(permission)
         var made: ExperienceShell<ScopePresenter>?
         let request = ExperienceOpenRequest(id: id, seed: 7, snapshot: nil, refusedSnapshotFails: false) {
-            let shell = OscilloscopeStudioExperience.make(id: id, permission: access, factory: sources)
+            let shell = OscilloscopeStudioExperience.make(id: id, permission: access, factory: sources,
+                                                          storage: storage)
             made = shell
             return shell
         }
@@ -177,6 +183,28 @@ enum ScopeTest {
         let shell = try XCTUnwrap(made)
         try frames(session, 1)
         return shell
+    }
+
+    /// A fresh experience storage in a temporary directory with its own defaults suite; `cleanUp` removes both.
+    nonisolated static func temporaryStorage() throws -> (storage: ExperienceStorage, cleanUp: @Sendable () -> Void) {
+        let suite = "dev.visualcore.a08-p04.presets.\(UUID().uuidString)"
+        let defaults = try XCTUnwrap(UserDefaults(suiteName: suite))
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent(suite, isDirectory: true)
+        let storage = ExperienceStorage(id: ExperienceID(rawValue: "a08.preset-test")!, root: root, defaults: defaults)
+        return (storage, {
+            UserDefaults(suiteName: suite)?.removePersistentDomain(forName: suite)
+            try? FileManager.default.removeItem(at: root)
+        })
+    }
+
+    /// A pointer event at (`x`, `y`) view points.
+    static func touch(_ id: Int, _ phase: PointerPhase, _ x: Double, _ y: Double, at time: Double = 0) -> PointerEvent {
+        PointerEvent(id: id, phase: phase, location: Vec2(x, y), timestamp: time)
+    }
+
+    /// Lets tasks the presenter scheduled on the main actor run.
+    static func settle() async {
+        for _ in 0..<10 { await Task.yield() }
     }
 
     /// Draws `count` frames back to back.
