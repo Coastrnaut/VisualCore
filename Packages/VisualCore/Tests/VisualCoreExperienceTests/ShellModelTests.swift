@@ -255,7 +255,8 @@ import Testing
         let manifest = try CatalogFixture.manifest()
         let categories = try Self.categories()
         let everything = Set(manifest.experiences.map(\.id))
-        #expect(LauncherModel.shown(manifest: manifest, registered: everything).map(\.id.rawValue) == ["a01.generative-art-studio", "a02.fluid-art-playground", "a03.fractal-explorer"])
+        #expect(LauncherModel.shown(manifest: manifest, registered: everything).map(\.id.rawValue) == ["a01.generative-art-studio", "a02.fluid-art-playground", "a03.fractal-explorer",
+                         "a04.particle-universe"])
         for search in ["", "aurora"] {
             #expect(LauncherModel.state(manifest: .success(manifest), categories: categories, registered: [],
                                         searchText: search) == .empty, "nothing registered shows nothing")

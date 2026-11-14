@@ -40,7 +40,8 @@ import Testing
 
     @Test func todaysCatalogWithTheIntegratedExperiencesRegisteredIsAMatch() throws {
         let manifest = try CatalogFixture.manifest()
-        let integrated = ["a01.generative-art-studio", "a02.fluid-art-playground", "a03.fractal-explorer"].compactMap(ExperienceID.init(rawValue:))
+        let integrated = ["a01.generative-art-studio", "a02.fluid-art-playground", "a03.fractal-explorer",
+                         "a04.particle-universe"].compactMap(ExperienceID.init(rawValue:))
         #expect(manifest.registryReport(registered: integrated).isMatch)
         #expect(manifest.registryReport(registered: []).missingRegistrations == integrated)
     }
