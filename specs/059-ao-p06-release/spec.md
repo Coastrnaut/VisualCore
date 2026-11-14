@@ -43,8 +43,9 @@ its fixtures (`resources: [.copy("Fixtures")]`) are the precedent; the app alrea
   tunnel (loads), format 1 star corridor with calm motion (loads), format 2 (newer, kept), damaged JSON (unreadable,
   kept), and a file whose name claims a built-in id (unreadable, kept); ids from the synthetic range
   `00000000-0000-4000-8000-0000000007c1…c5`; plus the snapshot schema 1 and 2 examples already in the registry.
-- Q: How is the drawing failure forced? → A: An internal `failNextDraw` on `OdysseyPresenter` that makes the next draw
-  throw `OdysseyDrawError.injected` once, as in Infinite Geometry.
+- Q: How is the drawing failure forced? → A: The internal `failNextDraw` that `OdysseyPresenter` already has (added in
+  A07-P02, re-checked 2026-11-14: the next draw throws `OdysseyDrawError.injected` once); the release phase adds the
+  recovery test with preset files, not the seam.
 - Q: How is the privacy manifest covered? → A: The release build checks' privacy-manifest step must pass; Audio Odyssey adds
   no required-reason API beyond the file timestamps and defaults already declared for experience storage.
 
