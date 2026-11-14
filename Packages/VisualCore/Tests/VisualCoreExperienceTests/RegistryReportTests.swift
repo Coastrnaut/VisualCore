@@ -42,7 +42,8 @@ import Testing
         let manifest = try CatalogFixture.manifest()
         let integrated = ["a01.generative-art-studio", "a02.fluid-art-playground", "a03.fractal-explorer",
                          "a04.particle-universe", "a05.infinite-geometry",
-                         "a06.visualcore-music-lab", "a07.audio-odyssey"].compactMap(ExperienceID.init(rawValue:))
+                         "a06.visualcore-music-lab", "a07.audio-odyssey",
+                         "a08.oscilloscope-studio"].compactMap(ExperienceID.init(rawValue:))
         #expect(manifest.registryReport(registered: integrated).isMatch)
         #expect(manifest.registryReport(registered: []).missingRegistrations == integrated)
     }

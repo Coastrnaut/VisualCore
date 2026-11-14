@@ -47,7 +47,7 @@ evidence**: no physical-device test of the unified app has been run.
 |---|---|---|
 | Framework packages (version 1.0.0-rc.1) | simulator-verified: host tests and iOS Simulator tests | `.autonomy/evidence/F00.json` … `F09.json`; [release notes](docs/release/release-notes-1.0.0-rc.1.md) |
 | Unified VisualCore app (`Apps/VisualCore`) | exists: launcher, routes, settings, about, onboarding, session host, persistence, quality profiles, verification runner (UA-F00 … UA-F07, UA-F09 … UA-F11 pass) | `python3 scripts/migration_ledger.py status` |
-| Audio modules `VisualCoreAudioDSP` and `VisualCoreAudio` | implemented: FFT, bands, RMS, onsets, test signals, min/max decimation; demo, file, microphone, test-signal and two-channel sources with interruption and route handling | A06, A07 and A08 phases; [known limitations](docs/release/known-limitations.md) |
+| Audio modules `VisualCoreAudioDSP` and `VisualCoreAudio` | implemented: FFT, bands, RMS, onsets, test signals, min/max decimation; demo, file, microphone, test-signal and two-channel sources with interruption and route handling | A06–A08 phases; [known limitations](docs/release/known-limitations.md) |
 | A01 Generative Art Studio | experience in the app; X-A01 pass | `.autonomy/migration/checks/X-A01.*.json` |
 | A02 Fluid Art Playground | experience in the app; X-A02 pass | `.autonomy/migration/checks/X-A02.*.json` |
 | A03 Fractal Explorer | experience in the app; X-A03 pass | `.autonomy/migration/checks/X-A03.*.json` |
@@ -55,7 +55,7 @@ evidence**: no physical-device test of the unified app has been run.
 | A05 Infinite Geometry | experience in the app; X-A05 pass | `.autonomy/migration/checks/X-A05.*.json` |
 | A06 VisualCore Music Lab | experience in the app; X-A06 pass | `.autonomy/migration/checks/X-A06.*.json` |
 | A07 Audio Odyssey | experience in the app; X-A07 pass | `.autonomy/migration/checks/X-A07.*.json` |
-| A08 Oscilloscope Studio | all seven phases (A08-P00 … A08-P06) pass; registered as a candidate until X-A08 is recorded | `.autonomy/evidence/A08-P00.json` … `A08-P06.json` |
+| A08 Oscilloscope Studio | experience in the app; X-A08 pass | `.autonomy/migration/checks/X-A08.*.json` |
 | A09–A25 | not started | next legacy gate A09-P00 |
 | Shared round features (R02-F02 … F05, F26) | pass | `python3 scripts/migration_ledger.py status` |
 | Games of Rounds 2–12 | planned; none exists in source | [catalog](docs/catalog/experience-catalog.json) |
@@ -63,7 +63,7 @@ evidence**: no physical-device test of the unified app has been run.
 | App Store | no submission and nothing for sale; signing, App Store Connect and agreements are owner actions | [build and archive](docs/release/build-and-archive.md) |
 
 Ledger totals today: the legacy ledger records **66 of 263** gates as passed (F00–F09 and the app phases
-A01-P00 … A08-P06); the unified-app ledger has 1,233 gates, with 7 experience gates, 11 unified-app features,
+A01-P00 … A08-P06); the unified-app ledger has 1,233 gates, with 8 experience gates (X-A01 … X-A08), 11 unified-app features,
 5 shared round features and both governance milestones passed.
 
 ```bash
@@ -161,7 +161,7 @@ python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime 27.2 --kind phon
 
 `project.yml` is the XcodeGen specification of the VisualCore app, its unit and interface tests, and the Showcase.
 Xcode projects and build output are generated locally and are not committed. Debug builds show experiences that are
-still candidates with the launch argument `-vcCandidates`.
+still candidates (none today) with the launch argument `-vcCandidates`.
 
 ## Testing and continuous integration
 

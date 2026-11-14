@@ -1,5 +1,5 @@
 // OSSupport — feature 066 (A08-P06) T-A08-609: helpers of the interface tests of Oscilloscope Studio (A08) inside the
-// one app, modelled on `AOSupport`. A08 is a candidate until X-A08; every launch carries `-vcCandidates`, and the tests
+// one app, modelled on `AOSupport`. A08 was a candidate until X-A08 (integrated 2026-11-14); every launch still carries `-vcCandidates`, and the tests
 // open it directly with `-openExperience`. The controls are found by the identifiers of `ScopeControls`
 // (`port.identifier(name)`, that is `experience.a08.oscilloscope-studio.<name>`). They sit below the canvas in a scroll
 // view of limited height, so a control is scrolled into view before it is used. The choices are menu pickers (their

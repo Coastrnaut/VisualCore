@@ -1294,7 +1294,7 @@ class UnifiedAppTargetTests(unittest.TestCase):
                                     "VisualCoreMusicLabExperience",
                                     # Feature 054 (A07-P01): Audio Odyssey, integrated at X-A07.
                                     "AudioOdysseyExperience",
-                                    # Feature 061 (A08-P01): Oscilloscope Studio, a candidate until X-A08.
+                                    # Feature 061 (A08-P01): Oscilloscope Studio, integrated at X-A08.
                                     "OscilloscopeStudioExperience"])
 
     def test_the_standing_isolation_step_requires_sources(self):

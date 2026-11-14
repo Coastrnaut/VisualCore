@@ -59,16 +59,17 @@ struct ExperienceRegistration: Sendable {
 /// The explicit list of registered experiences.
 enum ExperienceRegistry {
     /// Every registered experience, in catalog order: those whose X gate is pass (X-A01, X-A02 and X-A03, recorded
-    /// 2026-11-13 after UA-F07; X-A04 recorded 2026-11-13 after A04-P06; X-A05 recorded 2026-11-14 after A05-P06; X-A06 recorded 2026-11-14 after A06-P06; X-A07 recorded 2026-11-14 after A07-P06).
+    /// 2026-11-13 after UA-F07; X-A04 recorded 2026-11-13 after A04-P06; X-A05 recorded 2026-11-14 after A05-P06; X-A06 recorded 2026-11-14 after A06-P06; X-A07 recorded 2026-11-14 after A07-P06; X-A08 recorded 2026-11-14 after A08-P06).
     static let all: [ExperienceRegistration] = [generativeArtStudio, fluidArtPlayground, fractalExplorer,
                                                 particleUniverse, infiniteGeometry,
-                                                visualCoreMusicLab, audioOdyssey].compactMap { $0 }
+                                                visualCoreMusicLab, audioOdyssey,
+                                                oscilloscopeStudio].compactMap { $0 }
 
     /// The adopted experiences before their X gate (feature 193, FR-U07-021; clarification 4), in catalog order:
     /// each carries its scenario manifest, so that the verification runner can open it, but it stays unavailable
     /// in the catalog and outside `all`. Debug builds show them with `-vcCandidates`. Recording an experience's X
     /// gate moves its registration from here to `all`.
-    static let candidates: [ExperienceRegistration] = [oscilloscopeStudio].compactMap { $0 }
+    static let candidates: [ExperienceRegistration] = []
 
     /// A01 Generative Art Studio (feature 193, US1).
     private static var generativeArtStudio: ExperienceRegistration? {
@@ -185,7 +186,7 @@ extension ExperienceRegistry {
         #endif
         return registration
     }
-    /// A08 Oscilloscope Studio (feature 061, A08-P01): a candidate until X-A08.
+    /// A08 Oscilloscope Studio (features 060–066, A08-P00…P06): integrated at X-A08 (2026-11-14).
     fileprivate static var oscilloscopeStudio: ExperienceRegistration? {
         guard let id = OscilloscopeStudioExperience.id else { return nil }
         // Schema 2 (feature 062) adds the display mode, schema 3 (feature 064) the freeze and the cursors; the stored
