@@ -25,7 +25,7 @@
 
 ## Phase 4: Polish & evidence
 
-- [ ] T-A06-410 Rendering audio tests on sim-27.2 (`python3 Tools/python/desktop_runbook.py run-check --stage A06-P04 --timeout 600 --name rendering-ios27 -- python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --only-testing VisualCoreAudioTests`)
+- [X] T-A06-410 Rendering audio tests on sim-27.2 (`python3 Tools/python/desktop_runbook.py run-check --stage A06-P04 --timeout 600 --name rendering-ios27 -- python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --only-testing VisualCoreAudioTests`) — Verified 2026-11-14: — Verified 2026-11-14: .autonomy/checks/A06-P04.rendering-ios27.json
 - [ ] T-A06-411 Experiences package on sim-27.2 (`python3 Tools/python/desktop_runbook.py run-check --stage A06-P04 --timeout 600 --name experiences-ios27 -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test`)
 - [ ] T-A06-412 App build and unit (`python3 Tools/python/desktop_runbook.py run-check --stage A06-P04 --timeout 600 --name app-unit -- python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27`)
 - [ ] T-A06-413 Runner iOS 27 (`python3 Tools/python/desktop_runbook.py run-check --stage A06-P04 --timeout 600 --name verify-27 -- python3 scripts/verify_experiences.py --only a06.visualcore-music-lab --runtime 27`)
