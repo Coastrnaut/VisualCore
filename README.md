@@ -56,15 +56,15 @@ evidence**: no physical-device test of the unified app has been run.
 | A06 VisualCore Music Lab | experience in the app; X-A06 pass | `.autonomy/migration/checks/X-A06.*.json` |
 | A07 Audio Odyssey | experience in the app; X-A07 pass | `.autonomy/migration/checks/X-A07.*.json` |
 | A08 Oscilloscope Studio | experience in the app; X-A08 pass | `.autonomy/migration/checks/X-A08.*.json` |
-| A09 Digital Aquarium | in progress: A09-P00 boundary audit pass (contract: 20 rows, 7 gaps, decision go) | [docs/apps/digital-aquarium](docs/apps/digital-aquarium/README.md) |
+| A09 Digital Aquarium | in progress: A09-P00 and A09-P01 pass (habitat model, species catalog with license audit, bounded swimming); registered as a candidate | [docs/apps/digital-aquarium](docs/apps/digital-aquarium/README.md) |
 | A10–A25 | not started | `python3 Tools/python/desktop_runbook.py next` |
 | Shared round features (R02-F02 … F05, F26) | pass | `python3 scripts/migration_ledger.py status` |
 | Games of Rounds 2–12 | planned; none exists in source | [catalog](docs/catalog/experience-catalog.json) |
 | Physical-device testing | none run; waits for `ImplementationLock-100` | [support matrix](docs/release/support-matrix.md) |
 | App Store | no submission and nothing for sale; signing, App Store Connect and agreements are owner actions | [build and archive](docs/release/build-and-archive.md) |
 
-Ledger totals today: the legacy ledger records **67 of 263** gates as passed (F00–F09 and the app phases
-A01-P00 … A09-P00); the unified-app ledger has 1,233 gates, with 8 experience gates (X-A01 … X-A08), 11 unified-app features,
+Ledger totals today: the legacy ledger records **68 of 263** gates as passed (F00–F09 and the app phases
+A01-P00 … A09-P01); the unified-app ledger has 1,233 gates, with 8 experience gates (X-A01 … X-A08), 11 unified-app features,
 5 shared round features and both governance milestones passed.
 
 ```bash
@@ -162,7 +162,7 @@ python3 scripts/xcodebuild_app.py --scheme VisualCore --runtime 27.2 --kind phon
 
 `project.yml` is the XcodeGen specification of the VisualCore app, its unit and interface tests, and the Showcase.
 Xcode projects and build output are generated locally and are not committed. Debug builds show experiences that are
-still candidates (none today) with the launch argument `-vcCandidates`.
+still candidates (A09 today) with the launch argument `-vcCandidates`.
 
 ## Testing and continuous integration
 
@@ -198,7 +198,7 @@ team ids, secrets) over the commits of every push and pull request; it is never 
 | `Apps/GenerativeArtStudio/`, `Apps/FluidArtPlayground/`, `Apps/FractalExplorer/` | resources kept from the former standalone apps; their sources now live in `Packages/ExperiencesCreative` |
 | `Packages/VisualCore/` | pure Swift modules without GPU or UIKit code; tested on the macOS host |
 | `Packages/VisualCoreRendering/` | iOS modules over ANGLE: render host, experience host, resources, shaders, effects, UI, audio, automation |
-| `Packages/ExperiencesCreative/` | the creative experiences, one folder each with `Core`, `CoreTests`, `Experience`, `ExperienceTests` and a `scenario-manifest.json`: `GenerativeArtStudio`, `FluidArtPlayground`, `FractalExplorer`, `ParticleUniverse`, `InfiniteGeometry`, `VisualCoreMusicLab`, `AudioOdyssey`, `OscilloscopeStudio` |
+| `Packages/ExperiencesCreative/` | the creative experiences, one folder each with `Core`, `CoreTests`, `Experience`, `ExperienceTests` and a `scenario-manifest.json`: `GenerativeArtStudio`, `FluidArtPlayground`, `FractalExplorer`, `ParticleUniverse`, `InfiniteGeometry`, `VisualCoreMusicLab`, `AudioOdyssey`, `OscilloscopeStudio`, `DigitalAquarium` (candidate) |
 | `Packages/ExperiencesRound02` … `Round04` | **planned** packages for the games (ADR-0009, D-06); none exists yet |
 | `Showcase/` | developer Showcase app; not an App Store product |
 | `Harnesses/` | non-shipping test hosts: `InteractiveDemo/`, `SecondConsumer/` (Lumen Garden, a small sample game), `ProjectMReference/` |
