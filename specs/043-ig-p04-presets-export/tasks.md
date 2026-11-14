@@ -14,7 +14,7 @@
 
 ## Phase 3: User Story 1 — save and reopen exactly (P1) 🎯
 
-- [ ] T-A05-403 [P] [US1] Write `Packages/ExperiencesCreative/InfiniteGeometry/Experience/GeometryLibrary.swift` (ParticleLibrary pattern: `composition-<uuid>.json` = {document, digest, format: 1, id, saved}, sorted keys; unique names with numeric suffix; unreadable and newer counted, never deleted or rewritten; atomic writes; quota refusal keeps files; last error message) and `Packages/ExperiencesCreative/InfiniteGeometry/ExperienceTests/GeometryLibraryTests.swift` (save/list/open/rename/delete; duplicate → "Name 2"; empty → "Untitled"; quota of 64 files refused with files intact; damaged and newer files counted and refused; reload after a new library instance sees every entry) (FR-A05-401, 403–405)
+- [X] T-A05-403 [P] [US1] Write `Packages/ExperiencesCreative/InfiniteGeometry/Experience/GeometryLibrary.swift` (ParticleLibrary pattern: `composition-<uuid>.json` = {document, digest, format: 1, id, saved}, sorted keys; unique names with numeric suffix; unreadable and newer counted, never deleted or rewritten; atomic writes; quota refusal keeps files; last error message) and `Packages/ExperiencesCreative/InfiniteGeometry/ExperienceTests/GeometryLibraryTests.swift` (save/list/open/rename/delete; duplicate → "Name 2"; empty → "Untitled"; quota of 64 files refused with files intact; damaged and newer files counted and refused; reload after a new library instance sees every entry) (FR-A05-401, 403–405) — Verified 2026-11-13: 2026-11-13 .autonomy/checks/A05-P04.experiences-ios27.json and .experiences-ios26.json (exit 0); GeometryLibraryTests 8/8
 
 ## Phase 4: User Story 2 — still export (P1)
 
