@@ -114,6 +114,11 @@ public struct ScopeCore: ExperienceCore, Equatable {
 
     /// Schema 3; the step from schema 1 adds `"display": 0` (the waveform view); the step from schema 2 adds not
     /// frozen and the cursors hidden at A 0.25, B 0.75, frequency 0.5 and level 0.5.
+    /// Three quality tiers since feature 065 (A08-P05; FR-A08-521): the host's tier selects the `ScopeQuality` level
+    /// (drawn columns 1, ½, ¼; spectrum analysis every 1, 2, 4 frames); the tier never reaches the state, so every
+    /// tier keeps the digest.
+    public static var qualityTiers: Int { 3 }
+
     public static var migrations: MigrationChain {
         MigrationChain(currentVersion: 3, steps: [
             1: { payload in

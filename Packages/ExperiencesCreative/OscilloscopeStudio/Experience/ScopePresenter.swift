@@ -7,8 +7,9 @@
 //     describes the core after each accepted action, so a change takes effect at once). The test signal is a
 //     `TestSignalAudioSource` of `testSignal(for:)` (the state's waveform and frequency, amplitude 0.5, the sweep from
 //     100 Hz to 10 kHz over 2 s, two channels with the right at 1.5 × the left frequency) and a chosen file a
-//     `StereoFileAudioSource`; both write into a `StereoSampleBuffer` of 16,384 frames. The microphone is the shared
-//     mono `MicrophoneAudioSource` writing into a `SampleRingBuffer` of 16,384 samples and is read as one channel.
+//     `StereoFileAudioSource`; both write into a `StereoSampleBuffer` of 16,384 frames. Since A08-P05 the microphone
+//     is the two-channel `StereoMicrophoneAudioSource` writing into the same kind of buffer and reporting the route's
+//     channel count (1 or 2), so XY works with two-channel routes and falls back to the mark on one-channel routes.
 //     Every start gets a fresh buffer and resets the acquisition, so no sample of the previous source (or of the time
 //     before a pause) is ever drawn; at most one source runs. A change of source, waveform or frequency restarts it
 //     (the sweep ignores the frequency, so a frequency change leaves a running sweep alone).
@@ -50,8 +51,7 @@
 //
 // Feature 063 (A08-P03) T-A08-303 (FR-A08-301–305, FR-A08-320; story 1; clarifications 2–5; edge cases):
 //   - Spectrum view (`state.display == .spectrum`): every drawn frame (and every description) reads the newest 4,096
-//     frames of the left (or only) channel from the running source's buffer (`StereoSampleBuffer.latestFrames` or the
-//     microphone ring's `latest`), with the buffer's total as the written-frame count; fewer frames are zero-padded by
+//     frames of the left (or only) channel from the running source's buffer (`StereoSampleBuffer.latestFrames`), with the buffer's total as the written-frame count; fewer frames are zero-padded by
 //     the analyser and the readout says "filling". ONE `SpectrumAnalyzer(size: 4096)` is created on first use and kept.
 //     The spectrum is not triggered and not scaled by the display gain. `SpectrumReadout.make` gives the peak readout
 //     ("peak 1,000 Hz at −6.0 dBFS, relative to full scale") or the reason none is shown ("no signal", "clipping,
@@ -94,6 +94,18 @@
 //     `preset.apply <index>` for a built-in and, for a user preset (which the core cannot see), its settings as the
 //     individual actions `signal.waveform`, `signal.frequency`, `gain.select`, `timebase.select`, `trigger.level`,
 //     `trigger.slope`, `trigger.mode` and `display.select`.
+//
+// Feature 065 (A08-P05) T-A08-505 (FR-A08-511, FR-A08-520, FR-A08-521; clarifications 1, 3, 4):
+//   - Microphone: the two-channel `StereoMicrophoneAudioSource` (see the sources above); its channel count follows the
+//     route each frame, so XY and the mark follow a route change without a new choice.
+//   - Quality: each frame the level is `ScopeQuality.level(tier:forced:)` of the host's tier and `forceTierForTesting`;
+//     the waveform and spectrum use `columns(forPixelWidth:)` of their plot width (1, ½, ¼ of the pixel columns) and
+//     the spectrum is analysed only on frames where `shouldAnalyse(frame:)` holds (every 1, 2, 4 frames; the last
+//     readout is kept in between). The level never reaches the state, so the digest is the same at every level.
+//   - Announcements: after each frame the view, freeze, trigger, clipping and channel count are compared with the
+//     previous frame's; changes are offered to a `ScopeAnnouncer` (one per 1.5 s of the frame clock, held text
+//     released by `tick`) and what it releases goes to the injected `AnnouncementSink` only while
+//     `voiceOverRunning()` is true. The first frame after `setup` sets the reference and announces nothing.
 import Foundation
 import SwiftUI
 import UIKit
@@ -171,13 +183,13 @@ struct ScopeSourceFactory {
     /// The file source for a picked URL; throws for a file the system cannot decode.
     var file: @MainActor (URL) throws -> any StereoAudioSource
     /// The microphone source behind a permission.
-    var microphone: @MainActor (any MicrophonePermission) -> any AudioSource
+    var microphone: @MainActor (any MicrophonePermission) -> any StereoAudioSource
 
     /// The VisualCoreAudio sources.
     static var system: ScopeSourceFactory {
         ScopeSourceFactory(testSignal: { TestSignalAudioSource(signal: $0) },
                            file: { try StereoFileAudioSource(url: $0) },
-                           microphone: { MicrophoneAudioSource(permission: $0) })
+                           microphone: { StereoMicrophoneAudioSource(permission: $0) })
     }
 }
 
@@ -194,8 +206,6 @@ final class ScopePresenter: ExperiencePresenter {
 
     /// The capacity of the two-channel buffer in frames (a window plus one window of lookback always fits).
     nonisolated static let bufferFrames = 16_384
-    /// The capacity of the microphone's ring buffer in samples.
-    nonisolated static let ringCapacity = 16_384
     /// The amplitude of the test signal (half of full scale).
     nonisolated static let testAmplitude = 0.5
     /// The right channel's frequency ratio of the test signal (2 : 3, the Lissajous figure of the XY view).
@@ -287,14 +297,10 @@ final class ScopePresenter: ExperiencePresenter {
     /// The shell's lifecycle state, set by `OscilloscopeStudioExperience.make`; nil means active.
     var lifecycle: (@MainActor () -> ExperienceLifecycleState?)?
 
-    /// The two-channel buffer of the running test-signal or file source (a fresh one per start).
+    /// The two-channel buffer of the running source (a fresh one per start).
     private(set) var stereoBuffer = StereoSampleBuffer(capacityFrames: ScopePresenter.bufferFrames)
-    /// The ring buffer of the running microphone (a fresh one per start).
-    private(set) var ring = SampleRingBuffer(capacity: ScopePresenter.ringCapacity)
-    /// The running test-signal or file source, if any.
+    /// The running source (test signal, file or microphone), if any.
     private(set) var activeStereo: (any StereoAudioSource)?
-    /// The running microphone source, if any.
-    private(set) var activeMono: (any AudioSource)?
     /// What the running source was started for.
     private(set) var activeKey: SourceKey?
     /// A key whose start failed; not retried until the selection changes.
@@ -387,9 +393,42 @@ final class ScopePresenter: ExperiencePresenter {
     private var lastMagnitudes: [Float] = []
     private var lastSpectrumRate = TestSignal.defaultSampleRate
 
+    /// Where announcements go (feature 065; the system's VoiceOver announcements by default).
+    let announcementSink: any AnnouncementSink
+    /// Whether VoiceOver is running (feature 065; the system's answer by default).
+    let voiceOverRunning: @MainActor () -> Bool
+    /// The rate limit of the announcements (feature 065), reset in `setup`.
+    private(set) var announcer = ScopeAnnouncer(voiceOverRunning: true)
+    /// The frame clock of the announcements: the sum of the frame deltas since `setup`, in seconds.
+    private(set) var announcementClock = 0.0
+    /// The view, freeze, trigger, clipping and channel state last seen by the announcements; nil until the first frame.
+    private var announcedState: AnnouncedState?
+    /// Every text sent to the sink (tests read it; bounded to the newest 32).
+    private(set) var sentAnnouncements: [String] = []
+    /// A tier that overrides the host's in tests (feature 065); nil in the app.
+    var forceTierForTesting: Int?
+    /// The quality level of the last frame (0…2).
+    private(set) var lastQualityLevel = 0
+    /// The frames drawn since `setup` (the spectrum's analysis cadence).
+    private(set) var drawnFrames = 0
+    /// The spectrum analyses made by drawn frames since `setup`.
+    private(set) var spectrumAnalyses = 0
+
+    /// What the announcements compare from frame to frame.
+    struct AnnouncedState: Equatable {
+        var display: ScopeDisplay
+        var frozen: Bool
+        var triggered: Bool
+        var clipping: Bool
+        var channels: Int
+    }
+
     init(experienceID: ExperienceID, permission: any MicrophonePermission, factory: ScopeSourceFactory = .system,
-         storage: ExperienceStorage? = nil) {
+         storage: ExperienceStorage? = nil, announcementSink: (any AnnouncementSink)? = nil,
+         voiceOverRunning: (@MainActor () -> Bool)? = nil) {
         self.experienceID = experienceID
+        self.announcementSink = announcementSink ?? SystemAnnouncementSink()
+        self.voiceOverRunning = voiceOverRunning ?? { UIAccessibility.isVoiceOverRunning }
         self.permission = permission
         self.factory = factory
         presets = storage.map { ScopePresetStore(storage: $0) }
@@ -411,12 +450,12 @@ final class ScopePresenter: ExperiencePresenter {
     }
 
     /// The running source's sample rate (48 kHz when none runs).
-    var activeSampleRate: Double { activeStereo?.sampleRate ?? activeMono?.sampleRate ?? TestSignal.defaultSampleRate }
+    var activeSampleRate: Double { activeStereo?.sampleRate ?? TestSignal.defaultSampleRate }
 
-    /// The running source's channel count: the stereo source's (1 or 2), 1 for the microphone, 0 when none runs.
+    /// The running source's channel count (1 or 2; the microphone's follows its route), 0 when none runs.
     var activeChannelCount: Int {
-        if let activeStereo { return min(max(activeStereo.channelCount, 1), 2) }
-        return activeMono == nil ? 0 : 1
+        guard let activeStereo else { return 0 }
+        return min(max(activeStereo.channelCount, 1), 2)
     }
 
     /// The test signal of `state`: its waveform and frequency (the sweep from 100 Hz to 10 kHz over 2 s), amplitude
@@ -441,6 +480,11 @@ final class ScopePresenter: ExperiencePresenter {
     func setup(_ context: RenderContext) throws {
         primitives = try PrimitiveRenderer(registry: context.resources)
         isLive = true
+        announcer.reset()
+        announcementClock = 0
+        announcedState = nil
+        drawnFrames = 0
+        spectrumAnalyses = 0
         let center = NotificationCenter.default
         observers = [
             center.addObserver(forName: UIApplication.didEnterBackgroundNotification, object: nil, queue: .main) { [weak self] _ in
@@ -466,7 +510,7 @@ final class ScopePresenter: ExperiencePresenter {
         checkLifecycle()
         sync(core)
         if mirror.message == nil {
-            if case .failed(let reason)? = activeStereo?.state ?? activeMono?.state {
+            if case .failed(let reason)? = activeStereo?.state {
                 setMessage("The signal stopped: \(reason)", settings: false, offer: core.state.source != .testSignal)
             }
         }
@@ -475,13 +519,60 @@ final class ScopePresenter: ExperiencePresenter {
         lastLiveWindow = live
         let window = shownWindow(live: live, state: core.state)
         lastWindow = window
-        if core.state.display == .spectrum, !spectrumHeld(core.state) { analyseSpectrum() }
+        lastQualityLevel = ScopeQuality.level(tier: tier, forced: forceTierForTesting)
+        if core.state.display == .spectrum, !spectrumHeld(core.state),
+           quality.shouldAnalyse(frame: drawnFrames) || lastMagnitudes.isEmpty {
+            analyseSpectrum()
+            spectrumAnalyses += 1
+        }
+        drawnFrames += 1
         updateStatus(core.state)
         let width = Double(max(1, context.pixelWidth)), height = Double(max(1, context.pixelHeight))
         layOut(width: width, height: height, window: window, state: core.state)
         updateCursorReadout(core.state)
         if primitives == nil { primitives = try PrimitiveRenderer(registry: context.resources) }
         try primitives?.draw(root, camera: Camera2D(), metrics: ViewMetrics(size: Vec2(width, height), scale: 1))
+        updateAnnouncements(core.state, window: window, frame: frame)
+    }
+
+    /// The quality of the last frame's level.
+    var quality: ScopeQuality { ScopeQuality.level(lastQualityLevel) }
+
+    // MARK: Announcements (feature 065)
+
+    /// Advances the frame clock, offers what changed since the last frame to the announcer, releases held text when
+    /// due, and sends what it releases to the sink while VoiceOver runs (see the file header).
+    private func updateAnnouncements(_ state: ScopeState, window: SignalWindow, frame: FrameInfo) {
+        if frame.delta.isFinite, frame.delta > 0 { announcementClock += frame.delta }
+        announcer.voiceOverRunning = voiceOverRunning()
+        let current = AnnouncedState(display: state.display, frozen: state.frozen, triggered: window.triggered,
+                                     clipping: window.clipped, channels: activeChannelCount)
+        var texts: [String] = []
+        if let previous = announcedState {
+            if previous.display != current.display { texts.append(ScopeAnnouncer.viewChanged(current.display)) }
+            if previous.frozen != current.frozen { texts.append(ScopeAnnouncer.freeze(current.frozen)) }
+            if previous.channels != current.channels, current.channels > 0, previous.channels > 0 {
+                texts.append(ScopeAnnouncer.channels(current.channels))
+            }
+            if !current.frozen, current.display != .spectrum, previous.triggered != current.triggered {
+                texts.append(ScopeAnnouncer.trigger(locked: current.triggered))
+            }
+            if previous.clipping != current.clipping { texts.append(ScopeAnnouncer.clipping(current.clipping)) }
+        }
+        announcedState = current
+        if !texts.isEmpty, announcer.announce(texts.joined(separator: ". "), at: announcementClock),
+           let text = announcer.lastAnnounced {
+            send(text)
+        }
+        if let text = announcer.tick(at: announcementClock) { send(text) }
+    }
+
+    /// Sends `text` to the announcement sink while VoiceOver runs.
+    private func send(_ text: String) {
+        guard voiceOverRunning() else { return }
+        announcementSink.announce(text)
+        sentAnnouncements.append(text)
+        if sentAnnouncements.count > 32 { sentAnnouncements.removeFirst(sentAnnouncements.count - 32) }
     }
 
     func teardown(_ context: RenderContext) {
@@ -502,9 +593,6 @@ final class ScopePresenter: ExperiencePresenter {
         if let activeStereo {
             return acquisition.window(from: stereoBuffer, channelCount: activeStereo.channelCount,
                                       sampleRate: activeStereo.sampleRate, state: state)
-        }
-        if let activeMono {
-            return acquisition.window(from: ring, sampleRate: activeMono.sampleRate, state: state)
         }
         return .empty(sampleRate: TestSignal.defaultSampleRate, channelCount: 1,
                       waiting: ScopeSettings.index(of: state.triggerMode) == 1, shortened: false)
@@ -555,7 +643,7 @@ final class ScopePresenter: ExperiencePresenter {
                 : window.sampleCount
             let share = span > 0 ? min(Double(window.sampleCount) / Double(span), 1) : 1
             let rect = (x: left, y: bottom, width: plotWidth * share, height: plotHeight)
-            let columns = min(max(Int(rect.width.rounded(.down)), 1), Self.maxColumns)
+            let columns = min(quality.columns(forPixelWidth: rect.width.rounded(.down)), Self.maxColumns)
             let g32 = Float(gain)
             for channel in 0..<2 {
                 let node = traceNodes[channel]
@@ -875,10 +963,6 @@ final class ScopePresenter: ExperiencePresenter {
             let n = stereoBuffer.latestFrames(SpectrumReadout.frameSize, left: &spectrumLeft, right: &spectrumRight)
             samples = Array(spectrumLeft[0..<n])
             written = stereoBuffer.totalFrames
-        } else if activeMono != nil {
-            let n = ring.latest(SpectrumReadout.frameSize, into: &spectrumLeft)
-            samples = Array(spectrumLeft[0..<n])
-            written = ring.totalWritten
         } else {
             lastMagnitudes = []
             lastReadout = nil
@@ -901,7 +985,7 @@ final class ScopePresenter: ExperiencePresenter {
     /// Places the spectrum grid (decade and plot-edge verticals, level-mark horizontals) and the spectrum curve
     /// (one polyline, the strongest bin per pixel column) inside `rect` (world pixels, y up).
     private func layOutSpectrum(rect: (x: Double, y: Double, width: Double, height: Double)) {
-        let columns = min(max(Int(rect.width.rounded(.down)), 1), SpectrumView.maximumWidth)
+        let columns = min(quality.columns(forPixelWidth: rect.width.rounded(.down)), SpectrumView.maximumWidth)
         var lines: [(Vec2, Vec2, Vec4)] = []
         lines.append((Vec2(rect.x, rect.y), Vec2(rect.x, rect.y + rect.height), Self.axisColor))
         lines.append((Vec2(rect.x + rect.width, rect.y), Vec2(rect.x + rect.width, rect.y + rect.height),
@@ -1021,10 +1105,10 @@ final class ScopePresenter: ExperiencePresenter {
                 activeStereo = pickedFile.source
             case .microphone:
                 let source = factory.microphone(permission)
-                let buffer = SampleRingBuffer(capacity: Self.ringCapacity)
+                let buffer = StereoSampleBuffer(capacityFrames: Self.bufferFrames)
                 try source.start(into: buffer)
-                ring = buffer
-                activeMono = source
+                stereoBuffer = buffer
+                activeStereo = source
             }
             activeKey = key
             startCount += 1
@@ -1041,9 +1125,7 @@ final class ScopePresenter: ExperiencePresenter {
     /// Stops the running source, if any (the microphone is released).
     private func stopActive() {
         activeStereo?.stop()
-        activeMono?.stop()
         activeStereo = nil
-        activeMono = nil
         activeKey = nil
     }
 

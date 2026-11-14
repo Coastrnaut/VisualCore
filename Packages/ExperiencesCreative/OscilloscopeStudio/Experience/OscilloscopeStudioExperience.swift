@@ -28,13 +28,17 @@ public enum OscilloscopeStudioExperience {
 
     /// The experience with its presenter exposed (tests) and an injected permission and source factory (nil
     /// permission: the system's); the presenter gets the shell's port and lifecycle state. With `storage` the presenter
-    /// keeps the user presets there; without it (nil, some tests) only the built-in presets are listed.
+    /// keeps the user presets there; without it (nil, some tests) only the built-in presets are listed. Tests inject an
+    /// announcement sink and the VoiceOver state (feature 065); nil means the system's.
     @MainActor
     static func make(id: ExperienceID, permission: (any MicrophonePermission)? = nil,
                      factory: ScopeSourceFactory = .system, storage: ExperienceStorage? = nil,
-                     reduceMotion: Bool = false, reduceFlashing: Bool = false) -> ExperienceShell<ScopePresenter> {
+                     reduceMotion: Bool = false, reduceFlashing: Bool = false,
+                     announcementSink: (any AnnouncementSink)? = nil,
+                     voiceOverRunning: (@MainActor () -> Bool)? = nil) -> ExperienceShell<ScopePresenter> {
         let presenter = ScopePresenter(experienceID: id, permission: permission ?? SystemMicrophonePermission(),
-                                       factory: factory, storage: storage)
+                                       factory: factory, storage: storage, announcementSink: announcementSink,
+                                       voiceOverRunning: voiceOverRunning)
         let shell = ExperienceShell(id: id, presenter: presenter)
         presenter.port = shell.port
         presenter.lifecycle = { [weak shell] in shell?.state }

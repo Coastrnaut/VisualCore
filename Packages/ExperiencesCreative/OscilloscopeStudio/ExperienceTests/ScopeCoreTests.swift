@@ -49,7 +49,7 @@ final class ScopeCoreTests: XCTestCase {
                                                              [0...1], [0...1], [0...2], [0...1], [0...1], [0...1],
                                                              [0...1], [0...1], [-1...1], [0...2]])
         XCTAssertEqual(ScopeCore.migrations.currentVersion, 3)
-        XCTAssertEqual(ScopeCore.qualityTiers, 1)
+        XCTAssertEqual(ScopeCore.qualityTiers, 3, "three quality levels since A08-P05")
     }
 
     func testConformancePassesOverFourSeeds() async {

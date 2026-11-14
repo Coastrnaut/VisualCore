@@ -22,6 +22,7 @@ import VisualCoreExperienceHost
 import VisualCoreMath
 import VisualCoreRendering
 import VisualCoreScenes
+import VisualCoreUI
 
 /// A microphone permission with a fixed answer that never asks the system.
 @MainActor
@@ -40,13 +41,32 @@ final class ScopeFixedPermission: MicrophonePermission {
     }
 }
 
-/// A silent mono source double standing in for the microphone.
+/// An announcement sink that records what it is given (VoiceOver is never driven by tests).
 @MainActor
-final class ScopeQuietMicrophone: AudioSource {
+final class ScopeRecordingSink: AnnouncementSink {
+    /// Every announced text, oldest first.
+    private(set) var texts: [String] = []
+    func announce(_ text: String) { texts.append(text) }
+}
+
+/// An announcement sink that drops everything (the default of `ScopeTest.open`).
+@MainActor
+final class ScopeSilentSink: AnnouncementSink {
+    func announce(_ text: String) {}
+}
+
+/// A silent microphone double (the two-channel microphone source of A08-P05): its route's channel count is set by a
+/// test (1 by default), as a route change would set it.
+@MainActor
+final class ScopeQuietMicrophone: StereoAudioSource {
     var sampleRate: Double { 48_000 }
+    /// The channel count of the simulated route (1 or 2).
+    var channelCount: Int
     private(set) var state: AudioSourceState = .idle
 
-    func start(into buffer: SampleRingBuffer) throws { state = .running }
+    init(channelCount: Int = 1) { self.channelCount = channelCount }
+
+    func start(into buffer: StereoSampleBuffer) throws { state = .running }
     func stop() { state = .idle }
 }
 
@@ -163,14 +183,17 @@ enum ScopeTest {
     /// points and draws one frame.
     static func open(_ session: ExperienceSession, permission: MicrophonePermissionState = .granted,
                      factory: ScopeSourceFactory? = nil, storage: ExperienceStorage? = nil,
-                     size: CGSize = CGSize(width: 160, height: 120)) async throws -> ExperienceShell<ScopePresenter> {
+                     size: CGSize = CGSize(width: 160, height: 120),
+                     announcementSink: (any AnnouncementSink)? = nil,
+                     voiceOverRunning: (@MainActor () -> Bool)? = nil) async throws -> ExperienceShell<ScopePresenter> {
         let id = self.id
         let sources = factory ?? self.sources
         let access = ScopeFixedPermission(permission)
         var made: ExperienceShell<ScopePresenter>?
         let request = ExperienceOpenRequest(id: id, seed: 7, snapshot: nil, refusedSnapshotFails: false) {
             let shell = OscilloscopeStudioExperience.make(id: id, permission: access, factory: sources,
-                                                          storage: storage)
+                                                          storage: storage, announcementSink: announcementSink ?? ScopeSilentSink(),
+                                                          voiceOverRunning: voiceOverRunning ?? { false })
             made = shell
             return shell
         }

@@ -254,7 +254,6 @@ final class ScopeSessionTests: XCTestCase {
         XCTAssertEqual(result, .rejected(.rule(code: ScopeRule.permissionDenied)))
         XCTAssertEqual(try core(shell).state.source, .testSignal, "nothing was sent")
         XCTAssertEqual(presenter.activeKey, key, "the previous source keeps running")
-        XCTAssertNil(presenter.activeMono)
         XCTAssertEqual(presenter.mirror.message, ScopePresenter.deniedMessage)
         XCTAssertTrue(presenter.mirror.showsSettingsLink)
         XCTAssertTrue(presenter.mirror.offersTestSignal)
@@ -268,7 +267,7 @@ final class ScopeSessionTests: XCTestCase {
         session.close()
     }
 
-    func testAGrantedMicrophoneIsReadAsOneChannel() async throws {
+    func testAGrantedMicrophoneOnAOneChannelRouteIsReadAsOneChannel() async throws {
         let session = ExperienceSession()
         let shell = try await ScopeTest.open(session, permission: .granted)
         let presenter = shell.presenter
@@ -276,9 +275,8 @@ final class ScopeSessionTests: XCTestCase {
         XCTAssertEqual(result, .accepted)
         XCTAssertEqual(try core(shell).state.source, .microphone)
         XCTAssertEqual(presenter.activeKey, .microphone)
-        XCTAssertNotNil(presenter.activeMono)
-        XCTAssertNil(presenter.activeStereo)
-        XCTAssertEqual(presenter.activeChannelCount, 1)
+        XCTAssertTrue(presenter.activeStereo is ScopeQuietMicrophone, "the two-channel microphone source runs")
+        XCTAssertEqual(presenter.activeChannelCount, 1, "a one-channel route")
         try ScopeTest.frames(session, 1)
         XCTAssertEqual(try XCTUnwrap(presenter.lastWindow).channelCount, 1)
         XCTAssertEqual(presenter.lastPointCounts[1], 0, "no second trace for a mono source")
@@ -286,7 +284,42 @@ final class ScopeSessionTests: XCTestCase {
         XCTAssertTrue(shell.accessibilitySummary.hasPrefix("Oscilloscope Studio: microphone, 1 channel, "),
                       shell.accessibilitySummary)
         session.close()
-        XCTAssertNil(presenter.activeMono, "the microphone is released with the scene")
+        XCTAssertNil(presenter.activeStereo, "the microphone is released with the scene")
+    }
+
+    /// T-A08-505 (FR-A08-511; story 2 AC1, AC2; edge case "route changes while running"): the scope's microphone is the
+    /// two-channel source; a two-channel route draws XY, a route change to one channel falls back to the waveform
+    /// with the mark, and back to two channels shows XY again without a new choice.
+    func testATwoChannelMicrophoneRouteDrawsXYAndARouteChangeFallsBackWithTheMark() async throws {
+        let microphone = ScopeQuietMicrophone(channelCount: 2)
+        let factory = ScopeSourceFactory(testSignal: { TestSignalAudioSource(signal: $0) },
+                                         file: { _ in throw AudioSourceError.undecodable("test double") },
+                                         microphone: { _ in microphone })
+        let session = ExperienceSession()
+        let shell = try await ScopeTest.open(session, permission: .granted, factory: factory)
+        let presenter = shell.presenter
+        XCTAssertTrue(shell.handle(control: "display.select", values: [1]).isAccepted)
+        let picked = await presenter.pickSource(.microphone)
+        XCTAssertEqual(picked, .accepted)
+        try ScopeTest.frames(session, 1)
+        XCTAssertTrue(presenter.activeStereo === microphone)
+        XCTAssertEqual(presenter.activeChannelCount, 2)
+        XCTAssertEqual(try XCTUnwrap(presenter.lastWindow).channelCount, 2)
+        XCTAssertNil(presenter.mirror.displayNote, "two channels: no mark")
+        XCTAssertTrue(shell.accessibilitySummary.contains("microphone, 2 channels, "), shell.accessibilitySummary)
+
+        microphone.channelCount = 1                                 // headset out: a one-channel route
+        try ScopeTest.frames(session, 1)
+        XCTAssertEqual(presenter.activeChannelCount, 1)
+        XCTAssertEqual(try XCTUnwrap(presenter.lastWindow).channelCount, 1)
+        XCTAssertFalse(presenter.lastShowsXY)
+        XCTAssertEqual(presenter.mirror.displayNote, ScopePresenter.xyNeedsStereo)
+        XCTAssertEqual(try core(shell).state.display, .xy, "the chosen view stays XY")
+
+        microphone.channelCount = 2                                 // back to two channels
+        try ScopeTest.frames(session, 1)
+        XCTAssertNil(presenter.mirror.displayNote)
+        session.close()
     }
 
     func testAnUndecodableFileKeepsThePreviousSource() async throws {
