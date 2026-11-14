@@ -22,7 +22,7 @@
 
 ## Phase 4: User Story 3 — the experience in the one app (P2)
 
-- [ ] T-A05-107 [US3] Add the four targets and product `InfiniteGeometryExperience` to `Packages/ExperiencesCreative/Package.swift`; register `a05.infinite-geometry` in `Catalog/registrations.json` (capabilities, quality tiers, palette, manifest path) and as a candidate in `Apps/VisualCore/App/ExperienceRegistry.swift`; link the product in `project.yml`; rebuild the catalog (`scripts/build_catalog.py`)
+- [ ] T-A05-107 [US3] Add the four targets and product `InfiniteGeometryExperience` to `Packages/ExperiencesCreative/Package.swift` (the Core and CoreTests targets depend on VisualCoreMath, VisualCoreScenes — for `Mesh` and the R02-F05 compiler —, VisualCoreSimulation and VisualCoreParameters; the Experience targets add VisualCoreExperience, VisualCoreRendering, VisualCoreUI and VisualCoreExperienceHost); register `a05.infinite-geometry` in `Catalog/registrations.json` (capabilities, quality tiers, palette, manifest path) and as a candidate in `Apps/VisualCore/App/ExperienceRegistry.swift`; link the product in `project.yml`; rebuild the catalog (`scripts/build_catalog.py`)
 - [ ] T-A05-108 [US3] Write `Packages/ExperiencesCreative/InfiniteGeometry/Experience/Adapter/GeometryManifest.swift` (nine standard scenarios, DEBUG/automation only) and `Packages/ExperiencesCreative/InfiniteGeometry/ExperienceTests/GeometryManifestTests.swift` (the committed `Packages/ExperiencesCreative/InfiniteGeometry/scenario-manifest.json` equals the Swift manifest; regenerate with `UPDATE_SCENARIO_MANIFEST=1`)
 
 ## Phase 5: Polish and evidence (one task per quickstart command)
@@ -43,7 +43,7 @@
 ## Dependencies
 
 T-A05-101 → T-A05-102 → T-A05-103 → T-A05-104 → T-A05-105/106; T-A05-107/108 with 104–106 (the package must declare all
-four targets at once); Polish last.
+four targets at once, so the package edit of T-A05-107 is made before the first build of 103); Polish last.
 
 ## Parallel examples
 

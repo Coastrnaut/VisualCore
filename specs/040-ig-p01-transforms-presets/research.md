@@ -21,3 +21,8 @@
   culling alone draws them correctly in Phase 01; depth arrives in Phase 03.
 - **D4 Composition cache:** rebuilt only when the state digest changes, outside the render callback's hot path.
 - **D5 Candidate:** registered under `ExperienceRegistry.candidates`, hidden from people until X-A05.
+
+## 2. Analysis record (`/speckit-analyze`, 2026-11-13)
+
+- I1 (HIGH) fixed: the Core target depends on VisualCoreScenes (Mesh, R02-F05), stated in T-A05-107; the package edit
+  precedes the first build. Re-run: 0 critical, 0 high.
