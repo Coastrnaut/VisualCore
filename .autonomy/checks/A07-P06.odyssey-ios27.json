@@ -1,0 +1,24 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/ExperiencesCreative",
+    "--scheme",
+    "ExperiencesCreative-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test",
+  "elapsed_seconds": 175.649,
+  "exit_code": 0,
+  "finished": "2026-11-14T15:13:06+00:00",
+  "log": ".autonomy/logs/A07-P06.odyssey-ios27.log",
+  "log_sha256": "021b3245a46d540ff97e3813a1497fb8fe60b8e895c3ea14a8bc06cbc4ce6d62",
+  "name": "odyssey-ios27",
+  "stage": "A07-P06",
+  "started": "2026-11-14T15:10:10+00:00",
+  "timed_out": false
+}
