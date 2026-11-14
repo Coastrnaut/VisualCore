@@ -494,13 +494,32 @@
       "id": "M15",
       "capability": "Audio interruption, route change and media-services reset recovery",
       "source": "v0.1 feature 04; manual section 6 algorithm 1",
-      "status": "upstream gap",
-      "evidence": [],
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreAudio/AudioSessionEvent.swift",
+          "symbol": "AudioSessionEvent",
+          "product": "VisualCoreAudio",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreAudio/AudioSessionEvent.swift",
+          "symbol": "AudioSessionEventMonitor",
+          "product": "VisualCoreAudio",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreAudio/AudioSource.swift",
+          "symbol": "ResumableAudioSource",
+          "product": "VisualCoreAudio",
+          "public": true
+        }
+      ],
       "example": {
-        "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceSession.swift",
-        "symbol": "ExperienceSession"
+        "file": "Packages/ExperiencesCreative/VisualCoreMusicLab/Experience/MusicLabPresenter.swift",
+        "symbol": "MusicLabPresenter"
       },
-      "notes": "ExperienceSession handles scene phase and memory, not audio session events. G-INTERRUPTION: an interruption/route/reset state machine in VisualCoreAudio driven by AVAudioSession notifications, resuming only when allowed, falling back to the demo signal or a paused state with a message."
+      "notes": "ExperienceSession handles scene phase and memory, not audio session events. G-INTERRUPTION: an interruption/route/reset state machine in VisualCoreAudio driven by AVAudioSession notifications, resuming only when allowed, falling back to the demo signal or a paused state with a message. Built in A06-P04."
     },
     {
       "id": "M16",
@@ -1113,7 +1132,8 @@
       "owner": "VisualCore:VisualCoreAudio",
       "phase": 4,
       "test": "Unit tests with injected session notifications: interruption began pauses the source and marks status interrupted, ended with shouldResume resumes, route change (headphones removed) and media-services reset rebuild the engine, background stops capture; no crash or stuck state across a scripted sequence",
-      "justification": "Found in A06-P00: ExperienceSession knows scene phase but not audio session events; every audio experience needs the same recovery."
+      "justification": "Found in A06-P00: ExperienceSession knows scene phase but not audio session events; every audio experience needs the same recovery.",
+      "closed": "A06-P04"
     },
     {
       "id": "G-A11YMETRICS",

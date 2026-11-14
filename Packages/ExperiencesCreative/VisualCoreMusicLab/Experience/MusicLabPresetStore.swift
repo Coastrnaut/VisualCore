@@ -1,4 +1,4 @@
-// MusicLabPresetLibrary — feature 050 (A06-P04) T-A06-404 (FR-A06-411, FR-A06-412; SC-A06-403; US2; research D5;
+// MusicLabPresetStore — feature 050 (A06-P04) T-A06-404 (FR-A06-411, FR-A06-412; SC-A06-403; US2; research D5;
 // data model "Preset library"; clarification 4). The presets of VisualCore Music Lab: the three read-only built-ins of
 // `MusicPreset.builtIns` first, then one file `preset-<lowercased uuid>.json` per user preset in the experience's own
 // storage, sorted by name ignoring case. Follows `GeometryLibrary`: unreadable and newer files are counted and never
@@ -19,7 +19,7 @@ import VisualCoreMusicLabCore
 /// The presets of Music Lab: the built-ins, then the user presets saved in the experience's storage.
 @MainActor
 @Observable
-final class MusicLabPresetLibrary {
+final class MusicLabPresetStore {
     /// The experience's storage.
     let storage: ExperienceStorage
     /// The built-in presets first (in their fixed order), then the user presets sorted by name ignoring case.

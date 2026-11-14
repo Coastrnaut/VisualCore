@@ -1,4 +1,4 @@
-// MusicLabPresetLibraryTests — feature 050 (A06-P04) T-A06-404 (FR-A06-411, FR-A06-412; SC-A06-403; US2). The preset
+// MusicLabPresetStoreTests — feature 050 (A06-P04) T-A06-404 (FR-A06-411, FR-A06-412; SC-A06-403; US2). The preset
 // library in a temporary experience storage: built-ins listed first, save → reload in a new library with the same
 // choices, the numbered suffix on a name clash (on save and on rename, built-in names included), built-ins refused for
 // rename and delete, delete removing the file, planted unreadable and newer files counted and left byte-identical,
@@ -9,7 +9,7 @@ import VisualCoreExperience
 import VisualCoreMusicLabCore
 
 @MainActor
-final class MusicLabPresetLibraryTests: XCTestCase {
+final class MusicLabPresetStoreTests: XCTestCase {
     private var root: URL!
     private var defaults: UserDefaults!
     private var suite = ""
@@ -37,12 +37,12 @@ final class MusicLabPresetLibraryTests: XCTestCase {
     }
 
     /// The user presets (entries after the built-ins).
-    private func userPresets(_ library: MusicLabPresetLibrary) -> [MusicPreset] {
+    private func userPresets(_ library: MusicLabPresetStore) -> [MusicPreset] {
         Array(library.entries.dropFirst(MusicPreset.builtIns.count))
     }
 
     func testBuiltInsAreListedFirst() throws {
-        let library = MusicLabPresetLibrary(storage: storage)
+        let library = MusicLabPresetStore(storage: storage)
         XCTAssertEqual(MusicPreset.builtIns.count, 3)
         XCTAssertEqual(library.entries.map(\.id), MusicPreset.builtIns.map(\.id))
         XCTAssertTrue(library.entries.allSatisfy(\.isBuiltIn))
@@ -56,7 +56,7 @@ final class MusicLabPresetLibraryTests: XCTestCase {
 
     func testSaveThenReloadInANewLibraryKeepsTheChoices() throws {
         let fixed = Date(timeIntervalSinceReferenceDate: 1_000)
-        let library = MusicLabPresetLibrary(storage: storage)
+        let library = MusicLabPresetStore(storage: storage)
         let choices = try geometryChoices()
         let saved = try XCTUnwrap(library.save(name: "  Night drive  ", scene: .geometry, choices: choices,
                                                now: fixed))
@@ -66,7 +66,7 @@ final class MusicLabPresetLibraryTests: XCTestCase {
         XCTAssertTrue(storage.exists(MusicPreset.fileName(for: saved.id)))
         XCTAssertEqual(userPresets(library).map(\.name), ["Bright", "Night drive"])
 
-        let relaunched = MusicLabPresetLibrary(storage: storage)
+        let relaunched = MusicLabPresetStore(storage: storage)
         XCTAssertEqual(relaunched.entries.map(\.id), library.entries.map(\.id))
         let loaded = try XCTUnwrap(relaunched.preset(saved.id))
         XCTAssertEqual(loaded.name, "Night drive")
@@ -77,7 +77,7 @@ final class MusicLabPresetLibraryTests: XCTestCase {
     }
 
     func testSavingAnExistingNameGetsTheNextFreeSuffix() throws {
-        let library = MusicLabPresetLibrary(storage: storage)
+        let library = MusicLabPresetStore(storage: storage)
         let choices = MusicLabScene.bars.defaultChoices
         XCTAssertEqual(library.save(name: "Name", scene: .bars, choices: choices)?.name, "Name")
         XCTAssertEqual(library.save(name: "Name", scene: .bars, choices: choices)?.name, "Name 2")
@@ -91,7 +91,7 @@ final class MusicLabPresetLibraryTests: XCTestCase {
 
     func testRenameToAUsedNameIsMadeUniqueAndKeepsTheSavedDate() throws {
         let fixed = Date(timeIntervalSinceReferenceDate: 5_000)
-        let library = MusicLabPresetLibrary(storage: storage)
+        let library = MusicLabPresetStore(storage: storage)
         let a = try XCTUnwrap(library.save(name: "Aurora", scene: .geometry, choices: try geometryChoices(),
                                            now: fixed))
         _ = try XCTUnwrap(library.save(name: "Bloom", scene: .bars, choices: MusicLabScene.bars.defaultChoices))
@@ -101,7 +101,7 @@ final class MusicLabPresetLibraryTests: XCTestCase {
         XCTAssertEqual(renamed.name, "bloom 2")
         XCTAssertEqual(renamed.saved, fixed)
         XCTAssertEqual(renamed.choices, try geometryChoices())
-        XCTAssertEqual(MusicLabPresetLibrary(storage: storage).preset(a.id)?.name, "bloom 2", "the file was rewritten")
+        XCTAssertEqual(MusicLabPresetStore(storage: storage).preset(a.id)?.name, "bloom 2", "the file was rewritten")
 
         XCTAssertTrue(library.rename(a.id, to: "BLOOM 2"), "a change of case of its own name is not a clash")
         XCTAssertEqual(library.preset(a.id)?.name, "BLOOM 2")
@@ -112,7 +112,7 @@ final class MusicLabPresetLibraryTests: XCTestCase {
     }
 
     func testBuiltInsCannotBeRenamedOrDeleted() throws {
-        let library = MusicLabPresetLibrary(storage: storage)
+        let library = MusicLabPresetStore(storage: storage)
         let builtIn = try XCTUnwrap(MusicPreset.builtIns.first)
         XCTAssertFalse(library.rename(builtIn.id, to: "Mine"))
         XCTAssertNotNil(library.lastMessage)
@@ -124,7 +124,7 @@ final class MusicLabPresetLibraryTests: XCTestCase {
     }
 
     func testDeleteRemovesTheFile() throws {
-        let library = MusicLabPresetLibrary(storage: storage)
+        let library = MusicLabPresetStore(storage: storage)
         let a = try XCTUnwrap(library.save(name: "Aurora", scene: .bars, choices: MusicLabScene.bars.defaultChoices))
         let b = try XCTUnwrap(library.save(name: "Bloom", scene: .rings, choices: MusicLabScene.rings.defaultChoices))
         XCTAssertTrue(library.delete(a.id))
@@ -151,7 +151,7 @@ final class MusicLabPresetLibraryTests: XCTestCase {
         try storage.write(garbage, to: garbageName)
         try storage.write(newerFile, to: newerName)
 
-        let library = MusicLabPresetLibrary(storage: storage)
+        let library = MusicLabPresetStore(storage: storage)
         XCTAssertEqual(library.unreadable, 1)
         XCTAssertEqual(library.newer, 1)
         XCTAssertEqual(library.entries.map(\.id), MusicPreset.builtIns.map(\.id))
@@ -166,7 +166,7 @@ final class MusicLabPresetLibraryTests: XCTestCase {
         XCTAssertEqual(library.unreadable, 1)
         XCTAssertEqual(library.newer, 1)
 
-        let relaunched = MusicLabPresetLibrary(storage: storage)
+        let relaunched = MusicLabPresetStore(storage: storage)
         XCTAssertEqual(relaunched.unreadable, 1)
         XCTAssertEqual(relaunched.newer, 1)
         XCTAssertEqual(try storage.read(garbageName), garbage)
@@ -175,7 +175,7 @@ final class MusicLabPresetLibraryTests: XCTestCase {
     }
 
     func testARefusedWriteSetsAMessageAndChangesNothing() throws {
-        let library = MusicLabPresetLibrary(storage: storage)
+        let library = MusicLabPresetStore(storage: storage)
         let kept = try XCTUnwrap(library.save(name: "Kept", scene: .bars, choices: MusicLabScene.bars.defaultChoices))
         let keptName = MusicPreset.fileName(for: kept.id)
         let keptData = try storage.read(keptName)

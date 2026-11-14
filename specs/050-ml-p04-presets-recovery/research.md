@@ -17,7 +17,7 @@
   are ignored.
 - **D5 Presets.** Decision: Core `MusicPreset` (id UUID, name ≤ 60 chars cleaned, scene, choices count = scene's parameter
   count, saved Date; format 1 file coding) and three built-ins with fixed UUIDs `00000000-0000-4000-8000-0000000006a{1,2,3}`
-  (synthetic, pre-push safe); experience `MusicLabPresetLibrary` follows `GeometryLibrary` (entries, unreadable, newer,
+  (synthetic, pre-push safe); experience `MusicLabPresetStore` follows `GeometryLibrary` (entries, unreadable, newer,
   lastMessage; unique names ignoring case with " 2", " 3"…).
 - **D6 Apply action.** `preset.apply [0…2, 0…6, 0…4, 0…6, 0…4, 0…6, 0…4]`; for a 2-parameter scene slot 3 values must be 0
   (else refused as rule `a06.no-such-parameter`).

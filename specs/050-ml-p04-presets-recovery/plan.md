@@ -8,7 +8,7 @@ VisualCore closes G-INTERRUPTION in `VisualCoreAudio`: `AudioSessionEvent` (pure
 notifications), `AudioSessionEventMonitor` (injectable `NotificationCenter`), `AudioSourceState.interrupted`, and
 `MicrophoneAudioSource.handle(_:)`/`resume()` over an internal `MicrophoneCapture` seam (system capture = today's
 session + engine code). The experience adds the status condition and recovery buttons, a preset library
-(`MusicLabPresetLibrary`, one file per preset in `ExperienceStorage`, built-ins in code), the `preset.apply` action,
+(`MusicLabPresetStore`, one file per preset in `ExperienceStorage`, built-ins in code), the `preset.apply` action,
 preset controls, and a permission-denied usability test. Research: [research.md](research.md); model:
 [data-model.md](data-model.md); contract: [contracts/api.md](contracts/api.md); evidence: [quickstart.md](quickstart.md).
 
@@ -41,10 +41,10 @@ Packages/VisualCoreRendering/Sources/VisualCoreAudio/{AudioSource,MicrophoneAudi
 Packages/VisualCoreRendering/Tests/VisualCoreAudioTests/{AudioSessionEventTests,MicrophoneRecoveryTests}.swift  new
 Packages/ExperiencesCreative/VisualCoreMusicLab/Core/MusicPreset.swift                                          new (preset value, built-ins, file coding)
 Packages/ExperiencesCreative/VisualCoreMusicLab/CoreTests/MusicPresetTests.swift                                new
-Packages/ExperiencesCreative/VisualCoreMusicLab/Experience/MusicLabPresetLibrary.swift                          new
+Packages/ExperiencesCreative/VisualCoreMusicLab/Experience/MusicLabPresetStore.swift                          new
 Packages/ExperiencesCreative/VisualCoreMusicLab/Experience/Adapter/MusicLabCore.swift                           modify (preset.apply)
 Packages/ExperiencesCreative/VisualCoreMusicLab/Experience/{MusicLabPresenter,MusicLabControls,VisualCoreMusicLabExperience}.swift  modify
-Packages/ExperiencesCreative/VisualCoreMusicLab/ExperienceTests/{MusicLabPresetLibraryTests,MusicLabRecoveryTests,MusicLabDeniedUsabilityTests}.swift  new
+Packages/ExperiencesCreative/VisualCoreMusicLab/ExperienceTests/{MusicLabPresetStoreTests,MusicLabRecoveryTests,MusicLabDeniedUsabilityTests}.swift  new
 Packages/ExperiencesCreative/VisualCoreMusicLab/scenario-manifest.json                                           regenerate (new control)
 docs/api/visualcore-public-api.txt, Packages/VisualCoreRendering/README.md, Auto-Creator.md §13, docs/apps/visualcore-music-lab/visualcore-contract.{json,md}  modify
 ```
@@ -60,5 +60,5 @@ revert the commits; preset files stay in the experience's storage and are ignore
 ## Parallel work
 
 Agent A: VisualCoreAudio events + capture seam + recovery + tests. Agent B: Core `MusicPreset` + tests. Agent C:
-`MusicLabPresetLibrary` + tests. Lead: core action, presenter status/recovery wiring, controls, denied-usability and
+`MusicLabPresetStore` + tests. Lead: core action, presenter status/recovery wiring, controls, denied-usability and
 recovery experience tests, manifest, docs, runs, commits.

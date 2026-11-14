@@ -127,7 +127,7 @@ struct MusicLabControls: View {
     }
 
     /// The presets: each with Apply (and Rename, Delete for saved ones), then Save current as….
-    @ViewBuilder private func presetSection(_ presets: MusicLabPresetLibrary) -> some View {
+    @ViewBuilder private func presetSection(_ presets: MusicLabPresetStore) -> some View {
         section("Presets") {
             ForEach(presets.entries) { preset in
                 HStack {

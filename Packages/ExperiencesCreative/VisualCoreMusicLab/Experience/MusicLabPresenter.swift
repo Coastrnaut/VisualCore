@@ -212,7 +212,7 @@ final class MusicLabPresenter: ExperiencePresenter {
     private(set) var lastDisplay = AnalysisDisplay.silent(bandCount: 16)
 
     /// The preset library in the experience's own storage (feature 050); nil without storage (some tests).
-    let presets: MusicLabPresetLibrary?
+    let presets: MusicLabPresetStore?
     /// Whether Reduce Motion is on: the Geometry scene's spin then stays at its range minimum (FR-A06-314).
     let reduceMotion: Bool
     /// The mappers of the active scene's parameters (feature 049), rebuilt when the scene or a choice changes.
@@ -231,7 +231,7 @@ final class MusicLabPresenter: ExperiencePresenter {
          reduceMotion: Bool = false, storage: ExperienceStorage? = nil) {
         self.experienceID = experienceID
         self.reduceMotion = reduceMotion
-        presets = storage.map { MusicLabPresetLibrary(storage: $0) }
+        presets = storage.map { MusicLabPresetStore(storage: $0) }
         self.permission = permission
         self.factory = factory
         root.add(centre)
