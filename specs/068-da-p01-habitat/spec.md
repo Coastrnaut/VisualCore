@@ -24,6 +24,43 @@ Canonical overrides:
 - **Owner rulings:** short tests; audits and device runs in the device campaign; iOS 27 at phase gates; reference
   regression at X-A09; every Spec Kit step runs.
 
+## Clarifications
+
+### Session 2026-11-14
+
+Answered autonomously under the owner's standing delegation, recommended option each time. Facts checked in code: an
+`ExperienceCore` declares `stepDuration` (default 1/120 s), `update(step:)`, `apply(_:)`, `reset()`, snapshot payload and
+restore with a `MigrationChain`, `qualityTiers` (default 1) and controls; the session steps the core only while
+running (suspension stops stepping); `SeededRandom` (xoshiro256**) saves and restores its state
+(`SeededRandom+State.swift`); `PrimitiveRenderer` draws a `SceneNode` tree of rect, circle, line, polygon (≤ 256
+points) and polyline shapes in one batch; `ExperienceStorage` holds per-experience files.
+
+- Q: How do fish move in this phase, and what guarantees the bounds? → A: Each fixed step (1/60 s) every fish turns by
+  a seeded random amount within ±(species turn rate × step), eases its speed toward the species cruise speed (never
+  above the maximum), steers inward when closer than a margin of 1 unit to a bound, then moves; a final clamp keeps the
+  position inside the bounds and reflects the outward velocity component, so leaving is impossible by construction.
+  Bounded steering with neighbours (schools) replaces the wander rules in A09-P02; the bounds guarantee stays.
+- Q: Which coordinates and bounds does the habitat use? → A: Habitat units: the tank is 16 × 9 units (x 0…16, y 0…9,
+  y up); the swim bounds are x 0.5…15.5 and y 1.5…8.5 (above the gravel band); plants stand on y 1.0; drawing maps
+  the tank to the canvas with uniform scaling and letterboxing in the water colour. The tank and bounds belong to the
+  habitat document, so later habitats can change them within validated limits.
+- Q: Where does the catalog live, and how is it validated? → A: In the experience's core as Swift data
+  (`SpeciesCatalog.bundled`) with a JSON encoding and a validating decoder used by tests and the audit; items carry
+  `author` and `license`, and the allowed licenses are exactly ["MIT"] (the repository's license, author "VisualCore
+  project"); shapes are an enumeration (fish: `teardrop`, `slender`; plants: `ribbon`, `fan`); a starter habitat
+  names species and plants by id. Refusal reasons: `missing-license`, `unsupported-license`, `unknown-shape`,
+  `unknown-reference`, `invalid-number`, `too-many-fish`. The license audit is generated as
+  `docs/apps/digital-aquarium/content-licenses.md` and checked against the catalog by a test.
+- Q: Which actions and saved state does the experience have? → A: Actions `habitat.select [0…1]` (two starter
+  habitats: "Reef" with clownfish-like orange fish and blue tangs, "Kelp" with silver fish and gold fish, each with
+  plants), `lighting.level [0…2]` (dim, soft, bright) and `motion.pause [0…1]`; snapshot schema 1 holds the habitat
+  document, the step count, the pause flag and the generator state; one quality level (`level-0`), declared by the
+  core. Species names are descriptive, never brand or real-animal-care names ("orange striped fish", not a product).
+- Q: What does a fish look like, and how many are there? → A: A fish is a closed polygon (body outline of 12 points
+  from the species shape, scaled by size) plus a tail triangle, rotated to its heading and mirrored when swimming left;
+  the tail swings with the animation phase. Starter habitats hold 6 to 10 fish and 4 to 6 plants; a habitat may hold
+  at most 24 fish and 12 plants, so a frame draws at most 36 shapes plus the water and gravel.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - A complete aquarium to watch (Priority: P1) 🎯
@@ -39,7 +76,7 @@ at least one plant; the same seed draws the same aquarium.
 **Acceptance Scenarios**:
 
 1. **Given** the starter habitat, **When** the experience opens, **Then** the aquarium contains fish of exactly two
-   species and at least three plants, drawn as distinct shapes and colours.
+   species (6 to 10 fish) and 4 to 6 plants, drawn as distinct shapes and colours.
 2. **Given** the same seed, **When** the aquarium is opened twice and advanced by the same number of steps, **Then** the
    habitat state is identical.
 3. **Given** a person choosing the other starter habitat, **When** it is applied, **Then** the fish, plants and water
