@@ -593,32 +593,32 @@
       "id": "M18",
       "capability": "Signal data in shaders: per-frame spectrum/waveform upload to a small texture sampled by a full-screen fragment program",
       "source": "v0.1 feature 03; manual section 6 render stage 3, 4",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
-          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GPUObjects.swift",
-          "symbol": "Texture.upload",
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/PrimitiveRenderer.swift",
+          "symbol": "PrimitiveRenderer",
           "product": "VisualCoreRendering",
           "public": true
         },
         {
-          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
-          "symbol": "ResourceRegistry.makeTexture",
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/MeshRenderer.swift",
+          "symbol": "MeshRenderer",
           "product": "VisualCoreRendering",
           "public": true
         },
         {
-          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FullScreenShaderScene.swift",
-          "symbol": "FullScreenShaderScene",
-          "product": "VisualCoreRendering",
+          "file": "Packages/VisualCore/Sources/VisualCoreAudioDSP/AudioMapper.swift",
+          "symbol": "AudioMapper",
+          "product": "VisualCoreAudioDSP",
           "public": true
         }
       ],
       "example": {
-        "file": "Showcase/App/Scenes/GradientTextureScene.swift",
-        "symbol": "GradientTextureScene"
+        "file": "Packages/ExperiencesCreative/VisualCoreMusicLab/Experience/MusicLabPresenter.swift",
+        "symbol": "MusicLabPresenter"
       },
-      "notes": "Textures can be created and uploaded, but FullScreenShaderScene binds no texture and ShaderProgram has no float-array setter. G-SIGNALTEXTURE: a full-screen scene input that uploads up to N float samples per frame (one row, linear filtering) and binds it as u_signal, rebuilt after context loss."
+      "notes": "Textures can be created and uploaded, but FullScreenShaderScene binds no texture and ShaderProgram has no float-array setter. G-SIGNALTEXTURE: a full-screen scene input that uploads up to N float samples per frame (one row, linear filtering) and binds it as u_signal, rebuilt after context loss. Adapted in A06-P05 (no signal texture needed)."
     },
     {
       "id": "M19",
@@ -778,26 +778,26 @@
       "id": "M23",
       "capability": "Accessibility text metrics: level, band and beat values as text for VoiceOver and without animation or colour",
       "source": "v0.1 feature 05; manual section 3 legibility rule",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
-        {
-          "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/ParameterPanel.swift",
-          "symbol": "ParameterPanel",
-          "product": "VisualCoreUI",
-          "public": true
-        },
         {
           "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/AccessibilityPlayers.swift",
           "symbol": "AnnouncementSink",
           "product": "VisualCoreUI",
           "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreAudioDSP/AudioFeatures.swift",
+          "symbol": "AudioFeatures",
+          "product": "VisualCoreAudioDSP",
+          "public": true
         }
       ],
       "example": {
-        "file": "Packages/ExperiencesCreative/FractalExplorer/Core/FractalExplanations.swift",
-        "symbol": "FractalExplanations"
+        "file": "Packages/ExperiencesCreative/VisualCoreMusicLab/Experience/MusicLabPresenter.swift",
+        "symbol": "MusicLabPresenter"
       },
-      "notes": "Native labelled controls and announcements exist; the metric phrasing (rounded dBFS, band names, rate-limited announcements) is experience copy. G-A11YMETRICS (app-local)."
+      "notes": "Native labelled controls and announcements exist; the metric phrasing (rounded dBFS, band names, rate-limited announcements) is experience copy. G-A11YMETRICS (app-local). Built in A06-P05: app-local MetricText and AnnouncementGate (VisualCoreMusicLab/Core/MetricText.swift) on these VisualCore types."
     },
     {
       "id": "M24",
@@ -914,32 +914,20 @@
       "id": "M27",
       "capability": "Audio and render performance budget: analysis cost per frame, FFT size and band count by quality level, frame pacing",
       "source": "manual section 6 frame budget; phase 05",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
-          "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/PacingMeter.swift",
-          "symbol": "PacingMeter",
-          "product": "VisualCoreDiagnostics",
-          "public": true
-        },
-        {
-          "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/QualityProfile.swift",
-          "symbol": "QualityLevel",
-          "product": "VisualCoreDiagnostics",
-          "public": true
-        },
-        {
-          "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/FramePacing.swift",
-          "symbol": "FramePacing",
-          "product": "VisualCoreDiagnostics",
+          "file": "Packages/VisualCore/Sources/VisualCoreAudioDSP/AnalysisQuality.swift",
+          "symbol": "AnalysisQuality",
+          "product": "VisualCoreAudioDSP",
           "public": true
         }
       ],
       "example": {
-        "file": "Packages/ExperiencesCreative/ParticleUniverse/Core/FrameBudgetMonitor.swift",
-        "symbol": "FrameBudgetMonitor"
+        "file": "Packages/ExperiencesCreative/VisualCoreMusicLab/Experience/MusicLabPresenter.swift",
+        "symbol": "MusicLabPresenter"
       },
-      "notes": "Frame pacing and quality levels exist; nothing bounds analysis work or maps it to a level. G-AUDIOBUDGET: an analysis configuration (FFT size, hop, band count) per quality level with a measured per-window cost bound."
+      "notes": "Frame pacing and quality levels exist; nothing bounds analysis work or maps it to a level. G-AUDIOBUDGET: an analysis configuration (FFT size, hop, band count) per quality level with a measured per-window cost bound. Built in A06-P05."
     },
     {
       "id": "M28",
@@ -1121,7 +1109,8 @@
       "owner": "VisualCore:VisualCoreRendering",
       "phase": 5,
       "test": "Simulator tests: a full-screen program samples an uploaded ramp signal and offscreen pixels match within a stated tolerance; per-frame upload reuses one texture; context recreation rebuilds it with no stale handle",
-      "justification": "Found in A06-P00: FullScreenShaderScene binds no texture; signal-driven shaders are generic for audio and data experiences. Re-phased to 5 in A06-P03: the three scenes draw with the host primitive and mesh renderers and need no signal texture."
+      "justification": "Found in A06-P00: FullScreenShaderScene binds no texture; signal-driven shaders are generic for audio and data experiences. Re-phased to 5 in A06-P03: the three scenes draw with the host primitive and mesh renderers and need no signal texture. Closed as adapted in A06-P05: per-frame audio values reach the visuals through PrimitiveRenderer and MeshRenderer geometry driven by AudioMapper (A06-P03); no texture path is needed.",
+      "closed": "A06-P05"
     },
     {
       "id": "G-INTERRUPTION",
@@ -1144,7 +1133,8 @@
       "owner": "app-local",
       "phase": 5,
       "test": "Core tests: metric text for given features (rounded dBFS, dominant band name, beat yes/no) and rate-limited announcements; UI test that the metrics are exposed as accessibility values without animation",
-      "justification": "Phrasing of level, band and beat text is experience copy over VisualCore's AnnouncementSink and native controls; nothing generic is missing."
+      "justification": "Phrasing of level, band and beat text is experience copy over VisualCore's AnnouncementSink and native controls; nothing generic is missing.",
+      "closed": "A06-P05"
     },
     {
       "id": "G-AUDIOBUDGET",
@@ -1155,7 +1145,8 @@
       "owner": "VisualCore:VisualCoreAudioDSP",
       "phase": 5,
       "test": "Host tests: each quality level maps to a valid analysis configuration; a short measured run of the analysis per window stays within the stated per-window bound (asserted locally, extrapolated on CI)",
-      "justification": "Found in A06-P00: quality levels and pacing exist but analysis cost is unbounded and not tied to a level."
+      "justification": "Found in A06-P00: quality levels and pacing exist but analysis cost is unbounded and not tied to a level.",
+      "closed": "A06-P05"
     }
   ],
   "traceability": [

@@ -42,6 +42,7 @@ VisualCoreAudio | var | public var state: MicrophonePermissionState
 VisualCoreAudioDSP | class | public final class FeatureExtractor
 VisualCoreAudioDSP | class | public final class SampleRingBuffer: @unchecked Sendable
 VisualCoreAudioDSP | class | public final class SpectrumWorkspace
+VisualCoreAudioDSP | enum | public enum AnalysisQuality
 VisualCoreAudioDSP | enum | public enum AudioDSPInfo
 VisualCoreAudioDSP | enum | public enum AudioFeatureKind: String, Codable, Sendable, CaseIterable
 VisualCoreAudioDSP | enum | public enum LevelMeter
@@ -62,9 +63,11 @@ VisualCoreAudioDSP | func | public mutating func setMapping(_ mapping: AudioMapp
 VisualCoreAudioDSP | func | public mutating func update(flux: Float, time: Double) -> Bool
 VisualCoreAudioDSP | func | public mutating func update(target: Float, elapsed: Double) -> Float
 VisualCoreAudioDSP | func | public mutating func value(for features: AudioFeatures, range: ClosedRange<Double>, elapsed: Double) -> Double
+VisualCoreAudioDSP | func | public static func configuration(level: Int) -> (size: Int, bandCount: Int)
 VisualCoreAudioDSP | func | public static func dBFS(_ amplitude: Float) -> Float
 VisualCoreAudioDSP | func | public static func expectedBin(frequency: Double, sampleRate: Double, size: Int) -> Int
 VisualCoreAudioDSP | func | public static func from(index: Int) -> AudioFeatureKind?
+VisualCoreAudioDSP | func | public static func makeExtractor(level: Int, sampleRate: Double) -> FeatureExtractor?
 VisualCoreAudioDSP | func | public static func peak(_ samples: UnsafeBufferPointer<Float>) -> Float
 VisualCoreAudioDSP | func | public static func peakBin(_ magnitudesDB: [Float]) -> Int?
 VisualCoreAudioDSP | func | public static func rms(_ samples: UnsafeBufferPointer<Float>) -> Float
@@ -102,6 +105,7 @@ VisualCoreAudioDSP | let | public static let beatRelease: Double
 VisualCoreAudioDSP | let | public static let floorDB: Float
 VisualCoreAudioDSP | let | public static let gainRange: ClosedRange<Double>
 VisualCoreAudioDSP | let | public static let levelWindowDB: ClosedRange<Float>
+VisualCoreAudioDSP | let | public static let levels: ClosedRange<Int>
 VisualCoreAudioDSP | let | public static let maximumBandCount
 VisualCoreAudioDSP | let | public static let maximumCapacity
 VisualCoreAudioDSP | let | public static let maximumSize
