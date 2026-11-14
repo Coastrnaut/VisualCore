@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "/bin/sh",
+    "-c",
+    "! grep -rniE '\"[^\"]*(dB SPL|volts|calibrated|certified)[^\"]*\"' Packages/ExperiencesCreative/OscilloscopeStudio/Experience"
+  ],
+  "command": "/bin/sh -c '! grep -rniE '\"'\"'\"[^\"]*(dB SPL|volts|calibrated|certified)[^\"]*\"'\"'\"' Packages/ExperiencesCreative/OscilloscopeStudio/Experience'",
+  "elapsed_seconds": 0.012,
+  "exit_code": 0,
+  "finished": "2026-11-14T17:16:40+00:00",
+  "log": ".autonomy/logs/A08-P03.os-copy.log",
+  "log_sha256": "22ed16fc59aa29ce809a635da2f02ef8efea79e924418003b046fd00e9c865e8",
+  "name": "os-copy",
+  "stage": "A08-P03",
+  "started": "2026-11-14T17:16:40+00:00",
+  "timed_out": false
+}
