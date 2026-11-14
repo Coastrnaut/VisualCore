@@ -40,6 +40,11 @@ T-A06-101 → (102 ∥ 103) → 104 → 105 → 106 → Polish.
 
 Agent A: T-A06-102. Agent B: T-A06-103. Agent C: T-A06-104 (against contracts/api.md). Lead: 105, 106, docs, runs, commits.
 
+## Phase 5: Convergence
+
+- [ ] T-A06-116 Add `testAnUndecodableFileKeepsThePreviousSourceAndShowsAMessage` to `Packages/ExperiencesCreative/VisualCoreMusicLab/ExperienceTests/MusicLabSessionTests.swift` (factory `file` closure throws `AudioSourceError.undecodable`; the demo keeps running, the message is `MusicLabPresenter.undecodableMessage`, the digest is unchanged) and record `python3 Tools/python/desktop_runbook.py run-check --stage A06-P01 --timeout 600 --name experiences-ios27-3 -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing VisualCoreMusicLabExperienceTests` per SC-A06-104, FR-A06-103 (partial)
+- [ ] T-A06-117 Amend `specs/047-ml-p01-audio-source/data-model.md` "MusicLabState": digest = source, demoSeed, demoMode; fileName is display-only (not in digest or snapshot), as recorded in `MusicLabCore.swift` per data-model digest (contradicts)
+
 ## Implementation strategy
 
 MVP: demo/file/microphone sources with the waveform (US1, US2) on the DSP/audio layer (US3); evidence last.
