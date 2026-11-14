@@ -97,6 +97,28 @@ and `VisualCoreRendering` (iOS, GL). ADR-0003 and the package map record this. R
 - Presets stay on the device (no sync); at most 64 files fit in the experience's storage, and a save beyond the quota
   is refused with a message.
 
+### Audio Odyssey (A07; feature 059 T-A07-607)
+
+- Frame time per world and quality level, piece generation while flying fast, the level the governor settles on,
+  memory and the thermal state over ten minutes are unmeasured on devices. They wait for the device campaign
+  ([device-campaign.md](../apps/audio-odyssey/device-campaign.md)).
+- Interruptions (call, alarm, Siri), route changes (headphones out) and media resets are tested only as simulated
+  audio-session events of the shared microphone source; their behaviour on hardware, and that other apps' music keeps
+  playing, wait for the device campaign.
+- The microphone permission flows (first request, refusal, grant, revoke in Settings while running) are tested with an
+  injected permission state only; the system prompt itself is answered by the owner on the devices.
+- The system accessibility audits (default and largest text size), VoiceOver labels and values on hardware (including
+  the canvas description and the announcements), Dynamic Type at the largest size, Reduce Motion and calm motion, the
+  contrast of each world and the comfort review of the flight's motion wait for the device campaign (owner ruling of
+  2026-11-13). No comfort, motion-sickness or health claim is made.
+- Drawn detail (pieces ahead and behind, draw distance, stars per piece) follows the host's quality level; the journey
+  and its digest never change with it.
+- Sound is analysed in memory only and never recorded; the sound of other apps cannot be captured. A picked file is
+  read in place and not remembered across a restore: the person chooses it again. A file that cannot be decoded keeps
+  the previous source and shows a message.
+- Journeys stay on the device (no sync); at most 64 files fit in the experience's storage, and a save beyond the quota
+  is refused with a message.
+
 ## Distribution
 
 - No App Store submission, signing or purchase setup is part of this release; those are owner actions.
