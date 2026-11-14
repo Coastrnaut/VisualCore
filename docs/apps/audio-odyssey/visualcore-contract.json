@@ -773,38 +773,20 @@
       "id": "M20",
       "capability": "Spoken description of the journey and its state (environment, speed, input source, paused) and control alternatives for gestures",
       "source": "cross-cutting: accessibility; constitution A07 accessibility",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/AccessibilityPlayers.swift",
           "symbol": "AnnouncementSink",
           "product": "VisualCoreUI",
           "public": true
-        },
-        {
-          "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/AccessibilityPlayers.swift",
-          "symbol": "SystemAnnouncementSink",
-          "product": "VisualCoreUI",
-          "public": true
-        },
-        {
-          "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/AccessibilitySettingsSection.swift",
-          "symbol": "AccessibilitySettingsSection",
-          "product": "VisualCoreUI",
-          "public": true
-        },
-        {
-          "file": "Packages/VisualCore/Sources/VisualCoreExperience/GestureAlternatives.swift",
-          "symbol": "GestureAlternatives",
-          "product": "VisualCoreExperience",
-          "public": true
         }
       ],
       "example": {
-        "file": "Packages/ExperiencesCreative/VisualCoreMusicLab/Experience/MusicLabPresenter.swift",
-        "symbol": "MusicLabPresenter"
+        "file": "Packages/ExperiencesCreative/AudioOdyssey/Experience/OdysseyPresenter.swift",
+        "symbol": "OdysseyPresenter"
       },
-      "notes": "The announcement plumbing is available and tested; the journey description phrasing is experience domain. G-JOURNEYA11Y (app-local), A07-P05."
+      "notes": "The announcement plumbing is available and tested; the journey description phrasing is experience domain. G-JOURNEYA11Y (app-local), A07-P05. Built in A07-P05: the journey wording and throttle (JourneyAnnouncer) are experience domain over the shared AnnouncementSink."
     },
     {
       "id": "M21",
@@ -829,38 +811,26 @@
       "id": "M22",
       "capability": "Long-session resource budget: segment count, draw distance and vertex totals bounded per quality level with steady memory over the session",
       "source": "cross-cutting: quality tiers; constitution A07 bounded resources",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
-          "file": "Packages/VisualCore/Sources/VisualCoreScenes/MeshBuilder.swift",
-          "symbol": "MeshBudget",
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/StreamingBudget.swift",
+          "symbol": "StreamingBudget",
           "product": "VisualCoreScenes",
           "public": true
         },
         {
-          "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/QualityProfile.swift",
-          "symbol": "QualityLevel",
-          "product": "VisualCoreDiagnostics",
-          "public": true
-        },
-        {
-          "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/ResourceLedger.swift",
-          "symbol": "ResourceLedger",
-          "product": "VisualCoreDiagnostics",
-          "public": true
-        },
-        {
-          "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/ResourceLedger.swift",
-          "symbol": "ResourceBudget",
-          "product": "VisualCoreDiagnostics",
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/StreamingBudget.swift",
+          "symbol": "StreamingLevel",
+          "product": "VisualCoreScenes",
           "public": true
         }
       ],
       "example": {
-        "file": "Packages/ExperiencesCreative/ParticleUniverse/Core/SceneQuality.swift",
-        "symbol": "SceneQuality"
+        "file": "Packages/ExperiencesCreative/AudioOdyssey/Experience/OdysseyPresenter.swift",
+        "symbol": "OdysseyPresenter"
       },
-      "notes": "Budgets and the quality element share exist and are tested; nothing ties a segment window and draw distance to QualityLevel. G-JOURNEYBUDGET, A07-P05 (measured over a short run, bounded by arithmetic)."
+      "notes": "Budgets and the quality element share exist and are tested; nothing ties a segment window and draw distance to QualityLevel. G-JOURNEYBUDGET, A07-P05 (measured over a short run, bounded by arithmetic). Built in A07-P05."
     }
   ],
   "gaps": [
@@ -925,7 +895,7 @@
       "phase": 5,
       "test": "Host tests of the journey description for each state (environment, speed band, input source, paused, interrupted) and VoiceOver announcement through a RecordingAnnouncementSink",
       "justification": "The wording of the journey description is experience domain; the generic AnnouncementSink plumbing already exists in VisualCoreUI.",
-      "closed": null
+      "closed": "A07-P05"
     },
     {
       "id": "G-JOURNEYBUDGET",
@@ -937,7 +907,7 @@
       "phase": 5,
       "test": "Host tests: segment window size, draw distance and vertex total derived from QualityLevel stay within MeshBudget at every level; a short simulated run shows constant pool size and resource ledger totals, extrapolated by arithmetic to a long session",
       "justification": "Found in A07-P00: budgets and quality levels exist but nothing maps them to a segment window.",
-      "closed": null
+      "closed": "A07-P05"
     }
   ],
   "traceability": [

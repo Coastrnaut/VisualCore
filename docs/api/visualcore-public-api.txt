@@ -1995,12 +1995,14 @@ VisualCoreScenes | func | public func contains(_ p: Vec2) -> Bool
 VisualCoreScenes | func | public func contains(_ p: Vec3, tolerance: Double = 1e-9) -> Bool
 VisualCoreScenes | func | public func drawList(parentTransform: Mat3 = .identity) -> [(node: SceneNode, world: Mat3)]
 VisualCoreScenes | func | public func events(forFrame frame: Int) -> [PointerEvent]
+VisualCoreScenes | func | public func fits(level: Int, perPieceVertices: Int, budget: MeshBudget) -> Bool
 VisualCoreScenes | func | public func fromCamera(_ c: Vec2) -> Vec2?
 VisualCoreScenes | func | public func fromNDC(_ n: Vec2) -> Vec2?
 VisualCoreScenes | func | public func fromPixels(_ p: Vec2) -> Vec2?
 VisualCoreScenes | func | public func fromWorld(_ w: Vec2, camera: Camera2D) -> Vec2?
 VisualCoreScenes | func | public func hitTest(_ world: Vec2) -> SceneNode?
 VisualCoreScenes | func | public func interleavedPositionNormal() -> [Float]
+VisualCoreScenes | func | public func level(_ index: Int) -> StreamingLevel
 VisualCoreScenes | func | public func mesh(for key: UInt64, build: () throws -> Mesh) rethrows -> Mesh
 VisualCoreScenes | func | public func removeAll()
 VisualCoreScenes | func | public func removeFromParent()
@@ -2010,6 +2012,7 @@ VisualCoreScenes | func | public func toNDC(_ p: Vec2) -> Vec2?
 VisualCoreScenes | func | public func toPixels(_ p: Vec2) -> Vec2?
 VisualCoreScenes | func | public func toWorld(_ p: Vec2, camera: Camera2D) -> Vec2?
 VisualCoreScenes | func | public func validate(requireClosed: Bool = false, budget: MeshBudget = .default) -> MeshReport
+VisualCoreScenes | func | public func vertexTotal(level: Int, perPieceVertices: Int) -> Int
 VisualCoreScenes | func | public func withFlatNormals() -> Mesh
 VisualCoreScenes | func | public func withSmoothNormals(creaseAngle: Double) -> Mesh
 VisualCoreScenes | func | public func worldToNDC(camera: Camera2D) -> Mat3?
@@ -2037,6 +2040,7 @@ VisualCoreScenes | func | public static func tube(path: [Vec3], radius: Double, 
 VisualCoreScenes | func | public static func uvSphere(segments: Int = 32, rings: Int = 16, radius: Double = 1) -> Mesh
 VisualCoreScenes | init | public init()
 VisualCoreScenes | init | public init(_ declarations: [GestureDeclaration])
+VisualCoreScenes | init | public init(behind: Int, ahead: Int, drawDistance: Double, elementShare: Double)
 VisualCoreScenes | init | public init(budget: MeshBudget = .default, weldTolerance: Double = 1e-9, weldPositionsOnly: Bool = false)
 VisualCoreScenes | init | public init(capacity: Int, make: (Int) -> Element)
 VisualCoreScenes | init | public init(gesture: String, phase: Phase, values: [Double])
@@ -2062,21 +2066,26 @@ VisualCoreScenes | init | public init(vertices: Int, triangles: Int, boundaryEdg
 VisualCoreScenes | init | public init(width: Int, height: Int)
 VisualCoreScenes | init | public init?(behind: Int, ahead: Int, capacity: Int)
 VisualCoreScenes | init | public init?(id: String, title: String, width: Int, height: Int)
+VisualCoreScenes | init | public init?(levels: [StreamingLevel], pieceLength: Double)
 VisualCoreScenes | let | public let ahead: Int
 VisualCoreScenes | let | public let behind: Int
 VisualCoreScenes | let | public let budget: MeshBudget
 VisualCoreScenes | let | public let capacity: Int
 VisualCoreScenes | let | public let declarations: [GestureDeclaration]
+VisualCoreScenes | let | public let drawDistance: Double
+VisualCoreScenes | let | public let elementShare: Double
 VisualCoreScenes | let | public let frameInterval: Double
 VisualCoreScenes | let | public let height: Int
 VisualCoreScenes | let | public let id: Int
 VisualCoreScenes | let | public let id: String
+VisualCoreScenes | let | public let levels: [StreamingLevel]
 VisualCoreScenes | let | public let maxBytes: Int
 VisualCoreScenes | let | public let maxEdge: Int
 VisualCoreScenes | let | public let maxEntries: Int
 VisualCoreScenes | let | public let maxPixels: Int
 VisualCoreScenes | let | public let maxSamplesPerUpdate: Int
 VisualCoreScenes | let | public let phase: PointerPhase
+VisualCoreScenes | let | public let pieceLength: Double
 VisualCoreScenes | let | public let pointerCount: Int
 VisualCoreScenes | let | public let position: Vec2
 VisualCoreScenes | let | public let seed: UInt64
@@ -2101,6 +2110,7 @@ VisualCoreScenes | let | public static let defaultMaxPixels
 VisualCoreScenes | let | public static let hardMaxEdge
 VisualCoreScenes | let | public static let landscape
 VisualCoreScenes | let | public static let maxBuildsPerStep
+VisualCoreScenes | let | public static let maxLevels
 VisualCoreScenes | let | public static let maxPointers
 VisualCoreScenes | let | public static let maxPolygonPoints
 VisualCoreScenes | let | public static let minimumInterval
@@ -2137,6 +2147,8 @@ VisualCoreScenes | struct | public struct Sample: Sendable, Equatable
 VisualCoreScenes | struct | public struct SegmentWindow: Sendable, Equatable
 VisualCoreScenes | struct | public struct SegmentWindowStep: Sendable, Equatable
 VisualCoreScenes | struct | public struct SlotPool<Element: Sendable>: Sendable
+VisualCoreScenes | struct | public struct StreamingBudget: Sendable, Equatable
+VisualCoreScenes | struct | public struct StreamingLevel: Sendable, Equatable
 VisualCoreScenes | struct | public struct SyntheticGestureScript: Sendable, Equatable
 VisualCoreScenes | struct | public struct TapRecognizer: GestureRecognizer
 VisualCoreScenes | struct | public struct ViewMetrics: Sendable, Equatable
