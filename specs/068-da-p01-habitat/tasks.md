@@ -7,7 +7,7 @@
 
 ## Phase 1: Setup
 
-- [ ] T-A09-101 Baseline: cite the last package evidence on an unchanged `Packages` tree (`.autonomy/migration/checks/X-A08.host.json`, `.autonomy/checks/A09-P00.app-build.json`) instead of a rerun (owner ruling of 2026-11-14)
+- [X] T-A09-101 Baseline: cite the last package evidence on an unchanged `Packages` tree (`.autonomy/migration/checks/X-A08.host.json`, `.autonomy/checks/A09-P00.app-build.json`) instead of a rerun (owner ruling of 2026-11-14) — Verified 2026-11-14: 2026-11-14: Packages unchanged since X-A08 follow-through; cites .autonomy/migration/checks/X-A08.host.json and .autonomy/checks/A09-P00.app-build.json
 
 ## Phase 2: Foundational — the habitat model (stories 1–4)
 
