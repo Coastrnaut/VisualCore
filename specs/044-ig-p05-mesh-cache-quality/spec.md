@@ -137,6 +137,8 @@ their ratio matches the expected ratio within one pixel.
 - **FR-A05-503**: Every drawn mesh at every tier MUST be closed, valid and within the mesh budget.
 - **FR-A05-504**: The tier MUST NOT change the experience state, its digest, snapshots or saved compositions.
 - **FR-A05-505**: A quality level pinned by the person through the host MUST be honoured.
+- **FR-A05-506**: A tier change MUST take effect at the next drawn frame (the drawn mesh switches between frames, never
+  during one) and MUST NOT interrupt a gesture or refuse an action.
 
 **Mesh cache (story 2)**
 - **FR-A05-510**: Built meshes MUST be cached by a signature of the composition's shape parameters and the tier, so a
