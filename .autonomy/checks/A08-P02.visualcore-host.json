@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/VisualCore",
+    "--filter",
+    "MinMaxDecimatorTests|SceneGraphTests"
+  ],
+  "command": "swift test --package-path Packages/VisualCore --filter 'MinMaxDecimatorTests|SceneGraphTests'",
+  "elapsed_seconds": 4.037,
+  "exit_code": 0,
+  "finished": "2026-11-14T16:47:55+00:00",
+  "log": ".autonomy/logs/A08-P02.visualcore-host.log",
+  "log_sha256": "d6ded0ebbae423239ed15315059287014a8b6652efbab3e7b852da9014cb00d7",
+  "name": "visualcore-host",
+  "stage": "A08-P02",
+  "started": "2026-11-14T16:47:51+00:00",
+  "timed_out": false
+}
