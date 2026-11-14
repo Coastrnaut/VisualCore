@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "/bin/sh",
+    "-c",
+    "! grep -rnE 'URLSession|import Network|CoreMotion|CoreLocation|AVAudioRecorder|AVAssetWriter' Packages/ExperiencesCreative/AudioOdyssey Packages/VisualCoreRendering/Sources/VisualCoreAudio"
+  ],
+  "command": "/bin/sh -c '! grep -rnE '\"'\"'URLSession|import Network|CoreMotion|CoreLocation|AVAudioRecorder|AVAssetWriter'\"'\"' Packages/ExperiencesCreative/AudioOdyssey Packages/VisualCoreRendering/Sources/VisualCoreAudio'",
+  "elapsed_seconds": 0.025,
+  "exit_code": 0,
+  "finished": "2026-11-14T15:02:12+00:00",
+  "log": ".autonomy/logs/A07-P06.ao-no-network.log",
+  "log_sha256": "8956ee94b08fc16737e9b7b91d15c63fb543b185b996c5d6a527826b3b63cc64",
+  "name": "ao-no-network",
+  "stage": "A07-P06",
+  "started": "2026-11-14T15:02:12+00:00",
+  "timed_out": false
+}
