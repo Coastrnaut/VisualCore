@@ -22,6 +22,31 @@ Canonical overrides:
   attached results and every device test is planned with its result pending the campaign; no unsupported promised
   feature in the interface or the store text; no fabricated measured performance claim.
 
+## Clarifications
+
+### Session 2026-11-14
+
+Answered autonomously under the owner's standing delegation, recommended option each time. Facts checked in code: the
+shared copy denylist (`Configs/copy-claims-denylist.json`) contains "audio", "music" and "microphone", which are real
+Music Lab features, and `check_copy_claims.py --allow` removes such words per experience (A05 allowed "camera",
+"share"); `release_check.py` derives `experience-release-<code>` and `copy-claims-<code>` steps from
+`docs/apps/<slug>/release.json` and runs interface chunks from `UI_CHUNKS`; Infinite Geometry's `failNextDraw` seam and
+its fixtures (`resources: [.copy("Fixtures")]`) are the precedent; the app already declares `NSMicrophoneUsageDescription`.
+
+- Q: Which denylist words may Music Lab's copy use? → A: `copyCheck.allow` = ["audio", "music", "microphone"]; every
+  measured-claim pattern and every other word stays refused.
+- Q: Which interface chunk proves the journeys? → A: chunk "m2" with `MLScenesUITests` (scenes, palette, metrics) and
+  `MLPresetsUITests` (mapping change, built-in preset, save) in `Apps/VisualCore/Tests/UI/MusicLab/` with an `MLSupport`
+  helper following `IGSupport` (candidate launch); the microphone is never chosen in interface tests (no permission prompt
+  automation).
+- Q: Which preset fixtures are committed? → A: Five files in `ExperienceTests/Fixtures/`: format 1 (loads, Aurora),
+  format 2 (loads, Ember), format 3 (newer, kept), damaged JSON (unreadable, kept), and a file whose name claims a
+  built-in id (unreadable, kept); ids from the synthetic range `00000000-0000-4000-8000-0000000006b1…b5`.
+- Q: How is the drawing failure forced? → A: An internal `failNextDraw` on `MusicLabPresenter` that makes the next draw
+  throw `MusicLabDrawError.injected` once, as in Infinite Geometry.
+- Q: How is the privacy manifest covered? → A: The release build checks' privacy-manifest step must pass; Music Lab adds
+  no required-reason API beyond the file timestamps and defaults already declared for experience storage.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Sound stays on my device and access is explained (Priority: P1) 🎯
