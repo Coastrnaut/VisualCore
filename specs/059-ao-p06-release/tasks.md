@@ -38,7 +38,7 @@ Evidence: `python3 Tools/python/desktop_runbook.py run-check --stage A07-P06 --t
 - [X] T-A07-614 Script tests (`python3 Tools/python/desktop_runbook.py run-check --stage A07-P06 --timeout 600 --name script-tests -- python3 scripts/test_scripts.py`) — Verified 2026-11-14: 2026-11-14: .autonomy/checks/A07-P06.script-tests.json exit 0
 - [ ] T-A07-615 BLOCKED_OWNER_ACTION: signing, archive upload and App Store Connect entry of Audio Odyssey's store text, per `docs/release/build-and-archive.md` owner steps (FR-A07-640)
 - [ ] T-A07-616 {device} In the device campaign (after ImplementationLock-100): the measurements and audits of `docs/apps/audio-odyssey/device-campaign.md` on D1–D3
-- [ ] T-A07-617 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A07-P06 (owner and device items stay open, as for A06-P06)
+- [X] T-A07-617 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A07-P06 (owner and device items stay open, as for A06-P06) — Verified 2026-11-14: 2026-11-14: /speckit-converge appended nothing (17 FR/SC, 4 stories, 14 tasks with evidence); owner T-A07-615 and device T-A07-616 open by rule
 
 ## Dependencies
 
