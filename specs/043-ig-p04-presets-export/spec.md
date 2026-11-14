@@ -150,7 +150,8 @@ the cycles equal those after the first cycle and nothing is reported leaked.
 - **FR-A05-430**: Every new control MUST have an accessible label and identifier; saving, opening, renaming, deleting and
   exporting MUST all be possible with buttons (no gesture-only path).
 - **FR-A05-431**: No network, no account, no analytics; exported pictures leave the app only through the share sheet
-  chosen by the person; no imported assets.
+  chosen by the person and carry no metadata beyond size and colour space (no location, device or time); no imported
+  assets.
 - **FR-A05-432**: The nine standard scenarios and five fixtures MUST stay valid.
 
 ### Key Entities
@@ -179,6 +180,8 @@ the cycles equal those after the first cycle and nothing is reported leaked.
 - The host exposes a still renderer to controls (as used by Fluid Art); exports are drawn at the requested size through
   it.
 - Pixel comparisons are done on the simulator; device colour fidelity is checked in the device campaign.
+- One export holds at most 2048 × 2048 × 4 bytes (16 MiB) of pixels plus its PNG in memory, released when the share sheet
+  closes; the offscreen target is released by the host after the render.
 
 ## Out of Scope
 
