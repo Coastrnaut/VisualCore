@@ -44,4 +44,4 @@ evidence last.
 
 ## Phase 5: Convergence
 
-- [ ] T-A07-514 Record in `specs/058-ao-p05-performance-a11y/data-model.md` (JourneyAnnouncer) that the presenter's announcement clock is the sum of frame steps since setup (the host's frame time is wall clock) and that offering the last announced text clears any pending text, as `Packages/ExperiencesCreative/AudioOdyssey/Experience/OdysseyPresenter.swift` and `Core/JourneyAnnouncer.swift` do per plan: data model (contradicts)
+- [X] T-A07-514 Record in `specs/058-ao-p05-performance-a11y/data-model.md` (JourneyAnnouncer) that the presenter's announcement clock is the sum of frame steps since setup (the host's frame time is wall clock) and that offering the last announced text clears any pending text, as `Packages/ExperiencesCreative/AudioOdyssey/Experience/OdysseyPresenter.swift` and `Core/JourneyAnnouncer.swift` do per plan: data model (contradicts) — Verified 2026-11-14: Verified 2026-11-14: data-model.md JourneyAnnouncer records the frame-step clock and the repeat rule, matching OdysseyPresenter.swift and JourneyAnnouncer.swift; validate_docs passed in the tick
