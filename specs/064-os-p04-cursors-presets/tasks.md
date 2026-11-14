@@ -47,3 +47,7 @@ Agent A: T-A08-402. Agent B: T-A08-404 store and tests after A. Agent C: T-A08-4
 ## Implementation strategy
 
 MVP: freeze and cursors with precise readouts (US1, US4 rules); then zoom and presets; evidence last.
+
+## Phase 7: Convergence
+
+- [ ] T-A08-413 Record in `specs/064-os-p04-cursors-presets/contracts/api.md` the presenter-only rule `a08.nothing-to-freeze` (an empty window cannot be frozen) and the identifiers `display.hint`, `preset.message` and `preset.skipped` that the controls use, per contracts/api.md (unrequested)
