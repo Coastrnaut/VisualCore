@@ -1,6 +1,8 @@
 // AudioSource — feature 047 T-A06-103 (FR-A06-101, FR-A06-105; gaps G-AUDIOSOURCE, G-MICPERMISSION, G-FILESOURCE):
 // one interface for the demo, file and microphone sources. Every source writes mono Float samples into a
 // `SampleRingBuffer`, the single hand-off point to the render side.
+// Feature 050 (A06-P04) T-A06-402 (FR-A06-402; gap G-INTERRUPTION; analyze U1): adds the `interrupted` state and the
+// `ResumableAudioSource` protocol.
 import Foundation
 import VisualCoreAudioDSP
 
@@ -10,6 +12,10 @@ public enum AudioSourceState: Equatable, Sendable {
     case idle
     /// Producing samples into the ring buffer.
     case running
+    /// Paused by the system (an audio interruption such as a call or an alarm). Capture is stopped; the source resumes
+    /// by itself when the interruption ends with permission to resume, or when `ResumableAudioSource.resume()` is
+    /// called after an interruption ended without that permission.
+    case interrupted
     /// Start failed; the associated text says why.
     case failed(String)
 }
@@ -41,4 +47,18 @@ public protocol AudioSource: AnyObject {
     func start(into buffer: SampleRingBuffer) throws
     /// Stops writing samples and releases any system resource. Safe to call when idle.
     func stop()
+}
+
+/// An `AudioSource` that can be paused by the system and resumed on request (FR-A06-402; analyze U1).
+///
+/// Presenters resume any resumable source through this protocol (for example from a "Resume" button), so tests can
+/// use doubles.
+@MainActor
+public protocol ResumableAudioSource: AudioSource {
+    /// True only while the source is `.interrupted` after an interruption ended without permission to resume, that
+    /// is when `resume()` is the way back; false in every other situation.
+    var awaitsResume: Bool { get }
+    /// Restarts capture after an interruption. Does nothing unless the state is `.interrupted`; a restart that fails
+    /// leaves the source `.failed` with a reason.
+    func resume()
 }

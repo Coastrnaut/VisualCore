@@ -7,6 +7,9 @@
 // at least 44 by 44 points and text that wraps.
 // Feature 049 (A06-P03) T-A06-308 (FR-A06-312): the scene picker and the mapping editor — per parameter of the shown
 // scene a feature picker (seven features), a gain slider (0…4, steps of 0.1) and the live value, and Reset mapping.
+// Feature 050 (A06-P04) T-A06-406 (FR-A06-410, 411, 415): the status line with the source's condition and the recovery
+// button (Resume, Use demo signal), and the presets (built-ins and saved ones: Apply, Save current as…, Rename,
+// Delete with confirmation, the library's message).
 import SwiftUI
 import UIKit
 import UniformTypeIdentifiers
@@ -20,6 +23,10 @@ struct MusicLabControls: View {
     let mirror: MusicLabMirror
 
     @State private var importing = false
+    @State private var newPresetName = ""
+    @State private var renaming: MusicPreset?
+    @State private var renameText = ""
+    @State private var deleting: MusicPreset?
 
     var body: some View {
         Group {
@@ -50,9 +57,21 @@ struct MusicLabControls: View {
                        hint: "Draws an audio file you pick; it is read in place, not copied") {
                     importing = true
                 }
-                Text(verbatim: "Playing: \(mirror.status)")
+                Text(verbatim: "Playing: \(mirror.statusLine)")
                     .font(.footnote)
                     .accessibilityIdentifier(port.identifier("status"))
+                switch mirror.recovery {
+                case .resume:
+                    button("Resume", identifier: "recovery.resume", hint: "Restarts the microphone input") {
+                        presenter.resumeSource()
+                    }
+                case .useDemo:
+                    button("Use demo signal", identifier: "recovery.demo", hint: "Switches to the built-in demo signal") {
+                        presenter.useDemo()
+                    }
+                case .none:
+                    EmptyView()
+                }
                 if let message = mirror.message {
                     Text(verbatim: message)
                         .font(.footnote).foregroundStyle(.primary)
@@ -88,6 +107,65 @@ struct MusicLabControls: View {
                 }
             }
             mappingEditor(state)
+            if let presets = presenter.presets { presetSection(presets) }
+        }
+        .alert("Rename preset", isPresented: Binding(get: { renaming != nil }, set: { if !$0 { renaming = nil } })) {
+            TextField("Name", text: $renameText)
+            Button("Rename") {
+                if let preset = renaming { _ = presenter.presets?.rename(preset.id, to: renameText) }
+                renaming = nil
+            }
+            Button("Cancel", role: .cancel) { renaming = nil }
+        }
+        .confirmationDialog("Delete preset?", isPresented: Binding(get: { deleting != nil },
+                                                                   set: { if !$0 { deleting = nil } })) {
+            Button("Delete", role: .destructive) {
+                if let preset = deleting { _ = presenter.presets?.delete(preset.id) }
+                deleting = nil
+            }
+        }
+    }
+
+    /// The presets: each with Apply (and Rename, Delete for saved ones), then Save current as….
+    @ViewBuilder private func presetSection(_ presets: MusicLabPresetLibrary) -> some View {
+        section("Presets") {
+            ForEach(presets.entries) { preset in
+                HStack {
+                    Text(verbatim: preset.isBuiltIn ? "\(preset.name) (built in)" : preset.name)
+                        .font(.body).fixedSize(horizontal: false, vertical: true)
+                    Spacer()
+                    button("Apply", identifier: "preset.\(preset.id.uuidString.lowercased()).apply",
+                           hint: "Shows the \(preset.scene.displayName) scene with this preset's mapping") {
+                        presenter.apply(preset)
+                    }
+                    if !preset.isBuiltIn {
+                        button("Rename", identifier: "preset.\(preset.id.uuidString.lowercased()).rename",
+                               hint: "Renames this preset") {
+                            renameText = preset.name
+                            renaming = preset
+                        }
+                        button("Delete", identifier: "preset.\(preset.id.uuidString.lowercased()).delete",
+                               hint: "Deletes this preset") {
+                            deleting = preset
+                        }
+                    }
+                }
+            }
+            HStack {
+                TextField("Preset name", text: $newPresetName)
+                    .textFieldStyle(.roundedBorder)
+                    .frame(minHeight: 44)
+                    .accessibilityLabel(Text(verbatim: "Preset name"))
+                    .accessibilityIdentifier(port.identifier("preset.name"))
+                button("Save current as…", identifier: "preset.save", hint: "Saves the current scene and mapping") {
+                    presenter.saveCurrentPreset(named: newPresetName)
+                    newPresetName = ""
+                }
+            }
+            if let message = presets.lastMessage {
+                Text(verbatim: message).font(.footnote).fixedSize(horizontal: false, vertical: true)
+                    .accessibilityIdentifier(port.identifier("preset.message"))
+            }
         }
     }
 

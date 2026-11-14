@@ -28,7 +28,7 @@ private func core(_ engine: ExperienceEngine<MusicLabCore>) throws -> MusicLabCo
         #expect(VisualCoreMusicLabExperience.id?.rawValue == "a06.visualcore-music-lab")
         #expect(MusicLabCore.controls.map(\.id)
                 == ["source.demo", "source.microphone", "source.file", "demo.mode", "demo.reseed", "permission.mirror",
-                    "scene.select", "mapping.set", "mapping.reset"])
+                    "scene.select", "mapping.set", "mapping.reset", "preset.apply"])
         #expect(MusicLabCore.migrations.currentVersion == 2)
     }
 
@@ -39,11 +39,13 @@ private func core(_ engine: ExperienceEngine<MusicLabCore>) throws -> MusicLabCo
                       ScriptedAction("source.microphone"), ScriptedAction("source.file"),
                       ScriptedAction("source.demo"), ScriptedAction("demo.mode", [3]),
                       ScriptedAction("permission.mirror", [2]), ScriptedAction("scene.select", [2]),
-                      ScriptedAction("mapping.set", [2, 1, 4, 1.5]), ScriptedAction("mapping.reset", [2])],
+                      ScriptedAction("mapping.set", [2, 1, 4, 1.5]), ScriptedAction("mapping.reset", [2]),
+                      ScriptedAction("preset.apply", [1, 3, 1.2, 6, 2, 0, 0])],
             rejected: [ScriptedAction("demo.mode", [4]), ScriptedAction("demo.mode", [.nan]),
                        ScriptedAction("source.demo", [1]), ScriptedAction("permission.mirror", [9]),
                        ScriptedAction("scene.select", [3]), ScriptedAction("mapping.set", [0, 0, 7, 1]),
-                       ScriptedAction("mapping.set", [0, 0, 1, 4.5]), ScriptedAction("bogus")])
+                       ScriptedAction("mapping.set", [0, 0, 1, 4.5]), ScriptedAction("preset.apply", [0, 0, 1, 2, 1, 3, 1]),
+                       ScriptedAction("bogus")])
         let report = await ExperienceConformance.run(MusicLabCore.self, id: id, plan: plan)
         for entry in report.entries { #expect(entry.passed, "\(entry.check): \(entry.detail)") }
     }
@@ -189,6 +191,27 @@ private func core(_ engine: ExperienceEngine<MusicLabCore>) throws -> MusicLabCo
         let snapshot = try ExperienceSnapshot(experience: id, schemaVersion: 2, seed: 7, stepIndex: 0, digest: before,
                                               payload: payload)
         #expect(throws: ExperienceError.self) { try engine.restore(snapshot) }
+        #expect(try engine.digest() == before)
+    }
+
+    // Feature 050 (A06-P04) T-A06-405: applying a preset in one action.
+    @Test func applyingAPresetSetsTheSceneAndItsChoices() async throws {
+        var engine = try await engine()
+        let before = try engine.digest()
+        #expect(engine.handle(control: "preset.apply", values: [2, 2, 1.5, 5, 1, 3, 1.5]).isAccepted)
+        let state = try core(engine).state
+        #expect(state.scene == .geometry)
+        #expect(state.mappings[2] == [MappingChoice(feature: 2, gain: 1.5)!, MappingChoice(feature: 5, gain: 1)!,
+                                      MappingChoice(feature: 3, gain: 1.5)!])
+        #expect(try engine.digest() != before)
+    }
+
+    @Test func aPresetWithValuesForAMissingSlotIsRefusedAndChangesNothing() async throws {
+        var engine = try await engine()
+        let before = try engine.digest()
+        #expect(engine.handle(control: "preset.apply", values: [0, 0, 1, 2, 1, 3, 1])
+                == .rejected(.rule(code: MusicLabRule.noSuchParameter)))
+        #expect(engine.handle(control: "preset.apply", values: [0, 0, 1]) == .rejected(.wrongValueCount(expected: 7, found: 3)))
         #expect(try engine.digest() == before)
     }
 }

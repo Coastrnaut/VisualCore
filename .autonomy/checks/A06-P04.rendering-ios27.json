@@ -1,0 +1,26 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/VisualCoreRendering",
+    "--scheme",
+    "VisualCoreRendering-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--only-testing",
+    "VisualCoreAudioTests"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --only-testing VisualCoreAudioTests",
+  "elapsed_seconds": 9.036,
+  "exit_code": 0,
+  "finished": "2026-11-14T08:28:06+00:00",
+  "log": ".autonomy/logs/A06-P04.rendering-ios27.log",
+  "log_sha256": "bc94ecc25ee4843e57abedd7e86be7d360e67c875b246a75bac28c9d62f51ef3",
+  "name": "rendering-ios27",
+  "stage": "A06-P04",
+  "started": "2026-11-14T08:27:57+00:00",
+  "timed_out": false
+}

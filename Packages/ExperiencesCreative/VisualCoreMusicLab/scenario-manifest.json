@@ -8,7 +8,8 @@
     "permission.mirror",
     "scene.select",
     "mapping.set",
-    "mapping.reset"
+    "mapping.reset",
+    "preset.apply"
   ],
   "experience" : "a06.visualcore-music-lab",
   "kind" : "creative",

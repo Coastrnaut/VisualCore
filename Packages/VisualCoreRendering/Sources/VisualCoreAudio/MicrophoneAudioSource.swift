@@ -1,6 +1,10 @@
 // MicrophoneAudioSource — feature 047 T-A06-103 (FR-A06-104, FR-A06-105, FR-A06-107; gap G-MICPERMISSION): live
 // input from AVAudioEngine's input node, started only with granted permission, mixed with other apps' audio. Gaps
 // G-AUDIOSOURCE and G-FILESOURCE are closed by the sibling files.
+// Feature 050 (A06-P04) T-A06-402 (FR-A06-401–403; SC-A06-402; gap G-INTERRUPTION; research D3, D4, D6b): the session
+// and engine code moved to `SystemMicrophoneCapture` behind the internal `MicrophoneCapture` seam; the source pauses
+// on interruptions, resumes when allowed or asked, rebuilds on route loss and media-services reset, and never runs two
+// captures.
 import AVFAudio
 import Foundation
 import VisualCoreAudioDSP
@@ -12,8 +16,14 @@ import VisualCoreAudioDSP
 /// `.playAndRecord` with `.mixWithOthers`, so music the person is playing keeps playing (FR-A06-107). The engine is
 /// created on start and released on stop, which also deactivates the session with `.notifyOthersOnDeactivation`, so
 /// the microphone is not held after leaving (FR-A06-105). Nothing is recorded to disk.
+///
+/// Recovery (FR-A06-402, FR-A06-403): while running or interrupted the source observes the default notification
+/// center through an `AudioSessionEventMonitor` and reacts in `handle(_:)`: interruption began → capture stopped,
+/// `.interrupted`; ended with permission to resume → restarted; ended without it → stays `.interrupted` until
+/// `resume()`; route lost or media services reset while running → capture rebuilt. A restart re-checks the permission;
+/// if it fails the state becomes `.failed` with the reason. At most one capture runs at any time.
 @MainActor
-public final class MicrophoneAudioSource: AudioSource {
+public final class MicrophoneAudioSource: ResumableAudioSource {
     /// Requested tap size, in frames (a hint; the system may deliver other sizes).
     public static let tapFrames: AVAudioFrameCount = 1_024
     /// Audio session category used while running.
@@ -27,81 +37,186 @@ public final class MicrophoneAudioSource: AudioSource {
     public private(set) var sampleRate: Double = 48_000
     /// Current lifecycle state.
     public private(set) var state: AudioSourceState = .idle
+    /// True only while `.interrupted` after an interruption ended without permission to resume (`resume()` is the
+    /// way back); false otherwise.
+    public private(set) var awaitsResume = false
 
     private let permission: any MicrophonePermission
-    private var engine: AVAudioEngine?
-    private var sink: MicrophoneTapSink?
-    /// Number of times the engine was started (test hook for "no engine without permission").
+    private let makeCapture: @MainActor () -> any MicrophoneCapture
+    private let center: NotificationCenter?
+    private var capture: (any MicrophoneCapture)?
+    private var buffer: SampleRingBuffer?
+    private var monitor: AudioSessionEventMonitor?
+    /// Number of successful capture starts, restarts included (test hook for "no engine without permission").
     internal private(set) var engineStartCount = 0
+    /// Number of captures currently running (test hook for FR-A06-403; never above 1).
+    internal private(set) var runningCaptures = 0
 
-    /// Creates a microphone source gated by `permission`.
-    public init(permission: any MicrophonePermission) {
-        self.permission = permission
+    /// Creates a microphone source gated by `permission`, capturing with the system engine and observing the
+    /// default notification center for audio-session events while running or interrupted.
+    public convenience init(permission: any MicrophonePermission) {
+        self.init(permission: permission, makeCapture: { SystemMicrophoneCapture() }, center: .default)
     }
 
-    isolated deinit { tearDown() }
+    /// Test seam: `makeCapture` builds the capture for every start and restart; a `nil` center installs no monitor
+    /// (tests call `handle(_:)` directly or post on a private center).
+    init(permission: any MicrophonePermission, makeCapture: @escaping @MainActor () -> any MicrophoneCapture,
+         center: NotificationCenter?) {
+        self.permission = permission
+        self.makeCapture = makeCapture
+        self.center = center
+    }
+
+    isolated deinit {
+        monitor?.stop()
+        capture?.stop()
+    }
 
     /// Starts capturing into `buffer`.
     /// - Throws: `AudioSourceError.notDetermined` when permission was never asked, `.permissionDenied` when denied or
     ///   restricted, `.engineFailed` when the session or engine cannot start (for example no input route).
     public func start(into buffer: SampleRingBuffer) throws {
         stop()
-        switch permission.state {
-        case .granted: break
-        case .notDetermined:
-            state = .failed("microphone permission not determined")
-            throw AudioSourceError.notDetermined
-        case .denied, .restricted:
-            state = .failed("microphone permission denied")
-            throw AudioSourceError.permissionDenied
+        if let error = permissionError() {
+            state = .failed(Self.reason(for: error))
+            throw error
         }
+        self.buffer = buffer
         do {
-            let session = AVAudioSession.sharedInstance()
-            try session.setCategory(Self.sessionCategory, mode: Self.sessionMode, options: Self.sessionOptions)
-            try session.setActive(true)
-            let engine = AVAudioEngine()
-            let input = engine.inputNode
-            let format = input.outputFormat(forBus: 0)
-            guard format.sampleRate > 0, format.channelCount > 0 else {
-                throw AudioSourceError.engineFailed("no audio input available")
-            }
-            let sink = MicrophoneTapSink(buffer: buffer)
-            input.installTap(onBus: 0, bufferSize: Self.tapFrames, format: format, block: Self.makeTapBlock(sink))
-            engine.prepare()
-            self.engine = engine
-            self.sink = sink
-            try engine.start()
-            engineStartCount += 1
-            sampleRate = format.sampleRate
-            state = .running
+            try startCapture(into: buffer)
         } catch {
-            tearDown()
-            let message = (error as? AudioSourceError).map { "\($0)" } ?? error.localizedDescription
+            let (message, thrown) = Self.describe(error)
             state = .failed(message)
-            if let known = error as? AudioSourceError { throw known }
-            throw AudioSourceError.engineFailed(message)
+            throw thrown
+        }
+        state = .running
+        if let center {
+            monitor = AudioSessionEventMonitor(center: center) { [weak self] event in self?.handle(event) }
         }
     }
 
     /// Stops capturing: removes the tap, stops the engine and deactivates the session. Safe to call when idle.
+    /// A running or interrupted source becomes `.idle`; a failed source keeps its failure.
     public func stop() {
-        tearDown()
-        if case .running = state { state = .idle }
+        dropMonitor()
+        stopCapture()
+        awaitsResume = false
+        switch state {
+        case .running, .interrupted: state = .idle
+        case .idle, .failed: break
+        }
     }
 
-    private func tearDown() {
-        guard let engine else { return }
-        engine.inputNode.removeTap(onBus: 0)
-        engine.stop()
-        self.engine = nil
-        sink = nil
-        try? AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
+    /// Reacts to a system audio-session event (research D4). Events while idle or failed are ignored.
+    ///
+    /// Running: began → capture stopped, `.interrupted`; route lost or media services reset → capture stopped and
+    /// restarted; ended → ignored. Interrupted: ended with permission to resume → restarted; ended without it → stays
+    /// `.interrupted` with `awaitsResume`; began, route lost and media services reset keep it `.interrupted` (the next
+    /// restart builds a fresh engine anyway). A failed restart ends in `.failed(reason)`.
+    public func handle(_ event: AudioSessionEvent) {
+        switch state {
+        case .running:
+            switch event {
+            case .interruptionBegan:
+                stopCapture()
+                awaitsResume = false
+                state = .interrupted
+            case .routeLost, .mediaServicesReset:
+                stopCapture()
+                restart()
+            case .interruptionEnded:
+                break
+            }
+        case .interrupted:
+            switch event {
+            case .interruptionEnded(let shouldResume):
+                if shouldResume { restart() } else { awaitsResume = true }
+            case .interruptionBegan:
+                awaitsResume = false
+            case .routeLost, .mediaServicesReset:
+                break
+            }
+        case .idle, .failed:
+            break
+        }
     }
 
-    /// Builds the tap block outside the main actor: the block runs on the audio render thread, so it must not
-    /// inherit main-actor isolation.
-    private nonisolated static func makeTapBlock(_ sink: MicrophoneTapSink) -> AVAudioNodeTapBlock {
-        { pcm, _ in sink.consume(pcm) }
+    /// Restarts capture after an interruption (for example after it ended without permission to resume). Does
+    /// nothing unless the state is `.interrupted`.
+    public func resume() {
+        guard state == .interrupted else { return }
+        restart()
+    }
+
+    /// Restarts into the kept buffer, re-checking the permission; ends `.running` or `.failed(reason)`.
+    private func restart() {
+        stopCapture()
+        awaitsResume = false
+        if let error = permissionError() {
+            fail(Self.reason(for: error))
+            return
+        }
+        guard let buffer else {
+            fail("no buffer to resume into")
+            return
+        }
+        do {
+            try startCapture(into: buffer)
+            state = .running
+        } catch {
+            fail(Self.describe(error).message)
+        }
+    }
+
+    private func fail(_ reason: String) {
+        dropMonitor()
+        stopCapture()
+        awaitsResume = false
+        state = .failed(reason)
+    }
+
+    private func startCapture(into buffer: SampleRingBuffer) throws {
+        stopCapture()
+        let capture = makeCapture()
+        let rate = try capture.start(into: buffer)
+        self.capture = capture
+        runningCaptures += 1
+        engineStartCount += 1
+        sampleRate = rate
+    }
+
+    private func stopCapture() {
+        guard let capture else { return }
+        capture.stop()
+        self.capture = nil
+        runningCaptures -= 1
+    }
+
+    private func dropMonitor() {
+        monitor?.stop()
+        monitor = nil
+    }
+
+    private func permissionError() -> AudioSourceError? {
+        switch permission.state {
+        case .granted: return nil
+        case .notDetermined: return .notDetermined
+        case .denied, .restricted: return .permissionDenied
+        }
+    }
+
+    private static func reason(for error: AudioSourceError) -> String {
+        switch error {
+        case .notDetermined: return "microphone permission not determined"
+        case .permissionDenied: return "microphone permission denied"
+        default: return "\(error)"
+        }
+    }
+
+    private static func describe(_ error: any Error) -> (message: String, thrown: AudioSourceError) {
+        if let known = error as? AudioSourceError { return ("\(known)", known) }
+        let message = error.localizedDescription
+        return (message, .engineFailed(message))
     }
 }
 

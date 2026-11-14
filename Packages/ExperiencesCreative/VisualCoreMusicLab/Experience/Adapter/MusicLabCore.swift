@@ -63,8 +63,9 @@ public struct MusicLabCore: ExperienceCore, Equatable {
         ])
     }
 
-    /// The nine controls: three sources, the demo mode, a new melody, the permission mirror, and (feature 049) the
-    /// scene, a mapping choice and a scene's mapping reset.
+    /// The ten controls: three sources, the demo mode, a new melody, the permission mirror, (feature 049) the scene, a
+    /// mapping choice and a scene's mapping reset, and (feature 050) applying a preset: the scene and up to three
+    /// choices in one action.
     public static var controls: [ExperienceControl] {
         let modes = Double(MusicLabState.demoModeRange.lowerBound)...Double(MusicLabState.demoModeRange.upperBound)
         let access = Double(MicrophoneAccess.notDetermined.rawValue)...Double(MicrophoneAccess.restricted.rawValue)
@@ -78,6 +79,8 @@ public struct MusicLabCore: ExperienceCore, Equatable {
             ExperienceControl(id: "scene.select", ranges: [0...2]),
             ExperienceControl(id: "mapping.set", ranges: [0...2, 0...2, 0...6, MappingChoice.gainRange]),
             ExperienceControl(id: "mapping.reset", ranges: [0...2]),
+            ExperienceControl(id: "preset.apply", ranges: [0...2, 0...6, MappingChoice.gainRange, 0...6,
+                                                           MappingChoice.gainRange, 0...6, MappingChoice.gainRange]),
         ]
     }
 
@@ -130,9 +133,37 @@ public struct MusicLabCore: ExperienceCore, Equatable {
                 return .rejected(.outOfRange(index: 0))
             }
             state.resetMappings(scene: scene)
+        case "preset.apply":
+            return applyPreset(v)
         default:
             return .rejected(.unknownControl(action.control))
         }
+        return .accepted
+    }
+
+    /// `preset.apply [scene, feature₀, gain₀, feature₁, gain₁, feature₂, gain₂]` (feature 050, FR-A06-413): sets the scene
+    /// and its choices; slots beyond the scene's parameter count must be zero (rule `a06.no-such-parameter`), an invalid
+    /// choice is out of range. All-or-nothing: a refusal changes nothing.
+    private mutating func applyPreset(_ v: [Double]) -> ActionResult {
+        guard v.count == 7 else { return .rejected(.wrongValueCount(expected: 7, found: v.count)) }
+        guard let scene = MusicLabScene(rawValue: Int(v[0].rounded())) else { return .rejected(.outOfRange(index: 0)) }
+        let count = scene.parameters.count
+        var choices: [MappingChoice] = []
+        for slot in 0..<3 {
+            let feature = v[1 + slot * 2], gain = v[2 + slot * 2]
+            if slot < count {
+                guard let choice = MappingChoice(feature: Int(feature.rounded()), gain: gain) else {
+                    return .rejected(.outOfRange(index: 1 + slot * 2))
+                }
+                choices.append(choice)
+            } else if feature != 0 || gain != 0 {
+                return .rejected(.rule(code: MusicLabRule.noSuchParameter))
+            }
+        }
+        var next = state
+        next.select(scene: scene)
+        for (slot, choice) in choices.enumerated() { next.setMapping(scene: scene, slot: slot, choice: choice) }
+        state = next
         return .accepted
     }
 

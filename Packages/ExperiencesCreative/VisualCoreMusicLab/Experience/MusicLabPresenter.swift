@@ -49,6 +49,41 @@ final class MusicLabMirror {
     /// The active scene's parameter values, rounded to hundredths so the controls update only when a shown digit
     /// changes (feature 049, FR-A06-312).
     var parameterValues: [Double] = []
+    /// The active source's condition (feature 050, FR-A06-410).
+    var condition: SourceCondition = .live
+    /// The recovery the controls offer (feature 050).
+    var recovery: Recovery = .none
+    /// "<source> — live", "— paused by the system" or "— stopped".
+    var statusLine: String { "\(status) — \(condition.text)" }
+}
+
+/// The condition of the active source as the status shows it (feature 050).
+enum SourceCondition: Equatable {
+    /// Producing samples (the demo and file sources are always live while selected).
+    case live
+    /// The system paused the input (a call, an alarm, another app).
+    case paused
+    /// The source stopped with an error.
+    case stopped
+
+    /// The words after the source's name.
+    var text: String {
+        switch self {
+        case .live: "live"
+        case .paused: "paused by the system"
+        case .stopped: "stopped"
+        }
+    }
+}
+
+/// The recovery button the controls show (feature 050).
+enum Recovery: Equatable {
+    /// Nothing to offer.
+    case none
+    /// "Resume": the interruption ended without permission to resume.
+    case resume
+    /// "Use demo signal": the microphone failed.
+    case useDemo
 }
 
 /// How the presenter makes its sources; tests replace the file and microphone sources with doubles.
@@ -176,6 +211,8 @@ final class MusicLabPresenter: ExperiencePresenter {
     /// The display heights of the last frame.
     private(set) var lastDisplay = AnalysisDisplay.silent(bandCount: 16)
 
+    /// The preset library in the experience's own storage (feature 050); nil without storage (some tests).
+    let presets: MusicLabPresetLibrary?
     /// Whether Reduce Motion is on: the Geometry scene's spin then stays at its range minimum (FR-A06-314).
     let reduceMotion: Bool
     /// The mappers of the active scene's parameters (feature 049), rebuilt when the scene or a choice changes.
@@ -191,9 +228,10 @@ final class MusicLabPresenter: ExperiencePresenter {
     private var meshes: GeometryMeshes?
 
     init(experienceID: ExperienceID, permission: any MicrophonePermission, factory: MusicLabSourceFactory = .system,
-         reduceMotion: Bool = false) {
+         reduceMotion: Bool = false, storage: ExperienceStorage? = nil) {
         self.experienceID = experienceID
         self.reduceMotion = reduceMotion
+        presets = storage.map { MusicLabPresetLibrary(storage: $0) }
         self.permission = permission
         self.factory = factory
         root.add(centre)
@@ -239,6 +277,7 @@ final class MusicLabPresenter: ExperiencePresenter {
         if case .failed(let reason)? = activeSource?.state, mirror.message == nil {
             mirror.message = "The sound stopped: \(reason)"
         }
+        updateCondition()
         try clear.render(context, frame: frame)
         let width = Double(max(1, context.pixelWidth)), height = Double(max(1, context.pixelHeight))
         let count = ring.latest(Self.drawnSampleCount, into: &scratch)
@@ -609,6 +648,53 @@ final class MusicLabPresenter: ExperiencePresenter {
         return deniedMessage
     }
 
+    // MARK: Recovery (feature 050, FR-A06-410)
+
+    /// Brings the status condition and the offered recovery in line with the active source's state.
+    func updateCondition() {
+        let condition: SourceCondition
+        let recovery: Recovery
+        switch activeSource?.state {
+        case .interrupted?:
+            condition = .paused
+            recovery = (activeSource as? any ResumableAudioSource)?.awaitsResume == true ? .resume : .none
+        case .failed?:
+            condition = .stopped
+            recovery = lastCore?.state.source == .microphone ? .useDemo : .none
+        default:
+            condition = .live
+            recovery = .none
+        }
+        if mirror.condition != condition { mirror.condition = condition }
+        if mirror.recovery != recovery { mirror.recovery = recovery }
+    }
+
+    /// "Resume": restarts a source paused by the system.
+    func resumeSource() {
+        (activeSource as? any ResumableAudioSource)?.resume()
+        updateCondition()
+    }
+
+    /// Applies `preset` through the port (one `preset.apply` action, FR-A06-413). Returns the core's answer.
+    @discardableResult
+    func apply(_ preset: MusicPreset) -> ActionResult {
+        port?.send("preset.apply", preset.actionValues) ?? .rejected(.unknownControl("preset.apply"))
+    }
+
+    /// Saves the current scene and its choices as a preset named `name` (made unique); nil when refused.
+    @discardableResult
+    func saveCurrentPreset(named name: String) -> MusicPreset? {
+        guard let presets, let state = lastCore?.state else { return nil }
+        return presets.save(name: name, scene: state.scene, choices: state.currentChoices)
+    }
+
+    /// "Use demo signal": switches to the demo after the microphone failed.
+    func useDemo() {
+        _ = port?.send("source.demo")
+        mirror.message = nil
+        updateCondition()
+    }
+
     // MARK: Description
 
     /// Records the display copy of the state (with the picked file's name) and the status line.
@@ -656,6 +742,6 @@ final class MusicLabPresenter: ExperiencePresenter {
     /// Every action has a native control; the permission mirror is sent by the Microphone button's flow.
     var nativeActions: Set<String> {
         ["source.demo", "source.microphone", "source.file", "demo.mode", "demo.reseed", "permission.mirror",
-         "scene.select", "mapping.set", "mapping.reset"]
+         "scene.select", "mapping.set", "mapping.reset", "preset.apply"]
     }
 }

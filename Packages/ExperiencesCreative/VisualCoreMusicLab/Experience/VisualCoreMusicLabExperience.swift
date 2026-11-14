@@ -10,13 +10,15 @@ public enum VisualCoreMusicLabExperience {
     public static let id = ExperienceID(rawValue: MusicLabCore.experienceID)
 
     /// The experience registered as `id`, with the system microphone permission and the VisualCoreAudio sources.
-    /// It stores nothing (no audio is written; the source and scene choices travel in the host's saved session state).
+    /// It stores only presets (feature 050, one small file each in `storage`; no audio); the source and scene choices
+    /// travel in the host's saved session state.
     /// Reduce Motion keeps the Geometry scene's sound-driven spin at rest (feature 049, FR-A06-314); nothing flashes,
     /// so Reduce Flashing changes nothing.
     @MainActor
     public static func make(id: ExperienceID, storage: ExperienceStorage, reduceMotion: Bool,
                             reduceFlashing: Bool) -> any Experience {
-        make(id: id, permission: SystemMicrophonePermission(), factory: .system, reduceMotion: reduceMotion)
+        make(id: id, permission: SystemMicrophonePermission(), factory: .system, reduceMotion: reduceMotion,
+             storage: storage)
     }
 
     /// The experience with an injected permission and source factory (tests use doubles for both); the presenter
@@ -24,9 +26,10 @@ public enum VisualCoreMusicLabExperience {
     @MainActor
     static func make(id: ExperienceID, permission: any MicrophonePermission,
                      factory: MusicLabSourceFactory = .system,
-                     reduceMotion: Bool = false) -> ExperienceShell<MusicLabPresenter> {
+                     reduceMotion: Bool = false,
+                     storage: ExperienceStorage? = nil) -> ExperienceShell<MusicLabPresenter> {
         let presenter = MusicLabPresenter(experienceID: id, permission: permission, factory: factory,
-                                          reduceMotion: reduceMotion)
+                                          reduceMotion: reduceMotion, storage: storage)
         let shell = ExperienceShell(id: id, presenter: presenter)
         presenter.port = shell.port
         return shell
