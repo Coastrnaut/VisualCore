@@ -17,6 +17,9 @@
   Alternative: a new pass (duplication, two code paths to keep equal).
 - **D3 Response:** two `AudioMapper`s (low → ripple, level → brightness) followed by a step limiter and clamps, pure in
   Core so it is testable without audio hardware.
-- **D4 Ripple at draw time:** per-piece radial scale about the rail (same scale for all pieces in a frame) keeps joins
-  watertight and avoids per-frame mesh rebuilds.
+- **D4 Breathing at draw time:** one radial scaling per frame about the camera's point on the rail, in the plane
+  perpendicular to the rail direction (factor 1 along it), applied as the same model matrix to every tunnel piece, so
+  neighbouring pieces stay watertight and no mesh is rebuilt per frame (convergence T-A07-217). A uniform 3-D scale
+  about a point at the eye would be invisible (rays through the eye map to themselves); a per-piece scale about each
+  piece's own rail point would open the joins. Documented in `OdysseyPresenter.breathingModel`.
 - **D5 Sources:** A06's source set and permission flow, reused unchanged.
