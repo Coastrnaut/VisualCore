@@ -71,6 +71,13 @@ evidence commands are found as described in Auto-Creator.md §19. Simulators are
    one pass on the iOS 27.x phone. **Stopping a run** (lesson of 2026-11-13): TaskStop the whole background loop, not
    only its xcodebuild, and check `pgrep -fl xcodebuild` before a new run; `xcodebuild_app.py` refuses a busy
    simulator.
+   **Faster gates** (owner ruling of 2026-11-14): (1) the iOS 27 and iOS 26 runs of a gate go in parallel (separate
+   derived data per runtime); (2) gates overlap — while one gate's long evidence runs in the background, the next gate's
+   Spec Kit steps start (each gate's own steps stay in order); (3) runs while a gate is being built test only the
+   experience being changed, the full suite runs at the gate's final evidence; (4) no separate baseline run when the
+   previous gate's final evidence is from the same commit (cite it instead); (5) iOS 26 runs only at an experience's X
+   gate, phase gates use iOS 27; (6) the ProjectM reference regression runs once per experience at its X gate (and for
+   shared-round VisualCore features), not at every phase that touches VisualCore. Gates are never merged or skipped.
    **No open-ended waits** (owner ruling of 2026-11-12): nothing is waited for without a limit. App tests run
    through `scripts/xcodebuild_app.py`, which stops a run after `--max-seconds` (default 540) and names the test
    it was on; a run that would not fit is split into chunks of whole test classes with `--only-testing`. A CI run
