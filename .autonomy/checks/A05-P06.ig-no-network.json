@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "/bin/sh",
+    "-c",
+    "! grep -rnE 'URLSession|import Network|CoreMotion|AVFoundation|CoreLocation|AdSupport|AppTrackingTransparency' Packages/ExperiencesCreative/InfiniteGeometry"
+  ],
+  "command": "/bin/sh -c '! grep -rnE '\"'\"'URLSession|import Network|CoreMotion|AVFoundation|CoreLocation|AdSupport|AppTrackingTransparency'\"'\"' Packages/ExperiencesCreative/InfiniteGeometry'",
+  "elapsed_seconds": 0.025,
+  "exit_code": 0,
+  "finished": "2026-11-14T05:32:14+00:00",
+  "log": ".autonomy/logs/A05-P06.ig-no-network.log",
+  "log_sha256": "d496f9a14b5c88dcb9d2ab95b6771c8e5b89d947877d0acc760ce1c7a35034dc",
+  "name": "ig-no-network",
+  "stage": "A05-P06",
+  "started": "2026-11-14T05:32:14+00:00",
+  "timed_out": false
+}
