@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--only",
+    "a08.oscilloscope-studio",
+    "--runtime",
+    "27"
+  ],
+  "command": "python3 scripts/verify_experiences.py --only a08.oscilloscope-studio --runtime 27",
+  "elapsed_seconds": 21.94,
+  "exit_code": 0,
+  "finished": "2026-11-14T18:39:12+00:00",
+  "log": ".autonomy/logs/A08-P04.verify-27.log",
+  "log_sha256": "80b5bacff207750bfcf2fc3166f5cb172981f9b1726bafa71df86b56a944ef4b",
+  "name": "verify-27",
+  "stage": "A08-P04",
+  "started": "2026-11-14T18:38:50+00:00",
+  "timed_out": false
+}
