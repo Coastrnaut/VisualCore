@@ -1,0 +1,51 @@
+# Tasks: Oscilloscope Studio — Phase 05 Device-route and accuracy audits
+
+**Input**: [spec.md](spec.md), [plan.md](plan.md), [research.md](research.md), [data-model.md](data-model.md),
+[contracts/api.md](contracts/api.md), [quickstart.md](quickstart.md). Gate A08-P05 (legacy). Evidence:
+`python3 Tools/python/desktop_runbook.py run-check --stage A08-P05 --timeout 600 --name <check> -- <command>`. Commit after every task (no trailers). iOS 27 only; reference regression at X-A08
+(owner, 2026-11-14).
+
+## Phase 1: Setup
+
+- [ ] T-A08-501 Baseline: cite the A08-P04 evidence on the unchanged tree (`.autonomy/checks/A08-P04.scope-ios27.json`, `.autonomy/checks/A08-P04.app-unit.json`, `.autonomy/checks/A08-P04.verify-27.json`) instead of a rerun (owner ruling of 2026-11-14)
+
+## Phase 2: Foundational (VisualCore and core)
+
+- [ ] T-A08-502 [P] [US2] Write `Packages/VisualCoreRendering/Sources/VisualCoreAudio/{StereoMicrophoneCapture,StereoMicrophoneAudioSource}.swift` per contracts/api.md (internal seam `StereoMicrophoneCapture`: start into a `StereoSampleBuffer` returning sample rate and channel count, stop; `SystemStereoMicrophoneCapture` with the mono source's session category, mode and options, tapping channels 0 and 1 or duplicating channel 0; `StereoMicrophoneAudioSource` with `MicrophonePermission`, `AudioSessionEventMonitor` interruption and route handling, `awaitsResume`, `resume()`, `channelCount` 1 or 2; `MicrophoneAudioSource` unchanged) and `Packages/VisualCoreRendering/Tests/VisualCoreAudioTests/StereoMicrophoneAudioSourceTests.swift` with a capture double (two-channel route reports 2 and separate samples; one-channel route reports 1; denied and undetermined permission refused without a capture; interruption stops and resume restarts; route change rebuilds with the new channel count) (FR-A08-501; SC-A08-502)
+- [ ] T-A08-503 [P] [US3] Core `Packages/ExperiencesCreative/OscilloscopeStudio/Core/{ScopeQuality,ScopeAnnouncer}.swift` ("levels [(columnShare 1, analysisInterval 1), (0.5, 2), (0.25, 4)]"; `level(tier:forced:)` clamped; announcer "interval 1.5 s", VoiceOver only) with `CoreTests/{ScopeQualityTests,ScopeAnnouncerTests}.swift` (level arithmetic, clamping; announcements never closer than 1.5 s, none without VoiceOver) (FR-A08-520, 521; SC-A08-503, 504)
+
+## Phase 3: User Story 1 — readouts that match the known signal (P1) 🎯
+
+- [ ] T-A08-504 [US1] `Experience/ScopeAccuracyAudit.swift` (cases of clarification 2 through `StereoSampleBuffer`, `ScopeAcquisition`, `SpectrumAnalyzer`, `SpectrumReadout`, `ScopeReadout`; `AccuracyReport` with case, expected, measured, tolerance, pass) and `ExperienceTests/ScopeAccuracyAuditTests.swift` (100 % of cases pass; the sweep at 0.5/1/1.5 s within the frame's range ± one bin and rising; square extremes ±0.50 of full scale and fundamental peak; readout words contain "relative to full scale" and none of "calibrated", "certified", "laboratory", "medical") (FR-A08-510; SC-A08-501)
+
+## Phase 4: User Story 2 and 3 — routes, speech and levels (P1/P2)
+
+- [ ] T-A08-505 [US2] [US3] Experience wiring: `ScopeCore.qualityTiers = 3`; `ScopePresenter` uses `StereoMicrophoneAudioSource` for the microphone (XY with two-channel routes; route-change announcement of the channel count), `ScopeQuality` for columns and spectrum interval (forced level for tests), `ScopeAnnouncer` with an `AnnouncementSink` and a VoiceOver flag (as Audio Odyssey's presenter); `Catalog/registrations.json` a08 `quality_tiers` level-0/1/2 and catalog rebuilt; tests `ExperienceTests/{ScopeDescriptionTests,ScopeSessionTests}.swift` (description for waveform/XY/spectrum × no signal/clipping/frozen/demo/mono names its parts; announcements paced and VoiceOver-only through a recording sink; levels 1 and 2 halve and quarter the drawn points and analyses (±1) with identical digests; the core declares 3 levels and the shell's quality profile has 3 levels; frozen samples unchanged across a level change) (FR-A08-511, 520, 521; SC-A08-502–504)
+
+## Phase 5: User Story 4 — the freeze metadata fixture (P2)
+
+- [ ] T-A08-506 [US4] Manifest fixture "frozen capture metadata" in `Experience/Adapter/ScopeManifest.swift`, regenerate `scenario-manifest.json` (`UPDATE_SCENARIO_MANIFEST=1 TEST_RUNNER_UPDATE_SCENARIO_MANIFEST=1`), update `ExperienceTests/ScopeManifestTests.swift`; session test: a frozen window's sample rate, channel count, start, count and samples stay identical over frames, a gain change and a level change (FR-A08-531; SC-A08-505)
+
+## Phase 6: Polish & evidence
+
+- [ ] T-A08-507 VisualCoreAudio on sim-27.2 (`python3 Tools/python/desktop_runbook.py run-check --stage A08-P05 --timeout 600 --name audio-ios27 -- python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --only-testing VisualCoreAudioTests`)
+- [ ] T-A08-508 Oscilloscope Studio tests on sim-27.2 (`python3 Tools/python/desktop_runbook.py run-check --stage A08-P05 --timeout 600 --name scope-ios27 -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing OscilloscopeStudioCoreTests OscilloscopeStudioExperienceTests`; each test < 10 s) (SC-A08-505)
+- [ ] T-A08-509 App build and unit (`python3 Tools/python/desktop_runbook.py run-check --stage A08-P05 --timeout 600 --name app-unit -- python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27`)
+- [ ] T-A08-510 Runner iOS 27 (`python3 Tools/python/desktop_runbook.py run-check --stage A08-P05 --timeout 600 --name verify-27 -- python3 scripts/verify_experiences.py --only a08.oscilloscope-studio --runtime 27`)
+- [ ] T-A08-511 Experience package check and hot-path check of the new source (`python3 Tools/python/desktop_runbook.py run-check --stage A08-P05 --timeout 600 --name experience-packages -- python3 scripts/check_experience_packages.py`; add `StereoMicrophoneAudioSource` to `DEFAULT_FILES` in `scripts/check_audio_hot_path.py` if it has a tap block and update its test count; `python3 Tools/python/desktop_runbook.py run-check --stage A08-P05 --timeout 600 --name hot-path -- python3 scripts/check_audio_hot_path.py`)
+- [ ] T-A08-512 Public API, docs and records: `check_public_api.py --update`, `python3 Tools/python/desktop_runbook.py run-check --stage A08-P05 --timeout 600 --name public-api -- python3 scripts/check_public_api.py`; `Packages/VisualCoreRendering/README.md` (two-channel microphone); new `docs/apps/oscilloscope-studio/device-campaign.md` (stereo routes, input latency, 44.1 kHz routes, thermal and quality levels; device D1–D3, procedure, pass criterion, result pending) and device-only items in `docs/release/known-limitations.md`; contract G-STEREOMIC, G-ACCURACY, G-MEASUREA11Y closed by "A08-P05" and `python3 Tools/python/desktop_runbook.py run-check --stage A08-P05 --timeout 600 --name contract -- python3 scripts/check_app_contract.py --app oscilloscope-studio --render` (FR-A08-530)
+- [ ] T-A08-513 Script tests (`python3 Tools/python/desktop_runbook.py run-check --stage A08-P05 --timeout 600 --name script-tests -- python3 scripts/test_scripts.py`)
+- [ ] T-A08-514 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A08-P05
+
+## Dependencies
+
+T-A08-501 → (502 ∥ 503 ∥ 504) → 505 (needs 502, 503) → 506 → Polish.
+
+## Parallel examples
+
+Agent A: T-A08-502. Agent B: T-A08-503. Agent C: T-A08-504. Agent D: T-A08-505 after A and B. Lead: 506, docs,
+registrations, contract, runs, commits.
+
+## Implementation strategy
+
+MVP: the accuracy audit (US1); then routes, speech and levels; evidence and device records last.
