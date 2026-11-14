@@ -151,8 +151,9 @@ the start edge of the next; generation of a piece stays within its vertex budget
 
 **Experience (stories 1, 2)**
 - **FR-A07-120**: Audio Odyssey MUST be an experience of the one app in `Packages/ExperiencesCreative/AudioOdyssey`,
-  registered as a candidate with the nine standard scenarios and one scenario per regression fixture that this phase
-  proves (watertight joins; comfort limits).
+  registered as a candidate with the nine standard scenarios and one scenario per regression fixture of the planning
+  catalog (five; the source-switching and audio-response fixtures use world switches and steady flight until audio
+  arrives in A07-P03).
 - **FR-A07-121**: The experience MUST draw the current world around the rail camera through the host (no context of its
   own), with controls for world, speed and pause; the journey state (world, distance, speed choice, seed, paused) is
   part of its digest and snapshot.

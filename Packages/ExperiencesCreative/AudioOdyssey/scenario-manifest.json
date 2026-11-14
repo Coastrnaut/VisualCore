@@ -334,6 +334,105 @@
       },
       "name" : "fixture-2",
       "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "world.select",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 5
+        },
+        {
+          "action" : {
+            "control" : "world.select",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 5
+        },
+        {
+          "action" : {
+            "control" : "world.select",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 5
+        },
+        {
+          "action" : {
+            "control" : "world.select",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 5
+        },
+        {
+          "steps" : 60
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "34297dbac792830afeb0a699832c2272548a856f57908ef2f28fa5e0f92b24c9",
+        "initialDigest" : "c6d5b3cf0048c9c546d70860f5e5e3373b2146996e609adf1d108c2963187523"
+      },
+      "name" : "fixture-3",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "speed.select",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "steps" : 600
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "baa3d213e16183c615ed9c2695f53af15dd4b374844b8aee19b84bfafc4898a9",
+        "initialDigest" : "c6d5b3cf0048c9c546d70860f5e5e3373b2146996e609adf1d108c2963187523"
+      },
+      "name" : "fixture-4",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "speed.select",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "steps" : 2400
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "d6b53e38d6e6956795986f318c342b7453a56e6614521fe37f5454aabc837d7a",
+        "initialDigest" : "c6d5b3cf0048c9c546d70860f5e5e3373b2146996e609adf1d108c2963187523"
+      },
+      "name" : "fixture-5",
+      "seed" : "7"
     }
   ],
   "schema" : 1

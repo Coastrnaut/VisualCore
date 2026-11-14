@@ -1,6 +1,6 @@
 // OdysseyManifest — feature 054 (A07-P01) T-A07-106 (FR-A07-120). The scenarios the verification runner plays for
-// Audio Odyssey: the nine standard ones and one `fixture-<n>` per regression fixture this phase proves (watertight
-// joins; comfort limits), all short (owner rule of 2026-11-13). The flight advances with every step, so the expected
+// Audio Odyssey: the nine standard ones and one `fixture-<n>` per regression fixture of the planning catalog (watertight
+// joins; comfort limits; world switches without a context reset; steady response; long travel), all short (owner rule of 2026-11-13). The flight advances with every step, so the expected
 // digests are derived by playing the entries on a core exactly as the engine plays them (the steps of an entry, then
 // its action) and digesting it with the experience id as domain, like Music Lab's manifest.
 #if DEBUG || VISUALCORE_AUTOMATION
@@ -66,6 +66,16 @@ extension OdysseyCore {
              step("journey.reseed", steps: 240), step("world.select", [0], steps: 240), ScenarioStep(steps: 240)],
             [step("speed.select", [2], steps: 10), step("speed.select", [0], steps: 600),
              step("flight.pause", steps: 240), step("flight.resume", steps: 240), ScenarioStep(steps: 120)],
+            // Fixture 3 (catalog: "source switching does not reset the context"): until audio sources arrive in
+            // A07-P03, rapid world switches while flying stand in for source switches; the host context stays.
+            [step("world.select", [2], steps: 5), step("world.select", [1], steps: 5), step("world.select", [0], steps: 5),
+             step("world.select", [2], steps: 5), ScenarioStep(steps: 60)],
+            // Fixture 4 (catalog: "stable and measurable scene response"): a steady medium flight advances the same
+            // distance for the same steps; the audio-driven form follows in A07-P03.
+            [step("speed.select", [1], steps: 1), ScenarioStep(steps: 600)],
+            // Fixture 5 (catalog: "long-duration travel avoids precision collapse"): a fast flight crosses many
+            // pieces; the rebasing itself is proven by OriginRebaseTests at 10^7 units.
+            [step("speed.select", [2], steps: 1), ScenarioStep(steps: 2_400)],
         ]
     }
 

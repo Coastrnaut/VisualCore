@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--only",
+    "a07.audio-odyssey",
+    "--runtime",
+    "27"
+  ],
+  "command": "python3 scripts/verify_experiences.py --only a07.audio-odyssey --runtime 27",
+  "elapsed_seconds": 18.351,
+  "exit_code": 0,
+  "finished": "2026-11-14T10:45:37+00:00",
+  "log": ".autonomy/logs/A07-P01.verify-27-2.log",
+  "log_sha256": "868dfc76aaa7aac41f5dcab8d9739268b1b25a6899a5e5772a98e4ed593bc6ff",
+  "name": "verify-27-2",
+  "stage": "A07-P01",
+  "started": "2026-11-14T10:45:19+00:00",
+  "timed_out": false
+}

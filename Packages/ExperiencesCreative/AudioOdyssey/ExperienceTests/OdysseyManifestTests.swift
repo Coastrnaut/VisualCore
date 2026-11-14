@@ -28,13 +28,13 @@ private func play(_ spec: ScenarioSpec) async throws -> (initial: String, result
 }
 
 @Suite struct OdysseyManifestTests {
-    @Test func theManifestIsValidWithTheNineStandardScenariosAndTwoFixtures() {
+    @Test func theManifestIsValidWithTheNineStandardScenariosAndFiveFixtures() {
         let manifest = OdysseyCore.manifest(for: id)
         let problems = ScenarioManifestValidator.problems(manifest, controls: OdysseyCore.controls,
-                                                          content: ContentRequirement(fixtures: 2))
+                                                          content: ContentRequirement(fixtures: 5))
         #expect(problems.isEmpty, "\(problems)")
         #expect(Set(manifest.scenarios.map(\.name))
-                == Set(ScenarioManifest.standardNames).union((1...2).map { "fixture-\($0)" }))
+                == Set(ScenarioManifest.standardNames).union((1...5).map { "fixture-\($0)" }))
     }
 
     @Test func derivedDigestsAndResultsAreWhatTheEngineGives() async throws {
@@ -66,6 +66,19 @@ private func play(_ spec: ScenarioSpec) async throws -> (initial: String, result
         #expect(comfort.state.speedChoice == .slow)
         #expect(!comfort.state.paused)
         #expect(comfort.state.speed > 0 && comfort.state.speed <= 2)
+        // Fixture 3: the last world switch wins; the flight never stopped.
+        let switches = OdysseyCore.played(seed: OdysseyCore.manifestSeed, entries: OdysseyCore.fixtureEntries[2])
+        #expect(switches.state.world == .starCorridor)
+        #expect(switches.state.distance > 0)
+        // Fixture 4: the same steady flight played twice gives the same distance (a stable, measurable response).
+        let steady = OdysseyCore.played(seed: OdysseyCore.manifestSeed, entries: OdysseyCore.fixtureEntries[3])
+        let again = OdysseyCore.played(seed: OdysseyCore.manifestSeed, entries: OdysseyCore.fixtureEntries[3])
+        #expect(steady.state.distance == again.state.distance)
+        #expect(steady.state.distance > 8)
+        // Fixture 5: a fast flight crosses many pieces and stays within the speed limit.
+        let long = OdysseyCore.played(seed: OdysseyCore.manifestSeed, entries: OdysseyCore.fixtureEntries[4])
+        #expect(long.state.distance > 10 * 8)
+        #expect(long.state.speed <= 7 + 1e-9)
     }
 
     /// The JSON form with the control ids, named by `Catalog/registrations.json`. `UPDATE_SCENARIO_MANIFEST=1`

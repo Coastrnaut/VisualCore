@@ -1291,7 +1291,9 @@ class UnifiedAppTargetTests(unittest.TestCase):
                                     # Feature 040 (A05-P01): Infinite Geometry, integrated at X-A05.
                                     "InfiniteGeometryExperience",
                                     # Feature 047 (A06-P01): VisualCore Music Lab, integrated at X-A06.
-                                    "VisualCoreMusicLabExperience"])
+                                    "VisualCoreMusicLabExperience",
+                                    # Feature 054 (A07-P01): Audio Odyssey, a candidate until X-A07.
+                                    "AudioOdysseyExperience"])
 
     def test_the_standing_isolation_step_requires_sources(self):
         listing = subprocess.run([sys.executable, str(HERE / "release_check.py"), "--list"],
