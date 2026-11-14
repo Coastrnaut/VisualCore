@@ -1,0 +1,48 @@
+# Tasks: VisualCore Music Lab — Phase 05 Audio/render performance and accessibility
+
+**Input**: [spec.md](spec.md), [plan.md](plan.md), [research.md](research.md), [data-model.md](data-model.md),
+[contracts/api.md](contracts/api.md), [quickstart.md](quickstart.md). Gate A06-P05 (legacy). Evidence:
+`python3 Tools/python/desktop_runbook.py run-check --stage A06-P05 --timeout 600 --name <check> -- <command>`. Commit after every task (no trailers). iOS 27 only; reference regression at X-A06
+(owner, 2026-11-14).
+
+## Phase 1: Setup
+
+- [ ] T-A06-501 Baseline: cite the A06-P04 evidence on the unchanged tree (`.autonomy/checks/A06-P04.rendering-ios27.json`, `.autonomy/checks/A06-P04.experiences-ios27-2.json`, `.autonomy/checks/A06-P04.app-unit-2.json`, `.autonomy/checks/A06-P04.verify-27.json`) instead of a rerun (owner ruling 4 of 2026-11-14)
+
+## Phase 2: Foundational
+
+- [ ] T-A06-502 [P] [US3] Write `Packages/VisualCore/Tests/VisualCoreAudioDSPTests/{AnalysisQualityTests,AnalysisTimingTests}.swift` first, then `Packages/VisualCore/Sources/VisualCoreAudioDSP/AnalysisQuality.swift` per contracts/api.md ("levels 0…2 → (1,024, 16), (512, 16), (256, 8); clamped"); tests: each level's configuration and extractor valid at 48 and 44.1 kHz; −1 → level 0, 5 → level 2; timing: 10 warm-up then 500 `analyze(_:time:elapsed:into:)` calls at level 0 with `ContinuousClock`, print the mean, assert < 0.5 ms only when `ProcessInfo.processInfo.environment["CI"]` is nil (FR-A06-501; SC-A06-501, 502)
+- [ ] T-A06-503 [P] [US1] Write `Packages/ExperiencesCreative/VisualCoreMusicLab/CoreTests/MetricTextTests.swift` first, then `Packages/ExperiencesCreative/VisualCoreMusicLab/Core/MetricText.swift` (`MetricText.make(rmsDB:regionEnergies:beat:) -> String` per spec clarification 2: "Level −9 dB" with U+2212 and rounding to nearest, "Level silent" at ≤ −90 dBFS or non-finite, "strongest low|low-mid|high-mid|high|none", "beat"/"no beat" at > 0.5, joined with ", "; `regionEnergies(bandEnergies:)` summing bands 0–3/4–7/8–11/12–15, missing bands 0) and `AnnouncementGate` (minimumInterval 2 s; `shouldAnnounce(text:at:) -> Bool` true only for changed text ≥ 2 s after the last announcement; first non-empty text announces); tests: exact strings for silence, −9.03 dB tone in region 2, beat; NaN → silent; gate over a scripted 10 s timeline (changes every 0.5 s → ≤ 5 announcements, none for repeats) (FR-A06-510, 511; SC-A06-503)
+- [ ] T-A06-504 [P] [US2] Write `Packages/ExperiencesCreative/VisualCoreMusicLab/CoreTests/MusicLabPaletteTests.swift` first, then `Packages/ExperiencesCreative/VisualCoreMusicLab/Core/MusicLabPalette.swift` (`enum MusicLabPalette: Int, CaseIterable, Codable, Sendable { aurora = 0, ember = 1, mono = 2 }` with `displayName` and RGBA colours (Doubles 0…1) `bar, wave, level, peak, beat, sphere, cube`; Aurora = today's presenter colours (bar 0.45/0.6/1.0, wave 0.35/0.85/1.0, level 0.4/0.95/0.55, peak 1.0/0.9/0.4, beat 1.0/0.45/0.6, sphere 1.0/0.45/0.6, cube 0.45/0.6/1.0), Ember warm, Mono greys with clearly different luminance per role); tests: three palettes, colours in range, palettes pairwise different, Aurora equals today's values (FR-A06-512)
+
+## Phase 3: User Stories 1, 2, 4 (P1) 🎯
+
+- [ ] T-A06-505 [US2] Extend `Core/MusicLabState.swift` (palette 0…2, schema 3, `select(palette:)`, persisted, validated) and `Core/MusicPreset.swift` (palette field; format 2 written; format 1 decoded with palette 0; `actionValues` 8 numbers with palette last; `init?` gains `palette` defaulting to aurora; built-ins get palettes Aurora/Ember/Mono) with tests in `CoreTests/{MusicLabStateTests,MusicPresetTests}.swift` (depends on T-A06-504) (FR-A06-512; SC-A06-504)
+- [ ] T-A06-506 [US2] Modify `Experience/Adapter/MusicLabCore.swift`: `palette.select [0…2]`; `preset.apply` 8 values (palette last, validated); digest adds palette; migrations 2→3 (palette 0) with 1→2 kept; tests in `ExperienceTests/MusicLabCoreTests.swift` (palette action changes digest, schema-2 payload restores with palette 0, schema-1 still restores, preset.apply sets palette, conformance) and `MusicLabPresetStoreTests.swift` (format-2 save/reload keeps palette; planted format-1 file loads with palette 0; format 3 counted newer) (FR-A06-512; SC-A06-504)
+- [ ] T-A06-507 [US1] Modify `Experience/MusicLabPresenter.swift`, `MusicLabScenes.swift`, `MusicLabControls.swift`, `VisualCoreMusicLabExperience.swift` (depends on T-A06-502, 503, 506): tier → `AnalysisQuality` level each frame, rebuild extractor and reset mappers on change; `lastMetricText` from `MetricText` after each analysis; injectable `announcementSink: any AnnouncementSink` and `voiceOverRunning: () -> Bool` (defaults system) with an `AnnouncementGate`; description appends ". <metric text>"; controls: palette picker (`palette.<n>` identifiers), "Sound metrics (approximate)" section showing the text as accessibility value without animation (`metrics` identifier); scenes read colours from the state's palette (FR-A06-510–513)
+- [ ] T-A06-508 [US1] Write `ExperienceTests/MusicLabMetricsTests.swift`: 1 kHz demo → metric text "Level −9 dB, strongest high-mid, no beat" (level from analysis within ±1 dB of −9 → exact string from `MetricText` of the frame's features), silence → "Level silent, strongest none, no beat"; recording sink: VoiceOver on → announcements rate-limited over frames with stepped frame times, VoiceOver off → none; tier 2 → extractor size 256 with 8 bands; each palette changes the Bars picture (FR-A06-510–513; SC-A06-503)
+- [ ] T-A06-509 [US4] Write `ExperienceTests/MusicLabTransitionTests.swift`: with the A06-P04 resumable microphone double, drive interrupted → (awaitsResume) → resume → background notification → foreground notification → failed → use demo → microphone again, rendering a frame after each step (each `renderOneFrame` true), end state live; close → `hostsAlive == 0` and the double stopped (FR-A06-514; SC-A06-505)
+- [ ] T-A06-510 Update `Catalog/registrations.json` a06 `quality_tiers` to ["level-0", "level-1", "level-2"], run `python3 scripts/build_catalog.py` and regenerate `Packages/ExperiencesCreative/VisualCoreMusicLab/scenario-manifest.json` (`TEST_RUNNER_UPDATE_SCENARIO_MANIFEST=1`) (FR-A06-513; SC-A06-506)
+
+## Phase 4: Polish & evidence
+
+- [ ] T-A06-511 DSP host tests (`python3 Tools/python/desktop_runbook.py run-check --stage A06-P05 --timeout 600 --name dsp-host -- swift test --package-path Packages/VisualCore --filter VisualCoreAudioDSPTests`)
+- [ ] T-A06-512 Experiences package on sim-27.2 (`python3 Tools/python/desktop_runbook.py run-check --stage A06-P05 --timeout 600 --name experiences-ios27 -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test`)
+- [ ] T-A06-513 App build and unit (`python3 Tools/python/desktop_runbook.py run-check --stage A06-P05 --timeout 600 --name app-unit -- python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27`)
+- [ ] T-A06-514 Runner iOS 27 (`python3 Tools/python/desktop_runbook.py run-check --stage A06-P05 --timeout 600 --name verify-27 -- python3 scripts/verify_experiences.py --only a06.visualcore-music-lab --runtime 27`)
+- [ ] T-A06-515 Public API and docs: `check_public_api.py --update`, `python3 Tools/python/desktop_runbook.py run-check --stage A06-P05 --timeout 600 --name public-api -- python3 scripts/check_public_api.py`; `Packages/VisualCore/README.md`, `Auto-Creator.md` §13 row, `docs/apps/visualcore-music-lab/visualcore-contract.{json,md}` (G-AUDIOBUDGET, G-A11YMETRICS closed in A06-P05; G-SIGNALTEXTURE closed as adapted; rows M18, M23, M27 available with evidence; `check_app_contract.py --render`)
+- [ ] T-A06-516 Script tests (`python3 Tools/python/desktop_runbook.py run-check --stage A06-P05 --timeout 600 --name script-tests -- python3 scripts/test_scripts.py`)
+- [ ] T-A06-517 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A06-P05
+
+## Dependencies
+
+T-A06-501 → (T-A06-502 ∥ T-A06-503 ∥ T-A06-504) → T-A06-505 → T-A06-506 → T-A06-507 → (T-A06-508, T-A06-509) →
+T-A06-510 → T-A06-511…516 → T-A06-517. Review checkpoints: after T-A06-506 (schemas), after T-A06-510 (manifest).
+
+## Parallel execution
+
+Agents: A = T-A06-502, B = T-A06-503, C = T-A06-504. Lead: T-A06-505…510, docs, runs, commits.
+
+## Implementation strategy
+
+MVP: metrics (US1) and palettes in presets (US2), transition fixture (US4), quality levels (US3); evidence last.
