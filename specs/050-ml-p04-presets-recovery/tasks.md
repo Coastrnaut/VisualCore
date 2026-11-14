@@ -1,0 +1,49 @@
+# Tasks: VisualCore Music Lab — Phase 04 Presets and recovery UX
+
+**Input**: [spec.md](spec.md), [plan.md](plan.md), [research.md](research.md), [data-model.md](data-model.md),
+[contracts/api.md](contracts/api.md), [quickstart.md](quickstart.md). Gate A06-P04 (legacy). Evidence:
+`python3 Tools/python/desktop_runbook.py run-check --stage A06-P04 --timeout 600 --name <check> -- <command>`. Commit after every task (no trailers). iOS 27 only; reference regression at X-A06
+(owner, 2026-11-14).
+
+## Phase 1: Setup
+
+- [ ] T-A06-401 Baseline: cite the A06-P03 evidence on the unchanged tree (`.autonomy/checks/A06-P03.rendering-ios27.json`, `.autonomy/checks/A06-P03.experiences-ios27-2.json`, `.autonomy/checks/A06-P03.app-unit.json`, `.autonomy/checks/A06-P03.verify-27.json`) instead of a rerun (owner ruling 4 of 2026-11-14)
+
+## Phase 2: Foundational (VisualCore recovery, story 1; preset value, story 2)
+
+- [ ] T-A06-402 [P] [US1] Write `Packages/VisualCoreRendering/Tests/VisualCoreAudioTests/{AudioSessionEventTests,MicrophoneRecoveryTests}.swift` first, then `Packages/VisualCoreRendering/Sources/VisualCoreAudio/{AudioSessionEvent,MicrophoneCapture}.swift` and modify `AudioSource.swift` (add `case interrupted`) and `MicrophoneAudioSource.swift` (move session/engine code into internal `SystemMicrophoneCapture: MicrophoneCapture`; internal init with `makeCapture` and optional `NotificationCenter`; public init unchanged in behaviour and owning an `AudioSessionEventMonitor` on `.default` while running; `handle(_:)` and `resume()` per research D4; keep `engineStartCount`; add internal `runningCaptures`; keep the hot-path region in `MicrophoneTapSink.consume`) per contracts/api.md; tests: mapping table for all notification kinds incl. shouldResume true/false, route-change reasons other than oldDeviceUnavailable → nil, malformed userInfo → nil; monitor delivers events posted on a private center and stops after `stop()`; with a capture double: began → interrupted (capture stopped), ended(true) → running, ended(false) → interrupted then `resume()` → running, routeLost/mediaReset while running → restart, restart failure → failed, events while idle ignored; 50 seeded random sequences never exceed one running capture and end in the state of the last effective event (FR-A06-401–403; SC-A06-401, 402)
+- [ ] T-A06-403 [P] [US2] Write `Packages/ExperiencesCreative/VisualCoreMusicLab/CoreTests/MusicPresetTests.swift` first, then `Packages/ExperiencesCreative/VisualCoreMusicLab/Core/MusicPreset.swift` per data-model.md ("name cleaned: trimmed, ≤ 60 characters, empty → Untitled"; "choices count = scene's parameter count"; file format 1 with sorted keys `choices, format, id, name, saved, scene`; greater format → `.newer`; id must match the file name); three built-ins "Spectrum" (bars), "Waveform rings" (rings), "Pulse geometry" (geometry) with fixed ids `00000000-0000-4000-8000-0000000006a1/2/3` and curated choices; `static func uniqueName(_:among:)` with " 2", " 3"… ignoring case; `actionValues` (7 numbers for `preset.apply`); tests: cleaning, uniqueness, coding round trip, newer and malformed refused, built-ins valid and read-only flag (FR-A06-411–413)
+- [ ] T-A06-404 [P] [US2] Write `Packages/ExperiencesCreative/VisualCoreMusicLab/ExperienceTests/MusicLabPresetLibraryTests.swift` first, then `Packages/ExperiencesCreative/VisualCoreMusicLab/Experience/MusicLabPresetLibrary.swift` following `Packages/ExperiencesCreative/InfiniteGeometry/Experience/GeometryLibrary.swift` (one file `preset-<uuid>.json` per user preset through `ExperienceStorage.write/read/list/remove`; entries = built-ins then user presets by name; unreadable and newer counted, never deleted or rewritten; save/rename/delete; built-ins refused for rename/delete; storage refusal → message, nothing changed); tests with a temporary `ExperienceStorage`: save → list → reload in a new library instance; rename to a used name → unique; delete removes the file; planted unreadable and newer files counted and byte-identical afterwards (FR-A06-411, 412; SC-A06-403)
+
+## Phase 3: User Stories 1–3 — status, presets in the experience, denied usability (P1) 🎯
+
+- [ ] T-A06-405 [US2] Modify `Packages/ExperiencesCreative/VisualCoreMusicLab/Experience/Adapter/MusicLabCore.swift` (depends on T-A06-403): control `preset.apply [0…2, 0…6, 0…4, 0…6, 0…4, 0…6, 0…4]` setting the scene and its choices (slot values beyond the scene's count must be 0, else rule `a06.no-such-parameter`); tests in `ExperienceTests/MusicLabCoreTests.swift`: apply changes scene and choices and digest, bad values refused, conformance with the new action (FR-A06-413)
+- [ ] T-A06-406 [US1] Modify `MusicLabPresenter.swift`, `MusicLabControls.swift` and `VisualCoreMusicLabExperience.swift` (depends on T-A06-402, 404, 405): status "<source> — live / paused by the system / stopped" and `mirror.recovery` (none/resume/useDemo) from the active source's state each frame; "Resume" calls `MicrophoneAudioSource.resume()`, "Use demo signal" sends `source.demo`; preset section (list with built-ins marked, Apply, Save current as…, Rename, Delete with confirmation, library message) using `MusicLabPresetLibrary` on the factory's `storage`; identifiers `preset.<id>.apply`, `preset.save`, `preset.<id>.rename`, `preset.<id>.delete`, `recovery.resume`, `recovery.demo` (FR-A06-410, 411, 415)
+- [ ] T-A06-407 [US1] Write `Packages/ExperiencesCreative/VisualCoreMusicLab/ExperienceTests/MusicLabRecoveryTests.swift`: with a source double whose state is driven to interrupted/failed, the status text and recovery button follow; Resume restarts; Use demo signal switches to the demo; demo/file sources keep "— live" (FR-A06-410; US1 AC1–4)
+- [ ] T-A06-408 [US3] Write `Packages/ExperiencesCreative/VisualCoreMusicLab/ExperienceTests/MusicLabDeniedUsabilityTests.swift`: permission denied → microphone refused with the Settings message, demo keeps playing; then each scene selected (non-blank picture), one `mapping.set`, one built-in `preset.apply`, one saved preset applied — every action accepted (FR-A06-414; SC-A06-404)
+- [ ] T-A06-409 Regenerate `Packages/ExperiencesCreative/VisualCoreMusicLab/scenario-manifest.json` (`TEST_RUNNER_UPDATE_SCENARIO_MANIFEST=1`) for the new control (SC-A06-405)
+
+## Phase 4: Polish & evidence
+
+- [ ] T-A06-410 Rendering audio tests on sim-27.2 (`python3 Tools/python/desktop_runbook.py run-check --stage A06-P04 --timeout 600 --name rendering-ios27 -- python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --only-testing VisualCoreAudioTests`)
+- [ ] T-A06-411 Experiences package on sim-27.2 (`python3 Tools/python/desktop_runbook.py run-check --stage A06-P04 --timeout 600 --name experiences-ios27 -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test`)
+- [ ] T-A06-412 App build and unit (`python3 Tools/python/desktop_runbook.py run-check --stage A06-P04 --timeout 600 --name app-unit -- python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27`)
+- [ ] T-A06-413 Runner iOS 27 (`python3 Tools/python/desktop_runbook.py run-check --stage A06-P04 --timeout 600 --name verify-27 -- python3 scripts/verify_experiences.py --only a06.visualcore-music-lab --runtime 27`)
+- [ ] T-A06-414 Hot-path check (`python3 Tools/python/desktop_runbook.py run-check --stage A06-P04 --timeout 600 --name hot-path -- python3 scripts/check_audio_hot_path.py`)
+- [ ] T-A06-415 Public API and docs: `check_public_api.py --update`, `python3 Tools/python/desktop_runbook.py run-check --stage A06-P04 --timeout 600 --name public-api -- python3 scripts/check_public_api.py`; `Packages/VisualCoreRendering/README.md`, `Auto-Creator.md` §13 row, `docs/apps/visualcore-music-lab/visualcore-contract.{json,md}` (G-INTERRUPTION closed in A06-P04, row M15 available; `check_app_contract.py --app visualcore-music-lab --render`)
+- [ ] T-A06-416 Script tests (`python3 Tools/python/desktop_runbook.py run-check --stage A06-P04 --timeout 600 --name script-tests -- python3 scripts/test_scripts.py`)
+- [ ] T-A06-417 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A06-P04
+
+## Dependencies
+
+T-A06-401 → (T-A06-402 ∥ T-A06-403 ∥ T-A06-404 after 403's types) → T-A06-405 → T-A06-406 → (T-A06-407, T-A06-408) →
+T-A06-409 → T-A06-410…416 → T-A06-417. Review checkpoints: after T-A06-402 (VisualCoreAudio API), after T-A06-409.
+
+## Parallel execution
+
+Agents: A = T-A06-402, B = T-A06-403, C = T-A06-404 (uses 403's `MusicPreset` API as specified). Lead: T-A06-405…409,
+docs, runs, commits.
+
+## Implementation strategy
+
+MVP: recovery in VisualCore and the status (US1), presets (US2), denied usability (US3); evidence last.
