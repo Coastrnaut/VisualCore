@@ -159,7 +159,8 @@ and pan and field-of-view bounds for the orbit camera without the experience.
   by Phase 02 or Phase 01 MUST restore with the default target and field of view through the shared migration chain.
 - **FR-A05-315**: Two-finger drag MUST pan the 3D composition while the pinch zooms; field of view MUST have native
   controls ("Wider"/"Narrower", 5° steps) and no gesture; pan on the 3D composition MUST be reachable with the existing
-  pan buttons.
+  pan buttons. Every new button MUST have an accessible label and identifier, and the canvas's accessibility value MUST
+  state the field of view when the 3D composition is shown.
 
 **Framework (story 3)**
 - **FR-A05-320**: VisualCore MUST provide a depth-correct mesh scene that draws a list of meshes (each with a model
@@ -203,6 +204,8 @@ and pan and field-of-view bounds for the orbit camera without the experience.
 - The window surface has no depth buffer, so the scene renders to its own target with depth and copies the colour to
   the context's framebuffer (Clarifications); the existing render targets with depth (feature 204) are reused.
 - The composition's bounding sphere is computed from the built mesh (its bounds), not hard-coded.
+- The depth target costs width × height × 8 bytes (colour plus 24-bit depth stored in 4 bytes) and is accounted in the
+  resource ledger like every render target; it is the only new GPU memory of this phase.
 - The field of view is the vertical angle of the perspective projection.
 - Two-finger pan and pinch share one gesture: the centroid's movement pans and the distance ratio zooms.
 - Device performance is measured in the device campaign, not here.
