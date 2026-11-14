@@ -48,3 +48,7 @@
 - Smooth normals on a 32 × 16 sphere are radial within 0.015, not 1e-6 (area- and angle-weighted face normals of a
   coarse sphere are not exactly radial); the test uses 0.015 and checks seam copies to 1e-12.
 - A cube smoothed at 100° keeps 24 vertices (their texture coordinates differ) and shares 8 diagonal normals.
+
+- 2026-11-13 (after the gate): the budget-size test ran 11–14 s on CI runners. Per the owner's short-test rule it now
+  builds a quarter-budget mesh and bounds the full budget by linear extrapolation (asserted < 5 s on the project Mac,
+  printed on CI); budget exactness is checked on a small budget.
