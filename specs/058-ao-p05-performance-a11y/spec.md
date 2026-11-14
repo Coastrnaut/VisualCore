@@ -22,6 +22,39 @@ Canonical overrides:
   accessibility audits and device measurements in the device campaign; iOS 27 at phase gates; reference regression at
   X-A07; every Spec Kit step runs.
 
+## Clarifications
+
+### Session 2026-11-14
+
+Answered autonomously under the owner's standing delegation, recommended option each time. Facts checked in code:
+`QualityLevel` (VisualCoreDiagnostics) carries resolution, element and iteration shares; the host passes the chosen
+level index to the presenter (`draw(_:tier:context:frame:)`, as A06 uses it with `forceTierForTesting`);
+`ResourceRegistry.stats` gives a ledger snapshot; `AnnouncementSink` (VisualCoreUI) announces text; A06 has an
+`AnnouncementGate` (2 s, changed text only) in its own Core; `MeshBudget` and `SegmentWindow` are in VisualCoreScenes.
+
+- Q: What does the streaming budget look like? → A: `StreamingBudget` in VisualCoreScenes: `levels: [StreamingLevel]`
+  with `behind`, `ahead`, `drawDistance` and `elementShare`; `init?(levels:pieceLength:)` refuses an empty list,
+  rising values or a draw distance beyond `ahead × pieceLength`; `vertexTotal(level:perPieceVertices:)` and
+  `fits(level:perPieceVertices:budget: MeshBudget)`. Audio Odyssey's three levels: ahead 8/6/4, behind 2/2/1,
+  draw distance 110/80/50 units (fog end), element share 1.0/0.6/0.35 (star count per piece).
+- Q: How is the precision fixture measured at 10^9? → A: In Core and VisualCoreMath tests: `CameraRail.pose(at:)` at
+  10^9 + x equals `pose(at: (10^9 + x) mod length)` within 1e-6; pieces with index ≈ 1.25 × 10^8 join within 1e-6; the
+  presenter, restored at distance 10^9 through a snapshot, draws its first frame with the rebased camera within 1e-3 of
+  the reference pose (Float). The rail wraps, so world positions are bounded; the unwrapped distance stays Double.
+- Q: How is the long session measured without a soak? → A: 3,600 frames (60 s at 60 fps) of simulated flight at
+  7 units/s on the simulator: live renderers ≤ capacity every frame, ≤ 2 built per frame, and the registry's ledger
+  snapshot after frame 3,600 equals the snapshot after the first full window; longer sessions are bounded by
+  arithmetic because the per-frame work and the pool are constant.
+- Q: Where does the announcement gate live, and what is announced? → A: A07's own `JourneyAnnouncer` (Core, pure):
+  announcements for world, source, preset applied, pause and resume, at most one per 1.5 s, changed text only, latest
+  pending text announced when the interval passes; the presenter sends through the injected `AnnouncementSink` only
+  while VoiceOver runs (injectable `voiceOverRunning`, as A06). The gate is duplicated by design: it is a few lines and
+  each experience's wording and events differ (Principle II covers generic machinery; promoting it is noted for a
+  later shared-UI feature).
+- Q: How is persistence across sessions proven? → A: An experience test saves a preset through the store, takes the
+  session snapshot, closes the session, opens a new session with the same storage and the snapshot, and compares the
+  preset list and the restored journey (world, distance, speed target, mappings, source).
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - A long flight that stays smooth and precise (Priority: P1) 🎯
