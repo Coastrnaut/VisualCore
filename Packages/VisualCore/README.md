@@ -114,7 +114,9 @@ dihedral of order 1–24 and `WallpaperLattice` square p4m and hexagonal p6m, ea
 idempotent `fold` into the fundamental region), camera bounds (feature 041, A05-P02: `ViewBounds2D` clamps a `Camera2D`'s
 zoom and centre, `Camera2D.panned(by:within:)` and `zoomed(by:within:)`; `OrbitBounds` clamps an `OrbitCamera`'s pitch and
 distance and wraps yaw, `OrbitCamera.orbited(yaw:pitch:within:)` and `zoomed(by:within:)`; non-finite or non-positive
-inputs leave the camera unchanged), `Mesh.plane/cube/uvSphere`
+inputs leave the camera unchanged), orbit view bounds (feature 042, A05-P03: `OrbitViewBounds` adds a target radius, a
+field-of-view range and the bounding-sphere rule — minimum distance = max(lower bound, |target| + clearance + 2 · near);
+`OrbitCamera.forward/right/up`, `panned(by:within:)` in view space, `withFieldOfView(_:within:)`), `Mesh.plane/cube/uvSphere`
 (segments 3–256, rings 2–256, subdivisions ≤ 256). Feature 205 (R02-F05) adds the mesh compiler: `MeshBuilder` (welding of
 equal vertices, `MeshBudget` default 262,144 vertices and 1,572,864 indices, typed `MeshError`), the shapes
 `Mesh.surface`, `.revolution`, `.extrusion`, `.tube` (rotation-minimizing frames) and `.bevelledBox`,

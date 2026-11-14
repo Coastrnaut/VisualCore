@@ -1168,9 +1168,12 @@ VisualCoreMath | func | public func fold(_ p: Vec2) -> Vec2
 VisualCoreMath | func | public func framing(at t: Double, curve: EasingCurve = .sine) -> PlaneFraming
 VisualCoreMath | func | public func images(of p: Vec2) -> [Vec2]
 VisualCoreMath | func | public func images(of p: Vec2, rings: Int) -> [Vec2]
+VisualCoreMath | func | public func minimumDistance(for camera: OrbitCamera) -> Double
 VisualCoreMath | func | public func mix(_ b: Vec4, _ t: Double) -> Vec4
 VisualCoreMath | func | public func orbited(yaw: Double, pitch: Double, within bounds: OrbitBounds) -> OrbitCamera
+VisualCoreMath | func | public func orbited(yaw: Double, pitch: Double, within bounds: OrbitViewBounds) -> OrbitCamera
 VisualCoreMath | func | public func panned(by delta: Vec2) -> PlaneViewport
+VisualCoreMath | func | public func panned(by delta: Vec2, within bounds: OrbitViewBounds) -> OrbitCamera
 VisualCoreMath | func | public func panned(by delta: Vec2, within bounds: ViewBounds2D) -> Camera2D
 VisualCoreMath | func | public func pinched(by scale: Double, anchor: Vec2) -> PlaneViewport
 VisualCoreMath | func | public func plane(fromScreen p: Vec2) -> Vec2
@@ -1188,7 +1191,9 @@ VisualCoreMath | func | public func state(at time: Double) -> State
 VisualCoreMath | func | public func view() -> Mat4
 VisualCoreMath | func | public func viewProjection(aspect: Double) -> Mat4
 VisualCoreMath | func | public func viewport(size: Vec2) -> PlaneViewport
+VisualCoreMath | func | public func withFieldOfView(_ fovY: Double, within bounds: OrbitViewBounds) -> OrbitCamera
 VisualCoreMath | func | public func zoomed(by factor: Double, within bounds: OrbitBounds) -> OrbitCamera
+VisualCoreMath | func | public func zoomed(by factor: Double, within bounds: OrbitViewBounds) -> OrbitCamera
 VisualCoreMath | func | public func zoomed(by factor: Double, within bounds: ViewBounds2D) -> Camera2D
 VisualCoreMath | func | public mutating func orbit(dYaw: Double, dPitch: Double)
 VisualCoreMath | func | public mutating func pan(by delta: Vec2)
@@ -1252,6 +1257,7 @@ VisualCoreMath | init | public init(center: Vec2, unitsPerPoint: Double, size: V
 VisualCoreMath | init | public init(framing: PlaneFraming, hold: Double)
 VisualCoreMath | init | public init(from decoder: any Decoder) throws
 VisualCoreMath | init | public init(from: PlaneFraming, to: PlaneFraming)
+VisualCoreMath | init | public init(orbit: OrbitBounds, targetRadius: Double, fovRange: ClosedRange<Double>, clearance: Double = 0)
 VisualCoreMath | init | public init(pitchLimit: Double, distanceRange: ClosedRange<Double>)
 VisualCoreMath | init | public init(start: PlaneFraming, stops: [Stop], flightDuration: Double, reduceMotion: Bool)
 VisualCoreMath | init | public init(target: Vec3 = .zero, distance: Double = 5, yaw: Double = 0, pitch: Double = 0,
@@ -1288,6 +1294,7 @@ VisualCoreMath | struct | public struct Mat3: Sendable, Equatable
 VisualCoreMath | struct | public struct Mat4: Sendable, Equatable
 VisualCoreMath | struct | public struct OrbitBounds: Sendable, Equatable, Codable
 VisualCoreMath | struct | public struct OrbitCamera: Sendable, Equatable
+VisualCoreMath | struct | public struct OrbitViewBounds: Sendable, Equatable, Codable
 VisualCoreMath | struct | public struct PlaneFraming: Sendable, Equatable, Hashable, Codable
 VisualCoreMath | struct | public struct PlaneViewport: Sendable, Equatable
 VisualCoreMath | struct | public struct Quat: Sendable, Equatable
@@ -1307,6 +1314,7 @@ VisualCoreMath | var | public var basis: (Vec2, Vec2)
 VisualCoreMath | var | public var c0: Vec3, c1: Vec3, c2: Vec3
 VisualCoreMath | var | public var c0: Vec4, c1: Vec4, c2: Vec4, c3: Vec4
 VisualCoreMath | var | public var center: Vec2
+VisualCoreMath | var | public var clearance: Double
 VisualCoreMath | var | public var conjugate: Quat
 VisualCoreMath | var | public var determinant: Double
 VisualCoreMath | var | public var distance: Double
@@ -1316,6 +1324,8 @@ VisualCoreMath | var | public var extent: Double
 VisualCoreMath | var | public var eye: Vec3
 VisualCoreMath | var | public var far: Double
 VisualCoreMath | var | public var floats: [Float]
+VisualCoreMath | var | public var forward: Vec3
+VisualCoreMath | var | public var fovRange: ClosedRange<Double>
 VisualCoreMath | var | public var fovY: Double
 VisualCoreMath | var | public var imageCount: Int
 VisualCoreMath | var | public var inverse: Mat3
@@ -1330,13 +1340,17 @@ VisualCoreMath | var | public var near: Double
 VisualCoreMath | var | public var normalized: Quat
 VisualCoreMath | var | public var normalized: Vec2
 VisualCoreMath | var | public var normalized: Vec3
+VisualCoreMath | var | public var orbit: OrbitBounds
 VisualCoreMath | var | public var order: Int
 VisualCoreMath | var | public var pitch: Double
 VisualCoreMath | var | public var pitchLimit: Double
 VisualCoreMath | var | public var pointGroup: PointGroup
 VisualCoreMath | var | public var pointGroupImages: Int
+VisualCoreMath | var | public var right: Vec3
 VisualCoreMath | var | public var rotation: Double
 VisualCoreMath | var | public var target: Vec3
+VisualCoreMath | var | public var targetRadius: Double
+VisualCoreMath | var | public var up: Vec3
 VisualCoreMath | var | public var x: Double, y: Double
 VisualCoreMath | var | public var x: Double, y: Double, z: Double
 VisualCoreMath | var | public var x: Double, y: Double, z: Double, w: Double
@@ -1466,6 +1480,7 @@ VisualCorePersistence | var | public var modifiedAt: Date
 VisualCorePersistence | var | public var name: String
 VisualCorePersistence | var | public var payload: Payload
 VisualCoreRendering | class | public final class ClearColorScene: RenderScene
+VisualCoreRendering | class | public final class DepthMeshPass
 VisualCoreRendering | class | public final class FieldPass
 VisualCoreRendering | class | public final class FullScreenShaderScene: RenderScene
 VisualCoreRendering | class | public final class GPUBuffer: GPUResource
@@ -1509,6 +1524,7 @@ VisualCoreRendering | func | public func capture(host: RenderHost, size: ExportS
 VisualCoreRendering | func | public func clear()
 VisualCoreRendering | func | public func clearTrails()
 VisualCoreRendering | func | public func destroy()
+VisualCoreRendering | func | public func draw(_ items: [Item], camera: OrbitCamera, context: RenderContext) throws
 VisualCoreRendering | func | public func draw(_ particles: [ParticleInstance], camera: Camera2D, metrics: ViewMetrics, blend: ParticleBlend = .normal) throws
 VisualCoreRendering | func | public func draw(_ root: SceneNode, camera: Camera2D, metrics: ViewMetrics) throws
 VisualCoreRendering | func | public func draw(model: Mat4 = .identity, camera: OrbitCamera, aspect: Double, color: Vec4) throws
@@ -1586,10 +1602,12 @@ VisualCoreRendering | init | public init(name: String, minimum: Int, reported: I
 VisualCoreRendering | init | public init(program: ShaderProgram, state: RenderState)
 VisualCoreRendering | init | public init(rangeMin: Int, rangeMax: Int, precisionBits: Int)
 VisualCoreRendering | init | public init(red: Float = 0, green: Float = 0, blue: Float = 0)
+VisualCoreRendering | init | public init(registry: ResourceRegistry)
 VisualCoreRendering | init | public init(registry: ResourceRegistry) throws
 VisualCoreRendering | init | public init(registry: ResourceRegistry, fragment: String, inputs: [String], label: String,
 VisualCoreRendering | init | public init(registry: ResourceRegistry, width: Int, height: Int) throws
 VisualCoreRendering | init | public init(registry: ResourceRegistry, width: Int, height: Int, format: TextureFormat, label: String) throws
+VisualCoreRendering | init | public init(renderer: MeshRenderer, model: Mat4 = .identity, color: Vec4)
 VisualCoreRendering | init | public init(scene: RenderScene, maxFramesPerSecond: Int = 60, budget: ResourceBudget = ResourceBudget()) throws
 VisualCoreRendering | init | public init(world: WorldRect, background: Vec4 = Vec4(0, 0, 0, 1), source: @escaping @MainActor (FrameInfo) -> [ParticleInstance])
 VisualCoreRendering | init | public init?(width: Int, height: Int, bottomUpRGBA: [UInt8])
@@ -1650,6 +1668,7 @@ VisualCoreRendering | struct | public struct FloatRenderSupport: Sendable, Equat
 VisualCoreRendering | struct | public struct FloorFinding: Sendable, Equatable, Codable
 VisualCoreRendering | struct | public struct FrameInfo: Sendable, Equatable
 VisualCoreRendering | struct | public struct GPUHandle: Sendable, Equatable
+VisualCoreRendering | struct | public struct Item
 VisualCoreRendering | struct | public struct Pipeline: Hashable
 VisualCoreRendering | struct | public struct PresentedFrame: Sendable, Equatable
 VisualCoreRendering | struct | public struct RenderCapabilities: Sendable, Equatable, Codable
@@ -1692,6 +1711,8 @@ VisualCoreRendering | var | public var bytes: Int
 VisualCoreRendering | var | public var bytesPerPixel: Int
 VisualCoreRendering | var | public var cachedProgramCount: Int
 VisualCoreRendering | var | public var center: Vec2
+VisualCoreRendering | var | public var clearColor
+VisualCoreRendering | var | public var color: Vec4
 VisualCoreRendering | var | public var eglExtensions: [String]?
 VisualCoreRendering | var | public var eglVendor
 VisualCoreRendering | var | public var eglVersion: String?
@@ -1725,6 +1746,7 @@ VisualCoreRendering | var | public var maxVertexUniformVectors: Int?
 VisualCoreRendering | var | public var maxViewport
 VisualCoreRendering | var | public var minimum: Int
 VisualCoreRendering | var | public var missingEntryPoints: Int?
+VisualCoreRendering | var | public var model: Mat4
 VisualCoreRendering | var | public var name: String
 VisualCoreRendering | var | public var names: [String]
 VisualCoreRendering | var | public var palette: [SIMD3<Float>]
@@ -1736,6 +1758,7 @@ VisualCoreRendering | var | public var rangeMin: Int
 VisualCoreRendering | var | public var red: Float, green: Float, blue: Float
 VisualCoreRendering | var | public var rejectedTransitions: Int
 VisualCoreRendering | var | public var renderer
+VisualCoreRendering | var | public var renderer: MeshRenderer
 VisualCoreRendering | var | public var reported: Int
 VisualCoreRendering | var | public var reportsColorBufferHalfFloat: Bool
 VisualCoreRendering | var | public var retiredProgramCount: Int

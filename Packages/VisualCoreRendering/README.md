@@ -101,6 +101,7 @@ from `PassSchemas` in `VisualCoreEffectsGraph`; per-effect GPU cost on devices i
 | `ParticleLayerScene` (feature 034) | a `RenderScene`: background + `[ParticleInstance]` from a source closure per frame | aspect-fits a `WorldRect` (y up) with `fit(world:viewSize:)`; `worldPoint`/`viewPoint` map taps with the same fit; feature 035: `blend`, `trailStrength`, `brightnessCap`, `clearTrails()` |
 | `TrailLayer` (feature 035) | a fading trail image on an RGBA8 `PingPongTarget` | `frame(delta:output:draw:)`: decay (`TrailDecay`), draw on top, composite over `background` with `brightnessCap`; longer edge ≤ 2,048; `clear()`, `release()` |
 | `MeshRenderer` | a `Mesh` through an `OrbitCamera` | Lambert + ambient, back faces culled; enable depth testing yourself when the framebuffer has depth |
+| `DepthMeshPass` | a list of `MeshRenderer` items (model, colour) through one `OrbitCamera` | feature 042: owns a render target with depth at the context's size, draws with depth test and write, blits the colour to the context's framebuffer (window or export target); rebuilt on resize and context recreation, `release()` in teardown |
 
 All three allocate through `ResourceRegistry`, rebuild their GPU objects on the first draw after a context
 recreation and free them in `release()` (call it from `teardown`). `RenderHost.pointerHandler` delivers UIKit
