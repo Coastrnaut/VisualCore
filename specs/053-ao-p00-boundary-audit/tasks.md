@@ -25,7 +25,7 @@
 
 ## Phase 6: User Story 4 — Stop/go decision (P2)
 
-- [ ] T-A07-008 [US4] Complete the contract's `gaps` (every non-available row: owning VisualCore module and phase A07-P01..P06) and `decision` (verdict and reasons; "stop" if no working host or buildable audio path; the camera rail, streaming segments and origin rebasing assessed per FR-A07-003); re-run the checker (`python3 Tools/python/desktop_runbook.py run-check --stage A07-P00 --timeout 600 --name contract-final -- python3 scripts/check_app_contract.py --app audio-odyssey --render`) (FR-A07-003, 006; SC-A07-002)
+- [X] T-A07-008 [US4] Complete the contract's `gaps` (every non-available row: owning VisualCore module and phase A07-P01..P06) and `decision` (verdict and reasons; "stop" if no working host or buildable audio path; the camera rail, streaming segments and origin rebasing assessed per FR-A07-003); re-run the checker (`python3 Tools/python/desktop_runbook.py run-check --stage A07-P00 --timeout 600 --name contract-final -- python3 scripts/check_app_contract.py --app audio-odyssey --render`) (FR-A07-003, 006; SC-A07-002) — Verified 2026-11-14: Verified 2026-11-14: .autonomy/checks/A07-P00.contract-final.json exit 0; 6 gaps each with module and phase (G-CAMERARAIL, G-ORIGINREBASE VisualCoreMath P01; G-RAILDRAW VisualCoreRendering, G-SEGMENTSTREAM VisualCoreScenes P02; G-JOURNEYBUDGET VisualCoreScenes, G-JOURNEYA11Y app-local P05); decision go, no blockers
 
 ## Phase 7: Polish and evidence
 
