@@ -25,7 +25,7 @@
 - **D3 Regression:** two chunks as for every VisualCore-adjacent gate (`reference-engine-xcframework
   reference-build-projectm-ios-sim reference-clean`; `reference-test-anglerendering-ios27 reference-test-anglerendering-ios26
   projectm-reference-ios27 projectm-reference-ios26`).
-- **D4 Gap owners (clarification 5):** trigger and timebase window, min/max decimation, square and sweep demo →
-  `VisualCoreAudioDSP` (A08-P01); two-channel capture → `VisualCoreAudio` (A08-P02); multi-point trace strips →
-  `VisualCoreScenes` with drawing in `VisualCoreRendering` (A08-P02); spectrum annotation and spoken measurements →
-  app-local (A08-P03, A08-P05).
+- **D4 Gap owners (clarification 5):** square and sweep demo → `VisualCoreAudioDSP` and two-channel capture →
+  `VisualCoreAudio` (A08-P01); trigger and timebase window and min/max decimation → `VisualCoreAudioDSP`, multi-point
+  trace strips → `VisualCoreScenes` with drawing in `VisualCoreRendering` (A08-P02); spectrum annotation and XY mode →
+  app-local (A08-P03); spoken measurements → app-local (A08-P05).

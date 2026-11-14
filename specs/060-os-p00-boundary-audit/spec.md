@@ -54,11 +54,13 @@ with a −200 dB floor and `expectedBin(frequency:sampleRate:size:)`; the scene 
   checked by `BundleTests`); Oscilloscope Studio reuses the shared permission and string, so audio rows cite those
   products and the app's privacy answers do not change.
 - Q: Which scope pieces exist, and who owns the missing ones? → A: Mono sources, the ring buffer, the spectrum in dB
-  and the demo tones exist. Gaps and owners: trigger detection with a timebase window, min/max display decimation and
-  a demo generator with square and sweep signals → `VisualCoreAudioDSP` (A08-P01); two-channel (stereo) capture for
-  the XY view → `VisualCoreAudio` (A08-P02); bounded multi-point trace strips → built in `VisualCoreScenes` and drawn
-  through `VisualCoreRendering` (A08-P02); spectrum frequency and dBFS annotation and the spoken measurement
-  description stay app-local (A08-P03 and A08-P05). The audit confirms or corrects each from the code.
+  and the demo tones exist. Gaps and owners, following the manual's phases (P01 audio fixture and acquisition, P02
+  timebase/trigger waveform renderer, P03 spectrum and XY): a demo generator with square and sweep signals →
+  `VisualCoreAudioDSP` and two-channel (stereo) capture → `VisualCoreAudio` (A08-P01); trigger detection with a
+  timebase window and min/max display decimation → `VisualCoreAudioDSP`, and bounded multi-point trace strips built in
+  `VisualCoreScenes` and drawn through `VisualCoreRendering` (A08-P02); spectrum frequency and dBFS annotation and the
+  XY mode stay app-local (A08-P03); the spoken measurement description is app-local (A08-P05). The audit confirms or
+  corrects each from the code (owner phases corrected to the manual's phase titles during implementation, 2026-11-14).
 
 ## User Scenarios & Testing *(mandatory)*
 

@@ -6,7 +6,7 @@
 
 ## Phase 1: Setup
 
-- [ ] T-A08-001 Create `docs/apps/oscilloscope-studio/README.md` (what the experience is per the manual §1–§2, that it is an experience of the one app, its documents) and `docs/apps/oscilloscope-studio/regression-baseline.md` with the phase start `6fdb5ca9` (the specify commit; constitution `0cdd2ca0`) and the reference pin `d93edd1`
+- [X] T-A08-001 Create `docs/apps/oscilloscope-studio/README.md` (what the experience is per the manual §1–§2, that it is an experience of the one app, its documents) and `docs/apps/oscilloscope-studio/regression-baseline.md` with the phase start `6fdb5ca9` (the specify commit; constitution `0cdd2ca0`) and the reference pin `d93edd1` — Verified 2026-11-14: 2026-11-14: docs/apps/oscilloscope-studio/README.md and regression-baseline.md (phase start 6fdb5ca9, constitution 0cdd2ca0, pin d93edd1); gap phases aligned with the manual's phase titles
 
 ## Phase 3: User Story 1 — Evidence-backed integration matrix (P1) 🎯
 
