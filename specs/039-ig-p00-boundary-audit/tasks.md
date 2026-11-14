@@ -25,7 +25,7 @@
 
 ## Phase 6: User Story 4 — Stop/go decision (P2)
 
-- [ ] T-A05-008 [US4] Complete the contract's `gaps` (every non-available row: owning VisualCore module and phase A05-P01..P06) and `decision` (verdict and reasons; "stop" if no working host or mesh path); re-run the checker (`python3 Tools/python/desktop_runbook.py run-check --stage A05-P00 --timeout 600 --name contract-final -- python3 scripts/check_app_contract.py --app infinite-geometry --render`) (FR-A05-003, 006; SC-A05-002)
+- [X] T-A05-008 [US4] Complete the contract's `gaps` (every non-available row: owning VisualCore module and phase A05-P01..P06) and `decision` (verdict and reasons; "stop" if no working host or mesh path); re-run the checker (`python3 Tools/python/desktop_runbook.py run-check --stage A05-P00 --timeout 600 --name contract-final -- python3 scripts/check_app_contract.py --app infinite-geometry --render`) (FR-A05-003, 006; SC-A05-002) — Verified 2026-11-13: 2026-11-13 .autonomy/checks/A05-P00.contract.json (PASS: 22 rows, 109 citations, 6 gaps, decision go); gaps G-SYMMETRY, G-SDF2D, G-MESHSCENE, G-ORBITBOUNDS, G-MESHCACHE, G-MESHLOD each with module and phase; decision go with reasons, no blockers
 
 ## Phase 7: Polish and evidence
 
