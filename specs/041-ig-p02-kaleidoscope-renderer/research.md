@@ -16,3 +16,8 @@
 - **D3 Kaleidoscope shader:** distance to the motif polygon (convex SDF) in folded coordinates for each repeat ring;
   coverage via `smoothstep` over one pixel; colour from the palette by ring.
 - **D4 Snapshot schema 2:** camera fields added; migration from 1 fills defaults (shared `MigrationChain`).
+
+## 2. Analysis record (`/speckit-analyze`, 2026-11-13)
+
+- C1 (HIGH) fixed: FR-A05-220 no longer lists a framework convex-polygon helper; matches contracts/api.md. Re-run:
+  0 critical, 0 high.

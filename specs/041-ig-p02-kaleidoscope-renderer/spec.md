@@ -135,8 +135,9 @@ Other experiences can fold points into a kaleidoscope wedge on the GPU and get e
   (schema 1, no camera) MUST restore with the preset's default camera through the shared migration chain.
 
 **Framework (story 3)**
-- **FR-A05-220**: VisualCore MUST provide 2D distance helpers (circle, box, segment, convex polygon) and a dihedral fold
-  in its shader library matching `PointGroup.fold`.
+- **FR-A05-220**: VisualCore MUST provide 2D distance helpers (circle, box, segment) and a dihedral fold in its shader
+  library matching `PointGroup.fold`; the motif polygon's distance is computed by the experience from the segment helper
+  (its points are experience data).
 - **FR-A05-221**: VisualCore MUST provide camera bounds for the 2D and orbit cameras (pan, zoom, orbit, clamp, reset).
 - **FR-A05-222**: Both MUST be documented, in the public-API baseline (Swift parts), tested, and followed by the reference
   regression.
