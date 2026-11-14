@@ -48,8 +48,8 @@ Packages/ExperiencesCreative/VisualCoreMusicLab/scenario-manifest.json, Catalog/
 docs/api/visualcore-public-api.txt, Packages/VisualCore/README.md, Auto-Creator.md §13, docs/apps/visualcore-music-lab/visualcore-contract.{json,md}  modify
 ```
 
-**Dependency direction**: unchanged (experience → VisualCoreAudioDSP, VisualCoreUI for the sink protocol through the host
-product it already uses; Core stays audio-free).
+**Dependency direction**: experience → VisualCoreAudioDSP (unchanged) and → VisualCoreUI (new, for `AnnouncementSink` and
+`SystemAnnouncementSink`; analyze U1); Core stays audio-free; nothing in VisualCore depends on the experience.
 
 **Lifecycle**: per frame the presenter maps `tier` → level; on change it rebuilds the extractor and resets mappers; after
 analysis it updates the metric text and asks the gate whether to announce. **Migration**: state 2 → 3 (palette 0);
