@@ -36,6 +36,10 @@
 - [X] T-A06-318 Script tests (`python3 Tools/python/desktop_runbook.py run-check --stage A06-P03 --timeout 600 --name script-tests -- python3 scripts/test_scripts.py`) — Verified 2026-11-14: — Verified 2026-11-14: .autonomy/checks/A06-P03.script-tests.json
 - [ ] T-A06-319 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A06-P03
 
+## Phase 5: Convergence
+
+- [ ] T-A06-320 Assert in `Packages/ExperiencesCreative/VisualCoreMusicLab/ExperienceTests/MusicLabSceneRenderTests.swift` that `presenter.mirror.parameterValues` equals `lastParameterValues` rounded to hundredths after a settled frame (the editor's live value); record `python3 Tools/python/desktop_runbook.py run-check --stage A06-P03 --timeout 600 --name experiences-ios27-2 -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing VisualCoreMusicLabExperienceTests VisualCoreMusicLabCoreTests` per US2 live value, FR-A06-312 (partial)
+
 ## Dependencies
 
 T-A06-301 → (T-A06-302 ∥ T-A06-303 ∥ T-A06-304) → T-A06-305 → T-A06-306 → T-A06-307 → (T-A06-308, T-A06-309, T-A06-310) →
