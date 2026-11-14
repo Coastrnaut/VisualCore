@@ -22,6 +22,38 @@ Canonical overrides:
 - **Constitution:** 2.3.0 adds the A07 experience rules (committed at the start of this gate).
 - **Evidence:** host and simulator only.
 
+## Clarifications
+
+### Session 2026-11-14
+
+Answered autonomously under the owner's standing delegation, recommended option each time. Facts checked in code:
+`scripts/check_experience_packages.py` reports `EXTRA_TARGET` for any experience target of an `Experiences*` package
+that belongs to no registered experience; `LauncherModel.shown` lists only available experiences; the A07 constitution
+commit is `fcf6ad46` and the A07-P00 specify commit `b5c919b4` (the phase start: the no-change diff of `Packages` and
+`External` is taken from it); the reference submodule is pinned at `d93edd1`. The contract is
+`docs/apps/audio-odyssey/visualcore-contract.json` with the generated `visualcore-contract.md`, checked by
+`scripts/check_app_contract.py --app audio-odyssey`; the baseline is `docs/apps/audio-odyssey/regression-baseline.md`;
+the build steps are the named steps of `python3 scripts/release_check.py --list` at the time of the check, with the count.
+
+- Q: How is the manual's "compile an empty shell" gate met in the one app? → A: The one app is the shell: this phase
+  proves the VisualCore app still builds for testing with Audio Odyssey absent (not registered, not linked, catalog
+  unavailable). The experience's targets are created in A07-P01 with its first real domain rules, because an empty
+  target would be an `EXTRA_TARGET` finding and registering an empty experience would be a placeholder.
+- Q: What makes a capability "available"? → A: A public declaration in a VisualCore framework product with at least one
+  test that exercises it; an implementation that exists only inside another experience (A05, A06) or a harness is
+  "requires adaptation" at best.
+- Q: Which package holds Audio Odyssey? → A: `Packages/ExperiencesCreative/AudioOdyssey` (Auto-Creator.md §16), as A06
+  did with `ExperiencesCreative/VisualCoreMusicLab`; no new package is created.
+- Q: Does Audio Odyssey need a new permission or privacy answer? → A: No. `VisualCoreAudio` and `VisualCoreAudioDSP` are
+  real products since A06 and the app's `NSMicrophoneUsageDescription` exists (`project.yml`, checked by
+  `BundleTests`); Audio Odyssey reuses the shared permission and string, so audio rows cite those products and the
+  app's privacy answers do not change.
+- Q: Which camera and mesh pieces exist, and who owns the missing ones? → A: `OrbitCamera` and `Camera2D`
+  (`VisualCoreMath`) and `DepthMeshPass` (`VisualCoreRendering`) exist; a camera rail with eased speed and comfort caps
+  and world-origin rebasing are gaps owned by `VisualCoreMath` (A07-P01), streaming tunnel/terrain segments with a
+  bounded pool by `VisualCoreScenes` with drawing through `VisualCoreRendering` (A07-P02); the audit confirms or
+  corrects each from the code.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - An evidence-backed integration matrix (Priority: P1) 🎯
@@ -150,8 +182,8 @@ VisualCore module will own each missing piece and in which phase.
 
 - `VisualCoreAudio` and `VisualCoreAudioDSP` are real products since A06 (sources, permission, session recovery,
   ring buffer, FFT, bands, onsets, smoothing, mapping, quality tiers); Audio Odyssey reuses them.
-- Camera rails, streaming procedural segments and origin rebasing are expected upstream gaps; the audit confirms or
-  refutes this from the code.
+- Camera rails, streaming procedural segments and origin rebasing are expected upstream gaps (see Clarifications for
+  the owners); the audit confirms or corrects this from the code.
 - Later phases (A07-P01 to A07-P06) build the gaps; this phase builds none.
 
 ## Traceability
