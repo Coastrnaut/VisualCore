@@ -41,3 +41,7 @@ Agent A: T-A07-502. Agent B: T-A07-503. Agent C: T-A07-504 after A and B. Lead: 
 
 MVP: precision and the long-session bound (US1) with quality levels (US2); announcements (US3) and persistence (US4);
 evidence last.
+
+## Phase 5: Convergence
+
+- [ ] T-A07-514 Record in `specs/058-ao-p05-performance-a11y/data-model.md` (JourneyAnnouncer) that the presenter's announcement clock is the sum of frame steps since setup (the host's frame time is wall clock) and that offering the last announced text clears any pending text, as `Packages/ExperiencesCreative/AudioOdyssey/Experience/OdysseyPresenter.swift` and `Core/JourneyAnnouncer.swift` do per plan: data model (contradicts)
