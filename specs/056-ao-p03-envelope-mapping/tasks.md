@@ -26,7 +26,7 @@
 - [X] T-A07-309 Experience package check (`python3 Tools/python/desktop_runbook.py run-check --stage A07-P03 --timeout 600 --name experience-packages -- python3 scripts/check_experience_packages.py`) — Verified 2026-11-14: Verified 2026-11-14: .autonomy/checks/A07-P03.experience-packages.json exit 0
 - [X] T-A07-310 Public API unchanged (`python3 Tools/python/desktop_runbook.py run-check --stage A07-P03 --timeout 600 --name public-api -- python3 scripts/check_public_api.py`) — Verified 2026-11-14: Verified 2026-11-14: .autonomy/checks/A07-P03.public-api.json exit 0 (no VisualCore change)
 - [X] T-A07-311 Script tests (`python3 Tools/python/desktop_runbook.py run-check --stage A07-P03 --timeout 600 --name script-tests -- python3 scripts/test_scripts.py`) — Verified 2026-11-14: Verified 2026-11-14: .autonomy/checks/A07-P03.script-tests.json exit 0
-- [ ] T-A07-312 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A07-P03
+- [X] T-A07-312 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A07-P03 — Verified 2026-11-14: Verified 2026-11-14: converge round 1 appended T-A07-313 (response continuity), implemented; round 2 found 0 findings (tasks.md unchanged)
 
 ## Dependencies
 
