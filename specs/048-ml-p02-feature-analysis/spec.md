@@ -23,6 +23,31 @@ Canonical overrides:
 - **Owner rulings:** short tests; audits and device runs in the device campaign; iOS 27 at phase gates; every Spec Kit
   step runs.
 
+## Clarifications
+
+### Session 2026-11-14
+
+Answered autonomously under the owner's standing delegation, recommended option each time. Facts checked in code:
+`SpectrumAnalyzer.magnitudesDB(_:)` allocates four arrays per call (input, windowed, real/imag, result), so an
+allocation-free path needs preallocated buffers; `FrameInfo.delta` is the clamped (0…0.1 s) time since the previous
+frame; the presenter already names the level "quiet/medium/loud" from the RMS at −40 and −20 dBFS
+(`MusicLabPresenter.levelText`); the demo note sequence changes pitch every 0.5 s.
+
+- Q: How is analysis kept free of allocation per call? → A: A feature extractor object owned by the render side holds
+  every buffer (window, FFT input, split complex, magnitudes, band energies, flux history), created once for a window
+  size and sample rate; `SpectrumAnalyzer` gains an in-place variant writing linear power into a caller buffer. The
+  existing `magnitudesDB(_:)` stays unchanged.
+- Q: What exactly is a band's energy? → A: The sum of squared linear magnitudes (power, full scale = 1) of the bins whose
+  centre lies in the band; every bin 1…N/2−1 belongs to at most one band, every band to at least one bin (low edges are
+  widened to the next bin when narrower than one bin); dB form is 10·log10(energy) floored at −120 dB.
+- Q: What is the "smoothed beat energy"? → A: The onset pulse (1 in an update with an onset, else 0) passed through the
+  smoother with attack 0.01 s and release 0.25 s; "beat" is shown while it is above 0.5.
+- Q: How is an onset decided and what is a hop? → A: An update analyses the newest window (N = 1,024); in host tests
+  updates advance by a hop of 512 samples. Flux = sum over bands of max(0, energy − previous energy). Onset when flux >
+  1.5 × mean of the previous 43 fluxes (≈ 0.46 s at 512-sample hops) + 1e-4 and at least 0.1 s after the previous onset.
+- Q: Which words describe the level? → A: Keep A06-P01's words and thresholds from the feature RMS: "quiet" below −40
+  dBFS, "medium" below −20 dBFS, "loud" otherwise.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - See the sound's level, spectrum and beat (Priority: P1) 🎯
@@ -121,8 +146,8 @@ The level, band, flux, onset and smoothing calculations are correct on known sig
   energy) beside the waveform.
 - **FR-A06-211**: The smoothed beat energy MUST be reset when the source changes and MUST decay with the release time in
   seconds independent of frame rate.
-- **FR-A06-212**: The canvas description MUST state the source, the level in words (quiet, soft, medium, loud) and
-  "beat" while the beat meter is above half scale.
+- **FR-A06-212**: The canvas description MUST state the source, the level in words (quiet below −40 dBFS, medium below
+  −20 dBFS, loud otherwise) and "beat" while the smoothed beat energy is above 0.5.
 - **FR-A06-213**: Features are not state: they are in neither the digest nor the snapshot; the scenario manifest and its
   digests are unchanged by this phase.
 
@@ -134,8 +159,9 @@ The level, band, flux, onset and smoothing calculations are correct on known sig
 
 - **Audio features**: timestamp, RMS, peak, band energies, spectral flux, onset flag, smoothed beat energy.
 - **Band layout**: band count, lowest and highest frequency, sample rate, transform size → bin ranges per band.
-- **Smoother**: attack and release in seconds, current value.
-- **Onset detector**: recent flux history, threshold multiple, minimum value, minimum interval.
+- **Smoother**: attack and release in seconds, current value; beat energy uses attack 0.01 s, release 0.25 s on the
+  onset pulse.
+- **Onset detector**: the previous 43 fluxes, threshold multiple 1.5, minimum 1e-4, minimum interval 0.1 s.
 
 ## Success Criteria *(mandatory)*
 
