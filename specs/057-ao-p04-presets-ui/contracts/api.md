@@ -11,6 +11,7 @@ public struct JourneyPreset: Equatable, Sendable {
   public init?(id:name:saved:world:mappings:speedTarget:easing:calmMotion:isBuiltIn: = false)
   public init(from state: JourneyState, id: UUID, name: String, saved: Date)
   public var actionValues: [Double]                                     // 16 values for preset.apply
+  public static func fromActionValues(_ values: [Double]) -> (world, mappings, speedTarget, easing, calmMotion)?
   public func fileData() throws -> Data
   public static func decode(_ data: Data, fileID: UUID) throws(FileError) -> JourneyPreset
   public enum FileError: Error, Equatable { case newer(Int), malformed }
@@ -20,7 +21,9 @@ public struct JourneyPreset: Equatable, Sendable {
 }
 public enum DemoResponseTrace {
   public static func run(bandFrames: [[Float]], flux: [Float], onsets: [Bool], world: JourneyWorld,
-                         mapping: WorldMapping, step: Double) -> [(primary: Double, light: Double)]
+                         mapping: WorldMapping, step: Double, reduceMotion: Bool = false,
+                         reduceFlashing: Bool = false) -> [TracePoint]   // TracePoint { primary, light }, Equatable
+  public static func maxRise(_ trace: [TracePoint], world: JourneyWorld) -> Double
 }
 // module AudioOdysseyExperience (internal)
 @MainActor final class JourneyPresetStore { init(storage: ExperienceStorage); entries; unreadable; newer; lastMessage;
