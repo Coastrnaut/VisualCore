@@ -10,7 +10,7 @@
 
 ## Phase 3: User Story 1 — Evidence-backed integration matrix (P1) 🎯
 
-- [ ] T-A08-002 [US1] Write `docs/apps/oscilloscope-studio/visualcore-contract.json` (schema 1; app `oscilloscope-studio`; gate `A08-P00`): `inventory` of every FR-A08-001 area with paths, the release-check step count from `python3 scripts/release_check.py --list`; `matrix` rows covering the 5 brainstorm capabilities and 6 version 0.1 features with status ∈ {available, requires adaptation, upstream gap} per clarification 2 and file/symbol/product evidence; `traceability`; `negative` rules of FR-A08-006; audio rows cite `VisualCoreAudio` and `VisualCoreAudioDSP` (shared since A06: `AudioSource`, `MicrophonePermission`, `SampleRingBuffer`, `SpectrumAnalyzer`, `DemoSignal`), line rows the scene graph's `.line` and `PrimitiveRenderer`
+- [ ] T-A08-002 [US1] Write `docs/apps/oscilloscope-studio/visualcore-contract.json` (schema 1; app `oscilloscope-studio`; gate `A08-P00`): `inventory` of every FR-A08-001 area with paths, the release-check step count from `python3 scripts/release_check.py --list`; `matrix` rows covering the 5 brainstorm capabilities and 6 version 0.1 features with status ∈ {available, requires adaptation, upstream gap} per clarification 2 and file/symbol/product evidence; `traceability`; `negative` rules of FR-A08-006; audio rows cite `VisualCoreAudio` and `VisualCoreAudioDSP` (shared since A06: `AudioSource`, `MicrophonePermission`, `SampleRingBuffer`, `SpectrumAnalyzer`, `DemoSignal`), line rows the scene graph's `.line` and `PrimitiveRenderer` (FR-A08-001, 002)
 - [ ] T-A08-003 [US1] Run the contract checker and render the view (`python3 Tools/python/desktop_runbook.py run-check --stage A08-P00 --timeout 600 --name contract -- python3 scripts/check_app_contract.py --app oscilloscope-studio --render`); `docs/apps/oscilloscope-studio/visualcore-contract.md` is generated (FR-A08-007, SC-A08-001)
 
 ## Phase 4: User Story 2 — The reference stays proven (P1)
@@ -30,7 +30,7 @@
 ## Phase 7: Polish and evidence
 
 - [ ] T-A08-009 No-change proof (`python3 Tools/python/desktop_runbook.py run-check --stage A08-P00 --timeout 600 --name no-change -- git diff --exit-code --stat 6fdb5ca9..HEAD -- Packages External`) (FR-A08-008, SC-A08-005)
-- [ ] T-A08-010 Script tests (`python3 Tools/python/desktop_runbook.py run-check --stage A08-P00 --timeout 600 --name script-tests -- python3 scripts/test_scripts.py`) and the release-check document steps (`python3 Tools/python/desktop_runbook.py run-check --stage A08-P00 --timeout 600 --name fast-checks -- python3 scripts/release_check.py --only docs app-contracts compliance dependencies`)
+- [ ] T-A08-010 Script tests (`python3 Tools/python/desktop_runbook.py run-check --stage A08-P00 --timeout 600 --name script-tests -- python3 scripts/test_scripts.py`) and the release-check document steps (`python3 Tools/python/desktop_runbook.py run-check --stage A08-P00 --timeout 600 --name fast-checks -- python3 scripts/release_check.py --only docs app-contracts compliance dependencies`); every run-check of this gate stays within its 600 s limit and the contract check under 10 s (SC-A08-006)
 - [ ] T-A08-011 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A08-P00
 
 ## Dependencies
