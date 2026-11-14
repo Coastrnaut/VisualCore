@@ -49,3 +49,7 @@ registrations, contract, runs, commits.
 ## Implementation strategy
 
 MVP: the accuracy audit (US1); then routes, speech and levels; evidence and device records last.
+
+## Phase 7: Convergence
+
+- [ ] T-A08-515 Remove the unused `sentAnnouncements` record from `ScopePresenter` (tests read the injected `ScopeRecordingSink`) per plan: presenter owns the announcer (unrequested)
