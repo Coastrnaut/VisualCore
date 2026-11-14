@@ -38,7 +38,7 @@
 - [X] T-A05-117 Reference chunk 1 (`python3 Tools/python/desktop_runbook.py run-check --stage A05-P01 --timeout 600 --name reference-1 -- python3 scripts/release_check.py --only reference-engine-xcframework reference-build-projectm-ios-sim reference-clean`) — Verified 2026-11-13: 2026-11-13 .autonomy/checks/A05-P01.reference-1.json (3/3)
 - [X] T-A05-118 Reference chunk 2 (`python3 Tools/python/desktop_runbook.py run-check --stage A05-P01 --timeout 600 --name reference-2 -- python3 scripts/release_check.py --only reference-test-anglerendering-ios27 reference-test-anglerendering-ios26 projectm-reference-ios27 projectm-reference-ios26`) (SC-A05-105) — Verified 2026-11-13: 2026-11-13 .autonomy/checks/A05-P01.reference-2.json (4/4)
 - [X] T-A05-119 Script tests (`python3 Tools/python/desktop_runbook.py run-check --stage A05-P01 --timeout 600 --name script-tests -- python3 scripts/test_scripts.py`) — Verified 2026-11-13: 2026-11-13 .autonomy/checks/A05-P01.script-tests-r2.json (exit 0, incl. the audits test: content counts with the 5 fixtures); first run failed on counts grown by the registration and on the missing fixtures, both fixed; package r2 on both runtimes, runner r2 9/9 on both, app-unit-r3 pass after the change
-- [ ] T-A05-120 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A05-P01
+- [X] T-A05-120 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A05-P01 — Verified 2026-11-13: 2026-11-13 converge round 1 appended nothing (18 FRs, 6 SCs; package r2 both runtimes, runner 9/9 both, app-unit-r3, script-tests-r2, reference 7/7, public API)
 
 ## Dependencies
 
