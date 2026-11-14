@@ -65,4 +65,4 @@ MVP is the builder plus validation (US2) and the shapes (US1); bounds, compatibi
 
 Appended by `/speckit-converge` (T-R02F05-021, round 1, 2026-11-13).
 
-- [ ] T-R02F05-022 Align `data-model.md` and `contracts/api.md` with the implemented `MeshSummary` (`boundsMin`/`boundsMax: Vec3?` instead of `bounds`, so the summary stays Codable) and the additive builder properties (`budget`, `weldTolerance`, `weldPositionsOnly`, `vertexCount`, `indexCount`) per plan: data model and contracts (partial)
+- [X] T-R02F05-022 Align `data-model.md` and `contracts/api.md` with the implemented `MeshSummary` (`boundsMin`/`boundsMax: Vec3?` instead of `bounds`, so the summary stays Codable) and the additive builder properties (`budget`, `weldTolerance`, `weldPositionsOnly`, `vertexCount`, `indexCount`) per plan: data model and contracts (partial) — Verified 2026-11-13: 2026-11-13 data-model.md and contracts/api.md list boundsMin/boundsMax and the builder properties; all five names present in docs/api/visualcore-public-api.txt (grep)
