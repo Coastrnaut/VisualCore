@@ -1,0 +1,324 @@
+{
+  "controls" : [
+    "preset.select",
+    "symmetry.order",
+    "repeats.set",
+    "scale.set",
+    "palette.set",
+    "reseed"
+  ],
+  "experience" : "a05.infinite-geometry",
+  "kind" : "creative",
+  "scenarios" : [
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+        "initialDigest" : "f2f8906949bca1ec2a6394e4dcf52a772fb4162861721997edc9a382ee08ec5d"
+      },
+      "name" : "launch-first-frame",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "repeats.set",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 2
+        },
+        {
+          "action" : {
+            "control" : "scale.set",
+            "values" : [
+              1.5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 2
+        },
+        {
+          "action" : {
+            "control" : "palette.set",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 2
+        },
+        {
+          "action" : {
+            "control" : "reseed",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 2
+        },
+        {
+          "action" : {
+            "control" : "preset.select",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 2
+        },
+        {
+          "action" : {
+            "control" : "symmetry.order",
+            "values" : [
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 2
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "389597ff3d869d868bf4b8cb94a36390ab4d12f72da25f9f292118abf5f7c021",
+        "initialDigest" : "f2f8906949bca1ec2a6394e4dcf52a772fb4162861721997edc9a382ee08ec5d"
+      },
+      "name" : "input-response",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "preset.select",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 2
+        }
+      ],
+      "expect" : {
+        "outcome" : "composition-built"
+      },
+      "name" : "completion",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "symmetry.order",
+            "values" : [
+              6
+            ]
+          },
+          "result" : "action.rule.a05.order-fixed-by-lattice",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "preset.select",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.rule.a05.unchanged",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "palette.set",
+            "values" : [
+              9
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        }
+      ],
+      "expect" : {
+
+      },
+      "name" : "rejection",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "repeats.set",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 2
+        },
+        {
+          "action" : {
+            "control" : "scale.set",
+            "values" : [
+              1.5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 2
+        },
+        {
+          "action" : {
+            "control" : "palette.set",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 2
+        },
+        {
+          "action" : {
+            "control" : "reseed",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 2
+        },
+        {
+          "action" : {
+            "control" : "preset.select",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 2
+        },
+        {
+          "action" : {
+            "control" : "symmetry.order",
+            "values" : [
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 2
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "389597ff3d869d868bf4b8cb94a36390ab4d12f72da25f9f292118abf5f7c021",
+        "initialDigest" : "f2f8906949bca1ec2a6394e4dcf52a772fb4162861721997edc9a382ee08ec5d"
+      },
+      "name" : "save-restore",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "repeats.set",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 2
+        },
+        {
+          "action" : {
+            "control" : "scale.set",
+            "values" : [
+              1.5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 2
+        },
+        {
+          "action" : {
+            "control" : "palette.set",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 2
+        },
+        {
+          "action" : {
+            "control" : "reseed",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 2
+        },
+        {
+          "action" : {
+            "control" : "preset.select",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 2
+        },
+        {
+          "action" : {
+            "control" : "symmetry.order",
+            "values" : [
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 2
+        }
+      ],
+      "expect" : {
+        "initialDigest" : "f2f8906949bca1ec2a6394e4dcf52a772fb4162861721997edc9a382ee08ec5d",
+        "resetDigest" : true
+      },
+      "name" : "reset",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "suspend-resume",
+      "seed" : "7"
+    },
+    {
+      "cycles" : 5,
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "teardown-reentry",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "cancel-prepare",
+      "seed" : "7"
+    }
+  ],
+  "schema" : 1
+}

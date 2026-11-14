@@ -153,10 +153,23 @@
         "creative-and-visual"
       ],
       "order": 5,
-      "palette": [],
+      "palette": [
+        "#0B1026",
+        "#3A5BA0",
+        "#7FD1E8",
+        "#F2E9C9"
+      ],
       "tile_seed": 393185064,
-      "capabilities": [],
-      "quality_tiers": [],
+      "capabilities": [
+        "symmetry groups",
+        "wallpaper tilings",
+        "kaleidoscope",
+        "procedural meshes",
+        "presets"
+      ],
+      "quality_tiers": [
+        "level-0"
+      ],
       "content": null,
       "available": false
     },

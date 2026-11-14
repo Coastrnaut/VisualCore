@@ -89,6 +89,26 @@
       ],
       "content": null,
       "manifest": "Packages/ExperiencesCreative/ParticleUniverse/scenario-manifest.json"
+    },
+    "a05.infinite-geometry": {
+      "capabilities": [
+        "symmetry groups",
+        "wallpaper tilings",
+        "kaleidoscope",
+        "procedural meshes",
+        "presets"
+      ],
+      "quality_tiers": [
+        "level-0"
+      ],
+      "palette": [
+        "#0B1026",
+        "#3A5BA0",
+        "#7FD1E8",
+        "#F2E9C9"
+      ],
+      "content": null,
+      "manifest": "Packages/ExperiencesCreative/InfiniteGeometry/scenario-manifest.json"
     }
   }
 }

@@ -4,6 +4,7 @@
 import FluidArtPlaygroundExperience
 import FractalExplorerExperience
 import GenerativeArtStudioExperience
+import InfiniteGeometryExperience
 import ParticleUniverseExperience
 import VisualCoreExperience
 import VisualCoreExperienceHost
@@ -63,7 +64,7 @@ enum ExperienceRegistry {
     /// each carries its scenario manifest, so that the verification runner can open it, but it stays unavailable
     /// in the catalog and outside `all`. Debug builds show them with `-vcCandidates`. Recording an experience's X
     /// gate moves its registration from here to `all`.
-    static let candidates: [ExperienceRegistration] = []
+    static let candidates: [ExperienceRegistration] = [infiniteGeometry].compactMap { $0 }
 
     /// A01 Generative Art Studio (feature 193, US1).
     private static var generativeArtStudio: ExperienceRegistration? {
@@ -126,6 +127,20 @@ extension ExperienceRegistry {
         }
         #if DEBUG || VISUALCORE_AUTOMATION
         registration.scenarioManifest = ParticleCore.manifest(for: id)
+        #endif
+        return registration
+    }
+    /// A05 Infinite Geometry (feature 040, A05-P01): a candidate until X-A05.
+    fileprivate static var infiniteGeometry: ExperienceRegistration? {
+        guard let id = InfiniteGeometryExperience.id else { return nil }
+        var registration = ExperienceRegistration(id: id, core: GeometryCore.self) { launch in
+            let system = SystemAccessibilityObserver.systemValues()
+            return InfiniteGeometryExperience.make(id: id, storage: launch.storage,
+                                                   reduceMotion: launch.reduceMotion.resolved(system: system.reduceMotion),
+                                                   reduceFlashing: launch.reduceFlashing.resolved(system: system.dimFlashingLights))
+        }
+        #if DEBUG || VISUALCORE_AUTOMATION
+        registration.scenarioManifest = GeometryCore.manifest(for: id)
         #endif
         return registration
     }
