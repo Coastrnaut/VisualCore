@@ -109,7 +109,9 @@ size and color over life; `ParticleForce` gravity/drag/attractor and (feature 03
 `gravityWell`, `wind` and `vortex`, each with `clamped()`, `bound(speed:)` and `acceleration(at:velocity:)`, finite at
 every position including the center; `liveLimit`; `liveCount(source:)` (feature 035); `TrailDecay` (feature 035: frame-rate-independent fade of 8-bit trail
 images, `factor`, `subtraction`, `step8`); NaN removal, `checksum()`; `instances()` →
-`ParticleInstance` for `ParticleRenderer`); 3D: `OrbitCamera` (pitch ±89°, `project`, `ray`), `Mesh.plane/cube/uvSphere`
+`ParticleInstance` for `ParticleRenderer`); 3D: `OrbitCamera` (pitch ±89°, `project`, `ray`), symmetry (feature 040, A05-P01: `PointGroup` cyclic and
+dihedral of order 1–24 and `WallpaperLattice` square p4m and hexagonal p6m, each with `images` in a fixed order and an
+idempotent `fold` into the fundamental region), `Mesh.plane/cube/uvSphere`
 (segments 3–256, rings 2–256, subdivisions ≤ 256). Feature 205 (R02-F05) adds the mesh compiler: `MeshBuilder` (welding of
 equal vertices, `MeshBudget` default 262,144 vertices and 1,572,864 indices, typed `MeshError`), the shapes
 `Mesh.surface`, `.revolution`, `.extrusion`, `.tube` (rotation-minimizing frames) and `.bevelledBox`,

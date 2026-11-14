@@ -1144,13 +1144,16 @@ VisualCoreMath | enum | public enum MathInfo
 VisualCoreMath | enum | public enum NumericError: Error, Equatable, Sendable
 VisualCoreMath | enum | public enum NumericHygiene
 VisualCoreMath | enum | public enum Phase: String, Sendable, Equatable
+VisualCoreMath | enum | public enum PointGroup: Sendable, Equatable, Hashable, Codable
 VisualCoreMath | enum | public enum PrecisionAdvisor
 VisualCoreMath | enum | public enum ShaderHash
 VisualCoreMath | enum | public enum StableHash
+VisualCoreMath | enum | public enum WallpaperLattice: Sendable, Equatable, Hashable, Codable
 VisualCoreMath | func | public func apply(_ p: Vec2) -> Vec2
 VisualCoreMath | func | public func applyPoint(_ p: Vec3) -> Vec3
 VisualCoreMath | func | public func applyVector(_ v: Vec2) -> Vec2
 VisualCoreMath | func | public func applyVector(_ v: Vec3) -> Vec3
+VisualCoreMath | func | public func cellCenters(rings: Int) -> [Vec2]
 VisualCoreMath | func | public func cross(_ b: Vec2) -> Double
 VisualCoreMath | func | public func cross(_ b: Vec3) -> Vec3
 VisualCoreMath | func | public func distance(to b: Vec2) -> Double
@@ -1159,7 +1162,10 @@ VisualCoreMath | func | public func dot(_ b: Vec3) -> Double
 VisualCoreMath | func | public func dot(_ b: Vec4) -> Double
 VisualCoreMath | func | public func ease(_ t: Double, _ curve: EasingCurve, _ mode: EasingMode = .inOut) -> Double
 VisualCoreMath | func | public func encode(to encoder: any Encoder) throws
+VisualCoreMath | func | public func fold(_ p: Vec2) -> Vec2
 VisualCoreMath | func | public func framing(at t: Double, curve: EasingCurve = .sine) -> PlaneFraming
+VisualCoreMath | func | public func images(of p: Vec2) -> [Vec2]
+VisualCoreMath | func | public func images(of p: Vec2, rings: Int) -> [Vec2]
 VisualCoreMath | func | public func mix(_ b: Vec4, _ t: Double) -> Vec4
 VisualCoreMath | func | public func panned(by delta: Vec2) -> PlaneViewport
 VisualCoreMath | func | public func pinched(by scale: Double, anchor: Vec2) -> PlaneViewport
@@ -1263,6 +1269,7 @@ VisualCoreMath | let | public static let identity
 VisualCoreMath | let | public static let maxUnitsPerPoint
 VisualCoreMath | let | public static let minUnitsPerPoint
 VisualCoreMath | let | public static let nearLimitMargin
+VisualCoreMath | let | public static let orderRange: ClosedRange<Int>
 VisualCoreMath | let | public static let pitchLimit
 VisualCoreMath | let | public static let version
 VisualCoreMath | let | public static let zero
@@ -1286,6 +1293,7 @@ VisualCoreMath | var | public private(set) var center: Vec2
 VisualCoreMath | var | public private(set) var size: Vec2
 VisualCoreMath | var | public private(set) var unitsPerPoint: Double
 VisualCoreMath | var | public private(set) var wasClamped: Bool
+VisualCoreMath | var | public var basis: (Vec2, Vec2)
 VisualCoreMath | var | public var c0: Vec3, c1: Vec3, c2: Vec3
 VisualCoreMath | var | public var c0: Vec4, c1: Vec4, c2: Vec4, c3: Vec4
 VisualCoreMath | var | public var center: Vec2
@@ -1297,10 +1305,12 @@ VisualCoreMath | var | public var eye: Vec3
 VisualCoreMath | var | public var far: Double
 VisualCoreMath | var | public var floats: [Float]
 VisualCoreMath | var | public var fovY: Double
+VisualCoreMath | var | public var imageCount: Int
 VisualCoreMath | var | public var inverse: Mat3
 VisualCoreMath | var | public var inverse: Mat3?
 VisualCoreMath | var | public var inverse: Mat4?
 VisualCoreMath | var | public var isFinite: Bool
+VisualCoreMath | var | public var isOrderInRange: Bool
 VisualCoreMath | var | public var length: Double
 VisualCoreMath | var | public var matrix: Mat3
 VisualCoreMath | var | public var matrix: Mat4
@@ -1308,7 +1318,10 @@ VisualCoreMath | var | public var near: Double
 VisualCoreMath | var | public var normalized: Quat
 VisualCoreMath | var | public var normalized: Vec2
 VisualCoreMath | var | public var normalized: Vec3
+VisualCoreMath | var | public var order: Int
 VisualCoreMath | var | public var pitch: Double
+VisualCoreMath | var | public var pointGroup: PointGroup
+VisualCoreMath | var | public var pointGroupImages: Int
 VisualCoreMath | var | public var rotation: Double
 VisualCoreMath | var | public var target: Vec3
 VisualCoreMath | var | public var x: Double, y: Double
