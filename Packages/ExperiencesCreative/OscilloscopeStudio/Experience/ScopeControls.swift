@@ -10,6 +10,9 @@
 //     division) and the trace status (`trace.status`: channels, trigger state, clipping).
 //   Trigger: the level slider (`trigger.level`, −1…1 in steps of 0.05), the slope picker (`trigger.slope`: Rising,
 //     Falling) and the mode picker (`trigger.mode`: Auto, Normal).
+// Feature 062 (A08-P02) T-A08-206 (FR-A08-211): the Display section starts with the view picker (`display.select`,
+//   label "View": Waveform, XY) and, while XY is chosen for a one-channel source, the mark "XY needs two channels"
+//   (`display.status`); the chosen view stays XY, so a stereo source shows XY again without a new choice.
 // Every control has an accessible label and value and an identifier from the port; hit areas are at least 44 points
 // high and text wraps. Levels are relative to full scale only; nothing claims a calibrated measurement.
 import SwiftUI
@@ -90,6 +93,18 @@ struct ScopeControls: View {
                 }
             }
             section("Display") {
+                choicePicker("View", identifier: "display.select", selection: mirror.display.rawValue,
+                             options: ScopeDisplay.allCases.map { Self.viewName($0) },
+                             hint: "Waveform draws each channel against time; XY plots the left channel against the right") { index in
+                    _ = port.send("display.select", [Double(index)])
+                }
+                if let note = mirror.displayNote {
+                    Text(verbatim: note)
+                        .font(.footnote).foregroundStyle(.primary)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .accessibilityLabel(Text(verbatim: "\(note); showing the waveform"))
+                        .accessibilityIdentifier(port.identifier("display.status"))
+                }
                 choicePicker("Gain", identifier: "gain.select", selection: mirror.gainIndex,
                              options: ScopeSettings.gains.indices.map { ScopeSettings.gainName($0) },
                              hint: "Scales the trace; values beyond full scale are clipped at the edge") { index in
@@ -174,6 +189,11 @@ struct ScopeControls: View {
             .accessibilityHint(Text(verbatim: "The level the signal crosses where the trace starts"))
             .accessibilityIdentifier(port.identifier("trigger.level"))
         }
+    }
+
+    /// The picker name of a view: "Waveform" or "XY".
+    static func viewName(_ display: ScopeDisplay) -> String {
+        Self.sentence(display.displayName)
     }
 
     /// `status` with a capital first letter ("No samples yet" when empty).

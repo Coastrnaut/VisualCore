@@ -24,8 +24,18 @@
 // presenter (the core never needs to refuse the microphone, because the presenter only sends `source.select 2` with
 // access granted and sends `source.select 0` when a restored microphone selection has none).
 //
-// Snapshot schema 1: `ScopeState` as JSON with sorted keys; the preparation seed comes from the snapshot envelope. One
-// quality tier (`level-0`) in this phase. The digest is `ScopeState.digestText` (`a08.scope.v1|…`).
+// Snapshot schema 1 (A08-P01): `ScopeState` as JSON with sorted keys; the preparation seed comes from the snapshot
+// envelope. One quality tier (`level-0`).
+//
+// Feature 062 (A08-P02) T-A08-206 (FR-A08-211, FR-A08-212; contract "Experience actions"): one more action.
+//   display.select [0…1]     waveform, XY. A whole number is required (`a08.invalid-choice` otherwise). The core never
+//                            refuses XY for a mono source: the choice is kept in the state (so snapshots stay
+//                            deterministic) and the presenter draws the waveform with the mark "XY needs two channels"
+//                            while the running source has one channel.
+// Snapshot schema 2: `ScopeState` schema 2 (the eight A08-P01 keys plus `display`) as JSON with sorted keys. The step
+// 1 → 2 adds `display` 0 (waveform), so a stored A08-P01 state restores unchanged with the waveform view.
+// `schemaOneExample()` is the stored schema-1 payload the registry's migration check restores. The digest is
+// `ScopeState.digestText` (`a08.scope.v2|…|display=…`).
 import Foundation
 import OscilloscopeStudioCore
 import VisualCoreAudioDSP
@@ -43,7 +53,7 @@ public enum ScopeRule {
     public static let permissionDenied = "a08.permission-denied"
 }
 
-/// The state of Oscilloscope Studio. Schema version 1.
+/// The state of Oscilloscope Studio. Schema version 2.
 public struct ScopeCore: ExperienceCore, Equatable {
     /// The experience's id in the catalog.
     public static let experienceID = "a08.oscilloscope-studio"
@@ -54,11 +64,12 @@ public struct ScopeCore: ExperienceCore, Equatable {
 
     /// The action ids in declaration order.
     public static let actionIDs = ["source.select", "signal.waveform", "signal.frequency", "gain.select",
-                                   "timebase.select", "trigger.level", "trigger.slope", "trigger.mode"]
+                                   "timebase.select", "trigger.level", "trigger.slope", "trigger.mode",
+                                   "display.select"]
 
     /// The preparation seed; `reset()` returns to the first state (the seed does not change the scope's settings).
     public private(set) var preparationSeed: UInt64
-    /// The domain state: source, waveform, frequency, gain, timebase and trigger.
+    /// The domain state: source, waveform, frequency, gain, timebase, trigger and display mode.
     public internal(set) var state: ScopeState
 
     /// The first state (`ScopeState.initial`) prepared with `seed`.
@@ -69,10 +80,50 @@ public struct ScopeCore: ExperienceCore, Equatable {
 
     // MARK: Contract
 
-    /// Schema 1 (no earlier schema).
-    public static var migrations: MigrationChain { MigrationChain(currentVersion: 1) }
+    /// Schema 2; the step from schema 1 adds `"display": 0` (the waveform view).
+    public static var migrations: MigrationChain {
+        MigrationChain(currentVersion: 2, steps: [
+            1: { payload in
+                var upgraded = payload
+                upgraded["display"] = ScopeDisplay.waveform.rawValue
+                return upgraded
+            },
+        ])
+    }
 
-    /// The eight controls with their declared ranges (the positions of the `ScopeSettings` tables).
+    /// The stored example of schema 1 for the registry's migration check (feature 062, T-A08-206): the feature 061
+    /// payload (the eight A08-P01 keys, no `display`) of a scope on the square test signal at 440 Hz, gain ×2, 2 ms per
+    /// division, a falling normal trigger at −0.25, with the digest its restore must give — the same scope with the
+    /// waveform view. Nil only if the encoding failed.
+    public static func schemaOneExample(seed: UInt64 = 7) -> MigrationExample? {
+        guard let expected = ScopeState(source: .testSignal, waveform: .square, frequencyIndex: 1, gainIndex: 2,
+                                        timebaseIndex: 4, triggerLevel: -0.25, triggerSlope: .falling,
+                                        triggerMode: .normal, display: .waveform) else { return nil }
+        let payload: [String: Any] = ["source": expected.source.rawValue,
+                                      "waveform": ScopeSettings.index(of: expected.waveform),
+                                      "frequency": expected.frequencyIndex, "gain": expected.gainIndex,
+                                      "timebase": expected.timebaseIndex, "level": expected.triggerLevel,
+                                      "slope": ScopeSettings.index(of: expected.triggerSlope),
+                                      "mode": ScopeSettings.index(of: expected.triggerMode)]
+        return example(version: 1, seed: seed, payload: payload, expected: expected)
+    }
+
+    /// A stored example of `version` with `payload` and the digest of a core prepared with `seed` holding `expected`.
+    private static func example(version: Int, seed: UInt64, payload: [String: Any],
+                                expected state: ScopeState) -> MigrationExample? {
+        guard let id = ExperienceID(rawValue: experienceID) else { return nil }
+        let expected = ScopeCore(seed: seed, state: state)
+        var builder = DigestBuilder(domain: id.rawValue)
+        guard (try? expected.writeDigest(into: &builder)) != nil,
+              let data = try? JSONSerialization.data(withJSONObject: payload, options: [.sortedKeys]),
+              let snapshot = try? ExperienceSnapshot(experience: id, schemaVersion: version, seed: seed, stepIndex: 0,
+                                                     digest: builder.finish(), payload: data),
+              let encoded = try? snapshot.encoded() else { return nil }
+        return MigrationExample(version: version, snapshot: encoded, expectedDigest: builder.finish().hex)
+    }
+
+    /// The nine controls with their declared ranges (the positions of the `ScopeSettings` tables and of
+    /// `ScopeDisplay`).
     public static var controls: [ExperienceControl] {
         func last<T>(_ table: [T]) -> Double { Double(table.count - 1) }
         return [
@@ -84,6 +135,7 @@ public struct ScopeCore: ExperienceCore, Equatable {
             ExperienceControl(id: "trigger.level", ranges: [ScopeSettings.triggerLevelRange]),
             ExperienceControl(id: "trigger.slope", ranges: [0...last(ScopeSettings.slopes)]),
             ExperienceControl(id: "trigger.mode", ranges: [0...last(ScopeSettings.modes)]),
+            ExperienceControl(id: "display.select", ranges: [0...Double(ScopeDisplay.allCases.count - 1)]),
         ]
     }
 
@@ -136,6 +188,10 @@ public struct ScopeCore: ExperienceCore, Equatable {
                 return .rejected(.rule(code: ScopeRule.invalidChoice))
             }
             state.select(ScopeSettings.modes[i])
+        case "display.select":
+            guard let i = Self.choice(x, count: ScopeDisplay.allCases.count), state.selectDisplay(i) else {
+                return .rejected(.rule(code: ScopeRule.invalidChoice))
+            }
         default:
             return .rejected(.unknownControl(action.control))
         }
@@ -156,20 +212,21 @@ public struct ScopeCore: ExperienceCore, Equatable {
         state = .initial
     }
 
-    /// The canonical text of every field (`ScopeState.digestText`, `a08.scope.v1|…`).
+    /// The canonical text of every field (`ScopeState.digestText`, `a08.scope.v2|…|display=…`).
     public func writeDigest(into builder: inout DigestBuilder) throws(DigestError) {
         builder.add(state.digestText)
     }
 
-    /// The scope state (schema 1) as JSON with sorted keys.
+    /// The scope state (schema 2) as JSON with sorted keys.
     public func snapshotPayload() throws -> Data {
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.sortedKeys, .withoutEscapingSlashes]
         return try encoder.encode(state)
     }
 
-    /// The core of a schema-1 payload with the envelope's `seed` as preparation seed; an unknown source, waveform,
-    /// index, slope or mode, or a trigger level that is not finite in −1…1, is refused (the decoding throws).
+    /// The core of a schema-2 payload (a schema-1 payload arrives migrated with `display` 0) with the envelope's `seed`
+    /// as preparation seed; an unknown source, waveform, index, slope, mode or display, or a trigger level that is not
+    /// finite in −1…1, is refused (the decoding throws).
     public static func restore(payload: Data, seed: UInt64) throws -> ScopeCore {
         ScopeCore(seed: seed, state: try JSONDecoder().decode(ScopeState.self, from: payload))
     }

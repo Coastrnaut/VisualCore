@@ -4,6 +4,7 @@
 // `TestSignalAudioSource` (its first 1,024 frames are written by `start`, so a 1 ms/div window is complete on the first
 // frame without waiting), opening the experience in the one app's session host, drawing frames, measuring the periods
 // in a window from its interpolated rising zero crossings, and reading the pixels of a frame.
+// Feature 062 (A08-P02) T-A08-206: a factory whose "file" is a mono 1 kHz test signal (one channel, so XY falls back).
 import Foundation
 import XCTest
 @testable import OscilloscopeStudioExperience
@@ -59,6 +60,17 @@ enum ScopeTest {
                                TestSignalAudioSource(signal: TestSignal(waveform: .sine, amplitude: 0, channelCount: 2))
                            },
                            file: { _ in throw AudioSourceError.undecodable("test double") },
+                           microphone: { _ in ScopeQuietMicrophone() })
+    }
+
+    /// Like `sources`, but every picked file opens as the one-channel 1 kHz sine at amplitude 0.5 (a mono source for
+    /// the XY fallback; no file is read).
+    static var monoFileSources: ScopeSourceFactory {
+        ScopeSourceFactory(testSignal: { TestSignalAudioSource(signal: $0) },
+                           file: { _ in
+                               TestSignalAudioSource(signal: TestSignal(waveform: .sine, frequency: 1_000,
+                                                                        amplitude: 0.5, channelCount: 1))
+                           },
                            microphone: { _ in ScopeQuietMicrophone() })
     }
 

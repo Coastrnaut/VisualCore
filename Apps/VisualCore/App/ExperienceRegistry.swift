@@ -188,7 +188,9 @@ extension ExperienceRegistry {
     /// A08 Oscilloscope Studio (feature 061, A08-P01): a candidate until X-A08.
     fileprivate static var oscilloscopeStudio: ExperienceRegistration? {
         guard let id = OscilloscopeStudioExperience.id else { return nil }
-        var registration = ExperienceRegistration(id: id, core: ScopeCore.self) { launch in
+        // Schema 2 (feature 062) adds the display mode; the stored schema-1 example proves the migration.
+        let examples = [ScopeCore.schemaOneExample()].compactMap { $0 }
+        var registration = ExperienceRegistration(id: id, core: ScopeCore.self, examples: examples) { launch in
             let system = SystemAccessibilityObserver.systemValues()
             return OscilloscopeStudioExperience.make(id: id, storage: launch.storage,
                                                      reduceMotion: launch.reduceMotion.resolved(system: system.reduceMotion),

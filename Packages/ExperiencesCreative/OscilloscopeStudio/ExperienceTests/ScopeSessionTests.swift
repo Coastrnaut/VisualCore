@@ -7,6 +7,11 @@
 // waiting); suspending stops the source and activating starts it on a fresh buffer; a denied microphone keeps the
 // previous source with a message and the offer of the test signal; a granted microphone is read as one channel; an
 // undecodable file keeps the previous source.
+// Feature 062 (A08-P02) T-A08-206 (FR-A08-210–213; story 1 scenarios 1–3; story 2 scenario 4): each channel is one
+// decimated polyline (at most two points per pixel column, at most two trace nodes per frame); in XY the plotted points
+// are exactly `ScopeTrace.xyPoints` of the window's pairs scaled by the gain, one per frame; a mono source in XY keeps
+// the waveform with the mark "XY needs two channels" and says so, and a stereo source shows XY again without a new
+// choice; the description names the view and the test signal's 2 : 3 ratio.
 import Foundation
 import XCTest
 @testable import OscilloscopeStudioExperience
@@ -46,11 +51,21 @@ final class ScopeSessionTests: XCTestCase {
         XCTAssertEqual(periods, 10, accuracy: 0.1)
         let right = try XCTUnwrap(ScopeTest.measuredPeriods(window.right))
         XCTAssertEqual(right, 15, accuracy: 0.15, "the right channel runs at 1.5 kHz")
-        XCTAssertEqual(presenter.lastSegmentCounts, [479, 479], "one segment per displayed sample")
+        XCTAssertEqual(presenter.lastTraceNodeCount, 2, "one polyline per channel")
+        XCTAssertGreaterThanOrEqual(presenter.lastColumns, 1)
+        XCTAssertLessThanOrEqual(presenter.lastColumns, ScopePresenter.maxColumns)
+        for channel in 0..<2 {
+            let reduced = MinMaxDecimator.reduce(window.displayValues(channel: channel, gain: 1),
+                                                 columns: presenter.lastColumns)
+            XCTAssertEqual(presenter.lastPointCounts[channel], 2 * reduced.count, "min and max per column")
+            XCTAssertLessThanOrEqual(presenter.lastPointCounts[channel], 2 * presenter.lastColumns,
+                                     "at most two points per pixel column")
+        }
+        XCTAssertFalse(presenter.lastShowsXY)
         XCTAssertGreaterThan(shell.diagnostics.gpu?.objects ?? 0, 0, "drawn through the host's registry")
         XCTAssertEqual(shell.accessibilitySummary,
-                       "Oscilloscope Studio: test signal, sine 1 kHz, 2 channels, 1 ms per division, gain ×1, "
-                           + "triggered rising at 0, not clipping.")
+                       "Oscilloscope Studio: test signal, sine 1 kHz, 2 channels, waveform view, 1 ms per division, "
+                           + "gain ×1, triggered rising at 0, not clipping.")
         XCTAssertEqual(presenter.mirror.status, "2 channels, triggered rising at 0, not clipping")
 
         // Consecutive windows start at a rising crossing too, so the trace does not drift.
@@ -60,6 +75,7 @@ final class ScopeSessionTests: XCTestCase {
             XCTAssertTrue(next.triggered)
             XCTAssertGreaterThanOrEqual(next.left[0], 0)
             XCTAssertLessThan(next.left[0], 0.07)
+            XCTAssertLessThanOrEqual(presenter.lastTraceNodeCount, 2)
         }
 
         session.close()
@@ -91,7 +107,11 @@ final class ScopeSessionTests: XCTestCase {
         XCTAssertTrue(full, "the source writes 4,800 frames within about 0.1 s")
         let wide = try XCTUnwrap(presenter.lastWindow)
         XCTAssertEqual(try XCTUnwrap(ScopeTest.measuredPeriods(wide.left)), 50, accuracy: 0.1)
-        XCTAssertLessThanOrEqual(presenter.lastSegmentCounts[0], wide.sampleCount - 1)
+        XCTAssertLessThanOrEqual(presenter.lastPointCounts[0], 2 * presenter.lastColumns)
+        XCTAssertEqual(presenter.lastPointCounts[0],
+                       2 * MinMaxDecimator.reduce(wide.displayValues(channel: 0, gain: 1),
+                                                  columns: presenter.lastColumns).count)
+        XCTAssertLessThan(presenter.lastPointCounts[0], 2 * wide.sampleCount, "2,400 samples reduced to the columns")
         XCTAssertEqual(presenter.startCount, starts, "gain and timebase do not restart the source")
         session.close()
     }
@@ -141,6 +161,36 @@ final class ScopeSessionTests: XCTestCase {
         XCTAssertTrue(waiting.waiting)
         XCTAssertTrue(shell.accessibilitySummary.contains("waiting for a rising trigger at 0"),
                       shell.accessibilitySummary)
+        session.close()
+    }
+
+    /// Feature 062 (A08-P02) T-A08-207 (FR-A08-213; SC-A08-204): a level the 0.5 test signal never reaches is a
+    /// missing crossing: auto mode shows the newest span and says "no trigger"; after one triggered window at 0,
+    /// normal mode keeps that window and says "waiting".
+    func testAMissingCrossingNeverTriggersAndNormalModeKeepsTheLastTrace() async throws {
+        let session = ExperienceSession()
+        let shell = try await ScopeTest.open(session)
+        let presenter = shell.presenter
+        try ScopeTest.frames(session, 1)
+        let triggered = try XCTUnwrap(presenter.lastWindow)
+        XCTAssertTrue(triggered.triggered, "the level 0 crossing triggers first")
+        XCTAssertTrue(shell.handle(control: "trigger.level", values: [0.9]).isAccepted)
+        try ScopeTest.frames(session, 1)
+        let free = try XCTUnwrap(presenter.lastWindow)
+        XCTAssertFalse(free.triggered)
+        XCTAssertFalse(free.waiting)
+        XCTAssertTrue(shell.accessibilitySummary.contains("no trigger"), shell.accessibilitySummary)
+        XCTAssertTrue(shell.handle(control: "trigger.level", values: [0]).isAccepted)
+        XCTAssertTrue(shell.handle(control: "trigger.mode", values: [1]).isAccepted)
+        try ScopeTest.frames(session, 1)
+        let kept = try XCTUnwrap(presenter.lastWindow)
+        XCTAssertTrue(kept.triggered)
+        XCTAssertTrue(shell.handle(control: "trigger.level", values: [0.9]).isAccepted)
+        try ScopeTest.frames(session, 1)
+        let waiting = try XCTUnwrap(presenter.lastWindow)
+        XCTAssertTrue(waiting.waiting)
+        XCTAssertEqual(waiting.startFrame, kept.startFrame, "the last triggered trace stays")
+        XCTAssertTrue(shell.accessibilitySummary.contains("waiting"), shell.accessibilitySummary)
         session.close()
     }
 
@@ -214,7 +264,8 @@ final class ScopeSessionTests: XCTestCase {
         XCTAssertEqual(presenter.activeChannelCount, 1)
         try ScopeTest.frames(session, 1)
         XCTAssertEqual(try XCTUnwrap(presenter.lastWindow).channelCount, 1)
-        XCTAssertEqual(presenter.lastSegmentCounts[1], 0, "no second trace for a mono source")
+        XCTAssertEqual(presenter.lastPointCounts[1], 0, "no second trace for a mono source")
+        XCTAssertLessThanOrEqual(presenter.lastTraceNodeCount, 1)
         XCTAssertTrue(shell.accessibilitySummary.hasPrefix("Oscilloscope Studio: microphone, 1 channel, "),
                       shell.accessibilitySummary)
         session.close()
@@ -233,6 +284,90 @@ final class ScopeSessionTests: XCTestCase {
         XCTAssertEqual(presenter.mirror.message, ScopePresenter.undecodableMessage)
         XCTAssertTrue(presenter.mirror.offersTestSignal)
         XCTAssertFalse(presenter.mirror.showsSettingsLink)
+        session.close()
+    }
+
+    func testXYPlotsTheScaledSamplePairsOfTheStereoTestSignal() async throws {
+        let session = ExperienceSession()
+        let shell = try await ScopeTest.open(session)
+        let presenter = shell.presenter
+        XCTAssertTrue(shell.handle(control: "display.select", values: [1]).isAccepted)
+        XCTAssertEqual(try core(shell).state.display, .xy)
+        for gainIndex in [1.0, 2.0] {    // ×1, then ×2 (0.5 × 2 reaches full scale)
+            XCTAssertTrue(shell.handle(control: "gain.select", values: [gainIndex]).isAccepted)
+            try ScopeTest.frames(session, 2)
+            let window = try XCTUnwrap(presenter.lastWindow)
+            let gain = try core(shell).state.gain
+            XCTAssertEqual(window.channelCount, 2)
+            XCTAssertTrue(presenter.lastShowsXY)
+            XCTAssertEqual(presenter.lastXYPoints,
+                           ScopeTrace.xyPoints(left: window.left, right: window.right, gain: gain,
+                                               in: presenter.lastXYSquare),
+                           "every point is (left × gain, right × gain) of one frame")
+            XCTAssertEqual(presenter.lastXYPoints.count, window.sampleCount, "one point per frame")
+            XCTAssertEqual(presenter.lastTraceNodeCount, 1, "one XY polyline")
+            XCTAssertEqual(presenter.lastPointCounts, [0, 0])
+            let square = presenter.lastXYSquare
+            XCTAssertGreaterThan(square.side, 0)
+            for point in presenter.lastXYPoints {
+                XCTAssertTrue(point.x >= square.x && point.x <= square.x + square.side
+                              && point.y >= square.y && point.y <= square.y + square.side)
+            }
+        }
+        XCTAssertNil(presenter.mirror.displayNote)
+        XCTAssertEqual(presenter.mirror.display, .xy)
+        XCTAssertTrue(presenter.mirror.status.hasPrefix("XY view, 2 channels, "), presenter.mirror.status)
+        XCTAssertTrue(shell.accessibilitySummary.contains(
+            "2 channels, XY view, left 1 kHz against right 1.5 kHz (2 : 3), 1 ms per division"),
+            shell.accessibilitySummary)
+
+        // Back to the waveform: two polylines again.
+        XCTAssertTrue(shell.handle(control: "display.select", values: [0]).isAccepted)
+        try ScopeTest.frames(session, 1)
+        XCTAssertFalse(presenter.lastShowsXY)
+        XCTAssertTrue(presenter.lastXYPoints.isEmpty)
+        XCTAssertEqual(presenter.lastTraceNodeCount, 2)
+        XCTAssertTrue(shell.accessibilitySummary.contains("2 channels, waveform view, "), shell.accessibilitySummary)
+        session.close()
+    }
+
+    func testAMonoSourceInXYFallsBackWithTheMarkAndAStereoSourceShowsXYAgain() async throws {
+        let session = ExperienceSession()
+        let shell = try await ScopeTest.open(session, factory: ScopeTest.monoFileSources)
+        let presenter = shell.presenter
+        XCTAssertTrue(shell.handle(control: "display.select", values: [1]).isAccepted)
+        try ScopeTest.frames(session, 1)
+        XCTAssertTrue(presenter.lastShowsXY, "the stereo test signal shows XY")
+
+        // A mono source while XY is chosen: the waveform with the mark, and the view stays XY.
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent("mono.wav")
+        XCTAssertTrue(presenter.chooseFile(url: url))
+        XCTAssertEqual(try core(shell).state.source, .file)
+        XCTAssertEqual(presenter.activeChannelCount, 1)
+        try ScopeTest.frames(session, 2)
+        let mono = try XCTUnwrap(presenter.lastWindow)
+        XCTAssertEqual(mono.channelCount, 1)
+        XCTAssertFalse(presenter.lastShowsXY, "a mono source never enters XY")
+        XCTAssertTrue(presenter.lastXYPoints.isEmpty)
+        XCTAssertGreaterThan(presenter.lastPointCounts[0], 0, "the waveform is drawn")
+        XCTAssertEqual(presenter.lastPointCounts[1], 0)
+        XCTAssertEqual(presenter.lastTraceNodeCount, 1)
+        XCTAssertEqual(try core(shell).state.display, .xy, "the chosen view stays XY")
+        XCTAssertEqual(presenter.mirror.displayNote, "XY needs two channels")
+        XCTAssertTrue(presenter.mirror.status.hasPrefix("XY needs two channels, 1 channel, "), presenter.mirror.status)
+        XCTAssertTrue(shell.accessibilitySummary.contains("1 channel, XY needs two channels, waveform view, "),
+                      shell.accessibilitySummary)
+
+        // Back to a stereo source without a new view choice: XY again.
+        XCTAssertEqual(presenter.useTestSignal(), .accepted)
+        try ScopeTest.frames(session, 2)
+        let stereo = try XCTUnwrap(presenter.lastWindow)
+        XCTAssertEqual(stereo.channelCount, 2)
+        XCTAssertTrue(presenter.lastShowsXY)
+        XCTAssertEqual(presenter.lastXYPoints.count, stereo.sampleCount)
+        XCTAssertLessThanOrEqual(presenter.lastTraceNodeCount, 2)
+        XCTAssertNil(presenter.mirror.displayNote)
+        XCTAssertTrue(shell.accessibilitySummary.contains("2 channels, XY view, "), shell.accessibilitySummary)
         session.close()
     }
 }

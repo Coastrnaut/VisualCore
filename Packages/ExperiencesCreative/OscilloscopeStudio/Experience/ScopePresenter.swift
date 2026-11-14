@@ -25,14 +25,28 @@
 //     the source and the return starts it again on a fresh buffer with the acquisition reset.
 //   - Drawing: per frame one `SignalWindow` from `ScopeAcquisition` (triggered on channel 0, at most 4,096 samples per
 //     channel), a 10 × 8 division grid inside a 6 % inset (the centre lines brighter) and the trace of channel 0 (and of
-//     channel 1 in a second colour when the source carries two) as `.line` scene nodes: at most one segment per
-//     displayed sample. The values are `displayValues(channel:gain:)` (× gain, clamped to full scale, so a clipped
-//     trace runs along the plot edge); a segment touching a clipped sample is drawn in the clip colour, and the window's
-//     `clipped` flag is reported in the description. The sample spacing is that of the full span, so a partial window
-//     is drawn from the left without stretching.
-//   - Description: "Oscilloscope Studio: test signal, sine 1 kHz, 2 channels, 1 ms per division, gain ×1, triggered
-//     rising at 0, not clipping." (source, signal, channels, timebase, gain, trigger state, clipping).
+//     channel 1 in a second colour when the source carries two). The values are `displayValues(channel:gain:)` (× gain,
+//     clamped to full scale, so a clipped trace runs along the plot edge); the window's `clipped` flag is reported in
+//     the description. (Since A08-P02 the traces are decimated polylines; see below.)
+//   - Description: "Oscilloscope Studio: test signal, sine 1 kHz, 2 channels, waveform view, 1 ms per division, gain
+//     ×1, triggered rising at 0, not clipping." (source, signal, channels, view since A08-P02, timebase, gain, trigger
+//     state, clipping).
 //   - Privacy: nothing is recorded, stored or sent; the microphone is never played to the speaker.
+//
+// Feature 062 (A08-P02) T-A08-206 (FR-A08-210–213; story 1 scenarios 1–3; story 2 scenario 4; clarifications 2–4):
+//   - Waveform view: each channel is ONE `.polyline` scene node per frame (no per-segment shapes). The window's
+//     `displayValues(channel:gain:)` are reduced by `MinMaxDecimator` to the pixel columns of the trace area (the
+//     grid's pixel width, 1…4,096; a partial window covers only its share of the span, so it is drawn from the left
+//     without stretching) and drawn as the zig-zag of `ScopeTrace.waveformPoints` (min then max per column): at most
+//     two points per column, every peak on screen. The world is pixels from the centre with y up, the same direction
+//     as `TracePoint`'s y, so no flip is needed. A channel with a clipped sample is drawn in the clip colour.
+//   - XY view (`state.display == .xy`): when the window has two channels, one polyline of `ScopeTrace.xyPoints` of the
+//     window's (left × gain, right × gain) pairs inside the largest square centred in the grid; the second trace node
+//     is empty. A mono window keeps the waveform view and shows the mark "XY needs two channels" (the controls'
+//     `display.status` and the trace status) and says so; the chosen view stays XY, so a stereo source shows XY again
+//     without a new choice.
+//   - Description: the view is named after the channels ("waveform view", "XY view" and, with the stereo test
+//     signal, "left 1 kHz against right 1.5 kHz (2 : 3)"; "XY needs two channels" for a mono window in XY).
 import Foundation
 import SwiftUI
 import UIKit
@@ -72,6 +86,10 @@ final class ScopeMirror {
     var modeIndex = 0
     /// The trace status in words (channels, trigger state, clipping).
     var status = ""
+    /// The chosen display mode (`display.select`).
+    var display: ScopeDisplay = .waveform
+    /// The mark shown while XY is chosen but the window has one channel ("XY needs two channels"); nil otherwise.
+    var displayNote: String?
     /// A plain message (refused microphone access, an unplayable or moved file, a stopped source); nil when all is
     /// well.
     var message: String?
@@ -117,7 +135,7 @@ final class ScopePresenter: ExperiencePresenter {
     nonisolated static let ringCapacity = 16_384
     /// The amplitude of the test signal (half of full scale).
     nonisolated static let testAmplitude = 0.5
-    /// The right channel's frequency ratio of the test signal (so a later XY view has content).
+    /// The right channel's frequency ratio of the test signal (2 : 3, the Lissajous figure of the XY view).
     nonisolated static let rightRatio = 1.5
     /// The sweep's start and end frequency and its duration.
     nonisolated static let sweepStart = 100.0, sweepEnd = 10_000.0, sweepDuration = 2.0
@@ -137,6 +155,10 @@ final class ScopePresenter: ExperiencePresenter {
     nonisolated static let traceColors = [Vec4(0.35, 1.0, 0.55, 1), Vec4(1.0, 0.75, 0.3, 1)]
     /// The colour of a segment touching a clipped sample (red).
     nonisolated static let clipColor = Vec4(1.0, 0.25, 0.25, 1)
+    /// The most pixel columns of the waveform view (the window cap, `TimebaseWindow.maxSamples`).
+    nonisolated static let maxColumns = 4_096
+    /// The mark of a mono window in the XY view.
+    static let xyNeedsStereo = "XY needs two channels"
     /// The interval of the lifecycle watch in seconds.
     nonisolated static let watchInterval = 0.1
 
@@ -205,8 +227,19 @@ final class ScopePresenter: ExperiencePresenter {
     private(set) var lastCore: ScopeCore?
     /// The window drawn by the last frame; nil before the first frame.
     private(set) var lastWindow: SignalWindow?
-    /// The trace segments drawn by the last frame per channel (at most one per displayed sample).
-    private(set) var lastSegmentCounts = [0, 0]
+    /// The points of each channel's waveform polyline drawn by the last frame (at most two per pixel column; 0 for a
+    /// channel not drawn, and for both channels in the XY view).
+    private(set) var lastPointCounts = [0, 0]
+    /// The pixel columns of the waveform trace area of the last frame (the decimation's column count).
+    private(set) var lastColumns = 0
+    /// The points of the XY polyline drawn by the last frame (empty unless the XY view was drawn).
+    private(set) var lastXYPoints: [TracePoint] = []
+    /// The XY square of the last frame in world pixels (x, y of the lower-left corner, side).
+    private(set) var lastXYSquare: (x: Double, y: Double, side: Double) = (0, 0, 0)
+    /// The trace nodes holding a shape after the last frame (at most two).
+    private(set) var lastTraceNodeCount = 0
+    /// Whether the last frame drew the XY view (XY chosen and a two-channel window).
+    private(set) var lastShowsXY = false
     /// The number of starts of a source since the presenter was created (tests read it).
     private(set) var startCount = 0
     /// Set only by tests; the next draw throws `ScopeDrawError.injected` and clears the flag.
@@ -217,7 +250,8 @@ final class ScopePresenter: ExperiencePresenter {
     private var primitives: PrimitiveRenderer?
     private let root = SceneNode(id: "scope")
     private var gridNodes: [SceneNode] = []
-    private var traceNodes: [[SceneNode]] = [[], []]
+    /// The two trace nodes (channel 0 or the XY trace, channel 1), reused every frame.
+    private var traceNodes: [SceneNode] = []
 
     init(experienceID: ExperienceID, permission: any MicrophonePermission, factory: ScopeSourceFactory = .system) {
         self.experienceID = experienceID
@@ -227,6 +261,11 @@ final class ScopePresenter: ExperiencePresenter {
             let node = SceneNode(id: "g\(index)", z: 0, color: Self.gridColor)
             root.add(node)
             gridNodes.append(node)
+        }
+        for channel in 0..<2 {
+            let node = SceneNode(id: "t\(channel)", z: 1 + channel, color: Self.traceColors[channel])
+            root.add(node)
+            traceNodes.append(node)
         }
     }
 
@@ -295,8 +334,7 @@ final class ScopePresenter: ExperiencePresenter {
         lastWindow = window
         updateStatus(core.state)
         let width = Double(max(1, context.pixelWidth)), height = Double(max(1, context.pixelHeight))
-        layOut(width: width, height: height, window: window, gain: core.state.gain,
-               secondsPerDivision: core.state.secondsPerDivision)
+        layOut(width: width, height: height, window: window, state: core.state)
         if primitives == nil { primitives = try PrimitiveRenderer(registry: context.resources) }
         try primitives?.draw(root, camera: Camera2D(), metrics: ViewMetrics(size: Vec2(width, height), scale: 1))
     }
@@ -328,7 +366,7 @@ final class ScopePresenter: ExperiencePresenter {
     }
 
     /// Places the grid and the traces for a view of `width` × `height` pixels (world = pixels from the centre, y up).
-    private func layOut(width: Double, height: Double, window: SignalWindow, gain: Double, secondsPerDivision: Double) {
+    private func layOut(width: Double, height: Double, window: SignalWindow, state: ScopeState) {
         let plotWidth = width * (1 - 2 * Self.inset), plotHeight = height * (1 - 2 * Self.inset)
         let left = -plotWidth / 2, bottom = -plotHeight / 2
         var g = 0
@@ -344,37 +382,53 @@ final class ScopePresenter: ExperiencePresenter {
             gridNodes[g].color = j == Self.verticalDivisions / 2 ? Self.axisColor : Self.gridColor
             g += 1
         }
-        let span = window.sampleRate.isFinite && window.sampleRate > 0
-            ? TimebaseWindow(secondsPerDivision: secondsPerDivision).sampleCount(sampleRate: window.sampleRate)
-            : window.sampleCount
-        let dx = plotWidth / Double(max(span - 1, max(window.sampleCount - 1, 1)))
-        let halfHeight = plotHeight / 2
-        let g32 = Float(gain)
-        for channel in 0..<2 {
-            let raw = channel < window.channelCount ? window.samples(channel: channel) : []
-            let values = channel < window.channelCount ? window.displayValues(channel: channel, gain: gain) : []
-            let segments = max(values.count - 1, 0)
-            while traceNodes[channel].count < segments {
-                let node = SceneNode(id: "t\(channel).\(traceNodes[channel].count)", z: 1 + channel,
-                                     color: Self.traceColors[channel])
-                root.add(node)
-                traceNodes[channel].append(node)
+        let gain = state.gain
+        if state.display == .xy, window.channelCount == 2 {
+            let side = min(plotWidth, plotHeight)
+            let square = (x: -side / 2, y: -side / 2, side: side)
+            let points = ScopeTrace.xyPoints(left: window.left, right: window.right, gain: gain, in: square)
+            traceNodes[0].primitive = points.isEmpty
+                ? nil : Primitive.polyline(points.map(Self.vec), width: Self.traceWidth)
+            traceNodes[0].color = window.clipped ? Self.clipColor : Self.traceColors[0]
+            traceNodes[1].primitive = nil
+            lastXYPoints = points
+            lastXYSquare = square
+            lastPointCounts = [0, 0]
+            lastShowsXY = true
+        } else {
+            // The trace area: the share of the span the window covers, from the left edge of the grid.
+            let span = window.sampleRate.isFinite && window.sampleRate > 0
+                ? TimebaseWindow(secondsPerDivision: state.secondsPerDivision).sampleCount(sampleRate: window.sampleRate)
+                : window.sampleCount
+            let share = span > 0 ? min(Double(window.sampleCount) / Double(span), 1) : 1
+            let rect = (x: left, y: bottom, width: plotWidth * share, height: plotHeight)
+            let columns = min(max(Int(rect.width.rounded(.down)), 1), Self.maxColumns)
+            let g32 = Float(gain)
+            for channel in 0..<2 {
+                let node = traceNodes[channel]
+                guard channel < window.channelCount else {
+                    node.primitive = nil
+                    lastPointCounts[channel] = 0
+                    continue
+                }
+                let reduced = MinMaxDecimator.reduce(window.displayValues(channel: channel, gain: gain),
+                                                     columns: columns)
+                let points = ScopeTrace.waveformPoints(reduced, in: rect)
+                node.primitive = points.isEmpty
+                    ? nil : Primitive.polyline(points.map(Self.vec), width: Self.traceWidth)
+                let clipped = window.samples(channel: channel).contains { abs($0 * g32) > 1 }
+                node.color = clipped ? Self.clipColor : Self.traceColors[channel]
+                lastPointCounts[channel] = points.count
             }
-            func y(_ k: Int) -> Double {
-                let v = Double(values[k])
-                return v.isFinite ? v * halfHeight : 0
-            }
-            func clipped(_ k: Int) -> Bool { abs(raw[k] * g32) > 1 }
-            let nodes = traceNodes[channel]
-            for k in 0..<segments {
-                let a = Vec2(left + Double(k) * dx, y(k)), b = Vec2(left + Double(k + 1) * dx, y(k + 1))
-                nodes[k].primitive = .line(a, b, width: Self.traceWidth)
-                nodes[k].color = clipped(k) || clipped(k + 1) ? Self.clipColor : Self.traceColors[channel]
-            }
-            for k in segments..<nodes.count where nodes[k].primitive != nil { nodes[k].primitive = nil }
-            lastSegmentCounts[channel] = segments
+            lastColumns = columns
+            lastXYPoints = []
+            lastShowsXY = false
         }
+        lastTraceNodeCount = traceNodes.filter { $0.primitive != nil }.count
     }
+
+    /// The world position of a trace point (the same pixel units, y up).
+    nonisolated private static func vec(_ point: TracePoint) -> Vec2 { Vec2(point.x, point.y) }
 
     // MARK: Lifecycle
 
@@ -601,13 +655,57 @@ final class ScopePresenter: ExperiencePresenter {
         if mirror.slopeIndex != slope { mirror.slopeIndex = slope }
         let mode = ScopeSettings.index(of: state.triggerMode)
         if mirror.modeIndex != mode { mirror.modeIndex = mode }
+        if mirror.display != state.display { mirror.display = state.display }
     }
 
     /// Records the trace status of the last window when it changed.
     private func updateStatus(_ state: ScopeState) {
-        let status = Self.channelWords(activeChannelCount) + ", " + Self.triggerWords(lastWindow, state: state) + ", "
+        let note = xyFallsBack(state) ? Self.xyNeedsStereo : nil
+        if mirror.displayNote != note { mirror.displayNote = note }
+        var status = Self.channelWords(activeChannelCount) + ", " + Self.triggerWords(lastWindow, state: state) + ", "
             + (lastWindow?.clipped == true ? "clipping" : "not clipping")
+        if state.display == .xy { status = (note ?? "XY view") + ", " + status }
         if mirror.status != status { mirror.status = status }
+    }
+
+    /// The channel count the view is decided by: the last window's, or the running source's before the first window.
+    private var viewChannelCount: Int { lastWindow?.channelCount ?? activeChannelCount }
+
+    /// Whether XY is chosen but the window (or the running source) has fewer than two channels.
+    private func xyFallsBack(_ state: ScopeState) -> Bool {
+        state.display == .xy && viewChannelCount < 2
+    }
+
+    /// The view in words: "waveform view"; "XY view" (with the stereo test signal: "XY view, left 1 kHz against right
+    /// 1.5 kHz (2 : 3)"); "XY needs two channels, waveform view" for a mono window in XY.
+    private func viewWords(_ state: ScopeState) -> String {
+        guard state.display == .xy else { return "waveform view" }
+        if xyFallsBack(state) { return Self.xyNeedsStereo + ", waveform view" }
+        guard state.source == .testSignal else { return "XY view" }
+        return "XY view, " + Self.ratioWords(state)
+    }
+
+    /// The test signal's channels in words: "left 1 kHz against right 1.5 kHz (2 : 3)", "left 100 Hz to 10 kHz
+    /// against right 150 Hz to 15 kHz (2 : 3)" for the sweep.
+    nonisolated static func ratioWords(_ state: ScopeState) -> String {
+        if state.waveform == .sweep {
+            return "left \(frequencyWords(sweepStart)) to \(frequencyWords(sweepEnd)) against right "
+                + "\(frequencyWords(sweepStart * rightRatio)) to \(frequencyWords(sweepEnd * rightRatio)) (2 : 3)"
+        }
+        return "left \(frequencyWords(state.frequency)) against right "
+            + "\(frequencyWords(state.frequency * rightRatio)) (2 : 3)"
+    }
+
+    /// A frequency in words: "440 Hz", "660 Hz", "1 kHz", "1.5 kHz", "7.5 kHz" (hertz below 1 kHz, otherwise kilohertz
+    /// with at most two decimals).
+    nonisolated static func frequencyWords(_ hertz: Double) -> String {
+        guard hertz.isFinite else { return "0 Hz" }
+        if hertz < 1_000 {
+            let r = hertz.rounded()
+            return "\(Int(r)) Hz"
+        }
+        let k = (hertz / 10).rounded() / 100
+        return k == k.rounded() ? "\(Int(k)) kHz" : "\(k) kHz"
     }
 
     /// "Test signal", "Microphone" or the picked file's name ("File" when none is open).
@@ -669,13 +767,16 @@ final class ScopePresenter: ExperiencePresenter {
         return window.shortened ? words + ", shortened span" : words
     }
 
-    /// "Oscilloscope Studio: test signal, sine 1 kHz, 2 channels, 1 ms per division, gain ×1, triggered rising at 0,
-    /// not clipping." Also brings the running source in line with `core`.
+    /// "Oscilloscope Studio: test signal, sine 1 kHz, 2 channels, waveform view, 1 ms per division, gain ×1, triggered
+    /// rising at 0, not clipping." (in XY: "…, 2 channels, XY view, left 1 kHz against right 1.5 kHz (2 : 3), …"; a
+    /// mono window in XY: "…, 1 channel, XY needs two channels, waveform view, …"). Also brings the running source in
+    /// line with `core`.
     func describe(_ core: ScopeCore) -> String {
         checkLifecycle()
         sync(core)
         let state = core.state
         return "Oscilloscope Studio: \(spokenSource(state)), \(Self.channelWords(activeChannelCount)), "
+            + "\(viewWords(state)), "
             + "\(ScopeSettings.timebaseName(state.timebaseIndex)), gain \(ScopeSettings.gainName(state.gainIndex)), "
             + "\(Self.triggerWords(lastWindow, state: state)), "
             + (lastWindow?.clipped == true ? "clipping" : "not clipping") + "."
