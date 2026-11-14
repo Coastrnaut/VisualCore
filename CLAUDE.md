@@ -68,9 +68,9 @@ evidence commands are found as described in Auto-Creator.md §19. Simulators are
    **Faster tests** (owner ruling of 2026-11-13): an app test pass builds once (`--action build-for-testing`, then
    `test-without-building` chunks) and may use parallel simulator clones (`--parallel N`). **All system
    accessibility audits wait until device testing** (`VC_RUN_AUDITS=1` only there). A gate's interface evidence is
-   one pass on the iOS 27.x phone. **Stopping a run** (lesson of 2026-11-13): TaskStop the whole background loop, not
-   only its xcodebuild, and check `pgrep -fl xcodebuild` before a new run; `xcodebuild_app.py` refuses a busy
-   simulator.
+   one pass on the iOS 27.x phone. **Stopping a run:** TaskStop the whole loop; check `pgrep -fl xcodebuild` first.
+   **A gate boundary is never a turn end** (2026-11-14): after `record` the next action is `next`;
+   wrap-up only at a §28 stop.
    **Faster gates** (owner ruling of 2026-11-14): iOS 27/26 runs in parallel; the next gate's Spec Kit steps start
    while evidence runs; interim runs test only the changed experience; no baseline rerun on an unchanged commit; iOS 26
    and the reference regression only at X gates. Every Spec Kit skill and prompt still runs; no gate is merged or skipped.
