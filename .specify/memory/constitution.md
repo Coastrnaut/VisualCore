@@ -417,6 +417,49 @@ standalone target: it is built directly as an experience in `Packages/Experience
 - **One phase at a time:** implement only one Spec Kit phase at a time (one ledger gate, ADR-0004), in order
   A05-P00 → A05-P06.
 
+### A06 VisualCore Music Lab (`a06.visualcore-music-lab`)
+
+Ratified from the app manual's constitution prompt (2026-11-14). Like A05, it never had a standalone target: it is
+built directly as an experience of the one app. Its product goal is an audio-reactive visualizer with oscillograms,
+spectrum analysis and customizable scenes that is not a ProjectM clone.
+
+- **Consumer, not fork:** an experience of the VisualCore app and a VisualCore consumer, never a fork of
+  projectm-ios. It uses only audited VisualCore public APIs over the OpenGL ES → ANGLE → Metal
+  integration. It MUST NOT create its own EGL/ANGLE initialization path, a second renderer, or link
+  ProjectM engine code; ProjectM's preset formats and visuals are not imitated.
+- **Reuse first (Principle II):** generic audio and visual machinery goes into VisualCore with tests, docs, the API
+  baseline and the reference regression. This covers:
+  - audio capture and file decoding behind one source interface, ring buffers, FFT, band energies, RMS and onset
+    detection (the planned `VisualCoreAudio` and `VisualCoreAudioDSP` products);
+  - audio-to-parameter mapping with smoothing and bounds;
+  - waveform and spectrum drawing primitives, presets, still capture and quality tiers.
+
+  Only the curated scenes, copy and UI stay in the experience.
+- **GPU-free and device-free domain:** DSP, mappings, scene schemas and persisted presets MUST be testable without GPU
+  access and without a microphone, through host `swift test` with synthetic signals (sines, noise, impulses) and
+  committed audio fixtures.
+- **Audio privacy:** microphone input is used only after the system permission request with a disclosed usage
+  string, and only while the person has chosen live input; the experience MUST also work without the permission
+  (bundled demo signals and files the person opens). Audio is analysed on the device only; nothing is recorded to
+  disk unless the person saves, and no audio or analysis ever leaves the device.
+- **Truthful claims:** an entertainment visualizer, not a measurement instrument; no claims of calibrated levels,
+  pitch accuracy, health or hearing effects; latency and performance numbers are claimed only from device
+  measurements.
+- **Offline-first:** no networking, streaming services, accounts or online galleries.
+- **Bounded resources:** audio buffer sizes, FFT sizes, band counts, particle and geometry budgets, capture sizes and
+  frame work are capped; quality tiers lower the load under heat or Low Power Mode; the audio thread never blocks on
+  rendering and never allocates in its callback; context loss rebuilds everything from versioned CPU state.
+- **Accessibility:** native SwiftUI controls with VoiceOver labels, Dynamic Type, Reduce Motion (calmer, slower
+  response) and Reduce Flashing (brightness and flash-rate caps on beat-driven effects). The canvas has a spoken
+  description, and every gesture has a control alternative.
+- **Licenses:** every bundled audio fixture, demo track, preset, palette and shader records its license and author;
+  only original or license-cleared audio is bundled.
+- **Regression when VisualCore changes:** any VisualCore change made for this experience MUST be followed by the
+  ProjectM reference regression (at the experience's X gate per the owner ruling of 2026-11-14).
+- **Python only:** repository automation uses Python 3; there is no PowerShell dependency.
+- **One phase at a time:** implement only one Spec Kit phase at a time (one ledger gate, ADR-0004), in order
+  A06-P00 → A06-P06.
+
 ## Governance
 
 - Precedence: real Apple platform and toolchain behavior and observed test results → owner
@@ -435,5 +478,7 @@ standalone target: it is built directly as an experience in `Packages/Experience
   `docs/decisions/ADR-0010-constitution-2-0-0.md`.
 - Amendment 2.1.0 (2026-11-13, MINOR): App-Scoped Rules gain the A05 Infinite Geometry subsection, ratified from
   its manual's constitution prompt at gate A05-P00 (feature 039; ADR-0007, ADR-0008); no principle changes.
+- Amendment 2.2.0 (2026-11-14, MINOR): App-Scoped Rules gain the A06 VisualCore Music Lab subsection, ratified
+  from its manual's constitution prompt at gate A06-P00 (feature 046); no principle changes.
 
-**Version**: 2.1.0 | **Ratified**: 2026-11-10 | **Last Amended**: 2026-11-13
+**Version**: 2.2.0 | **Ratified**: 2026-11-10 | **Last Amended**: 2026-11-14
