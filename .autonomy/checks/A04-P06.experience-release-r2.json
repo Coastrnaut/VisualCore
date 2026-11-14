@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "python3",
+    "scripts/release_check.py",
+    "--only",
+    "experience-release-a04"
+  ],
+  "command": "python3 scripts/release_check.py --only experience-release-a04",
+  "elapsed_seconds": 1.121,
+  "exit_code": 0,
+  "finished": "2026-11-14T00:21:12+00:00",
+  "log": ".autonomy/logs/A04-P06.experience-release-r2.log",
+  "log_sha256": "f91bcde0033a533addaa34e2b844be3ad7497fb886a819969f5264970bfa64a3",
+  "name": "experience-release-r2",
+  "stage": "A04-P06",
+  "started": "2026-11-14T00:21:11+00:00",
+  "timed_out": false
+}

@@ -85,9 +85,15 @@ final class PUSandboxUITests: XCTestCase {
         let paused = PU.live(app)
         usleep(1_000_000)
         XCTAssertEqual(PU.live(app), paused, "a paused scene does not advance")
-        for _ in 0..<12 { step.tap() }
-        // At a steady state a step can retire more particles than it emits, so the count changes in either direction.
-        XCTAssertNotEqual(PU.waitForLive(app) { $0 != paused }, paused, "Step advances a paused scene")
+        // At a steady state a step can retire as many particles as it emits, so the count changes in either
+        // direction and a few steps can cancel out exactly (seen at 12 steps on 2026-11-13, A04-P06): step in
+        // groups of 12 until the count moves, at most 60 steps.
+        var stepped = paused
+        for _ in 0..<5 where stepped == paused {
+            for _ in 0..<12 { step.tap() }
+            stepped = PU.waitForLive(app, timeout: 3) { $0 != paused }
+        }
+        XCTAssertNotEqual(stepped, paused, "Step advances a paused scene")
         PU.tap(app, "reseed")
         XCTAssertEqual(PU.waitForLive(app) { $0 == 0 }, 0, "a new seed restarts the scene")
         PU.tap(app, "step")
