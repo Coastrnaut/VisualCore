@@ -1,0 +1,45 @@
+# Tasks: VisualCore Music Lab — Phase 02 FFT/feature analysis with fixtures
+
+**Input**: [spec.md](spec.md), [plan.md](plan.md), [research.md](research.md), [data-model.md](data-model.md),
+[contracts/api.md](contracts/api.md), [quickstart.md](quickstart.md). Gate A06-P02 (legacy). Evidence:
+`python3 Tools/python/desktop_runbook.py run-check --stage A06-P02 --timeout 600 --name <check> -- <command>`. Commit after every task (no trailers). iOS 27 only; reference regression at X-A06
+(owner, 2026-11-14).
+
+## Phase 1: Setup
+
+- [ ] T-A06-201 Baseline: cite the A06-P01 evidence on the unchanged tree (`.autonomy/checks/A06-P01.dsp-host.json`, `.autonomy/checks/A06-P01.experiences-ios27-3.json`, `.autonomy/checks/A06-P01.app-unit-3.json`) instead of a rerun (owner ruling 4 of 2026-11-14)
+
+## Phase 2: Foundational (VisualCore, story 3)
+
+- [ ] T-A06-202 [P] [US3] Write `Packages/VisualCore/Tests/VisualCoreAudioDSPTests/{LevelMeterTests,BandLayoutTests}.swift` first, then `Packages/VisualCore/Sources/VisualCoreAudioDSP/{LevelMeter,BandLayout}.swift` and the `SpectrumWorkspace` + `powerSpectrum(_:into:workspace:)` addition to `SpectrumAnalyzer.swift` per contracts/api.md ("floorDB −120"; "non-finite → 0; empty → 0"; "bandCount 1…64, default 16"; "bins contiguous, increasing, non-empty, within 1…N/2−1"; "invalid input → nil"); tests: RMS/peak of sine (A/√2, A), square (A, A), silence (0) within 1e-6 relative; dBFS floor; layouts at (48 kHz, 1,024), (44.1 kHz, 1,024), (48 kHz, 4,096) and (8 kHz, 256) obey the bin rules; powerSpectrum equals 10^(magnitudesDB/10) within 1e-4 relative where above −100 dB (FR-A06-201, 202, 206; SC-A06-201)
+- [ ] T-A06-203 [P] [US3] Write `Packages/VisualCore/Tests/VisualCoreAudioDSPTests/{FeatureSmootherTests,OnsetDetectorTests}.swift` first, then `Packages/VisualCore/Sources/VisualCoreAudioDSP/{FeatureSmoother,OnsetDetector}.swift` per contracts/api.md ("coefficient 1 − exp(−Δt/τ)"; "historyCount 43, multiple 1.5, minimum 1e-4, minimumInterval 0.1 s"); tests: step reaches 1 − 1/e after attack and 1/e after release ± one update at 30 and 120 updates/s; reset → 0; negative elapsed treated as 0; detector fires on a flux spike over a steady history, never twice within 0.1 s, never on constant or zero flux (FR-A06-203, 204; SC-A06-204)
+- [ ] T-A06-204 [US3] Write `Packages/VisualCore/Tests/VisualCoreAudioDSPTests/FeatureExtractorTests.swift` first, then `Packages/VisualCore/Sources/VisualCoreAudioDSP/{AudioFeatures,FeatureExtractor}.swift` (depends on T-A06-202, 203) per contracts/api.md ("beatAttack 0.01, beatRelease 0.25"; features not Sendable-shared, buffers allocated once); tests with 512-sample hops at 48 kHz: silence → rms 0, peak 0, every band ≤ −120 dB, flux 0, no onset, beat 0; tones 100 Hz/1 kHz/5 kHz → the band holding the tone is the highest and band energies sum to the covered bins' power within 1e-4; 4 s click train every 0.5 s → one onset within one hop of each click and none elsewhere; steady tone after its first window → no onset; non-finite samples treated as 0; reset clears beat and history; fewer samples than a window are zero-padded (FR-A06-203, 205, 206; SC-A06-202, 203)
+
+## Phase 3: User Story 1 + 2 — see level, spectrum and beat; silence is calm (P1) 🎯
+
+- [ ] T-A06-205 [P] [US1] Write `Packages/ExperiencesCreative/VisualCoreMusicLab/CoreTests/AnalysisDisplayTests.swift` first, then `Packages/ExperiencesCreative/VisualCoreMusicLab/Core/AnalysisDisplay.swift` per data-model.md ("bars 0…1, level 0…1, peakMark 0…1, beat 0…1"; "−80…0 dB mapped linearly, clamped"); tests: −120 → 0, −80 → 0, −40 → 0.5, 0 → 1, +6 → 1, NaN → 0; bar count follows the input; level words "quiet" below −40 dBFS, "medium" below −20, "loud" otherwise (FR-A06-210, 212)
+- [ ] T-A06-206 [US1] Modify `Packages/ExperiencesCreative/VisualCoreMusicLab/Experience/MusicLabPresenter.swift` (depends on T-A06-204, 205): own a `FeatureExtractor` (created in setup for the active source's sample rate, re-created when the rate changes, `reset()` on every source-key change, dropped in teardown); analyse the newest 1,024 samples once per draw with `frame.time` and `frame.delta`; draw the waveform in 10 %…50 % of the height, 16 bars in 58 %…90 %, level meter (with peak mark) and beat meter as right-edge columns, all through PrimitiveRenderer; description "Music Lab: <source>, level <word>[, beat]." with beat while beat energy > 0.5; the A06-P01 background probe stays valid; expose `lastFeatures` for tests; add the explicit `VisualCoreAudioDSP` dependency in `Packages/ExperiencesCreative/Package.swift` if not already present (FR-A06-210–213)
+- [ ] T-A06-207 [US1] Write `Packages/ExperiencesCreative/VisualCoreMusicLab/ExperienceTests/MusicLabAnalysisTests.swift`: demo tone 1 kHz → highest band is the band holding 1 kHz, level ≈ −9 dBFS ± 1 dB, description says "medium" or "loud" per the thresholds; demo silence → all features zero and two consecutive frames read identical pixels; the note sequence over ≤ 2.5 s of frames shows ≥ 3 separate beats; switching source resets beat to 0 (FR-A06-210–213; SC-A06-205); existing `MusicLabManifestTests.theCommittedManifestFileMatches` must still pass unchanged (FR-A06-213)
+
+## Phase 4: Polish & evidence
+
+- [ ] T-A06-208 DSP host tests (`python3 Tools/python/desktop_runbook.py run-check --stage A06-P02 --timeout 600 --name dsp-host -- swift test --package-path Packages/VisualCore --filter VisualCoreAudioDSPTests`)
+- [ ] T-A06-209 Experiences package on sim-27.2 (`python3 Tools/python/desktop_runbook.py run-check --stage A06-P02 --timeout 600 --name experiences-ios27 -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test`)
+- [ ] T-A06-210 App build and unit (`python3 Tools/python/desktop_runbook.py run-check --stage A06-P02 --timeout 600 --name app-unit -- python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27`)
+- [ ] T-A06-211 Runner iOS 27 (`python3 Tools/python/desktop_runbook.py run-check --stage A06-P02 --timeout 600 --name verify-27 -- python3 scripts/verify_experiences.py --only a06.visualcore-music-lab --runtime 27`; digests unchanged)
+- [ ] T-A06-212 Public API and docs: `check_public_api.py --update`, `python3 Tools/python/desktop_runbook.py run-check --stage A06-P02 --timeout 600 --name public-api -- python3 scripts/check_public_api.py`; `Packages/VisualCore/README.md` (VisualCoreAudioDSP section), `Auto-Creator.md` §13 row, `docs/apps/visualcore-music-lab/visualcore-contract.{json,md}` G-AUDIODSP marked built in A06-P02 (validate_autocreator)
+- [ ] T-A06-213 Script tests (`python3 Tools/python/desktop_runbook.py run-check --stage A06-P02 --timeout 600 --name script-tests -- python3 scripts/test_scripts.py`)
+- [ ] T-A06-214 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A06-P02
+
+## Dependencies
+
+T-A06-201 → (T-A06-202 ∥ T-A06-203 ∥ T-A06-205) → T-A06-204 → T-A06-206 → T-A06-207 → T-A06-208…213 → T-A06-214.
+Review checkpoints: after T-A06-204 (DSP API frozen, baseline update), after T-A06-207 (experience complete).
+
+## Parallel execution
+
+Agents: A = T-A06-202, B = T-A06-203, C = T-A06-205 (disjoint files). Lead: T-A06-204, 206, 207, docs, runs, commits.
+
+## Implementation strategy
+
+MVP: the DSP features (US3) feeding the experience's bars and meters (US1) with the silence fixture (US2); evidence last.
