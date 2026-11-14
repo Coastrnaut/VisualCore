@@ -112,11 +112,14 @@ public final class PrimitiveRenderer {
         case .polygon(let pts):
             return earClip(pts)
         case .polyline(let pts, let w):
-            // feature 062 (A08-P02): one quad per non-zero segment, identical to a two-point `.line`.
+            // feature 062 (A08-P02): one quad per non-zero segment, identical to a two-point `.line`; never thinner
+            // than one pixel on screen (convergence T-A08-217), so a hairline trace stays visible.
             var out: [Vec2] = []
             guard pts.count >= 2 else { return out }
             out.reserveCapacity((pts.count - 1) * 6)
-            for i in 1..<pts.count { appendSegment(pts[i - 1], pts[i], width: w, to: &out) }
+            let onePixel = pointsPerUnit > 0 && pointsPerUnit.isFinite ? 1 / pointsPerUnit : 0
+            let width = max(w, onePixel)
+            for i in 1..<pts.count { appendSegment(pts[i - 1], pts[i], width: width, to: &out) }
             return out
         }
     }

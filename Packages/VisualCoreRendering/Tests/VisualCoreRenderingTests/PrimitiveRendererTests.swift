@@ -139,6 +139,19 @@ final class PrimitiveRendererTests: XCTestCase {
         XCTAssertLessThanOrEqual(Double(differing), Double(covered) * 0.01, "\(differing) of \(covered) pixels differ")
     }
 
+    /// Convergence T-A08-217 (spec Edge Cases "Width below one pixel"): a 0.3-unit polyline is drawn one pixel wide.
+    func testAHairlinePolylineStillCoversPixels() throws {
+        let hair = SceneNode(primitive: .polyline([Vec2(-16, 0.5), Vec2(16, 0.5)], width: 0.3), color: Vec4(1, 1, 1, 1))
+        let p = try DrawHarness.pixels(keep: &host) { ctx in
+            try PrimitiveRenderer(registry: ctx.resources).draw(hair, camera: Camera2D(), metrics: self.metrics)
+        }
+        var lit = 0
+        for y in 0..<32 { for x in 0..<32 where DrawHarness.px(p, 32, x, y).x > 0 { lit += 1 } }
+        XCTAssertGreaterThanOrEqual(lit, 28, "about one row of 32 pixels: \(lit)")
+        let quad = PrimitiveRenderer.triangles(.polyline([Vec2(0, 0), Vec2(4, 0)], width: 0.3), pointsPerUnit: 1)
+        XCTAssertEqual(quad[0].y - quad[1].y, 1, accuracy: 1e-12, "widened to one pixel")
+    }
+
     func testRecreationRebuildsAndTeardownLeaksNothing() throws {
         let scene = PrimitiveScene(root: SceneNode(primitive: .circle(6), color: Vec4(1, 0, 0, 1)))
         let host = try RenderHost(scene: scene)
