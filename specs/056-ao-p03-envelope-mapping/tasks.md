@@ -39,3 +39,7 @@ Agent A: T-A07-302. Agent B: T-A07-303 after A passes. Lead: 304, 305, runs, com
 ## Implementation strategy
 
 MVP: continuous speed, easing and calm motion (US1) with per-world mapping (US2); fixture continuity (US3); evidence last.
+
+## Phase 5: Convergence
+
+- [ ] T-A07-313 Keep the response continuous when the world or the calm/Reduce Motion/Reduce Flashing flags change: add to `Packages/ExperiencesCreative/AudioOdyssey/Core/WorldResponse.swift` a way to start from given values (clamped into the new ranges) and use it in `Packages/ExperiencesCreative/AudioOdyssey/Experience/OdysseyPresenter.swift` instead of rebuilding at rest, so light never changes by more than its step limit in one frame; tests in `CoreTests/WorldResponseTests.swift` and an experience test toggling calm and switching worlds under a loud tone per FR-A07-311 and spec Edge Cases (partial)
