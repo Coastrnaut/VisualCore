@@ -41,7 +41,10 @@ Catalog/registrations.json (quality_tiers level-0/1/2), docs/api, Packages/Visua
   docs/apps/audio-odyssey/visualcore-contract.json (G-JOURNEYBUDGET, G-JOURNEYA11Y closed)                     modify
 ```
 
-**Lifecycle**: unchanged; the announcer lives in the presenter and is reset on setup. **Migration**: none.
+**Lifecycle**: the announcer lives in the presenter and is reset on setup. On a quality level change the presenter
+replaces its `SegmentWindow` with one of the new level's behind/ahead (capacity unchanged at 12, the level-0 need), so
+pieces outside the new window are retired at once and missing ones are built at most two per frame; the journey state
+is untouched. **Migration**: none.
 **Rollback**: revert.
 
 ## Parallel work
