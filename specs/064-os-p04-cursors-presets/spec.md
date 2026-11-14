@@ -21,6 +21,43 @@ Canonical overrides:
 - **Owner rulings:** short tests; audits and device runs in the device campaign; iOS 27 at phase gates; every Spec Kit
   step runs.
 
+## Clarifications
+
+### Session 2026-11-14
+
+Answered autonomously under the owner's standing delegation, recommended option each time. Facts checked in code:
+`PinchRecognizer` (VisualCoreScenes) recognises a two-pointer pinch from `PointerEvent`s and reports a scale; the
+experience presenter receives canvas touches through `handlePointer(_:viewSize:)` (the scope's presenter does not use
+it yet); Audio Odyssey's `JourneyPresetStore` keeps one file `journey-<uuid>.json` per user preset in the experience's
+`ExperienceStorage`, with built-ins in code, format checks (`.newer`, damaged) and counts of unreadable and newer files;
+`ScopeState` is schema 2.
+
+- Q: How are freeze and cursors saved? → A: `ScopeState` schema 3 adds `frozen` (Bool), `cursorsShown` (Bool),
+  `cursorA`, `cursorB` (0…1 of the window, A ≤ B not required), `levelCursor` (−1…1 of full scale) and
+  `frequencyCursor` (0…1 of the spectrum width); the migration from schema 2 adds frozen false, cursors hidden at
+  0.25 / 0.75 / 0.5 / 0.5. Actions `freeze.set [0…1]`, `cursors.show [0…1]`, `cursor.a`, `cursor.b`, `cursor.level`,
+  `cursor.frequency`. The held window itself is presenter state (not saved): a restored frozen state freezes the next
+  acquired window.
+- Q: How does pinch zoom map to the timebase? → A: The presenter feeds canvas pointers to a `PinchRecognizer`; each
+  time the accumulated scale crosses a doubling (≥ 2 or ≤ 0.5 of the scale at the last step) it sends `timebase.select`
+  one index down (pinch out, zoom in) or up (pinch in), clamped at 0 and 5; one-finger drags move the nearest cursor
+  when cursors are shown. In the spectrum view pinch does nothing.
+- Q: How are readouts formatted so they never claim false precision? → A: A `ScopeReadout` formatter in the core:
+  time Δt = |B − A| × span, rounded to the sample period, shown with three significant digits in ms (or µs below
+  0.1 ms) and with "1 sample" wording at one-sample spacing; 1/Δt in whole hertz, marked "(limited by the sample
+  period)" when Δt is under 10 samples; level as a fraction of full scale with two decimals and its dBFS to 0.1 dB;
+  |level| ≥ 1 reads "at or beyond full scale"; spectrum cursor frequency rounded to the bin width and marked
+  "± <bin width> Hz".
+- Q: What is a scope preset and where does it live? → A: `ScopePreset` (format 1): id, name (1…40 characters after
+  trimming), saved time and the settings of `ScopeState` except the source, freeze and cursor positions; one file
+  `scope-<uuid>.json` per user preset in the experience's storage; three built-ins with fixed synthetic ids ("Audio
+  overview": sine 1 kHz, 1 ms/div, waveform; "Bass detail": 5 ms/div, ×2, waveform; "Spectrum check": spectrum view);
+  `ScopePresetStore` mirrors `JourneyPresetStore` (list built-ins first, save, rename, delete, damaged and newer files
+  kept and counted). Action `preset.apply [index]` applies an entry of the list.
+- Q: What does the person see while frozen? → A: The trace stays as captured; the status says "frozen" with the frozen
+  window's sample rate and channel count; gain changes rescale the frozen samples, a timebase change shows the frozen
+  span cut or marked "frozen window shorter than the span"; a source change unfreezes.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Freeze a moment and measure it (Priority: P1) 🎯
@@ -127,8 +164,8 @@ full scale".
 - **FR-A08-410**: Scope presets MUST be saved, listed, renamed, applied and deleted as versioned documents in the
   experience's own storage; built-in presets come first and are read-only; damaged and newer files are kept unchanged
   and counted.
-- **FR-A08-411**: Freeze, cursor positions and the cursors' visibility MUST be part of the scope state (saved with the
-  session); a restored frozen state freezes the next acquired window.
+- **FR-A08-411**: Freeze, cursor positions and the cursors' visibility MUST be part of the scope state (schema 3, saved
+  with the session, migrated from schema 2); a restored frozen state freezes the next acquired window.
 - **FR-A08-412**: Every new control has an accessible label and identifier; the description reads the frozen state and
   the cursor readouts.
 - **FR-A08-420**: The scenario manifest MUST add fixtures for freeze with cursors, for zoom steps and for a preset
