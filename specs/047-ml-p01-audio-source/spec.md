@@ -20,7 +20,7 @@ Canonical overrides:
   G-MICPERMISSION (permission state and request), G-FILESOURCE (decoding a file the person picks), G-RINGBUFFER
   (bounded sample buffer between the audio and render sides), G-DEMOSIGNAL (deterministic built-in signals), and the
   minimal spectrum transform the fixture needs (the rest of G-AUDIODSP — bands, RMS, onsets — is Phase 02).
-- **Experience:** created in a new `Packages/ExperiencesAudio` package (A06-P00 decision), registered as a candidate
+- **Experience:** created in `Packages/ExperiencesCreative/VisualCoreMusicLab` (the package map of `scripts/check_experience_packages.py` places A01–A25 there; this corrects A06-P00's proposal of a separate `ExperiencesAudio` package), registered as a candidate
   with its scenario manifest; the slice draws the selected source's live waveform (no placeholder).
 - **Owner rulings:** short tests; audits and device runs in the device campaign; iOS 27 at phase gates; every Spec Kit
   step runs.
@@ -33,7 +33,7 @@ Answered autonomously under the owner's standing delegation, recommended option 
 packages target iOS 26 (and macOS 15 for `VisualCore`), so the standard `Synchronization` module (`Atomic`) is
 available for a lock-free buffer; `scripts/check_dependencies.py` allows `Accelerate` in pure modules; `VisualCoreAudioDSP`
 is a target of the `VisualCore` package and `VisualCoreAudio` of `VisualCoreRendering` (depending on the DSP product);
-`NSMicrophoneUsageDescription` is absent from the app.
+`NSMicrophoneUsageDescription` is absent from the app; the experience package map (`check_experience_packages.py`) puts every A01–A25 experience in `ExperiencesCreative` under its UpperCamelCase catalog name, so A06 lives in `Packages/ExperiencesCreative/VisualCoreMusicLab` (correcting A06-P00's `ExperiencesAudio` proposal).
 
 - Q: How does the audio side hand samples to the render side without waiting or allocating? → A: A single-producer,
   single-consumer ring buffer of `Float` with power-of-two capacity, preallocated, whose write and read positions are
@@ -149,7 +149,7 @@ The spectrum transform used later by the scenes is correct: a pure tone shows it
   pure tone lies at the expected bin within ± 1 bin.
 
 **Experience (story 1)**
-- **FR-A06-120**: VisualCore Music Lab MUST be an experience of the one app in `Packages/ExperiencesAudio`, registered as
+- **FR-A06-120**: VisualCore Music Lab MUST be an experience of the one app in `Packages/ExperiencesCreative/VisualCoreMusicLab`, registered as
   a candidate with the nine standard scenarios and one scenario per regression fixture of the planning catalog.
 - **FR-A06-121**: The experience MUST draw the selected source's waveform through the host (no context of its own) and
   show a source status; the source choice is part of its state (digest, snapshot), samples are not.

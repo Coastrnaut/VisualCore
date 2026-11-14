@@ -6,7 +6,7 @@
   "inventory": [
     {
       "area": "Package products",
-      "description": "Pure, host-testable products of Packages/VisualCore: VisualCoreMath, VisualCoreSimulation, VisualCoreScenes, VisualCoreShaderSource, VisualCoreEffectsGraph, VisualCoreDiagnostics, VisualCoreAudioDSP, VisualCorePersistence, VisualCoreParameters, VisualCoreExperience (+ VisualCoreTestSupport for test targets). iOS products of Packages/VisualCoreRendering: VisualCoreRendering, VisualCoreEffects, VisualCoreUI, VisualCoreAudio (links AVFAudio), VisualCoreAutomation, VisualCoreExperienceHost. VisualCoreAudioDSP holds only AudioDSPInfo.version and VisualCoreAudio only AudioInfo.version (checked 2026-11-14): no capture, decoding, ring buffer, FFT, bands, RMS or onset code exists in any product. Experience targets live in Packages/ExperiencesCreative (A01-A05 today); A06 targets go to a new Packages/ExperiencesAudio package created in A06-P01. Dependency rules enforced by scripts/check_dependencies.py; public surface recorded in docs/api/visualcore-public-api.txt.",
+      "description": "Pure, host-testable products of Packages/VisualCore: VisualCoreMath, VisualCoreSimulation, VisualCoreScenes, VisualCoreShaderSource, VisualCoreEffectsGraph, VisualCoreDiagnostics, VisualCoreAudioDSP, VisualCorePersistence, VisualCoreParameters, VisualCoreExperience (+ VisualCoreTestSupport for test targets). iOS products of Packages/VisualCoreRendering: VisualCoreRendering, VisualCoreEffects, VisualCoreUI, VisualCoreAudio (links AVFAudio), VisualCoreAutomation, VisualCoreExperienceHost. VisualCoreAudioDSP holds only AudioDSPInfo.version and VisualCoreAudio only AudioInfo.version (checked 2026-11-14): no capture, decoding, ring buffer, FFT, bands, RMS or onset code exists in any product. Experience targets live in Packages/ExperiencesCreative (A01-A05 today); A06 targets go to a new Packages/ExperiencesCreative (package map; corrected in A06-P01) package created in A06-P01. Dependency rules enforced by scripts/check_dependencies.py; public surface recorded in docs/api/visualcore-public-api.txt.",
       "paths": [
         "Packages/VisualCore/Package.swift",
         "Packages/VisualCoreRendering/Package.swift",
@@ -77,7 +77,7 @@
     },
     {
       "area": "Source ownership",
-      "description": "VisualCore Music Lab owns its domain (MusicPreset, scene choice, ReactiveMapping choices and defaults, copy, accessibility metric phrasing), curated presets and UI under Packages/ExperiencesAudio/MusicLab/ (Core GPU-free, Experience UIKit/GPU; package created in A06-P01). VisualCore owns reusable audio machinery: sources, permission, interruption handling (VisualCoreAudio), ring buffer, FFT, bands, RMS, peak, onset, smoothing, demo signal and feature-to-parameter mapping (VisualCoreAudioDSP), plus shaders, effects, quality and persistence (constitution Principle II, Auto-Creator.md section 13). ProjectM stays in the harness.",
+      "description": "VisualCore Music Lab owns its domain (MusicPreset, scene choice, ReactiveMapping choices and defaults, copy, accessibility metric phrasing), curated presets and UI under Packages/ExperiencesCreative/VisualCoreMusicLab/ (Core GPU-free, Experience UIKit/GPU; package created in A06-P01). VisualCore owns reusable audio machinery: sources, permission, interruption handling (VisualCoreAudio), ring buffer, FFT, bands, RMS, peak, onset, smoothing, demo signal and feature-to-parameter mapping (VisualCoreAudioDSP), plus shaders, effects, quality and persistence (constitution Principle II, Auto-Creator.md section 13). ProjectM stays in the harness.",
       "paths": [
         ".specify/memory/constitution.md",
         "Auto-Creator.md",
@@ -896,7 +896,7 @@
         "file": "Packages/ExperiencesCreative/FractalExplorer/Experience/FractalExperience.swift",
         "symbol": "FractalExperience"
       },
-      "notes": "A06 registers in A06-P01 with its four targets in Packages/ExperiencesAudio."
+      "notes": "A06 registers in A06-P01 with its four targets in Packages/ExperiencesCreative (package map; corrected in A06-P01)."
     }
   ],
   "gaps": [
@@ -1212,7 +1212,7 @@
       "The render host, shader path, effects graph, animation, presets, persistence, export, quality and accessibility exist with tests: 13 of 29 rows are available, and the three scenes can be drawn with PrimitiveRenderer and DepthMeshPass today.",
       "Audio is buildable inside VisualCore's planned products on public APIs (AVFAudio/AVFoundation for sources, permission and session events; Accelerate vDSP for the FFT): VisualCoreAudio already links AVFAudio and VisualCoreAudioDSP is a pure, host-testable target, so no second backend, fork, private API or networking is needed.",
       "All eleven gaps are additive and owned: G-AUDIOSOURCE, G-MICPERMISSION, G-FILESOURCE (VisualCoreAudio, P01), G-RINGBUFFER and G-DEMOSIGNAL (VisualCoreAudioDSP, P01), G-AUDIODSP (P02), G-AUDIOMAP and G-SIGNALTEXTURE (P03), G-INTERRUPTION (P04), G-AUDIOBUDGET and the app-local G-A11YMETRICS (P05).",
-      "VisualCore Music Lab stays unregistered until A06-P01 creates Packages/ExperiencesAudio with its four targets and real domain rules, so the experience package check and the one app are unchanged.",
+      "VisualCore Music Lab stays unregistered until A06-P01 creates Packages/ExperiencesCreative (package map; corrected in A06-P01) with its four targets and real domain rules, so the experience package check and the one app are unchanged.",
       "A06-P01 starts with G-RINGBUFFER, G-DEMOSIGNAL and the source interface, so the permission-free demo path works before the microphone path."
     ],
     "blockers": []
