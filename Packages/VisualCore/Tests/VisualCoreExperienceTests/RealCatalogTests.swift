@@ -29,10 +29,10 @@ enum CatalogFixture {
     }
 
     @Test func onlyExperiencesWithAPassingIntegrationGateAreAvailable() throws {
-        // X-A01 to X-A04 are pass in the migration ledger (2026-11-13); the build tool is the only writer of
-        // this flag.
+        // X-A01 to X-A05 are pass in the migration ledger (2026-11-13 and 2026-11-14); the build tool is the only
+        // writer of this flag.
         #expect(try CatalogFixture.manifest().available.map(\.id.rawValue) == ["a01.generative-art-studio", "a02.fluid-art-playground", "a03.fractal-explorer",
-                         "a04.particle-universe"])
+                         "a04.particle-universe", "a05.infinite-geometry"])
     }
 
     @Test func everyIdIsInTheGoldenListAndWellFormed() throws {

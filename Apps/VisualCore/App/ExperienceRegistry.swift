@@ -56,15 +56,15 @@ struct ExperienceRegistration: Sendable {
 /// The explicit list of registered experiences.
 enum ExperienceRegistry {
     /// Every registered experience, in catalog order: those whose X gate is pass (X-A01, X-A02 and X-A03, recorded
-    /// 2026-11-13 after UA-F07; X-A04 recorded 2026-11-13 after A04-P06).
+    /// 2026-11-13 after UA-F07; X-A04 recorded 2026-11-13 after A04-P06; X-A05 recorded 2026-11-14 after A05-P06).
     static let all: [ExperienceRegistration] = [generativeArtStudio, fluidArtPlayground, fractalExplorer,
-                                                particleUniverse].compactMap { $0 }
+                                                particleUniverse, infiniteGeometry].compactMap { $0 }
 
     /// The adopted experiences before their X gate (feature 193, FR-U07-021; clarification 4), in catalog order:
     /// each carries its scenario manifest, so that the verification runner can open it, but it stays unavailable
     /// in the catalog and outside `all`. Debug builds show them with `-vcCandidates`. Recording an experience's X
     /// gate moves its registration from here to `all`.
-    static let candidates: [ExperienceRegistration] = [infiniteGeometry].compactMap { $0 }
+    static let candidates: [ExperienceRegistration] = []
 
     /// A01 Generative Art Studio (feature 193, US1).
     private static var generativeArtStudio: ExperienceRegistration? {
@@ -130,7 +130,7 @@ extension ExperienceRegistry {
         #endif
         return registration
     }
-    /// A05 Infinite Geometry (features 040–042, A05-P01…P03): a candidate until X-A05.
+    /// A05 Infinite Geometry (features 040–042, A05-P01…P03): integrated at X-A05 (2026-11-14).
     fileprivate static var infiniteGeometry: ExperienceRegistration? {
         guard let id = InfiniteGeometryExperience.id else { return nil }
         // Schema 2 (feature 041, A05-P02) adds the camera and schema 3 (feature 042, A05-P03) its target and field of
