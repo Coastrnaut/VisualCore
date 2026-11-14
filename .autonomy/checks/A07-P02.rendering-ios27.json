@@ -1,0 +1,29 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/VisualCoreRendering",
+    "--scheme",
+    "VisualCoreRendering-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--only-testing",
+    "VisualCoreRenderingTests/MeshFogTests",
+    "VisualCoreRenderingTests/DepthMeshPassTests",
+    "VisualCoreRenderingTests/MeshRendererTests",
+    "VisualCoreRenderingTests/ShaderValidationTests"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --only-testing VisualCoreRenderingTests/MeshFogTests VisualCoreRenderingTests/DepthMeshPassTests VisualCoreRenderingTests/MeshRendererTests VisualCoreRenderingTests/ShaderValidationTests",
+  "elapsed_seconds": 46.331,
+  "exit_code": 0,
+  "finished": "2026-11-14T10:55:41+00:00",
+  "log": ".autonomy/logs/A07-P02.rendering-ios27.log",
+  "log_sha256": "f459f05247beeb59f7f86b2a5990e5bd31db0ad89d0e02b9a4741a08c619c760",
+  "name": "rendering-ios27",
+  "stage": "A07-P02",
+  "started": "2026-11-14T10:54:54+00:00",
+  "timed_out": false
+}

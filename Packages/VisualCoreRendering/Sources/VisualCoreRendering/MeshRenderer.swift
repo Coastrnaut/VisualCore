@@ -1,7 +1,9 @@
 // MeshRenderer.swift — draws a generated Mesh with Lambert lighting through an OrbitCamera
 // (feature 006 T-F517; FR-F508, FR-F509; research R7/R8). Back faces are culled; depth testing is left
 // to the caller (enable it when the bound framebuffer has a depth buffer). GPU buffers are rebuilt after
-// a context recreation.
+// a context recreation. Feature 055 (A07-P02) T-A07-203 (FR-A07-202; gap G-RAILDRAW) adds the free-camera overload
+// `draw(model:view:projection:color:fog:)` with optional linear eye-depth fog (MeshFog); the orbit-camera method
+// forwards to it with fog nil, whose mix factor is exactly 0, so existing pixels are unchanged.
 import CVisualCoreGL
 import VisualCoreMath
 import VisualCoreScenes
@@ -25,22 +27,30 @@ public final class MeshRenderer {
     layout(location = 1) in vec3 a_normal;
     uniform mat4 u_mvp;
     uniform mat4 u_model;
+    uniform mat4 u_modelView;
     out vec3 v_normal;
+    out float v_depth;
     void main() {
         v_normal = mat3(u_model) * a_normal;
+        v_depth = -(u_modelView * vec4(a_position, 1.0)).z;
         gl_Position = u_mvp * vec4(a_position, 1.0);
     }
     """
     static let fragmentSource = """
     precision mediump float;
     in vec3 v_normal;
+    in highp float v_depth;
     uniform vec4 u_color;
     uniform vec3 u_light;
     uniform float u_ambient;
+    uniform highp vec3 u_fog;
+    uniform vec4 u_fogColor;
     out vec4 color;
     void main() {
         float lambert = max(dot(normalize(v_normal), normalize(u_light)), 0.0);
-        color = vec4(u_color.rgb * (u_ambient + (1.0 - u_ambient) * lambert) * u_color.a, u_color.a);
+        vec4 lit = vec4(u_color.rgb * (u_ambient + (1.0 - u_ambient) * lambert) * u_color.a, u_color.a);
+        float f = u_fog.z * clamp((v_depth - u_fog.x) / (u_fog.y - u_fog.x), 0.0, 1.0);
+        color = mix(lit, u_fogColor, f);
     }
     """
 
@@ -62,13 +72,33 @@ public final class MeshRenderer {
         indexBuffer = ib
     }
 
-    /// Draws with `model` transform and premultiplied-alpha `color` (RGBA 0…1).
+    /// Draws with `model` transform and premultiplied-alpha `color` (RGBA 0…1) through `camera`; forwards to
+    /// `draw(model:view:projection:color:fog:)` with the camera's view and projection and no fog.
     public func draw(model: Mat4 = .identity, camera: OrbitCamera, aspect: Double, color: Vec4) throws {
+        try draw(model: model, view: camera.view(), projection: camera.projection(aspect: aspect), color: color, fog: nil)
+    }
+
+    /// Draws with `model` transform and premultiplied-alpha `color` (RGBA 0…1) through a free camera given as `view`
+    /// and `projection` matrices (GL clip space). With `fog`, the colour is mixed linearly in eye-space depth toward
+    /// the fog colour (factor clamp((depth − start) / (end − start), 0, 1)); with nil the factor is exactly 0.
+    public func draw(model: Mat4, view: Mat4, projection: Mat4, color: Vec4, fog: MeshFog?) throws {
         if program == nil || program!.generation != registry.generation { try build() }
         guard let program, let vertexBuffer, let indexBuffer, !mesh.indices.isEmpty else { return }
         program.use()
-        program.set("u_mvp", matrix4: (camera.viewProjection(aspect: aspect) * model).floats)
+        program.set("u_mvp", matrix4: (projection * view * model).floats)
         program.set("u_model", matrix4: model.floats)
+        program.set("u_modelView", matrix4: (view * model).floats)
+        if let fog {
+            // Clamp into Float range and keep end > start after rounding so the shader never divides by zero.
+            let start = Float(min(fog.start, 1e30))
+            var end = Float(min(fog.end, 2e30))
+            if !(end > start) { end = start.nextUp }
+            program.set("u_fog", SIMD3<Float>(start, end, 1))
+            program.set("u_fogColor", SIMD4<Float>(Float(fog.color.x), Float(fog.color.y), Float(fog.color.z), Float(fog.color.w)))
+        } else {
+            program.set("u_fog", SIMD3<Float>(0, 1, 0))
+            program.set("u_fogColor", SIMD4<Float>(0, 0, 0, 0))
+        }
         program.set("u_color", SIMD4<Float>(Float(color.x), Float(color.y), Float(color.z), Float(color.w)))
         program.set("u_light", SIMD3<Float>(Float(lightDirection.x), Float(lightDirection.y), Float(lightDirection.z)))
         program.set("u_ambient", Float(ambient))

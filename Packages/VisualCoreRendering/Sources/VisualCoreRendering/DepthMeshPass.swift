@@ -3,6 +3,8 @@
 // The window surface and the offscreen export target carry no depth buffer, so the pass owns a registry render target
 // with a 24-bit depth renderbuffer at the context's pixel size, rebuilt on resize and on a new context generation,
 // and blits its colour (nearest) to `context.framebuffer`; screen and export therefore show the same result.
+// Feature 055 (A07-P02) T-A07-203 (FR-A07-202; gap G-RAILDRAW) adds `draw(_:view:projection:fog:context:)` for a free
+// camera with optional linear depth fog; the orbit-camera method forwards to it with fog nil.
 import CVisualCoreGL
 import VisualCoreMath
 
@@ -40,7 +42,20 @@ public final class DepthMeshPass {
     /// Clears the depth target to `clearColor` and depth 1, draws `items` in order with depth testing through
     /// `camera`, restores depth state and copies the colour to `context.framebuffer`. A zero-sized context draws
     /// nothing; an empty item list clears and copies. The framebuffer binding and viewport of `context` are restored.
+    /// Forwards to `draw(_:view:projection:fog:context:)` with the camera's view, its projection at the context's
+    /// aspect and no fog.
     public func draw(_ items: [Item], camera: OrbitCamera, context: RenderContext) throws {
+        let width = context.pixelWidth, height = context.pixelHeight
+        guard width > 0, height > 0 else { return }
+        let aspect = Double(width) / Double(height)
+        try draw(items, view: camera.view(), projection: camera.projection(aspect: aspect), fog: nil, context: context)
+    }
+
+    /// Clears the depth target to `clearColor` and depth 1, draws `items` in order with depth testing through the free
+    /// camera `view` and `projection` (GL clip space) with optional linear eye-depth `fog` (nil draws unfogged), restores
+    /// depth state and copies the colour to `context.framebuffer`. A zero-sized context draws nothing; an empty item
+    /// list clears and copies. The framebuffer binding and viewport of `context` are restored.
+    public func draw(_ items: [Item], view: Mat4, projection: Mat4, fog: MeshFog?, context: RenderContext) throws {
         let width = context.pixelWidth, height = context.pixelHeight
         guard width > 0, height > 0 else { return }
         let target = try ensureTarget(width: width, height: height)
@@ -60,9 +75,8 @@ public final class DepthMeshPass {
         vcglClear(GLbitfield(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT))
         vcglEnable(GLenum(GL_DEPTH_TEST))
         vcglDepthFunc(GLenum(GL_LESS))
-        let aspect = Double(width) / Double(height)
         for item in items {
-            try item.renderer.draw(model: item.model, camera: camera, aspect: aspect, color: item.color)
+            try item.renderer.draw(model: item.model, view: view, projection: projection, color: item.color, fog: fog)
         }
         vcglDisable(GLenum(GL_DEPTH_TEST))
         vcglBindFramebuffer(GLenum(GL_READ_FRAMEBUFFER), target.handle.name)
