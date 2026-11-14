@@ -53,3 +53,8 @@ Agent D: the presenter, controls and tests of 105 once 102–104 pass. Lead: 105
 
 MVP: test signal, trigger and the triggered window (US1 with the US2 foundation); then two-channel sources and the
 fixture scenarios; evidence last.
+
+## Phase 7: Convergence
+
+- [ ] T-A08-118 Extend `Packages/ExperiencesCreative/OscilloscopeStudio/CoreTests/ScopeAcquisitionTests.swift` so the spectrum peak bin equals `SpectrumAnalyzer.expectedBin` for the 100 Hz, 440 Hz, 1 kHz and 5 kHz sines at 48 kHz per SC-A08-102 (partial)
+- [ ] T-A08-119 Record in `specs/061-os-p01-acquisition/research.md` (D7) that the manifest carries five fixtures (the planning catalog's count: periods, spectrum bin, no trigger, clipping, falling-slope sweep), as `ScopeManifestTests` asserts, per tasks T-A08-107 (contradicts)
