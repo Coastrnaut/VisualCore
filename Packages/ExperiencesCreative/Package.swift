@@ -24,6 +24,8 @@ let package = Package(
         .library(name: "InfiniteGeometryExperience", targets: ["InfiniteGeometryExperience"]),
         // Feature 047 (A06-P01): VisualCore Music Lab, a candidate until X-A06.
         .library(name: "VisualCoreMusicLabExperience", targets: ["VisualCoreMusicLabExperience"]),
+        // Feature 054 (A07-P01): Audio Odyssey, a candidate until X-A07.
+        .library(name: "AudioOdysseyExperience", targets: ["AudioOdysseyExperience"]),
         // The standalone ParticleUniverse app target compiles the moved sources and needs the Core until X-A04.
         .library(name: "ParticleUniverseCore", targets: ["ParticleUniverseCore"]),
     ],
@@ -246,6 +248,28 @@ let package = Package(
                                    .product(name: "VisualCoreMath", package: visualCore),
                                    .product(name: "VisualCoreScenes", package: visualCore)],
                     path: "AudioOdyssey/CoreTests"),
+        // Feature 054 (A07-P01) T-A07-104: the experience (core adapter, presenter drawing the rail window through
+        // DepthMeshPass, controls).
+        .target(name: "AudioOdysseyExperience",
+                dependencies: ["AudioOdysseyCore",
+                               .product(name: "VisualCoreMath", package: visualCore),
+                               .product(name: "VisualCoreScenes", package: visualCore),
+                               .product(name: "VisualCorePersistence", package: visualCore),
+                               .product(name: "VisualCoreExperience", package: visualCore),
+                               .product(name: "VisualCoreRendering", package: rendering),
+                               .product(name: "VisualCoreExperienceHost", package: rendering),
+                               .product(name: "VisualCoreUI", package: rendering)],
+                path: "AudioOdyssey/Experience"),
+        .testTarget(name: "AudioOdysseyExperienceTests",
+                    dependencies: ["AudioOdysseyExperience", "AudioOdysseyCore",
+                                   .product(name: "VisualCoreMath", package: visualCore),
+                                   .product(name: "VisualCoreScenes", package: visualCore),
+                                   .product(name: "VisualCorePersistence", package: visualCore),
+                                   .product(name: "VisualCoreExperience", package: visualCore),
+                                   .product(name: "VisualCoreRendering", package: rendering),
+                                   .product(name: "VisualCoreExperienceHost", package: rendering),
+                                   .product(name: "VisualCoreUI", package: rendering)],
+                    path: "AudioOdyssey/ExperienceTests"),
         .target(name: "ParticleUniverseCore",
                 dependencies: [
                                .product(name: "VisualCoreSimulation", package: visualCore),
