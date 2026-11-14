@@ -23,7 +23,7 @@ Evidence: `python3 Tools/python/desktop_runbook.py run-check --stage A06-P06 --t
 ## Phase 4: User Story 3 — copy promises only what exists (P2)
 
 - [X] T-A06-607 [P] [US3] Write `docs/apps/visualcore-music-lab/{store-listing.md (text + traceability table claim → test), release-checklist.md (Item | Area | Status | Evidence; statuses verified/pending/blocked-owner/device; artifact inventory), device-campaign.md (per measurement: device D1–D3, procedure, pass criterion, result pending — frame time per scene and tier, thermal over 10 min, real interruptions and route changes, microphone permission flows, VoiceOver labels and values, Dynamic Type, Reduce Motion, palette contrast), release.json (contracts/release-config.md)}` and add Music Lab's device-only items to `docs/release/known-limitations.md` (FR-A06-620, 622, 623) — Verified 2026-11-14: — Verified 2026-11-14: .autonomy/checks/A06-P06.release-docs.json (5 documents, 31 checklist rows; known limitations updated)
-- [ ] T-A06-608 [US3] Release-document and copy checks (`python3 Tools/python/desktop_runbook.py run-check --stage A06-P06 --timeout 600 --name release-docs -- python3 scripts/release_check.py --only experience-release-a06 copy-claims-a06`) (FR-A06-620, 621; SC-A06-604, 605)
+- [X] T-A06-608 [US3] Release-document and copy checks (`python3 Tools/python/desktop_runbook.py run-check --stage A06-P06 --timeout 600 --name release-docs -- python3 scripts/release_check.py --only experience-release-a06 copy-claims-a06`) (FR-A06-620, 621; SC-A06-604, 605) — Verified 2026-11-14: — Verified 2026-11-14: .autonomy/checks/A06-P06.release-docs.json (experience-release-a06, copy-claims-a06 PASS)
 
 ## Phase 5: User Story 4 — interface proves the journeys (P2)
 
