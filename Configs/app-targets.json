@@ -11,13 +11,6 @@
       "bundle": "dev.visualcore.Showcase",
       "ships": false,
       "reason": "framework showcase harness"
-    },
-    {
-      "name": "ParticleUniverse",
-      "bundle": "dev.visualcore.ParticleUniverse",
-      "ships": false,
-      "reason": "standalone target kept for A04-P04 to A04-P06",
-      "until_gate": "X-A04"
     }
   ]
 }

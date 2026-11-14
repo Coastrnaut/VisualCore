@@ -108,75 +108,6 @@ targets:
         TEST_TARGET_NAME: Showcase
     dependencies:
       - target: Showcase
-  ParticleUniverse:
-    # A04 Particle Universe (feature 032 A04-P00): app shell; feature 033 (A04-P01) adds the seeded particle domain; the GPU loop arrives in Phase 02.
-    type: application
-    platform: iOS
-    sources:
-      - path: Apps/ParticleUniverse/App
-      # Feature 193 (UA-F07): the app's other sources moved into Packages/ExperiencesCreative; this target compiles
-      # them from there until X-A04 retires it (FR-U07-043), without the adapter.
-      - path: Packages/ExperiencesCreative/ParticleUniverse/Experience
-        excludes: [Adapter, ParticlePresenter.swift, ParticleControls.swift, ParticleExperience.swift]
-    info:
-      path: Apps/ParticleUniverse/Generated/Info.plist
-      properties:
-        CFBundleDisplayName: Particle Universe
-        CFBundleShortVersionString: "0.1.0"
-        CFBundleVersion: "1"
-        ITSAppUsesNonExemptEncryption: false
-        UILaunchScreen: {}
-        UIApplicationSceneManifest:
-          UIApplicationSupportsMultipleScenes: false
-        UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait, UIInterfaceOrientationLandscapeLeft, UIInterfaceOrientationLandscapeRight]
-        UISupportedInterfaceOrientations~ipad: [UIInterfaceOrientationPortrait, UIInterfaceOrientationPortraitUpsideDown, UIInterfaceOrientationLandscapeLeft, UIInterfaceOrientationLandscapeRight]
-    settings:
-      base:
-        PRODUCT_BUNDLE_IDENTIFIER: dev.visualcore.ParticleUniverse
-        PRODUCT_NAME: ParticleUniverse
-        GENERATE_INFOPLIST_FILE: NO
-        ENABLE_USER_SCRIPT_SANDBOXING: NO
-    dependencies:
-      # Feature 032 (A04-P00): accessible colors only; no render host yet.
-      - package: VisualCoreRendering
-        product: VisualCoreUI
-      # Feature 033 (A04-P01): the GPU-free particle domain and the VisualCore simulation it builds on.
-      - package: ExperiencesCreative
-        product: ParticleUniverseCore
-      - package: VisualCore
-        product: VisualCoreSimulation
-      - package: VisualCore
-        product: VisualCoreMath
-      # Feature 034 (A04-P02): the GPU render loop (RenderHost, ParticleLayerScene) and quality tiers.
-      - package: VisualCoreRendering
-        product: VisualCoreRendering
-      - package: VisualCore
-        product: VisualCoreDiagnostics
-      # Feature 035 (A04-P03): built-in palettes for the color gradients.
-      - package: VisualCore
-        product: VisualCoreParameters
-    postBuildScripts:
-      # FR-A04-006: the build fails if the app depends on ProjectM engine/preset/bridge modules.
-      - name: Dependency audit (FR-A04-006)
-        basedOnDependencyAnalysis: false
-        script: |
-          set -e
-          env -i PATH=/usr/bin:/bin:/usr/sbin:/sbin HOME="$HOME" DEVELOPER_DIR="$DEVELOPER_DIR" \
-            /usr/bin/python3 "$SRCROOT/scripts/audit_showcase_dependencies.py" --root "$SRCROOT" --spec project.yml \
-            --target ParticleUniverse --sources Apps/ParticleUniverse --app "$TARGET_BUILD_DIR/$WRAPPER_NAME"
-  ParticleUniverseUITests:
-    type: bundle.ui-testing
-    platform: iOS
-    sources: [Apps/ParticleUniverse/Tests/UI]
-    info:
-      path: Apps/ParticleUniverse/Generated/UITests-Info.plist
-    settings:
-      base:
-        PRODUCT_BUNDLE_IDENTIFIER: dev.visualcore.ParticleUniverseUITests
-        GENERATE_INFOPLIST_FILE: NO
-        TEST_TARGET_NAME: ParticleUniverse
-    dependencies:
-      - target: ParticleUniverse
   VisualCore:
     # The unified app (feature 190, UA-F04; ADR-0009 D-01): the only shippable application target. Its Swift module is
     # VisualCoreApp, so that it cannot be confused with the framework package VisualCore.
@@ -295,10 +226,3 @@ schemes:
         ShowcaseUITests: [test]
     test:
       targets: [ShowcaseTests, ShowcaseUITests]
-  ParticleUniverse:
-    build:
-      targets:
-        ParticleUniverse: all
-        ParticleUniverseUITests: [test]
-    test:
-      targets: [ParticleUniverseUITests]

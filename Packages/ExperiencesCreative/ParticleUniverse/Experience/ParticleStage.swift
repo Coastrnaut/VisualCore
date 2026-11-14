@@ -1,7 +1,8 @@
 // ParticleStage.swift — the sandbox's GPU stage: one VisualCore RenderHost drawing a ParticleLayerScene (feature 034
 // A04-P02 T-A04-213; FR-A04-206; plan "Lifecycle contracts"). The app makes no GL or EGL call: VisualCore's host owns
-// the context and its thread, and the layer scene owns the GPU objects. The particle state stays in SceneModel (CPU),
-// so a context recreation only rebuilds GPU objects.
+// the context and its thread, and the layer scene owns the GPU objects. The standalone app's `SceneModel` and
+// `SandboxView` that drove this stage were retired with the standalone target after X-A04 (FR-U07-043, 2026-11-13);
+// the hosted experience uses `ParticleStage.world` through `ParticlePresenter`.
 import ParticleUniverseCore
 import VisualCoreMath
 import VisualCoreRendering

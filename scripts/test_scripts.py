@@ -1093,14 +1093,15 @@ class ReleaseCheckTests(unittest.TestCase):
             self.assertEqual(tests[0].needs_simulator, "27.2")
         self.assertEqual(relcheck.kebab("GenerativeArtStudio"), "generative-art-studio")
         names = [s.name for s in relcheck.steps("X")]
-        for required in ["documented-api-particle-universe", "app-particle-universe-ios26",
-                         # Feature 193: the adopted experiences' package on both runtimes.
+        for required in [# Feature 193: the adopted experiences' package on both runtimes.
                          "experiences-creative-sim-ios27", "experiences-creative-sim-ios26"]:
             self.assertIn(required, names)
-        # Feature 193 (UA-F07): A01 to A03 are retired; no step of their standalone apps remains. Their experiences
-        # keep per-experience verification steps of the one app (UA-F10, `verify-<id>-iosNN`).
+        # Feature 193 (UA-F07): A01 to A04 are retired (A04 after X-A04, FR-U07-043); no step of their standalone
+        # apps remains. Their experiences keep per-experience verification steps of the one app (UA-F10,
+        # `verify-<id>-iosNN`).
         self.assertFalse([n for n in names if not n.startswith("verify-a0") and ("generative-art-studio" in n
-                          or "fluid-art-playground" in n or "fractal-explorer" in n)], names)
+                          or "fluid-art-playground" in n or "fractal-explorer" in n or "particle-universe" in n)],
+                         names)
 
     def test_select_only_skip_and_unknown(self):
         all_steps = relcheck.steps("X")

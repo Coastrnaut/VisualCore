@@ -4,7 +4,8 @@
 // steps the simulation. Taps and drags on the canvas become `force.place` actions at the world point under the
 // finger, normalized to the world square.
 //
-// Differences from the standalone app's `SceneModel` and `ParticleStage` (FR-U07-003):
+// Differences from the standalone app's `SceneModel` and `ParticleStage` (FR-U07-003; the standalone app was retired
+// after X-A04, FR-U07-043):
 //   1. The render callback only reads: the core steps the simulation (the standalone `gpuFrame` advanced it).
 //   2. The quality level comes from the session host and caps the drawn count; the simulation keeps its limit.
 //   3. There is no CPU preview renderer: a GPU failure fails the session's setup and shows its failure view.
@@ -156,7 +157,7 @@ final class ParticlePresenter: ExperiencePresenter {
         AnyView(ParticleControls(port: port, mirror: mirror, library: library, reduceMotion: reduceMotion))
     }
 
-    /// A tap or a drag on the canvas places the force under the finger, as `SceneModel.touch(at:in:)` does.
+    /// A tap or a drag on the canvas places the force under the finger, as the retired standalone `SceneModel.touch(at:in:)` did.
     func pointer(_ event: PointerEvent, viewSize: Vec2, port: ExperienceActionPort) {
         guard event.phase == .began || event.phase == .moved,
               let world = ParticleLayerScene.worldPoint(event.location, viewSize: viewSize, world: ParticleStage.world)

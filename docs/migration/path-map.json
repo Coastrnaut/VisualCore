@@ -280,7 +280,7 @@
    "to": "Packages/ExperiencesCreative/ParticleUniverse/Experience",
    "action": "move",
    "by": "UA-F07",
-   "state": "pending",
+   "state": "done",
    "note": "SwiftUI and scene sources become target ParticleUniverseExperience; the @main type ParticleUniverseApp.swift is replaced by the experience factory and is retired.",
    "experience": "A04"
   },
@@ -289,7 +289,7 @@
    "to": "Apps/VisualCore/Tests/UI/ParticleUniverse",
    "action": "move",
    "by": "UA-F07",
-   "state": "pending",
+   "state": "done",
    "note": "UI tests are ported to the unified app; a mapping table and the enumeration guard prove none is lost.",
    "experience": "A04"
   },
