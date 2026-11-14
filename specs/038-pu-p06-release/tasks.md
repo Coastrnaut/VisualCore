@@ -71,4 +71,4 @@ MVP is US2 (migration and recovery, P1) with US1's note; then US4's checks and d
 
 Appended by `/speckit-converge` (T-A04-623, round 1, 2026-11-13).
 
-- [ ] T-A04-624 Document the optional `copyCheck` ({text, swift}) of the experience release config and the release-check steps `experience-release-a04` and `copy-claims-a04` in `specs/038-pu-p06-release/data-model.md` and `contracts/scripts.md` per plan: data model and contracts (partial)
+- [X] T-A04-624 Document the optional `copyCheck` ({text, swift}) of the experience release config and the release-check steps `experience-release-a04` and `copy-claims-a04` in `specs/038-pu-p06-release/data-model.md` and `contracts/scripts.md` per plan: data model and contracts (partial) — Verified 2026-11-13: 2026-11-13 data-model.md and contracts/scripts.md describe copyCheck and the steps; release_check.py --list shows experience-release-a04 and copy-claims-a04, both passing in .autonomy/checks/A04-P06.experience-release-r2.json and copy-claims.json
