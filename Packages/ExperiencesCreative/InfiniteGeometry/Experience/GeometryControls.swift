@@ -6,6 +6,10 @@
 // Feature 041 (A05-P02) T-A05-207 (FR-A05-212): the "View" section gives every camera gesture a button — pan
 // arrows (2D presets), zoom in and out (the 2D zoom, or the distance on the 3D composition), orbit arrows (3D
 // composition) and reset — sending the same actions as the gestures.
+//
+// Feature 042 (A05-P03) T-A05-306 (FR-A05-315): the pan arrows are shown on the 3D composition too (they move the
+// orbit target by a fixed step in world units), and "Wider"/"Narrower" step the field of view by 5°, clamped into
+// 30…75° before the action is sent; both have labels, hints and identifiers like the other camera buttons.
 import InfiniteGeometryCore
 import SwiftUI
 import VisualCoreExperience
@@ -23,6 +27,15 @@ struct GeometryControls: View {
     static let zoomStep = 1.25
     /// One orbit button's angle in radians.
     static let orbitStep = 0.2
+    /// One "Wider"/"Narrower" step of the field of view in degrees.
+    static let fovStep = 5.0
+
+    /// The field of view one step from `degrees` (`direction` +1 wider, −1 narrower), clamped into
+    /// `GeometryCore.fovRange`.
+    static func steppedFieldOfView(_ degrees: Double, direction: Double) -> Double {
+        let range = GeometryCore.fovRange
+        return min(max(degrees + direction * fovStep, range.lowerBound), range.upperBound)
+    }
 
     var body: some View {
         Group {
@@ -80,10 +93,12 @@ struct GeometryControls: View {
 
     // MARK: View
 
-    /// The camera buttons: pan arrows on a 2D preset, orbit arrows on the 3D composition, zoom and reset on both.
+    /// The camera buttons: pan arrows, zoom and reset on every preset; orbit arrows and the field of view on the 3D
+    /// composition.
     @ViewBuilder private func cameraSection(_ core: GeometryCore) -> some View {
         let solid = core.preset.kind == .solid
-        let pan = Self.panStep / max(core.view2D.zoom, 1e-6)
+        let pan = solid ? Self.panStep : Self.panStep / max(core.view2D.zoom, 1e-6)
+        let fov = core.orbit3D.fovDegrees
         section("View") {
             if solid {
                 HStack(spacing: 8) {
@@ -96,16 +111,29 @@ struct GeometryControls: View {
                     arrow("Orbit down", symbol: "arrow.down", identifier: "camera.orbit.down",
                           hint: "Looks at the composition from lower down") { _ = port.send("camera.orbit", [0, -Self.orbitStep]) }
                 }
-            } else {
+            }
+            HStack(spacing: 8) {
+                arrow("Pan left", symbol: "arrow.left", identifier: "camera.pan.left",
+                      hint: "Moves the view to the left") { _ = port.send("camera.pan", [-pan, 0]) }
+                arrow("Pan right", symbol: "arrow.right", identifier: "camera.pan.right",
+                      hint: "Moves the view to the right") { _ = port.send("camera.pan", [pan, 0]) }
+                arrow("Pan up", symbol: "arrow.up", identifier: "camera.pan.up",
+                      hint: "Moves the view up") { _ = port.send("camera.pan", [0, pan]) }
+                arrow("Pan down", symbol: "arrow.down", identifier: "camera.pan.down",
+                      hint: "Moves the view down") { _ = port.send("camera.pan", [0, -pan]) }
+            }
+            if solid {
                 HStack(spacing: 8) {
-                    arrow("Pan left", symbol: "arrow.left", identifier: "camera.pan.left",
-                          hint: "Moves the view to the left") { _ = port.send("camera.pan", [-pan, 0]) }
-                    arrow("Pan right", symbol: "arrow.right", identifier: "camera.pan.right",
-                          hint: "Moves the view to the right") { _ = port.send("camera.pan", [pan, 0]) }
-                    arrow("Pan up", symbol: "arrow.up", identifier: "camera.pan.up",
-                          hint: "Moves the view up") { _ = port.send("camera.pan", [0, pan]) }
-                    arrow("Pan down", symbol: "arrow.down", identifier: "camera.pan.down",
-                          hint: "Moves the view down") { _ = port.send("camera.pan", [0, -pan]) }
+                    button("Wider", identifier: "camera.fov.wider", hint: "Widens the field of view by 5 degrees") {
+                        let next = Self.steppedFieldOfView(fov, direction: 1)
+                        if next != fov { _ = port.send("camera.fov", [next]) }
+                    }
+                    .disabled(fov >= GeometryCore.fovRange.upperBound)
+                    button("Narrower", identifier: "camera.fov.narrower", hint: "Narrows the field of view by 5 degrees") {
+                        let next = Self.steppedFieldOfView(fov, direction: -1)
+                        if next != fov { _ = port.send("camera.fov", [next]) }
+                    }
+                    .disabled(fov <= GeometryCore.fovRange.lowerBound)
                 }
             }
             HStack(spacing: 8) {
@@ -122,7 +150,8 @@ struct GeometryControls: View {
                 }
             }
             Text(verbatim: solid
-                 ? String(format: "Pitch %.0f°, distance %.1f", core.orbit3D.pitch * 180 / Double.pi, core.orbit3D.distance)
+                 ? String(format: "Pitch %.0f°, distance %.1f, field of view %.0f°", core.orbit3D.pitch * 180 / Double.pi,
+                          core.orbit3D.distance, fov)
                  : String(format: "Zoom ×%.2f, centre %.2f, %.2f", core.view2D.zoom, core.view2D.centerX, core.view2D.centerY))
                 .font(.footnote).accessibilityIdentifier(port.identifier("camera.summary"))
         }

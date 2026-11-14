@@ -7,7 +7,8 @@
 //   - 2D: a root `SceneNode` scaled so that the square −1…1 fills the shorter side of the view, one polygon node per
 //     composition polygon, coloured from `Palette.builtIns[palette]` sampled by the polygon's colour index.
 //   - 3D: one `MeshRenderer` for the current solid, recreated (the old one released) when the digest changes, seen
-//     through `OrbitCamera(distance: 6, pitch: 0.5)`. Depth testing is left off (the renderer culls back faces).
+//     through `OrbitCamera(distance: 6, pitch: 0.5)`. Depth testing was left off here (A05-P03 draws the solid
+//     through a depth-correct pass, below).
 //   - The probe is a background point the CPU proves uncovered: a point of a fixed grid that lies outside every
 //     polygon by a margin (2D), or outside the projected bounds of the mesh (3D); it must read `dark`.
 //
@@ -21,6 +22,15 @@
 //   - Canvas gestures become camera actions: one finger drags `camera.pan` (2D; screen points converted to world
 //     units by the fit and zoom) or `camera.orbit` (3D; 0.01 rad per point), two fingers pinch `camera.zoom` (the
 //     distance ratio), a double tap sends `camera.reset`. Each has a button in `GeometryControls`.
+//
+// Feature 042 (A05-P03) T-A05-304, T-A05-306 (FR-A05-301–303, FR-A05-315):
+//   - The 3D composition is drawn through VisualCoreRendering's `DepthMeshPass` (one item: the solid's
+//     `MeshRenderer` with its palette colour), so nearer petals hide farther ones from every angle, on screen and
+//     offscreen; the pass is made in `setup` and released in `teardown` (it is remade after a context loss). The 2D
+//     presets keep their Phase 02 renderers.
+//   - Two fingers on the 3D composition pan the target with the centroid's movement (the composition follows the
+//     fingers: world delta = −movement · 2 · distance · tan(fov / 2) / view height, y down on screen) alongside the
+//     pinch zoom; the field of view has buttons only (`camera.fov`), and the canvas description states it.
 import Foundation
 import InfiniteGeometryCore
 import SwiftUI
@@ -77,6 +87,10 @@ final class GeometryPresenter: ExperiencePresenter {
     private var lastView = GeometryCore.View2D.default
     /// The kind of the last draw: drags orbit on the 3D composition and pan otherwise.
     private var lastKind = GeometryPreset.curated[0].kind
+    /// The orbit camera of the last draw, for converting two-finger movement into a target pan.
+    private var lastOrbit = GeometryCore.Orbit3D.default
+    /// The depth-correct pass the 3D composition is drawn through; made in `setup`, released in `teardown`.
+    private var depthPass: DepthMeshPass?
 
     // Touch translation (presentation state, never domain state).
     private var pointers = PointerTracker()
@@ -107,6 +121,14 @@ final class GeometryPresenter: ExperiencePresenter {
             throw KaleidoscopeShaderError(message: message)
         }
         kaleidoscope = scene
+        depthPass = Self.makeDepthPass(context)
+    }
+
+    /// A depth-correct mesh pass on the registry of `context`, clearing to the black background of the clear scene.
+    private static func makeDepthPass(_ context: RenderContext) -> DepthMeshPass {
+        let pass = DepthMeshPass(registry: context.resources)
+        pass.clearColor = Vec4(0, 0, 0, 1)
+        return pass
     }
 
     func resize(_ context: RenderContext) {
@@ -120,6 +142,7 @@ final class GeometryPresenter: ExperiencePresenter {
         refresh(core)
         lastView = core.view2D
         lastKind = core.preset.kind
+        lastOrbit = core.orbit3D
         switch composition {
         case .plane(let polygons) where core.preset.kind == .kaleidoscope:
             guard let kaleidoscope else { drawnCount = 0; return }
@@ -144,8 +167,10 @@ final class GeometryPresenter: ExperiencePresenter {
                 meshRenderer = try MeshRenderer(mesh: mesh, registry: context.resources)
                 meshDigest = compositionKey
             }
-            try meshRenderer?.draw(camera: core.orbit3D.camera, aspect: width / height,
-                                   color: Self.color(palette: core.preset.palette, index: 4))
+            guard let meshRenderer else { drawnCount = 0; return }
+            if depthPass == nil { depthPass = Self.makeDepthPass(context) }
+            let item = DepthMeshPass.Item(renderer: meshRenderer, color: Self.color(palette: core.preset.palette, index: 4))
+            try depthPass?.draw([item], camera: core.orbit3D.camera, context: context)
             drawnCount = mesh.triangleCount
         case nil:
             drawnCount = 0
@@ -160,6 +185,8 @@ final class GeometryPresenter: ExperiencePresenter {
         meshRenderer?.release()
         meshRenderer = nil
         meshDigest = nil
+        depthPass?.release()
+        depthPass = nil
         drawnCount = 0
     }
 
@@ -196,10 +223,18 @@ final class GeometryPresenter: ExperiencePresenter {
         return Vec4(Palette.sRGB(fromLinear: c.x), Palette.sRGB(fromLinear: c.y), Palette.sRGB(fromLinear: c.z), 1)
     }
 
+    /// The canvas description: kind, symmetry and element count, and on the 3D composition the field of view
+    /// (FR-A05-315), e.g. "…, 288 elements, field of view 60°."
     func describe(_ core: GeometryCore) -> String {
         mirror.core = core
+        let fov = core.preset.kind == .solid ? ", field of view \(Self.degreesText(core.orbit3D.fovDegrees))" : ""
         return "Infinite Geometry: \(GeometryCore.kindName(core.preset.kind)), \(GeometryCore.symmetryText(core.preset)), "
-            + "\(core.elementCount) elements."
+            + "\(core.elementCount) elements\(fov)."
+    }
+
+    /// An angle in degrees as spoken and shown: whole degrees, e.g. "60°".
+    static func degreesText(_ degrees: Double) -> String {
+        String(format: "%.0f°", degrees)
     }
 
     /// One background probe that must read `dark`: the first candidate the CPU proves uncovered by the composition.
@@ -272,10 +307,11 @@ final class GeometryPresenter: ExperiencePresenter {
         AnyView(GeometryControls(port: port, mirror: mirror))
     }
 
-    /// The six preset actions and the four camera actions of the native controls (every gesture action has a button).
+    /// The six preset actions, the four camera actions and the field of view of the native controls (every gesture
+    /// action has a button; the field of view has buttons and no gesture).
     var nativeActions: Set<String> {
         let presetActions: Set<String> = ["preset.select", "symmetry.order", "repeats.set", "scale.set", "palette.set", "reseed"]
-        return presetActions.union(Self.cameraActions)
+        return presetActions.union(Self.cameraActions).union(["camera.fov"])
     }
 
     /// The camera actions a canvas gesture sends (FR-A05-212).
@@ -284,10 +320,11 @@ final class GeometryPresenter: ExperiencePresenter {
     /// The four camera action ids.
     static let cameraActions: Set<String> = ["camera.pan", "camera.zoom", "camera.orbit", "camera.reset"]
 
-    /// Canvas touches as camera actions (FR-A05-212; spec Clarifications): one finger moving pans the 2D view by its
-    /// movement converted to world units (the content follows the finger) or orbits the 3D composition by 0.01 rad
-    /// per point; two fingers zoom by the ratio of their distances; a double tap resets the camera. Values are
-    /// clamped into the controls' ranges so a fast gesture is never refused as out of range.
+    /// Canvas touches as camera actions (FR-A05-212, FR-A05-315; spec Clarifications): one finger moving pans the 2D
+    /// view by its movement converted to world units (the content follows the finger) or orbits the 3D composition
+    /// by 0.01 rad per point; two fingers zoom by the ratio of their distances and, on the 3D composition, pan the
+    /// target by the centroid's movement (`solidPan`); a double tap resets the camera. Values are clamped into the
+    /// controls' ranges so a fast gesture is never refused as out of range.
     func pointer(_ event: PointerEvent, viewSize: Vec2, port: ExperienceActionPort) {
         let side = min(viewSize.x, viewSize.y)
         guard side > 0 else { return }
@@ -308,6 +345,11 @@ final class GeometryPresenter: ExperiencePresenter {
             if let a0 = previous[ids[0]], let b0 = previous[ids[1]],
                let a1 = pointers.active[ids[0]], let b1 = pointers.active[ids[1]] {
                 let d0 = a0.distance(to: b0), d1 = a1.distance(to: b1)
+                if lastKind == .solid,
+                   let pan = Self.solidPan(centroidMove: (a1 + b1) * 0.5 - (a0 + b0) * 0.5, viewHeight: viewSize.y,
+                                           orbit: lastOrbit) {
+                    port.send("camera.pan", pan)
+                }
                 if d0 > 0, d1 > 0, d1 != d0 {
                     port.send("camera.zoom", [Self.clamp(d1 / d0, GeometryCore.zoomFactorRange)])
                 }
@@ -332,6 +374,17 @@ final class GeometryPresenter: ExperiencePresenter {
         case .ended, .cancelled: lastPoint[event.id] = nil
         }
         if pointers.count == 0 { lastPoint.removeAll() }
+    }
+
+    /// The `camera.pan` values of a two-finger centroid movement `centroidMove` (view points, y down) on the 3D
+    /// composition seen through `orbit` in a view `viewHeight` points high, or nil when nothing moves: one point is
+    /// 2 · distance · tan(fov / 2) / height world units at the target, and the target moves against the fingers so
+    /// the composition follows them (x negated; y negated twice, as the screen's y points down).
+    static func solidPan(centroidMove: Vec2, viewHeight: Double, orbit: GeometryCore.Orbit3D) -> [Double]? {
+        guard viewHeight > 0, centroidMove.x != 0 || centroidMove.y != 0 else { return nil }
+        let perPoint = 2 * orbit.distance * tan(orbit.fovDegrees * Double.pi / 360) / viewHeight
+        let range = GeometryCore.panRange
+        return [clamp(-centroidMove.x * perPoint, range), clamp(centroidMove.y * perPoint, range)]
     }
 
     /// `value` clamped into `range`; a non-finite value counts as 0.

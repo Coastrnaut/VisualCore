@@ -9,7 +9,8 @@
     "camera.pan",
     "camera.zoom",
     "camera.orbit",
-    "camera.reset"
+    "camera.reset",
+    "camera.fov"
   ],
   "experience" : "a05.infinite-geometry",
   "kind" : "creative",
@@ -19,7 +20,7 @@
 
       ],
       "expect" : {
-        "initialDigest" : "7ac53aa255769d7ca24b52a18da49ba6b261918e9e656c38f490890b85835f77"
+        "initialDigest" : "24bf4d9696e7c4149ad6802f0eedfb7709168c9f026189d1f3753a59ba88317f"
       },
       "name" : "launch-first-frame",
       "seed" : "7"
@@ -88,8 +89,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "280e1e2e6d48afd933dad572f4c7620219d7567599d8c40f96e822c25f0af0fc",
-        "initialDigest" : "7ac53aa255769d7ca24b52a18da49ba6b261918e9e656c38f490890b85835f77"
+        "finalDigest" : "4d36e28a8372b869f5f49ab3c4918393bea8b82ade5451bcdd53c8e2627d3539",
+        "initialDigest" : "24bf4d9696e7c4149ad6802f0eedfb7709168c9f026189d1f3753a59ba88317f"
       },
       "name" : "input-response",
       "seed" : "7"
@@ -216,8 +217,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "280e1e2e6d48afd933dad572f4c7620219d7567599d8c40f96e822c25f0af0fc",
-        "initialDigest" : "7ac53aa255769d7ca24b52a18da49ba6b261918e9e656c38f490890b85835f77"
+        "finalDigest" : "4d36e28a8372b869f5f49ab3c4918393bea8b82ade5451bcdd53c8e2627d3539",
+        "initialDigest" : "24bf4d9696e7c4149ad6802f0eedfb7709168c9f026189d1f3753a59ba88317f"
       },
       "name" : "save-restore",
       "seed" : "7"
@@ -286,7 +287,7 @@
         }
       ],
       "expect" : {
-        "initialDigest" : "7ac53aa255769d7ca24b52a18da49ba6b261918e9e656c38f490890b85835f77",
+        "initialDigest" : "24bf4d9696e7c4149ad6802f0eedfb7709168c9f026189d1f3753a59ba88317f",
         "resetDigest" : true
       },
       "name" : "reset",
@@ -357,8 +358,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "17a1645d059deb85e4bf9713c133c8e26cb579261b977ed611f8df9d4a7b7cd4",
-        "initialDigest" : "7ac53aa255769d7ca24b52a18da49ba6b261918e9e656c38f490890b85835f77"
+        "finalDigest" : "a6091f5b889a246e4c789acc0d3f3e5f251744ba56c93e18257ba3ab7e16c585",
+        "initialDigest" : "24bf4d9696e7c4149ad6802f0eedfb7709168c9f026189d1f3753a59ba88317f"
       },
       "name" : "fixture-1",
       "seed" : "7"
@@ -397,8 +398,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "a114f5992e0d867e95fdeb46700e71082a4ee6ca570ff2c3542c8810f202abfe",
-        "initialDigest" : "7ac53aa255769d7ca24b52a18da49ba6b261918e9e656c38f490890b85835f77"
+        "finalDigest" : "fa2e1d75b11562c801853da18488556fbd6bb100842d0003213c1a74d423bf2b",
+        "initialDigest" : "24bf4d9696e7c4149ad6802f0eedfb7709168c9f026189d1f3753a59ba88317f"
       },
       "name" : "fixture-2",
       "seed" : "7"
@@ -474,11 +475,104 @@
           },
           "result" : "action.out-of-range",
           "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "preset.select",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "camera.fov",
+            "values" : [
+              30
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "camera.fov",
+            "values" : [
+              75
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "camera.fov",
+            "values" : [
+              80
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "camera.pan",
+            "values" : [
+              0.59999999999999998,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "camera.pan",
+            "values" : [
+              0.59999999999999998,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "camera.pan",
+            "values" : [
+              0.59999999999999998,
+              0
+            ]
+          },
+          "result" : "action.rule.a05.unchanged",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "camera.zoom",
+            "values" : [
+              100
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "camera.zoom",
+            "values" : [
+              100
+            ]
+          },
+          "result" : "action.rule.a05.unchanged",
+          "steps" : 1
         }
       ],
       "expect" : {
-        "finalDigest" : "c0cf9edc726ace8cf42e6e841cc716cefaf4e03f054c4c6ec71873dfef15d98d",
-        "initialDigest" : "7ac53aa255769d7ca24b52a18da49ba6b261918e9e656c38f490890b85835f77"
+        "finalDigest" : "448d538f827a5ea4316fe34df501103bd07c3aab02190413710c8ed530a1ae52",
+        "initialDigest" : "24bf4d9696e7c4149ad6802f0eedfb7709168c9f026189d1f3753a59ba88317f"
       },
       "name" : "fixture-3",
       "seed" : "7"
@@ -567,8 +661,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "7ac53aa255769d7ca24b52a18da49ba6b261918e9e656c38f490890b85835f77",
-        "initialDigest" : "7ac53aa255769d7ca24b52a18da49ba6b261918e9e656c38f490890b85835f77"
+        "finalDigest" : "24bf4d9696e7c4149ad6802f0eedfb7709168c9f026189d1f3753a59ba88317f",
+        "initialDigest" : "24bf4d9696e7c4149ad6802f0eedfb7709168c9f026189d1f3753a59ba88317f"
       },
       "name" : "fixture-4",
       "seed" : "7"
@@ -597,8 +691,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "21f821c3d2ae592cb874c3d1346a69492b2d04b0ef301b1a4f244afd0b863fa1",
-        "initialDigest" : "7ac53aa255769d7ca24b52a18da49ba6b261918e9e656c38f490890b85835f77"
+        "finalDigest" : "9ce0275811a4514771ece04332cae127becdb9ff1c6a9680cc3bdafa4cad37e7",
+        "initialDigest" : "24bf4d9696e7c4149ad6802f0eedfb7709168c9f026189d1f3753a59ba88317f"
       },
       "name" : "fixture-5",
       "seed" : "7"

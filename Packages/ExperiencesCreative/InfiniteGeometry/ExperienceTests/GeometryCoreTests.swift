@@ -40,7 +40,7 @@ private var tilingActions: [ScriptedAction] {
         #expect(GeometryPreset.curated.map(\.kind) == [.squareTiling, .hexTiling, .kaleidoscope, .solid])
         #expect(GeometryCore.controls.map(\.id)
                 == ["preset.select", "symmetry.order", "repeats.set", "scale.set", "palette.set", "reseed",
-                    "camera.pan", "camera.zoom", "camera.orbit", "camera.reset"])
+                    "camera.pan", "camera.zoom", "camera.orbit", "camera.reset", "camera.fov"])
     }
 
     @Test func conformancePassesOverFourSeeds() async {

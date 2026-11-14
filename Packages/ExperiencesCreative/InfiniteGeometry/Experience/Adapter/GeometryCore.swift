@@ -17,14 +17,23 @@
 // `OrbitBounds` (pitch ±80°, distance 3…12), so the state never holds an out-of-bounds camera. Selecting a preset
 // returns both cameras to the preset's default; a new scale clamps the centre into the new extent. Snapshot schema 2
 // adds the two cameras; a schema-1 payload (Phase 01) is migrated by the shared `MigrationChain` with the defaults.
+//
+// Feature 042 (A05-P03) T-A05-305 (FR-A05-310–314; data-model "GeometryCore.Orbit3D (schema 3)"): the orbit camera
+// gains a target (|target| ≤ 1, default the origin) and a vertical field of view (30…75°, default 60°). On the 3D
+// composition `camera.pan [dx, dy]` moves the target along the camera's right and up vectors, `camera.fov [degrees]`
+// sets the field of view, and pan, zoom and orbit are clamped by VisualCoreMath's `OrbitViewBounds`, whose distance
+// rule keeps the eye outside the composition's bounding sphere: minimum distance = max(3, |target| + R + 2 · near),
+// R = |bounds centre| + bounds radius of the built solid (derived, never stored; 0 for a 2D preset). Snapshot schema 3
+// adds target and field of view; the chain 1 → 2 → 3 fills the defaults.
 import Foundation
 import InfiniteGeometryCore
 import VisualCoreExperience
 import VisualCoreMath
 import VisualCorePersistence
+import VisualCoreScenes
 
 /// The state of Infinite Geometry: the preparation seed, the selected curated preset, the current preset with the
-/// composition it builds and the two cameras. Schema version 2.
+/// composition it builds and the two cameras. Schema version 3.
 public struct GeometryCore: ExperienceCore, Equatable, Codable {
     /// The 2D camera of the tilings and the kaleidoscope: the view centre in world units and the zoom relative to
     /// the preset's fit (the square −1…1 on the view's shorter side).
@@ -55,32 +64,61 @@ public struct GeometryCore: ExperienceCore, Equatable, Codable {
         public var camera: Camera2D { Camera2D(center: Vec2(centerX, centerY), zoom: zoom) }
     }
 
-    /// The orbit camera of the 3D composition: yaw (−π…π), pitch and distance to the origin.
+    /// The orbit camera of the 3D composition: yaw (−π…π), pitch, distance to the target, the target (|target| ≤ 1)
+    /// and the vertical field of view in degrees (30…75).
     public struct Orbit3D: Sendable, Equatable, Codable {
         /// The yaw in radians, wrapped into −π…π.
         public var yaw: Double
         /// The pitch in radians.
         public var pitch: Double
-        /// The eye's distance to the origin.
+        /// The eye's distance to the target.
         public var distance: Double
+        /// The target's x in world units.
+        public var targetX: Double
+        /// The target's y in world units.
+        public var targetY: Double
+        /// The target's z in world units.
+        public var targetZ: Double
+        /// The vertical field of view in degrees.
+        public var fovDegrees: Double
 
-        /// The preset's default: yaw 0, pitch 0.5, distance 6 (the Phase 01 camera).
+        /// The preset's default: yaw 0, pitch 0.5, distance 6 (the Phase 01 camera), target at the origin, 60°.
         public static let `default` = Orbit3D(yaw: 0, pitch: 0.5, distance: 6)
 
-        /// Creates the camera from its angles and distance.
-        public init(yaw: Double, pitch: Double, distance: Double) {
+        /// Creates the camera from its angles, distance, target and field of view in degrees.
+        public init(yaw: Double, pitch: Double, distance: Double, target: Vec3 = .zero, fovDegrees: Double = 60) {
             self.yaw = yaw
             self.pitch = pitch
             self.distance = distance
+            targetX = target.x
+            targetY = target.y
+            targetZ = target.z
+            self.fovDegrees = fovDegrees
         }
 
-        /// The angles and distance of `camera`.
-        public init(_ camera: OrbitCamera) {
-            self.init(yaw: camera.yaw, pitch: camera.pitch, distance: camera.distance)
+        /// The angles, distance and target of `camera` with the field of view `fovDegrees`, which is carried as
+        /// given (never converted back from radians, so a field of view keeps its exact value).
+        public init(_ camera: OrbitCamera, fovDegrees: Double) {
+            self.init(yaw: camera.yaw, pitch: camera.pitch, distance: camera.distance, target: camera.target,
+                      fovDegrees: fovDegrees)
         }
 
-        /// The VisualCoreMath orbit camera looking at the origin.
-        public var camera: OrbitCamera { OrbitCamera(distance: distance, yaw: yaw, pitch: pitch) }
+        /// The target as a vector.
+        public var target: Vec3 { Vec3(targetX, targetY, targetZ) }
+
+        /// The VisualCoreMath orbit camera looking at `target` with the field of view in radians.
+        public var camera: OrbitCamera {
+            OrbitCamera(target: target, distance: distance, yaw: yaw, pitch: pitch, fovY: fovDegrees * Double.pi / 180)
+        }
+
+        /// All seven values, in declaration order.
+        var values: [Double] { [yaw, pitch, distance, targetX, targetY, targetZ, fovDegrees] }
+
+        /// Whether every value equals the one of `other` within `tolerance` relative to its magnitude (at least 1),
+        /// so a clamp that rescales the target at its limit by one rounding step counts as no change.
+        func isNearlyEqual(to other: Orbit3D, tolerance: Double = 1e-12) -> Bool {
+            zip(values, other.values).allSatisfy { abs($0 - $1) <= tolerance * max(1, abs($0), abs($1)) }
+        }
     }
 
     /// The experience's id in the catalog.
@@ -95,8 +133,11 @@ public struct GeometryCore: ExperienceCore, Equatable, Codable {
     public static let unchangedCode = "a05.unchanged"
     /// The rule code of a preparation or a restore whose preset does not build or whose camera is out of bounds.
     public static let invalidStateCode = "a05.invalid-state"
-    /// The rule code of `camera.pan` on the 3D composition (it orbits instead).
+    /// The rule code `camera.pan` on the 3D composition had in Phase 02; since Phase 03 (FR-A05-310) a pan on the
+    /// solid moves the orbit target and this code is no longer returned. Kept so recorded results stay readable.
     public static let panPlaneOnlyCode = "a05.pan-plane-only"
+    /// The rule code of `camera.fov` on a 2D preset (the field of view belongs to the 3D composition).
+    public static let fovSolidOnlyCode = "a05.fov-solid-only"
     /// The rule code of `camera.orbit` on a 2D preset (it pans instead).
     public static let orbitSolidOnlyCode = "a05.orbit-solid-only"
     /// The 2D zoom range relative to the preset's fit (FR-A05-210).
@@ -109,6 +150,27 @@ public struct GeometryCore: ExperienceCore, Equatable, Codable {
     public static let zoomFactorRange: ClosedRange<Double> = 0.01...100
     /// The accepted angle of one `camera.orbit` step, per axis.
     public static let orbitRange: ClosedRange<Double> = -2 * Double.pi...2 * Double.pi
+    /// The field of view of the orbit camera in degrees (FR-A05-311); `camera.fov` outside it is refused.
+    public static let fovRange: ClosedRange<Double> = 30...75
+    /// The largest distance of the orbit target from the origin, in world units (FR-A05-310).
+    public static let targetRadius = 1.0
+
+    /// The bounds of the orbit camera on a composition of bounding radius `clearance` (FR-A05-310–312): the
+    /// Phase 02 `orbitBounds`, the target within `targetRadius`, the field of view within `fovRange` (in radians)
+    /// and the distance rule max(3, |target| + clearance + 2 · near).
+    public static func orbitViewBounds(clearance: Double) -> OrbitViewBounds {
+        OrbitViewBounds(orbit: orbitBounds, targetRadius: targetRadius,
+                        fovRange: fovRange.lowerBound * Double.pi / 180...fovRange.upperBound * Double.pi / 180,
+                        clearance: clearance)
+    }
+
+    /// The bounding radius of `composition` about the origin: |bounds centre| + bounds radius of the solid's mesh,
+    /// 0 for a plane or an empty mesh.
+    public static func boundingRadius(of composition: Composition) -> Double {
+        guard case .solid(let mesh) = composition, let centre = mesh.bounds.center, let radius = mesh.bounds.radius
+        else { return 0 }
+        return centre.length + radius
+    }
 
     /// The bounds of the 2D camera for a preset of `scale`: zoom 0.5…8, centre within the composition's extent ±1/scale.
     public static func viewBounds(scale: Double) -> ViewBounds2D {
@@ -127,24 +189,46 @@ public struct GeometryCore: ExperienceCore, Equatable, Codable {
     public private(set) var elementCount: Int
     /// The 2D camera, always within `viewBounds(scale: preset.scale)`.
     public private(set) var view2D: View2D = .default
-    /// The orbit camera, always within `orbitBounds`.
+    /// The orbit camera, always within `orbitViewBounds`.
     public private(set) var orbit3D: Orbit3D = .default
+    /// The bounding radius of the current composition (derived from the built mesh; 0 for a 2D preset).
+    public private(set) var boundingRadius: Double = 0
+
+    /// The bounds of the orbit camera on the current composition.
+    public var orbitViewBounds: OrbitViewBounds { Self.orbitViewBounds(clearance: boundingRadius) }
 
     // MARK: Contract
 
-    /// Schema 2 (cameras added); the step from schema 1 fills the preset's default cameras (FR-A05-213).
+    /// Schema 3 (target and field of view added). The step from schema 1 fills the preset's default cameras as
+    /// Phase 02 stored them (FR-A05-213); the step from schema 2 adds the default target (the origin) and field of
+    /// view (60°) to the orbit camera (FR-A05-314), so a Phase 01 payload passes through both.
     public static var migrations: MigrationChain {
-        MigrationChain(currentVersion: 2, steps: [1: { payload in
-            var upgraded = payload
-            let view = View2D.default, orbit = Orbit3D.default
-            upgraded[CodingKeys.view2D.rawValue] = ["centerX": view.centerX, "centerY": view.centerY, "zoom": view.zoom]
-            upgraded[CodingKeys.orbit3D.rawValue] = ["yaw": orbit.yaw, "pitch": orbit.pitch, "distance": orbit.distance]
-            return upgraded
-        }])
+        MigrationChain(currentVersion: 3, steps: [
+            1: { payload in
+                var upgraded = payload
+                let view = View2D.default, orbit = Orbit3D.default
+                upgraded[CodingKeys.view2D.rawValue] = ["centerX": view.centerX, "centerY": view.centerY,
+                                                        "zoom": view.zoom]
+                upgraded[CodingKeys.orbit3D.rawValue] = ["yaw": orbit.yaw, "pitch": orbit.pitch,
+                                                         "distance": orbit.distance]
+                return upgraded
+            },
+            2: { payload in
+                var upgraded = payload
+                let orbit = Orbit3D.default
+                var camera = payload[CodingKeys.orbit3D.rawValue] as? [String: Any] ?? [:]
+                camera["targetX"] = orbit.targetX
+                camera["targetY"] = orbit.targetY
+                camera["targetZ"] = orbit.targetZ
+                camera["fovDegrees"] = orbit.fovDegrees
+                upgraded[CodingKeys.orbit3D.rawValue] = camera
+                return upgraded
+            },
+        ])
     }
 
     /// The six actions of FR-A05-120 with the ranges of `GeometryPreset`, then the four camera actions of
-    /// FR-A05-210. Whole-number controls round their value.
+    /// FR-A05-210 and the field of view of FR-A05-311. Whole-number controls round their value.
     public static var controls: [ExperienceControl] {
         [
             ExperienceControl(id: "preset.select", ranges: [0...Double(GeometryPreset.curated.count - 1)]),
@@ -157,6 +241,7 @@ public struct GeometryCore: ExperienceCore, Equatable, Codable {
             ExperienceControl(id: "camera.zoom", ranges: [zoomFactorRange]),
             ExperienceControl(id: "camera.orbit", ranges: [orbitRange, orbitRange]),
             ExperienceControl(id: "camera.reset"),
+            ExperienceControl(id: "camera.fov", ranges: [fovRange]),
         ]
     }
 
@@ -179,7 +264,8 @@ public struct GeometryCore: ExperienceCore, Equatable, Codable {
     }
 
     /// The state of `preset` with the cameras `view` and `orbit`, validated and built; throws `ExperienceFailure`
-    /// with the error's code otherwise, or `a05.invalid-state` when a camera lies outside its bounds.
+    /// with the error's code otherwise, or `a05.invalid-state` when a camera lies outside its bounds (the orbit
+    /// camera against `orbitViewBounds` of the built composition, the field of view against `fovRange`).
     private init(seed: UInt64, presetIndex: Int, preset: GeometryPreset, view: View2D = .default,
                  orbit: Orbit3D = .default) throws(ExperienceFailure) {
         guard GeometryPreset.curated.indices.contains(presetIndex) else {
@@ -192,12 +278,15 @@ public struct GeometryCore: ExperienceCore, Equatable, Codable {
             self.preset = built.preset
             compositionDigest = built.composition.digest
             elementCount = built.composition.elementCount
+            boundingRadius = built.boundingRadius
         case .failure(let rejection):
             throw ExperienceFailure(code: Self.invalidStateCode, message: rejection.code)
         }
-        let finite = [view.centerX, view.centerY, view.zoom, orbit.yaw, orbit.pitch, orbit.distance].allSatisfy(\.isFinite)
+        let finite = ([view.centerX, view.centerY, view.zoom] + orbit.values).allSatisfy(\.isFinite)
         guard finite, View2D(Self.viewBounds(scale: self.preset.scale).clamp(view.camera)) == view,
-              Orbit3D(Self.orbitBounds.clamp(orbit.camera)) == orbit else {
+              Self.fovRange.contains(orbit.fovDegrees),
+              Orbit3D(orbitViewBounds.clamp(orbit.camera), fovDegrees: orbit.fovDegrees)
+                .isNearlyEqual(to: orbit, tolerance: 1e-9) else {
             throw ExperienceFailure(code: Self.invalidStateCode, message: "camera out of bounds")
         }
         view2D = view
@@ -248,47 +337,67 @@ public struct GeometryCore: ExperienceCore, Equatable, Codable {
                 orbit3D = .default
             } else {
                 view2D = View2D(Self.viewBounds(scale: built.preset.scale).clamp(view2D.camera))
+                // A new solid may be larger: the distance rule of its bounding radius applies at once.
+                let bounds = Self.orbitViewBounds(clearance: built.boundingRadius)
+                orbit3D = Orbit3D(bounds.clamp(orbit3D.camera), fovDegrees: orbit3D.fovDegrees)
             }
             preset = built.preset
             presetIndex = nextIndex
             compositionDigest = built.composition.digest
             elementCount = built.composition.elementCount
+            boundingRadius = built.boundingRadius
             return .accepted
         case .failure(let rejection):
             return .rejected(rejection)
         }
     }
 
-    /// Carries out a camera action (FR-A05-210, FR-A05-211): pan and orbit need the matching kind, zoom acts on the
-    /// 2D zoom or on the orbit distance, reset restores both default cameras. Every result is clamped by the
-    /// framework bounds; an action that would change nothing (a camera at its bound, a reset at the default) is
-    /// refused as unchanged, so a refusal never changes the digest.
+    /// Carries out a camera action (FR-A05-210, FR-A05-211, FR-A05-310–313): pan moves the 2D centre or the orbit
+    /// target, orbit and field of view need the 3D composition, zoom acts on the 2D zoom or on the orbit distance,
+    /// reset restores both default cameras (target and field of view included). Every result is clamped by the
+    /// framework bounds (`ViewBounds2D`, `OrbitViewBounds` with the composition's bounding radius); an action that
+    /// would change nothing (a camera at its bound, a reset at the default) is refused as unchanged, so a refusal
+    /// never changes the digest.
     private mutating func applyCamera(_ action: ExperienceAction) -> ActionResult {
         let v = action.values
         if let index = v.firstIndex(where: { !$0.isFinite }) { return .rejected(.nonFinite(index: index)) }
         let solid = preset.kind == .solid
         let bounds = Self.viewBounds(scale: preset.scale)
+        let orbitBounds = orbitViewBounds
         var view = view2D, orbit = orbit3D
+        let fov = orbit.fovDegrees
         switch action.control {
         case "camera.pan":
-            guard !solid else { return .rejected(.rule(code: Self.panPlaneOnlyCode)) }
             guard v.count == 2 else { return .rejected(.wrongValueCount(expected: 2, found: v.count)) }
-            // `panned(by:)` takes a camera-space delta and moves the centre by −delta / zoom; the action moves the
-            // view centre by (dx, dy) world units.
-            let camera = view.camera
-            view = View2D(camera.panned(by: Vec2(-v[0] * camera.zoom, -v[1] * camera.zoom), within: bounds))
+            if solid {
+                // The target moves by dx along the camera's right vector and dy along its up vector (world units),
+                // clamped to |target| ≤ 1 and the distance rule.
+                orbit = Orbit3D(orbit.camera.panned(by: Vec2(v[0], v[1]), within: orbitBounds), fovDegrees: fov)
+            } else {
+                // `panned(by:)` takes a camera-space delta and moves the centre by −delta / zoom; the action moves
+                // the view centre by (dx, dy) world units.
+                let camera = view.camera
+                view = View2D(camera.panned(by: Vec2(-v[0] * camera.zoom, -v[1] * camera.zoom), within: bounds))
+            }
         case "camera.zoom":
             guard v.count == 1 else { return .rejected(.wrongValueCount(expected: 1, found: v.count)) }
             guard v[0] > 0 else { return .rejected(.outOfRange(index: 0)) }
             if solid {
-                orbit = Orbit3D(orbit.camera.zoomed(by: v[0], within: Self.orbitBounds))
+                orbit = Orbit3D(orbit.camera.zoomed(by: v[0], within: orbitBounds), fovDegrees: fov)
             } else {
                 view = View2D(view.camera.zoomed(by: v[0], within: bounds))
             }
         case "camera.orbit":
             guard solid else { return .rejected(.rule(code: Self.orbitSolidOnlyCode)) }
             guard v.count == 2 else { return .rejected(.wrongValueCount(expected: 2, found: v.count)) }
-            orbit = Orbit3D(orbit.camera.orbited(yaw: v[0], pitch: v[1], within: Self.orbitBounds))
+            orbit = Orbit3D(orbit.camera.orbited(yaw: v[0], pitch: v[1], within: orbitBounds), fovDegrees: fov)
+        case "camera.fov":
+            guard solid else { return .rejected(.rule(code: Self.fovSolidOnlyCode)) }
+            guard v.count == 1 else { return .rejected(.wrongValueCount(expected: 1, found: v.count)) }
+            guard Self.fovRange.contains(v[0]) else { return .rejected(.outOfRange(index: 0)) }
+            // The degrees are kept exactly as sent; the rest of the camera is re-clamped with the new angle.
+            orbit.fovDegrees = v[0]
+            orbit = Orbit3D(orbitBounds.clamp(orbit.camera), fovDegrees: v[0])
         case "camera.reset":
             guard v.isEmpty else { return .rejected(.wrongValueCount(expected: 0, found: v.count)) }
             view = .default
@@ -296,7 +405,9 @@ public struct GeometryCore: ExperienceCore, Equatable, Codable {
         default:
             return .rejected(.unknownControl(action.control))
         }
-        guard view != view2D || orbit != orbit3D else { return .rejected(.rule(code: Self.unchangedCode)) }
+        guard view != view2D || !orbit.isNearlyEqual(to: orbit3D) else {
+            return .rejected(.rule(code: Self.unchangedCode))
+        }
         view2D = view
         orbit3D = orbit
         return .accepted
@@ -313,7 +424,7 @@ public struct GeometryCore: ExperienceCore, Equatable, Codable {
     }
 
     /// The preparation seed, the preset index, every preset field, the composition's digest and element count, then
-    /// the 2D camera (centre, zoom) and the orbit camera (yaw, pitch, distance).
+    /// the 2D camera (centre, zoom) and the orbit camera (yaw, pitch, distance, target x, y, z, field of view).
     public func writeDigest(into builder: inout DigestBuilder) throws(DigestError) {
         builder.add(seed)
         builder.add(presetIndex)
@@ -332,6 +443,10 @@ public struct GeometryCore: ExperienceCore, Equatable, Codable {
         try builder.add(orbit3D.yaw)
         try builder.add(orbit3D.pitch)
         try builder.add(orbit3D.distance)
+        try builder.add(orbit3D.targetX)
+        try builder.add(orbit3D.targetY)
+        try builder.add(orbit3D.targetZ)
+        try builder.add(orbit3D.fovDegrees)
     }
 
     // MARK: Validation
@@ -342,6 +457,8 @@ public struct GeometryCore: ExperienceCore, Equatable, Codable {
         var preset: GeometryPreset
         /// The composition it builds.
         var composition: Composition
+        /// The composition's bounding radius about the origin (`boundingRadius(of:)`).
+        var boundingRadius: Double { GeometryCore.boundingRadius(of: composition) }
     }
 
     /// Validates `preset` and builds its composition; a failure is a rule rejection with the error's code.
@@ -392,8 +509,8 @@ public struct GeometryCore: ExperienceCore, Equatable, Codable {
         case seed, presetIndex, preset, view2D, orbit3D
     }
 
-    /// Decodes the seed, the preset index, the preset and the two cameras (schema 2; a schema-1 payload gains the
-    /// default cameras through `migrations` first), then validates and rebuilds; a payload whose preset does not
+    /// Decodes the seed, the preset index, the preset and the two cameras (schema 3; a schema-1 or schema-2 payload
+    /// gains the default cameras, target and field of view through `migrations` first), then validates and rebuilds; a payload whose preset does not
     /// build or whose camera lies outside its bounds fails with `ExperienceFailure` (`a05.invalid-state`).
     public init(from decoder: any Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
@@ -433,5 +550,28 @@ public struct GeometryCore: ExperienceCore, Equatable, Codable {
                                                      digest: builder.finish(), payload: data),
               let encoded = try? snapshot.encoded() else { return nil }
         return MigrationExample(version: 1, snapshot: encoded, expectedDigest: builder.finish().hex)
+    }
+
+    /// The stored example of schema 2 for `SnapshotMigrationCheck` (FR-A05-314): the Phase 02 payload of the state
+    /// prepared with `seed` with an orbit camera that is not the default (yaw 0.5, pitch 0.25, distance 5; no target,
+    /// no field of view) in a schema-2 snapshot, with the digest its restore must give — that camera with the
+    /// default target and field of view. Nil only if the preparation or the encoding failed.
+    public static func schemaTwoExample(seed: UInt64 = 7) -> MigrationExample? {
+        let orbit = Orbit3D(yaw: 0.5, pitch: 0.25, distance: 5)
+        guard let id = ExperienceID(rawValue: experienceID), let prepared = try? GeometryCore(seed: seed),
+              let core = try? GeometryCore(seed: seed, presetIndex: 0, preset: prepared.preset, orbit: orbit),
+              let preset = try? JSONSerialization.jsonObject(with: JSONEncoder().encode(core.preset)),
+              let view = try? JSONSerialization.jsonObject(with: JSONEncoder().encode(core.view2D)) else { return nil }
+        let payload: [String: Any] = [CodingKeys.seed.rawValue: seed, CodingKeys.presetIndex.rawValue: 0,
+                                      CodingKeys.preset.rawValue: preset, CodingKeys.view2D.rawValue: view,
+                                      CodingKeys.orbit3D.rawValue: ["yaw": orbit.yaw, "pitch": orbit.pitch,
+                                                                    "distance": orbit.distance]]
+        var builder = DigestBuilder(domain: id.rawValue)
+        guard (try? core.writeDigest(into: &builder)) != nil,
+              let data = try? JSONSerialization.data(withJSONObject: payload, options: [.sortedKeys]),
+              let snapshot = try? ExperienceSnapshot(experience: id, schemaVersion: 2, seed: seed, stepIndex: 0,
+                                                     digest: builder.finish(), payload: data),
+              let encoded = try? snapshot.encoded() else { return nil }
+        return MigrationExample(version: 2, snapshot: encoded, expectedDigest: builder.finish().hex)
     }
 }

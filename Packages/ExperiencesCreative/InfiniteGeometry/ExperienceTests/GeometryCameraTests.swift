@@ -4,6 +4,8 @@
 // sequences never leave them, invalid actions are refused with the digest unchanged, reset restores the default
 // exactly, the camera is part of the digest and the snapshot, a preset selection resets it, and a schema-1 snapshot
 // written as Phase 01 wrote it (no camera) restores with the default cameras through the migration chain. Host tests.
+// Feature 042 (A05-P03): schema 3; a pan on the solid moves the orbit target (GeometryOrbitViewTests), the field of
+// view is refused on a plane, and the nearest distance follows the bounding-sphere rule.
 import Foundation
 import Testing
 @testable import InfiniteGeometryExperience
@@ -42,7 +44,7 @@ private func withinBounds(_ core: GeometryCore) -> Bool {
         let state = try core(try await engine())
         #expect(state.view2D == GeometryCore.View2D(centerX: 0, centerY: 0, zoom: 1))
         #expect(state.orbit3D == GeometryCore.Orbit3D(yaw: 0, pitch: 0.5, distance: 6))
-        #expect(GeometryCore.migrations.currentVersion == 2)
+        #expect(GeometryCore.migrations.currentVersion == 3)
     }
 
     @Test func panAndZoomStopAtTheBoundsOnAPlane() async throws {
@@ -72,7 +74,10 @@ private func withinBounds(_ core: GeometryCore) -> Bool {
         #expect(engine.handle(control: "camera.orbit", values: [0, -6]) == .accepted)
         #expect(try core(engine).orbit3D.pitch == -80 * Double.pi / 180)
         #expect(engine.handle(control: "camera.zoom", values: [100]) == .accepted)
-        #expect(try core(engine).orbit3D.distance == 3)
+        // The nearest distance is the larger of 3 and the bounding-sphere rule |target| + R + 2 · near (A05-P03).
+        let state = try core(engine)
+        let nearest = max(3, state.orbit3D.target.length + state.boundingRadius + 2 * state.orbit3D.camera.near)
+        #expect(abs(state.orbit3D.distance - nearest) < 1e-9)
         #expect(engine.handle(control: "camera.zoom", values: [0.01]) == .accepted)
         #expect(try core(engine).orbit3D.distance == 12)
         for _ in 0..<5 { _ = engine.handle(control: "camera.orbit", values: [6, 0]) }
@@ -91,12 +96,13 @@ private func withinBounds(_ core: GeometryCore) -> Bool {
             ("camera.pan", [.nan, 0], .rejected(.nonFinite(index: 0))),
             ("camera.pan", [0, 9], .rejected(.outOfRange(index: 1))),
             ("camera.orbit", [0.1, 0.1], .rejected(.rule(code: GeometryCore.orbitSolidOnlyCode))),
+            ("camera.fov", [45], .rejected(.rule(code: GeometryCore.fovSolidOnlyCode))),
             ("camera.reset", [], .rejected(.rule(code: GeometryCore.unchangedCode))),
             ("camera.reset", [1], .rejected(.wrongValueCount(expected: 0, found: 1))),
             ("camera.bogus", [], .rejected(.unknownControl("camera.bogus"))),
         ]
         let solidCases: [(String, [Double], ActionResult)] = [
-            ("camera.pan", [0.1, 0.1], .rejected(.rule(code: GeometryCore.panPlaneOnlyCode))),
+            ("camera.fov", [80], .rejected(.outOfRange(index: 0))),
             ("camera.orbit", [.infinity, 0], .rejected(.nonFinite(index: 0))),
             ("camera.orbit", [0, 7], .rejected(.outOfRange(index: 1))),
             ("camera.zoom", [0], .rejected(.outOfRange(index: 0))),
@@ -174,7 +180,7 @@ private func withinBounds(_ core: GeometryCore) -> Bool {
         #expect(engine.handle(control: "camera.orbit", values: [0.7, -0.2]) == .accepted)
         #expect(engine.handle(control: "camera.zoom", values: [1.3]) == .accepted)
         let snapshot = try engine.snapshot()
-        #expect(snapshot.schemaVersion == 2)
+        #expect(snapshot.schemaVersion == 3)
         var restored = ExperienceEngine<GeometryCore>(id: id)
         try await restored.prepare(seed: 11)
         try restored.restore(try ExperienceSnapshot(data: try snapshot.encoded()))
@@ -207,9 +213,9 @@ private func withinBounds(_ core: GeometryCore) -> Bool {
         let state = try core(restored)
         #expect(state.preset == preset && state.presetIndex == kaleidoscope)
         #expect(state.view2D == .default && state.orbit3D == .default)
-        // The stored example for the registry's migration check restores to its recorded digest.
-        let example = try #require(GeometryCore.schemaOneExample())
-        let problems = await SnapshotMigrationCheck.problems(for: GeometryCore.self, id: id, examples: [example])
+        // The stored examples for the registry's migration check (one per earlier schema) restore to their digests.
+        let examples = [try #require(GeometryCore.schemaOneExample()), try #require(GeometryCore.schemaTwoExample())]
+        let problems = await SnapshotMigrationCheck.problems(for: GeometryCore.self, id: id, examples: examples)
         #expect(problems.isEmpty, "\(problems)")
     }
 }

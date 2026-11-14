@@ -130,11 +130,12 @@ extension ExperienceRegistry {
         #endif
         return registration
     }
-    /// A05 Infinite Geometry (features 040 and 041, A05-P01/P02): a candidate until X-A05.
+    /// A05 Infinite Geometry (features 040–042, A05-P01…P03): a candidate until X-A05.
     fileprivate static var infiniteGeometry: ExperienceRegistration? {
         guard let id = InfiniteGeometryExperience.id else { return nil }
-        // Schema 2 (feature 041, A05-P02) adds the camera; the stored schema-1 example proves the migration.
-        let examples = [GeometryCore.schemaOneExample()].compactMap { $0 }
+        // Schema 2 (feature 041, A05-P02) adds the camera and schema 3 (feature 042, A05-P03) its target and field of
+        // view; the stored schema-1 and schema-2 examples prove the migrations.
+        let examples = [GeometryCore.schemaOneExample(), GeometryCore.schemaTwoExample()].compactMap { $0 }
         var registration = ExperienceRegistration(id: id, core: GeometryCore.self, examples: examples) { launch in
             let system = SystemAccessibilityObserver.systemValues()
             return InfiniteGeometryExperience.make(id: id, storage: launch.storage,

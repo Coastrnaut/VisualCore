@@ -69,7 +69,9 @@ extension GeometryCore {
     ///    accepted build is a closed, validated mesh — `Composition.build` refuses anything else);
     /// 3. zoom clamps avoid singular states: the scale at both bounds is accepted and beyond them refused; the 2D
     ///    camera zoomed far beyond its upper bound stops at 8, a further zoom is refused as unchanged and a zero
-    ///    factor is out of range (A05-P02; the field of view arrives in Phase 03 and extends this fixture there);
+    ///    factor is out of range (A05-P02); on the 3D composition the field of view is accepted at 30° and 75° and refused
+    ///    beyond, a pan stops at the target radius (a further pan is refused as unchanged) and the maximum zoom stops at
+    ///    the bounding-sphere distance (A05-P03, FR-A05-330);
     /// 4. repeated preset transitions leave the state stable: two full cycles through the four presets end where they
     ///    began (final digest = initial digest; the records' GPU counts show no leak);
     /// 5. non-square displays keep proportions: the hexagonal tiling at scale 0.5 drawn on the phone's non-square
@@ -89,7 +91,14 @@ extension GeometryCore {
              step("scale.set", [GeometryPreset.scaleRange.lowerBound / 2], "action.out-of-range"),
              step("camera.zoom", [GeometryCore.zoomFactorRange.upperBound]),
              step("camera.zoom", [GeometryCore.zoomFactorRange.upperBound], "action.rule." + unchangedCode),
-             step("camera.zoom", [0], "action.out-of-range")],
+             step("camera.zoom", [0], "action.out-of-range"),
+             step("preset.select", [solid]),
+             step("camera.fov", [GeometryCore.fovRange.lowerBound]), step("camera.fov", [GeometryCore.fovRange.upperBound]),
+             step("camera.fov", [GeometryCore.fovRange.upperBound + 5], "action.out-of-range"),
+             step("camera.pan", [0.6, 0]), step("camera.pan", [0.6, 0]),
+             step("camera.pan", [0.6, 0], "action.rule." + unchangedCode),
+             step("camera.zoom", [GeometryCore.zoomFactorRange.upperBound]),
+             step("camera.zoom", [GeometryCore.zoomFactorRange.upperBound], "action.rule." + unchangedCode)],
             cycle + cycle,
             [step("preset.select", [hex]), step("scale.set", [0.5])],
         ]

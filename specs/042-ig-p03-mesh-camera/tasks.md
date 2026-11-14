@@ -15,7 +15,7 @@
 
 ## Phase 3: User Story 1 — a solid composition that looks solid (P1) 🎯
 
-- [ ] T-A05-304 [US1] Draw the 3D composition through `DepthMeshPass` in `Packages/ExperiencesCreative/InfiniteGeometry/Experience/GeometryPresenter.swift` (pass created in setup, released in teardown; 2D presets unchanged) and write `Packages/ExperiencesCreative/InfiniteGeometry/ExperienceTests/SolidOcclusionTests.swift`: the composition seen from yaw π shows the nearer petal at probe pixels (FR-A05-301–303)
+- [X] T-A05-304 [US1] Draw the 3D composition through `DepthMeshPass` in `Packages/ExperiencesCreative/InfiniteGeometry/Experience/GeometryPresenter.swift` (pass created in setup, released in teardown; 2D presets unchanged) and write `Packages/ExperiencesCreative/InfiniteGeometry/ExperienceTests/SolidOcclusionTests.swift`: the composition seen from yaw π shows the nearer petal at probe pixels (FR-A05-301–303) — Verified 2026-11-13: 2026-11-13 .autonomy/checks/A05-P03.experiences-ios27.json and .experiences-ios26.json (exit 0); SolidOcclusionTests 2/2 (12 probes per view; mutation with depth test off fails)
 
 ## Phase 4: User Story 2 — move around without breaking the view (P2)
 
