@@ -82,10 +82,11 @@ final class MusicLabPresetStore {
     ///   - choices: The scene's mapping choices, one per parameter.
     ///   - now: The saved time.
     @discardableResult
-    func save(name: String, scene: MusicLabScene, choices: [MappingChoice], now: Date = Date()) -> MusicPreset? {
+    func save(name: String, scene: MusicLabScene, choices: [MappingChoice], palette: MusicLabPalette = .aurora,
+              now: Date = Date()) -> MusicPreset? {
         let unique = MusicPreset.uniqueName(MusicPreset.clean(name), among: entries.map(\.name))
         guard let preset = MusicPreset(id: UUID(), name: unique, scene: scene, choices: choices, saved: now,
-                                       isBuiltIn: false) else {
+                                       isBuiltIn: false, palette: palette) else {
             lastMessage = "Couldn't save the preset: the mappings do not fit the scene."
             return nil
         }
@@ -117,7 +118,7 @@ final class MusicLabPresetStore {
         let others = entries.filter { $0.id != id }.map(\.name)
         let unique = MusicPreset.uniqueName(MusicPreset.clean(name), among: others)
         guard let renamed = MusicPreset(id: current.id, name: unique, scene: current.scene, choices: current.choices,
-                                        saved: current.saved, isBuiltIn: false) else {
+                                        saved: current.saved, isBuiltIn: false, palette: current.palette) else {
             lastMessage = "Couldn't rename the preset: it can't be read."
             return false
         }

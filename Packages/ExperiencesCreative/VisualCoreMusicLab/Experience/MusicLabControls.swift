@@ -10,6 +10,8 @@
 // Feature 050 (A06-P04) T-A06-406 (FR-A06-410, 411, 415): the status line with the source's condition and the recovery
 // button (Resume, Use demo signal), and the presets (built-ins and saved ones: Apply, Save current as…, Rename,
 // Delete with confirmation, the library's message).
+// Feature 051 (A06-P05) T-A06-507 (FR-A06-510, 512): the palette picker and the "Sound metrics (approximate)"
+// section, plain text exposed as an accessibility value, without animation or colour.
 import SwiftUI
 import UIKit
 import UniformTypeIdentifiers
@@ -105,6 +107,22 @@ struct MusicLabControls: View {
                         if state.scene != scene { _ = port.send("scene.select", [Double(scene.rawValue)]) }
                     }
                 }
+            }
+            section("Palette") {
+                ForEach(MusicLabPalette.allCases, id: \.rawValue) { palette in
+                    choice(palette.displayName, selected: state.palette == palette,
+                           identifier: "palette.\(palette.rawValue)", hint: "Colours the visuals \(palette.displayName)") {
+                        if state.palette != palette { _ = port.send("palette.select", [Double(palette.rawValue)]) }
+                    }
+                }
+            }
+            section("Sound metrics (approximate)") {
+                Text(verbatim: mirror.metricText.isEmpty ? "–" : mirror.metricText)
+                    .font(.body.monospacedDigit())
+                    .fixedSize(horizontal: false, vertical: true)
+                    .accessibilityLabel(Text(verbatim: "Sound metrics, approximate visual aid"))
+                    .accessibilityValue(Text(verbatim: mirror.metricText))
+                    .accessibilityIdentifier(port.identifier("metrics"))
             }
             mappingEditor(state)
             if let presets = presenter.presets { presetSection(presets) }

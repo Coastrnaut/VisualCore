@@ -51,13 +51,19 @@ public struct MusicLabCore: ExperienceCore, Equatable {
     /// Schema 2 since feature 049 (A06-P03, FR-A06-313): the step from schema 1 adds the Bars scene and the default
     /// mapping choices of every scene.
     public static var migrations: MigrationChain {
-        MigrationChain(currentVersion: 2, steps: [
+        MigrationChain(currentVersion: 3, steps: [
             1: { payload in
                 var upgraded = payload
                 upgraded["scene"] = MusicLabScene.bars.rawValue
                 upgraded["mappings"] = MusicLabScene.defaultMappings().map { list in
                     list.map { ["feature": $0.feature, "gain": $0.gain] as [String: Any] }
                 }
+                return upgraded
+            },
+            // Feature 051 (A06-P05, FR-A06-512): schema 3 adds the palette (Aurora).
+            2: { payload in
+                var upgraded = payload
+                upgraded["palette"] = MusicLabPalette.aurora.rawValue
                 return upgraded
             },
         ])
@@ -80,7 +86,9 @@ public struct MusicLabCore: ExperienceCore, Equatable {
             ExperienceControl(id: "mapping.set", ranges: [0...2, 0...2, 0...6, MappingChoice.gainRange]),
             ExperienceControl(id: "mapping.reset", ranges: [0...2]),
             ExperienceControl(id: "preset.apply", ranges: [0...2, 0...6, MappingChoice.gainRange, 0...6,
-                                                           MappingChoice.gainRange, 0...6, MappingChoice.gainRange]),
+                                                           MappingChoice.gainRange, 0...6, MappingChoice.gainRange,
+                                                           0...2]),
+            ExperienceControl(id: "palette.select", ranges: [0...2]),
         ]
     }
 
@@ -135,17 +143,23 @@ public struct MusicLabCore: ExperienceCore, Equatable {
             state.resetMappings(scene: scene)
         case "preset.apply":
             return applyPreset(v)
+        case "palette.select":
+            guard let x = v.first, let palette = MusicLabPalette(rawValue: Int(x.rounded())) else {
+                return .rejected(.outOfRange(index: 0))
+            }
+            state.select(palette: palette)
         default:
             return .rejected(.unknownControl(action.control))
         }
         return .accepted
     }
 
-    /// `preset.apply [scene, feature₀, gain₀, feature₁, gain₁, feature₂, gain₂]` (feature 050, FR-A06-413): sets the scene
-    /// and its choices; slots beyond the scene's parameter count must be zero (rule `a06.no-such-parameter`), an invalid
+    /// `preset.apply [scene, feature₀, gain₀, feature₁, gain₁, feature₂, gain₂, palette]` (feature 050, FR-A06-413; the
+    /// palette since feature 051): sets the scene, its choices and the palette; slots beyond the scene's parameter count must be zero (rule `a06.no-such-parameter`), an invalid
     /// choice is out of range. All-or-nothing: a refusal changes nothing.
     private mutating func applyPreset(_ v: [Double]) -> ActionResult {
-        guard v.count == 7 else { return .rejected(.wrongValueCount(expected: 7, found: v.count)) }
+        guard v.count == 8 else { return .rejected(.wrongValueCount(expected: 8, found: v.count)) }
+        guard let palette = MusicLabPalette(rawValue: Int(v[7].rounded())) else { return .rejected(.outOfRange(index: 7)) }
         guard let scene = MusicLabScene(rawValue: Int(v[0].rounded())) else { return .rejected(.outOfRange(index: 0)) }
         let count = scene.parameters.count
         var choices: [MappingChoice] = []
@@ -162,6 +176,7 @@ public struct MusicLabCore: ExperienceCore, Equatable {
         }
         var next = state
         next.select(scene: scene)
+        next.select(palette: palette)
         for (slot, choice) in choices.enumerated() { next.setMapping(scene: scene, slot: slot, choice: choice) }
         state = next
         return .accepted
@@ -189,6 +204,7 @@ public struct MusicLabCore: ExperienceCore, Equatable {
         builder.add(state.demoSeed)
         builder.add(state.demoMode)
         builder.add(state.scene.rawValue)
+        builder.add(state.palette.rawValue)
         for list in state.mappings {
             for choice in list {
                 builder.add(choice.feature)

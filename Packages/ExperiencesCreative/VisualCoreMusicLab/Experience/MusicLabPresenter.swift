@@ -31,6 +31,7 @@ import VisualCoreMath
 import VisualCoreMusicLabCore
 import VisualCoreRendering
 import VisualCoreScenes
+import VisualCoreUI
 
 /// What the controls show: the display copy of the state (with the file name), the status line and a message.
 @MainActor
@@ -53,6 +54,8 @@ final class MusicLabMirror {
     var condition: SourceCondition = .live
     /// The recovery the controls offer (feature 050).
     var recovery: Recovery = .none
+    /// The sound metrics as text (feature 051, FR-A06-510); empty before the first frame.
+    var metricText = ""
     /// "<source> — live", "— paused by the system" or "— stopped".
     var statusLine: String { "\(status) — \(condition.text)" }
 }
@@ -211,6 +214,19 @@ final class MusicLabPresenter: ExperiencePresenter {
     /// The display heights of the last frame.
     private(set) var lastDisplay = AnalysisDisplay.silent(bandCount: 16)
 
+    /// Where announcements go (feature 051; the system's VoiceOver announcements by default).
+    let announcementSink: any AnnouncementSink
+    /// Whether VoiceOver is running (feature 051; the system's answer by default).
+    let voiceOverRunning: @MainActor () -> Bool
+    private var announcementGate = AnnouncementGate()
+    /// The metric text of the last frame (feature 051).
+    private(set) var lastMetricText = ""
+    /// The analysis level of the current extractor (feature 051, from the host's tier).
+    private(set) var analysisLevel = 0
+    /// A tier that overrides the host's in tests (feature 051); nil in the app.
+    var forceTierForTesting: Int?
+    /// The palette drawn by the last frame (feature 051).
+    private(set) var lastPalette: MusicLabPalette = .aurora
     /// The preset library in the experience's own storage (feature 050); nil without storage (some tests).
     let presets: MusicLabPresetStore?
     /// Whether Reduce Motion is on: the Geometry scene's spin then stays at its range minimum (FR-A06-314).
@@ -228,8 +244,11 @@ final class MusicLabPresenter: ExperiencePresenter {
     private var meshes: GeometryMeshes?
 
     init(experienceID: ExperienceID, permission: any MicrophonePermission, factory: MusicLabSourceFactory = .system,
-         reduceMotion: Bool = false, storage: ExperienceStorage? = nil) {
+         reduceMotion: Bool = false, storage: ExperienceStorage? = nil,
+         announcementSink: (any AnnouncementSink)? = nil, voiceOverRunning: (@MainActor () -> Bool)? = nil) {
         self.experienceID = experienceID
+        self.announcementSink = announcementSink ?? SystemAnnouncementSink()
+        self.voiceOverRunning = voiceOverRunning ?? { UIAccessibility.isVoiceOverRunning }
         self.reduceMotion = reduceMotion
         presets = storage.map { MusicLabPresetStore(storage: $0) }
         self.permission = permission
@@ -284,7 +303,11 @@ final class MusicLabPresenter: ExperiencePresenter {
         lastDrawnTotalWritten = ring.totalWritten
         let drawn = max(0, min(count, scratch.count))
         lastDrawnSamples = Array(scratch.prefix(drawn))
-        analyze(drawn: drawn, frame: frame)
+        let tier = forceTierForTesting ?? tier
+        analyze(drawn: drawn, frame: frame, level: min(max(tier, AnalysisQuality.levels.lowerBound),
+                                                        AnalysisQuality.levels.upperBound))
+        lastPalette = core.state.palette
+        updateMetrics(frame: frame)
         updateParameters(core, frame: frame)
         lastScene = core.state.scene
         if lastScene == .geometry {
@@ -292,7 +315,9 @@ final class MusicLabPresenter: ExperiencePresenter {
             let values = lastParameterValues
             spinAngle = (spinAngle + values[1] * frame.delta).truncatingRemainder(dividingBy: 2 * Double.pi)
             if let meshes {
-                try meshes.draw(meshes.items(pulse: values[0], lift: values[2], angle: spinAngle, bars: lastDisplay.bars),
+                try meshes.draw(meshes.items(pulse: values[0], lift: values[2], angle: spinAngle, bars: lastDisplay.bars,
+                                             sphere: Self.vec(core.state.palette.sphere),
+                                             cube: Self.vec(core.state.palette.cube)),
                                 context: context)
             }
         }
@@ -352,10 +377,15 @@ final class MusicLabPresenter: ExperiencePresenter {
     }
 
     /// Analyses the newest `drawn` samples of `scratch` once for this frame (feature 048, FR-A06-210, 211).
-    private func analyze(drawn: Int, frame: FrameInfo) {
+    /// Since feature 051 the window size and band count follow the host's quality tier (`AnalysisQuality`); a change
+    /// of level or sample rate rebuilds the extractor and restarts the mappers (FR-A06-513).
+    private func analyze(drawn: Int, frame: FrameInfo, level: Int) {
         let rate = activeSource?.sampleRate ?? 48_000
-        if extractor == nil || extractor?.sampleRate != rate {
-            extractor = FeatureExtractor(size: Self.analysisSize, sampleRate: rate)
+        if extractor == nil || extractor?.sampleRate != rate || level != analysisLevel {
+            extractor = AnalysisQuality.makeExtractor(level: level, sampleRate: rate)
+            analysisLevel = level
+            lastFeatures = AudioFeatures.silent(bandCount: extractor?.layout.bandCount ?? 16)
+            resetMappers()
         }
         guard let extractor else { return }
         scratch.withUnsafeBufferPointer { all in
@@ -366,6 +396,25 @@ final class MusicLabPresenter: ExperiencePresenter {
         let bandDB = (0..<features.bandEnergies.count).map { features.bandDB($0) }
         lastDisplay = AnalysisDisplay(bandDB: bandDB, rmsDB: features.rmsDB, peakDB: features.peakDB,
                                       beat: features.beatEnergy)
+    }
+
+    /// The metric text of this frame, shown in the controls and announced (rate-limited, only while VoiceOver runs;
+    /// feature 051, FR-A06-510, 511).
+    private func updateMetrics(frame: FrameInfo) {
+        let features = lastFeatures
+        let text = MetricText.make(rmsDB: features.rmsDB,
+                                   regionEnergies: MetricText.regionEnergies(bandEnergies: features.bandEnergies),
+                                   beat: features.beatEnergy)
+        lastMetricText = text
+        if mirror.metricText != text { mirror.metricText = text }
+        if voiceOverRunning(), announcementGate.shouldAnnounce(text: text, at: frame.time) {
+            announcementSink.announce(text)
+        }
+    }
+
+    /// `color` as a scene colour.
+    static func vec(_ color: PaletteColor, scale: Double = 1) -> Vec4 {
+        Vec4(color.r * scale, color.g * scale, color.b * scale, color.a)
     }
 
     /// Places the centre line and the 1,023 segments for a view of `width` × `height` pixels (world = pixels from
@@ -394,6 +443,7 @@ final class MusicLabPresenter: ExperiencePresenter {
         for i in 1..<n {
             let point = Vec2(-width / 2 + Double(i) * dx, y(i))
             segments[i - 1].primitive = .line(previous, point, width: Self.lineWidth)
+            segments[i - 1].color = Self.vec(lastPalette.wave)
             previous = point
         }
         layOutAnalysis(width: width, height: height)
@@ -425,6 +475,7 @@ final class MusicLabPresenter: ExperiencePresenter {
             let points = RingLayout.points(ring: ring, samples: lastDrawnSamples, radius: values[0], wobble: values[1],
                                            short: short)
             for j in 0..<RingLayout.segments {
+                ringNodes[ring * RingLayout.segments + j].color = Self.vec(lastPalette.wave)
                 ringNodes[ring * RingLayout.segments + j].primitive =
                     .line(points[j], points[(j + 1) % RingLayout.segments], width: Self.lineWidth)
             }
@@ -432,6 +483,10 @@ final class MusicLabPresenter: ExperiencePresenter {
     }
 
     private func layOutAnalysis(width: Double, height: Double) {
+        let palette = lastPalette
+        levelNode.color = Self.vec(palette.level)
+        peakNode.color = Self.vec(palette.peak)
+        beatNode.color = Self.vec(palette.beat)
         let bottom = height / 2 - height * Self.barsBottomShare
         let span = height * (Self.barsBottomShare - Self.barsTopShare)
         let barsWidth = width * (1 - Self.metersShare)
@@ -443,7 +498,7 @@ final class MusicLabPresenter: ExperiencePresenter {
             let h = index < display.bars.count ? display.bars[index] * span * scale : 0
             node.primitive = .line(Vec2(x, bottom), Vec2(x, bottom + h), width: slot * 0.7)
             let glow = lastParameterValues.count > 1 ? lastParameterValues[1] : 1
-            node.color = Vec4(Self.barColor.x * glow, Self.barColor.y * glow, Self.barColor.z * glow, 1)
+            node.color = Self.vec(lastPalette.bar, scale: glow)
         }
         let column = width * Self.metersShare / 2
         let levelX = width / 2 - column * 1.5, beatX = width / 2 - column * 0.5
@@ -685,7 +740,7 @@ final class MusicLabPresenter: ExperiencePresenter {
     @discardableResult
     func saveCurrentPreset(named name: String) -> MusicPreset? {
         guard let presets, let state = lastCore?.state else { return nil }
-        return presets.save(name: name, scene: state.scene, choices: state.currentChoices)
+        return presets.save(name: name, scene: state.scene, choices: state.currentChoices, palette: state.palette)
     }
 
     /// "Use demo signal": switches to the demo after the microphone failed.
@@ -726,8 +781,9 @@ final class MusicLabPresenter: ExperiencePresenter {
     func describe(_ core: MusicLabCore) -> String {
         sync(core)
         let word = LevelWord.from(rmsDB: lastFeatures.rmsDB).rawValue
+        let metrics = lastMetricText.isEmpty ? "" : " \(lastMetricText)."
         return "Music Lab: \(core.state.scene.displayName) scene, \(mirror.status), level \(word)"
-            + "\(lastDisplay.isBeat ? ", beat" : "")."
+            + "\(lastDisplay.isBeat ? ", beat" : "")." + metrics
     }
 
     /// One background probe in the top-left corner, outside the waveform's band (10 %…50 % of the height) and the bars.
@@ -742,6 +798,6 @@ final class MusicLabPresenter: ExperiencePresenter {
     /// Every action has a native control; the permission mirror is sent by the Microphone button's flow.
     var nativeActions: Set<String> {
         ["source.demo", "source.microphone", "source.file", "demo.mode", "demo.reseed", "permission.mirror",
-         "scene.select", "mapping.set", "mapping.reset", "preset.apply"]
+         "scene.select", "mapping.set", "mapping.reset", "preset.apply", "palette.select"]
     }
 }

@@ -3,6 +3,7 @@
 import VisualCoreAudio
 import VisualCoreExperience
 import VisualCoreExperienceHost
+import VisualCoreUI
 
 /// Builds VisualCore Music Lab as an experience of the one app.
 public enum VisualCoreMusicLabExperience {
@@ -27,9 +28,11 @@ public enum VisualCoreMusicLabExperience {
     static func make(id: ExperienceID, permission: any MicrophonePermission,
                      factory: MusicLabSourceFactory = .system,
                      reduceMotion: Bool = false,
-                     storage: ExperienceStorage? = nil) -> ExperienceShell<MusicLabPresenter> {
+                     storage: ExperienceStorage? = nil, announcementSink: (any AnnouncementSink)? = nil,
+                     voiceOverRunning: (@MainActor () -> Bool)? = nil) -> ExperienceShell<MusicLabPresenter> {
         let presenter = MusicLabPresenter(experienceID: id, permission: permission, factory: factory,
-                                          reduceMotion: reduceMotion, storage: storage)
+                                          reduceMotion: reduceMotion, storage: storage,
+                                          announcementSink: announcementSink, voiceOverRunning: voiceOverRunning)
         let shell = ExperienceShell(id: id, presenter: presenter)
         presenter.port = shell.port
         return shell

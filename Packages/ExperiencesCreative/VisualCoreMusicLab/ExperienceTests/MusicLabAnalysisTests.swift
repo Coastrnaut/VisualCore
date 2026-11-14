@@ -86,7 +86,7 @@ final class MusicLabAnalysisTests: XCTestCase {
         let first = host.readPixels()
         XCTAssertTrue(host.renderOneFrame(present: false))
         XCTAssertEqual(host.readPixels(), first, "two frames of silence are identical")
-        XCTAssertTrue(shell.accessibilitySummary.hasSuffix("level quiet."), shell.accessibilitySummary)
+        XCTAssertTrue(shell.accessibilitySummary.contains("level quiet. Level silent"), shell.accessibilitySummary)
         session.close()
     }
 
@@ -103,7 +103,7 @@ final class MusicLabAnalysisTests: XCTestCase {
             if isBeat, !above {
                 beats += 1
                 // Convergence T-A06-216 (US1/AC3, FR-A06-212): the spoken description names the beat.
-                XCTAssertTrue(shell.presenter.describe(try XCTUnwrap(shell.engine.core)).hasSuffix(", beat."))
+                XCTAssertTrue(shell.presenter.describe(try XCTUnwrap(shell.engine.core)).contains(", beat. Level"))
             }
             above = isBeat
         }

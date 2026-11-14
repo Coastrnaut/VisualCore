@@ -24,7 +24,7 @@ public enum MusicLabRule {
 /// The state of Music Lab. Schema version 2.
 public struct MusicLabState: Sendable, Equatable, Codable {
     /// The schema version of the persisted fields (2 since feature 049: scene and mappings).
-    public static let schemaVersion = 2
+    public static let schemaVersion = 3
     /// The longest display name of a picked file, in characters.
     public static let fileNameLimit = 120
     /// The demo modes by index: melody (seeded tone sequence), 440 Hz tone, 1 kHz tone, silence.
@@ -48,6 +48,8 @@ public struct MusicLabState: Sendable, Equatable, Codable {
     public private(set) var scene: MusicLabScene = .bars
     /// The mapping choices per scene, in scene order; each list holds exactly its scene's parameter count.
     public private(set) var mappings: [[MappingChoice]] = MusicLabScene.defaultMappings()
+    /// The colour palette (feature 051, schema 3).
+    public private(set) var palette: MusicLabPalette = .aurora
 
     /// The first state: the demo signal's melody with `seed`, no file, permission not determined.
     public init(seed: UInt64) {
@@ -103,6 +105,11 @@ public struct MusicLabState: Sendable, Equatable, Codable {
         return String(trimmed.prefix(fileNameLimit))
     }
 
+    /// Selects `palette` (feature 051, FR-A06-512).
+    public mutating func select(palette: MusicLabPalette) {
+        self.palette = palette
+    }
+
     /// Selects `scene` (FR-A06-310).
     public mutating func select(scene: MusicLabScene) {
         self.scene = scene
@@ -139,7 +146,7 @@ public struct MusicLabState: Sendable, Equatable, Codable {
     // MARK: Coding (persisted fields only)
 
     private enum CodingKeys: String, CodingKey {
-        case source, demoSeed, demoMode, scene, mappings
+        case source, demoSeed, demoMode, scene, mappings, palette
     }
 
     /// Decodes the persisted fields; a demo mode outside `demoModeRange` is refused as corrupt data.
@@ -165,6 +172,12 @@ public struct MusicLabState: Sendable, Equatable, Codable {
         }
         self.scene = scene
         self.mappings = mappings
+        let paletteIndex = try c.decode(Int.self, forKey: .palette)
+        guard let palette = MusicLabPalette(rawValue: paletteIndex) else {
+            throw DecodingError.dataCorruptedError(forKey: .palette, in: c,
+                                                   debugDescription: "\(MusicLabRule.invalidState): palette \(paletteIndex)")
+        }
+        self.palette = palette
     }
 
     /// Encodes the persisted fields: source, demo seed, demo mode, scene index and mapping choices.
@@ -175,5 +188,6 @@ public struct MusicLabState: Sendable, Equatable, Codable {
         try c.encode(demoMode, forKey: .demoMode)
         try c.encode(scene.rawValue, forKey: .scene)
         try c.encode(mappings, forKey: .mappings)
+        try c.encode(palette.rawValue, forKey: .palette)
     }
 }

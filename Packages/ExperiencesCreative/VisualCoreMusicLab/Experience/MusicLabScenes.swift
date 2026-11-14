@@ -61,17 +61,18 @@ final class GeometryMeshes {
 
     /// The draw items: the sphere scaled by `pulse` and turned by `angle`, and cube i on the ring at `angle` + 2πi/16
     /// with height 0.15 + `lift` · bars[i] (bars are 0…1 display heights).
-    func items(pulse: Double, lift: Double, angle: Double, bars: [Double]) -> [DepthMeshPass.Item] {
+    func items(pulse: Double, lift: Double, angle: Double, bars: [Double], sphere sphereColor: Vec4 = GeometryMeshes.sphereColor,
+               cube cubeColor: Vec4 = GeometryMeshes.cubeColor) -> [DepthMeshPass.Item] {
         let turn = Mat4.rotation(Quat(axis: Vec3(0, 1, 0), angle: angle))
         var items = [DepthMeshPass.Item(renderer: sphere, model: turn * Mat4.scale(Vec3(pulse, pulse, pulse)),
-                                        color: Self.sphereColor)]
+                                        color: sphereColor)]
         for i in 0..<16 {
             let a = angle + 2 * Double.pi * Double(i) / 16
             let height = 0.15 + lift * (i < bars.count ? bars[i] : 0)
             let position = Vec3(cos(a) * Self.ringRadius, height / 2 - 0.8, sin(a) * Self.ringRadius)
             let model = Mat4.translation(position) * Mat4.rotation(Quat(axis: Vec3(0, 1, 0), angle: -a))
                 * Mat4.scale(Vec3(0.3, height, 0.3))
-            items.append(DepthMeshPass.Item(renderer: cube, model: model, color: Self.cubeColor))
+            items.append(DepthMeshPass.Item(renderer: cube, model: model, color: cubeColor))
         }
         return items
     }

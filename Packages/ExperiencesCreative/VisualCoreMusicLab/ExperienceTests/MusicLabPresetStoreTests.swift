@@ -145,7 +145,7 @@ final class MusicLabPresetStoreTests: XCTestCase {
         let garbageName = MusicPreset.fileName(for: garbageID)
         let newerName = MusicPreset.fileName(for: newerID)
         let garbage = Data("not a preset {".utf8)
-        let newerFile = Data(("{\"choices\":[{\"feature\":0,\"gain\":1},{\"feature\":2,\"gain\":1}],\"format\":2,"
+        let newerFile = Data(("{\"choices\":[{\"feature\":0,\"gain\":1},{\"feature\":2,\"gain\":1}],\"format\":3,"
                               + "\"id\":\"\(newerID.uuidString)\",\"name\":\"Future\",\"palette\":3,\"saved\":0,"
                               + "\"scene\":0}").utf8)
         try storage.write(garbage, to: garbageName)

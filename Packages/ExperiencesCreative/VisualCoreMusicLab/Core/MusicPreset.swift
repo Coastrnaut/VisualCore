@@ -6,8 +6,9 @@ import Foundation
 
 /// A saved Music Lab preset: a name, a scene and one mapping choice per parameter of that scene.
 public struct MusicPreset: Sendable, Equatable, Identifiable {
-    /// The file format written by `fileData()`; greater formats are refused as `.newer`.
-    public static let format = 1
+    /// The file format written by `fileData()` (2 since feature 051: the palette); format 1 is still read (palette
+    /// Aurora); greater formats are refused as `.newer`.
+    public static let format = 2
     /// The maximum number of characters of a preset name.
     public static let nameLimit = 60
 
@@ -23,6 +24,8 @@ public struct MusicPreset: Sendable, Equatable, Identifiable {
     public let saved: Date
     /// Whether the preset is one of the read-only built-ins (not written to files).
     public let isBuiltIn: Bool
+    /// The colour palette (feature 051, FR-A06-512).
+    public let palette: MusicLabPalette
 
     /// Creates a preset, or returns `nil` when the number of choices differs from the scene's parameter count or any
     /// choice is out of range. The name is cleaned with `clean(_:)`.
@@ -34,7 +37,8 @@ public struct MusicPreset: Sendable, Equatable, Identifiable {
     ///   - saved: The save time.
     ///   - isBuiltIn: Whether the preset is a read-only built-in.
     public init?(
-        id: UUID, name: String, scene: MusicLabScene, choices: [MappingChoice], saved: Date, isBuiltIn: Bool = false
+        id: UUID, name: String, scene: MusicLabScene, choices: [MappingChoice], saved: Date, isBuiltIn: Bool = false,
+        palette: MusicLabPalette = .aurora
     ) {
         guard choices.count == scene.parameters.count, choices.allSatisfy(\.isValid) else { return nil }
         self.id = id
@@ -43,6 +47,7 @@ public struct MusicPreset: Sendable, Equatable, Identifiable {
         self.choices = choices
         self.saved = saved
         self.isBuiltIn = isBuiltIn
+        self.palette = palette
     }
 
     // MARK: Names
@@ -82,19 +87,19 @@ public struct MusicPreset: Sendable, Equatable, Identifiable {
     /// The three read-only built-in presets, one per scene: "Spectrum" (bars), "Waveform rings" (rings) and
     /// "Pulse geometry" (geometry), each with curated choices that differ from the scene defaults.
     public static let builtIns: [MusicPreset] = [
-        builtIn("00000000-0000-4000-8000-0000000006a1", "Spectrum", .bars, [(0, 1.5), (2, 1)]),
-        builtIn("00000000-0000-4000-8000-0000000006a2", "Waveform rings", .rings, [(3, 1.2), (6, 2)]),
-        builtIn("00000000-0000-4000-8000-0000000006a3", "Pulse geometry", .geometry, [(2, 1.5), (5, 1), (3, 1.5)]),
+        builtIn("00000000-0000-4000-8000-0000000006a1", "Spectrum", .bars, [(0, 1.5), (2, 1)], .aurora),
+        builtIn("00000000-0000-4000-8000-0000000006a2", "Waveform rings", .rings, [(3, 1.2), (6, 2)], .ember),
+        builtIn("00000000-0000-4000-8000-0000000006a3", "Pulse geometry", .geometry, [(2, 1.5), (5, 1), (3, 1.5)], .mono),
     ]
 
     private static func builtIn(
-        _ id: String, _ name: String, _ scene: MusicLabScene, _ pairs: [(Int, Double)]
+        _ id: String, _ name: String, _ scene: MusicLabScene, _ pairs: [(Int, Double)], _ palette: MusicLabPalette
     ) -> MusicPreset {
         let choices = pairs.compactMap { MappingChoice(feature: $0.0, gain: $0.1) }
         guard let uuid = UUID(uuidString: id),
             let preset = MusicPreset(
                 id: uuid, name: name, scene: scene, choices: choices,
-                saved: Date(timeIntervalSinceReferenceDate: 0), isBuiltIn: true)
+                saved: Date(timeIntervalSinceReferenceDate: 0), isBuiltIn: true, palette: palette)
         else {
             preconditionFailure("built-in preset \(name) is invalid")
         }
@@ -103,8 +108,8 @@ public struct MusicPreset: Sendable, Equatable, Identifiable {
 
     // MARK: Apply action
 
-    /// The seven values of the `preset.apply` action: `[scene, feature0, gain0, feature1, gain1, feature2, gain2]`,
-    /// with zeros for slots the scene does not have.
+    /// The eight values of the `preset.apply` action: `[scene, feature0, gain0, feature1, gain1, feature2, gain2,
+    /// palette]`, with zeros for slots the scene does not have (the palette since feature 051).
     public var actionValues: [Double] {
         var values = [Double(scene.rawValue)]
         for slot in 0..<3 {
@@ -116,6 +121,7 @@ public struct MusicPreset: Sendable, Equatable, Identifiable {
                 values.append(0)
             }
         }
+        values.append(Double(palette.rawValue))
         return values
     }
 
@@ -141,15 +147,16 @@ public struct MusicPreset: Sendable, Equatable, Identifiable {
         let name: String
         let saved: Double
         let scene: Int
+        let palette: Int?
     }
 
-    /// Encodes the preset as format-1 JSON with sorted keys `choices`, `format`, `id`, `name`, `saved` (seconds since
-    /// 2001-01-01) and `scene`. `isBuiltIn` is not coded.
+    /// Encodes the preset as format-2 JSON with sorted keys `choices`, `format`, `id`, `name`, `palette`, `saved` (seconds
+    /// since 2001-01-01) and `scene`. `isBuiltIn` is not coded.
     /// - Returns: The file contents.
     public func fileData() throws -> Data {
         let body = FileBody(
             choices: choices, format: Self.format, id: id.uuidString, name: name,
-            saved: saved.timeIntervalSinceReferenceDate, scene: scene.rawValue)
+            saved: saved.timeIntervalSinceReferenceDate, scene: scene.rawValue, palette: palette.rawValue)
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.sortedKeys]
         return try encoder.encode(body)
@@ -165,14 +172,16 @@ public struct MusicPreset: Sendable, Equatable, Identifiable {
         let decoder = JSONDecoder()
         guard let probe = try? decoder.decode(FormatProbe.self, from: data) else { throw .malformed }
         if probe.format > format { throw .newer(probe.format) }
-        guard probe.format == format,
+        guard probe.format >= 1,
             let body = try? decoder.decode(FileBody.self, from: data),
+            probe.format == 1 || body.palette != nil,
+            let palette = MusicLabPalette(rawValue: body.palette ?? 0),
             let id = UUID(uuidString: body.id), id == fileID,
             let scene = MusicLabScene(rawValue: body.scene),
             body.saved.isFinite,
             let preset = MusicPreset(
                 id: id, name: body.name, scene: scene, choices: body.choices,
-                saved: Date(timeIntervalSinceReferenceDate: body.saved))
+                saved: Date(timeIntervalSinceReferenceDate: body.saved), palette: palette)
         else { throw .malformed }
         return preset
     }

@@ -28,8 +28,8 @@ private func core(_ engine: ExperienceEngine<MusicLabCore>) throws -> MusicLabCo
         #expect(VisualCoreMusicLabExperience.id?.rawValue == "a06.visualcore-music-lab")
         #expect(MusicLabCore.controls.map(\.id)
                 == ["source.demo", "source.microphone", "source.file", "demo.mode", "demo.reseed", "permission.mirror",
-                    "scene.select", "mapping.set", "mapping.reset", "preset.apply"])
-        #expect(MusicLabCore.migrations.currentVersion == 2)
+                    "scene.select", "mapping.set", "mapping.reset", "preset.apply", "palette.select"])
+        #expect(MusicLabCore.migrations.currentVersion == 3)
     }
 
     @Test func conformancePassesOverFourSeeds() async {
@@ -40,12 +40,13 @@ private func core(_ engine: ExperienceEngine<MusicLabCore>) throws -> MusicLabCo
                       ScriptedAction("source.demo"), ScriptedAction("demo.mode", [3]),
                       ScriptedAction("permission.mirror", [2]), ScriptedAction("scene.select", [2]),
                       ScriptedAction("mapping.set", [2, 1, 4, 1.5]), ScriptedAction("mapping.reset", [2]),
-                      ScriptedAction("preset.apply", [1, 3, 1.2, 6, 2, 0, 0])],
+                      ScriptedAction("preset.apply", [1, 3, 1.2, 6, 2, 0, 0, 1]),
+                      ScriptedAction("palette.select", [2])],
             rejected: [ScriptedAction("demo.mode", [4]), ScriptedAction("demo.mode", [.nan]),
                        ScriptedAction("source.demo", [1]), ScriptedAction("permission.mirror", [9]),
                        ScriptedAction("scene.select", [3]), ScriptedAction("mapping.set", [0, 0, 7, 1]),
-                       ScriptedAction("mapping.set", [0, 0, 1, 4.5]), ScriptedAction("preset.apply", [0, 0, 1, 2, 1, 3, 1]),
-                       ScriptedAction("bogus")])
+                       ScriptedAction("mapping.set", [0, 0, 1, 4.5]), ScriptedAction("preset.apply", [0, 0, 1, 2, 1, 3, 1, 0]),
+                       ScriptedAction("palette.select", [3]), ScriptedAction("bogus")])
         let report = await ExperienceConformance.run(MusicLabCore.self, id: id, plan: plan)
         for entry in report.entries { #expect(entry.passed, "\(entry.check): \(entry.detail)") }
     }
@@ -117,7 +118,7 @@ private func core(_ engine: ExperienceEngine<MusicLabCore>) throws -> MusicLabCo
         #expect(first.handle(control: "demo.mode", values: [1]).isAccepted)
         #expect(first.handle(control: "demo.reseed").isAccepted)
         let snapshot = try first.snapshot()
-        #expect(snapshot.schemaVersion == 2)
+        #expect(snapshot.schemaVersion == 3)
         let decoded = try ExperienceSnapshot(data: snapshot.encoded())
         var second = try await engine(seed: 3)
         try second.restore(decoded)
@@ -187,8 +188,8 @@ private func core(_ engine: ExperienceEngine<MusicLabCore>) throws -> MusicLabCo
     @Test func aDamagedMappingPayloadIsRefused() async throws {
         var engine = try await engine()
         let before = try engine.digest()
-        let payload = Data(#"{"demoMode":0,"demoSeed":7,"mappings":[[{"feature":9,"gain":1}]],"scene":0,"source":"demo"}"#.utf8)
-        let snapshot = try ExperienceSnapshot(experience: id, schemaVersion: 2, seed: 7, stepIndex: 0, digest: before,
+        let payload = Data(#"{"demoMode":0,"demoSeed":7,"mappings":[[{"feature":9,"gain":1}]],"palette":0,"scene":0,"source":"demo"}"#.utf8)
+        let snapshot = try ExperienceSnapshot(experience: id, schemaVersion: 3, seed: 7, stepIndex: 0, digest: before,
                                               payload: payload)
         #expect(throws: ExperienceError.self) { try engine.restore(snapshot) }
         #expect(try engine.digest() == before)
@@ -198,7 +199,7 @@ private func core(_ engine: ExperienceEngine<MusicLabCore>) throws -> MusicLabCo
     @Test func applyingAPresetSetsTheSceneAndItsChoices() async throws {
         var engine = try await engine()
         let before = try engine.digest()
-        #expect(engine.handle(control: "preset.apply", values: [2, 2, 1.5, 5, 1, 3, 1.5]).isAccepted)
+        #expect(engine.handle(control: "preset.apply", values: [2, 2, 1.5, 5, 1, 3, 1.5, 1]).isAccepted)
         let state = try core(engine).state
         #expect(state.scene == .geometry)
         #expect(state.mappings[2] == [MappingChoice(feature: 2, gain: 1.5)!, MappingChoice(feature: 5, gain: 1)!,
@@ -209,9 +210,34 @@ private func core(_ engine: ExperienceEngine<MusicLabCore>) throws -> MusicLabCo
     @Test func aPresetWithValuesForAMissingSlotIsRefusedAndChangesNothing() async throws {
         var engine = try await engine()
         let before = try engine.digest()
-        #expect(engine.handle(control: "preset.apply", values: [0, 0, 1, 2, 1, 3, 1])
+        #expect(engine.handle(control: "preset.apply", values: [0, 0, 1, 2, 1, 3, 1, 0])
                 == .rejected(.rule(code: MusicLabRule.noSuchParameter)))
-        #expect(engine.handle(control: "preset.apply", values: [0, 0, 1]) == .rejected(.wrongValueCount(expected: 7, found: 3)))
+        #expect(engine.handle(control: "preset.apply", values: [0, 0, 1]) == .rejected(.wrongValueCount(expected: 8, found: 3)))
         #expect(try engine.digest() == before)
+    }
+
+    // Feature 051 (A06-P05) T-A06-506: the palette.
+    @Test func thePaletteActionAndPresetPaletteChangeTheDigest() async throws {
+        var engine = try await engine()
+        let before = try engine.digest()
+        #expect(engine.handle(control: "palette.select", values: [1]).isAccepted)
+        #expect(try core(engine).state.palette == .ember)
+        let afterPalette = try engine.digest()
+        #expect(afterPalette != before)
+        #expect(engine.handle(control: "preset.apply", values: [0, 0, 1, 2, 1, 0, 0, 2]).isAccepted)
+        #expect(try core(engine).state.palette == .mono)
+        #expect(engine.handle(control: "palette.select", values: [3]) == .rejected(.outOfRange(index: 0)))
+    }
+
+    @Test func aSchemaTwoPayloadRestoresWithAurora() async throws {
+        var engine = try await engine(seed: 5)
+        let payload = Data(#"{"demoMode":1,"demoSeed":5,"mappings":[[{"feature":0,"gain":1},{"feature":2,"gain":1}],[{"feature":0,"gain":1},{"feature":5,"gain":1}],[{"feature":2,"gain":1},{"feature":0,"gain":1},{"feature":3,"gain":1}]],"scene":2,"source":"demo"}"#.utf8)
+        let snapshot = try ExperienceSnapshot(experience: id, schemaVersion: 2, seed: 5, stepIndex: 0,
+                                              digest: try engine.digest(), payload: payload)
+        try engine.restore(snapshot)
+        let state = try core(engine).state
+        #expect(state.palette == .aurora)
+        #expect(state.scene == .geometry)
+        #expect(state.demoMode == 1)
     }
 }

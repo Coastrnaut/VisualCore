@@ -1,6 +1,6 @@
 // MusicPresetTests — feature 050 (A06-P04) T-A06-403 (FR-A06-411, FR-A06-412, FR-A06-413; spec clarifications 3–4;
 // data-model "MusicPreset"; research D5, D6). Name cleaning and uniqueness, validation of choices, the three
-// read-only built-ins, the seven `preset.apply` action values, the format-1 file round trip, refusal of newer and
+// read-only built-ins, the eight `preset.apply` action values (seven before feature 051), the format-2 file round trip, refusal of newer and
 // malformed files, and the file-name/id round trip.
 import Foundation
 import Testing
@@ -104,10 +104,11 @@ import VisualCoreMusicLabCore
     // MARK: Action values
 
     @Test func actionValuesFillMissingSlotsWithZero() {
-        #expect(Self.sample().actionValues == [0, 1, 2.5, 6, 0.75, 0, 0])
-        #expect(MusicPreset.builtIns[1].actionValues == [1, 3, 1.2, 6, 2, 0, 0])
-        #expect(MusicPreset.builtIns[2].actionValues == [2, 2, 1.5, 5, 1, 3, 1.5])
-        #expect(MusicPreset.builtIns.allSatisfy { $0.actionValues.count == 7 })
+        // Eight values since feature 051: the palette last.
+        #expect(Self.sample().actionValues == [0, 1, 2.5, 6, 0.75, 0, 0, 0])
+        #expect(MusicPreset.builtIns[1].actionValues == [1, 3, 1.2, 6, 2, 0, 0, 1])
+        #expect(MusicPreset.builtIns[2].actionValues == [2, 2, 1.5, 5, 1, 3, 1.5, 2])
+        #expect(MusicPreset.builtIns.allSatisfy { $0.actionValues.count == 8 })
     }
 
     // MARK: File coding
@@ -117,16 +118,38 @@ import VisualCoreMusicLabCore
         let data = try preset.fileData()
         let text = String(decoding: data, as: UTF8.self)
         #expect(text.hasPrefix("{\"choices\":"))
-        #expect(text.contains("\"format\":1"))
+        #expect(text.contains("\"format\":2"))
         let object = try JSONSerialization.jsonObject(with: data) as? [String: Any]
-        let keys: Set<String> = ["choices", "format", "id", "name", "saved", "scene"]
+        let keys: Set<String> = ["choices", "format", "id", "name", "palette", "saved", "scene"]
         #expect(object.map { Set($0.keys) } == keys)
         let decoded = try MusicPreset.decode(data, fileID: Self.fileID)
         #expect(decoded.isBuiltIn == false)
         let expected = MusicPreset(
             id: preset.id, name: preset.name, scene: preset.scene, choices: preset.choices, saved: preset.saved)
         #expect(decoded == expected)
-        #expect(MusicPreset.format == 1)
+        #expect(MusicPreset.format == 2)
+    }
+
+    // Feature 051 (A06-P05) T-A06-505: the palette in format 2; format 1 reads as Aurora.
+    @Test func thePaletteRoundTripsAndFormatOneReadsAsAurora() throws {
+        let preset = try #require(MusicPreset(id: Self.fileID, name: "Warm", scene: .rings,
+                                              choices: MusicLabScene.rings.defaultChoices, saved: Date(),
+                                              palette: .ember))
+        #expect(try MusicPreset.decode(preset.fileData(), fileID: Self.fileID).palette == .ember)
+        let formatOne = Self.validObject()
+        #expect(try MusicPreset.decode(Self.json(formatOne), fileID: Self.fileID).palette == .aurora)
+        var badPalette = Self.validObject()
+        badPalette["format"] = 2
+        badPalette["palette"] = 5
+        #expect(throws: MusicPreset.FileError.malformed) {
+            try MusicPreset.decode(Self.json(badPalette), fileID: Self.fileID)
+        }
+        var missingPalette = Self.validObject()
+        missingPalette["format"] = 2
+        #expect(throws: MusicPreset.FileError.malformed) {
+            try MusicPreset.decode(Self.json(missingPalette), fileID: Self.fileID)
+        }
+        #expect(MusicPreset.builtIns.map(\.palette) == [.aurora, .ember, .mono])
     }
 
     @Test func builtInRoundTripDropsTheFlag() throws {
@@ -139,8 +162,8 @@ import VisualCoreMusicLabCore
 
     @Test func newerFormatIsRefused() {
         var object = Self.validObject()
-        object["format"] = 2
-        #expect(throws: MusicPreset.FileError.newer(2)) {
+        object["format"] = 3
+        #expect(throws: MusicPreset.FileError.newer(3)) {
             try MusicPreset.decode(Self.json(object), fileID: Self.fileID)
         }
         #expect(throws: MusicPreset.FileError.newer(7)) {

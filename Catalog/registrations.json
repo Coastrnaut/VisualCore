@@ -121,7 +121,9 @@
         "waveform"
       ],
       "quality_tiers": [
-        "level-0"
+        "level-0",
+        "level-1",
+        "level-2"
       ],
       "palette": [
         "#05070D",

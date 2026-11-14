@@ -79,7 +79,7 @@ import VisualCoreMusicLabCore
         state.setDemoMode(2)
         let data = try JSONEncoder().encode(state)
         let object = try #require(try JSONSerialization.jsonObject(with: data) as? [String: Any])
-        #expect(Set(object.keys) == ["source", "demoSeed", "demoMode", "scene", "mappings"])
+        #expect(Set(object.keys) == ["source", "demoSeed", "demoMode", "scene", "mappings", "palette"])
         let decoded = try JSONDecoder().decode(MusicLabState.self, from: data)
         #expect(decoded.source == .file)
         #expect(decoded.demoSeed == 0xFFFF_FFFF_FFFF_FFFF)
@@ -128,6 +128,20 @@ import VisualCoreMusicLabCore
         }
         object["scene"] = 0
         object["mappings"] = [[["feature": 0, "gain": 1]]]
+        #expect(throws: (any Error).self) {
+            try JSONDecoder().decode(MusicLabState.self, from: JSONSerialization.data(withJSONObject: object))
+        }
+    }
+
+    // Feature 051 (A06-P05) T-A06-505: the palette.
+    @Test func thePalettePersistsAndAnInvalidOneIsRefused() throws {
+        var state = MusicLabState(seed: 2)
+        #expect(state.palette == .aurora)
+        state.select(palette: .mono)
+        let data = try JSONEncoder().encode(state)
+        #expect(try JSONDecoder().decode(MusicLabState.self, from: data).palette == .mono)
+        var object = try #require(try JSONSerialization.jsonObject(with: data) as? [String: Any])
+        object["palette"] = 3
         #expect(throws: (any Error).self) {
             try JSONDecoder().decode(MusicLabState.self, from: JSONSerialization.data(withJSONObject: object))
         }
