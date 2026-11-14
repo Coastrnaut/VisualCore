@@ -12,6 +12,7 @@ public enum AudioSessionEvent: Equatable, Sendable {
 }
 public protocol ResumableAudioSource: AudioSource {   // analyze U1: the presenter resumes through this protocol
   func resume()
+  var awaitsResume: Bool { get }   // true only after an interruption ended without permission to resume
 }
 extension MicrophoneAudioSource: ResumableAudioSource {
   public func handle(_ event: AudioSessionEvent)      // reactions per research D4
