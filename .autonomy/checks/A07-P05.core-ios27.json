@@ -1,0 +1,26 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/ExperiencesCreative",
+    "--scheme",
+    "ExperiencesCreative-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--only-testing",
+    "AudioOdysseyCoreTests"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing AudioOdysseyCoreTests",
+  "elapsed_seconds": 16.397,
+  "exit_code": 0,
+  "finished": "2026-11-14T14:41:35+00:00",
+  "log": ".autonomy/logs/A07-P05.core-ios27.log",
+  "log_sha256": "768a6527b0398f55c5a5fd3408705b871b127c2ce91d6c607392ed7a16f044cf",
+  "name": "core-ios27",
+  "stage": "A07-P05",
+  "started": "2026-11-14T14:41:18+00:00",
+  "timed_out": false
+}
