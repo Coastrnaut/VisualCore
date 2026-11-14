@@ -32,7 +32,7 @@ before this record (CHK010).
 
 ## Accessibility and privacy
 
-- [x] CHK010 Are accessibility requirements for the controls and Reduce Motion stated as functional requirements? [Spec §FR-A09-123] — failed at first (only an edge-case note without a measure); FR-A09-123 now requires labels and values and halves sway and random turning under Reduce Motion.
+- [x] CHK010 Are accessibility requirements for the controls and Reduce Motion stated as functional requirements? [Spec §FR-A09-123] — failed at first (only an edge-case note without a measure); FR-A09-123 now requires labels and values and halves the drawn motion (sway, tail swing) under Reduce Motion; the state stays independent of the preference.
 - [x] CHK011 Is the absence of permissions and network stated? [Spec §Negative Requirements] — yes.
 
 ## Release constraints and licenses

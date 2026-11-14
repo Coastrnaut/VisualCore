@@ -146,7 +146,7 @@ load preserves species, decor transforms and lighting" and "background/resume do
 - **Too many fish:** fish counts per habitat are capped; a habitat asking more is refused.
 - **Very small screens or iPad landscape:** the aquarium fills the canvas with the same habitat coordinates; drawing
   scales, the simulation does not.
-- **Reduce Motion:** fish keep swimming (the display stays alive) but plant sway and the fish's random turning are halved
+- **Reduce Motion:** fish keep swimming (the display stays alive) but plant sway and tail swing are halved
   (FR-A09-123); the preference is presentation only.
 - **Non-finite numbers in a saved state or catalog:** refused.
 
@@ -177,8 +177,10 @@ load preserves species, decor transforms and lighting" and "background/resume do
   with a spoken description naming the habitat, the species and the fish count.
 - **FR-A09-121**: The person MUST be able to choose a starter habitat and to pause and resume the motion; the state MUST
   be saved and restored by the host.
-- **FR-A09-123**: Every control MUST have a VoiceOver label and value; with Reduce Motion on, plant sway and the fish's
-  random turning MUST be halved while the fish keep swimming (the state and digest do not depend on the preference).
+- **FR-A09-123**: Every control MUST have a VoiceOver label and value; with Reduce Motion on, the drawn motion (plant sway
+  and the fish's tail swing) MUST be halved while the fish keep swimming; the simulated paths, the state and the digest
+  do not depend on the preference (resolved at implementation, 2026-11-14: halving the random turning would have made
+  the state depend on it).
 - **FR-A09-122**: The experience MUST be registered as a candidate with a scenario manifest holding the nine standard
   scenarios and fixtures for the swim bounds, save/restore, no fast-forward on resume, catalog refusal and bounded
   counts.
