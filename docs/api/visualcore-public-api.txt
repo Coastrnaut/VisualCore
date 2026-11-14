@@ -31,28 +31,62 @@ VisualCoreAudio | protocol | public protocol MicrophonePermission: AnyObject
 VisualCoreAudio | var | public private(set) var sampleRate: Double
 VisualCoreAudio | var | public private(set) var state: AudioSourceState
 VisualCoreAudio | var | public var state: MicrophonePermissionState
+VisualCoreAudioDSP | class | public final class FeatureExtractor
 VisualCoreAudioDSP | class | public final class SampleRingBuffer: @unchecked Sendable
+VisualCoreAudioDSP | class | public final class SpectrumWorkspace
 VisualCoreAudioDSP | enum | public enum AudioDSPInfo
+VisualCoreAudioDSP | enum | public enum LevelMeter
 VisualCoreAudioDSP | enum | public enum Mode: Int, Sendable, CaseIterable
+VisualCoreAudioDSP | func | public func analyze(_ samples: UnsafeBufferPointer<Float>, time: Double, elapsed: Double) -> AudioFeatures
+VisualCoreAudioDSP | func | public func bandDB(_ index: Int) -> Float
 VisualCoreAudioDSP | func | public func latest(_ count: Int, into out: inout [Float]) -> Int
 VisualCoreAudioDSP | func | public func magnitudesDB(_ frame: [Float]) -> [Float]
+VisualCoreAudioDSP | func | public func powerSpectrum(_ frame: UnsafeBufferPointer<Float>, into power: UnsafeMutableBufferPointer<Float>,
+VisualCoreAudioDSP | func | public func reset()
 VisualCoreAudioDSP | func | public func write(_ samples: UnsafeBufferPointer<Float>)
 VisualCoreAudioDSP | func | public mutating func render(into out: UnsafeMutableBufferPointer<Float>)
+VisualCoreAudioDSP | func | public mutating func reset()
+VisualCoreAudioDSP | func | public mutating func update(flux: Float, time: Double) -> Bool
+VisualCoreAudioDSP | func | public mutating func update(target: Float, elapsed: Double) -> Float
+VisualCoreAudioDSP | func | public static func dBFS(_ amplitude: Float) -> Float
 VisualCoreAudioDSP | func | public static func expectedBin(frequency: Double, sampleRate: Double, size: Int) -> Int
+VisualCoreAudioDSP | func | public static func peak(_ samples: UnsafeBufferPointer<Float>) -> Float
 VisualCoreAudioDSP | func | public static func peakBin(_ magnitudesDB: [Float]) -> Int?
+VisualCoreAudioDSP | func | public static func rms(_ samples: UnsafeBufferPointer<Float>) -> Float
+VisualCoreAudioDSP | func | public static func silent(bandCount: Int) -> AudioFeatures
+VisualCoreAudioDSP | init | public init(attack: Double, release: Double)
 VisualCoreAudioDSP | init | public init(capacity: Int)
+VisualCoreAudioDSP | init | public init(historyCount: Int = 43, multiple: Float = 1.5, minimum: Float = 1e-4, minimumInterval: Double = 0.1)
 VisualCoreAudioDSP | init | public init(seed: UInt64, mode: Mode, sampleRate: Double = 48_000)
+VisualCoreAudioDSP | init | public init(timestamp: Double, rms: Float, peak: Float, bandEnergies: [Float], flux: Float, onset: Bool,
+VisualCoreAudioDSP | init | public init?(bandCount: Int = 16, lowestFrequency: Double = 40, highestFrequency: Double = 16_000,
+VisualCoreAudioDSP | init | public init?(size: Int = 1_024, sampleRate: Double, bandCount: Int = 16)
 VisualCoreAudioDSP | init | public init?(size: Int)
+VisualCoreAudioDSP | let | public let attack: Double
+VisualCoreAudioDSP | let | public let bandCount: Int
+VisualCoreAudioDSP | let | public let bins: [Range<Int>]
 VisualCoreAudioDSP | let | public let capacity: Int
+VisualCoreAudioDSP | let | public let highestFrequency: Double
+VisualCoreAudioDSP | let | public let historyCount: Int
+VisualCoreAudioDSP | let | public let layout: BandLayout
+VisualCoreAudioDSP | let | public let lowestFrequency: Double
+VisualCoreAudioDSP | let | public let minimum: Float
+VisualCoreAudioDSP | let | public let minimumInterval: Double
 VisualCoreAudioDSP | let | public let mode: Mode
+VisualCoreAudioDSP | let | public let multiple: Float
+VisualCoreAudioDSP | let | public let release: Double
 VisualCoreAudioDSP | let | public let sampleRate: Double
 VisualCoreAudioDSP | let | public let seed: UInt64
 VisualCoreAudioDSP | let | public let size: Int
+VisualCoreAudioDSP | let | public static let beatAttack: Double
+VisualCoreAudioDSP | let | public static let beatRelease: Double
 VisualCoreAudioDSP | let | public static let floorDB: Float
+VisualCoreAudioDSP | let | public static let maximumBandCount
 VisualCoreAudioDSP | let | public static let maximumCapacity
 VisualCoreAudioDSP | let | public static let maximumSize
 VisualCoreAudioDSP | let | public static let minimumCapacity
 VisualCoreAudioDSP | let | public static let minimumSize
+VisualCoreAudioDSP | let | public static let minimumTimeConstant: Double
 VisualCoreAudioDSP | let | public static let noiseAmplitude: Float
 VisualCoreAudioDSP | let | public static let noteDuration
 VisualCoreAudioDSP | let | public static let pentatonic: [Double]
@@ -60,8 +94,25 @@ VisualCoreAudioDSP | let | public static let sequenceAmplitude: Float
 VisualCoreAudioDSP | let | public static let silenceThresholdDB: Float
 VisualCoreAudioDSP | let | public static let toneAmplitude: Float
 VisualCoreAudioDSP | let | public static let version
+VisualCoreAudioDSP | struct | public struct AudioFeatures: Sendable, Equatable
+VisualCoreAudioDSP | struct | public struct BandLayout: Sendable, Equatable
 VisualCoreAudioDSP | struct | public struct DemoSignal: Sendable
+VisualCoreAudioDSP | struct | public struct FeatureSmoother: Sendable, Equatable
+VisualCoreAudioDSP | struct | public struct OnsetDetector: Sendable
 VisualCoreAudioDSP | struct | public struct SpectrumAnalyzer: Sendable
+VisualCoreAudioDSP | var | public private(set) var features: AudioFeatures
+VisualCoreAudioDSP | var | public private(set) var value: Float
+VisualCoreAudioDSP | var | public var bandEnergies: [Float]
+VisualCoreAudioDSP | var | public var beatEnergy: Float
+VisualCoreAudioDSP | var | public var flux: Float
+VisualCoreAudioDSP | var | public var onset: Bool
+VisualCoreAudioDSP | var | public var peak: Float
+VisualCoreAudioDSP | var | public var peakDB: Float
+VisualCoreAudioDSP | var | public var rms: Float
+VisualCoreAudioDSP | var | public var rmsDB: Float
+VisualCoreAudioDSP | var | public var sampleRate: Double
+VisualCoreAudioDSP | var | public var size: Int
+VisualCoreAudioDSP | var | public var timestamp: Double
 VisualCoreAudioDSP | var | public var totalWritten: Int
 VisualCoreAutomation | class | public final class AutomationRunner
 VisualCoreAutomation | class | public final class Coordinator

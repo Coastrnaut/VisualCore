@@ -103,3 +103,87 @@ private final class FFTSetupBox: @unchecked Sendable {
 
     deinit { vDSP_destroy_fftsetup(setup) }
 }
+
+// SpectrumWorkspace and powerSpectrum — feature 048 (A06-P02) T-A06-202 (FR-A06-202, FR-A06-205; research D1, D2):
+// an allocation-free linear power spectrum with the same scale and bin-0 handling as magnitudesDB(_:).
+
+/// Preallocated buffers for ``SpectrumAnalyzer/powerSpectrum(_:into:workspace:)`` at one frame size.
+///
+/// Holds its own Hann window (identical to the analyser's), the windowed input and the split-complex halves. The
+/// buffers are allocated once in `init` and freed in `deinit`. Not `Sendable`: use one workspace per thread (the
+/// render side).
+public final class SpectrumWorkspace {
+    /// Frame size N in samples (a power of two, 256…4,096).
+    public let size: Int
+    let window: UnsafeMutablePointer<Float>
+    let input: UnsafeMutablePointer<Float>
+    let real: UnsafeMutablePointer<Float>
+    let imag: UnsafeMutablePointer<Float>
+
+    /// Creates buffers for frames of `size` samples, or `nil` when `size` is not a power of two in 256…4,096.
+    public init?(size: Int) {
+        guard size >= SpectrumAnalyzer.minimumSize, size <= SpectrumAnalyzer.maximumSize, size & (size - 1) == 0
+        else { return nil }
+        let half = size / 2
+        self.size = size
+        window = .allocate(capacity: size)
+        input = .allocate(capacity: size)
+        real = .allocate(capacity: half)
+        imag = .allocate(capacity: half)
+        let hann = vDSP.window(ofType: Float.self, usingSequence: .hanningDenormalized, count: size, isHalfWindow: false)
+        hann.withUnsafeBufferPointer { window.initialize(from: $0.baseAddress!, count: size) }
+        input.initialize(repeating: 0, count: size)
+        real.initialize(repeating: 0, count: half)
+        imag.initialize(repeating: 0, count: half)
+    }
+
+    deinit {
+        window.deallocate()
+        input.deallocate()
+        real.deallocate()
+        imag.deallocate()
+    }
+}
+
+extension SpectrumAnalyzer {
+    /// Writes N/2 linear powers into `power` without allocating: power[k] = (|X[k]| · scale)².
+    ///
+    /// The scale and the bin-0 handling (DC only, Nyquist dropped) are those of ``magnitudesDB(_:)``, so
+    /// 10·log10(power[k]) equals `magnitudesDB(frame)[k]` wherever the magnitude is positive, and a full-scale
+    /// bin-centred sine gives about 1 in its bin. A frame shorter than N is padded with zeros, a longer one is cut to
+    /// its first N samples, and non-finite samples count as 0. Only the first N/2 elements of `power` are written.
+    /// - Parameters:
+    ///   - frame: the time-domain samples.
+    ///   - power: destination with at least N/2 elements.
+    ///   - workspace: buffers for this analyser's size.
+    /// - Precondition: `workspace.size == size` and `power.count >= size / 2`.
+    public func powerSpectrum(_ frame: UnsafeBufferPointer<Float>, into power: UnsafeMutableBufferPointer<Float>,
+                              workspace: SpectrumWorkspace) {
+        let n = size
+        let half = n / 2
+        precondition(workspace.size == n, "SpectrumWorkspace size \(workspace.size) differs from analyser size \(n)")
+        precondition(power.count >= half, "power buffer holds \(power.count) elements, needs \(half)")
+        let input = workspace.input
+        let used = min(frame.count, n)
+        for i in 0..<used {
+            let sample = frame[i]
+            input[i] = sample.isFinite ? sample : 0
+        }
+        if used < n { (input + used).update(repeating: 0, count: n - used) }
+        vDSP_vmul(input, 1, workspace.window, 1, input, 1, vDSP_Length(n))
+
+        let rp = workspace.real
+        let ip = workspace.imag
+        var split = DSPSplitComplex(realp: rp, imagp: ip)
+        input.withMemoryRebound(to: DSPComplex.self, capacity: half) { complex in
+            vDSP_ctoz(complex, 2, &split, 1, vDSP_Length(half))
+        }
+        vDSP_fft_zrip(setup.setup, &split, 1, log2n, FFTDirection(kFFTDirection_Forward))
+        // Same scale as magnitudesDB(_:): vDSP_fft_zrip returns twice the DFT; the window's coherent gain is 0.5.
+        let scale = 1 / (2 * Float(half) * 0.5)
+        for k in 0..<half {
+            let magnitude = k == 0 ? abs(rp[0]) * scale * 0.5 : (rp[k] * rp[k] + ip[k] * ip[k]).squareRoot() * scale
+            power[k] = magnitude * magnitude
+        }
+    }
+}
