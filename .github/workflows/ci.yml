@@ -11,9 +11,11 @@ on:
     branches: [main]
   pull_request:
 
+# A running run finishes; GitHub keeps only the newest pending run behind it. With commits every few minutes and a run
+# of about 20 minutes, cancelling in progress meant no run ever completed (2026-11-14), so failures went unseen.
 concurrency:
   group: ci-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 permissions:
   contents: read
