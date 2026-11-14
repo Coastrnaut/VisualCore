@@ -32,7 +32,7 @@
 
 ## Phase 6: User Story 4 — Existing meshes keep working (P3)
 
-- [ ] T-R02F05-011 [US4] Write `Packages/VisualCore/Tests/VisualCoreScenesTests/MeshCompatibilityTests.swift`: plane, cube and sphere outputs equal digests committed in this task from the generators as they are (`git diff --exit-code Packages/VisualCore/Sources/VisualCoreScenes/MeshGenerators.swift` proves them unchanged), and pass the validator (cube and sphere with requireClosed: topology by welded position)
+- [X] T-R02F05-011 [US4] Write `Packages/VisualCore/Tests/VisualCoreScenesTests/MeshCompatibilityTests.swift`: plane, cube and sphere outputs equal digests committed in this task from the generators as they are (`git diff --exit-code Packages/VisualCore/Sources/VisualCoreScenes/MeshGenerators.swift` proves them unchanged), and pass the validator (cube and sphere with requireClosed: topology by welded position) — Verified 2026-11-13: 2026-11-13 .autonomy/migration/checks/R02-F05.host.json (swift test Packages/VisualCore, all pass): MeshCompatibilityTests: plane, cube, sphere digests unchanged (MeshGenerators.swift git diff clean) and valid; budget mesh 262,144 vertices 4.1 s debug
 - [ ] T-R02F05-012 [US4] Write `Packages/VisualCoreRendering/Tests/VisualCoreRenderingTests/MeshCompilerRuntimeTests.swift`: the committed digests of a fixed set of descriptions (one per shape) equal on the simulator; a capped tube drawn by `MeshRenderer` into an offscreen target covers at least 1% of the target's pixels with non-background colour and the context ends with 0 leaked objects
 
 ## Phase 7: Polish and evidence (one task per quickstart command)
