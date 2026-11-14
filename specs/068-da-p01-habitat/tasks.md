@@ -25,7 +25,7 @@
 
 ## Phase 5: Polish & evidence
 
-- [ ] T-A09-107 Aquarium tests on sim-27.2 (`python3 Tools/python/desktop_runbook.py run-check --stage A09-P01 --timeout 600 --name aquarium-ios27 -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing DigitalAquariumCoreTests DigitalAquariumExperienceTests`; each test < 10 s) (SC-A09-105)
+- [X] T-A09-107 Aquarium tests on sim-27.2 (`python3 Tools/python/desktop_runbook.py run-check --stage A09-P01 --timeout 600 --name aquarium-ios27 -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing DigitalAquariumCoreTests DigitalAquariumExperienceTests`; each test < 10 s) (SC-A09-105) — Verified 2026-11-14: 2026-11-14: .autonomy/checks/A09-P01.aquarium-ios27.json exit 0, 61 tests 0 failures on sim-27.2; slowest 0.58 s
 - [ ] T-A09-108 App build and unit (`python3 Tools/python/desktop_runbook.py run-check --stage A09-P01 --timeout 600 --name app-unit -- python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27`)
 - [ ] T-A09-109 Runner iOS 27 (`python3 Tools/python/desktop_runbook.py run-check --stage A09-P01 --timeout 600 --name verify-27 -- python3 scripts/verify_experiences.py --only a09.digital-aquarium --runtime 27`)
 - [ ] T-A09-110 Experience package check (`python3 Tools/python/desktop_runbook.py run-check --stage A09-P01 --timeout 600 --name experience-packages -- python3 scripts/check_experience_packages.py`)
