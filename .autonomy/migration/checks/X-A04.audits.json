@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--only",
+    "a04.particle-universe",
+    "--audits"
+  ],
+  "command": "python3 scripts/verify_experiences.py --only a04.particle-universe --audits",
+  "elapsed_seconds": 1.026,
+  "exit_code": 0,
+  "finished": "2026-11-14T00:29:40+00:00",
+  "gate": "X-A04",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/X-A04.audits.log",
+  "log_sha256": "32580835309dac07263acd52672b2ba4470a663a53c8a759edccde0d23d20f38",
+  "name": "audits",
+  "started": "2026-11-14T00:29:39+00:00",
+  "timed_out": false
+}

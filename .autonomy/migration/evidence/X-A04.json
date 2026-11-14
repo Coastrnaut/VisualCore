@@ -1,0 +1,69 @@
+{
+  "branch": "main",
+  "dirty": false,
+  "dirty_paths": [],
+  "failed_attempts": [],
+  "gate": "X-A04",
+  "ledger": "migration",
+  "passing_checks": [
+    {
+      "command": "python3 scripts/verify_experiences.py --only a04.particle-universe --audits",
+      "exit_code": 0,
+      "finished": "2026-11-14T00:29:40+00:00",
+      "log": ".autonomy/logs/migration/X-A04.audits.log",
+      "log_sha256": "32580835309dac07263acd52672b2ba4470a663a53c8a759edccde0d23d20f38",
+      "name": "audits"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --result-name xa04-host",
+      "exit_code": 0,
+      "finished": "2026-11-14T00:28:35+00:00",
+      "log": ".autonomy/logs/migration/X-A04.host.log",
+      "log_sha256": "11ab1b3d205a8712c2ff914fc20fc61ecf3a0fbc992f3c69ed259cf3e058d41a",
+      "name": "host"
+    },
+    {
+      "command": "python3 scripts/verify_experiences.py --only a04.particle-universe --runtime 26",
+      "exit_code": 0,
+      "finished": "2026-11-14T00:29:39+00:00",
+      "log": ".autonomy/logs/migration/X-A04.sim26.log",
+      "log_sha256": "e47d04fe462a95ff92750a7a3f9670a68143d1c8a32752edd8eef04c39916a9c",
+      "name": "sim26"
+    },
+    {
+      "command": "python3 scripts/verify_experiences.py --only a04.particle-universe --runtime 27",
+      "exit_code": 0,
+      "finished": "2026-11-14T00:29:08+00:00",
+      "log": ".autonomy/logs/migration/X-A04.sim27.log",
+      "log_sha256": "0eeeb147141ba886170ba89ed947a70bf205c502d4042b255a0a6ea2e904676a",
+      "name": "sim27"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only app-build-for-testing-ios27 app-ui-ios27-j2",
+      "exit_code": 0,
+      "finished": "2026-11-14T00:34:16+00:00",
+      "log": ".autonomy/logs/migration/X-A04.ui-j2.log",
+      "log_sha256": "8cef40e3cf7afd4013166ea7892266fc5a064bec9428b37300f960cae78ff394",
+      "name": "ui-j2"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only app-ui-ios27-j3",
+      "exit_code": 0,
+      "finished": "2026-11-14T00:41:06+00:00",
+      "log": ".autonomy/logs/migration/X-A04.ui-j3.log",
+      "log_sha256": "880f3a9d4d6c6020f801508d48af2737af56058406c6ac9c7f796d815ff97f0a",
+      "name": "ui-j3"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only app-ui-ios27-j4",
+      "exit_code": 0,
+      "finished": "2026-11-14T00:44:37+00:00",
+      "log": ".autonomy/logs/migration/X-A04.ui-j4.log",
+      "log_sha256": "9125e4c91371af34b273d8a5ad7ed98e4bff15772c2277fec396edf7ff49e28a",
+      "name": "ui-j4"
+    }
+  ],
+  "revision": "a99580c5620aa06ee29c2b0f002728dbed7cae51",
+  "revision_number": 1,
+  "sealed": "2026-11-14T00:44:43+00:00"
+}

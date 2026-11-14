@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "python3",
+    "scripts/release_check.py",
+    "--only",
+    "app-ui-ios27-j3"
+  ],
+  "command": "python3 scripts/release_check.py --only app-ui-ios27-j3",
+  "elapsed_seconds": 407.348,
+  "exit_code": 0,
+  "finished": "2026-11-14T00:41:06+00:00",
+  "gate": "X-A04",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/X-A04.ui-j3.log",
+  "log_sha256": "880f3a9d4d6c6020f801508d48af2737af56058406c6ac9c7f796d815ff97f0a",
+  "name": "ui-j3",
+  "started": "2026-11-14T00:34:18+00:00",
+  "timed_out": false
+}

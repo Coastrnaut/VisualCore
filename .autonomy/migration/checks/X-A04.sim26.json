@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--only",
+    "a04.particle-universe",
+    "--runtime",
+    "26"
+  ],
+  "command": "python3 scripts/verify_experiences.py --only a04.particle-universe --runtime 26",
+  "elapsed_seconds": 21.661,
+  "exit_code": 0,
+  "finished": "2026-11-14T00:29:39+00:00",
+  "gate": "X-A04",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/X-A04.sim26.log",
+  "log_sha256": "e47d04fe462a95ff92750a7a3f9670a68143d1c8a32752edd8eef04c39916a9c",
+  "name": "sim26",
+  "started": "2026-11-14T00:29:17+00:00",
+  "timed_out": false
+}

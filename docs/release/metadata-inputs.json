@@ -25,15 +25,23 @@
       "name": "Fractal Explorer",
       "permissions": [],
       "tier": "free"
+    },
+    {
+      "category": "create",
+      "code": "A04",
+      "id": "a04.particle-universe",
+      "name": "Particle Universe",
+      "permissions": [],
+      "tier": "free"
     }
   ],
-  "ledger_sha256": "2b76cd2b1c6163ab6b3dc6a6297c64407a2ec35da97a397cdc5eca18fe18fe04",
+  "ledger_sha256": "809a13f0ff6bdc3b66b4a5cf3a4a1c0d3e517202738b627182c8a03312749006",
   "privacy_answers": {
     "data_collected": "none",
     "proof": {
-      "executable_sha256": "0bd0b072319c7e24778859a37160ed14597eb22a0ed0825894ac4b7797eff31e",
-      "privacy_report": ".autonomy/logs/ua-f11/privacy-20261113T154648.json",
-      "tracking_report": ".autonomy/logs/ua-f11/tracking-20261113T154648.json"
+      "executable_sha256": "1147e51e499064fcd72f3291c2e560423ba44925ee41be0c55b82934c2d5df38",
+      "privacy_report": ".autonomy/logs/ua-f11/privacy-20261113T185519.json",
+      "tracking_report": ".autonomy/logs/ua-f11/tracking-20261113T185519.json"
     },
     "tracking": "no"
   },
