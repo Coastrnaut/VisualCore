@@ -32,7 +32,7 @@
 - [X] T-A06-414 Hot-path check (`python3 Tools/python/desktop_runbook.py run-check --stage A06-P04 --timeout 600 --name hot-path -- python3 scripts/check_audio_hot_path.py`) — Verified 2026-11-14: — Verified 2026-11-14: .autonomy/checks/A06-P04.hot-path.json
 - [X] T-A06-415 Public API and docs: `check_public_api.py --update`, `python3 Tools/python/desktop_runbook.py run-check --stage A06-P04 --timeout 600 --name public-api -- python3 scripts/check_public_api.py`; `Packages/VisualCoreRendering/README.md`, `Auto-Creator.md` §13 row, `docs/apps/visualcore-music-lab/visualcore-contract.{json,md}` (G-INTERRUPTION closed in A06-P04, row M15 available; `check_app_contract.py --app visualcore-music-lab --render`) — Verified 2026-11-14: — Verified 2026-11-14: .autonomy/checks/A06-P04.public-api.json; README, Auto-Creator §13, contract (check_app_contract PASS)
 - [X] T-A06-416 Script tests (`python3 Tools/python/desktop_runbook.py run-check --stage A06-P04 --timeout 600 --name script-tests -- python3 scripts/test_scripts.py`) — Verified 2026-11-14: — Verified 2026-11-14: .autonomy/checks/A06-P04.script-tests.json
-- [ ] T-A06-417 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A06-P04
+- [X] T-A06-417 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A06-P04 — Verified 2026-11-14: — Verified 2026-11-14: converge round 1 found no gaps (tasks.md unchanged)
 
 ## Dependencies
 
