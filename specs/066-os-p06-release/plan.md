@@ -7,7 +7,7 @@
 Release readiness for a08 following A07-P06: privacy and credits note, store-text input with traceability, release
 checklist with artifact inventory, the device-campaign plan (started in A08-P05) completed with CPU/GPU, memory,
 persistence and accessibility rows, and `release.json` (copy allow list audio/microphone) under
-`docs/apps/oscilloscope-studio/`; signal-unit markers on the five copy-check lines; a no-network/no-recording scan; five
+`docs/apps/oscilloscope-studio/`; signal-unit markers on the four copy-check lines (five hits); a no-network/no-recording scan; five
 committed preset fixtures and a migration test; a recovery test through the existing `failNextDraw` seam; interface
 chunk "p2" (`OSScopeUITests`, `OSPresetsUITests`); the release build checks; owner-only and device items recorded
 open. No VisualCore change. Research: [research.md](research.md); model: [data-model.md](data-model.md); contract:
@@ -40,7 +40,7 @@ claim; no recording). Post-design: PASS.
 docs/apps/oscilloscope-studio/{privacy-and-credits.md,store-listing.md,release-checklist.md,release.json}          new
 docs/apps/oscilloscope-studio/device-campaign.md (CPU/GPU, memory, persistence, Dynamic Type, Reduce Motion rows)   modify
 docs/release/known-limitations.md (A08 rows: quota, restored file, device items)                                      modify
-Packages/ExperiencesCreative/OscilloscopeStudio/Experience/ScopePresenter.swift (5 lines: copy-claims allow marker)   modify
+Packages/ExperiencesCreative/OscilloscopeStudio/Experience/ScopePresenter.swift (4 lines, 5 hits: copy-claims allow marker)   modify
 scripts/release_check.py (UI_CHUNKS "p2")                                                                             modify
 Packages/ExperiencesCreative/Package.swift (resources: [.copy("Fixtures")] on OscilloscopeStudioExperienceTests)       modify
 Packages/ExperiencesCreative/OscilloscopeStudio/ExperienceTests/Fixtures/scope-00000000-0000-4000-8000-0000000008c{1..4}.json

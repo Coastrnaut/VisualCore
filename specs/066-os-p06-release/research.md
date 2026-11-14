@@ -6,7 +6,7 @@
   shape. Alternative (a new format) rejected: no tool reads it.
 - **D2 Copy allow list.** audio, microphone (real inputs); "music" stays refused (the scope names no music feature);
   all measured-claim patterns stay.
-- **D3 Signal units.** The five lines of `ScopePresenter.swift` that the copy check flags ("20 Hz", "100 Hz", "0 Hz")
+- **D3 Signal units.** The four lines (five hits) of `ScopePresenter.swift` that the copy check flags ("20 Hz", "100 Hz", "0 Hz")
   name units of the displayed signal; each gets `// copy-claims: allow (signal unit)`. Alternative (rewording to avoid
   numbers) rejected: the axis words must name their marks for VoiceOver.
 - **D4 Scan.** `grep -rnE 'URLSession|import Network|CoreMotion|CoreLocation|AVAudioRecorder|AVAssetWriter'` over
