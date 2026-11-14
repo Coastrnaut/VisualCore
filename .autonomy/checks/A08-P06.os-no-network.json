@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "/bin/sh",
+    "-c",
+    "! grep -rnE 'URLSession|import Network|CoreMotion|CoreLocation|AVAudioRecorder|AVAssetWriter' Packages/ExperiencesCreative/OscilloscopeStudio Packages/VisualCoreRendering/Sources/VisualCoreAudio"
+  ],
+  "command": "/bin/sh -c '! grep -rnE '\"'\"'URLSession|import Network|CoreMotion|CoreLocation|AVAudioRecorder|AVAssetWriter'\"'\"' Packages/ExperiencesCreative/OscilloscopeStudio Packages/VisualCoreRendering/Sources/VisualCoreAudio'",
+  "elapsed_seconds": 0.042,
+  "exit_code": 0,
+  "finished": "2026-11-14T19:09:21+00:00",
+  "log": ".autonomy/logs/A08-P06.os-no-network.log",
+  "log_sha256": "4cce7cdc2cce36464d4e8a7b3f66a7de29062dd935ed042fdb416a7416a4ed17",
+  "name": "os-no-network",
+  "stage": "A08-P06",
+  "started": "2026-11-14T19:09:21+00:00",
+  "timed_out": false
+}
