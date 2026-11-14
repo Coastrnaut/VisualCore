@@ -275,6 +275,15 @@ let package = Package(
                                    .product(name: "VisualCoreUI", package: rendering)],
                     path: "AudioOdyssey/ExperienceTests",
                     resources: [.copy("Fixtures")]),
+        // Feature 061 (A08-P01) T-A08-104: Oscilloscope Studio — the device-free domain (scope state, signal windows,
+        // triggered acquisition); the experience target follows in T-A08-105.
+        .target(name: "OscilloscopeStudioCore",
+                dependencies: [.product(name: "VisualCoreAudioDSP", package: visualCore)],
+                path: "OscilloscopeStudio/Core"),
+        .testTarget(name: "OscilloscopeStudioCoreTests",
+                    dependencies: ["OscilloscopeStudioCore",
+                                   .product(name: "VisualCoreAudioDSP", package: visualCore)],
+                    path: "OscilloscopeStudio/CoreTests"),
         .target(name: "ParticleUniverseCore",
                 dependencies: [
                                .product(name: "VisualCoreSimulation", package: visualCore),
