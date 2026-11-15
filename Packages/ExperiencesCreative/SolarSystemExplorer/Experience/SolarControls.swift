@@ -49,12 +49,11 @@ struct SolarControls: View {
     let port: ExperienceActionPort
     /// What the controls show.
     let mirror: SolarMirror
-    /// "Now": the presenter sends `date.set` with its injected clock's days since J2000.0.
-    let onNow: @MainActor () -> Void
-    /// "Save view": the presenter writes the current view to `view.json`.
-    let onSaveView: @MainActor () -> Void
-    /// "Restore view": the presenter reads `view.json` and sends `view.apply`.
-    let onRestoreView: @MainActor () -> Void
+    /// The presenter Now, Save view and Restore view go through: "Now" sends `date.set` with its injected clock's
+    /// days since J2000.0, "Save view" writes the current view to `view.json`, "Restore view" reads it and sends
+    /// `view.apply`. A reference, not closures, so that the view compares equal from one host update to the next
+    /// (the host redraws on every port revision, which grows with every simulation step; feature 108 T-A14-609).
+    let presenter: SolarPresenter
 
     /// The titles of the bundled tours in order (the Tour menu's entries).
     static var tourTitles: [String] { Tour.bundled.map(\.title) }
@@ -332,7 +331,7 @@ struct SolarControls: View {
                    enabled: true) { send("time.play", [mirror.playing ? 0 : 1]) }
             button("Now", name: "now", value: mirror.dateTimeLabel,
                    hint: "Sets the date to the current moment, within 1950-01-01 to 2051-01-01",
-                   enabled: true) { onNow() }
+                   enabled: true) { _ = presenter.setNow(port) }
         }
         Picker(selection: Binding(get: { mirror.rateIndex },
                                   set: { index in
@@ -397,11 +396,11 @@ struct SolarControls: View {
         HStack(spacing: 8) {
             button("Save view", name: "save-view", value: mirror.viewMessage.isEmpty ? camera : mirror.viewMessage,
                    hint: "Keeps the body, date, rate, camera and scale on this device",
-                   enabled: true) { onSaveView() }
+                   enabled: true) { _ = presenter.saveView() }
             button("Restore view", name: "restore-view",
                    value: mirror.viewMessage.isEmpty ? camera : mirror.viewMessage,
                    hint: "Returns to the saved body, date, rate, camera and scale",
-                   enabled: true) { onRestoreView() }
+                   enabled: true) { _ = presenter.restoreView(port) }
         }
         if !mirror.viewMessage.isEmpty {
             Text(verbatim: mirror.viewMessage)

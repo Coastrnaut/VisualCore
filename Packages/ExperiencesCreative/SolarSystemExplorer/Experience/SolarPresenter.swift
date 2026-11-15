@@ -1092,10 +1092,7 @@ final class SolarPresenter: ExperiencePresenter {
 
     /// The native controls, sending through `port`.
     func makeControls(_ port: ExperienceActionPort) -> AnyView {
-        AnyView(SolarControls(port: port, mirror: mirror,
-                              onNow: { [weak self] in _ = self?.setNow(port) },
-                              onSaveView: { [weak self] in _ = self?.saveView() },
-                              onRestoreView: { [weak self] in _ = self?.restoreView(port) }))
+        AnyView(SolarControls(port: port, mirror: mirror, presenter: self))
     }
 
     /// The labels and the tour caption drawn over the canvas (``SolarOverlay``); it never takes touches.

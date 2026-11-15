@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-15 (A14-P05: generated review documents, quality levels compared by digest, state-count slip).
+Last updated: 2026-11-15 (A14-P06: controls rebuilt every frame by closures; the menu never settled).
 
 ## 1. What is tested, and where
 
@@ -131,6 +131,13 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
 - **`check_documented_api.py` needs `--sources <dir>`**; a run without it fails with exit 2 (kept as a failed check).
 - **Python `str.replace` fails silently.** When editing documents with scripts, assert the anchor exists first; an
   unmatched replacement once left a stale file header.
+- **"App animations complete notification not received" after a menu tap** means the app never settles. The shell
+  adds a port revision on every frame in which a simulation step ran, so the host rebuilds the controls every frame;
+  a controls view that stores closures never compares equal, SwiftUI rebuilds its Menu and Picker each frame, the
+  menu closes again, picker taps are lost and canvas-overlay labels may not show. Controls store references only (port,
+  mirror, presenter), as Light Maze's do; `SolarControlsIdentityTests` guards this for A14 (A14-P06). To find such a
+  loop, add `let _ = Self._printChanges()` to the view bodies temporarily and read the app's console
+  (`xcrun simctl launch --console-pty`).
 
 ### Process
 
