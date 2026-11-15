@@ -49,3 +49,7 @@ Package.swift, 105, 106 regeneration, 107, 108, runs, commits.
 
 MVP: collision and the game core (US3 and US1's rules with US2's replay), then the drawn game, registration, fixtures
 and records; evidence last.
+
+## Phase 6: Convergence
+
+- [ ] T-A10-115 [US1] Make a held drag follow the finger: in `Packages/ExperiencesCreative/NeonArcade/Experience/ArcadeGestures.swift` keep the last finger position while steering and add a method that recomputes the steering value from a new player x (offset ÷ 1.5, clamped, rounded to 0.01) and returns `run.steer` only when it differs from the last sent value; call it from `ArcadePresenter.draw` with the drawn run's player x and send through the port; test in `Packages/ExperiencesCreative/NeonArcade/ExperienceTests/ArcadeRenderTests.swift` (or a gesture test) that a finger held still ahead of the player brings the steering to 0 as the player reaches it, and that no action is sent while the value is unchanged, per FR-A10-121 / Clarification Q4 (partial)
