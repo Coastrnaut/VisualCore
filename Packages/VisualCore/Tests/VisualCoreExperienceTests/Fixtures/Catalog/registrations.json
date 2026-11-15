@@ -248,8 +248,10 @@
         "touch editing: add, grab, pin, delete",
         "velocity and force arrows",
         "measured energy panel",
-        "pause, single step and time scale",
-        "deterministic replay"
+        "presets: pendulum, chain, stack",
+        "four saved experiment slots",
+        "two guided tutorials",
+        "pause, single step and time scale"
       ],
       "quality_tiers": [
         "level-0"

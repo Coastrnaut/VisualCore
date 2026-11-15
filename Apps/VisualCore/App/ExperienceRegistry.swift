@@ -250,9 +250,10 @@ extension ExperienceRegistry {
     fileprivate static var physicsPlayground: ExperienceRegistration? {
         guard let id = PhysicsPlaygroundExperience.id else { return nil }
         // Schema 2 (feature 083, A11-P02) adds springs, force levels and the contact cache, schema 3 (feature 084,
-        // A11-P03) pins, selection, the grab and the overlay choices; the stored schema-1 and schema-2 examples prove
-        // the migrations.
-        let examples = [PlaygroundCore.schemaOneExample(), PlaygroundCore.schemaTwoExample()].compactMap { $0 }
+        // A11-P03) pins, selection, the grab and the overlay choices, schema 4 (feature 085, A11-P04) the opened
+        // experiment and tutorial progress; the stored schema-1 to schema-3 examples prove the migrations.
+        let examples = [PlaygroundCore.schemaOneExample(), PlaygroundCore.schemaTwoExample(),
+                        PlaygroundCore.schemaThreeExample()].compactMap { $0 }
         var registration = ExperienceRegistration(id: id, core: PlaygroundCore.self, examples: examples) { launch in
             let system = SystemAccessibilityObserver.systemValues()
             return PhysicsPlaygroundExperience.make(id: id, storage: launch.storage,

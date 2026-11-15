@@ -539,7 +539,7 @@
       "id": "M10",
       "capability": "Presets pendulum, spring chain and stacked objects, and saved experiments: bundled starting documents that load, run deterministically and reset, and person-made experiments saved and reopened on the device",
       "source": "v0.1 feature 5: presets pendulum, spring chain, stacked objects; manual saved experiments",
-      "status": "upstream gap",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift",
@@ -561,10 +561,10 @@
         }
       ],
       "example": {
-        "file": "Packages/ExperiencesCreative/OscilloscopeStudio/Experience/ScopePresetStore.swift",
-        "symbol": "ScopePresetStore"
+        "file": "Packages/ExperiencesCreative/PhysicsPlayground/Experience/ExperimentStore.swift",
+        "symbol": "ExperimentStore"
       },
-      "notes": "Per-experience storage, named libraries and parameter presets exist and are tested (ExperienceStorageTests, NamedLibraryTests, ParametersTests); the pendulum and spring chain need spring constraints (G-SPRINGS) and the stack needs box contacts with friction (G-CONTACTS), both upstream in A11-P02; the preset documents and the experiment schema are G-EXPERIMENTS (app-local over ExperienceStorage), A11-P04."
+      "notes": "Since A11-P04 (G-EXPERIMENTS closed): presets for a pendulum, a spring chain and stacked objects and four saved experiment slots in the experience's storage (ExperimentStoreTests, ExperimentSampleFileTests, PresetTests); reset restores the opened experiment; spring energy stays bounded (SpringEnergyFixtureTests)."
     },
     {
       "id": "M11",
@@ -730,7 +730,7 @@
         "file": "Packages/ExperiencesCreative/OscilloscopeStudio/Experience/ScopePresetStore.swift",
         "symbol": "ScopePresetStore"
       },
-      "notes": "Tested in VisualCorePersistenceTests and VisualCoreExperienceTests (ExperienceStorageTests, SavedStateStoreTests). The experiment document schema is G-EXPERIMENTS (M10)."
+      "notes": "Tested in VisualCorePersistenceTests and VisualCoreExperienceTests (ExperienceStorageTests, SavedStateStoreTests). The experiment document schema is G-EXPERIMENTS (M10). Since A11-P04: experiments are saved as experiment-<slot>.json (document schema 1) through ExperienceStorage.write; damaged, truncated and newer files are refused and left byte-identical."
     },
     {
       "id": "M15",
@@ -971,10 +971,10 @@
       ],
       "kind": "adaptation",
       "owner": "app-local",
-      "justification": "The pendulum, spring chain and stacked-objects presets and the saved-experiment document are the playground's content stored in ExperienceStorage through VisualCorePersistence (clarification 5); they run on G-CONTACTS and G-SPRINGS.",
+      "justification": "The pendulum, spring chain and stacked-objects presets and the saved-experiment document are the playground's content stored in ExperienceStorage through VisualCorePersistence (clarification 5); they run on G-CONTACTS and G-SPRINGS. Built in A11-P04: Presets (free play, pendulum, spring chain, stacked objects; MIT), Tutorials (two, with conditions), ExperimentDocument (file schema 1) and ExperimentStore over ExperienceStorage (four slots, refusals left untouched); reset restores the opened experiment.",
       "phase": 4,
       "test": "Host tests: each preset loads, runs deterministically and resets to its document; the pendulum's period and the chain's rest shape match stated tolerances; saved experiments round-trip, a write interrupted mid-way keeps the previous file, damaged or newer files are reported and never crash",
-      "closed": null
+      "closed": "A11-P04"
     },
     {
       "id": "G-STABILITY",
