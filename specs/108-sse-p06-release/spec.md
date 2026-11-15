@@ -154,7 +154,10 @@ switch the scale and restore a saved view, each in under 60 seconds.
   reopen MUST draw normally.
 - **FR-A14-612**: Saved sessions of schemas 1 to 3 MUST open in schema 4 (stored examples).
 - **FR-A14-620**: A release checklist with an artifact inventory, store text with a claim → test table, the device plan
-  and a release configuration MUST exist and pass the release-document check.
+  and a release configuration MUST exist and pass the release-document check; the checklist's `owner-action` rows are
+  the signing set-up, the archive and its upload (steps from `docs/release/build-and-archive.md`), recorded as
+  BLOCKED_OWNER_ACTION and never done by the agent; its `pending-campaign-ii` rows name the device-campaign rows
+  SSE-D1 to SSE-D6.
 - **FR-A14-621**: The shared copy-claim check MUST pass on the store text and the interface copy, and the experience's
   own scan MUST refuse precision, ephemeris, real-time-sky and measured-performance words.
 - **FR-A14-622**: Known limitations MUST list the device-only items and the model's approximation and range.
