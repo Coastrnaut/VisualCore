@@ -254,11 +254,12 @@ UI_CHUNKS = {
     "o2": ["AOJourneyUITests", "AOPresetsUITests"],   # feature 059 A07-P06 (T-A07-609)
     "p2": ["OSScopeUITests", "OSPresetsUITests"],   # feature 066 A08-P06 (T-A08-609)
     "q2": ["DAAquariumUITests", "DALibraryUITests"],   # feature 073 A09-P06 (T-A09-608)
+    "r2": ["NAArcadeUITests"],   # feature 078 A10-P04 (T-A10-404)
 }
 # Chunks that run on one simulator (feature 066 A08-P06): the oscilloscope draws every frame on the main thread, and
 # two parallel clones competing for the host's CPU kept XCTest's idle wait from settling (single tests took 60–89 s in
 # parallel, 23–41 s serially, with the same total time).
-SERIAL_CHUNKS = {"p2", "q2"}
+SERIAL_CHUNKS = {"p2", "q2", "r2"}
 UNIFIED_LIMIT = 590       # seconds, below the ten-minute limit of one foreground command
 RELEASE_FORBIDDEN = ["DebugLaunch", "DebugExperience", "DebugInventory", "ScenarioLaunch", "ScenarioHostView",
                      "vcDamageStat", "vcCandidates", "vc_ci_angle_standin"]
