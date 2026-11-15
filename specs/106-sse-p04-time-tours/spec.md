@@ -26,6 +26,54 @@ Canonical overrides:
 - **Owner rulings:** short tests; audits and device runs in the device campaign; iOS 27 at phase gates; reference
   regression and iOS 26 at X-A14; every Spec Kit step runs.
 
+## Clarifications
+
+### Session 2026-11-15
+
+Answered autonomously under the owner's standing delegation, recommended option each time. Facts checked in code: the
+host draws frames but runs no step while suspended and resumes "without catching up on the time spent suspended"
+(ExperienceShell.swift), so backgrounding cannot fast-forward a step-driven clock; the experience's controls sit below
+the canvas in a `VStack` and nothing is drawn over the canvas (ExperienceHostView.swift); `ExperienceStorage` offers
+`write(_:to:)`, `read(_:)`, `exists(_:)`, `remove(_:)` with `StorageError`; `OrbitCamera.project(_:aspect:)` returns
+normalised device coordinates; `AnnouncementSink` (VisualCoreUI) has system and recording sinks; the experience's
+`make(id:storage:reduceMotion:…)` receives the storage and ignores it until now; the host step is 1/120 s.
+
+- Q: How does the simulated clock run, at which rates, and how is "Now" deterministic? → A: State gains `playing`
+  (Bool) and `rateIndex` into the rates [1, 7, 30, 365] simulated days per second (labels "1 day/s", "1 week/s",
+  "1 month/s", "1 year/s"). Each host step while playing adds rate × 1/120 days, so N steps add exactly
+  rate × N / 120. Reaching either end clamps to it, sets `playing` false and records `stopReason` "end-of-range"
+  (spoken "The model's range ends here"). "Now" is the action `date.set [days]`: the presenter's control computes days
+  since J2000.0 from an injected clock (`Date.init` in the app, a fixed date in tests) and clamps; the core accepts any
+  finite value inside the range (else `a14.out-of-range`), so replays never read the clock. Actions: `time.play [0|1]`,
+  `time.rate [0…3]`, `date.set [days]`. The date label gains the time: "2025-01-01 12:00 UTC". While playing, the
+  spoken date is announced at most once every 10 seconds of wall time and on play, pause and rate changes.
+- Q: What are the tours and how do their stops run? → A: Two tours: "Inner planets" (Sun, Mercury, Venus, Earth,
+  Mars) and "Giant planets" (Jupiter, Saturn, Uranus, Neptune); each stop holds 600 host steps (5 s), so tours last
+  25 s and 20 s (≤ 6 stops, ≤ 40 s). Captions are generated from the catalog with units and the source title, e.g.
+  "Mars: mean radius 3,389.5 km; one orbit takes 687 days (Planetary Fact Sheet — Metric)." State: `tourIndex` (−1
+  none), `tourStop`, `tourStep`, `tourPaused`. Actions: `tour.start [0…1]` (selects the first stop's body),
+  `tour.next` (skip; after the last stop ends the tour), `tour.pause [0|1]`, `tour.stop`; refused without a tour with
+  `a14.no-tour`. Each stop sets the selection, so the presenter's focus flight flies there (Reduce Motion cuts). A tour
+  runs its steps whether or not time is playing; the user's body choice during a tour stops the tour.
+- Q: What does the VisualCore host gain for labels and captions? → A: `ExperiencePresenter.makeCanvasOverlay(_:)
+  -> AnyView?` (default `nil`) and `Experience.canvasOverlay: AnyView?` (default `nil`), shown by
+  `ExperienceHostView` in a `ZStack` over the render surface with `.allowsHitTesting(false)` and its own
+  accessibility elements hidden (the canvas label already speaks the state), so it can never take touches or cover the
+  controls (they sit below the canvas). Additive: documented with `///`, host tests (default nil; a presenter's overlay
+  reaches the experience), README section, API baseline; reference regression at X-A14.
+- Q: How are labels placed? → A: Pure `LabelLayout`: each body's centre projected with the drawn camera; hidden when
+  behind the camera (clip w ≤ 0 or NDC z outside −1…1) or outside the canvas; placed 8 pt right of and 8 pt above the
+  body's point; the focused body first, then by increasing distance from the eye; a label whose 90 × 20 pt box
+  overlaps an already placed one is skipped. Captions show at the canvas's bottom edge while a tour runs.
+- Q: What is the saved view document? → A: `SavedView` (JSON, sorted keys, schema 1: selection, dayOffset, rateIndex,
+  yawSteps, pitchDegrees, zoomSteps, scaleMode) stored as `view.json` in the experience's storage; refused as
+  `damaged`, `newer-version`, `out-of-range` or `oversized` (more than 4,096 bytes). Controls "Save view" and "Restore
+  view": saving writes the file (presenter); restoring reads and validates it, then sends the action
+  `view.apply [selection, dayOffset, rateIndex, yawSteps, pitchDegrees, zoomSteps, scaleMode]`, which the core
+  validates as a whole (a refused file or action changes nothing and shows the reason). State schema 4 = schema 3 +
+  playing, rateIndex, stopReason, tourIndex, tourStop, tourStep, tourPaused; migration 3 → 4 adds paused, rate 0,
+  no tour.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Watch the planets move (Priority: P1) 🎯
