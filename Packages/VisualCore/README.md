@@ -103,6 +103,18 @@ circles first touch (0 when already touching, nil for no contact), so a fast obj
 between steps. Non-finite input or a negative radius gives no hit. Pure and deterministic; host tests
 `Collision2DTests`.
 
+**2D rigid-body contacts and impulse solver** (`VisualCoreSimulation`, feature 082): `Shape2D` is a circle (radius)
+or a box (half-extents) with its `area` and `inertia(mass:)`; `Pose2D` places it (position, angle) and maps points
+with `toWorld` and `toLocal`. `Contacts2D.collide(_:_:_:_:)` returns a `ContactManifold2D` for circle–circle,
+circle–box and box–box — a unit normal from the first shape to the second, a depth ≥ 0 and one or two world points
+(boxes by the separating-axis test with reference-face clipping) — with touching counting (tolerance 1e-9) and nil
+for separated shapes, non-finite poses or non-positive sizes. `ImpulseSolver2D.solve(_:contacts:settings:)` resolves
+`Contact2D`s between `RigidBodyState2D`s (inverse mass and inertia, restitution, friction) by sequential impulses:
+a fixed number of velocity iterations (default 10) with restitution max(eA, eB) above a 0.5 m/s closing speed and
+Coulomb friction √(μA·μB), then a positional correction of 80 % of the depth beyond a 0.005 slop. Inverse mass 0 is
+static and never changes; nothing non-finite is written. Pure and deterministic; host tests `Contacts2DTests` and
+`ImpulseSolver2DTests`.
+
 **CPU field references** (`VisualCoreSimulation`, feature 019): a `FieldGrid` is a W×H grid with 1…4 channels,
 row-major from the bottom row up, as in GL. `StoragePrecision` (`float32`, `float16`, `float16TowardZero`, `unorm8`) rounds values the
 way GPU storage does after every step. GLES leaves the rounding of half-float color writes implementation-defined,
