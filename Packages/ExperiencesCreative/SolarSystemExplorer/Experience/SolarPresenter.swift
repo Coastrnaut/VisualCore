@@ -70,6 +70,9 @@
 //     model's range. None of this reaches the core except through those actions.
 // Nothing flashes; the only motion is the focus flight, cut by Reduce Motion, and the bodies moving while simulated
 // time plays (paused by default). No audio.
+// Feature 108 (A14-P06) T-A14-604 (FR-A14-611): the test-only seam `failNextDraw` makes the next `draw` throw
+// `SolarDrawError.injected` once (and clears itself), so a test can drive the host into its failure state; nothing in
+// the experience sets it.
 import Foundation
 import SolarSystemExplorerCore
 import SwiftUI
@@ -234,6 +237,8 @@ final class SolarPresenter: ExperiencePresenter {
     /// The number of bodies drawn by the last frame.
     private(set) var lastBodiesDrawn = 0
     /// The detail level the last frame drew (the host's tier clamped to 0 … 1); nil before the first frame.
+    /// Set by a test to make the next draw throw `SolarDrawError.injected` (the seam clears itself; feature 108).
+    var failNextDraw = false
     private(set) var lastTier: Int?
     /// The vertices of the nine body spheres drawn by the last frame (9 × 1,225 at level 0, 9 × 325 at level 1); 0
     /// before the first frame.
@@ -392,6 +397,10 @@ final class SolarPresenter: ExperiencePresenter {
     /// with depth through the drawn camera of the focus flight, camera-relative, from the meshes of the detail level of
     /// `tier` (clamped to 0 … 1).
     func draw(_ core: SolarCore, tier: Int, context: RenderContext, frame: FrameInfo) throws {
+        if failNextDraw {
+            failNextDraw = false
+            throw SolarDrawError.injected
+        }
         sync(core)
         let width = Double(max(1, context.pixelWidth)), height = Double(max(1, context.pixelHeight))
         lastCanvas = Vec2(width, height)
@@ -1099,4 +1108,10 @@ final class SolarPresenter: ExperiencePresenter {
     var nativeActions: Set<String> {
         Set(SolarCore.actionIDs)
     }
+}
+
+/// Why a draw of Solar System Explorer failed on purpose (feature 108, test-only seam).
+enum SolarDrawError: Error, Equatable {
+    /// The test-only seam asked for one failed draw.
+    case injected
 }
