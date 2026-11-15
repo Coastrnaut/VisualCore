@@ -47,3 +47,8 @@ commits.
 
 MVP: the tier policy under pressure with an unchanged world (US1); then the stale-object fixture (US2), saved worlds
 across tiers (US3), the truthful catalog entry and device plan (US4); evidence last.
+
+## Phase 5: Convergence
+
+- [ ] T-A12-515 Prove the host's memory-warning path end to end: in `Packages/ExperiencesCreative/TinyWorlds/ExperienceTests/WorldsQualityTests.swift` post `UIApplication.didReceiveMemoryWarningNotification` to a running session and read tier 2 (and terrain level 2) on the next frame with the digest unchanged, per FR-A12-502 / Clarifications Q1 (partial)
+- [ ] T-A12-516 Record in `specs/093-tw-p05-qa/research.md` As built that the scenario manifest and `WorldsManifest.swift` stay unchanged (the engine carries no tier, so a replayed fixture cannot vary it; digest independence is proven by `WorldsQualityTests`), resolving plan: Project Structure (contradicts)
