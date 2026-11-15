@@ -43,7 +43,7 @@ launch's storage but does not use it yet; `MazeState` is schema 1 (level index, 
 - Q: What is the progress document? → A: Schema 1, sorted-key JSON of at most 16 KB: `{"levels":[{"best":n|null,
   "id":"lm-01","open":true,"solved":false},…],"schema":1}` with exactly the 20 catalog ids in order; level 1 always
   open; a solved level is open and has best 1…999, an unsolved one has best null; anything else, unknown ids or a
-  different count is `damaged`; a higher schema is `newer-version`; a refused file is reported and left untouched and
+  different count is `damaged`; a file above 16 KB is `too-large`; a higher schema is `newer-version`; a refused file is reported and left untouched and
   play continues from fresh progress in memory (not written until the next real change, which then replaces it).
 - Q: How are moves, undo and restart kept? → A: State schema 2 = schema 1 plus `moves` (each: tile index, orientation
   before, orientation after), at most 64 (the oldest dropped beyond that); `tile.turn` appends; a new action
@@ -108,7 +108,7 @@ newer progress file never loses the app's ability to play.
 **Acceptance Scenarios**:
 
 1. **Given** progress, **When** saved and reopened, **Then** it is identical.
-2. **Given** a damaged, truncated or newer progress file, **When** opened, **Then** it is reported, the file is left
+2. **Given** a damaged, truncated or newer progress file, **When** opened, **Then** it is reported (as are oversized files), the file is left
    untouched and play starts from fresh progress in memory.
 3. **Given** a write interrupted midway, **Then** the previous file stays intact.
 
