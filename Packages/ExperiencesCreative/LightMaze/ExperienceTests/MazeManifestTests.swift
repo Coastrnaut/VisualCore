@@ -1,6 +1,6 @@
 // MazeManifestTests — feature 096 (A13-P01) T-A13-106 (FR-A13-113, FR-A13-122; SC-A13-103, SC-A13-106). The scenario
 // manifest of Light Maze: valid with the nine standard scenarios, the five fixtures `fixture-lm-01`, `-05`, `-10`,
-// `-16` and `fixture-lm-20` and the three refusal scenarios; its derived digests and expected results equal to what the
+// `-16` and `fixture-lm-20`, the undo fixture `fixture-undo` (feature 098) and the three refusal scenarios; its derived digests and expected results equal to what the
 // engine gives when the runner plays them; every fixture solving its level by the recorded solution with the committed
 // final digest; and the committed `scenario-manifest.json` equal to the Swift manifest (`UPDATE_SCENARIO_MANIFEST=1`,
 // on the simulator `TEST_RUNNER_UPDATE_SCENARIO_MANIFEST=1`, rewrites it).
@@ -30,19 +30,24 @@ private func play(_ spec: ScenarioSpec) async throws -> (initial: String, result
 }
 
 @Suite struct MazeManifestTests {
-    /// The names of the five fixtures.
+    /// The names of the five solved fixtures.
     static let fixtureNames = ["fixture-lm-01", "fixture-lm-05", "fixture-lm-10", "fixture-lm-16", "fixture-lm-20"]
+    /// The names of all six fixtures: the five solved ones, then the undo fixture (feature 098).
+    static let allFixtureNames = fixtureNames + ["fixture-undo"]
     /// The names of the three refusal scenarios.
     static let refusalNames = ["refusal-level-out-of-range", "refusal-level-before-first",
                                "refusal-turn-without-selection"]
 
-    @Test func theManifestIsValidWithTheStandardScenariosThreeFixturesAndThreeRefusals() {
+    @Test func theManifestIsValidWithTheStandardScenariosSixFixturesAndThreeRefusals() {
         let manifest = MazeCore.manifest(for: id)
         let problems = ScenarioManifestValidator.problems(manifest, controls: MazeCore.controls,
-                                                          content: ContentRequirement(fixtures: 5))
+                                                          content: ContentRequirement(fixtures: 6))
         #expect(problems.isEmpty, "\(problems)")
         #expect(manifest.scenarios.map(\.name)
-                == ScenarioManifest.standardNames + Self.fixtureNames + Self.refusalNames)
+                == ScenarioManifest.standardNames + Self.allFixtureNames + Self.refusalNames)
+        let fixtures = manifest.scenarios.filter { $0.name.hasPrefix("fixture-") }
+        #expect(fixtures.count == 6)
+        #expect(fixtures.count >= 5, "the content-count audit needs at least five fixtures")
         #expect(MazeCore.solvedFixtures.map { MazeCore.fixtureName(level: $0.level) } == Self.fixtureNames)
         #expect(manifest.kind == .creative)
         #expect(manifest.experience == id)
@@ -95,6 +100,31 @@ private func play(_ spec: ScenarioSpec) async throws -> (initial: String, result
             let controls = Set(spec.entries.compactMap { $0.action?.control })
             #expect(controls.isSubset(of: ["level.select", "tile.select", "tile.turn"]), "\(name): solved by actions")
         }
+    }
+
+    /// Feature 098: `fixture-undo` solves level 1 and takes the turn back, ending unsolved with no moves at the
+    /// committed digest.
+    @Test func theUndoFixtureSolvesLevelOneThenTakesTheTurnBack() async throws {
+        let manifest = MazeCore.manifest(for: id)
+        let spec = try #require(manifest.scenarios.first { $0.name == MazeCore.undoFixtureName })
+        #expect(spec.name == "fixture-undo")
+        #expect(spec.expect.finalDigest == MazeCore.undoFixtureDigest)
+        #expect(spec.expect.outcome == nil, "unsolved after the undo")
+        let controls: [String] = spec.entries.compactMap { $0.action?.control }
+        #expect(controls == ["level.select", "tile.select", "tile.turn", "move.undo"])
+        var beforeUndo: [ScenarioStep] = []
+        for entry in spec.entries.dropLast() { beforeUndo.append(entry) }
+        let solved = MazeCore.played(seed: spec.seed, entries: beforeUndo)
+        #expect(solved.isSolved, "level 1 solved before the undo")
+        #expect(solved.state.moves.count == 1)
+        let played = try await play(spec)
+        #expect(played.final == MazeCore.undoFixtureDigest, "fixture-undo: \(played.final)")
+        let core = try #require(played.core)
+        #expect(core.state.levelIndex == 0)
+        #expect(!core.isSolved)
+        #expect(core.state.moves.isEmpty)
+        #expect(core.state.orientations == core.level.startOrientations)
+        #expect(played.final != played.initial, "the mirror stays selected")
     }
 
     /// The JSON form with the control ids, named by `Catalog/registrations.json`. `UPDATE_SCENARIO_MANIFEST=1`

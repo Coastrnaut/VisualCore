@@ -14,6 +14,10 @@
 // The completion scenario solves level 1 (select its mirror and turn it) and expects the outcome `level-solved`. The
 // expected digests are derived by playing the entries on a core exactly as the engine plays them (the steps of an
 // entry, then its action) and digesting it with the experience id as domain, as Tiny Worlds' manifest does.
+// Feature 098 (A13-P03) T-A13-305 (FR-A13-310): the state is schema 2 (with `moves`), so every committed digest was
+// regenerated; a sixth fixture `fixture-undo` solves level 1 (select its mirror, turn it) and takes the turn back with
+// `move.undo`, ending unsolved with no moves (digest pinned by ``undoFixtureDigest``); the rejection scenario also
+// refuses `move.undo` with nothing to undo (`a13.no-moves`).
 #if DEBUG || VISUALCORE_AUTOMATION
 import LightMazeCore
 import VisualCoreExperience
@@ -22,15 +26,31 @@ extension MazeCore {
     /// The seed of every scenario.
     public static let manifestSeed: UInt64 = 1
 
-    /// The committed digests (engine digest, the experience id as domain) of the state after solving levels 1, 10 and
-    /// 20 by ``fixtureEntries(level:)`` from the first state, by level index (0, 9, 19).
+    /// The committed digests (engine digest, the experience id as domain) of the state after solving levels 1, 5, 10,
+    /// 16 and 20 by ``fixtureEntries(level:)`` from the first state, by level index (0, 4, 9, 15, 19). State schema 2.
     public static let solvedFixtures: [(level: Int, digest: String)] = [
-        (0, "5b1647722de8398753bb2b7632d10df7a7f770182255246bc68a535a49e182be"),
-        (4, "37d602a78af7f294950734742173e9de968491a6b788b778c0a7deab2fde07f4"),
-        (9, "76571f7d393e11f964ecca92b965f906aedf8c6e49a3d7df19a941d806720a0f"),
-        (15, "159bc8b44b393b4d03fde865b24e83d49d94a03cb5ae765601a84364ee167424"),
-        (19, "3f2c1f9126b4ebadd66a75cd5f3faff5349cc5e5de5676e8db1cdae10f9c46e5"),
+        (0, "f7dce4d2f7ab2e1633c1d342c03031d00ae6ec8ecab9adfdcd94513ddb9f6db0"),
+        (4, "8b157f3280296441ceaba724e306f9d9789d73619ec9c40f0071c94750f4ce8a"),
+        (9, "25884fffd0d22826cc762d66740fc950e01e0c95c9b671a436dc92400dc0a748"),
+        (15, "8d619fc6555eca0ad704224ca5ed230bfb74c938cb7d2f72021b11479088ffce"),
+        (19, "2ad678202a3fe2256ae28e506f7da8422d0f531869e245d28be0293fd05d6f02"),
     ]
+
+    /// The name of the undo fixture.
+    public static let undoFixtureName = "fixture-undo"
+
+    /// The committed digest of the state after ``undoFixtureEntries`` from the first state (level 1 unsolved, its mirror
+    /// selected, no moves).
+    public static let undoFixtureDigest = "c1f0d91515e2b5d838e09bd2d8a96caed8b49d454671470b4f489be4459f2494"
+
+    /// The entries of `fixture-undo`: level 1 chosen, its mirror selected and turned (solved), then the turn taken back
+    /// (unsolved, no moves).
+    public static var undoFixtureEntries: [ScenarioStep] {
+        [ScenarioStep(steps: 1, action: ScriptedAction("level.select", [0]), result: "accepted"),
+         ScenarioStep(steps: 1, action: ScriptedAction("tile.select", [0]), result: "accepted"),
+         ScenarioStep(steps: 1, action: ScriptedAction("tile.turn"), result: "accepted"),
+         ScenarioStep(steps: 1, action: ScriptedAction("move.undo"), result: "accepted")]
+    }
 
     /// The name of the fixture of level index `level`: `fixture-<level id>` (`fixture-lm-01`).
     public static func fixtureName(level: Int) -> String {
@@ -83,7 +103,9 @@ extension MazeCore {
                              result: "action.out-of-range"),
                 ScenarioStep(steps: 0, action: ScriptedAction("level.next", [1]), result: "action.wrong-value-count"),
                 ScenarioStep(steps: 0, action: ScriptedAction("level.reset", [0]), result: "action.wrong-value-count"),
-                ScenarioStep(steps: 0, action: ScriptedAction("tile.select"), result: "action.wrong-value-count")]
+                ScenarioStep(steps: 0, action: ScriptedAction("tile.select"), result: "action.wrong-value-count"),
+                ScenarioStep(steps: 0, action: ScriptedAction("move.undo"), result: "action.rule." + MazeRule.noMoves),
+                ScenarioStep(steps: 0, action: ScriptedAction("move.undo", [0]), result: "action.wrong-value-count")]
     }
 
     /// The refusal scenarios by name with their single entry (see the file header).
@@ -156,6 +178,8 @@ extension MazeCore {
                                                                    finalDigest: fixture.digest,
                                                                    outcome: solvedOutcome)))
         }
+        specs.append(ScenarioSpec(name: undoFixtureName, seed: seed, entries: undoFixtureEntries,
+                                  expect: ScenarioExpectations(initialDigest: initial, finalDigest: undoFixtureDigest)))
         for refusal in refusalScenarios {
             specs.append(ScenarioSpec(name: refusal.name, seed: seed, entries: [refusal.entry],
                                       expect: ScenarioExpectations(initialDigest: initial, finalDigest: initial)))

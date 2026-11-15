@@ -5,7 +5,8 @@
     "level.previous",
     "tile.select",
     "tile.turn",
-    "level.reset"
+    "level.reset",
+    "move.undo"
   ],
   "experience" : "a13.light-maze",
   "kind" : "creative",
@@ -15,7 +16,7 @@
 
       ],
       "expect" : {
-        "initialDigest" : "f4eec244ab5b55ffe7f4675699d8647d5293feb8c4dcd2d5444a6540a3db25d2"
+        "initialDigest" : "77b24a14c8640d0c7ada6b88a639572c6ccfb85207db3bf762105ab50312b6b4"
       },
       "name" : "launch-first-frame",
       "seed" : "1"
@@ -74,8 +75,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "90dcc41fb9e43f27d967aa2fa6c0e49dbe645944c17aeb02bfc420f8ae01f71f",
-        "initialDigest" : "f4eec244ab5b55ffe7f4675699d8647d5293feb8c4dcd2d5444a6540a3db25d2"
+        "finalDigest" : "678dd896cef46b7b79795db8b159db9d3b4c22df1a67df0458ec711069b399c1",
+        "initialDigest" : "77b24a14c8640d0c7ada6b88a639572c6ccfb85207db3bf762105ab50312b6b4"
       },
       "name" : "input-response",
       "seed" : "1"
@@ -210,6 +211,26 @@
           },
           "result" : "action.wrong-value-count",
           "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "move.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.a13.no-moves",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "move.undo",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
         }
       ],
       "expect" : {
@@ -272,8 +293,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "90dcc41fb9e43f27d967aa2fa6c0e49dbe645944c17aeb02bfc420f8ae01f71f",
-        "initialDigest" : "f4eec244ab5b55ffe7f4675699d8647d5293feb8c4dcd2d5444a6540a3db25d2"
+        "finalDigest" : "678dd896cef46b7b79795db8b159db9d3b4c22df1a67df0458ec711069b399c1",
+        "initialDigest" : "77b24a14c8640d0c7ada6b88a639572c6ccfb85207db3bf762105ab50312b6b4"
       },
       "name" : "save-restore",
       "seed" : "1"
@@ -332,7 +353,7 @@
         }
       ],
       "expect" : {
-        "initialDigest" : "f4eec244ab5b55ffe7f4675699d8647d5293feb8c4dcd2d5444a6540a3db25d2",
+        "initialDigest" : "77b24a14c8640d0c7ada6b88a639572c6ccfb85207db3bf762105ab50312b6b4",
         "resetDigest" : true
       },
       "name" : "reset",
@@ -403,8 +424,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "5b1647722de8398753bb2b7632d10df7a7f770182255246bc68a535a49e182be",
-        "initialDigest" : "f4eec244ab5b55ffe7f4675699d8647d5293feb8c4dcd2d5444a6540a3db25d2",
+        "finalDigest" : "f7dce4d2f7ab2e1633c1d342c03031d00ae6ec8ecab9adfdcd94513ddb9f6db0",
+        "initialDigest" : "77b24a14c8640d0c7ada6b88a639572c6ccfb85207db3bf762105ab50312b6b4",
         "outcome" : "level-solved"
       },
       "name" : "fixture-lm-01",
@@ -464,8 +485,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "37d602a78af7f294950734742173e9de968491a6b788b778c0a7deab2fde07f4",
-        "initialDigest" : "f4eec244ab5b55ffe7f4675699d8647d5293feb8c4dcd2d5444a6540a3db25d2",
+        "finalDigest" : "8b157f3280296441ceaba724e306f9d9789d73619ec9c40f0071c94750f4ce8a",
+        "initialDigest" : "77b24a14c8640d0c7ada6b88a639572c6ccfb85207db3bf762105ab50312b6b4",
         "outcome" : "level-solved"
       },
       "name" : "fixture-lm-05",
@@ -585,8 +606,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "76571f7d393e11f964ecca92b965f906aedf8c6e49a3d7df19a941d806720a0f",
-        "initialDigest" : "f4eec244ab5b55ffe7f4675699d8647d5293feb8c4dcd2d5444a6540a3db25d2",
+        "finalDigest" : "25884fffd0d22826cc762d66740fc950e01e0c95c9b671a436dc92400dc0a748",
+        "initialDigest" : "77b24a14c8640d0c7ada6b88a639572c6ccfb85207db3bf762105ab50312b6b4",
         "outcome" : "level-solved"
       },
       "name" : "fixture-lm-10",
@@ -646,8 +667,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "159bc8b44b393b4d03fde865b24e83d49d94a03cb5ae765601a84364ee167424",
-        "initialDigest" : "f4eec244ab5b55ffe7f4675699d8647d5293feb8c4dcd2d5444a6540a3db25d2",
+        "finalDigest" : "8d619fc6555eca0ad704224ca5ed230bfb74c938cb7d2f72021b11479088ffce",
+        "initialDigest" : "77b24a14c8640d0c7ada6b88a639572c6ccfb85207db3bf762105ab50312b6b4",
         "outcome" : "level-solved"
       },
       "name" : "fixture-lm-16",
@@ -787,11 +808,61 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "3f2c1f9126b4ebadd66a75cd5f3faff5349cc5e5de5676e8db1cdae10f9c46e5",
-        "initialDigest" : "f4eec244ab5b55ffe7f4675699d8647d5293feb8c4dcd2d5444a6540a3db25d2",
+        "finalDigest" : "2ad678202a3fe2256ae28e506f7da8422d0f531869e245d28be0293fd05d6f02",
+        "initialDigest" : "77b24a14c8640d0c7ada6b88a639572c6ccfb85207db3bf762105ab50312b6b4",
         "outcome" : "level-solved"
       },
       "name" : "fixture-lm-20",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "level.select",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "tile.select",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "tile.turn",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "move.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "c1f0d91515e2b5d838e09bd2d8a96caed8b49d454671470b4f489be4459f2494",
+        "initialDigest" : "77b24a14c8640d0c7ada6b88a639572c6ccfb85207db3bf762105ab50312b6b4"
+      },
+      "name" : "fixture-undo",
       "seed" : "1"
     },
     {
@@ -808,8 +879,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "f4eec244ab5b55ffe7f4675699d8647d5293feb8c4dcd2d5444a6540a3db25d2",
-        "initialDigest" : "f4eec244ab5b55ffe7f4675699d8647d5293feb8c4dcd2d5444a6540a3db25d2"
+        "finalDigest" : "77b24a14c8640d0c7ada6b88a639572c6ccfb85207db3bf762105ab50312b6b4",
+        "initialDigest" : "77b24a14c8640d0c7ada6b88a639572c6ccfb85207db3bf762105ab50312b6b4"
       },
       "name" : "refusal-level-out-of-range",
       "seed" : "1"
@@ -828,8 +899,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "f4eec244ab5b55ffe7f4675699d8647d5293feb8c4dcd2d5444a6540a3db25d2",
-        "initialDigest" : "f4eec244ab5b55ffe7f4675699d8647d5293feb8c4dcd2d5444a6540a3db25d2"
+        "finalDigest" : "77b24a14c8640d0c7ada6b88a639572c6ccfb85207db3bf762105ab50312b6b4",
+        "initialDigest" : "77b24a14c8640d0c7ada6b88a639572c6ccfb85207db3bf762105ab50312b6b4"
       },
       "name" : "refusal-level-before-first",
       "seed" : "1"
@@ -848,8 +919,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "f4eec244ab5b55ffe7f4675699d8647d5293feb8c4dcd2d5444a6540a3db25d2",
-        "initialDigest" : "f4eec244ab5b55ffe7f4675699d8647d5293feb8c4dcd2d5444a6540a3db25d2"
+        "finalDigest" : "77b24a14c8640d0c7ada6b88a639572c6ccfb85207db3bf762105ab50312b6b4",
+        "initialDigest" : "77b24a14c8640d0c7ada6b88a639572c6ccfb85207db3bf762105ab50312b6b4"
       },
       "name" : "refusal-turn-without-selection",
       "seed" : "1"
