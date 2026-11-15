@@ -1,0 +1,22 @@
+{
+  "argv": [
+    "env",
+    "CI=1",
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/VisualCore",
+    "--filter",
+    "Collision2DTests"
+  ],
+  "command": "env CI=1 swift test --package-path Packages/VisualCore --filter Collision2DTests",
+  "elapsed_seconds": 3.734,
+  "exit_code": 0,
+  "finished": "2026-11-15T02:40:49+00:00",
+  "log": ".autonomy/logs/A10-P01.visualcore-host.log",
+  "log_sha256": "bd4fa9b0596cd67f1b0f4308986654b06b92569f8882df1a4b164f1b415a3bf1",
+  "name": "visualcore-host",
+  "stage": "A10-P01",
+  "started": "2026-11-15T02:40:45+00:00",
+  "timed_out": false
+}
