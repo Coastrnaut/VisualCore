@@ -28,7 +28,7 @@ X-A11 (owner, 2026-11-14). Precedent: `specs/075-na-p01-engine/tasks.md`.
 
 ## Phase 5: Polish & evidence
 
-- [ ] T-A11-109 VisualCore host tests (`--name visualcore-host -- swift test --package-path Packages/VisualCore --filter "Contacts2DTests|ImpulseSolver2DTests"`) and public API (`--name public-api -- python3 scripts/check_public_api.py`) (SC-A11-105, 107)
+- [X] T-A11-109 VisualCore host tests (`--name visualcore-host -- swift test --package-path Packages/VisualCore --filter "Contacts2DTests|ImpulseSolver2DTests"`) and public API (`--name public-api -- python3 scripts/check_public_api.py`) (SC-A11-105, 107) — Verified 2026-11-15: 2026-11-15: .autonomy/checks/A11-P01.visualcore-host.json exit 0 (Contacts2DTests and ImpulseSolver2DTests, 25 tests); .autonomy/checks/A11-P01.public-api.json exit 0 (2,874 declarations, 0 undocumented)
 - [ ] T-A11-110 Playground tests on sim-27.2 (`--name playground-ios27 -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing PhysicsPlaygroundCoreTests PhysicsPlaygroundExperienceTests`; each test < 10 s) (SC-A11-101–107)
 - [ ] T-A11-111 App build and unit (`--name app-unit -- python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27`)
 - [ ] T-A11-112 Runner iOS 27 (`--name verify-27 -- python3 scripts/verify_experiences.py --only a11.physics-playground --runtime 27`)
