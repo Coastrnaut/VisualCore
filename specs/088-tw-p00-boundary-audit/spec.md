@@ -25,6 +25,47 @@ Canonical overrides:
 - **Constitution:** 2.8.0 adds the A12 experience rules (committed at the start of this gate).
 - **Evidence:** host and simulator only; device tasks are tagged {device} and wait for ImplementationLock-100.
 
+## Clarifications
+
+### Session 2026-11-15
+
+Answered autonomously under the owner's standing delegation, recommended option each time. Facts checked in code:
+the A12 constitution commit is `dbc35ba4` and the A12-P00 specify commit `9315c27e` (the phase start: the no-change
+diff of `Packages` and `External` is taken from it); the reference submodule is pinned at `d93edd1`; eleven experiences
+are registered (`Catalog/registrations.json`, A01–A11). VisualCore offers `VisualCoreMath.OrbitCamera` (target,
+distance clamped to 0.01…1,000,000, yaw, pitch clamped to ±89°, field of view, near and far planes, view and
+projection matrices, `project` and `ray` for picking) and `CameraRail`; `VisualCoreScenes` mesh pieces (`Mesh`,
+`MeshBuilder`, `MeshGenerators.plane`, `cube`, `uvSphere`, `MeshShapes.surface(columns:rows:…)`, `revolution`,
+`extrusion`, `tube`, `bevelledBox`, normals, bounds, validation with `MeshBudget`, digests, `MeshCache`, and
+`StreamingBudget` with `StreamingLevel`); `VisualCoreSimulation.SeededRandom`; `VisualCoreRendering.MeshRenderer`
+(one mesh with Lambert lighting from one light direction plus an ambient fraction, optional linear `MeshFog`),
+`DepthMeshPass` (several meshes drawn with depth testing into an owned depth render target, then copied to the
+framebuffer), `ParticleRenderer` (instanced quads), render-target `readPixels` and `StillCapture` (one PNG of the
+host). No seeded noise or height-field generator exists in any framework product; there is no instanced mesh drawing,
+no per-material colour or shading model beyond one colour per draw, and no level-of-detail selection for meshes.
+
+- Q: How is the manual's "compile an empty shell" gate met in the one app? → A: As for A11: the one app is the shell;
+  this phase proves it builds for testing with Tiny Worlds absent; the targets come with A12-P01's first rules.
+- Q: What makes a capability "available"? → A: A public declaration in a VisualCore framework product with at least one
+  test that exercises it; an implementation that exists only inside another experience or a harness is "requires
+  adaptation" at best.
+- Q: Which package holds Tiny Worlds? → A: `Packages/ExperiencesCreative/TinyWorlds` (Auto-Creator.md §16), as A05–A11
+  did; no new package is created.
+- Q: Does Tiny Worlds need a permission or a new privacy answer? → A: No. Version 0.1 needs no microphone, camera,
+  photos, motion or location; saved worlds and their thumbnails live in the experience's own storage, so the app's
+  privacy answers do not change.
+- Q: Which pieces exist, and who owns the missing ones? → A: The orbit camera, mesh builders, generators and
+  validation, the mesh renderer with one directional light and fog, the depth pass, seeded random numbers, render-target
+  read-back, storage and quality tiers exist. Gaps and owners, following the manual's phases (P01 procedural seed and
+  mesh fixtures, P02 camera and scene renderer, P03 world customization and persistence, P04 three environment packs,
+  P05 memory, thermal and content QA): seeded noise and a height-field terrain generator with seam-free normals →
+  `VisualCoreScenes` (A12-P01); constrained orbit and zoom limits for comfortable control, a scene of several lit meshes
+  with depth and picking geometry separate from the visual meshes → `VisualCoreMath`/`VisualCoreRendering` where
+  generic, app-local otherwise (A12-P02); prop placement, light adjustment, the world document and thumbnails →
+  app-local over `ExperienceStorage` and render-target read-back (A12-P03); the island, asteroid garden and miniature
+  city packs → app-local (A12-P04); the detail tier over `StreamingBudget` and `MeshBudget` with memory and thermal
+  limits → app-local (A12-P05). The audit confirms or corrects each from the code.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - An evidence-backed integration matrix (Priority: P1) 🎯
@@ -97,14 +138,16 @@ own each missing piece and in which phase.
   constrained zoom): marked "requires adaptation" with the missing part named.
 - **A capability exists only inside another experience** (for example Infinite Geometry's or Particle Universe's 3D
   code) but not in a framework product: not counted as available; reuse needs it moved into VisualCore first.
-- **Depth for 3D drawing:** whether a depth buffer is available to experiences (the window surface or an off-screen
-  target) is recorded with evidence; a missing depth path is a gap with an owner, never a reason for a second renderer.
+- **Depth for 3D drawing:** the window surface is colour-only; depth comes from `DepthMeshPass`'s owned off-screen
+  target copied to the framebuffer. The audit records whether that path serves several lit meshes per frame; a missing
+  piece is a gap with an owner, never a reason for a second renderer or a changed window configuration.
 - **Seams between terrain pieces and unstable generation** (the manual's terrain risk): the audit records which seeded
   noise and mesh-normal pieces exist; their proof is assigned to a phase, nothing is built here.
 - **Unbounded geometry** (prop count, terrain resolution, thumbnails): the audit records existing budget pieces; the
   budget's owner is named.
 - **Camera penetrating terrain or extreme zoom:** recorded as a rule (constrained orbit and zoom), not solved here.
-- **Thumbnails of saved worlds:** whether an off-screen render-and-read-back path exists is recorded; otherwise a gap.
+- **Thumbnails of saved worlds:** render-target read-back and the host's still capture exist; the audit records
+  whether a small off-screen thumbnail of a world can be produced with them, otherwise a gap.
 - **The build-step count changes during the phase**: the inventory records the count at the time of the check.
 - **The reference regression fails before any change**: recorded as a blocker; no Tiny Worlds work starts.
 - **Persisted data, permissions, accessibility interface:** not applicable in this phase (no interface is added).
