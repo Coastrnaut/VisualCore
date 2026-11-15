@@ -150,25 +150,13 @@ struct PlaygroundControls: View {
                        hint: mirror.paused ? "Advances the world by one tick" : "Available while paused",
                        enabled: mirror.paused) { _ = port.send("world.step") }
             }
-            Picker(selection: Binding(get: { mirror.timeScaleIndex },
-                                      set: { index in
-                                          if index != mirror.timeScaleIndex {
-                                              _ = port.send("world.timeScale", [Double(index)])
-                                          }
-                                      })) {
-                ForEach(0..<PhysicsWorld.timeScales.count, id: \.self) { index in
-                    Text(verbatim: PlaygroundPresenter.timeScaleText(index))
-                        .accessibilityLabel(Text(verbatim: PlaygroundPresenter.timeScaleWords(index)))
-                        .tag(index)
-                }
-            } label: {
-                Text(verbatim: "Time scale")
-            }
-            .pickerStyle(.segmented)
-            .frame(minHeight: 44)
-            .accessibilityLabel(Text(verbatim: "Time scale"))
-            .accessibilityValue(Text(verbatim: PlaygroundPresenter.timeScaleWords(mirror.timeScaleIndex)))
-            .accessibilityIdentifier(port.identifier("time-scale"))
+            PlaygroundSegmentedPicker(
+                title: "Time scale", identifier: port.identifier("time-scale"),
+                titles: PhysicsWorld.timeScales.indices.map { PlaygroundPresenter.timeScaleText($0) },
+                words: PhysicsWorld.timeScales.indices.map { PlaygroundPresenter.timeScaleWords($0) },
+                selected: mirror.timeScaleIndex,
+                choose: { index in _ = port.send("world.timeScale", [Double(index)]) })
+            .equatable()
             levelPicker("Gravity", name: "gravity", control: "world.gravity",
                         titles: PlaygroundPresenter.gravityTitles, selected: mirror.gravityLevel,
                         value: PlaygroundPresenter.gravityValue)
@@ -259,18 +247,11 @@ struct PlaygroundControls: View {
                 }
             }
         }
-        Picker(selection: Binding(get: { mirror.shapeKind }, set: { mirror.shapeKind = $0 })) {
-            ForEach(Self.shapeTitles.indices, id: \.self) { index in
-                Text(verbatim: Self.shapeTitles[index]).tag(index)
-            }
-        } label: {
-            Text(verbatim: "Shape")
-        }
-        .pickerStyle(.segmented)
-        .frame(minHeight: 44)
-        .accessibilityLabel(Text(verbatim: "Shape to add"))
-        .accessibilityValue(Text(verbatim: Self.shapeTitles[mirror.shapeKind == 1 ? 1 : 0]))
-        .accessibilityIdentifier(port.identifier("shape"))
+        PlaygroundSegmentedPicker(
+            title: "Shape to add", identifier: port.identifier("shape"), titles: Self.shapeTitles,
+            words: Self.shapeTitles, selected: mirror.shapeKind == 1 ? 1 : 0,
+            choose: { [mirror] index in mirror.shapeKind = index })
+        .equatable()
         HStack(spacing: 8) {
             ForEach(Self.directions.indices, id: \.self) { index in
                 let direction = Self.directions[index]
@@ -469,23 +450,10 @@ struct PlaygroundControls: View {
     /// The segmented picker of ``levelPicker(_:name:control:titles:selected:value:)``.
     private func picker(_ title: String, name: String, control: String, titles: [String], selected: Int,
                         value: @escaping (Int) -> String) -> some View {
-        Picker(selection: Binding(get: { selected },
-                                  set: { level in
-                                      if level != selected { _ = port.send(control, [Double(level)]) }
-                                  })) {
-            ForEach(titles.indices, id: \.self) { level in
-                Text(verbatim: titles[level])
-                    .accessibilityLabel(Text(verbatim: value(level)))
-                    .tag(level)
-            }
-        } label: {
-            Text(verbatim: title)
-        }
-        .pickerStyle(.segmented)
-        .frame(minHeight: 44)
-        .accessibilityLabel(Text(verbatim: title))
-        .accessibilityValue(Text(verbatim: value(selected)))
-        .accessibilityIdentifier(port.identifier(name))
+        PlaygroundSegmentedPicker(title: title, identifier: port.identifier(name), titles: titles,
+                                  words: titles.indices.map(value), selected: selected,
+                                  choose: { level in _ = port.send(control, [Double(level)]) })
+        .equatable()
     }
 
     /// A bordered button `title` with the identifier `name`, the accessible value `value` and the hint `hint`.
@@ -504,5 +472,47 @@ struct PlaygroundControls: View {
         .accessibilityValue(Text(verbatim: value))
         .accessibilityHint(Text(verbatim: hint))
         .accessibilityIdentifier(port.identifier(name))
+    }
+}
+
+/// A segmented picker of the controls (time scale, gravity, drag, spring stiffness, shape to add). It is an
+/// `Equatable` view compared without its `choose` handler, so the per-frame redraws of the controls (the status line
+/// and the description change every frame while the world runs) leave the segmented control alone unless its
+/// selection or titles change: rebuilt every frame with a new binding, the control dropped a tap that came while the
+/// world ran (found by the interface test `PPWorldUITests.testTimeScale`, feature 087).
+struct PlaygroundSegmentedPicker: View, Equatable {
+    /// The picker's spoken label ("Time scale").
+    let title: String
+    /// The accessibility identifier.
+    let identifier: String
+    /// The visible title of each segment.
+    let titles: [String]
+    /// The spoken label of each segment, also the picker's spoken value for the selected one.
+    let words: [String]
+    /// The selected segment.
+    let selected: Int
+    /// Called with a segment other than the selected one when it is chosen.
+    let choose: (Int) -> Void
+
+    nonisolated static func == (lhs: PlaygroundSegmentedPicker, rhs: PlaygroundSegmentedPicker) -> Bool {
+        lhs.title == rhs.title && lhs.identifier == rhs.identifier && lhs.titles == rhs.titles
+            && lhs.words == rhs.words && lhs.selected == rhs.selected
+    }
+
+    var body: some View {
+        Picker(selection: Binding(get: { selected }, set: { index in if index != selected { choose(index) } })) {
+            ForEach(titles.indices, id: \.self) { index in
+                Text(verbatim: titles[index])
+                    .accessibilityLabel(Text(verbatim: words.indices.contains(index) ? words[index] : titles[index]))
+                    .tag(index)
+            }
+        } label: {
+            Text(verbatim: title)
+        }
+        .pickerStyle(.segmented)
+        .frame(minHeight: 44)
+        .accessibilityLabel(Text(verbatim: title))
+        .accessibilityValue(Text(verbatim: words.indices.contains(selected) ? words[selected] : ""))
+        .accessibilityIdentifier(identifier)
     }
 }

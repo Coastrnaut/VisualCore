@@ -186,6 +186,26 @@ and `VisualCoreRendering` (iOS, GL). ADR-0003 and the package map record this. R
 - Version 0.1 is one game, Neon Dodge; reaching game over through the interface takes minutes of play, so the
   game-over screen and its table are proved by the session and render tests, not by an interface test.
 
+### Physics Playground (A11; features 081–087)
+
+- Frame pacing at each quality level (stacked objects and free play at 48 bodies), the thermal state over a
+  ten-minute session and the touch latency of a grab are unmeasured on devices; they wait for the device campaign
+  ([device-campaign.md](../apps/physics-playground/device-campaign.md), rows PP-D1 to PP-D3). No frame-time, latency,
+  battery or memory figure is stated.
+- The VoiceOver pass on hardware (row PP-D4), Dynamic Type at the largest sizes on hardware and the system
+  accessibility audits (row PP-D5) wait for the device campaign; the labels and values, the native alternative to
+  every gesture, the spoken description with the tutorial steps and the absence of decorative motion are proved by the
+  experience's tests only.
+- The numbers of the playground — the material constants, the gravity, drag and stiffness levels, the arrows and the
+  energy, momentum and speed of the state panel — are an educational approximation of a 2D rigid-body world at a fixed
+  step, not engineering data or a physical measurement; the panel and the controls say so. Arrows show velocity,
+  weight and the net spring force only; contact and drag forces are not drawn.
+- The world is 2D with circles and boxes only (no polygons, soft bodies or fluids), at most 48 bodies; springs come
+  with the starting scene and the presets and cannot be drawn by hand in version 0.1.
+- Four saved experiment slots, kept on the device only (no sync, no export). A damaged, half-written or newer
+  experiment file is refused with its reason and left in place until the person saves over it
+  (`ExperimentStoreTests.testRefusedFilesAreReportedAndLeftUntouched`).
+
 ## Distribution
 
 - No App Store submission, signing or purchase setup is part of this release; those are owner actions.
