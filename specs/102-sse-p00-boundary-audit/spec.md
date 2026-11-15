@@ -26,6 +26,50 @@ Canonical overrides:
 - **Constitution:** 2.10.0 adds the A14 experience rules (committed at the start of this gate).
 - **Evidence:** host and simulator only; device tasks are tagged {device} and wait for ImplementationLock-100.
 
+## Clarifications
+
+### Session 2026-11-15
+
+Answered autonomously under the owner's standing delegation, recommended option each time. Facts checked in code:
+the A14 constitution commit is `462c0a1f` and the A14-P00 specify commit `9335c07c` (the phase start: the no-change
+diff of `Packages` and `External` is taken from it); the reference submodule is pinned at `d93edd1`; thirteen
+experiences are registered (`Catalog/registrations.json`, A01–A13). VisualCore offers `VisualCoreMath` `Vec3`, `Mat4`,
+`Quat`, `OrbitCamera` (with `OrbitBounds`), `CameraRail`, `FramingFlight` with `TourTimeline`, `OriginRebase`,
+`PrecisionAdvisor` and `Ray3`/`RayHit3` with ray–sphere, box and triangle casts (`RayIntersection.swift`);
+`VisualCoreScenes` `MeshGenerators.uvSphere(segments:rings:radius:)`, `MeshBuilder`, `GradientNoise2D` and
+`FractalNoise2D`; `VisualCoreRendering` `MeshRenderer` (Lambert lighting toward a light direction, an `OrbitCamera` or
+explicit view and projection, per-vertex colours, `MeshFog`), `DepthMeshPass`, `RenderTarget`, `PrimitiveRenderer`
+and `ResourceRegistry`; `VisualCoreSimulation` `SceneClock` (bounded delta, speed 0–4, reduced-motion factor),
+`Timeline`, `FixedStepClock` and `FixedStepRunner`; gesture recognizers with `GestureArbiter`; accessibility planners
+and sinks; `ExperienceStorage`, `DocumentStore`, `MigrationChain`. No Kepler or other orbit propagation, no simulated
+calendar date with a time rate, no astronomical unit conversion and no body catalog exist in any framework product
+(grep for kepler, eccentric anomaly, ephemeris finds nothing).
+
+- Q: How is the manual's "compile an empty shell" gate met in the one app? → A: As for A13: the one app is the shell;
+  this phase proves it builds for testing with Solar System Explorer absent; the targets come with A14-P01's first
+  rules.
+- Q: What makes a capability "available"? → A: A public declaration in a VisualCore framework product with at least one
+  test that exercises it; an implementation that exists only inside another experience or a harness is "requires
+  adaptation" at best.
+- Q: Which package holds Solar System Explorer? → A: `Packages/ExperiencesCreative/SolarSystemExplorer`
+  (Auto-Creator.md §16), as A05–A13 did; no new package is created.
+- Q: Does Solar System Explorer need a permission or a new privacy answer? → A: No. Version 0.1 needs no location,
+  camera, motion, microphone or network; "reset to present" reads the device clock only; view state lives in the
+  experience's own storage, so the app's privacy answers do not change.
+- Q: Which pieces exist, and who owns the missing ones? → A: Vectors, matrices, quaternions, the orbit camera, camera
+  rails and tour timelines, origin rebasing and precision advice, ray–sphere picking, the UV sphere, noise, the
+  lit mesh renderer with fog, render targets, the scene clock, gestures, accessibility planners and storage exist. Gaps
+  and owners, following the manual's phases (P01 scientific catalog, units and citation audit, P02 approximate orbit
+  computation with fixtures, P03 camera and 3D body rendering, P04 time controls and guided tours, P05 scientific review
+  and device QA): the body catalog with sourced data, unit conversion and the citation record → app-local (A14-P01);
+  approximate Kepler propagation for a simulated date → `VisualCoreMath` if reusable, else app-local (A14-P02);
+  procedural planet surfaces, rings, the Sun, starfield, orbit lines, labels, camera-relative positions, planet focus
+  and the two scale modes → app-local over the mesh renderer, noise and the orbit camera (A14-P03); the simulated clock
+  with play, pause, rate and a bounded date range, captioned tours, fact cards and saved view state → app-local over
+  `SceneClock`, `TourTimeline` and `ExperienceStorage`, with a reusable scaled-date clock assessed for
+  `VisualCoreSimulation` (A14-P04); the data provenance and tolerance review → app-local (A14-P05). The audit confirms or corrects each from the code and the
+  manual's phase list.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - An evidence-backed integration matrix (Priority: P1) 🎯
