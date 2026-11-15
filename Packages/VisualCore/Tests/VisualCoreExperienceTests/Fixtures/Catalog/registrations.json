@@ -282,7 +282,7 @@
         "place, move, turn and delete props",
         "sun direction and ambient light",
         "four saved worlds with pictures",
-        "three terrain detail levels",
+        "less detail under memory or heat",
         "new seed on request"
       ],
       "quality_tiers": [

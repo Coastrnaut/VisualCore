@@ -653,7 +653,7 @@
       "id": "M11",
       "capability": "Dynamic detail tier based on the GPU and memory budget: terrain resolution, prop count and draw count lowered per quality level under heat, Low Power Mode and memory pressure, without changing the world document",
       "source": "v0.1 feature 6: dynamic detail tier under GPU/memory budget; constitution A12 bounded",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/TessellationChoice.swift",
@@ -693,10 +693,10 @@
         }
       ],
       "example": {
-        "file": "Packages/ExperiencesCreative/AudioOdyssey/Core/OdysseyQuality.swift",
-        "symbol": "OdysseyQuality"
+        "file": "Packages/ExperiencesCreative/TinyWorlds/Core/TierPolicy.swift",
+        "symbol": "TierPolicy"
       },
-      "notes": "Segment counts per quality level under a vertex budget (TessellationChoiceTests), streaming levels (StreamingBudgetTests), mesh budgets (MeshBuilderTests), the governor and profiles (QualityGovernorTests, QualityProfileTests) and the process footprint (used by VisualCoreExperienceHostTests/EnduranceTests) exist; no level-of-detail mesh selection or prop and draw caps per tier exist in a framework product. The world's tier table (terrain resolution, prop and draw caps, thumbnail size) and its memory-warning response are G-DETAIL (app-local), A12-P05; Core.qualityTiers must match the presenter's levels. A12-P02 adds three terrain detail levels (TerrainDetail: full, half, quarter resolution; 27 meshes validate with every index in bounds) declared as quality levels level-0…2; the tier policy under memory, heat and Low Power Mode remains (G-DETAIL, A12-P05)."
+      "notes": "Segment counts per quality level under a vertex budget (TessellationChoiceTests), streaming levels (StreamingBudgetTests), mesh budgets (MeshBuilderTests), the governor and profiles (QualityGovernorTests, QualityProfileTests) and the process footprint (used by VisualCoreExperienceHostTests/EnduranceTests) exist; no level-of-detail mesh selection or prop and draw caps per tier exist in a framework product. The world's tier table (terrain resolution, prop and draw caps, thumbnail size) and its memory-warning response are G-DETAIL (app-local), A12-P05; Core.qualityTiers must match the presenter's levels. A12-P02 adds three terrain detail levels (TerrainDetail: full, half, quarter resolution; 27 meshes validate with every index in bounds) declared as quality levels level-0…2; the tier policy under memory, heat and Low Power Mode remains (G-DETAIL, A12-P05). A12-P05 (G-DETAIL closed): DetailTier (tier i draws terrain level i: 64/32/16 cells, city 48/24/12; every world part and prop drawn at every tier; thumbnail 160 × 120) and TierPolicy (tier = max(host level, Low Power Mode → 2, memory warning → 2 held 30 s of frame time)); a tier change rebuilds the terrain renderer once and never changes the world or its digest; 20 load/unload cycles keep the live graphics objects of cycle 1 (DetailTierTests, TierPolicyTests, WorldsQualityTests, WorldsStaleObjectTests)."
     },
     {
       "id": "M12",
@@ -1238,7 +1238,7 @@
       "justification": "The world's tier table (terrain resolution through TessellationChoice, prop and draw caps, thumbnail size) and its response to memory warnings, heat and Low Power Mode are the experience's policy over StreamingBudget, MeshBudget, QualityProfile and QualityGovernor (clarification 5); level-of-detail mesh selection beyond segment counts is not needed for a bounded diorama.",
       "phase": 5,
       "test": "Host tests: each tier's terrain, prop and draw counts stay within the arithmetic bound of its budget; lower tiers never raise a count; changing the tier never changes the world document or its digest; a memory warning drops to the lowest tier and rebuilds within budget; Core.qualityTiers matches the presenter's levels",
-      "closed": null
+      "closed": "A12-P05"
     },
     {
       "id": "G-CONTENTLICENSES",
