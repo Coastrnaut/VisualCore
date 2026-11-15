@@ -1,11 +1,12 @@
-// SolarRenderTests — feature 103 (A14-P01) T-A14-103 (FR-A14-120, 121; clarifications Q4, Q5; SC-A14-104). Solar
-// System Explorer rendered inside the one app's session host on the simulator, short runs only (each test under 10 s,
-// no wall-clock assertion): a drawn frame with the Sun, Earth and Neptune selected is non-blank and not black, with
-// its background and body probes holding; changing the selection changes the drawn pixels where the ring outline was
-// and where it now is, and the fact card; drawing never changes the state or its digest; the display radius formula
-// and the line-up of clarification Q4; the camera fits the row; the procedural two-band colours; the words of the
-// controls; teardown releases every GPU object; and the experience's sources never create a graphics context of their
-// own.
+// SolarRenderTests — feature 103 (A14-P01) T-A14-103 (FR-A14-120, 121; clarifications Q4, Q5; SC-A14-104), updated for
+// the orbit view of feature 104 (A14-P02) T-A14-207 and T-A14-208 (FR-A14-220, FR-A14-221). Solar System Explorer
+// rendered inside the one app's session host on the simulator, short runs only (each test under 10 s, no wall-clock
+// assertion): a drawn frame with the Sun, Earth and Neptune focused is non-blank and not black, with its background
+// and body probes holding; changing the focus changes the drawn pixels, puts the ring around the new body and changes
+// the fact card; drawing never changes the state or its digest; the display radius formula of clarification Q4 and the
+// orbit view's meshes at the scaled radii; the procedural two-band colours; the words of the controls; teardown
+// releases every GPU object; and the experience's sources never create a graphics context of their own. The orbit
+// view's own geometry and frames are tested in OrbitLayoutTests and SolarOrbitRenderTests.
 import Foundation
 import XCTest
 @testable import SolarSystemExplorerExperience
@@ -27,7 +28,7 @@ final class SolarRenderTests: XCTestCase {
         XCTAssertFalse(FrameChecks.isBlack(frame.rgba, width: frame.width, height: frame.height), "\(name) not black")
         let probes = shell.frameProbes
         XCTAssertGreaterThanOrEqual(probes.count, 1, "\(name): at least the background")
-        XCTAssertEqual(probes.first?.name, "background", name)
+        XCTAssertEqual(probes.first?.name, "background", "\(name): the overview camera keeps the top clear")
         for probe in probes {
             let found = FrameChecks.probe(probe, rgba: frame.rgba, width: frame.width, height: frame.height)
             XCTAssertEqual(found?.rawValue, probe.expected, "\(name) \(probe.name)")
@@ -58,7 +59,14 @@ final class SolarRenderTests: XCTestCase {
         XCTAssertEqual(sun.expected, "red")
         XCTAssertEqual(FrameChecks.probe(sun, rgba: frame.rgba, width: frame.width, height: frame.height)?.rawValue,
                        "red")
+        // Neptune focused and zoomed in, seen from its sunlit side (the yaw step nearest the direction to the Sun).
         XCTAssertTrue(shell.handle(control: "body.select", values: [8]).isAccepted)
+        for _ in 0..<8 { XCTAssertTrue(shell.handle(control: "camera.zoom", values: [1]).isAccepted) }
+        let position = OrbitLayout.scenePosition(index: 8, day: 0)
+        let steps = Int((atan2(-position.x, -position.z) * 180 / Double.pi / 15).rounded())
+        for _ in 0..<abs(steps) {
+            XCTAssertTrue(shell.handle(control: "camera.orbit", values: [steps < 0 ? -1 : 1]).isAccepted)
+        }
         frame = try SolarTest.picture(session)
         let neptune = try XCTUnwrap(shell.frameProbes.first { $0.name == "body-8" })
         XCTAssertEqual(neptune.expected, "blue")
@@ -73,27 +81,27 @@ final class SolarRenderTests: XCTestCase {
         let before = try SolarTest.picture(session)
         let card = shell.presenter.mirror.facts
         let canvas = Vec2(Double(before.width), Double(before.height))
-        // Pixels per world unit on the row's plane.
-        let camera = SolarPresenter.camera(aspect: canvas.x / canvas.y)
-        let scale = canvas.y / (2 * camera.distance * tan(SolarPresenter.fieldOfView / 2))
-        // The ring's top point around the Sun, and around Earth.
-        let sunRing = SolarPresenter.ringRadius(displayRadius: SolarPresenter.sunDisplayRadius)
-        let sunTop = SolarPresenter.pixel(of: Vec3(0, sunRing, 0), canvas: canvas)
-        let earthRing = SolarPresenter.ringRadius(displayRadius: SolarPresenter.displayRadius(index: 3))
-        let earthTop = SolarPresenter.pixel(of: Vec3(SolarPresenter.xPosition(index: 3), earthRing, 0), canvas: canvas)
-        let radius = max(1, Int((SolarPresenter.ringTubeRadius * 2 * scale).rounded(.up)))
         XCTAssertTrue(shell.handle(control: "body.select", values: [3]).isAccepted)
         let after = try SolarTest.picture(session)
         assertDrawn(shell, after, "Earth")
         XCTAssertNotEqual(StableHash.sha256Hex(before.rgba), StableHash.sha256Hex(after.rgba), "the frame changes")
-        XCTAssertGreaterThan(SolarTest.differingPixels(before, after, around: sunTop, radius: radius), 0,
-                             "the ring left the Sun")
-        XCTAssertGreaterThan(SolarTest.differingPixels(before, after, around: earthTop, radius: radius), 0,
-                             "the ring is around Earth")
+        // Earth is now in the middle of the canvas, where the Sun was.
+        let middle = Vec2(canvas.x / 2, canvas.y / 2)
+        XCTAssertGreaterThan(SolarTest.differingPixels(before, after, around: middle, radius: 2), 0, "Earth in focus")
+        // The ring surrounds Earth: the pixels around its top point (in the ring's own plane) hold the ring colour.
+        let state = try SolarTest.core(shell).state
+        let camera = OrbitLayout.camera(state: state)
+        let ring = SolarPresenter.ringRadius(displayRadius: OrbitLayout.displayRadius(index: 3))
+        let top = OrbitLayout.ringModel(center: camera.target, camera: camera).applyPoint(Vec3(0, ring, 0))
+        let p = OrbitLayout.pixel(of: top, state: state, canvas: canvas)
+        XCTAssertGreaterThan(SolarTest.differingPixels(before, after, around: p, radius: 3), 0, "the ring is there")
         XCTAssertGreaterThan(SolarTest.pixels(near: SolarPresenter.ringColor, in: after), 0, "the ring is drawn")
+        XCTAssertEqual(shell.presenter.ringRenderer.map { ObjectIdentifier($0) },
+                       ObjectIdentifier(shell.presenter.ringRenderers[3]), "Earth's ring")
         XCTAssertNotEqual(shell.presenter.mirror.facts, card, "the card changes")
         XCTAssertEqual(shell.presenter.mirror.facts,
                        try XCTUnwrap(BodyCatalog.bundled.factCard(for: 3)).facts.map(\.text))
+        XCTAssertEqual(shell.presenter.mirror.distance, SolarCore.distanceWords(index: 3, dayOffset: 0))
 
         // The same state draws the same frame.
         let again = try SolarTest.picture(session)
@@ -122,7 +130,7 @@ final class SolarRenderTests: XCTestCase {
         session.close()
     }
 
-    func testTheDisplayRadiusFormulaAndTheLineUpOfClarificationQ4() throws {
+    func testTheDisplayRadiusFormulaOfClarificationQ4AndTheOrbitViewMeshes() throws {
         XCTAssertEqual(SolarPresenter.displayRadius(index: 0), 1.6, accuracy: 1e-12, "the Sun")
         XCTAssertEqual(SolarPresenter.displayRadius(index: 1), 0.25, accuracy: 1e-12, "Mercury")
         let radii: [Double] = [6_051.8, 6_371.0, 3_389.5, 69_911, 58_232, 25_362, 24_622]
@@ -139,51 +147,41 @@ final class SolarRenderTests: XCTestCase {
         XCTAssertEqual(SolarPresenter.displayRadius(radiusKm: 1, kind: .planet), 0.05, "at least 0.05")
         XCTAssertEqual(SolarPresenter.referenceRadiusKm, 2_439.7)
 
-        // The Sun at x = 0, the planets to its right 2.4 apart, none touching its neighbour.
-        XCTAssertEqual(SolarPresenter.xPosition(index: 0), 0)
-        XCTAssertEqual(SolarPresenter.xPosition(index: 1), 2.8, accuracy: 1e-12)
-        for index in 1..<9 {
-            let gap = SolarPresenter.xPosition(index: index) - SolarPresenter.xPosition(index: index - 1)
-            if index > 1 { XCTAssertEqual(gap, 2.4, accuracy: 1e-12, "even spacing at \(index)") }
-            XCTAssertGreaterThan(gap - SolarPresenter.displayRadius(index: index)
-                                 - SolarPresenter.displayRadius(index: index - 1), 0.3, "apart at \(index)")
-        }
-
-        // The meshes: nine UV spheres of 32 segments and 16 rings at the display radius, one colour per vertex.
+        // The meshes: nine UV spheres of 32 segments and 16 rings at the orbit view's display radius (× 0.6, the Sun
+        // × 0.5), one colour per vertex.
         let meshes = SolarPresenter.meshes()
         XCTAssertEqual(meshes.count, 9)
         for (index, part) in meshes.enumerated() {
             XCTAssertEqual(part.mesh, Mesh.uvSphere(segments: 32, rings: 16,
-                                                    radius: SolarPresenter.displayRadius(index: index)))
+                                                    radius: OrbitLayout.displayRadius(index: index)))
             XCTAssertEqual(part.colors.count, part.mesh.positions.count)
         }
         let ring = try SolarPresenter.ringMesh(selection: 3)
         XCTAssertGreaterThan(ring.triangleCount, 0)
-        let outer = SolarPresenter.ringRadius(displayRadius: SolarPresenter.displayRadius(index: 3))
+        let outer = SolarPresenter.ringRadius(displayRadius: OrbitLayout.displayRadius(index: 3))
             + SolarPresenter.ringTubeRadius
         for position in ring.positions {
             XCTAssertLessThanOrEqual((position.x * position.x + position.y * position.y).squareRoot(), outer + 1e-9)
             XCTAssertGreaterThan((position.x * position.x + position.y * position.y).squareRoot(),
-                                 SolarPresenter.displayRadius(index: 3), "the ring lies outside the body")
+                                 OrbitLayout.displayRadius(index: 3), "the ring lies outside the body")
+            XCTAssertEqual(position.z, 0, accuracy: SolarPresenter.ringTubeRadius + 1e-9, "the ring's x–y plane")
         }
-    }
-
-    func testTheCameraFitsTheRow() {
-        let aspects: [Double] = [0.46, 1, 1.5, 2.16]
-        let extent = SolarPresenter.rowExtent
-        for aspect in aspects {
-            let camera = SolarPresenter.camera(aspect: aspect)
-            XCTAssertEqual(camera.yaw, 0)
-            XCTAssertEqual(camera.pitch, 0)
-            let left = camera.project(Vec3(extent.minX, 0, 0), aspect: aspect)
-            let right = camera.project(Vec3(extent.maxX, 0, 0), aspect: aspect)
-            let top = camera.project(Vec3(0, extent.halfHeight, 0), aspect: aspect)
-            XCTAssertGreaterThanOrEqual(left.x, -1 / 1.1 - 1e-9, "aspect \(aspect): left inside")
-            XCTAssertLessThanOrEqual(right.x, 1 / 1.1 + 1e-9, "aspect \(aspect): right inside")
-            XCTAssertLessThanOrEqual(top.y, 0.8 + 1e-9, "aspect \(aspect): the top below the background probe")
-            XCTAssertEqual(left.x, -right.x, accuracy: 1e-9, "aspect \(aspect): centred")
+        // The orbit meshes: closed tubes of radius 0.04 around each 128-point path.
+        for id in OrbitLayout.orbitBodyIDs {
+            let orbit = try SolarPresenter.orbitMesh(bodyID: id)
+            XCTAssertGreaterThan(orbit.triangleCount, 0, id)
+            let path = OrbitLayout.orbitPath(bodyID: id)
+            // Every 7th vertex (a short test): each lies on the tube around the path (1 % for the joints).
+            for position in stride(from: 0, to: orbit.positions.count, by: 7).map({ orbit.positions[$0] }) {
+                var nearest = Double.infinity
+                for k in path.indices {
+                    nearest = min(nearest, OrbitLayout.segmentDistance(position, position, path[k],
+                                                                       path[(k + 1) % path.count]))
+                }
+                XCTAssertLessThanOrEqual(nearest, SolarPresenter.orbitTubeRadius * 1.01, id)
+                XCTAssertGreaterThanOrEqual(nearest, SolarPresenter.orbitTubeRadius * 0.9, id)
+            }
         }
-        XCTAssertEqual(SolarPresenter.camera(aspect: .nan), SolarPresenter.camera(aspect: 1))
     }
 
     func testTheTwoBandColoursAreProceduralAndDeterministic() {
@@ -218,6 +216,32 @@ final class SolarRenderTests: XCTestCase {
         XCTAssertEqual(SolarPresenter.answerWords(control: "body.previous", result: refused),
                        "The Sun is the first body.")
         XCTAssertEqual(SolarPresenter.answerWords(control: "body.select", result: refused), "There is no such body.")
+        let beyond = ActionResult.rejected(.rule(code: SolarRule.outOfRange))
+        XCTAssertEqual(SolarPresenter.answerWords(control: "date.step", result: beyond),
+                       "The date stays within 1950-01-01 to 2051-01-01.")
+        XCTAssertEqual(SolarPresenter.answerWords(control: "camera.tilt", result: beyond),
+                       "The view cannot tilt further.")
+        XCTAssertEqual(SolarPresenter.answerWords(control: "camera.zoom", result: beyond),
+                       "The view cannot zoom further.")
+        XCTAssertEqual(SolarPresenter.answerWords(control: "camera.orbit", result: beyond),
+                       "That is not possible here.")
+        XCTAssertEqual(SolarControls.dateSteps, [-365, -30, -1, 1, 30, 365])
+        XCTAssertEqual(SolarControls.dateName(-365), "date-minus-365")
+        XCTAssertEqual(SolarControls.dateName(1), "date-plus-1")
+        XCTAssertEqual(SolarControls.dateTitle(-1), "\u{2212}1 day")
+        XCTAssertEqual(SolarControls.dateTitle(30), "+30 days")
+        XCTAssertTrue(SolarControls.canStep(dayOffset: 0, by: 365))
+        XCTAssertFalse(SolarControls.canStep(dayOffset: 18_627.5, by: 1), "the end of the range")
+        XCTAssertFalse(SolarControls.canStep(dayOffset: -18_262.5, by: -1), "the start of the range")
+        XCTAssertEqual(SolarControls.distanceLine(date: "2000-01-01", distance: "0.983 AU (147,099,000 km)"),
+                       "Distance from the Sun on 2000-01-01: 0.983 AU (147,099,000 km)")
+        XCTAssertEqual(SolarControls.distanceLine(date: "2000-01-01", distance: ""), "")
+        XCTAssertEqual(SolarControls.yawWords(345), "Yaw 345°")
+        XCTAssertEqual(SolarControls.pitchWords(35), "Pitch 35°")
+        XCTAssertEqual(SolarControls.zoomWords(distance: 60, steps: 0),
+                       "Distance 60.0 scene units, zoom step 0 (\u{2212}1 to 12)")
+        XCTAssertEqual(SolarControls.cameraWords(yaw: 0, pitch: 35, distance: 60),
+                       "Yaw 0°, pitch 35°, distance 60.0 scene units")
         XCTAssertEqual(SolarControls.bodyWords(index: 3, count: 9), "Earth, body 4 of 9")
         XCTAssertEqual(SolarControls.sentence("earth selected"), "Earth selected")
         XCTAssertEqual(SolarControls.sentence(""), "Loading")
@@ -229,14 +253,26 @@ final class SolarRenderTests: XCTestCase {
 
         let session = ExperienceSession()
         let shell = try await SolarTest.open(session, size: size)
-        let names: [String] = ["previous-body", "next-body", "body", "fact-1", "legend", "status", "message"]
+        let names: [String] = ["previous-body", "next-body", "body", "fact-1", "legend", "status", "message", "date",
+                               "date-minus-365", "date-minus-30", "date-minus-1", "date-plus-1", "date-plus-30",
+                               "date-plus-365", "orbit-left", "orbit-right", "tilt-up", "tilt-down", "zoom-in",
+                               "zoom-out", "reset-view", "distance"]
         for name in names {
             XCTAssertEqual(shell.port.identifier(name), "experience.a14.solar-system-explorer.\(name)")
         }
         XCTAssertEqual(shell.port.send("body.previous").code, "action.rule.a14.invalid-choice")
         XCTAssertTrue(shell.port.send("body.next").isAccepted)
-        XCTAssertTrue(shell.accessibilitySummary.hasPrefix("Solar System Explorer: Mercury selected;"),
-                      shell.accessibilitySummary)
+        let summary = shell.accessibilitySummary
+        XCTAssertTrue(summary.hasPrefix("Solar System Explorer: Mercury in focus on 2000-01-01, "), summary)
+        XCTAssertTrue(summary.hasSuffix("Distances and sizes not to scale."), summary)
+        XCTAssertTrue(shell.port.send("date.step", [30]).isAccepted)
+        XCTAssertEqual(shell.port.send("date.step", [2]).code, "action.rule.a14.invalid-step")
+        XCTAssertTrue(shell.port.send("camera.zoom", [-1]).isAccepted)
+        XCTAssertEqual(shell.port.send("camera.zoom", [-1]).code, "action.rule.a14.out-of-range",
+                       "zoom step −1 is the end")
+        try SolarTest.frames(session, 1)
+        XCTAssertEqual(shell.presenter.mirror.dateLabel, "2000-01-31")
+        XCTAssertEqual(shell.presenter.mirror.zoomSteps, -1)
         session.close()
     }
 
@@ -248,13 +284,17 @@ final class SolarRenderTests: XCTestCase {
         XCTAssertEqual(shell.presenter.bodyRenderers.count, 9)
         XCTAssertNotNil(shell.presenter.ringRenderer)
         XCTAssertNotNil(shell.presenter.depthPass)
+        XCTAssertEqual(shell.presenter.orbitRenderers.count, 8)
         session.close()
         XCTAssertFalse(shell.presenter.isLive)
         XCTAssertTrue(shell.presenter.bodyRenderers.isEmpty)
+        XCTAssertTrue(shell.presenter.ringRenderers.isEmpty)
+        XCTAssertTrue(shell.presenter.orbitRenderers.isEmpty)
         XCTAssertNil(shell.presenter.ringRenderer)
         XCTAssertNil(shell.presenter.depthPass)
         XCTAssertEqual(shell.presenter.lastBodiesDrawn, 0)
         XCTAssertEqual(shell.presenter.bodyMeshes.count, 9, "the CPU meshes stay")
+        XCTAssertEqual(shell.presenter.orbitMeshes.count, 8, "the CPU meshes stay")
         XCTAssertEqual(session.diagnostics.lastCloseCounts?.objects, 0)
         XCTAssertEqual(shell.state, .inactive, "closed without a GPU leak")
     }
