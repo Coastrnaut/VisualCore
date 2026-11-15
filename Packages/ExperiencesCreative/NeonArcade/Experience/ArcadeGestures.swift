@@ -8,6 +8,11 @@
 // finger has lifted.
 // View points (top-left origin, y down) map onto the 9 × 16 field the way the presenter draws it: centred, scale
 // s = min(width / 9, height / 16) points per unit.
+// Feature 078 (A10-P04) T-A10-403 (FR-A10-401; clarification 1; research D1; edge case "Sensitivity changed
+// mid-run"): the reach is no longer fixed at 1.5 units; the offset is divided by the reach of the sensitivity step of
+// the last drawn state (`Sensitivity.steering(offset:step:)`: reaches 2.5, 2.0, 1.5, 1.0, 0.6 for steps 0…4, step 2 by
+// default), so a change takes effect from the next finger movement (or the next followed frame). The native left,
+// right and straight controls stay the alternative to the drag (`GestureAlternatives.missing` is empty).
 import Foundation
 import NeonArcadeCore
 import VisualCoreMath
@@ -18,8 +23,9 @@ import VisualCoreScenes
 struct ArcadeGestures: Sendable {
     /// The actions the gesture sends (each also reachable through a native control).
     static let gestureActions: Set<String> = ["run.steer"]
-    /// The finger offset from the player, in game units, that gives full steering.
-    static let steerReach = 1.5
+    /// The finger offset from the player, in game units, that gives full steering at the default sensitivity step
+    /// (step 2; each step's reach is `Sensitivity.reach(step:)`).
+    static let steerReach = Sensitivity.reach(step: Sensitivity.defaultStep)
     /// The gesture declaration: drag → steer, one finger.
     static let declarations = [GestureDeclaration(id: "steer", kind: .drag, priority: 1, pointers: 1)]
 
@@ -41,9 +47,9 @@ struct ArcadeGestures: Sendable {
 
     /// Applies one pointer event (view points, top-left origin) and returns the actions it causes, in order, each as a
     /// control id with its values (`run.steer [value]`). `playerX` is the player's x in game units in the last drawn
-    /// run; `viewSize` is the canvas size in points.
-    mutating func handle(_ event: PointerEvent, playerX: Double,
-                         viewSize: Vec2) -> [(control: String, values: [Double])] {
+    /// run; `viewSize` is the canvas size in points; `step` is the sensitivity step of the last drawn state.
+    mutating func handle(_ event: PointerEvent, playerX: Double, viewSize: Vec2,
+                         step: Int = Sensitivity.defaultStep) -> [(control: String, values: [Double])] {
         var actions: [(control: String, values: [Double])] = []
         switch event.phase {
         case .began:
@@ -74,7 +80,8 @@ struct ArcadeGestures: Sendable {
             switch outcome.phase {
             case .began:
                 steering = true
-                if let value = Self.steeringValue(view: event.location, playerX: playerX, viewSize: viewSize) {
+                if let value = Self.steeringValue(view: event.location, playerX: playerX, viewSize: viewSize,
+                                                         step: step) {
                     actions.append(("run.steer", [value]))
                 }
             case .ended, .cancelled:
@@ -84,7 +91,8 @@ struct ArcadeGestures: Sendable {
             }
         }
         if event.phase == .moved, held, steering,
-           let value = Self.steeringValue(view: event.location, playerX: playerX, viewSize: viewSize) {
+           let value = Self.steeringValue(view: event.location, playerX: playerX, viewSize: viewSize,
+                                             step: step) {
             actions.append(("run.steer", [value]))
         }
         if (event.phase == .ended || event.phase == .cancelled), down.isEmpty, steering {
@@ -105,10 +113,14 @@ struct ArcadeGestures: Sendable {
     /// Feature 075 T-A10-115 (FR-A10-121; clarification 4): a finger held still keeps steering by its offset from the
     /// player as the player moves. Called with the player's x of each drawn run while a drag steers: recomputes the
     /// steering value from the held finger (rounded to 0.01) and returns `run.steer` only when it differs from the last
-    /// value sent, so the player settles under the finger and no action is sent while nothing changes.
-    mutating func follow(playerX: Double) -> [(control: String, values: [Double])] {
+    /// value sent, so the player settles under the finger and no action is sent while nothing changes. `step` is the
+    /// sensitivity step of the drawn state.
+    mutating func follow(playerX: Double,
+                         step: Int = Sensitivity.defaultStep) -> [(control: String, values: [Double])] {
         guard steering, !suppressed, let location = fingerLocation, let size = fingerViewSize,
-              let raw = Self.steeringValue(view: location, playerX: playerX, viewSize: size) else { return [] }
+              let raw = Self.steeringValue(view: location, playerX: playerX, viewSize: size, step: step) else {
+            return []
+        }
         let value = (raw * 100).rounded() / 100
         if let last = lastSentSteering, abs(last - value) < 0.005 { return [] }
         lastSentSteering = value
@@ -135,10 +147,12 @@ struct ArcadeGestures: Sendable {
         return (x - viewSize.x / 2) / s + GameRun.fieldWidth / 2
     }
 
-    /// The steering value of a finger at view point `p`: (field x − `playerX`) ÷ ``steerReach``, clamped to −1…1; nil
-    /// when the point cannot be mapped or `playerX` is not finite.
-    static func steeringValue(view p: Vec2, playerX: Double, viewSize: Vec2) -> Double? {
+    /// The steering value of a finger at view point `p` at sensitivity `step`: `Sensitivity.steering` of the offset
+    /// field x − `playerX` (offset ÷ the step's reach, clamped to −1…1); nil when the point cannot be mapped or
+    /// `playerX` is not finite.
+    static func steeringValue(view p: Vec2, playerX: Double, viewSize: Vec2,
+                              step: Int = Sensitivity.defaultStep) -> Double? {
         guard playerX.isFinite, let x = fieldX(view: p.x, viewSize: viewSize) else { return nil }
-        return min(max((x - playerX) / steerReach, -1), 1)
+        return Sensitivity.steering(offset: x - playerX, step: step)
     }
 }

@@ -229,8 +229,10 @@ extension ExperienceRegistry {
     fileprivate static var neonArcade: ExperienceRegistration? {
         guard let id = NeonArcadeExperience.id else { return nil }
         // Schema 2 (feature 076, A10-P02) adds the waves, schema 3 (feature 077, A10-P03) the screen and the sound and
-        // haptics settings; the stored schema-1 and schema-2 examples prove the migrations.
-        let examples = [ArcadeCore.schemaOneExample(), ArcadeCore.schemaTwoExample()].compactMap { $0 }
+        // haptics settings, schema 4 (feature 078, A10-P04) the sensitivity and the run number; the stored schema-1…3
+        // examples prove the migrations.
+        let examples = [ArcadeCore.schemaOneExample(), ArcadeCore.schemaTwoExample(),
+                        ArcadeCore.schemaThreeExample()].compactMap { $0 }
         var registration = ExperienceRegistration(id: id, core: ArcadeCore.self, examples: examples) { launch in
             let system = SystemAccessibilityObserver.systemValues()
             return NeonArcadeExperience.make(id: id, storage: launch.storage,

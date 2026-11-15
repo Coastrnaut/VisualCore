@@ -17,7 +17,13 @@
 // `a10.wrong-screen` on every other screen; the step that ends the run shows the game-over screen; the settings take
 // 0 or 1 only, are in the digest and never change the game; the stored schema-1 and schema-2 examples restore (the
 // latter on the paused screen); the migration 2 → 3 derives the screen from the run; a saved title or game-over
-// screen restores to the same screen; a screen that contradicts its run is refused; schema 4 is refused as newer.
+// screen restores to the same screen; a screen that contradicts its run is refused.
+// Feature 078 (A10-P04) T-A10-403 (FR-A10-401, FR-A10-402, FR-A10-412; SC-A10-401; clarification 1): schema 4 with
+// the sensitivity step and the run number, seven controls; `settings.sensitivity` takes whole steps 0…4 on any screen
+// (a fraction refused with `a10.invalid-choice`), is in the digest, round-trips through a snapshot and never changes
+// the game; the run number counts the runs started (+1 for play again and restart, not for the first start); the
+// stored schema-3 example restores through the migration 3 → 4 with step 2 and run 1; a sensitivity outside 0…4 or a
+// run number below 1 is refused; schema 5 is refused as newer.
 import Foundation
 import XCTest
 @testable import NeonArcadeExperience
@@ -63,10 +69,12 @@ final class ArcadeCoreTests: XCTestCase {
     func testIdControlsSchemaTiersAndStep() {
         XCTAssertEqual(ArcadeCore.experienceID, "a10.neon-arcade")
         XCTAssertEqual(ArcadeCore.controls.map(\.id),
-                       ["run.start", "run.steer", "run.pause", "run.restart", "settings.sound", "settings.haptics"])
+                       ["run.start", "run.steer", "run.pause", "run.restart", "settings.sound", "settings.haptics",
+                        "settings.sensitivity"])
         XCTAssertEqual(ArcadeCore.controls.map(\.id), ArcadeCore.actionIDs)
-        XCTAssertEqual(ArcadeCore.controls.map(\.ranges), [[], [-1...1], [0...1], [], [0...1], [0...1]])
-        XCTAssertEqual(ArcadeCore.migrations.currentVersion, 3)
+        XCTAssertEqual(ArcadeCore.controls.map(\.ranges), [[], [-1...1], [0...1], [], [0...1], [0...1], [0...4]])
+        XCTAssertEqual(ArcadeCore.migrations.currentVersion, 4)
+        XCTAssertEqual(ArcadeCore.snapshotSchema, 4)
         XCTAssertEqual(ExperienceEngine<ArcadeCore>.schemaVersion, ArcadeCore.snapshotSchema)
         XCTAssertEqual(ArcadeCore.qualityTiers, 1)
         XCTAssertEqual(ArcadeCore.stepDuration, 1.0 / 60, accuracy: 1e-12)
@@ -83,13 +91,16 @@ final class ArcadeCoreTests: XCTestCase {
                       ScriptedAction("run.pause", [1]), ScriptedAction("run.pause", [0]),
                       ScriptedAction("settings.sound", [0]), ScriptedAction("run.pause", [1]),
                       ScriptedAction("run.restart"), ScriptedAction("settings.haptics", [0]),
-                      ScriptedAction("run.steer", [0.25])],
+                      ScriptedAction("settings.sensitivity", [4]), ScriptedAction("run.steer", [0.25]),
+                      ScriptedAction("settings.sensitivity", [0])],
             rejected: [ScriptedAction("run.steer", [2]), ScriptedAction("run.steer", [-1.5]),
                        ScriptedAction("run.steer", [.nan]), ScriptedAction("run.steer", []),
                        ScriptedAction("run.pause", [0.5]), ScriptedAction("run.pause", [2]),
                        ScriptedAction("run.pause", [.infinity]), ScriptedAction("run.restart", [1]),
                        ScriptedAction("run.pause", [1]), ScriptedAction("run.restart"),
                        ScriptedAction("settings.sound", [0.5]), ScriptedAction("settings.haptics", [2]),
+                       ScriptedAction("settings.sensitivity", [2.5]), ScriptedAction("settings.sensitivity", [5]),
+                       ScriptedAction("settings.sensitivity", [-1]), ScriptedAction("settings.sensitivity", []),
                        ScriptedAction("run.start", [1]), ScriptedAction("bogus")])
         let report = await ExperienceConformance.run(ArcadeCore.self, id: arcadeID, plan: plan)
         for entry in report.entries { XCTAssertTrue(entry.passed, "\(entry.check): \(entry.detail)") }
@@ -250,7 +261,7 @@ final class ArcadeCoreTests: XCTestCase {
     func testTheSnapshotRestoresIdenticallyInAnotherEngine() async throws {
         var engine = try await replayed(steps: 400)
         let snapshot = try engine.snapshot()
-        XCTAssertEqual(snapshot.schemaVersion, 3)
+        XCTAssertEqual(snapshot.schemaVersion, ArcadeCore.snapshotSchema)
         let saved = try XCTUnwrap(engine.core)
         var other = try await makeEngine(seed: 3)
         try other.restore(ExperienceSnapshot(data: snapshot.encoded()))
@@ -268,7 +279,7 @@ final class ArcadeCoreTests: XCTestCase {
         let saved = try engine.snapshot()
         let before = try engine.digest()
 
-        func envelope(_ payload: Data, schema: Int = 3) throws -> ExperienceSnapshot {
+        func envelope(_ payload: Data, schema: Int = ArcadeCore.snapshotSchema) throws -> ExperienceSnapshot {
             try ExperienceSnapshot(experience: arcadeID, schemaVersion: schema, seed: saved.seed,
                                    stepIndex: saved.stepIndex, digest: saved.digest, payload: payload)
         }
@@ -317,8 +328,15 @@ final class ArcadeCoreTests: XCTestCase {
             XCTAssertThrowsError(try engine.restore(envelope(
                 JSONSerialization.data(withJSONObject: bad, options: [.sortedKeys]))), screen)
         }
-        // Newer: schema 4 is not known to this build.
-        XCTAssertThrowsError(try engine.restore(envelope(Data(saved.payload.utf8), schema: 4)))
+        // Settings outside their rules: a sensitivity outside 0…4, a run number below 1 (feature 078).
+        for (key, value) in [("sensitivity", 5), ("sensitivity", -1), ("runNumber", 0)] as [(String, Any)] {
+            var bad = try XCTUnwrap(try JSONSerialization.jsonObject(with: Data(saved.payload.utf8)) as? [String: Any])
+            bad[key] = value
+            XCTAssertThrowsError(try engine.restore(envelope(
+                JSONSerialization.data(withJSONObject: bad, options: [.sortedKeys]))), "\(key) \(value)")
+        }
+        // Newer: schema 5 is not known to this build.
+        XCTAssertThrowsError(try engine.restore(envelope(Data(saved.payload.utf8), schema: 5)))
         XCTAssertEqual(try engine.digest(), before, "every refusal leaves the state as it was")
 
         // The core names the reason.
@@ -387,8 +405,9 @@ final class ArcadeCoreTests: XCTestCase {
         XCTAssertEqual(continued.run.waveStep, ArcadeCore.migrationSteps)
         XCTAssertEqual(continued, try XCTUnwrap(other.core), "the migrated run plays on identically")
 
-        // The registry's check accepts both stored examples (one per earlier schema).
-        let examples = try [example, XCTUnwrap(ArcadeCore.schemaTwoExample())]
+        // The registry's check accepts the three stored examples (one per earlier schema).
+        let examples = try [example, XCTUnwrap(ArcadeCore.schemaTwoExample()),
+                            XCTUnwrap(ArcadeCore.schemaThreeExample())]
         let problems = await SnapshotMigrationCheck.problems(for: ArcadeCore.self, id: arcadeID, examples: examples)
         XCTAssertEqual(problems, [])
     }
@@ -432,7 +451,7 @@ final class ArcadeCoreTests: XCTestCase {
         XCTAssertEqual(saved.run.patternId, "wall")
         XCTAssertGreaterThanOrEqual(saved.run.freeLane, 0)
         let snapshot = try engine.snapshot()
-        XCTAssertEqual(snapshot.schemaVersion, 3)
+        XCTAssertEqual(snapshot.schemaVersion, ArcadeCore.snapshotSchema)
         var other = try await makeEngine(seed: 5)
         try other.restore(ExperienceSnapshot(data: snapshot.encoded()))
         XCTAssertEqual(try XCTUnwrap(other.core).state, saved.state)
@@ -616,7 +635,8 @@ final class ArcadeCoreTests: XCTestCase {
         let pausedSnapshot = try paused.snapshot()
         var builder = DigestBuilder(domain: arcadeID.rawValue)
         try overCore.writeDigest(into: &builder)
-        let overSnapshot = try ExperienceSnapshot(experience: arcadeID, schemaVersion: 3, seed: 7, stepIndex: 640,
+        let overSnapshot = try ExperienceSnapshot(experience: arcadeID, schemaVersion: ArcadeCore.snapshotSchema,
+                                                  seed: 7, stepIndex: 640,
                                                   digest: builder.finish(), payload: overCore.snapshotPayload())
         let cases = [(titleSnapshot, ArcadeScreen.title), (pausedSnapshot, .paused), (overSnapshot, .over)]
         for (snapshot, screen) in cases {
@@ -687,5 +707,112 @@ final class ArcadeCoreTests: XCTestCase {
         XCTAssertEqual(core.screen, .title)
         XCTAssertTrue(core.sound)
         XCTAssertEqual(core.run, GameRun.new())
+    }
+
+    // MARK: Feature 078 (A10-P04)
+
+    /// T-A10-403 (FR-A10-401, FR-A10-402; SC-A10-401): the sensitivity takes whole steps 0…4 on any screen, is in the
+    /// digest, round-trips through a snapshot into another engine and never changes the run.
+    func testTheSensitivityIsARecordedSettingThatRoundTrips() async throws {
+        var title = try await makeEngine(start: false)
+        XCTAssertEqual(try XCTUnwrap(title.core).sensitivity, Sensitivity.defaultStep)
+        let before = try title.digest()
+        XCTAssertEqual(title.handle(control: "settings.sensitivity", values: [2.5]),
+                       .rejected(.rule(code: ArcadeRule.invalidChoice)))
+        XCTAssertEqual(title.handle(control: "settings.sensitivity", values: [5]), .rejected(.outOfRange(index: 0)))
+        XCTAssertEqual(try title.digest(), before, "a refusal changes nothing")
+        var core = ArcadeCore(seed: 7)
+        XCTAssertEqual(core.apply(action("settings.sensitivity", [0.5])),
+                       .rejected(.rule(code: ArcadeRule.invalidChoice)))
+        XCTAssertEqual(core.apply(action("settings.sensitivity", [7])), .rejected(.rule(code: ArcadeRule.invalidChoice)),
+                       "called directly, a step outside 0…4 is refused by the core")
+        for step in Sensitivity.steps {
+            XCTAssertEqual(title.handle(control: "settings.sensitivity", values: [Double(step)]), .accepted)
+            XCTAssertEqual(try XCTUnwrap(title.core).sensitivity, step)
+        }
+        XCTAssertNotEqual(try title.digest(), before, "the sensitivity is in the digest")
+
+        var gentle = try await makeEngine()
+        var sharp = try await makeEngine()
+        XCTAssertEqual(gentle.handle(control: "settings.sensitivity", values: [0]), .accepted)
+        XCTAssertEqual(sharp.handle(control: "settings.sensitivity", values: [4]), .accepted)
+        try gentle.run(steps: 120)
+        try sharp.run(steps: 120)
+        XCTAssertEqual(try XCTUnwrap(gentle.core).run, try XCTUnwrap(sharp.core).run, "the step never changes the run")
+        XCTAssertEqual(try XCTUnwrap(gentle.core).generator, try XCTUnwrap(sharp.core).generator)
+
+        var other = try await makeEngine(seed: 3, start: false)
+        try other.restore(ExperienceSnapshot(data: sharp.snapshot().encoded()))
+        XCTAssertEqual(try XCTUnwrap(other.core).sensitivity, 4)
+        XCTAssertEqual(try XCTUnwrap(other.core), try XCTUnwrap(sharp.core))
+        try engineReset(&other)
+    }
+
+    /// Resets `engine` and checks the default step and run number come back.
+    private func engineReset(_ engine: inout ExperienceEngine<ArcadeCore>) throws {
+        try engine.reset()
+        XCTAssertEqual(try XCTUnwrap(engine.core).sensitivity, Sensitivity.defaultStep)
+        XCTAssertEqual(try XCTUnwrap(engine.core).runNumber, 1)
+    }
+
+    /// T-A10-403 (FR-A10-412): the run number counts the runs started: 1 on the title screen and after the first start,
+    /// +1 for play again from the game-over screen and for a restart, kept through a snapshot.
+    func testTheRunNumberCountsTheRunsStarted() async throws {
+        var engine = try await makeEngine(start: false)
+        XCTAssertEqual(try XCTUnwrap(engine.core).runNumber, 1)
+        XCTAssertEqual(engine.handle(control: "run.start"), .accepted)
+        XCTAssertEqual(try XCTUnwrap(engine.core).runNumber, 1, "the first start plays the held run")
+        XCTAssertEqual(engine.handle(control: "run.pause", values: [1]), .accepted)
+        XCTAssertEqual(engine.handle(control: "run.restart"), .accepted)
+        XCTAssertEqual(try XCTUnwrap(engine.core).runNumber, 2, "a restart is a new run")
+        XCTAssertEqual(engine.handle(control: "settings.sensitivity", values: [1]), .accepted)
+        XCTAssertEqual(engine.handle(control: "run.steer", values: [ArcadeCore.gameOverSteering]), .accepted)
+        try engine.run(steps: ArcadeCore.gameOverSteps)
+        let over = try XCTUnwrap(engine.core)
+        XCTAssertEqual(over.screen, .over)
+        XCTAssertEqual(over.runNumber, 2)
+        XCTAssertEqual(engine.handle(control: "run.start"), .accepted)
+        XCTAssertEqual(try XCTUnwrap(engine.core).runNumber, 3, "play again is a new run")
+        XCTAssertEqual(try XCTUnwrap(engine.core).sensitivity, 1, "a new run keeps the sensitivity")
+        let saved = try engine.snapshot()
+        var other = try await makeEngine(seed: 5, start: false)
+        try other.restore(ExperienceSnapshot(data: saved.encoded()))
+        XCTAssertEqual(try XCTUnwrap(other.core).runNumber, 3)
+        try engineReset(&other)
+    }
+
+    /// T-A10-403 (clarification 1): the stored schema-3 example (sound off, no sensitivity or run number) restores in a
+    /// new engine through the migration 3 → 4 with step 2 and run 1 and everything else kept; a schema-3 payload with
+    /// the keys missing decodes the same way, and a payload that does not decode is refused by the step.
+    func testASchemaThreeSnapshotRestoresWithTheDefaultStepAndRunOne() async throws {
+        let example = try XCTUnwrap(ArcadeCore.schemaThreeExample())
+        XCTAssertEqual(example.version, 3)
+        let snapshot = try ExperienceSnapshot(data: example.snapshot)
+        XCTAssertEqual(snapshot.schemaVersion, 3)
+        let payload = try XCTUnwrap(try JSONSerialization.jsonObject(with: Data(snapshot.payload.utf8)) as? [String: Any])
+        for key in ["sensitivity", "runNumber"] { XCTAssertNil(payload[key], "a schema-3 payload has no \(key)") }
+        XCTAssertEqual(payload["sound"] as? Bool, false)
+        let stored = try JSONDecoder().decode(ArcadeState.self, from: Data(snapshot.payload.utf8))
+
+        var engine = try await makeEngine(seed: 3, start: false)
+        try engine.restore(snapshot)
+        XCTAssertEqual(try engine.digest().hex, example.expectedDigest)
+        let core = try XCTUnwrap(engine.core)
+        XCTAssertEqual(core.sensitivity, Sensitivity.defaultStep)
+        XCTAssertEqual(core.runNumber, 1)
+        XCTAssertEqual(core.run, stored.run)
+        XCTAssertEqual(core.screen, .playing)
+        XCTAssertFalse(core.sound)
+        XCTAssertTrue(core.haptics)
+
+        let upgraded = try ArcadeCore.migrations.migrate(payload, from: 3)
+        XCTAssertEqual(upgraded["sensitivity"] as? Int, 2)
+        XCTAssertEqual(upgraded["runNumber"] as? Int, 1)
+        XCTAssertThrowsError(try ArcadeCore.migrations.migrate(["run": 1], from: 3), "a payload that does not decode")
+        // The earlier steps no longer leave schema-4 keys behind.
+        let two = try ArcadeCore.migrations.migrate(payload, from: 2)
+        XCTAssertEqual(two["sensitivity"] as? Int, 2)
+        XCTAssertEqual(try JSONDecoder().decode(ArcadeState.self, from: JSONSerialization.data(withJSONObject: two)),
+                       ArcadeState(run: stored.run, random: stored.random, screen: .playing, sound: false))
     }
 }

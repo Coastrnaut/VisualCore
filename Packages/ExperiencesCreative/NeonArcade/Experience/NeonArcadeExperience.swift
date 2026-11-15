@@ -9,6 +9,9 @@
 // through the shell's port (a recorded action, so the saved state and every replay show the paused screen and nothing
 // advanced: backgrounding pauses the game and never fast-forwards it) and then stops every sound. The host's
 // `ExperiencePresenter` has no suspension callback, so the wrapper is where the experience learns of it.
+// Feature 078 (A10-P04) T-A10-403 (FR-A10-411; clarification 2): the launch storage reaches the presenter as its
+// `HighScoreStore` (the file `high-scores.json` in the experience's own folder; the app's reset of the experience's
+// data removes it). The run itself still travels in the host's saved session state.
 import SwiftUI
 import NeonArcadeCore
 import VisualCoreExperience
@@ -22,22 +25,25 @@ public enum NeonArcadeExperience {
     /// The catalog id `a10.neon-arcade`; nil only if the id text were malformed.
     public static let id = ExperienceID(rawValue: ArcadeCore.experienceID)
 
-    /// The experience registered as `id`. `storage` is not used in this phase (the run travels in the host's saved
-    /// session state); `reduceMotion` halves the glow pulse and the background drift and makes screen changes
-    /// immediate; `reduceFlashing` keeps only the ring of a hit (no full-field tint).
+    /// The experience registered as `id`. `storage` holds the high-score table (feature 078; the run travels in the
+    /// host's saved session state); `reduceMotion` halves the glow pulse and the background drift and makes screen
+    /// changes immediate; `reduceFlashing` keeps only the ring of a hit (no full-field tint).
     @MainActor
     public static func make(id: ExperienceID, storage: ExperienceStorage, reduceMotion: Bool,
                             reduceFlashing: Bool) -> any Experience {
-        make(id: id, reduceMotion: reduceMotion, reduceFlashing: reduceFlashing)
+        make(id: id, reduceMotion: reduceMotion, reduceFlashing: reduceFlashing,
+             highScores: HighScoreStore(storage: storage))
     }
 
-    /// The experience with its shell and presenter exposed (tests inject the sound sink and the haptic route).
+    /// The experience with its shell and presenter exposed (tests inject the sound sink, the haptic and announcement
+    /// route and the high-score store; without one the table is kept in memory only).
     @MainActor
     static func make(id: ExperienceID, reduceMotion: Bool = false, reduceFlashing: Bool = false,
-                     soundSink: (any ArcadeSoundSink)? = nil, feedback: ExperienceFeedback? = nil) -> ArcadeExperience {
+                     soundSink: (any ArcadeSoundSink)? = nil, feedback: ExperienceFeedback? = nil,
+                     highScores: HighScoreStore? = nil) -> ArcadeExperience {
         ArcadeExperience(shell: ExperienceShell(id: id, presenter: ArcadePresenter(
             experienceID: id, reduceMotion: reduceMotion, reduceFlashing: reduceFlashing, soundSink: soundSink,
-            feedback: feedback)))
+            feedback: feedback, highScores: highScores)))
     }
 }
 

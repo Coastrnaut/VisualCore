@@ -17,8 +17,17 @@
 // screen sends nothing; the digests are identical with reduced flashing, with the effects drawn or not, and the run
 // identical with sound and haptics on or off; the injected sound and haptic sinks receive the cues only while their
 // setting is on; the effects freeze while paused; a saved title or game-over screen restores to the same screen;
-// schema 4 is the newer saved state.
+// schema 4 was the newer saved state (since feature 078 the schema after the current one is).
+// Feature 078 (A10-P04) T-A10-403 (FR-A10-401, FR-A10-402, FR-A10-411–413, FR-A10-420, FR-A10-421; SC-A10-401–404):
+// a run played to game over in a session is entered into the high-score table in a temporary storage once, marked,
+// announced as a new high score and named in the description, and restoring its game-over screen in a new session
+// enters nothing again; announcements are at most one per second over a run with many events and name the hits and
+// the game over; the same finger offset gives a different, bounded steering value for each sensitivity step, in a
+// session too, and every gesture keeps a native alternative; every control is labelled with a value or hint, and the
+// controls grow with Dynamic Type.
 import Foundation
+import SwiftUI
+import UIKit
 import XCTest
 import VisualCoreDiagnostics
 @testable import NeonArcadeExperience
@@ -280,8 +289,8 @@ final class ArcadeSessionTests: XCTestCase {
         try ArcadeTest.frames(first, 60)
         let saved = try shell.snapshot()
         first.close()
-        let newer = try ExperienceSnapshot(experience: ArcadeTest.id, schemaVersion: 4, seed: saved.seed,
-                                           stepIndex: saved.stepIndex, digest: saved.digest,
+        let newer = try ExperienceSnapshot(experience: ArcadeTest.id, schemaVersion: ArcadeCore.snapshotSchema + 1,
+                                           seed: saved.seed, stepIndex: saved.stepIndex, digest: saved.digest,
                                            payload: Data(saved.payload.utf8))
 
         let second = ExperienceSession()
@@ -389,7 +398,7 @@ final class ArcadeSessionTests: XCTestCase {
         try ArcadeTest.frames(session, 60)
         XCTAssertEqual(try ArcadeTest.core(shell), first, "nothing falls until the person starts")
         XCTAssertEqual(shell.accessibilitySummary,
-                       "Neon Arcade: Neon Dodge, wave 1, score 0, 3 lives, no objects falling, title screen.")
+                       "Neon Arcade: Neon Dodge, wave 1, score 0, 3 lives, no objects falling, best score none, title screen.")
         XCTAssertEqual(presenter.mirror.screen, .title)
         XCTAssertTrue(presenter.mirror.status.hasSuffix("title screen"), presenter.mirror.status)
         XCTAssertEqual(presenter.lastStateMark, "title")
@@ -437,8 +446,8 @@ final class ArcadeSessionTests: XCTestCase {
             run: over, random: SeededRandom(seed: 7).state, screen: .over)), seed: 7)
         var builder = DigestBuilder(domain: ArcadeTest.id.rawValue)
         try core.writeDigest(into: &builder)
-        let overSnapshot = try ExperienceSnapshot(experience: ArcadeTest.id, schemaVersion: 3, seed: 7,
-                                                  stepIndex: 1_400, digest: builder.finish(),
+        let overSnapshot = try ExperienceSnapshot(experience: ArcadeTest.id, schemaVersion: ArcadeCore.snapshotSchema,
+                                                  seed: 7, stepIndex: 1_400, digest: builder.finish(),
                                                   payload: core.snapshotPayload())
         let third = ExperienceSession()
         let restoredOver = try await ArcadeTest.open(third, snapshot: overSnapshot)
@@ -447,7 +456,7 @@ final class ArcadeSessionTests: XCTestCase {
         try ArcadeTest.frames(third, 30)
         XCTAssertEqual(try ArcadeTest.core(restoredOver).state, core.state, "nothing advances on the game over")
         XCTAssertEqual(restoredOver.accessibilitySummary,
-                       "Neon Arcade: Neon Dodge, wave 3, score 88, no lives, no objects falling, over.")
+                       "Neon Arcade: Neon Dodge, wave 3, score 88, no lives, no objects falling, best score 88, over.")
         XCTAssertEqual(restoredOver.presenter.lastStateMark, "over")
         XCTAssertEqual(restoredOver.presenter.lastOverScoreText, "88")
         XCTAssertEqual(restoredOver.presenter.lastOverWaveText, "3")
@@ -569,5 +578,183 @@ final class ArcadeSessionTests: XCTestCase {
         XCTAssertTrue(ArcadeControls.canRestart(.paused) && ArcadeControls.canRestart(.over))
         XCTAssertEqual(ArcadeControls.onOff(true), "On")
         XCTAssertEqual(ArcadeControls.onOff(false), "Off")
+    }
+
+    // MARK: Feature 078 (A10-P04)
+
+    /// T-A10-403 (FR-A10-411–413, FR-A10-420; SC-A10-402, SC-A10-403): a run played to game over is entered once into
+    /// the table in the experience's storage, drawn with its mark, announced as a new high score and described; a new
+    /// session restoring the game-over screen enters nothing again.
+    func testAFinishedRunIsEnteredOnceEvenAfterRestoringTheGameOverScreen() async throws {
+        let temporary = TemporaryArcadeStorage()
+        defer { temporary.remove() }
+        let store = HighScoreStore(storage: temporary.storage)
+        let spoken = RecordingAnnouncementSink()
+        let session = ExperienceSession()
+        let experience = try await ArcadeTest.openExperience(session, feedback: ArcadeTest.speakingFeedback(spoken),
+                                                             highScores: store)
+        let presenter = experience.presenter
+        XCTAssertTrue(experience.handle(control: "run.steer", values: [ArcadeCore.gameOverSteering]).isAccepted)
+        // The run ends before step 700; 90 more frames let an announcement held by the one-second limit go out.
+        try ArcadeTest.frames(session, ArcadeCore.gameOverSteps + 90)
+        let over = try ArcadeTest.core(experience.shell)
+        XCTAssertEqual(over.screen, .over)
+        XCTAssertGreaterThan(over.run.score, 0)
+        let entry = HighScoreEntry(score: over.run.score, wave: over.run.wave, run: 1)
+        XCTAssertEqual(store.table.entries, [entry])
+        XCTAssertEqual(store.writes, 1)
+        XCTAssertEqual(try HighScoreTable.decode(temporary.storage.read(HighScoreStore.fileName)).get(), store.table)
+        XCTAssertEqual(presenter.lastBestTexts, [ArcadePresenter.scoreText(over.run.score)])
+        XCTAssertEqual(presenter.lastBestMarkedRow, 0)
+        let words = "New high score \(over.run.score)"
+        XCTAssertEqual(presenter.announced.last?.text, words, "\(presenter.announced.map(\.text))")
+        XCTAssertEqual(spoken.spoken.last, words)
+        XCTAssertFalse(presenter.announced.map(\.text).contains { $0.hasPrefix("Game over") })
+        XCTAssertTrue(experience.accessibilitySummary.contains("best score \(ArcadePresenter.grouped(over.run.score))"),
+                      experience.accessibilitySummary)
+        XCTAssertTrue(presenter.mirror.best.hasPrefix("Best score: \(ArcadePresenter.grouped(over.run.score))"),
+                      presenter.mirror.best)
+        let snapshot = try experience.snapshot()
+        session.close()
+
+        let reopenedStore = HighScoreStore(storage: temporary.storage)
+        XCTAssertEqual(reopenedStore.table, store.table)
+        let again = ExperienceSession()
+        let restored = try await ArcadeTest.openExperience(again, snapshot: snapshot, highScores: reopenedStore,
+                                                           start: false)
+        try ArcadeTest.frames(again, 10)
+        XCTAssertEqual(try ArcadeTest.core(restored.shell).screen, .over)
+        XCTAssertEqual(reopenedStore.table, store.table, "the restored ending is not entered again")
+        XCTAssertEqual(reopenedStore.writes, 0)
+        XCTAssertNil(reopenedStore.newEntry, "and not marked as new")
+        XCTAssertEqual(restored.presenter.lastBestTexts, [ArcadePresenter.scoreText(over.run.score)])
+        XCTAssertNil(restored.presenter.lastBestMarkedRow)
+        XCTAssertTrue(restored.presenter.announced.isEmpty, "a restored ending is not announced")
+        again.close()
+    }
+
+    /// T-A10-403 (FR-A10-420; SC-A10-404): over a run with many events (hits, pickups, a wave, the game over) the
+    /// announcements are at least a second apart, name the hits and end with the game over; pickups are never spoken.
+    /// The game-over cue is announced even though the effect plan may drop it (the presenter detects the ending).
+    func testAnnouncementsAreAtMostOnePerSecondOverARun() async throws {
+        let spoken = RecordingAnnouncementSink()
+        let presenter = ArcadePresenter(experienceID: ArcadeTest.id, soundSink: RecordingSoundSink(),
+                                        feedback: ArcadeTest.speakingFeedback(spoken))
+        var engine = ExperienceEngine<ArcadeCore>(id: ArcadeTest.id)
+        try await engine.prepare(seed: ArcadeCore.manifestSeed)
+        try engine.activate()
+        XCTAssertEqual(engine.handle(control: "run.start"), .accepted)
+        XCTAssertEqual(engine.handle(control: "run.steer", values: [ArcadeCore.gameOverSteering]), .accepted)
+        presenter.advancePresentation(try XCTUnwrap(engine.core), seconds: 1.0 / 60)
+        try play(&engine, steps: ArcadeCore.gameOverSteps + 120, presenter: presenter)
+        let run = try XCTUnwrap(engine.core).run
+        XCTAssertTrue(run.over)
+        let times = presenter.announced.map(\.time)
+        for (earlier, later) in zip(times, times.dropFirst()) {
+            XCTAssertGreaterThanOrEqual(later - earlier, ArcadeAnnouncer.minimumInterval - 1e-9)
+        }
+        XCTAssertLessThanOrEqual(times.count, Int(presenter.presentationTime / ArcadeAnnouncer.minimumInterval) + 1)
+        let texts = presenter.announced.map(\.text)
+        XCTAssertTrue(texts.contains { $0.hasPrefix("Hit, ") }, "\(texts)")
+        XCTAssertEqual(texts.last, "New high score \(run.score)", "the first finished run enters the empty table")
+        XCTAssertFalse(texts.contains { $0.lowercased().contains("orb") || $0.lowercased().contains("pickup") })
+        XCTAssertEqual(spoken.spoken, texts, "every announcement goes to the host's feedback route")
+
+        // The ending detection: watched from the playing screen a few steps earlier, not from a restored screen.
+        var playing = ArcadeCore(seed: 7)
+        _ = playing.apply(ExperienceAction(control: "run.start", values: [], step: 0))
+        let ended = try XCTUnwrap(engine.core)
+        XCTAssertFalse(ArcadePresenter.watchedEnding(from: nil, to: ended))
+        XCTAssertFalse(ArcadePresenter.watchedEnding(from: playing, to: ended), "hundreds of steps apart")
+        XCTAssertFalse(ArcadePresenter.watchedEnding(from: ended, to: ended), "already over")
+    }
+
+    /// T-A10-403 (FR-A10-401, FR-A10-402; SC-A10-401): the same finger offset gives a different steering value for each
+    /// step, ordered gentle → sharp and within −1…1; in a session the drag uses the chosen step; the drag keeps its
+    /// native alternative.
+    func testTheDragReachFollowsTheSensitivityStep() async throws {
+        let view = Vec2(90, 160)   // 10 points per unit; the player (x 4.5) is at view x 45
+        for offset in [0.3, 0.5, -0.55] {   // below the sharpest reach (0.6), so no two steps clamp alike
+            let values = Sensitivity.steps.map {
+                ArcadeGestures.steeringValue(view: Vec2(45 + offset * 10, 140), playerX: 4.5, viewSize: view, step: $0)
+            }.compactMap { $0 }
+            XCTAssertEqual(values.count, Sensitivity.reaches.count)
+            XCTAssertEqual(Set(values).count, values.count, "a different value per step for offset \(offset)")
+            XCTAssertEqual(values, offset > 0 ? values.sorted() : values.sorted(by: >), "gentle → sharp")
+            XCTAssertTrue(values.allSatisfy { (-1...1).contains($0) })
+            for (step, value) in values.enumerated() {
+                XCTAssertEqual(value, Sensitivity.steering(offset: offset, step: step), accuracy: 1e-9)
+            }
+        }
+        XCTAssertEqual(ArcadeGestures.steerReach, 1.5, "the default step keeps the reach of A10-P01")
+
+        let session = ExperienceSession()
+        let shell = try await ArcadeTest.open(session)
+        XCTAssertTrue(shell.handle(control: "run.pause", values: [1]).isAccepted, "the player holds still")
+        func steering() throws -> Double { try ArcadeTest.core(shell).run.steering }
+        func drag(to x: Double, at time: Double) {
+            shell.handlePointer(ArcadeTest.touch(1, .began, 45, 140, at: time), viewSize: view)
+            shell.handlePointer(ArcadeTest.touch(1, .moved, 60, 140, at: time + 0.05), viewSize: view)
+            shell.handlePointer(ArcadeTest.touch(1, .moved, x, 140, at: time + 0.1), viewSize: view)
+        }
+        func release(at time: Double) {
+            shell.handlePointer(ArcadeTest.touch(1, .ended, 45, 140, at: time), viewSize: view)
+        }
+        for (step, expected) in [(4, 0.5), (0, 0.12), (2, 0.2)] {
+            XCTAssertTrue(shell.handle(control: "settings.sensitivity", values: [Double(step)]).isAccepted)
+            try ArcadeTest.frames(session, 1)
+            drag(to: 48, at: Double(step))   // 0.3 units right of the player
+            XCTAssertEqual(try steering(), expected, accuracy: 1e-9, "step \(step)")
+            release(at: Double(step) + 0.2)
+            XCTAssertEqual(try steering(), 0)
+        }
+        let presenter = shell.presenter
+        XCTAssertTrue(presenter.nativeActions.contains("settings.sensitivity"))
+        XCTAssertEqual(GestureAlternatives.missing(gesture: presenter.gestureActions, native: presenter.nativeActions),
+                       [])
+        session.close()
+    }
+
+    /// T-A10-403 (FR-A10-421; SC-A10-405; analyze addition): every control has a label and a value or hint on every
+    /// screen; the sensitivity speaks its step; the best-score text names the best score; the controls grow with the
+    /// text size (text styles, wrapping).
+    func testEveryControlIsLabelledAndTheControlsGrowWithDynamicType() async throws {
+        let session = ExperienceSession()
+        let shell = try await ArcadeTest.open(session, start: false)
+        let presenter = shell.presenter
+        for screen in ArcadeScreen.allCases {
+            presenter.mirror.screen = screen
+            let table = ArcadeControls.accessibility(presenter.mirror)
+            for action in presenter.nativeActions {
+                for name in ArcadeControls.controlNames(for: action) {
+                    let entry = try XCTUnwrap(table[name], "\(name) on \(screen)")
+                    XCTAssertFalse(entry.label.isEmpty, "\(name) on \(screen)")
+                    XCTAssertFalse(entry.value.isEmpty && entry.hint.isEmpty, "\(name) on \(screen)")
+                }
+            }
+            XCTAssertTrue(table["scores.best"]?.label.contains("Best") == true)
+        }
+        presenter.mirror.screen = .title
+        let table = ArcadeControls.accessibility(presenter.mirror)
+        XCTAssertEqual(table["settings.sensitivity"]?.label, "Steering sensitivity")
+        XCTAssertEqual(table["settings.sensitivity"]?.value, "Step 3 of 5, normal")
+        XCTAssertEqual(table["scores.best"]?.label, "Best score: none")
+        XCTAssertEqual(ArcadeControls.sensitivityValue(0), "Step 1 of 5, gentle")
+        XCTAssertEqual(ArcadeControls.sensitivityValue(4), "Step 5 of 5, sharp")
+        XCTAssertTrue(shell.handle(control: "settings.sensitivity", values: [4]).isAccepted)
+        try ArcadeTest.frames(session, 1)
+        XCTAssertEqual(presenter.mirror.sensitivity, 4)
+        XCTAssertEqual(ArcadeControls.accessibility(presenter.mirror)["settings.sensitivity"]?.value,
+                       "Step 5 of 5, sharp")
+
+        func height(_ size: DynamicTypeSize) -> CGFloat {
+            let controller = UIHostingController(rootView: presenter.makeControls(shell.port)
+                .environment(\.dynamicTypeSize, size))
+            return controller.sizeThatFits(in: CGSize(width: 320, height: CGFloat.greatestFiniteMagnitude)).height
+        }
+        let small = height(.xSmall), large = height(.accessibility3)
+        XCTAssertGreaterThan(small, 0)
+        XCTAssertGreaterThan(large, small * 1.3, "the texts grow with Dynamic Type (\(small) → \(large))")
+        session.close()
     }
 }

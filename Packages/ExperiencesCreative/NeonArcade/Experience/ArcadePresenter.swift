@@ -37,6 +37,19 @@
 // the collision shapes are always above every effect. Sounds stop on teardown and when the experience is suspended
 // (`suspended()`); the presenter never changes the core and sends nothing on its own (the suspension's `run.pause` is
 // sent by `ArcadeExperience` through the port).
+// Scores and accessibility — feature 078 (A10-P04) T-A10-403 (FR-A10-401, FR-A10-411–413, FR-A10-420, FR-A10-421;
+// SC-A10-401–404; clarifications 1, 2 and 4): the presenter owns the experience's `HighScoreStore` (loaded from the
+// launch storage). Each drawn frame that shows the game-over screen offers the run to the store under the core's run
+// number (entered once; an ending watched while drawn — the screen changed to over since the last drawn state — is
+// `live`). The title and game-over screens draw the best scores below their emblem or final score: the top three
+// entries in seven-segment digits, each row centred, and the run just entered marked in magenta with a small arrow
+// beside it (as a fourth row when it ranks below third). The canvas drag reaches full steering at the reach of the
+// drawn state's sensitivity step. Announcements: the drawn effect cues without the game-over cue (the effect plan caps
+// cues at three and may drop it) plus a game-over cue when the presenter watched the run end go through an
+// `ArcadeAnnouncer` (`AnnouncementPlanner(minimumInterval: 1.0)`; "Hit, n lives left", "Wave n", "Game over, score s"
+// or "New high score s" when the run entered the table; never pickups) on the presentation clock (the sum of the drawn
+// frame times), and every announcement it returns goes to the host's `ExperienceFeedback.announce`. The description
+// and the controls name the best score ("best score none" / "best score 1,230").
 import Foundation
 import SwiftUI
 import NeonArcadeCore
@@ -71,6 +84,12 @@ final class ArcadeMirror {
     var haptics = true
     /// The status line: score, lives and the screen.
     var status = ""
+    /// The steering sensitivity step 0…4 (feature 078).
+    var sensitivity = Sensitivity.defaultStep
+    /// The best-score text of the controls (feature 078), for example "Best score: none".
+    var best = ArcadePresenter.bestWords(nil, newRank: nil)
+    /// The high-score problem to show, or nil (feature 078).
+    var scoresProblem: String?
 }
 
 /// A failure the presenter injects for tests (`failNextDraw`).
@@ -173,6 +192,17 @@ final class ArcadePresenter: ExperiencePresenter {
     nonisolated static let screenFade = 0.25
     /// The field point (game units) near the bottom centre where the frame probe is taken when it lies in the field.
     nonisolated static let probeMargin = 0.35
+    /// The most best-score rows drawn: the top three and the new entry below them (feature 078).
+    nonisolated static let bestRows = 4
+    /// The top entries always drawn (feature 078).
+    nonisolated static let bestShown = 3
+    /// The top of the first best-score row on the title and game-over screens and the distance between rows (game
+    /// units; feature 078).
+    nonisolated static let titleBestTop = 5.0, overBestTop = 4.2, bestSpacing = 0.8
+    /// The colour of the best-score rows and of the marked new entry (feature 078).
+    nonisolated static let bestColor = Vec4(0.85, 0.98, 1.0, 0.75), newEntryColor = Vec4(1.0, 0.35, 0.85, 1)
+    /// The gap between the new-entry arrow and its row, and the arrow's half height (game units; feature 078).
+    nonisolated static let markerGap = 0.25, markerSize = 0.22
 
     let experienceID: ExperienceID
     let mirror = ArcadeMirror()
@@ -219,6 +249,21 @@ final class ArcadePresenter: ExperiencePresenter {
     private(set) var lastPulseAmount = 0.0, lastDriftAmount = 0.0
     /// The canvas gesture (a drag steers).
     private var gestures = ArcadeGestures()
+    /// The high-score table in the experience's storage (feature 078).
+    let highScores: HighScoreStore
+    /// The rate limit of the announcements (feature 078).
+    private(set) var announcer = ArcadeAnnouncer()
+    /// The presentation clock of the announcer: the sum of the drawn frame times in seconds (feature 078).
+    private(set) var presentationTime = 0.0
+    /// The announcements sent to the feedback route since the presenter was made, with their presentation times
+    /// (tests; feature 078).
+    private(set) var announced: [Announcement] = []
+    /// The core of the last presented frame (feature 078: the game-over transition is detected against it).
+    private(set) var lastPresented: ArcadeCore?
+    /// The best-score rows of the last frame as drawn texts (empty when none were shown) and the marked row's index
+    /// (feature 078).
+    private(set) var lastBestTexts: [String] = []
+    private(set) var lastBestMarkedRow: Int?
     /// The port of the last canvas pointer event: a held drag keeps steering through it as the player moves
     /// (T-A10-115).
     private var followPort: ExperienceActionPort?
@@ -262,6 +307,9 @@ final class ArcadePresenter: ExperiencePresenter {
     let titlePlay = SceneNode(id: "title.play", z: ArcadePresenter.stateZ)
     /// The seven segment nodes of each final score digit and final wave digit on the game-over screen.
     private(set) var overScoreNodes: [[SceneNode]] = [], overWaveNodes: [[SceneNode]] = []
+    /// The seven segment nodes of each digit of each best-score row and the new-entry arrow (feature 078).
+    private(set) var bestNodes: [[[SceneNode]]] = []
+    let bestMarker = SceneNode(id: "best.marker", z: ArcadePresenter.stateZ)
 
     /// A presenter.
     /// - Parameters:
@@ -270,10 +318,14 @@ final class ArcadePresenter: ExperiencePresenter {
     ///     (presentation only).
     ///   - reduceFlashing: A hit keeps only its ring (no full-field tint).
     ///   - soundSink: Where the sounds go (by default VisualCore's `SoundEffectPlayer`).
-    ///   - feedback: The haptic route (by default the host's shared `ExperienceFeedback`).
+    ///   - feedback: The haptic and announcement route (by default the host's shared `ExperienceFeedback`).
+    ///   - highScores: The high-score table (by default one kept in memory only; the app passes one over the
+    ///     experience's storage).
     init(experienceID: ExperienceID, reduceMotion: Bool = false, reduceFlashing: Bool = false,
-         soundSink: (any ArcadeSoundSink)? = nil, feedback: ExperienceFeedback? = nil) {
+         soundSink: (any ArcadeSoundSink)? = nil, feedback: ExperienceFeedback? = nil,
+         highScores: HighScoreStore? = nil) {
         self.experienceID = experienceID
+        self.highScores = highScores ?? HighScoreStore(storage: nil)
         self.reduceMotion = reduceMotion
         self.reduceFlashing = reduceFlashing
         self.soundSink = soundSink ?? ArcadeSoundPlayer()
@@ -352,6 +404,20 @@ final class ArcadePresenter: ExperiencePresenter {
             if prefix == "overScore" { overScoreNodes = digits } else { overWaveNodes = digits }
         }
         for node in [titleShadeNode, titleRing, titleChevron, titlePlay] { root.add(node) }
+        for row in 0..<Self.bestRows {
+            var digits: [[SceneNode]] = []
+            for digit in 0..<Self.maxDigits {
+                var segments: [SceneNode] = []
+                for segment in 0..<7 {
+                    let node = SceneNode(id: "best\(row).\(digit).\(segment)", z: Self.stateZ)
+                    root.add(node)
+                    segments.append(node)
+                }
+                digits.append(segments)
+            }
+            bestNodes.append(digits)
+        }
+        root.add(bestMarker)
         for side in 0..<4 {
             let node = SceneNode(id: "mask\(side)", z: Self.maskZ)
             root.add(node)
@@ -401,16 +467,19 @@ final class ArcadePresenter: ExperiencePresenter {
     }
 
     /// The presentation step of one drawn frame of `seconds`: the screen and its cross-fade, then the effects of the
-    /// run change since the last drawn run, with their sounds (sound setting on) and haptics (haptics setting on).
-    /// Reads `core` only.
+    /// run change since the last drawn run, with their sounds (sound setting on) and haptics (haptics setting on), the
+    /// game-over entry into the high-score table and the announcements (feature 078). Reads `core` only.
     func advancePresentation(_ core: ArcadeCore, seconds: Double) {
+        let previous = lastPresented
+        lastPresented = core
         let before = shownScreen
         noteScreen(core.screen)
         if before == shownScreen, fadingScreen != nil, seconds.isFinite, seconds > 0 {
             transitionElapsed += seconds
             if transitionProgress >= 1 { fadingScreen = nil }
         }
-        for cue in effects.advance(to: core.run) {
+        let cues = effects.advance(to: core.run)
+        for cue in cues {
             guard let sound = cue.sound else { continue }
             if core.sound {
                 soundSink.play(sound)
@@ -421,6 +490,33 @@ final class ArcadePresenter: ExperiencePresenter {
                 hapticsStarted += 1
             }
         }
+        let ended = Self.watchedEnding(from: previous, to: core)
+        var rank: Int?
+        if core.screen == .over {
+            rank = highScores.record(run: core.run, number: core.runNumber, live: ended)
+        }
+        syncScores(core)
+        if seconds.isFinite, seconds > 0 { presentationTime += seconds }
+        var spoken = cues.filter { $0.kind != .over }
+        if ended { spoken.append(EffectCue(kind: .over, position: core.run.player.center, visual: false, sound: nil)) }
+        if let announcement = announcer.update(cues: spoken, run: core.run, newHighScore: rank != nil,
+                                               time: presentationTime) {
+            feedback.announce(announcement.text, kind: announcement.kind)
+            announced.append(announcement)
+        }
+    }
+
+    /// The most steps between two drawn states for an ending to count as watched (a frame advances a few steps).
+    nonisolated static let watchedSteps = 30
+
+    /// Whether the run of `current` ended while drawn: the last presented state showed another screen for the same run
+    /// number, a few steps earlier (a restored game-over screen or the first frame is no watched ending).
+    nonisolated static func watchedEnding(from previous: ArcadeCore?, to current: ArcadeCore) -> Bool {
+        guard let previous, current.screen == .over, previous.screen != .over,
+              previous.runNumber == current.runNumber, current.run.step >= previous.run.step,
+              current.run.step - previous.run.step <= watchedSteps,
+              current.run.eventCount >= previous.run.eventCount else { return false }
+        return true
     }
 
     /// The experience was suspended: every sound stops (nothing is queued for later).
@@ -465,9 +561,11 @@ final class ArcadePresenter: ExperiencePresenter {
         lastParticlesDrawn = particleRenderer?.lastInstanceCount ?? 0
         try primitives?.draw(root, camera: Camera2D(), metrics: metrics)
         // T-A10-115: a finger held still keeps steering by its offset from the drawn player (an action at the next
-        // step, recorded like any other; the drawing itself changes nothing).
+        // step, recorded like any other; the drawing itself changes nothing), at the drawn sensitivity step.
         if let port = followPort {
-            for action in gestures.follow(playerX: core.run.player.x) { _ = port.send(action.control, action.values) }
+            for action in gestures.follow(playerX: core.run.player.x, step: core.sensitivity) {
+                _ = port.send(action.control, action.values)
+            }
         }
     }
 
@@ -754,6 +852,7 @@ final class ArcadePresenter: ExperiencePresenter {
         } else {
             for node in [titleShadeNode, titleRing, titleChevron, titlePlay] { node.primitive = nil }
         }
+        layOutBestScores(titleAlpha: titleAlpha, overAlpha: overAlpha, world: world, px: px)
 
         // Letterbox masks: everything outside the field is covered in the clear colour.
         let halfW = Self.fieldWidth / 2 * s, halfH = Self.fieldHeight / 2 * s
@@ -764,6 +863,55 @@ final class ArcadePresenter: ExperiencePresenter {
             node.primitive = .rect(big)
             node.position = centre
             node.color = Self.letterboxColor
+        }
+    }
+
+    /// The best-score rows to draw: the top ``bestShown`` entries and, when the new entry ranks below them, the new
+    /// entry as a further row; with the index of the marked row (the new entry), or nil.
+    nonisolated static func bestRowsShown(_ table: HighScoreTable, newEntryIndex: Int?)
+        -> (entries: [HighScoreEntry], marked: Int?) {
+        var rows = Array(table.entries.prefix(bestShown))
+        var marked: Int?
+        if let index = newEntryIndex, index < table.entries.count {
+            if index < bestShown {
+                marked = index
+            } else {
+                rows.append(table.entries[index])
+                marked = rows.count - 1
+            }
+        }
+        return (rows, marked)
+    }
+
+    /// Draws the best-score rows on the title screen (below the play triangle) or the game-over screen (below the
+    /// final wave), whichever overlay is the more visible, with that overlay's alpha; clears them on other screens.
+    private func layOutBestScores(titleAlpha: Double, overAlpha: Double, world: (Vec2) -> Vec2,
+                                  px: (Double) -> Double) {
+        let alpha = max(titleAlpha, overAlpha)
+        let shown = alpha > 0 ? Self.bestRowsShown(highScores.table, newEntryIndex: highScores.newEntryIndex)
+                              : (entries: [], marked: nil)
+        let top = overAlpha >= titleAlpha ? Self.overBestTop : Self.titleBestTop
+        lastBestTexts = shown.entries.map { Self.scoreText($0.score) }
+        lastBestMarkedRow = shown.marked
+        bestMarker.primitive = nil
+        for (row, nodes) in bestNodes.enumerated() {
+            guard row < shown.entries.count else {
+                for node in nodes.joined() { node.primitive = nil }
+                continue
+            }
+            let text = lastBestTexts[row]
+            let origin = Vec2(Self.centredDigitsX(text.count), top - Double(row) * Self.bestSpacing)
+            let marked = row == shown.marked
+            let color = Self.faded(marked ? Self.newEntryColor : Self.bestColor, alpha)
+            Self.drawDigits(text, nodes: nodes, origin: origin, color: color, world: world,
+                            width: px(Self.segmentWidth))
+            if marked {
+                let tip = Vec2(origin.x - Self.markerGap, origin.y - Self.digitHeight / 2)
+                let h = Self.markerSize
+                bestMarker.primitive = .polygon([world(tip), world(tip + Vec2(-h * 1.6, h)),
+                                                 world(tip + Vec2(-h * 1.6, -h))])
+                bestMarker.color = color
+            }
         }
     }
 
@@ -784,6 +932,44 @@ final class ArcadePresenter: ExperiencePresenter {
         if mirror.haptics != core.haptics { mirror.haptics = core.haptics }
         let status = Self.status(run, screen: core.screen)
         if mirror.status != status { mirror.status = status }
+        if mirror.sensitivity != core.sensitivity { mirror.sensitivity = core.sensitivity }
+        syncScores(core)
+    }
+
+    /// Brings the best-score text and the high-score problem of the controls in line with the store (feature 078).
+    func syncScores(_ core: ArcadeCore) {
+        let rank = core.screen == .over ? highScores.newEntryIndex : nil
+        let best = Self.bestWords(highScores.best, newRank: rank)
+        if mirror.best != best { mirror.best = best }
+        let problem = highScores.problem.map { ArcadeControls.sentence($0) }
+        if mirror.scoresProblem != problem { mirror.scoresProblem = problem }
+    }
+
+    /// `value` in decimal digits grouped by commas: "1,230" (feature 078).
+    nonisolated static func grouped(_ value: Int) -> String {
+        let digits = String(abs(value))
+        var groups: [Substring] = []
+        var end = digits.endIndex
+        while end > digits.startIndex {
+            let start = digits.index(end, offsetBy: -3, limitedBy: digits.startIndex) ?? digits.startIndex
+            groups.insert(digits[start..<end], at: 0)
+            end = start
+        }
+        return (value < 0 ? "-" : "") + groups.joined(separator: ",")
+    }
+
+    /// The best score in words for the description: "best score none" or "best score 1,230" (feature 078).
+    nonisolated static func bestScoreWords(_ best: HighScoreEntry?) -> String {
+        best.map { "best score \(grouped($0.score))" } ?? "best score none"
+    }
+
+    /// The best-score text of the controls: "Best score: none", "Best score: 1,230 in wave 4", and on the game-over
+    /// screen after a run that entered the table "… This run is number 2 in the table." (feature 078).
+    nonisolated static func bestWords(_ best: HighScoreEntry?, newRank: Int?) -> String {
+        guard let best else { return "Best score: none" }
+        var text = "Best score: \(grouped(best.score)) in wave \(best.wave)"
+        if let rank = newRank { text += ". This run is number \(rank + 1) in the table." }
+        return text
     }
 
     /// "playing", "paused" or "over".
@@ -842,10 +1028,17 @@ final class ArcadePresenter: ExperiencePresenter {
             + "\(objectWords(run.objects.count)), \(screenWord(screen))."
     }
 
-    /// The description of `core`'s run on its screen.
+    /// The canvas description on `screen` with the best score before the screen (feature 078), for example "Neon
+    /// Arcade: Neon Dodge, wave 1, score 0, 3 lives, no objects falling, best score none, title screen."
+    nonisolated static func description(_ run: GameRun, screen: ArcadeScreen, best: HighScoreEntry?) -> String {
+        "Neon Arcade: Neon Dodge, wave \(run.wave), score \(run.score), \(livesWords(run.lives)), "
+            + "\(objectWords(run.objects.count)), \(bestScoreWords(best)), \(screenWord(screen))."
+    }
+
+    /// The description of `core`'s run on its screen with the best score.
     func describe(_ core: ArcadeCore) -> String {
         sync(core)
-        return Self.description(core.run, screen: core.screen)
+        return Self.description(core.run, screen: core.screen, best: highScores.best)
     }
 
     /// The field point (game units) under the canvas point at fraction (0.5, 0.99) of the last canvas (y from the
@@ -907,12 +1100,12 @@ final class ArcadePresenter: ExperiencePresenter {
     /// The action the canvas drag sends: `run.steer`.
     var gestureActions: Set<String> { ArcadeGestures.gestureActions }
 
-    /// Turns a canvas pointer event into `run.steer` actions against the player of the last synced run and sends each
-    /// through `port`; nothing happens before a state was seen.
+    /// Turns a canvas pointer event into `run.steer` actions against the player of the last synced run at its
+    /// sensitivity step and sends each through `port`; nothing happens before a state was seen.
     func pointer(_ event: PointerEvent, viewSize: Vec2, port: ExperienceActionPort) {
-        guard let run = lastCore?.run else { return }
+        guard let core = lastCore else { return }
         followPort = port
-        let actions = gestures.handle(event, playerX: run.player.x, viewSize: viewSize)
+        let actions = gestures.handle(event, playerX: core.run.player.x, viewSize: viewSize, step: core.sensitivity)
         for action in actions { _ = port.send(action.control, action.values) }
     }
 }

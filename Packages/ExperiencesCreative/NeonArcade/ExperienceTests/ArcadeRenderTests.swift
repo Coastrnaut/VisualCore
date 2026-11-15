@@ -18,6 +18,10 @@
 // change at once under Reduce Motion; the effects are drawn in the back layer, before the particles and both before
 // every collision shape; a hit draws its ring and, unless reduced flashing, the full-field tint; the wave sweep runs
 // down the field; particles reach the renderer in a session; the probe steps aside for effects.
+// Feature 078 (A10-P04) T-A10-403 (FR-A10-413, FR-A10-421; analyze addition): the title and game-over screens draw the
+// best scores — the top three rows in seven-segment digits and the new entry marked in magenta with an arrow, as a
+// fourth row when it ranks below third — and nothing on the playing screen; the description names the best score
+// ("best score 1,230") before the screen.
 import Foundation
 import XCTest
 @testable import NeonArcadeExperience
@@ -268,7 +272,7 @@ final class ArcadeRenderTests: XCTestCase {
         XCTAssertEqual(core, copy)
         XCTAssertEqual(after.finish(), before.finish())
         XCTAssertEqual(presenter.describe(core),
-                       "Neon Arcade: Neon Dodge, wave 3, score 57, 3 lives, 3 objects falling, playing.")
+                       "Neon Arcade: Neon Dodge, wave 3, score 57, 3 lives, 3 objects falling, best score none, playing.")
     }
 
     func testReduceMotionHalvesPulseAndDriftAndLeavesTheCoreAlone() throws {
@@ -480,7 +484,8 @@ final class ArcadeRenderTests: XCTestCase {
         XCTAssertEqual(ArcadePresenter.centredDigitsX(1), 4.5 - ArcadePresenter.digitWidth / 2, accuracy: 1e-12)
         XCTAssertNil(presenter.titleShadeNode.primitive)
         XCTAssertEqual(presenter.describe(try core(run, screen: .over)),
-                       "Neon Arcade: Neon Dodge, wave 3, score 1250, no lives, 3 objects falling, over.")
+                       "Neon Arcade: Neon Dodge, wave 3, score 1250, no lives, 3 objects falling, "
+                           + "best score none, over.")
     }
 
     /// T-A10-304 (FR-A10-311; story 1 scenario 4; analyze addition): a screen change cross-fades over 0.25 s of frame
@@ -615,5 +620,57 @@ final class ArcadeRenderTests: XCTestCase {
         XCTAssertEqual(shell.presenter.effects.particles.aliveCount, 0)
         session.close()
         XCTAssertEqual(shell.state, .inactive, "closed without a GPU leak")
+    }
+
+    /// T-A10-403 (FR-A10-413; analyze addition): the title and game-over screens draw the best scores with the new entry
+    /// marked; the playing screen draws none; the description names the best score.
+    func testTheBestScoresAreDrawnOnTheTitleAndGameOverScreensWithTheNewEntryMarked() throws {
+        let store = HighScoreStore(storage: nil)
+        for (number, score) in [(1, 900), (2, 450), (3, 1_230), (4, 60)] {
+            XCTAssertNotNil(store.record(run: ArcadeTest.finishedRun(score: score), number: number))
+        }
+        XCTAssertEqual(store.newEntryIndex, 3, "run 4 ranks fourth")
+        let presenter = ArcadePresenter(experienceID: ArcadeTest.id, reduceMotion: true, highScores: store)
+        func lit(_ row: Int) -> [Int] { presenter.bestNodes[row].map { $0.filter { $0.primitive != nil }.count } }
+        func rowColor(_ row: Int) -> Vec4? { presenter.bestNodes[row].joined().first { $0.primitive != nil }?.color }
+
+        presenter.layOut(try core(GameRun.new(), screen: .title), width: 90, height: 160)
+        XCTAssertEqual(presenter.lastBestTexts, ["1230", "900", "450", "60"], "the top three and the new entry")
+        XCTAssertEqual(presenter.lastBestMarkedRow, 3)
+        XCTAssertEqual(Array(lit(0).prefix(5)), [1, 2, 3, 0].map { ArcadePresenter.segmentTable[$0].count } + [0])
+        XCTAssertEqual(rowColor(0), ArcadePresenter.bestColor)
+        XCTAssertEqual(rowColor(3), ArcadePresenter.newEntryColor, "the new entry is marked")
+        XCTAssertNotNil(presenter.bestMarker.primitive, "with its arrow")
+        XCTAssertEqual(presenter.bestMarker.z, ArcadePresenter.stateZ)
+        XCTAssertTrue(presenter.describe(try core(GameRun.new(), screen: .title))
+            .hasSuffix("no objects falling, best score 1,230, title screen."))
+
+        let over = ArcadeTest.finishedRun(score: 60)
+        presenter.layOut(try core(over, screen: .over), width: 90, height: 160)
+        XCTAssertEqual(presenter.lastStateMark, "over")
+        XCTAssertEqual(presenter.lastBestTexts, ["1230", "900", "450", "60"])
+        XCTAssertEqual(presenter.lastBestMarkedRow, 3)
+        XCTAssertNotNil(presenter.bestMarker.primitive)
+        XCTAssertEqual(presenter.lastOverScoreText, "60", "the final score stays drawn above the table")
+
+        presenter.layOut(try core(GameRun.new(), screen: .playing), width: 90, height: 160)
+        XCTAssertEqual(presenter.lastBestTexts, [])
+        XCTAssertNil(presenter.lastBestMarkedRow)
+        XCTAssertTrue(presenter.bestNodes.joined().joined().allSatisfy { $0.primitive == nil }, "none while playing")
+        XCTAssertNil(presenter.bestMarker.primitive)
+
+        // A new entry in the top three is marked in place; an empty table draws no rows.
+        XCTAssertEqual(ArcadePresenter.bestRowsShown(store.table, newEntryIndex: 1).marked, 1)
+        XCTAssertEqual(ArcadePresenter.bestRowsShown(store.table, newEntryIndex: 1).entries.count, 3)
+        XCTAssertEqual(ArcadePresenter.bestRowsShown(HighScoreTable(), newEntryIndex: nil).entries, [])
+        let empty = ArcadePresenter(experienceID: ArcadeTest.id, reduceMotion: true)
+        empty.layOut(try core(GameRun.new(), screen: .title), width: 90, height: 160)
+        XCTAssertEqual(empty.lastBestTexts, [])
+        XCTAssertTrue(empty.describe(try core(GameRun.new(), screen: .title)).contains("best score none, title screen."))
+        XCTAssertEqual(ArcadePresenter.grouped(1_234_567), "1,234,567")
+        XCTAssertEqual(ArcadePresenter.grouped(999), "999")
+        XCTAssertEqual(ArcadePresenter.bestWords(nil, newRank: nil), "Best score: none")
+        XCTAssertEqual(ArcadePresenter.bestWords(HighScoreEntry(score: 1_230, wave: 4, run: 2), newRank: 1),
+                       "Best score: 1,230 in wave 4. This run is number 2 in the table.")
     }
 }

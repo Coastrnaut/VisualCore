@@ -45,6 +45,18 @@
 // paused). `schemaTwoExample()` is the stored schema-2 payload (a paused run) the registry's migration check restores.
 // The digest covers the screen and both settings; the outcome names the screen (`run-title`, `run-playing`,
 // `run-paused`, `run-over`).
+//
+// Snapshot schema 4 — feature 078 (A10-P04) T-A10-403 (FR-A10-401, FR-A10-402, FR-A10-412; clarification 1; data-model
+// "ArcadeState"): `ArcadeState` adds `sensitivity` (the steering sensitivity step 0…4 of `Sensitivity`, default 2) and
+// `runNumber` (the runs started, ≥ 1: a new experience holds run 1 on its title screen, and every new run — `run.start`
+// from the game-over screen and `run.restart` — adds one; the high-score table enters a finished run under this number
+// once). The step 3 → 4 decodes a schema-3 payload and sets the sensitivity to 2 and the run number to 1 (a payload
+// missing these keys decodes the same way). Action since schema 4:
+//   settings.sensitivity [0…4]   the sensitivity step on any screen; a fractional value is refused with
+//                                `a10.invalid-choice`. It never changes the run (the canvas drag reads it), so a
+//                                replay stays exact.
+// The restore refuses a sensitivity outside 0…4 or a run number below 1. `schemaThreeExample()` is the stored schema-3
+// payload (sound off, a playing run) the registry's migration check restores. The digest covers both new fields.
 import Foundation
 import NeonArcadeCore
 import VisualCoreExperience
@@ -54,7 +66,7 @@ import VisualCoreSimulation
 /// The rule codes of Neon Arcade's refusals.
 public enum ArcadeRule {
     /// A choice value that is not a whole number naming an entry of the action's table (`run.pause`,
-    /// `settings.sound` or `settings.haptics` other than 0 or 1).
+    /// `settings.sound` or `settings.haptics` other than 0 or 1, `settings.sensitivity` other than 0…4).
     public static let invalidChoice = "a10.invalid-choice"
     /// A steering value that is not finite or lies outside −1…1 (only reachable when the core is called directly).
     public static let invalidSteering = "a10.invalid-steering"
@@ -70,8 +82,8 @@ public enum ArcadeRestoreError: Error, Equatable {
     case invalidGenerator
 }
 
-/// The saved state of Neon Arcade (snapshot schema 3): the schema-2 run, the generator state, the screen and the
-/// sound and haptics settings.
+/// The saved state of Neon Arcade (snapshot schema 4): the schema-2 run, the generator state, the screen, the sound
+/// and haptics settings, the steering sensitivity step and the run number.
 public struct ArcadeState: Codable, Equatable, Sendable {
     /// The Neon Dodge run.
     public var run: GameRun
@@ -83,24 +95,32 @@ public struct ArcadeState: Codable, Equatable, Sendable {
     public var sound: Bool
     /// Whether haptics play (feature 077; on by default).
     public var haptics: Bool
+    /// The steering sensitivity step 0…4 (feature 078; default ``Sensitivity/defaultStep``).
+    public var sensitivity: Int
+    /// The number of the run held, counting the runs started from 1 (feature 078).
+    public var runNumber: Int
 
     /// A state of `run` with the generator state `random` on `screen` (by default the screen the run implies:
-    /// ``ArcadeScreen/derived(from:)``) with the settings given (on by default).
+    /// ``ArcadeScreen/derived(from:)``) with the settings given (sound and haptics on, sensitivity step 2 and run 1 by
+    /// default).
     public init(run: GameRun, random: SeededRandom.State, screen: ArcadeScreen? = nil, sound: Bool = true,
-                haptics: Bool = true) {
+                haptics: Bool = true, sensitivity: Int = Sensitivity.defaultStep, runNumber: Int = 1) {
         self.run = run
         self.random = random
         self.screen = screen ?? ArcadeScreen.derived(from: run)
         self.sound = sound
         self.haptics = haptics
+        self.sensitivity = sensitivity
+        self.runNumber = runNumber
     }
 
     private enum CodingKeys: String, CodingKey {
-        case run, random, screen, sound, haptics
+        case run, random, screen, sound, haptics, sensitivity, runNumber
     }
 
     /// Decodes a state; a payload written before schema 3 (without `screen`, `sound` or `haptics`) reads with the
-    /// screen derived from its run and both settings on (clarification 2).
+    /// screen derived from its run and both settings on (clarification 2), and one written before schema 4 (without
+    /// `sensitivity` or `runNumber`) with sensitivity step 2 and run 1 (feature 078, clarification 1).
     public init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         run = try container.decode(GameRun.self, forKey: .run)
@@ -108,6 +128,19 @@ public struct ArcadeState: Codable, Equatable, Sendable {
         screen = try container.decodeIfPresent(ArcadeScreen.self, forKey: .screen) ?? ArcadeScreen.derived(from: run)
         sound = try container.decodeIfPresent(Bool.self, forKey: .sound) ?? true
         haptics = try container.decodeIfPresent(Bool.self, forKey: .haptics) ?? true
+        sensitivity = try container.decodeIfPresent(Int.self, forKey: .sensitivity) ?? Sensitivity.defaultStep
+        runNumber = try container.decodeIfPresent(Int.self, forKey: .runNumber) ?? 1
+    }
+
+    /// The problems of the schema-4 settings, empty when the sensitivity is a step 0…4 and the run number is ≥ 1.
+    public func settingProblems() -> [String] {
+        var problems: [String] = []
+        if !Sensitivity.steps.contains(sensitivity) {
+            let steps = Sensitivity.steps
+            problems.append("sensitivity \(sensitivity) is outside \(steps.lowerBound)…\(steps.upperBound)")
+        }
+        if runNumber < 1 { problems.append("run number \(runNumber) is below 1") }
+        return problems
     }
 
     /// The problems of the screen against the run, empty when they agree: the screen is over exactly when the run is
@@ -123,7 +156,7 @@ public struct ArcadeState: Codable, Equatable, Sendable {
     }
 }
 
-/// The state of Neon Arcade. Schema version 3.
+/// The state of Neon Arcade. Schema version 4.
 public struct ArcadeCore: ExperienceCore, Equatable {
     /// The experience's id in the catalog.
     public static let experienceID = "a10.neon-arcade"
@@ -137,16 +170,20 @@ public struct ArcadeCore: ExperienceCore, Equatable {
     /// The outcome once the lives are gone.
     public static let overOutcome = "run-over"
 
-    /// The snapshot schema of this build (feature 077).
-    public static let snapshotSchema = 3
+    /// The snapshot schema of this build (feature 078).
+    public static let snapshotSchema = 4
     /// The snapshot schema of feature 076 (A10-P02), before the screen and the settings.
     public static let schemaTwo = 2
+    /// The snapshot schema of feature 077 (A10-P03), before the sensitivity and the run number.
+    public static let schemaThree = 3
     /// The keys schema 3 adds to the stored state.
     static let schemaThreeKeys = ["screen", "sound", "haptics"]
+    /// The keys schema 4 adds to the stored state (feature 078).
+    static let schemaFourKeys = ["sensitivity", "runNumber"]
 
     /// The action ids in declaration order.
     public static let actionIDs = ["run.start", "run.steer", "run.pause", "run.restart", "settings.sound",
-                                   "settings.haptics"]
+                                   "settings.haptics", "settings.sensitivity"]
 
     /// The content the run spawns from: the bundled catalog (it validates: `ArcadeCatalog.decode` of its encoding
     /// refuses nothing, which the tests check).
@@ -164,9 +201,14 @@ public struct ArcadeCore: ExperienceCore, Equatable {
     public private(set) var sound: Bool
     /// Whether haptics play (feature 077).
     public private(set) var haptics: Bool
+    /// The steering sensitivity step 0…4 the canvas drag uses (feature 078).
+    public private(set) var sensitivity: Int
+    /// The number of the run held, counting the runs started from 1 (feature 078).
+    public private(set) var runNumber: Int
 
     /// The first state prepared with `seed`: the title screen holding a new run (step 0, score 0, three lives, the
-    /// player at rest in the middle, no objects), a generator seeded by `seed`, sound and haptics on.
+    /// player at rest in the middle, no objects), a generator seeded by `seed`, sound and haptics on, sensitivity step 2
+    /// and run number 1.
     public init(seed: UInt64) {
         preparationSeed = seed
         run = GameRun.new()
@@ -174,6 +216,8 @@ public struct ArcadeCore: ExperienceCore, Equatable {
         screen = ArcadeFlow.initialScreen
         sound = true
         haptics = true
+        sensitivity = Sensitivity.defaultStep
+        runNumber = 1
     }
 
     /// A core holding `state`, prepared with `seed`; throws when the generator state cannot be restored.
@@ -183,6 +227,8 @@ public struct ArcadeCore: ExperienceCore, Equatable {
         screen = state.screen
         sound = state.sound
         haptics = state.haptics
+        sensitivity = state.sensitivity
+        runNumber = state.runNumber
         do {
             generator = try SeededRandom(restoring: state.random)
         } catch {
@@ -190,9 +236,10 @@ public struct ArcadeCore: ExperienceCore, Equatable {
         }
     }
 
-    /// The whole state: the run, the generator state, the screen and the settings.
+    /// The whole state: the run, the generator state, the screen, the settings and the run number.
     public var state: ArcadeState {
-        ArcadeState(run: run, random: generator.state, screen: screen, sound: sound, haptics: haptics)
+        ArcadeState(run: run, random: generator.state, screen: screen, sound: sound, haptics: haptics,
+                    sensitivity: sensitivity, runNumber: runNumber)
     }
 
     // MARK: Contract
@@ -203,30 +250,42 @@ public struct ArcadeCore: ExperienceCore, Equatable {
     /// One quality tier (`level-0`): the drawing has nothing to scale down.
     public static var qualityTiers: Int { 1 }
 
-    /// Schema 3 (feature 077). The step 1 → 2 decodes a Phase 01 payload, lifts its run with `GameRun.migrated()`
-    /// (the start of wave 1 with `rain`, everything else kept) and re-encodes it without the schema-3 keys; the step
-    /// 2 → 3 adds the screen derived from the run and both settings on. A payload that does not decode is refused by
-    /// the step (the engine reports the migration as failed).
+    /// Schema 4 (feature 078). The step 1 → 2 decodes a Phase 01 payload, lifts its run with `GameRun.migrated()`
+    /// (the start of wave 1 with `rain`, everything else kept) and re-encodes it without the schema-3 and schema-4
+    /// keys; the step 2 → 3 adds the screen derived from the run and both settings on (without the schema-4 keys); the
+    /// step 3 → 4 adds sensitivity step 2 and run number 1. A payload that does not decode is refused by the step (the
+    /// engine reports the migration as failed).
     public static var migrations: MigrationChain {
         MigrationChain(currentVersion: snapshotSchema, steps: [
             1: { payload in try migratedToSchemaTwo(payload) },
             2: { payload in try migratedToSchemaThree(payload) },
+            3: { payload in try migratedToSchemaFour(payload) },
         ])
     }
 
     /// The step 1 → 2: `payload` decoded as an `ArcadeState` (a schema-1 run reads with the wave fields at their
-    /// defaults), its run migrated and the state encoded again as a JSON object without the schema-3 keys.
+    /// defaults), its run migrated and the state encoded again as a JSON object without the schema-3 and schema-4
+    /// keys.
     static func migratedToSchemaTwo(_ payload: [String: Any]) throws -> [String: Any] {
         var state = try decodeState(payload)
         state.run = state.run.migrated()
         var object = try jsonObject(state)
-        for key in schemaThreeKeys { object[key] = nil }
+        for key in schemaThreeKeys + schemaFourKeys { object[key] = nil }
         return object
     }
 
-    /// The step 2 → 3 (clarification 2): `payload` decoded as an `ArcadeState` — the screen derived from its run
-    /// when absent, sound and haptics on when absent — and encoded again as a JSON object.
+    /// The step 2 → 3 (clarification 2 of feature 077): `payload` decoded as an `ArcadeState` — the screen derived
+    /// from its run when absent, sound and haptics on when absent — and encoded again as a JSON object without the
+    /// schema-4 keys.
     static func migratedToSchemaThree(_ payload: [String: Any]) throws -> [String: Any] {
+        var object = try jsonObject(decodeState(payload))
+        for key in schemaFourKeys { object[key] = nil }
+        return object
+    }
+
+    /// The step 3 → 4 (feature 078, clarification 1): `payload` decoded as an `ArcadeState` — sensitivity step 2 and
+    /// run number 1 when absent — and encoded again as a JSON object.
+    static func migratedToSchemaFour(_ payload: [String: Any]) throws -> [String: Any] {
         try jsonObject(decodeState(payload))
     }
 
@@ -284,13 +343,13 @@ public struct ArcadeCore: ExperienceCore, Equatable {
     /// failed.
     public static func schemaOneExample(seed: UInt64 = 7) -> MigrationExample? {
         let core = exampleSource(seed: seed)
-        // The schema-1 shape: the run without the wave fields, at schema 1, and no schema-3 keys.
+        // The schema-1 shape: the run without the wave fields, at schema 1, and no schema-3 or schema-4 keys.
         guard var object = (try? JSONSerialization.jsonObject(with: encode(core.state))) as? [String: Any],
               var run = object["run"] as? [String: Any] else { return nil }
         run["schema"] = GameRun.schemaOne
         for key in ["wave", "waveStep", "patternId", "freeLane", "patternCursor"] { run[key] = nil }
         object["run"] = run
-        for key in schemaThreeKeys { object[key] = nil }
+        for key in schemaThreeKeys + schemaFourKeys { object[key] = nil }
         return example(version: GameRun.schemaOne, object: object, seed: seed)
     }
 
@@ -304,8 +363,22 @@ public struct ArcadeCore: ExperienceCore, Equatable {
         guard var object = (try? JSONSerialization.jsonObject(with: encode(core.state))) as? [String: Any] else {
             return nil
         }
-        for key in schemaThreeKeys { object[key] = nil }
+        for key in schemaThreeKeys + schemaFourKeys { object[key] = nil }
         return example(version: schemaTwo, object: object, seed: seed)
+    }
+
+    /// The stored example of schema 3 for the registry's migration check (feature 078, T-A10-403): the A10-P03 payload
+    /// (screen, sound and haptics, but no sensitivity or run number) of the run ``schemaOneExample(seed:)`` was saved
+    /// from, playing after its 120 steps with sound off, with the digest its restore must give: the same run,
+    /// generator, screen and settings with sensitivity step 2 and run number 1. Nil only if the encoding failed.
+    public static func schemaThreeExample(seed: UInt64 = 7) -> MigrationExample? {
+        var core = exampleSource(seed: seed)
+        _ = core.apply(ExperienceAction(control: "settings.sound", values: [0], step: schemaOneExampleSteps))
+        guard var object = (try? JSONSerialization.jsonObject(with: encode(core.state))) as? [String: Any] else {
+            return nil
+        }
+        for key in schemaFourKeys { object[key] = nil }
+        return example(version: schemaThree, object: object, seed: seed)
     }
 
     /// The steps of the recorded replay the stored examples are saved after.
@@ -314,14 +387,16 @@ public struct ArcadeCore: ExperienceCore, Equatable {
     /// the manifest's `recordedInputs`, which exists in test builds only).
     public static let schemaOneExampleInputs: [(step: Int, value: Double)] = [(0, 0.6), (45, -0.3)]
 
-    /// The six controls with their declared ranges.
+    /// The seven controls with their declared ranges.
     public static var controls: [ExperienceControl] {
         [ExperienceControl(id: "run.start"),
          ExperienceControl(id: "run.steer", ranges: [-1...1]),
          ExperienceControl(id: "run.pause", ranges: [0...1]),
          ExperienceControl(id: "run.restart"),
          ExperienceControl(id: "settings.sound", ranges: [0...1]),
-         ExperienceControl(id: "settings.haptics", ranges: [0...1])]
+         ExperienceControl(id: "settings.haptics", ranges: [0...1]),
+         ExperienceControl(id: "settings.sensitivity",
+                           ranges: [Double(Sensitivity.steps.lowerBound)...Double(Sensitivity.steps.upperBound)])]
     }
 
     /// The first state with `seed` as the preparation seed.
@@ -340,7 +415,7 @@ public struct ArcadeCore: ExperienceCore, Equatable {
 
     /// The number of values each action takes.
     private static let valueCounts = ["run.start": 0, "run.steer": 1, "run.pause": 1, "run.restart": 0,
-                                      "settings.sound": 1, "settings.haptics": 1]
+                                      "settings.sound": 1, "settings.haptics": 1, "settings.sensitivity": 1]
 
     /// Carries out a well-formed action (the engine checked the control, the value count, finiteness and ranges).
     public mutating func apply(_ action: ExperienceAction) -> ActionResult {
@@ -363,6 +438,11 @@ public struct ArcadeCore: ExperienceCore, Equatable {
         case "settings.sound":
             guard let i = Self.choice(v[0], count: 2) else { return .rejected(.rule(code: ArcadeRule.invalidChoice)) }
             sound = i == 1
+        case "settings.sensitivity":
+            guard let i = Self.choice(v[0], count: Sensitivity.reaches.count) else {
+                return .rejected(.rule(code: ArcadeRule.invalidChoice))
+            }
+            sensitivity = i
         default:   // settings.haptics
             guard let i = Self.choice(v[0], count: 2) else { return .rejected(.rule(code: ArcadeRule.invalidChoice)) }
             haptics = i == 1
@@ -372,12 +452,16 @@ public struct ArcadeCore: ExperienceCore, Equatable {
 
     /// Applies a flow move: refused with `a10.wrong-screen` when `ArcadeFlow` does not allow it on this screen;
     /// otherwise a new run when the move asks for one (the generator continues, so the new run draws new objects by
-    /// the same rules), the new screen, and `run.paused` set to mirror the paused screen.
+    /// the same rules) with the run number one higher, the new screen, and `run.paused` set to mirror the paused
+    /// screen.
     private mutating func flow(_ action: ArcadeFlowAction) -> ActionResult {
         guard let transition = ArcadeFlow.apply(action, to: screen) else {
             return .rejected(.rule(code: ArcadeRule.wrongScreen))
         }
-        if transition.newRun { GameSimulation.restart(&run) }
+        if transition.newRun {
+            GameSimulation.restart(&run)
+            runNumber += 1
+        }
         screen = transition.screen
         run.paused = screen == .paused
         return .accepted
@@ -405,8 +489,8 @@ public struct ArcadeCore: ExperienceCore, Equatable {
     }
 
     /// The canonical text of the whole state (`a10.arcade.v1|` and the state as JSON with sorted keys: the run, the
-    /// generator, the screen and both settings); a value that cannot be written (a non-finite number) is refused as
-    /// non-finite.
+    /// generator, the screen, the three settings and the run number); a value that cannot be written (a non-finite
+    /// number) is refused as non-finite.
     public func writeDigest(into builder: inout DigestBuilder) throws(DigestError) {
         guard let text = try? String(data: Self.encode(state), encoding: .utf8) else {
             throw .nonFinite(field: builder.fieldCount)
@@ -414,17 +498,18 @@ public struct ArcadeCore: ExperienceCore, Equatable {
         builder.add("a10.arcade.v1|" + text)
     }
 
-    /// The arcade state (schema 3) as JSON with sorted keys.
+    /// The arcade state (schema 4) as JSON with sorted keys.
     public func snapshotPayload() throws -> Data {
         try Self.encode(state)
     }
 
-    /// The core of a schema-3 payload (an older one has been through ``migrations``) with the envelope's `seed` as
+    /// The core of a schema-4 payload (an older one has been through ``migrations``) with the envelope's `seed` as
     /// preparation seed. A payload that does not decode, a run that does not validate (a schema-1 run included), a
-    /// screen that contradicts the run or a malformed generator state is refused (throws).
+    /// screen that contradicts the run, a sensitivity outside 0…4, a run number below 1 or a malformed generator state
+    /// is refused (throws).
     public static func restore(payload: Data, seed: UInt64) throws -> ArcadeCore {
         let state = try JSONDecoder().decode(ArcadeState.self, from: payload)
-        let problems = state.run.validate() + state.screenProblems()
+        let problems = state.run.validate() + state.screenProblems() + state.settingProblems()
         guard problems.isEmpty else { throw ArcadeRestoreError.invalidRun(problems) }
         return try ArcadeCore(seed: seed, state: state)
     }
