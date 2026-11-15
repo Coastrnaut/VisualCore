@@ -178,7 +178,10 @@ The owner sees that the shown distances in AU and km agree, and that repeated da
 - **FR-A14-220**: The experience MUST draw the Sun, the planets at their positions and their orbit lines through the one
   host's drawing path with a stated, labelled distance mapping (not to scale).
 - **FR-A14-221**: Native controls MUST step the date, focus a body, orbit, tilt and zoom the camera and reset the view;
-  the focused body stays in front of the near plane; every control has a label and value.
+  the focused body stays in front of the near plane; every control has a label and value. Camera ranges: yaw in
+  15° steps (unbounded, wraps), pitch 5°…85° in 10° steps (5 + 10k), zoom steps −1…12 (distance 60 × 1.25^−n,
+  4.03…75); a tilt or zoom step leaving its range is refused `a14.out-of-range`. The minimum distance 4 exceeds
+  3 × the largest display radius + 0.5 (Sun 0.8 → 2.9), so focus never crosses the near plane.
 - **FR-A14-222**: The scenario manifest MUST be updated (state schema 2 with migration from 1) and pass the runner on
   iOS 27.
 
