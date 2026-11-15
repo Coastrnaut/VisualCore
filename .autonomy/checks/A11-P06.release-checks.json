@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "/bin/sh",
+    "-c",
+    "python3 scripts/release_check.py --only app-release-build app-release-symbols app-privacy-manifest app-no-tracking app-licenses app-usage-descriptions"
+  ],
+  "command": "/bin/sh -c 'python3 scripts/release_check.py --only app-release-build app-release-symbols app-privacy-manifest app-no-tracking app-licenses app-usage-descriptions'",
+  "elapsed_seconds": 34.88,
+  "exit_code": 0,
+  "finished": "2026-11-15T10:42:16+00:00",
+  "log": ".autonomy/logs/A11-P06.release-checks.log",
+  "log_sha256": "af2fb9b3f7f0038b72a58d2f7a702b89aaee73a53b4ce064429a4c200f770513",
+  "name": "release-checks",
+  "stage": "A11-P06",
+  "started": "2026-11-15T10:41:41+00:00",
+  "timed_out": false
+}
