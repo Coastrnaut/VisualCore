@@ -38,3 +38,7 @@ Agent A: T-A11-302. Agent B: T-A11-303 after A. Lead: 304 regeneration, 305, run
 
 MVP: pinning and edits in the core (US3's fixture and US1's rules), then gestures, arrows and panel, fixtures and
 records; evidence last.
+
+## Phase 5: Convergence
+
+- [ ] T-A11-310 Record in `specs/084-pp-p03-editor/research.md` D1 and `specs/084-pp-p03-editor/contracts/actions.md` the two behaviours built beyond the plan's wording: the native Hold / Let go control and the four move buttons that send `edit.grab` (at the selected body's centre), `edit.move` (±0.5 m) and `edit.release`, so grabbing has a native alternative as FR-A11-303 requires; and that pinning the grabbed body ends the grab, per plan: research D1 (unrequested)
