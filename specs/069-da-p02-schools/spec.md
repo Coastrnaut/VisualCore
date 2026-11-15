@@ -145,14 +145,18 @@ restores with the starter decor.
 
 - **FR-A09-210**: Same-species fish MUST school using the VisualCore steering with the species' tuning; fish of another
   species are separated from but not aligned with or drawn toward; a reduced seeded wander turn remains; the Phase 01
-  bounds and speed guarantees MUST still hold; each fish's smoothed `turn` is kept in the state for drawing.
+  bounds and speed guarantees MUST still hold, and no fish drops below half its cruise speed; every fish's force is
+  computed from the state at the start of the step, so the result does not depend on the fish order; each fish's
+  smoothed `turn` is kept in the state for drawing.
 - **FR-A09-211**: Fish MUST be drawn with a swim animation: a body wave (0.06 body lengths) whose frequency grows with
   speed, a tail swing (0.15 body lengths) and a bend toward the turn (`turn` × 0.12 s, at most ±0.35 rad); Reduce
   Motion halves the drawn wave, swing and bend and never changes the state.
 - **FR-A09-212**: The habitat document MUST hold decor pieces with position, rotation (−π…π) and scale (0.5…2.0)
   (schema 2); the catalog MUST hold licensed decor kinds and starter decor per habitat; a schema-1 state MUST migrate
   (rotation 0, scale 1, turn 0, starter decor added when it has none); decor is drawn procedurally (rocks and
-  shells); unknown kinds, positions outside the tank and scales outside 0.5…2.0 are refused.
+  shells); unknown kinds, positions outside the tank and scales outside 0.5…2.0 are refused. The saved experience
+  state moves to snapshot schema 2 and restores a schema-1 snapshot through the same migration; a snapshot that still
+  fails validation after migration is refused as in Phase 01.
 - **FR-A09-213**: The scenario manifest MUST add fixtures for schooling and for save/load of species, decor transforms
   and lighting.
 
