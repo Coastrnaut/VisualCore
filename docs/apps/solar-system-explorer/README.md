@@ -22,8 +22,10 @@ view — positions for a simulated date (1950–2050, steps of ±1, ±30 and ±3
 navigation, with distances and sizes labelled not to scale. A14-P03 the 3D bodies: seam-free procedural surfaces
 (banded giants, terrain, Earth's oceans and caps, the glowing Sun), Saturn's two-sided rings, a seeded starfield, an
 eased focus flight that never enters a body (cut by Reduce Motion) and two scale modes — visibility-enhanced, labelled
-not to scale, and true-relative, with markers for bodies too small to see. Time playback, saved views, tours and
-on-canvas labels follow in A14-P04.
+not to scale, and true-relative, with markers for bodies too small to see. A14-P04 time and tours: play, pause and
+four rates (a day to a year per second) with the UTC date and time, "Now", two captioned guided tours (inner and giant
+planets) with pause, skip and stop, a saved view, and body labels on the canvas. A14-P05 reviews the data, wording and
+scale labels (G-REVIEW).
 
 | Document | Content |
 |---|---|
