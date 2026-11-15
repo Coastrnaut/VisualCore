@@ -31,6 +31,7 @@
 
 ## Notes
 
-- Validated 2026-11-15 inside `/speckit-specify`: all template sections present, no clarification marker, 16/16 items
+- Validated 2026-11-15 inside `/speckit-specify` (the draft was committed just before the skill was invoked; the skill
+  then validated it): all template sections present, no clarification marker, 16/16 items
   pass. The phase-gate override (circles and boxes with collision and the momentum fixture in Phase 01) moves the
   contact part of G-CONTACTS forward; the rest stays with A11-P02.
