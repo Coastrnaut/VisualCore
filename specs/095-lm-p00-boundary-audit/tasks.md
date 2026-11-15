@@ -21,7 +21,7 @@ after every task (no trailers); read every check's exit before ticking. No Swift
 
 ## Phase 5: User Story 3 — The shell builds with the experience absent (P2)
 
-- [ ] T-A13-006 [US3] Build the one app for testing (`--name app-build -- python3 scripts/release_check.py --only app-build-for-testing-ios27`)
+- [X] T-A13-006 [US3] Build the one app for testing (`--name app-build -- python3 scripts/release_check.py --only app-build-for-testing-ios27`) — Verified 2026-11-15: 2026-11-15: .autonomy/checks/A13-P00.app-build.json exit 0 (iOS 27.2 phone simulator; the attestation was committed with T-A13-004)
 - [ ] T-A13-007 [US3] Experience package check (`--name experience-packages -- python3 scripts/check_experience_packages.py`: 12 experiences, none A13); `grep -c a13 Catalog/registrations.json Apps/VisualCore/App/ExperienceRegistry.swift` gives 0 (FR-A13-005, SC-A13-004)
 
 ## Phase 6: User Story 4 — Stop/go decision (P2)
