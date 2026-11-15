@@ -3,7 +3,8 @@
 // recipe colours; Saturn's ring is two-sided (every triangle has a twin with reversed winding, each wound with its
 // normals), its radii keep the ring record's ratio and the Cassini division is darker; the 400 star directions are
 // deterministic unit vectors spread over the sphere and each star's tetrahedron is small and wound outward; the star
-// sphere lies at 0.9 × far, inside the depth range in both modes and beyond every body in the enhanced mode; the orbit
+// sphere lies at 0.9 × far, inside the depth range in both modes (StarDepthTests proves it lies beyond every body in
+// both modes); the orbit
 // paths have 128 points per planet in both modes (true-relative Neptune about 60 units out); the marker is a unit circle.
 import Foundation
 import XCTest
