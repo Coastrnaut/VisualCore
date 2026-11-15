@@ -22,6 +22,36 @@ Canonical overrides:
 - **Owner rulings:** short tests; audits in the device campaign; iOS 27 at phase gates; interface tests under 60 s each,
   run serially if parallel clones starve the test runner.
 
+## Clarifications
+
+### Session 2026-11-14
+
+Facts checked in code: `scripts/check_experience_release.py` reads `docs/apps/<slug>/release.json` (schema 1:
+`experience`, `requiredDocs`, `checklist`, `copyCheck` with `text`, `swift`, `allow`) and accepts checklist statuses
+`verified`, `pending-campaign-ii` and `owner-action`; `scripts/release_check.py` derives the steps
+`experience-release-<code>` and `copy-claims-<code>` from each such file; `Configs/copy-claims-denylist.json` is shared
+by every experience (measured patterns, unmeasured quality words, features an experience does not have);
+`AquariumPresenter` has the test-only `failNextDraw` seam; Digital Aquarium declares no permission in its registration.
+
+- Q: Which statuses does the release checklist use? → A: The checker's: `verified` (with evidence), `pending-campaign-ii`
+  (device rows, with the device-campaign row named) and `owner-action` (with the owner steps); "device" and
+  "blocked-owner" in this spec mean those two.
+- Q: How are realism and animal-care claims refused without changing the shared denylist? → A: A Digital Aquarium scan
+  step over the store text and the experience's interface Swift refuses the words realistic, lifelike, real fish,
+  pet, care for, healthy, hungry, starve, nutrition and therapy (case-insensitive, whole words), alongside the shared
+  copy check; the shared denylist is not changed, so no other experience is affected.
+- Q: What does the source scan refuse? → A: In `Packages/ExperiencesCreative/DigitalAquarium`: `URLSession`,
+  `import Network`, `CLLocation`, `AVCapture`, `AVAudio`, `CMMotion`, `CNContact`, `ASIdentifierManager`,
+  `AppTrackingTransparency`, `UIScreen.main.brightness` and `isIdleTimerDisabled`.
+- Q: Which sample saved files are committed? → A: Four files under the experience tests' `Fixtures`: a valid
+  configuration (format 1), a newer-format file (format 2), a damaged file (not JSON) and a valid configuration whose
+  file name names another id; copied into a temporary storage, the valid one is listed, the others counted (two
+  unreadable, one newer), all byte-identical after a reload and a save.
+- Q: Which interface journeys run, and how? → A: A serial chunk `q2` with `DAAquariumUITests` (feed by the Feed button,
+  add, move right and remove a decoration, switch to Kelp, turn ambient on — checked through the canvas description and
+  the controls' values) and `DALibraryUITests` (save an aquarium under a name, change the habitat, open the saved one);
+  launched as a candidate with `-vcCandidates` and `-openExperience a09.digital-aquarium`; each test under 60 s.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Nothing leaves the device (Priority: P1) 🎯
@@ -81,8 +111,8 @@ test; the checklist lists every artifact with a status.
 
 1. **Given** the store text, **When** it is checked, **Then** every claim has a proving test and no measured, realism or
    care claim appears.
-2. **Given** the release checklist, **When** it is read, **Then** every item has a status (verified, pending, device,
-   blocked-owner) and evidence.
+2. **Given** the release checklist, **When** it is read, **Then** every item has a status (`verified`,
+   `pending-campaign-ii`, `owner-action`) and evidence or owner steps.
 3. **Given** a missing release document, **When** the check runs, **Then** it fails and names the document.
 
 ---
@@ -116,7 +146,8 @@ ambient mode and saved aquariums; the release build and its checks pass.
 
 **Privacy (story 1)**
 - **FR-A09-601**: Digital Aquarium MUST request no permission and add no usage string.
-- **FR-A09-602**: The experience's sources MUST contain no network, tracking, advertising or sensor use (scan).
+- **FR-A09-602**: The experience's sources MUST contain none of the scanned network, tracking, sensor, brightness or
+  idle-timer uses (Clarifications Q3).
 - **FR-A09-603**: The app's privacy manifest MUST cover every required-reason use the experience makes.
 - **FR-A09-604**: A privacy and credits note MUST state what is stored and where, that nothing is sent, and credit every
   bundled item with author and license.
@@ -131,8 +162,8 @@ ambient mode and saved aquariums; the release build and its checks pass.
 **Copy and release documents (story 3)**
 - **FR-A09-620**: A release checklist with an artifact inventory, a store text input with a traceability table, the
   device-campaign plan and a release configuration MUST exist and pass the release-document check.
-- **FR-A09-621**: The copy-claim check MUST find no measured, unimplemented, realism or animal-care claim in the store
-  text and the interface copy.
+- **FR-A09-621**: The shared copy-claim check MUST pass on the store text and the interface copy, and the Digital Aquarium
+  scan MUST find none of the realism and animal-care words (Clarifications Q2).
 - **FR-A09-622**: Known limitations MUST list Digital Aquarium's device-only items; the device-campaign plan names each
   measurement with its device and pass criterion, results pending; the release checklist marks them `device`.
 
@@ -149,7 +180,7 @@ ambient mode and saved aquariums; the release build and its checks pass.
 
 ### Key Entities
 
-- **Release checklist item**: area, status (verified, pending, device, blocked-owner), evidence.
+- **Release checklist item**: area, status (`verified`, `pending-campaign-ii`, `owner-action`), evidence or owner steps.
 - **Store claim**: a sentence of the store text and the test that proves it.
 - **Sample saved file**: one committed file per form (valid, newer, damaged, mismatched name).
 
