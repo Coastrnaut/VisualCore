@@ -8,7 +8,7 @@ after every task (no trailers); read every check's exit before ticking. iOS 27 o
 
 ## Phase 1: Setup
 
-- [ ] T-A13-301 Baseline: cite the A13-P02 evidence on the unchanged tree (`.autonomy/checks/A13-P02.{maze-ios27,app-unit,verify-27}.json`) instead of a rerun (owner ruling of 2026-11-14)
+- [X] T-A13-301 Baseline: cite the A13-P02 evidence on the unchanged tree (`.autonomy/checks/A13-P02.{maze-ios27,app-unit,verify-27}.json`) instead of a rerun (owner ruling of 2026-11-14) — Verified 2026-11-15: 2026-11-15: cited .autonomy/checks/A13-P02.{maze-ios27,app-unit,verify-27}.json (exit 0) on the unchanged tree (no rerun)
 
 ## Phase 2: Foundational — progress document and moves in the core (stories 1–2, 4)
 
