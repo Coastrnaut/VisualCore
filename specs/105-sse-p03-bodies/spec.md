@@ -165,7 +165,9 @@ jitter, because positions are kept in double precision and drawn relative to the
   emissive Sun); the same seed gives the same surface digest.
 - **FR-A14-302**: Saturn MUST have rings in its equatorial plane tilted by its catalog axial tilt, with inner and outer
   radii recorded with source, units and license.
-- **FR-A14-303**: A seeded starfield MUST lie behind every body at a fixed far distance and never occlude a body.
+- **FR-A14-303**: A seeded starfield of 400 stars MUST lie behind every body: drawn centred on the eye at 0.9 × the
+  active far plane (so it stays inside the depth range in both modes and never occludes a body), with directions fixed
+  by the seed.
 
 **Scale modes (story 2)**
 
