@@ -19,6 +19,7 @@ constitution (2.6.0).
 |---|---|
 | [visualcore-contract.json](visualcore-contract.json) / [.md](visualcore-contract.md) | Phase 00 inventory, capability matrix, gaps, decision (checked by `scripts/check_app_contract.py`) |
 | [regression-baseline.md](regression-baseline.md) | Phase start, reference pin, the ProjectM reference regression results |
+| [content-licenses.md](content-licenses.md) | Author and license of the player, every hazard and every orb (generated) |
 
 Phases: A10-P00 boundary audit (feature 074), P01 fixed-step engine and collision fixtures, P02 Neon Dodge mechanics,
 P03 visual effects and audio/haptics, P04 scores and accessibility, P05 balance and device QA preparation, P06

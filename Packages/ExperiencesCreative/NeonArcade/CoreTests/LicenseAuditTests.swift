@@ -51,4 +51,20 @@ import NeonArcadeCore
         odd.items[0].name = "Pipe | and\nbreak"
         #expect(LicenseAudit.markdown(odd).contains("| player | chevron | Pipe \\| and break | VisualCore project |"))
     }
+
+    /// T-A10-108 (FR-A10-113): the committed `docs/apps/neon-arcade/content-licenses.md` is the audit's Markdown of the
+    /// bundled catalog, so it lists every item. `UPDATE_SCENARIO_MANIFEST=1` (on the simulator
+    /// `TEST_RUNNER_UPDATE_SCENARIO_MANIFEST=1`) rewrites it.
+    @Test func theCommittedLicenseDocumentMatchesTheCatalog() throws {
+        let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
+            .deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
+        let file = root.appendingPathComponent("docs/apps/neon-arcade/content-licenses.md")
+        let text = LicenseAudit.markdown(catalog)
+        if ProcessInfo.processInfo.environment["UPDATE_SCENARIO_MANIFEST"] == "1" {
+            try Data(text.utf8).write(to: file)
+        }
+        let committed = try String(contentsOf: file, encoding: .utf8)
+        #expect(committed == text, "run with UPDATE_SCENARIO_MANIFEST=1 and commit the document")
+        for row in LicenseAudit.rows(catalog) { #expect(committed.contains(row.id), "\(row.id) is listed") }
+    }
 }
