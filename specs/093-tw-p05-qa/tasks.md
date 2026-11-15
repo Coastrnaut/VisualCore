@@ -9,7 +9,7 @@ stay open until ImplementationLock-100. Precedents: `specs/086-pp-p05-stability/
 
 ## Phase 1: Setup
 
-- [ ] T-A12-501 Baseline: cite the A12-P04 evidence on the unchanged tree (`.autonomy/checks/A12-P04.{worlds-ios27,app-unit,verify-27}.json`) instead of a rerun (owner ruling of 2026-11-14)
+- [X] T-A12-501 Baseline: cite the A12-P04 evidence on the unchanged tree (`.autonomy/checks/A12-P04.{worlds-ios27,app-unit,verify-27}.json`) instead of a rerun (owner ruling of 2026-11-14) — Verified 2026-11-15: 2026-11-15: cited .autonomy/checks/A12-P04.{worlds-ios27,app-unit,verify-27}.json on the unchanged tree (no rerun)
 
 ## Phase 2: Foundational — tier table and tier policy in the core
 
