@@ -46,3 +46,7 @@ Agent: T-A13-002 (contract draft, read-heavy). Lead: T-A13-001, the runs, T-A13-
 ## Implementation strategy
 
 MVP is US1 (the matrix) with US2 (reference); US3 and US4 complete the gate.
+
+## Phase 8: Convergence
+
+- [ ] T-A13-012 Record in `specs/095-lm-p00-boundary-audit/research.md` the audit's findings beyond D4 (`VisualCoreSimulation.Collision2D` with closest point on a segment and swept circles, still no ray cast or reflection; `StateSign` and `AccessibleColors.contrastRatio` for colour-independent cues; `EffectScene` as the effect wrapper experiences use; 118 release-check steps; licenses (M20) covered by G-LEVELS and rechecked with G-SOLVER) per plan: research D4 (partial)
