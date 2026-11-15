@@ -34,14 +34,14 @@ final class SolarSessionTests: XCTestCase {
         XCTAssertEqual(SolarControls.bodyNames,
                        ["Sun", "Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune"])
         XCTAssertEqual(shell.accessibilitySummary,
-                       "Solar System Explorer: Sun selected; 9 bodies. Sizes and spacing not to scale.")
+                       "Solar System Explorer: Sun in focus on 2000-01-01; 9 bodies. Distances and sizes not to scale.")
         XCTAssertTrue(presenter.mirror.ready)
         XCTAssertEqual(presenter.mirror.selection, 0)
         XCTAssertEqual(presenter.mirror.bodyCount, 9)
         XCTAssertEqual(presenter.mirror.bodyName, "Sun")
         XCTAssertEqual(presenter.mirror.status, "Sun selected, body 1 of 9")
         XCTAssertEqual(presenter.mirror.facts, try XCTUnwrap(BodyCatalog.bundled.factCard(for: 0)).facts.map(\.text))
-        XCTAssertEqual(presenter.nativeActions, ["body.select", "body.next", "body.previous"])
+        XCTAssertEqual(presenter.nativeActions.count, 8)
         XCTAssertEqual(presenter.nativeActions, Set(SolarCore.actionIDs), "every action has a native control")
         XCTAssertEqual(presenter.gestureActions, [])
         XCTAssertEqual(GestureAlternatives.missing(gesture: presenter.gestureActions, native: presenter.nativeActions),
@@ -49,8 +49,8 @@ final class SolarSessionTests: XCTestCase {
 
         let sunCard = presenter.mirror.facts
         XCTAssertTrue(shell.handle(control: "body.select", values: [3]).isAccepted)
-        XCTAssertEqual(shell.accessibilitySummary,
-                       "Solar System Explorer: Earth selected; 9 bodies. Sizes and spacing not to scale.")
+        XCTAssertEqual(shell.accessibilitySummary, SolarCore.canvasDescription(selection: 3, dayOffset: 0))
+        XCTAssertTrue(shell.accessibilitySummary.contains("Earth in focus on 2000-01-01, 0.983 AU ("))
         XCTAssertEqual(presenter.mirror.bodyName, "Earth", "the description syncs the controls")
         XCTAssertNotEqual(presenter.mirror.facts, sunCard, "the card follows the selection")
         XCTAssertTrue(presenter.mirror.facts.contains { $0.hasPrefix("Mean radius: 6,371 km — ") },
@@ -122,8 +122,8 @@ final class SolarSessionTests: XCTestCase {
         XCTAssertTrue(shell.handle(control: "body.select", values: [4]).isAccepted)
         let saved = try shell.snapshot()
         first.close()
-        let newerEnvelope = try solarEnvelope(Data(saved.payload.utf8), like: saved, schema: 2)
-        let newerPayload = try solarEnvelope(solarPayload(saved.payload) { $0["schema"] = 2 }, like: saved)
+        let newerEnvelope = try solarEnvelope(Data(saved.payload.utf8), like: saved, schema: 3)
+        let newerPayload = try solarEnvelope(solarPayload(saved.payload) { $0["schema"] = 3 }, like: saved)
 
         let cases: [(String, ExperienceSnapshot)] = [("envelope", newerEnvelope), ("payload", newerPayload)]
         for (name, newer) in cases {

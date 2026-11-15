@@ -1,34 +1,48 @@
-// SolarCore — feature 103 (A14-P01) T-A14-103 (FR-A14-120…122; clarifications Q4, Q5; contracts/catalog.md). The
-// state of Solar System Explorer as an experience: a `SolarState` (the selected body index, 0 = Sun … 8 = Neptune,
-// into `BodyCatalog.bundled`) and the preparation seed. Nothing animates: a host step (the default 1/120 s) changes
-// nothing, so a suspension never changes the line-up either.
+// SolarCore — feature 103 (A14-P01) T-A14-103 (FR-A14-120…122; clarifications Q4, Q5; contracts/catalog.md), with the
+// orbit view's date and camera by feature 104 (A14-P02) T-A14-208 (FR-A14-211, FR-A14-221, FR-A14-222; clarifications
+// Q3–Q5; contracts/orbit-view.md). The state of Solar System Explorer as an experience: a `SolarState` (schema 2: the
+// selected and focused body, 0 = Sun … 8 = Neptune, into `BodyCatalog.bundled`; the simulated date in days since
+// J2000.0; the camera's yaw, pitch and zoom steps) and the preparation seed. Nothing animates: a host step (the
+// default 1/120 s) changes nothing, so a suspension never changes the view either.
 //
-// Preparation: every preparation seed opens with the Sun selected (`SolarState.initial`); the seed is kept only as the
-// envelope's preparation seed (`reset()` returns to the same first state). The catalog is fixed data, so nothing
-// depends on the seed.
+// Preparation: every preparation seed opens with the Sun selected at J2000.0 with the overview camera
+// (`SolarState.initial`); the seed is kept only as the envelope's preparation seed (`reset()` returns to the same first
+// state). The catalog and the orbital elements are fixed data, so nothing depends on the seed.
 //
 // Actions (all carried as numbers, as every experience action is; the engine refuses a value outside the declared
 // range with `outOfRange`, a non-finite value with `nonFinite` and a wrong value count with `wrongValueCount` before
 // the core sees it):
-//   body.select [0…8]   the body by catalog index; a value that is not a whole index 0…8 is refused with
-//                       `a14.invalid-choice`.
-//   body.next           the next body (refused with `a14.invalid-choice` at Neptune).
-//   body.previous       the previous body (refused with `a14.invalid-choice` at the Sun).
+//   body.select [0…8]       the body by catalog index; a value that is not a whole index 0…8 is refused with
+//                           `a14.invalid-choice`.
+//   body.next               the next body (refused with `a14.invalid-choice` at Neptune).
+//   body.previous           the previous body (refused with `a14.invalid-choice` at the Sun).
+//   date.step [−365…365]    steps the date by ±1, ±30 or ±365 days; another value is refused with `a14.invalid-step`,
+//                           a step leaving 1950-01-01 … 2051-01-01 (days −18,262.5 … 18,627.5) with `a14.out-of-range`.
+//   camera.orbit [−1…1]     turns the camera by one 15° step; a value other than ±1 is refused with `a14.invalid-step`.
+//   camera.tilt [−1…1]      tilts by 10° within 5°…85°; beyond is refused with `a14.out-of-range`, a value other
+//                           than ±1 with `a14.invalid-step`.
+//   camera.zoom [−1…1]      +1 closer, −1 farther, zoom steps −1…12; beyond is refused with `a14.out-of-range`, a
+//                           value other than ±1 with `a14.invalid-step`.
+//   view.reset              the overview camera (yaw 0, pitch 35°, zoom 0); the selection and the date stay.
 // Called directly (not through the engine), the core refuses an unknown control with `unknownControl` and a wrong
 // value count with `wrongValueCount`, as the engine does. A refusal changes nothing.
 //
-// Snapshot schema 1: `SolarState.encoded()` (JSON with sorted keys: schema, selection); the preparation seed and the
-// schema version come from the snapshot envelope (`MigrationChain(currentVersion: 1)`, so a newer envelope is refused
-// by the engine). A payload `SolarState.decode(_:)` refuses (damaged, newer inside the payload or out of range) is
-// refused (the restore throws `SolarRestoreError`). One quality tier (`level-0`). The digest is the canonical text of
-// the state ("a14.solar.v1|" and the state's JSON) followed by the selection and the selected body's id.
+// Snapshot schema 2: `SolarState.encoded()` (JSON with sorted keys: dayOffset, pitchDegrees, schema, selection,
+// yawSteps, zoomSteps); the preparation seed and the schema version come from the snapshot envelope
+// (`MigrationChain(currentVersion: 2)` with the step 1 → 2 adding J2000.0 and the overview camera, so a schema-1
+// envelope opens at its selection and a newer envelope is refused by the engine). A payload `SolarState.decode(_:)`
+// refuses (damaged, newer inside the payload or out of range) is refused (the restore throws `SolarRestoreError`). One
+// quality tier (`level-0`). The digest is the canonical text of the state ("a14.solar.v2|" and the state's JSON)
+// followed by the selection and the selected body's id.
 //
 // The outcome is `viewing-<body id>` ("viewing-sun", "viewing-earth") for the selected body: the scenario manifest's
-// completion scenario must expect an outcome (`ScenarioManifestValidator`), and selecting a body is what a session of
+// completion scenario must expect an outcome (`ScenarioManifestValidator`), and focusing a body is what a session of
 // this phase completes, as Tiny Worlds' `world-<preset>` outcome is.
 //
-// The canvas description (clarifications Q4, Q5): "Solar System Explorer: Earth selected; 9 bodies. Sizes and spacing
-// not to scale."
+// The canvas description (clarifications Q4, Q5): "Solar System Explorer: Earth in focus on 2000-01-01, 0.983 AU
+// (147,099,000 km) from the Sun; 9 bodies. Distances and sizes not to scale." (for the Sun: "Sun in focus on
+// 2000-01-01; 9 bodies. …"). Distances are the approximate model's, in AU to three decimals and in km rounded to the
+// thousand through 1 AU = 149,597,870.7 km.
 import Foundation
 import SolarSystemExplorerCore
 import VisualCoreExperience
@@ -39,6 +53,10 @@ import VisualCoreSimulation
 public enum SolarRule {
     /// A body index that is not a whole index 0…8, or a step past the first or the last body.
     public static let invalidChoice = "a14.invalid-choice"
+    /// A date step other than ±1, ±30 or ±365 days, or a camera step other than ±1.
+    public static let invalidStep = DateStepRefusal.invalidStep.rawValue
+    /// A date step leaving the model's range, or a tilt or zoom step beyond its range.
+    public static let outOfRange = DateStepRefusal.outOfRange.rawValue
 }
 
 /// Why a stored Solar System Explorer state is refused.
@@ -47,19 +65,28 @@ public enum SolarRestoreError: Error, Equatable {
     case refused(SolarStateRefusal)
 }
 
-/// The state of Solar System Explorer. Schema version 1.
+/// The state of Solar System Explorer. Schema version 2.
 public struct SolarCore: ExperienceCore, Equatable {
     /// The experience's id in the catalog.
     public static let experienceID = "a14.solar-system-explorer"
 
     /// The action ids in declaration order.
-    public static let actionIDs = ["body.select", "body.next", "body.previous"]
+    public static let actionIDs = ["body.select", "body.next", "body.previous", "date.step", "camera.orbit",
+                                   "camera.tilt", "camera.zoom", "view.reset"]
+
+    /// The value count of each action.
+    static let valueCounts: [String: Int] = ["body.select": 1, "body.next": 0, "body.previous": 0, "date.step": 1,
+                                             "camera.orbit": 1, "camera.tilt": 1, "camera.zoom": 1,
+                                             "view.reset": 0]
+
+    /// The approximate orbit model of the bundled catalog and elements.
+    public static let model = OrbitModel.bundled
 
     /// The prefix of the outcome code; the selected body's id follows.
     public static let outcomePrefix = "viewing-"
 
     /// The words the canvas description and the legend end with.
-    public static let notToScale = "Sizes and spacing not to scale"
+    public static let notToScale = "Distances and sizes not to scale"
 
     /// The catalog the selection refers to.
     public static var catalog: BodyCatalog { SolarState.catalog }
@@ -69,10 +96,10 @@ public struct SolarCore: ExperienceCore, Equatable {
 
     /// The preparation seed; `reset()` returns to the first state.
     public private(set) var preparationSeed: UInt64
-    /// The whole saved state: the selected body.
+    /// The whole saved state: the selected body, the date and the camera.
     public private(set) var state: SolarState
 
-    /// The first state (the Sun selected) with `seed` as preparation seed.
+    /// The first state (the Sun selected at J2000.0, overview camera) with `seed` as preparation seed.
     public init(seed: UInt64) {
         self.init(seed: seed, state: .initial)
     }
@@ -92,19 +119,32 @@ public struct SolarCore: ExperienceCore, Equatable {
 
     // MARK: Contract
 
-    /// One quality tier (`level-0`): the line-up has nothing to scale down in this phase.
+    /// One quality tier (`level-0`): the orbit view has nothing to scale down in this phase.
     public static var qualityTiers: Int { 1 }
 
-    /// Schema 1, no steps.
+    /// Schema 2 with the step 1 → 2 (J2000.0 and the overview camera added to a schema-1 payload).
     public static var migrations: MigrationChain {
-        MigrationChain(currentVersion: SolarState.schemaVersion)
+        MigrationChain(currentVersion: SolarState.schemaVersion, steps: [1: { payload in
+            var next = payload
+            next["schema"] = 2
+            next["dayOffset"] = 0.0
+            next["yawSteps"] = 0
+            next["pitchDegrees"] = SolarState.overviewPitch
+            next["zoomSteps"] = 0
+            return next
+        }])
     }
 
-    /// The three controls with their declared ranges.
+    /// The eight controls with their declared ranges.
     public static var controls: [ExperienceControl] {
         [ExperienceControl(id: "body.select", ranges: [0...Double(bodyCount - 1)]),
          ExperienceControl(id: "body.next"),
-         ExperienceControl(id: "body.previous")]
+         ExperienceControl(id: "body.previous"),
+         ExperienceControl(id: "date.step", ranges: [-365...365]),
+         ExperienceControl(id: "camera.orbit", ranges: [-1...1]),
+         ExperienceControl(id: "camera.tilt", ranges: [-1...1]),
+         ExperienceControl(id: "camera.zoom", ranges: [-1...1]),
+         ExperienceControl(id: "view.reset")]
     }
 
     /// The first state with `seed` as the preparation seed.
@@ -119,21 +159,44 @@ public struct SolarCore: ExperienceCore, Equatable {
     /// Carries out a well-formed action (see the file header); a refused action changes nothing.
     public mutating func apply(_ action: ExperienceAction) -> ActionResult {
         let v = action.values
-        let expected = ["body.select": 1, "body.next": 0, "body.previous": 0][action.control]
-        guard let expected else { return .rejected(.unknownControl(action.control)) }
+        guard let expected = Self.valueCounts[action.control] else {
+            return .rejected(.unknownControl(action.control))
+        }
         guard v.count == expected else { return .rejected(.wrongValueCount(expected: expected, found: v.count)) }
-        let refused = ActionResult.rejected(.rule(code: SolarRule.invalidChoice))
+        func rule(_ code: String) -> ActionResult { .rejected(.rule(code: code)) }
         var next = state
         switch action.control {
         case "body.select":
-            guard let index = Self.choice(v[0], count: Self.bodyCount), next.select(index) else { return refused }
+            guard let index = Self.choice(v[0], count: Self.bodyCount), next.select(index) else {
+                return rule(SolarRule.invalidChoice)
+            }
         case "body.next":
-            guard next.next() else { return refused }
-        default:   // body.previous
-            guard next.previous() else { return refused }
+            guard next.next() else { return rule(SolarRule.invalidChoice) }
+        case "body.previous":
+            guard next.previous() else { return rule(SolarRule.invalidChoice) }
+        case "date.step":
+            guard let days = Self.whole(v[0]) else { return rule(SolarRule.invalidStep) }
+            if let refusal = next.stepDate(by: days) { return rule(refusal.rawValue) }
+        case "view.reset":
+            next.resetView()
+        default:   // camera.orbit, camera.tilt, camera.zoom
+            guard let step = Self.whole(v[0]), step == 1 || step == -1 else { return rule(SolarRule.invalidStep) }
+            let accepted: Bool
+            switch action.control {
+            case "camera.orbit": accepted = next.orbit(step)
+            case "camera.tilt": accepted = next.tilt(step)
+            default: accepted = next.zoom(step)
+            }
+            guard accepted else { return rule(SolarRule.outOfRange) }
         }
         state = next
         return .accepted
+    }
+
+    /// `value` as a whole number when it is finite and whole, nil otherwise.
+    static func whole(_ value: Double) -> Int? {
+        guard value.isFinite, value == value.rounded(), abs(value) <= 1_000_000 else { return nil }
+        return Int(value)
     }
 
     /// The table index named by `value`: a finite whole number in `0..<count`; nil otherwise.
@@ -157,17 +220,17 @@ public struct SolarCore: ExperienceCore, Equatable {
         guard let text = String(data: state.encoded(), encoding: .utf8), !text.isEmpty else {
             throw .nonFinite(field: builder.fieldCount)
         }
-        builder.add("a14.solar.v1|" + text)
+        builder.add("a14.solar.v2|" + text)
         builder.add(state.selection)
         builder.add(body?.id ?? "")
     }
 
-    /// The state (schema 1) as JSON with sorted keys.
+    /// The state (schema 2) as JSON with sorted keys.
     public func snapshotPayload() throws -> Data {
         state.encoded()
     }
 
-    /// The core of a schema-1 payload with the envelope's `seed` as preparation seed; a payload that
+    /// The core of a schema-2 (or migrated schema-1) payload with the envelope's `seed` as preparation seed; a payload that
     /// `SolarState.decode(_:)` refuses (damaged, newer or out of range) throws ``SolarRestoreError/refused(_:)``.
     public static func restore(payload: Data, seed: UInt64) throws -> SolarCore {
         switch SolarState.decode(payload) {
@@ -188,11 +251,27 @@ public struct SolarCore: ExperienceCore, Equatable {
         "\(name(index: selection)) selected, body \(selection + 1) of \(bodyCount)"
     }
 
-    /// The canvas description: "Solar System Explorer: Earth selected; 9 bodies. Sizes and spacing not to scale."
-    public static func canvasDescription(selection: Int) -> String {
-        "Solar System Explorer: \(name(index: selection)) selected; \(bodyCount) bodies. \(notToScale)."
+    /// The distance of body `index` from the Sun on day `dayOffset` as words: "0.983 AU (147,099,000 km)"; nil for
+    /// the Sun or an unknown index.
+    public static func distanceWords(index: Int, dayOffset: Double) -> String? {
+        guard let body = catalog.body(at: index), body.kind == .planet,
+              let au = model.distanceAU(bodyID: body.id, day: dayOffset),
+              let km = model.distanceKm(bodyID: body.id, day: dayOffset) else { return nil }
+        let kmText = Units.storedText((km / 1000).rounded() * 1000)
+        return String(format: "%.3f AU", au) + " (\(kmText) km)"
+    }
+
+    /// The canvas description: "Solar System Explorer: Earth in focus on 2000-01-01, 0.983 AU (147,099,000 km) from
+    /// the Sun; 9 bodies. Distances and sizes not to scale."
+    public static func canvasDescription(selection: Int, dayOffset: Double = 0) -> String {
+        let date = SimulatedDate(dayOffset: dayOffset)?.label ?? SimulatedDate.j2000.label
+        let distance = distanceWords(index: selection, dayOffset: dayOffset).map { ", \($0) from the Sun" } ?? ""
+        return "Solar System Explorer: \(name(index: selection)) in focus on \(date)\(distance); \(bodyCount) bodies. "
+            + "\(notToScale)."
     }
 
     /// The canvas description of this core.
-    public var canvasDescription: String { Self.canvasDescription(selection: state.selection) }
+    public var canvasDescription: String {
+        Self.canvasDescription(selection: state.selection, dayOffset: state.dayOffset)
+    }
 }

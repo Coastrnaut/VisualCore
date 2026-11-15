@@ -120,7 +120,8 @@ func solarCore(_ state: SolarState, seed: UInt64 = 1) throws -> SolarCore {
 }
 
 /// A snapshot envelope of Solar System Explorer around `payload` with the fields of `saved` and schema `schema`.
-func solarEnvelope(_ payload: Data, like saved: ExperienceSnapshot, schema: Int = 1) throws -> ExperienceSnapshot {
+func solarEnvelope(_ payload: Data, like saved: ExperienceSnapshot,
+                   schema: Int = SolarState.schemaVersion) throws -> ExperienceSnapshot {
     let id = try XCTUnwrap(ExperienceID(rawValue: SolarCore.experienceID))
     return try ExperienceSnapshot(experience: id, schemaVersion: schema, seed: saved.seed,
                                   stepIndex: saved.stepIndex, digest: saved.digest, payload: payload)
