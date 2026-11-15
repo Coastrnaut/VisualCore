@@ -6,6 +6,9 @@
 //
 // Feature 091 (A12-P03) T-A12-302 (FR-A12-301; clarification Q1): the props (role prop) and prop palettes (role
 // prop-palette) follow the palettes; the document lists them in two more tables and counts them in the summary.
+//
+// Feature 092 (A12-P04) T-A12-402 (FR-A12-406; clarification Q2): the packs (role pack) follow the prop palettes; the
+// document lists them in a pack table and counts them in the summary.
 import Foundation
 import Testing
 import TinyWorldsCore
@@ -16,13 +19,16 @@ import TinyWorldsCore
     @Test func everyPresetPaletteAndPropHasOneRowWithAuthorAndLicense() {
         let rows = LicenseAudit.rows(catalog)
         #expect(rows.map(\.role) == [.preset, .preset, .preset, .palette, .palette, .palette,
-                                     .prop, .prop, .prop, .prop, .propPalette, .propPalette, .propPalette, .propPalette])
+                                     .prop, .prop, .prop, .prop, .propPalette, .propPalette, .propPalette, .propPalette,
+                                     .pack, .pack, .pack])
         #expect(rows.map(\.id) == ["island", "asteroid-garden", "miniature-city",
                                    "island", "asteroid-garden", "miniature-city",
-                                   "tree", "rock", "house", "lantern", "tree", "rock", "house", "lantern"])
+                                   "tree", "rock", "house", "lantern", "tree", "rock", "house", "lantern",
+                                   "island", "asteroid-garden", "miniature-city"])
         #expect(rows.map(\.name) == ["Island", "Asteroid garden", "Miniature city",
                                      "Island", "Asteroid garden", "Miniature city",
-                                     "Tree", "Rock", "House", "Lantern", "Tree", "Rock", "House", "Lantern"])
+                                     "Tree", "Rock", "House", "Lantern", "Tree", "Rock", "House", "Lantern",
+                                     "Island", "Asteroid garden", "Miniature city"])
         #expect(rows.allSatisfy { $0.author == "VisualCore project" && $0.license == "MIT" })
     }
 
@@ -37,12 +43,15 @@ import TinyWorldsCore
         broken.palettes[1].license = "GPL-3.0"
         broken.props[2].author = ""
         broken.propPalettes[3].license = "CC-BY-4.0"
+        broken.packs[1].author = ""
         #expect(LicenseAudit.problems(broken) == ["preset island: missing-license",
                                                   "preset miniature-city: missing-license",
                                                   "palette asteroid-garden: unsupported-license",
                                                   "prop house: missing-license",
-                                                  "prop-palette lantern: unsupported-license"])
-        #expect(LicenseAudit.markdown(broken).hasSuffix("3 presets, 3 palettes, 4 props, 4 prop palettes; 5 problems.\n"))
+                                                  "prop-palette lantern: unsupported-license",
+                                                  "pack asteroid-garden: missing-license"])
+        #expect(LicenseAudit.markdown(broken)
+            .hasSuffix("3 presets, 3 palettes, 4 props, 4 prop palettes, 3 packs; 6 problems.\n"))
     }
 
     @Test func theMarkdownListsEveryRecordDeterministically() {
@@ -70,7 +79,13 @@ import TinyWorldsCore
             #expect(text.contains("| \(palette.id) | \(palette.name) | \(colours) | VisualCore project | MIT |"))
         }
         #expect(text.contains("| tree | Tree | tree | VisualCore project | MIT |"))
-        #expect(text.hasSuffix("3 presets, 3 palettes, 4 props, 4 prop palettes; 0 problems.\n") && !text.contains("\r"))
+        for pack in catalog.packs {
+            #expect(text.contains("| \(pack.id) | \(pack.name) | \(pack.preset) | VisualCore project | MIT |"))
+        }
+        #expect(text.contains("| Id | Name | Preset | Author | License |\n|---|---|---|---|---|\n"
+                              + "| island | Island | island | VisualCore project | MIT |\n"))
+        #expect(text.hasSuffix("3 presets, 3 palettes, 4 props, 4 prop palettes, 3 packs; 0 problems.\n")
+                && !text.contains("\r"))
         #expect(LicenseAudit.markdown(catalog) == text)
         var piped = catalog
         piped.presets[0].name = "Is|land\nX"

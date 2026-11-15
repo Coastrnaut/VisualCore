@@ -7,6 +7,10 @@
 // Feature 091 (A12-P03) T-A12-302 (FR-A12-301; clarification Q1): the four props and their prop palettes (same ids,
 // three colours, "VisualCore project", "MIT"); malformed prop and prop palette records refused with their reasons;
 // documents without the prop lists still read.
+//
+// Feature 092 (A12-P04) T-A12-402 (FR-A12-406; clarification Q2): the three packs (island, asteroid-garden,
+// miniature-city) naming their presets, "VisualCore project", "MIT"; malformed pack records refused with their
+// reasons; documents without the pack list still read; the sorted JSON now starts with the packs.
 import Foundation
 import Testing
 import TinyWorldsCore
@@ -89,6 +93,45 @@ import TinyWorldsCore
         #expect(ContentKind.propPalette.rawValue == "prop-palette" && ContentKind.prop.rawValue == "prop")
     }
 
+    @Test func theBundledPacksNameTheirPresetsAndProvenance() {
+        #expect(catalog.packs.map(\.id) == ids && catalog.packs.map(\.preset) == ids)
+        #expect(catalog.packs.map(\.name) == ["Island", "Asteroid garden", "Miniature city"])
+        #expect(catalog.packs.map(\.id) == WorldPack.all.map(\.id))
+        #expect(catalog.packs.allSatisfy { $0.author == "VisualCore project" && $0.license == "MIT" })
+        #expect(catalog.packs.allSatisfy { ContentCatalog.check($0) == nil && catalog.preset(id: $0.preset) != nil })
+        #expect(catalog.pack(id: "miniature-city")?.name == "Miniature city" && catalog.pack(id: "tree") == nil)
+        #expect(ContentKind.pack.rawValue == "pack")
+    }
+
+    @Test func malformedPackRecordsAreRefusedAndDocumentsWithoutPacksStillRead() throws {
+        var packs = try records("packs")
+        packs[0]["license"] = "CC0-1.0"                                // island: unsupported-license
+        packs[1]["preset"] = ""                                        // asteroid-garden: invalid-number
+        let duplicate = try records("packs")[2]                        // miniature-city again: duplicate-id
+        let data = try JSONSerialization.data(withJSONObject: [
+            "palettes": try records("palettes"), "presets": try records("presets"),
+            "propPalettes": try records("propPalettes"), "props": try records("props"), "packs": packs + [duplicate]])
+        let result = ContentCatalog.decode(data)
+        #expect(result.refused == [
+            CatalogRefusal(kind: .pack, id: "island", reason: .unsupportedLicense),
+            CatalogRefusal(kind: .pack, id: "asteroid-garden", reason: .invalidNumber),
+            CatalogRefusal(kind: .pack, id: "miniature-city", reason: .duplicateId),
+        ])
+        #expect(result.catalog.packs.map(\.id) == ["miniature-city"])
+        #expect(result.catalog.props == catalog.props && result.catalog.presets == catalog.presets)
+        let old = ContentCatalog.decode(try JSONSerialization.data(withJSONObject: [
+            "palettes": try records("palettes"), "presets": try records("presets"),
+            "propPalettes": try records("propPalettes"), "props": try records("props")]))
+        #expect(old.refused.isEmpty && old.catalog.packs.isEmpty && old.catalog.props == catalog.props)
+        let notAList = ContentCatalog.decode(Data("{\"packs\":{},\"palettes\":[],\"presets\":[]}".utf8))
+        #expect(notAList.refused == [CatalogRefusal(kind: .palette, id: "catalog", reason: .invalidNumber)])
+        var pack = catalog.packs[0]
+        pack.preset = ""
+        #expect(ContentCatalog.check(pack) == .invalidNumber)
+        pack.author = " "
+        #expect(ContentCatalog.check(pack) == .missingLicense)
+    }
+
     @Test func theJSONRoundTripIsExactAndSorted() throws {
         let data = catalog.encoded()
         let decoded = ContentCatalog.decode(data)
@@ -96,7 +139,9 @@ import TinyWorldsCore
         #expect(decoded.catalog == catalog)
         #expect(decoded.catalog.encoded() == data)
         let text = try #require(String(data: data, encoding: .utf8))
-        #expect(text.hasPrefix("{\"palettes\":[{\"author\":\"VisualCore project\",\"colors\":[{\"a\":1,\"b\":"))
+        #expect(text.hasPrefix("{\"packs\":[{\"author\":\"VisualCore project\",\"id\":\"island\",\"license\":\"MIT\","
+                               + "\"name\":\"Island\",\"preset\":\"island\"}"))
+        #expect(text.contains("],\"palettes\":[{\"author\":\"VisualCore project\",\"colors\":[{\"a\":1,\"b\":"))
         #expect(text.contains("\"presets\":[{\"author\":\"VisualCore project\",\"id\":\"island\""))
         #expect(text.contains("],\"propPalettes\":[{\"author\":\"VisualCore project\",\"colors\":"))
         #expect(text.contains("],\"props\":[{\"author\":\"VisualCore project\",\"id\":\"tree\""))

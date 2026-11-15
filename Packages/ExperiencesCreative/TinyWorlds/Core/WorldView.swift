@@ -9,7 +9,58 @@
 // the default view (yaw 45°, pitch 35°, distance 18 m). A non-finite or out-of-range step or factor is refused: the
 // call returns false and nothing changes. Decoding refuses a yaw outside −π…π or a pitch or distance outside its range
 // (and anything non-finite), so a decoded view is always valid.
+//
+// Feature 092 (A12-P04) T-A12-402 (FR-A12-403; clarification Q3; research D2; data-model "WorldPack"): camera limits
+// per preset. `CameraLimits` holds a pitch range and a distance range inside the global ones above
+// (`CameraLimits.global` is exactly 10°…75° and 10…30 m); `clamped(to:)` clamps a view's pitch and distance into
+// them (yaw unchanged), and `orbit(yawDegrees:pitchDegrees:limits:)` and `zoom(_:limits:)` step within them. Each
+// preset's limits are its pack's (`CameraPolicy.limits(for:)`); restored views are clamped to them by the camera
+// policy, never refused for them.
 import Foundation
+
+/// A pitch range and a distance range for the orbit view, always inside ``WorldView``'s global limits.
+public struct CameraLimits: Equatable, Sendable {
+    /// The global limits: pitch 10°…75°, distance 10…30 m (``WorldView/pitchRange``, ``WorldView/distanceRange``).
+    public static let global = CameraLimits(pitchDegrees: 10...75, distance: 10...30)
+
+    /// The allowed pitch in radians.
+    public let pitch: ClosedRange<Double>
+    /// The allowed distance in metres.
+    public let distance: ClosedRange<Double>
+
+    /// Limits of `pitchDegrees` (converted as degrees × ``WorldView/radiansPerDegree``) and `distance` (metres), each
+    /// bound clamped into the global range; a non-finite bound takes the global bound.
+    public init(pitchDegrees: ClosedRange<Double>, distance: ClosedRange<Double>) {
+        func bounded(_ value: Double, _ fallback: Double, _ range: ClosedRange<Double>) -> Double {
+            value.isFinite ? WorldView.clamp(value, range) : fallback
+        }
+        let low = bounded(pitchDegrees.lowerBound * WorldView.radiansPerDegree, WorldView.pitchRange.lowerBound,
+                          WorldView.pitchRange)
+        let high = bounded(pitchDegrees.upperBound * WorldView.radiansPerDegree, WorldView.pitchRange.upperBound,
+                           WorldView.pitchRange)
+        pitch = low...max(low, high)
+        let near = bounded(distance.lowerBound, WorldView.distanceRange.lowerBound, WorldView.distanceRange)
+        let far = bounded(distance.upperBound, WorldView.distanceRange.upperBound, WorldView.distanceRange)
+        self.distance = near...max(near, far)
+    }
+
+    /// The pitch range in degrees.
+    public var pitchDegrees: ClosedRange<Double> {
+        (pitch.lowerBound / WorldView.radiansPerDegree)...(pitch.upperBound / WorldView.radiansPerDegree)
+    }
+
+    /// True when these limits lie inside the global ones.
+    public var isInsideGlobal: Bool {
+        Self.global.pitch.lowerBound <= pitch.lowerBound && pitch.upperBound <= Self.global.pitch.upperBound
+            && Self.global.distance.lowerBound <= distance.lowerBound
+            && distance.upperBound <= Self.global.distance.upperBound
+    }
+
+    /// True when `view` is valid and its pitch and distance lie within these limits.
+    public func contains(_ view: WorldView) -> Bool {
+        view.isValid && pitch.contains(view.pitch) && distance.contains(view.distance)
+    }
+}
 
 /// The orbit view of a world (yaw, pitch, distance), always within its limits.
 public struct WorldView: Codable, Equatable, Sendable {
@@ -73,6 +124,31 @@ public struct WorldView: Codable, Equatable, Sendable {
 
     /// Restores the default view.
     public mutating func reset() { self = .default }
+
+    /// This view with its pitch and distance clamped into `limits` (yaw unchanged).
+    public func clamped(to limits: CameraLimits) -> WorldView {
+        WorldView(yaw: yaw, pitch: Self.clamp(pitch, limits.pitch), distance: Self.clamp(distance, limits.distance))
+    }
+
+    /// ``orbit(yawDegrees:pitchDegrees:)`` with the pitch then clamped into `limits` (the distance too, so the result
+    /// lies within them); false, with nothing changed, when a step is refused.
+    @discardableResult
+    public mutating func orbit(yawDegrees: Double, pitchDegrees: Double, limits: CameraLimits) -> Bool {
+        var next = self
+        guard next.orbit(yawDegrees: yawDegrees, pitchDegrees: pitchDegrees) else { return false }
+        self = next.clamped(to: limits)
+        return true
+    }
+
+    /// ``zoom(_:)`` with the distance then clamped into `limits` (the pitch too); false, with nothing changed, when
+    /// the factor is refused.
+    @discardableResult
+    public mutating func zoom(_ factor: Double, limits: CameraLimits) -> Bool {
+        var next = self
+        guard next.zoom(factor) else { return false }
+        self = next.clamped(to: limits)
+        return true
+    }
 
     /// `angle` wrapped into −π…π (IEEE remainder, exact).
     static func wrap(_ angle: Double) -> Double {

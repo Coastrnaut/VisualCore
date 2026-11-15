@@ -2,6 +2,10 @@
 // view, host-free and short: the default view; yaw wraps into −π…π, pitch clamps to 10°…75° and distance to 10…30 m;
 // orbit steps outside −180…180 degrees, zoom factors outside 0.5…2 and non-finite input are refused and change
 // nothing; reset restores the default; the JSON round trip is exact and a view outside its limits does not decode.
+//
+// Feature 092 (A12-P04) T-A12-402 (FR-A12-403; clarification Q3): camera limits per preset. The global limits equal
+// the view's ranges; limits are clamped into them; `clamped(to:)`, `orbit(…limits:)` and `zoom(_:limits:)` keep a
+// view within a preset's limits, and refused steps still change nothing.
 import Foundation
 import Testing
 import TinyWorldsCore
@@ -64,6 +68,38 @@ import TinyWorldsCore
         #expect(view.pitch == WorldView.pitchRange.upperBound && view.distance == 10)
         let fallback = WorldView(yaw: .nan, pitch: .infinity, distance: -.infinity)
         #expect(fallback == .default)
+    }
+
+    @Test func theGlobalLimitsAreTheViewsRangesAndLimitsStayInsideThem() {
+        #expect(CameraLimits.global.pitch == WorldView.pitchRange && CameraLimits.global.distance == WorldView.distanceRange)
+        #expect(CameraLimits.global.isInsideGlobal && CameraLimits.global.contains(.default))
+        let wide = CameraLimits(pitchDegrees: 0...90, distance: 5...40)
+        #expect(wide == .global)
+        let beyond = CameraLimits(pitchDegrees: 80...90, distance: 31...40)
+        #expect(beyond.pitch == WorldView.pitchRange.upperBound...WorldView.pitchRange.upperBound)
+        #expect(beyond.distance == 30...30 && beyond.isInsideGlobal)
+        let infinite = CameraLimits(pitchDegrees: -Double.infinity...Double.infinity, distance: 12...Double.infinity)
+        #expect(infinite.pitch == WorldView.pitchRange && infinite.distance == 12...30)
+    }
+
+    @Test func viewsAreClampedAndSteppedWithinPresetLimits() {
+        let limits = CameraLimits(pitchDegrees: 25...75, distance: 10...24)
+        let low = WorldView(yaw: 0.5, pitch: 12 * degree, distance: 29)
+        #expect(!limits.contains(low) && low.isValid)
+        let clamped = low.clamped(to: limits)
+        #expect(abs(clamped.pitchDegrees - 25) < 1e-9 && clamped.distance == 24 && clamped.yaw == 0.5)
+        #expect(limits.contains(clamped) && clamped.clamped(to: limits) == clamped)
+        var view = WorldView(yaw: 0, pitch: 30 * degree, distance: 20)
+        let orbited = view.orbit(yawDegrees: 10, pitchDegrees: -20, limits: limits)
+        #expect(orbited && abs(view.pitchDegrees - 25) < 1e-9 && abs(view.yawDegrees - 10) < 1e-9)
+        let out = view.zoom(0.5, limits: limits)
+        #expect(out && view.distance == 24)
+        let inward = view.zoom(2, limits: limits)
+        #expect(inward && view.distance == 12)
+        let before = view
+        let badOrbit = view.orbit(yawDegrees: 200, pitchDegrees: 0, limits: limits)
+        let badZoom = view.zoom(3, limits: limits)
+        #expect(!badOrbit && !badZoom && view == before)
     }
 
     @Test func theJSONRoundTripIsExactAndOutOfRangeViewsDoNotDecode() throws {

@@ -4,6 +4,10 @@
 // clamp, which only ever raises the pitch in whole degrees; a view that already keeps the clearance is unchanged; a
 // high flat terrain raises the lowest pitch to the first whole degree that clears it, and an impossible one stops at
 // 75°; the preset overload equals the field overload.
+//
+// Feature 092 (A12-P04) T-A12-402 (FR-A12-403; clarification Q3): the overload over a bare field keeps the global
+// limits (the sweep above), while the preset overload uses the preset's pack limits: it equals the field overload
+// given those limits, and its results lie within them.
 import Foundation
 import Testing
 import TinyWorldsCore
@@ -90,10 +94,18 @@ import VisualCoreScenes
     }
 
     @Test(arguments: WorldPreset.all)
-    func thePresetOverloadEqualsTheFieldOverload(preset: WorldPreset) throws {
+    func thePresetOverloadEqualsTheFieldOverloadWithThePresetsLimits(preset: WorldPreset) throws {
         let field = try TerrainGenerator.heightField(preset: preset, seed: 1)
-        for view in sweep.prefix(16) {
-            #expect(CameraPolicy.clamp(view, preset: preset, seed: 1) == CameraPolicy.clamp(view, field: field))
+        let limits = CameraPolicy.limits(for: preset)
+        #expect(limits == WorldPack.pack(for: preset.id).limits && limits.isInsideGlobal)
+        for view in sweep.prefix(48) {
+            let clamped = CameraPolicy.clamp(view, preset: preset, seed: 1)
+            #expect(clamped == CameraPolicy.clamp(view, field: field, limits: limits))
+            #expect(limits.contains(clamped) && CameraPolicy.keepsClearance(clamped, field: field, limits: limits))
+            let state = WorldState(presetIndex: preset.id.rawValue, seed: 1, view: view,
+                                   random: WorldState.initial.random)
+            #expect(CameraPolicy.clamp(view, state: state) == clamped, "no props: the state overload agrees")
         }
+        #expect(CameraPolicy.limits(for: preset).pitch.lowerBound > WorldView.pitchRange.lowerBound)
     }
 }

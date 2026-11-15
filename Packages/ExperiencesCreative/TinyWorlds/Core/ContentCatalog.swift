@@ -9,17 +9,21 @@
 // lantern) and their prop palettes with the same ids; a prop palette has three colours (base, main, accent). The props'
 // meshes are code (`PropCatalog`).
 //
-// The JSON codec writes the catalog with sorted keys (`{"palettes":[…],"presets":[…],"propPalettes":[…],
+// Feature 092 (A12-P04) T-A12-402 (FR-A12-406; clarifications Q2 and Q5; G-PACKS) adds the three environment packs
+// (island, asteroid-garden, miniature-city; `WorldPack`) as pack records naming their preset, each by "VisualCore
+// project" under "MIT". A pack record without a preset is `invalid-number`.
+//
+// The JSON codec writes the catalog with sorted keys (`{"packs":[…],"palettes":[…],"presets":[…],"propPalettes":[…],
 // "props":[…]}`); the validating decoder reads the same layout record by record (palettes, presets, prop palettes,
-// then props, each in document order; the two prop lists may be absent and then are empty), keeps every valid record
-// and refuses each invalid one with a named reason, so one damaged entry never hides the rest. Checks per record, in
-// this order (the first failure names the reason):
+// props, then packs, each in document order; the prop and pack lists may be absent and then are empty), keeps every
+// valid record and refuses each invalid one with a named reason, so one damaged entry never hides the rest. Checks per
+// record, in this order (the first failure names the reason):
 // 1. `missing-license`: the `license` or the `author` is missing or empty.
 // 2. `unsupported-license`: the license is not in `ContentCatalog.allowedLicenses` (["MIT"]).
 // 3. `invalid-number`: the record is not a JSON object with a non-empty string `id` and a string `name` (and, for a
-//    preset or a prop, a non-empty string `palette`), or a palette's `colors` is not a list of exactly three colour objects
-//    whose r, g, b and a are finite numbers. An unreadable document is refused as a whole with the id `catalog` and
-//    this reason.
+//    preset or a prop, a non-empty string `palette`; for a pack, a non-empty string `preset`), or a palette's `colors`
+//    is not a list of exactly three colour objects whose r, g, b and a are finite numbers. An unreadable document is
+//    refused as a whole with the id `catalog` and this reason.
 // 4. `out-of-range`: a finite colour component lies outside 0…1.
 // 5. `duplicate-id`: an otherwise valid record repeats the id of a record of the same kind already kept.
 import Foundation
@@ -57,6 +61,8 @@ public enum ContentKind: String, Codable, CaseIterable, Sendable {
     case prop
     /// A prop's colour palette: base, main and accent (A12-P03).
     case propPalette = "prop-palette"
+    /// An environment pack (A12-P04).
+    case pack
 }
 
 /// One palette: three named colours of a world and its provenance.
@@ -162,7 +168,27 @@ public struct PropRecord: Codable, Equatable, Sendable, Identifiable {
     }
 }
 
-/// The content catalog of Tiny Worlds: presets, palettes, props and prop palettes.
+/// One pack record: the content side of an environment pack (its name, preset and provenance); the composition is
+/// `WorldPack`'s.
+public struct PackRecord: Codable, Equatable, Sendable, Identifiable {
+    /// Kebab-case identifier, unique among the packs (one of `WorldPack`'s ids for the bundled catalog).
+    public var id: String
+    /// Display name ("Island").
+    public var name: String
+    /// The id of the pack's preset.
+    public var preset: String
+    /// The author ("VisualCore project").
+    public var author: String
+    /// The license, one of ``ContentCatalog/allowedLicenses``.
+    public var license: String
+
+    /// Creates a pack record from all of its fields (no validation).
+    public init(id: String, name: String, preset: String, author: String, license: String) {
+        self.id = id; self.name = name; self.preset = preset; self.author = author; self.license = license
+    }
+}
+
+/// The content catalog of Tiny Worlds: presets, palettes, props, prop palettes and packs.
 public struct ContentCatalog: Codable, Equatable, Sendable {
     /// The only licenses a record may carry.
     public static let allowedLicenses = ["MIT"]
@@ -179,13 +205,17 @@ public struct ContentCatalog: Codable, Equatable, Sendable {
     public var propPalettes: [Palette]
     /// The props in catalog order.
     public var props: [PropRecord]
+    /// The packs in catalog order.
+    public var packs: [PackRecord]
 
     /// Creates a catalog from its records (no validation; ``decode(_:)`` validates).
-    public init(palettes: [Palette], presets: [PresetRecord], propPalettes: [Palette] = [], props: [PropRecord] = []) {
+    public init(palettes: [Palette], presets: [PresetRecord], propPalettes: [Palette] = [], props: [PropRecord] = [],
+                packs: [PackRecord] = []) {
         self.palettes = palettes
         self.presets = presets
         self.propPalettes = propPalettes
         self.props = props
+        self.packs = packs
     }
 
     /// The palette with `id`, if any.
@@ -196,10 +226,13 @@ public struct ContentCatalog: Codable, Equatable, Sendable {
     public func propPalette(id: String) -> Palette? { propPalettes.first { $0.id == id } }
     /// The prop record with `id`, if any.
     public func prop(id: String) -> PropRecord? { props.first { $0.id == id } }
+    /// The pack record with `id`, if any.
+    public func pack(id: String) -> PackRecord? { packs.first { $0.id == id } }
 
     /// The bundled content: the palettes and presets island, asteroid-garden and miniature-city, and the prop
-    /// palettes and props tree, rock, house and lantern, each by "VisualCore project" under "MIT"; each preset and
-    /// each prop uses the palette of the same id.
+    /// palettes and props tree, rock, house and lantern, and the packs of `WorldPack.all` (island, asteroid-garden,
+    /// miniature-city), each by "VisualCore project" under "MIT"; each preset and each prop uses the palette of the
+    /// same id, each pack names its preset.
     public static let bundled: ContentCatalog = {
         let author = projectAuthor, license = "MIT"
         return ContentCatalog(
@@ -237,6 +270,10 @@ public struct ContentCatalog: Codable, Equatable, Sendable {
             ],
             props: PropKind.allCases.map {
                 PropRecord(id: $0.contentId, name: $0.name, palette: $0.contentId, author: author, license: license)
+            },
+            packs: WorldPack.all.map {
+                PackRecord(id: $0.id, name: $0.name, preset: $0.preset.id.contentId, author: $0.author,
+                           license: $0.license)
             })
     }()
 
@@ -273,6 +310,13 @@ public struct ContentCatalog: Codable, Equatable, Sendable {
         return nil
     }
 
+    /// The first problem of `pack` (license, then layout), or nil when valid.
+    public static func check(_ pack: PackRecord) -> CatalogRefusalReason? {
+        if let error = licenseError(author: pack.author, license: pack.license) { return error }
+        guard !pack.id.isEmpty, !pack.preset.isEmpty else { return .invalidNumber }
+        return nil
+    }
+
     // MARK: - JSON
 
     /// The catalog as JSON with sorted keys (deterministic bytes for equal catalogs); a non-finite number (only
@@ -285,8 +329,8 @@ public struct ContentCatalog: Codable, Equatable, Sendable {
 
     /// Decodes a catalog from `data`, keeping every valid record and naming every refused one (see the file header
     /// for the checks and their order). Unreadable JSON, or a document without both lists, gives an empty catalog and
-    /// one `catalog` refusal. Absent `propPalettes` and `props` lists are empty; a present one that is not a list
-    /// refuses the document the same way.
+    /// one `catalog` refusal. Absent `propPalettes`, `props` and `packs` lists are empty; a present one that is not a
+    /// list refuses the document the same way.
     public static func decode(_ data: Data) -> (catalog: ContentCatalog, refused: [CatalogRefusal]) {
         let unreadable = (ContentCatalog(palettes: [], presets: []),
                           [CatalogRefusal(kind: .palette, id: "catalog", reason: .invalidNumber)])
@@ -295,7 +339,8 @@ public struct ContentCatalog: Codable, Equatable, Sendable {
             return unreadable
         }
         guard let propPaletteList = root["propPalettes"] == nil ? [] : root["propPalettes"] as? [Any],
-              let propList = root["props"] == nil ? [] : root["props"] as? [Any] else { return unreadable }
+              let propList = root["props"] == nil ? [] : root["props"] as? [Any],
+              let packList = root["packs"] == nil ? [] : root["packs"] as? [Any] else { return unreadable }
         var refused: [CatalogRefusal] = []
         // Keeps the valid records of `list` parsed by `parse`, refusing invalid and repeated ones as `kind`.
         func records<Record: Identifiable>(_ list: [Any], _ kind: ContentKind,
@@ -318,7 +363,9 @@ public struct ContentCatalog: Codable, Equatable, Sendable {
         let presets = records(presetList, .preset, parsePreset)
         let propPalettes = records(propPaletteList, .propPalette, parsePalette)
         let props = records(propList, .prop, parseProp)
-        return (ContentCatalog(palettes: palettes, presets: presets, propPalettes: propPalettes, props: props), refused)
+        let packs = records(packList, .pack, parsePack)
+        return (ContentCatalog(palettes: palettes, presets: presets, propPalettes: propPalettes, props: props,
+                               packs: packs), refused)
     }
 
     /// A finite JSON number, or nil (booleans and strings are not numbers).
@@ -373,5 +420,16 @@ public struct ContentCatalog: Codable, Equatable, Sendable {
                               license: object["license"] as? String ?? "")
         if let error = check(prop) { return .failure(error) }
         return .success(prop)
+    }
+
+    /// One JSON object to a checked pack record, or the first reason it is refused.
+    private static func parsePack(_ object: [String: Any]) -> Result<PackRecord, CatalogRefusalReason> {
+        if let error = licenseError(object) { return .failure(error) }
+        guard let id = object["id"] as? String, !id.isEmpty, let name = object["name"] as? String,
+              let preset = object["preset"] as? String, !preset.isEmpty else { return .failure(.invalidNumber) }
+        let pack = PackRecord(id: id, name: name, preset: preset, author: object["author"] as? String ?? "",
+                              license: object["license"] as? String ?? "")
+        if let error = check(pack) { return .failure(error) }
+        return .success(pack)
     }
 }
