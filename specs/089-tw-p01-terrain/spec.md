@@ -64,7 +64,9 @@ an ambient fraction and optional fog; `DepthMeshPass` draws a list of renderer i
   seed from the session's generator, a 32-bit value so it is easy to read and say); `view.orbit [Δyaw°, Δpitch°]`
   (each −180…180); `view.zoom [factor 0.5…2]`; `view.reset`. Fractional or out-of-range choices are refused with
   `a12.invalid-choice` and change nothing. The view is an orbit around the world centre with pitch 10°…75° (never
-  below the ground plane) and distance 8…30 m (outside the 12 m world, eye above its highest point). Snapshot schema
+  below the ground plane) and distance 10…30 m: the eye stays outside the 12 m world (half-diagonal 8.49 m) and,
+  at the lowest pitch, 1.74 m above the centre plane, above every preset's highest point (each preset's terrain stays
+  within −1…1.6 m). Snapshot schema
   1: preset, seed, view and generator state as JSON with sorted keys; damaged or newer payloads are refused and the
   default world opens; one quality level (`level-0`); the step duration is the default 1/120 s and nothing animates.
 - Q: Which content is licensed, and what does the manifest hold? → A: The three presets and their three palettes are
