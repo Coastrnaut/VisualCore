@@ -49,12 +49,14 @@ Packages/ExperiencesCreative/LightMaze/Experience/{Adapter/MazeCore,Adapter/Maze
 Packages/ExperiencesCreative/LightMaze/ExperienceTests/{MazeHintTests,MazeFeedbackTests,MazeStyleTests}.swift new
 Packages/ExperiencesCreative/LightMaze/ExperienceTests/{MazeCoreTests,MazeManifestTests,MazeTestSupport}.swift modify
 Packages/ExperiencesCreative/LightMaze/scenario-manifest.json                                               regenerate
+Packages/ExperiencesCreative/Package.swift (Light Maze experience and test targets: VisualCoreAudio, VisualCoreAudioDSP) modify
 docs/apps/light-maze/visualcore-contract.json (G-FEEDBACK closed by A13-P04; rows M09, M10, M17)            modify
 ```
 
 **Dependency direction**: unchanged — LightMazeCore depends on VisualCoreMath only (the cue rules are plain Swift);
-LightMazeExperience adds VisualCoreAudio and VisualCoreAudioDSP to its existing VisualCore dependencies if not already
-present (Package.swift checked at implementation; ExperiencesCreative already links them for Neon Arcade).
+LightMazeExperience and LightMazeExperienceTests gain the products VisualCoreAudio (rendering) and VisualCoreAudioDSP
+(VisualCore) in `Packages/ExperiencesCreative/Package.swift` (today they list neither; Neon Arcade's targets already
+use both from the same packages), no new package.
 **Lifecycle**: `make(id:storage:reduceMotion:reduceFlashing:)` passes the flags into the presenter; the presenter
 detects the solve transition in `draw` (as A13-P03), then plays the cue once: words to the spoken list and message
 (posted while VoiceOver runs), sound to the sink, `success` haptic through the feedback route, and starts the border
