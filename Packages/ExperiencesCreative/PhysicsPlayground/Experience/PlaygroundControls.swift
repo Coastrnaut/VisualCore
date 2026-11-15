@@ -9,6 +9,14 @@
 //   educational approximations.
 // Every control has an accessible label and value (or hint) and the identifier
 // `experience.a11.physics-playground.<name>` from the port; hit areas are at least 44 points high and text wraps.
+//
+// Feature 083 (A11-P02) T-A11-204 (FR-A11-221; clarification 4) adds three segmented pickers, each sending its level
+// through the port only when it changes:
+//   Gravity (`gravity` → `world.gravity [0…2]`: Off, Moon, Earth);
+//   Drag (`drag` → `world.drag [0…2]`: None, Low, High);
+//   Spring stiffness (`stiffness` → `world.stiffness [0…3]`: Soft, Medium, Stiff, Very stiff);
+// with VoiceOver labels and values naming the level and its number ("Earth, 9.81 metres per second squared"), and a
+// forces line (`forces`: springs, stiffness, gravity and drag) under the status line.
 import SwiftUI
 import PhysicsPlaygroundCore
 import VisualCoreExperienceHost
@@ -80,14 +88,26 @@ struct PlaygroundControls: View {
             .accessibilityLabel(Text(verbatim: "Time scale"))
             .accessibilityValue(Text(verbatim: PlaygroundPresenter.timeScaleWords(mirror.timeScaleIndex)))
             .accessibilityIdentifier(port.identifier("time-scale"))
+            levelPicker("Gravity", name: "gravity", control: "world.gravity",
+                        titles: PlaygroundPresenter.gravityTitles, selected: mirror.gravityLevel,
+                        value: PlaygroundPresenter.gravityValue)
+            levelPicker("Drag", name: "drag", control: "world.drag", titles: PlaygroundPresenter.dragTitles,
+                        selected: mirror.dragLevel, value: PlaygroundPresenter.dragValue)
+            levelPicker("Spring stiffness", name: "stiffness", control: "world.stiffness",
+                        titles: PlaygroundPresenter.stiffnessTitles, selected: mirror.stiffnessLevel,
+                        value: PlaygroundPresenter.stiffnessValue)
             button("Reset", name: "reset", value: bodies,
-                   hint: "Returns to the starting scene at normal speed", enabled: true) {
+                   hint: "Returns to the starting scene at normal speed with the default forces", enabled: true) {
                 _ = port.send("world.reset")
             }
             Text(verbatim: Self.sentence(mirror.status))
                 .font(.footnote)
                 .fixedSize(horizontal: false, vertical: true)
                 .accessibilityIdentifier(port.identifier("status"))
+            Text(verbatim: Self.sentence(mirror.forces))
+                .font(.footnote)
+                .fixedSize(horizontal: false, vertical: true)
+                .accessibilityIdentifier(port.identifier("forces"))
             Text(verbatim: Self.note)
                 .font(.footnote)
                 .foregroundStyle(.secondary)
@@ -95,6 +115,40 @@ struct PlaygroundControls: View {
                 .accessibilityIdentifier(port.identifier("note"))
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    /// A segmented picker `title` with the identifier `name` over the levels `titles`, showing `selected` and sending
+    /// `control` with the chosen level when it changes; its accessible value is `value(selected)` and each segment's
+    /// label is `value` of its level; a visible caption names it above.
+    private func levelPicker(_ title: String, name: String, control: String, titles: [String], selected: Int,
+                             value: @escaping (Int) -> String) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            // The visible caption; VoiceOver reads the picker's own label instead.
+            Text(verbatim: title).font(.footnote).accessibilityHidden(true)
+            picker(title, name: name, control: control, titles: titles, selected: selected, value: value)
+        }
+    }
+
+    /// The segmented picker of ``levelPicker(_:name:control:titles:selected:value:)``.
+    private func picker(_ title: String, name: String, control: String, titles: [String], selected: Int,
+                        value: @escaping (Int) -> String) -> some View {
+        Picker(selection: Binding(get: { selected },
+                                  set: { level in
+                                      if level != selected { _ = port.send(control, [Double(level)]) }
+                                  })) {
+            ForEach(titles.indices, id: \.self) { level in
+                Text(verbatim: titles[level])
+                    .accessibilityLabel(Text(verbatim: value(level)))
+                    .tag(level)
+            }
+        } label: {
+            Text(verbatim: title)
+        }
+        .pickerStyle(.segmented)
+        .frame(minHeight: 44)
+        .accessibilityLabel(Text(verbatim: title))
+        .accessibilityValue(Text(verbatim: value(selected)))
+        .accessibilityIdentifier(port.identifier(name))
     }
 
     /// A bordered button `title` with the identifier `name`, the accessible value `value` and the hint `hint`.

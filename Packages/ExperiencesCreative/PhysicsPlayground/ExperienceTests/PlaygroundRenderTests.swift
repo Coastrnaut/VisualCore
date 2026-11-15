@@ -8,6 +8,11 @@
 // pixel; the description names the body count, running or paused and the time scale; the probe steps aside for
 // bodies near it; a failed draw reaches the session; and the experience's sources never create a graphics context of
 // their own.
+//
+// Feature 083 (A11-P02) T-A11-204 (FR-A11-220; clarification 5): springs are drawn under the bodies as 8-coil zigzags
+// 0.03 m wide from anchor to anchor at the physics anchors (a body anchor through the body's pose, a world anchor
+// fixed), with anchor dots; the description adds the springs, stiffness, gravity and drag; the probe also steps aside
+// for a spring passing near it.
 import Foundation
 import XCTest
 @testable import PhysicsPlaygroundExperience
@@ -209,16 +214,46 @@ final class PlaygroundRenderTests: XCTestCase {
     func testTheDescriptionNamesBodiesStateAndTimeScale() async throws {
         var world = playgroundSampleWorld()
         XCTAssertEqual(PlaygroundPresenter.description(world),
-                       "Physics Playground: 3 bodies, running, normal speed (time scale 1×).")
+                       "Physics Playground: 3 bodies, running, normal speed (time scale 1×); "
+                       + "no springs, stiffness medium, gravity Earth, drag low.")
         world.paused = true
         world.timeScaleIndex = 0
+        XCTAssertTrue(WorldSimulation.setGravityLevel(&world, 1))
+        XCTAssertTrue(WorldSimulation.setDragLevel(&world, 2))
+        XCTAssertTrue(WorldSimulation.setStiffnessLevel(&world, 3))
+        world.springs = [WorldSpring(id: 0, a: .world(Vec2(5, 7.5)), b: .body(1), restLength: 1)]
         XCTAssertEqual(PlaygroundPresenter.description(world),
-                       "Physics Playground: 3 bodies, paused, quarter speed (time scale ¼×).")
+                       "Physics Playground: 3 bodies, paused, quarter speed (time scale ¼×); "
+                       + "1 spring, stiffness very stiff, gravity Moon, drag high.")
+        world.springs = []
         world.bodies = [world.bodies[0]]
         world.timeScaleIndex = 1
+        XCTAssertTrue(WorldSimulation.setGravityLevel(&world, 0))
+        XCTAssertTrue(WorldSimulation.setDragLevel(&world, 0))
+        XCTAssertTrue(WorldSimulation.setStiffnessLevel(&world, 0))
         XCTAssertEqual(PlaygroundPresenter.description(world),
-                       "Physics Playground: 1 body, paused, half speed (time scale ½×).")
+                       "Physics Playground: 1 body, paused, half speed (time scale ½×); "
+                       + "no springs, stiffness soft, gravity off, drag none.")
+        XCTAssertEqual(PlaygroundPresenter.description(PlaygroundCore(seed: 7).world),
+                       "Physics Playground: 10 bodies, running, normal speed (time scale 1×); "
+                       + "2 springs, stiffness medium, gravity Earth, drag low.")
         XCTAssertEqual(PlaygroundPresenter.bodyWords(0), "no bodies")
+        XCTAssertEqual(PlaygroundPresenter.springWords(0), "no springs")
+        XCTAssertEqual(PlaygroundPresenter.springWords(2), "2 springs")
+        XCTAssertEqual(PlaygroundPresenter.stiffnessWord(2), "stiff")
+
+        // The pickers' titles and spoken values.
+        XCTAssertEqual(PlaygroundPresenter.gravityTitles, ["Off", "Moon", "Earth"])
+        XCTAssertEqual(PlaygroundPresenter.dragTitles, ["None", "Low", "High"])
+        XCTAssertEqual(PlaygroundPresenter.stiffnessTitles, ["Soft", "Medium", "Stiff", "Very stiff"])
+        XCTAssertEqual((0...2).map(PlaygroundPresenter.gravityValue),
+                       ["Off", "Moon, 1.62 metres per second squared", "Earth, 9.81 metres per second squared"])
+        XCTAssertEqual((0...2).map(PlaygroundPresenter.dragValue),
+                       ["None", "Low, 0.05 per second", "High, 1 per second"])
+        XCTAssertEqual((0...3).map(PlaygroundPresenter.stiffnessValue),
+                       ["Soft, 20 newtons per metre", "Medium, 60 newtons per metre", "Stiff, 150 newtons per metre",
+                        "Very stiff, 400 newtons per metre"])
+        XCTAssertEqual(PlaygroundPresenter.gravityValue(3), "Unknown")
         XCTAssertEqual(PlaygroundControls.sentence("7 bodies, running, normal speed"),
                        "7 bodies, running, normal speed")
         XCTAssertEqual(PlaygroundControls.sentence(""), "Loading")
@@ -228,13 +263,98 @@ final class PlaygroundRenderTests: XCTestCase {
 
         let session = ExperienceSession()
         let shell = try await PlaygroundTest.open(session, size: size)
-        XCTAssertTrue(shell.accessibilitySummary.contains("7 bodies"))
+        XCTAssertTrue(shell.accessibilitySummary.contains("10 bodies"))
+        XCTAssertTrue(shell.accessibilitySummary.contains("2 springs, stiffness medium, gravity Earth, drag low"))
         XCTAssertTrue(shell.handle(control: "world.pause", values: [1]).isAccepted)
         XCTAssertTrue(shell.accessibilitySummary.contains("paused"))
+        XCTAssertTrue(shell.handle(control: "world.stiffness", values: [0]).isAccepted)
+        XCTAssertTrue(shell.handle(control: "world.gravity", values: [1]).isAccepted)
+        XCTAssertTrue(shell.handle(control: "world.drag", values: [2]).isAccepted)
+        XCTAssertTrue(shell.accessibilitySummary.contains("stiffness soft, gravity Moon, drag high"),
+                      shell.accessibilitySummary)
+        XCTAssertEqual(shell.presenter.mirror.stiffnessLevel, 0)
+        XCTAssertEqual(shell.presenter.mirror.gravityLevel, 1)
+        XCTAssertEqual(shell.presenter.mirror.dragLevel, 2)
+        XCTAssertEqual(shell.presenter.mirror.forces, "2 springs, stiffness soft, gravity Moon, drag high")
         XCTAssertTrue(shell.handle(control: "world.reset").isAccepted)
         XCTAssertTrue(shell.accessibilitySummary.contains("running"))
+        XCTAssertTrue(shell.accessibilitySummary.contains("stiffness medium, gravity Earth, drag low"))
         XCTAssertEqual(shell.port.identifier("drop-circle"), "experience.a11.physics-playground.drop-circle")
+        XCTAssertEqual(shell.port.identifier("gravity"), "experience.a11.physics-playground.gravity")
+        XCTAssertEqual(shell.port.identifier("drag"), "experience.a11.physics-playground.drag")
+        XCTAssertEqual(shell.port.identifier("stiffness"), "experience.a11.physics-playground.stiffness")
         session.close()
+    }
+
+    /// T-A11-204 (FR-A11-220): each spring is an 8-coil zigzag from its world anchor A to its world anchor B at the
+    /// physics positions — a body anchor through the body's pose, a world anchor fixed — 0.03 m wide (at least a
+    /// pixel), under the bodies, with a dot at each anchor; unused slots draw nothing.
+    func testSpringsAreDrawnAtTheirPhysicsAnchors() throws {
+        let presenter = PlaygroundPresenter(experienceID: PlaygroundTest.id)
+        var world = playgroundSampleWorld()
+        // A world anchor to a point off the rotated wood circle's centre, and a spring between the circle and the box.
+        world.springs = [
+            WorldSpring(id: 0, a: .world(Vec2(5, 7.5)), b: .body(1, local: Vec2(0, 0.5)), restLength: 1.5),
+            WorldSpring(id: 1, a: .body(1), b: .body(2, local: Vec2(0.6, 0)), restLength: 2),
+        ]
+        world.nextSpringId = 2
+        XCTAssertEqual(world.validate(), [])
+        let core = try playgroundCore(world)
+        presenter.layOut(core, width: 1200, height: 1000)
+        let s = presenter.lastScale
+        XCTAssertEqual(s, 100, accuracy: 1e-12)
+        XCTAssertEqual(presenter.lastSpringsDrawn, 2)
+        let map = { (p: Vec2) in PlaygroundPresenter.world(p, scale: s) }
+        func close(_ a: Vec2, _ b: Vec2, _ message: String) {
+            XCTAssertEqual(a.x, b.x, accuracy: 1e-9, message)
+            XCTAssertEqual(a.y, b.y, accuracy: 1e-9, message)
+        }
+        // The physics anchors: the circle's local (0, 0.5) turned by its angle 0.6; the box's local (0.6, 0) by 0.4.
+        let circleTop = Vec2(3 - 0.5 * sin(0.6), 5 + 0.5 * cos(0.6))
+        let boxSide = Vec2(7 + 0.6 * cos(0.4), 3 + 0.6 * sin(0.4))
+        let ends = [(Vec2(5, 7.5), circleTop), (Vec2(3, 5), boxSide)]
+        for (slot, (a, b)) in ends.enumerated() {
+            let anchors = try XCTUnwrap(PlaygroundPresenter.anchors(world.springs[slot], in: world))
+            close(anchors.a, a, "spring \(slot) anchor a")
+            close(anchors.b, b, "spring \(slot) anchor b")
+            guard case .polyline(let points, let width)? = presenter.springNodes[slot].primitive else {
+                return XCTFail("spring \(slot) has no zigzag")
+            }
+            XCTAssertEqual(points.count, PlaygroundPresenter.springPoints)
+            XCTAssertEqual(points.count, 20, "two leads and 8 coils of two peaks")
+            close(points[0], map(a), "spring \(slot) starts at anchor a")
+            close(points[points.count - 1], map(b), "spring \(slot) ends at anchor b")
+            XCTAssertEqual(width, 0.03 * s, accuracy: 1e-9, "0.03 m wide")
+            // Every peak lies the coil amplitude from the axis, alternately on either side.
+            let axis = (map(b) - map(a)) * (1 / (map(b) - map(a)).length)
+            var sides: [Double] = []
+            for point in points[2..<(points.count - 2)] {
+                let offset = point - map(a)
+                let across = offset.x * -axis.y + offset.y * axis.x
+                XCTAssertEqual(abs(across), PlaygroundPresenter.springAmplitude * s, accuracy: 1e-9)
+                sides.append(across > 0 ? 1 : -1)
+            }
+            XCTAssertEqual(sides, (0..<16).map { $0 % 2 == 0 ? 1 : -1 })
+            XCTAssertEqual(presenter.springNodes[slot].color, PlaygroundPresenter.springColor)
+            let dots = presenter.anchorNodes[slot]
+            XCTAssertEqual(dots.a.primitive, .circle(PlaygroundPresenter.anchorDotRadius * s))
+            close(dots.a.position, map(a), "spring \(slot) dot a")
+            close(dots.b.position, map(b), "spring \(slot) dot b")
+        }
+        XCTAssertLessThan(PlaygroundPresenter.springZ, PlaygroundPresenter.fillZ, "springs under the bodies")
+        XCTAssertGreaterThan(PlaygroundPresenter.springZ, PlaygroundPresenter.wallZ)
+        XCTAssertNil(presenter.springNodes[2].primitive)
+        XCTAssertNil(presenter.anchorNodes[15].a.primitive)
+
+        // At a small canvas the zigzag is still a pixel wide; the starting scene draws its two springs.
+        presenter.layOut(PlaygroundCore(seed: 7), width: 120, height: 100)
+        XCTAssertEqual(presenter.lastSpringsDrawn, 2)
+        guard case .polyline(let hanging, let thin)? = presenter.springNodes[0].primitive else {
+            return XCTFail("no hanging spring")
+        }
+        XCTAssertEqual(thin, 1, "at least one pixel")
+        close(hanging[0], PlaygroundPresenter.world(StartingScene.hangingAnchor, scale: 10), "the ceiling anchor")
+        XCTAssertEqual(PlaygroundPresenter.zigzag(from: Vec2(1, 1), to: Vec2(1, 1)), [Vec2(1, 1), Vec2(1, 1)])
     }
 
     func testTheProbeStepsAsideForBodiesNearIt() throws {
@@ -249,6 +369,13 @@ final class PlaygroundRenderTests: XCTestCase {
                                         position: Vec2(5.2, 0.5)))
         world.nextId = max(world.nextId, 4)
         XCTAssertEqual(presenter.probes(try playgroundCore(world)), [], "a body over the probe point")
+        world.bodies.removeLast()
+        XCTAssertEqual(presenter.probes(try playgroundCore(world)).count, 1)
+        world.springs = [WorldSpring(id: 0, a: .world(Vec2(5, 0.8)), b: .body(2), restLength: 2)]
+        world.nextSpringId = max(world.nextSpringId, 1)
+        XCTAssertEqual(world.validate(), [])
+        XCTAssertEqual(presenter.probes(try playgroundCore(world)), [], "a spring over the probe point")
+        XCTAssertEqual(presenter.probes(PlaygroundCore(seed: 7)).count, 1, "the starting scene leaves the probe clear")
         XCTAssertEqual(PlaygroundPresenter.colorClassOfStage, FrameColorClass.dark.rawValue)
         XCTAssertEqual(PlaygroundPresenter.colorClass(red: PlaygroundPresenter.letterboxColor.x,
                                                       green: PlaygroundPresenter.letterboxColor.y,

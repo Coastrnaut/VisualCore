@@ -13,6 +13,14 @@
 //     body is drawn darker (fill × 0.55, edge × 0.7) with a hatch inside its shape (parallel lines across it, joined
 //     at its edge into one path). A body whose material is not in the catalog is drawn in a neutral grey.
 // There is no decorative motion, so Reduce Motion changes nothing; nothing flashes. No audio.
+//
+// Feature 083 (A11-P02) T-A11-204 (FR-A11-220, FR-A11-221; clarification 5): every spring is drawn under the bodies
+// (so the bodies stay readable and a body's centre still shows its fill) as an 8-coil zigzag polyline 0.03 m wide
+// between its two world anchors at its current length — a body anchor through the body's pose
+// (`PhysicsWorld.anchorPosition`), a world anchor fixed — with straight leads of 10 % of the length at each end and
+// coils 0.12 m to each side of the axis, plus a small dot (radius 0.06 m) at each anchor, in a pale spring colour. The
+// description adds the springs, the stiffness level, gravity and drag ("2 springs, stiffness medium, gravity Earth,
+// drag low"), and the frame probe also steps aside when a spring passes near it.
 import Foundation
 import SwiftUI
 import PhysicsPlaygroundCore
@@ -35,8 +43,16 @@ final class PlaygroundMirror {
     var paused = false
     /// The time-scale index, 0…3 (¼, ½, 1, 2).
     var timeScaleIndex = PhysicsWorld.normalTimeScaleIndex
+    /// The gravity level, 0…2 (off, Moon, Earth).
+    var gravityLevel = ForceLevels.defaultGravityLevel
+    /// The drag level, 0…2 (none, low, high).
+    var dragLevel = ForceLevels.defaultDragLevel
+    /// The stiffness level, 0…3 (soft, medium, stiff, very stiff).
+    var stiffnessLevel = ForceLevels.defaultStiffnessLevel
     /// The status line: bodies, running or paused, time scale.
     var status = ""
+    /// The forces line: springs, stiffness, gravity and drag.
+    var forces = ""
 }
 
 /// A failure the presenter injects for tests (`failNextDraw`).
@@ -72,8 +88,23 @@ final class PlaygroundPresenter: ExperiencePresenter {
     nonisolated static let ringPoints = 33
     /// The spacing of the hatch of a static body in metres.
     nonisolated static let hatchSpacing = 0.25
-    /// The z of the stage, the walls, the body fills, the outlines and marks, the hatch and the letterbox masks.
-    nonisolated static let stageZ = 0, wallZ = 1, fillZ = 2, edgeZ = 3, hatchZ = 4, maskZ = 9
+    /// The z of the stage, the walls, the springs and their anchor dots, the body fills, the outlines and marks, the
+    /// hatch and the letterbox masks.
+    nonisolated static let stageZ = 0, wallZ = 1, springZ = 2, fillZ = 3, edgeZ = 4, hatchZ = 5, maskZ = 9
+    /// The colour of the springs and their anchor dots (a pale straw).
+    nonisolated static let springColor = Vec4(0.92, 0.86, 0.55, 1)
+    /// The width of a spring's zigzag in metres.
+    nonisolated static let springWidth = 0.03
+    /// The number of coils of a spring's zigzag (each coil one peak to each side).
+    nonisolated static let springCoils = 8
+    /// The distance of a coil's peaks from the spring's axis in metres.
+    nonisolated static let springAmplitude = 0.12
+    /// The share of a spring's length taken by the straight lead at each end.
+    nonisolated static let springLead = 0.1
+    /// The radius of a spring's anchor dots in metres.
+    nonisolated static let anchorDotRadius = 0.06
+    /// The number of points of a spring's zigzag: both anchors, both lead ends and two peaks per coil.
+    nonisolated static var springPoints: Int { 4 + 2 * springCoils }
     /// The stage point (metres) near the floor at the stage's middle where the frame probe is taken.
     nonisolated static let probePoint = Vec2(5, 0.75)
     /// The clearance around the probe point (metres) a body's bounding circle must keep for the probe to be taken.
@@ -92,6 +123,8 @@ final class PlaygroundPresenter: ExperiencePresenter {
     private(set) var lastScale = 0.0, lastCanvas = Vec2(0, 0)
     /// The number of bodies drawn in the last frame and how many of them were hatched as static.
     private(set) var lastBodiesDrawn = 0, lastStaticDrawn = 0
+    /// The number of springs drawn in the last frame.
+    private(set) var lastSpringsDrawn = 0
 
     private let clear = ClearColorScene(red: 0, green: 0, blue: 0)
     private var primitives: PrimitiveRenderer?
@@ -103,6 +136,8 @@ final class PlaygroundPresenter: ExperiencePresenter {
     /// The fill, outline, rotation mark and hatch node of each body slot.
     private(set) var fillNodes: [SceneNode] = [], edgeNodes: [SceneNode] = [], markNodes: [SceneNode] = [],
                      hatchNodes: [SceneNode] = []
+    /// The zigzag and the two anchor dots (end A, end B) of each spring slot.
+    private(set) var springNodes: [SceneNode] = [], anchorNodes: [(a: SceneNode, b: SceneNode)] = []
     private var maskNodes: [SceneNode] = []
 
     /// A presenter for the experience `experienceID`.
@@ -113,6 +148,13 @@ final class PlaygroundPresenter: ExperiencePresenter {
             let node = SceneNode(id: "wall\(index)", z: Self.wallZ)
             root.add(node)
             wallNodes.append(node)
+        }
+        for slot in 0..<ForceLevels.maxSprings {
+            let line = SceneNode(id: "s\(slot)", z: Self.springZ)
+            let a = SceneNode(id: "s\(slot).a", z: Self.springZ), b = SceneNode(id: "s\(slot).b", z: Self.springZ)
+            for node in [line, a, b] { root.add(node) }
+            springNodes.append(line)
+            anchorNodes.append((a, b))
         }
         for slot in 0..<PhysicsWorld.maxBodies {
             let fill = SceneNode(id: "b\(slot)", z: Self.fillZ)
@@ -223,6 +265,40 @@ final class PlaygroundPresenter: ExperiencePresenter {
         return points
     }
 
+    /// The zigzag of a spring from the world point `a` to the world point `b` (metres): `a`, the end of the lead
+    /// (``springLead`` of the length along the axis), two peaks per coil (``springCoils`` coils) alternately
+    /// ``springAmplitude`` to the left and to the right of the axis, evenly spaced between the leads, the start of the
+    /// other lead, and `b` — ``springPoints`` points. Two coincident anchors give the straight segment [a, b].
+    nonisolated static func zigzag(from a: Vec2, to b: Vec2) -> [Vec2] {
+        let d = b - a, length = d.length
+        guard length > 1e-9 else { return [a, b] }
+        let axis = d * (1 / length), side = Vec2(-axis.y, axis.x)
+        let peaks = 2 * springCoils
+        var points = [a, a + d * springLead]
+        for k in 0..<peaks {
+            let t = springLead + (1 - 2 * springLead) * (Double(k) + 0.5) / Double(peaks)
+            let sign: Double = k % 2 == 0 ? 1 : -1
+            points.append(a + d * t + side * (sign * springAmplitude))
+        }
+        points += [a + d * (1 - springLead), b]
+        return points
+    }
+
+    /// The world anchors (metres) of `spring` in `world`, nil when a body end names a missing body.
+    nonisolated static func anchors(_ spring: WorldSpring, in world: PhysicsWorld) -> (a: Vec2, b: Vec2)? {
+        guard let a = world.anchorPosition(spring.a), let b = world.anchorPosition(spring.b), a.isFinite, b.isFinite
+        else { return nil }
+        return (a, b)
+    }
+
+    /// The distance from `p` to the segment from `a` to `b`.
+    nonisolated static func distance(from p: Vec2, toSegment a: Vec2, _ b: Vec2) -> Double {
+        let d = b - a, lengthSquared = d.x * d.x + d.y * d.y
+        guard lengthSquared > 0 else { return (p - a).length }
+        let t = min(max(((p.x - a.x) * d.x + (p.y - a.y) * d.y) / lengthSquared, 0), 1)
+        return (p - (a + d * t)).length
+    }
+
     /// A material colour as a vector.
     nonisolated static func vector(_ color: RGB) -> Vec4 { Vec4(color.r, color.g, color.b, 1) }
 
@@ -262,6 +338,24 @@ final class PlaygroundPresenter: ExperiencePresenter {
             node.position = map(wall.pose.position)
             node.color = Self.wallColor
         }
+
+        var springsDrawn = 0
+        for slot in 0..<ForceLevels.maxSprings {
+            let line = springNodes[slot], (dotA, dotB) = anchorNodes[slot]
+            for node in [line, dotA, dotB] {
+                node.primitive = nil
+                node.position = .zero
+                node.color = Self.springColor
+            }
+            guard slot < world.springs.count, let ends = Self.anchors(world.springs[slot], in: world) else { continue }
+            line.primitive = .polyline(Self.zigzag(from: ends.a, to: ends.b).map(map), width: px(Self.springWidth))
+            dotA.primitive = .circle(px(Self.anchorDotRadius))
+            dotA.position = map(ends.a)
+            dotB.primitive = .circle(px(Self.anchorDotRadius))
+            dotB.position = map(ends.b)
+            springsDrawn += 1
+        }
+        lastSpringsDrawn = springsDrawn
 
         var drawn = 0, hatched = 0
         for slot in 0..<PhysicsWorld.maxBodies {
@@ -321,8 +415,70 @@ final class PlaygroundPresenter: ExperiencePresenter {
         if mirror.bodyCount != world.bodies.count { mirror.bodyCount = world.bodies.count }
         if mirror.paused != world.paused { mirror.paused = world.paused }
         if mirror.timeScaleIndex != world.timeScaleIndex { mirror.timeScaleIndex = world.timeScaleIndex }
+        if mirror.gravityLevel != world.gravityLevel { mirror.gravityLevel = world.gravityLevel }
+        if mirror.dragLevel != world.dragLevel { mirror.dragLevel = world.dragLevel }
+        if mirror.stiffnessLevel != world.stiffnessLevel { mirror.stiffnessLevel = world.stiffnessLevel }
         let status = Self.status(world)
         if mirror.status != status { mirror.status = status }
+        let forces = Self.forces(world)
+        if mirror.forces != forces { mirror.forces = forces }
+    }
+
+    /// The word of `index` in `words`, or "unknown" outside it.
+    nonisolated private static func word(_ words: [String], _ index: Int) -> String {
+        words.indices.contains(index) ? words[index] : "unknown"
+    }
+
+    /// The gravity levels as shown on the picker: "Off", "Moon", "Earth".
+    nonisolated static let gravityTitles = ["Off", "Moon", "Earth"]
+    /// The drag levels as shown on the picker: "None", "Low", "High".
+    nonisolated static let dragTitles = ["None", "Low", "High"]
+    /// The stiffness levels as shown on the picker: "Soft", "Medium", "Stiff", "Very stiff".
+    nonisolated static let stiffnessTitles = ["Soft", "Medium", "Stiff", "Very stiff"]
+
+    /// The gravity level in the description: "off", "Moon" or "Earth".
+    nonisolated static func gravityWord(_ level: Int) -> String { word(["off", "Moon", "Earth"], level) }
+    /// The drag level in the description: "none", "low" or "high".
+    nonisolated static func dragWord(_ level: Int) -> String { word(["none", "low", "high"], level) }
+    /// The stiffness level in the description: "soft", "medium", "stiff" or "very stiff".
+    nonisolated static func stiffnessWord(_ level: Int) -> String {
+        word(["soft", "medium", "stiff", "very stiff"], level)
+    }
+
+    /// The spoken value of a gravity level: "Off", "Moon, 1.62 metres per second squared", "Earth, 9.81 metres per
+    /// second squared".
+    nonisolated static func gravityValue(_ level: Int) -> String {
+        guard let g = ForceLevels.gravityVector(level: level) else { return "Unknown" }
+        return level == 0 ? "Off" : "\(gravityTitles[level]), \(number(-g.y)) metres per second squared"
+    }
+    /// The spoken value of a drag level: "None", "Low, 0.05 per second", "High, 1 per second".
+    nonisolated static func dragValue(_ level: Int) -> String {
+        guard let drag = ForceLevels.dragValue(level: level) else { return "Unknown" }
+        return level == 0 ? "None" : "\(dragTitles[level]), \(number(drag)) per second"
+    }
+    /// The spoken value of a stiffness level: "Medium, 60 newtons per metre".
+    nonisolated static func stiffnessValue(_ level: Int) -> String {
+        guard let k = ForceLevels.stiffnessValue(level: level) else { return "Unknown" }
+        return "\(stiffnessTitles[level]), \(number(k)) newtons per metre"
+    }
+    /// `value` without a trailing ".0" ("60", "1.62", "0.05").
+    nonisolated static func number(_ value: Double) -> String {
+        value == value.rounded() ? String(Int(value)) : String(value)
+    }
+
+    /// "no springs", "1 spring" or "2 springs".
+    nonisolated static func springWords(_ count: Int) -> String {
+        switch count {
+        case ...0: return "no springs"
+        case 1: return "1 spring"
+        default: return "\(count) springs"
+        }
+    }
+
+    /// The forces line: "2 springs, stiffness medium, gravity Earth, drag low".
+    nonisolated static func forces(_ world: PhysicsWorld) -> String {
+        "\(springWords(world.springs.count)), stiffness \(stiffnessWord(world.stiffnessLevel)), "
+            + "gravity \(gravityWord(world.gravityLevel)), drag \(dragWord(world.dragLevel))"
     }
 
     /// The time scale as shown: "¼×", "½×", "1×" or "2×" ("?" outside 0…3).
@@ -353,9 +509,10 @@ final class PlaygroundPresenter: ExperiencePresenter {
         "\(bodyWords(world.bodies.count)), \(stateWord(world)), \(timeScaleWords(world.timeScaleIndex))"
     }
 
-    /// The canvas description, for example "Physics Playground: 7 bodies, running, normal speed (time scale 1×)."
+    /// The canvas description, for example "Physics Playground: 10 bodies, running, normal speed (time scale 1×);
+    /// 2 springs, stiffness medium, gravity Earth, drag low."
     nonisolated static func description(_ world: PhysicsWorld) -> String {
-        "Physics Playground: \(status(world)) (time scale \(timeScaleText(world.timeScaleIndex)))."
+        "Physics Playground: \(status(world)) (time scale \(timeScaleText(world.timeScaleIndex))); \(forces(world))."
     }
 
     /// The description of `core`'s world.
@@ -397,11 +554,19 @@ final class PlaygroundPresenter: ExperiencePresenter {
     }
 
     /// One probe on the stage background near the floor at the middle, expecting `dark`; none while a body's bounding
-    /// circle comes within ``probeMargin`` of that point.
+    /// circle, or a spring's zigzag and anchor dots (its axis widened by the coil amplitude and the dot radius), comes
+    /// within ``probeMargin`` of that point.
     func probes(_ core: PlaygroundCore) -> [FrameProbe] {
         guard let expected = Self.colorClassOfStage else { return [] }
         for body in core.world.bodies {
             if (body.position - Self.probePoint).length < body.boundingRadius + Self.probeMargin { return [] }
+        }
+        let springReach = max(Self.springAmplitude, Self.anchorDotRadius) + Self.springWidth
+        for spring in core.world.springs {
+            guard let ends = Self.anchors(spring, in: core.world) else { continue }
+            if Self.distance(from: Self.probePoint, toSegment: ends.a, ends.b) < springReach + Self.probeMargin {
+                return []
+            }
         }
         let fraction = canvasFraction(of: Self.probePoint)
         return [FrameProbe(name: "stage", x: fraction.x, y: fraction.y, expected: expected)].compactMap { $0 }
@@ -411,6 +576,6 @@ final class PlaygroundPresenter: ExperiencePresenter {
         AnyView(PlaygroundControls(port: port, mirror: mirror))
     }
 
-    /// Every action has a native control; there is no canvas gesture.
+    /// Every action has a native control (the three level pickers included); there is no canvas gesture.
     var nativeActions: Set<String> { Set(PlaygroundCore.actionIDs) }
 }

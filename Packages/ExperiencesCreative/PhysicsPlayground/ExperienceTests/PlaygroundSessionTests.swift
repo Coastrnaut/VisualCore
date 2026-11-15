@@ -6,6 +6,10 @@
 // 1/120 s give the same world after the same steps as the bare replay; the state saved by the shell restores
 // identically in a new session; newer and damaged saved states are refused and the starting scene opens; reopening
 // keeps the drawing resources steady.
+//
+// Feature 083 (A11-P02) T-A11-204 (FR-A11-212, FR-A11-220; SC-A11-206): the starting scene holds ten bodies and two
+// springs, both drawn; the description adds the springs and the levels; a level picked in a session survives the
+// saved state; a schema-3 state is the newer one refused; the stored schema-1 example opens through the migration.
 import Foundation
 import XCTest
 import VisualCoreDiagnostics
@@ -27,13 +31,15 @@ final class PlaygroundSessionTests: XCTestCase {
         XCTAssertGreaterThan(presenter.lastScale, 0)
         XCTAssertGreaterThan(shell.diagnostics.gpu?.objects ?? 0, 0, "drawn through the host's registry")
         let core = try PlaygroundTest.core(shell)
-        XCTAssertEqual(core.world.bodies.count, 7)
-        XCTAssertEqual(presenter.lastBodiesDrawn, 7)
+        XCTAssertEqual(core.world.bodies.count, 10)
+        XCTAssertEqual(presenter.lastBodiesDrawn, 10)
         XCTAssertEqual(presenter.lastStaticDrawn, 1, "the ledge is hatched")
+        XCTAssertEqual(presenter.lastSpringsDrawn, 2, "the hanging box's and the joined circles' springs")
         let summary = shell.accessibilitySummary
-        XCTAssertEqual(summary, "Physics Playground: 7 bodies, running, normal speed (time scale 1×).")
+        XCTAssertEqual(summary, "Physics Playground: 10 bodies, running, normal speed (time scale 1×); "
+                       + "2 springs, stiffness medium, gravity Earth, drag low.")
         XCTAssertTrue(presenter.mirror.ready)
-        XCTAssertEqual(presenter.mirror.bodyCount, 7)
+        XCTAssertEqual(presenter.mirror.bodyCount, 10)
         XCTAssertEqual(presenter.nativeActions, Set(PlaygroundCore.actionIDs))
         XCTAssertEqual(presenter.gestureActions, [])
         XCTAssertEqual(GestureAlternatives.missing(gesture: presenter.gestureActions, native: presenter.nativeActions),
@@ -44,10 +50,13 @@ final class PlaygroundSessionTests: XCTestCase {
         XCTAssertTrue(presenter.mirror.paused)
         XCTAssertTrue(shell.handle(control: "world.timeScale", values: [3]).isAccepted)
         XCTAssertTrue(shell.handle(control: "world.drop", values: [1]).isAccepted)
+        XCTAssertTrue(shell.handle(control: "world.stiffness", values: [2]).isAccepted)
         XCTAssertEqual(shell.accessibilitySummary,
-                       "Physics Playground: 8 bodies, paused, double speed (time scale 2×).")
+                       "Physics Playground: 11 bodies, paused, double speed (time scale 2×); "
+                       + "2 springs, stiffness stiff, gravity Earth, drag low.")
         XCTAssertEqual(presenter.mirror.timeScaleIndex, 3)
-        XCTAssertEqual(presenter.mirror.bodyCount, 8)
+        XCTAssertEqual(presenter.mirror.bodyCount, 11)
+        XCTAssertEqual(presenter.mirror.stiffnessLevel, 2)
 
         session.close()
         XCTAssertEqual(session.hostsAlive, 0)
@@ -122,7 +131,7 @@ final class PlaygroundSessionTests: XCTestCase {
             }
             reference.update(step: step)
         }
-        XCTAssertEqual(reference.world.bodies.count, 10)
+        XCTAssertEqual(reference.world.bodies.count, 13)
 
         var digests: [String] = []
         for delta in [1.0 / 30, 1.0 / 60, 1.0 / 120] {
@@ -158,8 +167,12 @@ final class PlaygroundSessionTests: XCTestCase {
         XCTAssertTrue(shell.handle(control: "world.drop", values: [1]).isAccepted)
         try PlaygroundTest.frames(first, 60)
         XCTAssertTrue(shell.handle(control: "world.timeScale", values: [1]).isAccepted)
+        XCTAssertTrue(shell.handle(control: "world.gravity", values: [1]).isAccepted)
+        XCTAssertTrue(shell.handle(control: "world.drag", values: [2]).isAccepted)
+        XCTAssertTrue(shell.handle(control: "world.stiffness", values: [3]).isAccepted)
         try PlaygroundTest.frames(first, 3)
         let snapshot = try shell.snapshot()
+        XCTAssertEqual(snapshot.schemaVersion, 2)
         let saved = try PlaygroundTest.core(shell)
         XCTAssertGreaterThan(saved.world.tick, 0, "a world in motion")
         first.close()
@@ -169,8 +182,34 @@ final class PlaygroundSessionTests: XCTestCase {
         try restored.restore(ExperienceSnapshot(data: snapshot.encoded()))
         let core = try PlaygroundTest.core(restored)
         XCTAssertEqual(core.state, saved.state,
-                       "bodies, tick, flags, time scale, remainder and generator are identical")
+                       "bodies, tick, flags, time scale, remainder, springs, levels, cache and generator are identical")
+        XCTAssertEqual(core.world.gravityLevel, 1)
+        XCTAssertEqual(core.world.dragLevel, 2)
+        XCTAssertEqual(core.world.stiffnessLevel, 3)
+        try PlaygroundTest.frames(second, 1)
+        XCTAssertEqual(restored.presenter.mirror.stiffnessLevel, 3, "the controls show the restored levels")
+        XCTAssertEqual(restored.presenter.mirror.gravityLevel, 1)
+        XCTAssertEqual(restored.presenter.mirror.dragLevel, 2)
         second.close()
+    }
+
+    func testTheStoredSchemaOneExampleOpensThroughTheMigration() async throws {
+        let example = try XCTUnwrap(PlaygroundCore.schemaOneExample())
+        let snapshot = try ExperienceSnapshot(data: example.snapshot)
+        XCTAssertEqual(snapshot.schemaVersion, 1)
+        let session = ExperienceSession()
+        let opened = try await PlaygroundTest.open(session, seed: 3, snapshot: snapshot)
+        XCTAssertNil(session.lastRestoreRefusal, "the Phase 01 state is migrated, not refused")
+        let core = try PlaygroundTest.core(opened)
+        XCTAssertEqual(core.world.springs, [])
+        XCTAssertEqual(core.world.bodies.count, 9)
+        XCTAssertEqual(core.world.validate(), [])
+        XCTAssertTrue(core.world.paused, "saved paused, so the first frame changes nothing")
+        XCTAssertEqual(opened.presenter.lastSpringsDrawn, 0)
+        XCTAssertTrue(opened.accessibilitySummary.contains("9 bodies, paused, half speed"),
+                      opened.accessibilitySummary)
+        XCTAssertTrue(opened.accessibilitySummary.contains("no springs, stiffness medium, gravity Earth, drag low"))
+        session.close()
     }
 
     func testANewerSavedStateIsRefusedAndTheStartingSceneOpens() async throws {
@@ -180,7 +219,7 @@ final class PlaygroundSessionTests: XCTestCase {
         try PlaygroundTest.frames(first, 60)
         let saved = try shell.snapshot()
         first.close()
-        let newer = try ExperienceSnapshot(experience: PlaygroundTest.id, schemaVersion: 2, seed: saved.seed,
+        let newer = try ExperienceSnapshot(experience: PlaygroundTest.id, schemaVersion: 3, seed: saved.seed,
                                            stepIndex: saved.stepIndex, digest: saved.digest,
                                            payload: Data(saved.payload.utf8))
 
@@ -189,7 +228,7 @@ final class PlaygroundSessionTests: XCTestCase {
         XCTAssertNotNil(second.lastRestoreRefusal, "the newer state is refused")
         let core = try PlaygroundTest.core(opened)
         XCTAssertLessThanOrEqual(core.world.tick, 2, "the starting scene opens")
-        XCTAssertEqual(core.world.bodies.count, 7)
+        XCTAssertEqual(core.world.bodies.count, 10)
         XCTAssertThrowsError(try opened.restore(newer))
         second.close()
     }
