@@ -8,7 +8,7 @@ stay open, as for A10-P06.
 
 ## Phase 1: Setup
 
-- [ ] T-A11-601 Baseline: cite the A11-P05 evidence on the unchanged tree (`.autonomy/checks/A11-P05.*` package, app and runner checks) instead of a rerun (owner ruling of 2026-11-14)
+- [ ] T-A11-601 Baseline: cite the A11-P05 evidence on the unchanged tree (`.autonomy/checks/A11-P05.{playground-ios27,app-unit,verify-27}.json`) instead of a rerun (owner ruling of 2026-11-14)
 
 ## Phase 2: User Story 1 — nothing leaves the device (P1) 🎯
 
@@ -22,16 +22,16 @@ stay open, as for A10-P06.
 
 ## Phase 4: User Story 3 — honest copy and a complete checklist (P1)
 
-- [ ] T-A11-606 [P] [US3] Write `docs/apps/physics-playground/{store-listing.md (text + claim → proving-test table; no measured or accuracy claim), release-checklist.md (Item | Area | Status | Evidence; statuses verified, pending-campaign-ii, owner-action; artifact inventory; accessibility rows per FR-A11-623), release.json (contracts/release-config.md)}`, link them from `docs/apps/physics-playground/README.md`, and add the A11 section to `docs/release/known-limitations.md` (frame pacing, thermals, touch latency, VoiceOver) (FR-A11-620, 622, 623)
-- [ ] T-A11-607 [US3] Write `specs/087-pp-p06-release/scan-claims-release.sh` (the accuracy words of Clarifications Q2 refused in the store text and the interface Swift after removing the two allowed denial phrases; every test name in the store-listing claim table found in `Packages/ExperiencesCreative/PhysicsPlayground`, `Packages/VisualCore`, `Packages/VisualCoreRendering` or `Apps/VisualCore/Tests`; exit 1 otherwise) and run (`--name release-docs -- /bin/sh -c "python3 scripts/release_check.py --only experience-release-a11 copy-claims-a11 && sh specs/087-pp-p06-release/scan-claims-release.sh"`) (FR-A11-620, 621; SC-A11-603)
+- [ ] T-A11-606 [P] [US3] Write `docs/apps/physics-playground/{store-listing.md (text + claim → proving-test table; no measured or accuracy claim), release-checklist.md (Item | Area | Status | Evidence; statuses verified, pending-campaign-ii, owner-action; artifact inventory; accessibility rows per FR-A11-623), release.json (contracts/release-config.md)}`, link them from `docs/apps/physics-playground/README.md`, and add the A11 section to `docs/release/known-limitations.md` (frame pacing, thermals, touch latency, VoiceOver; the numbers are an educational approximation) (FR-A11-620, 622, 623)
+- [ ] T-A11-607 [US3] Write `specs/087-pp-p06-release/scan-claims-release.sh` (the accuracy, safety, prediction and learning-outcome words of Clarifications Q2 refused in the store text and the interface Swift after removing the two allowed denial phrases; every test name in the store-listing claim table found in `Packages/ExperiencesCreative/PhysicsPlayground`, `Packages/VisualCore`, `Packages/VisualCoreRendering` or `Apps/VisualCore/Tests`; exit 1 otherwise) and run (`--name release-docs -- /bin/sh -c "python3 scripts/release_check.py --only experience-release-a11 copy-claims-a11 && sh specs/087-pp-p06-release/scan-claims-release.sh"`) (FR-A11-620, 621; SC-A11-603)
 
 ## Phase 5: User Story 4 — the playground works in the real app (P2)
 
-- [ ] T-A11-608 [P] [US4] Write `Apps/VisualCore/Tests/UI/PhysicsPlayground/{PPSupport,PPWorldUITests,PPExperimentUITests}.swift` (drop a body, pause, single step, time scale, open a preset, save and reopen an experiment, start a tutorial; native controls; modelled on `NASupport`) and add chunk `"s2"` (serial) to `scripts/release_check.py` (FR-A11-630)
+- [ ] T-A11-608 [P] [US4] Write `Apps/VisualCore/Tests/UI/PhysicsPlayground/{PPSupport,PPWorldUITests,PPExperimentUITests}.swift` (`PPWorldUITests`: drop a body, pause, single step, time scale; `PPExperimentUITests`: open a preset, force arrows, start a tutorial; native controls; modelled on `NASupport`) and add chunk `"s2"` (serial) to `scripts/release_check.py` (FR-A11-630)
 - [ ] T-A11-609 [US4] Physics Playground suites on sim-27.2 (`--name playground-ios27 -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing PhysicsPlaygroundCoreTests PhysicsPlaygroundExperienceTests`) (FR-A11-610–612, 632; SC-A11-602, 605)
 - [ ] T-A11-610 [US4] App build, unit and interface chunk (`xcodegen generate --spec project.yml` first, then `--name app-ui -- python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27 app-ui-ios27-s2`; each interface test < 60 s) (FR-A11-630; SC-A11-604)
 - [ ] T-A11-611 [US4] Runner iOS 27 (`--name verify-27 -- python3 scripts/verify_experiences.py --only a11.physics-playground --runtime 27`) (SC-A11-605)
-- [ ] T-A11-612 [US4] Release build checks (`--name release-checks -- python3 scripts/release_check.py --only app-release-build app-release-symbols app-privacy-manifest app-no-tracking app-licenses app-usage-descriptions`) (FR-A11-603, 631; SC-A11-601)
+- [ ] T-A11-612 [US4] Release build checks (`--name release-checks -- python3 scripts/release_check.py --only app-release-build app-release-symbols app-privacy-manifest app-no-tracking app-licenses app-usage-descriptions`) (FR-A11-601, 603, 631; SC-A11-601)
 
 ## Phase 6: Polish, owner and device items
 
