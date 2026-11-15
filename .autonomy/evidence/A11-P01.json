@@ -1,0 +1,80 @@
+{
+  "checks": [
+    {
+      "attestation": ".autonomy/checks/A11-P01.app-unit-2.json",
+      "command": "python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A11-P01.app-unit-2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A11-P01.app-unit.json",
+      "command": "python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A11-P01.app-unit.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A11-P01.catalog-host.json",
+      "command": "swift test --package-path Packages/VisualCore --filter RealCatalogTests",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A11-P01.catalog-host.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A11-P01.contract.json",
+      "command": "python3 scripts/check_app_contract.py --app physics-playground --render",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A11-P01.contract.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A11-P01.experience-packages.json",
+      "command": "python3 scripts/check_experience_packages.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A11-P01.experience-packages.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A11-P01.playground-ios27-1.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing PhysicsPlaygroundCoreTests PhysicsPlaygroundExperienceTests",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A11-P01.playground-ios27-1.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A11-P01.playground-ios27-2.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing PhysicsPlaygroundCoreTests PhysicsPlaygroundExperienceTests",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A11-P01.playground-ios27-2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A11-P01.playground-ios27.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing PhysicsPlaygroundCoreTests PhysicsPlaygroundExperienceTests",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A11-P01.playground-ios27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A11-P01.public-api.json",
+      "command": "python3 scripts/check_public_api.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A11-P01.public-api.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A11-P01.script-tests-2.json",
+      "command": "python3 scripts/test_scripts.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A11-P01.script-tests-2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A11-P01.verify-27-2.json",
+      "command": "python3 scripts/verify_experiences.py --only a11.physics-playground --runtime 27",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A11-P01.verify-27-2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A11-P01.visualcore-host.json",
+      "command": "swift test --package-path Packages/VisualCore --filter 'Contacts2DTests|ImpulseSolver2DTests'",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A11-P01.visualcore-host.log"
+    }
+  ],
+  "generated": "2026-11-15T06:43:30+00:00",
+  "method": "deterministic-run-check",
+  "stage": "A11-P01",
+  "status": "pass"
+}

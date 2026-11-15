@@ -2257,10 +2257,10 @@
    "implementation": {
     "state": "standalone-partial",
     "legacy_gates_passed": [
-     "A11-P00"
+     "A11-P00",
+     "A11-P01"
     ],
     "legacy_gates_pending": [
-     "A11-P01",
      "A11-P02",
      "A11-P03",
      "A11-P04",
