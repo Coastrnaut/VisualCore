@@ -623,6 +623,49 @@ orbs) — not a whole arcade collection, online leaderboard or user-generated le
 - **One phase at a time:** implement only one Spec Kit phase at a time (one ledger gate, ADR-0004), in order
   A10-P00 → A10-P06.
 
+### A11 Physics Playground (`a11.physics-playground`)
+
+Ratified from the app manual's constitution prompt (2026-11-15). Like A05–A10, it never had a standalone target: it
+is built directly as an experience of the one app. Its product goal is a deterministic 2D sandbox for gravity,
+collisions, springs and forces with explanatory overlays — in version 0.1 circles and boxes with rigid-body
+collision, constant gravity, springs and drag, spawn/grab/pin/delete gestures, pause, single step, time scale and
+reset, presets (pendulum, spring chain, stacked objects) and optional velocity and force overlays with a measured
+state panel — not a complete engineering simulation, a 3D soft-body or fluid solver, or a predictive tool.
+
+- **Consumer, not fork:** an experience of the VisualCore app and a VisualCore consumer, never a fork of
+  projectm-ios. It uses only audited VisualCore public APIs over the OpenGL ES → ANGLE → Metal integration. It MUST
+  NOT create its own EGL/ANGLE initialization path, a second renderer, or link ProjectM engine code.
+- **Reuse first (Principle II):** scenes, primitives, gestures, the seeded fixed-step clock and runner, `Collision2D`,
+  persistence, quality tiers and accessibility planning already in VisualCore are reused, not copied. New generic
+  machinery (for example a broad phase, polygon or box contacts, an impulse solver or spring integration) goes into
+  VisualCore with tests, docs, the API baseline and the reference regression when it is reusable; experiment content,
+  presets, copy and UI stay in the experience.
+- **Visuals are code:** bodies, springs, vectors, panels and backgrounds are procedural; no purchased, generated or
+  hand-made artwork, sprites, textures or recordings.
+- **Authoritative, GPU-free physics:** the world advances at a fixed step independent of the frame rate; forces,
+  collisions, constraints and integration are decided by the domain alone and MUST be testable without GPU access
+  through `swift test`; the same document and inputs give the same result, and drawing never changes the state.
+- **Stable and bounded:** body, contact and constraint counts, solver iterations, stiffness for the chosen step and
+  speeds are capped; non-finite values are rejected; an experiment that would become unstable is clamped or refused,
+  never allowed to explode.
+- **Offline-first and private:** no networking, accounts, analytics or ads; experiments are stored only on the device;
+  no permission beyond what a feature actually needs.
+- **Truthful claims:** results are labelled as educational approximations; no claims of physical accuracy, engineering
+  or safety prediction, or learning outcomes; performance or battery numbers only from device measurements.
+- **Bounded resources:** draw batches and per-step work are capped; quality tiers lower the load under heat and Low
+  Power Mode; context loss rebuilds everything from versioned CPU state; backgrounding pauses the simulation and never
+  fast-forwards it.
+- **Accessibility:** native SwiftUI controls with VoiceOver labels and Dynamic Type; the canvas has a spoken
+  description of the experiment; every gesture (spawn, grab, pin, delete, spring) has a control alternative; Reduce
+  Motion calms decorative motion without changing the physics.
+- **Licenses:** every bundled preset, palette and shader records its author and license; only original or
+  license-cleared content is bundled.
+- **Regression when VisualCore changes:** any VisualCore change made for this experience MUST be followed by the
+  ProjectM reference regression (at the experience's X gate per the owner ruling of 2026-11-14).
+- **Python only:** repository automation uses Python 3; there is no PowerShell dependency.
+- **One phase at a time:** implement only one Spec Kit phase at a time (one ledger gate, ADR-0004), in order
+  A11-P00 → A11-P06.
+
 ## Governance
 
 - Precedence: real Apple platform and toolchain behavior and observed test results → owner
@@ -651,5 +694,7 @@ orbs) — not a whole arcade collection, online leaderboard or user-generated le
   manual's constitution prompt at gate A09-P00 (feature 067); no principle changes.
 - Amendment 2.6.0 (2026-11-14, MINOR): App-Scoped Rules gain the A10 Neon Arcade subsection, ratified from its
   manual's constitution prompt at gate A10-P00 (feature 074); no principle changes.
+- Amendment 2.7.0 (2026-11-15, MINOR): App-Scoped Rules gain the A11 Physics Playground subsection, ratified
+  from its manual's constitution prompt at gate A11-P00 (feature 081); no principle changes.
 
-**Version**: 2.6.0 | **Ratified**: 2026-11-10 | **Last Amended**: 2026-11-14
+**Version**: 2.7.0 | **Ratified**: 2026-11-10 | **Last Amended**: 2026-11-15
