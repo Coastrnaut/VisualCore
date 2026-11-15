@@ -1,0 +1,18 @@
+# Contract: Digital Aquarium release configuration (`docs/apps/digital-aquarium/release.json`, schema 1)
+
+```json
+{
+  "schema": 1,
+  "experience": "a09.digital-aquarium",
+  "requiredDocs": ["docs/apps/digital-aquarium/privacy-and-credits.md", "docs/apps/digital-aquarium/store-listing.md",
+                   "docs/apps/digital-aquarium/release-checklist.md", "docs/apps/digital-aquarium/device-campaign.md",
+                   "docs/release/build-and-archive.md"],
+  "checklist": "docs/apps/digital-aquarium/release-checklist.md",
+  "copyCheck": {"text": ["docs/apps/digital-aquarium/store-listing.md"],
+                "swift": ["Packages/ExperiencesCreative/DigitalAquarium/Experience/AquariumControls.swift",
+                          "Packages/ExperiencesCreative/DigitalAquarium/Experience/AquariumPresenter.swift"],
+                "allow": []}
+}
+```
+
+`release_check.py` then provides the steps `experience-release-a09` and `copy-claims-a09`.
