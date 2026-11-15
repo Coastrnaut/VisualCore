@@ -15,6 +15,10 @@ fails beyond 10 points), `TapRecognizer` (0.3 s, 10 points), `DragRecognizer` (b
   centred scale (the letterbox outside the tank clamps to 0…1).
 - **Rationale**: the arbiter's one-owner rule forbids long-press-then-drag in one touch; drag-to-move is the common
   pattern. Pure mapping type (`AquariumGestures`) keeps it host-testable with synthetic events.
+- **Finding (implementation, 2026-11-14)**: `GestureArbiter` emits a continuous owner's `changed` only when its
+  recognizer's state changes, so a drag reports one `changed` and then nothing until it ends. `AquariumGestures`
+  therefore sends `decor.move` for every move of the held finger itself (app-local; VisualCore is unchanged in this
+  phase). Drag outcomes carry `[x, y, dx, dy]`; the hit test uses the touch-down point.
 - **Alternatives**: own recognizers in the presenter (duplicates shared code); double tap to remove (no native
   equivalent needed but adds a gesture without value).
 

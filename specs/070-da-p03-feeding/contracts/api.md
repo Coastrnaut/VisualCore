@@ -10,7 +10,7 @@ public enum Feeding {
     public static func canDrop(_ doc: HabitatDocument) -> Bool
     public static func drop(at point: Vec2, into doc: inout HabitatDocument) -> Bool   // false when refused
     public static func seekForce(for fish: FishAgent, food: [FoodPellet]) -> Vec2
-    public static func step(_ doc: inout HabitatDocument, catalog: SpeciesCatalog, dt: Double)  // sink, eat, floor
+    @discardableResult public static func step(_ doc: inout HabitatDocument, catalog: SpeciesCatalog, dt: Double) -> (eaten: Int, floored: Int)
 }
 public enum DecorEditing {
     public static func place(kindId: String, at point: Vec2, into doc: inout HabitatDocument) -> Bool
@@ -25,6 +25,9 @@ public enum DecorEditing {
 Actions (refusal codes in parentheses): `food.drop [0…1, 0…1]` (`a09.food-full`), `decor.kind [0…2]`
 (`a09.invalid-choice`), `decor.place [0…1, 0…1]` (`a09.decor-full`), `decor.move [0…11, 0…1, 0…1]`
 (`a09.no-such-decor`, `a09.invalid-choice`), `decor.remove [0…11]` (`a09.no-such-decor`, `a09.invalid-choice`).
-`AquariumGestures` (main actor): `init(viewSize:)`, `mutating func handle(_ event: PointerEvent, document:
-HabitatDocument, viewSize: Vec2) -> [(control: String, values: [Double])]`, `reset()`. Presenter `gestureActions =
+`AquariumGestures` (value type, internal): `init()`, `mutating func handle(_ event: PointerEvent, document:
+HabitatDocument, catalog: SpeciesCatalog, viewSize: Vec2) -> [(control: String, values: [Double])]` (the catalog gives
+the decor sizes for the hit test), `reset()`; it also tracks a second finger itself (the one-pointer declarations never
+see it) and then sends nothing until every finger lifts. Drag outcomes carry `[x, y, dx, dy]`; the hit test uses the
+touch-down point `(x − dx, y − dy)`. Presenter `gestureActions =
 {food.drop, decor.place, decor.move}`, `nativeActions` ⊇ all five. Snapshot schema 3; `schemaTwoExample()`.
