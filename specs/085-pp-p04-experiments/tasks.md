@@ -21,7 +21,7 @@ after every task (no trailers); read every check's exit before ticking. iOS 27 o
 
 ## Phase 4: Polish & evidence
 
-- [ ] T-A11-406 Playground tests on sim-27.2 (`--name playground-ios27 -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing PhysicsPlaygroundCoreTests PhysicsPlaygroundExperienceTests`; each test < 10 s) (SC-A11-405)
+- [X] T-A11-406 Playground tests on sim-27.2 (`--name playground-ios27 -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing PhysicsPlaygroundCoreTests PhysicsPlaygroundExperienceTests`; each test < 10 s) (SC-A11-405) — Verified 2026-11-15: 2026-11-15: .autonomy/checks/A11-P04.playground-ios27.json exit 0 (93 core, 82 experience, 7 manifest tests on sim-27.2, slowest 4.6 s)
 - [ ] T-A11-407 App build and unit (`--name app-unit -- python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27`) and runner iOS 27 (`--name verify-27 -- python3 scripts/verify_experiences.py --only a11.physics-playground --runtime 27`)
 - [ ] T-A11-408 Experience package check, contract and script tests (`--name experience-packages -- python3 scripts/check_experience_packages.py`; `--name contract -- python3 scripts/check_app_contract.py --app physics-playground --render`; `--name script-tests -- python3 scripts/test_scripts.py`)
 - [ ] T-A11-409 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A11-P04; update README.md (status, gate count) in the record commit (rule 16)
