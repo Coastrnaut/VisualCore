@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "/bin/sh",
+    "-c",
+    "swift test --package-path Packages/VisualCore --filter 'RealCatalogTests|RegistryReportTests|ShellModelTests'"
+  ],
+  "command": "/bin/sh -c 'swift test --package-path Packages/VisualCore --filter '\"'\"'RealCatalogTests|RegistryReportTests|ShellModelTests'\"'\"''",
+  "elapsed_seconds": 4.016,
+  "exit_code": 0,
+  "finished": "2026-11-15T15:24:56+00:00",
+  "log": ".autonomy/logs/A12-P03.catalog-host.log",
+  "log_sha256": "bb455f5d29f329ad8529c9efa7fd87aee3f5d979c2d5246d2ba5f82a5f2151ed",
+  "name": "catalog-host",
+  "stage": "A12-P03",
+  "started": "2026-11-15T15:24:52+00:00",
+  "timed_out": false
+}
