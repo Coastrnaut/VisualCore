@@ -155,6 +155,14 @@ making the angle of incidence equal the angle of reflection. Used by Light Maze 
 multiplied into the draw colour before lighting (also through `DepthMeshPass`); without colours the attribute is a
 constant 1, so existing pixels are unchanged; a wrong count or a value that is non-finite or outside 0…1 is refused
 with `MeshError.invalidInput`; the stream is rebuilt after a context recreation. Used by Tiny Worlds (A12).
+**Kepler orbits** (`VisualCoreMath`, feature 104): `KeplerOrbit(semiMajorAxis:eccentricity:inclination:ascendingNode:
+argumentOfPeriapsis:meanAnomalyAtEpoch:meanMotion:)` (radians and radians per time unit; nil for a non-finite value,
+e outside 0 ≤ e < 1, or a non-positive axis or mean motion) propagates an elliptical two-body orbit approximately:
+`meanAnomaly(at:)` is M₀ + n·t normalised to (−π, π]; `eccentricAnomaly(meanAnomaly:eccentricity:)` solves Kepler's
+equation by Newton's method from E₀ = M (e < 0.8) or π, at most 32 steps, stopping below 1e-12 rad (residual below
+1e-10 for e up to 0.95); `position(at:)` returns the position in the reference frame (x toward the reference
+direction, z toward the plane's north) after rotating by ω, i and Ω, in the axis's unit, always finite (a non-finite
+time is the epoch); `period` is 2π/n. No secular rates or perturbations. Used by Solar System Explorer (A14).
 
 **CPU field references** (`VisualCoreSimulation`, feature 019): a `FieldGrid` is a W×H grid with 1…4 channels,
 row-major from the bottom row up, as in GL. `StoragePrecision` (`float32`, `float16`, `float16TowardZero`, `unorm8`) rounds values the

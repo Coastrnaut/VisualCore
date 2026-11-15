@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_documented_api.py",
+    "--sources",
+    "Packages/ExperiencesCreative/SolarSystemExplorer"
+  ],
+  "command": "python3 scripts/check_documented_api.py --sources Packages/ExperiencesCreative/SolarSystemExplorer",
+  "elapsed_seconds": 0.494,
+  "exit_code": 0,
+  "finished": "2026-11-15T20:41:44+00:00",
+  "log": ".autonomy/logs/A14-P02.visualcore-docs-2.log",
+  "log_sha256": "6fbfdeea6c47cacdec8685d3cab59891905fead114c14afd987742b3d4fced04",
+  "name": "visualcore-docs-2",
+  "stage": "A14-P02",
+  "started": "2026-11-15T20:41:43+00:00",
+  "timed_out": false
+}

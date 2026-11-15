@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_documented_api.py"
+  ],
+  "command": "python3 scripts/check_documented_api.py",
+  "elapsed_seconds": 0.031,
+  "exit_code": 2,
+  "finished": "2026-11-15T20:41:32+00:00",
+  "log": ".autonomy/logs/A14-P02.visualcore-docs.log",
+  "log_sha256": "7c60f040566e944306aef8fe9a5746e7e50b6300e3e8781b6b5eb1550ada8c44",
+  "name": "visualcore-docs",
+  "stage": "A14-P02",
+  "started": "2026-11-15T20:41:32+00:00",
+  "timed_out": false
+}
