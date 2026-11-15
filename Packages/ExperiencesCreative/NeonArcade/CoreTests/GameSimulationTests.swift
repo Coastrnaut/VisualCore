@@ -9,6 +9,11 @@
 // one step is caught by the swept test; capsules hit by end-of-step overlap and the capsule speed bound holds for the
 // catalog; objects below y −1 are removed; game over and pause stop the run; the score stops at 9,999,999; a
 // non-finite steering value is ignored.
+// A10-P02 (feature 076, T-A10-202; FR-A10-201, 203, 205; SC-A10-201, 202): spawning goes through the wave director,
+// so the first object still comes at step 30 at a lane centre; the bounded run also checks every spawn against its
+// wave's difficulty (speed range, orb value × multiplier) and lane centres, and the 70 % hazard share for `rain`; the
+// cap check starts at wave step 30; the capsule bound is checked at the difficulty ceiling (fall ≤ 5); survival adds
+// 1 point per 60 played steps (not paused or over); an orb spawned in a later wave is worth its value × multiplier.
 import Foundation
 import Testing
 import VisualCoreMath
@@ -56,10 +61,15 @@ import NeonArcadeCore
             #expect(game.objects.isEmpty && game.nextObjectId == 0)
             advance(&game, &random, steps: 1)
             #expect(game.objects.count == 1 && game.nextObjectId == 1, "seed \(seed)")
+            #expect(Lanes.centres.contains(game.objects.first?.position.x ?? -1))
             advance(&game, &random, steps: 89)   // 120 steps = 2 s
             #expect(game.nextObjectId >= 2)
         }
-        #expect(GameSimulation.isSpawnStep(30) && GameSimulation.isSpawnStep(70) && !GameSimulation.isSpawnStep(50))
+        #expect(WaveDirector.spawnIndex(waveStep: 30, every: 40) == 0)
+        #expect(WaveDirector.spawnIndex(waveStep: 70, every: 40) == 1)
+        #expect(WaveDirector.spawnIndex(waveStep: 50, every: 40) == nil)
+        #expect(WaveDirector.spawnIndex(waveStep: 29, every: 40) == nil)
+        #expect(Difficulty(wave: 1).spawnGap == 40)
     }
 
     @Test func steeringEasesTheVelocityAndMovesThePlayer() {
@@ -89,7 +99,8 @@ import NeonArcadeCore
 
     @Test func thePlayerStaysInsideAndObjectsStayBoundedOver10000StepsAnd20Seeds() {
         // Violations are counted and checked once at the end, so the 200,000 steps stay fast.
-        var spawned = 0, hazards = 0, playerOutside = 0, tooFast = 0, tooMany = 0, badSpawns = 0, invalid = 0
+        var spawned = 0, hazards = 0, rainSpawned = 0, rainHazards = 0
+        var playerOutside = 0, tooFast = 0, tooMany = 0, badSpawns = 0, invalid = 0
         var maxObjects = 0, runsOver = 0
         for seed in UInt64(100)..<120 {
             var game = GameRun.new()
@@ -98,6 +109,7 @@ import NeonArcadeCore
             for i in 0..<10_000 {
                 if i % 37 == 0 { GameSimulation.steer(&game, value: steering.range(-1.5...1.5)) }
                 let firstNew = game.nextObjectId
+                let difficulty = Difficulty(wave: game.wave), isRain = game.patternId == "rain"
                 GameSimulation.advance(&game, catalog: catalog, random: &random)
                 if game.player.x < 0.5 || game.player.x > 8.5 || !game.player.x.isFinite { playerOutside += 1 }
                 if !(abs(game.player.velocity) <= 9) { tooFast += 1 }
@@ -106,13 +118,19 @@ import NeonArcadeCore
                 for object in game.objects where object.id >= firstNew {
                     spawned += 1
                     if object.kind == .hazard { hazards += 1 }
+                    if isRain { rainSpawned += 1; if object.kind == .hazard { rainHazards += 1 } }
                     guard let item = catalog.item(id: object.contentId),
-                          (0.5...8.5).contains(object.position.x),
-                          (3.0...5.0).contains(-object.velocity.y), object.velocity.x == 0,
+                          Lanes.centres.contains(object.position.x),
+                          // Spawned this step, so moved once.
+                          abs(object.position.y - GameSimulation.spawnY - object.velocity.y * GameSimulation.step)
+                              < 1e-9,
+                          difficulty.fallSpeed.contains(-object.velocity.y), (3.0...5.0).contains(-object.velocity.y),
+                          object.velocity.x == 0,
                           item.radiusRange.closed.contains(object.radius),
                           object.isCapsule == (item.shape == .bar),
                           item.halfLengthRange.map({ $0.closed.contains(object.halfLength) }) ?? true,
-                          object.value == (object.kind == .orb ? item.value : 0) else { badSpawns += 1; continue }
+                          object.value == (object.kind == .orb ? item.value * difficulty.orbMultiplier : 0)
+                    else { badSpawns += 1; continue }
                 }
                 if game.over {
                     runsOver += 1
@@ -122,12 +140,13 @@ import NeonArcadeCore
             }
             if !game.validate().isEmpty { invalid += 1 }
         }
-        #expect(playerOutside == 0 && tooFast == 0 && tooMany == 0 && badSpawns == 0 && invalid == 0)
+        #expect(playerOutside == 0 && tooFast == 0 && tooMany == 0 && badSpawns == 0 && invalid == 0,
+                "\(playerOutside) \(tooFast) \(tooMany) \(badSpawns) \(invalid)")
         #expect(maxObjects > 0 && maxObjects <= 24)
         #expect(runsOver > 0)
-        #expect(spawned > 4000)
-        let share = Double(hazards) / Double(spawned)
-        #expect(share > 0.65 && share < 0.75, "hazard share \(share)")
+        #expect(spawned > 4000 && hazards > 0)
+        let share = Double(rainHazards) / Double(rainSpawned)
+        #expect(rainSpawned > 1000 && share > 0.65 && share < 0.75, "rain hazard share \(share)")
     }
 
     @Test func aSpawnAtTheCapIsSkippedWithTheSameGeneratorUse() {
@@ -135,9 +154,9 @@ import NeonArcadeCore
                                                position: Vec2(0.5 + Double($0) * 0.3, 15), velocity: .zero,
                                                radius: 0.35) }
         var capped = run(with: full)
-        capped.step = 30
+        capped.waveStep = 30
         var open = GameRun.new()
-        open.step = 30
+        open.waveStep = 30
         var randomA = SeededRandom(seed: 44), randomB = SeededRandom(seed: 44)
         GameSimulation.advance(&capped, catalog: catalog, random: &randomA)
         GameSimulation.advance(&open, catalog: catalog, random: &randomB)
@@ -220,9 +239,11 @@ import NeonArcadeCore
         #expect(game.lives == 3 && game.events.isEmpty && game.objects.count == 1)
     }
 
-    @Test func theCapsuleSpeedBoundHoldsForTheCatalog() throws {
-        let maxFallPerStep = GameSimulation.fallSpeedRange.upperBound * GameSimulation.step
-        #expect(GameSimulation.fallSpeedRange.upperBound <= 5)
+    @Test func theCapsuleSpeedBoundHoldsForTheCatalogAtTheDifficultyCeiling() throws {
+        let ceiling = Difficulty.ceiling.fallSpeed.upperBound
+        for wave in 1...40 { #expect(Difficulty(wave: wave).fallSpeed.upperBound <= ceiling) }
+        let maxFallPerStep = ceiling * GameSimulation.step
+        #expect(ceiling <= 5 && GameSimulation.fallSpeedRange.upperBound <= 5)
         for item in catalog.items where item.shape == .bar {
             #expect(maxFallPerStep < item.radiusRange.min + PlayerState.hitRadius, "\(item.id)")
             #expect(item.radiusRange.min + PlayerState.hitRadius >= 0.6)
@@ -288,5 +309,44 @@ import NeonArcadeCore
         #expect(game.steering == 1)
         GameSimulation.steer(&game, value: -2)
         #expect(game.steering == -1)
+    }
+
+    @Test func survivalAddsOnePointPerSecondOfPlayOnly() {
+        let empty = ArcadeCatalog(items: [])
+        var game = GameRun.new()
+        var random = SeededRandom(seed: 2)
+        advance(&game, &random, steps: 59, catalog: empty)
+        #expect(game.score == 0)
+        advance(&game, &random, steps: 1, catalog: empty)
+        #expect(game.score == 1)
+        advance(&game, &random, steps: 540, catalog: empty)
+        #expect(game.score == 10 && game.step == 600 && game.wave == 2)
+        game.paused = true
+        advance(&game, &random, steps: 600, catalog: empty)
+        #expect(game.score == 10 && game.step == 600)
+        game.paused = false
+        game.lives = 0; game.over = true
+        advance(&game, &random, steps: 600, catalog: empty)
+        #expect(game.score == 10 && game.step == 600)
+        game.lives = 1; game.over = false; game.score = 9_999_999
+        advance(&game, &random, steps: 60, catalog: empty)
+        #expect(game.score == 9_999_999 && game.validate().isEmpty)
+    }
+
+    @Test func anOrbInALaterWaveIsWorthItsValueTimesTheMultiplier() {
+        var game = GameRun.new()
+        game.wave = 5; game.patternId = "orb-trail"; game.patternCursor = 2
+        var random = SeededRandom(seed: 6)
+        advance(&game, &random, steps: 31)
+        let orb = game.objects.first { $0.kind == .orb }
+        #expect(game.objects.count == 1)
+        #expect(Difficulty(wave: 5).orbMultiplier == 3)
+        #expect(orb?.value == 30 && orb?.position.x == Lanes.centre(2))
+        // Collected: the score rises by 30 (the survival point at step 60 is not reached).
+        var pickup = run(with: [FallingObject(id: 0, contentId: "glow-orb", kind: .orb, position: Vec2(4.5, 1.6),
+                                              velocity: Vec2(0, -4), radius: 0.25, value: orb?.value ?? 0)])
+        pickup.wave = 5
+        advance(&pickup, &random, steps: 1)
+        #expect(pickup.score == 30 && pickup.events.map(\.kind) == [.pickup])
     }
 }

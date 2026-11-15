@@ -2,6 +2,8 @@
 // audit, host-free and short: one row per catalog item with role, id, name, author and license and none missing an
 // author or license; no problems for the bundled catalog; a missing author, a missing license and an unsupported
 // license are each named; the Markdown document has the title, the table header and every item, and is deterministic.
+// A10-P02 (feature 076, T-A10-202; FR-A10-222): the four spawn patterns follow the items as rows with role `pattern`,
+// author "VisualCore project" and license "MIT"; a pattern's broken record is named like an item's.
 import Foundation
 import Testing
 import NeonArcadeCore
@@ -11,9 +13,11 @@ import NeonArcadeCore
 
     @Test func everyItemHasOneRowWithAuthorAndLicense() {
         let rows = LicenseAudit.rows(catalog)
-        #expect(rows.count == catalog.items.count)
-        #expect(rows.map(\.id) == catalog.items.map(\.id))
-        #expect(rows.map(\.role) == [.player, .hazard, .hazard, .orb])
+        #expect(rows.count == catalog.items.count + PatternTable.bundled.count)
+        #expect(rows.map(\.id) == catalog.items.map(\.id) + ["rain", "wall", "zigzag", "orb-trail"])
+        #expect(rows.map(\.role) == [.player, .hazard, .hazard, .orb, .pattern, .pattern, .pattern, .pattern])
+        #expect(rows.filter { $0.role == .pattern }.map(\.name) == ["Rain", "Wall", "Zigzag", "Orb trail"])
+        #expect(LicenseAudit.rows(catalog, patterns: []).count == catalog.items.count)
         #expect(rows.allSatisfy { !$0.author.isEmpty && !$0.license.isEmpty })
         #expect(rows.allSatisfy { $0.author == "VisualCore project" && $0.license == "MIT" })
     }
@@ -31,6 +35,12 @@ import NeonArcadeCore
                                                   "hazard spike-ball: missing-license",
                                                   "orb glow-orb: unsupported-license"])
         #expect(LicenseAudit.markdown(broken).contains("3 problems."))
+        var patterns = PatternTable.bundled
+        patterns[1].license = "CC-BY-4.0"
+        patterns[2].author = ""
+        #expect(LicenseAudit.problems(catalog, patterns: patterns) == ["pattern wall: unsupported-license",
+                                                                       "pattern zigzag: missing-license"])
+        #expect(LicenseAudit.markdown(catalog, patterns: patterns).contains("2 problems."))
     }
 
     @Test func theMarkdownListsEveryItemDeterministically() {
@@ -41,7 +51,10 @@ import NeonArcadeCore
             #expect(text.contains("| \(row.role.rawValue) | \(row.id) | \(row.name) | VisualCore project | MIT |"))
         }
         #expect(text.contains("| hazard | bar | Bar | VisualCore project | MIT |"))
-        #expect(text.contains("4 items (1 player, 2 hazards, 1 orb); 0 problems."))
+        #expect(text.contains("| pattern | wall | Wall | VisualCore project | MIT |"))
+        #expect(text.contains("| pattern | orb-trail | Orb trail | VisualCore project | MIT |"))
+        #expect(text.contains("PatternTable.bundled"))
+        #expect(text.contains("8 entries (1 player, 2 hazards, 1 orb, 4 patterns); 0 problems."))
         #expect(text.hasSuffix("\n") && !text.contains("\r"))
         #expect(LicenseAudit.markdown(catalog) == text)
     }

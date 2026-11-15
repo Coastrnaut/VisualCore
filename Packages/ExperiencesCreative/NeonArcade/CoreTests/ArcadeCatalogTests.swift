@@ -3,7 +3,8 @@
 // and `bar`, orb `glow-orb` worth 10) with their size ranges inside the limits and author and license on every item;
 // the sorted-key JSON round trip; a malformed JSON fixture with one item per refusal reason (missing-license,
 // unsupported-license, unknown-shape, invalid-number), each refused by name while every valid item is kept; the checks
-// on hand-built items; unreadable JSON refused as a whole.
+// on hand-built items; unreadable JSON refused as a whole. A10-P02 (feature 076, T-A10-202): the role `pattern` exists
+// for license rows only; no bundled item has it and a catalog item claiming it is refused as unknown-shape.
 import Foundation
 import Testing
 import NeonArcadeCore
@@ -124,6 +125,21 @@ import NeonArcadeCore
         #expect(ArcadeCatalog.check(bar) == .invalidNumber)
         var orb = catalog.items[3]; orb.value = 0
         #expect(ArcadeCatalog.check(orb) == .invalidNumber)
+    }
+
+    @Test func thePatternRoleIsForLicenseRowsOnly() {
+        #expect(ContentRole.allCases.map(\.rawValue) == ["player", "hazard", "orb", "pattern"])
+        #expect(!catalog.items.contains { $0.role == .pattern })
+        #expect(!ContentShape.allCases.contains { $0.role == .pattern })
+        var item = catalog.items[1]; item.role = .pattern
+        #expect(ArcadeCatalog.check(item) == .unknownShape)
+        let text = """
+        {"items": [{"id": "wall", "name": "Wall", "role": "pattern", "shape": "spike-ball",
+          "color": {"r": 1, "g": 1, "b": 1, "a": 1}, "glowColor": {"r": 1, "g": 1, "b": 1, "a": 1},
+          "radiusRange": {"min": 0.5, "max": 0.5}, "value": 0, "author": "VisualCore project", "license": "MIT"}]}
+        """
+        let (decoded, refused) = ArcadeCatalog.decode(Data(text.utf8))
+        #expect(decoded.items.isEmpty && refused == [CatalogRefusal(id: "wall", error: .unknownShape)])
     }
 
     @Test func unreadableJSONIsRefusedAsAWhole() {

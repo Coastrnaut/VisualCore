@@ -69,6 +69,9 @@ public enum ContentRole: String, Codable, CaseIterable, Sendable {
     case hazard
     /// A falling object that adds its value to the score on contact.
     case orb
+    /// A spawn pattern of the wave director (license audit rows only; no catalog item has this role, so a catalog
+    /// item claiming it is refused as `unknown-shape`).
+    case pattern
 }
 
 /// The form a catalog item is drawn and collided as.

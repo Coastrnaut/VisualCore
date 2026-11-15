@@ -2,7 +2,9 @@
 // host-free and short: a replay is a seed plus a list of (step, steering value) entries; playing 12 recorded steering
 // inputs over 1,200 steps twice gives the identical run (score, lives, event count and the events themselves); saving
 // the run as JSON with the generator state halfway and restoring both continues to the same run; another seed gives a
-// different run; events keep the last 256 while the event count keeps the total.
+// different run; events keep the last 256 while the event count keeps the total. A10-P02 (feature 076, T-A10-202;
+// FR-A10-211; SC-A10-205): over 2,400 steps (waves 1–4, the player kept invulnerable so the run lasts) two plays give
+// the same wave and pattern sequence, score and events.
 import Foundation
 import Testing
 import VisualCoreMath
@@ -71,11 +73,36 @@ import NeonArcadeCore
             game.objects = [FallingObject(id: i, contentId: "glow-orb", kind: .orb, position: Vec2(4.5, 1.5),
                                           velocity: Vec2(0, -4), radius: 0.25, value: 10)]
             game.nextObjectId = i + 1
-            game.step = 0   // stay before the first spawn step
+            game.step = 0       // no survival point
+            game.waveStep = 0   // stay before the wave's first spawn step
             GameSimulation.advance(&game, catalog: catalog, random: &random)
         }
         #expect(game.eventCount == 300 && game.events.count == 256)
         #expect(game.events.first?.objectId == 44 && game.events.last?.objectId == 299)
         #expect(game.score == 3000)
+    }
+
+    @Test func replayingSeveralWavesGivesTheSameWavesPatternsScoreAndEvents() {
+        func play(_ seed: UInt64) -> (GameRun, [String]) {
+            var run = GameRun.new()
+            var random = SeededRandom(seed: seed)
+            var waves: [String] = []
+            for step in 0..<2400 {
+                for input in Self.inputs where input.step == step % 1200 {
+                    GameSimulation.steer(&run, value: input.value)
+                }
+                run.player.invulnerableSteps = max(run.player.invulnerableSteps, 1)   // keeps the run going
+                GameSimulation.advance(&run, catalog: catalog, random: &random)
+                if waves.last != "\(run.wave) \(run.patternId)" { waves.append("\(run.wave) \(run.patternId)") }
+            }
+            return (run, waves)
+        }
+        for seed: UInt64 in [7, 2026] {
+            let (a, wavesA) = play(seed)
+            let (b, wavesB) = play(seed)
+            #expect(a == b && wavesA == wavesB)
+            #expect(a.wave == 5 && a.waveStep == 0 && wavesA.count == 5 && wavesA.first == "1 rain")
+            #expect(a.score >= 40 && a.validate().isEmpty)
+        }
     }
 }
