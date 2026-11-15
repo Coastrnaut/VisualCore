@@ -3219,7 +3219,8 @@ class PromptCoverageTests(unittest.TestCase):
             next(f for f in index["features"] if f["id"] == "R02-F01")["prompts"].clear()  # superseded: never walked
 
         def empty_phase_stage(manifest):
-            entry = next(f for f in manifest["features"] if f["gate"] == "A10-P03")
+            # A gate that stays pending for long (a passed gate's prompts are not walked; A10-P03 passed 2026-11-14).
+            entry = next(f for f in manifest["features"] if f["gate"] == "A25-P03")
             next(c for c in entry["commands"] if c["command"] == "speckit-tasks")["prompt"] = "  "
             manifest["features"] = [f for f in manifest["features"] if f["gate"] != "A11-P00"]
 
@@ -3232,7 +3233,7 @@ class PromptCoverageTests(unittest.TestCase):
         self.assertEqual(prompts, 8 * features - len(problems))
         self.assertEqual(len(problems), 1 + 1 + 8 + 8)
         self.assertTrue(any(p.startswith("R03-G05-07 plan: ") for p in problems), problems[:4])
-        self.assertTrue(any(p.startswith("A10-P03 tasks: ") for p in problems))
+        self.assertTrue(any(p.startswith("A25-P03 tasks: ") for p in problems))
         for stage in planidx.STAGES:
             self.assertTrue(any(p.startswith(f"A11-P00 {stage}: ") for p in problems), stage)
             self.assertTrue(any(p.startswith(f"UA-F13 {stage}: ") for p in problems), stage)
