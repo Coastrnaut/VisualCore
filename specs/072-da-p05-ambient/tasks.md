@@ -36,7 +36,7 @@ measurements are planned here and run in the device campaign (the {device} task 
 - [X] T-A09-512 Experience package check (`python3 Tools/python/desktop_runbook.py run-check --stage A09-P05 --timeout 600 --name experience-packages -- python3 scripts/check_experience_packages.py`) — Verified 2026-11-14: 2026-11-14: .autonomy/checks/A09-P05.experience-packages.json exit 0
 - [X] T-A09-513 Contract G-AMBIENT closed by "A09-P05" (M15 available; M14, M16 notes) in `docs/apps/digital-aquarium/visualcore-contract.json` and `python3 Tools/python/desktop_runbook.py run-check --stage A09-P05 --timeout 600 --name contract -- python3 scripts/check_app_contract.py --app digital-aquarium --render` — Verified 2026-11-14: 2026-11-14: G-AMBIENT closed by A09-P05; M15 available; M14 and M16 notes (.autonomy/checks/A09-P05.contract.json exit 0)
 - [X] T-A09-514 Script tests (`python3 Tools/python/desktop_runbook.py run-check --stage A09-P05 --timeout 600 --name script-tests -- python3 scripts/test_scripts.py`) — Verified 2026-11-14: 2026-11-14: .autonomy/checks/A09-P05.script-tests.json exit 0
-- [ ] T-A09-515 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A09-P05; update README.md (status, gate count) in the record commit (rule 16)
+- [X] T-A09-515 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A09-P05; update README.md (status, gate count) in the record commit (rule 16) — Verified 2026-11-14: 2026-11-14: /speckit-converge appended T-A09-516 (quickstart wording), implemented; second converge appended nothing
 
 ## Dependencies
 
