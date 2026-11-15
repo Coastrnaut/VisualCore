@@ -192,7 +192,8 @@ generated document that a test keeps equal to the catalog.
 
 - **FR-A12-120**: The experience MUST draw the current world lit, with depth, through the one host's drawing path and an
   orbit camera within limits, and rebuild its GPU objects after context loss; drawing MUST NOT change the world.
-- **FR-A12-121**: Native controls MUST choose the preset, make a new seed, turn and tilt the view and reset it, each
+- **FR-A12-121**: Native controls MUST choose the preset, make a new seed, turn, tilt and zoom the view and reset
+  it, each
   with a VoiceOver label and value; the canvas MUST have a spoken description (world, seed, view).
 - **FR-A12-122**: The experience MUST be registered as a candidate with a scenario manifest (standard scenarios and
   fixtures), saved and restored through its state schema 1, with damaged or newer payloads refused.
@@ -208,8 +209,8 @@ generated document that a test keeps equal to the catalog.
 
 ### Measurable Outcomes
 
-- **SC-A12-101**: 100 % of the 9 fixture worlds (3 presets × 3 seeds) reproduce their committed digests; 0 of 9
-  seed pairs per preset collide.
+- **SC-A12-101**: 100 % of the 9 fixture worlds (3 presets × 3 seeds) reproduce their committed digests; 0 of the 3 seed
+  pairs per preset collide.
 - **SC-A12-102**: Shared edges of adjacent field pieces match exactly in height and normal (0 mismatches over the
   tested edges).
 - **SC-A12-103**: Every preset draws a non-blank lit frame on the iOS 27 simulator; turning the view changes the frame
