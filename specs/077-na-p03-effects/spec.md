@@ -128,6 +128,9 @@ between two steps.
 - **Sound when the device is silenced or another app plays audio:** effects follow the system's silent switch and mix
   with other audio; no permission is ever requested.
 - **An audio interruption (call, alarm) or backgrounding:** playback stops; nothing is queued for later.
+- **Leaving the app while playing:** the game moves to the paused screen (a recorded `run.pause` sent when the
+  experience is suspended), so returning shows the paused screen and nothing advanced (constitution A10: backgrounding
+  pauses the game and never fast-forwards it).
 - **Many events in one step:** at most a fixed number of sounds and particle bursts start per step; extra ones are
   dropped, never delayed.
 - **Pausing during a burst:** effects freeze with the game; they never advance while paused.
