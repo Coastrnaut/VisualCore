@@ -493,7 +493,7 @@
       "id": "M10",
       "capability": "Tap-to-feed and decoration placement: a tap drops food that sinks and is eaten (fish seek the nearest pellet), decor is placed, moved and removed within tank bounds by long-press and drag with hit testing and a bounded count",
       "source": "v0.1 feature 03; manual P03 editing, feeding and save system",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCore/Sources/VisualCoreScenes/GestureRecognizers.swift",
@@ -527,10 +527,10 @@
         }
       ],
       "example": {
-        "file": "Packages/ExperiencesCreative/InfiniteGeometry/Experience/GeometryPresenter.swift",
-        "symbol": "GeometryPresenter"
+        "file": "Packages/ExperiencesCreative/DigitalAquarium/Experience/AquariumGestures.swift",
+        "symbol": "AquariumGestures"
       },
-      "notes": "Gestures, hit testing and view-to-world conversion exist and are tested; food pellets, seeking and the placement rules are experience domain over the shared gestures. G-FEEDPLACE (app-local), A09-P03."
+      "notes": "Gestures, hit testing and view-to-world conversion exist and are tested; food pellets, seeking and the placement rules are experience domain over the shared gestures. G-FEEDPLACE (app-local), A09-P03. Built in A09-P03 (app-local): Feeding drops three pellets per tap (at most 12), sinks them at 0.5 units/s, lets fish seek the nearest pellet within 4 units and eat it, and removes the rest at the floor; DecorEditing places, moves and removes decor inside the tank with at most 12 pieces; AquariumGestures routes tap → feed, long press → place and a drag on a piece → move through GestureArbiter, and every gesture action has a native control (FeedingTests, DecorEditingTests, AquariumGestureTests, AquariumRenderTests). The arbiter reports a drag's changed phase once, so the aquarium sends a move for every later finger movement itself."
     },
     {
       "id": "M11",
@@ -951,7 +951,7 @@
       "justification": "Feeding and decoration placement are the aquarium's interaction model over the shared gestures, hit testing and view-to-world mapping.",
       "phase": 3,
       "test": "Host tests: a tap drops a bounded number of pellets that sink and are removed when eaten or at the floor; fish seek the nearest pellet within range; decor is placed, moved and removed only inside tank bounds with a bounded count; gesture conflicts resolve through GestureArbiter",
-      "closed": null
+      "closed": "A09-P03"
     },
     {
       "id": "G-WATERFX",
