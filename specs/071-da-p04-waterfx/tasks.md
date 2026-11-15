@@ -27,7 +27,7 @@
 ## Phase 6: User Story 4 — damaged or unknown content (P2)
 
 - [X] T-A09-406 [P] [US4] `CoreTests/UnknownContentTests.swift` (malformed catalogs refused with named reasons: unknown species reference, unsupported fish, plant and decor shapes, unknown decor in a habitat, vent outside the tank; documents with unknown species, plant or decor refused by validation) and a session test in `ExperienceTests/AquariumSessionTests.swift` restoring a snapshot that names an unknown species and an unknown decor kind (refused, `lastRestoreRefusal` set, the Reef opens) (FR-A09-430; SC-A09-406) — Verified 2026-11-14: 2026-11-14: UnknownContentTests (catalog refusals with named reasons; documents with unknown kinds refused) pass on sim-27.2; AquariumSessionTests unknown-content restore refused and the Reef opens
-- [ ] T-A09-407 [US4] Manifest fixture 11 (Reef, 600 steps) in `Experience/Adapter/AquariumManifest.swift`, regenerate `scenario-manifest.json`, update `ExperienceTests/AquariumManifestTests.swift` (eleven fixtures; at fixture 11's final step `WaterEffects.bubbles` for the Reef's vents has at most 48 bubbles, all between the vents and the surface) (FR-A09-431; SC-A09-402)
+- [X] T-A09-407 [US4] Manifest fixture 11 (Reef, 600 steps) in `Experience/Adapter/AquariumManifest.swift`, regenerate `scenario-manifest.json`, update `ExperienceTests/AquariumManifestTests.swift` (eleven fixtures; at fixture 11's final step `WaterEffects.bubbles` for the Reef's vents has at most 48 bubbles, all between the vents and the surface) (FR-A09-431; SC-A09-402) — Verified 2026-11-14: 2026-11-14: fixture 11 (Reef, 600 steps), manifest regenerated; AquariumManifestTests 4 tests pass on sim-27.2 (eleven fixtures; fixture 11 bubbles within the caps)
 
 ## Phase 7: Polish & evidence
 

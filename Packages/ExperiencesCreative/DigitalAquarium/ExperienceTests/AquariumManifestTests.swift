@@ -1,7 +1,8 @@
 // AquariumManifestTests — feature 068 (A09-P01) T-A09-105 (FR-A09-122; SC-A09-105); fixtures 6 and 7 feature 069
-// (A09-P02) T-A09-207 (FR-A09-213); fixtures 8–10 feature 070 (A09-P03) T-A09-308 (FR-A09-322). The scenario manifest
-// of Digital Aquarium: valid with the nine standard scenarios and ten fixtures (A09-P01's five, schooling and save/load,
-// feeding, decor editing and no fast-forward with food) (swim bounds, save/restore, no
+// (A09-P02) T-A09-207 (FR-A09-213); fixtures 8–10 feature 070 (A09-P03) T-A09-308 (FR-A09-322); fixture 11 feature
+// 071 (A09-P04) T-A09-407. The scenario manifest of Digital Aquarium: valid with the nine standard scenarios and eleven
+// fixtures (A09-P01's five, schooling and save/load, feeding, decor editing, no fast-forward with food and water
+// effects) (swim bounds, save/restore, no
 // fast-forward while paused, both validated habitats, bounded counts), its derived digests and expected results equal
 // to what the engine gives when the runner plays them, the fixtures ending in the states they name, and the committed
 // `scenario-manifest.json` equal to the Swift manifest (`UPDATE_SCENARIO_MANIFEST=1`, on the simulator
@@ -32,13 +33,13 @@ private func play(_ spec: ScenarioSpec) async throws -> (initial: String, result
 }
 
 @Suite struct AquariumManifestTests {
-    @Test func theManifestIsValidWithTheNineStandardScenariosAndTenFixtures() {
+    @Test func theManifestIsValidWithTheNineStandardScenariosAndElevenFixtures() {
         let manifest = AquariumCore.manifest(for: id)
         let problems = ScenarioManifestValidator.problems(manifest, controls: AquariumCore.controls,
-                                                          content: ContentRequirement(fixtures: 10))
+                                                          content: ContentRequirement(fixtures: 11))
         #expect(problems.isEmpty, "\(problems)")
         #expect(Set(manifest.scenarios.map(\.name))
-                == Set(ScenarioManifest.standardNames).union((1...10).map { "fixture-\($0)" }))
+                == Set(ScenarioManifest.standardNames).union((1...11).map { "fixture-\($0)" }))
     }
 
     @Test func derivedDigestsAndResultsAreWhatTheEngineGives() async throws {
@@ -140,6 +141,13 @@ private func play(_ spec: ScenarioSpec) async throws -> (initial: String, result
         let dropped = AquariumCore.played(seed: seed, entries: Array(fixtures[9].prefix(1))).state
         let early = AquariumCore.played(seed: seed, entries: fixtures[9]).state
         #expect(early.step == 65)
+
+        // 11. Water effects: at the final step the Reef's vents give at most 48 bubbles, between the vents and the
+        //     surface (drawn from the step count; the state never holds them).
+        let watered = AquariumCore.played(seed: seed, entries: fixtures[10]).state
+        let bubbles = WaterEffects.bubbles(step: watered.step, vents: catalog.habitats[0].vents, reduceMotion: false)
+        #expect(!bubbles.isEmpty && bubbles.count <= WaterEffects.maxBubbles)
+        #expect(bubbles.allSatisfy { $0.y >= WaterEffects.ventY && $0.y < WaterEffects.surface })
         #expect(dropped.document.food.count == Feeding.pelletsPerFeed)
         for pellet in early.document.food {
             #expect(dropped.document.food.contains { abs($0.position.x - pellet.position.x) < 1e-12

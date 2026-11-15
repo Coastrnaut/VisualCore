@@ -71,6 +71,9 @@ extension AquariumCore {
     ///    species, then 600 steps; `AquariumManifestTests` checks that at least one pellet was eaten;
     /// 9. decor editing: kind 1, a placement, a move of piece 0, a removal of piece 1;
     /// 10. no fast-forward with food: a feed, then 60 steps (`AquariumSessionTests` suspends and resumes it).
+    /// 11. water effects (feature 071, T-A09-407): the Reef runs 600 steps; `AquariumManifestTests` checks the bubbles
+    ///     its vents give at the final step against the caps (bubbles and motes are drawn from the step count and
+    ///     never change the state).
     /// The tank fractions of the mean position of the Reef's first species after 300 steps (fixture 8).
     static var feedPoint: [Double] {
         let select = ScenarioStep(steps: 5, action: ScriptedAction("habitat.select", [0]), result: "accepted")
@@ -100,6 +103,7 @@ extension AquariumCore {
             [step("decor.kind", [1]), step("decor.place", [0.25, 0.2]), step("decor.move", [0, 0.75, 0.3]),
              step("decor.remove", [1])],
             [step("food.drop", [0.5, 0.9]), ScenarioStep(steps: 60)],
+            [step("habitat.select", [0]), ScenarioStep(steps: 600)],
         ]
     }
 

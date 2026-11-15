@@ -575,6 +575,29 @@
       },
       "name" : "fixture-10",
       "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "habitat.select",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 5
+        },
+        {
+          "steps" : 600
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "45b0c5dd5117f8f0d58369b031bec60f3f869539575c4c05c88e4ebe78900e15",
+        "initialDigest" : "398f03aa42aed12dc7b4dee6166c4a9a87c117c11ba732b1abcd0faed5f432bb"
+      },
+      "name" : "fixture-11",
+      "seed" : "7"
     }
   ],
   "schema" : 1
