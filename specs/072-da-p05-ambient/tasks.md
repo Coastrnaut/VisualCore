@@ -51,3 +51,7 @@ contract, runs, commits.
 
 MVP: saved aquariums and ambient in the core; then the library and the ambient drawing; then the long-run proofs;
 evidence and the device plan last.
+
+## Phase 7: Convergence
+
+- [ ] T-A09-516 Correct `specs/072-da-p05-ambient/quickstart.md`'s expected outcome: the runner plays its nine standard scenarios at the default level; the three quality levels and their unchanged digest are proved by `AquariumRenderTests` per plan: quickstart (contradicts)
