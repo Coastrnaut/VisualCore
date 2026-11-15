@@ -22,7 +22,7 @@ after every task (no trailers). iOS 27 only; reference regression and iOS 26 at 
 
 ## Phase 4: Polish & evidence
 
-- [ ] T-A10-206 Arcade tests on sim-27.2 (`python3 Tools/python/desktop_runbook.py run-check --stage A10-P02 --timeout 600 --name arcade-ios27 -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing NeonArcadeCoreTests NeonArcadeExperienceTests`; each test < 10 s) (SC-A10-201–206)
+- [X] T-A10-206 Arcade tests on sim-27.2 (`python3 Tools/python/desktop_runbook.py run-check --stage A10-P02 --timeout 600 --name arcade-ios27 -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing NeonArcadeCoreTests NeonArcadeExperienceTests`; each test < 10 s) (SC-A10-201–206) — Verified 2026-11-14: 2026-11-14: .autonomy/checks/A10-P02.arcade-ios27.json exit 0 (105 tests on sim-27.2, each < 1 s)
 - [ ] T-A10-207 App build and unit (`python3 Tools/python/desktop_runbook.py run-check --stage A10-P02 --timeout 600 --name app-unit -- python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27`)
 - [ ] T-A10-208 Runner iOS 27 (`python3 Tools/python/desktop_runbook.py run-check --stage A10-P02 --timeout 600 --name verify-27 -- python3 scripts/verify_experiences.py --only a10.neon-arcade --runtime 27`)
 - [ ] T-A10-209 Experience package check and script tests (`--name experience-packages -- python3 scripts/check_experience_packages.py`; `--name script-tests -- python3 scripts/test_scripts.py`)
