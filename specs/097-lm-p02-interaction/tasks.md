@@ -42,3 +42,7 @@ Agent A: T-A13-202. Agent B: T-A13-203. Lead: 204, 205, records, runs, commits.
 ## Implementation strategy
 
 MVP: gestures snapping to the grid (US1, US2) with the loop fixtures (US4); then the glow (US3); evidence last.
+
+## Phase 6: Convergence
+
+- [ ] T-A13-211 Record in `specs/097-lm-p02-interaction/research.md` As built the `MazeExperience` wrapper in `Packages/ExperiencesCreative/LightMaze/Experience/LightMazeExperience.swift` (suspension and deactivation call `presenter.suspended()` so a touch cut off by backgrounding never stays in the arbiter, as Neon Arcade's wrapper does; the public factory is unchanged) and the lit-target ring drawn as an inset square (clarification Q4), per plan: Lifecycle (unrequested)
