@@ -167,23 +167,11 @@ struct WorldsControls: View {
         let zoomIn = Self.canZoomIn(view, preset: preset), zoomOut = Self.canZoomOut(view, preset: preset)
         VStack(alignment: .leading, spacing: 8) {
             Text(verbatim: "Tiny Worlds").font(.headline).accessibilityAddTraits(.isHeader)
-            Picker(selection: Binding(get: { mirror.presetIndex },
-                                      set: { index in
-                                          if index != mirror.presetIndex {
-                                              _ = port.send("world.preset", [Double(index)])
-                                          }
-                                      })) {
-                ForEach(WorldPreset.all.indices, id: \.self) { index in
-                    Text(verbatim: WorldPreset.all[index].name).tag(index)
-                }
-            } label: {
-                Text(verbatim: "World")
+            WorldsSegmentedPicker(title: "World", identifier: port.identifier("preset"),
+                                  titles: WorldPreset.all.map(\.name), selected: mirror.presetIndex) { index in
+                _ = port.send("world.preset", [Double(index)])
             }
-            .pickerStyle(.segmented)
-            .frame(minHeight: 44)
-            .accessibilityLabel(Text(verbatim: "World"))
-            .accessibilityValue(Text(verbatim: WorldPreset.preset(index: mirror.presetIndex)?.name ?? "Island"))
-            .accessibilityIdentifier(port.identifier("preset"))
+            .equatable()
             button("New seed", name: "new-seed", value: "Seed \(mirror.seed)",
                    hint: "Makes a new world of the same kind", enabled: true) { _ = port.send("world.seed") }
             HStack(spacing: 8) {
@@ -229,18 +217,11 @@ struct WorldsControls: View {
         let chosen = WorldPack.pack(index: mirror.packChoice) ?? .island
         let current = WorldPack.pack(index: mirror.presetIndex) ?? .island
         Text(verbatim: "Packs").font(.headline).accessibilityAddTraits(.isHeader)
-        Picker(selection: Binding(get: { mirror.packChoice }, set: { mirror.packChoice = $0 })) {
-            ForEach(WorldPack.all.indices, id: \.self) { index in
-                Text(verbatim: WorldPack.all[index].name).tag(index)
-            }
-        } label: {
-            Text(verbatim: "Pack")
+        WorldsSegmentedPicker(title: "Pack to open", identifier: port.identifier("pack"),
+                              titles: WorldPack.all.map(\.name), selected: mirror.packChoice) { index in
+            mirror.packChoice = index
         }
-        .pickerStyle(.segmented)
-        .frame(minHeight: 44)
-        .accessibilityLabel(Text(verbatim: "Pack to open"))
-        .accessibilityValue(Text(verbatim: chosen.name))
-        .accessibilityIdentifier(port.identifier("pack"))
+        .equatable()
         HStack(spacing: 8) {
             button("Open pack", name: "open-pack", value: chosen.name,
                    hint: "Replaces the world with the chosen pack", enabled: true) {
@@ -260,18 +241,11 @@ struct WorldsControls: View {
         let selectedWords = selected.map { "The \(WorldsPresenter.propName($0.kind)), prop \(mirror.selection + 1) of \(count)" }
             ?? (count == 0 ? "No props" : "None selected")
         Text(verbatim: "Props").font(.headline).accessibilityAddTraits(.isHeader)
-        Picker(selection: Binding(get: { mirror.placeKind }, set: { mirror.placeKind = $0 })) {
-            ForEach(PropKind.allCases, id: \.rawValue) { kind in
-                Text(verbatim: kind.name).tag(kind.rawValue)
-            }
-        } label: {
-            Text(verbatim: "Prop")
+        WorldsSegmentedPicker(title: "Prop to place", identifier: port.identifier("prop-kind"),
+                              titles: PropKind.allCases.map(\.name), selected: mirror.placeKind) { index in
+            mirror.placeKind = index
         }
-        .pickerStyle(.segmented)
-        .frame(minHeight: 44)
-        .accessibilityLabel(Text(verbatim: "Prop to place"))
-        .accessibilityValue(Text(verbatim: PropKind(rawValue: mirror.placeKind)?.name ?? "Tree"))
-        .accessibilityIdentifier(port.identifier("prop-kind"))
+        .equatable()
         button("Place", name: "place", value: "\(count) of \(WorldEditing.maxProps) props",
                hint: "Places the chosen prop where you last tapped the ground, or at the centre",
                enabled: count < WorldEditing.maxProps) { edit.place(mirror.placeKind) }
@@ -427,5 +401,43 @@ struct WorldsControls: View {
         .accessibilityValue(Text(verbatim: value))
         .accessibilityHint(Text(verbatim: hint))
         .accessibilityIdentifier(port.identifier(name))
+    }
+}
+
+/// A segmented picker that keeps its control while the world runs (feature 094, found by
+/// `TWWorldUITests.testOpenPack`): the controls' body is re-evaluated every frame, and a picker given a new binding on
+/// every pass dropped taps; compared without its handler and used with `.equatable()`, it is left alone until its
+/// selection or titles change (as Physics Playground's `PlaygroundSegmentedPicker`, A11-P06). The spoken label, the
+/// spoken value (the selected title) and the identifier are as before.
+struct WorldsSegmentedPicker: View, Equatable {
+    /// The picker's spoken label ("Pack to open").
+    let title: String
+    /// The accessibility identifier.
+    let identifier: String
+    /// The title of each segment, also the spoken value of the selected one.
+    let titles: [String]
+    /// The selected segment.
+    let selected: Int
+    /// Called with a segment other than the selected one when it is chosen.
+    let choose: (Int) -> Void
+
+    nonisolated static func == (lhs: WorldsSegmentedPicker, rhs: WorldsSegmentedPicker) -> Bool {
+        lhs.title == rhs.title && lhs.identifier == rhs.identifier && lhs.titles == rhs.titles
+            && lhs.selected == rhs.selected
+    }
+
+    var body: some View {
+        Picker(selection: Binding(get: { selected }, set: { index in if index != selected { choose(index) } })) {
+            ForEach(titles.indices, id: \.self) { index in
+                Text(verbatim: titles[index]).tag(index)
+            }
+        } label: {
+            Text(verbatim: title)
+        }
+        .pickerStyle(.segmented)
+        .frame(minHeight: 44)
+        .accessibilityLabel(Text(verbatim: title))
+        .accessibilityValue(Text(verbatim: titles.indices.contains(selected) ? titles[selected] : ""))
+        .accessibilityIdentifier(identifier)
     }
 }
