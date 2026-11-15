@@ -42,3 +42,7 @@ Agent A: T-A11-202. Agent B: T-A11-203. Agent C: T-A11-204 after A and B. Lead: 
 
 MVP: springs and the stack (US1, US2) in VisualCore and the core, then the drawn springs and controls, fixtures and
 records; evidence last.
+
+## Phase 5: Convergence
+
+- [ ] T-A11-212 Record in `specs/083-pp-p02-springs/research.md` D5 what manifest fixtures 11 and 13 actually script (11: a dropped pile settling until its fastest body moves < 0.05 m/s; 13: spring energy with gravity and drag off at the world's damping ratio 0.1) and that the five-box stack bound and the undamped ± 2 % energy band are proven by `StackFixtureTests`, `ImpulseSolver2DTests` (five-box stack) and `Springs2DTests` (undamped energy), because the manifest only replays the experience's actions, per plan: research D5 (partial)
