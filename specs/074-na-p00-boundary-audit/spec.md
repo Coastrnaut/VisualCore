@@ -133,6 +133,9 @@ module will own each missing piece and in which phase.
   collision) but not in a framework product: not counted as available; reuse needs it moved into VisualCore first.
 - **Many hazards and particles at once** (the manual's draw and readability risks): the audit records whether shapes
   batch into one draw and what bounds exist; it does not measure performance.
+- **Fast hazards pass through the player between steps** (the manual's collision-tunnelling risk): the audit records
+  whether any swept or continuous test exists; the gap's owner and the fixture that proves it are named (clarification
+  5), nothing is built here.
 - **The build-step count changes during the phase**: the inventory records the count at the time of the check.
 - **The reference regression fails before any change**: recorded as a blocker; no Neon Arcade work starts.
 - **Skill or health claims and monetization:** recorded as rules (no benefit claims, no loot boxes, no online
