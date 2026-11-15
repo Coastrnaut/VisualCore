@@ -8,7 +8,7 @@ Precedent: `specs/091-tw-p03-customize/tasks.md`.
 
 ## Phase 1: Setup
 
-- [ ] T-A12-401 Baseline: cite the last evidence on an unchanged `Packages` tree (`.autonomy/checks/A12-P03.{worlds-ios27,app-unit,verify-27}.json`) instead of a rerun (owner ruling of 2026-11-14)
+- [X] T-A12-401 Baseline: cite the last evidence on an unchanged `Packages` tree (`.autonomy/checks/A12-P03.{worlds-ios27,app-unit,verify-27}.json`) instead of a rerun (owner ruling of 2026-11-14) — Verified 2026-11-15: 2026-11-15: cited .autonomy/checks/A12-P03.{worlds-ios27,app-unit,verify-27}.json on the unchanged Packages tree (no rerun)
 
 ## Phase 2: Foundational — pack data, limits and clearance (stories 1–3)
 
