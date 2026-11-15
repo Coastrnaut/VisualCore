@@ -26,6 +26,46 @@ Canonical overrides:
 - **Owner rulings:** short tests; audits and device runs in the device campaign; iOS 27 at phase gates; reference
   regression and iOS 26 at X-A14; every Spec Kit step runs.
 
+## Clarifications
+
+### Session 2026-11-15
+
+Answered autonomously under the owner's standing delegation, recommended option each time. Facts checked in code:
+`VisualCoreScenes.MeshGenerators.uvSphere(segments:rings:radius:)` (segments 3…256, rings 2…256, clamped) and
+`VisualCoreRendering.MeshRenderer` (Lambert lighting toward a light direction, per-vertex colours through
+`MeshRenderer(mesh:colors:registry:)`, `draw(model:camera:aspect:color:)` with an `OrbitCamera`) are the pieces Tiny
+Worlds uses through `DepthMeshPass`; `VisualCoreMath.OrbitCamera(target:distance:yaw:pitch:…)`; Light Maze's
+`LevelCatalog.licenseError`/`LicenseAudit` and committed `content-licenses.md` are the content-record pattern (its
+allowed licenses are `["MIT"]` for original levels); the experience pattern (Core, CoreTests, Experience with Adapter/,
+ExperienceTests, scenario manifest, candidate registration in `Apps/VisualCore/App/ExperienceRegistry.swift`) is the
+one A13 used at A13-P01.
+
+- Q: Where do the numbers come from and under what license? → A: Planetary values from the NASA Space Science Data
+  Coordinated Archive "Planetary Fact Sheet" (D. R. Williams, NASA Goddard Space Flight Center), a work of the US
+  government in the public domain; the Sun's radius is the IAU 2015 Resolution B3 nominal solar radius (695,700 km);
+  epoch J2000.0 for orbital elements. Allowed licenses: `public-domain` and `CC0-1.0`; anything else is refused.
+- Q: Which values are stored, in which units? → A: Mean (volumetric) radius in km — Sun 695,700; Mercury 2,439.7;
+  Venus 6,051.8; Earth 6,371.0; Mars 3,389.5; Jupiter 69,911; Saturn 58,232; Uranus 25,362; Neptune 24,622.
+  Semi-major axis in km (from the fact sheet's 10⁶ km column) — Mercury 57.909e6; Venus 108.210e6; Earth 149.598e6;
+  Mars 227.956e6; Jupiter 778.479e6; Saturn 1,432.041e6; Uranus 2,867.043e6; Neptune 4,514.953e6. Sidereal period in
+  days — 87.969; 224.701; 365.256; 686.980; 4,332.589; 10,759.22; 30,685.4; 60,189.0. Axial tilt (obliquity to orbit,
+  degrees, above 90° meaning retrograde rotation) — Sun 7.25 (to the ecliptic); 0.034; 177.4; 23.44; 25.19; 3.13;
+  26.73; 97.77; 28.32. AU values are derived through 149,597,870.7 km, never stored separately.
+- Q: What is the regression fixture and its tolerance? → A: Independent approximate values from general reference
+  (periods in Julian years: 0.241, 0.615, 1.000, 1.881, 11.86, 29.46, 84.01, 164.8; radii in km rounded to four
+  significant figures: 2,440, 6,052, 6,371, 3,390, 69,910, 58,230, 25,360, 24,620); each catalog value within 1 %
+  relative; distances in AU increase strictly from Mercury to Neptune.
+- Q: How are the bodies drawn in this phase? → A: A static visibility-enhanced line-up: the Sun at the left with display
+  radius 1.6, the planets to its right at even spacing with display radius 0.25 + 0.15 · log₂(radius / Mercury's
+  radius), each a UV sphere lit from the Sun's side with per-vertex colours made in code (a seeded two-band latitude
+  palette per body); a fixed orbit camera; the selected body gets a ring outline; the canvas description and a legend
+  say "Sizes and spacing not to scale".
+- Q: What is the experience's state and actions? → A: State schema 1 = the selected body index (0 = Sun … 8 = Neptune).
+  Actions `body.select [0…8]`, `body.next`, `body.previous`; a value that is not a whole index 0…8, or a step past an
+  end, is refused with `a14.invalid-choice`. Native controls: Previous body, Next body, a Body menu and the fact card
+  (each fact as "Mean radius: 6,371 km — NASA Planetary Fact Sheet"). The manifest has the standard scenarios and five
+  fixtures selecting Mercury, Earth, Jupiter, Saturn and Neptune.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Meet the Sun and the eight planets (Priority: P1) 🎯
