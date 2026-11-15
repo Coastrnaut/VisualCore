@@ -173,12 +173,13 @@ refused and the starter habitat opens; a document with unknown kinds draws witho
 - **FR-A09-410**: Every fish and plant MUST belong to one of three depth layers (index mod 3); farther layers MUST be
   drawn first, smaller (0.75, 0.875, 1.0) and tinted toward the water colour (35 %, 15 %, 0 %).
 - **FR-A09-411**: A caustics light pattern MUST be drawn over the gravel and the water, animated, seamless across the
-  tank, scaled by the lighting level, still under Reduce Motion, and omitted without harm when it cannot be prepared.
+  tank, scaled by the lighting level, still under Reduce Motion, and omitted without harm when it cannot be prepared;
+  after a graphics-context loss or a resize it is prepared again from the state like every other drawn element.
 - **FR-A09-420**: The canvas description MUST name the habitat, each species with its count, plants, decorations, food
   and motion state.
 - **FR-A09-421**: Changes (food dropped, habitat changed, decoration added or removed, motion paused or resumed) MUST be
   announced through the shared announcement sink, only with VoiceOver on, at most one per 3 seconds, the latest change
-  winning.
+  winning; the first frame after opening or restoring announces nothing (it sets the reference state).
 - **FR-A09-430**: Content naming unknown or unsupported items MUST be refused with a named reason at catalog read and at
   restore, and skipped when drawn; nothing crashes.
 - **FR-A09-431**: The scenario manifest MUST add a fixture for bubbles and motes over a run (600 steps); the restore of
