@@ -112,6 +112,8 @@ author and license in the generated license document.
 - **A pack's camera limits narrower than the global ones:** the pack's limits apply and stay within the global ones.
 - **Newer or damaged pack data:** refused by the same document rules as saved worlds.
 - **Reduce Motion:** opening a pack moves the camera directly.
+- **Saved worlds and restored states from before the per-preset limits:** their view is clamped to the preset's
+  limits on restore (the document's props and light are kept); the clamp never changes a prop.
 
 ## Requirements *(mandatory)*
 
