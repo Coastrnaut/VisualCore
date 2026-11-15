@@ -349,20 +349,8 @@
       "id": "M06",
       "capability": "Scene transitions: title, playing, paused and game-over screens with animated changes that become instant under Reduce Motion, without a second render context",
       "source": "brainstorm: scene transitions",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
-        {
-          "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceLifecycle.swift",
-          "symbol": "ExperienceLifecycleState",
-          "product": "VisualCoreExperience",
-          "public": true
-        },
-        {
-          "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperiencePresenter.swift",
-          "symbol": "ExperiencePresenter",
-          "product": "VisualCoreExperienceHost",
-          "public": true
-        },
         {
           "file": "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPlans.swift",
           "symbol": "transitionDuration",
@@ -370,23 +358,17 @@
           "public": true
         },
         {
-          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/Timeline.swift",
-          "symbol": "Tween",
-          "product": "VisualCoreSimulation",
-          "public": true
-        },
-        {
-          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
-          "symbol": "RenderHost.replaceScene",
-          "product": "VisualCoreRendering",
+          "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceCore.swift",
+          "symbol": "ExperienceCore",
+          "product": "VisualCoreExperience",
           "public": true
         }
       ],
       "example": {
-        "file": "Packages/ExperiencesCreative/DigitalAquarium/Experience/AquariumPresenter.swift",
-        "symbol": "AquariumPresenter"
+        "file": "Packages/ExperiencesCreative/NeonArcade/Core/ArcadeFlow.swift",
+        "symbol": "ArcadeFlow"
       },
-      "notes": "The experience lifecycle states, the presenter seam, scene replacement, tweens and transitionDuration (0 under Reduce Motion) exist and are tested (LifecycleTests, AccessibilityPlansTests, TimelineTests, VisualCoreRenderingTests); no game-screen transition component exists beyond the experience lifecycle states. G-TRANSITIONS (app-local over the presenter), A10-P03."
+      "notes": "Since A10-P03 (G-TRANSITIONS closed): title, playing, paused and game-over screens follow ArcadeFlow's allowed moves (others refused with a10.wrong-screen), are saved in snapshot schema 3 and cross-fade over transitionDuration(0.25, reduceMotion:), 0 s under Reduce Motion (ArcadeFlowTests, ArcadeRenderTests)."
     },
     {
       "id": "M07",
@@ -442,44 +424,26 @@
       "id": "M09",
       "capability": "Start, pause, restart and game-over flows with local scores: a title, pause that stops the loop (and pauses in the background without fast-forwarding), restart from a fresh seed, game over with a crash-safe local high-score table",
       "source": "v0.1 feature 03: start/pause/restart/game-over flows with local scores",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
-          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/PlaybackState.swift",
-          "symbol": "PlaybackState",
+          "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceCore.swift",
+          "symbol": "ExperienceCore",
+          "product": "VisualCoreExperience",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPlans.swift",
+          "symbol": "transitionDuration",
           "product": "VisualCoreSimulation",
-          "public": true
-        },
-        {
-          "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceLifecycle.swift",
-          "symbol": "ExperienceLifecycleState",
-          "product": "VisualCoreExperience",
-          "public": true
-        },
-        {
-          "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift",
-          "symbol": "ExperienceStorage",
-          "product": "VisualCoreExperience",
-          "public": true
-        },
-        {
-          "file": "Packages/VisualCore/Sources/VisualCoreExperience/SavedStateStore.swift",
-          "symbol": "SavedStateStore",
-          "product": "VisualCoreExperience",
-          "public": true
-        },
-        {
-          "file": "Packages/VisualCore/Sources/VisualCorePersistence/DocumentStore.swift",
-          "symbol": "DocumentStore",
-          "product": "VisualCorePersistence",
           "public": true
         }
       ],
       "example": {
-        "file": "Packages/ExperiencesCreative/ParticleUniverse/Experience/ParticleLibrary.swift",
-        "symbol": "ParticleLibrary"
+        "file": "Packages/ExperiencesCreative/NeonArcade/Experience/Adapter/ArcadeCore.swift",
+        "symbol": "ArcadeCore"
       },
-      "notes": "PlaybackState (play/pause with background suspension), lifecycle states, per-experience storage and atomic document stores exist and are tested (PlaybackStateTests, LifecycleTests, ExperienceStorageTests, SavedStateStoreTests, DocumentStoreTests); the game-state flow and the score table are the game's. G-TRANSITIONS (app-local), A10-P03; G-HIGHSCORES (app-local over ExperienceStorage), A10-P04."
+      "notes": "Since A10-P03: start, pause, restart and game over are actions on the core with screen rules; the game-over screen shows the run's score and wave; suspension while playing records a pause. The stored high-score table is G-HIGHSCORES (A10-P04)."
     },
     {
       "id": "M10",
@@ -565,50 +529,32 @@
       "id": "M12",
       "capability": "Sound and haptic toggles with reduced-flash controls: synthesized sound effects (no recordings) behind a sound switch, haptics behind the haptics switch, Reduce Flashing calming flashes and glow pulses",
       "source": "v0.1 feature 06: sound and haptic toggles with reduced-flash controls",
-      "status": "upstream gap",
+      "status": "available",
       "evidence": [
         {
-          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPlans.swift",
-          "symbol": "HapticPlanner",
-          "product": "VisualCoreSimulation",
+          "file": "Packages/VisualCore/Sources/VisualCoreAudioDSP/SoundEffect.swift",
+          "symbol": "SoundEffectSynth",
+          "product": "VisualCoreAudioDSP",
           "public": true
         },
         {
-          "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceFeedback.swift",
-          "symbol": "ExperienceFeedback",
-          "product": "VisualCoreExperienceHost",
-          "public": true
-        },
-        {
-          "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceFeedback.swift",
-          "symbol": "ExperienceFeedback.hapticsEnabled",
-          "product": "VisualCoreExperienceHost",
-          "public": true
-        },
-        {
-          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPreferences.swift",
-          "symbol": "AccessibilityPreferences",
-          "product": "VisualCoreSimulation",
-          "public": true
-        },
-        {
-          "file": "Packages/VisualCoreRendering/Sources/VisualCoreEffects/EffectScene.swift",
-          "symbol": "EffectScene.reduceFlashing",
-          "product": "VisualCoreEffects",
-          "public": true
-        },
-        {
-          "file": "Packages/VisualCoreRendering/Sources/VisualCoreAudio/AudioSource.swift",
-          "symbol": "AudioSource",
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreAudio/SoundEffectPlayer.swift",
+          "symbol": "SoundEffectPlayer",
           "product": "VisualCoreAudio",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPlans.swift",
+          "symbol": "HapticKind",
+          "product": "VisualCoreSimulation",
           "public": true
         }
       ],
       "example": {
-        "file": "Apps/VisualCore/App/AppModel.swift",
-        "symbol": "AppModel"
+        "file": "Packages/ExperiencesCreative/NeonArcade/Core/ArcadeEffects.swift",
+        "symbol": "ArcadeEffects"
       },
-      "notes": "Haptic planning and routing with the app's haptics switch (ExperienceFeedbackTests, AccessibilityPlansTests) and Reduce Flashing (AccessibilityPreferencesTests, FlashLimiterModelTests) exist; VisualCoreAudio holds input sources only (demo, file, microphone, test signal), so no sound playback exists. G-SOUNDFX (VisualCoreAudio, upstream), A10-P03."
+      "notes": "Since A10-P03 (G-SOUNDFX closed): sound effects are synthesized in code (SoundEffectSynthTests) and played on the ambient session without any permission (SoundEffectPlayerTests on the simulator); Neon Arcade's sound and haptics settings gate them, and reduced flashing keeps only the hit ring."
     },
     {
       "id": "M13",
@@ -825,7 +771,7 @@
       "owner": "VisualCore:VisualCoreSimulation",
       "justification": "Found in A10-P00: no shape-against-shape overlap and no swept test exists in any framework product; circle and capsule overlap and swept tests are generic 2D game machinery and belong to VisualCoreSimulation (clarification 5). The swept case is proved by A10-P03's fast-hazard fixture.",
       "phase": 1,
-      "test": "Host tests (Collision2DTests, 13 tests): circle-circle and circle-capsule overlap agree with analytic answers including touching, inside, both rounded ends and a degenerate segment; the swept circle-circle test returns 0 when already touching, the analytic earliest fraction in [0, 1] for crossings and nil for misses, and catches tunnelling at 4, 10 and 50 times the summed radii per step; NaN/Inf and negative radii give no hit; deterministic (API baseline additive). Capsules are not swept: their fall speed is bounded below the summed radii per step (GameSimulationTests). A10-P03 fixture: a fast hazard never passes through the player between steps.",
+      "test": "Host tests (Collision2DTests, 13 tests): circle-circle and circle-capsule overlap agree with analytic answers including touching, inside, both rounded ends and a degenerate segment; the swept circle-circle test returns 0 when already touching, the analytic earliest fraction in [0, 1] for crossings and nil for misses, and catches tunnelling at 4, 10 and 50 times the summed radii per step; NaN/Inf and negative radii give no hit; deterministic (API baseline additive). Capsules are not swept: their fall speed is bounded below the summed radii per step (GameSimulationTests). A10-P03 fixture (HighSpeedFixtureTests): circle hazards at 20, 50 and 100 units/s crossing the player within one step are hit, and the same 1.5 units to the side are not.",
       "closed": "A10-P01"
     },
     {
@@ -852,7 +798,7 @@
       "justification": "Found in A10-P00: VisualCoreAudio holds input sources only (demo, file, microphone, test signal); synthesized sound-effect playback (short code-generated tones, no recordings) is generic and belongs to VisualCoreAudio (clarification 5).",
       "phase": 3,
       "test": "Host tests: synthesized effects render deterministic, bounded, click-free buffers (no NaN, peak below full scale, fade in and out); simulator tests: playback starts and stops without a microphone permission, respects the sound switch and silences on interruption and background",
-      "closed": null
+      "closed": "A10-P03"
     },
     {
       "id": "G-TRANSITIONS",
@@ -865,7 +811,7 @@
       "justification": "The title, playing, paused and game-over screens and their transitions are the game's flow over the presenter, PlaybackState, Tween and transitionDuration; no generic transition component is needed beyond the experience lifecycle states.",
       "phase": 3,
       "test": "Host tests: the flow allows only title -> playing -> paused/game over -> restart, pause stops the fixed-step loop and background never fast-forwards, restart starts from a fresh seed, and transitions take 0 s under Reduce Motion",
-      "closed": null
+      "closed": "A10-P03"
     },
     {
       "id": "G-STEERINPUT",
