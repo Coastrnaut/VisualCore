@@ -8,7 +8,7 @@ after every task (no trailers). iOS 27 only; reference regression and iOS 26 at 
 
 ## Phase 1: Setup
 
-- [ ] T-A10-101 Baseline: cite the last evidence on an unchanged `Packages` tree (`.autonomy/checks/A10-P00.app-build.json`, `.autonomy/migration/checks/X-A09.*.json`) instead of a rerun (owner ruling of 2026-11-14)
+- [X] T-A10-101 Baseline: cite the last evidence on an unchanged `Packages` tree (`.autonomy/checks/A10-P00.app-build.json`, `.autonomy/migration/checks/X-A09.*.json`) instead of a rerun (owner ruling of 2026-11-14) — Verified 2026-11-14: 2026-11-14: cited .autonomy/checks/A10-P00.app-build.json and .autonomy/migration/checks/X-A09.*.json on the unchanged Packages tree (no rerun)
 
 ## Phase 2: Foundational — generic collision (story 3) and the game core (stories 1, 2, 4)
 
