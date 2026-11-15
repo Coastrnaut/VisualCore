@@ -40,7 +40,7 @@
 // this phase completes, as Tiny Worlds' `world-<preset>` outcome is.
 //
 // The canvas description (clarifications Q4, Q5): "Solar System Explorer: Earth in focus on 2000-01-01, 0.983 AU
-// (147,099,000 km) from the Sun; 9 bodies. Distances and sizes not to scale." (for the Sun: "Sun in focus on
+// (147,101,000 km) from the Sun; 9 bodies. Distances and sizes not to scale." (for the Sun: "Sun in focus on
 // 2000-01-01; 9 bodies. …"). Distances are the approximate model's, in AU to three decimals and in km rounded to the
 // thousand through 1 AU = 149,597,870.7 km.
 import Foundation
@@ -251,7 +251,7 @@ public struct SolarCore: ExperienceCore, Equatable {
         "\(name(index: selection)) selected, body \(selection + 1) of \(bodyCount)"
     }
 
-    /// The distance of body `index` from the Sun on day `dayOffset` as words: "0.983 AU (147,099,000 km)"; nil for
+    /// The distance of body `index` from the Sun on day `dayOffset` as words: "0.983 AU (147,101,000 km)"; nil for
     /// the Sun or an unknown index.
     public static func distanceWords(index: Int, dayOffset: Double) -> String? {
         guard let body = catalog.body(at: index), body.kind == .planet,
@@ -261,7 +261,7 @@ public struct SolarCore: ExperienceCore, Equatable {
         return String(format: "%.3f AU", au) + " (\(kmText) km)"
     }
 
-    /// The canvas description: "Solar System Explorer: Earth in focus on 2000-01-01, 0.983 AU (147,099,000 km) from
+    /// The canvas description: "Solar System Explorer: Earth in focus on 2000-01-01, 0.983 AU (147,101,000 km) from
     /// the Sun; 9 bodies. Distances and sizes not to scale."
     public static func canvasDescription(selection: Int, dayOffset: Double = 0) -> String {
         let date = SimulatedDate(dayOffset: dayOffset)?.label ?? SimulatedDate.j2000.label

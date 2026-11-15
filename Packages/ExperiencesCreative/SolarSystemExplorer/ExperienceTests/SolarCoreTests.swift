@@ -258,6 +258,8 @@ final class SolarCoreTests: XCTestCase {
         let earth = try solarCore(SolarState(selection: 3)).canvasDescription
         XCTAssertTrue(earth.hasPrefix("Solar System Explorer: Earth in focus on 2000-01-01, 0.983 AU ("), earth)
         XCTAssertTrue(earth.hasSuffix(" km) from the Sun; 9 bodies. Distances and sizes not to scale."), earth)
+        XCTAssertEqual(SolarCore.distanceWords(index: 3, dayOffset: 0), "0.983 AU (147,101,000 km)",
+                       "the example of the header (T-A14-216)")
         let neptune = SolarCore.canvasDescription(selection: 8, dayOffset: 9_132)
         XCTAssertTrue(neptune.hasPrefix("Solar System Explorer: Neptune in focus on 2025-01-01, "), neptune)
         XCTAssertEqual(SolarCore.status(selection: 3), "Earth selected, body 4 of 9")
