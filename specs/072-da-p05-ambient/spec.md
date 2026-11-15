@@ -155,7 +155,7 @@ pattern — without changing the aquarium itself.
 
 - **Saving with an empty or very long name:** an empty name gets a default name; names are cut to a maximum length.
 - **Two saves with the same name:** both are kept (names need not be unique); each has its own identity.
-- **Opening a saved aquarium of an older format:** it is migrated like any restored state.
+- **A saved file of a newer format:** it is counted as newer, listed as not readable and never changed.
 - **Ambient mode while paused:** dimming still follows touches; nothing moves.
 - **A touch during dimming:** brightness restores immediately; the touch still feeds or edits as usual.
 - **Low Power Mode turned off:** drawing returns to the chosen mode at once.
@@ -166,7 +166,8 @@ pattern — without changing the aquarium itself.
 
 - **FR-A09-501**: A person MUST be able to save the current aquarium's configuration (habitat, decorations with
   transforms, lighting, decoration kind, ambient choice) under a name, list saved aquariums, open one and delete one; at
-  most 12 are kept and a save beyond them is refused with a reason.
+  most 12 are kept and a save beyond them, or one the storage quota refuses, is refused with a reason and changes no
+  file; every library control is labelled.
 - **FR-A09-502**: Opening a saved aquarium MUST rebuild its configuration exactly through actions (including the new
   `decor.turn [index, rotation −π…π, scale 0.5…2.0]`); damaged, foreign, newer or unreadable saved files MUST be
   counted, skipped and reported without being deleted and without affecting the others or the current aquarium.
@@ -176,7 +177,8 @@ pattern — without changing the aquarium itself.
   after 60 s without a canvas touch and MUST restore on the next touch; the system screen brightness and idle timer
   MUST never be changed.
 - **FR-A09-512**: Low Power Mode and Reduce Motion MUST select ambient drawing (fewer particles, dimming) without
-  changing the saved state.
+  changing the saved state. The canvas description MUST say "ambient" when ambient mode is on, and turning it on or off
+  is announced ("Ambient on", "Ambient off") like the other changes.
 - **FR-A09-520**: The experience MUST declare three quality levels (level 0 all; level 1 bubbles 12 per vent, 12 motes,
   one-octave caustics; level 2 bubbles 6 per vent, 6 motes, no caustics), matching its registration; the state MUST
   never depend on the level.
