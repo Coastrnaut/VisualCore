@@ -23,18 +23,23 @@ enum MazeTest {
     static var id: ExperienceID { LightMazeExperience.id ?? ExperienceID(rawValue: "a13.unknown")! }
 
     /// Opens Light Maze in `session` (seed `seed`, optionally restoring `snapshot`, keeping progress in `progressStore`
-    /// (memory when nil), with `voiceOverRunning` and `announcementSink` replacing the system's when given), lays the view out at `size` points and draws one frame.
+    /// (memory when nil), with `voiceOverRunning` and `announcementSink` replacing the system's when given; feature 099: the motion and
+    /// flashing flags and the sound and haptic routes), lays the view out at `size` points and draws one frame.
     /// The session holds the experience (`MazeExperience`); its shell is returned.
     static func open(_ session: ExperienceSession, seed: UInt64 = 1, snapshot: ExperienceSnapshot? = nil,
                      size: CGSize = CGSize(width: 120, height: 100), progressStore: ProgressStore? = nil,
                      voiceOverRunning: (@MainActor () -> Bool)? = nil,
-                     announcementSink: (any AnnouncementSink)? = nil) async throws -> ExperienceShell<MazePresenter> {
+                     announcementSink: (any AnnouncementSink)? = nil, reduceMotion: Bool = false,
+                     reduceFlashing: Bool = false, soundSink: (any MazeSoundSink)? = nil,
+                     feedback: ExperienceFeedback? = nil) async throws -> ExperienceShell<MazePresenter> {
         let id = self.id
         var made: ExperienceShell<MazePresenter>?
         let request = ExperienceOpenRequest(id: id, seed: seed, snapshot: snapshot, refusedSnapshotFails: false) {
             let experience = LightMazeExperience.make(id: id, progressStore: progressStore,
                                                       voiceOverRunning: voiceOverRunning,
-                                                      announcementSink: announcementSink)
+                                                      announcementSink: announcementSink,
+                                                      reduceMotion: reduceMotion, reduceFlashing: reduceFlashing,
+                                                      soundSink: soundSink, feedback: feedback)
             made = experience.shell
             return experience
         }
@@ -137,4 +142,16 @@ func mazePayload(_ payload: String, _ change: (inout [String: Any]) -> Void) thr
     var object = try XCTUnwrap(try JSONSerialization.jsonObject(with: Data(payload.utf8)) as? [String: Any])
     change(&object)
     return try JSONSerialization.data(withJSONObject: object, options: [.sortedKeys])
+}
+
+/// A sound sink that records the success sweeps and stops (feature 099).
+@MainActor
+final class RecordingMazeSoundSink: MazeSoundSink {
+    /// The success sweeps played.
+    private(set) var successes = 0
+    /// The times every sound was stopped.
+    private(set) var stops = 0
+
+    func playSuccess() { successes += 1 }
+    func stopAll() { stops += 1 }
 }

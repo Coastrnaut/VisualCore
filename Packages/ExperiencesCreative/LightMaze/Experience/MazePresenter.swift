@@ -44,12 +44,24 @@
 // that changed anything, the progress is saved once. Locks are enforced where a person chooses a level
 // (`chooseLevel(_:port:)`: a locked level is answered "Level 7 is locked; solve level 6 first." and nothing is sent);
 // the engine's `level.select` is not gated, so replays never depend on progress.
+// Feature 099 (A13-P04) T-A13-406 and T-A13-407 (FR-A13-401, 402, 410, 411, 420, 421; clarifications Q1–Q3; contract
+// contracts/feedback.md): `showHint(send:)` sends `hint.show` and answers "Hint: turn the mirror at row 2, column 3."
+// (columns from the left, rows from the bottom) or "Level 4 is already solved."; `describeBoard()` shows and speaks
+// `BoardDescription.full`. Words are kept in ``spoken`` and shown in the controls' message whether or not VoiceOver
+// runs; they are posted only while it runs. On every frame that shows the current level solved after it was not, the
+// success cue plays once: the words ("Level 3 solved in 5 moves. Level 4 is open."), the success sweep through the
+// sound sink, a `success` haptic through the feedback route (the person's switch and its rate limit), and the border
+// clock starts. While the level is solved the board has a border in ``MazeStyle/successColor`` with a tick (a sign,
+// not only a colour) whose colour is scaled by `SuccessCue.brightness` (one rise and fall over 0.6 s of frame time;
+// constant under Reduce Motion or Reduce Flashing). Suspension stops the sound and ends the brightening; it is not
+// replayed. The cue never touches the engine state.
 import Foundation
 import LightMazeCore
 import SwiftUI
 import VisualCoreExperience
 import VisualCoreExperienceHost
 import VisualCoreMath
+import VisualCoreSimulation
 import VisualCoreRendering
 import VisualCoreScenes
 import UIKit
@@ -98,6 +110,8 @@ final class MazePresenter: ExperiencePresenter {
     nonisolated static let haloOpacity = 0.25
     /// The farthest the glow reaches from a beam segment, in cells (half the halo's width).
     nonisolated static var glowReach: Double { haloWidth / 2 }
+    /// The width of the solved board's border and tick in cells (feature 099).
+    nonisolated static let solvedBorderWidth = 0.08
     /// The width of a mirror's or a prism's line in cells.
     nonisolated static let mirrorWidth = 0.16
     /// The width of the grid lines in cells.
@@ -125,8 +139,8 @@ final class MazePresenter: ExperiencePresenter {
     nonisolated static let mirrorColor = Vec4(0.86, 0.9, 0.96, 1)
     /// The prisms.
     nonisolated static let prismColor = Vec4(0.55, 0.85, 1, 1)
-    /// A target that is not lit.
-    nonisolated static let targetColor = Vec4(0.62, 0.16, 0.18, 1)
+    /// A target that is not lit: a clear red, apart from the orange beam, at about 3.9:1 against the board (FR-A13-431).
+    nonisolated static let targetColor = Vec4(0.86, 0.3, 0.36, 1)
     /// A lit target.
     nonisolated static let litTargetColor = Vec4(0.16, 0.86, 0.34, 1)
     /// The ring around a lit target.
@@ -201,13 +215,37 @@ final class MazePresenter: ExperiencePresenter {
     private(set) var recordedSolves = 0
     /// The level index and solved state of the last drawn frame; nil before the first.
     private(set) var lastFrameSolve: (levelIndex: Int, solved: Bool)?
+    /// Whether Reduce Motion is on: the solved border never brightens (feature 099).
+    let reduceMotion: Bool
+    /// Whether Reduce Flashing is on: the solved border never brightens (feature 099).
+    let reduceFlashing: Bool
+    /// Where the success sweep goes (feature 099).
+    let soundSink: any MazeSoundSink
+    /// The haptic route (feature 099): the person's switch and the rate limit.
+    let feedback: ExperienceFeedback
+    /// The success cues played since the presenter was made (feature 099).
+    private(set) var cuesPlayed = 0
+    /// The frame-time clock of the success cue, in seconds (sum of the drawn frames' times).
+    private(set) var cueClock = 0.0
+    /// The cue clock when the last success cue started; nil when no brightening runs.
+    private(set) var cueStart: Double?
+    /// The border brightness the last frame was drawn with (1 when none or static).
+    private(set) var lastBorderBrightness = 1.0
 
     /// A presenter for the experience `experienceID` keeping its progress in `progressStore` (memory when nil; loaded
     /// here once). `voiceOverRunning` (nil: `UIAccessibility.isVoiceOverRunning`) and `announcementSink` (nil: the
     /// system's VoiceOver announcements) replace the system's answers in tests.
+    /// `reduceMotion` and `reduceFlashing` keep the solved border static; `soundSink` (nil: VisualCore's
+    /// `SoundEffectPlayer`) and `feedback` (nil: the shared route) replace the success sound and haptic in tests.
     init(experienceID: ExperienceID, progressStore: ProgressStore? = nil,
-         voiceOverRunning: (@MainActor () -> Bool)? = nil, announcementSink: (any AnnouncementSink)? = nil) {
+         voiceOverRunning: (@MainActor () -> Bool)? = nil, announcementSink: (any AnnouncementSink)? = nil,
+         reduceMotion: Bool = false, reduceFlashing: Bool = false, soundSink: (any MazeSoundSink)? = nil,
+         feedback: ExperienceFeedback? = nil) {
         self.experienceID = experienceID
+        self.reduceMotion = reduceMotion
+        self.reduceFlashing = reduceFlashing
+        self.soundSink = soundSink ?? MazeSoundPlayer()
+        self.feedback = feedback ?? .shared
         self.voiceOverRunning = voiceOverRunning ?? { UIAccessibility.isVoiceOverRunning }
         self.announcementSink = announcementSink ?? SystemAnnouncementSink()
         let store = progressStore ?? ProgressStore(storage: nil)
@@ -236,8 +274,11 @@ final class MazePresenter: ExperiencePresenter {
         let width = Double(max(1, context.pixelWidth)), height = Double(max(1, context.pixelHeight))
         let canvas = Vec2(width, height)
         lastCanvas = canvas
-        if root == nil || sceneState != core.state {
-            root = Self.scene(core)
+        advanceCueClock(frame.delta)
+        let brightness = borderBrightness(solved: core.isSolved)
+        if root == nil || sceneState != core.state || brightness != lastBorderBrightness {
+            root = Self.scene(core, borderBrightness: brightness)
+            lastBorderBrightness = brightness
             sceneState = core.state
             rebuildCount += 1
         }
@@ -258,6 +299,7 @@ final class MazePresenter: ExperiencePresenter {
 
     /// Records a solve when `core` (the core of a drawn frame) shows its level solved and the last frame did not show
     /// that same level solved; saves once when the progress changed. Returns whether the progress changed.
+    /// Every such transition also plays the success cue once (feature 099), whether or not the progress changed.
     @discardableResult
     func recordSolve(_ core: MazeCore) -> Bool {
         let level = core.state.levelIndex
@@ -266,13 +308,90 @@ final class MazePresenter: ExperiencePresenter {
         if let last = lastFrameSolve, last.levelIndex == level, last.solved { wasSolved = true }
         lastFrameSolve = (level, solved)
         guard solved, !wasSolved else { return false }
+        let moves = core.state.moves.count
+        let nextWasOpen = progress.isOpen(level + 1)
         var next = progress
-        guard next.recordSolved(levelIndex: level, moves: core.state.moves.count) else { return false }
-        progress = next
-        recordedSolves += 1
-        lastSaveRefusal = progressStore.save(next)
-        mirror.progress = next
-        return true
+        let changed = next.recordSolved(levelIndex: level, moves: moves)
+        if changed {
+            progress = next
+            recordedSolves += 1
+            lastSaveRefusal = progressStore.save(next)
+            mirror.progress = next
+        }
+        let isLast = level >= progress.levels.count - 1
+        playSuccessCue(words: SuccessCue.words(levelNumber: level + 1, moves: moves,
+                                               nextOpened: !nextWasOpen && progress.isOpen(level + 1),
+                                               isLast: isLast))
+        return changed
+    }
+
+    // MARK: Feedback (feature 099)
+
+    /// Plays the success cue once: words (kept, shown, posted while VoiceOver runs), the sweep, the `success` haptic
+    /// and the start of the border's brightening.
+    func playSuccessCue(words: String) {
+        cuesPlayed += 1
+        mirror.message = words
+        speak(words)
+        soundSink.playSuccess()
+        feedback.haptic(.success)
+        cueStart = cueClock
+    }
+
+    /// Advances the cue clock by `delta` seconds of frame time (non-finite or negative times add nothing); called by
+    /// every drawn frame, and by tests with synthetic frame times.
+    func advanceCueClock(_ delta: Double) {
+        if delta.isFinite, delta > 0 { cueClock += delta }
+    }
+
+    /// The solved border's brightness for this frame: 1 when not solved or no cue runs, else
+    /// `SuccessCue.brightness` of the time since the cue started; a finished brightening is forgotten.
+    func borderBrightness(solved: Bool) -> Double {
+        guard solved, let start = cueStart else { return 1 }
+        let elapsed = cueClock - start
+        if elapsed >= SuccessCue.duration { cueStart = nil; return 1 }
+        return SuccessCue.brightness(elapsed: elapsed, reduceMotion: reduceMotion, reduceFlashing: reduceFlashing)
+    }
+
+    /// The hint's words for `state` after `hint.show` was answered `result`: "Hint: turn the mirror at row 2, column
+    /// 3." (columns from the left, rows from the bottom) or "Level 4 is already solved.".
+    nonisolated static func hintWords(_ state: MazeState, result: ActionResult) -> String {
+        guard result.isAccepted, let index = state.selectedTileIndex, state.board.tiles.indices.contains(index) else {
+            return "Level \(state.levelIndex + 1) is already solved."
+        }
+        let tile = state.board.tiles[index]
+        return "Hint: turn the \(tile.kind.rawValue) at row \(tile.cell.row + 1), column \(tile.cell.column + 1)."
+    }
+
+    /// Asks for a hint as a person does (the Hint control): sends `hint.show` through `port` and shows and speaks the
+    /// answer. Returns the words.
+    @discardableResult
+    func showHint(port: ExperienceActionPort) -> String {
+        showHint { port.send($0, $1) }
+    }
+
+    /// ``showHint(port:)`` sending through `send` (tests record the actions).
+    @discardableResult
+    func showHint(send: (String, [Double]) -> ActionResult) -> String {
+        let result = send("hint.show", [])
+        guard let core = shell?.engine.core else { return "" }
+        sync(core)
+        let words = Self.hintWords(core.state, result: result)
+        mirror.message = words
+        speak(words)
+        return words
+    }
+
+    /// The full description of the current board (`BoardDescription.full`), shown in the controls' message and
+    /// spoken. Returns the text (empty before the first state).
+    @discardableResult
+    func describeBoard() -> String {
+        guard let core = shell?.engine.core else { return "" }
+        let text = BoardDescription.full(levelName: core.level.name, levelNumber: core.state.levelIndex + 1,
+                                         board: core.board, beam: core.beam)
+        mirror.message = text
+        speak(text)
+        return text
     }
 
     /// The refusal of choosing level index `index` in words: "Level 7 is locked; solve level 6 first." for a locked
@@ -318,9 +437,12 @@ final class MazePresenter: ExperiencePresenter {
         gestures.reset()
     }
 
-    /// The experience was suspended or is leaving: every touch is forgotten (nothing is sent).
+    /// The experience was suspended or is leaving: every touch is forgotten (nothing is sent), the success sound stops
+    /// and the border's brightening ends (it is not replayed).
     func suspended() {
         gestures.reset()
+        soundSink.stopAll()
+        cueStart = nil
     }
 
     /// Drops the scene tree; the next draw builds it again from the core.
@@ -362,7 +484,9 @@ final class MazePresenter: ExperiencePresenter {
     }
 
     /// The scene tree of `core` (see the file header).
-    static func scene(_ core: MazeCore) -> SceneNode {
+    /// While the level is solved the board has a border in ``MazeStyle/successColor`` (scaled by `borderBrightness`,
+    /// clamped to 1) with a tick in the top-right margin.
+    static func scene(_ core: MazeCore, borderBrightness: Double = 1) -> SceneNode {
         let board = core.board
         let beam = core.beam
         let root = SceneNode(id: "maze", scale: Vec2(unit, unit))
@@ -422,6 +546,18 @@ final class MazePresenter: ExperiencePresenter {
         for (index, segment) in beam.segments.enumerated() {
             root.add(SceneNode(id: "beam\(index)", z: 4, primitive: .line(segment.start, segment.end, width: beamWidth),
                                color: beamColor))
+        }
+        if core.isSolved {
+            let c = MazeStyle.successColor, k = borderBrightness.isFinite ? max(1, borderBrightness) : 1
+            let color = Vec4(min(1, c.x * k), min(1, c.y * k), min(1, c.z * k), c.w)
+            root.add(SceneNode(id: "solved.border", z: 6,
+                               primitive: .polyline([Vec2(0, 0), Vec2(w, 0), Vec2(w, h), Vec2(0, h), Vec2(0, 0)],
+                                                    width: solvedBorderWidth),
+                               color: color))
+            root.add(SceneNode(id: "solved.tick", z: 6,
+                               primitive: .polyline([Vec2(w - 0.9, h + 0.15), Vec2(w - 0.7, h - 0.05),
+                                                     Vec2(w - 0.3, h + 0.35)], width: solvedBorderWidth),
+                               color: color))
         }
         if let selected = core.state.selectedTileIndex, board.tiles.indices.contains(selected) {
             root.add(SceneNode(id: "selection", z: 5,
@@ -501,6 +637,7 @@ final class MazePresenter: ExperiencePresenter {
         case "tile.select": return "This level has no such tile."
         case "level.select": return "There is no such level."
         case "move.undo": return "There is no move to undo."
+        case "hint.show": return "This level is already solved."
         default: return "That is not possible here."
         }
     }
@@ -519,7 +656,8 @@ final class MazePresenter: ExperiencePresenter {
     /// The actions the native controls send (every action: `level.select` through the Level menu, `move.undo` through
     /// Undo).
     var nativeActions: Set<String> {
-        ["level.select", "level.next", "level.previous", "tile.select", "tile.turn", "level.reset", "move.undo"]
+        ["level.select", "level.next", "level.previous", "tile.select", "tile.turn", "level.reset", "move.undo",
+         "hint.show"]
     }
 
     // MARK: Gestures

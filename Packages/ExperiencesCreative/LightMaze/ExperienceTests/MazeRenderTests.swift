@@ -71,9 +71,12 @@ final class MazeRenderTests: XCTestCase {
                              "the beam no longer runs south of the mirror")
         XCTAssertGreaterThan(MazeTest.pixels(near: MazePresenter.beamColor, in: after), 0, "the beam is drawn")
 
-        // The same state draws the same frame.
+        // The same state draws the same frame once the solved border has settled (feature 099: the border brightens
+        // once over 0.6 s of frame time; 40 frames of 1/60 s pass it).
+        try MazeTest.frames(session, 40)
+        let settled = try MazeTest.picture(session)
         let again = try MazeTest.picture(session)
-        XCTAssertEqual(StableHash.sha256Hex(after.rgba), StableHash.sha256Hex(again.rgba), "a still state holds")
+        XCTAssertEqual(StableHash.sha256Hex(settled.rgba), StableHash.sha256Hex(again.rgba), "a still state holds")
         session.close()
     }
 

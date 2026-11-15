@@ -26,23 +26,29 @@ public enum LightMazeExperience {
     public static let id = ExperienceID(rawValue: MazeCore.experienceID)
 
     /// The experience registered as `id`. `storage` keeps the level progress (`progress.json`; the maze itself
-    /// travels in the host's saved session state); `reduceMotion` and `reduceFlashing` change nothing (no motion,
-    /// nothing flashes).
+    /// travels in the host's saved session state); `reduceMotion` and `reduceFlashing` keep the solved border static
+    /// (feature 099: no brightening).
     @MainActor
     public static func make(id: ExperienceID, storage: ExperienceStorage, reduceMotion: Bool,
                             reduceFlashing: Bool) -> any Experience {
-        make(id: id, progressStore: ProgressStore(storage: storage))
+        make(id: id, progressStore: ProgressStore(storage: storage), reduceMotion: reduceMotion,
+             reduceFlashing: reduceFlashing)
     }
 
     /// The experience with its shell and presenter exposed (tests): `progressStore` keeps the progress (nil: in
-    /// memory); `voiceOverRunning` and `announcementSink` replace the system's answers when given. The presenter is
+    /// memory); `voiceOverRunning` and `announcementSink` replace the system's answers when given; `soundSink` and
+    /// `feedback` replace the success sound and haptic route (feature 099). The presenter is
     /// handed the shell, through which gestures read the live state.
     @MainActor
     static func make(id: ExperienceID, progressStore: ProgressStore? = nil,
                      voiceOverRunning: (@MainActor () -> Bool)? = nil,
-                     announcementSink: (any AnnouncementSink)? = nil) -> MazeExperience {
+                     announcementSink: (any AnnouncementSink)? = nil, reduceMotion: Bool = false,
+                     reduceFlashing: Bool = false, soundSink: (any MazeSoundSink)? = nil,
+                     feedback: ExperienceFeedback? = nil) -> MazeExperience {
         let presenter = MazePresenter(experienceID: id, progressStore: progressStore,
-                                      voiceOverRunning: voiceOverRunning, announcementSink: announcementSink)
+                                      voiceOverRunning: voiceOverRunning, announcementSink: announcementSink,
+                                      reduceMotion: reduceMotion, reduceFlashing: reduceFlashing,
+                                      soundSink: soundSink, feedback: feedback)
         let shell = ExperienceShell(id: id, presenter: presenter)
         presenter.shell = shell
         return MazeExperience(shell: shell)
