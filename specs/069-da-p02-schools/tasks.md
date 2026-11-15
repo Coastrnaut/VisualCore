@@ -20,7 +20,7 @@
 
 ## Phase 4: User Story 2 — fish that look alive (P1)
 
-- [ ] T-A09-205 [US2] Swim animation and decor drawing in `Packages/ExperiencesCreative/DigitalAquarium/Experience/AquariumPresenter.swift` per research D5 (body wave 0.06 body lengths, tail swing 0.15 body lengths, bend `turn` × 0.12 s capped ±0.35 rad, Reduce Motion × 0.5 on all three; rocks and shells as polygons at each decor transform) with tests in `ExperienceTests/AquariumRenderTests.swift` (a faster fish's outline repeats sooner; a left turn bends the outline left; mirrored by heading; Reduce Motion halves the displacement; two moments of a swim draw different frames; decor polygons follow rotation and scale; the state digest is unchanged by Reduce Motion) (FR-A09-211)
+- [X] T-A09-205 [US2] Swim animation and decor drawing in `Packages/ExperiencesCreative/DigitalAquarium/Experience/AquariumPresenter.swift` per research D5 (body wave 0.06 body lengths, tail swing 0.15 body lengths, bend `turn` × 0.12 s capped ±0.35 rad, Reduce Motion × 0.5 on all three; rocks and shells as polygons at each decor transform) with tests in `ExperienceTests/AquariumRenderTests.swift` (a faster fish's outline repeats sooner; a left turn bends the outline left; mirrored by heading; Reduce Motion halves the displacement; two moments of a swim draw different frames; decor polygons follow rotation and scale; the state digest is unchanged by Reduce Motion) (FR-A09-211) — Verified 2026-11-14: 2026-11-14: body wave, tail sweep, turn bend, Reduce Motion ×0.5, decor polygons; AquariumRenderTests 12 tests pass on sim-27.2
 
 ## Phase 5: User Story 3 — the aquarium is saved as it was (P2)
 

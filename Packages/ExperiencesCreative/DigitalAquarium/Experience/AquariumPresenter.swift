@@ -11,11 +11,27 @@
 //     amplitude × t² × sin(step × 0.05 + x + 1.5 t) (t the height fraction); a fan is five lines spread from its base,
 //     their tips swaying the same way. Reduce Motion halves the sway amplitude.
 //   - Fish: a closed polygon of 12 outline points from the species shape (teardrop: deep and rounded at the head;
-//     slender: long and thin), scaled by the species length, plus a tail triangle in the fin colour swinging by
-//     sin(animation phase) × 0.4 rad (Reduce Motion: × 0.2), rotated to the heading and mirrored when swimming left so
-//     the fish is never upside down.
-//   - At most 24 fish and 12 plants: 48 fish shapes, 12 plant nodes of up to 5 lines each, the water and the gravel.
+//     slender: long and thin), scaled by the species length, plus a tail triangle in the fin colour, rotated to the
+//     heading and mirrored when swimming left so the fish is never upside down.
+//   - Decor (feature 069): each decor piece of the document is one polygon in its kind's colour under the lighting, in
+//     front of the water, gravel and plants and behind the fish: a rock is an irregular rounded 9-point outline, a shell
+//     a 12-point snail spiral opening at its lip; the drawn width is the kind's size × the piece's scale, turned by the
+//     piece's rotation about its position. Pieces of kinds missing from the catalog are skipped.
+//   - At most 24 fish, 12 plants and 12 decor pieces: 48 fish shapes, 12 plant nodes of up to 5 lines each, 12 decor
+//     polygons, the water and the gravel.
 // Reduce Motion is presentation only: the core's state and digest never depend on it. No audio.
+//
+// Feature 069 (A09-P02) T-A09-205 (FR-A09-211; clarification 5; research D5): the swim animation is drawn from the
+// state only (the animation phase and the smoothed `turn`; drawing never writes the state). In the fish's local frame
+// (nose along +x at x = length/2) with u = 0 at the nose to 1 at the back (u = ½ − x / length, clamped):
+//   - body wave: each outline point moves sideways by 0.06 × length × sin(phase − 4u) × u; its frequency grows with
+//     speed because the simulation advances the phase by 0.6 × speed / length beats per second;
+//   - tail swing: the tail's two tips move sideways by 0.15 × length × sin(phase) (its joint follows the body wave),
+//     replacing the Phase 01 angular swing of 0.4 rad;
+//   - bend: every point turns about the nose by clamp(turn × 0.12, ±0.35) × u² rad so the back curves to the side the
+//     fish turns to (a left turn, positive `turn`, bends the body to the left of the heading); a fish mirrored to swim
+//     left draws its local bend with the opposite sign, so the bend always follows the turn in the tank;
+//   - Reduce Motion multiplies wave, swing and bend by ½.
 //
 // Description: "Digital Aquarium: Reef, 7 fish of 2 species (Orange striped fish and Blue fish with yellow tail), 5
 // plants, lighting soft, swimming." — habitat name, fish count, species count and names (in order of first appearance),
@@ -78,14 +94,32 @@ final class AquariumPresenter: ExperiencePresenter {
     nonisolated static let swayAmplitude = 0.35
     /// The sway's angular rate per simulation step.
     nonisolated static let swayRate = 0.05
-    /// The tail's largest swing in radians (full motion).
-    nonisolated static let tailSwing = 0.4
+    /// The most decor pieces a habitat may hold.
+    nonisolated static let maxDecor = HabitatDocument.maxDecor
+    /// The body wave's amplitude at the back in body lengths (full motion).
+    nonisolated static let bodyWave = 0.06
+    /// The phase lag of the body wave from nose to back in radians.
+    nonisolated static let waveLag = 4.0
+    /// The tail tips' sideways swing in body lengths (full motion).
+    nonisolated static let tailSweep = 0.15
+    /// The bend per unit of `turn` (rad/s) in radians per second.
+    nonisolated static let bendPerTurn = 0.12
+    /// The largest bend at the back in radians (full motion).
+    nonisolated static let maxBend = 0.35
+    /// The radii (fractions of the half width) of a rock's 9 outline points, counter-clockwise from +x.
+    nonisolated static let rockRadii = [1.0, 0.86, 0.95, 0.8, 0.92, 0.84, 0.97, 0.82, 0.9]
+    /// A rock's height as a fraction of its width.
+    nonisolated static let rockAspect = 0.62
+    /// The number of outline points of a shell.
+    nonisolated static let shellPoints = 12
+    /// The inner radius of a shell's spiral as a fraction of its outer radius.
+    nonisolated static let shellInner = 0.35
     /// The line width of plants in habitat units.
     nonisolated static let plantWidth = 0.14
 
     let experienceID: ExperienceID
     let mirror = AquariumMirror()
-    /// With Reduce Motion on, the plant sway and the tail swing are halved (presentation only).
+    /// With Reduce Motion on, the plant sway and the swim animation are halved (presentation only).
     let reduceMotion: Bool
 
     /// Set by a test to make the next draw throw `AquariumDrawError.injected` (the seam clears itself).
@@ -98,7 +132,9 @@ final class AquariumPresenter: ExperiencePresenter {
     private(set) var lastScale = 0.0
     /// The number of fish and plant nodes drawn in the last frame.
     private(set) var lastFishDrawn = 0, lastPlantsDrawn = 0
-    /// The sway factor (1 or ½) and the tail factor (1 or ½) of the last frame.
+    /// The number of decor pieces drawn in the last frame.
+    private(set) var lastDecorDrawn = 0
+    /// The motion factor (1 or ½) of the plant sway and the swim animation in the last frame.
     private(set) var lastSwayFactor = 1.0
 
     private let clear = ClearColorScene(red: 0, green: 0, blue: 0)
@@ -107,6 +143,7 @@ final class AquariumPresenter: ExperiencePresenter {
     private let water = SceneNode(id: "water", z: 0)
     private let gravel = SceneNode(id: "gravel", z: 1)
     private var plantNodes: [[SceneNode]] = []
+    private var decorNodes: [SceneNode] = []
     private var tailNodes: [SceneNode] = []
     private var bodyNodes: [SceneNode] = []
 
@@ -124,9 +161,14 @@ final class AquariumPresenter: ExperiencePresenter {
             }
             plantNodes.append(lines)
         }
+        for piece in 0..<Self.maxDecor {
+            let node = SceneNode(id: "d\(piece)", z: 3)
+            root.add(node)
+            decorNodes.append(node)
+        }
         for fish in 0..<Self.maxFish {
-            let tail = SceneNode(id: "t\(fish)", z: 3)
-            let body = SceneNode(id: "f\(fish)", z: 4)
+            let tail = SceneNode(id: "t\(fish)", z: 4)
+            let body = SceneNode(id: "f\(fish)", z: 5)
             root.add(tail)
             root.add(body)
             tailNodes.append(tail)
@@ -134,7 +176,7 @@ final class AquariumPresenter: ExperiencePresenter {
         }
     }
 
-    /// The sway and tail factor: ½ with Reduce Motion, 1 otherwise.
+    /// The factor of the plant sway and the swim animation: ½ with Reduce Motion, 1 otherwise.
     var motionFactor: Double { reduceMotion ? 0.5 : 1 }
 
     // MARK: Render scene
@@ -207,12 +249,99 @@ final class AquariumPresenter: ExperiencePresenter {
         }
     }
 
-    /// The tail triangle of a fish of `length`, swung by `swing` radians about the body's back end.
-    nonisolated static func tail(length: Double, swing: Double) -> [Vec2] {
-        let joint = Vec2(-length * 0.42, 0)
-        let local = [Vec2(0, 0), Vec2(-length * 0.32, length * 0.2), Vec2(-length * 0.32, -length * 0.2)]
-        let c = cos(swing), s = sin(swing)
-        return local.map { p in joint + Vec2(p.x * c - p.y * s, p.x * s + p.y * c) }
+    /// The body fraction u of the fish-local x of a fish of `length`: 0 at the nose (x = length/2), 1 at the back
+    /// (x = −length/2), clamped to 0…1 (the tail behind the body counts as the back).
+    nonisolated static func bodyFraction(_ x: Double, length: Double) -> Double {
+        guard length > 0 else { return 0 }
+        return min(max(0.5 - x / length, 0), 1)
+    }
+
+    /// The bend at the back in radians for `turn` (rad/s): clamp(turn × 0.12, ±0.35) × `factor`; 0 for a non-finite
+    /// turn.
+    nonisolated static func bendAngle(turn: Double, factor: Double) -> Double {
+        guard turn.isFinite else { return 0 }
+        return min(max(turn * bendPerTurn, -maxBend), maxBend) * factor
+    }
+
+    /// The sideways body-wave displacement at body fraction `u`: 0.06 × length × sin(phase − 4u) × u × `factor`.
+    nonisolated static func waveOffset(u: Double, length: Double, phase: Double, factor: Double) -> Double {
+        bodyWave * length * sin(phase - waveLag * u) * u * factor
+    }
+
+    /// `p` (fish-local) turned about the nose (length/2, 0) by −`bend` × u², so a positive bend moves the back to +y
+    /// (the fish's left in the unmirrored frame).
+    nonisolated static func bent(_ p: Vec2, u: Double, length: Double, bend: Double) -> Vec2 {
+        let nose = Vec2(length / 2, 0)
+        let angle = -bend * u * u
+        let d = p - nose
+        let c = cos(angle), s = sin(angle)
+        return nose + Vec2(d.x * c - d.y * s, d.x * s + d.y * c)
+    }
+
+    /// The 12 animated outline points of a fish body of `shape` and `length` (fish-local, nose along +x): the
+    /// ``outline(_:length:)`` with the body wave of `phase` and the bend of `turn` (rad/s, positive = left), both
+    /// scaled by `factor` (1, ½ with Reduce Motion, 0 for the straight outline).
+    nonisolated static func animatedOutline(_ shape: FishShape, length: Double, phase: Double, turn: Double,
+                                            factor: Double) -> [Vec2] {
+        let bend = bendAngle(turn: turn, factor: factor)
+        return outline(shape, length: length).map { p in
+            let u = bodyFraction(p.x, length: length)
+            let waved = Vec2(p.x, p.y + waveOffset(u: u, length: length, phase: phase, factor: factor))
+            return bent(waved, u: u, length: length, bend: bend)
+        }
+    }
+
+    /// The animated tail triangle of a fish of `length` (fish-local, nose along +x): the joint at x = −0.42 length
+    /// follows the body wave, the two tips swing sideways by 0.15 × length × sin(`phase`), and all three follow the
+    /// bend of `turn`; everything scaled by `factor`.
+    nonisolated static func animatedTail(length: Double, phase: Double, turn: Double, factor: Double) -> [Vec2] {
+        let bend = bendAngle(turn: turn, factor: factor)
+        let jointX = -length * 0.42, tipX = jointX - length * 0.32
+        let joint = waveOffset(u: bodyFraction(jointX, length: length), length: length, phase: phase, factor: factor)
+        let sweep = tailSweep * length * sin(phase) * factor
+        let points = [Vec2(jointX, joint), Vec2(tipX, length * 0.2 + sweep), Vec2(tipX, -length * 0.2 + sweep)]
+        return points.map { bent($0, u: bodyFraction($0.x, length: length), length: length, bend: bend) }
+    }
+
+    /// The body and tail polygons of `fish` (habitat units) for a species of `shape` and `length`: animated from the
+    /// fish's phase and turn by `factor`, mirrored when it swims left (with the local bend negated, so the body still
+    /// bends toward the turn in the tank), rotated to its heading and moved to its position.
+    nonisolated static func fishPolygons(_ fish: FishAgent, shape: FishShape, length: Double,
+                                         factor: Double) -> (body: [Vec2], tail: [Vec2]) {
+        let mirrored = fish.velocity.x < 0
+        let turn = mirrored ? -fish.turn : fish.turn
+        let body = animatedOutline(shape, length: length, phase: fish.animationPhase, turn: turn, factor: factor)
+        let tail = animatedTail(length: length, phase: fish.animationPhase, turn: turn, factor: factor)
+        return (placed(body, position: fish.position, heading: fish.heading, mirrored: mirrored),
+                placed(tail, position: fish.position, heading: fish.heading, mirrored: mirrored))
+    }
+
+    /// The outline of a decor piece of `shape` (centred on the origin, habitat units) whose drawn width is
+    /// `size` × `scale`, turned counter-clockwise by `rotation`: a rock is an irregular rounded 9-point outline
+    /// (``rockRadii``, height ``rockAspect`` of the width); a shell a 12-point spiral whose radius grows from
+    /// ``shellInner`` to 1 of its outer radius over one turn, closed across its lip.
+    nonisolated static func decorOutline(_ shape: DecorShape, size: Double, rotation: Double, scale: Double) -> [Vec2] {
+        let width = size * scale
+        let local: [Vec2]
+        switch shape {
+        case .rock:
+            local = rockRadii.indices.map { i in
+                let r = rockRadii[i]
+                let angle = 2 * Double.pi * Double(i) / Double(rockRadii.count)
+                return Vec2(cos(angle) * r * width / 2, sin(angle) * r * width / 2 * rockAspect)
+            }
+        case .shell:
+            // The spiral spans x from −r(π) to r(2π) = R, so its width is R × (1 + r(π)/R).
+            let outer = width / (1 + shellInner + (1 - shellInner) / 2)
+            local = (0..<shellPoints).map { i in
+                let t = Double(i) / Double(shellPoints - 1)
+                let angle = 2 * Double.pi * t
+                let r = outer * (shellInner + (1 - shellInner) * t)
+                return Vec2(cos(angle) * r, sin(angle) * r)
+            }
+        }
+        let c = cos(rotation), s = sin(rotation)
+        return local.map { p in Vec2(p.x * c - p.y * s, p.x * s + p.y * c) }
     }
 
     /// `points` (fish-local, nose along +x) mirrored vertically when `mirrored`, rotated by `heading` and moved to
@@ -283,6 +412,20 @@ final class AquariumPresenter: ExperiencePresenter {
         }
         lastPlantsDrawn = plantsDrawn
 
+        var decorDrawn = 0
+        for (index, node) in decorNodes.enumerated() {
+            node.primitive = nil
+            guard index < document.decor.count, let kind = catalog.decor(id: document.decor[index].kindId) else {
+                continue
+            }
+            let piece = document.decor[index]
+            let points = Self.decorOutline(kind.shape, size: kind.size, rotation: piece.rotation, scale: piece.scale)
+            node.primitive = .polygon(points.map { world(piece.position + $0) })
+            node.color = Self.lit(kind.color, level: level)
+            decorDrawn += 1
+        }
+        lastDecorDrawn = decorDrawn
+
         var fishDrawn = 0
         for index in 0..<Self.maxFish {
             let body = bodyNodes[index], tail = tailNodes[index]
@@ -292,15 +435,10 @@ final class AquariumPresenter: ExperiencePresenter {
                 continue
             }
             let fish = document.fish[index]
-            let mirrored = fish.velocity.x < 0
-            let swing = sin(fish.animationPhase) * Self.tailSwing * factor
-            let outline = Self.placed(Self.outline(species.shape, length: species.length), position: fish.position,
-                                      heading: fish.heading, mirrored: mirrored)
-            let fin = Self.placed(Self.tail(length: species.length, swing: swing), position: fish.position,
-                                  heading: fish.heading, mirrored: mirrored)
-            body.primitive = .polygon(outline.map(world))
+            let shapes = Self.fishPolygons(fish, shape: species.shape, length: species.length, factor: factor)
+            body.primitive = .polygon(shapes.body.map(world))
             body.color = Self.lit(species.bodyColor, level: level)
-            tail.primitive = .polygon(fin.map(world))
+            tail.primitive = .polygon(shapes.tail.map(world))
             tail.color = Self.lit(species.finColor, level: level)
             fishDrawn += 1
         }
