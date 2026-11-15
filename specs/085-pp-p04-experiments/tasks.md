@@ -38,3 +38,7 @@ Agent A: T-A11-402. Agent B: T-A11-403 after A (Package.swift by the lead). Lead
 
 MVP: presets with reset to the experiment and the energy fixture (US1, US4), then saving (US2) and tutorials (US3);
 evidence last.
+
+## Phase 5: Convergence
+
+- [ ] T-A11-410 Correct `specs/085-pp-p04-experiments/research.md` D3 and D4 to the built behaviour: opening a saved slot keeps a running tutorial (as the spec's edge case requires: it stays on its step) instead of clearing it, and a reset, an opened preset or an opened slot restarts the current tutorial step at the new world's tick (otherwise "Step forward one tick" and "Let it run for 3 seconds" could never complete after the tick jumps back); cite `PlaygroundCore.opening(document:slot:from:)` and the tests that cover it, per plan: research D3/D4 (contradicts)
