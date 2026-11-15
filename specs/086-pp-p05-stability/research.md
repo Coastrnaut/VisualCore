@@ -11,7 +11,16 @@ Facts verified on 2026-11-15 (clarification session).
   one); any level change wakes all. Sleeping bodies get no gravity, drag or integration; pairs where neither side is an
   awake dynamic body are skipped before the narrow phase.
 - **Rationale**: the textbook resting-contact optimisation with conservative, deterministic triggers.
-- **Alternatives**: islands (more work, not needed at 48 bodies).
+- **Alternatives**: islands (more work, not needed at 48 bodies) — superseded at implementation, see below.
+- **As built (T-A11-502)**: (1) bodies that touch (overlapping bounds) or share a spring between two dynamic bodies
+  fall asleep together: a group sleeps only when every member has 60 rest ticks and none is grabbed (static and pinned
+  bodies and walls never join a group), because a body sleeping alone was woken again at once by its awake neighbour
+  and a stack never settled. (2) A body joined by a spring to a world point or to a static or pinned body never sleeps
+  (its rest counter stays 0): with damping 0.1 a hanging body's speed stays below 0.05 m/s through small swings, and it
+  froze mid-swing; with the rule the A11-P02 hanging-box tests pass unchanged. Measured on the host: the stack is
+  asleep after 62 ticks with 0 narrow-phase tests; stress 5 seeds × 1,200 ticks with 0 bad values; unedited damped
+  energy rise ≤ 0.041 %/s; work at 48 awake bodies ≤ 79 narrow-phase tests, 68 points, 680 solver updates per tick;
+  median tick 0.72 ms (debug host, not asserted; device timing is PP-D1).
 
 ## D2 — Work count and timing
 

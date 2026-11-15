@@ -11,6 +11,10 @@
 // migrate 1 → 2 → 3 (nothing pinned, no selection, no grab, overlays off); a schema-2 record (as feature 083 wrote it,
 // without `pinned`) migrates 2 → 3 keeping every field; the strict schema-3 decoder refuses both; schema 4 is refused;
 // a schema-3 world with pins, a selection, a grab and overlays round-trips exactly.
+// Updated by feature 086 (A11-P05) T-A11-502 (FR-A11-502; clarification 1) for schema 4: every migration ends with every
+// body awake and 0 rest ticks; a schema-3 record (without `asleep` and `restTicks`) migrates 3 → 4 keeping every other
+// field; schema 5 is refused; a schema-4 world with sleeping bodies, pins, a selection, a grab and overlays round-trips
+// exactly.
 import Foundation
 import Testing
 import VisualCoreMath
@@ -34,7 +38,8 @@ import PhysicsPlaygroundCore
     @Test func aSchemaOneWorldJSONMigratesWithDefaults() throws {
         let data = Data(Self.schemaOneJSON.utf8)
         let world = try PhysicsWorld.decode(data)
-        #expect(world.schema == 3 && world.validate(catalog: catalog).isEmpty)
+        #expect(world.schema == 4 && world.validate(catalog: catalog).isEmpty)
+        #expect(world.bodies.allSatisfy { !$0.asleep && $0.restTicks == 0 })
         #expect(world.bodies.allSatisfy { !$0.pinned } && world.selectedId == nil && world.grab == nil)
         #expect(!world.showVelocity && !world.showForces)
         #expect(world.bodies.map(\.id) == [0, 3] && world.nextId == 4)
@@ -82,9 +87,9 @@ import PhysicsPlaygroundCore
     }
 
     @Test func anotherSchemaIsRefused() {
-        let four = Self.schemaOneJSON.replacingOccurrences(of: "\"schema\":1", with: "\"schema\":4")
-        #expect(throws: PhysicsWorld.DecodeError.unsupportedSchema(4)) {
-            try PhysicsWorld.decode(Data(four.utf8))
+        let five = Self.schemaOneJSON.replacingOccurrences(of: "\"schema\":1", with: "\"schema\":5")
+        #expect(throws: PhysicsWorld.DecodeError.unsupportedSchema(5)) {
+            try PhysicsWorld.decode(Data(five.utf8))
         }
         #expect(throws: DecodingError.self) { try PhysicsWorld.decode(Data("{}".utf8)) }
     }
@@ -98,6 +103,8 @@ import PhysicsPlaygroundCore
         object["bodies"] = bodies.map { body -> [String: Any] in
             var body = body
             body.removeValue(forKey: "pinned")
+            body.removeValue(forKey: "asleep")
+            body.removeValue(forKey: "restTicks")
             return body
         }
         return try JSONSerialization.data(withJSONObject: object, options: [.sortedKeys])
@@ -117,8 +124,10 @@ import PhysicsPlaygroundCore
         // The strict schema-3 decoder refuses it; the migrating decoder keeps every schema-2 field.
         #expect(throws: DecodingError.self) { try JSONDecoder().decode(PhysicsWorld.self, from: data) }
         let migrated = try PhysicsWorld.decode(data)
+        // Schema 4 (feature 086): the migrated bodies are awake with 0 rest ticks; the run may have put some to sleep.
+        Sleep.wakeAll(&world)
         #expect(migrated == world)
-        #expect(migrated.schema == 3 && migrated.validate(catalog: catalog).isEmpty)
+        #expect(migrated.schema == 4 && migrated.validate(catalog: catalog).isEmpty)
         #expect(migrated.bodies.allSatisfy { !$0.pinned } && migrated.selectedId == nil && migrated.grab == nil)
         #expect(!migrated.showVelocity && !migrated.showForces)
         let old = try JSONDecoder().decode(PhysicsWorld.SchemaTwo.self, from: data)
@@ -127,6 +136,52 @@ import PhysicsPlaygroundCore
         var a = world, b = migrated
         for _ in 0..<60 { WorldSimulation.tick(&a, catalog: catalog); WorldSimulation.tick(&b, catalog: catalog) }
         #expect(a.encoded() == b.encoded())
+    }
+
+    /// A schema-3 record of `world` exactly as feature 084 wrote it: no `asleep` or `restTicks` keys.
+    private func schemaThreeData(_ world: PhysicsWorld) throws -> Data {
+        var object = try #require(try JSONSerialization.jsonObject(with: world.encoded()) as? [String: Any])
+        object["schema"] = 3
+        let bodies = try #require(object["bodies"] as? [[String: Any]])
+        object["bodies"] = bodies.map { body -> [String: Any] in
+            var body = body
+            body.removeValue(forKey: "asleep")
+            body.removeValue(forKey: "restTicks")
+            return body
+        }
+        return try JSONSerialization.data(withJSONObject: object, options: [.sortedKeys])
+    }
+
+    @Test func aSchemaThreeWorldMigratesToSchemaFourAwake() throws {
+        var random = SeededRandom(seed: 12)
+        var world = StartingScene.make(random: &random, catalog: catalog)
+        for _ in 0..<480 { WorldSimulation.tick(&world, catalog: catalog) }
+        #expect(WorldEditing.togglePin(&world, id: 2) == nil)
+        #expect(WorldEditing.select(&world, id: 3) == nil)
+        world.showForces = true
+        let data = try schemaThreeData(world)
+        let text = try #require(String(data: data, encoding: .utf8))
+        #expect(text.contains("\"schema\":3") && !text.contains("asleep") && !text.contains("restTicks"))
+        let migrated = try PhysicsWorld.decode(data)
+        #expect(migrated.schema == 4 && migrated.validate(catalog: catalog).isEmpty)
+        #expect(migrated.bodies.allSatisfy { !$0.asleep && $0.restTicks == 0 })
+        var awake = world
+        Sleep.wakeAll(&awake)
+        #expect(migrated == awake)
+        let three = try JSONDecoder().decode(PhysicsWorld.self, from: data)
+        #expect(three.schema == 3 && PhysicsWorld.migrated(fromSchemaThree: three) == awake)
+    }
+
+    @Test func aSchemaFourWorldRoundTripsExactly() throws {
+        var random = SeededRandom(seed: 11)
+        var world = Presets.make(.stackedObjects, random: &random, catalog: catalog)
+        for _ in 0..<360 { WorldSimulation.tick(&world, catalog: catalog) }
+        #expect(world.bodies.allSatisfy { $0.asleep })
+        let data = world.encoded()
+        let text = try #require(String(data: data, encoding: .utf8))
+        #expect(text.contains("\"schema\":4") && text.contains("\"asleep\":true") && text.contains("\"restTicks\":60"))
+        let back = try PhysicsWorld.decode(data)
+        #expect(back == world && back.encoded() == data)
     }
 
     @Test func aSchemaThreeWorldRoundTripsExactly() throws {
@@ -142,7 +197,7 @@ import PhysicsPlaygroundCore
         #expect(world.validate(catalog: catalog) == [])
         let data = world.encoded()
         let text = try #require(String(data: data, encoding: .utf8))
-        #expect(text.contains("\"schema\":3") && text.contains("\"pinned\":true") && text.contains("\"grab\":{"))
+        #expect(text.contains("\"schema\":4") && text.contains("\"pinned\":true") && text.contains("\"grab\":{"))
         #expect(text.contains("\"selectedId\":2") && text.contains("\"showForces\":true"))
         let back = try PhysicsWorld.decode(data)
         #expect(back == world && back.encoded() == data)

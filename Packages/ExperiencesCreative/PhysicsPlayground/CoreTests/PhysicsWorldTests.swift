@@ -27,7 +27,7 @@ import PhysicsPlaygroundCore
         #expect(settings.tick == 1.0 / 120.0 && settings.iterations == 10)
         #expect(settings.stageSize == Vec2(10, 8))
         let world = PhysicsWorld()
-        #expect(world.schema == 3 && world.tick == 0 && world.nextId == 0 && !world.paused)
+        #expect(world.schema == 4 && world.tick == 0 && world.nextId == 0 && !world.paused)
         #expect(world.springs.isEmpty && world.nextSpringId == 0 && world.contactCache.isEmpty)
         #expect(world.gravityLevel == 2 && world.dragLevel == 1 && world.stiffnessLevel == 1)
         #expect(world.timeScaleIndex == 2 && world.remainder == 0)
@@ -64,7 +64,8 @@ import PhysicsPlaygroundCore
         #expect(back.encoded() == data)
         let text = try #require(String(data: data, encoding: .utf8))
         #expect(text.hasPrefix("{\"bodies\":[{\"angle\":"))
-        #expect(text.contains("\"schema\":3") && text.contains("\"pinned\":false"))
+        #expect(text.contains("\"schema\":4") && text.contains("\"pinned\":false"))
+        #expect(text.contains("\"asleep\":false") && text.contains("\"restTicks\":0"))
     }
 
     @Test func validateNamesEachProblem() {
@@ -75,7 +76,7 @@ import PhysicsPlaygroundCore
             change(&world)
             return world.validate()
         }
-        #expect(problems { $0.schema = 1 } == ["schema 1 is not 3"])
+        #expect(problems { $0.schema = 1 } == ["schema 1 is not 4"])
         #expect(problems { $0.settings.gravity = Vec2(0, .nan) } == ["settings.gravity is not finite"])
         #expect(problems { $0.settings.gravity = Vec2(0, -25) } == ["settings.gravity exceeds 20.0 m/s²",
                                                                  "settings.gravity does not match gravityLevel 2"])

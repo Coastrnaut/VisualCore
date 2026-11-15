@@ -21,6 +21,10 @@
 // - `nudge(dx:dy:)`: adds 1 m/s × (dx, dy) (each clamped to −1…1) to the selected body's velocity, then the 40 m/s cap
 //   (`noSelection` without a selection; `notGrabbable` for a static or pinned body; `invalidChoice` for a non-finite
 //   value).
+// Feature 086 (A11-P05) T-A11-502 (FR-A11-502; clarification 1; research D1): edits wake (Sleep.swift). `grab`, `nudge`
+// and `togglePin` wake the body they name (a pinned body is never asleep); `delete` wakes every body whose bounds touch
+// the deleted body's bounds and every body a removed spring joined to it; an added body starts awake; `select`, `move`
+// and `release` wake nothing (a grabbed body is awake while grabbed).
 import Foundation
 import VisualCoreMath
 import VisualCoreSimulation
@@ -102,6 +106,7 @@ public enum WorldEditing {
         let anchor = world.bodies[index].pose.toLocal(point)
         guard anchor.isFinite else { return .invalidChoice }
         world.grab = Grab(bodyId: id, localAnchor: anchor, target: clampedIntoStage(point, world))
+        Sleep.wake(&world, id: id)
         return nil
     }
 
@@ -133,12 +138,18 @@ public enum WorldEditing {
             world.bodies[index].angularVelocity = 0
             if world.grab?.bodyId == id { world.grab = nil }
         }
+        Sleep.wake(&world, id: id)
         return nil
     }
 
     /// Deletes body `id` with its springs, contact-cache entries, grab and selection.
     public static func delete(_ world: inout PhysicsWorld, id: Int) -> EditRefusal? {
         guard let index = world.index(ofBody: id) else { return .unknownBody }
+        let deleted = world.bodies[index]
+        Sleep.wakeTouching(&world, bounds: deleted.shape.bounds(at: deleted.pose))
+        for spring in world.springs where spring.a.bodyId == id || spring.b.bodyId == id {
+            for other in [spring.a.bodyId, spring.b.bodyId] { if let other, other != id { Sleep.wake(&world, id: other) } }
+        }
         world.bodies.remove(at: index)
         world.springs.removeAll { $0.a.bodyId == id || $0.b.bodyId == id }
         world.contactCache.removeAll { $0.bodyA == id || $0.bodyB == id }
@@ -157,6 +168,7 @@ public enum WorldEditing {
         let speed = velocity.length
         if speed > PhysicsWorld.speedCap { velocity = velocity * (PhysicsWorld.speedCap / speed) }
         world.bodies[index].velocity = velocity
+        Sleep.wake(&world, id: id)
         return nil
     }
 

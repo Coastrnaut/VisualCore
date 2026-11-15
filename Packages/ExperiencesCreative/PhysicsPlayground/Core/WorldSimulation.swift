@@ -1,8 +1,11 @@
 // WorldSimulation — feature 082 (A11-P01) T-A11-103 (FR-A11-111, FR-A11-112; clarifications 1 and 4; research D3,
 // D4; SC-A11-101–104), extended by feature 083 (A11-P02) T-A11-203 (FR-A11-211; clarifications 1–4; research D1–D4).
 // Extended by feature 084 (A11-P03) T-A11-302 (FR-A11-301, FR-A11-302; clarification 3; research D1–D3): pinned
-// bodies and the grab pull.
+// bodies and the grab pull. Extended by feature 086 (A11-P05) T-A11-502 (FR-A11-502, FR-A11-503; clarifications 1, 2;
+// research D1, D2): sleep (Sleep.swift) and the counted work (WorkCount.swift).
 // The fixed-tick rules of the playground world. One tick (1/120 s) does, in this order:
+// 0. Wake triggers (Sleep.swift): a sleeping body whose bounds overlap an awake dynamic body's bounds, or that a spring
+//    joins to an awake dynamic body, wakes (repeated until nothing changes). A sleeping body keeps its state below.
 // 1. Solver states: the bodies in id order (static and pinned bodies with inverse mass and inverse inertia 0, and a
 //    pinned body with velocity and angular velocity 0), then the four walls (floor, ceiling, left, right; static,
 //    restitution 0, friction 0.5).
@@ -15,11 +18,11 @@
 //    never sees the gravity speed of the same tick (that would shorten a hanging body's rest stretch by 2ζ·ω·dt,
 //    about 1.8 % at ζ = 0.1). With a `ForceMeasurement`, each spring is applied on its own in the same order (the
 //    same result) and its impulse J·n is summed per body ÷ dt (see ForceMeasurement.swift).
-// 3. Every dynamic (not static, not pinned) body: v += g·dt; v ·= 1/(1 + kₗ·dt); ω ·= 1/(1 + kₐ·dt); then the caps (40 m/s, 40 rad/s). Gravity
+// 3. Every awake dynamic (not static, not pinned, not asleep) body: v += g·dt; v ·= 1/(1 + kₗ·dt); ω ·= 1/(1 + kₐ·dt); then the caps (40 m/s, 40 rad/s). Gravity
 //    and drag come from the settings, which carry the world's gravity and drag levels.
 // 4. Contacts through VisualCore's `Contacts2D.collide`: the body pairs i < j that `BroadPhase2D.pairs` reports over
-//    each body's `Shape2D.bounds(at:)` (pairs of two fixed bodies — static or pinned — skipped), in ascending (i, j)
-//    order, then every dynamic, unpinned body
+//    each body's `Shape2D.bounds(at:)` (pairs in which neither body is awake and dynamic — static, pinned or asleep —
+//    skipped), in ascending (i, j) order, then every awake dynamic body
 //    against each wall it can reach (a body whose bounding circle stays more than 1e-6 m inside a wall's stage edge is
 //    not tested; this only saves work). ``ContactPairing/allPairs`` passes every pair instead (the reference the broad
 //    phase is tested against; the result is identical).
@@ -32,14 +35,17 @@
 //    is limited to 0.1 m so a deep overlap (a drop onto another body) separates over a few ticks and never pushes a
 //    body through a 1 m wall. The caps apply again; static bodies are never written, and a pinned body only has its
 //    velocity and angular velocity set to 0 (its position and angle are never written).
-// 7. Semi-implicit Euler for dynamic, unpinned bodies: x += v·dt, θ += ω·dt (θ kept in −π…π); the tick count
-//    increases.
+//    A sleeping body is never written.
+// 7. Semi-implicit Euler for awake dynamic bodies: x += v·dt, θ += ω·dt (θ kept in −π…π).
+// 8. Rest count and falling asleep (Sleep.swift); the tick count increases. With a `WorkCount`, the narrow-phase tests,
+//    contacts, contact points and solver point updates of the tick are counted (the world is the same either way).
 //
 // A world with a non-finite number, an unknown material, unsound settings, levels that do not match the settings or an
 // unsound spring is refused (`tick` returns false and changes nothing). `advanceHostStep` turns host steps into ticks
 // with the quarter-tick remainder (¼ runs one tick every fourth host step, 2 runs two ticks per host step), so the world
 // after N ticks is the same at every time scale; `step` runs exactly one tick while paused; `drop` adds a seeded body at
-// y = 7 m; `setGravityLevel`, `setDragLevel` and `setStiffnessLevel` change a level (and the settings it drives).
+// y = 7 m (awake); `setGravityLevel`, `setDragLevel` and `setStiffnessLevel` change a level (and the settings it drives)
+// and wake every body.
 import Foundation
 import VisualCoreMath
 import VisualCoreSimulation
@@ -119,8 +125,21 @@ public enum WorldSimulation {
     /// the world cannot be simulated.
     @discardableResult
     public static func tick(_ world: inout PhysicsWorld, catalog: MaterialCatalog, pairing: ContactPairing) -> Bool {
-        var none: ForceMeasurement?
-        return run(&world, catalog: catalog, pairing: pairing, forces: &none)
+        var none: ForceMeasurement?, noWork: WorkCount?
+        return run(&world, catalog: catalog, pairing: pairing, forces: &none, work: &noWork)
+    }
+
+    /// Runs one tick with the broad phase and counts its work in `work` (replaced as a whole; see ``WorkCount``).
+    /// Returns false and changes neither the world nor `work` when the world cannot be simulated. The world after the
+    /// tick is identical to ``tick(_:catalog:)``.
+    @discardableResult
+    public static func tick(_ world: inout PhysicsWorld, catalog: MaterialCatalog, work: inout WorkCount) -> Bool {
+        var none: ForceMeasurement?, counted: WorkCount? = WorkCount()
+        guard run(&world, catalog: catalog, pairing: .broadPhase, forces: &none, work: &counted), let counted else {
+            return false
+        }
+        work = counted
+        return true
     }
 
     /// Runs one tick with the broad phase and records the measured spring forces of that tick in `forces` (replaced
@@ -129,21 +148,24 @@ public enum WorldSimulation {
     @discardableResult
     public static func tick(_ world: inout PhysicsWorld, catalog: MaterialCatalog,
                             forces: inout ForceMeasurement) -> Bool {
-        var measured: ForceMeasurement? = ForceMeasurement()
-        guard run(&world, catalog: catalog, pairing: .broadPhase, forces: &measured), let measured else {
+        var measured: ForceMeasurement? = ForceMeasurement(), noWork: WorkCount?
+        guard run(&world, catalog: catalog, pairing: .broadPhase, forces: &measured, work: &noWork),
+              let measured else {
             return false
         }
         forces = measured
         return true
     }
 
-    /// The tick itself; measures spring forces into `forces` when it is not nil.
+    /// The tick itself; measures spring forces into `forces` and counts work into `work` when they are not nil.
     private static func run(_ world: inout PhysicsWorld, catalog: MaterialCatalog, pairing: ContactPairing,
-                            forces: inout ForceMeasurement?) -> Bool {
+                            forces: inout ForceMeasurement?, work: inout WorkCount?) -> Bool {
         guard canSimulate(world, catalog: catalog) else { return false }
         let settings = world.settings, dt = settings.tick
         let linear = 1 / (1 + settings.linearDrag * dt), angular = 1 / (1 + settings.angularDrag * dt)
         var bodies = world.bodies
+        let grabbedId = world.grab?.bodyId
+        Sleep.applyWakeTriggers(&bodies, springs: world.springs, grabbedId: grabbedId)
 
         var states: [RigidBodyState2D] = bodies.map { body in
             let material = catalog.material(id: body.materialId)!
@@ -206,7 +228,7 @@ public enum WorldSimulation {
         }
 
         // Gravity and drag (after the springs, so a spring's damper never sees this tick's gravity speed), then caps.
-        for index in bodies.indices where !bodies[index].isFixed {
+        for index in bodies.indices where bodies[index].isAwakeDynamic {
             states[index].velocity = (states[index].velocity + settings.gravity * dt) * linear
             states[index].angularVelocity *= angular
             cap(&states[index])
@@ -215,7 +237,8 @@ public enum WorldSimulation {
         // Contacts.
         var contacts: [Contact2D] = []
         let count = bodies.count
-        let fixed = bodies.map(\.isFixed)
+        let active = bodies.map(\.isAwakeDynamic)
+        var tests = 0
         var pairs: [(Int, Int)] = []
         switch pairing {
         case .broadPhase:
@@ -223,18 +246,20 @@ public enum WorldSimulation {
         case .allPairs:
             for i in 0..<count { for j in (i + 1)..<max(count, i + 1) { pairs.append((i, j)) } }
         }
-        for (i, j) in pairs where !(fixed[i] && fixed[j]) {
+        for (i, j) in pairs where active[i] || active[j] {
             let a = bodies[i], b = bodies[j]
+            tests += 1
             if let manifold = Contacts2D.collide(a.shape, a.pose, b.shape, b.pose) {
                 contacts.append(Contact2D(a: i, b: j, manifold: manifold))
             }
         }
-        for i in 0..<count where !fixed[i] {
+        for i in 0..<count where active[i] {
             let body = bodies[i]
             let bound = body.boundingRadius + 1e-6, stage = settings.stageSize
             let reaches = [body.position.y - bound <= 0, body.position.y + bound >= stage.y,
                            body.position.x - bound <= 0, body.position.x + bound >= stage.x]
             for (k, wall) in walls.enumerated() where reaches[k] {
+                tests += 1
                 if let manifold = Contacts2D.collide(body.shape, body.pose, wall.shape, wall.pose) {
                     contacts.append(Contact2D(a: i, b: count + k, manifold: manifold))
                 }
@@ -265,6 +290,11 @@ public enum WorldSimulation {
         var solver = ImpulseSolver2D.Settings()
         solver.iterations = settings.iterations
         ImpulseSolver2D.solve(&states, contacts: &contacts, settings: solver)
+        if work != nil {
+            let points = contacts.reduce(0) { $0 + $1.manifold.points.count }
+            work = WorkCount(narrowPhaseTests: tests, contacts: contacts.count, contactPoints: points,
+                             solverPointUpdates: max(settings.iterations, 0) * points)
+        }
 
         var cache: [ContactCacheEntry] = []
         for contact in contacts {
@@ -282,7 +312,7 @@ public enum WorldSimulation {
         }
         cache.sort { ($0.bodyA, $0.bodyB, $0.pointIndex) < ($1.bodyA, $1.bodyB, $1.pointIndex) }
 
-        for index in bodies.indices where !bodies[index].isStatic {
+        for index in bodies.indices where !bodies[index].isStatic && !bodies[index].isSleeping {
             var body = bodies[index]
             if body.pinned {
                 body.velocity = .zero
@@ -303,6 +333,7 @@ public enum WorldSimulation {
             if abs(body.angle) > Double.pi { body.angle = remainder(body.angle, 2 * Double.pi) }
             bodies[index] = body
         }
+        Sleep.settle(&bodies, springs: world.springs, grabbedId: grabbedId)
         guard bodies.allSatisfy(\.isFinite) else { return false }
         world.bodies = bodies
         world.contactCache = cache
@@ -339,7 +370,10 @@ public enum WorldSimulation {
         let quarters = next.remainder + PhysicsWorld.quarterTicks[next.timeScaleIndex]
         next.remainder = quarters % 4
         for _ in 0..<(quarters / 4) {
-            guard run(&next, catalog: catalog, pairing: .broadPhase, forces: &measured) else { return 0 }
+            var noWork: WorkCount?
+            guard run(&next, catalog: catalog, pairing: .broadPhase, forces: &measured, work: &noWork) else {
+                return 0
+            }
         }
         world = next
         forces = measured
@@ -383,33 +417,36 @@ public enum WorldSimulation {
         return true
     }
 
-    /// Sets the gravity level (0 off, 1 Moon, 2 Earth) and the settings' gravity to its vector. Refused (false,
-    /// nothing changes) outside 0…2.
+    /// Sets the gravity level (0 off, 1 Moon, 2 Earth) and the settings' gravity to its vector, and wakes every body.
+    /// Refused (false, nothing changes) outside 0…2.
     @discardableResult
     public static func setGravityLevel(_ world: inout PhysicsWorld, _ level: Int) -> Bool {
         guard let gravity = ForceLevels.gravityVector(level: level) else { return false }
         world.gravityLevel = level
         world.settings.gravity = gravity
+        Sleep.wakeAll(&world)
         return true
     }
 
-    /// Sets the drag level (0 none, 1 low, 2 high) and the settings' linear and angular drag to its value. Refused
-    /// (false, nothing changes) outside 0…2.
+    /// Sets the drag level (0 none, 1 low, 2 high) and the settings' linear and angular drag to its value, and wakes
+    /// every body. Refused (false, nothing changes) outside 0…2.
     @discardableResult
     public static func setDragLevel(_ world: inout PhysicsWorld, _ level: Int) -> Bool {
         guard let drag = ForceLevels.dragValue(level: level) else { return false }
         world.dragLevel = level
         world.settings.linearDrag = drag
         world.settings.angularDrag = drag
+        Sleep.wakeAll(&world)
         return true
     }
 
-    /// Sets the stiffness level (0…3: 20, 60, 150, 400 N/m) every spring uses. Refused (false, nothing changes)
-    /// outside 0…3.
+    /// Sets the stiffness level (0…3: 20, 60, 150, 400 N/m) every spring uses, and wakes every body. Refused (false,
+    /// nothing changes) outside 0…3.
     @discardableResult
     public static func setStiffnessLevel(_ world: inout PhysicsWorld, _ level: Int) -> Bool {
         guard ForceLevels.stiffnessLevels.contains(level) else { return false }
         world.stiffnessLevel = level
+        Sleep.wakeAll(&world)
         return true
     }
 

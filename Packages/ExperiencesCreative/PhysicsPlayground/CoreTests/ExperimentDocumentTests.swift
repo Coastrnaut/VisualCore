@@ -128,7 +128,7 @@ import PhysicsPlaygroundCore
         var world = try #require(whole["world"] as? [String: Any])
         // An unsupported world schema, a malformed world and a world that does not validate.
         var unsupported = whole
-        world["schema"] = 4
+        world["schema"] = 5
         unsupported["world"] = world
         #expect(ExperimentDocument.decode(try data(unsupported)) == .failure(.invalidWorld))
         var malformed = whole
