@@ -22,7 +22,7 @@ after every task (no trailers); read every check's exit before ticking. No Swift
 ## Phase 5: User Story 3 — The shell builds with the experience absent (P2)
 
 - [X] T-A11-006 [US3] Build the one app for testing (`--name app-build -- python3 scripts/release_check.py --only app-build-for-testing-ios27`) — Verified 2026-11-15: 2026-11-15: .autonomy/checks/A11-P00.app-build.json exit 0 (iOS 27.2 phone simulator)
-- [ ] T-A11-007 [US3] Experience package check (`--name experience-packages -- python3 scripts/check_experience_packages.py`: 10 experiences, none A11); `grep -c a11 Catalog/registrations.json Apps/VisualCore/App/ExperienceRegistry.swift` gives 0 (FR-A11-005, SC-A11-004)
+- [X] T-A11-007 [US3] Experience package check (`--name experience-packages -- python3 scripts/check_experience_packages.py`: 10 experiences, none A11); `grep -c a11 Catalog/registrations.json Apps/VisualCore/App/ExperienceRegistry.swift` gives 0 (FR-A11-005, SC-A11-004) — Verified 2026-11-15: 2026-11-15: .autonomy/checks/A11-P00.experience-packages.json exit 0 (10 experiences, none A11); grep a11 in registrations.json and ExperienceRegistry.swift gives 0
 
 ## Phase 6: User Story 4 — Stop/go decision (P2)
 
