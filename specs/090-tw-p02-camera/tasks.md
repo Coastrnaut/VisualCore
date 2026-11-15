@@ -46,3 +46,7 @@ Agent A: T-A12-202. Agent B: T-A12-203. Agent C: T-A12-204. Agent D: T-A12-205 a
 
 MVP: the camera policy and gestures (US1) over the generic ray and colour additions; then colour, pick and levels;
 evidence last.
+
+## Phase 6: Convergence
+
+- [ ] T-A12-214 Record in `specs/090-tw-p02-camera/research.md` (as built): D3 — the camera policy also runs after `world.preset` and `world.seed` (a new terrain can rise under the eye) and on prepare, restore and reset; level-0 height fields are memoised (at most 16, pure); `WorldsMotion.swift` holds `ViewEasing` and `ViewAnnouncer`; `WorldsGestures` measures drag and pinch steps from the finger positions because `GestureArbiter` reports only state changes; the bundled presets never need a pitch raise over the 768-view sweep (their eye stays outside the high ground), so the raise is proven on synthetic fields (`CameraPolicyTests`), per plan: research D3, SC-A12-201 (unrequested, partial)
