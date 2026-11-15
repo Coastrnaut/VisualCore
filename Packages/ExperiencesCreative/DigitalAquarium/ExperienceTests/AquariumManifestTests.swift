@@ -1,6 +1,7 @@
 // AquariumManifestTests — feature 068 (A09-P01) T-A09-105 (FR-A09-122; SC-A09-105); fixtures 6 and 7 feature 069
 // (A09-P02) T-A09-207 (FR-A09-213); fixtures 8–10 feature 070 (A09-P03) T-A09-308 (FR-A09-322); fixture 11 feature
-// 071 (A09-P04) T-A09-407. The scenario manifest of Digital Aquarium: valid with the nine standard scenarios and eleven
+// 071 (A09-P04) T-A09-407; fixtures 12 and 13 feature 072 (A09-P05) T-A09-507. The scenario manifest of Digital
+// Aquarium: valid with the nine standard scenarios and thirteen
 // fixtures (A09-P01's five, schooling and save/load, feeding, decor editing, no fast-forward with food and water
 // effects) (swim bounds, save/restore, no
 // fast-forward while paused, both validated habitats, bounded counts), its derived digests and expected results equal
@@ -33,13 +34,13 @@ private func play(_ spec: ScenarioSpec) async throws -> (initial: String, result
 }
 
 @Suite struct AquariumManifestTests {
-    @Test func theManifestIsValidWithTheNineStandardScenariosAndElevenFixtures() {
+    @Test func theManifestIsValidWithTheNineStandardScenariosAndThirteenFixtures() {
         let manifest = AquariumCore.manifest(for: id)
         let problems = ScenarioManifestValidator.problems(manifest, controls: AquariumCore.controls,
-                                                          content: ContentRequirement(fixtures: 11))
+                                                          content: ContentRequirement(fixtures: 13))
         #expect(problems.isEmpty, "\(problems)")
         #expect(Set(manifest.scenarios.map(\.name))
-                == Set(ScenarioManifest.standardNames).union((1...11).map { "fixture-\($0)" }))
+                == Set(ScenarioManifest.standardNames).union((1...13).map { "fixture-\($0)" }))
     }
 
     @Test func derivedDigestsAndResultsAreWhatTheEngineGives() async throws {
@@ -148,6 +149,22 @@ private func play(_ spec: ScenarioSpec) async throws -> (initial: String, result
         let bubbles = WaterEffects.bubbles(step: watered.step, vents: catalog.habitats[0].vents, reduceMotion: false)
         #expect(!bubbles.isEmpty && bubbles.count <= WaterEffects.maxBubbles)
         #expect(bubbles.allSatisfy { $0.y >= WaterEffects.ventY && $0.y < WaterEffects.surface })
+
+        // 12. Ambient: the state holds ambient on, and the fish are slower than the same run without it.
+        let calm = AquariumCore.played(seed: seed, entries: fixtures[11])
+        let plain = AquariumCore.played(seed: seed, entries: [ScenarioStep(steps: 5), ScenarioStep(steps: 600)])
+        func mean(_ core: AquariumCore) -> Double {
+            core.document.fish.map(\.velocity.length).reduce(0, +) / Double(max(core.document.fish.count, 1))
+        }
+        #expect(calm.ambient && !plain.ambient)
+        #expect(mean(calm) < mean(plain))
+
+        // 13. Long run: 2,000 steps with a feed every 100 keep the fish count and every limit.
+        let long = AquariumCore.played(seed: seed, entries: fixtures[12])
+        #expect(long.step == 2_000)
+        #expect(long.document.fish.count == AquariumCore(seed: seed).document.fish.count)
+        #expect(long.document.food.count <= Feeding.maxPellets)
+        #expect(long.document.validate(catalog: catalog).isEmpty)
         #expect(dropped.document.food.count == Feeding.pelletsPerFeed)
         for pellet in early.document.food {
             #expect(dropped.document.food.contains { abs($0.position.x - pellet.position.x) < 1e-12

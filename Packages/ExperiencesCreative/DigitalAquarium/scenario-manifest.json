@@ -600,6 +600,259 @@
       },
       "name" : "fixture-11",
       "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "ambient.mode",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 5
+        },
+        {
+          "steps" : 600
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "b1d4d31fd75fb80876e6c3e8cefbe3b1073bdb339a729747d1d8f22b12eee40d",
+        "initialDigest" : "82ef762b7d72b16690c9dc9314958014c76d6fae0dd98d744da0cfc9cb381c29"
+      },
+      "name" : "fixture-12",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "food.drop",
+            "values" : [
+              0.5,
+              0.80000000000000004
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 100
+        },
+        {
+          "action" : {
+            "control" : "food.drop",
+            "values" : [
+              0.5,
+              0.80000000000000004
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 100
+        },
+        {
+          "action" : {
+            "control" : "food.drop",
+            "values" : [
+              0.5,
+              0.80000000000000004
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 100
+        },
+        {
+          "action" : {
+            "control" : "food.drop",
+            "values" : [
+              0.5,
+              0.80000000000000004
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 100
+        },
+        {
+          "action" : {
+            "control" : "food.drop",
+            "values" : [
+              0.5,
+              0.80000000000000004
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 100
+        },
+        {
+          "action" : {
+            "control" : "food.drop",
+            "values" : [
+              0.5,
+              0.80000000000000004
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 100
+        },
+        {
+          "action" : {
+            "control" : "food.drop",
+            "values" : [
+              0.5,
+              0.80000000000000004
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 100
+        },
+        {
+          "action" : {
+            "control" : "food.drop",
+            "values" : [
+              0.5,
+              0.80000000000000004
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 100
+        },
+        {
+          "action" : {
+            "control" : "food.drop",
+            "values" : [
+              0.5,
+              0.80000000000000004
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 100
+        },
+        {
+          "action" : {
+            "control" : "food.drop",
+            "values" : [
+              0.5,
+              0.80000000000000004
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 100
+        },
+        {
+          "action" : {
+            "control" : "food.drop",
+            "values" : [
+              0.5,
+              0.80000000000000004
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 100
+        },
+        {
+          "action" : {
+            "control" : "food.drop",
+            "values" : [
+              0.5,
+              0.80000000000000004
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 100
+        },
+        {
+          "action" : {
+            "control" : "food.drop",
+            "values" : [
+              0.5,
+              0.80000000000000004
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 100
+        },
+        {
+          "action" : {
+            "control" : "food.drop",
+            "values" : [
+              0.5,
+              0.80000000000000004
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 100
+        },
+        {
+          "action" : {
+            "control" : "food.drop",
+            "values" : [
+              0.5,
+              0.80000000000000004
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 100
+        },
+        {
+          "action" : {
+            "control" : "food.drop",
+            "values" : [
+              0.5,
+              0.80000000000000004
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 100
+        },
+        {
+          "action" : {
+            "control" : "food.drop",
+            "values" : [
+              0.5,
+              0.80000000000000004
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 100
+        },
+        {
+          "action" : {
+            "control" : "food.drop",
+            "values" : [
+              0.5,
+              0.80000000000000004
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 100
+        },
+        {
+          "action" : {
+            "control" : "food.drop",
+            "values" : [
+              0.5,
+              0.80000000000000004
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 100
+        },
+        {
+          "action" : {
+            "control" : "food.drop",
+            "values" : [
+              0.5,
+              0.80000000000000004
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 100
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "040a2c75fa18aa7386adf0b02151b068a311820c1e25bf3dbdae8e7ab61272d7",
+        "initialDigest" : "82ef762b7d72b16690c9dc9314958014c76d6fae0dd98d744da0cfc9cb381c29"
+      },
+      "name" : "fixture-13",
+      "seed" : "7"
     }
   ],
   "schema" : 1

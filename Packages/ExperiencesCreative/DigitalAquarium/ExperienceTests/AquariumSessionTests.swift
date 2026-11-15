@@ -8,6 +8,7 @@
 // but never changes the state; every action has a native control.
 import Foundation
 import XCTest
+import VisualCoreDiagnostics
 @testable import DigitalAquariumExperience
 import DigitalAquariumCore
 import VisualCoreExperience
@@ -176,6 +177,27 @@ final class AquariumSessionTests: XCTestCase {
         XCTAssertEqual(try AquariumTest.core(opened).document.habitatId, "reef", "the starter habitat opens")
         XCTAssertThrowsError(try opened.restore(damaged))
         second.close()
+    }
+
+    /// Feature 072 (A09-P05) T-A09-507 (FR-A09-530; SC-A09-504): opening, running and closing the aquarium five times
+    /// leaves the same live drawing resources after each opening, nothing leaked, and nothing alive after closing.
+    func testReopeningFiveTimesKeepsTheDrawingResourcesSteady() async throws {
+        var reference: ResourceLedger.Snapshot?
+        for cycle in 1...5 {
+            let session = ExperienceSession()
+            let shell = try await AquariumTest.open(session)
+            XCTAssertTrue(shell.handle(control: "food.drop", values: [0.5, 0.8]).isAccepted)
+            try AquariumTest.frames(session, 30)
+            let stats = try XCTUnwrap(session.renderHost).resources.stats
+            XCTAssertEqual(stats.leaked, 0, "cycle \(cycle)")
+            if let reference {
+                XCTAssertEqual(stats.liveCount, reference.liveCount, "cycle \(cycle): the same live objects per kind")
+                XCTAssertEqual(stats.liveBytes, reference.liveBytes, "cycle \(cycle): the same live bytes per kind")
+            } else {
+                reference = stats
+            }
+            session.close()
+        }
     }
 
     func testTheSavedStateRestoresIdenticallyInANewSession() async throws {

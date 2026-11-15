@@ -25,7 +25,7 @@ measurements are planned here and run in the device campaign (the {device} task 
 
 ## Phase 5: User Story 3 — steady over long runs (P1)
 
-- [ ] T-A09-507 [US3] Session test in `ExperienceTests/AquariumSessionTests.swift`: open and close the experience five times and compare `ResourceRegistry.stats` after each open with the first; manifest fixtures 12 (ambient on, 600 steps) and 13 (2,000 steps, a feed every 100) in `Experience/Adapter/AquariumManifest.swift`, regenerate `scenario-manifest.json`, update `ExperienceTests/AquariumManifestTests.swift` (thirteen fixtures; fixture 12 slower fish; fixture 13 bounds) (FR-A09-530, 531; SC-A09-504)
+- [X] T-A09-507 [US3] Session test in `ExperienceTests/AquariumSessionTests.swift`: open and close the experience five times and compare `ResourceRegistry.stats` after each open with the first; manifest fixtures 12 (ambient on, 600 steps) and 13 (2,000 steps, a feed every 100) in `Experience/Adapter/AquariumManifest.swift`, regenerate `scenario-manifest.json`, update `ExperienceTests/AquariumManifestTests.swift` (thirteen fixtures; fixture 12 slower fish; fixture 13 bounds) (FR-A09-530, 531; SC-A09-504) — Verified 2026-11-14: 2026-11-14: reopen test (five sessions, same live resources, no leak) and fixtures 12 (ambient) and 13 (2,000 steps with feeds); manifest regenerated; AquariumSessionTests and AquariumManifestTests pass on sim-27.2
 
 ## Phase 6: Polish & evidence
 

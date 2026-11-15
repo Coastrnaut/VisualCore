@@ -338,6 +338,7 @@ let package = Package(
         .testTarget(name: "DigitalAquariumExperienceTests",
                     dependencies: ["DigitalAquariumExperience", "DigitalAquariumCore",
                                    .product(name: "VisualCoreSimulation", package: visualCore),
+                                   .product(name: "VisualCoreDiagnostics", package: visualCore),
                                    .product(name: "VisualCoreMath", package: visualCore),
                                    .product(name: "VisualCoreScenes", package: visualCore),
                                    .product(name: "VisualCorePersistence", package: visualCore),

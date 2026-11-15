@@ -74,6 +74,8 @@ extension AquariumCore {
     /// 11. water effects (feature 071, T-A09-407): the Reef runs 600 steps; `AquariumManifestTests` checks the bubbles
     ///     its vents give at the final step against the caps (bubbles and motes are drawn from the step count and
     ///     never change the state).
+    /// 12. ambient (feature 072, T-A09-507): ambient mode on, then 600 steps (the fish cruise at 0.6 of their speed);
+    /// 13. long run: 2,000 steps with a feed every 100 (fish count constant, food within its limit).
     /// The tank fractions of the mean position of the Reef's first species after 300 steps (fixture 8).
     static var feedPoint: [Double] {
         let select = ScenarioStep(steps: 5, action: ScriptedAction("habitat.select", [0]), result: "accepted")
@@ -104,6 +106,8 @@ extension AquariumCore {
              step("decor.remove", [1])],
             [step("food.drop", [0.5, 0.9]), ScenarioStep(steps: 60)],
             [step("habitat.select", [0]), ScenarioStep(steps: 600)],
+            [step("ambient.mode", [1]), ScenarioStep(steps: 600)],
+            (0..<20).map { _ in step("food.drop", [0.5, 0.8], steps: 100) },
         ]
     }
 
