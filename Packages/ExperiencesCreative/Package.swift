@@ -503,7 +503,8 @@ let package = Package(
                                .product(name: "VisualCoreUI", package: rendering),
                                .product(name: "VisualCoreAudio", package: rendering),
                                .product(name: "VisualCoreAudioDSP", package: visualCore)],
-                    path: "LightMaze/ExperienceTests"),
+                    path: "LightMaze/ExperienceTests",
+                    resources: [.copy("Fixtures")]),
         .target(name: "ParticleUniverseCore",
                 dependencies: [
                                .product(name: "VisualCoreSimulation", package: visualCore),
