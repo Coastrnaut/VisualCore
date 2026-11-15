@@ -11,7 +11,7 @@
 ## Phase 3: User Story 1 — Evidence-backed integration matrix (P1) 🎯
 
 - [X] T-A10-002 [US1] Write `docs/apps/neon-arcade/visualcore-contract.json` (schema 1; app `neon-arcade`; gate `A10-P00`): `inventory` of every FR-A10-001 area with paths, the release-check step count from `python3 scripts/release_check.py --list`; `matrix` rows covering the 6 brainstorm capabilities and 6 version 0.1 features plus cross-cutting rows (persistence, quality tiers and low power, accessibility and Reduce Motion, lifecycle, licenses) with status ∈ {available, requires adaptation, upstream gap} per clarification 2 and file/symbol/product evidence; `traceability`; `negative` rules of FR-A10-006 (FR-A10-001, 002) — Verified 2026-11-14: 2026-11-14: visualcore-contract.json, 17 rows (8 available, 6 adaptation, 3 upstream), 7 gaps, 103 release steps, decision go
-- [ ] T-A10-003 [US1] Run the contract checker and render the view (`python3 Tools/python/desktop_runbook.py run-check --stage A10-P00 --timeout 600 --name contract -- python3 scripts/check_app_contract.py --app neon-arcade --render`); `docs/apps/neon-arcade/visualcore-contract.md` is generated (FR-A10-007, SC-A10-001)
+- [X] T-A10-003 [US1] Run the contract checker and render the view (`python3 Tools/python/desktop_runbook.py run-check --stage A10-P00 --timeout 600 --name contract -- python3 scripts/check_app_contract.py --app neon-arcade --render`); `docs/apps/neon-arcade/visualcore-contract.md` is generated (FR-A10-007, SC-A10-001) — Verified 2026-11-14: 2026-11-14: .autonomy/checks/A10-P00.contract.json exit 0 (PASS 17 rows, 99 citations, 7 gaps); visualcore-contract.md rendered
 
 ## Phase 4: User Story 2 — The reference stays proven (P1)
 
