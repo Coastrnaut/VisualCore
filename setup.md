@@ -317,6 +317,8 @@ rebuilds itself, not Git history (`.git` is 169 MB):
 | `build/DerivedData` | 46 GB | Build cache of `scripts/xcodebuild_app.py` |
 | `../projectm-ios` (separate checkout) | 47 GB | `Vendor` alone is 23 GB |
 | `External` | 13 GB | The pinned projectM submodule |
+| `~/Library/Developer/CoreDevice/DeviceFS` | 22 GB | Cached device file systems; re-created when a device connects |
+| `~/Library/Developer/Xcode/iOS DeviceSupport` | 9 GB | Debug symbols per device OS; re-created on connect |
 
 1. `xcrun simctl delete unavailable` frees nothing while every simulator is still available. To reclaim simulator
    space, run `xcrun simctl shutdown all && xcrun simctl erase all`: it wipes contents but keeps every device, so
@@ -326,5 +328,6 @@ rebuilds itself, not Git history (`.git` is 169 MB):
    them after the run that needed them.
 3. Remove a cache folder itself, `rm -rf ~/Library/Developer/Xcode/DerivedData`, not its contents through a glob.
    With `DerivedData/*`, zsh asks to confirm more than 100 files, and when no answer comes, nothing is deleted.
-4. Clearing either DerivedData folder costs only a slower first build. Nothing inside `Vendor/angle` or
+4. Clearing either DerivedData folder costs only a slower first build. Erasing the simulators and removing both
+   DerivedData folders took the data volume from 365 GB to 187 GB used. Nothing inside `Vendor/angle` or
    `External/projectm-ios` is removed to save space (CLAUDE.md rule 12).
