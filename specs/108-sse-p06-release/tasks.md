@@ -8,7 +8,7 @@ X-A14. Precedent: `specs/101-lm-p06-release/tasks.md`.
 
 ## Phase 1: Setup
 
-- [ ] T-A14-601 Baseline: cite the A14-P05 evidence on the unchanged tree (`.autonomy/checks/A14-P05.{sse-ios27,app-unit-2,verify-27}.json`) instead of a rerun (owner ruling of 2026-11-14)
+- [X] T-A14-601 Baseline: cite the A14-P05 evidence on the unchanged tree (`.autonomy/checks/A14-P05.{sse-ios27,app-unit-2,verify-27}.json`) instead of a rerun (owner ruling of 2026-11-14) — Verified 2026-11-15: 2026-11-15: cited .autonomy/checks/A14-P05.sse-ios27.json, A14-P05.app-unit-2.json and A14-P05.verify-27.json (exit 0) on the tree recorded at A14-P05, unchanged since apart from spec documents (no rerun)
 
 ## Phase 2: Story 1 — privacy
 
