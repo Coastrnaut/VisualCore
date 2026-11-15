@@ -3,6 +3,10 @@
 // colours, author and license; the JSON round trip with sorted keys; each refusal reason (missing-license,
 // unsupported-license, out-of-range, invalid-number, duplicate-id) named for a malformed record while the valid rest is
 // kept; an unreadable document refused as a whole.
+//
+// Feature 091 (A12-P03) T-A12-302 (FR-A12-301; clarification Q1): the four props and their prop palettes (same ids,
+// three colours, "VisualCore project", "MIT"); malformed prop and prop palette records refused with their reasons;
+// documents without the prop lists still read.
 import Foundation
 import Testing
 import TinyWorldsCore
@@ -39,6 +43,52 @@ import TinyWorldsCore
         #expect(catalog.palette(id: "lava") == nil && catalog.preset(id: "lava") == nil)
     }
 
+    @Test func theBundledPropsHaveTheirPalettesAndProvenance() {
+        let propIds = ["tree", "rock", "house", "lantern"]
+        #expect(catalog.props.map(\.id) == propIds && catalog.propPalettes.map(\.id) == propIds)
+        #expect(catalog.props.map(\.name) == ["Tree", "Rock", "House", "Lantern"])
+        #expect(catalog.props.map(\.id) == PropKind.allCases.map(\.contentId))
+        #expect(catalog.props.map(\.palette) == propIds)
+        #expect(catalog.propPalettes.allSatisfy { ContentCatalog.check($0) == nil })
+        #expect(catalog.props.allSatisfy { ContentCatalog.check($0) == nil })
+        #expect(catalog.propPalettes.allSatisfy { Set($0.colors.map { [$0.r, $0.g, $0.b] }).count == 3 })
+        #expect(catalog.props.allSatisfy { $0.author == "VisualCore project" && $0.license == "MIT" })
+        #expect(catalog.propPalettes.allSatisfy { $0.author == "VisualCore project" && $0.license == "MIT" })
+        #expect(catalog.propPalette(id: "lantern")?.colors.count == 3 && catalog.prop(id: "house")?.name == "House")
+        #expect(catalog.prop(id: "island") == nil && catalog.propPalette(id: "island") == nil)
+    }
+
+    @Test func malformedPropRecordsAreRefusedAndDocumentsWithoutPropsStillRead() throws {
+        var propPalettes = try records("propPalettes")
+        propPalettes[0]["author"] = nil                                // tree: missing-license
+        var colors = try #require(propPalettes[1]["colors"] as? [[String: Any]])
+        colors[2]["r"] = -0.5
+        propPalettes[1]["colors"] = colors                             // rock: out-of-range
+        var props = try records("props")
+        props[0]["license"] = "Proprietary"                            // tree: unsupported-license
+        props[1]["palette"] = ""                                       // rock: invalid-number
+        let duplicate = try records("props")[3]                        // lantern again: duplicate-id
+        let data = try JSONSerialization.data(withJSONObject: [
+            "palettes": try records("palettes"), "presets": try records("presets"),
+            "propPalettes": propPalettes, "props": props + [duplicate]])
+        let result = ContentCatalog.decode(data)
+        #expect(result.refused == [
+            CatalogRefusal(kind: .propPalette, id: "tree", reason: .missingLicense),
+            CatalogRefusal(kind: .propPalette, id: "rock", reason: .outOfRange),
+            CatalogRefusal(kind: .prop, id: "tree", reason: .unsupportedLicense),
+            CatalogRefusal(kind: .prop, id: "rock", reason: .invalidNumber),
+            CatalogRefusal(kind: .prop, id: "lantern", reason: .duplicateId),
+        ])
+        #expect(result.catalog.propPalettes.map(\.id) == ["house", "lantern"])
+        #expect(result.catalog.props.map(\.id) == ["house", "lantern"])
+        #expect(result.catalog.palettes == catalog.palettes && result.catalog.presets == catalog.presets)
+        let old = try decode(palettes: try records("palettes"), presets: try records("presets"))
+        #expect(old.refused.isEmpty && old.catalog.props.isEmpty && old.catalog.propPalettes.isEmpty)
+        let notAList = ContentCatalog.decode(Data("{\"palettes\":[],\"presets\":[],\"props\":3}".utf8))
+        #expect(notAList.refused == [CatalogRefusal(kind: .palette, id: "catalog", reason: .invalidNumber)])
+        #expect(ContentKind.propPalette.rawValue == "prop-palette" && ContentKind.prop.rawValue == "prop")
+    }
+
     @Test func theJSONRoundTripIsExactAndSorted() throws {
         let data = catalog.encoded()
         let decoded = ContentCatalog.decode(data)
@@ -48,6 +98,8 @@ import TinyWorldsCore
         let text = try #require(String(data: data, encoding: .utf8))
         #expect(text.hasPrefix("{\"palettes\":[{\"author\":\"VisualCore project\",\"colors\":[{\"a\":1,\"b\":"))
         #expect(text.contains("\"presets\":[{\"author\":\"VisualCore project\",\"id\":\"island\""))
+        #expect(text.contains("],\"propPalettes\":[{\"author\":\"VisualCore project\",\"colors\":"))
+        #expect(text.contains("],\"props\":[{\"author\":\"VisualCore project\",\"id\":\"tree\""))
     }
 
     @Test func eachMalformedRecordIsRefusedWithItsReasonAndTheRestIsKept() throws {

@@ -5,14 +5,19 @@
 // record carries its name, its author ("VisualCore project") and its license; the allowed licenses are exactly
 // ["MIT"] (the repository's license). The terrain recipes themselves are code (`WorldPreset`).
 //
-// The JSON codec writes the catalog with sorted keys (`{"palettes":[…],"presets":[…]}`); the validating decoder reads
-// the same layout record by record (palettes first, then presets, each in document order), keeps every valid record
+// Feature 091 (A12-P03) T-A12-302 (FR-A12-301; clarification Q1; G-PROPS) adds the four props (tree, rock, house,
+// lantern) and their prop palettes with the same ids; a prop palette has three colours (base, main, accent). The props'
+// meshes are code (`PropCatalog`).
+//
+// The JSON codec writes the catalog with sorted keys (`{"palettes":[…],"presets":[…],"propPalettes":[…],
+// "props":[…]}`); the validating decoder reads the same layout record by record (palettes, presets, prop palettes,
+// then props, each in document order; the two prop lists may be absent and then are empty), keeps every valid record
 // and refuses each invalid one with a named reason, so one damaged entry never hides the rest. Checks per record, in
 // this order (the first failure names the reason):
 // 1. `missing-license`: the `license` or the `author` is missing or empty.
 // 2. `unsupported-license`: the license is not in `ContentCatalog.allowedLicenses` (["MIT"]).
 // 3. `invalid-number`: the record is not a JSON object with a non-empty string `id` and a string `name` (and, for a
-//    preset, a non-empty string `palette`), or a palette's `colors` is not a list of exactly three colour objects
+//    preset or a prop, a non-empty string `palette`), or a palette's `colors` is not a list of exactly three colour objects
 //    whose r, g, b and a are finite numbers. An unreadable document is refused as a whole with the id `catalog` and
 //    this reason.
 // 4. `out-of-range`: a finite colour component lies outside 0…1.
@@ -46,8 +51,12 @@ public struct RGBA: Codable, Equatable, Sendable {
 public enum ContentKind: String, Codable, CaseIterable, Sendable {
     /// A world preset (a terrain recipe with its palette).
     case preset
-    /// A colour palette.
+    /// A colour palette of a world.
     case palette
+    /// A prop (A12-P03).
+    case prop
+    /// A prop's colour palette: base, main and accent (A12-P03).
+    case propPalette = "prop-palette"
 }
 
 /// One palette: three named colours of a world and its provenance.
@@ -134,7 +143,26 @@ public struct CatalogRefusal: Codable, Equatable, Sendable {
     }
 }
 
-/// The content catalog of Tiny Worlds: presets and palettes.
+/// One prop record: the content side of a prop (its name, palette and provenance); the mesh is `PropCatalog`'s.
+public struct PropRecord: Codable, Equatable, Sendable, Identifiable {
+    /// Kebab-case identifier, unique among the props (one of ``PropKind``'s ids for the bundled catalog).
+    public var id: String
+    /// Display name ("Tree").
+    public var name: String
+    /// The id of the prop's palette.
+    public var palette: String
+    /// The author ("VisualCore project").
+    public var author: String
+    /// The license, one of ``ContentCatalog/allowedLicenses``.
+    public var license: String
+
+    /// Creates a prop record from all of its fields (no validation).
+    public init(id: String, name: String, palette: String, author: String, license: String) {
+        self.id = id; self.name = name; self.palette = palette; self.author = author; self.license = license
+    }
+}
+
+/// The content catalog of Tiny Worlds: presets, palettes, props and prop palettes.
 public struct ContentCatalog: Codable, Equatable, Sendable {
     /// The only licenses a record may carry.
     public static let allowedLicenses = ["MIT"]
@@ -147,20 +175,31 @@ public struct ContentCatalog: Codable, Equatable, Sendable {
     public var palettes: [Palette]
     /// The presets in catalog order.
     public var presets: [PresetRecord]
+    /// The prop palettes in catalog order (colours: base, main, accent).
+    public var propPalettes: [Palette]
+    /// The props in catalog order.
+    public var props: [PropRecord]
 
     /// Creates a catalog from its records (no validation; ``decode(_:)`` validates).
-    public init(palettes: [Palette], presets: [PresetRecord]) {
+    public init(palettes: [Palette], presets: [PresetRecord], propPalettes: [Palette] = [], props: [PropRecord] = []) {
         self.palettes = palettes
         self.presets = presets
+        self.propPalettes = propPalettes
+        self.props = props
     }
 
     /// The palette with `id`, if any.
     public func palette(id: String) -> Palette? { palettes.first { $0.id == id } }
     /// The preset record with `id`, if any.
     public func preset(id: String) -> PresetRecord? { presets.first { $0.id == id } }
+    /// The prop palette with `id`, if any.
+    public func propPalette(id: String) -> Palette? { propPalettes.first { $0.id == id } }
+    /// The prop record with `id`, if any.
+    public func prop(id: String) -> PropRecord? { props.first { $0.id == id } }
 
-    /// The bundled content: the palettes and presets island, asteroid-garden and miniature-city, each by
-    /// "VisualCore project" under "MIT"; each preset uses the palette of the same id.
+    /// The bundled content: the palettes and presets island, asteroid-garden and miniature-city, and the prop
+    /// palettes and props tree, rock, house and lantern, each by "VisualCore project" under "MIT"; each preset and
+    /// each prop uses the palette of the same id.
     public static let bundled: ContentCatalog = {
         let author = projectAuthor, license = "MIT"
         return ContentCatalog(
@@ -181,7 +220,24 @@ public struct ContentCatalog: Codable, Equatable, Sendable {
                              author: author, license: license),
                 PresetRecord(id: "miniature-city", name: "Miniature city", palette: "miniature-city",
                              author: author, license: license),
-            ])
+            ],
+            propPalettes: [
+                Palette(id: "tree", name: "Tree",
+                        colors: [RGBA(0.42, 0.28, 0.16), RGBA(0.20, 0.48, 0.22), RGBA(0.38, 0.62, 0.28)],
+                        author: author, license: license),
+                Palette(id: "rock", name: "Rock",
+                        colors: [RGBA(0.36, 0.35, 0.34), RGBA(0.55, 0.53, 0.50), RGBA(0.40, 0.52, 0.30)],
+                        author: author, license: license),
+                Palette(id: "house", name: "House",
+                        colors: [RGBA(0.90, 0.84, 0.72), RGBA(0.66, 0.24, 0.18), RGBA(0.36, 0.24, 0.16)],
+                        author: author, license: license),
+                Palette(id: "lantern", name: "Lantern",
+                        colors: [RGBA(0.20, 0.20, 0.22), RGBA(0.32, 0.30, 0.28), RGBA(1.00, 0.82, 0.42)],
+                        author: author, license: license),
+            ],
+            props: PropKind.allCases.map {
+                PropRecord(id: $0.contentId, name: $0.name, palette: $0.contentId, author: author, license: license)
+            })
     }()
 
     // MARK: - Validation
@@ -210,6 +266,13 @@ public struct ContentCatalog: Codable, Equatable, Sendable {
         return nil
     }
 
+    /// The first problem of `prop` (license, then layout), or nil when valid.
+    public static func check(_ prop: PropRecord) -> CatalogRefusalReason? {
+        if let error = licenseError(author: prop.author, license: prop.license) { return error }
+        guard !prop.id.isEmpty, !prop.palette.isEmpty else { return .invalidNumber }
+        return nil
+    }
+
     // MARK: - JSON
 
     /// The catalog as JSON with sorted keys (deterministic bytes for equal catalogs); a non-finite number (only
@@ -222,37 +285,40 @@ public struct ContentCatalog: Codable, Equatable, Sendable {
 
     /// Decodes a catalog from `data`, keeping every valid record and naming every refused one (see the file header
     /// for the checks and their order). Unreadable JSON, or a document without both lists, gives an empty catalog and
-    /// one `catalog` refusal.
+    /// one `catalog` refusal. Absent `propPalettes` and `props` lists are empty; a present one that is not a list
+    /// refuses the document the same way.
     public static func decode(_ data: Data) -> (catalog: ContentCatalog, refused: [CatalogRefusal]) {
+        let unreadable = (ContentCatalog(palettes: [], presets: []),
+                          [CatalogRefusal(kind: .palette, id: "catalog", reason: .invalidNumber)])
         guard let root = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any],
               let paletteList = root["palettes"] as? [Any], let presetList = root["presets"] as? [Any] else {
-            return (ContentCatalog(palettes: [], presets: []),
-                    [CatalogRefusal(kind: .palette, id: "catalog", reason: .invalidNumber)])
+            return unreadable
         }
-        var palettes: [Palette] = []
-        var presets: [PresetRecord] = []
+        guard let propPaletteList = root["propPalettes"] == nil ? [] : root["propPalettes"] as? [Any],
+              let propList = root["props"] == nil ? [] : root["props"] as? [Any] else { return unreadable }
         var refused: [CatalogRefusal] = []
-        for element in paletteList {
-            let object = (element as? [String: Any]) ?? [:]
-            switch parsePalette(object) {
-            case .success(let palette) where palettes.contains(where: { $0.id == palette.id }):
-                refused.append(CatalogRefusal(kind: .palette, id: palette.id, reason: .duplicateId))
-            case .success(let palette): palettes.append(palette)
-            case .failure(let reason):
-                refused.append(CatalogRefusal(kind: .palette, id: (object["id"] as? String) ?? "", reason: reason))
+        // Keeps the valid records of `list` parsed by `parse`, refusing invalid and repeated ones as `kind`.
+        func records<Record: Identifiable>(_ list: [Any], _ kind: ContentKind,
+                                           _ parse: ([String: Any]) -> Result<Record, CatalogRefusalReason>)
+            -> [Record] where Record.ID == String {
+            var kept: [Record] = []
+            for element in list {
+                let object = (element as? [String: Any]) ?? [:]
+                switch parse(object) {
+                case .success(let record) where kept.contains(where: { $0.id == record.id }):
+                    refused.append(CatalogRefusal(kind: kind, id: record.id, reason: .duplicateId))
+                case .success(let record): kept.append(record)
+                case .failure(let reason):
+                    refused.append(CatalogRefusal(kind: kind, id: (object["id"] as? String) ?? "", reason: reason))
+                }
             }
+            return kept
         }
-        for element in presetList {
-            let object = (element as? [String: Any]) ?? [:]
-            switch parsePreset(object) {
-            case .success(let preset) where presets.contains(where: { $0.id == preset.id }):
-                refused.append(CatalogRefusal(kind: .preset, id: preset.id, reason: .duplicateId))
-            case .success(let preset): presets.append(preset)
-            case .failure(let reason):
-                refused.append(CatalogRefusal(kind: .preset, id: (object["id"] as? String) ?? "", reason: reason))
-            }
-        }
-        return (ContentCatalog(palettes: palettes, presets: presets), refused)
+        let palettes = records(paletteList, .palette, parsePalette)
+        let presets = records(presetList, .preset, parsePreset)
+        let propPalettes = records(propPaletteList, .propPalette, parsePalette)
+        let props = records(propList, .prop, parseProp)
+        return (ContentCatalog(palettes: palettes, presets: presets, propPalettes: propPalettes, props: props), refused)
     }
 
     /// A finite JSON number, or nil (booleans and strings are not numbers).
@@ -296,5 +362,16 @@ public struct ContentCatalog: Codable, Equatable, Sendable {
                                   license: object["license"] as? String ?? "")
         if let error = check(preset) { return .failure(error) }
         return .success(preset)
+    }
+
+    /// One JSON object to a checked prop record, or the first reason it is refused.
+    private static func parseProp(_ object: [String: Any]) -> Result<PropRecord, CatalogRefusalReason> {
+        if let error = licenseError(object) { return .failure(error) }
+        guard let id = object["id"] as? String, !id.isEmpty, let name = object["name"] as? String,
+              let palette = object["palette"] as? String, !palette.isEmpty else { return .failure(.invalidNumber) }
+        let prop = PropRecord(id: id, name: name, palette: palette, author: object["author"] as? String ?? "",
+                              license: object["license"] as? String ?? "")
+        if let error = check(prop) { return .failure(error) }
+        return .success(prop)
     }
 }
