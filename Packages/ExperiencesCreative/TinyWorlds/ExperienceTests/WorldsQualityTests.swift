@@ -73,6 +73,23 @@ final class WorldsQualityTests: XCTestCase {
         session.close()
     }
 
+    /// The system's memory warning, posted to a running session, reaches the presenter through the host: the next
+    /// frame draws the lightest tier and the world is unchanged (feature 093 T-A12-515).
+    func testTheSystemMemoryWarningReachesThePresenterThroughTheSession() async throws {
+        let session = ExperienceSession()
+        let shell = try await WorldsTest.open(session)
+        let presenter = shell.presenter
+        let digest = try shell.engine.digest()
+        XCTAssertEqual(presenter.lastTier, 0)
+        NotificationCenter.default.post(name: UIApplication.didReceiveMemoryWarningNotification, object: nil)
+        XCTAssertEqual(session.state, .running, "the world is small enough to stay open")
+        try WorldsTest.frames(session, 1)
+        XCTAssertEqual(presenter.lastTier, 2, "the lightest tier on the next frame")
+        XCTAssertEqual(presenter.terrainLevel, 2)
+        XCTAssertEqual(try shell.engine.digest(), digest)
+        session.close()
+    }
+
     /// Repeated warnings keep the lightest tier and rebuild the terrain renderer at most once.
     func testRepeatedWarningsRebuildTheTerrainAtMostOnce() async throws {
         let session = ExperienceSession()
