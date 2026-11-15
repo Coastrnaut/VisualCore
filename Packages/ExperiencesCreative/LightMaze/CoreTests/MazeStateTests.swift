@@ -3,7 +3,9 @@
 // selected; choosing a level (0…19, others refused), selecting and turning a tile, and resetting; the first level is
 // solved by turning its mirror; the beam follows the state; the sorted-key JSON round trip is exact; damaged payloads
 // (not JSON, truncated, missing keys, out-of-range level, wrong orientation count, bad selection) and newer payloads
-// are refused with their reason.
+// are refused with their reason. Schema 2 (feature 098 (A13-P03) T-A13-302): the state now carries its moves, the JSON
+// has a sorted `moves` key, a schema-1 payload migrates and only a schema above 2 is newer; moves and undo are tested
+// in MovesTests.
 import Foundation
 import LightMazeCore
 import Testing
@@ -15,7 +17,7 @@ import Testing
         #expect(state.orientations == LevelCatalog.bundled.levels[0].startOrientations)
         #expect(state.level.id == "lm-01" && state.board == state.level.board)
         #expect(!state.isSolved && state.beam.endReasons == [.wall])
-        #expect(MazeState.schemaVersion == 1 && MazeState.noSelection == -1)
+        #expect(MazeState.schemaVersion == 2 && MazeState.noSelection == -1 && state.moves.isEmpty)
     }
 
     @Test func choosingALevelAcceptsOnlyTheCatalog() {
@@ -74,8 +76,11 @@ import Testing
         let data = state.encoded()
         #expect(MazeState.decode(data) == .success(state))
         let text = String(decoding: data, as: UTF8.self)
-        #expect(text.hasPrefix(#"{"levelIndex":9,"orientations":["#))
-        #expect(text.hasSuffix(#"],"schema":1,"selection":3}"#))
+        let after: String = state.orientations[3].rawValue
+        let before: String = state.orientations[3].toggled.rawValue
+        let move: String = #"{"after":"\#(after)","before":"\#(before)","tile":3}"#
+        #expect(text.hasPrefix(#"{"levelIndex":9,"moves":["# + move + #"],"orientations":["#), "\(text)")
+        #expect(text.hasSuffix(#"],"schema":2,"selection":3}"#))
         #expect(MazeState.decode(MazeState.initial.encoded()) == .success(MazeState.initial))
     }
 
@@ -101,7 +106,7 @@ import Testing
             #expect(MazeState.decode(Data(payload.utf8)) == .failure(.damaged), "\(payload)")
         }
         let newer: [String] = [
-            #"{"levelIndex":0,"orientations":\#(one),"schema":2,"selection":-1}"#,
+            #"{"levelIndex":0,"moves":[],"orientations":\#(one),"schema":3,"selection":-1}"#,
             #"{"schema":7}"#,
         ]
         for payload in newer {
@@ -112,7 +117,9 @@ import Testing
             Issue.record("a valid payload decodes")
             return
         }
-        #expect(state.isSolved && state.selection == 0)
+        #expect(state.isSolved && state.selection == 0 && state.moves.isEmpty, "schema 1 migrates with no moves")
+        let schemaTwoWithoutMoves = #"{"levelIndex":0,"orientations":\#(one),"schema":2,"selection":-1}"#
+        #expect(MazeState.decode(Data(schemaTwoWithoutMoves.utf8)) == .failure(.damaged))
         #expect(MazeStateRefusal.allCases.map(\.rawValue) == ["damaged", "newer-version"])
     }
 }
