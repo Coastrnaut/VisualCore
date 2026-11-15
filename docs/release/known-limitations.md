@@ -163,6 +163,29 @@ and `VisualCoreRendering` (iOS, GL). ADR-0003 and the package map record this. R
 - Fish, food and the school are a bounded visual simulation, not an ecosystem: fish do not age, grow or need feeding,
   and food is only a visual effect.
 
+### Neon Arcade (A10; features 074–080)
+
+- CPU and GPU time per frame at each quality level, the thermal state over a ten-minute session and the readability of
+  the glow on a real screen in bright light are unmeasured on devices; they wait for the device campaign
+  ([device-campaign.md](../apps/neon-arcade/device-campaign.md)). No frame-time, battery or memory figure is stated.
+- Audio routes (speaker, wired and Bluetooth headphones, the silent switch, interruptions on hardware) are tested with
+  the ambient session on the simulator only (`SoundEffectPlayerTests`); they wait for the device campaign. Sound is
+  synthesized, plays with the ambient session and opens no input.
+- The VoiceOver pass on hardware, Dynamic Type at the largest sizes on hardware and the system accessibility audits
+  wait for the device campaign; the labels, announcements, Reduce Motion and reduced flashing are proved by the
+  experience's tests only.
+- High-score survival after a force-quit on hardware waits for the device campaign; on the simulator an interrupted
+  save leaves the last complete table (`HighScoreStoreTests.testAnInterruptedSaveLeavesTheLastCompleteTable`).
+- The high-score table keeps the ten best runs with score, wave and run number only (no name or date); it stays on the
+  device (no sync, no export, no online table). A damaged, half-written or newer table is reported, left in place and
+  replaced by the next finished run's valid table
+  (`HighScoreStoreTests.testANewerOrInvalidFileIsReportedAndThenReplaced`).
+- The core's run number restarts at 1 after a reset or a refused saved state; a run the presenter saw end whose number
+  the table has already processed is entered under the next number after the table's last run
+  (`HighScoreStoreTests.testAWatchedEndingAfterARestartedCountIsEnteredAndMarked`), so a reset never loses a new run.
+- Version 0.1 is one game, Neon Dodge; reaching game over through the interface takes minutes of play, so the
+  game-over screen and its table are proved by the session and render tests, not by an interface test.
+
 ## Distribution
 
 - No App Store submission, signing or purchase setup is part of this release; those are owner actions.

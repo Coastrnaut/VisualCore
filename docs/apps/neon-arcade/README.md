@@ -21,6 +21,10 @@ constitution (2.6.0).
 | [regression-baseline.md](regression-baseline.md) | Phase start, reference pin, the ProjectM reference regression results |
 | [content-licenses.md](content-licenses.md) | Author and license of the player, every hazard and every orb (generated) |
 | [device-campaign.md](device-campaign.md) | Device measurements planned for after `ImplementationLock-100` (frame pacing per quality level, thermal state, glow readability in bright light, audio routes, VoiceOver, high-score survival); nothing measured yet |
+| [privacy-and-credits.md](privacy-and-credits.md) | What is stored (`high-scores.json`, the session state) and where, how to delete it, permissions (none), sound and haptics, what is not done, required-reason APIs, credits |
+| [store-listing.md](store-listing.md) | Store text input for the one app's listing, with a claim → proving-test table |
+| [release-checklist.md](release-checklist.md) | Release checklist (Item, Area, Status, Evidence) and artifact inventory |
+| [release.json](release.json) | Release configuration read by `scripts/check_experience_release.py` and `scripts/release_check.py` (`experience-release-a10`, `copy-claims-a10`) |
 
 Phases: A10-P00 boundary audit (feature 074), P01 fixed-step engine and collision fixtures, P02 Neon Dodge mechanics,
 P03 visual effects and audio/haptics, P04 scores and accessibility, P05 balance and device QA preparation, P06
