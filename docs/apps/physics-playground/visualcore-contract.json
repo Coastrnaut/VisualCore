@@ -306,7 +306,7 @@
       "id": "M05",
       "capability": "Data visualization: plots of measured quantities (speed, energy, spring extension) over time and readable numeric values, drawn as polylines and native text without a second renderer",
       "source": "brainstorm: data visualization",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCore/Sources/VisualCoreScenes/SceneGraph.swift",
@@ -334,10 +334,10 @@
         }
       ],
       "example": {
-        "file": "Packages/ExperiencesCreative/OscilloscopeStudio/Core/ScopeTrace.swift",
-        "symbol": "ScopeTrace"
+        "file": "Packages/ExperiencesCreative/PhysicsPlayground/Experience/PlaygroundPresenter.swift",
+        "symbol": "PlaygroundPanel"
       },
-      "notes": "Polylines and lines drawn in one batch (SceneGraphTests, PrimitiveRendererTests) and the native parameter panel (ParameterPanelTests) exist; no chart or plot component (axes, scaling, sampling of a quantity over time) exists in any framework product (grep 2026-11-15). Oscilloscope Studio's ScopeTrace is experience code. The playground's plots and readouts are its own over polylines and native SwiftUI text. G-OVERLAYS (app-local), A11-P03."
+      "notes": "Since A11-P03: the measured quantities are shown as a native state panel (energy, momentum, selected speed) rather than a plot; plots are a later idea of the manual (data-plot export)."
     },
     {
       "id": "M06",
@@ -435,7 +435,7 @@
       "id": "M08",
       "capability": "Spawn, grab, pin and delete gestures: tap to spawn a chosen body, drag to grab and throw with a bounded grab force, long press or a mode to pin, a delete mode, each with a native control alternative and gesture arbitration",
       "source": "v0.1 feature 3: spawn/grab/pin/delete gestures; constitution A11 accessibility",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCore/Sources/VisualCoreScenes/GestureRecognizers.swift",
@@ -493,10 +493,10 @@
         }
       ],
       "example": {
-        "file": "Packages/ExperiencesCreative/NeonArcade/Experience/ArcadeGestures.swift",
-        "symbol": "ArcadeGestures"
+        "file": "Packages/ExperiencesCreative/PhysicsPlayground/Experience/PlaygroundGestures.swift",
+        "symbol": "PlaygroundGestures"
       },
-      "notes": "The recognizers, arbitration, pointer tracking, hit testing and the gesture-alternative check exist and are tested (GestureTests, GestureArbiterTests, PointerTrackerTests, SceneGraphTests, GestureAlternativesTests); RenderView+Touches feeds pointer events. The editor modes, grab force and pin semantics are the playground's. G-EDITOR (app-local over the recognizers), A11-P03."
+      "notes": "Since A11-P03 (G-EDITOR closed): tap adds or selects, drag grabs, long press pins and double tap deletes through VisualCore's recognizers and arbiter (PlaygroundGestureTests); every action has a native control."
     },
     {
       "id": "M09",
@@ -570,7 +570,7 @@
       "id": "M11",
       "capability": "Velocity and force vector overlays and the measured state panel: optional arrows (shaft line and polygon head) for velocity and force per body, a native panel of measured values (position, speed, kinetic and potential energy, spring extension) with units, and a spoken summary",
       "source": "v0.1 feature 6: velocity/force vector overlays and measured state panel",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCore/Sources/VisualCoreScenes/SceneGraph.swift",
@@ -598,10 +598,10 @@
         }
       ],
       "example": {
-        "file": "Packages/ExperiencesCreative/OscilloscopeStudio/Core/ScopeReadout.swift",
-        "symbol": "ScopeReadout"
+        "file": "Packages/ExperiencesCreative/PhysicsPlayground/Experience/PlaygroundPresenter.swift",
+        "symbol": "PlaygroundPresenter"
       },
-      "notes": "Lines and polygons (SceneGraphTests, PrimitiveRendererTests), the native panel (ParameterPanelTests) and rate-limited announcements (AccessibilityPlansTests) exist; no arrow primitive, vector scaling or measured-state model exists in a framework product. G-OVERLAYS (app-local), A11-P03."
+      "notes": "Since A11-P03 (G-OVERLAYS closed): velocity and force arrows at stated scales and the measured state panel (PlaygroundRenderTests), labelled as educational approximations."
     },
     {
       "id": "M12",
@@ -946,10 +946,10 @@
       ],
       "kind": "adaptation",
       "owner": "app-local",
-      "justification": "Spawn, grab, pin and delete are the playground's editor modes over VisualCore's recognizers, GestureArbiter and SceneNode.hitTest, with native controls as the alternative; no new generic gesture is needed.",
+      "justification": "Spawn, grab, pin and delete are the playground's editor modes over VisualCore's recognizers, GestureArbiter and SceneNode.hitTest, with native controls as the alternative; no new generic gesture is needed. Built in A11-P03: WorldEditing (add, select, grab with a critically damped pull, move, release, pin, delete, nudge) and PlaygroundGestures over TapRecognizer, DoubleTapRecognizer, LongPressRecognizer, DragRecognizer and GestureArbiter, each action also reachable by a native control.",
       "phase": 3,
       "test": "Host tests: tap spawns the chosen body at the touch point, drag grabs the hit body with a bounded grab force and releases with its velocity, pin fixes a body, delete removes it, every action has a control alternative (GestureAlternatives.missing is empty) and is recorded as a replayable command",
-      "closed": null
+      "closed": "A11-P03"
     },
     {
       "id": "G-OVERLAYS",
@@ -959,10 +959,10 @@
       ],
       "kind": "adaptation",
       "owner": "app-local",
-      "justification": "Velocity and force arrows, plots of measured quantities and the measured state panel with units are the playground's views over Primitive lines, polylines and polygons and native SwiftUI controls; no chart component is needed for version 0.1.",
+      "justification": "Velocity and force arrows, plots of measured quantities and the measured state panel with units are the playground's views over Primitive lines, polylines and polygons and native SwiftUI controls; no chart component is needed for version 0.1. Built in A11-P03: velocity, weight and measured spring-force arrows drawn with Primitive lines and polygons, and the state panel from WorldDiagnostics (educational approximation).",
       "phase": 3,
       "test": "Host tests: arrows scale with the measured vector within caps and vanish when switched off, panel values (speed, kinetic and potential energy, spring extension) match the world state with stated units, overlays never change the state digest, the spoken summary is rate-limited",
-      "closed": null
+      "closed": "A11-P03"
     },
     {
       "id": "G-EXPERIMENTS",

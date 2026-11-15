@@ -380,8 +380,10 @@
         "rigid-body circles and boxes",
         "springs with bounded stiffness",
         "gravity and drag levels",
+        "touch editing: add, grab, pin, delete",
+        "velocity and force arrows",
+        "measured energy panel",
         "pause, single step and time scale",
-        "drop circles and boxes",
         "deterministic replay"
       ],
       "quality_tiers": [
