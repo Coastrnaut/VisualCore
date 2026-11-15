@@ -11,6 +11,11 @@
 - **Decision**: layered primitives (halo, then core) per segment; static; no effect graph pass. **Rationale**: exact,
   cheap, legible, nothing to flash; the effect graph's bloom stays available for later polish (A13-P04) if needed.
 
+## D2b — Spoken changes
+- **Decision**: an app-local `BeamAnnouncer` in `MazePresenter.swift` (latest text wins, at most one per second of the
+  presenter's frame clock), because Tiny Worlds' `ViewAnnouncer` is internal to that module; touches arrive through the
+  presenter's `pointer(_:viewSize:port:)` as in Tiny Worlds.
+
 ## D3 — Loops
 - **Decision**: `LoopFixtureTests` with three committed boards (mirror path back to the emitter, prism branches meeting,
   a mirror spiral to the bounce cap), asserting reasons and the budgets.

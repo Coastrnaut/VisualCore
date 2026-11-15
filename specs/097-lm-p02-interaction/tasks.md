@@ -21,7 +21,7 @@ after every task (no trailers); read every check's exit before ticking. iOS 27 o
 
 ## Phase 4: Story 3 — glowing beam (P2)
 
-- [ ] T-A13-205 [US3] In `MazePresenter.swift` draw each beam segment as a halo (width 0.30 cell, opacity 0.25) under the core (0.08 cell, opacity 1), lit targets with a ring (inset 0.05) and the selected tile with an outline (inset 0.04); speak beam changes at most once per second of frame time while VoiceOver runs; tests in `Packages/ExperiencesCreative/LightMaze/ExperienceTests/MazeGlowTests.swift` (every core primitive lies on a tracer segment; halo half-width ≤ 0.15 cell; lit targets carry a ring; the selected tile an outline; announcements rate-limited) and a pixel check in `MazeRenderTests.swift` (beam brighter than the board along the path) (FR-A13-210–212; SC-A13-204)
+- [ ] T-A13-205 [US3] In `MazePresenter.swift` draw each beam segment as a halo (width 0.30 cell, opacity 0.25) under the core (0.08 cell, opacity 1), lit targets with a ring (inset 0.05) and the selected tile with an outline (inset 0.04); speak beam changes at most once per second of frame time while VoiceOver runs through an app-local `BeamAnnouncer` (research D2b); tests in `Packages/ExperiencesCreative/LightMaze/ExperienceTests/MazeGlowTests.swift` (every core primitive lies on a tracer segment; halo half-width ≤ 0.15 cell; lit targets carry a ring; the selected tile an outline; announcements rate-limited) and a pixel check in `MazeRenderTests.swift` (beam brighter than the board along the path) (FR-A13-210–212; SC-A13-204)
 
 ## Phase 5: Records and evidence
 
