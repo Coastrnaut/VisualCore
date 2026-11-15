@@ -1,7 +1,8 @@
 // DASupport — feature 073 (A09-P06) T-A09-608 (FR-A09-630): helpers of the interface tests of Digital Aquarium (A09)
-// inside the one app, modelled on `OSSupport`. A09 is a candidate until its X gate; every launch carries
-// `-vcCandidates`, and the tests open it directly with `-openExperience`. The controls are found by the identifiers of
-// `AquariumControls` (`port.identifier(name)`, that is `experience.a09.digital-aquarium.<name>`). They sit below the
+// inside the one app, modelled on `OSSupport`. A09 was a candidate until X-A09 (integrated 2026-11-14); every
+// launch still carries `-vcCandidates`, and the tests open it directly with `-openExperience`. The controls are
+// found by the identifiers of `AquariumControls` (`port.identifier(name)`, that is
+// `experience.a09.digital-aquarium.<name>`). They sit below the
 // canvas in a scroll view of limited height, so a control is scrolled into view before it is used. The habitat,
 // lighting, decoration kind and piece choices are menu pickers (their spoken value is the chosen entry's title), Pause
 // motion and Ambient are toggles (values "Swimming"/"Paused" and "Off"/"On"), and the saved aquariums are buttons

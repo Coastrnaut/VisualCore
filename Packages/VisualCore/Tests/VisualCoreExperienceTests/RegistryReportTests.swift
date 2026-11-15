@@ -43,7 +43,7 @@ import Testing
         let integrated = ["a01.generative-art-studio", "a02.fluid-art-playground", "a03.fractal-explorer",
                          "a04.particle-universe", "a05.infinite-geometry",
                          "a06.visualcore-music-lab", "a07.audio-odyssey",
-                         "a08.oscilloscope-studio"].compactMap(ExperienceID.init(rawValue:))
+                         "a08.oscilloscope-studio", "a09.digital-aquarium"].compactMap(ExperienceID.init(rawValue:))
         #expect(manifest.registryReport(registered: integrated).isMatch)
         #expect(manifest.registryReport(registered: []).missingRegistrations == integrated)
     }

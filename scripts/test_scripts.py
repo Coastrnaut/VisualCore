@@ -1296,7 +1296,7 @@ class UnifiedAppTargetTests(unittest.TestCase):
                                     "AudioOdysseyExperience",
                                     # Feature 061 (A08-P01): Oscilloscope Studio, integrated at X-A08.
                                     "OscilloscopeStudioExperience",
-                                    # Feature 068 (A09-P01): Digital Aquarium, a candidate until X-A09.
+                                    # Feature 068 (A09-P01): Digital Aquarium, integrated at X-A09.
                                     "DigitalAquariumExperience"])
 
     def test_the_standing_isolation_step_requires_sources(self):
