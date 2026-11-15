@@ -2467,10 +2467,10 @@
     "state": "standalone-partial",
     "legacy_gates_passed": [
      "A12-P00",
-     "A12-P01"
+     "A12-P01",
+     "A12-P02"
     ],
     "legacy_gates_pending": [
-     "A12-P02",
      "A12-P03",
      "A12-P04",
      "A12-P05",
