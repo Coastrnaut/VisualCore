@@ -121,8 +121,10 @@ describes Neon Arcade exactly as it is.
 ### Edge Cases
 
 - **The quality level drops mid-burst:** particles above the new cap are removed oldest first; no new burst exceeds it.
-- **Low Power Mode and the host's level:** the level drawn is 0 while Low Power Mode is on, otherwise the host's chosen
-  level clamped to 0…2 (presentation only; the game never sees it).
+- **Low Power Mode and the host's level:** the budget drawn is level 0 while Low Power Mode is on; otherwise it is
+  2 − the host's tier clamped to 0…2, because the host counts tiers from the best (tier 0 = full drawing, raised under
+  heat) while the budget counts from the lowest (presentation only; the game never sees it; resolved at
+  implementation, 2026-11-15).
 - **A simulated player reaches the difficulty ceiling:** the targets account for the capped speed.
 - **A balance target fails:** the value is tuned and the change recorded in research; earlier replays and fixtures are
   regenerated.

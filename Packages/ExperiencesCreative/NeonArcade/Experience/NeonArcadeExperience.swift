@@ -12,8 +12,13 @@
 // Feature 078 (A10-P04) T-A10-403 (FR-A10-411; clarification 2): the launch storage reaches the presenter as its
 // `HighScoreStore` (the file `high-scores.json` in the experience's own folder; the app's reset of the experience's
 // data removes it). The run itself still travels in the host's saved session state.
+// Feature 079 (A10-P05) T-A10-503 (FR-A10-501, FR-A10-503): three quality levels. `ArcadeExperience` forwards the
+// shell's `qualityProfile` (the core's `level-0`…`level-2`, as the catalog), so the session's governor steps through
+// all three; the presenter draws each frame with the budget of the host's tier, or level 0 under Low Power Mode
+// (`lowPowerMode` injected in tests, the system's state otherwise).
 import SwiftUI
 import NeonArcadeCore
+import VisualCoreDiagnostics
 import VisualCoreExperience
 import VisualCoreExperienceHost
 import VisualCoreMath
@@ -36,19 +41,21 @@ public enum NeonArcadeExperience {
     }
 
     /// The experience with its shell and presenter exposed (tests inject the sound sink, the haptic and announcement
-    /// route and the high-score store; without one the table is kept in memory only).
+    /// route, the high-score store — without one the table is kept in memory only — and Low Power Mode — nil: the
+    /// system's state).
     @MainActor
     static func make(id: ExperienceID, reduceMotion: Bool = false, reduceFlashing: Bool = false,
                      soundSink: (any ArcadeSoundSink)? = nil, feedback: ExperienceFeedback? = nil,
-                     highScores: HighScoreStore? = nil) -> ArcadeExperience {
+                     highScores: HighScoreStore? = nil,
+                     lowPowerMode: (@MainActor () -> Bool)? = nil) -> ArcadeExperience {
         ArcadeExperience(shell: ExperienceShell(id: id, presenter: ArcadePresenter(
             experienceID: id, reduceMotion: reduceMotion, reduceFlashing: reduceFlashing, soundSink: soundSink,
-            feedback: feedback, highScores: highScores)))
+            feedback: feedback, highScores: highScores, lowPowerMode: lowPowerMode)))
     }
 }
 
 /// Neon Arcade's experience: the shell of its presenter with the suspension rule of feature 077 (see the file header).
-/// The quality profile is the protocol's default single level, which equals the shell's (one tier).
+/// The quality profile is the shell's (the core's three levels, feature 079).
 @MainActor
 final class ArcadeExperience: Experience {
     /// The shell every call goes to.
@@ -70,6 +77,7 @@ final class ArcadeExperience: Experience {
     var accessibilitySummary: String { shell.accessibilitySummary }
     var diagnostics: ExperienceDiagnostics { shell.diagnostics }
     var frameProbes: [FrameProbe] { shell.frameProbes }
+    var qualityProfile: QualityProfile { shell.qualityProfile }
 
     func prepare(seed: UInt64, timeLimit: Duration?) async throws(ExperienceError) {
         try await shell.prepare(seed: seed, timeLimit: timeLimit)

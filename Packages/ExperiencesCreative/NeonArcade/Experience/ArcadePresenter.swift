@@ -50,6 +50,23 @@
 // or "New high score s" when the run entered the table; never pickups) on the presentation clock (the sum of the drawn
 // frame times), and every announcement it returns goes to the host's `ExperienceFeedback.announce`. The description
 // and the controls name the best score ("best score none" / "best score 1,230").
+// Quality levels — feature 079 (A10-P05) T-A10-503 (FR-A10-501–503; SC-A10-501; clarifications 1 and 2; research
+// D1; edge cases "the quality level drops mid-burst", "Low Power Mode and the host's level"): every drawn frame
+// chooses an `ArcadeBudget` before anything else (`applyQuality(tier:)`): level 0 (the lowest) while Low Power Mode is
+// on (injected `lowPowerMode`, default `ProcessInfo.processInfo.isLowPowerModeEnabled`), otherwise the level of the
+// host's tier. The host counts its tiers from the best (tier 0 = the best drawing, as `QualityGovernor` and
+// `QualityPolicy` step toward higher tiers under heat and Low Power Mode) while `ArcadeBudget` counts its levels from
+// the lowest, so host tier t (clamped to 0…2) draws budget level 2 − t: tier 0 → level 2 (the full drawing of
+// A10-P01…P04), tier 2 → level 0 (`budgetLevel(tier:lowPower:)`). With the budget:
+//   - each glow (objects and player) has the radius `glowFactor` × the object's radius (1.2, 1.4, 1.6) and the alpha
+//     `budget.glowAlpha(base: 0.35, pulse: amount × sin(step × 0.08))`, at most the level's cap (0.25, 0.30, 0.35);
+//     the pulse term is used only on a level that pulses and never under reduced flashing (a steady glow at the cap);
+//     Reduce Motion still halves the amplitude (0.15 → 0.075);
+//   - the effects layer scales each burst by `burstCount` and keeps the live particles drawn within `particleCap`
+//     (oldest removed first when the level drops; see `ArcadeEffectsLayer`).
+// The collision shapes keep their rule sizes and stay above every glow and particle at every level. The tier is
+// presentation only: the core stores none and its digest is the same at every level. The frame probe keeps the full
+// glow reach (1.6 ×), the largest of any level.
 import Foundation
 import SwiftUI
 import NeonArcadeCore
@@ -125,8 +142,11 @@ final class ArcadePresenter: ExperiencePresenter {
     nonisolated static let glowPulse = 0.15
     /// The pulse's angular rate per simulation step.
     nonisolated static let pulseRate = 0.08
-    /// A glow's radius as a multiple of its object's radius.
+    /// A glow's radius as a multiple of its object's radius at the full drawing (level 2, the largest of any level;
+    /// the frame probe keeps this reach). The drawn factor is the budget's `glowFactor`.
     nonisolated static let glowScale = 1.6
+    /// The number of quality levels the presenter draws: `ArcadeBudget.levels` (equal to `ArcadeCore.qualityTiers`).
+    nonisolated static let levelCount = ArcadeBudget.levels
     /// The player ring's line width in game units.
     nonisolated static let ringWidth = 0.07
     /// The number of points of the player ring (closed: the last equals the first).
@@ -247,6 +267,19 @@ final class ArcadePresenter: ExperiencePresenter {
     private var transitionElapsed = 0.0
     /// The glow pulse amplitude and the drift speed the last frame was drawn with.
     private(set) var lastPulseAmount = 0.0, lastDriftAmount = 0.0
+    /// Whether Low Power Mode is on (injected; by default the system's state). Read once per drawn frame.
+    let lowPowerMode: @MainActor () -> Bool
+    /// The host tier the last drawn frame was given (nil before the first draw).
+    private(set) var lastHostTier: Int?
+    /// Whether Low Power Mode was on for the last drawn frame.
+    private(set) var lastLowPower = false
+    /// The pulse amplitude actually applied in the last laid-out frame (0 on a level without pulse or under reduced
+    /// flashing; otherwise `pulseAmount`).
+    private(set) var lastPulseApplied = 0.0
+    /// The glow alpha of the objects in the last laid-out frame (the player's is this × its blink alpha).
+    private(set) var lastGlowAlpha = 0.0
+    /// The glow radius factor of the last laid-out frame.
+    private(set) var lastGlowFactor = 0.0
     /// The canvas gesture (a drag steers).
     private var gestures = ArcadeGestures()
     /// The high-score table in the experience's storage (feature 078).
@@ -321,10 +354,13 @@ final class ArcadePresenter: ExperiencePresenter {
     ///   - feedback: The haptic and announcement route (by default the host's shared `ExperienceFeedback`).
     ///   - highScores: The high-score table (by default one kept in memory only; the app passes one over the
     ///     experience's storage).
+    ///   - lowPowerMode: Whether Low Power Mode is on (nil: `ProcessInfo.processInfo.isLowPowerModeEnabled`); while
+    ///     it is, every frame draws quality level 0.
     init(experienceID: ExperienceID, reduceMotion: Bool = false, reduceFlashing: Bool = false,
          soundSink: (any ArcadeSoundSink)? = nil, feedback: ExperienceFeedback? = nil,
-         highScores: HighScoreStore? = nil) {
+         highScores: HighScoreStore? = nil, lowPowerMode: (@MainActor () -> Bool)? = nil) {
         self.experienceID = experienceID
+        self.lowPowerMode = lowPowerMode ?? { ProcessInfo.processInfo.isLowPowerModeEnabled }
         self.highScores = highScores ?? HighScoreStore(storage: nil)
         self.reduceMotion = reduceMotion
         self.reduceFlashing = reduceFlashing
@@ -431,6 +467,25 @@ final class ArcadePresenter: ExperiencePresenter {
     var pulseAmount: Double { Self.glowPulse * motionFactor }
     /// The background drift speed in game units per second this presenter draws with (0.6, or 0.3 with Reduce Motion).
     var driftAmount: Double { Self.driftSpeed * motionFactor }
+    /// The drawing budget in force (the full drawing, level 2, until a frame is drawn with another).
+    var budget: ArcadeBudget { effects.budget }
+
+    /// The budget level (0 the lowest … 2 the full drawing) for the host's `tier` (0 the best; clamped to 0…2):
+    /// 0 while `lowPower` is on, otherwise `ArcadeBudget.levels − 1 − tier`.
+    nonisolated static func budgetLevel(tier: Int, lowPower: Bool) -> Int {
+        if lowPower { return 0 }
+        return levelCount - 1 - min(max(tier, 0), levelCount - 1)
+    }
+
+    /// Chooses the budget of a frame drawn at the host's `tier` (Low Power Mode read now) and hands it to the
+    /// effects. Presentation only.
+    func applyQuality(tier: Int) {
+        let lowPower = lowPowerMode()
+        lastHostTier = tier
+        lastLowPower = lowPower
+        effects.apply(ArcadeBudget.level(Self.budgetLevel(tier: tier, lowPower: lowPower)))
+    }
+
     /// The length of a screen cross-fade this presenter draws with: `transitionDuration(0.25, reduceMotion:)`, so 0
     /// under Reduce Motion.
     var screenTransitionDuration: Double {
@@ -541,6 +596,7 @@ final class ArcadePresenter: ExperiencePresenter {
             throw ArcadeDrawError.injected
         }
         sync(core)
+        applyQuality(tier: tier)
         advancePresentation(core, seconds: frame.delta)
         clear.red = Float(Self.letterboxColor.x)
         clear.green = Float(Self.letterboxColor.y)
@@ -594,9 +650,11 @@ final class ArcadePresenter: ExperiencePresenter {
         Vec2((p.x - fieldWidth / 2) * scale, (p.y - fieldHeight / 2) * scale)
     }
 
-    /// The glow alpha at `step` with pulse amplitude `amount`: 0.35 + `amount` × sin(step × 0.08).
-    nonisolated static func glowAlpha(step: Int, amount: Double) -> Double {
-        glowBase + amount * sin(Double(step) * pulseRate)
+    /// The glow alpha at `step` with pulse amplitude `amount` under `budget`:
+    /// `budget.glowAlpha(base: 0.35, pulse: amount × sin(step × 0.08))` — at most the level's cap, steady at the cap
+    /// on a level without pulse or with `amount` 0.
+    nonisolated static func glowAlpha(step: Int, amount: Double, budget: ArcadeBudget) -> Double {
+        budget.glowAlpha(base: glowBase, pulse: amount * sin(Double(step) * pulseRate))
     }
 
     /// How far the background lines have drifted down at `step` with drift speed `speed` (units per second of game
@@ -730,7 +788,13 @@ final class ArcadePresenter: ExperiencePresenter {
         effects.layOut(world: world, scale: s, fieldCenter: field.position,
                        fieldSize: Vec2(Self.fieldWidth * s, Self.fieldHeight * s))
 
-        let glowAlpha = Self.glowAlpha(step: run.step, amount: pulse)
+        let budget = self.budget
+        let applied = budget.pulse && !reduceFlashing ? pulse : 0
+        let glowAlpha = Self.glowAlpha(step: run.step, amount: applied, budget: budget)
+        let glowFactor = budget.glowFactor
+        lastPulseApplied = applied
+        lastGlowAlpha = glowAlpha
+        lastGlowFactor = glowFactor
         var drawn = 0
         for slot in 0..<GameRun.maxObjects {
             let glow = glowNodes[slot], body = bodyNodes[slot]
@@ -744,7 +808,7 @@ final class ArcadePresenter: ExperiencePresenter {
             if object.isCapsule {
                 let a = Vec2(object.position.x - object.halfLength, object.position.y)
                 let b = Vec2(object.position.x + object.halfLength, object.position.y)
-                glow.primitive = .line(world(a), world(b), width: px(2 * object.radius * Self.glowScale))
+                glow.primitive = .line(world(a), world(b), width: px(2 * object.radius * glowFactor))
                 body.primitive = .line(world(a), world(b), width: px(2 * object.radius))
                 capA.primitive = .circle(px(object.radius))
                 capA.position = world(a)
@@ -753,7 +817,7 @@ final class ArcadePresenter: ExperiencePresenter {
                 capB.position = world(b)
                 capB.color = fill
             } else {
-                glow.primitive = .circle(px(object.radius * Self.glowScale))
+                glow.primitive = .circle(px(object.radius * glowFactor))
                 glow.position = world(object.position)
                 body.primitive = .circle(px(object.radius))
                 body.position = world(object.position)
@@ -768,7 +832,7 @@ final class ArcadePresenter: ExperiencePresenter {
         let blinking = run.player.invulnerableSteps > 0 && (run.player.invulnerableSteps / Self.blinkSteps) % 2 == 1
         let playerAlpha = blinking ? Self.blinkAlpha : 1
         let center = run.player.center
-        playerGlow.primitive = .circle(px(run.player.hitRadius * Self.glowScale))
+        playerGlow.primitive = .circle(px(run.player.hitRadius * glowFactor))
         playerGlow.position = world(center)
         playerGlow.color = Self.faded(playerGlowColor, glowAlpha * playerAlpha)
         playerRing.primitive = .polyline(Self.ring(center: center, radius: run.player.hitRadius).map(world),

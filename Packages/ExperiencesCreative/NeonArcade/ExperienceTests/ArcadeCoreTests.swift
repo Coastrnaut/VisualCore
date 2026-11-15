@@ -24,6 +24,10 @@
 // the game; the run number counts the runs started (+1 for play again and restart, not for the first start); the
 // stored schema-3 example restores through the migration 3 → 4 with step 2 and run 1; a sensitivity outside 0…4 or a
 // run number below 1 is refused; schema 5 is refused as newer.
+// Feature 079 (A10-P05) T-A10-503 (FR-A10-501, FR-A10-503; SC-A10-501): three quality tiers — the core's
+// `qualityTiers`, `ArcadeBudget.levels`, the presenter's `levelCount`, the profile's names and the registration's
+// `quality_tiers` agree; `setQualityTier` at every tier, also mid-run, leaves the state and the digest unchanged; the
+// reference field colour of `Contrast` is the presenter's field colour.
 import Foundation
 import XCTest
 @testable import NeonArcadeExperience
@@ -76,7 +80,7 @@ final class ArcadeCoreTests: XCTestCase {
         XCTAssertEqual(ArcadeCore.migrations.currentVersion, 4)
         XCTAssertEqual(ArcadeCore.snapshotSchema, 4)
         XCTAssertEqual(ExperienceEngine<ArcadeCore>.schemaVersion, ArcadeCore.snapshotSchema)
-        XCTAssertEqual(ArcadeCore.qualityTiers, 1)
+        XCTAssertEqual(ArcadeCore.qualityTiers, ArcadeBudget.levels)
         XCTAssertEqual(ArcadeCore.stepDuration, 1.0 / 60, accuracy: 1e-12)
         XCTAssertEqual(ExperienceEngine<ArcadeCore>.stepDuration, 1.0 / 60, accuracy: 1e-12)
         XCTAssertTrue(ArcadeRule.invalidChoice.hasPrefix("a10."))
@@ -814,5 +818,54 @@ final class ArcadeCoreTests: XCTestCase {
         XCTAssertEqual(two["sensitivity"] as? Int, 2)
         XCTAssertEqual(try JSONDecoder().decode(ArcadeState.self, from: JSONSerialization.data(withJSONObject: two)),
                        ArcadeState(run: stored.run, random: stored.random, screen: .playing, sound: false))
+    }
+
+    // MARK: Quality tiers (feature 079)
+
+    /// T-A10-503 (FR-A10-501): the core, the budget, the presenter, the profile and the registration declare the same
+    /// three levels.
+    func testTheDeclaredTiersEqualTheBudgetThePresenterAndTheRegistration() throws {
+        XCTAssertEqual(ArcadeCore.qualityTiers, 3)
+        XCTAssertEqual(ArcadeCore.qualityTiers, ArcadeBudget.levels)
+        XCTAssertEqual(ArcadePresenter.levelCount, ArcadeBudget.levels)
+        XCTAssertEqual(ArcadeBudget.all.map(\.level), Array(0..<ArcadeCore.qualityTiers))
+        XCTAssertEqual(ArcadeCore.qualityProfile.count, ArcadeCore.qualityTiers)
+        XCTAssertEqual(ArcadeCore.qualityProfile.names, ["level-0", "level-1", "level-2"])
+        let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
+            .deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
+        let data = try Data(contentsOf: root.appendingPathComponent("Catalog/registrations.json"))
+        let object = try XCTUnwrap(try JSONSerialization.jsonObject(with: data) as? [String: Any])
+        let registrations = try XCTUnwrap(object["registrations"] as? [String: Any])
+        let entry = try XCTUnwrap(registrations[ArcadeCore.experienceID] as? [String: Any])
+        XCTAssertEqual(entry["quality_tiers"] as? [String], ArcadeCore.qualityProfile.names,
+                       "the registration names the core's levels")
+    }
+
+    /// T-A10-503 (FR-A10-503): the tier is presentation only — every tier, also changed mid-run on an engine, keeps the
+    /// state and the digest of the same run without tier changes.
+    func testTheQualityTierNeverChangesTheStateOrTheDigest() async throws {
+        var plain = try await makeEngine()
+        var tiered = try await makeEngine()
+        for engine in [plain, tiered] { XCTAssertEqual(engine.core?.screen, .playing) }
+        XCTAssertTrue(plain.handle(control: "run.steer", values: [0.5]).isAccepted)
+        XCTAssertTrue(tiered.handle(control: "run.steer", values: [0.5]).isAccepted)
+        for tier in [2, 1, 0, 2] {
+            try tiered.setQualityTier(tier)
+            XCTAssertEqual(tiered.qualityTier, tier)
+            try plain.run(steps: 50)
+            try tiered.run(steps: 50)
+            XCTAssertEqual(tiered.core, plain.core, "tier \(tier)")
+            XCTAssertEqual(try tiered.digest(), try plain.digest(), "tier \(tier)")
+        }
+        for tier in 0..<ArcadeCore.qualityTiers {
+            var copy = try XCTUnwrap(plain.core)
+            copy.setQualityTier(tier)
+            XCTAssertEqual(copy, plain.core)
+        }
+    }
+
+    /// T-A10-502/503 (FR-A10-502): the contrast reference field is the colour the presenter draws the field in.
+    func testTheContrastFieldIsThePresentersFieldColour() {
+        XCTAssertEqual(Contrast.field, ArcadePresenter.fieldColor)
     }
 }

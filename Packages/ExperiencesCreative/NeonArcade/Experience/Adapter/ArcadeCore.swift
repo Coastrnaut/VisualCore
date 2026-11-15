@@ -23,7 +23,7 @@
 // the generator state untouched — and re-encodes it. A payload that does not decode, whose run does not validate
 // (`GameRun.validate()` names a problem; a schema-1 run that skipped the migration is refused as "schema 1 is not 2")
 // or whose generator state is malformed is refused (the restore throws). `schemaOneExample()` is the stored Phase 01
-// payload the registry's migration check restores. One quality tier (`level-0`). The digest is the canonical text of
+// payload the registry's migration check restores. Three quality tiers since feature 079 (see below). The digest is the canonical text of
 // the whole state — the run with its step, score, lives, flags, steering, player, objects, next id, the kept events,
 // the event count and the wave state, and the generator state.
 //
@@ -57,6 +57,11 @@
 //                                replay stays exact.
 // The restore refuses a sensitivity outside 0…4 or a run number below 1. `schemaThreeExample()` is the stored schema-3
 // payload (sound off, a playing run) the registry's migration check restores. The digest covers both new fields.
+//
+// Quality tiers — feature 079 (A10-P05) T-A10-503 (FR-A10-501, FR-A10-503; clarification 1; research D1):
+// `qualityTiers` is `ArcadeBudget.levels` (3; profile `level-0`…`level-2`, as the registration). The core stores no
+// tier: `setQualityTier` keeps the protocol's default (nothing), so the state, the replay and the digest are the same
+// at every tier; the presenter alone turns the host's tier and Low Power Mode into a drawing budget.
 import Foundation
 import NeonArcadeCore
 import VisualCoreExperience
@@ -247,8 +252,12 @@ public struct ArcadeCore: ExperienceCore, Equatable {
     /// One fixed simulation step: `GameSimulation.step` (1/60 s).
     public static var stepDuration: Double { GameSimulation.step }
 
-    /// One quality tier (`level-0`): the drawing has nothing to scale down.
-    public static var qualityTiers: Int { 1 }
+    /// Three quality tiers (`level-0`…`level-2`, feature 079 A10-P05; the default uniform profile names them as the
+    /// catalog does): `ArcadeBudget.levels`. The tier is presentation only — the presenter draws the glow and the
+    /// particles with an `ArcadeBudget` chosen from the host's tier and Low Power Mode; the core keeps nothing
+    /// (`setQualityTier` is the protocol's default, which does nothing), so the state and its digest are the same at
+    /// every tier.
+    public static var qualityTiers: Int { ArcadeBudget.levels }
 
     /// Schema 4 (feature 078). The step 1 → 2 decodes a Phase 01 payload, lifts its run with `GameRun.migrated()`
     /// (the start of wave 1 with `rain`, everything else kept) and re-encodes it without the schema-3 and schema-4

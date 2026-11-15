@@ -22,6 +22,12 @@
 // best scores — the top three rows in seven-segment digits and the new entry marked in magenta with an arrow, as a
 // fourth row when it ranks below third — and nothing on the playing screen; the description names the best score
 // ("best score 1,230") before the screen.
+// Feature 079 (A10-P05) T-A10-503 (FR-A10-501–503; SC-A10-501; edge case "the quality level drops mid-burst"): the
+// host's tier t draws budget level 2 − t and Low Power Mode level 0; at every level each glow is drawn at the level's
+// radius factor and at most its opacity cap (pulsing below the cap at levels 1 and 2, steady at level 0 and under
+// reduced flashing) while every collision shape keeps its rule size above the glows; bursts scale by the level and the
+// live particles stay within its cap; a lowered cap removes the oldest particles from the drawing at once and no new
+// burst exceeds it; drawing at any level never changes the core.
 import Foundation
 import XCTest
 @testable import NeonArcadeExperience
@@ -284,7 +290,9 @@ final class ArcadeRenderTests: XCTestCase {
         XCTAssertEqual(reduced.driftAmount, 0.3, accuracy: 1e-12)
 
         var run = runWithObjects()
-        run.step = 20   // sin(20 × 0.08) ≈ 1: near the pulse's peak
+        // sin(59 × 0.08) ≈ −1: near the pulse's trough (feature 079: the glow alpha is capped at 0.35 = the base at
+        // level 2, so the swing shows below the base).
+        run.step = 59
         let core = try core(run)
         let copy = core
         full.layOut(core, width: 90, height: 160)
@@ -672,5 +680,184 @@ final class ArcadeRenderTests: XCTestCase {
         XCTAssertEqual(ArcadePresenter.bestWords(nil, newRank: nil), "Best score: none")
         XCTAssertEqual(ArcadePresenter.bestWords(HighScoreEntry(score: 1_230, wave: 4, run: 2), newRank: 1),
                        "Best score: 1,230 in wave 4. This run is number 2 in the table.")
+    }
+
+    // MARK: Quality levels (feature 079)
+
+    /// A run at `step` whose last three events are pickups of objects that are gone (each a cue at the player).
+    private func pickupRun(step: Int, eventCount: Int) -> GameRun {
+        var run = GameRun.new()
+        run.step = step
+        run.events = (0..<3).map { CollisionEvent(step: max(step - 1, 0), objectId: 100 + $0, kind: .pickup) }
+        run.eventCount = eventCount
+        return run
+    }
+
+    /// Advances `effects` through `steps` steps after `from`, each with three new pickups (three bursts per step).
+    private func burst(_ effects: ArcadeEffectsLayer, from: Int, steps: Int) {
+        for step in (from + 1)...(from + steps) {
+            _ = effects.advance(to: pickupRun(step: step, eventCount: 3 * step))
+        }
+    }
+
+    /// T-A10-503 (FR-A10-501): the host's tier 0 (the best) draws budget level 2, tier 2 level 0, an out-of-range tier
+    /// is clamped, and Low Power Mode draws level 0 at every tier.
+    func testTheHostTierAndLowPowerModeChooseTheBudget() {
+        XCTAssertEqual((0..<3).map { ArcadePresenter.budgetLevel(tier: $0, lowPower: false) }, [2, 1, 0])
+        XCTAssertEqual(ArcadePresenter.budgetLevel(tier: -1, lowPower: false), 2)
+        XCTAssertEqual(ArcadePresenter.budgetLevel(tier: 9, lowPower: false), 0)
+        XCTAssertEqual((-1...3).map { ArcadePresenter.budgetLevel(tier: $0, lowPower: true) }, [0, 0, 0, 0, 0])
+        let lowPower = TestSwitch(false)
+        let presenter = ArcadePresenter(experienceID: ArcadeTest.id, lowPowerMode: { lowPower.on })
+        XCTAssertEqual(presenter.budget.level, 2, "the full drawing before the first frame")
+        for (tier, level) in [(0, 2), (1, 1), (2, 0)] {
+            presenter.applyQuality(tier: tier)
+            XCTAssertEqual(presenter.budget, ArcadeBudget.level(level), "tier \(tier)")
+            XCTAssertEqual(presenter.effects.particles.liveLimit, ArcadeBudget.level(level).particleCap)
+        }
+        lowPower.on = true
+        presenter.applyQuality(tier: 0)
+        XCTAssertEqual(presenter.budget.level, 0, "Low Power Mode draws level 0")
+        XCTAssertTrue(presenter.lastLowPower)
+        lowPower.on = false
+        presenter.applyQuality(tier: 0)
+        XCTAssertEqual(presenter.budget.level, 2, "and the host's level again once it is off")
+    }
+
+    /// T-A10-503 (FR-A10-501, FR-A10-502; SC-A10-501): at every level and over a whole pulse period each glow is drawn
+    /// at the level's radius factor and at most its opacity cap, the pulse showing at levels 1 and 2 only, while the
+    /// collision shapes keep their rule sizes in the front layer above the glows; drawing never changes the core.
+    func testEachLevelDrawsTheGlowWithinItsCapsAndTheShapesAtTheRuleSizes() throws {
+        for tier in 0..<ArcadeCore.qualityTiers {
+            let presenter = ArcadePresenter(experienceID: ArcadeTest.id, lowPowerMode: { false })
+            presenter.applyQuality(tier: tier)
+            let budget = presenter.budget
+            XCTAssertEqual(budget.level, ArcadeBudget.levels - 1 - tier)
+            var alphas: [Double] = []
+            for step in stride(from: 0, to: 80, by: 3) {   // 80 × 0.08 = 6.4 > 2π: a whole pulse period
+                var run = runWithObjects()
+                run.step = step
+                let core = try core(run)
+                let copy = core
+                presenter.layOut(core, width: 90, height: 160)
+                XCTAssertEqual(core, copy, "drawing reads the core only")
+                let s = presenter.lastScale
+                let world = { (p: Vec2) in ArcadePresenter.world(p, scale: s) }
+                XCTAssertEqual(presenter.lastGlowFactor, budget.glowFactor)
+                XCTAssertLessThanOrEqual(presenter.lastGlowAlpha, budget.glowOpacityCap + 1e-12)
+                alphas.append(presenter.lastGlowAlpha)
+                // Glows at the level's factor, no more opaque than its cap.
+                XCTAssertEqual(presenter.glowNodes[0].primitive, .circle(0.5 * budget.glowFactor * s))
+                XCTAssertEqual(presenter.glowNodes[1].primitive,
+                               .line(world(Vec2(4.2, 10)), world(Vec2(5.8, 10)), width: 2 * 0.2 * budget.glowFactor * s))
+                XCTAssertEqual(presenter.glowNodes[2].primitive, .circle(0.25 * budget.glowFactor * s))
+                XCTAssertEqual(presenter.playerGlow.primitive, .circle(PlayerState.hitRadius * budget.glowFactor * s))
+                for node in presenter.glowNodes.prefix(3) + [presenter.playerGlow] {
+                    XCTAssertLessThanOrEqual(node.color.w, budget.glowOpacityCap + 1e-12, "\(node.id) level \(budget.level)")
+                }
+                // Collision shapes at their rule sizes, drawn after (above) the glows.
+                XCTAssertEqual(presenter.bodyNodes[0].primitive, .circle(0.5 * s))
+                XCTAssertEqual(presenter.bodyNodes[1].primitive,
+                               .line(world(Vec2(4.2, 10)), world(Vec2(5.8, 10)), width: 0.4 * s))
+                XCTAssertEqual(presenter.bodyNodes[2].primitive, .circle(0.25 * s))
+                let order = presenter.root.drawList().map { ObjectIdentifier($0.node) }
+                for slot in 0..<3 {
+                    let glow = try XCTUnwrap(order.firstIndex(of: ObjectIdentifier(presenter.glowNodes[slot])))
+                    for body in [presenter.bodyNodes[slot]] {
+                        let index = try XCTUnwrap(order.firstIndex(of: ObjectIdentifier(body)))
+                        XCTAssertGreaterThan(index, glow, "the shape above its glow")
+                    }
+                }
+                let ring = try XCTUnwrap(order.firstIndex(of: ObjectIdentifier(presenter.playerRing)))
+                let playerGlow = try XCTUnwrap(order.firstIndex(of: ObjectIdentifier(presenter.playerGlow)))
+                XCTAssertGreaterThan(ring, playerGlow, "the player's ring above its glow")
+            }
+            let spread = (alphas.max() ?? 0) - (alphas.min() ?? 0)
+            XCTAssertEqual(alphas.max() ?? 0, budget.glowOpacityCap, accuracy: 1e-12, "the glow reaches its cap")
+            if budget.pulse {
+                XCTAssertGreaterThan(spread, 0.05, "level \(budget.level) pulses")
+                XCTAssertEqual(presenter.lastPulseApplied, ArcadePresenter.glowPulse)
+            } else {
+                XCTAssertEqual(spread, 0, accuracy: 1e-12, "level 0 holds the glow steady")
+                XCTAssertEqual(presenter.lastPulseApplied, 0)
+            }
+        }
+    }
+
+    /// T-A10-503 (FR-A10-503): reduced flashing removes the pulse at every level (a steady glow at the level's cap);
+    /// Reduce Motion alone still halves the amplitude.
+    func testReducedFlashingHoldsTheGlowSteadyAtEveryLevel() throws {
+        for tier in 0..<ArcadeCore.qualityTiers {
+            for reduceMotion in [false, true] {
+                let presenter = ArcadePresenter(experienceID: ArcadeTest.id, reduceMotion: reduceMotion,
+                                                reduceFlashing: true, lowPowerMode: { false })
+                presenter.applyQuality(tier: tier)
+                var alphas = Set<Double>()
+                for step in stride(from: 0, to: 80, by: 3) {
+                    var run = runWithObjects()
+                    run.step = step
+                    presenter.layOut(try core(run), width: 90, height: 160)
+                    alphas.insert(presenter.lastGlowAlpha)
+                    XCTAssertEqual(presenter.lastPulseApplied, 0)
+                }
+                XCTAssertEqual(alphas, [presenter.budget.glowOpacityCap], "tier \(tier) steady at the cap")
+            }
+        }
+        let motion = ArcadePresenter(experienceID: ArcadeTest.id, reduceMotion: true, lowPowerMode: { false })
+        motion.applyQuality(tier: 0)
+        var run = runWithObjects()
+        run.step = 59
+        motion.layOut(try core(run), width: 90, height: 160)
+        XCTAssertEqual(motion.lastPulseApplied, ArcadePresenter.glowPulse / 2, "Reduce Motion halves the pulse")
+    }
+
+    /// T-A10-503 (FR-A10-501; SC-A10-501): at every level a burst starts `burstCount` particles and, with three bursts
+    /// a step, the live particles reach the level's cap and never pass it.
+    func testEachLevelKeepsTheLiveParticlesWithinItsCap() {
+        for tier in 0..<ArcadeCore.qualityTiers {
+            let presenter = ArcadePresenter(experienceID: ArcadeTest.id, lowPowerMode: { false })
+            presenter.applyQuality(tier: tier)
+            let budget = presenter.budget
+            let effects = presenter.effects
+            _ = effects.advance(to: pickupRun(step: 0, eventCount: 0))
+            _ = effects.advance(to: pickupRun(step: 1, eventCount: 3))
+            XCTAssertEqual(effects.particles.aliveCount, 3 * budget.burstCount(ArcadeEffectsLayer.pickupParticles),
+                           "three scaled bursts at level \(budget.level)")
+            for step in 2...20 {
+                _ = effects.advance(to: pickupRun(step: step, eventCount: 3 * step))
+                XCTAssertLessThanOrEqual(effects.particles.aliveCount, budget.particleCap)
+                XCTAssertLessThanOrEqual(effects.instances.count, budget.particleCap)
+            }
+            XCTAssertEqual(effects.particles.aliveCount, budget.particleCap, "the cap binds at level \(budget.level)")
+            XCTAssertEqual(effects.liveParticles, budget.particleCap)
+        }
+        XCTAssertEqual(ArcadeBudget.level(0).burstCount(ArcadeEffectsLayer.hitParticles), 5)
+        XCTAssertEqual(ArcadeBudget.level(2).burstCount(ArcadeEffectsLayer.hitParticles), ArcadeEffectsLayer.hitParticles)
+    }
+
+    /// T-A10-503 (edge case "the quality level drops mid-burst"): when the level drops from 2 to 0 with 256 particles
+    /// alive, the drawing keeps the 48 youngest at once (the oldest removed first), no new burst passes the cap while
+    /// the rest expire, and the level rising again lets bursts reach the higher cap.
+    func testALoweredCapRemovesTheOldestParticlesFirst() {
+        let presenter = ArcadePresenter(experienceID: ArcadeTest.id, lowPowerMode: { false })
+        presenter.applyQuality(tier: 0)
+        let effects = presenter.effects
+        _ = effects.advance(to: pickupRun(step: 0, eventCount: 0))
+        burst(effects, from: 0, steps: 10)
+        XCTAssertEqual(effects.particles.aliveCount, 256)
+        let before = effects.particles.instances().map(\.size).sorted(by: >)
+        presenter.applyQuality(tier: 2)
+        let kept = effects.instances
+        XCTAssertEqual(kept.count, 48, "the drawing drops to the new cap at once")
+        XCTAssertEqual(kept.map(\.size).sorted(by: >), Array(before.prefix(48)), "the youngest are kept")
+        XCTAssertGreaterThanOrEqual(kept.map(\.size).min() ?? 0, before[48], "every removed particle is older")
+        for step in 11...40 {
+            _ = effects.advance(to: pickupRun(step: step, eventCount: 3 * step))
+            XCTAssertLessThanOrEqual(effects.instances.count, 48, "step \(step)")
+        }
+        XCTAssertLessThanOrEqual(effects.particles.aliveCount, 48, "the old particles have expired")
+        presenter.applyQuality(tier: 0)
+        burst(effects, from: 40, steps: 10)
+        XCTAssertEqual(effects.particles.aliveCount, 256, "the full cap again")
     }
 }

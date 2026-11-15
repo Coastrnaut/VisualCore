@@ -365,6 +365,7 @@ let package = Package(
                 dependencies: ["NeonArcadeCore",
                                .product(name: "VisualCoreSimulation", package: visualCore),
                                .product(name: "VisualCoreMath", package: visualCore),
+                               .product(name: "VisualCoreDiagnostics", package: visualCore),
                                .product(name: "VisualCoreScenes", package: visualCore),
                                .product(name: "VisualCorePersistence", package: visualCore),
                                .product(name: "VisualCoreExperience", package: visualCore),

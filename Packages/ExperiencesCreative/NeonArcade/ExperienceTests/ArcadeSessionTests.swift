@@ -25,6 +25,11 @@
 // the game over; the same finger offset gives a different, bounded steering value for each sensitivity step, in a
 // session too, and every gesture keeps a native alternative; every control is labelled with a value or hint, and the
 // controls grow with Dynamic Type.
+// Feature 079 (A10-P05) T-A10-503 (FR-A10-501, FR-A10-503; SC-A10-501; edge case "Low Power Mode and the host's
+// level"): the experience shows the core's three-level profile to the session; a pinned level reaches the presenter
+// (level 0 the best → budget level 2) and a level changed mid-run keeps the shapes, the state and the digest of the
+// same run drawn without changes; Low Power Mode draws level 0 whatever the host's level, also when it turns on and
+// off mid-run, and never changes the state.
 import Foundation
 import SwiftUI
 import UIKit
@@ -756,5 +761,95 @@ final class ArcadeSessionTests: XCTestCase {
         XCTAssertGreaterThan(small, 0)
         XCTAssertGreaterThan(large, small * 1.3, "the texts grow with Dynamic Type (\(small) → \(large))")
         session.close()
+    }
+
+    // MARK: Quality levels (feature 079)
+
+    /// T-A10-503 (FR-A10-501): the session sees the core's profile (three levels named as the catalog), not the
+    /// single level an experience declares by default.
+    func testTheExperienceShowsTheCoresThreeLevels() {
+        let experience = NeonArcadeExperience.make(id: ArcadeTest.id, lowPowerMode: { false })
+        XCTAssertEqual(experience.qualityProfile, ArcadeCore.qualityProfile)
+        XCTAssertEqual(experience.qualityProfile.count, ArcadePresenter.levelCount)
+        XCTAssertEqual(QualityDeclaration.problems(profile: experience.qualityProfile,
+                                                   tierCount: ArcadeCore.qualityTiers,
+                                                   catalogNames: ["level-0", "level-1", "level-2"]), [])
+    }
+
+    /// T-A10-503 (FR-A10-503; SC-A10-501): pinning levels 2, 1 and 0 in turn mid-run draws budget levels 0, 1 and 2,
+    /// with the collision shapes, the core and the digest equal to the same run drawn at the session's own level.
+    func testALevelChangeMidRunKeepsTheShapesTheStateAndTheDigest() async throws {
+        let plain = ExperienceSession()
+        let plainShell = try await ArcadeTest.open(plain)
+        plain.qualityPin = 0
+        let tiered = ExperienceSession()
+        let tieredShell = try await ArcadeTest.open(tiered)
+        for shell in [plainShell, tieredShell] {
+            XCTAssertTrue(shell.handle(control: "run.steer", values: [0.5]).isAccepted)
+        }
+        try ArcadeTest.frames(plain, 30)
+        try ArcadeTest.frames(tiered, 30)
+        for (pin, level) in [(2, 0), (1, 1), (0, 2)] {
+            tiered.qualityPin = pin
+            try ArcadeTest.frames(plain, 40)
+            try ArcadeTest.frames(tiered, 40)
+            let presenter = tieredShell.presenter
+            XCTAssertEqual(presenter.lastHostTier, pin, "the pinned level reaches the presenter")
+            XCTAssertEqual(presenter.budget.level, level)
+            XCTAssertEqual(presenter.lastGlowFactor, ArcadeBudget.level(level).glowFactor)
+            XCTAssertLessThanOrEqual(presenter.lastGlowAlpha, ArcadeBudget.level(level).glowOpacityCap)
+            XCTAssertEqual(plainShell.presenter.budget.level, 2, "the plain session draws the full level")
+            XCTAssertEqual(try ArcadeTest.core(tieredShell), try ArcadeTest.core(plainShell), "pin \(pin)")
+            XCTAssertEqual(try tieredShell.engine.digest(), try plainShell.engine.digest(), "pin \(pin)")
+            XCTAssertEqual(presenter.lastObjectsDrawn, plainShell.presenter.lastObjectsDrawn)
+            XCTAssertEqual(presenter.bodyNodes.map(\.primitive), plainShell.presenter.bodyNodes.map(\.primitive),
+                           "the collision shapes at their rule sizes at every level")
+            XCTAssertEqual(presenter.playerRing.primitive, plainShell.presenter.playerRing.primitive)
+            XCTAssertLessThanOrEqual(presenter.effects.instances.count, ArcadeBudget.level(level).particleCap)
+        }
+        plain.close()
+        tiered.close()
+    }
+
+    /// T-A10-503 (FR-A10-503; edge case "Low Power Mode and the host's level"): with Low Power Mode on every frame
+    /// draws level 0 whatever the host's level (no pulse, the 1.2 × glow, 48 particles at most); off again, the host's
+    /// level returns; the state and the digest equal a run drawn without Low Power Mode.
+    func testLowPowerModeDrawsLevelZeroAndNeverChangesTheState() async throws {
+        let plain = ExperienceSession()
+        let plainShell = try await ArcadeTest.open(plain)
+        plain.qualityPin = 0
+        let lowPower = TestSwitch(true)
+        let saving = ExperienceSession()
+        let savingShell = try await ArcadeTest.open(saving, lowPowerMode: { lowPower.on })
+        saving.qualityPin = 0
+        for shell in [plainShell, savingShell] {
+            XCTAssertTrue(shell.handle(control: "run.steer", values: [-0.5]).isAccepted)
+        }
+        try ArcadeTest.frames(plain, 40)
+        try ArcadeTest.frames(saving, 40)
+        let presenter = savingShell.presenter
+        XCTAssertTrue(presenter.lastLowPower)
+        XCTAssertEqual(presenter.lastHostTier, 0)
+        XCTAssertEqual(presenter.budget, ArcadeBudget.level(0), "Low Power Mode draws level 0")
+        XCTAssertEqual(presenter.lastGlowFactor, 1.2)
+        XCTAssertEqual(presenter.lastPulseApplied, 0, "no pulse at level 0")
+        XCTAssertEqual(presenter.effects.particles.liveLimit, 48)
+        XCTAssertEqual(try ArcadeTest.core(savingShell), try ArcadeTest.core(plainShell))
+        XCTAssertEqual(try savingShell.engine.digest(), try plainShell.engine.digest())
+        lowPower.on = false
+        try ArcadeTest.frames(plain, 20)
+        try ArcadeTest.frames(saving, 20)
+        XCTAssertFalse(presenter.lastLowPower)
+        XCTAssertEqual(presenter.budget.level, 2, "the host's level once Low Power Mode is off")
+        XCTAssertEqual(try savingShell.engine.digest(), try plainShell.engine.digest())
+        lowPower.on = true
+        saving.qualityPin = 1
+        try ArcadeTest.frames(plain, 20)
+        try ArcadeTest.frames(saving, 20)
+        XCTAssertEqual(presenter.lastHostTier, 1)
+        XCTAssertEqual(presenter.budget.level, 0, "level 0 at any host level")
+        XCTAssertEqual(try savingShell.engine.digest(), try plainShell.engine.digest())
+        plain.close()
+        saving.close()
     }
 }

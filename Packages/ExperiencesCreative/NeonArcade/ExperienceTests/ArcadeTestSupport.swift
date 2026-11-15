@@ -6,6 +6,8 @@
 // Feature 078 (A10-P04) T-A10-403: a recording announcement sink and a feedback route with VoiceOver running, a
 // temporary `ExperienceStorage`, finished runs for the high-score table, and `openExperience` taking a high-score
 // store.
+// Feature 079 (A10-P05) T-A10-503: `openExperience` and `open` take an injected Low Power Mode, off by default, so the
+// drawn quality level never depends on the machine's own Low Power Mode.
 import Foundation
 import XCTest
 @testable import NeonArcadeExperience
@@ -17,6 +19,13 @@ import VisualCoreRendering
 import VisualCoreScenes
 import VisualCoreSimulation
 import VisualCoreUI
+
+/// A switch a test flips while the presenter reads it, such as Low Power Mode (feature 079).
+@MainActor
+final class TestSwitch {
+    var on: Bool
+    init(_ on: Bool) { self.on = on }
+}
 
 /// Records the sounds played and the stops (feature 077).
 @MainActor
@@ -106,11 +115,13 @@ enum ArcadeTest {
 
     /// Opens Neon Arcade in `session` (seed `seed`, optionally restoring `snapshot`), lays the view out at `size`
     /// points, sends `run.start` when `start` is true and the experience shows the title screen, and draws one frame.
-    /// Without a `soundSink` a recorder is used, so tests never play audio.
+    /// Without a `soundSink` a recorder is used, so tests never play audio; without `lowPowerMode` Low Power Mode is
+    /// off (feature 079).
     static func openExperience(_ session: ExperienceSession, seed: UInt64 = 7, snapshot: ExperienceSnapshot? = nil,
                                reduceMotion: Bool = false, reduceFlashing: Bool = false,
                                soundSink: (any ArcadeSoundSink)? = nil, feedback: ExperienceFeedback? = nil,
                                highScores: HighScoreStore? = nil, start: Bool = true,
+                               lowPowerMode: (@MainActor () -> Bool)? = nil,
                                size: CGSize = CGSize(width: 90, height: 160)) async throws -> ArcadeExperience {
         let id = self.id
         var made: ArcadeExperience?
@@ -119,7 +130,8 @@ enum ArcadeTest {
         let request = ExperienceOpenRequest(id: id, seed: seed, snapshot: snapshot, refusedSnapshotFails: false) {
             let experience = NeonArcadeExperience.make(id: id, reduceMotion: reduceMotion,
                                                        reduceFlashing: reduceFlashing, soundSink: sound,
-                                                       feedback: route, highScores: highScores)
+                                                       feedback: route, highScores: highScores,
+                                                       lowPowerMode: lowPowerMode ?? { false })
             made = experience
             return experience
         }
@@ -138,12 +150,12 @@ enum ArcadeTest {
     }
 
     /// The shell of
-    /// ``openExperience(_:seed:snapshot:reduceMotion:reduceFlashing:soundSink:feedback:highScores:start:size:)``.
+    /// ``openExperience(_:seed:snapshot:reduceMotion:reduceFlashing:soundSink:feedback:highScores:start:lowPowerMode:size:)``.
     static func open(_ session: ExperienceSession, seed: UInt64 = 7, snapshot: ExperienceSnapshot? = nil,
-                     reduceMotion: Bool = false, start: Bool = true,
+                     reduceMotion: Bool = false, start: Bool = true, lowPowerMode: (@MainActor () -> Bool)? = nil,
                      size: CGSize = CGSize(width: 90, height: 160)) async throws -> ExperienceShell<ArcadePresenter> {
         try await openExperience(session, seed: seed, snapshot: snapshot, reduceMotion: reduceMotion, start: start,
-                                 size: size).shell
+                                 lowPowerMode: lowPowerMode, size: size).shell
     }
 
     /// The core of `shell`.

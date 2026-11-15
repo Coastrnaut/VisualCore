@@ -19,6 +19,15 @@
 //     while the haptics setting is on. The plan's caps (3 visual and 2 sound cues per step) hold here unchanged.
 // The effect nodes sit in the presenter's back layer, which is drawn before the particles and both before the
 // glows, objects, player and HUD: the collision shapes are always drawn above every effect.
+// Quality levels — feature 079 (A10-P05) T-A10-503 (FR-A10-501, FR-A10-503; clarification 1; research D1; edge case
+// "the quality level drops mid-burst"): the presenter hands the layer the `ArcadeBudget` of each drawn frame
+// (`apply(_:)`) before advancing it. A burst designed as n particles at full drawing starts `budget.burstCount(n)`
+// particles (16 → 16, 8, 3 and 24 → 24, 12, 5 at levels 2, 1, 0), and the pool's emission ceiling (`liveLimit`) is
+// the level's particle cap (256, 128, 48), so no new burst exceeds it. When the cap drops below the particles alive,
+// the oldest above the cap are removed from what is drawn at once (`instances` keeps the youngest `particleCap`; every
+// particle lives 0.4 s and shrinks from 0.16 units to 0 over its life, so a larger size is a younger particle) and the
+// pool lets them expire within 0.4 s; VisualCore's `ParticleSystem` has no call that deletes a live particle. Nothing
+// here reaches the game.
 import Foundation
 import NeonArcadeCore
 import VisualCoreAudio
@@ -113,6 +122,10 @@ final class ArcadeEffectsLayer {
     private(set) var lastCues: [EffectCue] = []
     /// The bursts started since the layer was made (tests).
     private(set) var burstCount = 0
+    /// The drawing budget in force (feature 079; the full drawing, level 2, until the presenter applies another).
+    private(set) var budget = ArcadeBudget.level(ArcadeBudget.levels - 1)
+    /// The most live particles drawn: the budget's particle cap.
+    var particleCap: Int { budget.particleCap }
 
     /// The ring nodes, the tint node and the sweep node (in the presenter's back layer).
     private(set) var ringNodes: [SceneNode] = []
@@ -146,9 +159,17 @@ final class ArcadeEffectsLayer {
         return system
     }
 
+    /// Uses `budget` from now on: bursts scale by its cap and the pool emits no particle beyond it; particles alive
+    /// above a lowered cap leave the drawing at once, oldest first (see `instances`).
+    func apply(_ budget: ArcadeBudget) {
+        self.budget = budget
+        particles.liveLimit = budget.particleCap
+    }
+
     /// Forgets every effect (a new run, a restore).
     func clear() {
         particles = Self.makeParticles()
+        particles.liveLimit = budget.particleCap
         rings = []
         tintStart = nil
         sweepStart = nil
@@ -170,11 +191,11 @@ final class ArcadeEffectsLayer {
             switch cue.kind {
             case .pickup:
                 particles.emitters[slot].position = cue.position
-                particles.burst(Self.pickupParticles, from: slot)
+                particles.burst(budget.burstCount(Self.pickupParticles), from: slot)
                 burstCount += 1
             case .hit:
                 particles.emitters[Self.slots + slot].position = cue.position
-                particles.burst(Self.hitParticles, from: Self.slots + slot)
+                particles.burst(budget.burstCount(Self.hitParticles), from: Self.slots + slot)
                 burstCount += 1
                 rings.append((cue.position, run.step))
                 if rings.count > Self.maxRings { rings.removeFirst(rings.count - Self.maxRings) }
@@ -211,8 +232,21 @@ final class ArcadeEffectsLayer {
         sweepStart.map { GameRun.fieldHeight * (1 - progress($0, steps: Self.sweepSteps)) }
     }
 
-    /// The live particles in game units.
-    var instances: [ParticleInstance] { particles.instances() }
+    /// The live particles drawn, in game units: every live particle of the pool, or — when more are alive than the
+    /// budget's cap (the level just dropped) — the youngest `particleCap` of them (the largest, since every particle
+    /// shrinks over the same 0.4 s life; ties keep the pool's order), so the oldest above the cap are removed first.
+    var instances: [ParticleInstance] {
+        let all = particles.instances()
+        let cap = particleCap
+        guard all.count > cap else { return all }
+        let youngest = all.indices.sorted { a, b in
+            all[a].size != all[b].size ? all[a].size > all[b].size : a < b
+        }.prefix(cap).sorted()
+        return youngest.map { all[$0] }
+    }
+
+    /// The live particles drawn (at most the budget's cap).
+    var liveParticles: Int { min(particles.aliveCount, particleCap) }
 
     /// Whether an effect lies within `margin` game units of `point` (the frame probe steps aside for it).
     func touches(_ point: Vec2, margin: Double) -> Bool {
