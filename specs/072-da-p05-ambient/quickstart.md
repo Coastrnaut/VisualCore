@@ -12,5 +12,6 @@ python3 scripts/test_scripts.py
 Expected: all pass; saved configurations round-trip through actions and damaged files are counted; ambient halves the
 particles and slows the fish to 0.6; dimming at 60 s and restore on touch; three levels with monotone budgets and an
 unchanged digest; the long run keeps every bound and the resource count is steady over five reopenings; the runner's
-nine standard scenarios pass with three quality levels; the manifest's thirteen fixtures pass; the device campaign is
+nine standard scenarios pass (at the default level; the three levels and their unchanged digest are proved by
+`AquariumRenderTests`); the manifest's thirteen fixtures pass; the device campaign is
 planned; the contract records G-AMBIENT closed by A09-P05.

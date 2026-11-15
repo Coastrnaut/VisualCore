@@ -54,4 +54,4 @@ evidence and the device plan last.
 
 ## Phase 7: Convergence
 
-- [ ] T-A09-516 Correct `specs/072-da-p05-ambient/quickstart.md`'s expected outcome: the runner plays its nine standard scenarios at the default level; the three quality levels and their unchanged digest are proved by `AquariumRenderTests` per plan: quickstart (contradicts)
+- [X] T-A09-516 Correct `specs/072-da-p05-ambient/quickstart.md`'s expected outcome: the runner plays its nine standard scenarios at the default level; the three quality levels and their unchanged digest are proved by `AquariumRenderTests` per plan: quickstart (contradicts) — Verified 2026-11-14: 2026-11-14: quickstart states the runner plays the default level; the levels are proved by AquariumRenderTests (passed in .autonomy/logs/A09-P05.aquarium-ios27.log)
