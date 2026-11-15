@@ -1,7 +1,8 @@
 // ExperienceHostView — feature 189 T-U03-009 (FR-U03-060 to FR-U03-063; research R6; contract
 // specs/189-ua-f03-experience-host/contracts/session-api.md). The SwiftUI face of a session: the canvas with the
 // experience's native controls while it runs, and the session's own views while it prepares, after a failure and
-// after a message. Every text comes from `SessionStrings`; every control has a stable identifier.
+// after a message. Every text comes from `SessionStrings`; every control has a stable identifier. Feature 106
+// (A14-P04, FR-A14-420): the experience's optional canvas overlay is drawn over the canvas without hit testing.
 import SwiftUI
 import VisualCoreExperience
 import VisualCoreRendering
@@ -258,6 +259,15 @@ public struct ExperienceHostView: View {
                               accessibilityHint: SessionStrings.text(.canvasHint))
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .accessibilityIdentifier(SessionViewID.canvas)
+                    .overlay {
+                        // Feature 106 (FR-A14-420): the experience's optional canvas overlay, inside the canvas's
+                        // frame, never taking touches and hidden from assistive technology.
+                        if let overlay = session.experience?.canvasOverlay {
+                            overlay
+                                .allowsHitTesting(false)
+                                .accessibilityHidden(true)
+                        }
+                    }
             }
             if let experience = session.experience {
                 ScrollView {

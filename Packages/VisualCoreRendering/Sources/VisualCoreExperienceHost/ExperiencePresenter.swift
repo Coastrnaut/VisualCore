@@ -1,7 +1,9 @@
 // ExperiencePresenter — feature 188 T-U02-038 (FR-U02-050 to FR-U02-053, FR-U02-056, FR-U02-062, FR-U02-080;
 // research R1; contract specs/188-ua-f02-experience-sdk/contracts/experience-host-api.md). The main-actor part an
 // author writes for an experience (GPU objects, drawing, controls, the state in words) and the face every
-// experience shows to the session host.
+// experience shows to the session host. Feature 106 (A14-P04) T-A14-402 (FR-A14-420) adds the optional canvas overlay:
+// `makeCanvasOverlay(_:)` and `Experience.canvasOverlay`, both nil by default (contract
+// specs/106-sse-p04-time-tours/contracts/canvas-overlay.md).
 import SwiftUI
 import VisualCoreDiagnostics
 import VisualCoreExperience
@@ -32,6 +34,10 @@ public protocol ExperiencePresenter: AnyObject {
     func describe(_ core: Core) -> String
     /// The native controls of the experience; they call `port.send`.
     func makeControls(_ port: ExperienceActionPort) -> AnyView
+    /// An optional view drawn over the canvas, such as labels at projected positions or a caption (feature 106,
+    /// FR-A14-420). The host shows it inside the canvas's frame, never lets it take touches and hides its elements
+    /// from assistive technology (the canvas's own label speaks the state). Default: nil, no overlay.
+    func makeCanvasOverlay(_ port: ExperienceActionPort) -> AnyView?
     /// Points of the rendered frame whose colour class follows from `core` (feature 195, FR-U09-040): the
     /// verification runner reads the drawn frame and checks each one. Default: none; every experience that is
     /// verified declares at least one.
@@ -61,6 +67,8 @@ extension ExperiencePresenter {
     public var gestureActions: Set<String> { [] }
     /// No declared native actions.
     public var nativeActions: Set<String> { [] }
+    /// No canvas overlay.
+    public func makeCanvasOverlay(_ port: ExperienceActionPort) -> AnyView? { nil }
 }
 
 /// One experience as the session host sees it: lifecycle, scene, controls, state description and diagnostics.
@@ -76,6 +84,8 @@ public protocol Experience: AnyObject {
     var port: ExperienceActionPort { get }
     /// The native controls of the experience.
     var controls: AnyView { get }
+    /// The optional view drawn over the canvas (feature 106); nil without one.
+    var canvasOverlay: AnyView? { get }
     /// The current state in words; empty while there is no state.
     var accessibilitySummary: String { get }
     /// The diagnostics of the experience, with GPU counts once a graphics context was seen.
@@ -127,4 +137,6 @@ extension Experience {
     public var qualityProfile: QualityProfile { .single }
     /// No probes.
     public var frameProbes: [FrameProbe] { [] }
+    /// No canvas overlay.
+    public var canvasOverlay: AnyView? { nil }
 }

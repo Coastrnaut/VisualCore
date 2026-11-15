@@ -61,6 +61,10 @@ final class SamplePresenter<Fault: SampleFault>: ExperiencePresenter {
     /// footprint on the iOS 26.5 simulator (observed 2026-11-12 with the UA-F06 endurance test: 9.3 MB over
     /// 36,000 frames, flat without it), so only the verification tests turn it on.
     var marksCorner = false
+    /// The canvas overlay `makeCanvasOverlay` returns (feature 106); nil by default, like every presenter.
+    var overlay: AnyView?
+    /// How often `makeCanvasOverlay` was called (feature 106).
+    private(set) var overlayCalls = 0
 
     init() {}
 
@@ -127,6 +131,11 @@ final class SamplePresenter<Fault: SampleFault>: ExperiencePresenter {
         lastViewSize = viewSize
         guard event.phase == .ended, viewSize.x > 0 else { return }
         lastPointerResult = port.send("move", [event.location.x / viewSize.x >= 0.5 ? 1 : -1, 0])
+    }
+
+    func makeCanvasOverlay(_ port: ExperienceActionPort) -> AnyView? {
+        overlayCalls += 1
+        return overlay
     }
 
     func makeControls(_ port: ExperienceActionPort) -> AnyView {

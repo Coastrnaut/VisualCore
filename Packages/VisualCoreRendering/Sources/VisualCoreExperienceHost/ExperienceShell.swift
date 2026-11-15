@@ -71,6 +71,8 @@ public final class ExperienceShell<Presenter: ExperiencePresenter>: Experience {
     public var scene: any RenderScene { sceneObject }
     /// The presenter's native controls, connected to `port`.
     public var controls: AnyView { presenter.makeControls(port) }
+    /// The presenter's canvas overlay, connected to `port`; nil when the presenter has none (feature 106).
+    public var canvasOverlay: AnyView? { presenter.makeCanvasOverlay(port) }
     /// The presenter's description of the current state; empty while there is no state.
     public var accessibilitySummary: String {
         guard let core = engine.core else { return "" }
