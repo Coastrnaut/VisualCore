@@ -23,7 +23,7 @@
 
 ## Snapshot (`AquariumState`)
 
-Schema 2 adds a `schema` field; a payload without it is schema 1 and its document is migrated before validation.
+Schema 2 is carried by the snapshot envelope (`MigrationChain(currentVersion: 2)`); a schema-1 payload passes the step unchanged and its document is migrated before validation; `schemaOneExample()` is the stored schema-1 payload.
 
 ## State transitions
 

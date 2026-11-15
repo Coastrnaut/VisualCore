@@ -54,5 +54,5 @@ bundled catalog has no decor; `AquariumSimulation.advance` is the Phase 01 bound
 ## D6 — Fixtures
 
 - **Decision**: fixture-6 schooling (Reef, 1,800 steps = 30 s; the test checks cohesion and agreement); fixture-7
-  save/load (Kelp, bright, 120 steps; the save-restore check compares species, decor transforms and lighting). Manifest
+  save/load (Kelp, bright, 240 steps; the save-restore check compares species, decor transforms and lighting). Manifest
   digests derived as in A09-P01.

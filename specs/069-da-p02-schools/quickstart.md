@@ -1,7 +1,7 @@
 # Quickstart: A09-P02 evidence (legacy ledger; iOS 27 only)
 
 ```bash
-swift test --package-path Packages/VisualCore --filter SteeringTests
+swift test --package-path Packages/VisualCore --filter "SteeringForceTests|NeighbourSearchTests"
 python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing DigitalAquariumCoreTests DigitalAquariumExperienceTests
 python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27
 python3 scripts/verify_experiences.py --only a09.digital-aquarium --runtime 27

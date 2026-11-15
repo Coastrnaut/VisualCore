@@ -21,7 +21,7 @@ and lighting. Research: [research.md](research.md). Data: [data-model.md](data-m
 `VisualCoreExperienceHost`, `VisualCoreScenes`, `VisualCorePersistence`, `VisualCoreUI`); new VisualCore API only in
 `VisualCoreSimulation`, depending on `VisualCoreMath.Vec2` (verified: `+ - * /`, `dot`, `length`, `normalized`,
 `distance(to:)`, `isFinite`). **Storage**: experience snapshot (`AquariumState` schema 2, `HabitatDocument` schema 2,
-both migrating schema 1). **Testing**: host `swift test --package-path Packages/VisualCore --filter SteeringTests`
+both migrating schema 1). **Testing**: host `swift test --package-path Packages/VisualCore --filter "SteeringForceTests|NeighbourSearchTests"`
 (VisualCore); ExperiencesCreative on sim-27.2 (`DigitalAquariumCoreTests`, `DigitalAquariumExperienceTests`); app build
 and unit; runner iOS 27; public API; script tests. **Performance**: 24 fish × at most 6 neighbours per step (linear scan
 of 24); 10,000 steps × 20 seeds measured on the host and bounded by arithmetic, no wall-clock assertions on CI.
@@ -60,7 +60,7 @@ Packages/ExperiencesCreative/DigitalAquarium/Experience/AquariumPresenter.swift 
   decor drawing)                                                                                      modify
 Packages/ExperiencesCreative/DigitalAquarium/ExperienceTests/{AquariumCoreTests,AquariumManifestTests,
   AquariumRenderTests,AquariumSessionTests}.swift                                                     modify
-Packages/ExperiencesCreative/DigitalAquarium/ExperienceTests/Fixtures/aquarium-schema1.json           new
+Apps/VisualCore/App/ExperienceRegistry.swift (schema-1 example)                                   modify
 Packages/ExperiencesCreative/DigitalAquarium/scenario-manifest.json                                   regenerate
 docs/apps/digital-aquarium/content-licenses.md                                                        regenerate
 docs/api/visualcore-public-api.txt, Packages/VisualCore/README.md,
@@ -73,7 +73,7 @@ in VisualCore depends on the aquarium.
 **Lifecycle**: as A09-P01; a host step runs one `AquariumSimulation.advance` unless paused; drawing reads the state
 and the Reduce Motion factor and never writes the state. **Migration**: `HabitatDocument` and `AquariumState` decode
 schema 1 (missing `turn`, `rotation`, `scale` take 0, 0, 1; empty decor gets the habitat's starter decor) and write
-schema 2; a schema-1 example is stored as a test fixture. **Rollback**: revert the commits; the VisualCore API is
+schema 2; the envelope carries the version (`MigrationChain`), and `AquariumCore.schemaOneExample()` is the stored schema-1 payload of the registry's migration check. **Rollback**: revert the commits; the VisualCore API is
 additive; a schema-2 state is not readable by the Phase 01 build (acceptable: no release exists).
 
 ## Build and evidence
