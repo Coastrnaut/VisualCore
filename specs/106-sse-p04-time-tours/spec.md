@@ -54,7 +54,8 @@ normalised device coordinates; `AnnouncementSink` (VisualCoreUI) has system and 
   none), `tourStop`, `tourStep`, `tourPaused`. Actions: `tour.start [0…1]` (selects the first stop's body),
   `tour.next` (skip; after the last stop ends the tour), `tour.pause [0|1]`, `tour.stop`; refused without a tour with
   `a14.no-tour`. Each stop sets the selection, so the presenter's focus flight flies there (Reduce Motion cuts). A tour
-  runs its steps whether or not time is playing; the user's body choice during a tour stops the tour.
+  runs its steps whether or not time is playing; the user's body choice or `view.apply` during a tour stops the
+  tour, and `tour.start` during a tour restarts with the chosen tour from its first stop.
 - Q: What does the VisualCore host gain for labels and captions? → A: `ExperiencePresenter.makeCanvasOverlay(_:)
   -> AnyView?` (default `nil`) and `Experience.canvasOverlay: AnyView?` (default `nil`), shown by
   `ExperienceHostView` in a `ZStack` over the render surface with `.allowsHitTesting(false)` and its own
@@ -134,6 +135,8 @@ the camera) and can save the current view and restore it later.
 - **Playing into either end of the range:** stops exactly at the end, never beyond.
 - **A date step while playing:** applies immediately; play continues.
 - **A tour while time is playing:** the tour controls the camera; time keeps its own play state.
+- **Choosing a body, restoring a view or starting a tour during a tour:** the first two stop the tour; the third
+  restarts with the chosen tour.
 - **Bodies behind the camera or off the canvas:** no label.
 - **Rapid announcements:** the spoken date while playing is rate-limited.
 
