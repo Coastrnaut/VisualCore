@@ -8,7 +8,7 @@ after every task (no trailers). iOS 27 only; reference regression and iOS 26 at 
 
 ## Phase 1: Setup
 
-- [ ] T-A10-301 Baseline: cite the A10-P02 evidence on the unchanged tree (`.autonomy/checks/A10-P02.{arcade-ios27,app-unit,verify-27}.json`) instead of a rerun (owner ruling of 2026-11-14)
+- [X] T-A10-301 Baseline: cite the A10-P02 evidence on the unchanged tree (`.autonomy/checks/A10-P02.{arcade-ios27,app-unit,verify-27}.json`) instead of a rerun (owner ruling of 2026-11-14) — Verified 2026-11-14: 2026-11-14: cited .autonomy/checks/A10-P02.{arcade-ios27,app-unit,verify-27}.json on the unchanged tree (no rerun)
 
 ## Phase 2: Foundational — VisualCore sound effects (story 2) and the core flow and effects (stories 1–3)
 
