@@ -182,4 +182,41 @@ import VisualCoreMath
         #expect(WaterEffects.tinted(fish, toward: water, amount: 5) == RGBA(0, 0.5, 1, 0.8))
         #expect(WaterEffects.tinted(fish, toward: water, amount: .nan) == fish)
     }
+
+    // Limits — feature 072 (A09-P05) T-A09-502 (FR-A09-510, FR-A09-520; research D4): the per-vent and mote limits
+    // are parameters; the defaults give the lists above, a smaller limit gives the newest bubbles of each vent and a
+    // prefix of the motes, and out-of-range limits are clamped to 0…the default.
+
+    @Test func theDefaultLimitsGiveTheSameLists() {
+        for habitat in habitats {
+            for step in stride(from: 0, through: 3_600, by: 37) {
+                #expect(WaterEffects.bubbles(step: step, vents: habitat.vents, reduceMotion: false,
+                                             perVent: WaterEffects.bubblesPerVent)
+                        == WaterEffects.bubbles(step: step, vents: habitat.vents, reduceMotion: false))
+                #expect(WaterEffects.bubbles(step: step, vents: habitat.vents, reduceMotion: false, perVent: 99)
+                        == WaterEffects.bubbles(step: step, vents: habitat.vents, reduceMotion: false))
+            }
+        }
+        #expect(WaterEffects.motes(step: 123, reduceMotion: true, count: 24)
+                == WaterEffects.motes(step: 123, reduceMotion: true))
+        #expect(WaterEffects.motes(step: 123, reduceMotion: false, count: 99).count == 24)
+    }
+
+    @Test func smallerLimitsDrawFewerOfTheSameBubblesAndMotes() {
+        let vents = [4.0, 12.0]
+        for step in stride(from: 0, through: 3_600, by: 13) {
+            let full = WaterEffects.bubbles(step: step, vents: vents, reduceMotion: false)
+            for perVent in [12, 6] {
+                let few = WaterEffects.bubbles(step: step, vents: vents, reduceMotion: false, perVent: perVent)
+                #expect(few.count <= 2 * perVent)
+                #expect(few.allSatisfy { full.contains($0) })
+            }
+            #expect(WaterEffects.bubbles(step: step, vents: vents, reduceMotion: false, perVent: 0).isEmpty)
+            #expect(WaterEffects.bubbles(step: step, vents: vents, reduceMotion: false, perVent: -3).isEmpty)
+            let motes = WaterEffects.motes(step: step, reduceMotion: false)
+            #expect(WaterEffects.motes(step: step, reduceMotion: false, count: 12) == Array(motes.prefix(12)))
+            #expect(WaterEffects.motes(step: step, reduceMotion: false, count: -1).isEmpty)
+        }
+        #expect(WaterEffects.bubbles(step: 3_600, vents: vents, reduceMotion: false, perVent: 12).count == 24)
+    }
 }

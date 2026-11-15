@@ -14,6 +14,10 @@
 // (Reduce Motion: a tenth), wrapping into 0…16, and sway ±0.15 units at 0.1 Hz (Reduce Motion: a tenth of the
 // amplitude) around their base, clamped to 1.5…8.5.
 //
+// Limits since feature 072 (A09-P05) T-A09-502 (FR-A09-510, FR-A09-520; clarifications 2 and 4; research D4): the
+// per-vent bubble limit and the mote count are parameters (clamped to 0…the defaults) so a quality level or ambient
+// drawing can draw fewer; the defaults give exactly the lists of Phase 04, and the total cap stays ``maxBubbles``.
+//
 // Depth layers: fish `i` and plant `i` are in layer `i mod 3` (0 back, 1 middle, 2 front), drawn at scale 0.75, 0.875
 // and 1.0 and tinted 35 %, 15 % and 0 % toward the water colour.
 import Foundation
@@ -58,21 +62,24 @@ public enum WaterEffects {
     static func phase(vent index: Int) -> Int { (index % 2) * ventPhase }
 
     /// The bubbles alive at `step` for vents at the x positions `vents`: per vent newest first, vents in order, at
-    /// most ``bubblesPerVent`` per vent and ``maxBubbles`` in all. Every bubble is at or above ``ventY`` and below
-    /// ``surface``, and within ``wobble`` of its vent's x (exactly at it with Reduce Motion). A negative step or no
-    /// vents give no bubbles. The same arguments always give the same list.
-    public static func bubbles(step: Int, vents: [Double], reduceMotion: Bool) -> [Vec2] {
+    /// most `perVent` (clamped to 0…``bubblesPerVent``; default ``bubblesPerVent``) per vent and ``maxBubbles`` in
+    /// all. Every bubble is at or above ``ventY`` and below ``surface``, and within ``wobble`` of its vent's x (exactly
+    /// at it with Reduce Motion). A negative step or no vents give no bubbles. The same arguments always give the same
+    /// list, and a smaller `perVent` gives the newest bubbles of each vent of the default list.
+    public static func bubbles(step: Int, vents: [Double], reduceMotion: Bool,
+                               perVent: Int = bubblesPerVent) -> [Vec2] {
         guard step >= 0 else { return [] }
+        let limit = min(max(perVent, 0), bubblesPerVent)
         let speed = reduceMotion ? riseSpeed * 0.5 : riseSpeed
         var result: [Vec2] = []
-        result.reserveCapacity(min(maxBubbles, vents.count * bubblesPerVent))
+        result.reserveCapacity(min(maxBubbles, vents.count * limit))
         for (index, ventX) in vents.enumerated() {
             if result.count >= maxBubbles { break }
             let offset = phase(vent: index)
             guard step >= offset else { continue }
             let newest = (step - offset) / releaseInterval
             var k = newest, given = 0
-            while k >= 0, given < bubblesPerVent, result.count < maxBubbles {
+            while k >= 0, given < limit, result.count < maxBubbles {
                 let release = releaseInterval * k + offset
                 let age = Double(step - release) / stepsPerSecond
                 let y = ventY + speed * age
@@ -96,15 +103,17 @@ public enum WaterEffects {
         }
     }()
 
-    /// The ``moteCount`` motes at `step`: each drifts sideways from its seeded base at ``moteSpeed`` (Reduce Motion:
-    /// a tenth), wrapped into 0 ≤ x < 16, and sways ±0.15 at 0.1 Hz (Reduce Motion: ±0.015) around its base height,
-    /// inside 1.5…8.5. The same arguments always give the same list.
-    public static func motes(step: Int, reduceMotion: Bool) -> [Vec2] {
+    /// The first `count` (clamped to 0…``moteCount``; default ``moteCount``) motes at `step`: each drifts sideways
+    /// from its seeded base at ``moteSpeed`` (Reduce Motion: a tenth), wrapped into 0 ≤ x < 16, and sways ±0.15 at
+    /// 0.1 Hz (Reduce Motion: ±0.015) around its base height, inside 1.5…8.5. The same arguments always give the same
+    /// list, and a smaller `count` gives a prefix of the default list.
+    public static func motes(step: Int, reduceMotion: Bool, count: Int = moteCount) -> [Vec2] {
+        let limit = min(max(count, 0), moteCount)
         let t = Double(step) / stepsPerSecond
         let speed = reduceMotion ? moteSpeed * 0.1 : moteSpeed
         let sway = reduceMotion ? moteSway * 0.1 : moteSway
         let width = SwimBounds.tankWidth
-        return moteBases.enumerated().map { index, base in
+        return moteBases.prefix(limit).enumerated().map { index, base in
             var x = (base.x + speed * t).truncatingRemainder(dividingBy: width)
             if x < 0 { x += width }
             if x >= width { x = 0 }

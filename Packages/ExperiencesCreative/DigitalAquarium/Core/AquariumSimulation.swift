@@ -23,6 +23,10 @@
 // the start of the step), and the sum is capped again to the species' maximum force; after every fish has moved,
 // ``Feeding/step(_:catalog:dt:)`` sinks, eats and removes pellets. Without food the seek force is zero and nothing is
 // re-capped, so a document without food advances bit for bit as before.
+// Ambient since feature 072 (A09-P05) T-A09-502 (FR-A09-510; clarification 2; research D2): with `ambient` true every
+// fish cruises at ``ambientSpeedFactor`` × its species' cruise speed, so the speed floor is 0.5 × that scaled cruise
+// and the maximum speed is unchanged; every other bound holds. With `ambient` false (the default) the effective cruise
+// is the species' cruise itself and every result is bit-identical to Phase 04.
 import Foundation
 import VisualCoreMath
 import VisualCoreSimulation
@@ -41,6 +45,8 @@ public enum AquariumSimulation {
     public static let turnSmoothing = 0.2
     /// Tail swings per unit of (speed / body length).
     public static let tailBeatsPerLength = 0.6
+    /// The share of the species cruise speed fish cruise at in ambient mode (the speed floor scales with it).
+    public static let ambientSpeedFactor = 0.6
 
     /// The steering tuning of `species`: neighbour radius 2.5 units, at most 6 neighbours, separation radius
     /// 1.6 × body length, weights separation 2.0, alignment 1.0, cohesion 0.8 and boundary 3.0, boundary margin
@@ -85,8 +91,11 @@ public enum AquariumSimulation {
     /// draw per fish whose species is known, in document order). Every steering force is computed from the state at
     /// the start of the step, the seek toward food included. A fish whose species is not in the catalog is only
     /// clamped into the bounds. After every fish has moved, ``Feeding/step(_:catalog:dt:)`` sinks, eats and removes
-    /// the pellets; plants, decor and lighting are not changed.
-    public static func advance(_ doc: inout HabitatDocument, catalog: SpeciesCatalog, random: inout SeededRandom) {
+    /// the pellets; plants, decor and lighting are not changed. With `ambient` true the cruise speed used for the
+    /// speed floor and the fallback velocity is the species' cruise × ``ambientSpeedFactor``; with `ambient` false
+    /// (the default) the result is bit-identical to the advance without the parameter.
+    public static func advance(_ doc: inout HabitatDocument, catalog: SpeciesCatalog, random: inout SeededRandom,
+                               ambient: Bool = false) {
         let bounds = doc.bounds
         let dt = step
         let forces = forces(doc, catalog: catalog)
@@ -97,10 +106,11 @@ public enum AquariumSimulation {
                 doc.fish[index] = fish
                 continue
             }
+            let cruise = ambient ? species.cruiseSpeed * ambientSpeedFactor : species.cruiseSpeed
             let oldHeading = fish.heading.isFinite ? fish.heading : 0
             // 1. Steering.
             var velocity = fish.velocity.isFinite
-                ? fish.velocity : Vec2(cos(oldHeading), sin(oldHeading)) * species.cruiseSpeed
+                ? fish.velocity : Vec2(cos(oldHeading), sin(oldHeading)) * cruise
             velocity += forces[index] * dt
             // 2. Reduced seeded wander turn.
             let wander = random.range(-1...1) * species.turnRate * wanderShare * dt
@@ -109,7 +119,7 @@ public enum AquariumSimulation {
             // 3. Speed between half the cruise speed and the maximum.
             var speed = velocity.length
             let direction = speed > 0 && speed.isFinite ? velocity / speed : Vec2(cos(oldHeading), sin(oldHeading))
-            speed = min(max(speed.isFinite ? speed : species.cruiseSpeed, minimumSpeedShare * species.cruiseSpeed),
+            speed = min(max(speed.isFinite ? speed : cruise, minimumSpeedShare * cruise),
                         species.maxSpeed)
             velocity = direction * speed
             // 4. Move.

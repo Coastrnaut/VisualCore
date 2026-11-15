@@ -142,4 +142,79 @@ import DigitalAquariumCore
         #expect(doc.fish[0].position == Vec2(15.5, 1.5))
         #expect(random == before)
     }
+
+    // Ambient — feature 072 (A09-P05) T-A09-502 (FR-A09-510; clarification 2; research D2). The default advance is the
+    // plain one; in ambient the floor is 0.5 × 0.6 × cruise, the maximum holds, bounds hold, and the fish are slower:
+    // over steps 600…1,200 the mean speed is 0.6 × cruise within 0.15 × cruise and below the plain run's mean. (The
+    // steering has no pull toward the cruise speed, so plain runs average 0.60…0.79 × cruise and ambient runs
+    // 0.49…0.57 × cruise, measured 2026-11-14 over seeds 1…4.)
+
+    @Test func ambientFalseIsTheDefaultAdvance() {
+        var random1 = SeededRandom(seed: 41), random2 = SeededRandom(seed: 41)
+        var a = HabitatDocument.starter(0, catalog: catalog, random: &random1)
+        var b = HabitatDocument.starter(0, catalog: catalog, random: &random2)
+        for _ in 0..<300 {
+            AquariumSimulation.advance(&a, catalog: catalog, random: &random1)
+            AquariumSimulation.advance(&b, catalog: catalog, random: &random2, ambient: false)
+        }
+        #expect(a == b)
+        #expect(random1 == random2)
+        #expect(AquariumSimulation.ambientSpeedFactor == 0.6)
+    }
+
+    /// The mean of speed / cruise over every fish and steps 600..<1,200 from `seed`.
+    private func meanSpeedRatio(seed: Int, ambient: Bool) throws -> (mean: Double, slow: Int, fast: Int) {
+        var random = SeededRandom(seed: UInt64(seed))
+        var doc = HabitatDocument.starter(seed % 2, catalog: catalog, random: &random)
+        var sum = 0.0, count = 0, slow = 0, fast = 0
+        let floorShare = AquariumSimulation.minimumSpeedShare * (ambient ? AquariumSimulation.ambientSpeedFactor : 1)
+        for step in 0..<1_200 {
+            AquariumSimulation.advance(&doc, catalog: catalog, random: &random, ambient: ambient)
+            for fish in doc.fish {
+                let species = try #require(catalog.species(id: fish.speciesId))
+                let speed = fish.velocity.length
+                if speed < floorShare * species.cruiseSpeed - 1e-9 { slow += 1 }
+                if speed > species.maxSpeed * (1 + 1e-12) { fast += 1 }
+                if step >= 600 { sum += speed / species.cruiseSpeed; count += 1 }
+            }
+        }
+        return (sum / Double(count), slow, fast)
+    }
+
+    @Test(arguments: 1...4) func ambientFishCruiseNearSixTenthsOfTheirCruiseSpeed(seed: Int) throws {
+        let ambient = try meanSpeedRatio(seed: seed, ambient: true)
+        let plain = try meanSpeedRatio(seed: seed, ambient: false)
+        #expect(abs(ambient.mean - AquariumSimulation.ambientSpeedFactor) <= 0.15, "ambient mean \(ambient.mean)")
+        #expect(ambient.mean < plain.mean, "ambient \(ambient.mean), plain \(plain.mean)")
+        #expect(ambient.slow == 0 && ambient.fast == 0)
+        #expect(plain.slow == 0 && plain.fast == 0)
+    }
+
+    @Test func anAmbientRestingFishIsBroughtUpToTheScaledFloor() throws {
+        var doc = try lone(Vec2(8, 5), .zero, heading: 0)
+        var random = SeededRandom(seed: 9)
+        AquariumSimulation.advance(&doc, catalog: catalog, random: &random, ambient: true)
+        let species = try #require(catalog.species(id: doc.fish[0].speciesId))
+        let expected = AquariumSimulation.minimumSpeedShare * AquariumSimulation.ambientSpeedFactor * species.cruiseSpeed
+        #expect(abs(doc.fish[0].velocity.length - expected) < 1e-9)
+    }
+
+    @Test(arguments: 0..<5) func ambientBoundsHoldOverThreeThousandSteps(seed: Int) throws {
+        var random = SeededRandom(seed: UInt64(seed) &* 0x9E37_79B9 &+ 11)
+        var doc = HabitatDocument.starter(seed % 2, catalog: catalog, random: &random)
+        var violations = 0
+        for _ in 0..<3_000 {
+            AquariumSimulation.advance(&doc, catalog: catalog, random: &random, ambient: true)
+            for fish in doc.fish {
+                let species = try #require(catalog.species(id: fish.speciesId))
+                let speed = fish.velocity.length
+                if !doc.bounds.contains(fish.position) { violations += 1 }
+                if !(speed <= species.maxSpeed * (1 + 1e-12)) { violations += 1 }
+                if !(speed >= 0.5 * 0.6 * species.cruiseSpeed - 1e-9) { violations += 1 }
+                if !fish.turn.isFinite { violations += 1 }
+            }
+        }
+        #expect(violations == 0)
+        #expect(doc.validate(catalog: catalog).isEmpty)
+    }
 }
