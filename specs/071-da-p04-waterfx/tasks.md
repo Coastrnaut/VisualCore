@@ -14,7 +14,7 @@
 
 ## Phase 3: User Story 1 — living water (P1) 🎯
 
-- [ ] T-A09-403 [US1] `Core/WaterEffects.swift` per contracts/api.md and research D1, D2 (bubbles and motes from the step count; caps 24 per vent, 48 total, 24 motes; Reduce Motion speeds and no wobble; layers, scales, tints, `tinted`) with `CoreTests/WaterEffectsTests.swift` (every bubble between vent y and surface, x within the wobble of its vent, count ≤ 48 at every step of 3,600 for both habitats; newest bubble at the vent; a bubble leaves at the surface; same step → same output; Reduce Motion halves rise and removes wobble; motes inside 0…16 × 1.5…8.5 and wrap; layer order, scales and tints) (FR-A09-401–404, 410; SC-A09-401, 403)
+- [X] T-A09-403 [US1] `Core/WaterEffects.swift` per contracts/api.md and research D1, D2 (bubbles and motes from the step count; caps 24 per vent, 48 total, 24 motes; Reduce Motion speeds and no wobble; layers, scales, tints, `tinted`) with `CoreTests/WaterEffectsTests.swift` (every bubble between vent y and surface, x within the wobble of its vent, count ≤ 48 at every step of 3,600 for both habitats; newest bubble at the vent; a bubble leaves at the surface; same step → same output; Reduce Motion halves rise and removes wobble; motes inside 0…16 × 1.5…8.5 and wrap; layer order, scales and tints) (FR-A09-401–404, 410; SC-A09-401, 403) — Verified 2026-11-14: 2026-11-14: WaterEffects (bubbles ≤ 48 from vents to the surface, 24 motes, depth layers); WaterEffectsTests 11 tests pass on sim-27.2
 
 ## Phase 4: User Story 3 — the aquarium in words (P2)
 
