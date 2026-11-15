@@ -8,7 +8,7 @@ X-A12 (owner, 2026-11-14). Precedent: `specs/089-tw-p01-terrain/tasks.md`.
 
 ## Phase 1: Setup
 
-- [ ] T-A12-201 Baseline: cite the last evidence on an unchanged `Packages` tree (`.autonomy/checks/A12-P01.{worlds-ios27,app-unit,verify-27}.json`) instead of a rerun (owner ruling of 2026-11-14)
+- [X] T-A12-201 Baseline: cite the last evidence on an unchanged `Packages` tree (`.autonomy/checks/A12-P01.{worlds-ios27,app-unit,verify-27}.json`) instead of a rerun (owner ruling of 2026-11-14) — Verified 2026-11-15: 2026-11-15: cited .autonomy/checks/A12-P01.{worlds-ios27,app-unit,verify-27}.json on the unchanged Packages tree (no rerun)
 
 ## Phase 2: Foundational — generic additions (stories 2–3) and the world rules (stories 1–4)
 
