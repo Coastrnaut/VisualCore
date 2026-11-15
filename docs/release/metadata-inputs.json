@@ -103,9 +103,17 @@
       "name": "Tiny Worlds",
       "permissions": [],
       "tier": "free"
+    },
+    {
+      "category": "play",
+      "code": "A13",
+      "id": "a13.light-maze",
+      "name": "Light Maze",
+      "permissions": [],
+      "tier": "free"
     }
   ],
-  "ledger_sha256": "d1e55da189ce644a689b5076f86c88913befffba1fa286664043c30a714cdba5",
+  "ledger_sha256": "1fa5559a73ba7ec33bade3ea6f352562a5f1eeb0ba596154c2dfe0dc6eced39a",
   "privacy_answers": "unproven",
   "schema": 1
 }

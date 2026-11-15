@@ -1,5 +1,5 @@
 // LMSupport — feature 101 (A13-P06) T-A13-608 (FR-A13-630; research D4): helpers of the interface tests of Light Maze
-// (A13) inside the one app, modelled on `TWSupport`. A13 is a candidate experience, so every launch carries
+// (A13) inside the one app, modelled on `TWSupport`. A13 was a candidate until X-A13 (integrated 2026-11-15); every launch still carries
 // `-vcCandidates` (DebugLaunch: the candidates' catalog entries become available and are registered), starts with
 // erased data (`-vcResetData`, so the level progress is fresh and level 2 is locked until level 1 is solved), skips
 // the welcome and opens the experience directly with `-openExperience a13.light-maze`. The controls are found by the

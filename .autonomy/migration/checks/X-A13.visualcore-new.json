@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/VisualCore",
+    "--filter",
+    "Ray2Tests"
+  ],
+  "command": "swift test --package-path Packages/VisualCore --filter Ray2Tests",
+  "elapsed_seconds": 2.32,
+  "exit_code": 0,
+  "finished": "2026-11-15T19:39:24+00:00",
+  "gate": "X-A13",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/X-A13.visualcore-new.log",
+  "log_sha256": "be1480564e63021209e1308d9c421eea29c6ae6167e8d87127516f2e423bb57c",
+  "name": "visualcore-new",
+  "started": "2026-11-15T19:39:22+00:00",
+  "timed_out": false
+}

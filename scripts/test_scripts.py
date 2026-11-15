@@ -1304,7 +1304,7 @@ class UnifiedAppTargetTests(unittest.TestCase):
                                     "PhysicsPlaygroundExperience",
                                     # Feature 089 (A12-P01): Tiny Worlds, integrated at X-A12.
                                     "TinyWorldsExperience",
-                                    # Feature 096 (A13-P01): Light Maze, a candidate until X-A13.
+                                    # Feature 096 (A13-P01): Light Maze, integrated at X-A13.
                                     "LightMazeExperience"])
 
     def test_the_standing_isolation_step_requires_sources(self):

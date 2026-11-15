@@ -1,0 +1,97 @@
+{
+  "branch": "main",
+  "dirty": true,
+  "dirty_paths": [
+    "docs/verification/a13.light-maze/summary-27.2.json",
+    "docs/verification/a13.light-maze/summary-26.5.json"
+  ],
+  "failed_attempts": [
+    {
+      "command": "python3 scripts/verify_experiences.py --only a13.light-maze --runtime 27",
+      "exit_code": 1,
+      "log": ".autonomy/logs/migration/X-A13.sim27.log",
+      "log_sha256": "85f45d73c93199dadf662f524b5b8d88698ee869cb6ddf352c9e99823535803c",
+      "name": "sim27",
+      "timed_out": false
+    }
+  ],
+  "gate": "X-A13",
+  "ledger": "migration",
+  "passing_checks": [
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --result-name xa13-host",
+      "exit_code": 0,
+      "finished": "2026-11-15T19:39:16+00:00",
+      "log": ".autonomy/logs/migration/X-A13.host.log",
+      "log_sha256": "a2847806eccc7483a4192388a47c61da18256536efcec5fa8d896772653aab34",
+      "name": "host"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only reference-engine-xcframework reference-build-projectm-ios-sim reference-clean",
+      "exit_code": 0,
+      "finished": "2026-11-15T19:44:22+00:00",
+      "log": ".autonomy/logs/migration/X-A13.reference-1.log",
+      "log_sha256": "11eef645f9b62f945c999845b40320111104a6ced170cb979ea0dac71752699a",
+      "name": "reference-1"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only reference-test-anglerendering-ios27 reference-test-anglerendering-ios26 projectm-reference-ios27 projectm-reference-ios26",
+      "exit_code": 0,
+      "finished": "2026-11-15T19:44:57+00:00",
+      "log": ".autonomy/logs/migration/X-A13.reference-2.log",
+      "log_sha256": "ba17b9ade8e5344c15080b2c18abc94c183c20639ae6316c75def38673a8406d",
+      "name": "reference-2"
+    },
+    {
+      "command": "python3 scripts/verify_experiences.py --only a13.light-maze --runtime 26",
+      "exit_code": 0,
+      "finished": "2026-11-15T19:41:30+00:00",
+      "log": ".autonomy/logs/migration/X-A13.sim26.log",
+      "log_sha256": "8341f633082940d2bbe29c557449fe42b47a273971a5f9246dc92c00241f90c0",
+      "name": "sim26"
+    },
+    {
+      "command": "python3 scripts/verify_experiences.py --only a13.light-maze --runtime 27",
+      "exit_code": 0,
+      "finished": "2026-11-15T19:42:27+00:00",
+      "log": ".autonomy/logs/migration/X-A13.sim27-2.log",
+      "log_sha256": "67e3f5bdb663960440c0a87503cb5ee7a0540969dfeb4213012da13a2a9a14da",
+      "name": "sim27-2"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only app-build-for-testing-ios27 app-ui-ios27-u2",
+      "exit_code": 0,
+      "finished": "2026-11-15T19:43:56+00:00",
+      "log": ".autonomy/logs/migration/X-A13.ui-u2.log",
+      "log_sha256": "e5d23c04cc6a4a6f36aa49d9c5e32fcd39968cd9ffd6cd68ee5f1da97b01de14",
+      "name": "ui-u2"
+    },
+    {
+      "command": "swift test --package-path Packages/VisualCore",
+      "exit_code": 0,
+      "finished": "2026-11-15T19:35:57+00:00",
+      "log": ".autonomy/logs/migration/X-A13.visualcore-host.log",
+      "log_sha256": "46a615ab67dbcac4fc27083556ca47de11bf030003bf298b0283453e33f5e275",
+      "name": "visualcore-host"
+    },
+    {
+      "command": "swift test --package-path Packages/VisualCore --filter Ray2Tests",
+      "exit_code": 0,
+      "finished": "2026-11-15T19:39:24+00:00",
+      "log": ".autonomy/logs/migration/X-A13.visualcore-new.log",
+      "log_sha256": "be1480564e63021209e1308d9c421eea29c6ae6167e8d87127516f2e423bb57c",
+      "name": "visualcore-new"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --result-name xa13-rendering",
+      "exit_code": 0,
+      "finished": "2026-11-15T19:40:21+00:00",
+      "log": ".autonomy/logs/migration/X-A13.visualcore-rendering.log",
+      "log_sha256": "0c92a04e146d228ea6229f65d9f0d485f386f6064ad106875bd5f86afaef3dfd",
+      "name": "visualcore-rendering"
+    }
+  ],
+  "revision": "6118acabe2afa4e607719fcfc5c528866e54a0f0",
+  "revision_number": 1,
+  "sealed": "2026-11-15T19:45:04+00:00"
+}
