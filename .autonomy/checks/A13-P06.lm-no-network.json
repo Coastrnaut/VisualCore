@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "/bin/sh",
+    "-c",
+    "! grep -rnE 'URLSession|import Network|CLLocation|AVCapture|AVAudioRecorder|inputNode|installTap|CMMotion|CNContact|ASIdentifierManager|AppTrackingTransparency|UIScreen.main.brightness|isIdleTimerDisabled' Packages/ExperiencesCreative/LightMaze"
+  ],
+  "command": "/bin/sh -c '! grep -rnE '\"'\"'URLSession|import Network|CLLocation|AVCapture|AVAudioRecorder|inputNode|installTap|CMMotion|CNContact|ASIdentifierManager|AppTrackingTransparency|UIScreen.main.brightness|isIdleTimerDisabled'\"'\"' Packages/ExperiencesCreative/LightMaze'",
+  "elapsed_seconds": 0.039,
+  "exit_code": 0,
+  "finished": "2026-11-15T19:26:00+00:00",
+  "log": ".autonomy/logs/A13-P06.lm-no-network.log",
+  "log_sha256": "8de26c5e6f23d86870c1fb0f6b1eb38861085f44cb586b1b965a5967deb67d7f",
+  "name": "lm-no-network",
+  "stage": "A13-P06",
+  "started": "2026-11-15T19:26:00+00:00",
+  "timed_out": false
+}
