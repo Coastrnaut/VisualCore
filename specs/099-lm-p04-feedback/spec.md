@@ -22,6 +22,52 @@ Canonical overrides:
 - **Owner rulings:** short tests; system accessibility audits and device runs wait for the device campaign ({device});
   iOS 27 at phase gates; reference regression and iOS 26 at X-A13; every Spec Kit step runs.
 
+## Clarifications
+
+### Session 2026-11-15
+
+Answered autonomously under the owner's standing delegation, recommended option each time. Facts checked in code:
+VisualCoreSimulation has `HapticPlanner` (default 0.05 s interval, switch `enabled`), `HapticKind.success`,
+`AnnouncementPlanner`, `StateSign` with `stateSignProblems(_:)` and `transitionDuration(_:reduceMotion:)`;
+VisualCoreUI has `AccessibilitySettingsSection.contrastRatio(_:_:)` (UIKit colours); VisualCoreAudioDSP has
+`SoundEffect` (frequency 40–4,000 Hz, duration 0.02–1 s, gain ≤ 0.9) played by VisualCoreAudio's `SoundEffectPlayer`
+(ambient session, so the silent switch mutes it); VisualCoreExperienceHost's `ExperienceFeedback.shared` applies the
+person's haptic switch and the rate limit, as Neon Arcade uses it; the registry already passes Reduce Motion and Reduce
+Flashing to `LightMazeExperience.make`, which ignores them today; the presenter records every spoken text and posts it
+only while VoiceOver runs; each level records its solution; beams branch at prisms (at most 16 branches, 256 segments);
+boards hold at most 144 tiles; the unlit target colour has a contrast of about 2.1 : 1 against the board (below 3 : 1).
+
+- Q: Is the hint an engine action, and what does it change? → A: A new replayable action `hint.show` in the engine:
+  it selects the first turnable tile (board order) whose orientation differs from the level's recorded solution;
+  on a solved board it is refused with `a13.already-solved` and nothing changes. It changes only the selection (no
+  move, no best count). The presenter answers in words: "Hint: turn the mirror at row 2, column 3." (rows and columns
+  from 1, row 1 at the top) or "Level 4 is already solved." Native control: Hint (`hint`). The hinted tile is the
+  selected tile, drawn with the selection outline.
+- Q: Where do the spoken words go when VoiceOver is off? → A: As today: every text is kept in the presenter's spoken
+  list and shown in the controls' message line; it is posted to the announcement sink only while VoiceOver runs. The
+  board element's accessible value is the summary ("2 of 3 targets lit"); a Describe control (`describe`) shows and
+  speaks the full description.
+- Q: What exactly is the success cue? → A: Played when the presenter sees the drawn board become solved (the same
+  transition that records the solve), every time it happens: (1) visual — while solved, the board gets a border in the
+  success colour with a tick drawn as a polyline (a sign, not only colour); with motion allowed the border brightens
+  once over 0.6 s and settles (one rise and fall, never repeated); under Reduce Motion the border is static from the
+  first frame; under Reduce Flashing there is no brightening at all; (2) sound — one sine sweep 660 → 990 Hz, 0.25 s,
+  gain 0.3, through `SoundEffectPlayer` behind a sink (tests record it); (3) haptic — `success` through the shared
+  feedback route (person's switch and rate limit); (4) words — "Level 3 solved in 5 moves. Level 4 is open." (or
+  "Level 20 solved in 7 moves." on the last level, and without the second sentence when the next level was already
+  open). Suspension stops the sound and ends the brightening; resume does not replay it.
+- Q: Which states and signs are checked, and against what? → A: Nine states, each with a distinct sign checked by
+  `stateSignProblems` (empty): wall "filled square", mirror "single diagonal line", prism "double diagonal line",
+  emitter "triangle", unlit target "filled square with gap" (smaller square), lit target "square with ring", beam
+  "line with halo", selected tile "cell outline", solved board "border with tick". Each state colour has a contrast of
+  at least 3 : 1 against the board colour by `contrastRatio`; colours below it (the unlit target today) are raised. The
+  glow cap of A13-P02 (0.15 cell) is kept.
+- Q: What is the board description's form and bound? → A: Plain sentences: "Level 3, Bounce: 5 by 5 board." then one
+  sentence per tile kind listing places ("Mirrors: row 2, column 3, slash; row 4, column 1, backslash."), then each
+  beam branch ("Beam 1 starts at row 1, column 1 heading east, turns at row 1, column 4, and ends at the target at row
+  3, column 4."), then targets ("Targets: row 3, column 4, lit; row 5, column 2, unlit."). At most 4,000 characters for
+  any board within the caps (a test builds the largest allowed board).
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Ask for a hint (Priority: P1) 🎯
@@ -83,7 +129,7 @@ settings, and plays once per solve.
 1. **Given** a level one turn from solved, **When** the turn is made, **Then** exactly one success cue plays (visual,
    sound, haptic and words); further frames of the same solved board play none.
 2. **Given** Reduce Motion, **Then** the visual cue appears without movement (a static solved frame); **given** Reduce
-   Flashing, **then** no brightness change repeats.
+   Flashing, **then** the border never brightens.
 3. **Given** a solved level is undone and solved again, **Then** the cue plays again, but haptics never exceed the
    framework's rate limit.
 
@@ -91,8 +137,8 @@ settings, and plays once per solve.
 
 ### User Story 4 - Colour is never the only cue (Priority: P2)
 
-Every state the board shows — the beam, lit and unlit targets, the selected tile, the hinted tile, mirrors, prisms,
-walls and emitters — differs by shape or sign as well as colour, and every colour stands out against the board.
+Every state the board shows — the beam, lit and unlit targets, the selected (and hinted) tile, mirrors, prisms,
+walls, emitters and the solved board — differs by shape or sign as well as colour, and every colour stands out against the board.
 
 **Why this priority**: manual feature 5 ("glow and colour cues without hiding beam connectivity") and row M10.
 
@@ -112,9 +158,9 @@ walls and emitters — differs by shape or sign as well as colour, and every col
 - **A board solved in a way other than the recorded solution:** it is solved; hints are not offered.
 - **A hint while a different tile is selected:** the selection moves to the hinted tile.
 - **Sound off or the device muted, haptics unavailable:** the words and the visual cue still play; nothing fails.
-- **VoiceOver off:** words are still given to the announcement sink; nothing depends on VoiceOver being on.
+- **VoiceOver off:** words are still kept and shown in the message line; they are posted only while VoiceOver runs.
 - **Suspension during a success cue:** the cue stops; it does not play again on resume.
-- **Long descriptions:** a 7×7 board's description stays a few sentences per tile kind, bounded in length.
+- **Long descriptions:** the largest board within the caps (144 tiles, 16 beam branches) stays within 4,000 characters.
 
 ## Requirements *(mandatory)*
 
@@ -123,31 +169,32 @@ walls and emitters — differs by shape or sign as well as colour, and every col
 **Hints (story 1)**
 
 - **FR-A13-401**: A hint MUST select one turnable tile whose orientation differs from the level's recorded solution
-  (the first in board order) and answer in words with its kind, row and column; on a solved board it MUST answer
-  "already solved" and change nothing.
+  (the first in board order) and answer in words with its kind, row and column; on a solved board it MUST be refused
+  as already solved and change nothing; a hint changes only the selection, never the moves or best count.
 - **FR-A13-402**: The hint MUST be a replayable action with a native control and a gesture-free path; following hints
   MUST solve every shipping level within its count of turnable tiles.
 
 **Spoken board (story 2)**
 
 - **FR-A13-410**: A board description MUST name the level, the board size, every tile with its row, column and
-  direction or orientation, the beam path (the cells where it turns or ends) and each target as lit or unlit, bounded
-  in length.
+  direction or orientation, each beam branch's path (the cells where it starts, turns and ends) and each target as
+  lit or unlit, in at most 4,000 characters.
 - **FR-A13-411**: The board element's accessible value MUST summarise the targets lit; a native control MUST speak the
   full description.
 
 **Success cue (story 3)**
 
-- **FR-A13-420**: On the transition to solved, exactly one success cue MUST play: a visual cue, a sound made in code,
+- **FR-A13-420**: On every transition to solved, exactly one success cue MUST play: a visual cue with a sign (border and
+  tick), a sound made in code,
   a success haptic within the framework's rate limit, and spoken words naming the level, the move count and the
   level that opened.
-- **FR-A13-421**: Under Reduce Motion the visual cue MUST be static; under Reduce Flashing no brightness change may
-  repeat; the cue MUST stop on suspension and not replay.
+- **FR-A13-421**: With motion allowed the border MUST brighten once (0.6 s) and settle; under Reduce Motion the visual cue
+  MUST be static; under Reduce Flashing there MUST be no brightness change; the cue MUST stop on suspension and not replay.
 
 **Signs and contrast (story 4)**
 
 - **FR-A13-430**: Every board state MUST carry a distinct non-colour sign, checked by the framework's colour-plus-sign
-  check with no problems.
+  check with no problems (nine states, clarification 4).
 - **FR-A13-431**: Every state colour MUST reach a contrast of at least 3 : 1 against the board background; the glow cap
   of A13-P02 MUST be kept.
 
@@ -166,7 +213,7 @@ walls and emitters — differs by shape or sign as well as colour, and every col
   change a solved board.
 - **SC-A13-402**: 100 % of fixture board descriptions name every tile, the beam's turning and end cells and every
   target's state.
-- **SC-A13-403**: Exactly 1 success cue per solve transition; 0 under repeated frames; 0 repeated brightness changes
+- **SC-A13-403**: Exactly 1 success cue per solve transition; 0 under repeated frames; 0 brightness changes
   under Reduce Flashing; 0 movement under Reduce Motion.
 - **SC-A13-404**: 0 colour-plus-sign problems; 100 % of state colours at contrast ≥ 3 : 1 against the background.
 - **SC-A13-405**: The runner's scenarios pass on iOS 27; every test runs in under 10 s.
