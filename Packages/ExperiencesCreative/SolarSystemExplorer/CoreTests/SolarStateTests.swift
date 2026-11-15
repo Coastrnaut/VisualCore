@@ -12,7 +12,7 @@ import Testing
     @Test func theInitialStateSelectsTheSun() {
         let state = SolarState.initial
         #expect(state.selection == 0 && state.body.id == "sun" && state.factCard.name == "Sun")
-        #expect(SolarState.schemaVersion == 3 && SolarState.bodyCount == 9)
+        #expect(SolarState.schemaVersion == 4 && SolarState.bodyCount == 9)
         #expect(SolarState(selection: 42).selection == 8 && SolarState(selection: -3).selection == 0)
     }
 
@@ -54,7 +54,7 @@ import Testing
         let state = SolarState(selection: 3)
         let data = state.encoded()
         #expect(String(decoding: data, as: UTF8.self)
-                == #"{"dayOffset":0,"pitchDegrees":35,"scaleMode":0,"schema":3,"selection":3,"yawSteps":0,"zoomSteps":0}"#)
+                == #"{"dayOffset":0,"pitchDegrees":35,"playing":false,"rateIndex":0,"scaleMode":0,"schema":4,"selection":3,"stopReason":"","tourIndex":-1,"tourPaused":false,"tourStep":0,"tourStop":0,"yawSteps":0,"zoomSteps":0}"#)
         #expect(SolarState.decode(data) == .success(state))
         #expect(SolarState.decode(SolarState.initial.encoded()) == .success(SolarState.initial))
     }
@@ -74,7 +74,7 @@ import Testing
         for payload in damaged {
             #expect(SolarState.decode(Data(payload.utf8)) == .failure(.damaged), "\(payload)")
         }
-        let newer: [String] = [#"{"schema":4,"selection":3}"#, #"{"schema":9}"#]
+        let newer: [String] = [#"{"schema":5,"selection":3}"#, #"{"schema":9}"#]
         for payload in newer {
             #expect(SolarState.decode(Data(payload.utf8)) == .failure(.newerVersion), "\(payload)")
         }

@@ -17,11 +17,11 @@ import Testing
         #expect(state.scaleMode == .trueRelative, "reset keeps the scale mode")
     }
 
-    @Test func schema3RoundTripsWithSortedKeys() {
+    @Test func theScaleModeRoundTripsWithSortedKeys() {
         let state = SolarState(selection: 6, dayOffset: 365, yawSteps: 2, pitchDegrees: 45, zoomSteps: 3,
                                scaleMode: .trueRelative)!
         let text = String(decoding: state.encoded(), as: UTF8.self)
-        #expect(text == #"{"dayOffset":365,"pitchDegrees":45,"scaleMode":1,"schema":3,"selection":6,"yawSteps":2,"zoomSteps":3}"#)
+        #expect(text.contains(#""scaleMode":1,"schema":4,"selection":6,"#), "schema 4 writes the scale mode (A14-P04)")
         #expect(SolarState.decode(state.encoded()) == .success(state))
         let decoded = try? JSONDecoder().decode(SolarState.self, from: state.encoded())
         #expect(decoded == state)
@@ -43,7 +43,7 @@ import Testing
         #expect(SolarState.decode(bad) == .failure(.outOfRange))
         let missing = Data(#"{"dayOffset":0,"pitchDegrees":35,"schema":3,"selection":1,"yawSteps":0,"zoomSteps":0}"#.utf8)
         #expect(SolarState.decode(missing) == .failure(.damaged))
-        let newer = Data(#"{"schema":4,"selection":1}"#.utf8)
+        let newer = Data(#"{"schema":5,"selection":1}"#.utf8)
         #expect(SolarState.decode(newer) == .failure(.newerVersion))
         #expect((try? JSONDecoder().decode(SolarState.self, from: bad)) == nil)
     }
