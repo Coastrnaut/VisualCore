@@ -55,5 +55,5 @@ Documents and scans first, then the recovery test, then the interface chunk and 
 
 ## Phase 7: Convergence
 
-- [ ] T-A11-617 Record the as-built segmented-picker fix (`PlaygroundSegmentedPicker` in `Packages/ExperiencesCreative/PhysicsPlayground/Experience/PlaygroundControls.swift`, found by `PPWorldUITests.testTimeScale`) in `specs/087-pp-p06-release/research.md` and `docs/apps/physics-playground/README.md` per plan: Project Structure (unrequested)
+- [X] T-A11-617 Record the as-built segmented-picker fix (`PlaygroundSegmentedPicker` in `Packages/ExperiencesCreative/PhysicsPlayground/Experience/PlaygroundControls.swift`, found by `PPWorldUITests.testTimeScale`) in `specs/087-pp-p06-release/research.md` and `docs/apps/physics-playground/README.md` per plan: Project Structure (unrequested) — Verified 2026-11-15: 2026-11-15: research.md 'As built' and README 'Implementation notes' record the PlaygroundSegmentedPicker fix; specs/086-pp-p05-stability/scan-claims.sh still PASS (25 proving tests, 0 refused claims)
 - [ ] T-A11-618 Re-run the release-document, copy and claims checks on the current documents (`--name release-docs-2`, the command of T-A11-607) per FR-A11-620, SC-A11-603 (partial)

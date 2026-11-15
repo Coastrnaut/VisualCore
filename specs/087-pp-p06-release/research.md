@@ -31,3 +31,15 @@ shared copy denylist; `failNextDraw`; no permission in the a11 registration; fou
   `NASupport`); `PPWorldUITests` (drop circle raises the body count in the status; pause, step, time scale picker; force
   arrows toggle value), `PPExperimentUITests` (preset Pendulum shown in the experiment line; tutorial start shows step 1
   and stop hides it); chunk `"s2": ["PPWorldUITests", "PPExperimentUITests"]` (serial).
+
+## As built (2026-11-15)
+
+- **Segmented pickers rebuilt per frame dropped taps.** `PPWorldUITests.testTimeScale` found that a tap on a time-scale
+  segment was lost while the world ran (it worked while paused): the controls' body is re-evaluated every frame (the
+  status line and the description change), and each pass gave the segmented control a new binding. The five segmented
+  pickers (time scale, gravity, drag, spring stiffness, shape to add) are now one `PlaygroundSegmentedPicker`, an
+  `Equatable` view compared without its handler and used with `.equatable()`, so a running world leaves the control
+  alone until its selection or titles change. The labels, spoken values and identifiers are unchanged. Evidence:
+  `.autonomy/checks/A11-P06.app-ui-4.json` (passes; `app-ui`, `-2`, `-3` before the fix fail at the time-scale step)
+  and `.autonomy/checks/A11-P06.playground-ios27-2.json`. The UI test's segment helper also keeps a fallback tap by
+  place and a check of the picker's spoken value.

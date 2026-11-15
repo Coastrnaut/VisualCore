@@ -30,6 +30,12 @@ Phases: A11-P00 boundary audit (feature 081), P01 physics model, units and deter
 spring solver, P03 gesture editor and overlays, P04 saved experiments and tutorials, P05 numerical stability and
 performance audit, P06 release readiness; then the experience's integration gate X-A11.
 
+## Implementation notes
+
+- The segmented pickers of the controls (time scale, gravity, drag, spring stiffness, shape to add) are one
+  `Equatable` view, `PlaygroundSegmentedPicker`, so the per-frame redraws of a running world do not rebuild the
+  segmented control and drop a tap (found by `PPWorldUITests.testTimeScale` in A11-P06, feature 087).
+
 ## Capabilities and their proof
 
 The catalog entry (`Catalog/registrations.json`, `a11.physics-playground`) lists only the capabilities below, each
