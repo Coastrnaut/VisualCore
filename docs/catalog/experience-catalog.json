@@ -2046,10 +2046,11 @@
     ]
    },
    "implementation": {
-    "state": "not-started",
-    "legacy_gates_passed": [],
+    "state": "standalone-partial",
+    "legacy_gates_passed": [
+     "A10-P00"
+    ],
     "legacy_gates_pending": [
-     "A10-P00",
      "A10-P01",
      "A10-P02",
      "A10-P03",
