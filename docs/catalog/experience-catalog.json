@@ -1846,10 +1846,10 @@
      "A09-P01",
      "A09-P02",
      "A09-P03",
-     "A09-P04"
+     "A09-P04",
+     "A09-P05"
     ],
     "legacy_gates_pending": [
-     "A09-P05",
      "A09-P06"
     ],
     "unified_integration": "pending"
