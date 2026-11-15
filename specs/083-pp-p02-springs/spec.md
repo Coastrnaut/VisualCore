@@ -140,6 +140,8 @@ springs and the default forces.
 - **Stiffness or damping above the stable bound for the bodies' mass and the tick:** clamped, never applied raw.
 - **Springs to the ceiling (world anchors):** a fixed point, not a body; the anchor never moves.
 - **Many bodies:** the broad phase keeps per-tick work proportional to nearby pairs; results equal brute force.
+- **Reset:** returns to the starting scene of the seed with the default levels (Earth gravity, low drag, stiffness
+  level 1), time scale 1, running, and an empty contact cache.
 - **Gravity off:** bodies keep their velocity apart from drag; springs still act.
 - **Non-finite numbers in input or saved state:** refused; the world is unchanged.
 
