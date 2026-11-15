@@ -1,9 +1,12 @@
 // AquariumSimulationTests — feature 068 (A09-P01) T-A09-102 (FR-A09-110, FR-A09-111; clarification 1; SC-A09-101,
-// SC-A09-102). The bounded wander, host-free and short: the step is 1/60 s; the same seed and steps give the same
-// document (and a different seed a different one); over 10,000 steps from each of 20 seeds (alternating the two starter
-// habitats) no fish position lies outside the swim bounds and no speed exceeds the species maximum, and the document
-// stays valid; a fish at each corner heading outward turns back and stays inside after one step; speed eases to
-// cruise; the heading follows the velocity; a fish of an unknown species is only clamped.
+// SC-A09-102), updated for schooling by feature 069 (A09-P02) T-A09-204 (FR-A09-210; research D3; SC-A09-203). The
+// bounded schooling, host-free and short: the step is 1/60 s; the same seed and steps give the same document (and a
+// different seed a different one); over 10,000 steps from each of 20 seeds (alternating the two starter habitats) no
+// fish position lies outside the swim bounds, no speed exceeds the species maximum or drops below half its cruise
+// speed, `turn` stays finite, and the document stays valid; a fish at each corner heading outward turns back and stays
+// inside after one step; a resting fish is brought up to half its cruise speed along its heading; a too-fast fish is
+// held at its maximum; `turn` eases by 0.2 per step toward the heading change per second; the heading follows the
+// velocity; a fish of an unknown species is only clamped.
 import Foundation
 import Testing
 import VisualCoreMath
@@ -46,16 +49,23 @@ import DigitalAquariumCore
         var random = SeededRandom(seed: UInt64(seed) &* 0x9E37_79B9 &+ 1)
         var doc = HabitatDocument.starter(seed % 2, catalog: catalog, random: &random)
         let maxSpeeds = try doc.fish.map { try #require(catalog.species(id: $0.speciesId)).maxSpeed }
-        var outside = 0, tooFast = 0
+        let minSpeeds = try doc.fish.map {
+            try #require(catalog.species(id: $0.speciesId)).cruiseSpeed * AquariumSimulation.minimumSpeedShare
+        }
+        var outside = 0, tooFast = 0, tooSlow = 0, badTurn = 0
         for _ in 0..<10_000 {
             AquariumSimulation.advance(&doc, catalog: catalog, random: &random)
-            for (fish, maxSpeed) in zip(doc.fish, maxSpeeds) {
+            for (index, fish) in doc.fish.enumerated() {
                 if !doc.bounds.contains(fish.position) { outside += 1 }
-                if !(fish.velocity.length <= maxSpeed * (1 + 1e-12)) { tooFast += 1 }
+                if !(fish.velocity.length <= maxSpeeds[index] * (1 + 1e-12)) { tooFast += 1 }
+                if !(fish.velocity.length >= minSpeeds[index] * (1 - 1e-12)) { tooSlow += 1 }
+                if !fish.turn.isFinite { badTurn += 1 }
             }
         }
         #expect(outside == 0)
         #expect(tooFast == 0)
+        #expect(tooSlow == 0)
+        #expect(badTurn == 0)
         #expect(doc.validate(catalog: catalog).isEmpty)
     }
 
@@ -82,18 +92,44 @@ import DigitalAquariumCore
         }
     }
 
-    @Test func speedEasesTowardCruise() throws {
+    /// A one-fish document of the first bundled species at `position` with `velocity`, heading `heading`.
+    private func lone(_ position: Vec2, _ velocity: Vec2, heading: Double, turn: Double = 0) throws -> HabitatDocument {
         let species = try #require(catalog.species.first)
-        var doc = HabitatDocument(habitatIndex: 0, habitatId: "reef", waterColor: RGBA(0, 0.4, 0.6), plants: [],
-                                  fish: [FishAgent(speciesId: species.id, position: Vec2(8, 5),
-                                                   velocity: Vec2(species.maxSpeed, 0), heading: 0,
-                                                   animationPhase: 0)])
+        return HabitatDocument(habitatIndex: 0, habitatId: "reef", waterColor: RGBA(0, 0.4, 0.6), plants: [],
+                               fish: [FishAgent(speciesId: species.id, position: position, velocity: velocity,
+                                                heading: heading, animationPhase: 0, turn: turn)])
+    }
+
+    @Test func aRestingFishIsBroughtUpToHalfItsCruiseSpeedAlongItsHeading() throws {
+        let species = try #require(catalog.species.first)
+        var doc = try lone(Vec2(8, 5), .zero, heading: 1.0)
         var random = SeededRandom(seed: 3)
-        for _ in 0..<120 { AquariumSimulation.advance(&doc, catalog: catalog, random: &random) }
-        let speed = doc.fish[0].velocity.length
-        #expect(speed < species.maxSpeed)
-        #expect(abs(speed - species.cruiseSpeed) < 0.2 * (species.maxSpeed - species.cruiseSpeed))
-        #expect(doc.fish[0].animationPhase > 0)
+        AquariumSimulation.advance(&doc, catalog: catalog, random: &random)
+        let fish = doc.fish[0]
+        #expect(abs(fish.velocity.length - 0.5 * species.cruiseSpeed) < 1e-12)
+        #expect(abs(AquariumSimulation.wrappedAngle(fish.heading - 1.0)) < 0.05)
+        #expect(fish.animationPhase > 0)
+    }
+
+    @Test func aTooFastFishIsHeldAtItsMaximumSpeed() throws {
+        let species = try #require(catalog.species.first)
+        var doc = try lone(Vec2(8, 5), Vec2(10 * species.maxSpeed, 0), heading: 0)
+        var random = SeededRandom(seed: 4)
+        for _ in 0..<60 {
+            AquariumSimulation.advance(&doc, catalog: catalog, random: &random)
+            #expect(doc.fish[0].velocity.length <= species.maxSpeed * (1 + 1e-12))
+        }
+    }
+
+    @Test func turnEasesTowardTheHeadingChangePerSecond() throws {
+        var doc = try lone(Vec2(8, 5), Vec2(1, 0), heading: 0, turn: 0.5)
+        var random = SeededRandom(seed: 11)
+        AquariumSimulation.advance(&doc, catalog: catalog, random: &random)
+        let fish = doc.fish[0]
+        let change = AquariumSimulation.wrappedAngle(fish.heading - 0) / AquariumSimulation.step
+        #expect(change != 0)
+        #expect(abs(fish.turn - (0.5 + 0.2 * (change - 0.5))) < 1e-9)
+        #expect(abs(AquariumSimulation.wrappedAngle(fish.heading - atan2(fish.velocity.y, fish.velocity.x))) < 1e-12)
     }
 
     @Test func aFishOfAnUnknownSpeciesIsOnlyClamped() {

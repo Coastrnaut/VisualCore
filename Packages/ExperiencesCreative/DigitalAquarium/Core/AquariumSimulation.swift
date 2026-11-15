@@ -1,39 +1,85 @@
-// AquariumSimulation — feature 068 (A09-P01) T-A09-102 (FR-A09-110, FR-A09-111; clarification 1; research D1). The
-// seeded, fixed-step bounded wander of this phase. Each step (1/60 s) every fish, in document order:
-// 1. turns by a seeded random amount within ±(species turn rate × step);
-// 2. eases its speed toward the species cruise speed (never above the maximum);
-// 3. steers inward when closer than `margin` (1 unit) to a bound, turning toward the inside by at most
-//    `steerRate` × step (stronger the closer it is);
+// AquariumSimulation — feature 068 (A09-P01) T-A09-102 (FR-A09-110, FR-A09-111; clarification 1; research D1),
+// schooling since feature 069 (A09-P02) T-A09-204 (FR-A09-210; clarification 3; research D3). The seeded, fixed-step
+// schooling of the fish. Each step (1/60 s) first computes every fish's steering force from the state at the start of
+// the step (VisualCore `Steering`: separation from every neighbour, alignment and cohesion only with the same species,
+// inward push near the bounds; ``parameters(for:)``), so the result does not depend on the fish order. Then every fish
+// of a known species, in document order:
+// 1. adds force × step to its velocity;
+// 2. turns by a reduced seeded wander of ±(species turn rate × 0.35 × step) (exactly one draw per fish);
+// 3. has its speed clamped to 0.5 × cruise…maximum (a zero velocity takes the current heading);
 // 4. moves by velocity × step;
-// 5. is clamped into the swim bounds, and each outward velocity component at a clamped edge is reflected.
-// The heading then follows the velocity, and the animation phase advances in proportion to speed / body length. The
-// clamp makes leaving the bounds impossible by construction; reflection never changes the speed, so no fish exceeds its
-// maximum. There is no wall-clock input: the same document, catalog and generator state give the same result. Reduce
-// Motion never reaches this type (the experience halves only what it draws), so the state never depends on it.
-// Bounded steering with neighbours (schools) replaces steps 1–2 in A09-P02; the bounds guarantee stays.
+// 5. is clamped into the swim bounds, and each outward velocity component at a clamped edge is reflected (Phase 01).
+// The heading then follows the velocity, `turn` eases (0.2 per step) toward the heading change per second, and the
+// animation phase advances in proportion to speed / body length. A fish of an unknown species is only clamped (it is
+// still an agent the others keep away from, in a group of its own). The clamp makes leaving the bounds impossible by
+// construction; reflection never changes the speed, so no fish exceeds its maximum or drops below half its cruise.
+// There is no wall-clock input: the same document, catalog and generator state give the same result. Reduce Motion
+// never reaches this type (the experience halves only what it draws), and while paused the caller does not advance.
+// Tuning (research D3): neighbour radius 2.5, limit 6, separation radius 1.6 × body length, weights separation 2.0,
+// alignment 1.0, cohesion 0.8, boundary 3.0 with margin 1.0, maximum force 2.0 — unchanged from D3; measured over seeds
+// 1…20 after 1,800 steps: Reef 20 of 20 seeds closer (SC-A09-201) and 19 aligned (SC-A09-202), Kelp 19 and 18.
 import Foundation
 import VisualCoreMath
 import VisualCoreSimulation
 
-/// The fixed-step bounded wander of the fish in a habitat document.
+/// The fixed-step schooling of the fish in a habitat document.
 public enum AquariumSimulation {
     /// The fixed step in seconds.
     public static let step = 1.0 / 60
-    /// The distance from a bound inside which a fish steers inward, in habitat units.
+    /// The distance from a bound inside which a fish is pushed inward, in habitat units.
     public static let margin = 1.0
-    /// The largest inward steering turn per second, in radians (at the bound itself).
-    public static let steerRate = 3.0
-    /// How quickly the speed eases toward the cruise speed, per second.
-    public static let easeRate = 1.5
+    /// The share of the species turn rate used by the seeded wander turn while schooling.
+    public static let wanderShare = 0.35
+    /// The lowest speed as a share of the species cruise speed.
+    public static let minimumSpeedShare = 0.5
+    /// How much of the gap to the new heading change per second `turn` closes each step.
+    public static let turnSmoothing = 0.2
     /// Tail swings per unit of (speed / body length).
     public static let tailBeatsPerLength = 0.6
 
+    /// The steering tuning of `species`: neighbour radius 2.5 units, at most 6 neighbours, separation radius
+    /// 1.6 × body length, weights separation 2.0, alignment 1.0, cohesion 0.8 and boundary 3.0, boundary margin
+    /// ``margin``, maximum force 2.0 units/s².
+    public static func parameters(for species: FishSpecies) -> SteeringParameters {
+        SteeringParameters(neighbourRadius: 2.5, neighbourLimit: 6, separationRadius: 1.6 * species.length,
+                           separationWeight: 2.0, alignmentWeight: 1.0, cohesionWeight: 0.8, boundaryWeight: 3.0,
+                           boundaryMargin: margin, maxForce: 2.0)
+    }
+
+    /// The steering agents of `doc`: each fish's position and velocity, grouped by the index of its species in
+    /// `catalog` (−1 − fish index for an unknown species, so it never schools).
+    static func agents(_ doc: HabitatDocument, catalog: SpeciesCatalog) -> [SteeringAgent] {
+        doc.fish.enumerated().map { index, fish in
+            let group = catalog.species.firstIndex { $0.id == fish.speciesId } ?? (-1 - index)
+            return SteeringAgent(position: fish.position, velocity: fish.velocity, group: group)
+        }
+    }
+
+    /// The steering force on every fish of `doc`, all from the same (current) state; `.zero` for a fish of an unknown
+    /// species. The force on a fish depends only on the set of fish, not on their order (ties in the neighbour search
+    /// aside).
+    static func forces(_ doc: HabitatDocument, catalog: SpeciesCatalog) -> [Vec2] {
+        let agents = agents(doc, catalog: catalog)
+        let bounds = SteeringBounds(minX: doc.bounds.minX, maxX: doc.bounds.maxX,
+                                    minY: doc.bounds.minY, maxY: doc.bounds.maxY)
+        return doc.fish.indices.map { index in
+            guard let species = catalog.species(id: doc.fish[index].speciesId) else { return .zero }
+            let parameters = parameters(for: species)
+            let neighbours = NeighbourSearch.neighbours(of: index, in: agents, radius: parameters.neighbourRadius,
+                                                        limit: parameters.neighbourLimit)
+            return Steering.force(for: index, agents: agents, neighbours: neighbours, parameters: parameters,
+                                  bounds: bounds)
+        }
+    }
+
     /// Advances every fish of `doc` by one ``step`` using the species of `catalog` and the generator `random` (one
-    /// draw per fish whose species is known). A fish whose species is not in the catalog is only clamped into the
-    /// bounds; plants, decor and lighting are not changed.
+    /// draw per fish whose species is known, in document order). Every steering force is computed from the state at
+    /// the start of the step. A fish whose species is not in the catalog is only clamped into the bounds; plants,
+    /// decor and lighting are not changed.
     public static func advance(_ doc: inout HabitatDocument, catalog: SpeciesCatalog, random: inout SeededRandom) {
         let bounds = doc.bounds
         let dt = step
+        let forces = forces(doc, catalog: catalog)
         for index in doc.fish.indices {
             var fish = doc.fish[index]
             guard let species = catalog.species(id: fish.speciesId) else {
@@ -41,22 +87,21 @@ public enum AquariumSimulation {
                 doc.fish[index] = fish
                 continue
             }
-            // 1. Seeded random turn.
-            var heading = fish.heading + random.range(-1...1) * species.turnRate * dt
-            // 2. Ease the speed toward cruise, never above the maximum.
-            var speed = fish.velocity.isFinite ? fish.velocity.length : species.cruiseSpeed
-            speed += (species.cruiseSpeed - speed) * min(1, easeRate * dt)
-            speed = min(max(speed, 0), species.maxSpeed)
-            // 3. Inward steering near a bound.
-            let push = inwardPush(fish.position, bounds)
-            if push.x != 0 || push.y != 0 {
-                let strength = min(1, push.length)
-                let target = atan2(push.y, push.x)
-                let difference = wrappedAngle(target - heading)
-                let limit = steerRate * strength * dt
-                heading += min(max(difference, -limit), limit)
-            }
-            var velocity = Vec2(cos(heading), sin(heading)) * speed
+            let oldHeading = fish.heading.isFinite ? fish.heading : 0
+            // 1. Steering.
+            var velocity = fish.velocity.isFinite
+                ? fish.velocity : Vec2(cos(oldHeading), sin(oldHeading)) * species.cruiseSpeed
+            velocity += forces[index] * dt
+            // 2. Reduced seeded wander turn.
+            let wander = random.range(-1...1) * species.turnRate * wanderShare * dt
+            let (s, c) = (sin(wander), cos(wander))
+            velocity = Vec2(velocity.x * c - velocity.y * s, velocity.x * s + velocity.y * c)
+            // 3. Speed between half the cruise speed and the maximum.
+            var speed = velocity.length
+            let direction = speed > 0 && speed.isFinite ? velocity / speed : Vec2(cos(oldHeading), sin(oldHeading))
+            speed = min(max(speed.isFinite ? speed : species.cruiseSpeed, minimumSpeedShare * species.cruiseSpeed),
+                        species.maxSpeed)
+            velocity = direction * speed
             // 4. Move.
             var position = fish.position + velocity * dt
             // 5. Clamp into the bounds and reflect the outward component.
@@ -66,22 +111,14 @@ public enum AquariumSimulation {
             if position.y > bounds.maxY { position.y = bounds.maxY; if velocity.y > 0 { velocity.y = -velocity.y } }
             fish.position = clamped(position, bounds)
             fish.velocity = velocity
-            fish.heading = speed > 0 ? atan2(velocity.y, velocity.x) : wrappedAngle(heading)
+            fish.heading = atan2(velocity.y, velocity.x)
+            let change = wrappedAngle(fish.heading - oldHeading) / dt
+            let turn = fish.turn.isFinite ? fish.turn : 0
+            fish.turn = turn + turnSmoothing * (change - turn)
             let beats = tailBeatsPerLength * speed / species.length
             fish.animationPhase = wrappedPhase(fish.animationPhase + 2 * Double.pi * beats * dt)
             doc.fish[index] = fish
         }
-    }
-
-    /// The inward push at `p`: per axis, 0 farther than ``margin`` from both bounds, rising linearly to 1 at a bound,
-    /// pointing into the bounds.
-    static func inwardPush(_ p: Vec2, _ b: SwimBounds) -> Vec2 {
-        var push = Vec2.zero
-        if p.x < b.minX + margin { push.x += min(1, (b.minX + margin - p.x) / margin) }
-        if p.x > b.maxX - margin { push.x -= min(1, (p.x - (b.maxX - margin)) / margin) }
-        if p.y < b.minY + margin { push.y += min(1, (b.minY + margin - p.y) / margin) }
-        if p.y > b.maxY - margin { push.y -= min(1, (p.y - (b.maxY - margin)) / margin) }
-        return push
     }
 
     /// `p` clamped into `b` (a non-finite component becomes the bound's centre).
