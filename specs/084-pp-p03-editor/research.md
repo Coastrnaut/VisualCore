@@ -12,6 +12,9 @@ Facts verified on 2026-11-15 (clarification session).
   and inertia 0 and their velocity set to 0 when pinned.
 - **Rationale**: keeps every edit a validated, replayable action; pinning reuses the static path the solver already has
   (the gate's mass-zero fixture).
+- **As built** (recorded at convergence, T-A11-310): pinning the grabbed body ends the grab (a pinned body cannot be
+  held); the native controls include Hold / Let go and four move buttons, which send `edit.grab` at the selected
+  body's centre, `edit.move` by ±0.5 m and `edit.release`, so grabbing has a native alternative (FR-A11-303).
 
 ## D2 — Grab pull
 

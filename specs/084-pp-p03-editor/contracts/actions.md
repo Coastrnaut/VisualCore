@@ -16,3 +16,6 @@ Schema-2 actions plus:
 
 Gesture identifiers (the presenter's `gestureActions`): `edit.add`, `edit.select`, `edit.grab`, `edit.move`,
 `edit.release`, `edit.pin`, `edit.delete`; every one also reachable by a native control.
+
+Native alternatives for the drag: Hold (`edit.grab` at the selected body's centre), four move buttons (`edit.move` ±0.5 m
+from the current target) and Let go (`edit.release`). `edit.pin` on the grabbed body ends the grab (T-A11-310).
