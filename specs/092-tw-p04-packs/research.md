@@ -20,3 +20,15 @@ Facts verified on 2026-11-15 (clarification session): `WorldState` schema 2 fiel
 - **Decision**: count vertices (terrain + sea + Σ prop model vertices), props and draws (2 + props) per pack; commit the
   state digest after `world.pack` from the default state for each pack; a broken pack fixture (a prop moved under
   water) is refused with `a12.under-water`.
+
+## As built (2026-11-15, recorded at convergence T-A12-410)
+
+- **D1 generator:** `WorldPack.apply` resets the seed generator to `SeededRandom(seed: WorldState.generatorSeed)`, so
+  an opened pack depends only on the pack: "Reset to pack" returns the exact committed digest after any edits,
+  including a new seed (`WorldPackTests`, `WorldsPackTests`, manifest fixture `fixture-pack-reset`).
+- **Controls:** `world.pack` is the last declared control, so the ids and order of the earlier controls are unchanged;
+  `view.reset` returns to the global default view (45°, 35°, 18 m) clamped to the preset's limits, while "Reset to
+  pack" restores the pack's own default view.
+- **D2 policy:** because the clearance now includes props, the camera policy runs after every accepted action —
+  including prop and light actions — and on prepare, restore and reset, using the preset's limits
+  (`CameraPolicy.clamp(_:state:field:)`).
