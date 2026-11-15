@@ -57,3 +57,9 @@ Facts verified on 2026-11-15 (clarification session and the plan's read-only aud
   `shedCaches()`; the shell's `shedCaches()` (the host's memory-warning path) reaches it.
 - Measured on the iOS 27.2 simulator, recorded and not asserted: the 20-cycle stale-object fixture ran in 1.058 s, the
   seven quality tests in 0.197 s and the tiers × packs round trip within the 70 experience tests' 6.1 s.
+- The scenario manifest and `WorldsManifest.swift` stay unchanged (T-A12-516): the engine carries no tier, so a
+  replayed fixture cannot vary it; the plan's Project Structure listed them before analyze removed that fixture, and
+  the tier's independence from the digest is proven by `WorldsQualityTests` instead.
+- The host's real memory-warning path (the session observes `UIApplication.didReceiveMemoryWarningNotification` and
+  calls the shell's `shedCaches()`) is proven end to end by
+  `WorldsQualityTests.testTheSystemMemoryWarningReachesThePresenterThroughTheSession` (T-A12-515).
