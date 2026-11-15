@@ -2380,6 +2380,7 @@ VisualCoreShaderSource | var | public var green: Bool
 VisualCoreShaderSource | var | public var red: Bool
 VisualCoreSimulation | enum | public enum AccessibilityChoice: String, Sendable, Codable, CaseIterable, Identifiable
 VisualCoreSimulation | enum | public enum AnnouncementKind: String, Sendable, Equatable, CaseIterable
+VisualCoreSimulation | enum | public enum Collision2D
 VisualCoreSimulation | enum | public enum EmitterShape: Sendable, Equatable, Codable
 VisualCoreSimulation | enum | public enum HapticKind: String, Sendable, Equatable, CaseIterable
 VisualCoreSimulation | enum | public enum NeighbourSearch
@@ -2452,6 +2453,7 @@ VisualCoreSimulation | func | public mutating func toggle()
 VisualCoreSimulation | func | public mutating func weightedIndex(_ weights: [Double]) throws(RandomChoiceError) -> Int
 VisualCoreSimulation | func | public static func capped(_ v: Vec2, to limit: Double) -> Vec2
 VisualCoreSimulation | func | public static func clampedStrength(_ strength: Double) -> Double
+VisualCoreSimulation | func | public static func closestPoint(on capsule: CollisionCapsule, to point: Vec2) -> Vec2
 VisualCoreSimulation | func | public static func derive(_ seed: UInt64, index: UInt64) -> UInt64
 VisualCoreSimulation | func | public static func derive(_ seed: UInt64, label: String) -> UInt64
 VisualCoreSimulation | func | public static func factor(strength: Double, delta: Double) -> Double
@@ -2461,12 +2463,17 @@ VisualCoreSimulation | func | public static func keys(prefix: String) -> (reduce
 VisualCoreSimulation | func | public static func load(from defaults: UserDefaults, keyPrefix prefix: String) -> AccessibilityPreferences
 VisualCoreSimulation | func | public static func mix(_ z: UInt64) -> UInt64
 VisualCoreSimulation | func | public static func neighbours(of index: Int, in agents: [SteeringAgent], radius: Double, limit: Int) -> [Int]
+VisualCoreSimulation | func | public static func overlaps(_ a: CollisionCircle, _ b: CollisionCircle) -> Bool
+VisualCoreSimulation | func | public static func overlaps(_ circle: CollisionCircle, _ capsule: CollisionCapsule) -> Bool
 VisualCoreSimulation | func | public static func step8(_ value: UInt8, factor: Double, subtract: Double = 1) -> UInt8
 VisualCoreSimulation | func | public static func subtraction(delta: Double) -> Double
+VisualCoreSimulation | func | public static func sweep(_ a: CollisionCircle, moving da: Vec2, _ b: CollisionCircle, moving db: Vec2) -> Double?
 VisualCoreSimulation | func | public static func unorm8(range: Float) -> SignedRangeEncoding?
 VisualCoreSimulation | init | public init()
 VisualCoreSimulation | init | public init(_ entries: [(step: Int, command: Command)] = [])
+VisualCoreSimulation | init | public init(a: Vec2, b: Vec2, radius: Double)
 VisualCoreSimulation | init | public init(capacity: Int = ParticleSystem.defaultCapacity, seed: UInt64 = 0)
+VisualCoreSimulation | init | public init(center: Vec2, radius: Double)
 VisualCoreSimulation | init | public init(count: Int, interval: Double)
 VisualCoreSimulation | init | public init(duration: Double = 120, speed: Double = 1, isPlaying: Bool = true)
 VisualCoreSimulation | init | public init(from decoder: Decoder) throws
@@ -2542,11 +2549,14 @@ VisualCoreSimulation | let | public static let speedRange: ClosedRange<Double>
 VisualCoreSimulation | let | public static let spreadRange: ClosedRange<Double>
 VisualCoreSimulation | let | public static let strengthLimit
 VisualCoreSimulation | let | public static let strengthRange: ClosedRange<Double>
+VisualCoreSimulation | let | public static let tolerance: Double
 VisualCoreSimulation | let | public static let version
 VisualCoreSimulation | protocol | public protocol FixedStepSimulation
 VisualCoreSimulation | struct | public struct AccessibilityPreferences: Sendable, Equatable, Codable
 VisualCoreSimulation | struct | public struct Announcement: Sendable, Equatable
 VisualCoreSimulation | struct | public struct AnnouncementPlanner: Sendable, Equatable
+VisualCoreSimulation | struct | public struct CollisionCapsule: Sendable, Equatable
+VisualCoreSimulation | struct | public struct CollisionCircle: Sendable, Equatable
 VisualCoreSimulation | struct | public struct ControlStream<Command>
 VisualCoreSimulation | struct | public struct EffectiveAccessibility: Sendable, Equatable
 VisualCoreSimulation | struct | public struct Emitter: Sendable, Equatable
@@ -2597,12 +2607,15 @@ VisualCoreSimulation | var | public private(set) var time
 VisualCoreSimulation | var | public private(set) var time: Double
 VisualCoreSimulation | var | public private(set) var totalSteps
 VisualCoreSimulation | var | public private(set) var wantsToPlay: Bool
+VisualCoreSimulation | var | public var a: Vec2
 VisualCoreSimulation | var | public var alignmentWeight: Double
 VisualCoreSimulation | var | public var alpha: Double
 VisualCoreSimulation | var | public var autoreverses: Bool
+VisualCoreSimulation | var | public var b: Vec2
 VisualCoreSimulation | var | public var boundaryMargin: Double
 VisualCoreSimulation | var | public var boundaryWeight: Double
 VisualCoreSimulation | var | public var burst: EmitterBurst?
+VisualCoreSimulation | var | public var center: Vec2
 VisualCoreSimulation | var | public var cohesionWeight: Double
 VisualCoreSimulation | var | public var color: Vec4
 VisualCoreSimulation | var | public var colorHex: String
@@ -2640,6 +2653,7 @@ VisualCoreSimulation | var | public var offset: Double
 VisualCoreSimulation | var | public var playbackRate: Double
 VisualCoreSimulation | var | public var position: Vec2
 VisualCoreSimulation | var | public var radial: Bool
+VisualCoreSimulation | var | public var radius: Double
 VisualCoreSimulation | var | public var rate
 VisualCoreSimulation | var | public var rate: Double
 VisualCoreSimulation | var | public var reduceFlashing: AccessibilityChoice

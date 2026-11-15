@@ -7,7 +7,7 @@ iOS 26+ inside apps. The package map and dependency rules R1–R5 are in
 | Product | Purpose |
 |---|---|
 | VisualCoreMath | vectors, matrices, quaternions, cameras, double-precision plane viewports (PlaneViewport) and size-independent framings (PlaneFraming), log-scale framing flights and tour timelines (FramingFlight, TourTimeline), precision advice (PrecisionAdvisor), easing, camera rails with comfort limits (CameraRail, RailPose, ComfortLimits, RailFlight) and origin rebasing for long journeys (OriginRebase) |
-| VisualCoreSimulation | fixed-step clock, seeded RNG, timelines, particle pool, NaN guard, CPU field grids, storage precision, time-step policy, bounded steering and neighbour search |
+| VisualCoreSimulation | fixed-step clock, seeded RNG, timelines, particle pool, NaN guard, CPU field grids, storage precision, time-step policy, bounded steering and neighbour search, 2D overlap and swept collision tests |
 | VisualCoreScenes | input mapping, pointer tracking and velocity, seeded synthetic gesture scripts, mesh generators, export geometry, streaming piece windows (SegmentWindow), fixed-size slot pools (SlotPool) and per-quality-level streaming budgets (StreamingBudget, StreamingLevel); feature 062 (A08-P02): `Primitive.polyline` (a bounded multi-point line of up to 8,192 finite points with a width) |
 | VisualCoreShaderSource | shader library, includes, line maps, diagnostics parsing |
 | VisualCoreEffectsGraph | effect DAG model, validation, quotas, flash-limiter model |
@@ -94,6 +94,14 @@ separation (all neighbours inside `separationRadius`; coincident agents part alo
 (only neighbours of the same `group`) and an inward boundary push inside `boundaryMargin` of valid `SteeringBounds`;
 each term and the sum are capped to `maxForce`, and non-finite input gives zero force. Deterministic, no randomness;
 host tests `SteeringForceTests` and `NeighbourSearchTests`.
+
+**2D collision** (`VisualCoreSimulation`, feature 075): `CollisionCircle` and `CollisionCapsule` (a segment with a
+radius) are plain values; `Collision2D.overlaps` answers circle–circle and circle–capsule overlap with touching counting
+(tolerance 1e-9), `Collision2D.closestPoint(on:to:)` gives the nearest point of a capsule's segment, and
+`Collision2D.sweep(_:moving:_:moving:)` returns the earliest fraction 0…1 of one step at which two linearly moving
+circles first touch (0 when already touching, nil for no contact), so a fast object cannot pass through another
+between steps. Non-finite input or a negative radius gives no hit. Pure and deterministic; host tests
+`Collision2DTests`.
 
 **CPU field references** (`VisualCoreSimulation`, feature 019): a `FieldGrid` is a W×H grid with 1…4 channels,
 row-major from the bottom row up, as in GL. `StoragePrecision` (`float32`, `float16`, `float16TowardZero`, `unorm8`) rounds values the
