@@ -28,3 +28,20 @@ Facts verified on 2026-11-15 (clarification session): `ExperimentStore` pattern 
 ## D5 — Thumbnails
 - **Decision**: `renderStill(width: 160, height: 120)` → `StillImageEncoder` PNG → `world-<slot>.png` after the
   document; missing context → no picture; size cap 64 KB (refuse larger, keep the document).
+
+## As built (2026-11-15, recorded at convergence T-A12-310)
+
+- **D2 ground height:** a placed or moved prop rests on the drawn terrain: `WorldEditing.groundHeight` interpolates
+  inside the mesh triangle under the point (each cell split along its (i, j)–(i + 1, j + 1) diagonal), so a prop sits
+  on the visible surface (`WorldEditingTests` check within 1 mm against the mesh vertices). `GroundPick` keeps the
+  bilinear sampler of A12-P02; a tapped point therefore differs from the drawn surface by at most the cell's bilinear
+  error, and placement snaps it to the drawn surface.
+- **D2 editing details:** placing selects the new prop; re-choosing the preset already shown keeps the props, while
+  `world.seed` and a real preset change clear props and selection; an out-of-range or non-finite move or turn step is
+  refused with `a12.invalid-choice` after `a12.no-selection` is checked.
+- **D3 light range:** the engine accepts `light.azimuth` only within its declared 0…360°, so the azimuth stepper wraps
+  its value before sending; `WorldLight.setAzimuth` wraps any finite value for direct core calls.
+- **D4 documents:** the saved file's own schema must be exactly 2 (a file schema 1 is refused as `damaged`), while a
+  schema-1 state inside a schema-2 document migrates like a snapshot. The interrupted-write test makes the experience's
+  folder read-only (the storage's internal failure hook is not public) and checks that the previous JSON and PNG stay
+  byte-identical (`WorldStoreTests`).
