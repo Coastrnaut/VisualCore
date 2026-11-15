@@ -16,7 +16,7 @@ public enum Steering {
 Guarantees: `neighbours` returns ≤ max(0, limit) indices, never `index`, nearest first, ties by index, only agents
 within `radius` with finite positions; an out-of-range `index` returns []. `force` is finite and `length ≤ maxForce`;
 separation uses every neighbour, alignment and cohesion only neighbours of the same group; an out-of-range index or a
-non-finite agent gives `.zero`.
+non-finite agent gives `.zero`; bounds that are not `isValid` add no boundary force.
 
 ## DigitalAquariumCore
 
