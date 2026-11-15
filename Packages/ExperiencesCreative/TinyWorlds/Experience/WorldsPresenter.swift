@@ -43,6 +43,31 @@
 //     also sent by the native controls; a tap casts the ray of the drawn camera through the tapped point
 //     (`OrbitCamera.ray(ndc:aspect:)`, `Ray3`) against the level-0 height field (`GroundPick.hit(ray:field:)`) and
 //     speaks "Ground at x 1.2, z -0.5, height 0.3 metres." or "No ground there."; the state never changes.
+//
+// Feature 091 (A12-P03) T-A12-303 (FR-A12-301–303, FR-A12-310, FR-A12-320–323; SC-A12-301–305; clarifications Q1–Q5;
+// research D1–D5):
+//   - Props: one `MeshRenderer` per prop kind (`PropCatalog.model(_:)`: its mesh and per-vertex colours), made lazily
+//     with the host's registry the first time a prop of that kind is drawn, forgotten in teardown (so a recreated
+//     context makes them again) and released there. Every placed prop is drawn after the world's parts through the
+//     same depth pass with its model matrix (`PlacedProp.modelMatrix`), in a white draw colour; the selected prop in
+//     ``highlight`` (1.3 in each colour channel), so it reads brighter.
+//   - Light: every renderer (terrain, sea and props) takes the state's light every frame: `WorldLight.direction` and
+//     its ambient level.
+//   - Tap: the ray of the drawn camera through the tapped point is met with the props' picking boxes
+//     (`WorldEditing.pick(ray:props:)`) and the level-0 terrain (`GroundPick`); a prop nearer than the ground (or with
+//     no ground behind it) is selected by sending `prop.select [index]` through the caller's port, otherwise the ground
+//     point is remembered (``lastGround``) for the next Place and spoken as before.
+//   - Words: every editing and light action sent by the controls or a tap is answered in words (the refusal's reason
+//     or a confirmation, ``editWords``), shown in the controls and spoken while VoiceOver runs; a preset or seed
+//     change that removes props says so. The description adds the props ("; 2 props, the house selected") when there
+//     are any.
+//   - Saved worlds: the presenter's `WorldStore` saves, opens and clears the four slots for the controls, outside the
+//     action replay. Saving writes `WorldDocument(state:)` of the current world, then a 160 × 120 still drawn off
+//     screen by the session (`ExperienceStillRenderer`, which the host view hands to the controls) encoded by
+//     `StillImageEncoder` (at most 64 KB; no picture without a renderer or when drawing fails). Opening reads and
+//     validates the slot's file and restores a snapshot of `WorldsCore.opening(state:from:)` through the shell
+//     (`ExperienceShell.restore`); a refused file is reported and the world stays as it was. Clearing removes both
+//     files.
 import Foundation
 import SwiftUI
 import TinyWorldsCore
@@ -68,6 +93,22 @@ final class WorldsMirror {
     var view = WorldView.default
     /// The status line: world, seed and view in words.
     var status = ""
+    /// The placed props (feature 091).
+    var props: [PlacedProp] = []
+    /// The selected prop's index, or `WorldState.noSelection`.
+    var selection = WorldState.noSelection
+    /// The world light.
+    var light = WorldLight.default
+    /// The prop kind the Place button places (presentation state, never in the world).
+    var placeKind = PropKind.tree.rawValue
+    /// The words of the last editing action, tap or slot action.
+    var message = ""
+    /// The stored name of each slot, empty for an empty or refused slot.
+    var slotNames = Array(repeating: "", count: WorldStore.slots.count)
+    /// The status text of each slot: what it holds, or the result of the last save, open or clear.
+    var slotStatus = Array(repeating: "", count: WorldStore.slots.count)
+    /// The PNG thumbnail of each slot, nil when none is stored.
+    var slotPictures: [Data?] = Array(repeating: nil, count: WorldStore.slots.count)
 }
 
 /// Draws Tiny Worlds and owns its presentation state (the cached parts and the GPU objects).
@@ -79,10 +120,12 @@ final class WorldsPresenter: ExperiencePresenter {
     nonisolated static let fieldOfView = Double.pi / 3
     /// The camera's near and far planes in metres.
     nonisolated static let near = 0.1, far = 100.0
-    /// The direction towards the light, fixed in this phase.
-    nonisolated static let lightDirection = Vec3(0.4, 1, 0.3).normalized
-    /// The ambient fraction added to the Lambert term.
-    nonisolated static let ambient = 0.35
+    /// The direction towards the default light (feature 091: every frame takes the state's light).
+    nonisolated static let lightDirection = WorldLight.default.direction
+    /// The default ambient fraction added to the Lambert term.
+    nonisolated static let ambient = WorldLight.default.ambient
+    /// The draw colour of the selected prop (brighter than the white of the others).
+    nonisolated static let highlight = Vec4(1.3, 1.3, 1.3, 1)
     /// The world's box: x and z in −6…6 m, y in the terrain's height range.
     nonisolated static let worldLow = Vec3(WorldPreset.worldOrigin, WorldPreset.heightRange.lowerBound,
                                            WorldPreset.worldOrigin)
@@ -159,20 +202,39 @@ final class WorldsPresenter: ExperiencePresenter {
     /// The canvas gestures.
     private(set) var gestures = WorldsGestures()
 
+    /// One renderer per prop kind, made lazily with the current context's registry (feature 091).
+    private(set) var propRenderers: [PropKind: MeshRenderer] = [:]
+    /// How many prop renderers were made since the presenter was made.
+    private(set) var propBuildCount = 0
+    /// The number of props drawn by the last frame.
+    private(set) var lastPropsDrawn = 0
+    /// The light the renderers drew the last frame with; nil before the first frame.
+    private(set) var lastLight: WorldLight?
+    /// The ground point of the last tap that met the ground, where Place puts a prop; nil before.
+    private(set) var lastGround: Vec3?
+    /// The saved worlds.
+    let store: WorldStore
+    /// The shell that holds this presenter: opening a slot restores a snapshot through it. Set by the factory; weak,
+    /// because the shell holds the presenter.
+    weak var shell: ExperienceShell<WorldsPresenter>?
+
     /// A presenter for the experience `experienceID`.
     /// - Parameters:
     ///   - reduceMotion: The one app's Reduce Motion flag (the drawn view moves directly).
     ///   - systemReduceMotion: The system setting, read every frame (nil: `UIAccessibility.isReduceMotionEnabled`).
     ///   - voiceOverRunning: Whether VoiceOver runs (nil: `UIAccessibility.isVoiceOverRunning`).
     ///   - announcementSink: Where spoken texts go (nil: the system's VoiceOver announcements).
+    ///   - store: The saved worlds (in memory by default).
     init(experienceID: ExperienceID, reduceMotion: Bool = false,
          systemReduceMotion: (@MainActor () -> Bool)? = nil, voiceOverRunning: (@MainActor () -> Bool)? = nil,
-         announcementSink: (any AnnouncementSink)? = nil) {
+         announcementSink: (any AnnouncementSink)? = nil, store: WorldStore = WorldStore(storage: nil)) {
         self.experienceID = experienceID
+        self.store = store
         self.reduceMotion = reduceMotion
         self.systemReduceMotion = systemReduceMotion ?? { UIAccessibility.isReduceMotionEnabled }
         self.voiceOverRunning = voiceOverRunning ?? { UIAccessibility.isVoiceOverRunning }
         self.announcementSink = announcementSink ?? SystemAnnouncementSink()
+        refreshSlots()
     }
 
     /// True when the drawn view moves directly: the one app's flag or the system setting.
@@ -216,14 +278,27 @@ final class WorldsPresenter: ExperiencePresenter {
         if depthPass == nil { depthPass = DepthMeshPass(registry: context.resources) }
         guard let depthPass else { return }
         depthPass.clearColor = Self.backgroundColor(core.preset)
-        let items = zip(renderers, parts).enumerated().map { index, pair in
+        var items = zip(renderers, parts).enumerated().map { index, pair in
             let colored = index == 0 && hasTerrain && terrainColored
             return DepthMeshPass.Item(renderer: pair.0, color: colored ? Vec4(1, 1, 1, 1) : Self.vector(pair.1.color))
+        }
+        let worldItems = items.count
+        for (index, prop) in core.props.enumerated() {
+            let renderer = try propRenderer(prop.kind, context)
+            items.append(DepthMeshPass.Item(renderer: renderer, model: prop.modelMatrix,
+                                            color: index == core.selection ? Self.highlight : Vec4(1, 1, 1, 1)))
+        }
+        let light = core.light, direction = core.light.direction
+        for item in items {
+            item.renderer.lightDirection = direction
+            item.renderer.ambient = light.ambient
         }
         let view = drawnView(core, delta: frame.delta)
         try depthPass.draw(items, camera: Self.camera(view), context: context)
         lastDrawnView = view
-        lastPartsDrawn = items.count
+        lastPartsDrawn = worldItems
+        lastPropsDrawn = items.count - worldItems
+        lastLight = light
         updateAnnouncements(core, delta: frame.delta)
     }
 
@@ -232,6 +307,8 @@ final class WorldsPresenter: ExperiencePresenter {
     func teardown(_ context: RenderContext) {
         isLive = false
         releaseRenderers()
+        releasePropRenderers()
+        lastPropsDrawn = 0
         depthPass?.release()
         depthPass = nil
         lastPartsDrawn = 0
@@ -319,6 +396,22 @@ final class WorldsPresenter: ExperiencePresenter {
         terrainBuildCount += 1
     }
 
+    /// The renderer of prop `kind`, made with the registry of `context` the first time it is needed.
+    private func propRenderer(_ kind: PropKind, _ context: RenderContext) throws -> MeshRenderer {
+        if let known = propRenderers[kind] { return known }
+        let model = PropCatalog.model(kind)
+        let renderer = try makeRenderer(model.mesh, colors: model.colors, context)
+        propRenderers[kind] = renderer
+        propBuildCount += 1
+        return renderer
+    }
+
+    /// Releases the prop renderers; the next frame makes them again.
+    private func releasePropRenderers() {
+        for renderer in propRenderers.values { renderer.release() }
+        propRenderers = [:]
+    }
+
     /// Releases every renderer and forgets their key.
     private func releaseRenderers() {
         for renderer in renderers { renderer.release() }
@@ -329,10 +422,11 @@ final class WorldsPresenter: ExperiencePresenter {
 
     // MARK: Motion, words and gestures
 
-    /// The level-0 height field of `core`'s world, made once per world; nil when it cannot be built.
+    /// The level-0 height field of `core`'s world, made once per world (from the core's memo); nil when it cannot be
+    /// built.
     func groundField(_ core: WorldsCore) -> HeightField? {
         if Self.key(core) == partsKey, let groundField { return groundField }
-        let field = try? TerrainGenerator.heightField(preset: core.preset, seed: core.seed)
+        let field = WorldsCore.heightField(of: core.state)
         if Self.key(core) == partsKey { groundField = field }
         return field
     }
@@ -368,14 +462,32 @@ final class WorldsPresenter: ExperiencePresenter {
         return words.prefix(1).uppercased() + words.dropFirst() + "."
     }
 
-    /// The ground point the view point `point` (points, top-left origin) on a canvas of `viewSize` points meets
-    /// through the camera of `view` over `field`, or nil (sky, void or a degenerate canvas).
-    nonisolated static func groundPoint(view: WorldView, point: Vec2, viewSize: Vec2, field: HeightField) -> Vec3? {
+    /// The ray of the camera of `view` through the view point `point` (points, top-left origin) on a canvas of
+    /// `viewSize` points, or nil for a degenerate canvas.
+    nonisolated static func ray(view: WorldView, point: Vec2, viewSize: Vec2) -> Ray3? {
         guard point.isFinite, viewSize.isFinite, viewSize.x > 0, viewSize.y > 0 else { return nil }
         let ndc = Vec2(2 * point.x / viewSize.x - 1, 1 - 2 * point.y / viewSize.y)
         let cast = camera(view).ray(ndc: ndc, aspect: viewSize.x / viewSize.y)
-        guard let ray = Ray3(origin: cast.origin, direction: cast.direction) else { return nil }
+        return Ray3(origin: cast.origin, direction: cast.direction)
+    }
+
+    /// The ground point the view point `point` (points, top-left origin) on a canvas of `viewSize` points meets
+    /// through the camera of `view` over `field`, or nil (sky, void or a degenerate canvas).
+    nonisolated static func groundPoint(view: WorldView, point: Vec2, viewSize: Vec2, field: HeightField) -> Vec3? {
+        guard let ray = ray(view: view, point: point, viewSize: viewSize) else { return nil }
         return GroundPick.hit(ray: ray, field: field)
+    }
+
+    /// What a tap along `ray` meets: the index of the nearest prop whose picking box it meets before the ground (or
+    /// with no ground behind it), else the ground point (nil for a miss).
+    nonisolated static func tapTarget(ray: Ray3, props: [PlacedProp], field: HeightField?)
+        -> (prop: Int?, ground: Vec3?) {
+        let ground = field.flatMap { GroundPick.hit(ray: ray, field: $0) }
+        let groundDistance = ground.map { ($0 - ray.origin).length } ?? .infinity
+        if let hit = WorldEditing.pick(ray: ray, props: props), hit.distance < groundDistance {
+            return (hit.index, ground)
+        }
+        return (nil, ground)
     }
 
     /// A number in words with one decimal ("1.2", "-0.5"; never "-0.0").
@@ -390,17 +502,28 @@ final class WorldsPresenter: ExperiencePresenter {
         return "Ground at x \(decimal(point.x)), z \(decimal(point.z)), height \(decimal(point.y)) metres."
     }
 
-    /// Resolves a tap at the view point `point` against the last drawn world and view, and speaks the result; the
-    /// state never changes. Returns the words.
+    /// Resolves a tap at the view point `point` against the last drawn world and view: a prop nearer than the ground
+    /// is selected through `send` (`prop.select`), otherwise the ground point is remembered for Place. The result is
+    /// spoken and returned.
     @discardableResult
-    func pick(at point: Vec2, viewSize: Vec2) -> String? {
-        guard let core = lastCore else { return nil }
+    func pick(at point: Vec2, viewSize: Vec2, send: WorldsGestures.Send) -> String? {
+        guard let core = currentCore else { return nil }
         let view = lastDrawnView ?? core.view
-        let hit = groundField(core).flatMap { field in
-            Self.groundPoint(view: view, point: point, viewSize: viewSize, field: field)
+        let target = Self.ray(view: view, point: point, viewSize: viewSize).map { ray in
+            Self.tapTarget(ray: ray, props: core.props, field: groundField(core))
         }
-        let words = Self.pickWords(hit)
+        let words: String
+        if let index = target?.prop {
+            let result = send("prop.select", [Double(index)])
+            words = Self.editWords("prop.select", [Double(index)], result: result, before: core.state,
+                                   after: currentCore?.state ?? core.state) ?? "No prop selected."
+        } else {
+            let hit = target?.ground
+            if let hit { lastGround = hit }
+            words = Self.pickWords(hit)
+        }
         lastPick = words
+        mirror.message = words
         speak(words)
         return words
     }
@@ -419,7 +542,7 @@ final class WorldsPresenter: ExperiencePresenter {
         var taps: [Vec2] = []
         current.handle(event, send: send) { taps.append($0) }
         gestures = current
-        for point in taps { pick(at: point, viewSize: viewSize) }
+        for point in taps { pick(at: point, viewSize: viewSize, send: send) }
     }
 
     // MARK: Geometry and colour
@@ -512,6 +635,9 @@ final class WorldsPresenter: ExperiencePresenter {
         if mirror.view != core.view { mirror.view = core.view }
         let status = Self.status(preset: core.preset, seed: core.seed, view: core.view)
         if mirror.status != status { mirror.status = status }
+        if mirror.props != core.props { mirror.props = core.props }
+        if mirror.selection != core.selection { mirror.selection = core.selection }
+        if mirror.light != core.light { mirror.light = core.light }
     }
 
     /// The compass direction the view looks from (north is +z, east is +x): "north", "north-east", … "north-west".
@@ -552,17 +678,241 @@ final class WorldsPresenter: ExperiencePresenter {
         "Tiny Worlds: \(status(preset: preset, seed: seed, view: view))."
     }
 
-    /// The description of `core`'s world.
+    /// The description of `core`'s world, with its props when there are any (feature 091).
     func describe(_ core: WorldsCore) -> String {
         sync(core)
-        return Self.description(preset: core.preset, seed: core.seed, view: core.view)
+        let base = Self.description(preset: core.preset, seed: core.seed, view: core.view)
+        guard let props = Self.propsWords(core.props, selection: core.selection) else { return base }
+        return String(base.dropLast()) + "; " + props + "."
     }
 
-    /// The native controls, sending through `port`.
+    /// The native controls, sending through `port`; editing actions are answered in words, slot actions go to the
+    /// presenter.
     func makeControls(_ port: ExperienceActionPort) -> AnyView {
-        AnyView(WorldsControls(port: port, mirror: mirror))
+        let edit = WorldsEditActions(
+            send: { [weak self] control, values in
+                guard let self else { _ = port.send(control, values); return }
+                self.send(control, values) { port.send($0, $1) }
+            },
+            place: { [weak self] kind in
+                guard let self else { return }
+                self.send("prop.place", self.placeValues(kind: kind)) { port.send($0, $1) }
+            })
+        let slots = WorldsSlotActions(
+            save: { [weak self] slot, still in _ = self?.saveWorld(slot: slot, still: still) },
+            open: { [weak self] slot in _ = self?.openWorld(slot: slot) },
+            clear: { [weak self] slot in _ = self?.clearWorld(slot: slot) })
+        return AnyView(WorldsControls(port: port, mirror: mirror, edit: edit, slots: slots))
     }
 
-    /// Every action has a native control, the gestures' `view.orbit` and `view.zoom` among them.
+    /// Every action has a native control, the gestures' `view.orbit`, `view.zoom` and `prop.select` among them.
     var nativeActions: Set<String> { Set(WorldsCore.actionIDs) }
+
+    // MARK: Editing words (feature 091)
+
+    /// The current core: the shell's, or the last one drawn.
+    private var currentCore: WorldsCore? { shell?.engine.core ?? lastCore }
+
+    /// The `prop.place` values for `kind`: the last tapped ground point (x and z clamped into −6…6), else the centre.
+    func placeValues(kind: Int) -> [Double] {
+        let range = WorldsCore.placeCoordinateRange
+        func clamp(_ v: Double) -> Double { min(max(v, range.lowerBound), range.upperBound) }
+        guard let ground = lastGround else { return [Double(kind), 0, 0] }
+        return [Double(kind), clamp(ground.x), clamp(ground.z)]
+    }
+
+    /// Sends `control` with `values` through `send` and answers it in words (shown and spoken); returns the result.
+    @discardableResult
+    func send(_ control: String, _ values: [Double], through send: WorldsGestures.Send) -> ActionResult {
+        let before = currentCore?.state
+        let result = send(control, values)
+        let after = currentCore?.state
+        if let words = Self.editWords(control, values, result: result, before: before, after: after) {
+            mirror.message = words
+            speak(words)
+        }
+        return result
+    }
+
+    /// The name of prop `kind` in a sentence: "tree", "rock", "house", "lantern".
+    nonisolated static func propName(_ kind: PropKind) -> String { kind.name.lowercased() }
+
+    /// The props in words: "1 prop, the tree selected", "3 props, none selected"; nil without props.
+    nonisolated static func propsWords(_ props: [PlacedProp], selection: Int) -> String? {
+        guard !props.isEmpty else { return nil }
+        let count = props.count == 1 ? "1 prop" : "\(props.count) props"
+        guard props.indices.contains(selection) else { return count + ", none selected" }
+        return count + ", the \(propName(props[selection].kind)) selected"
+    }
+
+    /// The reason of a refused action in words.
+    nonisolated static func refusalWords(_ result: ActionResult) -> String {
+        guard case .rejected(let reason) = result else { return "" }
+        if case .rule(let code) = reason, let refusal = WorldEditRefusal(rawValue: code) {
+            switch refusal {
+            case .propCap: return "Not done: the world already holds \(WorldEditing.maxProps) props."
+            case .outside: return "Not done: that point is outside the world."
+            case .underWater: return "Not done: that point is under water."
+            case .tooClose: return "Not done: too close to another prop."
+            case .noSelection: return "Not done: no prop is selected."
+            case .invalidChoice: return "Not done: that choice is not possible."
+            }
+        }
+        return "Not done: that value is out of range."
+    }
+
+    /// The light in words: "Light from 30 degrees, 50 degrees up, ambient 0.35."
+    nonisolated static func lightWords(_ light: WorldLight) -> String {
+        "Light from \(Int(light.azimuth.rounded())) degrees, \(Int(light.elevation.rounded())) degrees up, ambient "
+            + String(format: "%.2f", light.ambient) + "."
+    }
+
+    /// The words that answer `control` sent with `values` (state `before` and `after` it), or nil when the action is
+    /// answered elsewhere (the view's announcements) or changed nothing worth saying.
+    nonisolated static func editWords(_ control: String, _ values: [Double], result: ActionResult,
+                                      before: WorldState?, after: WorldState?) -> String? {
+        guard result.isAccepted else {
+            return control.hasPrefix("view.") ? nil : refusalWords(result)
+        }
+        switch control {
+        case "world.preset", "world.seed":
+            guard let before, !before.props.isEmpty, after?.props.isEmpty ?? true else { return nil }
+            return "The props were cleared for the new terrain."
+        case "prop.place", "prop.move":
+            guard let prop = after?.selectedProp else { return nil }
+            let verb = control == "prop.place" ? "Placed a" : "Moved the"
+            let preposition = control == "prop.place" ? "at" : "to"
+            return "\(verb) \(propName(prop.kind)) \(preposition) x \(decimal(prop.x)), z \(decimal(prop.z))."
+        case "prop.select":
+            guard let after, let prop = after.selectedProp else { return "No prop selected." }
+            return "Selected the \(propName(prop.kind)), prop \(after.selection + 1) of \(after.props.count)."
+        case "prop.rotate":
+            guard let prop = after?.selectedProp else { return nil }
+            let degrees = Int((prop.rotation / WorldView.radiansPerDegree).rounded())
+            return "Turned the \(propName(prop.kind)) to \(degrees == 0 ? 0 : degrees) degrees."
+        case "prop.delete":
+            guard let prop = before?.selectedProp else { return "Deleted the prop." }
+            return "Deleted the \(propName(prop.kind))."
+        case "light.azimuth", "light.elevation", "light.ambient":
+            guard let light = after?.light else { return nil }
+            return lightWords(light)
+        default:
+            return nil
+        }
+    }
+
+    // MARK: Saved worlds (feature 091)
+
+    /// What a refused save, open or clear means, in words.
+    nonisolated static func refusalText(_ refusal: WorldStoreRefusal) -> String {
+        switch refusal {
+        case .emptySlot: "The slot is empty."
+        case .invalidSlot: "There is no such slot."
+        case .document(.damaged): "The saved file is damaged and was left as it is."
+        case .document(.newerVersion): "The saved file comes from a newer version and was left as it is."
+        case .document(.tooLarge): "The saved file is too large and was left as it is."
+        case .storage(let error): "The storage refused it (\(error.code))."
+        }
+    }
+
+    /// What a slot holds, in words: "Holds “Island, seed 1”.", "Holds “Island, seed 1”, no picture.", "Empty." or
+    /// the refusal's text.
+    nonisolated static func holdingText(_ result: Result<WorldDocument, WorldStoreRefusal>, hasPicture: Bool) -> String {
+        switch result {
+        case .success(let document): hasPicture ? "Holds “\(document.name)”." : "Holds “\(document.name)”, no picture."
+        case .failure(.emptySlot): "Empty."
+        case .failure(let refusal): refusalText(refusal)
+        }
+    }
+
+    /// Reads every slot once: its name, picture and what it holds (nothing is written).
+    func refreshSlots() {
+        for slot in WorldStore.slots { refreshSlot(slot) }
+    }
+
+    /// Reads `slot` once: its name, picture and what it holds.
+    private func refreshSlot(_ slot: Int) {
+        let result = store.read(slot: slot)
+        let picture = store.thumbnail(slot: slot)
+        let name = (try? result.get())?.name ?? ""
+        if mirror.slotNames[slot] != name { mirror.slotNames[slot] = name }
+        if mirror.slotPictures[slot] != picture { mirror.slotPictures[slot] = picture }
+        mirror.slotStatus[slot] = Self.holdingText(result, hasPicture: picture != nil)
+    }
+
+    /// The 160 × 120 PNG of the current world drawn by `still`, or nil (no renderer, drawing or encoding failed, or
+    /// more than 64 KB).
+    static func thumbnail(_ still: ExperienceStillRenderer?) -> Data? {
+        guard let still,
+              let image = try? still(width: WorldStore.thumbnailWidth, height: WorldStore.thumbnailHeight),
+              let png = try? StillImageEncoder.pngData(image), png.count <= WorldStore.maxThumbnailBytes else {
+            return nil
+        }
+        return png
+    }
+
+    /// Saves the current world to `slot` as `WorldDocument(state:)` with a thumbnail drawn by `still` (no picture
+    /// without one). Returns the status text, also set as the slot's status and spoken.
+    @discardableResult
+    func saveWorld(slot: Int, still: ExperienceStillRenderer?) -> String {
+        guard WorldStore.slots.contains(slot) else { return Self.refusalText(.invalidSlot) }
+        guard let core = currentCore else { return report(slot, "Not saved: the world is not ready.") }
+        let document = WorldDocument(state: core.state)
+        let picture = Self.thumbnail(still)
+        switch store.save(document, slot: slot, thumbnail: picture) {
+        case .success(let stored):
+            refreshSlot(slot)
+            return report(slot, stored ? "Saved “\(document.name)”." : "Saved “\(document.name)”, no picture.")
+        case .failure(.document(.tooLarge)):
+            return report(slot, "Not saved: the world is too large to save.")
+        case .failure(let refusal):
+            return report(slot, "Not saved: " + Self.refusalText(refusal))
+        }
+    }
+
+    /// Opens the world saved in `slot`: the file is read and validated, and a snapshot of
+    /// `WorldsCore.opening(state:from:)` is restored through the shell. A refused file is left as it is and the world
+    /// stays. Returns the status text, also set as the slot's status and spoken.
+    @discardableResult
+    func openWorld(slot: Int) -> String {
+        guard WorldStore.slots.contains(slot) else { return Self.refusalText(.invalidSlot) }
+        let document: WorldDocument
+        switch store.read(slot: slot) {
+        case .success(let read): document = read
+        case .failure(let refusal): return report(slot, "Not opened: " + Self.refusalText(refusal))
+        }
+        guard let shell, let core = shell.engine.core else { return report(slot, "Not opened: the world is not ready.") }
+        let opened = WorldsCore.opening(state: document.state, from: core)
+        do {
+            let snapshot = try WorldsCore.openingSnapshot(of: opened, experience: shell.id,
+                                                          stepIndex: shell.engine.stepIndex)
+            try shell.restore(snapshot)
+        } catch {
+            return report(slot, "Not opened: the world could not be restored.")
+        }
+        lastGround = nil
+        sync(opened)
+        return report(slot, "Opened “\(document.name)”.")
+    }
+
+    /// Removes the world saved in `slot`. Returns the status text, also set as the slot's status and spoken.
+    @discardableResult
+    func clearWorld(slot: Int) -> String {
+        guard WorldStore.slots.contains(slot) else { return Self.refusalText(.invalidSlot) }
+        switch store.clear(slot: slot) {
+        case .success:
+            refreshSlot(slot)
+            return report(slot, "Cleared.")
+        case .failure(let refusal):
+            return report(slot, "Not cleared: " + Self.refusalText(refusal))
+        }
+    }
+
+    /// Sets `text` as the status of `slot` and the message, speaks it and returns it.
+    private func report(_ slot: Int, _ text: String) -> String {
+        mirror.slotStatus[slot] = text
+        mirror.message = text
+        speak(text)
+        return text
+    }
 }

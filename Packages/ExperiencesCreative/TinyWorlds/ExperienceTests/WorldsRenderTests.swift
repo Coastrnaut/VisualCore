@@ -13,6 +13,11 @@
 // eases to the state's view in 0.35 s of frame time (21 frames of 1/60 s) with the canvas label current at once, and
 // moves directly under Reduce Motion, also when it is switched on mid-ease; view announcements are spoken at most once
 // per second of the injected frame clock.
+//
+// Feature 091 (A12-P03) T-A12-303 (FR-A12-301, FR-A12-310; SC-A12-301; acceptance scenarios US1-1 and US2-2): placed
+// props are drawn with their model matrices (the pixels where a prop projects change when it is placed; one renderer
+// per kind, made lazily and released in teardown; the selected prop drawn brighter); the world light reaches every
+// renderer each frame, and a face lit head-on is brighter than after the light moves away and low.
 import Foundation
 import XCTest
 @testable import TinyWorldsExperience
@@ -114,6 +119,7 @@ final class WorldsRenderTests: XCTestCase {
         XCTAssertGreaterThan(camera.eye.z, 0, "and north of it")
         XCTAssertGreaterThan(camera.eye.y, WorldPreset.heightRange.upperBound)
         XCTAssertEqual(WorldsPresenter.lightDirection.length, 1, accuracy: 1e-12)
+        XCTAssertEqual(WorldsPresenter.lightDirection, WorldLight.default.direction, "the default light (feature 091)")
         XCTAssertEqual(WorldsPresenter.ambient, 0.35)
 
         XCTAssertEqual(WorldsPresenter.backgroundColor(.island), Vec4(0.16, 0.42, 0.62, 1))
@@ -351,6 +357,93 @@ final class WorldsRenderTests: XCTestCase {
         try WorldsTest.frames(session, 60)
         XCTAssertEqual(sink.announced.count, 2, "nothing more without a change")
         XCTAssertEqual(WorldsPresenter.spokenView(.default), "View from the north-east, 35 degrees up, 18 metres away.")
+        session.close()
+    }
+
+    // MARK: Feature 091
+
+    func testPlacedPropsAreDrawnWithTheirModelMatrices() async throws {
+        let session = ExperienceSession()
+        let shell = try await WorldsTest.open(session, size: CGSize(width: 240, height: 200))
+        let presenter = shell.presenter
+        XCTAssertTrue(shell.handle(control: "view.zoom", values: [2]).isAccepted)
+        try WorldsTest.settle(session, shell)
+        let before = try WorldsTest.picture(session)
+        XCTAssertEqual(presenter.lastPropsDrawn, 0)
+        XCTAssertTrue(presenter.propRenderers.isEmpty, "made lazily")
+        let digest = try shell.engine.digest()
+        XCTAssertTrue(shell.handle(control: "prop.place", values: [2, 0, 0]).isAccepted)
+        XCTAssertTrue(shell.handle(control: "prop.select", values: [-1]).isAccepted)
+        let plain = try WorldsTest.picture(session)
+        assertDrawn(shell, plain, "a house")
+        XCTAssertEqual(presenter.lastPropsDrawn, 1)
+        XCTAssertEqual(presenter.lastPartsDrawn, 2, "terrain and sea, then the props")
+        XCTAssertEqual(presenter.propRenderers.count, 1)
+        let house = try WorldsTest.core(shell).props[0]
+        let view = try XCTUnwrap(presenter.lastDrawnView)
+        let point = try XCTUnwrap(WorldsTest.viewPoint(Vec3(house.x, house.y + 0.3, house.z), view: view,
+                                                        size: Vec2(240, 200)))
+        let fx = point.x / 240, fy = point.y / 200
+        let a = WorldsTest.region(before, fx: fx, fy: fy, radius: 2), b = WorldsTest.region(plain, fx: fx, fy: fy,
+                                                                                               radius: 2)
+        XCTAssertGreaterThan(WorldsTest.differingPixels(a.flatMap { $0 }, b.flatMap { $0 }), 0,
+                             "the house is drawn where it projects")
+        XCTAssertGreaterThan(WorldsTest.differingPixels(before.rgba, plain.rgba), 0)
+        XCTAssertNotEqual(try shell.engine.digest(), digest)
+
+        // The selected prop is drawn brighter.
+        XCTAssertTrue(shell.handle(control: "prop.select", values: [0]).isAccepted)
+        let selected = try WorldsTest.picture(session)
+        let c = WorldsTest.region(selected, fx: fx, fy: fy, radius: 2)
+        XCTAssertGreaterThan(WorldsTest.meanLuma(c), WorldsTest.meanLuma(b), "the selection is highlighted")
+
+        // A second kind makes a second renderer; teardown releases both.
+        XCTAssertTrue(shell.handle(control: "prop.place", values: [0, 1.5, -1]).isAccepted)
+        try WorldsTest.frames(session, 1)
+        XCTAssertEqual(presenter.lastPropsDrawn, 2)
+        XCTAssertEqual(presenter.propRenderers.count, 2)
+        XCTAssertEqual(presenter.propBuildCount, 2)
+        session.close()
+        XCTAssertTrue(presenter.propRenderers.isEmpty)
+        XCTAssertEqual(presenter.lastPropsDrawn, 0)
+        XCTAssertEqual(session.diagnostics.lastCloseCounts?.objects, 0)
+    }
+
+    func testALitFaceIsBrighterThanAfterTheLightMovesAway() async throws {
+        let session = ExperienceSession()
+        let shell = try await WorldsTest.open(session, size: CGSize(width: 240, height: 200))
+        let presenter = shell.presenter
+        XCTAssertTrue(shell.handle(control: "view.zoom", values: [2]).isAccepted)
+        XCTAssertTrue(shell.handle(control: "prop.place", values: [1, 0, 0]).isAccepted)
+        XCTAssertTrue(shell.handle(control: "prop.select", values: [-1]).isAccepted)
+        try WorldsTest.settle(session, shell)
+        // The light from the eye's side (the default eye is north-east: azimuth 45°), high.
+        XCTAssertTrue(shell.handle(control: "light.azimuth", values: [45]).isAccepted)
+        XCTAssertTrue(shell.handle(control: "light.elevation", values: [60]).isAccepted)
+        let lit = try WorldsTest.picture(session)
+        XCTAssertEqual(presenter.lastLight, try WorldsTest.core(shell).light, "every frame takes the state's light")
+        for renderer in presenter.renderers + Array(presenter.propRenderers.values) {
+            XCTAssertEqual(renderer.lightDirection, WorldLight(azimuth: 45, elevation: 60, ambient: 0.35).direction)
+            XCTAssertEqual(renderer.ambient, 0.35)
+        }
+        let rock = try WorldsTest.core(shell).props[0]
+        let view = try XCTUnwrap(presenter.lastDrawnView)
+        let point = try XCTUnwrap(WorldsTest.viewPoint(Vec3(rock.x, rock.y + 0.3, rock.z), view: view,
+                                                        size: Vec2(240, 200)))
+        let fx = point.x / 240, fy = point.y / 200
+        // The light moved away (from the south-west, behind the rock) and low.
+        XCTAssertTrue(shell.handle(control: "light.azimuth", values: [225]).isAccepted)
+        XCTAssertTrue(shell.handle(control: "light.elevation", values: [10]).isAccepted)
+        let away = try WorldsTest.picture(session)
+        assertDrawn(shell, away, "light away")
+        XCTAssertGreaterThan(WorldsTest.meanLuma(WorldsTest.region(lit, fx: fx, fy: fy, radius: 2)),
+                             WorldsTest.meanLuma(WorldsTest.region(away, fx: fx, fy: fy, radius: 2)) + 5,
+                             "the rock's lit face is darker once the light moves away")
+        XCTAssertGreaterThan(WorldsTest.meanLuma(lit), WorldsTest.meanLuma(away), "and so is the terrain")
+        // More ambient light brightens the shadowed frame.
+        XCTAssertTrue(shell.handle(control: "light.ambient", values: [0.6]).isAccepted)
+        let ambient = try WorldsTest.picture(session)
+        XCTAssertGreaterThan(WorldsTest.meanLuma(ambient), WorldsTest.meanLuma(away))
         session.close()
     }
 }

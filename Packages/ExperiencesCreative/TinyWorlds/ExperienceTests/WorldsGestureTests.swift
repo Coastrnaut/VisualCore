@@ -90,7 +90,7 @@ final class WorldsGestureTests: XCTestCase {
 
     func testEveryGestureHasANativeControl() async throws {
         let presenter = WorldsPresenter(experienceID: WorldsTest.id)
-        XCTAssertEqual(presenter.gestureActions, ["view.orbit", "view.zoom"])
+        XCTAssertEqual(presenter.gestureActions, ["view.orbit", "view.zoom", "prop.select"])
         XCTAssertTrue(presenter.gestureActions.isSubset(of: Set(WorldsCore.actionIDs)))
         XCTAssertEqual(GestureAlternatives.missing(gesture: presenter.gestureActions, native: presenter.nativeActions),
                        [])

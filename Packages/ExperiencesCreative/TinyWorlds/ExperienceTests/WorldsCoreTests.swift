@@ -7,7 +7,11 @@
 // trip into another engine; damaged and newer snapshots refused; reset; the outcome. Feature 090 (A12-P02) T-A12-205
 // (FR-A12-210; SC-A12-201; edge case "Damaged or newer saved state"): every restored and every acted view keeps the
 // camera policy (limits and the 0.5 m clearance over the level-0 terrain), a restored view equals its policy clamp,
-// and a view that keeps the clearance restores unchanged.
+// and a view that keeps the clearance restores unchanged. Feature 091 (A12-P03) T-A12-303 (FR-A12-320; clarification
+// Q4): thirteen controls with their ranges, snapshot schema 2 with the step 1 → 2, three quality tiers still; the
+// conformance plan adds light and selection actions; newer snapshots are now schema 3, a schema-1 envelope around a
+// schema-2 payload is refused by the step, and a damaged prop or light in a payload is refused; the digest covers
+// props, selection and light.
 import Foundation
 import XCTest
 @testable import TinyWorldsExperience
@@ -33,10 +37,14 @@ final class WorldsCoreTests: XCTestCase {
     func testIdControlsSchemaTiersAndStep() {
         XCTAssertEqual(WorldsCore.experienceID, "a12.tiny-worlds")
         XCTAssertEqual(WorldsCore.controls.map(\.id),
-                       ["world.preset", "world.seed", "view.orbit", "view.zoom", "view.reset"])
+                       ["world.preset", "world.seed", "view.orbit", "view.zoom", "view.reset", "prop.place",
+                        "prop.select", "prop.move", "prop.rotate", "prop.delete", "light.azimuth", "light.elevation",
+                        "light.ambient"])
         XCTAssertEqual(WorldsCore.controls.map(\.id), WorldsCore.actionIDs)
-        XCTAssertEqual(WorldsCore.controls.map(\.ranges), [[0...2], [], [-180...180, -180...180], [0.5...2], []])
-        XCTAssertEqual(WorldsCore.migrations.currentVersion, 1)
+        XCTAssertEqual(WorldsCore.controls.map(\.ranges),
+                       [[0...2], [], [-180...180, -180...180], [0.5...2], [], [0...3, -6...6, -6...6], [-1...23],
+                        [-1...1, -1...1], [-180...180], [], [0...360], [10...85], [0.1...0.6]])
+        XCTAssertEqual(WorldsCore.migrations.currentVersion, 2, "schema 2 (feature 091)")
         XCTAssertEqual(WorldsCore.qualityTiers, 3, "level-0…level-2 (feature 090)")
         XCTAssertEqual(WorldsCore.stepDuration, 1.0 / 120, accuracy: 1e-15)
         XCTAssertEqual(WorldsRule.invalidChoice, "a12.invalid-choice")
@@ -48,12 +56,16 @@ final class WorldsCoreTests: XCTestCase {
             actions: [ScriptedAction("world.preset", [1]), ScriptedAction("world.seed"),
                       ScriptedAction("view.orbit", [20, -5]), ScriptedAction("view.zoom", [1.5]),
                       ScriptedAction("view.reset"), ScriptedAction("world.preset", [2]),
-                      ScriptedAction("world.seed")],
+                      ScriptedAction("world.seed"), ScriptedAction("light.azimuth", [200]),
+                      ScriptedAction("light.elevation", [25]), ScriptedAction("light.ambient", [0.5]),
+                      ScriptedAction("prop.select", [-1])],
             rejected: [ScriptedAction("world.preset", [0.5]), ScriptedAction("world.preset", [3]),
                        ScriptedAction("world.preset", [.nan]), ScriptedAction("world.preset", []),
                        ScriptedAction("world.seed", [1]), ScriptedAction("view.orbit", [200, 0]),
                        ScriptedAction("view.orbit", [10]), ScriptedAction("view.zoom", [0.25]),
                        ScriptedAction("view.zoom", [.infinity]), ScriptedAction("view.reset", [0]),
+                       ScriptedAction("prop.place", [4, 0, 0]), ScriptedAction("prop.move", [0.5]),
+                       ScriptedAction("light.elevation", [90]), ScriptedAction("light.ambient", [0]),
                        ScriptedAction("bogus")])
         let report = await ExperienceConformance.run(WorldsCore.self, id: worldsID, plan: plan)
         for entry in report.entries { XCTAssertTrue(entry.passed, "\(entry.check): \(entry.detail)") }
@@ -189,8 +201,16 @@ final class WorldsCoreTests: XCTestCase {
             WorldState(presetIndex: 0, seed: base.seed, view: zoomed, random: base.random),
             WorldState(presetIndex: 0, seed: base.seed, view: base.view, random: generator.state),
         ]
-        let digests = try states.map { try worldsDigest(worldsCore($0)) }
-        XCTAssertEqual(Set(digests).count, states.count, "preset, seed, view and generator are digested")
+        let withProp = worldsStateWithProps(count: 1)
+        var turnedProp = withProp
+        XCTAssertNil(WorldEditing.rotate(degrees: 1, in: &turnedProp))
+        var unselected = withProp
+        XCTAssertNil(WorldEditing.select(-1, in: &unselected))
+        var lit = base
+        XCTAssertTrue(lit.light.setElevation(20))
+        let digests = try (states + [withProp, turnedProp, unselected, lit]).map { try worldsDigest(worldsCore($0)) }
+        XCTAssertEqual(Set(digests).count, states.count + 4,
+                       "preset, seed, view, generator, props, selection and light are digested")
         XCTAssertEqual(try worldsDigest(worldsCore(base, seed: 9)), digests[0], "the preparation seed is not state")
 
         // The terrain digest is part of the digested text: a core whose cached terrain differed would digest
@@ -211,7 +231,7 @@ final class WorldsCoreTests: XCTestCase {
             }
         }
         let snapshot = try engine.snapshot()
-        XCTAssertEqual(snapshot.schemaVersion, 1)
+        XCTAssertEqual(snapshot.schemaVersion, 2)
         XCTAssertEqual(Data(snapshot.payload.utf8), try XCTUnwrap(engine.core).state.encoded())
         let saved = try XCTUnwrap(engine.core)
         var other = try await makeEngine(seed: 3)
@@ -258,10 +278,24 @@ final class WorldsCoreTests: XCTestCase {
             XCTAssertThrowsError(try engine.restore(worldsEnvelope(worldsPayload(saved.payload, change), like: saved)),
                                  name)
         }
-        // Newer: an envelope of schema 2, and a payload of schema 2 inside a schema-1 envelope.
-        XCTAssertThrowsError(try engine.restore(worldsEnvelope(Data(saved.payload.utf8), like: saved, schema: 2)))
-        let newerPayload = try worldsPayload(saved.payload) { $0["schema"] = 2 }
-        XCTAssertThrowsError(try engine.restore(worldsEnvelope(newerPayload, like: saved)))
+        // A damaged prop or light (feature 091).
+        let props: [(String, (inout [String: Any]) -> Void)] = [
+            ("prop outside", { $0["props"] = [["kind": 0, "rotation": 0.0, "scale": 1.0, "x": 9.0, "y": 0.2,
+                                               "z": 0.0]] }),
+            ("selection without props", { $0["selection"] = 0 }),
+            ("elevation 90°", { $0["light"] = ["ambient": 0.35, "azimuth": 30.0, "elevation": 90.0] }),
+            ("no light", { $0["light"] = nil }),
+        ]
+        for (name, change) in props {
+            XCTAssertThrowsError(try engine.restore(worldsEnvelope(worldsPayload(saved.payload, change), like: saved,
+                                                                   schema: 2)), name)
+        }
+        // Newer: an envelope of schema 3, and a payload of schema 3 inside a schema-2 envelope; a schema-1 envelope
+        // around a schema-2 payload is refused by the step 1 → 2.
+        XCTAssertThrowsError(try engine.restore(worldsEnvelope(Data(saved.payload.utf8), like: saved, schema: 3)))
+        let newerPayload = try worldsPayload(saved.payload) { $0["schema"] = 3 }
+        XCTAssertThrowsError(try engine.restore(worldsEnvelope(newerPayload, like: saved, schema: 2)))
+        XCTAssertThrowsError(try engine.restore(worldsEnvelope(Data(saved.payload.utf8), like: saved, schema: 1)))
         XCTAssertEqual(try engine.digest(), before, "every refusal leaves the state as it was")
 
         // The core names the reason.

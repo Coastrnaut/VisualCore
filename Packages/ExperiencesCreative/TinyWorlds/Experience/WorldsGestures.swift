@@ -21,6 +21,11 @@
 //     point and speaks it (no action, so the world never changes).
 // Both actions are also sent by the native controls (turn, tilt and zoom buttons), so `GestureAlternatives.missing`
 // is empty. The type never changes the world; `reset()` forgets every touch (suspension and teardown).
+//
+// Feature 091 (A12-P03) T-A12-303 (FR-A12-303; clarification Q2): the tap is routed to the presenter with the caller's
+// `send`, so a tap on a prop nearer than the ground sends `prop.select [index]` (a recorded action, also sent by the
+// Select previous and Select next controls); a tap on the ground is remembered as the next Place point. The gesture
+// actions are therefore `view.orbit`, `view.zoom` and `prop.select`, each with a native control.
 import Foundation
 import TinyWorldsCore
 import VisualCoreExperience
@@ -32,8 +37,9 @@ struct WorldsGestures: Sendable {
     /// What carries out an action and answers it.
     typealias Send = (String, [Double]) -> ActionResult
 
-    /// The actions the gestures send (each also reachable through a native control).
-    static let gestureActions: Set<String> = ["view.orbit", "view.zoom"]
+    /// The actions the gestures send (each also reachable through a native control): drag, pinch and, through the
+    /// presenter's tap routing, `prop.select`.
+    static let gestureActions: Set<String> = ["view.orbit", "view.zoom", "prop.select"]
     /// Degrees of yaw and of pitch per point of drag.
     static let degreesPerPoint = 0.3
     /// The declarations, by priority: pinch (two fingers) > drag > tap.

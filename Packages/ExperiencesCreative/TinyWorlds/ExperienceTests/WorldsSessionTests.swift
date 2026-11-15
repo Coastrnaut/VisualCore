@@ -35,7 +35,8 @@ final class WorldsSessionTests: XCTestCase {
         XCTAssertTrue(presenter.mirror.ready)
         XCTAssertEqual(presenter.mirror.presetIndex, 0)
         XCTAssertEqual(presenter.nativeActions, Set(WorldsCore.actionIDs))
-        XCTAssertEqual(presenter.gestureActions, ["view.orbit", "view.zoom"], "drag and pinch (feature 090)")
+        XCTAssertEqual(presenter.gestureActions, ["view.orbit", "view.zoom", "prop.select"],
+                       "drag and pinch (feature 090), a tap on a prop (feature 091)")
         XCTAssertEqual(GestureAlternatives.missing(gesture: presenter.gestureActions, native: presenter.nativeActions),
                        [])
 
@@ -114,8 +115,10 @@ final class WorldsSessionTests: XCTestCase {
         XCTAssertTrue(shell.handle(control: "world.preset", values: [1]).isAccepted)
         let saved = try shell.snapshot()
         first.close()
-        let newerEnvelope = try worldsEnvelope(Data(saved.payload.utf8), like: saved, schema: 2)
-        let newerPayload = try worldsEnvelope(worldsPayload(saved.payload) { $0["schema"] = 2 }, like: saved)
+        // Schema 3 is newer than the current schema 2 (feature 091).
+        let newerEnvelope = try worldsEnvelope(Data(saved.payload.utf8), like: saved, schema: 3)
+        let newerPayload = try worldsEnvelope(worldsPayload(saved.payload) { $0["schema"] = 3 }, like: saved,
+                                              schema: 2)
 
         for (name, newer) in [("envelope", newerEnvelope), ("payload", newerPayload)] {
             let second = ExperienceSession()
