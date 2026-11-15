@@ -150,6 +150,9 @@ final class ArcadePresenter: ExperiencePresenter {
     private(set) var lastPulseAmount = 0.0, lastDriftAmount = 0.0
     /// The canvas gesture (a drag steers).
     private var gestures = ArcadeGestures()
+    /// The port of the last canvas pointer event: a held drag keeps steering through it as the player moves
+    /// (T-A10-115).
+    private var followPort: ExperienceActionPort?
 
     private let clear = ClearColorScene(red: 0, green: 0, blue: 0)
     private var primitives: PrimitiveRenderer?
@@ -262,11 +265,17 @@ final class ArcadePresenter: ExperiencePresenter {
         layOut(core, width: width, height: height)
         if primitives == nil { primitives = try PrimitiveRenderer(registry: context.resources) }
         try primitives?.draw(root, camera: Camera2D(), metrics: ViewMetrics(size: Vec2(width, height), scale: 1))
+        // T-A10-115: a finger held still keeps steering by its offset from the drawn player (an action at the next
+        // step, recorded like any other; the drawing itself changes nothing).
+        if let port = followPort {
+            for action in gestures.follow(playerX: core.run.player.x) { _ = port.send(action.control, action.values) }
+        }
     }
 
     func teardown(_ context: RenderContext) {
         isLive = false
         gestures.reset()
+        followPort = nil
         primitives?.release()
         primitives = nil
     }
@@ -595,6 +604,7 @@ final class ArcadePresenter: ExperiencePresenter {
     /// through `port`; nothing happens before a state was seen.
     func pointer(_ event: PointerEvent, viewSize: Vec2, port: ExperienceActionPort) {
         guard let run = lastCore?.run else { return }
+        followPort = port
         let actions = gestures.handle(event, playerX: run.player.x, viewSize: viewSize)
         for action in actions { _ = port.send(action.control, action.values) }
     }

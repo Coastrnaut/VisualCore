@@ -265,6 +265,24 @@ final class ArcadeRenderTests: XCTestCase {
         session.close()
     }
 
+    /// T-A10-115 (FR-A10-121; clarification 4): a finger held still keeps steering by its offset from the player as
+    /// the player moves, reaching 0 under the finger, and nothing is sent while the value is unchanged.
+    func testAHeldDragFollowsTheFingerAsThePlayerMoves() {
+        var gestures = ArcadeGestures()
+        let view = Vec2(90, 160)   // 10 points per unit
+        XCTAssertTrue(gestures.follow(playerX: 4.5).isEmpty, "no drag, nothing")
+        _ = gestures.handle(ArcadeTest.touch(1, .began, 45, 140, at: 0), playerX: 4.5, viewSize: view)
+        let moved = gestures.handle(ArcadeTest.touch(1, .moved, 60, 140, at: 0.05), playerX: 4.5, viewSize: view)
+        XCTAssertEqual(moved.last?.values, [1], "1.5 units right of the player: full right")
+        XCTAssertTrue(gestures.follow(playerX: 4.5).isEmpty, "unchanged value, nothing sent")
+        XCTAssertEqual(gestures.follow(playerX: 5.25).first?.values, [0.5], "the player moved halfway: half")
+        XCTAssertTrue(gestures.follow(playerX: 5.25).isEmpty)
+        XCTAssertEqual(gestures.follow(playerX: 6.0).first?.values, [0], "under the finger: no steering")
+        XCTAssertEqual(gestures.follow(playerX: 6.75).first?.values, [-0.5], "past the finger: steers back")
+        _ = gestures.handle(ArcadeTest.touch(1, .ended, 60, 140, at: 0.3), playerX: 6.75, viewSize: view)
+        XCTAssertTrue(gestures.follow(playerX: 4.5).isEmpty, "released: nothing follows")
+    }
+
     func testTheProbeStepsAsideForObjectsNearIt() throws {
         let presenter = ArcadePresenter(experienceID: ArcadeTest.id)
         var run = GameRun.new()

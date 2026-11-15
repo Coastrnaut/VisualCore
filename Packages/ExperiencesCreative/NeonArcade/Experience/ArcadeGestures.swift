@@ -30,6 +30,11 @@ struct ArcadeGestures: Sendable {
     private var suppressed = false
     /// Whether a drag is steering (its release sends `run.steer [0]`).
     private(set) var steering = false
+    /// The held finger's last view point and the canvas size it was mapped with (T-A10-115).
+    private var fingerLocation: Vec2?
+    private var fingerViewSize: Vec2?
+    /// The last steering value sent (nil before any).
+    private(set) var lastSentSteering: Double?
 
     /// Creates the gesture with no touch in progress.
     init() {}
@@ -86,7 +91,28 @@ struct ArcadeGestures: Sendable {
             steering = false
             actions.append(("run.steer", [0]))
         }
+        if steering {
+            fingerLocation = event.location
+            fingerViewSize = viewSize
+        } else {
+            fingerLocation = nil
+            fingerViewSize = nil
+        }
+        if let last = actions.last { lastSentSteering = last.values.first }
         return actions
+    }
+
+    /// Feature 075 T-A10-115 (FR-A10-121; clarification 4): a finger held still keeps steering by its offset from the
+    /// player as the player moves. Called with the player's x of each drawn run while a drag steers: recomputes the
+    /// steering value from the held finger (rounded to 0.01) and returns `run.steer` only when it differs from the last
+    /// value sent, so the player settles under the finger and no action is sent while nothing changes.
+    mutating func follow(playerX: Double) -> [(control: String, values: [Double])] {
+        guard steering, !suppressed, let location = fingerLocation, let size = fingerViewSize,
+              let raw = Self.steeringValue(view: location, playerX: playerX, viewSize: size) else { return [] }
+        let value = (raw * 100).rounded() / 100
+        if let last = lastSentSteering, abs(last - value) < 0.005 { return [] }
+        lastSentSteering = value
+        return [("run.steer", [value])]
     }
 
     /// Cancels the drag in progress and forgets the fingers down (no action is sent).
@@ -95,6 +121,8 @@ struct ArcadeGestures: Sendable {
         down = []
         suppressed = false
         steering = false
+        fingerLocation = nil
+        fingerViewSize = nil
     }
 
     // MARK: Mapping
