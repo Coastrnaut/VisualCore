@@ -323,7 +323,7 @@
       "id": "a10.neon-arcade",
       "code": "A10",
       "title": "Neon Arcade",
-      "summary": "A compact collection of highly legible arcade games with glow, particles and disciplined game logic.",
+      "summary": "Neon Dodge: steer through falling hazards and collect orbs in waves.",
       "kind": "creative",
       "tier": "free",
       "category": "play",
@@ -340,11 +340,13 @@
       ],
       "tile_seed": 1936113027,
       "capabilities": [
-        "Neon Dodge",
-        "fixed-step game loop",
+        "fixed-step game",
         "swept collision",
-        "recorded input replay",
-        "local run state"
+        "wave patterns",
+        "local high scores",
+        "synthesized sounds and haptics",
+        "five steering sensitivities",
+        "three quality levels"
       ],
       "quality_tiers": [
         "level-0"

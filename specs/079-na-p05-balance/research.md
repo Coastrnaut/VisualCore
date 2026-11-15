@@ -17,6 +17,11 @@ optional manifest and permissions in a registration.
 - **Decision**: per clarification 3; each player reads the current `GameRun` and returns a steering value applied as a
   recorded `run.steer` each step it changes; median over 20 seeds; runs end at game over or 6,000 steps.
 
+- **Note (implementation, 2026-11-14)**: "within 1 unit sideways" is measured edge to edge (|dx| − halfLength − r −
+  0.4 ≤ 1), and the threat band is −(r + 0.4) < y − 1.5 < 4; read centre to centre the dodger grazed 0.6-radius hazards and
+  scored like idle (median wave 2.0). Measured over seeds 1…20: idle wave 2.0 / score 25.5, dodger 3.0 / 41.5, collector
+  2.0 / 66.5 — all targets met with no value tuned; contrast: spike-ball 5.69 vs field, ≥ 3.80 vs its glow at 0.35.
+
 ## D4 — Catalog summary
 - **Decision**: optional registration key `summary` (string, 1…300 characters) overriding the design summary in
   `Catalog/experiences.json`; a test in `scripts/test_scripts.py` covers present, absent and invalid.
