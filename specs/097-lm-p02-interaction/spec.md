@@ -23,6 +23,43 @@ Canonical overrides:
 - **Owner rulings:** short tests; audits and device runs in the device campaign; iOS 27 at phase gates; reference
   regression and iOS 26 at X-A13; every Spec Kit step runs.
 
+## Clarifications
+
+### Session 2026-11-15
+
+Answered autonomously under the owner's standing delegation, recommended option each time. Facts checked in code:
+`VisualCoreScenes` offers `TapRecognizer` (10 points, 0.3 s), `DragRecognizer` (begins after 10 points),
+`RotateRecognizer` (two fingers) and `GestureArbiter` with `GestureDeclaration(id:kind:priority:pointers:)`, as Tiny
+Worlds' `WorldsGestures` uses them (a pure value type over the arbiter, host-testable with synthetic pointer events,
+sending actions through the caller's `send`); `GestureAlternatives.missing(gesture:native:)` checks every gesture
+action has a native control; `MazePresenter` draws through `PrimitiveRenderer` with a `Camera2D` fitting the board and
+already offers `tile.select [index]` and `tile.turn`; `AnnouncementSink`/`ViewAnnouncer`-style rate limiting exists in
+Tiny Worlds (`ViewAnnouncer`, one per second of frame time).
+
+- Q: How does a canvas point map to a cell, and what does a tap do? → A: The presenter inverts its board camera (view
+  points → board units, cell = floor of x and y); a tap on a turnable tile sends `tile.select [index]` when it is not
+  selected and `tile.turn` when it is; a tap on anything else sends nothing and is answered in words ("Nothing to turn
+  there." / "Outside the board."). Taps on fixed tiles never change the board.
+- Q: How does a drag snap? → A: A drag that begins (10 points) on a turnable tile is measured from touch-down to the
+  latest point in board units; once it is at least 0.35 of a cell long it snaps the tile to `/` when the direction lies
+  within 45° of north-east or south-west, else to `\`, by a new action `tile.orient [index, 0 = /, 1 = \]` (refused
+  for a fixed tile or an index out of range; no change when already so); the tile is selected too. One orientation
+  change at most per drag movement; later movement may snap it back if the direction crosses over. A drag that begins
+  elsewhere does nothing.
+- Q: How does the two-finger rotation snap? → A: `RotateRecognizer` over the selected tile; each time the accumulated
+  angle passes ±45° from the last snap the tile turns once (`tile.turn`) and the reference resets; less than 45° does
+  nothing. Arbiter priorities: rotate 3 (two fingers), drag 2, tap 1.
+- Q: How is the glow drawn and bounded? → A: Layered primitives under the core line: a halo line of width 0.30 cell at
+  opacity 0.25 and the core line of width 0.08 cell at full opacity, in the beam colour; nothing post-processed, nothing
+  animated; the glow never exceeds 0.15 cell from the segment. Lit targets get a ring (an outline square inset 0.05 from
+  the target) and the selected tile an outline square inset 0.04 from its cell; both shapes, not colour alone.
+- Q: What do the loop fixtures and the spoken changes cover? → A: Core tests with committed boards: a mirror-only board
+  whose path returns to the emitter (ends "emitter"), a prism board whose branches meet (ends "loop"), a long mirror
+  spiral that reaches the bounce cap, each within 64 bounces per branch and 256 segments; a spoken change ("Beam ends at
+  the target; solved.") when the beam's end words or the solved state change, at most once per second of frame time,
+  while VoiceOver runs; the new action `tile.orient` has its native control alternative through Select and Turn (state
+  reached by turning) and is listed among the native actions.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Touch a mirror to turn it (Priority: P1) 🎯
