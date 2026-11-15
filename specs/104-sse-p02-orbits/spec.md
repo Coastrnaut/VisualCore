@@ -55,7 +55,7 @@ and AU through `Units.kmPerAU`.
   the record states this basis. The mean motion is 2π / the catalog's sidereal period (no secular rates), so the
   catalog and the orbits agree on periods.
 - Q: What is the date range, the start date and the fixture? → A: Days since J2000.0 (2000-01-01 12:00 UTC), allowed
-  −18,262.5 … +18,627.5 (1950-01-01 00:00 to 2050-12-31 00:00 UTC); start at 0. Steps ±1, ±30, ±365 days; others
+  −18,262.5 … +18,627.5 (1950-01-01 00:00 to 2051-01-01 00:00 UTC, the end of 2050); start at 0. Steps ±1, ±30, ±365 days; others
   refused `a14.invalid-step`; leaving the range refused `a14.out-of-range`. Fixture: Earth's heliocentric ecliptic
   longitude at J2000.0 is 100.38° ± 0.3°; Earth's perihelion and aphelion distances 0.98329 and 1.01671 AU ± 0.2 %;
   Mars between 1.381 and 1.666 AU ± 0.5 %; every planet back within 1e-6 rad of its start angle after one period; 100
@@ -180,7 +180,7 @@ The owner sees that the shown distances in AU and km agree, and that repeated da
 - **FR-A14-221**: Native controls MUST step the date, focus a body, orbit, tilt and zoom the camera and reset the view;
   the focused body stays in front of the near plane; every control has a label and value. Camera ranges: yaw in
   15° steps (unbounded, wraps), pitch 5°…85° in 10° steps (5 + 10k), zoom steps −1…12 (distance 60 × 1.25^−n,
-  4.03…75); a tilt or zoom step leaving its range is refused `a14.out-of-range`. The minimum distance 4 exceeds
+  4.12…75); a tilt or zoom step leaving its range is refused `a14.out-of-range`. The minimum distance 4 exceeds
   3 × the largest display radius + 0.5 (Sun 0.8 → 2.9), so focus never crosses the near plane.
 - **FR-A14-222**: The scenario manifest MUST be updated (state schema 2 with migration from 1) and pass the runner on
   iOS 27.

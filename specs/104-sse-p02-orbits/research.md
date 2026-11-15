@@ -23,7 +23,7 @@
 ## D4 — Display mapping and camera
 - **Decision**: heliocentric ecliptic (x, y, z) → scene (x, z, −y)·(4√r / r); orbit lines 128 samples, `tube` radius
   0.04, 6 sides, closed; camera target the focused body's scene position, yaw 15° steps, pitch 5…85°, distance
-  60·1.25^−zoomSteps with zoomSteps −1…12 (4.03…75; steps beyond refused), always ≥ 3·displayRadius + 0.5.
+  60·1.25^−zoomSteps with zoomSteps −1…12 (4.12…75; steps beyond refused), always ≥ 3·displayRadius + 0.5.
 - **Rationale**: √ mapping keeps Mercury and Neptune both visible in one overview (2.5 vs 21.9).
 
 ## D5 — Fixture tolerances

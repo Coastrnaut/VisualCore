@@ -508,9 +508,10 @@ let package = Package(
                     resources: [.copy("Fixtures")]),
         // A14 Solar System Explorer (feature 103, A14-P01): a candidate until X-A14.
         .target(name: "SolarSystemExplorerCore",
+                dependencies: [.product(name: "VisualCoreMath", package: visualCore)],
                 path: "SolarSystemExplorer/Core"),
         .testTarget(name: "SolarSystemExplorerCoreTests",
-                    dependencies: ["SolarSystemExplorerCore"],
+                    dependencies: ["SolarSystemExplorerCore", .product(name: "VisualCoreMath", package: visualCore)],
                     path: "SolarSystemExplorer/CoreTests"),
         .target(name: "SolarSystemExplorerExperience",
                 dependencies: ["SolarSystemExplorerCore",
