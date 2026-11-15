@@ -22,6 +22,46 @@ Canonical overrides:
 - **Constitution:** 2.7.0 adds the A11 experience rules (committed at the start of this gate).
 - **Evidence:** host and simulator only.
 
+## Clarifications
+
+### Session 2026-11-15
+
+Answered autonomously under the owner's standing delegation, recommended option each time. Facts checked in code:
+the A11 constitution commit is `35c24d86` and the A11-P00 specify commit `d3797d7c` (the phase start: the no-change
+diff of `Packages` and `External` is taken from it); the reference submodule is pinned at `d93edd1`; ten experiences
+are registered (`Catalog/registrations.json`, A01–A10); VisualCore offers `VisualCoreSimulation` (`FixedStepClock`,
+`FixedStepRunner` with `FixedStepSimulation`, `TimeStepPolicy` clamping the step to 1/240…1/30 s, `SeededRandom`,
+`ParticleSystem`, and `Collision2D` with `CollisionCircle` and `CollisionCapsule` overlap, closest point and swept
+tests added at A10-P01), `VisualCoreScenes` (`SceneNode` with `Primitive` rectangles, circles, lines, polygons and
+polylines drawn in one batch and hit tested; `TapRecognizer`, `DoubleTapRecognizer`, `LongPressRecognizer`,
+`DragRecognizer`, `PinchRecognizer`, `RotateRecognizer`, `GestureArbiter`), `VisualCoreRendering`
+(`PrimitiveRenderer`), `VisualCoreExperienceHost` and `VisualCoreExperience` (`ExperienceStorage`, quality tiers).
+No rigid-body dynamics exist in any framework product: no box or polygon contact generation, no impulse or constraint
+solver, no spring constraint and no broad phase; the only solver is Fluid Art Playground's app-local `FluidSolver`. No
+chart or plot component exists.
+
+- Q: How is the manual's "compile an empty shell" gate met in the one app? → A: As for A10: the one app is the shell;
+  this phase proves it builds for testing with Physics Playground absent; the targets come with A11-P01's first rules.
+- Q: What makes a capability "available"? → A: A public declaration in a VisualCore framework product with at least one
+  test that exercises it; an implementation that exists only inside another experience or a harness is "requires
+  adaptation" at best.
+- Q: Which package holds Physics Playground? → A: `Packages/ExperiencesCreative/PhysicsPlayground` (Auto-Creator.md
+  §16), as A05–A10 did; no new package is created.
+- Q: Does Physics Playground need a permission or a new privacy answer? → A: No. Version 0.1 needs no microphone,
+  camera, photos, motion or location; saved experiments live in the experience's own storage, so the app's privacy
+  answers do not change.
+- Q: Which pieces exist, and who owns the missing ones? → A: The fixed-step clock and runner, the step policy, batched
+  shapes with hit testing, the gesture recognizers, circle and capsule collision, storage and quality tiers exist. Gaps
+  and owners, following the manual's phases (P01 physics model, units and deterministic tests, P02 contacts and spring
+  solver, P03 gesture editor and overlays, P04 saved experiments and tutorials, P05 numerical stability and performance
+  audit): the body and world model with units, static bodies of zero mass, gravity, drag, integration, pause, single
+  step, time scale and reset → app-local over `FixedStepRunner` (A11-P01); box contacts (circle–box, box–box), an
+  impulse solver with restitution, friction and positional correction, spring constraints with bounded stiffness and a
+  broad phase → `VisualCoreSimulation` (A11-P02); spawn, grab, pin and delete gestures, velocity and force arrows and
+  the measured state panel → app-local over the recognizers, `Primitive` lines and polygons and native controls
+  (A11-P03); presets and saved experiments → app-local over `ExperienceStorage` (A11-P04); stability caps, the body
+  budget and sleeping bodies → app-local (A11-P05). The audit confirms or corrects each from the code.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - An evidence-backed integration matrix (Priority: P1) 🎯
