@@ -58,15 +58,15 @@ evidence**: no physical-device test of the unified app has been run.
 | A08 Oscilloscope Studio | experience in the app; X-A08 pass | `.autonomy/migration/checks/X-A08.*.json` |
 | A09 Digital Aquarium | experience in the app; X-A09 pass | `.autonomy/migration/checks/X-A09.*.json` |
 | A10 Neon Arcade | experience in the app; X-A10 pass — Neon Dodge: five lanes and four wave patterns, swept collision, title, pause and game-over screens, a local high-score table, synthesized sounds and haptics, five steering sensitivities, three quality levels ([contract](docs/apps/neon-arcade/visualcore-contract.md)) | `.autonomy/migration/checks/X-A10.*.json` |
-| A11 Physics Playground | a candidate in the app (A11-P01 pass) — circles and boxes that fall, collide and settle on a 10 × 8 m stage; pause, single step, time scale and reset; four licensed materials; VisualCore gains 2D contacts and an impulse solver ([contract](docs/apps/physics-playground/visualcore-contract.md)) | `.autonomy/checks/A11-P01.*.json` |
+| A11 Physics Playground | a candidate in the app (A11-P02 pass) — circles and boxes that collide, stack and settle on a 10 × 8 m stage; springs with bounded stiffness; gravity off, Moon or Earth and three drag levels; pause, single step, time scale and reset; four licensed materials; VisualCore gains 2D contacts, an impulse solver with warm starting, springs and a broad phase ([contract](docs/apps/physics-playground/visualcore-contract.md)) | `.autonomy/checks/A11-P02.*.json` |
 | A12–A25 | not started | `python3 Tools/python/desktop_runbook.py next` |
 | Shared round features (R02-F02 … F05, F26) | pass | `python3 scripts/migration_ledger.py status` |
 | Games of Rounds 2–12 | planned; none exists in source | [catalog](docs/catalog/experience-catalog.json) |
 | Physical-device testing | none run; waits for `ImplementationLock-100` | [support matrix](docs/release/support-matrix.md) |
 | App Store | no submission and nothing for sale; a one-time name and bundle reservation is prepared and waits for the owner (signing, App Store Connect and agreements are owner actions) | [build and archive](docs/release/build-and-archive.md), [name reservation](docs/release/name-reservation.md) |
 
-Ledger totals today: the legacy ledger records **82 of 263** gates as passed (F00–F09 and the app phases
-A01-P00 … A11-P01); the unified-app ledger has 1,233 gates, with 10 experience gates (X-A01 … X-A10), 11 unified-app features,
+Ledger totals today: the legacy ledger records **83 of 263** gates as passed (F00–F09 and the app phases
+A01-P00 … A11-P02); the unified-app ledger has 1,233 gates, with 10 experience gates (X-A01 … X-A10), 11 unified-app features,
 5 shared round features and both governance milestones passed.
 
 ```bash
@@ -85,7 +85,8 @@ python3 scripts/migration_ledger.py status        # unified-app gates and the ne
   steering (separation, alignment, cohesion, boundary) over a capped neighbour search moves schools of agents;
   circle and capsule overlap tests and a swept circle test (`Collision2D`) keep fast objects from passing through
   each other between steps; circle and box contact manifolds (`Contacts2D`) and a sequential impulse solver with
-  restitution and friction (`ImpulseSolver2D`) let rigid bodies collide and come to rest.
+  restitution, friction and warm starting (`ImpulseSolver2D`), springs (`Springs2D`) and a broad phase
+  (`BroadPhase2D`) let rigid bodies collide, hang on springs and come to rest.
 - **Experience contract.** Every experience implements one contract (core state, actions, snapshots with migrations,
   quality tiers, accessibility description) and is opened, suspended, restored and torn down by one host.
 - **Audio without recording.** Live analysis of microphone, file and test-signal input in memory only; nothing is
