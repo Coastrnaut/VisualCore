@@ -223,6 +223,26 @@ and `VisualCoreRendering` (iOS, GL). ADR-0003 and the package map record this. R
   too-large or newer world file is refused with its reason and left in place until the person saves over it
   (`WorldStoreTests.testRefusedFilesAreReportedAndLeftUntouched`).
 
+### Light Maze (A13; features 095–101)
+
+- Frame pacing on the largest boards (levels 15 and 20), the thermal state over a ten-minute session, the memory
+  high-water mark across level switches, the touch latency of tap-to-turn, drag and two-finger rotation, and the feel
+  of the success haptic and sweep are unmeasured on devices; they wait for the device campaign
+  ([device-campaign.md](../apps/light-maze/device-campaign.md), rows LM-D1 to LM-D5). No frame-time, latency, power or
+  memory figure is stated.
+- The system accessibility audits, Dynamic Type at the largest sizes on hardware and the VoiceOver pass on hardware
+  (row LM-D6) wait for the device campaign; the labels and values, the native alternative to every gesture, the spoken
+  board and hints, colour plus sign with at least 3:1 contrast and the Reduce Motion and Reduce Flashing behaviour are
+  proved by the experience's tests only.
+- The beams follow the game's grid rules, not real light: a beam travels along the grid, a mirror turns it at equal
+  angles on one of two diagonals, a prism splits it into two branches, and a beam ends after a set number of bounces;
+  there is no refraction, colour mixing, intensity falloff or curved surface.
+- Twenty handcrafted levels in version 0.1 and no level editor: levels cannot be made, imported or exchanged, and no
+  levels are generated. Tiles turn between two diagonals only; they cannot be moved.
+- The level progress is kept on the device only (no sync, no export). A damaged, half-written, too-large or newer
+  progress file is refused with its reason, play starts from fresh progress, and the file is left in place until the
+  next solve replaces it (`ProgressStoreTests.testRefusedFilesAreReportedAndLeftUntouched`).
+
 ## Distribution
 
 - No App Store submission, signing or purchase setup is part of this release; those are owner actions.
