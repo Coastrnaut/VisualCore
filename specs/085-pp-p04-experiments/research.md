@@ -24,13 +24,16 @@ Facts verified on 2026-11-15 (clarification session).
   `experiment-<slot>.json` over `ExperienceStorage`, reporting `empty-slot` and storage errors; never rewrites a refused
   file; `clear` removes. Opening: the presenter asks the core for a state built from the document
   (`PlaygroundCore.opening(document:slot:from:)`) and restores it through `ExperienceShell.restore` with a snapshot of
-  the current schema.
+  the current schema. As built (T-A11-410): opening keeps the generator and a running tutorial (the spec's edge case:
+  a tutorial stays on its step when a preset or slot opens), restarting the current step at the opened world's tick.
 
 ## D4 — Tutorials
 
 - **Decision**: `Tutorials.all` (two tutorials, steps with text and a pure condition over (state, step-start tick, step
   start paused tick)); `TutorialProgress` (id, step, startTick); evaluated after every applied action and every host
-  step; completing the last step ends the tutorial; `tutorial.stop` clears progress only.
+  step; completing the last step ends the tutorial; `tutorial.stop` clears progress only. As built (T-A11-410): a
+  reset, an opened preset or an opened slot restarts the current step at the new world's tick, since the tick jumps
+  back and a step measured from the old start tick could never complete.
 
 ## D5 — Fixtures
 
