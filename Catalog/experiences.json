@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "catalog_sha256": "9fdedb7159c36e6db58f0d9587d85ba3650c98df93f96e7beb9455f397fb1d23",
+  "catalog_sha256": "168b3087266a50bd31e3088de76dd104f59e0bccd756112f8010ac3011716a0a",
   "experiences": [
     {
       "id": "a01.generative-art-studio",
@@ -477,7 +477,7 @@
       "id": "a14.solar-system-explorer",
       "code": "A14",
       "title": "Solar System Explorer",
-      "summary": "An educational solar system viewer that cleanly distinguishes astronomical scale, time simulation and artistically exaggerated displays.",
+      "summary": "A solar system primer: the Sun and the eight planets with fact cards whose numbers carry units and sources.",
       "kind": "creative",
       "tier": "free",
       "category": "learn",
@@ -486,10 +486,24 @@
         "education-and-science"
       ],
       "order": 14,
-      "palette": [],
+      "palette": [
+        "#05070F",
+        "#FFB547",
+        "#4C8BF5",
+        "#E8EAF0"
+      ],
       "tile_seed": 3067068499,
-      "capabilities": [],
-      "quality_tiers": [],
+      "capabilities": [
+        "the Sun and eight planets",
+        "fact cards with units and sources",
+        "distances in km and AU",
+        "values from NASA's fact sheet",
+        "planets drawn in code",
+        "sizes and spacing not to scale"
+      ],
+      "quality_tiers": [
+        "level-0"
+      ],
       "content": null,
       "available": false
     },

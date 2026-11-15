@@ -2876,10 +2876,10 @@
    "implementation": {
     "state": "standalone-partial",
     "legacy_gates_passed": [
-     "A14-P00"
+     "A14-P00",
+     "A14-P01"
     ],
     "legacy_gates_pending": [
-     "A14-P01",
      "A14-P02",
      "A14-P03",
      "A14-P04",
