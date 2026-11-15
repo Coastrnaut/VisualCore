@@ -13,7 +13,7 @@ stay open, as for A10-P06.
 ## Phase 2: User Story 1 — nothing leaves the device (P1) 🎯
 
 - [ ] T-A11-602 [P] [US1] Write `docs/apps/physics-playground/privacy-and-credits.md` (stored: `experiment-<slot>.json` saved experiments and the app's session state in the experience's folder, no personal data; nothing sent; no permission; how to delete: delete an experiment in the experience, the app's Settings reset of the experience's data, or removing the app; credits from `content-licenses.md`: 4 materials, 4 presets, 2 tutorials, all original) (FR-A11-601, 604)
-- [ ] T-A11-603 [US1] Source scan (`--name pp-no-network -- /bin/sh -c "! grep -rnE 'URLSession|import Network|CLLocation|AVCapture|AVAudioRecorder|inputNode|installTap|CMMotion|CNContact|ASIdentifierManager|AppTrackingTransparency|UIScreen.main.brightness|isIdleTimerDisabled' Packages/ExperiencesCreative/PhysicsPlayground"`) (FR-A11-602; SC-A11-601)
+- [X] T-A11-603 [US1] Source scan (`--name pp-no-network -- /bin/sh -c "! grep -rnE 'URLSession|import Network|CLLocation|AVCapture|AVAudioRecorder|inputNode|installTap|CMMotion|CNContact|ASIdentifierManager|AppTrackingTransparency|UIScreen.main.brightness|isIdleTimerDisabled' Packages/ExperiencesCreative/PhysicsPlayground"`) (FR-A11-602; SC-A11-601) — Verified 2026-11-15: 2026-11-15: .autonomy/checks/A11-P06.pp-no-network.json exit 0 (no network, tracking, sensor, recording, brightness or idle-timer use in Packages/ExperiencesCreative/PhysicsPlayground)
 
 ## Phase 3: User Story 2 — damaged data never breaks the playground (P1)
 

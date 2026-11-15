@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "/bin/sh",
+    "-c",
+    "! grep -rnE 'URLSession|import Network|CLLocation|AVCapture|AVAudioRecorder|inputNode|installTap|CMMotion|CNContact|ASIdentifierManager|AppTrackingTransparency|UIScreen.main.brightness|isIdleTimerDisabled' Packages/ExperiencesCreative/PhysicsPlayground"
+  ],
+  "command": "/bin/sh -c '! grep -rnE '\"'\"'URLSession|import Network|CLLocation|AVCapture|AVAudioRecorder|inputNode|installTap|CMMotion|CNContact|ASIdentifierManager|AppTrackingTransparency|UIScreen.main.brightness|isIdleTimerDisabled'\"'\"' Packages/ExperiencesCreative/PhysicsPlayground'",
+  "elapsed_seconds": 0.047,
+  "exit_code": 0,
+  "finished": "2026-11-15T10:09:07+00:00",
+  "log": ".autonomy/logs/A11-P06.pp-no-network.log",
+  "log_sha256": "f1a754bd1602c89a997c77ca7e5de2f861c35f54e774d5a0681c6aae0a486db7",
+  "name": "pp-no-network",
+  "stage": "A11-P06",
+  "started": "2026-11-15T10:09:07+00:00",
+  "timed_out": false
+}
