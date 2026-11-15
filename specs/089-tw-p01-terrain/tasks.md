@@ -49,3 +49,7 @@ Package.swift, 105, 106 regeneration, 107, 108, runs, commits.
 
 MVP: noise, height field and the preset terrains with fixtures (US2 and US1's rules), then the drawn world,
 registration, manifest and records; evidence last.
+
+## Phase 6: Convergence
+
+- [ ] T-A12-115 Record in `specs/089-tw-p01-terrain/research.md` (as built): D2 — shared-edge equality is bit-exact for cell sizes exact in binary (the presets use 12/64 and 12/48 m); D4 — the engine refuses out-of-range and non-finite values (`action.out-of-range`, `action.non-finite`) and wrong value counts before `WorldsCore`, so `a12.invalid-choice` covers fractional choices and direct core calls; the state digest is the state JSON plus the terrain digest, so turning the view changes the state digest and leaves the terrain digest and renderers unchanged; the terrain digest is memoised per preset and seed (≤ 64 entries, pure, so cached equals regenerated); the preparation seed in 1…UInt32.max names the world seed, otherwise seed 1; D5 — the zoom refusal scenario uses 0.25 (every factor in 0.5…2 is legal) and the launch probe reads the clear colour outside the projected world, per plan: research D2/D4/D5 (partial, unrequested)
