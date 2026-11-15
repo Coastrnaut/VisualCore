@@ -1,0 +1,52 @@
+# Tasks: Solar System Explorer — Phase 04 Time controls and guided tours
+
+**Input**: [spec.md](spec.md), [plan.md](plan.md), [research.md](research.md), [data-model.md](data-model.md),
+[contracts/canvas-overlay.md](contracts/canvas-overlay.md), [contracts/time-tours.md](contracts/time-tours.md),
+[quickstart.md](quickstart.md). Gate A14-P04 (legacy). Evidence:
+`python3 Tools/python/desktop_runbook.py run-check --stage A14-P04 --timeout 600 --name <check> -- <command>`. Commit
+after every task (no trailers); read every check's exit before ticking. iOS 27 only; reference regression and iOS 26 at
+X-A14. Precedents: `specs/096-lm-p01-solver/tasks.md` (VisualCore addition), `specs/105-sse-p03-bodies/tasks.md`.
+
+## Phase 1: Setup
+
+- [ ] T-A14-401 Baseline: cite the last evidence on the unchanged tree (`.autonomy/checks/A14-P03.{sse-ios27,app-unit,verify-27}.json`) instead of a rerun (owner ruling of 2026-11-14)
+
+## Phase 2: Foundational — VisualCore host slot (story 3)
+
+- [ ] T-A14-402 [P] [US3] Add the canvas overlay slot per contracts/canvas-overlay.md in `Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/{ExperiencePresenter,ExperienceShell,ExperienceHostView}.swift` (`makeCanvasOverlay(_:) -> AnyView?` default nil; `Experience.canvasOverlay` default nil; the shell forwards; the host view draws it over the render surface with `.allowsHitTesting(false)` and `.accessibilityHidden(true)`; `///` on every new symbol) with `Packages/VisualCoreRendering/Tests/VisualCoreExperienceHostTests/CanvasOverlayTests.swift` (default nil; a presenter's overlay reaches the shell; the host view builds with and without one) (FR-A14-420)
+- [ ] T-A14-403 Document the slot in `Packages/VisualCoreRendering/README.md` and update the API baseline (`python3 scripts/check_public_api.py --update`); checks `--name host-overlay -- python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --only-testing VisualCoreExperienceHostTests/CanvasOverlayTests VisualCoreExperienceHostTests/ExperienceHostViewTests VisualCoreExperienceHostTests/ShellPortTests`, `--name visualcore-api -- python3 scripts/check_public_api.py` (FR-A14-420, 430)
+
+## Phase 3: Foundational — core clock, tours and saved view (stories 1–3)
+
+- [ ] T-A14-404 [P] [US1] Add `Packages/ExperiencesCreative/SolarSystemExplorer/Core/{SimClock,Tours,SavedView}.swift` per data-model.md (`SimClock` rates "[1, 7, 30, 365] days/s", step 1/120 s, advance with clamp and "end-of-range"; `Tour.bundled` "Inner planets" (0, 1, 2, 3, 4) and "Giant planets" (5, 6, 7, 8), "≤ 6 stops", holdSteps 600, captions built from catalog values with units and the source title; `SavedView` schema 1 with "selection 0…8, dayOffset (in range), rateIndex 0…3, yawSteps, pitchDegrees 5 + 10k in 5…85, zoomSteps −1…12, scaleMode 0…1" and refusals `damaged`, `newer-version`, `out-of-range`, `oversized` (> 4,096 bytes)), and `SimulatedDate.labelWithTime` ("2025-01-01 12:00 UTC"), with `CoreTests/{SimClockTests,ToursTests,SavedViewTests}.swift` (N steps advance exactly rate × N / 120 days for each rate; clamp at both ends with the reason; tours ≤ 6 stops and ≤ 40 s; every caption number appears in the catalog with its unit; saved view round trip and each refusal) (FR-A14-401–403, 410, 421; SC-A14-401–403, 405)
+- [ ] T-A14-405 [US1] `SolarState` schema 4 in `Core/SolarState.swift` (schema 3 + "playing, rateIndex 0…3, stopReason ("" or "end-of-range"), tourIndex −1…1, tourStop, tourStep 0…599, tourPaused"; `advance()` for one host step: clock then tour; migration 3 → 4 "paused, rate 0, no tour"; damaged or newer refused) with `CoreTests/SolarStateSchema4Tests.swift` and the existing state tests adjusted (FR-A14-401, 402, 411, 430)
+
+## Phase 4: Stories 1–2 — experience model
+
+- [ ] T-A14-406 [US2] Update `Experience/Adapter/SolarCore.swift` (`update(step:)` advances the state; actions `time.play [0…1]`, `time.rate [0…3]`, `date.set`, `tour.start [0…1]`, `tour.next`, `tour.pause [0…1]`, `tour.stop`, `view.apply [7 values]`; refusals `a14.invalid-choice`, `a14.no-tour`, `a14.out-of-range`; body choices and `view.apply` stop a tour; `tour.start` restarts; migration 3 → 4; canvas description with the UTC time, play state and rate, and the tour caption while touring) with `SolarCoreTests` adjusted (FR-A14-401–403, 411, 421)
+- [ ] T-A14-407 [US2] Update `Experience/Adapter/SolarManifest.swift` (schema 4; fixtures `fixture-play-year` and `fixture-tour-inner`; digests re-pinned) and regenerate `SolarSystemExplorer/scenario-manifest.json` with `SolarManifestTests` adjusted (FR-A14-430)
+
+## Phase 5: Stories 1–3 — presenter, controls and overlay
+
+- [ ] T-A14-408 [US3] Add `Experience/{LabelLayout,ViewStore,AnnouncementLimiter,SolarOverlay}.swift` and update `Experience/{SolarPresenter,SolarControls,SolarSystemExplorerExperience}.swift` (labels per Clarifications Q4 in the overlay with the tour caption; `ViewStore` over `ExperienceStorage` "`view.json`"; Save view and Restore view controls sending `view.apply`; Play/Pause, Rate, Now (injected clock), tour menu, Next stop, Pause tour, Stop tour, each with label and value; spoken date at most every 10 s through the limiter with an injected clock; storage passed from `make`) with `ExperienceTests/{LabelLayoutTests,ViewStoreTests,AnnouncementLimiterTests,SolarTimeTourSessionTests}.swift` and existing render and session tests adjusted (labels never overlap and none behind the camera; save, change, restore returns the view; damaged, newer and oversized files refused; limiter intervals; playing a year moves Earth's drawn position; a tour visits its stops and shows the caption; Reduce Motion cuts tour flights) (FR-A14-403, 411, 420, 421; SC-A14-404, 405)
+
+## Phase 6: Records and evidence
+
+- [ ] T-A14-409 Contract `docs/apps/solar-system-explorer/visualcore-contract.json`: G-TIME and G-TOURS closed by "A14-P04"; rows M05, M08, M10, M11, M15, M22, M23 updated; the host slot recorded (`--name contract -- python3 scripts/check_app_contract.py --app solar-system-explorer --render`)
+- [ ] T-A14-410 Solar System Explorer tests on sim-27.2 (`--name sse-ios27 -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing SolarSystemExplorerCoreTests SolarSystemExplorerExperienceTests`) and documented API (`--name visualcore-docs -- python3 scripts/check_documented_api.py --sources Packages/ExperiencesCreative/SolarSystemExplorer`) (SC-A14-401–406)
+- [ ] T-A14-411 App build and unit (`xcodegen generate --spec project.yml`; `--name app-unit -- python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27`) and runner (`--name verify-27 -- python3 scripts/verify_experiences.py --only a14.solar-system-explorer --runtime 27`) (SC-A14-406)
+- [ ] T-A14-412 Packages and script tests (`--name experience-packages -- python3 scripts/check_experience_packages.py`; `--name script-tests -- python3 scripts/test_scripts.py`)
+- [ ] T-A14-413 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A14-P04; update README.md in the record commit (rule 16)
+
+## Dependencies
+
+T-A14-401 → (402 ∥ 404) → 403; 404 → 405 → 406 → 407; (403, 406) → 408 → 409 → 410 → 411 → 412 → 413.
+
+## Parallel examples
+
+Agent A: T-A14-402. Agent B: T-A14-404. Lead: 403, 405–407. Agent C: T-A14-408 after 403 and 406.
+
+## Implementation strategy
+
+MVP: the clock (404–406, story 1), then tours (story 2), then the overlay, labels and saved view (story 3). Review
+checkpoints after 403 (host tests and API), after 405 (core tests) and at 410.
