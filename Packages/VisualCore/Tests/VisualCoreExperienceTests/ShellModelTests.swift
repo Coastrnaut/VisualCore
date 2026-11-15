@@ -258,7 +258,7 @@ import Testing
         #expect(LauncherModel.shown(manifest: manifest, registered: everything).map(\.id.rawValue) == ["a01.generative-art-studio", "a02.fluid-art-playground", "a03.fractal-explorer",
                          "a04.particle-universe", "a05.infinite-geometry", "a06.visualcore-music-lab",
                          "a07.audio-odyssey", "a08.oscilloscope-studio", "a09.digital-aquarium",
-                         "a10.neon-arcade"])
+                         "a10.neon-arcade", "a11.physics-playground"])
         for search in ["", "aurora"] {
             #expect(LauncherModel.state(manifest: .success(manifest), categories: categories, registered: [],
                                         searchText: search) == .empty, "nothing registered shows nothing")

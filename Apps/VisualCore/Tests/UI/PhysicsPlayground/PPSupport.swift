@@ -1,5 +1,5 @@
 // PPSupport — feature 087 (A11-P06) T-A11-608 (FR-A11-630): helpers of the interface tests of Physics Playground (A11)
-// inside the one app, modelled on `NASupport`. A11 is a candidate until X-A11: every launch carries `-vcCandidates`
+// inside the one app, modelled on `NASupport`. A11 was a candidate until X-A11 (integrated 2026-11-15); every launch still carries `-vcCandidates`
 // (DebugLaunch: the candidates' catalog entries become available and are registered), and the tests open it directly
 // with `-openExperience a11.physics-playground`. The controls are found by the identifiers of `PlaygroundControls`
 // (`port.identifier(name)`, that is `experience.a11.physics-playground.<name>`): Drop circle and Drop box

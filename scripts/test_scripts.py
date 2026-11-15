@@ -1300,7 +1300,7 @@ class UnifiedAppTargetTests(unittest.TestCase):
                                     "DigitalAquariumExperience",
                                     # Feature 075 (A10-P01): Neon Arcade, integrated at X-A10.
                                     "NeonArcadeExperience",
-                                    # Feature 082 (A11-P01): Physics Playground, a candidate until X-A11.
+                                    # Feature 082 (A11-P01): Physics Playground, integrated at X-A11.
                                     "PhysicsPlaygroundExperience"])
 
     def test_the_standing_isolation_step_requires_sources(self):
