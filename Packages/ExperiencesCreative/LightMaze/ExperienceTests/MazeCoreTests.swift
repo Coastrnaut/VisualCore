@@ -35,11 +35,11 @@ final class MazeCoreTests: XCTestCase {
         XCTAssertEqual(MazeCore.experienceID, "a13.light-maze")
         let ids: [String] = MazeCore.controls.map(\.id)
         XCTAssertEqual(ids, ["level.select", "level.next", "level.previous", "tile.select", "tile.turn", "level.reset",
-                             "move.undo"])
+                             "move.undo", "hint.show"])
         XCTAssertEqual(ids, MazeCore.actionIDs)
         XCTAssertEqual(MazeCore.levelCount, 20)
         XCTAssertEqual(MazeCore.maxTurnable, 8)
-        let ranges: [[ClosedRange<Double>]] = [[0...19], [], [], [0...7], [], [], []]
+        let ranges: [[ClosedRange<Double>]] = [[0...19], [], [], [0...7], [], [], [], []]
         XCTAssertEqual(MazeCore.controls.map(\.ranges), ranges)
         XCTAssertEqual(MazeCore.migrations.currentVersion, 2)
         XCTAssertEqual(MazeCore.qualityTiers, 1)
@@ -362,26 +362,29 @@ final class MazeCoreTests: XCTestCase {
     }
 
     func testTheCanvasDescriptionFollowsClarificationQ5() {
+        // Feature 099: the count of lit targets precedes the solved words (A13-P04 clarification Q2).
         let first = MazeCore(seed: 1)
         XCTAssertEqual(first.canvasDescription,
-                       "Light Maze: level 1, First light; 1 mirror, 1 target; beam ends at the wall; not solved.")
+                       "Light Maze: level 1, First light; 1 mirror, 1 target; beam ends at the wall; 0 of 1 target lit; "
+                       + "not solved.")
         var solved = first
         _ = solved.apply(action("tile.select", [0]))
         _ = solved.apply(action("tile.turn"))
         XCTAssertEqual(solved.canvasDescription,
-                       "Light Maze: level 1, First light; 1 mirror, 1 target; beam ends at the target; solved.")
+                       "Light Maze: level 1, First light; 1 mirror, 1 target; beam ends at the target; 1 of 1 target lit; "
+                       + "solved.")
         let two = MazeState(levelIndex: 1)
         XCTAssertEqual(MazeCore.canvasDescription(two, beam: two.beam),
-                       "Light Maze: level 2, Around the corner; 2 mirrors, 1 target; beam ends at the edge; "
+                       "Light Maze: level 2, Around the corner; 2 mirrors, 1 target; beam ends at the edge; 0 of 1 target lit; "
                        + "not solved.")
         let sixteen = MazeState(levelIndex: 15)
         XCTAssertEqual(MazeCore.canvasDescription(sixteen, beam: sixteen.beam),
                        "Light Maze: level 16, Split; 1 mirror, 1 prism, 2 targets; beams end at the edge and the "
-                       + "target; not solved.")
+                       + "target; 1 of 2 targets lit; not solved.")
         let twenty = MazeCore.played(seed: 1, entries: MazeCore.fixtureEntries(level: 19))
         XCTAssertEqual(twenty.canvasDescription,
                        "Light Maze: level 20, Prism maze; 5 mirrors, 1 prism, 2 targets; beams end at 2 targets; "
-                       + "solved.")
+                       + "2 of 2 targets lit; solved.")
         XCTAssertEqual(MazeCore.counted(1, "mirror"), "1 mirror")
         XCTAssertEqual(MazeCore.counted(0, "prism"), "0 prisms")
         XCTAssertEqual(MazeCore.endPlace(.loop, count: 1), "a loop")

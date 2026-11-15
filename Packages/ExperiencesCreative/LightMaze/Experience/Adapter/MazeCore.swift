@@ -24,6 +24,9 @@
 //   level.reset           the level's starting orientations, nothing selected, no moves (the restart).
 //   move.undo             feature 098: restores the last move's tile to its orientation before the move and removes
 //                         the move; refused with `a13.no-moves` when the level's move list is empty.
+//   hint.show             feature 099: selects the hinted tile (`Hint.tile`: the first turnable tile whose orientation
+//                         differs from the level's recorded solution); refused with `a13.already-solved` when there is
+//                         none (the board is solved). Changes only the selection: no move, no best count.
 // Called directly (not through the engine), the core refuses an unknown control with `unknownControl` and a wrong
 // value count with `wrongValueCount`, as the engine does. A refusal changes nothing.
 //
@@ -45,6 +48,10 @@
 // appends a move (`MazeState.moves`, at most 64, the oldest dropped), `move.undo` takes the last one back exactly,
 // `level.reset` and `level.select` empty the list. Progress (opened and solved levels) is not engine state: it is the
 // presenter's `ProgressStore`, so replays and digests never depend on it.
+//
+// Feature 099 (A13-P04) T-A13-406 (FR-A13-401, FR-A13-402, FR-A13-411; clarifications Q1, Q2): the action `hint.show`
+// above, and the canvas description (the board's accessible summary) gains the count of lit targets before the solved
+// words: "Light Maze: level 1, First light; 1 mirror, 1 target; beam ends at the wall; 0 of 1 target lit; not solved."
 import Foundation
 import LightMazeCore
 import VisualCoreExperience
@@ -58,6 +65,8 @@ public enum MazeRule {
     public static let invalidChoice = "a13.invalid-choice"
     /// `move.undo` on a level whose move list is empty (feature 098).
     public static let noMoves = "a13.no-moves"
+    /// `hint.show` on a board with no tile to turn: the level is solved (feature 099).
+    public static let alreadySolved = "a13.already-solved"
 }
 
 /// Why a stored maze state is refused.
@@ -75,7 +84,7 @@ public struct MazeCore: ExperienceCore, Equatable {
 
     /// The action ids in declaration order.
     public static let actionIDs = ["level.select", "level.next", "level.previous", "tile.select", "tile.turn",
-                                   "level.reset", "move.undo"]
+                                   "level.reset", "move.undo", "hint.show"]
 
     /// The outcome code while the current level is solved.
     public static let solvedOutcome = "level-solved"
@@ -135,7 +144,7 @@ public struct MazeCore: ExperienceCore, Equatable {
         return upgraded
     }
 
-    /// The seven controls with their declared ranges.
+    /// The eight controls with their declared ranges.
     public static var controls: [ExperienceControl] {
         [ExperienceControl(id: "level.select", ranges: [0...Double(levelCount - 1)]),
          ExperienceControl(id: "level.next"),
@@ -143,7 +152,8 @@ public struct MazeCore: ExperienceCore, Equatable {
          ExperienceControl(id: "tile.select", ranges: [0...Double(maxTurnable - 1)]),
          ExperienceControl(id: "tile.turn"),
          ExperienceControl(id: "level.reset"),
-         ExperienceControl(id: "move.undo")]
+         ExperienceControl(id: "move.undo"),
+         ExperienceControl(id: "hint.show")]
     }
 
     /// The first state with `seed` as the preparation seed.
@@ -159,7 +169,7 @@ public struct MazeCore: ExperienceCore, Equatable {
     public mutating func apply(_ action: ExperienceAction) -> ActionResult {
         let v = action.values
         let expected = ["level.select": 1, "level.next": 0, "level.previous": 0, "tile.select": 1, "tile.turn": 0,
-                        "level.reset": 0, "move.undo": 0][action.control]
+                        "level.reset": 0, "move.undo": 0, "hint.show": 0][action.control]
         guard let expected else { return .rejected(.unknownControl(action.control)) }
         guard v.count == expected else { return .rejected(.wrongValueCount(expected: expected, found: v.count)) }
         let refused = ActionResult.rejected(.rule(code: MazeRule.invalidChoice))
@@ -179,6 +189,10 @@ public struct MazeCore: ExperienceCore, Equatable {
             guard next.turnSelected() else { return refused }
         case "move.undo":
             guard next.undo() else { return .rejected(.rule(code: MazeRule.noMoves)) }
+        case "hint.show":
+            guard let tile = Hint.tile(for: state), next.selectTile(tile) else {
+                return .rejected(.rule(code: MazeRule.alreadySolved))
+            }
         default:   // level.reset
             next.reset()
         }
@@ -342,9 +356,11 @@ public struct MazeCore: ExperienceCore, Equatable {
         return (beam.endReasons.count == 1 ? "beam ends at " : "beams end at ") + joined
     }
 
-    /// The status line: "level 1, First light; 1 mirror, 1 target; beam ends at the wall; not solved".
+    /// The status line: "level 1, First light; 1 mirror, 1 target; beam ends at the wall; 0 of 1 target lit; not solved"
+    /// (the count of lit targets since feature 099).
     public static func status(_ state: MazeState, beam: Beam) -> String {
         "level \(state.levelIndex + 1), \(state.level.name); \(tileWords(state.board)); \(endWords(beam)); "
+            + "\(BoardDescription.targetWords(board: state.board, beam: beam)); "
             + (beam.isSolved ? "solved" : "not solved")
     }
 

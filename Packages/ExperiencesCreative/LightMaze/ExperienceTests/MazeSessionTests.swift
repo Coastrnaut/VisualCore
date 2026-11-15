@@ -35,13 +35,14 @@ final class MazeSessionTests: XCTestCase {
         XCTAssertGreaterThan(presenter.lastTriangleCount, 0)
         XCTAssertEqual(presenter.rebuildCount, 1, "one scene tree for the first state")
         XCTAssertEqual(shell.accessibilitySummary,
-                       "Light Maze: level 1, First light; 1 mirror, 1 target; beam ends at the wall; not solved.")
+                       "Light Maze: level 1, First light; 1 mirror, 1 target; beam ends at the wall; "
+                       + "0 of 1 target lit; not solved.")
         XCTAssertTrue(presenter.mirror.ready)
         XCTAssertEqual(presenter.mirror.levelIndex, 0)
         XCTAssertEqual(presenter.mirror.turnableCount, 1)
         XCTAssertEqual(presenter.mirror.selectedWords, "No tile selected")
         XCTAssertEqual(presenter.nativeActions, ["level.select", "level.next", "level.previous", "tile.select",
-                                                 "tile.turn", "level.reset", "move.undo"])
+                                                 "tile.turn", "level.reset", "move.undo", "hint.show"])
         XCTAssertEqual(presenter.nativeActions, Set(MazeCore.actionIDs), "every action has a native control")
         XCTAssertEqual(presenter.gestureActions, ["tile.select", "tile.turn"], "feature 097: tap, drag and twist")
         XCTAssertEqual(GestureAlternatives.missing(gesture: presenter.gestureActions, native: presenter.nativeActions),
@@ -52,9 +53,11 @@ final class MazeSessionTests: XCTestCase {
                        "the description syncs the controls")
         XCTAssertTrue(shell.handle(control: "tile.turn").isAccepted)
         XCTAssertEqual(shell.accessibilitySummary,
-                       "Light Maze: level 1, First light; 1 mirror, 1 target; beam ends at the target; solved.")
+                       "Light Maze: level 1, First light; 1 mirror, 1 target; beam ends at the target; "
+                       + "1 of 1 target lit; solved.")
         XCTAssertTrue(presenter.mirror.solved)
         try MazeTest.frames(session, 1)
+        try MazeTest.frames(session, 40)   // feature 099: the solved border's brightening (0.6 s) has settled
         let trees = presenter.rebuildCount
         XCTAssertGreaterThan(trees, 1, "the turned state rebuilt the tree")
         XCTAssertEqual(presenter.sceneState, try MazeTest.core(shell).state)
@@ -114,7 +117,8 @@ final class MazeSessionTests: XCTestCase {
         XCTAssertEqual(core.state.orientations, [.slash], "the second tap turns it")
         XCTAssertTrue(core.isSolved)
         XCTAssertEqual(shell.accessibilitySummary,
-                       "Light Maze: level 1, First light; 1 mirror, 1 target; beam ends at the target; solved.")
+                       "Light Maze: level 1, First light; 1 mirror, 1 target; beam ends at the target; "
+                       + "1 of 1 target lit; solved.")
         try MazeTest.frames(session, 1)
         XCTAssertEqual(presenter.sceneState, core.state, "the next frame draws the turned mirror")
         session.close()

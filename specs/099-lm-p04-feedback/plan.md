@@ -19,7 +19,7 @@ Flashing flags passed from `make`, the nine state signs checked by `stateSignPro
 (`HapticKind.success`, `StateSign`, `stateSignProblems(_:)`, `transitionDuration(_:reduceMotion:)`),
 `VisualCoreAudioDSP` (`SoundEffect`, `SoundWaveform`), `VisualCoreAudio` (`SoundEffectPlayer`, ambient session),
 `VisualCoreExperienceHost` (`ExperienceFeedback.haptic(_:)`), `VisualCoreUI`
-(`AccessibilitySettingsSection.contrastRatio(_:_:)`, tests only), the A13-P01–P03 core and experience.
+(`AccessibleColors.contrastRatio(_:_:)`, tests only), the A13-P01–P03 core and experience.
 **Storage**: none new; state schema stays 2 (a hint changes only the selection). **Testing**: ExperiencesCreative on
 sim-27.2; app build and unit; runner iOS 27; packages; contract; script tests. **Performance**: the description is
 built on request only; the cue adds one border node and one tick polyline; one sound and one haptic per solve.

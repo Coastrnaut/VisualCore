@@ -29,7 +29,7 @@ Canonical overrides:
 Answered autonomously under the owner's standing delegation, recommended option each time. Facts checked in code:
 VisualCoreSimulation has `HapticPlanner` (default 0.05 s interval, switch `enabled`), `HapticKind.success`,
 `AnnouncementPlanner`, `StateSign` with `stateSignProblems(_:)` and `transitionDuration(_:reduceMotion:)`;
-VisualCoreUI has `AccessibilitySettingsSection.contrastRatio(_:_:)` (UIKit colours); VisualCoreAudioDSP has
+VisualCoreUI has `AccessibleColors.contrastRatio(_:_:)` (UIKit colours); VisualCoreAudioDSP has
 `SoundEffect` (frequency 40–4,000 Hz, duration 0.02–1 s, gain ≤ 0.9) played by VisualCoreAudio's `SoundEffectPlayer`
 (ambient session, so the silent switch mutes it); VisualCoreExperienceHost's `ExperienceFeedback.shared` applies the
 person's haptic switch and the rate limit, as Neon Arcade uses it; the registry already passes Reduce Motion and Reduce
@@ -46,7 +46,7 @@ boards hold at most 144 tiles; the unlit target colour has a contrast of about 2
 - Q: Where do the spoken words go when VoiceOver is off? → A: As today: every text is kept in the presenter's spoken
   list and shown in the controls' message line; it is posted to the announcement sink only while VoiceOver runs. The
   board element's accessible value is the summary: the existing canvas description with the count of lit targets
-  added ("Light Maze: level 1, First light; 1 mirror, 1 target; beam ends at the wall; 0 of 1 targets lit; not
+  added ("Light Maze: level 1, First light; 1 mirror, 1 target; beam ends at the wall; 0 of 1 target lit; not
   solved."); a Describe control (`describe`) shows and
   speaks the full description.
 - Q: What exactly is the success cue? → A: Played when the presenter sees the drawn board become solved (the same

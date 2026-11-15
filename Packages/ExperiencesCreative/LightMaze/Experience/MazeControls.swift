@@ -17,6 +17,10 @@
 //   identifier `reset-level`); the Level menu lists locked levels disabled with "(locked)" and solved ones with their
 //   best count, and a choice goes through the presenter (`chooseLevel(_:port:)`), which refuses a locked level in words;
 //   Next level is disabled when the next level is locked.
+// Feature 099 (A13-P04) T-A13-406 (FR-A13-402, FR-A13-411; clarifications Q1–Q2): Hint (`hint` → `hint.show` through
+//   the presenter's `showHint(port:)`, which answers with the tile to turn or "Level N is already solved."; disabled
+//   while the level is solved) and Describe (`describe`: the presenter's `describeBoard()` shows and speaks the full
+//   board description; no action).
 // Every control has an accessible label and value (and a hint) and the identifier `experience.a13.light-maze.<name>`
 // from the port; hit areas are at least 44 points high and text wraps.
 import LightMazeCore
@@ -145,6 +149,15 @@ struct MazeControls: View {
                 button("Restart", name: "reset-level", value: mirror.solved ? "Solved" : "Not solved",
                        hint: "Returns every tile of the level to its starting position", enabled: true) {
                     send("level.reset")
+                }
+            }
+            HStack(spacing: 8) {
+                button("Hint", name: "hint", value: mirror.solved ? "Solved" : "Not solved",
+                       hint: mirror.solved ? "This level is already solved" : "Selects a tile to turn and says where",
+                       enabled: !mirror.solved) { presenter.showHint(port: port) }
+                button("Describe", name: "describe", value: mirror.solved ? "Solved" : "Not solved",
+                       hint: "Speaks every tile, the beam's path and each target", enabled: true) {
+                    presenter.describeBoard()
                 }
             }
             Text(verbatim: Self.sentence(mirror.status))

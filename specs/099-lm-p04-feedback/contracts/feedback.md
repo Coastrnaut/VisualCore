@@ -14,7 +14,7 @@ Native controls: Hint (`experience.a13.light-maze.hint`) sends `hint.show`; Desc
 - Solve: "Level N solved in M moves. Level N+1 is open." — the second sentence only when the solve opened it; "move"
   singular for 1.
 - Summary (canvas accessible value): the A13-P01 canvas description with "K of T targets lit" before the solved words:
-  "Light Maze: level 1, First light; 1 mirror, 1 target; beam ends at the wall; 0 of 1 targets lit; not solved."
+  "Light Maze: level 1, First light; 1 mirror, 1 target; beam ends at the wall; 0 of 1 target lit; not solved."
 
 ## Success cue
 - Once per transition to solved: border (success colour) and tick polyline while solved; brightness per
