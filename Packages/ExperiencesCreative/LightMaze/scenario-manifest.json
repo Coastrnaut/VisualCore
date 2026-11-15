@@ -1,0 +1,737 @@
+{
+  "controls" : [
+    "level.select",
+    "level.next",
+    "level.previous",
+    "tile.select",
+    "tile.turn",
+    "level.reset"
+  ],
+  "experience" : "a13.light-maze",
+  "kind" : "creative",
+  "scenarios" : [
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+        "initialDigest" : "f4eec244ab5b55ffe7f4675699d8647d5293feb8c4dcd2d5444a6540a3db25d2"
+      },
+      "name" : "launch-first-frame",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "tile.select",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "tile.turn",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "tile.select",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "tile.turn",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "90dcc41fb9e43f27d967aa2fa6c0e49dbe645944c17aeb02bfc420f8ae01f71f",
+        "initialDigest" : "f4eec244ab5b55ffe7f4675699d8647d5293feb8c4dcd2d5444a6540a3db25d2"
+      },
+      "name" : "input-response",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "tile.select",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "tile.turn",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "outcome" : "level-solved"
+      },
+      "name" : "completion",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "level.select",
+            "values" : [
+              20
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "level.select",
+            "values" : [
+              -1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "level.select",
+            "values" : [
+              0.5
+            ]
+          },
+          "result" : "action.rule.a13.invalid-choice",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "level.previous",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.a13.invalid-choice",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "tile.turn",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.a13.invalid-choice",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "tile.select",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "action.rule.a13.invalid-choice",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "tile.select",
+            "values" : [
+              8
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "level.reset",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "tile.select",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        }
+      ],
+      "expect" : {
+
+      },
+      "name" : "rejection",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "tile.select",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "tile.turn",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "tile.select",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "tile.turn",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "90dcc41fb9e43f27d967aa2fa6c0e49dbe645944c17aeb02bfc420f8ae01f71f",
+        "initialDigest" : "f4eec244ab5b55ffe7f4675699d8647d5293feb8c4dcd2d5444a6540a3db25d2"
+      },
+      "name" : "save-restore",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "tile.select",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "tile.turn",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "tile.select",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "tile.turn",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "initialDigest" : "f4eec244ab5b55ffe7f4675699d8647d5293feb8c4dcd2d5444a6540a3db25d2",
+        "resetDigest" : true
+      },
+      "name" : "reset",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "suspend-resume",
+      "seed" : "1"
+    },
+    {
+      "cycles" : 5,
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "teardown-reentry",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "cancel-prepare",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "level.select",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "tile.select",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "tile.turn",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "5b1647722de8398753bb2b7632d10df7a7f770182255246bc68a535a49e182be",
+        "initialDigest" : "f4eec244ab5b55ffe7f4675699d8647d5293feb8c4dcd2d5444a6540a3db25d2",
+        "outcome" : "level-solved"
+      },
+      "name" : "fixture-lm-01",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "level.select",
+            "values" : [
+              9
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "tile.select",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "tile.turn",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "tile.select",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "tile.turn",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "tile.select",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "tile.turn",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "tile.select",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "tile.turn",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "tile.select",
+            "values" : [
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "tile.turn",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "76571f7d393e11f964ecca92b965f906aedf8c6e49a3d7df19a941d806720a0f",
+        "initialDigest" : "f4eec244ab5b55ffe7f4675699d8647d5293feb8c4dcd2d5444a6540a3db25d2",
+        "outcome" : "level-solved"
+      },
+      "name" : "fixture-lm-10",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "level.select",
+            "values" : [
+              19
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "tile.select",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "tile.turn",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "tile.select",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "tile.turn",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "tile.select",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "tile.turn",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "tile.select",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "tile.turn",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "tile.select",
+            "values" : [
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "tile.turn",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "tile.select",
+            "values" : [
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "tile.turn",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "3f2c1f9126b4ebadd66a75cd5f3faff5349cc5e5de5676e8db1cdae10f9c46e5",
+        "initialDigest" : "f4eec244ab5b55ffe7f4675699d8647d5293feb8c4dcd2d5444a6540a3db25d2",
+        "outcome" : "level-solved"
+      },
+      "name" : "fixture-lm-20",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "level.select",
+            "values" : [
+              20
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "f4eec244ab5b55ffe7f4675699d8647d5293feb8c4dcd2d5444a6540a3db25d2",
+        "initialDigest" : "f4eec244ab5b55ffe7f4675699d8647d5293feb8c4dcd2d5444a6540a3db25d2"
+      },
+      "name" : "refusal-level-out-of-range",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "level.previous",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.a13.invalid-choice",
+          "steps" : 0
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "f4eec244ab5b55ffe7f4675699d8647d5293feb8c4dcd2d5444a6540a3db25d2",
+        "initialDigest" : "f4eec244ab5b55ffe7f4675699d8647d5293feb8c4dcd2d5444a6540a3db25d2"
+      },
+      "name" : "refusal-level-before-first",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "tile.turn",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.a13.invalid-choice",
+          "steps" : 0
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "f4eec244ab5b55ffe7f4675699d8647d5293feb8c4dcd2d5444a6540a3db25d2",
+        "initialDigest" : "f4eec244ab5b55ffe7f4675699d8647d5293feb8c4dcd2d5444a6540a3db25d2"
+      },
+      "name" : "refusal-turn-without-selection",
+      "seed" : "1"
+    }
+  ],
+  "schema" : 1
+}
