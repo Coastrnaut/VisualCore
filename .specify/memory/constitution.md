@@ -709,6 +709,49 @@ creation, photorealistic global illumination or full physics gameplay.
 - **One phase at a time:** implement only one Spec Kit phase at a time (one ledger gate, ADR-0004), in order
   A12-P00 → A12-P06.
 
+### A13 Light Maze (`a13.light-maze`)
+
+Ratified from the app manual's constitution prompt (2026-11-15). Like A05–A12, it never had a standalone target: it
+is built directly as an experience of the one app. Its product goal is a tactile light-reflection puzzle with clear
+beams and deterministic rules — in version 0.1 at least 20 handcrafted levels with emitter, wall, mirror, target and
+optional prism tiles; drag and rotate interactions snapped to the puzzle grid; deterministic beam propagation with
+reflection and a finite bounce cap; level select, unlock progression, undo and restart with success feedback; glow and
+colour cues that never hide the beam's path; and a built-in solvability check for level data — not photorealistic
+optics with refraction physics, unvalidated user-generated level sharing or endless procedural level generation.
+
+- **Consumer, not fork:** an experience of the VisualCore app and a VisualCore consumer, never a fork of
+  projectm-ios. It uses only audited VisualCore public APIs over the OpenGL ES → ANGLE → Metal integration. It MUST
+  NOT create its own EGL/ANGLE initialization path, a second renderer, or link ProjectM engine code.
+- **Reuse first (Principle II):** geometry, ray and segment intersection, transforms, render targets, shaders,
+  compositing, gestures, the seeded fixed-step clock and runner, persistence, quality tiers and accessibility planning
+  already in VisualCore are reused, not copied. New generic machinery (for example 2D ray casting against segments
+  with reflection, or a grid puzzle board model) goes into VisualCore with tests, docs, the API baseline and the
+  reference regression when it is reusable; levels, tiles, copy and UI stay in the experience.
+- **Visuals are code:** beams, glow, tiles and backgrounds are procedural geometry, SDFs and shaders; no purchased,
+  generated or hand-made sprites, textures or recordings.
+- **Deterministic, GPU-free rules:** a level document and its moves determine the beam path and the solved state
+  exactly; propagation, snapping, progression, the solvability check and persisted files MUST be testable without GPU
+  access through `swift test`, and drawing never changes the game state.
+- **Bounded:** board size, tile count, beam segments and the bounce cap are fixed limits; glow passes, render targets
+  and draw budgets are capped per quality level; non-finite values and documents beyond the caps are refused.
+- **Offline-first and private:** no networking, accounts, analytics or ads; progress is stored only on the device; no
+  permission beyond what a feature actually needs, each disclosed.
+- **Truthful claims:** no claims of physical or scientific optics accuracy or learning outcomes; reflection follows
+  the stated grid rule; performance, memory or battery numbers only from device measurements.
+- **Resilient GPU state:** context loss rebuilds every render target and texture from versioned CPU state;
+  backgrounding pauses animation and never fast-forwards it.
+- **Accessibility:** native SwiftUI controls with VoiceOver labels and Dynamic Type; the board has a spoken
+  description of the tiles, the beam path and the targets; every gesture (drag, rotate, select) has a control
+  alternative; the beam and targets stay legible without glow, colour alone or animation; Reduce Motion and Reduce
+  Flashing calm the success feedback.
+- **Licenses:** every bundled level, palette and shader records its author and license; only original or
+  license-cleared content is bundled.
+- **Regression when VisualCore changes:** any VisualCore change made for this experience MUST be followed by the
+  ProjectM reference regression (at the experience's X gate per the owner ruling of 2026-11-14).
+- **Python only:** repository automation uses Python 3; there is no PowerShell dependency.
+- **One phase at a time:** implement only one Spec Kit phase at a time (one ledger gate, ADR-0004), in order
+  A13-P00 → A13-P06.
+
 ## Governance
 
 - Precedence: real Apple platform and toolchain behavior and observed test results → owner
@@ -741,5 +784,7 @@ creation, photorealistic global illumination or full physics gameplay.
   from its manual's constitution prompt at gate A11-P00 (feature 081); no principle changes.
 - Amendment 2.8.0 (2026-11-15, MINOR): App-Scoped Rules gain the A12 Tiny Worlds subsection, ratified from its
   manual's constitution prompt at gate A12-P00 (feature 088); no principle changes.
+- Amendment 2.9.0 (2026-11-15, MINOR): App-Scoped Rules gain the A13 Light Maze subsection, ratified from its
+  manual's constitution prompt at gate A13-P00 (feature 095); no principle changes.
 
-**Version**: 2.8.0 | **Ratified**: 2026-11-10 | **Last Amended**: 2026-11-15
+**Version**: 2.9.0 | **Ratified**: 2026-11-10 | **Last Amended**: 2026-11-15
