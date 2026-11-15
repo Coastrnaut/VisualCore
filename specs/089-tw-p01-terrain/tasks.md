@@ -33,7 +33,7 @@ X-A12 (owner, 2026-11-14). Precedent: `specs/082-pp-p01-model/tasks.md`.
 - [X] T-A12-111 App build and unit (`--name app-unit -- python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27`) — Verified 2026-11-15: 2026-11-15: .autonomy/checks/A12-P01.app-unit.json exit 0 (app build-for-testing with TinyWorlds and unit tests, iOS 27.2)
 - [X] T-A12-112 Runner iOS 27 (`--name verify-27 -- python3 scripts/verify_experiences.py --only a12.tiny-worlds --runtime 27`) (SC-A12-106) — Verified 2026-11-15: 2026-11-15: .autonomy/checks/A12-P01.verify-27.json exit 0; runner 9/9 standard scenarios for a12.tiny-worlds on iOS 27.2
 - [X] T-A12-113 Experience package check, contract and script tests (`--name experience-packages -- python3 scripts/check_experience_packages.py`; `--name contract -- python3 scripts/check_app_contract.py --app tiny-worlds --render`; `--name script-tests -- python3 scripts/test_scripts.py`) — Verified 2026-11-15: 2026-11-15: .autonomy/checks/A12-P01.{experience-packages,contract,script-tests}.json exit 0 (12 experiences, A12 a candidate; contract 21 rows, 10 gaps, 2 closed; script tests OK)
-- [ ] T-A12-114 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A12-P01; update README.md (status, gate count) in the record commit (rule 16)
+- [X] T-A12-114 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A12-P01; update README.md (status, gate count) in the record commit (rule 16) — Verified 2026-11-15: 2026-11-15: /speckit-converge round 1 appended T-A12-115 (as-built notes, done); round 2 appended nothing (11 FR, 6 SC, 4 stories, 15 tasks with evidence; G-TERRAIN and G-CONTENTLICENSES closed)
 
 ## Dependencies
 
