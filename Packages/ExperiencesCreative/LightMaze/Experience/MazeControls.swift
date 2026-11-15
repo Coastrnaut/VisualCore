@@ -9,6 +9,8 @@
 //   Reset level (`reset-level` → `level.reset`: the level's starting orientations);
 //   the status line (`status`: level, tiles, where the beam ends and whether it is solved) and the answer to a refused
 //     action (`message`, shown only when there is one).
+// Feature 096 T-A13-115 (FR-A13-121; convergence): the Level menu (`level` → `level.select [index]`) lists the 20
+//   levels by number and name, so every action has a native control.
 // Every control has an accessible label and value (and a hint) and the identifier `experience.a13.light-maze.<name>`
 // from the port; hit areas are at least 44 points high and text wraps.
 import LightMazeCore
@@ -72,6 +74,24 @@ struct MazeControls: View {
                            : "This is the last level",
                        enabled: mirror.levelIndex < mirror.levelCount - 1) { send("level.next") }
             }
+            Menu {
+                ForEach(LevelCatalog.bundled.levels.indices, id: \.self) { index in
+                    Button {
+                        send("level.select", [Double(index)])
+                    } label: {
+                        Text(verbatim: "\(index + 1). \(LevelCatalog.bundled.levels[index].name)")
+                    }
+                }
+            } label: {
+                Text(verbatim: "Level")
+                    .font(.body)
+                    .frame(maxWidth: .infinity, minHeight: 44)
+            }
+            .buttonStyle(.bordered)
+            .accessibilityLabel(Text(verbatim: "Level"))
+            .accessibilityValue(Text(verbatim: level))
+            .accessibilityHint(Text(verbatim: "Opens any of the levels"))
+            .accessibilityIdentifier(port.identifier("level"))
             HStack(spacing: 8) {
                 button("Select previous", name: "select-previous", value: mirror.selectedWords,
                        hint: "Selects the previous mirror or prism", enabled: previous != nil) {

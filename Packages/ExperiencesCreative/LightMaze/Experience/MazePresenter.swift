@@ -368,5 +368,7 @@ final class MazePresenter: ExperiencePresenter {
 
     /// The actions the native controls send (every action but `level.select`, which the controls reach step by step
     /// through Previous level and Next level); there is no canvas gesture in this phase.
-    var nativeActions: Set<String> { ["level.next", "level.previous", "tile.select", "tile.turn", "level.reset"] }
+    var nativeActions: Set<String> {
+        ["level.select", "level.next", "level.previous", "tile.select", "tile.turn", "level.reset"]
+    }
 }

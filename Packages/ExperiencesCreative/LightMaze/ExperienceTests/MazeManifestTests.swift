@@ -1,6 +1,6 @@
 // MazeManifestTests — feature 096 (A13-P01) T-A13-106 (FR-A13-113, FR-A13-122; SC-A13-103, SC-A13-106). The scenario
-// manifest of Light Maze: valid with the nine standard scenarios, the five fixtures `fixture-lm-01`, `-05`, `-10`, `-16`
-// and `fixture-lm-20` and the three refusal scenarios; its derived digests and expected results equal to what the
+// manifest of Light Maze: valid with the nine standard scenarios, the five fixtures `fixture-lm-01`, `-05`, `-10`,
+// `-16` and `fixture-lm-20` and the three refusal scenarios; its derived digests and expected results equal to what the
 // engine gives when the runner plays them; every fixture solving its level by the recorded solution with the committed
 // final digest; and the committed `scenario-manifest.json` equal to the Swift manifest (`UPDATE_SCENARIO_MANIFEST=1`,
 // on the simulator `TEST_RUNNER_UPDATE_SCENARIO_MANIFEST=1`, rewrites it).

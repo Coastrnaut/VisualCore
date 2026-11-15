@@ -36,8 +36,9 @@ final class MazeSessionTests: XCTestCase {
         XCTAssertEqual(presenter.mirror.levelIndex, 0)
         XCTAssertEqual(presenter.mirror.turnableCount, 1)
         XCTAssertEqual(presenter.mirror.selectedWords, "No tile selected")
-        XCTAssertEqual(presenter.nativeActions, ["level.next", "level.previous", "tile.select", "tile.turn",
-                                                 "level.reset"])
+        XCTAssertEqual(presenter.nativeActions, ["level.select", "level.next", "level.previous", "tile.select",
+                                                 "tile.turn", "level.reset"])
+        XCTAssertEqual(presenter.nativeActions, Set(MazeCore.actionIDs), "every action has a native control")
         XCTAssertEqual(presenter.gestureActions, [])
         XCTAssertEqual(GestureAlternatives.missing(gesture: presenter.gestureActions, native: presenter.nativeActions),
                        [])
