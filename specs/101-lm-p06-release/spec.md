@@ -49,8 +49,9 @@ declares no permission; the controls carry identifiers `experience.a13.light-maz
 - Q: What does the source scan refuse? → A: In `Packages/ExperiencesCreative/LightMaze`: `URLSession`, `import Network`,
   `CLLocation`, `AVCapture`, `AVAudioRecorder`, `inputNode`, `installTap`, `CMMotion`, `CNContact`, `ASIdentifierManager`,
   `AppTrackingTransparency`, `UIScreen.main.brightness` and `isIdleTimerDisabled`.
-- Q: Which interface journeys run, and how? → A: A new serial chunk `u2` with `LMLevelUITests` (choose level 2 from the
-  Level menu; select next and turn on level 1 until solved — status says solved; undo returns to not solved) and
+- Q: Which interface journeys run, and how? → A: A new serial chunk `u2` with `LMLevelUITests` (on level 1 select next and
+  turn — status says solved; undo returns to not solved; turn again; then level 2, now open, is chosen from the Level
+  menu — a fresh install has level 2 locked, so the level is chosen only after the solve) and
   `LMHelpUITests` (Hint selects a tile and the message names it; Describe shows the board text), launched as in
   `TWSupport` through `LMSupport`; identifiers `experience.a13.light-maze.<name>`; each test under 60 s.
 - Q: How are crash recovery and sample files proved? → A: A test-only `failNextDraw` seam is added to the presenter (as
@@ -118,8 +119,8 @@ an artifact inventory, a release configuration, the device-campaign plan and the
 
 ### User Story 4 - The maze works in the real app (Priority: P2)
 
-Light Maze's main journeys work through the app's interface on the iOS 27 phone simulator — choosing a level,
-selecting and turning a mirror to solve level 1, undoing, asking for a hint and hearing the board — and the release build
+Light Maze's main journeys work through the app's interface on the iOS 27 phone simulator — selecting and turning a
+mirror to solve level 1, undoing, choosing the level it opened, asking for a hint and hearing the board — and the release build
 and its checks pass.
 
 **Acceptance Scenarios**:
@@ -174,7 +175,8 @@ and its checks pass.
 
 **Interface and build (story 4)**
 
-- **FR-A13-630**: Interface tests on iOS 27 MUST cover choosing a level, solving level 1 by select and turn, undo, a hint
+- **FR-A13-630**: Interface tests on iOS 27 MUST cover solving level 1 by select and turn, undo, choosing the opened
+  level 2, a hint
   and Describe, each under 60 s, in their own chunk.
 - **FR-A13-631**: The release build checks MUST pass.
 - **FR-A13-632**: The experience's package tests MUST pass on iOS 27.

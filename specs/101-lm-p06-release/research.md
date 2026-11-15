@@ -18,8 +18,8 @@
 
 ## D4 — Interface tests
 - **Decision**: `LMSupport` modelled on `TWSupport` (launch `-vcCandidates -openExperience a13.light-maze`, element
-  lookup by `experience.a13.light-maze.<name>`); `LMLevelUITests` (Level menu → level 2; back to level 1; select next,
-  turn → status solved; undo → not solved) and `LMHelpUITests` (Hint → message names a mirror; Describe → message
+  lookup by `experience.a13.light-maze.<name>`); `LMLevelUITests` (level 1: select next, turn → status solved; undo →
+  not solved; turn → solved; Level menu → level 2, open after the solve) and `LMHelpUITests` (Hint → message names a mirror; Describe → message
   starts "Level 1, First light"); serial chunk `u2`.
 
 ## D5 — Release checks
