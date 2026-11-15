@@ -421,13 +421,18 @@
       "capabilities": [
         "island, asteroid garden, miniature city",
         "seeded terrain, seam-free normals",
-        "lit 3D terrain drawn with depth",
-        "orbit, tilt and zoom within limits",
+        "terrain coloured by height",
+        "drag to orbit, pinch to zoom",
+        "eye kept above the terrain",
+        "tap the ground to locate it",
+        "three terrain detail levels",
         "new seed on request",
         "deterministic terrain digests"
       ],
       "quality_tiers": [
-        "level-0"
+        "level-0",
+        "level-1",
+        "level-2"
       ],
       "content": null,
       "available": false
