@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "sh",
+    "specs/108-sse-p06-release/scan-sources-release.sh"
+  ],
+  "command": "sh specs/108-sse-p06-release/scan-sources-release.sh",
+  "elapsed_seconds": 0.047,
+  "exit_code": 0,
+  "finished": "2026-11-15T23:05:16+00:00",
+  "log": ".autonomy/logs/A14-P06.sse-no-network.log",
+  "log_sha256": "6e43b6a6035756d1c13ce68faf5e6837b4b1a9af79f172970ad446929decd002",
+  "name": "sse-no-network",
+  "stage": "A14-P06",
+  "started": "2026-11-15T23:05:16+00:00",
+  "timed_out": false
+}
