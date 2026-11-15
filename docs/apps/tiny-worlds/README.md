@@ -55,3 +55,11 @@ claims of the kinds the constitution refuses.
 | new seed on request | `WorldStateTests.swift aNewSeedComesFromTheGeneratorAndContinuesIt`, `WorldsCoreTests.swift testNewSeedsComeFromTheGenerator` |
 
 The device measurements still to make are in [device-campaign.md](device-campaign.md).
+
+## Implementation notes
+
+- The world preset, pack and prop-kind pickers are one `Equatable` `WorldsSegmentedPicker` (`WorldsControls.swift`),
+  left alone by the per-frame update of the controls so a segment tap is never lost while the world runs (found by
+  `TWWorldUITests.testOpenPack`, A12-P06).
+- A slot shows its picture only beside a world file that reads; a picture left alone is not shown and not deleted
+  (found by `WorldSampleFileTests`, A12-P06).

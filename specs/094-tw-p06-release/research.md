@@ -40,3 +40,16 @@ a12 registration; control identifiers.
   change their spoken values; reset view), `TWEditUITests` (place raises "N of 24 props"; the light azimuth slider moves;
   save to slot 0 shows its status and picture); chunk `"t2": ["TWWorldUITests", "TWEditUITests"]` (serial: the world
   draws every frame, as Physics Playground).
+
+## As built (2026-11-15)
+
+- **Segmented pickers rebuilt per frame dropped taps.** `TWWorldUITests.testOpenPack` found that a tap on the pack
+  picker's "Asteroid garden" segment was lost while the world ran (the first `app-ui` run failed there): the controls'
+  body is re-evaluated every frame, and each pass gave the segmented control a new binding. The three segmented pickers
+  (world preset, pack, prop kind) are now one `WorldsSegmentedPicker` in `WorldsControls.swift`, an `Equatable` view
+  compared without its handler and used with `.equatable()`, as Physics Playground's `PlaygroundSegmentedPicker`
+  (A11-P06). Labels, spoken values and identifiers are unchanged. Evidence: `.autonomy/checks/A12-P06.app-ui-2.json`
+  (passes) and `.autonomy/checks/A12-P06.worlds-ios27-2.json`.
+- **A picture without its world is not shown.** `WorldSampleFileTests` found that a lone `world-0.png` was shown beside
+  a slot reading "Empty."; `WorldsPresenter.refreshSlot` now shows a slot's picture only when its world file reads. The
+  file itself is left untouched.

@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "/bin/sh",
+    "-c",
+    "python3 scripts/release_check.py --only experience-release-a12 copy-claims-a12 && sh specs/094-tw-p06-release/scan-claims-release.sh && sh specs/093-tw-p05-qa/scan-claims.sh"
+  ],
+  "command": "/bin/sh -c 'python3 scripts/release_check.py --only experience-release-a12 copy-claims-a12 && sh specs/094-tw-p06-release/scan-claims-release.sh && sh specs/093-tw-p05-qa/scan-claims.sh'",
+  "elapsed_seconds": 7.38,
+  "exit_code": 0,
+  "finished": "2026-11-15T16:54:32+00:00",
+  "log": ".autonomy/logs/A12-P06.release-docs-3.log",
+  "log_sha256": "78e8b8cb49f68063812f5d94d4792c0e3ff5ec4ae5bb500f795f8ff365774897",
+  "name": "release-docs-3",
+  "stage": "A12-P06",
+  "started": "2026-11-15T16:54:25+00:00",
+  "timed_out": false
+}
