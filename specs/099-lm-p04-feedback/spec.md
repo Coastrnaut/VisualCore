@@ -40,12 +40,14 @@ boards hold at most 144 tiles; the unlit target colour has a contrast of about 2
 - Q: Is the hint an engine action, and what does it change? → A: A new replayable action `hint.show` in the engine:
   it selects the first turnable tile (board order) whose orientation differs from the level's recorded solution;
   on a solved board it is refused with `a13.already-solved` and nothing changes. It changes only the selection (no
-  move, no best count). The presenter answers in words: "Hint: turn the mirror at row 2, column 3." (rows and columns
-  from 1, row 1 at the top) or "Level 4 is already solved." Native control: Hint (`hint`). The hinted tile is the
+  move, no best count). The presenter answers in words: "Hint: turn the mirror at row 2, column 3." (columns from the left and rows from the
+  bottom, counted from 1, as the selected-tile words) or "Level 4 is already solved." Native control: Hint (`hint`). The hinted tile is the
   selected tile, drawn with the selection outline.
 - Q: Where do the spoken words go when VoiceOver is off? → A: As today: every text is kept in the presenter's spoken
   list and shown in the controls' message line; it is posted to the announcement sink only while VoiceOver runs. The
-  board element's accessible value is the summary ("2 of 3 targets lit"); a Describe control (`describe`) shows and
+  board element's accessible value is the summary: the existing canvas description with the count of lit targets
+  added ("Light Maze: level 1, First light; 1 mirror, 1 target; beam ends at the wall; 0 of 1 targets lit; not
+  solved."); a Describe control (`describe`) shows and
   speaks the full description.
 - Q: What exactly is the success cue? → A: Played when the presenter sees the drawn board become solved (the same
   transition that records the solve), every time it happens: (1) visual — while solved, the board gets a border in the
@@ -63,7 +65,7 @@ boards hold at most 144 tiles; the unlit target colour has a contrast of about 2
   at least 3 : 1 against the board colour by `contrastRatio`; colours below it (the unlit target today) are raised. The
   glow cap of A13-P02 (0.15 cell) is kept.
 - Q: What is the board description's form and bound? → A: Plain sentences: "Level 3, Bounce: 5 by 5 board." then one
-  sentence per tile kind listing places ("Mirrors: row 2, column 3, slash; row 4, column 1, backslash."), then each
+  sentence per tile kind listing places ("Mirrors: row 2, column 3, leaning right; row 4, column 1, leaning left."), then each
   beam branch ("Beam 1 starts at row 1, column 1 heading east, turns at row 1, column 4, and ends at the target at row
   3, column 4."), then targets ("Targets: row 3, column 4, lit; row 5, column 2, unlit."). At most 4,000 characters for
   any board within the caps (a test builds the largest allowed board).
