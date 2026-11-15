@@ -9,7 +9,7 @@ X-A14. Precedents: `specs/096-lm-p01-solver/tasks.md` (VisualCore addition), `sp
 
 ## Phase 1: Setup
 
-- [ ] T-A14-201 Baseline: cite the last evidence on the unchanged tree (`.autonomy/checks/A14-P01.{sse-ios27,app-unit,verify-27}.json`) instead of a rerun (owner ruling of 2026-11-14)
+- [X] T-A14-201 Baseline: cite the last evidence on the unchanged tree (`.autonomy/checks/A14-P01.{sse-ios27,app-unit,verify-27}.json`) instead of a rerun (owner ruling of 2026-11-14) — Verified 2026-11-15: 2026-11-15: cited .autonomy/checks/A14-P01.sse-ios27.json, A14-P01.app-unit.json and A14-P01.verify-27.json (exit 0) on the tree recorded at A14-P01, unchanged since apart from spec documents (no rerun)
 
 ## Phase 2: Foundational — VisualCore (story 2)
 
