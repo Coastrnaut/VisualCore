@@ -21,6 +21,10 @@ VisualCore (a gap of the contract), the rest in the experience. Its rules are th
 | [regression-baseline.md](regression-baseline.md) | Phase start, reference pin, the ProjectM reference regression results |
 | [content-licenses.md](content-licenses.md) | Author and license of every bundled species, plant, decoration and habitat (generated) |
 | [device-campaign.md](device-campaign.md) | The planned device measurements (pending until ImplementationLock-100) |
+| [privacy-and-credits.md](privacy-and-credits.md) | What is stored and where, how to delete it, no permission, nothing sent, credits |
+| [store-listing.md](store-listing.md) | Store text input for the one app's listing, with a claim → proving-test table |
+| [release-checklist.md](release-checklist.md) | Release checklist (status and evidence per item) and artifact inventory |
+| [release.json](release.json) | Release configuration read by `scripts/check_experience_release.py` and `scripts/release_check.py` |
 
 Phases: A09-P00 boundary audit (feature 067), P01 habitat model and content license audit, P02 fish movement and
 visual prototype, P03 editing, feeding and save system, P04 lighting, particles and accessibility, P05 ambient device

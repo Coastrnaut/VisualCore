@@ -138,6 +138,31 @@ and `VisualCoreRendering` (iOS, GL). ADR-0003 and the package map record this. R
 - Persistence, the container's contents, memory, CPU and GPU frame time per view, Dynamic Type, Reduce Motion and
   Reduce Flashing and trace contrast are unchecked on devices; they wait for the device campaign.
 
+### Digital Aquarium (A09; features 067–073)
+
+- CPU and GPU frame time per quality level, the level the governor settles on, the thermal state over ten minutes of
+  ambient mode and memory across feeds, saved aquariums and reopenings are unmeasured on devices; they wait for the
+  device campaign ([device-campaign.md](../apps/digital-aquarium/device-campaign.md)). No frame-time, battery or
+  memory figure is stated.
+- The ambient dimming timing (fade after a minute without a touch, restore on a tap), Low Power Mode on hardware and
+  the gestures on hardware (tap to feed, long press to place, drag a piece, two-finger touches) are tested on the
+  simulator and with gesture doubles only; they wait for the device campaign. The system screen brightness and the
+  idle timer are never changed (`AquariumRenderTests.testNoSourceSetsTheSystemBrightnessOrTheIdleTimer`).
+- VoiceOver on hardware, the announcements, Dynamic Type at the largest sizes, Reduce Motion and Increase Contrast on
+  hardware and the system accessibility audits wait for the device campaign.
+- The saved-aquarium library holds at most 12 aquariums (`AquariumLibrary.maxEntries`); a thirteenth save is refused
+  with a message and writes no file (`AquariumLibraryTests.testTheThirteenthSaveIsRefusedWithNoNewFile`). The
+  experience's folder holds at most 64 files and 16 MiB together (`StorageQuota`); a save the storage refuses is
+  refused with a message and changes nothing (`AquariumLibraryTests.testASaveTheStorageRefusesChangesNoFile`). Saved
+  aquariums stay on the device (no sync, no export).
+- The shared `GestureArbiter` reports a drag's changed phase once; Digital Aquarium sends a move for every later finger
+  movement itself (app-local, A09-P03), so VisualCore is unchanged. Long-press-then-drag in one touch is not supported
+  by the arbiter's one-owner rule; a piece is placed by a long press and moved by a separate drag.
+- Ambient mode scales the fish's cruise speed and its floor by 0.6; with the steering forces the measured mean speed
+  in ambient runs is about 0.5 to 0.6 of the species' cruise (simulator runs, feature 072), not exactly 0.6.
+- Fish, food and the school are a bounded visual simulation, not an ecosystem: fish do not age, grow or need feeding,
+  and food is only a visual effect.
+
 ## Distribution
 
 - No App Store submission, signing or purchase setup is part of this release; those are owner actions.
