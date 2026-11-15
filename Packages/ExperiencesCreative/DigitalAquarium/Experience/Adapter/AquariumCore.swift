@@ -13,8 +13,12 @@
 // A choice value that is not a whole number naming an entry is refused with the rule `a09.invalid-choice`; a refusal
 // changes nothing.
 //
-// Snapshot schema 1: `AquariumState` as JSON with sorted keys; the preparation seed comes from the snapshot envelope. A
-// payload whose document does not validate, whose habitat index or lighting level names no entry, whose step count is
+// Snapshot schema 2 (feature 069, A09-P02, T-A09-206; FR-A09-212): `AquariumState` as JSON with sorted keys; the
+// preparation seed and the schema version come from the snapshot envelope. Schema 2 adds the fish `turn` and the decor
+// rotation and scale (habitat document schema 2). A schema-1 payload passes the migration step unchanged and its
+// document is migrated by `HabitatDocument.migrated(catalog:)` on restore (missing fields take 0, 0 and 1; the
+// habitat's starter decor is added when the document has none); `schemaOneExample()` is the stored schema-1 payload
+// the registry's migration check restores. A payload whose (migrated) document does not validate, whose habitat index or lighting level names no entry, whose step count is
 // negative or whose generator state is malformed is refused (the restore throws). One quality tier (`level-0`).
 import Foundation
 import DigitalAquariumCore
@@ -42,7 +46,7 @@ public enum AquariumRestoreError: Error, Equatable {
     case invalidGenerator
 }
 
-/// The saved state of Digital Aquarium (snapshot schema 1).
+/// The saved state of Digital Aquarium (snapshot schema 2).
 public struct AquariumState: Codable, Equatable, Sendable {
     /// The habitat document: water colour, bounds, plants, fish, decor and lighting.
     public var document: HabitatDocument
@@ -62,7 +66,7 @@ public struct AquariumState: Codable, Equatable, Sendable {
     }
 }
 
-/// The state of Digital Aquarium. Schema version 1.
+/// The state of Digital Aquarium. Schema version 2.
 public struct AquariumCore: ExperienceCore, Equatable {
     /// The experience's id in the catalog.
     public static let experienceID = "a09.digital-aquarium"
@@ -128,8 +132,41 @@ public struct AquariumCore: ExperienceCore, Equatable {
     /// One quality tier (`level-0`): the aquarium draws at most 36 shapes plus the water and the gravel.
     public static var qualityTiers: Int { 1 }
 
-    /// Schema 1; no older schema exists.
-    public static var migrations: MigrationChain { MigrationChain(currentVersion: 1) }
+    /// Schema 2; a schema-1 payload is carried over unchanged and its habitat document is migrated on restore
+    /// (`HabitatDocument.migrated(catalog:)` needs the catalog, which a payload step does not have).
+    public static var migrations: MigrationChain {
+        MigrationChain(currentVersion: 2, steps: [1: { payload in payload }])
+    }
+
+    /// The stored example of schema 1 for the registry's migration check (feature 069, T-A09-206): the A09-P01 payload
+    /// of the Kelp habitat at bright lighting after 120 steps — written as A09-P01 wrote it (habitat document schema 1,
+    /// no `turn`, `rotation` or `scale`, no decor) — with the digest its restore must give: the same aquarium with its
+    /// document migrated (schema 2, the Kelp starter decor). Nil only if the encoding failed.
+    public static func schemaOneExample(seed: UInt64 = 7) -> MigrationExample? {
+        guard let id = ExperienceID(rawValue: experienceID) else { return nil }
+        var core = AquariumCore(seed: seed)
+        _ = core.apply(ExperienceAction(control: "habitat.select", values: [1], step: 0))
+        _ = core.apply(ExperienceAction(control: "lighting.level", values: [2], step: 0))
+        for s in 0..<120 { core.update(step: s) }
+        // The schema-1 shape: the document without the decor and the schema-2 fields.
+        guard var object = (try? JSONSerialization.jsonObject(with: encode(core.state))) as? [String: Any],
+              var document = object["document"] as? [String: Any],
+              let fish = document["fish"] as? [[String: Any]] else { return nil }
+        document["schema"] = 1
+        document["decor"] = [Any]()
+        document["fish"] = fish.map { var f = $0; f["turn"] = nil; return f }
+        object["document"] = document
+        // The expected state: the schema-1 document as decoded (turn 0), then migrated.
+        guard let payload = try? JSONSerialization.data(withJSONObject: object, options: [.sortedKeys]),
+              let restored = try? restore(payload: payload, seed: seed) else { return nil }
+        var builder = DigestBuilder(domain: id.rawValue)
+        guard (try? restored.writeDigest(into: &builder)) != nil,
+              let snapshot = try? ExperienceSnapshot(experience: id, schemaVersion: 1, seed: seed,
+                                                     stepIndex: restored.step, digest: builder.finish(),
+                                                     payload: payload),
+              let encoded = try? snapshot.encoded() else { return nil }
+        return MigrationExample(version: 1, snapshot: encoded, expectedDigest: builder.finish().hex)
+    }
 
     /// The three controls with their declared ranges.
     public static var controls: [ExperienceControl] {
@@ -204,16 +241,18 @@ public struct AquariumCore: ExperienceCore, Equatable {
         builder.add("a09.aquarium.v1|" + text)
     }
 
-    /// The aquarium state (schema 1) as JSON with sorted keys.
+    /// The aquarium state (schema 2) as JSON with sorted keys.
     public func snapshotPayload() throws -> Data {
         try Self.encode(state)
     }
 
-    /// The core of a schema-1 payload with the envelope's `seed` as preparation seed; a payload that does not decode, a
+    /// The core of a payload (schema 2, or schema 1 carried over by ``migrations``) with the envelope's `seed` as
+    /// preparation seed; its document is migrated to schema 2 first. A payload that does not decode, a migrated
     /// document that does not validate, an unknown habitat, a lighting level outside 0…2, a negative step count or a
     /// malformed generator state is refused (throws).
     public static func restore(payload: Data, seed: UInt64) throws -> AquariumCore {
-        let state = try JSONDecoder().decode(AquariumState.self, from: payload)
+        var state = try JSONDecoder().decode(AquariumState.self, from: payload)
+        state.document = state.document.migrated(catalog: catalog)
         let problems = state.document.validate(catalog: catalog)
         guard problems.isEmpty else { throw AquariumRestoreError.invalidDocument(problems) }
         guard catalog.habitats.indices.contains(state.document.habitatIndex) else {

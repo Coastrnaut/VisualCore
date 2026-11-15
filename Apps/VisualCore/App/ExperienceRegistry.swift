@@ -204,10 +204,13 @@ extension ExperienceRegistry {
         #endif
         return registration
     }
-    /// A09 Digital Aquarium (feature 068, A09-P01): a candidate until X-A09.
+    /// A09 Digital Aquarium (features 068–069, A09-P01…P02): a candidate until X-A09.
     fileprivate static var digitalAquarium: ExperienceRegistration? {
         guard let id = DigitalAquariumExperience.id else { return nil }
-        var registration = ExperienceRegistration(id: id, core: AquariumCore.self, examples: []) { launch in
+        // Schema 2 (feature 069) adds the fish turn and the decor transforms; the stored schema-1 example proves the
+        // migration.
+        let examples = [AquariumCore.schemaOneExample()].compactMap { $0 }
+        var registration = ExperienceRegistration(id: id, core: AquariumCore.self, examples: examples) { launch in
             let system = SystemAccessibilityObserver.systemValues()
             return DigitalAquariumExperience.make(id: id, storage: launch.storage,
                                                   reduceMotion: launch.reduceMotion.resolved(system: system.reduceMotion),

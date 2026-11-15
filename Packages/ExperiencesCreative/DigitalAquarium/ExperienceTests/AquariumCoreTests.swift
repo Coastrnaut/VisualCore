@@ -34,7 +34,7 @@ final class AquariumCoreTests: XCTestCase {
         XCTAssertEqual(AquariumCore.controls.map(\.id), ["habitat.select", "lighting.level", "motion.pause"])
         XCTAssertEqual(AquariumCore.controls.map(\.id), AquariumCore.actionIDs)
         XCTAssertEqual(AquariumCore.controls.map { $0.ranges }, [[0...1], [0...2], [0...1]])
-        XCTAssertEqual(AquariumCore.migrations.currentVersion, 1)
+        XCTAssertEqual(AquariumCore.migrations.currentVersion, 2)
         XCTAssertEqual(AquariumCore.qualityTiers, 1)
         XCTAssertEqual(AquariumCore.stepDuration, 1.0 / 60, accuracy: 1e-12)
         XCTAssertTrue(AquariumRule.invalidChoice.hasPrefix("a09."))
@@ -174,7 +174,7 @@ final class AquariumCoreTests: XCTestCase {
         XCTAssertTrue(first.handle(control: "lighting.level", values: [2]).isAccepted)
         try first.run(steps: 45)
         let snapshot = try first.snapshot()
-        XCTAssertEqual(snapshot.schemaVersion, 1)
+        XCTAssertEqual(snapshot.schemaVersion, 2)
         XCTAssertEqual(snapshot.stepIndex, 75)
         let decoded = try ExperienceSnapshot(data: snapshot.encoded())
         var second = try await makeEngine(seed: 3)
@@ -239,14 +239,14 @@ final class AquariumCoreTests: XCTestCase {
         try engine.run(steps: 10)
         let digest = try engine.digest()
         let state = try XCTUnwrap(engine.core).state
-        let newer = try ExperienceSnapshot(experience: aquariumID, schemaVersion: 2, seed: 7, stepIndex: 10,
+        let newer = try ExperienceSnapshot(experience: aquariumID, schemaVersion: 3, seed: 7, stepIndex: 10,
                                            digest: digest, payload: AquariumCore.encode(state))
         XCTAssertThrowsError(try engine.restore(newer)) { error in
-            XCTAssertEqual(error as? ExperienceError, .snapshot(.newerSchema(found: 2, current: 1)))
+            XCTAssertEqual(error as? ExperienceError, .snapshot(.newerSchema(found: 3, current: 2)))
         }
         var broken = state
         broken.document.lighting = 7
-        let damaged = try ExperienceSnapshot(experience: aquariumID, schemaVersion: 1, seed: 7, stepIndex: 10,
+        let damaged = try ExperienceSnapshot(experience: aquariumID, schemaVersion: 2, seed: 7, stepIndex: 10,
                                              digest: digest, payload: AquariumCore.encode(broken))
         XCTAssertThrowsError(try engine.restore(damaged)) { error in
             guard case .snapshot(.corrupt)? = error as? ExperienceError else {
@@ -265,5 +265,48 @@ final class AquariumCoreTests: XCTestCase {
         try engine.reset()
         XCTAssertEqual(try engine.digest(), first)
         XCTAssertEqual(engine.core, AquariumCore(seed: 11))
+    }
+
+    /// Feature 069 (A09-P02) T-A09-206 (FR-A09-212; SC-A09-204): the stored schema-1 payload restores through the
+    /// engine's migration with the Kelp starter decor added, its fish, plants and lighting kept, and the digest the
+    /// example names; a schema-2 save of decor with transforms round-trips identically.
+    func testASchemaOneSnapshotMigratesWithTheStarterDecor() async throws {
+        let example = try XCTUnwrap(AquariumCore.schemaOneExample())
+        XCTAssertEqual(example.version, 1)
+        let snapshot = try ExperienceSnapshot(data: example.snapshot)
+        let payload = try XCTUnwrap(try JSONSerialization.jsonObject(with: Data(snapshot.payload.utf8)) as? [String: Any])
+        let document = try XCTUnwrap(payload["document"] as? [String: Any])
+        XCTAssertEqual(document["schema"] as? Int, 1)
+        XCTAssertEqual((document["decor"] as? [Any])?.count, 0)
+        var engine = try await makeEngine(seed: 3)
+        try engine.restore(snapshot)
+        XCTAssertEqual(try engine.digest().hex, example.expectedDigest)
+        let core = try XCTUnwrap(engine.core)
+        let kelp = AquariumCore.catalog.habitats[1]
+        XCTAssertEqual(core.document.schema, 2)
+        XCTAssertEqual(core.document.habitatId, kelp.id)
+        XCTAssertEqual(core.document.lighting, 2)
+        XCTAssertEqual(core.document.decor, kelp.decor.map(DecorPlacement.init))
+        XCTAssertEqual(core.document.fish.count, kelp.fishCount)
+        XCTAssertTrue(core.document.fish.allSatisfy { $0.turn == 0 })
+        XCTAssertEqual(core.document.plants.count, kelp.plants.count)
+    }
+
+    func testDecorTransformsSpeciesAndLightingSurviveASaveAndRestore() async throws {
+        var engine = try await makeEngine(seed: 7)
+        XCTAssertTrue(engine.handle(control: "habitat.select", values: [1]).isAccepted)
+        XCTAssertTrue(engine.handle(control: "lighting.level", values: [0]).isAccepted)
+        try engine.run(steps: 90)
+        let before = try XCTUnwrap(engine.core).document
+        XCTAssertFalse(before.decor.isEmpty)
+        XCTAssertTrue(before.decor.contains { $0.rotation != 0 || $0.scale != 1 }, "transforms are not the defaults")
+        let snapshot = try ExperienceSnapshot(data: engine.snapshot().encoded())
+        var other = try await makeEngine(seed: 3)
+        try other.restore(snapshot)
+        let after = try XCTUnwrap(other.core).document
+        XCTAssertEqual(after.fish.map(\.speciesId), before.fish.map(\.speciesId))
+        XCTAssertEqual(after.decor, before.decor)
+        XCTAssertEqual(after.lighting, before.lighting)
+        XCTAssertEqual(after, before)
     }
 }
