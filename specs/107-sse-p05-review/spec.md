@@ -133,7 +133,11 @@ or state, and a device-campaign document lists what must be measured on real dev
   mode as such; a test MUST sample the state space.
 - **FR-A14-510**: The experience MUST declare its detail levels; the drawing's levels and the registration MUST agree;
   a lower level MUST change no position and no state.
-- **FR-A14-511**: A device-campaign document MUST list the device-only measurements and audits as {device} tasks.
+- **FR-A14-511**: A device-campaign document MUST list the device-only measurements and audits as {device} tasks,
+  each with a pass criterion: frame time (95th percentile at most 16.7 ms at level 0 on the iOS 27 phone during a
+  60-second orbit and tour run), the drop to level 1 when the thermal state reaches serious or Low Power Mode is on,
+  peak memory (at most 300 MB), the system accessibility audit (no issues), VoiceOver reading of the model statement,
+  labels and captions, Dynamic Type at the largest size, and Reduce Motion cutting flights.
 - **FR-A14-520**: The contract MUST close G-REVIEW; the runner MUST pass on iOS 27.
 
 ### Key Entities
