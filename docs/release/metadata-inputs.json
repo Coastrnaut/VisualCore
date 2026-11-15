@@ -71,9 +71,17 @@
         "microphone"
       ],
       "tier": "free"
+    },
+    {
+      "category": "audio",
+      "code": "A09",
+      "id": "a09.digital-aquarium",
+      "name": "Digital Aquarium",
+      "permissions": [],
+      "tier": "free"
     }
   ],
-  "ledger_sha256": "2e01dbc8acc029e711a9d4020c31cb4b8a9443a4d85b4d2ad45bf06d3f99e934",
+  "ledger_sha256": "858bb2c70ab3de85674f35a5f2b7caac365699ec48f53a4e56be924d2a3acab5",
   "privacy_answers": "unproven",
   "schema": 1
 }

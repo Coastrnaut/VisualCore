@@ -1,0 +1,97 @@
+{
+  "branch": "main",
+  "dirty": true,
+  "dirty_paths": [
+    "docs/verification/a09.digital-aquarium/summary-27.2.json",
+    "docs/verification/a09.digital-aquarium/summary-26.5.json"
+  ],
+  "failed_attempts": [
+    {
+      "command": "swift test --package-path Packages/VisualCore --no-parallel",
+      "exit_code": 1,
+      "log": ".autonomy/logs/migration/X-A09.visualcore-host-2.log",
+      "log_sha256": "b990fadcfffb623eb5806ff05a2ec6efd98983a958af6683394c91f2683bfba0",
+      "name": "visualcore-host-2",
+      "timed_out": false
+    },
+    {
+      "command": "swift test --package-path Packages/VisualCore",
+      "exit_code": 1,
+      "log": ".autonomy/logs/migration/X-A09.visualcore-host.log",
+      "log_sha256": "58cad9b90b8fecdccf12f82b112a74a238524c8bc61bc556acf2d8f8b5370b87",
+      "name": "visualcore-host",
+      "timed_out": false
+    }
+  ],
+  "gate": "X-A09",
+  "ledger": "migration",
+  "passing_checks": [
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --result-name xa09-host",
+      "exit_code": 0,
+      "finished": "2026-11-15T02:02:53+00:00",
+      "log": ".autonomy/logs/migration/X-A09.host.log",
+      "log_sha256": "114f737b0061754946fd414c40735989f89cd5843cd7c7359720ce3d89bbd972",
+      "name": "host"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only reference-engine-xcframework reference-build-projectm-ios-sim reference-clean",
+      "exit_code": 0,
+      "finished": "2026-11-15T02:10:51+00:00",
+      "log": ".autonomy/logs/migration/X-A09.reference-1.log",
+      "log_sha256": "2f976e0b6b21fb0ae7623125e74a8b9f25da522aec4d19b0780f583b1fec2b6f",
+      "name": "reference-1"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only reference-test-anglerendering-ios27 reference-test-anglerendering-ios26 projectm-reference-ios27 projectm-reference-ios26",
+      "exit_code": 0,
+      "finished": "2026-11-15T02:12:43+00:00",
+      "log": ".autonomy/logs/migration/X-A09.reference-2.log",
+      "log_sha256": "b22a8743f54cff1fbc3af07bd4672d96e2f77cdc78d713901e03ff0316d5bd53",
+      "name": "reference-2"
+    },
+    {
+      "command": "python3 scripts/verify_experiences.py --only a09.digital-aquarium --runtime 26",
+      "exit_code": 0,
+      "finished": "2026-11-15T02:07:29+00:00",
+      "log": ".autonomy/logs/migration/X-A09.sim26.log",
+      "log_sha256": "6a9418dfca85a8192a1c15b79d81dc50c339eb2ce8b7270b8db2beb253bfdf5d",
+      "name": "sim26"
+    },
+    {
+      "command": "python3 scripts/verify_experiences.py --only a09.digital-aquarium --runtime 27",
+      "exit_code": 0,
+      "finished": "2026-11-15T02:06:58+00:00",
+      "log": ".autonomy/logs/migration/X-A09.sim27.log",
+      "log_sha256": "3b1d6384ca5eafa82b7c10b3891e3cf016435e7cf247dabed41268dedd31f497",
+      "name": "sim27"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only app-build-for-testing-ios27 app-ui-ios27-q2",
+      "exit_code": 0,
+      "finished": "2026-11-15T02:09:52+00:00",
+      "log": ".autonomy/logs/migration/X-A09.ui-q2.log",
+      "log_sha256": "1a9a2456f3a6035c57edc41f18c9582842fc86cef3d6aa054df39163f13bef88",
+      "name": "ui-q2"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --result-name xa09-rendering",
+      "exit_code": 0,
+      "finished": "2026-11-15T02:04:53+00:00",
+      "log": ".autonomy/logs/migration/X-A09.visualcore-rendering.log",
+      "log_sha256": "ad39d4c2d0e613797b08c2404730760bfde7854f57f829d1e040863f58caef2e",
+      "name": "visualcore-rendering"
+    },
+    {
+      "command": "swift test --package-path Packages/VisualCore --filter 'SteeringForceTests|NeighbourSearchTests'",
+      "exit_code": 0,
+      "finished": "2026-11-15T02:06:39+00:00",
+      "log": ".autonomy/logs/migration/X-A09.visualcore-steering.log",
+      "log_sha256": "17629950934ecbf3f866046649c0206cc4202dd3b1e0103346872a8d9d355bc5",
+      "name": "visualcore-steering"
+    }
+  ],
+  "revision": "f741b8a6fe0c72df807c69d05ecd71c7735d63ec",
+  "revision_number": 1,
+  "sealed": "2026-11-15T02:12:50+00:00"
+}
