@@ -31,10 +31,14 @@ final class AquariumCoreTests: XCTestCase {
     func testIdControlsSchemaAndTiers() {
         XCTAssertEqual(AquariumCore.experienceID, "a09.digital-aquarium")
         XCTAssertEqual(DigitalAquariumExperience.id?.rawValue, "a09.digital-aquarium")
-        XCTAssertEqual(AquariumCore.controls.map(\.id), ["habitat.select", "lighting.level", "motion.pause"])
+        XCTAssertEqual(AquariumCore.controls.map(\.id), ["habitat.select", "lighting.level", "motion.pause",
+                                                         "food.drop", "decor.kind", "decor.place", "decor.move",
+                                                         "decor.remove"])
         XCTAssertEqual(AquariumCore.controls.map(\.id), AquariumCore.actionIDs)
-        XCTAssertEqual(AquariumCore.controls.map { $0.ranges }, [[0...1], [0...2], [0...1]])
-        XCTAssertEqual(AquariumCore.migrations.currentVersion, 2)
+        XCTAssertEqual(AquariumCore.controls.map { $0.ranges },
+                       [[0...1], [0...2], [0...1], [0...1, 0...1], [0...2], [0...1, 0...1], [0...11, 0...1, 0...1],
+                        [0...11]])
+        XCTAssertEqual(AquariumCore.migrations.currentVersion, 3)
         XCTAssertEqual(AquariumCore.qualityTiers, 1)
         XCTAssertEqual(AquariumCore.stepDuration, 1.0 / 60, accuracy: 1e-12)
         XCTAssertTrue(AquariumRule.invalidChoice.hasPrefix("a09."))
@@ -174,7 +178,7 @@ final class AquariumCoreTests: XCTestCase {
         XCTAssertTrue(first.handle(control: "lighting.level", values: [2]).isAccepted)
         try first.run(steps: 45)
         let snapshot = try first.snapshot()
-        XCTAssertEqual(snapshot.schemaVersion, 2)
+        XCTAssertEqual(snapshot.schemaVersion, 3)
         XCTAssertEqual(snapshot.stepIndex, 75)
         let decoded = try ExperienceSnapshot(data: snapshot.encoded())
         var second = try await makeEngine(seed: 3)
@@ -239,10 +243,10 @@ final class AquariumCoreTests: XCTestCase {
         try engine.run(steps: 10)
         let digest = try engine.digest()
         let state = try XCTUnwrap(engine.core).state
-        let newer = try ExperienceSnapshot(experience: aquariumID, schemaVersion: 3, seed: 7, stepIndex: 10,
+        let newer = try ExperienceSnapshot(experience: aquariumID, schemaVersion: 4, seed: 7, stepIndex: 10,
                                            digest: digest, payload: AquariumCore.encode(state))
         XCTAssertThrowsError(try engine.restore(newer)) { error in
-            XCTAssertEqual(error as? ExperienceError, .snapshot(.newerSchema(found: 3, current: 2)))
+            XCTAssertEqual(error as? ExperienceError, .snapshot(.newerSchema(found: 4, current: 3)))
         }
         var broken = state
         broken.document.lighting = 7
@@ -283,7 +287,7 @@ final class AquariumCoreTests: XCTestCase {
         XCTAssertEqual(try engine.digest().hex, example.expectedDigest)
         let core = try XCTUnwrap(engine.core)
         let kelp = AquariumCore.catalog.habitats[1]
-        XCTAssertEqual(core.document.schema, 2)
+        XCTAssertEqual(core.document.schema, HabitatDocument.currentSchema)
         XCTAssertEqual(core.document.habitatId, kelp.id)
         XCTAssertEqual(core.document.lighting, 2)
         XCTAssertEqual(core.document.decor, kelp.decor.map(DecorPlacement.init))
@@ -308,5 +312,95 @@ final class AquariumCoreTests: XCTestCase {
         XCTAssertEqual(after.decor, before.decor)
         XCTAssertEqual(after.lighting, before.lighting)
         XCTAssertEqual(after, before)
+    }
+
+    // MARK: Feature 070 (A09-P03) T-A09-306 — feeding and decor editing actions (FR-A09-301, 310, 320)
+
+    func testFeedingAddsThreePelletsAndRefusesBeyondTwelve() async throws {
+        var engine = try await makeEngine()
+        for n in 1...4 {
+            XCTAssertTrue(engine.handle(control: "food.drop", values: [0.5, 0.8]).isAccepted, "feed \(n)")
+            XCTAssertEqual(try XCTUnwrap(engine.core).document.food.count, 3 * n)
+        }
+        let before = try XCTUnwrap(engine.core).state
+        XCTAssertEqual(engine.handle(control: "food.drop", values: [0.5, 0.8]).code,
+                       "action.rule." + AquariumRule.foodFull)
+        XCTAssertEqual(try XCTUnwrap(engine.core).state, before, "a refused feed changes nothing")
+        let x = try XCTUnwrap(engine.core).document.food.map(\.position.x)
+        XCTAssertEqual(Array(x.prefix(3)), [7.75, 8.0, 8.25])
+    }
+
+    func testAFeedWhilePausedWaitsForTheMotion() async throws {
+        var engine = try await makeEngine()
+        XCTAssertTrue(engine.handle(control: "motion.pause", values: [1]).isAccepted)
+        XCTAssertTrue(engine.handle(control: "food.drop", values: [0.5, 0.8]).isAccepted)
+        let held = try XCTUnwrap(engine.core).document.food
+        try engine.run(steps: 60)
+        XCTAssertEqual(try XCTUnwrap(engine.core).document.food, held, "pellets do not sink while paused")
+        XCTAssertTrue(engine.handle(control: "motion.pause", values: [0]).isAccepted)
+        try engine.run(steps: 60)
+        let sunk = try XCTUnwrap(engine.core).document.food
+        XCTAssertTrue(zip(sunk, held).allSatisfy { $0.position.y < $1.position.y } || sunk.count < held.count)
+    }
+
+    func testDecorKindPlaceMoveAndRemove() async throws {
+        var engine = try await makeEngine()
+        let starter = try XCTUnwrap(engine.core).document.decor
+        XCTAssertTrue(engine.handle(control: "decor.kind", values: [2]).isAccepted)
+        XCTAssertTrue(engine.handle(control: "decor.place", values: [0.25, 0.2]).isAccepted)
+        var decor = try XCTUnwrap(engine.core).document.decor
+        XCTAssertEqual(decor.count, starter.count + 1)
+        XCTAssertEqual(decor.last?.kindId, AquariumCore.catalog.decor[2].id)
+        XCTAssertEqual(decor.last?.position, Vec2(4, 1.8))
+        XCTAssertEqual(decor.last?.rotation, 0)
+        XCTAssertEqual(decor.last?.scale, 1)
+        XCTAssertTrue(engine.handle(control: "decor.move", values: [0, 0.75, 0.3]).isAccepted)
+        decor = try XCTUnwrap(engine.core).document.decor
+        XCTAssertEqual(decor[0].position.x, 12, accuracy: 1e-9)
+        XCTAssertEqual(decor[0].position.y, 2.7, accuracy: 1e-9)
+        XCTAssertTrue(engine.handle(control: "decor.remove", values: [0]).isAccepted)
+        XCTAssertEqual(try XCTUnwrap(engine.core).document.decor.count, starter.count)
+        let last = Double(starter.count)        // the index that no longer exists
+        XCTAssertEqual(engine.handle(control: "decor.move", values: [last, 0.5, 0.5]).code,
+                       "action.rule." + AquariumRule.noSuchDecor, "a just-removed index is refused")
+        XCTAssertEqual(engine.handle(control: "decor.remove", values: [11]).code,
+                       "action.rule." + AquariumRule.noSuchDecor)
+        XCTAssertEqual(engine.handle(control: "decor.kind", values: [1.5]).code,
+                       "action.rule." + AquariumRule.invalidChoice)
+        while try XCTUnwrap(engine.core).document.decor.count < HabitatDocument.maxDecor {
+            XCTAssertTrue(engine.handle(control: "decor.place", values: [0.5, 0.5]).isAccepted)
+        }
+        XCTAssertEqual(engine.handle(control: "decor.place", values: [0.5, 0.5]).code,
+                       "action.rule." + AquariumRule.decorFull)
+    }
+
+    func testAHabitatChangeClearsFoodAndKeepsTheChosenKind() async throws {
+        var engine = try await makeEngine()
+        XCTAssertTrue(engine.handle(control: "decor.kind", values: [1]).isAccepted)
+        XCTAssertTrue(engine.handle(control: "food.drop", values: [0.5, 0.8]).isAccepted)
+        XCTAssertTrue(engine.handle(control: "decor.remove", values: [0]).isAccepted)
+        XCTAssertTrue(engine.handle(control: "habitat.select", values: [1]).isAccepted)
+        let core = try XCTUnwrap(engine.core)
+        XCTAssertTrue(core.document.food.isEmpty)
+        XCTAssertEqual(core.document.decor, AquariumCore.catalog.habitats[1].decor.map(DecorPlacement.init))
+        XCTAssertEqual(core.decorKind, 1)
+    }
+
+    func testSchemaTwoSnapshotsMigrateAndADamagedKindIsRefused() async throws {
+        let example = try XCTUnwrap(AquariumCore.schemaTwoExample())
+        XCTAssertEqual(example.version, 2)
+        var engine = try await makeEngine(seed: 3)
+        try engine.restore(ExperienceSnapshot(data: example.snapshot))
+        XCTAssertEqual(try engine.digest().hex, example.expectedDigest)
+        let core = try XCTUnwrap(engine.core)
+        XCTAssertEqual(core.document.schema, HabitatDocument.currentSchema)
+        XCTAssertTrue(core.document.food.isEmpty)
+        XCTAssertEqual(core.decorKind, 0)
+        XCTAssertEqual(core.document.lighting, 0)
+        var damaged = core.state
+        damaged.decorKind = 5
+        XCTAssertThrowsError(try AquariumCore.restore(payload: AquariumCore.encode(damaged), seed: 7)) { error in
+            XCTAssertEqual(error as? AquariumRestoreError, .invalidDecorKind(5))
+        }
     }
 }

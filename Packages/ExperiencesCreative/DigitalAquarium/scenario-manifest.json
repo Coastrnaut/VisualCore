@@ -2,7 +2,12 @@
   "controls" : [
     "habitat.select",
     "lighting.level",
-    "motion.pause"
+    "motion.pause",
+    "food.drop",
+    "decor.kind",
+    "decor.place",
+    "decor.move",
+    "decor.remove"
   ],
   "experience" : "a09.digital-aquarium",
   "kind" : "creative",
@@ -12,7 +17,7 @@
 
       ],
       "expect" : {
-        "initialDigest" : "8f49285453d508389732cd3392ec72fd85d418669f3db6994cbd96fc1a3b95a2"
+        "initialDigest" : "398f03aa42aed12dc7b4dee6166c4a9a87c117c11ba732b1abcd0faed5f432bb"
       },
       "name" : "launch-first-frame",
       "seed" : "7"
@@ -51,8 +56,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "35ccddad55916eedddd7a25ec1071438533375a63eae9bebb6a4de3a4d1f836c",
-        "initialDigest" : "8f49285453d508389732cd3392ec72fd85d418669f3db6994cbd96fc1a3b95a2"
+        "finalDigest" : "05de95080badd7c40397dcc0b9cd2e4196935ab66713f26223ac13a8a9999a2f",
+        "initialDigest" : "398f03aa42aed12dc7b4dee6166c4a9a87c117c11ba732b1abcd0faed5f432bb"
       },
       "name" : "input-response",
       "seed" : "7"
@@ -149,8 +154,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "35ccddad55916eedddd7a25ec1071438533375a63eae9bebb6a4de3a4d1f836c",
-        "initialDigest" : "8f49285453d508389732cd3392ec72fd85d418669f3db6994cbd96fc1a3b95a2"
+        "finalDigest" : "05de95080badd7c40397dcc0b9cd2e4196935ab66713f26223ac13a8a9999a2f",
+        "initialDigest" : "398f03aa42aed12dc7b4dee6166c4a9a87c117c11ba732b1abcd0faed5f432bb"
       },
       "name" : "save-restore",
       "seed" : "7"
@@ -189,7 +194,7 @@
         }
       ],
       "expect" : {
-        "initialDigest" : "8f49285453d508389732cd3392ec72fd85d418669f3db6994cbd96fc1a3b95a2",
+        "initialDigest" : "398f03aa42aed12dc7b4dee6166c4a9a87c117c11ba732b1abcd0faed5f432bb",
         "resetDigest" : true
       },
       "name" : "reset",
@@ -243,8 +248,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "6f84e29dfc4fb37dd8741180076e69f971e9df7621d2a67597985b083545a2ec",
-        "initialDigest" : "8f49285453d508389732cd3392ec72fd85d418669f3db6994cbd96fc1a3b95a2"
+        "finalDigest" : "45b0c5dd5117f8f0d58369b031bec60f3f869539575c4c05c88e4ebe78900e15",
+        "initialDigest" : "398f03aa42aed12dc7b4dee6166c4a9a87c117c11ba732b1abcd0faed5f432bb"
       },
       "name" : "fixture-1",
       "seed" : "7"
@@ -276,8 +281,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "f8fab0aa9c70d10f44a411f88f073da3f6a6fa25be17d0af21ebc7cbecdba817",
-        "initialDigest" : "8f49285453d508389732cd3392ec72fd85d418669f3db6994cbd96fc1a3b95a2"
+        "finalDigest" : "b7a3368f8773bb82f3dae63fe79747660438e01a9515f6058315732cefe8c5cd",
+        "initialDigest" : "398f03aa42aed12dc7b4dee6166c4a9a87c117c11ba732b1abcd0faed5f432bb"
       },
       "name" : "fixture-2",
       "seed" : "7"
@@ -299,8 +304,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "2d220e0e5f95e42d6e2f8bbebc514d470876adde7a8ef1b24cd02eb2b5f563de",
-        "initialDigest" : "8f49285453d508389732cd3392ec72fd85d418669f3db6994cbd96fc1a3b95a2"
+        "finalDigest" : "36443324b6797834dc80ec560e777636321876f1c2a0eaf0754c5eaa6ca74566",
+        "initialDigest" : "398f03aa42aed12dc7b4dee6166c4a9a87c117c11ba732b1abcd0faed5f432bb"
       },
       "name" : "fixture-3",
       "seed" : "7"
@@ -332,8 +337,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "d6a9cd20791abd81d7e27e27995c67d3622c8ceb5632d48bc7e7883cc3de9548",
-        "initialDigest" : "8f49285453d508389732cd3392ec72fd85d418669f3db6994cbd96fc1a3b95a2"
+        "finalDigest" : "60f4131f2aced5d9d14359bf1a01f15cbe30b7c8d51b32d5dde35a721da043d4",
+        "initialDigest" : "398f03aa42aed12dc7b4dee6166c4a9a87c117c11ba732b1abcd0faed5f432bb"
       },
       "name" : "fixture-4",
       "seed" : "7"
@@ -395,8 +400,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "841b789ce5ac53219f74c742e1b525e8d93fee52a578582e25b31dfeb99b5a2c",
-        "initialDigest" : "8f49285453d508389732cd3392ec72fd85d418669f3db6994cbd96fc1a3b95a2"
+        "finalDigest" : "1a3c3632c68df8bfe0df77999b3cd181b217d79c2e583e46c961982fbab28815",
+        "initialDigest" : "398f03aa42aed12dc7b4dee6166c4a9a87c117c11ba732b1abcd0faed5f432bb"
       },
       "name" : "fixture-5",
       "seed" : "7"
@@ -418,8 +423,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "ed8b20d1104d85ed6422fa3a76fc8b0d91cefdb2d7189fc799548f91c34d8195",
-        "initialDigest" : "8f49285453d508389732cd3392ec72fd85d418669f3db6994cbd96fc1a3b95a2"
+        "finalDigest" : "287309e3b2e8829982d4f8688056990d397f66eee97b9b2510749b1bd4d3936b",
+        "initialDigest" : "398f03aa42aed12dc7b4dee6166c4a9a87c117c11ba732b1abcd0faed5f432bb"
       },
       "name" : "fixture-6",
       "seed" : "7"
@@ -451,8 +456,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "0e461cf90091fb87024053d00bcdfcd58486b74a568256d2ef5ad662b67170f8",
-        "initialDigest" : "8f49285453d508389732cd3392ec72fd85d418669f3db6994cbd96fc1a3b95a2"
+        "finalDigest" : "b0e5856b3e8c3b6d1a231edb52f715adb7a14d48ccdbf4246e64350e8bf9eda4",
+        "initialDigest" : "398f03aa42aed12dc7b4dee6166c4a9a87c117c11ba732b1abcd0faed5f432bb"
       },
       "name" : "fixture-7",
       "seed" : "7"
