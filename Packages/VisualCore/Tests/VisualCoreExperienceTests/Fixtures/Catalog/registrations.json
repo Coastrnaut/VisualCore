@@ -300,6 +300,29 @@
       "manifest": "Packages/ExperiencesCreative/TinyWorlds/scenario-manifest.json",
       "permissions": [],
       "summary": "A gallery of tiny procedural worlds to orbit, each built from a seed."
+    },
+    "a13.light-maze": {
+      "capabilities": [
+        "twenty handcrafted levels",
+        "emitter, wall, mirror, target, prism",
+        "beam reflects at equal angles",
+        "bounded beam, loops end safely",
+        "turn a mirror to light a target",
+        "beam drawn from the exact path"
+      ],
+      "quality_tiers": [
+        "level-0"
+      ],
+      "palette": [
+        "#0E1220",
+        "#F2C14E",
+        "#4FD1C5",
+        "#E8EAF0"
+      ],
+      "content": null,
+      "manifest": "Packages/ExperiencesCreative/LightMaze/scenario-manifest.json",
+      "permissions": [],
+      "summary": "A light-reflection puzzle: turn mirrors and prisms on a grid to guide a beam into every target."
     }
   }
 }

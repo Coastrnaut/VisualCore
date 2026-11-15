@@ -13,6 +13,7 @@ import DigitalAquariumExperience
 import NeonArcadeExperience
 import PhysicsPlaygroundExperience
 import TinyWorldsExperience
+import LightMazeExperience
 import VisualCoreExperience
 import VisualCoreExperienceHost
 import VisualCoreUI
@@ -74,7 +75,7 @@ enum ExperienceRegistry {
     /// each carries its scenario manifest, so that the verification runner can open it, but it stays unavailable
     /// in the catalog and outside `all`. Debug builds show them with `-vcCandidates`. Recording an experience's X
     /// gate moves its registration from here to `all`.
-    static let candidates: [ExperienceRegistration] = []
+    static let candidates: [ExperienceRegistration] = [lightMaze].compactMap { $0 }
 
     /// A01 Generative Art Studio (feature 193, US1).
     private static var generativeArtStudio: ExperienceRegistration? {
@@ -283,6 +284,21 @@ extension ExperienceRegistry {
         }
         #if DEBUG || VISUALCORE_AUTOMATION
         registration.scenarioManifest = WorldsCore.manifest(for: id)
+        #endif
+        return registration
+    }
+
+    /// A13 Light Maze (feature 096, A13-P01): a candidate until X-A13.
+    fileprivate static var lightMaze: ExperienceRegistration? {
+        guard let id = LightMazeExperience.id else { return nil }
+        var registration = ExperienceRegistration(id: id, core: MazeCore.self, examples: []) { launch in
+            let system = SystemAccessibilityObserver.systemValues()
+            return LightMazeExperience.make(id: id, storage: launch.storage,
+                                            reduceMotion: launch.reduceMotion.resolved(system: system.reduceMotion),
+                                            reduceFlashing: launch.reduceFlashing.resolved(system: system.dimFlashingLights))
+        }
+        #if DEBUG || VISUALCORE_AUTOMATION
+        registration.scenarioManifest = MazeCore.manifest(for: id)
         #endif
         return registration
     }

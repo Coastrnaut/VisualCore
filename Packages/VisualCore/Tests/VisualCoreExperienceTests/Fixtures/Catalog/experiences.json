@@ -443,7 +443,7 @@
       "id": "a13.light-maze",
       "code": "A13",
       "title": "Light Maze",
-      "summary": "A precise, tactile light-reflection puzzle game with visually rich beams and deterministic rules.",
+      "summary": "A light-reflection puzzle: turn mirrors and prisms on a grid to guide a beam into every target.",
       "kind": "creative",
       "tier": "free",
       "category": "play",
@@ -452,10 +452,24 @@
         "games-and-interactive-experiences"
       ],
       "order": 13,
-      "palette": [],
+      "palette": [
+        "#0E1220",
+        "#F2C14E",
+        "#4FD1C5",
+        "#E8EAF0"
+      ],
       "tile_seed": 3689267109,
-      "capabilities": [],
-      "quality_tiers": [],
+      "capabilities": [
+        "twenty handcrafted levels",
+        "emitter, wall, mirror, target, prism",
+        "beam reflects at equal angles",
+        "bounded beam, loops end safely",
+        "turn a mirror to light a target",
+        "beam drawn from the exact path"
+      ],
+      "quality_tiers": [
+        "level-0"
+      ],
       "content": null,
       "available": false
     },
