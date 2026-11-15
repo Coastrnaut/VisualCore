@@ -136,7 +136,7 @@ switch the scale and restore a saved view, each in under 60 seconds.
 
 - **No saved view yet:** restoring says so and changes nothing.
 - **A saved view with a date outside the range:** refused as out of range.
-- **A drawing failure during a tour:** the saved view is unchanged and a reopen starts at the saved session state.
+- **A drawing failure during a tour:** the saved view is unchanged and a reopened session draws normally.
 
 ## Requirements *(mandatory)*
 
