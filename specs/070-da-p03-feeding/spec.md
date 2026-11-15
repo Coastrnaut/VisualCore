@@ -22,6 +22,46 @@ Canonical overrides:
 - **Owner rulings:** short tests; audits and device runs in the device campaign; iOS 27 at phase gates; every Spec Kit
   step runs.
 
+## Clarifications
+
+### Session 2026-11-14
+
+Facts checked in code: `GestureArbiter` (VisualCoreScenes) takes `GestureDeclaration(id:kind:priority:pointers:)`
+for tap, double tap, long press, drag, pinch and rotate, gives each touch to one owner (highest priority on the same
+event), and after a discrete owner is recognized sends nothing more until every finger lifts; `LongPressRecognizer`
+recognizes on the next event at or after 0.5 s (the lift included), so no timer is needed, and fails on a movement of
+more than 10 points, where `DragRecognizer` begins; `TapRecognizer` needs a lift within 0.3 s and 10 points.
+`ExperiencePresenter.pointer(_:viewSize:port:)` delivers canvas touches in view points and sends actions with positions
+normalized to 0…1; `gestureActions` must be a subset of `nativeActions`. Multi-value actions exist
+(`ExperienceControl(id:ranges:)` with several ranges, e.g. `force.place [0…1, 0…1]`). The presenter maps the 16 × 9
+tank onto the canvas with `scale(width:height:)` and `world(_:scale:)` (centred, y up).
+
+- Q: Which gestures map to which actions, given the arbiter's one-owner rule? → A: Three one-finger declarations: tap
+  (priority 1) → `food.drop`; long press (priority 2), held 0.5 s and released without moving → `decor.place` of the
+  chosen kind at the press point; drag (priority 3) that starts on a decor piece (within its drawn half size) →
+  `decor.move` of that piece on every change; a drag starting on water does nothing. Moving is therefore "drag a
+  piece", not "long-press then drag" (the arbiter claims the touch after the long press).
+- Q: What are the actions, their values and their refusals? → A: `food.drop [x 0…1, y 0…1]`, `decor.kind [0…2]`,
+  `decor.place [x 0…1, y 0…1]`, `decor.move [index 0…11, x 0…1, y 0…1]`, `decor.remove [index 0…11]`; x and y are
+  fractions of the tank (x left→right, y bottom→top). Pellets start at the point clamped into the swim bounds; decor
+  is clamped into the tank. Refusals: `a09.food-full` (no room for a feed), `a09.decor-full` (12 pieces),
+  `a09.no-such-decor` (index of a missing piece), and the existing `a09.invalid-choice` for a fractional kind or
+  index. Native controls: Feed (drops at x 0.5, y 0.95), a kind picker, Add (places at x 0.5, y 0.15), a piece picker
+  (view-only selection), Move left / right / up / down (±0.5 units), Remove.
+- Q: How do pellets behave? → A: A feed adds 3 pellets spread 0.25 units apart horizontally around the point; at most
+  12 pellets in the water (a feed that would exceed 12 is refused whole); pellets sink 0.5 units per second; a pellet
+  at or below the swim bounds' floor is removed; a fish eats a pellet when its centre is within 0.5 × its length +
+  0.15 units (at most one per fish per step, fish in document order, pellets nearest first); fish seek their nearest
+  pellet within 4 units with an added force of weight 2.5 toward it, summed before the existing force cap.
+- Q: Where are pellets and the chosen kind saved, and how are older saves migrated? → A: Pellets are part of the
+  habitat document (schema 3: `food`, a list of positions; missing → none); the chosen decoration kind is part of the
+  experience state (snapshot schema 3: `decorKind`, missing → 0). A schema-2 snapshot migrates through the chain
+  (schema 1 still migrates). Changing the habitat clears the pellets and resets the decor to the new starter decor;
+  the chosen kind stays.
+- Q: How is "a feed beside a school" measured for SC-A09-302? → A: For seeds 1…20, the Reef swims 300 steps, then a
+  feed is dropped at the mean position of the first species' fish; at least one pellet is eaten within the next 600
+  steps (10 s) in at least 18 seeds.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Feeding the fish (Priority: P1) 🎯
@@ -49,8 +89,8 @@ fish within range move toward the nearest one, eaten pellets vanish, and the res
 
 ### User Story 2 - Arranging decorations (Priority: P1)
 
-A person long-presses empty water to place the chosen decoration there, long-presses an existing decoration and drags
-it to move it, and removes a decoration with a control. Decorations never leave the tank, and there is a limit to how
+A person long-presses the water to place the chosen decoration there, drags an existing decoration to move it, and
+removes a decoration with a control. Decorations never leave the tank, and there is a limit to how
 many can be placed.
 
 **Why this priority**: the manual's MVP ("decoration placement gestures").
@@ -62,8 +102,8 @@ beyond the limit; each has a native control.
 
 1. **Given** a chosen decoration kind, **When** the person long-presses empty water, **Then** a piece of that kind
    appears at that point (kept inside the tank).
-2. **Given** a decoration, **When** the person long-presses it and drags, **Then** it follows the finger and stays
-   inside the tank; releasing leaves it there.
+2. **Given** a decoration, **When** the person drags it, **Then** it follows the finger and stays inside the tank;
+   releasing leaves it there. A drag that starts on water moves nothing.
 3. **Given** the decoration limit is reached, **When** the person places another, **Then** it is refused.
 4. **Given** a selected decoration, **When** the person uses Remove, **Then** it disappears.
 5. **Given** no touch, **When** the person uses the native controls (choose kind, Add, choose piece, Move left/right/
@@ -98,7 +138,9 @@ where they were; a save and restore keeps pellets, decor and the chosen kind; an
 - **A tap outside the water (on the gravel):** pellets start at the swim bounds' nearest point.
 - **Moving onto another decoration:** allowed (decor may overlap); fish are unaffected by decor.
 - **Removing the piece being dragged:** the drag ends; nothing else changes.
-- **Two fingers:** the gesture arbitration lets only one gesture win; a second finger cancels a pending long-press.
+- **Two fingers:** the gesture arbitration lets only one gesture win; a second finger fails a pending long-press and
+  cancels a drag.
+- **A hold between 0.3 s and 0.5 s:** neither a tap nor a long-press; nothing happens.
 - **Invalid action values** (index of a missing piece, kind out of range, non-finite position): refused with a reason.
 - **Habitat change:** pellets are cleared and the new habitat's starter decor replaces the edited decor.
 
@@ -106,24 +148,25 @@ where they were; a save and restore keeps pellets, decor and the chosen kind; an
 
 ### Functional Requirements
 
-- **FR-A09-301**: A feed MUST add pellets at a point in the water, at most a bounded total in the water; a feed at the
-  limit MUST be refused.
-- **FR-A09-302**: Pellets MUST sink at a steady pace and be removed when a fish eats them or when they reach the floor.
-- **FR-A09-303**: Fish within a seeking range MUST steer toward their nearest pellet, with the steering still capped
-  and the Phase 01–02 bounds and speed guarantees still holding.
+- **FR-A09-301**: A feed MUST add 3 pellets around a point in the water, at most 12 in the water; a feed that would
+  exceed 12 MUST be refused whole (`a09.food-full`).
+- **FR-A09-302**: Pellets MUST sink at 0.5 units per second and be removed when a fish eats them (centre within 0.5 ×
+  length + 0.15) or when they reach the floor of the swim bounds.
+- **FR-A09-303**: Fish within 4 units of a pellet MUST steer toward their nearest pellet (weight 2.5), with the
+  steering still capped and the Phase 01–02 bounds and speed guarantees still holding.
 - **FR-A09-310**: A person MUST be able to place a piece of the chosen decoration kind at a point, move a piece and
   remove a piece; positions stay inside the tank and the count never exceeds the limit (12).
-- **FR-A09-311**: Canvas gestures MUST be: tap → feed; long-press on water → place; long-press on a piece then drag →
-  move. They MUST be resolved by the shared gesture arbitration so only one wins.
+- **FR-A09-311**: Canvas gestures MUST be: tap → feed; long-press (0.5 s, no movement) → place the chosen kind; a drag
+  that starts on a piece → move it. They MUST be resolved by the shared gesture arbitration so only one wins.
 - **FR-A09-312**: Every gesture action MUST also be reachable through a native, labelled control.
-- **FR-A09-320**: The saved state MUST hold the pellets and the chosen decoration kind (new schema) and MUST restore a
-  Phase 02 state with no pellets and the first kind.
+- **FR-A09-320**: The saved state MUST hold the pellets (habitat document schema 3) and the chosen decoration kind
+  (snapshot schema 3) and MUST restore a Phase 02 (and Phase 01) state with no pellets and the first kind.
 - **FR-A09-321**: A suspension MUST never advance the simulation; the resume continues from the saved step (fixture).
 - **FR-A09-322**: The scenario manifest MUST add fixtures for feeding, decor editing and no fast-forward with food.
 
 ### Key Entities
 
-- **Food pellet**: position, age; sinks; removed when eaten or at the floor.
+- **Food pellet**: position; sinks; removed when eaten or at the floor; at most 12.
 - **Decoration choice**: the kind used by the next placement.
 - **Decor piece** (from Phase 02): kind, position, rotation, scale.
 
@@ -133,8 +176,9 @@ where they were; a save and restore keeps pellets, decor and the chosen kind; an
 
 - **SC-A09-301**: A feed adds its pellets at the requested point in 100 % of accepted feeds; the pellet count never
   exceeds the limit over any sequence of feeds.
-- **SC-A09-302**: Within 10 simulated seconds of a feed beside a school, at least one pellet is eaten for at least 18 of
-  20 seeds; every uneaten pellet is gone once it reaches the floor.
+- **SC-A09-302**: Within 10 simulated seconds (600 steps) of a feed at the mean position of the Reef's first species
+  after 300 steps, at least one pellet is eaten for at least 18 of 20 seeds; every uneaten pellet is gone once it
+  reaches the floor.
 - **SC-A09-303**: Placement, move and removal give exactly the requested decor list (positions clamped into the tank)
   in 100 % of accepted actions; 0 actions exceed the limit or leave the tank.
 - **SC-A09-304**: A tap never places or moves decor and a long-press never feeds, in all gesture tests.
