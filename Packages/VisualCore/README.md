@@ -126,6 +126,17 @@ impulses; `ImpulseSolver2D.solve(_:contacts: inout ...)` starts from them (warm 
 which keeps resting stacks standing; with nothing stored it gives exactly the earlier results. Host tests
 `Springs2DTests`, `BroadPhase2DTests` and `ImpulseSolver2DTests`.
 
+**Seeded noise and height-field terrain** (`VisualCoreScenes`, feature 089): `GradientNoise2D(seed:)` gives 2D
+gradient noise in −1…1 (lattice corners hashed with the SplitMix64 finalizer, eight gradient directions, quintic fade;
+only +, −, × and floor, so values are bit-identical on every device; non-finite input gives 0). `FractalNoise2D` sums
+1…8 octaves (lacunarity 1…4, gain 0…1, frequency > 0; invalid settings give nil) normalised to −1…1. `HeightField`
+samples a height function on a grid of 1…512 columns and rows at a cell size from an origin in the x–z plane (y up),
+keeping one ring beyond the grid so its normals come from the field itself: two pieces that share an edge from one
+function get bit-identical edge heights and normals (for cell sizes exact in binary). It offers grid heights, a
+bilinear sampler clamped to the grid, normals, and `mesh(budget:)` (one vertex per grid point, two counter-clockwise
+triangles per cell seen from +y, checked against the `MeshBudget` before building; non-finite input is refused with
+`MeshError.invalidInput`). Used by Tiny Worlds (A12) for its preset terrains.
+
 **CPU field references** (`VisualCoreSimulation`, feature 019): a `FieldGrid` is a W×H grid with 1…4 channels,
 row-major from the bottom row up, as in GL. `StoragePrecision` (`float32`, `float16`, `float16TowardZero`, `unorm8`) rounds values the
 way GPU storage does after every step. GLES leaves the rounding of half-float color writes implementation-defined,
