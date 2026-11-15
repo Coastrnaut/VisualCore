@@ -22,6 +22,48 @@ Canonical overrides:
   sleeping bodies (A11-P05).
 - **Owner rulings:** short tests; iOS 27 at phase gates; every Spec Kit step runs.
 
+## Clarifications
+
+### Session 2026-11-15
+
+Answered autonomously under the owner's standing delegation, recommended option each time. Facts checked in code:
+`VisualCoreScenes` offers `TapRecognizer` (≤ 10 pt movement, ≤ 0.3 s), `DoubleTapRecognizer` (second tap within
+0.3 s and 30 pt), `LongPressRecognizer` (≥ 0.5 s, ≤ 10 pt), `DragRecognizer` (≥ 10 pt) and `GestureArbiter` with
+`GestureDeclaration`s (id, kind, priority, pointers); a presenter receives `pointer(_:viewSize:port:)` and declares
+`gestureActions`; actions go through `ExperienceActionPort`; `Springs2D.apply` exists for the grab pull; the world is
+schema 2 with `WorldDiagnostics` (kinetic, potential, spring and total energy, momentum).
+
+- Q: Which actions carry the edits, and with which values? → A: `edit.add [x 0…10, y 0…8, kind 0…1]` (refused with
+  `a11.body-cap`, or `a11.no-room` when the new body's bounds would cross the stage edge or overlap a body by more than
+  half its size); `edit.select [id -1…10000]` (−1 clears; an unknown id → `a11.unknown-body`); `edit.grab [id, x, y]`
+  (dynamic, unpinned bodies only, else `a11.not-grabbable`; the anchor is the touched point in the body's frame),
+  `edit.move [x, y]` (clamped to the stage; refused `a11.no-grab` without a grab), `edit.release` (ends the grab; the
+  body keeps its own velocity); `edit.pin [id]` (toggles; a pinned body has inverse mass and inertia 0 and zero
+  velocity; static bodies cannot be unpinned → `a11.static-body`); `edit.delete [id]` (removes the body, its springs,
+  its cache entries, the grab and selection if they name it); `edit.nudge [dx −1…1, dy −1…1]` (adds 1 m/s × value to
+  the selected dynamic body's velocity); `overlay.velocity [0…1]`, `overlay.forces [0…1]`. Coordinates are stage
+  metres; ids are whole numbers.
+- Q: How do gestures map to those actions? → A: The presenter converts view points to stage metres through its
+  letterbox mapping and arbitrates: double-tap on a body → `edit.delete`; long-press on a body → `edit.pin`; drag
+  starting on a body → `edit.grab`, then `edit.move` per move, `edit.release` on end, cancel or a second finger; tap on
+  a body → `edit.select`; tap on empty stage → `edit.add` with the shape picker's kind. Priority: double-tap > long-press
+  > drag > tap; a tap waits for the double-tap window (0.3 s). Native controls: previous/next body (select), Pin,
+  Delete, Add at centre, four nudge buttons, the shape picker, two overlay toggles.
+- Q: How does the grab pull work? → A: A spring from the body's anchor to the target with stiffness at the body's
+  stable bound (`Springs2D.stableStiffness`) and damping ratio 1.0 (critically damped), applied each tick with the
+  world's springs; it is not stored as a world spring and draws as a thin line. Measured target: within 5 cm of a still
+  target in 1 s.
+- Q: How are arrows and the panel computed? → A: Velocity arrow: from the centre along v, length 0.25 s × |v| m,
+  capped at 2 m. Force arrows per dynamic body: weight m·g (down) and net spring force (sum of the springs' last-tick
+  forces on the body), each drawn at 0.05 m per newton, capped at 2 m; arrowheads are triangles 0.12 m long. The panel
+  shows kinetic, potential (above the floor), spring and total energy in joules (2 decimals), total momentum in
+  kg·m/s (2 decimals) and the selected body's speed in m/s (2 decimals), with the line "Educational approximation".
+  Arrows and the panel never write to the world.
+- Q: What is stored, and how does schema 2 migrate? → A: Schema 3 adds per-body `pinned` (false), `selectedId` (nil),
+  `grab` (nil: body id, local anchor, target), `showVelocity` and `showForces` (false). Migration 2 → 3 sets those
+  defaults; reset clears them. Pinning keeps the body's material; unpinning restores mass from it. The digest covers
+  all of them.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Edit the stage with touch (Priority: P1) 🎯
