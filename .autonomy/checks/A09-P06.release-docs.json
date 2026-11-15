@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "/bin/sh",
+    "-c",
+    "python3 scripts/release_check.py --only experience-release-a09 copy-claims-a09 && sh specs/073-da-p06-release/scan-realism.sh"
+  ],
+  "command": "/bin/sh -c 'python3 scripts/release_check.py --only experience-release-a09 copy-claims-a09 && sh specs/073-da-p06-release/scan-realism.sh'",
+  "elapsed_seconds": 0.692,
+  "exit_code": 0,
+  "finished": "2026-11-15T01:57:07+00:00",
+  "log": ".autonomy/logs/A09-P06.release-docs.log",
+  "log_sha256": "22e8d1365ac354c7c655629376254313523e2424180dbe938ee57122048ced00",
+  "name": "release-docs",
+  "stage": "A09-P06",
+  "started": "2026-11-15T01:57:07+00:00",
+  "timed_out": false
+}
