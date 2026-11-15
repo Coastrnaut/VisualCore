@@ -57,15 +57,15 @@ evidence**: no physical-device test of the unified app has been run.
 | A07 Audio Odyssey | experience in the app; X-A07 pass | `.autonomy/migration/checks/X-A07.*.json` |
 | A08 Oscilloscope Studio | experience in the app; X-A08 pass | `.autonomy/migration/checks/X-A08.*.json` |
 | A09 Digital Aquarium | experience in the app; X-A09 pass | `.autonomy/migration/checks/X-A09.*.json` |
-| A10 Neon Arcade | in progress, a candidate (not yet available): A10-P00 … A10-P04 pass — Neon Dodge with title, pause and game-over screens, a crash-safe local high-score table, five steering sensitivities, spoken announcements, five lanes, four licensed wave patterns, a capped difficulty ramp, swept collision (`Collision2D`), particle and ring effects, synthesized sounds (`SoundEffectSynth`, `SoundEffectPlayer`) and haptics with on/off settings, recorded-input replay and saved-state migration ([contract](docs/apps/neon-arcade/visualcore-contract.md)); A10-P05 next | `.autonomy/evidence/A10-P0{0,1,2,3,4}.json` |
+| A10 Neon Arcade | in progress, a candidate (not yet available): A10-P00 … A10-P05 pass — Neon Dodge with three quality levels whose glow never hides a collision shape, a balance checked by simulated players, title, pause and game-over screens, a crash-safe local high-score table, five steering sensitivities, spoken announcements, five lanes, four licensed wave patterns, a capped difficulty ramp, swept collision (`Collision2D`), particle and ring effects, synthesized sounds (`SoundEffectSynth`, `SoundEffectPlayer`) and haptics with on/off settings, recorded-input replay and saved-state migration ([contract](docs/apps/neon-arcade/visualcore-contract.md)); A10-P06 next | `.autonomy/evidence/A10-P0{0,…,5}.json` |
 | A11–A25 | not started | `python3 Tools/python/desktop_runbook.py next` |
 | Shared round features (R02-F02 … F05, F26) | pass | `python3 scripts/migration_ledger.py status` |
 | Games of Rounds 2–12 | planned; none exists in source | [catalog](docs/catalog/experience-catalog.json) |
 | Physical-device testing | none run; waits for `ImplementationLock-100` | [support matrix](docs/release/support-matrix.md) |
 | App Store | no submission and nothing for sale; a one-time name and bundle reservation is prepared and waits for the owner (signing, App Store Connect and agreements are owner actions) | [build and archive](docs/release/build-and-archive.md), [name reservation](docs/release/name-reservation.md) |
 
-Ledger totals today: the legacy ledger records **78 of 263** gates as passed (F00–F09 and the app phases
-A01-P00 … A09-P06, A10-P00 … A10-P04); the unified-app ledger has 1,233 gates, with 9 experience gates (X-A01 … X-A09), 11 unified-app features,
+Ledger totals today: the legacy ledger records **79 of 263** gates as passed (F00–F09 and the app phases
+A01-P00 … A09-P06, A10-P00 … A10-P05); the unified-app ledger has 1,233 gates, with 9 experience gates (X-A01 … X-A09), 11 unified-app features,
 5 shared round features and both governance milestones passed.
 
 ```bash

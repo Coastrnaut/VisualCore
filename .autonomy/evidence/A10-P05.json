@@ -1,0 +1,74 @@
+{
+  "checks": [
+    {
+      "attestation": ".autonomy/checks/A10-P05.app-ui.json",
+      "command": "python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27 app-ui-ios27-r2",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A10-P05.app-ui.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A10-P05.arcade-ios27.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing NeonArcadeCoreTests NeonArcadeExperienceTests",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A10-P05.arcade-ios27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A10-P05.catalog.json",
+      "command": "python3 scripts/build_catalog.py --check",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A10-P05.catalog.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A10-P05.claims-2.json",
+      "command": "bash specs/079-na-p05-balance/scan-claims.sh",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A10-P05.claims-2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A10-P05.claims.json",
+      "command": "bash specs/079-na-p05-balance/scan-claims.sh",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A10-P05.claims.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A10-P05.contract.json",
+      "command": "python3 scripts/check_app_contract.py --app neon-arcade --render",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A10-P05.contract.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A10-P05.distinctiveness-2.json",
+      "command": "python3 scripts/check_distinctiveness.py --check",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A10-P05.distinctiveness-2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A10-P05.experience-packages.json",
+      "command": "python3 scripts/check_experience_packages.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A10-P05.experience-packages.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A10-P05.script-tests-2.json",
+      "command": "python3 scripts/test_scripts.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A10-P05.script-tests-2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A10-P05.script-tests.json",
+      "command": "python3 scripts/test_scripts.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A10-P05.script-tests.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A10-P05.verify-27.json",
+      "command": "python3 scripts/verify_experiences.py --only a10.neon-arcade --runtime 27",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A10-P05.verify-27.log"
+    }
+  ],
+  "generated": "2026-11-15T05:12:51+00:00",
+  "method": "deterministic-run-check",
+  "stage": "A10-P05",
+  "status": "pass"
+}
