@@ -41,7 +41,10 @@ speed 3…5 units/s; the capsule speed bound (fall ≤ 5 units/s, 0.083 units pe
   hazard 70 % / orb 30 %), `wall` (a row every 120 steps: spike-balls of radius 0.5 in four lanes, the free lane seeded,
   never the same free lane twice in a row), `zigzag` (a hazard per spawn gap walking lanes 0→4→0), `orb-trail` (orbs
   per spawn gap in one seeded lane, bars in both neighbouring lanes every second gap). Wave 1 is always `rain`; each
-  later wave draws uniformly from the patterns other than the previous wave's.
+  later wave draws uniformly from the patterns other than the previous wave's. Content per pattern: `rain` picks the
+  hazard item (spike-ball or bar) as Phase 01 did; `wall` and `zigzag` use spike-balls (wall radius 0.5, zigzag radius
+  from the item's range); `orb-trail` uses glow-orbs and bars. Every spawn draws its fall speed from the wave's range,
+  and all objects of one wall row share one speed so the gap stays a straight lane.
 - Q: How does difficulty rise and where is the ceiling? → A: Level L = min(wave − 1, 8). Fall speed range
   (3 + 0.2 L) … min(5, 3.6 + 0.2 L) units/s (wave 9 on: 4.6…5.0, keeping the capsule bound); spawn gap
   max(20, 40 − 2.5 L) steps; orb multiplier 1 + L / 2 (integer division: 1…5). Survival: 1 point per 60 steps of play.
