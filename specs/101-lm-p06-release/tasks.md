@@ -35,7 +35,7 @@ Commit after every task (no trailers); read every check's exit before ticking. i
 
 ## Phase 6: Records and evidence
 
-- [ ] T-A13-613 Script tests (`--name script-tests -- python3 scripts/test_scripts.py`)
+- [X] T-A13-613 Script tests (`--name script-tests -- python3 scripts/test_scripts.py`) — Verified 2026-11-15: 2026-11-15: .autonomy/checks/A13-P06.script-tests.json exit 0
 - [ ] T-A13-614 BLOCKED_OWNER_ACTION: signing, archive upload and App Store Connect entry of Light Maze's store text, per `docs/release/build-and-archive.md` owner steps (FR-A13-620)
 - [ ] T-A13-615 {device} In the device campaign (after ImplementationLock-100): the measurements and audits of `docs/apps/light-maze/device-campaign.md` on D1–D3 (FR-A13-622)
 - [ ] T-A13-616 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A13-P06 (owner and device items stay open, as for A12-P06); update README.md (status, gate count) in the record commit (rule 16)
