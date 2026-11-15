@@ -322,7 +322,7 @@
       "id": "M04",
       "capability": "Lighting: a scene light shared by every mesh of a world (direction and ambient level, optionally a warm or cool tint), adjustable at run time, legible without colour alone",
       "source": "brainstorm: lighting",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/MeshRenderer.swift",
@@ -344,16 +344,16 @@
         }
       ],
       "example": {
-        "file": "Packages/ExperiencesCreative/AudioOdyssey/Experience/OdysseyPresenter.swift",
-        "symbol": "OdysseyPresenter"
+        "file": "Packages/ExperiencesCreative/TinyWorlds/Core/WorldLight.swift",
+        "symbol": "WorldLight"
       },
-      "notes": "MeshRenderer has one directional Lambert light (lightDirection) plus an ambient fraction per renderer, both public vars and exercised by MeshRendererTests (lit sphere brighter facing the light; cube ambient); there is no light colour, specular term, point light or shadow, and no scene-wide light object: the world must apply one light to every renderer it draws, and a tint goes through the per-draw colour. Version 0.1 needs direction and ambient only; photorealistic lighting is a non-goal. G-LIGHT (app-local), A12-P03."
+      "notes": "Since A12-P03 (G-LIGHT closed): the world light (azimuth wrapped, elevation 10…85°, ambient 0.1…0.6) is stored in the world document and applied to every renderer's lightDirection and ambient each frame (WorldLightTests; WorldsRenderTests show a lit face darkening when the light moves)."
     },
     {
       "id": "M05",
       "capability": "Materials and assets: distinguishable surfaces (sand, grass, rock, water, metal, glass-like windows) and a catalog of procedural props without model, texture or image files",
       "source": "brainstorm: materials and assets; constitution A12 visuals are code",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/MeshRenderer.swift",
@@ -387,10 +387,10 @@
         }
       ],
       "example": {
-        "file": "Packages/ExperiencesCreative/VisualCoreMusicLab/Experience/MusicLabScenes.swift",
-        "symbol": "GeometryMeshes"
+        "file": "Packages/ExperiencesCreative/TinyWorlds/Core/PropCatalog.swift",
+        "symbol": "PropCatalog"
       },
-      "notes": "A draw has exactly one premultiplied colour (DepthMeshPass.Item.color; DepthMeshPassTests, MeshRendererTests) and palettes exist (ParametersTests); Mesh carries uvs but MeshRenderer samples no texture, and there is no per-vertex colour or material model in any framework product (grep 2026-11-15). A height-coloured terrain therefore needs either one draw per colour band or a per-vertex colour stream; the generic stream is G-MATERIALS (VisualCoreRendering, A12-P02). The prop catalog (procedural shapes with named palette colours) is G-PROPS (app-local), A12-P03. Since A12-P02 (G-MATERIALS closed): MeshRenderer(mesh:colors:registry:) draws one RGBA per vertex multiplied into the lit colour, pixel-identical without a stream (MeshRendererColorTests, MeshRendererTests, DepthMeshPassTests); Tiny Worlds colours its terrain by height (TerrainColoring). Props remain (G-PROPS)."
+      "notes": "Since A12-P03 (G-PROPS closed): four procedural props (tree, rock, house, lantern) are one mesh each with per-vertex colours from licensed prop palettes, drawn with MeshRenderer(mesh:colors:registry:) through the depth pass (PropCatalogTests, WorldsRenderTests)."
     },
     {
       "id": "M06",
@@ -555,7 +555,7 @@
       "id": "M09",
       "capability": "Prop placement and scene light adjustment: tap or drag a prop from the catalog onto the terrain (snapped to the ground, kept inside the world and apart from other props), select, move and delete it, and change the light's direction and ambient level, each with a native control alternative",
       "source": "v0.1 feature 4: prop placement and scene light adjustment; user journey 3",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCore/Sources/VisualCoreMath/OrbitCamera.swift",
@@ -595,16 +595,16 @@
         }
       ],
       "example": {
-        "file": "Packages/ExperiencesCreative/PhysicsPlayground/Core/WorldEditing.swift",
+        "file": "Packages/ExperiencesCreative/TinyWorlds/Core/WorldEditing.swift",
         "symbol": "WorldEditing"
       },
-      "notes": "Picking rays (OrbitCameraTests), mesh bounds (MeshBoundsTests), recognizers (GestureTests), the light direction (MeshRendererTests) and the gesture-alternative check (GestureAlternativesTests) exist; no ray intersection with boxes, spheres, triangles or the ground exists (G-PICKING, VisualCoreMath upstream, A12-P02; ground hits use G-TERRAIN's height sampler). The prop catalog, placement rules and editor commands are G-PROPS and the world light is G-LIGHT, both app-local, A12-P03."
+      "notes": "Since A12-P03 (G-PROPS, G-LIGHT closed): props are placed, selected, moved, turned and deleted by replayable actions with bounds, sea-level, spacing and cap rules, resting on the drawn terrain; a tap selects the nearest prop by its picking box (Ray3) or picks the ground; every action has a control (WorldEditingTests, WorldsEditingTests)."
     },
     {
       "id": "M10",
       "capability": "Saved world composition and thumbnails: a versioned world document (preset, seed, terrain parameters, props, light, camera) saved and reopened on the device, each with a small off-screen thumbnail image of bounded size",
       "source": "v0.1 feature 5: saved world composition and thumbnails; spec edge case thumbnails",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift",
@@ -644,10 +644,10 @@
         }
       ],
       "example": {
-        "file": "Packages/ExperiencesCreative/PhysicsPlayground/Experience/ExperimentStore.swift",
-        "symbol": "ExperimentStore"
+        "file": "Packages/ExperiencesCreative/TinyWorlds/Core/WorldDocument.swift",
+        "symbol": "WorldDocument"
       },
-      "notes": "Storage, named libraries, off-screen rendering at any size (DepthMeshPassTests draws depth-correct off screen at another size), the session's still renderer, read-back and PNG encoding exist and are tested (ExperienceStorageTests, NamedLibraryTests, OffscreenExportTests, StillRenderTests, StillCaptureTests): a small thumbnail can be produced with them. The world document schema, the thumbnail size cap and storing the thumbnail beside the document are G-WORLDDOC (app-local), A12-P03."
+      "notes": "Since A12-P03 (G-WORLDDOC closed): the world document (schema 2: preset, seed, props, selection, light, view) saves to four slots through ExperienceStorage's atomic writes with 160×120 PNG thumbnails drawn by the session's still renderer; damaged, newer and oversized files are reported; prop transforms reopen bit-identical (WorldDocumentTests, WorldStoreTests)."
     },
     {
       "id": "M11",
@@ -1189,7 +1189,7 @@
       "justification": "The prop catalog (procedural shapes from MeshShapes with named palette colours), placement rules (snap to ground, inside the world, minimum spacing, prop cap), selection, move and delete as replayable editor commands, and the spoken world description are the experience's content and editor over VisualCore's meshes, recognizers and G-PICKING (clarification 5).",
       "phase": 3,
       "test": "Host tests: each catalog prop builds a valid mesh within its budget; a placed prop rests on the terrain height at its position within a tolerance, stays inside the world and keeps the minimum spacing; placement beyond the prop cap is refused with a message; select, move and delete change only the document and replay to the same digest; every action has a control alternative",
-      "closed": null
+      "closed": "A12-P03"
     },
     {
       "id": "G-LIGHT",
@@ -1202,7 +1202,7 @@
       "justification": "The world light (direction from azimuth and elevation within stated ranges, ambient level, optional tint through the draw colour) is a world setting applied to every renderer's existing lightDirection and ambient; no new shading model is needed for version 0.1 (clarification 5).",
       "phase": 3,
       "test": "Host tests: azimuth and elevation map to the stated unit direction and are clamped to their ranges; ambient is clamped to 0...1; the light is stored in and restored from the world document; non-finite values rejected; a simulator test shows a lit face brighter than a shaded one after the light moves",
-      "closed": null
+      "closed": "A12-P03"
     },
     {
       "id": "G-WORLDDOC",
@@ -1214,7 +1214,7 @@
       "justification": "The world document (preset, seed, terrain parameters, props, light, camera, schema version), saved worlds and their bounded thumbnails are the experience's data stored in ExperienceStorage through VisualCorePersistence, with thumbnails drawn off screen by the session's still renderer and encoded as PNG (clarification 5).",
       "phase": 3,
       "test": "Host tests: world documents round-trip and regenerate the same digest; damaged, truncated or newer files are reported and never crash; a write interrupted mid-way keeps the previous file; documents beyond the prop or size caps are refused; a simulator test renders a thumbnail at the capped size, stores it beside the document and reopens both",
-      "closed": null
+      "closed": "A12-P03"
     },
     {
       "id": "G-PACKS",

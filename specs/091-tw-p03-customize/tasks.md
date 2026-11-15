@@ -21,7 +21,7 @@ Precedent: `specs/085-pp-p04-experiments/tasks.md`.
 ## Phase 4: Records
 
 - [X] T-A12-304 Registration, manifest and documents: `Apps/VisualCore/App/ExperienceRegistry.swift` (the schema-1 example for the migration), `Catalog/registrations.json` (capabilities: props, light, saved worlds); `python3 scripts/build_catalog.py`; regenerate `Packages/ExperiencesCreative/TinyWorlds/scenario-manifest.json` and `docs/apps/tiny-worlds/content-licenses.md` (`UPDATE_SCENARIO_MANIFEST=1 TEST_RUNNER_UPDATE_SCENARIO_MANIFEST=1`) with prop fixtures in `Adapter/WorldsManifest.swift` (place, move, rotate, delete and the refusals) — Verified 2026-11-15: 2026-11-15: ExperienceRegistry passes WorldsCore.schemaOneExample() for the 1→2 migration; registrations.json a12 capabilities (10); build_catalog (11 available); WorldsManifest prop fixture (fixture-props-island-1) and refusals regenerated into scenario-manifest.json, content-licenses.md regenerated (3 presets, 3 palettes, 4 props, 4 prop palettes) — both match in .autonomy/checks/A12-P03.worlds-ios27.json (theCommittedManifestFileMatches, theCommittedLicenseDocumentMatchesTheCatalog pass)
-- [ ] T-A12-305 Contract `docs/apps/tiny-worlds/visualcore-contract.json`: G-PROPS, G-LIGHT and G-WORLDDOC closed by "A12-P03"; rows M04, M05, M09, M10 updated
+- [X] T-A12-305 Contract `docs/apps/tiny-worlds/visualcore-contract.json`: G-PROPS, G-LIGHT and G-WORLDDOC closed by "A12-P03"; rows M04, M05, M09, M10 updated — Verified 2026-11-15: 2026-11-15: contract G-PROPS, G-LIGHT and G-WORLDDOC closed by A12-P03; M04, M05, M09, M10 available with notes and examples (only G-PACKS and G-DETAIL open); .autonomy/checks/A12-P03.contract.json exit 0 (PASS 21 rows, 137 citations, 10 gaps)
 
 ## Phase 5: Polish & evidence
 
