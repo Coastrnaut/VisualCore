@@ -22,6 +22,15 @@
 // caustics shader falls back to the Phase 03 water and gravel and the frame still draws; bubbles and motes are drawn
 // (at least one pixel in radius); the state digest does not depend on Reduce Motion and the effects; unknown plant and
 // decor kinds are skipped when drawn.
+//
+// Feature 072 (A09-P05) T-A09-506 (FR-A09-510–512, 520; SC-A09-502, 503, 505): each quality level draws no more bubbles
+// and motes than the level above and the digest is the same at every level; level 2 draws the plain fallback (no
+// caustics); ambient mode halves the drawn particles; Low Power Mode (injected) draws ambient budgets while the state's
+// ambient stays off and the digest equals the plain run's; with ambient drawing the scene dims to 0.6 after 60 s of
+// frame time (the dimmer's clock is moved forward by 60 s and the last seconds are drawn as real frames, since the
+// host's frames are 1/60 s each) and a canvas touch restores 1, also while paused; a tap during dimming restores the
+// brightness and still feeds; the presenter owns a library with storage; no source of the experience sets the system
+// screen brightness or the idle timer.
 import Foundation
 import XCTest
 @testable import DigitalAquariumExperience
@@ -550,5 +559,191 @@ final class AquariumRenderTests: XCTestCase {
         XCTAssertEqual(presenter.lastBubblesDrawn, 0, "an unknown habitat has no vents")
         XCTAssertEqual(presenter.lastMotesDrawn, WaterEffects.moteCount)
         XCTAssertTrue(presenter.describe(core).hasPrefix("Digital Aquarium: Aquarium, "))
+    }
+
+    // MARK: Quality levels, ambient and dimming (feature 072, T-A09-506)
+
+    /// The visible bubble and mote nodes of `shell`'s presenter.
+    private func particles(_ shell: ExperienceShell<AquariumPresenter>) -> (bubbles: Int, motes: Int) {
+        (shell.presenter.bubbleNodes.filter { $0.primitive != nil }.count,
+         shell.presenter.moteNodes.filter { $0.primitive != nil }.count)
+    }
+
+    func testEachLevelDrawsNoMoreParticlesThanTheLevelAboveWithTheSameDigest() async throws {
+        var counts: [(bubbles: Int, motes: Int)] = []
+        var digests: [StateDigest] = []
+        var caustics: [Bool] = []
+        for tier in 0..<AquariumBudget.levels {
+            let session = ExperienceSession()
+            let shell = try await AquariumTest.open(session)
+            try shell.setQualityTier(tier)
+            try AquariumTest.frames(session, 300)
+            XCTAssertEqual(shell.presenter.lastTier, tier)
+            XCTAssertEqual(shell.presenter.lastBudget, AquariumBudget.budget(tier: tier, ambient: false))
+            counts.append(particles(shell))
+            caustics.append(shell.presenter.lastCausticsDrawn)
+            digests.append(try shell.engine.digest())
+            session.close()
+        }
+        XCTAssertEqual(AquariumCore.qualityTiers, 3)
+        XCTAssertEqual(AquariumCore.qualityProfile.count, 3)
+        for tier in 1..<counts.count {
+            XCTAssertLessThanOrEqual(counts[tier].bubbles, counts[tier - 1].bubbles, "level \(tier) bubbles")
+            XCTAssertLessThanOrEqual(counts[tier].motes, counts[tier - 1].motes, "level \(tier) motes")
+        }
+        XCTAssertEqual(counts.map(\.motes), [24, 12, 6])
+        XCTAssertLessThan(counts[2].bubbles, counts[0].bubbles)
+        XCTAssertEqual(caustics, [true, true, false], "level 2 draws the plain fallback")
+        XCTAssertTrue(digests.allSatisfy { $0 == digests[0] }, "the level never changes the state")
+    }
+
+    func testAmbientHalvesTheDrawnParticles() async throws {
+        let plain = ExperienceSession()
+        let plainShell = try await AquariumTest.open(plain)
+        try AquariumTest.frames(plain, 300)
+        let ambient = ExperienceSession()
+        let ambientShell = try await AquariumTest.open(ambient)
+        XCTAssertTrue(ambientShell.handle(control: "ambient.mode", values: [1]).isAccepted)
+        try AquariumTest.frames(ambient, 300)
+        let before = particles(plainShell), after = particles(ambientShell)
+        XCTAssertTrue(ambientShell.presenter.lastAmbientDrawing)
+        XCTAssertEqual(ambientShell.presenter.lastBudget, AquariumBudget.ambientBudget)
+        XCTAssertEqual(after.motes * 2, before.motes, "half the motes")
+        let core = try AquariumTest.core(ambientShell)
+        let vents = AquariumPresenter.vents(core.document, catalog: AquariumCore.catalog)
+        XCTAssertEqual(after.bubbles, WaterEffects.bubbles(step: core.step, vents: vents, reduceMotion: false,
+                                                           perVent: 12).count, "12 bubbles per vent at most")
+        XCTAssertLessThan(after.bubbles, before.bubbles)
+        XCTAssertLessThanOrEqual(after.bubbles, vents.count * WaterEffects.bubblesPerVent / 2)
+        plain.close()
+        ambient.close()
+    }
+
+    func testLowPowerModeDrawsAmbientWithoutChangingTheState() async throws {
+        let plain = ExperienceSession()
+        let plainShell = try await AquariumTest.open(plain)
+        try AquariumTest.frames(plain, 300)
+        let low = ExperienceSession()
+        let lowShell = try await AquariumTest.open(low, lowPowerMode: { true })
+        try AquariumTest.frames(low, 300)
+        XCTAssertFalse(try AquariumTest.core(lowShell).ambient, "Low Power Mode never sets the saved choice")
+        XCTAssertTrue(lowShell.presenter.lastAmbientDrawing)
+        XCTAssertFalse(plainShell.presenter.lastAmbientDrawing)
+        XCTAssertEqual(lowShell.presenter.lastBudget, AquariumBudget.ambientBudget)
+        XCTAssertEqual(particles(lowShell).motes, 12)
+        XCTAssertEqual(try lowShell.engine.digest(), try plainShell.engine.digest(),
+                       "Low Power Mode is presentation only")
+        XCTAssertFalse(lowShell.accessibilitySummary.contains("ambient"), "the description follows the saved choice")
+        plain.close()
+        low.close()
+    }
+
+    /// Moves `shell`'s dimmer clock forward by 60 s of ambient frame time and draws 130 real frames (≈ 2.17 s), so
+    /// more than 62 s (the interval and the 2 s fade) have passed; returns the brightness of the last frame.
+    private func dimByWaiting(_ session: ExperienceSession, _ shell: ExperienceShell<AquariumPresenter>) throws
+        -> Double {
+        shell.presenter.dimmer.advance(by: AmbientDimmer.idleInterval, active: true)
+        try AquariumTest.frames(session, 130)
+        return shell.presenter.lastBrightness
+    }
+
+    func testAmbientDimsAfterAMinuteAndATouchRestoresAlsoWhilePaused() async throws {
+        let session = ExperienceSession()
+        let shell = try await AquariumTest.open(session)
+        let presenter = shell.presenter
+        // Without ambient drawing the clock stays at 0.
+        try AquariumTest.frames(session, 30)
+        XCTAssertEqual(presenter.dimmer.idle, 0)
+        XCTAssertEqual(try dimByWaiting(session, shell), 1, "no dimming without ambient drawing")
+
+        XCTAssertTrue(shell.handle(control: "ambient.mode", values: [1]).isAccepted)
+        try AquariumTest.frames(session, 60)
+        XCTAssertEqual(presenter.dimmer.idle, 1, accuracy: 0.05, "the drawn frames advance the idle clock")
+        XCTAssertEqual(presenter.lastBrightness, 1)
+        XCTAssertEqual(try dimByWaiting(session, shell), AmbientDimmer.dimLevel, accuracy: 1e-9)
+        // Every node colour and the caustics colours are scaled.
+        let core = try AquariumTest.core(shell)
+        let lit = AquariumPresenter.lit(AquariumPresenter.bubbleColor, level: core.document.lighting)
+        let bubble = try XCTUnwrap(presenter.bubbleNodes.first { $0.primitive != nil })
+        XCTAssertEqual(bubble.color.x, lit.x * 0.6, accuracy: 1e-9)
+        XCTAssertEqual(bubble.color.w, lit.w, accuracy: 1e-9, "alpha kept")
+        let water = AquariumPresenter.waterColor(core.document)
+        let caustics = try XCTUnwrap(presenter.caustics)
+        XCTAssertEqual(caustics.inner.parameters["waterR"] ?? 0, water.x * 0.6, accuracy: 1e-9)
+        XCTAssertEqual(caustics.strength, CausticsScene.strength(lighting: core.document.lighting) * 0.6,
+                       accuracy: 1e-9)
+
+        let view = Vec2(Double(size.width), Double(size.height))
+        shell.handlePointer(PointerEvent(id: 1, phase: .began, location: Vec2(80, 30), timestamp: 1), viewSize: view)
+        shell.handlePointer(PointerEvent(id: 1, phase: .cancelled, location: Vec2(80, 30), timestamp: 1.05),
+                            viewSize: view)
+        XCTAssertEqual(presenter.dimmer.brightness, 1, "a touch restores at once")
+        try AquariumTest.frames(session, 1)
+        XCTAssertEqual(presenter.lastBrightness, 1)
+
+        // Paused: the idle clock still runs and a touch still restores.
+        XCTAssertTrue(shell.handle(control: "motion.pause", values: [1]).isAccepted)
+        XCTAssertEqual(try dimByWaiting(session, shell), AmbientDimmer.dimLevel, accuracy: 1e-9)
+        shell.handlePointer(PointerEvent(id: 2, phase: .began, location: Vec2(80, 30), timestamp: 2), viewSize: view)
+        XCTAssertEqual(presenter.dimmer.brightness, 1)
+        try AquariumTest.frames(session, 1)
+        XCTAssertEqual(presenter.lastBrightness, 1)
+        session.close()
+    }
+
+    func testATapDuringDimmingRestoresTheBrightnessAndStillFeeds() async throws {
+        let session = ExperienceSession()
+        let shell = try await AquariumTest.open(session)
+        XCTAssertTrue(shell.handle(control: "ambient.mode", values: [1]).isAccepted)
+        XCTAssertTrue(shell.handle(control: "motion.pause", values: [1]).isAccepted)
+        XCTAssertEqual(try dimByWaiting(session, shell), AmbientDimmer.dimLevel, accuracy: 1e-9)
+        let foodBefore = try AquariumTest.core(shell).document.food.count
+        let view = Vec2(Double(size.width), Double(size.height))
+        let point = Vec2(80, 30)
+        shell.presenter.pointer(PointerEvent(id: 1, phase: .began, location: point, timestamp: 10.0), viewSize: view,
+                                port: shell.port)
+        XCTAssertEqual(shell.presenter.dimmer.brightness, 1, "the touch restores at once")
+        shell.presenter.pointer(PointerEvent(id: 1, phase: .ended, location: point, timestamp: 10.1), viewSize: view,
+                                port: shell.port)
+        XCTAssertEqual(try AquariumTest.core(shell).document.food.count, foodBefore + Feeding.pelletsPerFeed,
+                       "the tap still feeds")
+        try AquariumTest.frames(session, 1)
+        XCTAssertEqual(shell.presenter.lastBrightness, 1)
+        session.close()
+    }
+
+    func testThePresenterOwnsALibraryOnlyWithStorage() async throws {
+        let suite = "dev.visualcore.a09-p05.render.\(UUID().uuidString)"
+        let defaults = try XCTUnwrap(UserDefaults(suiteName: suite))
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent(suite, isDirectory: true)
+        defer {
+            UserDefaults(suiteName: suite)?.removePersistentDomain(forName: suite)
+            try? FileManager.default.removeItem(at: root)
+        }
+        let storage = ExperienceStorage(id: AquariumTest.id, root: root, defaults: defaults)
+        let session = ExperienceSession()
+        let shell = try await AquariumTest.open(session, storage: storage)
+        let library = try XCTUnwrap(shell.presenter.library)
+        XCTAssertTrue(shell.presenter.saveAquarium(named: "Evening"))
+        XCTAssertEqual(library.entries.map(\.name), ["Evening"])
+        session.close()
+        XCTAssertNil(AquariumPresenter(experienceID: AquariumTest.id).library)
+    }
+
+    /// The experience never sets the system screen brightness or the idle timer (clarification Q3).
+    func testNoSourceSetsTheSystemBrightnessOrTheIdleTimer() throws {
+        let directory = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
+        let files = try XCTUnwrap(FileManager.default.enumerator(at: directory, includingPropertiesForKeys: nil))
+            .compactMap { $0 as? URL }.filter { $0.pathExtension == "swift" }
+        XCTAssertGreaterThanOrEqual(files.count, 20)
+        // Split so this file does not match its own list.
+        let words = ["UIScreen" + ".main.brightness", "isIdleTimer" + "Disabled"]
+        let assignment = try NSRegularExpression(pattern: "\\." + "brightness\\s*=(?!=)")
+        for file in files {
+            let text = try String(contentsOf: file, encoding: .utf8)
+            for word in words { XCTAssertFalse(text.contains(word), "\(file.lastPathComponent) mentions \(word)") }
+            let range = NSRange(text.startIndex..., in: text)
+            XCTAssertNil(assignment.firstMatch(in: text, range: range), "\(file.lastPathComponent) sets a brightness")
+        }
     }
 }

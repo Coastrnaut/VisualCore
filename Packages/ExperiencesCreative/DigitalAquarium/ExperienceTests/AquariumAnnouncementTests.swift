@@ -4,6 +4,7 @@
 // with VoiceOver off; the first frame after opening only sets the reference; two changes inside the 3 s interval give
 // one announcement, and the later change follows once the interval has passed. Frames advance the host by 1/60 s, so
 // the interval is measured in frames, not wall-clock time.
+// Feature 072 (A09-P05) T-A09-506: turning ambient mode on announces "Ambient on", off "Ambient off".
 import Foundation
 import XCTest
 @testable import DigitalAquariumExperience
@@ -69,6 +70,21 @@ final class AquariumAnnouncementTests: XCTestCase {
         XCTAssertEqual(sink.texts, ["Food dropped", "Paused"], "the latest held change wins after the interval")
         try AquariumTest.frames(session, 200)
         XCTAssertEqual(sink.texts.count, 2, "nothing more without a change")
+        session.close()
+    }
+
+    func testTogglingAmbientAnnouncesIt() async throws {
+        let session = ExperienceSession()
+        let sink = AquariumRecordingSink()
+        let shell = try await open(session, sink: sink, voiceOver: true)
+        XCTAssertTrue(shell.handle(control: "ambient.mode", values: [1]).isAccepted)
+        try AquariumTest.frames(session, 1)
+        XCTAssertEqual(sink.texts, ["Ambient on"])
+        XCTAssertTrue(shell.accessibilitySummary.contains(", ambient, swimming."))
+        try AquariumTest.frames(session, 190)
+        XCTAssertTrue(shell.handle(control: "ambient.mode", values: [0]).isAccepted)
+        try AquariumTest.frames(session, 1)
+        XCTAssertEqual(sink.texts, ["Ambient on", "Ambient off"])
         session.close()
     }
 }

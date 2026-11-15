@@ -60,6 +60,22 @@
 //     `AnnouncementSink` only while `voiceOverRunning()` is true. The first frame after `setup` sets the reference and
 //     announces nothing; `teardown` and `setup` reset it.
 //   - Unknown plant, decor and species kinds stay skipped when drawn.
+//
+// Feature 072 (A09-P05) T-A09-506 (FR-A09-510–512, 520; clarifications Q2–Q4; research D2–D4):
+//   - Quality: three levels (`AquariumCore.qualityTiers` 3; the core's default profile names them level-0…level-2,
+//     as the catalog does). Each frame draws with `AquariumBudget.budget(tier:ambient:)` for the host's tier and
+//     *ambient drawing* — the saved `ambient` choice OR Low Power Mode (injected `lowPowerMode`, default
+//     `ProcessInfo.processInfo.isLowPowerModeEnabled`) OR Reduce Motion: bubbles per vent and motes come from the
+//     budget (`WaterEffects.bubbles(…, perVent:)`, `motes(…, count:)`); caustics octaves 2 or 1 go to the caustics
+//     shader, 0 draws the plain fallback (clear colour, water and gravel rectangles). Low Power Mode and Reduce Motion
+//     never change the state (presentation only); the digest is the same at every level.
+//   - Dimming: an `AmbientDimmer` advanced by every drawn frame's delta while ambient drawing is active (pausing does
+//     not stop it); every canvas pointer `.began` touches it (full brightness at once, and the touch still goes to the
+//     gestures). Every node colour, the fallback clear colour and the caustics' water, gravel and strength are
+//     multiplied by its brightness. The system screen brightness and the idle timer are never touched.
+//   - Library: with the experience's storage the presenter owns an `AquariumLibrary` (saved aquariums) for the
+//     controls; without storage there is none.
+//   - Words: the description says ", ambient" and the announcer says "Ambient on"/"Ambient off".
 import Foundation
 import SwiftUI
 import UIKit
@@ -93,6 +109,8 @@ final class AquariumMirror {
     var decorFractions: [Vec2] = []
     /// The number of food pellets in the water.
     var foodCount = 0
+    /// Whether ambient mode is on (the saved choice, feature 072).
+    var ambient = false
 }
 
 /// A failure the presenter injects for tests (`failNextDraw`).
@@ -202,6 +220,20 @@ final class AquariumPresenter: ExperiencePresenter {
     private(set) var lastBubblesDrawn = 0, lastMotesDrawn = 0
     /// Whether the last frame was drawn by the caustics shader (false: the Phase 03 fallback).
     private(set) var lastCausticsDrawn = false
+    /// Whether Low Power Mode is on (the system's answer by default; tests inject it).
+    let lowPowerMode: @MainActor () -> Bool
+    /// The saved aquariums in the experience's storage; nil without storage.
+    let library: AquariumLibrary?
+    /// The in-scene dimming of ambient drawing (feature 072); internal so tests can move its clock.
+    var dimmer = AmbientDimmer()
+    /// The drawing budget of the last frame.
+    private(set) var lastBudget = AquariumBudget.budget(tier: 0, ambient: false)
+    /// Whether the last frame was drawn as ambient (saved choice, Low Power Mode or Reduce Motion).
+    private(set) var lastAmbientDrawing = false
+    /// The dimmer's brightness the last frame was drawn with.
+    private(set) var lastBrightness = 1.0
+    /// The quality tier of the last frame.
+    private(set) var lastTier = 0
 
     /// Where announcements go (the system's VoiceOver announcements by default).
     let announcementSink: any AnnouncementSink
@@ -234,10 +266,22 @@ final class AquariumPresenter: ExperiencePresenter {
     /// The bubble and mote nodes.
     private(set) var bubbleNodes: [SceneNode] = [], moteNodes: [SceneNode] = []
 
+    /// A presenter.
+    /// - Parameters:
+    ///   - experienceID: The experience's id.
+    ///   - reduceMotion: Halves the motion and selects ambient drawing (presentation only).
+    ///   - announcementSink: Where announcements go (nil: the system's VoiceOver announcements).
+    ///   - voiceOverRunning: Whether VoiceOver runs (nil: the system's answer).
+    ///   - causticsFragmentOverride: A caustics shader used instead of the real one (tests).
+    ///   - lowPowerMode: Whether Low Power Mode is on (nil: `ProcessInfo.processInfo.isLowPowerModeEnabled`).
+    ///   - storage: The experience's storage, where the saved aquariums live (nil: no library).
     init(experienceID: ExperienceID, reduceMotion: Bool = false, announcementSink: (any AnnouncementSink)? = nil,
-         voiceOverRunning: (@MainActor () -> Bool)? = nil, causticsFragmentOverride: String? = nil) {
+         voiceOverRunning: (@MainActor () -> Bool)? = nil, causticsFragmentOverride: String? = nil,
+         lowPowerMode: (@MainActor () -> Bool)? = nil, storage: ExperienceStorage? = nil) {
         self.experienceID = experienceID
         self.reduceMotion = reduceMotion
+        self.lowPowerMode = lowPowerMode ?? { ProcessInfo.processInfo.isLowPowerModeEnabled }
+        self.library = storage.map { AquariumLibrary(storage: $0) }
         self.announcementSink = announcementSink ?? SystemAnnouncementSink()
         self.voiceOverRunning = voiceOverRunning ?? { UIAccessibility.isVoiceOverRunning }
         self.causticsFragmentOverride = causticsFragmentOverride
@@ -308,15 +352,24 @@ final class AquariumPresenter: ExperiencePresenter {
         }
         sync(core)
         let document = core.document
-        let waterColor = Self.waterColor(document)
+        let ambientDrawing = isAmbientDrawing(core)
+        let budget = AquariumBudget.budget(tier: tier, ambient: ambientDrawing)
+        dimmer.advance(by: frame.delta, active: ambientDrawing)
+        let brightness = dimmer.brightness
+        lastTier = tier
+        lastBudget = budget
+        lastAmbientDrawing = ambientDrawing
+        lastBrightness = brightness
+        let waterColor = Self.dimmed(Self.waterColor(document), brightness)
         let width = Double(max(1, context.pixelWidth)), height = Double(max(1, context.pixelHeight))
-        let causticsOn = caustics?.isAvailable ?? false
+        let causticsOn = (caustics?.isAvailable ?? false) && budget.causticsOctaves > 0
         if let caustics, causticsOn {
             let s = Self.scale(width: width, height: height)
             let origin = Vec2(width / 2 - Self.tankWidth / 2 * s, height / 2 - Self.tankHeight / 2 * s)
             caustics.configure(step: core.step, reduceMotion: reduceMotion, lighting: document.lighting,
-                               water: waterColor, gravel: Self.litGravel(document.lighting), scale: s, origin: origin,
-                               tankSize: Vec2(Self.tankWidth, Self.tankHeight), gravelTop: Self.gravelTop)
+                               water: Self.waterColor(document), gravel: Self.litGravel(document.lighting), scale: s,
+                               origin: origin, tankSize: Vec2(Self.tankWidth, Self.tankHeight),
+                               gravelTop: Self.gravelTop, octaves: budget.causticsOctaves, brightness: brightness)
             try caustics.render(context, frame: frame)
         } else {
             clear.red = Float(waterColor.x)
@@ -325,7 +378,7 @@ final class AquariumPresenter: ExperiencePresenter {
             try clear.render(context, frame: frame)
         }
         lastCausticsDrawn = causticsOn
-        layOut(core, width: width, height: height, caustics: causticsOn)
+        layOut(core, width: width, height: height, caustics: causticsOn, budget: budget, brightness: brightness)
         if primitives == nil { primitives = try PrimitiveRenderer(registry: context.resources) }
         try primitives?.draw(root, camera: Camera2D(), metrics: ViewMetrics(size: Vec2(width, height), scale: 1))
         updateAnnouncements(core, frame: frame)
@@ -356,7 +409,7 @@ final class AquariumPresenter: ExperiencePresenter {
         if frame.delta.isFinite, frame.delta > 0 { announcementClock += frame.delta }
         announcer.voiceOverRunning = voiceOverRunning()
         let current = AquariumWording.state(document: core.document, catalog: AquariumCore.catalog,
-                                            paused: core.paused)
+                                            paused: core.paused, ambient: core.ambient)
         let change = AquariumWording.change(from: announcedState, to: current)
         announcedState = current
         if let change, announcer.announce(change, at: announcementClock), let text = announcer.lastAnnounced {
@@ -372,6 +425,16 @@ final class AquariumPresenter: ExperiencePresenter {
     }
 
     // MARK: Drawing
+
+    /// Whether `core` is drawn as ambient: the saved choice, Low Power Mode or Reduce Motion (presentation only).
+    func isAmbientDrawing(_ core: AquariumCore) -> Bool {
+        core.ambient || reduceMotion || lowPowerMode()
+    }
+
+    /// `color` with its red, green and blue multiplied by `brightness` (alpha kept).
+    nonisolated static func dimmed(_ color: Vec4, _ brightness: Double) -> Vec4 {
+        Vec4(color.x * brightness, color.y * brightness, color.z * brightness, color.w)
+    }
 
     /// The lighting factor of `level` (0.6, 0.8 or 1.0; soft for an unknown level).
     nonisolated static func lightingFactor(_ level: Int) -> Double {
@@ -539,8 +602,11 @@ final class AquariumPresenter: ExperiencePresenter {
     }
 
     /// Places every node for a canvas of `width` × `height` pixels (world = pixels from the centre, y up); with
-    /// `caustics` the water and gravel rectangles are hidden (the caustics shader draws them).
-    func layOut(_ core: AquariumCore, width: Double, height: Double, caustics: Bool = false) {
+    /// `caustics` the water and gravel rectangles are hidden (the caustics shader draws them). `budget` limits the
+    /// bubbles per vent and the motes (default: level 0); every node colour is multiplied by `brightness` (default 1).
+    func layOut(_ core: AquariumCore, width: Double, height: Double, caustics: Bool = false,
+                budget: AquariumBudget = AquariumBudget.budget(tier: 0, ambient: false), brightness: Double = 1) {
+        let b = brightness
         let document = core.document
         let catalog = AquariumCore.catalog
         let level = document.lighting
@@ -552,10 +618,10 @@ final class AquariumPresenter: ExperiencePresenter {
 
         water.primitive = .rect(Vec2(Self.tankWidth * s, Self.tankHeight * s))
         water.position = world(Vec2(Self.tankWidth / 2, Self.tankHeight / 2))
-        water.color = Self.waterColor(document)
+        water.color = Self.dimmed(Self.waterColor(document), b)
         gravel.primitive = .rect(Vec2(Self.tankWidth * s, Self.gravelTop * s))
         gravel.position = world(Vec2(Self.tankWidth / 2, Self.gravelTop / 2))
-        gravel.color = Self.litGravel(level)
+        gravel.color = Self.dimmed(Self.litGravel(level), b)
         water.isVisible = !caustics
         gravel.isVisible = !caustics
 
@@ -568,7 +634,7 @@ final class AquariumPresenter: ExperiencePresenter {
             let x = document.plants[index].x
             let layer = WaterEffects.layer(index: index)
             let depth = WaterEffects.scale(layer: layer)
-            let color = Self.layered(kind.color, layer: layer, document: document)
+            let color = Self.dimmed(Self.layered(kind.color, layer: layer, document: document), b)
             let width = Self.plantWidth * depth * s
             let plantHeight = kind.height * depth
             switch kind.shape {
@@ -605,13 +671,13 @@ final class AquariumPresenter: ExperiencePresenter {
             let piece = document.decor[index]
             let points = Self.decorOutline(kind.shape, size: kind.size, rotation: piece.rotation, scale: piece.scale)
             node.primitive = .polygon(points.map { world(piece.position + $0) })
-            node.color = Self.lit(kind.color, level: level)
+            node.color = Self.dimmed(Self.lit(kind.color, level: level), b)
             decorDrawn += 1
         }
         lastDecorDrawn = decorDrawn
 
         var foodDrawn = 0
-        let foodColor = Self.lit(Self.foodColor, level: level)
+        let foodColor = Self.dimmed(Self.lit(Self.foodColor, level: level), b)
         for (index, node) in foodNodes.enumerated() {
             node.primitive = nil
             guard index < document.food.count else { continue }
@@ -635,16 +701,16 @@ final class AquariumPresenter: ExperiencePresenter {
             let length = species.length * WaterEffects.scale(layer: layer)
             let shapes = Self.fishPolygons(fish, shape: species.shape, length: length, factor: factor)
             body.primitive = .polygon(shapes.body.map(world))
-            body.color = Self.layered(species.bodyColor, layer: layer, document: document)
+            body.color = Self.dimmed(Self.layered(species.bodyColor, layer: layer, document: document), b)
             tail.primitive = .polygon(shapes.tail.map(world))
-            tail.color = Self.layered(species.finColor, layer: layer, document: document)
+            tail.color = Self.dimmed(Self.layered(species.finColor, layer: layer, document: document), b)
             fishDrawn += 1
         }
         lastFishDrawn = fishDrawn
 
         let bubbles = WaterEffects.bubbles(step: core.step, vents: Self.vents(document, catalog: catalog),
-                                           reduceMotion: reduceMotion)
-        let bubbleColor = Self.lit(Self.bubbleColor, level: level)
+                                           reduceMotion: reduceMotion, perVent: budget.bubblesPerVent)
+        let bubbleColor = Self.dimmed(Self.lit(Self.bubbleColor, level: level), b)
         let bubbleRadius = max(Self.bubbleRadius * s, Self.minParticlePixels)
         for (index, node) in bubbleNodes.enumerated() {
             guard index < bubbles.count else { node.primitive = nil; continue }
@@ -654,8 +720,8 @@ final class AquariumPresenter: ExperiencePresenter {
         }
         lastBubblesDrawn = min(bubbles.count, bubbleNodes.count)
 
-        let motes = WaterEffects.motes(step: core.step, reduceMotion: reduceMotion)
-        let moteColor = Self.lit(Self.moteColor, level: level)
+        let motes = WaterEffects.motes(step: core.step, reduceMotion: reduceMotion, count: budget.motes)
+        let moteColor = Self.dimmed(Self.lit(Self.moteColor, level: level), b)
         let moteRadius = max(Self.moteRadius * s, Self.minParticlePixels)
         for (index, node) in moteNodes.enumerated() {
             guard index < motes.count else { node.primitive = nil; continue }
@@ -691,6 +757,7 @@ final class AquariumPresenter: ExperiencePresenter {
         }
         if mirror.decorFractions != fractions { mirror.decorFractions = fractions }
         if mirror.foodCount != document.food.count { mirror.foodCount = document.food.count }
+        if mirror.ambient != core.ambient { mirror.ambient = core.ambient }
     }
 
     /// The name of `document`'s starter habitat ("Aquarium" for an unknown index).
@@ -736,18 +803,19 @@ final class AquariumPresenter: ExperiencePresenter {
         return names.dropLast().joined(separator: ", ") + " and " + last
     }
 
-    /// The canvas description by `AquariumWording.description(document:catalog:paused:)`, for example "Digital
-    /// Aquarium: Reef, 7 fish of 2 species (4 Orange striped fish and 3 Blue fish with yellow tail), 5 plants,
-    /// 3 decorations, no food, lighting soft, swimming."
+    /// The canvas description by `AquariumWording.description(document:catalog:paused:ambient:)`, for example
+    /// "Digital Aquarium: Reef, 7 fish of 2 species (4 Orange striped fish and 3 Blue fish with yellow tail), 5 plants,
+    /// 3 decorations, no food, lighting soft, swimming." (", ambient" before the last word with ambient mode on).
     func describe(_ core: AquariumCore) -> String {
         sync(core)
-        return AquariumWording.description(document: core.document, catalog: AquariumCore.catalog, paused: core.paused)
+        return AquariumWording.description(document: core.document, catalog: AquariumCore.catalog, paused: core.paused,
+                                           ambient: core.ambient)
     }
 
     /// One water probe at the top centre of the canvas (above the swim bounds, where no plant reaches), expecting the
-    /// colour class of the lit water; none when the lit water lies within 4 of 255 of a class threshold.
+    /// colour class of the lit water (under the last frame's dimming); none when the lit water lies within 4 of 255 of a class threshold.
     func probes(_ core: AquariumCore) -> [FrameProbe] {
-        let color = Self.waterColor(core.document)
+        let color = Self.dimmed(Self.waterColor(core.document), lastBrightness)
         guard let expected = Self.colorClass(red: color.x, green: color.y, blue: color.z) else { return [] }
         return [FrameProbe(name: "water", x: 0.5, y: 0.01, expected: expected)].compactMap { $0 }
     }
@@ -770,7 +838,7 @@ final class AquariumPresenter: ExperiencePresenter {
     }
 
     func makeControls(_ port: ExperienceActionPort) -> AnyView {
-        AnyView(AquariumControls(port: port, mirror: mirror))
+        AnyView(AquariumControls(port: port, mirror: mirror, library: library, presenter: self))
     }
 
     /// Every action has a native control.
@@ -779,9 +847,19 @@ final class AquariumPresenter: ExperiencePresenter {
     /// The actions the canvas gestures send: `food.drop`, `decor.place` and `decor.move`.
     var gestureActions: Set<String> { AquariumGestures.gestureActions }
 
+    /// Saves the last drawn aquarium in the library under `name`; false without storage, before a state was seen, or
+    /// when the library refuses (its `lastFailure` says why).
+    @discardableResult
+    func saveAquarium(named name: String) -> Bool {
+        guard let library, let core = lastCore else { return false }
+        return library.save(name: name, core: core)
+    }
+
     /// Turns a canvas pointer event into gesture actions against the last synced habitat document and sends each
-    /// through `port`; nothing happens before a state was seen.
+    /// through `port`; nothing happens before a state was seen. Every touch that begins restores the dimmer's full
+    /// brightness first (the touch still feeds or edits as usual).
     func pointer(_ event: PointerEvent, viewSize: Vec2, port: ExperienceActionPort) {
+        if event.phase == .began { dimmer.touch() }
         guard let document = lastCore?.document else { return }
         let actions = gestures.handle(event, document: document, catalog: AquariumCore.catalog, viewSize: viewSize)
         for action in actions { port.send(action.control, action.values) }

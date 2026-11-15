@@ -17,20 +17,25 @@ enum AquariumTest {
 
     /// Opens Digital Aquarium in `session` (seed `seed`, optionally restoring `snapshot`), lays the view out at `size`
     /// points and draws one frame. Announcements go to `announcementSink` (default: dropped) with VoiceOver reported
-    /// by `voiceOverRunning` (default: off); `causticsFragment` replaces the caustics shader.
+    /// by `voiceOverRunning` (default: off); `causticsFragment` replaces the caustics shader; Low Power Mode is
+    /// reported by `lowPowerMode` (default: off, so the simulator's own setting never changes a test); `storage` gives
+    /// the presenter its saved-aquarium library (default: none).
     static func open(_ session: ExperienceSession, seed: UInt64 = 7, snapshot: ExperienceSnapshot? = nil,
                      reduceMotion: Bool = false,
                      size: CGSize = CGSize(width: 160, height: 90),
                      announcementSink: (any AnnouncementSink)? = nil,
                      voiceOverRunning: (@MainActor () -> Bool)? = nil,
-                     causticsFragment: String? = nil) async throws -> ExperienceShell<AquariumPresenter> {
+                     causticsFragment: String? = nil, lowPowerMode: (@MainActor () -> Bool)? = nil,
+                     storage: ExperienceStorage? = nil) async throws -> ExperienceShell<AquariumPresenter> {
         let id = self.id
         var made: ExperienceShell<AquariumPresenter>?
         let sink = announcementSink ?? AquariumSilentSink()
         let voiceOver = voiceOverRunning ?? { false }
+        let lowPower = lowPowerMode ?? { false }
         let request = ExperienceOpenRequest(id: id, seed: seed, snapshot: snapshot, refusedSnapshotFails: false) {
             let shell = DigitalAquariumExperience.make(id: id, reduceMotion: reduceMotion, announcementSink: sink,
-                                                       voiceOverRunning: voiceOver, causticsFragment: causticsFragment)
+                                                       voiceOverRunning: voiceOver, causticsFragment: causticsFragment,
+                                                       lowPowerMode: lowPower, storage: storage)
             made = shell
             return shell
         }

@@ -17,6 +17,9 @@ AquariumSimulation.advance(_:catalog:random:ambient: Bool = false)
 AquariumSimulation.ambientSpeedFactor = 0.6
 WaterEffects.bubbles(step:vents:reduceMotion:perVent: Int = bubblesPerVent)
 WaterEffects.motes(step:reduceMotion:count: Int = moteCount)
+AquariumWording.description(document:catalog:paused:ambient: Bool = false)  // ", ambient" before the motion word
+AquariumWording.state(document:catalog:paused:ambient: Bool = false); AquariumWordingState.ambient
+AquariumWording.change(from:to:) → also "Ambient on" / "Ambient off" (lowest priority)
 ```
 
 ## Experience

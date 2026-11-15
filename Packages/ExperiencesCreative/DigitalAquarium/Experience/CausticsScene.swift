@@ -18,6 +18,10 @@
 // Strength: 0.04, 0.07 and 0.10 for dim, soft and bright lighting (soft for an unknown level). When the shader cannot
 // be prepared, `errorMessage` is set by the inner scene and `isAvailable` is false; the presenter then falls back to
 // the Phase 03 clear colour and gravel rectangle.
+// Feature 072 (A09-P05) T-A09-506 (FR-A09-511, FR-A09-520; research D3, D4): `u_octaves` (from the drawing budget) is
+// 2 for both noise layers (as before) or 1 for the first layer only (`b` held at 0.5, so `c = 1 − 2 |a − 0.5|`); at 0
+// the presenter does not draw this scene at all (the plain fallback). `configure(…, brightness:)` multiplies the water
+// and gravel colours and the caustic strength by the ambient dimmer's brightness (1 = unchanged).
 import VisualCoreMath
 import VisualCoreRendering
 
@@ -51,6 +55,7 @@ final class CausticsScene: RenderScene {
     uniform float u_gravelR;
     uniform float u_gravelG;
     uniform float u_gravelB;
+    uniform float u_octaves;
     out vec4 color;
 
     float cellHash(vec2 c) {
@@ -81,7 +86,9 @@ final class CausticsScene: RenderScene {
         }
         float t = u_time;
         float a = periodicNoise(vec2(tank.x + 0.9 * t, 1.3 * tank.y - 0.4 * t), 16.0);
-        float b = periodicNoise(vec2(2.0 * tank.x - 1.3 * t, 2.0 * tank.y + 0.7 * t), 32.0);
+        float b = u_octaves >= 1.5
+            ? periodicNoise(vec2(2.0 * tank.x - 1.3 * t, 2.0 * tank.y + 0.7 * t), 32.0)
+            : 0.5;
         float c = clamp(1.0 - 2.0 * abs(a - b), 0.0, 1.0);
         bool onGravel = tank.y < u_gravelTop;
         float fade = onGravel ? 1.0 : 0.6 * (1.0 - smoothstep(u_gravelTop, u_tankHeight - 0.5, tank.y));
@@ -111,8 +118,11 @@ final class CausticsScene: RenderScene {
     /// The pattern time of the last ``configure``.
     var time: Double { inner.fixedTime ?? 0 }
 
-    /// The caustic strength of the last ``configure``.
+    /// The caustic strength of the last ``configure`` (after the brightness).
     var strength: Double { inner.parameters["strength"] ?? 0 }
+
+    /// The octaves of the last ``configure`` (1 or 2).
+    var octaves: Int { Int(inner.parameters["octaves"] ?? 2) }
 
     /// The caustic strength of lighting `level`: 0.04 dim, 0.07 soft, 0.10 bright (soft for an unknown level).
     nonisolated static func strength(lighting level: Int) -> Double {
@@ -135,15 +145,19 @@ final class CausticsScene: RenderScene {
     ///   - origin: The pixel of the tank's bottom-left corner (y up).
     ///   - tankSize: The tank's width and height in habitat units.
     ///   - gravelTop: The top of the gravel band in habitat units.
+    ///   - octaves: The noise layers: 2 both (default), 1 the first only (clamped to 1…2).
+    ///   - brightness: The ambient dimmer's colour scale applied to the water, the gravel and the strength (default 1).
     func configure(step: Int, reduceMotion: Bool, lighting: Int, water: Vec4, gravel: Vec4, scale: Double,
-                   origin: Vec2, tankSize: Vec2, gravelTop: Double) {
+                   origin: Vec2, tankSize: Vec2, gravelTop: Double, octaves: Int = 2, brightness: Double = 1) {
         inner.fixedTime = Self.time(step: step, reduceMotion: reduceMotion)
+        let b = brightness
         inner.parameters = [
             "scale": scale, "originX": origin.x, "originY": origin.y,
             "tankWidth": tankSize.x, "tankHeight": tankSize.y, "gravelTop": gravelTop,
-            "strength": Self.strength(lighting: lighting),
-            "waterR": water.x, "waterG": water.y, "waterB": water.z,
-            "gravelR": gravel.x, "gravelG": gravel.y, "gravelB": gravel.z,
+            "strength": Self.strength(lighting: lighting) * b,
+            "waterR": water.x * b, "waterG": water.y * b, "waterB": water.z * b,
+            "gravelR": gravel.x * b, "gravelG": gravel.y * b, "gravelB": gravel.z * b,
+            "octaves": Double(min(max(octaves, 1), 2)),
         ]
     }
 

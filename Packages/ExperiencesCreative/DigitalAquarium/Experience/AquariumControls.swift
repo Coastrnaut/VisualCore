@@ -13,6 +13,12 @@
 //   `decor.move [i, x, y]` half a tank unit from the piece's current position, 0.5/16 across or 0.5/9 up, clamped to
 //   0…1) and Remove (`decor.remove` → `decor.remove [i]`). The piece buttons are disabled while there is no piece.
 //   The positions come from the presenter's mirror, which is updated from the habitat document on every sync.
+// Feature 072 (A09-P05) T-A09-506 (FR-A09-501, 502, 510): the Ambient toggle (`ambient.mode` → `ambient.mode [1/0]`,
+// showing the mirrored saved choice) in the first section, and with the experience's storage a "Saved aquariums"
+// section modelled on Oscilloscope Studio's presets: the name field (`library.name`, "Aquarium name"), Save
+// (`library.save`), one button per saved aquarium (`library.0` …, labelled with its name; a tap opens it through the
+// port and selects it), Delete for the selected one (`library.delete`), the count of files that could not be read or
+// were made by a newer version (`library.status`, only when non-zero) and the last failure (`library.failure`).
 // Every control has an accessible label and value and an identifier from the port; hit areas are at least 44 points
 // high and text wraps.
 import SwiftUI
@@ -24,8 +30,16 @@ import VisualCoreMath
 struct AquariumControls: View {
     let port: ExperienceActionPort
     let mirror: AquariumMirror
+    /// The saved aquariums (nil without storage: the section is not shown).
+    let library: AquariumLibrary?
+    /// The presenter (saves the last drawn aquarium).
+    let presenter: AquariumPresenter
     /// The piece the move and remove buttons act on (view-only; clamped to the pieces present).
     @State private var piece = 0
+    /// The name typed for the next save.
+    @State private var aquariumName = ""
+    /// The saved aquarium last opened or saved (view-only selection for Delete).
+    @State private var selectedAquarium: UUID?
 
     /// One move step across the tank as a fraction of its width (half a tank unit of 16).
     static let stepX = 0.5 / 16
@@ -89,12 +103,22 @@ struct AquariumControls: View {
             .accessibilityValue(Text(verbatim: mirror.paused ? "Paused" : "Swimming"))
             .accessibilityHint(Text(verbatim: "Stops and resumes the fish and the plants"))
             .accessibilityIdentifier(port.identifier("motion.pause"))
+            Toggle(isOn: Binding(get: { mirror.ambient },
+                                 set: { on in if on != mirror.ambient { _ = port.send("ambient.mode", [on ? 1 : 0]) } })) {
+                Text(verbatim: "Ambient").font(.body)
+            }
+            .frame(minHeight: 44)
+            .accessibilityLabel(Text(verbatim: "Ambient"))
+            .accessibilityValue(Text(verbatim: mirror.ambient ? "On" : "Off"))
+            .accessibilityHint(Text(verbatim: "Calmer fish, fewer bubbles, and the scene dims after a minute untouched"))
+            .accessibilityIdentifier(port.identifier("ambient.mode"))
             Text(verbatim: Self.sentence(mirror.status))
                 .font(.footnote)
                 .fixedSize(horizontal: false, vertical: true)
                 .accessibilityIdentifier(port.identifier("aquarium.status"))
             feeding
             decorations
+            if let library { savedAquariums(library) }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
@@ -146,6 +170,67 @@ struct AquariumControls: View {
             _ = port.send("decor.remove", [Double(selected)])
             piece = Self.clampedPiece(selected, count: count - 1)
         }
+    }
+
+    /// The "Saved aquariums" section: name field, Save, one row per entry (tap opens), Delete, counts and failure.
+    @ViewBuilder private func savedAquariums(_ library: AquariumLibrary) -> some View {
+        Text(verbatim: "Saved aquariums").font(.headline).accessibilityAddTraits(.isHeader)
+        TextField(text: $aquariumName) { Text(verbatim: "Aquarium name") }
+            .textFieldStyle(.roundedBorder)
+            .frame(minHeight: 44)
+            .accessibilityLabel(Text(verbatim: "Aquarium name"))
+            .accessibilityHint(Text(verbatim: "1 to 40 characters; empty saves as My aquarium"))
+            .accessibilityIdentifier(port.identifier("library.name"))
+        actionButton("Save aquarium", identifier: "library.save",
+                     hint: "Saves the habitat, decorations, lighting and ambient choice under this name") {
+            let before = Set(library.entries.map(\.id))
+            if presenter.saveAquarium(named: aquariumName) {
+                selectedAquarium = library.entries.first { !before.contains($0.id) }?.id
+            }
+        }
+        ForEach(Array(library.entries.enumerated()), id: \.element.id) { index, entry in
+            let selected = selectedAquarium == entry.id
+            Button {
+                selectedAquarium = entry.id
+                aquariumName = entry.name
+                _ = library.open(entry, port: port)
+            } label: {
+                HStack {
+                    Text(verbatim: entry.name).font(.body).fixedSize(horizontal: false, vertical: true)
+                    Spacer()
+                    Text(verbatim: selected ? "Selected" : "Open").font(.footnote)
+                }
+                .frame(minHeight: 44)
+            }
+            .buttonStyle(.bordered)
+            .accessibilityLabel(Text(verbatim: entry.name))
+            .accessibilityValue(Text(verbatim: selected ? "Saved aquarium, selected" : "Saved aquarium"))
+            .accessibilityHint(Text(verbatim: "Opens this saved aquarium; the fish start afresh and there is no food"))
+            .accessibilityIdentifier(port.identifier("library.\(index)"))
+        }
+        let chosen = selectedAquarium.flatMap { id in library.entries.first { $0.id == id } }
+        actionButton("Delete saved aquarium", identifier: "library.delete",
+                     hint: "Deletes the selected saved aquarium; the current aquarium stays", disabled: chosen == nil) {
+            if let chosen, library.delete(chosen.id) { selectedAquarium = nil }
+        }
+        if library.unreadable > 0 || library.newer > 0 {
+            Text(verbatim: Self.skippedWords(unreadable: library.unreadable, newer: library.newer))
+                .font(.footnote).fixedSize(horizontal: false, vertical: true)
+                .accessibilityIdentifier(port.identifier("library.status"))
+        }
+        if let failure = library.lastFailure {
+            Text(verbatim: failure)
+                .font(.footnote).fixedSize(horizontal: false, vertical: true)
+                .accessibilityIdentifier(port.identifier("library.failure"))
+        }
+    }
+
+    /// The saved files left out of the list in words: "2 saved files can't be read; 1 was made by a newer version".
+    static func skippedWords(unreadable: Int, newer: Int) -> String {
+        var parts: [String] = []
+        if unreadable > 0 { parts.append("\(unreadable) saved \(unreadable == 1 ? "file" : "files") can't be read") }
+        if newer > 0 { parts.append("\(newer) \(newer == 1 ? "was" : "were") made by a newer version") }
+        return parts.joined(separator: "; ")
     }
 
     /// A button that moves piece `piece` by `dx`, `dy` (tank fractions) from its current position.

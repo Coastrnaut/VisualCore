@@ -8,6 +8,9 @@
 //   - ``AquariumWordingState`` is the part of the tank whose changes are announced, and
 //     ``AquariumWording/change(from:to:)`` gives the one change sentence between two states (priority: habitat, food
 //     dropped, decoration added, decoration removed, paused or swimming). Food that is eaten is not announced.
+// Feature 072 (A09-P05) T-A09-506 (FR-A09-510): with ambient mode on the description says ", ambient" right before the
+// final ", swimming." or ", paused." (all other words unchanged), and the state's `ambient` announces "Ambient on" or
+// "Ambient off" (lowest priority, after paused or swimming).
 import Foundation
 
 /// The announced part of an aquarium: habitat, food and decor counts, and the motion state.
@@ -22,11 +25,14 @@ public struct AquariumWordingState: Equatable, Sendable {
     public var decorCount: Int
     /// Whether the motion is paused.
     public var paused: Bool
+    /// Whether ambient mode is on (feature 072).
+    public var ambient: Bool
 
-    /// Creates a state from all of its fields.
-    public init(habitatId: String, habitatName: String, foodCount: Int, decorCount: Int, paused: Bool) {
+    /// Creates a state from all of its fields (`ambient` off by default).
+    public init(habitatId: String, habitatName: String, foodCount: Int, decorCount: Int, paused: Bool,
+                ambient: Bool = false) {
         self.habitatId = habitatId; self.habitatName = habitatName
-        self.foodCount = foodCount; self.decorCount = decorCount; self.paused = paused
+        self.foodCount = foodCount; self.decorCount = decorCount; self.paused = paused; self.ambient = ambient
     }
 }
 
@@ -43,14 +49,17 @@ public enum AquariumWording {
     ///   - document: The habitat document described.
     ///   - catalog: The catalog naming the habitat and the species.
     ///   - paused: Whether the motion is paused ("paused") or not ("swimming").
-    public static func description(document: HabitatDocument, catalog: SpeciesCatalog, paused: Bool) -> String {
+    ///   - ambient: Whether ambient mode is on: ", ambient" before the final motion word (default off).
+    public static func description(document: HabitatDocument, catalog: SpeciesCatalog, paused: Bool,
+                                   ambient: Bool = false) -> String {
         let counts = speciesCounts(document, catalog: catalog)
         let species = counts.count == 1 ? "1 species" : "\(counts.count) species"
         let names = counts.map { "\($0.count) \($0.name)" }
         return "Digital Aquarium: \(habitatName(document, catalog: catalog)), \(fishWords(document.fish.count)) "
             + "of \(species) (\(joined(names))), \(plantWords(document.plants.count)), "
             + "\(decorWords(document.decor.count)), \(foodWords(document.food.count)), "
-            + "lighting \(lightingName(document.lighting)), \(paused ? "paused" : "swimming")."
+            + "lighting \(lightingName(document.lighting)), \(ambient ? "ambient, " : "")"
+            + "\(paused ? "paused" : "swimming")."
     }
 
     /// The announced state of `document`.
@@ -58,16 +67,19 @@ public enum AquariumWording {
     ///   - document: The habitat document.
     ///   - catalog: The catalog naming the habitat.
     ///   - paused: Whether the motion is paused.
-    public static func state(document: HabitatDocument, catalog: SpeciesCatalog, paused: Bool)
-        -> AquariumWordingState {
+    ///   - ambient: Whether ambient mode is on (default off).
+    public static func state(document: HabitatDocument, catalog: SpeciesCatalog, paused: Bool,
+                             ambient: Bool = false) -> AquariumWordingState {
         AquariumWordingState(habitatId: document.habitatId, habitatName: habitatName(document, catalog: catalog),
-                             foodCount: document.food.count, decorCount: document.decor.count, paused: paused)
+                             foodCount: document.food.count, decorCount: document.decor.count, paused: paused,
+                             ambient: ambient)
     }
 
     /// The change sentence from `old` to `new`, or nil when `old` is nil (the first state only sets the reference)
     /// or nothing announced changed. One sentence, by priority: "Habitat <name>" when the habitat id changed;
     /// "Food dropped" when the food count rose; "Decoration added" or "Decoration removed" when the decor count rose
-    /// or fell; "Paused" or "Swimming" when the motion state changed. A falling food count (eaten or sunk) is silent.
+    /// or fell; "Paused" or "Swimming" when the motion state changed; "Ambient on" or "Ambient off" when ambient mode
+    /// changed. A falling food count (eaten or sunk) is silent.
     public static func change(from old: AquariumWordingState?, to new: AquariumWordingState) -> String? {
         guard let old else { return nil }
         if old.habitatId != new.habitatId { return "Habitat \(new.habitatName)" }
@@ -75,6 +87,7 @@ public enum AquariumWording {
         if new.decorCount > old.decorCount { return "Decoration added" }
         if new.decorCount < old.decorCount { return "Decoration removed" }
         if new.paused != old.paused { return new.paused ? "Paused" : "Swimming" }
+        if new.ambient != old.ambient { return new.ambient ? "Ambient on" : "Ambient off" }
         return nil
     }
 

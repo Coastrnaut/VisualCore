@@ -3,6 +3,8 @@
 // fish of species missing from the catalog counted under "unknown"; the word helpers; and the change sentences with
 // their priority (habitat, food dropped, decoration added, decoration removed, paused or swimming) and their nil cases
 // (first state, nothing announced changed, food eaten). Host-free and short.
+// Feature 072 (A09-P05) T-A09-506 (FR-A09-510): ", ambient" before the final motion word only when ambient is on (the
+// rest of the text unchanged); "Ambient on" and "Ambient off" with the lowest priority.
 import DigitalAquariumCore
 import Foundation
 import Testing
@@ -52,6 +54,18 @@ import VisualCoreSimulation
             + "1 plant, 1 decoration, 1 food pellet, lighting dim, swimming.")
     }
 
+    @Test func ambientIsSaidBeforeTheMotionWordOnlyWhenOn() {
+        let plain = AquariumWording.description(document: starter(0), catalog: catalog, paused: false)
+        #expect(AquariumWording.description(document: starter(0), catalog: catalog, paused: false, ambient: false)
+            == plain)
+        #expect(AquariumWording.description(document: starter(0), catalog: catalog, paused: false, ambient: true)
+            == "Digital Aquarium: Reef, 7 fish of 2 species (4 Orange striped fish and 3 Blue fish with yellow tail), "
+            + "5 plants, 3 decorations, no food, lighting soft, ambient, swimming.")
+        #expect(AquariumWording.description(document: starter(1), catalog: catalog, paused: true, ambient: true)
+            == "Digital Aquarium: Kelp, 8 fish of 2 species (5 Silver slender fish and 3 Gold round fish), "
+            + "6 plants, 2 decorations, no food, lighting soft, ambient, paused.")
+    }
+
     @Test func unknownSpeciesAreCountedTogetherUnderUnknown() {
         let doc = HabitatDocument(habitatIndex: 0, habitatId: "reef", waterColor: RGBA(0, 0.4, 0.6), plants: [],
                                   fish: [fish("mystery-fish"), fish("orange-striped-fish"), fish("other-fish"),
@@ -83,6 +97,10 @@ import VisualCoreSimulation
         let state = AquariumWording.state(document: starter(1), catalog: catalog, paused: true)
         #expect(state == AquariumWordingState(habitatId: "kelp", habitatName: "Kelp", foodCount: 0, decorCount: 2,
                                               paused: true))
+        #expect(!state.ambient)
+        let ambient = AquariumWording.state(document: starter(1), catalog: catalog, paused: true, ambient: true)
+        #expect(ambient == AquariumWordingState(habitatId: "kelp", habitatName: "Kelp", foodCount: 0, decorCount: 2,
+                                                paused: true, ambient: true))
     }
 
     // MARK: - Change sentences
@@ -115,6 +133,8 @@ import VisualCoreSimulation
         #expect(AquariumWording.change(from: reef, to: changed { $0.decorCount = 2 }) == "Decoration removed")
         #expect(AquariumWording.change(from: reef, to: changed { $0.paused = true }) == "Paused")
         #expect(AquariumWording.change(from: changed { $0.paused = true }, to: reef) == "Swimming")
+        #expect(AquariumWording.change(from: reef, to: changed { $0.ambient = true }) == "Ambient on")
+        #expect(AquariumWording.change(from: changed { $0.ambient = true }, to: reef) == "Ambient off")
     }
 
     @Test func theSentencesFollowThePriority() {
@@ -131,5 +151,10 @@ import VisualCoreSimulation
         #expect(AquariumWording.change(from: reef, to: changed { $0.foodCount = 0; $0.paused = true }) == "Paused")
         let eatenAndPaused = changed { $0.foodCount = 1; $0.paused = true }
         #expect(AquariumWording.change(from: changed { $0.foodCount = 3 }, to: eatenAndPaused) == "Paused")
+        #expect(AquariumWording.change(from: reef, to: changed { $0.paused = true; $0.ambient = true }) == "Paused")
+        #expect(AquariumWording.change(from: reef, to: changed { $0.decorCount = 4; $0.ambient = true })
+            == "Decoration added")
+        #expect(AquariumWording.change(from: changed { $0.foodCount = 3 }, to: changed { $0.foodCount = 1
+            $0.ambient = true }) == "Ambient on", "eaten food is silent, ambient still announced")
     }
 }
