@@ -270,6 +270,29 @@
       "manifest": "Packages/ExperiencesCreative/PhysicsPlayground/scenario-manifest.json",
       "permissions": [],
       "summary": "A sandbox of circles, boxes and springs under gravity and drag, with presets, saved experiments and tutorials."
+    },
+    "a12.tiny-worlds": {
+      "capabilities": [
+        "island, asteroid garden, miniature city",
+        "seeded terrain, seam-free normals",
+        "lit 3D terrain drawn with depth",
+        "orbit, tilt and zoom within limits",
+        "new seed on request",
+        "deterministic terrain digests"
+      ],
+      "quality_tiers": [
+        "level-0"
+      ],
+      "palette": [
+        "#296B9E",
+        "#5C9E4D",
+        "#B8A880",
+        "#14161C"
+      ],
+      "content": null,
+      "manifest": "Packages/ExperiencesCreative/TinyWorlds/scenario-manifest.json",
+      "permissions": [],
+      "summary": "A gallery of tiny procedural worlds to orbit, each built from a seed."
     }
   }
 }
