@@ -1297,7 +1297,9 @@ class UnifiedAppTargetTests(unittest.TestCase):
                                     # Feature 061 (A08-P01): Oscilloscope Studio, integrated at X-A08.
                                     "OscilloscopeStudioExperience",
                                     # Feature 068 (A09-P01): Digital Aquarium, integrated at X-A09.
-                                    "DigitalAquariumExperience"])
+                                    "DigitalAquariumExperience",
+                                    # Feature 075 (A10-P01): Neon Arcade, a candidate until X-A10.
+                                    "NeonArcadeExperience"])
 
     def test_the_standing_isolation_step_requires_sources(self):
         listing = subprocess.run([sys.executable, str(HERE / "release_check.py"), "--list"],

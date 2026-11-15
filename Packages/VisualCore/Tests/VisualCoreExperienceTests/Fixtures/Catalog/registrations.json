@@ -213,6 +213,27 @@
       "content": null,
       "manifest": "Packages/ExperiencesCreative/DigitalAquarium/scenario-manifest.json",
       "permissions": []
+    },
+    "a10.neon-arcade": {
+      "capabilities": [
+        "Neon Dodge",
+        "fixed-step game loop",
+        "swept collision",
+        "recorded input replay",
+        "local run state"
+      ],
+      "quality_tiers": [
+        "level-0"
+      ],
+      "palette": [
+        "#07061A",
+        "#22E6FF",
+        "#FF3DA6",
+        "#FFE14D"
+      ],
+      "content": null,
+      "manifest": "Packages/ExperiencesCreative/NeonArcade/scenario-manifest.json",
+      "permissions": []
     }
   }
 }

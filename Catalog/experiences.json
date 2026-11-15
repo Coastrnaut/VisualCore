@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "catalog_sha256": "763716cb815b9aee1eb0810935344f6a087536036c89d4b8ea9b3304a57aa02c",
+  "catalog_sha256": "59a71af56f4ac8af9f7aac582b651db46336e61a769819230b4d5acd8e914ad8",
   "experiences": [
     {
       "id": "a01.generative-art-studio",
@@ -332,10 +332,23 @@
         "games-and-interactive-experiences"
       ],
       "order": 10,
-      "palette": [],
+      "palette": [
+        "#07061A",
+        "#22E6FF",
+        "#FF3DA6",
+        "#FFE14D"
+      ],
       "tile_seed": 1936113027,
-      "capabilities": [],
-      "quality_tiers": [],
+      "capabilities": [
+        "Neon Dodge",
+        "fixed-step game loop",
+        "swept collision",
+        "recorded input replay",
+        "local run state"
+      ],
+      "quality_tiers": [
+        "level-0"
+      ],
       "content": null,
       "available": false
     },

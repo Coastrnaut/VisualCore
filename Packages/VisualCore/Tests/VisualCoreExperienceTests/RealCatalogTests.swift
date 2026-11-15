@@ -87,7 +87,9 @@ enum CatalogFixture {
                                // Feature 061 (A08-P01); integrated at X-A08.
                                "a08.oscilloscope-studio",
                                // Feature 068 (A09-P01); integrated at X-A09.
-                               "a09.digital-aquarium"],
+                               "a09.digital-aquarium",
+                               // Feature 075 (A10-P01): registered as a candidate, not yet available.
+                               "a10.neon-arcade"],
                 "the registrations of Catalog/registrations.json")
     }
 
