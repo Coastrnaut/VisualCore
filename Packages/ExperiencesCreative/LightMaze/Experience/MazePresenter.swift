@@ -55,6 +55,9 @@
 // not only a colour) whose colour is scaled by `SuccessCue.brightness` (one rise and fall over 0.6 s of frame time;
 // constant under Reduce Motion or Reduce Flashing). Suspension stops the sound and ends the brightening; it is not
 // replayed. The cue never touches the engine state.
+// Feature 101 (A13-P06) T-A13-604 (FR-A13-611): the test-only seam `failNextDraw` makes the next `draw` throw
+// `MazeDrawError.injected` once (and clears itself), so a test can drive the host into its failure state; nothing
+// else reads it.
 import Foundation
 import LightMazeCore
 import SwiftUI
@@ -229,6 +232,8 @@ final class MazePresenter: ExperiencePresenter {
     private(set) var cueClock = 0.0
     /// The cue clock when the last success cue started; nil when no brightening runs.
     private(set) var cueStart: Double?
+    /// Set by a test to make the next draw throw `MazeDrawError.injected` (the seam clears itself; feature 101).
+    var failNextDraw = false
     /// The border brightness the last frame was drawn with (1 when none or static).
     private(set) var lastBorderBrightness = 1.0
 
@@ -268,6 +273,10 @@ final class MazePresenter: ExperiencePresenter {
 
     /// Clears the canvas, rebuilds the scene tree when the state changed, and draws it through the fitting camera.
     func draw(_ core: MazeCore, tier: Int, context: RenderContext, frame: FrameInfo) throws {
+        if failNextDraw {
+            failNextDraw = false
+            throw MazeDrawError.injected
+        }
         sync(core)
         lastCore = core
         try clear.render(context, frame: frame)
@@ -772,4 +781,10 @@ struct BeamAnnouncer: Sendable, Equatable {
 
     /// Forgets the held text and the last spoken time.
     mutating func reset() { self = BeamAnnouncer() }
+}
+
+/// A failure the presenter injects for tests (`failNextDraw`; feature 101).
+enum MazeDrawError: Error, Equatable {
+    /// The test-only seam asked for one failed draw.
+    case injected
 }
