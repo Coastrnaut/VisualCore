@@ -1,0 +1,51 @@
+# Tasks: Light Maze — Phase 01 Grid/ray reflection solver and fixtures
+
+**Input**: [spec.md](spec.md), [plan.md](plan.md), [research.md](research.md), [data-model.md](data-model.md),
+[contracts/api.md](contracts/api.md), [quickstart.md](quickstart.md). Gate A13-P01 (legacy). Evidence:
+`python3 Tools/python/desktop_runbook.py run-check --stage A13-P01 --timeout 600 --name <check> -- <command>`. Commit
+after every task (no trailers); read every check's exit before ticking. iOS 27 only; reference regression and iOS 26 at
+X-A13 (owner, 2026-11-14). Precedent: `specs/089-tw-p01-terrain/tasks.md`.
+
+## Phase 1: Setup
+
+- [ ] T-A13-101 Baseline: cite the last evidence on an unchanged `Packages` tree (`.autonomy/checks/A13-P00.{app-build,no-change}.json`) instead of a rerun (owner ruling of 2026-11-14)
+
+## Phase 2: Foundational — generic 2D ray casting (story 2) and the puzzle core (stories 1–4)
+
+- [ ] T-A13-102 [P] [US2] Write `Packages/VisualCore/Tests/VisualCoreMathTests/Ray2Tests.swift` first, then `Packages/VisualCore/Sources/VisualCoreMath/Ray2.swift` per contracts/api.md and research D1–D2 (public with `///` docs): `Ray2.init?` refuses non-finite origins and zero or non-finite directions and normalises; cast returns the nearest hit (distance, point, segment index, unit normal facing the ray) for hits with distance > minimumDistance; parallel and collinear segments miss; end points hit; segments with non-finite or coincident points are skipped; `excluding` ignores one index; a reflected ray re-cast from the hit point with `excluding` the hit segment never returns distance 0 on that segment; `Vec2.reflected(about:)` keeps length and makes incidence equal reflection within 1e-12 over 360 angles against horizontal, vertical and 45° segments; a zero or non-finite normal returns the vector unchanged. Plain loops in test literals (CI type-check rule) (FR-A13-101–103; SC-A13-101, 102)
+- [ ] T-A13-103 [P] [US3] Create the core target `Packages/ExperiencesCreative/LightMaze/Core/{Board,BeamTracer,LevelCatalog,LicenseAudit,MazeState}.swift` and `Packages/ExperiencesCreative/LightMaze/CoreTests/{BoardTests,BeamTracerTests,BeamFixtureTests,LevelCatalogTests,LicenseAuditTests,MazeStateTests}.swift` per data-model.md, clarifications Q2–Q5 and research D3–D4: board "width 4…12, height 4…12", tiles ("one tile per cell; inside the board"; "exactly one emitter, ≥ 1 target, ≤ 144 tiles"), segments per tile (wall square, mirror and prism diagonals by orientation, target square of side 0.6, emitter square), tracer over `Ray2.cast` with the board edges, "≤ 256 segments, ≤ 64 bounces per branch, ≤ 16 branches", cycle state (cell, direction) across branches, end reasons left-board, wall, target, emitter, loop, bounce-cap, segment-cap; 20 levels `lm-01`…`lm-20` as Swift data with recorded solutions (levels 1–5 one or two mirrors, 6–15 more mirrors and walls, 16–20 with prisms and two targets), author "VisualCore project", license "MIT"; validating JSON codec with named refusal reasons; `LicenseAudit` (missing-license, unsupported-license) and `markdown(.bundled)`; `MazeState` schema 1 ("level index 0…19, orientations of turnable tiles, selection (−1 or index)"; damaged or newer refused). Tests: every level valid, unsolved at start, solved by its solution; looping boards end with "loop"; caps hold; beam fixtures for levels 1, 10 and 20 (exact segment end points) (FR-A13-110–114; SC-A13-102–104)
+
+## Phase 3: User Story 1 — turn a mirror and light the target (P1) 🎯
+
+- [ ] T-A13-104 [US1] Create the experience targets in `Packages/ExperiencesCreative/Package.swift` (`LightMazeCore`, `LightMazeCoreTests`, `LightMazeExperience`, `LightMazeExperienceTests`, product `LightMazeExperience`) and `Packages/ExperiencesCreative/LightMaze/Experience/{Adapter/MazeCore.swift,MazePresenter.swift,MazeControls.swift,LightMazeExperience.swift}`: adapter (ExperienceCore; actions level.select [0…19], level.next, level.previous, tile.select [index], tile.turn, level.reset with code a13.invalid-choice; snapshot schema 1 = `MazeState`; qualityTiers 1; digest covers the state and the beam), presenter drawing the board and beam through `PrimitiveRenderer` per research D5 (rebuilt after context recreation, released in teardown), controls with labels and values and the canvas description of clarification Q5; tests `Packages/ExperiencesCreative/LightMaze/ExperienceTests/{MazeCoreTests,MazeSessionTests,MazeRenderTests,MazeTestSupport}.swift` (non-blank frame; turning the mirror changes the drawn beam pixels; drawing never changes the state; restore refuses damaged and newer payloads) (FR-A13-120–122; SC-A13-105)
+
+## Phase 4: Stories 2–4 — registration, fixtures and records
+
+- [ ] T-A13-105 [US3] Register: `Catalog/registrations.json` entry for a13 (summary, capabilities, quality_tiers ["level-0"], palette, manifest), candidate in `Apps/VisualCore/App/ExperienceRegistry.swift`, `project.yml` dependency on the product, `scripts/test_scripts.py` products list, `Packages/VisualCore/Tests/VisualCoreExperienceTests/RealCatalogTests.swift` registrations and the synthetic candidate in `Apps/VisualCore/Tests/Unit/AppModelTests.swift` moved past a13; `python3 scripts/build_catalog.py`; `xcodegen generate --spec project.yml` (FR-A13-122)
+- [ ] T-A13-106 [US2] Write `Packages/ExperiencesCreative/LightMaze/Experience/Adapter/MazeManifest.swift` (nine standard scenarios + fixtures solving levels 1, 10 and 20 by actions) and generate `Packages/ExperiencesCreative/LightMaze/scenario-manifest.json` (`UPDATE_SCENARIO_MANIFEST=1 TEST_RUNNER_UPDATE_SCENARIO_MANIFEST=1`), with `Packages/ExperiencesCreative/LightMaze/ExperienceTests/MazeManifestTests.swift` (FR-A13-113, 122; SC-A13-103, 106)
+- [ ] T-A13-107 [US2] VisualCore records: `Packages/VisualCore/README.md` (2D ray section), API baseline (`python3 scripts/check_public_api.py --update`) and the contract `docs/apps/light-maze/visualcore-contract.json` (G-RAYCAST2D and G-BOARD closed by "A13-P01"; rows M03, M06, M08, M12 updated with the new evidence) (FR-A13-104)
+- [ ] T-A13-108 [US4] Generate `docs/apps/light-maze/content-licenses.md` from `LicenseAudit.markdown(.bundled)` with a test in `Packages/ExperiencesCreative/LightMaze/CoreTests/LicenseAuditTests.swift` that the document matches; link it from `docs/apps/light-maze/README.md` (FR-A13-114; SC-A13-104)
+
+## Phase 5: Polish & evidence
+
+- [ ] T-A13-109 VisualCore host tests (`--name visualcore-host -- swift test --package-path Packages/VisualCore --filter Ray2Tests`) and public API (`--name public-api -- python3 scripts/check_public_api.py`) (SC-A13-101, 102)
+- [ ] T-A13-110 Light Maze tests on sim-27.2 (`--name maze-ios27 -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing LightMazeCoreTests LightMazeExperienceTests`; each test < 10 s) (SC-A13-101–106)
+- [ ] T-A13-111 App build and unit (`--name app-unit -- python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27`)
+- [ ] T-A13-112 Runner iOS 27 (`--name verify-27 -- python3 scripts/verify_experiences.py --only a13.light-maze --runtime 27`) (SC-A13-106)
+- [ ] T-A13-113 Experience package check, contract and script tests (`--name experience-packages -- python3 scripts/check_experience_packages.py`; `--name contract -- python3 scripts/check_app_contract.py --app light-maze --render`; `--name script-tests -- python3 scripts/test_scripts.py`)
+- [ ] T-A13-114 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A13-P01; update README.md (status, gate count) in the record commit (rule 16)
+
+## Dependencies
+
+T-A13-101 → (102 ∥ 103) → 104 (needs 102, 103) → 105 → 106 → (107 ∥ 108) → Polish. 103 builds against
+contracts/api.md for the ray calls and compiles once 102 lands.
+
+## Parallel examples
+
+Agent A: T-A13-102. Agent B: T-A13-103. Agent C: T-A13-104 experience files and tests after A and B. Lead:
+Package.swift, 105, 106 regeneration, 107, 108, runs, commits.
+
+## Implementation strategy
+
+MVP: the ray cast, the tracer and the 20 levels with fixtures (US2, US3), then the drawn board, registration, manifest
+and records; evidence last.
