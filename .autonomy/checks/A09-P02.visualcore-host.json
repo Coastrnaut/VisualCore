@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/VisualCore",
+    "--filter",
+    "SteeringForceTests|NeighbourSearchTests"
+  ],
+  "command": "swift test --package-path Packages/VisualCore --filter 'SteeringForceTests|NeighbourSearchTests'",
+  "elapsed_seconds": 3.467,
+  "exit_code": 0,
+  "finished": "2026-11-15T00:28:51+00:00",
+  "log": ".autonomy/logs/A09-P02.visualcore-host.log",
+  "log_sha256": "4e8cb30e28da37d4993cce187f1beb3a4bd26589b6e9f4c4631fb4427f353394",
+  "name": "visualcore-host",
+  "stage": "A09-P02",
+  "started": "2026-11-15T00:28:47+00:00",
+  "timed_out": false
+}
