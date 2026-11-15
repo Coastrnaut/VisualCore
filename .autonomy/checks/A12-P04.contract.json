@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_app_contract.py",
+    "--app",
+    "tiny-worlds",
+    "--render"
+  ],
+  "command": "python3 scripts/check_app_contract.py --app tiny-worlds --render",
+  "elapsed_seconds": 0.057,
+  "exit_code": 0,
+  "finished": "2026-11-15T15:44:51+00:00",
+  "log": ".autonomy/logs/A12-P04.contract.log",
+  "log_sha256": "1f5ae6a26a1fb8a036535af13c080da2a35a0a08c6553895b9e232c978de8888",
+  "name": "contract",
+  "stage": "A12-P04",
+  "started": "2026-11-15T15:44:51+00:00",
+  "timed_out": false
+}

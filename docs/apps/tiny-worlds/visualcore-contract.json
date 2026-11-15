@@ -396,7 +396,7 @@
       "id": "M06",
       "capability": "Three small world presets: island, asteroid garden and miniature city, each a bundled world document (seed, terrain parameters, props, light, camera limits) that loads, generates deterministically and resets",
       "source": "v0.1 feature 1: three world presets island, asteroid garden, miniature city",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCore/Sources/VisualCoreScenes/HeightField.swift",
@@ -430,10 +430,10 @@
         }
       ],
       "example": {
-        "file": "Packages/ExperiencesCreative/TinyWorlds/Core/WorldPreset.swift",
-        "symbol": "WorldPreset"
+        "file": "Packages/ExperiencesCreative/TinyWorlds/Core/WorldPack.swift",
+        "symbol": "WorldPack"
       },
-      "notes": "A12-P01 built the three preset terrains with palettes (TinyWorldsCore WorldPreset, TerrainGenerator, digest fixtures); props, light, camera limits per world and the bundled world documents remain (G-PROPS, G-LIGHT, G-CAMERA A12-P02/P03, G-PACKS A12-P04)."
+      "notes": "Since A12-P04 (G-PACKS closed): the island (seed 11), asteroid garden (seed 7) and miniature city (seed 5) packs each bundle a terrain, a prop set placed through the editing rules, a light and camera limits inside the global ones; world.pack opens and resets them, budgets hold (≤ 16 props, ≤ 30,000 vertices, ≤ 18 draws) and committed digests pin them (WorldPackTests, WorldsPackTests); author VisualCore project, MIT."
     },
     {
       "id": "M07",
@@ -1226,7 +1226,7 @@
       "justification": "The island, asteroid garden and miniature city packs (terrain parameters, prop sets, palettes, light and camera limits) are the experience's bundled content built on G-TERRAIN, G-PROPS and G-LIGHT (clarification 5).",
       "phase": 4,
       "test": "Host tests: each pack loads, generates deterministically (digest fixture), stays within its vertex, prop and draw budgets, keeps the camera limits valid for its terrain and resets to its document; each records author and license",
-      "closed": null
+      "closed": "A12-P04"
     },
     {
       "id": "G-DETAIL",
