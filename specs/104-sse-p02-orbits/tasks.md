@@ -50,3 +50,9 @@ contract, runs, commits.
 
 MVP: VisualCore Kepler with tests (202–203), then the model with the fixture (204–206), then the drawn orbit view and
 controls (207–209). Review checkpoints after 203 (host tests and API), after 206 (core tests on sim-27.2) and at 211.
+
+## Phase 6: Convergence
+
+- [ ] T-A14-215 Record in `specs/104-sse-p02-orbits/research.md` (§As built) what the build settled beyond D1–D5: camera near 0.5 and far 200 (depth precision), light from the Sun toward each planet per frame, 26 renderers (9 bodies, 9 rings, 8 orbits) made together and released together, the ring facing the camera scaled by max(1, d/20), the range end 18,627.5 days = 2051-01-01 00:00 UTC, zoom step 12 = 4.12 scene units, the five P01 fixture digests re-pinned for schema 2 and the dated fixture, and the controls committed with T-A14-207 per plan: research D3–D4 (partial)
+- [ ] T-A14-216 Correct the example distance in the header and doc comments of `Packages/ExperiencesCreative/SolarSystemExplorer/Experience/Adapter/SolarCore.swift` to the model's value for Earth at J2000.0 (0.983 AU, 147,101,000 km) per story 4 / FR-A14-221 (contradicts)
+- [ ] T-A14-217 Update `docs/apps/solar-system-explorer/README.md` so the data-sources row names the orbital elements and the phase state names the orbit view of A14-P02 per plan: Project Structure (partial)
