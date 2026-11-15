@@ -8,6 +8,9 @@
 // waves 1–4, the wall gap (rows of four with exactly one free lane, never the previous one), background/resume in wave
 // 3 (the paused steps change nothing and the resume equals the unpaused run) and the Phase 01 migration (the stored
 // schema-1 example restored, then 60 steps).
+// Feature 077 (A10-P03) T-A10-305 (FR-A10-330; SC-A10-306; research D5): fourteen fixtures, each of 1–12 and 14
+// beginning with `run.start`; 12 plays a run past its first hit (the high-speed crossings are `HighSpeedFixtureTests`'),
+// 13 holds the title screen until the start, 14 plays with sound and haptics off and equals the run with them on.
 import Foundation
 import Testing
 @testable import NeonArcadeExperience
@@ -34,13 +37,19 @@ private func play(_ spec: ScenarioSpec) async throws -> (initial: String, result
 }
 
 @Suite struct ArcadeManifestTests {
-    @Test func theManifestIsValidWithTheNineStandardScenariosAndElevenFixtures() {
+    @Test func theManifestIsValidWithTheNineStandardScenariosAndFourteenFixtures() {
         let manifest = ArcadeCore.manifest(for: id)
         let problems = ScenarioManifestValidator.problems(manifest, controls: ArcadeCore.controls,
-                                                          content: ContentRequirement(fixtures: 11))
+                                                          content: ContentRequirement(fixtures: 14))
         #expect(problems.isEmpty, "\(problems)")
         #expect(Set(manifest.scenarios.map(\.name))
-                == Set(ScenarioManifest.standardNames).union((1...11).map { "fixture-\($0)" }))
+                == Set(ScenarioManifest.standardNames).union((1...14).map { "fixture-\($0)" }))
+        // Every scenario with actions starts the game first, except fixture 13 and rejection (which stays on the title
+        // screen to show the wrong-screen refusal).
+        for spec in manifest.scenarios where spec.entries.contains(where: { $0.action != nil }) {
+            guard spec.name != "fixture-13", spec.name != "rejection" else { continue }
+            #expect(spec.entries.first?.action?.control == "run.start", "\(spec.name)")
+        }
         #expect(manifest.kind == .creative)
         #expect(manifest.experience == id)
     }
@@ -67,10 +76,11 @@ private func play(_ spec: ScenarioSpec) async throws -> (initial: String, result
     @Test func theFixturesEndInTheStatesTheyName() throws {
         let seed = ArcadeCore.manifestSeed
         let fixtures = ArcadeCore.fixtureEntries
-        #expect(fixtures.count == 11)
+        #expect(fixtures.count == 14)
 
-        // 1. Replay: twelve recorded inputs over 1,200 steps; two plays give the same score, lives and events.
-        #expect(fixtures[0].compactMap(\.action).count == 12)
+        // 1. Replay: the start and twelve recorded inputs over 1,200 steps; two plays give the same score, lives and
+        // events.
+        #expect(fixtures[0].compactMap(\.action).count == 13)
         #expect(fixtures[0].reduce(0) { $0 + $1.steps } == ArcadeCore.replaySteps)
         let replayA = ArcadeCore.played(seed: seed, entries: fixtures[0])
         let replayB = ArcadeCore.played(seed: seed, entries: fixtures[0])
@@ -104,7 +114,7 @@ private func play(_ spec: ScenarioSpec) async throws -> (initial: String, result
         #expect(restored == original)
 
         // 5. Resume without catch-up: after the pause, 300 steps change nothing.
-        let paused = ArcadeCore.played(seed: seed, entries: Array(fixtures[4].prefix(2)))
+        let paused = ArcadeCore.played(seed: seed, entries: Array(fixtures[4].prefix(3)))
         let later = ArcadeCore.played(seed: seed, entries: fixtures[4])
         #expect(paused.run.paused && paused.run.step == 60)
         #expect(later == paused, "no motion while paused")
@@ -164,7 +174,7 @@ private func play(_ spec: ScenarioSpec) async throws -> (initial: String, result
 
         // 8. Wave progression: 1,900 steps alive through waves 1–4, each pattern other than the one before.
         #expect(fixtures[7].reduce(0) { $0 + $1.steps } == ArcadeCore.waveSteps)
-        #expect(fixtures[7].compactMap(\.action).count == ArcadeCore.waveInputs.count)
+        #expect(fixtures[7].compactMap(\.action).count == ArcadeCore.waveInputs.count + 1)
         let progression = patterns(seed: seed, entries: fixtures[7])
         let wave4 = progression.core.run
         #expect(!wave4.over && wave4.lives > 0, "the run lives through four waves")
@@ -175,15 +185,15 @@ private func play(_ spec: ScenarioSpec) async throws -> (initial: String, result
         #expect(progression.core == ArcadeCore.played(seed: seed, entries: fixtures[7]))
         #expect(wave4.score >= wave4.step / GameSimulation.survivalInterval, "survival points at least")
 
-        // 9. Wall gap: after the restart at step 31 the new run's wave 2 is `wall`; at its end two rows of four
-        // spike-balls of radius 0.5, one shared speed each, at the lane centres, each with one free lane, the second's
-        // not the first's and equal to the run's.
-        #expect(fixtures[8].first?.action?.control == "run.restart")
-        #expect(fixtures[8].first?.steps == ArcadeCore.wallRestartSteps)
+        // 9. Wall gap: after the pause and restart at step 31 the new run's wave 2 is `wall`; at its end two rows of
+        // four spike-balls of radius 0.5, one shared speed each, at the lane centres, each with one free lane, the
+        // second's not the first's and equal to the run's.
+        #expect(fixtures[8][1].action?.control == "run.pause" && fixtures[8][1].steps == ArcadeCore.wallRestartSteps)
+        #expect(fixtures[8][2].action?.control == "run.restart" && fixtures[8][2].steps == 0)
         let wall = patterns(seed: seed, entries: fixtures[8])
         let wallRun = wall.core.run
         #expect(wall.patterns == ["rain", "wall"], "\(wall.patterns)")
-        #expect(patterns(seed: seed, entries: [ScenarioStep(steps: 800)]).patterns[1] != "wall",
+        #expect(patterns(seed: seed, entries: [ArcadeCore.startEntry, ScenarioStep(steps: 800)]).patterns[1] != "wall",
                 "without the restart wave 2 of seed 7 is not a wall")
         #expect(wallRun.step == ArcadeCore.wallSteps && wallRun.wave == 2 && wallRun.patternId == "wall")
         #expect(!wallRun.over)
@@ -216,7 +226,7 @@ private func play(_ spec: ScenarioSpec) async throws -> (initial: String, result
         #expect(ArcadeCore.played(seed: seed, entries: Array(beforeResume)) == atPause,
                 "300 paused steps change nothing")
         let resumed = ArcadeCore.played(seed: seed, entries: fixtures[9])
-        let unpaused = ArcadeCore.played(seed: seed, entries: ArcadeCore.steeringEntries(
+        let unpaused = ArcadeCore.played(seed: seed, entries: [ArcadeCore.startEntry] + ArcadeCore.steeringEntries(
             ArcadeCore.waveInputs, steps: ArcadeCore.waveThreeSteps + 60))
         #expect(resumed == unpaused, "no catch-up: the resume continues from the paused step")
         #expect(resumed.run.wave == 3 && resumed.run.step == ArcadeCore.waveThreeSteps + 60)
@@ -225,8 +235,9 @@ private func play(_ spec: ScenarioSpec) async throws -> (initial: String, result
         // restores to that run's step, score, lives, player and objects at wave 1, wave step 0, and plays 60 steps on.
         #expect(fixtures[10].reduce(0) { $0 + $1.steps }
                 == ArcadeCore.schemaOneExampleSteps + ArcadeCore.migrationSteps)
-        let source = ArcadeCore.played(seed: seed, entries: ArcadeCore.steeringEntries(
+        let source = ArcadeCore.played(seed: seed, entries: [ArcadeCore.startEntry] + ArcadeCore.steeringEntries(
             ArcadeCore.schemaOneExampleInputs, steps: ArcadeCore.schemaOneExampleSteps))
+        #expect(source.state == ArcadeCore.exampleSource(seed: seed).state, "the run the examples were saved from")
         let example = try #require(ArcadeCore.schemaOneExample(seed: seed))
         let snapshot = try ExperienceSnapshot(data: example.snapshot)
         let object = try #require(try JSONSerialization.jsonObject(with: Data(snapshot.payload.utf8)) as? [String: Any])
@@ -244,6 +255,42 @@ private func play(_ spec: ScenarioSpec) async throws -> (initial: String, result
         #expect(migrated.run.waveStep == ArcadeCore.migrationSteps)
         let played = ArcadeCore.played(seed: seed, entries: fixtures[10]).run
         #expect(played.step == migrated.run.step && played.validate().isEmpty)
+    }
+
+    /// T-A10-305 (FR-A10-330; SC-A10-306): fixtures 12–14 end in the states they name.
+    @Test func thePhaseThreeFixturesEndInTheStatesTheyName() throws {
+        let seed = ArcadeCore.manifestSeed
+        let fixtures = ArcadeCore.fixtureEntries
+
+        // 12. A run past its first hit: one life lost at the hit, the run advancing after it, not over. The high-speed
+        // crossings themselves are proved by HighSpeedFixtureTests (an action cannot place a hazard).
+        #expect(fixtures[11].first == ArcadeCore.startEntry)
+        let hitRun = ArcadeCore.played(seed: seed, entries: fixtures[11])
+        let firstHit = try #require(hitRun.run.events.first { $0.kind == .hit })
+        #expect(firstHit.step < ArcadeCore.firstHitSteps - 30, "the run plays on past its first hit")
+        #expect(hitRun.run.step == ArcadeCore.firstHitSteps && !hitRun.run.over && hitRun.screen == .playing)
+        #expect(hitRun.run.lives == GameRun.startLives - hitRun.run.events.filter { $0.kind == .hit }.count)
+        #expect(hitRun.run.validate().isEmpty)
+
+        // 13. Title → start: the title steps change nothing; after the start the run advances.
+        #expect(fixtures[12].first?.action?.control == "run.start" && fixtures[12].first?.steps == ArcadeCore.titleSteps)
+        let held = ArcadeCore.played(seed: seed, entries: [ScenarioStep(steps: ArcadeCore.titleSteps)])
+        #expect(held == ArcadeCore(seed: seed) && held.screen == .title, "nothing advances on the title screen")
+        let started = ArcadeCore.played(seed: seed, entries: fixtures[12])
+        #expect(started.screen == .playing && started.run.step == ArcadeCore.titleSteps)
+        #expect(started.run == ArcadeCore.played(seed: seed, entries: [ArcadeCore.startEntry,
+                                                                         ScenarioStep(steps: ArcadeCore.titleSteps)]).run)
+
+        // 14. Settings off: both off and saved; the run and generator equal the same steps with both on.
+        let off = ArcadeCore.played(seed: seed, entries: fixtures[13])
+        #expect(!off.sound && !off.haptics && off.screen == .playing)
+        let on = ArcadeCore.played(seed: seed, entries: [ArcadeCore.startEntry,
+                                                         ScenarioStep(steps: ArcadeCore.settingsSteps)])
+        #expect(off.run == on.run && off.generator == on.generator && off.run.step == ArcadeCore.settingsSteps)
+        var restored = try ArcadeCore.restore(payload: off.snapshotPayload(), seed: seed)
+        #expect(restored == off)
+        restored.update(step: ArcadeCore.settingsSteps)
+        #expect(!restored.sound && !restored.haptics)
     }
 
     /// The JSON form with the control ids, named by `Catalog/registrations.json`. `UPDATE_SCENARIO_MANIFEST=1`

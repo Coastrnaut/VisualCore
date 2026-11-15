@@ -10,6 +10,12 @@
 // wave plays; the steering inputs of fixtures 8 and 10 were chosen so the run survives to the waves they name. Fixtures
 // 1–7 keep their entries except fixture 3 (steering half left; half right no longer meets a hazard); their digests
 // changed with the waves.
+// Fixtures 12–14 — feature 077 (A10-P03) T-A10-305 (FR-A10-330; SC-A10-306; research D5): a run played past its
+// first hit (the high-speed crossings at 20, 50 and 100 units/s cannot be set up by actions; `HighSpeedFixtureTests`
+// proves them on the core), the title screen held until `run.start`, and the sound and haptics settings off. Since
+// schema 3 a new experience opens on the title screen, so fixtures 1–11 and the standard scenarios with actions begin
+// with `run.start`; fixture 9 pauses before its restart (a restart is allowed only from the paused or game-over
+// screen); every digest changed with the screen and the settings.
 #if DEBUG || VISUALCORE_AUTOMATION
 import NeonArcadeCore
 import VisualCoreExperience
@@ -43,6 +49,19 @@ extension ArcadeCore {
     /// The steps the migration fixture (11) plays after the 120 steps the schema-1 example was saved after.
     public static let migrationSteps = 60
 
+    /// The `run.start` entry the scenarios with actions begin with (the title screen → playing, feature 077).
+    public static var startEntry: ScenarioStep {
+        ScenarioStep(steps: 0, action: ScriptedAction("run.start"), result: "accepted")
+    }
+
+    /// The steps the high-speed fixture (12) plays straight on: past its first hit (at step 595 with seed 7) and on
+    /// with one life less.
+    public static let firstHitSteps = 660
+    /// The steps the title fixture (13) holds the title screen before `run.start`, and plays after it.
+    public static let titleSteps = 30
+    /// The steps the settings fixture (14) plays with sound and haptics off.
+    public static let settingsSteps = 120
+
     /// `inputs` as scenario entries: the steps up to each input, the `run.steer` action, and the steps left up to
     /// `steps`.
     public static func steeringEntries(_ inputs: [(step: Int, value: Double)], steps: Int) -> [ScenarioStep] {
@@ -57,21 +76,26 @@ extension ArcadeCore {
         return entries
     }
 
-    /// The actions of input-response, save-restore and reset: steer right, steer half left, pause.
+    /// The actions of input-response, save-restore and reset: start, steer right, steer half left, pause.
     public static var inputEntries: [ScenarioStep] {
-        [ScenarioStep(steps: 10, action: ScriptedAction("run.steer", [1]), result: "accepted"),
+        [startEntry,
+         ScenarioStep(steps: 10, action: ScriptedAction("run.steer", [1]), result: "accepted"),
          ScenarioStep(steps: 30, action: ScriptedAction("run.steer", [-0.5]), result: "accepted"),
          ScenarioStep(steps: 10, action: ScriptedAction("run.pause", [1]), result: "accepted")]
     }
 
-    /// The entries of rejection: a steering value out of range, a pause value out of range, a fractional pause choice
-    /// and a restart carrying a value.
+    /// The entries of rejection: a steering value out of range, a pause value out of range, a fractional pause choice,
+    /// a restart carrying a value, a pause on the title screen (`a10.wrong-screen`) and a fractional sound setting.
     public static var rejectionEntries: [ScenarioStep] {
         [ScenarioStep(steps: 0, action: ScriptedAction("run.steer", [2]), result: "action.out-of-range"),
          ScenarioStep(steps: 0, action: ScriptedAction("run.pause", [-1]), result: "action.out-of-range"),
          ScenarioStep(steps: 0, action: ScriptedAction("run.pause", [0.5]),
                       result: "action.rule." + ArcadeRule.invalidChoice),
-         ScenarioStep(steps: 0, action: ScriptedAction("run.restart", [1]), result: "action.wrong-value-count")]
+         ScenarioStep(steps: 0, action: ScriptedAction("run.restart", [1]), result: "action.wrong-value-count"),
+         ScenarioStep(steps: 0, action: ScriptedAction("run.pause", [1]),
+                      result: "action.rule." + ArcadeRule.wrongScreen),
+         ScenarioStep(steps: 0, action: ScriptedAction("settings.sound", [0.5]),
+                      result: "action.rule." + ArcadeRule.invalidChoice)]
     }
 
     /// The recorded inputs as scenario entries: the steps up to each input, the `run.steer` action, and the steps
@@ -105,7 +129,8 @@ extension ArcadeCore {
         return builder.finish().hex
     }
 
-    /// The entries of the eleven fixtures (research D5 of features 075 and 076):
+    /// The entries of the fourteen fixtures (research D5 of features 075, 076 and 077); each begins with
+    /// ``startEntry`` except 13, which holds the title screen first:
     /// 1. replay: the twelve recorded steering inputs over 1,200 steps (`ArcadeManifestTests` plays them twice and
     ///    compares score, lives and the events; `ReplayTests` proves it for three seeds on the bare run);
     /// 2. frame pacing: the same entries — the same digest whatever the frame pacing, because the runner steps the
@@ -126,10 +151,11 @@ extension ArcadeCore {
     /// 8. wave progression (A10-P02): the ``waveInputs`` over 1,900 steps — waves 1–4 (rain, orb-trail, wall, rain)
     ///    with the run alive (`ArcadeManifestTests` checks the wave, the wave step and the patterns; the difficulty per
     ///    wave is proved by `DifficultyTests`);
-    /// 9. wall gap: 31 steps, a restart (the generator continues), then 800 steps — the new run's wave 2 is `wall`
-    ///    (with seed 7 its wave 2 is `orb-trail` without the restart); the test checks two rows of four spike-balls of
-    ///    radius 0.5 sharing one speed at the lane centres, each with exactly one free lane, the second's free lane
-    ///    not the first's and equal to the run's (`WaveDirectorTests` proves the rule over many rows);
+    /// 9. wall gap: 31 steps, a pause and a restart (the generator continues), then 800 steps — the new run's wave 2
+    ///    is `wall` (with seed 7 its wave 2 is `orb-trail` without the restart); the test checks two rows of four
+    ///    spike-balls of radius 0.5 sharing one speed at the lane centres, each with exactly one free lane, the
+    ///    second's free lane not the first's and equal to the run's (`WaveDirectorTests` proves the rule over many
+    ///    rows);
     /// 10. background/resume in wave 3: the first two ``waveInputs`` to step 1,300 (wave 3, `wall`), a pause, 300
     ///     steps that change nothing, the resume and 60 steps — the same state as 1,360 steps played without the pause
     ///     (`ArcadeSessionTests` suspends a session in wave 3 for several lengths and finds wave, step, objects and
@@ -138,7 +164,15 @@ extension ArcadeCore {
     ///     was saved after, then 60 steps. A scenario cannot restore a stored payload, so the fixture plays the run the
     ///     example was saved from; `ArcadeManifestTests` restores the stored example in an engine, plays the same 60
     ///     steps and checks the migrated run (wave 1 restarted at wave step 0, score, lives, player and objects kept)
-    ///     advances validly; the registry's migration check (`SnapshotMigrationCheck`) restores the same example.
+    ///     advances validly; the registry's migration check (`SnapshotMigrationCheck`) restores the same example;
+    /// 12. high-speed hazards (A10-P03): ``firstHitSteps`` steps straight on — the run past its first hit
+    ///     (`ArcadeManifestTests` checks one life lost at the hit and the run advancing after it). Hazards at 20, 50
+    ///     and 100 units/s crossing the player within one step, and the same hazards 1.5 units aside, cannot be placed
+    ///     by an action; `HighSpeedFixtureTests` proves one hit (and none) for each speed on the core;
+    /// 13. title → start: ``titleSteps`` steps on the title screen (nothing advances), `run.start`, then
+    ///     ``titleSteps`` steps — the run at step 30 (`ArcadeManifestTests` checks the held title and the start);
+    /// 14. settings off: `settings.sound [0]` and `settings.haptics [0]`, then ``settingsSteps`` steps — the run and
+    ///     the generator identical to the same steps with both settings on (`ArcadeManifestTests`).
     public static var fixtureEntries: [[ScenarioStep]] {
         func step(_ control: String, _ values: [Double], steps: Int = 0) -> ScenarioStep {
             ScenarioStep(steps: steps, action: ScriptedAction(control, values), result: "accepted")
@@ -151,7 +185,7 @@ extension ArcadeCore {
             step600 = input.step
         }
         halfway.append(ScenarioStep(steps: 600 - step600))
-        return [
+        let fixtures: [[ScenarioStep]] = [
             replay,
             replay,
             [step("run.steer", [-0.5]), ScenarioStep(steps: 500)],
@@ -161,11 +195,16 @@ extension ArcadeCore {
             (0..<12).map { step("run.steer", [$0 % 2 == 0 ? -1 : 1], steps: $0 == 0 ? 0 : 200) }
                 + [ScenarioStep(steps: 200)],
             steeringEntries(waveInputs, steps: waveSteps),
-            [ScenarioStep(steps: wallRestartSteps, action: ScriptedAction("run.restart"), result: "accepted"),
-             ScenarioStep(steps: wallSteps)],
+            [step("run.pause", [1], steps: wallRestartSteps), step("run.restart", []), ScenarioStep(steps: wallSteps)],
             steeringEntries(waveInputs, steps: waveThreeSteps)
                 + [step("run.pause", [1]), step("run.pause", [0], steps: 300), ScenarioStep(steps: 60)],
             steeringEntries(schemaOneExampleInputs, steps: schemaOneExampleSteps + migrationSteps),
+            [ScenarioStep(steps: firstHitSteps)],
+        ]
+        return fixtures.map { [startEntry] + $0 } + [
+            [step("run.start", [], steps: titleSteps), ScenarioStep(steps: titleSteps)],
+            [startEntry, step("settings.sound", [0]), step("settings.haptics", [0]),
+             ScenarioStep(steps: settingsSteps)],
         ]
     }
 
@@ -180,6 +219,7 @@ extension ArcadeCore {
             ScenarioSpec(name: "input-response", seed: seed, entries: input,
                          expect: ScenarioExpectations(initialDigest: initial, finalDigest: final)),
             ScenarioSpec(name: "completion", seed: seed, entries: [
+                startEntry,
                 ScenarioStep(steps: 10, action: ScriptedAction("run.steer", [1]), result: "accepted"),
             ], expect: ScenarioExpectations(outcome: playingOutcome)),
             ScenarioSpec(name: "rejection", seed: seed, entries: rejectionEntries),
