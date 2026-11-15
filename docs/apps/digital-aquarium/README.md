@@ -19,6 +19,8 @@ VisualCore (a gap of the contract), the rest in the experience. Its rules are th
 |---|---|
 | [visualcore-contract.json](visualcore-contract.json) / [.md](visualcore-contract.md) | Phase 00 inventory, capability matrix, gaps, decision (checked by `scripts/check_app_contract.py`) |
 | [regression-baseline.md](regression-baseline.md) | Phase start, reference pin, the ProjectM reference regression results |
+| [content-licenses.md](content-licenses.md) | Author and license of every bundled species, plant, decoration and habitat (generated) |
+| [device-campaign.md](device-campaign.md) | The planned device measurements (pending until ImplementationLock-100) |
 
 Phases: A09-P00 boundary audit (feature 067), P01 habitat model and content license audit, P02 fish movement and
 visual prototype, P03 editing, feeding and save system, P04 lighting, particles and accessibility, P05 ambient device
