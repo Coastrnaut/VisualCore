@@ -1,0 +1,1205 @@
+{
+  "schema": 1,
+  "app": "physics-playground",
+  "gate": "A11-P00",
+  "date": "2026-11-15",
+  "inventory": [
+    {
+      "area": "Package products",
+      "description": "Pure, host-testable products of Packages/VisualCore: VisualCoreMath, VisualCoreSimulation, VisualCoreScenes, VisualCoreShaderSource, VisualCoreEffectsGraph, VisualCoreDiagnostics, VisualCoreAudioDSP, VisualCorePersistence, VisualCoreParameters, VisualCoreExperience (+ VisualCoreTestSupport for test targets). iOS products of Packages/VisualCoreRendering: VisualCoreRendering, VisualCoreEffects, VisualCoreUI, VisualCoreAudio, VisualCoreAutomation, VisualCoreExperienceHost. For the playground (checked 2026-11-15): VisualCoreSimulation has SeededRandom, FixedStepClock, FixedStepRunner (FixedStepSimulation, ControlStream, pause, stepOnce, run), TimeStepPolicy (clamps a step to 1/240...1/30 s), ParticleSystem with ParticleForce (gravity, drag, attractor and other fields for particles only), Collision2D with CollisionCircle and CollisionCapsule (overlap, closest point, swept circle test; added at A10-P01) and NeighbourSearch (linear-scan neighbours of steering agents); VisualCoreScenes has the 2D SceneNode tree with Primitive rect, circle, line, polygon and polyline, Primitive.contains and SceneNode.hitTest, PointerTracker, PointerVelocityTracker, TapRecognizer, DoubleTapRecognizer, LongPressRecognizer, DragRecognizer, PinchRecognizer, RotateRecognizer and GestureArbiter; VisualCoreMath has Vec2, Camera2D and NumericHygiene; VisualCoreRendering has PrimitiveRenderer; VisualCoreUI has ParameterPanel; VisualCoreExperience has ExperienceStorage and the declared quality tiers. No rigid-body dynamics exist in any framework product: no box or polygon contact generation, no impulse or constraint solver, no spring constraint, no broad phase and no chart or plot component (grep 2026-11-15). The only solver in the repository is Fluid Art Playground's app-local grid FluidSolver, which is not rigid-body dynamics.",
+      "paths": [
+        "Packages/VisualCore/Package.swift",
+        "Packages/VisualCoreRendering/Package.swift",
+        "Packages/ExperiencesCreative/Package.swift",
+        "Packages/VisualCore/Sources/VisualCoreSimulation/FixedStepRunner.swift",
+        "Packages/VisualCore/Sources/VisualCoreSimulation/TimeStepPolicy.swift",
+        "Packages/VisualCore/Sources/VisualCoreSimulation/Collision2D.swift",
+        "Packages/VisualCore/Sources/VisualCoreSimulation/ParticleSystem.swift",
+        "Packages/VisualCore/Sources/VisualCoreSimulation/Steering.swift",
+        "Packages/VisualCore/Sources/VisualCoreScenes/SceneGraph.swift",
+        "Packages/VisualCore/Sources/VisualCoreScenes/GestureRecognizers.swift",
+        "Packages/VisualCore/Sources/VisualCoreMath/Vectors.swift",
+        "Packages/VisualCore/Sources/VisualCoreMath/NumericHygiene.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreUI/ParameterPanel.swift",
+        "Packages/ExperiencesCreative/FluidArtPlayground/Core/FluidSolver.swift",
+        "scripts/check_dependencies.py",
+        "docs/api/visualcore-public-api.txt"
+      ],
+      "owner": "VisualCore packages (ADR-0003, ADR-0009)"
+    },
+    {
+      "area": "EGL render host and thread",
+      "description": "RenderHost (@MainActor) owns the EGL display, context and surfaces over ANGLE's Metal backend (EGLDisplayProvider), the CAMetalLayer RenderView, the FrameScheduler and context generations; pause/resume, replaceScene, recreateContext, renderOffscreen and destroy; scenes implement RenderScene setup/resize/render/teardown. All EGL and GL work runs on the main thread. Physics Playground's world (bodies, forces, contacts, springs, integration) is GPU-free CPU work stepped at a fixed step on the main thread at the frame boundary; drawing reads finished state and never changes it, and no simulation runs in shaders. Physics Playground adds no EGL or GL context of its own.",
+      "paths": [
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderScene.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderView.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderView+Touches.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FrameScheduler.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/EGLDisplayProvider.swift"
+      ],
+      "owner": "VisualCoreRendering (ADR-0002 seam)"
+    },
+    {
+      "area": "Shaders and resources",
+      "description": "ResourceRegistry creates buffers, textures, programs and render targets under a ResourceBudget and rejects stale handles after a generation change. ShaderProgram, ShaderBundle and ShaderLibrary (#include expansion with line maps) compile bundled GLSL; the vc/ library holds color, field, hash, noise, palette and sdf helpers. PrimitiveRenderer draws a 2D SceneNode tree (bodies, springs as lines or polylines, vector arrows as lines and polygons) as one batched triangle list through Camera2D; FullScreenShaderScene and the effects graph (copy, colorMatrix, blur, bloom, distort, composite, feedback, flashLimit; EffectScene, EffectRenderer) are available for decorative backgrounds and highlights only.",
+      "paths": [
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GPUObjects.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ShaderProgram.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ShaderBundle.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/PrimitiveRenderer.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FullScreenShaderScene.swift",
+        "Packages/VisualCore/Sources/VisualCoreShaderSource/ShaderLibrary.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreRendering/GLSL/vc/sdf.glsl",
+        "Packages/VisualCore/Sources/VisualCoreEffectsGraph/PassSchemas.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreEffects/EffectPasses.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreEffects/EffectScene.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreEffects/EffectRenderer.swift"
+      ],
+      "owner": "VisualCoreRendering + VisualCoreShaderSource + VisualCoreEffects"
+    },
+    {
+      "area": "Experience host",
+      "description": "ExperienceSession opens, checkpoints, closes and recovers an Experience on one RenderHost, applies the quality level (QualityGovernor over the experience's QualityProfile, fed by DeviceConditions thermal state and Low Power Mode) and memory/scene-phase events; ExperienceShell adapts an ExperiencePresenter (scene, controls) to Experience; ExperienceCore is the GPU-free state with its qualityTiers; ExperienceStorage is the per-experience sandbox; ExperienceFeedback routes haptics and announcements; the one app registers experiences in ExperienceRegistry and Catalog/registrations.json (ten registered, A01-A10, checked 2026-11-15; Physics Playground joins in A11-P01 and stays unregistered and unavailable in A11-P00; scripts/check_experience_packages.py forbids unregistered targets). Physics Playground version 0.1 needs no microphone, camera, photos, motion or location; saved experiments live in its own storage, so no usage description or privacy answer changes.",
+      "paths": [
+        "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceSession.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceShell.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperiencePresenter.swift",
+        "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceFeedback.swift",
+        "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceCore.swift",
+        "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift",
+        "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceLifecycle.swift",
+        "Apps/VisualCore/App/ExperienceRegistry.swift",
+        "Catalog/registrations.json",
+        "scripts/check_experience_packages.py",
+        "project.yml"
+      ],
+      "owner": "VisualCoreExperience + VisualCoreExperienceHost + the one app"
+    },
+    {
+      "area": "Build and release steps",
+      "description": "XcodeGen spec project.yml for the one app (target VisualCore), package schemes via scripts/xcodebuild_package.py, app tests via scripts/xcodebuild_app.py, and scripts/release_check.py: 108 named steps listed by --list on 2026-11-15 (shared checks, package and app builds/tests, per-experience release, copy-claims and verify steps of A01-A10 on iOS 27 and 26, release audits of the one app, the seven reference regression steps and the ProjectM independence check).",
+      "paths": [
+        "project.yml",
+        "scripts/release_check.py",
+        "scripts/xcodebuild_package.py",
+        "scripts/xcodebuild_app.py",
+        "scripts/check_licenses.py",
+        ".github/workflows/ci.yml"
+      ],
+      "owner": "repository tooling"
+    },
+    {
+      "area": "Source ownership",
+      "description": "Physics Playground owns its domain (the body and world model with units, static bodies, gravity, drag, integration, pause, single step, time scale and reset, the spawn/grab/pin/delete editor, vector overlays and the measured state panel, presets pendulum, spring chain and stacked objects, saved experiments, stability caps, the body budget and sleeping bodies, the spoken experiment description, educational-approximation wording and content licenses) and UI under Packages/ExperiencesCreative/PhysicsPlayground/ (Core GPU-free, CoreTests, Experience with Adapter/, ExperienceTests, Shaders, scenario-manifest.json; created in A11-P01, not present today). VisualCore owns reusable machinery: the seeded fixed-step clock, runner and step policy, Collision2D, and the rigid-body pieces to come (box contacts, impulse solver with restitution, friction and positional correction, spring constraints, broad phase; VisualCoreSimulation), 2D shapes and gestures (VisualCoreScenes, drawn by VisualCoreRendering), quality, persistence and storage (constitution Principle II, A11 section). Neon Arcade's GameSimulation and Fluid Art Playground's FluidSolver stay experience code and are not reused. ProjectM stays in the harness.",
+      "paths": [
+        ".specify/memory/constitution.md",
+        "Auto-Creator.md",
+        "docs/decisions/ADR-0009-unified-app.md",
+        "Packages/ExperiencesCreative/Package.swift",
+        "specs/081-pp-p00-boundary-audit/spec.md"
+      ],
+      "owner": "constitution + ADR-0009"
+    },
+    {
+      "area": "ProjectM reference regression",
+      "description": "Reference pinned at d93edd1, read-only; scripts/run_reference_baseline.py lists the ordered reference steps; scripts/check_reference_clean.py checks the submodule; the 7 release-check steps run in two chunks via release_check.py --only (reference-engine-xcframework, reference-build-projectm-ios-sim, reference-clean; reference-test-anglerendering-ios27, reference-test-anglerendering-ios26, projectm-reference-ios27, projectm-reference-ios26), recorded in the A11 regression baseline document (docs/apps/physics-playground/regression-baseline.md) with the phase-start commit d3797d7c.",
+      "paths": [
+        "scripts/run_reference_baseline.py",
+        "scripts/check_reference_clean.py",
+        "Harnesses/ProjectMReference/ProjectMReference.yml",
+        "specs/081-pp-p00-boundary-audit/research.md"
+      ],
+      "owner": "reference adapter (harness only)"
+    },
+    {
+      "area": "Fixed-step simulation",
+      "description": "FixedStepClock (default 1/120 s, at most 8 steps per frame, interpolation alpha) and FixedStepRunner over a FixedStepSimulation with a ControlStream of timed commands give deterministic, frame-rate-independent stepping with pause, stepOnce and run(steps:); TimeStepPolicy clamps a variable delta to 1/240...1/30 s and counts clamped and invalid deltas; SeededRandom (SplitMix64) and SeedDerivation give reproducible streams; StateDigest fingerprints state. Particle Universe (A04), Digital Aquarium (A09) and Neon Arcade (A10) step this way; the playground's world will too, so the same document and inputs give the same result.",
+      "paths": [
+        "Packages/VisualCore/Sources/VisualCoreSimulation/FixedStepClock.swift",
+        "Packages/VisualCore/Sources/VisualCoreSimulation/FixedStepRunner.swift",
+        "Packages/VisualCore/Sources/VisualCoreSimulation/TimeStepPolicy.swift",
+        "Packages/VisualCore/Sources/VisualCoreSimulation/SeededRandom.swift",
+        "Packages/VisualCore/Sources/VisualCoreSimulation/SeedDerivation.swift",
+        "Packages/VisualCore/Sources/VisualCoreExperience/StateDigest.swift",
+        "Packages/ExperiencesCreative/ParticleUniverse/Core/SceneSimulation.swift",
+        "Packages/ExperiencesCreative/NeonArcade/Core/GameSimulation.swift"
+      ],
+      "owner": "VisualCoreSimulation"
+    }
+  ],
+  "matrix": [
+    {
+      "id": "M01",
+      "capability": "Scene rendering: bodies, springs, ground, walls and overlays as SceneNode shapes with transform, z order, visibility and colour, batched into one triangle list per tree through Camera2D on the main thread over RenderHost",
+      "source": "brainstorm: scene rendering",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/SceneGraph.swift",
+          "symbol": "SceneNode",
+          "product": "VisualCoreScenes",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/PrimitiveRenderer.swift",
+          "symbol": "PrimitiveRenderer",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/Camera2D.swift",
+          "symbol": "Camera2D",
+          "product": "VisualCoreMath",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+          "symbol": "RenderHost",
+          "product": "VisualCoreRendering",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/InfiniteGeometry/Experience/GeometryPresenter.swift",
+        "symbol": "GeometryPresenter"
+      },
+      "notes": "Tested in VisualCoreScenesTests/SceneGraphTests, VisualCoreRenderingTests (PrimitiveRendererTests, RenderHostTests) and VisualCoreMathTests/Camera2DTests. Every node of a tree lands in one batch; polygons are capped at 256 points and polylines at 8,192; the audit does not measure performance. Shapes are procedural, never bitmap art."
+    },
+    {
+      "id": "M02",
+      "capability": "Geometry: 2D vectors, rectangles, circles, lines, polygons and polylines, point-in-shape tests and hit testing of a shape tree, circle and capsule overlap, closest point and swept circle tests",
+      "source": "brainstorm: geometry",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/Vectors.swift",
+          "symbol": "Vec2",
+          "product": "VisualCoreMath",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/SceneGraph.swift",
+          "symbol": "Primitive.rect",
+          "product": "VisualCoreScenes",
+          "public": false
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/SceneGraph.swift",
+          "symbol": "Primitive.contains",
+          "product": "VisualCoreScenes",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/SceneGraph.swift",
+          "symbol": "SceneNode.hitTest",
+          "product": "VisualCoreScenes",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/Collision2D.swift",
+          "symbol": "Collision2D",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/Collision2D.swift",
+          "symbol": "CollisionCircle",
+          "product": "VisualCoreSimulation",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/NeonArcade/Core/GameSimulation.swift",
+        "symbol": "GameSimulation"
+      },
+      "notes": "Tested in VisualCoreMathTests (LinearAlgebraTests), VisualCoreScenesTests/SceneGraphTests and VisualCoreSimulationTests/Collision2DTests. Box geometry for contacts (circle-box, box-box) does not exist; that is the rigid-body row M06 (G-CONTACTS)."
+    },
+    {
+      "id": "M03",
+      "capability": "Animation: deterministic seeded fixed-step clock with interpolation alpha, tweens and timelines, easing curves for decorative motion (the physics itself is integrated, not animated)",
+      "source": "brainstorm: animation",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/FixedStepClock.swift",
+          "symbol": "FixedStepClock",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/FixedStepRunner.swift",
+          "symbol": "FixedStepRunner",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/Timeline.swift",
+          "symbol": "Tween",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/Timeline.swift",
+          "symbol": "Timeline",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/Easing.swift",
+          "symbol": "EasingCurve",
+          "product": "VisualCoreMath",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/ParticleUniverse/Core/SceneSimulation.swift",
+        "symbol": "SceneSimulation"
+      },
+      "notes": "Tested in VisualCoreSimulationTests (FixedStepClockTests, FixedStepRunnerTests, TimelineTests) and VisualCoreMathTests (EasingTests)."
+    },
+    {
+      "id": "M04",
+      "capability": "Shader-based effects: bundled GLSL programs, full-screen shader scenes and the effects graph (blur, bloom, colour matrix, composite, flash limit) for decorative backgrounds and highlights only; the CPU solver stays authoritative and no simulation runs in shaders",
+      "source": "brainstorm: shader-based effects; constitution A11 authoritative, GPU-free physics",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ShaderProgram.swift",
+          "symbol": "ShaderProgram",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/FullScreenShaderScene.swift",
+          "symbol": "FullScreenShaderScene",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreEffectsGraph/PassSchemas.swift",
+          "symbol": "PassSchemas",
+          "product": "VisualCoreEffectsGraph",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreEffects/EffectScene.swift",
+          "symbol": "EffectScene",
+          "product": "VisualCoreEffects",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreEffectsGraph/FlashLimiterModel.swift",
+          "symbol": "FlashLimiterModel",
+          "product": "VisualCoreEffectsGraph",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/NeonArcade/Core/ArcadeEffects.swift",
+        "symbol": "ArcadeEffects"
+      },
+      "notes": "Tested in VisualCoreRenderingTests (ShaderProgramTests, FullScreenShaderSceneTests), VisualCoreEffectsTests (PassPixelTests, EffectRendererTests) and VisualCoreEffectsGraphTests. Version 0.1 needs no custom shader; any later bundled shader records its author and license (M18)."
+    },
+    {
+      "id": "M05",
+      "capability": "Data visualization: plots of measured quantities (speed, energy, spring extension) over time and readable numeric values, drawn as polylines and native text without a second renderer",
+      "source": "brainstorm: data visualization",
+      "status": "requires adaptation",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/SceneGraph.swift",
+          "symbol": "Primitive.polyline",
+          "product": "VisualCoreScenes",
+          "public": false
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/SceneGraph.swift",
+          "symbol": "Primitive.line",
+          "product": "VisualCoreScenes",
+          "public": false
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/PrimitiveRenderer.swift",
+          "symbol": "PrimitiveRenderer",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/ParameterPanel.swift",
+          "symbol": "ParameterPanel",
+          "product": "VisualCoreUI",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/OscilloscopeStudio/Core/ScopeTrace.swift",
+        "symbol": "ScopeTrace"
+      },
+      "notes": "Polylines and lines drawn in one batch (SceneGraphTests, PrimitiveRendererTests) and the native parameter panel (ParameterPanelTests) exist; no chart or plot component (axes, scaling, sampling of a quantity over time) exists in any framework product (grep 2026-11-15). Oscilloscope Studio's ScopeTrace is experience code. The playground's plots and readouts are its own over polylines and native SwiftUI text. G-OVERLAYS (app-local), A11-P03."
+    },
+    {
+      "id": "M06",
+      "capability": "Circles and boxes with rigid-body collision: dynamic and static (zero-mass, infinite-inertia) bodies with mass and moment of inertia in stated units; circle-circle, circle-box and box-box contact generation; an impulse solver with restitution, friction and positional correction; a broad phase",
+      "source": "v0.1 feature 1: circles and boxes with rigid-body collision; constitution A11 reuse first",
+      "status": "upstream gap",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/Collision2D.swift",
+          "symbol": "Collision2D",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/Collision2D.swift",
+          "symbol": "CollisionCircle",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/Collision2D.swift",
+          "symbol": "CollisionCapsule",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/SceneGraph.swift",
+          "symbol": "Primitive.rect",
+          "product": "VisualCoreScenes",
+          "public": false
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/NeonArcade/Core/GameSimulation.swift",
+        "symbol": "GameSimulation"
+      },
+      "notes": "Collision2D answers circle-circle and circle-capsule overlap, closest point and swept circle tests (Collision2DTests) and boxes can be drawn; no contact manifold (normal, depth, points), no box contacts, no impulse or constraint solver and no broad phase exist in any framework product; NeighbourSearch is a linear scan over steering agents (grep 2026-11-15). Neon Arcade's GameSimulation decides overlaps for a game and resolves no contacts. G-CONTACTS (VisualCoreSimulation, upstream), A11-P02; the body and world model with static bodies is G-RIGIDBODY (app-local), A11-P01."
+    },
+    {
+      "id": "M07",
+      "capability": "Constant gravity, springs and drag: a uniform gravity vector and linear drag applied to bodies each step, spring constraints between bodies or a body and a pin with rest length, bounded stiffness and damping",
+      "source": "v0.1 feature 2: constant gravity, springs and drag",
+      "status": "upstream gap",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/ParticleSystem.swift",
+          "symbol": "ParticleForce",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/ParticleSystem.swift",
+          "symbol": "ParticleForce.gravity",
+          "product": "VisualCoreSimulation",
+          "public": false
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/ParticleSystem.swift",
+          "symbol": "ParticleForce.drag",
+          "product": "VisualCoreSimulation",
+          "public": false
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/FixedStepRunner.swift",
+          "symbol": "FixedStepRunner",
+          "product": "VisualCoreSimulation",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/ParticleUniverse/Core/SceneSimulation.swift",
+        "symbol": "SceneSimulation"
+      },
+      "notes": "ParticleForce gravity and drag act on ParticleSystem particles only (ParticleSystemTests, ParticleForceFieldTests); they apply to no body with mass, rotation or contacts. No spring constraint exists in any framework product (grep 2026-11-15). Gravity and drag on bodies are G-RIGIDBODY (app-local), A11-P01; spring constraints with bounded stiffness are G-SPRINGS (VisualCoreSimulation, upstream), A11-P02."
+    },
+    {
+      "id": "M08",
+      "capability": "Spawn, grab, pin and delete gestures: tap to spawn a chosen body, drag to grab and throw with a bounded grab force, long press or a mode to pin, a delete mode, each with a native control alternative and gesture arbitration",
+      "source": "v0.1 feature 3: spawn/grab/pin/delete gestures; constitution A11 accessibility",
+      "status": "requires adaptation",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/GestureRecognizers.swift",
+          "symbol": "TapRecognizer",
+          "product": "VisualCoreScenes",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/GestureRecognizers.swift",
+          "symbol": "DoubleTapRecognizer",
+          "product": "VisualCoreScenes",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/GestureRecognizers.swift",
+          "symbol": "LongPressRecognizer",
+          "product": "VisualCoreScenes",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/GestureRecognizers.swift",
+          "symbol": "DragRecognizer",
+          "product": "VisualCoreScenes",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/GestureRecognizers.swift",
+          "symbol": "PinchRecognizer",
+          "product": "VisualCoreScenes",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/GestureArbiter.swift",
+          "symbol": "GestureArbiter",
+          "product": "VisualCoreScenes",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/PointerTracker.swift",
+          "symbol": "PointerTracker",
+          "product": "VisualCoreScenes",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/SceneGraph.swift",
+          "symbol": "SceneNode.hitTest",
+          "product": "VisualCoreScenes",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreExperience/GestureAlternatives.swift",
+          "symbol": "GestureAlternatives",
+          "product": "VisualCoreExperience",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/NeonArcade/Experience/ArcadeGestures.swift",
+        "symbol": "ArcadeGestures"
+      },
+      "notes": "The recognizers, arbitration, pointer tracking, hit testing and the gesture-alternative check exist and are tested (GestureTests, GestureArbiterTests, PointerTrackerTests, SceneGraphTests, GestureAlternativesTests); RenderView+Touches feeds pointer events. The editor modes, grab force and pin semantics are the playground's. G-EDITOR (app-local over the recognizers), A11-P03."
+    },
+    {
+      "id": "M09",
+      "capability": "Pause, single step, time scale and reset: pause stops the world, single step advances exactly one fixed step while paused, time scale changes how many fixed steps a frame runs (never the step size), reset restores the experiment's initial document",
+      "source": "v0.1 feature 4: pause/single step/time scale/reset",
+      "status": "requires adaptation",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/FixedStepRunner.swift",
+          "symbol": "FixedStepRunner.pause",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/FixedStepRunner.swift",
+          "symbol": "FixedStepRunner.stepOnce",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/FixedStepClock.swift",
+          "symbol": "FixedStepClock",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/PlaybackState.swift",
+          "symbol": "PlaybackState",
+          "product": "VisualCoreSimulation",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/FluidArtPlayground/Core/SimulationControl.swift",
+        "symbol": "SimulationControl"
+      },
+      "notes": "FixedStepRunner pause, resume, stepOnce and run(steps:) and PlaybackState (background suspension) exist and are tested (FixedStepRunnerTests, PlaybackStateTests); no time-scale control exists and reset needs the playground's world document. Fluid Art Playground's SimulationControl is experience code. G-RIGIDBODY (app-local over FixedStepRunner), A11-P01."
+    },
+    {
+      "id": "M10",
+      "capability": "Presets pendulum, spring chain and stacked objects, and saved experiments: bundled starting documents that load, run deterministically and reset, and person-made experiments saved and reopened on the device",
+      "source": "v0.1 feature 5: presets pendulum, spring chain, stacked objects; manual saved experiments",
+      "status": "upstream gap",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift",
+          "symbol": "ExperienceStorage",
+          "product": "VisualCoreExperience",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCorePersistence/NamedLibrary.swift",
+          "symbol": "NamedLibrary",
+          "product": "VisualCorePersistence",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreParameters/Preset.swift",
+          "symbol": "Preset",
+          "product": "VisualCoreParameters",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/OscilloscopeStudio/Experience/ScopePresetStore.swift",
+        "symbol": "ScopePresetStore"
+      },
+      "notes": "Per-experience storage, named libraries and parameter presets exist and are tested (ExperienceStorageTests, NamedLibraryTests, ParametersTests); the pendulum and spring chain need spring constraints (G-SPRINGS) and the stack needs box contacts with friction (G-CONTACTS), both upstream in A11-P02; the preset documents and the experiment schema are G-EXPERIMENTS (app-local over ExperienceStorage), A11-P04."
+    },
+    {
+      "id": "M11",
+      "capability": "Velocity and force vector overlays and the measured state panel: optional arrows (shaft line and polygon head) for velocity and force per body, a native panel of measured values (position, speed, kinetic and potential energy, spring extension) with units, and a spoken summary",
+      "source": "v0.1 feature 6: velocity/force vector overlays and measured state panel",
+      "status": "requires adaptation",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/SceneGraph.swift",
+          "symbol": "Primitive.line",
+          "product": "VisualCoreScenes",
+          "public": false
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreScenes/SceneGraph.swift",
+          "symbol": "Primitive.polygon",
+          "product": "VisualCoreScenes",
+          "public": false
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/ParameterPanel.swift",
+          "symbol": "ParameterPanel",
+          "product": "VisualCoreUI",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPlans.swift",
+          "symbol": "AnnouncementPlanner",
+          "product": "VisualCoreSimulation",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/OscilloscopeStudio/Core/ScopeReadout.swift",
+        "symbol": "ScopeReadout"
+      },
+      "notes": "Lines and polygons (SceneGraphTests, PrimitiveRendererTests), the native panel (ParameterPanelTests) and rate-limited announcements (AccessibilityPlansTests) exist; no arrow primitive, vector scaling or measured-state model exists in a framework product. G-OVERLAYS (app-local), A11-P03."
+    },
+    {
+      "id": "M12",
+      "capability": "Fixed step and step policy: the world advances at a fixed step independent of the frame rate with a capped catch-up, a clamped and validated frame delta, timed commands and a state digest so the same document and inputs give the same result",
+      "source": "cross-cutting: fixed step and step policy; constitution A11 authoritative, GPU-free physics; manual risk 1",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/FixedStepClock.swift",
+          "symbol": "FixedStepClock",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/FixedStepRunner.swift",
+          "symbol": "FixedStepRunner",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/FixedStepRunner.swift",
+          "symbol": "FixedStepSimulation",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/TimeStepPolicy.swift",
+          "symbol": "TimeStepPolicy",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/SeededRandom.swift",
+          "symbol": "SeededRandom",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreExperience/StateDigest.swift",
+          "symbol": "StateDigest",
+          "product": "VisualCoreExperience",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/NeonArcade/Core/GameSimulation.swift",
+        "symbol": "GameSimulation"
+      },
+      "notes": "Tested in VisualCoreSimulationTests (FixedStepClockTests, FixedStepRunnerTests, TimeStepPolicyTests, SeededRandomTests) and VisualCoreExperienceTests/StateDigestTests. The playground's world implements FixedStepSimulation in A11-P01 (G-RIGIDBODY on M06/M09)."
+    },
+    {
+      "id": "M13",
+      "capability": "Stability and body budget: caps on body, contact and constraint counts, solver iterations, spring stiffness for the chosen step and speeds; non-finite values rejected; sleeping bodies; an experiment that would become unstable is clamped or refused",
+      "source": "cross-cutting: stability and body budget; constitution A11 stable and bounded; manual risks 1 and 3",
+      "status": "requires adaptation",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreMath/NumericHygiene.swift",
+          "symbol": "NumericHygiene",
+          "product": "VisualCoreMath",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/TimeStepPolicy.swift",
+          "symbol": "TimeStepPolicy",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/ParticleBudget.swift",
+          "symbol": "ParticleBudget",
+          "product": "VisualCoreDiagnostics",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/QualityGovernor.swift",
+          "symbol": "QualityGovernor",
+          "product": "VisualCoreDiagnostics",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/NeonArcade/Core/ArcadeBudget.swift",
+        "symbol": "ArcadeBudget"
+      },
+      "notes": "Finite-value checks (NumericHygieneTests), step clamping (TimeStepPolicyTests), a particle budget per quality level (ParticleBudgetTests) and the governor (QualityGovernorTests) exist; no body budget, sleeping bodies or stiffness and speed caps exist. The solver's own iteration and stiffness bounds come with G-CONTACTS and G-SPRINGS (A11-P02); the experience's caps, budget and sleeping are G-STABILITY (app-local), A11-P05."
+    },
+    {
+      "id": "M14",
+      "capability": "Persistence: settings and saved experiments as versioned documents in per-experience storage with atomic writes, migration and safe recovery from damaged or newer files",
+      "source": "cross-cutting: persistence",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCorePersistence/DocumentStore.swift",
+          "symbol": "DocumentStore",
+          "product": "VisualCorePersistence",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCorePersistence/NamedLibrary.swift",
+          "symbol": "NamedLibrary",
+          "product": "VisualCorePersistence",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCorePersistence/Migration.swift",
+          "symbol": "MigrationChain",
+          "product": "VisualCorePersistence",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift",
+          "symbol": "ExperienceStorage",
+          "product": "VisualCoreExperience",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreExperience/SavedStateStore.swift",
+          "symbol": "SavedStateStore",
+          "product": "VisualCoreExperience",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/OscilloscopeStudio/Experience/ScopePresetStore.swift",
+        "symbol": "ScopePresetStore"
+      },
+      "notes": "Tested in VisualCorePersistenceTests and VisualCoreExperienceTests (ExperienceStorageTests, SavedStateStoreTests). The experiment document schema is G-EXPERIMENTS (M10)."
+    },
+    {
+      "id": "M15",
+      "capability": "Quality tiers and low power: quality governor fed by thermal state and Low Power Mode, declared quality tiers that lower overlay detail and draw load (never the physics step), refreshed by the session",
+      "source": "cross-cutting: quality tiers and low power; constitution A11 bounded resources",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/QualityGovernor.swift",
+          "symbol": "QualityGovernor",
+          "product": "VisualCoreDiagnostics",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/QualityProfile.swift",
+          "symbol": "QualityProfile",
+          "product": "VisualCoreDiagnostics",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreDiagnostics/DeviceConditions.swift",
+          "symbol": "DeviceConditions",
+          "product": "VisualCoreDiagnostics",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceCore.swift",
+          "symbol": "ExperienceCore.qualityTiers",
+          "product": "VisualCoreExperience",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceSession.swift",
+          "symbol": "ExperienceSession.refreshQuality",
+          "product": "VisualCoreExperienceHost",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/ParticleUniverse/Core/SceneQuality.swift",
+        "symbol": "SceneQuality"
+      },
+      "notes": "Tested in VisualCoreDiagnosticsTests (QualityGovernorTests, QualityProfileTests), VisualCoreExperienceTests (QualityDeclarationTests) and VisualCoreExperienceHostTests. Core.qualityTiers must match the presenter's levels (declared at P05)."
+    },
+    {
+      "id": "M16",
+      "capability": "Accessibility and Reduce Motion: system preferences observed, decorative motion calmed without changing the physics, flashes limited, rate-limited announcements describing the experiment for VoiceOver, a control alternative for every gesture",
+      "source": "cross-cutting: accessibility and Reduce Motion; constitution A11 accessibility",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPreferences.swift",
+          "symbol": "SystemAccessibility",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/SystemAccessibilityObserver.swift",
+          "symbol": "SystemAccessibilityObserver",
+          "product": "VisualCoreUI",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPlans.swift",
+          "symbol": "AnnouncementPlanner",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/AccessibilityPlayers.swift",
+          "symbol": "AnnouncementSink",
+          "product": "VisualCoreUI",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPlans.swift",
+          "symbol": "transitionDuration",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreExperience/GestureAlternatives.swift",
+          "symbol": "GestureAlternatives",
+          "product": "VisualCoreExperience",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/VisualCoreMusicLab/Experience/MusicLabPresenter.swift",
+        "symbol": "MusicLabPresenter"
+      },
+      "notes": "Tested in VisualCoreSimulationTests (AccessibilityPreferencesTests, AccessibilityPlansTests), VisualCoreUITests (SystemAccessibilityObserverTests, AccessibilityPlayersTests) and VisualCoreExperienceTests (GestureAlternativesTests). The spoken experiment description is experience wording over AnnouncementPlanner, built with the overlays in A11-P03 (G-OVERLAYS on M11)."
+    },
+    {
+      "id": "M17",
+      "capability": "Lifecycle and context loss: context loss, resize, background and memory warning rebuild everything from versioned CPU world state; backgrounding pauses the simulation and never fast-forwards it",
+      "source": "cross-cutting: lifecycle; constitution A11 bounded resources",
+      "status": "available",
+      "evidence": [
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+          "symbol": "RenderHost.recreateContext",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/RenderHost.swift",
+          "symbol": "RenderHost.pause",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreRendering/ResourceRegistry.swift",
+          "symbol": "ResourceRegistry",
+          "product": "VisualCoreRendering",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceSession.swift",
+          "symbol": "ExperienceSession.handleMemoryWarning",
+          "product": "VisualCoreExperienceHost",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperienceSession.swift",
+          "symbol": "ExperienceSession.checkpoint",
+          "product": "VisualCoreExperienceHost",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/PlaybackState.swift",
+          "symbol": "PlaybackState",
+          "product": "VisualCoreSimulation",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/FractalExplorer/Experience/FractalScene.swift",
+        "symbol": "FractalScene"
+      },
+      "notes": "Tested in VisualCoreRenderingTests (RenderHostTests, ResourceRegistryTests), VisualCoreExperienceHostTests and VisualCoreSimulationTests (PlaybackStateTests); FixedStepClock caps catch-up at 8 steps per frame."
+    },
+    {
+      "id": "M18",
+      "capability": "Licenses and provenance: every preset, palette and shader bundled later records its author and license; only original content",
+      "source": "cross-cutting: licenses; constitution A11 licenses; spec FR-A11-006",
+      "status": "requires adaptation",
+      "evidence": [
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/AcknowledgementsView.swift",
+          "symbol": "LicenseInventory",
+          "product": "VisualCoreUI",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/AcknowledgementsView.swift",
+          "symbol": "AcknowledgementsView",
+          "product": "VisualCoreUI",
+          "public": true
+        }
+      ],
+      "example": {
+        "file": "Packages/ExperiencesCreative/NeonArcade/Core/LicenseAudit.swift",
+        "symbol": "LicenseAudit"
+      },
+      "notes": "LicenseInventory and AcknowledgementsView cover third-party notices (AcknowledgementsViewTests; scripts/check_licenses.py audits the built app); per-content author and license fields for presets, palettes and shaders do not exist in a framework product and belong to the experience's content definitions, as Neon Arcade's LicenseAudit does. G-CONTENTLICENSES (app-local), A11-P01."
+    }
+  ],
+  "gaps": [
+    {
+      "id": "G-RIGIDBODY",
+      "matrix": [
+        "M06",
+        "M07",
+        "M09"
+      ],
+      "kind": "adaptation",
+      "owner": "app-local",
+      "justification": "The playground's body and world model with stated units (metres, kilograms, seconds), static zero-mass bodies, constant gravity, linear drag, semi-implicit integration, pause, single step, time scale and reset are the experience's domain over VisualCore's FixedStepRunner, FixedStepClock and TimeStepPolicy (clarification 5); contacts and springs come from G-CONTACTS and G-SPRINGS.",
+      "phase": 1,
+      "test": "Host tests (swift test, no GPU): a body in free fall matches the analytic position within a stated tolerance for the step; static bodies never move and have zero inverse mass; drag decays speed monotonically; the same document and inputs give the same state digest; pause stops stepping, single step advances exactly one fixed step, time scale changes steps per frame but never the step size, reset restores the initial document; non-finite inputs rejected",
+      "closed": null
+    },
+    {
+      "id": "G-CONTACTS",
+      "matrix": [
+        "M06",
+        "M10"
+      ],
+      "kind": "upstream",
+      "owner": "VisualCore:VisualCoreSimulation",
+      "justification": "Found in A11-P00: Collision2D answers circle and capsule overlap only; no contact manifold, no circle-box or box-box contacts, no impulse solver and no broad phase exist in any framework product. Contacts, an impulse solver with restitution, friction and positional correction, and a broad phase are generic 2D machinery and belong to VisualCoreSimulation (constitution A11 reuse first, clarification 5).",
+      "phase": 2,
+      "test": "Host tests: circle-circle, circle-box and box-box manifolds (normal, depth, points) agree with analytic answers including touching, nested and rotated cases; the solver conserves momentum in a two-body impact, restitution 0 and 1 give inelastic and elastic outcomes, friction holds a box on a slope below its angle of repose, positional correction removes penetration within bounded iterations; the broad phase returns the same pairs as brute force; a stack of boxes stays standing; NaN/Inf rejected; API baseline additive and the reference regression passes",
+      "closed": null
+    },
+    {
+      "id": "G-SPRINGS",
+      "matrix": [
+        "M07",
+        "M10"
+      ],
+      "kind": "upstream",
+      "owner": "VisualCore:VisualCoreSimulation",
+      "justification": "Found in A11-P00: no spring constraint exists in any framework product; spring constraints between bodies or a body and a fixed point with rest length, bounded stiffness for the chosen step and damping are generic and belong to VisualCoreSimulation (clarification 5).",
+      "phase": 2,
+      "test": "Host tests: a mass on a spring oscillates with the analytic period within a stated tolerance; stiffness above the stable bound for the step is clamped; damping decays energy monotonically; a spring chain stays finite over a bounded run; NaN/Inf rejected; API baseline additive and the reference regression passes",
+      "closed": null
+    },
+    {
+      "id": "G-EDITOR",
+      "matrix": [
+        "M08"
+      ],
+      "kind": "adaptation",
+      "owner": "app-local",
+      "justification": "Spawn, grab, pin and delete are the playground's editor modes over VisualCore's recognizers, GestureArbiter and SceneNode.hitTest, with native controls as the alternative; no new generic gesture is needed.",
+      "phase": 3,
+      "test": "Host tests: tap spawns the chosen body at the touch point, drag grabs the hit body with a bounded grab force and releases with its velocity, pin fixes a body, delete removes it, every action has a control alternative (GestureAlternatives.missing is empty) and is recorded as a replayable command",
+      "closed": null
+    },
+    {
+      "id": "G-OVERLAYS",
+      "matrix": [
+        "M05",
+        "M11"
+      ],
+      "kind": "adaptation",
+      "owner": "app-local",
+      "justification": "Velocity and force arrows, plots of measured quantities and the measured state panel with units are the playground's views over Primitive lines, polylines and polygons and native SwiftUI controls; no chart component is needed for version 0.1.",
+      "phase": 3,
+      "test": "Host tests: arrows scale with the measured vector within caps and vanish when switched off, panel values (speed, kinetic and potential energy, spring extension) match the world state with stated units, overlays never change the state digest, the spoken summary is rate-limited",
+      "closed": null
+    },
+    {
+      "id": "G-EXPERIMENTS",
+      "matrix": [
+        "M10"
+      ],
+      "kind": "adaptation",
+      "owner": "app-local",
+      "justification": "The pendulum, spring chain and stacked-objects presets and the saved-experiment document are the playground's content stored in ExperienceStorage through VisualCorePersistence (clarification 5); they run on G-CONTACTS and G-SPRINGS.",
+      "phase": 4,
+      "test": "Host tests: each preset loads, runs deterministically and resets to its document; the pendulum's period and the chain's rest shape match stated tolerances; saved experiments round-trip, a write interrupted mid-way keeps the previous file, damaged or newer files are reported and never crash",
+      "closed": null
+    },
+    {
+      "id": "G-STABILITY",
+      "matrix": [
+        "M13"
+      ],
+      "kind": "adaptation",
+      "owner": "app-local",
+      "justification": "The body budget, caps on contacts, constraints, speeds and stiffness per quality tier, sleeping bodies and the clamp-or-refuse policy for an experiment that would become unstable are the playground's policy over the solver's own bounds (clarification 5).",
+      "phase": 5,
+      "test": "Host tests: spawning beyond the body budget is refused with a message, speeds and stiffness stay within caps, resting bodies fall asleep and wake on contact or grab, an extreme experiment is clamped or refused and never produces a non-finite value; per-step work stays within the arithmetic bound for the budget",
+      "closed": null
+    },
+    {
+      "id": "G-CONTENTLICENSES",
+      "matrix": [
+        "M18"
+      ],
+      "kind": "adaptation",
+      "owner": "app-local",
+      "justification": "Per-content author and license fields for presets, palettes and shaders belong to the experience's content definitions (as Neon Arcade's LicenseAudit); the audit starts with the first bundled content in A11-P01 and covers the presets added in A11-P04.",
+      "phase": 1,
+      "test": "Host tests: every bundled preset, palette and shader records an author and a license and the audit fails on a missing one",
+      "closed": null
+    }
+  ],
+  "traceability": [
+    {
+      "item": "brainstorm: scene rendering",
+      "matrix": [
+        "M01"
+      ],
+      "phases": [
+        1,
+        3
+      ]
+    },
+    {
+      "item": "brainstorm: geometry",
+      "matrix": [
+        "M02",
+        "M06"
+      ],
+      "phases": [
+        1,
+        2
+      ]
+    },
+    {
+      "item": "brainstorm: animation",
+      "matrix": [
+        "M03",
+        "M12"
+      ],
+      "phases": [
+        1
+      ]
+    },
+    {
+      "item": "brainstorm: shader-based effects",
+      "matrix": [
+        "M04"
+      ],
+      "phases": [
+        3,
+        5
+      ]
+    },
+    {
+      "item": "brainstorm: data visualization",
+      "matrix": [
+        "M05",
+        "M11"
+      ],
+      "phases": [
+        3
+      ]
+    },
+    {
+      "item": "v0.1 feature 1: circles and boxes with rigid-body collision",
+      "matrix": [
+        "M02",
+        "M06"
+      ],
+      "phases": [
+        1,
+        2
+      ]
+    },
+    {
+      "item": "v0.1 feature 2: constant gravity, springs and drag",
+      "matrix": [
+        "M07"
+      ],
+      "phases": [
+        1,
+        2
+      ]
+    },
+    {
+      "item": "v0.1 feature 3: spawn/grab/pin/delete gestures",
+      "matrix": [
+        "M08",
+        "M16"
+      ],
+      "phases": [
+        3
+      ]
+    },
+    {
+      "item": "v0.1 feature 4: pause/single step/time scale/reset",
+      "matrix": [
+        "M09",
+        "M12"
+      ],
+      "phases": [
+        1
+      ]
+    },
+    {
+      "item": "v0.1 feature 5: presets pendulum, spring chain, stacked objects",
+      "matrix": [
+        "M10",
+        "M14"
+      ],
+      "phases": [
+        2,
+        4
+      ]
+    },
+    {
+      "item": "v0.1 feature 6: velocity/force vector overlays and measured state panel",
+      "matrix": [
+        "M11",
+        "M05"
+      ],
+      "phases": [
+        3
+      ]
+    },
+    {
+      "item": "cross-cutting: fixed step and step policy",
+      "matrix": [
+        "M12"
+      ],
+      "phases": [
+        1
+      ]
+    },
+    {
+      "item": "cross-cutting: stability and body budget",
+      "matrix": [
+        "M13"
+      ],
+      "phases": [
+        2,
+        5
+      ]
+    },
+    {
+      "item": "cross-cutting: persistence, quality tiers and low power, lifecycle",
+      "matrix": [
+        "M14",
+        "M15",
+        "M17"
+      ],
+      "phases": [
+        4,
+        5
+      ]
+    },
+    {
+      "item": "cross-cutting: accessibility and Reduce Motion",
+      "matrix": [
+        "M16"
+      ],
+      "phases": [
+        3,
+        4
+      ]
+    },
+    {
+      "item": "cross-cutting: licenses and provenance",
+      "matrix": [
+        "M18"
+      ],
+      "phases": [
+        1,
+        4
+      ]
+    }
+  ],
+  "negative": [
+    {
+      "rule": "No EGL display, context, surface or GL path of its own and no second renderer; all drawing goes through VisualCore's RenderHost on OpenGL ES -> ANGLE -> Metal",
+      "source": "constitution A11 consumer, not fork; CLAUDE.md rule 4; spec FR-A11-006"
+    },
+    {
+      "rule": "No ProjectM types, engine or presets and no ProjectM code reused",
+      "source": "constitution A11 consumer, not fork; CLAUDE.md rule 12; spec FR-A11-006"
+    },
+    {
+      "rule": "No networking, accounts, analytics, tracking or advertising; experiments are stored only on the device",
+      "source": "constitution A11 offline-first and private; CLAUDE.md rule 3; spec FR-A11-006"
+    },
+    {
+      "rule": "No simulation in shaders: forces, collisions, constraints and integration are decided by the GPU-free CPU solver, which is authoritative; VisualCore is used for drawing only and drawing never changes the state",
+      "source": "constitution A11 authoritative, GPU-free physics; spec edge case simulation offloaded to shaders; spec FR-A11-006"
+    },
+    {
+      "rule": "No 3D soft bodies, no fluid solver and no complete engineering simulation; version 0.1 is 2D rigid bodies, springs, gravity and drag",
+      "source": "manual non-goals; constitution A11 product goal; spec FR-A11-006"
+    },
+    {
+      "rule": "No purchased, generated or hand-made artwork, sprites, textures or recordings: bodies, springs, vectors, panels and backgrounds are procedural code",
+      "source": "CLAUDE.md rule 4; constitution A11 visuals are code; spec FR-A11-006"
+    },
+    {
+      "rule": "No claims of physical or engineering accuracy, safety-critical prediction or learning outcomes; results are labelled as educational approximations; performance or battery numbers only from device measurements",
+      "source": "constitution A11 truthful claims; manual risk 2; spec FR-A11-006"
+    },
+    {
+      "rule": "License rule: every preset, palette and shader bundled later records its author and license; only original content is bundled",
+      "source": "constitution A11 licenses; spec FR-A11-006"
+    },
+    {
+      "rule": "No permission prompts: no microphone, camera, photos, motion or location in version 0.1",
+      "source": "spec clarification 4; CLAUDE.md rule 6"
+    },
+    {
+      "rule": "No fork or copy of VisualCore, ANGLE or projectm-ios, no standalone app target and no copy of Neon Arcade's GameSimulation, Fluid Art Playground's FluidSolver or other experience code; generic needs become VisualCore gaps",
+      "source": "ADR-0009; constitution A11 reuse first; CLAUDE.md rule 1; spec edge cases"
+    }
+  ],
+  "decision": {
+    "result": "go",
+    "reasons": [
+      "A working host and drawing path exist: RenderHost on OpenGL ES -> ANGLE -> Metal and PrimitiveRenderer drawing a SceneNode tree of rectangles, circles, lines, polygons and polylines in one batch through Camera2D, all public and tested.",
+      "9 of 18 rows are available with tests: scene rendering, geometry, animation, shader-based effects, fixed step and step policy, persistence, quality tiers and low power, accessibility and Reduce Motion, lifecycle; the deterministic base (FixedStepRunner with pause and stepOnce, TimeStepPolicy, SeededRandom, StateDigest, Collision2D) is in place.",
+      "All gaps are additive and owned: G-CONTACTS (box contacts, impulse solver with restitution, friction and positional correction, broad phase) and G-SPRINGS (spring constraints with bounded stiffness), both VisualCoreSimulation upstream in A11-P02; app-local G-RIGIDBODY (body and world model, units, static bodies, gravity, drag, integration, pause, single step, time scale, reset) and G-CONTENTLICENSES in A11-P01, G-EDITOR and G-OVERLAYS in A11-P03, G-EXPERIMENTS in A11-P04, G-STABILITY in A11-P05.",
+      "No permission and no privacy answer changes; Physics Playground stays unregistered until A11-P01 creates Packages/ExperiencesCreative/PhysicsPlayground with its targets and first real rules, so the experience package check and the one app are unchanged."
+    ],
+    "blockers": []
+  }
+}

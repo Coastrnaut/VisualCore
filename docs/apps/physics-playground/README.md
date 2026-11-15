@@ -1,0 +1,26 @@
+# Physics Playground (`a11.physics-playground`)
+
+A deterministic sandbox for gravity, collisions, springs and forces with explanatory overlays (archived manual
+`apps/11-physics-playground.md` §1–§2), for children experimenting with motion, teachers giving live demonstrations
+and enthusiasts. Version 0.1: circles and boxes with rigid-body collision; constant gravity, springs and drag; spawn,
+grab, pin and delete gestures; pause, single step, time scale and reset; presets (pendulum, spring chain, stacked
+objects); optional velocity and force overlays with a measured state panel. Its results are educational
+approximations. Non-goals: a physically complete engineering simulation, 3D soft bodies or a fluid solver,
+safety-critical prediction claims.
+
+Physics Playground is an experience of the one VisualCore app (ADR-0009), built from Phase 01 on in
+`Packages/ExperiencesCreative/PhysicsPlayground`; it never has a standalone target. Bodies, springs, arrows and
+backgrounds are drawn in code (no artwork). The physics runs on the CPU at a fixed step and is authoritative; drawing
+never changes it. It reuses VisualCore's seeded fixed-step clock and runner, step policy, batched 2D shapes with hit
+testing, gesture recognizers, circle and capsule collision, storage and quality tiers; box contacts, an impulse
+solver, spring constraints and a broad phase are built in VisualCore (gaps of the contract), the rest in the
+experience. Its rules are the A11 subsection of the constitution (2.7.0).
+
+| Document | Content |
+|---|---|
+| [visualcore-contract.json](visualcore-contract.json) / [.md](visualcore-contract.md) | Phase 00 inventory, capability matrix, gaps, decision (checked by `scripts/check_app_contract.py`) |
+| [regression-baseline.md](regression-baseline.md) | Phase start, reference pin, the ProjectM reference regression results |
+
+Phases: A11-P00 boundary audit (feature 081), P01 physics model, units and deterministic tests, P02 contacts and
+spring solver, P03 gesture editor and overlays, P04 saved experiments and tutorials, P05 numerical stability and
+performance audit, P06 release readiness; then the experience's integration gate X-A11.

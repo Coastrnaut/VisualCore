@@ -7,7 +7,7 @@ after every task (no trailers); read every check's exit before ticking. No Swift
 
 ## Phase 1: Setup
 
-- [ ] T-A11-001 Create `docs/apps/physics-playground/README.md` (what the experience is per the manual §1–§2: a deterministic 2D sandbox for gravity, collisions, springs and forces, educational approximation; that it is an experience of the one app; its documents) and `docs/apps/physics-playground/regression-baseline.md` with the phase start `d3797d7c` (the specify commit; constitution `35c24d86`) and the reference pin `d93edd1`
+- [X] T-A11-001 Create `docs/apps/physics-playground/README.md` (what the experience is per the manual §1–§2: a deterministic 2D sandbox for gravity, collisions, springs and forces, educational approximation; that it is an experience of the one app; its documents) and `docs/apps/physics-playground/regression-baseline.md` with the phase start `d3797d7c` (the specify commit; constitution `35c24d86`) and the reference pin `d93edd1` — Verified 2026-11-15: 2026-11-15: docs/apps/physics-playground/README.md and regression-baseline.md (phase start d3797d7c, constitution 35c24d86, pin d93edd1; reference 7/7 recorded); committed with the contract they link to
 
 ## Phase 3: User Story 1 — Evidence-backed integration matrix (P1) 🎯
 
