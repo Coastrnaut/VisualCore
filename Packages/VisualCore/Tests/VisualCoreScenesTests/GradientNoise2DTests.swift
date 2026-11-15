@@ -4,9 +4,19 @@ import Testing
 
 @Suite struct GradientNoise2DTests {
     /// The 64 × 64 sample of points used for the range checks (spans several lattice cells, both signs).
-    static let grid: [(Double, Double)] = (0..<64).flatMap { j in
-        (0..<64).map { i in (Double(i) * 0.173 - 5.3, Double(j) * 0.211 - 6.7) }
-    }
+    /// Built with explicit types and a plain loop: the nested closures took the CI compiler too long to type-check.
+    static let grid: [(Double, Double)] = {
+        var points: [(Double, Double)] = []
+        points.reserveCapacity(64 * 64)
+        for j in 0..<64 {
+            let y: Double = Double(j) * 0.211 - 6.7
+            for i in 0..<64 {
+                let x: Double = Double(i) * 0.173 - 5.3
+                points.append((x, y))
+            }
+        }
+        return points
+    }()
 
     @Test func sameSeedAndPointGiveTheSameValue() {
         let a = GradientNoise2D(seed: 42), b = GradientNoise2D(seed: 42)
