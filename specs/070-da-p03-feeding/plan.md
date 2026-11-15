@@ -52,9 +52,7 @@ Packages/ExperiencesCreative/DigitalAquarium/ExperienceTests/AquariumGestureTest
 Packages/ExperiencesCreative/DigitalAquarium/ExperienceTests/{AquariumCoreTests,AquariumSessionTests,
   AquariumRenderTests,AquariumManifestTests}.swift                                                         modify
 Packages/ExperiencesCreative/DigitalAquarium/scenario-manifest.json                                       regenerate
-Packages/ExperiencesCreative/Package.swift (VisualCoreScenes for the experience target, if not present)   modify
 Apps/VisualCore/App/ExperienceRegistry.swift (schema-2 example)                                           modify
-Catalog/registrations.json (a09 controls, if listed there)                                                modify
 docs/apps/digital-aquarium/visualcore-contract.{json,md} (G-FEEDPLACE closed; M10 available)             modify
 ```
 
