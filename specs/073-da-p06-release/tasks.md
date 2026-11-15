@@ -16,7 +16,7 @@ stay open, as for A07-P06 and A08-P06.
 
 ## Phase 3: User Story 2 — damaged data never breaks the aquarium (P1)
 
-- [ ] T-A09-604 [P] [US2] Add `resources: [.copy("Fixtures")]` to the `DigitalAquariumExperienceTests` target in `Packages/ExperiencesCreative/Package.swift` and commit four samples in `Packages/ExperiencesCreative/DigitalAquarium/ExperienceTests/Fixtures/` ("valid (format 1), newer (format 2), damaged (not JSON), mismatched id"; synthetic ids `00000000-0000-4000-8000-…`) (FR-A09-610)
+- [X] T-A09-604 [P] [US2] Add `resources: [.copy("Fixtures")]` to the `DigitalAquariumExperienceTests` target in `Packages/ExperiencesCreative/Package.swift` and commit four samples in `Packages/ExperiencesCreative/DigitalAquarium/ExperienceTests/Fixtures/` ("valid (format 1), newer (format 2), damaged (not JSON), mismatched id"; synthetic ids `00000000-0000-4000-8000-…`) (FR-A09-610) — Verified 2026-11-14: 2026-11-14: Fixtures resource on DigitalAquariumExperienceTests; four samples (valid, newer, damaged, mismatched id) with synthetic ids
 - [ ] T-A09-605 [P] [US2] Write `ExperienceTests/AquariumSampleFileTests.swift` (samples copied into a temporary storage; the valid one listed, two unreadable and one newer counted; all byte-identical after a reload and a save) and `ExperienceTests/AquariumRecoveryDrawTests.swift` (a saved configuration, `failNextDraw`, a frame puts the session into its failure state, files byte-identical, a new session draws; schema-1…3 examples restore) (FR-A09-610–612; SC-A09-602)
 
 ## Phase 4: User Story 3 — honest copy and a complete checklist (P1)
