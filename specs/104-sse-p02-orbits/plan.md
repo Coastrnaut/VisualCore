@@ -58,7 +58,8 @@ docs/apps/solar-system-explorer/{data-sources.md (regenerated), visualcore-contr
 
 **Dependency direction**: `SolarSystemExplorerCore` → `VisualCoreMath` (new dependency, for `KeplerOrbit`) and
 Foundation; Experience → Core, scenes, rendering, host, UI; VisualCoreMath depends on nothing new; nothing in VisualCore
-depends on the experience. If the core target does not yet list `VisualCoreMath`, Package.swift gains it.
+depends on the experience. The core and core-test targets do not list `VisualCoreMath` today (checked in
+Package.swift); both gain it, as `LightMazeCore` does.
 
 **Lifecycle**: the core holds `SolarState` schema 2 (selection, dayOffset, yawSteps, pitchDegrees, zoomSteps); actions
 apply at their step; positions are a pure function of the date. The presenter creates every renderer once when the
