@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_app_contract.py",
+    "--app",
+    "physics-playground",
+    "--render"
+  ],
+  "command": "python3 scripts/check_app_contract.py --app physics-playground --render",
+  "elapsed_seconds": 0.09,
+  "exit_code": 0,
+  "finished": "2026-11-15T05:57:00+00:00",
+  "log": ".autonomy/logs/A11-P00.contract.log",
+  "log_sha256": "d926259b71e310e279c2b750a9c166ad761e242cd224526364074bfbea77a0c5",
+  "name": "contract",
+  "stage": "A11-P00",
+  "started": "2026-11-15T05:57:00+00:00",
+  "timed_out": false
+}
