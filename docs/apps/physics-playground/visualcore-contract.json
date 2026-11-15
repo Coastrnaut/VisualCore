@@ -343,7 +343,7 @@
       "id": "M06",
       "capability": "Circles and boxes with rigid-body collision: dynamic and static (zero-mass, infinite-inertia) bodies with mass and moment of inertia in stated units; circle-circle, circle-box and box-box contact generation; an impulse solver with restitution, friction and positional correction; a broad phase",
       "source": "v0.1 feature 1: circles and boxes with rigid-body collision; constitution A11 reuse first",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCore/Sources/VisualCoreSimulation/Contacts2D.swift",
@@ -374,41 +374,53 @@
           "symbol": "RigidBodyState2D",
           "product": "VisualCoreSimulation",
           "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/BroadPhase2D.swift",
+          "symbol": "BroadPhase2D",
+          "product": "VisualCoreSimulation",
+          "public": true
+        },
+        {
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/BroadPhase2D.swift",
+          "symbol": "AABB2D",
+          "product": "VisualCoreSimulation",
+          "public": true
         }
       ],
       "example": {
         "file": "Packages/ExperiencesCreative/PhysicsPlayground/Core/WorldSimulation.swift",
         "symbol": "WorldSimulation"
       },
-      "notes": "Since A11-P01 (contact part of G-CONTACTS closed): Contacts2D generates circle-circle, circle-box and box-box manifolds and ImpulseSolver2D resolves them with restitution, friction and positional correction (Contacts2DTests, ImpulseSolver2DTests); WorldSimulation runs all pairs of at most 48 bodies. Open: the broad phase and resting-stack stability (G-BROADPHASE, A11-P02)."
+      "notes": "Since A11-P02 (G-BROADPHASE closed): circle and box contacts (Contacts2D), the impulse solver with warm starting (ImpulseSolver2D) and the broad phase (BroadPhase2D) cover rigid-body collision of circles and boxes, with a resting stack bounded (Contacts2DTests, ImpulseSolver2DTests, BroadPhase2DTests); WorldSimulation uses them."
     },
     {
       "id": "M07",
       "capability": "Constant gravity, springs and drag: a uniform gravity vector and linear drag applied to bodies each step, spring constraints between bodies or a body and a pin with rest length, bounded stiffness and damping",
       "source": "v0.1 feature 2: constant gravity, springs and drag",
-      "status": "upstream gap",
+      "status": "available",
       "evidence": [
         {
-          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/ParticleSystem.swift",
-          "symbol": "ParticleForce",
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/Springs2D.swift",
+          "symbol": "Springs2D",
           "product": "VisualCoreSimulation",
           "public": true
         },
         {
-          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/ParticleSystem.swift",
-          "symbol": "ParticleForce.gravity",
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/Springs2D.swift",
+          "symbol": "Spring2D",
           "product": "VisualCoreSimulation",
-          "public": false
+          "public": true
         },
         {
-          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/ParticleSystem.swift",
-          "symbol": "ParticleForce.drag",
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/Springs2D.swift",
+          "symbol": "SpringAnchor2D",
           "product": "VisualCoreSimulation",
-          "public": false
+          "public": true
         },
         {
-          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/FixedStepRunner.swift",
-          "symbol": "FixedStepRunner",
+          "file": "Packages/VisualCore/Sources/VisualCoreSimulation/ImpulseSolver2D.swift",
+          "symbol": "RigidBodyState2D",
           "product": "VisualCoreSimulation",
           "public": true
         }
@@ -417,7 +429,7 @@
         "file": "Packages/ExperiencesCreative/PhysicsPlayground/Core/WorldSimulation.swift",
         "symbol": "WorldSimulation"
       },
-      "notes": "ParticleForce gravity and drag act on ParticleSystem particles only (ParticleSystemTests, ParticleForceFieldTests); they apply to no body with mass, rotation or contacts. No spring constraint exists in any framework product (grep 2026-11-15). Gravity and drag on bodies are G-RIGIDBODY (app-local), A11-P01; spring constraints with bounded stiffness are G-SPRINGS (VisualCoreSimulation, upstream), A11-P02. Since A11-P01: constant gravity and linear and angular drag act on rigid bodies in WorldSimulation (free fall within 1 %); springs remain G-SPRINGS (A11-P02)."
+      "notes": "Since A11-P02 (G-SPRINGS closed): springs between bodies or to fixed points with stiffness and damping bounded for the tick (Springs2D, Springs2DTests); constant gravity (off, Moon, Earth) and linear and angular drag (none, low, high) act on rigid bodies in WorldSimulation."
     },
     {
       "id": "M08",
@@ -922,10 +934,10 @@
       ],
       "kind": "upstream",
       "owner": "VisualCore:VisualCoreSimulation",
-      "justification": "Found in A11-P00: no spring constraint exists in any framework product; spring constraints between bodies or a body and a fixed point with rest length, bounded stiffness for the chosen step and damping are generic and belong to VisualCoreSimulation (clarification 5).",
+      "justification": "Found in A11-P00: no spring constraint exists in any framework product; spring constraints between bodies or a body and a fixed point with rest length, bounded stiffness for the chosen step and damping are generic and belong to VisualCoreSimulation (clarification 5). Built in A11-P02: Springs2D (SpringAnchor2D, Spring2D, stable stiffness 0.1·m/dt² and damping m/dt, apply as impulses at the anchors); the world applies springs before gravity (research D1).",
       "phase": 2,
-      "test": "Host tests: a mass on a spring oscillates with the analytic period within a stated tolerance; stiffness above the stable bound for the step is clamped; damping decays energy monotonically; a spring chain stays finite over a bounded run; NaN/Inf rejected; API baseline additive and the reference regression passes",
-      "closed": null
+      "test": "Host tests (Springs2DTests, 10 tests): ends pulled together, world anchors and static ends fixed, zero length inert, clamps exact, undamped energy within 2 % over 1,200 ticks, damped energy non-increasing and below 10 % by 10 s, equilibrium m·g/k within 2 %; API baseline additive; reference regression at X-A11",
+      "closed": "A11-P02"
     },
     {
       "id": "G-EDITOR",
@@ -996,10 +1008,10 @@
       ],
       "kind": "upstream",
       "owner": "VisualCore:VisualCoreSimulation",
-      "justification": "Split from G-CONTACTS at A11-P01: a broad phase (pairs equal to brute force, fewer narrow-phase tests) and resting-stack stability (warm starting or equivalent positional handling so a stack of boxes stays bounded) are generic and belong to VisualCoreSimulation; A11-P01 tests all pairs of at most 48 bodies.",
+      "justification": "Split from G-CONTACTS at A11-P01: a broad phase (pairs equal to brute force, fewer narrow-phase tests) and resting-stack stability (warm starting or equivalent positional handling so a stack of boxes stays bounded) are generic and belong to VisualCoreSimulation; A11-P01 tests all pairs of at most 48 bodies. Built in A11-P02: AABB2D, Shape2D.bounds(at:), BroadPhase2D.pairs (sweep and prune, equal to brute force) and warm starting (Contact2D stored impulses, inout ImpulseSolver2D.solve); a five-box stack drifts 0.8 mm and sinks 1.4 mm over 10 s.",
       "phase": 2,
-      "test": "Host tests: the broad phase returns exactly the brute-force pairs for random scenes; a resting stack of boxes stays bounded (manual fixture 2); determinism; API baseline additive; reference regression at X-A11",
-      "closed": null
+      "test": "Host tests (BroadPhase2DTests, 7 tests; ImpulseSolver2DTests): broad phase equals brute force on 50 seeded scenes; cold start bit-identical to Phase 01; five-box stack drift < 2 cm and sink < 1 cm over 1,200 ticks; API baseline additive; reference regression at X-A11",
+      "closed": "A11-P02"
     }
   ],
   "traceability": [

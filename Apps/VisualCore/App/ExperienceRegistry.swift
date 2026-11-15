@@ -249,7 +249,10 @@ extension ExperienceRegistry {
     /// A11 Physics Playground (feature 082, A11-P01): a candidate until X-A11.
     fileprivate static var physicsPlayground: ExperienceRegistration? {
         guard let id = PhysicsPlaygroundExperience.id else { return nil }
-        var registration = ExperienceRegistration(id: id, core: PlaygroundCore.self, examples: []) { launch in
+        // Schema 2 (feature 083, A11-P02) adds springs, force levels and the contact cache; the stored schema-1 example
+        // proves the migration.
+        let examples = [PlaygroundCore.schemaOneExample()].compactMap { $0 }
+        var registration = ExperienceRegistration(id: id, core: PlaygroundCore.self, examples: examples) { launch in
             let system = SystemAccessibilityObserver.systemValues()
             return PhysicsPlaygroundExperience.make(id: id, storage: launch.storage,
                                                     reduceMotion: launch.reduceMotion.resolved(system: system.reduceMotion),

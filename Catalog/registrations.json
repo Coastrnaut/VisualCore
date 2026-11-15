@@ -243,7 +243,8 @@
     "a11.physics-playground": {
       "capabilities": [
         "rigid-body circles and boxes",
-        "gravity and drag in SI units",
+        "springs with bounded stiffness",
+        "gravity and drag levels",
         "pause, single step and time scale",
         "drop circles and boxes",
         "deterministic replay"
