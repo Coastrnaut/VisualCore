@@ -49,3 +49,25 @@ fog) and `DepthMeshPass`; no noise or height field in any framework product (con
 
 - **Decision**: nine standard scenarios plus fixtures `fixture-<preset>-<seed>` for the three presets × seeds 1, 2, 3,
   each asserting the terrain digest; plus refusal scenarios for an out-of-range preset and a fractional zoom.
+
+## As built (2026-11-15, recorded at convergence T-A12-115)
+
+- **D2 seams:** `HeightField` computes grid x and z as origin + i·cellSize, so two pieces sharing an edge get
+  bit-identical edge heights and normals when the cell size is exact in binary (the presets use 12/64 and 12/48 m);
+  `HeightFieldTests.fieldsSharingAnEdgeAgreeBitForBit` uses 3/16 m. A non-dyadic cell size can round the edge
+  coordinate differently in the two pieces.
+- **D4 refusals:** the engine checks every action against the declared ranges and value counts before the core sees
+  it, so out-of-range and non-finite values give `action.out-of-range` and `action.non-finite`, and a wrong count
+  `wrongValueCount`; `WorldsCore` refuses with `a12.invalid-choice` what passes those checks — a fractional preset —
+  and any invalid value on a direct core call (`WorldsCoreTests.testRefusalsKeepTheStateWithTheirReasons`).
+- **D4 digests:** the state digest is the state's JSON plus the terrain digest (`WorldsCore.swift` header), so a
+  scenario's final digest pins the terrain; turning the view changes the state digest and leaves the terrain digest and
+  the renderers unchanged (`WorldsRenderTests.testTurningTheViewChangesTheFrameAndNotTheTerrain`). The terrain digest
+  is memoised per preset and seed (`WorldsCore.terrainMemo`, at most 64 entries behind a `Mutex`): generation is pure,
+  so a cached value equals a regenerated one, and the conformance test drops from 12.2 s to 0.9 s in a debug build.
+- **D4 preparation seed:** a preparation seed in 1…UInt32.max names the world's seed (the manifest fixtures use 1, 2,
+  3); any other seed — the app's own seed is wider than 32 bits — opens seed 1 (`WorldState.initial`).
+- **D5 refusals and probe:** every zoom factor in 0.5…2 is legal, so the refusal scenario uses 0.25 (refused as
+  `action.out-of-range`) next to a fractional preset (1.5, `a12.invalid-choice`) and an out-of-range preset (3). The
+  launch scenario's frame probe reads the clear colour at the first corner or edge midpoint outside the world's projected
+  bounds (`WorldsPresenter.probes`); the miniature city's sea colour sits on a class threshold, so it declares no probe.
