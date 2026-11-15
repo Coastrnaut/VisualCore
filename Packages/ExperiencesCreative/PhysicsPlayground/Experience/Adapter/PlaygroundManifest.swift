@@ -5,6 +5,15 @@
 // and digesting it with the experience id as domain, as Neon Arcade's manifest does. The physical properties
 // themselves are proved by the tests named with each fixture (`PhysicsFixtureTests`, `ReplayTests`,
 // `MaterialCatalogTests` of the core, and the experience tests).
+//
+// Feature 083 (A11-P02) T-A11-205 (FR-A11-222; research D5): the starting scene now holds ten bodies and two springs
+// (the body-cap fixture needs 38 drops), the input and rejection scenarios use the level actions, and fixtures 11–18
+// are added, each scripted over the experience's actions so the world reaches the situation it names: 11 resting pile,
+// 12 spring equilibrium, 13 spring energy without gravity and drag, 14 damped spring energy, 15 stiffness clamp, 16
+// broad phase equals all pairs, 17 gravity and drag levels, 18 schema-1 migration. The exact bounds (the five-box
+// stack, the undamped and damped oscillators, the clamp, brute-force equality on 50 scenes) are proved by the core's
+// `StackFixtureTests`, `SpringWorldTests`, `MigrationTests` and VisualCore's `Springs2DTests` and `BroadPhase2DTests`;
+// `PlaygroundManifestTests` checks each fixture's end state.
 #if DEBUG || VISUALCORE_AUTOMATION
 import PhysicsPlaygroundCore
 import VisualCoreExperience
@@ -24,21 +33,41 @@ extension PlaygroundCore {
     /// The number of host steps the replay fixture plays.
     public static let replaySteps = 600
 
-    /// The number of drops of the body-cap fixture that are accepted (the starting scene holds 7 bodies; 41 more make
-    /// 48).
-    public static let capDrops = PhysicsWorld.maxBodies - 7
+    /// The number of bodies of the starting scene (the ledge, six seeded bodies, the hanging box and the two joined
+    /// circles).
+    public static let startingBodies = 10
 
-    /// The actions of input-response, save-restore and reset: drop a circle, drop a box, half speed, pause, one step.
+    /// The number of drops of the body-cap fixture that are accepted (the starting scene holds 10 bodies; 38 more make
+    /// 48).
+    public static let capDrops = PhysicsWorld.maxBodies - startingBodies
+
+    /// The host steps of the long fixtures (11–15): 10 s at 1×.
+    public static let settleSteps = 1_200
+
+    /// The host steps fixture 13 runs under Earth gravity before switching gravity and drag off (0.5 s), so the
+    /// springs start out stretched and moving.
+    public static let energyLeadSteps = 60
+
+    /// The host steps of each segment of fixture 17 (1 s at 1×).
+    public static let levelSegmentSteps = 120
+
+    /// The host steps fixture 16 runs after its drops.
+    public static let broadPhaseSteps = 240
+
+    /// The actions of input-response, save-restore and reset: drop a circle, drop a box, stiffer springs, half speed,
+    /// pause, one step.
     public static var inputEntries: [ScenarioStep] {
         [ScenarioStep(steps: 20, action: ScriptedAction("world.drop", [0]), result: "accepted"),
          ScenarioStep(steps: 40, action: ScriptedAction("world.drop", [1]), result: "accepted"),
-         ScenarioStep(steps: 20, action: ScriptedAction("world.timeScale", [1]), result: "accepted"),
+         ScenarioStep(steps: 10, action: ScriptedAction("world.stiffness", [2]), result: "accepted"),
+         ScenarioStep(steps: 10, action: ScriptedAction("world.timeScale", [1]), result: "accepted"),
          ScenarioStep(steps: 20, action: ScriptedAction("world.pause", [1]), result: "accepted"),
          ScenarioStep(steps: 0, action: ScriptedAction("world.step"), result: "accepted")]
     }
 
     /// The entries of rejection: a pause value out of range, a fractional pause, a fractional and an out-of-range time
-    /// scale, a single step while running, a reset carrying a value and a fractional drop.
+    /// scale, a single step while running, a reset carrying a value, a fractional drop, a fractional gravity, an
+    /// out-of-range drag and a fractional stiffness.
     public static var rejectionEntries: [ScenarioStep] {
         [ScenarioStep(steps: 0, action: ScriptedAction("world.pause", [2]), result: "action.out-of-range"),
          ScenarioStep(steps: 0, action: ScriptedAction("world.pause", [0.5]),
@@ -50,6 +79,11 @@ extension PlaygroundCore {
                       result: "action.rule." + PlaygroundRule.notPaused),
          ScenarioStep(steps: 0, action: ScriptedAction("world.reset", [1]), result: "action.wrong-value-count"),
          ScenarioStep(steps: 0, action: ScriptedAction("world.drop", [0.5]),
+                      result: "action.rule." + PlaygroundRule.invalidChoice),
+         ScenarioStep(steps: 0, action: ScriptedAction("world.gravity", [1.5]),
+                      result: "action.rule." + PlaygroundRule.invalidChoice),
+         ScenarioStep(steps: 0, action: ScriptedAction("world.drag", [3]), result: "action.out-of-range"),
+         ScenarioStep(steps: 0, action: ScriptedAction("world.stiffness", [2.25]),
                       result: "action.rule." + PlaygroundRule.invalidChoice)]
     }
 
@@ -91,9 +125,9 @@ extension PlaygroundCore {
         return builder.finish().hex
     }
 
-    /// The entries of the ten fixtures (research D5):
+    /// The entries of the eighteen fixtures (research D5 of features 082 and 083):
     /// 1. free fall: a circle dropped at step 0, then 120 host steps (1 s at 1×); the 1 % free-fall property without
-    ///    drag is proved by `PhysicsFixtureTests` (an action cannot switch the drag off);
+    ///    drag is proved by `PhysicsFixtureTests` and, through the level actions, by fixture 17;
     /// 2. two-body momentum: two circles dropped, then 240 steps; the head-on elastic exchange (momentum within 1e-9
     ///    relative, velocities within 2 %) is proved by `PhysicsFixtureTests`;
     /// 3. static zero mass: a box dropped, then 1,000 steps in which bodies land on and around the ledge; the ledge
@@ -110,8 +144,27 @@ extension PlaygroundCore {
     ///    host steps the same way; `PlaygroundSessionTests` suspends and resumes a session);
     /// 9. catalog: two circles and two boxes dropped, then 200 steps; every body names a material of the validated
     ///    bundled catalog (the refusals of malformed catalogs are proved by `MaterialCatalogTests`);
-    /// 10. body cap: 41 drops, 10 steps apart, fill the world to 48 bodies; the 42nd drop is refused with
-    ///    `a11.body-cap`; then 60 steps.
+    /// 10. body cap: 38 drops, 10 steps apart, fill the world to 48 bodies; the 39th drop is refused with
+    ///    `a11.body-cap`; then 60 steps;
+    /// 11. resting pile: five boxes dropped 30 steps apart with high drag, then 1,200 steps (10 s); the bodies come to
+    ///    rest in contact (the five-box stack bound, drift < 2 cm and sink < 1 cm, is `StackFixtureTests`');
+    /// 12. spring equilibrium: stiffness level 2 (150 N/m), then 1,200 steps; the hanging box rests within 2 % of
+    ///    m·g/k' below its rest length;
+    /// 13. spring energy: 60 steps under Earth gravity stretch the springs, then gravity and drag off and 1,200 steps;
+    ///    with no gravity and no drag only the springs' own damping (ratio 0.1) and the contacts remove energy, so the
+    ///    total energy never rises above its value at the switch (the undamped 2 % band is `Springs2DTests`');
+    /// 14. damped spring energy: soft springs (level 0) and high drag, then 1,200 steps; the hanging box's motion dies
+    ///    away (the 0.1 %/s and 10 % bounds at ζ = 0.5 are `Springs2DTests`');
+    /// 15. stiffness clamp: level 3 (400 N/m), above the stable bound 0.1·m/dt² of the hanging box and the joined
+    ///    circles, then 1,200 steps; every number stays finite and the box rests at the clamped stretch m·g/k';
+    /// 16. broad phase equals all pairs: three circles and three boxes dropped, then 240 steps; the world equals the
+    ///    same ticks run with every pair tested (`ContactPairing.allPairs`);
+    /// 17. gravity and drag levels: Moon gravity and no drag with a circle dropped, 120 steps; then gravity off and
+    ///    high drag, 120 steps; then Earth and low drag, 120 steps; the settings follow the levels, the circle falls at
+    ///    1.62 m/s² and then slows as e^(−t);
+    /// 18. schema-1 migration: the A11-P01 actions the stored schema-1 example was saved after (a circle and a box
+    ///    dropped, half speed, pause), 30 paused steps, then running for 60 steps; the stored example
+    ///    (`schemaOneExample()`) restores through the step 1 → 2 with the same generator and dropped bodies.
     public static var fixtureEntries: [[ScenarioStep]] {
         func act(_ control: String, _ values: [Double] = [], steps: Int = 0,
                  result: String = "accepted") -> ScenarioStep {
@@ -134,6 +187,21 @@ extension PlaygroundCore {
             [act("world.drop", [0]), act("world.drop", [1]), act("world.drop", [0]), act("world.drop", [1]),
              ScenarioStep(steps: 200)],
             cap,
+            [act("world.drag", [2])] + (0..<5).map { act("world.drop", [1], steps: $0 == 0 ? 0 : 30) }
+                + [ScenarioStep(steps: settleSteps)],
+            [act("world.stiffness", [2]), ScenarioStep(steps: settleSteps)],
+            [act("world.gravity", [0], steps: energyLeadSteps), act("world.drag", [0]),
+             ScenarioStep(steps: settleSteps)],
+            [act("world.stiffness", [0]), act("world.drag", [2]), ScenarioStep(steps: settleSteps)],
+            [act("world.stiffness", [3]), ScenarioStep(steps: settleSteps)],
+            [act("world.drop", [0]), act("world.drop", [1]), act("world.drop", [0]), act("world.drop", [1]),
+             act("world.drop", [0]), act("world.drop", [1]), ScenarioStep(steps: broadPhaseSteps)],
+            [act("world.gravity", [1]), act("world.drag", [0]), act("world.drop", [0]),
+             act("world.gravity", [0], steps: levelSegmentSteps), act("world.drag", [2]),
+             act("world.gravity", [2], steps: levelSegmentSteps), act("world.drag", [1]),
+             ScenarioStep(steps: levelSegmentSteps)],
+            schemaOneExampleActions.map { act($0.control, $0.values) }
+                + [act("world.pause", [0], steps: 30), ScenarioStep(steps: 60)],
         ]
     }
 

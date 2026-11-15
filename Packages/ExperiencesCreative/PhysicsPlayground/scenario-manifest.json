@@ -4,7 +4,10 @@
     "world.step",
     "world.timeScale",
     "world.reset",
-    "world.drop"
+    "world.drop",
+    "world.gravity",
+    "world.drag",
+    "world.stiffness"
   ],
   "experience" : "a11.physics-playground",
   "kind" : "creative",
@@ -14,7 +17,7 @@
 
       ],
       "expect" : {
-        "initialDigest" : "a6ad7f6e612d3265fbe6cb1d844bd5627c55737a5bc194371b4d7f04604d108d"
+        "initialDigest" : "a4eadeeacfc79c8b2524ca7b9f33a209396519f546e7c32a059b9319f2d14d36"
       },
       "name" : "launch-first-frame",
       "seed" : "7"
@@ -43,13 +46,23 @@
         },
         {
           "action" : {
+            "control" : "world.stiffness",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
             "control" : "world.timeScale",
             "values" : [
               1
             ]
           },
           "result" : "accepted",
-          "steps" : 20
+          "steps" : 10
         },
         {
           "action" : {
@@ -73,8 +86,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "152fa42c00a9b2eb08051a7a62c752ccc22392d252685bb71e2b8a0d7eb64de9",
-        "initialDigest" : "a6ad7f6e612d3265fbe6cb1d844bd5627c55737a5bc194371b4d7f04604d108d"
+        "finalDigest" : "92a87e34f5c3b3f197321d0f0f1e8726b9730c36cbc4cdf05c41787dfcb33537",
+        "initialDigest" : "a4eadeeacfc79c8b2524ca7b9f33a209396519f546e7c32a059b9319f2d14d36"
       },
       "name" : "input-response",
       "seed" : "7"
@@ -169,6 +182,36 @@
           },
           "result" : "action.rule.a11.invalid-choice",
           "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "world.gravity",
+            "values" : [
+              1.5
+            ]
+          },
+          "result" : "action.rule.a11.invalid-choice",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "world.drag",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "world.stiffness",
+            "values" : [
+              2.25
+            ]
+          },
+          "result" : "action.rule.a11.invalid-choice",
+          "steps" : 0
         }
       ],
       "expect" : {
@@ -201,13 +244,23 @@
         },
         {
           "action" : {
+            "control" : "world.stiffness",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
             "control" : "world.timeScale",
             "values" : [
               1
             ]
           },
           "result" : "accepted",
-          "steps" : 20
+          "steps" : 10
         },
         {
           "action" : {
@@ -231,8 +284,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "152fa42c00a9b2eb08051a7a62c752ccc22392d252685bb71e2b8a0d7eb64de9",
-        "initialDigest" : "a6ad7f6e612d3265fbe6cb1d844bd5627c55737a5bc194371b4d7f04604d108d"
+        "finalDigest" : "92a87e34f5c3b3f197321d0f0f1e8726b9730c36cbc4cdf05c41787dfcb33537",
+        "initialDigest" : "a4eadeeacfc79c8b2524ca7b9f33a209396519f546e7c32a059b9319f2d14d36"
       },
       "name" : "save-restore",
       "seed" : "7"
@@ -261,13 +314,23 @@
         },
         {
           "action" : {
+            "control" : "world.stiffness",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
             "control" : "world.timeScale",
             "values" : [
               1
             ]
           },
           "result" : "accepted",
-          "steps" : 20
+          "steps" : 10
         },
         {
           "action" : {
@@ -291,7 +354,7 @@
         }
       ],
       "expect" : {
-        "initialDigest" : "a6ad7f6e612d3265fbe6cb1d844bd5627c55737a5bc194371b4d7f04604d108d",
+        "initialDigest" : "a4eadeeacfc79c8b2524ca7b9f33a209396519f546e7c32a059b9319f2d14d36",
         "resetDigest" : true
       },
       "name" : "reset",
@@ -345,8 +408,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "af5f2b124376c94eedcabaf696ae21a7fdda0330950a590911497e7b741c1fbc",
-        "initialDigest" : "a6ad7f6e612d3265fbe6cb1d844bd5627c55737a5bc194371b4d7f04604d108d"
+        "finalDigest" : "a633193b82f4f3bf3021fe0195abbe72975d23bae98129e7d42815f48b6c6844",
+        "initialDigest" : "a4eadeeacfc79c8b2524ca7b9f33a209396519f546e7c32a059b9319f2d14d36"
       },
       "name" : "fixture-1",
       "seed" : "7"
@@ -378,8 +441,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "f55dafb17b3f7ae0d569e9e88a4c86d986a10b955b5935363a8a699daf104a9f",
-        "initialDigest" : "a6ad7f6e612d3265fbe6cb1d844bd5627c55737a5bc194371b4d7f04604d108d"
+        "finalDigest" : "5ca3fba733ee9717a314a19556103be06724d17d675d3b22ea2ea9f4c59fdd3c",
+        "initialDigest" : "a4eadeeacfc79c8b2524ca7b9f33a209396519f546e7c32a059b9319f2d14d36"
       },
       "name" : "fixture-2",
       "seed" : "7"
@@ -401,8 +464,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "4d403f4c77097daaefc005224a8e1981ad778aa0c241552185fbe90fefde5b86",
-        "initialDigest" : "a6ad7f6e612d3265fbe6cb1d844bd5627c55737a5bc194371b4d7f04604d108d"
+        "finalDigest" : "f9e4f952e8f71526d252172c602c3e5a51ae2dbc5ecf7dae77a47787d4bb4469",
+        "initialDigest" : "a4eadeeacfc79c8b2524ca7b9f33a209396519f546e7c32a059b9319f2d14d36"
       },
       "name" : "fixture-3",
       "seed" : "7"
@@ -524,8 +587,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "93daaffd60636bab57a74af5fcfe9aa0cf386ee2093c4428ec16223cfafc0127",
-        "initialDigest" : "a6ad7f6e612d3265fbe6cb1d844bd5627c55737a5bc194371b4d7f04604d108d"
+        "finalDigest" : "a59ef6f7c0f51c8052b4048de5ff7708409bc7bcca00d7bd9cac068caebd03ad",
+        "initialDigest" : "a4eadeeacfc79c8b2524ca7b9f33a209396519f546e7c32a059b9319f2d14d36"
       },
       "name" : "fixture-4",
       "seed" : "7"
@@ -647,8 +710,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "93daaffd60636bab57a74af5fcfe9aa0cf386ee2093c4428ec16223cfafc0127",
-        "initialDigest" : "a6ad7f6e612d3265fbe6cb1d844bd5627c55737a5bc194371b4d7f04604d108d"
+        "finalDigest" : "a59ef6f7c0f51c8052b4048de5ff7708409bc7bcca00d7bd9cac068caebd03ad",
+        "initialDigest" : "a4eadeeacfc79c8b2524ca7b9f33a209396519f546e7c32a059b9319f2d14d36"
       },
       "name" : "fixture-5",
       "seed" : "7"
@@ -720,8 +783,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "c222cace187d8d45ef2c57dcb572bed0688a81414ad1a2fb90b91d2520108b43",
-        "initialDigest" : "a6ad7f6e612d3265fbe6cb1d844bd5627c55737a5bc194371b4d7f04604d108d"
+        "finalDigest" : "86cf7debe9d59c6c1018e4cc530d0b1a0de9f9db0015522d9aadb71b78210438",
+        "initialDigest" : "a4eadeeacfc79c8b2524ca7b9f33a209396519f546e7c32a059b9319f2d14d36"
       },
       "name" : "fixture-6",
       "seed" : "7"
@@ -783,8 +846,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "79d2c3a42565fd18b2e7a84a82a265af4d2cc900b253ad6d75e736b574823cc0",
-        "initialDigest" : "a6ad7f6e612d3265fbe6cb1d844bd5627c55737a5bc194371b4d7f04604d108d"
+        "finalDigest" : "4a92d7fc3ac3053faa0ea92e18ad8cb55c3f7eb25a3470c93ae2cd88316188ae",
+        "initialDigest" : "a4eadeeacfc79c8b2524ca7b9f33a209396519f546e7c32a059b9319f2d14d36"
       },
       "name" : "fixture-7",
       "seed" : "7"
@@ -816,8 +879,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "cd586b5f0c7792c20e0ab4beacf1e4d61cb974b0ca3cb94d7bcecc60fe78d788",
-        "initialDigest" : "a6ad7f6e612d3265fbe6cb1d844bd5627c55737a5bc194371b4d7f04604d108d"
+        "finalDigest" : "431450c447775510e2b266dd5bc5b12238c30dfdb54dc295a38c605a1ca08e49",
+        "initialDigest" : "a4eadeeacfc79c8b2524ca7b9f33a209396519f546e7c32a059b9319f2d14d36"
       },
       "name" : "fixture-8",
       "seed" : "7"
@@ -869,8 +932,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "6b94ec1e7fcaa93e3c92632262daafea2e9e952395c23e3b79f23b513107560c",
-        "initialDigest" : "a6ad7f6e612d3265fbe6cb1d844bd5627c55737a5bc194371b4d7f04604d108d"
+        "finalDigest" : "4a4bdc3e7bf4eca63c8432f20bea7d0a850a79847835c042615501aab9b90ab6",
+        "initialDigest" : "a4eadeeacfc79c8b2524ca7b9f33a209396519f546e7c32a059b9319f2d14d36"
       },
       "name" : "fixture-9",
       "seed" : "7"
@@ -1264,8 +1327,31 @@
               0
             ]
           },
-          "result" : "accepted",
+          "result" : "action.rule.a11.body-cap",
           "steps" : 10
+        },
+        {
+          "steps" : 60
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "27576f6ea7323aaa70318a10a3a43b0099365da5aa437d2a4f79623e00a08be1",
+        "initialDigest" : "a4eadeeacfc79c8b2524ca7b9f33a209396519f546e7c32a059b9319f2d14d36"
+      },
+      "name" : "fixture-10",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "world.drag",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
         },
         {
           "action" : {
@@ -1275,7 +1361,192 @@
             ]
           },
           "result" : "accepted",
-          "steps" : 10
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "world.drop",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 30
+        },
+        {
+          "action" : {
+            "control" : "world.drop",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 30
+        },
+        {
+          "action" : {
+            "control" : "world.drop",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 30
+        },
+        {
+          "action" : {
+            "control" : "world.drop",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 30
+        },
+        {
+          "steps" : 1200
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "908b140384f70f8e524544fe5df7830d59d1337bde21972c65bc462b1eb51288",
+        "initialDigest" : "a4eadeeacfc79c8b2524ca7b9f33a209396519f546e7c32a059b9319f2d14d36"
+      },
+      "name" : "fixture-11",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "world.stiffness",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "steps" : 1200
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "ca101ec77834a652223c8be31237a0ccc1d0672c8cd2984e58a3b729de7d8d92",
+        "initialDigest" : "a4eadeeacfc79c8b2524ca7b9f33a209396519f546e7c32a059b9319f2d14d36"
+      },
+      "name" : "fixture-12",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "world.gravity",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 60
+        },
+        {
+          "action" : {
+            "control" : "world.drag",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "steps" : 1200
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "38ecb08d84371adf705632bb2c4c3bbd1d850605ea2a86dafd269bad05e81724",
+        "initialDigest" : "a4eadeeacfc79c8b2524ca7b9f33a209396519f546e7c32a059b9319f2d14d36"
+      },
+      "name" : "fixture-13",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "world.stiffness",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "world.drag",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "steps" : 1200
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "21b9eed2900fa7e8ca9b4245e8995360a513b12be7c8f900fc129765cc6a7342",
+        "initialDigest" : "a4eadeeacfc79c8b2524ca7b9f33a209396519f546e7c32a059b9319f2d14d36"
+      },
+      "name" : "fixture-14",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "world.stiffness",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "steps" : 1200
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "265c3ad4e319eb8d7c98bab6203404cfc93df4cabea04a58bda51cf6e03c95d3",
+        "initialDigest" : "a4eadeeacfc79c8b2524ca7b9f33a209396519f546e7c32a059b9319f2d14d36"
+      },
+      "name" : "fixture-15",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "world.drop",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "world.drop",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
         },
         {
           "action" : {
@@ -1285,7 +1556,17 @@
             ]
           },
           "result" : "accepted",
-          "steps" : 10
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "world.drop",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
         },
         {
           "action" : {
@@ -1294,18 +1575,174 @@
               0
             ]
           },
-          "result" : "action.rule.a11.body-cap",
-          "steps" : 10
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "world.drop",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "steps" : 240
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "2feca96d71c283a1870654eaf9d0de8654d91fbb4bdcf738ca1c226de5d040e5",
+        "initialDigest" : "a4eadeeacfc79c8b2524ca7b9f33a209396519f546e7c32a059b9319f2d14d36"
+      },
+      "name" : "fixture-16",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "world.gravity",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "world.drag",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "world.drop",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "world.gravity",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 120
+        },
+        {
+          "action" : {
+            "control" : "world.drag",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "world.gravity",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 120
+        },
+        {
+          "action" : {
+            "control" : "world.drag",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "steps" : 120
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "3858d760c1236813487f19396722adc3d53f2b7d3676a8ac07a975641d9310e9",
+        "initialDigest" : "a4eadeeacfc79c8b2524ca7b9f33a209396519f546e7c32a059b9319f2d14d36"
+      },
+      "name" : "fixture-17",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "world.drop",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "world.drop",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "world.timeScale",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "world.pause",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "world.pause",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 30
         },
         {
           "steps" : 60
         }
       ],
       "expect" : {
-        "finalDigest" : "1379e824602a28620f713c07ce8e49ccd5846b8fe6f275ae81777307907b8e90",
-        "initialDigest" : "a6ad7f6e612d3265fbe6cb1d844bd5627c55737a5bc194371b4d7f04604d108d"
+        "finalDigest" : "f6bdac3b0baa80149085769cd728e3a5fdd1ec096560a783fc5814282cd401e1",
+        "initialDigest" : "a4eadeeacfc79c8b2524ca7b9f33a209396519f546e7c32a059b9319f2d14d36"
       },
-      "name" : "fixture-10",
+      "name" : "fixture-18",
       "seed" : "7"
     }
   ],
