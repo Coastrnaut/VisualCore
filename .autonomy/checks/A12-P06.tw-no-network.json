@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "/bin/sh",
+    "-c",
+    "! grep -rnE 'URLSession|import Network|CLLocation|AVCapture|AVAudioRecorder|inputNode|installTap|CMMotion|CNContact|ASIdentifierManager|AppTrackingTransparency|UIScreen.main.brightness|isIdleTimerDisabled' Packages/ExperiencesCreative/TinyWorlds"
+  ],
+  "command": "/bin/sh -c '! grep -rnE '\"'\"'URLSession|import Network|CLLocation|AVCapture|AVAudioRecorder|inputNode|installTap|CMMotion|CNContact|ASIdentifierManager|AppTrackingTransparency|UIScreen.main.brightness|isIdleTimerDisabled'\"'\"' Packages/ExperiencesCreative/TinyWorlds'",
+  "elapsed_seconds": 0.033,
+  "exit_code": 0,
+  "finished": "2026-11-15T16:39:00+00:00",
+  "log": ".autonomy/logs/A12-P06.tw-no-network.log",
+  "log_sha256": "f6c30290628dd15ff5b4caa65b1194f08ef1f0af2e32c5e21423c4740d1d2fa3",
+  "name": "tw-no-network",
+  "stage": "A12-P06",
+  "started": "2026-11-15T16:39:00+00:00",
+  "timed_out": false
+}
