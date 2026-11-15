@@ -8,7 +8,7 @@ open until ImplementationLock-100. Precedents: `specs/078-na-p04-scores/tasks.md
 
 ## Phase 1: Setup
 
-- [ ] T-A10-501 Baseline: cite the A10-P04 evidence on the unchanged tree (`.autonomy/checks/A10-P04.{arcade-ios27,app-ui,verify-27}.json`) instead of a rerun (owner ruling of 2026-11-14)
+- [X] T-A10-501 Baseline: cite the A10-P04 evidence on the unchanged tree (`.autonomy/checks/A10-P04.{arcade-ios27,app-ui,verify-27}.json`) instead of a rerun (owner ruling of 2026-11-14) — Verified 2026-11-14: 2026-11-14: cited .autonomy/checks/A10-P04.{arcade-ios27,app-ui,verify-27}.json on the unchanged tree (no rerun)
 
 ## Phase 2: Foundational — budgets, contrast and balance in the core
 
