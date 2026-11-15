@@ -7,6 +7,10 @@
 // refused step changes nothing. Steps are whole days, so any sequence of steps followed by its reverse returns exactly
 // to the start in `Double`. `label` is the UTC calendar date `yyyy-MM-dd`, computed with a Gregorian calendar in the
 // UTC time zone (locale en_US_POSIX), so it is the same on every device.
+//
+// Feature 106 (A14-P04) T-A14-404 (FR-A14-401; clarification Q1) adds `labelWithTime`, "yyyy-MM-dd HH:mm UTC"
+// ("2000-01-01 12:00 UTC" for day 0) with the same calendar, the instant rounded to the nearest second first so that a
+// clock advanced in 1/120-day steps never shows a minute short.
 import Foundation
 
 /// Why a date step was refused.
@@ -66,5 +70,15 @@ public struct SimulatedDate: Equatable, Hashable, Sendable {
     public var label: String {
         let parts = Self.utcCalendar.dateComponents([.year, .month, .day], from: date)
         return String(format: "%04d-%02d-%02d", parts.year ?? 0, parts.month ?? 0, parts.day ?? 0)
+    }
+
+    /// The UTC calendar date and time `yyyy-MM-dd HH:mm UTC` ("2000-01-01 12:00 UTC" for day 0), from the instant
+    /// rounded to the nearest second.
+    public var labelWithTime: String {
+        let seconds = (date.timeIntervalSince1970).rounded()
+        let parts = Self.utcCalendar.dateComponents([.year, .month, .day, .hour, .minute],
+                                                    from: Date(timeIntervalSince1970: seconds))
+        return String(format: "%04d-%02d-%02d %02d:%02d UTC", parts.year ?? 0, parts.month ?? 0, parts.day ?? 0,
+                      parts.hour ?? 0, parts.minute ?? 0)
     }
 }
