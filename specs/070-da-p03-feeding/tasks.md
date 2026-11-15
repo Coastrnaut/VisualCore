@@ -52,4 +52,4 @@ MVP: feeding (core and tap); then decor editing; then the save and resume fixtur
 
 ## Phase 7: Convergence
 
-- [ ] T-A09-316 Update the doc comments in `Packages/ExperiencesCreative/DigitalAquarium/Experience/Adapter/AquariumCore.swift` that still call schema 2 current (header lines 26–28, `schemaOneExample` doc at 191, `snapshotPayload` at 358, `restore(payload:seed:)` at 363) to snapshot schema 3 (chain 1 → 2 → 3) with the habitat document migrated to schema 3 per FR-A09-320 (partial)
+- [X] T-A09-316 Update the doc comments in `Packages/ExperiencesCreative/DigitalAquarium/Experience/Adapter/AquariumCore.swift` that still call schema 2 current (header lines 26–28, `schemaOneExample` doc at 191, `snapshotPayload` at 358, `restore(payload:seed:)` at 363) to snapshot schema 3 (chain 1 → 2 → 3) with the habitat document migrated to schema 3 per FR-A09-320 (partial) — Verified 2026-11-14: 2026-11-14: AquariumCore doc comments name snapshot schema 3 (chain 1 → 2 → 3, document schema 3, decoration kind refusal); DigitalAquariumExperienceTests 55 + 4 pass on sim-27.2

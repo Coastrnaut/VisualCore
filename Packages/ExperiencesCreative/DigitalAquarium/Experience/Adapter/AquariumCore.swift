@@ -23,14 +23,15 @@
 // A choice value that is not a whole number naming an entry is refused with the rule `a09.invalid-choice`; a refusal
 // changes nothing.
 //
-// Snapshot schema 2 (feature 069, A09-P02, T-A09-206; FR-A09-212): `AquariumState` as JSON with sorted keys; the
-// preparation seed and the schema version come from the snapshot envelope. Schema 2 adds the fish `turn` and the decor
-// rotation and scale (habitat document schema 2). A schema-1 payload passes the migration step unchanged and its
-// document is migrated by `HabitatDocument.migrated(catalog:)` on restore (missing fields take 0, 0 and 1; the
-// habitat's starter decor is added when the document has none); `schemaOneExample()` is the stored schema-1 payload
-// the registry's migration check restores. A payload whose (migrated) document does not validate, whose habitat
-// index or lighting level names no entry, whose step count is negative or whose generator state is malformed is
-// refused (the restore throws). One quality tier (`level-0`).
+// Snapshot schema 3 (features 069 and 070; FR-A09-212, FR-A09-320): `AquariumState` as JSON with sorted keys; the
+// preparation seed and the schema version come from the snapshot envelope. Schema 2 added the fish `turn` and the decor
+// rotation and scale, schema 3 the pellets (habitat document schema 3, `food`) and the chosen decoration kind
+// (`decorKind`). The chain carries a schema-1 payload unchanged and gives a schema-2 payload `decorKind` 0; the
+// document is migrated to schema 3 by `HabitatDocument.migrated(catalog:)` on restore (missing fields take their
+// defaults; a schema-1 document without decor gets the habitat's starter decor). `schemaOneExample()` and
+// `schemaTwoExample()` are the stored payloads the registry's migration check restores. A payload whose (migrated)
+// document does not validate, whose habitat index, lighting level or decoration kind names no entry, whose step count
+// is negative or whose generator state is malformed is refused (the restore throws). One quality tier (`level-0`).
 import Foundation
 import DigitalAquariumCore
 import VisualCoreExperience
@@ -188,7 +189,7 @@ public struct AquariumCore: ExperienceCore, Equatable {
     /// The stored example of schema 1 for the registry's migration check (feature 069, T-A09-206): the A09-P01 payload
     /// of the Kelp habitat at bright lighting after 120 steps — written as A09-P01 wrote it (habitat document schema 1,
     /// no `turn`, `rotation` or `scale`, no decor) — with the digest its restore must give: the same aquarium with its
-    /// document migrated (schema 2, the Kelp starter decor). Nil only if the encoding failed.
+    /// document migrated (schema 3, the Kelp starter decor, no pellets). Nil only if the encoding failed.
     public static func schemaOneExample(seed: UInt64 = 7) -> MigrationExample? {
         guard let id = ExperienceID(rawValue: experienceID) else { return nil }
         var core = AquariumCore(seed: seed)
@@ -355,15 +356,15 @@ public struct AquariumCore: ExperienceCore, Equatable {
         builder.add("a09.aquarium.v1|" + text)
     }
 
-    /// The aquarium state (schema 2) as JSON with sorted keys.
+    /// The aquarium state (schema 3) as JSON with sorted keys.
     public func snapshotPayload() throws -> Data {
         try Self.encode(state)
     }
 
-    /// The core of a payload (schema 2, or schema 1 carried over by ``migrations``) with the envelope's `seed` as
-    /// preparation seed; its document is migrated to schema 2 first. A payload that does not decode, a migrated
-    /// document that does not validate, an unknown habitat, a lighting level outside 0…2, a negative step count or a
-    /// malformed generator state is refused (throws).
+    /// The core of a payload (schema 3, or schema 1 or 2 carried over by ``migrations``) with the envelope's `seed` as
+    /// preparation seed; its document is migrated to schema 3 first. A payload that does not decode, a migrated
+    /// document that does not validate, an unknown habitat, a lighting level outside 0…2, a negative step count, a
+    /// decoration kind outside the catalog or a malformed generator state is refused (throws).
     public static func restore(payload: Data, seed: UInt64) throws -> AquariumCore {
         var state = try JSONDecoder().decode(AquariumState.self, from: payload)
         state.document = state.document.migrated(catalog: catalog)
