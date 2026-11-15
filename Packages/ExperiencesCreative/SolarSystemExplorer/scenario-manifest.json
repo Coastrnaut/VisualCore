@@ -8,7 +8,15 @@
     "camera.tilt",
     "camera.zoom",
     "view.reset",
-    "scale.mode"
+    "scale.mode",
+    "time.play",
+    "time.rate",
+    "date.set",
+    "tour.start",
+    "tour.next",
+    "tour.pause",
+    "tour.stop",
+    "view.apply"
   ],
   "experience" : "a14.solar-system-explorer",
   "kind" : "creative",
@@ -18,7 +26,7 @@
 
       ],
       "expect" : {
-        "initialDigest" : "3c51838205e63d305f15510e2fbc7f09e671d26f0b2228cd044c08f02351f011"
+        "initialDigest" : "60fc5f6d465004daabc637a7f530564a56735961bff918b89f08fc6352156843"
       },
       "name" : "launch-first-frame",
       "seed" : "1"
@@ -117,6 +125,36 @@
         },
         {
           "action" : {
+            "control" : "time.rate",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "time.play",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "time.play",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
             "control" : "body.select",
             "values" : [
               8
@@ -127,8 +165,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "7a1a90a70160571318ca023d26dac84b432873e0bf48e0e64a603699c41dafa2",
-        "initialDigest" : "3c51838205e63d305f15510e2fbc7f09e671d26f0b2228cd044c08f02351f011"
+        "finalDigest" : "706006ab3a5a4dcdad0732139ded75bafb1718334be6d51b41f7c87653a66fd2",
+        "initialDigest" : "60fc5f6d465004daabc637a7f530564a56735961bff918b89f08fc6352156843"
       },
       "name" : "input-response",
       "seed" : "1"
@@ -363,6 +401,42 @@
           },
           "result" : "action.out-of-range",
           "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "tour.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.a14.no-tour",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "time.rate",
+            "values" : [
+              4
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "view.apply",
+            "values" : [
+              3,
+              10,
+              1,
+              2,
+              40,
+              3,
+              0
+            ]
+          },
+          "result" : "action.rule.a14.out-of-range",
+          "steps" : 0
         }
       ],
       "expect" : {
@@ -465,6 +539,36 @@
         },
         {
           "action" : {
+            "control" : "time.rate",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "time.play",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "time.play",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
             "control" : "body.select",
             "values" : [
               8
@@ -475,8 +579,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "7a1a90a70160571318ca023d26dac84b432873e0bf48e0e64a603699c41dafa2",
-        "initialDigest" : "3c51838205e63d305f15510e2fbc7f09e671d26f0b2228cd044c08f02351f011"
+        "finalDigest" : "706006ab3a5a4dcdad0732139ded75bafb1718334be6d51b41f7c87653a66fd2",
+        "initialDigest" : "60fc5f6d465004daabc637a7f530564a56735961bff918b89f08fc6352156843"
       },
       "name" : "save-restore",
       "seed" : "1"
@@ -575,6 +679,36 @@
         },
         {
           "action" : {
+            "control" : "time.rate",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "time.play",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "time.play",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
             "control" : "body.select",
             "values" : [
               8
@@ -585,7 +719,7 @@
         }
       ],
       "expect" : {
-        "initialDigest" : "3c51838205e63d305f15510e2fbc7f09e671d26f0b2228cd044c08f02351f011",
+        "initialDigest" : "60fc5f6d465004daabc637a7f530564a56735961bff918b89f08fc6352156843",
         "resetDigest" : true
       },
       "name" : "reset",
@@ -636,8 +770,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "3193c17a1b3dc910ffd62e7714d377852876c5492e8f22fe5098846fc7e22ba5",
-        "initialDigest" : "3c51838205e63d305f15510e2fbc7f09e671d26f0b2228cd044c08f02351f011",
+        "finalDigest" : "613818279c3df5c82a3a88c7d0d7ff3eade77c5182da678f7d75daa3342949ae",
+        "initialDigest" : "60fc5f6d465004daabc637a7f530564a56735961bff918b89f08fc6352156843",
         "outcome" : "viewing-mercury"
       },
       "name" : "fixture-mercury",
@@ -657,8 +791,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "c8ea2956122ee2307ad95c59cc4373af0a5afe602397334387dc4ae98aa1dda1",
-        "initialDigest" : "3c51838205e63d305f15510e2fbc7f09e671d26f0b2228cd044c08f02351f011",
+        "finalDigest" : "c13fa430307c326b790621e986a95d300404e59edd1e6ede1cbf78f163b5c802",
+        "initialDigest" : "60fc5f6d465004daabc637a7f530564a56735961bff918b89f08fc6352156843",
         "outcome" : "viewing-earth"
       },
       "name" : "fixture-earth",
@@ -678,8 +812,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "7bb2d6b2db0a1d4b406647fa5a643d1790e3256b0bacbc2b6b4288fcd4d4335d",
-        "initialDigest" : "3c51838205e63d305f15510e2fbc7f09e671d26f0b2228cd044c08f02351f011",
+        "finalDigest" : "02ddb707011f09b97bf14f798551d48f24aabeaf4decadb80b45d590366f257b",
+        "initialDigest" : "60fc5f6d465004daabc637a7f530564a56735961bff918b89f08fc6352156843",
         "outcome" : "viewing-jupiter"
       },
       "name" : "fixture-jupiter",
@@ -699,8 +833,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "dbea97dfd17d2d7b7f1b8d23532882f0c6d6a7697a7f9f040cd1a888ffe535d7",
-        "initialDigest" : "3c51838205e63d305f15510e2fbc7f09e671d26f0b2228cd044c08f02351f011",
+        "finalDigest" : "0de1cee6d52524bcab4ab37af15b29f3bb5a09a1a5b64acc5902c2d5fbf6b682",
+        "initialDigest" : "60fc5f6d465004daabc637a7f530564a56735961bff918b89f08fc6352156843",
         "outcome" : "viewing-saturn"
       },
       "name" : "fixture-saturn",
@@ -720,8 +854,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "0c626a905221f5b4669ef9d0b5fea76612cb727a58cc8fde89e5ddb73aad7eb8",
-        "initialDigest" : "3c51838205e63d305f15510e2fbc7f09e671d26f0b2228cd044c08f02351f011",
+        "finalDigest" : "eb36276ffe20fe6fff6c0a61ed7dc45761b996e82eea5f83a0e27728a33c874e",
+        "initialDigest" : "60fc5f6d465004daabc637a7f530564a56735961bff918b89f08fc6352156843",
         "outcome" : "viewing-neptune"
       },
       "name" : "fixture-neptune",
@@ -1061,11 +1195,69 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "ea08f6c2aa76932347679c72f450b4479ee5c89e26cbf9c155da5fce820e094f",
-        "initialDigest" : "3c51838205e63d305f15510e2fbc7f09e671d26f0b2228cd044c08f02351f011",
+        "finalDigest" : "32ccf87a65c561b8183577a1103b6f6125cc1188d1400fe0d1ceae1896a8d1e6",
+        "initialDigest" : "60fc5f6d465004daabc637a7f530564a56735961bff918b89f08fc6352156843",
         "outcome" : "viewing-earth"
       },
       "name" : "fixture-earth-2025",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "time.rate",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "time.play",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "steps" : 120
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "384dc044a3a3c8ebed85a7472b05ce2e7c9e0adc7b03e6ea6aa47bfdde256c47",
+        "initialDigest" : "60fc5f6d465004daabc637a7f530564a56735961bff918b89f08fc6352156843",
+        "outcome" : "viewing-sun"
+      },
+      "name" : "fixture-play-year",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "tour.start",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "steps" : 600
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "fa8e138800987b44cedb7860d84400afa62113102de170416be8f8f09792bdf8",
+        "initialDigest" : "60fc5f6d465004daabc637a7f530564a56735961bff918b89f08fc6352156843",
+        "outcome" : "viewing-mercury"
+      },
+      "name" : "fixture-tour-inner",
       "seed" : "1"
     },
     {
@@ -1092,8 +1284,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "22ef219c0ccaa9e251d96595018ef68a9d1b28c2f0acd2c04c9d621215cb1d84",
-        "initialDigest" : "3c51838205e63d305f15510e2fbc7f09e671d26f0b2228cd044c08f02351f011",
+        "finalDigest" : "65cfd222be2b1fc30e94fd5eb119ae84ce1e12daa772b9fac698fad722067af7",
+        "initialDigest" : "60fc5f6d465004daabc637a7f530564a56735961bff918b89f08fc6352156843",
         "outcome" : "viewing-earth"
       },
       "name" : "fixture-earth-true-scale",

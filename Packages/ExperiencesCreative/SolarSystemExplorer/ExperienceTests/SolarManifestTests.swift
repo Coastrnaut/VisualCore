@@ -5,7 +5,8 @@
 // final digest; and the committed `scenario-manifest.json` equal to the Swift manifest (`UPDATE_SCENARIO_MANIFEST=1`,
 // on the simulator `TEST_RUNNER_UPDATE_SCENARIO_MANIFEST=1`, rewrites it). Feature 104 (A14-P02) T-A14-209 adds the
 // dated fixture `fixture-earth-2025` (Earth, then date steps to day 9,132) with its committed digest; feature 105
-// (A14-P03) T-A14-309 the true-scale fixture `fixture-earth-true-scale`.
+// (A14-P03) T-A14-309 the true-scale fixture `fixture-earth-true-scale`; feature 106 (A14-P04) T-A14-407 the
+// fixtures `fixture-play-year` and `fixture-tour-inner`.
 import Foundation
 import Testing
 @testable import SolarSystemExplorerExperience
@@ -39,11 +40,12 @@ private func play(_ spec: ScenarioSpec) async throws -> (initial: String, result
     @Test func theManifestIsValidWithTheStandardScenariosAndFiveFixtures() {
         let manifest = SolarCore.manifest(for: id)
         let problems = ScenarioManifestValidator.problems(manifest, controls: SolarCore.controls,
-                                                          content: ContentRequirement(fixtures: 7))
+                                                          content: ContentRequirement(fixtures: 9))
         #expect(problems.isEmpty, "\(problems)")
         #expect(manifest.scenarios.map(\.name)
                 == ScenarioManifest.standardNames + Self.fixtureNames
-                + [SolarCore.datedFixtureName, SolarCore.trueScaleFixtureName])
+                + [SolarCore.datedFixtureName, "fixture-play-year", "fixture-tour-inner",
+                   SolarCore.trueScaleFixtureName])
         #expect(SolarCore.selectedFixtures.map { SolarCore.fixtureName(body: $0.body) } == Self.fixtureNames)
         #expect(manifest.kind == .creative)
         #expect(manifest.experience == id)
@@ -124,6 +126,25 @@ private func play(_ spec: ScenarioSpec) async throws -> (initial: String, result
         #expect(core.selection == 3 && core.state.scaleMode == .trueRelative)
         let earth = SolarCore.selectedFixtures.first { $0.body == 3 }?.digest
         #expect(earth != SolarCore.trueScaleFixtureDigest, "the mode changes the digest")
+    }
+
+    @Test func theTimeFixturesPlayAndTourWithTheirCommittedDigests() async throws {
+        let manifest = SolarCore.manifest(for: id)
+        for fixture in SolarCore.timeFixtures {
+            let spec = try #require(manifest.scenarios.first { $0.name == fixture.name })
+            #expect(spec.expect.finalDigest == fixture.digest, "\(fixture.name)")
+            let derived = SolarCore.expectedDigest(for: id, seed: SolarCore.manifestSeed,
+                                                   entries: SolarCore.timeFixtureEntries(fixture.name))
+            #expect(derived == fixture.digest, "\(fixture.name): derived \(derived ?? "nil")")
+            let played = try await play(spec)
+            #expect(played.final == fixture.digest, "\(fixture.name): played \(played.final)")
+            let core = try #require(played.core)
+            if fixture.name == "fixture-play-year" {
+                #expect(abs(core.state.dayOffset - 365) < 1e-9 && core.state.playing)
+            } else {
+                #expect(core.state.tourIndex == 0 && core.state.tourStop == 1 && core.selection == 1)
+            }
+        }
     }
 
     /// The JSON form with the control ids, named by `Catalog/registrations.json`. `UPDATE_SCENARIO_MANIFEST=1`
