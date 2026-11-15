@@ -39,7 +39,7 @@ Packages/ExperiencesCreative/LightMaze/ExperienceTests/Fixtures/progress-{valid,
 Packages/ExperiencesCreative/Package.swift (LightMazeExperienceTests resources: [.copy("Fixtures")])             modify
 Apps/VisualCore/Tests/UI/LightMaze/{LMSupport,LMLevelUITests,LMHelpUITests}.swift                              new
 scripts/release_check.py (chunk "u2", serial)                                                                  modify
-project.yml (only if the UI test folder must be listed; xcodegen generate)                                      check
+project.yml: no change (its UI target takes Apps/VisualCore/Tests/UI as a folder); `xcodegen generate` (T-A13-610)
 ```
 
 **Dependency direction**: unchanged. **Lifecycle**: `failNextDraw` (internal, test-only) makes the next `draw` throw
