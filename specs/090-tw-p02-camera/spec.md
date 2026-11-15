@@ -121,8 +121,8 @@ by pointing (A12-P03).
 
 **Acceptance Scenarios**:
 
-1. **Given** a tap on the terrain, **When** resolved, **Then** the reported point lies on the terrain within a small
-   tolerance and the spoken text names it.
+1. **Given** a tap on the terrain, **When** resolved, **Then** the reported point lies on the terrain within 1 mm
+   (vertical distance to the sampled height) and the spoken text names it.
 2. **Given** a tap on the sky or void, **When** resolved, **Then** a miss is reported and nothing changes.
 
 ---
@@ -200,7 +200,7 @@ an existing vertex — and that the experience can switch between them without c
   and keep the clearance.
 - **SC-A12-202**: Ray intersection matches analytic answers within 1e-9 for all tested box, sphere and triangle cases.
 - **SC-A12-203**: 100 % of the 27 detail meshes (3 presets × 3 seeds × 3 levels) validate with all indices in bounds.
-- **SC-A12-204**: Coloured regions match their palette colours within the stated pixel tolerance; meshes without
+- **SC-A12-204**: Coloured regions match their lit palette colours within ±8 of 255 per channel; meshes without
   colours are pixel-identical to before.
 - **SC-A12-205**: Every camera gesture has a control alternative (0 missing); the runner's nine scenarios pass on
   iOS 27; every test runs in under 10 s.
