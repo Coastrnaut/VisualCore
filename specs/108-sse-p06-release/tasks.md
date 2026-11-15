@@ -36,7 +36,7 @@ X-A14. Precedent: `specs/101-lm-p06-release/tasks.md`.
 ## Phase 6: Records
 
 - [X] T-A14-613 Script tests (`--name script-tests -- python3 scripts/test_scripts.py`) — Verified 2026-11-15: .autonomy/checks/A14-P06.script-tests.json exit 0 (scripts/test_scripts.py, which loads release_check.py and lists its steps, the new chunk v2 among them)
-- [ ] T-A14-614 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A14-P06 (owner and device items stay open as BLOCKED_OWNER_ACTION and pending-campaign-ii); update README.md (rule 16) and `docs/automatedtesting.md` if a tool, rule or lesson changed (rule 17)
+- [X] T-A14-614 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A14-P06 (owner and device items stay open as BLOCKED_OWNER_ACTION and pending-campaign-ii); update README.md (rule 16) and `docs/automatedtesting.md` if a tool, rule or lesson changed (rule 17) — Verified 2026-11-15: /speckit-converge round 1 appended nothing (15 FR, 5 SC, 4 stories checked; every one proved by A14-P06 checks: sse-no-network, sse-claims, sse-ios27-3, app-ui-2, verify-27, release-checks, script-tests, all exit 0); sealed .autonomy/evidence/A14-P06.json (the failed app-ui attempt skipped) and recorded A14-P06 (VERIFIED-GATE; 108 pass); owner rows stay owner-action (BLOCKED_OWNER_ACTION) and device rows pending-campaign-ii
 
 ## Dependencies
 
