@@ -24,6 +24,54 @@ Canonical overrides:
 - **Owner rulings:** short tests; audits and device runs in the device campaign; iOS 27 at phase gates; reference
   regression and iOS 26 at X-A14; every Spec Kit step runs.
 
+## Clarifications
+
+### Session 2026-11-15
+
+Answered autonomously under the owner's standing delegation, recommended option each time. Facts checked in code:
+VisualCoreMath has no orbit propagation (A14-P00 audit); its additive types follow `Ray2` (A13-P01: `Sendable`,
+`Equatable`, failable initialisers refusing non-finite input, `///` on every symbol, host tests in
+`VisualCoreMathTests`); `OrbitCamera` clamps distance to 0.01…1,000,000 and pitch to ±89°; A14-P01's `SolarState` is
+schema 1 (selection only) with refusals `damaged`, `newer-version`, `out-of-range`; the catalog stores periods in days
+and AU through `Units.kmPerAU`.
+
+- Q: What does VisualCore offer, in which units and frame? → A: `VisualCoreMath.KeplerOrbit` (new, additive):
+  `init?(semiMajorAxis:eccentricity:inclination:ascendingNode:argumentOfPeriapsis:meanAnomalyAtEpoch:meanMotion:)`
+  (angles in radians, mean motion in radians per time unit; refuses non-finite values, e outside 0 ≤ e < 1, and
+  non-positive axis or motion); `static func eccentricAnomaly(meanAnomaly:eccentricity:) -> Double` (Newton's method
+  from E₀ = M for e < 0.8, else π, at most 32 steps, stops below 1e-12 rad); `position(at time:) -> Vec3` in the
+  orbit's reference frame (x toward the ascending-node reference direction, y 90° ahead in the reference plane, z
+  toward the plane's north), and `meanAnomaly(at:)`, `period`. Generic: any elliptical orbit, no planet data.
+- Q: Which elements, from where, under what license? → A: Mean J2000.0 elements of E. M. Standish, "Keplerian
+  Elements for Approximate Positions of the Major Planets" (JPL Solar System Dynamics, Table 1, valid 1800–2050):
+  a (AU), e, i, mean longitude L, longitude of perihelion ϖ, longitude of the ascending node Ω (degrees) — Mercury
+  0.38709927, 0.20563593, 7.00497902, 252.25032350, 77.45779628, 48.33076593; Venus 0.72333566, 0.00677672,
+  3.39467605, 181.97909950, 131.60246718, 76.67984255; Earth (Earth–Moon barycentre) 1.00000261, 0.01671123,
+  −0.00001531, 100.46457166, 102.93768193, 0.0; Mars 1.52371034, 0.09339410, 1.84969142, −4.55343205, −23.94362959,
+  49.55953891; Jupiter 5.20288700, 0.04838624, 1.30439695, 34.39644051, 14.72847983, 100.47390909; Saturn 9.53667594,
+  0.05386179, 2.48599187, 49.95424423, 92.59887831, 113.66242448; Uranus 19.18916464, 0.04725744, 0.77263783,
+  313.23810451, 170.95427630, 74.01692503; Neptune 30.06992276, 0.00859048, 1.77004347, −55.12002969, 44.96476227,
+  131.78422574. Recorded license `public-domain`: the elements are numerical facts published by a NASA laboratory;
+  the record states this basis. The mean motion is 2π / the catalog's sidereal period (no secular rates), so the
+  catalog and the orbits agree on periods.
+- Q: What is the date range, the start date and the fixture? → A: Days since J2000.0 (2000-01-01 12:00 UTC), allowed
+  −18,262.5 … +18,627.5 (1950-01-01 00:00 to 2050-12-31 00:00 UTC); start at 0. Steps ±1, ±30, ±365 days; others
+  refused `a14.invalid-step`; leaving the range refused `a14.out-of-range`. Fixture: Earth's heliocentric ecliptic
+  longitude at J2000.0 is 100.38° ± 0.3°; Earth's perihelion and aphelion distances 0.98329 and 1.01671 AU ± 0.2 %;
+  Mars between 1.381 and 1.666 AU ± 0.5 %; every planet back within 1e-6 rad of its start angle after one period; 100
+  steps forward and back exact; Kepler residual |E − e sin E − M| < 1e-10 for e ∈ {0, 0.2056, 0.5, 0.9, 0.95}.
+- Q: How is the orbit view drawn and navigated? → A: Scene plane x–z (ecliptic north = +y); display radius of a point
+  at r AU is 4·√r scene units in its direction (Mercury ≈ 2.5, Neptune ≈ 21.9), labelled "Distances and sizes not to
+  scale"; orbit lines are 128 samples of each orbit through the same mapping drawn as thin tubes; bodies at A14-P01's
+  display radii × 0.6 (the Sun × 0.5). Camera: `OrbitCamera` target = focused body (the Sun for the overview), yaw step
+  15°, pitch 5°…85° in 10° steps, distance 4…80 in factors of 1.25, overview yaw 0, pitch 35°, distance 60; focusing a
+  body keeps distance ≥ 3 × its display radius + 0.5 (in front of the near plane).
+- Q: What is the state and its migration? → A: State schema 2 = selection, `dayOffset` (days since J2000.0), camera
+  `yawSteps` (integer), `pitchDegrees` (5…85), `zoomSteps` (integer, distance 60 × 1.25^−n clamped 4…80). Actions:
+  `body.select/next/previous` (focus = selection), `date.step [days]`, `camera.orbit [±1]`, `camera.tilt [±1]`,
+  `camera.zoom [±1]`, `view.reset`. Schema 1 migrates with dayOffset 0 and the overview camera. The fact card gains
+  "Distance from the Sun on <date>: x AU (y km)".
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - See where the planets are on a date (Priority: P1) 🎯
