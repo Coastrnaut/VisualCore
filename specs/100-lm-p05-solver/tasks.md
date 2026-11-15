@@ -20,7 +20,7 @@ after every task (no trailers); read every check's exit before ticking. iOS 27 o
 
 ## Phase 4: Story 3 — drawn beam equals the traced beam (P2)
 
-- [ ] T-A13-504 [P] [US3] Experience test `Packages/ExperiencesCreative/LightMaze/ExperienceTests/MazeBeamFixtureTests.swift`: for each of the 20 levels at its start, with its recorded solution and with `Solver.solve`'s answer (60 boards), the core beam lines of `MazePresenter.scene(_:)` (ids `beam<i>` without `.halo`, line end points in cells under the root's scale) equal `core.beam.segments` one to one within 1e-9 (FR-A13-520; SC-A13-504)
+- [X] T-A13-504 [P] [US3] Experience test `Packages/ExperiencesCreative/LightMaze/ExperienceTests/MazeBeamFixtureTests.swift`: for each of the 20 levels at its start, with its recorded solution and with `Solver.solve`'s answer (60 boards), the core beam lines of `MazePresenter.scene(_:)` (ids `beam<i>` without `.halo`, line end points in cells under the root's scale) equal `core.beam.segments` one to one within 1e-9 (FR-A13-520; SC-A13-504) — Verified 2026-11-15: 2026-11-15: MazeBeamFixtureTests — the drawn core beam lines equal the tracer segments on 60 boards (20 levels × start, recorded solution, solver answer) pass in .autonomy/checks/A13-P05.maze-ios27.json exit 0 on sim-27.2 (LightMazeCoreTests 93, LightMazeExperienceTests 75, manifest 6)
 
 ## Phase 5: Records and evidence
 
