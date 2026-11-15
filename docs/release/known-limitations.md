@@ -206,6 +206,23 @@ and `VisualCoreRendering` (iOS, GL). ADR-0003 and the package map record this. R
   experiment file is refused with its reason and left in place until the person saves over it
   (`ExperimentStoreTests.testRefusedFilesAreReportedAndLeftUntouched`).
 
+### Tiny Worlds (A12; features 088–094)
+
+- Frame pacing at each detail tier (each pack with 24 props), the thermal state over a ten-minute session, the memory
+  high-water mark across pack switches and the touch latency of orbit and place are unmeasured on devices; they wait
+  for the device campaign ([device-campaign.md](../apps/tiny-worlds/device-campaign.md), rows TW-D1 to TW-D4). No
+  frame-time, latency, battery or memory figure is stated.
+- The system accessibility audits, Dynamic Type at the largest sizes on hardware and the VoiceOver pass on hardware
+  (row TW-D5) wait for the device campaign; the labels and values, the native control for every gesture, the spoken
+  view and pick descriptions and the Reduce Motion behaviour are proved by the experience's tests only.
+- The worlds are stylised dioramas generated from a seed, not maps of any place: the island, the asteroid garden and
+  the miniature city stand for no real location, and their heights, colours and light are artistic, not measured.
+- Three presets, four prop kinds and three packs in version 0.1; at most 24 props per world, a fixed world size and no
+  open-ended terrain or streaming; props can be moved, turned and deleted but not resized.
+- Four saved world slots with their thumbnails, kept on the device only (no sync, no export). A damaged, half-written,
+  too-large or newer world file is refused with its reason and left in place until the person saves over it
+  (`WorldStoreTests.testRefusedFilesAreReportedAndLeftUntouched`).
+
 ## Distribution
 
 - No App Store submission, signing or purchase setup is part of this release; those are owner actions.
