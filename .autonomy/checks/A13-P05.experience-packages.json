@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_experience_packages.py"
+  ],
+  "command": "python3 scripts/check_experience_packages.py",
+  "elapsed_seconds": 0.031,
+  "exit_code": 0,
+  "finished": "2026-11-15T19:18:15+00:00",
+  "log": ".autonomy/logs/A13-P05.experience-packages.log",
+  "log_sha256": "d4c9826221b95c45222047abc44cfc830651e29d408a213ce1bfb3da98b28f5d",
+  "name": "experience-packages",
+  "stage": "A13-P05",
+  "started": "2026-11-15T19:18:15+00:00",
+  "timed_out": false
+}
