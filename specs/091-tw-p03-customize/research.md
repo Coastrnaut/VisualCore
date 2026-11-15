@@ -21,7 +21,8 @@ Facts verified on 2026-11-15 (clarification session): `ExperimentStore` pattern 
 ## D4 — Document and slots (G-WORLDDOC)
 - **Decision**: `WorldState` schema 2; `WorldDocument` (`schema`, `name`, `state`) encoded as sorted-key JSON (≤ 64 KB);
   `WorldStore` with `save/read/clear/summaries` on `world-<slot>.json` and `world-<slot>.png`, refusals `damaged`,
-  `newer-version`, `too-large`; opening sends `world.open` with the document's state JSON as the replay record.
+  `newer-version`, `too-large`; opening restores a snapshot of the document's state through `ExperienceShell.restore` (engine actions carry
+  only numbers, so a whole state is never an action; Physics Playground opens slots the same way).
 - **Rationale**: mirrors `ExperimentStore` (proven in A11-P04) and keeps every edit replayable.
 
 ## D5 — Thumbnails

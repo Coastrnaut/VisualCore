@@ -55,7 +55,8 @@ schema 1 with a `MigrationChain` in `WorldsCore`.
   file `world-<slot>.json` (slots 0…3) holds the schema-2 document as sorted-key JSON (at most 64 KB) plus the slot
   name ("Island, seed 1"); Swift's shortest round-trip number encoding keeps every transform bit-identical. Save,
   open and clear are slot actions of the presenter through a `WorldStore` over `ExperienceStorage` (as Physics
-  Playground); opening restores the document into the engine as one replayable `world.open` state replacement;
+  Playground); opening restores a snapshot of the document's state through the shell
+  (`ExperienceShell.restore`, outside the replayed actions, as Physics Playground does);
   damaged, truncated, oversized or newer files are reported (`damaged`, `newer-version`, `too-large`) and the
   current world stays; a failed write leaves the previous file byte-identical.
 - Q: How are thumbnails made? → A: On save, the session draws a still of the world off screen at 160 × 120 pixels,

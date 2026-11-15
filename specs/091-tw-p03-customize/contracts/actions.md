@@ -4,7 +4,6 @@
 |---|---|---|
 | `world.preset` | [0…2] | a12.invalid-choice (clears props) |
 | `world.seed` | [] | (clears props) |
-| `world.open` | state replaced from a document | damaged, newer-version |
 | `view.orbit`, `view.zoom`, `view.reset` | as in A12-P02 | as in A12-P02 |
 | `prop.place` | [kind 0…3, x, z] | a12.prop-cap, a12.outside, a12.under-water, a12.too-close, a12.invalid-choice |
 | `prop.select` | [index or −1] | a12.invalid-choice |
@@ -13,4 +12,5 @@
 | `prop.delete` | [] | a12.no-selection |
 | `light.azimuth`, `light.elevation`, `light.ambient` | [value] | out of range |
 
-Slot actions (save, open, clear) are presenter actions through `WorldStore`; every action above has a native control.
+Slot actions (save, open, clear) are presenter actions through `WorldStore`; opening restores a snapshot through
+`ExperienceShell.restore`; every action above has a native control.
