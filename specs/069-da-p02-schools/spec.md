@@ -23,6 +23,38 @@ Canonical overrides:
 - **Owner rulings:** short tests; audits and device runs in the device campaign; iOS 27 at phase gates; every Spec Kit
   step runs.
 
+## Clarifications
+
+### Session 2026-11-14
+
+Facts checked in code: `VisualCoreSimulation` has no steering or neighbour type (only particles, field grids, clocks
+and seeded random); `VisualCoreMath.Vec2` offers `+ - * /`, `dot`, `cross`, `length`, `normalized`, `distance(to:)`
+and `isFinite`; `DecorPlacement` holds only `kindId` and `position`, the bundled catalog has no decor kinds and the
+Phase 01 starter documents carry no decor; `FishAgent` holds no turn value.
+
+- Q: Where does the steering live and how does it name its types? → A: A new file in `VisualCoreSimulation` with
+  value types `SteeringAgent` (position, velocity, group), `SteeringBounds` (rectangle), `SteeringParameters` (weights,
+  radii, boundary margin, maximum force) and the functions `NeighbourSearch.neighbours(of:in:radius:limit:)` and
+  `Steering.force(for:agents:neighbours:parameters:bounds:)`; nothing from the aquarium enters VisualCore.
+- Q: How does the neighbour search stay bounded and deterministic? → A: A linear scan over the agents (at most the
+  caller's count; the aquarium has ≤ 24) that keeps the `limit` nearest agents within `radius`, ordered by distance
+  and then by index; the agent itself is never returned; a limit ≤ 0 or a non-finite radius returns nothing. No grid
+  in this phase (24 fish do not need one).
+- Q: Which forces act between fish of different species? → A: Separation acts between all agents; alignment and
+  cohesion only between agents of the same `group` (the species). A lone fish of a species gets only separation and
+  boundary forces, plus the Phase 01 seeded wander turn, which stays at a reduced weight so fish never freeze.
+- Q: What does schema 2 add to the document and how is schema 1 migrated? → A: `DecorPlacement` gains `rotation`
+  (radians, −π…π) and `scale` (0.5…2.0); `FishAgent` gains `turn` (smoothed heading change in radians per second,
+  used only for drawing the bend); the catalog gains decor kinds (rock and shell shapes, colour, size, author,
+  license) and each starter habitat a list of starter decor spots. A schema-1 state decodes with rotation 0, scale 1
+  and turn 0, and when its decor list is empty the habitat's starter decor is added; schema 2 is then written.
+  Validation refuses unknown decor kinds (with a catalog), positions outside the tank and scales outside 0.5…2.0.
+- Q: What are the drawn swim-animation amounts? → A: The tail swing is 0.15 body lengths and the body wave 0.06 body
+  lengths at full motion, driven by the state's animation phase (which advances with speed / body length, so faster
+  fish beat more often); the bend toward the turn is `turn` × 0.12 s, capped at ±0.35 rad; Reduce Motion halves the
+  swing, the wave and the bend in drawing only. Heading agreement (SC-A09-202) is measured as the length of the mean
+  unit heading of each species with at least two fish, averaged over those species.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Fish that swim together (Priority: P1) 🎯
@@ -104,18 +136,23 @@ restores with the starter decor.
 - **FR-A09-201**: VisualCore MUST offer bounded steering forces (separation, alignment, cohesion and boundary
   avoidance) for agents in a plane, each weighted and capped, with the combined force capped by a maximum.
 - **FR-A09-202**: VisualCore MUST offer a bounded neighbour search that returns, for an agent, at most a given number of
-  neighbours within a radius, deterministically (same input, same order).
+  neighbours within a radius, nearest first with ties broken by index, never the agent itself, deterministically
+  (same input, same order).
 - **FR-A09-203**: The steering and the search MUST be deterministic, host-tested, documented and recorded in the public
   API baseline; existing simulation types stay unchanged.
 
 **Experience**
 
 - **FR-A09-210**: Same-species fish MUST school using the VisualCore steering with the species' tuning; fish of another
-  species are separated from but not aligned with; the Phase 01 bounds and speed guarantees MUST still hold.
-- **FR-A09-211**: Fish MUST be drawn with a swim animation: a body wave whose frequency grows with speed, a tail swing
-  and a bend toward the turn; Reduce Motion halves the drawn wave and swing.
-- **FR-A09-212**: The habitat document MUST hold decor pieces with position, rotation and scale (schema 2); a schema-1
-  state MUST migrate with the habitat's starter decor; decor is drawn procedurally (rocks and shells).
+  species are separated from but not aligned with or drawn toward; a reduced seeded wander turn remains; the Phase 01
+  bounds and speed guarantees MUST still hold; each fish's smoothed `turn` is kept in the state for drawing.
+- **FR-A09-211**: Fish MUST be drawn with a swim animation: a body wave (0.06 body lengths) whose frequency grows with
+  speed, a tail swing (0.15 body lengths) and a bend toward the turn (`turn` × 0.12 s, at most ±0.35 rad); Reduce
+  Motion halves the drawn wave, swing and bend and never changes the state.
+- **FR-A09-212**: The habitat document MUST hold decor pieces with position, rotation (−π…π) and scale (0.5…2.0)
+  (schema 2); the catalog MUST hold licensed decor kinds and starter decor per habitat; a schema-1 state MUST migrate
+  (rotation 0, scale 1, turn 0, starter decor added when it has none); decor is drawn procedurally (rocks and
+  shells); unknown kinds, positions outside the tank and scales outside 0.5…2.0 are refused.
 - **FR-A09-213**: The scenario manifest MUST add fixtures for schooling and for save/load of species, decor transforms
   and lighting.
 
@@ -123,7 +160,9 @@ restores with the starter decor.
 
 - **Steering parameters**: separation, alignment and cohesion weights and radii, boundary margin, maximum force.
 - **Neighbour query**: radius, maximum count.
-- **Decor piece**: kind, position, rotation, scale; catalog decor kinds with author and license.
+- **Decor piece**: kind, position, rotation (−π…π), scale (0.5…2.0); catalog decor kinds (rock or shell shape, colour,
+  size) with author and license; starter decor spots per habitat.
+- **Fish (schema 2)**: the Phase 01 fields plus `turn`, the smoothed heading change used for drawing.
 
 ## Success Criteria *(mandatory)*
 
@@ -131,8 +170,8 @@ restores with the starter decor.
 
 - **SC-A09-201**: After 30 simulated seconds, the mean same-species distance is at most 60 % of its starting value and
   smaller than the mean cross-species distance, for at least 18 of 20 seeds.
-- **SC-A09-202**: The mean heading agreement of same-species neighbours is at least 0.7 (1 = all parallel) after
-  30 simulated seconds, for at least 18 of 20 seeds.
+- **SC-A09-202**: The heading agreement — the length of each species' mean unit heading, averaged over species with
+  at least two fish — is at least 0.7 (1 = all parallel) after 30 simulated seconds, for at least 18 of 20 seeds.
 - **SC-A09-203**: 0 positions outside the bounds and 0 speeds above maximum over 10,000 steps × 20 seeds.
 - **SC-A09-204**: Save/restore keeps species, decor transforms and lighting identical in 100 % of round trips; a
   schema-1 state migrates.
