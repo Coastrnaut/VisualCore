@@ -51,3 +51,7 @@ docs, contract, runs, commits.
 ## Implementation strategy
 
 MVP: VisualCore steering and schooling; then the swim animation; then save/load fixtures; evidence last.
+
+## Phase 7: Convergence
+
+- [X] T-A09-217 Update the doc comments that still describe Phase 01 motion — `Packages/ExperiencesCreative/DigitalAquarium/Experience/DigitalAquariumExperience.swift` lines 4 and 14 and `ExperienceTests/AquariumSessionTests.swift` line 7 (Reduce Motion halves the plant sway, the body wave, the tail sweep and the turn bend) and `Experience/Adapter/AquariumCore.swift` `update(step:)` and the generator comments (one fixed step of schooling; the generator drives the reduced wander) per FR-A09-211, FR-A09-210 (partial) — Verified 2026-11-14: 2026-11-14: comments name the body wave, tail sweep, bend and schooling; DigitalAquariumExperienceTests 33 + 4 tests pass on sim-27.2

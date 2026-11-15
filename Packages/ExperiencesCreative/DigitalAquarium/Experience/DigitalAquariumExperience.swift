@@ -1,7 +1,8 @@
 // DigitalAquariumExperience — feature 068 (A09-P01) T-A09-103 (FR-A09-120, FR-A09-121, FR-A09-123). The public face
 // of the framework `DigitalAquariumExperience`: the experience's id and the factory the one app's registry calls. The
 // aquarium's state travels in the host's saved session state; the experience keeps no files of its own in this phase.
-// Reduce Motion halves the plant sway and the tail swing (presentation only); there is nothing that flashes.
+// Reduce Motion halves the plant sway, the body wave, the tail sweep and the turn bend (presentation only); there is
+// nothing that flashes.
 import VisualCoreExperience
 import VisualCoreExperienceHost
 
@@ -11,8 +12,8 @@ public enum DigitalAquariumExperience {
     public static let id = ExperienceID(rawValue: AquariumCore.experienceID)
 
     /// The experience registered as `id`. `storage` is unused in this phase (the state travels in the host's saved
-    /// session state); `reduceMotion` halves the plant sway and the tail swing; `reduceFlashing` changes nothing (no
-    /// element flashes).
+    /// session state); `reduceMotion` halves the plant sway, the body wave, the tail sweep and the turn bend;
+    /// `reduceFlashing` changes nothing (no element flashes).
     @MainActor
     public static func make(id: ExperienceID, storage: ExperienceStorage, reduceMotion: Bool,
                             reduceFlashing: Bool) -> any Experience {

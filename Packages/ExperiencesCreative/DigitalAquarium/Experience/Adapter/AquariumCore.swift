@@ -18,8 +18,9 @@
 // rotation and scale (habitat document schema 2). A schema-1 payload passes the migration step unchanged and its
 // document is migrated by `HabitatDocument.migrated(catalog:)` on restore (missing fields take 0, 0 and 1; the
 // habitat's starter decor is added when the document has none); `schemaOneExample()` is the stored schema-1 payload
-// the registry's migration check restores. A payload whose (migrated) document does not validate, whose habitat index or lighting level names no entry, whose step count is
-// negative or whose generator state is malformed is refused (the restore throws). One quality tier (`level-0`).
+// the registry's migration check restores. A payload whose (migrated) document does not validate, whose habitat
+// index or lighting level names no entry, whose step count is negative or whose generator state is malformed is
+// refused (the restore throws). One quality tier (`level-0`).
 import Foundation
 import DigitalAquariumCore
 import VisualCoreExperience
@@ -54,7 +55,7 @@ public struct AquariumState: Codable, Equatable, Sendable {
     public var step: Int
     /// Whether the motion is paused.
     public var paused: Bool
-    /// The state of the generator that drives the wander and builds the starter habitats.
+    /// The state of the generator that drives the reduced wander turn and builds the starter habitats.
     public var random: SeededRandom.State
 
     /// A state of `document` after `step` steps, paused or not, with the generator state `random`.
@@ -92,7 +93,7 @@ public struct AquariumCore: ExperienceCore, Equatable {
     public private(set) var step: Int
     /// Whether the motion is paused.
     public private(set) var paused: Bool
-    /// The generator of the wander and of the starter habitats.
+    /// The generator of the reduced wander turn and of the starter habitats.
     public private(set) var generator: SeededRandom
 
     /// The first state prepared with `seed`: the first starter habitat (Reef) built with a generator seeded by `seed`,
@@ -181,7 +182,7 @@ public struct AquariumCore: ExperienceCore, Equatable {
         return AquariumCore(seed: seed)
     }
 
-    /// One fixed step of the bounded wander, unless the motion is paused.
+    /// One fixed step of schooling (`AquariumSimulation.advance`), unless the motion is paused.
     public mutating func update(step: Int) {
         guard !paused else { return }
         AquariumSimulation.advance(&document, catalog: Self.catalog, random: &generator)

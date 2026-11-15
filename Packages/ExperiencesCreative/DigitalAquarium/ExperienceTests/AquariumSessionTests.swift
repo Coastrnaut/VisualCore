@@ -4,8 +4,8 @@
 // every fish and plant and describes it in words; each drawn frame advances one simulation step; a suspension of any
 // wall-clock length does not advance the step count, and the resume continues from the same step (no fast-forward);
 // pause stops the motion; the state saved by the shell restores identically in a new session; a newer saved state is
-// refused and the starter habitat opens; Reduce Motion halves the sway and the tail swing but never changes the state;
-// every action has a native control.
+// refused and the starter habitat opens; Reduce Motion halves the sway and the swim motion (wave, tail sweep, bend)
+// but never changes the state; every action has a native control.
 import Foundation
 import XCTest
 @testable import DigitalAquariumExperience
