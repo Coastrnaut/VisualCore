@@ -477,7 +477,7 @@
       "id": "a14.solar-system-explorer",
       "code": "A14",
       "title": "Solar System Explorer",
-      "summary": "A solar system primer: the Sun and the eight planets with fact cards whose numbers carry units and sources.",
+      "summary": "A solar system primer: the Sun and the eight planets on approximate orbits, with time controls, guided tours and fact cards whose numbers carry units and sources.",
       "kind": "creative",
       "tier": "free",
       "category": "learn",
@@ -494,15 +494,16 @@
       ],
       "tile_seed": 3067068499,
       "capabilities": [
-        "the Sun and eight planets",
+        "the Sun and eight planets drawn in code",
+        "approximate orbits, 1950 to 2050",
+        "play, pause, rates and guided tours",
         "fact cards with units and sources",
-        "distances in km and AU",
-        "values from NASA's fact sheet",
-        "planets drawn in code",
-        "sizes and spacing not to scale"
+        "labels and a saved view",
+        "enhanced view labelled not to scale"
       ],
       "quality_tiers": [
-        "level-0"
+        "level-0",
+        "level-1"
       ],
       "content": null,
       "available": false
