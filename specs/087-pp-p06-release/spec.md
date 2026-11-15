@@ -22,6 +22,39 @@ Canonical overrides:
 - **Owner rulings:** short tests; audits in the device campaign; iOS 27 at phase gates; reference regression and iOS 26
   at X-A11; interface tests under 60 s each, serial chunk.
 
+## Clarifications
+
+### Session 2026-11-15
+
+Answered autonomously under the owner's standing delegation, recommended option each time, as for A10-P06. Facts
+checked in code: `scripts/check_experience_release.py` reads `docs/apps/<slug>/release.json` (schema 1: `experience`,
+`requiredDocs`, `checklist`, `copyCheck` with `text`, `swift`, `allow`) and accepts the statuses `verified`,
+`pending-campaign-ii` and `owner-action`; `scripts/release_check.py` derives `experience-release-<code>` and
+`copy-claims-<code>` from that file and runs interface chunks (serial ones listed in `SERIAL_CHUNKS`); `PlaygroundPresenter`
+has the test-only `failNextDraw`; experiments live in `experiment-<slot>.json` (`ExperimentStore`) with four committed
+sample files from A11-P04; Physics Playground's sources import no audio, motion or network framework; the registration
+declares no permission; Neon Arcade's UI tests open a candidate with `-vcCandidates` and `-openExperience`;
+`specs/086-pp-p05-stability/scan-claims.sh` already refuses accuracy and similar words in the catalog entry and README.
+
+- Q: Which statuses does the release checklist use? → A: The checker's: `verified` (with evidence),
+  `pending-campaign-ii` (device rows, naming the device-campaign row) and `owner-action` (with the owner steps).
+- Q: How are refused claims checked in the store text and interface copy? → A: A Physics Playground scan over the store
+  text and the experience's interface Swift refuses accurate, accuracy, precise, precision, engineering-grade, safety,
+  predict, prediction, teaches, learning outcome and improves understanding (case-insensitive, whole words), alongside
+  the shared copy check; the shared denylist is not changed; the interface note "Educational approximation" is allowed.
+- Q: What does the source scan refuse? → A: In `Packages/ExperiencesCreative/PhysicsPlayground`: `URLSession`,
+  `import Network`, `CLLocation`, `AVCapture`, `AVAudioRecorder`, `inputNode`, `installTap`, `CMMotion`, `CNContact`,
+  `ASIdentifierManager`, `AppTrackingTransparency`, `UIScreen.main.brightness` and `isIdleTimerDisabled`.
+- Q: Which interface journeys run, and how? → A: A new serial chunk `s2` with `PPWorldUITests` (drop a circle; pause,
+  single step and time scale; force arrows toggle) and `PPExperimentUITests` (open the pendulum preset; start and stop
+  the "Controlling time" tutorial), launched as a candidate with `-vcCandidates` and `-openExperience
+  a11.physics-playground` through `PPSupport`; identifiers `experience.a11.physics-playground.<name>`; each test under
+  60 s.
+- Q: How is crash recovery proved? → A: A test saves an experiment to slot 0 in a temporary storage, sets `failNextDraw`,
+  draws a frame so the session enters its failure state, checks `experiment-0.json` is byte-identical, opens a new
+  session and draws; the four committed samples are re-run (valid opens; newer, damaged and truncated refused and
+  byte-identical); the schema-1…4 examples restore.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Nothing leaves the device (Priority: P1) 🎯
