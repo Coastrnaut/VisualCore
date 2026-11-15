@@ -1,0 +1,68 @@
+{
+  "checks": [
+    {
+      "attestation": ".autonomy/checks/A12-P06.app-ui-2.json",
+      "command": "python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27 app-ui-ios27-t2",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A12-P06.app-ui-2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A12-P06.release-checks.json",
+      "command": "python3 scripts/release_check.py --only app-release-build app-release-symbols app-privacy-manifest app-no-tracking app-licenses app-usage-descriptions",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A12-P06.release-checks.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A12-P06.release-docs-2.json",
+      "command": "/bin/sh -c 'python3 scripts/release_check.py --only experience-release-a12 copy-claims-a12 && sh specs/094-tw-p06-release/scan-claims-release.sh'",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A12-P06.release-docs-2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A12-P06.release-docs-3.json",
+      "command": "/bin/sh -c 'python3 scripts/release_check.py --only experience-release-a12 copy-claims-a12 && sh specs/094-tw-p06-release/scan-claims-release.sh && sh specs/093-tw-p05-qa/scan-claims.sh'",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A12-P06.release-docs-3.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A12-P06.release-docs.json",
+      "command": "/bin/sh -c 'python3 scripts/release_check.py --only experience-release-a12 copy-claims-a12 && sh specs/094-tw-p06-release/scan-claims-release.sh'",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A12-P06.release-docs.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A12-P06.script-tests.json",
+      "command": "python3 scripts/test_scripts.py",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A12-P06.script-tests.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A12-P06.tw-no-network.json",
+      "command": "/bin/sh -c '! grep -rnE '\"'\"'URLSession|import Network|CLLocation|AVCapture|AVAudioRecorder|inputNode|installTap|CMMotion|CNContact|ASIdentifierManager|AppTrackingTransparency|UIScreen.main.brightness|isIdleTimerDisabled'\"'\"' Packages/ExperiencesCreative/TinyWorlds'",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A12-P06.tw-no-network.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A12-P06.verify-27.json",
+      "command": "python3 scripts/verify_experiences.py --only a12.tiny-worlds --runtime 27",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A12-P06.verify-27.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A12-P06.worlds-ios27-2.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing TinyWorldsCoreTests TinyWorldsExperienceTests",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A12-P06.worlds-ios27-2.log"
+    },
+    {
+      "attestation": ".autonomy/checks/A12-P06.worlds-ios27.json",
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing TinyWorldsCoreTests TinyWorldsExperienceTests",
+      "exit_code": 0,
+      "log": ".autonomy/logs/A12-P06.worlds-ios27.log"
+    }
+  ],
+  "generated": "2026-11-15T16:54:49+00:00",
+  "method": "deterministic-run-check",
+  "stage": "A12-P06",
+  "status": "pass"
+}

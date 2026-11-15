@@ -2464,18 +2464,17 @@
     ]
    },
    "implementation": {
-    "state": "standalone-partial",
+    "state": "standalone-complete",
     "legacy_gates_passed": [
      "A12-P00",
      "A12-P01",
      "A12-P02",
      "A12-P03",
      "A12-P04",
-     "A12-P05"
-    ],
-    "legacy_gates_pending": [
+     "A12-P05",
      "A12-P06"
     ],
+    "legacy_gates_pending": [],
     "unified_integration": "pending"
    },
    "source": {
