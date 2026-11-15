@@ -25,6 +25,52 @@ Canonical overrides:
 - **Constitution:** 2.9.0 adds the A13 experience rules (committed at the start of this gate).
 - **Evidence:** host and simulator only; device tasks are tagged {device} and wait for ImplementationLock-100.
 
+## Clarifications
+
+### Session 2026-11-15
+
+Answered autonomously under the owner's standing delegation, recommended option each time. Facts checked in code:
+the A13 constitution commit is `d5d232b6` and the A13-P00 specify commit `57a587f9` (the phase start: the no-change
+diff of `Packages` and `External` is taken from it); the reference submodule is pinned at `d93edd1`; twelve
+experiences are registered (`Catalog/registrations.json`, A01–A12). VisualCore offers `VisualCoreMath.Vec2` (dot,
+scalar cross, length, normalized, distance; no reflect, perpendicular or rotate), `Mat3` (rotation, translation, scale,
+`trs`) and `Camera2D`; `VisualCoreMath.Ray3`/`RayHit3` (3D only); `VisualCoreSimulation.AABB2D`, `BroadPhase2D`,
+`Shape2D` (circle and box, no segment or polygon), `Pose2D` and `Contacts2D`; `VisualCoreScenes.Primitive` (rect,
+circle, line with width, polygon, polyline) and `SceneNode` with transforms and hit testing; `VisualCoreRendering`
+`PrimitiveRenderer` (draws a scene-node tree through a `Camera2D`), `RenderTarget`, `ResourceRegistry`,
+`PingPongTarget` and `TrailLayer`; `VisualCoreEffects.EffectRenderer` running an `EffectGraphDescription` whose pass
+schemas include blur, bloom, composite and flashLimit (`VisualCoreEffectsGraph`); `VisualCoreShaderSource.RenderState`
+with additive blending; gesture recognizers (drag, rotate, tap, double-tap, pinch) and `GestureArbiter`
+(`VisualCoreScenes`); `AnnouncementSink`, `HapticSink` (`VisualCoreUI`), `AnnouncementPlanner`, `HapticPlanner` and
+`EffectiveAccessibility` with Reduce Motion and Reduce Flashing (`VisualCoreSimulation`); `ExperienceStorage`,
+`DocumentStore`, `MigrationChain`; `SoundEffectSynth` and `SoundEffectPlayer`. No 2D ray against segments, no
+reflection about a normal, no tile board, no undo history, no progression model and no graph search exist in any
+framework product; Neon Arcade's glow layer, Oscilloscope Studio's beam polylines and Physics Playground's 2D editing
+live only inside those experiences.
+
+- Q: How is the manual's "compile an empty shell" gate met in the one app? → A: As for A12: the one app is the shell;
+  this phase proves it builds for testing with Light Maze absent; the targets come with A13-P01's first rules.
+- Q: What makes a capability "available"? → A: A public declaration in a VisualCore framework product with at least one
+  test that exercises it; an implementation that exists only inside another experience or a harness is "requires
+  adaptation" at best.
+- Q: Which package holds Light Maze? → A: `Packages/ExperiencesCreative/LightMaze` (Auto-Creator.md §16), as A05–A12
+  did; no new package is created.
+- Q: Does Light Maze need a permission or a new privacy answer? → A: No. Version 0.1 needs no microphone, camera,
+  photos, motion or location; progress lives in the experience's own storage, so the app's privacy answers do not
+  change.
+- Q: Which pieces exist, and who owns the missing ones? → A: Vectors, 2D transforms and camera, primitives with hit
+  testing, the primitive renderer, render targets, the effect graph with blur, bloom and composite, additive blending,
+  gestures, accessibility sinks and planners, storage and sound effects exist. Gaps and owners, following the manual's
+  phases (P01 grid/ray reflection solver and fixtures, P02 rendering and tap interactions, P03 core levels and progress,
+  P04 hints, accessibility and visual polish, P05 content solvability and release QA): a 2D ray cast against segments
+  and reflection about a normal → `VisualCoreMath` (A13-P01); the tile board, optical rules, bounce cap and cycle
+  detection → app-local (A13-P01); beam rendering from the tracer's exact segments with capped glow, and snapped drag
+  and rotate → app-local over the primitive renderer, the effect graph and the gesture recognizers (A13-P02); the 20
+  levels, level select, unlock progression, undo, restart and saved progress → app-local over `ExperienceStorage`
+  (A13-P03); hints, spoken board descriptions, legible colour cues and success feedback → app-local over the
+  accessibility planners and sound effects (A13-P04); the solvability checker and its shipping-level proof →
+  app-local (A13-P05). The audit confirms or corrects each from the code.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - An evidence-backed integration matrix (Priority: P1) 🎯
