@@ -95,9 +95,17 @@
       "name": "Physics Playground",
       "permissions": [],
       "tier": "free"
+    },
+    {
+      "category": "play",
+      "code": "A12",
+      "id": "a12.tiny-worlds",
+      "name": "Tiny Worlds",
+      "permissions": [],
+      "tier": "free"
     }
   ],
-  "ledger_sha256": "37c7ea7a4c351cef3f72d63ba4c67ea186fb99ccddb9a24fbe224a7b7c934fbc",
+  "ledger_sha256": "d1e55da189ce644a689b5076f86c88913befffba1fa286664043c30a714cdba5",
   "privacy_answers": "unproven",
   "schema": 1
 }

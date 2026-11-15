@@ -1,0 +1,88 @@
+{
+  "branch": "main",
+  "dirty": true,
+  "dirty_paths": [
+    "docs/verification/a12.tiny-worlds/summary-27.2.json",
+    "docs/verification/a12.tiny-worlds/summary-26.5.json"
+  ],
+  "failed_attempts": [],
+  "gate": "X-A12",
+  "ledger": "migration",
+  "passing_checks": [
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --result-name xa12-host",
+      "exit_code": 0,
+      "finished": "2026-11-15T16:59:04+00:00",
+      "log": ".autonomy/logs/migration/X-A12.host.log",
+      "log_sha256": "d36d282afd42b4c05243995fd631806ce430c9fa82664f7acb6c891e6c989f8f",
+      "name": "host"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only reference-engine-xcframework reference-build-projectm-ios-sim reference-clean",
+      "exit_code": 0,
+      "finished": "2026-11-15T17:04:55+00:00",
+      "log": ".autonomy/logs/migration/X-A12.reference-1.log",
+      "log_sha256": "61990005cc8ea6866d5fb6d1c7b22ef310f7bd8cd13189b15915d9126d9e8213",
+      "name": "reference-1"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only reference-test-anglerendering-ios27 reference-test-anglerendering-ios26 projectm-reference-ios27 projectm-reference-ios26",
+      "exit_code": 0,
+      "finished": "2026-11-15T17:05:37+00:00",
+      "log": ".autonomy/logs/migration/X-A12.reference-2.log",
+      "log_sha256": "47f843d1675984d4f459afda4f67cf74c60b7c503f07a98496f41a50d7dbf6f0",
+      "name": "reference-2"
+    },
+    {
+      "command": "python3 scripts/verify_experiences.py --only a12.tiny-worlds --runtime 26",
+      "exit_code": 0,
+      "finished": "2026-11-15T17:01:49+00:00",
+      "log": ".autonomy/logs/migration/X-A12.sim26.log",
+      "log_sha256": "d84ec94e0ca45758b40d867262f1e81c0c4c48809e40c0861e2796f19d161c58",
+      "name": "sim26"
+    },
+    {
+      "command": "python3 scripts/verify_experiences.py --only a12.tiny-worlds --runtime 27",
+      "exit_code": 0,
+      "finished": "2026-11-15T17:01:01+00:00",
+      "log": ".autonomy/logs/migration/X-A12.sim27.log",
+      "log_sha256": "0f9eb9d12ecba67c3a09703008ca1b45f20f0d194b0f8e675b135243fa83e57e",
+      "name": "sim27"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only app-build-for-testing-ios27 app-ui-ios27-t2",
+      "exit_code": 0,
+      "finished": "2026-11-15T17:04:25+00:00",
+      "log": ".autonomy/logs/migration/X-A12.ui-t2.log",
+      "log_sha256": "1b67ccc22fb3b930d0fde3ad9606ea1133298195feba1b24478f425114bcdec0",
+      "name": "ui-t2"
+    },
+    {
+      "command": "swift test --package-path Packages/VisualCore",
+      "exit_code": 0,
+      "finished": "2026-11-15T16:55:47+00:00",
+      "log": ".autonomy/logs/migration/X-A12.visualcore-host.log",
+      "log_sha256": "858618ae339e42b3d3053219c80307fb8d65315c60c4397d1d7e1df46b2447dd",
+      "name": "visualcore-host"
+    },
+    {
+      "command": "swift test --package-path Packages/VisualCore --filter 'GradientNoise2DTests|HeightFieldTests|RayIntersectionTests'",
+      "exit_code": 0,
+      "finished": "2026-11-15T16:59:12+00:00",
+      "log": ".autonomy/logs/migration/X-A12.visualcore-new.log",
+      "log_sha256": "95421aa68df1f941f68c9fcaf688512e88940dcc4b51657c6728c045c17f946c",
+      "name": "visualcore-new"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --result-name xa12-rendering",
+      "exit_code": 0,
+      "finished": "2026-11-15T16:59:54+00:00",
+      "log": ".autonomy/logs/migration/X-A12.visualcore-rendering.log",
+      "log_sha256": "5a77a23448ce0e46ff3bc7d3c4051c0fe89e50430726cec90aa6615a6d303c2f",
+      "name": "visualcore-rendering"
+    }
+  ],
+  "revision": "2ada01bd935a538bfdbe86fd06e6d7e8d64e6723",
+  "revision_number": 1,
+  "sealed": "2026-11-15T17:05:49+00:00"
+}

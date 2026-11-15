@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/VisualCore",
+    "--filter",
+    "GradientNoise2DTests|HeightFieldTests|RayIntersectionTests"
+  ],
+  "command": "swift test --package-path Packages/VisualCore --filter 'GradientNoise2DTests|HeightFieldTests|RayIntersectionTests'",
+  "elapsed_seconds": 2.246,
+  "exit_code": 0,
+  "finished": "2026-11-15T16:59:12+00:00",
+  "gate": "X-A12",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/X-A12.visualcore-new.log",
+  "log_sha256": "95421aa68df1f941f68c9fcaf688512e88940dcc4b51657c6728c045c17f946c",
+  "name": "visualcore-new",
+  "started": "2026-11-15T16:59:10+00:00",
+  "timed_out": false
+}
