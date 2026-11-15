@@ -204,7 +204,7 @@ final class AquariumSessionTests: XCTestCase {
         XCTAssertTrue(shell.handle(control: "habitat.select", values: [1]).isAccepted)
         let saved = try shell.snapshot()
         first.close()
-        let newer = try ExperienceSnapshot(experience: AquariumTest.id, schemaVersion: 4, seed: saved.seed,
+        let newer = try ExperienceSnapshot(experience: AquariumTest.id, schemaVersion: 5, seed: saved.seed,
                                            stepIndex: saved.stepIndex, digest: saved.digest,
                                            payload: Data(saved.payload.utf8))
 

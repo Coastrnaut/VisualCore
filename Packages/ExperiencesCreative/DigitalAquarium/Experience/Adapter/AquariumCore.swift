@@ -20,6 +20,14 @@
 //   decor.move [0…11, 0…1, 0…1]    piece `index` to the point; `a09.no-such-decor` for a missing piece.
 //   decor.remove [0…11]            piece `index`; `a09.no-such-decor` for a missing piece.
 // A habitat change clears the pellets and brings the new habitat's starter decor; the chosen kind stays.
+// Feature 072 (A09-P05) T-A09-504 (FR-A09-501, 510, 520; clarifications 1, 2 and 4):
+//   ambient.mode [0…1]                    off, on: the fish cruise at 0.6 of their speed (the drawing also halves the
+//                                         particles and dims after idle; Low Power Mode and Reduce Motion do that
+//                                         without touching the state).
+//   decor.turn [0…11, −π…π, 0.5…2.0]      piece `index` gets the rotation and the scale (used when a saved
+//                                         configuration is rebuilt); `a09.no-such-decor` for a missing piece.
+// Snapshot schema 4 adds `ambient` (missing → off). Three quality tiers (`level-0`…`level-2`) choose the drawing
+// budget (`AquariumBudget`); the state never depends on them.
 // A choice value that is not a whole number naming an entry is refused with the rule `a09.invalid-choice`; a refusal
 // changes nothing.
 //
@@ -31,7 +39,7 @@
 // defaults; a schema-1 document without decor gets the habitat's starter decor). `schemaOneExample()` and
 // `schemaTwoExample()` are the stored payloads the registry's migration check restores. A payload whose (migrated)
 // document does not validate, whose habitat index, lighting level or decoration kind names no entry, whose step count
-// is negative or whose generator state is malformed is refused (the restore throws). One quality tier (`level-0`).
+// is negative or whose generator state is malformed is refused (the restore throws). Three quality tiers (feature 072).
 import Foundation
 import DigitalAquariumCore
 import VisualCoreExperience
@@ -66,7 +74,7 @@ public enum AquariumRestoreError: Error, Equatable {
     case invalidDecorKind(Int)
 }
 
-/// The saved state of Digital Aquarium (snapshot schema 3).
+/// The saved state of Digital Aquarium (snapshot schema 4).
 public struct AquariumState: Codable, Equatable, Sendable {
     /// The habitat document: water colour, bounds, plants, fish, decor and lighting.
     public var document: HabitatDocument
@@ -78,10 +86,14 @@ public struct AquariumState: Codable, Equatable, Sendable {
     public var random: SeededRandom.State
     /// The decoration kind the next placement uses: an index into the catalog's decor kinds (schema 3; 0 when missing).
     public var decorKind: Int
+    /// Whether ambient mode is on (schema 4; off when missing): the fish cruise at 0.6 of their speed.
+    public var ambient: Bool
 
-    /// A state of `document` after `step` steps, paused or not, with the generator state `random` and the chosen
-    /// decoration kind `decorKind`.
-    public init(document: HabitatDocument, step: Int, paused: Bool, random: SeededRandom.State, decorKind: Int = 0) {
+    /// A state of `document` after `step` steps, paused or not, with the generator state `random`, the chosen
+    /// decoration kind `decorKind` and the ambient choice `ambient`.
+    public init(document: HabitatDocument, step: Int, paused: Bool, random: SeededRandom.State, decorKind: Int = 0,
+                ambient: Bool = false) {
+        self.ambient = ambient
         self.document = document
         self.step = step
         self.paused = paused
@@ -89,7 +101,7 @@ public struct AquariumState: Codable, Equatable, Sendable {
         self.decorKind = decorKind
     }
 
-    private enum CodingKeys: String, CodingKey { case document, step, paused, random, decorKind }
+    private enum CodingKeys: String, CodingKey { case document, step, paused, random, decorKind, ambient }
 
     /// Decodes a state; a missing `decorKind` (snapshot schemas 1 and 2) decodes as 0.
     public init(from decoder: Decoder) throws {
@@ -99,10 +111,11 @@ public struct AquariumState: Codable, Equatable, Sendable {
         paused = try c.decode(Bool.self, forKey: .paused)
         random = try c.decode(SeededRandom.State.self, forKey: .random)
         decorKind = try c.decodeIfPresent(Int.self, forKey: .decorKind) ?? 0
+        ambient = try c.decodeIfPresent(Bool.self, forKey: .ambient) ?? false
     }
 }
 
-/// The state of Digital Aquarium. Schema version 3.
+/// The state of Digital Aquarium. Schema version 4.
 public struct AquariumCore: ExperienceCore, Equatable {
     /// The experience's id in the catalog.
     public static let experienceID = "a09.digital-aquarium"
@@ -113,7 +126,7 @@ public struct AquariumCore: ExperienceCore, Equatable {
 
     /// The action ids in declaration order.
     public static let actionIDs = ["habitat.select", "lighting.level", "motion.pause", "food.drop", "decor.kind",
-                                   "decor.place", "decor.move", "decor.remove"]
+                                   "decor.place", "decor.move", "decor.remove", "ambient.mode", "decor.turn"]
 
     /// The number of lighting levels (dim, soft, bright).
     public static let lightingLevels = 3
@@ -133,6 +146,8 @@ public struct AquariumCore: ExperienceCore, Equatable {
     public private(set) var generator: SeededRandom
     /// The decoration kind the next placement uses (an index into the catalog's decor kinds).
     public private(set) var decorKind: Int = 0
+    /// Whether ambient mode is on.
+    public private(set) var ambient: Bool = false
 
     /// The first state prepared with `seed`: the first starter habitat (Reef) built with a generator seeded by `seed`,
     /// step 0, swimming.
@@ -152,6 +167,7 @@ public struct AquariumCore: ExperienceCore, Equatable {
         step = state.step
         paused = state.paused
         decorKind = state.decorKind
+        ambient = state.ambient
         do {
             generator = try SeededRandom(restoring: state.random)
         } catch {
@@ -161,7 +177,8 @@ public struct AquariumCore: ExperienceCore, Equatable {
 
     /// The whole state: document, step count, pause flag and generator state.
     public var state: AquariumState {
-        AquariumState(document: document, step: step, paused: paused, random: generator.state, decorKind: decorKind)
+        AquariumState(document: document, step: step, paused: paused, random: generator.state, decorKind: decorKind,
+                      ambient: ambient)
     }
 
     // MARK: Contract
@@ -169,18 +186,24 @@ public struct AquariumCore: ExperienceCore, Equatable {
     /// One fixed simulation step: `AquariumSimulation.step` (1/60 s).
     public static var stepDuration: Double { AquariumSimulation.step }
 
-    /// One quality tier (`level-0`): the aquarium draws at most 36 shapes plus the water and the gravel.
-    public static var qualityTiers: Int { 1 }
+    /// Three quality tiers (`level-0`…`level-2`, feature 072): level 0 draws everything, level 1 halves the bubbles
+    /// and motes and draws one-octave caustics, level 2 quarters them and draws no caustics (`AquariumBudget`).
+    public static var qualityTiers: Int { AquariumBudget.levels }
 
     /// Schema 3; a schema-1 payload is carried over unchanged, a schema-2 payload gains `decorKind` 0 (feature 070),
     /// and the habitat document is migrated on restore (`HabitatDocument.migrated(catalog:)` needs the catalog, which a
     /// payload step does not have).
     public static var migrations: MigrationChain {
-        MigrationChain(currentVersion: 3, steps: [
+        MigrationChain(currentVersion: 4, steps: [
             1: { payload in payload },
             2: { payload in
                 var upgraded = payload
                 upgraded["decorKind"] = 0
+                return upgraded
+            },
+            3: { payload in
+                var upgraded = payload
+                upgraded["ambient"] = false
                 return upgraded
             },
         ])
@@ -206,6 +229,7 @@ public struct AquariumCore: ExperienceCore, Equatable {
         document["fish"] = fish.map { var f = $0; f["turn"] = nil; return f }
         object["document"] = document
         object["decorKind"] = nil
+        object["ambient"] = nil
         // The expected state: the schema-1 document as decoded (turn 0), then migrated.
         guard let payload = try? JSONSerialization.data(withJSONObject: object, options: [.sortedKeys]),
               let restored = try? restore(payload: payload, seed: seed) else { return nil }
@@ -233,6 +257,7 @@ public struct AquariumCore: ExperienceCore, Equatable {
         document["food"] = nil
         object["document"] = document
         object["decorKind"] = nil
+        object["ambient"] = nil
         guard let payload = try? JSONSerialization.data(withJSONObject: object, options: [.sortedKeys]),
               let restored = try? restore(payload: payload, seed: seed) else { return nil }
         var builder = DigestBuilder(domain: id.rawValue)
@@ -244,7 +269,33 @@ public struct AquariumCore: ExperienceCore, Equatable {
         return MigrationExample(version: 2, snapshot: encoded, expectedDigest: builder.finish().hex)
     }
 
-    /// The eight controls with their declared ranges (positions as fractions of the tank; decor indices below the
+    /// The stored example of schema 3 for the registry's migration check (feature 072, T-A09-504): an A09-P04 payload
+    /// (no `ambient`) of the Kelp habitat at soft lighting after 60 steps with decoration kind 2 chosen and food in the
+    /// water, with the digest its restore must give: the same aquarium with ambient mode off. Nil only if the encoding
+    /// failed.
+    public static func schemaThreeExample(seed: UInt64 = 7) -> MigrationExample? {
+        guard let id = ExperienceID(rawValue: experienceID) else { return nil }
+        var core = AquariumCore(seed: seed)
+        _ = core.apply(ExperienceAction(control: "habitat.select", values: [1], step: 0))
+        _ = core.apply(ExperienceAction(control: "decor.kind", values: [2], step: 0))
+        _ = core.apply(ExperienceAction(control: "food.drop", values: [0.5, 0.8], step: 0))
+        for s in 0..<60 { core.update(step: s) }
+        guard var object = (try? JSONSerialization.jsonObject(with: encode(core.state))) as? [String: Any] else {
+            return nil
+        }
+        object["ambient"] = nil
+        guard let payload = try? JSONSerialization.data(withJSONObject: object, options: [.sortedKeys]),
+              let restored = try? restore(payload: payload, seed: seed) else { return nil }
+        var builder = DigestBuilder(domain: id.rawValue)
+        guard (try? restored.writeDigest(into: &builder)) != nil,
+              let snapshot = try? ExperienceSnapshot(experience: id, schemaVersion: 3, seed: seed,
+                                                     stepIndex: restored.step, digest: builder.finish(),
+                                                     payload: payload),
+              let encoded = try? snapshot.encoded() else { return nil }
+        return MigrationExample(version: 3, snapshot: encoded, expectedDigest: builder.finish().hex)
+    }
+
+    /// The ten controls with their declared ranges (positions as fractions of the tank; decor indices below the
     /// 12-piece limit; kinds of the catalog's decor).
     public static var controls: [ExperienceControl] {
         let pieces = Double(HabitatDocument.maxDecor - 1)
@@ -255,7 +306,9 @@ public struct AquariumCore: ExperienceCore, Equatable {
                 ExperienceControl(id: "decor.kind", ranges: [0...Double(max(catalog.decor.count - 1, 0))]),
                 ExperienceControl(id: "decor.place", ranges: [0...1, 0...1]),
                 ExperienceControl(id: "decor.move", ranges: [0...pieces, 0...1, 0...1]),
-                ExperienceControl(id: "decor.remove", ranges: [0...pieces])]
+                ExperienceControl(id: "decor.remove", ranges: [0...pieces]),
+                ExperienceControl(id: "ambient.mode", ranges: [0...1]),
+                ExperienceControl(id: "decor.turn", ranges: [0...pieces, -Double.pi...Double.pi, 0.5...2.0])]
     }
 
     /// The first state with `seed` as the preparation seed.
@@ -267,14 +320,14 @@ public struct AquariumCore: ExperienceCore, Equatable {
     /// One fixed step of schooling (`AquariumSimulation.advance`), unless the motion is paused.
     public mutating func update(step: Int) {
         guard !paused else { return }
-        AquariumSimulation.advance(&document, catalog: Self.catalog, random: &generator)
+        AquariumSimulation.advance(&document, catalog: Self.catalog, random: &generator, ambient: ambient)
         self.step += 1
     }
 
     /// Carries out a well-formed action (the engine checked the control, the value count, finiteness and ranges).
     public mutating func apply(_ action: ExperienceAction) -> ActionResult {
         let v = action.values
-        let expected = ["food.drop": 2, "decor.place": 2, "decor.move": 3][action.control] ?? 1
+        let expected = ["food.drop": 2, "decor.place": 2, "decor.move": 3, "decor.turn": 3][action.control] ?? 1
         guard v.count == expected else { return .rejected(.wrongValueCount(expected: expected, found: v.count)) }
         let x = v[0]
         switch action.control {
@@ -320,6 +373,16 @@ public struct AquariumCore: ExperienceCore, Equatable {
             guard DecorEditing.move(index: i, to: point, in: &document) else {
                 return .rejected(.rule(code: AquariumRule.noSuchDecor))
             }
+        case "ambient.mode":
+            guard let i = Self.choice(x, count: 2) else { return .rejected(.rule(code: AquariumRule.invalidChoice)) }
+            ambient = i == 1
+        case "decor.turn":
+            guard let i = Self.choice(x, count: HabitatDocument.maxDecor) else {
+                return .rejected(.rule(code: AquariumRule.invalidChoice))
+            }
+            guard document.decor.indices.contains(i) else { return .rejected(.rule(code: AquariumRule.noSuchDecor)) }
+            document.decor[i].rotation = v[1]
+            document.decor[i].scale = v[2]
         case "decor.remove":
             guard let i = Self.choice(x, count: HabitatDocument.maxDecor) else {
                 return .rejected(.rule(code: AquariumRule.invalidChoice))

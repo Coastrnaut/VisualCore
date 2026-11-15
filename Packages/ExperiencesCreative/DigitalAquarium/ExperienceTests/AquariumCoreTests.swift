@@ -33,13 +33,13 @@ final class AquariumCoreTests: XCTestCase {
         XCTAssertEqual(DigitalAquariumExperience.id?.rawValue, "a09.digital-aquarium")
         XCTAssertEqual(AquariumCore.controls.map(\.id), ["habitat.select", "lighting.level", "motion.pause",
                                                          "food.drop", "decor.kind", "decor.place", "decor.move",
-                                                         "decor.remove"])
+                                                         "decor.remove", "ambient.mode", "decor.turn"])
         XCTAssertEqual(AquariumCore.controls.map(\.id), AquariumCore.actionIDs)
         XCTAssertEqual(AquariumCore.controls.map { $0.ranges },
                        [[0...1], [0...2], [0...1], [0...1, 0...1], [0...2], [0...1, 0...1], [0...11, 0...1, 0...1],
-                        [0...11]])
-        XCTAssertEqual(AquariumCore.migrations.currentVersion, 3)
-        XCTAssertEqual(AquariumCore.qualityTiers, 1)
+                        [0...11], [0...1], [0...11, -Double.pi...Double.pi, 0.5...2.0]])
+        XCTAssertEqual(AquariumCore.migrations.currentVersion, 4)
+        XCTAssertEqual(AquariumCore.qualityTiers, 3)
         XCTAssertEqual(AquariumCore.stepDuration, 1.0 / 60, accuracy: 1e-12)
         XCTAssertTrue(AquariumRule.invalidChoice.hasPrefix("a09."))
     }
@@ -178,7 +178,7 @@ final class AquariumCoreTests: XCTestCase {
         XCTAssertTrue(first.handle(control: "lighting.level", values: [2]).isAccepted)
         try first.run(steps: 45)
         let snapshot = try first.snapshot()
-        XCTAssertEqual(snapshot.schemaVersion, 3)
+        XCTAssertEqual(snapshot.schemaVersion, 4)
         XCTAssertEqual(snapshot.stepIndex, 75)
         let decoded = try ExperienceSnapshot(data: snapshot.encoded())
         var second = try await makeEngine(seed: 3)
@@ -243,10 +243,10 @@ final class AquariumCoreTests: XCTestCase {
         try engine.run(steps: 10)
         let digest = try engine.digest()
         let state = try XCTUnwrap(engine.core).state
-        let newer = try ExperienceSnapshot(experience: aquariumID, schemaVersion: 4, seed: 7, stepIndex: 10,
+        let newer = try ExperienceSnapshot(experience: aquariumID, schemaVersion: 5, seed: 7, stepIndex: 10,
                                            digest: digest, payload: AquariumCore.encode(state))
         XCTAssertThrowsError(try engine.restore(newer)) { error in
-            XCTAssertEqual(error as? ExperienceError, .snapshot(.newerSchema(found: 4, current: 3)))
+            XCTAssertEqual(error as? ExperienceError, .snapshot(.newerSchema(found: 5, current: 4)))
         }
         var broken = state
         broken.document.lighting = 7
@@ -402,5 +402,49 @@ final class AquariumCoreTests: XCTestCase {
         XCTAssertThrowsError(try AquariumCore.restore(payload: AquariumCore.encode(damaged), seed: 7)) { error in
             XCTAssertEqual(error as? AquariumRestoreError, .invalidDecorKind(5))
         }
+    }
+
+    // MARK: Feature 072 (A09-P05) T-A09-504 — ambient mode, decor transforms, schema 4 (FR-A09-501, 510, 520)
+
+    func testAmbientModeIsSavedAndSlowsTheFish() async throws {
+        var calm = try await makeEngine()
+        var normal = try await makeEngine()
+        XCTAssertTrue(calm.handle(control: "ambient.mode", values: [1]).isAccepted)
+        XCTAssertTrue(try XCTUnwrap(calm.core).ambient)
+        try calm.run(steps: 900)
+        try normal.run(steps: 900)
+        func meanSpeed(_ core: AquariumCore) -> Double {
+            let fish = core.document.fish
+            return fish.map(\.velocity.length).reduce(0, +) / Double(max(fish.count, 1))
+        }
+        XCTAssertLessThan(meanSpeed(try XCTUnwrap(calm.core)), meanSpeed(try XCTUnwrap(normal.core)) * 0.8)
+        let snapshot = try ExperienceSnapshot(data: calm.snapshot().encoded())
+        var other = try await makeEngine(seed: 3)
+        try other.restore(snapshot)
+        XCTAssertTrue(try XCTUnwrap(other.core).ambient)
+        XCTAssertEqual(calm.handle(control: "ambient.mode", values: [0.5]).code,
+                       "action.rule." + AquariumRule.invalidChoice)
+    }
+
+    func testDecorTurnSetsRotationAndScale() async throws {
+        var engine = try await makeEngine()
+        XCTAssertTrue(engine.handle(control: "decor.turn", values: [0, 1.2, 1.5]).isAccepted)
+        let piece = try XCTUnwrap(engine.core).document.decor[0]
+        XCTAssertEqual(piece.rotation, 1.2)
+        XCTAssertEqual(piece.scale, 1.5)
+        XCTAssertEqual(engine.handle(control: "decor.turn", values: [11, 0, 1]).code,
+                       "action.rule." + AquariumRule.noSuchDecor)
+    }
+
+    func testASchemaThreeSnapshotMigratesWithAmbientOff() async throws {
+        let example = try XCTUnwrap(AquariumCore.schemaThreeExample())
+        XCTAssertEqual(example.version, 3)
+        var engine = try await makeEngine(seed: 3)
+        try engine.restore(ExperienceSnapshot(data: example.snapshot))
+        XCTAssertEqual(try engine.digest().hex, example.expectedDigest)
+        let core = try XCTUnwrap(engine.core)
+        XCTAssertFalse(core.ambient)
+        XCTAssertEqual(core.decorKind, 2)
+        XCTAssertEqual(core.document.habitatId, AquariumCore.catalog.habitats[1].id)
     }
 }
