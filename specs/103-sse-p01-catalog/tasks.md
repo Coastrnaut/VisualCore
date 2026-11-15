@@ -27,7 +27,7 @@ after every task (no trailers); read every check's exit before ticking. iOS 27 o
 
 ## Phase 5: Records and evidence
 
-- [ ] T-A14-108 Solar System Explorer tests on sim-27.2 (`--name sse-ios27 -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing SolarSystemExplorerCoreTests SolarSystemExplorerExperienceTests`) (SC-A14-101–105)
+- [X] T-A14-108 Solar System Explorer tests on sim-27.2 (`--name sse-ios27 -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing SolarSystemExplorerCoreTests SolarSystemExplorerExperienceTests`) (SC-A14-101–105) — Verified 2026-11-15: 2026-11-15: .autonomy/checks/A14-P01.sse-ios27.json exit 0 on sim-27.2 (core 25, experience 29, manifest 4; each test well under 10 s)
 - [ ] T-A14-109 App build and unit (`xcodegen generate --spec project.yml`; `--name app-unit -- python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27`) and runner (`--name verify-27 -- python3 scripts/verify_experiences.py --only a14.solar-system-explorer --runtime 27`) (SC-A14-105)
 - [ ] T-A14-110 Packages and script tests (`--name experience-packages -- python3 scripts/check_experience_packages.py`; `--name script-tests -- python3 scripts/test_scripts.py`)
 - [ ] T-A14-111 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A14-P01; update README.md in the record commit (rule 16)
