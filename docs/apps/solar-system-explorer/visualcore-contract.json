@@ -400,7 +400,7 @@
       "id": "M05",
       "capability": "Time-based simulation: body positions advanced from a simulated time by a deterministic model, stepped with a bounded clock, replayable, independent of frame rate",
       "source": "brainstorm: time-based simulation",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCore/Sources/VisualCoreSimulation/FixedStepClock.swift",
@@ -443,7 +443,7 @@
         "file": "Packages/ExperiencesCreative/ParticleUniverse/Core/SceneSimulation.swift",
         "symbol": "SceneSimulation"
       },
-      "notes": "Fixed steps, replayable command streams, delta clamping and background pause exist and are tested (FixedStepClockTests, FixedStepRunnerTests, SceneClockTests, TimeStepPolicyTests, PlaybackStateTests). Missing: an orbit model that turns a simulated date into positions (G-ORBIT) and a simulated calendar date advancing at a chosen rate within a bounded range (G-TIME); SceneClock's speed range 0...4 and its scene duration are not a calendar. A14-P02 (G-ORBIT): the orbit model turns a simulated date (SimulatedDate, days since J2000.0, 1950–2050, steps ±1, ±30, ±365 days) into positions (OrbitModel; OrbitFixtureTests, SimulatedDateTests); play, pause and rate stay with G-TIME (A14-P04)."
+      "notes": "Fixed steps, replayable command streams, delta clamping and background pause exist and are tested (FixedStepClockTests, FixedStepRunnerTests, SceneClockTests, TimeStepPolicyTests, PlaybackStateTests). Missing: an orbit model that turns a simulated date into positions (G-ORBIT) and a simulated calendar date advancing at a chosen rate within a bounded range (G-TIME); SceneClock's speed range 0...4 and its scene duration are not a calendar. A14-P02 (G-ORBIT): the orbit model turns a simulated date (SimulatedDate, days since J2000.0, 1950–2050, steps ±1, ±30, ±365 days) into positions (OrbitModel; OrbitFixtureTests, SimulatedDateTests); play, pause and rate stay with G-TIME (A14-P04). A14-P04 (G-TIME, closed): the date advances on host steps at 1 day, week, month or year per second while playing and stops at the range ends with a reason (SimClock, SolarState.advance; SimClockTests, SolarStateSchema4Tests)."
     },
     {
       "id": "M06",
@@ -553,7 +553,7 @@
       "id": "M08",
       "capability": "Play, pause and speed up simulated motion with an explicit date and time display (UTC by default), reset to present from the device clock",
       "source": "v0.1 feature 3: play/pause/speed up simulated motion with explicit date/time display",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCore/Sources/VisualCoreSimulation/SceneClock.swift",
@@ -590,7 +590,7 @@
         "file": "Packages/ExperiencesCreative/FractalExplorer/Experience/FractalScene.swift",
         "symbol": "FractalScene"
       },
-      "notes": "Play, pause, toggle, a bounded speed and background pause exist and are tested (SceneClockTests, PlaybackStateTests, FixedStepClockTests). Missing: a simulated UTC instant advanced by a rate in simulated days per second, with discrete rate steps, a bounded date range and reset to present (G-TIME); a reusable scaled-date clock is assessed for VisualCoreSimulation there."
+      "notes": "Play, pause, toggle, a bounded speed and background pause exist and are tested (SceneClockTests, PlaybackStateTests, FixedStepClockTests). Missing: a simulated UTC instant advanced by a rate in simulated days per second, with discrete rate steps, a bounded date range and reset to present (G-TIME); a reusable scaled-date clock is assessed for VisualCoreSimulation there. A14-P04 (G-TIME, closed): play, pause and four rates with the UTC date and time shown and spoken (rate-limited), reset to the present through date.set from an injected clock, no fast-forward while suspended (SolarCore, SolarControls, AnnouncementLimiter; SolarTimeTourSessionTests)."
     },
     {
       "id": "M09",
@@ -627,7 +627,7 @@
       "id": "M10",
       "capability": "Guided tours with narration-free captions: a bounded sequence of camera stops over bodies with eased flights, holds and a caption per stop, pausable and skippable, Reduce Motion cutting instead of flying",
       "source": "v0.1 feature 5: guided tours with narration-free captions",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCore/Sources/VisualCoreMath/FramingFlight.swift",
@@ -664,13 +664,13 @@
         "file": "Packages/ExperiencesCreative/FractalExplorer/Experience/TourPlayer.swift",
         "symbol": "TourPlayer"
       },
-      "notes": "Tour timing with holds and a Reduce Motion form (FramingFlightTests), 3D camera rails (CameraRailTests) and announcements (AccessibilityPlansTests) exist. TourTimeline moves 2D PlaneFraming stops, not orbit cameras, so 3D tours with captions are G-TOURS (app-local over TourTimeline's timing and OrbitCamera); a generic 3D orbit-camera tour track is assessed for VisualCoreMath there."
+      "notes": "Tour timing with holds and a Reduce Motion form (FramingFlightTests), 3D camera rails (CameraRailTests) and announcements (AccessibilityPlansTests) exist. TourTimeline moves 2D PlaneFraming stops, not orbit cameras, so 3D tours with captions are G-TOURS (app-local over TourTimeline's timing and OrbitCamera); a generic 3D orbit-camera tour track is assessed for VisualCoreMath there. A14-P04 (G-TOURS, closed): two bounded tours (Inner planets, Giant planets) with catalog-built captions, pause, skip and stop, Reduce Motion cutting between stops (Tours, SolarState; ToursTests, SolarTimeTourSessionTests)."
     },
     {
       "id": "M11",
       "capability": "References and units on educational claims: every fact card value shows its units and a citation of a bundled reviewed source",
       "source": "v0.1 feature 6: references and units displayed on educational claims; manual regression fixture all displayed facts reference a bundled source",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCoreRendering/Sources/VisualCoreUI/AcknowledgementsView.swift",
@@ -689,7 +689,7 @@
         "file": "Packages/ExperiencesCreative/TinyWorlds/Core/LicenseAudit.swift",
         "symbol": "LicenseAudit"
       },
-      "notes": "A license inventory and acknowledgements screen exist and are tested (AcknowledgementsViewTests). No fact, unit or citation model exists in a framework product: the citation records and units are G-CATALOG and the fact cards that show them are G-TOURS, both app-local. A14-P01 (G-CATALOG): every fact on a card shows its unit and its source title (FactCard; SolarCoreTests, SolarSessionTests); the reviewed citation display in tours stays with G-TOURS."
+      "notes": "A license inventory and acknowledgements screen exist and are tested (AcknowledgementsViewTests). No fact, unit or citation model exists in a framework product: the citation records and units are G-CATALOG and the fact cards that show them are G-TOURS, both app-local. A14-P01 (G-CATALOG): every fact on a card shows its unit and its source title (FactCard; SolarCoreTests, SolarSessionTests); the reviewed citation display in tours stays with G-TOURS. A14-P04 (G-TOURS, closed): captions take every number from the sourced catalog with its unit and source title (ToursTests), and the saved view document round-trips with damaged, newer and oversized files refused (SavedView, ViewStore; SavedViewTests, ViewStoreTests)."
     },
     {
       "id": "M12",
@@ -812,7 +812,7 @@
       "id": "M15",
       "capability": "Bounded content and date range: fixed caps for body count, mesh detail, orbit samples, time rate and the simulated date range; non-finite values and documents beyond the caps refused",
       "source": "cross-cutting: bounded content and date range; constitution A14 bounded; spec edge case long timescales",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCore/Sources/VisualCoreScenes/MeshBuilder.swift",
@@ -849,7 +849,7 @@
         "file": "Packages/ExperiencesCreative/AudioOdyssey/Core/OdysseyQuality.swift",
         "symbol": "OdysseyQuality"
       },
-      "notes": "Mesh and resource budgets, a bounded speed and numeric hygiene exist and are tested (MeshBuilderTests, ResourceLedgerTests, NumericHygieneTests, SceneClockTests). Missing: the catalog's body cap and validation (G-CATALOG) and the simulated date range and rate cap that keep long timescales from overflowing or leaving the model's validity range (G-TIME). A14-P01 (G-CATALOG): the catalog document is versioned and bounded (1…16 bodies, radius, axis, period and tilt ranges; BodyCatalogTests); the simulated date range stays with G-TIME."
+      "notes": "Mesh and resource budgets, a bounded speed and numeric hygiene exist and are tested (MeshBuilderTests, ResourceLedgerTests, NumericHygieneTests, SceneClockTests). Missing: the catalog's body cap and validation (G-CATALOG) and the simulated date range and rate cap that keep long timescales from overflowing or leaving the model's validity range (G-TIME). A14-P01 (G-CATALOG): the catalog document is versioned and bounded (1…16 bodies, radius, axis, period and tilt ranges; BodyCatalogTests); the simulated date range stays with G-TIME. A14-P04 (G-TIME, closed): the simulated instant is a state value advanced only by host steps, so the same command stream gives the same digest (SolarCoreTests) and the manifest fixtures fixture-play-year and fixture-tour-inner pin it."
     },
     {
       "id": "M16",
@@ -1126,13 +1126,13 @@
         "file": "Packages/ExperiencesCreative/FractalExplorer/Experience/FractalScene.swift",
         "symbol": "FractalScene"
       },
-      "notes": "Clocks with elapsed simulated time and announcements exist and are tested (SceneClockTests, FixedStepClockTests, AccessibilityPlansTests); no framework product holds a calendar date or time zone. The labelled UTC date and the range rule are G-TIME; the model-scope wording review is G-REVIEW; both app-local."
+      "notes": "Clocks with elapsed simulated time and announcements exist and are tested (SceneClockTests, FixedStepClockTests, AccessibilityPlansTests); no framework product holds a calendar date or time zone. The labelled UTC date and the range rule are G-TIME; the model-scope wording review is G-REVIEW; both app-local. A14-P04 (G-TIME, closed): the spoken date and rate are rate-limited (AnnouncementLimiter); the wording review stays with G-REVIEW."
     },
     {
       "id": "M23",
       "capability": "Orbit lines, labels and starfield: orbit paths drawn as thin closed meshes, native labels placed at projected body positions without overlapping the controls, and a procedural seeded starfield backdrop",
       "source": "cross-cutting: orbit lines and labels; manual render sequence stage 3; spec FR-A14-003",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCore/Sources/VisualCoreScenes/MeshShapes.swift",
@@ -1163,13 +1163,19 @@
           "symbol": "SeededRandom",
           "product": "VisualCoreSimulation",
           "public": true
+        },
+        {
+          "file": "Packages/VisualCoreRendering/Sources/VisualCoreExperienceHost/ExperiencePresenter.swift",
+          "symbol": "makeCanvasOverlay",
+          "product": "VisualCoreExperienceHost",
+          "public": true
         }
       ],
       "example": {
         "file": "Packages/ExperiencesCreative/AudioOdyssey/Core/WorldPieces.swift",
         "symbol": "WorldPieces"
       },
-      "notes": "Tubes along a path (MeshShapeTests), projection to the screen (OrbitCameraTests), instanced quads through Camera2D (ParticleRendererTests), full-screen shader scenes and seeded random numbers (SeededRandomTests) exist. Missing: orbit samples from the model (G-ORBIT), and the orbit line, label placement and starfield of the solar system scene (G-BODIES, app-local); ParticleRenderer draws through Camera2D, so a 3D starfield is either sphere-mapped in a shader or projected stars. A14-P03 (G-BODIES, closed): orbit lines for both scale modes and a seeded 400-star backdrop centred on the eye inside the far plane (SceneMeshes; SceneMeshesTests); the native labels at projected positions moved to G-TOURS (A14-P04)."
+      "notes": "Tubes along a path (MeshShapeTests), projection to the screen (OrbitCameraTests), instanced quads through Camera2D (ParticleRendererTests), full-screen shader scenes and seeded random numbers (SeededRandomTests) exist. Missing: orbit samples from the model (G-ORBIT), and the orbit line, label placement and starfield of the solar system scene (G-BODIES, app-local); ParticleRenderer draws through Camera2D, so a 3D starfield is either sphere-mapped in a shader or projected stars. A14-P03 (G-BODIES, closed): orbit lines for both scale modes and a seeded 400-star backdrop centred on the eye inside the far plane (SceneMeshes; SceneMeshesTests); the native labels at projected positions moved to G-TOURS (A14-P04). A14-P04 (G-TOURS, closed): native labels at projected body positions in the host's canvas overlay, never overlapping one another or the controls and hidden behind the camera (LabelLayout, SolarOverlay; LabelLayoutTests)."
     },
     {
       "id": "M24",
@@ -1273,10 +1279,10 @@
       ],
       "kind": "adaptation",
       "owner": "app-local",
-      "justification": "SceneClock, FixedStepClock and PlaybackState give play, pause, a bounded speed and background pause, but no simulated calendar instant, rate in simulated days per second, bounded date range, UTC label or reset to present exist. The simulated clock and its labelled UTC date, discrete rates, the date range inside the model's validity range and the spoken date and rate are app-local over SceneClock and PlaybackState (clarification 5, manual phase 04 time controls, A14-P04); a reusable scaled-date clock is assessed for VisualCoreSimulation there.",
+      "justification": "SceneClock, FixedStepClock and PlaybackState give play, pause, a bounded speed and background pause, but no simulated calendar instant, rate in simulated days per second, bounded date range, UTC label or reset to present exist. The simulated clock and its labelled UTC date, discrete rates, the date range inside the model's validity range and the spoken date and rate are app-local over SceneClock and PlaybackState (clarification 5, manual phase 04 time controls, A14-P04); a reusable scaled-date clock is assessed for VisualCoreSimulation there. A14-P04 (closing): app-local SimClock (four rates, step-driven, range clamp with a reason) inside the deterministic core; a reusable scaled-date clock was not added to VisualCoreSimulation (one consumer).",
       "phase": 4,
       "test": "Core host tests: play, pause and each rate advance the simulated UTC instant by rate times elapsed time; the date clamps at both ends of the range with a typed reason; backgrounding never fast-forwards; reset to present uses an injected clock; the displayed date carries its time zone (UTC by default); the same command stream gives the same instants and digest; spoken date and rate announcements are rate limited",
-      "closed": null
+      "closed": "A14-P04"
     },
     {
       "id": "G-TOURS",
@@ -1287,10 +1293,10 @@
       ],
       "kind": "adaptation",
       "owner": "app-local",
-      "justification": "TourTimeline (2D PlaneFraming stops), CameraRail, the announcement planner and ExperienceStorage exist, but captioned 3D tours over bodies, fact cards showing units and citations, and the saved view document (camera, simulated date, rate, scale mode, selected body) do not. They are Solar System Explorer's content and UI, app-local over TourTimeline's timing, OrbitCamera and ExperienceStorage (clarification 5, manual phase 04 guided tours, A14-P04); a generic 3D orbit-camera tour track is assessed for VisualCoreMath there. From A14-P03: the native labels at projected body positions (row M23), which share the captions' canvas overlay.",
+      "justification": "TourTimeline (2D PlaneFraming stops), CameraRail, the announcement planner and ExperienceStorage exist, but captioned 3D tours over bodies, fact cards showing units and citations, and the saved view document (camera, simulated date, rate, scale mode, selected body) do not. They are Solar System Explorer's content and UI, app-local over TourTimeline's timing, OrbitCamera and ExperienceStorage (clarification 5, manual phase 04 guided tours, A14-P04); a generic 3D orbit-camera tour track is assessed for VisualCoreMath there. From A14-P03: the native labels at projected body positions (row M23), which share the captions' canvas overlay. A14-P04 (closing): the labels and captions use a generic, additive canvas overlay slot added to VisualCoreExperienceHost (ExperiencePresenter.makeCanvasOverlay, Experience.canvasOverlay; CanvasOverlayTests, README, API baseline); tours, captions, the saved view and label placement stay app-local; a generic 3D tour track was not needed (tours select bodies and reuse the A14-P03 focus flight).",
       "phase": 4,
       "test": "Core and experience tests: each bundled tour is bounded in stops and duration, every stop has a caption and a valid body, pause and skip work, and Reduce Motion cuts between stops; every fact card value shows units and a citation present in the catalog; the saved view document round-trips, and damaged, newer and oversized files are reported; each label sits at its body's projected position, never overlaps the controls and is hidden for a body behind the camera",
-      "closed": null
+      "closed": "A14-P04"
     },
     {
       "id": "G-REVIEW",
