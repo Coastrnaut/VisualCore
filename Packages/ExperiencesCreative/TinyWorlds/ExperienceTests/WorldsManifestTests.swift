@@ -3,7 +3,10 @@
 // `fixture-<preset>-<seed>` and the three refusal scenarios; its derived digests and expected results equal to what the
 // engine gives when the runner plays them; every fixture's world generating its committed terrain digest (the same
 // values as the core's `TerrainFixtureTests`); and the committed `scenario-manifest.json` equal to the Swift manifest
-// (`UPDATE_SCENARIO_MANIFEST=1`, on the simulator `TEST_RUNNER_UPDATE_SCENARIO_MANIFEST=1`, rewrites it).
+// (`UPDATE_SCENARIO_MANIFEST=1`, on the simulator `TEST_RUNNER_UPDATE_SCENARIO_MANIFEST=1`, rewrites it). Feature 091
+// (A12-P03) T-A12-303 (FR-A12-302, FR-A12-323; SC-A12-301, SC-A12-302): the prop fixture `fixture-props-island-1` and
+// four prop refusal scenarios follow; the fixture's props rest on the terrain and its final digest pins their exact
+// transforms and the light.
 import Foundation
 import Testing
 @testable import TinyWorldsExperience
@@ -34,6 +37,9 @@ private func play(_ spec: ScenarioSpec) async throws -> (initial: String, result
     static let fixtureNames = WorldsCore.terrainFixtures.map { WorldsCore.fixtureName($0.preset, seed: $0.seed) }
     /// The names of the three refusal scenarios.
     static let refusalNames = ["refusal-preset-out-of-range", "refusal-preset-fractional", "refusal-zoom-out-of-range"]
+    /// The prop fixture and the four prop refusal scenarios (feature 091).
+    static let propNames = ["fixture-props-island-1", "refusal-prop-outside", "refusal-prop-under-water",
+                            "refusal-prop-too-close", "refusal-prop-no-selection"]
 
     @Test func theManifestIsValidWithTheStandardScenariosNineFixturesAndThreeRefusals() {
         let manifest = WorldsCore.manifest(for: id)
@@ -41,7 +47,7 @@ private func play(_ spec: ScenarioSpec) async throws -> (initial: String, result
                                                           content: ContentRequirement(fixtures: 9))
         #expect(problems.isEmpty, "\(problems)")
         #expect(manifest.scenarios.map(\.name)
-                == ScenarioManifest.standardNames + Self.fixtureNames + Self.refusalNames)
+                == ScenarioManifest.standardNames + Self.fixtureNames + Self.refusalNames + Self.propNames)
         #expect(Self.fixtureNames == [
             "fixture-island-1", "fixture-island-2", "fixture-island-3",
             "fixture-asteroid-garden-1", "fixture-asteroid-garden-2", "fixture-asteroid-garden-3",
@@ -74,10 +80,30 @@ private func play(_ spec: ScenarioSpec) async throws -> (initial: String, result
         #expect(completion.expect.outcome == "world-miniature-city")
         #expect(WorldsCore.played(seed: completion.seed, entries: completion.entries).outcome?.code
                 == completion.expect.outcome)
-        for name in Self.refusalNames {
+        for name in Self.refusalNames + ["refusal-prop-outside", "refusal-prop-under-water",
+                                         "refusal-prop-no-selection"] {
             let spec = try #require(manifest.scenarios.first { $0.name == name })
             #expect(spec.expect.finalDigest == spec.expect.initialDigest, "\(name) changes nothing")
         }
+    }
+
+    @Test func thePropFixturePinsExactTransformsOnTheTerrain() async throws {
+        let manifest = WorldsCore.manifest(for: id)
+        let spec = try #require(manifest.scenarios.first { $0.name == "fixture-props-island-1" })
+        let played = try await play(spec)
+        let core = try #require(played.core)
+        #expect(core.props.map(\.kind) == [.tree, .house])
+        #expect(core.props[0].x == 0.5 && core.props[0].z == -0.5)
+        #expect(core.props[0].rotation == Double.pi / 4)
+        #expect(core.props[1].x == 1.5 && core.props[1].z == 0.5 && core.props[1].rotation == 0)
+        #expect(core.selection == -1, "the deleted rock's selection cleared")
+        #expect(core.light == WorldLight(azimuth: 120, elevation: 30, ambient: 0.2))
+        let field = try #require(WorldEditing.groundField(of: core.state))
+        for prop in core.props {
+            #expect(abs(prop.y - WorldEditing.groundHeight(field: field, x: prop.x, z: prop.z)) < 1e-3)
+        }
+        #expect(spec.expect.finalDigest == played.final)
+        #expect(spec.expect.finalDigest != spec.expect.initialDigest)
     }
 
     @Test func everyFixtureGeneratesItsCommittedTerrainDigest() async throws {

@@ -424,10 +424,11 @@
         "terrain coloured by height",
         "drag to orbit, pinch to zoom",
         "eye kept above the terrain",
-        "tap the ground to locate it",
+        "place, move, turn and delete props",
+        "sun direction and ambient light",
+        "four saved worlds with pictures",
         "three terrain detail levels",
-        "new seed on request",
-        "deterministic terrain digests"
+        "new seed on request"
       ],
       "quality_tiers": [
         "level-0",

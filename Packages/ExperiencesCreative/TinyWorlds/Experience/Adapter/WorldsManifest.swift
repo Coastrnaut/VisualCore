@@ -13,6 +13,19 @@
 //     digest.
 // The expected digests are derived by playing the entries on a core exactly as the engine plays them (the steps of an
 // entry, then its action) and digesting it with the experience id as domain, as Physics Playground's manifest does.
+//
+// Feature 091 (A12-P03) T-A12-303 (FR-A12-302, FR-A12-303, FR-A12-310, FR-A12-323; SC-A12-301, SC-A12-302): the prop
+// and light scenarios, all on the island of seed 1:
+//   - `fixture-props-island-1` (the phase's regression fixture: placed props persist at exact transforms): places a
+//     tree at the centre, a house at (1.5, 0.5) and a rock at (−1, 1.25), selects the tree, moves it by (0.5, −0.5),
+//     turns it by 45°, selects the rock and deletes it, then sets the light (azimuth 120°, elevation 30°, ambient
+//     0.2); its final digest pins every transform and the light;
+//   - `refusal-prop-outside` (x 5.8 m: `a12.outside`), `refusal-prop-under-water` (the island's corner (5.4, 5.4):
+//     `a12.under-water`), `refusal-prop-too-close` (a second prop 0.3 m from the first: `a12.too-close`, after an
+//     accepted placement) and `refusal-prop-no-selection` (`prop.delete` with nothing selected: `a12.no-selection`);
+//     the first, second and fourth end in their initial digest;
+//   - the rejection scenario also refuses a prop kind 4 and an elevation of 90° (out of range) and a move with
+//     nothing selected.
 #if DEBUG || VISUALCORE_AUTOMATION
 import TinyWorldsCore
 import VisualCoreExperience
@@ -69,7 +82,41 @@ extension WorldsCore {
                 ScenarioStep(steps: 0, action: ScriptedAction("view.orbit", [200, 0]), result: "action.out-of-range"),
                 ScenarioStep(steps: 0, action: ScriptedAction("world.seed", [1]), result: "action.wrong-value-count"),
                 ScenarioStep(steps: 0, action: ScriptedAction("view.reset", [0]), result: "action.wrong-value-count"),
-                ScenarioStep(steps: 0, action: ScriptedAction("view.orbit", [10]), result: "action.wrong-value-count")]
+                ScenarioStep(steps: 0, action: ScriptedAction("view.orbit", [10]), result: "action.wrong-value-count"),
+                ScenarioStep(steps: 0, action: ScriptedAction("prop.place", [4, 0, 0]), result: "action.out-of-range"),
+                ScenarioStep(steps: 0, action: ScriptedAction("light.elevation", [90]), result: "action.out-of-range"),
+                ScenarioStep(steps: 0, action: ScriptedAction("prop.move", [0.5, 0]),
+                             result: "action.rule." + WorldEditRefusal.noSelection.rawValue)]
+    }
+
+    /// The entries of `fixture-props-island-1` (see the file header).
+    public static var propEntries: [ScenarioStep] {
+        func step(_ control: String, _ values: [Double] = []) -> ScenarioStep {
+            ScenarioStep(steps: 1, action: ScriptedAction(control, values), result: "accepted")
+        }
+        return [step("prop.place", [0, 0, 0]), step("prop.place", [2, 1.5, 0.5]), step("prop.place", [1, -1, 1.25]),
+                step("prop.select", [0]), step("prop.move", [0.5, -0.5]), step("prop.rotate", [45]),
+                step("prop.select", [2]), step("prop.delete"), step("light.azimuth", [120]),
+                step("light.elevation", [30]), step("light.ambient", [0.2])]
+    }
+
+    /// The prop refusal scenarios by name with their entries (see the file header), and whether they end in their
+    /// initial digest.
+    public static var propRefusalScenarios: [(name: String, entries: [ScenarioStep], unchanged: Bool)] {
+        func rule(_ refusal: WorldEditRefusal) -> String { "action.rule." + refusal.rawValue }
+        return [
+            ("refusal-prop-outside",
+             [ScenarioStep(steps: 0, action: ScriptedAction("prop.place", [0, 5.8, 0]), result: rule(.outside))], true),
+            ("refusal-prop-under-water",
+             [ScenarioStep(steps: 0, action: ScriptedAction("prop.place", [3, 5.4, 5.4]), result: rule(.underWater))],
+             true),
+            ("refusal-prop-too-close",
+             [ScenarioStep(steps: 0, action: ScriptedAction("prop.place", [0, 0, 0]), result: "accepted"),
+              ScenarioStep(steps: 0, action: ScriptedAction("prop.place", [1, 0.3, 0]), result: rule(.tooClose))],
+             false),
+            ("refusal-prop-no-selection",
+             [ScenarioStep(steps: 0, action: ScriptedAction("prop.delete"), result: rule(.noSelection))], true),
+        ]
     }
 
     /// The refusal scenarios by name with their single entry (see the file header).
@@ -148,6 +195,16 @@ extension WorldsCore {
         for refusal in refusalScenarios {
             specs.append(ScenarioSpec(name: refusal.name, seed: seed, entries: [refusal.entry],
                                       expect: ScenarioExpectations(initialDigest: initial, finalDigest: initial)))
+        }
+        let props = propEntries
+        specs.append(ScenarioSpec(name: "fixture-props-island-1", seed: seed, entries: props,
+                                  expect: ScenarioExpectations(initialDigest: initial,
+                                                               finalDigest: expectedDigest(for: id, seed: seed,
+                                                                                           entries: props))))
+        for refusal in propRefusalScenarios {
+            let final = refusal.unchanged ? initial : expectedDigest(for: id, seed: seed, entries: refusal.entries)
+            specs.append(ScenarioSpec(name: refusal.name, seed: seed, entries: refusal.entries,
+                                      expect: ScenarioExpectations(initialDigest: initial, finalDigest: final)))
         }
         return ScenarioManifest(experience: id, kind: .creative, scenarios: specs)
     }

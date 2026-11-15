@@ -269,10 +269,13 @@ extension ExperienceRegistry {
         return registration
     }
 
-    /// A12 Tiny Worlds (feature 089, A12-P01): a candidate until X-A12.
+    /// A12 Tiny Worlds (features 088–091, A12-P00…P03): a candidate until X-A12.
     fileprivate static var tinyWorlds: ExperienceRegistration? {
         guard let id = TinyWorldsExperience.id else { return nil }
-        var registration = ExperienceRegistration(id: id, core: WorldsCore.self, examples: []) { launch in
+        // Schema 2 (feature 091, A12-P03) adds props, the selection and the light; the stored schema-1 example proves
+        // the migration.
+        let examples = [WorldsCore.schemaOneExample()].compactMap { $0 }
+        var registration = ExperienceRegistration(id: id, core: WorldsCore.self, examples: examples) { launch in
             let system = SystemAccessibilityObserver.systemValues()
             return TinyWorldsExperience.make(id: id, storage: launch.storage,
                                              reduceMotion: launch.reduceMotion.resolved(system: system.reduceMotion),

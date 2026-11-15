@@ -4,7 +4,15 @@
     "world.seed",
     "view.orbit",
     "view.zoom",
-    "view.reset"
+    "view.reset",
+    "prop.place",
+    "prop.select",
+    "prop.move",
+    "prop.rotate",
+    "prop.delete",
+    "light.azimuth",
+    "light.elevation",
+    "light.ambient"
   ],
   "experience" : "a12.tiny-worlds",
   "kind" : "creative",
@@ -14,7 +22,7 @@
 
       ],
       "expect" : {
-        "initialDigest" : "b2a20cc67ad727bb4ca0e91cae3d3fa98adc4fcfd09009bb680ccc2105277224"
+        "initialDigest" : "f64e358a43a19ebe3a09118d77a4cf0d2d05d000fa228792afca40c73c92fef5"
       },
       "name" : "launch-first-frame",
       "seed" : "1"
@@ -64,8 +72,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "548fb9cee985cd0a046ee38fb2a27786b75904f287a16214df864a5c5c270f13",
-        "initialDigest" : "b2a20cc67ad727bb4ca0e91cae3d3fa98adc4fcfd09009bb680ccc2105277224"
+        "finalDigest" : "c48c0863b181baf9f1ac65073b7f98eb267626763cf7ba0de9d816636438b4a5",
+        "initialDigest" : "f64e358a43a19ebe3a09118d77a4cf0d2d05d000fa228792afca40c73c92fef5"
       },
       "name" : "input-response",
       "seed" : "1"
@@ -181,6 +189,39 @@
           },
           "result" : "action.wrong-value-count",
           "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "prop.place",
+            "values" : [
+              4,
+              0,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "light.elevation",
+            "values" : [
+              90
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "prop.move",
+            "values" : [
+              0.5,
+              0
+            ]
+          },
+          "result" : "action.rule.a12.no-selection",
+          "steps" : 0
         }
       ],
       "expect" : {
@@ -234,8 +275,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "548fb9cee985cd0a046ee38fb2a27786b75904f287a16214df864a5c5c270f13",
-        "initialDigest" : "b2a20cc67ad727bb4ca0e91cae3d3fa98adc4fcfd09009bb680ccc2105277224"
+        "finalDigest" : "c48c0863b181baf9f1ac65073b7f98eb267626763cf7ba0de9d816636438b4a5",
+        "initialDigest" : "f64e358a43a19ebe3a09118d77a4cf0d2d05d000fa228792afca40c73c92fef5"
       },
       "name" : "save-restore",
       "seed" : "1"
@@ -285,7 +326,7 @@
         }
       ],
       "expect" : {
-        "initialDigest" : "b2a20cc67ad727bb4ca0e91cae3d3fa98adc4fcfd09009bb680ccc2105277224",
+        "initialDigest" : "f64e358a43a19ebe3a09118d77a4cf0d2d05d000fa228792afca40c73c92fef5",
         "resetDigest" : true
       },
       "name" : "reset",
@@ -336,8 +377,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "b2a20cc67ad727bb4ca0e91cae3d3fa98adc4fcfd09009bb680ccc2105277224",
-        "initialDigest" : "b2a20cc67ad727bb4ca0e91cae3d3fa98adc4fcfd09009bb680ccc2105277224"
+        "finalDigest" : "f64e358a43a19ebe3a09118d77a4cf0d2d05d000fa228792afca40c73c92fef5",
+        "initialDigest" : "f64e358a43a19ebe3a09118d77a4cf0d2d05d000fa228792afca40c73c92fef5"
       },
       "name" : "fixture-island-1",
       "seed" : "1"
@@ -356,8 +397,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "2e7be2b7348f28de92ef0d823190174a9a403dec86fb5c6f07561bcfd69af62d",
-        "initialDigest" : "2e7be2b7348f28de92ef0d823190174a9a403dec86fb5c6f07561bcfd69af62d"
+        "finalDigest" : "0551de61f5105348dbaaacfa7d9c0fb468c835f94a3d583cde6775530ed85a55",
+        "initialDigest" : "0551de61f5105348dbaaacfa7d9c0fb468c835f94a3d583cde6775530ed85a55"
       },
       "name" : "fixture-island-2",
       "seed" : "2"
@@ -376,8 +417,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "021580e2723a77b687689b4664d114efa2a57231597ca2627bdda4e9136dd776",
-        "initialDigest" : "021580e2723a77b687689b4664d114efa2a57231597ca2627bdda4e9136dd776"
+        "finalDigest" : "94c1c0552c776d95130389d29e6bdc7e1ea1779970a154d618ff94bf5253943b",
+        "initialDigest" : "94c1c0552c776d95130389d29e6bdc7e1ea1779970a154d618ff94bf5253943b"
       },
       "name" : "fixture-island-3",
       "seed" : "3"
@@ -396,8 +437,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "c5655456d515785826ca1d23fcbab20e6cd3f29fee117534cf2350f1b0fcfde6",
-        "initialDigest" : "b2a20cc67ad727bb4ca0e91cae3d3fa98adc4fcfd09009bb680ccc2105277224"
+        "finalDigest" : "5c016bfd21e71453ccd1efbab293980552e00044433aa0f97f82a0948e79708c",
+        "initialDigest" : "f64e358a43a19ebe3a09118d77a4cf0d2d05d000fa228792afca40c73c92fef5"
       },
       "name" : "fixture-asteroid-garden-1",
       "seed" : "1"
@@ -416,8 +457,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "07406c49c03cfb956d9363d633a3ba7322f8916e26b7c02051b269bd2c913b02",
-        "initialDigest" : "2e7be2b7348f28de92ef0d823190174a9a403dec86fb5c6f07561bcfd69af62d"
+        "finalDigest" : "a79a91a386198b1209c472dcbd7921b2cf849bdcaf2266e5e70f16670e0eb8a7",
+        "initialDigest" : "0551de61f5105348dbaaacfa7d9c0fb468c835f94a3d583cde6775530ed85a55"
       },
       "name" : "fixture-asteroid-garden-2",
       "seed" : "2"
@@ -436,8 +477,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "437d7a8fcc3b44ad5e3182d3520910b0a1ef06093cfa11dad6cf5f241fbe7e19",
-        "initialDigest" : "021580e2723a77b687689b4664d114efa2a57231597ca2627bdda4e9136dd776"
+        "finalDigest" : "16ed8cef5791c2ad2f92c64fc83639e205253db5cbea2f631ab4384d0d97aa88",
+        "initialDigest" : "94c1c0552c776d95130389d29e6bdc7e1ea1779970a154d618ff94bf5253943b"
       },
       "name" : "fixture-asteroid-garden-3",
       "seed" : "3"
@@ -456,8 +497,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "0d775211a1aa32492dac4b0efafa696e19156eca337987cf08d1b9aad4865c8c",
-        "initialDigest" : "b2a20cc67ad727bb4ca0e91cae3d3fa98adc4fcfd09009bb680ccc2105277224"
+        "finalDigest" : "07818a18a91031ebb8d374c8cdadd1f2d486c279279f481aa2c81facdb879c81",
+        "initialDigest" : "f64e358a43a19ebe3a09118d77a4cf0d2d05d000fa228792afca40c73c92fef5"
       },
       "name" : "fixture-miniature-city-1",
       "seed" : "1"
@@ -476,8 +517,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "b1e888014244fe2aea834158513b5dbb0a0f3be070f119c1139e7c0c9044c680",
-        "initialDigest" : "2e7be2b7348f28de92ef0d823190174a9a403dec86fb5c6f07561bcfd69af62d"
+        "finalDigest" : "a33a9c6fbae085adaf5bf06f47fc5ff5d535f9d1899e85f99ca9ed647b7cd6a3",
+        "initialDigest" : "0551de61f5105348dbaaacfa7d9c0fb468c835f94a3d583cde6775530ed85a55"
       },
       "name" : "fixture-miniature-city-2",
       "seed" : "2"
@@ -496,8 +537,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "352e02f6647863c246778d39112efed8be6b5a78d25047ef8a5c8bab64209fca",
-        "initialDigest" : "021580e2723a77b687689b4664d114efa2a57231597ca2627bdda4e9136dd776"
+        "finalDigest" : "d00647df19d640cbccab709735ab6d06442c4b351332fd083a64e4ea04e44231",
+        "initialDigest" : "94c1c0552c776d95130389d29e6bdc7e1ea1779970a154d618ff94bf5253943b"
       },
       "name" : "fixture-miniature-city-3",
       "seed" : "3"
@@ -516,8 +557,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "b2a20cc67ad727bb4ca0e91cae3d3fa98adc4fcfd09009bb680ccc2105277224",
-        "initialDigest" : "b2a20cc67ad727bb4ca0e91cae3d3fa98adc4fcfd09009bb680ccc2105277224"
+        "finalDigest" : "f64e358a43a19ebe3a09118d77a4cf0d2d05d000fa228792afca40c73c92fef5",
+        "initialDigest" : "f64e358a43a19ebe3a09118d77a4cf0d2d05d000fa228792afca40c73c92fef5"
       },
       "name" : "refusal-preset-out-of-range",
       "seed" : "1"
@@ -536,8 +577,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "b2a20cc67ad727bb4ca0e91cae3d3fa98adc4fcfd09009bb680ccc2105277224",
-        "initialDigest" : "b2a20cc67ad727bb4ca0e91cae3d3fa98adc4fcfd09009bb680ccc2105277224"
+        "finalDigest" : "f64e358a43a19ebe3a09118d77a4cf0d2d05d000fa228792afca40c73c92fef5",
+        "initialDigest" : "f64e358a43a19ebe3a09118d77a4cf0d2d05d000fa228792afca40c73c92fef5"
       },
       "name" : "refusal-preset-fractional",
       "seed" : "1"
@@ -556,10 +597,235 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "b2a20cc67ad727bb4ca0e91cae3d3fa98adc4fcfd09009bb680ccc2105277224",
-        "initialDigest" : "b2a20cc67ad727bb4ca0e91cae3d3fa98adc4fcfd09009bb680ccc2105277224"
+        "finalDigest" : "f64e358a43a19ebe3a09118d77a4cf0d2d05d000fa228792afca40c73c92fef5",
+        "initialDigest" : "f64e358a43a19ebe3a09118d77a4cf0d2d05d000fa228792afca40c73c92fef5"
       },
       "name" : "refusal-zoom-out-of-range",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "prop.place",
+            "values" : [
+              0,
+              0,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "prop.place",
+            "values" : [
+              2,
+              1.5,
+              0.5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "prop.place",
+            "values" : [
+              1,
+              -1,
+              1.25
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "prop.select",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "prop.move",
+            "values" : [
+              0.5,
+              -0.5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "prop.rotate",
+            "values" : [
+              45
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "prop.select",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "prop.delete",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "light.azimuth",
+            "values" : [
+              120
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "light.elevation",
+            "values" : [
+              30
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "light.ambient",
+            "values" : [
+              0.20000000000000001
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "21a631436a19bef4cc3300780605f635af7cd189cb65eac70ee2d102454519ef",
+        "initialDigest" : "f64e358a43a19ebe3a09118d77a4cf0d2d05d000fa228792afca40c73c92fef5"
+      },
+      "name" : "fixture-props-island-1",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "prop.place",
+            "values" : [
+              0,
+              5.7999999999999998,
+              0
+            ]
+          },
+          "result" : "action.rule.a12.outside",
+          "steps" : 0
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "f64e358a43a19ebe3a09118d77a4cf0d2d05d000fa228792afca40c73c92fef5",
+        "initialDigest" : "f64e358a43a19ebe3a09118d77a4cf0d2d05d000fa228792afca40c73c92fef5"
+      },
+      "name" : "refusal-prop-outside",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "prop.place",
+            "values" : [
+              3,
+              5.4000000000000004,
+              5.4000000000000004
+            ]
+          },
+          "result" : "action.rule.a12.under-water",
+          "steps" : 0
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "f64e358a43a19ebe3a09118d77a4cf0d2d05d000fa228792afca40c73c92fef5",
+        "initialDigest" : "f64e358a43a19ebe3a09118d77a4cf0d2d05d000fa228792afca40c73c92fef5"
+      },
+      "name" : "refusal-prop-under-water",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "prop.place",
+            "values" : [
+              0,
+              0,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "prop.place",
+            "values" : [
+              1,
+              0.29999999999999999,
+              0
+            ]
+          },
+          "result" : "action.rule.a12.too-close",
+          "steps" : 0
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "ddaf6dad9df24b1e4dbaf1b467e4c58e2c5bc9022e5b1e72c6eb7d07149e94a8",
+        "initialDigest" : "f64e358a43a19ebe3a09118d77a4cf0d2d05d000fa228792afca40c73c92fef5"
+      },
+      "name" : "refusal-prop-too-close",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "prop.delete",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.a12.no-selection",
+          "steps" : 0
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "f64e358a43a19ebe3a09118d77a4cf0d2d05d000fa228792afca40c73c92fef5",
+        "initialDigest" : "f64e358a43a19ebe3a09118d77a4cf0d2d05d000fa228792afca40c73c92fef5"
+      },
+      "name" : "refusal-prop-no-selection",
       "seed" : "1"
     }
   ],
