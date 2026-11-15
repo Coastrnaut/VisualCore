@@ -155,12 +155,16 @@ where they were; a save and restore keeps pellets, decor and the chosen kind; an
 - **FR-A09-303**: Fish within 4 units of a pellet MUST steer toward their nearest pellet (weight 2.5), with the
   steering still capped and the Phase 01–02 bounds and speed guarantees still holding.
 - **FR-A09-310**: A person MUST be able to place a piece of the chosen decoration kind at a point, move a piece and
-  remove a piece; positions stay inside the tank and the count never exceeds the limit (12).
+  remove a piece; positions stay inside the tank and the count never exceeds the limit (12). A placement at the limit
+  is refused (`a09.decor-full`), a move or removal of a missing piece is refused (`a09.no-such-decor`).
 - **FR-A09-311**: Canvas gestures MUST be: tap → feed; long-press (0.5 s, no movement) → place the chosen kind; a drag
   that starts on a piece → move it. They MUST be resolved by the shared gesture arbitration so only one wins.
 - **FR-A09-312**: Every gesture action MUST also be reachable through a native, labelled control.
+- **FR-A09-313**: The canvas description MUST name the number of pellets in the water and of decor pieces, so the
+  result of a feed or an edit is perceivable without sight.
 - **FR-A09-320**: The saved state MUST hold the pellets (habitat document schema 3) and the chosen decoration kind
-  (snapshot schema 3) and MUST restore a Phase 02 (and Phase 01) state with no pellets and the first kind.
+  (snapshot schema 3) and MUST restore a Phase 02 (and Phase 01) state with no pellets and the first kind; a saved
+  kind outside the catalog's decor kinds or more than 12 pellets is refused as a damaged state.
 - **FR-A09-321**: A suspension MUST never advance the simulation; the resume continues from the saved step (fixture).
 - **FR-A09-322**: The scenario manifest MUST add fixtures for feeding, decor editing and no fast-forward with food.
 
