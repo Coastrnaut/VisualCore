@@ -10,6 +10,11 @@
 // so the saved state and every replay show the body let go), then forgets the gesture state; leaving the experience
 // forgets it too. The host's `ExperiencePresenter` has no suspension callback, so the wrapper is where the presenter
 // learns of it (as Neon Arcade's `ArcadeExperience` does).
+//
+// Feature 085 (A11-P04) T-A11-403 (FR-A11-403; research D3): the experience now keeps files of its own — the four saved
+// experiments `experiment-0.json` … `experiment-3.json` of `ExperimentStore`, built from the launch's storage — and the
+// factory hands the presenter its shell, through which an opened slot is restored. Without storage (tests) the saved
+// experiments are kept in memory.
 import SwiftUI
 import VisualCoreDiagnostics
 import VisualCoreExperience
@@ -23,18 +28,23 @@ public enum PhysicsPlaygroundExperience {
     /// The catalog id `a11.physics-playground`; nil only if the id text were malformed.
     public static let id = ExperienceID(rawValue: PlaygroundCore.experienceID)
 
-    /// The experience registered as `id`. `storage` is not used in this phase (the world travels in the host's saved
-    /// session state); `reduceMotion` and `reduceFlashing` change nothing (no decorative motion, nothing flashes).
+    /// The experience registered as `id`. `storage` holds the saved experiments (feature 085; the world itself
+    /// travels in the host's saved session state); `reduceMotion` and `reduceFlashing` change nothing (no decorative
+    /// motion, nothing flashes).
     @MainActor
     public static func make(id: ExperienceID, storage: ExperienceStorage, reduceMotion: Bool,
                             reduceFlashing: Bool) -> any Experience {
-        PlaygroundExperience(shell: make(id: id))
+        PlaygroundExperience(shell: make(id: id, store: ExperimentStore(storage: storage)))
     }
 
-    /// The experience's shell with its presenter exposed (tests).
+    /// The experience's shell with its presenter exposed (tests); `store` keeps the saved experiments (in memory
+    /// when nil). The presenter is handed the shell, through which an opened slot is restored.
     @MainActor
-    static func make(id: ExperienceID) -> ExperienceShell<PlaygroundPresenter> {
-        ExperienceShell(id: id, presenter: PlaygroundPresenter(experienceID: id))
+    static func make(id: ExperienceID, store: ExperimentStore? = nil) -> ExperienceShell<PlaygroundPresenter> {
+        let presenter = PlaygroundPresenter(experienceID: id, store: store ?? ExperimentStore(storage: nil))
+        let shell = ExperienceShell(id: id, presenter: presenter)
+        presenter.shell = shell
+        return shell
     }
 }
 

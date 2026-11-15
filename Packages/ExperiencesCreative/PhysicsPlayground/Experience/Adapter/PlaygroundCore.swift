@@ -67,6 +67,34 @@
 // `PlaygroundCore.forces`: derived data for the force arrows, never encoded, never digested and not part of the core's
 // equality (a restored or reset core has none until its next tick). Reset gives the starting scene with no pins, no
 // selection, no grab and both overlays off.
+//
+// Feature 085 (A11-P04) T-A11-403 (FR-A11-402, FR-A11-403, FR-A11-410, FR-A11-430; clarifications 2, 4, 5; research
+// D2–D4; data-model "PlaygroundState (schema 4)"; contract contracts/experiments.md). The state remembers the
+// experiment it was opened from: `origin` (`ExperimentOrigin`: preset 0…3 or slot 0…3), `startingWorld` (the world as
+// it opened) and the tutorial progress (`TutorialProgress?`). Three actions are added:
+//   experiment.preset [0…3]  opens free play, the pendulum, the spring chain or the stacked objects
+//                            (`Presets.make` with the core's generator; only free play draws from it); the preset
+//                            becomes the starting world and the origin `.preset(i)`; no grab, no selection, no measured
+//                            forces;
+//   tutorial.start [0…1]     starts "Controlling time" or "Springs and energy" at step 0 (`Tutorials.start`) at the
+//                            world's tick;
+//   tutorial.stop            ends the tutorial (the world is unchanged); refused with `a11.no-tutorial` when none runs;
+// a fractional value is refused with `a11.invalid-choice`. `world.reset` now restores the starting world at normal
+// speed, running, with no grab, no selection and no measured forces; the generator keeps going (later drops stay
+// seeded and replayable). The core's `reset()` is still a fresh preparation from the seed (free play, no tutorial).
+// After every applied action and every host step the tutorial is advanced (`Tutorials.advance`, with `justReset` true
+// for `world.reset`); a reset, a preset or an opened slot replaces the world, so a running tutorial stays on its step
+// and the step begins again at the new world's tick (edge case "Opening a preset or a slot during a tutorial": it
+// continues if its next step expects the new experiment, which the advance after the action checks).
+//
+// Snapshot schema 4: `PlaygroundState` holds the world, the generator state, the origin, the starting world and the
+// tutorial progress (omitted when none runs). `MigrationChain(currentVersion: 4)` has the steps 1 → 2, 2 → 3 and
+// 3 → 4 (`migratedToSchemaFour`: a schema-3 payload gets origin free play, the current world without grab and
+// selection as the starting world, and no tutorial). The restore also validates the starting world and refuses a
+// tutorial progress that names no tutorial or step. `schemaThreeExample()` is the stored Phase 03 payload the
+// registry's migration check restores. A saved slot is opened outside the replay: `opening(document:slot:from:)`
+// builds the state and `openingSnapshot(of:experience:stepIndex:)` the snapshot the presenter hands to
+// `ExperienceShell.restore`. The digest covers the whole state (world, generator, origin, starting world, tutorial).
 import Foundation
 import PhysicsPlaygroundCore
 import VisualCoreExperience
@@ -94,6 +122,8 @@ public enum PlaygroundRule {
     public static let staticBody = EditRefusal.staticBody.code
     /// There is no selected body to nudge (feature 084).
     public static let noSelection = EditRefusal.noSelection.code
+    /// `tutorial.stop` while no tutorial runs (feature 085).
+    public static let noTutorial = "a11.no-tutorial"
 }
 
 /// The saved state of Physics Playground at snapshot schema 1 (feature 082): the schema-1 world and the generator
@@ -136,23 +166,62 @@ public enum PlaygroundRestoreError: Error, Equatable {
     case notSchemaOne(Int)
     /// A payload handed to the step 2 → 3 whose world is not at schema 2 (the schema it names; feature 084).
     case notSchemaTwo(Int)
+    /// A payload handed to the step 3 → 4 whose world is not at schema 3 (the schema it names; feature 085).
+    case notSchemaThree(Int)
+    /// The starting world does not validate (its problems; feature 085).
+    case invalidStartingWorld([String])
+    /// The tutorial progress names no tutorial or step, or a negative start tick (feature 085).
+    case invalidTutorial
 }
 
-/// The saved state of Physics Playground (snapshot schema 3): the world and the generator state.
-public struct PlaygroundState: Codable, Equatable, Sendable {
-    /// The physics world.
+/// The saved state of Physics Playground at snapshot schema 3 (feature 084): the schema-3 world and the generator
+/// state, exactly the keys A11-P03 wrote.
+public struct PlaygroundStateSchemaThree: Codable, Equatable, Sendable {
+    /// The schema-3 world.
     public var world: PhysicsWorld
     /// The state of the generator that draws dropped bodies.
     public var random: SeededRandom.State
 
-    /// A state of `world` with the generator state `random`.
+    /// A schema-3 state of `world` with the generator state `random`.
     public init(world: PhysicsWorld, random: SeededRandom.State) {
         self.world = world
         self.random = random
     }
 }
 
-/// The state of Physics Playground. Schema version 3.
+/// The saved state of Physics Playground (snapshot schema 4, feature 085): the world, the generator state, the origin
+/// of the opened experiment, its starting world and the tutorial progress (nil, and not written, when none runs).
+public struct PlaygroundState: Codable, Equatable, Sendable {
+    /// The physics world.
+    public var world: PhysicsWorld
+    /// The state of the generator that draws dropped bodies.
+    public var random: SeededRandom.State
+    /// Where the opened experiment came from.
+    public var origin: ExperimentOrigin
+    /// The world as the experiment opened (what `world.reset` restores).
+    public var startingWorld: PhysicsWorld
+    /// The running tutorial's progress, nil when none runs.
+    public var tutorial: TutorialProgress?
+
+    /// A state of every field.
+    public init(world: PhysicsWorld, random: SeededRandom.State, origin: ExperimentOrigin,
+                startingWorld: PhysicsWorld, tutorial: TutorialProgress?) {
+        self.world = world
+        self.random = random
+        self.origin = origin
+        self.startingWorld = startingWorld
+        self.tutorial = tutorial
+    }
+
+    /// A free-play state of `world` with the generator state `random`: `world` without grab and selection is the
+    /// starting world, and no tutorial runs (the form the migration 3 → 4 gives).
+    public init(world: PhysicsWorld, random: SeededRandom.State) {
+        self.init(world: world, random: random, origin: .freePlay,
+                  startingWorld: ExperimentDocument.withoutEditing(world), tutorial: nil)
+    }
+}
+
+/// The state of Physics Playground. Schema version 4.
 public struct PlaygroundCore: ExperienceCore, Equatable {
     /// The experience's id in the catalog.
     public static let experienceID = "a11.physics-playground"
@@ -166,14 +235,15 @@ public struct PlaygroundCore: ExperienceCore, Equatable {
     public static let actionIDs = ["world.pause", "world.step", "world.timeScale", "world.reset", "world.drop",
                                    "world.gravity", "world.drag", "world.stiffness",
                                    "edit.add", "edit.select", "edit.grab", "edit.move", "edit.release", "edit.pin",
-                                   "edit.delete", "edit.nudge", "overlay.velocity", "overlay.forces"]
+                                   "edit.delete", "edit.nudge", "overlay.velocity", "overlay.forces",
+                                   "experiment.preset", "tutorial.start", "tutorial.stop"]
 
     /// The edit actions a canvas gesture sends (feature 084; each also reachable through a native control).
     public static let gestureActionIDs: Set<String> = ["edit.add", "edit.select", "edit.grab", "edit.move",
                                                        "edit.release", "edit.pin", "edit.delete"]
 
     /// The snapshot schema this build writes.
-    public static let snapshotSchema = 3
+    public static let snapshotSchema = 4
 
     /// The largest body id an edit action names.
     public static let maxBodyId = 10_000
@@ -192,22 +262,34 @@ public struct PlaygroundCore: ExperienceCore, Equatable {
     /// the force arrows, never encoded, never digested and not compared by `==`; empty after preparation, restore and
     /// reset until the next tick.
     public private(set) var forces = ForceMeasurement()
+    /// Where the opened experiment came from (feature 085): free play after preparation.
+    public private(set) var origin: ExperimentOrigin
+    /// The world as the opened experiment began (feature 085): what `world.reset` restores.
+    public private(set) var startingWorld: PhysicsWorld
+    /// The running tutorial's progress (feature 085), nil when none runs.
+    public private(set) var tutorial: TutorialProgress?
 
     /// The first state prepared with `seed`: a generator seeded by `seed` and the starting scene drawn from it (the
     /// static ledge, three circles and three boxes at rest, the hanging box and the joined circles with their two
     /// springs, the default levels, an empty contact cache, no pins, no selection, no grab, both overlays off, tick 0,
-    /// running at 1×).
+    /// running at 1×); free play, that scene as the starting world, no tutorial.
     public init(seed: UInt64) {
         preparationSeed = seed
         var random = SeededRandom(seed: seed)
         world = StartingScene.make(random: &random, catalog: Self.catalog)
         generator = random
+        origin = .freePlay
+        startingWorld = world
+        tutorial = nil
     }
 
     /// A core holding `state`, prepared with `seed`; throws when the generator state cannot be restored.
     init(seed: UInt64, state: PlaygroundState) throws {
         preparationSeed = seed
         world = state.world
+        origin = state.origin
+        startingWorld = state.startingWorld
+        tutorial = state.tutorial
         do {
             generator = try SeededRandom(restoring: state.random)
         } catch {
@@ -215,14 +297,18 @@ public struct PlaygroundCore: ExperienceCore, Equatable {
         }
     }
 
-    /// Two cores are equal when their preparation seeds, worlds and generators are; the measured ``forces`` are
-    /// derived data and are not compared.
+    /// Two cores are equal when their preparation seeds, worlds, generators, origins, starting worlds and tutorial
+    /// progress are; the measured ``forces`` are derived data and are not compared.
     public static func == (lhs: PlaygroundCore, rhs: PlaygroundCore) -> Bool {
         lhs.preparationSeed == rhs.preparationSeed && lhs.world == rhs.world && lhs.generator == rhs.generator
+            && lhs.origin == rhs.origin && lhs.startingWorld == rhs.startingWorld && lhs.tutorial == rhs.tutorial
     }
 
-    /// The whole state: the world and the generator state.
-    public var state: PlaygroundState { PlaygroundState(world: world, random: generator.state) }
+    /// The whole state: the world, the generator state, the origin, the starting world and the tutorial progress.
+    public var state: PlaygroundState {
+        PlaygroundState(world: world, random: generator.state, origin: origin, startingWorld: startingWorld,
+                        tutorial: tutorial)
+    }
 
     // MARK: Contract
 
@@ -232,13 +318,15 @@ public struct PlaygroundCore: ExperienceCore, Equatable {
     /// One quality tier (`level-0`): the drawing has nothing to scale down.
     public static var qualityTiers: Int { 1 }
 
-    /// Schema 3 (feature 084). The step 1 → 2 (``migratedToSchemaTwo(_:)``) turns a Phase 01 payload into a Phase 02
-    /// payload; the step 2 → 3 (``migratedToSchemaThree(_:)``) turns a Phase 02 payload into a schema-3 payload. A
-    /// payload that does not decode is refused by its step (the engine reports the migration as failed).
+    /// Schema 4 (feature 085). The step 1 → 2 (``migratedToSchemaTwo(_:)``) turns a Phase 01 payload into a Phase 02
+    /// payload; the step 2 → 3 (``migratedToSchemaThree(_:)``) turns a Phase 02 payload into a Phase 03 payload; the
+    /// step 3 → 4 (``migratedToSchemaFour(_:)``) turns a Phase 03 payload into a schema-4 payload. A payload that does
+    /// not decode is refused by its step (the engine reports the migration as failed).
     public static var migrations: MigrationChain {
         MigrationChain(currentVersion: snapshotSchema, steps: [
             1: { payload in try migratedToSchemaTwo(payload) },
             2: { payload in try migratedToSchemaThree(payload) },
+            3: { payload in try migratedToSchemaFour(payload) },
         ])
     }
 
@@ -285,14 +373,32 @@ public struct PlaygroundCore: ExperienceCore, Equatable {
 
     /// The step 2 → 3: `payload` decoded as a ``PlaygroundStateSchemaTwo`` (its world must name schema 2), the world
     /// migrated with `PhysicsWorld.migrated(fromSchemaTwo:)` (no pins, no selection, no grab, overlays off; everything
-    /// else kept), the generator state kept, and the state encoded again as a JSON object. Not validated here; the
-    /// restore validates.
+    /// else kept), the generator state kept, and the Phase 03 state (``PlaygroundStateSchemaThree``) encoded again as
+    /// a JSON object. Not validated here; the restore validates.
     static func migratedToSchemaThree(_ payload: [String: Any]) throws -> [String: Any] {
         let data = try JSONSerialization.data(withJSONObject: payload, options: [.sortedKeys])
         let old = try JSONDecoder().decode(PlaygroundStateSchemaTwo.self, from: data)
         guard old.world.schema == 2 else { throw PlaygroundRestoreError.notSchemaTwo(old.world.schema) }
-        let state = PlaygroundState(world: PhysicsWorld.migrated(fromSchemaTwo: old.world), random: old.random)
-        guard let object = try JSONSerialization.jsonObject(with: encode(state)) as? [String: Any] else {
+        let state = PlaygroundStateSchemaThree(world: PhysicsWorld.migrated(fromSchemaTwo: old.world),
+                                               random: old.random)
+        return try jsonObject(state)
+    }
+
+    /// The step 3 → 4 (feature 085): `payload` decoded as a ``PlaygroundStateSchemaThree`` (its world must name schema
+    /// 3), kept as it is, with origin free play, the world without grab and selection as the starting world and no
+    /// tutorial; the generator state kept; encoded again as a JSON object. Not validated here; the restore validates.
+    static func migratedToSchemaFour(_ payload: [String: Any]) throws -> [String: Any] {
+        let data = try JSONSerialization.data(withJSONObject: payload, options: [.sortedKeys])
+        let old = try JSONDecoder().decode(PlaygroundStateSchemaThree.self, from: data)
+        guard old.world.schema == 3 else { throw PlaygroundRestoreError.notSchemaThree(old.world.schema) }
+        return try jsonObject(PlaygroundState(world: old.world, random: old.random))
+    }
+
+    /// `value` encoded with sorted keys as a JSON object.
+    static func jsonObject<Value: Encodable>(_ value: Value) throws -> [String: Any] {
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.sortedKeys, .withoutEscapingSlashes]
+        guard let object = try JSONSerialization.jsonObject(with: encoder.encode(value)) as? [String: Any] else {
             throw PlaygroundRestoreError.invalidWorld(["the migrated state is not a JSON object"])
         }
         return object
@@ -406,7 +512,37 @@ public struct PlaygroundCore: ExperienceCore, Equatable {
         return migrationExample(version: 2, payload: payload, seed: seed)
     }
 
-    /// The eighteen controls with their declared ranges.
+    /// The actions the stored Phase 03 example was saved after, all at step 0 (A11-P01 … A11-P03 actions only): drop a
+    /// circle, drop a box, pin circle 8, select circle 9, grab the hanging box 7 at its centre, velocity arrows on,
+    /// half speed, pause (feature 085).
+    public static let schemaThreeExampleActions: [(control: String, values: [Double])] = [
+        ("world.drop", [0]), ("world.drop", [1]), ("edit.pin", [8]), ("edit.select", [9]),
+        ("edit.grab", [7, 7.5, 6.2]), ("overlay.velocity", [1]), ("world.timeScale", [1]), ("world.pause", [1]),
+    ]
+
+    /// The A11-P03 state of seed `seed` after ``schemaThreeExampleActions`` at step 0: the ten-body starting scene, a
+    /// dropped circle and a dropped box (ids 10 and 11), circle 8 pinned, circle 9 selected, the hanging box held,
+    /// velocity arrows on, half speed, paused, tick 0, and the generator after those draws. No tick has run and the
+    /// actions are A11-P03's, so this is exactly what A11-P03 saved for that seed and those actions (feature 085).
+    public static func schemaThreeExampleState(seed: UInt64 = 7) -> PlaygroundStateSchemaThree {
+        var core = PlaygroundCore(seed: seed)
+        for action in schemaThreeExampleActions {
+            _ = core.apply(ExperienceAction(control: action.control, values: action.values, step: 0))
+        }
+        return PlaygroundStateSchemaThree(world: core.world, random: core.generator.state)
+    }
+
+    /// The stored example of schema 3 for the registry's migration check (feature 085, T-A11-403): the A11-P03 payload
+    /// ``schemaThreeExampleState(seed:)`` — exactly the keys `random` and `world` (the schema-3 world) at step 0 —
+    /// with the digest its restore through the step 3 → 4 must give: the same world and generator, origin free play,
+    /// the world without its grab and selection as the starting world, and no tutorial. Nil only if the encoding
+    /// failed.
+    public static func schemaThreeExample(seed: UInt64 = 7) -> MigrationExample? {
+        guard let payload = try? jsonObject(schemaThreeExampleState(seed: seed)) else { return nil }
+        return migrationExample(version: 3, payload: payload, seed: seed)
+    }
+
+    /// The twenty-one controls with their declared ranges.
     public static var controls: [ExperienceControl] {
         let id = -1...Double(maxBodyId), body = 0...Double(maxBodyId)
         let stage = WorldSettings.defaultStage, wall = WorldSimulation.wallThickness
@@ -427,7 +563,10 @@ public struct PlaygroundCore: ExperienceCore, Equatable {
                 ExperienceControl(id: "edit.delete", ranges: [body]),
                 ExperienceControl(id: "edit.nudge", ranges: [-1...1, -1...1]),
                 ExperienceControl(id: "overlay.velocity", ranges: [0...1]),
-                ExperienceControl(id: "overlay.forces", ranges: [0...1])]
+                ExperienceControl(id: "overlay.forces", ranges: [0...1]),
+                ExperienceControl(id: "experiment.preset", ranges: [0...Double(PresetID.allCases.count - 1)]),
+                ExperienceControl(id: "tutorial.start", ranges: [0...Double(Tutorials.all.count - 1)]),
+                ExperienceControl(id: "tutorial.stop")]
     }
 
     /// The first state with `seed` as the preparation seed.
@@ -437,9 +576,11 @@ public struct PlaygroundCore: ExperienceCore, Equatable {
     }
 
     /// One host step: the measured `WorldSimulation.advanceHostStep` (nothing while paused; otherwise the time
-    /// scale's whole ticks), keeping the spring forces of the last tick it ran in ``forces``.
+    /// scale's whole ticks), keeping the spring forces of the last tick it ran in ``forces``; then a running tutorial
+    /// is advanced (feature 085).
     public mutating func update(step: Int) {
         WorldSimulation.advanceHostStep(&world, catalog: Self.catalog, forces: &forces)
+        if tutorial != nil { advanceTutorial(justReset: false) }
     }
 
     /// The number of values each action carries.
@@ -447,18 +588,29 @@ public struct PlaygroundCore: ExperienceCore, Equatable {
         "world.pause": 1, "world.step": 0, "world.timeScale": 1, "world.reset": 0, "world.drop": 1,
         "world.gravity": 1, "world.drag": 1, "world.stiffness": 1, "edit.add": 3, "edit.select": 1, "edit.grab": 3,
         "edit.move": 2, "edit.release": 0, "edit.pin": 1, "edit.delete": 1, "edit.nudge": 2, "overlay.velocity": 1,
-        "overlay.forces": 1,
+        "overlay.forces": 1, "experiment.preset": 1, "tutorial.start": 1, "tutorial.stop": 0,
     ]
 
     /// Carries out a well-formed action (the engine checked the control, the value count, finiteness and ranges);
-    /// a refused action changes nothing.
+    /// a refused action changes nothing. After an applied action a running tutorial is advanced (feature 085), with
+    /// `justReset` true for `world.reset`.
     public mutating func apply(_ action: ExperienceAction) -> ActionResult {
+        let result = applyAction(action)
+        if result.isAccepted, tutorial != nil { advanceTutorial(justReset: action.control == "world.reset") }
+        return result
+    }
+
+    /// The action itself, without the tutorial check (see ``apply(_:)``).
+    mutating func applyAction(_ action: ExperienceAction) -> ActionResult {
         let v = action.values
         guard let expected = Self.valueCounts[action.control] else {
             return .rejected(.unknownControl(action.control))
         }
         guard v.count == expected else { return .rejected(.wrongValueCount(expected: expected, found: v.count)) }
         if action.control.hasPrefix("edit.") || action.control.hasPrefix("overlay.") { return applyEdit(action) }
+        if action.control.hasPrefix("experiment.") || action.control.hasPrefix("tutorial.") {
+            return applyExperiment(action)
+        }
         switch action.control {
         case "world.pause":
             guard let i = Self.choice(v[0], count: 2) else {
@@ -480,7 +632,7 @@ public struct PlaygroundCore: ExperienceCore, Equatable {
             }
             world.timeScaleIndex = i
         case "world.reset":
-            self = PlaygroundCore(seed: preparationSeed)
+            restartExperiment()
         case "world.gravity":
             var next = world
             guard let i = Self.choice(v[0], count: ForceLevels.gravity.count),
@@ -563,6 +715,92 @@ public struct PlaygroundCore: ExperienceCore, Equatable {
         return .accepted
     }
 
+    /// The experiment and tutorial actions (feature 085; see the file header).
+    mutating func applyExperiment(_ action: ExperienceAction) -> ActionResult {
+        let invalid = ActionResult.rejected(.rule(code: PlaygroundRule.invalidChoice))
+        switch action.control {
+        case "experiment.preset":
+            guard let i = Self.choice(action.values[0], count: PresetID.allCases.count),
+                  let id = PresetID(rawValue: i) else { return invalid }
+            var random = generator
+            let opened = Presets.make(id, random: &random, catalog: Self.catalog)
+            generator = random
+            open(ExperimentDocument.withoutEditing(opened), origin: .preset(i))
+        case "tutorial.start":
+            guard let i = Self.choice(action.values[0], count: Tutorials.all.count),
+                  let progress = Tutorials.start(i, tick: world.tick) else { return invalid }
+            tutorial = progress
+        case "tutorial.stop":
+            guard tutorial != nil else { return .rejected(.rule(code: PlaygroundRule.noTutorial)) }
+            tutorial = nil
+        default:
+            return .rejected(.unknownControl(action.control))
+        }
+        return .accepted
+    }
+
+    /// Opens `opened` as the experiment of `origin`: it becomes the world and the starting world, the measured forces
+    /// are cleared and a running tutorial's current step begins again at the new world's tick.
+    mutating func open(_ opened: PhysicsWorld, origin: ExperimentOrigin) {
+        world = opened
+        startingWorld = opened
+        self.origin = origin
+        forces = ForceMeasurement()
+        restartTutorialStep()
+    }
+
+    /// `world.reset` (feature 085): the starting world at normal speed, running, with no grab, no selection and no
+    /// measured forces; the generator, the origin and the starting world are kept; a running tutorial's current step
+    /// begins again at the restored tick.
+    mutating func restartExperiment() {
+        world = startingWorld
+        world.timeScaleIndex = PhysicsWorld.normalTimeScaleIndex
+        world.paused = false
+        world.grab = nil
+        world.selectedId = nil
+        forces = ForceMeasurement()
+        restartTutorialStep()
+    }
+
+    /// Sets the start tick of a running tutorial's current step to the world's tick (after the world was replaced).
+    mutating func restartTutorialStep() {
+        guard var progress = tutorial else { return }
+        progress.startTick = world.tick
+        tutorial = progress
+    }
+
+    /// Completes as many steps of the running tutorial as hold now (`Tutorials.advance`).
+    mutating func advanceTutorial(justReset: Bool) {
+        Tutorials.advance(&tutorial, context: TutorialContext(world: world, startingWorld: startingWorld,
+                                                              origin: origin,
+                                                              justReset: justReset))
+    }
+
+    /// The core `current` with the saved experiment `document` opened from slot `slot` (0…3; feature 085, research
+    /// D3): the same seed and generator, the document's world (without grab and selection) as the world and the
+    /// starting world, origin `.slot(slot)`, no measured forces; a running tutorial stays on its step, which begins
+    /// again at the opened world's tick, and is then advanced. A slot outside 0…3 changes nothing (returns `current`).
+    public static func opening(document: ExperimentDocument, slot: Int,
+                               from current: PlaygroundCore) -> PlaygroundCore {
+        guard ExperimentOrigin.validRange.contains(slot) else { return current }
+        var core = current
+        core.open(ExperimentDocument.withoutEditing(document.world), origin: .slot(slot))
+        if core.tutorial != nil { core.advanceTutorial(justReset: false) }
+        return core
+    }
+
+    /// The snapshot of `core` for `ExperienceShell.restore` (feature 085): schema 4, the core's preparation seed, the
+    /// step index `stepIndex`, the core's digest with `experience` as domain and its payload. Throws when the payload
+    /// or the digest cannot be written or the envelope is refused.
+    public static func openingSnapshot(of core: PlaygroundCore, experience: ExperienceID,
+                                       stepIndex: Int) throws -> ExperienceSnapshot {
+        var builder = DigestBuilder(domain: experience.rawValue)
+        try core.writeDigest(into: &builder)
+        return try ExperienceSnapshot(experience: experience, schemaVersion: snapshotSchema,
+                                      seed: core.preparationSeed, stepIndex: stepIndex, digest: builder.finish(),
+                                      payload: core.snapshotPayload())
+    }
+
     /// The table index named by `value`: a finite whole number in `0..<count`; nil otherwise.
     static func choice(_ value: Double, count: Int) -> Int? {
         guard value.isFinite, value == value.rounded(), value >= 0, value < Double(count) else { return nil }
@@ -580,14 +818,15 @@ public struct PlaygroundCore: ExperienceCore, Equatable {
         ExperienceOutcome(code: world.paused ? Self.pausedOutcome : Self.runningOutcome)
     }
 
-    /// Back to the first state built from the preparation seed.
+    /// Back to the first state built from the preparation seed (free play, no tutorial).
     public mutating func reset() {
         self = PlaygroundCore(seed: preparationSeed)
     }
 
     /// The canonical text of the whole state (`a11.playground.v1|` and the state as JSON with sorted keys: the world
-    /// with its pins, selection, grab and overlay flags, and the generator state; never the measured forces); a value
-    /// that cannot be written (a non-finite number) is refused as non-finite.
+    /// with its pins, selection, grab and overlay flags, the generator state, the origin, the starting world and the
+    /// tutorial progress; never the measured forces); a value that cannot be written (a non-finite number) is refused
+    /// as non-finite.
     public func writeDigest(into builder: inout DigestBuilder) throws(DigestError) {
         guard let text = try? String(data: Self.encode(state), encoding: .utf8) else {
             throw .nonFinite(field: builder.fieldCount)
@@ -595,19 +834,22 @@ public struct PlaygroundCore: ExperienceCore, Equatable {
         builder.add("a11.playground.v1|" + text)
     }
 
-    /// The playground state (schema 3) as JSON with sorted keys.
+    /// The playground state (schema 4) as JSON with sorted keys.
     public func snapshotPayload() throws -> Data {
         try Self.encode(state)
     }
 
-    /// The core of a schema-3 payload (an older one has been through ``migrations``) with the envelope's `seed` as
-    /// preparation seed. A payload that does not decode as schema 3 (a schema-1 or schema-2 payload included), a world
-    /// that does not validate or a malformed generator state is refused (throws). The restored core has no measured
-    /// forces until its next tick.
+    /// The core of a schema-4 payload (an older one has been through ``migrations``) with the envelope's `seed` as
+    /// preparation seed. A payload that does not decode as schema 4 (a schema-1, 2 or 3 payload included), a world or
+    /// a starting world that does not validate, a tutorial progress that names no tutorial or step, or a malformed
+    /// generator state is refused (throws). The restored core has no measured forces until its next tick.
     public static func restore(payload: Data, seed: UInt64) throws -> PlaygroundCore {
         let state = try JSONDecoder().decode(PlaygroundState.self, from: payload)
         let problems = state.world.validate(catalog: catalog)
         guard problems.isEmpty else { throw PlaygroundRestoreError.invalidWorld(problems) }
+        let starting = state.startingWorld.validate(catalog: catalog)
+        guard starting.isEmpty else { throw PlaygroundRestoreError.invalidStartingWorld(starting) }
+        if let progress = state.tutorial, !progress.isValid { throw PlaygroundRestoreError.invalidTutorial }
         return try PlaygroundCore(seed: seed, state: state)
     }
 

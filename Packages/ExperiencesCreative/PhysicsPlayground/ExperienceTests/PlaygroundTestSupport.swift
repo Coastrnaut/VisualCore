@@ -1,6 +1,7 @@
 // PlaygroundTestSupport — feature 082 (A11-P01) T-A11-104 (FR-A11-120, FR-A11-121). Shared helpers of the Physics
 // Playground experience tests: opening the experience in the one app's session host, drawing frames, reading the pixels
-// of a frame, counting the pixels two frames differ in, and building a core that holds a given world.
+// of a frame, counting the pixels two frames differ in, and building a core that holds a given world. Feature 085
+// (A11-P04) T-A11-403 adds a temporary experience storage for the saved-experiment tests.
 import Foundation
 import XCTest
 @testable import PhysicsPlaygroundExperience
@@ -17,15 +18,15 @@ enum PlaygroundTest {
     /// The experience id `a11.physics-playground`.
     static var id: ExperienceID { PhysicsPlaygroundExperience.id ?? ExperienceID(rawValue: "a11.unknown")! }
 
-    /// Opens Physics Playground in `session` (seed `seed`, optionally restoring `snapshot`), lays the view out at
-    /// `size` points and draws one frame.
+    /// Opens Physics Playground in `session` (seed `seed`, optionally restoring `snapshot`, with the saved
+    /// experiments of `store`, in memory when nil), lays the view out at `size` points and draws one frame.
     static func open(_ session: ExperienceSession, seed: UInt64 = 7, snapshot: ExperienceSnapshot? = nil,
-                     size: CGSize = CGSize(width: 120, height: 100)) async throws
+                     size: CGSize = CGSize(width: 120, height: 100), store: ExperimentStore? = nil) async throws
         -> ExperienceShell<PlaygroundPresenter> {
         let id = self.id
         var made: ExperienceShell<PlaygroundPresenter>?
         let request = ExperienceOpenRequest(id: id, seed: seed, snapshot: snapshot, refusedSnapshotFails: false) {
-            let shell = PhysicsPlaygroundExperience.make(id: id)
+            let shell = PhysicsPlaygroundExperience.make(id: id, store: store)
             made = shell
             return shell
         }
@@ -98,4 +99,32 @@ func playgroundSampleWorld() -> PhysicsWorld {
         PhysicsBody(id: 2, shape: .box(halfExtents: Vec2(0.6, 0.3)), materialId: "steel", position: Vec2(7, 3),
                     angle: 0.4),
     ])
+}
+
+/// A temporary storage of Physics Playground (feature 085): its root folder and defaults suite are removed by
+/// ``remove()``.
+struct TemporaryPlaygroundStorage {
+    let root: URL
+    let suite: String
+    let storage: ExperienceStorage
+
+    /// A new empty storage under the temporary directory.
+    init() {
+        let name = "pp-experiments-" + UUID().uuidString
+        root = FileManager.default.temporaryDirectory.appendingPathComponent(name, isDirectory: true)
+        suite = name
+        let id = ExperienceID(rawValue: PlaygroundCore.experienceID) ?? ExperienceID(rawValue: "a11.unknown")!
+        storage = ExperienceStorage(id: id, root: root, defaults: UserDefaults(suiteName: name) ?? .standard)
+    }
+
+    /// The experience's folder (`<root>/a11.physics-playground/`).
+    var folder: URL {
+        root.appendingPathComponent(storage.id.storageNamespace, isDirectory: true)
+    }
+
+    /// Removes the folder and the defaults suite.
+    func remove() {
+        try? FileManager.default.removeItem(at: root)
+        UserDefaults(suiteName: suite)?.removePersistentDomain(forName: suite)
+    }
 }

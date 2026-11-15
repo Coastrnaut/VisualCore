@@ -15,6 +15,11 @@
 // the selection and the overlays; the seven edit actions are the gesture actions, each with a native alternative;
 // pins, selection, grab and overlays survive the saved state (schema 3); a schema-4 state is the newer one refused;
 // the stored schema-2 example opens through the migration 2 → 3.
+//
+// Feature 085 (A11-P04) T-A11-403 (FR-A11-402, FR-A11-410, FR-A11-430; SC-A11-403): the description ends with the
+// experiment ("Experiment: Free play.") and, while a tutorial runs, its step; the mirror carries the experiment and the
+// tutorial; the origin, starting world and tutorial survive the saved state (schema 4); a schema-5 state is the newer
+// one refused; the stored schema-3 example opens through the migration 3 → 4; a tutorial runs through the shell.
 import Foundation
 import XCTest
 import VisualCoreDiagnostics
@@ -42,7 +47,8 @@ final class PlaygroundSessionTests: XCTestCase {
         XCTAssertEqual(presenter.lastSpringsDrawn, 2, "the hanging box's and the joined circles' springs")
         let summary = shell.accessibilitySummary
         XCTAssertEqual(summary, "Physics Playground: 10 bodies, running, normal speed (time scale 1×); "
-                       + "2 springs, stiffness medium, gravity Earth, drag low; none pinned, no selection, arrows off.")
+                       + "2 springs, stiffness medium, gravity Earth, drag low; none pinned, no selection, arrows off. "
+                       + "Experiment: Free play.")
         XCTAssertTrue(presenter.mirror.ready)
         XCTAssertEqual(presenter.mirror.bodyCount, 10)
         XCTAssertEqual(presenter.nativeActions, Set(PlaygroundCore.actionIDs))
@@ -58,13 +64,15 @@ final class PlaygroundSessionTests: XCTestCase {
         XCTAssertTrue(shell.handle(control: "world.stiffness", values: [2]).isAccepted)
         XCTAssertEqual(shell.accessibilitySummary,
                        "Physics Playground: 11 bodies, paused, double speed (time scale 2×); "
-                       + "2 springs, stiffness stiff, gravity Earth, drag low; none pinned, no selection, arrows off.")
+                       + "2 springs, stiffness stiff, gravity Earth, drag low; none pinned, no selection, arrows off. "
+                       + "Experiment: Free play.")
         XCTAssertTrue(shell.handle(control: "edit.pin", values: [8]).isAccepted)
         XCTAssertTrue(shell.handle(control: "edit.select", values: [7]).isAccepted)
         XCTAssertTrue(shell.handle(control: "edit.grab", values: [7, 7.5, 6.2]).isAccepted)
         XCTAssertTrue(shell.handle(control: "overlay.velocity", values: [1]).isAccepted)
         XCTAssertTrue(shell.accessibilitySummary.hasSuffix(
-            "; 1 pinned, body 7 selected (a box), body 7 held, velocity arrows on."), shell.accessibilitySummary)
+            "; 1 pinned, body 7 selected (a box), body 7 held, velocity arrows on. Experiment: Free play."),
+            shell.accessibilitySummary)
         XCTAssertEqual(presenter.mirror.pinnedCount, 1)
         XCTAssertEqual(presenter.mirror.selectedId, 7)
         XCTAssertEqual(presenter.mirror.grabbedId, 7)
@@ -193,7 +201,7 @@ final class PlaygroundSessionTests: XCTestCase {
         XCTAssertTrue(shell.handle(control: "overlay.forces", values: [1]).isAccepted)
         try PlaygroundTest.frames(first, 2)
         let snapshot = try shell.snapshot()
-        XCTAssertEqual(snapshot.schemaVersion, 3)
+        XCTAssertEqual(snapshot.schemaVersion, 4)
         let saved = try PlaygroundTest.core(shell)
         XCTAssertGreaterThan(saved.world.tick, 0, "a world in motion")
         first.close()
@@ -234,7 +242,8 @@ final class PlaygroundSessionTests: XCTestCase {
         XCTAssertTrue(opened.accessibilitySummary.contains("9 bodies, paused, half speed"),
                       opened.accessibilitySummary)
         XCTAssertTrue(opened.accessibilitySummary.contains("no springs, stiffness medium, gravity Earth, drag low"))
-        XCTAssertTrue(opened.accessibilitySummary.hasSuffix("none pinned, no selection, arrows off."))
+        XCTAssertTrue(opened.accessibilitySummary.hasSuffix("none pinned, no selection, arrows off. "
+                                                            + "Experiment: Free play."))
         session.close()
     }
 
@@ -255,7 +264,8 @@ final class PlaygroundSessionTests: XCTestCase {
         XCTAssertEqual(opened.presenter.lastSpringsDrawn, 2)
         XCTAssertEqual(opened.accessibilitySummary,
                        "Physics Playground: 12 bodies, paused, half speed (time scale ½×); "
-                       + "2 springs, stiffness stiff, gravity Moon, drag high; none pinned, no selection, arrows off.")
+                       + "2 springs, stiffness stiff, gravity Moon, drag high; none pinned, no selection, arrows off. "
+                       + "Experiment: Free play.")
         XCTAssertEqual(opened.presenter.mirror.pinnedCount, 0)
         XCTAssertNil(opened.presenter.mirror.selectedId)
         session.close()
@@ -268,7 +278,7 @@ final class PlaygroundSessionTests: XCTestCase {
         try PlaygroundTest.frames(first, 60)
         let saved = try shell.snapshot()
         first.close()
-        let newer = try ExperienceSnapshot(experience: PlaygroundTest.id, schemaVersion: 4, seed: saved.seed,
+        let newer = try ExperienceSnapshot(experience: PlaygroundTest.id, schemaVersion: 5, seed: saved.seed,
                                            stepIndex: saved.stepIndex, digest: saved.digest,
                                            payload: Data(saved.payload.utf8))
 
@@ -324,5 +334,65 @@ final class PlaygroundSessionTests: XCTestCase {
             }
             session.close()
         }
+    }
+
+    /// T-A11-403 (FR-A11-430): the stored Phase 03 payload opens in a session through the migration 3 → 4 with its
+    /// world, free play as the origin and the world without grab and selection as the starting world.
+    func testTheStoredSchemaThreeExampleOpensThroughTheMigration() async throws {
+        let example = try XCTUnwrap(PlaygroundCore.schemaThreeExample())
+        let snapshot = try ExperienceSnapshot(data: example.snapshot)
+        XCTAssertEqual(snapshot.schemaVersion, 3)
+        let session = ExperienceSession()
+        let opened = try await PlaygroundTest.open(session, seed: 3, snapshot: snapshot)
+        XCTAssertNil(session.lastRestoreRefusal, "the Phase 03 state is migrated, not refused")
+        let core = try PlaygroundTest.core(opened)
+        XCTAssertEqual(core.world, PlaygroundCore.schemaThreeExampleState().world)
+        XCTAssertEqual(core.origin, .freePlay)
+        XCTAssertEqual(core.startingWorld, ExperimentDocument.withoutEditing(core.world))
+        XCTAssertNil(core.tutorial)
+        XCTAssertTrue(opened.accessibilitySummary.hasSuffix("velocity arrows on. Experiment: Free play."),
+                      opened.accessibilitySummary)
+        session.close()
+    }
+
+    /// T-A11-403 (FR-A11-401, FR-A11-410; SC-A11-403): a preset and a tutorial through the shell: the description and
+    /// the mirror name the experiment and the step; the experiment and the progress survive the saved state.
+    func testAPresetAndATutorialRunThroughTheShell() async throws {
+        let session = ExperienceSession()
+        let shell = try await PlaygroundTest.open(session)
+        let presenter = shell.presenter
+        XCTAssertEqual(presenter.mirror.experiment, "Experiment: Free play.")
+        XCTAssertEqual(presenter.mirror.presetIndex, 0)
+        XCTAssertTrue(shell.handle(control: "tutorial.start", values: [1]).isAccepted)
+        XCTAssertTrue(shell.accessibilitySummary.hasSuffix(
+            "Experiment: Free play. Tutorial: Springs and energy, step 1 of 3: Open the spring chain."),
+            shell.accessibilitySummary)
+        XCTAssertEqual(presenter.mirror.tutorialId, 1)
+        XCTAssertEqual(presenter.mirror.tutorialStep, "Springs and energy, step 1 of 3")
+        XCTAssertEqual(presenter.mirror.tutorialText, "Open the spring chain.")
+        XCTAssertTrue(shell.handle(control: "experiment.preset", values: [2]).isAccepted)
+        XCTAssertTrue(shell.accessibilitySummary.hasSuffix(
+            "Experiment: Spring chain. Tutorial: Springs and energy, step 2 of 3: Show the force arrows."),
+            shell.accessibilitySummary)
+        XCTAssertEqual(presenter.mirror.presetIndex, 2)
+        XCTAssertTrue(shell.handle(control: "overlay.forces", values: [1]).isAccepted)
+        try PlaygroundTest.frames(session, 10)
+        let snapshot = try shell.snapshot()
+        let saved = try PlaygroundTest.core(shell)
+        XCTAssertEqual(saved.tutorial?.step, 2)
+        session.close()
+
+        let second = ExperienceSession()
+        let restored = try await PlaygroundTest.open(second, seed: 3)
+        try restored.restore(ExperienceSnapshot(data: snapshot.encoded()))
+        let core = try PlaygroundTest.core(restored)
+        XCTAssertEqual(core.state, saved.state, "origin, starting world and tutorial included")
+        XCTAssertEqual(core.origin, .preset(2))
+        XCTAssertTrue(restored.handle(control: "tutorial.stop").isAccepted)
+        XCTAssertNil(try PlaygroundTest.core(restored).tutorial)
+        XCTAssertTrue(restored.accessibilitySummary.hasSuffix("Experiment: Spring chain."))
+        XCTAssertNil(restored.presenter.mirror.tutorialText, "the tutorial card hides")
+        XCTAssertEqual(restored.handle(control: "tutorial.stop"), .rejected(.rule(code: PlaygroundRule.noTutorial)))
+        second.close()
     }
 }

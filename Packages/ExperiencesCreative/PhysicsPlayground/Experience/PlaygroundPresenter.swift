@@ -41,6 +41,16 @@
 // The description adds the pinned bodies, the selection, a grab and the overlays ("none pinned, no selection, arrows
 // off"), the mirror carries the state panel (`PlaygroundPanel`: kinetic, potential, spring and total energy, momentum
 // and the selected body's speed from `WorldDiagnostics`), and the probe steps aside for every overlay near it.
+//
+// Feature 085 (A11-P04) T-A11-403 (FR-A11-402, FR-A11-403, FR-A11-410; SC-A11-402, SC-A11-403; clarifications 2–4;
+// research D3): the presenter owns the experience's `ExperimentStore` (built from the launch's storage; in memory
+// without one) and saves, opens and clears the four slots for the controls. Saving writes an `ExperimentDocument` of
+// the current world (without grab and selection) and origin; opening reads and validates the slot's file and restores
+// a snapshot of `PlaygroundCore.opening(document:slot:from:)` through the shell (`ExperienceShell.restore`, outside the
+// replay), so the document's world becomes the world and the starting world; clearing removes the file. Each result
+// is reported as the slot's status text; a refused file is left as it is. The description adds the experiment
+// ("Experiment: Pendulum.", or the saved slot's name and number) and, while a tutorial runs, its name, step and text;
+// the mirror carries the same for the controls (the step text is announced there).
 import Foundation
 import SwiftUI
 import PhysicsPlaygroundCore
@@ -100,6 +110,22 @@ final class PlaygroundMirror {
     var panel = PlaygroundPanel()
     /// The editing line: pinned bodies, the selection, a grab and the overlays.
     var editing = ""
+    /// The experiment line (feature 085): "Experiment: Pendulum." or the saved slot's name and number.
+    var experiment = ""
+    /// The preset number of the opened experiment, nil for an experiment opened from a slot.
+    var presetIndex: Int? = PresetID.freePlay.rawValue
+    /// The running tutorial's id, nil when none runs.
+    var tutorialId: Int?
+    /// The running tutorial's name and step ("Controlling time, step 1 of 4"), empty when none runs.
+    var tutorialStep = ""
+    /// The current step's text, nil when no tutorial runs (announced when it changes).
+    var tutorialText: String?
+    /// The stored name of each slot, empty for an empty or refused slot.
+    var slotNames = Array(repeating: "", count: ExperimentStore.slots.count)
+    /// The status text of each slot: what it holds, or the result of the last save, open or clear.
+    var slotStatus = Array(repeating: "", count: ExperimentStore.slots.count)
+    /// The name typed for each slot (presentation state, never in the world).
+    var slotDrafts = Array(repeating: "", count: ExperimentStore.slots.count)
 }
 
 /// The measured values of the state panel (feature 084, FR-A11-311): read from `WorldDiagnostics` without changing the
@@ -277,6 +303,11 @@ final class PlaygroundPresenter: ExperiencePresenter {
 
     let experienceID: ExperienceID
     let mirror = PlaygroundMirror()
+    /// The saved experiments (feature 085).
+    let store: ExperimentStore
+    /// The shell that holds this presenter (feature 085): opening a slot restores a snapshot through it. Set by the
+    /// factory; weak, because the shell holds the presenter.
+    weak var shell: ExperienceShell<PlaygroundPresenter>?
 
     /// Set by a test to make the next draw throw `PlaygroundDrawError.injected` (the seam clears itself).
     var failNextDraw = false
@@ -318,9 +349,10 @@ final class PlaygroundPresenter: ExperiencePresenter {
     /// frame tick.
     private var gesturePort: ExperienceActionPort?
 
-    /// A presenter for the experience `experienceID`.
-    init(experienceID: ExperienceID) {
+    /// A presenter for the experience `experienceID` with the saved experiments of `store` (in memory by default).
+    init(experienceID: ExperienceID, store: ExperimentStore = ExperimentStore(storage: nil)) {
         self.experienceID = experienceID
+        self.store = store
         root.add(stage)
         for index in 0..<4 {
             let node = SceneNode(id: "wall\(index)", z: Self.wallZ)
@@ -368,6 +400,7 @@ final class PlaygroundPresenter: ExperiencePresenter {
             root.add(node)
             maskNodes.append(node)
         }
+        refreshSlots()
     }
 
     // MARK: Render scene
@@ -643,6 +676,15 @@ final class PlaygroundPresenter: ExperiencePresenter {
         if mirror.panel != panel { mirror.panel = panel }
         let editing = Self.editing(world)
         if mirror.editing != editing { mirror.editing = editing }
+        let experiment = experimentSentence(core.origin)
+        if mirror.experiment != experiment { mirror.experiment = experiment }
+        let preset: Int? = if case .preset(let index) = core.origin { index } else { nil }
+        if mirror.presetIndex != preset { mirror.presetIndex = preset }
+        if mirror.tutorialId != core.tutorial?.tutorial { mirror.tutorialId = core.tutorial?.tutorial }
+        let step = Self.tutorialStepWords(core.tutorial) ?? ""
+        if mirror.tutorialStep != step { mirror.tutorialStep = step }
+        let text = Tutorials.text(core.tutorial)
+        if mirror.tutorialText != text { mirror.tutorialText = text }
     }
 
     /// The word of `index` in `words`, or "unknown" outside it.
@@ -776,10 +818,145 @@ final class PlaygroundPresenter: ExperiencePresenter {
             + overlayWords(world)
     }
 
-    /// The description of `core`'s world.
+    /// The description of `core`: its world, then the experiment and, while a tutorial runs, its step (feature 085),
+    /// for example "… arrows off. Experiment: Pendulum. Tutorial: Controlling time, step 1 of 4: Pause the world."
     func describe(_ core: PlaygroundCore) -> String {
         sync(core)
-        return Self.description(core.world)
+        var text = Self.description(core.world) + " " + experimentSentence(core.origin)
+        if let tutorial = Self.tutorialSentence(core.tutorial) { text += " " + tutorial }
+        return text
+    }
+
+    // MARK: Experiments and tutorials (feature 085)
+
+    /// The experiment in words: "Experiment: Pendulum.", "Experiment: “Ramp test” from slot 2." or, for a slot whose
+    /// name is not known, "Experiment: slot 2."
+    nonisolated static func experimentSentence(_ origin: ExperimentOrigin, slotName: String?) -> String {
+        switch origin {
+        case .preset(let index):
+            return "Experiment: \(PresetID(rawValue: index)?.name ?? "unknown")."
+        case .slot(let index):
+            guard let slotName, !slotName.isEmpty else { return "Experiment: slot \(index + 1)." }
+            return "Experiment: “\(slotName)” from slot \(index + 1)."
+        }
+    }
+
+    /// The experiment sentence of `origin` with the stored name of its slot.
+    func experimentSentence(_ origin: ExperimentOrigin) -> String {
+        guard case .slot(let index) = origin, mirror.slotNames.indices.contains(index) else {
+            return Self.experimentSentence(origin, slotName: nil)
+        }
+        return Self.experimentSentence(origin, slotName: mirror.slotNames[index])
+    }
+
+    /// The running tutorial's name and step: "Controlling time, step 1 of 4"; nil when none runs.
+    nonisolated static func tutorialStepWords(_ progress: TutorialProgress?) -> String? {
+        guard let progress, progress.isValid, let tutorial = Tutorials.tutorial(id: progress.tutorial) else {
+            return nil
+        }
+        return "\(tutorial.name), step \(progress.step + 1) of \(tutorial.steps.count)"
+    }
+
+    /// The running tutorial in words: "Tutorial: Controlling time, step 1 of 4: Pause the world."; nil when none runs.
+    nonisolated static func tutorialSentence(_ progress: TutorialProgress?) -> String? {
+        guard let step = tutorialStepWords(progress), let text = Tutorials.text(progress) else { return nil }
+        return "Tutorial: \(step): \(text)"
+    }
+
+    /// What a refused save, open or clear means, in words.
+    nonisolated static func refusalText(_ refusal: StoreRefusal) -> String {
+        switch refusal {
+        case .emptySlot: "The slot is empty."
+        case .invalidSlot: "There is no such slot."
+        case .document(.damaged): "The saved file is damaged and was left as it is."
+        case .document(.newerVersion): "The saved file comes from a newer version and was left as it is."
+        case .document(.invalidWorld): "The saved experiment is not valid and was left as it is."
+        case .storage(let error): "The storage refused it (\(error.code))."
+        }
+    }
+
+    /// What a slot holds, in words: "Holds “Ramp test”.", "Empty." or the refusal's text.
+    nonisolated static func holdingText(_ result: Result<ExperimentDocument, StoreRefusal>) -> String {
+        switch result {
+        case .success(let document): "Holds “\(document.name)”."
+        case .failure(.emptySlot): "Empty."
+        case .failure(let refusal): refusalText(refusal)
+        }
+    }
+
+    /// Reads every slot once: its name and what it holds (nothing is written).
+    func refreshSlots() {
+        for slot in ExperimentStore.slots {
+            let result = store.read(slot: slot)
+            let name = (try? result.get())?.name ?? ""
+            if mirror.slotNames[slot] != name { mirror.slotNames[slot] = name }
+            mirror.slotStatus[slot] = Self.holdingText(result)
+        }
+    }
+
+    /// The current core: the shell's, or the last one drawn or described.
+    private var currentCore: PlaygroundCore? { shell?.engine.core ?? lastCore }
+
+    /// Saves the current experiment to `slot` under `name` (cut to 24 characters; "Experiment N" when empty): the
+    /// world without grab and selection and the origin. Returns the status text, also set as the slot's status.
+    @discardableResult
+    func saveExperiment(slot: Int, name: String) -> String {
+        guard ExperimentStore.slots.contains(slot) else { return Self.refusalText(.invalidSlot) }
+        guard let core = currentCore else { return setStatus(slot, "Not saved: the experiment is not ready.") }
+        let document = ExperimentDocument(name: name, origin: core.origin, world: core.world, slot: slot)
+        switch store.save(document, slot: slot) {
+        case .success:
+            mirror.slotNames[slot] = document.name
+            return setStatus(slot, "Saved “\(document.name)”.")
+        case .failure(let refusal):
+            return setStatus(slot, "Not saved: " + Self.refusalText(refusal))
+        }
+    }
+
+    /// Opens the experiment saved in `slot`: the file is read and validated, and a snapshot of
+    /// `PlaygroundCore.opening(document:slot:from:)` is restored through the shell. A refused file is left as it is.
+    /// Returns the status text, also set as the slot's status.
+    @discardableResult
+    func openExperiment(slot: Int) -> String {
+        guard ExperimentStore.slots.contains(slot) else { return Self.refusalText(.invalidSlot) }
+        let document: ExperimentDocument
+        switch store.read(slot: slot) {
+        case .success(let read): document = read
+        case .failure(let refusal): return setStatus(slot, "Not opened: " + Self.refusalText(refusal))
+        }
+        mirror.slotNames[slot] = document.name
+        guard let shell, let core = shell.engine.core else {
+            return setStatus(slot, "Not opened: the experiment is not ready.")
+        }
+        let opened = PlaygroundCore.opening(document: document, slot: slot, from: core)
+        do {
+            let snapshot = try PlaygroundCore.openingSnapshot(of: opened, experience: shell.id,
+                                                              stepIndex: shell.engine.stepIndex)
+            try shell.restore(snapshot)
+        } catch {
+            return setStatus(slot, "Not opened: the experiment could not be restored.")
+        }
+        sync(opened)
+        return setStatus(slot, "Opened “\(document.name)”.")
+    }
+
+    /// Removes the experiment saved in `slot`. Returns the status text, also set as the slot's status.
+    @discardableResult
+    func clearExperiment(slot: Int) -> String {
+        guard ExperimentStore.slots.contains(slot) else { return Self.refusalText(.invalidSlot) }
+        switch store.clear(slot: slot) {
+        case .success:
+            mirror.slotNames[slot] = ""
+            return setStatus(slot, "Cleared.")
+        case .failure(let refusal):
+            return setStatus(slot, "Not cleared: " + Self.refusalText(refusal))
+        }
+    }
+
+    /// Sets `text` as the status of `slot` and returns it.
+    private func setStatus(_ slot: Int, _ text: String) -> String {
+        mirror.slotStatus[slot] = text
+        return text
     }
 
     /// The canvas fraction (x from the left, y from the top) of the stage point `p` in the last frame; without a frame
@@ -852,11 +1029,15 @@ final class PlaygroundPresenter: ExperiencePresenter {
     }
 
     func makeControls(_ port: ExperienceActionPort) -> AnyView {
-        AnyView(PlaygroundControls(port: port, mirror: mirror))
+        let slots = PlaygroundSlotActions(
+            save: { [weak self] slot, name in _ = self?.saveExperiment(slot: slot, name: name) },
+            open: { [weak self] slot in _ = self?.openExperiment(slot: slot) },
+            clear: { [weak self] slot in _ = self?.clearExperiment(slot: slot) })
+        return AnyView(PlaygroundControls(port: port, mirror: mirror, slots: slots))
     }
 
     /// Every action has a native control (the three level pickers, the selection, pin, delete, add, hold and
-    /// direction buttons and the two overlay toggles included).
+    /// direction buttons, the two overlay toggles, the preset picker and the tutorial buttons included).
     var nativeActions: Set<String> { Set(PlaygroundCore.actionIDs) }
 
     // MARK: Gestures (feature 084)

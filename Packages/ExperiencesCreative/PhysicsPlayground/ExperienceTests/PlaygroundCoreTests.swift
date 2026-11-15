@@ -25,6 +25,15 @@
 // restore; the stored schema-1 example restoring through 1 → 2 → 3 and the stored schema-2 example through 2 → 3 (no
 // pins, selection, grab or overlays; everything else kept), both accepted by the registry's `SnapshotMigrationCheck`;
 // replays of editing sessions identical.
+//
+// Feature 085 (A11-P04) T-A11-403 (FR-A11-402, FR-A11-410, FR-A11-430; SC-A11-401, SC-A11-403; clarifications 2, 4, 5;
+// contract contracts/experiments.md): twenty-one controls and schema 4; `world.reset` restores the starting world
+// (the generator keeps going); `experiment.preset` opens each preset as the starting world and reset after edits and
+// time controls returns to it exactly; `tutorial.start` and `tutorial.stop` with their refusals; both tutorials
+// completed through actions and host steps; a tutorial that stays on its step when a preset or a slot opens; opening a
+// saved document keeps the generator and becomes the starting world; the digest covering the origin, the starting
+// world and the tutorial; the stored schema-3 example restoring through the step 3 → 4 (and the examples of schemas 1
+// and 2 through the whole chain); a schema-4 state with a bad starting world or tutorial refused.
 import Foundation
 import XCTest
 @testable import PhysicsPlaygroundExperience
@@ -58,17 +67,19 @@ final class PlaygroundCoreTests: XCTestCase {
         XCTAssertEqual(PlaygroundCore.controls.map(\.id),
                        ["world.pause", "world.step", "world.timeScale", "world.reset", "world.drop", "world.gravity",
                         "world.drag", "world.stiffness", "edit.add", "edit.select", "edit.grab", "edit.move",
-                        "edit.release", "edit.pin", "edit.delete", "edit.nudge", "overlay.velocity", "overlay.forces"])
+                        "edit.release", "edit.pin", "edit.delete", "edit.nudge", "overlay.velocity", "overlay.forces",
+                        "experiment.preset", "tutorial.start", "tutorial.stop"])
         XCTAssertEqual(PlaygroundCore.controls.map(\.id), PlaygroundCore.actionIDs)
         XCTAssertEqual(PlaygroundCore.controls.map(\.ranges),
                        [[0...1], [], [0...3], [], [0...1], [0...2], [0...2], [0...3],
                         [0...10, 0...8, 0...1], [-1...10_000], [0...10_000, 0...10, 0...8], [-1...11, -1...9], [],
-                        [0...10_000], [0...10_000], [-1...1, -1...1], [0...1], [0...1]])
+                        [0...10_000], [0...10_000], [-1...1, -1...1], [0...1], [0...1], [0...3], [0...1], []])
         XCTAssertEqual(PlaygroundCore.gestureActionIDs,
                        ["edit.add", "edit.select", "edit.grab", "edit.move", "edit.release", "edit.pin", "edit.delete"])
         XCTAssertTrue(PlaygroundCore.gestureActionIDs.isSubset(of: Set(PlaygroundCore.actionIDs)))
-        XCTAssertEqual(PlaygroundCore.migrations.currentVersion, 3)
-        XCTAssertEqual(PlaygroundCore.snapshotSchema, 3)
+        XCTAssertEqual(PlaygroundCore.migrations.currentVersion, 4)
+        XCTAssertEqual(PlaygroundCore.snapshotSchema, 4)
+        XCTAssertEqual(PlaygroundRule.noTutorial, "a11.no-tutorial")
         XCTAssertEqual(PlaygroundCore.qualityTiers, 1)
         XCTAssertEqual(PlaygroundCore.stepDuration, 1.0 / 120, accuracy: 1e-15)
         XCTAssertEqual(ExperienceEngine<PlaygroundCore>.stepDuration, 1.0 / 120, accuracy: 1e-15)
@@ -95,7 +106,10 @@ final class PlaygroundCoreTests: XCTestCase {
                       ScriptedAction("edit.pin", [8]), ScriptedAction("edit.grab", [9, 8, 1.5]),
                       ScriptedAction("edit.move", [6, 4]), ScriptedAction("edit.release"),
                       ScriptedAction("overlay.velocity", [1]), ScriptedAction("overlay.forces", [1]),
-                      ScriptedAction("edit.pin", [8]), ScriptedAction("edit.delete", [7])],
+                      ScriptedAction("edit.pin", [8]), ScriptedAction("edit.delete", [7]),
+                      ScriptedAction("tutorial.start", [0]), ScriptedAction("experiment.preset", [1]),
+                      ScriptedAction("world.reset"), ScriptedAction("tutorial.stop"),
+                      ScriptedAction("experiment.preset", [0])],
             rejected: [ScriptedAction("world.pause", [0.5]), ScriptedAction("world.pause", [2]),
                        ScriptedAction("world.pause", [.nan]), ScriptedAction("world.pause", []),
                        ScriptedAction("world.step"), ScriptedAction("world.step", [1]),
@@ -112,7 +126,10 @@ final class PlaygroundCoreTests: XCTestCase {
                        ScriptedAction("edit.move", [5, 4]), ScriptedAction("edit.release"),
                        ScriptedAction("edit.pin", [0]), ScriptedAction("edit.delete", [99]),
                        ScriptedAction("edit.nudge", [1, 0]), ScriptedAction("overlay.forces", [0.5]),
-                       ScriptedAction("overlay.velocity", [2])])
+                       ScriptedAction("overlay.velocity", [2]), ScriptedAction("experiment.preset", [1.5]),
+                       ScriptedAction("experiment.preset", [4]), ScriptedAction("tutorial.start", [0.5]),
+                       ScriptedAction("tutorial.start", [2]), ScriptedAction("tutorial.stop"),
+                       ScriptedAction("tutorial.stop", [0])])
         let report = await ExperienceConformance.run(PlaygroundCore.self, id: playgroundID, plan: plan)
         for entry in report.entries { XCTAssertTrue(entry.passed, "\(entry.check): \(entry.detail)") }
     }
@@ -181,7 +198,8 @@ final class PlaygroundCoreTests: XCTestCase {
         XCTAssertEqual(engine.handle(control: "world.pause", values: [0]), .accepted)
         XCTAssertFalse(try XCTUnwrap(engine.core).world.paused)
         XCTAssertEqual(engine.handle(control: "world.reset"), .accepted)
-        XCTAssertEqual(try XCTUnwrap(engine.core), PlaygroundCore(seed: 7), "world.reset: the starting scene")
+        XCTAssertEqual(try XCTUnwrap(engine.core).world, PlaygroundCore(seed: 7).world,
+                       "world.reset: the starting scene (the generator keeps going)")
     }
 
     func testRefusalsKeepTheStateWithTheirReasons() async throws {
@@ -404,7 +422,7 @@ final class PlaygroundCoreTests: XCTestCase {
         XCTAssertEqual(engine.handle(control: "overlay.forces", values: [1]), .accepted)
         try engine.run(steps: 3)
         let snapshot = try engine.snapshot()
-        XCTAssertEqual(snapshot.schemaVersion, 3)
+        XCTAssertEqual(snapshot.schemaVersion, 4)
         let saved = try XCTUnwrap(engine.core)
         var other = try await makeEngine(seed: 3)
         try other.restore(ExperienceSnapshot(data: snapshot.encoded()))
@@ -494,9 +512,9 @@ final class PlaygroundCoreTests: XCTestCase {
         object["random"] = random
         XCTAssertThrowsError(try engine.restore(envelope(
             JSONSerialization.data(withJSONObject: object, options: [.sortedKeys]))))
-        // Newer: schema 4 is not known to this build.
-        XCTAssertThrowsError(try engine.restore(envelope(Data(saved.payload.utf8), schema: 4)))
-        // A schema-3 payload sent as schema 1 runs the step 1 → 2, which refuses it (its world is not schema 1), and
+        // Newer: schema 5 is not known to this build.
+        XCTAssertThrowsError(try engine.restore(envelope(Data(saved.payload.utf8), schema: 5)))
+        // A schema-4 payload sent as schema 1 runs the step 1 → 2, which refuses it (its world is not schema 1), and
         // sent as schema 2 runs the step 2 → 3, which refuses it (its world is not schema 2).
         XCTAssertThrowsError(try engine.restore(envelope(Data(saved.payload.utf8), schema: 1)))
         XCTAssertThrowsError(try engine.restore(envelope(Data(saved.payload.utf8), schema: 2)))
@@ -524,13 +542,17 @@ final class PlaygroundCoreTests: XCTestCase {
         XCTAssertEqual(try XCTUnwrap(engine.core), PlaygroundCore(seed: 7))
         XCTAssertEqual(engine.stepIndex, 0)
 
-        // `world.reset` from a paused, slowed, fuller world: the starting scene at 1×, running, generator restarted.
+        // `world.reset` from a paused, slowed, fuller world: the starting scene at 1×, running; the generator keeps
+        // the drop's draws (feature 085).
         var core = PlaygroundCore(seed: 7)
         _ = core.apply(action("world.drop", [0]))
         _ = core.apply(action("world.timeScale", [0]))
         _ = core.apply(action("world.pause", [1]))
+        let drawn = core.generator
         XCTAssertEqual(core.apply(action("world.reset")), .accepted)
-        XCTAssertEqual(core, PlaygroundCore(seed: 7))
+        XCTAssertEqual(core.world, PlaygroundCore(seed: 7).world)
+        XCTAssertEqual(core.generator, drawn)
+        XCTAssertEqual(core.origin, .freePlay)
         XCTAssertEqual(core.world.timeScaleIndex, 2)
         XCTAssertFalse(core.world.paused)
 
@@ -541,7 +563,7 @@ final class PlaygroundCoreTests: XCTestCase {
         XCTAssertEqual(core.apply(action("world.drag", [2])), .accepted)
         XCTAssertEqual(core.apply(action("world.stiffness", [3])), .accepted)
         XCTAssertEqual(core.apply(action("world.reset")), .accepted)
-        XCTAssertEqual(core, PlaygroundCore(seed: 7))
+        XCTAssertEqual(core.world, PlaygroundCore(seed: 7).world)
         XCTAssertEqual(core.world.gravityLevel, ForceLevels.defaultGravityLevel)
         XCTAssertEqual(core.world.dragLevel, ForceLevels.defaultDragLevel)
         XCTAssertEqual(core.world.stiffnessLevel, ForceLevels.defaultStiffnessLevel)
@@ -557,7 +579,7 @@ final class PlaygroundCoreTests: XCTestCase {
         }
         XCTAssertFalse(core.forces.springForces.isEmpty)
         XCTAssertEqual(core.apply(action("world.reset")), .accepted)
-        XCTAssertEqual(core, PlaygroundCore(seed: 7))
+        XCTAssertEqual(core.world, PlaygroundCore(seed: 7).world)
         XCTAssertFalse(core.world.bodies.contains(where: \.pinned))
         XCTAssertNil(core.world.selectedId)
         XCTAssertNil(core.world.grab)
@@ -667,8 +689,9 @@ final class PlaygroundCoreTests: XCTestCase {
         XCTAssertEqual(continued, try XCTUnwrap(other.core), "the migrated world plays on identically")
 
         let two = try XCTUnwrap(PlaygroundCore.schemaTwoExample())
+        let three = try XCTUnwrap(PlaygroundCore.schemaThreeExample())
         let problems = await SnapshotMigrationCheck.problems(for: PlaygroundCore.self, id: playgroundID,
-                                                              examples: [example, two])
+                                                              examples: [example, two, three])
         XCTAssertEqual(problems, [])
     }
 
@@ -696,8 +719,8 @@ final class PlaygroundCoreTests: XCTestCase {
             payload: JSONSerialization.data(withJSONObject: upgraded, options: [.sortedKeys]), seed: 7)
         XCTAssertEqual(restored.world,
                        PhysicsWorld.migrated(fromSchemaOne: PlaygroundCore.schemaOneExampleState().world))
-        XCTAssertEqual(try PlaygroundCore.migrations.migrate(current, from: 3) as NSDictionary,
-                       current as NSDictionary, "a schema-3 payload needs no step")
+        XCTAssertEqual(try PlaygroundCore.migrations.migrate(current, from: 4) as NSDictionary,
+                       current as NSDictionary, "a schema-4 payload needs no step")
         // The step 1 → 2 alone writes a faithful Phase 02 payload.
         let phaseTwo = try PlaygroundCore.migratedToSchemaTwo(object)
         let phaseTwoWorld = try XCTUnwrap(phaseTwo["world"] as? [String: Any])
@@ -753,7 +776,10 @@ final class PlaygroundCoreTests: XCTestCase {
         for item in PlaygroundCore.schemaTwoExampleActions {
             _ = expected.apply(action(item.control, item.values))
         }
-        XCTAssertEqual(core, expected, "the same world the A11-P02 actions give")
+        XCTAssertEqual(core.world, expected.world, "the same world the A11-P02 actions give")
+        XCTAssertEqual(core.generator, expected.generator)
+        XCTAssertEqual(core.origin, .freePlay)
+        XCTAssertEqual(core.startingWorld, core.world, "nothing grabbed or selected, so the world itself")
 
         var other = ExperienceEngine<PlaygroundCore>(id: playgroundID)
         try await other.prepare(seed: 11)
@@ -767,8 +793,9 @@ final class PlaygroundCoreTests: XCTestCase {
         XCTAssertEqual(try XCTUnwrap(engine.core), try XCTUnwrap(other.core), "the migrated world plays on identically")
 
         let one = try XCTUnwrap(PlaygroundCore.schemaOneExample())
+        let three = try XCTUnwrap(PlaygroundCore.schemaThreeExample())
         let problems = await SnapshotMigrationCheck.problems(for: PlaygroundCore.self, id: playgroundID,
-                                                              examples: [one, example])
+                                                              examples: [one, example, three])
         XCTAssertEqual(problems, [])
     }
 
@@ -922,5 +949,248 @@ final class PlaygroundCoreTests: XCTestCase {
         XCTAssertEqual(core.outcome?.code, "world-paused")
         _ = core.apply(action("world.reset"))
         XCTAssertEqual(core.outcome?.code, "world-running")
+    }
+
+    // MARK: Feature 085 (A11-P04)
+
+    /// The preset `id` as `Presets.make` builds it from `generator`, with the generator after it.
+    private func preset(_ id: PresetID, from generator: SeededRandom) -> (world: PhysicsWorld, random: SeededRandom) {
+        var random = generator
+        let world = Presets.make(id, random: &random, catalog: PlaygroundCore.catalog)
+        return (world, random)
+    }
+
+    /// T-A11-403 (FR-A11-401, FR-A11-402; SC-A11-401): each preset opens as the world and the starting world with its
+    /// origin (only free play draws from the generator), and reset after edits and time controls returns to it exactly.
+    func testPresetsOpenAsTheStartingWorldAndResetReturnsToThem() {
+        for id in PresetID.allCases {
+            var core = PlaygroundCore(seed: 7)
+            for step in 0..<20 { core.update(step: step) }
+            let expected = preset(id, from: core.generator)
+            XCTAssertEqual(core.apply(action("experiment.preset", [Double(id.rawValue)])), .accepted, id.name)
+            XCTAssertEqual(core.world, expected.world, id.name)
+            XCTAssertEqual(core.startingWorld, expected.world, id.name)
+            XCTAssertEqual(core.origin, .preset(id.rawValue), id.name)
+            XCTAssertEqual(core.generator, expected.random, id.name)
+            XCTAssertEqual(core.generator == PlaygroundCore(seed: 7).generator, id != .freePlay,
+                           "\(id.name): only free play draws")
+            XCTAssertEqual(core.forces, ForceMeasurement())
+            XCTAssertEqual(core.world.validate(), [], id.name)
+
+            for step in 0..<50 { core.update(step: step) }
+            let dynamic = core.world.bodies.first { !$0.isFixed }?.id ?? 0
+            for (control, values) in [("world.drop", [0.0]), ("edit.select", [Double(dynamic)]),
+                                      ("edit.nudge", [1.0, 0.5]), ("world.timeScale", [0.0]), ("world.pause", [1.0]),
+                                      ("world.step", []), ("world.gravity", [1.0]), ("world.stiffness", [0.0]),
+                                      ("edit.grab", [Double(dynamic), 5.0, 4.0])] {
+                XCTAssertEqual(core.apply(action(control, values)), .accepted, "\(id.name) \(control)")
+            }
+            XCTAssertEqual(core.apply(action("world.reset")), .accepted)
+            XCTAssertEqual(core.world, expected.world, "\(id.name): reset returns to the preset exactly")
+            XCTAssertFalse(core.world.paused)
+            XCTAssertEqual(core.world.timeScaleIndex, PhysicsWorld.normalTimeScaleIndex)
+            XCTAssertNil(core.world.grab)
+            XCTAssertNil(core.world.selectedId)
+            XCTAssertEqual(core.origin, .preset(id.rawValue))
+        }
+        var core = PlaygroundCore(seed: 7)
+        let before = core
+        XCTAssertEqual(core.apply(action("experiment.preset", [1.5])),
+                       .rejected(.rule(code: PlaygroundRule.invalidChoice)))
+        XCTAssertEqual(core.apply(action("experiment.preset", [4])),
+                       .rejected(.rule(code: PlaygroundRule.invalidChoice)))
+        XCTAssertEqual(core, before)
+    }
+
+    /// T-A11-403 (FR-A11-410; SC-A11-403): `tutorial.start` and `tutorial.stop`, their refusals, and a stop that
+    /// leaves the world unchanged.
+    func testTutorialStartAndStop() {
+        var core = PlaygroundCore(seed: 7)
+        for step in 0..<12 { core.update(step: step) }
+        let before = core
+        XCTAssertEqual(core.apply(action("tutorial.stop")), .rejected(.rule(code: PlaygroundRule.noTutorial)))
+        XCTAssertEqual(core.apply(action("tutorial.start", [0.5])),
+                       .rejected(.rule(code: PlaygroundRule.invalidChoice)))
+        XCTAssertEqual(core.apply(action("tutorial.start", [2])),
+                       .rejected(.rule(code: PlaygroundRule.invalidChoice)))
+        XCTAssertEqual(core, before)
+        XCTAssertEqual(core.apply(action("tutorial.start", [0])), .accepted)
+        XCTAssertEqual(core.tutorial, TutorialProgress(tutorial: 0, step: 0, startTick: 12))
+        XCTAssertEqual(core.apply(action("tutorial.start", [1])), .accepted)
+        XCTAssertEqual(core.tutorial, TutorialProgress(tutorial: 1, step: 0, startTick: 12), "a start replaces")
+        XCTAssertEqual(core.apply(action("tutorial.stop")), .accepted)
+        XCTAssertNil(core.tutorial)
+        XCTAssertEqual(core, before, "stopping leaves the world unchanged")
+    }
+
+    /// T-A11-403 (FR-A11-410; SC-A11-403; story 3 scenario 1): "Controlling time" completes through its actions, step
+    /// by step in order, and ends.
+    func testControllingTimeCompletesThroughItsActions() {
+        var core = PlaygroundCore(seed: 7)
+        XCTAssertEqual(core.apply(action("tutorial.start", [0])), .accepted)
+        XCTAssertEqual(Tutorials.text(core.tutorial), "Pause the world.")
+        for step in 0..<10 { core.update(step: step) }
+        XCTAssertEqual(core.tutorial?.step, 0, "running: the first step waits")
+        XCTAssertEqual(core.apply(action("world.timeScale", [1])), .accepted)
+        XCTAssertEqual(core.tutorial?.step, 0, "half speed before the pause does not skip a step")
+        XCTAssertEqual(core.apply(action("world.timeScale", [2])), .accepted)
+        XCTAssertEqual(core.apply(action("world.pause", [1])), .accepted)
+        XCTAssertEqual(core.tutorial, TutorialProgress(tutorial: 0, step: 1, startTick: 10))
+        for step in 0..<20 { core.update(step: step) }
+        XCTAssertEqual(core.tutorial?.step, 1, "paused host steps change nothing")
+        XCTAssertEqual(core.apply(action("world.step")), .accepted)
+        XCTAssertEqual(core.tutorial, TutorialProgress(tutorial: 0, step: 2, startTick: 11))
+        XCTAssertEqual(core.apply(action("world.timeScale", [1])), .accepted)
+        XCTAssertEqual(core.tutorial?.step, 3)
+        XCTAssertEqual(Tutorials.text(core.tutorial), "Press Reset.")
+        XCTAssertEqual(core.apply(action("world.reset")), .accepted)
+        XCTAssertNil(core.tutorial, "the last step completes and the tutorial ends")
+        XCTAssertEqual(core.world, PlaygroundCore(seed: 7).world)
+    }
+
+    /// T-A11-403 (FR-A11-410; SC-A11-403; story 3 scenario 2; edge case "Opening a preset or a slot during a
+    /// tutorial"): "Springs and energy" stays on its step when another preset opens, completes when the spring chain
+    /// opens, the force arrows show and 360 running ticks pass, and ends.
+    func testSpringsAndEnergyCompletesAndStaysOnItsStep() {
+        var core = PlaygroundCore(seed: 7)
+        XCTAssertEqual(core.apply(action("tutorial.start", [1])), .accepted)
+        XCTAssertEqual(core.apply(action("experiment.preset", [3])), .accepted)
+        XCTAssertEqual(core.tutorial?.step, 0, "the stack is not the spring chain")
+        XCTAssertEqual(core.apply(action("experiment.preset", [2])), .accepted)
+        XCTAssertEqual(core.tutorial?.step, 1)
+        XCTAssertEqual(core.apply(action("overlay.forces", [1])), .accepted)
+        XCTAssertEqual(core.tutorial, TutorialProgress(tutorial: 1, step: 2, startTick: 0))
+        for step in 0..<100 { core.update(step: step) }
+        XCTAssertEqual(core.apply(action("world.reset")), .accepted)
+        XCTAssertEqual(core.tutorial, TutorialProgress(tutorial: 1, step: 2, startTick: 0),
+                       "a reset begins the step again at the restored tick")
+        for step in 0..<(Tutorials.runTicks - 1) { core.update(step: step) }
+        XCTAssertEqual(core.tutorial?.step, 2)
+        core.update(step: Tutorials.runTicks)
+        XCTAssertNil(core.tutorial)
+        XCTAssertEqual(core.world.tick, Tutorials.runTicks)
+    }
+
+    /// T-A11-403 (FR-A11-402, FR-A11-403; research D3): opening a saved document keeps the seed and the generator,
+    /// makes the document's world (without grab and selection) the world and the starting world with origin the slot,
+    /// keeps a running tutorial on its step, and restores through the snapshot the presenter builds.
+    func testOpeningADocumentKeepsTheGeneratorAndBecomesTheStartingWorld() async throws {
+        var current = PlaygroundCore(seed: 7)
+        _ = current.apply(action("world.drop", [0]))
+        _ = current.apply(action("tutorial.start", [1]))
+        for step in 0..<30 { current.update(step: step) }
+        var world = preset(.pendulum, from: current.generator).world
+        world.selectedId = 1
+        world.grab = Grab(bodyId: 1, localAnchor: .zero, target: Vec2(6, 4))
+        let document = ExperimentDocument(name: "Swing", origin: .preset(1), world: world, slot: 2)
+        let opened = PlaygroundCore.opening(document: document, slot: 2, from: current)
+        XCTAssertEqual(opened.world, ExperimentDocument.withoutEditing(world))
+        XCTAssertEqual(opened.startingWorld, opened.world)
+        XCTAssertEqual(opened.origin, .slot(2))
+        XCTAssertEqual(opened.generator, current.generator)
+        XCTAssertEqual(opened.preparationSeed, current.preparationSeed)
+        XCTAssertEqual(opened.tutorial, TutorialProgress(tutorial: 1, step: 0, startTick: 0), "it stays on its step")
+        XCTAssertEqual(PlaygroundCore.opening(document: document, slot: 4, from: current), current)
+
+        var reset = opened
+        for step in 0..<40 { reset.update(step: step) }
+        _ = reset.apply(action("world.drop", [1]))
+        XCTAssertEqual(reset.apply(action("world.reset")), .accepted)
+        XCTAssertEqual(reset.world, opened.world, "reset returns to the opened document")
+
+        var engine = try await makeEngine()
+        try engine.run(steps: 5)
+        let snapshot = try PlaygroundCore.openingSnapshot(of: opened, experience: playgroundID, stepIndex: 5)
+        XCTAssertEqual(snapshot.schemaVersion, 4)
+        try engine.restore(snapshot)
+        XCTAssertEqual(try XCTUnwrap(engine.core), opened)
+        XCTAssertEqual(engine.stepIndex, 5)
+    }
+
+    /// T-A11-403 (FR-A11-430): the digest covers the origin, the starting world and the tutorial progress.
+    func testTheDigestCoversTheExperimentAndTheTutorial() throws {
+        let base = PlaygroundCore(seed: 7)
+        var tutorial = base
+        XCTAssertEqual(tutorial.apply(action("tutorial.start", [0])), .accepted)
+        XCTAssertEqual(tutorial.world, base.world)
+        XCTAssertNotEqual(try digest(tutorial), try digest(base))
+        var state = base.state
+        state.origin = .slot(1)
+        let slot = try PlaygroundCore.restore(payload: PlaygroundCore.encode(state), seed: 7)
+        XCTAssertNotEqual(try digest(slot), try digest(base))
+        state = base.state
+        state.startingWorld.tick = 5
+        let starting = try PlaygroundCore.restore(payload: PlaygroundCore.encode(state), seed: 7)
+        XCTAssertNotEqual(try digest(starting), try digest(base))
+        XCTAssertNotEqual(starting, base)
+        let payload = try XCTUnwrap(String(data: base.snapshotPayload(), encoding: .utf8))
+        XCTAssertFalse(payload.contains("\"tutorial\""), "no tutorial key when none runs")
+        XCTAssertTrue(payload.contains("\"startingWorld\""))
+    }
+
+    /// T-A11-403 (FR-A11-430): the stored Phase 03 payload restores through the step 3 → 4 with the digest the example
+    /// names: the same world (its grab and selection kept) and generator, origin free play, the world without grab and
+    /// selection as the starting world, no tutorial; the registry's check accepts all three examples.
+    func testTheSchemaThreeExampleRestoresThroughTheMigration() async throws {
+        let example = try XCTUnwrap(PlaygroundCore.schemaThreeExample())
+        XCTAssertEqual(example.version, 3)
+        let snapshot = try ExperienceSnapshot(data: example.snapshot)
+        XCTAssertEqual(snapshot.schemaVersion, 3)
+        let payload = try XCTUnwrap(try JSONSerialization.jsonObject(with: Data(snapshot.payload.utf8))
+                                    as? [String: Any])
+        XCTAssertEqual(Set(payload.keys), ["random", "world"], "exactly the A11-P03 keys")
+        let phaseThree = try JSONDecoder().decode(PlaygroundStateSchemaThree.self, from: Data(snapshot.payload.utf8))
+        XCTAssertEqual(phaseThree, PlaygroundCore.schemaThreeExampleState())
+        XCTAssertEqual(phaseThree.world.selectedId, 9)
+        XCTAssertEqual(phaseThree.world.grab?.bodyId, 7)
+
+        var engine = ExperienceEngine<PlaygroundCore>(id: playgroundID)
+        try await engine.prepare(seed: 3)
+        try engine.activate()
+        try engine.restore(snapshot)
+        XCTAssertEqual(try engine.digest().hex, example.expectedDigest)
+        let core = try XCTUnwrap(engine.core)
+        XCTAssertEqual(core.world, phaseThree.world)
+        XCTAssertEqual(core.state.random, phaseThree.random)
+        XCTAssertEqual(core.origin, .freePlay)
+        XCTAssertEqual(core.startingWorld, ExperimentDocument.withoutEditing(phaseThree.world))
+        XCTAssertNil(core.tutorial)
+        XCTAssertEqual(engine.handle(control: "world.reset"), .accepted)
+        XCTAssertEqual(try XCTUnwrap(engine.core).world.selectedId, nil)
+
+        let one = try XCTUnwrap(PlaygroundCore.schemaOneExample())
+        let two = try XCTUnwrap(PlaygroundCore.schemaTwoExample())
+        let twoSnapshot = try ExperienceSnapshot(data: two.snapshot)
+        let twoPayload = try XCTUnwrap(try JSONSerialization.jsonObject(with: Data(twoSnapshot.payload.utf8))
+                                       as? [String: Any])
+        XCTAssertThrowsError(try PlaygroundCore.migratedToSchemaFour(twoPayload), "a Phase 02 payload needs 2 → 3")
+        let problems = await SnapshotMigrationCheck.problems(for: PlaygroundCore.self, id: playgroundID,
+                                                              examples: [one, two, example])
+        XCTAssertEqual(problems, [])
+    }
+
+    /// T-A11-403 (FR-A11-430): a schema-4 state whose starting world does not validate or whose tutorial names no
+    /// tutorial or step is refused, and a schema-3 payload needs the step 3 → 4.
+    func testAStateWithABadStartingWorldOrTutorialIsRefused() throws {
+        var state = PlaygroundCore(seed: 7).state
+        state.startingWorld.remainder = 12
+        XCTAssertThrowsError(try PlaygroundCore.restore(payload: PlaygroundCore.encode(state), seed: 7)) { error in
+            guard case PlaygroundRestoreError.invalidStartingWorld(let problems)? = error as? PlaygroundRestoreError
+            else { return XCTFail("\(error)") }
+            XCTAssertFalse(problems.isEmpty)
+        }
+        for progress in [TutorialProgress(tutorial: 2, step: 0, startTick: 0),
+                         TutorialProgress(tutorial: 0, step: 4, startTick: 0),
+                         TutorialProgress(tutorial: 1, step: 0, startTick: -1)] {
+            state = PlaygroundCore(seed: 7).state
+            state.tutorial = progress
+            XCTAssertThrowsError(try PlaygroundCore.restore(payload: PlaygroundCore.encode(state), seed: 7)) { error in
+                XCTAssertEqual(error as? PlaygroundRestoreError, .invalidTutorial)
+            }
+        }
+        let example = try XCTUnwrap(PlaygroundCore.schemaThreeExample())
+        let snapshot = try ExperienceSnapshot(data: example.snapshot)
+        XCTAssertThrowsError(try PlaygroundCore.restore(payload: Data(snapshot.payload.utf8), seed: 7),
+                             "a schema-3 payload lacks the schema-4 keys")
     }
 }

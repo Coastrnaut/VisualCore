@@ -36,15 +36,48 @@
 // kg·m/s and the selected body's speed in m/s, each with two decimals (`panel-kinetic`, `panel-potential`,
 // `panel-spring`, `panel-total`, `panel-momentum`, `panel-speed`), and the note that contact and drag forces are not
 // drawn (`arrow-note`). Every control has a VoiceOver label and value.
+//
+// Feature 085 (A11-P04) T-A11-403 (FR-A11-401, FR-A11-402, FR-A11-403, FR-A11-410; clarifications 1–4; edge cases "A
+// preset after an edit", "Reduce Motion and VoiceOver") adds an "Experiment" group:
+//   the experiment line (`experiment`: "Experiment: Pendulum.");
+//   the preset picker (`preset` → `experiment.preset [0…3]`: Free play, Pendulum, Spring chain, Stacked objects; it
+//   shows the opened preset, or nothing chosen for a saved slot) with the note (`preset-note`) "Opening a preset
+//   replaces the current experiment. Save it first to keep it.";
+//   four slot rows (`slot-<n>-name` text field, `slot-<n>-save`, `slot-<n>-open`, `slot-<n>-clear` buttons and the
+//   status `slot-<n>-status`, n = 0…3), handled by the presenter (`PlaygroundSlotActions`), not by actions;
+// and a "Tutorials" card: a Start button for each tutorial (`tutorial-0-start`, `tutorial-1-start` →
+// `tutorial.start [0/1]`), the running tutorial's name and step (`tutorial-progress`), the current step's text
+// (`tutorial-step`, announced to VoiceOver when it changes, and "Tutorial ended." when it ends) and Stop
+// (`tutorial-stop` → `tutorial.stop`, enabled while a tutorial runs). Reset now returns to the opened experiment.
 import SwiftUI
 import PhysicsPlaygroundCore
 import VisualCoreExperienceHost
 import VisualCoreMath
 
+/// What the slot buttons do (feature 085): the presenter saves, opens and clears slots outside the action replay.
+struct PlaygroundSlotActions {
+    /// Saves the current experiment to the slot under the name.
+    var save: (Int, String) -> Void
+    /// Opens the experiment saved in the slot.
+    var open: (Int) -> Void
+    /// Removes the experiment saved in the slot.
+    var clear: (Int) -> Void
+
+    /// Slot actions that do nothing (previews).
+    static var none: PlaygroundSlotActions { PlaygroundSlotActions(save: { _, _ in }, open: { _ in }, clear: { _ in }) }
+}
+
 /// The controls of Physics Playground.
 struct PlaygroundControls: View {
     let port: ExperienceActionPort
     let mirror: PlaygroundMirror
+    /// The slot buttons' handlers (feature 085).
+    var slots: PlaygroundSlotActions = .none
+
+    /// The note under the preset picker (feature 085).
+    static let presetNote = "Opening a preset replaces the current experiment. Save it first to keep it."
+    /// What VoiceOver hears when a tutorial ends (feature 085).
+    static let tutorialEnded = "Tutorial ended."
 
     /// The note shown under the controls.
     static let note = "The simulation is an educational approximation, not a precise physical measurement."
@@ -145,9 +178,11 @@ struct PlaygroundControls: View {
                         titles: PlaygroundPresenter.stiffnessTitles, selected: mirror.stiffnessLevel,
                         value: PlaygroundPresenter.stiffnessValue)
             button("Reset", name: "reset", value: bodies,
-                   hint: "Returns to the starting scene at normal speed with the default forces", enabled: true) {
+                   hint: "Returns to the experiment as it opened, running at normal speed", enabled: true) {
                 _ = port.send("world.reset")
             }
+            experimentGroup
+            tutorialCard
             editGroup(canAdd: canDrop)
             Text(verbatim: Self.sentence(mirror.status))
                 .font(.footnote)
@@ -255,6 +290,120 @@ struct PlaygroundControls: View {
         }
         toggle("Velocity arrows", name: "velocity-arrows", control: "overlay.velocity", isOn: mirror.showVelocity)
         toggle("Force arrows", name: "force-arrows", control: "overlay.forces", isOn: mirror.showForces)
+    }
+
+    /// The slot rows' title: "Slot 1" … "Slot 4".
+    static func slotTitle(_ slot: Int) -> String { "Slot \(slot + 1)" }
+
+    /// The experiment group (feature 085): the experiment line, the preset picker with its note and the four slots.
+    @ViewBuilder private var experimentGroup: some View {
+        Text(verbatim: "Experiment").font(.subheadline).accessibilityAddTraits(.isHeader)
+        Text(verbatim: mirror.experiment)
+            .font(.footnote)
+            .fixedSize(horizontal: false, vertical: true)
+            .accessibilityIdentifier(port.identifier("experiment"))
+        Picker(selection: Binding(get: { mirror.presetIndex ?? -1 },
+                                  set: { index in
+                                      if index >= 0, index != mirror.presetIndex {
+                                          _ = port.send("experiment.preset", [Double(index)])
+                                      }
+                                  })) {
+            ForEach(PresetID.allCases, id: \.rawValue) { preset in
+                Text(verbatim: preset.name).tag(preset.rawValue)
+            }
+        } label: {
+            Text(verbatim: "Preset")
+        }
+        .pickerStyle(.menu)
+        .frame(minHeight: 44)
+        .accessibilityLabel(Text(verbatim: "Preset"))
+        .accessibilityValue(Text(verbatim: mirror.presetIndex.flatMap { PresetID(rawValue: $0)?.name }
+                                 ?? "Saved experiment"))
+        .accessibilityHint(Text(verbatim: Self.presetNote))
+        .accessibilityIdentifier(port.identifier("preset"))
+        Text(verbatim: Self.presetNote)
+            .font(.footnote)
+            .foregroundStyle(.secondary)
+            .fixedSize(horizontal: false, vertical: true)
+            .accessibilityIdentifier(port.identifier("preset-note"))
+        ForEach(Array(ExperimentStore.slots), id: \.self) { slot in
+            slotRow(slot)
+        }
+    }
+
+    /// The row of `slot`: its name field, Save, Open, Clear and its status.
+    @ViewBuilder private func slotRow(_ slot: Int) -> some View {
+        let title = Self.slotTitle(slot)
+        let stored = mirror.slotNames[slot]
+        let holding = stored.isEmpty ? "Empty" : "Holds \(stored)"
+        VStack(alignment: .leading, spacing: 4) {
+            TextField(text: Binding(get: { mirror.slotDrafts[slot] }, set: { mirror.slotDrafts[slot] = $0 })) {
+                Text(verbatim: "\(title) name")
+            }
+            .textFieldStyle(.roundedBorder)
+            .frame(minHeight: 44)
+            .accessibilityLabel(Text(verbatim: "\(title) name"))
+            .accessibilityHint(Text(verbatim: "Up to 24 characters; empty saves as Experiment \(slot + 1)"))
+            .accessibilityIdentifier(port.identifier("slot-\(slot)-name"))
+            HStack(spacing: 8) {
+                button("Save", name: "slot-\(slot)-save", value: holding,
+                       hint: "Saves the current experiment to \(title), replacing what it holds", enabled: true) {
+                    slots.save(slot, mirror.slotDrafts[slot])
+                }
+                button("Open", name: "slot-\(slot)-open", value: holding,
+                       hint: "Opens the experiment saved in \(title)", enabled: true) {
+                    slots.open(slot)
+                }
+                button("Clear", name: "slot-\(slot)-clear", value: holding,
+                       hint: "Removes the experiment saved in \(title)", enabled: true) {
+                    slots.clear(slot)
+                }
+            }
+            Text(verbatim: "\(title): \(mirror.slotStatus[slot])")
+                .font(.footnote)
+                .fixedSize(horizontal: false, vertical: true)
+                .accessibilityIdentifier(port.identifier("slot-\(slot)-status"))
+        }
+    }
+
+    /// The tutorial card (feature 085): Start for each tutorial, the running step and Stop; the step text is announced.
+    @ViewBuilder private var tutorialCard: some View {
+        let running = mirror.tutorialText != nil
+        VStack(alignment: .leading, spacing: 4) {
+            Text(verbatim: "Tutorials").font(.subheadline).accessibilityAddTraits(.isHeader)
+            HStack(spacing: 8) {
+                ForEach(Tutorials.all, id: \.id) { tutorial in
+                    button("Start \(tutorial.name)", name: "tutorial-\(tutorial.id)-start",
+                           value: mirror.tutorialId == tutorial.id ? "Running" : "Not running",
+                           hint: "Starts the tutorial at its first step", enabled: true) {
+                        _ = port.send("tutorial.start", [Double(tutorial.id)])
+                    }
+                }
+            }
+            if let text = mirror.tutorialText {
+                Text(verbatim: mirror.tutorialStep)
+                    .font(.footnote.weight(.semibold))
+                    .fixedSize(horizontal: false, vertical: true)
+                    .accessibilityIdentifier(port.identifier("tutorial-progress"))
+                Text(verbatim: text)
+                    .font(.body)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .accessibilityLabel(Text(verbatim: "Tutorial step"))
+                    .accessibilityValue(Text(verbatim: text))
+                    .accessibilityIdentifier(port.identifier("tutorial-step"))
+            }
+            button("Stop tutorial", name: "tutorial-stop", value: running ? mirror.tutorialStep : "No tutorial",
+                   hint: "Ends the tutorial; the world is unchanged", enabled: running) {
+                _ = port.send("tutorial.stop")
+            }
+        }
+        .onChange(of: mirror.tutorialText) { old, new in
+            if let new {
+                AccessibilityNotification.Announcement(new).post()
+            } else if old != nil {
+                AccessibilityNotification.Announcement(Self.tutorialEnded).post()
+            }
+        }
     }
 
     /// The four direction buttons: (title, identifier name, direction in words, dx, dy).

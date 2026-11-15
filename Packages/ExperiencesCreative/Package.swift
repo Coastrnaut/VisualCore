@@ -426,7 +426,8 @@ let package = Package(
                                .product(name: "VisualCoreRendering", package: rendering),
                                .product(name: "VisualCoreExperienceHost", package: rendering),
                                .product(name: "VisualCoreUI", package: rendering)],
-                    path: "PhysicsPlayground/ExperienceTests"),
+                    path: "PhysicsPlayground/ExperienceTests",
+                    resources: [.copy("Fixtures")]),
         .target(name: "ParticleUniverseCore",
                 dependencies: [
                                .product(name: "VisualCoreSimulation", package: visualCore),
