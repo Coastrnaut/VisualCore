@@ -45,7 +45,7 @@ lowest.
   pinned body, is not tested. It wakes (counter reset) in the tick in which an awake dynamic body's bounds overlap it, a
   spring joins it to an awake body, an edit names it (grab, nudge, pin, delete of a body touching it), or any level
   changes (all wake); presets, reset and opened slots start awake. Per-body `asleep` and `restTicks` are saved (world
-  schema 4, migration 3 → 4 sets awake with 0) and covered by the digest.
+  schema 4, migration 3 → 4 sets awake with 0; the experience state becomes schema 5) and covered by the digest.
 - Q: What is the stated work budget? → A: Counted per tick (derived, never saved): narrow-phase tests ≤ 48·47/2 + 48·4
   = 1,320, contact points ≤ 2 per contact, solver point updates ≤ iterations × points. The audit records the counts at
   48 awake bodies and 16 springs and the host's median tick time over 600 ticks in research.md (measured, not asserted);
