@@ -9,6 +9,9 @@
 // "DecorSpot"): decor kinds (rock and shell shapes, colour, size 0.3…2.0, author, license) and per-habitat starter
 // decor spots (kind, position inside the tank, rotation −π…π, scale 0.5…2.0, at most 12). A catalog or habitat JSON
 // without "decor" keys (written before this feature) decodes with no decor.
+// Feature 071 (A09-P04) T-A09-402 (FR-A09-401; clarification 1; data-model "StarterHabitat"): per-habitat bubble vents
+// (x positions on the gravel, each finite in 0.5…15.5, at most 4); Reef [3.0, 12.5], Kelp [5.5, 10.0]. A habitat JSON
+// without a "vents" key (written before this feature) decodes with no vents.
 // The JSON codec and the validating decoder are in `CatalogDecoder.swift`; the license audit in `LicenseAudit.swift`.
 import Foundation
 import VisualCoreMath
@@ -205,24 +208,33 @@ public struct StarterHabitat: Codable, Equatable, Sendable, Identifiable {
     public var plants: [PlantSpot]
     /// The starter decor pieces; at most ``HabitatDocument/maxDecor``.
     public var decor: [DecorSpot]
+    /// The bubble vents: x positions on the gravel in habitat units, each finite in ``ventRange``; at most
+    /// ``maxVents``.
+    public var vents: [Double]
     /// Who made this item.
     public var author: String
     /// The license of this item; one of ``SpeciesCatalog/allowedLicenses``.
     public var license: String
 
-    /// Creates a starter habitat from all of its fields (`decor` defaults to none); validity is checked by the
-    /// catalog decoder.
+    /// The most bubble vents a habitat may have.
+    public static let maxVents = 4
+    /// Allowed vent x positions in habitat units (the swim bounds' x range).
+    public static let ventRange = 0.5...15.5
+
+    /// Creates a starter habitat from all of its fields (`decor` and `vents` default to none); validity is checked by
+    /// the catalog decoder.
     public init(id: String, name: String, waterColor: RGBA, species: [SpeciesCount], plants: [PlantSpot],
-                author: String, license: String, decor: [DecorSpot] = []) {
+                author: String, license: String, decor: [DecorSpot] = [], vents: [Double] = []) {
         self.id = id; self.name = name; self.waterColor = waterColor; self.species = species; self.plants = plants
-        self.decor = decor; self.author = author; self.license = license
+        self.decor = decor; self.vents = vents; self.author = author; self.license = license
     }
 
     private enum CodingKeys: String, CodingKey {
-        case id, name, waterColor, species, plants, decor, author, license
+        case id, name, waterColor, species, plants, decor, vents, author, license
     }
 
-    /// Decodes a habitat; a missing `decor` key (a habitat written before decor existed) gives no decor.
+    /// Decodes a habitat; a missing `decor` key (a habitat written before decor existed) gives no decor, and a
+    /// missing `vents` key (written before vents existed) gives no vents.
     public init(from decoder: any Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
         id = try c.decode(String.self, forKey: .id)
@@ -231,6 +243,7 @@ public struct StarterHabitat: Codable, Equatable, Sendable, Identifiable {
         species = try c.decode([SpeciesCount].self, forKey: .species)
         plants = try c.decode([PlantSpot].self, forKey: .plants)
         decor = try c.decodeIfPresent([DecorSpot].self, forKey: .decor) ?? []
+        vents = try c.decodeIfPresent([Double].self, forKey: .vents) ?? []
         author = try c.decode(String.self, forKey: .author)
         license = try c.decode(String.self, forKey: .license)
     }
@@ -292,7 +305,8 @@ public struct SpeciesCatalog: Codable, Equatable, Sendable {
     /// The bundled content: four fish species, four plant kinds and the two starter habitats "Reef" (orange striped
     /// fish and blue fish with yellow tails) and "Kelp" (silver fish and gold fish), each with two species, 6…10 fish
     /// and 4…6 plants; three decor kinds ("Round rock", "Flat rock", "Spiral shell") with three starter pieces in
-    /// Reef and two in Kelp, resting on the gravel; every item is by "VisualCore project" under "MIT".
+    /// Reef and two in Kelp, resting on the gravel; bubble vents at x 3.0 and 12.5 (Reef) and 5.5 and 10.0 (Kelp);
+    /// every item is by "VisualCore project" under "MIT".
     public static let bundled: SpeciesCatalog = {
         let author = projectAuthor, license = "MIT"
         let species = [
@@ -342,7 +356,8 @@ public struct SpeciesCatalog: Codable, Equatable, Sendable {
                                    DecorSpot(decorId: "spiral-shell", position: Vec2(9.5, 1.05), rotation: -0.6,
                                              scale: 0.8),
                                    DecorSpot(decorId: "flat-rock", position: Vec2(12.3, 1.3), rotation: 0.15,
-                                             scale: 1.5)]),
+                                             scale: 1.5)],
+                           vents: [3.0, 12.5]),
             StarterHabitat(id: "kelp", name: "Kelp", waterColor: RGBA(0.08, 0.3, 0.32),
                            species: [SpeciesCount(speciesId: "silver-slender-fish", count: 5),
                                      SpeciesCount(speciesId: "gold-round-fish", count: 3)],
@@ -356,7 +371,8 @@ public struct SpeciesCatalog: Codable, Equatable, Sendable {
                            decor: [DecorSpot(decorId: "flat-rock", position: Vec2(5.8, 1.25), rotation: -0.2,
                                              scale: 1.3),
                                    DecorSpot(decorId: "round-rock", position: Vec2(11.2, 1.4), rotation: 0.9,
-                                             scale: 0.9)]),
+                                             scale: 0.9)],
+                           vents: [5.5, 10.0]),
         ]
         return SpeciesCatalog(species: species, plants: plants, habitats: habitats, decor: decor)
     }()

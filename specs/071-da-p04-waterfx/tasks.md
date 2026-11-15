@@ -10,7 +10,7 @@
 
 ## Phase 2: Foundational (catalog vents)
 
-- [ ] T-A09-402 `StarterHabitat.vents` ("x positions; missing → []", "each finite, 0.5…15.5; at most 4") with Reef [3.0, 12.5] and Kelp [5.5, 10.0] in `Packages/ExperiencesCreative/DigitalAquarium/Core/SpeciesCatalog.swift`, validated in `Core/CatalogDecoder.swift` (refusal `invalid-number` as for other numbers); tests in `CoreTests/SpeciesCatalogTests.swift` (FR-A09-401)
+- [X] T-A09-402 `StarterHabitat.vents` ("x positions; missing → []", "each finite, 0.5…15.5; at most 4") with Reef [3.0, 12.5] and Kelp [5.5, 10.0] in `Packages/ExperiencesCreative/DigitalAquarium/Core/SpeciesCatalog.swift`, validated in `Core/CatalogDecoder.swift` (refusal `invalid-number` as for other numbers); tests in `CoreTests/SpeciesCatalogTests.swift` (FR-A09-401) — Verified 2026-11-14: 2026-11-14: StarterHabitat.vents (Reef [3, 12.5], Kelp [5.5, 10]) validated by CatalogDecoder; SpeciesCatalogTests pass in DigitalAquariumCoreTests (116 tests) on sim-27.2; content-licenses.md unchanged
 
 ## Phase 3: User Story 1 — living water (P1) 🎯
 

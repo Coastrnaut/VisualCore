@@ -22,6 +22,9 @@
 // habitat's decor spots are checked too: at most `HabitatDocument.maxDecor` (12), each position finite inside the tank
 // (x 0…16, y 0…9), rotation −π…π and scale 0.5…2.0 (`invalid-number`), and each kind among the kept decor kinds
 // (`unknown-reference`). A catalog or habitat without a `decor` key has no decor.
+// Feature 071 (A09-P04) T-A09-402 (FR-A09-401): a habitat's bubble vents are checked too: at most
+// `StarterHabitat.maxVents` (4), each a finite x in `StarterHabitat.ventRange` (0.5…15.5), else `invalid-number`; a
+// `vents` value that is not a list is `unknown-shape`. A habitat without a `vents` key has no vents.
 import Foundation
 import VisualCoreMath
 
@@ -184,8 +187,8 @@ public enum CatalogDecoder {
             && spot.scale.isFinite && DecorSpot.scaleRange.contains(spot.scale)
     }
 
-    /// The first problem of `habitat` against the known species, plant and decor ids (license, numbers, fish total,
-    /// references), or nil when it is valid. Decor spots are always checked for count (≤ 12) and numbers; their kinds
+    /// The first problem of `habitat` against the known species, plant and decor ids (license, numbers including the
+    /// vents, fish total, references), or nil when it is valid. Decor spots are always checked for count (≤ 12) and numbers; their kinds
     /// are checked against `decorIds` when it is given (nil skips that reference check).
     public static func check(_ habitat: StarterHabitat, speciesIds: Set<String>, plantIds: Set<String>,
                              decorIds: Set<String>? = nil) -> CatalogError? {
@@ -196,7 +199,9 @@ public enum CatalogDecoder {
               habitat.plants.count <= HabitatDocument.maxPlants,
               habitat.plants.allSatisfy({ $0.x.isFinite && $0.x >= bounds.minX && $0.x <= bounds.maxX }),
               habitat.decor.count <= HabitatDocument.maxDecor,
-              habitat.decor.allSatisfy(isValid) else {
+              habitat.decor.allSatisfy(isValid),
+              habitat.vents.count <= StarterHabitat.maxVents,
+              habitat.vents.allSatisfy({ $0.isFinite && StarterHabitat.ventRange.contains($0) }) else {
             return .invalidNumber
         }
         if habitat.fishCount > HabitatDocument.maxFish { return .tooManyFish }
@@ -332,8 +337,17 @@ public enum CatalogDecoder {
                 decor.append(DecorSpot(decorId: id, position: Vec2(x, y), rotation: rotation, scale: scale))
             }
         }
+        var vents: [Double] = []
+        if let raw = item["vents"] {
+            guard let ventList = raw as? [Any] else { return .failure(.unknownShape) }
+            for entry in ventList {
+                guard let x = number(entry) else { return .failure(.invalidNumber) }
+                vents.append(x)
+            }
+        }
         let habitat = StarterHabitat(id: head.id, name: head.name, waterColor: water, species: species,
-                                     plants: plants, author: head.author, license: head.license, decor: decor)
+                                     plants: plants, author: head.author, license: head.license, decor: decor,
+                                     vents: vents)
         if let error = check(habitat, speciesIds: speciesIds, plantIds: plantIds, decorIds: decorIds) {
             return .failure(error)
         }

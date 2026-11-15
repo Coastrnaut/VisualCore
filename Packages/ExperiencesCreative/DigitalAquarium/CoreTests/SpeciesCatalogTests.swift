@@ -7,6 +7,9 @@
 // Feature 069 (A09-P02) T-A09-203 (FR-A09-212): the bundled decor kinds (round-rock, flat-rock, spiral-shell; both
 // shapes; MIT, project author) and the starter decor (Reef 3 pieces, Kelp 2, on the gravel, transforms in range). The
 // decoder's decor refusals are in `HabitatMigrationTests`.
+// Feature 071 (A09-P04) T-A09-402 (FR-A09-401): the bundled bubble vents (Reef [3.0, 12.5], Kelp [5.5, 10.0]), a
+// habitat without a "vents" key decoding with none, and the decoder refusing five vents, a vent at 0.2 and a NaN vent
+// (a non-number in JSON and a hand-built NaN) as `invalid-number`.
 import Foundation
 import Testing
 import DigitalAquariumCore
@@ -199,5 +202,51 @@ import DigitalAquariumCore
         let (decoded, refused) = SpeciesCatalog.decode(Data("not json".utf8))
         #expect(decoded == SpeciesCatalog(species: [], plants: [], habitats: []))
         #expect(refused == [CatalogRefusal(kind: .catalog, id: "catalog", error: .unknownShape)])
+    }
+
+    @Test func theBundledHabitatsHaveTwoVentsEach() throws {
+        let reef = try #require(catalog.habitats.first { $0.id == "reef" })
+        let kelp = try #require(catalog.habitats.first { $0.id == "kelp" })
+        #expect(reef.vents == [3.0, 12.5])
+        #expect(kelp.vents == [5.5, 10.0])
+        #expect(StarterHabitat.maxVents == 4)
+        #expect(StarterHabitat.ventRange == 0.5...15.5)
+    }
+
+    @Test func aHabitatWithoutVentsDecodesWithNone() throws {
+        let item = try variant(of: "habitats", ["id": "still-habitat", "vents": nil])
+        let (decoded, refused) = SpeciesCatalog.decode(try appending(item, to: "habitats"))
+        #expect(refused.isEmpty)
+        #expect(decoded.habitats.last?.id == "still-habitat")
+        #expect(decoded.habitats.last?.vents == [])
+        var object = try bundledObject()
+        var habitats = try #require(object["habitats"] as? [[String: Any]])
+        habitats[0]["vents"] = nil
+        object["habitats"] = habitats
+        let data = try JSONSerialization.data(withJSONObject: object, options: [.sortedKeys])
+        #expect(try JSONDecoder().decode(SpeciesCatalog.self, from: data).habitats[0].vents == [])
+    }
+
+    @Test func badVentsAreRefusedAsInvalidNumbers() throws {
+        let cases: [(String, Any)] = [("five-vents", [1.0, 4.0, 7.0, 10.0, 13.0]), ("edge-vent", [0.2, 8.0]),
+                                      ("nan-vent", ["NaN"]), ("far-vent", [15.6])]
+        for (id, vents) in cases {
+            let item = try variant(of: "habitats", ["id": id, "vents": vents])
+            let (decoded, refused) = SpeciesCatalog.decode(try appending(item, to: "habitats"))
+            #expect(refused == [CatalogRefusal(kind: .habitat, id: id, error: .invalidNumber)], "\(id)")
+            #expect(decoded == catalog)
+        }
+        let notAList = try variant(of: "habitats", ["id": "odd-vents", "vents": 3.0])
+        #expect(SpeciesCatalog.decode(try appending(notAList, to: "habitats")).refused
+                == [CatalogRefusal(kind: .habitat, id: "odd-vents", error: .unknownShape)])
+        var habitat = catalog.habitats[0]
+        let speciesIds = Set(catalog.species.map(\.id)), plantIds = Set(catalog.plants.map(\.id))
+        #expect(CatalogDecoder.check(habitat, speciesIds: speciesIds, plantIds: plantIds) == nil)
+        for vents in [[Double.nan], [Double.infinity], [0.2], [1, 2, 3, 4, 5]] {
+            habitat.vents = vents
+            #expect(CatalogDecoder.check(habitat, speciesIds: speciesIds, plantIds: plantIds) == .invalidNumber)
+        }
+        habitat.vents = [0.5, 15.5, 8, 8]
+        #expect(CatalogDecoder.check(habitat, speciesIds: speciesIds, plantIds: plantIds) == nil)
     }
 }
