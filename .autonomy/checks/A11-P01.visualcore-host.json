@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/VisualCore",
+    "--filter",
+    "Contacts2DTests|ImpulseSolver2DTests"
+  ],
+  "command": "swift test --package-path Packages/VisualCore --filter 'Contacts2DTests|ImpulseSolver2DTests'",
+  "elapsed_seconds": 7.599,
+  "exit_code": 0,
+  "finished": "2026-11-15T06:09:45+00:00",
+  "log": ".autonomy/logs/A11-P01.visualcore-host.log",
+  "log_sha256": "b253c73708969f48224470baaf3c69065dfc65ebdd1b006708041c178f15075b",
+  "name": "visualcore-host",
+  "stage": "A11-P01",
+  "started": "2026-11-15T06:09:38+00:00",
+  "timed_out": false
+}
