@@ -1,0 +1,53 @@
+# Tasks: Digital Aquarium — Phase 05 Ambient device testing and release content
+
+**Input**: [spec.md](spec.md), [plan.md](plan.md), [research.md](research.md), [data-model.md](data-model.md),
+[contracts/api.md](contracts/api.md), [quickstart.md](quickstart.md). Gate A09-P05 (legacy). Evidence:
+`python3 Tools/python/desktop_runbook.py run-check --stage A09-P05 --timeout 600 --name <check> -- <command>`. Commit after every task (no trailers). iOS 27 only; no VisualCore change. Device
+measurements are planned here and run in the device campaign (the {device} task is A09-P06's).
+
+## Phase 1: Setup
+
+- [ ] T-A09-501 Baseline: cite the A09-P04 evidence on the unchanged tree (`.autonomy/checks/A09-P04.aquarium-ios27.json`, `.autonomy/checks/A09-P04.app-unit.json`, `.autonomy/checks/A09-P04.verify-27.json`) instead of a rerun (owner ruling of 2026-11-14)
+
+## Phase 2: Foundational (core budgets and ambient)
+
+- [ ] T-A09-502 [P] `Core/AquariumBudget.swift` ("level 0 (24, 24, 2), level 1 (12, 12, 1), level 2 (6, 6, 0); ambient (12, 12, 2); combined by the minimum"), `Core/AmbientDimmer.swift` ("60 s idle, 2 s fade, 0.6 floor"; advance only while active; touch resets), `WaterEffects` per-vent and mote limits as parameters with the current defaults, and the ambient speed factor 0.6 in `Core/AquariumSimulation.swift` (`advance(_:catalog:random:ambient:)`, default false keeps every earlier result bit-identical); tests `CoreTests/{AquariumBudgetTests,AmbientDimmerTests}.swift`, ambient cases in `CoreTests/AquariumSimulationTests.swift` (cruise 0.6, bounds and maximum speed hold) and `CoreTests/LongRunTests.swift` (3 seeds × 10,000 steps, a feed every 100: fish count constant, food ≤ 12, bubbles ≤ 48, motes ≤ 24 at every 50th step) (FR-A09-510, 511, 520, 530; SC-A09-502–505)
+
+## Phase 3: User Story 1 — saved aquariums (P1) 🎯
+
+- [ ] T-A09-503 [P] [US1] `Core/AquariumConfiguration.swift` (format 1; "name 1…40 after trimming"; "≤ 12 decor, positions in the tank, rotation −π…π, scale 0.5…2.0; known kinds"; `make`, `validate(catalog:)`, `actions(catalog:)` per research D1) with `CoreTests/AquariumConfigurationTests.swift` (round trip JSON; validation refusals; the action list rebuilds the configuration when applied to a core in a test helper) (FR-A09-501, 502)
+- [ ] T-A09-504 [US1] Core actions and schema 4 in `Experience/Adapter/AquariumCore.swift`: `ambient.mode [0…1]` and `decor.turn [0…11, −π…π, 0.5…2.0]` (`a09.no-such-decor`), `ambient` in `AquariumState` (missing → false), update passes `ambient` to the simulation, `MigrationChain(currentVersion: 4)` with step 3 adding `ambient` false, `schemaThreeExample()` in `Apps/VisualCore/App/ExperienceRegistry.swift`, `qualityTiers` 3 and `Catalog/registrations.json` a09 `quality_tiers` ["level-0", "level-1", "level-2"]; tests in `ExperienceTests/AquariumCoreTests.swift` (controls and ranges; actions; schema-3 example restores with ambient off; configuration actions applied through the engine rebuild the configuration) (FR-A09-501, 510, 520)
+- [ ] T-A09-505 [US1] `Experience/AquariumLibrary.swift` (main actor, observable; files `aquarium-<lowercased uuid>.json` in the experience's storage; "≤ 12 files"; sorted by name ignoring case, ties by id; unreadable and newer counted, never deleted; `save`, `open(_:port:)`, `delete`, `lastFailure` with the storage error code) with `ExperienceTests/AquariumLibraryTests.swift` (save/list/open/delete round trip through a session; limit 12 refused; a damaged, a foreign and a newer file counted and skipped; a refused save changes no file) (FR-A09-501, 502; SC-A09-501)
+
+## Phase 4: User Story 2 — ambient mode (P1)
+
+- [ ] T-A09-506 [US2] Presenter, controls and caustics: budgets from `AquariumBudget.budget(tier:ambient:)` with ambient drawing = state ambient OR Low Power Mode (injected `lowPowerMode`, default `ProcessInfo.processInfo.isLowPowerModeEnabled`) OR Reduce Motion; one-octave and off caustics by level; `AmbientDimmer` colour scale on every node and the caustics colours, advanced by frame time while ambient drawing is active, reset by every canvas touch; description says "ambient" when on and the announcer says "Ambient on"/"Ambient off" (`Core/AquariumWording.swift`); controls: Ambient toggle (`ambient.mode`), library list with Open and Delete, name field and Save, unreadable/newer count text; files `Experience/{AquariumPresenter,AquariumControls,CausticsScene,DigitalAquariumExperience}.swift`, `Core/AquariumWording.swift`; tests in `ExperienceTests/{AquariumRenderTests,AquariumAnnouncementTests}.swift` and `CoreTests/AquariumWordingTests.swift` (each level draws no more bubbles and motes than the level above and the digest is identical at every level; ambient halves the drawn particles; Low Power Mode draws ambient without changing the state; dimming after 60 s and restore on touch; no system-brightness call in the experience's sources) (FR-A09-510–512, 520; SC-A09-502, 503, 505)
+
+## Phase 5: User Story 3 — steady over long runs (P1)
+
+- [ ] T-A09-507 [US3] Session test in `ExperienceTests/AquariumSessionTests.swift`: open and close the experience five times and compare `ResourceRegistry.stats` after each open with the first; manifest fixtures 12 (ambient on, 600 steps) and 13 (2,000 steps, a feed every 100) in `Experience/Adapter/AquariumManifest.swift`, regenerate `scenario-manifest.json`, update `ExperienceTests/AquariumManifestTests.swift` (thirteen fixtures; fixture 12 slower fish; fixture 13 bounds) (FR-A09-530, 531; SC-A09-504)
+
+## Phase 6: Polish & evidence
+
+- [ ] T-A09-508 Device-campaign plan `docs/apps/digital-aquarium/device-campaign.md` per research D6 (every row pending; D1 → D2 → D3; D3 stays on iPadOS 26.5) and a link from `docs/apps/digital-aquarium/README.md` (FR-A09-540)
+- [ ] T-A09-509 Digital Aquarium tests on sim-27.2 (`python3 Tools/python/desktop_runbook.py run-check --stage A09-P05 --timeout 600 --name aquarium-ios27 -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing DigitalAquariumCoreTests DigitalAquariumExperienceTests`; each test < 10 s) (SC-A09-506)
+- [ ] T-A09-510 App build and unit (`python3 Tools/python/desktop_runbook.py run-check --stage A09-P05 --timeout 600 --name app-unit -- python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27`)
+- [ ] T-A09-511 Runner iOS 27 (`python3 Tools/python/desktop_runbook.py run-check --stage A09-P05 --timeout 600 --name verify-27 -- python3 scripts/verify_experiences.py --only a09.digital-aquarium --runtime 27`)
+- [ ] T-A09-512 Experience package check (`python3 Tools/python/desktop_runbook.py run-check --stage A09-P05 --timeout 600 --name experience-packages -- python3 scripts/check_experience_packages.py`)
+- [ ] T-A09-513 Contract G-AMBIENT closed by "A09-P05" (M15 available; M14, M16 notes) in `docs/apps/digital-aquarium/visualcore-contract.json` and `python3 Tools/python/desktop_runbook.py run-check --stage A09-P05 --timeout 600 --name contract -- python3 scripts/check_app_contract.py --app digital-aquarium --render`
+- [ ] T-A09-514 Script tests (`python3 Tools/python/desktop_runbook.py run-check --stage A09-P05 --timeout 600 --name script-tests -- python3 scripts/test_scripts.py`)
+- [ ] T-A09-515 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A09-P05; update README.md (status, gate count) in the record commit (rule 16)
+
+## Dependencies
+
+T-A09-501 → (502 ∥ 503) → 504 (needs 502, 503) → (505 ∥ 506) → 507 → 508 → Polish.
+
+## Parallel examples
+
+Agent A: T-A09-502. Agent B: T-A09-503, then 505. Agent C: T-A09-506 after the lead's 504. Lead: 504, 507, 508,
+contract, runs, commits.
+
+## Implementation strategy
+
+MVP: saved aquariums and ambient in the core; then the library and the ambient drawing; then the long-run proofs;
+evidence and the device plan last.
