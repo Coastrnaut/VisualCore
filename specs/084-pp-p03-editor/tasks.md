@@ -1,0 +1,40 @@
+# Tasks: Physics Playground — Phase 03 Gesture editor and overlays
+
+**Input**: [spec.md](spec.md), [plan.md](plan.md), [research.md](research.md), [data-model.md](data-model.md),
+[contracts/actions.md](contracts/actions.md), [quickstart.md](quickstart.md). Gate A11-P03 (legacy). Evidence:
+`python3 Tools/python/desktop_runbook.py run-check --stage A11-P03 --timeout 600 --name <check> -- <command>`. Commit
+after every task (no trailers); read every check's exit before ticking. iOS 27 only; no VisualCore change.
+
+## Phase 1: Setup
+
+- [ ] T-A11-301 Baseline: cite the A11-P02 evidence on the unchanged tree (`.autonomy/checks/A11-P02.{playground-ios27-1,app-unit,verify-27}.json`) instead of a rerun (owner ruling of 2026-11-14)
+
+## Phase 2: Foundational — editing, pinning and measurement in the core
+
+- [ ] T-A11-302 [US1] Core: new `Packages/ExperiencesCreative/PhysicsPlayground/Core/{WorldEditing,ForceMeasurement}.swift` and changes to `Core/{PhysicsWorld,WorldSimulation,StartingScene}.swift` per research D1–D3 and data-model.md: schema 3 (`pinned` per body, "pinned ⇒ velocity 0 and inverse mass and inertia 0 in the tick; static bodies are not pinnable", `selectedId?`, `grab?` ("body exists, dynamic, unpinned; target inside the stage"), `showVelocity`, `showForces` default false), migration 2 → 3, edits add/select/grab/move/release/togglePin/delete/nudge with the refusal reasons of contracts/actions.md, the critically damped grab pull applied before the world's springs, per-body measured net spring force (derived, not saved, not in the digest); tests in `Packages/ExperiencesCreative/PhysicsPlayground/CoreTests/{WorldEditingTests,PinFixtureTests,ForceMeasurementTests}.swift` plus updates to existing tests: every edit and refusal; a pinned body hit for 1,000 ticks moves by exactly 0 with no non-finite value; unpinned it falls at g within 1 %; a spring from a pinned body swings the other end; grab reaches 5 cm of a still target within 1 s and release keeps the body's velocity; delete removes springs, cache entries, grab and selection; add refused without room and at the cap; schema-2 worlds migrate; measured spring force equals k'·(L − L₀) along the spring for a static stretch (FR-A11-301, 302, 320; SC-A11-302, 303, 305)
+
+## Phase 3: Stories 1, 2 and 4 — gestures, overlays, panel, manifest
+
+- [ ] T-A11-303 [US1] Experience: `Packages/ExperiencesCreative/PhysicsPlayground/Experience/PlaygroundGestures.swift` (new; recognizers + arbiter per research D4, view → stage metres, hit test, priorities, tap after the double-tap window, cancel → `edit.release`) and changes to `Experience/{Adapter/PlaygroundCore.swift,PlaygroundPresenter.swift,PlaygroundControls.swift}`: snapshot schema 3 with `MigrationChain(currentVersion: 3)` steps 1 → 2 → 3 and `schemaTwoExample()`; the eleven actions of contracts/actions.md; `gestureActions`; velocity and force arrows (scales 0.25 s and 0.05 m/N, caps 2 m, triangle heads 0.12 m) and the grab line, drawn only when on and never writing the world; controls for previous/next body, Pin, Delete, Add at centre, four nudges, shape picker, two overlay toggles and the state panel ("Educational approximation"; kinetic, potential, spring, total energy in J, momentum in kg·m/s, selected speed in m/s, 2 decimals) with identifiers, labels and values; tests in `Packages/ExperiencesCreative/PhysicsPlayground/ExperienceTests/PlaygroundGestureTests.swift` (new: scripted pointer sequences for tap-empty, tap-body, drag, long-press, double-tap, two fingers, cancel) and updates to the existing experience tests (actions and refusals, arrows at the stated lengths within one pixel, overlays off draw none, panel equals diagnostics, schema-1 and schema-2 examples restore) (FR-A11-303, 310, 311; SC-A11-301, 304)
+- [ ] T-A11-304 [US4] Manifest fixtures 19–26 per research D5 in `Packages/ExperiencesCreative/PhysicsPlayground/Experience/Adapter/PlaygroundManifest.swift`, regenerate `Packages/ExperiencesCreative/PhysicsPlayground/scenario-manifest.json` (`UPDATE_SCENARIO_MANIFEST=1 TEST_RUNNER_UPDATE_SCENARIO_MANIFEST=1`), `PlaygroundManifestTests` updated (FR-A11-321; SC-A11-305)
+- [ ] T-A11-305 [US4] Registry and records: `examples: [schemaOneExample(), schemaTwoExample()]` in `Apps/VisualCore/App/ExperienceRegistry.swift`; `Catalog/registrations.json` a11 capabilities (touch editing, force overlays); `python3 scripts/build_catalog.py`; contract `docs/apps/physics-playground/visualcore-contract.json` (G-EDITOR and G-OVERLAYS closed by "A11-P03"; M05, M08 and M11 available with the experience examples)
+
+## Phase 4: Polish & evidence
+
+- [ ] T-A11-306 Playground tests on sim-27.2 (`--name playground-ios27 -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing PhysicsPlaygroundCoreTests PhysicsPlaygroundExperienceTests`; each test < 10 s) (SC-A11-306)
+- [ ] T-A11-307 App build and unit (`--name app-unit -- python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27`) and runner iOS 27 (`--name verify-27 -- python3 scripts/verify_experiences.py --only a11.physics-playground --runtime 27`)
+- [ ] T-A11-308 Experience package check, contract and script tests (`--name experience-packages -- python3 scripts/check_experience_packages.py`; `--name contract -- python3 scripts/check_app_contract.py --app physics-playground --render`; `--name script-tests -- python3 scripts/test_scripts.py`)
+- [ ] T-A11-309 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A11-P03; update README.md (status, gate count) in the record commit (rule 16)
+
+## Dependencies
+
+T-A11-301 → 302 → 303 → 304 → 305 → Polish.
+
+## Parallel examples
+
+Agent A: T-A11-302. Agent B: T-A11-303 after A. Lead: 304 regeneration, 305, runs, commits.
+
+## Implementation strategy
+
+MVP: pinning and edits in the core (US3's fixture and US1's rules), then gestures, arrows and panel, fixtures and
+records; evidence last.
