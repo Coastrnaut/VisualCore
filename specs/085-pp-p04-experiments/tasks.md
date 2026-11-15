@@ -1,0 +1,40 @@
+# Tasks: Physics Playground — Phase 04 Saved experiments and tutorials
+
+**Input**: [spec.md](spec.md), [plan.md](plan.md), [research.md](research.md), [data-model.md](data-model.md),
+[contracts/experiments.md](contracts/experiments.md), [quickstart.md](quickstart.md). Gate A11-P04 (legacy). Evidence:
+`python3 Tools/python/desktop_runbook.py run-check --stage A11-P04 --timeout 600 --name <check> -- <command>`. Commit
+after every task (no trailers); read every check's exit before ticking. iOS 27 only; no VisualCore change.
+
+## Phase 1: Setup
+
+- [ ] T-A11-401 Baseline: cite the A11-P03 evidence on the unchanged tree (`.autonomy/checks/A11-P03.{playground-ios27,app-unit,verify-27}.json`) instead of a rerun (owner ruling of 2026-11-14)
+
+## Phase 2: Foundational — presets, tutorials and documents in the core
+
+- [ ] T-A11-402 [US1] Core: new `Packages/ExperiencesCreative/PhysicsPlayground/Core/{Presets,Tutorials,ExperimentDocument}.swift` and changes to `Core/{LicenseAudit,PhysicsWorld}.swift` per research D1–D4 and data-model.md: presets free play, pendulum, spring chain, stacked objects with the clarified geometry and "author \"VisualCore project\", license \"MIT\""; `Origin` ("preset(0…3) or slot(0…3)"); `TutorialProgress` ("tutorial 0…1, step 0…n−1, startTick"); the two tutorials with step texts and pure conditions; `ExperimentDocument` (file schema 1; "name (1–24 chars)"; refusals `damaged`, `newer-version`, `invalid-world`; world decoded through `PhysicsWorld.decode` and validated; grab and selection removed on save); `LicenseAudit` rows for presets (role preset) and tutorials (role tutorial); tests in `Packages/ExperiencesCreative/PhysicsPlayground/CoreTests/{PresetTests,TutorialTests,ExperimentDocumentTests,SpringEnergyFixtureTests}.swift`: each preset validates and has its bodies and springs; pendulum swings; stack stands for 600 ticks; tutorial conditions complete in order; document round trip identical; each refusal reason; spring chain 1,200 ticks energy rises < 0.5 % per second and ends below start; pendulum 600 ticks within 5 % (FR-A11-401, 410, 420, 431; SC-A11-401, 403, 404)
+
+## Phase 3: Stories 1–3 — store, adapter, controls, manifest
+
+- [ ] T-A11-403 [US2] Experience: new `Packages/ExperiencesCreative/PhysicsPlayground/Experience/ExperimentStore.swift` (slots `experiment-0…3.json` over `ExperienceStorage`; save, read with refusals `empty-slot`/`damaged`/`newer-version`/`invalid-world` and storage errors, clear; never rewrites a refused file) and changes to `Experience/{Adapter/PlaygroundCore.swift,PlaygroundPresenter.swift,PlaygroundControls.swift,PhysicsPlaygroundExperience.swift}`: state schema 4 (`PlaygroundState` "world, random, origin, startingWorld, tutorial?"; `MigrationChain(currentVersion: 4)` steps 1→2→3→4; "migration 3 → 4: origin free play, startingWorld = world without grab and selection, no tutorial"; `schemaThreeExample()`); actions `experiment.preset [0…3]`, `tutorial.start [0…1]`, `tutorial.stop` (refused `a11.no-tutorial`); reset restores the starting world; tutorial progress checked after every action and step; opening a slot through `ExperienceShell.restore` with a state built by `PlaygroundCore.opening(document:slot:from:)`; controls: preset picker with the note "Opening a preset replaces the current experiment. Save it first to keep it.", four slot rows (name field, Save, Open, Clear, status), tutorial card (step text spoken, Stop); tests in `Packages/ExperiencesCreative/PhysicsPlayground/ExperienceTests/{ExperimentStoreTests,ExperimentSampleFileTests}.swift` and updates to existing tests (save/open round trip; reset after open returns to the opened document; empty, damaged, newer, truncated sample files refused and byte-identical; schema-1…3 examples restore; tutorial flow through actions) with four samples `Packages/ExperiencesCreative/PhysicsPlayground/ExperienceTests/Fixtures/experiment-{valid,newer,damaged,truncated}.json` and `resources: [.copy("Fixtures")]` added to the `PhysicsPlaygroundExperienceTests` target in `Packages/ExperiencesCreative/Package.swift` (FR-A11-402, 403, 430; SC-A11-401, 402, 403)
+- [ ] T-A11-404 [US1] Manifest fixtures 27–33 per research D5 in `Packages/ExperiencesCreative/PhysicsPlayground/Experience/Adapter/PlaygroundManifest.swift`, regenerate `Packages/ExperiencesCreative/PhysicsPlayground/scenario-manifest.json` and `docs/apps/physics-playground/content-licenses.md` (`UPDATE_SCENARIO_MANIFEST=1 TEST_RUNNER_UPDATE_SCENARIO_MANIFEST=1`), `PlaygroundManifestTests` updated (FR-A11-430; SC-A11-405)
+- [ ] T-A11-405 [US2] Registry and records: `examples:` adds `schemaThreeExample()` in `Apps/VisualCore/App/ExperienceRegistry.swift`; `Catalog/registrations.json` a11 capabilities (presets, saved experiments, tutorials); `python3 scripts/build_catalog.py`; contract `docs/apps/physics-playground/visualcore-contract.json` (G-EXPERIMENTS closed by "A11-P04"; M10 available, M14 note on the experiment files)
+
+## Phase 4: Polish & evidence
+
+- [ ] T-A11-406 Playground tests on sim-27.2 (`--name playground-ios27 -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing PhysicsPlaygroundCoreTests PhysicsPlaygroundExperienceTests`; each test < 10 s) (SC-A11-405)
+- [ ] T-A11-407 App build and unit (`--name app-unit -- python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27`) and runner iOS 27 (`--name verify-27 -- python3 scripts/verify_experiences.py --only a11.physics-playground --runtime 27`)
+- [ ] T-A11-408 Experience package check, contract and script tests (`--name experience-packages -- python3 scripts/check_experience_packages.py`; `--name contract -- python3 scripts/check_app_contract.py --app physics-playground --render`; `--name script-tests -- python3 scripts/test_scripts.py`)
+- [ ] T-A11-409 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A11-P04; update README.md (status, gate count) in the record commit (rule 16)
+
+## Dependencies
+
+T-A11-401 → 402 → 403 → 404 → 405 → Polish.
+
+## Parallel examples
+
+Agent A: T-A11-402. Agent B: T-A11-403 after A (Package.swift by the lead). Lead: 404 regeneration, 405, runs, commits.
+
+## Implementation strategy
+
+MVP: presets with reset to the experiment and the energy fixture (US1, US4), then saving (US2) and tutorials (US3);
+evidence last.
