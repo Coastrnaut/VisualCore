@@ -5,6 +5,9 @@
 // new session; newer and damaged saved states are refused and the first level opens; a context recreation makes the
 // renderer once more, keeps the scene tree and the digest; reopening keeps the drawing resources steady and closing
 // leaves no GPU object behind.
+// Feature 097 (A13-P02) T-A13-204 (FR-A13-201, FR-A13-204): taps on the canvas, through the shell's pointer entry
+// and the presenter's inverse camera, select then turn level 1's mirror and refuse a tap elsewhere in words; every
+// gesture action has a native control; a suspension forgets a touch in progress.
 import Foundation
 import XCTest
 import VisualCoreDiagnostics
@@ -13,6 +16,7 @@ import LightMazeCore
 import VisualCoreExperience
 import VisualCoreExperienceHost
 import VisualCoreMath
+import VisualCoreScenes
 
 @MainActor
 final class MazeSessionTests: XCTestCase {
@@ -39,7 +43,7 @@ final class MazeSessionTests: XCTestCase {
         XCTAssertEqual(presenter.nativeActions, ["level.select", "level.next", "level.previous", "tile.select",
                                                  "tile.turn", "level.reset"])
         XCTAssertEqual(presenter.nativeActions, Set(MazeCore.actionIDs), "every action has a native control")
-        XCTAssertEqual(presenter.gestureActions, [])
+        XCTAssertEqual(presenter.gestureActions, ["tile.select", "tile.turn"], "feature 097: tap, drag and twist")
         XCTAssertEqual(GestureAlternatives.missing(gesture: presenter.gestureActions, native: presenter.nativeActions),
                        [])
 
@@ -66,6 +70,84 @@ final class MazeSessionTests: XCTestCase {
         XCTAssertFalse(presenter.isLive)
         XCTAssertNil(presenter.primitives, "the renderer is released in teardown")
         XCTAssertEqual(shell.state, .inactive, "closed without a GPU leak")
+    }
+
+    /// The view point (points, top-left origin) of the board point `point` on the last frame of `presenter`.
+    private func viewPoint(_ point: Vec2, _ presenter: MazePresenter, board: Board, viewSize: Vec2) throws -> Vec2 {
+        let canvas = try XCTUnwrap(presenter.lastCanvas)
+        let pixel = MazePresenter.pixel(of: point, board: board, canvas: canvas)
+        return Vec2(pixel.x * viewSize.x / canvas.x, viewSize.y - pixel.y * viewSize.y / canvas.y)
+    }
+
+    func testTapsOnTheCanvasSelectThenTurnLevelOnesMirror() async throws {
+        let session = ExperienceSession()
+        let shell = try await MazeTest.open(session)
+        let presenter = shell.presenter
+        let viewSize = Vec2(120, 100)
+        let board = try MazeTest.core(shell).board
+        var clock = 10.0
+        func tap(_ point: Vec2, _ id: Int) throws {
+            let view = try viewPoint(point, presenter, board: board, viewSize: viewSize)
+            clock += 0.05
+            shell.handlePointer(PointerEvent(id: id, phase: .began, location: view, timestamp: clock),
+                                viewSize: viewSize)
+            clock += 0.05
+            shell.handlePointer(PointerEvent(id: id, phase: .ended, location: view, timestamp: clock),
+                                viewSize: viewSize)
+        }
+        XCTAssertEqual(GestureAlternatives.missing(gesture: presenter.gestureActions, native: presenter.nativeActions),
+                       [], "every gesture action has a native control")
+
+        try tap(Vec2(1.5, 1.5), 1)
+        XCTAssertEqual(try MazeTest.core(shell).state, MazeState.initial, "an empty cell changes nothing")
+        XCTAssertEqual(presenter.mirror.message, "Nothing to turn there.")
+        try tap(Vec2(-0.3, 2.5), 2)
+        XCTAssertEqual(try MazeTest.core(shell).state, MazeState.initial)
+        XCTAssertEqual(presenter.mirror.message, "Outside the board.")
+
+        try tap(Vec2(2.5, 2.5), 3)
+        XCTAssertEqual(try MazeTest.core(shell).state.selection, 0, "the first tap selects the mirror")
+        XCTAssertEqual(presenter.mirror.message, "", "an accepted action clears the message")
+        XCTAssertEqual(presenter.mirror.selectedWords, "Mirror 1 of 1, leaning left, column 3, row 3")
+        try tap(Vec2(2.4, 2.6), 4)
+        let core = try MazeTest.core(shell)
+        XCTAssertEqual(core.state.orientations, [.slash], "the second tap turns it")
+        XCTAssertTrue(core.isSolved)
+        XCTAssertEqual(shell.accessibilitySummary,
+                       "Light Maze: level 1, First light; 1 mirror, 1 target; beam ends at the target; solved.")
+        try MazeTest.frames(session, 1)
+        XCTAssertEqual(presenter.sceneState, core.state, "the next frame draws the turned mirror")
+        session.close()
+    }
+
+    func testASuspensionForgetsEveryTouch() async throws {
+        let session = ExperienceSession()
+        let shell = try await MazeTest.open(session)
+        let presenter = shell.presenter
+        let viewSize = Vec2(120, 100)
+        let board = try MazeTest.core(shell).board
+        let down = try viewPoint(Vec2(2.5, 2.5), presenter, board: board, viewSize: viewSize)
+        let northEast = try viewPoint(Vec2(3.3, 3.3), presenter, board: board, viewSize: viewSize)
+        shell.handlePointer(PointerEvent(id: 1, phase: .began, location: down, timestamp: 1), viewSize: viewSize)
+        shell.handlePointer(PointerEvent(id: 1, phase: .moved, location: northEast, timestamp: 1.05),
+                            viewSize: viewSize)
+        XCTAssertTrue(presenter.gestures.isDragging, "the drag holds the mirror")
+        XCTAssertEqual(try MazeTest.core(shell).state.orientations, [.slash], "and snapped it to `/`")
+        session.setScenePhase(.background)
+        XCTAssertEqual(shell.state, .suspended)
+        XCTAssertFalse(presenter.gestures.isDragging, "the suspension forgets the touch")
+        session.setScenePhase(.active)
+        try tap(shell, at: try viewPoint(Vec2(2.5, 2.5), presenter, board: board, viewSize: viewSize), viewSize)
+        XCTAssertEqual(try MazeTest.core(shell).state.orientations, [.backslash],
+                       "a fresh tap after the resume turns the selected mirror at once")
+        session.close()
+        XCTAssertFalse(presenter.gestures.isDragging)
+    }
+
+    /// A tap at the view point `view` through the shell's pointer entry.
+    private func tap(_ shell: ExperienceShell<MazePresenter>, at view: Vec2, _ viewSize: Vec2) throws {
+        shell.handlePointer(PointerEvent(id: 9, phase: .began, location: view, timestamp: 20), viewSize: viewSize)
+        shell.handlePointer(PointerEvent(id: 9, phase: .ended, location: view, timestamp: 20.05), viewSize: viewSize)
     }
 
     func testASuspensionChangesNothing() async throws {

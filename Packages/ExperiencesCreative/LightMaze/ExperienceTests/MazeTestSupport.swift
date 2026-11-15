@@ -12,6 +12,7 @@ import VisualCoreMath
 import VisualCoreRendering
 import VisualCoreScenes
 import VisualCoreSimulation
+import VisualCoreUI
 
 /// A frame read back from the host: RGBA bytes, rows bottom-up.
 typealias MazeFrame = (rgba: [UInt8], width: Int, height: Int)
@@ -21,16 +22,20 @@ enum MazeTest {
     /// The experience id `a13.light-maze`.
     static var id: ExperienceID { LightMazeExperience.id ?? ExperienceID(rawValue: "a13.unknown")! }
 
-    /// Opens Light Maze in `session` (seed `seed`, optionally restoring `snapshot`), lays the view out at `size`
-    /// points and draws one frame.
+    /// Opens Light Maze in `session` (seed `seed`, optionally restoring `snapshot`, with `voiceOverRunning` and
+    /// `announcementSink` replacing the system's when given), lays the view out at `size` points and draws one frame.
+    /// The session holds the experience (`MazeExperience`); its shell is returned.
     static func open(_ session: ExperienceSession, seed: UInt64 = 1, snapshot: ExperienceSnapshot? = nil,
-                     size: CGSize = CGSize(width: 120, height: 100)) async throws -> ExperienceShell<MazePresenter> {
+                     size: CGSize = CGSize(width: 120, height: 100),
+                     voiceOverRunning: (@MainActor () -> Bool)? = nil,
+                     announcementSink: (any AnnouncementSink)? = nil) async throws -> ExperienceShell<MazePresenter> {
         let id = self.id
         var made: ExperienceShell<MazePresenter>?
         let request = ExperienceOpenRequest(id: id, seed: seed, snapshot: snapshot, refusedSnapshotFails: false) {
-            let shell = LightMazeExperience.make(id: id)
-            made = shell
-            return shell
+            let experience = LightMazeExperience.make(id: id, voiceOverRunning: voiceOverRunning,
+                                                      announcementSink: announcementSink)
+            made = experience.shell
+            return experience
         }
         let opened = await session.open(request)
         XCTAssertEqual(opened, .running)
