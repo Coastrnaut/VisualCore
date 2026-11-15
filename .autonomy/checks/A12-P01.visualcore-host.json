@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/VisualCore",
+    "--filter",
+    "GradientNoise2DTests|HeightFieldTests"
+  ],
+  "command": "swift test --package-path Packages/VisualCore --filter 'GradientNoise2DTests|HeightFieldTests'",
+  "elapsed_seconds": 3.441,
+  "exit_code": 0,
+  "finished": "2026-11-15T11:33:17+00:00",
+  "log": ".autonomy/logs/A12-P01.visualcore-host.log",
+  "log_sha256": "69b5ff976c7d6912b8760bf259b05fa7983cc2a5112af39938aacbb2d106b667",
+  "name": "visualcore-host",
+  "stage": "A12-P01",
+  "started": "2026-11-15T11:33:14+00:00",
+  "timed_out": false
+}
