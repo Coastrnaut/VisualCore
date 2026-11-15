@@ -31,5 +31,7 @@
 
 ## Notes
 
-- Validated 2026-11-14 in one pass. Repository vocabulary (package products, render host) is the audience's own
-  language for an audit phase, not an implementation choice.
+- Validated 2026-11-14 inside `/speckit-specify` (the draft was written just before the skill was invoked; the skill
+  then validated it): all template sections present, no clarification marker, 16/16 items pass. The registration count
+  of SC-A10-004 (9, A01–A09) was checked against `Catalog/registrations.json`. Repository vocabulary (package products,
+  render host) is the audience's own language for an audit phase, not an implementation choice.
