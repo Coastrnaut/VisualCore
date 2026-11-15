@@ -30,7 +30,6 @@ device campaign by the owner's ruling) · VIII PASS (privacy scan, note, manifes
 
 ```text
 docs/apps/digital-aquarium/{privacy-and-credits.md, store-listing.md, release-checklist.md, release.json}   new
-docs/apps/digital-aquarium/device-campaign.md (accessibility audit rows checked; already complete)            modify if needed
 docs/apps/digital-aquarium/README.md (document links)                                                        modify
 docs/release/known-limitations.md (A09 section)                                                              modify
 Packages/ExperiencesCreative/Package.swift (resources .copy("Fixtures") for DigitalAquariumExperienceTests)   modify
