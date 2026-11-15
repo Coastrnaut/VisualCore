@@ -24,7 +24,7 @@ X-A14. Precedent: `specs/104-sse-p02-orbits/tasks.md`.
 
 ## Phase 4: Story 1 — drawing
 
-- [ ] T-A14-308 [US1] Add `Experience/SceneMeshes.swift` (48 × 24 spheres with recipe colours, two-sided ring annulus with the Cassini band tilted by Saturn's axial tilt, 400-star mesh centred on the eye at 0.9 × far, marker rings) and update `Experience/OrbitLayout.swift`, `Experience/SolarPresenter.swift` (scale mode mapping, markers below 2 px, starfield, flight with Reduce Motion from `SolarSystemExplorerExperience.make`, camera-relative model matrices, all renderers made and released together) and `Experience/SolarControls.swift` (Scale picker with value and announcement), with `ExperienceTests/{SceneMeshesTests,SolarBodiesRenderTests}.swift` and the existing render and session tests adjusted (coloured bodies; the ring visible around Saturn; switching the scale changes pixels; context recreation redraws within a pixel tolerance) (FR-A14-301–303, 311, 312, 320)
+- [ ] T-A14-308 [US1] Add `Experience/SceneMeshes.swift` (48 × 24 spheres with recipe colours, orbit paths for both scale modes (128 samples each), two-sided ring annulus with the Cassini band tilted by Saturn's axial tilt, 400-star mesh centred on the eye at 0.9 × far, marker rings) and update `Experience/OrbitLayout.swift`, `Experience/SolarPresenter.swift` (scale mode mapping, markers below 2 px, starfield, flight with Reduce Motion from `SolarSystemExplorerExperience.make`, camera-relative model matrices, all renderers made and released together) and `Experience/SolarControls.swift` (Scale picker with value and announcement), with `ExperienceTests/{SceneMeshesTests,SolarBodiesRenderTests}.swift` and the existing render and session tests adjusted (coloured bodies; the ring visible around Saturn; switching the scale changes pixels and the Scale control's value and spoken description name the active mode; markers drawn only for bodies below 2 px in the true-relative mode; context recreation redraws within a pixel tolerance) (FR-A14-301–303, 311, 312, 320)
 - [ ] T-A14-309 [US2] Update `Experience/Adapter/SolarManifest.swift` (state schema 3; fixture `fixture-earth-true-scale`; digests re-pinned) and regenerate `SolarSystemExplorer/scenario-manifest.json` with `SolarManifestTests` adjusted (FR-A14-330)
 
 ## Phase 5: Records and evidence
@@ -37,11 +37,11 @@ X-A14. Precedent: `specs/104-sse-p02-orbits/tasks.md`.
 
 ## Dependencies
 
-T-A14-301 → (302 ∥ 303 ∥ 304) → 305 → 306 → 307 → 308 → 309 → 310 → 311 → 312 → 313 → 314; 307 may start with 302.
+T-A14-301 → (302 ∥ 303 ∥ 304) → 305 → 306 → 308 → 309 → 310 → 311 → 312 → 313 → 314; 307 needs only 304 (ScaleMode's drawn radii and near/far) and runs in parallel with 305–306; 308 needs 302–307.
 
 ## Parallel examples
 
-Agent A: T-A14-302. Agent B: T-A14-307 (against contracts/bodies.md and the lead's ScaleMode). Lead: 303–306, 309.
+Agent A: T-A14-302. Agent B: T-A14-307 once T-A14-304 lands (against contracts/bodies.md and ScaleMode). Lead: 303–306, 309.
 Agent C: T-A14-308 after 302–307.
 
 ## Implementation strategy
