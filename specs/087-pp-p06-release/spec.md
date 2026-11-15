@@ -41,7 +41,9 @@ declares no permission; Neon Arcade's UI tests open a candidate with `-vcCandida
 - Q: How are refused claims checked in the store text and interface copy? → A: A Physics Playground scan over the store
   text and the experience's interface Swift refuses accurate, accuracy, precise, precision, engineering-grade, safety,
   predict, prediction, teaches, learning outcome and improves understanding (case-insensitive, whole words), alongside
-  the shared copy check; the shared denylist is not changed; the interface note "Educational approximation" is allowed.
+  the shared copy check; the shared denylist is not changed. Allowed exactly as written (they deny a claim): the interface note "The
+  simulation is an educational approximation, not a precise physical measurement." and the panel line "Educational
+  approximation"; the scan removes these exact strings before searching.
 - Q: What does the source scan refuse? → A: In `Packages/ExperiencesCreative/PhysicsPlayground`: `URLSession`,
   `import Network`, `CLLocation`, `AVCapture`, `AVAudioRecorder`, `inputNode`, `installTap`, `CMMotion`, `CNContact`,
   `ASIdentifierManager`, `AppTrackingTransparency`, `UIScreen.main.brightness` and `isIdleTimerDisabled`.
