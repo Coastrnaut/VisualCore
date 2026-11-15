@@ -8,7 +8,7 @@ Precedent: `specs/085-pp-p04-experiments/tasks.md`.
 
 ## Phase 1: Setup
 
-- [ ] T-A12-301 Baseline: cite the last evidence on an unchanged `Packages` tree (`.autonomy/checks/A12-P02.{worlds-ios27,app-unit,verify-27}.json`) instead of a rerun (owner ruling of 2026-11-14)
+- [X] T-A12-301 Baseline: cite the last evidence on an unchanged `Packages` tree (`.autonomy/checks/A12-P02.{worlds-ios27,app-unit,verify-27}.json`) instead of a rerun (owner ruling of 2026-11-14) — Verified 2026-11-15: 2026-11-15: cited .autonomy/checks/A12-P02.{worlds-ios27,app-unit,verify-27}.json on the unchanged Packages tree (no rerun)
 
 ## Phase 2: Foundational — the world document, props and light (stories 1–3)
 
