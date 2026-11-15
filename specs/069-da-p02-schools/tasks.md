@@ -7,7 +7,7 @@
 
 ## Phase 1: Setup
 
-- [ ] T-A09-201 Baseline: cite the A09-P01 evidence on the unchanged tree (`.autonomy/checks/A09-P01.aquarium-ios27.json`, `.autonomy/checks/A09-P01.app-unit.json`, `.autonomy/checks/A09-P01.verify-27.json`) instead of a rerun (owner ruling of 2026-11-14)
+- [X] T-A09-201 Baseline: cite the A09-P01 evidence on the unchanged tree (`.autonomy/checks/A09-P01.aquarium-ios27.json`, `.autonomy/checks/A09-P01.app-unit.json`, `.autonomy/checks/A09-P01.verify-27.json`) instead of a rerun (owner ruling of 2026-11-14) — Verified 2026-11-14: 2026-11-14: no source change since the A09-P01 record (only specs); cites .autonomy/checks/A09-P01.{aquarium-ios27,app-unit,verify-27}.json
 
 ## Phase 2: Foundational (VisualCore steering, story 1)
 
