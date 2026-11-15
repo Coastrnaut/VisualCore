@@ -19,3 +19,16 @@
 ## D3 — Loops
 - **Decision**: `LoopFixtureTests` with three committed boards (mirror path back to the emitter, prism branches meeting,
   a mirror spiral to the bounce cap), asserting reasons and the budgets.
+
+## As built (2026-11-15)
+
+- **Suspension wrapper:** `ExperiencePresenter` has no suspension callback, so `LightMazeExperience.make` now wraps the
+  shell in `MazeExperience` (as Neon Arcade's wrapper does): `suspend()` and `beginDeactivation()` call
+  `presenter.suspended()`, which forgets every touch, so a touch cut off by backgrounding never stays in the arbiter
+  (the next tap would otherwise count as a second finger). The public factory signature is unchanged; tests reach the
+  shell as before (`MazeSessionTests.testASuspensionForgetsEveryTouch`).
+- **Ring shape:** the lit-target ring is an outline square inset 0.05 from the target (clarification Q4), replacing the
+  A13-P01 circle; colours are unchanged.
+- **Gesture details:** an axis-aligned drag is exactly 45° from both diagonals and snaps to `\` ("within 45°" is
+  strict); a drag that begins on a fixed tile answers as a tap would; refusal words go to the controls' message line,
+  while `BeamAnnouncer` speaks only beam changes.
