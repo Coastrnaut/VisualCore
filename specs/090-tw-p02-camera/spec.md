@@ -24,6 +24,54 @@ Canonical overrides:
 - **Owner rulings:** short tests; audits and device runs in the device campaign; iOS 27 at phase gates; the reference
   regression for the VisualCore change runs at X-A12 (owner ruling 2026-11-14); every Spec Kit step runs.
 
+## Clarifications
+
+### Session 2026-11-15
+
+Answered autonomously under the owner's standing delegation, recommended option each time. Facts checked in code:
+`MeshRenderer` (VisualCoreRendering) compiles one program with attributes position (location 0) and normal (location
+1), a uniform premultiplied colour, one light direction, an ambient fraction and optional linear fog, uploads an
+interleaved position-normal buffer and rebuilds after a context recreation; `DepthMeshPass` draws `Item`s that each
+hold a renderer, a model matrix and a colour; `MeshRendererTests` and `DepthMeshPassTests` pin today's pixels;
+`Vec4` and `Vec3` exist in `VisualCoreMath`, `OrbitCamera.ray(ndc:aspect:)` gives an origin and direction, and no ray
+intersection exists; `GestureAlternatives.missing(gesture:native:)` (VisualCoreExperience) lists gesture actions
+without a control; `HeightField.height(atX:z:)` samples the terrain (A12-P01).
+
+- Q: How does a mesh get per-vertex colours without changing existing output? → A: `MeshRenderer` gains an initializer
+  with an optional colour stream (one `Vec4` RGBA 0…1 per vertex, straight alpha), uploaded as attribute location 2;
+  without a stream the attribute is disabled and its constant value is (1, 1, 1, 1), so the lit colour is multiplied
+  by exactly 1 and existing pixels do not change. The stream multiplies the draw colour before lighting. A stream
+  whose count differs from the vertex count, or with a non-finite value or one outside 0…1, is refused with
+  `MeshError.invalidInput`; the stream is rebuilt with the buffers after a context recreation. `DepthMeshPass` draws
+  coloured renderers unchanged (the colour lives with the renderer).
+- Q: What exactly does ray intersection return? → A: In `VisualCoreMath`: `Ray3` (origin, unit direction; `init?`
+  refuses non-finite values and a zero direction and normalises), `RayHit3` (distance ≥ 0, point, unit normal facing
+  against the ray), and `intersect` against an axis-aligned box (min, max), a sphere (centre, radius > 0) and a
+  triangle (two-sided, Möller–Trumbore); the nearest hit at distance ≥ 0 wins; a start inside a box or sphere hits at
+  distance 0 with the normal −direction; a tangent ray hits once; a ray parallel to a triangle's plane, a degenerate
+  triangle or invalid shapes give nil; tolerance 1e-12. A helper picks the nearest of several hits. The ground hit
+  over a height field stays app-local: march from the world box entry in steps of half a cell until the ray is below
+  the terrain, then bisect 40 times (tolerance under 1e-6 m).
+- Q: Which camera policy does each world use? → A: Every world: pitch 10°…75°, distance 10…30 m, target (0, 0.3, 0),
+  clearance 0.5 m: the eye's height must exceed the highest terrain sample within 1 m of the point below the eye (9
+  samples on a 0.5 m grid) by 0.5 m, else the pitch is raised in 1° steps up to 75°. Drag orbits (0.3° of yaw and of
+  pitch per point), pinch zooms (the distance divided by the gesture's scale, each step's factor clamped to
+  0.5…2), both sent as the existing `view.orbit` and `view.zoom` actions, so every gesture has its button. Easing
+  is the presenter's alone: 0.35 s smoothstep from the drawn view to the state's view; Reduce Motion (or a change of
+  it mid-ease) draws the state's view directly. The canvas label is always current; the spoken announcement of a view
+  change is posted at most once per second.
+- Q: How is a world coloured by height? → A: Per terrain vertex: below sea level 0 (island, city) the low-land
+  colour darkened by 25 %; from 0.1 m to 1.2 m a linear blend from low land to high land (clamped outside); the
+  asteroid garden's falling edge below −0.5 m blends to the void colour. Colours are a pure function of the height
+  and the palette, tested apart from the geometry; the terrain digest (geometry only) and its nine fixtures do not
+  change. The renderer's draw colour is white; the sea plane keeps one colour.
+- Q: What are the detail levels and how are they chosen? → A: Level 0 is the recipe's resolution, level 1 half and
+  level 2 a quarter (island and asteroid garden 64, 32, 16 cells; city 48, 24, 12), over the same 12 m from the same
+  height function. The experience declares three quality levels (`level-0`…`level-2`, registration updated) mapped to
+  them; the host chooses the level and it is not saved; the state digest and the terrain fixtures stay at level 0. The
+  fixture validates all 27 meshes (3 presets × seeds 1–3 × 3 levels) with `validate()` and every index below the
+  vertex count. Snapshot schema stays 1.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Look around a tiny world comfortably (Priority: P1) 🎯
