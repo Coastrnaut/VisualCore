@@ -5,8 +5,8 @@ A deterministic sandbox for gravity, collisions, springs and forces with explana
 and enthusiasts. Version 0.1: circles and boxes with rigid-body collision; constant gravity, springs and drag; spawn,
 grab, pin and delete gestures; pause, single step, time scale and reset; presets (pendulum, spring chain, stacked
 objects); optional velocity and force overlays with a measured state panel. Its results are educational
-approximations. Non-goals: a physically complete engineering simulation, 3D soft bodies or a fluid solver,
-safety-critical prediction claims.
+approximations.
+Non-goals: a physically complete engineering simulation, 3D soft bodies or a fluid solver, safety-critical prediction claims.
 
 Physics Playground is an experience of the one VisualCore app (ADR-0009), built from Phase 01 on in
 `Packages/ExperiencesCreative/PhysicsPlayground`; it never has a standalone target. Bodies, springs, arrows and
@@ -25,3 +25,26 @@ experience. Its rules are the A11 subsection of the constitution (2.7.0).
 Phases: A11-P00 boundary audit (feature 081), P01 physics model, units and deterministic tests, P02 contacts and
 spring solver, P03 gesture editor and overlays, P04 saved experiments and tutorials, P05 numerical stability and
 performance audit, P06 release readiness; then the experience's integration gate X-A11.
+
+## Capabilities and their proof
+
+The catalog entry (`Catalog/registrations.json`, `a11.physics-playground`) lists only the capabilities below, each
+proved by the named tests (feature 086, A11-P05, FR-A11-530). Simulator and host results; nothing here is a device
+measurement, and the playground's numbers are educational approximations. `specs/086-pp-p05-stability/scan-claims.sh`
+checks that every named test exists and that the entry and this page make no claims of the kinds the constitution refuses.
+
+| Capability | Proving tests |
+|---|---|
+| rigid-body circles and boxes | `PhysicsFixtureTests.swift twoEqualCirclesHeadOnKeepMomentumAndExchangeVelocities`, `StackFixtureTests.swift aFiveBoxStackStaysStandingForTenSeconds` |
+| springs with bounded stiffness | `ForceMeasurementTests.swift theSettledHangingBoxsSpringForceBalancesItsWeight`, `Springs2DTests.swift stiffnessAndDampingAreClamped` |
+| gravity and drag levels | `SpringWorldTests.swift gravityLevelsGiveTheStatedAcceleration`, `SpringWorldTests.swift dragLevelsGiveTheStatedDecay` |
+| touch editing: add, grab, pin, delete | `PlaygroundGestureTests.swift testATapOnTheEmptyStageAddsThePickedShapeAfterTheDoubleTapWindow`, `PlaygroundGestureTests.swift testADragOnABodyGrabsMovesAndReleasesIt`, `PlaygroundGestureTests.swift testALongPressOnABodyPinsIt`, `PlaygroundGestureTests.swift testADoubleTapOnABodyDeletesItWithoutSelectingIt` |
+| velocity and force arrows | `PlaygroundRenderTests.swift testVelocityArrowsHaveTheStatedLengthsAndOnlyWhenOn`, `PlaygroundRenderTests.swift testForceArrowsShowWeightAndTheMeasuredSpringForce` |
+| measured energy panel | `PlaygroundRenderTests.swift testThePanelEqualsTheDiagnosticsAndOverlaysNeverWriteTheWorld` |
+| presets: pendulum, chain, stack | `PresetTests.swift thePendulumHasAPinnedPivotAndABobAtThirtyDegrees`, `PresetTests.swift theSpringChainHangsStraightDownAtRestLengths`, `PresetTests.swift theStackedObjectsRestOnEachOtherAndStandForFiveSeconds` |
+| four saved experiment slots | `ExperimentStoreTests.swift testSavingAndOpeningASlotThenResetReturnsToIt` |
+| two guided tutorials | `TutorialTests.swift controllingTimeCompletesInOrderOnlyWhenEachConditionHolds`, `TutorialTests.swift springsAndEnergyCompletesWithTheChainArrowsAndThreeSeconds` |
+| pause, single step and time scale | `WorldSimulationTests.swift pauseBlocksAdvanceAndSingleStepRunsExactlyOneTick`, `WorldSimulationTests.swift everyTimeScaleGivesTheSameWorldAfterTheSameTicks` |
+
+The device measurements still to make are in [device-campaign.md](device-campaign.md).
+
