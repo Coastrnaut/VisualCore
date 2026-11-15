@@ -86,6 +86,9 @@ python3 scripts/check_experience_release.py --config docs/apps/particle-universe
 
 ## 5. Owner steps (BLOCKED_OWNER_ACTION)
 
+The one-time name and bundle reservation requested on 2026-11-14 (after X-A09) is described step by step in
+[name-reservation.md](name-reservation.md).
+
 The agent never performs these steps (CLAUDE.md rule 6, setup.md section 10). Each stays `BLOCKED_OWNER_ACTION` in the
 release records until the owner has done it.
 

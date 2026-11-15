@@ -61,7 +61,7 @@ evidence**: no physical-device test of the unified app has been run.
 | Shared round features (R02-F02 … F05, F26) | pass | `python3 scripts/migration_ledger.py status` |
 | Games of Rounds 2–12 | planned; none exists in source | [catalog](docs/catalog/experience-catalog.json) |
 | Physical-device testing | none run; waits for `ImplementationLock-100` | [support matrix](docs/release/support-matrix.md) |
-| App Store | no submission and nothing for sale; signing, App Store Connect and agreements are owner actions | [build and archive](docs/release/build-and-archive.md) |
+| App Store | no submission and nothing for sale; a one-time name and bundle reservation is prepared and waits for the owner (signing, App Store Connect and agreements are owner actions) | [build and archive](docs/release/build-and-archive.md), [name reservation](docs/release/name-reservation.md) |
 
 Ledger totals today: the legacy ledger records **73 of 263** gates as passed (F00–F09 and the app phases
 A01-P00 … A09-P06); the unified-app ledger has 1,233 gates, with 9 experience gates (X-A01 … X-A09), 11 unified-app features,
