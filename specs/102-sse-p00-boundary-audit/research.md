@@ -31,3 +31,24 @@
   propagation → `VisualCoreMath` if reusable (A14-P02); rendering, focus and scale modes → app-local (A14-P03); clock,
   tours, fact cards and saved state → app-local, scaled-date clock assessed for `VisualCoreSimulation` (A14-P04);
   provenance and tolerance review → app-local (A14-P05).
+
+## 2. As found by the audit (2026-11-15)
+
+- **D4 confirmed:** no orbit propagation exists in any VisualCore product (a grep for kepler, eccentric, ephemeris,
+  julian and semiMajor finds nothing), nor a calendar date with a rate, km/AU conversion or a body catalog; gap G-ORBIT
+  → `VisualCoreMath` if reusable (A14-P02); G-CATALOG, G-BODIES, G-TIME, G-TOURS and G-REVIEW stay app-local.
+- **Tours:** `TourTimeline` and `FramingFlight` move 2D `PlaneFraming` stops only, so captioned 3D tours of an orbit
+  camera need adaptation (G-TOURS; a 3D orbit-camera tour track is assessed for `VisualCoreMath` there).
+- **Noise:** `GradientNoise2D` and `FractalNoise2D` are 2D; mapped onto a sphere they seam at the date line, so a
+  seamless spherical or 3D noise is assessed for `VisualCoreScenes` in G-BODIES.
+- **Lighting:** `MeshRenderer` has one directional Lambert light; the Sun's light is set per body before its draw and
+  the Sun itself drawn with ambient 1 (G-BODIES).
+- **Precision:** `OriginRebase` rebases at a fixed threshold of 1,024 units (`OriginRebase.threshold`); astronomical
+  distances still need double precision on the CPU and camera-relative positions (G-BODIES, row M13).
+- **Meshes:** `Mesh.revolution(profile:segments:…)` and `Mesh.tube(path:radius:sides:caps:closed:…)`
+  (`MeshShapes.swift`) serve rings and orbit lines.
+- **Clock evidence:** `FixedStepClock.simulatedTime` has no test, so the contract cites `FixedStepClock.advance`
+  (tested in `FixedStepClockTests`).
+- **Inventory:** `python3 scripts/release_check.py --list` gives 123 steps (A13-P00 recorded 118).
+- The contract (`docs/apps/solar-system-explorer/visualcore-contract.json`) holds 24 rows (10 available, 13 requires
+  adaptation, 1 upstream gap) and 6 gaps; decision go.
