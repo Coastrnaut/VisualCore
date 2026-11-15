@@ -1269,6 +1269,7 @@ VisualCoreExperienceHost | func | public func haptic(_ kind: HapticKind)
 VisualCoreExperienceHost | func | public func haptic(_ kind: HapticKind, route: ExperienceFeedback = .shared)
 VisualCoreExperienceHost | func | public func identifier(_ name: String) -> String
 VisualCoreExperienceHost | func | public func makeBody(configuration: Configuration) -> some View
+VisualCoreExperienceHost | func | public func makeCanvasOverlay(_ port: ExperienceActionPort) -> AnyView?
 VisualCoreExperienceHost | func | public func open(_ request: ExperienceOpenRequest) async -> SessionOpenResult
 VisualCoreExperienceHost | func | public func pointer(_ event: PointerEvent, viewSize: Vec2, port: ExperienceActionPort)
 VisualCoreExperienceHost | func | public func prepare(seed: UInt64, timeLimit: Duration? = nil) async throws(ExperienceError)
@@ -1366,6 +1367,7 @@ VisualCoreExperienceHost | var | public private(set) var summary: String
 VisualCoreExperienceHost | var | public var accessibilitySummary: String
 VisualCoreExperienceHost | var | public var body: some View
 VisualCoreExperienceHost | var | public var budget: ResourceBudget
+VisualCoreExperienceHost | var | public var canvasOverlay: AnyView?
 VisualCoreExperienceHost | var | public var controls: AnyView
 VisualCoreExperienceHost | var | public var diagnostics: ExperienceDiagnostics
 VisualCoreExperienceHost | var | public var diagnostics: SessionDiagnostics

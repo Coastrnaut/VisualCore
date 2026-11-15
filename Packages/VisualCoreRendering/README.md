@@ -311,6 +311,15 @@ A memory warning sheds caches; when the live bytes are still above the memory-pr
 closed with a message. Texts come from the module's string catalog (`SessionStrings`).
 Contract: [session-api.md](../../specs/189-ua-f03-experience-host/contracts/session-api.md).
 
+## Canvas overlay (feature 106, A14-P04)
+
+`ExperiencePresenter.makeCanvasOverlay(_:)` may return a SwiftUI view to draw over the canvas, such as labels at
+projected positions or a caption; the default is nil, so existing presenters are unchanged. `ExperienceShell` forwards
+it as `Experience.canvasOverlay` (default nil for other conformers), and `ExperienceHostView` places it over the render
+surface, inside the canvas's frame, with hit testing off and its elements hidden from assistive technology: it never
+takes a touch, never covers the controls (they sit below the canvas) and the canvas label keeps speaking the state.
+Tested by `CanvasOverlayTests`. Used by Solar System Explorer (A14) for body labels and tour captions.
+
 ## Scenario runner (feature 195, UA-F09)
 
 `ScenarioRunner(session:)` runs a scenario of an experience's manifest in the app's session: every action goes
