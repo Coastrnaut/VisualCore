@@ -8,6 +8,7 @@
 #if DEBUG || VISUALCORE_AUTOMATION
 import DigitalAquariumCore
 import VisualCoreExperience
+import VisualCoreMath
 
 extension AquariumCore {
     /// The seed of every scenario.
@@ -65,7 +66,22 @@ extension AquariumCore {
     /// 6. schooling (feature 069, T-A09-207): the Reef habitat swims for 1,800 steps (30 s); `AquariumManifestTests`
     ///    checks that same-species fish end closer together and heading alike (`SchoolMetrics`);
     /// 7. save/load: the Kelp habitat at bright lighting after 240 steps, with its starter decor; the test round-trips it
-    ///    through a snapshot and compares species, decor transforms and lighting.
+    ///    through a snapshot and compares species, decor transforms and lighting;
+    /// 8. feeding (feature 070, T-A09-308): the Reef swims 300 steps, a feed drops at the mean position of its first
+    ///    species, then 600 steps; `AquariumManifestTests` checks that at least one pellet was eaten;
+    /// 9. decor editing: kind 1, a placement, a move of piece 0, a removal of piece 1;
+    /// 10. no fast-forward with food: a feed, then 60 steps (`AquariumSessionTests` suspends and resumes it).
+    /// The tank fractions of the mean position of the Reef's first species after 300 steps (fixture 8).
+    static var feedPoint: [Double] {
+        let select = ScenarioStep(steps: 5, action: ScriptedAction("habitat.select", [0]), result: "accepted")
+        let reef = played(seed: manifestSeed, entries: [select, ScenarioStep(steps: 300)]).document
+        let first = catalog.habitats.first?.species.first?.speciesId
+        let school = reef.fish.filter { $0.speciesId == first }
+        guard !school.isEmpty else { return [0.5, 0.5] }
+        let mean = school.reduce(Vec2.zero) { $0 + $1.position } / Double(school.count)
+        return [mean.x / SwimBounds.tankWidth, mean.y / SwimBounds.tankHeight]
+    }
+
     public static var fixtureEntries: [[ScenarioStep]] {
         func step(_ control: String, _ values: [Double], steps: Int = 5) -> ScenarioStep {
             ScenarioStep(steps: steps, action: ScriptedAction(control, values), result: "accepted")
@@ -79,6 +95,11 @@ extension AquariumCore {
              step("habitat.select", [0]), step("habitat.select", [1]), ScenarioStep(steps: 60)],
             [step("habitat.select", [0]), ScenarioStep(steps: 1_800)],
             [step("habitat.select", [1]), step("lighting.level", [2]), ScenarioStep(steps: 240)],
+            [step("habitat.select", [0]), ScenarioStep(steps: 300), step("food.drop", feedPoint, steps: 0),
+             ScenarioStep(steps: 600)],
+            [step("decor.kind", [1]), step("decor.place", [0.25, 0.2]), step("decor.move", [0, 0.75, 0.3]),
+             step("decor.remove", [1])],
+            [step("food.drop", [0.5, 0.9]), ScenarioStep(steps: 60)],
         ]
     }
 

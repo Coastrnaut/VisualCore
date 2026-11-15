@@ -461,6 +461,120 @@
       },
       "name" : "fixture-7",
       "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "habitat.select",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 5
+        },
+        {
+          "steps" : 300
+        },
+        {
+          "action" : {
+            "control" : "food.drop",
+            "values" : [
+              0.60542009095111482,
+              0.69141049359387485
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "steps" : 600
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "2cc2239449cc3f6ee5d0e30d71732b78534eff6af8ba24f6b56c404be46ecd7c",
+        "initialDigest" : "398f03aa42aed12dc7b4dee6166c4a9a87c117c11ba732b1abcd0faed5f432bb"
+      },
+      "name" : "fixture-8",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "decor.kind",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 5
+        },
+        {
+          "action" : {
+            "control" : "decor.place",
+            "values" : [
+              0.25,
+              0.20000000000000001
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 5
+        },
+        {
+          "action" : {
+            "control" : "decor.move",
+            "values" : [
+              0,
+              0.75,
+              0.29999999999999999
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 5
+        },
+        {
+          "action" : {
+            "control" : "decor.remove",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 5
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "7fed87e9f6311380ce69cee323b4fc5e51eae078017bc56df61f0fc9bec7e512",
+        "initialDigest" : "398f03aa42aed12dc7b4dee6166c4a9a87c117c11ba732b1abcd0faed5f432bb"
+      },
+      "name" : "fixture-9",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "food.drop",
+            "values" : [
+              0.5,
+              0.90000000000000002
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 5
+        },
+        {
+          "steps" : 60
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "58ceee17df8c04568022897b474f79704a6feeee40e137ddba9f47b8b94e0ee5",
+        "initialDigest" : "398f03aa42aed12dc7b4dee6166c4a9a87c117c11ba732b1abcd0faed5f432bb"
+      },
+      "name" : "fixture-10",
+      "seed" : "7"
     }
   ],
   "schema" : 1

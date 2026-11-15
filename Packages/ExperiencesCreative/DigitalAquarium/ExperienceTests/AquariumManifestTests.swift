@@ -1,6 +1,7 @@
 // AquariumManifestTests — feature 068 (A09-P01) T-A09-105 (FR-A09-122; SC-A09-105); fixtures 6 and 7 feature 069
-// (A09-P02) T-A09-207 (FR-A09-213). The scenario manifest of Digital Aquarium: valid with the nine standard scenarios
-// and seven fixtures (A09-P01's five plus schooling and save/load) (swim bounds, save/restore, no
+// (A09-P02) T-A09-207 (FR-A09-213); fixtures 8–10 feature 070 (A09-P03) T-A09-308 (FR-A09-322). The scenario manifest
+// of Digital Aquarium: valid with the nine standard scenarios and ten fixtures (A09-P01's five, schooling and save/load,
+// feeding, decor editing and no fast-forward with food) (swim bounds, save/restore, no
 // fast-forward while paused, both validated habitats, bounded counts), its derived digests and expected results equal
 // to what the engine gives when the runner plays them, the fixtures ending in the states they name, and the committed
 // `scenario-manifest.json` equal to the Swift manifest (`UPDATE_SCENARIO_MANIFEST=1`, on the simulator
@@ -10,6 +11,7 @@ import Testing
 @testable import DigitalAquariumExperience
 import DigitalAquariumCore
 import VisualCoreExperience
+import VisualCoreMath
 
 private let id = ExperienceID(rawValue: AquariumCore.experienceID)!
 
@@ -30,13 +32,13 @@ private func play(_ spec: ScenarioSpec) async throws -> (initial: String, result
 }
 
 @Suite struct AquariumManifestTests {
-    @Test func theManifestIsValidWithTheNineStandardScenariosAndSevenFixtures() {
+    @Test func theManifestIsValidWithTheNineStandardScenariosAndTenFixtures() {
         let manifest = AquariumCore.manifest(for: id)
         let problems = ScenarioManifestValidator.problems(manifest, controls: AquariumCore.controls,
-                                                          content: ContentRequirement(fixtures: 7))
+                                                          content: ContentRequirement(fixtures: 10))
         #expect(problems.isEmpty, "\(problems)")
         #expect(Set(manifest.scenarios.map(\.name))
-                == Set(ScenarioManifest.standardNames).union((1...7).map { "fixture-\($0)" }))
+                == Set(ScenarioManifest.standardNames).union((1...10).map { "fixture-\($0)" }))
     }
 
     @Test func derivedDigestsAndResultsAreWhatTheEngineGives() async throws {
@@ -105,6 +107,44 @@ private func play(_ spec: ScenarioSpec) async throws -> (initial: String, result
         #expect(saved.document.decor == catalog.habitats[1].decor.map(DecorPlacement.init))
         let restored = try? AquariumCore.restore(payload: saved.snapshotPayload(), seed: seed)
         #expect(restored?.state == saved.state)
+
+        // 8. Feeding: after the feed, at least one pellet is eaten (removed while still above the floor).
+        let feedIndex = 2
+        var fed = AquariumCore.played(seed: seed, entries: Array(fixtures[7].prefix(feedIndex + 1)))
+        #expect(fed.document.food.count == Feeding.pelletsPerFeed)
+        var eaten = 0
+        for s in 0..<600 {
+            let before = fed.document.food
+            let floor = fed.document.bounds.minY
+            fed.update(step: 305 + s)
+            let floored = before.filter { $0.position.y - Feeding.sinkSpeed * AquariumSimulation.step <= floor }.count
+            eaten += max(0, before.count - fed.document.food.count - floored)
+        }
+        #expect(eaten >= 1, "no pellet was eaten")
+        #expect(fed.document.food.allSatisfy { $0.position.y > fed.document.bounds.minY })
+
+        // 9. Decor editing: the Reef's starter decor with piece 0 moved, piece 1 removed and a piece of kind 1 placed.
+        let edited = AquariumCore.played(seed: seed, entries: fixtures[8]).state
+        var expected = catalog.habitats[0].decor.map(DecorPlacement.init)
+        expected.append(DecorPlacement(kindId: catalog.decor[1].id, position: Vec2(4, 1.8)))
+        expected[0].position = Vec2(12, 0.3 * 9)
+        expected.remove(at: 1)
+        #expect(edited.decorKind == 1)
+        #expect(edited.document.decor.map(\.kindId) == expected.map(\.kindId))
+        for (a, b) in zip(edited.document.decor, expected) {
+            #expect(abs(a.position.x - b.position.x) < 1e-9 && abs(a.position.y - b.position.y) < 1e-9)
+        }
+
+        // 10. No fast-forward with food: 5 steps, a feed, 60 steps; uneaten pellets have sunk by exactly one second of
+        //     motion (60 steps × 1/60 s × 0.5 units/s), no more.
+        let dropped = AquariumCore.played(seed: seed, entries: Array(fixtures[9].prefix(1))).state
+        let early = AquariumCore.played(seed: seed, entries: fixtures[9]).state
+        #expect(early.step == 65)
+        #expect(dropped.document.food.count == Feeding.pelletsPerFeed)
+        for pellet in early.document.food {
+            #expect(dropped.document.food.contains { abs($0.position.x - pellet.position.x) < 1e-12
+                && abs($0.position.y - Feeding.sinkSpeed - pellet.position.y) < 1e-9 })
+        }
     }
 
     /// The JSON form with the control ids, named by `Catalog/registrations.json`. `UPDATE_SCENARIO_MANIFEST=1`

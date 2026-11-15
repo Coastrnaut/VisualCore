@@ -25,7 +25,7 @@
 
 ## Phase 5: User Story 3 — leaving and returning (P2)
 
-- [ ] T-A09-308 [US3] Manifest fixtures 8 (feeding), 9 (decor editing) and 10 (no fast-forward with food) in `Experience/Adapter/AquariumManifest.swift`, regenerate `scenario-manifest.json`, update `ExperienceTests/AquariumManifestTests.swift`; session test: with pellets sinking, a suspension of any length and a resume leave step, fish and pellets identical and continue; schema-1 and schema-2 snapshots restore (FR-A09-321, 322; SC-A09-305)
+- [X] T-A09-308 [US3] Manifest fixtures 8 (feeding), 9 (decor editing) and 10 (no fast-forward with food) in `Experience/Adapter/AquariumManifest.swift`, regenerate `scenario-manifest.json`, update `ExperienceTests/AquariumManifestTests.swift`; session test: with pellets sinking, a suspension of any length and a resume leave step, fish and pellets identical and continue; schema-1 and schema-2 snapshots restore (FR-A09-321, 322; SC-A09-305) — Verified 2026-11-14: 2026-11-14: fixtures 8 (feeding), 9 (decor editing), 10 (no fast-forward with food); manifest regenerated; AquariumManifestTests 4 and AquariumSessionTests 9 tests pass on sim-27.2 (suspension with food holds step, fish and pellets)
 
 ## Phase 6: Polish & evidence
 

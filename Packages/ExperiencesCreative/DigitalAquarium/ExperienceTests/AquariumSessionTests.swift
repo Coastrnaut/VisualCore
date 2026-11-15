@@ -100,6 +100,54 @@ final class AquariumSessionTests: XCTestCase {
         session.close()
     }
 
+    /// Feature 070 (A09-P03) T-A09-308 (FR-A09-321; SC-A09-305): with pellets sinking, a suspension of any wall-clock
+    /// length moves neither the fish nor the pellets, and the resume continues from the same step.
+    func testASuspensionDoesNotFastForwardFishOrFood() async throws {
+        let session = ExperienceSession()
+        let shell = try await AquariumTest.open(session)
+        XCTAssertTrue(shell.handle(control: "food.drop", values: [0.5, 0.9]).isAccepted)
+        try AquariumTest.frames(session, 10)
+        let before = try AquariumTest.core(shell)
+        XCTAssertEqual(before.document.food.count, 3)
+        let stepIndex = shell.engine.stepIndex
+        session.setScenePhase(.background)
+        XCTAssertEqual(shell.state, .suspended)
+        for _ in 0..<10 { _ = session.renderHost?.renderOneFrame(present: false) }
+        try await Task.sleep(for: .milliseconds(150))
+        XCTAssertEqual(try AquariumTest.core(shell), before, "fish and pellets hold while suspended")
+        XCTAssertEqual(shell.engine.stepIndex, stepIndex)
+        session.setScenePhase(.active)
+        XCTAssertEqual(try AquariumTest.core(shell), before, "the resume continues from the same state")
+        try AquariumTest.frames(session, 1)
+        let resumed = try AquariumTest.core(shell)
+        XCTAssertLessThanOrEqual(resumed.step - before.step, 2, "one frame's steps, never the suspended time")
+        session.close()
+    }
+
+    /// Feature 070 (A09-P03) T-A09-308 (FR-A09-320; SC-A09-305): pellets, edited decor and the chosen kind survive a
+    /// save and a restore in a new session.
+    func testFoodDecorEditsAndTheChosenKindRestore() async throws {
+        let first = ExperienceSession()
+        let shell = try await AquariumTest.open(first)
+        XCTAssertTrue(shell.handle(control: "decor.kind", values: [2]).isAccepted)
+        XCTAssertTrue(shell.handle(control: "decor.place", values: [0.3, 0.2]).isAccepted)
+        XCTAssertTrue(shell.handle(control: "decor.move", values: [0, 0.6, 0.25]).isAccepted)
+        XCTAssertTrue(shell.handle(control: "food.drop", values: [0.4, 0.9]).isAccepted)
+        try AquariumTest.frames(first, 15)
+        let snapshot = try shell.snapshot()
+        let saved = try AquariumTest.core(shell)
+        first.close()
+
+        let second = ExperienceSession()
+        let restored = try await AquariumTest.open(second, seed: 3)
+        try restored.restore(ExperienceSnapshot(data: snapshot.encoded()))
+        let core = try AquariumTest.core(restored)
+        XCTAssertEqual(core.state, saved.state)
+        XCTAssertEqual(core.decorKind, 2)
+        XCTAssertFalse(core.document.food.isEmpty)
+        second.close()
+    }
+
     func testTheSavedStateRestoresIdenticallyInANewSession() async throws {
         let first = ExperienceSession()
         let shell = try await AquariumTest.open(first)
