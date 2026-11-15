@@ -26,7 +26,7 @@ after every task (no trailers). iOS 27 only; reference regression and iOS 26 at 
 - [X] T-A10-207 App build and unit (`python3 Tools/python/desktop_runbook.py run-check --stage A10-P02 --timeout 600 --name app-unit -- python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27`) — Verified 2026-11-14: 2026-11-14: .autonomy/checks/A10-P02.app-unit.json exit 0 (app build-for-testing and unit tests incl. the registry's schema-1 migration example)
 - [X] T-A10-208 Runner iOS 27 (`python3 Tools/python/desktop_runbook.py run-check --stage A10-P02 --timeout 600 --name verify-27 -- python3 scripts/verify_experiences.py --only a10.neon-arcade --runtime 27`) — Verified 2026-11-14: 2026-11-14: .autonomy/checks/A10-P02.verify-27.json exit 0 (runner, a10.neon-arcade, nine standard scenarios)
 - [X] T-A10-209 Experience package check and script tests (`--name experience-packages -- python3 scripts/check_experience_packages.py`; `--name script-tests -- python3 scripts/test_scripts.py`) — Verified 2026-11-14: 2026-11-14: .autonomy/checks/A10-P02.{experience-packages,script-tests}.json exit 0
-- [ ] T-A10-210 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A10-P02
+- [X] T-A10-210 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A10-P02 — Verified 2026-11-14: 2026-11-14: /speckit-converge appended nothing (14 FR/SC, 3 stories, 9 tasks with evidence; G-GAMERULES closed)
 
 ## Dependencies
 
