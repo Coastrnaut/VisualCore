@@ -139,7 +139,8 @@ energy stays within a stated band over its first swings.
 - **An empty slot:** opening it is refused with a reason.
 - **A slot name:** 1–24 characters; longer names are cut; an empty name becomes "Experiment N".
 - **Storage unavailable or full:** saving reports the failure and changes nothing.
-- **A preset after an edit:** opening a preset discards unsaved edits (the person is told before).
+- **A preset after an edit:** opening a preset replaces the current experiment without a dialog; the preset picker
+  always shows the note "Opening a preset replaces the current experiment. Save it first to keep it."
 - **Reduce Motion and VoiceOver:** tutorial steps are announced; nothing decorative moves.
 
 ## Requirements *(mandatory)*
