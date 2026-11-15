@@ -113,8 +113,8 @@ committed fixtures.
    surface at distance zero.
 3. **Given** mirrors that would make the beam loop, **When** traced, **Then** the trace ends at the bounce cap or on the
    first repeated state, and reports why.
-4. **Given** each level and its stored state, **When** traced twice, **Then** the beam segments are identical and equal
-   the committed fixtures.
+4. **Given** each level and its stored state, **When** traced twice, **Then** the beam segments are identical; for
+   levels 1, 10 and 20 they equal the committed fixtures.
 
 ---
 

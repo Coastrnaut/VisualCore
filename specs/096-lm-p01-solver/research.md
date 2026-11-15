@@ -16,7 +16,9 @@
   mirrors, targets and the board edge alike).
 - **D2 Reflection:** d − 2(d·n)n; incidence and reflection angles equal by construction; the fixture sweeps 360
   incidence angles against horizontal, vertical and 45° segments and checks the angles and |d| within 1e-12.
-- **D3 Tracer:** a branch is (origin, direction, last segment index); each step casts against all tile segments and the
+- **D3 Tracer:** a branch is (origin, direction, excluded segment indices); the first branch starts at the emitter
+  cell's centre with the emitter's own four segments excluded (later branches that hit the emitter end with
+  "emitter"); each step casts against all tile segments and the
   4 board edges, excluding the last segment; the tile owning the hit decides: wall, target, emitter → end; mirror →
   reflect; prism → reflect and push a straight-on branch (continuing past the prism with the prism's segment excluded);
   board edge → end. Cycle detection keys on (cell entered, direction) across all branches of one trace (a branch
