@@ -22,6 +22,42 @@ Canonical overrides:
 - **Owner rulings:** short tests; audits in the device campaign; iOS 27 at phase gates; reference regression and iOS 26
   at X-A13; interface tests under 60 s each.
 
+## Clarifications
+
+### Session 2026-11-15
+
+Answered autonomously under the owner's standing delegation, recommended option each time, as for A12-P06. Facts
+checked in code: `scripts/check_experience_release.py` reads `docs/apps/<slug>/release.json` (schema 1: `experience`,
+`requiredDocs`, `checklist`, `copyCheck` with `text`, `swift`, `allow`) and accepts the statuses `verified`,
+`pending-campaign-ii` and `owner-action`; `scripts/release_check.py` derives `experience-release-<code>` and
+`copy-claims-<code>` from that file and runs interface chunks (`t2` is Tiny Worlds', serial; `u2` is free); the progress
+store (`ProgressStore`) refuses `damaged`, `too-large`, `newer-version` and storage errors, never writes on load and
+writes `progress.json` atomically; `MazePresenter` has no test-only failure seam yet (Tiny Worlds' `failNextDraw` is the
+model); there are no committed sample progress files yet; Light Maze's sources import only Foundation, SwiftUI, UIKit and
+VisualCore modules (VisualCoreAudio for the code-made sweep, ambient session, no recording); the a13 registration
+declares no permission; the controls carry identifiers `experience.a13.light-maze.<name>` (`level`, `previous-level`,
+`next-level`, `select-previous`, `select-next`, `turn`, `undo`, `reset-level`, `hint`, `describe`, `status`, `message`);
+`MazeCore.schemaOneExample()` is the stored schema-1 example the registry restores.
+
+- Q: Which statuses does the release checklist use? → A: The checker's: `verified` (with evidence),
+  `pending-campaign-ii` (device rows, naming the device-campaign row) and `owner-action` (with the owner steps).
+- Q: How are refused claims checked in the store text and interface copy? → A: A Light Maze scan over the store text and
+  the experience's interface Swift (controls and presenter) refuses the words physics, physical, optics, optical,
+  accurate, accuracy, precise, precision, scientific, realistic, fps, frames per second, battery and a millisecond figure
+  (whole words, case-insensitive), alongside the shared copy check; every test named in the store claim table must exist.
+- Q: What does the source scan refuse? → A: In `Packages/ExperiencesCreative/LightMaze`: `URLSession`, `import Network`,
+  `CLLocation`, `AVCapture`, `AVAudioRecorder`, `inputNode`, `installTap`, `CMMotion`, `CNContact`, `ASIdentifierManager`,
+  `AppTrackingTransparency`, `UIScreen.main.brightness` and `isIdleTimerDisabled`.
+- Q: Which interface journeys run, and how? → A: A new serial chunk `u2` with `LMLevelUITests` (choose level 2 from the
+  Level menu; select next and turn on level 1 until solved — status says solved; undo returns to not solved) and
+  `LMHelpUITests` (Hint selects a tile and the message names it; Describe shows the board text), launched as in
+  `TWSupport` through `LMSupport`; identifiers `experience.a13.light-maze.<name>`; each test under 60 s.
+- Q: How are crash recovery and sample files proved? → A: A test-only `failNextDraw` seam is added to the presenter (as
+  Tiny Worlds'); a test solves level 1 with a temporary storage so `progress.json` is written, sets `failNextDraw`, draws a
+  frame so the session enters its failure state, checks `progress.json` byte-identical, opens a new session and draws.
+  Four committed sample files (`progress-valid`, `-newer`, `-damaged`, `-truncated`) under the experience's test
+  fixtures are loaded by `ProgressStore` and answered as specified, each byte-identical afterwards.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Nothing leaves the device (Priority: P1) 🎯
