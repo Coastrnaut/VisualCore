@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--only",
+    "a11.physics-playground",
+    "--runtime",
+    "27"
+  ],
+  "command": "python3 scripts/verify_experiences.py --only a11.physics-playground --runtime 27",
+  "elapsed_seconds": 40.117,
+  "exit_code": 0,
+  "finished": "2026-11-15T10:02:41+00:00",
+  "log": ".autonomy/logs/A11-P05.verify-27.log",
+  "log_sha256": "7995825b9c8695788f77910aa49da394058c6db986c691549feeff0534721370",
+  "name": "verify-27",
+  "stage": "A11-P05",
+  "started": "2026-11-15T10:02:01+00:00",
+  "timed_out": false
+}

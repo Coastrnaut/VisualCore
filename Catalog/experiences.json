@@ -360,7 +360,7 @@
       "id": "a11.physics-playground",
       "code": "A11",
       "title": "Physics Playground",
-      "summary": "A deterministic sandbox for gravity, collisions, springs and forces with explanatory overlays.",
+      "summary": "A sandbox of circles, boxes and springs under gravity and drag, with presets, saved experiments and tutorials.",
       "kind": "creative",
       "tier": "free",
       "category": "play",
@@ -386,10 +386,14 @@
         "presets: pendulum, chain, stack",
         "four saved experiment slots",
         "two guided tutorials",
+        "resting bodies sleep",
+        "three drawing quality levels",
         "pause, single step and time scale"
       ],
       "quality_tiers": [
-        "level-0"
+        "level-0",
+        "level-1",
+        "level-2"
       ],
       "content": null,
       "available": false

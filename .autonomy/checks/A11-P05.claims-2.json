@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "bash",
+    "specs/086-pp-p05-stability/scan-claims.sh"
+  ],
+  "command": "bash specs/086-pp-p05-stability/scan-claims.sh",
+  "elapsed_seconds": 5.183,
+  "exit_code": 0,
+  "finished": "2026-11-15T10:02:46+00:00",
+  "log": ".autonomy/logs/A11-P05.claims-2.log",
+  "log_sha256": "37acf7ff1e6efd794882f6026838bf51c63da0e13ea6e9357d69f4b708335760",
+  "name": "claims-2",
+  "stage": "A11-P05",
+  "started": "2026-11-15T10:02:41+00:00",
+  "timed_out": false
+}

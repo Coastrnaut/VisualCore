@@ -44,6 +44,8 @@ checks that every named test exists and that the entry and this page make no cla
 | presets: pendulum, chain, stack | `PresetTests.swift thePendulumHasAPinnedPivotAndABobAtThirtyDegrees`, `PresetTests.swift theSpringChainHangsStraightDownAtRestLengths`, `PresetTests.swift theStackedObjectsRestOnEachOtherAndStandForFiveSeconds` |
 | four saved experiment slots | `ExperimentStoreTests.swift testSavingAndOpeningASlotThenResetReturnsToIt` |
 | two guided tutorials | `TutorialTests.swift controllingTimeCompletesInOrderOnlyWhenEachConditionHolds`, `TutorialTests.swift springsAndEnergyCompletesWithTheChainArrowsAndThreeSeconds` |
+| resting bodies sleep | `SleepTests.swift theStackFallsAsleepWithinThreeSecondsAndThenTestsNothing`, `SleepTests.swift aBodyDroppedOntoTheSleepingStackWakesItInTheTickItsBoundsReachIt` |
+| three drawing quality levels | `PlaygroundQualityTests.swift testTheDeclaredTiersEqualThePresenterLevelsAndTheProfile`, `PlaygroundQualityTests.swift testTheDigestIsTheSameAtEveryTier` |
 | pause, single step and time scale | `WorldSimulationTests.swift pauseBlocksAdvanceAndSingleStepRunsExactlyOneTick`, `WorldSimulationTests.swift everyTimeScaleGivesTheSameWorldAfterTheSameTicks` |
 
 The device measurements still to make are in [device-campaign.md](device-campaign.md).

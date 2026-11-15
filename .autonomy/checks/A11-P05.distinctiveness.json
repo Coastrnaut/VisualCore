@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_distinctiveness.py",
+    "--check"
+  ],
+  "command": "python3 scripts/check_distinctiveness.py --check",
+  "elapsed_seconds": 0.078,
+  "exit_code": 0,
+  "finished": "2026-11-15T10:02:47+00:00",
+  "log": ".autonomy/logs/A11-P05.distinctiveness.log",
+  "log_sha256": "6d2701ef3d7ab25e6a28a19a638bd86da738a7844c6756e4e507c3e983a8f923",
+  "name": "distinctiveness",
+  "stage": "A11-P05",
+  "started": "2026-11-15T10:02:47+00:00",
+  "timed_out": false
+}

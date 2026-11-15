@@ -656,7 +656,7 @@
       "id": "M13",
       "capability": "Stability and body budget: caps on body, contact and constraint counts, solver iterations, spring stiffness for the chosen step and speeds; non-finite values rejected; sleeping bodies; an experiment that would become unstable is clamped or refused",
       "source": "cross-cutting: stability and body budget; constitution A11 stable and bounded; manual risks 1 and 3",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCore/Sources/VisualCoreMath/NumericHygiene.swift",
@@ -684,10 +684,10 @@
         }
       ],
       "example": {
-        "file": "Packages/ExperiencesCreative/NeonArcade/Core/ArcadeBudget.swift",
-        "symbol": "ArcadeBudget"
+        "file": "Packages/ExperiencesCreative/PhysicsPlayground/Core/Sleep.swift",
+        "symbol": "Sleep"
       },
-      "notes": "Finite-value checks (NumericHygieneTests), step clamping (TimeStepPolicyTests), a particle budget per quality level (ParticleBudgetTests) and the governor (QualityGovernorTests) exist; no body budget, sleeping bodies or stiffness and speed caps exist. The solver's own iteration and stiffness bounds come with G-CONTACTS and G-SPRINGS (A11-P02); the experience's caps, budget and sleeping are G-STABILITY (app-local), A11-P05."
+      "notes": "Since A11-P05 (G-STABILITY closed): caps on bodies, springs, speeds, stiffness, damping and positional correction hold under stress (StressTests); resting bodies sleep and cost no pair tests (SleepTests); the per-tick work stays within the stated budget (WorkBudgetTests)."
     },
     {
       "id": "M14",
@@ -773,7 +773,7 @@
         "file": "Packages/ExperiencesCreative/ParticleUniverse/Core/SceneQuality.swift",
         "symbol": "SceneQuality"
       },
-      "notes": "Tested in VisualCoreDiagnosticsTests (QualityGovernorTests, QualityProfileTests), VisualCoreExperienceTests (QualityDeclarationTests) and VisualCoreExperienceHostTests. Core.qualityTiers must match the presenter's levels (declared at P05)."
+      "notes": "Tested in VisualCoreDiagnosticsTests (QualityGovernorTests, QualityProfileTests), VisualCoreExperienceTests (QualityDeclarationTests) and VisualCoreExperienceHostTests. Core.qualityTiers must match the presenter's levels (declared at P05). Since A11-P05: three drawing quality levels (level-0…2: spring coils, circle segments, hatch) chosen from the host's tier, level 2 under Low Power Mode; the physics digest is the same at every level (PlaygroundQualityTests)."
     },
     {
       "id": "M16",
@@ -983,10 +983,10 @@
       ],
       "kind": "adaptation",
       "owner": "app-local",
-      "justification": "The body budget, caps on contacts, constraints, speeds and stiffness per quality tier, sleeping bodies and the clamp-or-refuse policy for an experiment that would become unstable are the playground's policy over the solver's own bounds (clarification 5).",
+      "justification": "The body budget, caps on contacts, constraints, speeds and stiffness per quality tier, sleeping bodies and the clamp-or-refuse policy for an experiment that would become unstable are the playground's policy over the solver's own bounds (clarification 5). Built in A11-P05: Sleep (touching bodies sleep together after 0.5 s at rest; anchored bodies never sleep; wake on contact, springs, edits and level changes), WorkCount with a stated per-tick budget, stress scenes (5 seeds × 1,200 ticks, 0 bad values) and the energy audit; host timing recorded, device timing in the device campaign (PP-D1).",
       "phase": 5,
       "test": "Host tests: spawning beyond the body budget is refused with a message, speeds and stiffness stay within caps, resting bodies fall asleep and wake on contact or grab, an extreme experiment is clamped or refused and never produces a non-finite value; per-step work stays within the arithmetic bound for the budget",
-      "closed": null
+      "closed": "A11-P05"
     },
     {
       "id": "G-CONTENTLICENSES",

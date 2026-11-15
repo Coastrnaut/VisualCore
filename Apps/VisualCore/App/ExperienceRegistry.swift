@@ -252,8 +252,9 @@ extension ExperienceRegistry {
         // Schema 2 (feature 083, A11-P02) adds springs, force levels and the contact cache, schema 3 (feature 084,
         // A11-P03) pins, selection, the grab and the overlay choices, schema 4 (feature 085, A11-P04) the opened
         // experiment and tutorial progress; the stored schema-1 to schema-3 examples prove the migrations.
+        // Schema 5 (feature 086, A11-P05) adds sleep to the world; the schema-4 example proves that step.
         let examples = [PlaygroundCore.schemaOneExample(), PlaygroundCore.schemaTwoExample(),
-                        PlaygroundCore.schemaThreeExample()].compactMap { $0 }
+                        PlaygroundCore.schemaThreeExample(), PlaygroundCore.schemaFourExample()].compactMap { $0 }
         var registration = ExperienceRegistration(id: id, core: PlaygroundCore.self, examples: examples) { launch in
             let system = SystemAccessibilityObserver.systemValues()
             return PhysicsPlaygroundExperience.make(id: id, storage: launch.storage,
