@@ -525,7 +525,7 @@
       "id": "M09",
       "capability": "Level select, unlock progression, undo and restart, and success feedback when every target is lit",
       "source": "v0.1 feature 4: level select, unlock progression, undo/restart and success feedback",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCore/Sources/VisualCoreExperience/ExperienceStorage.swift",
@@ -562,13 +562,13 @@
         "file": "Packages/ExperiencesCreative/NeonArcade/Core/ArcadeFlow.swift",
         "symbol": "ArcadeFlow"
       },
-      "notes": "Storage, versioned documents, sound effects and haptic planning exist and are tested (ExperienceStorageTests, DocumentStoreTests, SoundEffectPlayerTests, AccessibilityPlansTests). No undo history and no progression model exist in any framework product (grep 2026-11-15); a move list per level with undo and restart is small and tied to the board: G-LEVELS (app-local over ExperienceStorage, A13-P03); the success cue is G-FEEDBACK (app-local, A13-P04). A13-P03 (G-LEVELS closed): the Level menu lists locked levels disabled and solved ones with their best count, a locked choice is refused in words, Next level waits for the solve; the move list (at most 64) with Undo (move.undo, a13.no-moves) and Restart (MazeState schema 2, MovesTests, MazeProgressTests); progress.json through ProgressStore over ExperienceStorage, read never writes, a damaged, too-large or newer file is reported and left byte-identical (ProgressStoreTests); state schema 1 migrates to 2. The success cue stays with G-FEEDBACK (A13-P04)."
+      "notes": "Storage, versioned documents, sound effects and haptic planning exist and are tested (ExperienceStorageTests, DocumentStoreTests, SoundEffectPlayerTests, AccessibilityPlansTests). No undo history and no progression model exist in any framework product (grep 2026-11-15); a move list per level with undo and restart is small and tied to the board: G-LEVELS (app-local over ExperienceStorage, A13-P03); the success cue is G-FEEDBACK (app-local, A13-P04). A13-P03 (G-LEVELS closed): the Level menu lists locked levels disabled and solved ones with their best count, a locked choice is refused in words, Next level waits for the solve; the move list (at most 64) with Undo (move.undo, a13.no-moves) and Restart (MazeState schema 2, MovesTests, MazeProgressTests); progress.json through ProgressStore over ExperienceStorage, read never writes, a damaged, too-large or newer file is reported and left byte-identical (ProgressStoreTests); state schema 1 migrates to 2. The success cue stays with G-FEEDBACK (A13-P04). A13-P04 (G-FEEDBACK closed): the success cue plays once per transition to solved — words naming the level, the moves and the level that opened, a sine sweep made in code through VisualCoreAudio's SoundEffectPlayer, a success haptic through ExperienceFeedback (the person's switch and HapticPlanner's rate limit), and a border with a tick while solved (MazeFeedbackTests); a Hint control (hint.show, a13.already-solved) points at a tile that differs from the recorded solution (HintTests, MazeHintTests)."
     },
     {
       "id": "M10",
       "capability": "Glow and colour cues that keep the beam path legible: a capped glow that never hides the beam or tiles, beam colours with a non-colour sign, contrast against the board, and no flashing under Reduce Flashing",
       "source": "v0.1 feature 5: glow and colour cues that keep the beam path legible; spec edge case glow hiding the beam",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCore/Sources/VisualCoreEffectsGraph/PassSchemas.swift",
@@ -611,7 +611,7 @@
         "file": "Packages/ExperiencesCreative/NeonArcade/Experience/ArcadeEffectsLayer.swift",
         "symbol": "ArcadeEffectsLayer"
       },
-      "notes": "Bloom and blur passes, additive blending, colour-plus-sign checking, contrast ratios and the flash limiter exist and are tested (PassPixelTests, RenderStateTests, AccessibilityPlansTests, AccessibilitySettingsSectionTests, FlashLimiterModelTests). Neon Arcade's glow layer is experience code and is not copied. The beam style (core line from exact segments, glow strength cap) is G-BEAMS (app-local, A13-P02); colour plus sign cues and contrast checks for beams, targets and tiles are G-FEEDBACK (app-local, A13-P04). A13-P02: capped static glow (halo 0.30 cell at 0.25 opacity under a 0.08 core), lit-target rings and a selection outline beside colour; the remaining hints and success feedback stay with G-FEEDBACK."
+      "notes": "Bloom and blur passes, additive blending, colour-plus-sign checking, contrast ratios and the flash limiter exist and are tested (PassPixelTests, RenderStateTests, AccessibilityPlansTests, AccessibilitySettingsSectionTests, FlashLimiterModelTests). Neon Arcade's glow layer is experience code and is not copied. The beam style (core line from exact segments, glow strength cap) is G-BEAMS (app-local, A13-P02); colour plus sign cues and contrast checks for beams, targets and tiles are G-FEEDBACK (app-local, A13-P04). A13-P02: capped static glow (halo 0.30 cell at 0.25 opacity under a 0.08 core), lit-target rings and a selection outline beside colour; the remaining hints and success feedback stay with G-FEEDBACK. A13-P04 (G-FEEDBACK closed): nine board states carry distinct non-colour signs (stateSignProblems empty) and every state colour reaches at least 3 : 1 against the board by AccessibleColors.contrastRatio, the unlit target raised from 2.1 : 1 to 3.85 : 1; the glow cap of 0.15 cell is kept (MazeStyleTests)."
     },
     {
       "id": "M11",
@@ -827,7 +827,7 @@
       "id": "M17",
       "capability": "Accessibility: Reduce Motion and Reduce Flashing honoured, VoiceOver announcements, a spoken board description (tiles, beam path, lit and unlit targets), colour never the only cue",
       "source": "cross-cutting: accessibility with Reduce Motion, Reduce Flashing and spoken board description; constitution A13 accessibility",
-      "status": "requires adaptation",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCore/Sources/VisualCoreSimulation/AccessibilityPreferences.swift",
@@ -870,7 +870,7 @@
         "file": "Packages/ExperiencesCreative/NeonArcade/Core/ArcadeAnnouncements.swift",
         "symbol": "ArcadeAnnouncer"
       },
-      "notes": "Preferences, announcement planning and sinks, reduced-motion durations, colour-plus-sign checks and the flash limiter exist and are tested (AccessibilityPreferencesTests, AccessibilityPlansTests, AccessibilityPlayersTests, FlashLimiterModelTests). The spoken board description and hints are specific to the board: G-FEEDBACK (app-local, A13-P04). System accessibility audits wait for device testing."
+      "notes": "Preferences, announcement planning and sinks, reduced-motion durations, colour-plus-sign checks and the flash limiter exist and are tested (AccessibilityPreferencesTests, AccessibilityPlansTests, AccessibilityPlayersTests, FlashLimiterModelTests). The spoken board description and hints are specific to the board: G-FEEDBACK (app-local, A13-P04). System accessibility audits wait for device testing. A13-P04 (G-FEEDBACK closed): Describe speaks the full board (tiles by kind with rows and columns, each beam branch's start, turns and end, every target lit or unlit; at most 4,000 characters, BoardDescriptionTests); the canvas description counts lit targets; words are kept and shown with VoiceOver off and posted only while it runs; Reduce Motion and Reduce Flashing keep the solved border static (MazeFeedbackTests). System accessibility audits wait for device testing."
     },
     {
       "id": "M18",
@@ -1064,7 +1064,7 @@
       "justification": "Announcement and haptic planners, sinks, colour-plus-sign checks and sound effects exist; hints, the spoken board description (tiles, beam path, lit and unlit targets), colour plus sign cues for beams, targets and tiles with contrast checks, and the success cue with sound and haptics are specific to the board, app-local over the accessibility planners and sound effects (clarification 5, A13-P04).",
       "phase": 4,
       "test": "Core and experience tests: the board description names every tile, the beam path and each target's state for fixture boards; every beam and target state has a distinct non-colour sign (stateSignProblems empty) and meets the contrast threshold; the success cue plays once per solve and respects the haptic rate limit; Reduce Motion shortens transitions and Reduce Flashing removes pulsing",
-      "closed": null
+      "closed": "A13-P04"
     },
     {
       "id": "G-SOLVER",
