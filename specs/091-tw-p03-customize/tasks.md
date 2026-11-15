@@ -1,0 +1,44 @@
+# Tasks: Tiny Worlds — Phase 03 World customization and persistence
+
+**Input**: [spec.md](spec.md), [plan.md](plan.md), [research.md](research.md), [data-model.md](data-model.md),
+[contracts/actions.md](contracts/actions.md), [quickstart.md](quickstart.md). Gate A12-P03 (legacy). Evidence:
+`python3 Tools/python/desktop_runbook.py run-check --stage A12-P03 --timeout 600 --name <check> -- <command>`. Commit
+after every task (no trailers); read every check's exit before ticking. iOS 27 only; no VisualCore change in this phase.
+Precedent: `specs/085-pp-p04-experiments/tasks.md`.
+
+## Phase 1: Setup
+
+- [ ] T-A12-301 Baseline: cite the last evidence on an unchanged `Packages` tree (`.autonomy/checks/A12-P02.{worlds-ios27,app-unit,verify-27}.json`) instead of a rerun (owner ruling of 2026-11-14)
+
+## Phase 2: Foundational — the world document, props and light (stories 1–3)
+
+- [ ] T-A12-302 [US1] Core: new `Packages/ExperiencesCreative/TinyWorlds/Core/{PropCatalog,WorldEditing,WorldLight,WorldDocument}.swift` and changes to `Core/{WorldState,ContentCatalog,LicenseAudit}.swift` per data-model.md and Clarifications Q1–Q4: four props (tree, rock, house, lantern; "at most 2,000 vertices, height ≤ 1.2 m", per-vertex colours from a three-colour prop palette, picking box = bounds, author "VisualCore project", license "MIT", recorded in the catalog and the license audit); `WorldEditing` (place/select/move/rotate/delete with "|x|, |z| ≤ 5.5 m", "ground ≥ 0.05 m above sea level (island, city), ≥ −0.4 m (asteroid garden)", "spacing ≥ 0.6 m", "at most 24 props", refusals a12.prop-cap, a12.outside, a12.under-water, a12.too-close, a12.no-selection, a12.invalid-choice; y snapped to the terrain height; preset or seed change clears props and selection); `WorldLight` ("azimuth 0…360° wrapped, elevation 10…85°, ambient 0.1…0.6", default 30°, 50°, 0.35; unit direction); `WorldState` schema 2 (props, selection, light; sorted-key JSON; schema-1 payloads decode with no props and the default light); `WorldDocument` (name, state; "≤ 64 KB"; refusals damaged, newer-version, too-large). Tests in `Packages/ExperiencesCreative/TinyWorlds/CoreTests/{PropCatalogTests,WorldEditingTests,WorldLightTests,WorldDocumentTests}.swift` and updated `WorldStateTests`, `ContentCatalogTests`, `LicenseAuditTests`: every prop mesh validates within its budget; placement rules and refusals; placed props rest within 1 mm of the terrain; replay of edits gives the same state; light mapping and clamps; document round trip bit-identical for every prop transform (the phase fixture) and refusals; schema-1 decode (FR-A12-301–303, 310, 320, 323; SC-A12-301–303)
+
+## Phase 3: Stories 1–3 in the experience
+
+- [ ] T-A12-303 [US1] Experience: new `Packages/ExperiencesCreative/TinyWorlds/Experience/WorldStore.swift` (slots 0…3, `world-<slot>.json` and `world-<slot>.png` through `ExperienceStorage`, save/read/clear/summaries as `ExperimentStore` does, refusals as `WorldDocument`, a failed write keeps the previous file); `Adapter/WorldsCore.swift` (actions of contracts/actions.md incl. `world.open`; snapshot schema 2 with `MigrationChain` 1 → 2 and a `schemaOneExample()`; camera policy still applied); `WorldsPresenter.swift` (one renderer per prop kind with model matrices through the depth pass; the world light on every renderer; a tap selects the nearest prop whose picking box the ray hits before the ground, else picks the ground; spoken refusals; slot save with a 160 × 120 thumbnail via `renderStill` and `StillImageEncoder` after the document, "no picture" without a context; open and clear); `WorldsControls.swift` (prop kind picker, Place, Select previous/next, Move ±0.5 m in x and z, Rotate ±45°, Delete, light azimuth/elevation/ambient steppers, four slot rows with Save/Open/Clear and thumbnails); `WorldsGestures.swift` (tap routing). Tests in `Packages/ExperiencesCreative/TinyWorlds/ExperienceTests/{WorldStoreTests.swift (new),WorldsEditingTests.swift (new),WorldsCoreTests.swift,WorldsRenderTests.swift}`: store round trip, damaged/truncated/newer/oversized files reported and the world unchanged, an interrupted write keeps the previous file byte-identical, thumbnail written at 160 × 120 and ≤ 64 KB, migration of the schema-1 example, tap selection, every action has a control (`GestureAlternatives.missing` empty), a lit face brighter than after the light moves away (FR-A12-302–303, 310, 320–323; SC-A12-301–305)
+
+## Phase 4: Records
+
+- [ ] T-A12-304 Registration, manifest and documents: `Apps/VisualCore/App/ExperienceRegistry.swift` (the schema-1 example for the migration), `Catalog/registrations.json` (capabilities: props, light, saved worlds); `python3 scripts/build_catalog.py`; regenerate `Packages/ExperiencesCreative/TinyWorlds/scenario-manifest.json` and `docs/apps/tiny-worlds/content-licenses.md` (`UPDATE_SCENARIO_MANIFEST=1 TEST_RUNNER_UPDATE_SCENARIO_MANIFEST=1`) with prop fixtures in `Adapter/WorldsManifest.swift` (place, move, rotate, delete and the refusals)
+- [ ] T-A12-305 Contract `docs/apps/tiny-worlds/visualcore-contract.json`: G-PROPS, G-LIGHT and G-WORLDDOC closed by "A12-P03"; rows M04, M05, M09, M10 updated
+
+## Phase 5: Polish & evidence
+
+- [ ] T-A12-306 Tiny Worlds tests on sim-27.2 (`--name worlds-ios27 -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing TinyWorldsCoreTests TinyWorldsExperienceTests`; each test < 10 s) (SC-A12-301–305)
+- [ ] T-A12-307 App build and unit (`--name app-unit -- python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27`) and runner iOS 27 (`--name verify-27 -- python3 scripts/verify_experiences.py --only a12.tiny-worlds --runtime 27`)
+- [ ] T-A12-308 Experience package check, contract, catalog host tests and script tests (`--name experience-packages -- python3 scripts/check_experience_packages.py`; `--name contract -- python3 scripts/check_app_contract.py --app tiny-worlds --render`; `--name catalog-host -- swift test --package-path Packages/VisualCore --filter "RealCatalogTests|RegistryReportTests|ShellModelTests"`; `--name script-tests -- python3 scripts/test_scripts.py`)
+- [ ] T-A12-309 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A12-P03; update README.md (status, gate count) in the record commit (rule 16)
+
+## Dependencies
+
+T-A12-301 → 302 → 303 → 304 → 305 → Polish.
+
+## Parallel examples
+
+Agent A: T-A12-302. Agent B: T-A12-303 after A. Lead: 304, 305, runs, commits.
+
+## Implementation strategy
+
+MVP: props and the document with the exact-transform fixture (US1, US3), then light, slots and thumbnails; evidence
+last.
