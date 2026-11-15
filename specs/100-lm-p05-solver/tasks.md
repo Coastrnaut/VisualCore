@@ -24,7 +24,7 @@ after every task (no trailers); read every check's exit before ticking. iOS 27 o
 
 ## Phase 5: Records and evidence
 
-- [ ] T-A13-505 Contract `docs/apps/light-maze/visualcore-contract.json`: G-SOLVER closed by "A13-P05"; rows M11 (available) and M20 notes updated (`--name contract -- python3 scripts/check_app_contract.py --app light-maze --render`)
+- [X] T-A13-505 Contract `docs/apps/light-maze/visualcore-contract.json`: G-SOLVER closed by "A13-P05"; rows M11 (available) and M20 notes updated (`--name contract -- python3 scripts/check_app_contract.py --app light-maze --render`) — Verified 2026-11-15: 2026-11-15: G-SOLVER closed by A13-P05; M11 available, M20 notes updated; .autonomy/checks/A13-P05.contract.json exit 0
 - [ ] T-A13-506 Light Maze tests on sim-27.2 (`--name maze-ios27 -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing LightMazeCoreTests LightMazeExperienceTests`) (SC-A13-501–505)
 - [ ] T-A13-507 App build and unit (`--name app-unit -- python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27`) and runner (`--name verify-27 -- python3 scripts/verify_experiences.py --only a13.light-maze --runtime 27`) (SC-A13-505)
 - [ ] T-A13-508 Packages and script tests (`--name experience-packages -- python3 scripts/check_experience_packages.py`; `--name script-tests -- python3 scripts/test_scripts.py`)

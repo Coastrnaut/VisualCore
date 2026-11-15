@@ -617,7 +617,7 @@
       "id": "M11",
       "capability": "Built-in solvability test: a bounded search over the movable tiles' cells and orientations that proves each shipping level solvable and records one solution",
       "source": "v0.1 feature 6: built-in solvability test",
-      "status": "upstream gap",
+      "status": "available",
       "evidence": [
         {
           "file": "Packages/VisualCore/Sources/VisualCoreExperience/StateDigest.swift",
@@ -636,7 +636,7 @@
         "file": "Packages/ExperiencesCreative/NeonArcade/Core/SimulatedPlayer.swift",
         "symbol": "SimulatedPlayer"
       },
-      "notes": "State digests and scenario manifests exist for fixtures and replay (StateDigestTests, ScenarioManifestTests); no graph search or solver exists in any framework product (grep 2026-11-15). The search is specific to the board's rules and stays app-local: G-SOLVER (app-local, A13-P05) runs over G-BOARD's tracer."
+      "notes": "State digests and scenario manifests exist for fixtures and replay (StateDigestTests, ScenarioManifestTests); no graph search or solver exists in any framework product (grep 2026-11-15). The search is specific to the board's rules and stays app-local: G-SOLVER (app-local, A13-P05) runs over G-BOARD's tracer. A13-P05 (G-SOLVER closed): LightMazeCore's Solver searches the turnable tiles' orientations (tiles never move) by increasing turns, lexicographic within, traced with BeamTracer; it reports the first solved set (fewest turns) with the sets examined, unsolvable after 2ⁿ, and refuses invalid boards and more than 16 turnable tiles before tracing; all 20 levels are proven solvable with the recorded solution's turns as the fewest (SolverTests); ContentQA checks every level (unsolvable, wrong-solution, longer-solution, solved-start, no-license) and docs/apps/light-maze/content-qa.md is its committed table (ContentQATests); the drawn beam equals the tracer's segments on 60 boards (MazeBeamFixtureTests)."
     },
     {
       "id": "M12",
@@ -981,7 +981,7 @@
         "file": "Packages/ExperiencesCreative/PhysicsPlayground/Core/LicenseAudit.swift",
         "symbol": "LicenseAudit"
       },
-      "notes": "LicenseInventory and AcknowledgementsView cover third-party notices (AcknowledgementsViewTests; scripts/check_licenses.py audits the built app); per-content author and license fields for levels, palettes and shaders do not exist in a framework product and belong to the experience's content data, as Physics Playground's LicenseAudit does: part of G-LEVELS (app-local, A13-P03), checked again at release QA with G-SOLVER (A13-P05). A13-P03 (G-LEVELS closed): every one of the 20 levels records its author and license and LicenseAudit checks them against the committed content-licenses document (LicenseAuditTests); release QA rechecks with G-SOLVER (A13-P05)."
+      "notes": "LicenseInventory and AcknowledgementsView cover third-party notices (AcknowledgementsViewTests; scripts/check_licenses.py audits the built app); per-content author and license fields for levels, palettes and shaders do not exist in a framework product and belong to the experience's content data, as Physics Playground's LicenseAudit does: part of G-LEVELS (app-local, A13-P03), checked again at release QA with G-SOLVER (A13-P05). A13-P03 (G-LEVELS closed): every one of the 20 levels records its author and license and LicenseAudit checks them against the committed content-licenses document (LicenseAuditTests); release QA rechecks with G-SOLVER (A13-P05). A13-P05: release QA rechecks every level's author and license (ContentQA `no-license`, docs/apps/light-maze/content-qa.md)."
     }
   ],
   "gaps": [
@@ -1076,7 +1076,7 @@
       "justification": "No graph search or solver exists in any framework product. A bounded search over the movable tiles' cells and orientations, using G-BOARD's tracer, that proves each shipping level solvable and records one solution is specific to Light Maze's rules and stays app-local (clarification 5, A13-P05).",
       "phase": 5,
       "test": "Core host tests: every shipping level is proven solvable within the search's node cap and its recorded solution lights every target when replayed; an unsolvable fixture is reported unsolvable; the search is deterministic and refuses boards above the cap",
-      "closed": null
+      "closed": "A13-P05"
     }
   ],
   "traceability": [
