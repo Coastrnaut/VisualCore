@@ -8,7 +8,7 @@ Commit after every task (no trailers); read every check's exit before ticking. i
 
 ## Phase 1: Setup
 
-- [ ] T-A13-601 Baseline: cite the A13-P05 evidence on the unchanged tree (`.autonomy/checks/A13-P05.{maze-ios27,app-unit,verify-27}.json`) instead of a rerun (owner ruling of 2026-11-14)
+- [X] T-A13-601 Baseline: cite the A13-P05 evidence on the unchanged tree (`.autonomy/checks/A13-P05.{maze-ios27,app-unit,verify-27}.json`) instead of a rerun (owner ruling of 2026-11-14) — Verified 2026-11-15: 2026-11-15: cited .autonomy/checks/A13-P05.{maze-ios27,app-unit,verify-27}.json (exit 0) on the unchanged tree (no rerun)
 
 ## Phase 2: Story 1 — nothing leaves the device (P1)
 
