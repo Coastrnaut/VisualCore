@@ -129,7 +129,8 @@ claims accuracy or measured performance.
 
 - **Repeated memory warnings:** stay at the lowest tier; never below it; no rebuild storm (at most one rebuild per tier
   change).
-- **Thermal state flapping:** stepping up waits for a hold time, so the tier changes at most once per hold time.
+- **Thermal state flapping:** the host's quality governor decides at most once per second and steps up only after its
+  hold, so the host level, and with it the tier, changes at most once per second.
 - **Low Power Mode on at launch:** the lowest tier from the first frame.
 - **A thumbnail requested at the lowest tier:** same capped size; drawn at the current tier.
 - **Context loss during a tier change:** rebuilds once, at the new tier.
@@ -154,8 +155,9 @@ claims accuracy or measured performance.
 
 ### Key Entities
 
-- **Tier**: index 0…2, terrain cells, prop draw cap, draw cap, thumbnail size.
-- **Pressure**: memory warning, thermal state, Low Power Mode.
+- **Tier**: index 0…2, terrain cells (columns × rows per preset), draw count (2 + props), thumbnail size (160 × 120).
+- **Pressure**: the host's quality level (thermal state through the host's governor), Low Power Mode, memory warnings
+  (held 30 s of frame time after the last).
 
 ## Success Criteria *(mandatory)*
 
