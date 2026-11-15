@@ -43,7 +43,7 @@ A12 used at A12-P01; `ContentCatalog`/`LicenseAudit` in Tiny Worlds are the cont
   Int? = nil, minimumDistance: Double = 1e-9) -> RayHit2?` returns the nearest hit with distance > minimumDistance
   (`distance`, `point`, `segmentIndex`, `normal` unit and facing the ray); parallel or collinear rays miss; end points
   count as hits; non-finite segments are skipped. `Vec2.reflected(about normal:)` (`d − 2(d·n)n` for a unit normal; a
-  non-unit or zero normal returns the direction unchanged) keeps length; tolerance for the fixture 1e-12 on angles and
+  non-unit normal is normalised first; a zero or non-finite normal returns the direction unchanged) keeps length; tolerance for the fixture 1e-12 on angles and
   lengths. In `VisualCoreMath`, files `Ray2.swift`, tests `Ray2Tests`.
 - Q: Which board geometry and tile rules apply? → A: Cells of 1 unit; board 4…12 × 4…12 cells; at most one tile per
   cell; the beam starts at the emitter cell's centre heading in its direction (east, north, west or south) and travels

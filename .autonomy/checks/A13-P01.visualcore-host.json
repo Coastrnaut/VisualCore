@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/VisualCore",
+    "--filter",
+    "Ray2Tests"
+  ],
+  "command": "swift test --package-path Packages/VisualCore --filter Ray2Tests",
+  "elapsed_seconds": 9.63,
+  "exit_code": 0,
+  "finished": "2026-11-15T17:33:51+00:00",
+  "log": ".autonomy/logs/A13-P01.visualcore-host.log",
+  "log_sha256": "bec4a99f769b01f4738ebd0750db776ba1fe6c88d648588dcbe4e959f8ed6869",
+  "name": "visualcore-host",
+  "stage": "A13-P01",
+  "started": "2026-11-15T17:33:41+00:00",
+  "timed_out": false
+}
