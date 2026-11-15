@@ -1,0 +1,51 @@
+# Tasks: Tiny Worlds — Phase 01 Procedural seed and mesh fixtures
+
+**Input**: [spec.md](spec.md), [plan.md](plan.md), [research.md](research.md), [data-model.md](data-model.md),
+[contracts/api.md](contracts/api.md), [quickstart.md](quickstart.md). Gate A12-P01 (legacy). Evidence:
+`python3 Tools/python/desktop_runbook.py run-check --stage A12-P01 --timeout 600 --name <check> -- <command>`. Commit
+after every task (no trailers); read every check's exit before ticking. iOS 27 only; reference regression and iOS 26 at
+X-A12 (owner, 2026-11-14). Precedent: `specs/082-pp-p01-model/tasks.md`.
+
+## Phase 1: Setup
+
+- [ ] T-A12-101 Baseline: cite the last evidence on an unchanged `Packages` tree (`.autonomy/checks/A12-P00.{app-build,no-change}.json`, `.autonomy/migration/checks/X-A11.*.json`) instead of a rerun (owner ruling of 2026-11-14)
+
+## Phase 2: Foundational — generic terrain (story 2) and the world core (stories 1–4)
+
+- [ ] T-A12-102 [P] [US2] Write `Packages/VisualCore/Tests/VisualCoreScenesTests/{GradientNoise2DTests,HeightFieldTests}.swift` first, then `Packages/VisualCore/Sources/VisualCoreScenes/{GradientNoise2D,HeightField}.swift` per contracts/api.md and research D1–D2 (public with `///` docs). Noise tests: same seed and point give the same value; values in −1…1 over a 64 × 64 sample of points; different seeds differ; zero at lattice points; continuity (|Δvalue| small for a 1e-6 step); `FractalNoise2D` refuses octaves 0 and 9, frequency 0 and non-finite, lacunarity 0.5 and 5, gain −0.1 and 1.1; fractal output in −1…1; committed value fixtures for 3 points × 2 seeds (bit-exact). Height-field tests: counts 0 and 513, cell size 0 and non-finite, a non-finite height refused (`.invalidInput`); grid heights equal the function at grid points; bilinear sampler exact at grid points and clamped outside; a flat field has normals (0, 1, 0); a plane z-slope gives the analytic normal; two fields sharing an edge (origin offset by the first's width) from one function have equal edge heights and normals bit for bit; the mesh has (c + 1)(r + 1) vertices and 6·c·r indices wound CCW from +y (cross product of every triangle has y > 0 on a flat field); budget refusal (`.budget`) before building; mesh digest fixture for one small field; `MeshGenerators.plane` digest unchanged (FR-A12-101–103; SC-A12-102)
+- [ ] T-A12-103 [P] [US1] Create the core target `Packages/ExperiencesCreative/TinyWorlds/Core/{ContentCatalog,LicenseAudit,WorldPreset,TerrainGenerator,WorldView,WorldState}.swift` and `Packages/ExperiencesCreative/TinyWorlds/CoreTests/{ContentCatalogTests,LicenseAuditTests,TerrainGeneratorTests,TerrainFixtureTests,WorldViewTests,WorldStateTests}.swift` per data-model.md and research D3–D4: content records (presets island, asteroid-garden, miniature-city and palettes island, asteroid-garden, miniature-city, each with 3 colours) with author "VisualCore project", license ∈ {"MIT"}, refusal reasons missing-license, unsupported-license, out-of-range, invalid-number, duplicate-id with the valid rest kept; `WorldPreset` recipes of clarification 3 (12 × 12 m, island 64 × 64 cells, asteroid garden 64 × 64 with 6 craters and 8 mounds placed by `SeededRandom(seed)`, miniature city 48 × 48 with 0.35 m terraces; heights within −1…1.6 m); `TerrainGenerator.parts(preset:seed:)` returning the terrain `HeightField` mesh and the optional sea plane with palette colours, within `MeshBudget.default`, and `digest(preset:seed:)`; `WorldView` (yaw wrapped −π…π, "pitch 10°…75°", "distance 10…30 m", orbit and zoom with refusal of non-finite input); `WorldState` schema 1 ("presetIndex 0…2", "seed UInt32", view, generator state; sorted-key JSON; damaged or newer refused). Tests: catalog decode and refusals; audit 0 problems; each preset's terrain is deterministic, within height range and budget; digests for seeds 1, 2, 3 of each preset equal committed fixtures (9) and differ pairwise per preset; view clamps; state round trip and refusals (FR-A12-110–113; SC-A12-101, 104, 105)
+
+## Phase 3: User Story 1 — open a tiny island and look around (P1) 🎯
+
+- [ ] T-A12-104 [US1] Create the experience targets in `Packages/ExperiencesCreative/Package.swift` (`TinyWorldsCore`, `TinyWorldsCoreTests`, `TinyWorldsExperience`, `TinyWorldsExperienceTests` with `resources` only if needed, product `TinyWorldsExperience`) and `Packages/ExperiencesCreative/TinyWorlds/Experience/{Adapter/WorldsCore.swift,WorldsPresenter.swift,WorldsControls.swift,TinyWorldsExperience.swift}`: adapter (ExperienceCore; actions world.preset [0…2], world.seed, view.orbit [Δyaw°, Δpitch° each −180…180], view.zoom [0.5…2], view.reset with code a12.invalid-choice; snapshot schema 1 = `WorldState`; qualityTiers 1; digest covers the state; the terrain digest exposed for fixtures), presenter drawing the world's parts lit with depth through one `DepthMeshPass` and up to three `MeshRenderer`s (light direction and ambient fixed for this slice) with an `OrbitCamera` from the view, built with the host's context only, rebuilt on a terrain-digest change or context recreation and released in teardown, native controls (preset picker, New seed, turn left/right, tilt up/down, zoom in/out, reset view) with VoiceOver labels and values, spoken description (world name, seed, view in words); tests in `Packages/ExperiencesCreative/TinyWorlds/ExperienceTests/{WorldsCoreTests,WorldsSessionTests,WorldsRenderTests,WorldsTestSupport}.swift` (actions and refusals, save/restore identity, damaged and newer payloads refused, suspension changes nothing, drawing does not change the digest, a drawn frame of each preset is non-blank, turning the view changes the frame and not the digest) (FR-A12-120, 121; SC-A12-103)
+
+## Phase 4: Stories 2–4 — registration, fixtures and records
+
+- [ ] T-A12-105 [US3] Register: `Catalog/registrations.json` entry for a12 (summary, capabilities, quality_tiers ["level-0"], palette, manifest), candidate in `Apps/VisualCore/App/ExperienceRegistry.swift`, `project.yml` dependency on the product, `scripts/test_scripts.py` products list, `Packages/VisualCore/Tests/VisualCoreExperienceTests/RealCatalogTests.swift` registrations and the synthetic candidate in `Apps/VisualCore/Tests/Unit/AppModelTests.swift` moved past a12; `python3 scripts/build_catalog.py`; `xcodegen generate --spec project.yml` (FR-A12-122)
+- [ ] T-A12-106 [US2] Write `Packages/ExperiencesCreative/TinyWorlds/Experience/Adapter/WorldsManifest.swift` (nine standard scenarios + nine fixtures `fixture-<preset>-<seed>` per research D5) and generate `Packages/ExperiencesCreative/TinyWorlds/scenario-manifest.json` (`UPDATE_SCENARIO_MANIFEST=1 TEST_RUNNER_UPDATE_SCENARIO_MANIFEST=1`), with `Packages/ExperiencesCreative/TinyWorlds/ExperienceTests/WorldsManifestTests.swift` (FR-A12-112, 122; SC-A12-101, 106)
+- [ ] T-A12-107 [US2] VisualCore records: `Packages/VisualCore/README.md` (terrain section), API baseline (`python3 scripts/check_public_api.py --update`) and the contract `docs/apps/tiny-worlds/visualcore-contract.json` (G-TERRAIN and G-CONTENTLICENSES closed by "A12-P01"; rows M03, M08, M14, M21 updated with the new evidence) (FR-A12-103)
+- [ ] T-A12-108 [US4] Generate `docs/apps/tiny-worlds/content-licenses.md` from `LicenseAudit.markdown(.bundled)` with a test in `Packages/ExperiencesCreative/TinyWorlds/CoreTests/LicenseAuditTests.swift` that the document lists every record; link it from `docs/apps/tiny-worlds/README.md` (FR-A12-113; SC-A12-104)
+
+## Phase 5: Polish & evidence
+
+- [ ] T-A12-109 VisualCore host tests (`--name visualcore-host -- swift test --package-path Packages/VisualCore --filter "GradientNoise2DTests|HeightFieldTests"`) and public API (`--name public-api -- python3 scripts/check_public_api.py`) (SC-A12-102)
+- [ ] T-A12-110 Tiny Worlds tests on sim-27.2 (`--name worlds-ios27 -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing TinyWorldsCoreTests TinyWorldsExperienceTests`; each test < 10 s) (SC-A12-101–106)
+- [ ] T-A12-111 App build and unit (`--name app-unit -- python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27`)
+- [ ] T-A12-112 Runner iOS 27 (`--name verify-27 -- python3 scripts/verify_experiences.py --only a12.tiny-worlds --runtime 27`) (SC-A12-106)
+- [ ] T-A12-113 Experience package check, contract and script tests (`--name experience-packages -- python3 scripts/check_experience_packages.py`; `--name contract -- python3 scripts/check_app_contract.py --app tiny-worlds --render`; `--name script-tests -- python3 scripts/test_scripts.py`)
+- [ ] T-A12-114 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A12-P01; update README.md (status, gate count) in the record commit (rule 16)
+
+## Dependencies
+
+T-A12-101 → (102 ∥ 103) → 104 (needs 102, 103) → 105 → 106 → (107 ∥ 108) → Polish. 103 builds against
+contracts/api.md for the terrain calls and compiles once 102 lands.
+
+## Parallel examples
+
+Agent A: T-A12-102. Agent B: T-A12-103. Agent C: T-A12-104 experience files and tests after A and B. Lead:
+Package.swift, 105, 106 regeneration, 107, 108, runs, commits.
+
+## Implementation strategy
+
+MVP: noise, height field and the preset terrains with fixtures (US2 and US1's rules), then the drawn world,
+registration, manifest and records; evidence last.
