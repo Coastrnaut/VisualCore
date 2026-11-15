@@ -416,6 +416,67 @@
           "action" : {
             "control" : "level.select",
             "values" : [
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "tile.select",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "tile.turn",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "tile.select",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "tile.turn",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "37d602a78af7f294950734742173e9de968491a6b788b778c0a7deab2fde07f4",
+        "initialDigest" : "f4eec244ab5b55ffe7f4675699d8647d5293feb8c4dcd2d5444a6540a3db25d2",
+        "outcome" : "level-solved"
+      },
+      "name" : "fixture-lm-05",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "level.select",
+            "values" : [
               9
             ]
           },
@@ -529,6 +590,67 @@
         "outcome" : "level-solved"
       },
       "name" : "fixture-lm-10",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "level.select",
+            "values" : [
+              15
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "tile.select",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "tile.turn",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "tile.select",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "tile.turn",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "159bc8b44b393b4d03fde865b24e83d49d94a03cb5ae765601a84364ee167424",
+        "initialDigest" : "f4eec244ab5b55ffe7f4675699d8647d5293feb8c4dcd2d5444a6540a3db25d2",
+        "outcome" : "level-solved"
+      },
+      "name" : "fixture-lm-16",
       "seed" : "1"
     },
     {

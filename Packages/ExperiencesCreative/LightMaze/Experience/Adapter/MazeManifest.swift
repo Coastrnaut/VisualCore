@@ -1,7 +1,7 @@
 // MazeManifest — feature 096 (A13-P01) T-A13-106 (FR-A13-113, FR-A13-122; SC-A13-103, SC-A13-106). The scenarios the
 // verification runner plays for Light Maze, all short (owner rule of 2026-11-13):
 //   - the nine standard scenarios, prepared with seed 1 (every seed opens the first level);
-//   - three fixtures `fixture-lm-01`, `fixture-lm-10` and `fixture-lm-20` that solve levels 1, 10 and 20 by actions:
+//   - five fixtures `fixture-lm-01`, `-05`, `-10`, `-16` and `-20` that solve levels 1, 5, 10, 16 and 20 by actions:
 //     `level.select` of the level, then for every turnable tile whose recorded solution differs from its starting
 //     orientation `tile.select` of that tile and `tile.turn`. The final digest is pinned by ``solvedFixtures``
 //     (committed values; `MazeManifestTests` proves each equal to the derived digest, the played core solved and its
@@ -26,7 +26,9 @@ extension MazeCore {
     /// 20 by ``fixtureEntries(level:)`` from the first state, by level index (0, 9, 19).
     public static let solvedFixtures: [(level: Int, digest: String)] = [
         (0, "5b1647722de8398753bb2b7632d10df7a7f770182255246bc68a535a49e182be"),
+        (4, "37d602a78af7f294950734742173e9de968491a6b788b778c0a7deab2fde07f4"),
         (9, "76571f7d393e11f964ecca92b965f906aedf8c6e49a3d7df19a941d806720a0f"),
+        (15, "159bc8b44b393b4d03fde865b24e83d49d94a03cb5ae765601a84364ee167424"),
         (19, "3f2c1f9126b4ebadd66a75cd5f3faff5349cc5e5de5676e8db1cdae10f9c46e5"),
     ]
 

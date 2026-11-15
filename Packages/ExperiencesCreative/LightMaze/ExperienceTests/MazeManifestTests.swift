@@ -1,5 +1,5 @@
 // MazeManifestTests — feature 096 (A13-P01) T-A13-106 (FR-A13-113, FR-A13-122; SC-A13-103, SC-A13-106). The scenario
-// manifest of Light Maze: valid with the nine standard scenarios, the three fixtures `fixture-lm-01`, `fixture-lm-10`
+// manifest of Light Maze: valid with the nine standard scenarios, the five fixtures `fixture-lm-01`, `-05`, `-10`, `-16`
 // and `fixture-lm-20` and the three refusal scenarios; its derived digests and expected results equal to what the
 // engine gives when the runner plays them; every fixture solving its level by the recorded solution with the committed
 // final digest; and the committed `scenario-manifest.json` equal to the Swift manifest (`UPDATE_SCENARIO_MANIFEST=1`,
@@ -30,8 +30,8 @@ private func play(_ spec: ScenarioSpec) async throws -> (initial: String, result
 }
 
 @Suite struct MazeManifestTests {
-    /// The names of the three fixtures.
-    static let fixtureNames = ["fixture-lm-01", "fixture-lm-10", "fixture-lm-20"]
+    /// The names of the five fixtures.
+    static let fixtureNames = ["fixture-lm-01", "fixture-lm-05", "fixture-lm-10", "fixture-lm-16", "fixture-lm-20"]
     /// The names of the three refusal scenarios.
     static let refusalNames = ["refusal-level-out-of-range", "refusal-level-before-first",
                                "refusal-turn-without-selection"]
@@ -39,7 +39,7 @@ private func play(_ spec: ScenarioSpec) async throws -> (initial: String, result
     @Test func theManifestIsValidWithTheStandardScenariosThreeFixturesAndThreeRefusals() {
         let manifest = MazeCore.manifest(for: id)
         let problems = ScenarioManifestValidator.problems(manifest, controls: MazeCore.controls,
-                                                          content: ContentRequirement(fixtures: 3))
+                                                          content: ContentRequirement(fixtures: 5))
         #expect(problems.isEmpty, "\(problems)")
         #expect(manifest.scenarios.map(\.name)
                 == ScenarioManifest.standardNames + Self.fixtureNames + Self.refusalNames)
@@ -78,8 +78,8 @@ private func play(_ spec: ScenarioSpec) async throws -> (initial: String, result
 
     @Test func everyFixtureSolvesItsLevelWithTheCommittedDigest() async throws {
         let manifest = MazeCore.manifest(for: id)
-        #expect(MazeCore.solvedFixtures.map(\.level) == [0, 9, 19])
-        #expect(Set(MazeCore.solvedFixtures.map(\.digest)).count == 3)
+        #expect(MazeCore.solvedFixtures.map(\.level) == [0, 4, 9, 15, 19])
+        #expect(Set(MazeCore.solvedFixtures.map(\.digest)).count == 5)
         for fixture in MazeCore.solvedFixtures {
             let name = MazeCore.fixtureName(level: fixture.level)
             let spec = try #require(manifest.scenarios.first { $0.name == name })
