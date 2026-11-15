@@ -150,3 +150,242 @@ struct ImpulseSolverTests {
         #expect(s.iterations == 10 && s.restitutionThreshold == 0.5 && s.slop == 0.005 && s.correction == 0.8)
     }
 }
+
+// Warm starting — feature 083 (A11-P02) T-A11-202 (FR-A11-203, 204; SC-A11-204; contract specs/083-pp-p02-springs/
+// contracts/api.md; research D3). Without stored impulses the inout solve equals the Phase 01 solve bit for bit (a
+// verbatim reference copy of the Phase 01 algorithm below); the accumulated impulses are written back; stored impulses
+// of the wrong count are ignored; five boxes stacked on a static floor stay standing for 1,200 ticks.
+
+/// The Phase 01 (feature 082) solve, copied verbatim apart from names, as the reference for the cold start.
+private func phaseOneSolve(_ bodies: inout [RigidBodyState2D], contacts: [Contact2D],
+                           settings: ImpulseSolver2D.Settings = .init()) {
+    struct Point {
+        var a: Int, b: Int, rA: Vec2, rB: Vec2, normal: Vec2, tangent: Vec2, normalMass: Double, tangentMass: Double
+        var bias: Double, friction: Double, normalImpulse = 0.0, tangentImpulse = 0.0
+    }
+    func cross(_ w: Double, _ r: Vec2) -> Vec2 { Vec2(-w * r.y, w * r.x) }
+    func relative(_ bA: RigidBodyState2D, _ bB: RigidBodyState2D, _ rA: Vec2, _ rB: Vec2) -> Vec2 {
+        bB.velocity + cross(bB.angularVelocity, rB) - bA.velocity - cross(bA.angularVelocity, rA)
+    }
+    func usableNormal(_ c: Contact2D) -> Vec2? {
+        let range = bodies.indices
+        guard c.a != c.b, range.contains(c.a), range.contains(c.b), bodies[c.a].isUsable, bodies[c.b].isUsable,
+              c.manifold.normal.isFinite, c.manifold.depth.isFinite else { return nil }
+        let length = c.manifold.normal.length
+        guard length.isFinite, length > 0 else { return nil }
+        return c.manifold.normal / length
+    }
+    func apply(_ p: Vec2, _ point: Point) {
+        let bA = bodies[point.a], bB = bodies[point.b]
+        let va = bA.velocity - p * bA.inverseMass
+        let wa = bA.angularVelocity - bA.inverseInertia * point.rA.cross(p)
+        let vb = bB.velocity + p * bB.inverseMass
+        let wb = bB.angularVelocity + bB.inverseInertia * point.rB.cross(p)
+        guard va.isFinite, wa.isFinite, vb.isFinite, wb.isFinite else { return }
+        bodies[point.a].velocity = va
+        bodies[point.a].angularVelocity = wa
+        bodies[point.b].velocity = vb
+        bodies[point.b].angularVelocity = wb
+    }
+    var points: [Point] = []
+    for contact in contacts {
+        guard let normal = usableNormal(contact) else { continue }
+        let bA = bodies[contact.a], bB = bodies[contact.b]
+        let tangent = Vec2(-normal.y, normal.x)
+        let e = max(bA.restitution, bB.restitution)
+        let mu = (max(bA.friction, 0) * max(bB.friction, 0)).squareRoot()
+        for p in contact.manifold.points where p.isFinite {
+            let rA = p - bA.position, rB = p - bB.position
+            let rnA = rA.cross(normal), rnB = rB.cross(normal)
+            let kN = bA.inverseMass + bB.inverseMass + bA.inverseInertia * rnA * rnA + bB.inverseInertia * rnB * rnB
+            guard kN.isFinite, kN > 0 else { continue }
+            let rtA = rA.cross(tangent), rtB = rB.cross(tangent)
+            let kT = bA.inverseMass + bB.inverseMass + bA.inverseInertia * rtA * rtA + bB.inverseInertia * rtB * rtB
+            let vn = relative(bA, bB, rA, rB).dot(normal)
+            var bias = -vn > settings.restitutionThreshold ? -e * vn : 0
+            if !bias.isFinite { bias = 0 }
+            points.append(Point(a: contact.a, b: contact.b, rA: rA, rB: rB, normal: normal, tangent: tangent,
+                                normalMass: kN, tangentMass: kT.isFinite ? kT : 0, bias: bias,
+                                friction: mu.isFinite ? mu : 0))
+        }
+    }
+    for _ in 0..<max(settings.iterations, 0) {
+        for i in points.indices {
+            var point = points[i]
+            let vn = relative(bodies[point.a], bodies[point.b], point.rA, point.rB).dot(point.normal)
+            let lambdaN = (-vn + point.bias) / point.normalMass
+            if lambdaN.isFinite {
+                let newImpulse = max(point.normalImpulse + lambdaN, 0)
+                let delta = newImpulse - point.normalImpulse
+                point.normalImpulse = newImpulse
+                apply(point.normal * delta, point)
+            }
+            if point.tangentMass > 0 {
+                let vt = relative(bodies[point.a], bodies[point.b], point.rA, point.rB).dot(point.tangent)
+                let lambdaT = -vt / point.tangentMass
+                if lambdaT.isFinite {
+                    let limit = point.friction * point.normalImpulse
+                    let newImpulse = min(max(point.tangentImpulse + lambdaT, -limit), limit)
+                    let delta = newImpulse - point.tangentImpulse
+                    point.tangentImpulse = newImpulse
+                    apply(point.tangent * delta, point)
+                }
+            }
+            points[i] = point
+        }
+    }
+    for contact in contacts {
+        guard let normal = usableNormal(contact) else { continue }
+        let invA = bodies[contact.a].inverseMass, invB = bodies[contact.b].inverseMass
+        let sum = invA + invB
+        guard sum > 0 else { continue }
+        let amount = settings.correction * max(contact.manifold.depth - settings.slop, 0) / sum
+        guard amount.isFinite, amount > 0 else { continue }
+        let xa = bodies[contact.a].position - normal * (amount * invA)
+        let xb = bodies[contact.b].position + normal * (amount * invB)
+        guard xa.isFinite, xb.isFinite else { continue }
+        bodies[contact.a].position = xa
+        bodies[contact.b].position = xb
+    }
+}
+
+/// A seeded scene of overlapping circles and boxes with every pairwise contact.
+private func seededScene(_ seed: UInt64) -> (bodies: [RigidBodyState2D], shapes: [Shape2D], contacts: [Contact2D]) {
+    var random = SeededRandom(seed: seed)
+    var bodies: [RigidBodyState2D] = [], shapes: [Shape2D] = []
+    for i in 0..<10 {
+        let shape: Shape2D = i % 2 == 0 ? .circle(radius: random.range(0.2...0.6))
+            : .box(halfExtents: Vec2(random.range(0.2...0.6), random.range(0.2...0.6)))
+        shapes.append(shape)
+        let isStatic = i == 0
+        bodies.append(RigidBodyState2D(position: Vec2(random.range(0...3), random.range(0...3)),
+                                       angle: random.range(-1...1),
+                                       velocity: Vec2(random.range(-3...3), random.range(-3...3)),
+                                       angularVelocity: random.range(-2...2), inverseMass: isStatic ? 0 : random.range(0.2...3),
+                                       inverseInertia: isStatic ? 0 : random.range(0.5...6),
+                                       restitution: random.range(0...1), friction: random.range(0...1)))
+    }
+    var contacts: [Contact2D] = []
+    for a in bodies.indices {
+        for b in bodies.indices where b > a {
+            if let m = Contacts2D.collide(shapes[a], Pose2D(position: bodies[a].position, angle: bodies[a].angle),
+                                          shapes[b], Pose2D(position: bodies[b].position, angle: bodies[b].angle)) {
+                contacts.append(Contact2D(a: a, b: b, manifold: m))
+            }
+        }
+    }
+    return (bodies, shapes, contacts)
+}
+
+struct ImpulseSolver2DTests {
+    @Test func coldStartEqualsPhaseOneExactly() {
+        for seed in UInt64(1)...20 {
+            let scene = seededScene(seed)
+            var reference = scene.bodies, plain = scene.bodies, warm = scene.bodies
+            phaseOneSolve(&reference, contacts: scene.contacts)
+            ImpulseSolver2D.solve(&plain, contacts: scene.contacts)
+            var contacts = scene.contacts
+            ImpulseSolver2D.solve(&warm, contacts: &contacts)
+            #expect(plain == reference)
+            #expect(warm == reference)
+            // The manifolds are untouched and the impulses are written back, one per point.
+            #expect(contacts.map(\.manifold) == scene.contacts.map(\.manifold))
+            for c in contacts {
+                #expect(c.normalImpulses.count == c.manifold.points.count)
+                #expect(c.tangentImpulses.count == c.manifold.points.count)
+                #expect(c.normalImpulses.allSatisfy { $0 >= 0 && $0.isFinite })
+            }
+        }
+    }
+
+    @Test func storedImpulsesWithTheWrongCountAreIgnored() throws {
+        let scene = seededScene(7)
+        let first = try #require(scene.contacts.first)
+        var reference = scene.bodies
+        phaseOneSolve(&reference, contacts: scene.contacts)
+        var contacts = scene.contacts
+        contacts[0] = Contact2D(a: first.a, b: first.b, manifold: first.manifold,
+                                normalImpulses: Array(repeating: 5, count: first.manifold.points.count + 1),
+                                tangentImpulses: [])
+        var bodies = scene.bodies
+        ImpulseSolver2D.solve(&bodies, contacts: &contacts)
+        #expect(bodies == reference)
+    }
+
+    @Test func restingContactKeepsItsImpulse() throws {
+        // A crate resting on the floor: the second solve, warm-started, ends with the same supporting impulse and the
+        // crate at rest; ignored contacts get empty arrays.
+        let floorShape = Shape2D.box(halfExtents: Vec2(5, 0.5)), crateShape = Shape2D.box(halfExtents: Vec2(0.5, 0.5))
+        let g = 9.81, dt = 1.0 / 120
+        var bodies = [RigidBodyState2D(position: Vec2(0, -0.5), angle: 0, velocity: .zero, angularVelocity: 0,
+                                       inverseMass: 0, inverseInertia: 0, restitution: 0, friction: 0.5),
+                      RigidBodyState2D(position: Vec2(0, 0.5), angle: 0, velocity: .zero, angularVelocity: 0,
+                                       inverseMass: 0.5, inverseInertia: 3, restitution: 0, friction: 0.5)]
+        let m = try #require(Contacts2D.collide(floorShape, Pose2D(position: bodies[0].position), crateShape,
+                                                Pose2D(position: bodies[1].position)))
+        var contacts = [Contact2D(a: 0, b: 1, manifold: m), Contact2D(a: 0, b: 0, manifold: m)]
+        var residuals: [Double] = []
+        var totals: [Double] = []
+        for _ in 0..<3 {
+            bodies[1].velocity.y -= g * dt
+            ImpulseSolver2D.solve(&bodies, contacts: &contacts)
+            residuals.append(abs(bodies[1].velocity.y))
+            totals.append(contacts[0].normalImpulses.reduce(0, +))
+        }
+        // The cold first solve leaves a small residual; warm-started solves converge further.
+        #expect(residuals[0] <= 1e-5)
+        #expect(residuals[1] < residuals[0] && residuals[2] <= 1e-8)
+        // The accumulated normal impulse supports the weight impulse m·g·dt (mass 2).
+        for total in totals { #expect(abs(total - 2 * g * dt) <= 1e-5) }
+        #expect(contacts[1].normalImpulses.isEmpty && contacts[1].tangentImpulses.isEmpty)
+    }
+
+    @Test func fiveBoxStackStandsWithWarmStarting() {
+        // Five 0.5 m boxes of 0.15 kg (density 0.6 kg/m²), friction 0.5, restitution 0, on a static floor whose top is
+        // at y = 0; gravity −9.81 m/s², dt = 1/120 s, 1,200 ticks: gravity → contacts (broad phase over all pairs) →
+        // warm-started solve (previous impulses matched by pair and point index) → integrate.
+        let dt = 1.0 / 120, g = -9.81
+        let half = 0.25, mass = 0.6 * 0.25
+        let crate = Shape2D.box(halfExtents: Vec2(half, half))
+        var shapes: [Shape2D] = [.box(halfExtents: Vec2(5, 0.5))]
+        var bodies = [RigidBodyState2D(position: Vec2(0, -0.5), angle: 0, velocity: .zero, angularVelocity: 0,
+                                       inverseMass: 0, inverseInertia: 0, restitution: 0, friction: 0.5)]
+        for i in 0..<5 {
+            shapes.append(crate)
+            bodies.append(RigidBodyState2D(position: Vec2(0, half + 0.5 * Double(i)), angle: 0, velocity: .zero,
+                                           angularVelocity: 0, inverseMass: 1 / mass,
+                                           inverseInertia: 1 / crate.inertia(mass: mass), restitution: 0,
+                                           friction: 0.5))
+        }
+        let resting = bodies.map(\.position.y)
+        var previous: [BroadPhasePair2D: Contact2D] = [:]
+        var worstSink = 0.0, worstDrift = 0.0
+        for _ in 0..<1_200 {
+            for i in bodies.indices where bodies[i].inverseMass > 0 { bodies[i].velocity.y += g * dt }
+            let poses = bodies.map { Pose2D(position: $0.position, angle: $0.angle) }
+            let boxes = shapes.indices.map { shapes[$0].bounds(at: poses[$0]) }
+            var contacts: [Contact2D] = []
+            for pair in BroadPhase2D.pairs(boxes) {
+                guard let m = Contacts2D.collide(shapes[pair.a], poses[pair.a], shapes[pair.b], poses[pair.b])
+                else { continue }
+                var contact = Contact2D(a: pair.a, b: pair.b, manifold: m)
+                if let old = previous[pair], old.normalImpulses.count == m.points.count {
+                    contact.normalImpulses = old.normalImpulses
+                    contact.tangentImpulses = old.tangentImpulses
+                }
+                contacts.append(contact)
+            }
+            ImpulseSolver2D.solve(&bodies, contacts: &contacts)
+            previous = Dictionary(uniqueKeysWithValues: contacts.map { (BroadPhasePair2D(a: $0.a, b: $0.b), $0) })
+            for i in bodies.indices where bodies[i].inverseMass > 0 {
+                bodies[i].position += bodies[i].velocity * dt
+                bodies[i].angle += bodies[i].angularVelocity * dt
+            }
+            for i in 1..<bodies.count { worstSink = max(worstSink, abs(bodies[i].position.y - resting[i])) }
+            worstDrift = max(worstDrift, abs(bodies[5].position.x))
+        }
+        #expect(worstDrift < 0.02, "top box horizontal drift \(worstDrift) m")
+        #expect(worstSink < 0.01, "largest height deviation \(worstSink) m")
+        for b in bodies { #expect(b.position.isFinite && b.velocity.isFinite) }
+    }
+}

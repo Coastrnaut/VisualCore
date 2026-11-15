@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/VisualCore",
+    "--filter",
+    "Springs2DTests|BroadPhase2DTests|ImpulseSolver2DTests|Contacts2DTests"
+  ],
+  "command": "swift test --package-path Packages/VisualCore --filter 'Springs2DTests|BroadPhase2DTests|ImpulseSolver2DTests|Contacts2DTests'",
+  "elapsed_seconds": 3.049,
+  "exit_code": 0,
+  "finished": "2026-11-15T06:55:23+00:00",
+  "log": ".autonomy/logs/A11-P02.visualcore-host-1.log",
+  "log_sha256": "e0befc079a6cd51544c31dc21bfd2abde045ba56bcb1cd4881dd923d550de27e",
+  "name": "visualcore-host-1",
+  "stage": "A11-P02",
+  "started": "2026-11-15T06:55:20+00:00",
+  "timed_out": false
+}

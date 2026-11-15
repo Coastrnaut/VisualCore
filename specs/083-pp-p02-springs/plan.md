@@ -8,7 +8,7 @@ Close G-SPRINGS and G-BROADPHASE upstream in `VisualCoreSimulation`: `SpringAnch
 (impulses with stiffness and damping clamped to the stable bound for the tick), `AABB2D` and `Shape2D.bounds(at:)`,
 `BroadPhase2D.pairs` (sweep and prune, equal to brute force) and warm starting in `ImpulseSolver2D` (stored impulses on
 `Contact2D`, an `inout` solve; the Phase 01 solve unchanged). In the experience: world schema 2 (springs, gravity, drag
-and stiffness levels) with the 1 → 2 migration, the tick order gravity and drag → springs → broad-phase contacts with
+and stiffness levels) with the 1 → 2 migration, the tick order springs → gravity and drag → broad-phase contacts (research D1) with
 a warm-start cache → solve → integrate, the starting scene's hanging box and joined circles, spring drawing, three new
 actions and controls, and the new fixtures. Research: [research.md](research.md). Data: [data-model.md](data-model.md).
 API: [contracts/api.md](contracts/api.md).

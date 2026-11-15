@@ -2,7 +2,9 @@
 // two bodies and `ImpulseSolver2D.solve` with restitution, Coulomb friction and a positional correction (feature 082
 // (A11-P01) T-A11-102 (FR-A11-102); contract specs/082-pp-p01-model/contracts/api.md; research D2). The solver is pure
 // and deterministic (fixed order), never divides by zero, never writes a non-finite value and never moves a body whose
-// inverse mass and inverse inertia are both 0.
+// inverse mass and inverse inertia are both 0. Warm starting (feature 083 (A11-P02) T-A11-202 (FR-A11-203); contract
+// specs/083-pp-p02-springs/contracts/api.md; research D3): a contact may carry the accumulated impulses of the previous
+// step, which the `inout` solve applies first and writes back; without stored impulses it is the Phase 01 cold start.
 import Foundation
 import VisualCoreMath
 
@@ -55,12 +57,28 @@ public struct Contact2D: Sendable, Equatable {
     public var b: Int
     /// The contact manifold; its normal points from body `a` to body `b`.
     public var manifold: ContactManifold2D
+    /// Accumulated normal impulse per manifold point from a previous solve (warm start); empty means a cold start.
+    /// Used only when its count equals the manifold's point count.
+    public var normalImpulses: [Double] = []
+    /// Accumulated friction impulse per manifold point from a previous solve (warm start); empty means a cold start.
+    /// Used only when its count equals the manifold's point count.
+    public var tangentImpulses: [Double] = []
 
-    /// Creates a contact between body `a` and body `b`.
+    /// Creates a contact between body `a` and body `b` without stored impulses (cold start).
     public init(a: Int, b: Int, manifold: ContactManifold2D) {
         self.a = a
         self.b = b
         self.manifold = manifold
+    }
+
+    /// Creates a contact between body `a` and body `b` carrying the accumulated normal and tangent impulses per
+    /// manifold point of a previous solve, for warm starting.
+    public init(a: Int, b: Int, manifold: ContactManifold2D, normalImpulses: [Double], tangentImpulses: [Double]) {
+        self.a = a
+        self.b = b
+        self.manifold = manifold
+        self.normalImpulses = normalImpulses
+        self.tangentImpulses = tangentImpulses
     }
 }
 
@@ -89,6 +107,8 @@ public enum ImpulseSolver2D {
 
     /// Per-point solver data captured before the iterations.
     private struct Point {
+        var contact: Int
+        var index: Int
         var a: Int
         var b: Int
         var rA: Vec2
@@ -125,35 +145,53 @@ public enum ImpulseSolver2D {
     }
 
     /// Applies impulse `p` at offsets `rA`, `rB`: −p to body a and +p to body b. Nothing changes if any result would
-    /// not be finite.
-    private static func apply(_ p: Vec2, _ point: Point, _ bodies: inout [RigidBodyState2D]) {
+    /// not be finite; the result says whether the impulse was applied.
+    @discardableResult
+    private static func apply(_ p: Vec2, _ point: Point, _ bodies: inout [RigidBodyState2D]) -> Bool {
         let bodyA = bodies[point.a], bodyB = bodies[point.b]
         let va = bodyA.velocity - p * bodyA.inverseMass
         let wa = bodyA.angularVelocity - bodyA.inverseInertia * point.rA.cross(p)
         let vb = bodyB.velocity + p * bodyB.inverseMass
         let wb = bodyB.angularVelocity + bodyB.inverseInertia * point.rB.cross(p)
-        guard va.isFinite, wa.isFinite, vb.isFinite, wb.isFinite else { return }
+        guard va.isFinite, wa.isFinite, vb.isFinite, wb.isFinite else { return false }
         bodies[point.a].velocity = va
         bodies[point.a].angularVelocity = wa
         bodies[point.b].velocity = vb
         bodies[point.b].angularVelocity = wb
+        return true
     }
 
     /// Resolves `contacts` on `bodies`: `settings.iterations` sequential passes over every contact point accumulating a
     /// non-negative normal impulse (with the restitution bias −e·vₙ captured once when the closing speed exceeds
     /// `restitutionThreshold`, e = max(eA, eB)) and a friction impulse clamped to ±μ·Pₙ (μ = √(μA·μB)); then one
     /// positional pass that moves each body by its inverse-mass share of `correction`·max(depth − `slop`, 0) along the
-    /// normal. Contacts with out-of-range or equal indices, unusable bodies or a degenerate normal are ignored.
+    /// normal. Contacts with out-of-range or equal indices, unusable bodies or a degenerate normal are ignored. Stored
+    /// impulses in the contacts are used as a warm start (see `solve(_:contacts:settings:)` with `inout` contacts);
+    /// without them the result is the Phase 01 cold start.
     public static func solve(_ bodies: inout [RigidBodyState2D], contacts: [Contact2D],
                              settings: Settings = Settings()) {
+        var copy = contacts
+        solve(&bodies, contacts: &copy, settings: settings)
+    }
+
+    /// Resolves `contacts` on `bodies` like `solve(_:contacts:settings:)` with warm starting: for each contact whose
+    /// stored `normalImpulses` and `tangentImpulses` both have one value per manifold point, the stored impulses
+    /// (normal clamped ≥ 0, friction to ±μ·Pₙ, non-finite values read as 0) are applied first and the iterations start
+    /// from them; the restitution bias is still taken from the velocities before the warm start. Afterwards every
+    /// contact holds the accumulated normal and tangent impulse per manifold point (0 for a skipped point; empty for
+    /// an ignored contact).
+    public static func solve(_ bodies: inout [RigidBodyState2D], contacts: inout [Contact2D],
+                             settings: Settings = Settings()) {
         var points: [Point] = []
-        for contact in contacts {
+        var used = Array(repeating: false, count: contacts.count)
+        for (contactIndex, contact) in contacts.enumerated() {
             guard let normal = usableNormal(contact, bodies) else { continue }
+            used[contactIndex] = true
             let bodyA = bodies[contact.a], bodyB = bodies[contact.b]
             let tangent = Vec2(-normal.y, normal.x)
             let e = max(bodyA.restitution, bodyB.restitution)
             let mu = (max(bodyA.friction, 0) * max(bodyB.friction, 0)).squareRoot()
-            for p in contact.manifold.points where p.isFinite {
+            for (pointIndex, p) in contact.manifold.points.enumerated() where p.isFinite {
                 let rA = p - bodyA.position, rB = p - bodyB.position
                 let rnA = rA.cross(normal), rnB = rB.cross(normal)
                 let kN = bodyA.inverseMass + bodyB.inverseMass
@@ -165,9 +203,28 @@ public enum ImpulseSolver2D {
                 let vn = relativeVelocity(bodyA, bodyB, rA, rB).dot(normal)
                 var bias = -vn > settings.restitutionThreshold ? -e * vn : 0
                 if !bias.isFinite { bias = 0 }
-                points.append(Point(a: contact.a, b: contact.b, rA: rA, rB: rB, normal: normal, tangent: tangent,
+                points.append(Point(contact: contactIndex, index: pointIndex, a: contact.a, b: contact.b, rA: rA, rB: rB, normal: normal, tangent: tangent,
                                     normalMass: kN, tangentMass: kT.isFinite ? kT : 0, bias: bias,
                                     friction: mu.isFinite ? mu : 0))
+            }
+        }
+
+        // Warm start: apply the stored impulses after every bias has been captured from the cold velocities.
+        for i in points.indices {
+            let contact = contacts[points[i].contact]
+            let count = contact.manifold.points.count
+            guard contact.normalImpulses.count == count, contact.tangentImpulses.count == count else { continue }
+            let storedN = contact.normalImpulses[points[i].index], storedT = contact.tangentImpulses[points[i].index]
+            let normalImpulse = storedN.isFinite ? max(storedN, 0) : 0
+            let limit = points[i].friction * normalImpulse
+            let tangentImpulse = storedT.isFinite && points[i].tangentMass > 0 ? min(max(storedT, -limit), limit) : 0
+            guard normalImpulse != 0 || tangentImpulse != 0 else { continue }
+            let p = points[i].normal * normalImpulse + points[i].tangent * tangentImpulse
+            guard p.isFinite else { continue }
+            // `apply` leaves the bodies unchanged when a result would not be finite; then nothing is accumulated.
+            if apply(p, points[i], &bodies) {
+                points[i].normalImpulse = normalImpulse
+                points[i].tangentImpulse = tangentImpulse
             }
         }
 
@@ -197,6 +254,17 @@ public enum ImpulseSolver2D {
                 }
                 points[i] = point
             }
+        }
+
+        // Write the accumulated impulses back, one per manifold point.
+        for c in contacts.indices {
+            let count = used[c] ? contacts[c].manifold.points.count : 0
+            contacts[c].normalImpulses = Array(repeating: 0, count: count)
+            contacts[c].tangentImpulses = Array(repeating: 0, count: count)
+        }
+        for point in points {
+            contacts[point.contact].normalImpulses[point.index] = point.normalImpulse
+            contacts[point.contact].tangentImpulses[point.index] = point.tangentImpulse
         }
 
         for contact in contacts {

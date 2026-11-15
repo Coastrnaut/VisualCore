@@ -259,3 +259,21 @@ public enum Contacts2D {
         return ContactManifold2D(normal: normal, depth: depth, points: Array(points.prefix(2)))
     }
 }
+
+// Bounds for the broad phase (feature 083 (A11-P02) T-A11-202 (FR-A11-202); research D2).
+extension Shape2D {
+    /// The axis-aligned bounds of the shape placed at `pose`: centre ± r for a circle; for a box the extents of its
+    /// rotated corners, centre ± (|cos θ|·hx + |sin θ|·hy, |sin θ|·hx + |cos θ|·hy). A non-finite pose or size gives
+    /// non-finite bounds, which never pair in `BroadPhase2D`.
+    public func bounds(at pose: Pose2D) -> AABB2D {
+        let extent: Vec2
+        switch self {
+        case .circle(let radius):
+            extent = Vec2(radius, radius)
+        case .box(let h):
+            let c = abs(cos(pose.angle)), s = abs(sin(pose.angle))
+            extent = Vec2(c * h.x + s * h.y, s * h.x + c * h.y)
+        }
+        return AABB2D(min: pose.position - extent, max: pose.position + extent)
+    }
+}

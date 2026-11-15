@@ -167,7 +167,8 @@ springs and the default forces.
 - **FR-A11-210**: The world MUST hold springs (between two bodies, or a body and a fixed point) and force settings
   (gravity off, Moon, Earth; drag none, low, high; a stiffness level of four), saved as snapshot schema 2 with a
   migration from schema 1.
-- **FR-A11-211**: Each tick MUST apply gravity and drag, then springs, then contacts from the broad phase through the
+- **FR-A11-211**: Each tick MUST apply springs, then gravity and drag (order fixed at implementation, research D1), then
+  contacts from the broad phase through the
   solver with warm starting, then integrate.
 - **FR-A11-212**: The starting scene MUST include a box hanging from the ceiling on a spring and two circles joined by a
   spring, as well as the Phase 01 bodies.

@@ -8,7 +8,10 @@ Facts verified on 2026-11-15 (clarification session).
   anchors pA, pB, d = pB − pA, L = |d|; skip when L < 1e-9 or both ends static; n = d/L; relative velocity at the
   anchors projected on n; m = 1/(Σ inverse masses); k' = min(k, 0.1·m/dt²); c = min(2ζ√(k'·m), m/dt);
   J = (k'·(L − L₀) + c·vₙ)·dt pulls the ends together when stretched (A gets +J·n at pA, B −J·n at pB, angular by r×J).
-  Applied before contacts, in spring order.
+  Applied before contacts, in spring order, and before gravity and drag in the world's tick: with gravity first the
+  damper sees the gravity speed of the same tick and the rest stretch becomes (m·g − c·g·dt)/k, short by 2ζ·ω·dt
+  (measured by the VisualCore agent at implementation; recorded 2026-11-15). The world tick is therefore springs →
+  gravity and drag → broad-phase contacts → warm-started solve → integrate.
 - **Rationale**: impulse form matches the velocity-level solver; ω·dt ≤ 0.32 keeps semi-implicit Euler's energy error
   small (undamped energy band within 2 % in the fixture).
 - **Alternatives**: a spring as a soft constraint inside the solver iterations (more coupling, not needed for ≤ 16).
