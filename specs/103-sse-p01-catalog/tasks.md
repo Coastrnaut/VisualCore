@@ -45,3 +45,7 @@ project.yml, xcodegen, manifest and document regeneration, contract, runs, commi
 
 MVP: the core with the fixture (102), then the drawn line-up (103–105), then citations recorded (106–107). Review
 checkpoints after 102 (host core tests), after 105 and at 108.
+
+## Phase 6: Convergence
+
+- [ ] T-A14-112 Record in `specs/103-sse-p01-catalog/research.md` (§As built) and the plan's lifecycle note: the outcome code `viewing-<body id>` (the manifest validator requires an outcome for the completion scenario; clarification Q5 named none); the nine ring renderers made once with the bodies because releasing any `MeshRenderer` releases the registry's shared cached program for every renderer (found by the first run, where all bodies drew at the selection); the render tests' 240 × 160 canvas so Mercury spans several pixels per plan: research D4–D5 (partial)
