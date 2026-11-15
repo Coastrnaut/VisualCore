@@ -1,0 +1,22 @@
+{
+  "argv": [
+    "git",
+    "diff",
+    "--exit-code",
+    "--stat",
+    "9315c27e..HEAD",
+    "--",
+    "Packages",
+    "External"
+  ],
+  "command": "git diff --exit-code --stat 9315c27e..HEAD -- Packages External",
+  "elapsed_seconds": 0.009,
+  "exit_code": 0,
+  "finished": "2026-11-15T11:21:28+00:00",
+  "log": ".autonomy/logs/A12-P00.no-change.log",
+  "log_sha256": "78fa6fdcff8deec129c0a8d1fa09eec8b2ddf3ea1b62ccc69afb1b5685ae00ab",
+  "name": "no-change",
+  "stage": "A12-P00",
+  "started": "2026-11-15T11:21:28+00:00",
+  "timed_out": false
+}
