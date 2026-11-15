@@ -5,6 +5,9 @@
 // each leaving the state as it was; host steps changing nothing; the digest covering the state and the beam, stable;
 // the snapshot round trip into another engine; damaged and newer snapshots refused; reset; the outcome; the canvas
 // description of clarification Q5.
+// Feature 098 (A13-P03) T-A13-304 (FR-A13-310, FR-A13-311, FR-A13-321): the seventh control `move.undo` (accepted with a
+// move to take back, refused with `a13.no-moves` otherwise), snapshot schema 2 with moves, the step 1 → 2 and the
+// stored schema-1 example restoring with no moves.
 import Foundation
 import XCTest
 @testable import LightMazeExperience
@@ -31,22 +34,25 @@ final class MazeCoreTests: XCTestCase {
     func testIdControlsSchemaTiersAndStep() {
         XCTAssertEqual(MazeCore.experienceID, "a13.light-maze")
         let ids: [String] = MazeCore.controls.map(\.id)
-        XCTAssertEqual(ids, ["level.select", "level.next", "level.previous", "tile.select", "tile.turn", "level.reset"])
+        XCTAssertEqual(ids, ["level.select", "level.next", "level.previous", "tile.select", "tile.turn", "level.reset",
+                             "move.undo"])
         XCTAssertEqual(ids, MazeCore.actionIDs)
         XCTAssertEqual(MazeCore.levelCount, 20)
         XCTAssertEqual(MazeCore.maxTurnable, 8)
-        let ranges: [[ClosedRange<Double>]] = [[0...19], [], [], [0...7], [], []]
+        let ranges: [[ClosedRange<Double>]] = [[0...19], [], [], [0...7], [], [], []]
         XCTAssertEqual(MazeCore.controls.map(\.ranges), ranges)
-        XCTAssertEqual(MazeCore.migrations.currentVersion, 1)
+        XCTAssertEqual(MazeCore.migrations.currentVersion, 2)
         XCTAssertEqual(MazeCore.qualityTiers, 1)
         XCTAssertEqual(MazeCore.qualityProfile.levels.count, 1)
         XCTAssertEqual(MazeCore.stepDuration, 1.0 / 120, accuracy: 1e-15)
         XCTAssertEqual(MazeRule.invalidChoice, "a13.invalid-choice")
+        XCTAssertEqual(MazeRule.noMoves, "a13.no-moves")
     }
 
     func testConformancePassesOverThreeSeeds() async {
         let actions: [ScriptedAction] = [
-            ScriptedAction("tile.select", [0]), ScriptedAction("tile.turn"), ScriptedAction("level.next"),
+            ScriptedAction("tile.select", [0]), ScriptedAction("tile.turn"), ScriptedAction("move.undo"),
+            ScriptedAction("tile.turn"), ScriptedAction("level.next"),
             ScriptedAction("tile.select", [1]), ScriptedAction("tile.turn"), ScriptedAction("level.reset"),
             ScriptedAction("level.select", [5]), ScriptedAction("level.previous"),
         ]
@@ -55,7 +61,7 @@ final class MazeCoreTests: XCTestCase {
             ScriptedAction("level.select", [.nan]), ScriptedAction("level.select", []),
             ScriptedAction("level.next", [1]), ScriptedAction("tile.select", [8]),
             ScriptedAction("tile.select", [.infinity]), ScriptedAction("tile.turn", [0]),
-            ScriptedAction("level.reset", [0]), ScriptedAction("bogus"),
+            ScriptedAction("level.reset", [0]), ScriptedAction("move.undo", [1]), ScriptedAction("bogus"),
         ]
         let plan = ConformancePlan(seeds: [1, 2, 0xFFFF_FFFF_FFFF_FFFF], stepsPerSegment: 5, actions: actions,
                                    rejected: rejected)
@@ -194,13 +200,16 @@ final class MazeCoreTests: XCTestCase {
             }
         }
         let snapshot = try engine.snapshot()
-        XCTAssertEqual(snapshot.schemaVersion, 1)
+        XCTAssertEqual(snapshot.schemaVersion, 2)
+        XCTAssertEqual(try XCTUnwrap(engine.core).state.moves.count, 1, "level 2's turn is on the move list")
+        XCTAssertTrue(snapshot.payload.contains("\"moves\""), "schema 2 carries the moves")
         XCTAssertEqual(Data(snapshot.payload.utf8), try XCTUnwrap(engine.core).state.encoded())
         let saved = try XCTUnwrap(engine.core)
         var other = try await makeEngine(seed: 3)
         try other.restore(ExperienceSnapshot(data: snapshot.encoded()))
         let restored = try XCTUnwrap(other.core)
         XCTAssertEqual(restored.state, saved.state)
+        XCTAssertEqual(restored.state.moves, saved.state.moves, "the moves restore")
         XCTAssertEqual(restored.beam, saved.beam)
         XCTAssertEqual(try other.digest(), try engine.digest())
         XCTAssertEqual(engine.handle(control: "tile.turn"), .accepted)
@@ -230,14 +239,15 @@ final class MazeCoreTests: XCTestCase {
             ("selection 9", { $0["selection"] = 9 }),
             ("selection -2", { $0["selection"] = -2 }),
             ("no schema", { $0["schema"] = nil }),
+            ("inconsistent move", { $0["moves"] = [["after": "slash", "before": "slash", "tile": 0]] }),
         ]
         for (name, change) in damaged {
             XCTAssertThrowsError(try engine.restore(mazeEnvelope(mazePayload(saved.payload, change), like: saved)),
                                  name)
         }
-        // Newer: an envelope of schema 2, and a payload of schema 2 inside a schema-1 envelope.
-        XCTAssertThrowsError(try engine.restore(mazeEnvelope(Data(saved.payload.utf8), like: saved, schema: 2)))
-        let newerPayload = try mazePayload(saved.payload) { $0["schema"] = 2 }
+        // Newer: an envelope of schema 3, and a payload of schema 3 inside a schema-2 envelope.
+        XCTAssertThrowsError(try engine.restore(mazeEnvelope(Data(saved.payload.utf8), like: saved, schema: 3)))
+        let newerPayload = try mazePayload(saved.payload) { $0["schema"] = 3 }
         XCTAssertThrowsError(try engine.restore(mazeEnvelope(newerPayload, like: saved)))
         XCTAssertEqual(try engine.digest(), before, "every refusal leaves the state as it was")
 
@@ -247,6 +257,79 @@ final class MazeCoreTests: XCTestCase {
         }
         XCTAssertThrowsError(try MazeCore.restore(payload: Data("{not json".utf8), seed: 1)) { error in
             XCTAssertEqual(error as? MazeRestoreError, .refused(.damaged))
+        }
+    }
+
+    func testUndoTakesTheLastTurnBackAndIsRefusedWithNoMoves() async throws {
+        var engine = try await makeEngine()
+        let noMoves = ActionResult.rejected(.rule(code: MazeRule.noMoves))
+        let start = try engine.digest()
+        XCTAssertEqual(engine.handle(control: "move.undo"), noMoves, "nothing to undo at the start")
+        XCTAssertEqual(try engine.digest(), start, "a refused undo changes nothing")
+        XCTAssertEqual(engine.handle(control: "level.select", values: [1]), .accepted)
+        let level = try XCTUnwrap(engine.core)
+        XCTAssertEqual(engine.handle(control: "tile.select", values: [0]), .accepted)
+        XCTAssertEqual(engine.handle(control: "tile.turn"), .accepted)
+        let once = try XCTUnwrap(engine.core)
+        XCTAssertEqual(engine.handle(control: "tile.select", values: [1]), .accepted)
+        XCTAssertEqual(engine.handle(control: "tile.turn"), .accepted)
+        XCTAssertEqual(try XCTUnwrap(engine.core).state.moves.count, 2)
+        XCTAssertEqual(engine.handle(control: "move.undo"), .accepted)
+        var core = try XCTUnwrap(engine.core)
+        XCTAssertEqual(core.state.orientations, once.state.orientations, "the second turn is taken back exactly")
+        XCTAssertEqual(core.beam, once.beam, "and the beam with it")
+        XCTAssertEqual(core.state.moves.count, 1)
+        XCTAssertEqual(engine.handle(control: "move.undo"), .accepted)
+        core = try XCTUnwrap(engine.core)
+        XCTAssertEqual(core.state.orientations, level.state.orientations, "back to the level's start")
+        XCTAssertEqual(core.beam, level.beam)
+        XCTAssertTrue(core.state.moves.isEmpty)
+        XCTAssertEqual(engine.handle(control: "move.undo"), noMoves, "undo at the start is refused")
+
+        // Restart and choosing a level empty the moves.
+        XCTAssertEqual(engine.handle(control: "tile.turn"), .accepted)
+        XCTAssertEqual(engine.handle(control: "level.reset"), .accepted)
+        XCTAssertTrue(try XCTUnwrap(engine.core).state.moves.isEmpty)
+        XCTAssertEqual(engine.handle(control: "move.undo"), noMoves)
+        XCTAssertEqual(engine.handle(control: "tile.select", values: [0]), .accepted)
+        XCTAssertEqual(engine.handle(control: "tile.turn"), .accepted)
+        XCTAssertEqual(engine.handle(control: "level.select", values: [2]), .accepted)
+        XCTAssertTrue(try XCTUnwrap(engine.core).state.moves.isEmpty)
+
+        // Called directly, a wrong value count is refused as by the engine.
+        var direct = MazeCore(seed: 1)
+        XCTAssertEqual(direct.apply(action("move.undo", [0])), .rejected(.wrongValueCount(expected: 0, found: 1)))
+        XCTAssertEqual(direct.apply(action("move.undo")), noMoves)
+        XCTAssertEqual(direct, MazeCore(seed: 1))
+    }
+
+    func testTheSchemaOneExampleRestoresWithNoMoves() async throws {
+        let example = try XCTUnwrap(MazeCore.schemaOneExample())
+        XCTAssertEqual(example.version, 1)
+        let problems = await SnapshotMigrationCheck.problems(for: MazeCore.self, id: mazeID, examples: [example])
+        XCTAssertEqual(problems, [])
+        let snapshot = try ExperienceSnapshot(data: example.snapshot)
+        XCTAssertEqual(snapshot.schemaVersion, 1)
+        let payload = try XCTUnwrap(try JSONSerialization.jsonObject(with: Data(snapshot.payload.utf8))
+                                        as? [String: Any])
+        XCTAssertEqual(Set(payload.keys), ["levelIndex", "orientations", "schema", "selection"], "the A13-P02 keys")
+        var engine = try await makeEngine(seed: snapshot.seed)
+        try engine.restore(snapshot)
+        let core = try XCTUnwrap(engine.core)
+        XCTAssertEqual(core.state.levelIndex, 1)
+        XCTAssertEqual(core.state.selection, 0)
+        XCTAssertTrue(core.state.moves.isEmpty, "the step 1 → 2 adds no moves")
+        XCTAssertNotEqual(core.state.orientations, core.level.startOrientations, "the saved turn is kept")
+        XCTAssertEqual(try engine.digest().hex, example.expectedDigest)
+        XCTAssertEqual(engine.handle(control: "move.undo"), .rejected(.rule(code: MazeRule.noMoves)),
+                       "a migrated state has nothing to undo")
+
+        // The step refuses a payload that is not schema 1.
+        XCTAssertThrowsError(try MazeCore.migratedToSchemaTwo(["schema": 2])) { error in
+            XCTAssertEqual(error as? MazeRestoreError, .notSchemaOne(2))
+        }
+        XCTAssertThrowsError(try MazeCore.migratedToSchemaTwo([:])) { error in
+            XCTAssertEqual(error as? MazeRestoreError, .notSchemaOne(-1))
         }
     }
 

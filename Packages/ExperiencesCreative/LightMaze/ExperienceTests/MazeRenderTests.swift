@@ -246,7 +246,7 @@ final class MazeRenderTests: XCTestCase {
         let session = ExperienceSession()
         let shell = try await MazeTest.open(session, size: size)
         let names: [String] = ["previous-level", "next-level", "select-previous", "select-next", "turn",
-                               "reset-level", "status", "message"]
+                               "reset-level", "undo", "status", "message"]
         for name in names {
             XCTAssertEqual(shell.port.identifier(name), "experience.a13.light-maze.\(name)")
         }

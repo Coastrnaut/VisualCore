@@ -8,6 +8,9 @@
 // It wraps the shell in `MazeExperience`, which forwards every call to it and forgets every touch when the experience
 // is suspended or starts leaving: the host's `ExperiencePresenter` has no suspension callback, so the wrapper is where
 // the presenter learns of it (as Neon Arcade's and Physics Playground's wrappers do).
+// Feature 098 (A13-P03) T-A13-304 (FR-A13-320; clarification Q1): the launch's storage now holds the level progress
+// (`progress.json` through a `ProgressStore` the presenter owns); tests pass a store of their own or keep progress in
+// memory.
 import SwiftUI
 import VisualCoreDiagnostics
 import VisualCoreExperience
@@ -22,21 +25,24 @@ public enum LightMazeExperience {
     /// The catalog id `a13.light-maze`; nil only if the id text were malformed.
     public static let id = ExperienceID(rawValue: MazeCore.experienceID)
 
-    /// The experience registered as `id`. `storage` is not used in this phase (the maze travels in the host's saved
-    /// session state); `reduceMotion` and `reduceFlashing` change nothing (no motion, nothing flashes).
+    /// The experience registered as `id`. `storage` keeps the level progress (`progress.json`; the maze itself
+    /// travels in the host's saved session state); `reduceMotion` and `reduceFlashing` change nothing (no motion,
+    /// nothing flashes).
     @MainActor
     public static func make(id: ExperienceID, storage: ExperienceStorage, reduceMotion: Bool,
                             reduceFlashing: Bool) -> any Experience {
-        make(id: id)
+        make(id: id, progressStore: ProgressStore(storage: storage))
     }
 
-    /// The experience with its shell and presenter exposed (tests): `voiceOverRunning` and `announcementSink` replace
-    /// the system's answers when given. The presenter is handed the shell, through which gestures read the live state.
+    /// The experience with its shell and presenter exposed (tests): `progressStore` keeps the progress (nil: in
+    /// memory); `voiceOverRunning` and `announcementSink` replace the system's answers when given. The presenter is
+    /// handed the shell, through which gestures read the live state.
     @MainActor
-    static func make(id: ExperienceID, voiceOverRunning: (@MainActor () -> Bool)? = nil,
+    static func make(id: ExperienceID, progressStore: ProgressStore? = nil,
+                     voiceOverRunning: (@MainActor () -> Bool)? = nil,
                      announcementSink: (any AnnouncementSink)? = nil) -> MazeExperience {
-        let presenter = MazePresenter(experienceID: id, voiceOverRunning: voiceOverRunning,
-                                      announcementSink: announcementSink)
+        let presenter = MazePresenter(experienceID: id, progressStore: progressStore,
+                                      voiceOverRunning: voiceOverRunning, announcementSink: announcementSink)
         let shell = ExperienceShell(id: id, presenter: presenter)
         presenter.shell = shell
         return MazeExperience(shell: shell)

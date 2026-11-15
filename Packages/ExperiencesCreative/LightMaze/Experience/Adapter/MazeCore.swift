@@ -21,14 +21,18 @@
 //                         `a13.invalid-choice`.
 //   tile.turn             toggles the selected tile's orientation; refused with `a13.invalid-choice` when nothing is
 //                         selected.
-//   level.reset           the level's starting orientations, nothing selected.
+//   level.reset           the level's starting orientations, nothing selected, no moves (the restart).
+//   move.undo             feature 098: restores the last move's tile to its orientation before the move and removes
+//                         the move; refused with `a13.no-moves` when the level's move list is empty.
 // Called directly (not through the engine), the core refuses an unknown control with `unknownControl` and a wrong
 // value count with `wrongValueCount`, as the engine does. A refusal changes nothing.
 //
-// Snapshot schema 1: `MazeState.encoded()` (JSON with sorted keys); the preparation seed and the schema version come
-// from the snapshot envelope (`MigrationChain(currentVersion: 1)`, so a newer envelope is refused by the engine). A
-// payload `MazeState.decode(_:)` refuses (damaged, or a newer schema inside the payload) is refused (the restore throws
-// `MazeRestoreError`). One quality tier (`level-0`). The digest is the canonical text of the state followed by every
+// Snapshot schema 2 (feature 098): `MazeState.encoded()` (JSON with sorted keys: level, moves, orientations, selection);
+// the preparation seed and the schema version come from the snapshot envelope (`MigrationChain(currentVersion: 2)`, so
+// a newer envelope is refused by the engine) with the step 1 → 2 (``MazeCore/migratedToSchemaTwo(_:)``: a schema-1
+// payload gets no moves). A payload `MazeState.decode(_:)` refuses (damaged, or a newer schema inside the payload) is
+// refused (the restore throws `MazeRestoreError`). `schemaOneExample()` is a stored A13-P02 payload the registry's
+// migration check restores, with the digest its restore through the step must give. One quality tier (`level-0`). The digest is the canonical text of the state followed by every
 // field of the beam it traces (segments with exact end points, bounce and branch; lit targets; end reasons; dropped
 // branches; solved), so a scenario's final digest pins the beam path too. The outcome is `level-solved` while every
 // target of the current level is lit, none otherwise.
@@ -36,6 +40,11 @@
 // The canvas description (clarification Q5): "Light Maze: level 1, First light; 1 mirror, 1 target; beam ends at the
 // wall; not solved." — the level number and name, the counts of mirrors, prisms (only when the level has any) and
 // targets with plurals, where the beam ends (`MazeCore.endWords`) and "solved" or "not solved".
+//
+// Feature 098 (A13-P03) T-A13-304 (FR-A13-310, FR-A13-311, FR-A13-321; clarification Q3): every accepted `tile.turn`
+// appends a move (`MazeState.moves`, at most 64, the oldest dropped), `move.undo` takes the last one back exactly,
+// `level.reset` and `level.select` empty the list. Progress (opened and solved levels) is not engine state: it is the
+// presenter's `ProgressStore`, so replays and digests never depend on it.
 import Foundation
 import LightMazeCore
 import VisualCoreExperience
@@ -47,22 +56,26 @@ public enum MazeRule {
     /// A level or tile index that is not a valid choice, a step past the first or last level, or a turn with nothing
     /// selected.
     public static let invalidChoice = "a13.invalid-choice"
+    /// `move.undo` on a level whose move list is empty (feature 098).
+    public static let noMoves = "a13.no-moves"
 }
 
 /// Why a stored maze state is refused.
 public enum MazeRestoreError: Error, Equatable {
     /// `MazeState.decode(_:)` refused the payload, for the named reason.
     case refused(MazeStateRefusal)
+    /// The migration step 1 → 2 was handed a payload whose `schema` is not 1 (the number found, −1 when missing).
+    case notSchemaOne(Int)
 }
 
-/// The state of Light Maze. Schema version 1.
+/// The state of Light Maze. Schema version 2 (feature 098).
 public struct MazeCore: ExperienceCore, Equatable {
     /// The experience's id in the catalog.
     public static let experienceID = "a13.light-maze"
 
     /// The action ids in declaration order.
     public static let actionIDs = ["level.select", "level.next", "level.previous", "tile.select", "tile.turn",
-                                   "level.reset"]
+                                   "level.reset", "move.undo"]
 
     /// The outcome code while the current level is solved.
     public static let solvedOutcome = "level-solved"
@@ -75,7 +88,7 @@ public struct MazeCore: ExperienceCore, Equatable {
 
     /// The preparation seed; `reset()` returns to the first state.
     public private(set) var preparationSeed: UInt64
-    /// The whole saved state: level, orientations and selection.
+    /// The whole saved state: level, orientations, selection and moves.
     public private(set) var state: MazeState
     /// The beam of the current board (a cache of the state, never saved).
     public private(set) var beam: Beam
@@ -104,17 +117,33 @@ public struct MazeCore: ExperienceCore, Equatable {
     /// One quality tier (`level-0`): the drawing has nothing to scale down in this phase.
     public static var qualityTiers: Int { 1 }
 
-    /// Schema 1, the first; nothing to migrate.
-    public static var migrations: MigrationChain { MigrationChain(currentVersion: MazeState.schemaVersion) }
+    /// Schema 2 with the step 1 → 2 (``migratedToSchemaTwo(_:)``).
+    public static var migrations: MigrationChain {
+        MigrationChain(currentVersion: MazeState.schemaVersion, steps: [
+            1: { payload in try migratedToSchemaTwo(payload) },
+        ])
+    }
 
-    /// The six controls with their declared ranges.
+    /// The step 1 → 2: a schema-1 payload (its `schema` must be 1) with no moves added and the schema set to 2; every
+    /// other key is kept as it was. Not validated here; the restore validates.
+    static func migratedToSchemaTwo(_ payload: [String: Any]) throws -> [String: Any] {
+        let schema = (payload["schema"] as? NSNumber)?.intValue ?? -1
+        guard schema == 1 else { throw MazeRestoreError.notSchemaOne(schema) }
+        var upgraded = payload
+        upgraded["schema"] = MazeState.schemaVersion
+        upgraded["moves"] = [Any]()
+        return upgraded
+    }
+
+    /// The seven controls with their declared ranges.
     public static var controls: [ExperienceControl] {
         [ExperienceControl(id: "level.select", ranges: [0...Double(levelCount - 1)]),
          ExperienceControl(id: "level.next"),
          ExperienceControl(id: "level.previous"),
          ExperienceControl(id: "tile.select", ranges: [0...Double(maxTurnable - 1)]),
          ExperienceControl(id: "tile.turn"),
-         ExperienceControl(id: "level.reset")]
+         ExperienceControl(id: "level.reset"),
+         ExperienceControl(id: "move.undo")]
     }
 
     /// The first state with `seed` as the preparation seed.
@@ -130,7 +159,7 @@ public struct MazeCore: ExperienceCore, Equatable {
     public mutating func apply(_ action: ExperienceAction) -> ActionResult {
         let v = action.values
         let expected = ["level.select": 1, "level.next": 0, "level.previous": 0, "tile.select": 1, "tile.turn": 0,
-                        "level.reset": 0][action.control]
+                        "level.reset": 0, "move.undo": 0][action.control]
         guard let expected else { return .rejected(.unknownControl(action.control)) }
         guard v.count == expected else { return .rejected(.wrongValueCount(expected: expected, found: v.count)) }
         let refused = ActionResult.rejected(.rule(code: MazeRule.invalidChoice))
@@ -148,6 +177,8 @@ public struct MazeCore: ExperienceCore, Equatable {
             }
         case "tile.turn":
             guard next.turnSelected() else { return refused }
+        case "move.undo":
+            guard next.undo() else { return .rejected(.rule(code: MazeRule.noMoves)) }
         default:   // level.reset
             next.reset()
         }
@@ -202,18 +233,60 @@ public struct MazeCore: ExperienceCore, Equatable {
         builder.add(beam.isSolved)
     }
 
-    /// The maze state (schema 1) as JSON with sorted keys.
+    /// The maze state (schema 2) as JSON with sorted keys.
     public func snapshotPayload() throws -> Data {
         state.encoded()
     }
 
-    /// The core of a schema-1 payload with the envelope's `seed` as preparation seed; a payload that
+    /// The core of a schema-2 payload (a schema-1 payload reaches here through the step 1 → 2; `MazeState.decode(_:)`
+    /// also reads schema 1 directly) with the envelope's `seed` as preparation seed; a payload that
     /// `MazeState.decode(_:)` refuses (damaged or newer) throws ``MazeRestoreError/refused(_:)``.
     public static func restore(payload: Data, seed: UInt64) throws -> MazeCore {
         switch MazeState.decode(payload) {
         case .success(let state): return MazeCore(seed: seed, state: state)
         case .failure(let reason): throw MazeRestoreError.refused(reason)
         }
+    }
+
+    // MARK: Migration example (feature 098)
+
+    /// The actions the stored A13-P02 example was saved after (A13-P01 and A13-P02 actions only): level 2, its first
+    /// mirror selected and turned.
+    public static let schemaOneExampleActions: [(control: String, values: [Double])] = [
+        ("level.select", [1]), ("tile.select", [0]), ("tile.turn", []),
+    ]
+
+    /// The schema-1 payload of ``schemaOneExampleActions``: exactly the keys A13-P01 and A13-P02 wrote (`levelIndex`,
+    /// `orientations`, `schema` 1, `selection`), as A13-P02 saved it for those actions.
+    public static func schemaOneExamplePayload() -> [String: Any]? {
+        var core = MazeCore(seed: 1)
+        for action in schemaOneExampleActions {
+            _ = core.apply(ExperienceAction(control: action.control, values: action.values, step: 0))
+        }
+        guard var object = (try? JSONSerialization.jsonObject(with: core.state.encoded())) as? [String: Any] else {
+            return nil
+        }
+        object["moves"] = nil
+        object["schema"] = 1
+        return object
+    }
+
+    /// The stored example of schema 1 for the registry's migration check: ``schemaOneExamplePayload()`` in an envelope
+    /// of schema 1 at step 0 with seed `seed`, with the digest its restore through the step 1 → 2 must give (the same
+    /// level, orientations and selection, no moves). Nil only if the encoding failed.
+    public static func schemaOneExample(seed: UInt64 = 7) -> MigrationExample? {
+        guard let id = ExperienceID(rawValue: experienceID), let payload = schemaOneExamplePayload(),
+              let data = try? JSONSerialization.data(withJSONObject: payload, options: [.sortedKeys]),
+              let upgraded = try? migrations.migrate(payload, from: 1),
+              let migrated = try? JSONSerialization.data(withJSONObject: upgraded, options: [.sortedKeys]),
+              let restored = try? restore(payload: migrated, seed: seed) else { return nil }
+        var builder = DigestBuilder(domain: id.rawValue)
+        guard (try? restored.writeDigest(into: &builder)) != nil else { return nil }
+        let digest = builder.finish()
+        guard let snapshot = try? ExperienceSnapshot(experience: id, schemaVersion: 1, seed: seed, stepIndex: 0,
+                                                     digest: digest, payload: data),
+              let encoded = try? snapshot.encoded() else { return nil }
+        return MigrationExample(version: 1, snapshot: encoded, expectedDigest: digest.hex)
     }
 
     // MARK: Words

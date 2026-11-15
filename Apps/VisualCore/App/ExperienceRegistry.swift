@@ -291,7 +291,8 @@ extension ExperienceRegistry {
     /// A13 Light Maze (feature 096, A13-P01): a candidate until X-A13.
     fileprivate static var lightMaze: ExperienceRegistration? {
         guard let id = LightMazeExperience.id else { return nil }
-        var registration = ExperienceRegistration(id: id, core: MazeCore.self, examples: []) { launch in
+        let examples = [MazeCore.schemaOneExample()].compactMap { $0 }
+        var registration = ExperienceRegistration(id: id, core: MazeCore.self, examples: examples) { launch in
             let system = SystemAccessibilityObserver.systemValues()
             return LightMazeExperience.make(id: id, storage: launch.storage,
                                             reduceMotion: launch.reduceMotion.resolved(system: system.reduceMotion),

@@ -22,17 +22,18 @@ enum MazeTest {
     /// The experience id `a13.light-maze`.
     static var id: ExperienceID { LightMazeExperience.id ?? ExperienceID(rawValue: "a13.unknown")! }
 
-    /// Opens Light Maze in `session` (seed `seed`, optionally restoring `snapshot`, with `voiceOverRunning` and
-    /// `announcementSink` replacing the system's when given), lays the view out at `size` points and draws one frame.
+    /// Opens Light Maze in `session` (seed `seed`, optionally restoring `snapshot`, keeping progress in `progressStore`
+    /// (memory when nil), with `voiceOverRunning` and `announcementSink` replacing the system's when given), lays the view out at `size` points and draws one frame.
     /// The session holds the experience (`MazeExperience`); its shell is returned.
     static func open(_ session: ExperienceSession, seed: UInt64 = 1, snapshot: ExperienceSnapshot? = nil,
-                     size: CGSize = CGSize(width: 120, height: 100),
+                     size: CGSize = CGSize(width: 120, height: 100), progressStore: ProgressStore? = nil,
                      voiceOverRunning: (@MainActor () -> Bool)? = nil,
                      announcementSink: (any AnnouncementSink)? = nil) async throws -> ExperienceShell<MazePresenter> {
         let id = self.id
         var made: ExperienceShell<MazePresenter>?
         let request = ExperienceOpenRequest(id: id, seed: seed, snapshot: snapshot, refusedSnapshotFails: false) {
-            let experience = LightMazeExperience.make(id: id, voiceOverRunning: voiceOverRunning,
+            let experience = LightMazeExperience.make(id: id, progressStore: progressStore,
+                                                      voiceOverRunning: voiceOverRunning,
                                                       announcementSink: announcementSink)
             made = experience.shell
             return experience
@@ -122,8 +123,10 @@ func mazeCore(_ state: MazeState, seed: UInt64 = 1) throws -> MazeCore {
     try MazeCore.restore(payload: state.encoded(), seed: seed)
 }
 
-/// A snapshot envelope of Light Maze around `payload` with the fields of `saved` and schema `schema`.
-func mazeEnvelope(_ payload: Data, like saved: ExperienceSnapshot, schema: Int = 1) throws -> ExperienceSnapshot {
+/// A snapshot envelope of Light Maze around `payload` with the fields of `saved` and schema `schema` (the current
+/// schema 2 by default).
+func mazeEnvelope(_ payload: Data, like saved: ExperienceSnapshot,
+                  schema: Int = MazeState.schemaVersion) throws -> ExperienceSnapshot {
     let id = try XCTUnwrap(ExperienceID(rawValue: MazeCore.experienceID))
     return try ExperienceSnapshot(experience: id, schemaVersion: schema, seed: saved.seed,
                                   stepIndex: saved.stepIndex, digest: saved.digest, payload: payload)

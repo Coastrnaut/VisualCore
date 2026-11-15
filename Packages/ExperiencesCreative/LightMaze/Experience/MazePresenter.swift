@@ -35,6 +35,15 @@
 // or the solved state change ("Beam ends at the target; solved."), the text is offered to `BeamAnnouncer`, which speaks
 // at most once per second of frame time (the latest text wins); texts are posted to the announcement sink only while
 // VoiceOver runs. The announcement clock is the sum of the frame times since `setup`; it starts over in `teardown`.
+// Feature 098 (A13-P03) T-A13-304 (FR-A13-301, FR-A13-302, FR-A13-311; clarifications Q1, Q3 and Q4; contract
+// contracts/progress.md): the presenter owns the level progress through a `ProgressStore` (handed in by the factory:
+// the experience's storage, or memory in tests), loaded once at init (a refused file is kept as ``progressRefusal`` and
+// play starts from fresh progress; nothing is written until the next real change). Each drawn frame compares the
+// current level's solved state with the last frame's: when the current level is solved and the last frame did not show
+// that same level solved, `Progress.recordSolved(levelIndex:moves:)` records it with the state's move count and, when
+// that changed anything, the progress is saved once. Locks are enforced where a person chooses a level
+// (`chooseLevel(_:port:)`: a locked level is answered "Level 7 is locked; solve level 6 first." and nothing is sent);
+// the engine's `level.select` is not gated, so replays never depend on progress.
 import Foundation
 import LightMazeCore
 import SwiftUI
@@ -68,6 +77,10 @@ final class MazeMirror {
     var status = ""
     /// The answer to the last refused action; empty after an accepted one.
     var message = ""
+    /// The number of moves on the current level's move list (feature 098).
+    var moveCount = 0
+    /// The level progress (feature 098): which levels are open and solved, with best counts.
+    var progress = LightMazeCore.Progress.fresh()
 }
 
 /// Draws Light Maze and owns its presentation state (the scene tree and the renderer).
@@ -176,14 +189,33 @@ final class MazePresenter: ExperiencePresenter {
     private(set) var announcedText: String?
     /// Every text spoken (whether or not VoiceOver ran), oldest first.
     private(set) var spoken: [String] = []
+    /// Where the level progress is kept (feature 098).
+    let progressStore: ProgressStore
+    /// The level progress: loaded once at init, changed only by a recorded solve.
+    private(set) var progress: LightMazeCore.Progress
+    /// The code of the reason the stored progress file was refused at init (nil when there was none or it was read).
+    let progressRefusal: String?
+    /// The storage error's code of the last refused save; nil when the last save succeeded or before one.
+    private(set) var lastSaveRefusal: String?
+    /// The number of solves recorded that changed the progress (each saved once).
+    private(set) var recordedSolves = 0
+    /// The level index and solved state of the last drawn frame; nil before the first.
+    private(set) var lastFrameSolve: (levelIndex: Int, solved: Bool)?
 
-    /// A presenter for the experience `experienceID`. `voiceOverRunning` (nil: `UIAccessibility.isVoiceOverRunning`)
-    /// and `announcementSink` (nil: the system's VoiceOver announcements) replace the system's answers in tests.
-    init(experienceID: ExperienceID, voiceOverRunning: (@MainActor () -> Bool)? = nil,
-         announcementSink: (any AnnouncementSink)? = nil) {
+    /// A presenter for the experience `experienceID` keeping its progress in `progressStore` (memory when nil; loaded
+    /// here once). `voiceOverRunning` (nil: `UIAccessibility.isVoiceOverRunning`) and `announcementSink` (nil: the
+    /// system's VoiceOver announcements) replace the system's answers in tests.
+    init(experienceID: ExperienceID, progressStore: ProgressStore? = nil,
+         voiceOverRunning: (@MainActor () -> Bool)? = nil, announcementSink: (any AnnouncementSink)? = nil) {
         self.experienceID = experienceID
         self.voiceOverRunning = voiceOverRunning ?? { UIAccessibility.isVoiceOverRunning }
         self.announcementSink = announcementSink ?? SystemAnnouncementSink()
+        let store = progressStore ?? ProgressStore(storage: nil)
+        self.progressStore = store
+        let loaded = store.load()
+        progress = loaded.progress
+        progressRefusal = loaded.refusal
+        mirror.progress = loaded.progress
     }
 
     // MARK: Render scene
@@ -219,6 +251,57 @@ final class MazePresenter: ExperiencePresenter {
         lastSegmentsDrawn = core.beam.segments.count
         lastTriangleCount = primitives.lastTriangleCount
         updateAnnouncements(core, delta: frame.delta)
+        recordSolve(core)
+    }
+
+    // MARK: Progress (feature 098)
+
+    /// Records a solve when `core` (the core of a drawn frame) shows its level solved and the last frame did not show
+    /// that same level solved; saves once when the progress changed. Returns whether the progress changed.
+    @discardableResult
+    func recordSolve(_ core: MazeCore) -> Bool {
+        let level = core.state.levelIndex
+        let solved = core.isSolved
+        var wasSolved = false
+        if let last = lastFrameSolve, last.levelIndex == level, last.solved { wasSolved = true }
+        lastFrameSolve = (level, solved)
+        guard solved, !wasSolved else { return false }
+        var next = progress
+        guard next.recordSolved(levelIndex: level, moves: core.state.moves.count) else { return false }
+        progress = next
+        recordedSolves += 1
+        lastSaveRefusal = progressStore.save(next)
+        mirror.progress = next
+        return true
+    }
+
+    /// The refusal of choosing level index `index` in words: "Level 7 is locked; solve level 6 first." for a locked
+    /// level; nil for an open one (or an index outside the catalog, which the engine answers).
+    func lockedWords(_ index: Int) -> String? {
+        guard index > 0, index < progress.levels.count, !progress.isOpen(index) else { return nil }
+        return "Level \(index + 1) is locked; solve level \(index) first."
+    }
+
+    /// Chooses level index `index` as a person does (the Level menu): a locked level is refused in words and nothing
+    /// is sent; otherwise `level.select` is sent through `port`. Returns the words shown (empty when accepted), which
+    /// also become the controls' message.
+    @discardableResult
+    func chooseLevel(_ index: Int, port: ExperienceActionPort) -> String {
+        chooseLevel(index) { port.send($0, $1) }
+    }
+
+    /// ``chooseLevel(_:port:)`` sending through `send` (tests record the actions).
+    @discardableResult
+    func chooseLevel(_ index: Int, send: (String, [Double]) -> ActionResult) -> String {
+        let words: String
+        if let locked = lockedWords(index) {
+            words = locked
+        } else {
+            words = Self.answerWords(control: "level.select", result: send("level.select", [Double(index)]))
+        }
+        mirror.message = words
+        if let core = shell?.engine.core { sync(core) }
+        return words
     }
 
     /// Releases the renderer; the scene tree stays for the next context. The announcements and the gestures start
@@ -384,6 +467,8 @@ final class MazePresenter: ExperiencePresenter {
         let selected = Self.selectedWords(state)
         if mirror.selectedWords != selected { mirror.selectedWords = selected }
         if mirror.solved != core.isSolved { mirror.solved = core.isSolved }
+        if mirror.moveCount != state.moves.count { mirror.moveCount = state.moves.count }
+        if mirror.progress != progress { mirror.progress = progress }
         let status = MazeCore.status(state, beam: core.beam)
         if mirror.status != status { mirror.status = status }
     }
@@ -415,6 +500,7 @@ final class MazePresenter: ExperiencePresenter {
         case "tile.turn": return "Select a mirror or prism first."
         case "tile.select": return "This level has no such tile."
         case "level.select": return "There is no such level."
+        case "move.undo": return "There is no move to undo."
         default: return "That is not possible here."
         }
     }
@@ -427,12 +513,13 @@ final class MazePresenter: ExperiencePresenter {
 
     /// The native controls, sending through `port`.
     func makeControls(_ port: ExperienceActionPort) -> AnyView {
-        AnyView(MazeControls(port: port, mirror: mirror))
+        AnyView(MazeControls(port: port, mirror: mirror, presenter: self))
     }
 
-    /// The actions the native controls send (every action: `level.select` through the Level menu).
+    /// The actions the native controls send (every action: `level.select` through the Level menu, `move.undo` through
+    /// Undo).
     var nativeActions: Set<String> {
-        ["level.select", "level.next", "level.previous", "tile.select", "tile.turn", "level.reset"]
+        ["level.select", "level.next", "level.previous", "tile.select", "tile.turn", "level.reset", "move.undo"]
     }
 
     // MARK: Gestures

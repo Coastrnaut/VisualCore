@@ -41,7 +41,7 @@ final class MazeSessionTests: XCTestCase {
         XCTAssertEqual(presenter.mirror.turnableCount, 1)
         XCTAssertEqual(presenter.mirror.selectedWords, "No tile selected")
         XCTAssertEqual(presenter.nativeActions, ["level.select", "level.next", "level.previous", "tile.select",
-                                                 "tile.turn", "level.reset"])
+                                                 "tile.turn", "level.reset", "move.undo"])
         XCTAssertEqual(presenter.nativeActions, Set(MazeCore.actionIDs), "every action has a native control")
         XCTAssertEqual(presenter.gestureActions, ["tile.select", "tile.turn"], "feature 097: tap, drag and twist")
         XCTAssertEqual(GestureAlternatives.missing(gesture: presenter.gestureActions, native: presenter.nativeActions),
@@ -202,8 +202,8 @@ final class MazeSessionTests: XCTestCase {
         XCTAssertTrue(shell.handle(control: "level.select", values: [4]).isAccepted)
         let saved = try shell.snapshot()
         first.close()
-        let newerEnvelope = try mazeEnvelope(Data(saved.payload.utf8), like: saved, schema: 2)
-        let newerPayload = try mazeEnvelope(mazePayload(saved.payload) { $0["schema"] = 2 }, like: saved)
+        let newerEnvelope = try mazeEnvelope(Data(saved.payload.utf8), like: saved, schema: 3)
+        let newerPayload = try mazeEnvelope(mazePayload(saved.payload) { $0["schema"] = 3 }, like: saved)
 
         let cases: [(String, ExperienceSnapshot)] = [("envelope", newerEnvelope), ("payload", newerPayload)]
         for (name, newer) in cases {
