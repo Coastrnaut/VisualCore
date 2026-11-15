@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/ExperiencesCreative",
+    "--scheme",
+    "ExperiencesCreative-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--only-testing",
+    "PhysicsPlaygroundCoreTests",
+    "PhysicsPlaygroundExperienceTests"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing PhysicsPlaygroundCoreTests PhysicsPlaygroundExperienceTests",
+  "elapsed_seconds": 23.038,
+  "exit_code": 0,
+  "finished": "2026-11-15T10:10:43+00:00",
+  "log": ".autonomy/logs/A11-P06.playground-ios27.log",
+  "log_sha256": "22c771d4b5a6fc7dc95cc13a3c6ad1f0d3003991ea700d335a074732175f0cd7",
+  "name": "playground-ios27",
+  "stage": "A11-P06",
+  "started": "2026-11-15T10:10:20+00:00",
+  "timed_out": false
+}

@@ -17,7 +17,7 @@ stay open, as for A10-P06.
 
 ## Phase 3: User Story 2 — damaged data never breaks the playground (P1)
 
-- [ ] T-A11-604 [P] [US2] Write `Packages/ExperiencesCreative/PhysicsPlayground/ExperienceTests/PlaygroundRecoveryDrawTests.swift` (a saved experiment, `failNextDraw`, a frame puts the session into its failure state, `experiment-<slot>.json` byte-identical, a new session draws; the schema-1…4 examples restore) (FR-A11-611, 612)
+- [X] T-A11-604 [P] [US2] Write `Packages/ExperiencesCreative/PhysicsPlayground/ExperienceTests/PlaygroundRecoveryDrawTests.swift` (a saved experiment, `failNextDraw`, a frame puts the session into its failure state, `experiment-<slot>.json` byte-identical, a new session draws; the schema-1…4 examples restore) (FR-A11-611, 612) — Verified 2026-11-15: 2026-11-15: .autonomy/checks/A11-P06.playground-ios27.json exit 0 (sim-27.2: 92 XCTest + 118 Swift Testing tests); PlaygroundRecoveryDrawTests: failNextDraw fails the session, experiment-2.json byte-identical, a new session draws; schema-1…4 examples restore
 - [ ] T-A11-605 [US2] Re-run the committed sample files (`ExperimentSampleFileTests`: valid opened; newer, damaged, truncated refused and byte-identical) in the package run of T-A11-610 (FR-A11-610; SC-A11-602)
 
 ## Phase 4: User Story 3 — honest copy and a complete checklist (P1)
