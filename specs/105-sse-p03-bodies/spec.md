@@ -69,7 +69,7 @@ back faces (`GL_CULL_FACE`, `GL_BACK`, MeshRenderer.swift); `OrbitCamera` has pu
   pushed out radially to the clearance. Reduce Motion (passed at make) cuts in one frame. A new focus during a flight
   starts from the current drawn eye. The pure `FocusFlight` function is tested for all 72 ordered pairs in both modes.
 - Q: What near and far planes and what precision bound apply? → A: Enhanced: near 0.5, far 200 (A14-P02). True-relative:
-  near = max(1e-4, 0.05 × camera distance), far = camera distance + 70. Model matrices are built from positions minus
+  near = max(1e-4, 0.05 × camera distance), far = camera distance + 140. Model matrices are built from positions minus
   the camera target in double precision before conversion to single precision; the test converts every body's
   camera-relative position to Float and back for both modes, every focus and zoom steps −1, 0 and 12, and bounds the
   error by 0.1 pixel at a 2,000-pixel-high canvas with a 60° field of view (pixel size 2 · d · tan 30° / 2,000 at camera

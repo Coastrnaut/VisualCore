@@ -10,8 +10,9 @@
 //     drawn radii and distances keep the catalog's ratios. Label: "Distances and sizes to one scale; small bodies
 //     marked" (a body drawn under 2 px gets a marker, which the presenter draws).
 // Camera: the overview distance is 60 (enhanced) or 120 (true-relative) times 1.25^−zoomSteps; near and far are
-// 0.5 and 200 (enhanced) or max(1e-4, 0.05 · d) and d + 70 (true-relative) for camera distance d, so the scene (at
-// most 22 or about 61 units from the Sun) and the focused body stay inside the depth range.
+// 0.5 and 200 (enhanced) or max(1e-4, 0.05 · d) and d + 140 (true-relative) for camera distance d, so the scene (at
+// most 22 or about 61 units from the Sun) and the focused body stay inside the depth range, and the starfield drawn at
+// 0.9 × far (180, or 0.9 · d + 126) lies beyond every body (97 at most, or d + 61) for every camera distance used.
 import Foundation
 import VisualCoreMath
 
@@ -103,7 +104,7 @@ public enum ScaleMode: Int, CaseIterable, Codable, Sendable {
     public func clipRange(distance: Double) -> (near: Double, far: Double) {
         switch self {
         case .enhanced: return (0.5, 200)
-        case .trueRelative: return (max(1e-4, 0.05 * distance), distance + 70)
+        case .trueRelative: return (max(1e-4, 0.05 * distance), distance + 140)
         }
     }
 }

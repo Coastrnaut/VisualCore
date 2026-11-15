@@ -1,43 +1,54 @@
 // SolarPresenter — feature 103 (A14-P01) T-A14-103 (FR-A14-120…122; clarifications Q4, Q5), the orbit view by feature
-// 104 (A14-P02) T-A14-207 and T-A14-208 (FR-A14-220, FR-A14-221; clarifications Q4, Q5; research D4;
-// contracts/orbit-view.md). Draws Solar System Explorer through the host only (the host's context and registry,
-// VisualCore's `DepthMeshPass` and `MeshRenderer` with an `OrbitCamera`; no context of its own, no second renderer, no
-// imported assets). The presenter reads the core and never writes it:
-//   - The orbit view: the Sun at the origin and each planet at its scene position for the state's date
-//     (``OrbitLayout/scenePosition(index:day:)``: the heliocentric ecliptic position through the 4√r mapping, the
-//     ecliptic in the scene's x–z plane, y up), with display radius A14-P01's × 0.6 (planets) or × 0.5 (the Sun)
-//     (``OrbitLayout/displayRadius(index:)``). Distances and sizes are not to scale; the canvas description and the
-//     legend say so.
-//   - Orbits: eight closed `Mesh.tube` loops (radius 0.04, 6 sides) along 128 samples of each planet's orbit
-//     (``OrbitLayout/orbitPath(bodyID:)``), drawn fully bright in a dim colour (``SolarPresenter/orbitColor``).
-//   - Meshes: one UV sphere per body (`Mesh.uvSphere(segments: 32, rings: 16, radius:)`) with per-vertex colours from a
-//     seeded two-band latitude palette made in code (``SolarPresenter/palettes``: two colours and an odd number of
-//     latitude bands per body, each band's brightness scaled by 0.88…1 from a SplitMix64 hash of the body index and
-//     the band, so the equator always lies in the middle of one band). The body, ring and orbit meshes are CPU data,
-//     made once and kept across context recreations.
-//   - Light from the Sun: every frame each planet renderer lights toward the Sun from the planet's scene position
-//     (``SolarPresenter/lightDirection(at:)``) with ambient 0.25, so the lit half faces the Sun; the Sun is drawn
-//     fully bright (ambient 1).
-//   - The selected (focused) body gets a ring outline: a closed `Mesh.tube` circle of radius
-//     ``SolarPresenter/ringRadius(displayRadius:)`` made in the x–y plane and turned to face the camera, scaled by
-//     max(1, distance / 20) so it stays visible from afar (``OrbitLayout/ringModel(center:camera:)``), drawn fully
-//     bright in the ring colour.
-//   - Camera: ``OrbitLayout/camera(state:)``, target the focused body's scene position, yaw, pitch and distance from
-//     the state (the native controls step them), 60° field of view.
-//   - GPU objects: one `DepthMeshPass` and 26 mesh renderers (nine bodies, nine rings, eight orbits), all made together
-//     with the host's registry in `setup` (so they are made again after a context recreation; `draw` makes them all if
-//     any are missing) and all released together in `teardown`. Every mesh renderer shares one cached shader program
-//     in the host's registry and releasing any renderer releases that program for all of them (A14-P01 research, As
-//     built), so no renderer is ever released while others are in use: the selection only picks a ring.
-//   - Probes: the background at (0.5, 0.04) from the top left, expected dark, when the ray through it misses every
-//     body, the ring and the orbits' slab (``OrbitLayout/rayMissesScene(ndc:state:aspect:)``); and the focused body's
-//     centre with the colour class of its equator band and the bands of the vertex rows next to it under the light
-//     there, when the body is at least 3 pixels in radius, nothing lies in front of its centre and the class is robust
-//     at 0.7…1.3 times the brightness (it is for the Sun, drawn at full brightness: red).
-//   - Words: the canvas description of `SolarCore`; the controls show the date, the camera, the status, the fact card
-//     with the distance from the Sun and the answer to a refused action.
-// Nothing moves by itself (only an action changes the view), so Reduce Motion changes nothing; nothing flashes. No
-// audio.
+// 104 (A14-P02) T-A14-207 and T-A14-208 (FR-A14-220, FR-A14-221; research D4; contracts/orbit-view.md), the 3D bodies,
+// scale modes and focus flight by feature 105 (A14-P03) T-A14-308 (FR-A14-301–303, FR-A14-311, FR-A14-312,
+// FR-A14-320–322; clarifications Q1–Q5; contracts/bodies.md). Draws Solar System Explorer through the host only (the
+// host's context and registry, VisualCore's `DepthMeshPass` and `MeshRenderer` with an `OrbitCamera`; no context of
+// its own, no second renderer, no imported assets). The presenter reads the core and never writes it:
+//   - Bodies: each body is the unit 48 × 24 sphere of ``SceneMeshes`` with per-vertex colours from its `SurfaceRecipe`
+//     (seam-free procedural surfaces), drawn at its position in the state's scale mode (``OrbitLayout/scenePosition(
+//     index:day:mode:)``), scaled to the mode's drawn radius and tilted by its catalog axial tilt about the scene x
+//     axis. The Sun is emissive (ambient 1); each planet is lit from the Sun (its light direction points from the
+//     planet toward the origin, ``lightDirection(at:)``, ambient 0.25).
+//   - Saturn's ring: the two-sided annulus of ``SceneMeshes/saturnRing(_:)`` (Cassini division darker) around Saturn,
+//     scaled with Saturn's drawn radius and tilted with it, lit from the Sun with ambient 0.7.
+//   - Orbits: eight closed tubes per scale mode along 128 samples of each planet's orbit
+//     (``OrbitLayout/orbitPath(bodyID:mode:)``); the active mode's set is drawn fully bright in a dim colour.
+//   - Starfield: 400 seeded stars (``SceneMeshes/starMesh(directions:)``) centred on the eye at 0.9 × the active far
+//     plane, white at ambient 1, drawn last; in the enhanced mode every body lies nearer (at most 75 + 22 units from
+//     the eye against 180), so no star is ever drawn in front of a body.
+//   - Markers (true-relative mode): every body drawn under 2 pixels in radius gets a camera-facing marker ring of 6
+//     pixels in its recipe's primary colour (``OrbitLayout/markerIndices(mode:day:eye:heightPixels:)``); markers never
+//     change the drawn body.
+//   - The selected body gets a ring outline: a closed `Mesh.tube` circle of radius ``OrbitLayout/selectionRingRadius(
+//     index:)`` facing the camera, scaled by max(1, distance / 20) (enhanced) or to 10 pixels (true-relative), drawn
+//     fully bright in the ring colour.
+//   - Focus flight: the drawn camera follows a ``FocusFlight``. When the selection or the scale mode changes, a flight
+//     starts from the view drawn last to the new view (restarted from the current view if one is running); every drawn
+//     frame advances it one of its 30 frames, so the new view is reached on the 30th frame; Reduce Motion (passed at
+//     make) cuts to it on the first. A zoom or date change only moves the flight's destination. The eye is pushed out
+//     of every body's clearance (``FocusFlight/eye(at:yaw:pitch:bodies:near:)``); near and far come from the mode's
+//     clip range at the drawn distance. The flight is presentation state and never reaches the core.
+//   - Camera-relative drawing (FR-A14-322): every model matrix is built from the position minus the drawn target,
+//     subtracted in Double and rounded to Float (``CameraRelative/relative(_:to:)``), and the scene is drawn through an
+//     orbit camera with the same yaw, pitch and distance whose target is the origin, so precision does not depend on
+//     the distance from the Sun.
+//   - GPU objects: one `DepthMeshPass` and 37 mesh renderers (nine bodies, nine selection rings, eight orbits per
+//     scale mode, Saturn's ring, the starfield and one marker ring), all made together with the host's registry in
+//     `setup` (so they are made again after a context recreation; `draw` releases and makes them all if any is
+//     missing) and all released together in `teardown`. Every mesh renderer shares one cached shader program in the
+//     host's registry and releasing any renderer releases that program for all of them (A14-P01 research, As built),
+//     so no renderer is ever released while others are in use. The CPU meshes are made once and kept.
+//   - Probes (from the camera and eye of the last drawn frame): the background at the first of
+//     ``backgroundProbes`` whose ray misses every body, Saturn's ring, the selection ring, every marker, the orbits
+//     and every star (``OrbitLayout/rayMissesScene(ndc:camera:state:aspect:heightPixels:)``), expected dark; and the focused body's centre with the colour class of the recipe colours
+//     of the sphere vertices around the point facing the eye, lit as drawn, when the body is at least 3 pixels in
+//     radius, inside the canvas and the star sphere, nothing lies in front of its centre and the class is robust (at
+//     0.7…1.3 times the brightness for a lit planet; for the emissive Sun, drawn exactly in its vertex colours, at 1).
+//   - Words: the canvas description of `SolarCore` (ending with the scale mode's label); the controls show the date,
+//     the camera, the scale mode, the status, the fact card with the distance from the Sun and the answer to a refused
+//     action. A change of the scale mode is announced with the new description (through the system's VoiceOver
+//     announcements; tests inject a sink).
+// Nothing flashes; the only motion is the focus flight, cut by Reduce Motion. No audio.
 import Foundation
 import SolarSystemExplorerCore
 import SwiftUI
@@ -46,6 +57,7 @@ import VisualCoreExperienceHost
 import VisualCoreMath
 import VisualCoreRendering
 import VisualCoreScenes
+import VisualCoreUI
 
 /// What the controls show, updated only when a field changes.
 @MainActor
@@ -77,26 +89,22 @@ final class SolarMirror {
     var pitchDegrees = SolarState.overviewPitch
     /// The zoom steps, −1…12.
     var zoomSteps = 0
-    /// The camera distance in scene units (60 · 1.25^−zoomSteps).
+    /// The camera distance in scene units of the active scale mode (60 or 120 · 1.25^−zoomSteps).
     var cameraDistance = SolarState.overviewDistance
+    /// The active scale mode.
+    var scaleMode = ScaleMode.enhanced
+    /// The active scale mode's name ("Enhanced", "True relative").
+    var scaleName = ScaleMode.enhanced.name
+    /// The active scale mode's label ("Distances and sizes not to scale").
+    var scaleLabel = ScaleMode.enhanced.label
 }
 
-/// The colours of one body: two band colours (RGB 0…1) and an odd number of latitude bands.
-struct BodyPalette: Equatable, Sendable {
-    /// The colour of the even bands (the equator band when `bands` is 1, 5 or 9).
-    let first: Vec3
-    /// The colour of the odd bands.
-    let second: Vec3
-    /// The number of latitude bands (odd, so the equator lies in the middle of a band).
-    let bands: Int
-}
-
-/// Draws Solar System Explorer and owns its presentation state (meshes, renderers and the depth pass).
+/// Draws Solar System Explorer and owns its presentation state (meshes, renderers, the depth pass and the flight).
 @MainActor
 final class SolarPresenter: ExperiencePresenter {
-    /// A14-P01's display radius of the Sun (clarification Q4); the orbit view draws it × 0.5.
+    /// A14-P01's display radius of the Sun (clarification Q4); the enhanced mode draws it × 0.5.
     nonisolated static let sunDisplayRadius = 1.6
-    /// A14-P01's display radius of a planet of Mercury's size; the orbit view draws planets × 0.6.
+    /// A14-P01's display radius of a planet of Mercury's size; the enhanced mode draws planets × 0.6.
     nonisolated static let basePlanetRadius = 0.25
     /// The display radius added per doubling of the mean radius.
     nonisolated static let radiusPerDoubling = 0.15
@@ -104,26 +112,31 @@ final class SolarPresenter: ExperiencePresenter {
     nonisolated static let referenceRadiusKm: Double = {
         BodyCatalog.bundled.bodies.first { $0.id == "mercury" }?.meanRadiusKm ?? 2_439.7
     }()
-    /// Longitude segments of each sphere.
-    nonisolated static let sphereSegments = 32
-    /// Latitude rings of each sphere.
-    nonisolated static let sphereRings = 16
     /// The ring outline's tube radius (before the ring scale).
     nonisolated static let ringTubeRadius = 0.05
     /// The points of the ring outline's circle.
     nonisolated static let ringPoints = 64
     /// The sides of the ring outline's tube.
     nonisolated static let ringSides = 8
-    /// The orbit tubes' radius (research D4).
-    nonisolated static let orbitTubeRadius = 0.04
+    /// The enhanced orbit tubes' radius (A14-P02 research D4).
+    nonisolated static let orbitTubeRadius = OrbitLayout.enhancedOrbitTubeRadius
     /// The sides of the orbit tubes (research D4).
     nonisolated static let orbitSides = 6
     /// The planets' ambient light fraction.
     nonisolated static let planetAmbient = 0.25
     /// The smallest radius in pixels a body needs for a centre probe.
     nonisolated static let probeMinimumPixels = 3.0
-    /// The background probe's position from the top left.
+    /// The background probe's first position from the top left.
     nonisolated static let backgroundProbe = Vec2(0.5, 0.04)
+    /// The background probe's positions from the top left, tried in order (the first whose ray misses everything).
+    nonisolated static let backgroundProbes: [Vec2] = [Vec2(0.5, 0.04), Vec2(0.25, 0.04), Vec2(0.75, 0.04),
+                                                       Vec2(0.06, 0.06), Vec2(0.94, 0.06), Vec2(0.5, 0.1),
+                                                       Vec2(0.06, 0.94), Vec2(0.94, 0.94)]
+    /// The angle around the point facing the eye within which sphere vertices feed the centre probe (radians; one
+    /// cell diagonal of the 48 × 24 sphere is about 0.185).
+    nonisolated static let centerNeighbourAngle = 0.19
+    /// The brightness factors a lit planet's centre class must survive.
+    nonisolated static let litScales: [Double] = [0.7, 0.85, 1, 1.15, 1.3]
 
     /// The canvas around the bodies.
     nonisolated static let backgroundColor = Vec4(0.02, 0.025, 0.05, 1)
@@ -132,30 +145,28 @@ final class SolarPresenter: ExperiencePresenter {
     /// The orbit lines (dim, so the bodies stand out).
     nonisolated static let orbitColor = Vec4(0.24, 0.3, 0.42, 1)
 
-    /// The palettes of the nine bodies in catalog order: Sun, Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus,
-    /// Neptune (made in code; not imagery).
-    nonisolated static let palettes: [BodyPalette] = [
-        BodyPalette(first: Vec3(1, 0.62, 0.18), second: Vec3(1, 0.75, 0.3), bands: 5),
-        BodyPalette(first: Vec3(0.62, 0.6, 0.58), second: Vec3(0.5, 0.48, 0.46), bands: 3),
-        BodyPalette(first: Vec3(0.9, 0.82, 0.6), second: Vec3(0.82, 0.72, 0.5), bands: 3),
-        BodyPalette(first: Vec3(0.2, 0.42, 0.85), second: Vec3(0.28, 0.6, 0.32), bands: 5),
-        BodyPalette(first: Vec3(0.82, 0.38, 0.2), second: Vec3(0.66, 0.3, 0.16), bands: 3),
-        BodyPalette(first: Vec3(0.86, 0.74, 0.58), second: Vec3(0.7, 0.5, 0.36), bands: 9),
-        BodyPalette(first: Vec3(0.92, 0.84, 0.62), second: Vec3(0.8, 0.7, 0.5), bands: 7),
-        BodyPalette(first: Vec3(0.62, 0.86, 0.9), second: Vec3(0.52, 0.78, 0.84), bands: 3),
-        BodyPalette(first: Vec3(0.3, 0.45, 0.95), second: Vec3(0.22, 0.36, 0.82), bands: 5),
-    ]
+    /// The selection and scale mode a flight goes to.
+    struct FocusKey: Equatable {
+        /// The selected body.
+        var selection: Int
+        /// The scale mode.
+        var mode: ScaleMode
+    }
 
     /// The experience this presenter draws.
     let experienceID: ExperienceID
+    /// Whether Reduce Motion is on (the focus flight cuts).
+    let reduceMotion: Bool
+    /// Where announcements go (the system's VoiceOver announcements by default).
+    let announcementSink: any AnnouncementSink
     /// What the controls show.
     let mirror = SolarMirror()
 
     /// Whether the GPU side is set up (between `setup` and `teardown`).
     private(set) var isLive = false
-    /// How many times the renderers (bodies, rings and orbits, always together) were made.
+    /// How many times the renderers (all 37, always together) were made.
     private(set) var rendererBuildCount = 0
-    /// How many times the nine ring renderers were made (with the body renderers; never per selection).
+    /// How many times the nine selection ring renderers were made (with the others; never per selection).
     private(set) var ringBuildCount = 0
     /// How many times the CPU meshes were made (once per presenter).
     private(set) var meshBuildCount = 0
@@ -163,33 +174,74 @@ final class SolarPresenter: ExperiencePresenter {
     private(set) var lastBodiesDrawn = 0
     /// The number of orbit lines drawn by the last frame.
     private(set) var lastOrbitsDrawn = 0
-    /// Whether the last frame drew the ring outline.
+    /// Whether the last frame drew the selection ring.
     private(set) var lastRingDrawn = false
+    /// Whether the last frame drew Saturn's ring.
+    private(set) var lastSaturnRingDrawn = false
+    /// Whether the last frame drew the starfield.
+    private(set) var lastStarsDrawn = false
+    /// The star sphere's radius in the last frame (0.9 × its far plane); 0 before the first frame.
+    private(set) var lastStarRadius = 0.0
+    /// The number of markers drawn by the last frame.
+    private(set) var lastMarkersDrawn = 0
+    /// The bodies marked in the last frame, in catalog order.
+    private(set) var lastMarkedBodies: [Int] = []
     /// The selection the last frame drew; nil before the first frame.
     private(set) var lastSelection: Int?
     /// The simulated date (days since J2000.0) the last frame drew; nil before the first frame.
     private(set) var lastDayOffset: Double?
-    /// The camera of the last frame; nil before the first frame.
+    /// The scale mode the last frame drew; nil before the first frame.
+    private(set) var lastScaleMode: ScaleMode?
+    /// The drawn camera of the last frame in scene coordinates (target = the drawn target); nil before the first.
     private(set) var lastCamera: OrbitCamera?
+    /// The drawn eye of the last frame in scene coordinates (after the clearance push); nil before the first frame.
+    private(set) var lastEye: Vec3?
     /// The drawable size in pixels of the last frame; nil before the first.
     private(set) var lastCanvas: Vec2?
-    /// The body meshes with their colours in catalog order; empty until first needed.
+    /// The focus flight the drawn camera follows; nil before the first frame.
+    private(set) var flight: FocusFlight?
+    /// The flight frame the last frame drew (0…30).
+    private(set) var flightFrame = 0
+    /// The view the last frame drew; nil before the first frame.
+    private(set) var lastDrawnView: FocusFlight.View?
+    /// The selection and scale mode of the last frame's flight destination; nil before the first frame.
+    private(set) var focusKey: FocusKey?
+    /// The scale mode last seen by the announcements; nil until the first state.
+    private(set) var announcedScaleMode: ScaleMode?
+    /// The last text announced; empty before the first announcement.
+    private(set) var lastAnnouncement = ""
+    /// The number of announcements made.
+    private(set) var announcementCount = 0
+    /// The unit body spheres with their recipe colours in catalog order; empty until first needed.
     private(set) var bodyMeshes: [(mesh: Mesh, colors: [Vec4])] = []
-    /// The ring meshes in catalog order (centred on the origin, x–y plane); empty until first needed.
+    /// The selection ring meshes in catalog order (centred on the origin, x–y plane); empty until first needed.
     private(set) var ringMeshes: [Mesh] = []
-    /// The orbit meshes of ``OrbitLayout/orbitBodyIDs`` (scene coordinates); empty until first needed.
+    /// The enhanced orbit meshes of ``OrbitLayout/orbitBodyIDs`` (scene coordinates); empty until first needed.
     private(set) var orbitMeshes: [Mesh] = []
+    /// The true-relative orbit meshes of ``OrbitLayout/orbitBodyIDs``; empty until first needed.
+    private(set) var trueOrbitMeshes: [Mesh] = []
+    /// Saturn's two-sided ring in Saturn radii with its colours; nil until first needed.
+    private(set) var saturnRingMesh: (mesh: Mesh, colors: [Vec4])?
+    /// The starfield on the unit sphere; nil until first needed.
+    private(set) var starMesh: Mesh?
+    /// The unit marker ring; nil until first needed.
+    private(set) var markerMesh: Mesh?
     /// The body renderers in catalog order; empty after `teardown`.
     private(set) var bodyRenderers: [MeshRenderer] = []
-    /// The ring renderers of the nine bodies in catalog order, made once with the body renderers; empty after
-    /// `teardown`. All mesh renderers share one cached shader program in the host's registry, and releasing any
-    /// renderer releases that program for all of them, so no renderer is released while the others are in use: the
-    /// selection only chooses which ring is drawn.
+    /// The selection ring renderers of the nine bodies in catalog order, made once with the others; empty after
+    /// `teardown`. The selection only chooses which ring is drawn.
     private(set) var ringRenderers: [MeshRenderer] = []
-    /// The eight orbit renderers in the order of ``OrbitLayout/orbitBodyIDs``, made with the body renderers; empty
-    /// after `teardown`.
+    /// The eight enhanced orbit renderers in the order of ``OrbitLayout/orbitBodyIDs``; empty after `teardown`.
     private(set) var orbitRenderers: [MeshRenderer] = []
-    /// The ring renderer of the last drawn selection; nil after `teardown` or before the first frame.
+    /// The eight true-relative orbit renderers; empty after `teardown`.
+    private(set) var trueOrbitRenderers: [MeshRenderer] = []
+    /// Saturn's ring renderer; nil after `teardown`.
+    private(set) var saturnRingRenderer: MeshRenderer?
+    /// The starfield renderer; nil after `teardown`.
+    private(set) var starRenderer: MeshRenderer?
+    /// The marker renderer (drawn once per marked body); nil after `teardown`.
+    private(set) var markerRenderer: MeshRenderer?
+    /// The selection ring renderer of the last drawn selection; nil after `teardown` or before the first frame.
     var ringRenderer: MeshRenderer? {
         guard let selection = lastSelection, ringRenderers.indices.contains(selection) else { return nil }
         return ringRenderers[selection]
@@ -197,9 +249,12 @@ final class SolarPresenter: ExperiencePresenter {
     /// The depth-correct pass the scene is drawn through; made in `setup`, released in `teardown`.
     private(set) var depthPass: DepthMeshPass?
 
-    /// A presenter for the experience `experienceID`.
-    init(experienceID: ExperienceID) {
+    /// A presenter for the experience `experienceID`; `reduceMotion` cuts the focus flight; `announcementSink`
+    /// replaces the system's VoiceOver announcements (nil: the system's).
+    init(experienceID: ExperienceID, reduceMotion: Bool = false, announcementSink: (any AnnouncementSink)? = nil) {
         self.experienceID = experienceID
+        self.reduceMotion = reduceMotion
+        self.announcementSink = announcementSink ?? SystemAnnouncementSink()
     }
 
     // MARK: Render scene
@@ -212,14 +267,16 @@ final class SolarPresenter: ExperiencePresenter {
         isLive = true
     }
 
-    /// Whether every renderer is present (nine bodies, nine rings and one per orbit).
+    /// Whether every renderer is present.
     private var renderersComplete: Bool {
         bodyRenderers.count == SolarCore.bodyCount && ringRenderers.count == SolarCore.bodyCount
             && !orbitRenderers.isEmpty && orbitRenderers.count == orbitMeshes.count
+            && trueOrbitRenderers.count == trueOrbitMeshes.count && saturnRingRenderer != nil && starRenderer != nil
+            && markerRenderer != nil
     }
 
-    /// Draws the nine bodies at their positions on the state's date, lit from the Sun, the orbit lines and the ring
-    /// outline on the focused body, with depth, through the state's camera.
+    /// Draws the bodies, Saturn's ring, the active mode's orbits, the selection ring, the markers and the starfield
+    /// with depth through the drawn camera of the focus flight, camera-relative.
     func draw(_ core: SolarCore, tier: Int, context: RenderContext, frame: FrameInfo) throws {
         sync(core)
         let width = Double(max(1, context.pixelWidth)), height = Double(max(1, context.pixelHeight))
@@ -230,44 +287,139 @@ final class SolarPresenter: ExperiencePresenter {
             releaseRenderers()
             try makeRenderers(context)
         }
-        guard let depthPass else { return }
+        guard let depthPass, let saturnRingRenderer, let starRenderer, let markerRenderer else { return }
         depthPass.clearColor = Self.backgroundColor
         let state = core.state
-        let camera = OrbitLayout.camera(state: state)
+        let mode = state.scaleMode
+        let day = state.dayOffset
+        let drawn = advanceView(state: state)
+        let camera = drawn.camera
+        let eye = drawn.eye
+        let target = camera.target
+        // Draw relative to the drawn target: the same yaw, pitch and distance looking at the origin.
+        let relativeCamera = OrbitCamera(target: .zero, distance: camera.distance, yaw: camera.yaw,
+                                         pitch: camera.pitch, fovY: camera.fovY, near: camera.near, far: camera.far)
+        func relative(_ p: Vec3) -> Vec3 {
+            let f = CameraRelative.relative(p, to: target)
+            return Vec3(Double(f.x), Double(f.y), Double(f.z))
+        }
         var items: [DepthMeshPass.Item] = []
+        var centers: [Vec3] = []
         for (index, renderer) in bodyRenderers.enumerated() {
-            let center = OrbitLayout.scenePosition(index: index, day: state.dayOffset)
+            let center = OrbitLayout.scenePosition(index: index, day: day, mode: mode)
+            centers.append(center)
             if index > 0 { renderer.lightDirection = Self.lightDirection(at: center) }
-            items.append(DepthMeshPass.Item(renderer: renderer, model: Mat4.translation(center),
-                                            color: Vec4(1, 1, 1, 1)))
+            let r = mode.drawnRadius(index: index)
+            let model = Mat4.translation(relative(center)) * SceneMeshes.bodyTilt(index: index)
+                * Mat4.scale(Vec3(r, r, r))
+            items.append(DepthMeshPass.Item(renderer: renderer, model: model, color: Vec4(1, 1, 1, 1)))
         }
         let bodies = items.count
-        for renderer in orbitRenderers {
-            items.append(DepthMeshPass.Item(renderer: renderer, model: .identity, color: Self.orbitColor))
+        // Saturn's ring (unit = Saturn radii), tilted with Saturn.
+        let saturn = SceneMeshes.saturnIndex
+        let saturnCenter = centers.indices.contains(saturn) ? centers[saturn] : .zero
+        let saturnRadius = mode.drawnRadius(index: saturn)
+        saturnRingRenderer.lightDirection = Self.lightDirection(at: saturnCenter)
+        items.append(DepthMeshPass.Item(renderer: saturnRingRenderer,
+                                        model: Mat4.translation(relative(saturnCenter))
+                                            * SceneMeshes.bodyTilt(index: saturn)
+                                            * Mat4.scale(Vec3(saturnRadius, saturnRadius, saturnRadius)),
+                                        color: Vec4(1, 1, 1, 1)))
+        let orbits = mode == .enhanced ? orbitRenderers : trueOrbitRenderers
+        let orbitModel = Mat4.translation(relative(.zero))
+        for renderer in orbits {
+            items.append(DepthMeshPass.Item(renderer: renderer, model: orbitModel, color: Self.orbitColor))
         }
         let selection = state.selection
-        let ringDrawn = ringRenderers.indices.contains(selection)
+        let ringDrawn = ringRenderers.indices.contains(selection) && centers.indices.contains(selection)
         if ringDrawn {
+            let center = centers[selection]
+            let scale = OrbitLayout.selectionRingScale(index: selection, mode: mode, cameraDistance: camera.distance,
+                                                       eyeDistance: (center - eye).length, heightPixels: height)
             items.append(DepthMeshPass.Item(renderer: ringRenderers[selection],
-                                            model: OrbitLayout.ringModel(center: camera.target, camera: camera),
+                                            model: OrbitLayout.facingModel(center: relative(center), yaw: camera.yaw,
+                                                                           pitch: camera.pitch, scale: scale),
                                             color: Self.ringColor))
         }
-        try depthPass.draw(items, camera: camera, context: context)
+        let marked = OrbitLayout.markerIndices(mode: mode, day: day, eye: eye, heightPixels: height)
+        for index in marked where centers.indices.contains(index) {
+            let center = centers[index]
+            let scale = OrbitLayout.markerScale(center: center, eye: eye, heightPixels: height)
+            items.append(DepthMeshPass.Item(renderer: markerRenderer,
+                                            model: OrbitLayout.facingModel(center: relative(center), yaw: camera.yaw,
+                                                                           pitch: camera.pitch, scale: scale),
+                                            color: SceneMeshes.markerColor(index: index)))
+        }
+        // The starfield last, centred on the eye at 0.9 × far.
+        let starRadius = SceneMeshes.starRadius(far: camera.far)
+        items.append(DepthMeshPass.Item(renderer: starRenderer,
+                                        model: Mat4.translation(relative(eye))
+                                            * Mat4.scale(Vec3(starRadius, starRadius, starRadius)),
+                                        color: SceneMeshes.starColor))
+        try depthPass.draw(items, camera: relativeCamera, context: context)
         lastBodiesDrawn = bodies
-        lastOrbitsDrawn = orbitRenderers.count
+        lastOrbitsDrawn = orbits.count
         lastRingDrawn = ringDrawn
+        lastSaturnRingDrawn = true
+        lastStarsDrawn = true
+        lastStarRadius = starRadius
+        lastMarkersDrawn = marked.count
+        lastMarkedBodies = marked
         lastSelection = selection
-        lastDayOffset = state.dayOffset
+        lastDayOffset = day
+        lastScaleMode = mode
         lastCamera = camera
+        lastEye = eye
     }
 
-    /// Releases every GPU object; the CPU meshes stay for the next context.
+    /// Advances the focus flight by one drawn frame for `state` and returns the drawn camera (scene coordinates) and
+    /// eye (see the file header).
+    private func advanceView(state: SolarState) -> (camera: OrbitCamera, eye: Vec3) {
+        let mode = state.scaleMode
+        let destination = FocusFlight.View(
+            target: OrbitLayout.scenePosition(index: state.selection, day: state.dayOffset, mode: mode),
+            distance: mode.cameraDistance(zoomSteps: state.zoomSteps))
+        let key = FocusKey(selection: state.selection, mode: mode)
+        var current: FocusFlight
+        if let running = flight, let drawnView = lastDrawnView {
+            if key != focusKey {
+                current = running.restarted(from: drawnView, to: destination)
+                flightFrame = 0
+            } else {
+                current = running
+                current.to = destination
+            }
+        } else {
+            current = FocusFlight(from: destination, to: destination, reduceMotion: reduceMotion)
+            flightFrame = FocusFlight.frameCount
+        }
+        flightFrame = min(flightFrame + 1, FocusFlight.frameCount)
+        flight = current
+        focusKey = key
+        let view = current.view(at: flightFrame)
+        lastDrawnView = view
+        let degrees = Double.pi / 180
+        let yaw = state.yawDegrees * degrees, pitch = Double(state.pitchDegrees) * degrees
+        let clip = mode.clipRange(distance: view.distance)
+        let raw = OrbitCamera(target: view.target, distance: view.distance, yaw: yaw, pitch: pitch,
+                              fovY: OrbitLayout.fieldOfView, near: clip.near, far: clip.far)
+        let eye = current.eye(at: flightFrame, yaw: yaw, pitch: pitch,
+                              bodies: FocusFlight.bodies(mode: mode, day: state.dayOffset), near: clip.near)
+        if eye == raw.eye { return (raw, eye) }
+        return (OrbitLayout.camera(target: view.target, eye: eye, near: clip.near, far: clip.far), eye)
+    }
+
+    /// Releases every GPU object; the CPU meshes and the flight stay for the next context.
     func teardown(_ context: RenderContext) {
         isLive = false
         releaseGPU()
         lastBodiesDrawn = 0
         lastOrbitsDrawn = 0
         lastRingDrawn = false
+        lastSaturnRingDrawn = false
+        lastStarsDrawn = false
+        lastMarkersDrawn = 0
+        lastMarkedBodies = []
     }
 
     /// Releases every renderer and the depth pass.
@@ -277,63 +429,93 @@ final class SolarPresenter: ExperiencePresenter {
         depthPass = nil
     }
 
-    /// Releases the body, ring and orbit renderers, all together.
+    /// Releases every mesh renderer, all together.
     private func releaseRenderers() {
         for renderer in bodyRenderers { renderer.release() }
         for renderer in ringRenderers { renderer.release() }
         for renderer in orbitRenderers { renderer.release() }
+        for renderer in trueOrbitRenderers { renderer.release() }
+        saturnRingRenderer?.release()
+        starRenderer?.release()
+        markerRenderer?.release()
         bodyRenderers = []
         ringRenderers = []
         orbitRenderers = []
+        trueOrbitRenderers = []
+        saturnRingRenderer = nil
+        starRenderer = nil
+        markerRenderer = nil
     }
 
-    /// Makes the CPU meshes (bodies, rings and orbits) once.
+    /// Whether every CPU mesh is present.
+    private var meshesComplete: Bool {
+        bodyMeshes.count == SolarCore.bodyCount && ringMeshes.count == SolarCore.bodyCount && !orbitMeshes.isEmpty
+            && trueOrbitMeshes.count == orbitMeshes.count && saturnRingMesh != nil && starMesh != nil
+            && markerMesh != nil
+    }
+
+    /// Makes the CPU meshes once: bodies, selection rings, both orbit sets, Saturn's ring, the stars and the marker.
     private func buildMeshes() throws {
-        let bodies = Self.meshes()
+        let bodies = SceneMeshes.bodies()
         var rings: [Mesh] = []
         for index in 0..<SolarCore.bodyCount { rings.append(try Self.ringMesh(selection: index)) }
         var orbits: [Mesh] = []
-        for id in OrbitLayout.orbitBodyIDs { orbits.append(try Self.orbitMesh(bodyID: id)) }
+        var trueOrbits: [Mesh] = []
+        for id in OrbitLayout.orbitBodyIDs {
+            orbits.append(try SceneMeshes.orbitMesh(bodyID: id, mode: .enhanced))
+            trueOrbits.append(try SceneMeshes.orbitMesh(bodyID: id, mode: .trueRelative))
+        }
+        let saturnRing = try SceneMeshes.saturnRing()
+        let marker = try SceneMeshes.markerMesh()
         bodyMeshes = bodies
         ringMeshes = rings
         orbitMeshes = orbits
+        trueOrbitMeshes = trueOrbits
+        saturnRingMesh = saturnRing
+        starMesh = SceneMeshes.starMesh()
+        markerMesh = marker
         meshBuildCount += 1
     }
 
     /// Makes all the renderers together: the nine bodies (the Sun fully bright, the planets lit from the Sun), the
-    /// nine rings and the orbits (fully bright); a failure releases every renderer made so far and rethrows.
+    /// nine selection rings, both orbit sets, Saturn's ring (ambient 0.7), the stars and the marker (fully bright); a
+    /// failure releases every renderer made so far and rethrows.
     private func makeRenderers(_ context: RenderContext) throws {
-        if bodyMeshes.count != SolarCore.bodyCount || ringMeshes.count != SolarCore.bodyCount || orbitMeshes.isEmpty {
-            try buildMeshes()
+        if !meshesComplete { try buildMeshes() }
+        guard let saturnRingMesh, let starMesh, let markerMesh else { return }
+        var made: [MeshRenderer] = []
+        func renderer(_ mesh: Mesh, colors: [Vec4]? = nil, ambient: Double) throws -> MeshRenderer {
+            let renderer = try MeshRenderer(mesh: mesh, colors: colors, registry: context.resources)
+            renderer.ambient = ambient
+            made.append(renderer)
+            return renderer
         }
-        var bodies: [MeshRenderer] = []
-        var rings: [MeshRenderer] = []
-        var orbits: [MeshRenderer] = []
         do {
+            var bodies: [MeshRenderer] = []
             for (index, part) in bodyMeshes.enumerated() {
-                let renderer = try MeshRenderer(mesh: part.mesh, colors: part.colors, registry: context.resources)
-                renderer.ambient = index == 0 ? 1 : Self.planetAmbient
-                bodies.append(renderer)
+                bodies.append(try renderer(part.mesh, colors: part.colors, ambient: index == 0 ? 1 : Self.planetAmbient))
             }
-            for mesh in ringMeshes {
-                let renderer = try MeshRenderer(mesh: mesh, registry: context.resources)
-                renderer.ambient = 1
-                rings.append(renderer)
-            }
-            for mesh in orbitMeshes {
-                let renderer = try MeshRenderer(mesh: mesh, registry: context.resources)
-                renderer.ambient = 1
-                orbits.append(renderer)
-            }
+            var rings: [MeshRenderer] = []
+            for mesh in ringMeshes { rings.append(try renderer(mesh, ambient: 1)) }
+            var orbits: [MeshRenderer] = []
+            for mesh in orbitMeshes { orbits.append(try renderer(mesh, ambient: 1)) }
+            var trueOrbits: [MeshRenderer] = []
+            for mesh in trueOrbitMeshes { trueOrbits.append(try renderer(mesh, ambient: 1)) }
+            let saturnRing = try renderer(saturnRingMesh.mesh, colors: saturnRingMesh.colors,
+                                          ambient: SceneMeshes.ringAmbient)
+            let stars = try renderer(starMesh, ambient: 1)
+            let marker = try renderer(markerMesh, ambient: 1)
+            bodyRenderers = bodies
+            ringRenderers = rings
+            orbitRenderers = orbits
+            trueOrbitRenderers = trueOrbits
+            saturnRingRenderer = saturnRing
+            starRenderer = stars
+            markerRenderer = marker
         } catch {
-            for renderer in bodies { renderer.release() }
-            for renderer in rings { renderer.release() }
-            for renderer in orbits { renderer.release() }
+            for renderer in made { renderer.release() }
             throw error
         }
-        bodyRenderers = bodies
-        ringRenderers = rings
-        orbitRenderers = orbits
         rendererBuildCount += 1
         ringBuildCount += 1
     }
@@ -342,7 +524,7 @@ final class SolarPresenter: ExperiencePresenter {
 
     /// A14-P01's display radius of a body of `radiusKm` and `kind` (clarification Q4): 1.6 for the star; for a planet
     /// 0.25 + 0.15 · log₂(radiusKm / 2,439.7), at least 0.05 (a non-finite or non-positive radius gives 0.25). The
-    /// orbit view draws it scaled (``OrbitLayout/displayRadius(index:)``).
+    /// enhanced mode draws it scaled (``OrbitLayout/displayRadius(index:)``).
     nonisolated static func displayRadius(radiusKm: Double, kind: BodyKind) -> Double {
         if kind == .star { return sunDisplayRadius }
         guard radiusKm.isFinite, radiusKm > 0 else { return basePlanetRadius }
@@ -366,56 +548,15 @@ final class SolarPresenter: ExperiencePresenter {
         return Vec3(-center.x / length, -center.y / length, -center.z / length)
     }
 
-    /// A number in 0…1 from `seed` and `band` (SplitMix64).
-    nonisolated static func unitHash(seed: UInt64, band: Int) -> Double {
-        var z = seed &* 0x9E37_79B9_7F4A_7C15 &+ UInt64(truncatingIfNeeded: band) &+ 0x632B_E59B_D9B4_E019
-        z = (z ^ (z >> 30)) &* 0xBF58_476D_1CE4_E5B9
-        z = (z ^ (z >> 27)) &* 0x94D0_49BB_1331_11EB
-        z ^= z >> 31
-        return Double(z >> 11) / Double(UInt64(1) << 53)
-    }
-
-    /// The band of latitude fraction `v` (0 at the north pole, 1 at the south pole) among `bands` bands.
-    nonisolated static func band(v: Double, bands: Int) -> Int {
-        let n = max(1, bands)
-        return min(n - 1, max(0, Int(v * Double(n))))
-    }
-
-    /// The colour (RGB 0…1, alpha 1) of band `band` of the body at `index`: the palette's first colour on even bands,
-    /// its second on odd ones, scaled by 0.88 + 0.12 · hash(index, band).
-    nonisolated static func bandColor(index: Int, band: Int) -> Vec4 {
-        let palette = palettes[min(max(index, 0), palettes.count - 1)]
-        let base = band % 2 == 0 ? palette.first : palette.second
-        let scale = 0.88 + 0.12 * unitHash(seed: UInt64(max(index, 0)) + 1, band: band)
-        return Vec4(min(1, base.x * scale), min(1, base.y * scale), min(1, base.z * scale), 1)
-    }
-
-    /// The per-vertex colours of `mesh` (a UV sphere: texture v is the latitude fraction) for the body at `index`.
-    nonisolated static func colors(mesh: Mesh, index: Int) -> [Vec4] {
-        let palette = palettes[min(max(index, 0), palettes.count - 1)]
-        var colors: [Vec4] = []
-        colors.reserveCapacity(mesh.uvs.count)
-        for uv in mesh.uvs {
-            colors.append(bandColor(index: index, band: band(v: uv.y, bands: palette.bands)))
-        }
-        return colors
-    }
-
-    /// The nine sphere meshes of the catalog at the orbit view's display radii, with their colours.
+    /// The nine unit body spheres with their recipe colours (``SceneMeshes/bodies()``).
     nonisolated static func meshes() -> [(mesh: Mesh, colors: [Vec4])] {
-        var parts: [(mesh: Mesh, colors: [Vec4])] = []
-        for index in 0..<SolarCore.bodyCount {
-            let mesh = Mesh.uvSphere(segments: sphereSegments, rings: sphereRings,
-                                     radius: OrbitLayout.displayRadius(index: index))
-            parts.append((mesh, colors(mesh: mesh, index: index)))
-        }
-        return parts
+        SceneMeshes.bodies()
     }
 
     /// The ring outline around the body `selection`, centred on the origin: a closed tube along a circle in the x–y
-    /// plane, of radius ``ringRadius(displayRadius:)`` of the body's orbit-view display radius.
+    /// plane of radius ``OrbitLayout/selectionRingRadius(index:)``.
     nonisolated static func ringMesh(selection: Int) throws -> Mesh {
-        let radius = ringRadius(displayRadius: OrbitLayout.displayRadius(index: selection))
+        let radius = OrbitLayout.selectionRingRadius(index: selection)
         var path: [Vec3] = []
         for i in 0..<ringPoints {
             let angle = 2 * Double.pi * Double(i) / Double(ringPoints)
@@ -424,10 +565,9 @@ final class SolarPresenter: ExperiencePresenter {
         return try Mesh.tube(path: path, radius: ringTubeRadius, sides: ringSides, caps: false, closed: true)
     }
 
-    /// The orbit line of `bodyID`: a closed tube (radius 0.04, 6 sides) along ``OrbitLayout/orbitPath(bodyID:)``.
+    /// The enhanced orbit line of `bodyID` (``SceneMeshes/orbitMesh(bodyID:mode:)``).
     nonisolated static func orbitMesh(bodyID: String) throws -> Mesh {
-        try Mesh.tube(path: OrbitLayout.orbitPath(bodyID: bodyID), radius: orbitTubeRadius, sides: orbitSides,
-                      caps: false, closed: true)
+        try SceneMeshes.orbitMesh(bodyID: bodyID, mode: .enhanced)
     }
 
     // MARK: Probes
@@ -445,11 +585,10 @@ final class SolarPresenter: ExperiencePresenter {
     }
 
     /// The colour class shared by every colour of `colors` (channels 0…1) when it is robust: the same class for each
-    /// colour at every brightness 0.7…1.3 times and every channel moved by up to 3 of 255; nil otherwise (or for no
-    /// colour).
-    nonisolated static func robustClass(_ colors: [Vec3]) -> String? {
+    /// colour at every brightness factor of `scales` and every channel moved by up to 3 of 255; nil otherwise (or for
+    /// no colour).
+    nonisolated static func robustClass(_ colors: [Vec3], scales: [Double] = SolarPresenter.litScales) -> String? {
         var classes: Set<String> = []
-        let scales: [Double] = [0.7, 0.85, 1, 1.15, 1.3]
         let nudges: [Int] = [-3, 0, 3]
         for color in colors {
             for scale in scales {
@@ -466,48 +605,58 @@ final class SolarPresenter: ExperiencePresenter {
         return classes.count == 1 ? classes.first : nil
     }
 
-    /// The lit colours (RGB 0…1) around the visible centre of the body at `index` seen through the camera of
-    /// `state`: the band colours of the equator's vertex row and of the rows above and below it (the pixel there
-    /// blends them), each times ambient + (1 − ambient) · Lambert, the normal pointing from the body's centre to the
-    /// eye and the light coming from the Sun.
-    nonisolated static func centerColors(index: Int, state: SolarState) -> [Vec3] {
-        let palette = palettes[min(max(index, 0), palettes.count - 1)]
+    /// The lit colours (RGB 0…1) around the visible centre of the body at `index` seen from `eye` in the scene of
+    /// `state`: the recipe colours of the unit sphere's vertices within ``centerNeighbourAngle`` of the point facing
+    /// the eye (in the body's own frame, the axial tilt undone), each times ambient + (1 − ambient) · Lambert with the
+    /// normal toward the eye and the light from the Sun (the Sun: ambient 1).
+    nonisolated static func centerColors(index: Int, eye: Vec3, state: SolarState) -> [Vec3] {
+        guard let recipe = SceneMeshes.recipe(index: index) else { return [] }
+        let mode = state.scaleMode
         let ambient = index == 0 ? 1 : planetAmbient
-        let center = OrbitLayout.scenePosition(index: index, day: state.dayOffset)
-        let normal = (OrbitLayout.camera(state: state).eye - center).normalized
+        let center = OrbitLayout.scenePosition(index: index, day: state.dayOffset, mode: mode)
+        let normal = (eye - center).normalized
         let lambert = max(0, normal.dot(lightDirection(at: center)))
         let f = ambient + (1 - ambient) * lambert
-        let row = 1.0 / Double(sphereRings)
-        let latitudes: [Double] = [0.5 - row, 0.5, 0.5 + row]
+        let untilt = Mat4.rotation(Quat(axis: Vec3(1, 0, 0), angle: -SceneMeshes.axialTilt(index: index)))
+        let local = untilt.applyVector(normal)
+        let limit = cos(centerNeighbourAngle)
         var colors: [Vec3] = []
-        for v in latitudes {
-            let base = bandColor(index: index, band: band(v: v, bands: palette.bands))
-            colors.append(Vec3(base.x * f, base.y * f, base.z * f))
+        for p in SceneMeshes.unitSphere.positions where p.dot(local) >= limit {
+            let c = recipe.color(at: p)
+            colors.append(Vec3(c.r * f, c.g * f, c.b * f))
         }
         return colors
     }
 
-    /// The probes of `core` on the last canvas (see the file header); none before the first frame.
+    /// The probes of `core` on the last canvas through the last drawn camera (see the file header); none before the
+    /// first frame.
     func probes(_ core: SolarCore) -> [FrameProbe] {
-        guard let canvas = lastCanvas else { return [] }
+        guard let canvas = lastCanvas, let camera = lastCamera, let eye = lastEye else { return [] }
         let state = core.state
+        let mode = state.scaleMode
         let aspect = canvas.x / max(canvas.y, 1)
         var probes: [FrameProbe] = []
-        let ndc = Vec2(Self.backgroundProbe.x * 2 - 1, 1 - Self.backgroundProbe.y * 2)
-        if OrbitLayout.rayMissesScene(ndc: ndc, state: state, aspect: aspect),
-           let background = FrameProbe(name: "background", x: Self.backgroundProbe.x, y: Self.backgroundProbe.y,
-                                       expected: FrameColorClass.dark.rawValue) {
-            probes.append(background)
+        for candidate in Self.backgroundProbes {
+            let ndc = Vec2(candidate.x * 2 - 1, 1 - candidate.y * 2)
+            guard OrbitLayout.rayMissesScene(ndc: ndc, camera: camera, state: state, aspect: aspect,
+                                             heightPixels: canvas.y) else { continue }
+            if let background = FrameProbe(name: "background", x: candidate.x, y: candidate.y,
+                                           expected: FrameColorClass.dark.rawValue) {
+                probes.append(background)
+            }
+            break
         }
         let selection = state.selection
-        let center = OrbitLayout.scenePosition(index: selection, day: state.dayOffset)
-        let radius = OrbitLayout.pixelRadius(OrbitLayout.displayRadius(index: selection), at: center, state: state,
-                                             height: canvas.y)
-        guard radius >= Self.probeMinimumPixels, OrbitLayout.centreUnobstructed(index: selection, state: state) else {
-            return probes
-        }
-        let p = OrbitLayout.pixel(of: center, state: state, canvas: canvas)
-        if let expected = Self.robustClass(Self.centerColors(index: selection, state: state)),
+        let center = OrbitLayout.scenePosition(index: selection, day: state.dayOffset, mode: mode)
+        let drawnRadius = mode.drawnRadius(index: selection)
+        let radius = OrbitLayout.pixelRadius(drawnRadius, at: center, eye: eye, heightPixels: canvas.y)
+        let insideStars = (center - eye).length + drawnRadius < SceneMeshes.starRadius(far: camera.far)
+        guard radius >= Self.probeMinimumPixels, insideStars,
+              OrbitLayout.centreUnobstructed(index: selection, eye: eye, state: state) else { return probes }
+        let p = OrbitLayout.pixel(of: center, camera: camera, canvas: canvas)
+        guard p.x >= 1, p.y >= 1, p.x <= canvas.x - 1, p.y <= canvas.y - 1 else { return probes }
+        let scales: [Double] = selection == 0 ? [1] : Self.litScales
+        if let expected = Self.robustClass(Self.centerColors(index: selection, eye: eye, state: state), scales: scales),
            let probe = FrameProbe(name: "body-\(selection)", x: p.x / canvas.x, y: 1 - p.y / canvas.y,
                                   expected: expected) {
             probes.append(probe)
@@ -517,7 +666,7 @@ final class SolarPresenter: ExperiencePresenter {
 
     // MARK: Words and controls
 
-    /// Brings the controls' mirror in line with `core`.
+    /// Brings the controls' mirror in line with `core` and announces a change of the scale mode.
     func sync(_ core: SolarCore) {
         if !mirror.ready { mirror.ready = true }
         let state = core.state
@@ -536,7 +685,19 @@ final class SolarPresenter: ExperiencePresenter {
         if mirror.yawDegrees != state.yawDegrees { mirror.yawDegrees = state.yawDegrees }
         if mirror.pitchDegrees != state.pitchDegrees { mirror.pitchDegrees = state.pitchDegrees }
         if mirror.zoomSteps != state.zoomSteps { mirror.zoomSteps = state.zoomSteps }
-        if mirror.cameraDistance != state.cameraDistance { mirror.cameraDistance = state.cameraDistance }
+        let mode = state.scaleMode
+        let cameraDistance = mode.cameraDistance(zoomSteps: state.zoomSteps)
+        if mirror.cameraDistance != cameraDistance { mirror.cameraDistance = cameraDistance }
+        if mirror.scaleMode != mode { mirror.scaleMode = mode }
+        if mirror.scaleName != mode.name { mirror.scaleName = mode.name }
+        if mirror.scaleLabel != mode.label { mirror.scaleLabel = mode.label }
+        if let announced = announcedScaleMode, announced != mode {
+            let text = core.canvasDescription
+            announcementSink.announce(text)
+            lastAnnouncement = text
+            announcementCount += 1
+        }
+        announcedScaleMode = mode
     }
 
     /// The lines of `card` ("Mean radius: 6,371 km — Planetary Fact Sheet — Metric"); none without a card.
@@ -554,11 +715,12 @@ final class SolarPresenter: ExperiencePresenter {
         case "date.step": return "The date stays within 1950-01-01 to 2051-01-01."
         case "camera.tilt": return "The view cannot tilt further."
         case "camera.zoom": return "The view cannot zoom further."
+        case "scale.mode": return "There is no such scale."
         default: return "That is not possible here."
         }
     }
 
-    /// The description of `core`'s orbit view.
+    /// The description of `core`'s view.
     func describe(_ core: SolarCore) -> String {
         sync(core)
         return core.canvasDescription
@@ -569,8 +731,8 @@ final class SolarPresenter: ExperiencePresenter {
         AnyView(SolarControls(port: port, mirror: mirror))
     }
 
-    /// The actions the native controls send: every action (body, date and camera buttons and the Body menu); there
-    /// is no canvas gesture in this phase.
+    /// The actions the native controls send: every action (body, date, camera and scale controls and the Body menu);
+    /// there is no canvas gesture in this phase.
     var nativeActions: Set<String> {
         Set(SolarCore.actionIDs)
     }

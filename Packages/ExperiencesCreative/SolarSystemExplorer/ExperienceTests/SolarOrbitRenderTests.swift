@@ -3,7 +3,9 @@
 // wall-clock assertion): a frame of the overview is non-blank with nine bodies, eight orbit lines and the ring; a
 // date step of +365 days changes the drawn pixels where Jupiter was; focusing a body moves the camera onto it; the
 // camera actions change the view and Reset view brings the first frame back; every listed probe holds across camera
-// states; and nothing is released or remade mid-session (all 26 renderers are the same objects throughout).
+// states; and nothing is released or remade mid-session (all 37 renderers of feature 105 are the same objects
+// throughout). A change of focus starts a 30-frame focus flight (A14-P03 FR-A14-320), so a test that judges the focused
+// view draws the flight's frames first; probes are always judged against the camera actually drawn.
 import Foundation
 import XCTest
 @testable import SolarSystemExplorerExperience
@@ -18,6 +20,11 @@ import VisualCoreSimulation
 @MainActor
 final class SolarOrbitRenderTests: XCTestCase {
     private let size = CGSize(width: 240, height: 160)
+
+    /// Draws the frames of a whole focus flight, so the drawn camera reaches the state's view.
+    private func settle(_ session: ExperienceSession) throws {
+        try SolarTest.frames(session, FocusFlight.frameCount)
+    }
 
     /// Every probe of `shell` holds in `frame`.
     private func assertProbesHold(_ shell: ExperienceShell<SolarPresenter>, _ frame: SolarFrame, _ name: String) {
@@ -57,6 +64,10 @@ final class SolarOrbitRenderTests: XCTestCase {
         for renderer in presenter.bodyRenderers { ids.append(ObjectIdentifier(renderer)) }
         for renderer in presenter.ringRenderers { ids.append(ObjectIdentifier(renderer)) }
         for renderer in presenter.orbitRenderers { ids.append(ObjectIdentifier(renderer)) }
+        for renderer in presenter.trueOrbitRenderers { ids.append(ObjectIdentifier(renderer)) }
+        if let renderer = presenter.saturnRingRenderer { ids.append(ObjectIdentifier(renderer)) }
+        if let renderer = presenter.starRenderer { ids.append(ObjectIdentifier(renderer)) }
+        if let renderer = presenter.markerRenderer { ids.append(ObjectIdentifier(renderer)) }
         return ids
     }
 
@@ -113,6 +124,7 @@ final class SolarOrbitRenderTests: XCTestCase {
         let shell = try await SolarTest.open(session, size: size)
         let before = try SolarTest.picture(session)
         XCTAssertTrue(shell.handle(control: "body.select", values: [5]).isAccepted)
+        try settle(session)
         let after = try SolarTest.picture(session)
         let camera = try XCTUnwrap(shell.presenter.lastCamera)
         XCTAssertEqual(camera.target, OrbitLayout.scenePosition(index: 5, day: 0), "the camera looks at Jupiter")
@@ -138,6 +150,7 @@ final class SolarOrbitRenderTests: XCTestCase {
         let session = ExperienceSession()
         let shell = try await SolarTest.open(session, size: size)
         XCTAssertTrue(shell.handle(control: "body.select", values: [3]).isAccepted)
+        try settle(session)
         let first = try SolarTest.picture(session)
         var previous = StableHash.sha256Hex(first.rgba)
         let actions: [(control: String, value: Double)] = [("camera.orbit", 1), ("camera.tilt", 1),
@@ -177,6 +190,7 @@ final class SolarOrbitRenderTests: XCTestCase {
         for _ in 0..<abs(steps) {
             XCTAssertTrue(shell.handle(control: "camera.orbit", values: [steps < 0 ? -1 : 1]).isAccepted)
         }
+        try settle(session)
         var frame = try SolarTest.picture(session)
         let probe = try XCTUnwrap(shell.frameProbes.first { $0.name == "body-8" }, "Neptune is large and lit")
         XCTAssertEqual(probe.expected, "blue")
@@ -202,14 +216,18 @@ final class SolarOrbitRenderTests: XCTestCase {
         XCTAssertEqual(presenter.bodyRenderers.count, 9)
         XCTAssertEqual(presenter.ringRenderers.count, 9)
         XCTAssertEqual(presenter.orbitRenderers.count, 8)
+        XCTAssertEqual(presenter.trueOrbitRenderers.count, 8)
         let ids = rendererIDs(presenter)
+        XCTAssertEqual(ids.count, 37, "9 bodies, 9 rings, 2 × 8 orbits, Saturn's ring, the stars and the marker")
         let builds = presenter.rendererBuildCount
         let rings = presenter.ringBuildCount
         let meshes = presenter.meshBuildCount
         let moves: [(control: String, values: [Double])] = [("date.step", [365]), ("body.select", [3]),
                                                             ("camera.orbit", [1]), ("camera.tilt", [-1]),
                                                             ("camera.zoom", [1]), ("body.next", []),
-                                                            ("date.step", [-30]), ("view.reset", [])]
+                                                            ("date.step", [-30]), ("view.reset", []),
+                                                            ("scale.mode", [1]), ("body.select", [8]),
+                                                            ("scale.mode", [0])]
         for move in moves {
             XCTAssertTrue(shell.handle(control: move.control, values: move.values).isAccepted, move.control)
             try SolarTest.frames(session, 1)
@@ -224,6 +242,10 @@ final class SolarOrbitRenderTests: XCTestCase {
         XCTAssertTrue(presenter.bodyRenderers.isEmpty)
         XCTAssertTrue(presenter.ringRenderers.isEmpty)
         XCTAssertTrue(presenter.orbitRenderers.isEmpty, "released together in teardown")
+        XCTAssertTrue(presenter.trueOrbitRenderers.isEmpty, "released together in teardown")
+        XCTAssertNil(presenter.saturnRingRenderer)
+        XCTAssertNil(presenter.starRenderer)
+        XCTAssertNil(presenter.markerRenderer)
         XCTAssertEqual(presenter.lastOrbitsDrawn, 0)
         XCTAssertEqual(session.diagnostics.lastCloseCounts?.objects, 0)
     }

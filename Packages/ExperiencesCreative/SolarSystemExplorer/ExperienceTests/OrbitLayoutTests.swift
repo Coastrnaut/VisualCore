@@ -2,7 +2,10 @@
 // geometry of the orbit view, no GPU: the 4√r scene mapping (Mercury's 0.387 AU at 2.49 scene units, Neptune's 30.07
 // AU at 21.9, the Sun at the origin, the ecliptic in the scene's x–z plane), the display radii (A14-P01's × 0.6 and the
 // Sun × 0.5), the 128-point closed orbit paths, the camera (target follows the focus, yaw, pitch and distance from the
-// state, the focused body always in front of the near plane), the ring facing the camera and the background ray test.
+// state, the focused body always in front of the near plane), the ring facing the camera and the background ray test;
+// with feature 105 (A14-P03) T-A14-308 the delegation to `ScaleMode` (the enhanced mapping unchanged, the true-relative
+// mapping at 2 units per AU), the mode-aware camera, the rebuilt camera of a pushed eye, Saturn's selection ring around
+// its planetary ring and the markers below 2 pixels.
 import Foundation
 import XCTest
 @testable import SolarSystemExplorerExperience
@@ -167,5 +170,88 @@ final class OrbitLayoutTests: XCTestCase {
                        accuracy: 1e-12)
         XCTAssertEqual(OrbitLayout.segmentDistance(Vec3(-1, 0, 0), Vec3(1, 0, 0), Vec3(0, -1, 1), Vec3(0, 1, 1)), 1,
                        accuracy: 1e-12, "crossing segments a unit apart")
+    }
+
+    func testTheScaleModesAreDelegatedAndTheCameraFollowsTheMode() throws {
+        let days: [Double] = [0, 365]
+        for day in days {
+            for index in 0..<SolarCore.bodyCount {
+                let id = SolarCore.catalog.bodies[index].id
+                let p = SolarCore.model.position(bodyID: id, day: day) ?? .zero
+                XCTAssertEqual(OrbitLayout.scenePosition(index: index, day: day),
+                               ScaleMode.enhanced.scenePosition(p), "\(id): the enhanced mapping is ScaleMode's")
+                XCTAssertEqual(OrbitLayout.scenePosition(index: index, day: day, mode: .trueRelative),
+                               ScaleMode.trueRelative.scenePosition(p), "\(id)")
+                XCTAssertEqual(OrbitLayout.drawnRadius(index: index, mode: .enhanced),
+                               OrbitLayout.displayRadius(index: index), accuracy: 1e-15)
+                XCTAssertEqual(OrbitLayout.drawnRadius(index: index, mode: .trueRelative),
+                               ScaleMode.trueRelative.drawnRadius(index: index), accuracy: 1e-15)
+            }
+        }
+        assertClose(OrbitLayout.scenePosition(Vec3(1, 0, 0), mode: .trueRelative), Vec3(2, 0, 0), 1e-12, "2 per AU")
+        XCTAssertEqual(OrbitLayout.orbitPath(bodyID: "earth"), OrbitLayout.orbitPath(bodyID: "earth", mode: .enhanced))
+        XCTAssertEqual(OrbitLayout.orbitTubeRadius(mode: .enhanced), 0.04)
+        XCTAssertEqual(OrbitLayout.orbitTubeRadius(mode: .trueRelative), 0.1)
+        XCTAssertTrue(OrbitLayout.trueExtent.radius > 59 && OrbitLayout.trueExtent.radius < 61.5,
+                      "\(OrbitLayout.trueExtent.radius)")
+        XCTAssertEqual(OrbitLayout.paths(mode: .trueRelative).count, 8)
+        XCTAssertEqual(OrbitLayout.paths(mode: .enhanced)[2], OrbitLayout.orbitPath(bodyID: "earth"))
+
+        let trueState = try XCTUnwrap(SolarState(selection: 5, dayOffset: 0, yawSteps: 0, pitchDegrees: 35,
+                                                 zoomSteps: 12, scaleMode: .trueRelative))
+        let camera = OrbitLayout.camera(state: trueState)
+        XCTAssertEqual(camera.distance, 120 * pow(1.25, -12), accuracy: 1e-9)
+        XCTAssertEqual(camera.near, max(1e-4, 0.05 * camera.distance), accuracy: 1e-12)
+        XCTAssertEqual(camera.far, camera.distance + 140, accuracy: 1e-12)
+        XCTAssertEqual(camera.target, OrbitLayout.scenePosition(index: 5, day: 0, mode: .trueRelative))
+
+        // A camera rebuilt from its own eye looks the same way from the same place.
+        let rebuilt = OrbitLayout.camera(target: camera.target, eye: camera.eye, near: camera.near, far: camera.far)
+        assertClose(rebuilt.eye, camera.eye, 1e-9, "rebuilt eye")
+        XCTAssertEqual(rebuilt.yaw, camera.yaw, accuracy: 1e-9)
+        XCTAssertEqual(rebuilt.pitch, camera.pitch, accuracy: 1e-9)
+        XCTAssertEqual(rebuilt.distance, camera.distance, accuracy: 1e-9)
+    }
+
+    func testSaturnsSelectionRingSurroundsItsPlanetaryRing() {
+        let saturn = SceneMeshes.saturnIndex
+        XCTAssertEqual(BodyCatalog.bundled.bodies[saturn].id, "saturn")
+        let planetary = OrbitLayout.saturnRingRadius(mode: .enhanced)
+        XCTAssertEqual(planetary, 136_775 / 58_232 * OrbitLayout.displayRadius(index: saturn), accuracy: 1e-9)
+        XCTAssertGreaterThan(OrbitLayout.selectionRingRadius(index: saturn) - SolarPresenter.ringTubeRadius, planetary)
+        for index in 0..<SolarCore.bodyCount where index != saturn {
+            XCTAssertEqual(OrbitLayout.selectionRingRadius(index: index),
+                           SolarPresenter.ringRadius(displayRadius: OrbitLayout.displayRadius(index: index)),
+                           accuracy: 1e-12, "body \(index)")
+        }
+        // True-relative: the ring is 10 pixels at its distance from the eye.
+        let scale = OrbitLayout.selectionRingScale(index: 3, mode: .trueRelative, cameraDistance: 120,
+                                                   eyeDistance: 100, heightPixels: 480)
+        let pixel = CameraRelative.pixelSize(distance: 100, fovY: Double.pi / 3, heightPixels: 480)
+        XCTAssertEqual(scale * OrbitLayout.selectionRingRadius(index: 3), 10 * pixel, accuracy: 1e-12)
+        XCTAssertEqual(OrbitLayout.selectionRingScale(index: 3, mode: .enhanced, cameraDistance: 60, eyeDistance: 60,
+                                                      heightPixels: 480), 3, accuracy: 1e-12)
+    }
+
+    func testMarkersAreChosenBelowTwoPixelsInTheTrueRelativeModeOnly() throws {
+        let eye = Vec3(0, 120 * pow(1.25, -12) * sin(35 * Double.pi / 180),
+                       120 * pow(1.25, -12) * cos(35 * Double.pi / 180))
+        XCTAssertEqual(OrbitLayout.markerIndices(mode: .enhanced, day: 0, eye: eye, heightPixels: 480), [])
+        // On a phone canvas every true-relative body is far under 2 pixels.
+        XCTAssertEqual(OrbitLayout.markerIndices(mode: .trueRelative, day: 0, eye: eye, heightPixels: 480),
+                       Array(0..<SolarCore.bodyCount))
+        // On a canvas 20,000 pixels high the Sun, 8.25 units away, is about 19 pixels: only it goes unmarked.
+        let tall = OrbitLayout.markerIndices(mode: .trueRelative, day: 0, eye: eye, heightPixels: 20_000)
+        XCTAssertFalse(tall.contains(0), "the Sun is large enough")
+        XCTAssertTrue(tall.contains(1), "Mercury stays marked")
+        for index in 0..<SolarCore.bodyCount {
+            let center = OrbitLayout.scenePosition(index: index, day: 0, mode: .trueRelative)
+            let pixels = OrbitLayout.pixelRadius(ScaleMode.trueRelative.drawnRadius(index: index), at: center,
+                                                 eye: eye, heightPixels: 20_000)
+            XCTAssertEqual(tall.contains(index), pixels < 2, "body \(index): \(pixels) px")
+        }
+        let scale = OrbitLayout.markerScale(center: .zero, eye: eye, heightPixels: 480)
+        XCTAssertEqual(scale, 6 * CameraRelative.pixelSize(distance: eye.length, fovY: Double.pi / 3, heightPixels: 480),
+                       accuracy: 1e-12)
     }
 }

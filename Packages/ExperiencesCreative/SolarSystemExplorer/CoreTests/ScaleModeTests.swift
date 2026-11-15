@@ -47,9 +47,9 @@ import VisualCoreMath
         let enhanced = ScaleMode.enhanced.clipRange(distance: 4.12)
         #expect(enhanced.near == 0.5 && enhanced.far == 200)
         let close = ScaleMode.trueRelative.clipRange(distance: 0.001)
-        #expect(close.near == 1e-4 && close.far == 70.001)
+        #expect(close.near == 1e-4 && close.far == 140.001)
         let far = ScaleMode.trueRelative.clipRange(distance: 150)
-        #expect(far.near == 7.5 && far.far == 220)
+        #expect(far.near == 7.5 && far.far == 290)
         #expect(ScaleMode.allCases.map(\.rawValue) == [0, 1])
     }
 }

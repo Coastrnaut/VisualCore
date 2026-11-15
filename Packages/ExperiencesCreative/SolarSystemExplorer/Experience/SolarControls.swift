@@ -1,6 +1,7 @@
 // SolarControls — feature 103 (A14-P01) T-A14-103 (FR-A14-121; clarifications Q4, Q5), with the orbit view's date and
 // camera controls by feature 104 (A14-P02) T-A14-208 (FR-A14-211, FR-A14-221; clarifications Q3–Q5;
-// contracts/orbit-view.md). The native controls of Solar System Explorer in one section:
+// contracts/orbit-view.md), with the scale mode by feature 105 (A14-P03) T-A14-308. The native controls of Solar System
+// Explorer in one section:
 //   the date (`date`: "Date: 2000-01-01") and the date buttons −365, −30, −1, +1, +30, +365 days (`date-minus-365`,
 //     `date-minus-30`, `date-minus-1`, `date-plus-1`, `date-plus-30`, `date-plus-365` → `date.step [days]`; each
 //     disabled when the step would leave 1950-01-01 … 2051-01-01; the date as accessible value);
@@ -15,8 +16,13 @@
 //   the fact card of the selected body (`fact-1`, `fact-2`, … in display order, each "Mean radius: 6,371 km —
 //     Planetary Fact Sheet — Metric": label, value, unit, note and source) and, for a planet, the line
 //     "Distance from the Sun on 2000-01-01: 0.983 AU (147,099,000 km)" (`distance`);
-//   the legend "Distances and sizes not to scale" (`legend`), the status line (`status`: "Earth selected, body 4 of
-//     9") and the answer to a refused action (`message`, shown only when there is one).
+//   the Scale picker of feature 105 (A14-P03) T-A14-308 (FR-A14-312; contracts/bodies.md): a segmented control
+//     (`scale` → `scale.mode [0 / 1]`) with Enhanced and True relative, accessible label "Scale" and value the active
+//     mode's name and label ("Enhanced, Distances and sizes not to scale"); the presenter announces the new canvas
+//     description when the mode changes;
+//   the legend (`legend`): the active mode's label ("Distances and sizes not to scale" or "Distances and sizes to one
+//     scale; small bodies marked"), the status line (`status`: "Earth selected, body 4 of 9") and the answer to a
+//     refused action (`message`, shown only when there is one).
 // Every control has an accessible label and value (and a hint) and the identifier
 // `experience.a14.solar-system-explorer.<name>` from the port; hit areas are at least 44 points high and text wraps.
 import SolarSystemExplorerCore
@@ -88,6 +94,12 @@ struct SolarControls: View {
     static func cameraWords(yaw: Double, pitch: Int, distance: Double) -> String {
         "Yaw \(Int(yaw.rounded()))°, pitch \(pitch)°, " + String(format: "distance %.1f scene units", distance)
     }
+
+    /// The scale picker's accessible value: the mode's name and label ("Enhanced, Distances and sizes not to scale").
+    static func scaleWords(_ mode: ScaleMode) -> String { "\(mode.name), \(mode.label)" }
+
+    /// The legend: the active mode's label.
+    static func legendText(_ mode: ScaleMode) -> String { mode.label }
 
     /// The controls, or a progress indicator before the first state.
     var body: some View {
@@ -181,6 +193,7 @@ struct SolarControls: View {
             button("Reset view", name: "reset-view", value: camera,
                    hint: "Returns to the overview camera; the body and the date stay",
                    enabled: true) { send("view.reset") }
+            scalePicker
             Text(verbatim: mirror.bodyName).font(.subheadline).accessibilityAddTraits(.isHeader)
             ForEach(mirror.facts.indices, id: \.self) { index in
                 Text(verbatim: mirror.facts[index])
@@ -198,11 +211,11 @@ struct SolarControls: View {
                     .accessibilityValue(Text(verbatim: distanceLine))
                     .accessibilityIdentifier(port.identifier("distance"))
             }
-            Text(verbatim: SolarCore.notToScale)
+            Text(verbatim: Self.legendText(mirror.scaleMode))
                 .font(.footnote.italic())
                 .fixedSize(horizontal: false, vertical: true)
                 .accessibilityLabel(Text(verbatim: "Legend"))
-                .accessibilityValue(Text(verbatim: SolarCore.notToScale))
+                .accessibilityValue(Text(verbatim: Self.legendText(mirror.scaleMode)))
                 .accessibilityIdentifier(port.identifier("legend"))
             Text(verbatim: Self.sentence(mirror.status))
                 .font(.footnote)
@@ -220,6 +233,28 @@ struct SolarControls: View {
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    /// The segmented Scale picker: Enhanced and True relative (sends `scale.mode [0 / 1]` when the choice changes).
+    private var scalePicker: some View {
+        Picker(selection: Binding(get: { mirror.scaleMode },
+                                  set: { mode in
+                                      guard mode != mirror.scaleMode else { return }
+                                      send("scale.mode", [Double(mode.rawValue)])
+                                  })) {
+            ForEach(ScaleMode.allCases, id: \.rawValue) { mode in
+                Text(verbatim: mode.name).tag(mode)
+            }
+        } label: {
+            Text(verbatim: "Scale")
+        }
+        .pickerStyle(.segmented)
+        .frame(minHeight: 44)
+        .accessibilityLabel(Text(verbatim: "Scale"))
+        .accessibilityValue(Text(verbatim: Self.scaleWords(mirror.scaleMode)))
+        .accessibilityHint(Text(verbatim: "Enhanced enlarges the bodies and compresses distances; True relative "
+                                    + "draws sizes and distances to one scale and marks small bodies"))
+        .accessibilityIdentifier(port.identifier("scale"))
     }
 
     /// The date button of `days` (sends `date.step [days]`; disabled when the step would leave the range).
