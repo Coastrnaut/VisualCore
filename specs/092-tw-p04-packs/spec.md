@@ -21,6 +21,39 @@ Canonical overrides:
 - **Owner rulings:** short tests; audits and device runs in the device campaign; iOS 27 at phase gates; every Spec
   Kit step runs; no VisualCore change is planned.
 
+## Clarifications
+
+### Session 2026-11-15
+
+Answered autonomously under the owner's standing delegation, recommended option each time. Facts checked in code:
+`WorldState` is schema 2 (preset index 0…2, a 32-bit seed, view, props, selection, light; no pack field);
+`WorldEditing` validates placements against the terrain (bounds, sea level per preset, 0.6 m spacing, 24-prop cap);
+`CameraPolicy` clamps to the global limits (pitch 10°…75°, distance 10…30 m) and keeps the eye 0.5 m above the
+highest of 9 terrain samples within 1 m, ignoring props; `ContentCatalog` and `LicenseAudit` hold presets, palettes,
+props and prop palettes.
+
+- Q: How does a pack relate to the presets and the saved state? → A: One pack per preset (pack i uses preset i), so
+  the state needs no new field and schema 2 stays: `world.pack [0…2]` replaces the world with pack i's composition
+  (preset, fixed seed, props in order, no selection, light, the pack's default view) and is replayable; "reset to
+  pack" sends `world.pack` with the current preset. Opening is spoken ("Opened the island pack."); under Reduce Motion
+  the camera moves directly.
+- Q: What does each pack hold? → A: Island — seed 11, 3 trees, 2 rocks, 1 house, 1 lantern, light 120°/45°/0.35,
+  pitch 15°…70°, distance 12…28 m, default view 45°, 35°, 18 m; asteroid garden — seed 7, 5 rocks, 3 lanterns, light
+  300°/30°/0.25, pitch 20°…75°, distance 12…30 m, default view 135°, 40°, 20 m; miniature city — seed 5, 6 houses, 4
+  lanterns, 2 trees, light 210°/60°/0.40, pitch 25°…75°, distance 10…24 m, default view 315°, 45°, 16 m. Prop
+  positions and turns are fixed numbers in the pack data, chosen to satisfy the placement rules on that seed's
+  terrain and verified at load; author "VisualCore project", license "MIT".
+- Q: How do pack camera limits and props enter the camera policy? → A: The camera limits become per preset (the
+  pack's range, inside the global one) for every world of that preset, applied after every action and on restore; the
+  clearance check takes the highest of the 9 terrain samples and of the top (y + model height) of every prop whose
+  centre lies within 1 m plus its picking radius of the eye's ground point, and raises the pitch in 1° steps up to the
+  pack's upper pitch.
+- Q: Which budgets apply? → A: Per pack at most 16 props, 30,000 vertices in all (terrain, sea and every placed prop's
+  mesh counted per placement) and 2 + props draws (terrain, sea, one draw per prop).
+- Q: What do the fixtures pin? → A: For each pack the state digest right after `world.pack` from the default state
+  (committed), its prop count, and that `world.pack` after edits returns that digest exactly; a deliberately broken
+  pack (a prop under water) is refused at load with `a12.under-water` and the world stays.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Open a finished tiny world (Priority: P1) 🎯
