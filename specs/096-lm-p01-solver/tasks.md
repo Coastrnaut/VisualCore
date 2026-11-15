@@ -49,3 +49,8 @@ Package.swift, 105, 106 regeneration, 107, 108, runs, commits.
 
 MVP: the ray cast, the tracer and the 20 levels with fixtures (US2, US3), then the drawn board, registration, manifest
 and records; evidence last.
+
+## Phase 6: Convergence
+
+- [ ] T-A13-115 Add a native level chooser to `Packages/ExperiencesCreative/LightMaze/Experience/MazeControls.swift` (a menu of the 20 levels by number and name sending `level.select [index]`, identifier `level`, label "Level", value the current level) so `nativeActions` covers every action; test in `Packages/ExperiencesCreative/LightMaze/ExperienceTests/MazeCoreTests.swift` that every action id has a native control, per FR-A13-121 / Clarifications Q5 (partial)
+- [ ] T-A13-116 Record in `specs/096-lm-p01-solver/research.md` As built that the scenario manifest holds five solved-level fixtures (lm-01, lm-05, lm-10, lm-16, lm-20), added because the repository's content-count audit asks for at least five, per plan: quickstart and T-A13-106 (partial)
