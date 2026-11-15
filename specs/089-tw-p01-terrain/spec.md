@@ -26,6 +26,53 @@ Canonical overrides:
 - **Owner rulings:** short tests; audits and device runs in the device campaign; iOS 27 at phase gates; the reference
   regression for the VisualCore change runs at X-A12 (owner ruling 2026-11-14); every Spec Kit step runs.
 
+## Clarifications
+
+### Session 2026-11-15
+
+Answered autonomously under the owner's standing delegation, recommended option each time. Facts checked in code:
+`VisualCoreScenes` depends on `VisualCoreMath` and `VisualCoreSimulation`; `Mesh` holds positions, normals, texture
+coordinates and indices, `MeshDigest` hashes them as SHA-256 over little-endian IEEE-754 bit patterns, `MeshBudget`
+caps vertices and indices and `MeshShapes.surface` throws `.budget` before building; `SeededRandom` (xoshiro256**) is
+seeded by a `UInt64`; `OrbitCamera` clamps pitch to ±89° and distance to 0.01…1,000,000 m, and `OrbitBounds` clamps
+pitch symmetrically and distance into a range; `MeshRenderer` draws one mesh in one colour with one light direction,
+an ambient fraction and optional fog; `DepthMeshPass` draws a list of renderer items with depth into its own target.
+
+- Q: Which noise, and how is it the same on every device? → A: Seeded gradient noise in two dimensions: each lattice
+  corner's gradient is chosen from 8 fixed unit directions by a 64-bit integer hash of (seed, i, j) (SplitMix64
+  finalizer), blended with the quintic fade 6t⁵ − 15t⁴ + 10t³; only +, −, × and floor on binary64 values (no
+  trigonometric, exponential or square-root calls), so results are bit-identical on every supported device. The single
+  octave is scaled into −1…1 and clamped; fractal sums (octaves 1…8, lacunarity 1…4, gain 0…1, frequency > 0) are
+  normalised by the sum of amplitudes so the result stays in −1…1. Invalid parameters are refused (nil).
+- Q: What does the height field offer, and how are seams avoided? → A: A grid of (columns + 1) × (rows + 1) heights
+  (columns and rows 1…512) at a cell size > 0 from an origin in the x–z plane, y up, built from a height function of
+  world position; the sampler interpolates bilinearly and clamps outside the grid; each grid normal is the normalised
+  (h(x − c) − h(x + c), 2c, h(z − c) − h(z + c)) from the height function itself (one ring beyond the grid is sampled),
+  so two pieces that share an edge get identical edge heights and normals. The mesh has one vertex per grid point
+  (position, normal, texture coordinate u, v in 0…1) and two triangles per cell wound counter-clockwise seen from +y,
+  is checked against the mesh budget before building (`.budget`) and refuses non-finite heights (`.invalidInput`).
+- Q: What are the three preset recipes? → A: All 12 × 12 m, centred at the origin, with digests pinned for seeds 1, 2
+  and 3: **island** — 64 × 64 cells, fractal noise (4 octaves, frequency 0.18 per metre, lacunarity 2, gain 0.5) times
+  1.6 m, minus a radial falloff that sinks the land below sea level 0 towards the edge, drawn as land plus a flat sea
+  plane; **asteroid garden** — 64 × 64 cells, a rocky disc of radius 5.5 m (fractal noise 5 octaves, 0.3 per metre,
+  times 0.6 m) with 6 seeded craters (smooth bowls of radius 0.6…1.4 m) and 8 seeded boulder mounds, falling away
+  outside the disc over a dark void; **miniature city** — 48 × 48 cells, a plateau whose low-frequency noise (2
+  octaves, 0.12 per metre) is quantised into 0.35 m terraces, with a sea plane around it. Each has a palette of 3
+  named colours (sea or void, low land, high land) and is drawn as at most 3 coloured parts (one draw each) until
+  G-MATERIALS lands.
+- Q: Which actions, view limits and saved state does the slice have? → A: `world.preset [0…2]`; `world.seed` (the next
+  seed from the session's generator, a 32-bit value so it is easy to read and say); `view.orbit [Δyaw°, Δpitch°]`
+  (each −180…180); `view.zoom [factor 0.5…2]`; `view.reset`. Fractional or out-of-range choices are refused with
+  `a12.invalid-choice` and change nothing. The view is an orbit around the world centre with pitch 10°…75° (never
+  below the ground plane) and distance 8…30 m (outside the 12 m world, eye above its highest point). Snapshot schema
+  1: preset, seed, view and generator state as JSON with sorted keys; damaged or newer payloads are refused and the
+  default world opens; one quality level (`level-0`); the step duration is the default 1/120 s and nothing animates.
+- Q: Which content is licensed, and what does the manifest hold? → A: The three presets and their three palettes are
+  original, author "VisualCore project", license "MIT" (the only allowed license); refusal reasons `missing-license`,
+  `unsupported-license`, `out-of-range`, `invalid-number`, `duplicate-id`, with the valid rest kept; the generated
+  document is `docs/apps/tiny-worlds/content-licenses.md`. The manifest has the nine standard scenarios and one fixture
+  per preset and seed (nine), each pinning the terrain digest.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Open a tiny island and look around (Priority: P1) 🎯
