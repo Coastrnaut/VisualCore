@@ -37,7 +37,7 @@ stay open, as for A07-P06 and A08-P06.
 - [X] T-A09-613 Script tests (`python3 Tools/python/desktop_runbook.py run-check --stage A09-P06 --timeout 600 --name script-tests -- python3 scripts/test_scripts.py`) — Verified 2026-11-14: 2026-11-14: .autonomy/checks/A09-P06.script-tests.json exit 0 (includes the release-document check's missing-document failure tests)
 - [ ] T-A09-614 BLOCKED_OWNER_ACTION: signing, archive upload and App Store Connect entry of Digital Aquarium's store text, per `docs/release/build-and-archive.md` owner steps (FR-A09-640)
 - [ ] T-A09-615 {device} In the device campaign (after ImplementationLock-100): the measurements and audits of `docs/apps/digital-aquarium/device-campaign.md` on D1–D3 (FR-A09-641)
-- [ ] T-A09-616 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A09-P06 (owner and device items stay open, as for A08-P06); update README.md (status, gate count) in the record commit (rule 16)
+- [X] T-A09-616 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A09-P06 (owner and device items stay open, as for A08-P06); update README.md (status, gate count) in the record commit (rule 16) — Verified 2026-11-14: 2026-11-14: /speckit-converge appended nothing (first pass); owner T-A09-614 and device T-A09-615 stay open, as for A08-P06
 
 ## Dependencies
 
