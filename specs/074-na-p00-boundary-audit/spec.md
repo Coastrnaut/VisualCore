@@ -22,6 +22,44 @@ Canonical overrides:
 - **Constitution:** 2.6.0 adds the A10 experience rules (committed at the start of this gate).
 - **Evidence:** host and simulator only.
 
+## Clarifications
+
+### Session 2026-11-14
+
+Answered autonomously under the owner's standing delegation, recommended option each time. Facts checked in code:
+the A10 constitution commit is `1d922dd7` and the A10-P00 specify commit `8e4fcdbe` (the phase start: the no-change
+diff of `Packages` and `External` is taken from it); the reference submodule is pinned at `d93edd1`; nine
+experiences are registered (`Catalog/registrations.json`, A01–A09); VisualCore offers `VisualCoreSimulation`
+(`FixedStepClock`, `FixedStepRunner`, `SeededRandom`, `ParticleSystem`, `HapticPlanner` and `AnnouncementPlanner` in
+`AccessibilityPlans.swift`), `VisualCoreScenes` (`SceneNode` with `Primitive` shapes drawn in one batch and
+`SceneNode.hitTest` in `SceneGraph.swift`; `TapRecognizer`, `DragRecognizer`, `GestureArbiter`), `VisualCoreEffects`
+with a bloom pass, `VisualCoreRendering` (`ParticleRenderer`, `PrimitiveRenderer`), `VisualCoreExperienceHost`
+(`ExperienceFeedback` for haptics and announcements) and `VisualCoreExperience` (`ExperienceStorage`, quality tiers).
+No 2D collision library (shape-against-shape overlap or swept tests) exists in any framework product — the matches of
+"intersect" are mesh and camera-bound helpers — and no sound playback exists: `VisualCoreAudio` holds input sources
+(demo, file, microphone, test signal) only. No transition component exists beyond the experience lifecycle states.
+
+- Q: How is the manual's "compile an empty shell" gate met in the one app? → A: As for A09: the one app is the shell;
+  this phase proves it builds for testing with Neon Arcade absent; the targets come with A10-P01's first rules.
+- Q: What makes a capability "available"? → A: A public declaration in a VisualCore framework product with at least one
+  test that exercises it; an implementation that exists only inside another experience or a harness is "requires
+  adaptation" at best.
+- Q: Which package holds Neon Arcade? → A: `Packages/ExperiencesCreative/NeonArcade` (Auto-Creator.md §16), as A05–A09
+  did; no new package is created.
+- Q: Does Neon Arcade need a permission or a new privacy answer? → A: No. Version 0.1 needs no microphone, camera,
+  photos or location; sounds are synthesized and played, not recorded; local scores live in the experience's own
+  storage, so the app's privacy answers do not change.
+- Q: Which pieces exist, and who owns the missing ones? → A: The fixed-step clock and runner, particles, batched shapes
+  with hit testing, drag and tap gestures, bloom, haptic and announcement planning, storage and quality tiers exist.
+  Gaps and owners, following the manual's phases (P01 fixed-step engine and collision fixtures, P02 Neon Dodge
+  mechanics, P03 visual effects and audio/haptics, P04 scores and accessibility, P05 balance, device QA and
+  storefront): 2D collision (circle and capsule overlap, swept tests for fast hazards) → `VisualCoreSimulation` (A10-P01,
+  the swept case proved by A10-P03's fixture); the game rules, input replay and lanes → app-local (A10-P01/P02);
+  synthesized sound-effect playback → `VisualCoreAudio` (A10-P03); title, pause and game-over transitions → app-local
+  over the presenter (A10-P03); glow readability caps over bloom quality → app-local (A10-P05); touch-steering
+  sensitivity → app-local over `DragRecognizer` (A10-P04); crash-safe local high scores → app-local over
+  `ExperienceStorage` (A10-P04). The audit confirms or corrects each from the code.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - An evidence-backed integration matrix (Priority: P1) 🎯
