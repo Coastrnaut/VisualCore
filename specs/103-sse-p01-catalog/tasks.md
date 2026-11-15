@@ -22,7 +22,7 @@ after every task (no trailers); read every check's exit before ticking. iOS 27 o
 
 ## Phase 4: Story 4 — citations recorded
 
-- [ ] T-A14-106 [US4] Generate `docs/apps/solar-system-explorer/data-sources.md` from `CitationAudit.markdown(.bundled)` with a test in `CoreTests/CitationAuditTests.swift` comparing the committed file (through `#filePath`, regenerated with `UPDATE_DATA_SOURCES=1` or `TEST_RUNNER_UPDATE_DATA_SOURCES=1`); link it from `docs/apps/solar-system-explorer/README.md` (FR-A14-110; SC-A14-103)
+- [X] T-A14-106 [US4] Generate `docs/apps/solar-system-explorer/data-sources.md` from `CitationAudit.markdown(.bundled)` with a test in `CoreTests/CitationAuditTests.swift` comparing the committed file (through `#filePath`, regenerated with `UPDATE_DATA_SOURCES=1` or `TEST_RUNNER_UPDATE_DATA_SOURCES=1`); link it from `docs/apps/solar-system-explorer/README.md` (FR-A14-110; SC-A14-103) — Verified 2026-11-15: 2026-11-15: docs/apps/solar-system-explorer/data-sources.md (34 values, 0 problems) generated from CitationAudit.markdown and checked by CitationAuditTests.theCommittedDataSourcesDocumentMatchesTheCatalog in .autonomy/checks/A14-P01.sse-ios27.json exit 0 on sim-27.2 (SolarSystemExplorerCoreTests 25, SolarSystemExplorerExperienceTests 29, manifest 4); linked from the experience README
 - [ ] T-A14-107 [US4] Contract `docs/apps/solar-system-explorer/visualcore-contract.json`: G-CATALOG closed by "A14-P01"; rows M06, M09, M11, M15, M20 updated (`--name contract -- python3 scripts/check_app_contract.py --app solar-system-explorer --render`)
 
 ## Phase 5: Records and evidence
