@@ -126,6 +126,9 @@ orb, a wave starts or the run ends, and can start, pause, steer, restart and cha
   stay exact.
 - **Restoring an older saved game:** sensitivity takes its default step.
 - **VoiceOver announcements during a burst of events:** collapsed into one; the spoken description stays complete.
+- **Where the scores live and how they go away:** the table is the experience's own local data (no copy elsewhere, not
+  in backups of other apps); the app's existing reset of an experience's data removes it, and the A10-P06 privacy
+  document lists it.
 
 ## Requirements *(mandatory)*
 
