@@ -157,8 +157,8 @@ checks pass.
 **Data and recovery (story 2)**
 
 - **FR-A12-610**: Committed sample world files of each form MUST open or be refused as specified, with refused files
-  byte-identical; a picture without its world file MUST leave the slot empty and a world file without its picture MUST
-  read as "no picture".
+  byte-identical; a picture without its world file MUST leave the slot reading "Empty." and a world file without its picture
+  MUST read "Holds “<name>”, no picture.".
 - **FR-A12-611**: A forced drawing failure (test-only seam) MUST put the session into its failure state with the saved
   files byte-identical, and a reopen MUST draw normally.
 - **FR-A12-612**: Saved states of schema 1 MUST restore (stored example), re-run here.

@@ -30,7 +30,8 @@ a12 registration; control identifiers.
   example restores). `WorldSampleFileTests` over `Fixtures/world-{valid,newer,damaged,truncated}.json` copied as
   `world-0.json` into a temporary storage: valid opens (state equal to its document, digest stable), newer →
   `newer-version`, damaged (not JSON) → `damaged`, truncated (valid cut in half) → `damaged`; each file byte-identical
-  after the read; a lone `world-0.png` leaves slot 0 empty and the valid sample without a picture reads "no picture".
+  after the read; a lone `world-0.png` leaves slot 0's status "Empty." and the valid sample without a picture reads "Holds “<name>”,
+  no picture.".
 
 ## D4 — Interface tests
 
