@@ -133,6 +133,8 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
 - **Commit boundaries follow tasks.** When one task's files must ship with another (controls that read a presenter's
   mirror), the evidence says so.
 - **Pushes cancel queued CI runs.** Batch pushes; check `gh run list` between gates and fix a failure before the next.
+- **Validate before committing a steering document.** `validate_autocreator.py` also limits CLAUDE.md to 12,000 bytes;
+  a CLAUDE.md edit was once committed before its failure was read, and the next commit fixed it.
 
 ## 6. Keeping this file current
 
