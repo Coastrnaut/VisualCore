@@ -8,7 +8,7 @@ X-A12 (owner, 2026-11-14). Precedent: `specs/082-pp-p01-model/tasks.md`.
 
 ## Phase 1: Setup
 
-- [ ] T-A12-101 Baseline: cite the last evidence on an unchanged `Packages` tree (`.autonomy/checks/A12-P00.{app-build,no-change}.json`, `.autonomy/migration/checks/X-A11.*.json`) instead of a rerun (owner ruling of 2026-11-14)
+- [X] T-A12-101 Baseline: cite the last evidence on an unchanged `Packages` tree (`.autonomy/checks/A12-P00.{app-build,no-change}.json`, `.autonomy/migration/checks/X-A11.*.json`) instead of a rerun (owner ruling of 2026-11-14) — Verified 2026-11-15: 2026-11-15: cited .autonomy/checks/A12-P00.{app-build,no-change}.json and .autonomy/migration/checks/X-A11.*.json on the unchanged Packages tree (no rerun)
 
 ## Phase 2: Foundational — generic terrain (story 2) and the world core (stories 1–4)
 
