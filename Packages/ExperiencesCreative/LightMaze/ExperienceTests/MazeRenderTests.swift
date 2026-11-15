@@ -5,6 +5,8 @@
 // solving level 1 shows the lit target colour; drawing never changes the state or its digest; the camera fits the
 // board and the scene tree holds what research D5 lists; the words of the controls; teardown releases every GPU
 // object; and the experience's sources never create a graphics context of their own.
+// Feature 097 (A13-P02) T-A13-205 (FR-A13-210; SC-A13-204): along the beam the core is brighter than its halo and the
+// halo brighter than the board.
 import Foundation
 import XCTest
 @testable import LightMazeExperience
@@ -94,6 +96,49 @@ final class MazeRenderTests: XCTestCase {
         session.close()
     }
 
+    /// The luminance (0…255) of the brightest pixel of `frame` within one pixel of the pixel `at` (x from the left, y
+    /// from the bottom).
+    private func luminance(_ frame: MazeFrame, at point: Vec2) -> Double {
+        let cx = Int(point.x.rounded(.down)), cy = Int(point.y.rounded(.down))
+        var best = 0.0
+        for y in (cy - 1)...(cy + 1) where y >= 0 && y < frame.height {
+            for x in (cx - 1)...(cx + 1) where x >= 0 && x < frame.width {
+                let i = (y * frame.width + x) * 4
+                let value = 0.2126 * Double(frame.rgba[i]) + 0.7152 * Double(frame.rgba[i + 1])
+                    + 0.0722 * Double(frame.rgba[i + 2])
+                best = max(best, value)
+            }
+        }
+        return best
+    }
+
+    func testTheBeamPathIsBrighterThanTheBoard() async throws {
+        let session = ExperienceSession()
+        let shell = try await MazeTest.open(session, size: CGSize(width: 240, height: 200))
+        let frame = try MazeTest.picture(session)
+        let core = try MazeTest.core(shell)
+        let board = core.board
+        let canvas = Vec2(Double(frame.width), Double(frame.height))
+        // lm-01: the beam runs east from the emitter (0, 2) to the mirror (2, 2), then south to the wall (2, 0).
+        let empty = luminance(frame, at: MazePresenter.pixel(of: Vec2(1.5, 3.5), board: board, canvas: canvas))
+        XCTAssertGreaterThan(core.beam.segments.count, 1)
+        for (index, segment) in core.beam.segments.enumerated() {
+            let middle = (segment.start + segment.end) / 2
+            let bright = luminance(frame, at: MazePresenter.pixel(of: middle, board: board, canvas: canvas))
+            XCTAssertGreaterThan(bright, empty + 40, "segment \(index): the beam's core outshines the board")
+        }
+        // Beside the first segment, 0.11 cell off its line: inside the halo (0.15) and outside the core (0.04).
+        let first = try XCTUnwrap(core.beam.segments.first)
+        let middle = (first.start + first.end) / 2
+        let halo = luminance(frame, at: MazePresenter.pixel(of: middle + Vec2(0, 0.11), board: board, canvas: canvas))
+        let line = luminance(frame, at: MazePresenter.pixel(of: middle, board: board, canvas: canvas))
+        let outside = luminance(frame, at: MazePresenter.pixel(of: middle + Vec2(0, 0.3), board: board, canvas: canvas))
+        XCTAssertGreaterThan(halo, outside + 8, "the halo brightens the board beside the beam")
+        XCTAssertGreaterThan(line, halo + 20, "the core stays brighter than its halo, so the path stays legible")
+        XCTAssertEqual(outside, empty, accuracy: 6, "beyond the glow the board is untouched")
+        session.close()
+    }
+
     func testDrawingNeverChangesTheState() async throws {
         let session = ExperienceSession()
         let shell = try await MazeTest.open(session, size: size)
@@ -139,7 +184,7 @@ final class MazeRenderTests: XCTestCase {
         var root = MazePresenter.scene(core)
         XCTAssertEqual(root.scale, Vec2(MazePresenter.unit, MazePresenter.unit))
         var ids: [String] = root.children.map(\.id)
-        XCTAssertEqual(ids.count, 1 + 8 + 4 + core.beam.segments.count)
+        XCTAssertEqual(ids.count, 1 + 8 + 4 + 2 * core.beam.segments.count, "a halo and a core per segment")
         XCTAssertTrue(ids.contains("board"))
         XCTAssertTrue(ids.contains("tile0.wall") && ids.contains("tile1.emitter") && ids.contains("tile2.mirror")
                       && ids.contains("tile3.target"))
