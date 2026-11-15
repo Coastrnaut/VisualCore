@@ -1,5 +1,6 @@
 // SolarManifest — feature 103 (A14-P01) T-A14-105 (FR-A14-122; clarification Q5), state schema 2 by feature 104
-// (A14-P02) T-A14-209 (FR-A14-222; contracts/orbit-view.md). The scenarios the verification runner plays for Solar
+// (A14-P02) T-A14-209 (FR-A14-222; contracts/orbit-view.md), state schema 3 by feature 105 (A14-P03) T-A14-309
+// (FR-A14-330; contracts/bodies.md). The scenarios the verification runner plays for Solar
 // System Explorer, all short (owner rule of 2026-11-13):
 //   - the nine standard scenarios, prepared with seed 1 (every seed opens with the Sun selected);
 //   - five fixtures `fixture-mercury`, `fixture-earth`, `fixture-jupiter`, `fixture-saturn` and `fixture-neptune` that
@@ -7,10 +8,13 @@
 //     ``SolarCore/selectedFixtures`` (committed values; `SolarManifestTests` proves each equal to the derived digest
 //     and the played core's selection equal to the fixture's body), and each expects the outcome `viewing-<id>`;
 //   - the dated fixture `fixture-earth-2025` (A14-P02): Earth selected, then 25 date steps of +365 days and 7 of +1
-//     day (day 9,132, 2025-01-01 12:00 UTC), pinned by ``SolarCore/datedFixtureDigest``.
+//     day (day 9,132, 2025-01-01 12:00 UTC), pinned by ``SolarCore/datedFixtureDigest``;
+//   - the true-scale fixture `fixture-earth-true-scale` (A14-P03): Earth selected, then `scale.mode [1]`, pinned by
+//     ``SolarCore/trueScaleFixtureDigest``.
 // Input-response, save-restore and reset also step the date and move the camera; rejection also refuses a date step
 // of 7 days (`a14.invalid-step`), one beyond the declared range (`action.out-of-range`), a tilt past 85°
-// (`a14.out-of-range`) and a zoom step of 0 (`a14.invalid-step`).
+// (`a14.out-of-range`) and a zoom step of 0 (`a14.invalid-step`), and a scale mode of 0.5 (`a14.invalid-choice`) and
+// of 2 (`action.out-of-range`). Input-response also switches to the true-relative scale.
 // The completion scenario selects Earth and expects the outcome `viewing-earth`. The expected digests are derived by
 // playing the entries on a core exactly as the engine plays them (the steps of an entry, then its action) and
 // digesting it with the experience id as domain, as Light Maze's manifest does.
@@ -24,13 +28,13 @@ extension SolarCore {
 
     /// The committed digests (engine digest, the experience id as domain) of the state after selecting Mercury,
     /// Earth, Jupiter, Saturn and Neptune by ``fixtureEntries(body:)`` from the first state, by body index (1, 3, 5,
-    /// 6, 8), pinned from the first run of `SolarManifestTests` on sim-27.2 (re-pinned at A14-P02: state schema 2).
+    /// 6, 8), pinned from the first run of `SolarManifestTests` on sim-27.2 (re-pinned at A14-P02 for state schema 2 and at A14-P03 for schema 3).
     public static let selectedFixtures: [(body: Int, digest: String)] = [
-        (1, "baeed8b1a8d680336d9e2f878d66ab31ed2318ac9f7998f45e9ce8015880c031"),
-        (3, "890b547505b1c63dc84da161a57030f62349994aaff375f8d12c5b3eda10c6f1"),
-        (5, "5f9ad101f524613138d1f5ab4864e240a5616a6e7db13a5dae50dc1e008e0ef7"),
-        (6, "fb6578cd4b2c8f2df91f769bc36b0a5e3d4630c850f158e8dffdf20653645baa"),
-        (8, "458b44ac50bd868a3e1572056fd13ec1486a82e2c9e7e09c3a88c31a28ca97eb"),
+        (1, "3193c17a1b3dc910ffd62e7714d377852876c5492e8f22fe5098846fc7e22ba5"),
+        (3, "c8ea2956122ee2307ad95c59cc4373af0a5afe602397334387dc4ae98aa1dda1"),
+        (5, "7bb2d6b2db0a1d4b406647fa5a643d1790e3256b0bacbc2b6b4288fcd4d4335d"),
+        (6, "dbea97dfd17d2d7b7f1b8d23532882f0c6d6a7697a7f9f040cd1a888ffe535d7"),
+        (8, "0c626a905221f5b4669ef9d0b5fea76612cb727a58cc8fde89e5ddb73aad7eb8"),
     ]
 
     /// The name of the dated fixture.
@@ -38,7 +42,19 @@ extension SolarCore {
 
     /// The committed digest of the dated fixture (see the file header), pinned from the first run of
     /// `SolarManifestTests` on sim-27.2.
-    public static let datedFixtureDigest = "cf1d04fd1ae3373948db427a7cec5bd5ae1b04343e375cbc0d24cb6362d2d398"
+    public static let datedFixtureDigest = "ea08f6c2aa76932347679c72f450b4479ee5c89e26cbf9c155da5fce820e094f"
+
+    /// The name of the true-scale fixture.
+    public static let trueScaleFixtureName = "fixture-earth-true-scale"
+
+    /// The committed digest of the true-scale fixture, pinned from the first run of `SolarManifestTests` on sim-27.2.
+    public static let trueScaleFixtureDigest = "22ef219c0ccaa9e251d96595018ef68a9d1b28c2f0acd2c04c9d621215cb1d84"
+
+    /// The entries of the true-scale fixture: Earth, then the true-relative scale.
+    public static var trueScaleFixtureEntries: [ScenarioStep] {
+        [ScenarioStep(steps: 1, action: ScriptedAction("body.select", [3]), result: "accepted"),
+         ScenarioStep(steps: 0, action: ScriptedAction("scale.mode", [1]), result: "accepted")]
+    }
 
     /// The entries of the dated fixture: Earth, then 25 steps of +365 days and 7 of +1 day (day 9,132).
     public static var datedFixtureEntries: [ScenarioStep] {
@@ -79,6 +95,7 @@ extension SolarCore {
          ScenarioStep(steps: 10, action: ScriptedAction("camera.orbit", [1]), result: "accepted"),
          ScenarioStep(steps: 10, action: ScriptedAction("camera.tilt", [1]), result: "accepted"),
          ScenarioStep(steps: 10, action: ScriptedAction("camera.zoom", [1]), result: "accepted"),
+         ScenarioStep(steps: 10, action: ScriptedAction("scale.mode", [1]), result: "accepted"),
          ScenarioStep(steps: 10, action: ScriptedAction("body.select", [8]), result: "accepted")]
     }
 
@@ -113,7 +130,9 @@ extension SolarCore {
                 ScenarioStep(steps: 0, action: ScriptedAction("camera.tilt", [1]), result: "accepted"),
                 ScenarioStep(steps: 0, action: ScriptedAction("camera.tilt", [1]), result: outOfRange),
                 ScenarioStep(steps: 0, action: ScriptedAction("camera.zoom", [0]), result: invalidStep),
-                ScenarioStep(steps: 0, action: ScriptedAction("view.reset"), result: "accepted")]
+                ScenarioStep(steps: 0, action: ScriptedAction("view.reset"), result: "accepted"),
+                ScenarioStep(steps: 0, action: ScriptedAction("scale.mode", [0.5]), result: invalid),
+                ScenarioStep(steps: 0, action: ScriptedAction("scale.mode", [2]), result: "action.out-of-range")]
     }
 
     /// The core prepared with `seed` after playing `entries` as the engine plays them: each entry's steps, then its
@@ -177,6 +196,10 @@ extension SolarCore {
         }
         specs.append(ScenarioSpec(name: datedFixtureName, seed: seed, entries: datedFixtureEntries,
                                   expect: ScenarioExpectations(initialDigest: initial, finalDigest: datedFixtureDigest,
+                                                               outcome: outcomeCode(body: 3))))
+        specs.append(ScenarioSpec(name: trueScaleFixtureName, seed: seed, entries: trueScaleFixtureEntries,
+                                  expect: ScenarioExpectations(initialDigest: initial,
+                                                               finalDigest: trueScaleFixtureDigest,
                                                                outcome: outcomeCode(body: 3))))
         return ScenarioManifest(experience: id, kind: .creative, scenarios: specs)
     }

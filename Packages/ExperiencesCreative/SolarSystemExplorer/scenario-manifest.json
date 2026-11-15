@@ -7,7 +7,8 @@
     "camera.orbit",
     "camera.tilt",
     "camera.zoom",
-    "view.reset"
+    "view.reset",
+    "scale.mode"
   ],
   "experience" : "a14.solar-system-explorer",
   "kind" : "creative",
@@ -17,7 +18,7 @@
 
       ],
       "expect" : {
-        "initialDigest" : "7a93a837b2018246146099dbcbca46fff4beec71e7aaca2e83052f56445e4185"
+        "initialDigest" : "3c51838205e63d305f15510e2fbc7f09e671d26f0b2228cd044c08f02351f011"
       },
       "name" : "launch-first-frame",
       "seed" : "1"
@@ -106,6 +107,16 @@
         },
         {
           "action" : {
+            "control" : "scale.mode",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
             "control" : "body.select",
             "values" : [
               8
@@ -116,8 +127,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "00b09bb9c6594cd97694ff4a8b88a07dd4c89ed4dae29a9ca9ba90e8a04f1985",
-        "initialDigest" : "7a93a837b2018246146099dbcbca46fff4beec71e7aaca2e83052f56445e4185"
+        "finalDigest" : "7a1a90a70160571318ca023d26dac84b432873e0bf48e0e64a603699c41dafa2",
+        "initialDigest" : "3c51838205e63d305f15510e2fbc7f09e671d26f0b2228cd044c08f02351f011"
       },
       "name" : "input-response",
       "seed" : "1"
@@ -332,6 +343,26 @@
           },
           "result" : "accepted",
           "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "scale.mode",
+            "values" : [
+              0.5
+            ]
+          },
+          "result" : "action.rule.a14.invalid-choice",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "scale.mode",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
         }
       ],
       "expect" : {
@@ -424,6 +455,16 @@
         },
         {
           "action" : {
+            "control" : "scale.mode",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
             "control" : "body.select",
             "values" : [
               8
@@ -434,8 +475,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "00b09bb9c6594cd97694ff4a8b88a07dd4c89ed4dae29a9ca9ba90e8a04f1985",
-        "initialDigest" : "7a93a837b2018246146099dbcbca46fff4beec71e7aaca2e83052f56445e4185"
+        "finalDigest" : "7a1a90a70160571318ca023d26dac84b432873e0bf48e0e64a603699c41dafa2",
+        "initialDigest" : "3c51838205e63d305f15510e2fbc7f09e671d26f0b2228cd044c08f02351f011"
       },
       "name" : "save-restore",
       "seed" : "1"
@@ -524,6 +565,16 @@
         },
         {
           "action" : {
+            "control" : "scale.mode",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
             "control" : "body.select",
             "values" : [
               8
@@ -534,7 +585,7 @@
         }
       ],
       "expect" : {
-        "initialDigest" : "7a93a837b2018246146099dbcbca46fff4beec71e7aaca2e83052f56445e4185",
+        "initialDigest" : "3c51838205e63d305f15510e2fbc7f09e671d26f0b2228cd044c08f02351f011",
         "resetDigest" : true
       },
       "name" : "reset",
@@ -585,8 +636,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "baeed8b1a8d680336d9e2f878d66ab31ed2318ac9f7998f45e9ce8015880c031",
-        "initialDigest" : "7a93a837b2018246146099dbcbca46fff4beec71e7aaca2e83052f56445e4185",
+        "finalDigest" : "3193c17a1b3dc910ffd62e7714d377852876c5492e8f22fe5098846fc7e22ba5",
+        "initialDigest" : "3c51838205e63d305f15510e2fbc7f09e671d26f0b2228cd044c08f02351f011",
         "outcome" : "viewing-mercury"
       },
       "name" : "fixture-mercury",
@@ -606,8 +657,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "890b547505b1c63dc84da161a57030f62349994aaff375f8d12c5b3eda10c6f1",
-        "initialDigest" : "7a93a837b2018246146099dbcbca46fff4beec71e7aaca2e83052f56445e4185",
+        "finalDigest" : "c8ea2956122ee2307ad95c59cc4373af0a5afe602397334387dc4ae98aa1dda1",
+        "initialDigest" : "3c51838205e63d305f15510e2fbc7f09e671d26f0b2228cd044c08f02351f011",
         "outcome" : "viewing-earth"
       },
       "name" : "fixture-earth",
@@ -627,8 +678,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "5f9ad101f524613138d1f5ab4864e240a5616a6e7db13a5dae50dc1e008e0ef7",
-        "initialDigest" : "7a93a837b2018246146099dbcbca46fff4beec71e7aaca2e83052f56445e4185",
+        "finalDigest" : "7bb2d6b2db0a1d4b406647fa5a643d1790e3256b0bacbc2b6b4288fcd4d4335d",
+        "initialDigest" : "3c51838205e63d305f15510e2fbc7f09e671d26f0b2228cd044c08f02351f011",
         "outcome" : "viewing-jupiter"
       },
       "name" : "fixture-jupiter",
@@ -648,8 +699,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "fb6578cd4b2c8f2df91f769bc36b0a5e3d4630c850f158e8dffdf20653645baa",
-        "initialDigest" : "7a93a837b2018246146099dbcbca46fff4beec71e7aaca2e83052f56445e4185",
+        "finalDigest" : "dbea97dfd17d2d7b7f1b8d23532882f0c6d6a7697a7f9f040cd1a888ffe535d7",
+        "initialDigest" : "3c51838205e63d305f15510e2fbc7f09e671d26f0b2228cd044c08f02351f011",
         "outcome" : "viewing-saturn"
       },
       "name" : "fixture-saturn",
@@ -669,8 +720,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "458b44ac50bd868a3e1572056fd13ec1486a82e2c9e7e09c3a88c31a28ca97eb",
-        "initialDigest" : "7a93a837b2018246146099dbcbca46fff4beec71e7aaca2e83052f56445e4185",
+        "finalDigest" : "0c626a905221f5b4669ef9d0b5fea76612cb727a58cc8fde89e5ddb73aad7eb8",
+        "initialDigest" : "3c51838205e63d305f15510e2fbc7f09e671d26f0b2228cd044c08f02351f011",
         "outcome" : "viewing-neptune"
       },
       "name" : "fixture-neptune",
@@ -1010,11 +1061,42 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "cf1d04fd1ae3373948db427a7cec5bd5ae1b04343e375cbc0d24cb6362d2d398",
-        "initialDigest" : "7a93a837b2018246146099dbcbca46fff4beec71e7aaca2e83052f56445e4185",
+        "finalDigest" : "ea08f6c2aa76932347679c72f450b4479ee5c89e26cbf9c155da5fce820e094f",
+        "initialDigest" : "3c51838205e63d305f15510e2fbc7f09e671d26f0b2228cd044c08f02351f011",
         "outcome" : "viewing-earth"
       },
       "name" : "fixture-earth-2025",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "body.select",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "scale.mode",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "22ef219c0ccaa9e251d96595018ef68a9d1b28c2f0acd2c04c9d621215cb1d84",
+        "initialDigest" : "3c51838205e63d305f15510e2fbc7f09e671d26f0b2228cd044c08f02351f011",
+        "outcome" : "viewing-earth"
+      },
+      "name" : "fixture-earth-true-scale",
       "seed" : "1"
     }
   ],
