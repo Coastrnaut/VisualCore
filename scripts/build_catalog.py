@@ -50,7 +50,7 @@ ID = re.compile(r"(a\d\d|r\d\d-g\d\d)\.[a-z0-9]+(-[a-z0-9]+)*")
 FREE = [f"A{n:02d}" for n in range(1, 26)] + [f"R02-G{n:02d}" for n in range(1, 26)]
 PREMIUM = [f"R{r:02d}-G{n:02d}" for r in (3, 4) for n in range(1, 26)]
 REGISTRATION_KEYS = ["capabilities", "quality_tiers", "palette", "content"]
-OPTIONAL_KEYS = {"manifest", "permissions"}
+OPTIONAL_KEYS = {"manifest", "permissions", "summary"}
 VOCABULARY = Path("Configs/permission-vocabulary.json")
 WORD = re.compile(r"[a-z][a-z0-9]*(-[a-z0-9]+)*")
 USAGE_KEY = re.compile(r"NS[A-Za-z]+UsageDescription")
@@ -120,7 +120,7 @@ def load_registrations(root: Path, known_ids: set[str]) -> dict:
     for experience_id, entry in data["registrations"].items():
         need(experience_id in known_ids, REGISTRATIONS, f"{experience_id} is not an id of the planning catalog")
         need(isinstance(entry, dict) and sorted(set(entry) - OPTIONAL_KEYS) == sorted(REGISTRATION_KEYS), REGISTRATIONS,
-             f"{experience_id}: expected exactly the keys {', '.join(REGISTRATION_KEYS)} and optionally manifest and permissions")
+             f"{experience_id}: expected exactly the keys {', '.join(REGISTRATION_KEYS)} and optionally manifest, permissions and summary")
         # Feature 193 (UA-F07): the scenario manifest's JSON form that scripts/verify_experiences.py audits, a
         # repository-relative file; it does not enter the runtime catalog.
         need("manifest" not in entry or (isinstance(entry["manifest"], str)
@@ -139,6 +139,11 @@ def load_registrations(root: Path, known_ids: set[str]) -> dict:
             unknown = [w for w in permissions if w not in vocabulary]
             need(not unknown, REGISTRATIONS,
                  f"{experience_id}: permissions word {unknown[0] if unknown else ''} is not in {VOCABULARY.as_posix()}")
+        # Feature 079 (A10-P05, FR-A10-521): the storefront line shown in place of the planning catalog's design
+        # summary, 1 to 300 characters and not blank, so the entry describes what the experience proves it does.
+        need("summary" not in entry or (isinstance(entry["summary"], str) and 1 <= len(entry["summary"]) <= 300
+                                        and entry["summary"].strip() != ""), REGISTRATIONS,
+             f"{experience_id}: summary must be a non-blank string of 1 to 300 characters")
         strings(entry["capabilities"], REGISTRATIONS, f"{experience_id}: capabilities", 16, 40)
         strings(entry["quality_tiers"], REGISTRATIONS, f"{experience_id}: quality_tiers", 8, 40)
         need(isinstance(entry["palette"], list) and len(entry["palette"]) <= 8
@@ -236,6 +241,7 @@ def manifest_text(root: Path) -> tuple[str, dict]:
         if available and registration is None:
             fail(f"{e['id']} is available ({gate} is pass) but has no registration in {REGISTRATIONS.as_posix()}")
         registration = registration or {"capabilities": [], "quality_tiers": [], "palette": [], "content": None}
+        summary = registration.get("summary", summary)
         need(registration["content"] is None or e["kind"] == "game", REGISTRATIONS, f"{e['id']}: only a game has content facts")
         entries.append({
             "id": e["id"], "code": e["code"], "title": e["name"], "summary": summary,

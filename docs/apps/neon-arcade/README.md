@@ -20,7 +20,25 @@ constitution (2.6.0).
 | [visualcore-contract.json](visualcore-contract.json) / [.md](visualcore-contract.md) | Phase 00 inventory, capability matrix, gaps, decision (checked by `scripts/check_app_contract.py`) |
 | [regression-baseline.md](regression-baseline.md) | Phase start, reference pin, the ProjectM reference regression results |
 | [content-licenses.md](content-licenses.md) | Author and license of the player, every hazard and every orb (generated) |
+| [device-campaign.md](device-campaign.md) | Device measurements planned for after `ImplementationLock-100` (frame pacing per quality level, thermal state, glow readability in bright light, audio routes, VoiceOver, high-score survival); nothing measured yet |
 
 Phases: A10-P00 boundary audit (feature 074), P01 fixed-step engine and collision fixtures, P02 Neon Dodge mechanics,
 P03 visual effects and audio/haptics, P04 scores and accessibility, P05 balance and device QA preparation, P06
 release readiness; then the experience's integration gate X-A10.
+
+## Capabilities and their proof
+
+The catalog entry (`Catalog/registrations.json`, `a10.neon-arcade`) reads "Neon Dodge: steer through falling hazards
+and collect orbs in waves." and lists only the capabilities below, each proved by the named tests (feature 079,
+A10-P05, FR-A10-521). Simulator and host results; nothing here is a device measurement. `specs/079-na-p05-balance/scan-claims.sh`
+checks that every named test exists and that the entry and this page make no benefit claims.
+
+| Capability | Proving tests |
+|---|---|
+| fixed-step game | `GameSimulationTests.swift` `theStepIsOneSixtiethOfASecond`; `ReplayTests.swift` `replayingTheSameInputsTwiceGivesTheSameRun`; `ArcadeCoreTests.swift` `testTheSameSeedAndRecordedInputsGiveTheSameRun` |
+| swept collision | `Collision2DTests.swift` `earliestFractionForAHeadOnCrossing`; `GameSimulationTests.swift` `aFastCircleCrossingThePlayerInOneStepIsCaught`; `GameSimulationTests.swift` `capsulesHitByEndOfStepOverlap` |
+| wave patterns | `WaveDirectorTests.swift` `wavesAdvanceEvery600StepsWithAnotherPattern`; `WaveDirectorTests.swift` `everySpawnStartsAtALaneCentreAndThreePatternsAppearPerSeed`; `WaveDirectorTests.swift` `everyWallLeavesExactlyOneFreeLaneNeverThePrevious` |
+| local high scores | `HighScoreTableTests.swift` `entriesAreRankedHighestFirst`; `HighScoreStoreTests.swift` `testATableRoundTripsThroughStorageAndARunIsEnteredOnce`; `HighScoreStoreTests.swift` `testAnInterruptedSaveLeavesTheLastCompleteTable` |
+| synthesized sounds and haptics | `ArcadeEffectsTests.swift` `theFourSoundShapes`; `ArcadeEffectsTests.swift` `theSoundShapesStayInsideTheLimits`; `ArcadeSessionTests.swift` `testTheSoundAndHapticSinksReceiveCuesOnlyWhenEnabled` |
+| five steering sensitivities | `SensitivityTests.swift` `theFiveReachesAndTheDefault`; `SensitivityTests.swift` `oneOffsetIsOrderedGentleToSharpAndBounded`; `ArcadeSessionTests.swift` `testTheDragReachFollowsTheSensitivityStep` |
+| three quality levels | `ArcadeBudgetTests.swift` `ArcadeBudgetTests` (the per-level glow, opacity and particle caps) |

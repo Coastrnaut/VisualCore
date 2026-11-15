@@ -3425,6 +3425,42 @@ class BuildCatalogTests(unittest.TestCase):
             self.assertEqual((self.root / "Catalog/registrations.json").read_bytes(), changed)
             (self.root / "Catalog/registrations.json").write_bytes(good)
 
+    def test_an_optional_registration_summary_replaces_the_design_summary(self):
+        # Feature 079 (A10-P05, FR-A10-521, research D4): present, absent, too long, blank and not a string.
+        planning = {e["id"]: e for e in json.loads((self.root / "docs/catalog/experience-catalog.json").read_text())["experiences"]}
+        design = planning["a10.neon-arcade"]["design"]
+        design_summary = design.get("summary") or design["pitch"]
+        base = {"capabilities": ["fixed-step game loop"], "quality_tiers": ["level-0"], "palette": ["#07061A"], "content": None}
+
+        def register(**extra):
+            self.edit("Catalog/registrations.json",
+                      lambda r: r["registrations"].update({"a10.neon-arcade": dict(base, **extra)}))
+
+        def summary_of(experience_id):
+            return next(e["summary"] for e in self.manifest()["experiences"] if e["id"] == experience_id)
+
+        register()
+        self.assertEqual(self.run_tool()[0], 0)
+        self.assertEqual(summary_of("a10.neon-arcade"), design_summary)
+        line = "Neon Dodge: steer through falling hazards and collect orbs in waves."
+        register(summary=line)
+        self.assertEqual(self.run_tool()[0], 0)
+        self.assertEqual(summary_of("a10.neon-arcade"), line)
+        self.assertEqual(summary_of("a09.digital-aquarium"),
+                         planning["a09.digital-aquarium"]["design"].get("summary") or planning["a09.digital-aquarium"]["design"]["pitch"])
+        register(summary="x" * 300)
+        self.assertEqual(self.run_tool()[0], 0)
+        before = self.tree()
+        for label, value in (("too long", "x" * 301), ("empty", ""), ("blank", "   "), ("not a string", 42),
+                             ("a list", [line]), ("null", None)):
+            register(summary=value)
+            code, out = self.run_tool()
+            self.assertEqual(code, 1, label)
+            self.assertIn("a10.neon-arcade: summary must be", out, label)
+            after = self.tree()
+            after["Catalog/registrations.json"] = before["Catalog/registrations.json"]
+            self.assertEqual(after, before, label)
+
     def test_check_mode_names_the_file_and_writes_nothing(self):
         self.assertEqual(self.run_tool()[0], 0)
         code, out = self.run_tool("--check")

@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "bash",
+    "specs/079-na-p05-balance/scan-claims.sh"
+  ],
+  "command": "bash specs/079-na-p05-balance/scan-claims.sh",
+  "elapsed_seconds": 4.736,
+  "exit_code": 0,
+  "finished": "2026-11-15T04:57:02+00:00",
+  "log": ".autonomy/logs/A10-P05.claims.log",
+  "log_sha256": "d93976764159d427321448066f04da88ec16eeff2529719e592447575bde2a3f",
+  "name": "claims",
+  "stage": "A10-P05",
+  "started": "2026-11-15T04:56:57+00:00",
+  "timed_out": false
+}
