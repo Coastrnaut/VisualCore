@@ -22,3 +22,19 @@
 ## D5 — State and actions
 - **Decision**: schema 1 selected index; actions `body.select`, `body.next`, `body.previous`; refusal
   `a14.invalid-choice`; five fixtures (Mercury, Earth, Jupiter, Saturn, Neptune).
+
+## As built (2026-11-15)
+
+- **Outcome:** `SolarCore.outcome` is `viewing-<body id>` (for example `viewing-earth`); the scenario-manifest
+  validator requires an outcome for the completion scenario (`completion: no outcome expected` otherwise), so the
+  completion scenario selects Earth and expects `viewing-earth`, and each fixture expects its body (precedent: Tiny
+  Worlds' `world-<preset>`). Clarification Q5 named no outcome.
+- **Ring renderers:** all `MeshRenderer`s share one cached shader program in the host's `ResourceRegistry`, and
+  `MeshRenderer.release()` releases that program for every renderer using it. The first iOS 27 run remade the ring
+  renderer per selection, which released the program under the nine body renderers: they drew with the ring's stale
+  uniforms at the selected body. The presenter now makes the nine ring renderers once with the bodies and the
+  selection only picks one; no renderer is released while others are in use (released together in `teardown`). The
+  framework behaviour is recorded for a later VisualCore fix (reference counting of cached programs) and does not
+  change this phase's scope.
+- **Test canvas:** the render tests use a 240 × 160 point view (720 × 480 pixels on the simulator) so Mercury spans
+  several pixels.

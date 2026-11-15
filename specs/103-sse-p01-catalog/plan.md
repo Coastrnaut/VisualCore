@@ -55,8 +55,9 @@ product `SolarSystemExplorerExperience`, as `scripts/check_experience_packages.p
 host, UI; nothing in VisualCore depends on the experience.
 
 **Lifecycle**: the core holds `SolarState` (selected body index); actions apply at their step; the host's steps change
-nothing else. The presenter owns one `MeshRenderer` per body mesh (created when the host's context is current, rebuilt
-after a context recreation, released in teardown) and draws through `DepthMeshPass` with a fixed `OrbitCamera`; it reads
+nothing else. The presenter owns one `MeshRenderer` per body mesh and one ring renderer per body (all created once when the
+host's context is current, rebuilt after a context recreation, released together in teardown — never one at a time,
+since mesh renderers share a cached program; research §As built) and draws through `DepthMeshPass` with a fixed `OrbitCamera`; it reads
 the state and never writes it. **Migration**: none (new schema 1). **Rollback**: revert the commits.
 
 ## Parallel work
