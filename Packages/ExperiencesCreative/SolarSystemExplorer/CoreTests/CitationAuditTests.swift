@@ -105,8 +105,10 @@ import Testing
                               + "Space Science Data Coordinated Archive (D. R. Williams, NASA Goddard Space Flight "
                               + "Center) (nssdc.gsfc.nasa.gov/planetary/factsheet) | J2000.0 | public-domain |"))
         #expect(text.contains("| Mercury | axial-tilt | 0.034 | degrees |"))
-        let rows: [Substring] = text.split(separator: "\n").filter { $0.hasPrefix("| ") && !$0.hasPrefix("| Body") }
-        #expect(rows.count == 34 + 8, "34 values and 8 orbital-element sets (A14-P02)")
+        let rows: [Substring] = text.split(separator: "\n").filter {
+            $0.hasPrefix("| ") && !$0.hasPrefix("| Body") && !$0.hasPrefix("| Quantity")
+        }
+        #expect(rows.count == 34 + 8 + 3, "34 values, 8 orbital-element sets (A14-P02) and 3 ring values (A14-P03)")
         #expect(text.hasSuffix("\n34 values; 0 problems.\n"))
         #expect(!text.contains("\r") && !text.hasSuffix("\n\n"))
         #expect(CitationAudit.markdown(catalog) == text)

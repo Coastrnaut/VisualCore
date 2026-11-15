@@ -54,4 +54,14 @@ Mean elements at epoch J2000.0, held fixed (no secular rates): positions are app
 | Uranus | 19.18916464 | 0.04725744 | 0.77263783 | 313.23810451 | 170.9542763 | 74.01692503 | Keplerian Elements for Approximate Positions of the Major Planets, Table 1, E. M. Standish, NASA Jet Propulsion Laboratory Solar System Dynamics (numerical facts, public domain) (ssd.jpl.nasa.gov/planets/approx_pos.html) | J2000.0 | public-domain |
 | Neptune | 30.06992276 | 0.00859048 | 1.77004347 | -55.12002969 | 44.96476227 | 131.78422574 | Keplerian Elements for Approximate Positions of the Major Planets, Table 1, E. M. Standish, NASA Jet Propulsion Laboratory Solar System Dynamics (numerical facts, public domain) (ssd.jpl.nasa.gov/planets/approx_pos.html) | J2000.0 | public-domain |
 
+## Saturn's rings
+
+Main rings from the C ring's inner edge to the A ring's outer edge, distances from Saturn's centre in its equatorial plane; the drawing tilts the plane by Saturn's axial tilt.
+
+| Quantity | Value | Units | Source | Epoch | License |
+|---|---|---|---|---|---|
+| ring-inner-radius | 74,500 | km | Saturnian Rings Fact Sheet, NASA Space Science Data Coordinated Archive (D. R. Williams, NASA Goddard Space Flight Center) (nssdc.gsfc.nasa.gov/planetary/factsheet/satringfact.html) | J2000.0 | public-domain |
+| ring-outer-radius | 136,775 | km | Saturnian Rings Fact Sheet, NASA Space Science Data Coordinated Archive (D. R. Williams, NASA Goddard Space Flight Center) (nssdc.gsfc.nasa.gov/planetary/factsheet/satringfact.html) | J2000.0 | public-domain |
+| cassini-division | 117,580–122,170 | km | Saturnian Rings Fact Sheet, NASA Space Science Data Coordinated Archive (D. R. Williams, NASA Goddard Space Flight Center) (nssdc.gsfc.nasa.gov/planetary/factsheet/satringfact.html) | J2000.0 | public-domain |
+
 34 values; 0 problems.

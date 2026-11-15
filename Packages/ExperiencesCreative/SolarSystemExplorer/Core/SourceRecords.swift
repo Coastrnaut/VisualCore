@@ -18,6 +18,10 @@
 // Elements for Approximate Positions of the Major Planets", Table 1, NASA Jet Propulsion Laboratory Solar System
 // Dynamics, ssd.jpl.nasa.gov/planets/approx_pos.html, epoch J2000.0, units "AU, degrees", `public-domain` (numerical
 // facts published by a NASA laboratory). They are kept apart from `bundled`, which holds the catalog's values.
+//
+// Feature 105 (A14-P03) T-A14-303 (FR-A14-302; clarification Q2) adds `SourceRecord.ringRecords`: Saturn's
+// `ring-inner-radius`, `ring-outer-radius` and `cassini-division` (NASA NSSDCA "Saturnian Rings Fact Sheet", epoch
+// J2000.0, km, public-domain), kept apart from the catalog's values as the orbital elements are.
 import Foundation
 
 /// A stored quantity of a body, with its key in source records and the units it is stored in.
@@ -120,6 +124,24 @@ public struct SourceRecord: Codable, Equatable, Sendable {
             records.append(SourceRecord(bodyID: planet, quantity: orbitalElementsQuantity, title: standishTitle,
                                         publisher: standishPublisher, link: standishLink, epoch: j2000,
                                         units: orbitalElementsUnits, license: publicDomain))
+        }
+        return records
+    }()
+
+    /// The ring quantities, in order: `ring-inner-radius`, `ring-outer-radius`, `cassini-division`.
+    public static let ringQuantities: [String] = ["ring-inner-radius", "ring-outer-radius", "cassini-division"]
+    /// The title of the rings' source.
+    public static let ringsTitle = "Saturnian Rings Fact Sheet"
+    /// The rings' link text.
+    public static let ringsLink = "nssdc.gsfc.nasa.gov/planetary/factsheet/satringfact.html"
+
+    /// Saturn's three ring records (see the file header).
+    public static let ringRecords: [SourceRecord] = {
+        var records: [SourceRecord] = []
+        for quantity in ringQuantities {
+            records.append(SourceRecord(bodyID: "saturn", quantity: quantity, title: ringsTitle,
+                                        publisher: nssdcaPublisher, link: ringsLink, epoch: j2000, units: "km",
+                                        license: publicDomain))
         }
         return records
     }()

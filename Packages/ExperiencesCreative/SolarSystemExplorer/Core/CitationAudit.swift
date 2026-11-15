@@ -18,6 +18,11 @@
 // license; each record names an element set), and `markdown` adds the section "## Orbital elements" (a table
 // `Body | a (AU) | e | i (deg) | L (deg) | ϖ (deg) | Ω (deg) | Source | Epoch | License`) before the closing line, whose
 // problem count includes the element problems.
+//
+// Feature 105 (A14-P03) T-A14-303 (FR-A14-302): `ringProblems(_:sources:)` audits Saturn's ring record (its own
+// problems, then exactly one complete km record with an allowed license per ring quantity, and no other ring record),
+// and `markdown` adds "## Saturn's rings" (`Quantity | Value | Units | Source | Epoch | License`) before the closing
+// line, whose problem count includes the ring problems.
 import Foundation
 
 /// The citation audit of a body catalog.
@@ -101,6 +106,35 @@ public enum CitationAudit {
         return lines
     }
 
+    /// The ring record's audit problems, empty when the record is valid and each ring quantity has exactly one
+    /// complete km record with an allowed license; one line per problem, such as
+    /// "saturn ring-outer-radius: no source record".
+    public static func ringProblems(_ ring: RingRecord = .saturn,
+                                    sources: [SourceRecord] = SourceRecord.ringRecords) -> [String] {
+        var lines: [String] = ring.problems
+        for quantity in SourceRecord.ringQuantities {
+            let key = "\(ring.bodyID) \(quantity)"
+            let records = sources.filter { $0.bodyID == ring.bodyID && $0.quantity == quantity }
+            if records.isEmpty { lines.append("\(key): no source record") }
+            if records.count > 1 { lines.append("\(key): duplicate source record") }
+            for record in records {
+                if blank(record.title) || blank(record.publisher) || blank(record.link) {
+                    lines.append("\(key): missing source")
+                }
+                if blank(record.epoch) { lines.append("\(key): missing epoch") }
+                if record.units != "km" { lines.append("\(key): wrong units \(record.units)") }
+                if !allowedLicenses.contains(record.license) {
+                    lines.append("\(key): unsupported license \(record.license)")
+                }
+            }
+        }
+        for record in sources
+        where record.bodyID != ring.bodyID || !SourceRecord.ringQuantities.contains(record.quantity) {
+            lines.append("\(record.bodyID) \(record.quantity): source record without a ring value")
+        }
+        return lines
+    }
+
     /// True when `text` is empty or only white space.
     private static func blank(_ text: String) -> Bool {
         text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
@@ -108,7 +142,9 @@ public enum CitationAudit {
 
     /// The Markdown document (see the file header).
     public static func markdown(_ catalog: BodyCatalog, elements: [OrbitElements] = OrbitElements.bundled,
-                                elementSources: [SourceRecord] = SourceRecord.orbitalElements) -> String {
+                                elementSources: [SourceRecord] = SourceRecord.orbitalElements,
+                                ring: RingRecord? = .saturn,
+                                ringSources: [SourceRecord] = SourceRecord.ringRecords) -> String {
         var lines: [String] = [
             "# \(title)",
             "",
@@ -162,8 +198,30 @@ public enum CitationAudit {
                 lines.append("| " + cells.map(cell).joined(separator: " | ") + " |")
             }
         }
+        if let ring {
+            lines += [
+                "",
+                "## Saturn's rings",
+                "",
+                "Main rings from the C ring's inner edge to the A ring's outer edge, distances from Saturn's centre in "
+                    + "its equatorial plane; the drawing tilts the plane by Saturn's axial tilt.",
+                "",
+                "| Quantity | Value | Units | Source | Epoch | License |",
+                "|---|---|---|---|---|---|",
+            ]
+            let values: [String] = [Units.storedText(ring.innerKm), Units.storedText(ring.outerKm),
+                                    Units.storedText(ring.cassiniInnerKm) + "–" + Units.storedText(ring.cassiniOuterKm)]
+            for (quantity, value) in zip(SourceRecord.ringQuantities, values) {
+                let record = ringSources.first { $0.bodyID == ring.bodyID && $0.quantity == quantity }
+                let source = record.map { "\($0.title), \($0.publisher) (\($0.link))" } ?? ""
+                let cells: [String] = [quantity, value, record?.units ?? "", source, record?.epoch ?? "",
+                                       record?.license ?? ""]
+                lines.append("| " + cells.map(cell).joined(separator: " | ") + " |")
+            }
+        }
         let problemCount = problems(catalog).count
             + (elements.isEmpty ? 0 : elementProblems(elements, sources: elementSources).count)
+            + (ring.map { ringProblems($0, sources: ringSources).count } ?? 0)
         lines.append("")
         lines.append("\(count) value\(count == 1 ? "" : "s"); \(problemCount) problems.")
         return lines.joined(separator: "\n") + "\n"
