@@ -116,7 +116,9 @@ artifact inventory, a release configuration, the device-campaign plan and the kn
 ### User Story 4 - The game works in the real app (Priority: P2)
 
 Neon Arcade's main journeys work through the app's interface on the iOS 27 phone simulator — start, steer, pause,
-settings (sound, haptics, sensitivity), game over with the best score — and the release build and its checks pass.
+settings (sound, haptics, sensitivity) and the best-score text — and the release build and its checks pass. Reaching
+game over through the interface would take minutes of play, so the game-over screen and its table are proved by the
+session tests (A10-P04) rather than by an interface test.
 
 **Acceptance Scenarios**:
 
