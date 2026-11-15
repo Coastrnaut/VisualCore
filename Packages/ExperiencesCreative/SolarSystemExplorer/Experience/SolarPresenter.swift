@@ -48,10 +48,24 @@
 //     the camera, the scale mode, the status, the fact card with the distance from the Sun and the answer to a refused
 //     action. A change of the scale mode is announced with the new description (through the system's VoiceOver
 //     announcements; tests inject a sink).
-// Nothing flashes; the only motion is the focus flight, cut by Reduce Motion. No audio.
+//   - Time, tours, labels and the saved view (feature 106, A14-P04, T-A14-408; FR-A14-403, FR-A14-411, FR-A14-420,
+//     FR-A14-421; clarifications Q1–Q5): every drawn frame records the nine drawn body positions and places the body
+//     labels with ``LabelLayout`` through the drawn camera (camera-relative, the same frame the scene is drawn in) on
+//     the canvas in points (the size the overlay reports, else the drawable's pixels over the display scale); the
+//     overlay (``SolarOverlay``, the host's canvas overlay slot) shows them with the tour caption. A tour stop selects
+//     its body, so the focus flight flies there (Reduce Motion cuts). Announcements pass through an
+//     ``AnnouncementLimiter`` on an injected wall clock: play, pause and rate changes, the stop reason, tour stop
+//     changes with the caption and the end of a tour always; while time plays the date at most once every 10 s. Save
+//     view writes the state's `SavedView` through ``ViewStore`` (`view.json` in the experience's storage); Restore
+//     view reads and validates it and sends `view.apply` with its values through the port (a refused file changes
+//     nothing and shows why); Now sends `date.set` with the days since J2000.0 of an injected clock, clamped to the
+//     model's range. None of this reaches the core except through those actions.
+// Nothing flashes; the only motion is the focus flight, cut by Reduce Motion, and the bodies moving while simulated
+// time plays (paused by default). No audio.
 import Foundation
 import SolarSystemExplorerCore
 import SwiftUI
+import UIKit
 import VisualCoreExperience
 import VisualCoreExperienceHost
 import VisualCoreMath
@@ -97,6 +111,37 @@ final class SolarMirror {
     var scaleName = ScaleMode.enhanced.name
     /// The active scale mode's label ("Distances and sizes not to scale").
     var scaleLabel = ScaleMode.enhanced.label
+    /// Whether simulated time plays (A14-P04).
+    var playing = false
+    /// The rate index into `SimClock.rates`, 0…3.
+    var rateIndex = 0
+    /// The rate in words ("1 day/s").
+    var rateLabel = SimClock.rateLabels[0]
+    /// The simulated date and time ("2000-01-01 12:00 UTC").
+    var dateTimeLabel = SimulatedDate.j2000.labelWithTime
+    /// Why motion last stopped by itself: "" or `SimClock.endOfRange`.
+    var stopReason = ""
+    /// The running tour's index into `Tour.bundled`, or −1 without a tour.
+    var tourIndex = -1
+    /// The running tour's title ("Inner planets"); empty without a tour.
+    var tourTitle = ""
+    /// The current stop of the running tour (0-based); 0 without a tour.
+    var tourStop = 0
+    /// The number of stops of the running tour; 0 without a tour.
+    var tourStopCount = 0
+    /// Whether the running tour holds.
+    var tourPaused = false
+    /// The caption of the current tour stop; empty without a tour.
+    var tourCaption = ""
+    /// The answer to the last Save view or Restore view ("View saved.", "The saved view could not be read
+    /// (damaged)."); empty before the first.
+    var viewMessage = ""
+    /// The body labels of the last drawn frame in placing order (``LabelLayout``), in ``canvasSize`` points.
+    var labels: [LabelLayout.Label] = []
+    /// The canvas size in points the labels were laid out in; zero before the first frame.
+    var canvasSize = Vec2(0, 0)
+    /// The overlay's size in points as the overlay reports it; nil until the overlay appeared.
+    var overlaySize: Vec2?
 }
 
 /// Draws Solar System Explorer and owns its presentation state (meshes, renderers, the depth pass and the flight).
@@ -161,6 +206,14 @@ final class SolarPresenter: ExperiencePresenter {
     let announcementSink: any AnnouncementSink
     /// What the controls show.
     let mirror = SolarMirror()
+    /// Where Save view and Restore view keep the saved view (`view.json`).
+    let viewStore: ViewStore
+    /// The clock "Now" reads (`Date.init` in the app; a fixed date in tests).
+    let now: () -> Date
+    /// The display scale used to turn the drawable's pixels into points until the overlay reports its size.
+    let displayScale: Double
+    /// The rate limit of the announcements, on the injected wall clock.
+    private(set) var limiter: AnnouncementLimiter
 
     /// Whether the GPU side is set up (between `setup` and `teardown`).
     private(set) var isLive = false
@@ -212,6 +265,20 @@ final class SolarPresenter: ExperiencePresenter {
     private(set) var lastAnnouncement = ""
     /// The number of announcements made.
     private(set) var announcementCount = 0
+    /// The clock (playing, rate, stop reason) last seen by the announcements; nil until the first state.
+    private(set) var announcedClock: (playing: Bool, rateIndex: Int, stopReason: String)?
+    /// The tour (index, stop, paused) last seen by the announcements; nil until the first state.
+    private(set) var announcedTour: (index: Int, stop: Int, paused: Bool)?
+    /// The state last seen by `sync`; nil before the first (Save view saves it).
+    private(set) var lastState: SolarState?
+    /// The scene positions of the nine bodies drawn by the last frame, in catalog order; empty before the first.
+    private(set) var lastCenters: [Vec3] = []
+    /// The body labels placed for the last frame (also in the mirror).
+    private(set) var lastLabels: [LabelLayout.Label] = []
+    /// The canvas size in points the last frame's labels were laid out in; nil before the first frame.
+    private(set) var lastCanvasPoints: Vec2?
+    /// The number of frames drawn.
+    private(set) var framesDrawn = 0
     /// The unit body spheres with their recipe colours in catalog order; empty until first needed.
     private(set) var bodyMeshes: [(mesh: Mesh, colors: [Vec4])] = []
     /// The selection ring meshes in catalog order (centred on the origin, x–y plane); empty until first needed.
@@ -250,11 +317,22 @@ final class SolarPresenter: ExperiencePresenter {
     private(set) var depthPass: DepthMeshPass?
 
     /// A presenter for the experience `experienceID`; `reduceMotion` cuts the focus flight; `announcementSink`
-    /// replaces the system's VoiceOver announcements (nil: the system's).
-    init(experienceID: ExperienceID, reduceMotion: Bool = false, announcementSink: (any AnnouncementSink)? = nil) {
+    /// replaces the system's VoiceOver announcements (nil: the system's); `viewStore` keeps the saved view (nil: in
+    /// memory); `now` is the clock "Now" reads; `announcementClock` is the wall clock of the announcement limit (nil:
+    /// `now`); `displayScale` turns pixels into points until the overlay reports its size (nil: the current trait
+    /// collection's display scale, 2 when it has none).
+    init(experienceID: ExperienceID, reduceMotion: Bool = false, announcementSink: (any AnnouncementSink)? = nil,
+         viewStore: ViewStore? = nil, now: @escaping () -> Date = Date.init,
+         announcementClock: (() -> Date)? = nil, displayScale: Double? = nil) {
         self.experienceID = experienceID
         self.reduceMotion = reduceMotion
         self.announcementSink = announcementSink ?? SystemAnnouncementSink()
+        self.viewStore = viewStore ?? ViewStore(storage: nil)
+        self.now = now
+        self.limiter = AnnouncementLimiter(now: announcementClock ?? now)
+        let traitScale = Double(UITraitCollection.current.displayScale)
+        let scale = displayScale ?? (traitScale > 0 ? traitScale : 2)
+        self.displayScale = scale.isFinite && scale > 0 ? scale : 2
     }
 
     // MARK: Render scene
@@ -370,6 +448,31 @@ final class SolarPresenter: ExperiencePresenter {
         lastScaleMode = mode
         lastCamera = camera
         lastEye = eye
+        lastCenters = centers
+        framesDrawn += 1
+        placeLabels(centers: centers, camera: relativeCamera, eye: eye - target, target: target,
+                    selection: selection, pixels: Vec2(width, height))
+    }
+
+    /// Places the body labels of the frame just drawn (``LabelLayout``) through the camera-relative `camera` (target
+    /// at the origin) with the scene `centers` minus `target` and the relative `eye`, on the canvas in points (the
+    /// overlay's reported size, else `pixels` over ``displayScale``), and shows them in the mirror.
+    private func placeLabels(centers: [Vec3], camera: OrbitCamera, eye: Vec3, target: Vec3, selection: Int,
+                             pixels: Vec2) {
+        let canvas: Vec2
+        if let reported = mirror.overlaySize, reported.x > 0, reported.y > 0 {
+            canvas = reported
+        } else {
+            canvas = Vec2(pixels.x / displayScale, pixels.y / displayScale)
+        }
+        var relative: [Vec3] = []
+        for center in centers { relative.append(center - target) }
+        let labels = LabelLayout.labels(camera: camera, canvas: canvas, positions: relative, focused: selection,
+                                        eye: eye)
+        lastLabels = labels
+        lastCanvasPoints = canvas
+        if mirror.labels != labels { mirror.labels = labels }
+        if mirror.canvasSize != canvas { mirror.canvasSize = canvas }
     }
 
     /// Advances the focus flight by one drawn frame for `state` and returns the drawn camera (scene coordinates) and
@@ -666,10 +769,12 @@ final class SolarPresenter: ExperiencePresenter {
 
     // MARK: Words and controls
 
-    /// Brings the controls' mirror in line with `core` and announces a change of the scale mode.
+    /// Brings the controls' mirror in line with `core` and announces a change of the scale mode, the clock or the tour
+    /// (and, while time plays, the date at most every 10 s).
     func sync(_ core: SolarCore) {
         if !mirror.ready { mirror.ready = true }
         let state = core.state
+        lastState = state
         if mirror.selection != state.selection { mirror.selection = state.selection }
         let name = core.body?.name ?? ""
         if mirror.bodyName != name { mirror.bodyName = name }
@@ -691,13 +796,164 @@ final class SolarPresenter: ExperiencePresenter {
         if mirror.scaleMode != mode { mirror.scaleMode = mode }
         if mirror.scaleName != mode.name { mirror.scaleName = mode.name }
         if mirror.scaleLabel != mode.label { mirror.scaleLabel = mode.label }
+        syncTime(state)
         if let announced = announcedScaleMode, announced != mode {
-            let text = core.canvasDescription
-            announcementSink.announce(text)
-            lastAnnouncement = text
-            announcementCount += 1
+            announce(limiter.eventAnnouncement(core.canvasDescription))
         }
         announcedScaleMode = mode
+        announceTimeAndTour(state)
+    }
+
+    /// Brings the mirror's clock, tour and date fields in line with `state`.
+    private func syncTime(_ state: SolarState) {
+        if mirror.playing != state.playing { mirror.playing = state.playing }
+        if mirror.rateIndex != state.rateIndex { mirror.rateIndex = state.rateIndex }
+        let rate = Self.rateWords(state.rateIndex)
+        if mirror.rateLabel != rate { mirror.rateLabel = rate }
+        let dateTime = state.date.labelWithTime
+        if mirror.dateTimeLabel != dateTime { mirror.dateTimeLabel = dateTime }
+        if mirror.stopReason != state.stopReason { mirror.stopReason = state.stopReason }
+        if mirror.tourIndex != state.tourIndex { mirror.tourIndex = state.tourIndex }
+        let tour = state.tour
+        let title = tour?.title ?? ""
+        if mirror.tourTitle != title { mirror.tourTitle = title }
+        let stop = tour == nil ? 0 : state.tourStop
+        if mirror.tourStop != stop { mirror.tourStop = stop }
+        let count = tour?.stops.count ?? 0
+        if mirror.tourStopCount != count { mirror.tourStopCount = count }
+        let paused = tour != nil && state.tourPaused
+        if mirror.tourPaused != paused { mirror.tourPaused = paused }
+        let caption = state.tourCaption ?? ""
+        if mirror.tourCaption != caption { mirror.tourCaption = caption }
+    }
+
+    /// Announces a change of the clock or the tour since the state last seen (nothing for the first state), else,
+    /// while time plays, the date at most every 10 s (``AnnouncementLimiter``).
+    private func announceTimeAndTour(_ state: SolarState) {
+        let clock = (playing: state.playing, rateIndex: state.rateIndex, stopReason: state.stopReason)
+        let tour = (index: state.tour == nil ? -1 : state.tourIndex, stop: state.tour == nil ? 0 : state.tourStop,
+                    paused: state.tour != nil && state.tourPaused)
+        defer {
+            announcedClock = clock
+            announcedTour = tour
+        }
+        guard let seenClock = announcedClock, let seenTour = announcedTour else { return }
+        var events: [String] = []
+        if clock.stopReason == SimClock.endOfRange, seenClock.stopReason != SimClock.endOfRange {
+            events.append(Self.stopWords(state))
+        } else if clock.playing != seenClock.playing || clock.rateIndex != seenClock.rateIndex {
+            events.append(Self.clockWords(state, rateOnly: clock.playing == seenClock.playing))
+        }
+        if tour.index != seenTour.index || tour.stop != seenTour.stop || tour.paused != seenTour.paused {
+            if let words = SolarCore.tourWords(state: state) {
+                events.append(words)
+            } else if seenTour.index >= 0 {
+                events.append(Self.tourEndedWords)
+            }
+        }
+        if !events.isEmpty {
+            announce(limiter.eventAnnouncement(events.joined(separator: " ")))
+        } else if state.playing {
+            announce(limiter.periodicDateAnnouncement(Self.dateWords(state)))
+        }
+    }
+
+    /// Posts `text` when the limiter let it pass.
+    private func announce(_ text: String?) {
+        guard let text else { return }
+        announcementSink.announce(text)
+        lastAnnouncement = text
+        announcementCount += 1
+    }
+
+    /// The words announced when a tour ends.
+    nonisolated static let tourEndedWords = "Tour ended."
+
+    /// The rate in words ("1 year/s"); "" outside the rates.
+    nonisolated static func rateWords(_ index: Int) -> String {
+        SimClock.rateLabels.indices.contains(index) ? SimClock.rateLabels[index] : ""
+    }
+
+    /// The Play/Pause control's value: "Playing at 1 year/s" or "Paused".
+    nonisolated static func playWords(playing: Bool, rateIndex: Int) -> String {
+        playing ? "Playing at \(rateWords(rateIndex))" : "Paused"
+    }
+
+    /// The words announced on play, pause or a rate change: "Time playing at 1 year/s. Date 2000-01-01 12:00 UTC."
+    /// (played, or the rate changed while playing), "Time paused. Date …" (paused) or "Rate 1 year/s, time paused.
+    /// Date …" (`rateOnly`: the rate changed while paused).
+    nonisolated static func clockWords(_ state: SolarState, rateOnly: Bool = false) -> String {
+        let rate = rateWords(state.rateIndex)
+        let motion: String
+        if state.playing {
+            motion = "Time playing at \(rate)."
+        } else {
+            motion = rateOnly ? "Rate \(rate), time paused." : "Time paused."
+        }
+        return "\(motion) \(dateWords(state))"
+    }
+
+    /// The words announced when time stops at an end of the range: "The model's range ends here. Date …".
+    nonisolated static func stopWords(_ state: SolarState) -> String {
+        "\(SimClock.stopSentence). \(dateWords(state))"
+    }
+
+    /// The spoken date: "Date 2000-01-01 12:00 UTC."
+    nonisolated static func dateWords(_ state: SolarState) -> String {
+        "Date \(state.date.labelWithTime)."
+    }
+
+    // MARK: Now, Save view, Restore view
+
+    /// The days since J2000.0 of the instant `date` ((Unix seconds − 946,728,000) / 86,400), clamped to the model's
+    /// range; a non-finite result gives J2000.0.
+    nonisolated static func nowDays(_ date: Date) -> Double {
+        let days = (date.timeIntervalSince1970 - SimulatedDate.j2000UnixSeconds) / SimulatedDate.secondsPerDay
+        guard days.isFinite else { return 0 }
+        return min(max(days, SimulatedDate.range.lowerBound), SimulatedDate.range.upperBound)
+    }
+
+    /// "Now": sends `date.set` with ``nowDays(_:)`` of the injected clock through `port`.
+    @discardableResult
+    func setNow(_ port: ExperienceActionPort) -> ActionResult {
+        let result = port.send("date.set", [Self.nowDays(now())])
+        mirror.message = Self.answerWords(control: "date.set", result: result)
+        return result
+    }
+
+    /// "Save view": writes the last seen state's view through the view store; true when it was written. The mirror's
+    /// view message says "View saved." or why it was not.
+    @discardableResult
+    func saveView() -> Bool {
+        guard let view = lastState?.savedView else {
+            mirror.viewMessage = "There is no view to save yet."
+            return false
+        }
+        do {
+            try viewStore.save(view)
+            mirror.viewMessage = "View saved."
+            return true
+        } catch {
+            mirror.viewMessage = "The view could not be saved (\(error.code))."
+            return false
+        }
+    }
+
+    /// "Restore view": reads and validates the saved view and sends `view.apply` with its values through `port`;
+    /// the action's result, or nil when there was no acceptable file (the mirror's view message says why; nothing
+    /// changes).
+    @discardableResult
+    func restoreView(_ port: ExperienceActionPort) -> ActionResult? {
+        switch viewStore.load() {
+        case .failure(let failure):
+            mirror.viewMessage = failure.words
+            return nil
+        case .success(let view):
+            let result = port.send("view.apply", view.values)
+            mirror.viewMessage = result.isAccepted ? "View restored."
+                : Self.answerWords(control: "view.apply", result: result)
+            return result
+        }
     }
 
     /// The lines of `card` ("Mean radius: 6,371 km — Planetary Fact Sheet — Metric"); none without a card.
@@ -716,6 +972,11 @@ final class SolarPresenter: ExperiencePresenter {
         case "camera.tilt": return "The view cannot tilt further."
         case "camera.zoom": return "The view cannot zoom further."
         case "scale.mode": return "There is no such scale."
+        case "date.set": return "The date stays within 1950-01-01 to 2051-01-01."
+        case "time.rate": return "There is no such rate."
+        case "tour.start": return "There is no such tour."
+        case "tour.next", "tour.pause", "tour.stop": return "There is no tour running."
+        case "view.apply": return "The saved view is outside the model's ranges."
         default: return "That is not possible here."
         }
     }
@@ -728,11 +989,19 @@ final class SolarPresenter: ExperiencePresenter {
 
     /// The native controls, sending through `port`.
     func makeControls(_ port: ExperienceActionPort) -> AnyView {
-        AnyView(SolarControls(port: port, mirror: mirror))
+        AnyView(SolarControls(port: port, mirror: mirror,
+                              onNow: { [weak self] in _ = self?.setNow(port) },
+                              onSaveView: { [weak self] in _ = self?.saveView() },
+                              onRestoreView: { [weak self] in _ = self?.restoreView(port) }))
     }
 
-    /// The actions the native controls send: every action (body, date, camera and scale controls and the Body menu);
-    /// there is no canvas gesture in this phase.
+    /// The labels and the tour caption drawn over the canvas (``SolarOverlay``); it never takes touches.
+    func makeCanvasOverlay(_ port: ExperienceActionPort) -> AnyView? {
+        AnyView(SolarOverlay(mirror: mirror))
+    }
+
+    /// The actions the native controls send: every action (body, date, camera and scale controls, the Body menu, the
+    /// time and tour controls, Now and Restore view); there is no canvas gesture in this phase.
     var nativeActions: Set<String> {
         Set(SolarCore.actionIDs)
     }

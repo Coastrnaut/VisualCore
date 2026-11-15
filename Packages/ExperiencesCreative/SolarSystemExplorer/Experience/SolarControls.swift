@@ -23,6 +23,15 @@
 //   the legend (`legend`): the active mode's label ("Distances and sizes not to scale" or "Distances and sizes to one
 //     scale; small bodies marked"), the status line (`status`: "Earth selected, body 4 of 9") and the answer to a
 //     refused action (`message`, shown only when there is one).
+//   the time and tour controls of feature 106 (A14-P04) T-A14-408 (FR-A14-401–403, FR-A14-411, FR-A14-421;
+//     contracts/time-tours.md): the date and time with the clock (`time`: "2000-01-01 12:00 UTC, paused"); Play/Pause
+//     (`play-pause` → `time.play [1 / 0]`, value "Playing at 1 year/s" or "Paused"); the Rate picker (`rate` →
+//     `time.rate [0…3]`: "1 day/s", "1 week/s", "1 month/s", "1 year/s"); Now (`now` → the presenter sends
+//     `date.set [days]` from its injected clock); the Tour menu (`tour` → `tour.start [0 / 1]`: Inner planets, Giant
+//     planets; value the running tour and stop or "No tour"); Next stop (`tour-next` → `tour.next`), Pause tour /
+//     Resume tour (`tour-pause` → `tour.pause [1 / 0]`) and Stop tour (`tour-stop` → `tour.stop`), each disabled
+//     without a tour; Save view (`save-view`, the presenter writes `view.json`) and Restore view (`restore-view`, the
+//     presenter reads it and sends `view.apply`), with the answer (`view-message`, shown only when there is one);
 // Every control has an accessible label and value (and a hint) and the identifier
 // `experience.a14.solar-system-explorer.<name>` from the port; hit areas are at least 44 points high and text wraps.
 import SolarSystemExplorerCore
@@ -36,6 +45,29 @@ struct SolarControls: View {
     let port: ExperienceActionPort
     /// What the controls show.
     let mirror: SolarMirror
+    /// "Now": the presenter sends `date.set` with its injected clock's days since J2000.0.
+    let onNow: @MainActor () -> Void
+    /// "Save view": the presenter writes the current view to `view.json`.
+    let onSaveView: @MainActor () -> Void
+    /// "Restore view": the presenter reads `view.json` and sends `view.apply`.
+    let onRestoreView: @MainActor () -> Void
+
+    /// The titles of the bundled tours in order (the Tour menu's entries).
+    static var tourTitles: [String] { Tour.bundled.map(\.title) }
+
+    /// The clock in words: "2000-01-01 12:00 UTC, playing at 1 year/s" or "2000-01-01 12:00 UTC, paused", with
+    /// "; the model's range ends here" after motion stopped at a range end.
+    static func timeWords(dateTime: String, playing: Bool, rate: String, stopReason: String) -> String {
+        let motion = playing ? "playing at \(rate)" : "paused"
+        let stop = stopReason == SimClock.endOfRange ? "; the model's range ends here" : ""
+        return "\(dateTime), \(motion)\(stop)"
+    }
+
+    /// The running tour in words: "Inner planets, stop 2 of 5" (", paused" when held), or "No tour".
+    static func tourValue(title: String, stop: Int, count: Int, paused: Bool) -> String {
+        guard !title.isEmpty, count > 0 else { return "No tour" }
+        return "\(title), stop \(stop + 1) of \(count)\(paused ? ", paused" : "")"
+    }
 
     /// The names of the bodies in catalog order (the Body menu's entries).
     static var bodyNames: [String] { SolarCore.catalog.bodies.map(\.name) }
@@ -194,6 +226,9 @@ struct SolarControls: View {
                    hint: "Returns to the overview camera; the body and the date stay",
                    enabled: true) { send("view.reset") }
             scalePicker
+            timeSection
+            tourSection
+            viewSection
             Text(verbatim: mirror.bodyName).font(.subheadline).accessibilityAddTraits(.isHeader)
             ForEach(mirror.facts.indices, id: \.self) { index in
                 Text(verbatim: mirror.facts[index])
@@ -255,6 +290,104 @@ struct SolarControls: View {
         .accessibilityHint(Text(verbatim: "Enhanced enlarges the bodies and compresses distances; True relative "
                                     + "draws sizes and distances to one scale and marks small bodies"))
         .accessibilityIdentifier(port.identifier("scale"))
+    }
+
+    /// The clock: the date and time, Play/Pause, the Rate picker and Now.
+    @ViewBuilder private var timeSection: some View {
+        let time = Self.timeWords(dateTime: mirror.dateTimeLabel, playing: mirror.playing, rate: mirror.rateLabel,
+                                  stopReason: mirror.stopReason)
+        let play = SolarPresenter.playWords(playing: mirror.playing, rateIndex: mirror.rateIndex)
+        Text(verbatim: "Time: \(time)")
+            .font(.subheadline)
+            .fixedSize(horizontal: false, vertical: true)
+            .accessibilityLabel(Text(verbatim: "Time"))
+            .accessibilityValue(Text(verbatim: time))
+            .accessibilityIdentifier(port.identifier("time"))
+        HStack(spacing: 8) {
+            button(mirror.playing ? "Pause" : "Play", name: "play-pause", value: play,
+                   hint: mirror.playing ? "Stops simulated time" : "Runs simulated time at the chosen rate",
+                   enabled: true) { send("time.play", [mirror.playing ? 0 : 1]) }
+            button("Now", name: "now", value: mirror.dateTimeLabel,
+                   hint: "Sets the date to the current moment, within 1950-01-01 to 2051-01-01",
+                   enabled: true) { onNow() }
+        }
+        Picker(selection: Binding(get: { mirror.rateIndex },
+                                  set: { index in
+                                      guard index != mirror.rateIndex else { return }
+                                      send("time.rate", [Double(index)])
+                                  })) {
+            ForEach(SimClock.rateLabels.indices, id: \.self) { index in
+                Text(verbatim: SimClock.rateLabels[index]).tag(index)
+            }
+        } label: {
+            Text(verbatim: "Rate")
+        }
+        .pickerStyle(.segmented)
+        .frame(minHeight: 44)
+        .accessibilityLabel(Text(verbatim: "Rate"))
+        .accessibilityValue(Text(verbatim: mirror.rateLabel))
+        .accessibilityHint(Text(verbatim: "Simulated time per second while playing"))
+        .accessibilityIdentifier(port.identifier("rate"))
+    }
+
+    /// The tours: the Tour menu, Next stop, Pause or Resume tour and Stop tour.
+    @ViewBuilder private var tourSection: some View {
+        let hasTour = mirror.tourIndex >= 0
+        let value = Self.tourValue(title: mirror.tourTitle, stop: mirror.tourStop, count: mirror.tourStopCount,
+                                   paused: mirror.tourPaused)
+        Menu {
+            ForEach(Self.tourTitles.indices, id: \.self) { index in
+                Button {
+                    send("tour.start", [Double(index)])
+                } label: {
+                    Text(verbatim: Self.tourTitles[index])
+                }
+            }
+        } label: {
+            Text(verbatim: "Tour")
+                .font(.body)
+                .frame(maxWidth: .infinity, minHeight: 44)
+        }
+        .buttonStyle(.bordered)
+        .accessibilityLabel(Text(verbatim: "Tour"))
+        .accessibilityValue(Text(verbatim: value))
+        .accessibilityHint(Text(verbatim: "Starts a guided tour: Inner planets or Giant planets"))
+        .accessibilityIdentifier(port.identifier("tour"))
+        HStack(spacing: 8) {
+            button("Next stop", name: "tour-next", value: value,
+                   hint: hasTour ? "Moves the tour to its next stop" : "There is no tour running",
+                   enabled: hasTour) { send("tour.next") }
+            button(mirror.tourPaused ? "Resume tour" : "Pause tour", name: "tour-pause", value: value,
+                   hint: hasTour ? (mirror.tourPaused ? "Continues the tour" : "Holds the tour at this stop")
+                                 : "There is no tour running",
+                   enabled: hasTour) { send("tour.pause", [mirror.tourPaused ? 0 : 1]) }
+            button("Stop tour", name: "tour-stop", value: value,
+                   hint: hasTour ? "Ends the tour; the body stays in focus" : "There is no tour running",
+                   enabled: hasTour) { send("tour.stop") }
+        }
+    }
+
+    /// The saved view: Save view, Restore view and their answer.
+    @ViewBuilder private var viewSection: some View {
+        let camera = Self.cameraWords(yaw: mirror.yawDegrees, pitch: mirror.pitchDegrees,
+                                      distance: mirror.cameraDistance)
+        HStack(spacing: 8) {
+            button("Save view", name: "save-view", value: mirror.viewMessage.isEmpty ? camera : mirror.viewMessage,
+                   hint: "Keeps the body, date, rate, camera and scale on this device",
+                   enabled: true) { onSaveView() }
+            button("Restore view", name: "restore-view",
+                   value: mirror.viewMessage.isEmpty ? camera : mirror.viewMessage,
+                   hint: "Returns to the saved body, date, rate, camera and scale",
+                   enabled: true) { onRestoreView() }
+        }
+        if !mirror.viewMessage.isEmpty {
+            Text(verbatim: mirror.viewMessage)
+                .font(.footnote)
+                .fixedSize(horizontal: false, vertical: true)
+                .accessibilityLabel(Text(verbatim: "Saved view"))
+                .accessibilityValue(Text(verbatim: mirror.viewMessage))
+                .accessibilityIdentifier(port.identifier("view-message"))
+        }
     }
 
     /// The date button of `days` (sends `date.step [days]`; disabled when the step would leave the range).
