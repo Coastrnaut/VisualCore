@@ -32,6 +32,10 @@
 // terrain renderer alone, once; repeated warnings at the lightest tier rebuild nothing. The tier is presentation only:
 // the state, the world document and the digest never see it.
 //
+// Feature 094 (A12-P06) T-A12-604 (FR-A12-611): the test-only seam `failNextDraw` makes the next `draw` throw
+// `WorldsDrawError.injected` once (and clears itself), so a test can drive the host into its failure state; nothing
+// else reads it.
+//
 // Feature 090 (A12-P02) T-A12-205 (FR-A12-211–213, FR-A12-220–222; SC-A12-201, SC-A12-205; clarifications 3–5;
 // research D3–D5; plan "Lifecycle"):
 //   - Colour and detail: the terrain part is drawn from the terrain mesh at the detail level of the host's quality tier
@@ -229,6 +233,8 @@ final class WorldsPresenter: ExperiencePresenter {
     private(set) var lastPropsDrawn = 0
     /// The light the renderers drew the last frame with; nil before the first frame.
     private(set) var lastLight: WorldLight?
+    /// Set by a test to make the next draw throw `WorldsDrawError.injected` (the seam clears itself; feature 094).
+    var failNextDraw = false
     /// Whether Low Power Mode is on, read every frame (feature 093).
     private let lowPowerMode: @MainActor () -> Bool
     /// The rules that choose the drawn tier (feature 093).
@@ -290,6 +296,10 @@ final class WorldsPresenter: ExperiencePresenter {
     /// recreated, remakes the terrain renderer alone when the tier's detail level changed, then draws every part lit,
     /// with depth, through the orbit camera of the eased view; then speaks a changed view when allowed.
     func draw(_ core: WorldsCore, tier: Int, context: RenderContext, frame: FrameInfo) throws {
+        if failNextDraw {
+            failNextDraw = false
+            throw WorldsDrawError.injected
+        }
         let drawnTier = applyPressure(hostTier: tier, delta: frame.delta)
         sync(core)
         lastCore = core
@@ -886,10 +896,11 @@ final class WorldsPresenter: ExperiencePresenter {
         for slot in WorldStore.slots { refreshSlot(slot) }
     }
 
-    /// Reads `slot` once: its name, picture and what it holds.
+    /// Reads `slot` once: its name, picture and what it holds. A picture is shown only beside a world that reads (a
+    /// picture left without its world file is not shown; feature 094).
     private func refreshSlot(_ slot: Int) {
         let result = store.read(slot: slot)
-        let picture = store.thumbnail(slot: slot)
+        let picture = (try? result.get()) == nil ? nil : store.thumbnail(slot: slot)
         let name = (try? result.get())?.name ?? ""
         if mirror.slotNames[slot] != name { mirror.slotNames[slot] = name }
         if mirror.slotPictures[slot] != picture { mirror.slotPictures[slot] = picture }
@@ -971,4 +982,10 @@ final class WorldsPresenter: ExperiencePresenter {
         speak(text)
         return text
     }
+}
+
+/// A failure the presenter injects for tests (`failNextDraw`; feature 094).
+enum WorldsDrawError: Error, Equatable {
+    /// The injected failure.
+    case injected
 }
