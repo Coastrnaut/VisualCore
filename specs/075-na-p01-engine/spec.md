@@ -26,6 +26,49 @@ Canonical overrides:
 - **Owner rulings:** short tests; audits and device runs in the device campaign; iOS 27 at phase gates; the reference
   regression runs here because VisualCore changes (two chunks); every Spec Kit step runs.
 
+## Clarifications
+
+### Session 2026-11-14
+
+Answered autonomously under the owner's standing delegation, recommended option each time. Facts checked in code: an
+`ExperienceCore` declares `stepDuration` (default 1/120 s), `update(step:)`, `apply(_:)`, `reset()`, snapshot payload
+and restore with a `MigrationChain`, `qualityTiers` (default 1); an `ExperienceAction` carries `control`, `values` and
+the `step` it applies at, so a recorded action list is an input record; the engine's `suspend()`/`resume()` stop and
+restart stepping and its fixed-step run serves replays (`ExperienceEngine.swift`); `SeededRandom` saves and restores
+its state; `Primitive` offers rect, circle, line, polygon and polyline shapes drawn in one batch; `Vec2` lives in
+`VisualCoreMath`; no 2D shape-against-shape or swept test exists in any framework product (contract G-COLLISION2D).
+
+- Q: Which coordinates, speeds and step does the game use? → A: Game units, portrait field 9 × 16 (x 0…9, y 0…16, y
+  up); the fixed step is 1/60 s; the player is a circle of hit radius 0.4 on the line y = 1.5, x kept inside 0.5…8.5,
+  maximum speed 9 units/s; a steering value −1…1 sets the target velocity (value × maximum speed) and holds until the
+  next steering input. Drawing scales the field uniformly and letterboxes it.
+- Q: What exactly does the shared collision code offer, and how does it treat touching and fast objects? → A: In
+  `VisualCoreSimulation`: a circle (centre, radius), a capsule (segment end points, radius), overlap tests
+  circle–circle and circle–capsule (touching counts, tolerance 1e-9), and a swept circle–circle test over one step
+  (both circles move linearly; it returns the earliest fraction 0…1 at which they touch, or none; a pair already
+  touching at the start returns 0); non-finite or negative-radius input gives none. The game uses the swept test for
+  every circle object against the player; capsule hazards fall at most 5 units/s (0.083 units per step, below the
+  smallest summed radius 0.6), so the end-of-step overlap test cannot miss them — an invariant the tests check.
+- Q: How are objects spawned, and what are the values and limits? → A: The first object spawns at step 30 (0.5 s),
+  then one every 40 steps; the seeded generator picks hazard (70 %) or orb (30 %), x uniform in 0.5…8.5, start y 16.5,
+  fall speed 3…5 units/s; hazards are circles (radius 0.35…0.6) or horizontal capsules (half-length 0.6…1.0, radius
+  0.2); orbs are circles of radius 0.25 worth 10 points. At most 24 objects; a spawn beyond the cap is skipped. Lives
+  start at 3; a hit grants 90 steps (1.5 s) of invulnerability; the score is capped at 9,999,999. Lanes, waves and
+  difficulty replace this simple schedule in A10-P02.
+- Q: Which actions and saved state does the experience have, and how is a replay recorded? → A: Actions `run.steer
+  [−1…1]`, `run.pause [0…1]` and `run.restart`; the drag gesture turns the finger's horizontal offset from the player
+  into a steering value (offset ÷ 1.5 units, clamped) and sends `run.steer`; left/right controls send −1/+1 while held
+  and 0 on release. A replay is the seed plus the list of applied `run.steer` actions with their steps; the game keeps
+  the last 256 collision events (step, object id, kind) and their total count, and the digest covers both. Snapshot
+  schema 1 holds the game run and the generator state; one quality level (`level-0`).
+- Q: Where is the content catalog, and how are shapes drawn? → A: In the experience's core as Swift data
+  (`ArcadeCatalog.bundled`) with a JSON encoding and a validating decoder used by tests and the audit: the player
+  (shape `chevron`), hazards (`spike-ball` circle, `bar` capsule) and the orb (`glow-orb` circle), each with colours,
+  size limits and value, author "VisualCore project" and license "MIT" (the only allowed license); refusal reasons
+  `missing-license`, `unsupported-license`, `unknown-shape`, `invalid-number`. Every object is drawn with its
+  collision shape at the rule size (the player: a ring at the hit radius with a chevron inside); the license document
+  is generated as `docs/apps/neon-arcade/content-licenses.md` and checked against the catalog by a test.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - A game to play (Priority: P1) 🎯
