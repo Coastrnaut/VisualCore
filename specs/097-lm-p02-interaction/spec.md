@@ -42,10 +42,10 @@ Tiny Worlds (`ViewAnnouncer`, one per second of frame time).
   there." / "Outside the board."). Taps on fixed tiles never change the board.
 - Q: How does a drag snap? → A: A drag that begins (10 points) on a turnable tile is measured from touch-down to the
   latest point in board units; once it is at least 0.35 of a cell long it snaps the tile to `/` when the direction lies
-  within 45° of north-east or south-west, else to `\`, by a new action `tile.orient [index, 0 = /, 1 = \]` (refused
-  for a fixed tile or an index out of range; no change when already so); the tile is selected too. One orientation
-  change at most per drag movement; later movement may snap it back if the direction crosses over. A drag that begins
-  elsewhere does nothing.
+  within 45° of north-east or south-west, else to `\`: when the tile's orientation differs, the gesture sends
+  `tile.select [index]` and `tile.turn` (the same actions as the Select and Turn controls, so no new action exists and
+  every gesture action has a native control); when it already matches, it sends nothing. At most one turn per drag
+  movement; later movement may turn it back if the direction crosses over. A drag that begins elsewhere does nothing.
 - Q: How does the two-finger rotation snap? → A: `RotateRecognizer` over the selected tile; each time the accumulated
   angle passes ±45° from the last snap the tile turns once (`tile.turn`) and the reference resets; less than 45° does
   nothing. Arbiter priorities: rotate 3 (two fingers), drag 2, tap 1.
@@ -57,8 +57,7 @@ Tiny Worlds (`ViewAnnouncer`, one per second of frame time).
   whose path returns to the emitter (ends "emitter"), a prism board whose branches meet (ends "loop"), a long mirror
   spiral that reaches the bounce cap, each within 64 bounces per branch and 256 segments; a spoken change ("Beam ends at
   the target; solved.") when the beam's end words or the solved state change, at most once per second of frame time,
-  while VoiceOver runs; the new action `tile.orient` has its native control alternative through Select and Turn (state
-  reached by turning) and is listed among the native actions.
+  while VoiceOver runs.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -150,8 +149,8 @@ The engineer can trust that any board whose beam would repeat stops within the b
   the drag exceeds a snap distance; shorter drags MUST change nothing.
 - **FR-A13-203**: A two-finger rotation over a selected tile MUST turn it once per snap angle crossed; smaller rotations
   MUST change nothing.
-- **FR-A13-204**: Every gesture MUST go through the same replayable actions as the native controls (adding a set-
-  orientation action if needed), and every gesture action MUST have a native control.
+- **FR-A13-204**: Every gesture MUST go through the same replayable actions as the native controls (`tile.select`,
+  `tile.turn`), so every gesture action has a native control.
 
 **Drawing (G-BEAMS, story 3)**
 
