@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "bash",
+    "specs/093-tw-p05-qa/scan-claims.sh"
+  ],
+  "command": "bash specs/093-tw-p05-qa/scan-claims.sh",
+  "elapsed_seconds": 5.785,
+  "exit_code": 0,
+  "finished": "2026-11-15T16:28:30+00:00",
+  "log": ".autonomy/logs/A12-P05.claims.log",
+  "log_sha256": "c913a00b7d8c9d7a68eb23382495e4c4a9e8350188ec7baee7db3baa6a28b81c",
+  "name": "claims",
+  "stage": "A12-P05",
+  "started": "2026-11-15T16:28:24+00:00",
+  "timed_out": false
+}
