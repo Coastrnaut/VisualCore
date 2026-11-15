@@ -959,8 +959,14 @@
       "status": "pass"
     },
     "A10-P06": {
-      "attempts": [],
-      "status": "pending"
+      "attempts": [
+        {
+          "at": "2026-11-15T05:30:23+00:00",
+          "evidence": ".autonomy/evidence/A10-P06.json",
+          "result": "pass"
+        }
+      ],
+      "status": "pass"
     },
     "A11-P00": {
       "attempts": [],
@@ -1795,5 +1801,5 @@
       "status": "pending"
     }
   },
-  "updated": "2026-11-15T05:12:51+00:00"
+  "updated": "2026-11-15T05:30:23+00:00"
 }

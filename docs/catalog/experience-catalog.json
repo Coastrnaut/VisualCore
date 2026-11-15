@@ -2046,18 +2046,17 @@
     ]
    },
    "implementation": {
-    "state": "standalone-partial",
+    "state": "standalone-complete",
     "legacy_gates_passed": [
      "A10-P00",
      "A10-P01",
      "A10-P02",
      "A10-P03",
      "A10-P04",
-     "A10-P05"
-    ],
-    "legacy_gates_pending": [
+     "A10-P05",
      "A10-P06"
     ],
+    "legacy_gates_pending": [],
     "unified_integration": "pending"
    },
    "source": {
