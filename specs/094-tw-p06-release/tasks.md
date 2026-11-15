@@ -53,3 +53,7 @@ tests and fixtures (Package.swift and the seam by the lead). Lead: scans, releas
 ## Implementation strategy
 
 Documents and scans first, then the seam, recovery and sample tests, then the interface chunk and the builds.
+
+## Phase 7: Convergence
+
+- [ ] T-A12-618 Record the as-built fixes found by this phase's tests — the Equatable `WorldsSegmentedPicker` in `Packages/ExperiencesCreative/TinyWorlds/Experience/WorldsControls.swift` (found by `TWWorldUITests.testOpenPack`) and the picture shown only beside a readable world in `WorldsPresenter.refreshSlot` (found by `WorldSampleFileTests`) — in `specs/094-tw-p06-release/research.md` and `docs/apps/tiny-worlds/README.md`, and re-run the release documents and claims checks, per plan: Project Structure (unrequested)
