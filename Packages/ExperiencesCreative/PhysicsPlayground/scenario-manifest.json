@@ -1,0 +1,1313 @@
+{
+  "controls" : [
+    "world.pause",
+    "world.step",
+    "world.timeScale",
+    "world.reset",
+    "world.drop"
+  ],
+  "experience" : "a11.physics-playground",
+  "kind" : "creative",
+  "scenarios" : [
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+        "initialDigest" : "a6ad7f6e612d3265fbe6cb1d844bd5627c55737a5bc194371b4d7f04604d108d"
+      },
+      "name" : "launch-first-frame",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "world.drop",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 20
+        },
+        {
+          "action" : {
+            "control" : "world.drop",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 40
+        },
+        {
+          "action" : {
+            "control" : "world.timeScale",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 20
+        },
+        {
+          "action" : {
+            "control" : "world.pause",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 20
+        },
+        {
+          "action" : {
+            "control" : "world.step",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "152fa42c00a9b2eb08051a7a62c752ccc22392d252685bb71e2b8a0d7eb64de9",
+        "initialDigest" : "a6ad7f6e612d3265fbe6cb1d844bd5627c55737a5bc194371b4d7f04604d108d"
+      },
+      "name" : "input-response",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "world.pause",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "outcome" : "world-paused"
+      },
+      "name" : "completion",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "world.pause",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "world.pause",
+            "values" : [
+              0.5
+            ]
+          },
+          "result" : "action.rule.a11.invalid-choice",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "world.timeScale",
+            "values" : [
+              1.5
+            ]
+          },
+          "result" : "action.rule.a11.invalid-choice",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "world.timeScale",
+            "values" : [
+              4
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "world.step",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.a11.not-paused",
+          "steps" : 5
+        },
+        {
+          "action" : {
+            "control" : "world.reset",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "world.drop",
+            "values" : [
+              0.5
+            ]
+          },
+          "result" : "action.rule.a11.invalid-choice",
+          "steps" : 0
+        }
+      ],
+      "expect" : {
+
+      },
+      "name" : "rejection",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "world.drop",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 20
+        },
+        {
+          "action" : {
+            "control" : "world.drop",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 40
+        },
+        {
+          "action" : {
+            "control" : "world.timeScale",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 20
+        },
+        {
+          "action" : {
+            "control" : "world.pause",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 20
+        },
+        {
+          "action" : {
+            "control" : "world.step",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "152fa42c00a9b2eb08051a7a62c752ccc22392d252685bb71e2b8a0d7eb64de9",
+        "initialDigest" : "a6ad7f6e612d3265fbe6cb1d844bd5627c55737a5bc194371b4d7f04604d108d"
+      },
+      "name" : "save-restore",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "world.drop",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 20
+        },
+        {
+          "action" : {
+            "control" : "world.drop",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 40
+        },
+        {
+          "action" : {
+            "control" : "world.timeScale",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 20
+        },
+        {
+          "action" : {
+            "control" : "world.pause",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 20
+        },
+        {
+          "action" : {
+            "control" : "world.step",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        }
+      ],
+      "expect" : {
+        "initialDigest" : "a6ad7f6e612d3265fbe6cb1d844bd5627c55737a5bc194371b4d7f04604d108d",
+        "resetDigest" : true
+      },
+      "name" : "reset",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "suspend-resume",
+      "seed" : "7"
+    },
+    {
+      "cycles" : 5,
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "teardown-reentry",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "cancel-prepare",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "world.drop",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "steps" : 120
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "af5f2b124376c94eedcabaf696ae21a7fdda0330950a590911497e7b741c1fbc",
+        "initialDigest" : "a6ad7f6e612d3265fbe6cb1d844bd5627c55737a5bc194371b4d7f04604d108d"
+      },
+      "name" : "fixture-1",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "world.drop",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "world.drop",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "steps" : 240
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "f55dafb17b3f7ae0d569e9e88a4c86d986a10b955b5935363a8a699daf104a9f",
+        "initialDigest" : "a6ad7f6e612d3265fbe6cb1d844bd5627c55737a5bc194371b4d7f04604d108d"
+      },
+      "name" : "fixture-2",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "world.drop",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "steps" : 1000
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "4d403f4c77097daaefc005224a8e1981ad778aa0c241552185fbe90fefde5b86",
+        "initialDigest" : "a6ad7f6e612d3265fbe6cb1d844bd5627c55737a5bc194371b4d7f04604d108d"
+      },
+      "name" : "fixture-3",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "world.drop",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "world.drop",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 60
+        },
+        {
+          "action" : {
+            "control" : "world.timeScale",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 60
+        },
+        {
+          "action" : {
+            "control" : "world.drop",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 80
+        },
+        {
+          "action" : {
+            "control" : "world.timeScale",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 60
+        },
+        {
+          "action" : {
+            "control" : "world.pause",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 100
+        },
+        {
+          "action" : {
+            "control" : "world.step",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "world.step",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "world.pause",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "world.timeScale",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 40
+        },
+        {
+          "action" : {
+            "control" : "world.drop",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 80
+        },
+        {
+          "steps" : 120
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "93daaffd60636bab57a74af5fcfe9aa0cf386ee2093c4428ec16223cfafc0127",
+        "initialDigest" : "a6ad7f6e612d3265fbe6cb1d844bd5627c55737a5bc194371b4d7f04604d108d"
+      },
+      "name" : "fixture-4",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "world.drop",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "world.drop",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 60
+        },
+        {
+          "action" : {
+            "control" : "world.timeScale",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 60
+        },
+        {
+          "action" : {
+            "control" : "world.drop",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 80
+        },
+        {
+          "action" : {
+            "control" : "world.timeScale",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 60
+        },
+        {
+          "action" : {
+            "control" : "world.pause",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 100
+        },
+        {
+          "action" : {
+            "control" : "world.step",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "world.step",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "world.pause",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "world.timeScale",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 40
+        },
+        {
+          "action" : {
+            "control" : "world.drop",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 80
+        },
+        {
+          "steps" : 120
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "93daaffd60636bab57a74af5fcfe9aa0cf386ee2093c4428ec16223cfafc0127",
+        "initialDigest" : "a6ad7f6e612d3265fbe6cb1d844bd5627c55737a5bc194371b4d7f04604d108d"
+      },
+      "name" : "fixture-5",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "world.timeScale",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "world.timeScale",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 40
+        },
+        {
+          "action" : {
+            "control" : "world.pause",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 40
+        },
+        {
+          "action" : {
+            "control" : "world.step",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "world.step",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "world.step",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "steps" : 30
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "c222cace187d8d45ef2c57dcb572bed0688a81414ad1a2fb90b91d2520108b43",
+        "initialDigest" : "a6ad7f6e612d3265fbe6cb1d844bd5627c55737a5bc194371b4d7f04604d108d"
+      },
+      "name" : "fixture-6",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "world.drop",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "world.drop",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 60
+        },
+        {
+          "action" : {
+            "control" : "world.timeScale",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 60
+        },
+        {
+          "action" : {
+            "control" : "world.drop",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 80
+        },
+        {
+          "action" : {
+            "control" : "world.timeScale",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 60
+        },
+        {
+          "steps" : 40
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "79d2c3a42565fd18b2e7a84a82a265af4d2cc900b253ad6d75e736b574823cc0",
+        "initialDigest" : "a6ad7f6e612d3265fbe6cb1d844bd5627c55737a5bc194371b4d7f04604d108d"
+      },
+      "name" : "fixture-7",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "world.drop",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "world.pause",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 60
+        },
+        {
+          "steps" : 300
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "cd586b5f0c7792c20e0ab4beacf1e4d61cb974b0ca3cb94d7bcecc60fe78d788",
+        "initialDigest" : "a6ad7f6e612d3265fbe6cb1d844bd5627c55737a5bc194371b4d7f04604d108d"
+      },
+      "name" : "fixture-8",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "world.drop",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "world.drop",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "world.drop",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "world.drop",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "steps" : 200
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "6b94ec1e7fcaa93e3c92632262daafea2e9e952395c23e3b79f23b513107560c",
+        "initialDigest" : "a6ad7f6e612d3265fbe6cb1d844bd5627c55737a5bc194371b4d7f04604d108d"
+      },
+      "name" : "fixture-9",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "world.drop",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "world.drop",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "world.drop",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "world.drop",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "world.drop",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "world.drop",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "world.drop",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "world.drop",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "world.drop",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "world.drop",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "world.drop",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "world.drop",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "world.drop",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "world.drop",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "world.drop",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "world.drop",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "world.drop",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "world.drop",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "world.drop",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "world.drop",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "world.drop",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "world.drop",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "world.drop",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "world.drop",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "world.drop",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "world.drop",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "world.drop",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "world.drop",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "world.drop",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "world.drop",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "world.drop",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "world.drop",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "world.drop",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "world.drop",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "world.drop",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "world.drop",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "world.drop",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "world.drop",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "world.drop",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "world.drop",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "world.drop",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "world.drop",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.rule.a11.body-cap",
+          "steps" : 10
+        },
+        {
+          "steps" : 60
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "1379e824602a28620f713c07ce8e49ccd5846b8fe6f275ae81777307907b8e90",
+        "initialDigest" : "a6ad7f6e612d3265fbe6cb1d844bd5627c55737a5bc194371b4d7f04604d108d"
+      },
+      "name" : "fixture-10",
+      "seed" : "7"
+    }
+  ],
+  "schema" : 1
+}
