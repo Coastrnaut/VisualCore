@@ -5,14 +5,14 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-15 (A14-P04, Solar System Explorer time controls and tours).
+Last updated: 2026-11-15 (A14-P04 convergence: canvas overlay tests, documented-API check, injected clocks).
 
 ## 1. What is tested, and where
 
 | Layer | What it covers | Where the tests live | How they run |
 |---|---|---|---|
 | VisualCore host tests | Pure Swift framework code: math, simulation, scenes, persistence, the experience contract | `Packages/VisualCore/Tests` (Swift Testing) | `swift test --package-path Packages/VisualCore [--filter <Suite>]` on the Mac |
-| Rendering and host tests | GPU code on the OpenGL ES → ANGLE → Metal path, the experience shell, session and host view | `Packages/VisualCoreRendering/Tests` | `scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --only-testing <Target/Class …>` |
+| Rendering and host tests | GPU code on the OpenGL ES → ANGLE → Metal path, the experience shell, session and host view (including the canvas overlay slot, `CanvasOverlayTests`) | `Packages/VisualCoreRendering/Tests` | `scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --only-testing <Target/Class …>` |
 | Experience core tests | Each experience's GPU-free rules (state, codecs, catalogs, solvers, fixtures) | `Packages/Experiences*/<Experience>/CoreTests` (Swift Testing) | `xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing <Experience>CoreTests` |
 | Experience tests | The adapter core, scenario manifest, presenter (real frames read back on the simulator), controls and session | `Packages/Experiences*/<Experience>/ExperienceTests` (XCTest and Swift Testing) | the same command with `<Experience>ExperienceTests` |
 | App unit and UI tests | The one app: registry, catalog, store, launch, per-experience UI flows | `Apps/VisualCore/Tests/Unit`, `Apps/VisualCore/Tests/UI` | `scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27 [app-ui-ios27-<chunk>]` (wraps `scripts/xcodebuild_app.py`) |
@@ -133,6 +133,12 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
 - **Commit boundaries follow tasks.** When one task's files must ship with another (controls that read a presenter's
   mirror), the evidence says so.
 - **Pushes cancel queued CI runs.** Batch pushes; check `gh run list` between gates and fix a failure before the next.
+- **Run the documented-API check every phase.** `check_documented_api.py --sources <experience>` caught
+  `RecordingAnnouncementSink` one phase after an agent first used it in a test helper (A14-P03 → A14-P04); every
+  phase that touches an experience runs it.
+- **Drive time with steps and injected clocks.** The simulated clock advances only on host steps, "Now" enters as an
+  action computed from an injected clock, and the announcement limiter takes an injected clock, so tests of playback,
+  rate limits and suspension assert exact values without waiting (A14-P04).
 - **Validate before committing a steering document.** `validate_autocreator.py` also limits CLAUDE.md to 12,000 bytes;
   a CLAUDE.md edit was once committed before its failure was read, and the next commit fixed it.
 
