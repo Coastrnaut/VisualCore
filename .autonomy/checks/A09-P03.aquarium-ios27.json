@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/ExperiencesCreative",
+    "--scheme",
+    "ExperiencesCreative-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--only-testing",
+    "DigitalAquariumCoreTests",
+    "DigitalAquariumExperienceTests"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing DigitalAquariumCoreTests DigitalAquariumExperienceTests",
+  "elapsed_seconds": 23.46,
+  "exit_code": 0,
+  "finished": "2026-11-15T00:52:51+00:00",
+  "log": ".autonomy/logs/A09-P03.aquarium-ios27.log",
+  "log_sha256": "ce1ed5d98c9498d6f3261847050211b41fc416cccc56d9d266c4639c36483b32",
+  "name": "aquarium-ios27",
+  "stage": "A09-P03",
+  "started": "2026-11-15T00:52:28+00:00",
+  "timed_out": false
+}
