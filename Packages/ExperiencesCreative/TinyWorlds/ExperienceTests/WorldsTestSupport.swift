@@ -25,10 +25,12 @@ enum WorldsTest {
 
     /// Opens Tiny Worlds in `session` (seed `seed`, optionally restoring `snapshot`), lays the view out at `size`
     /// points and draws one frame. The system's Reduce Motion is reported off; `announcements`, when given, records
-    /// what is spoken with VoiceOver reported running (otherwise VoiceOver is reported off).
+    /// what is spoken with VoiceOver reported running (otherwise VoiceOver is reported off). Low Power Mode is reported
+    /// off unless `lowPowerMode` answers otherwise (feature 093).
     static func open(_ session: ExperienceSession, seed: UInt64 = 1, snapshot: ExperienceSnapshot? = nil,
                      size: CGSize = CGSize(width: 120, height: 100), reduceMotion: Bool = false,
-                     announcements: RecordingAnnouncementSink? = nil, store: WorldStore? = nil) async throws
+                     announcements: RecordingAnnouncementSink? = nil, store: WorldStore? = nil,
+                     lowPowerMode: (@MainActor () -> Bool)? = nil) async throws
         -> ExperienceShell<WorldsPresenter> {
         let id = self.id
         var made: ExperienceShell<WorldsPresenter>?
@@ -37,7 +39,7 @@ enum WorldsTest {
             let shell = TinyWorldsExperience.make(id: id, reduceMotion: reduceMotion, systemReduceMotion: { false },
                                                   voiceOverRunning: { voiceOver },
                                                   announcementSink: announcements ?? RecordingAnnouncementSink(),
-                                                  store: store)
+                                                  store: store, lowPowerMode: lowPowerMode ?? { false })
             made = shell
             return shell
         }

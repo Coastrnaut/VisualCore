@@ -23,6 +23,15 @@
 //     18 metres away."
 // Nothing flashes. No audio.
 //
+// Feature 093 (A12-P05) T-A12-504 (FR-A12-502, FR-A12-505; SC-A12-501, SC-A12-502; clarifications Q1–Q3; research
+// D2–D3): the tier a frame is drawn at is chosen by `TierPolicy` before anything is drawn: the host's tier, the
+// lightest tier while Low Power Mode is on (injected `lowPowerMode`, default
+// `ProcessInfo.processInfo.isLowPowerModeEnabled`), and the lightest tier from a memory warning (`shedCaches()`, which
+// the host calls on a warning) until 30 s of frame time after the last one. The frame clock (``pressureClock``) is the
+// sum of the frame times since the presenter was made; it does not restart in `setup`. A change of tier rebuilds the
+// terrain renderer alone, once; repeated warnings at the lightest tier rebuild nothing. The tier is presentation only:
+// the state, the world document and the digest never see it.
+//
 // Feature 090 (A12-P02) T-A12-205 (FR-A12-211–213, FR-A12-220–222; SC-A12-201, SC-A12-205; clarifications 3–5;
 // research D3–D5; plan "Lifecycle"):
 //   - Colour and detail: the terrain part is drawn from the terrain mesh at the detail level of the host's quality tier
@@ -174,6 +183,8 @@ final class WorldsPresenter: ExperiencePresenter {
 
     /// The detail level the terrain renderer (`renderers[0]`) was made for; nil without renderers.
     private(set) var terrainLevel: Int?
+    /// The vertex count of the terrain mesh the terrain renderer was made from; nil without renderers (feature 093).
+    private(set) var terrainVertices: Int?
     /// Whether the terrain renderer carries a colour stream (false only when the palette is missing).
     private(set) var terrainColored = false
     /// How many times the terrain renderer was (re)built, with the others or alone after a change of tier.
@@ -218,6 +229,16 @@ final class WorldsPresenter: ExperiencePresenter {
     private(set) var lastPropsDrawn = 0
     /// The light the renderers drew the last frame with; nil before the first frame.
     private(set) var lastLight: WorldLight?
+    /// Whether Low Power Mode is on, read every frame (feature 093).
+    private let lowPowerMode: @MainActor () -> Bool
+    /// The rules that choose the drawn tier (feature 093).
+    private(set) var tierPolicy = TierPolicy()
+    /// The frame clock of the tier policy: the sum of the frame times since the presenter was made, in seconds.
+    private(set) var pressureClock = 0.0
+    /// The tier the last frame was drawn at (after the policy); nil before the first frame.
+    private(set) var lastTier: Int?
+    /// The host tier the last frame was given; nil before the first frame.
+    private(set) var lastHostTier: Int?
     /// The ground point of the last tap that met the ground, where Place puts a prop; nil before.
     private(set) var lastGround: Vec3?
     /// The saved worlds.
@@ -233,10 +254,13 @@ final class WorldsPresenter: ExperiencePresenter {
     ///   - voiceOverRunning: Whether VoiceOver runs (nil: `UIAccessibility.isVoiceOverRunning`).
     ///   - announcementSink: Where spoken texts go (nil: the system's VoiceOver announcements).
     ///   - store: The saved worlds (in memory by default).
+    ///   - lowPowerMode: Whether Low Power Mode is on (nil: `ProcessInfo.processInfo.isLowPowerModeEnabled`).
     init(experienceID: ExperienceID, reduceMotion: Bool = false,
          systemReduceMotion: (@MainActor () -> Bool)? = nil, voiceOverRunning: (@MainActor () -> Bool)? = nil,
-         announcementSink: (any AnnouncementSink)? = nil, store: WorldStore = WorldStore(storage: nil)) {
+         announcementSink: (any AnnouncementSink)? = nil, store: WorldStore = WorldStore(storage: nil),
+         lowPowerMode: (@MainActor () -> Bool)? = nil) {
         self.experienceID = experienceID
+        self.lowPowerMode = lowPowerMode ?? { ProcessInfo.processInfo.isLowPowerModeEnabled }
         self.store = store
         self.reduceMotion = reduceMotion
         self.systemReduceMotion = systemReduceMotion ?? { UIAccessibility.isReduceMotionEnabled }
@@ -266,6 +290,7 @@ final class WorldsPresenter: ExperiencePresenter {
     /// recreated, remakes the terrain renderer alone when the tier's detail level changed, then draws every part lit,
     /// with depth, through the orbit camera of the eased view; then speaks a changed view when allowed.
     func draw(_ core: WorldsCore, tier: Int, context: RenderContext, frame: FrameInfo) throws {
+        let drawnTier = applyPressure(hostTier: tier, delta: frame.delta)
         sync(core)
         lastCore = core
         lastCanvas = Vec2(Double(max(1, context.pixelWidth)), Double(max(1, context.pixelHeight)))
@@ -277,7 +302,7 @@ final class WorldsPresenter: ExperiencePresenter {
             terrainLevels = [:]
             groundField = nil
         }
-        let level = Self.level(forTier: tier)
+        let level = Self.level(forTier: drawnTier)
         if renderersKey != key || renderers.count != parts.count {
             try rebuildRenderers(context, key: key, core: core, level: level)
         } else if terrainLevel != level, hasTerrain {
@@ -323,8 +348,22 @@ final class WorldsPresenter: ExperiencePresenter {
         resetMotionAndWords()
     }
 
-    /// Drops the CPU parts, the detail levels and the ground field; the next draw makes them again from the core.
+    /// Advances the frame clock by `delta` (finite, non-negative) and chooses the tier of this frame from the host's
+    /// `hostTier`, Low Power Mode read now and the memory hold (`TierPolicy`). Presentation only.
+    @discardableResult
+    func applyPressure(hostTier: Int, delta: Double) -> Int {
+        if delta.isFinite, delta > 0 { pressureClock += delta }
+        let chosen = tierPolicy.tier(host: hostTier, lowPower: lowPowerMode(), now: pressureClock)
+        lastHostTier = hostTier
+        lastTier = chosen
+        return chosen
+    }
+
+    /// Records a memory warning at the current frame clock (the next frame draws the lightest tier for 30 s of frame
+    /// time), then drops the CPU parts, the detail levels and the ground field; the next draw makes them again from
+    /// the core.
     func shedCaches() {
+        tierPolicy.recordMemoryWarning(at: pressureClock)
         parts = []
         partsKey = nil
         terrainLevels = [:]
@@ -377,6 +416,7 @@ final class WorldsPresenter: ExperiencePresenter {
                     let terrain = try terrain(core, level: level)
                     made.append(try makeRenderer(terrain.mesh, colors: terrain.colors, context))
                     colored = terrain.colors != nil
+                    terrainVertices = terrain.mesh.positions.count
                 } else {
                     made.append(try makeRenderer(part.mesh, colors: nil, context))
                 }
@@ -400,6 +440,7 @@ final class WorldsPresenter: ExperiencePresenter {
         renderers[0].release()
         renderers[0] = renderer
         terrainLevel = level
+        terrainVertices = terrain.mesh.positions.count
         terrainColored = terrain.colors != nil
         terrainBuildCount += 1
     }
@@ -426,6 +467,7 @@ final class WorldsPresenter: ExperiencePresenter {
         renderers = []
         renderersKey = nil
         terrainLevel = nil
+        terrainVertices = nil
     }
 
     // MARK: Motion, words and gestures

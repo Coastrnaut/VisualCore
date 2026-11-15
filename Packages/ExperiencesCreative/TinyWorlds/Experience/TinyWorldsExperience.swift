@@ -29,15 +29,18 @@ public enum TinyWorldsExperience {
 
     /// The experience with its presenter exposed (tests): `systemReduceMotion`, `voiceOverRunning` and
     /// `announcementSink` replace the system's answers when given; `store` keeps the saved worlds (in memory when
-    /// nil). The presenter is handed the shell, through which an opened slot is restored.
+    /// nil); `lowPowerMode` tells whether Low Power Mode is on (nil: the system's state; feature 093). The presenter is
+    /// handed the shell, through which an opened slot is restored.
     @MainActor
     static func make(id: ExperienceID, reduceMotion: Bool = false, systemReduceMotion: (@MainActor () -> Bool)? = nil,
                      voiceOverRunning: (@MainActor () -> Bool)? = nil,
                      announcementSink: (any AnnouncementSink)? = nil,
-                     store: WorldStore? = nil) -> ExperienceShell<WorldsPresenter> {
+                     store: WorldStore? = nil,
+                     lowPowerMode: (@MainActor () -> Bool)? = nil) -> ExperienceShell<WorldsPresenter> {
         let presenter = WorldsPresenter(experienceID: id, reduceMotion: reduceMotion,
                                         systemReduceMotion: systemReduceMotion, voiceOverRunning: voiceOverRunning,
-                                        announcementSink: announcementSink, store: store ?? WorldStore(storage: nil))
+                                        announcementSink: announcementSink, store: store ?? WorldStore(storage: nil),
+                                        lowPowerMode: lowPowerMode)
         let shell = ExperienceShell(id: id, presenter: presenter)
         presenter.shell = shell
         return shell
