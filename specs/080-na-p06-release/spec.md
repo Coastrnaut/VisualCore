@@ -22,6 +22,39 @@ Canonical overrides:
 - **Owner rulings:** short tests; audits in the device campaign; iOS 27 at phase gates; reference regression and iOS 26
   at X-A10; interface tests under 60 s each, serial chunk.
 
+## Clarifications
+
+### Session 2026-11-15
+
+Answered autonomously under the owner's standing delegation, recommended option each time, as for A09-P06. Facts
+checked in code: `scripts/check_experience_release.py` reads `docs/apps/<slug>/release.json` (schema 1: `experience`,
+`requiredDocs`, `checklist`, `copyCheck` with `text`, `swift`, `allow`) and accepts the statuses `verified`,
+`pending-campaign-ii` and `owner-action`; `scripts/release_check.py` derives `experience-release-<code>` and
+`copy-claims-<code>` from that file; `Configs/copy-claims-denylist.json` is shared; `ArcadePresenter` has the
+test-only `failNextDraw`; the high-score table lives in `high-scores.json` (`HighScoreStore`); Neon Arcade's sources
+import no audio framework directly (sounds go through VisualCore's `SoundEffectPlayer`, ambient, no input); the
+registration declares no permission; `specs/079-na-p05-balance/scan-claims.sh` already refuses benefit words in the
+catalog entry and the README.
+
+- Q: Which statuses does the release checklist use? → A: The checker's: `verified` (with evidence),
+  `pending-campaign-ii` (device rows, naming the device-campaign row) and `owner-action` (with the owner steps).
+- Q: How are skill and ranking claims refused without changing the shared denylist? → A: A Neon Arcade scan over the
+  store text and the experience's interface Swift refuses skill, reflex, reaction time, cognitive, brain, health,
+  therapy, improve your, train your, leaderboard, rank among, compete with and world record (case-insensitive, whole
+  words), alongside the shared copy check; the shared denylist is not changed.
+- Q: What does the source scan refuse? → A: In `Packages/ExperiencesCreative/NeonArcade`: `URLSession`,
+  `import Network`, `CLLocation`, `AVCapture`, `AVAudioRecorder`, `inputNode`, `installTap`, `MicrophoneAudioSource`,
+  `CMMotion`, `CNContact`, `ASIdentifierManager`, `AppTrackingTransparency`, `UIScreen.main.brightness` and
+  `isIdleTimerDisabled`.
+- Q: Which sample high-score files are committed? → A: Four files under the experience tests' `Fixtures`: a valid
+  table (board version 1, three entries), a newer one (board version 2), a damaged one (not JSON) and a truncated one
+  (the valid table cut in half); each is copied into a temporary storage as `high-scores.json`: the valid one is shown,
+  the others are reported, and all stay byte-identical until a finished run writes a valid table (and after a reload).
+- Q: Which interface journeys run, and how? → A: The serial chunk `r2` gains `NASettingsUITests` (sound and haptics
+  toggles change their values; the sensitivity stepper's value changes) beside `NAArcadeUITests` (start and steer, pause
+  and resume, sensitivity, best score on the title); launched as a candidate with `-vcCandidates` and
+  `-openExperience a10.neon-arcade`; each test under 60 s.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Nothing leaves the device (Priority: P1) 🎯
