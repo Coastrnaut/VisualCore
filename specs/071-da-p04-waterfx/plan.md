@@ -53,7 +53,6 @@ Packages/ExperiencesCreative/DigitalAquarium/ExperienceTests/{AquariumRenderTest
   AquariumManifestTests}.swift                                                                                 modify
 Packages/ExperiencesCreative/DigitalAquarium/ExperienceTests/AquariumAnnouncementTests.swift                  new
 Packages/ExperiencesCreative/DigitalAquarium/scenario-manifest.json                                           regenerate
-docs/apps/digital-aquarium/content-licenses.md (if vents change the generated text)                           regenerate
 docs/apps/digital-aquarium/visualcore-contract.{json,md} (G-WATERFX, G-HABITATA11Y closed)                   modify
 ```
 
