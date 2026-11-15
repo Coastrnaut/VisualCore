@@ -150,6 +150,9 @@ module will own each missing piece and in which phase.
   true-relative and visibility-enhanced modes, labelled approximate model and epoch), not solved here.
 - **Long timescales and date overflow:** the audit records the existing time pieces; the bounded date range's owner is
   named.
+- **Timestamps, time zones and model scope** (the manual's algorithm decision 4): recorded as a rule (the simulated
+  date is shown with its time zone, UTC by default, and the clock rate never implies precision beyond the model's
+  validity range); its owner is named.
 - **Data without a source:** the audit records that every bundled number needs source, epoch, units and license; the
   check's owner is named.
 - **The build-step count changes during the phase**: the inventory records the count at the time of the check.
