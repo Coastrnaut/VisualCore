@@ -1,0 +1,48 @@
+# Tasks: Tiny Worlds — Phase 02 Camera and scene renderer
+
+**Input**: [spec.md](spec.md), [plan.md](plan.md), [research.md](research.md), [data-model.md](data-model.md),
+[contracts/api.md](contracts/api.md), [quickstart.md](quickstart.md). Gate A12-P02 (legacy). Evidence:
+`python3 Tools/python/desktop_runbook.py run-check --stage A12-P02 --timeout 600 --name <check> -- <command>`. Commit
+after every task (no trailers); read every check's exit before ticking. iOS 27 only; reference regression and iOS 26 at
+X-A12 (owner, 2026-11-14). Precedent: `specs/089-tw-p01-terrain/tasks.md`.
+
+## Phase 1: Setup
+
+- [ ] T-A12-201 Baseline: cite the last evidence on an unchanged `Packages` tree (`.autonomy/checks/A12-P01.{worlds-ios27,app-unit,verify-27}.json`) instead of a rerun (owner ruling of 2026-11-14)
+
+## Phase 2: Foundational — generic additions (stories 2–3) and the world rules (stories 1–4)
+
+- [ ] T-A12-202 [P] [US3] Write `Packages/VisualCore/Tests/VisualCoreMathTests/RayIntersectionTests.swift` first, then `Packages/VisualCore/Sources/VisualCoreMath/RayIntersection.swift` per contracts/api.md and research D2 (`Ray3` with `init?` refusing non-finite values and a zero direction and normalising; `RayHit3`; box slab method, sphere quadratic, two-sided Möller–Trumbore triangle; inside starts at distance 0 with normal −direction; tangent hits once; parallel, degenerate or invalid shapes nil; tolerance 1e-12; `nearest`). Tests: analytic distances and normals within 1e-9 for axis-aligned and diagonal rays against unit and offset boxes, spheres and triangles; grazing box edge and sphere tangent; inside starts; parallel triangle; degenerate triangle; misses; nearest of several; a ray through `OrbitCamera.ray` at the screen centre hits a box at the target (FR-A12-202; SC-A12-202)
+- [ ] T-A12-203 [P] [US2] Extend `Packages/VisualCoreRendering/Sources/VisualCoreRendering/MeshRenderer.swift` with `init(mesh:colors:registry:)` per research D1 (attribute `a_color` at location 2 in its own buffer; disabled with constant (1, 1, 1, 1) when nil; multiplies `u_color` before lighting; refusal `MeshError.invalidInput` for a wrong count, non-finite or outside 0…1; rebuilt after a context recreation; `///` docs) and write `Packages/VisualCoreRendering/Tests/VisualCoreRenderingTests/MeshRendererColorTests.swift` (a two-colour plane under the same light shows each colour within ±8 of 255 per channel; a mesh drawn with `colors: nil` is pixel-identical to the plain initializer; wrong count, NaN and 1.5 refused; colours survive a context recreation; drawn through `DepthMeshPass` too); existing `MeshRendererTests` and `DepthMeshPassTests` must pass unchanged (FR-A12-201; SC-A12-204)
+- [ ] T-A12-204 [P] [US1] Create `Packages/ExperiencesCreative/TinyWorlds/Core/{TerrainColoring,TerrainDetail,CameraPolicy,GroundPick}.swift` with tests `Packages/ExperiencesCreative/TinyWorlds/CoreTests/{TerrainColoringTests,TerrainDetailTests,CameraPolicyTests,GroundPickTests}.swift` per research D3–D5: `TerrainColoring.colors` ("below sea level 0 the low-land colour darkened by 25 %; 0.1…1.2 m blend low→high; asteroid edge below −0.5 m to the void colour"); `TerrainDetail` levels 0…2 ("cells = recipe ÷ 1, 2, 4") with `field(preset:seed:level:)` and `mesh(...)`; `CameraPolicy` ("pitch 10°…75°, distance 10…30 m, target (0, 0.3, 0), clearance 0.5 m over 9 samples within 1 m; raise pitch in 1° steps to 75°") with `clamp(_:preset:seed:)`; `GroundPick.hit(ray:field:)` (world box, half-cell march, 40 bisections). Tests: colour bands and determinism; 27 detail meshes validate with every index below the vertex count (3 presets × seeds 1–3 × 3 levels); level-0 digests equal the P01 fixtures; sweep of 24 yaw × 8 pitch × 4 distance views per preset stays in limits and keeps the clearance; ground pick within 1 mm of the sampled height and nil for sky rays (FR-A12-210, 220–222; SC-A12-201, 203)
+
+## Phase 3: User Story 1 — look around comfortably (P1) 🎯
+
+- [ ] T-A12-205 [US1] Experience: `Packages/ExperiencesCreative/TinyWorlds/Experience/Adapter/WorldsCore.swift` (apply `CameraPolicy.clamp` after every view action and on restore; `qualityTiers` 3), new `Packages/ExperiencesCreative/TinyWorlds/Experience/WorldsGestures.swift` (drag 0.3°/pt → `view.orbit`, pinch → `view.zoom` with the factor clamped 0.5…2, tap → ground pick), `WorldsPresenter.swift` (terrain renderer built with the colour stream at the host's quality level; 0.35 s smoothstep easing of the drawn view, direct under Reduce Motion including mid-ease; spoken view announcement at most once per second; tap result spoken), `WorldsControls.swift` unchanged unless a gesture lacks a control; tests in `Packages/ExperiencesCreative/TinyWorlds/ExperienceTests/{WorldsGestureTests.swift (new),WorldsRenderTests.swift,WorldsCoreTests.swift}` (gesture mapping; `GestureAlternatives.missing` empty; easing reaches the target in 0.35 s and is direct under Reduce Motion; announcement rate limit; coloured low and high regions differ in the frame; level change rebuilds only the terrain renderer and keeps the digest; restored views are policy-valid) (FR-A12-210–213, 220–222; SC-A12-201, 205)
+
+## Phase 4: Records
+
+- [ ] T-A12-206 Registration and manifest: `Catalog/registrations.json` a12 `quality_tiers` ["level-0", "level-1", "level-2"] and capabilities (coloured terrain, drag and pinch, ground pick, three detail levels); `python3 scripts/build_catalog.py`; regenerate `Packages/ExperiencesCreative/TinyWorlds/scenario-manifest.json` (`UPDATE_SCENARIO_MANIFEST=1 TEST_RUNNER_UPDATE_SCENARIO_MANIFEST=1`) if the declared tiers change it
+- [ ] T-A12-207 VisualCore records: `Packages/VisualCore/README.md` (ray intersection and colour stream), API baseline (`python3 scripts/check_public_api.py --update`), contract `docs/apps/tiny-worlds/visualcore-contract.json` (G-MATERIALS, G-PICKING, G-CAMERA closed by "A12-P02"; rows M04/M05, M07, M11, M13 updated) (FR-A12-203)
+
+## Phase 5: Polish & evidence
+
+- [ ] T-A12-208 VisualCore host tests (`--name visualcore-host -- swift test --package-path Packages/VisualCore --filter RayIntersectionTests`) and public API (`--name public-api -- python3 scripts/check_public_api.py`) (SC-A12-202)
+- [ ] T-A12-209 Rendering package on sim-27.2 (`--name rendering-ios27 -- python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --only-testing VisualCoreRenderingTests/MeshRendererTests VisualCoreRenderingTests/DepthMeshPassTests VisualCoreRenderingTests/MeshRendererColorTests`) (SC-A12-204)
+- [ ] T-A12-210 Tiny Worlds tests on sim-27.2 (`--name worlds-ios27 -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test --only-testing TinyWorldsCoreTests TinyWorldsExperienceTests`; each test < 10 s) (SC-A12-201–205)
+- [ ] T-A12-211 App build and unit (`--name app-unit -- python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27`) and runner iOS 27 (`--name verify-27 -- python3 scripts/verify_experiences.py --only a12.tiny-worlds --runtime 27`) (SC-A12-205)
+- [ ] T-A12-212 Experience package check, contract and script tests (`--name experience-packages -- python3 scripts/check_experience_packages.py`; `--name contract -- python3 scripts/check_app_contract.py --app tiny-worlds --render`; `--name script-tests -- python3 scripts/test_scripts.py`)
+- [ ] T-A12-213 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record A12-P02; update README.md (status, gate count) in the record commit (rule 16)
+
+## Dependencies
+
+T-A12-201 → (202 ∥ 203 ∥ 204) → 205 (needs 202–204) → 206 → 207 → Polish.
+
+## Parallel examples
+
+Agent A: T-A12-202. Agent B: T-A12-203. Agent C: T-A12-204. Agent D: T-A12-205 after A–C. Lead: 206, 207, runs, commits.
+
+## Implementation strategy
+
+MVP: the camera policy and gestures (US1) over the generic ray and colour additions; then colour, pick and levels;
+evidence last.
